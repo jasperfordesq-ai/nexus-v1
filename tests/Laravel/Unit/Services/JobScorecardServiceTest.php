@@ -13,6 +13,10 @@ use App\Models\JobScorecard;
 use Illuminate\Support\Facades\Log;
 use Mockery;
 
+/**
+ * @runInSeparateProcess
+ * @preserveGlobalState disabled
+ */
 class JobScorecardServiceTest extends TestCase
 {
     // ── upsert ──────────────────────────────────────────────────

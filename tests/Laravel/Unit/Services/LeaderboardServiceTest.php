@@ -62,6 +62,7 @@ class LeaderboardServiceTest extends TestCase
 
     public function test_getUserRank_returns_rank_data(): void
     {
+        DB::shouldReceive('raw')->andReturnUsing(fn ($v) => new \Illuminate\Database\Query\Expression($v));
         DB::shouldReceive('table')->with('users')->andReturnSelf();
         DB::shouldReceive('where')->andReturnSelf();
         DB::shouldReceive('select')->andReturnSelf();
@@ -69,8 +70,6 @@ class LeaderboardServiceTest extends TestCase
             'user_id' => 1, 'name' => 'Alice', 'first_name' => 'Alice',
             'last_name' => 'Smith', 'avatar_url' => null, 'score' => 100,
         ]);
-        DB::shouldReceive('table')->with('users')->andReturnSelf();
-        DB::shouldReceive('where')->andReturnSelf();
         DB::shouldReceive('count')->andReturn(3);
 
         $result = $this->service->getUserRank(2, 1);

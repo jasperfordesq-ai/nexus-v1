@@ -27,8 +27,9 @@ class AuthTest extends TestCase
      */
     public function test_login_returns_token_with_valid_credentials(): void
     {
+        $email = 'test_' . uniqid() . '@example.com';
         $user = User::factory()->forTenant($this->testTenantId)->create([
-            'email' => 'test@example.com',
+            'email' => $email,
             'password_hash' => Hash::make('secret123'),
             'status' => 'active',
             'is_approved' => true,
@@ -36,7 +37,7 @@ class AuthTest extends TestCase
         ]);
 
         $response = $this->apiPost('/auth/login', [
-            'email' => 'test@example.com',
+            'email' => $email,
             'password' => 'secret123',
         ]);
 
@@ -52,13 +53,14 @@ class AuthTest extends TestCase
      */
     public function test_login_rejects_invalid_credentials(): void
     {
+        $email = 'test_' . uniqid() . '@example.com';
         $user = User::factory()->forTenant($this->testTenantId)->create([
-            'email' => 'test@example.com',
+            'email' => $email,
             'password_hash' => Hash::make('secret123'),
         ]);
 
         $response = $this->apiPost('/auth/login', [
-            'email' => 'test@example.com',
+            'email' => $email,
             'password' => 'wrong-password',
         ]);
 
@@ -117,9 +119,10 @@ class AuthTest extends TestCase
      */
     public function test_login_is_tenant_scoped(): void
     {
+        $email = 'other_tenant_' . uniqid() . '@example.com';
         // Create a user on a DIFFERENT tenant
         User::factory()->forTenant(999)->create([
-            'email' => 'other-tenant@example.com',
+            'email' => $email,
             'password_hash' => Hash::make('secret123'),
             'status' => 'active',
             'email_verified_at' => now(),
@@ -127,7 +130,7 @@ class AuthTest extends TestCase
 
         // Attempt login against the default test tenant (2)
         $response = $this->apiPost('/auth/login', [
-            'email' => 'other-tenant@example.com',
+            'email' => $email,
             'password' => 'secret123',
         ]);
 

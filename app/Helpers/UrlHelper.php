@@ -76,6 +76,9 @@ class UrlHelper
             if ($host === null || !self::isAllowedHost($host)) {
                 return self::ensureRelative($fallback);
             }
+
+            // Absolute URL with allowed host — pass through
+            return $url;
         }
 
         // Prevent protocol-relative URLs (//evil.com)

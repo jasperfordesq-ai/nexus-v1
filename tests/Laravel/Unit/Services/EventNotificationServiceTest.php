@@ -11,14 +11,21 @@ use App\Services\EventNotificationService;
 use App\Models\Notification;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Mockery;
 
+/**
+ * @runInSeparateProcess
+ * @preserveGlobalState disabled
+ */
 class EventNotificationServiceTest extends TestCase
 {
     private EventNotificationService $service;
+    private $notificationAlias;
 
     protected function setUp(): void
     {
         parent::setUp();
+        $this->notificationAlias = Mockery::mock('alias:' . Notification::class);
         $this->service = new EventNotificationService();
     }
 
@@ -51,7 +58,7 @@ class EventNotificationServiceTest extends TestCase
         DB::shouldReceive('table->where->where->whereIn->distinct->pluck->map->all')
             ->andReturn([10, 20, 30]); // 10 is organizer
 
-        Notification::shouldReceive('create')->twice(); // 20 and 30 only
+        $this->notificationAlias->shouldReceive('create')->twice(); // 20 and 30 only
 
         $result = $this->service->notifyAttendees(2, 1, 'Event updated');
         $this->assertEquals(2, $result);
@@ -88,7 +95,7 @@ class EventNotificationServiceTest extends TestCase
         DB::shouldReceive('table->where->where->where->distinct->pluck->map->all')
             ->andReturn([30]); // Waitlisted
 
-        Notification::shouldReceive('create')->times(3);
+        $this->notificationAlias->shouldReceive('create')->times(3);
 
         $result = $this->service->notifyCancellation(2, 1, 'Weather issues');
         $this->assertEquals(3, $result);
@@ -103,7 +110,7 @@ class EventNotificationServiceTest extends TestCase
         DB::shouldReceive('table->where->where->where->distinct->pluck->map->all')
             ->andReturn([]);
 
-        Notification::shouldReceive('create')
+        $this->notificationAlias->shouldReceive('create')
             ->withArgs(function ($args) {
                 return str_contains($args['message'], 'Reason: Weather');
             })
@@ -118,7 +125,7 @@ class EventNotificationServiceTest extends TestCase
 
     public function test_notifyRsvp_ignores_non_going_or_interested_status(): void
     {
-        Notification::shouldReceive('create')->never();
+        $this->notificationAlias->shouldReceive('create')->never();
 
         $this->service->notifyRsvp(1, 5, 'declined');
     }
@@ -128,7 +135,7 @@ class EventNotificationServiceTest extends TestCase
         $event = (object) ['id' => 1, 'title' => 'Test', 'user_id' => 5];
         DB::shouldReceive('table->where->where->select->first')->andReturn($event);
 
-        Notification::shouldReceive('create')->never();
+        $this->notificationAlias->shouldReceive('create')->never();
 
         $this->service->notifyRsvp(1, 5, 'going'); // user 5 is the organizer
     }
@@ -151,7 +158,7 @@ class EventNotificationServiceTest extends TestCase
         DB::shouldReceive('table->where->where->whereIn->distinct->pluck->map->all')
             ->andReturn([20, 30]);
 
-        Notification::shouldReceive('create')->twice();
+        $this->notificationAlias->shouldReceive('create')->twice();
 
         $this->service->notifyEventUpdated(1, ['start_time' => '2026-04-01 14:00']);
     }

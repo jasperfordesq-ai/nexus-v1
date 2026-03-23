@@ -18,6 +18,8 @@ class MemberReportServiceTest extends TestCase
     {
         parent::setUp();
         $this->service = new MemberReportService();
+        // Service methods use DB::raw() for aggregate SQL expressions
+        DB::shouldReceive('raw')->andReturnUsing(fn ($v) => new \Illuminate\Database\Query\Expression($v));
     }
 
     public function test_getActiveMembers_returns_structure(): void

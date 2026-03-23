@@ -69,6 +69,19 @@ abstract class TestCase extends BaseTestCase
                 'updated_at' => now(),
             ]);
 
+            // Seed a secondary tenant used by tenant-isolation tests (forTenant(999))
+            DB::table('tenants')->insertOrIgnore([
+                'id' => 999,
+                'name' => 'Other Test Tenant',
+                'slug' => 'test-999',
+                'domain' => null,
+                'is_active' => true,
+                'depth' => 0,
+                'allows_subtenants' => false,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+
             TenantContext::setById($this->testTenantId);
         } catch (\Exception $e) {
             // DB not available — unit tests that don't need DB can still proceed.

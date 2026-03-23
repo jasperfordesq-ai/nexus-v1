@@ -13,8 +13,20 @@ use Illuminate\Support\Facades\Log;
 use Mockery;
 use Tests\Laravel\TestCase;
 
+/**
+ * @runInSeparateProcess
+ * @preserveGlobalState disabled
+ */
 class JobModerationServiceTest extends TestCase
 {
+    private $jobVacancyAlias;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+        $this->jobVacancyAlias = Mockery::mock('alias:' . JobVacancy::class);
+    }
+
     // ── isModerationEnabled ──────────────────────────────────────
 
     public function test_isModerationEnabled_returns_false_when_setting_not_set(): void
@@ -103,7 +115,7 @@ class JobModerationServiceTest extends TestCase
         $queryMock->shouldReceive('limit')->with(50)->andReturnSelf();
         $queryMock->shouldReceive('get')->andReturn(collect([]));
 
-        JobVacancy::shouldReceive('where')->with('tenant_id', 2)->andReturn($queryMock);
+        $this->jobVacancyAlias->shouldReceive('where')->with('tenant_id', 2)->andReturn($queryMock);
 
         $result = JobModerationService::getPendingJobs(2);
 
@@ -125,7 +137,7 @@ class JobModerationServiceTest extends TestCase
         $queryMock->shouldReceive('limit')->with(25)->andReturnSelf();
         $queryMock->shouldReceive('get')->andReturn(collect([]));
 
-        JobVacancy::shouldReceive('where')->with('tenant_id', 2)->andReturn($queryMock);
+        $this->jobVacancyAlias->shouldReceive('where')->with('tenant_id', 2)->andReturn($queryMock);
 
         $result = JobModerationService::getPendingJobs(2, 25, 10);
 
@@ -165,7 +177,7 @@ class JobModerationServiceTest extends TestCase
         $queryMock->shouldReceive('limit')->andReturnSelf();
         $queryMock->shouldReceive('get')->andReturn(collect([$job]));
 
-        JobVacancy::shouldReceive('where')->with('tenant_id', 2)->andReturn($queryMock);
+        $this->jobVacancyAlias->shouldReceive('where')->with('tenant_id', 2)->andReturn($queryMock);
 
         $result = JobModerationService::getPendingJobs(2);
 
@@ -182,7 +194,7 @@ class JobModerationServiceTest extends TestCase
 
     public function test_approveJob_returns_true_on_success(): void
     {
-        $jobMock = Mockery::mock(JobVacancy::class)->makePartial();
+        $jobMock = Mockery::mock();
         $jobMock->shouldReceive('update')->once()->with(Mockery::on(function ($data) {
             return $data['moderation_status'] === 'approved'
                 && $data['status'] === 'open'
@@ -194,7 +206,7 @@ class JobModerationServiceTest extends TestCase
         $queryMock->shouldReceive('where')->with('tenant_id', $this->testTenantId)->andReturnSelf();
         $queryMock->shouldReceive('first')->andReturn($jobMock);
 
-        JobVacancy::shouldReceive('where')->with('id', 42)->andReturn($queryMock);
+        $this->jobVacancyAlias->shouldReceive('where')->with('id', 42)->andReturn($queryMock);
         Log::shouldReceive('info')->once();
 
         $result = JobModerationService::approveJob(42, 5);
@@ -204,7 +216,7 @@ class JobModerationServiceTest extends TestCase
 
     public function test_approveJob_stores_notes(): void
     {
-        $jobMock = Mockery::mock(JobVacancy::class)->makePartial();
+        $jobMock = Mockery::mock();
         $jobMock->shouldReceive('update')->once()->with(Mockery::on(function ($data) {
             return $data['moderation_notes'] === 'Looks good to me';
         }))->andReturn(true);
@@ -213,7 +225,7 @@ class JobModerationServiceTest extends TestCase
         $queryMock->shouldReceive('where')->with('tenant_id', $this->testTenantId)->andReturnSelf();
         $queryMock->shouldReceive('first')->andReturn($jobMock);
 
-        JobVacancy::shouldReceive('where')->with('id', 42)->andReturn($queryMock);
+        $this->jobVacancyAlias->shouldReceive('where')->with('id', 42)->andReturn($queryMock);
         Log::shouldReceive('info')->once();
 
         $result = JobModerationService::approveJob(42, 5, 'Looks good to me');
@@ -227,7 +239,7 @@ class JobModerationServiceTest extends TestCase
         $queryMock->shouldReceive('where')->with('tenant_id', $this->testTenantId)->andReturnSelf();
         $queryMock->shouldReceive('first')->andReturn(null);
 
-        JobVacancy::shouldReceive('where')->with('id', 999)->andReturn($queryMock);
+        $this->jobVacancyAlias->shouldReceive('where')->with('id', 999)->andReturn($queryMock);
 
         $result = JobModerationService::approveJob(999, 5);
 
@@ -236,14 +248,14 @@ class JobModerationServiceTest extends TestCase
 
     public function test_approveJob_returns_false_on_exception(): void
     {
-        $jobMock = Mockery::mock(JobVacancy::class)->makePartial();
+        $jobMock = Mockery::mock();
         $jobMock->shouldReceive('update')->andThrow(new \RuntimeException('DB error'));
 
         $queryMock = Mockery::mock();
         $queryMock->shouldReceive('where')->with('tenant_id', $this->testTenantId)->andReturnSelf();
         $queryMock->shouldReceive('first')->andReturn($jobMock);
 
-        JobVacancy::shouldReceive('where')->with('id', 42)->andReturn($queryMock);
+        $this->jobVacancyAlias->shouldReceive('where')->with('id', 42)->andReturn($queryMock);
         Log::shouldReceive('error')->once();
 
         $result = JobModerationService::approveJob(42, 5);
@@ -255,7 +267,7 @@ class JobModerationServiceTest extends TestCase
 
     public function test_rejectJob_returns_true_on_success(): void
     {
-        $jobMock = Mockery::mock(JobVacancy::class)->makePartial();
+        $jobMock = Mockery::mock();
         $jobMock->shouldReceive('update')->once()->with(Mockery::on(function ($data) {
             return $data['moderation_status'] === 'rejected'
                 && $data['status'] === 'closed'
@@ -268,7 +280,7 @@ class JobModerationServiceTest extends TestCase
         $queryMock->shouldReceive('where')->with('tenant_id', $this->testTenantId)->andReturnSelf();
         $queryMock->shouldReceive('first')->andReturn($jobMock);
 
-        JobVacancy::shouldReceive('where')->with('id', 42)->andReturn($queryMock);
+        $this->jobVacancyAlias->shouldReceive('where')->with('id', 42)->andReturn($queryMock);
         Log::shouldReceive('info')->once();
 
         $result = JobModerationService::rejectJob(42, 5, 'Violates policy');
@@ -282,7 +294,7 @@ class JobModerationServiceTest extends TestCase
         $queryMock->shouldReceive('where')->with('tenant_id', $this->testTenantId)->andReturnSelf();
         $queryMock->shouldReceive('first')->andReturn(null);
 
-        JobVacancy::shouldReceive('where')->with('id', 999)->andReturn($queryMock);
+        $this->jobVacancyAlias->shouldReceive('where')->with('id', 999)->andReturn($queryMock);
 
         $result = JobModerationService::rejectJob(999, 5, 'spam');
 
@@ -291,14 +303,14 @@ class JobModerationServiceTest extends TestCase
 
     public function test_rejectJob_returns_false_on_exception(): void
     {
-        $jobMock = Mockery::mock(JobVacancy::class)->makePartial();
+        $jobMock = Mockery::mock();
         $jobMock->shouldReceive('update')->andThrow(new \RuntimeException('DB error'));
 
         $queryMock = Mockery::mock();
         $queryMock->shouldReceive('where')->with('tenant_id', $this->testTenantId)->andReturnSelf();
         $queryMock->shouldReceive('first')->andReturn($jobMock);
 
-        JobVacancy::shouldReceive('where')->with('id', 42)->andReturn($queryMock);
+        $this->jobVacancyAlias->shouldReceive('where')->with('id', 42)->andReturn($queryMock);
         Log::shouldReceive('error')->once();
 
         $result = JobModerationService::rejectJob(42, 5, 'Violates policy');
@@ -310,7 +322,7 @@ class JobModerationServiceTest extends TestCase
 
     public function test_flagJob_returns_true_on_success(): void
     {
-        $jobMock = Mockery::mock(JobVacancy::class)->makePartial();
+        $jobMock = Mockery::mock();
         $jobMock->shouldReceive('update')->once()->with(Mockery::on(function ($data) {
             return $data['moderation_status'] === 'flagged'
                 && $data['moderation_notes'] === 'Suspicious content'
@@ -323,7 +335,7 @@ class JobModerationServiceTest extends TestCase
         $queryMock->shouldReceive('where')->with('tenant_id', $this->testTenantId)->andReturnSelf();
         $queryMock->shouldReceive('first')->andReturn($jobMock);
 
-        JobVacancy::shouldReceive('where')->with('id', 42)->andReturn($queryMock);
+        $this->jobVacancyAlias->shouldReceive('where')->with('id', 42)->andReturn($queryMock);
         Log::shouldReceive('info')->once();
 
         $result = JobModerationService::flagJob(42, 5, 'Suspicious content');
@@ -337,7 +349,7 @@ class JobModerationServiceTest extends TestCase
         $queryMock->shouldReceive('where')->with('tenant_id', $this->testTenantId)->andReturnSelf();
         $queryMock->shouldReceive('first')->andReturn(null);
 
-        JobVacancy::shouldReceive('where')->with('id', 999)->andReturn($queryMock);
+        $this->jobVacancyAlias->shouldReceive('where')->with('id', 999)->andReturn($queryMock);
 
         $result = JobModerationService::flagJob(999, 5, 'Suspicious');
 
@@ -346,14 +358,14 @@ class JobModerationServiceTest extends TestCase
 
     public function test_flagJob_returns_false_on_exception(): void
     {
-        $jobMock = Mockery::mock(JobVacancy::class)->makePartial();
+        $jobMock = Mockery::mock();
         $jobMock->shouldReceive('update')->andThrow(new \RuntimeException('DB error'));
 
         $queryMock = Mockery::mock();
         $queryMock->shouldReceive('where')->with('tenant_id', $this->testTenantId)->andReturnSelf();
         $queryMock->shouldReceive('first')->andReturn($jobMock);
 
-        JobVacancy::shouldReceive('where')->with('id', 42)->andReturn($queryMock);
+        $this->jobVacancyAlias->shouldReceive('where')->with('id', 42)->andReturn($queryMock);
         Log::shouldReceive('error')->once();
 
         $result = JobModerationService::flagJob(42, 5, 'Suspicious');
@@ -389,7 +401,7 @@ class JobModerationServiceTest extends TestCase
         $totalQuery->shouldReceive('whereNotNull')->with('moderated_at')->andReturnSelf();
         $totalQuery->shouldReceive('count')->andReturn(8);
 
-        JobVacancy::shouldReceive('where')
+        $this->jobVacancyAlias->shouldReceive('where')
             ->with('tenant_id', 2)
             ->andReturn($pendingQuery, $approvedQuery, $rejectedQuery, $flaggedQuery, $totalQuery);
 
@@ -409,7 +421,7 @@ class JobModerationServiceTest extends TestCase
         $queryMock->shouldReceive('whereNotNull')->andReturnSelf();
         $queryMock->shouldReceive('count')->andReturn(0);
 
-        JobVacancy::shouldReceive('where')->with('tenant_id', 2)->andReturn($queryMock);
+        $this->jobVacancyAlias->shouldReceive('where')->with('tenant_id', 2)->andReturn($queryMock);
 
         $result = JobModerationService::getModerationStats(2);
 

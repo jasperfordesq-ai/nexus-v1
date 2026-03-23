@@ -147,7 +147,8 @@ class GamificationController extends BaseApiController
             return $this->success(['error' => 'Invalid leaderboard type']);
         }
 
-        $leaderboard = $this->leaderboardService->getLeaderboard($type, $period, $limit);
+        $tenantId = $this->getTenantId();
+        $leaderboard = $this->leaderboardService->getLeaderboardByType($tenantId, $type, $period, $limit);
 
         foreach ($leaderboard as &$entry) {
             $entry['formatted_score'] = $this->leaderboardService->formatScore($entry['score'], $type);
@@ -168,10 +169,11 @@ class GamificationController extends BaseApiController
 
     public function widget(): JsonResponse
     {
+        $tenantId = $this->getTenantId();
         $summary = [
-            'xp' => $this->leaderboardService->getLeaderboard('xp', 'all_time', 3, false),
-            'vol_hours' => $this->leaderboardService->getLeaderboard('vol_hours', 'all_time', 3, false),
-            'credits_earned' => $this->leaderboardService->getLeaderboard('credits_earned', 'all_time', 3, false),
+            'xp' => $this->leaderboardService->getLeaderboardByType($tenantId, 'xp', 'all_time', 3),
+            'vol_hours' => $this->leaderboardService->getLeaderboardByType($tenantId, 'vol_hours', 'all_time', 3),
+            'credits_earned' => $this->leaderboardService->getLeaderboardByType($tenantId, 'credits_earned', 'all_time', 3),
         ];
 
         foreach ($summary as $type => &$leaders) {

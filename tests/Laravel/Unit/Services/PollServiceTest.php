@@ -12,12 +12,29 @@ use App\Models\Poll;
 use Illuminate\Support\Facades\DB;
 use Mockery;
 
+/**
+ * @runInSeparateProcess
+ * @preserveGlobalState disabled
+ */
 class PollServiceTest extends TestCase
 {
+    private $pollAlias;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+        $this->pollAlias = Mockery::mock('alias:' . Poll::class);
+    }
+
     // ── getById ──
 
     public function test_getById_returns_null_when_not_found(): void
     {
+        $mockQuery = Mockery::mock();
+        $mockQuery->shouldReceive('with')->andReturnSelf();
+        $mockQuery->shouldReceive('find')->with(0)->andReturn(null);
+        $this->pollAlias->shouldReceive('query')->andReturn($mockQuery);
+
         $result = PollService::getById(0);
         $this->assertNull($result);
     }
@@ -45,12 +62,11 @@ class PollServiceTest extends TestCase
 
     public function test_delete_returns_false_for_wrong_owner(): void
     {
-        $poll = Mockery::mock(Poll::class);
-        $poll->user_id = 5;
+        $poll = (object) ['user_id' => 5];
 
         $mockQuery = Mockery::mock();
         $mockQuery->shouldReceive('find')->with(1)->andReturn($poll);
-        Poll::shouldReceive('query')->andReturn($mockQuery);
+        $this->pollAlias->shouldReceive('query')->andReturn($mockQuery);
 
         $result = PollService::delete(1, 99);
         $this->assertFalse($result);
@@ -68,6 +84,13 @@ class PollServiceTest extends TestCase
 
     public function test_getCategories_returns_array(): void
     {
+        $mockQuery = Mockery::mock();
+        $mockQuery->shouldReceive('whereNotNull')->andReturnSelf();
+        $mockQuery->shouldReceive('where')->andReturnSelf();
+        $mockQuery->shouldReceive('distinct')->andReturnSelf();
+        $mockQuery->shouldReceive('pluck')->andReturn(collect(['general', 'tech']));
+        $this->pollAlias->shouldReceive('query')->andReturn($mockQuery);
+
         $result = PollService::getCategories();
         $this->assertIsArray($result);
     }

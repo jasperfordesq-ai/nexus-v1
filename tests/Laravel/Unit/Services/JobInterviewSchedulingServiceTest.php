@@ -297,11 +297,11 @@ class JobInterviewSchedulingServiceTest extends TestCase
 
         $vacancyId = $this->insertTestVacancy(5);
 
-        // 2027-06-15 is Sunday; 09:00-15:00, 60-min slots
+        // 2027-06-15 is Tuesday; 09:00-15:00, 60-min slots
         // Only starts > 12:00: 13:00-14:00, 14:00-15:00 = 2 slots
         $result = $this->service->bulkCreateSlots(
             $vacancyId, 5, '2027-06-15', '2027-06-15', 60,
-            ['sunday' => ['start' => '09:00', 'end' => '15:00']],
+            ['tuesday' => ['start' => '09:00', 'end' => '15:00']],
             $this->testTenantId
         );
 

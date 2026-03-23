@@ -176,7 +176,7 @@ class AdminCommunityAnalyticsController extends BaseApiController
      * Note: This method streams CSV directly and cannot return JsonResponse.
      * Kept as delegation since it outputs raw CSV headers.
      */
-    public function export(): JsonResponse
+    public function export(): \Illuminate\Http\Response|JsonResponse
     {
         $this->requireAdmin();
         $tenantId = $this->getTenantId();

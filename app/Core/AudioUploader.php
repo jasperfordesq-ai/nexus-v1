@@ -112,8 +112,8 @@ class AudioUploader
 
         $mimeType = $baseMime;
 
-        // Decode base64
-        $audioData = base64_decode($base64Data);
+        // Decode base64 (strict mode to reject malformed input)
+        $audioData = base64_decode($base64Data, true);
         if ($audioData === false) {
             throw new \Exception("Invalid base64 audio data");
         }

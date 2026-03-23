@@ -42,7 +42,7 @@ class ColumnsBlockRendererTest extends TestCase
         ]);
 
         $this->assertStringContainsString('columns-3', $html);
-        $this->assertEquals(3, substr_count($html, 'pb-column'));
+        $this->assertEquals(3, substr_count($html, 'class="pb-column"'));
         $this->assertStringContainsString('Col 1', $html);
         $this->assertStringContainsString('Col 2', $html);
         $this->assertStringContainsString('Col 3', $html);
@@ -62,6 +62,6 @@ class ColumnsBlockRendererTest extends TestCase
         ]);
 
         // Should still produce 3 column divs
-        $this->assertEquals(3, substr_count($html, 'pb-column'));
+        $this->assertEquals(3, substr_count($html, 'class="pb-column"'));
     }
 }

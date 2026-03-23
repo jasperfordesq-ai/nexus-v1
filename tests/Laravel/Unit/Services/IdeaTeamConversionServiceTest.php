@@ -9,15 +9,22 @@ namespace Tests\Laravel\Unit\Services;
 use App\Models\IdeaTeamLink;
 use App\Services\IdeaTeamConversionService;
 use Illuminate\Support\Facades\DB;
+use Mockery;
 use Tests\Laravel\TestCase;
 
+/**
+ * @runInSeparateProcess
+ * @preserveGlobalState disabled
+ */
 class IdeaTeamConversionServiceTest extends TestCase
 {
     private IdeaTeamConversionService $service;
+    private $ideaTeamLinkAlias;
 
     protected function setUp(): void
     {
         parent::setUp();
+        $this->ideaTeamLinkAlias = Mockery::mock('alias:' . IdeaTeamLink::class);
         $this->service = new IdeaTeamConversionService();
     }
 
@@ -61,8 +68,8 @@ class IdeaTeamConversionServiceTest extends TestCase
             (object) ['id' => 1, 'title' => 'Idea', 'description' => 'Desc', 'user_id' => 10, 'challenge_id' => 1, 'status' => 'selected'],
         );
 
-        IdeaTeamLink::shouldReceive('where')->with('idea_id', 1)->andReturnSelf();
-        IdeaTeamLink::shouldReceive('first')->andReturn((object) ['id' => 5]);
+        $this->ideaTeamLinkAlias->shouldReceive('where')->with('idea_id', 1)->andReturnSelf();
+        $this->ideaTeamLinkAlias->shouldReceive('first')->andReturn((object) ['id' => 5]);
 
         $result = $this->service->convert(1, 10);
         $this->assertNull($result);

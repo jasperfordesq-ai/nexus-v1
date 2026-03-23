@@ -12,6 +12,10 @@ use App\Models\VolOpportunity;
 use Illuminate\Database\Eloquent\Builder;
 use Mockery;
 
+/**
+ * @runInSeparateProcess
+ * @preserveGlobalState disabled
+ */
 class VolunteerServiceTest extends TestCase
 {
     public function test_getOpportunities_returns_expected_structure(): void

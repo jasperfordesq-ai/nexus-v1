@@ -39,7 +39,7 @@ class VolunteerExpenseService
         // Validate required fields
         $required = ['organization_id', 'expense_type', 'amount', 'description'];
         foreach ($required as $field) {
-            if (empty($data[$field]) && $data[$field] !== 0) {
+            if (!array_key_exists($field, $data) || (empty($data[$field]) && $data[$field] !== 0)) {
                 throw new \InvalidArgumentException("Field '{$field}' is required.");
             }
         }

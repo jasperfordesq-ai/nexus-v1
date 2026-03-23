@@ -84,7 +84,7 @@ class AdminInsuranceCertificateController extends BaseApiController
         $insuranceType = $this->input('insurance_type');
 
         if (!$userId) {
-            return $this->respondWithError('VALIDATION_ERROR', 'user_id is required', 'user_id');
+            return $this->respondWithError('VALIDATION_ERROR', 'user_id is required', 'user_id', 422);
         }
 
         $validTypes = ['public_liability', 'professional_indemnity', 'employers_liability',
@@ -201,7 +201,7 @@ class AdminInsuranceCertificateController extends BaseApiController
         $reason = $this->input('reason', '');
 
         if (empty($reason)) {
-            return $this->respondWithError('VALIDATION_ERROR', 'A reason is required to reject an insurance certificate', 'reason');
+            return $this->respondWithError('VALIDATION_ERROR', 'A reason is required to reject an insurance certificate', 'reason', 422);
         }
 
         try {

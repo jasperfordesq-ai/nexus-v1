@@ -56,6 +56,7 @@ class LegalDocumentServiceTest extends TestCase
 
     public function test_getAllForTenant_returns_array(): void
     {
+        DB::shouldReceive('raw')->andReturnUsing(fn ($v) => new \Illuminate\Database\Query\Expression($v));
         DB::shouldReceive('table')->andReturnSelf();
         DB::shouldReceive('leftJoin')->andReturnSelf();
         DB::shouldReceive('where')->andReturnSelf();

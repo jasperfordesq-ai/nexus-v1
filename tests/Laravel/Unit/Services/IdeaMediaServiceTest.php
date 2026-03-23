@@ -13,13 +13,19 @@ use Illuminate\Support\Facades\Log;
 use Mockery;
 use Tests\Laravel\TestCase;
 
+/**
+ * @runInSeparateProcess
+ * @preserveGlobalState disabled
+ */
 class IdeaMediaServiceTest extends TestCase
 {
     private IdeaMediaService $service;
+    private $ideaMediaAlias;
 
     protected function setUp(): void
     {
         parent::setUp();
+        $this->ideaMediaAlias = Mockery::mock('alias:' . IdeaMedia::class);
         $this->service = new IdeaMediaService();
     }
 
@@ -82,12 +88,12 @@ class IdeaMediaServiceTest extends TestCase
             (object) ['id' => 1, 'user_id' => 10, 'challenge_id' => 1],
         );
 
-        $media = Mockery::mock(IdeaMedia::class);
+        $media = Mockery::mock();
         $media->id = 42;
         $media->shouldReceive('getAttribute')->with('id')->andReturn(42);
 
         // IdeaMedia::create should be called
-        IdeaMedia::shouldReceive('create')->once()->andReturn($media);
+        $this->ideaMediaAlias->shouldReceive('create')->once()->andReturn($media);
 
         $result = $this->service->addMedia(1, 10, ['url' => 'http://example.com/img.jpg', 'media_type' => 'invalid']);
         $this->assertSame(42, $result);
@@ -95,7 +101,7 @@ class IdeaMediaServiceTest extends TestCase
 
     public function test_deleteMedia_not_found_returns_false(): void
     {
-        IdeaMedia::shouldReceive('find')->with(999)->andReturn(null);
+        $this->ideaMediaAlias->shouldReceive('find')->with(999)->andReturn(null);
 
         $result = $this->service->deleteMedia(999, 1);
         $this->assertFalse($result);

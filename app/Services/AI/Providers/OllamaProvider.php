@@ -179,7 +179,13 @@ class OllamaProvider extends BaseProvider
             ]);
 
             $response = curl_exec($ch);
+            $curlError = curl_errno($ch);
             curl_close($ch);
+
+            // If curl failed or returned empty, fall back to config models
+            if ($curlError || $response === false || empty($response)) {
+                return $this->config['models'] ?? [];
+            }
 
             $data = json_decode($response, true);
             $models = [];
@@ -193,6 +199,11 @@ class OllamaProvider extends BaseProvider
                         'modified' => $model['modified_at'] ?? null,
                     ];
                 }
+            }
+
+            // If no models found from API, fall back to config
+            if (empty($models)) {
+                return $this->config['models'] ?? [];
             }
 
             return $models;

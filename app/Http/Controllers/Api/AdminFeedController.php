@@ -234,7 +234,7 @@ class AdminFeedController extends BaseApiController
         $adminId = $this->requireAdmin();
         $superAdmin = $this->isSuperAdmin();
         $tenantId = $this->getTenantId();
-        $sourceType = $this->getJsonInput()['type'] ?? $this->query('type', 'post');
+        $sourceType = $this->input('type') ?? $this->query('type', 'post');
 
         $effectiveTenantId = $this->resolveEffectiveTenantId($superAdmin, $tenantId);
         $tenantWhere = $effectiveTenantId !== null ? 'tenant_id = ?' : '1=1';

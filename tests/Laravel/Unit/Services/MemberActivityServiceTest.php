@@ -14,13 +14,21 @@ use Illuminate\Support\Facades\DB;
 use Mockery;
 use Tests\Laravel\TestCase;
 
+/**
+ * @runInSeparateProcess
+ * @preserveGlobalState disabled
+ */
 class MemberActivityServiceTest extends TestCase
 {
     private MemberActivityService $service;
+    private $transactionAlias;
+    private $connectionAlias;
 
     protected function setUp(): void
     {
         parent::setUp();
+        $this->transactionAlias = Mockery::mock('alias:' . Transaction::class);
+        $this->connectionAlias = Mockery::mock('alias:' . Connection::class);
         $this->service = new MemberActivityService();
     }
 
@@ -29,12 +37,12 @@ class MemberActivityServiceTest extends TestCase
         $givenQuery = Mockery::mock();
         $givenQuery->shouldReceive('where')->andReturnSelf();
         $givenQuery->shouldReceive('sum')->andReturn(10.0);
-        Transaction::shouldReceive('query')->andReturn($givenQuery);
+        $this->transactionAlias->shouldReceive('query')->andReturn($givenQuery);
 
         $receivedQuery = Mockery::mock();
         $receivedQuery->shouldReceive('where')->andReturnSelf();
         $receivedQuery->shouldReceive('sum')->andReturn(5.0);
-        Transaction::shouldReceive('query')->andReturn($receivedQuery);
+        $this->transactionAlias->shouldReceive('query')->andReturn($receivedQuery);
 
         $result = $this->service->getHours(1);
 
@@ -49,7 +57,7 @@ class MemberActivityServiceTest extends TestCase
         $query->shouldReceive('where')->andReturnSelf();
         $query->shouldReceive('sum')->andReturn(10.0);
         $query->shouldReceive('count')->andReturn(3);
-        Transaction::shouldReceive('query')->andReturn($query);
+        $this->transactionAlias->shouldReceive('query')->andReturn($query);
 
         $result = $this->service->getHoursSummary(1);
 
@@ -66,12 +74,12 @@ class MemberActivityServiceTest extends TestCase
         $query->shouldReceive('where')->andReturnSelf();
         $query->shouldReceive('orWhere')->andReturnSelf();
         $query->shouldReceive('count')->andReturn(5);
-        Connection::shouldReceive('query')->andReturn($query);
+        $this->connectionAlias->shouldReceive('query')->andReturn($query);
 
         $pendingQuery = Mockery::mock();
         $pendingQuery->shouldReceive('where')->andReturnSelf();
         $pendingQuery->shouldReceive('count')->andReturn(2);
-        Connection::shouldReceive('query')->andReturn($pendingQuery);
+        $this->connectionAlias->shouldReceive('query')->andReturn($pendingQuery);
 
         DB::shouldReceive('table')->andReturnSelf();
         DB::shouldReceive('join')->andReturnSelf();

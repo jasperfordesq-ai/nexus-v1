@@ -177,17 +177,17 @@ class ReviewService
     {
         $receiverId = (int) ($data['receiver_id'] ?? 0);
 
+        // Prevent self-review (check before validation to avoid unnecessary DB queries)
+        if ($receiverId > 0 && $reviewerId === $receiverId) {
+            throw new \RuntimeException('You cannot review yourself');
+        }
+
         validator($data, [
             'receiver_id'    => 'required|integer|exists:users,id',
             'rating'         => 'required|integer|min:1|max:5',
             'comment'        => 'nullable|string|max:2000',
             'transaction_id' => 'nullable|integer|exists:transactions,id',
         ])->validate();
-
-        // Prevent self-review
-        if ($reviewerId === $receiverId) {
-            throw new \RuntimeException('You cannot review yourself');
-        }
 
         // Prevent duplicate reviews for same transaction
         if (! empty($data['transaction_id'])) {

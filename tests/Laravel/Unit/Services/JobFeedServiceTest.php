@@ -12,6 +12,10 @@ use App\Models\JobVacancy;
 use Illuminate\Support\Facades\Cache;
 use Mockery;
 
+/**
+ * @runInSeparateProcess
+ * @preserveGlobalState disabled
+ */
 class JobFeedServiceTest extends TestCase
 {
     private JobFeedService $service;

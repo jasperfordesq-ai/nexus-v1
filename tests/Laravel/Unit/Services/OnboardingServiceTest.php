@@ -16,6 +16,10 @@ use App\Core\TenantContext;
 use Mockery;
 use Illuminate\Support\Facades\DB;
 
+/**
+ * @runInSeparateProcess
+ * @preserveGlobalState disabled
+ */
 class OnboardingServiceTest extends TestCase
 {
     protected function setUp(): void

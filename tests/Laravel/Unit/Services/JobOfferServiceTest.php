@@ -17,6 +17,10 @@ use Illuminate\Support\Facades\Log;
 use Mockery;
 use Tests\Laravel\TestCase;
 
+/**
+ * @runInSeparateProcess
+ * @preserveGlobalState disabled
+ */
 class JobOfferServiceTest extends TestCase
 {
     protected function tearDown(): void

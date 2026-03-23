@@ -15,6 +15,10 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use Mockery;
 
+/**
+ * @runInSeparateProcess
+ * @preserveGlobalState disabled
+ */
 class JobExpiryNotificationServiceTest extends TestCase
 {
     // ── notifyExpiringSoon ───────────────────────────────────────

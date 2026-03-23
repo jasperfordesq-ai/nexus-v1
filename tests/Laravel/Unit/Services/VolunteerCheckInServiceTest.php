@@ -12,6 +12,10 @@ use App\Models\VolShift;
 use App\Models\VolShiftCheckin;
 use Mockery;
 
+/**
+ * @runInSeparateProcess
+ * @preserveGlobalState disabled
+ */
 class VolunteerCheckInServiceTest extends TestCase
 {
     private VolunteerCheckInService $service;

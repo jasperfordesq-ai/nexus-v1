@@ -569,7 +569,7 @@ class JobVacancyService
         $candidateNumber = 0;
 
         return $applications
-            ->map(function (JobApplication $app) use ($isBlindHiring, &$candidateNumber) {
+            ->map(function ($app) use ($isBlindHiring, &$candidateNumber) {
                 $data = $app->toArray();
                 $candidateNumber++;
 
@@ -886,7 +886,7 @@ class JobVacancyService
         return JobAlert::where('user_id', $userId)
             ->orderByDesc('created_at')
             ->get()
-            ->map(function (JobAlert $alert) {
+            ->map(function ($alert) {
                 $data = $alert->toArray();
                 $data['id'] = (int) $data['id'];
                 $data['user_id'] = (int) $data['user_id'];
@@ -1146,7 +1146,7 @@ class JobVacancyService
             ->where('application_id', $applicationId)
             ->orderBy('changed_at')
             ->get()
-            ->map(function (JobApplicationHistory $entry) {
+            ->map(function ($entry) {
                 $data = $entry->toArray();
                 $data['id'] = (int) $data['id'];
                 $data['application_id'] = (int) $data['application_id'];

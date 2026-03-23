@@ -20,6 +20,10 @@ class IdentityProviderRegistryTest extends TestCase
 
     public function test_register_and_get_provider(): void
     {
+        // Trigger initialization first (registers built-in providers including MockIdentityProvider)
+        IdentityProviderRegistry::all();
+
+        // Now register our specific instance to overwrite the built-in one
         $mock = new MockIdentityProvider();
         IdentityProviderRegistry::register($mock);
 

@@ -63,20 +63,11 @@ class KnowledgeBaseServiceTest extends TestCase
 
     public function test_delete_no_children_succeeds(): void
     {
-        // Child count = 0
-        DB::shouldReceive('table')->with('knowledge_base_articles')->andReturnSelf();
+        // All table/where calls return self; count returns 0, delete returns 0 then 1
+        DB::shouldReceive('table')->andReturnSelf();
         DB::shouldReceive('where')->andReturnSelf();
         DB::shouldReceive('count')->andReturn(0);
-
-        // Delete feedback
-        DB::shouldReceive('table')->with('knowledge_base_feedback')->andReturnSelf();
-        DB::shouldReceive('where')->andReturnSelf();
-        DB::shouldReceive('delete')->andReturn(0);
-
-        // Delete article
-        DB::shouldReceive('table')->with('knowledge_base_articles')->andReturnSelf();
-        DB::shouldReceive('where')->andReturnSelf();
-        DB::shouldReceive('delete')->andReturn(1);
+        DB::shouldReceive('delete')->andReturn(0, 1);
 
         $this->assertTrue($this->service->delete(1));
     }
@@ -127,6 +118,7 @@ class KnowledgeBaseServiceTest extends TestCase
 
     public function test_search_returns_results(): void
     {
+        DB::shouldReceive('raw')->andReturnUsing(fn ($v) => new \Illuminate\Database\Query\Expression($v));
         DB::shouldReceive('table')->andReturnSelf();
         DB::shouldReceive('leftJoin')->andReturnSelf();
         DB::shouldReceive('where')->andReturnSelf();

@@ -11,6 +11,7 @@ use Illuminate\Foundation\Configuration\Middleware;
 
 $app = Application::configure(basePath: dirname(__DIR__))
     ->withProviders([
+        \App\Providers\AppServiceProvider::class,
         \App\Providers\RouteServiceProvider::class,
         \App\Providers\EventServiceProvider::class,
         \App\Providers\BroadcastServiceProvider::class,

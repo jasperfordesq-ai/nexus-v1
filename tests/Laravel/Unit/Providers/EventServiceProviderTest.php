@@ -73,12 +73,12 @@ class EventServiceProviderTest extends TestCase
         $this->assertFalse($provider->shouldDiscoverEvents());
     }
 
-    public function test_all_five_events_are_mapped(): void
+    public function test_all_six_events_are_mapped(): void
     {
         $provider = new EventServiceProvider($this->app);
         $listen = $this->getListenProperty($provider);
 
-        $this->assertCount(5, $listen);
+        $this->assertCount(6, $listen);
     }
 
     /**

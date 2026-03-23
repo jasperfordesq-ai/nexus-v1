@@ -50,8 +50,8 @@ class EmailTemplateTest extends TestCase
     public function test_render_excludes_button_when_not_provided(): void
     {
         $html = EmailTemplate::render('Title', 'Sub', 'Body');
-        // Should not contain the CTA button table structure
-        $this->assertStringNotContainsString('button-primary', $html);
+        // Should not contain the CTA button table structure (class is still in CSS)
+        $this->assertStringNotContainsString('<!-- CTA Button -->', $html);
     }
 
     public function test_render_uses_custom_tenant_name(): void

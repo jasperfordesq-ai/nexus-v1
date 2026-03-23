@@ -118,11 +118,11 @@ class AdminWalletGrantController extends BaseApiController
 
         // Validate required fields
         if ($userId <= 0) {
-            return $this->respondWithError('VALIDATION_ERROR', 'user_id is required and must be a positive integer', 'user_id');
+            return $this->respondWithError('VALIDATION_ERROR', 'user_id is required and must be a positive integer', 'user_id', 422);
         }
 
         if ($amount <= 0) {
-            return $this->respondWithError('VALIDATION_ERROR', 'amount is required and must be greater than zero', 'amount');
+            return $this->respondWithError('VALIDATION_ERROR', 'amount is required and must be greater than zero', 'amount', 422);
         }
 
         // Validate user exists and belongs to current tenant
@@ -137,7 +137,7 @@ class AdminWalletGrantController extends BaseApiController
 
         // Insert transaction
         DB::insert(
-            "INSERT INTO transactions (tenant_id, sender_id, receiver_id, amount, type, description, status, created_at)
+            "INSERT INTO transactions (tenant_id, sender_id, receiver_id, amount, transaction_type, description, status, created_at)
              VALUES (?, ?, ?, ?, 'admin_grant', ?, 'completed', NOW())",
             [$tenantId, $adminId, $userId, $amount, $reason ?? 'Admin credit grant']
         );

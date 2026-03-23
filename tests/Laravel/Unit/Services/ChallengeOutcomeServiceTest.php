@@ -47,13 +47,10 @@ class ChallengeOutcomeServiceTest extends TestCase
 
     public function test_upsert_returns_null_when_challenge_not_found(): void
     {
-        DB::shouldReceive('table')->with('users')->andReturnSelf();
+        // All table/where calls return self; first returns admin user, then null for challenge
+        DB::shouldReceive('table')->andReturnSelf();
         DB::shouldReceive('where')->andReturnSelf();
-        DB::shouldReceive('first')->andReturn((object) ['role' => 'admin']);
-
-        DB::shouldReceive('table')->with('ideation_challenges')->andReturnSelf();
-        DB::shouldReceive('where')->andReturnSelf();
-        DB::shouldReceive('first')->andReturnNull();
+        DB::shouldReceive('first')->andReturn((object) ['role' => 'admin'], null);
 
         $result = $this->service->upsert(999, 1, ['status' => 'in_progress']);
         $this->assertNull($result);

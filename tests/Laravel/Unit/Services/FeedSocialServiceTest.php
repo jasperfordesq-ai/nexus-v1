@@ -18,6 +18,8 @@ class FeedSocialServiceTest extends TestCase
     {
         parent::setUp();
         $this->service = new FeedSocialService();
+        // getTrendingHashtags uses DB::raw() for aggregate expressions
+        DB::shouldReceive('raw')->andReturnUsing(fn ($v) => new \Illuminate\Database\Query\Expression($v));
     }
 
     public function test_sharePost_returns_share_id(): void

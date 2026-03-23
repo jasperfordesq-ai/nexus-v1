@@ -137,12 +137,22 @@ class SkillsControllerTest extends TestCase
             'updated_at' => now(),
         ]);
 
-        DB::table('skills')->insert([
+        // The search endpoint queries user_skills (not skills), so we need a
+        // user_skills row linked to a real user for the search to find it.
+        $user = User::factory()->forTenant($this->testTenantId)->create([
+            'status'      => 'active',
+            'is_approved' => true,
+        ]);
+
+        DB::table('user_skills')->insert([
             'tenant_id'   => $this->testTenantId,
+            'user_id'     => $user->id,
             'category_id' => $categoryId,
-            'name'        => $skillName,
+            'skill_name'  => $skillName,
+            'proficiency'  => 'intermediate',
+            'is_offering'  => 1,
+            'is_requesting' => 0,
             'created_at'  => now(),
-            'updated_at'  => now(),
         ]);
 
         $response = $this->apiGet('/v2/skills/search?q=' . urlencode('UniqueSkillXYZ' . $uniqueSuffix));

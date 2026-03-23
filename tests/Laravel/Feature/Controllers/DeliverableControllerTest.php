@@ -36,14 +36,21 @@ class DeliverableControllerTest extends TestCase
 
     private function createDeliverable(array $overrides = []): int
     {
-        DB::table('deliverables')->insert(array_merge([
+        $data = array_merge([
             'tenant_id'   => $this->testTenantId,
             'user_id'     => 1,
             'title'       => 'Test Deliverable',
             'description' => 'A test deliverable',
             'status'      => 'pending',
             'created_at'  => now(),
-        ], $overrides));
+        ], $overrides);
+
+        // owner_id is a required FK column — default to user_id if not explicitly set
+        if (!isset($data['owner_id'])) {
+            $data['owner_id'] = $data['user_id'];
+        }
+
+        DB::table('deliverables')->insert($data);
 
         return (int) DB::getPdo()->lastInsertId();
     }

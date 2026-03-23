@@ -132,7 +132,7 @@ class AdminFederationController extends BaseApiController
             $config['federation'] = $federationSettings;
 
             DB::update("UPDATE tenants SET configuration = ? WHERE id = ?", [json_encode($config), $tenantId]);
-            try { \App\Services\RedisCache::delete('tenant_bootstrap', $tenantId); } catch (\Exception $e) {}
+            try { app(\App\Services\RedisCache::class)->delete('tenant_bootstrap', $tenantId); } catch (\Exception $e) {}
 
             return $this->respondWithData([
                 'federation_enabled' => $federationSettings['federation_enabled'] ?? false,
@@ -292,7 +292,7 @@ class AdminFederationController extends BaseApiController
             $config = json_decode($row->configuration ?? '{}', true) ?: [];
             $config['federation_profile'] = array_merge($config['federation_profile'] ?? [], $input);
             DB::update("UPDATE tenants SET configuration = ? WHERE id = ?", [json_encode($config), $tenantId]);
-            try { \App\Services\RedisCache::delete('tenant_bootstrap', $tenantId); } catch (\Exception $e) {}
+            try { app(\App\Services\RedisCache::class)->delete('tenant_bootstrap', $tenantId); } catch (\Exception $e) {}
             return $this->respondWithData($config['federation_profile']);
         } catch (\Exception $e) {
             return $this->respondWithError('UPDATE_FAILED', 'Failed to update federation profile', null, 500);

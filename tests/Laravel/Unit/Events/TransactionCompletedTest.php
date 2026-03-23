@@ -53,8 +53,8 @@ class TransactionCompletedTest extends TestCase
         $this->assertCount(2, $channels);
         $this->assertInstanceOf(PrivateChannel::class, $channels[0]);
         $this->assertInstanceOf(PrivateChannel::class, $channels[1]);
-        $this->assertEquals('tenant.3.user.10', $channels[0]->name);
-        $this->assertEquals('tenant.3.user.20', $channels[1]->name);
+        $this->assertEquals('private-tenant.3.user.10', $channels[0]->name);
+        $this->assertEquals('private-tenant.3.user.20', $channels[1]->name);
     }
 
     public function test_broadcast_as_returns_correct_name(): void

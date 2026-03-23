@@ -49,15 +49,14 @@ class MemberVerificationBadgeServiceTest extends TestCase
 
     public function test_grantBadge_already_active_returns_existing_id(): void
     {
-        DB::shouldReceive('table')->with('users')->andReturnSelf();
+        // All table/where/select calls return self; first returns user then badge
+        DB::shouldReceive('table')->andReturnSelf();
         DB::shouldReceive('where')->andReturnSelf();
         DB::shouldReceive('select')->andReturnSelf();
-        DB::shouldReceive('first')->andReturn((object) ['id' => 1, 'first_name' => 'Test', 'last_name' => 'User']);
-
-        DB::shouldReceive('table')->with('member_verification_badges')->andReturnSelf();
-        DB::shouldReceive('where')->andReturnSelf();
-        DB::shouldReceive('select')->andReturnSelf();
-        DB::shouldReceive('first')->andReturn((object) ['id' => 10, 'revoked_at' => null]);
+        DB::shouldReceive('first')->andReturn(
+            (object) ['id' => 1, 'first_name' => 'Test', 'last_name' => 'User'],
+            (object) ['id' => 10, 'revoked_at' => null]
+        );
 
         $result = $this->service->grantBadge(1, 'email_verified', 5);
         $this->assertSame(10, $result);
@@ -76,6 +75,7 @@ class MemberVerificationBadgeServiceTest extends TestCase
 
     public function test_getUserBadges_returns_array(): void
     {
+        DB::shouldReceive('raw')->andReturnUsing(fn ($v) => new \Illuminate\Database\Query\Expression($v));
         DB::shouldReceive('table')->andReturnSelf();
         DB::shouldReceive('leftJoin')->andReturnSelf();
         DB::shouldReceive('where')->andReturnSelf();

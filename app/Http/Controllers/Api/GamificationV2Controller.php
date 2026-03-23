@@ -266,11 +266,11 @@ class GamificationV2Controller extends BaseApiController
         }
 
         // Standard leaderboard via LeaderboardService
-        $rawEntries = $this->leaderboardService->getLeaderboard(
+        $rawEntries = $this->leaderboardService->getLeaderboardByType(
+            $tenantId,
             $serviceType,
             $servicePeriod,
             $limit,
-            true,
             $userId
         );
 

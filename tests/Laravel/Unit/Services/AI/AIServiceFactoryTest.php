@@ -45,7 +45,7 @@ class AIServiceFactoryTest extends TestCase
     public function test_getProvider_throws_for_unknown_provider(): void
     {
         $this->expectException(\Exception::class);
-        $this->expectExceptionMessage('Unknown AI provider');
+        $this->expectExceptionMessage("AI Provider 'nonexistent_provider' is not configured");
 
         AIServiceFactory::getProvider('nonexistent_provider');
     }

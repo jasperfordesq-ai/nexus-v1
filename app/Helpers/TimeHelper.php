@@ -43,31 +43,31 @@ class TimeHelper
         }
 
         if ($diff < 3600) {
-            $minutes = floor($diff / 60);
+            $minutes = (int) floor($diff / 60);
             return $minutes . ' ' . ($minutes === 1 ? 'minute' : 'minutes') . ' ago';
         }
 
         if ($diff < 86400) {
-            $hours = floor($diff / 3600);
+            $hours = (int) floor($diff / 3600);
             return $hours . ' ' . ($hours === 1 ? 'hour' : 'hours') . ' ago';
         }
 
         if ($diff < 604800) {
-            $days = floor($diff / 86400);
+            $days = (int) floor($diff / 86400);
             return $days . ' ' . ($days === 1 ? 'day' : 'days') . ' ago';
         }
 
         if ($diff < 2592000) {
-            $weeks = floor($diff / 604800);
+            $weeks = (int) floor($diff / 604800);
             return $weeks . ' ' . ($weeks === 1 ? 'week' : 'weeks') . ' ago';
         }
 
         if ($diff < 31536000) {
-            $months = floor($diff / 2592000);
+            $months = (int) floor($diff / 2592000);
             return $months . ' ' . ($months === 1 ? 'month' : 'months') . ' ago';
         }
 
-        $years = floor($diff / 31536000);
+        $years = (int) floor($diff / 31536000);
         return $years . ' ' . ($years === 1 ? 'year' : 'years') . ' ago';
     }
 

@@ -12,6 +12,10 @@ use App\Services\TenantSettingsService;
 use Illuminate\Support\Facades\DB;
 use Mockery;
 
+/**
+ * @runInSeparateProcess
+ * @preserveGlobalState disabled
+ */
 class StartingBalanceServiceTest extends TestCase
 {
     // ── getStartingBalance ──

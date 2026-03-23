@@ -12,6 +12,10 @@ use App\Models\JobReferral;
 use Illuminate\Support\Facades\Log;
 use Mockery;
 
+/**
+ * @runInSeparateProcess
+ * @preserveGlobalState disabled
+ */
 class JobReferralServiceTest extends TestCase
 {
     // ── getOrCreate ─────────────────────────────────────────────

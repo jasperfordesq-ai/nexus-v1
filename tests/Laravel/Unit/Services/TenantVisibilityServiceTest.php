@@ -12,6 +12,10 @@ use App\Core\SuperPanelAccess;
 use Illuminate\Support\Facades\DB;
 use Mockery;
 
+/**
+ * @runInSeparateProcess
+ * @preserveGlobalState disabled
+ */
 class TenantVisibilityServiceTest extends TestCase
 {
     public function test_getVisibleTenantIds_returns_empty_when_access_denied(): void

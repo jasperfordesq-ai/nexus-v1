@@ -23,11 +23,13 @@ class AdminFeedControllerTest extends TestCase
 
     private function createFeedActivity(int $userId, int $tenantId): int
     {
+        // Use a unique source_id to avoid uq_tenant_source constraint violations
+        $sourceId = random_int(100000, 999999);
         return DB::table('feed_activity')->insertGetId([
             'tenant_id' => $tenantId,
             'user_id' => $userId,
             'source_type' => 'post',
-            'source_id' => 1,
+            'source_id' => $sourceId,
             'title' => 'Test Feed Post',
             'content' => 'This is test feed content',
             'is_hidden' => 0,

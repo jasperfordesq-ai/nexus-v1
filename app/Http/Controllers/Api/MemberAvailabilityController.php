@@ -39,10 +39,10 @@ class MemberAvailabilityController extends BaseApiController
         $this->rateLimit('availability_update', 10, 60);
 
         $data = $this->getAllInput();
-        $schedule = $data['schedule'] ?? [];
+        $schedule = $data['schedule'] ?? $data['slots'] ?? [];
 
         if (empty($schedule) || !is_array($schedule)) {
-            return $this->respondWithError('VALIDATION_ERROR', 'schedule is required and must be an object', 'schedule', 400);
+            return $this->respondWithError('VALIDATION_ERROR', 'schedule is required and must be an array', 'schedule', 422);
         }
 
         $success = $this->memberAvailabilityService->setBulkAvailability($userId, $schedule);

@@ -28,8 +28,8 @@ class CommentsController extends BaseApiController
 
     public function index(): JsonResponse
     {
-        $targetType = $this->query('target_type');
-        $targetId = $this->queryInt('target_id');
+        $targetType = $this->query('target_type') ?? $this->query('commentable_type');
+        $targetId = $this->queryInt('target_id') ?? $this->queryInt('commentable_id');
 
         if (! $targetType || ! $targetId) {
             return $this->respondWithError(

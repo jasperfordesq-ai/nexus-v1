@@ -102,16 +102,17 @@ class AdminGamificationController extends BaseApiController
 
         $name = trim($this->input('name', ''));
         if (empty($name)) {
-            return $this->respondWithError('VALIDATION_ERROR', 'Badge name is required', 'name');
+            return $this->respondWithError('VALIDATION_ERROR', 'Badge name is required', 'name', 422);
         }
 
         $description = trim($this->input('description', ''));
         $icon = trim($this->input('icon', 'award'));
 
         try {
+            $badgeKey = 'custom_' . strtolower(preg_replace('/[^a-z0-9]+/i', '_', $name)) . '_' . time();
             DB::insert(
-                "INSERT INTO custom_badges (tenant_id, name, description, icon, xp, category, is_active, created_at) VALUES (?, ?, ?, ?, 0, 'custom', 1, NOW())",
-                [$tenantId, $name, $description, $icon]
+                "INSERT INTO custom_badges (tenant_id, badge_key, name, description, icon, badge_type, xp_reward, is_active, created_at) VALUES (?, ?, ?, ?, ?, 'custom', 0, 1, NOW())",
+                [$tenantId, $badgeKey, $name, $description, $icon]
             );
             $id = (int) DB::getPdo()->lastInsertId();
 
@@ -239,8 +240,8 @@ class AdminGamificationController extends BaseApiController
         $badgeSlug = trim($this->input('badge_slug', ''));
         $userIds = $this->input('user_ids', []);
 
-        if (empty($badgeSlug)) return $this->respondWithError('VALIDATION_ERROR', 'Badge slug is required', 'badge_slug');
-        if (empty($userIds) || !is_array($userIds)) return $this->respondWithError('VALIDATION_ERROR', 'User IDs array is required', 'user_ids');
+        if (empty($badgeSlug)) return $this->respondWithError('VALIDATION_ERROR', 'Badge slug is required', 'badge_slug', 422);
+        if (empty($userIds) || !is_array($userIds)) return $this->respondWithError('VALIDATION_ERROR', 'User IDs array is required', 'user_ids', 422);
 
         $awarded = 0; $errors = [];
         foreach ($userIds as $userId) {

@@ -194,13 +194,16 @@ class CheckMaintenanceModeTest extends TestCase
     {
         $this->enableMaintenanceMode();
 
-        // Clear tenant context
-        TenantContext::setById(0);
+        // Force tenant context to id=0 via reflection (setById(0) fails silently, leaving previous tenant)
+        $ref = new \ReflectionClass(TenantContext::class);
+        $prop = $ref->getProperty('tenant');
+        $prop->setAccessible(true);
+        $prop->setValue(null, ['id' => 0, 'name' => '', 'features' => '{}']);
 
         $request = Request::create('/api/v2/feed', 'GET');
         $response = $this->middleware->handle($request, $this->makeNext());
 
-        // Should pass through because no tenant is resolved
+        // Should pass through because tenant ID is 0 (falsy)
         $this->assertEquals(200, $response->getStatusCode());
     }
 

@@ -36,7 +36,8 @@ class JobVacancyTest extends TestCase
             'contact_phone', 'deadline', 'status', 'salary_min', 'salary_max',
             'salary_type', 'salary_currency', 'salary_negotiable', 'is_featured',
             'featured_until', 'expired_at', 'renewed_at', 'renewal_count',
-            'views_count', 'applications_count',
+            'views_count', 'applications_count', 'moderation_status', 'moderation_notes',
+            'moderated_by', 'moderated_at', 'spam_score', 'spam_flags',
         ];
         $this->assertEquals($expected, $this->model->getFillable());
     }

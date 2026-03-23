@@ -27,8 +27,9 @@ class AuthControllerTest extends TestCase
 
     public function test_login_returns_token_and_user_on_valid_credentials(): void
     {
+        $email = 'auth_' . uniqid() . '@example.com';
         User::factory()->forTenant($this->testTenantId)->create([
-            'email' => 'auth@example.com',
+            'email' => $email,
             'password_hash' => Hash::make('correct-password'),
             'status' => 'active',
             'is_approved' => true,
@@ -36,7 +37,7 @@ class AuthControllerTest extends TestCase
         ]);
 
         $response = $this->apiPost('/auth/login', [
-            'email' => 'auth@example.com',
+            'email' => $email,
             'password' => 'correct-password',
         ]);
 
@@ -87,15 +88,16 @@ class AuthControllerTest extends TestCase
 
     public function test_login_returns_401_with_wrong_password(): void
     {
+        $email = 'auth_' . uniqid() . '@example.com';
         User::factory()->forTenant($this->testTenantId)->create([
-            'email' => 'auth@example.com',
+            'email' => $email,
             'password_hash' => Hash::make('correct-password'),
             'status' => 'active',
             'email_verified_at' => now(),
         ]);
 
         $response = $this->apiPost('/auth/login', [
-            'email' => 'auth@example.com',
+            'email' => $email,
             'password' => 'wrong-password',
         ]);
 

@@ -12,6 +12,10 @@ use App\Models\SalaryBenchmark;
 use Illuminate\Support\Facades\Log;
 use Mockery;
 
+/**
+ * @runInSeparateProcess
+ * @preserveGlobalState disabled
+ */
 class SalaryBenchmarkServiceTest extends TestCase
 {
     // ── findForTitle ────────────────────────────────────────────

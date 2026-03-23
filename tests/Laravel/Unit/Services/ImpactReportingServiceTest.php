@@ -12,6 +12,13 @@ use Tests\Laravel\TestCase;
 
 class ImpactReportingServiceTest extends TestCase
 {
+    protected function setUp(): void
+    {
+        parent::setUp();
+        // All service methods use DB::raw() for aggregate SQL expressions
+        DB::shouldReceive('raw')->andReturnUsing(fn ($v) => new \Illuminate\Database\Query\Expression($v));
+    }
+
     public function test_calculateSROI_returns_expected_structure(): void
     {
         DB::shouldReceive('table')->with('transactions')->andReturnSelf();

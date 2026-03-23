@@ -12,8 +12,20 @@ use Illuminate\Support\Facades\DB;
 use Mockery;
 use Tests\Laravel\TestCase;
 
+/**
+ * @runInSeparateProcess
+ * @preserveGlobalState disabled
+ */
 class MessageServiceTest extends TestCase
 {
+    private $messageAlias;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+        $this->messageAlias = Mockery::mock('alias:' . Message::class);
+    }
+
     public function test_getConversations_returns_paginated_structure(): void
     {
         $this->app->instance('tenant.id', 2);
@@ -31,7 +43,7 @@ class MessageServiceTest extends TestCase
         $query->shouldReceive('whereIn')->andReturnSelf();
         $query->shouldReceive('orderByDesc')->andReturnSelf();
         $query->shouldReceive('get')->andReturn(collect([]));
-        Message::shouldReceive('query')->andReturn($query);
+        $this->messageAlias->shouldReceive('query')->andReturn($query);
 
         $result = MessageService::getConversations(1);
 

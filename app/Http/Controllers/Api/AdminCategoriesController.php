@@ -317,7 +317,14 @@ class AdminCategoriesController extends BaseApiController
         $categoryId = $this->input('category_id') ? (int) $this->input('category_id') : null;
         $inputType = trim($this->input('type', $this->input('input_type', 'checkbox')));
 
-        $id = \App\Models\Attribute::create($name, $categoryId, $inputType);
+        $attribute = \App\Models\Attribute::create([
+            'tenant_id' => $tenantId,
+            'name' => $name,
+            'category_id' => $categoryId,
+            'input_type' => $inputType,
+            'is_active' => true,
+        ]);
+        $id = $attribute->id;
 
         ActivityLog::log($adminId, 'admin_create_attribute', "Created attribute #{$id}: {$name}");
 

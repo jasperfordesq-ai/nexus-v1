@@ -23,16 +23,75 @@ use Illuminate\Support\Facades\Log;
 use Mockery;
 use Tests\Laravel\TestCase;
 
+/**
+ * @runInSeparateProcess
+ * @preserveGlobalState disabled
+ */
 class JobVacancyServiceTest extends TestCase
 {
     private JobVacancyService $service;
     private $mockVacancy;
+    private $userAlias;
+    private $jobApplicationAlias;
+    private $jobApplicationHistoryAlias;
+    private $savedJobAlias;
+    private $jobAlertAlias;
+    private $spamDetectionAlias;
+    private $moderationAlias;
+    private $webhookAlias;
 
     protected function setUp(): void
     {
         parent::setUp();
+
+        // Create alias mocks for statically-called services (never need instance mocks)
+        $this->userAlias = Mockery::mock('alias:' . User::class);
+        $this->savedJobAlias = Mockery::mock('alias:' . SavedJob::class);
+        $this->spamDetectionAlias = Mockery::mock('alias:' . JobSpamDetectionService::class);
+        $this->moderationAlias = Mockery::mock('alias:' . JobModerationService::class);
+        $this->webhookAlias = Mockery::mock('alias:' . WebhookDispatchService::class);
+
+        // For models that need BOTH static mocking AND typed instance mocking,
+        // create alias mocks lazily via helper methods.
+        // Do NOT create aliases here for: JobApplication, JobApplicationHistory, JobAlert
+
         $this->mockVacancy = Mockery::mock(JobVacancy::class)->makePartial();
         $this->service = new JobVacancyService($this->mockVacancy);
+    }
+
+    /**
+     * Get or create the JobApplication alias mock (lazy initialization).
+     * Call this in tests that need static JobApplication methods.
+     * Do NOT call in tests that need Mockery::mock(JobApplication::class)->makePartial().
+     */
+    private function getJobApplicationAlias()
+    {
+        if (!$this->jobApplicationAlias) {
+            $this->jobApplicationAlias = Mockery::mock('alias:' . JobApplication::class);
+        }
+        return $this->jobApplicationAlias;
+    }
+
+    /**
+     * Get or create the JobApplicationHistory alias mock (lazy initialization).
+     */
+    private function getJobApplicationHistoryAlias()
+    {
+        if (!$this->jobApplicationHistoryAlias) {
+            $this->jobApplicationHistoryAlias = Mockery::mock('alias:' . JobApplicationHistory::class);
+        }
+        return $this->jobApplicationHistoryAlias;
+    }
+
+    /**
+     * Get or create the JobAlert alias mock (lazy initialization).
+     */
+    private function getJobAlertAlias()
+    {
+        if (!$this->jobAlertAlias) {
+            $this->jobAlertAlias = Mockery::mock('alias:' . JobAlert::class);
+        }
+        return $this->jobAlertAlias;
     }
 
     // =========================================================================
@@ -239,7 +298,7 @@ class JobVacancyServiceTest extends TestCase
         $mockAppQuery = Mockery::mock();
         $mockAppQuery->shouldReceive('where')->andReturnSelf();
         $mockAppQuery->shouldReceive('count')->andReturn(5);
-        JobApplication::shouldReceive('where')->andReturn($mockAppQuery);
+        $this->getJobApplicationAlias()->shouldReceive('where')->andReturn($mockAppQuery);
 
         $result = $this->service->getById(42);
 
@@ -264,18 +323,18 @@ class JobVacancyServiceTest extends TestCase
         $this->mockVacancy->shouldReceive('newQuery')->andReturn($query);
 
         // Mock spam detection
-        JobSpamDetectionService::shouldReceive('analyzeJob')->andReturn([
+        $this->spamDetectionAlias->shouldReceive('analyzeJob')->andReturn([
             'score' => 0, 'flags' => [], 'action' => 'allow',
         ]);
 
         // Mock moderation check
-        JobModerationService::shouldReceive('isModerationEnabled')->andReturn(false);
+        $this->moderationAlias->shouldReceive('isModerationEnabled')->andReturn(false);
 
         // Mock webhook dispatch
-        WebhookDispatchService::shouldReceive('dispatch')->andReturnNull();
+        $this->webhookAlias->shouldReceive('dispatch')->andReturnNull();
 
         // Mock User::find for event dispatch
-        User::shouldReceive('find')->andReturn(null);
+        $this->userAlias->shouldReceive('find')->andReturn(null);
 
         $result = $this->service->create(1, [
             'title' => 'Test Job',
@@ -313,12 +372,12 @@ class JobVacancyServiceTest extends TestCase
         $query->shouldReceive('create')->andReturn($mockCreatedVacancy);
         $this->mockVacancy->shouldReceive('newQuery')->andReturn($query);
 
-        JobSpamDetectionService::shouldReceive('analyzeJob')->andReturn([
+        $this->spamDetectionAlias->shouldReceive('analyzeJob')->andReturn([
             'score' => 0, 'flags' => [], 'action' => 'allow',
         ]);
-        JobModerationService::shouldReceive('isModerationEnabled')->andReturn(false);
-        WebhookDispatchService::shouldReceive('dispatch')->andReturnNull();
-        User::shouldReceive('find')->andReturn(null);
+        $this->moderationAlias->shouldReceive('isModerationEnabled')->andReturn(false);
+        $this->webhookAlias->shouldReceive('dispatch')->andReturnNull();
+        $this->userAlias->shouldReceive('find')->andReturn(null);
 
         $result = $this->service->create(1, [
             'title' => 'Paid Negotiable Job',
@@ -341,12 +400,12 @@ class JobVacancyServiceTest extends TestCase
         $query->shouldReceive('create')->andReturn($mockCreatedVacancy);
         $this->mockVacancy->shouldReceive('newQuery')->andReturn($query);
 
-        JobSpamDetectionService::shouldReceive('analyzeJob')->andReturn([
+        $this->spamDetectionAlias->shouldReceive('analyzeJob')->andReturn([
             'score' => 0, 'flags' => [], 'action' => 'allow',
         ]);
-        JobModerationService::shouldReceive('isModerationEnabled')->andReturn(false);
-        WebhookDispatchService::shouldReceive('dispatch')->andReturnNull();
-        User::shouldReceive('find')->andReturn(null);
+        $this->moderationAlias->shouldReceive('isModerationEnabled')->andReturn(false);
+        $this->webhookAlias->shouldReceive('dispatch')->andReturnNull();
+        $this->userAlias->shouldReceive('find')->andReturn(null);
 
         $result = $this->service->create(1, [
             'title' => 'Paid Job With Salary',
@@ -370,12 +429,12 @@ class JobVacancyServiceTest extends TestCase
         $query->shouldReceive('create')->andReturn($mockCreatedVacancy);
         $this->mockVacancy->shouldReceive('newQuery')->andReturn($query);
 
-        JobSpamDetectionService::shouldReceive('analyzeJob')->andReturn([
+        $this->spamDetectionAlias->shouldReceive('analyzeJob')->andReturn([
             'score' => 90, 'flags' => ['suspicious_links'], 'action' => 'block',
         ]);
-        JobModerationService::shouldReceive('isModerationEnabled')->andReturn(false);
-        WebhookDispatchService::shouldReceive('dispatch')->andReturnNull();
-        User::shouldReceive('find')->andReturn(null);
+        $this->moderationAlias->shouldReceive('isModerationEnabled')->andReturn(false);
+        $this->webhookAlias->shouldReceive('dispatch')->andReturnNull();
+        $this->userAlias->shouldReceive('find')->andReturn(null);
         Log::shouldReceive('warning')->once();
         Log::shouldReceive('info')->zeroOrMoreTimes();
 
@@ -400,12 +459,12 @@ class JobVacancyServiceTest extends TestCase
         $query->shouldReceive('create')->andReturn($mockCreatedVacancy);
         $this->mockVacancy->shouldReceive('newQuery')->andReturn($query);
 
-        JobSpamDetectionService::shouldReceive('analyzeJob')->andReturn([
+        $this->spamDetectionAlias->shouldReceive('analyzeJob')->andReturn([
             'score' => 55, 'flags' => ['new_account'], 'action' => 'flag',
         ]);
-        JobModerationService::shouldReceive('isModerationEnabled')->andReturn(false);
-        WebhookDispatchService::shouldReceive('dispatch')->andReturnNull();
-        User::shouldReceive('find')->andReturn(null);
+        $this->moderationAlias->shouldReceive('isModerationEnabled')->andReturn(false);
+        $this->webhookAlias->shouldReceive('dispatch')->andReturnNull();
+        $this->userAlias->shouldReceive('find')->andReturn(null);
         Log::shouldReceive('info')->once();
         Log::shouldReceive('warning')->zeroOrMoreTimes();
 
@@ -429,12 +488,12 @@ class JobVacancyServiceTest extends TestCase
         $query->shouldReceive('create')->andReturn($mockCreatedVacancy);
         $this->mockVacancy->shouldReceive('newQuery')->andReturn($query);
 
-        JobSpamDetectionService::shouldReceive('analyzeJob')->andReturn([
+        $this->spamDetectionAlias->shouldReceive('analyzeJob')->andReturn([
             'score' => 0, 'flags' => [], 'action' => 'allow',
         ]);
-        JobModerationService::shouldReceive('isModerationEnabled')->andReturn(true);
-        WebhookDispatchService::shouldReceive('dispatch')->andReturnNull();
-        User::shouldReceive('find')->andReturn(null);
+        $this->moderationAlias->shouldReceive('isModerationEnabled')->andReturn(true);
+        $this->webhookAlias->shouldReceive('dispatch')->andReturnNull();
+        $this->userAlias->shouldReceive('find')->andReturn(null);
 
         $result = $this->service->create(1, [
             'title' => 'Moderated Job',
@@ -493,7 +552,7 @@ class JobVacancyServiceTest extends TestCase
         $mockUser->role = 'member';
         $mockUserQuery = Mockery::mock();
         $mockUserQuery->shouldReceive('first')->andReturn($mockUser);
-        User::shouldReceive('where')->with('id', 99)->andReturn($mockUserQuery);
+        $this->userAlias->shouldReceive('where')->with('id', 99)->andReturn($mockUserQuery);
 
         $result = $this->service->update(5, 99, ['title' => 'Hacked']);
         $this->assertFalse($result);
@@ -518,7 +577,7 @@ class JobVacancyServiceTest extends TestCase
         $mockUser->role = 'admin';
         $mockUserQuery = Mockery::mock();
         $mockUserQuery->shouldReceive('first')->andReturn($mockUser);
-        User::shouldReceive('where')->with('id', 99)->andReturn($mockUserQuery);
+        $this->userAlias->shouldReceive('where')->with('id', 99)->andReturn($mockUserQuery);
 
         $result = $this->service->update(5, 99, ['title' => 'Admin Edit']);
         $this->assertTrue($result);
@@ -590,7 +649,7 @@ class JobVacancyServiceTest extends TestCase
 
         $mockAppQuery = Mockery::mock();
         $mockAppQuery->shouldReceive('delete')->andReturn(0);
-        JobApplication::shouldReceive('where')->with('vacancy_id', 5)->andReturn($mockAppQuery);
+        $this->getJobApplicationAlias()->shouldReceive('where')->with('vacancy_id', 5)->andReturn($mockAppQuery);
 
         $result = $this->service->delete(5, 1);
         $this->assertTrue($result);
@@ -620,7 +679,7 @@ class JobVacancyServiceTest extends TestCase
         $mockUser->role = 'member';
         $mockUserQuery = Mockery::mock();
         $mockUserQuery->shouldReceive('first')->andReturn($mockUser);
-        User::shouldReceive('where')->with('id', 99)->andReturn($mockUserQuery);
+        $this->userAlias->shouldReceive('where')->with('id', 99)->andReturn($mockUserQuery);
 
         $result = $this->service->delete(5, 99);
         $this->assertFalse($result);
@@ -637,15 +696,15 @@ class JobVacancyServiceTest extends TestCase
         $existsQuery = Mockery::mock();
         $existsQuery->shouldReceive('where')->with('user_id', 10)->andReturnSelf();
         $existsQuery->shouldReceive('exists')->andReturn(false);
-        JobApplication::shouldReceive('where')->with('vacancy_id', 5)->andReturn($existsQuery);
+        $this->getJobApplicationAlias()->shouldReceive('where')->with('vacancy_id', 5)->andReturn($existsQuery);
 
         // Create application
         $mockApp = Mockery::mock();
         $mockApp->id = 100;
-        JobApplication::shouldReceive('create')->andReturn($mockApp);
+        $this->getJobApplicationAlias()->shouldReceive('create')->andReturn($mockApp);
 
         // logApplicationHistory
-        JobApplicationHistory::shouldReceive('create')->andReturn(Mockery::mock());
+        $this->getJobApplicationHistoryAlias()->shouldReceive('create')->andReturn(Mockery::mock());
 
         // Increment applications_count
         $incQuery = Mockery::mock();
@@ -654,7 +713,7 @@ class JobVacancyServiceTest extends TestCase
         $this->mockVacancy->shouldReceive('newQuery')->andReturn($incQuery);
 
         // Webhook
-        WebhookDispatchService::shouldReceive('dispatch')->andReturnNull();
+        $this->webhookAlias->shouldReceive('dispatch')->andReturnNull();
 
         $result = $this->service->apply(5, 10, ['cover_letter' => 'I am interested']);
         $this->assertEquals(100, $result);
@@ -665,7 +724,7 @@ class JobVacancyServiceTest extends TestCase
         $existsQuery = Mockery::mock();
         $existsQuery->shouldReceive('where')->with('user_id', 10)->andReturnSelf();
         $existsQuery->shouldReceive('exists')->andReturn(true);
-        JobApplication::shouldReceive('where')->with('vacancy_id', 5)->andReturn($existsQuery);
+        $this->getJobApplicationAlias()->shouldReceive('where')->with('vacancy_id', 5)->andReturn($existsQuery);
 
         $result = $this->service->apply(5, 10);
         $this->assertNull($result);
@@ -676,24 +735,24 @@ class JobVacancyServiceTest extends TestCase
         $existsQuery = Mockery::mock();
         $existsQuery->shouldReceive('where')->with('user_id', 10)->andReturnSelf();
         $existsQuery->shouldReceive('exists')->andReturn(false);
-        JobApplication::shouldReceive('where')->with('vacancy_id', 5)->andReturn($existsQuery);
+        $this->getJobApplicationAlias()->shouldReceive('where')->with('vacancy_id', 5)->andReturn($existsQuery);
 
         $mockApp = Mockery::mock();
         $mockApp->id = 101;
-        JobApplication::shouldReceive('create')->with(Mockery::on(function ($data) {
+        $this->getJobApplicationAlias()->shouldReceive('create')->with(Mockery::on(function ($data) {
             return $data['cv_path'] === '/uploads/cv.pdf'
                 && $data['cv_filename'] === 'cv.pdf'
                 && $data['cv_size'] === 1024;
         }))->andReturn($mockApp);
 
-        JobApplicationHistory::shouldReceive('create')->andReturn(Mockery::mock());
+        $this->getJobApplicationHistoryAlias()->shouldReceive('create')->andReturn(Mockery::mock());
 
         $incQuery = Mockery::mock();
         $incQuery->shouldReceive('where')->andReturnSelf();
         $incQuery->shouldReceive('increment')->andReturn(1);
         $this->mockVacancy->shouldReceive('newQuery')->andReturn($incQuery);
 
-        WebhookDispatchService::shouldReceive('dispatch')->andReturnNull();
+        $this->webhookAlias->shouldReceive('dispatch')->andReturnNull();
 
         $result = $this->service->apply(5, 10, [
             'cover_letter' => 'Here is my CV',
@@ -748,7 +807,7 @@ class JobVacancyServiceTest extends TestCase
         $mockUser->role = 'admin';
         $mockUserQuery = Mockery::mock();
         $mockUserQuery->shouldReceive('first')->andReturn($mockUser);
-        User::shouldReceive('where')->with('id', 1)->andReturn($mockUserQuery);
+        $this->userAlias->shouldReceive('where')->with('id', 1)->andReturn($mockUserQuery);
 
         $mockJob = Mockery::mock();
         $mockJob->shouldReceive('update')->andReturn(true);
@@ -767,7 +826,7 @@ class JobVacancyServiceTest extends TestCase
         $mockUser->role = 'member';
         $mockUserQuery = Mockery::mock();
         $mockUserQuery->shouldReceive('first')->andReturn($mockUser);
-        User::shouldReceive('where')->with('id', 99)->andReturn($mockUserQuery);
+        $this->userAlias->shouldReceive('where')->with('id', 99)->andReturn($mockUserQuery);
 
         $result = $this->service->featureJob(5, 99);
         $this->assertFalse($result);
@@ -780,7 +839,7 @@ class JobVacancyServiceTest extends TestCase
         $mockUser->role = 'admin';
         $mockUserQuery = Mockery::mock();
         $mockUserQuery->shouldReceive('first')->andReturn($mockUser);
-        User::shouldReceive('where')->with('id', 1)->andReturn($mockUserQuery);
+        $this->userAlias->shouldReceive('where')->with('id', 1)->andReturn($mockUserQuery);
 
         $query = Mockery::mock();
         $query->shouldReceive('find')->with(999)->andReturnNull();
@@ -797,7 +856,7 @@ class JobVacancyServiceTest extends TestCase
         $mockUser->role = 'super_admin';
         $mockUserQuery = Mockery::mock();
         $mockUserQuery->shouldReceive('first')->andReturn($mockUser);
-        User::shouldReceive('where')->with('id', 1)->andReturn($mockUserQuery);
+        $this->userAlias->shouldReceive('where')->with('id', 1)->andReturn($mockUserQuery);
 
         $mockJob = Mockery::mock();
         $mockJob->shouldReceive('update')->with(Mockery::on(function ($data) {
@@ -819,7 +878,7 @@ class JobVacancyServiceTest extends TestCase
         $mockUser->role = 'admin';
         $mockUserQuery = Mockery::mock();
         $mockUserQuery->shouldReceive('first')->andReturn($mockUser);
-        User::shouldReceive('where')->with('id', 1)->andReturn($mockUserQuery);
+        $this->userAlias->shouldReceive('where')->with('id', 1)->andReturn($mockUserQuery);
 
         $query = Mockery::mock();
         $query->shouldReceive('where')->with('id', 5)->andReturnSelf();
@@ -836,7 +895,7 @@ class JobVacancyServiceTest extends TestCase
         $mockUser->role = 'member';
         $mockUserQuery = Mockery::mock();
         $mockUserQuery->shouldReceive('first')->andReturn($mockUser);
-        User::shouldReceive('where')->with('id', 99)->andReturn($mockUserQuery);
+        $this->userAlias->shouldReceive('where')->with('id', 99)->andReturn($mockUserQuery);
 
         $result = $this->service->unfeatureJob(5, 99);
         $this->assertFalse($result);
@@ -872,7 +931,7 @@ class JobVacancyServiceTest extends TestCase
         $mockUser->role = 'member';
         $mockUserQuery = Mockery::mock();
         $mockUserQuery->shouldReceive('first')->andReturn($mockUser);
-        User::shouldReceive('where')->with('id', 99)->andReturn($mockUserQuery);
+        $this->userAlias->shouldReceive('where')->with('id', 99)->andReturn($mockUserQuery);
 
         $result = $this->service->getApplications(5, 99);
         $this->assertNull($result);
@@ -896,8 +955,9 @@ class JobVacancyServiceTest extends TestCase
         $mockApplicant->avatar_url = 'avatar.jpg';
         $mockApplicant->email = 'john@example.com';
 
-        $mockApp = Mockery::mock(JobApplication::class)->makePartial();
+        $mockApp = Mockery::mock();
         $mockApp->user_id = 10;
+        $mockApp->applicant = $mockApplicant;
         $mockApp->shouldReceive('getAttribute')->with('applicant')->andReturn($mockApplicant);
         $mockApp->shouldReceive('getAttribute')->with('user_id')->andReturn(10);
         $mockApp->shouldReceive('toArray')->andReturn([
@@ -911,7 +971,7 @@ class JobVacancyServiceTest extends TestCase
         $appQuery->shouldReceive('where')->with('vacancy_id', 5)->andReturnSelf();
         $appQuery->shouldReceive('orderByDesc')->with('created_at')->andReturnSelf();
         $appQuery->shouldReceive('get')->andReturn($appsCollection);
-        JobApplication::shouldReceive('with')->andReturn($appQuery);
+        $this->getJobApplicationAlias()->shouldReceive('with')->andReturn($appQuery);
 
         $result = $this->service->getApplications(5, 1);
 
@@ -937,8 +997,9 @@ class JobVacancyServiceTest extends TestCase
         $mockApplicant->avatar_url = 'avatar.jpg';
         $mockApplicant->email = 'jane@example.com';
 
-        $mockApp = Mockery::mock(JobApplication::class)->makePartial();
+        $mockApp = Mockery::mock();
         $mockApp->user_id = 10;
+        $mockApp->applicant = $mockApplicant;
         $mockApp->shouldReceive('getAttribute')->with('applicant')->andReturn($mockApplicant);
         $mockApp->shouldReceive('getAttribute')->with('user_id')->andReturn(10);
         $mockApp->shouldReceive('toArray')->andReturn([
@@ -952,7 +1013,7 @@ class JobVacancyServiceTest extends TestCase
         $appQuery->shouldReceive('where')->with('vacancy_id', 5)->andReturnSelf();
         $appQuery->shouldReceive('orderByDesc')->with('created_at')->andReturnSelf();
         $appQuery->shouldReceive('get')->andReturn($appsCollection);
-        JobApplication::shouldReceive('with')->andReturn($appQuery);
+        $this->getJobApplicationAlias()->shouldReceive('with')->andReturn($appQuery);
 
         $result = $this->service->getApplications(5, 1);
 
@@ -975,8 +1036,8 @@ class JobVacancyServiceTest extends TestCase
 
     public function test_updateApplicationStatus_returns_false_when_application_not_found(): void
     {
-        JobApplication::shouldReceive('with')->andReturnSelf();
-        JobApplication::shouldReceive('find')->with(999)->andReturnNull();
+        $this->getJobApplicationAlias()->shouldReceive('with')->andReturnSelf();
+        $this->getJobApplicationAlias()->shouldReceive('find')->with(999)->andReturnNull();
 
         $result = $this->service->updateApplicationStatus(999, 1, 'reviewed');
         $this->assertFalse($result);
@@ -989,7 +1050,12 @@ class JobVacancyServiceTest extends TestCase
         $mockVacancy->user_id = 1;
         $mockVacancy->tenant_id = 2;
 
-        $mockApp = Mockery::mock(JobApplication::class)->makePartial();
+        $mockApp = Mockery::mock();
+        $mockApp->vacancy = $mockVacancy;
+        $mockApp->user_id = 10;
+        $mockApp->stage = 'applied';
+        $mockApp->status = 'applied';
+        $mockApp->vacancy_id = 5;
         $mockApp->shouldReceive('getAttribute')->with('vacancy')->andReturn($mockVacancy);
         $mockApp->shouldReceive('getAttribute')->with('user_id')->andReturn(10);
         $mockApp->shouldReceive('getAttribute')->with('stage')->andReturn('applied');
@@ -999,13 +1065,13 @@ class JobVacancyServiceTest extends TestCase
 
         $appWithQuery = Mockery::mock();
         $appWithQuery->shouldReceive('find')->with(100)->andReturn($mockApp);
-        JobApplication::shouldReceive('with')->with(['vacancy'])->andReturn($appWithQuery);
+        $this->getJobApplicationAlias()->shouldReceive('with')->with(['vacancy'])->andReturn($appWithQuery);
 
         // logApplicationHistory
-        JobApplicationHistory::shouldReceive('create')->andReturn(Mockery::mock());
+        $this->getJobApplicationHistoryAlias()->shouldReceive('create')->andReturn(Mockery::mock());
 
         // Webhook
-        WebhookDispatchService::shouldReceive('dispatch')->andReturnNull();
+        $this->webhookAlias->shouldReceive('dispatch')->andReturnNull();
 
         $result = $this->service->updateApplicationStatus(100, 1, 'reviewed', 'Looks good');
         $this->assertTrue($result);
@@ -1017,18 +1083,19 @@ class JobVacancyServiceTest extends TestCase
         $mockVacancy->user_id = 1;
         $mockVacancy->tenant_id = 2;
 
-        $mockApp = Mockery::mock(JobApplication::class)->makePartial();
+        $mockApp = Mockery::mock();
+        $mockApp->vacancy = $mockVacancy;
         $mockApp->shouldReceive('getAttribute')->with('vacancy')->andReturn($mockVacancy);
 
         $appWithQuery = Mockery::mock();
         $appWithQuery->shouldReceive('find')->with(100)->andReturn($mockApp);
-        JobApplication::shouldReceive('with')->with(['vacancy'])->andReturn($appWithQuery);
+        $this->getJobApplicationAlias()->shouldReceive('with')->with(['vacancy'])->andReturn($appWithQuery);
 
         $mockUser = Mockery::mock();
         $mockUser->role = 'member';
         $mockUserQuery = Mockery::mock();
         $mockUserQuery->shouldReceive('first')->andReturn($mockUser);
-        User::shouldReceive('where')->with('id', 99)->andReturn($mockUserQuery);
+        $this->userAlias->shouldReceive('where')->with('id', 99)->andReturn($mockUserQuery);
 
         $result = $this->service->updateApplicationStatus(100, 99, 'reviewed');
         $this->assertFalse($result);
@@ -1049,9 +1116,9 @@ class JobVacancyServiceTest extends TestCase
         $existsQuery = Mockery::mock();
         $existsQuery->shouldReceive('where')->with('user_id', 10)->andReturnSelf();
         $existsQuery->shouldReceive('exists')->andReturn(false);
-        SavedJob::shouldReceive('where')->with('job_id', 5)->andReturn($existsQuery);
+        $this->savedJobAlias->shouldReceive('where')->with('job_id', 5)->andReturn($existsQuery);
 
-        SavedJob::shouldReceive('create')->andReturn(Mockery::mock());
+        $this->savedJobAlias->shouldReceive('create')->andReturn(Mockery::mock());
 
         $result = $this->service->saveJob(5, 10);
         $this->assertTrue($result);
@@ -1078,7 +1145,7 @@ class JobVacancyServiceTest extends TestCase
         $existsQuery = Mockery::mock();
         $existsQuery->shouldReceive('where')->with('user_id', 10)->andReturnSelf();
         $existsQuery->shouldReceive('exists')->andReturn(true);
-        SavedJob::shouldReceive('where')->with('job_id', 5)->andReturn($existsQuery);
+        $this->savedJobAlias->shouldReceive('where')->with('job_id', 5)->andReturn($existsQuery);
 
         $result = $this->service->saveJob(5, 10);
         $this->assertTrue($result);
@@ -1089,7 +1156,7 @@ class JobVacancyServiceTest extends TestCase
         $deleteQuery = Mockery::mock();
         $deleteQuery->shouldReceive('where')->with('user_id', 10)->andReturnSelf();
         $deleteQuery->shouldReceive('delete')->once()->andReturn(1);
-        SavedJob::shouldReceive('where')->with('job_id', 5)->andReturn($deleteQuery);
+        $this->savedJobAlias->shouldReceive('where')->with('job_id', 5)->andReturn($deleteQuery);
 
         $this->service->unsaveJob(5, 10);
         $this->assertTrue(true); // No exception means success
@@ -1104,7 +1171,7 @@ class JobVacancyServiceTest extends TestCase
         $mockQuery->shouldReceive('orderByDesc')->andReturnSelf();
         $mockQuery->shouldReceive('limit')->andReturnSelf();
         $mockQuery->shouldReceive('get')->andReturn(collect([]));
-        SavedJob::shouldReceive('where')->with('saved_jobs.user_id', 10)->andReturn($mockQuery);
+        $this->savedJobAlias->shouldReceive('where')->with('saved_jobs.user_id', 10)->andReturn($mockQuery);
 
         $result = $this->service->getSavedJobs(10);
         $this->assertArrayHasKey('items', $result);
@@ -1125,7 +1192,7 @@ class JobVacancyServiceTest extends TestCase
         $mockQuery->shouldReceive('orderByDesc')->andReturnSelf();
         $mockQuery->shouldReceive('limit')->andReturnSelf();
         $mockQuery->shouldReceive('get')->andReturn(collect([]));
-        JobApplication::shouldReceive('join')->andReturn($mockQuery);
+        $this->getJobApplicationAlias()->shouldReceive('join')->andReturn($mockQuery);
 
         $result = $this->service->getMyApplications(10);
         $this->assertArrayHasKey('items', $result);
@@ -1142,7 +1209,7 @@ class JobVacancyServiceTest extends TestCase
         $mockQuery->shouldReceive('orderByDesc')->andReturnSelf();
         $mockQuery->shouldReceive('limit')->andReturnSelf();
         $mockQuery->shouldReceive('get')->andReturn(collect([]));
-        JobApplication::shouldReceive('join')->andReturn($mockQuery);
+        $this->getJobApplicationAlias()->shouldReceive('join')->andReturn($mockQuery);
 
         $result = $this->service->getMyApplications(10, ['status' => 'rejected']);
         $this->assertIsArray($result);
@@ -1171,7 +1238,7 @@ class JobVacancyServiceTest extends TestCase
 
     public function test_getAlerts_returns_formatted_array(): void
     {
-        $mockAlert = Mockery::mock(JobAlert::class)->makePartial();
+        $mockAlert = Mockery::mock();
         $mockAlert->shouldReceive('toArray')->andReturn([
             'id' => 1, 'user_id' => 10, 'keywords' => 'developer',
             'is_active' => 1, 'is_remote_only' => 0,
@@ -1180,7 +1247,7 @@ class JobVacancyServiceTest extends TestCase
         $alertQuery = Mockery::mock();
         $alertQuery->shouldReceive('orderByDesc')->with('created_at')->andReturnSelf();
         $alertQuery->shouldReceive('get')->andReturn(collect([$mockAlert]));
-        JobAlert::shouldReceive('where')->with('user_id', 10)->andReturn($alertQuery);
+        $this->getJobAlertAlias()->shouldReceive('where')->with('user_id', 10)->andReturn($alertQuery);
 
         $result = $this->service->getAlerts(10);
         $this->assertIsArray($result);
@@ -1195,7 +1262,7 @@ class JobVacancyServiceTest extends TestCase
         $alertQuery = Mockery::mock();
         $alertQuery->shouldReceive('orderByDesc')->with('created_at')->andReturnSelf();
         $alertQuery->shouldReceive('get')->andReturn(collect([]));
-        JobAlert::shouldReceive('where')->with('user_id', 10)->andReturn($alertQuery);
+        $this->getJobAlertAlias()->shouldReceive('where')->with('user_id', 10)->andReturn($alertQuery);
 
         $result = $this->service->getAlerts(10);
         $this->assertIsArray($result);
@@ -1206,7 +1273,7 @@ class JobVacancyServiceTest extends TestCase
     {
         $mockAlert = Mockery::mock();
         $mockAlert->id = 5;
-        JobAlert::shouldReceive('create')->andReturn($mockAlert);
+        $this->getJobAlertAlias()->shouldReceive('create')->andReturn($mockAlert);
 
         $result = $this->service->subscribeAlert(10, [
             'keywords' => 'php developer',
@@ -1221,7 +1288,7 @@ class JobVacancyServiceTest extends TestCase
 
     public function test_subscribeAlert_returns_null_on_failure(): void
     {
-        JobAlert::shouldReceive('create')->andThrow(new \Exception('DB error'));
+        $this->getJobAlertAlias()->shouldReceive('create')->andThrow(new \Exception('DB error'));
         Log::shouldReceive('error')->once();
 
         $result = $this->service->subscribeAlert(10, ['keywords' => 'test']);
@@ -1233,7 +1300,7 @@ class JobVacancyServiceTest extends TestCase
         $longKeywords = str_repeat('a', 600);
         $mockAlert = Mockery::mock();
         $mockAlert->id = 6;
-        JobAlert::shouldReceive('create')->with(Mockery::on(function ($data) {
+        $this->getJobAlertAlias()->shouldReceive('create')->with(Mockery::on(function ($data) {
             return strlen($data['keywords']) <= 500;
         }))->andReturn($mockAlert);
 
@@ -1245,7 +1312,7 @@ class JobVacancyServiceTest extends TestCase
     {
         $mockAlert = Mockery::mock();
         $mockAlert->id = 7;
-        JobAlert::shouldReceive('create')->with(Mockery::on(function ($data) {
+        $this->getJobAlertAlias()->shouldReceive('create')->with(Mockery::on(function ($data) {
             return $data['type'] === null; // Invalid type should be null
         }))->andReturn($mockAlert);
 
@@ -1258,7 +1325,7 @@ class JobVacancyServiceTest extends TestCase
         $deleteQuery = Mockery::mock();
         $deleteQuery->shouldReceive('where')->with('user_id', 10)->andReturnSelf();
         $deleteQuery->shouldReceive('delete')->once()->andReturn(1);
-        JobAlert::shouldReceive('where')->with('id', 5)->andReturn($deleteQuery);
+        $this->getJobAlertAlias()->shouldReceive('where')->with('id', 5)->andReturn($deleteQuery);
 
         $this->service->deleteAlert(5, 10);
         $this->assertTrue(true);
@@ -1269,7 +1336,7 @@ class JobVacancyServiceTest extends TestCase
         $updateQuery = Mockery::mock();
         $updateQuery->shouldReceive('where')->with('user_id', 10)->andReturnSelf();
         $updateQuery->shouldReceive('update')->with(['is_active' => false])->once()->andReturn(1);
-        JobAlert::shouldReceive('where')->with('id', 5)->andReturn($updateQuery);
+        $this->getJobAlertAlias()->shouldReceive('where')->with('id', 5)->andReturn($updateQuery);
 
         $this->service->unsubscribeAlert(5, 10);
         $this->assertTrue(true);
@@ -1280,7 +1347,7 @@ class JobVacancyServiceTest extends TestCase
         $updateQuery = Mockery::mock();
         $updateQuery->shouldReceive('where')->with('user_id', 10)->andReturnSelf();
         $updateQuery->shouldReceive('update')->with(['is_active' => true])->once()->andReturn(1);
-        JobAlert::shouldReceive('where')->with('id', 5)->andReturn($updateQuery);
+        $this->getJobAlertAlias()->shouldReceive('where')->with('id', 5)->andReturn($updateQuery);
 
         $this->service->resubscribeAlert(5, 10);
         $this->assertTrue(true);
@@ -1294,7 +1361,7 @@ class JobVacancyServiceTest extends TestCase
     {
         $mockUser = Mockery::mock();
         $mockUser->skills = 'php, javascript, react';
-        User::shouldReceive('find')->with(10, ['id', 'skills'])->andReturn($mockUser);
+        $this->userAlias->shouldReceive('find')->with(10, ['id', 'skills'])->andReturn($mockUser);
 
         $mockJob = Mockery::mock();
         $mockJob->skills_required = 'php, javascript, react';
@@ -1313,7 +1380,7 @@ class JobVacancyServiceTest extends TestCase
     {
         $mockUser = Mockery::mock();
         $mockUser->skills = 'painting, cooking, gardening';
-        User::shouldReceive('find')->with(10, ['id', 'skills'])->andReturn($mockUser);
+        $this->userAlias->shouldReceive('find')->with(10, ['id', 'skills'])->andReturn($mockUser);
 
         $mockJob = Mockery::mock();
         $mockJob->skills_required = 'php, javascript, react';
@@ -1332,7 +1399,7 @@ class JobVacancyServiceTest extends TestCase
     {
         $mockUser = Mockery::mock();
         $mockUser->skills = 'php, python';
-        User::shouldReceive('find')->with(10, ['id', 'skills'])->andReturn($mockUser);
+        $this->userAlias->shouldReceive('find')->with(10, ['id', 'skills'])->andReturn($mockUser);
 
         $mockJob = Mockery::mock();
         $mockJob->skills_required = 'php, javascript, react';
@@ -1351,7 +1418,7 @@ class JobVacancyServiceTest extends TestCase
     {
         $mockUser = Mockery::mock();
         $mockUser->skills = 'php, javascript';
-        User::shouldReceive('find')->with(10, ['id', 'skills'])->andReturn($mockUser);
+        $this->userAlias->shouldReceive('find')->with(10, ['id', 'skills'])->andReturn($mockUser);
 
         $mockJob = Mockery::mock();
         $mockJob->skills_required = '';
@@ -1367,7 +1434,7 @@ class JobVacancyServiceTest extends TestCase
     {
         $mockUser = Mockery::mock();
         $mockUser->skills = '';
-        User::shouldReceive('find')->with(10, ['id', 'skills'])->andReturn($mockUser);
+        $this->userAlias->shouldReceive('find')->with(10, ['id', 'skills'])->andReturn($mockUser);
 
         $mockJob = Mockery::mock();
         $mockJob->skills_required = 'php, javascript';
@@ -1384,7 +1451,7 @@ class JobVacancyServiceTest extends TestCase
     {
         $mockUser = Mockery::mock();
         $mockUser->skills = 'javascript';
-        User::shouldReceive('find')->with(10, ['id', 'skills'])->andReturn($mockUser);
+        $this->userAlias->shouldReceive('find')->with(10, ['id', 'skills'])->andReturn($mockUser);
 
         $mockJob = Mockery::mock();
         // 'javascript developer' contains 'javascript', so it should match via str_contains
@@ -1447,9 +1514,9 @@ class JobVacancyServiceTest extends TestCase
         $mockUser->skills = 'php, laravel, javascript';
         $mockUser->latitude = null;
         $mockUser->longitude = null;
-        User::shouldReceive('find')->with(10, ['id', 'skills'])->andReturn($mockUser);
-        User::shouldReceive('where')->andReturnSelf();
-        User::shouldReceive('first')->andReturn($mockUser);
+        $this->userAlias->shouldReceive('find')->with(10, ['id', 'skills'])->andReturn($mockUser);
+        $this->userAlias->shouldReceive('where')->andReturnSelf();
+        $this->userAlias->shouldReceive('first')->andReturn($mockUser);
 
         // Mock DB for enrichVacancy has_applied/is_saved
         DB::shouldReceive('table')->andReturnSelf();
@@ -1458,8 +1525,8 @@ class JobVacancyServiceTest extends TestCase
         DB::shouldReceive('select')->andReturnSelf();
         DB::shouldReceive('first')->andReturnNull();
 
-        SavedJob::shouldReceive('where')->andReturnSelf();
-        SavedJob::shouldReceive('exists')->andReturn(false);
+        $this->savedJobAlias->shouldReceive('where')->andReturnSelf();
+        $this->savedJobAlias->shouldReceive('exists')->andReturn(false);
 
         $result = $this->service->getQualificationAssessment(10, 5);
 
@@ -1478,8 +1545,8 @@ class JobVacancyServiceTest extends TestCase
 
     public function test_getApplicationHistory_returns_null_when_not_found(): void
     {
-        JobApplication::shouldReceive('with')->with(['vacancy'])->andReturnSelf();
-        JobApplication::shouldReceive('find')->with(999)->andReturnNull();
+        $this->getJobApplicationAlias()->shouldReceive('with')->with(['vacancy'])->andReturnSelf();
+        $this->getJobApplicationAlias()->shouldReceive('find')->with(999)->andReturnNull();
 
         $result = $this->service->getApplicationHistory(999, 10);
         $this->assertNull($result);
@@ -1492,20 +1559,22 @@ class JobVacancyServiceTest extends TestCase
         $mockVacancy->user_id = 1;
         $mockVacancy->tenant_id = 2;
 
-        $mockApp = Mockery::mock(JobApplication::class)->makePartial();
+        $mockApp = Mockery::mock();
+        $mockApp->vacancy = $mockVacancy;
+        $mockApp->user_id = 10;
         $mockApp->shouldReceive('getAttribute')->with('vacancy')->andReturn($mockVacancy);
         $mockApp->shouldReceive('getAttribute')->with('user_id')->andReturn(10);
 
         $appWithQuery = Mockery::mock();
         $appWithQuery->shouldReceive('find')->with(100)->andReturn($mockApp);
-        JobApplication::shouldReceive('with')->with(['vacancy'])->andReturn($appWithQuery);
+        $this->getJobApplicationAlias()->shouldReceive('with')->with(['vacancy'])->andReturn($appWithQuery);
 
         // User 99 is not applicant (10), not owner (1), and not admin
         $mockUser = Mockery::mock();
         $mockUser->role = 'member';
         $mockUserQuery = Mockery::mock();
         $mockUserQuery->shouldReceive('first')->andReturn($mockUser);
-        User::shouldReceive('where')->with('id', 99)->andReturn($mockUserQuery);
+        $this->userAlias->shouldReceive('where')->with('id', 99)->andReturn($mockUserQuery);
 
         $result = $this->service->getApplicationHistory(100, 99);
         $this->assertNull($result);
@@ -1518,16 +1587,18 @@ class JobVacancyServiceTest extends TestCase
         $mockVacancy->user_id = 1;
         $mockVacancy->tenant_id = 2;
 
-        $mockApp = Mockery::mock(JobApplication::class)->makePartial();
+        $mockApp = Mockery::mock();
+        $mockApp->vacancy = $mockVacancy;
+        $mockApp->user_id = 10;
         $mockApp->shouldReceive('getAttribute')->with('vacancy')->andReturn($mockVacancy);
         $mockApp->shouldReceive('getAttribute')->with('user_id')->andReturn(10);
 
         $appWithQuery = Mockery::mock();
         $appWithQuery->shouldReceive('find')->with(100)->andReturn($mockApp);
-        JobApplication::shouldReceive('with')->with(['vacancy'])->andReturn($appWithQuery);
+        $this->getJobApplicationAlias()->shouldReceive('with')->with(['vacancy'])->andReturn($appWithQuery);
 
         // Mock the history query
-        $mockHistory = Mockery::mock(JobApplicationHistory::class)->makePartial();
+        $mockHistory = Mockery::mock();
         $mockHistory->shouldReceive('toArray')->andReturn([
             'id' => 1, 'application_id' => 100,
             'from_status' => null, 'to_status' => 'applied',
@@ -1535,13 +1606,14 @@ class JobVacancyServiceTest extends TestCase
         $mockChanger = Mockery::mock();
         $mockChanger->first_name = 'System';
         $mockChanger->last_name = '';
+        $mockHistory->changer = $mockChanger;
         $mockHistory->shouldReceive('getAttribute')->with('changer')->andReturn($mockChanger);
 
         $historyQuery = Mockery::mock();
         $historyQuery->shouldReceive('where')->with('application_id', 100)->andReturnSelf();
         $historyQuery->shouldReceive('orderBy')->with('changed_at')->andReturnSelf();
         $historyQuery->shouldReceive('get')->andReturn(collect([$mockHistory]));
-        JobApplicationHistory::shouldReceive('with')->with(['changer:id,first_name,last_name'])->andReturn($historyQuery);
+        $this->getJobApplicationHistoryAlias()->shouldReceive('with')->with(['changer:id,first_name,last_name'])->andReturn($historyQuery);
 
         $result = $this->service->getApplicationHistory(100, 10);
         $this->assertIsArray($result);
@@ -1582,7 +1654,7 @@ class JobVacancyServiceTest extends TestCase
         $mockUser->role = 'member';
         $mockUserQuery = Mockery::mock();
         $mockUserQuery->shouldReceive('first')->andReturn($mockUser);
-        User::shouldReceive('where')->with('id', 99)->andReturn($mockUserQuery);
+        $this->userAlias->shouldReceive('where')->with('id', 99)->andReturn($mockUserQuery);
 
         $result = $this->service->getAnalytics(5, 99);
         $this->assertNull($result);
@@ -1633,7 +1705,7 @@ class JobVacancyServiceTest extends TestCase
         $mockUser->role = 'member';
         $mockUserQuery = Mockery::mock();
         $mockUserQuery->shouldReceive('first')->andReturn($mockUser);
-        User::shouldReceive('where')->with('id', 99)->andReturn($mockUserQuery);
+        $this->userAlias->shouldReceive('where')->with('id', 99)->andReturn($mockUserQuery);
 
         $result = $this->service->renewJob(5, 99);
         $this->assertFalse($result);
@@ -1656,7 +1728,7 @@ class JobVacancyServiceTest extends TestCase
         $mockUser->role = 'super_admin';
         $mockUserQuery = Mockery::mock();
         $mockUserQuery->shouldReceive('first')->andReturn($mockUser);
-        User::shouldReceive('where')->with('id', 99)->andReturn($mockUserQuery);
+        $this->userAlias->shouldReceive('where')->with('id', 99)->andReturn($mockUserQuery);
 
         $result = $this->service->renewJob(5, 99, 15);
         $this->assertTrue($result);
@@ -1670,12 +1742,12 @@ class JobVacancyServiceTest extends TestCase
     {
         $mockUser = Mockery::mock();
         $mockUser->skills = 'php, laravel';
-        User::shouldReceive('find')->with(10, ['id', 'skills'])->andReturn($mockUser);
+        $this->userAlias->shouldReceive('find')->with(10, ['id', 'skills'])->andReturn($mockUser);
 
         // Mock applied IDs query
         $appliedQuery = Mockery::mock();
         $appliedQuery->shouldReceive('pluck')->with('vacancy_id')->andReturn(collect([]));
-        JobApplication::shouldReceive('where')->with('user_id', 10)->andReturn($appliedQuery);
+        $this->getJobApplicationAlias()->shouldReceive('where')->with('user_id', 10)->andReturn($appliedQuery);
 
         $query = Mockery::mock();
         $query->shouldReceive('leftJoin')->andReturnSelf();
@@ -1696,11 +1768,11 @@ class JobVacancyServiceTest extends TestCase
     {
         $mockUser = Mockery::mock();
         $mockUser->skills = '';
-        User::shouldReceive('find')->with(10, ['id', 'skills'])->andReturn($mockUser);
+        $this->userAlias->shouldReceive('find')->with(10, ['id', 'skills'])->andReturn($mockUser);
 
         $appliedQuery = Mockery::mock();
         $appliedQuery->shouldReceive('pluck')->with('vacancy_id')->andReturn(collect([]));
-        JobApplication::shouldReceive('where')->with('user_id', 10)->andReturn($appliedQuery);
+        $this->getJobApplicationAlias()->shouldReceive('where')->with('user_id', 10)->andReturn($appliedQuery);
 
         $query = Mockery::mock();
         $query->shouldReceive('leftJoin')->andReturnSelf();
@@ -1767,8 +1839,8 @@ class JobVacancyServiceTest extends TestCase
         DB::shouldReceive('where')->andReturnSelf();
         DB::shouldReceive('select')->andReturnSelf();
         DB::shouldReceive('first')->andReturnNull();
-        SavedJob::shouldReceive('where')->andReturnSelf();
-        SavedJob::shouldReceive('exists')->andReturn(false);
+        $this->savedJobAlias->shouldReceive('where')->andReturnSelf();
+        $this->savedJobAlias->shouldReceive('exists')->andReturn(false);
 
         // Mock the applications query for CSV
         $mockApplicant = Mockery::mock();
@@ -1788,7 +1860,7 @@ class JobVacancyServiceTest extends TestCase
         $appQuery->shouldReceive('where')->andReturnSelf();
         $appQuery->shouldReceive('orderBy')->with('created_at')->andReturnSelf();
         $appQuery->shouldReceive('get')->andReturn(collect([$mockApp]));
-        JobApplication::shouldReceive('with')->andReturn($appQuery);
+        $this->getJobApplicationAlias()->shouldReceive('with')->andReturn($appQuery);
 
         $result = $this->service->exportApplicationsCsv(5, 1);
 
@@ -1850,8 +1922,8 @@ class JobVacancyServiceTest extends TestCase
         DB::shouldReceive('where')->andReturnSelf();
         DB::shouldReceive('select')->andReturnSelf();
         DB::shouldReceive('first')->andReturnNull();
-        SavedJob::shouldReceive('where')->andReturnSelf();
-        SavedJob::shouldReceive('exists')->andReturn(false);
+        $this->savedJobAlias->shouldReceive('where')->andReturnSelf();
+        $this->savedJobAlias->shouldReceive('exists')->andReturn(false);
 
         $result = $this->service->bulkUpdateApplicationStatus(5, 1, [1, 2], 'invalid_status');
         $this->assertEquals(0, $result);
@@ -1875,17 +1947,17 @@ class JobVacancyServiceTest extends TestCase
         DB::shouldReceive('where')->andReturnSelf();
         DB::shouldReceive('select')->andReturnSelf();
         DB::shouldReceive('first')->andReturnNull();
-        SavedJob::shouldReceive('where')->andReturnSelf();
-        SavedJob::shouldReceive('exists')->andReturn(false);
+        $this->savedJobAlias->shouldReceive('where')->andReturnSelf();
+        $this->savedJobAlias->shouldReceive('exists')->andReturn(false);
 
         // Mock the bulk update
         $bulkQuery = Mockery::mock();
         $bulkQuery->shouldReceive('where')->andReturnSelf();
         $bulkQuery->shouldReceive('whereIn')->andReturnSelf();
         $bulkQuery->shouldReceive('update')->andReturn(3);
-        JobApplication::shouldReceive('where')->andReturn($bulkQuery);
+        $this->getJobApplicationAlias()->shouldReceive('where')->andReturn($bulkQuery);
 
-        WebhookDispatchService::shouldReceive('dispatch')->andReturnNull();
+        $this->webhookAlias->shouldReceive('dispatch')->andReturnNull();
 
         $result = $this->service->bulkUpdateApplicationStatus(5, 1, [1, 2, 3], 'rejected');
         $this->assertEquals(3, $result);
@@ -2046,22 +2118,22 @@ class JobVacancyServiceTest extends TestCase
         $existsQuery = Mockery::mock();
         $existsQuery->shouldReceive('where')->with('user_id', 10)->andReturnSelf();
         $existsQuery->shouldReceive('exists')->andReturn(false);
-        JobApplication::shouldReceive('where')->with('vacancy_id', 5)->andReturn($existsQuery);
+        $this->getJobApplicationAlias()->shouldReceive('where')->with('vacancy_id', 5)->andReturn($existsQuery);
 
         $mockApp = Mockery::mock();
         $mockApp->id = 200;
-        JobApplication::shouldReceive('create')->with(Mockery::on(function ($data) {
+        $this->getJobApplicationAlias()->shouldReceive('create')->with(Mockery::on(function ($data) {
             return $data['message'] === 'My message';
         }))->andReturn($mockApp);
 
-        JobApplicationHistory::shouldReceive('create')->andReturn(Mockery::mock());
+        $this->getJobApplicationHistoryAlias()->shouldReceive('create')->andReturn(Mockery::mock());
 
         $incQuery = Mockery::mock();
         $incQuery->shouldReceive('where')->andReturnSelf();
         $incQuery->shouldReceive('increment')->andReturn(1);
         $this->mockVacancy->shouldReceive('newQuery')->andReturn($incQuery);
 
-        WebhookDispatchService::shouldReceive('dispatch')->andReturnNull();
+        $this->webhookAlias->shouldReceive('dispatch')->andReturnNull();
 
         $result = $this->service->legacyApply(5, 10, 'My message');
         $this->assertEquals(200, $result);
@@ -2102,8 +2174,8 @@ class JobVacancyServiceTest extends TestCase
         DB::shouldReceive('select')->andReturnSelf();
         DB::shouldReceive('first')->andReturnNull();
 
-        SavedJob::shouldReceive('where')->andReturnSelf();
-        SavedJob::shouldReceive('exists')->andReturn(true);
+        $this->savedJobAlias->shouldReceive('where')->andReturnSelf();
+        $this->savedJobAlias->shouldReceive('exists')->andReturn(true);
 
         $result = $this->service->legacyGetById(5, 10);
 

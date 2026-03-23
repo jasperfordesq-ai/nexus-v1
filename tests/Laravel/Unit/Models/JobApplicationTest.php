@@ -29,8 +29,8 @@ class JobApplicationTest extends TestCase
     public function test_fillable_contains_expected_fields(): void
     {
         $expected = [
-            'vacancy_id', 'user_id', 'message', 'status', 'stage',
-            'reviewer_notes', 'reviewed_by', 'reviewed_at',
+            'vacancy_id', 'user_id', 'message', 'cv_path', 'cv_filename', 'cv_size',
+            'status', 'stage', 'reviewer_notes', 'reviewed_by', 'reviewed_at',
         ];
         $this->assertEquals($expected, $this->model->getFillable());
     }

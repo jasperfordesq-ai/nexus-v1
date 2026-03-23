@@ -124,27 +124,27 @@ class AdminSafeguardingController extends BaseApiController
 
         try {
             $assignments = DB::table('safeguarding_assignments as sa')
-                ->join('users as u', 'sa.user_id', '=', 'u.id')
+                ->join('users as u', 'sa.ward_user_id', '=', 'u.id')
                 ->where('sa.tenant_id', $tenantId)
                 ->select([
                     'sa.id',
-                    'sa.user_id',
+                    'sa.ward_user_id as user_id',
                     'u.first_name',
                     'u.last_name',
                     'u.email',
-                    'sa.assignee_id',
-                    'sa.type',
-                    'sa.status',
+                    'sa.guardian_user_id as assignee_id',
+                    DB::raw("'safeguarding' as type"),
+                    DB::raw("CASE WHEN sa.revoked_at IS NOT NULL THEN 'revoked' WHEN sa.consent_given_at IS NOT NULL THEN 'active' ELSE 'pending' END as status"),
                     'sa.notes',
-                    'sa.created_at',
-                    'sa.updated_at',
+                    'sa.assigned_at as created_at',
+                    'sa.assigned_at as updated_at',
                 ])
-                ->orderByDesc('sa.created_at')
+                ->orderByDesc('sa.assigned_at')
                 ->get()
                 ->map(fn ($row) => (array) $row)
                 ->toArray();
         } catch (\Illuminate\Database\QueryException $e) {
-            if ($this->isTableNotFound($e)) {
+            if ($this->isTableNotFound($e) || str_contains($e->getMessage(), 'Column not found')) {
                 return $this->respondWithCollection([]);
             }
             throw $e;

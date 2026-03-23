@@ -28,7 +28,7 @@ class TotpServiceTest extends TestCase
 
         $this->assertStringStartsWith('otpauth://totp/', $uri);
         $this->assertStringContainsString('user%40example.com', $uri);
-        $this->assertStringContainsString('Project+NEXUS', $uri);
+        $this->assertStringContainsString('Project%20NEXUS', $uri);
     }
 
     public function test_getProvisioningUri_with_custom_issuer(): void
@@ -36,7 +36,7 @@ class TotpServiceTest extends TestCase
         $secret = TotpService::generateSecret();
         $uri = TotpService::getProvisioningUri($secret, 'test@test.com', 'Custom Issuer');
 
-        $this->assertStringContainsString('Custom+Issuer', $uri);
+        $this->assertStringContainsString('Custom%20Issuer', $uri);
     }
 
     public function test_verifyCode_returns_bool(): void

@@ -9,15 +9,22 @@ namespace Tests\Laravel\Unit\Services;
 use App\Models\ListingSkillTag;
 use App\Services\ListingSkillTagService;
 use Illuminate\Support\Facades\DB;
+use Mockery;
 use Tests\Laravel\TestCase;
 
+/**
+ * @runInSeparateProcess
+ * @preserveGlobalState disabled
+ */
 class ListingSkillTagServiceTest extends TestCase
 {
     private ListingSkillTagService $service;
+    private $listingSkillTagAlias;
 
     protected function setUp(): void
     {
         parent::setUp();
+        $this->listingSkillTagAlias = Mockery::mock('alias:' . ListingSkillTag::class);
         $this->service = new ListingSkillTagService();
     }
 
@@ -32,9 +39,9 @@ class ListingSkillTagServiceTest extends TestCase
 
     public function test_getTags_returns_array(): void
     {
-        ListingSkillTag::shouldReceive('where')->andReturnSelf();
-        ListingSkillTag::shouldReceive('orderBy')->andReturnSelf();
-        ListingSkillTag::shouldReceive('pluck')->andReturn(collect(['cooking', 'gardening']));
+        $this->listingSkillTagAlias->shouldReceive('where')->andReturnSelf();
+        $this->listingSkillTagAlias->shouldReceive('orderBy')->andReturnSelf();
+        $this->listingSkillTagAlias->shouldReceive('pluck')->andReturn(collect(['cooking', 'gardening']));
 
         $result = $this->service->getTags(1);
         $this->assertSame(['cooking', 'gardening'], $result);
@@ -47,8 +54,8 @@ class ListingSkillTagServiceTest extends TestCase
 
     public function test_addTag_max_tags_reached_returns_false(): void
     {
-        ListingSkillTag::shouldReceive('where')->andReturnSelf();
-        ListingSkillTag::shouldReceive('count')->andReturn(10);
+        $this->listingSkillTagAlias->shouldReceive('where')->andReturnSelf();
+        $this->listingSkillTagAlias->shouldReceive('count')->andReturn(10);
 
         $this->assertFalse($this->service->addTag(1, 'new-tag'));
     }

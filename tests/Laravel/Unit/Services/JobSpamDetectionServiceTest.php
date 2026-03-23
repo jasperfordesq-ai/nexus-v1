@@ -12,8 +12,22 @@ use App\Services\JobSpamDetectionService;
 use Mockery;
 use Tests\Laravel\TestCase;
 
+/**
+ * @runInSeparateProcess
+ * @preserveGlobalState disabled
+ */
 class JobSpamDetectionServiceTest extends TestCase
 {
+    private $jobVacancyAlias;
+    private $userAlias;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+        $this->jobVacancyAlias = Mockery::mock('alias:' . JobVacancy::class);
+        $this->userAlias = Mockery::mock('alias:' . User::class);
+    }
+
     // ── analyzeJob: Duplicate Content ────────────────────────────
 
     public function test_analyzeJob_flags_duplicate_title(): void
@@ -34,15 +48,13 @@ class JobSpamDetectionServiceTest extends TestCase
         $rateQuery->shouldReceive('count')->andReturn(0);
 
         // New account check
-        $userMock = Mockery::mock();
-        $userMock->created_at = now()->subDays(30);
-        $userMock->shouldReceive('__get')->with('created_at')->andReturn(now()->subDays(30));
+        $userMock = (object) ['created_at' => now()->subDays(30)];
 
         $userQuery = Mockery::mock();
         $userQuery->shouldReceive('first')->andReturn($userMock);
 
-        JobVacancy::shouldReceive('where')->with('tenant_id', 2)->andReturn($duplicateQuery, $rateQuery);
-        User::shouldReceive('where')->with('id', 1)->andReturn($userQuery);
+        $this->jobVacancyAlias->shouldReceive('where')->with('tenant_id', 2)->andReturn($duplicateQuery, $rateQuery);
+        $this->userAlias->shouldReceive('where')->with('id', 1)->andReturn($userQuery);
 
         $result = JobSpamDetectionService::analyzeJob(
             ['title' => 'Existing Job', 'description' => 'Unique description here'],
@@ -59,9 +71,8 @@ class JobSpamDetectionServiceTest extends TestCase
         // Duplicate check: title not matched but description matched
         $duplicateQuery = Mockery::mock();
         $duplicateQuery->shouldReceive('where')->andReturnSelf();
-        $duplicateQuery->shouldReceive('exists')->andReturn(false);   // title not duplicate
-        $duplicateQuery->shouldReceive('where')->andReturnSelf();
-        $duplicateQuery->shouldReceive('exists')->andReturn(true);    // description duplicate
+        $duplicateQuery->shouldReceive('exists')->andReturn(false, true);   // title not duplicate, description duplicate
+        $duplicateQuery->shouldReceive('count')->andReturn(0);
 
         // Rate limit check
         $rateQuery = Mockery::mock();
@@ -69,13 +80,12 @@ class JobSpamDetectionServiceTest extends TestCase
         $rateQuery->shouldReceive('count')->andReturn(0);
 
         // New account check
-        $userMock = Mockery::mock();
-        $userMock->shouldReceive('__get')->with('created_at')->andReturn(now()->subDays(30));
+        $userMock = (object) ['created_at' => now()->subDays(30)];
         $userQuery = Mockery::mock();
         $userQuery->shouldReceive('first')->andReturn($userMock);
 
-        JobVacancy::shouldReceive('where')->with('tenant_id', 2)->andReturn($duplicateQuery, $rateQuery);
-        User::shouldReceive('where')->with('id', 1)->andReturn($userQuery);
+        $this->jobVacancyAlias->shouldReceive('where')->with('tenant_id', 2)->andReturn($duplicateQuery, $rateQuery);
+        $this->userAlias->shouldReceive('where')->with('id', 1)->andReturn($userQuery);
 
         $result = JobSpamDetectionService::analyzeJob(
             ['title' => 'Unique Title', 'description' => 'Duplicate description text'],
@@ -98,13 +108,12 @@ class JobSpamDetectionServiceTest extends TestCase
         $rateQuery->shouldReceive('where')->andReturnSelf();
         $rateQuery->shouldReceive('count')->andReturn(0);
 
-        $userMock = Mockery::mock();
-        $userMock->shouldReceive('__get')->with('created_at')->andReturn(now()->subDays(30));
+        $userMock = (object) ['created_at' => now()->subDays(30)];
         $userQuery = Mockery::mock();
         $userQuery->shouldReceive('first')->andReturn($userMock);
 
-        JobVacancy::shouldReceive('where')->with('tenant_id', 2)->andReturn($duplicateQuery, $rateQuery);
-        User::shouldReceive('where')->with('id', 1)->andReturn($userQuery);
+        $this->jobVacancyAlias->shouldReceive('where')->with('tenant_id', 2)->andReturn($duplicateQuery, $rateQuery);
+        $this->userAlias->shouldReceive('where')->with('id', 1)->andReturn($userQuery);
 
         $result = JobSpamDetectionService::analyzeJob(
             ['title' => 'Unique Title', 'description' => 'Unique description'],
@@ -181,13 +190,12 @@ class JobSpamDetectionServiceTest extends TestCase
         $rateQuery->shouldReceive('count')->andReturn(5);
 
         // Old account
-        $userMock = Mockery::mock();
-        $userMock->shouldReceive('__get')->with('created_at')->andReturn(now()->subDays(60));
+        $userMock = (object) ['created_at' => now()->subDays(60)];
         $userQuery = Mockery::mock();
         $userQuery->shouldReceive('first')->andReturn($userMock);
 
-        JobVacancy::shouldReceive('where')->with('tenant_id', 2)->andReturn($duplicateQuery, $rateQuery);
-        User::shouldReceive('where')->with('id', 1)->andReturn($userQuery);
+        $this->jobVacancyAlias->shouldReceive('where')->with('tenant_id', 2)->andReturn($duplicateQuery, $rateQuery);
+        $this->userAlias->shouldReceive('where')->with('id', 1)->andReturn($userQuery);
 
         $result = JobSpamDetectionService::analyzeJob(
             ['title' => 'Normal Job', 'description' => 'Normal description'],
@@ -211,13 +219,12 @@ class JobSpamDetectionServiceTest extends TestCase
         $rateQuery->shouldReceive('where')->andReturnSelf();
         $rateQuery->shouldReceive('count')->andReturn(3);
 
-        $userMock = Mockery::mock();
-        $userMock->shouldReceive('__get')->with('created_at')->andReturn(now()->subDays(60));
+        $userMock = (object) ['created_at' => now()->subDays(60)];
         $userQuery = Mockery::mock();
         $userQuery->shouldReceive('first')->andReturn($userMock);
 
-        JobVacancy::shouldReceive('where')->with('tenant_id', 2)->andReturn($duplicateQuery, $rateQuery);
-        User::shouldReceive('where')->with('id', 1)->andReturn($userQuery);
+        $this->jobVacancyAlias->shouldReceive('where')->with('tenant_id', 2)->andReturn($duplicateQuery, $rateQuery);
+        $this->userAlias->shouldReceive('where')->with('id', 1)->andReturn($userQuery);
 
         $result = JobSpamDetectionService::analyzeJob(
             ['title' => 'Normal Job', 'description' => 'Normal description'],
@@ -324,14 +331,12 @@ class JobSpamDetectionServiceTest extends TestCase
         $rateQuery->shouldReceive('count')->andReturn(0);
 
         // Account created 2 hours ago (< 24 hours)
-        $userMock = Mockery::mock();
-        $userMock->created_at = now()->subHours(2);
-        $userMock->shouldReceive('__get')->with('created_at')->andReturn(now()->subHours(2));
+        $userMock = (object) ['created_at' => now()->subHours(2)];
         $userQuery = Mockery::mock();
-        $userQuery->shouldReceive('first')->with(['id', 'created_at'])->andReturn($userMock);
+        $userQuery->shouldReceive('first')->andReturn($userMock);
 
-        JobVacancy::shouldReceive('where')->with('tenant_id', 2)->andReturn($duplicateQuery, $rateQuery);
-        User::shouldReceive('where')->with('id', 1)->andReturn($userQuery);
+        $this->jobVacancyAlias->shouldReceive('where')->with('tenant_id', 2)->andReturn($duplicateQuery, $rateQuery);
+        $this->userAlias->shouldReceive('where')->with('id', 1)->andReturn($userQuery);
 
         $result = JobSpamDetectionService::analyzeJob(
             ['title' => 'Normal Job', 'description' => 'Normal description'],
@@ -371,8 +376,8 @@ class JobSpamDetectionServiceTest extends TestCase
         $userQuery = Mockery::mock();
         $userQuery->shouldReceive('first')->andReturn(null);
 
-        JobVacancy::shouldReceive('where')->with('tenant_id', 2)->andReturn($duplicateQuery, $rateQuery);
-        User::shouldReceive('where')->with('id', 1)->andReturn($userQuery);
+        $this->jobVacancyAlias->shouldReceive('where')->with('tenant_id', 2)->andReturn($duplicateQuery, $rateQuery);
+        $this->userAlias->shouldReceive('where')->with('id', 1)->andReturn($userQuery);
 
         $result = JobSpamDetectionService::analyzeJob(
             ['title' => 'Normal Job', 'description' => 'Normal description'],
@@ -413,13 +418,12 @@ class JobSpamDetectionServiceTest extends TestCase
         $rateQuery->shouldReceive('count')->andReturn(5); // +30
 
         // New account
-        $userMock = Mockery::mock();
-        $userMock->shouldReceive('__get')->with('created_at')->andReturn(now()->subHours(1));
+        $userMock = (object) ['created_at' => now()->subHours(1)];
         $userQuery = Mockery::mock();
         $userQuery->shouldReceive('first')->andReturn($userMock);
 
-        JobVacancy::shouldReceive('where')->with('tenant_id', 2)->andReturn($duplicateQuery, $rateQuery);
-        User::shouldReceive('where')->with('id', 1)->andReturn($userQuery);
+        $this->jobVacancyAlias->shouldReceive('where')->with('tenant_id', 2)->andReturn($duplicateQuery, $rateQuery);
+        $this->userAlias->shouldReceive('where')->with('id', 1)->andReturn($userQuery);
 
         $result = JobSpamDetectionService::analyzeJob(
             [
@@ -445,13 +449,12 @@ class JobSpamDetectionServiceTest extends TestCase
         $rateQuery->shouldReceive('where')->andReturnSelf();
         $rateQuery->shouldReceive('count')->andReturn(10);
 
-        $userMock = Mockery::mock();
-        $userMock->shouldReceive('__get')->with('created_at')->andReturn(now()->subMinutes(5));
+        $userMock = (object) ['created_at' => now()->subMinutes(5)];
         $userQuery = Mockery::mock();
         $userQuery->shouldReceive('first')->andReturn($userMock);
 
-        JobVacancy::shouldReceive('where')->with('tenant_id', 2)->andReturn($duplicateQuery, $rateQuery);
-        User::shouldReceive('where')->with('id', 1)->andReturn($userQuery);
+        $this->jobVacancyAlias->shouldReceive('where')->with('tenant_id', 2)->andReturn($duplicateQuery, $rateQuery);
+        $this->userAlias->shouldReceive('where')->with('id', 1)->andReturn($userQuery);
 
         $result = JobSpamDetectionService::analyzeJob(
             [
@@ -512,7 +515,7 @@ class JobSpamDetectionServiceTest extends TestCase
             '["duplicate_content","suspicious_links"]',
         ]));
 
-        JobVacancy::shouldReceive('where')
+        $this->jobVacancyAlias->shouldReceive('where')
             ->with('tenant_id', 2)
             ->andReturn($totalQuery, $blockedQuery, $flaggedQuery, $avgQuery, $flagsQuery);
 
@@ -555,7 +558,7 @@ class JobSpamDetectionServiceTest extends TestCase
             '["duplicate_content","suspicious_links"]',
         ]));
 
-        JobVacancy::shouldReceive('where')
+        $this->jobVacancyAlias->shouldReceive('where')
             ->with('tenant_id', 2)
             ->andReturn($totalQuery, $blockedQuery, $flaggedQuery, $avgQuery, $flagsQuery);
 
@@ -576,7 +579,7 @@ class JobSpamDetectionServiceTest extends TestCase
         $queryMock->shouldReceive('avg')->andReturn(null);
         $queryMock->shouldReceive('pluck')->andReturn(collect([]));
 
-        JobVacancy::shouldReceive('where')->with('tenant_id', 2)->andReturn($queryMock);
+        $this->jobVacancyAlias->shouldReceive('where')->with('tenant_id', 2)->andReturn($queryMock);
 
         $result = JobSpamDetectionService::getSpamStats(2);
 
@@ -607,12 +610,11 @@ class JobSpamDetectionServiceTest extends TestCase
         $rateQuery->shouldReceive('count')->andReturn(0);
 
         // Old account (well past 24h threshold)
-        $userMock = Mockery::mock();
-        $userMock->shouldReceive('__get')->with('created_at')->andReturn(now()->subDays(60));
+        $userMock = (object) ['created_at' => now()->subDays(60)];
         $userQuery = Mockery::mock();
         $userQuery->shouldReceive('first')->andReturn($userMock);
 
-        JobVacancy::shouldReceive('where')->with('tenant_id', 2)->andReturn($duplicateQuery, $rateQuery);
-        User::shouldReceive('where')->with('id', 1)->andReturn($userQuery);
+        $this->jobVacancyAlias->shouldReceive('where')->with('tenant_id', 2)->andReturn($duplicateQuery, $rateQuery);
+        $this->userAlias->shouldReceive('where')->with('id', 1)->andReturn($userQuery);
     }
 }

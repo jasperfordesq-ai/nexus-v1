@@ -12,6 +12,10 @@ use App\Models\JobSavedProfile;
 use Illuminate\Support\Facades\Log;
 use Mockery;
 
+/**
+ * @runInSeparateProcess
+ * @preserveGlobalState disabled
+ */
 class JobSavedProfileServiceTest extends TestCase
 {
     // ── get ──────────────────────────────────────────────────────

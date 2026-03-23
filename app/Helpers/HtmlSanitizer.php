@@ -72,6 +72,10 @@ class HtmlSanitizer
         }
         $tagString = '<' . implode('><', $allowedTagList) . '>';
 
+        // Remove script and style blocks including their content before strip_tags
+        $html = preg_replace('/<script\b[^>]*>.*?<\/script>/is', '', $html);
+        $html = preg_replace('/<style\b[^>]*>.*?<\/style>/is', '', $html);
+
         // First pass: strip disallowed tags
         $html = strip_tags($html, $tagString);
 

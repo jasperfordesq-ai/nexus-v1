@@ -13,6 +13,10 @@ use App\Models\Group;
 use Illuminate\Support\Facades\DB;
 use Mockery;
 
+/**
+ * @runInSeparateProcess
+ * @preserveGlobalState disabled
+ */
 class ShiftGroupReservationServiceTest extends TestCase
 {
     protected function setUp(): void

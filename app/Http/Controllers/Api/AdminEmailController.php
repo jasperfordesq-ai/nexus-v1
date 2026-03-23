@@ -158,6 +158,12 @@ class AdminEmailController extends BaseApiController
         $tenantId = TenantContext::getId();
         $input = $this->getAllInput();
 
+        // Accept 'provider' as alias for 'email_provider'
+        if (isset($input['provider']) && !isset($input['email_provider'])) {
+            $input['email_provider'] = $input['provider'];
+            unset($input['provider']);
+        }
+
         if (isset($input['email_provider'])) {
             $validProviders = ['platform_default', 'sendgrid', 'gmail_api', 'smtp'];
             if (!in_array($input['email_provider'], $validProviders, true)) {

@@ -31,7 +31,7 @@ class UserFactory extends Factory
             'first_name'    => $firstName,
             'last_name'     => $lastName,
             'name'          => $firstName . ' ' . $lastName,
-            'email'         => $this->faker->unique()->safeEmail(),
+            'email'         => uniqid('u') . '_' . $this->faker->unique()->safeEmail(),
             'password_hash' => bcrypt('password'),
             'role'          => 'member',
             'status'        => 'active',

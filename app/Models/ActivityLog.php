@@ -17,6 +17,9 @@ class ActivityLog extends Model
     use HasFactory, HasTenantScope;
     protected $table = 'activity_log';
 
+    /** The activity_log table has created_at but no updated_at column. */
+    const UPDATED_AT = null;
+
     protected $fillable = [
         'user_id', 'action', 'details', 'is_public', 'link_url',
         'ip_address', 'action_type', 'entity_type', 'entity_id',

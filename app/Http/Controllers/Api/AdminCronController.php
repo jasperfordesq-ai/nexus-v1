@@ -115,14 +115,18 @@ class AdminCronController extends BaseApiController
         $tenantId = $this->getTenantId();
         $beforeDate = $this->query('before');
 
-        if (!$beforeDate) {
-            return $this->error('Missing before date', 400);
+        if ($beforeDate) {
+            $rowCount = DB::delete(
+                "DELETE FROM cron_logs WHERE (tenant_id = ? OR tenant_id IS NULL) AND executed_at < ?",
+                [$tenantId, $beforeDate]
+            );
+        } else {
+            // Clear all logs for this tenant
+            $rowCount = DB::delete(
+                "DELETE FROM cron_logs WHERE tenant_id = ? OR tenant_id IS NULL",
+                [$tenantId]
+            );
         }
-
-        $rowCount = DB::delete(
-            "DELETE FROM cron_logs WHERE (tenant_id = ? OR tenant_id IS NULL) AND executed_at < ?",
-            [$tenantId, $beforeDate]
-        );
 
         return $this->success(['message' => "Deleted {$rowCount} log entries", 'deleted_count' => $rowCount]);
     }

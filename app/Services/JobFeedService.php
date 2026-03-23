@@ -194,11 +194,12 @@ class JobFeedService
      */
     private function getOpenJobs(int $tenantId): \Illuminate\Database\Eloquent\Collection
     {
-        return JobVacancy::where('tenant_id', $tenantId)
-            ->where('status', 'open')
+        return JobVacancy::withoutGlobalScopes()
+            ->where('job_vacancies.tenant_id', $tenantId)
+            ->where('job_vacancies.status', 'open')
             ->where(function ($query) {
-                $query->whereNull('deadline')
-                      ->orWhere('deadline', '>', now());
+                $query->whereNull('job_vacancies.deadline')
+                      ->orWhere('job_vacancies.deadline', '>', now());
             })
             ->leftJoin('organizations as o', 'job_vacancies.organization_id', '=', 'o.id')
             ->select('job_vacancies.*', 'o.name as organization_name')

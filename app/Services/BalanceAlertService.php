@@ -145,8 +145,8 @@ class BalanceAlertService
         }
 
         return [
-            'low' => self::DEFAULT_LOW_BALANCE_THRESHOLD,
-            'critical' => self::DEFAULT_CRITICAL_BALANCE_THRESHOLD,
+            'low' => (float) self::DEFAULT_LOW_BALANCE_THRESHOLD,
+            'critical' => (float) self::DEFAULT_CRITICAL_BALANCE_THRESHOLD,
         ];
     }
 

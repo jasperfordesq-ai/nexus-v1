@@ -61,12 +61,13 @@ class IdentityProviderHealthController extends BaseApiController
                 [$tenantId, $slug]
             );
 
-            // Get last webhook event
+            // Get last webhook event (join via session to filter by provider)
             $lastWebhook = DB::selectOne(
-                "SELECT created_at, event_type
-                 FROM identity_verification_events
-                 WHERE tenant_id = ? AND JSON_EXTRACT(event_data, '$.provider_slug') = ?
-                 ORDER BY created_at DESC LIMIT 1",
+                "SELECT e.created_at, e.event_type
+                 FROM identity_verification_events e
+                 JOIN identity_verification_sessions s ON e.session_id = s.id
+                 WHERE e.tenant_id = ? AND s.provider_slug = ?
+                 ORDER BY e.created_at DESC LIMIT 1",
                 [$tenantId, $slug]
             );
 

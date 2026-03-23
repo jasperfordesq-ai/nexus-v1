@@ -12,8 +12,20 @@ use Illuminate\Support\Facades\DB;
 use Mockery;
 use Tests\Laravel\TestCase;
 
+/**
+ * @runInSeparateProcess
+ * @preserveGlobalState disabled
+ */
 class ListingServiceTest extends TestCase
 {
+    private $listingAlias;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+        $this->listingAlias = Mockery::mock('alias:' . Listing::class);
+    }
+
     public function test_getAll_returns_paginated_structure(): void
     {
         $query = Mockery::mock(\Illuminate\Database\Eloquent\Builder::class);
@@ -25,7 +37,7 @@ class ListingServiceTest extends TestCase
         $query->shouldReceive('limit')->andReturnSelf();
         $query->shouldReceive('get')->andReturn(collect([]));
 
-        Listing::shouldReceive('query')->andReturn($query);
+        $this->listingAlias->shouldReceive('query')->andReturn($query);
 
         $result = ListingService::getAll();
 
@@ -46,7 +58,7 @@ class ListingServiceTest extends TestCase
         $query->shouldReceive('limit')->andReturnSelf();
         $query->shouldReceive('get')->andReturn(collect([]));
 
-        Listing::shouldReceive('query')->andReturn($query);
+        $this->listingAlias->shouldReceive('query')->andReturn($query);
 
         $result = ListingService::getAll(['type' => 'offer']);
         $this->assertIsArray($result);
@@ -63,7 +75,7 @@ class ListingServiceTest extends TestCase
         $query->shouldReceive('limit')->with(101)->andReturnSelf(); // 100 + 1
         $query->shouldReceive('get')->andReturn(collect([]));
 
-        Listing::shouldReceive('query')->andReturn($query);
+        $this->listingAlias->shouldReceive('query')->andReturn($query);
 
         $result = ListingService::getAll(['limit' => 500]);
         $this->assertIsArray($result);

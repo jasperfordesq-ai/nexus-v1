@@ -18,6 +18,8 @@ class InactiveMemberServiceTest extends TestCase
     {
         parent::setUp();
         $this->service = new InactiveMemberService();
+        // Service methods use DB::raw() for aggregate SQL expressions
+        DB::shouldReceive('raw')->andReturnUsing(fn ($v) => new \Illuminate\Database\Query\Expression($v));
     }
 
     public function test_detectInactive_returns_summary(): void

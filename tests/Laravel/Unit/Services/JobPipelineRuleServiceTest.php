@@ -15,6 +15,10 @@ use App\Models\Notification;
 use Illuminate\Support\Facades\Log;
 use Mockery;
 
+/**
+ * @runInSeparateProcess
+ * @preserveGlobalState disabled
+ */
 class JobPipelineRuleServiceTest extends TestCase
 {
     protected function setUp(): void

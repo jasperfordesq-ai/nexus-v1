@@ -147,7 +147,18 @@ class JobVacanciesController extends BaseApiController
         $this->rateLimit('jobs_create', 5, 60);
 
         $data = $this->getAllInput();
-        $jobId = $this->jobService->create($userId, $data);
+
+        // Validate required fields before calling service
+        $title = trim($data['title'] ?? '');
+        if (empty($title)) {
+            return $this->respondWithError('VALIDATION_ERROR', 'Title is required', 'title', 422);
+        }
+
+        try {
+            $jobId = $this->jobService->create($userId, $data);
+        } catch (\Throwable $e) {
+            return $this->respondWithErrors([['code' => 'SERVER_INTERNAL_ERROR', 'message' => 'Failed to create job vacancy']], 500);
+        }
 
         if (!$jobId) {
             $errors = $this->jobService->getErrors();

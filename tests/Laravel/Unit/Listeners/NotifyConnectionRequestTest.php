@@ -15,6 +15,10 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Mockery;
 use Tests\Laravel\TestCase;
 
+/**
+ * @runInSeparateProcess
+ * @preserveGlobalState disabled
+ */
 class NotifyConnectionRequestTest extends TestCase
 {
     public function test_implements_should_queue(): void

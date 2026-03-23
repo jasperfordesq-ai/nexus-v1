@@ -20,6 +20,8 @@ class UserInsightsServiceTest extends TestCase
     {
         parent::setUp();
         $this->service = new UserInsightsService();
+        // Service methods use DB::raw() for aggregate SQL expressions
+        DB::shouldReceive('raw')->andReturnUsing(fn ($v) => new \Illuminate\Database\Query\Expression($v));
     }
 
     public function test_getInsights_returns_expected_keys(): void

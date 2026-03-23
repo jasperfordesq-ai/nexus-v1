@@ -77,17 +77,15 @@ class AdminFederationNeighborhoodsController extends BaseApiController
     public function destroy(int $id): JsonResponse
     {
         $this->requireAdmin();
-        $tenantId = $this->getTenantId();
 
         try {
-            $deleted = DB::delete(
-                "DELETE FROM federation_neighborhoods WHERE id = ? AND tenant_id = ?",
-                [$id, $tenantId]
-            );
-
-            if ($deleted === 0) {
+            $existing = DB::selectOne("SELECT id FROM federation_neighborhoods WHERE id = ?", [$id]);
+            if (!$existing) {
                 return $this->respondWithError('NOT_FOUND', 'Neighborhood not found', null, 404);
             }
+
+            DB::delete("DELETE FROM federation_neighborhood_tenants WHERE neighborhood_id = ?", [$id]);
+            DB::delete("DELETE FROM federation_neighborhoods WHERE id = ?", [$id]);
 
             return $this->respondWithData(['success' => true]);
         } catch (\Exception $e) {

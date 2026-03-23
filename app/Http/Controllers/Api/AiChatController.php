@@ -125,8 +125,8 @@ class AiChatController extends BaseApiController
         $limit = min($this->queryInt('limit', 50, 1, 100), 100);
         $offset = $this->queryInt('offset', 0, 0);
 
-        $conversations = AiConversation::getByUserId($userId, $limit, $offset);
-        $total = AiConversation::countByUserId($userId);
+        $conversations = AiConversation::getByUserId($userId, $this->getTenantId());
+        $total = AiConversation::countByUserId($userId, $this->getTenantId());
 
         return $this->respondWithData($conversations, [
             'total' => $total,
@@ -205,7 +205,7 @@ class AiChatController extends BaseApiController
     public function getLimits(): JsonResponse
     {
         $userId = $this->getUserId();
-        $limits = AiUserLimit::canMakeRequest($userId);
+        $limits = AiUserLimit::canMakeRequest($userId, $this->getTenantId());
 
         return $this->respondWithData(['limits' => $limits]);
     }

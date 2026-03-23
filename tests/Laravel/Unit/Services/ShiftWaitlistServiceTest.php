@@ -13,6 +13,10 @@ use Illuminate\Support\Facades\DB;
 use Mockery;
 use Carbon\Carbon;
 
+/**
+ * @runInSeparateProcess
+ * @preserveGlobalState disabled
+ */
 class ShiftWaitlistServiceTest extends TestCase
 {
     protected function setUp(): void

@@ -12,6 +12,10 @@ use App\Models\VolCustomField;
 use App\Models\VolAccessibilityNeed;
 use Mockery;
 
+/**
+ * @runInSeparateProcess
+ * @preserveGlobalState disabled
+ */
 class VolunteerFormServiceTest extends TestCase
 {
     public function test_getCustomFields_returns_empty_on_error(): void

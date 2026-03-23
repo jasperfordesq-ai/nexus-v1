@@ -30,6 +30,7 @@ class Translator
     public static function init(string $langDir): void
     {
         self::$langDir = rtrim($langDir, '/\\');
+        self::$loaded = [];
     }
 
     /**

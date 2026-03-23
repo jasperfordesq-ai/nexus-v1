@@ -12,6 +12,10 @@ use App\Models\JobTemplate;
 use Illuminate\Support\Facades\Log;
 use Mockery;
 
+/**
+ * @runInSeparateProcess
+ * @preserveGlobalState disabled
+ */
 class JobTemplateServiceTest extends TestCase
 {
     // ── list ─────────────────────────────────────────────────────

@@ -91,7 +91,7 @@ class RegistrationPolicyService
                 'verification_level' => $policy['verification_level'],
                 'post_verification' => $policy['post_verification'],
                 'fallback_mode' => $policy['fallback_mode'],
-                'require_email_verify' => (bool) $policy['require_email_verify'],
+                'require_email_verify' => (bool) ($policy['require_email_verify'] ?? false),
                 'has_policy' => true,
             ];
         }

@@ -224,9 +224,9 @@ Route::post('/v2/users/me/insurance', [\App\Http\Controllers\Api\UserInsuranceCo
 Route::get('/v2/users/{id}', [\App\Http\Controllers\Api\UsersController::class, 'show']);
 Route::get('/v2/users/{id}/listings', [\App\Http\Controllers\Api\UsersController::class, 'listings']);
 Route::get('/v2/members/nearby', [\App\Http\Controllers\Api\UsersController::class, 'nearby']);
-// Skills
-Route::get('/v2/skills/categories', [\App\Http\Controllers\Api\SkillTaxonomyController::class, 'getCategories']);
-Route::get('/v2/skills/search', [\App\Http\Controllers\Api\SkillTaxonomyController::class, 'search']);
+// Skills (categories + search are public; remaining skill routes require auth)
+Route::get('/v2/skills/categories', [\App\Http\Controllers\Api\SkillTaxonomyController::class, 'getCategories'])->withoutMiddleware('auth:sanctum');
+Route::get('/v2/skills/search', [\App\Http\Controllers\Api\SkillTaxonomyController::class, 'search'])->withoutMiddleware('auth:sanctum');
 Route::get('/v2/skills/members', [\App\Http\Controllers\Api\SkillTaxonomyController::class, 'getMembersWithSkill']);
 Route::get('/v2/skills/categories/{id}', [\App\Http\Controllers\Api\SkillTaxonomyController::class, 'getCategoryById']);
 Route::post('/v2/skills/categories', [\App\Http\Controllers\Api\SkillTaxonomyController::class, 'createCategory']);
@@ -551,7 +551,7 @@ Route::get('/v2/blog', [\App\Http\Controllers\Api\BlogPublicController::class, '
 Route::get('/v2/blog/categories', [\App\Http\Controllers\Api\BlogPublicController::class, 'categories']);
 Route::get('/v2/blog/{slug}', [\App\Http\Controllers\Api\BlogPublicController::class, 'show']);
 Route::get('/v2/help/faqs', [\App\Http\Controllers\Api\HelpController::class, 'getFaqs']);
-Route::get('/v2/pages/{slug}', [\App\Http\Controllers\Api\PagesPublicController::class, 'show']);
+Route::get('/v2/pages/{slug}', [\App\Http\Controllers\Api\PagesPublicController::class, 'show'])->withoutMiddleware('auth:sanctum');
 Route::get('/v2/resources', [\App\Http\Controllers\Api\ResourcePublicController::class, 'index']);
 Route::get('/v2/resources/categories', [\App\Http\Controllers\Api\ResourcePublicController::class, 'categories']);
 Route::get('/v2/resources/categories/tree', [\App\Http\Controllers\Api\ResourceCategoryController::class, 'tree']);
@@ -1212,9 +1212,9 @@ Route::get('/v2/auth/2fa/status', [\App\Http\Controllers\Api\TwoFactorController
 Route::post('/v2/auth/2fa/setup', [\App\Http\Controllers\Api\TwoFactorController::class, 'setup']);
 Route::post('/v2/auth/2fa/verify', [\App\Http\Controllers\Api\TwoFactorController::class, 'verify']);
 Route::post('/v2/auth/2fa/disable', [\App\Http\Controllers\Api\TwoFactorController::class, 'disable']);
-Route::post('/app/check-version', [\App\Http\Controllers\Api\AppController::class, 'checkVersion']);
-Route::get('/app/version', [\App\Http\Controllers\Api\AppController::class, 'version']);
-Route::post('/app/log', [\App\Http\Controllers\Api\AppController::class, 'log']);
+Route::post('/app/check-version', [\App\Http\Controllers\Api\AppController::class, 'checkVersion'])->withoutMiddleware('auth:sanctum');
+Route::get('/app/version', [\App\Http\Controllers\Api\AppController::class, 'version'])->withoutMiddleware('auth:sanctum');
+Route::post('/app/log', [\App\Http\Controllers\Api\AppController::class, 'log'])->withoutMiddleware('auth:sanctum');
 Route::post('/pusher/auth', [\App\Http\Controllers\Api\PusherController::class, 'auth']);
 Route::get('/pusher/auth', [\App\Http\Controllers\Api\PusherController::class, 'auth']);
 Route::get('/pusher/config', [\App\Http\Controllers\Api\PusherController::class, 'config']);

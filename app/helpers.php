@@ -85,3 +85,16 @@ if (!function_exists('__')) {
         return \App\I18n\Translator::get($key, $params);
     }
 }
+
+if (!function_exists('tenant_id')) {
+    /**
+     * Get the current tenant ID from TenantContext or Laravel container.
+     */
+    function tenant_id(): ?int
+    {
+        if (function_exists('app') && app()->bound('tenant.id')) {
+            return app('tenant.id');
+        }
+        return \App\Core\TenantContext::getId();
+    }
+}

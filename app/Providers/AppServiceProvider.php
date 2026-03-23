@@ -382,29 +382,21 @@ class AppServiceProvider extends ServiceProvider
             return new IdeationChallengeService();
         });
 
-        $this->app->singleton(JobVacancyService::class, function ($app) {
-            return new JobVacancyService();
-        });
+        $this->app->singleton(JobVacancyService::class);
 
         $this->app->singleton(SkillTaxonomyService::class, function ($app) {
             return new SkillTaxonomyService();
         });
 
-        $this->app->singleton(MemberAvailabilityService::class, function ($app) {
-            return new MemberAvailabilityService();
-        });
+        $this->app->singleton(MemberAvailabilityService::class);
 
-        $this->app->singleton(EndorsementService::class, function ($app) {
-            return new EndorsementService();
-        });
+        $this->app->singleton(EndorsementService::class);
 
         $this->app->singleton(MemberActivityService::class, function ($app) {
             return new MemberActivityService();
         });
 
-        $this->app->singleton(SubAccountService::class, function ($app) {
-            return new SubAccountService();
-        });
+        $this->app->singleton(SubAccountService::class);
 
         $this->app->singleton(KnowledgeBaseService::class, function ($app) {
             return new KnowledgeBaseService();
@@ -432,9 +424,7 @@ class AppServiceProvider extends ServiceProvider
 
         // --- Batch 4 services (15) — Admin/Specialized ---
 
-        $this->app->singleton(ContentModerationService::class, function ($app) {
-            return new ContentModerationService();
-        });
+        $this->app->singleton(ContentModerationService::class);
 
         $this->app->singleton(EmailService::class, function ($app) {
             return new EmailService();
@@ -472,9 +462,7 @@ class AppServiceProvider extends ServiceProvider
             return new FederationService();
         });
 
-        $this->app->singleton(ChallengeService::class, function ($app) {
-            return new ChallengeService();
-        });
+        $this->app->singleton(ChallengeService::class);
 
         $this->app->singleton(BadgeService::class, function ($app) {
             return new BadgeService(new UserBadge());
@@ -506,17 +494,11 @@ class AppServiceProvider extends ServiceProvider
             return new OnboardingService();
         });
 
-        $this->app->singleton(StreakService::class, function ($app) {
-            return new StreakService();
-        });
+        $this->app->singleton(StreakService::class);
 
-        $this->app->singleton(NexusScoreService::class, function ($app) {
-            return new NexusScoreService();
-        });
+        $this->app->singleton(NexusScoreService::class);
 
-        $this->app->singleton(NexusScoreCacheService::class, function ($app) {
-            return new NexusScoreCacheService();
-        });
+        $this->app->singleton(NexusScoreCacheService::class);
 
         $this->app->singleton(RateLimitService::class, function ($app) {
             return new RateLimitService();
@@ -538,9 +520,7 @@ class AppServiceProvider extends ServiceProvider
             return new ExchangeRatingService();
         });
 
-        $this->app->singleton(ExchangeWorkflowService::class, function ($app) {
-            return new ExchangeWorkflowService();
-        });
+        $this->app->singleton(ExchangeWorkflowService::class);
 
         $this->app->singleton(CreditDonationService::class, function ($app) {
             return new CreditDonationService();
@@ -620,9 +600,7 @@ class AppServiceProvider extends ServiceProvider
             return new AdminBadgeCountService();
         });
 
-        $this->app->singleton(BadgeCollectionService::class, function ($app) {
-            return new BadgeCollectionService();
-        });
+        $this->app->singleton(BadgeCollectionService::class);
 
         $this->app->singleton(BalanceAlertService::class, function ($app) {
             return new BalanceAlertService();
@@ -632,9 +610,7 @@ class AppServiceProvider extends ServiceProvider
             return new BrokerControlConfigService();
         });
 
-        $this->app->singleton(BrokerMessageVisibilityService::class, function ($app) {
-            return new BrokerMessageVisibilityService();
-        });
+        $this->app->singleton(BrokerMessageVisibilityService::class);
 
         $this->app->singleton(CSSSanitizer::class, function ($app) {
             return new CSSSanitizer();
@@ -727,9 +703,7 @@ class AppServiceProvider extends ServiceProvider
             return new FederationEmailService();
         });
 
-        $this->app->singleton(FederationFeatureService::class, function ($app) {
-            return new FederationFeatureService();
-        });
+        $this->app->singleton(FederationFeatureService::class);
 
         $this->app->singleton(FederationJwtService::class, function ($app) {
             return new FederationJwtService();
@@ -739,9 +713,7 @@ class AppServiceProvider extends ServiceProvider
             return new FederationNeighborhoodService();
         });
 
-        $this->app->singleton(FederationPartnershipService::class, function ($app) {
-            return new FederationPartnershipService();
-        });
+        $this->app->singleton(FederationPartnershipService::class);
 
         $this->app->singleton(FederationRealtimeService::class, function ($app) {
             return new FederationRealtimeService();
@@ -919,9 +891,7 @@ class AppServiceProvider extends ServiceProvider
             return new ReportExportService();
         });
 
-        $this->app->singleton(SafeguardingService::class, function ($app) {
-            return new SafeguardingService();
-        });
+        $this->app->singleton(SafeguardingService::class);
 
         $this->app->singleton(SearchLogService::class, function ($app) {
             return new SearchLogService();
@@ -947,9 +917,7 @@ class AppServiceProvider extends ServiceProvider
             return new SmartMatchingAnalyticsService();
         });
 
-        $this->app->singleton(SmartMatchingEngine::class, function ($app) {
-            return new SmartMatchingEngine();
-        });
+        $this->app->singleton(SmartMatchingEngine::class);
 
         $this->app->singleton(SocialNotificationService::class, function ($app) {
             return new SocialNotificationService();

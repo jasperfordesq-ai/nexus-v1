@@ -162,7 +162,7 @@ class DailyRewardService
             return 0;
         }
 
-        $daysSince = now()->startOfDay()->diffInDays($lastReward);
+        $daysSince = (int) abs(now()->startOfDay()->diffInDays(\Carbon\Carbon::parse($lastReward)->startOfDay()));
         if ($daysSince > 1) {
             return 0; // Streak broken
         }

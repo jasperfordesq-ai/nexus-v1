@@ -34,11 +34,13 @@ class PagesPublicControllerTest extends TestCase
     //  GET /v2/pages/{slug}
     // ------------------------------------------------------------------
 
-    public function test_show_requires_auth(): void
+    public function test_show_is_public_no_auth_required(): void
     {
-        $response = $this->apiGet('/v2/pages/about');
+        // /v2/pages/{slug} is a public endpoint — unauthenticated requests
+        // should NOT get 401. A missing page returns 404, not 401.
+        $response = $this->apiGet('/v2/pages/nonexistent-slug-xyz');
 
-        $response->assertStatus(401);
+        $response->assertStatus(404);
     }
 
     public function test_show_nonexistent_page(): void
