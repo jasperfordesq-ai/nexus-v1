@@ -195,7 +195,7 @@ export default function ThreadScreen() {
               <Ionicons
                 name="mic"
                 size={16}
-                color={isOwn ? 'rgba(255,255,255,0.9)' : theme.textSecondary}
+                color={isOwn ? 'rgba(255,255,255,0.9)' : theme.textSecondary} // contrast on primary
               />
               <Text style={[styles.voiceLabel, isOwn ? styles.bubbleTextOwn : styles.bubbleTextOther]}>
                 {t('thread.voiceMessage')}
@@ -331,11 +331,11 @@ function makeStyles(theme: Theme) {
     voiceRow: { flexDirection: 'row', alignItems: 'center', gap: 6 },
     voiceLabel: { fontSize: 14, fontStyle: 'italic' },
     bubbleText: { fontSize: 15, lineHeight: 20 },
-    bubbleTextOwn: { color: '#fff' },
+    bubbleTextOwn: { color: '#fff' }, // contrast on primary
     bubbleTextOther: { color: theme.text },
 
     bubbleTime: { fontSize: 10, marginTop: 2 },
-    bubbleTimeOwn: { color: 'rgba(255,255,255,0.75)', textAlign: 'right' },
+    bubbleTimeOwn: { color: 'rgba(255,255,255,0.75)', textAlign: 'right' }, // contrast on primary
     bubbleTimeOther: { color: theme.textMuted, textAlign: 'right' },
 
     inputRow: {
@@ -369,6 +369,6 @@ function makeStyles(theme: Theme) {
       justifyContent: 'center',
       alignItems: 'center',
     },
-    sendButtonText: { color: '#fff', fontWeight: '600', fontSize: 14 },
+    sendButtonText: { color: '#fff', fontWeight: '600', fontSize: 14 }, // contrast on primary
   });
 }

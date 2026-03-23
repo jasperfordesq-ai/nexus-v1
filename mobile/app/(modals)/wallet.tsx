@@ -49,7 +49,7 @@ function TransactionRow({
   primary: string;
   theme: Theme;
   styles: ReturnType<typeof makeStyles>;
-  t: (key: string) => string;
+  t: (key: string, opts?: Record<string, unknown>) => string;
 }) {
   const isCredit = item.type === 'credit';
   const sign = isCredit ? '+' : '\u2212';

@@ -1,5 +1,7 @@
 {
   "title": "Cónaidhm",
+  "partnerTitle": "Sonraí an chomhpháirtí",
+  "share": "Roinn comhpháirtí",
   "subtitle": "Pobail nasctha",
   "stats": {
     "partners": "{{count}} comhpháirtí",

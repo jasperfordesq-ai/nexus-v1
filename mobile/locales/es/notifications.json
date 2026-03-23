@@ -1,4 +1,6 @@
 {
+  "title": "Notificaciones",
+  "confirmMarkAllRead": "¿Marcar todas las notificaciones como leídas?",
   "allCaughtUpSub": "No tienes nuevas notificaciones.",
   "unreadItem": "No leído: {{label}}",
   "itemHint": "Toca para ver"

@@ -1,5 +1,7 @@
 {
   "title": "Organizações",
+  "detailTitle": "Detalhes da organização",
+  "share": "Partilhar organização",
   "searchPlaceholder": "Pesquisar organizações…",
   "empty": "Nenhuma organização encontrada.",
   "verified": "Verificada",

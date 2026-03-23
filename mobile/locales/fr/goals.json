@@ -1,5 +1,6 @@
 {
   "title": "Objectifs",
+  "confirmAbandon": "Êtes-vous sûr de vouloir abandonner cet objectif ?",
   "empty": "Aucun objectif pour le moment.",
   "addGoal": "Ajouter un objectif",
   "status": {

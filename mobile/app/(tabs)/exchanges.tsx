@@ -73,6 +73,7 @@ export default function ExchangesScreen() {
           accessibilityLabel={t('newListing')}
           accessibilityRole="button"
         >
+          {/* #fff = contrast on primary */}
           <Ionicons name="add" size={20} color="#fff" />
         </TouchableOpacity>
       </View>

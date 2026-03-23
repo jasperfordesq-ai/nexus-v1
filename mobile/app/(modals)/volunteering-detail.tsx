@@ -13,6 +13,7 @@ import {
   SafeAreaView,
   TouchableOpacity,
   Alert,
+  Share,
 } from 'react-native';
 import { useLocalSearchParams, router, useNavigation } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
@@ -25,6 +26,8 @@ import { usePrimaryColor } from '@/lib/hooks/useTenant';
 import { useTheme, type Theme } from '@/lib/hooks/useTheme';
 import Avatar from '@/components/ui/Avatar';
 import LoadingSpinner from '@/components/ui/LoadingSpinner';
+
+const WEB_URL = 'https://app.project-nexus.ie';
 
 export default function VolunteeringDetailScreen() {
   const { t } = useTranslation('volunteering');
@@ -51,6 +54,16 @@ export default function VolunteeringDetailScreen() {
 
   const [interestSent, setInterestSent] = useState(false);
   const [interestLoading, setInterestLoading] = useState(false);
+
+  async function handleShare() {
+    if (!opportunity) return;
+    void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    try {
+      await Share.share({
+        message: `${opportunity.title} — ${WEB_URL}/volunteering/${opportunity.id}`,
+      });
+    } catch { /* ignore */ }
+  }
 
   if (isNaN(opportunityId) || opportunityId <= 0) {
     return (
@@ -123,9 +136,18 @@ export default function VolunteeringDetailScreen() {
           <RefreshControl refreshing={isLoading} onRefresh={refresh} tintColor={primary} colors={[primary]} />
         }
       >
-        {/* Title + status */}
+        {/* Title + share + status */}
         <View style={styles.titleRow}>
           <Text style={styles.title}>{opportunity.title}</Text>
+          <TouchableOpacity
+            onPress={() => void handleShare()}
+            style={{ padding: 4 }}
+            activeOpacity={0.7}
+            accessibilityLabel={t('detail.share')}
+            accessibilityRole="button"
+          >
+            <Ionicons name="share-outline" size={22} color={primary} />
+          </TouchableOpacity>
           <View style={[styles.statusBadge, { backgroundColor: statusColor + '22' }]}>
             <Text style={[styles.statusText, { color: statusColor }]}>
               {t(`status.${opportunity.status}`)}
@@ -317,7 +339,7 @@ function makeStyles(theme: Theme) {
       marginTop: 8,
     },
     interestButtonDisabled: { opacity: 0.75 },
-    interestButtonText: { fontSize: 16, fontWeight: '700', color: '#fff' },
+    interestButtonText: { fontSize: 16, fontWeight: '700', color: '#fff' }, // contrast on primary
     errorText: { fontSize: 15, color: theme.textMuted },
   });
 }

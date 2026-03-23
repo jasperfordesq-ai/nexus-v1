@@ -20,6 +20,9 @@ import {
 } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { Link, router } from 'expo-router';
+import { Ionicons } from '@expo/vector-icons';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import * as Haptics from 'expo-haptics';
 
 import { register as apiRegister, extractToken } from '@/lib/api/auth';
 import { ApiResponseError } from '@/lib/api/client';
@@ -29,6 +32,9 @@ import { useAuth } from '@/lib/hooks/useAuth';
 import { usePrimaryColor } from '@/lib/hooks/useTenant';
 import { useTheme, type Theme } from '@/lib/hooks/useTheme';
 import { registerForPushNotifications } from '@/lib/notifications';
+
+/** White text used on primary-colored backgrounds for guaranteed contrast */
+const PRIMARY_CONTRAST_TEXT = '#FFFFFF'; // contrast text on primary
 
 function makeRegisterSchema(t: (key: string) => string) {
   return z
@@ -62,6 +68,7 @@ export default function RegisterScreen() {
   const primary = usePrimaryColor();
   const theme = useTheme();
   const styles = useMemo(() => makeStyles(theme), [theme]);
+  const insets = useSafeAreaInsets();
 
   const registerSchema = useMemo(() => makeRegisterSchema(t), [t]);
 
@@ -76,8 +83,11 @@ export default function RegisterScreen() {
 
   const [isLoading, setIsLoading] = useState(false);
   const [globalError, setGlobalError] = useState<string | null>(null);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   async function onSubmit(data: RegisterFormValues) {
+    void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     setIsLoading(true);
     setGlobalError(null);
 
@@ -121,8 +131,12 @@ export default function RegisterScreen() {
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
     >
       <ScrollView
-        contentContainerStyle={styles.container}
+        contentContainerStyle={[
+          styles.container,
+          { paddingTop: insets.top, paddingBottom: insets.bottom },
+        ]}
         keyboardShouldPersistTaps="handled"
+        keyboardDismissMode="on-drag"
       >
         <View style={styles.header}>
           <Text style={styles.title}>{t('register.title')}</Text>
@@ -130,7 +144,11 @@ export default function RegisterScreen() {
         </View>
 
         {globalError && (
-          <View style={styles.errorBanner}>
+          <View
+            style={styles.errorBanner}
+            accessibilityRole="alert"
+            accessibilityLiveRegion="polite"
+          >
             <Text style={styles.errorText}>{globalError}</Text>
           </View>
         )}
@@ -201,17 +219,32 @@ export default function RegisterScreen() {
             name="password"
             render={({ field: { onChange, onBlur, value } }) => (
               <>
-                <TextInput
-                  style={[styles.input, errors.password && styles.inputError]}
-                  value={value}
-                  onChangeText={onChange}
-                  onBlur={onBlur}
-                  placeholder={t('register.passwordPlaceholder')}
-                  secureTextEntry
-                  autoComplete="new-password"
-                  textContentType="newPassword"
-                  returnKeyType="next"
-                />
+                <View style={styles.passwordContainer}>
+                  <TextInput
+                    style={[styles.passwordInput, errors.password && styles.inputError]}
+                    value={value}
+                    onChangeText={onChange}
+                    onBlur={onBlur}
+                    placeholder={t('register.passwordPlaceholder')}
+                    secureTextEntry={!showPassword}
+                    autoComplete="new-password"
+                    textContentType="newPassword"
+                    returnKeyType="next"
+                  />
+                  <TouchableOpacity
+                    style={styles.eyeButton}
+                    onPress={() => setShowPassword((prev) => !prev)}
+                    activeOpacity={0.6}
+                    accessibilityLabel={t('auth:login.togglePassword')}
+                    accessibilityRole="button"
+                  >
+                    <Ionicons
+                      name={showPassword ? 'eye-off-outline' : 'eye-outline'}
+                      size={20}
+                      color={theme.textMuted}
+                    />
+                  </TouchableOpacity>
+                </View>
                 {errors.password && <Text style={styles.fieldError}>{errors.password.message}</Text>}
               </>
             )}
@@ -223,18 +256,33 @@ export default function RegisterScreen() {
             name="passwordConfirm"
             render={({ field: { onChange, onBlur, value } }) => (
               <>
-                <TextInput
-                  style={[styles.input, errors.passwordConfirm && styles.inputError]}
-                  value={value}
-                  onChangeText={onChange}
-                  onBlur={onBlur}
-                  placeholder={t('register.confirmPasswordPlaceholder')}
-                  secureTextEntry
-                  autoComplete="new-password"
-                  textContentType="newPassword"
-                  returnKeyType="done"
-                  onSubmitEditing={handleSubmit(onSubmit)}
-                />
+                <View style={styles.passwordContainer}>
+                  <TextInput
+                    style={[styles.passwordInput, errors.passwordConfirm && styles.inputError]}
+                    value={value}
+                    onChangeText={onChange}
+                    onBlur={onBlur}
+                    placeholder={t('register.confirmPasswordPlaceholder')}
+                    secureTextEntry={!showConfirmPassword}
+                    autoComplete="new-password"
+                    textContentType="newPassword"
+                    returnKeyType="done"
+                    onSubmitEditing={handleSubmit(onSubmit)}
+                  />
+                  <TouchableOpacity
+                    style={styles.eyeButton}
+                    onPress={() => setShowConfirmPassword((prev) => !prev)}
+                    activeOpacity={0.6}
+                    accessibilityLabel={t('auth:login.togglePassword')}
+                    accessibilityRole="button"
+                  >
+                    <Ionicons
+                      name={showConfirmPassword ? 'eye-off-outline' : 'eye-outline'}
+                      size={20}
+                      color={theme.textMuted}
+                    />
+                  </TouchableOpacity>
+                </View>
                 {errors.passwordConfirm && (
                   <Text style={styles.fieldError}>{errors.passwordConfirm.message}</Text>
                 )}
@@ -249,7 +297,7 @@ export default function RegisterScreen() {
             activeOpacity={0.8}
           >
             {isLoading ? (
-              <ActivityIndicator color="#fff" />
+              <ActivityIndicator color={PRIMARY_CONTRAST_TEXT} />
             ) : (
               <Text style={styles.buttonText}>{t('register.submit')}</Text>
             )}
@@ -299,6 +347,26 @@ function makeStyles(theme: Theme) {
       backgroundColor: theme.bg,
     },
     inputError: { borderColor: theme.error },
+    passwordContainer: {
+      position: 'relative',
+      justifyContent: 'center',
+    },
+    passwordInput: {
+      borderWidth: 1,
+      borderColor: theme.border,
+      borderRadius: 10,
+      paddingHorizontal: 14,
+      paddingRight: 44,
+      paddingVertical: 12,
+      fontSize: 16,
+      color: theme.text,
+      backgroundColor: theme.bg,
+    },
+    eyeButton: {
+      position: 'absolute',
+      right: 12,
+      padding: 4,
+    },
     fieldError: { color: theme.error, fontSize: 12, marginTop: 4, marginLeft: 4 },
     button: {
       borderRadius: 10,
@@ -307,7 +375,7 @@ function makeStyles(theme: Theme) {
       marginTop: 24,
     },
     buttonDisabled: { opacity: 0.6 },
-    buttonText: { color: '#fff', fontSize: 16, fontWeight: '600' },
+    buttonText: { color: PRIMARY_CONTRAST_TEXT, fontSize: 16, fontWeight: '600' }, // contrast text on primary
     footer: { flexDirection: 'row', justifyContent: 'center', marginTop: 32 },
     footerText: { color: theme.textSecondary, fontSize: 14 },
     link: { fontSize: 14, fontWeight: '600' },

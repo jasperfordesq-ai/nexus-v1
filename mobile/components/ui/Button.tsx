@@ -3,6 +3,7 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
+import React from 'react';
 import {
   TouchableOpacity,
   Text,
@@ -15,7 +16,7 @@ import { usePrimaryColor } from '@/lib/hooks/useTenant';
 type ButtonVariant = 'solid' | 'outline' | 'ghost';
 
 interface ButtonProps extends TouchableOpacityProps {
-  children: string;
+  children: React.ReactNode;
   variant?: ButtonVariant;
   isLoading?: boolean;
   color?: string;
@@ -58,8 +59,10 @@ export default function Button({
     >
       {isLoading ? (
         <ActivityIndicator color={variant === 'solid' ? '#fff' : resolvedColor} />
-      ) : (
+      ) : typeof children === 'string' ? (
         <Text style={textStyle}>{children}</Text>
+      ) : (
+        children
       )}
     </TouchableOpacity>
   );

@@ -13,8 +13,10 @@ import {
   SafeAreaView,
   RefreshControl,
   ActivityIndicator,
+  Share,
 } from 'react-native';
 import { useLocalSearchParams, router, useNavigation } from 'expo-router';
+import { Ionicons } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
 import * as Haptics from 'expo-haptics';
 
@@ -25,6 +27,8 @@ import { useTheme, type Theme } from '@/lib/hooks/useTheme';
 import { useAuth } from '@/lib/hooks/useAuth';
 import Avatar from '@/components/ui/Avatar';
 import LoadingSpinner from '@/components/ui/LoadingSpinner';
+
+const WEB_URL = 'https://app.project-nexus.ie';
 
 export default function ExchangeDetailModal() {
   const { t } = useTranslation('exchanges');
@@ -195,7 +199,7 @@ function makeStyles(theme: Theme) {
     postedByLabel: { fontSize: 12, color: theme.textMuted },
     postedByName: { fontSize: 15, fontWeight: '600', color: theme.text },
     actionButton: { borderRadius: 12, paddingVertical: 14, alignItems: 'center' },
-    actionButtonText: { color: '#fff', fontSize: 16, fontWeight: '600' },
+    actionButtonText: { color: '#fff', fontSize: 16, fontWeight: '600' }, // contrast on primary
     errorText: { color: theme.error, fontSize: 14, marginBottom: 16 },
     backLink: { fontSize: 15, fontWeight: '600' },
   });

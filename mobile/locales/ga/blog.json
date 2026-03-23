@@ -1,5 +1,6 @@
 {
   "title": "Blag",
+  "postTitle": "Postáil bhlag",
   "searchPlaceholder": "Cuardach alt…",
   "empty": "Níl aon alt ann fós.",
   "readingTime": "{{minutes}} nóim léitheoireachta",

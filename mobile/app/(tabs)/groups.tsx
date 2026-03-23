@@ -205,6 +205,7 @@ export default function GroupsScreen() {
           accessibilityLabel={t('newGroup')}
           accessibilityRole="button"
         >
+          {/* #fff = contrast on primary */}
           <Ionicons name="add" size={20} color="#fff" />
         </TouchableOpacity>
       </View>
@@ -243,6 +244,7 @@ export default function GroupsScreen() {
             <Text
               style={[
                 styles.filterPillText,
+                // '#fff' = contrast on primary
                 { color: filter === opt.value ? '#fff' : theme.textSecondary },
               ]}
             >

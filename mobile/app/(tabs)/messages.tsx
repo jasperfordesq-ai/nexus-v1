@@ -5,6 +5,7 @@
 
 import { useMemo, useCallback } from 'react';
 import {
+  ActivityIndicator,
   FlatList,
   View,
   Text,
@@ -18,23 +19,38 @@ import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
 import { useTranslation } from 'react-i18next';
 
-import { getConversations, type Conversation } from '@/lib/api/messages';
-import { useApi } from '@/lib/hooks/useApi';
+import { getConversations, type Conversation, type ConversationListResponse } from '@/lib/api/messages';
+import { usePaginatedApi } from '@/lib/hooks/usePaginatedApi';
 import { usePrimaryColor } from '@/lib/hooks/useTenant';
 import { useTheme, type Theme } from '@/lib/hooks/useTheme';
 import Avatar from '@/components/ui/Avatar';
 import { ConversationSkeleton } from '@/components/ui/Skeleton';
 import { formatRelativeTime } from '@/lib/utils/formatRelativeTime';
 
+/** Extractor for cursor-based ConversationListResponse. */
+function extractConversationsPage(response: ConversationListResponse) {
+  return {
+    items: response.data,
+    cursor: response.meta.cursor ?? null,
+    hasMore: response.meta.has_more,
+  };
+}
+
 export default function MessagesScreen() {
   const { t } = useTranslation('messages');
   const primary = usePrimaryColor();
   const theme = useTheme();
   const styles = useMemo(() => makeStyles(theme), [theme]);
-  const { data, isLoading, error, refresh } = useApi(() => getConversations());
-  const Separator = useCallback(() => <View style={styles.separator} />, [styles]);
 
-  const conversations = data?.data ?? [];
+  const fetchConversations = useCallback(
+    (cursor: string | null) => getConversations(cursor),
+    [],
+  );
+
+  const { items: conversations, isLoading, isLoadingMore, error, hasMore, loadMore, refresh } =
+    usePaginatedApi<Conversation, ConversationListResponse>(fetchConversations, extractConversationsPage);
+
+  const Separator = useCallback(() => <View style={styles.separator} />, [styles]);
 
   function renderConversation({ item }: { item: Conversation }) {
     const lastMsg = item.last_message;
@@ -98,6 +114,7 @@ export default function MessagesScreen() {
           accessibilityLabel={t('newMessage')}
           accessibilityRole="button"
         >
+          {/* #fff = contrast on primary */}
           <Ionicons name="create-outline" size={18} color="#fff" />
         </TouchableOpacity>
       </View>
@@ -110,6 +127,8 @@ export default function MessagesScreen() {
         refreshControl={
           <RefreshControl refreshing={isLoading && conversations.length > 0} onRefresh={refresh} />
         }
+        onEndReached={() => { if (hasMore) loadMore(); }}
+        onEndReachedThreshold={0.5}
         ListEmptyComponent={
           isLoading && conversations.length === 0 ? (
             <>
@@ -131,6 +150,13 @@ export default function MessagesScreen() {
               <Text style={styles.emptyText}>{t('empty.title')}</Text>
             </View>
           )
+        }
+        ListFooterComponent={
+          isLoadingMore ? (
+            <View style={styles.footer}>
+              <ActivityIndicator size="small" color={theme.textMuted} />
+            </View>
+          ) : null
         }
         contentContainerStyle={styles.list}
       />
@@ -186,5 +212,6 @@ function makeStyles(theme: Theme) {
     errorText: { color: theme.error, fontSize: 14, textAlign: 'center', marginBottom: 12 },
     retryBtn: { paddingHorizontal: 20, paddingVertical: 10 },
     emptyText: { color: theme.textSecondary, fontSize: 14, textAlign: 'center' },
+    footer: { paddingVertical: 16, alignItems: 'center' },
   });
 }

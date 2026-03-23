@@ -14,9 +14,11 @@ import {
   TouchableOpacity,
   Linking,
   Alert,
+  Share,
 } from 'react-native';
 import { useLocalSearchParams, router, useNavigation } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
+import * as Haptics from 'expo-haptics';
 import { useTranslation } from 'react-i18next';
 
 import { getOrganisation } from '@/lib/api/organisations';
@@ -25,6 +27,8 @@ import { usePrimaryColor } from '@/lib/hooks/useTenant';
 import { useTheme, type Theme } from '@/lib/hooks/useTheme';
 import Avatar from '@/components/ui/Avatar';
 import LoadingSpinner from '@/components/ui/LoadingSpinner';
+
+const WEB_URL = 'https://app.project-nexus.ie';
 
 export default function OrganisationDetailScreen() {
   const { t } = useTranslation('organisations');
@@ -79,6 +83,16 @@ export default function OrganisationDetailScreen() {
     );
   }
 
+  async function handleShare() {
+    if (!organisation) return;
+    void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    try {
+      await Share.share({
+        message: `${organisation.name} — ${WEB_URL}/organisations/${organisation.id}`,
+      });
+    } catch { /* ignore */ }
+  }
+
   async function handleOpenWebsite() {
     if (!organisation?.website) return;
     const supported = await Linking.canOpenURL(organisation.website);
@@ -97,11 +111,22 @@ export default function OrganisationDetailScreen() {
           <RefreshControl refreshing={isLoading} onRefresh={refresh} tintColor={primary} colors={[primary]} />
         }
       >
-        {/* Header: logo + name + verified */}
+        {/* Header: logo + name + verified + share */}
         <View style={styles.header}>
           <Avatar uri={organisation.logo} name={organisation.name} size={72} />
           <View style={styles.headerText}>
-            <Text style={styles.name}>{organisation.name}</Text>
+            <View style={{ flexDirection: 'row', alignItems: 'flex-start', gap: 8 }}>
+              <Text style={[styles.name, { flex: 1 }]}>{organisation.name}</Text>
+              <TouchableOpacity
+                onPress={() => void handleShare()}
+                style={{ padding: 4 }}
+                activeOpacity={0.7}
+                accessibilityLabel={t('detail.share')}
+                accessibilityRole="button"
+              >
+                <Ionicons name="share-outline" size={22} color={primary} />
+              </TouchableOpacity>
+            </View>
             {organisation.verified ? (
               <View style={[styles.verifiedBadge, { backgroundColor: primary + '1a' }]}>
                 <Ionicons name="checkmark-circle" size={14} color={primary} />

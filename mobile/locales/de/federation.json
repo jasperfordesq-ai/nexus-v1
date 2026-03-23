@@ -1,5 +1,7 @@
 {
   "title": "Verbund",
+  "partnerTitle": "Partnerdetails",
+  "share": "Partner teilen",
   "subtitle": "Verbundene Gemeinschaften",
   "stats": {
     "partners": "{{count}} Partner",

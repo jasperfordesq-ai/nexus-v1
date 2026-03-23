@@ -20,6 +20,7 @@ import {
 } from 'react-native';
 import { useNavigation } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
+import * as Haptics from 'expo-haptics';
 import { useTranslation } from 'react-i18next';
 
 import {
@@ -67,6 +68,7 @@ function GoalCard({
     : null;
 
   function handleAbandon() {
+    void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     Alert.alert(
       t('goals:abandonTitle'),
       t('goals:abandonMessage'),
@@ -125,7 +127,7 @@ function GoalCard({
         <View style={styles.actionRow}>
           <TouchableOpacity
             style={[styles.actionBtn, { borderColor: theme.success }]}
-            onPress={() => onComplete(goal.id)}
+            onPress={() => { void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light); onComplete(goal.id); }}
             activeOpacity={0.8}
             hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
           >
@@ -463,7 +465,7 @@ function makeStyles(theme: Theme) {
       paddingVertical: 11,
       borderRadius: 10,
     },
-    submitBtnText: { fontSize: 14, fontWeight: '700', color: '#fff' },
+    submitBtnText: { fontSize: 14, fontWeight: '700', color: '#fff' }, // contrast on primary
 
     // Empty / error
     emptyWrap: { paddingTop: 48, alignItems: 'center' },

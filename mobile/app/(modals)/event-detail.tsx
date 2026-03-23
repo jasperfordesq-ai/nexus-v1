@@ -15,6 +15,7 @@ import {
   Linking,
   RefreshControl,
   ActivityIndicator,
+  Share,
 } from 'react-native';
 import { useLocalSearchParams, router, useNavigation } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
@@ -27,6 +28,8 @@ import { usePrimaryColor } from '@/lib/hooks/useTenant';
 import { useTheme, type Theme } from '@/lib/hooks/useTheme';
 import Avatar from '@/components/ui/Avatar';
 import LoadingSpinner from '@/components/ui/LoadingSpinner';
+
+const WEB_URL = 'https://app.project-nexus.ie';
 
 export default function EventDetailScreen() {
   const { t } = useTranslation('events');
@@ -66,25 +69,48 @@ export default function EventDetailScreen() {
   const currentRsvp = rsvp ?? event?.user_rsvp ?? null;
   const counts = rsvpCounts ?? event?.rsvp_counts ?? { going: 0, interested: 0 };
 
+  async function handleShare() {
+    if (!event) return;
+    void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    try {
+      await Share.share({
+        message: `${event.title} — ${WEB_URL}/events/${event.id}`,
+      });
+    } catch { /* ignore */ }
+  }
+
   async function handleRsvp(status: 'going' | 'interested') {
     if (!event) return;
     void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    setUpdating(true);
 
-    // Toggle off if already selected
+    // Toggle off if already selected — confirm cancellation
     if (currentRsvp === status) {
-      try {
-        await removeRsvp(event.id);
-        setRsvp(null);
-        setRsvpCounts({ ...counts, [status]: Math.max(0, counts[status] - 1) });
-      } catch {
-        Alert.alert(t('common:errors.alertTitle'), t('rsvpError'));
-      } finally {
-        setUpdating(false);
-      }
+      Alert.alert(
+        t('common:buttons.confirm'),
+        t('rsvpCancelConfirm'),
+        [
+          { text: t('common:no'), style: 'cancel' },
+          {
+            text: t('common:yes'),
+            onPress: async () => {
+              setUpdating(true);
+              try {
+                await removeRsvp(event.id);
+                setRsvp(null);
+                setRsvpCounts({ ...counts, [status]: Math.max(0, counts[status] - 1) });
+              } catch {
+                Alert.alert(t('common:errors.alertTitle'), t('rsvpError'));
+              } finally {
+                setUpdating(false);
+              }
+            },
+          },
+        ],
+      );
       return;
     }
 
+    setUpdating(true);
     try {
       const result = await rsvpEvent(event.id, status);
       setRsvp(result.data.rsvp);
@@ -129,8 +155,19 @@ export default function EventDetailScreen() {
           <RefreshControl refreshing={isLoading} onRefresh={() => void refresh()} tintColor={primary} colors={[primary]} />
         }
       >
-        {/* Title + category */}
-        <Text style={styles.title}>{event.title}</Text>
+        {/* Title + share */}
+        <View style={{ flexDirection: 'row', alignItems: 'flex-start', gap: 10 }}>
+          <Text style={[styles.title, { flex: 1 }]}>{event.title}</Text>
+          <TouchableOpacity
+            onPress={() => void handleShare()}
+            style={{ padding: 4 }}
+            activeOpacity={0.7}
+            accessibilityLabel={t('detail.share')}
+            accessibilityRole="button"
+          >
+            <Ionicons name="share-outline" size={22} color={primary} />
+          </TouchableOpacity>
+        </View>
         {event.category && (
           <View style={[styles.categoryPill, { backgroundColor: (event.category.color ?? primary) + '20' }]}>
             <Text style={[styles.categoryText, { color: event.category.color ?? primary }]}>
@@ -261,7 +298,7 @@ function RsvpButton({
   disabled: boolean;
   onPress: () => void;
 }) {
-  const iconColor = selected ? '#fff' : theme.textSecondary;
+  const iconColor = selected ? '#fff' : theme.textSecondary; // contrast on primary
   return (
     <TouchableOpacity
       style={[
@@ -281,7 +318,7 @@ function RsvpButton({
       ) : (
         <Ionicons name={icon} size={16} color={iconColor} />
       )}
-      <Text style={[{ fontSize: 14, fontWeight: '600' as const, color: theme.textSecondary }, selected && { color: '#fff' }]}>{label}</Text>
+      <Text style={[{ fontSize: 14, fontWeight: '600' as const, color: theme.textSecondary }, selected && { color: '#fff' }]}>{label}</Text>{/* contrast on primary */}
     </TouchableOpacity>
   );
 }

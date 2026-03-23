@@ -1,4 +1,7 @@
 {
+  "detailTitle": "Event Details",
+  "confirmCancelRsvp": "Cancel your RSVP for this event?",
+  "share": "Share event",
   "upcoming": "Upcoming",
   "past": "Past",
   "loadError": "Could not load events.",

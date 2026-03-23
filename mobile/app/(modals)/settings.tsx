@@ -16,7 +16,7 @@ import {
 } from 'react-native';
 import { router, useNavigation } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
-
+import * as Haptics from 'expo-haptics';
 import Constants from 'expo-constants';
 import { useTranslation } from 'react-i18next';
 
@@ -63,6 +63,7 @@ export default function SettingsScreen() {
 
   async function toggle(key: keyof NotificationPrefs) {
     if (!current) return;
+    void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     const updated = { ...current, [key]: !current[key] };
     setPrefs(updated);
     setSaving(true);
@@ -175,7 +176,7 @@ export default function SettingsScreen() {
         </Section>
 
         <Text style={styles.attribution}>
-          © 2024–2026 Jasper Ford · Project NEXUS
+          {t('common:attribution')}
         </Text>
       </ScrollView>
     </SafeAreaView>

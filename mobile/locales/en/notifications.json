@@ -1,5 +1,6 @@
 {
   "title": "Notifications",
+  "confirmMarkAllRead": "Mark all notifications as read?",
   "markAllRead": "Mark all read",
   "marking": "Marking\u2026",
   "markError": "Could not mark notifications as read.",

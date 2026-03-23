@@ -8,6 +8,7 @@ import {
   Linking,
   SafeAreaView,
   ScrollView,
+  Share,
   StyleSheet,
   Text,
   TouchableOpacity,
@@ -15,6 +16,7 @@ import {
 } from 'react-native';
 import { router, useLocalSearchParams, useNavigation } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
+import * as Haptics from 'expo-haptics';
 import { useTranslation } from 'react-i18next';
 
 import { getFederationPartner } from '@/lib/api/federation';
@@ -23,6 +25,8 @@ import { usePrimaryColor } from '@/lib/hooks/useTenant';
 import { useTheme, type Theme } from '@/lib/hooks/useTheme';
 import Avatar from '@/components/ui/Avatar';
 import LoadingSpinner from '@/components/ui/LoadingSpinner';
+
+const WEB_URL = 'https://app.project-nexus.ie';
 
 export default function FederationPartnerScreen() {
   const { t } = useTranslation('federation');
@@ -81,6 +85,16 @@ export default function FederationPartnerScreen() {
     );
   }
 
+  async function handleShare() {
+    if (!partner) return;
+    void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    try {
+      await Share.share({
+        message: `${partner.name} — ${WEB_URL}/federation/${partner.id}`,
+      });
+    } catch { /* ignore */ }
+  }
+
   const connectedDate = new Date(partner.connected_since).toLocaleDateString('default', {
     day: 'numeric',
     month: 'long',
@@ -90,10 +104,21 @@ export default function FederationPartnerScreen() {
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView contentContainerStyle={styles.content}>
-        {/* Logo + name */}
+        {/* Logo + name + share */}
         <View style={styles.heroSection}>
           <Avatar uri={partner.logo} name={partner.name} size={80} />
-          <Text style={styles.partnerName}>{partner.name}</Text>
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+            <Text style={[styles.partnerName, { flex: 1 }]}>{partner.name}</Text>
+            <TouchableOpacity
+              onPress={() => void handleShare()}
+              style={{ padding: 4 }}
+              activeOpacity={0.7}
+              accessibilityLabel={t('detail.share')}
+              accessibilityRole="button"
+            >
+              <Ionicons name="share-outline" size={22} color={primary} />
+            </TouchableOpacity>
+          </View>
           {partner.location ? (
             <View style={styles.metaRow}>
               <Ionicons name="location-outline" size={14} color={theme.textSecondary} />
@@ -140,7 +165,7 @@ export default function FederationPartnerScreen() {
             accessibilityLabel={t('visitWebsite')}
             accessibilityRole="button"
           >
-            <Ionicons name="globe-outline" size={16} color="#fff" />
+            <Ionicons name="globe-outline" size={16} color="#fff" />{/* contrast on primary */}
             <Text style={styles.websiteButtonText}>{t('visitWebsite')}</Text>
           </TouchableOpacity>
         ) : null}
@@ -233,7 +258,7 @@ function makeStyles(theme: Theme) {
     websiteButtonText: {
       fontSize: 15,
       fontWeight: '600',
-      color: '#fff',
+      color: '#fff', // contrast on primary
     },
     errorText: {
       fontSize: 15,

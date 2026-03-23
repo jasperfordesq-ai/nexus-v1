@@ -22,5 +22,17 @@
   "notifications": {
     "newMessage": "Nova mensagem de {{name}}",
     "newMatch": "Tem um novo match!"
-  }
+  },
+  "poll": {
+    "totalVotes": "{{count}} votos",
+    "voted": "Você votou",
+    "closed": "Enquete encerrada",
+    "vote": "Votar"
+  },
+  "imageViewer": {
+    "close": "Fechar",
+    "share": "Compartilhar imagem"
+  },
+  "likePost": "Gostar desta publicação",
+  "unlikePost": "Deixar de gostar desta publicação"
 }

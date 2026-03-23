@@ -182,7 +182,7 @@ export default function EndorsementsScreen() {
       <View style={styles.tabRow}>
         <TouchableOpacity
           style={[styles.tabPill, activeTab === 'skills' && { backgroundColor: primary }]}
-          onPress={() => setActiveTab('skills')}
+          onPress={() => { void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light); setActiveTab('skills'); }}
           accessibilityRole="tab"
           accessibilityState={{ selected: activeTab === 'skills' }}
         >
@@ -192,7 +192,7 @@ export default function EndorsementsScreen() {
         </TouchableOpacity>
         <TouchableOpacity
           style={[styles.tabPill, activeTab === 'endorsements' && { backgroundColor: primary }]}
-          onPress={() => setActiveTab('endorsements')}
+          onPress={() => { void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light); setActiveTab('endorsements'); }}
           accessibilityRole="tab"
           accessibilityState={{ selected: activeTab === 'endorsements' }}
         >
@@ -331,7 +331,7 @@ function makeStyles(theme: Theme) {
       color: theme.textSecondary,
     },
     tabLabelActive: {
-      color: '#fff',
+      color: '#fff', // contrast on primary
     },
     listContent: {
       padding: 16,
@@ -378,7 +378,7 @@ function makeStyles(theme: Theme) {
     addBtnText: {
       fontSize: 14,
       fontWeight: '600',
-      color: '#fff',
+      color: '#fff', // contrast on primary
     },
     cancelBtn: {
       padding: 4,

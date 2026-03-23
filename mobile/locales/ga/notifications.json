@@ -1,4 +1,6 @@
 {
+  "title": "Fógraí",
+  "confirmMarkAllRead": "Na fógraí go léir a mharcáil mar léite?",
   "allCaughtUpSub": "Níl aon fhógraí nua agat.",
   "unreadItem": "Gan léamh: {{label}}",
   "itemHint": "Buail chun féachaint"

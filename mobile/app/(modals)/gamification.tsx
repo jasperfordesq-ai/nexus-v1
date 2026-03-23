@@ -15,6 +15,7 @@ import {
 } from 'react-native';
 import { useNavigation } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
+import * as Haptics from 'expo-haptics';
 import { useTranslation } from 'react-i18next';
 
 import {
@@ -147,7 +148,7 @@ function LeaderboardRow({
   primary: string;
   theme: Theme;
   styles: ReturnType<typeof makeStyles>;
-  t: (key: string) => string;
+  t: (key: string, opts?: Record<string, unknown>) => string;
 }) {
   return (
     <View style={[styles.lbRow, isCurrentUser && { backgroundColor: primary + '15', borderRadius: 10 }]}>
@@ -271,23 +272,23 @@ export default function GamificationScreen() {
               <View style={styles.tabRow}>
                 <TouchableOpacity
                   style={[styles.tabPill, activeTab === 'badges' && { backgroundColor: primary }]}
-                  onPress={() => setActiveTab('badges')}
+                  onPress={() => { void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light); setActiveTab('badges'); }}
                   activeOpacity={0.8}
                   accessibilityRole="tab"
                   accessibilityState={{ selected: activeTab === 'badges' }}
                 >
-                  <Text style={[styles.tabPillText, activeTab === 'badges' && { color: '#fff' }]}>
+                  <Text style={[styles.tabPillText, activeTab === 'badges' && { color: '#fff' }]}>{/* contrast on primary */}
                     {t('gamification:badges.title')}
                   </Text>
                 </TouchableOpacity>
                 <TouchableOpacity
                   style={[styles.tabPill, activeTab === 'leaderboard' && { backgroundColor: primary }]}
-                  onPress={() => setActiveTab('leaderboard')}
+                  onPress={() => { void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light); setActiveTab('leaderboard'); }}
                   activeOpacity={0.8}
                   accessibilityRole="tab"
                   accessibilityState={{ selected: activeTab === 'leaderboard' }}
                 >
-                  <Text style={[styles.tabPillText, activeTab === 'leaderboard' && { color: '#fff' }]}>
+                  <Text style={[styles.tabPillText, activeTab === 'leaderboard' && { color: '#fff' }]}>{/* contrast on primary */}
                     {t('gamification:leaderboard.title')}
                   </Text>
                 </TouchableOpacity>
@@ -302,7 +303,7 @@ export default function GamificationScreen() {
                   <TouchableOpacity
                     key={p.key}
                     style={[styles.periodPill, period === p.key && { backgroundColor: primary + '25', borderColor: primary }]}
-                    onPress={() => setPeriod(p.key)}
+                    onPress={() => { void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light); setPeriod(p.key); }}
                     activeOpacity={0.8}
                     accessibilityRole="button"
                     accessibilityState={{ selected: period === p.key }}
@@ -384,7 +385,7 @@ function makeStyles(theme: Theme) {
       paddingHorizontal: 10,
       paddingVertical: 4,
     },
-    levelBadgeText: { fontSize: 13, fontWeight: '700', color: '#fff' },
+    levelBadgeText: { fontSize: 13, fontWeight: '700', color: '#fff' }, // contrast on primary
     rankText: { fontSize: 13, fontWeight: '600' },
     unrankedText: { fontSize: 13, color: theme.textMuted },
     streakRow: { flexDirection: 'row', alignItems: 'center', gap: 4, marginLeft: 'auto' },

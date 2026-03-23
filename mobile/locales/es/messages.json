@@ -1,5 +1,6 @@
 {
   "title": "Mensajes",
+  "threadTitle": "Conversación",
   "thread": {
     "inputPlaceholder": "Escribe un mensaje…",
     "send": "Enviar",

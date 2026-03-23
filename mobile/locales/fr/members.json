@@ -1,5 +1,6 @@
 {
   "title": "Membres",
+  "profileTitle": "Profil du membre",
   "search": {
     "placeholder": "Rechercher des membres…"
   },
@@ -14,6 +15,15 @@
     "timeCredits_other": "{{count}} crédits temps",
     "memberSince": "Membre depuis {{date}}",
     "connect": "Connecter",
+    "connected": "Connecté",
+    "pendingSent": "Demande envoyée",
+    "pendingReceived": "Répondre à la demande",
+    "accept": "Accepter",
+    "decline": "Refuser",
+    "disconnect": "Déconnecter",
+    "disconnectConfirm": "Supprimer cette connexion ?",
+    "disconnectMessage": "Vous pourrez toujours vous reconnecter plus tard.",
+    "connectionError": "Impossible de mettre à jour la connexion",
     "message": "Message",
     "skills": "Compétences",
     "reviews": "Avis",

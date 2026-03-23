@@ -38,3 +38,7 @@ export const TIMEOUTS = {
 
 /** API path prefix for all v2 endpoints */
 export const API_V2 = '/api/v2';
+
+/** Web app URL for share links and deep linking */
+export const APP_URL: string =
+  process.env.EXPO_PUBLIC_APP_URL ?? 'https://app.project-nexus.ie';

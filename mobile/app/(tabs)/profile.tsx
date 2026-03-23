@@ -4,6 +4,7 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import {
+  ActivityIndicator,
   View,
   Text,
   TouchableOpacity,
@@ -49,7 +50,7 @@ const EXPLORE_ITEMS: Array<{ labelKey: string; route: string; icon: React.Compon
 
 export default function ProfileScreen() {
   const { t } = useTranslation('profile');
-  const { user, displayName, logout, refreshUser } = useAuth();
+  const { user, displayName, logout, refreshUser, isLoading: isAuthLoading } = useAuth();
   const primary = usePrimaryColor();
   const theme = useTheme();
   const styles = useMemo(() => makeStyles(theme), [theme]);
@@ -115,6 +116,21 @@ export default function ProfileScreen() {
     );
   }
 
+  // Error state: user fetch failed (not loading, no user)
+  if (!isAuthLoading && !user) {
+    return (
+      <SafeAreaView style={styles.container}>
+        <View style={styles.errorContainer}>
+          <Text style={styles.errorText}>{t('common:errors.generic')}</Text>
+          <TouchableOpacity onPress={handleRefresh} style={styles.retryBtn}>
+            <Text style={[styles.retryText, { color: primary }]}>{t('common:buttons.retry')}</Text>
+          </TouchableOpacity>
+        </View>
+      </SafeAreaView>
+    );
+  }
+
+  // Loading state
   if (!user) {
     return (
       <SafeAreaView style={styles.container}>
@@ -151,7 +167,12 @@ export default function ProfileScreen() {
           >
             <Avatar uri={user.avatar_url} name={displayName} size={88} />
             <View style={styles.cameraOverlay}>
-              <Ionicons name="camera-outline" size={20} color="#fff" />
+              {uploading ? (
+                <ActivityIndicator size="small" color="#fff" />
+              ) : (
+                // contrast on primary
+                <Ionicons name="camera-outline" size={20} color="#fff" />
+              )}
             </View>
           </TouchableOpacity>
           <Text style={styles.name}>{displayName}</Text>
@@ -171,12 +192,14 @@ export default function ProfileScreen() {
         {/* Bio */}
         {bio && (
           <View style={styles.section}>
-            <Text style={styles.sectionTitle}>{t('about')}</Text>
+            <Text style={styles.sectionTitle} accessibilityRole="header">{t('about')}</Text>
             <Text style={styles.bio}>{bio}</Text>
           </View>
         )}
 
         {/* Actions */}
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle} accessibilityRole="header">{t('actions')}</Text>
         <View style={styles.actions}>
           <TouchableOpacity
             style={[styles.actionButton, { borderColor: primary }]}
@@ -222,10 +245,11 @@ export default function ProfileScreen() {
             <Text style={styles.actionButtonText}>{t('settings')}</Text>
           </TouchableOpacity>
         </View>
+        </View>
 
         {/* Explore section */}
         <View style={styles.exploreSection}>
-          <Text style={styles.sectionTitle}>{t('explore')}</Text>
+          <Text style={styles.sectionTitle} accessibilityRole="header">{t('explore')}</Text>
           <View style={styles.actions}>
             {EXPLORE_ITEMS.map(({ labelKey, route, icon }) => (
               <TouchableOpacity
@@ -256,7 +280,7 @@ export default function ProfileScreen() {
 
         {/* AGPL attribution — required by Section 7(b) */}
         <Text style={styles.attribution}>
-          Project NEXUS · AGPL-3.0-or-later · © 2024–2026 Jasper Ford
+          {t('common:attribution')}
         </Text>
       </ScrollView>
     </SafeAreaView>
@@ -273,7 +297,7 @@ function makeStyles(theme: Theme) {
       position: 'absolute',
       bottom: 0,
       right: 0,
-      backgroundColor: 'rgba(0,0,0,0.55)',
+      backgroundColor: 'rgba(0,0,0,0.5)', // overlay
       borderRadius: 12,
       padding: 4,
     },
@@ -321,5 +345,14 @@ function makeStyles(theme: Theme) {
       textAlign: 'center',
       marginTop: 40,
     },
+    errorContainer: {
+      flex: 1,
+      justifyContent: 'center',
+      alignItems: 'center',
+      padding: 32,
+    },
+    errorText: { color: theme.error, fontSize: 15, textAlign: 'center', marginBottom: 12 },
+    retryBtn: { paddingHorizontal: 20, paddingVertical: 10 },
+    retryText: { fontWeight: '600', fontSize: 15 },
   });
 }

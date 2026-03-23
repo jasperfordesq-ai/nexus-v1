@@ -1,4 +1,6 @@
 {
+  "title": "Settings",
+  "changePasswordTitle": "Change Password",
   "pushNotifications": "Push Notifications",
   "emailNotifications": "Email Notifications",
   "push": {

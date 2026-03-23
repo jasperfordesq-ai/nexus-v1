@@ -95,10 +95,10 @@ export default function VoiceMessageBubble({
 
   const theme = useTheme();
 
-  const iconColor = isOwn ? 'rgba(255,255,255,0.95)' : primaryColor;
-  const timeColor = isOwn ? 'rgba(255,255,255,0.8)' : textColorSecondary;
-  const labelColor = isOwn ? '#fff' : textColor;
-  const unfilledBarColor = isOwn ? 'rgba(255,255,255,0.35)' : theme.border;
+  const iconColor = isOwn ? 'rgba(255,255,255,0.95)' : primaryColor; // contrast on primary
+  const timeColor = isOwn ? 'rgba(255,255,255,0.8)' : textColorSecondary; // contrast on primary
+  const labelColor = isOwn ? '#fff' : textColor; // contrast on primary
+  const unfilledBarColor = isOwn ? 'rgba(255,255,255,0.35)' : theme.border; // contrast on primary
 
   const progress = totalMs > 0 ? positionMs / totalMs : 0;
   const displayTime = isPlaying || positionMs > 0
@@ -137,7 +137,7 @@ export default function VoiceMessageBubble({
                 {
                   height: barHeight,
                   backgroundColor: filled
-                    ? (isOwn ? 'rgba(255,255,255,0.95)' : primaryColor)
+                    ? (isOwn ? 'rgba(255,255,255,0.95)' : primaryColor) // contrast on primary
                     : unfilledBarColor,
                 },
               ]}

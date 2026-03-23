@@ -1,5 +1,6 @@
 {
   "title": "Baill",
+  "profileTitle": "Próifíl an bhaill",
   "search": {
     "placeholder": "Cuardaigh baill…"
   },
@@ -14,6 +15,15 @@
     "timeCredits_other": "{{count}} creidmheas ama",
     "memberSince": "Ball ó {{date}}",
     "connect": "Ceangail",
+    "connected": "Ceangailte",
+    "pendingSent": "Iarratas seolta",
+    "pendingReceived": "Freagair an iarratas",
+    "accept": "Glac",
+    "decline": "Diúltaigh",
+    "disconnect": "Díceangail",
+    "disconnectConfirm": "An ceangal seo a bhaint?",
+    "disconnectMessage": "Is féidir leat ceangal arís níos déanaí.",
+    "connectionError": "Níorbh fhéidir an ceangal a nuashonrú",
     "message": "Teachtaireacht",
     "skills": "Scileanna",
     "reviews": "Léirmheasanna",

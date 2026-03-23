@@ -1,4 +1,13 @@
 {
+  "appName": "Project NEXUS",
+  "attribution": "Project NEXUS è un software open source con licenza AGPL-3.0.",
+  "tabs": {
+    "home": "Home",
+    "listings": "Annunci",
+    "events": "Eventi",
+    "messages": "Messaggi",
+    "profile": "Profilo"
+  },
   "buttons": {
     "save": "Salva",
     "cancel": "Annulla",

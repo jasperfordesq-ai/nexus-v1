@@ -3,18 +3,20 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import { useState, useMemo } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import { useState, useMemo, useCallback } from 'react';
+import { View, Text, Image, TouchableOpacity, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { router } from 'expo-router';
 import * as Haptics from 'expo-haptics';
 
 import { useTranslation } from 'react-i18next';
 
-import { toggleLike, type FeedItem as FeedItemType } from '@/lib/api/feed';
+import { toggleLike, type FeedItem as FeedItemType, type PollData } from '@/lib/api/feed';
 import { usePrimaryColor } from '@/lib/hooks/useTenant';
 import { useTheme, type Theme } from '@/lib/hooks/useTheme';
 import Avatar from '@/components/ui/Avatar';
 import Card from '@/components/ui/Card';
+import PollCard from '@/components/PollCard';
 import { formatRelativeTime } from '@/lib/utils/formatRelativeTime';
 
 interface FeedItemProps {
@@ -30,6 +32,13 @@ export default function FeedItem({ item }: FeedItemProps) {
   // Optimistic like state — initialise from server if available
   const [liked, setLiked] = useState(item.is_liked ?? false);
   const [likesCount, setLikesCount] = useState(item.likes_count);
+  const [isTruncated, setIsTruncated] = useState(false);
+  const [pollData, setPollData] = useState<PollData | null | undefined>(item.poll_data);
+
+  const onTextLayout = useCallback((e: { nativeEvent: { lines: unknown[] } }) => {
+    // numberOfLines={3} means if there are more than 3 lines the text is truncated
+    setIsTruncated(e.nativeEvent.lines.length >= 3);
+  }, []);
 
   async function handleLike() {
     void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
@@ -57,7 +66,7 @@ export default function FeedItem({ item }: FeedItemProps) {
       style={styles.wrapper}
       accessible={true}
       accessibilityLabel={cardLabel}
-      accessibilityRole="article"
+      accessibilityRole="summary"
     >
       <Card style={styles.card}>
         {/* Author row */}
@@ -76,7 +85,33 @@ export default function FeedItem({ item }: FeedItemProps) {
         {/* Content */}
         <Text style={styles.title}>{item.title}</Text>
         {item.content && (
-          <Text style={styles.body} numberOfLines={3}>{item.content}</Text>
+          <>
+            <Text style={styles.body} numberOfLines={3} onTextLayout={onTextLayout}>{item.content}</Text>
+            {(isTruncated || item.content.length > 100) && (
+              <Text style={styles.readMore}>{t('readMore')}</Text>
+            )}
+          </>
+        )}
+
+        {/* Image */}
+        {item.image_url && (
+          <TouchableOpacity
+            activeOpacity={0.9}
+            onPress={() => router.push({ pathname: '/(modals)/image-viewer', params: { uri: item.image_url!, title: item.title } })}
+            accessibilityLabel={t('feedTypes.post')}
+            accessibilityRole="imagebutton"
+          >
+            <Image source={{ uri: item.image_url }} style={styles.feedImage} resizeMode="cover" />
+          </TouchableOpacity>
+        )}
+
+        {/* Poll */}
+        {item.type === 'poll' && pollData && (
+          <PollCard
+            pollData={pollData}
+            itemId={item.id}
+            onVoted={(updated) => setPollData(updated)}
+          />
         )}
 
         {/* Location */}
@@ -93,7 +128,7 @@ export default function FeedItem({ item }: FeedItemProps) {
             style={styles.actionBtn}
             onPress={handleLike}
             activeOpacity={0.7}
-            accessibilityLabel={liked ? t('feedTypes.unlike') : t('feedTypes.like')}
+            accessibilityLabel={liked ? t('unlikePost') : t('likePost')}
             accessibilityRole="button"
           >
             <Ionicons
@@ -132,6 +167,8 @@ function makeStyles(theme: Theme) {
     typeBadgeText: { fontSize: 11, fontWeight: '600', color: theme.textSecondary },
     title: { fontSize: 15, fontWeight: '600', color: theme.text },
     body: { fontSize: 14, color: theme.textSecondary, lineHeight: 20 },
+    readMore: { fontSize: 13, color: theme.textMuted, fontWeight: '500' },
+    feedImage: { width: '100%', height: 200, borderRadius: 10 },
     locationRow: { flexDirection: 'row', alignItems: 'center', gap: 3 },
     locationText: { fontSize: 12, color: theme.textMuted },
     actions: { flexDirection: 'row', gap: 16, paddingTop: 4, borderTopWidth: 1, borderTopColor: theme.borderSubtle },

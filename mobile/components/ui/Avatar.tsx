@@ -33,7 +33,11 @@ export default function Avatar({ uri, name, size = 40 }: AvatarProps) {
   }
 
   return (
-    <View style={[styles.fallback, sizeStyle, { backgroundColor: primary }]}>
+    <View
+      style={[styles.fallback, sizeStyle, { backgroundColor: primary }]}
+      accessibilityLabel={name ?? undefined}
+      accessibilityRole="image"
+    >
       <Text style={[styles.initials, { fontSize: size * 0.36 }]}>{initials}</Text>
     </View>
   );

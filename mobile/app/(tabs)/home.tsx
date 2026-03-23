@@ -4,6 +4,7 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import { useCallback, useMemo } from 'react';
+import * as Haptics from 'expo-haptics';
 import {
   ActivityIndicator,
   FlatList,
@@ -79,7 +80,10 @@ export default function HomeScreen() {
               <Text style={styles.subText}>{t('feed.subtitle')}</Text>
             </View>
             <TouchableOpacity
-              onPress={() => router.push('/(modals)/notifications')}
+              onPress={() => {
+                void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                router.push('/(modals)/notifications');
+              }}
               style={styles.bellButton}
               activeOpacity={0.7}
               accessibilityLabel={t('notifications.title')}

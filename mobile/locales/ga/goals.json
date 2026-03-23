@@ -1,5 +1,6 @@
 {
   "title": "Spriocanna",
+  "confirmAbandon": "An bhfuil tú cinnte gur mhaith leat an sprioc seo a thréigean?",
   "empty": "Níl aon sprioc agat fós.",
   "addGoal": "Cuir sprioc leis",
   "status": {

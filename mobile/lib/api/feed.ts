@@ -17,6 +17,22 @@ export type FeedItemType =
   | 'volunteer'
   | 'review';
 
+export interface PollOption {
+  id: number;
+  text: string;
+  vote_count: number;
+  percentage: number;
+}
+
+export interface PollData {
+  id: number;
+  question: string;
+  options: PollOption[];
+  total_votes: number;
+  user_vote_option_id: number | null;
+  is_active: boolean;
+}
+
 export interface FeedItem {
   id: number;
   type: FeedItemType;
@@ -37,6 +53,17 @@ export interface FeedItem {
   commitment: string | null;
   submission_deadline: string | null;
   receiver: { id: number; name: string } | null;
+  poll_data?: PollData | null;
+  media?: Array<{
+    id: number;
+    media_type: 'image' | 'video';
+    file_url: string;
+    thumbnail_url: string | null;
+    alt_text: string | null;
+    width: number | null;
+    height: number | null;
+    display_order: number;
+  }>;
 }
 
 export interface FeedResponse {
@@ -78,4 +105,18 @@ export function toggleLike(targetType: string, targetId: number): Promise<{ data
     target_type: targetType,
     target_id: targetId,
   });
+}
+
+/**
+ * GET /api/v2/feed/polls/:pollId — fetch current poll state.
+ */
+export function getFeedPoll(pollId: number): Promise<{ data: PollData }> {
+  return api.get<{ data: PollData }>(`${API_V2}/feed/polls/${pollId}`);
+}
+
+/**
+ * POST /api/v2/feed/polls/:pollId/vote — cast a vote on a poll option.
+ */
+export function voteFeedPoll(pollId: number, optionId: number): Promise<{ data: PollData }> {
+  return api.post<{ data: PollData }>(`${API_V2}/feed/polls/${pollId}/vote`, { option_id: optionId });
 }

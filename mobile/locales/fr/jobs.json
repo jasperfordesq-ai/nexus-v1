@@ -1,5 +1,6 @@
 {
   "title": "Emplois",
+  "detailTitle": "Détails de l'emploi",
   "tabs": {
     "browse": "Parcourir",
     "myApplications": "Mes candidatures"

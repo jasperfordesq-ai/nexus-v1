@@ -25,7 +25,26 @@ import { usePaginatedApi } from '@/lib/hooks/usePaginatedApi';
 import { usePrimaryColor } from '@/lib/hooks/useTenant';
 import { useTheme, type Theme } from '@/lib/hooks/useTheme';
 import MemberCard from '@/components/MemberCard';
-import LoadingSpinner from '@/components/ui/LoadingSpinner';
+import { SkeletonBox } from '@/components/ui/Skeleton';
+
+/** Inline skeleton for a member card row. */
+function MemberCardSkeleton({ theme }: { theme: Theme }) {
+  return (
+    <View style={{
+      flexDirection: 'row',
+      alignItems: 'center',
+      paddingHorizontal: 16,
+      paddingVertical: 12,
+      backgroundColor: theme.surface,
+    }}>
+      <SkeletonBox width={48} height={48} borderRadius={24} />
+      <View style={{ flex: 1, marginLeft: 12, gap: 6 }}>
+        <SkeletonBox width="60%" height={14} />
+        <SkeletonBox width="40%" height={11} />
+      </View>
+    </View>
+  );
+}
 
 /** Extractor for offset-based MemberListResponse — encodes next offset as cursor string. */
 function extractMembersPage(response: MemberListResponse) {
@@ -85,7 +104,13 @@ export default function MembersScreen() {
         onEndReachedThreshold={0.3}
         ListEmptyComponent={
           isLoading ? (
-            <LoadingSpinner />
+            <>
+              <MemberCardSkeleton theme={theme} />
+              <MemberCardSkeleton theme={theme} />
+              <MemberCardSkeleton theme={theme} />
+              <MemberCardSkeleton theme={theme} />
+              <MemberCardSkeleton theme={theme} />
+            </>
           ) : error ? (
             <View style={styles.centered}>
               <Text style={styles.errorText}>{error}</Text>

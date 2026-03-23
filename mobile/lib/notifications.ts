@@ -20,6 +20,8 @@ import * as Notifications from 'expo-notifications';
 import * as Device from 'expo-device';
 import Constants from 'expo-constants';
 
+import * as Sentry from '@sentry/react-native';
+
 import { api } from '@/lib/api/client';
 
 /** Callback registered by RealtimeContext to handle background data pushes. */
@@ -102,6 +104,7 @@ export async function registerForPushNotifications(): Promise<void> {
   } catch (err) {
     // Non-critical — app works fine without push notifications
     console.warn('[Notifications] Failed to register device:', err);
+    Sentry.captureException(err, { tags: { module: 'push-notifications' } });
   }
 }
 
@@ -116,7 +119,10 @@ export async function unregisterPushNotifications(): Promise<void> {
     const projectId = Constants.expoConfig?.extra?.eas?.projectId;
     const tokenData = await Notifications.getExpoPushTokenAsync(projectId ? { projectId } : undefined);
     await api.post<void>('/api/push/unregister-device', { token: tokenData.data });
-  } catch {
-    // Best effort on logout
+  } catch (err) {
+    // Best effort on logout — log to Sentry for visibility
+    if (err instanceof Error) {
+      Sentry.captureMessage(`Push unregister failed: ${err.message}`, 'warning');
+    }
   }
 }

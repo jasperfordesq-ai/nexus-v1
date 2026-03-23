@@ -162,6 +162,7 @@ function EventCard({
       accessibilityLabel={event.title}
     >
       {/* Date badge */}
+      {/* primary + '15' = 8% opacity variant for light background */}
       <View style={[cardStyles.dateBadge, { backgroundColor: primary + '15' }]}>
         <Text style={[cardStyles.dateMonth, { color: primary }]}>{month}</Text>
         <Text style={[cardStyles.dateDay, { color: primary }]}>{day}</Text>

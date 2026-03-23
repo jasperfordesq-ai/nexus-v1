@@ -1,5 +1,6 @@
 {
   "title": "Jobs",
+  "detailTitle": "Job Details",
   "tabs": {
     "browse": "Browse",
     "myApplications": "My Applications"

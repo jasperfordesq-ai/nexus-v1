@@ -21,12 +21,19 @@ import {
 } from 'react-native';
 import { Link } from 'expo-router';
 import * as Haptics from 'expo-haptics';
+import { Ionicons } from '@expo/vector-icons';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '@/lib/hooks/useAuth';
 import { ApiResponseError } from '@/lib/api/client';
 import { usePrimaryColor } from '@/lib/hooks/useTenant';
 import { useTheme, type Theme } from '@/lib/hooks/useTheme';
+
+/** White text used on primary-colored backgrounds for guaranteed contrast */
+const PRIMARY_CONTRAST_TEXT = '#FFFFFF'; // contrast text on primary
+
+const FORGOT_PASSWORD_URL = 'https://app.project-nexus.ie/forgot-password';
 
 function makeLoginSchema(t: (key: string) => string) {
   return z.object({
@@ -43,6 +50,7 @@ export default function LoginScreen() {
   const primary = usePrimaryColor();
   const theme = useTheme();
   const styles = useMemo(() => makeStyles(theme), [theme]);
+  const insets = useSafeAreaInsets();
 
   const loginSchema = useMemo(() => makeLoginSchema(t), [t]);
 
@@ -57,6 +65,7 @@ export default function LoginScreen() {
 
   const [isLoading, setIsLoading] = useState(false);
   const [globalError, setGlobalError] = useState<string | null>(null);
+  const [showPassword, setShowPassword] = useState(false);
 
   async function onSubmit(data: LoginFormValues) {
     setIsLoading(true);
@@ -82,21 +91,33 @@ export default function LoginScreen() {
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
     >
       <ScrollView
-        contentContainerStyle={styles.container}
+        contentContainerStyle={[
+          styles.container,
+          { paddingTop: insets.top, paddingBottom: insets.bottom },
+        ]}
         keyboardShouldPersistTaps="handled"
+        keyboardDismissMode="on-drag"
       >
         {/* Logo / branding */}
         <View style={styles.header}>
-          <View style={[styles.logoCircle, { backgroundColor: primary }]}>
+          <View
+            style={[styles.logoCircle, { backgroundColor: primary }]}
+            accessibilityRole="image"
+            accessibilityLabel="Project NEXUS logo"
+          >
             <Text style={styles.logoText}>N</Text>
           </View>
-          <Text style={styles.title}>Project NEXUS</Text>
+          <Text style={styles.title}>{t('common:appName')}</Text>
           <Text style={styles.subtitle}>{t('login.subtitle')}</Text>
         </View>
 
         {/* Error banner */}
         {globalError && (
-          <View style={styles.errorBanner}>
+          <View
+            style={styles.errorBanner}
+            accessibilityRole="alert"
+            accessibilityLiveRegion="polite"
+          >
             <Text style={styles.errorText}>{globalError}</Text>
           </View>
         )}
@@ -131,18 +152,33 @@ export default function LoginScreen() {
             name="password"
             render={({ field: { onChange, onBlur, value } }) => (
               <>
-                <TextInput
-                  style={[styles.input, errors.password && styles.inputError]}
-                  value={value}
-                  onChangeText={onChange}
-                  onBlur={onBlur}
-                  placeholder="••••••••"
-                  secureTextEntry
-                  autoComplete="password"
-                  textContentType="password"
-                  returnKeyType="done"
-                  onSubmitEditing={handleSubmit(onSubmit)}
-                />
+                <View style={styles.passwordContainer}>
+                  <TextInput
+                    style={[styles.passwordInput, errors.password && styles.inputError]}
+                    value={value}
+                    onChangeText={onChange}
+                    onBlur={onBlur}
+                    placeholder="••••••••"
+                    secureTextEntry={!showPassword}
+                    autoComplete="password"
+                    textContentType="password"
+                    returnKeyType="done"
+                    onSubmitEditing={handleSubmit(onSubmit)}
+                  />
+                  <TouchableOpacity
+                    style={styles.eyeButton}
+                    onPress={() => setShowPassword((prev) => !prev)}
+                    activeOpacity={0.6}
+                    accessibilityLabel={t('auth:login.togglePassword')}
+                    accessibilityRole="button"
+                  >
+                    <Ionicons
+                      name={showPassword ? 'eye-off-outline' : 'eye-outline'}
+                      size={20}
+                      color={theme.textMuted}
+                    />
+                  </TouchableOpacity>
+                </View>
                 {errors.password && <Text style={styles.fieldError}>{errors.password.message}</Text>}
               </>
             )}
@@ -155,7 +191,7 @@ export default function LoginScreen() {
             activeOpacity={0.8}
           >
             {isLoading ? (
-              <ActivityIndicator color="#fff" />
+              <ActivityIndicator color={PRIMARY_CONTRAST_TEXT} />
             ) : (
               <Text style={styles.buttonText}>{t('login.submit')}</Text>
             )}
@@ -163,10 +199,9 @@ export default function LoginScreen() {
 
           <TouchableOpacity
             onPress={async () => {
-              const url = 'https://app.project-nexus.ie/forgot-password';
-              const supported = await Linking.canOpenURL(url);
+              const supported = await Linking.canOpenURL(FORGOT_PASSWORD_URL);
               if (supported) {
-                await Linking.openURL(url);
+                await Linking.openURL(FORGOT_PASSWORD_URL);
               }
             }}
             style={styles.forgotPasswordBtn}
@@ -214,7 +249,7 @@ function makeStyles(theme: Theme) {
       alignItems: 'center',
       marginBottom: 16,
     },
-    logoText: { color: '#fff', fontSize: 32, fontWeight: '700' },
+    logoText: { color: PRIMARY_CONTRAST_TEXT, fontSize: 32, fontWeight: '700' }, // contrast text on primary
     title: { fontSize: 26, fontWeight: '700', color: theme.text, marginBottom: 4 },
     subtitle: { fontSize: 14, color: theme.textSecondary },
     errorBanner: {
@@ -239,6 +274,26 @@ function makeStyles(theme: Theme) {
     inputError: {
       borderColor: theme.error,
     },
+    passwordContainer: {
+      position: 'relative',
+      justifyContent: 'center',
+    },
+    passwordInput: {
+      borderWidth: 1,
+      borderColor: theme.border,
+      borderRadius: 10,
+      paddingHorizontal: 14,
+      paddingRight: 44,
+      paddingVertical: 12,
+      fontSize: 16,
+      color: theme.text,
+      backgroundColor: theme.bg,
+    },
+    eyeButton: {
+      position: 'absolute',
+      right: 12,
+      padding: 4,
+    },
     fieldError: {
       color: theme.error,
       fontSize: 12,
@@ -252,7 +307,7 @@ function makeStyles(theme: Theme) {
       marginTop: 24,
     },
     buttonDisabled: { opacity: 0.6 },
-    buttonText: { color: '#fff', fontSize: 16, fontWeight: '600' },
+    buttonText: { color: PRIMARY_CONTRAST_TEXT, fontSize: 16, fontWeight: '600' }, // contrast text on primary
     forgotPasswordBtn: { alignSelf: 'center', marginTop: 14 },
     forgotPassword: { color: theme.textSecondary, fontSize: 13, fontWeight: '500' },
     footer: { flexDirection: 'row', justifyContent: 'center', marginTop: 32 },

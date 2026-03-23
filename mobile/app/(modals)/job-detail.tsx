@@ -31,6 +31,8 @@ import { useTheme, type Theme } from '@/lib/hooks/useTheme';
 import Avatar from '@/components/ui/Avatar';
 import LoadingSpinner from '@/components/ui/LoadingSpinner';
 
+const WEB_URL = 'https://app.project-nexus.ie';
+
 export default function JobDetailScreen() {
   const { t } = useTranslation('jobs');
   const navigation = useNavigation();
@@ -160,8 +162,8 @@ export default function JobDetailScreen() {
     try {
       await Share.share({
         title: job.title,
-        message: `${job.title}\n\nhttps://app.project-nexus.ie/jobs/${job.id}`,
-        url: `https://app.project-nexus.ie/jobs/${job.id}`,
+        message: `${job.title}\n\n${WEB_URL}/jobs/${job.id}`,
+        url: `${WEB_URL}/jobs/${job.id}`,
       });
     } catch {
       // User dismissed share sheet — no error needed
@@ -382,7 +384,7 @@ export default function JobDetailScreen() {
             <Ionicons
               name={hasApplied ? 'checkmark-circle' : 'send-outline'}
               size={18}
-              color="#fff"
+              color="#fff" // contrast on primary
             />
             <Text style={styles.applyButtonText}>
               {hasApplied ? t('detail.applied') : t('detail.apply')}
@@ -612,7 +614,7 @@ function makeStyles(theme: Theme) {
       borderRadius: 12,
       paddingVertical: 14,
     },
-    applyButtonText: { fontSize: 16, fontWeight: '700', color: '#fff' },
+    applyButtonText: { fontSize: 16, fontWeight: '700', color: '#fff' }, // contrast on primary
     errorText: { fontSize: 15, color: theme.textMuted },
     // Modal
     modalHeader: {

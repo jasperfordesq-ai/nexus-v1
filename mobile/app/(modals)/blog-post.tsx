@@ -26,6 +26,8 @@ import { useTheme, type Theme } from '@/lib/hooks/useTheme';
 import Avatar from '@/components/ui/Avatar';
 import LoadingSpinner from '@/components/ui/LoadingSpinner';
 
+const WEB_URL = 'https://app.project-nexus.ie';
+
 export default function BlogPostScreen() {
   const { t } = useTranslation('blog');
   const navigation = useNavigation();
@@ -35,7 +37,7 @@ export default function BlogPostScreen() {
   const styles = useMemo(() => makeStyles(theme), [theme]);
 
   const handleShare = useCallback(async (sharePost: { title: string; slug: string; excerpt: string | null }) => {
-    const url = `https://app.project-nexus.ie/blog/${sharePost.slug}`;
+    const url = `${WEB_URL}/blog/${sharePost.slug}`;
     const message = sharePost.excerpt
       ? `${sharePost.title}\n\n${sharePost.excerpt}\n\n${url}`
       : `${sharePost.title}\n\n${url}`;

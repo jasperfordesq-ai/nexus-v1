@@ -14,6 +14,7 @@ import {
   Alert,
   RefreshControl,
   ActivityIndicator,
+  Share,
 } from 'react-native';
 import { useLocalSearchParams, router, useNavigation } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
@@ -26,6 +27,8 @@ import { usePrimaryColor } from '@/lib/hooks/useTenant';
 import { useTheme, type Theme } from '@/lib/hooks/useTheme';
 import Avatar from '@/components/ui/Avatar';
 import LoadingSpinner from '@/components/ui/LoadingSpinner';
+
+const WEB_URL = 'https://app.project-nexus.ie';
 
 export default function GroupDetailScreen() {
   const { t } = useTranslation('groups');
@@ -77,6 +80,16 @@ export default function GroupDetailScreen() {
       setRefreshing(false);
     }
   }, [isLoading]);
+
+  async function handleShare() {
+    if (!group) return;
+    void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    try {
+      await Share.share({
+        message: `${group.name} — ${WEB_URL}/groups/${group.id}`,
+      });
+    } catch { /* ignore */ }
+  }
 
   if (isNaN(groupId) || groupId <= 0) {
     return (
@@ -183,6 +196,15 @@ export default function GroupDetailScreen() {
         {/* Title row */}
         <View style={styles.titleRow}>
           <Text style={styles.title}>{group.name}</Text>
+          <TouchableOpacity
+            onPress={() => void handleShare()}
+            style={{ padding: 4 }}
+            activeOpacity={0.7}
+            accessibilityLabel={t('detail.share')}
+            accessibilityRole="button"
+          >
+            <Ionicons name="share-outline" size={22} color={primary} />
+          </TouchableOpacity>
           {group.is_featured && (
             <View style={[styles.badge, { backgroundColor: primary + '20' }]}>
               <Text style={[styles.badgeText, { color: primary }]}>{t('featured')}</Text>
@@ -236,14 +258,14 @@ export default function GroupDetailScreen() {
         >
           {isUpdating ? (
             <ActivityIndicator
-              color={currentIsMember ? theme.text : '#fff'}
+              color={currentIsMember ? theme.text : '#fff'} // contrast on primary
               size="small"
             />
           ) : (
             <Text
               style={[
                 styles.memberBtnText,
-                { color: currentIsMember ? theme.text : '#fff' },
+                { color: currentIsMember ? theme.text : '#fff' }, // contrast on primary
               ]}
             >
               {currentIsMember ? t('leave') : t('join')}

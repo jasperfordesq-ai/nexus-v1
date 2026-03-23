@@ -59,7 +59,7 @@ function ErrorFallback({ onReset }: { onReset: () => void }) {
         accessibilityRole="button"
         accessibilityLabel={t('buttons.retry')}
       >
-        <Text style={{ fontSize: 14, fontWeight: '600', color: '#fff' }}>{t('buttons.retry')}</Text>
+        <Text style={{ fontSize: 14, fontWeight: '600', color: '#fff' /* contrast on primary */ }}>{t('buttons.retry')}</Text>
       </TouchableOpacity>
     </View>
   );

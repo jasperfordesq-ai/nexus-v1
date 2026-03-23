@@ -64,5 +64,17 @@
     "review": "Review",
     "unlike": "Unlike",
     "like": "Like"
-  }
+  },
+  "poll": {
+    "totalVotes": "{{count}} votes",
+    "voted": "You voted",
+    "closed": "Poll closed",
+    "vote": "Vote"
+  },
+  "imageViewer": {
+    "close": "Close",
+    "share": "Share image"
+  },
+  "likePost": "Like this post",
+  "unlikePost": "Unlike this post"
 }

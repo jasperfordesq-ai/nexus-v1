@@ -1,5 +1,6 @@
 {
   "title": "Mitglieder",
+  "profileTitle": "Mitgliederprofil",
   "search": {
     "placeholder": "Mitglieder suchen…"
   },
@@ -14,6 +15,15 @@
     "timeCredits_other": "{{count}} Zeitguthaben",
     "memberSince": "Mitglied seit {{date}}",
     "connect": "Verbinden",
+    "connected": "Verbunden",
+    "pendingSent": "Anfrage gesendet",
+    "pendingReceived": "Auf Anfrage antworten",
+    "accept": "Annehmen",
+    "decline": "Ablehnen",
+    "disconnect": "Trennen",
+    "disconnectConfirm": "Diese Verbindung entfernen?",
+    "disconnectMessage": "Du kannst dich jederzeit wieder verbinden.",
+    "connectionError": "Verbindung konnte nicht aktualisiert werden",
     "message": "Nachricht",
     "skills": "Fähigkeiten",
     "reviews": "Bewertungen",

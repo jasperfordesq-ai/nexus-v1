@@ -15,6 +15,8 @@ import {
   SafeAreaView,
 } from 'react-native';
 import { router } from 'expo-router';
+import { Ionicons } from '@expo/vector-icons';
+import * as Haptics from 'expo-haptics';
 
 import { useTranslation } from 'react-i18next';
 
@@ -22,6 +24,9 @@ import { listTenants, type TenantListItem } from '@/lib/api/tenant';
 import { useApi } from '@/lib/hooks/useApi';
 import { useTenant, usePrimaryColor } from '@/lib/hooks/useTenant';
 import { useTheme, type Theme } from '@/lib/hooks/useTheme';
+
+/** White text used on primary-colored backgrounds for guaranteed contrast */
+const PRIMARY_CONTRAST_TEXT = '#FFFFFF'; // contrast text on primary
 
 /**
  * Tenant picker — shown before login when the user needs to select
@@ -42,6 +47,7 @@ export default function SelectTenantScreen() {
   const tenants = data?.data ?? [];
 
   async function handleSelect(tenant: TenantListItem) {
+    void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     await setTenantSlug(tenant.slug);
     router.back();
   }
@@ -92,7 +98,7 @@ export default function SelectTenantScreen() {
             )}
             <Text style={styles.tenantName}>{item.name}</Text>
             {item.slug === tenantSlug && (
-              <Text style={styles.checkmark}>✓</Text>
+              <Ionicons name="checkmark" size={18} color={primary} />
             )}
           </TouchableOpacity>
         )}
@@ -136,9 +142,8 @@ function makeStyles(theme: Theme, primary: string) {
       justifyContent: 'center',
       alignItems: 'center',
     },
-    logoInitial: { color: '#fff', fontWeight: '700', fontSize: 18 },
+    logoInitial: { color: PRIMARY_CONTRAST_TEXT, fontWeight: '700', fontSize: 18 }, // contrast text on primary
     tenantName: { flex: 1, fontSize: 16, fontWeight: '500', color: theme.text },
-    checkmark: { color: primary, fontSize: 18, fontWeight: '700' },
     separator: { height: 1, backgroundColor: theme.borderSubtle },
   });
 }

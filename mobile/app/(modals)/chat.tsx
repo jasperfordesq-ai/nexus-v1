@@ -63,7 +63,7 @@ function MessageBubble({
             <Text style={[styles.bubbleText, { color: theme.textSecondary }]}>{t('chat:thinking')}</Text>
           </View>
         ) : (
-          <Text style={[styles.bubbleText, isUser ? { color: '#fff' } : { color: theme.text }]}>
+          <Text style={[styles.bubbleText, isUser ? { color: '#fff' } : { color: theme.text }]}>{/* contrast on primary */}
             {message.content}
           </Text>
         )}

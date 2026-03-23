@@ -23,6 +23,7 @@ import { useApi } from '@/lib/hooks/useApi';
 import { useDebounce } from '@/lib/hooks/useDebounce';
 import { usePrimaryColor } from '@/lib/hooks/useTenant';
 import { useTheme, type Theme } from '@/lib/hooks/useTheme';
+import { SkeletonBox } from '@/components/ui/Skeleton';
 import OfflineBanner from '@/components/OfflineBanner';
 
 type FilterOption = SearchResultType | 'all';
@@ -53,6 +54,27 @@ function navigateToResult(item: SearchResult): void {
       router.push({ pathname: '/(modals)/blog-post', params: { id: String(item.id) } });
       break;
   }
+}
+
+/** Inline skeleton for a search result row. */
+function SearchResultSkeleton({ theme }: { theme: Theme }) {
+  return (
+    <View style={{
+      flexDirection: 'row',
+      alignItems: 'center',
+      paddingHorizontal: 16,
+      paddingVertical: 12,
+      borderBottomWidth: StyleSheet.hairlineWidth,
+      borderBottomColor: theme.borderSubtle,
+    }}>
+      <SkeletonBox width={40} height={40} borderRadius={20} />
+      <View style={{ flex: 1, marginLeft: 12, gap: 6 }}>
+        <SkeletonBox width="65%" height={14} />
+        <SkeletonBox width="40%" height={11} />
+      </View>
+      <SkeletonBox width={48} height={20} borderRadius={6} style={{ marginLeft: 8 }} />
+    </View>
+  );
 }
 
 export default function SearchScreen() {
@@ -110,7 +132,16 @@ export default function SearchScreen() {
   }
 
   function renderEmpty() {
-    if (isLoading) return null;
+    if (isLoading && debouncedQuery.trim().length > 0) {
+      return (
+        <>
+          <SearchResultSkeleton theme={theme} />
+          <SearchResultSkeleton theme={theme} />
+          <SearchResultSkeleton theme={theme} />
+          <SearchResultSkeleton theme={theme} />
+        </>
+      );
+    }
     if (debouncedQuery.trim().length === 0) {
       return (
         <View style={styles.centered}>
@@ -181,6 +212,7 @@ export default function SearchScreen() {
               accessibilityRole="button"
               accessibilityState={{ selected: active }}
             >
+              {/* '#fff' = contrast on primary */}
               <Text style={[styles.filterText, active ? { color: '#fff' } : { color: theme.textSecondary }]}>
                 {filterLabel(f)}
               </Text>

@@ -81,7 +81,7 @@ export function logIntegrityWarnings(): void {
         // Dynamic import avoids a hard dependency — if Sentry isn't configured
         // the warning falls through to console.warn below.
         const Sentry = require('@sentry/react-native') as typeof import('@sentry/react-native');
-        if (Sentry.getCurrentScope) {
+        if (typeof Sentry.getCurrentScope === 'function') {
           Sentry.captureMessage(message, 'warning');
           continue;
         }

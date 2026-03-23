@@ -1,5 +1,6 @@
 {
   "title": "Nachrichten",
+  "threadTitle": "Unterhaltung",
   "thread": {
     "inputPlaceholder": "Nachricht eingeben…",
     "send": "Senden",

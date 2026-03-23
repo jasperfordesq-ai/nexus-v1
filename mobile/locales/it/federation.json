@@ -1,5 +1,7 @@
 {
   "title": "Federazione",
+  "partnerTitle": "Dettagli partner",
+  "share": "Condividi partner",
   "subtitle": "Comunità connesse",
   "stats": {
     "partners": "{{count}} partner",

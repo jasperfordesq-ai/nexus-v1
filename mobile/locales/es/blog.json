@@ -1,5 +1,6 @@
 {
   "title": "Blog",
+  "postTitle": "Entrada del blog",
   "searchPlaceholder": "Buscar artículos…",
   "empty": "Todavía no hay artículos.",
   "readingTime": "{{minutes}} min de lectura",

@@ -10,6 +10,7 @@ import { StatusBar } from 'expo-status-bar';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
+import { useTranslation } from 'react-i18next';
 import '@/lib/i18n'; // initialise i18next before any screen renders
 import { validateEnv } from '@/lib/env';
 import { AuthProvider, useAuthContext } from '@/lib/context/AuthContext';
@@ -59,6 +60,7 @@ export default Sentry.wrap(RootLayout);
  * Separated from RootLayout so it can consume AuthContext.
  */
 function RootNavigator() {
+  const { t } = useTranslation();
   const { isLoading, isAuthenticated } = useAuthContext();
 
   useEffect(() => {
@@ -100,107 +102,111 @@ function RootNavigator() {
       <Stack.Screen name="(tabs)" />
       <Stack.Screen
         name="(modals)/new-exchange"
-        options={{ presentation: 'modal', headerShown: true, title: '' }}
+        options={{ presentation: 'modal', headerShown: true, title: t('exchanges:newTitle') }}
       />
       <Stack.Screen
         name="(modals)/exchange-detail"
-        options={{ presentation: 'modal', headerShown: true, title: '' }}
+        options={{ presentation: 'modal', headerShown: true, title: t('exchanges:detailTitle') }}
       />
       <Stack.Screen
         name="(modals)/thread"
-        options={{ presentation: 'modal', headerShown: true, title: '' }}
+        options={{ presentation: 'modal', headerShown: true, title: t('messages:threadTitle') }}
       />
       <Stack.Screen
         name="(modals)/member-profile"
-        options={{ presentation: 'modal', headerShown: true, title: '' }}
+        options={{ presentation: 'modal', headerShown: true, title: t('members:profileTitle') }}
       />
       <Stack.Screen
         name="(modals)/notifications"
-        options={{ presentation: 'modal', headerShown: true, title: '' }}
+        options={{ presentation: 'modal', headerShown: true, title: t('notifications:title') }}
       />
       <Stack.Screen
         name="(modals)/wallet"
-        options={{ presentation: 'modal', headerShown: true, title: '' }}
+        options={{ presentation: 'modal', headerShown: true, title: t('wallet:title') }}
       />
       <Stack.Screen
         name="(modals)/settings"
-        options={{ presentation: 'modal', headerShown: true, title: '' }}
+        options={{ presentation: 'modal', headerShown: true, title: t('settings:title') }}
       />
       <Stack.Screen
         name="(modals)/edit-profile"
-        options={{ presentation: 'modal', headerShown: true, title: '' }}
+        options={{ presentation: 'modal', headerShown: true, title: t('profile:editTitle') }}
       />
       <Stack.Screen
         name="(modals)/event-detail"
-        options={{ presentation: 'modal', headerShown: true, title: '' }}
+        options={{ presentation: 'modal', headerShown: true, title: t('events:detailTitle') }}
       />
       <Stack.Screen
         name="(modals)/members"
-        options={{ presentation: 'modal', headerShown: true, title: '' }}
+        options={{ presentation: 'modal', headerShown: true, title: t('members:title') }}
       />
       <Stack.Screen
         name="(modals)/change-password"
-        options={{ presentation: 'modal', headerShown: true, title: '' }}
+        options={{ presentation: 'modal', headerShown: true, title: t('settings:changePasswordTitle') }}
       />
       <Stack.Screen
         name="(modals)/group-detail"
-        options={{ presentation: 'modal', headerShown: true, title: '' }}
+        options={{ presentation: 'modal', headerShown: true, title: t('groups:detailTitle') }}
       />
       <Stack.Screen
         name="(modals)/blog"
-        options={{ presentation: 'modal', headerShown: true, title: '' }}
+        options={{ presentation: 'modal', headerShown: true, title: t('blog:title') }}
       />
       <Stack.Screen
         name="(modals)/blog-post"
-        options={{ presentation: 'modal', headerShown: true, title: '' }}
+        options={{ presentation: 'modal', headerShown: true, title: t('blog:postTitle') }}
       />
       <Stack.Screen
         name="(modals)/gamification"
-        options={{ presentation: 'modal', headerShown: true, title: '' }}
+        options={{ presentation: 'modal', headerShown: true, title: t('gamification:title') }}
       />
       <Stack.Screen
         name="(modals)/goals"
-        options={{ presentation: 'modal', headerShown: true, title: '' }}
+        options={{ presentation: 'modal', headerShown: true, title: t('goals:title') }}
       />
       <Stack.Screen
         name="(modals)/chat"
-        options={{ presentation: 'modal', headerShown: true, title: '' }}
+        options={{ presentation: 'modal', headerShown: true, title: t('chat:title') }}
       />
       <Stack.Screen
         name="(modals)/volunteering"
-        options={{ presentation: 'modal', headerShown: true, title: '' }}
+        options={{ presentation: 'modal', headerShown: true, title: t('volunteering:title') }}
       />
       <Stack.Screen
         name="(modals)/volunteering-detail"
-        options={{ presentation: 'modal', headerShown: true, title: '' }}
+        options={{ presentation: 'modal', headerShown: true, title: t('volunteering:detailTitle') }}
       />
       <Stack.Screen
         name="(modals)/jobs"
-        options={{ presentation: 'modal', headerShown: true, title: '' }}
+        options={{ presentation: 'modal', headerShown: true, title: t('jobs:title') }}
       />
       <Stack.Screen
         name="(modals)/job-detail"
-        options={{ presentation: 'modal', headerShown: true, title: '' }}
+        options={{ presentation: 'modal', headerShown: true, title: t('jobs:detailTitle') }}
       />
       <Stack.Screen
         name="(modals)/organisations"
-        options={{ presentation: 'modal', headerShown: true, title: '' }}
+        options={{ presentation: 'modal', headerShown: true, title: t('organisations:title') }}
       />
       <Stack.Screen
         name="(modals)/organisation-detail"
-        options={{ presentation: 'modal', headerShown: true, title: '' }}
+        options={{ presentation: 'modal', headerShown: true, title: t('organisations:detailTitle') }}
       />
       <Stack.Screen
         name="(modals)/endorsements"
-        options={{ presentation: 'modal', headerShown: true, title: '' }}
+        options={{ presentation: 'modal', headerShown: true, title: t('endorsements:title') }}
       />
       <Stack.Screen
         name="(modals)/federation"
-        options={{ presentation: 'modal', headerShown: true, title: '' }}
+        options={{ presentation: 'modal', headerShown: true, title: t('federation:title') }}
       />
       <Stack.Screen
         name="(modals)/federation-partner"
-        options={{ presentation: 'modal', headerShown: true, title: '' }}
+        options={{ presentation: 'modal', headerShown: true, title: t('federation:partnerTitle') }}
+      />
+      <Stack.Screen
+        name="(modals)/image-viewer"
+        options={{ presentation: 'fullScreenModal', headerShown: false }}
       />
     </Stack>
   );

@@ -276,7 +276,7 @@ function ApplicationCard({
               }}
               activeOpacity={0.8}
             >
-              <Text style={{ fontSize: 13, fontWeight: '600', color: '#fff' }}>
+              <Text style={{ fontSize: 13, fontWeight: '600', color: '#fff' }}>{/* contrast on primary */}
                 {t('applications.accept_interview')}
               </Text>
             </TouchableOpacity>
@@ -325,7 +325,7 @@ function ApplicationCard({
               }}
               activeOpacity={0.8}
             >
-              <Text style={{ fontSize: 13, fontWeight: '600', color: '#fff' }}>
+              <Text style={{ fontSize: 13, fontWeight: '600', color: '#fff' }}>{/* contrast on primary */}
                 {t('applications.accept_offer')}
               </Text>
             </TouchableOpacity>
@@ -589,7 +589,7 @@ export default function JobsScreen() {
                 <Text
                   style={[
                     styles.filterChipText,
-                    typeFilter === type && { color: '#fff' },
+                    typeFilter === type && { color: '#fff' }, // contrast on primary
                   ]}
                 >
                   {t(type ? `filters.type.${type}` : 'filters.type.all')}
@@ -612,7 +612,7 @@ export default function JobsScreen() {
                 <Text
                   style={[
                     styles.filterChipText,
-                    commitmentFilter === commitment && { color: '#fff' },
+                    commitmentFilter === commitment && { color: '#fff' }, // contrast on primary
                   ]}
                 >
                   {t(

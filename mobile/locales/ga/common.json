@@ -1,4 +1,13 @@
 {
+  "appName": "Project NEXUS",
+  "attribution": "Is bogearraí foinse oscailte é Project NEXUS faoi cheadúnas AGPL-3.0.",
+  "tabs": {
+    "home": "Baile",
+    "listings": "Liostáil",
+    "events": "Imeachtaí",
+    "messages": "Teachtaireachtaí",
+    "profile": "Próifíl"
+  },
   "buttons": {
     "save": "Sábháil",
     "cancel": "Cealaigh",

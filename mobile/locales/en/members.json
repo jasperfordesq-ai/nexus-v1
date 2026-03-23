@@ -1,5 +1,6 @@
 {
   "title": "Members",
+  "profileTitle": "Member Profile",
   "search": {
     "placeholder": "Search members…"
   },
@@ -19,6 +20,15 @@
     "verified": "Verified",
     "loadError": "Could not load member profile. Please try again.",
     "connect": "Connect",
+    "connected": "Connected",
+    "pendingSent": "Request Sent",
+    "pendingReceived": "Respond to Request",
+    "accept": "Accept",
+    "decline": "Decline",
+    "disconnect": "Disconnect",
+    "disconnectConfirm": "Remove this connection?",
+    "disconnectMessage": "You can always reconnect later.",
+    "connectionError": "Could not update connection",
     "message": "Message",
     "skills": "Skills",
     "reviews": "Reviews",

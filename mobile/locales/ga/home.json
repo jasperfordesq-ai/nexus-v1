@@ -22,5 +22,17 @@
   "notifications": {
     "newMessage": "Teachtaireacht nua ó {{name}}",
     "newMatch": "Tá meaitseáil nua agat!"
-  }
+  },
+  "poll": {
+    "totalVotes": "{{count}} vóta",
+    "voted": "Vótáil tú",
+    "closed": "Pobalbhreith dúnta",
+    "vote": "Vótáil"
+  },
+  "imageViewer": {
+    "close": "Dún",
+    "share": "Roinn íomhá"
+  },
+  "likePost": "Is maith liom an phostáil seo",
+  "unlikePost": "Ní maith liom an phostáil seo a thuilleadh"
 }

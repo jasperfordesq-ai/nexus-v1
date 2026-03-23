@@ -7,6 +7,7 @@ import { useEffect } from 'react';
 import { Tabs, usePathname } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useTranslation } from 'react-i18next';
 
 import { usePrimaryColor } from '@/lib/hooks/useTenant';
 import { useTheme } from '@/lib/hooks/useTheme';
@@ -16,20 +17,21 @@ type IoniconName = React.ComponentProps<typeof Ionicons>['name'];
 
 interface TabConfig {
   name: string;
-  title: string;
+  i18nKey: string;
   icon: IoniconName;
   iconFocused: IoniconName;
 }
 
-const TABS: TabConfig[] = [
-  { name: 'home',      title: 'Home',      icon: 'home-outline',    iconFocused: 'home' },
-  { name: 'exchanges', title: 'Listings',  icon: 'storefront-outline', iconFocused: 'storefront' },
-  { name: 'events',    title: 'Events',    icon: 'calendar-outline', iconFocused: 'calendar' },
-  { name: 'messages',  title: 'Messages',  icon: 'chatbubble-outline', iconFocused: 'chatbubble' },
-  { name: 'profile',   title: 'Profile',   icon: 'person-outline',  iconFocused: 'person' },
+const TABS_CONFIG: TabConfig[] = [
+  { name: 'home',      i18nKey: 'common:tabs.home',      icon: 'home-outline',    iconFocused: 'home' },
+  { name: 'exchanges', i18nKey: 'common:tabs.listings',   icon: 'storefront-outline', iconFocused: 'storefront' },
+  { name: 'events',    i18nKey: 'common:tabs.events',     icon: 'calendar-outline', iconFocused: 'calendar' },
+  { name: 'messages',  i18nKey: 'common:tabs.messages',   icon: 'chatbubble-outline', iconFocused: 'chatbubble' },
+  { name: 'profile',   i18nKey: 'common:tabs.profile',    icon: 'person-outline',  iconFocused: 'person' },
 ];
 
 export default function TabsLayout() {
+  const { t } = useTranslation();
   const primary = usePrimaryColor();
   const theme = useTheme();
   const { unreadMessages, resetUnread } = useRealtimeContext();
@@ -63,12 +65,12 @@ export default function TabsLayout() {
         },
       }}
     >
-      {TABS.map(({ name, title, icon, iconFocused }) => (
+      {TABS_CONFIG.map(({ name, i18nKey, icon, iconFocused }) => (
         <Tabs.Screen
           key={name}
           name={name}
           options={{
-            title,
+            title: t(i18nKey),
             tabBarBadge: name === 'messages' && unreadMessages > 0 ? unreadMessages : undefined,
             tabBarBadgeStyle: name === 'messages' && unreadMessages > 0 ? { backgroundColor: primary } : undefined,
             tabBarIcon: ({ focused, color, size }) => (

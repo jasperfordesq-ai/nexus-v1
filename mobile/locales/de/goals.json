@@ -1,5 +1,6 @@
 {
   "title": "Ziele",
+  "confirmAbandon": "Bist du sicher, dass du dieses Ziel aufgeben möchtest?",
   "empty": "Noch keine Ziele vorhanden.",
   "addGoal": "Ziel hinzufügen",
   "status": {

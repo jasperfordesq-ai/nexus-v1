@@ -1,5 +1,6 @@
 {
   "title": "Goals",
+  "confirmAbandon": "Are you sure you want to abandon this goal?",
   "empty": "No goals yet.",
   "addGoal": "Add goal",
   "status": {

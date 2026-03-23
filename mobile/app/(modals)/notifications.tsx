@@ -49,17 +49,29 @@ export default function NotificationsScreen() {
   const notifications = data?.data ?? [];
   const unreadCount = notifications.filter((n) => !n.is_read).length;
 
-  async function handleMarkAll() {
-    setMarkingAll(true);
-    try {
-      await markAllRead();
-      void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-      refresh();
-    } catch {
-      Alert.alert(t('common:errors.alertTitle'), t('markError'));
-    } finally {
-      setMarkingAll(false);
-    }
+  function handleMarkAll() {
+    Alert.alert(
+      t('common:buttons.confirm'),
+      t('markAllConfirm'),
+      [
+        { text: t('common:no'), style: 'cancel' },
+        {
+          text: t('common:yes'),
+          onPress: async () => {
+            setMarkingAll(true);
+            try {
+              await markAllRead();
+              void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+              refresh();
+            } catch {
+              Alert.alert(t('common:errors.alertTitle'), t('markError'));
+            } finally {
+              setMarkingAll(false);
+            }
+          },
+        },
+      ],
+    );
   }
 
   function renderItem({ item }: { item: Notification }) {
@@ -193,7 +205,7 @@ function makeStyles(theme: Theme) {
       alignItems: 'center',
       paddingHorizontal: 5,
     },
-    badgeText: { color: '#fff', fontSize: 11, fontWeight: '700' },
+    badgeText: { color: '#fff', fontSize: 11, fontWeight: '700' }, // contrast on primary
     markAll: { fontSize: 14, fontWeight: '600' },
     list: { flexGrow: 1 },
     row: {

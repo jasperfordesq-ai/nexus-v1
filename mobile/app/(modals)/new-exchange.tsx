@@ -264,7 +264,7 @@ function makeStyles(theme: Theme) {
       alignItems: 'center',
     },
     toggleText: { fontSize: 14, fontWeight: '600', color: theme.textSecondary },
-    toggleTextActive: { color: '#fff' },
+    toggleTextActive: { color: '#fff' }, // contrast on primary
     input: {
       borderWidth: 1,
       borderColor: theme.border,
@@ -292,6 +292,6 @@ function makeStyles(theme: Theme) {
     errorBannerText: { color: theme.error, fontSize: 14 },
     button: { borderRadius: 10, paddingVertical: 14, alignItems: 'center', marginTop: 32 },
     buttonDisabled: { opacity: 0.6 },
-    buttonText: { color: '#fff', fontSize: 16, fontWeight: '600' },
+    buttonText: { color: '#fff', fontSize: 16, fontWeight: '600' }, // contrast on primary
   });
 }
