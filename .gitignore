@@ -49,6 +49,7 @@ CLAUDE.md
 !/scripts/post-deploy-algorithms.sh
 !/scripts/migrate-production.sh
 !/scripts/backup-production-db.sh
+!/scripts/server-nightly-backup.sh
 !/scripts/check-migration-drift.sh
 !/scripts/check-migration-ci.sh
 !/scripts/maintenance.sh
@@ -119,6 +120,7 @@ dump.sql
 *.zip
 *.tar
 *.tar.gz
+*.sql.gz
 *.rar
 *.pdf
 
@@ -169,7 +171,6 @@ firebase-service-account.json
 *.key
 *-api-token*
 cloudflare-api-token.txt
-nexus_backup_2026-03-07.sql.gz
 
 # ─── Scratch Scripts & Debug Artifacts ───────────────────────────────────────
 _*.py
