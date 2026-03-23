@@ -58,5 +58,7 @@
     "just_now": "Ahora mismo",
     "hours_ago": "hace {{count}}h",
     "days_ago": "hace {{count}}d"
-  }
+  },
+  "error_loading": "No se pudo cargar la página Descubrir. Es posible que sea un problema temporal.",
+  "retry": "Reintentar"
 }

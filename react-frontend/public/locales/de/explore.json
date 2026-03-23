@@ -58,5 +58,7 @@
     "just_now": "Gerade eben",
     "hours_ago": "vor {{count}}Std",
     "days_ago": "vor {{count}}T"
-  }
+  },
+  "error_loading": "Die Entdecken-Seite konnte nicht geladen werden. Dies könnte ein vorübergehendes Problem sein.",
+  "retry": "Erneut versuchen"
 }

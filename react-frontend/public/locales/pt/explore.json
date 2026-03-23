@@ -58,5 +58,7 @@
     "just_now": "Agora mesmo",
     "hours_ago": "{{count}}h atrás",
     "days_ago": "{{count}}d atrás"
-  }
+  },
+  "error_loading": "Não foi possível carregar a página Descobrir. Este pode ser um problema temporário.",
+  "retry": "Tentar novamente"
 }

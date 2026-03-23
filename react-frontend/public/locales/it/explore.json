@@ -58,5 +58,7 @@
     "just_now": "Proprio ora",
     "hours_ago": "{{count}}h fa",
     "days_ago": "{{count}}g fa"
-  }
+  },
+  "error_loading": "Impossibile caricare la pagina Esplora. Potrebbe essere un problema temporaneo.",
+  "retry": "Riprova"
 }

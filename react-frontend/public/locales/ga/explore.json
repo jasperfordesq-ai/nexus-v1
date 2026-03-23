@@ -58,5 +58,7 @@
     "just_now": "Díreach anois",
     "hours_ago": "{{count}}u ó shin",
     "days_ago": "{{count}}l ó shin"
-  }
+  },
+  "error_loading": "Níorbh fhéidir leathanach Aimsigh a luchtú. D'fhéadfadh sé seo a bheith ina fhadhb shealadach.",
+  "retry": "Atriail"
 }
