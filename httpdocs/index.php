@@ -16,6 +16,23 @@
 if (file_exists(__DIR__ . '/../.maintenance')) {
     $allowedIPs = ['127.0.0.1', '::1'];
     if (!in_array($_SERVER['REMOTE_ADDR'] ?? '', $allowedIPs)) {
+        // CORS headers must be sent here — without them the browser blocks the
+        // 503 response entirely (CORS violation) and the React frontend never
+        // sees the status code, so the maintenance page is never shown.
+        $origin = $_SERVER['HTTP_ORIGIN'] ?? '';
+        if ($origin !== '') {
+            header('Access-Control-Allow-Origin: ' . $origin);
+            header('Access-Control-Allow-Credentials: true');
+            header('Vary: Origin');
+        }
+        // Let OPTIONS preflight succeed so the real request can follow.
+        if (($_SERVER['REQUEST_METHOD'] ?? '') === 'OPTIONS') {
+            header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE, PATCH, OPTIONS');
+            header('Access-Control-Allow-Headers: Content-Type, Authorization, X-Tenant-ID, Accept, X-CSRF-TOKEN');
+            header('Access-Control-Max-Age: 86400');
+            http_response_code(204);
+            exit;
+        }
         http_response_code(503);
         header('Retry-After: 300');
         if (file_exists(__DIR__ . '/maintenance.html')) {

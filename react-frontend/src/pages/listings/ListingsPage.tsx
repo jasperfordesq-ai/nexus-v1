@@ -254,8 +254,11 @@ export function ListingsPage() {
             <Select
               aria-label={t('filter_type_label')}
               placeholder={t('filter_type_label')}
-              selectedKeys={selectedType ? [selectedType] : []}
-              onChange={(e) => setSelectedType(e.target.value as ListingType)}
+              selectedKeys={[selectedType]}
+              onSelectionChange={(keys) => {
+                const val = keys instanceof Set ? ([...keys][0] as string) : 'all';
+                setSelectedType((val || 'all') as ListingType);
+              }}
               className="w-full sm:w-36"
               classNames={{
                 trigger: 'bg-theme-elevated border-theme-default hover:bg-theme-hover',
@@ -272,7 +275,10 @@ export function ListingsPage() {
               aria-label={t('filter_category_label')}
               placeholder={t('filter_category_label')}
               selectedKeys={selectedCategory ? [selectedCategory] : []}
-              onChange={(e) => setSelectedCategory(e.target.value)}
+              onSelectionChange={(keys) => {
+                const val = keys instanceof Set ? ([...keys][0] as string ?? '') : '';
+                setSelectedCategory(val);
+              }}
               className="w-full sm:w-44"
               classNames={{
                 trigger: 'bg-theme-elevated border-theme-default hover:bg-theme-hover',
