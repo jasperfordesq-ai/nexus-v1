@@ -220,7 +220,7 @@ describe('DataTable', () => {
 
   it('shows empty state when no data', () => {
     render(<W><DataTable columns={columns} data={[]} /></W>);
-    expect(screen.getByText('No data found')).toBeTruthy();
+    expect(screen.getByText('No data available')).toBeTruthy();
   });
 });
 

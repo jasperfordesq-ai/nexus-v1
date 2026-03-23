@@ -115,7 +115,7 @@ describe('RegistrationPolicySettings', () => {
     renderWithProviders(<RegistrationPolicySettings />);
 
     await waitFor(() => {
-      expect(screen.getByText('system.registration_policy_settings_title')).toBeTruthy();
+      expect(screen.getByText('Registration & Identity Verification')).toBeTruthy();
     });
   });
 

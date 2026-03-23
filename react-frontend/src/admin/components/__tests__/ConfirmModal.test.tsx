@@ -93,8 +93,7 @@ describe('ConfirmModal', () => {
 
   it('renders the cancel button', () => {
     render(<W><ConfirmModal {...defaultProps} /></W>);
-    // t('cancel') falls back to key 'cancel' since admin.json has no 'cancel' key
-    expect(screen.getByText('cancel')).toBeTruthy();
+    expect(screen.getByText('Cancel')).toBeTruthy();
   });
 
   it('renders the confirm button with default label', () => {
@@ -119,8 +118,7 @@ describe('ConfirmModal', () => {
   it('calls onClose when cancel button is clicked', () => {
     const onClose = vi.fn();
     render(<W><ConfirmModal {...defaultProps} onClose={onClose} /></W>);
-    // t('cancel') returns 'cancel' as fallback key
-    fireEvent.click(screen.getByText('cancel'));
+    fireEvent.click(screen.getByText('Cancel'));
     expect(onClose).toHaveBeenCalledTimes(1);
   });
 

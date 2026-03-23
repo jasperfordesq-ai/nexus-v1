@@ -121,8 +121,7 @@ describe('DataTable', () => {
 
   it('shows empty content when no data', () => {
     render(<W><DataTable columns={columns} data={[]} /></W>);
-    // t('data_table.no_data') returns fallback key since not in admin.json
-    expect(screen.getByText('data_table.no_data')).toBeTruthy();
+    expect(screen.getByText('No data available')).toBeTruthy();
   });
 
   it('shows custom empty content', () => {
@@ -171,8 +170,7 @@ describe('DataTable', () => {
     render(
       <W><DataTable columns={columns} data={sampleData} onRefresh={onRefresh} /></W>
     );
-    // t('data_table.refresh') returns fallback key since not in admin.json
-    const refreshBtn = screen.getByLabelText('data_table.refresh');
+    const refreshBtn = screen.getByLabelText('Refresh');
     expect(refreshBtn).toBeTruthy();
   });
 
@@ -181,7 +179,7 @@ describe('DataTable', () => {
     render(
       <W><DataTable columns={columns} data={sampleData} onRefresh={onRefresh} /></W>
     );
-    fireEvent.click(screen.getByLabelText('data_table.refresh'));
+    fireEvent.click(screen.getByLabelText('Refresh'));
     expect(onRefresh).toHaveBeenCalledTimes(1);
   });
 

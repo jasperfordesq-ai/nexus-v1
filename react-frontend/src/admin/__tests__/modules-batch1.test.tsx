@@ -162,12 +162,12 @@ import { AdminDashboard } from '../modules/dashboard/AdminDashboard';
 describe('AdminDashboard', () => {
   it('renders without crashing', () => {
     render(<Wrapper><AdminDashboard /></Wrapper>);
-    expect(screen.getByText('Dashboard')).toBeInTheDocument();
+    expect(screen.getByText('Mission Control')).toBeInTheDocument();
   });
 
   it('shows stat card labels', () => {
     render(<Wrapper><AdminDashboard /></Wrapper>);
-    expect(screen.getByText('Total Users')).toBeInTheDocument();
+    expect(screen.getByText('Total Members')).toBeInTheDocument();
     expect(screen.getByText('Active Listings')).toBeInTheDocument();
     expect(screen.getByText('Transactions')).toBeInTheDocument();
     expect(screen.getByText('Hours Exchanged')).toBeInTheDocument();
@@ -185,7 +185,7 @@ describe('AdminDashboard', () => {
 
   it('shows Recent Activity section', () => {
     render(<Wrapper><AdminDashboard /></Wrapper>);
-    expect(screen.getByText('Recent Activity')).toBeInTheDocument();
+    expect(screen.getByText('Real-time Activity')).toBeInTheDocument();
   });
 
   it('shows Refresh button', () => {

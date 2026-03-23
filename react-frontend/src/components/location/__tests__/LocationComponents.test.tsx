@@ -65,12 +65,14 @@ vi.mock('@vis.gl/react-google-maps', () => ({
   APIProvider: ({ children }: { children: React.ReactNode }) => <div data-testid="api-provider">{children}</div>,
   Map: ({ children }: { children: React.ReactNode }) => <div data-testid="google-map">{children}</div>,
   Marker: () => <div data-testid="marker" />,
+  AdvancedMarker: ({ children, ...props }: { children?: React.ReactNode; [key: string]: unknown }) => <div data-testid="marker" {...props}>{children}</div>,
   InfoWindow: ({ children }: { children: React.ReactNode }) => <div data-testid="info-window">{children}</div>,
   useMap: vi.fn(() => ({
     setCenter: vi.fn(),
     setZoom: vi.fn(),
     fitBounds: vi.fn(),
   })),
+  useAdvancedMarkerRef: vi.fn(() => [vi.fn(), null]),
   useApiLoadingStatus: vi.fn(() => 'LOADED'),
   APILoadingStatus: {
     LOADED: 'LOADED',
@@ -85,12 +87,25 @@ vi.mock('@vis.gl/react-google-maps', () => ({
   })),
 }));
 
+vi.mock('@googlemaps/markerclusterer', () => ({
+  MarkerClusterer: vi.fn(() => ({
+    addMarker: vi.fn(),
+    removeMarker: vi.fn(),
+    clearMarkers: vi.fn(),
+    setMap: vi.fn(),
+  })),
+}));
+
 // Mock Google Maps globals
 (global as Record<string, unknown>).google = {
   maps: {
     LatLngBounds: vi.fn(() => ({
       extend: vi.fn(),
     })),
+    Marker: { MAX_ZINDEX: 1000000 },
+    marker: {
+      AdvancedMarkerElement: vi.fn(),
+    },
     places: {
       AutocompleteService: vi.fn(),
       PlacesService: vi.fn(),

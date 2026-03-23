@@ -153,10 +153,10 @@ describe('getItemDetailLabel', () => {
   };
 
   it('returns correct labels for typed items', () => {
-    expect(getItemDetailLabel({ ...base, type: 'listing' })).toBe('View Listing');
-    expect(getItemDetailLabel({ ...base, type: 'event' })).toBe('View Event');
-    expect(getItemDetailLabel({ ...base, type: 'goal' })).toBe('View Goals');
-    expect(getItemDetailLabel({ ...base, type: 'review' })).toBe('View Profile');
+    expect(getItemDetailLabel({ ...base, type: 'listing' })).toBe('card.detail_listing');
+    expect(getItemDetailLabel({ ...base, type: 'event' })).toBe('card.detail_event');
+    expect(getItemDetailLabel({ ...base, type: 'goal' })).toBe('card.detail_goals');
+    expect(getItemDetailLabel({ ...base, type: 'review' })).toBe('card.detail_profile');
   });
 
   it('returns null for post and poll', () => {

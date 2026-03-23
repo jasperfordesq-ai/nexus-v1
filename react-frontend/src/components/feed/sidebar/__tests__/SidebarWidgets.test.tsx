@@ -249,12 +249,12 @@ describe('FriendsWidget', () => {
 
   it('shows online indicator for online friends', () => {
     render(<FriendsWidget friends={sampleFriends} />);
-    expect(screen.getByLabelText('Online')).toBeInTheDocument();
+    expect(screen.getByLabelText('Online now')).toBeInTheDocument();
   });
 
   it('shows recently active indicator for recent friends', () => {
     render(<FriendsWidget friends={sampleFriends} />);
-    expect(screen.getByLabelText('Recently active')).toBeInTheDocument();
+    expect(screen.getByLabelText('Active today')).toBeInTheDocument();
   });
 
   it('displays location when provided', () => {
@@ -412,7 +412,7 @@ describe('PeopleYouMayKnowWidget', () => {
 
   it('renders online indicator for online members', () => {
     render(<PeopleYouMayKnowWidget members={sampleMembers} />);
-    expect(screen.getByLabelText('Online')).toBeInTheDocument();
+    expect(screen.getByLabelText('Online now')).toBeInTheDocument();
   });
 
   it('renders View buttons for each member', () => {
