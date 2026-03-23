@@ -10,12 +10,14 @@
 
 import { motion } from 'framer-motion';
 import { Loader2 } from 'lucide-react';
+import i18n from 'i18next';
 
 interface LoadingScreenProps {
   message?: string;
 }
 
-export function LoadingScreen({ message = 'Loading...' }: LoadingScreenProps) {
+export function LoadingScreen({ message }: LoadingScreenProps) {
+  const displayMessage = message ?? i18n.t('loading', { ns: 'common', defaultValue: 'Loading...' });
   return (
     <div
       className="min-h-screen flex items-center justify-center"
@@ -43,8 +45,8 @@ export function LoadingScreen({ message = 'Loading...' }: LoadingScreenProps) {
         >
           <Loader2 className="w-8 h-8 text-indigo-600 dark:text-indigo-400" />
         </motion.div>
-        <p className="text-theme-muted">{message}</p>
-        <span className="sr-only">{message}</span>
+        <p className="text-theme-muted">{displayMessage}</p>
+        <span className="sr-only">{displayMessage}</span>
       </motion.div>
     </div>
   );

@@ -213,7 +213,7 @@ export function FederationPartnerDetailPage() {
               />
               <div
                 className="absolute -bottom-1 -right-1 w-7 h-7 rounded-full bg-indigo-500 flex items-center justify-center ring-2 ring-white dark:ring-gray-900"
-                title="Federation Partner"
+                title={t('partner_detail.federation_partner_badge')}
               >
                 <Handshake className="w-4 h-4 text-white" aria-hidden="true" />
               </div>

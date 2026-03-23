@@ -8,6 +8,7 @@ import { Spinner } from '@heroui/react';
 import { GlassCard } from '@/components/ui';
 import { SkillSelector } from '@/components/skills/SkillSelector';
 import type { UserSkill } from '@/components/skills/SkillSelector';
+import { useTranslation } from 'react-i18next';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
 
@@ -16,6 +17,7 @@ import { logError } from '@/lib/logger';
 // ─────────────────────────────────────────────────────────────────────────────
 
 export function SkillsTab() {
+  const { t } = useTranslation('settings');
   const [userSkills, setUserSkills] = useState<UserSkill[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -40,9 +42,9 @@ export function SkillsTab() {
   return (
     <div className="space-y-6">
       <GlassCard className="p-6">
-        <h2 className="text-lg font-semibold text-theme-primary mb-2">Your Skills</h2>
+        <h2 className="text-lg font-semibold text-theme-primary mb-2">{t('skills.title')}</h2>
         <p className="text-sm text-theme-muted mb-6">
-          Add skills to your profile so other members can find you. Community members can endorse your skills.
+          {t('skills.description')}
         </p>
         {isLoading ? (
           <div className="flex justify-center py-8">

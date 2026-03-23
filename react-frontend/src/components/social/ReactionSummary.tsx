@@ -247,7 +247,7 @@ export function ReactionSummary({
                 tab: 'text-xs px-2',
               }}
             >
-              <Tab key="all" title={`All ${total}`} />
+              <Tab key="all" title={`${t('card.all', 'All')} ${total}`} />
               {sortedTypes.map(([type, count]) => (
                 <Tab
                   key={type}

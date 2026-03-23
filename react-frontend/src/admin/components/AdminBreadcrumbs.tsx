@@ -9,6 +9,7 @@
  */
 
 import { Link, useLocation } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { useTenant } from '@/contexts';
 import { ChevronRight, LayoutDashboard } from 'lucide-react';
 
@@ -21,54 +22,55 @@ interface AdminBreadcrumbsProps {
   items?: BreadcrumbItem[];
 }
 
-// Map URL segments to human-readable labels
-const SEGMENT_LABELS: Record<string, string> = {
-  admin: 'Admin',
-  users: 'Users',
-  listings: 'Listings',
-  blog: 'Blog',
-  pages: 'Pages',
-  menus: 'Menus',
-  categories: 'Categories',
-  attributes: 'Attributes',
-  gamification: 'Gamification',
-  campaigns: 'Campaigns',
-  'custom-badges': 'Custom Badges',
-  'smart-matching': 'Smart Matching',
-  'match-approvals': 'Match Approvals',
-  'broker-controls': 'Broker Controls',
-  newsletters: 'Newsletters',
-  subscribers: 'Subscribers',
-  segments: 'Segments',
-  templates: 'Templates',
-  federation: 'Federation',
-  partnerships: 'Partnerships',
-  directory: 'Directory',
-  'api-keys': 'API Keys',
-  enterprise: 'Enterprise',
-  roles: 'Roles',
-  permissions: 'Permissions',
-  gdpr: 'GDPR',
-  monitoring: 'Monitoring',
-  config: 'Configuration',
-  secrets: 'Secrets',
-  'legal-documents': 'Legal Documents',
-  seo: 'SEO',
-  '404-errors': '404 Errors',
-  timebanking: 'Timebanking',
-  alerts: 'Alerts',
-  'org-wallets': 'Org Wallets',
-  plans: 'Plans',
-  settings: 'Settings',
-  'tenant-features': 'Tenant Features',
-  'cron-jobs': 'Cron Jobs',
-  'activity-log': 'Activity Log',
-  analytics: 'Analytics',
-  create: 'Create',
-  edit: 'Edit',
+// Map URL segments to i18n keys for breadcrumb labels
+const SEGMENT_LABEL_KEYS: Record<string, string> = {
+  admin: 'breadcrumbs.admin',
+  users: 'breadcrumbs.users',
+  listings: 'breadcrumbs.listings',
+  blog: 'breadcrumbs.blog',
+  pages: 'breadcrumbs.pages',
+  menus: 'breadcrumbs.menus',
+  categories: 'breadcrumbs.categories',
+  attributes: 'breadcrumbs.attributes',
+  gamification: 'breadcrumbs.gamification',
+  campaigns: 'breadcrumbs.campaigns',
+  'custom-badges': 'breadcrumbs.custom_badges',
+  'smart-matching': 'breadcrumbs.smart_matching',
+  'match-approvals': 'breadcrumbs.match_approvals',
+  'broker-controls': 'breadcrumbs.broker_controls',
+  newsletters: 'breadcrumbs.newsletters',
+  subscribers: 'breadcrumbs.subscribers',
+  segments: 'breadcrumbs.segments',
+  templates: 'breadcrumbs.templates',
+  federation: 'breadcrumbs.federation',
+  partnerships: 'breadcrumbs.partnerships',
+  directory: 'breadcrumbs.directory',
+  'api-keys': 'breadcrumbs.api_keys',
+  enterprise: 'breadcrumbs.enterprise',
+  roles: 'breadcrumbs.roles',
+  permissions: 'breadcrumbs.permissions',
+  gdpr: 'breadcrumbs.gdpr',
+  monitoring: 'breadcrumbs.monitoring',
+  config: 'breadcrumbs.config',
+  secrets: 'breadcrumbs.secrets',
+  'legal-documents': 'breadcrumbs.legal_documents',
+  seo: 'breadcrumbs.seo',
+  '404-errors': 'breadcrumbs.errors_404',
+  timebanking: 'breadcrumbs.timebanking',
+  alerts: 'breadcrumbs.alerts',
+  'org-wallets': 'breadcrumbs.org_wallets',
+  plans: 'breadcrumbs.plans',
+  settings: 'breadcrumbs.settings',
+  'tenant-features': 'breadcrumbs.tenant_features',
+  'cron-jobs': 'breadcrumbs.cron_jobs',
+  'activity-log': 'breadcrumbs.activity_log',
+  analytics: 'breadcrumbs.analytics',
+  create: 'breadcrumbs.create',
+  edit: 'breadcrumbs.edit',
 };
 
 export function AdminBreadcrumbs({ items }: AdminBreadcrumbsProps) {
+  const { t } = useTranslation('admin');
   const location = useLocation();
   const { tenantSlug } = useTenant();
 
@@ -93,7 +95,8 @@ export function AdminBreadcrumbs({ items }: AdminBreadcrumbsProps) {
       // Skip numeric IDs
       if (/^\d+$/.test(segment)) continue;
 
-      const label = SEGMENT_LABELS[segment] || segment.charAt(0).toUpperCase() + segment.slice(1).replace(/-/g, ' ');
+      const labelKey = SEGMENT_LABEL_KEYS[segment];
+      const label = labelKey ? t(labelKey) : segment.charAt(0).toUpperCase() + segment.slice(1).replace(/-/g, ' ');
       const isLast = i === segments.length - 1;
 
       crumbs.push({

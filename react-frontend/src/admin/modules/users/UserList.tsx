@@ -48,6 +48,7 @@ import {
   Trash2,
 } from 'lucide-react';
 import { useAuth } from '@/contexts';
+import { useTranslation } from 'react-i18next';
 import { usePageTitle } from '@/hooks';
 import { useTenant, useToast } from '@/contexts';
 import { resolveAvatarUrl } from '@/lib/helpers';
@@ -56,6 +57,7 @@ import { DataTable, StatusBadge, PageHeader, ConfirmModal, type Column } from '.
 import type { AdminUser, UserListParams } from '../../api/types';
 
 export function UserList() {
+  const { t } = useTranslation('admin');
   usePageTitle('Admin - Users');
   const { tenantPath, tenant } = useTenant();
   const toast = useToast();
@@ -142,11 +144,11 @@ export function UserList() {
       const data = res.data as { imported: number; skipped: number; errors: string[]; total_rows: number };
       setImportResults(data);
       if (data.imported > 0) {
-        toast.success(`Successfully imported ${data.imported} users`);
+        toast.success(t('users.import_success', { count: data.imported }));
         loadUsers();
       }
     } else {
-      toast.error(res.error || 'Import failed');
+      toast.error(res.error || t('users.import_failed'));
     }
     setImportLoading(false);
   };
@@ -193,13 +195,13 @@ export function UserList() {
             // Store token in sessionStorage instead of URL query params
             // to avoid leaking it in browser history, Referer headers, and server logs
             sessionStorage.setItem('impersonate_token', token);
-            toast.success(`Impersonating ${user.name}. Opening in new tab...`);
+            toast.success(t('users.impersonate_success', { name: user.name }));
             window.open(`${window.location.origin}${tenantPath('/dashboard')}`, '_blank');
           } else {
-            toast.success('Impersonation started');
+            toast.success(t('users.impersonate_started'));
           }
         } else {
-          toast.error(res?.error || 'Failed to impersonate user');
+          toast.error(res?.error || t('users.impersonate_failed'));
         }
         setActionLoading(false);
         setConfirmAction(null);
@@ -211,13 +213,13 @@ export function UserList() {
       const data = res.data as Record<string, unknown> | undefined;
       if ((type === 'approve' || type === 'reactivate') && data?.email_sent === false) {
         const action = type === 'approve' ? 'approved' : 'reactivated';
-        toast.success(`User ${action}, but the notification email could not be sent. Please check your email configuration.`);
+        toast.success(t('users.user_approved_email_warning', { action }));
       } else {
-        toast.success(`User ${type}d successfully`);
+        toast.success(t('users.user_action_success', { action: type }));
       }
       loadUsers();
     } else {
-      toast.error(res?.error || `Failed to ${type} user`);
+      toast.error(res?.error || t('users.user_action_failed', { action: type }));
     }
 
     setActionLoading(false);
@@ -225,45 +227,45 @@ export function UserList() {
   };
 
   const confirmMessages: Record<string, { title: string; message: string; label: string }> = {
-    approve: { title: 'Approve User', message: 'This user will gain access to the platform.', label: 'Approve' },
-    suspend: { title: 'Suspend User', message: 'This user will be temporarily locked out.', label: 'Suspend' },
-    ban: { title: 'Ban User', message: 'This user will be permanently banned. This action is difficult to reverse.', label: 'Ban' },
-    reactivate: { title: 'Reactivate User', message: 'This user will regain access to the platform.', label: 'Reactivate' },
-    delete: { title: 'Delete User', message: 'This user and all their data will be permanently deleted. This cannot be undone.', label: 'Delete' },
-    reset2fa: { title: 'Reset 2FA', message: 'This will remove the user\'s two-factor authentication. They will need to set it up again.', label: 'Reset 2FA' },
-    impersonate: { title: 'Impersonate User', message: 'You will be logged in as this user. Your admin session will be preserved so you can return.', label: 'Impersonate' },
+    approve: { title: t('users.confirm_approve_title'), message: t('users.confirm_approve_message'), label: t('users.action_approve') },
+    suspend: { title: t('users.confirm_suspend_title'), message: t('users.confirm_suspend_message'), label: t('users.action_suspend') },
+    ban: { title: t('users.confirm_ban_title'), message: t('users.confirm_ban_message'), label: t('users.action_ban') },
+    reactivate: { title: t('users.confirm_reactivate_title'), message: t('users.confirm_reactivate_message'), label: t('users.action_reactivate') },
+    delete: { title: t('users.confirm_delete_title'), message: t('users.confirm_delete_message'), label: t('users.action_delete') },
+    reset2fa: { title: t('users.confirm_reset_2fa_title'), message: t('users.confirm_reset_2fa_message'), label: t('users.action_reset_2fa') },
+    impersonate: { title: t('users.confirm_impersonate_title'), message: t('users.confirm_impersonate_message'), label: t('users.action_impersonate') },
   };
 
   function UserActionsMenu({ user }: { user: AdminUser }) {
     type ActionKey = 'edit' | 'approve' | 'suspend' | 'ban' | 'reactivate' | 'reset2fa' | 'permissions' | 'impersonate' | 'delete';
 
     const items: { key: ActionKey; label: string; icon: React.ReactNode; color?: 'success' | 'warning' | 'danger'; className?: string }[] = [
-      { key: 'edit', label: 'Edit', icon: <Edit size={14} /> },
+      { key: 'edit', label: t('users.action_edit'), icon: <Edit size={14} /> },
     ];
 
     if (user.status === 'pending') {
-      items.push({ key: 'approve', label: 'Approve', icon: <UserCheck size={14} />, color: 'success', className: 'text-success' });
+      items.push({ key: 'approve', label: t('users.action_approve'), icon: <UserCheck size={14} />, color: 'success', className: 'text-success' });
     }
     if (user.status === 'active') {
-      items.push({ key: 'suspend', label: 'Suspend', icon: <UserX size={14} />, color: 'warning', className: 'text-warning' });
+      items.push({ key: 'suspend', label: t('users.action_suspend'), icon: <UserX size={14} />, color: 'warning', className: 'text-warning' });
     }
     if (user.status !== 'banned') {
-      items.push({ key: 'ban', label: 'Ban', icon: <Ban size={14} />, color: 'danger', className: 'text-danger' });
+      items.push({ key: 'ban', label: t('users.action_ban'), icon: <Ban size={14} />, color: 'danger', className: 'text-danger' });
     }
     if (user.status === 'suspended' || user.status === 'banned') {
-      items.push({ key: 'reactivate', label: 'Reactivate', icon: <RotateCcw size={14} />, color: 'success', className: 'text-success' });
+      items.push({ key: 'reactivate', label: t('users.action_reactivate'), icon: <RotateCcw size={14} />, color: 'success', className: 'text-success' });
     }
     if (user.has_2fa_enabled) {
-      items.push({ key: 'reset2fa', label: 'Reset 2FA', icon: <KeyRound size={14} /> });
+      items.push({ key: 'reset2fa', label: t('users.action_reset_2fa'), icon: <KeyRound size={14} /> });
     }
-    items.push({ key: 'permissions', label: 'Permissions', icon: <Shield size={14} /> });
+    items.push({ key: 'permissions', label: t('users.action_permissions'), icon: <Shield size={14} /> });
     // Super admins can impersonate other users (but not other super admins)
     if (isSuperAdmin && !user.is_super_admin && user.id !== currentUser?.id) {
-      items.push({ key: 'impersonate', label: 'Impersonate', icon: <LogIn size={14} /> });
+      items.push({ key: 'impersonate', label: t('users.action_impersonate'), icon: <LogIn size={14} /> });
     }
     // Delete (only if not current user)
     if (user.id !== currentUser?.id) {
-      items.push({ key: 'delete', label: 'Delete', icon: <Trash2 size={14} />, color: 'danger', className: 'text-danger' });
+      items.push({ key: 'delete', label: t('users.action_delete'), icon: <Trash2 size={14} />, color: 'danger', className: 'text-danger' });
     }
 
     const handleMenuAction = (key: React.Key) => {
@@ -282,11 +284,11 @@ export function UserList() {
     return (
       <Dropdown>
         <DropdownTrigger>
-          <Button isIconOnly size="sm" variant="light" aria-label="User actions">
+          <Button isIconOnly size="sm" variant="light" aria-label={t('users.actions_menu')}>
             <MoreVertical size={16} />
           </Button>
         </DropdownTrigger>
-        <DropdownMenu aria-label="User actions" onAction={handleMenuAction}>
+        <DropdownMenu aria-label={t('users.actions_menu')} onAction={handleMenuAction}>
           {items.map((item) => (
             <DropdownItem
               key={item.key}
@@ -305,7 +307,7 @@ export function UserList() {
   const columns: Column<AdminUser>[] = [
     {
       key: 'name',
-      label: 'User',
+      label: t('users.col_user'),
       sortable: true,
       render: (user) => (
         <div className="flex items-center gap-3">
@@ -328,7 +330,7 @@ export function UserList() {
     },
     {
       key: 'role',
-      label: 'Role',
+      label: t('users.col_role'),
       sortable: true,
       render: (user) => (
         <div className="flex items-center gap-1">
@@ -349,19 +351,19 @@ export function UserList() {
     },
     {
       key: 'status',
-      label: 'Status',
+      label: t('users.col_status'),
       sortable: true,
       render: (user) => <StatusBadge status={user.status} />,
     },
     {
       key: 'balance',
-      label: 'Balance',
+      label: t('users.col_balance'),
       sortable: true,
       render: (user) => <span>{user.balance ?? 0}h</span>,
     },
     {
       key: 'created_at',
-      label: 'Joined',
+      label: t('users.col_joined'),
       sortable: true,
       render: (user) => (
         <span className="text-sm text-default-500">
@@ -371,7 +373,7 @@ export function UserList() {
     },
     {
       key: 'actions',
-      label: 'Actions',
+      label: t('users.col_actions'),
       render: (user) => <UserActionsMenu user={user} />,
     },
   ];
@@ -379,8 +381,8 @@ export function UserList() {
   return (
     <div>
       <PageHeader
-        title="Users"
-        description="Manage platform users, roles, and permissions"
+        title={t('users.title')}
+        description={t('users.description')}
         actions={
           <div className="flex items-center gap-2">
             <Button
@@ -388,14 +390,14 @@ export function UserList() {
               startContent={<Upload size={16} />}
               onPress={() => setImportOpen(true)}
             >
-              Import CSV
+              {t('users.import_csv')}
             </Button>
             <Button
               color="primary"
               startContent={<Plus size={16} />}
               onPress={() => navigate(tenantPath('/admin/users/create'))}
             >
-              Add User
+              {t('users.add_user')}
             </Button>
           </div>
         }
@@ -409,11 +411,11 @@ export function UserList() {
           variant="underlined"
           size="sm"
         >
-          <Tab key="all" title="All Users" />
-          <Tab key="pending" title="Pending" />
-          <Tab key="active" title="Active" />
-          <Tab key="suspended" title="Suspended" />
-          <Tab key="banned" title="Banned" />
+          <Tab key="all" title={t('users.all_users')} />
+          <Tab key="pending" title={t('users.pending')} />
+          <Tab key="active" title={t('users.active')} />
+          <Tab key="suspended" title={t('users.suspended')} />
+          <Tab key="banned" title={t('users.banned')} />
         </Tabs>
       </div>
 
@@ -421,7 +423,7 @@ export function UserList() {
         columns={columns}
         data={users}
         isLoading={loading}
-        searchPlaceholder="Search by name or email..."
+        searchPlaceholder={t('users.search_placeholder')}
         onSearch={(q) => { setSearch(q); setPage(1); }}
         onRefresh={loadUsers}
         totalItems={total}
@@ -449,7 +451,7 @@ export function UserList() {
         <ModalContent>
           <ModalHeader className="flex items-center gap-2">
             <FileUp size={20} />
-            Import Users from CSV
+            {t('users.import_title')}
           </ModalHeader>
           <ModalBody>
             {!importResults ? (
@@ -465,12 +467,12 @@ export function UserList() {
                     startContent={<Download size={14} />}
                     onPress={() => adminUsers.downloadImportTemplate()}
                   >
-                    Download Template
+                    {t('users.import_download_template')}
                   </Button>
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium mb-1">CSV File</label>
+                  <label className="block text-sm font-medium mb-1">{t('users.import_csv_file')}</label>
                   <input
                     type="file"
                     accept=".csv"
@@ -480,7 +482,7 @@ export function UserList() {
                 </div>
 
                 <Select
-                  label="Default Role"
+                  label={t('users.import_default_role')}
                   selectedKeys={[importRole]}
                   onSelectionChange={(keys) => {
                     const selected = Array.from(keys)[0] as string;
@@ -489,9 +491,9 @@ export function UserList() {
                   size="sm"
                   variant="bordered"
                 >
-                  <SelectItem key="member">Member</SelectItem>
-                  <SelectItem key="broker">Broker</SelectItem>
-                  <SelectItem key="coordinator">Coordinator</SelectItem>
+                  <SelectItem key="member">{t('users.import_role_member')}</SelectItem>
+                  <SelectItem key="broker">{t('users.import_role_broker')}</SelectItem>
+                  <SelectItem key="coordinator">{t('users.import_role_coordinator')}</SelectItem>
                 </Select>
               </div>
             ) : (
@@ -499,12 +501,12 @@ export function UserList() {
                 <div className="flex items-center gap-4">
                   <div className="flex items-center gap-2 text-success">
                     <CheckCircle2 size={18} />
-                    <span className="font-medium">{importResults.imported} imported</span>
+                    <span className="font-medium">{t('users.import_imported', { count: importResults.imported })}</span>
                   </div>
                   {importResults.skipped > 0 && (
                     <div className="flex items-center gap-2 text-warning">
                       <AlertCircle size={18} />
-                      <span className="font-medium">{importResults.skipped} skipped</span>
+                      <span className="font-medium">{t('users.import_skipped', { count: importResults.skipped })}</span>
                     </div>
                   )}
                   <span className="text-sm text-default-400">
@@ -514,7 +516,7 @@ export function UserList() {
 
                 {importResults.errors.length > 0 && (
                   <div className="max-h-48 overflow-y-auto rounded-lg bg-danger-50 p-3">
-                    <p className="text-sm font-medium text-danger mb-1">Errors:</p>
+                    <p className="text-sm font-medium text-danger mb-1">{t('users.import_errors')}</p>
                     <ul className="text-xs text-danger-600 space-y-1">
                       {importResults.errors.map((err, i) => (
                         <li key={i}>{err}</li>
@@ -527,7 +529,7 @@ export function UserList() {
           </ModalBody>
           <ModalFooter>
             <Button variant="flat" onPress={resetImportModal} isDisabled={importLoading}>
-              {importResults ? 'Close' : 'Cancel'}
+              {importResults ? t('close') : t('cancel')}
             </Button>
             {!importResults && (
               <Button
@@ -537,7 +539,7 @@ export function UserList() {
                 isDisabled={!importFile}
                 startContent={!importLoading ? <Upload size={16} /> : undefined}
               >
-                Import
+                {t('import')}
               </Button>
             )}
           </ModalFooter>

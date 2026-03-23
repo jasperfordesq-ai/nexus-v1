@@ -44,6 +44,7 @@ import {
   ShieldCheck,
   FileCheck,
 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { usePageTitle } from '@/hooks';
 import { useAuth, useTenant, useToast } from '@/contexts';
 import { resolveAvatarUrl } from '@/lib/helpers';
@@ -52,6 +53,7 @@ import { PageHeader, ConfirmModal } from '../../components';
 import type { AdminUserDetail, AdminBadge, UpdateUserPayload, UserConsent, VettingRecord, InsuranceCertificate } from '../../api/types';
 
 export function UserEdit() {
+  const { t } = useTranslation('admin');
   const { id } = useParams<{ id: string }>();
   const { tenantPath } = useTenant();
   const toast = useToast();
@@ -150,10 +152,10 @@ export function UserEdit() {
         setIsTenantSuperAdmin(userData.is_tenant_super_admin || false);
         setIsGlobalSuperAdmin(userData.is_super_admin || false);
       } else {
-        setLoadError(res.error || 'Failed to load user');
+        setLoadError(res.error || t('user_edit.load_error'));
       }
     } catch {
-      setLoadError('An unexpected error occurred while loading user data');
+      setLoadError(t('user_edit.load_error_unexpected'));
     } finally {
       setLoading(false);
     }
@@ -195,15 +197,15 @@ export function UserEdit() {
 
   function validate(): boolean {
     const newErrors: Record<string, string> = {};
-    if (!firstName.trim()) newErrors.first_name = 'First name is required';
-    if (!lastName.trim()) newErrors.last_name = 'Last name is required';
+    if (!firstName.trim()) newErrors.first_name = t('user_edit.first_name_required');
+    if (!lastName.trim()) newErrors.last_name = t('user_edit.last_name_required');
     if (!email.trim()) {
-      newErrors.email = 'Email is required';
+      newErrors.email = t('user_edit.email_required');
     } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-      newErrors.email = 'Please enter a valid email address';
+      newErrors.email = t('user_edit.email_invalid');
     }
-    if (!role) newErrors.role = 'Role is required';
-    if (!status) newErrors.status = 'Status is required';
+    if (!role) newErrors.role = t('user_edit.role_required');
+    if (!status) newErrors.status = t('user_edit.status_required');
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   }
@@ -228,13 +230,13 @@ export function UserEdit() {
       };
       const res = await adminUsers.update(Number(id), payload);
       if (res.success) {
-        toast.success('User updated successfully');
+        toast.success(t('user_edit.update_success'));
         loadUser();
       } else {
-        toast.error(res.error || 'Failed to update user');
+        toast.error(res.error || t('user_edit.update_failed'));
       }
     } catch {
-      toast.error('An unexpected error occurred');
+      toast.error(t('error_occurred'));
     } finally {
       setSubmitting(false);
     }
@@ -247,12 +249,12 @@ export function UserEdit() {
       const res = await adminUsers.setSuperAdmin(Number(id), !isTenantSuperAdmin);
       if (res.success) {
         setIsTenantSuperAdmin(!isTenantSuperAdmin);
-        toast.success(`Tenant super admin ${!isTenantSuperAdmin ? 'granted' : 'revoked'} successfully`);
+        toast.success(!isTenantSuperAdmin ? t('user_edit.tenant_super_admin_granted') : t('user_edit.tenant_super_admin_revoked'));
       } else {
-        toast.error(res.error || 'Failed to update tenant super admin status');
+        toast.error(res.error || t('user_edit.tenant_super_admin_failed'));
       }
     } catch {
-      toast.error('Failed to update tenant super admin status');
+      toast.error(t('user_edit.tenant_super_admin_failed'));
     } finally {
       setTenantSuperAdminLoading(false);
     }
@@ -265,12 +267,12 @@ export function UserEdit() {
       const res = await adminUsers.setGlobalSuperAdmin(Number(id), !isGlobalSuperAdmin);
       if (res.success) {
         setIsGlobalSuperAdmin(!isGlobalSuperAdmin);
-        toast.success(`Global super admin ${!isGlobalSuperAdmin ? 'granted' : 'revoked'} successfully`);
+        toast.success(!isGlobalSuperAdmin ? t('user_edit.global_super_admin_granted') : t('user_edit.global_super_admin_revoked'));
       } else {
-        toast.error(res.error || 'Failed to update global super admin status');
+        toast.error(res.error || t('user_edit.global_super_admin_failed'));
       }
     } catch {
-      toast.error('Failed to update global super admin status');
+      toast.error(t('user_edit.global_super_admin_failed'));
     } finally {
       setGlobalSuperAdminLoading(false);
     }
@@ -289,13 +291,13 @@ export function UserEdit() {
           // to avoid leaking it in browser history, Referer headers, and server logs
           sessionStorage.setItem('impersonate_token', token);
           window.open(`${window.location.origin}/`, '_blank');
-          toast.success(`Logged in as ${user?.name}`);
+          toast.success(t('user_edit.impersonate_success', { name: user?.name }));
         }
       } else {
-        toast.error(res.error || 'Failed to impersonate user');
+        toast.error(res.error || t('user_edit.impersonate_failed'));
       }
     } catch {
-      toast.error('Failed to impersonate user');
+      toast.error(t('user_edit.impersonate_failed'));
     } finally {
       setImpersonateLoading(false);
     }
@@ -304,21 +306,21 @@ export function UserEdit() {
   async function handleAdjustBalance() {
     if (!id || !balanceAmount.trim() || !balanceReason.trim()) return;
     const amount = parseFloat(balanceAmount);
-    if (isNaN(amount) || amount === 0) { toast.error('Please enter a valid non-zero amount'); return; }
+    if (isNaN(amount) || amount === 0) { toast.error(t('user_edit.balance_invalid')); return; }
     setBalanceLoading(true);
     try {
       const res = await adminTimebanking.adjustBalance(Number(id), amount, balanceReason.trim());
       if (res.success) {
-        toast.success(`Balance adjusted by ${amount > 0 ? '+' : ''}${amount}h`);
+        toast.success(t('user_edit.balance_adjusted', { amount: `${amount > 0 ? '+' : ''}${amount}` }));
         setBalanceModalOpen(false);
         setBalanceAmount('');
         setBalanceReason('');
         loadUser();
       } else {
-        toast.error(res.error || 'Failed to adjust balance');
+        toast.error(res.error || t('user_edit.balance_failed'));
       }
     } catch {
-      toast.error('Failed to adjust balance');
+      toast.error(t('user_edit.balance_failed'));
     } finally {
       setBalanceLoading(false);
     }
@@ -330,15 +332,15 @@ export function UserEdit() {
     try {
       const res = await adminUsers.removeBadge(Number(id), badgeToRemove.id);
       if (res.success) {
-        toast.success(`Badge "${badgeToRemove.name}" removed`);
+        toast.success(t('user_edit.remove_badge_success', { badge: badgeToRemove.name }));
         setUser((prev) =>
           prev ? { ...prev, badges: prev.badges.filter((b) => b.id !== badgeToRemove.id) } : prev
         );
       } else {
-        toast.error(res.error || 'Failed to remove badge');
+        toast.error(res.error || t('user_edit.remove_badge_failed'));
       }
     } catch {
-      toast.error('An unexpected error occurred');
+      toast.error(t('error_occurred'));
     } finally {
       setRemovingBadge(false);
       setBadgeToRemove(null);
@@ -355,12 +357,12 @@ export function UserEdit() {
         if (data.badges) {
           setUser((prev) => prev ? { ...prev, badges: data.badges! } : prev);
         }
-        toast.success('Badge recheck complete');
+        toast.success(t('user_edit.recheck_complete'));
       } else {
-        toast.error(res.error || 'Badge recheck failed');
+        toast.error(res.error || t('user_edit.recheck_failed'));
       }
     } catch {
-      toast.error('Badge recheck failed');
+      toast.error(t('user_edit.recheck_failed'));
     } finally {
       setRecheckingBadges(false);
     }
@@ -368,19 +370,19 @@ export function UserEdit() {
 
   async function handleSetPassword() {
     if (!id || !newPassword.trim()) return;
-    if (newPassword.length < 8) { toast.error('Password must be at least 8 characters'); return; }
+    if (newPassword.length < 8) { toast.error(t('user_edit.password_min_length')); return; }
     setPasswordLoading(true);
     try {
       const res = await adminUsers.setPassword(Number(id), newPassword);
       if (res.success) {
-        toast.success('Password updated successfully');
+        toast.success(t('user_edit.password_updated'));
         setPasswordModalOpen(false);
         setNewPassword('');
       } else {
-        toast.error(res.error || 'Failed to set password');
+        toast.error(res.error || t('user_edit.password_failed'));
       }
     } catch {
-      toast.error('Failed to set password');
+      toast.error(t('user_edit.password_failed'));
     } finally {
       setPasswordLoading(false);
     }
@@ -392,12 +394,12 @@ export function UserEdit() {
     try {
       const res = await adminUsers.sendPasswordReset(Number(id));
       if (res.success) {
-        toast.success('Password reset email sent');
+        toast.success(t('user_edit.password_reset_sent'));
       } else {
-        toast.error(res.error || 'Failed to send password reset email');
+        toast.error(res.error || t('user_edit.password_reset_failed'));
       }
     } catch {
-      toast.error('Failed to send password reset email');
+      toast.error(t('user_edit.password_reset_failed'));
     } finally {
       setResetEmailLoading(false);
     }
@@ -409,12 +411,12 @@ export function UserEdit() {
     try {
       const res = await adminUsers.sendWelcomeEmail(Number(id));
       if (res.success) {
-        toast.success('Welcome email sent');
+        toast.success(t('user_edit.welcome_email_sent'));
       } else {
-        toast.error(res.error || 'Failed to send welcome email');
+        toast.error(res.error || t('user_edit.welcome_email_failed'));
       }
     } catch {
-      toast.error('Failed to send welcome email');
+      toast.error(t('user_edit.welcome_email_failed'));
     } finally {
       setWelcomeEmailLoading(false);
     }
@@ -423,7 +425,7 @@ export function UserEdit() {
   if (loading) {
     return (
       <div className="flex items-center justify-center py-20">
-        <Spinner size="lg" label="Loading user..." />
+        <Spinner size="lg" label={t('user_edit.loading_user')} />
       </div>
     );
   }
@@ -432,18 +434,18 @@ export function UserEdit() {
     return (
       <div>
         <PageHeader
-          title="Edit User"
+          title={t('user_edit.page_title')}
           actions={
             <Button variant="flat" startContent={<ArrowLeft size={16} />} onPress={() => navigate(tenantPath('/admin/users'))}>
-              Back to Users
+              {t('user_edit.back_to_users')}
             </Button>
           }
         />
         <Card className="max-w-2xl">
           <CardBody className="p-6">
-            <p className="text-center text-danger">{loadError || 'User not found'}</p>
+            <p className="text-center text-danger">{loadError || t('user_edit.user_not_found')}</p>
             <div className="mt-4 flex justify-center">
-              <Button variant="flat" onPress={() => navigate(tenantPath('/admin/users'))}>Return to User List</Button>
+              <Button variant="flat" onPress={() => navigate(tenantPath('/admin/users'))}>{t('user_edit.return_to_list')}</Button>
             </div>
           </CardBody>
         </Card>
@@ -469,11 +471,11 @@ export function UserEdit() {
                 isLoading={impersonateLoading}
                 size="sm"
               >
-                Impersonate
+                {t('user_edit.impersonate')}
               </Button>
             )}
             <Button variant="flat" startContent={<ArrowLeft size={16} />} onPress={() => navigate(tenantPath('/admin/users'))}>
-              Back to Users
+              {t('user_edit.back_to_users')}
             </Button>
           </div>
         }
@@ -573,11 +575,11 @@ export function UserEdit() {
               {/* Submit */}
               <div className="flex justify-end gap-3 pt-2">
                 <Button variant="flat" onPress={() => navigate(tenantPath('/admin/users'))} isDisabled={submitting}>
-                  Cancel
+                  {t('cancel')}
                 </Button>
                 <Button type="submit" color="primary" startContent={!submitting ? <Save size={16} /> : undefined}
                   isLoading={submitting}>
-                  Save Changes
+                  {t('user_edit.save_changes')}
                 </Button>
               </div>
             </CardBody>
@@ -590,15 +592,15 @@ export function UserEdit() {
             <CardHeader className="px-6 pt-5 pb-0">
               <div className="flex items-center gap-2">
                 <ShieldAlert size={18} className="text-warning" />
-                <h3 className="text-lg font-semibold text-foreground">Super Admin Access</h3>
+                <h3 className="text-lg font-semibold text-foreground">{t('user_edit.super_admin_access')}</h3>
               </div>
             </CardHeader>
             <CardBody className="p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="font-medium text-foreground">Tenant Super Admin</p>
+                  <p className="font-medium text-foreground">{t('user_edit.tenant_super_admin')}</p>
                   <p className="text-sm text-default-500">
-                    Can manage this tenant and any sub-tenants below it in the hierarchy.
+                    {t('user_edit.tenant_super_admin_description')}
                   </p>
                 </div>
                 <Switch
@@ -606,11 +608,11 @@ export function UserEdit() {
                   onValueChange={handleToggleTenantSuperAdmin}
                   isDisabled={tenantSuperAdminLoading || user.id === currentUser?.id}
                   color="warning"
-                  aria-label="Toggle tenant super admin status"
+                  aria-label={t('user_edit.tenant_super_admin_toggle')}
                 />
               </div>
               {user.id === currentUser?.id && (
-                <p className="text-xs text-default-400 mt-2">You cannot modify your own super admin status.</p>
+                <p className="text-xs text-default-400 mt-2">{t('user_edit.cannot_modify_own')}</p>
               )}
             </CardBody>
           </Card>
@@ -622,15 +624,15 @@ export function UserEdit() {
             <CardHeader className="px-6 pt-5 pb-0">
               <div className="flex items-center gap-2">
                 <ShieldAlert size={18} className="text-danger" />
-                <h3 className="text-lg font-semibold text-danger">Global Super Admin (God Mode)</h3>
+                <h3 className="text-lg font-semibold text-danger">{t('user_edit.global_super_admin')}</h3>
               </div>
             </CardHeader>
             <CardBody className="p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="font-medium text-foreground">Platform-Wide Access</p>
+                  <p className="font-medium text-foreground">{t('user_edit.platform_wide_access')}</p>
                   <p className="text-sm text-default-500">
-                    Bypasses ALL tenant isolation. Can access and manage every tenant on the platform. Use with extreme caution.
+                    {t('user_edit.global_super_admin_description')}
                   </p>
                 </div>
                 <Switch
@@ -638,11 +640,11 @@ export function UserEdit() {
                   onValueChange={handleToggleGlobalSuperAdmin}
                   isDisabled={globalSuperAdminLoading || user.id === currentUser?.id}
                   color="danger"
-                  aria-label="Toggle global super admin status"
+                  aria-label={t('user_edit.global_super_admin_toggle')}
                 />
               </div>
               {user.id === currentUser?.id && (
-                <p className="text-xs text-default-400 mt-2">You cannot modify your own super admin status.</p>
+                <p className="text-xs text-default-400 mt-2">{t('user_edit.cannot_modify_own')}</p>
               )}
             </CardBody>
           </Card>
@@ -653,7 +655,7 @@ export function UserEdit() {
           <CardHeader className="px-6 pt-5 pb-0">
             <div className="flex items-center gap-2">
               <KeyRound size={18} className="text-primary" />
-              <h3 className="text-lg font-semibold text-foreground">Account Actions</h3>
+              <h3 className="text-lg font-semibold text-foreground">{t('user_edit.account_actions')}</h3>
             </div>
           </CardHeader>
           <CardBody className="p-6">
@@ -665,7 +667,7 @@ export function UserEdit() {
                 startContent={<KeyRound size={14} />}
                 onPress={() => setPasswordModalOpen(true)}
               >
-                Set Password
+                {t('user_edit.set_password')}
               </Button>
               <Button
                 size="sm"
@@ -674,7 +676,7 @@ export function UserEdit() {
                 onPress={handleSendPasswordReset}
                 isLoading={resetEmailLoading}
               >
-                Send Password Reset
+                {t('user_edit.send_password_reset')}
               </Button>
               <Button
                 size="sm"
@@ -683,7 +685,7 @@ export function UserEdit() {
                 onPress={handleSendWelcomeEmail}
                 isLoading={welcomeEmailLoading}
               >
-                Resend Welcome Email
+                {t('user_edit.resend_welcome_email')}
               </Button>
             </div>
           </CardBody>
@@ -695,17 +697,17 @@ export function UserEdit() {
             <div className="flex items-center justify-between w-full">
               <div className="flex items-center gap-2">
                 <Coins size={18} className="text-primary" />
-                <h3 className="text-lg font-semibold text-foreground">Time Credits</h3>
+                <h3 className="text-lg font-semibold text-foreground">{t('user_edit.time_credits')}</h3>
               </div>
               <Button size="sm" variant="flat" color="primary" onPress={() => setBalanceModalOpen(true)}>
-                Adjust Balance
+                {t('user_edit.adjust_balance')}
               </Button>
             </div>
           </CardHeader>
           <CardBody className="p-6">
             <div className="flex items-center gap-4">
               <div className="text-3xl font-bold text-foreground">{user.balance ?? 0}h</div>
-              <p className="text-sm text-default-500">current balance</p>
+              <p className="text-sm text-default-500">{t('user_edit.current_balance')}</p>
             </div>
           </CardBody>
         </Card>
@@ -714,7 +716,7 @@ export function UserEdit() {
         <Card>
           <CardHeader className="px-6 pt-5 pb-0">
             <div className="flex items-center justify-between w-full">
-              <h3 className="text-lg font-semibold text-foreground">Badges</h3>
+              <h3 className="text-lg font-semibold text-foreground">{t('user_edit.badges')}</h3>
               <Button
                 size="sm"
                 variant="flat"
@@ -722,7 +724,7 @@ export function UserEdit() {
                 onPress={handleRecheckBadges}
                 isLoading={recheckingBadges}
               >
-                Recheck Badges
+                {t('user_edit.recheck_badges')}
               </Button>
             </div>
           </CardHeader>
@@ -749,7 +751,7 @@ export function UserEdit() {
                 ))}
               </div>
             ) : (
-              <p className="text-sm text-default-400">This user has no badges yet.</p>
+              <p className="text-sm text-default-400">{t('user_edit.no_badges')}</p>
             )}
           </CardBody>
         </Card>
@@ -759,12 +761,12 @@ export function UserEdit() {
           <CardHeader className="px-6 pt-5 pb-0">
             <div className="flex items-center gap-2">
               <ShieldCheck size={18} className="text-success" />
-              <h3 className="text-lg font-semibold text-foreground">GDPR Consents</h3>
+              <h3 className="text-lg font-semibold text-foreground">{t('user_edit.gdpr_consents')}</h3>
             </div>
           </CardHeader>
           <CardBody className="p-6">
             {consentsLoading ? (
-              <Spinner size="sm" label="Loading consents..." />
+              <Spinner size="sm" label={t('user_edit.loading_consents')} />
             ) : consents.length > 0 ? (
               <div className="flex flex-col gap-3">
                 {consents.map((consent) => (
@@ -805,7 +807,7 @@ export function UserEdit() {
                 ))}
               </div>
             ) : (
-              <p className="text-sm text-default-400">No consent records found for this user.</p>
+              <p className="text-sm text-default-400">{t('user_edit.no_consent_records')}</p>
             )}
           </CardBody>
         </Card>
@@ -815,12 +817,12 @@ export function UserEdit() {
           <CardHeader className="px-6 pt-5 pb-0">
             <div className="flex items-center gap-2">
               <ShieldAlert size={18} className="text-warning" />
-              <h3 className="text-lg font-semibold text-foreground">Safeguarding & Compliance</h3>
+              <h3 className="text-lg font-semibold text-foreground">{t('user_edit.safeguarding')}</h3>
             </div>
           </CardHeader>
           <CardBody className="p-6">
             {complianceLoading ? (
-              <Spinner size="sm" label="Loading compliance records..." />
+              <Spinner size="sm" label={t('user_edit.loading_compliance')} />
             ) : (
               <div className="flex flex-col gap-6">
                 {/* Vetting Status */}
@@ -828,7 +830,7 @@ export function UserEdit() {
                   <div className="flex items-center justify-between mb-3">
                     <div className="flex items-center gap-2">
                       <ShieldCheck size={16} className="text-primary" />
-                      <p className="font-medium text-foreground">DBS/Vetting Status</p>
+                      <p className="font-medium text-foreground">{t('user_edit.vetting_status')}</p>
                     </div>
                     <div className="flex items-center gap-2">
                       <Chip
@@ -851,7 +853,7 @@ export function UserEdit() {
                         variant="flat"
                         color="primary"
                       >
-                        Manage
+                        {t('manage')}
                       </Button>
                     </div>
                   </div>
@@ -888,7 +890,7 @@ export function UserEdit() {
                       )}
                     </div>
                   ) : (
-                    <p className="text-sm text-default-400">No vetting records for this user.</p>
+                    <p className="text-sm text-default-400">{t('user_edit.no_vetting_records')}</p>
                   )}
                 </div>
 
@@ -897,7 +899,7 @@ export function UserEdit() {
                   <div className="flex items-center justify-between mb-3">
                     <div className="flex items-center gap-2">
                       <FileCheck size={16} className="text-primary" />
-                      <p className="font-medium text-foreground">Insurance Certificates</p>
+                      <p className="font-medium text-foreground">{t('user_edit.insurance_certificates')}</p>
                     </div>
                     <div className="flex items-center gap-2">
                       <Chip
@@ -920,7 +922,7 @@ export function UserEdit() {
                         variant="flat"
                         color="primary"
                       >
-                        Manage
+                        {t('manage')}
                       </Button>
                     </div>
                   </div>
@@ -957,7 +959,7 @@ export function UserEdit() {
                       )}
                     </div>
                   ) : (
-                    <p className="text-sm text-default-400">No insurance certificates for this user.</p>
+                    <p className="text-sm text-default-400">{t('user_edit.no_insurance_records')}</p>
                   )}
                 </div>
               </div>
@@ -972,9 +974,9 @@ export function UserEdit() {
           isOpen={!!badgeToRemove}
           onClose={() => setBadgeToRemove(null)}
           onConfirm={handleRemoveBadge}
-          title="Remove Badge"
-          message={`Are you sure you want to remove the "${badgeToRemove.name}" badge from ${user.name}?`}
-          confirmLabel="Remove Badge"
+          title={t('user_edit.remove_badge')}
+          message={t('user_edit.remove_badge_confirm', { badge: badgeToRemove.name, name: user.name })}
+          confirmLabel={t('user_edit.remove_badge')}
           confirmColor="danger"
           isLoading={removingBadge}
         />
@@ -987,7 +989,7 @@ export function UserEdit() {
         <ModalContent>
           <ModalHeader className="flex items-center gap-2">
             <Coins size={20} className="text-primary" />
-            Adjust Time Credits
+            {t('user_edit.adjust_time_credits')}
           </ModalHeader>
           <ModalBody className="gap-4">
             <p className="text-sm text-default-500">Current balance: <strong>{user.balance ?? 0}h</strong></p>
@@ -1007,7 +1009,7 @@ export function UserEdit() {
             </Button>
             <Button color="primary" onPress={handleAdjustBalance} isLoading={balanceLoading}
               isDisabled={!balanceAmount.trim() || !balanceReason.trim()}>
-              Apply Adjustment
+              {t('user_edit.apply_adjustment')}
             </Button>
           </ModalFooter>
         </ModalContent>
@@ -1020,7 +1022,7 @@ export function UserEdit() {
         <ModalContent>
           <ModalHeader className="flex items-center gap-2">
             <KeyRound size={20} className="text-primary" />
-            Set User Password
+            {t('user_edit.set_password_title')}
           </ModalHeader>
           <ModalBody className="gap-4">
             <p className="text-sm text-default-500">
@@ -1044,7 +1046,7 @@ export function UserEdit() {
             </Button>
             <Button color="primary" onPress={handleSetPassword} isLoading={passwordLoading}
               isDisabled={newPassword.length < 8}>
-              Set Password
+              {t('user_edit.set_password')}
             </Button>
           </ModalFooter>
         </ModalContent>

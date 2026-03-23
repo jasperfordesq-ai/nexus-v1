@@ -29,6 +29,7 @@ import {
 } from 'lucide-react';
 import { GlassCard } from '@/components/ui';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { useTenant } from '@/contexts';
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -115,6 +116,7 @@ export function PrivacyTab({
   onInsuranceTypeChange,
   onOpenGdprModal,
 }: PrivacyTabProps) {
+  const { t } = useTranslation('settings');
   const navigate = useNavigate();
   const { tenantPath } = useTenant();
 
@@ -127,18 +129,18 @@ export function PrivacyTab({
   return (
     <div className="space-y-6">
       <GlassCard className="p-6">
-        <h2 className="text-lg font-semibold text-theme-primary mb-6">Privacy Settings</h2>
+        <h2 className="text-lg font-semibold text-theme-primary mb-6">{t('privacy_sections.title')}</h2>
 
         <div className="space-y-6">
           {/* Profile Visibility */}
           <div className="space-y-4">
             <h3 className="text-sm font-medium text-theme-muted flex items-center gap-2">
               <Eye className="w-4 h-4" aria-hidden="true" />
-              Profile Visibility
+              {t('privacy_sections.profile_visibility')}
             </h3>
 
             <Select
-              label="Who can see your profile"
+              label={t('privacy_prefs.profile_visibility')}
               selectedKeys={[privacy.profile_visibility]}
               onSelectionChange={(keys) => {
                 const value = Array.from(keys)[0] as string;
@@ -151,9 +153,9 @@ export function PrivacyTab({
               }}
               classNames={selectClassNames}
             >
-              <SelectItem key="public">Public - Anyone can view</SelectItem>
-              <SelectItem key="members">Members Only - Community members</SelectItem>
-              <SelectItem key="connections">Connections Only - Your connections</SelectItem>
+              <SelectItem key="public">{t('visibility_options.public')}</SelectItem>
+              <SelectItem key="members">{t('visibility_options.members')}</SelectItem>
+              <SelectItem key="connections">{t('visibility_options.connections')}</SelectItem>
             </Select>
           </div>
 
@@ -161,12 +163,12 @@ export function PrivacyTab({
           <div className="pt-4 border-t border-theme-default space-y-4">
             <h3 className="text-sm font-medium text-theme-muted flex items-center gap-2">
               <Search className="w-4 h-4" aria-hidden="true" />
-              Search &amp; Discovery
+              {t('privacy_sections.search_discovery')}
             </h3>
 
             <SettingToggle
-              label="Search Engine Indexing"
-              description="Allow search engines to index your profile"
+              label={t('privacy_prefs.search_indexing')}
+              description={t('privacy_descriptions.search_indexing')}
               checked={privacy.search_indexing}
               onChange={(checked) => onPrivacyChange((prev) => ({ ...prev, search_indexing: checked }))}
             />
@@ -176,12 +178,12 @@ export function PrivacyTab({
           <div className="pt-4 border-t border-theme-default space-y-4">
             <h3 className="text-sm font-medium text-theme-muted flex items-center gap-2">
               <MessageSquare className="w-4 h-4" aria-hidden="true" />
-              Contact Preferences
+              {t('privacy_sections.contact_preferences')}
             </h3>
 
             <SettingToggle
-              label="Allow Contact"
-              description="Allow other members to contact me"
+              label={t('privacy_prefs.allow_contact')}
+              description={t('privacy_descriptions.allow_contact')}
               checked={privacy.contact_permission}
               onChange={(checked) => onPrivacyChange((prev) => ({ ...prev, contact_permission: checked }))}
             />
@@ -193,7 +195,7 @@ export function PrivacyTab({
             startContent={<Save className="w-4 h-4" aria-hidden="true" />}
             isLoading={isSavingPrivacy}
           >
-            Save Privacy Settings
+            {t('save_privacy')}
           </Button>
         </div>
       </GlassCard>
@@ -210,8 +212,8 @@ export function PrivacyTab({
                   <Globe className="w-4 h-4 text-indigo-600 dark:text-indigo-400" aria-hidden="true" />
                 </div>
                 <div className="text-left">
-                  <p className="font-medium">Federation Settings</p>
-                  <p className="text-sm text-theme-subtle font-normal">Manage your visibility and preferences across partner communities</p>
+                  <p className="font-medium">{t('federation.title')}</p>
+                  <p className="text-sm text-theme-subtle font-normal">{t('federation.description')}</p>
                 </div>
               </div>
             }
@@ -225,11 +227,10 @@ export function PrivacyTab({
       <GlassCard className="p-6">
         <h2 className="text-lg font-semibold text-theme-primary mb-2 flex items-center gap-2">
           <FileText className="w-5 h-5 text-indigo-600 dark:text-indigo-400" aria-hidden="true" />
-          Data &amp; Privacy Rights
+          {t('gdpr.title')}
         </h2>
         <p className="text-theme-subtle text-sm mb-6">
-          Under the General Data Protection Regulation (GDPR), you have the right to access, export, and request
-          deletion of your personal data. These requests are processed within 30 days.
+          {t('gdpr.description')}
         </p>
 
         <div className="space-y-3">
@@ -244,8 +245,8 @@ export function PrivacyTab({
             onPress={() => onOpenGdprModal('download')}
           >
             <div className="text-left">
-              <p className="font-medium">Download My Data</p>
-              <p className="text-sm text-theme-subtle font-normal">Get a copy of all your personal data</p>
+              <p className="font-medium">{t('gdpr.download_title')}</p>
+              <p className="text-sm text-theme-subtle font-normal">{t('gdpr.download_desc')}</p>
             </div>
           </Button>
 
@@ -260,8 +261,8 @@ export function PrivacyTab({
             onPress={() => onOpenGdprModal('portability')}
           >
             <div className="text-left">
-              <p className="font-medium">Data Portability Request</p>
-              <p className="text-sm text-theme-subtle font-normal">Export data in a machine-readable format</p>
+              <p className="font-medium">{t('gdpr.portability_title')}</p>
+              <p className="text-sm text-theme-subtle font-normal">{t('gdpr.portability_desc')}</p>
             </div>
           </Button>
 
@@ -276,8 +277,8 @@ export function PrivacyTab({
             onPress={() => onOpenGdprModal('deletion')}
           >
             <div className="text-left">
-              <p className="font-medium text-red-600 dark:text-red-400">Request Data Deletion</p>
-              <p className="text-sm text-theme-subtle font-normal">Request permanent deletion of your data</p>
+              <p className="font-medium text-red-600 dark:text-red-400">{t('gdpr.deletion_title')}</p>
+              <p className="text-sm text-theme-subtle font-normal">{t('gdpr.deletion_desc')}</p>
             </div>
           </Button>
 
@@ -292,8 +293,8 @@ export function PrivacyTab({
             onPress={() => onOpenGdprModal('rectification')}
           >
             <div className="text-left">
-              <p className="font-medium">Data Rectification</p>
-              <p className="text-sm text-theme-subtle font-normal">Request correction of inaccurate personal data</p>
+              <p className="font-medium">{t('gdpr.rectification_title')}</p>
+              <p className="text-sm text-theme-subtle font-normal">{t('gdpr.rectification_desc')}</p>
             </div>
           </Button>
 
@@ -308,8 +309,8 @@ export function PrivacyTab({
             onPress={() => onOpenGdprModal('restriction')}
           >
             <div className="text-left">
-              <p className="font-medium">Restriction of Processing</p>
-              <p className="text-sm text-theme-subtle font-normal">Request restriction of your data processing</p>
+              <p className="font-medium">{t('gdpr.restriction_title')}</p>
+              <p className="text-sm text-theme-subtle font-normal">{t('gdpr.restriction_desc')}</p>
             </div>
           </Button>
 
@@ -324,8 +325,8 @@ export function PrivacyTab({
             onPress={() => onOpenGdprModal('objection')}
           >
             <div className="text-left">
-              <p className="font-medium">Right to Object</p>
-              <p className="text-sm text-theme-subtle font-normal">Object to processing of your personal data</p>
+              <p className="font-medium">{t('gdpr.objection_title')}</p>
+              <p className="text-sm text-theme-subtle font-normal">{t('gdpr.objection_desc')}</p>
             </div>
           </Button>
         </div>
@@ -333,7 +334,7 @@ export function PrivacyTab({
         <div className="mt-4 p-3 rounded-lg bg-blue-500/10 border border-blue-500/20">
           <p className="text-sm text-theme-muted flex items-start gap-2">
             <Info className="w-4 h-4 text-blue-500 flex-shrink-0 mt-0.5" aria-hidden="true" />
-            All six GDPR data subject rights are available above. Contact our Data Protection Officer for any additional concerns.
+            {t('gdpr.info')}
           </p>
         </div>
       </GlassCard>
@@ -343,16 +344,16 @@ export function PrivacyTab({
         <GlassCard className="p-6">
           <h2 className="text-lg font-semibold text-theme-primary mb-2 flex items-center gap-2">
             <FileCheck className="w-5 h-5 text-emerald-600 dark:text-emerald-400" aria-hidden="true" />
-            Insurance Certificates
+            {t('insurance.title')}
           </h2>
           <p className="text-theme-subtle text-sm mb-4">
-            Upload your insurance certificates for verification. Accepted formats: PDF, JPG, PNG (max 10MB).
+            {t('insurance.description')}
           </p>
 
           {insuranceLoading ? (
             <div className="flex items-center gap-2 text-sm text-theme-muted">
               <RefreshCw className="w-4 h-4 animate-spin" />
-              Loading certificates...
+              {t('insurance.loading')}
             </div>
           ) : (
             <>
@@ -368,7 +369,7 @@ export function PrivacyTab({
                           {cert.insurance_type.replace(/_/g, ' ').replace(/\b\w/g, (c: string) => c.toUpperCase())}
                         </p>
                         <p className="text-xs text-theme-muted">
-                          {cert.provider_name || 'Unknown provider'}
+                          {cert.provider_name || t('insurance.unknown_provider')}
                           {cert.expiry_date ? ` — Expires ${new Date(cert.expiry_date).toLocaleDateString()}` : ''}
                         </p>
                       </div>
@@ -387,7 +388,7 @@ export function PrivacyTab({
 
               <div className="flex flex-col sm:flex-row items-start sm:items-end gap-3">
                 <Select
-                  label="Insurance Type"
+                  label={t('insurance.type_label')}
                   selectedKeys={[insuranceType]}
                   onSelectionChange={(keys) => {
                     const val = Array.from(keys)[0] as string;
@@ -397,17 +398,17 @@ export function PrivacyTab({
                   size="sm"
                   className="max-w-xs"
                 >
-                  <SelectItem key="public_liability">Public Liability</SelectItem>
-                  <SelectItem key="professional_indemnity">Professional Indemnity</SelectItem>
-                  <SelectItem key="employers_liability">{"Employer's Liability"}</SelectItem>
-                  <SelectItem key="product_liability">Product Liability</SelectItem>
-                  <SelectItem key="personal_accident">Personal Accident</SelectItem>
-                  <SelectItem key="other">Other</SelectItem>
+                  <SelectItem key="public_liability">{t('insurance.public_liability')}</SelectItem>
+                  <SelectItem key="professional_indemnity">{t('insurance.professional_indemnity')}</SelectItem>
+                  <SelectItem key="employers_liability">{t('insurance.employers_liability')}</SelectItem>
+                  <SelectItem key="product_liability">{t('insurance.product_liability')}</SelectItem>
+                  <SelectItem key="personal_accident">{t('insurance.personal_accident')}</SelectItem>
+                  <SelectItem key="other">{t('insurance.other')}</SelectItem>
                 </Select>
                 <label className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-theme-elevated hover:bg-theme-hover cursor-pointer transition-colors border border-default-200">
                   <Upload className="w-4 h-4 text-theme-primary" />
                   <span className="text-sm font-medium text-theme-primary">
-                    {insuranceUploading ? 'Uploading...' : 'Upload Certificate'}
+                    {insuranceUploading ? t('insurance.uploading') : t('insurance.upload_certificate')}
                   </span>
                   <input
                     type="file"

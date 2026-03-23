@@ -144,12 +144,12 @@ export function SkillsBrowsePage() {
       if (response.success && response.data) {
         setCategories(response.data);
       } else {
-        setError('Failed to load skill categories');
+        setError(t('skills.load_failed', 'Failed to load skill categories'));
       }
     } catch (err) {
       if (controller.signal.aborted) return;
       logError('Failed to load skill categories', err);
-      setError('Failed to load skill categories. Please try again.');
+      setError(t('skills.load_failed_retry', 'Failed to load skill categories. Please try again.'));
     } finally {
       setIsLoading(false);
     }

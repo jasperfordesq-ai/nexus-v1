@@ -11,6 +11,7 @@
  */
 
 import { Shield } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { usePageTitle } from '@/hooks/usePageTitle';
 import {
   PlatformLegalPage,
@@ -485,17 +486,18 @@ const sections: PlatformLegalSection[] = [
 ];
 
 export function PlatformPrivacyPage() {
-  usePageTitle('Platform Privacy Policy');
+  const { t } = useTranslation('legal');
+  usePageTitle(t('platform_privacy.page_title'));
   return (
     <PlatformLegalPage
-      title="Platform Privacy Policy"
-      subtitle="How Project NEXUS handles data at the platform infrastructure level"
+      title={t('platform_privacy.title')}
+      subtitle={t('platform_privacy.subtitle')}
       icon={Shield}
       effectiveDate="1 March 2026"
       sections={sections}
       crossLinks={[
-        { label: 'Platform Terms of Service', to: '/platform/terms' },
-        { label: 'Platform Disclaimer', to: '/platform/disclaimer' },
+        { label: t('platform_privacy.link_terms'), to: '/platform/terms' },
+        { label: t('platform_privacy.link_disclaimer'), to: '/platform/disclaimer' },
       ]}
     />
   );

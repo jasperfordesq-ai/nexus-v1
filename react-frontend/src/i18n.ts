@@ -23,7 +23,11 @@ i18n
       'exchanges', 'group_exchanges', 'feed', 'notifications',
       'search_page', 'onboarding', 'gamification', 'blog',
       'community', 'utility', 'public', 'legal', 'about',
-      'federation', 'connections', 'chat',
+      'federation', 'connections', 'chat', 'activity', 'admin',
+      'admin_dashboard', 'admin_nav', 'auth', 'dashboard',
+      'emails', 'errors', 'goals', 'ideation', 'jobs', 'kb',
+      'listings', 'matches', 'messages', 'polls', 'settings',
+      'social', 'volunteering', 'explore',
     ],
     debug: import.meta.env.DEV,
 

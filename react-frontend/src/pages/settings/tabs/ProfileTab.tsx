@@ -106,7 +106,7 @@ export function ProfileTab({
               accept="image/*"
               onChange={onAvatarUpload}
               className="hidden"
-              aria-label="Upload profile photo"
+              aria-label={t('profile.upload_photo_aria', { defaultValue: 'Upload profile photo' })}
             />
             <Button
               isIconOnly
@@ -115,7 +115,7 @@ export function ProfileTab({
               onPress={() => fileInputRef.current?.click()}
               isDisabled={isUploading}
               isLoading={isUploading}
-              aria-label="Change profile photo"
+              aria-label={t('profile.change_photo_aria', { defaultValue: 'Change profile photo' })}
             >
               <Camera className="w-4 h-4" aria-hidden="true" />
             </Button>
@@ -239,7 +239,7 @@ export function ProfileTab({
             startContent={<Save className="w-4 h-4" aria-hidden="true" />}
             isLoading={isSaving}
           >
-            Save Changes
+            {t('save_changes')}
           </Button>
         </div>
       </GlassCard>

@@ -65,7 +65,7 @@ export function PeopleYouMayKnowWidget({ members }: PeopleYouMayKnowWidgetProps)
               {member.is_online && (
                 <span
                   className="absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full border-2 border-[var(--glass-bg)] bg-emerald-500"
-                  aria-label="Online"
+                  aria-label={t('sidebar.friends.online', 'Online now')}
                 />
               )}
             </Link>

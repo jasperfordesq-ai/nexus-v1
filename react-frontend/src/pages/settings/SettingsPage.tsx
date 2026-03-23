@@ -983,7 +983,7 @@ export function SettingsPage() {
                   accept="image/*"
                   onChange={handleAvatarUpload}
                   className="hidden"
-                  aria-label="Upload profile photo"
+                  aria-label={t('profile.upload_photo_aria', { defaultValue: 'Upload profile photo' })}
                 />
                 <Button
                   isIconOnly
@@ -992,7 +992,7 @@ export function SettingsPage() {
                   onPress={() => fileInputRef.current?.click()}
                   isDisabled={isUploading}
                   isLoading={isUploading}
-                  aria-label="Change profile photo"
+                  aria-label={t('profile.change_photo_aria', { defaultValue: 'Change profile photo' })}
                 >
                   <Camera className="w-4 h-4" aria-hidden="true" />
                 </Button>
@@ -1310,7 +1310,7 @@ export function SettingsPage() {
                         <p className="text-sm text-theme-subtle">{t("match_digest.frequency_description")}</p>
                       </div>
                       <Select
-                        aria-label="Match digest frequency"
+                        aria-label={t('match_digest.frequency')}
                         selectedKeys={[matchDigestFrequency]}
                         onSelectionChange={(keys) => {
                           const value = Array.from(keys)[0] as string;

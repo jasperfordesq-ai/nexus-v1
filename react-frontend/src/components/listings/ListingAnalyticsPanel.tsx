@@ -12,6 +12,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { Spinner } from '@heroui/react';
 import { Eye, MessageCircle, Heart, TrendingUp, TrendingDown } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
@@ -22,6 +23,7 @@ interface ListingAnalyticsPanelProps {
 }
 
 export function ListingAnalyticsPanel({ listingId }: ListingAnalyticsPanelProps) {
+  const { t } = useTranslation('listings');
   const [analytics, setAnalytics] = useState<ListingAnalytics | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -62,43 +64,43 @@ export function ListingAnalyticsPanel({ listingId }: ListingAnalyticsPanelProps)
 
   return (
     <GlassCard className="p-6">
-      <h3 className="text-lg font-semibold text-theme-primary mb-4">Listing Analytics</h3>
+      <h3 className="text-lg font-semibold text-theme-primary mb-4">{t('analytics.title', 'Listing Analytics')}</h3>
 
       {/* Summary Stats */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-6">
         <StatCard
           icon={<Eye className="w-5 h-5 text-blue-500" />}
-          label="Total Views"
+          label={t('analytics.total_views', 'Total Views')}
           value={summary.total_views}
-          subtext={`${summary.unique_viewers} unique`}
+          subtext={t('analytics.unique_viewers', '{{count}} unique', { count: summary.unique_viewers })}
         />
         <StatCard
           icon={<MessageCircle className="w-5 h-5 text-green-500" />}
-          label="Contacts"
+          label={t('analytics.contacts', 'Contacts')}
           value={summary.total_contacts}
-          subtext={`${summary.contact_rate}% rate`}
+          subtext={t('analytics.contact_rate', '{{rate}}% rate', { rate: summary.contact_rate })}
         />
         <StatCard
           icon={<Heart className="w-5 h-5 text-rose-500" />}
-          label="Saves"
+          label={t('analytics.saves', 'Saves')}
           value={summary.total_saves}
-          subtext={`${summary.save_rate}% rate`}
+          subtext={t('analytics.save_rate', '{{rate}}% rate', { rate: summary.save_rate })}
         />
         <StatCard
           icon={trendPositive
             ? <TrendingUp className="w-5 h-5 text-emerald-500" />
             : <TrendingDown className="w-5 h-5 text-amber-500" />
           }
-          label="7-Day Trend"
+          label={t('analytics.trend_7day', '7-Day Trend')}
           value={`${trendPositive ? '+' : ''}${summary.views_trend_percent}%`}
-          subtext="vs. previous week"
+          subtext={t('analytics.vs_previous_week', 'vs. previous week')}
         />
       </div>
 
       {/* Simple sparkline-style visualization using bars */}
       {analytics.views_over_time.length > 0 && (
         <div>
-          <h4 className="text-sm font-medium text-theme-muted mb-2">Views (Last {analytics.period_days} Days)</h4>
+          <h4 className="text-sm font-medium text-theme-muted mb-2">{t('analytics.views_last_days', 'Views (Last {{days}} Days)', { days: analytics.period_days })}</h4>
           <div className="flex items-end gap-1 h-16">
             {analytics.views_over_time.map((day) => {
               const maxCount = Math.max(...analytics.views_over_time.map((d) => Number(d.count)), 1);

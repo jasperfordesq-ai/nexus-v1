@@ -337,7 +337,7 @@ export function EventsPage() {
       {!error && (
         <>
           {isLoading ? (
-            <div className="space-y-6" aria-label="Loading events" aria-busy="true">
+            <div className="space-y-6" aria-label={t('loading_aria', 'Loading events')} aria-busy="true">
               {[1, 2, 3].map((i) => (
                 <GlassCard key={i} className="p-5">
                   <div className="flex gap-4">

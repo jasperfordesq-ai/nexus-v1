@@ -4,6 +4,7 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import { useState, useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   Modal,
   ModalContent,
@@ -22,6 +23,7 @@ interface IconPickerProps {
 }
 
 export function IconPicker({ value, onChange, label = 'Icon' }: IconPickerProps) {
+  const { t } = useTranslation('admin');
   const [isOpen, setIsOpen] = useState(false);
   const [search, setSearch] = useState('');
 
@@ -56,7 +58,7 @@ export function IconPicker({ value, onChange, label = 'Icon' }: IconPickerProps)
               <span className="text-sm text-theme-primary">{value}</span>
             </>
           ) : (
-            <span className="text-sm text-theme-subtle">Choose icon...</span>
+            <span className="text-sm text-theme-subtle">{t('icon_picker.choose_icon_placeholder')}</span>
           )}
         </Button>
         {value && (
@@ -65,7 +67,7 @@ export function IconPicker({ value, onChange, label = 'Icon' }: IconPickerProps)
             variant="light"
             size="sm"
             onPress={handleClear}
-            aria-label="Clear icon"
+            aria-label={t('icon_picker.clear_icon')}
           >
             <X className="w-4 h-4" />
           </Button>
@@ -80,10 +82,10 @@ export function IconPicker({ value, onChange, label = 'Icon' }: IconPickerProps)
       >
         <ModalContent>
           <ModalHeader className="flex flex-col gap-2">
-            <span>Choose Icon</span>
+            <span>{t('icon_picker.choose_icon')}</span>
             <Input
-              placeholder="Search icons..."
-              aria-label="Search icons"
+              placeholder={t('icon_picker.search_icons')}
+              aria-label={t('icon_picker.search_icons')}
               value={search}
               onValueChange={setSearch}
               startContent={<Search className="w-4 h-4 text-theme-subtle" />}

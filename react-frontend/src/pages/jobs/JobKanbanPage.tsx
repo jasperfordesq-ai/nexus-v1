@@ -147,7 +147,7 @@ function AppKanbanCard({ application, onDragStart, onDownloadCv, onScheduleInter
               checked={isSelected ?? false}
               onChange={(e) => onSelect(application.id, e.target.checked)}
               className="w-4 h-4 accent-primary cursor-pointer"
-              aria-label={`Select ${application.applicant.name}`}
+              aria-label={t('kanban.select_applicant', 'Select {{name}}', { name: application.applicant.name })}
               onClick={(e) => e.stopPropagation()}
             />
           </div>
@@ -265,6 +265,7 @@ interface ColumnProps {
 }
 
 function KanbanColumn({ column, applications, onDragStart, onDrop, onDownloadCv, onScheduleInterview, onSendOffer, onScoreApplicant, onSelect, selectedAppIds }: ColumnProps) {
+  const { t } = useTranslation('jobs');
   const [isDragOver, setIsDragOver] = useState(false);
 
   const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
@@ -310,7 +311,7 @@ function KanbanColumn({ column, applications, onDragStart, onDrop, onDownloadCv,
         {applications.length === 0 ? (
           <div className="flex items-center justify-center h-24 text-theme-subtle text-xs">
             <FileText size={16} className="mr-1" aria-hidden="true" />
-            Drop here
+            {t('kanban.drop_here', 'Drop here')}
           </div>
         ) : (
           applications.map((app) => (
@@ -378,11 +379,11 @@ export function JobKanbanPage() {
   const [bulkStatus, setBulkStatus] = useState('');
   const [isBulkUpdating, setIsBulkUpdating] = useState(false);
   const [scorecardCriteria, setScorecardCriteria] = useState([
-    { label: 'Communication', score: 5 },
-    { label: 'Technical Skills', score: 5 },
-    { label: 'Cultural Fit', score: 5 },
-    { label: 'Experience', score: 5 },
-    { label: 'Motivation', score: 5 },
+    { label: t('scorecard.communication'), score: 5 },
+    { label: t('scorecard.technical'), score: 5 },
+    { label: t('scorecard.cultural_fit'), score: 5 },
+    { label: t('scorecard.experience'), score: 5 },
+    { label: t('scorecard.motivation'), score: 5 },
   ]);
   const [scorecardNotes, setScorecardNotes] = useState('');
   const [isSubmittingScorecard, setIsSubmittingScorecard] = useState(false);
@@ -699,7 +700,7 @@ export function JobKanbanPage() {
       {/* Bulk action bar */}
       {selectedAppIds.size > 0 && (
         <div className="sticky top-0 z-20 flex items-center gap-3 p-3 mb-4 bg-primary/10 border border-primary/30 rounded-xl backdrop-blur-sm">
-          <span className="text-sm font-medium text-primary">{selectedAppIds.size} selected</span>
+          <span className="text-sm font-medium text-primary">{t('bulk.selected_count', '{{count}} selected', { count: selectedAppIds.size })}</span>
           <Select
             size="sm"
             placeholder={t('bulk.select_action', 'Move to stage...')}
@@ -783,10 +784,10 @@ export function JobKanbanPage() {
                 setInterviewForm((f) => ({ ...f, duration_mins: val }));
               }}
             >
-              <SelectItem key="30">30 minutes</SelectItem>
-              <SelectItem key="45">45 minutes</SelectItem>
-              <SelectItem key="60">1 hour</SelectItem>
-              <SelectItem key="90">1.5 hours</SelectItem>
+              <SelectItem key="30">{t('self_scheduling.duration_30', '30 minutes')}</SelectItem>
+              <SelectItem key="45">{t('self_scheduling.duration_45', '45 minutes')}</SelectItem>
+              <SelectItem key="60">{t('self_scheduling.duration_60', '1 hour')}</SelectItem>
+              <SelectItem key="90">{t('kanban.duration_90', '1.5 hours')}</SelectItem>
             </Select>
             <Input
               label={t('interview.location', 'Meeting Link / Location')}
@@ -842,7 +843,7 @@ export function JobKanbanPage() {
             ))}
             <Textarea
               label={t('scorecard.notes', 'Reviewer Notes')}
-              placeholder="Optional notes about this applicant..."
+              placeholder={t('scorecard.notes_placeholder', 'Optional notes about this applicant...')}
               value={scorecardNotes}
               onValueChange={setScorecardNotes}
               minRows={3}
@@ -876,7 +877,7 @@ export function JobKanbanPage() {
               onChange={(e) => setOfferForm((f) => ({ ...f, salary_offered: e.target.value }))}
             />
             <Select
-              label="Currency"
+              label={t('salary.form_currency_label', 'Currency')}
               selectedKeys={[offerForm.salary_currency]}
               onSelectionChange={(keys) => {
                 const key = [...keys][0] as string;
@@ -896,7 +897,7 @@ export function JobKanbanPage() {
               }}
             >
               <SelectItem key="hourly">{t('salary.hourly', 'per hour')}</SelectItem>
-              <SelectItem key="monthly">Monthly</SelectItem>
+              <SelectItem key="monthly">{t('kanban.salary_monthly', 'Monthly')}</SelectItem>
               <SelectItem key="annual">{t('salary.annual', 'per year')}</SelectItem>
             </Select>
             <Input
@@ -906,8 +907,8 @@ export function JobKanbanPage() {
               onChange={(e) => setOfferForm((f) => ({ ...f, start_date: e.target.value }))}
             />
             <Textarea
-              label="Personal Message"
-              placeholder="A note to the candidate..."
+              label={t('kanban.personal_message', 'Personal Message')}
+              placeholder={t('kanban.personal_message_placeholder', 'A note to the candidate...')}
               value={offerForm.message}
               onValueChange={(val) => setOfferForm((f) => ({ ...f, message: val }))}
               minRows={3}

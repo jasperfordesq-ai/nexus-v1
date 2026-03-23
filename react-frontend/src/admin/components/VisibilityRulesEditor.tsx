@@ -3,6 +3,7 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
+import { useTranslation } from 'react-i18next';
 import { Switch, Select, SelectItem } from '@heroui/react';
 import type { VisibilityRules } from '@/types/menu';
 
@@ -40,6 +41,7 @@ interface VisibilityRulesEditorProps {
 }
 
 export function VisibilityRulesEditor({ value, onChange }: VisibilityRulesEditorProps) {
+  const { t } = useTranslation('admin');
   const rules = value || {};
 
   const updateRule = <K extends keyof VisibilityRules>(key: K, val: VisibilityRules[K]) => {
@@ -58,18 +60,18 @@ export function VisibilityRulesEditor({ value, onChange }: VisibilityRulesEditor
 
   return (
     <div className="space-y-4">
-      <p className="text-sm font-medium text-theme-primary">Visibility Rules</p>
+      <p className="text-sm font-medium text-theme-primary">{t('visibility_rules.title')}</p>
 
       <Switch
         isSelected={rules.requires_auth ?? false}
         onValueChange={(checked) => updateRule('requires_auth', checked || undefined)}
         size="sm"
       >
-        <span className="text-sm">Requires authentication</span>
+        <span className="text-sm">{t('visibility_rules.requires_auth')}</span>
       </Switch>
 
       <Select
-        label="Minimum role"
+        label={t('visibility_rules.min_role')}
         selectedKeys={rules.min_role ? [rules.min_role] : []}
         onSelectionChange={(keys) => {
           const selected = Array.from(keys)[0] as string;
@@ -84,7 +86,7 @@ export function VisibilityRulesEditor({ value, onChange }: VisibilityRulesEditor
       </Select>
 
       <Select
-        label="Requires feature"
+        label={t('visibility_rules.requires_feature')}
         selectedKeys={rules.requires_feature ? [rules.requires_feature] : []}
         onSelectionChange={(keys) => {
           const selected = Array.from(keys)[0] as string;

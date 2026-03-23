@@ -10,6 +10,7 @@
  */
 
 import { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import { Chip, Skeleton } from '@heroui/react';
 import {
@@ -42,11 +43,11 @@ interface MessageContextCardProps {
   contextId: number;
 }
 
-const CONTEXT_CONFIG: Record<string, { icon: typeof ListChecks; label: string; color: string; basePath: string }> = {
-  listing: { icon: ListChecks, label: 'Listing', color: 'primary', basePath: '/listings' },
-  event: { icon: Calendar, label: 'Event', color: 'secondary', basePath: '/events' },
-  job: { icon: Briefcase, label: 'Job', color: 'warning', basePath: '/jobs' },
-  volunteering: { icon: Heart, label: 'Volunteering', color: 'danger', basePath: '/volunteering' },
+const CONTEXT_CONFIG: Record<string, { icon: typeof ListChecks; labelKey: string; color: string; basePath: string }> = {
+  listing: { icon: ListChecks, labelKey: 'context_type_listing', color: 'primary', basePath: '/listings' },
+  event: { icon: Calendar, labelKey: 'context_type_event', color: 'secondary', basePath: '/events' },
+  job: { icon: Briefcase, labelKey: 'context_type_job', color: 'warning', basePath: '/jobs' },
+  volunteering: { icon: Heart, labelKey: 'context_type_volunteering', color: 'danger', basePath: '/volunteering' },
 };
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -54,6 +55,7 @@ const CONTEXT_CONFIG: Record<string, { icon: typeof ListChecks; label: string; c
 // ─────────────────────────────────────────────────────────────────────────────
 
 export function MessageContextCard({ contextType, contextId }: MessageContextCardProps) {
+  const { t } = useTranslation('messages');
   const { tenantPath } = useTenant();
   const [context, setContext] = useState<ContextInfo | null>(null);
   const [loading, setLoading] = useState(true);
@@ -75,7 +77,7 @@ export function MessageContextCard({ contextType, contextId }: MessageContextCar
           setContext({
             type: contextType,
             id: contextId,
-            title: (data.title || data.name || data.summary || 'Untitled') as string,
+            title: (data.title || data.name || data.summary || t('context_untitled')) as string,
             image_url: (data.image_url || data.cover_image || data.thumbnail) as string | null,
             status: data.status as string | undefined,
           });
@@ -136,9 +138,9 @@ export function MessageContextCard({ contextType, contextId }: MessageContextCar
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2">
             <LinkIcon className="w-3 h-3 text-theme-subtle flex-shrink-0" />
-            <span className="text-xs text-theme-subtle">Regarding</span>
+            <span className="text-xs text-theme-subtle">{t('context_regarding')}</span>
             <Chip size="sm" variant="flat" color={config.color as 'primary' | 'secondary' | 'warning' | 'danger'}>
-              {config.label}
+              {t(config.labelKey)}
             </Chip>
           </div>
           <p className="font-medium text-sm text-theme-primary truncate group-hover:text-primary transition-colors">

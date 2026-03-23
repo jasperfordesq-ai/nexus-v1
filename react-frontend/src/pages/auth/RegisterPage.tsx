@@ -671,7 +671,7 @@ export function RegisterPage() {
                     variant="light"
                     className="min-w-0 w-auto h-auto p-0 text-theme-subtle"
                     onPress={() => setShowPassword(!showPassword)}
-                    aria-label={showPassword ? 'Hide password' : 'Show password'}
+                    aria-label={showPassword ? t('register.hide_password', { defaultValue: 'Hide password' }) : t('register.show_password', { defaultValue: 'Show password' })}
                   >
                     {showPassword ? (
                       <EyeOff className="w-4 h-4" aria-hidden="true" />

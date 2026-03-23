@@ -9,6 +9,7 @@
  */
 
 import { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from '@heroui/react';
 import { ArrowUp } from 'lucide-react';
@@ -16,6 +17,7 @@ import { ArrowUp } from 'lucide-react';
 const SCROLL_THRESHOLD = 400;
 
 export function BackToTop() {
+  const { t } = useTranslation('common');
   const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
@@ -47,7 +49,7 @@ export function BackToTop() {
             size="sm"
             onPress={scrollToTop}
             className="bg-[var(--surface-elevated)] border border-[var(--border-default)] text-theme-muted hover:text-theme-primary shadow-lg backdrop-blur-sm"
-            aria-label="Scroll to top"
+            aria-label={t('accessibility.scroll_to_top')}
           >
             <ArrowUp className="w-4 h-4" aria-hidden="true" />
           </Button>

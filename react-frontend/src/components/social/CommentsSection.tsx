@@ -333,6 +333,7 @@ function MentionInput({
   autoFocus,
   searchMentions,
 }: MentionInputProps) {
+  const { t } = useTranslation('social');
   const [mentionResults, setMentionResults] = useState<MentionUser[]>([]);
   const [showMentions, setShowMentions] = useState(false);
   const [mentionQuery, setMentionQuery] = useState('');
@@ -408,7 +409,7 @@ function MentionInput({
       <Input
         ref={inputRef}
         placeholder={placeholder}
-        aria-label={placeholder || "Write a comment"}
+        aria-label={placeholder || t('write_comment', 'Write a comment...')}
         value={value}
         onChange={(e) => handleChange(e.target.value)}
         onKeyDown={handleKeyDown}

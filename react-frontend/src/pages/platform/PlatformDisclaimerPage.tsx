@@ -4,6 +4,7 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import { AlertTriangle } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { usePageTitle } from '@/hooks/usePageTitle';
 import {
   PlatformLegalPage,
@@ -549,17 +550,18 @@ const sections: PlatformLegalSection[] = [
 ];
 
 export function PlatformDisclaimerPage() {
-  usePageTitle('Platform Disclaimer');
+  const { t } = useTranslation('legal');
+  usePageTitle(t('platform_disclaimer.page_title'));
   return (
     <PlatformLegalPage
-      title="Platform Disclaimer"
-      subtitle="Important disclaimers and liability limitations for the Project NEXUS platform"
+      title={t('platform_disclaimer.title')}
+      subtitle={t('platform_disclaimer.subtitle')}
       icon={AlertTriangle}
       effectiveDate="1 March 2026"
       sections={sections}
       crossLinks={[
-        { label: 'Platform Terms of Service', to: '/platform/terms' },
-        { label: 'Platform Privacy Policy', to: '/platform/privacy' },
+        { label: t('platform_disclaimer.link_terms'), to: '/platform/terms' },
+        { label: t('platform_disclaimer.link_privacy'), to: '/platform/privacy' },
       ]}
     />
   );

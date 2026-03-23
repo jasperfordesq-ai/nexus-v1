@@ -14,6 +14,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { Avatar, Skeleton } from '@heroui/react';
 import { Plus, ChevronLeft, ChevronRight } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { useAuth } from '@/contexts';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
@@ -39,6 +40,7 @@ interface StoriesBarProps {
 }
 
 export function StoriesBar({ friends: _friends }: StoriesBarProps) {
+  const { t } = useTranslation('feed');
   const { user, isAuthenticated } = useAuth();
   const [storyUsers, setStoryUsers] = useState<StoryUser[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -148,7 +150,7 @@ export function StoriesBar({ friends: _friends }: StoriesBarProps) {
           <button
             onClick={() => scroll('left')}
             className="absolute left-0 top-1/2 -translate-y-1/2 z-10 w-8 h-8 rounded-full bg-[var(--surface-elevated)] shadow-md flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity border border-[var(--border-default)]"
-            aria-label="Scroll stories left"
+            aria-label={t('stories.scroll_left', 'Scroll stories left')}
           >
             <ChevronLeft className="w-4 h-4 text-[var(--text-primary)]" />
           </button>
@@ -159,7 +161,7 @@ export function StoriesBar({ friends: _friends }: StoriesBarProps) {
           <button
             onClick={() => scroll('right')}
             className="absolute right-0 top-1/2 -translate-y-1/2 z-10 w-8 h-8 rounded-full bg-[var(--surface-elevated)] shadow-md flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity border border-[var(--border-default)]"
-            aria-label="Scroll stories right"
+            aria-label={t('stories.scroll_right', 'Scroll stories right')}
           >
             <ChevronRight className="w-4 h-4 text-[var(--text-primary)]" />
           </button>
@@ -174,7 +176,7 @@ export function StoriesBar({ friends: _friends }: StoriesBarProps) {
             <button
               onClick={handleCreateClick}
               className="flex flex-col items-center gap-1.5 flex-shrink-0 w-16 group/create"
-              aria-label="Create your story"
+              aria-label={t('stories.create_your_story', 'Create your story')}
             >
               <div className="relative">
                 <div className={`w-14 h-14 rounded-full p-[2px] ${
@@ -197,7 +199,7 @@ export function StoriesBar({ friends: _friends }: StoriesBarProps) {
                 </span>
               </div>
               <span className="text-xs truncate w-full text-center text-[var(--text-primary)]">
-                Your Story
+                {t('stories.your_story', 'Your Story')}
               </span>
             </button>
 
@@ -214,7 +216,7 @@ export function StoriesBar({ friends: _friends }: StoriesBarProps) {
                   key={storyUser.user_id}
                   onClick={() => handleStoryClick(actualIndex)}
                   className="flex flex-col items-center gap-1.5 flex-shrink-0 w-16"
-                  aria-label={`View story from ${storyUser.name}`}
+                  aria-label={t('stories.view_story_from', 'View story from {{name}}', { name: storyUser.name })}
                 >
                   <div className="relative">
                     {/* Ring: gradient for unseen, gray for seen */}

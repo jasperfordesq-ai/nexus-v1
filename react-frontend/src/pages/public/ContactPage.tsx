@@ -25,7 +25,7 @@ export function ContactPage() {
   const { t } = useTranslation('public');
   const { branding, tenantPath } = useTenant();
   const { user, isAuthenticated } = useAuth();
-  usePageTitle('Contact Us');
+  usePageTitle(t('contact.title'));
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [error, setError] = useState<string | null>(null);

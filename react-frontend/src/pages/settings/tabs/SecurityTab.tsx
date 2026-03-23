@@ -347,12 +347,12 @@ export function SecurityTab({
       {/* Change Password Modal */}
       <Modal isOpen={passwordModalOpen} onClose={passwordModalOnClose} classNames={modalClassNames}>
         <ModalContent>
-          <ModalHeader className="text-theme-primary">Change Password</ModalHeader>
+          <ModalHeader className="text-theme-primary">{t('password_modal.title')}</ModalHeader>
           <ModalBody>
             <div className="space-y-4">
               <Input
                 type={showCurrentPassword ? 'text' : 'password'}
-                label="Current Password"
+                label={t('password.current')}
                 value={passwordData.current_password}
                 onChange={(e) => onPasswordDataChange((prev) => ({ ...prev, current_password: e.target.value }))}
                 endContent={
@@ -362,7 +362,7 @@ export function SecurityTab({
                     variant="light"
                     className="min-w-0 w-auto h-auto p-0"
                     onPress={onShowCurrentPasswordToggle}
-                    aria-label={showCurrentPassword ? 'Hide current password' : 'Show current password'}
+                    aria-label={showCurrentPassword ? t('password.hide_current') : t('password.show_current')}
                   >
                     {showCurrentPassword ? <EyeOff className="w-4 h-4 text-theme-subtle" aria-hidden="true" /> : <Eye className="w-4 h-4 text-theme-subtle" aria-hidden="true" />}
                   </Button>
@@ -371,7 +371,7 @@ export function SecurityTab({
               />
               <Input
                 type={showNewPassword ? 'text' : 'password'}
-                label="New Password"
+                label={t('password.new')}
                 value={passwordData.new_password}
                 onChange={(e) => onPasswordDataChange((prev) => ({ ...prev, new_password: e.target.value }))}
                 endContent={
@@ -381,7 +381,7 @@ export function SecurityTab({
                     variant="light"
                     className="min-w-0 w-auto h-auto p-0"
                     onPress={onShowNewPasswordToggle}
-                    aria-label={showNewPassword ? 'Hide new password' : 'Show new password'}
+                    aria-label={showNewPassword ? t('password.hide_new') : t('password.show_new')}
                   >
                     {showNewPassword ? <EyeOff className="w-4 h-4 text-theme-subtle" aria-hidden="true" /> : <Eye className="w-4 h-4 text-theme-subtle" aria-hidden="true" />}
                   </Button>
@@ -390,7 +390,7 @@ export function SecurityTab({
               />
               <Input
                 type="password"
-                label="Confirm New Password"
+                label={t('password.confirm')}
                 value={passwordData.confirm_password}
                 onChange={(e) => onPasswordDataChange((prev) => ({ ...prev, confirm_password: e.target.value }))}
                 classNames={inputClassNames}
@@ -399,14 +399,14 @@ export function SecurityTab({
           </ModalBody>
           <ModalFooter>
             <Button variant="flat" className="bg-theme-elevated text-theme-primary" onPress={passwordModalOnClose}>
-              Cancel
+              {t('cancel')}
             </Button>
             <Button
               className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
               onPress={onChangePassword}
               isLoading={isChangingPassword}
             >
-              Change Password
+              {t('password_modal.submit')}
             </Button>
           </ModalFooter>
         </ModalContent>
@@ -415,21 +415,21 @@ export function SecurityTab({
       {/* Logout Confirmation Modal */}
       <Modal isOpen={logoutModalOpen} onClose={logoutModalOnClose} classNames={modalClassNames}>
         <ModalContent>
-          <ModalHeader className="text-theme-primary">Log Out</ModalHeader>
+          <ModalHeader className="text-theme-primary">{t('logout_modal.title')}</ModalHeader>
           <ModalBody>
             <p className="text-theme-muted">
-              Are you sure you want to log out of your account?
+              {t('logout_modal.confirm_message')}
             </p>
           </ModalBody>
           <ModalFooter>
             <Button variant="flat" className="bg-theme-elevated text-theme-primary" onPress={logoutModalOnClose}>
-              Cancel
+              {t('cancel')}
             </Button>
             <Button
               className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
               onPress={onLogout}
             >
-              Log Out
+              {t('logout_modal.submit')}
             </Button>
           </ModalFooter>
         </ModalContent>
@@ -440,25 +440,25 @@ export function SecurityTab({
         <ModalContent>
           <ModalHeader className="text-red-600 dark:text-red-400 flex items-center gap-2">
             <AlertTriangle className="w-5 h-5" aria-hidden="true" />
-            Delete Account
+            {t('delete_modal.title')}
           </ModalHeader>
           <ModalBody>
             <div className="space-y-4">
               <div className="p-4 rounded-lg bg-red-500/10 border border-red-500/20">
-                <p className="text-red-600 dark:text-red-400 font-medium">Warning: This action cannot be undone</p>
+                <p className="text-red-600 dark:text-red-400 font-medium">{t('delete_modal.warning')}</p>
                 <p className="text-theme-muted text-sm mt-1">
-                  All your data, including listings, messages, and transaction history will be permanently deleted.
+                  {t('delete_modal.warning_desc')}
                 </p>
               </div>
               <div>
                 <p className="text-theme-muted mb-2">
-                  Type <span className="font-mono text-red-600 dark:text-red-400">DELETE</span> to confirm:
+                  {t('delete_modal.type_confirm')}
                 </p>
                 <Input
                   value={deleteConfirmation}
                   onChange={(e) => onDeleteConfirmationChange(e.target.value)}
                   placeholder="DELETE"
-                  aria-label="Type DELETE to confirm account deletion"
+                  aria-label={t('delete_modal.aria_label')}
                   classNames={{
                     input: 'bg-transparent text-theme-primary font-mono',
                     inputWrapper: 'bg-theme-elevated border-theme-default',
@@ -469,7 +469,7 @@ export function SecurityTab({
           </ModalBody>
           <ModalFooter>
             <Button variant="flat" className="bg-theme-elevated text-theme-primary" onPress={deleteModalOnClose}>
-              Cancel
+              {t('cancel')}
             </Button>
             <Button
               className="bg-red-500 text-white"
@@ -477,7 +477,7 @@ export function SecurityTab({
               isLoading={isDeleting}
               isDisabled={deleteConfirmation !== 'DELETE'}
             >
-              Delete My Account
+              {t('delete_modal.submit')}
             </Button>
           </ModalFooter>
         </ModalContent>
@@ -531,7 +531,7 @@ export function SecurityTab({
                   <div className="inline-block p-4 bg-white rounded-xl">
                     <img
                       src={twoFactorSetupData.qr_code_url}
-                      alt="2FA QR Code"
+                      alt={t('twofa_qr_alt')}
                       className="w-48 h-48"
                       loading="lazy"
                     />

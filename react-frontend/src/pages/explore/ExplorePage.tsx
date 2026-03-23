@@ -3,8 +3,9 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import { useState, useMemo } from 'react';
+import { useState, useCallback } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import {
   Card,
   CardBody,
@@ -169,7 +170,8 @@ interface ExploreData {
 // ─────────────────────────────────────────────────────────────────────────────
 
 export default function ExplorePage() {
-  usePageTitle('Discover');
+  const { t } = useTranslation('explore');
+  usePageTitle(t('page_title'));
 
   const navigate = useNavigate();
   const { tenantPath, hasFeature } = useTenant();
@@ -209,19 +211,17 @@ export default function ExplorePage() {
   };
 
   // Memoize time-ago for trending posts
-  const timeAgo = useMemo(() => {
-    return (dateStr: string) => {
-      const now = new Date();
-      const date = new Date(dateStr);
-      const diffMs = now.getTime() - date.getTime();
-      const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
-      if (diffHours < 1) return 'Just now';
-      if (diffHours < 24) return `${diffHours}h ago`;
-      const diffDays = Math.floor(diffHours / 24);
-      if (diffDays < 7) return `${diffDays}d ago`;
-      return formatDate(dateStr);
-    };
-  }, []);
+  const timeAgo = useCallback((dateStr: string) => {
+    const now = new Date();
+    const date = new Date(dateStr);
+    const diffMs = now.getTime() - date.getTime();
+    const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
+    if (diffHours < 1) return t('time_ago.just_now');
+    if (diffHours < 24) return t('time_ago.hours_ago', { count: diffHours });
+    const diffDays = Math.floor(diffHours / 24);
+    if (diffDays < 7) return t('time_ago.days_ago', { count: diffDays });
+    return formatDate(dateStr);
+  }, [t]);
 
   return (
     <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
@@ -234,17 +234,17 @@ export default function ExplorePage() {
         className="text-center mb-8"
       >
         <h1 className="text-3xl sm:text-4xl font-bold text-[var(--text-primary)] mb-2">
-          Discover
+          {t('heading')}
         </h1>
         <p className="text-[var(--text-muted)] mb-6 max-w-xl mx-auto">
-          Find skills, events, groups, and more in your community
+          {t('subtitle')}
         </p>
 
         <form onSubmit={handleSearch} className="max-w-2xl mx-auto mb-4">
           <Input
             size="lg"
             variant="bordered"
-            placeholder="Discover skills, events, groups..."
+            placeholder={t('search_placeholder')}
             value={searchQuery}
             onValueChange={setSearchQuery}
             startContent={<Search className="w-5 h-5 text-[var(--text-muted)]" />}
@@ -299,10 +299,10 @@ export default function ExplorePage() {
                 ))
               ) : (
                 <>
-                  <ExploreStatCard icon={Users} label="Members" value={stats?.total_members ?? 0} />
-                  <ExploreStatCard icon={ArrowRightLeft} label="Exchanges This Month" value={stats?.exchanges_this_month ?? 0} />
-                  <ExploreStatCard icon={Clock} label="Hours Exchanged" value={stats?.hours_exchanged ?? 0} />
-                  <ExploreStatCard icon={ListTodo} label="Active Listings" value={stats?.active_listings ?? 0} />
+                  <ExploreStatCard icon={Users} label={t('stats.members')} value={stats?.total_members ?? 0} />
+                  <ExploreStatCard icon={ArrowRightLeft} label={t('stats.exchanges_this_month')} value={stats?.exchanges_this_month ?? 0} />
+                  <ExploreStatCard icon={Clock} label={t('stats.hours_exchanged')} value={stats?.hours_exchanged ?? 0} />
+                  <ExploreStatCard icon={ListTodo} label={t('stats.active_listings')} value={stats?.active_listings ?? 0} />
                 </>
               )}
             </div>
@@ -313,8 +313,8 @@ export default function ExplorePage() {
       {/* ─── Trending Posts ────────────────────────────────────────────────── */}
       {(isLoading || (data?.trending_posts && data.trending_posts.length > 0)) && (
         <ExploreSection
-          title="Trending Posts"
-          subtitle="Most engaging posts this week"
+          title={t('trending_posts.title')}
+          subtitle={t('trending_posts.subtitle')}
           seeAllLink={tenantPath('/feed')}
         >
           {isLoading ? (
@@ -383,8 +383,8 @@ export default function ExplorePage() {
       {/* ─── Popular Listings Grid ────────────────────────────────────────── */}
       {(isLoading || (data?.popular_listings && data.popular_listings.length > 0)) && (
         <ExploreSection
-          title="Popular Listings"
-          subtitle="Most viewed offers and requests"
+          title={t('popular_listings.title')}
+          subtitle={t('popular_listings.subtitle')}
           seeAllLink={tenantPath('/listings?sort=popular')}
         >
           {isLoading ? (
@@ -465,8 +465,8 @@ export default function ExplorePage() {
       {/* ─── Upcoming Events ──────────────────────────────────────────────── */}
       {hasFeature('events') && (isLoading || (data?.upcoming_events && data.upcoming_events.length > 0)) && (
         <ExploreSection
-          title="Upcoming Events"
-          subtitle="Join your community"
+          title={t('upcoming_events.title')}
+          subtitle={t('upcoming_events.subtitle')}
           seeAllLink={tenantPath('/events')}
         >
           {isLoading ? (
@@ -514,12 +514,12 @@ export default function ExplorePage() {
                         {event.location && (
                           <span className="flex items-center gap-1 truncate">
                             <MapPin className="w-3.5 h-3.5 shrink-0" />
-                            <span className="truncate">{event.is_online ? 'Online' : event.location}</span>
+                            <span className="truncate">{event.is_online ? t('upcoming_events.online') : event.location}</span>
                           </span>
                         )}
                         <span className="flex items-center gap-1">
                           <Users className="w-3.5 h-3.5" />
-                          {event.rsvp_count} attending
+                          {t('upcoming_events.attending', { count: event.rsvp_count })}
                           {event.max_attendees && ` / ${event.max_attendees}`}
                         </span>
                       </div>
@@ -535,8 +535,8 @@ export default function ExplorePage() {
       {/* ─── Active Groups ────────────────────────────────────────────────── */}
       {hasFeature('groups') && (isLoading || (data?.active_groups && data.active_groups.length > 0)) && (
         <ExploreSection
-          title="Active Groups"
-          subtitle="Connect with like-minded members"
+          title={t('active_groups.title')}
+          subtitle={t('active_groups.subtitle')}
           seeAllLink={tenantPath('/groups')}
         >
           {isLoading ? (
@@ -570,7 +570,7 @@ export default function ExplorePage() {
                           </h3>
                           <p className="text-xs text-[var(--text-muted)] flex items-center gap-1">
                             <Users className="w-3 h-3" />
-                            {group.member_count} members
+                            {t('active_groups.members', { count: group.member_count })}
                           </p>
                         </div>
                       </div>
@@ -585,7 +585,7 @@ export default function ExplorePage() {
                         color="primary"
                         className="w-full"
                       >
-                        View Group
+                        {t('active_groups.view_group')}
                       </Button>
                     </CardBody>
                   </Card>
@@ -599,8 +599,8 @@ export default function ExplorePage() {
       {/* ─── Top Contributors ─────────────────────────────────────────────── */}
       {hasFeature('gamification') && (isLoading || (data?.top_contributors && data.top_contributors.length > 0)) && (
         <ExploreSection
-          title="Top Contributors"
-          subtitle="Community leaders by experience"
+          title={t('top_contributors.title')}
+          subtitle={t('top_contributors.subtitle')}
           seeAllLink={tenantPath('/leaderboard')}
         >
           {isLoading ? (
@@ -632,7 +632,7 @@ export default function ExplorePage() {
                     )}
                     <div className="absolute -bottom-1 left-1/2 -translate-x-1/2">
                       <Chip size="sm" variant="solid" color="primary" className="text-[10px] px-1.5 h-5 min-h-5">
-                        Lv.{user.level}
+                        {t('top_contributors.level', { level: user.level })}
                       </Chip>
                     </div>
                   </div>
@@ -653,8 +653,8 @@ export default function ExplorePage() {
       {/* ─── Trending Hashtags ────────────────────────────────────────────── */}
       {(isLoading || (data?.trending_hashtags && data.trending_hashtags.length > 0)) && (
         <ExploreSection
-          title="Trending Hashtags"
-          subtitle="Popular topics in your community"
+          title={t('trending_hashtags.title')}
+          subtitle={t('trending_hashtags.subtitle')}
           seeAllLink={tenantPath('/feed/hashtags')}
         >
           {isLoading ? (
@@ -688,8 +688,8 @@ export default function ExplorePage() {
       {/* ─── Recommended For You ──────────────────────────────────────────── */}
       {isAuthenticated && data?.recommended_listings && data.recommended_listings.length > 0 && (
         <ExploreSection
-          title="Recommended For You"
-          subtitle="Based on your interests and activity"
+          title={t('recommended.title')}
+          subtitle={t('recommended.subtitle')}
           seeAllLink={tenantPath('/matches')}
         >
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -715,7 +715,7 @@ export default function ExplorePage() {
                           {listing.title}
                         </h3>
                         <p className="text-xs text-[var(--text-muted)]">
-                          by {listing.author_name}
+                          {t('recommended.by_author', { name: listing.author_name })}
                         </p>
                         {listing.category_name && (
                           <Chip size="sm" variant="flat" className="text-[10px] mt-1">
@@ -735,8 +735,8 @@ export default function ExplorePage() {
       {/* ─── New Members ──────────────────────────────────────────────────── */}
       {(isLoading || (data?.new_members && data.new_members.length > 0)) && (
         <ExploreSection
-          title="Welcome Our Newest Members"
-          subtitle="Say hello to recent joiners"
+          title={t('new_members.title')}
+          subtitle={t('new_members.subtitle')}
           seeAllLink={tenantPath('/members')}
         >
           {isLoading ? (
@@ -783,7 +783,7 @@ export default function ExplorePage() {
                       startContent={<UserPlus className="w-3 h-3" />}
                       onPress={() => navigate(tenantPath(`/messages/new/${member.id}`))}
                     >
-                      Connect
+                      {t('new_members.connect')}
                     </Button>
                   )}
                 </div>
@@ -796,8 +796,8 @@ export default function ExplorePage() {
       {/* ─── Featured Challenges ──────────────────────────────────────────── */}
       {hasFeature('ideation_challenges') && data?.featured_challenges && data.featured_challenges.length > 0 && (
         <ExploreSection
-          title="Featured Challenges"
-          subtitle="Share your ideas and make an impact"
+          title={t('featured_challenges.title')}
+          subtitle={t('featured_challenges.subtitle')}
           seeAllLink={tenantPath('/ideation')}
         >
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -821,11 +821,11 @@ export default function ExplorePage() {
                         <div className="flex items-center gap-3 mt-2 text-xs text-[var(--text-muted)]">
                           <span className="flex items-center gap-1">
                             <Lightbulb className="w-3 h-3" />
-                            {challenge.idea_count} ideas
+                            {t('featured_challenges.ideas_count', { count: challenge.idea_count })}
                           </span>
                           {challenge.end_date && (
                             <span>
-                              Ends {formatDate(challenge.end_date)}
+                              {t('featured_challenges.ends', { date: formatDate(challenge.end_date) })}
                             </span>
                           )}
                         </div>

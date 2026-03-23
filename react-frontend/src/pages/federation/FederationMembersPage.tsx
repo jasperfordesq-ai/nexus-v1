@@ -286,7 +286,7 @@ export function FederationMembersPage() {
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 startContent={<Search className="w-4 h-4 text-theme-subtle" aria-hidden="true" />}
-                aria-label="Search federated members"
+                aria-label={t('members.aria_search')}
                 classNames={{
                   input: 'bg-transparent text-theme-primary placeholder:text-theme-subtle',
                   inputWrapper: 'bg-theme-elevated border-theme-default hover:bg-theme-hover',
@@ -299,7 +299,7 @@ export function FederationMembersPage() {
               selectedKeys={selectedPartner ? [selectedPartner] : []}
               onChange={(e) => setSelectedPartner(e.target.value)}
               className="w-full lg:w-56"
-              aria-label="Filter by partner community"
+              aria-label={t('members.aria_filter_community')}
               classNames={{
                 trigger: 'bg-theme-elevated border-theme-default hover:bg-theme-hover',
                 value: 'text-theme-primary',
@@ -343,7 +343,7 @@ export function FederationMembersPage() {
                 value={skillsFilter}
                 onChange={(e) => setSkillsFilter(e.target.value)}
                 size="sm"
-                aria-label="Filter by skills"
+                aria-label={t('members.aria_filter_skills')}
                 classNames={{
                   input: 'bg-transparent text-theme-primary placeholder:text-theme-subtle',
                   inputWrapper: 'bg-theme-elevated border-theme-default hover:bg-theme-hover',

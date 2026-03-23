@@ -18,7 +18,7 @@ import { Link } from 'react-router-dom';
 
 export function MaintenancePage() {
   const { t } = useTranslation('public');
-  usePageTitle('Maintenance');
+  usePageTitle(t('maintenance.title'));
   const { tenant } = useTenant();
   const tenantName = tenant?.name || 'Project NEXUS';
   const adminPath = tenantPath('/admin', tenant?.slug);

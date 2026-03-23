@@ -11,6 +11,7 @@
  */
 
 import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { ChevronRight, Home } from 'lucide-react';
 import { useTenant } from '@/contexts';
 
@@ -26,18 +27,19 @@ interface BreadcrumbsProps {
 }
 
 export function Breadcrumbs({ items, showHome = true }: BreadcrumbsProps) {
+  const { t } = useTranslation('common');
   const { tenantPath } = useTenant();
   if (items.length === 0) return null;
 
   return (
-    <nav aria-label="Breadcrumb" className="mb-4">
+    <nav aria-label={t('accessibility.breadcrumb', { defaultValue: 'Breadcrumb' })} className="mb-4">
       <ol className="flex items-center gap-1 text-sm overflow-x-auto">
         {showHome && (
           <li className="flex items-center">
             <Link
               to={tenantPath('/')}
               className="inline-flex items-center justify-center min-w-[44px] min-h-[44px] text-theme-subtle hover:text-theme-primary transition-colors"
-              aria-label="Home"
+              aria-label={t('nav.home')}
             >
               <Home className="w-3.5 h-3.5" aria-hidden="true" />
             </Link>

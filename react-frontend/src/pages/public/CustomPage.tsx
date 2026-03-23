@@ -12,6 +12,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { useParams, Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
 import { Button, Spinner } from '@heroui/react';
 import { ArrowLeft, AlertTriangle, FileText } from 'lucide-react';
@@ -35,6 +36,7 @@ interface PageData {
 }
 
 export function CustomPage() {
+  const { t } = useTranslation('utility');
   const { slug } = useParams<{ slug: string }>();
   const { tenantPath, branding, tenant, isLoading: tenantLoading } = useTenant();
 
@@ -42,7 +44,7 @@ export function CustomPage() {
   const [loading, setLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
 
-  usePageTitle(page?.title || 'Page');
+  usePageTitle(page?.title || t('custom_page.default_title', 'Page'));
 
   // tenantId captured as primitive to avoid object reference churn in deps
   const tenantId = tenant?.id ?? null;
@@ -87,16 +89,16 @@ export function CustomPage() {
   if (notFound || !page) {
     return (
       <div className="max-w-3xl mx-auto px-4 py-16 text-center">
-        <PageMeta title="Page Not Found" />
+        <PageMeta title={t('not_found.page_title')} />
         <GlassCard className="p-8">
           <AlertTriangle className="w-12 h-12 text-warning mx-auto mb-4" />
-          <h1 className="text-2xl font-bold text-theme-primary mb-2">Page Not Found</h1>
+          <h1 className="text-2xl font-bold text-theme-primary mb-2">{t('not_found.heading')}</h1>
           <p className="text-theme-secondary mb-6">
-            The page you&apos;re looking for doesn&apos;t exist or is no longer available.
+            {t('custom_page.not_found_description', "The page you're looking for doesn't exist or is no longer available.")}
           </p>
           <Link to={tenantPath('/')}>
             <Button color="primary" startContent={<ArrowLeft size={16} />}>
-              Back to Home
+              {t('custom_page.back_to_home', 'Back to Home')}
             </Button>
           </Link>
         </GlassCard>
@@ -113,7 +115,7 @@ export function CustomPage() {
 
       <div className="max-w-4xl mx-auto px-4 py-8 space-y-6">
         <Breadcrumbs items={[
-          { label: 'Home', href: tenantPath('/') },
+          { label: t('not_found.go_home', 'Home'), href: tenantPath('/') },
           { label: page.title },
         ]} />
 

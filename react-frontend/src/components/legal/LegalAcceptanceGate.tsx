@@ -25,16 +25,18 @@ import {
 } from '@heroui/react';
 import { FileText, ExternalLink } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import type { PendingDocument } from '@/hooks/useLegalGate';
 import { useTenant } from '@/contexts';
 
-const TYPE_LABELS: Record<string, string> = {
-  terms:                'Terms of Service',
-  privacy:              'Privacy Policy',
-  cookies:              'Cookie Policy',
-  accessibility:        'Accessibility Statement',
-  community_guidelines: 'Community Guidelines',
-  acceptable_use:       'Acceptable Use Policy',
+// Label keys are resolved via i18n below; this map serves as fallback
+const TYPE_LABEL_KEYS: Record<string, string> = {
+  terms:                'gate.type_terms',
+  privacy:              'gate.type_privacy',
+  cookies:              'gate.type_cookies',
+  accessibility:        'gate.type_accessibility',
+  community_guidelines: 'gate.type_community_guidelines',
+  acceptable_use:       'gate.type_acceptable_use',
 };
 
 interface LegalAcceptanceGateProps {
@@ -48,6 +50,7 @@ export function LegalAcceptanceGate({
   onAcceptAll,
   isAccepting,
 }: LegalAcceptanceGateProps) {
+  const { t } = useTranslation('legal');
   const { tenantPath } = useTenant();
 
   const handleAccept = async () => {
@@ -67,18 +70,19 @@ export function LegalAcceptanceGate({
         <ModalHeader id="legal-gate-title" className="flex flex-col gap-1">
           <div className="flex items-center gap-2">
             <FileText className="w-5 h-5 text-warning shrink-0" aria-hidden="true" />
-            <span>Updated legal documents</span>
+            <span>{t('gate.title')}</span>
           </div>
           <p className="text-sm font-normal text-foreground-500">
             {pendingDocs.length === 1
-              ? 'A document has been updated. Please review and accept it to continue.'
-              : `${pendingDocs.length} documents have been updated. Please review and accept them to continue.`}
+              ? t('gate.subtitle_one')
+              : t('gate.subtitle_other', { count: pendingDocs.length })}
           </p>
         </ModalHeader>
 
         <ModalBody className="gap-3">
           {pendingDocs.map((doc) => {
-            const label = TYPE_LABELS[doc.document_type] ?? doc.title;
+            const labelKey = TYPE_LABEL_KEYS[doc.document_type];
+            const label = labelKey ? t(labelKey) : doc.title;
             const linkPath = tenantPath(`/${doc.document_type.replace('_', '-')}`);
             return (
               <div
@@ -90,7 +94,7 @@ export function LegalAcceptanceGate({
                   <span className="text-sm font-medium truncate">{label}</span>
                   {doc.acceptance_status === 'outdated' && (
                     <Chip color="warning" variant="flat" size="sm" className="shrink-0">
-                      Updated
+                      {t('gate.updated')}
                     </Chip>
                   )}
                 </div>
@@ -100,7 +104,7 @@ export function LegalAcceptanceGate({
                   rel="noopener noreferrer"
                   className="flex items-center gap-1 text-xs text-primary underline shrink-0 focus:outline-none focus:ring-2 focus:ring-primary rounded"
                 >
-                  Read
+                  {t('gate.read')}
                   <ExternalLink className="w-3 h-3" aria-hidden="true" />
                 </Link>
               </div>
@@ -110,16 +114,16 @@ export function LegalAcceptanceGate({
 
         <ModalFooter>
           <p className="text-xs text-foreground-400 flex-1">
-            By clicking Accept, you confirm you have read and agree to the documents listed above.
+            {t('gate.consent_text')}
           </p>
           <Button
             color="primary"
             onPress={handleAccept}
             isLoading={isAccepting}
             isDisabled={isAccepting}
-            aria-label="Accept all updated legal documents and continue"
+            aria-label={t('gate.accept_aria')}
           >
-            {isAccepting ? 'Accepting…' : 'Accept & Continue'}
+            {isAccepting ? t('gate.accepting') : t('gate.accept_continue')}
           </Button>
         </ModalFooter>
       </ModalContent>

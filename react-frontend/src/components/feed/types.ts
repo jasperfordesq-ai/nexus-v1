@@ -159,21 +159,21 @@ export function getItemDetailPath(item: FeedItem): string | null {
 export function getItemDetailLabel(item: FeedItem): string | null {
   switch (item.type) {
     case 'listing':
-      return 'View Listing';
+      return 'card.detail_listing';
     case 'event':
-      return 'View Event';
+      return 'card.detail_event';
     case 'goal':
-      return 'View Goals';
+      return 'card.detail_goals';
     case 'review':
-      return 'View Profile';
+      return 'card.detail_profile';
     case 'job':
-      return 'View Job';
+      return 'card.detail_job';
     case 'challenge':
-      return 'View Challenge';
+      return 'card.detail_challenge';
     case 'volunteer':
-      return 'View Opportunity';
+      return 'card.detail_volunteer';
     case 'blog':
-      return 'Read Article';
+      return 'card.detail_blog';
     default:
       return null;
   }

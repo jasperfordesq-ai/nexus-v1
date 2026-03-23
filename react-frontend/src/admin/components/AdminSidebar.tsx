@@ -11,6 +11,7 @@
 
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { Link, useLocation } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { Button } from '@heroui/react';
 import { useAuth, useTenant } from '@/contexts';
 import { adminBroker } from '../api/adminApi';
@@ -105,6 +106,7 @@ interface NavSection {
 }
 
 function useAdminNav(): NavSection[] {
+  const { t } = useTranslation('admin');
   const { hasFeature } = useTenant();
   const { user } = useAuth();
 
@@ -118,190 +120,190 @@ function useAdminNav(): NavSection[] {
     const sections: NavSection[] = [
       {
         key: 'dashboard',
-        label: 'Dashboard',
+        label: t('nav.dashboard'),
         icon: LayoutDashboard,
         href: '/admin',
       },
       {
         key: 'users',
-        label: 'Users',
+        label: t('nav.users'),
         icon: Users,
         items: [
-          { label: 'All Users', href: '/admin/users', icon: Users },
-          { label: 'Pending Approvals', href: '/admin/users?filter=pending', icon: UserCheck },
+          { label: t('nav.all_users'), href: '/admin/users', icon: Users },
+          { label: t('nav.pending_approvals'), href: '/admin/users?filter=pending', icon: UserCheck },
         ],
       },
       {
         key: 'crm',
-        label: 'Member CRM',
+        label: t('nav.crm'),
         icon: Contact,
         items: [
-          { label: 'CRM Dashboard', href: '/admin/crm', icon: Contact },
-          { label: 'Member Notes', href: '/admin/crm/notes', icon: StickyNote },
-          { label: 'Coordinator Tasks', href: '/admin/crm/tasks', icon: ClipboardList },
-          { label: 'Member Tags', href: '/admin/crm/tags', icon: Tag },
-          { label: 'Activity Timeline', href: '/admin/crm/timeline', icon: Activity },
-          { label: 'Onboarding Funnel', href: '/admin/crm/funnel', icon: Filter },
+          { label: t('nav.crm_dashboard'), href: '/admin/crm', icon: Contact },
+          { label: t('nav.member_notes'), href: '/admin/crm/notes', icon: StickyNote },
+          { label: t('nav.coordinator_tasks'), href: '/admin/crm/tasks', icon: ClipboardList },
+          { label: t('nav.member_tags'), href: '/admin/crm/tags', icon: Tag },
+          { label: t('nav.activity_timeline'), href: '/admin/crm/timeline', icon: Activity },
+          { label: t('nav.onboarding_funnel'), href: '/admin/crm/funnel', icon: Filter },
         ],
       },
       {
         key: 'listings',
-        label: 'Listings',
+        label: t('nav.listings'),
         icon: ListChecks,
         items: [
-          { label: 'All Content', href: '/admin/listings', icon: ListChecks },
+          { label: t('nav.all_content'), href: '/admin/listings', icon: ListChecks },
         ],
       },
       {
         key: 'content',
-        label: 'Content',
+        label: t('nav.content'),
         icon: Newspaper,
         items: [
-          { label: 'Blog Posts', href: '/admin/blog', icon: FileText },
-          { label: 'Resources', href: '/admin/resources', icon: BookOpen },
-          { label: 'Pages', href: '/admin/pages', icon: FileText },
-          { label: 'Menus', href: '/admin/menus', icon: Menu },
-          { label: 'Categories', href: '/admin/categories', icon: FolderTree },
-          { label: 'Attributes', href: '/admin/attributes', icon: Tags },
+          { label: t('nav.blog_posts'), href: '/admin/blog', icon: FileText },
+          { label: t('nav.resources'), href: '/admin/resources', icon: BookOpen },
+          { label: t('nav.pages'), href: '/admin/pages', icon: FileText },
+          { label: t('nav.menus'), href: '/admin/menus', icon: Menu },
+          { label: t('nav.categories'), href: '/admin/categories', icon: FolderTree },
+          { label: t('nav.attributes'), href: '/admin/attributes', icon: Tags },
         ],
       },
       {
         key: 'engagement',
-        label: 'Engagement',
+        label: t('nav.engagement'),
         icon: Trophy,
         items: [
-          { label: 'Gamification Hub', href: '/admin/gamification', icon: Gamepad2 },
-          { label: 'Campaigns', href: '/admin/gamification/campaigns', icon: Target },
-          { label: 'Custom Badges', href: '/admin/custom-badges', icon: Medal },
-          { label: 'Analytics', href: '/admin/gamification/analytics', icon: BarChart3 },
+          { label: t('nav.gamification_hub'), href: '/admin/gamification', icon: Gamepad2 },
+          { label: t('nav.campaigns'), href: '/admin/gamification/campaigns', icon: Target },
+          { label: t('nav.custom_badges'), href: '/admin/custom-badges', icon: Medal },
+          { label: t('nav.analytics'), href: '/admin/gamification/analytics', icon: BarChart3 },
         ],
       },
       {
         key: 'matching',
-        label: 'Matching',
+        label: t('nav.matching'),
         icon: Zap,
         items: [
-          { label: 'Smart Matching', href: '/admin/smart-matching', icon: Brain },
-          { label: 'Match Approvals', href: '/admin/match-approvals', icon: UserCheck, badge: 'NEW' },
-          { label: 'Broker Controls', href: '/admin/broker-controls', icon: Shield },
-          { label: 'Message Review', href: '/admin/broker-controls/messages', icon: MessageSquareWarning },
-          { label: 'User Monitoring', href: '/admin/broker-controls/monitoring', icon: Eye },
-          { label: 'Vetting Records', href: '/admin/broker-controls/vetting', icon: ShieldCheck },
-          { label: 'Insurance Certificates', href: '/admin/broker-controls/insurance', icon: FileCheck },
-          { label: 'Review Archive', href: '/admin/broker-controls/archives', icon: Archive },
-          { label: 'Safeguarding', href: '/admin/safeguarding', icon: ShieldCheck },
+          { label: t('nav.smart_matching'), href: '/admin/smart-matching', icon: Brain },
+          { label: t('nav.match_approvals'), href: '/admin/match-approvals', icon: UserCheck, badge: 'NEW' },
+          { label: t('nav.broker_controls'), href: '/admin/broker-controls', icon: Shield },
+          { label: t('nav.message_review'), href: '/admin/broker-controls/messages', icon: MessageSquareWarning },
+          { label: t('nav.user_monitoring'), href: '/admin/broker-controls/monitoring', icon: Eye },
+          { label: t('nav.vetting_records'), href: '/admin/broker-controls/vetting', icon: ShieldCheck },
+          { label: t('nav.insurance_certificates'), href: '/admin/broker-controls/insurance', icon: FileCheck },
+          { label: t('nav.review_archive'), href: '/admin/broker-controls/archives', icon: Archive },
+          { label: t('nav.safeguarding'), href: '/admin/safeguarding', icon: ShieldCheck },
         ],
       },
       {
         key: 'moderation',
-        label: 'Moderation',
+        label: t('nav.moderation'),
         icon: Shield,
         items: [
-          { label: 'Content Queue', href: '/admin/moderation/queue', icon: Shield, badge: 'NEW' },
-          { label: 'Feed Posts', href: '/admin/moderation/feed', icon: MessageSquare },
-          { label: 'Comments', href: '/admin/moderation/comments', icon: MessageCircle },
-          { label: 'Reviews', href: '/admin/moderation/reviews', icon: Star },
-          { label: 'Reports', href: '/admin/moderation/reports', icon: Flag },
+          { label: t('nav.content_queue'), href: '/admin/moderation/queue', icon: Shield, badge: 'NEW' },
+          { label: t('nav.feed_posts'), href: '/admin/moderation/feed', icon: MessageSquare },
+          { label: t('nav.comments'), href: '/admin/moderation/comments', icon: MessageCircle },
+          { label: t('nav.reviews'), href: '/admin/moderation/reviews', icon: Star },
+          { label: t('nav.reports'), href: '/admin/moderation/reports', icon: Flag },
         ],
       },
       {
         key: 'community',
-        label: 'Community',
+        label: t('nav.community'),
         icon: Users,
         items: [
-          { label: 'Groups', href: '/admin/groups', icon: Users },
-          { label: 'Group Types', href: '/admin/groups/types', icon: FolderTree },
-          { label: 'Group Recommendations', href: '/admin/groups/recommendations', icon: Brain },
-          { label: 'Group Ranking', href: '/admin/groups/ranking', icon: Trophy },
-          { label: 'Events', href: '/admin/events', icon: Calendar },
-          { label: 'Polls', href: '/admin/polls', icon: BarChart2 },
-          { label: 'Goals', href: '/admin/goals', icon: Target },
-          { label: 'Ideation Challenges', href: '/admin/ideation', icon: Lightbulb },
-          { label: 'Jobs', href: '/admin/jobs', icon: Briefcase },
-          { label: 'Job Moderation', href: '/admin/jobs/moderation', icon: ShieldCheck },
-          { label: 'Volunteering', href: '/admin/volunteering', icon: Heart },
+          { label: t('nav.groups'), href: '/admin/groups', icon: Users },
+          { label: t('nav.group_types'), href: '/admin/groups/types', icon: FolderTree },
+          { label: t('nav.group_recommendations'), href: '/admin/groups/recommendations', icon: Brain },
+          { label: t('nav.group_ranking'), href: '/admin/groups/ranking', icon: Trophy },
+          { label: t('nav.events'), href: '/admin/events', icon: Calendar },
+          { label: t('nav.polls'), href: '/admin/polls', icon: BarChart2 },
+          { label: t('nav.goals'), href: '/admin/goals', icon: Target },
+          { label: t('nav.ideation_challenges'), href: '/admin/ideation', icon: Lightbulb },
+          { label: t('nav.jobs'), href: '/admin/jobs', icon: Briefcase },
+          { label: t('nav.job_moderation'), href: '/admin/jobs/moderation', icon: ShieldCheck },
+          { label: t('nav.volunteering'), href: '/admin/volunteering', icon: Heart },
         ],
       },
       {
         key: 'marketing',
-        label: 'Marketing',
+        label: t('nav.marketing'),
         icon: Megaphone,
         items: [
-          { label: 'Newsletters', href: '/admin/newsletters', icon: Megaphone },
-          { label: 'Subscribers', href: '/admin/newsletters/subscribers', icon: Users },
-          { label: 'Templates', href: '/admin/newsletters/templates', icon: FileText },
-          { label: 'Bounces', href: '/admin/newsletters/bounces', icon: AlertTriangle },
-          { label: 'Send-Time Optimizer', href: '/admin/newsletters/send-time-optimizer', icon: Clock },
-          { label: 'Diagnostics', href: '/admin/newsletters/diagnostics', icon: Stethoscope },
-          { label: 'Deliverability', href: '/admin/deliverability', icon: Mail },
+          { label: t('nav.newsletters'), href: '/admin/newsletters', icon: Megaphone },
+          { label: t('nav.subscribers'), href: '/admin/newsletters/subscribers', icon: Users },
+          { label: t('nav.templates'), href: '/admin/newsletters/templates', icon: FileText },
+          { label: t('nav.bounces'), href: '/admin/newsletters/bounces', icon: AlertTriangle },
+          { label: t('nav.send_time_optimizer'), href: '/admin/newsletters/send-time-optimizer', icon: Clock },
+          { label: t('nav.diagnostics'), href: '/admin/newsletters/diagnostics', icon: Stethoscope },
+          { label: t('nav.deliverability'), href: '/admin/deliverability', icon: Mail },
         ],
       },
       {
         key: 'analytics',
-        label: 'Analytics & Reporting',
+        label: t('nav.analytics_reporting'),
         icon: BarChart3,
         items: [
-          { label: 'Community Analytics', href: '/admin/community-analytics', icon: BarChart3 },
-          { label: 'Impact Report', href: '/admin/impact-report', icon: FileText },
-          { label: 'Social Value / SROI', href: '/admin/reports/social-value', icon: DollarSign },
-          { label: 'Member Reports', href: '/admin/reports/members', icon: Users },
-          { label: 'Hours Reports', href: '/admin/reports/hours', icon: Clock },
-          { label: 'Inactive Members', href: '/admin/reports/inactive-members', icon: UserX },
+          { label: t('nav.community_analytics'), href: '/admin/community-analytics', icon: BarChart3 },
+          { label: t('nav.impact_report'), href: '/admin/impact-report', icon: FileText },
+          { label: t('nav.social_value'), href: '/admin/reports/social-value', icon: DollarSign },
+          { label: t('nav.member_reports'), href: '/admin/reports/members', icon: Users },
+          { label: t('nav.hours_reports'), href: '/admin/reports/hours', icon: Clock },
+          { label: t('nav.inactive_members'), href: '/admin/reports/inactive-members', icon: UserX },
         ],
       },
       {
         key: 'advanced',
-        label: 'Advanced',
+        label: t('nav.advanced'),
         icon: Sparkles,
         items: [
-          { label: 'AI Settings', href: '/admin/ai-settings', icon: Brain },
-          { label: 'Email Settings', href: '/admin/email-settings', icon: Mail },
-          { label: 'Algorithm Settings', href: '/admin/algorithm-settings', icon: Cpu },
-          { label: 'SEO Overview', href: '/admin/seo', icon: Search },
-          { label: '404 Tracking', href: '/admin/404-errors', icon: AlertTriangle },
-          { label: 'Diagnostics', href: '/admin/matching-diagnostic', icon: Stethoscope },
-          { label: 'Match Debug Panel', href: '/admin/match-debug', icon: Target },
+          { label: t('nav.ai_settings'), href: '/admin/ai-settings', icon: Brain },
+          { label: t('nav.email_settings'), href: '/admin/email-settings', icon: Mail },
+          { label: t('nav.algorithm_settings'), href: '/admin/algorithm-settings', icon: Cpu },
+          { label: t('nav.seo_overview'), href: '/admin/seo', icon: Search },
+          { label: t('nav.error_404_tracking'), href: '/admin/404-errors', icon: AlertTriangle },
+          { label: t('nav.diagnostics'), href: '/admin/matching-diagnostic', icon: Stethoscope },
+          { label: t('nav.match_debug_panel'), href: '/admin/match-debug', icon: Target },
         ],
       },
       {
         key: 'financial',
-        label: 'Financial',
+        label: t('nav.financial'),
         icon: Coins,
         items: [
-          { label: 'Timebanking', href: '/admin/timebanking', icon: Clock },
-          { label: 'Fraud Alerts', href: '/admin/timebanking/alerts', icon: AlertTriangle },
-          { label: 'Org Wallets', href: '/admin/timebanking/org-wallets', icon: Wallet },
-          { label: 'Starting Balances', href: '/admin/timebanking/starting-balances', icon: Wallet },
-          { label: 'Plans & Pricing', href: '/admin/plans', icon: CreditCard },
+          { label: t('nav.timebanking'), href: '/admin/timebanking', icon: Clock },
+          { label: t('nav.fraud_alerts'), href: '/admin/timebanking/alerts', icon: AlertTriangle },
+          { label: t('nav.org_wallets'), href: '/admin/timebanking/org-wallets', icon: Wallet },
+          { label: t('nav.starting_balances'), href: '/admin/timebanking/starting-balances', icon: Wallet },
+          { label: t('nav.plans_pricing'), href: '/admin/plans', icon: CreditCard },
         ],
       },
       {
         key: 'enterprise',
-        label: 'Enterprise',
+        label: t('nav.enterprise'),
         icon: Building2,
         items: [
-          { label: 'Enterprise Dashboard', href: '/admin/enterprise', icon: Building2 },
-          { label: 'Roles & Permissions', href: '/admin/enterprise/roles', icon: Key },
-          { label: 'GDPR Dashboard', href: '/admin/enterprise/gdpr', icon: ShieldCheck },
-          { label: 'Legal Documents', href: '/admin/legal-documents', icon: FileText },
-          { label: 'Compliance Dashboard', href: '/admin/legal-documents/compliance', icon: ShieldCheck },
-          { label: 'Monitoring', href: '/admin/enterprise/monitoring', icon: Heart },
-          { label: 'System Config', href: '/admin/enterprise/config', icon: Cog },
+          { label: t('nav.enterprise_dashboard'), href: '/admin/enterprise', icon: Building2 },
+          { label: t('nav.roles_permissions'), href: '/admin/enterprise/roles', icon: Key },
+          { label: t('nav.gdpr_dashboard'), href: '/admin/enterprise/gdpr', icon: ShieldCheck },
+          { label: t('nav.legal_documents'), href: '/admin/legal-documents', icon: FileText },
+          { label: t('nav.compliance_dashboard'), href: '/admin/legal-documents/compliance', icon: ShieldCheck },
+          { label: t('nav.monitoring'), href: '/admin/enterprise/monitoring', icon: Heart },
+          { label: t('nav.system_config'), href: '/admin/enterprise/config', icon: Cog },
         ],
       },
       {
         key: 'system',
-        label: 'System',
+        label: t('nav.system'),
         icon: Settings,
         items: [
-          { label: 'Settings', href: '/admin/settings', icon: Settings },
-          { label: 'Tenant Features', href: '/admin/tenant-features', icon: Cog },
-          { label: 'Cron Jobs', href: '/admin/cron-jobs', icon: Timer },
-          { label: 'Cron Logs', href: '/admin/cron-jobs/logs', icon: FileText },
-          { label: 'Cron Settings', href: '/admin/cron-jobs/settings', icon: Settings },
-          { label: 'Cron Setup', href: '/admin/cron-jobs/setup', icon: Wrench },
-          { label: 'Activity Log', href: '/admin/activity-log', icon: Activity },
-          { label: 'Tools', href: '/admin/seed-generator', icon: Wrench },
+          { label: t('nav.settings'), href: '/admin/settings', icon: Settings },
+          { label: t('nav.tenant_features'), href: '/admin/tenant-features', icon: Cog },
+          { label: t('nav.cron_jobs'), href: '/admin/cron-jobs', icon: Timer },
+          { label: t('nav.cron_logs'), href: '/admin/cron-jobs/logs', icon: FileText },
+          { label: t('nav.cron_settings'), href: '/admin/cron-jobs/settings', icon: Settings },
+          { label: t('nav.cron_setup'), href: '/admin/cron-jobs/setup', icon: Wrench },
+          { label: t('nav.activity_log'), href: '/admin/activity-log', icon: Activity },
+          { label: t('nav.tools'), href: '/admin/seed-generator', icon: Wrench },
         ],
       },
     ];
@@ -310,14 +312,14 @@ function useAdminNav(): NavSection[] {
     if (hasFeature('federation')) {
       sections.splice(sections.length - 1, 0, {
         key: 'federation',
-        label: 'Partner Timebanks',
+        label: t('nav.partner_timebanks'),
         icon: Globe,
         items: [
-          { label: 'Settings', href: '/admin/federation', icon: Settings },
-          { label: 'Partnerships', href: '/admin/federation/partnerships', icon: ArrowLeftRight },
-          { label: 'Directory', href: '/admin/federation/directory', icon: Globe },
-          { label: 'Analytics', href: '/admin/federation/analytics', icon: BarChart3 },
-          { label: 'API Keys', href: '/admin/federation/api-keys', icon: Key },
+          { label: t('nav.federation_settings'), href: '/admin/federation', icon: Settings },
+          { label: t('nav.federation_partnerships'), href: '/admin/federation/partnerships', icon: ArrowLeftRight },
+          { label: t('nav.federation_directory'), href: '/admin/federation/directory', icon: Globe },
+          { label: t('nav.federation_analytics'), href: '/admin/federation/analytics', icon: BarChart3 },
+          { label: t('nav.federation_api_keys'), href: '/admin/federation/api-keys', icon: Key },
         ],
       });
     }
@@ -326,16 +328,16 @@ function useAdminNav(): NavSection[] {
     if (isSuperAdmin) {
       sections.push({
         key: 'super-admin',
-        label: 'Super Admin',
+        label: t('nav.super_admin'),
         icon: Crown,
         items: [
-          { label: 'Dashboard', href: '/admin/super', icon: Crown },
-          { label: 'Tenants', href: '/admin/super/tenants', icon: Building2 },
-          { label: 'Hierarchy', href: '/admin/super/tenants/hierarchy', icon: Network },
-          { label: 'Cross-Tenant Users', href: '/admin/super/users', icon: Users },
-          { label: 'Bulk Operations', href: '/admin/super/bulk', icon: ListChecks },
-          { label: 'Audit Log', href: '/admin/super/audit', icon: ScrollText },
-          { label: 'Federation Controls', href: '/admin/super/federation', icon: Globe },
+          { label: t('nav.super_dashboard'), href: '/admin/super', icon: Crown },
+          { label: t('nav.super_tenants'), href: '/admin/super/tenants', icon: Building2 },
+          { label: t('nav.super_hierarchy'), href: '/admin/super/tenants/hierarchy', icon: Network },
+          { label: t('nav.super_cross_tenant_users'), href: '/admin/super/users', icon: Users },
+          { label: t('nav.super_bulk_operations'), href: '/admin/super/bulk', icon: ListChecks },
+          { label: t('nav.super_audit_log'), href: '/admin/super/audit', icon: ScrollText },
+          { label: t('nav.super_federation_controls'), href: '/admin/super/federation', icon: Globe },
         ],
       });
     }
@@ -354,6 +356,7 @@ interface AdminSidebarProps {
 }
 
 export function AdminSidebar({ collapsed, onToggle }: AdminSidebarProps) {
+  const { t } = useTranslation('admin');
   const sections = useAdminNav();
   const location = useLocation();
   const { tenantPath } = useTenant();
@@ -428,7 +431,7 @@ export function AdminSidebar({ collapsed, onToggle }: AdminSidebarProps) {
       <div className="flex h-16 items-center justify-between border-b border-divider px-4">
         {!collapsed && (
           <Link to={tenantPath('/admin')} className="text-lg font-bold text-foreground">
-            Admin
+            {t('sidebar.admin')}
           </Link>
         )}
         <Button
@@ -436,7 +439,7 @@ export function AdminSidebar({ collapsed, onToggle }: AdminSidebarProps) {
           isIconOnly
           onPress={onToggle}
           className="rounded-lg p-2 text-default-500 hover:bg-default-100 hover:text-foreground min-w-0 h-auto"
-          aria-label={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+          aria-label={collapsed ? t('sidebar.expand_sidebar') : t('sidebar.collapse_sidebar')}
         >
           {collapsed ? <PanelLeft size={20} /> : <PanelLeftClose size={20} />}
         </Button>

@@ -245,11 +245,11 @@ export function GroupAnnouncementsTab({ groupId, isAdmin }: GroupAnnouncementsTa
                   {isAdmin && (
                     <Dropdown>
                       <DropdownTrigger>
-                        <Button isIconOnly variant="light" size="sm" aria-label="Actions">
+                        <Button isIconOnly variant="light" size="sm" aria-label={t('announcements.actions_aria', 'Actions')}>
                           <MoreVertical className="w-4 h-4" />
                         </Button>
                       </DropdownTrigger>
-                      <DropdownMenu aria-label="Announcement actions">
+                      <DropdownMenu aria-label={t('announcements.dropdown_aria', 'Announcement actions')}>
                         <DropdownItem
                           key="pin"
                           startContent={announcement.is_pinned ? <PinOff className="w-4 h-4" /> : <Pin className="w-4 h-4" />}

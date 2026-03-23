@@ -59,7 +59,7 @@ export function ShareButton({
           // Revert
           setLocalIsShared(false);
           setLocalCount(localCount);
-          toast.error(response.error || 'Failed to share');
+          toast.error(response.error || t('toast.share_failed'));
           return;
         }
         toast.success(t('toast.post_shared'));
@@ -69,7 +69,7 @@ export function ShareButton({
           // Revert
           setLocalIsShared(true);
           setLocalCount(localCount);
-          toast.error(response.error || 'Failed to unshare');
+          toast.error(response.error || t('toast.share_failed'));
           return;
         }
         toast.info(t('toast.share_removed'));

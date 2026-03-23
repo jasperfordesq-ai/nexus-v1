@@ -15,6 +15,7 @@
 
 import { useMemo } from 'react';
 import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
 import { Button, Chip } from '@heroui/react';
 import {
@@ -72,6 +73,7 @@ export function PlatformLegalPage({
   sections,
   crossLinks,
 }: PlatformLegalPageProps) {
+  const { t } = useTranslation('legal');
   usePageTitle(`${title} — Project NEXUS`);
   const { tenantPath, tenant, branding } = useTenant();
 
@@ -107,7 +109,7 @@ export function PlatformLegalPage({
             startContent={<CalendarDays className="w-3 h-3" />}
             classNames={{ base: 'bg-slate-500/10 text-slate-600 dark:text-slate-400' }}
           >
-            Effective {effectiveDate}
+            {t('platform.effective_date', { date: effectiveDate })}
           </Chip>
           <Chip
             size="sm"
@@ -115,7 +117,7 @@ export function PlatformLegalPage({
             startContent={<Hexagon className="w-3 h-3" />}
             classNames={{ base: 'bg-blue-500/10 text-blue-600 dark:text-blue-400' }}
           >
-            Project NEXUS Platform
+            {t('platform.platform_chip')}
           </Chip>
         </div>
       </motion.div>
@@ -127,20 +129,16 @@ export function PlatformLegalPage({
             <Info className="w-5 h-5 text-blue-500 mt-0.5 shrink-0" aria-hidden="true" />
             <div>
               <h2 className="font-semibold text-sm text-blue-600 dark:text-blue-400 mb-1">
-                Platform Provider Notice
+                {t('platform.provider_notice_title')}
               </h2>
               <p className="text-sm text-theme-muted">
-                This document governs the relationship between you and{' '}
-                <strong className="text-theme-primary">Project NEXUS</strong> (the platform
-                provider). It is separate from any terms established by{' '}
-                <strong className="text-theme-primary">{tenantName}</strong> (your community
-                operator).
+                {t('platform.provider_notice_body', { tenant: tenantName })}
               </p>
               <Link
                 to={tenantPath('/legal')}
                 className="inline-flex items-center gap-1 mt-2 text-sm text-blue-600 dark:text-blue-400 hover:underline"
               >
-                View {tenantName}&apos;s legal documents
+                {t('platform.view_tenant_legal', { tenant: tenantName })}
                 <ArrowRight className="w-3.5 h-3.5" />
               </Link>
             </div>
@@ -152,8 +150,8 @@ export function PlatformLegalPage({
       {showToc && (
         <motion.div variants={itemVariants}>
           <GlassCard className="p-5 sm:p-6">
-            <h2 className="font-semibold text-theme-primary mb-3">Contents</h2>
-            <nav aria-label="Table of contents">
+            <h2 className="font-semibold text-theme-primary mb-3">{t('platform.contents')}</h2>
+            <nav aria-label={t('platform.contents')}>
               <ol className="grid grid-cols-1 sm:grid-cols-2 gap-1.5">
                 {sections.map((section, idx) => (
                   <li key={section.id}>
@@ -196,7 +194,7 @@ export function PlatformLegalPage({
       {crossLinks && crossLinks.length > 0 && (
         <motion.div variants={itemVariants}>
           <GlassCard className="p-5 sm:p-6">
-            <h2 className="font-semibold text-theme-primary mb-3">Related Platform Documents</h2>
+            <h2 className="font-semibold text-theme-primary mb-3">{t('platform.related_documents')}</h2>
             <div className="flex flex-wrap gap-2">
               {crossLinks.map((link) => (
                 <Link key={link.to} to={tenantPath(link.to)}>
@@ -223,12 +221,10 @@ export function PlatformLegalPage({
               <Icon className="w-8 h-8 text-slate-500 dark:text-slate-400" aria-hidden="true" />
             </div>
             <h2 className="text-xl font-semibold text-theme-primary">
-              Questions About This Document?
+              {t('platform.cta_title')}
             </h2>
             <p className="text-theme-muted text-sm max-w-lg mx-auto">
-              If you have questions about this platform-level document, contact the Project NEXUS
-              team. For questions about your community&apos;s policies, contact{' '}
-              <strong>{tenantName}</strong> directly.
+              {t('platform.cta_body', { tenant: tenantName })}
             </p>
             <div className="flex justify-center gap-3 flex-wrap">
               <a
@@ -240,7 +236,7 @@ export function PlatformLegalPage({
                   className="bg-gradient-to-r from-slate-600 to-blue-600 text-white"
                   startContent={<ExternalLink className="w-4 h-4" aria-hidden="true" />}
                 >
-                  Project NEXUS Website
+                  {t('platform.nexus_website')}
                 </Button>
               </a>
               <Link to={tenantPath('/contact')}>
@@ -248,7 +244,7 @@ export function PlatformLegalPage({
                   variant="flat"
                   className="bg-theme-elevated text-theme-primary"
                 >
-                  Contact {tenantName}
+                  {t('platform.contact_tenant', { tenant: tenantName })}
                 </Button>
               </Link>
             </div>

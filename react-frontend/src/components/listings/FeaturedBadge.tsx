@@ -8,6 +8,7 @@
  */
 
 import { Star } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 interface FeaturedBadgeProps {
   className?: string;
@@ -15,6 +16,7 @@ interface FeaturedBadgeProps {
 }
 
 export function FeaturedBadge({ className = '', size = 'sm' }: FeaturedBadgeProps) {
+  const { t } = useTranslation('listings');
   const sizeClasses = size === 'sm'
     ? 'text-[10px] px-1.5 py-0.5 gap-0.5'
     : 'text-xs px-2 py-1 gap-1';
@@ -23,10 +25,10 @@ export function FeaturedBadge({ className = '', size = 'sm' }: FeaturedBadgeProp
     <span
       className={`inline-flex items-center rounded-full font-medium
         bg-amber-500/20 text-amber-600 dark:text-amber-400 ${sizeClasses} ${className}`}
-      aria-label="Featured listing"
+      aria-label={t('featured_badge', 'Featured listing')}
     >
       <Star className={size === 'sm' ? 'w-3 h-3' : 'w-3.5 h-3.5'} fill="currentColor" />
-      Featured
+      {t('featured', 'Featured')}
     </span>
   );
 }

@@ -10,6 +10,7 @@
  */
 
 import { useState, useMemo, useCallback, type ReactNode } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   Table,
   TableHeader,
@@ -82,6 +83,7 @@ export function DataTable<T extends Record<string, any>>({
   topContent,
   emptyContent,
 }: DataTableProps<T>) {
+  const { t } = useTranslation('admin');
   const [searchValue, setSearchValue] = useState('');
   const [sortDescriptor, setSortDescriptor] = useState<SortDescriptor | undefined>(undefined);
 
@@ -144,7 +146,7 @@ export function DataTable<T extends Record<string, any>>({
               variant="flat"
               size="sm"
               onPress={onRefresh}
-              aria-label="Refresh"
+              aria-label={t('data_table.refresh')}
             >
               <RefreshCw size={16} />
             </Button>
@@ -177,7 +179,7 @@ export function DataTable<T extends Record<string, any>>({
 
   return (
     <Table
-      aria-label="Admin data table"
+      aria-label={t('data_table.admin_data_table')}
       selectionMode={selectable ? 'multiple' : 'none'}
       onSelectionChange={selectable ? handleSelectionChange : undefined}
       sortDescriptor={sortDescriptor}
@@ -204,7 +206,7 @@ export function DataTable<T extends Record<string, any>>({
       <TableBody
         isLoading={isLoading}
         loadingContent={<Spinner size="lg" />}
-        emptyContent={emptyContent || 'No data found'}
+        emptyContent={emptyContent || t('data_table.no_data')}
       >
         {sortedData.map((item) => (
           <TableRow key={String(item[keyField])}>

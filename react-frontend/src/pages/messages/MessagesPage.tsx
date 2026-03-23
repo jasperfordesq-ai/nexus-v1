@@ -42,7 +42,7 @@ function getOtherUser(conv: Conversation) {
   }
   // Fallback to participant (deprecated)
   const p = conv.participant;
-  if (!p) return { id: 0, name: 'Unknown', avatar: null, is_online: false };
+  if (!p) return { id: 0, name: 'Unknown User', avatar: null, is_online: false };
   return {
     id: p.id,
     name: p.name || `${p.first_name || ''} ${p.last_name || ''}`.trim(),
@@ -571,7 +571,7 @@ export function MessagesPage() {
             </Button>
           </GlassCard>
         ) : isLoading ? (
-          <div className="space-y-3" aria-label="Loading conversations" aria-busy="true">
+          <div className="space-y-3" aria-label={t('aria_loading_conversations')} aria-busy="true">
             {[1, 2, 3, 4, 5].map((i) => (
               <GlassCard key={i} className="p-4">
                 <div className="flex items-center gap-4">
@@ -622,7 +622,7 @@ export function MessagesPage() {
       ) : (
         // Archived view
         isLoadingArchived ? (
-          <div className="space-y-3" aria-label="Loading archived conversations" aria-busy="true">
+          <div className="space-y-3" aria-label={t('aria_loading_archived')} aria-busy="true">
             {[1, 2, 3].map((i) => (
               <GlassCard key={i} className="p-4">
                 <div className="flex items-center gap-4">
@@ -680,6 +680,7 @@ interface ConversationCardProps {
 }
 
 function ConversationCard({ conversation }: ConversationCardProps) {
+  const { t } = useTranslation('messages');
   const { tenantPath } = useTenant();
   const other_user = getOtherUser(conversation);
   const { last_message, unread_count } = conversation;
@@ -687,7 +688,7 @@ function ConversationCard({ conversation }: ConversationCardProps) {
   return (
     <Link
       to={tenantPath(`/messages/${conversation.id}`)}
-      aria-label={`Conversation with ${other_user.name}${unread_count > 0 ? `, ${unread_count} unread message${unread_count > 1 ? 's' : ''}` : ''}`}
+      aria-label={unread_count > 0 ? t('aria_conversation_unread', { name: other_user.name, count: unread_count }) : t('aria_conversation', { name: other_user.name })}
     >
       <GlassCard className="p-4 hover:bg-theme-hover transition-colors">
         <div className="flex items-center gap-4">

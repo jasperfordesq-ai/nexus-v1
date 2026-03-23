@@ -19,6 +19,7 @@
 import { memo, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { Tooltip } from '@heroui/react';
+import { useTranslation } from 'react-i18next';
 import { usePresenceOptional, type PresenceStatus } from '@/contexts/PresenceContext';
 
 interface PresenceIndicatorProps {
@@ -63,49 +64,31 @@ function getStatusColor(status: PresenceStatus): string {
 }
 
 /**
- * Human-readable status label.
+ * Human-readable status label key.
  */
-function getStatusLabel(status: PresenceStatus): string {
-  switch (status) {
-    case 'online':
-      return 'Online';
-    case 'away':
-      return 'Away';
-    case 'dnd':
-      return 'Do Not Disturb';
-    case 'offline':
-    default:
-      return 'Offline';
-  }
-}
+const STATUS_LABEL_KEYS: Record<string, string> = {
+  online: 'presence.online',
+  away: 'presence.away',
+  dnd: 'presence.dnd',
+  offline: 'presence.offline',
+};
 
 /**
  * Format "last seen" as a relative timestamp.
  */
-function formatLastSeen(lastSeen: string | null): string {
-  if (!lastSeen) return '';
-
-  const now = Date.now();
-  const then = new Date(lastSeen).getTime();
-  const diffMs = now - then;
-
-  if (diffMs < 60_000) return 'Just now';
-
-  const diffMin = Math.floor(diffMs / 60_000);
-  if (diffMin < 60) return `${diffMin}m ago`;
-
-  const diffHours = Math.floor(diffMin / 60);
-  if (diffHours < 24) return `${diffHours}h ago`;
-
-  const diffDays = Math.floor(diffHours / 24);
-  return `${diffDays}d ago`;
-}
+const LAST_SEEN_KEYS = {
+  just_now: 'presence.just_now',
+  minutes_ago: 'presence.minutes_ago',
+  hours_ago: 'presence.hours_ago',
+  days_ago: 'presence.days_ago',
+};
 
 export const PresenceIndicator = memo(function PresenceIndicator({
   userId,
   size = 'md',
   className,
 }: PresenceIndicatorProps) {
+  const { t } = useTranslation('social');
   const presence = usePresenceOptional();
 
   const presenceState = useMemo(() => {
@@ -123,6 +106,23 @@ export const PresenceIndicator = memo(function PresenceIndicator({
   const sizeClass = sizeClasses[size];
   const ringClass = ringClasses[size];
 
+  const statusLabel = t(STATUS_LABEL_KEYS[status] ?? STATUS_LABEL_KEYS.offline);
+
+  // Format last seen
+  const formatLastSeen = (lastSeen: string | null): string => {
+    if (!lastSeen) return '';
+    const now = Date.now();
+    const then = new Date(lastSeen).getTime();
+    const diffMs = now - then;
+    if (diffMs < 60_000) return t(LAST_SEEN_KEYS.just_now, 'Just now');
+    const diffMin = Math.floor(diffMs / 60_000);
+    if (diffMin < 60) return t(LAST_SEEN_KEYS.minutes_ago, '{{count}}m ago', { count: diffMin });
+    const diffHours = Math.floor(diffMin / 60);
+    if (diffHours < 24) return t(LAST_SEEN_KEYS.hours_ago, '{{count}}h ago', { count: diffHours });
+    const diffDays = Math.floor(diffHours / 24);
+    return t(LAST_SEEN_KEYS.days_ago, '{{count}}d ago', { count: diffDays });
+  };
+
   // Build tooltip content
   const tooltipLines: string[] = [];
   if (status_emoji && custom_status) {
@@ -130,10 +130,10 @@ export const PresenceIndicator = memo(function PresenceIndicator({
   } else if (custom_status) {
     tooltipLines.push(custom_status);
   } else {
-    tooltipLines.push(getStatusLabel(status));
+    tooltipLines.push(statusLabel);
   }
   if (status === 'away' && last_seen_at) {
-    tooltipLines.push(`Last seen ${formatLastSeen(last_seen_at)}`);
+    tooltipLines.push(t('presence.last_seen', 'Last seen {{time}}', { time: formatLastSeen(last_seen_at) }));
   }
 
   const tooltipContent = tooltipLines.join(' \u2022 ');
@@ -142,7 +142,7 @@ export const PresenceIndicator = memo(function PresenceIndicator({
     <Tooltip content={tooltipContent} placement="top" delay={300}>
       <div
         className={`absolute bottom-0 right-0 ${className ?? ''}`}
-        aria-label={getStatusLabel(status)}
+        aria-label={statusLabel}
         role="status"
       >
         {status === 'online' ? (

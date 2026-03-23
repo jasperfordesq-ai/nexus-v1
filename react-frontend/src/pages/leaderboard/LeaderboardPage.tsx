@@ -161,7 +161,7 @@ function SeasonCard() {
 
   if (isLoading) {
     return (
-      <GlassCard className="p-5" aria-label="Loading season" aria-busy="true">
+      <GlassCard className="p-5" aria-label={t('leaderboard.season.loading', 'Loading season')} aria-busy="true">
         <div className="space-y-3">
           <Skeleton className="rounded-lg">
             <div className="h-5 rounded-lg bg-default-300 w-1/3" />
@@ -584,7 +584,7 @@ export function LeaderboardPage() {
       {!error && (
         <>
           {isLoading ? (
-            <GlassCard className="divide-y divide-white/5" aria-label="Loading leaderboard" aria-busy="true">
+            <GlassCard className="divide-y divide-white/5" aria-label={t('leaderboard.loading', 'Loading leaderboard')} aria-busy="true">
               {Array.from({ length: 8 }).map((_, i) => (
                 <div key={i} className="flex items-center gap-4 p-4">
                   <Skeleton className="rounded-full flex-shrink-0">

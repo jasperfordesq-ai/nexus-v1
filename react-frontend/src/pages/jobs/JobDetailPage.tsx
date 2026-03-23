@@ -1181,12 +1181,12 @@ export function JobDetailPage() {
             <div className="flex gap-2 flex-wrap">
               <Link to={tenantPath(`/jobs/${vacancy.id}/edit`)}>
                 <Button size="sm" variant="flat" className="bg-theme-elevated text-theme-muted" startContent={<Edit3 className="w-4 h-4" aria-hidden="true" />}>
-                  Edit
+                  {t('detail.edit')}
                 </Button>
               </Link>
               <Link to={tenantPath(`/jobs/${vacancy.id}/analytics`)}>
                 <Button size="sm" variant="flat" className="bg-theme-elevated text-theme-muted" startContent={<BarChart3 className="w-4 h-4" aria-hidden="true" />}>
-                  Analytics
+                  {t('detail.analytics')}
                 </Button>
               </Link>
               <Link to={tenantPath(`/jobs/${vacancy.id}/kanban`)}>
@@ -1270,7 +1270,7 @@ export function JobDetailPage() {
                   {pendingInterview.duration_mins && (
                     <span className="flex items-center gap-1">
                       <Clock className="w-3.5 h-3.5" aria-hidden="true" />
-                      {pendingInterview.duration_mins} min
+                      {pendingInterview.duration_mins} {t('interview.minutes', 'min')}
                     </span>
                   )}
                 </div>
@@ -1458,7 +1458,7 @@ export function JobDetailPage() {
                       .replace('youtu.be/', 'youtube.com/embed/')}
                     className="w-full h-full"
                     allowFullScreen
-                    title="Company culture video"
+                    title={t('branding.video_label')}
                   />
                 </div>
               )}

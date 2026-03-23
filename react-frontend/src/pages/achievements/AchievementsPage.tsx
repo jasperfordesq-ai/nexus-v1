@@ -214,7 +214,7 @@ function DailyRewardWidget() {
 
   if (isLoading) {
     return (
-      <GlassCard className="p-4" aria-label="Loading daily reward" aria-busy="true">
+      <GlassCard className="p-4" aria-label={t('achievements.daily_reward.loading', 'Loading daily reward')} aria-busy="true">
         <div className="flex items-center gap-4">
           <Skeleton className="rounded-full flex-shrink-0"><div className="w-12 h-12 rounded-full bg-default-300" /></Skeleton>
           <div className="flex-1 space-y-2">
@@ -1232,7 +1232,7 @@ export function AchievementsPage() {
       {!error && (
         <>
           {isLoading ? (
-            <div aria-label="Loading achievements" aria-busy="true" className="space-y-6">
+            <div aria-label={t('achievements.loading', 'Loading achievements')} aria-busy="true" className="space-y-6">
               {/* Daily reward skeleton */}
               <GlassCard className="p-4">
                 <div className="flex items-center gap-4">

@@ -16,6 +16,7 @@
 
 import { useMemo } from 'react';
 import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
 import { Button, Chip } from '@heroui/react';
 import DOMPurify from 'dompurify';
@@ -195,6 +196,7 @@ interface Props {
 }
 
 export function CustomLegalDocument({ document: doc, accentColor = 'blue' }: Props) {
+  const { t } = useTranslation('legal');
   const { tenantPath } = useTenant();
   const styles = ACCENT_STYLES[accentColor] ?? ACCENT_STYLES.blue;
   const sections = useMemo(() => parseSections(doc.content), [doc.content]);
@@ -230,12 +232,11 @@ export function CustomLegalDocument({ document: doc, accentColor = 'blue' }: Pro
               <>
                 <CalendarDays className="w-4 h-4" aria-hidden="true" />
                 <span>
-                  Effective:{' '}
-                  {new Date(doc.effective_date).toLocaleDateString('en-IE', {
+                  {t('custom.effective_label', { date: new Date(doc.effective_date).toLocaleDateString('en-IE', {
                     year: 'numeric',
                     month: 'long',
                     day: 'numeric',
-                  })}
+                  }) })}
                 </span>
               </>
             )}
@@ -259,7 +260,7 @@ export function CustomLegalDocument({ document: doc, accentColor = 'blue' }: Pro
           <GlassCard className="p-5 sm:p-6">
             <h2 className="text-sm font-semibold text-theme-primary mb-3 flex items-center gap-2 uppercase tracking-wider">
               <List className="w-4 h-4" aria-hidden="true" />
-              Contents
+              {t('custom.contents')}
             </h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5">
               {sections.map((section, idx) => {
@@ -332,23 +333,23 @@ export function CustomLegalDocument({ document: doc, accentColor = 'blue' }: Pro
                   className="inline-flex items-center gap-2 text-sm text-theme-muted hover:text-theme-primary transition-colors"
                 >
                   <History className="w-4 h-4" aria-hidden="true" />
-                  View previous versions of this document
+                  {t('custom.view_previous_versions')}
                 </Link>
               </div>
             )}
             <div>
               <h2 className="text-xl font-semibold text-theme-primary mb-2">
-                Have Questions?
+                {t('custom.cta_title')}
               </h2>
               <p className="text-theme-muted text-sm mb-4">
-                If you have any questions about this document, please contact us.
+                {t('custom.cta_body')}
               </p>
               <Link to={tenantPath('/contact')}>
                 <Button
                   className={styles.btnGradient}
                   startContent={<Send className="w-4 h-4" aria-hidden="true" />}
                 >
-                  Contact Us
+                  {t('custom.contact_us')}
                 </Button>
               </Link>
             </div>

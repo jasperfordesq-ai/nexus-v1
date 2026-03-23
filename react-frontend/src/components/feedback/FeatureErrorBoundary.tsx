@@ -12,6 +12,7 @@ import { Component, type ReactNode, type ErrorInfo } from 'react';
 import { motion } from 'framer-motion';
 import { AlertTriangle, RefreshCw } from 'lucide-react';
 import { Button } from '@heroui/react';
+import i18n from 'i18next';
 import { GlassCard } from '@/components/ui';
 import { logError } from '@/lib/logger';
 
@@ -69,10 +70,10 @@ export class FeatureErrorBoundary extends Component<
               <AlertTriangle className="w-6 h-6 text-amber-400" />
             </div>
             <h3 className="text-lg font-semibold text-theme-primary mb-2">
-              Something went wrong
+              {i18n.t('error_boundary.title', { ns: 'common' })}
             </h3>
             <p className="text-theme-muted text-sm mb-4">
-              We couldn&apos;t load {this.props.featureName}. This section may be temporarily unavailable.
+              {i18n.t('feature_error.load_failed', { ns: 'common', feature: this.props.featureName })}
             </p>
             <Button
               variant="flat"
@@ -80,7 +81,7 @@ export class FeatureErrorBoundary extends Component<
               startContent={<RefreshCw className="w-4 h-4" />}
               onPress={this.handleRetry}
             >
-              Try Again
+              {i18n.t('error_boundary.try_again', { ns: 'common' })}
             </Button>
           </GlassCard>
         </motion.div>

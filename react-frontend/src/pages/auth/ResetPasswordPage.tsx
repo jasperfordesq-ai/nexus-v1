@@ -171,7 +171,7 @@ export function ResetPasswordPage() {
                     variant="light"
                     className="min-w-0 w-auto h-auto p-0 text-theme-subtle"
                     onPress={() => setShowPassword(!showPassword)}
-                    aria-label={showPassword ? 'Hide password' : 'Show password'}
+                    aria-label={showPassword ? t('reset_password.hide_password', { defaultValue: 'Hide password' }) : t('reset_password.show_password', { defaultValue: 'Show password' })}
                   >
                     {showPassword ? <EyeOff className="w-4 h-4" aria-hidden="true" /> : <Eye className="w-4 h-4" aria-hidden="true" />}
                   </Button>

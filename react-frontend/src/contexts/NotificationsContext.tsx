@@ -24,6 +24,7 @@ import {
   type ReactNode,
 } from 'react';
 import Pusher, { type Channel } from 'pusher-js';
+import i18n from 'i18next';
 import { api, tokenManager } from '@/lib/api';
 import { logError } from '@/lib/logger';
 import { useAuth } from './AuthContext';
@@ -322,15 +323,15 @@ export function NotificationsProvider({ children }: NotificationsProviderProps) 
           },
         }));
         const text = data.body || data.preview || data.message || '';
-        toast.info('New Message', text.substring(0, 50) || 'You have a new message');
+        toast.info(i18n.t('realtime.new_message', { ns: 'notifications' }), text.substring(0, 50) || i18n.t('realtime.new_message_fallback', { ns: 'notifications' }));
       });
 
       // Transaction events
       channel.bind('transaction', (data: { type: string; amount: number }) => {
         refreshCounts();
         toast.success(
-          'Transaction Complete',
-          `${data.type === 'credit' ? '+' : '-'}${data.amount} time credits`
+          i18n.t('realtime.transaction_complete', { ns: 'notifications' }),
+          i18n.t('realtime.transaction_amount', { ns: 'notifications', sign: data.type === 'credit' ? '+' : '-', amount: data.amount })
         );
       });
 
@@ -423,28 +424,29 @@ export function useNotifications(): NotificationsContextValue {
 // ─────────────────────────────────────────────────────────────────────────────
 
 function getToastConfig(type: string): { title: string } {
+  const t = (key: string, fallback: string) => i18n.t(`realtime.toast_${key}`, { ns: 'notifications', defaultValue: fallback });
   const configs: Record<string, { title: string }> = {
-    message: { title: 'New Message' },
-    listing: { title: 'Listing Update' },
-    transaction: { title: 'Transaction' },
-    connection: { title: 'Connection Request' },
-    event: { title: 'Event Update' },
-    group: { title: 'Group Notification' },
-    achievement: { title: 'Achievement Unlocked!' },
-    broker_review: { title: 'Message for Review' },
-    system: { title: 'System Notification' },
-    vol_application_received: { title: 'New Application' },
-    vol_application_approved: { title: 'Application Approved' },
-    vol_application_declined: { title: 'Application Declined' },
-    vol_application_withdrawn: { title: 'Application Withdrawn' },
-    vol_shift_signup: { title: 'Shift Sign-up' },
-    vol_shift_cancelled: { title: 'Shift Cancelled' },
-    vol_hours_approved: { title: 'Hours Approved' },
-    vol_hours_declined: { title: 'Hours Declined' },
-    vol_opportunity_closed: { title: 'Opportunity Closed' },
+    message: { title: t('message', 'New Message') },
+    listing: { title: t('listing', 'Listing Update') },
+    transaction: { title: t('transaction', 'Transaction') },
+    connection: { title: t('connection', 'Connection Request') },
+    event: { title: t('event', 'Event Update') },
+    group: { title: t('group', 'Group Notification') },
+    achievement: { title: t('achievement', 'Achievement Unlocked!') },
+    broker_review: { title: t('broker_review', 'Message for Review') },
+    system: { title: t('system', 'System Notification') },
+    vol_application_received: { title: t('vol_application_received', 'New Application') },
+    vol_application_approved: { title: t('vol_application_approved', 'Application Approved') },
+    vol_application_declined: { title: t('vol_application_declined', 'Application Declined') },
+    vol_application_withdrawn: { title: t('vol_application_withdrawn', 'Application Withdrawn') },
+    vol_shift_signup: { title: t('vol_shift_signup', 'Shift Sign-up') },
+    vol_shift_cancelled: { title: t('vol_shift_cancelled', 'Shift Cancelled') },
+    vol_hours_approved: { title: t('vol_hours_approved', 'Hours Approved') },
+    vol_hours_declined: { title: t('vol_hours_declined', 'Hours Declined') },
+    vol_opportunity_closed: { title: t('vol_opportunity_closed', 'Opportunity Closed') },
   };
 
-  return configs[type] || { title: 'Notification' };
+  return configs[type] || { title: t('default', 'Notification') };
 }
 
 export default NotificationsContext;

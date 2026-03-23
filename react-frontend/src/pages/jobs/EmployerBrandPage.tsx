@@ -139,7 +139,7 @@ export function EmployerBrandPage() {
             <div className="flex flex-wrap gap-2 mt-2">
               {employer?.company_size && (
                 <Chip size="sm" variant="flat" startContent={<Building2 size={12} />}>
-                  {employer.company_size} employees
+                  {t('employer.employees', '{{size}} employees', { size: employer.company_size })}
                 </Chip>
               )}
               <Chip size="sm" variant="flat" color="primary" startContent={<Briefcase size={12} />}>

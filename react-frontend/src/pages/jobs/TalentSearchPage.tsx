@@ -186,10 +186,10 @@ export function TalentSearchPage() {
     const now = new Date();
     const diffDays = Math.floor((now.getTime() - date.getTime()) / (1000 * 60 * 60 * 24));
 
-    if (diffDays === 0) return 'Today';
-    if (diffDays === 1) return 'Yesterday';
-    if (diffDays < 7) return `${diffDays} days ago`;
-    if (diffDays < 30) return `${Math.floor(diffDays / 7)} weeks ago`;
+    if (diffDays === 0) return t('talent_search.today', 'Today');
+    if (diffDays === 1) return t('talent_search.yesterday', 'Yesterday');
+    if (diffDays < 7) return t('talent_search.days_ago', '{{count}} days ago', { count: diffDays });
+    if (diffDays < 30) return t('talent_search.weeks_ago', '{{count}} weeks ago', { count: Math.floor(diffDays / 7) });
     return date.toLocaleDateString();
   };
 
@@ -258,7 +258,7 @@ export function TalentSearchPage() {
                 placeholder={t('talent_search.skills_placeholder')}
                 value={skillsInput}
                 onChange={(e) => setSkillsInput(e.target.value)}
-                description="Comma-separated skills"
+                description={t('talent_search.skills_description', 'Comma-separated skills')}
                 classNames={{
                   input: 'bg-transparent text-theme-primary',
                   inputWrapper: 'bg-theme-elevated border-theme-default hover:bg-theme-hover',
@@ -298,7 +298,7 @@ export function TalentSearchPage() {
                   color="secondary"
                   onClose={() => setSkillsInput('')}
                 >
-                  Skills: {skillsInput}
+                  {t('talent_search.skills_chip', 'Skills: {{skills}}', { skills: skillsInput })}
                 </Chip>
               )}
               {locationInput.trim() && (

@@ -504,7 +504,7 @@ export function LoginPage() {
                           variant="light"
                           className="min-w-0 w-auto h-auto p-0 text-theme-subtle"
                           onPress={() => setShowPassword(!showPassword)}
-                          aria-label={showPassword ? 'Hide password' : 'Show password'}
+                          aria-label={showPassword ? t('login.hide_password', { defaultValue: 'Hide password' }) : t('login.show_password', { defaultValue: 'Show password' })}
                         >
                           {showPassword ? (
                             <EyeOff className="w-4 h-4" aria-hidden="true" />

@@ -46,7 +46,7 @@ const itemVariants = {
 export function FaqPage() {
   const { t } = useTranslation('public');
   const { tenantPath } = useTenant();
-  usePageTitle('FAQ');
+  usePageTitle(t('faq.title'));
 
   const [searchQuery, setSearchQuery] = useState('');
 

@@ -29,14 +29,14 @@ export interface ReactionConfig {
 }
 
 export const REACTION_CONFIGS: ReactionConfig[] = [
-  { type: 'like', emoji: '\uD83D\uDC4D', label: 'Like' },
-  { type: 'love', emoji: '\u2764\uFE0F', label: 'Love' },
-  { type: 'laugh', emoji: '\uD83D\uDE02', label: 'Laugh' },
-  { type: 'wow', emoji: '\uD83D\uDE2E', label: 'Wow' },
-  { type: 'sad', emoji: '\uD83D\uDE22', label: 'Sad' },
-  { type: 'celebrate', emoji: '\uD83C\uDF89', label: 'Celebrate' },
-  { type: 'clap', emoji: '\uD83D\uDC4F', label: 'Clap' },
-  { type: 'time_credit', emoji: '\u23F0', label: 'Time Credit' },
+  { type: 'like', emoji: '\uD83D\uDC4D', label: 'reaction.like' },
+  { type: 'love', emoji: '\u2764\uFE0F', label: 'reaction.love' },
+  { type: 'laugh', emoji: '\uD83D\uDE02', label: 'reaction.laugh' },
+  { type: 'wow', emoji: '\uD83D\uDE2E', label: 'reaction.wow' },
+  { type: 'sad', emoji: '\uD83D\uDE22', label: 'reaction.sad' },
+  { type: 'celebrate', emoji: '\uD83C\uDF89', label: 'reaction.celebrate' },
+  { type: 'clap', emoji: '\uD83D\uDC4F', label: 'reaction.clap' },
+  { type: 'time_credit', emoji: '\u23F0', label: 'reaction.time_credit' },
 ];
 
 /** Map from reaction type to its emoji */
@@ -174,7 +174,7 @@ export function ReactionPicker({
 
   const currentConfig = userReaction ? REACTION_CONFIGS.find((r) => r.type === userReaction) : null;
 
-  const buttonLabel = currentConfig ? currentConfig.label : t('card.like_action', 'Like');
+  const buttonLabel = currentConfig ? t(currentConfig.label) : t('card.like_action', 'Like');
   const buttonEmoji = currentConfig ? currentConfig.emoji : null;
 
   // Color based on reaction type
@@ -226,7 +226,7 @@ export function ReactionPicker({
               {REACTION_CONFIGS.map((config) => (
                 <Tooltip
                   key={config.type}
-                  content={config.label}
+                  content={t(config.label)}
                   delay={200}
                   closeDelay={0}
                   size="sm"
@@ -242,13 +242,13 @@ export function ReactionPicker({
                         : 'hover:bg-[var(--surface-hover)]'
                       }`}
                     onClick={() => handleSelectReaction(config.type)}
-                    aria-label={config.label}
+                    aria-label={t(config.label)}
                     type="button"
                   >
                     {config.type === 'time_credit' ? (
                       <Clock className="w-5 h-5 text-purple-400" aria-hidden="true" />
                     ) : (
-                      <span role="img" aria-label={config.label}>{config.emoji}</span>
+                      <span role="img" aria-label={t(config.label)}>{config.emoji}</span>
                     )}
                   </motion.button>
                 </Tooltip>
@@ -281,7 +281,7 @@ export function ReactionPicker({
         onTouchStart={handleTouchStart}
         onTouchEnd={handleTouchEnd}
         isDisabled={!isAuthenticated || isDisabled}
-        aria-label={userReaction ? `${buttonLabel} (click to remove)` : 'React to this post'}
+        aria-label={userReaction ? t('reaction.click_to_remove', '{{label}} (click to remove)', { label: buttonLabel }) : t('reaction.react_to_post', 'React to this post')}
       >
         {buttonLabel}
       </Button>

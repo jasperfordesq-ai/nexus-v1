@@ -197,7 +197,7 @@ export function MessageInputArea({
                 size="sm"
                 className="absolute -top-1 -right-1 w-4 h-4 min-w-0 bg-red-500 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
                 onPress={() => onRemoveAttachment(index)}
-                aria-label={`Remove ${item.file.name}`}
+                aria-label={t('aria_remove_attachment', { name: item.file.name })}
               >
                 <X className="w-2.5 h-2.5 text-white" aria-hidden="true" />
               </Button>
@@ -274,7 +274,7 @@ export function MessageInputArea({
             <Button
               type="submit"
               isIconOnly
-              aria-label="Send message"
+              aria-label={t('aria_send_message')}
               className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white dark:text-white"
               isLoading={isSending}
             >

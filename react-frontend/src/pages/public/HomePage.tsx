@@ -131,7 +131,7 @@ const howItWorks = [
 
 export function HomePage() {
   const { t } = useTranslation('public');
-  usePageTitle('Home');
+  usePageTitle(t('nav.home', { ns: 'common', defaultValue: 'Home' }));
   const { branding, tenantPath } = useTenant();
   const { isAuthenticated } = useAuth();
   const [platformStats, setPlatformStats] = useState<PlatformStats | null>(null);

@@ -4,6 +4,7 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import { useState, useEffect, useRef } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Button } from '@heroui/react';
 import { Play, Pause } from 'lucide-react';
 import { resolveAssetUrl } from '@/lib/helpers';
@@ -17,6 +18,7 @@ export interface VoiceMessagePlayerProps {
  * Voice message player component
  */
 export function VoiceMessagePlayer({ audioUrl, audioBlob }: VoiceMessagePlayerProps) {
+  const { t } = useTranslation('messages');
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
@@ -83,7 +85,7 @@ export function VoiceMessagePlayer({ audioUrl, audioBlob }: VoiceMessagePlayerPr
         variant="light"
         className="w-8 h-8 min-w-0 bg-black/20 dark:bg-white/20 rounded-full"
         onPress={togglePlay}
-        aria-label={isPlaying ? 'Pause' : 'Play'}
+        aria-label={isPlaying ? t('voice_pause') : t('voice_play')}
       >
         {isPlaying ? (
           <Pause className="w-4 h-4" aria-hidden="true" />

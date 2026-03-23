@@ -5,6 +5,7 @@
 
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { useTenant } from '@/contexts';
 import { usePageTitle } from '@/hooks/usePageTitle';
 
@@ -20,9 +21,10 @@ import { usePageTitle } from '@/hooks/usePageTitle';
  *   - /matches?type=mutual (mutual match email)
  */
 export default function MatchesRedirectPage() {
+  const { t } = useTranslation('matches');
   const navigate = useNavigate();
   const { tenantPath } = useTenant();
-  usePageTitle('Matches');
+  usePageTitle(t('page_title'));
 
   useEffect(() => {
     navigate(tenantPath('/listings'), { replace: true });

@@ -46,26 +46,29 @@ import {
   Rocket,
   ChevronRight,
 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { usePageTitle } from '@/hooks';
 import { useTenant, useToast } from '@/contexts';
 import { adminDashboard } from '../../api/adminApi';
 import { StatCard, PageHeader } from '../../components';
 import type { AdminDashboardStats, ActivityLogEntry, MonthlyTrend } from '../../api/types';
 
-/** Quick action items matching the legacy PHP dashboard sidebar */
-const QUICK_ACTIONS = [
-  { label: 'Manage Users', path: '/admin/users', icon: UserPlus, color: 'text-primary bg-primary/10' },
-  { label: 'View Listings', path: '/admin/listings', icon: ListChecks, color: 'text-success bg-success/10' },
-  { label: 'Send Newsletter', path: '/admin/newsletters', icon: Send, color: 'text-secondary bg-secondary/10' },
-  { label: 'New Blog Post', path: '/admin/blog/create', icon: PenSquare, color: 'text-danger bg-danger/10' },
-  { label: 'Gamification', path: '/admin/gamification', icon: Trophy, color: 'text-warning bg-warning/10' },
-  { label: 'Settings', path: '/admin/settings', icon: Settings, color: 'text-default-600 bg-default/20' },
-] as const;
-
 export function AdminDashboard() {
-  usePageTitle('Admin Dashboard');
+  const { t } = useTranslation('admin_dashboard');
+  const { t: tAdmin } = useTranslation('admin');
+  usePageTitle(t('title'));
   const { tenantPath } = useTenant();
   const toast = useToast();
+
+  /** Quick action items matching the legacy PHP dashboard sidebar */
+  const QUICK_ACTIONS = [
+    { label: t('quick_actions.manage_users'), path: '/admin/users', icon: UserPlus, color: 'text-primary bg-primary/10' },
+    { label: t('quick_actions.view_listings'), path: '/admin/listings', icon: ListChecks, color: 'text-success bg-success/10' },
+    { label: t('quick_actions.send_newsletter'), path: '/admin/newsletters', icon: Send, color: 'text-secondary bg-secondary/10' },
+    { label: t('quick_actions.new_blog_post'), path: '/admin/blog/create', icon: PenSquare, color: 'text-danger bg-danger/10' },
+    { label: t('quick_actions.gamification'), path: '/admin/gamification', icon: Trophy, color: 'text-warning bg-warning/10' },
+    { label: t('quick_actions.settings'), path: '/admin/settings', icon: Settings, color: 'text-default-600 bg-default/20' },
+  ] as const;
 
   const [stats, setStats] = useState<AdminDashboardStats | null>(null);
   const [activity, setActivity] = useState<ActivityLogEntry[]>([]);
@@ -95,7 +98,7 @@ export function AdminDashboard() {
         setTrends(Array.isArray(trendsRes.data) ? trendsRes.data : []);
       }
     } catch {
-      toast.error('Failed to load dashboard data');
+      toast.error(t('load_error'));
     } finally {
       setLoading(false);
     }
@@ -108,8 +111,8 @@ export function AdminDashboard() {
   return (
     <div>
       <PageHeader
-        title="Dashboard"
-        description="Overview of your community platform"
+        title={t('title')}
+        description={t('subtitle')}
         actions={
           <Button
             variant="flat"
@@ -118,7 +121,7 @@ export function AdminDashboard() {
             isLoading={loading}
             size="sm"
           >
-            Refresh
+            {t('refresh')}
           </Button>
         }
       />
@@ -126,28 +129,28 @@ export function AdminDashboard() {
       {/* Stats Grid - Row 1: Core Metrics */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4 mb-4">
         <StatCard
-          label="Total Users"
+          label={t('stats.total_members')}
           value={stats?.total_users ?? '—'}
           icon={Users}
           color="primary"
           loading={loading}
         />
         <StatCard
-          label="Active Listings"
+          label={t('stats.active_listings')}
           value={stats?.active_listings ?? '—'}
           icon={FileCheck}
           color="success"
           loading={loading}
         />
         <StatCard
-          label="Transactions"
+          label={t('stats.transactions')}
           value={stats?.total_transactions ?? '—'}
           icon={ArrowLeftRight}
           color="secondary"
           loading={loading}
         />
         <StatCard
-          label="Hours Exchanged"
+          label={t('stats.hours_exchanged')}
           value={stats?.total_hours_exchanged ?? '—'}
           icon={Clock}
           color="warning"
@@ -158,28 +161,28 @@ export function AdminDashboard() {
       {/* Stats Grid - Row 2: This Month */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4 mb-6">
         <StatCard
-          label="New Users This Month"
+          label={t('stats.new_users_this_month')}
           value={stats?.new_users_this_month ?? '—'}
           icon={UserPlus}
           color="primary"
           loading={loading}
         />
         <StatCard
-          label="Active Users"
+          label={t('stats.active_users')}
           value={stats?.active_users ?? '—'}
           icon={UserCheck}
           color="success"
           loading={loading}
         />
         <StatCard
-          label="Total Listings"
+          label={t('stats.total_listings')}
           value={stats?.total_listings ?? '—'}
           icon={ListChecks}
           color="default"
           loading={loading}
         />
         <StatCard
-          label="New Listings This Month"
+          label={t('stats.new_listings_this_month')}
           value={stats?.new_listings_this_month ?? '—'}
           icon={ListChecks}
           color="default"
@@ -197,7 +200,7 @@ export function AdminDashboard() {
                   <UserCheck size={20} className="text-warning" />
                 </div>
                 <div className="flex-1">
-                  <p className="text-sm text-default-500">Pending Approvals</p>
+                  <p className="text-sm text-default-500">{t('alerts.pending_approvals')}</p>
                   <p className="text-lg font-bold">{stats.pending_users}</p>
                 </div>
                 <Button
@@ -207,7 +210,7 @@ export function AdminDashboard() {
                   color="warning"
                   variant="flat"
                 >
-                  Review
+                  {tAdmin('review')}
                 </Button>
               </CardBody>
             </Card>
@@ -220,7 +223,7 @@ export function AdminDashboard() {
                   <ListChecks size={20} className="text-primary" />
                 </div>
                 <div className="flex-1">
-                  <p className="text-sm text-default-500">Pending Listings</p>
+                  <p className="text-sm text-default-500">{t('alerts.pending_listings')}</p>
                   <p className="text-lg font-bold">{stats.pending_listings}</p>
                 </div>
                 <Button
@@ -230,7 +233,7 @@ export function AdminDashboard() {
                   color="primary"
                   variant="flat"
                 >
-                  Review
+                  {tAdmin('review')}
                 </Button>
               </CardBody>
             </Card>
@@ -245,7 +248,7 @@ export function AdminDashboard() {
         <Card shadow="sm">
           <CardHeader className="flex items-center gap-2 px-4 pt-4 pb-0">
             <Rocket size={18} className="text-primary" />
-            <h3 className="font-semibold">Quick Actions</h3>
+            <h3 className="font-semibold">{t('quick_actions.card_title')}</h3>
           </CardHeader>
           <CardBody className="px-4 pb-4">
             <div className="grid grid-cols-2 gap-2">
@@ -271,8 +274,8 @@ export function AdminDashboard() {
                 className="flex items-center justify-between text-sm text-primary hover:underline"
               >
                 <span className="flex items-center gap-1.5">
-                  <Chip size="sm" color="secondary" variant="flat">Enterprise</Chip>
-                  Advanced Controls
+                  <Chip size="sm" color="secondary" variant="flat">{t('quick_actions.enterprise')}</Chip>
+                  {t('quick_actions.advanced_controls')}
                 </span>
                 <ChevronRight size={14} />
               </Link>
@@ -284,7 +287,7 @@ export function AdminDashboard() {
         <Card shadow="sm">
           <CardHeader className="flex items-center gap-2 px-4 pt-4 pb-0">
             <TrendingUp size={18} className="text-primary" />
-            <h3 className="font-semibold">Monthly Trends</h3>
+            <h3 className="font-semibold">{t('trends.card_title')}</h3>
           </CardHeader>
           <CardBody className="px-4 pb-4">
             {loading ? (
@@ -293,14 +296,14 @@ export function AdminDashboard() {
               </div>
             ) : trends.length > 0 ? (
               <div className="space-y-3">
-                {trends.map((t) => (
-                  <div key={t.month} className="flex items-center justify-between">
-                    <span className="text-sm text-default-600">{t.month}</span>
+                {trends.map((trend) => (
+                  <div key={trend.month} className="flex items-center justify-between">
+                    <span className="text-sm text-default-600">{trend.month}</span>
                     <div className="flex items-center gap-4">
-                      <span className="text-sm font-medium">{t.hours} hrs</span>
+                      <span className="text-sm font-medium">{trend.hours} {t('trends.hours_suffix')}</span>
                       <div
                         className="h-2 rounded-full bg-primary"
-                        style={{ width: `${Math.min(100, (t.hours / Math.max(...trends.map((x) => x.hours || 1))) * 100)}px` }}
+                        style={{ width: `${Math.min(100, (trend.hours / Math.max(...trends.map((x) => x.hours || 1))) * 100)}px` }}
                       />
                     </div>
                   </div>
@@ -308,7 +311,7 @@ export function AdminDashboard() {
               </div>
             ) : (
               <p className="py-8 text-center text-sm text-default-400">
-                No trend data available yet
+                {t('trends.no_data')}
               </p>
             )}
           </CardBody>
@@ -319,7 +322,7 @@ export function AdminDashboard() {
           <CardHeader className="flex items-center justify-between px-4 pt-4 pb-0">
             <div className="flex items-center gap-2">
               <Activity size={18} className="text-primary" />
-              <h3 className="font-semibold">Recent Activity</h3>
+              <h3 className="font-semibold">{t('activity.card_title')}</h3>
             </div>
             <Button
               as={Link}
@@ -327,7 +330,7 @@ export function AdminDashboard() {
               size="sm"
               variant="light"
             >
-              View all
+              {t('activity.view_all')}
             </Button>
           </CardHeader>
           <CardBody className="px-4 pb-4">
@@ -354,7 +357,7 @@ export function AdminDashboard() {
               </div>
             ) : (
               <p className="py-8 text-center text-sm text-default-400">
-                No recent activity
+                {t('activity.empty')}
               </p>
             )}
           </CardBody>

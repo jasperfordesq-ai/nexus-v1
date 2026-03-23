@@ -1190,7 +1190,7 @@ export function ConversationPage() {
                   <MoreVertical className="w-4 h-4" />
                 </Button>
               </DropdownTrigger>
-              <DropdownMenu aria-label="Conversation actions">
+              <DropdownMenu aria-label={t('aria_conversation_actions')}>
                 <DropdownItem
                   key="archive"
                   startContent={<Trash2 className="w-4 h-4" />}

@@ -197,11 +197,11 @@ export function CreateEventPage() {
           setExistingImage(resolveAssetUrl(event.cover_image));
         }
       } else {
-        setLoadError('Event not found');
+        setLoadError(t('form.error_not_found'));
       }
     } catch (error) {
       logError('Failed to load event', error);
-      setLoadError('Failed to load event. Please try again.');
+      setLoadError(t('form.error_load_failed'));
     } finally {
       setIsLoading(false);
     }
@@ -715,7 +715,7 @@ export function CreateEventPage() {
                 </div>
               </div>
               <Switch
-                aria-label="Toggle recurring event"
+                aria-label={t('form.recurring_toggle_aria', 'Toggle recurring event')}
                 isSelected={formData.isRecurring}
                 onValueChange={(checked) => setFormData((prev) => ({ ...prev, isRecurring: checked }))}
                 classNames={{
@@ -735,7 +735,7 @@ export function CreateEventPage() {
                 {/* Frequency */}
                 <Select
                   label={t('form.recurrence_frequency', { defaultValue: 'Frequency' })}
-                  aria-label="Recurrence frequency"
+                  aria-label={t('form.recurrence_frequency_aria', 'Recurrence frequency')}
                   selectedKeys={[formData.recurrenceFrequency]}
                   onChange={(e) => setFormData((prev) => ({ ...prev, recurrenceFrequency: e.target.value as RecurrenceFrequency }))}
                   classNames={{
@@ -790,7 +790,7 @@ export function CreateEventPage() {
                 <div className="grid sm:grid-cols-2 gap-4">
                   <Select
                     label={t('form.recurrence_end_type', { defaultValue: 'Ends' })}
-                    aria-label="How the series ends"
+                    aria-label={t('form.recurrence_end_type_aria', 'How the series ends')}
                     selectedKeys={[formData.recurrenceEndType]}
                     onChange={(e) => setFormData((prev) => ({ ...prev, recurrenceEndType: e.target.value as RecurrenceEndType }))}
                     classNames={{

@@ -17,6 +17,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { motion, AnimatePresence, type PanInfo } from 'framer-motion';
 import { X, ChevronLeft, ChevronRight } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { createPortal } from 'react-dom';
 import { resolveAssetUrl } from '@/lib/helpers';
 import type { PostMedia } from './types';
@@ -30,6 +31,7 @@ interface ImageLightboxProps {
 const SWIPE_THRESHOLD = 80;
 
 export function ImageLightbox({ media, initialIndex = 0, onClose }: ImageLightboxProps) {
+  const { t } = useTranslation('feed');
   const [currentIndex, setCurrentIndex] = useState(initialIndex);
   const [direction, setDirection] = useState(0);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -134,7 +136,7 @@ export function ImageLightbox({ media, initialIndex = 0, onClose }: ImageLightbo
       onClick={onClose}
       role="dialog"
       aria-modal="true"
-      aria-label="Image viewer"
+      aria-label={t('lightbox.aria_label', 'Image viewer')}
       tabIndex={-1}
     >
       {/* Close button */}
@@ -145,7 +147,7 @@ export function ImageLightbox({ media, initialIndex = 0, onClose }: ImageLightbo
           e.stopPropagation();
           onClose();
         }}
-        aria-label="Close image viewer"
+        aria-label={t('lightbox.close', 'Close image viewer')}
       >
         <X className="w-6 h-6" />
       </button>
@@ -153,7 +155,7 @@ export function ImageLightbox({ media, initialIndex = 0, onClose }: ImageLightbo
       {/* Counter (screen reader live region) */}
       {total > 1 && (
         <div className="absolute top-4 left-1/2 -translate-x-1/2 z-10 text-white/80 text-sm font-medium" aria-live="polite" aria-atomic="true">
-          {currentIndex + 1} of {total}
+          {t('lightbox.counter', '{{current}} of {{total}}', { current: currentIndex + 1, total })}
         </div>
       )}
 
@@ -166,7 +168,7 @@ export function ImageLightbox({ media, initialIndex = 0, onClose }: ImageLightbo
           <motion.img
             key={currentIndex}
             src={resolveAssetUrl(current.file_url)}
-            alt={current.alt_text || `Image ${currentIndex + 1} of ${total}`}
+            alt={current.alt_text || t('carousel.image_of', 'Image {{current}} of {{total}}', { current: currentIndex + 1, total })}
             className="max-w-full max-h-full object-contain select-none rounded-lg"
             custom={direction}
             variants={slideVariants}
@@ -205,7 +207,7 @@ export function ImageLightbox({ media, initialIndex = 0, onClose }: ImageLightbo
             e.stopPropagation();
             goPrev();
           }}
-          aria-label="Previous image"
+          aria-label={t('carousel.previous', 'Previous image')}
         >
           <ChevronLeft className="w-6 h-6" />
         </button>
@@ -220,7 +222,7 @@ export function ImageLightbox({ media, initialIndex = 0, onClose }: ImageLightbo
             e.stopPropagation();
             goNext();
           }}
-          aria-label="Next image"
+          aria-label={t('carousel.next', 'Next image')}
         >
           <ChevronRight className="w-6 h-6" />
         </button>
@@ -243,7 +245,7 @@ export function ImageLightbox({ media, initialIndex = 0, onClose }: ImageLightbo
                 setDirection(idx > currentIndex ? 1 : -1);
                 setCurrentIndex(idx);
               }}
-              aria-label={`Go to image ${idx + 1}`}
+              aria-label={t('carousel.go_to_image', 'Go to image {{number}}', { number: idx + 1 })}
               aria-current={idx === currentIndex ? 'true' : undefined}
             />
           ))}

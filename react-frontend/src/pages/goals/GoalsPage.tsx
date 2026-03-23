@@ -558,7 +558,7 @@ export function GoalsPage() {
       {!error && (
         <>
           {isLoading ? (
-            <div className="space-y-4" aria-label="Loading goals" aria-busy="true">
+            <div className="space-y-4" aria-label={t('goals.loading', 'Loading goals')} aria-busy="true">
               {[1, 2, 3].map((i) => (
                 <GlassCard key={i} className="p-5">
                   <div className="space-y-3">

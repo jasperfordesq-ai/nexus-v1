@@ -8,6 +8,7 @@
  * Used before delete, ban, suspend, and other destructive operations
  */
 
+import { useTranslation } from 'react-i18next';
 import {
   Modal,
   ModalContent,
@@ -41,6 +42,7 @@ export function ConfirmModal({
   isLoading = false,
   children,
 }: ConfirmModalProps) {
+  const { t } = useTranslation('admin');
   return (
     <Modal isOpen={isOpen} onClose={onClose} size="sm">
       <ModalContent>
@@ -54,7 +56,7 @@ export function ConfirmModal({
         </ModalBody>
         <ModalFooter>
           <Button variant="flat" onPress={onClose} isDisabled={isLoading}>
-            Cancel
+            {t('cancel')}
           </Button>
           <Button
             color={confirmColor}

@@ -40,6 +40,7 @@ import {
   Heart,
   Zap,
 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
 import { formatRelativeTime } from '@/lib/helpers';
@@ -136,7 +137,7 @@ function ProgressValueBar({ data }: { data: Record<string, unknown> | undefined 
           indicator: 'bg-gradient-to-r from-indigo-500 to-purple-600',
           track: 'bg-theme-hover',
         }}
-        aria-label={`Progress: ${numVal}%`}
+        aria-label={`${numVal}%`}
       />
       <span className="text-xs text-theme-subtle">{numVal}%</span>
     </div>
@@ -146,6 +147,7 @@ function ProgressValueBar({ data }: { data: Record<string, unknown> | undefined 
 /* ───────────────────────── Component ───────────────────────── */
 
 export function GoalProgressHistory({ goalId, className = '' }: GoalProgressHistoryProps) {
+  const { t } = useTranslation('goals');
   const [events, setEvents] = useState<HistoryEvent[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -160,7 +162,7 @@ export function GoalProgressHistory({ goalId, className = '' }: GoalProgressHist
       }
     } catch (err) {
       logError('Failed to load goal history', err);
-      setError('Failed to load history.');
+      setError(t('history.load_failed'));
     } finally {
       setIsLoading(false);
     }
@@ -189,7 +191,7 @@ export function GoalProgressHistory({ goalId, className = '' }: GoalProgressHist
           startContent={<RefreshCw className="w-3.5 h-3.5" aria-hidden="true" />}
           onPress={loadHistory}
         >
-          Retry
+          {t('history.retry')}
         </Button>
       </div>
     );
@@ -199,7 +201,7 @@ export function GoalProgressHistory({ goalId, className = '' }: GoalProgressHist
     return (
       <div className={`text-center py-6 ${className}`}>
         <Clock className="w-8 h-8 text-theme-subtle mx-auto mb-2" aria-hidden="true" />
-        <p className="text-sm text-theme-muted">No activity recorded yet.</p>
+        <p className="text-sm text-theme-muted">{t('history.no_activity')}</p>
       </div>
     );
   }

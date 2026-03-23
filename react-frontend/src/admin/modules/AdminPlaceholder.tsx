@@ -9,6 +9,7 @@
  * Displays the module name and provides a link to the legacy PHP admin.
  */
 
+import { useTranslation } from 'react-i18next';
 import { Card, CardBody, Button } from '@heroui/react';
 import { Construction, ExternalLink } from 'lucide-react';
 import { usePageTitle } from '@/hooks';
@@ -21,6 +22,7 @@ interface AdminPlaceholderProps {
 }
 
 export function AdminPlaceholder({ title, description, legacyPath }: AdminPlaceholderProps) {
+  const { t } = useTranslation('admin');
   usePageTitle(`Admin - ${title}`);
 
   const apiBase = import.meta.env.VITE_API_BASE?.replace('/api', '') || '';
@@ -34,11 +36,10 @@ export function AdminPlaceholder({ title, description, legacyPath }: AdminPlaceh
             <Construction size={32} className="text-warning" />
           </div>
           <h3 className="text-lg font-semibold text-foreground">
-            Migration In Progress
+            {t('placeholder.migration_title')}
           </h3>
           <p className="mt-2 max-w-md text-sm text-default-500">
-            This module is being migrated from the legacy PHP admin panel to React.
-            Full functionality will be available here soon.
+            {t('placeholder.migration_description')}
           </p>
           {legacyPath && apiBase && (
             <Button
@@ -50,7 +51,7 @@ export function AdminPlaceholder({ title, description, legacyPath }: AdminPlaceh
               className="mt-6"
               endContent={<ExternalLink size={14} />}
             >
-              Open in Legacy Admin
+              {t('placeholder.open_legacy')}
             </Button>
           )}
         </CardBody>

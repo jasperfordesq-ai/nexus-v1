@@ -16,6 +16,7 @@
 import { useState, useCallback } from 'react';
 import { motion, AnimatePresence, type PanInfo } from 'framer-motion';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { resolveAssetUrl } from '@/lib/helpers';
 import type { PostMedia } from './types';
 import { ImageLightbox } from './ImageLightbox';
@@ -28,6 +29,7 @@ interface ImageCarouselProps {
 const SWIPE_THRESHOLD = 50;
 
 export function ImageCarousel({ media, className = '' }: ImageCarouselProps) {
+  const { t } = useTranslation('feed');
   const [currentIndex, setCurrentIndex] = useState(0);
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const [direction, setDirection] = useState(0);
@@ -98,7 +100,7 @@ export function ImageCarousel({ media, className = '' }: ImageCarouselProps) {
       <div
         className={`relative overflow-hidden rounded-xl group ${className}`}
         role="region"
-        aria-label={`Image carousel, ${currentIndex + 1} of ${total}`}
+        aria-label={t('carousel.aria_label', 'Image carousel, {{current}} of {{total}}', { current: currentIndex + 1, total })}
         aria-roledescription="carousel"
         tabIndex={0}
         onKeyDown={handleKeyDown}
@@ -126,7 +128,7 @@ export function ImageCarousel({ media, className = '' }: ImageCarouselProps) {
             >
               <img
                 src={resolveAssetUrl(current.file_url)}
-                alt={current.alt_text || `Image ${currentIndex + 1} of ${total}`}
+                alt={current.alt_text || t('carousel.image_of', 'Image {{current}} of {{total}}', { current: currentIndex + 1, total })}
                 className="w-full max-h-[500px] sm:max-h-[500px] max-sm:max-h-[400px] object-contain select-none"
                 draggable={false}
                 loading={currentIndex === 0 ? 'eager' : 'lazy'}
@@ -154,7 +156,7 @@ export function ImageCarousel({ media, className = '' }: ImageCarouselProps) {
               e.stopPropagation();
               goPrev();
             }}
-            aria-label="Previous image"
+            aria-label={t('carousel.previous', 'Previous image')}
           >
             <ChevronLeft className="w-5 h-5" />
           </button>
@@ -169,7 +171,7 @@ export function ImageCarousel({ media, className = '' }: ImageCarouselProps) {
               e.stopPropagation();
               goNext();
             }}
-            aria-label="Next image"
+            aria-label={t('carousel.next', 'Next image')}
           >
             <ChevronRight className="w-5 h-5" />
           </button>
@@ -191,7 +193,7 @@ export function ImageCarousel({ media, className = '' }: ImageCarouselProps) {
                   e.stopPropagation();
                   goTo(idx, idx > currentIndex ? 1 : -1);
                 }}
-                aria-label={`Go to image ${idx + 1}`}
+                aria-label={t('carousel.go_to_image', 'Go to image {{number}}', { number: idx + 1 })}
                 aria-current={idx === currentIndex ? 'true' : undefined}
               />
             ))}

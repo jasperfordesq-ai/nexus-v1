@@ -94,63 +94,63 @@ export interface FeedCardProps {
 /* ───────────────────────── Type Badge Config ───────────────────────── */
 
 const typeConfig = {
-  post: { label: null, color: 'default' as const, icon: null, gradient: '' },
+  post: { labelKey: null, color: 'default' as const, icon: null, gradient: '' },
   listing: {
-    label: 'Listing',
+    labelKey: 'card.type_listing',
     color: 'primary' as const,
     icon: <ShoppingBag className="w-3 h-3" aria-hidden="true" />,
     gradient: 'from-indigo-500/10 to-blue-500/10',
   },
   event: {
-    label: 'Event',
+    labelKey: 'card.type_event',
     color: 'success' as const,
     icon: <Calendar className="w-3 h-3" aria-hidden="true" />,
     gradient: 'from-emerald-500/10 to-green-500/10',
   },
   poll: {
-    label: 'Poll',
+    labelKey: 'card.type_poll',
     color: 'warning' as const,
     icon: <BarChart3 className="w-3 h-3" aria-hidden="true" />,
     gradient: 'from-amber-500/10 to-orange-500/10',
   },
   goal: {
-    label: 'Goal',
+    labelKey: 'card.type_goal',
     color: 'secondary' as const,
     icon: <Target className="w-3 h-3" aria-hidden="true" />,
     gradient: 'from-purple-500/10 to-pink-500/10',
   },
   review: {
-    label: 'Review',
+    labelKey: 'card.type_review',
     color: 'warning' as const,
     icon: <Star className="w-3 h-3" aria-hidden="true" />,
     gradient: 'from-amber-500/10 to-yellow-500/10',
   },
   job: {
-    label: 'Job',
+    labelKey: 'card.type_job',
     color: 'primary' as const,
     icon: <TrendingUp className="w-3 h-3" aria-hidden="true" />,
     gradient: 'from-blue-500/10 to-cyan-500/10',
   },
   challenge: {
-    label: 'Challenge',
+    labelKey: 'card.type_challenge',
     color: 'secondary' as const,
     icon: <Target className="w-3 h-3" aria-hidden="true" />,
     gradient: 'from-violet-500/10 to-purple-500/10',
   },
   volunteer: {
-    label: 'Volunteer',
+    labelKey: 'card.type_volunteer',
     color: 'success' as const,
     icon: <Heart className="w-3 h-3" aria-hidden="true" />,
     gradient: 'from-green-500/10 to-emerald-500/10',
   },
   blog: {
-    label: 'Blog',
+    labelKey: 'card.type_blog',
     color: 'primary' as const,
     icon: <BookOpen className="w-3 h-3" aria-hidden="true" />,
     gradient: 'from-sky-500/10 to-blue-500/10',
   },
   discussion: {
-    label: 'Discussion',
+    labelKey: 'card.type_discussion',
     color: 'secondary' as const,
     icon: <Users className="w-3 h-3" aria-hidden="true" />,
     gradient: 'from-fuchsia-500/10 to-purple-500/10',
@@ -293,6 +293,7 @@ const FeedCard = React.memo(function FeedCard({
   const author = getAuthor(item);
   const isOwnPost = currentUserId === author.id;
   const config = typeConfig[item.type];
+  const typeLabel = config.labelKey ? t(config.labelKey) : null;
   const detailPath = getItemDetailPath(item);
   const detailLabel = getItemDetailLabel(item);
   const { ref: trackingRef, recordClick } = useFeedTracking(item.id, isAuthenticated);
@@ -388,7 +389,7 @@ const FeedCard = React.memo(function FeedCard({
   return (
     <GlassCard ref={trackingRef} hoverable className="overflow-hidden group">
       {/* Type accent bar */}
-      {config.label && (
+      {typeLabel && (
         <div className={`h-0.5 bg-gradient-to-r ${config.gradient}`} />
       )}
 
@@ -413,7 +414,7 @@ const FeedCard = React.memo(function FeedCard({
                 >
                   {author.name}
                 </Link>
-                {config.label && (
+                {typeLabel && (
                   detailPath ? (
                     <Link to={tenantPath(detailPath)} onClick={recordClick}>
                       <Chip
@@ -423,7 +424,7 @@ const FeedCard = React.memo(function FeedCard({
                         startContent={config.icon}
                         className="text-[10px] h-5 cursor-pointer hover:opacity-80 transition-opacity"
                       >
-                        {config.label}
+                        {typeLabel}
                       </Chip>
                     </Link>
                   ) : (
@@ -434,7 +435,7 @@ const FeedCard = React.memo(function FeedCard({
                       startContent={config.icon}
                       className="text-[10px] h-5"
                     >
-                      {config.label}
+                      {typeLabel}
                     </Chip>
                   )
                 )}
@@ -457,12 +458,12 @@ const FeedCard = React.memo(function FeedCard({
                   size="sm"
                   variant="light"
                   className="text-[var(--text-subtle)] hover:text-[var(--text-primary)] min-w-0 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity"
-                  aria-label="Post options"
+                  aria-label={t('card.post_options', 'Post options')}
                 >
                   <MoreHorizontal className="w-4 h-4" />
                 </Button>
               </DropdownTrigger>
-              <DropdownMenu aria-label="Post actions">
+              <DropdownMenu aria-label={t('card.post_actions', 'Post actions')}>
                 {isOwnPost ? (
                   <DropdownItem
                     key="delete"
@@ -578,7 +579,7 @@ const FeedCard = React.memo(function FeedCard({
               <Link to={tenantPath(detailPath)}>
                 <img
                   src={resolveAssetUrl(item.image_url)}
-                  alt={`${config.label ?? 'Post'} image by ${author.name}`}
+                  alt={t('card.image_alt', '{{type}} image by {{name}}', { type: typeLabel ?? t('card.type_post', 'Post'), name: author.name })}
                   className="w-full max-h-[28rem] object-cover hover:scale-[1.02] transition-transform duration-500"
                   loading="lazy"
                   width={800}
@@ -589,7 +590,7 @@ const FeedCard = React.memo(function FeedCard({
             ) : (
               <img
                 src={resolveAssetUrl(item.image_url)}
-                alt={`Post image by ${author.name}`}
+                alt={t('card.image_alt', '{{type}} image by {{name}}', { type: t('card.type_post', 'Post'), name: author.name })}
                 className="w-full max-h-[28rem] object-cover hover:scale-[1.02] transition-transform duration-500"
                 loading="lazy"
                 width={800}
@@ -707,7 +708,7 @@ const FeedCard = React.memo(function FeedCard({
               className={`inline-flex items-center justify-center gap-2 py-2 px-5 rounded-xl text-sm font-medium transition-all bg-gradient-to-r ${config.gradient || 'from-[var(--color-primary)]/10 to-[var(--color-primary)]/5'} text-[var(--text-primary)] hover:opacity-80 border border-[var(--border-default)] hover:border-[var(--color-primary)]/30`}
             >
               {config.icon}
-              {detailLabel}
+              {t(detailLabel)}
               <ArrowRight className="w-3.5 h-3.5" aria-hidden="true" />
             </Link>
           </div>
@@ -856,7 +857,7 @@ const FeedCard = React.memo(function FeedCard({
                         className="text-[var(--color-primary)] min-w-0 w-auto h-auto p-0 disabled:opacity-30"
                         onPress={handleSubmitComment}
                         isDisabled={!newComment.trim() || isSubmittingComment}
-                        aria-label="Send comment"
+                        aria-label={t('card.send_comment', 'Send comment')}
                       >
                         <Send className="w-4 h-4" />
                       </Button>

@@ -12,6 +12,7 @@
 import { useState, useCallback, useRef } from 'react';
 import { Button, Input, Chip } from '@heroui/react';
 import { Tag } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
 
@@ -22,6 +23,7 @@ interface SkillTagsInputProps {
 }
 
 export function SkillTagsInput({ tags, onChange, maxTags = 10 }: SkillTagsInputProps) {
+  const { t } = useTranslation('listings');
   const [inputValue, setInputValue] = useState('');
   const [suggestions, setSuggestions] = useState<string[]>([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
@@ -87,7 +89,7 @@ export function SkillTagsInput({ tags, onChange, maxTags = 10 }: SkillTagsInputP
     <div className="space-y-2">
       <label className="text-sm font-medium text-theme-muted flex items-center gap-1">
         <Tag className="w-4 h-4" />
-        Skill Tags
+        {t('skill_tags.label', 'Skill Tags')}
         <span className="text-theme-subtle">({tags.length}/{maxTags})</span>
       </label>
 
@@ -113,8 +115,8 @@ export function SkillTagsInput({ tags, onChange, maxTags = 10 }: SkillTagsInputP
         <div className="relative">
           <Input
             size="sm"
-            placeholder="Type a skill and press Enter..."
-            aria-label="Add skill tag"
+            placeholder={t('skill_tags.placeholder', 'Type a skill and press Enter...')}
+            aria-label={t('skill_tags.aria_add', 'Add skill tag')}
             value={inputValue}
             onChange={(e) => handleInputChange(e.target.value)}
             onKeyDown={handleKeyDown}

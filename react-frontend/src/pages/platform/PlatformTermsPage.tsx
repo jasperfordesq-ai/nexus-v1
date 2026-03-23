@@ -4,6 +4,7 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import { FileText } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { usePageTitle } from '@/hooks/usePageTitle';
 import {
   PlatformLegalPage,
@@ -588,17 +589,19 @@ const sections: PlatformLegalSection[] = [
   },
 ];
 
-const crossLinks = [
-  { label: 'Platform Privacy Policy', to: '/platform/privacy' },
-  { label: 'Platform Disclaimer', to: '/platform/disclaimer' },
-];
-
 export function PlatformTermsPage() {
-  usePageTitle('Platform Terms of Service');
+  const { t } = useTranslation('legal');
+  usePageTitle(t('platform_terms.page_title'));
+
+  const crossLinks = [
+    { label: t('platform_terms.link_privacy'), to: '/platform/privacy' },
+    { label: t('platform_terms.link_disclaimer'), to: '/platform/disclaimer' },
+  ];
+
   return (
     <PlatformLegalPage
-      title="Platform Terms of Service"
-      subtitle="The terms governing the Project NEXUS platform infrastructure"
+      title={t('platform_terms.title')}
+      subtitle={t('platform_terms.subtitle')}
       icon={FileText}
       effectiveDate="1 March 2026"
       sections={sections}

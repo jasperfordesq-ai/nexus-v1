@@ -133,7 +133,7 @@ export function MessageBubble({
               <Input
                 value={editingText}
                 onChange={(e) => onEditingTextChange?.(e.target.value)}
-                aria-label="Edit message"
+                aria-label={t('aria_edit_message')}
                 classNames={{
                   input: 'bg-transparent text-inherit placeholder:text-inherit/40',
                   inputWrapper: 'bg-black/10 dark:bg-white/10 border-black/20 dark:border-white/20',

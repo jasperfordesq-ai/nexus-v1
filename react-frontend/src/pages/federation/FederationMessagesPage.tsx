@@ -715,7 +715,7 @@ export function FederationMessagesPage() {
                     size="sm"
                     className="md:hidden text-theme-muted"
                     onPress={() => setMobileShowThread(false)}
-                    aria-label="Back to message list"
+                    aria-label={t('messages.aria_back_to_list')}
                   >
                     <ArrowLeft className="w-5 h-5" aria-hidden="true" />
                   </Button>
@@ -808,9 +808,9 @@ export function FederationMessagesPage() {
                                 </span>
                                 {isOwn && (
                                   isRead ? (
-                                    <MailOpen className="w-3 h-3 text-indigo-400" aria-label="Read" />
+                                    <MailOpen className="w-3 h-3 text-indigo-400" aria-label={t('messages.aria_read')} />
                                   ) : (
-                                    <Mail className="w-3 h-3 text-theme-subtle" aria-label="Delivered" />
+                                    <Mail className="w-3 h-3 text-theme-subtle" aria-label={t('messages.aria_delivered')} />
                                   )
                                 )}
                               </div>
@@ -842,7 +842,7 @@ export function FederationMessagesPage() {
                           sendReply();
                         }
                       }}
-                      aria-label="Reply message"
+                      aria-label={t('messages.aria_reply')}
                     />
                     <Button
                       isIconOnly
@@ -850,7 +850,7 @@ export function FederationMessagesPage() {
                       onPress={sendReply}
                       isLoading={isSending}
                       isDisabled={!replyText.trim()}
-                      aria-label="Send reply"
+                      aria-label={t('messages.aria_send_reply')}
                     >
                       <Send className="w-4 h-4" aria-hidden="true" />
                     </Button>

@@ -15,20 +15,22 @@
  */
 
 import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { FlaskConical } from 'lucide-react';
 import { RELEASE_STATUS } from '@/config/releaseStatus';
 
 export function DevelopmentStatusBanner() {
+  const { t } = useTranslation('common');
   return (
     <div
       role="region"
-      aria-label="Development status"
+      aria-label={t('dev_banner.aria_label', 'Development status')}
       className="relative z-10 w-full bg-amber-50 dark:bg-amber-950 border-b border-amber-200 dark:border-amber-800 py-1 px-4 text-center"
     >
       <p className="text-amber-900 dark:text-amber-100 text-xs flex items-center justify-center gap-1.5 flex-wrap">
         <FlaskConical className="w-3.5 h-3.5 shrink-0" aria-hidden="true" />
         <span>
-          <span className="font-semibold">Development status: {RELEASE_STATUS.stageLabel}</span>
+          <span className="font-semibold">{t('dev_banner.status', { stage: RELEASE_STATUS.stageLabel, defaultValue: `Development status: ${RELEASE_STATUS.stageLabel}` })}</span>
           {' — '}
           {RELEASE_STATUS.stageSummary}
         </span>
@@ -36,7 +38,7 @@ export function DevelopmentStatusBanner() {
           to={RELEASE_STATUS.readMorePath}
           className="underline font-medium ml-1 focus:outline-none focus:ring-2 focus:ring-amber-500 rounded whitespace-nowrap"
         >
-          Read more
+          {t('dev_banner.read_more', 'Read more')}
         </Link>
       </p>
     </div>

@@ -143,8 +143,8 @@ const stagger = {
 
 export function AboutPage() {
   const { t } = useTranslation('public');
-  usePageTitle('About');
   const { branding, tenantPath } = useTenant();
+  usePageTitle(t('about.meta_title', { name: branding?.name || 'About' }));
   const { isAuthenticated } = useAuth();
   const [stats, setStats] = useState<PlatformStats | null>(null);
 

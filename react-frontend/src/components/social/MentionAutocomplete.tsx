@@ -14,6 +14,7 @@ import { forwardRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Avatar, Skeleton } from '@heroui/react';
 import { UserCheck } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { resolveAvatarUrl } from '@/lib/helpers';
 
 /* ─── Types ─────────────────────────────────────────────────── */
@@ -76,6 +77,7 @@ export const MentionAutocomplete = forwardRef<HTMLDivElement, MentionAutocomplet
     { isOpen, suggestions, selectedIndex, isLoading, query, onSelect, onHover, style, className = '' },
     ref,
   ) {
+    const { t } = useTranslation('social');
     if (!isOpen) return null;
 
     return (
@@ -89,7 +91,7 @@ export const MentionAutocomplete = forwardRef<HTMLDivElement, MentionAutocomplet
           className={`absolute z-50 w-full max-w-xs bg-[var(--surface-elevated)] border border-[var(--border-default)] rounded-lg shadow-lg overflow-hidden ${className}`}
           style={style}
           role="listbox"
-          aria-label={`Mention suggestions, ${suggestions.length} results`}
+          aria-label={t('mention.suggestions_aria', 'Mention suggestions, {{count}} results', { count: suggestions.length })}
         >
           {isLoading ? (
             /* Loading skeleton */
@@ -107,7 +109,7 @@ export const MentionAutocomplete = forwardRef<HTMLDivElement, MentionAutocomplet
           ) : suggestions.length === 0 ? (
             /* Empty state */
             <div className="px-3 py-4 text-center">
-              <p className="text-xs text-[var(--text-subtle)]">No users found</p>
+              <p className="text-xs text-[var(--text-subtle)]">{t('mention.no_users', 'No users found')}</p>
             </div>
           ) : (
             /* Results list */
@@ -147,7 +149,7 @@ export const MentionAutocomplete = forwardRef<HTMLDivElement, MentionAutocomplet
                     )}
                   </div>
                   {user.is_connection && (
-                    <UserCheck className="w-3.5 h-3.5 text-emerald-500 flex-shrink-0" aria-label="Connected" />
+                    <UserCheck className="w-3.5 h-3.5 text-emerald-500 flex-shrink-0" aria-label={t('mention.connected', 'Connected')} />
                   )}
                 </button>
               ))}

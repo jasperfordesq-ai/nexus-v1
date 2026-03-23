@@ -850,14 +850,14 @@ export function ProfilePage() {
                   <Link
                     key={listing.id}
                     to={tenantPath(`/listings/${listing.id}`)}
-                    aria-label={`${listing.type === 'offer' ? 'Offering' : 'Requesting'}: ${listing.title}`}
+                    aria-label={`${listing.type === 'offer' ? t('listing_type.offer') : t('listing_type.request')}: ${listing.title}`}
                   >
                     <article role="listitem">
                       <GlassCard className="hover:scale-[1.02] transition-transform h-full flex flex-col overflow-hidden">
                         {listing.image_url && (
                           <img
                             src={resolveAssetUrl(listing.image_url)}
-                            alt={listing.title || 'Listing image'}
+                            alt={listing.title || t('listing_image_alt', { defaultValue: 'Listing image' })}
                             className="w-full h-32 object-cover"
                             loading="lazy"
                           />
