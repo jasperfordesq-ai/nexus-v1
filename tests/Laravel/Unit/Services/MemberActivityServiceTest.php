@@ -15,7 +15,7 @@ use Mockery;
 use Tests\Laravel\TestCase;
 
 /**
- * @runInSeparateProcess
+ * @runTestsInSeparateProcesses
  * @preserveGlobalState disabled
  */
 class MemberActivityServiceTest extends TestCase

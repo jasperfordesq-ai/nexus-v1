@@ -13,7 +13,7 @@ use Illuminate\Support\Facades\DB;
 use Mockery;
 
 /**
- * @runInSeparateProcess
+ * @runTestsInSeparateProcesses
  * @preserveGlobalState disabled
  */
 class PollServiceTest extends TestCase
