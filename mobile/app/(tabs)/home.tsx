@@ -67,7 +67,7 @@ export default function HomeScreen() {
         keyExtractor={(item) => String(item.id)}
         renderItem={({ item }) => <FeedItem item={item} />}
         refreshControl={
-          <RefreshControl refreshing={isLoading && items.length > 0} onRefresh={() => void refresh()} />
+          <RefreshControl refreshing={isLoading && items.length > 0} onRefresh={() => void refresh()} tintColor={primary} colors={[primary]} />
         }
         onEndReached={loadMore}
         onEndReachedThreshold={0.3}

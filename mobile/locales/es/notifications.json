@@ -3,5 +3,13 @@
   "confirmMarkAllRead": "¿Marcar todas las notificaciones como leídas?",
   "allCaughtUpSub": "No tienes nuevas notificaciones.",
   "unreadItem": "No leído: {{label}}",
-  "itemHint": "Toca para ver"
+  "itemHint": "Toca para ver",
+  "markAllRead": "Marcar todo como leído",
+  "marking": "Marcando...",
+  "markError": "Error al marcar",
+  "allCaughtUp": "¡Todo al día!",
+  "justNow": "Justo ahora",
+  "minutesAgo": "hace {{count}} min",
+  "hoursAgo": "hace {{count}} h",
+  "daysAgo": "hace {{count}} d"
 }

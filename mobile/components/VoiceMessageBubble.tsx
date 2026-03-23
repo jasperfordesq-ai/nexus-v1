@@ -22,6 +22,7 @@ interface VoiceMessageBubbleProps {
 }
 
 function formatDuration(ms: number): string {
+  if (!Number.isFinite(ms) || ms < 0) return '0:00';
   const totalSeconds = Math.floor(ms / 1000);
   const m = Math.floor(totalSeconds / 60);
   const s = totalSeconds % 60;

@@ -73,7 +73,7 @@ export default function FeedItem({ item }: FeedItemProps) {
         <View style={styles.actor}>
           <Avatar uri={item.author_avatar} name={item.author_name} size={36} />
           <View style={styles.actorInfo}>
-            <Text style={styles.actorName}>{item.author_name}</Text>
+            <Text style={styles.actorName} numberOfLines={1}>{item.author_name}</Text>
             <Text style={styles.time}>{formatRelativeTime(item.created_at)}</Text>
           </View>
           {/* Type badge */}

@@ -16,6 +16,7 @@ import {
 } from 'react-native';
 import { router, useNavigation } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
+import * as Haptics from 'expo-haptics';
 import { useTranslation } from 'react-i18next';
 
 import {
@@ -150,12 +151,13 @@ export default function OrganisationsScreen() {
         theme={theme}
         styles={styles}
         t={t}
-        onPress={() =>
+        onPress={() => {
+          void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
           router.push({
             pathname: '/(modals)/organisation-detail',
             params: { id: String(item.id) },
-          })
-        }
+          });
+        }}
       />
     ),
     [primary, theme, styles, t],

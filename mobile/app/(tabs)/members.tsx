@@ -115,7 +115,7 @@ export default function MembersScreen() {
             <View style={styles.centered}>
               <Text style={styles.errorText}>{error}</Text>
               <TouchableOpacity onPress={() => void refresh()} style={styles.retryBtn}>
-                <Text style={{ color: theme.text, fontWeight: '600', fontSize: 15 }}>{t('common:buttons.retry')}</Text>
+                <Text style={{ color: primary, fontWeight: '600', fontSize: 15 }}>{t('common:buttons.retry')}</Text>
               </TouchableOpacity>
             </View>
           ) : (

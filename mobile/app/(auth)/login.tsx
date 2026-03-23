@@ -68,6 +68,7 @@ export default function LoginScreen() {
   const [showPassword, setShowPassword] = useState(false);
 
   async function onSubmit(data: LoginFormValues) {
+    void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     setIsLoading(true);
     setGlobalError(null);
 
@@ -169,7 +170,7 @@ export default function LoginScreen() {
                     style={styles.eyeButton}
                     onPress={() => setShowPassword((prev) => !prev)}
                     activeOpacity={0.6}
-                    accessibilityLabel={t('auth:login.togglePassword')}
+                    accessibilityLabel={t('login.togglePassword')}
                     accessibilityRole="button"
                   >
                     <Ionicons

@@ -125,7 +125,7 @@ export default function MessagesScreen() {
         renderItem={renderConversation}
         ItemSeparatorComponent={Separator}
         refreshControl={
-          <RefreshControl refreshing={isLoading && conversations.length > 0} onRefresh={refresh} />
+          <RefreshControl refreshing={isLoading && conversations.length > 0} onRefresh={refresh} tintColor={primary} colors={[primary]} />
         }
         onEndReached={() => { if (hasMore) loadMore(); }}
         onEndReachedThreshold={0.5}

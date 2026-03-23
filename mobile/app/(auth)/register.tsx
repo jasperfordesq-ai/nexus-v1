@@ -235,7 +235,7 @@ export default function RegisterScreen() {
                     style={styles.eyeButton}
                     onPress={() => setShowPassword((prev) => !prev)}
                     activeOpacity={0.6}
-                    accessibilityLabel={t('auth:login.togglePassword')}
+                    accessibilityLabel={t('login.togglePassword')}
                     accessibilityRole="button"
                   >
                     <Ionicons
@@ -273,7 +273,7 @@ export default function RegisterScreen() {
                     style={styles.eyeButton}
                     onPress={() => setShowConfirmPassword((prev) => !prev)}
                     activeOpacity={0.6}
-                    accessibilityLabel={t('auth:login.togglePassword')}
+                    accessibilityLabel={t('login.togglePassword')}
                     accessibilityRole="button"
                   >
                     <Ionicons

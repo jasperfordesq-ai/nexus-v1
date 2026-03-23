@@ -15,6 +15,7 @@ import {
 } from 'react-native';
 import { router, useNavigation } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
+import * as Haptics from 'expo-haptics';
 import { useTranslation } from 'react-i18next';
 
 import {
@@ -79,12 +80,13 @@ export default function FederationScreen() {
       return (
         <TouchableOpacity
           style={styles.partnerCard}
-          onPress={() =>
+          onPress={() => {
+            void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
             router.push({
               pathname: '/(modals)/federation-partner',
               params: { id: String(item.id) },
-            })
-          }
+            });
+          }}
           activeOpacity={0.75}
           accessibilityRole="button"
           accessibilityLabel={item.name}

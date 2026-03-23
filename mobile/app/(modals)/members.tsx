@@ -16,6 +16,7 @@ import {
 } from 'react-native';
 import { router, useNavigation } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
+import * as Haptics from 'expo-haptics';
 
 import { useTranslation } from 'react-i18next';
 
@@ -89,12 +90,13 @@ export default function MembersScreen() {
     return (
       <TouchableOpacity
         style={styles.row}
-        onPress={() =>
+        onPress={() => {
+          void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
           router.push({
             pathname: '/(modals)/member-profile',
             params: { id: item.id, name: item.name },
-          })
-        }
+          });
+        }}
         activeOpacity={0.7}
         accessibilityRole="button"
         accessibilityLabel={t('memberCard.accessibilityLabel', { name: item.name })}

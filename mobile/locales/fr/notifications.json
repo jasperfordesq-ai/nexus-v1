@@ -3,5 +3,13 @@
   "confirmMarkAllRead": "Marquer toutes les notifications comme lues ?",
   "allCaughtUpSub": "Vous n'avez aucune nouvelle notification.",
   "unreadItem": "Non lu : {{label}}",
-  "itemHint": "Appuyez pour afficher"
+  "itemHint": "Appuyez pour afficher",
+  "markAllRead": "Tout marquer comme lu",
+  "marking": "Marquage...",
+  "markError": "Erreur lors du marquage",
+  "allCaughtUp": "Tout est lu !",
+  "justNow": "À l'instant",
+  "minutesAgo": "il y a {{count}} min",
+  "hoursAgo": "il y a {{count}} h",
+  "daysAgo": "il y a {{count}} j"
 }

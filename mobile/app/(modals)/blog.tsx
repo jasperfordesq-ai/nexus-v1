@@ -16,6 +16,7 @@ import {
 } from 'react-native';
 import { router, useNavigation } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
+import * as Haptics from 'expo-haptics';
 import { useTranslation } from 'react-i18next';
 import { useEffect } from 'react';
 
@@ -61,9 +62,10 @@ export default function BlogScreen() {
           <TouchableOpacity
             style={styles.card}
             activeOpacity={0.8}
-            onPress={() =>
-              router.push({ pathname: '/(modals)/blog-post', params: { id: String(item.id) } })
-            }
+            onPress={() => {
+              void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+              router.push({ pathname: '/(modals)/blog-post', params: { id: String(item.id) } });
+            }}
           >
             {item.cover_image ? (
               <Image source={{ uri: item.cover_image }} style={styles.cover} resizeMode="cover" />
@@ -94,7 +96,7 @@ export default function BlogScreen() {
           </TouchableOpacity>
         )}
         refreshControl={
-          <RefreshControl refreshing={isLoading && items.length > 0} onRefresh={refresh} />
+          <RefreshControl refreshing={isLoading && items.length > 0} onRefresh={refresh} tintColor={primary} colors={[primary]} />
         }
         onEndReached={() => { if (hasMore) loadMore(); }}
         onEndReachedThreshold={0.3}
