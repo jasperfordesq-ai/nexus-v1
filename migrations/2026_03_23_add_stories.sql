@@ -3,7 +3,7 @@
 
 CREATE TABLE IF NOT EXISTS stories (
     id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-    tenant_id INT UNSIGNED NOT NULL,
+    tenant_id INT NOT NULL,
     user_id INT UNSIGNED NOT NULL,
     media_type ENUM('image','text','poll') NOT NULL DEFAULT 'image',
     media_url TEXT DEFAULT NULL,
@@ -47,7 +47,7 @@ CREATE TABLE IF NOT EXISTS story_reactions (
 
 CREATE TABLE IF NOT EXISTS story_highlights (
     id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-    tenant_id INT UNSIGNED NOT NULL,
+    tenant_id INT NOT NULL,
     user_id INT UNSIGNED NOT NULL,
     title VARCHAR(100) NOT NULL,
     cover_url TEXT DEFAULT NULL,

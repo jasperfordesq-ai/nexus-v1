@@ -4,7 +4,7 @@
 
 CREATE TABLE IF NOT EXISTS user_presence (
     user_id INT UNSIGNED NOT NULL,
-    tenant_id INT UNSIGNED NOT NULL,
+    tenant_id INT NOT NULL,
     status ENUM('online','away','dnd','offline') NOT NULL DEFAULT 'offline',
     custom_status VARCHAR(80) DEFAULT NULL,
     status_emoji VARCHAR(10) DEFAULT NULL,

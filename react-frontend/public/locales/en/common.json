@@ -47,10 +47,12 @@
     "nexus_score": "NexusScore",
     "knowledge_base": "Knowledge Base",
     "unread_notifications": "{{count}} unread notifications",
-    "timebanking": "Timebanking"
+    "timebanking": "Timebanking",
+    "explore": "Explore"
   },
   "nav_desc": {
     "feed": "Community feed",
+    "explore": "Discover trending content & people",
     "members": "Browse community members",
     "connections": "Your connections & requests",
     "events": "Upcoming community events",

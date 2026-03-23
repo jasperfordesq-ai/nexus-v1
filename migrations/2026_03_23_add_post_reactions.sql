@@ -4,7 +4,7 @@
 
 CREATE TABLE IF NOT EXISTS post_reactions (
     id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-    tenant_id INT UNSIGNED NOT NULL,
+    tenant_id INT NOT NULL,
     post_id BIGINT UNSIGNED NOT NULL,
     user_id INT UNSIGNED NOT NULL,
     reaction_type ENUM('love','like','laugh','wow','sad','celebrate','clap','time_credit') NOT NULL,
@@ -16,7 +16,7 @@ CREATE TABLE IF NOT EXISTS post_reactions (
 
 CREATE TABLE IF NOT EXISTS comment_reactions (
     id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-    tenant_id INT UNSIGNED NOT NULL,
+    tenant_id INT NOT NULL,
     comment_id BIGINT UNSIGNED NOT NULL,
     user_id INT UNSIGNED NOT NULL,
     reaction_type ENUM('love','like','laugh','wow','sad','celebrate','clap','time_credit') NOT NULL,

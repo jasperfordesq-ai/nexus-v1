@@ -3,7 +3,7 @@
 
 CREATE TABLE IF NOT EXISTS post_media (
     id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-    tenant_id INT UNSIGNED NOT NULL,
+    tenant_id INT NOT NULL,
     post_id BIGINT UNSIGNED NOT NULL,
     media_type ENUM('image','video') NOT NULL DEFAULT 'image',
     file_url TEXT NOT NULL,
