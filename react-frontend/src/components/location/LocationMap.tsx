@@ -6,13 +6,31 @@
 /**
  * LocationMap — renders an interactive Google Map with markers.
  *
- * Uses @vis.gl/react-google-maps components (Map, Marker, InfoWindow).
- * Returns null if no API key is configured or if the API fails to load
- * (e.g., billing not enabled) — graceful degradation.
+ * Uses @vis.gl/react-google-maps components (Map, AdvancedMarker, InfoWindow).
+ * Supports optional marker clustering via @googlemaps/markerclusterer for
+ * dense datasets. Returns null if no API key is configured or if the API
+ * fails to load (e.g., billing not enabled) — graceful degradation.
  */
 
-import { useState, useEffect, useCallback, type ReactNode } from 'react';
-import { Map, Marker, InfoWindow, useMap, useApiLoadingStatus, APILoadingStatus } from '@vis.gl/react-google-maps';
+import {
+  useState,
+  useEffect,
+  useCallback,
+  type ReactNode,
+} from 'react';
+import {
+  Map,
+  AdvancedMarker,
+  InfoWindow,
+  useMap,
+  useApiLoadingStatus,
+  useAdvancedMarkerRef,
+  APILoadingStatus,
+} from '@vis.gl/react-google-maps';
+import {
+  MarkerClusterer,
+  type Renderer,
+} from '@googlemaps/markerclusterer';
 import { useTheme } from '@/contexts/ThemeContext';
 import { DARK_MAP_STYLES } from '@/lib/map-styles';
 
@@ -34,11 +52,145 @@ export interface LocationMapProps {
   className?: string;
   onMarkerClick?: (marker: MapMarker) => void;
   fitBounds?: boolean;
+  /** Enable marker clustering. Defaults to true when markers.length > 10. */
+  cluster?: boolean;
 }
 
 /** Default center: neutral global fallback */
 const DEFAULT_CENTER = { lat: 20, lng: 0 };
 const DEFAULT_ZOOM = 12;
+const CLUSTER_AUTO_THRESHOLD = 10;
+
+// ---------------------------------------------------------------------------
+// Custom cluster renderer — indigo circle with white count label
+// ---------------------------------------------------------------------------
+
+const clusterRenderer: Renderer = {
+  render({ count, position }) {
+    const size = count < 10 ? 32 : count < 100 ? 38 : 44;
+    const el = document.createElement('div');
+    el.style.cssText = [
+      `width:${size}px`,
+      `height:${size}px`,
+      'border-radius:50%',
+      'background:#4f46e5',
+      'color:#fff',
+      `font-size:12px`,
+      'font-weight:700',
+      'display:flex',
+      'align-items:center',
+      'justify-content:center',
+      'box-shadow:0 2px 6px rgba(0,0,0,0.35)',
+      'cursor:pointer',
+    ].join(';');
+    el.textContent = String(count);
+
+    return new google.maps.marker.AdvancedMarkerElement({
+      position,
+      content: el,
+      // clusters sit above regular markers
+      zIndex: Number(google.maps.Marker.MAX_ZINDEX) + count,
+    });
+  },
+};
+
+// ---------------------------------------------------------------------------
+// Single AdvancedMarker that registers itself with a MarkerClusterer
+// ---------------------------------------------------------------------------
+
+interface ClusteredMarkerProps {
+  marker: MapMarker;
+  clusterer: MarkerClusterer | null;
+  onClick: (marker: MapMarker) => void;
+}
+
+function ClusteredMarkerItem({ marker, clusterer, onClick }: ClusteredMarkerProps) {
+  const [markerRef, advancedMarker] = useAdvancedMarkerRef();
+
+  // Register / unregister with the clusterer whenever the marker element changes
+  useEffect(() => {
+    if (!clusterer || !advancedMarker) return;
+    clusterer.addMarker(advancedMarker);
+    return () => {
+      clusterer.removeMarker(advancedMarker);
+    };
+  }, [clusterer, advancedMarker]);
+
+  return (
+    <AdvancedMarker
+      ref={markerRef}
+      position={{ lat: marker.lat, lng: marker.lng }}
+      title={marker.title}
+      onClick={() => onClick(marker)}
+    />
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Clustered markers sub-component — owns the MarkerClusterer lifecycle
+// ---------------------------------------------------------------------------
+
+interface ClusteredMarkersProps {
+  markers: MapMarker[];
+  onMarkerClick: (marker: MapMarker) => void;
+}
+
+function ClusteredMarkers({ markers, onMarkerClick }: ClusteredMarkersProps) {
+  const map = useMap();
+  const [clusterer, setClusterer] = useState<MarkerClusterer | null>(null);
+
+  // Create/destroy the clusterer when the map instance changes
+  useEffect(() => {
+    if (!map) return;
+    const instance = new MarkerClusterer({ map, renderer: clusterRenderer });
+    setClusterer(instance);
+    return () => {
+      instance.clearMarkers();
+      instance.setMap(null);
+    };
+  }, [map]);
+
+  return (
+    <>
+      {markers.map((marker) => (
+        <ClusteredMarkerItem
+          key={marker.id}
+          marker={marker}
+          clusterer={clusterer}
+          onClick={onMarkerClick}
+        />
+      ))}
+    </>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Plain (non-clustered) markers sub-component
+// ---------------------------------------------------------------------------
+
+interface PlainMarkersProps {
+  markers: MapMarker[];
+  onMarkerClick: (marker: MapMarker) => void;
+}
+
+function PlainMarkers({ markers, onMarkerClick }: PlainMarkersProps) {
+  return (
+    <>
+      {markers.map((marker) => (
+        <AdvancedMarker
+          key={marker.id}
+          position={{ lat: marker.lat, lng: marker.lng }}
+          title={marker.title}
+          onClick={() => onMarkerClick(marker)}
+        />
+      ))}
+    </>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// LocationMapInner — the real map component (rendered inside APIProvider)
+// ---------------------------------------------------------------------------
 
 function LocationMapInner({
   markers,
@@ -48,11 +200,16 @@ function LocationMapInner({
   className = '',
   onMarkerClick,
   fitBounds = true,
+  cluster,
 }: LocationMapProps) {
   const { resolvedTheme } = useTheme();
   const map = useMap();
   const status = useApiLoadingStatus();
   const [activeMarkerId, setActiveMarkerId] = useState<number | string | null>(null);
+
+  // Resolve whether clustering should be active
+  const clusteringEnabled =
+    cluster !== undefined ? cluster : markers.length > CLUSTER_AUTO_THRESHOLD;
 
   // Auto-fit bounds when markers change
   useEffect(() => {
@@ -82,9 +239,11 @@ function LocationMapInner({
     return null;
   }
 
-  const mapCenter = center ?? (markers.length === 1
-    ? { lat: markers[0].lat, lng: markers[0].lng }
-    : DEFAULT_CENTER);
+  const mapCenter =
+    center ??
+    (markers.length === 1
+      ? { lat: markers[0].lat, lng: markers[0].lng }
+      : DEFAULT_CENTER);
 
   const activeMarker = markers.find((m) => m.id === activeMarkerId);
 
@@ -102,14 +261,17 @@ function LocationMapInner({
         styles={resolvedTheme === 'dark' ? DARK_MAP_STYLES : undefined}
         clickableIcons={false}
       >
-        {markers.map((marker) => (
-          <Marker
-            key={marker.id}
-            position={{ lat: marker.lat, lng: marker.lng }}
-            title={marker.title}
-            onClick={() => handleMarkerClick(marker)}
+        {clusteringEnabled ? (
+          <ClusteredMarkers
+            markers={markers}
+            onMarkerClick={handleMarkerClick}
           />
-        ))}
+        ) : (
+          <PlainMarkers
+            markers={markers}
+            onMarkerClick={handleMarkerClick}
+          />
+        )}
 
         {activeMarker?.infoContent && (
           <InfoWindow
@@ -124,6 +286,10 @@ function LocationMapInner({
     </div>
   );
 }
+
+// ---------------------------------------------------------------------------
+// Public export — guards against missing API key
+// ---------------------------------------------------------------------------
 
 export function LocationMap(props: LocationMapProps) {
   const apiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;

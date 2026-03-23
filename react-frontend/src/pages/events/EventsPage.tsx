@@ -28,6 +28,7 @@ import {
   Tag,
   Star,
   Ban,
+  Loader2,
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
@@ -38,6 +39,7 @@ import { api } from '@/lib/api';
 import { MAPS_ENABLED } from '@/lib/map-config';
 import { logError } from '@/lib/logger';
 import { usePageTitle } from '@/hooks';
+import { useGeolocation } from '@/hooks/useGeolocation';
 import type { Event } from '@/types/api';
 
 type EventFilter = 'upcoming' | 'past' | 'all';
@@ -82,6 +84,9 @@ export function EventsPage() {
   const [filter, setFilter] = useState<EventFilter>('upcoming');
   const [selectedCategory, setSelectedCategory] = useState(searchParams.get('category') || 'all');
   const [viewMode, setViewMode] = useState<'list' | 'map'>('list');
+  const [nearMeEnabled, setNearMeEnabled] = useState(false);
+  const [radiusKm, setRadiusKm] = useState(25);
+  const geo = useGeolocation();
 
   const tRef = useRef(t);
   tRef.current = t;
@@ -136,7 +141,15 @@ export function EventsPage() {
         params.set('category', selectedCategory);
       }
 
-      const response = await api.get<Event[]>(`/v2/events?${params}`);
+      let endpoint = '/v2/events';
+      if (nearMeEnabled && geo.latitude !== null && geo.longitude !== null) {
+        endpoint = '/v2/events/nearby';
+        params.set('lat', String(geo.latitude));
+        params.set('lng', String(geo.longitude));
+        params.set('radius_km', String(radiusKm));
+      }
+
+      const response = await api.get<Event[]>(`${endpoint}?${params}`);
       if (controller.signal.aborted) return;
       if (response.success && response.data) {
         if (append) {
@@ -167,7 +180,7 @@ export function EventsPage() {
         setIsLoadingMore(false);
       }
     }
-  }, [debouncedQuery, filter, selectedCategory]);
+  }, [debouncedQuery, filter, selectedCategory, nearMeEnabled, geo.latitude, geo.longitude, radiusKm]);
 
   const loadEventsRef = useRef(loadEvents);
   loadEventsRef.current = loadEvents;
@@ -182,7 +195,7 @@ export function EventsPage() {
         abortControllerRef.current.abort();
       }
     };
-  }, [debouncedQuery, filter, selectedCategory]);
+  }, [debouncedQuery, filter, selectedCategory, nearMeEnabled, geo.latitude, geo.longitude, radiusKm]);
 
   // Update URL params
   useEffect(() => {
@@ -196,6 +209,30 @@ export function EventsPage() {
     if (isLoadingMore || !hasMore) return;
     loadEvents(true);
   }, [isLoadingMore, hasMore, loadEvents]);
+
+  function handleNearMeToggle() {
+    if (nearMeEnabled) {
+      setNearMeEnabled(false);
+      return;
+    }
+    if (geo.error) {
+      toast.error(geo.error);
+      return;
+    }
+    if (geo.latitude === null) {
+      geo.requestLocation();
+    }
+    setNearMeEnabled(true);
+  }
+
+  // Auto-disable near me if geolocation fails after enabling
+  useEffect(() => {
+    if (nearMeEnabled && geo.error) {
+      toast.error(geo.error);
+      setNearMeEnabled(false);
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [geo.error, nearMeEnabled]);
 
   // Group events by month
   const groupedEvents = events.reduce((groups, event) => {
@@ -262,6 +299,43 @@ export function EventsPage() {
             <SelectItem key="past">{t('filter_past')}</SelectItem>
             <SelectItem key="all">{t('filter_all')}</SelectItem>
           </Select>
+
+          <Button
+            variant={nearMeEnabled ? 'solid' : 'flat'}
+            className={nearMeEnabled
+              ? 'bg-primary text-white min-h-[40px]'
+              : 'bg-theme-elevated text-theme-primary min-h-[40px]'}
+            startContent={geo.loading
+              ? <Loader2 className="w-4 h-4 animate-spin" aria-hidden="true" />
+              : <MapPin className="w-4 h-4" aria-hidden="true" />}
+            onPress={handleNearMeToggle}
+            aria-pressed={nearMeEnabled}
+            aria-label={t('near_me', 'Near me')}
+          >
+            {t('near_me', 'Near me')}
+          </Button>
+
+          {nearMeEnabled && (
+            <Select
+              aria-label={t('radius_label', 'Radius')}
+              selectedKeys={[String(radiusKm)]}
+              onSelectionChange={(keys) => {
+                const val = keys instanceof Set ? ([...keys][0] as string) : '25';
+                setRadiusKm(Number(val) || 25);
+              }}
+              className="w-32 sm:w-36"
+              classNames={{
+                trigger: 'bg-theme-elevated border-theme-default hover:bg-theme-hover',
+                value: 'text-theme-primary',
+              }}
+            >
+              <SelectItem key="5">5 km</SelectItem>
+              <SelectItem key="10">10 km</SelectItem>
+              <SelectItem key="25">25 km</SelectItem>
+              <SelectItem key="50">50 km</SelectItem>
+              <SelectItem key="100">100 km</SelectItem>
+            </Select>
+          )}
 
           {MAPS_ENABLED && (
             <div className="flex rounded-lg overflow-hidden border border-default-200" role="group" aria-label={t('view_mode_aria')}>
