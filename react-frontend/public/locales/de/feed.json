@@ -394,9 +394,9 @@
     "react_to_post": "Auf diesen Beitrag reagieren"
   },
   "video": {
-    "select": "Add Video",
-    "too_large": "Video must be smaller than {{size}}MB",
-    "invalid_type": "Invalid video format. Supported: MP4, WebM, MOV",
-    "remove": "Remove video"
+    "select": "Video hinzufügen",
+    "too_large": "Das Video muss kleiner als {{size}}MB sein",
+    "invalid_type": "Ungültiges Videoformat. Unterstützt: MP4, WebM, MOV",
+    "remove": "Video entfernen"
   }
 }
