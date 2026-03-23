@@ -271,42 +271,42 @@
     "withdrawn": "Zurückgezogen"
   },
   "gdpr": {
-    "export_my_data": "Download my data",
-    "erase_my_data": "Erase my data",
-    "export_success": "Data exported successfully"
+    "export_my_data": "Meine Daten herunterladen",
+    "erase_my_data": "Meine Daten löschen",
+    "export_success": "Daten erfolgreich exportiert"
   },
   "application_withdrawn": "Bewerbung erfolgreich zurückgezogen.",
   "something_wrong": "Etwas ist schiefgelaufen. Bitte versuchen Sie es erneut.",
   "vacancy_closed": "Stelle geschlossen",
   "vacancy_reopened": "Stelle wiedereröffnet",
   "recommended": {
-    "title": "Recommended",
-    "empty_title": "No recommendations yet",
-    "empty_description": "Complete your profile skills to get matched with relevant opportunities"
+    "title": "Empfohlen",
+    "empty_title": "Noch keine Empfehlungen",
+    "empty_description": "Vervollständigen Sie Ihre Profilfähigkeiten, um mit relevanten Möglichkeiten abgeglichen zu werden"
   },
   "geo": {
-    "near_me": "Near me",
-    "radius_label": "Search radius",
+    "near_me": "In meiner Nähe",
+    "radius_label": "Suchradius",
     "radius_5": "5 km",
     "radius_10": "10 km",
     "radius_25": "25 km",
     "radius_50": "50 km",
     "radius_100": "100 km",
-    "within": "Within {{radius}}km",
-    "clear": "Clear location filter",
-    "not_supported": "Geolocation is not supported by your browser",
-    "permission_denied": "Location access denied. Please allow location access to use this feature."
+    "within": "Innerhalb von {{radius}} km",
+    "clear": "Standortfilter löschen",
+    "not_supported": "Geolokalisierung wird von Ihrem Browser nicht unterstützt",
+    "permission_denied": "Standortzugriff verweigert. Bitte erlauben Sie den Standortzugriff, um diese Funktion zu nutzen."
   },
   "kanban": {
-    "pipeline_title": "Kanban Pipeline",
-    "not_authorized": "You are not authorized to view this pipeline.",
-    "download_cv": "Download CV",
-    "drop_here": "Drop here",
-    "duration_90": "1.5 hours",
-    "salary_monthly": "Monthly",
-    "personal_message": "Personal Message",
-    "personal_message_placeholder": "A note to the candidate...",
-    "select_applicant": "Select {{name}}"
+    "pipeline_title": "Kanban-Pipeline",
+    "not_authorized": "Sie sind nicht berechtigt, diese Pipeline anzuzeigen.",
+    "download_cv": "Lebenslauf herunterladen",
+    "drop_here": "Hier ablegen",
+    "duration_90": "1,5 Stunden",
+    "salary_monthly": "Monatlich",
+    "personal_message": "Persönliche Nachricht",
+    "personal_message_placeholder": "Eine Notiz für den Kandidaten...",
+    "select_applicant": "{{name}} auswählen"
   },
   "apply": {
     "button": "Jetzt bewerben",
