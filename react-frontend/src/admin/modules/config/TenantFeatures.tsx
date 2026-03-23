@@ -30,6 +30,7 @@ import { adminConfig } from '../../api/adminApi';
 import { PageHeader } from '../../components';
 import type { TenantConfig, CacheStats, BackgroundJob } from '../../api/types';
 
+import { useTranslation } from 'react-i18next';
 // Feature metadata for display
 const FEATURE_META: Record<string, { label: string; description: string }> = {
   events: { label: 'Events', description: 'Community events with RSVPs' },
@@ -75,7 +76,8 @@ const PLATFORM_LANGUAGES = [
 ];
 
 export function TenantFeatures() {
-  usePageTitle('Admin - Tenant Features');
+  const { t } = useTranslation('admin');
+  usePageTitle(t('config.page_title'));
   const toast = useToast();
   const { refreshTenant, supportedLanguages, defaultLanguage } = useTenant();
 
@@ -155,23 +157,23 @@ export function TenantFeatures() {
   const handleClearCache = async () => {
     const res = await adminConfig.clearCache('tenant');
     if (res.success) {
-      toast.success('Cache cleared successfully');
+      toast.success(t('config.cache_cleared_successfully'));
       // Refresh cache stats
       const statsRes = await adminConfig.getCacheStats();
       if (statsRes.success && statsRes.data) {
         setCacheStats(statsRes.data);
       }
     } else {
-      toast.error('Failed to clear cache');
+      toast.error(t('config.failed_to_clear_cache'));
     }
   };
 
   const handleRunJob = async (jobId: string) => {
     const res = await adminConfig.runJob(jobId);
     if (res.success) {
-      toast.success('Job triggered successfully');
+      toast.success(t('config.job_triggered_successfully'));
     } else {
-      toast.error('Failed to trigger job');
+      toast.error(t('config.failed_to_trigger_job'));
     }
   };
 
@@ -194,7 +196,7 @@ export function TenantFeatures() {
       supported_languages: langSupported,
     });
     if (res.success) {
-      toast.success('Language settings saved');
+      toast.success(t('config.language_settings_saved'));
       refreshTenant();
     } else {
       toast.error(res.error || 'Failed to save language settings');
@@ -213,8 +215,8 @@ export function TenantFeatures() {
   return (
     <div>
       <PageHeader
-        title="Tenant Features & Modules"
-        description="Enable or disable platform features and core modules for this tenant"
+        title={t('config.tenant_features_title')}
+        description={t('config.tenant_features_desc')}
         actions={
           <Button
             variant="flat"
@@ -243,7 +245,7 @@ export function TenantFeatures() {
                   Shown to new visitors without a preference
                 </p>
                 <Select
-                  aria-label="Default language"
+                  aria-label={t('config.label_default_language')}
                   selectedKeys={[langDefault]}
                   onSelectionChange={(keys) => {
                     const val = Array.from(keys)[0] as string;

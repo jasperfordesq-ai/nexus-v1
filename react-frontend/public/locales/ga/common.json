@@ -189,8 +189,8 @@
     "skip_to_content": "Téigh go dtí an príomhábhar",
     "menu_opened": "Roghchlár nascleanúna oscailte",
     "close": "Dún",
-    "scroll_to_top": "Scroll to top",
-    "breadcrumb": "Breadcrumb"
+    "scroll_to_top": "Scrollaigh go barr",
+    "breadcrumb": "Lorg Aráin"
   },
   "cookie_consent": {
     "banner_label": "Toiliú fianán",
@@ -282,46 +282,46 @@
     "new_goal": "Sprioc Nua",
     "new_goal_desc": "Socraigh sprioc phearsanta"
   },
-  "loading": "Loading...",
+  "loading": "Á Lódáil...",
   "feature_error": {
-    "load_failed": "We couldn't load {{feature}}. This section may be temporarily unavailable."
+    "load_failed": "Ní rabhamar in ann {{feature}} a lódáil. D'fhéadfadh an chuid seo a bheith neamh-infhaighte go sealadach."
   },
   "dev_banner": {
-    "aria_label": "Development status",
-    "status": "Development status: {{stage}}",
-    "read_more": "Read more"
+    "aria_label": "Stádas forbartha",
+    "status": "Stádas forbartha: {{stage}}",
+    "read_more": "Léigh tuilleadh"
   },
   "skills": {
-    "browse_title": "Community Skills Directory",
-    "load_failed": "Failed to load skill categories",
-    "load_failed_retry": "Failed to load skill categories. Please try again.",
-    "offering_label": "Offering",
-    "offering_desc": "members willing to share this skill with others",
-    "requesting_label": "Requesting",
-    "requesting_desc": "members looking to learn or receive help with this skill",
-    "add_your_skills": "Add your own skills",
-    "categories": "Categories",
-    "sub_categories": "Sub-categories",
-    "total_skills": "Skills Listed",
-    "search_placeholder": "Search skill categories...",
-    "no_categories": "No categories found",
-    "no_match": "No categories match \"{{query}}\"",
-    "no_categories_yet": "No skill categories available yet.",
-    "members_with_skills": "skilled members",
-    "loading_skills": "Loading skills...",
-    "skills_in_category": "Skills",
-    "offering": "offering",
-    "requesting": "requesting",
-    "no_skills_yet": "No skills listed in this category yet.",
-    "members_with": "Members with \"{{skill}}\"",
-    "offers": "Offers",
-    "wants": "Wants",
-    "no_members": "No members found with this skill.",
+    "browse_title": "Eolaire Scileanna Pobail",
+    "load_failed": "Theip ar chatagóirí scileanna a lódáil",
+    "load_failed_retry": "Theip ar chatagóirí scileanna a lódáil. Bain triail eile as le do thoil.",
+    "offering_label": "Ag Tairiscint",
+    "offering_desc": "baill atá toilteanach an scil seo a roinnt le daoine eile",
+    "requesting_label": "Ag Iarraidh",
+    "requesting_desc": "baill atá ag iarraidh foghlaim nó cabhair a fháil leis an scil seo",
+    "add_your_skills": "Cuir do scileanna féin leis",
+    "categories": "Catagóirí",
+    "sub_categories": "Fo-chatagóirí",
+    "total_skills": "Scileanna Liostaithe",
+    "search_placeholder": "Cuardaigh catagóirí scileanna...",
+    "no_categories": "Níor aimsíodh catagóirí",
+    "no_match": "Níl catagóirí ag meaitseáil \"{{query}}\"",
+    "no_categories_yet": "Níl catagóirí scileanna ar fáil fós.",
+    "members_with_skills": "baill oilte",
+    "loading_skills": "Scileanna á lódáil...",
+    "skills_in_category": "Scileanna",
+    "offering": "á thairiscint",
+    "requesting": "á iarraidh",
+    "no_skills_yet": "Níl scileanna liostaithe sa chatagóir seo fós.",
+    "members_with": "Baill le \"{{skill}}\"",
+    "offers": "Tairiscintí",
+    "wants": "Miantaí",
+    "no_members": "Níor aimsíodh baill leis an scil seo.",
     "proficiency": {
-      "beginner": "Beginner",
-      "intermediate": "Intermediate",
-      "advanced": "Advanced",
-      "expert": "Expert"
+      "beginner": "Tosaíoch",
+      "intermediate": "Meánach",
+      "advanced": "Ardleibhéal",
+      "expert": "Saineolaí"
     }
   }
 }

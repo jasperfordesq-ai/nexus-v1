@@ -42,6 +42,7 @@ import { adminCategories } from '../../api/adminApi';
 import { DataTable, PageHeader, ConfirmModal, EmptyState, type Column } from '../../components';
 import type { AdminCategory } from '../../api/types';
 
+import { useTranslation } from 'react-i18next';
 // ─────────────────────────────────────────────────────────────────────────────
 // Constants
 // ─────────────────────────────────────────────────────────────────────────────
@@ -77,7 +78,8 @@ const COLOR_OPTIONS = [
 // ─────────────────────────────────────────────────────────────────────────────
 
 export function CategoriesAdmin() {
-  usePageTitle('Admin - Categories');
+  const { t } = useTranslation('admin');
+  usePageTitle(t('categories.page_title'));
   const toast = useToast();
 
   // Data state
@@ -110,7 +112,7 @@ export function CategoriesAdmin() {
         setCategories((data as { data: AdminCategory[] }).data || []);
       }
     } else {
-      toast.error('Failed to load categories');
+      toast.error(t('categories.failed_to_load_categories'));
     }
     setLoading(false);
   }, [typeFilter, toast]);
@@ -145,7 +147,7 @@ export function CategoriesAdmin() {
 
   const handleSave = async () => {
     if (!formData.name.trim()) {
-      toast.error('Category name is required');
+      toast.error(t('categories.category_name_is_required'));
       return;
     }
 
@@ -208,7 +210,7 @@ export function CategoriesAdmin() {
       setDeleteTarget(null);
       loadCategories();
     } else {
-      toast.error('Failed to delete category');
+      toast.error(t('categories.failed_to_delete_category'));
     }
 
     setDeleting(false);
@@ -231,11 +233,11 @@ export function CategoriesAdmin() {
     return (
       <Dropdown>
         <DropdownTrigger>
-          <Button isIconOnly size="sm" variant="light" aria-label="Category actions">
+          <Button isIconOnly size="sm" variant="light" aria-label={t('categories.label_category_actions')}>
             <MoreVertical size={16} />
           </Button>
         </DropdownTrigger>
-        <DropdownMenu aria-label="Category actions" onAction={handleMenuAction}>
+        <DropdownMenu aria-label={t('categories.label_category_actions')} onAction={handleMenuAction}>
           <DropdownItem key="edit" startContent={<Edit size={14} />}>
             Edit
           </DropdownItem>
@@ -313,8 +315,8 @@ export function CategoriesAdmin() {
   return (
     <div>
       <PageHeader
-        title="Categories"
-        description="Manage content categories for listings, events, blog posts, and volunteering"
+        title={t('categories.categories_admin_title')}
+        description={t('categories.categories_admin_desc')}
         actions={
           <Button
             color="primary"
@@ -374,7 +376,7 @@ export function CategoriesAdmin() {
           </ModalHeader>
           <ModalBody className="gap-4">
             <Input
-              label="Name"
+              label={t('categories.label_name')}
               placeholder="e.g. Arts & Crafts"
               value={formData.name}
               onValueChange={(v) => setFormData((prev) => ({ ...prev, name: v }))}
@@ -384,7 +386,7 @@ export function CategoriesAdmin() {
             />
 
             <Select
-              label="Type"
+              label={t('categories.label_type')}
               selectedKeys={new Set([formData.type])}
               onSelectionChange={(keys) => {
                 const selected = Array.from(keys)[0] as string;
@@ -398,7 +400,7 @@ export function CategoriesAdmin() {
             </Select>
 
             <Select
-              label="Colour"
+              label={t('categories.label_colour')}
               selectedKeys={new Set([formData.color])}
               onSelectionChange={(keys) => {
                 const selected = Array.from(keys)[0] as string;

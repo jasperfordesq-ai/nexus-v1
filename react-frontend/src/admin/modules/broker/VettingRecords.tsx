@@ -54,6 +54,7 @@ import { adminVetting, adminUsers } from '../../api/adminApi';
 import { DataTable, StatCard, PageHeader, ConfirmModal, EmptyState, type Column } from '../../components';
 import type { VettingRecord, VettingStats } from '../../api/types';
 
+import { useTranslation } from 'react-i18next';
 const VETTING_TYPE_LABELS: Record<string, string> = {
   dbs_basic: 'DBS Basic',
   dbs_standard: 'DBS Standard',
@@ -84,7 +85,8 @@ interface UserSearchResult {
 }
 
 export function VettingRecords() {
-  usePageTitle('Admin - Vetting Records');
+  const { t } = useTranslation('admin');
+  usePageTitle(t('broker.page_title'));
   const { tenantPath } = useTenant();
   const toast = useToast();
 
@@ -230,7 +232,7 @@ export function VettingRecords() {
         setTotal(Number(meta?.total ?? meta?.total_items ?? res.data.length));
       }
     } catch {
-      toast.error('Failed to load vetting records');
+      toast.error(t('broker.failed_to_load_vetting_records'));
     } finally {
       setLoading(false);
     }
@@ -256,7 +258,7 @@ export function VettingRecords() {
         toast.error(res?.error || 'Failed to verify record');
       }
     } catch {
-      toast.error('Failed to verify record');
+      toast.error(t('broker.failed_to_verify_record'));
     } finally {
       setVerifyingId(null);
     }
@@ -264,7 +266,7 @@ export function VettingRecords() {
 
   const handleReject = async () => {
     if (!rejectModal || !rejectReason.trim()) {
-      toast.error('A reason is required to reject a vetting record');
+      toast.error(t('broker.a_reason_is_required_to_reject_a_vetting'));
       return;
     }
     setRejectLoading(true);
@@ -278,7 +280,7 @@ export function VettingRecords() {
         toast.error(res?.error || 'Failed to reject record');
       }
     } catch {
-      toast.error('Failed to reject record');
+      toast.error(t('broker.failed_to_reject_record'));
     } finally {
       setRejectLoading(false);
       setRejectModal(null);
@@ -292,14 +294,14 @@ export function VettingRecords() {
     try {
       const res = await adminVetting.destroy(deleteItem.id);
       if (res?.success) {
-        toast.success('Vetting record deleted');
+        toast.success(t('broker.vetting_record_deleted'));
         loadItems();
         loadStats();
       } else {
         toast.error(res?.error || 'Failed to delete record');
       }
     } catch {
-      toast.error('Failed to delete record');
+      toast.error(t('broker.failed_to_delete_record'));
     } finally {
       setDeleteLoading(false);
       setDeleteItem(null);
@@ -308,7 +310,7 @@ export function VettingRecords() {
 
   const handleCreate = async () => {
     if (!createForm.user_id) {
-      toast.error('Please select a member');
+      toast.error(t('broker.please_select_a_member'));
       return;
     }
     setCreateLoading(true);
@@ -327,7 +329,7 @@ export function VettingRecords() {
 
       const res = await adminVetting.create(payload as Partial<VettingRecord>);
       if (res?.success || res?.data) {
-        toast.success('Vetting record created');
+        toast.success(t('broker.vetting_record_created'));
         setCreateOpen(false);
         resetCreateForm();
         loadItems();
@@ -336,7 +338,7 @@ export function VettingRecords() {
         toast.error(res?.error || 'Failed to create record');
       }
     } catch {
-      toast.error('Failed to create record');
+      toast.error(t('broker.failed_to_create_record'));
     } finally {
       setCreateLoading(false);
     }
@@ -391,7 +393,7 @@ export function VettingRecords() {
 
       const res = await adminVetting.update(editItem.id, payload as Partial<VettingRecord>);
       if (res?.success) {
-        toast.success('Vetting record updated');
+        toast.success(t('broker.vetting_record_updated'));
         setEditItem(null);
         loadItems();
         loadStats();
@@ -399,7 +401,7 @@ export function VettingRecords() {
         toast.error(res?.error || 'Failed to update record');
       }
     } catch {
-      toast.error('Failed to update record');
+      toast.error(t('broker.failed_to_update_record'));
     } finally {
       setEditLoading(false);
     }
@@ -411,7 +413,7 @@ export function VettingRecords() {
     try {
       const res = await adminVetting.uploadDocument(recordId, file);
       if (res?.success) {
-        toast.success('Document uploaded');
+        toast.success(t('broker.document_uploaded'));
         loadItems();
         // Refresh view modal if open
         if (viewItem?.id === recordId && res.data) {
@@ -421,7 +423,7 @@ export function VettingRecords() {
         toast.error(res?.error || 'Failed to upload document');
       }
     } catch {
-      toast.error('Failed to upload document');
+      toast.error(t('broker.failed_to_upload_document'));
     } finally {
       setUploadingId(null);
     }
@@ -432,7 +434,7 @@ export function VettingRecords() {
     if (!bulkAction || selectedIds.size === 0) return;
 
     if (bulkAction === 'reject' && !bulkRejectReason.trim()) {
-      toast.error('A reason is required for bulk rejection');
+      toast.error(t('broker.a_reason_is_required_for_bulk_rejection'));
       return;
     }
 
@@ -575,7 +577,7 @@ export function VettingRecords() {
             size="sm"
             variant="flat"
             onPress={() => setViewItem(item)}
-            aria-label="View details"
+            aria-label={t('broker.label_view_details')}
           >
             <Eye size={14} />
           </Button>
@@ -584,7 +586,7 @@ export function VettingRecords() {
             size="sm"
             variant="flat"
             onPress={() => openEditModal(item)}
-            aria-label="Edit record"
+            aria-label={t('broker.label_edit_record')}
           >
             <Pencil size={14} />
           </Button>
@@ -597,7 +599,7 @@ export function VettingRecords() {
                 color="success"
                 isLoading={verifyingId === item.id}
                 onPress={() => handleVerify(item)}
-                aria-label="Verify record"
+                aria-label={t('broker.label_verify_record')}
               >
                 <Check size={14} />
               </Button>
@@ -607,7 +609,7 @@ export function VettingRecords() {
                 variant="flat"
                 color="danger"
                 onPress={() => { setRejectModal(item); setRejectReason(''); }}
-                aria-label="Reject record"
+                aria-label={t('broker.label_reject_record')}
               >
                 <X size={14} />
               </Button>
@@ -619,7 +621,7 @@ export function VettingRecords() {
             variant="flat"
             color="danger"
             onPress={() => setDeleteItem(item)}
-            aria-label="Delete record"
+            aria-label={t('broker.label_delete_record')}
           >
             <Trash2 size={14} />
           </Button>
@@ -631,8 +633,8 @@ export function VettingRecords() {
   return (
     <div>
       <PageHeader
-        title="Vetting Records"
-        description="Manage DBS, Garda vetting, and safeguarding compliance records"
+        title={t('broker.vetting_records_title')}
+        description={t('broker.vetting_records_desc')}
         actions={
           <div className="flex gap-2">
             <Button
@@ -659,28 +661,28 @@ export function VettingRecords() {
       {/* Stats Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
         <StatCard
-          label="Total Records"
+          label={t('broker.label_total_records')}
           value={stats?.total ?? 0}
           icon={FileText}
           color="primary"
           loading={statsLoading}
         />
         <StatCard
-          label="Pending Review"
+          label={t('broker.label_pending_review')}
           value={stats?.pending ?? 0}
           icon={Clock}
           color="warning"
           loading={statsLoading}
         />
         <StatCard
-          label="Verified"
+          label={t('broker.label_verified')}
           value={stats?.verified ?? 0}
           icon={ShieldCheck}
           color="success"
           loading={statsLoading}
         />
         <StatCard
-          label="Expiring Soon"
+          label={t('broker.label_expiring_soon')}
           value={stats?.expiring_soon ?? 0}
           icon={ShieldAlert}
           color="danger"
@@ -692,7 +694,7 @@ export function VettingRecords() {
       <div className="mb-4">
         <Input
           placeholder="Search by name, email, or reference number..."
-          aria-label="Search vetting records"
+          aria-label={t('broker.label_search_vetting_records')}
           value={searchQuery}
           onValueChange={(val) => { setSearchQuery(val); setPage(1); }}
           startContent={<Search size={16} className="text-default-400" />}
@@ -842,8 +844,8 @@ export function VettingRecords() {
             ) : (
               <div>
                 <Input
-                  label="Search Member"
-                  placeholder="Type a name or email to search..."
+                  label={t('broker.label_search_member')}
+                  placeholder={t('broker.placeholder_type_a_name_or_email_to_search')}
                   value={userSearchQuery}
                   onValueChange={setUserSearchQuery}
                   variant="bordered"
@@ -880,7 +882,7 @@ export function VettingRecords() {
               </div>
             )}
             <Select
-              label="Vetting Type"
+              label={t('broker.label_vetting_type')}
               selectedKeys={[createForm.vetting_type]}
               onSelectionChange={(keys) => {
                 const val = Array.from(keys)[0] as VettingRecord['vetting_type'];
@@ -894,7 +896,7 @@ export function VettingRecords() {
               ))}
             </Select>
             <Input
-              label="Reference Number"
+              label={t('broker.label_reference_number')}
               placeholder="e.g., DBS-12345678"
               value={createForm.reference_number}
               onValueChange={(val) => setCreateForm(prev => ({ ...prev, reference_number: val }))}
@@ -902,14 +904,14 @@ export function VettingRecords() {
             />
             <div className="grid grid-cols-2 gap-4">
               <Input
-                label="Issue Date"
+                label={t('broker.label_issue_date')}
                 type="date"
                 value={createForm.issue_date}
                 onValueChange={(val) => setCreateForm(prev => ({ ...prev, issue_date: val }))}
                 variant="bordered"
               />
               <Input
-                label="Expiry Date"
+                label={t('broker.label_expiry_date')}
                 type="date"
                 value={createForm.expiry_date}
                 onValueChange={(val) => setCreateForm(prev => ({ ...prev, expiry_date: val }))}
@@ -937,8 +939,8 @@ export function VettingRecords() {
               </Checkbox>
             </div>
             <Textarea
-              label="Notes"
-              placeholder="Additional notes about this vetting record..."
+              label={t('broker.label_notes')}
+              placeholder={t('broker.placeholder_additional_notes_about_this_vetting_record')}
               value={createForm.notes}
               onValueChange={(val) => setCreateForm(prev => ({ ...prev, notes: val }))}
               variant="bordered"
@@ -990,7 +992,7 @@ export function VettingRecords() {
                 </div>
               </div>
               <Select
-                label="Vetting Type"
+                label={t('broker.label_vetting_type')}
                 selectedKeys={[editForm.vetting_type]}
                 onSelectionChange={(keys) => {
                   const val = Array.from(keys)[0] as VettingRecord['vetting_type'];
@@ -1004,7 +1006,7 @@ export function VettingRecords() {
                 ))}
               </Select>
               <Input
-                label="Reference Number"
+                label={t('broker.label_reference_number')}
                 placeholder="e.g., DBS-12345678"
                 value={editForm.reference_number}
                 onValueChange={(val) => setEditForm(prev => ({ ...prev, reference_number: val }))}
@@ -1012,14 +1014,14 @@ export function VettingRecords() {
               />
               <div className="grid grid-cols-2 gap-4">
                 <Input
-                  label="Issue Date"
+                  label={t('broker.label_issue_date')}
                   type="date"
                   value={editForm.issue_date}
                   onValueChange={(val) => setEditForm(prev => ({ ...prev, issue_date: val }))}
                   variant="bordered"
                 />
                 <Input
-                  label="Expiry Date"
+                  label={t('broker.label_expiry_date')}
                   type="date"
                   value={editForm.expiry_date}
                   onValueChange={(val) => setEditForm(prev => ({ ...prev, expiry_date: val }))}
@@ -1047,8 +1049,8 @@ export function VettingRecords() {
                 </Checkbox>
               </div>
               <Textarea
-                label="Notes"
-                placeholder="Additional notes about this vetting record..."
+                label={t('broker.label_notes')}
+                placeholder={t('broker.placeholder_additional_notes_about_this_vetting_record')}
                 value={editForm.notes}
                 onValueChange={(val) => setEditForm(prev => ({ ...prev, notes: val }))}
                 variant="bordered"
@@ -1094,7 +1096,7 @@ export function VettingRecords() {
               </p>
               <Textarea
                 label="Reason (required)"
-                placeholder="Provide a reason for rejection..."
+                placeholder={t('broker.placeholder_provide_a_reason_for_rejection')}
                 value={rejectReason}
                 onValueChange={setRejectReason}
                 minRows={3}
@@ -1336,7 +1338,7 @@ export function VettingRecords() {
               </p>
               <Textarea
                 label="Reason (required)"
-                placeholder="Provide a reason for rejection..."
+                placeholder={t('broker.placeholder_provide_a_reason_for_rejection')}
                 value={bulkRejectReason}
                 onValueChange={setBulkRejectReason}
                 minRows={3}

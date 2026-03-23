@@ -17,6 +17,7 @@ import { useToast } from '@/contexts';
 import { adminDiagnostics } from '../../api/adminApi';
 import { PageHeader, StatCard } from '../../components';
 
+import { useTranslation } from 'react-i18next';
 interface NexusScoreData {
   total_badges_awarded: number;
   active_users: number;
@@ -30,7 +31,8 @@ interface NexusScoreData {
 }
 
 export function NexusScoreAnalytics() {
-  usePageTitle('Admin - Nexus Score Analytics');
+  const { t } = useTranslation('admin');
+  usePageTitle(t('diagnostics.page_title'));
   const toast = useToast();
 
   const [data, setData] = useState<NexusScoreData | null>(null);
@@ -43,14 +45,14 @@ export function NexusScoreAnalytics() {
           setData(res.data as NexusScoreData);
         }
       })
-      .catch(() => toast.error('Failed to load Nexus Score analytics'))
+      .catch(() => toast.error(t('diagnostics.failed_to_load_nexus_score_analytics')))
       .finally(() => setLoading(false));
   }, [toast]);
 
   if (loading) {
     return (
       <div>
-        <PageHeader title="Nexus Score Analytics" description="User engagement scoring and distribution analysis" />
+        <PageHeader title={t('diagnostics.nexus_score_analytics_title')} description={t('diagnostics.nexus_score_analytics_desc')} />
         <div className="flex justify-center py-12"><Spinner size="lg" /></div>
       </div>
     );
@@ -60,11 +62,11 @@ export function NexusScoreAnalytics() {
 
   return (
     <div>
-      <PageHeader title="Nexus Score Analytics" description="User engagement scoring and distribution analysis" />
+      <PageHeader title={t('diagnostics.nexus_score_analytics_title')} description={t('diagnostics.nexus_score_analytics_desc')} />
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4 mb-6">
         <StatCard
-          label="Avg Nexus Score"
+          label={t('diagnostics.label_avg_nexus_score')}
           value={stats.avg_nexus_score !== undefined ? `${Number(stats.avg_nexus_score).toFixed(1)}` : String(stats.total_xp_awarded)}
           icon={BarChart3}
           color="primary"
@@ -76,7 +78,7 @@ export function NexusScoreAnalytics() {
           color="success"
         />
         <StatCard
-          label="Active Users Scored"
+          label={t('diagnostics.label_active_users_scored')}
           value={stats.active_users_scored ?? stats.active_users}
           icon={BarChart3}
           color="warning"

@@ -18,8 +18,10 @@ import { PageHeader, DataTable } from '../../components';
 import type { Column } from '../../components';
 import type { GdprAuditEntry } from '../../api/types';
 
+import { useTranslation } from 'react-i18next';
 export function GdprAuditLog() {
-  usePageTitle('Admin - GDPR Audit Log');
+  const { t } = useTranslation('admin');
+  usePageTitle(t('enterprise.page_title'));
   const toast = useToast();
 
   const [entries, setEntries] = useState<GdprAuditEntry[]>([]);
@@ -34,7 +36,7 @@ export function GdprAuditLog() {
         setEntries(Array.isArray(data) ? data : []);
       }
     } catch {
-      toast.error('Failed to load GDPR audit log');
+      toast.error(t('enterprise.failed_to_load_g_d_p_r_audit_log'));
     } finally {
       setLoading(false);
     }
@@ -60,8 +62,8 @@ export function GdprAuditLog() {
   return (
     <div>
       <PageHeader
-        title="GDPR Audit Log"
-        description="Read-only audit trail of all GDPR-related actions"
+        title={t('enterprise.gdpr_audit_log_title')}
+        description={t('enterprise.gdpr_audit_log_desc')}
         actions={
           <Button
             variant="flat"

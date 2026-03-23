@@ -44,8 +44,10 @@ import LegalDocVersionForm from './LegalDocVersionForm';
 import LegalDocVersionComparison from './LegalDocVersionComparison';
 import DOMPurify from 'dompurify';
 
+import { useTranslation } from 'react-i18next';
 export default function LegalDocVersionList() {
-  usePageTitle('Legal Document Versions');
+  const { t } = useTranslation('admin');
+  usePageTitle(t('enterprise.page_title'));
 
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
@@ -368,7 +370,7 @@ export default function LegalDocVersionList() {
                       size="sm"
                       variant="bordered"
                       isIconOnly
-                      aria-label="View full content"
+                      aria-label={t('enterprise.label_view_full_content')}
                       onPress={() => {
                         setViewingVersion(version);
                         setShowViewModal(true);
@@ -563,7 +565,7 @@ export default function LegalDocVersionList() {
                   <RadioGroup
                     value={notifyTarget}
                     onValueChange={(val) => setNotifyTarget(val as 'all' | 'non_accepted')}
-                    aria-label="Notification target"
+                    aria-label={t('enterprise.label_notification_target')}
                     classNames={{ wrapper: 'gap-3' }}
                   >
                     <Radio
@@ -583,7 +585,7 @@ export default function LegalDocVersionList() {
                         base: 'flex items-start gap-3 p-3 border border-[var(--color-border)] rounded-lg cursor-pointer hover:bg-[var(--color-surface)] max-w-full',
                         label: 'flex-1',
                       }}
-                      description="Send to everyone (may be redundant)"
+                      description={t('enterprise.desc_send_to_everyone_may_be_redundant')}
                     >
                       <span className="font-medium">All active users</span>
                     </Radio>

@@ -16,8 +16,10 @@ import { useToast } from '@/contexts';
 import { adminEnterprise } from '../../api/adminApi';
 import { PageHeader } from '../../components';
 
+import { useTranslation } from 'react-i18next';
 export function SystemConfig() {
-  usePageTitle('Admin - System Configuration');
+  const { t } = useTranslation('admin');
+  usePageTitle(t('enterprise.page_title'));
   const toast = useToast();
 
   const [, setConfig] = useState<Record<string, unknown>>({});
@@ -44,7 +46,7 @@ export function SystemConfig() {
         setEditedConfig(flat);
       }
     } catch {
-      toast.error('Failed to load configuration');
+      toast.error(t('enterprise.failed_to_load_configuration'));
     } finally {
       setLoading(false);
     }
@@ -67,10 +69,10 @@ export function SystemConfig() {
         }
       }
       await adminEnterprise.updateConfig(payload);
-      toast.success('Configuration saved');
+      toast.success(t('enterprise.configuration_saved'));
       loadData();
     } catch {
-      toast.error('Failed to save configuration');
+      toast.error(t('enterprise.failed_to_save_configuration'));
     } finally {
       setSaving(false);
     }
@@ -83,7 +85,7 @@ export function SystemConfig() {
   if (loading) {
     return (
       <div>
-        <PageHeader title="System Configuration" description="Tenant configuration settings" />
+        <PageHeader title={t('enterprise.system_config_title')} description={t('enterprise.system_config_desc')} />
         <div className="flex justify-center py-16">
           <Spinner size="lg" />
         </div>
@@ -96,8 +98,8 @@ export function SystemConfig() {
   return (
     <div>
       <PageHeader
-        title="System Configuration"
-        description="Tenant configuration settings (JSON stored in tenants.configuration)"
+        title={t('enterprise.system_config_title')}
+        description={t('enterprise.system_config_desc')}
         actions={
           <div className="flex gap-2">
             <Button

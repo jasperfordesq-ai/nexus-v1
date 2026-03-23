@@ -19,12 +19,14 @@ import { adminGamification } from '../../api/adminApi';
 import { StatCard, PageHeader } from '../../components';
 import type { GamificationStats, BadgeDefinition } from '../../api/types';
 
+import { useTranslation } from 'react-i18next';
 // ─────────────────────────────────────────────────────────────────────────────
 // Component
 // ─────────────────────────────────────────────────────────────────────────────
 
 export function GamificationAnalytics() {
-  usePageTitle('Admin - Gamification Analytics');
+  const { t } = useTranslation('admin');
+  usePageTitle(t('gamification.page_title'));
   const toast = useToast();
 
   const [stats, setStats] = useState<GamificationStats | null>(null);
@@ -48,7 +50,7 @@ export function GamificationAnalytics() {
         setStats(data as GamificationStats);
       }
     } else {
-      toast.error('Failed to load gamification stats');
+      toast.error(t('gamification.failed_to_load_gamification_stats'));
     }
 
     if (badgesRes.success && badgesRes.data) {
@@ -74,8 +76,8 @@ export function GamificationAnalytics() {
   return (
     <div>
       <PageHeader
-        title="Gamification Analytics"
-        description="Insights into badges, XP, and engagement"
+        title={t('gamification.gamification_analytics_title')}
+        description={t('gamification.gamification_analytics_desc')}
         actions={
           <Link to="../gamification">
             <Button variant="flat" startContent={<ArrowLeft size={16} />}>
@@ -88,28 +90,28 @@ export function GamificationAnalytics() {
       {/* Stats Row */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4 mb-6">
         <StatCard
-          label="Total Badges Awarded"
+          label={t('gamification.label_total_badges_awarded')}
           value={stats?.total_badges_awarded ?? 0}
           icon={Award}
           color="primary"
           loading={loading}
         />
         <StatCard
-          label="Users with Badges"
+          label={t('gamification.label_users_with_badges')}
           value={stats?.active_users ?? 0}
           icon={Users}
           color="success"
           loading={loading}
         />
         <StatCard
-          label="Total XP in System"
+          label={t('gamification.label_total_x_p_in_system')}
           value={stats?.total_xp_awarded ?? 0}
           icon={Zap}
           color="warning"
           loading={loading}
         />
         <StatCard
-          label="Active Campaigns"
+          label={t('gamification.label_active_campaigns')}
           value={stats?.active_campaigns ?? 0}
           icon={Target}
           color="secondary"

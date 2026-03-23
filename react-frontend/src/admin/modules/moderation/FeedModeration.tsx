@@ -31,6 +31,7 @@ import { adminModeration } from '@/admin/api/adminApi';
 import { adminSuper } from '@/admin/api/adminApi';
 import type { AdminFeedPost } from '@/admin/api/types';
 
+import { useTranslation } from 'react-i18next';
 const POST_TYPES = [
   { label: 'All Types', value: '' },
   { label: 'Text Post', value: 'post' },
@@ -47,7 +48,8 @@ const POST_TYPES = [
 ];
 
 export default function FeedModeration() {
-  usePageTitle('Feed Moderation');
+  const { t } = useTranslation('admin');
+  usePageTitle(t('moderation.page_title'));
 
   const toast = useToast();
   const { user } = useAuth();
@@ -141,7 +143,7 @@ export default function FeedModeration() {
         toast.error(response.error || 'Action failed');
       }
     } catch {
-      toast.error('An error occurred');
+      toast.error(t('moderation.an_error_occurred'));
     } finally {
       setActionLoading(false);
     }
@@ -244,7 +246,7 @@ export default function FeedModeration() {
   return (
     <div className="space-y-6">
       <PageHeader
-        title="Feed Moderation"
+        title={t('moderation.feed_moderation_title')}
         description={isSuperAdmin ? 'Moderate feed posts across all tenants' : 'Moderate feed posts across your community'}
         actions={
           <Button
@@ -262,8 +264,8 @@ export default function FeedModeration() {
       {/* Filter Bar */}
       <div className="flex flex-col sm:flex-row gap-4">
         <Input
-          placeholder="Search posts or users..."
-          aria-label="Search posts"
+          placeholder={t('moderation.placeholder_search_posts_or_users')}
+          aria-label={t('moderation.label_search_posts')}
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
@@ -271,7 +273,7 @@ export default function FeedModeration() {
           className="flex-1"
         />
         <Select
-          label="Post Type"
+          label={t('moderation.label_post_type')}
           selectedKeys={typeFilter ? [typeFilter] : []}
           onChange={(e) => setTypeFilter(e.target.value)}
           className="w-full sm:w-48"
@@ -284,7 +286,7 @@ export default function FeedModeration() {
         </Select>
         {isSuperAdmin && (
           <Select
-            label="Tenant"
+            label={t('moderation.label_tenant')}
             selectedKeys={tenantFilter ? [tenantFilter] : []}
             onChange={(e) => setTenantFilter(e.target.value)}
             className="w-full sm:w-56"
@@ -325,7 +327,7 @@ export default function FeedModeration() {
       )}
 
       {/* Table */}
-      <Table aria-label="Feed posts table">
+      <Table aria-label={t('moderation.label_feed_posts_table')}>
         <TableHeader>
           {columns.map((col) => (
             <TableColumn key={col}>{col}</TableColumn>

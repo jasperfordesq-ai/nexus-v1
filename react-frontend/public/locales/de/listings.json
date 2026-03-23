@@ -122,26 +122,29 @@
   "page_meta_keywords": "Inserate, Dienste, Angebote",
   "save_listing": "Eintrag speichern",
   "unsave_listing": "Eintrag nicht mehr speichern",
-  "saved_success": "Listing saved",
-  "unsaved_success": "Listing removed from saved",
+  "saved_success": "Anzeige gespeichert",
+  "unsaved_success": "Anzeige aus Gespeicherten entfernt",
   "save_error": "Failed to update saved listing",
-  "featured": "Featured",
-  "featured_badge": "Featured listing",
+  "featured": "Empfohlen",
+  "featured_badge": "Empfohlene Anzeige",
   "skill_tags": {
-    "label": "Skill Tags",
-    "placeholder": "Type a skill and press Enter...",
-    "aria_add": "Add skill tag"
+    "label": "Fähigkeits-Tags",
+    "placeholder": "Eine Fähigkeit eingeben und Enter drücken...",
+    "aria_add": "Fähigkeits-Tag hinzufügen"
   },
   "analytics": {
-    "title": "Listing Analytics",
-    "total_views": "Total Views",
-    "unique_viewers": "{{count}} unique",
-    "contacts": "Contacts",
-    "contact_rate": "{{rate}}% rate",
-    "saves": "Saves",
-    "save_rate": "{{rate}}% rate",
-    "trend_7day": "7-Day Trend",
-    "vs_previous_week": "vs. previous week",
-    "views_last_days": "Views (Last {{days}} Days)"
-  }
+    "title": "Anzeigenanalyse",
+    "total_views": "Gesamtaufrufe",
+    "unique_viewers": "{{count}} einzigartig",
+    "contacts": "Kontakte",
+    "contact_rate": "{{rate}}% Rate",
+    "saves": "Gespeichert",
+    "save_rate": "{{rate}}% Rate",
+    "trend_7day": "7-Tage-Trend",
+    "vs_previous_week": "ggü. Vorwoche",
+    "views_last_days": "Aufrufe (letzte {{days}} Tage)"
+  },
+  "detail_like": "Like",
+  "detail_liked": "Liked",
+  "detail_comments": "Comments"
 }

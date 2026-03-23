@@ -23,6 +23,7 @@ import { adminBroker, adminListings } from '../../api/adminApi';
 import { DataTable, PageHeader, type Column } from '../../components';
 import type { RiskTag } from '../../api/types';
 
+import { useTranslation } from 'react-i18next';
 const riskColorMap: Record<string, 'success' | 'warning' | 'danger' | 'default'> = {
   low: 'success',
   medium: 'warning',
@@ -76,7 +77,8 @@ interface ListingSearchResult {
 }
 
 export function RiskTagsPage() {
-  usePageTitle('Admin - Risk Tags');
+  const { t } = useTranslation('admin');
+  usePageTitle(t('broker.page_title'));
   const { tenantPath } = useTenant();
   const toast = useToast();
 
@@ -109,7 +111,7 @@ export function RiskTagsPage() {
         setItems(res.data);
       }
     } catch {
-      toast.error('Failed to load risk tags');
+      toast.error(t('broker.failed_to_load_risk_tags'));
     } finally {
       setLoading(false);
     }
@@ -193,11 +195,11 @@ export function RiskTagsPage() {
   async function handleSave() {
     const listingId = parseInt(form.listing_id);
     if (!listingId || listingId <= 0) {
-      toast.error('Please select a valid listing');
+      toast.error(t('broker.please_select_a_valid_listing'));
       return;
     }
     if (!form.risk_category.trim()) {
-      toast.error('Risk category is required');
+      toast.error(t('broker.risk_category_is_required'));
       return;
     }
 
@@ -217,10 +219,10 @@ export function RiskTagsPage() {
         closeModal();
         loadItems();
       } else {
-        toast.error('Failed to save risk tag');
+        toast.error(t('broker.failed_to_save_risk_tag'));
       }
     } catch {
-      toast.error('Failed to save risk tag');
+      toast.error(t('broker.failed_to_save_risk_tag'));
     } finally {
       setSaving(false);
     }
@@ -232,13 +234,13 @@ export function RiskTagsPage() {
     try {
       const res = await adminBroker.removeRiskTag(tag.listing_id);
       if (res.success) {
-        toast.success('Risk tag removed');
+        toast.success(t('broker.risk_tag_removed'));
         loadItems();
       } else {
-        toast.error('Failed to remove risk tag');
+        toast.error(t('broker.failed_to_remove_risk_tag'));
       }
     } catch {
-      toast.error('Failed to remove risk tag');
+      toast.error(t('broker.failed_to_remove_risk_tag'));
     } finally {
       setRemoving(null);
     }
@@ -363,7 +365,7 @@ export function RiskTagsPage() {
             color="primary"
             isIconOnly
             onPress={() => openEditModal(item)}
-            aria-label="Edit risk tag"
+            aria-label={t('broker.label_edit_risk_tag')}
           >
             <Edit size={14} />
           </Button>
@@ -374,7 +376,7 @@ export function RiskTagsPage() {
             isIconOnly
             isLoading={removing === item.listing_id}
             onPress={() => handleRemove(item)}
-            aria-label="Remove risk tag"
+            aria-label={t('broker.label_remove_risk_tag')}
           >
             <Trash2 size={14} />
           </Button>
@@ -386,8 +388,8 @@ export function RiskTagsPage() {
   return (
     <div>
       <PageHeader
-        title="Risk Tags"
-        description="Listings flagged with risk assessments"
+        title={t('broker.risk_tags_title')}
+        description={t('broker.risk_tags_desc')}
         actions={
           <div className="flex gap-2">
             <Button
@@ -468,10 +470,10 @@ export function RiskTagsPage() {
                 ) : (
                   <>
                     <Input
-                      label="Search Listing"
+                      label={t('broker.label_search_listing')}
                       value={listingSearch}
                       onValueChange={setListingSearch}
-                      placeholder="Type to search by title or ID..."
+                      placeholder={t('broker.placeholder_type_to_search_by_title_or_i_d')}
                       isRequired
                       startContent={searchingListings ? <Spinner size="sm" /> : <Search size={14} />}
                     />
@@ -497,7 +499,7 @@ export function RiskTagsPage() {
                     )}
                     {/* Fallback: manual ID entry */}
                     <Input
-                      label="Or enter Listing ID directly"
+                      label={t('broker.label_or_enter_listing_i_d_directly')}
                       type="number"
                       value={form.listing_id}
                       onValueChange={v => setForm(f => ({ ...f, listing_id: v }))}
@@ -518,7 +520,7 @@ export function RiskTagsPage() {
             )}
 
             <Select
-              label="Risk Level"
+              label={t('broker.label_risk_level')}
               selectedKeys={new Set([form.risk_level])}
               onSelectionChange={keys => {
                 const val = Array.from(keys)[0] as RiskTagForm['risk_level'];
@@ -534,7 +536,7 @@ export function RiskTagsPage() {
             </Select>
 
             <Select
-              label="Risk Category"
+              label={t('broker.label_risk_category')}
               selectedKeys={form.risk_category ? new Set([form.risk_category]) : new Set()}
               onSelectionChange={keys => {
                 const val = Array.from(keys)[0] as string;
@@ -553,15 +555,15 @@ export function RiskTagsPage() {
               label="Risk Notes (internal)"
               value={form.risk_notes}
               onValueChange={v => setForm(f => ({ ...f, risk_notes: v }))}
-              placeholder="Internal notes visible only to brokers"
+              placeholder={t('broker.placeholder_internal_notes_visible_only_to_brokers')}
               minRows={3}
             />
 
             <Textarea
-              label="Member Visible Notes"
+              label={t('broker.label_member_visible_notes')}
               value={form.member_visible_notes}
               onValueChange={v => setForm(f => ({ ...f, member_visible_notes: v }))}
-              placeholder="Notes shown to members when this tag is triggered"
+              placeholder={t('broker.placeholder_notes_shown_to_members_when_this_tag_is_triggered')}
               minRows={3}
             />
 

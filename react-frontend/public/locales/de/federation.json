@@ -415,14 +415,56 @@
   "messages.aria_send_reply": "Send reply",
   "partner_detail.federation_partner_badge": "Federation Partner",
   "hub": {},
-  "messages": {},
-  "onboarding": {},
+  "messages": {
+    "aria_back_to_list": "Zurück zur Nachrichtenliste",
+    "aria_read": "Lesen",
+    "aria_delivered": "Zugestellt",
+    "aria_reply": "Antworten",
+    "aria_send_reply": "Antwort senden"
+  },
+  "onboarding": {
+    "reach_label_remote_ok": "Remote möglich"
+  },
   "listings": {},
-  "members": {},
+  "members": {
+    "reach_remote_ok": "Remote möglich",
+    "aria_search": "Föderationsmitglieder suchen",
+    "aria_filter_community": "Nach Partnergemeinschaft filtern",
+    "aria_filter_skills": "Nach Fähigkeiten filtern"
+  },
   "events": {},
   "partners": {},
-  "partner_detail": {},
+  "partner_detail": {
+    "federation_partner_badge": "Föderationspartner"
+  },
   "member_profile": {},
   "settings": {},
-  "connections": {}
+  "connections": {
+    "page_title": "Verbindungen",
+    "breadcrumb_federation": "Föderation",
+    "breadcrumb_connections": "Verbindungen",
+    "title": "Föderationsverbindungen",
+    "subtitle": "Gemeinschaftsübergreifende Verbindungen verwalten",
+    "tab_connected": "Verbunden",
+    "tab_received": "Erhalten",
+    "tab_sent": "Gesendet",
+    "loading": "Verbindungen werden geladen...",
+    "empty_connected": "Noch keine Verbindungen",
+    "empty_received": "Keine ausstehenden Anfragen",
+    "empty_sent": "Keine gesendeten Anfragen",
+    "empty_connected_desc": "Vernetzen Sie sich mit Mitgliedern aus Partnergemeinschaften, um Ihr Netzwerk zu erweitern.",
+    "empty_received_desc": "Wenn Ihnen jemand eine Verbindungsanfrage sendet, erscheint sie hier.",
+    "empty_sent_desc": "Verbindungsanfragen, die Sie senden, erscheinen hier.",
+    "browse_members": "Föderationsmitglieder durchsuchen",
+    "unknown_member": "Föderationsmitglied",
+    "message": "Nachricht",
+    "remove": "Verbindung entfernen",
+    "accept": "Akzeptieren",
+    "decline": "Ablehnen",
+    "pending": "Ausstehend",
+    "accepted_success": "Verbindung akzeptiert!",
+    "rejected_success": "Verbindungsanfrage abgelehnt",
+    "removed_success": "Verbindung entfernt",
+    "action_failed": "Aktion fehlgeschlagen"
+  }
 }

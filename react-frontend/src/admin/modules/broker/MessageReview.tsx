@@ -32,8 +32,10 @@ import { adminBroker } from '../../api/adminApi';
 import { DataTable, PageHeader, type Column } from '../../components';
 import type { BrokerMessage } from '../../api/types';
 
+import { useTranslation } from 'react-i18next';
 export function MessageReview() {
-  usePageTitle('Admin - Message Review');
+  const { t } = useTranslation('admin');
+  usePageTitle(t('broker.page_title'));
   const { tenantPath } = useTenant();
   const toast = useToast();
 
@@ -64,7 +66,7 @@ export function MessageReview() {
         setTotal(Number(meta?.total ?? meta?.total_items ?? res.data.length));
       }
     } catch {
-      toast.error('Failed to load messages');
+      toast.error(t('broker.failed_to_load_messages'));
     } finally {
       setLoading(false);
     }
@@ -79,13 +81,13 @@ export function MessageReview() {
     try {
       const res = await adminBroker.reviewMessage(id);
       if (res?.success) {
-        toast.success('Message marked as reviewed');
+        toast.success(t('broker.message_marked_as_reviewed'));
         loadItems();
       } else {
         toast.error(res?.error || 'Failed to mark message as reviewed');
       }
     } catch {
-      toast.error('Failed to mark message as reviewed');
+      toast.error(t('broker.failed_to_mark_message_as_reviewed'));
     } finally {
       setReviewingId(null);
     }
@@ -101,21 +103,21 @@ export function MessageReview() {
   const handleFlag = async () => {
     if (!selectedMessageId) return;
     if (!flagReason.trim()) {
-      toast.error('A reason is required to flag a message');
+      toast.error(t('broker.a_reason_is_required_to_flag_a_message'));
       return;
     }
     setFlagLoading(true);
     try {
       const res = await adminBroker.flagMessage(selectedMessageId, flagReason, flagSeverity);
       if (res?.success) {
-        toast.success('Message flagged successfully');
+        toast.success(t('broker.message_flagged_successfully'));
         setFlagModalOpen(false);
         loadItems();
       } else {
         toast.error(res?.error || 'Failed to flag message');
       }
     } catch {
-      toast.error('Failed to flag message');
+      toast.error(t('broker.failed_to_flag_message'));
     } finally {
       setFlagLoading(false);
     }
@@ -224,7 +226,7 @@ export function MessageReview() {
               startContent={<CheckCircle size={14} />}
               onPress={() => handleReview(item.id)}
               isLoading={reviewingId === item.id}
-              aria-label="Mark as reviewed"
+              aria-label={t('broker.label_mark_as_reviewed')}
             >
               Review
             </Button>
@@ -236,7 +238,7 @@ export function MessageReview() {
               color="warning"
               startContent={<Flag size={14} />}
               onPress={() => openFlagModal(item.id)}
-              aria-label="Flag message"
+              aria-label={t('broker.label_flag_message')}
             >
               Flag
             </Button>
@@ -249,8 +251,8 @@ export function MessageReview() {
   return (
     <div>
       <PageHeader
-        title="Message Review"
-        description="Review broker message copies and flagged conversations"
+        title={t('broker.message_review_title')}
+        description={t('broker.message_review_desc')}
         actions={
           <Button
             as={Link}
@@ -304,7 +306,7 @@ export function MessageReview() {
           <ModalBody>
             <Textarea
               label="Reason (required)"
-              placeholder="Describe why this message is being flagged..."
+              placeholder={t('broker.placeholder_describe_why_this_message_is_being_flagged')}
               value={flagReason}
               onValueChange={setFlagReason}
               minRows={3}
@@ -312,7 +314,7 @@ export function MessageReview() {
               isRequired
             />
             <Select
-              label="Severity"
+              label={t('broker.label_severity')}
               selectedKeys={[flagSeverity]}
               onSelectionChange={(keys) => {
                 const val = Array.from(keys)[0] as 'info' | 'warning' | 'concern' | 'urgent';

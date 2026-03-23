@@ -212,8 +212,8 @@ function FeaturedListingsPanel() {
             Feature a Listing
           </h3>
           <Input
-            placeholder="Search active listings to feature..."
-            aria-label="Search listings"
+            placeholder={t('listings.placeholder_search_active_listings_to_feature')}
+            aria-label={t('listings.label_search_listings')}
             startContent={<Search size={16} className="text-default-400" />}
             value={searchQuery}
             onValueChange={handleSearch}
@@ -304,7 +304,7 @@ function FeaturedListingsPanel() {
 
 export function ListingsAdmin() {
   usePageTitle('Admin - Content');
-  useTranslation('admin');
+  const { t } = useTranslation('admin');
   const toast = useToast();
 
   const [activeTab, setActiveTab] = useState('content');
@@ -340,7 +340,7 @@ export function ListingsAdmin() {
         }
       }
     } catch {
-      toast.error('Failed to load content');
+      toast.error(t('listings.failed_to_load_content'));
     } finally {
       setLoading(false);
     }
@@ -366,7 +366,7 @@ export function ListingsAdmin() {
         toast.error(res?.error || `Failed to ${type} content`);
       }
     } catch {
-      toast.error('An unexpected error occurred');
+      toast.error(t('listings.an_unexpected_error_occurred'));
     } finally {
       setActionLoading(false);
       setConfirmAction(null);
@@ -389,7 +389,7 @@ export function ListingsAdmin() {
         toast.error(res?.error || 'Failed to update featured status');
       }
     } catch {
-      toast.error('An unexpected error occurred');
+      toast.error(t('listings.an_unexpected_error_occurred'));
     }
   };
 
@@ -445,7 +445,7 @@ export function ListingsAdmin() {
               variant="flat"
               color="success"
               onPress={() => setConfirmAction({ type: 'approve', item })}
-              aria-label="Approve"
+              aria-label={t('listings.label_approve')}
             >
               <CheckCircle size={14} />
             </Button>
@@ -468,7 +468,7 @@ export function ListingsAdmin() {
             variant="flat"
             color="danger"
             onPress={() => setConfirmAction({ type: 'delete', item })}
-            aria-label="Delete"
+            aria-label={t('listings.label_delete')}
           >
             <Trash2 size={14} />
           </Button>
@@ -480,8 +480,8 @@ export function ListingsAdmin() {
   return (
     <div>
       <PageHeader
-        title="Content Directory"
-        description="View and moderate all user-generated content"
+        title={t('listings.listings_admin_title')}
+        description={t('listings.listings_admin_desc')}
       />
 
       {/* Top-level tabs: Content | Featured */}

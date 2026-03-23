@@ -39,6 +39,7 @@ import { adminMatching } from '../../api/adminApi';
 import { StatCard, PageHeader, ConfirmModal } from '../../components';
 import type { SmartMatchingConfig, MatchingStatsResponse } from '../../api/types';
 
+import { useTranslation } from 'react-i18next';
 /** Weight metadata for display */
 const WEIGHT_META: Array<{
   key: keyof Pick<SmartMatchingConfig,
@@ -57,7 +58,8 @@ const WEIGHT_META: Array<{
 ];
 
 export function SmartMatchingOverview() {
-  usePageTitle('Admin - Smart Matching');
+  const { t } = useTranslation('admin');
+  usePageTitle(t('matching.page_title'));
   const { tenantPath } = useTenant();
   const toast = useToast();
 
@@ -102,10 +104,10 @@ export function SmartMatchingOverview() {
         setClearModalOpen(false);
         loadData();
       } else {
-        toast.error('Failed to clear cache');
+        toast.error(t('matching.failed_to_clear_cache'));
       }
     } catch {
-      toast.error('Failed to clear cache');
+      toast.error(t('matching.failed_to_clear_cache'));
     } finally {
       setClearing(false);
     }
@@ -116,8 +118,8 @@ export function SmartMatchingOverview() {
   return (
     <div>
       <PageHeader
-        title="Smart Matching"
-        description="Algorithm configuration and analytics"
+        title={t('matching.smart_matching_overview_title')}
+        description={t('matching.smart_matching_overview_desc')}
         actions={
           <Button
             variant="flat"
@@ -134,21 +136,21 @@ export function SmartMatchingOverview() {
       {/* Stats Row */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4 mb-6">
         <StatCard
-          label="Active Matches"
+          label={t('matching.label_active_matches')}
           value={overview?.active_users_matching ?? '---'}
           icon={Target}
           color="primary"
           loading={loading}
         />
         <StatCard
-          label="Cache Size"
+          label={t('matching.label_cache_size')}
           value={overview?.cache_entries ?? '---'}
           icon={Database}
           color="secondary"
           loading={loading}
         />
         <StatCard
-          label="Avg Score"
+          label={t('matching.label_avg_score')}
           value={overview?.avg_match_score !== undefined
             ? `${overview.avg_match_score}%`
             : '---'}
@@ -157,7 +159,7 @@ export function SmartMatchingOverview() {
           loading={loading}
         />
         <StatCard
-          label="Broker Approval"
+          label={t('matching.label_broker_approval')}
           value={stats?.broker_approval_enabled ? 'Enabled' : 'Disabled'}
           icon={ShieldCheck}
           color={stats?.broker_approval_enabled ? 'success' : 'warning'}

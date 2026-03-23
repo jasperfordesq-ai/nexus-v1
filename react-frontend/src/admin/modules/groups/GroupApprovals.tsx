@@ -17,8 +17,10 @@ import { adminGroups } from '../../api/adminApi';
 import { DataTable, PageHeader, ConfirmModal, EmptyState, type Column } from '../../components';
 import type { GroupApproval } from '../../api/types';
 
+import { useTranslation } from 'react-i18next';
 export function GroupApprovals() {
-  usePageTitle('Admin - Group Approvals');
+  const { t } = useTranslation('admin');
+  usePageTitle(t('groups.page_title'));
   const toast = useToast();
 
   const [items, setItems] = useState<GroupApproval[]>([]);
@@ -45,7 +47,7 @@ export function GroupApprovals() {
         }
       }
     } catch {
-      toast.error('Failed to load approvals');
+      toast.error(t('groups.failed_to_load_approvals'));
     } finally {
       setLoading(false);
     }
@@ -66,7 +68,7 @@ export function GroupApprovals() {
         toast.error(res?.error || 'Failed to approve membership');
       }
     } catch {
-      toast.error('An unexpected error occurred');
+      toast.error(t('groups.an_unexpected_error_occurred'));
     } finally {
       setActionLoading(null);
     }
@@ -84,7 +86,7 @@ export function GroupApprovals() {
         toast.error(res?.error || 'Failed to reject membership');
       }
     } catch {
-      toast.error('An unexpected error occurred');
+      toast.error(t('groups.an_unexpected_error_occurred'));
     } finally {
       setActionLoading(null);
       setConfirmReject(null);
@@ -139,7 +141,7 @@ export function GroupApprovals() {
             color="success"
             isLoading={actionLoading === item.id}
             onPress={() => handleApprove(item)}
-            aria-label="Approve membership"
+            aria-label={t('groups.label_approve_membership')}
           >
             <Check size={14} />
           </Button>
@@ -150,7 +152,7 @@ export function GroupApprovals() {
             color="danger"
             isDisabled={actionLoading === item.id}
             onPress={() => setConfirmReject(item)}
-            aria-label="Reject membership"
+            aria-label={t('groups.label_reject_membership')}
           >
             <X size={14} />
           </Button>
@@ -162,7 +164,7 @@ export function GroupApprovals() {
   if (loading) {
     return (
       <div>
-        <PageHeader title="Group Approvals" description="Review pending membership requests" />
+        <PageHeader title={t('groups.group_approvals_title')} description={t('groups.group_approvals_desc')} />
         <div className="flex items-center justify-center py-20">
           <Spinner size="lg" />
         </div>
@@ -172,13 +174,13 @@ export function GroupApprovals() {
 
   return (
     <div>
-      <PageHeader title="Group Approvals" description="Review pending membership requests" />
+      <PageHeader title={t('groups.group_approvals_title')} description={t('groups.group_approvals_desc')} />
 
       {items.length === 0 ? (
         <EmptyState
           icon={UserPlus}
           title="No Pending Approvals"
-          description="All membership requests have been reviewed. New requests will appear here."
+          description={t('groups.desc_all_membership_requests_have_been_review')}
         />
       ) : (
         <DataTable

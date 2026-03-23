@@ -28,6 +28,7 @@ import { useToast } from '@/contexts';
 import { PageHeader, EmptyState, DataTable, ConfirmModal, type Column } from '../../components';
 import { adminTools } from '../../api/adminApi';
 
+import { useTranslation } from 'react-i18next';
 interface Redirect {
   id: number;
   from_url: string;
@@ -38,7 +39,8 @@ interface Redirect {
 }
 
 export function Redirects() {
-  usePageTitle('Admin - Redirects');
+  const { t } = useTranslation('admin');
+  usePageTitle(t('advanced.page_title'));
   const toast = useToast();
 
   const [redirects, setRedirects] = useState<Redirect[]>([]);
@@ -61,7 +63,7 @@ export function Redirects() {
       const res = await adminTools.getRedirects();
       setRedirects(res.data ?? []);
     } catch {
-      toast.error('Failed to load redirects');
+      toast.error(t('advanced.failed_to_load_redirects'));
     } finally {
       setLoading(false);
     }
@@ -73,7 +75,7 @@ export function Redirects() {
 
   const handleAdd = async () => {
     if (!fromUrl.trim() || !toUrl.trim()) {
-      toast.warning('Both From URL and To URL are required');
+      toast.warning(t('advanced.both_from_u_r_l_and_to_u_r_l_are_required'));
       return;
     }
     setSaving(true);
@@ -85,7 +87,7 @@ export function Redirects() {
       });
 
       if (res.success) {
-        toast.success('Redirect created');
+        toast.success(t('advanced.redirect_created'));
         setFromUrl('');
         setToUrl('');
         setStatusCode('301');
@@ -96,7 +98,7 @@ export function Redirects() {
         toast.error(error);
       }
     } catch (err) {
-      toast.error('Failed to create redirect');
+      toast.error(t('advanced.failed_to_create_redirect'));
       console.error('Redirect create error:', err);
     } finally {
       setSaving(false);
@@ -110,7 +112,7 @@ export function Redirects() {
       const res = await adminTools.deleteRedirect(deleteTarget.id);
 
       if (res.success) {
-        toast.success('Redirect deleted');
+        toast.success(t('advanced.redirect_deleted'));
         setDeleteTarget(null);
         await fetchRedirects();
       } else {
@@ -118,7 +120,7 @@ export function Redirects() {
         toast.error(error);
       }
     } catch (err) {
-      toast.error('Failed to delete redirect');
+      toast.error(t('advanced.failed_to_delete_redirect'));
       console.error('Redirect delete error:', err);
     } finally {
       setDeleting(false);
@@ -153,7 +155,7 @@ export function Redirects() {
           color="danger"
           size="sm"
           onPress={() => setDeleteTarget(item)}
-          aria-label="Delete redirect"
+          aria-label={t('advanced.label_delete_redirect')}
         >
           <Trash2 size={16} />
         </Button>
@@ -164,7 +166,7 @@ export function Redirects() {
   if (loading) {
     return (
       <div>
-        <PageHeader title="Redirects" description="Manage URL redirects (301/302)" />
+        <PageHeader title={t('advanced.redirects_title')} description={t('advanced.redirects_desc')} />
         <div className="flex justify-center py-16">
           <Spinner size="lg" />
         </div>
@@ -175,8 +177,8 @@ export function Redirects() {
   return (
     <div>
       <PageHeader
-        title="Redirects"
-        description="Manage URL redirects (301/302)"
+        title={t('advanced.redirects_title')}
+        description={t('advanced.redirects_desc')}
         actions={
           <Button color="primary" startContent={<Plus size={16} />} onPress={onAddOpen}>
             Add Redirect
@@ -207,23 +209,23 @@ export function Redirects() {
           <ModalHeader>Add Redirect</ModalHeader>
           <ModalBody className="gap-4">
             <Input
-              label="From URL"
+              label={t('advanced.label_from_u_r_l')}
               placeholder="/old-page"
               variant="bordered"
               value={fromUrl}
               onValueChange={setFromUrl}
-              description="The URL path to redirect from"
+              description={t('advanced.desc_the_u_r_l_path_to_redirect_from')}
             />
             <Input
-              label="To URL"
+              label={t('advanced.label_to_u_r_l')}
               placeholder="/new-page"
               variant="bordered"
               value={toUrl}
               onValueChange={setToUrl}
-              description="The destination URL path"
+              description={t('advanced.desc_the_destination_u_r_l_path')}
             />
             <Select
-              label="Status Code"
+              label={t('advanced.label_status_code')}
               variant="bordered"
               selectedKeys={[statusCode]}
               onSelectionChange={(keys) => {

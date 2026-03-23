@@ -122,26 +122,29 @@
   "page_meta_keywords": "liostalacha, seirbhisi",
   "save_listing": "Sábháil liostáil",
   "unsave_listing": "Bain sábháil liostáil",
-  "saved_success": "Listing saved",
-  "unsaved_success": "Listing removed from saved",
-  "save_error": "Failed to update saved listing",
-  "featured": "Featured",
-  "featured_badge": "Featured listing",
+  "saved_success": "Liostú sábháilte",
+  "unsaved_success": "Liostú bainte ó shábháilte",
+  "save_error": "Theip ar liostú sábháilte a nuashonrú",
+  "featured": "Molta",
+  "featured_badge": "Liostú molta",
   "skill_tags": {
-    "label": "Skill Tags",
-    "placeholder": "Type a skill and press Enter...",
-    "aria_add": "Add skill tag"
+    "label": "Clibeanna Scileanna",
+    "placeholder": "Clóscríobh scil agus brúigh Iontráil...",
+    "aria_add": "Cuir clib scile leis"
   },
   "analytics": {
-    "title": "Listing Analytics",
-    "total_views": "Total Views",
-    "unique_viewers": "{{count}} unique",
-    "contacts": "Contacts",
-    "contact_rate": "{{rate}}% rate",
-    "saves": "Saves",
-    "save_rate": "{{rate}}% rate",
-    "trend_7day": "7-Day Trend",
-    "vs_previous_week": "vs. previous week",
-    "views_last_days": "Views (Last {{days}} Days)"
-  }
+    "title": "Anailísíocht Liostaithe",
+    "total_views": "Amhairc Iomlána",
+    "unique_viewers": "{{count}} uathúil",
+    "contacts": "Teagmhálacha",
+    "contact_rate": "{{rate}}% ráta",
+    "saves": "Sábhálacha",
+    "save_rate": "{{rate}}% ráta",
+    "trend_7day": "Treocht 7 Lá",
+    "vs_previous_week": "vs. an tseachtain roimhe",
+    "views_last_days": "Amhairc ({{days}} Lá Deiridh)"
+  },
+  "detail_like": "Like",
+  "detail_liked": "Liked",
+  "detail_comments": "Comments"
 }

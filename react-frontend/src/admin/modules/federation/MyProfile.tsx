@@ -17,6 +17,7 @@ import { useToast } from '@/contexts';
 import { adminFederation } from '../../api/adminApi';
 import { PageHeader } from '../../components';
 
+import { useTranslation } from 'react-i18next';
 interface FedProfile {
   id: number;
   name: string;
@@ -31,7 +32,8 @@ interface FedProfile {
 }
 
 export function MyProfile() {
-  usePageTitle('Admin - Federation Profile');
+  const { t } = useTranslation('admin');
+  usePageTitle(t('federation.page_title'));
   const toast = useToast();
 
   const [profile, setProfile] = useState<FedProfile | null>(null);
@@ -71,7 +73,7 @@ export function MyProfile() {
         populateForm(profileData);
       }
     } catch {
-      toast.error('Failed to load federation profile');
+      toast.error(t('federation.failed_to_load_federation_profile'));
       setProfile(null);
     }
     setLoading(false);
@@ -102,15 +104,15 @@ export function MyProfile() {
         },
       });
       if (res.success) {
-        toast.success('Federation profile updated successfully');
+        toast.success(t('federation.federation_profile_updated_successfully'));
         setDirty(false);
         // Refresh profile from server to get any server-side changes
         await loadData();
       } else {
-        toast.error('Failed to update federation profile');
+        toast.error(t('federation.failed_to_update_federation_profile'));
       }
     } catch {
-      toast.error('Failed to update federation profile');
+      toast.error(t('federation.failed_to_update_federation_profile'));
     } finally {
       setSaving(false);
     }
@@ -120,8 +122,8 @@ export function MyProfile() {
     return (
       <div>
         <PageHeader
-          title="My Federation Profile"
-          description="How your community appears in the federation directory"
+          title={t('federation.my_profile_title')}
+          description={t('federation.my_profile_desc')}
         />
         <div className="flex h-64 items-center justify-center">
           <Spinner size="lg" />
@@ -134,8 +136,8 @@ export function MyProfile() {
     return (
       <div>
         <PageHeader
-          title="My Federation Profile"
-          description="How your community appears in the federation directory"
+          title={t('federation.my_profile_title')}
+          description={t('federation.my_profile_desc')}
           actions={
             <Button variant="flat" startContent={<RefreshCw size={16} />} onPress={loadData}>
               Refresh
@@ -156,8 +158,8 @@ export function MyProfile() {
   return (
     <div>
       <PageHeader
-        title="My Federation Profile"
-        description="How your community appears in the federation directory"
+        title={t('federation.my_profile_title')}
+        description={t('federation.my_profile_desc')}
         actions={
           <div className="flex items-center gap-2">
             <Button
@@ -186,29 +188,29 @@ export function MyProfile() {
         <CardHeader><h3 className="text-lg font-semibold">Community Profile</h3></CardHeader>
         <CardBody className="gap-4">
           <Input
-            label="Community Name"
+            label={t('federation.label_community_name')}
             value={name}
             onValueChange={(val) => { setName(val); markDirty(); }}
             variant="bordered"
-            description="The public name of your community in the federation directory"
+            description={t('federation.desc_the_public_name_of_your_community_in_the')}
           />
           <Input
-            label="Slug"
+            label={t('federation.label_slug')}
             value={profile.slug}
             isReadOnly
             variant="bordered"
             description="URL-safe identifier (cannot be changed)"
           />
           <Input
-            label="Contact Email"
+            label={t('federation.label_contact_email')}
             type="email"
             value={contactEmail}
             onValueChange={(val) => { setContactEmail(val); markDirty(); }}
             variant="bordered"
-            description="Public contact email shown to partner communities"
+            description={t('federation.desc_public_contact_email_shown_to_partner_co')}
           />
           <Input
-            label="Website"
+            label={t('federation.label_website')}
             type="url"
             value={website}
             onValueChange={(val) => { setWebsite(val); markDirty(); }}
@@ -217,16 +219,16 @@ export function MyProfile() {
             description="Your community's website URL"
           />
           <Textarea
-            label="Description"
+            label={t('federation.label_description')}
             value={description}
             onValueChange={(val) => { setDescription(val); markDirty(); }}
             variant="bordered"
             minRows={3}
             maxRows={6}
-            description="A brief description of your community for the federation directory"
+            description={t('federation.desc_a_brief_description_of_your_community_fo')}
           />
           <Input
-            label="Categories"
+            label={t('federation.label_categories')}
             value={categories}
             onValueChange={(val) => { setCategories(val); markDirty(); }}
             variant="bordered"

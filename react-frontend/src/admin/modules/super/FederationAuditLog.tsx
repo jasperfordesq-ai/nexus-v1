@@ -17,6 +17,7 @@ import { adminSuper } from '../../api/adminApi';
 import { DataTable, PageHeader, StatCard, type Column } from '../../components';
 import type { SuperAuditEntry } from '../../api/types';
 
+import { useTranslation } from 'react-i18next';
 const PAGE_SIZE = 25;
 
 const CATEGORIES = [
@@ -76,7 +77,8 @@ const categoryColorMap: Record<string, 'primary' | 'secondary' | 'success' | 'wa
 };
 
 export function FederationAuditLog() {
-  usePageTitle('Super Admin - Federation Audit Log');
+  const { t } = useTranslation('admin');
+  usePageTitle(t('super.page_title'));
 
   const [logs, setLogs] = useState<SuperAuditEntry[]>([]);
   const [totalItems, setTotalItems] = useState(0);
@@ -250,8 +252,8 @@ export function FederationAuditLog() {
   return (
     <div>
       <PageHeader
-        title="Federation Audit Log"
-        description="Federation-specific action history and monitoring"
+        title={t('super.federation_audit_log_title')}
+        description={t('super.federation_audit_log_desc')}
         actions={
           <Button
             variant="flat"
@@ -275,21 +277,21 @@ export function FederationAuditLog() {
           loading={loading && stats.total === 0}
         />
         <StatCard
-          label="Federation Changes"
+          label={t('super.label_federation_changes')}
           value={stats.federation}
           icon={Network}
           color="success"
           loading={loading && stats.total === 0}
         />
         <StatCard
-          label="Partnership Actions"
+          label={t('super.label_partnership_actions')}
           value={stats.partnerships}
           icon={Handshake}
           color="secondary"
           loading={loading && stats.total === 0}
         />
         <StatCard
-          label="Emergency Actions"
+          label={t('super.label_emergency_actions')}
           value={stats.emergency}
           icon={AlertTriangle}
           color="danger"
@@ -300,7 +302,7 @@ export function FederationAuditLog() {
       {/* Filters */}
       <div className="flex flex-wrap gap-3 mb-4 items-end">
         <Select
-          label="Category"
+          label={t('super.label_category')}
           size="sm"
           className="max-w-[200px]"
           selectedKeys={category ? [category] : []}
@@ -315,7 +317,7 @@ export function FederationAuditLog() {
         </Select>
 
         <Select
-          label="Level"
+          label={t('super.label_level')}
           size="sm"
           className="max-w-[160px]"
           selectedKeys={level ? [level] : []}
@@ -330,7 +332,7 @@ export function FederationAuditLog() {
         </Select>
 
         <Input
-          label="From Date"
+          label={t('super.label_from_date')}
           type="date"
           size="sm"
           className="max-w-[170px]"
@@ -339,7 +341,7 @@ export function FederationAuditLog() {
         />
 
         <Input
-          label="To Date"
+          label={t('super.label_to_date')}
           type="date"
           size="sm"
           className="max-w-[170px]"
@@ -348,7 +350,7 @@ export function FederationAuditLog() {
         />
 
         <Input
-          label="Search"
+          label={t('super.label_search')}
           size="sm"
           className="max-w-[200px]"
           value={search}

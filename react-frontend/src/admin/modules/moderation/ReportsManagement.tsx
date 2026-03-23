@@ -33,6 +33,7 @@ import { adminModeration } from '@/admin/api/adminApi';
 import { adminSuper } from '@/admin/api/adminApi';
 import type { AdminReport, ModerationStats } from '@/admin/api/types';
 
+import { useTranslation } from 'react-i18next';
 const CONTENT_TYPES = [
   { label: 'All Types', value: '' },
   { label: 'Post', value: 'post' },
@@ -50,7 +51,8 @@ const STATUS_FILTERS = [
 ];
 
 export default function ReportsManagement() {
-  usePageTitle('Reports Management');
+  const { t } = useTranslation('admin');
+  usePageTitle(t('moderation.page_title'));
 
   const toast = useToast();
   const { user } = useAuth();
@@ -155,7 +157,7 @@ export default function ReportsManagement() {
         toast.error(response.error || 'Action failed');
       }
     } catch {
-      toast.error('An error occurred');
+      toast.error(t('moderation.an_error_occurred'));
     } finally {
       setActionLoading(false);
     }
@@ -263,7 +265,7 @@ export default function ReportsManagement() {
   return (
     <div className="space-y-6">
       <PageHeader
-        title="Reports Management"
+        title={t('moderation.reports_management_title')}
         description={isSuperAdmin ? 'Manage reports across all tenants' : 'Manage user-submitted reports and flagged content'}
         actions={
           <Button
@@ -334,8 +336,8 @@ export default function ReportsManagement() {
       {/* Filter Bar */}
       <div className="flex flex-col sm:flex-row gap-4">
         <Input
-          placeholder="Search reports..."
-          aria-label="Search reports"
+          placeholder={t('moderation.placeholder_search_reports')}
+          aria-label={t('moderation.label_search_reports')}
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
@@ -343,7 +345,7 @@ export default function ReportsManagement() {
           className="flex-1"
         />
         <Select
-          label="Content Type"
+          label={t('moderation.label_content_type')}
           selectedKeys={typeFilter ? [typeFilter] : []}
           onChange={(e) => setTypeFilter(e.target.value)}
           className="w-full sm:w-48"
@@ -355,7 +357,7 @@ export default function ReportsManagement() {
           ))}
         </Select>
         <Select
-          label="Status"
+          label={t('moderation.label_status')}
           selectedKeys={statusFilter ? [statusFilter] : []}
           onChange={(e) => setStatusFilter(e.target.value)}
           className="w-full sm:w-48"
@@ -368,7 +370,7 @@ export default function ReportsManagement() {
         </Select>
         {isSuperAdmin && (
           <Select
-            label="Tenant"
+            label={t('moderation.label_tenant')}
             selectedKeys={tenantFilter ? [tenantFilter] : []}
             onChange={(e) => setTenantFilter(e.target.value)}
             className="w-full sm:w-56"
@@ -409,7 +411,7 @@ export default function ReportsManagement() {
       )}
 
       {/* Table */}
-      <Table aria-label="Reports table">
+      <Table aria-label={t('moderation.label_reports_table')}>
         <TableHeader>
           {columns.map((col) => (
             <TableColumn key={col}>{col}</TableColumn>

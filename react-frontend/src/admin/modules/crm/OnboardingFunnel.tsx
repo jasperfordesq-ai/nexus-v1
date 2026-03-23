@@ -26,6 +26,7 @@ import {
 } from 'recharts';
 import { PageHeader } from '../../components';
 
+import { useTranslation } from 'react-i18next';
 // ─────────────────────────────────────────────────────────────────────────────
 // Types
 // ─────────────────────────────────────────────────────────────────────────────
@@ -62,7 +63,8 @@ function getConversionBg(rate: number): string {
 // ─────────────────────────────────────────────────────────────────────────────
 
 export default function OnboardingFunnel() {
-  usePageTitle('Admin - Onboarding Funnel');
+  const { t } = useTranslation('admin');
+  usePageTitle(t('crm.page_title'));
   const toast = useToast();
 
   const [data, setData] = useState<FunnelData | null>(null);
@@ -77,7 +79,7 @@ export default function OnboardingFunnel() {
       setData(res.data as FunnelData);
     } catch {
       setError('Failed to load onboarding funnel data.');
-      toast.error('Failed to load onboarding funnel data');
+      toast.error(t('crm.failed_to_load_onboarding_funnel_data'));
     } finally {
       setLoading(false);
     }
@@ -99,8 +101,8 @@ export default function OnboardingFunnel() {
     return (
       <div className="max-w-6xl mx-auto space-y-6">
         <PageHeader
-          title="Onboarding Funnel"
-          description="Track member progression from signup to active participation"
+          title={t('crm.onboarding_funnel_title')}
+          description={t('crm.onboarding_funnel_desc')}
         />
         <Card>
           <CardBody>
@@ -128,8 +130,8 @@ export default function OnboardingFunnel() {
   return (
     <div className="max-w-6xl mx-auto space-y-6">
       <PageHeader
-        title="Onboarding Funnel"
-        description="Track member progression from signup to active participation"
+        title={t('crm.onboarding_funnel_title')}
+        description={t('crm.onboarding_funnel_desc')}
       />
 
       {/* ── Hero Funnel Visualization ──────────────────────────────────── */}

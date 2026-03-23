@@ -136,8 +136,8 @@
     "try_again": "Erneut versuchen"
   },
   "custom_page": {
-    "default_title": "Page",
-    "not_found_description": "The page you're looking for doesn't exist or is no longer available.",
-    "back_to_home": "Back to Home"
+    "default_title": "Seite",
+    "not_found_description": "Die gesuchte Seite existiert nicht oder ist nicht mehr verfügbar.",
+    "back_to_home": "Zurück zur Startseite"
   }
 }

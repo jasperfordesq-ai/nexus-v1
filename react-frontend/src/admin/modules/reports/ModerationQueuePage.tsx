@@ -62,6 +62,7 @@ import { useToast } from '@/contexts/ToastContext';
 import { api } from '@/lib/api';
 import { StatCard, PageHeader } from '../../components';
 
+import { useTranslation } from 'react-i18next';
 // ---------------------------------------------------------------------------
 // Types
 // ---------------------------------------------------------------------------
@@ -147,7 +148,8 @@ const TYPE_COLORS: Record<string, 'primary' | 'secondary' | 'success' | 'warning
 // ---------------------------------------------------------------------------
 
 export function ModerationQueuePage() {
-  usePageTitle('Content Moderation');
+  const { t } = useTranslation('admin');
+  usePageTitle(t('reports.page_title'));
 
   const toast = useToast();
 
@@ -252,12 +254,12 @@ export function ModerationQueuePage() {
         decision: 'approved',
       });
       if (res.data) {
-        toast.success('Content approved');
+        toast.success(t('reports.content_approved'));
         await loadQueue();
         await loadStats();
       }
     } catch {
-      toast.error('Failed to approve content');
+      toast.error(t('reports.failed_to_approve_content'));
     } finally {
       setActionLoading(null);
     }
@@ -274,7 +276,7 @@ export function ModerationQueuePage() {
   const handleReject = async () => {
     if (!rejectItemId) return;
     if (!rejectReason.trim()) {
-      toast.warning('Please provide a rejection reason');
+      toast.warning(t('reports.please_provide_a_rejection_reason'));
       return;
     }
 
@@ -285,13 +287,13 @@ export function ModerationQueuePage() {
         rejection_reason: rejectReason.trim(),
       });
       if (res.data) {
-        toast.success('Content rejected');
+        toast.success(t('reports.content_rejected'));
         onRejectClose();
         await loadQueue();
         await loadStats();
       }
     } catch {
-      toast.error('Failed to reject content');
+      toast.error(t('reports.failed_to_reject_content'));
     } finally {
       setActionLoading(null);
     }
@@ -304,12 +306,12 @@ export function ModerationQueuePage() {
     try {
       const res = await api.put('/v2/admin/moderation/settings', localSettings);
       if (res.data) {
-        toast.success('Moderation settings updated');
+        toast.success(t('reports.moderation_settings_updated'));
         await loadSettings();
         onSettingsClose();
       }
     } catch {
-      toast.error('Failed to update settings');
+      toast.error(t('reports.failed_to_update_settings'));
     } finally {
       setSavingSettings(false);
     }
@@ -324,8 +326,8 @@ export function ModerationQueuePage() {
   return (
     <div>
       <PageHeader
-        title="Content Moderation"
-        description="Review and moderate user-submitted content before publication"
+        title={t('reports.moderation_queue_page_title')}
+        description={t('reports.moderation_queue_page_desc')}
         actions={
           <div className="flex items-center gap-2">
             <Button
@@ -355,28 +357,28 @@ export function ModerationQueuePage() {
       {/* Stats Cards */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-5 mb-6">
         <StatCard
-          label="Pending Review"
+          label={t('reports.label_pending_review')}
           value={stats?.pending ?? '\u2014'}
           icon={Clock}
           color="warning"
           loading={!stats}
         />
         <StatCard
-          label="Flagged"
+          label={t('reports.label_flagged')}
           value={stats?.flagged ?? '\u2014'}
           icon={AlertTriangle}
           color="danger"
           loading={!stats}
         />
         <StatCard
-          label="Approved"
+          label={t('reports.label_approved')}
           value={stats?.approved ?? '\u2014'}
           icon={CheckCircle}
           color="success"
           loading={!stats}
         />
         <StatCard
-          label="Rejected"
+          label={t('reports.label_rejected')}
           value={stats?.rejected ?? '\u2014'}
           icon={XCircle}
           color="default"
@@ -436,7 +438,7 @@ export function ModerationQueuePage() {
             setStatusFilter(v !== undefined ? String(v) : '');
           }}
           className="w-32"
-          aria-label="Status filter"
+          aria-label={t('reports.label_status_filter')}
         >
           {STATUS_OPTIONS.map((opt) => (
             <SelectItem key={opt.key}>{opt.label}</SelectItem>
@@ -450,7 +452,7 @@ export function ModerationQueuePage() {
             setTypeFilter(v !== undefined ? String(v) : '');
           }}
           className="w-32"
-          aria-label="Content type filter"
+          aria-label={t('reports.label_content_type_filter')}
         >
           {CONTENT_TYPE_OPTIONS.map((opt) => (
             <SelectItem key={opt.key}>{opt.label}</SelectItem>
@@ -458,8 +460,8 @@ export function ModerationQueuePage() {
         </Select>
         <Input
           size="sm"
-          placeholder="Search content..."
-          aria-label="Search moderation queue"
+          placeholder={t('reports.placeholder_search_content')}
+          aria-label={t('reports.label_search_moderation_queue')}
           value={search}
           onValueChange={setSearch}
           className="w-48"
@@ -469,7 +471,7 @@ export function ModerationQueuePage() {
       </div>
 
       {/* Queue Table */}
-      <Table aria-label="Moderation queue" shadow="sm">
+      <Table aria-label={t('reports.label_moderation_queue')} shadow="sm">
         <TableHeader>
           <TableColumn>Content</TableColumn>
           <TableColumn>Type</TableColumn>
@@ -532,7 +534,7 @@ export function ModerationQueuePage() {
                       isIconOnly
                       onPress={() => handleApprove(item.id)}
                       isLoading={actionLoading === item.id}
-                      aria-label="Approve"
+                      aria-label={t('reports.label_approve')}
                     >
                       <CheckCircle size={16} />
                     </Button>
@@ -543,7 +545,7 @@ export function ModerationQueuePage() {
                       isIconOnly
                       onPress={() => openRejectModal(item.id)}
                       isLoading={actionLoading === item.id}
-                      aria-label="Reject"
+                      aria-label={t('reports.label_reject')}
                     >
                       <XCircle size={16} />
                     </Button>
@@ -576,8 +578,8 @@ export function ModerationQueuePage() {
               Please provide a reason for rejecting this content. The author will see this message.
             </p>
             <Textarea
-              label="Rejection Reason"
-              placeholder="Explain why this content was rejected..."
+              label={t('reports.label_rejection_reason')}
+              placeholder={t('reports.placeholder_explain_why_this_content_was_rejected')}
               value={rejectReason}
               onValueChange={setRejectReason}
               variant="bordered"

@@ -31,6 +31,7 @@ import { adminModeration } from '@/admin/api/adminApi';
 import { adminSuper } from '@/admin/api/adminApi';
 import type { AdminReview } from '@/admin/api/types';
 
+import { useTranslation } from 'react-i18next';
 const RATING_FILTERS = [
   { label: 'All Ratings', value: '' },
   { label: '5 Stars', value: '5' },
@@ -41,7 +42,8 @@ const RATING_FILTERS = [
 ];
 
 export default function ReviewsModeration() {
-  usePageTitle('Reviews Moderation');
+  const { t } = useTranslation('admin');
+  usePageTitle(t('moderation.page_title'));
 
   const toast = useToast();
   const { user } = useAuth();
@@ -141,7 +143,7 @@ export default function ReviewsModeration() {
         toast.error(response.error || 'Action failed');
       }
     } catch {
-      toast.error('An error occurred');
+      toast.error(t('moderation.an_error_occurred'));
     } finally {
       setActionLoading(false);
     }
@@ -276,7 +278,7 @@ export default function ReviewsModeration() {
   return (
     <div className="space-y-6">
       <PageHeader
-        title="Reviews Moderation"
+        title={t('moderation.reviews_moderation_title')}
         description={isSuperAdmin ? 'Moderate member reviews across all tenants' : 'Moderate member reviews and ratings'}
         actions={
           <Button
@@ -294,8 +296,8 @@ export default function ReviewsModeration() {
       {/* Filter Bar */}
       <div className="flex flex-col sm:flex-row gap-4">
         <Input
-          placeholder="Search reviews or users..."
-          aria-label="Search reviews"
+          placeholder={t('moderation.placeholder_search_reviews_or_users')}
+          aria-label={t('moderation.label_search_reviews')}
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
@@ -303,7 +305,7 @@ export default function ReviewsModeration() {
           className="flex-1"
         />
         <Select
-          label="Rating"
+          label={t('moderation.label_rating')}
           selectedKeys={ratingFilter ? [ratingFilter] : []}
           onChange={(e) => setRatingFilter(e.target.value)}
           className="w-full sm:w-48"
@@ -316,7 +318,7 @@ export default function ReviewsModeration() {
         </Select>
         {isSuperAdmin && (
           <Select
-            label="Tenant"
+            label={t('moderation.label_tenant')}
             selectedKeys={tenantFilter ? [tenantFilter] : []}
             onChange={(e) => setTenantFilter(e.target.value)}
             className="w-full sm:w-56"
@@ -357,7 +359,7 @@ export default function ReviewsModeration() {
       )}
 
       {/* Table */}
-      <Table aria-label="Reviews table">
+      <Table aria-label={t('moderation.label_reviews_table')}>
         <TableHeader>
           {columns.map((col) => (
             <TableColumn key={col}>{col}</TableColumn>

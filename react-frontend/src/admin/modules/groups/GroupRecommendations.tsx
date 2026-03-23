@@ -11,8 +11,10 @@ import { useToast } from '@/contexts/ToastContext';
 import { adminGroups } from '@/admin/api/adminApi';
 import type { GroupRecommendation } from '@/admin/api/types';
 
+import { useTranslation } from 'react-i18next';
 export default function GroupRecommendations() {
-  usePageTitle('Group Recommendations');
+  const { t } = useTranslation('admin');
+  usePageTitle(t('groups.page_title'));
   const { error } = useToast();
   const [recommendations, setRecommendations] = useState<GroupRecommendation[]>([]);
   const [stats, setStats] = useState({ total: 0, avg_score: 0, join_rate: 0 });
@@ -85,7 +87,7 @@ export default function GroupRecommendations() {
 
       <Card className="p-4">
         <h2 className="text-lg font-semibold mb-4">Recent Recommendations</h2>
-        <Table aria-label="Recommendations table">
+        <Table aria-label={t('groups.label_recommendations_table')}>
           <TableHeader>
             <TableColumn>USER</TableColumn>
             <TableColumn>GROUP</TableColumn>

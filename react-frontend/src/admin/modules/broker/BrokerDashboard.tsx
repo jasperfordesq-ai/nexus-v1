@@ -31,6 +31,7 @@ import { adminBroker } from '../../api/adminApi';
 import { StatCard, PageHeader } from '../../components';
 import type { BrokerDashboardStats, BrokerActivityEntry } from '../../api/types';
 
+import { useTranslation } from 'react-i18next';
 const quickLinks = [
   {
     title: 'Exchange Management',
@@ -95,7 +96,8 @@ const quickLinkTextClass: Record<string, string> = {
 };
 
 export function BrokerDashboard() {
-  usePageTitle('Admin - Broker Controls');
+  const { t } = useTranslation('admin');
+  usePageTitle(t('broker.page_title'));
   const { tenantPath } = useTenant();
   const toast = useToast();
 
@@ -110,7 +112,7 @@ export function BrokerDashboard() {
         setStats(res.data);
       }
     } catch {
-      toast.error('Failed to load broker dashboard');
+      toast.error(t('broker.failed_to_load_broker_dashboard'));
     } finally {
       setLoading(false);
     }
@@ -123,8 +125,8 @@ export function BrokerDashboard() {
   return (
     <div>
       <PageHeader
-        title="Broker Controls"
-        description="Exchange management and monitoring"
+        title={t('broker.broker_dashboard_title')}
+        description={t('broker.broker_dashboard_desc')}
         actions={
           <Button
             variant="flat"
@@ -141,49 +143,49 @@ export function BrokerDashboard() {
       {/* Stats Grid */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4 mb-6">
         <StatCard
-          label="Pending Exchanges"
+          label={t('broker.label_pending_exchanges')}
           value={stats?.pending_exchanges ?? '—'}
           icon={ArrowLeftRight}
           color="primary"
           loading={loading}
         />
         <StatCard
-          label="Unreviewed Messages"
+          label={t('broker.label_unreviewed_messages')}
           value={stats?.unreviewed_messages ?? '—'}
           icon={MessageSquareWarning}
           color="warning"
           loading={loading}
         />
         <StatCard
-          label="High Risk Listings"
+          label={t('broker.label_high_risk_listings')}
           value={stats?.high_risk_listings ?? '—'}
           icon={ShieldAlert}
           color="danger"
           loading={loading}
         />
         <StatCard
-          label="Monitored Users"
+          label={t('broker.label_monitored_users')}
           value={stats?.monitored_users ?? '—'}
           icon={Eye}
           color="secondary"
           loading={loading}
         />
         <StatCard
-          label="Vetting Pending"
+          label={t('broker.label_vetting_pending')}
           value={stats?.vetting_pending ?? '—'}
           icon={ShieldCheck}
           color="success"
           loading={loading}
         />
         <StatCard
-          label="Expiring Soon"
+          label={t('broker.label_expiring_soon')}
           value={stats?.vetting_expiring ?? '—'}
           icon={Clock}
           color="warning"
           loading={loading}
         />
         <StatCard
-          label="Safeguarding Alerts"
+          label={t('broker.label_safeguarding_alerts')}
           value={stats?.safeguarding_alerts ?? '—'}
           icon={AlertTriangle}
           color="danger"

@@ -24,6 +24,7 @@ import { useTenant } from '@/contexts';
 import { adminCrm } from '../../api/adminApi';
 import { PageHeader } from '../../components';
 
+import { useTranslation } from 'react-i18next';
 interface TimelineEntry {
   id: number;
   user_id: number;
@@ -139,7 +140,8 @@ function formatRelativeTime(dateStr: string): string {
 }
 
 export function ActivityTimeline() {
-  usePageTitle('Admin - Activity Timeline');
+  const { t } = useTranslation('admin');
+  usePageTitle(t('crm.page_title'));
   const { tenantPath } = useTenant();
   const [searchParams] = useSearchParams();
 
@@ -191,8 +193,8 @@ export function ActivityTimeline() {
   return (
     <div className="max-w-6xl mx-auto">
       <PageHeader
-        title="Activity Timeline"
-        description="Chronological log of member activities across the platform"
+        title={t('crm.activity_timeline_title')}
+        description={t('crm.activity_timeline_desc')}
         actions={
           <Button
             variant="flat"
@@ -208,8 +210,8 @@ export function ActivityTimeline() {
       {/* Filters */}
       <div className="flex flex-wrap items-end gap-3 mb-6">
         <Input
-          label="User ID"
-          placeholder="Filter by user ID"
+          label={t('crm.label_user_i_d')}
+          placeholder={t('crm.placeholder_filter_by_user_i_d')}
           className="w-40"
           size="sm"
           type="number"
@@ -222,8 +224,8 @@ export function ActivityTimeline() {
         />
 
         <Select
-          label="Activity Type"
-          placeholder="All types"
+          label={t('crm.label_activity_type')}
+          placeholder={t('crm.placeholder_all_types')}
           className="w-52"
           size="sm"
           startContent={<Filter size={14} />}
@@ -240,7 +242,7 @@ export function ActivityTimeline() {
         </Select>
 
         <Select
-          label="Date Range"
+          label={t('crm.label_date_range')}
           className="w-44"
           size="sm"
           selectedKeys={[filterDays]}

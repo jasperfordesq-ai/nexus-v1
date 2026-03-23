@@ -50,12 +50,14 @@ import { adminCron } from '../../api/adminApi';
 import { PageHeader } from '../../components';
 import type { CronLog } from '../../api/types';
 
+import { useTranslation } from 'react-i18next';
 // ─────────────────────────────────────────────────────────────────────────────
 // Component
 // ─────────────────────────────────────────────────────────────────────────────
 
 export function CronJobLogs() {
-  usePageTitle('Admin - Cron Job Logs');
+  const { t } = useTranslation('admin');
+  usePageTitle(t('system.page_title'));
   const toast = useToast();
   const { isOpen, onOpen, onClose } = useDisclosure();
 
@@ -113,7 +115,7 @@ export function CronJobLogs() {
 
   const handleClearLogs = async () => {
     if (!clearBeforeDate) {
-      toast.error('Please select a date');
+      toast.error(t('system.please_select_a_date'));
       return;
     }
 
@@ -128,7 +130,7 @@ export function CronJobLogs() {
         toast.error(res.error || 'Failed to clear logs');
       }
     } catch {
-      toast.error('Failed to clear logs');
+      toast.error(t('system.failed_to_clear_logs'));
     }
   };
 
@@ -173,8 +175,8 @@ export function CronJobLogs() {
   return (
     <div>
       <PageHeader
-        title="Cron Job Logs"
-        description="View execution history and troubleshoot failures"
+        title={t('system.cron_job_logs_title')}
+        description={t('system.cron_job_logs_desc')}
         actions={
           <div className="flex items-center gap-2">
             <Button
@@ -216,8 +218,8 @@ export function CronJobLogs() {
         </CardHeader>
         <CardBody className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
           <Select
-            label="Status"
-            placeholder="All statuses"
+            label={t('system.label_status')}
+            placeholder={t('system.placeholder_all_statuses')}
             size="sm"
             variant="bordered"
             selectedKeys={statusFilter ? [statusFilter] : []}
@@ -235,8 +237,8 @@ export function CronJobLogs() {
           </Select>
 
           <Input
-            label="Job ID"
-            placeholder="Filter by job ID"
+            label={t('system.label_job_i_d')}
+            placeholder={t('system.placeholder_filter_by_job_i_d')}
             size="sm"
             variant="bordered"
             value={jobIdFilter}
@@ -247,7 +249,7 @@ export function CronJobLogs() {
           />
 
           <Input
-            label="Start Date"
+            label={t('system.label_start_date')}
             type="date"
             size="sm"
             variant="bordered"
@@ -259,7 +261,7 @@ export function CronJobLogs() {
           />
 
           <Input
-            label="End Date"
+            label={t('system.label_end_date')}
             type="date"
             size="sm"
             variant="bordered"
@@ -294,7 +296,7 @@ export function CronJobLogs() {
       {!loading && logs.length > 0 && (
         <Card shadow="sm">
           <CardBody className="p-0">
-            <Table aria-label="Cron job logs" removeWrapper>
+            <Table aria-label={t('system.label_cron_job_logs')} removeWrapper>
               <TableHeader>
                 <TableColumn>JOB NAME</TableColumn>
                 <TableColumn>STATUS</TableColumn>
@@ -453,7 +455,7 @@ export function CronJobLogs() {
               undone.
             </p>
             <Input
-              label="Delete logs before"
+              label={t('system.label_delete_logs_before')}
               type="date"
               variant="bordered"
               value={clearBeforeDate}

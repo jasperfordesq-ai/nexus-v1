@@ -52,6 +52,7 @@ import { adminInsurance, adminUsers, adminBroker } from '../../api/adminApi';
 import { DataTable, StatCard, PageHeader, ConfirmModal, EmptyState, type Column } from '../../components';
 import type { InsuranceCertificate, InsuranceStats, BrokerConfig } from '../../api/types';
 
+import { useTranslation } from 'react-i18next';
 const INSURANCE_TYPE_LABELS: Record<string, string> = {
   public_liability: 'Public Liability',
   professional_indemnity: 'Professional Indemnity',
@@ -80,7 +81,8 @@ interface UserSearchResult {
 }
 
 export function InsuranceCertificates() {
-  usePageTitle('Admin - Insurance Certificates');
+  const { t } = useTranslation('admin');
+  usePageTitle(t('broker.page_title'));
   const { tenantPath } = useTenant();
   const toast = useToast();
 
@@ -219,7 +221,7 @@ export function InsuranceCertificates() {
         setTotal(Number(meta?.total ?? meta?.total_items ?? res.data.length));
       }
     } catch {
-      toast.error('Failed to load insurance certificates');
+      toast.error(t('broker.failed_to_load_insurance_certificates'));
     } finally {
       setLoading(false);
     }
@@ -275,7 +277,7 @@ export function InsuranceCertificates() {
         toast.error(res?.error || 'Failed to verify certificate');
       }
     } catch {
-      toast.error('Failed to verify certificate');
+      toast.error(t('broker.failed_to_verify_certificate'));
     } finally {
       setVerifyingId(null);
     }
@@ -283,21 +285,21 @@ export function InsuranceCertificates() {
 
   const handleReject = async () => {
     if (!rejectModal || !rejectReason.trim()) {
-      toast.error('A reason is required to reject an insurance certificate');
+      toast.error(t('broker.a_reason_is_required_to_reject_an_insura'));
       return;
     }
     setRejectLoading(true);
     try {
       const res = await adminInsurance.reject(rejectModal.id, rejectReason);
       if (res?.success) {
-        toast.success('Insurance certificate rejected');
+        toast.success(t('broker.insurance_certificate_rejected'));
         loadItems();
         loadStats();
       } else {
         toast.error(res?.error || 'Failed to reject certificate');
       }
     } catch {
-      toast.error('Failed to reject certificate');
+      toast.error(t('broker.failed_to_reject_certificate'));
     } finally {
       setRejectLoading(false);
       setRejectModal(null);
@@ -311,14 +313,14 @@ export function InsuranceCertificates() {
     try {
       const res = await adminInsurance.destroy(deleteItem.id);
       if (res?.success) {
-        toast.success('Insurance certificate deleted');
+        toast.success(t('broker.insurance_certificate_deleted'));
         loadItems();
         loadStats();
       } else {
         toast.error(res?.error || 'Failed to delete certificate');
       }
     } catch {
-      toast.error('Failed to delete certificate');
+      toast.error(t('broker.failed_to_delete_certificate'));
     } finally {
       setDeleteLoading(false);
       setDeleteItem(null);
@@ -327,7 +329,7 @@ export function InsuranceCertificates() {
 
   const handleCreate = async () => {
     if (!createForm.user_id) {
-      toast.error('Please select a member');
+      toast.error(t('broker.please_select_a_member'));
       return;
     }
     setCreateLoading(true);
@@ -345,7 +347,7 @@ export function InsuranceCertificates() {
 
       const res = await adminInsurance.create(payload as Partial<InsuranceCertificate>);
       if (res?.success || res?.data) {
-        toast.success('Insurance certificate created');
+        toast.success(t('broker.insurance_certificate_created'));
         setCreateOpen(false);
         resetCreateForm();
         loadItems();
@@ -354,7 +356,7 @@ export function InsuranceCertificates() {
         toast.error(res?.error || 'Failed to create certificate');
       }
     } catch {
-      toast.error('Failed to create certificate');
+      toast.error(t('broker.failed_to_create_certificate'));
     } finally {
       setCreateLoading(false);
     }
@@ -377,7 +379,7 @@ export function InsuranceCertificates() {
 
       const res = await adminInsurance.update(editItem.id, payload as Partial<InsuranceCertificate>);
       if (res?.success) {
-        toast.success('Insurance certificate updated');
+        toast.success(t('broker.insurance_certificate_updated'));
         setEditItem(null);
         loadItems();
         loadStats();
@@ -385,7 +387,7 @@ export function InsuranceCertificates() {
         toast.error(res?.error || 'Failed to update certificate');
       }
     } catch {
-      toast.error('Failed to update certificate');
+      toast.error(t('broker.failed_to_update_certificate'));
     } finally {
       setEditLoading(false);
     }
@@ -515,7 +517,7 @@ export function InsuranceCertificates() {
             size="sm"
             variant="flat"
             onPress={() => setViewItem(item)}
-            aria-label="View details"
+            aria-label={t('broker.label_view_details')}
           >
             <Eye size={14} />
           </Button>
@@ -525,7 +527,7 @@ export function InsuranceCertificates() {
             size="sm"
             variant="flat"
             onPress={() => openEditModal(item)}
-            aria-label="Edit certificate"
+            aria-label={t('broker.label_edit_certificate')}
           >
             <Pencil size={14} />
           </Button>
@@ -538,7 +540,7 @@ export function InsuranceCertificates() {
                 color="success"
                 isLoading={verifyingId === item.id}
                 onPress={() => handleVerify(item)}
-                aria-label="Verify certificate"
+                aria-label={t('broker.label_verify_certificate')}
               >
                 <Check size={14} />
               </Button>
@@ -548,7 +550,7 @@ export function InsuranceCertificates() {
                 variant="flat"
                 color="danger"
                 onPress={() => { setRejectModal(item); setRejectReason(''); }}
-                aria-label="Reject certificate"
+                aria-label={t('broker.label_reject_certificate')}
               >
                 <X size={14} />
               </Button>
@@ -560,7 +562,7 @@ export function InsuranceCertificates() {
             variant="flat"
             color="danger"
             onPress={() => setDeleteItem(item)}
-            aria-label="Delete certificate"
+            aria-label={t('broker.label_delete_certificate')}
           >
             <Trash2 size={14} />
           </Button>
@@ -572,8 +574,8 @@ export function InsuranceCertificates() {
   return (
     <div>
       <PageHeader
-        title="Insurance Certificates"
-        description="Manage insurance certificates for compliance verification"
+        title={t('broker.insurance_certificates_title')}
+        description={t('broker.insurance_certificates_desc')}
         actions={
           <div className="flex gap-2">
             <Button
@@ -600,28 +602,28 @@ export function InsuranceCertificates() {
       {/* Stats Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
         <StatCard
-          label="Total Certificates"
+          label={t('broker.label_total_certificates')}
           value={stats?.total ?? 0}
           icon={FileText}
           color="primary"
           loading={statsLoading}
         />
         <StatCard
-          label="Pending Review"
+          label={t('broker.label_pending_review')}
           value={stats?.pending ?? 0}
           icon={Clock}
           color="warning"
           loading={statsLoading}
         />
         <StatCard
-          label="Verified"
+          label={t('broker.label_verified')}
           value={stats?.verified ?? 0}
           icon={ShieldCheck}
           color="success"
           loading={statsLoading}
         />
         <StatCard
-          label="Expiring Soon"
+          label={t('broker.label_expiring_soon')}
           value={stats?.expiring_soon ?? 0}
           icon={ShieldAlert}
           color="danger"
@@ -633,7 +635,7 @@ export function InsuranceCertificates() {
       <div className="mb-4">
         <Input
           placeholder="Search by name, email, provider, or policy number..."
-          aria-label="Search insurance certificates"
+          aria-label={t('broker.label_search_insurance_certificates')}
           value={searchQuery}
           onValueChange={setSearchQuery}
           startContent={<Search size={16} className="text-default-400" />}
@@ -721,8 +723,8 @@ export function InsuranceCertificates() {
             ) : (
               <div>
                 <Input
-                  label="Search Member"
-                  placeholder="Type a name or email to search..."
+                  label={t('broker.label_search_member')}
+                  placeholder={t('broker.placeholder_type_a_name_or_email_to_search')}
                   value={userSearchQuery}
                   onValueChange={setUserSearchQuery}
                   variant="bordered"
@@ -759,7 +761,7 @@ export function InsuranceCertificates() {
               </div>
             )}
             <Select
-              label="Insurance Type"
+              label={t('broker.label_insurance_type')}
               selectedKeys={[createForm.insurance_type]}
               onSelectionChange={(keys) => {
                 const val = Array.from(keys)[0] as InsuranceCertificate['insurance_type'];
@@ -773,14 +775,14 @@ export function InsuranceCertificates() {
               ))}
             </Select>
             <Input
-              label="Provider Name"
+              label={t('broker.label_provider_name')}
               placeholder="e.g., Aviva, Zurich"
               value={createForm.provider_name}
               onValueChange={(val) => setCreateForm(prev => ({ ...prev, provider_name: val }))}
               variant="bordered"
             />
             <Input
-              label="Policy Number"
+              label={t('broker.label_policy_number')}
               placeholder="e.g., PL-12345678"
               value={createForm.policy_number}
               onValueChange={(val) => setCreateForm(prev => ({ ...prev, policy_number: val }))}
@@ -788,7 +790,7 @@ export function InsuranceCertificates() {
             />
             {/* #11: EUR instead of GBP */}
             <Input
-              label="Coverage Amount"
+              label={t('broker.label_coverage_amount')}
               placeholder="e.g., 1000000"
               value={createForm.coverage_amount}
               onValueChange={(val) => setCreateForm(prev => ({ ...prev, coverage_amount: val }))}
@@ -798,14 +800,14 @@ export function InsuranceCertificates() {
             />
             <div className="grid grid-cols-2 gap-4">
               <Input
-                label="Start Date"
+                label={t('broker.label_start_date')}
                 type="date"
                 value={createForm.start_date}
                 onValueChange={(val) => setCreateForm(prev => ({ ...prev, start_date: val }))}
                 variant="bordered"
               />
               <Input
-                label="Expiry Date"
+                label={t('broker.label_expiry_date')}
                 type="date"
                 value={createForm.expiry_date}
                 onValueChange={(val) => setCreateForm(prev => ({ ...prev, expiry_date: val }))}
@@ -813,8 +815,8 @@ export function InsuranceCertificates() {
               />
             </div>
             <Textarea
-              label="Notes"
-              placeholder="Additional notes about this certificate..."
+              label={t('broker.label_notes')}
+              placeholder={t('broker.placeholder_additional_notes_about_this_certificate')}
               value={createForm.notes}
               onValueChange={(val) => setCreateForm(prev => ({ ...prev, notes: val }))}
               variant="bordered"
@@ -866,7 +868,7 @@ export function InsuranceCertificates() {
                 </div>
               </div>
               <Select
-                label="Insurance Type"
+                label={t('broker.label_insurance_type')}
                 selectedKeys={[editForm.insurance_type]}
                 onSelectionChange={(keys) => {
                   const val = Array.from(keys)[0] as InsuranceCertificate['insurance_type'];
@@ -880,21 +882,21 @@ export function InsuranceCertificates() {
                 ))}
               </Select>
               <Input
-                label="Provider Name"
+                label={t('broker.label_provider_name')}
                 placeholder="e.g., Aviva, Zurich"
                 value={editForm.provider_name}
                 onValueChange={(val) => setEditForm(prev => ({ ...prev, provider_name: val }))}
                 variant="bordered"
               />
               <Input
-                label="Policy Number"
+                label={t('broker.label_policy_number')}
                 placeholder="e.g., PL-12345678"
                 value={editForm.policy_number}
                 onValueChange={(val) => setEditForm(prev => ({ ...prev, policy_number: val }))}
                 variant="bordered"
               />
               <Input
-                label="Coverage Amount"
+                label={t('broker.label_coverage_amount')}
                 placeholder="e.g., 1000000"
                 value={editForm.coverage_amount}
                 onValueChange={(val) => setEditForm(prev => ({ ...prev, coverage_amount: val }))}
@@ -904,14 +906,14 @@ export function InsuranceCertificates() {
               />
               <div className="grid grid-cols-2 gap-4">
                 <Input
-                  label="Start Date"
+                  label={t('broker.label_start_date')}
                   type="date"
                   value={editForm.start_date}
                   onValueChange={(val) => setEditForm(prev => ({ ...prev, start_date: val }))}
                   variant="bordered"
                 />
                 <Input
-                  label="Expiry Date"
+                  label={t('broker.label_expiry_date')}
                   type="date"
                   value={editForm.expiry_date}
                   onValueChange={(val) => setEditForm(prev => ({ ...prev, expiry_date: val }))}
@@ -919,8 +921,8 @@ export function InsuranceCertificates() {
                 />
               </div>
               <Textarea
-                label="Notes"
-                placeholder="Additional notes about this certificate..."
+                label={t('broker.label_notes')}
+                placeholder={t('broker.placeholder_additional_notes_about_this_certificate')}
                 value={editForm.notes}
                 onValueChange={(val) => setEditForm(prev => ({ ...prev, notes: val }))}
                 variant="bordered"
@@ -966,7 +968,7 @@ export function InsuranceCertificates() {
               </p>
               <Textarea
                 label="Reason (required)"
-                placeholder="Provide a reason for rejection..."
+                placeholder={t('broker.placeholder_provide_a_reason_for_rejection')}
                 value={rejectReason}
                 onValueChange={setRejectReason}
                 minRows={3}

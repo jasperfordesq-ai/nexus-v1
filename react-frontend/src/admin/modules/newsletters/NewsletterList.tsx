@@ -21,6 +21,7 @@ import { adminNewsletters } from '../../api/adminApi';
 import { DataTable, PageHeader, StatusBadge, ConfirmModal, type Column } from '../../components';
 import { NewsletterResend } from './NewsletterResend';
 
+import { useTranslation } from 'react-i18next';
 interface NewsletterItem {
   id: number;
   name: string;
@@ -37,7 +38,8 @@ interface NewsletterItem {
 }
 
 export function NewsletterList() {
-  usePageTitle('Admin - Newsletters');
+  const { t } = useTranslation('admin');
+  usePageTitle(t('newsletters.page_title'));
   const navigate = useNavigate();
   const { tenantPath } = useTenant();
   const toast = useToast();
@@ -84,10 +86,10 @@ export function NewsletterList() {
         setDeleteTarget(null);
         loadData();
       } else {
-        toast.error('Failed to delete newsletter');
+        toast.error(t('newsletters.failed_to_delete_newsletter'));
       }
     } catch {
-      toast.error('Failed to delete newsletter');
+      toast.error(t('newsletters.failed_to_delete_newsletter'));
     }
     setDeleting(false);
   };
@@ -96,13 +98,13 @@ export function NewsletterList() {
     try {
       const res = await adminNewsletters.duplicateNewsletter(item.id);
       if (res.success) {
-        toast.success('Newsletter duplicated as draft');
+        toast.success(t('newsletters.newsletter_duplicated_as_draft'));
         loadData();
       } else {
-        toast.error('Failed to duplicate newsletter');
+        toast.error(t('newsletters.failed_to_duplicate_newsletter'));
       }
     } catch {
-      toast.error('Failed to duplicate newsletter');
+      toast.error(t('newsletters.failed_to_duplicate_newsletter'));
     }
   };
 
@@ -120,7 +122,7 @@ export function NewsletterList() {
         toast.error((res as { error?: string }).error || 'Failed to send newsletter');
       }
     } catch {
-      toast.error('Failed to send newsletter');
+      toast.error(t('newsletters.failed_to_send_newsletter'));
     }
     setSendingId(null);
   };
@@ -171,9 +173,9 @@ export function NewsletterList() {
       render: (item) => (
         <Dropdown>
           <DropdownTrigger>
-            <Button isIconOnly size="sm" variant="light" aria-label="Newsletter actions"><MoreVertical size={16} /></Button>
+            <Button isIconOnly size="sm" variant="light" aria-label={t('newsletters.label_newsletter_actions')}><MoreVertical size={16} /></Button>
           </DropdownTrigger>
-          <DropdownMenu aria-label="Newsletter actions" onAction={(key) => {
+          <DropdownMenu aria-label={t('newsletters.label_newsletter_actions')} onAction={(key) => {
             if (key === 'edit') navigate(tenantPath(`/admin/newsletters/edit/${item.id}`));
             else if (key === 'stats') navigate(tenantPath(`/admin/newsletters/${item.id}/stats`));
             else if (key === 'activity') navigate(tenantPath(`/admin/newsletters/${item.id}/activity`));
@@ -222,8 +224,8 @@ export function NewsletterList() {
   return (
     <div>
       <PageHeader
-        title="Newsletters"
-        description="Email campaign management"
+        title={t('newsletters.newsletter_list_title')}
+        description={t('newsletters.newsletter_list_desc')}
         actions={
           <div className="flex gap-2">
             <Button variant="flat" startContent={<RefreshCw size={16} />} onPress={loadData} isLoading={loading}>Refresh</Button>

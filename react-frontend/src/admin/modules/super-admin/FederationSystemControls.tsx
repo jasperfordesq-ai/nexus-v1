@@ -21,6 +21,7 @@ import { useToast } from '@/contexts/ToastContext';
 import { adminSuper } from '../../api/adminApi';
 import type { FederationSystemControls as FederationSystemControlsType } from '../../api/types';
 
+import { useTranslation } from 'react-i18next';
 interface SystemControls {
   federation_enabled: boolean;
   whitelist_mode: boolean;
@@ -59,7 +60,8 @@ function mapApiToLocal(sc: FederationSystemControlsType): { controls: SystemCont
 }
 
 export default function FederationSystemControls() {
-  usePageTitle('System Controls');
+  const { t } = useTranslation('admin');
+  usePageTitle(t('super_admin.page_title'));
   const toast = useToast();
   const [controls, setControls] = useState<SystemControls>({
     federation_enabled: false,
@@ -93,14 +95,14 @@ export default function FederationSystemControls() {
 
   const handleTriggerLockdown = async () => {
     if (!lockdownReason.trim()) {
-      toast.error('Please provide a reason for the lockdown');
+      toast.error(t('super_admin.please_provide_a_reason_for_the_lockdown'));
       return;
     }
 
     const res = await adminSuper.emergencyLockdown(lockdownReason);
     if (res.success) {
       setControls(prev => ({ ...prev, lockdown_active: true, lockdown_reason: lockdownReason }));
-      toast.success('Emergency lockdown activated');
+      toast.success(t('super_admin.emergency_lockdown_activated'));
       setLockdownReason('');
     } else {
       toast.error(res.error || 'Failed to activate lockdown');
@@ -111,7 +113,7 @@ export default function FederationSystemControls() {
     const res = await adminSuper.liftLockdown();
     if (res.success) {
       setControls(prev => ({ ...prev, lockdown_active: false, lockdown_reason: undefined }));
-      toast.success('Emergency lockdown lifted');
+      toast.success(t('super_admin.emergency_lockdown_lifted'));
     } else {
       toast.error(res.error || 'Failed to lift lockdown');
     }
@@ -129,7 +131,7 @@ export default function FederationSystemControls() {
     const res = await adminSuper.updateSystemControls({ [apiKey]: value });
     if (res.success) {
       setControls(prev => ({ ...prev, [key]: value }));
-      toast.success('System control updated');
+      toast.success(t('super_admin.system_control_updated'));
     } else {
       toast.error(res.error || 'Failed to update control');
     }
@@ -157,8 +159,8 @@ export default function FederationSystemControls() {
   return (
     <div className="space-y-6">
       <PageHeader
-        title="System Controls"
-        description="Master kill switches and emergency controls"
+        title={t('super_admin.federation_system_controls_title')}
+        description={t('super_admin.federation_system_controls_desc')}
       />
 
       {/* Emergency Controls */}
@@ -190,12 +192,12 @@ export default function FederationSystemControls() {
           ) : (
             <div className="space-y-3">
               <Input
-                label="Lockdown Reason"
-                placeholder="Enter reason for emergency lockdown"
+                label={t('super_admin.label_lockdown_reason')}
+                placeholder={t('super_admin.placeholder_enter_reason_for_emergency_lockdown')}
                 value={lockdownReason}
                 onValueChange={setLockdownReason}
                 variant="bordered"
-                description="This will immediately disable all federation features"
+                description={t('super_admin.desc_this_will_immediately_disable_all_federa')}
               />
               <Button
                 color="danger"
@@ -252,11 +254,11 @@ export default function FederationSystemControls() {
           {/* Max Level */}
           <div>
             <Select
-              label="Maximum Partnership Level"
+              label={t('super_admin.label_maximum_partnership_level')}
               selectedKeys={[controls.max_level.toString()]}
               onChange={(e) => handleToggleControl('max_level', parseInt(e.target.value))}
               variant="bordered"
-              description="Highest level allowed for new partnerships"
+              description={t('super_admin.desc_highest_level_allowed_for_new_partnershi')}
             >
               <SelectItem key="1">Level 1 - Profiles Only</SelectItem>
               <SelectItem key="2">Level 2 - Profiles + Messaging</SelectItem>

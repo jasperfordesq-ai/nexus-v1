@@ -33,6 +33,7 @@ import { useToast, useTenant } from '@/contexts';
 import { api } from '@/lib/api';
 import { PageHeader, ConfirmModal } from '../../components';
 
+import { useTranslation } from 'react-i18next';
 // ---------------------------------------------------------------------------
 // Types
 // ---------------------------------------------------------------------------
@@ -71,7 +72,8 @@ const statusColors: Record<string, 'primary' | 'success' | 'danger'> = {
 // ---------------------------------------------------------------------------
 
 export function GoalsAdmin() {
-  usePageTitle('Admin - Goals');
+  const { t } = useTranslation('admin');
+  usePageTitle(t('goals.page_title'));
   const toast = useToast();
   const { tenantPath } = useTenant();
 
@@ -102,7 +104,7 @@ export function GoalsAdmin() {
         setMeta(payload.meta || { page: 1, per_page: 50, total: 0, total_pages: 1 });
       }
     } catch {
-      toast.error('Failed to load goals');
+      toast.error(t('goals.failed_to_load_goals'));
     } finally {
       setLoading(false);
     }
@@ -141,7 +143,7 @@ export function GoalsAdmin() {
         toast.error(res?.error || 'Failed to delete goal');
       }
     } catch {
-      toast.error('An unexpected error occurred');
+      toast.error(t('goals.an_unexpected_error_occurred'));
     } finally {
       setDeleteLoading(false);
       setConfirmDelete(null);
@@ -167,8 +169,8 @@ export function GoalsAdmin() {
   return (
     <div>
       <PageHeader
-        title="Goals"
-        description="View and manage member goals, track progress, and remove abandoned entries"
+        title={t('goals.goals_admin_title')}
+        description={t('goals.goals_admin_desc')}
         actions={
           <Button
             variant="flat"
@@ -184,8 +186,8 @@ export function GoalsAdmin() {
       {/* Search bar */}
       <div className="mb-4 flex items-center gap-2">
         <Input
-          placeholder="Search goals by title or member..."
-          aria-label="Search goals"
+          placeholder={t('goals.placeholder_search_goals_by_title_or_member')}
+          aria-label={t('goals.label_search_goals')}
           value={searchInput}
           onValueChange={setSearchInput}
           onKeyDown={handleSearchKeyDown}
@@ -216,7 +218,7 @@ export function GoalsAdmin() {
             </div>
           ) : (
             <Table
-              aria-label="Goals administration table"
+              aria-label={t('goals.label_goals_administration_table')}
               removeWrapper
               isStriped
             >
@@ -285,7 +287,7 @@ export function GoalsAdmin() {
                           size="sm"
                           variant="flat"
                           color="primary"
-                          aria-label="View goal"
+                          aria-label={t('goals.label_view_goal')}
                           onPress={() => window.open(tenantPath(`/goals/${goal.id}`), '_blank')}
                         >
                           <Eye size={14} />
@@ -295,7 +297,7 @@ export function GoalsAdmin() {
                           size="sm"
                           variant="flat"
                           color="danger"
-                          aria-label="Delete goal"
+                          aria-label={t('goals.label_delete_goal')}
                           onPress={() => setConfirmDelete(goal)}
                         >
                           <Trash2 size={14} />

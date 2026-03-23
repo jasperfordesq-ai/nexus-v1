@@ -13,6 +13,7 @@ import { useToast } from '@/contexts/ToastContext';
 import { adminSuper } from '../../api/adminApi';
 import type { FederationPartnership } from '../../api/types';
 
+import { useTranslation } from 'react-i18next';
 interface Partnership {
   id: number;
   tenant_a_id: number;
@@ -66,7 +67,8 @@ function computeStats(partnerships: Partnership[]): Stats {
 }
 
 export default function Partnerships() {
-  usePageTitle('Partnerships');
+  const { t } = useTranslation('admin');
+  usePageTitle(t('super.page_title'));
   const toast = useToast();
   const [partnerships, setPartnerships] = useState<Partnership[]>([]);
   const [stats, setStats] = useState<Stats>({ active: 0, pending: 0, suspended: 0, terminated: 0 });
@@ -96,7 +98,7 @@ export default function Partnerships() {
         return updated;
       });
       setActionPartnership(null);
-      toast.success('Partnership suspended');
+      toast.success(t('super.partnership_suspended'));
     } else {
       toast.error(res.error || 'Failed to suspend partnership');
     }
@@ -111,7 +113,7 @@ export default function Partnerships() {
         return updated;
       });
       setActionPartnership(null);
-      toast.success('Partnership terminated');
+      toast.success(t('super.partnership_terminated'));
     } else {
       toast.error(res.error || 'Failed to terminate partnership');
     }
@@ -164,8 +166,8 @@ export default function Partnerships() {
   return (
     <div className="space-y-6">
       <PageHeader
-        title="Federation Partnerships"
-        description="Manage cross-community partnerships"
+        title={t('super.super_partnerships_title')}
+        description={t('super.super_partnerships_desc')}
       />
 
       {/* Stats Cards */}
@@ -242,7 +244,7 @@ export default function Partnerships() {
           </Tabs>
         </CardHeader>
         <CardBody>
-          <Table aria-label="Federation partnerships" shadow="sm" isStriped>
+          <Table aria-label={t('super.label_federation_partnerships')} shadow="sm" isStriped>
             <TableHeader>
               <TableColumn>Partnership</TableColumn>
               <TableColumn>Level</TableColumn>

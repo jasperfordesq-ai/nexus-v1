@@ -11,8 +11,10 @@ import { useToast } from '@/contexts/ToastContext';
 import { adminGroups } from '@/admin/api/adminApi';
 import type { FeaturedGroup } from '@/admin/api/types';
 
+import { useTranslation } from 'react-i18next';
 export default function GroupRanking() {
-  usePageTitle('Group Ranking');
+  const { t } = useTranslation('admin');
+  usePageTitle(t('groups.page_title'));
   const { success, error } = useToast();
   const [groups, setGroups] = useState<FeaturedGroup[]>([]);
   const [loading, setLoading] = useState(true);
@@ -77,7 +79,7 @@ export default function GroupRanking() {
       </div>
 
       <Card className="p-4">
-        <Table aria-label="Featured groups table">
+        <Table aria-label={t('groups.label_featured_groups_table')}>
           <TableHeader>
             <TableColumn>GROUP</TableColumn>
             <TableColumn>MEMBERS</TableColumn>

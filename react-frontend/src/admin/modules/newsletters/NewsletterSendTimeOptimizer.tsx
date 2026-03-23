@@ -18,8 +18,10 @@ import { adminNewsletters } from '../../api/adminApi';
 import { PageHeader } from '../../components';
 import type { SendTimeData } from '../../api/types';
 
+import { useTranslation } from 'react-i18next';
 export function NewsletterSendTimeOptimizer() {
-  usePageTitle('Admin - Send-Time Optimizer');
+  const { t } = useTranslation('admin');
+  usePageTitle(t('newsletters.page_title'));
   const [loading, setLoading] = useState(true);
   const [data, setData] = useState<SendTimeData | null>(null);
   const [days, setDays] = useState(30);
@@ -80,12 +82,12 @@ export function NewsletterSendTimeOptimizer() {
   return (
     <div>
       <PageHeader
-        title="Send-Time Optimizer"
-        description="Optimize newsletter send times based on engagement patterns"
+        title={t('newsletters.newsletter_send_time_optimizer_title')}
+        description={t('newsletters.newsletter_send_time_optimizer_desc')}
         actions={
           <div className="flex gap-2">
             <Select
-              label="Time Period"
+              label={t('newsletters.label_time_period')}
               selectedKeys={[String(days)]}
               onSelectionChange={(keys) => setDays(Number(Array.from(keys)[0]))}
               className="w-32"

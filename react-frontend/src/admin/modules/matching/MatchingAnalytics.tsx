@@ -37,6 +37,7 @@ import { adminMatching } from '../../api/adminApi';
 import { StatCard, PageHeader, EmptyState } from '../../components';
 import type { MatchingStatsResponse } from '../../api/types';
 
+import { useTranslation } from 'react-i18next';
 /** Color map for score distribution bars */
 const SCORE_COLORS: Record<string, 'danger' | 'warning' | 'primary' | 'success'> = {
   '0-40': 'danger',
@@ -70,7 +71,8 @@ const DIST_LABELS: Record<string, string> = {
 };
 
 export function MatchingAnalytics() {
-  usePageTitle('Admin - Matching Analytics');
+  const { t } = useTranslation('admin');
+  usePageTitle(t('matching.page_title'));
   const { tenantPath } = useTenant();
   const toast = useToast();
   const navigate = useNavigate();
@@ -86,7 +88,7 @@ export function MatchingAnalytics() {
         setStats(res.data);
       }
     } catch {
-      toast.error('Failed to load matching analytics');
+      toast.error(t('matching.failed_to_load_matching_analytics'));
     } finally {
       setLoading(false);
     }
@@ -108,8 +110,8 @@ export function MatchingAnalytics() {
   return (
     <div>
       <PageHeader
-        title="Matching Analytics"
-        description="Smart matching performance metrics and distribution analysis"
+        title={t('matching.matching_analytics_title')}
+        description={t('matching.matching_analytics_desc')}
         actions={
           <div className="flex items-center gap-2">
             <Button
@@ -150,21 +152,21 @@ export function MatchingAnalytics() {
           {/* Stats Row */}
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4 mb-6">
             <StatCard
-              label="Total Matches"
+              label={t('matching.label_total_matches')}
               value={overview?.total_matches_month ?? 0}
               icon={Target}
               color="primary"
               loading={loading}
             />
             <StatCard
-              label="Approval Rate"
+              label={t('matching.label_approval_rate')}
               value={`${stats?.approval_rate ?? 0}%`}
               icon={CheckCircle}
               color="success"
               loading={loading}
             />
             <StatCard
-              label="Average Score"
+              label={t('matching.label_average_score')}
               value={overview?.avg_match_score !== undefined
                 ? `${overview.avg_match_score}%`
                 : '---'}
@@ -173,7 +175,7 @@ export function MatchingAnalytics() {
               loading={loading}
             />
             <StatCard
-              label="Avg Distance"
+              label={t('matching.label_avg_distance')}
               value={overview?.avg_distance_km !== undefined
                 ? `${overview.avg_distance_km} km`
                 : '---'}
@@ -282,17 +284,17 @@ export function MatchingAnalytics() {
                 {overview ? (
                   <div className="space-y-3">
                     <ActivityRow
-                      label="Matches Today"
+                      label={t('matching.label_matches_today')}
                       value={overview.total_matches_today}
                     />
                     <Divider />
                     <ActivityRow
-                      label="Matches This Week"
+                      label={t('matching.label_matches_this_week')}
                       value={overview.total_matches_week}
                     />
                     <Divider />
                     <ActivityRow
-                      label="Matches This Month"
+                      label={t('matching.label_matches_this_month')}
                       value={overview.total_matches_month}
                     />
                     <Divider />
@@ -302,17 +304,17 @@ export function MatchingAnalytics() {
                     />
                     <Divider />
                     <ActivityRow
-                      label="Mutual Matches"
+                      label={t('matching.label_mutual_matches')}
                       value={overview.mutual_matches_count}
                     />
                     <Divider />
                     <ActivityRow
-                      label="Active Users in Matching"
+                      label={t('matching.label_active_users_in_matching')}
                       value={overview.active_users_matching}
                     />
                     <Divider />
                     <ActivityRow
-                      label="Cache Entries"
+                      label={t('matching.label_cache_entries')}
                       value={overview.cache_entries}
                     />
                   </div>
@@ -334,19 +336,19 @@ export function MatchingAnalytics() {
                 {stats ? (
                   <div className="space-y-3">
                     <ActivityRow
-                      label="Pending Approvals"
+                      label={t('matching.label_pending_approvals')}
                       value={stats.pending_approvals}
                       color="text-warning"
                     />
                     <Divider />
                     <ActivityRow
-                      label="Approved Matches"
+                      label={t('matching.label_approved_matches')}
                       value={stats.approved_count}
                       color="text-success"
                     />
                     <Divider />
                     <ActivityRow
-                      label="Rejected Matches"
+                      label={t('matching.label_rejected_matches')}
                       value={stats.rejected_count}
                       color="text-danger"
                     />

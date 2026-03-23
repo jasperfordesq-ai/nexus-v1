@@ -16,6 +16,7 @@ import { useToast } from '@/contexts';
 import { PageHeader, EmptyState, DataTable, ConfirmModal, type Column } from '../../components';
 import { adminTools } from '../../api/adminApi';
 
+import { useTranslation } from 'react-i18next';
 interface Error404Entry {
   id: number;
   url: string;
@@ -26,7 +27,8 @@ interface Error404Entry {
 }
 
 export function Error404Tracking() {
-  usePageTitle('Admin - 404 Error Tracking');
+  const { t } = useTranslation('admin');
+  usePageTitle(t('advanced.page_title'));
   const toast = useToast();
 
   const [errors, setErrors] = useState<Error404Entry[]>([]);
@@ -51,7 +53,7 @@ export function Error404Tracking() {
       setTotalItems(total);
       setPage(pg);
     } catch {
-      toast.error('Failed to load 404 errors');
+      toast.error(t('advanced.failed_to_load_404_errors'));
     } finally {
       if (mounted.current) setLoading(false);
     }
@@ -70,7 +72,7 @@ export function Error404Tracking() {
       const res = await adminTools.delete404Error(deleteTarget.id);
 
       if (res.success) {
-        toast.success('404 entry dismissed');
+        toast.success(t('advanced.404_entry_dismissed'));
         setDeleteTarget(null);
         await fetchErrors();
       } else {
@@ -78,7 +80,7 @@ export function Error404Tracking() {
         toast.error(error);
       }
     } catch (err) {
-      toast.error('Failed to delete 404 entry');
+      toast.error(t('advanced.failed_to_delete_404_entry'));
       console.error('404 error delete error:', err);
     } finally {
       setDeleting(false);
@@ -132,7 +134,7 @@ export function Error404Tracking() {
   if (loading) {
     return (
       <div>
-        <PageHeader title="404 Error Tracking" description="Monitor missing pages and broken URLs" />
+        <PageHeader title={t('advanced.error404_tracking_title')} description={t('advanced.error404_tracking_desc')} />
         <div className="flex justify-center py-16">
           <Spinner size="lg" />
         </div>
@@ -142,13 +144,13 @@ export function Error404Tracking() {
 
   return (
     <div>
-      <PageHeader title="404 Error Tracking" description="Monitor missing pages and broken URLs" />
+      <PageHeader title={t('advanced.error404_tracking_title')} description={t('advanced.error404_tracking_desc')} />
 
       {errors.length === 0 ? (
         <EmptyState
           icon={AlertTriangle}
           title="No 404 Errors Tracked"
-          description="When visitors hit missing pages, they will be logged here. You can then create redirects to fix them."
+          description={t('advanced.desc_when_visitors_hit_missing_pages_they_wi')}
         />
       ) : (
         <DataTable

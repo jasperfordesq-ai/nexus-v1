@@ -143,5 +143,8 @@
     "trend_7day": "7-Day Trend",
     "vs_previous_week": "vs. previous week",
     "views_last_days": "Views (Last {{days}} Days)"
-  }
+  },
+  "detail_like": "Like",
+  "detail_liked": "Liked",
+  "detail_comments": "Comments"
 }

@@ -21,8 +21,10 @@ import { adminNewsletters } from '../../api/adminApi';
 import { PageHeader } from '../../components';
 import type { NewsletterDiagnostics as DiagnosticsData } from '../../api/types';
 
+import { useTranslation } from 'react-i18next';
 export function NewsletterDiagnostics() {
-  usePageTitle('Admin - Newsletter Diagnostics');
+  const { t } = useTranslation('admin');
+  usePageTitle(t('newsletters.page_title'));
   const toast = useToast();
   const [loading, setLoading] = useState(true);
   const [data, setData] = useState<DiagnosticsData | null>(null);
@@ -36,7 +38,7 @@ export function NewsletterDiagnostics() {
       }
     } catch {
       setData(null);
-      toast.error('Failed to load diagnostics');
+      toast.error(t('newsletters.failed_to_load_diagnostics'));
     }
     setLoading(false);
   }, [toast]);
@@ -82,8 +84,8 @@ export function NewsletterDiagnostics() {
   return (
     <div>
       <PageHeader
-        title="Newsletter Diagnostics"
-        description="Email health dashboard and system checks"
+        title={t('newsletters.newsletter_diagnostics_title')}
+        description={t('newsletters.newsletter_diagnostics_desc')}
         actions={
           <Button
             variant="flat"

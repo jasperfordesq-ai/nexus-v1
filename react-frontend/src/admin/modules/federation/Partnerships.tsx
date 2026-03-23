@@ -19,6 +19,7 @@ import { useToast } from '@/contexts';
 import { adminFederation } from '../../api/adminApi';
 import { DataTable, PageHeader, EmptyState, StatusBadge, ConfirmModal, type Column } from '../../components';
 
+import { useTranslation } from 'react-i18next';
 interface Partnership {
   id: number;
   partner_name: string;
@@ -28,7 +29,8 @@ interface Partnership {
 }
 
 export function Partnerships() {
-  usePageTitle('Admin - Federation Partnerships');
+  const { t } = useTranslation('admin');
+  usePageTitle(t('federation.page_title'));
   const toast = useToast();
   const [items, setItems] = useState<Partnership[]>([]);
   const [loading, setLoading] = useState(true);
@@ -63,10 +65,10 @@ export function Partnerships() {
         toast.success(`Partnership with "${item.partner_name}" approved`);
         loadData();
       } else {
-        toast.error('Failed to approve partnership');
+        toast.error(t('federation.failed_to_approve_partnership'));
       }
     } catch {
-      toast.error('Failed to approve partnership');
+      toast.error(t('federation.failed_to_approve_partnership'));
     } finally {
       setActionLoading(false);
     }
@@ -80,10 +82,10 @@ export function Partnerships() {
         toast.success(`Partnership with "${item.partner_name}" rejected`);
         loadData();
       } else {
-        toast.error('Failed to reject partnership');
+        toast.error(t('federation.failed_to_reject_partnership'));
       }
     } catch {
-      toast.error('Failed to reject partnership');
+      toast.error(t('federation.failed_to_reject_partnership'));
     } finally {
       setActionLoading(false);
     }
@@ -99,10 +101,10 @@ export function Partnerships() {
         setTerminateTarget(null);
         loadData();
       } else {
-        toast.error('Failed to terminate partnership');
+        toast.error(t('federation.failed_to_terminate_partnership'));
       }
     } catch {
-      toast.error('Failed to terminate partnership');
+      toast.error(t('federation.failed_to_terminate_partnership'));
     } finally {
       setActionLoading(false);
     }
@@ -124,12 +126,12 @@ export function Partnerships() {
       render: (item) => (
         <Dropdown>
           <DropdownTrigger>
-            <Button isIconOnly size="sm" variant="light" aria-label="Actions" isDisabled={actionLoading}>
+            <Button isIconOnly size="sm" variant="light" aria-label={t('federation.label_actions')} isDisabled={actionLoading}>
               <MoreVertical size={16} />
             </Button>
           </DropdownTrigger>
           <DropdownMenu
-            aria-label="Partnership actions"
+            aria-label={t('federation.label_partnership_actions')}
             onAction={(key) => {
               if (key === 'approve') handleApprove(item);
               else if (key === 'reject') handleReject(item);
@@ -166,8 +168,8 @@ export function Partnerships() {
   if (!loading && items.length === 0) {
     return (
       <div>
-        <PageHeader title="Partnerships" description="Manage community partnerships" />
-        <EmptyState icon={Handshake} title="No Partnerships" description="No federation partnerships have been established yet. Visit the Partner Directory to find communities." />
+        <PageHeader title={t('federation.partnerships_title')} description={t('federation.partnerships_desc')} />
+        <EmptyState icon={Handshake} title="No Partnerships" description={t('federation.desc_no_federation_partnerships_have_been_est')} />
       </div>
     );
   }
@@ -175,8 +177,8 @@ export function Partnerships() {
   return (
     <div>
       <PageHeader
-        title="Partnerships"
-        description="Manage community partnerships"
+        title={t('federation.partnerships_title')}
+        description={t('federation.partnerships_desc')}
         actions={<Button variant="flat" startContent={<RefreshCw size={16} />} onPress={loadData} isLoading={loading}>Refresh</Button>}
       />
       <DataTable columns={columns} data={items} isLoading={loading} onRefresh={loadData} />

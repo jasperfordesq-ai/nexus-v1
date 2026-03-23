@@ -28,6 +28,7 @@ import { useToast, useTenant } from '@/contexts';
 import { api } from '@/lib/api';
 import { PageHeader } from '../../components';
 
+import { useTranslation } from 'react-i18next';
 interface RegistrationPolicy {
   registration_mode: string;
   verification_provider: string | null;
@@ -139,7 +140,8 @@ const PROVIDER_DESCRIPTIONS: Record<string, string> = {
 };
 
 export function RegistrationPolicySettings() {
-  usePageTitle('Admin - Registration Policy');
+  const { t } = useTranslation('admin');
+  usePageTitle(t('system.page_title'));
   const toast = useToast();
   const { tenant } = useTenant();
 
@@ -175,7 +177,7 @@ export function RegistrationPolicySettings() {
       if (policyRes.data) setPolicy(policyRes.data);
       if (providersRes.data) setProviders(Array.isArray(providersRes.data) ? providersRes.data : []);
     } catch {
-      toast.error('Failed to load registration policy');
+      toast.error(t('system.failed_to_load_registration_policy'));
     } finally {
       setLoading(false);
     }
@@ -212,11 +214,11 @@ export function RegistrationPolicySettings() {
         require_email_verify: policy.require_email_verify,
       });
       if (res.data) {
-        toast.success('Registration policy saved successfully');
+        toast.success(t('system.registration_policy_saved_successfully'));
         fetchData();
       }
     } catch {
-      toast.error('Failed to save registration policy');
+      toast.error(t('system.failed_to_save_registration_policy'));
     } finally {
       setSaving(false);
     }
@@ -235,7 +237,7 @@ export function RegistrationPolicySettings() {
       setCredentialInputs(prev => ({ ...prev, [slug]: { api_key: '', webhook_secret: '' } }));
       fetchData();
     } catch {
-      toast.error('Failed to save credentials. Please check your API keys and try again.');
+      toast.error(t('system.failed_to_save_credentials_please_check'));
     } finally {
       setSavingCredentials(prev => ({ ...prev, [slug]: false }));
     }
@@ -244,10 +246,10 @@ export function RegistrationPolicySettings() {
   const handleDeleteCredentials = async (slug: string) => {
     try {
       await api.delete(`/v2/admin/identity/provider-credentials/${slug}`);
-      toast.success('Credentials removed successfully');
+      toast.success(t('system.credentials_removed_successfully'));
       fetchData();
     } catch {
-      toast.error('Failed to remove credentials');
+      toast.error(t('system.failed_to_remove_credentials'));
     }
   };
 
@@ -266,7 +268,7 @@ export function RegistrationPolicySettings() {
         toast.success(`Generated ${res.data.codes.length} invite code(s)`);
       }
     } catch {
-      toast.error('Failed to generate invite codes');
+      toast.error(t('system.failed_to_generate_invite_codes'));
     } finally {
       setGenerating(false);
     }
@@ -275,16 +277,16 @@ export function RegistrationPolicySettings() {
   const handleDeactivateCode = async (id: number) => {
     try {
       await api.delete(`/v2/admin/invite-codes/${id}`);
-      toast.success('Invite code deactivated');
+      toast.success(t('system.invite_code_deactivated'));
       fetchInviteCodes();
     } catch {
-      toast.error('Failed to deactivate invite code');
+      toast.error(t('system.failed_to_deactivate_invite_code'));
     }
   };
 
   const copyToClipboard = (text: string) => {
     navigator.clipboard.writeText(text);
-    toast.success('Copied to clipboard');
+    toast.success(t('system.copied_to_clipboard'));
   };
 
   const showVerificationOptions = policy?.registration_mode === 'verified_identity' || policy?.registration_mode === 'government_id';
@@ -296,7 +298,7 @@ export function RegistrationPolicySettings() {
   if (loading || !policy) {
     return (
       <div>
-        <PageHeader title="Registration & Identity Verification" description={`Control how new members join ${tenant?.name || 'your community'}`} />
+        <PageHeader title={t('system.registration_policy_settings_title')} description={`Control how new members join ${tenant?.name || 'your community'}`} />
         <div className="flex justify-center py-16"><Spinner size="lg" /></div>
       </div>
     );
@@ -304,7 +306,7 @@ export function RegistrationPolicySettings() {
 
   return (
     <div>
-      <PageHeader title="Registration & Identity Verification" description={`Control how new members join ${tenant?.name || 'your community'}`} />
+      <PageHeader title={t('system.registration_policy_settings_title')} description={`Control how new members join ${tenant?.name || 'your community'}`} />
 
       <div className="space-y-6">
 
@@ -322,7 +324,7 @@ export function RegistrationPolicySettings() {
           </CardHeader>
           <CardBody className="gap-4">
             <Select
-              label="Registration Method"
+              label={t('system.label_registration_method')}
               selectedKeys={[policy.registration_mode]}
               onSelectionChange={(keys) => {
                 const key = Array.from(keys)[0] as string;
@@ -385,7 +387,7 @@ export function RegistrationPolicySettings() {
             </CardHeader>
             <CardBody className="gap-4">
               <Select
-                label="Verification Provider"
+                label={t('system.label_verification_provider')}
                 selectedKeys={policy.verification_provider ? [policy.verification_provider] : []}
                 onSelectionChange={(keys) => {
                   const key = Array.from(keys)[0] as string;
@@ -413,7 +415,7 @@ export function RegistrationPolicySettings() {
               </Select>
 
               <Select
-                label="Verification Level"
+                label={t('system.label_verification_level')}
                 selectedKeys={[policy.verification_level]}
                 onSelectionChange={(keys) => {
                   const key = Array.from(keys)[0] as string;
@@ -432,7 +434,7 @@ export function RegistrationPolicySettings() {
               <Divider />
 
               <Select
-                label="After Verification Passes"
+                label={t('system.label_after_verification_passes')}
                 selectedKeys={[policy.post_verification]}
                 onSelectionChange={(keys) => {
                   const key = Array.from(keys)[0] as string;
@@ -449,7 +451,7 @@ export function RegistrationPolicySettings() {
               </Select>
 
               <Select
-                label="Fallback if Provider Unavailable"
+                label={t('system.label_fallback_if_provider_unavailable')}
                 selectedKeys={[policy.fallback_mode]}
                 onSelectionChange={(keys) => {
                   const key = Array.from(keys)[0] as string;
@@ -489,7 +491,7 @@ export function RegistrationPolicySettings() {
               <Switch
                 isSelected={policy.require_email_verify}
                 onValueChange={(val) => setPolicy(prev => prev ? { ...prev, require_email_verify: val } : prev)}
-                aria-label="Require email verification"
+                aria-label={t('system.label_require_email_verification')}
               />
             </div>
           </CardBody>
@@ -573,7 +575,7 @@ export function RegistrationPolicySettings() {
 
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                           <Input
-                            label="API Key / Secret Key"
+                            label={t('system.label_a_p_i_key_secret_key')}
                             placeholder={p.has_credentials ? '(saved — enter new value to replace)' : 'Enter your API key'}
                             value={inputs.api_key}
                             onChange={(e) => setCredentialInputs(prev => ({ ...prev, [p.slug]: { ...inputs, api_key: e.target.value } }))}
@@ -588,14 +590,14 @@ export function RegistrationPolicySettings() {
                             }
                           />
                           <Input
-                            label="Webhook Secret"
+                            label={t('system.label_webhook_secret')}
                             placeholder={p.has_credentials ? '(saved — enter new value to replace)' : 'Enter your webhook secret'}
                             value={inputs.webhook_secret}
                             onChange={(e) => setCredentialInputs(prev => ({ ...prev, [p.slug]: { ...inputs, webhook_secret: e.target.value } }))}
                             type={visibility.webhook_secret ? 'text' : 'password'}
                             variant="bordered"
                             size="sm"
-                            description="Used to verify incoming webhook payloads from the provider"
+                            description={t('system.desc_used_to_verify_incoming_webhook_payloads')}
                             endContent={
                               <Button isIconOnly size="sm" variant="light" aria-label={visibility.webhook_secret ? "Hide webhook secret" : "Show webhook secret"} onPress={() => setCredentialVisibility(prev => ({ ...prev, [p.slug]: { ...visibility, webhook_secret: !visibility.webhook_secret } }))}>
                                 {visibility.webhook_secret ? <EyeOff size={14} /> : <Eye size={14} />}
@@ -688,7 +690,7 @@ export function RegistrationPolicySettings() {
                   <p className="text-xs text-default-400 mt-1">Click &quot;Generate Codes&quot; to create your first invite codes.</p>
                 </div>
               ) : (
-                <Table aria-label="Invite codes" removeWrapper>
+                <Table aria-label={t('system.label_invite_codes')} removeWrapper>
                   <TableHeader>
                     <TableColumn>Code</TableColumn>
                     <TableColumn>Uses</TableColumn>
@@ -703,7 +705,7 @@ export function RegistrationPolicySettings() {
                         <TableCell>
                           <div className="flex items-center gap-1">
                             <code className="text-sm font-mono">{ic.code}</code>
-                            <Button isIconOnly size="sm" variant="light" aria-label="Copy invite code" onPress={() => copyToClipboard(ic.code)}>
+                            <Button isIconOnly size="sm" variant="light" aria-label={t('system.label_copy_invite_code')} onPress={() => copyToClipboard(ic.code)}>
                               <Copy size={12} />
                             </Button>
                           </div>
@@ -732,7 +734,7 @@ export function RegistrationPolicySettings() {
                         </TableCell>
                         <TableCell>
                           {ic.is_active ? (
-                            <Button isIconOnly size="sm" variant="light" color="danger" aria-label="Deactivate invite code" onPress={() => handleDeactivateCode(ic.id)}>
+                            <Button isIconOnly size="sm" variant="light" color="danger" aria-label={t('system.label_deactivate_invite_code')} onPress={() => handleDeactivateCode(ic.id)}>
                               <Trash2 size={14} />
                             </Button>
                           ) : null}
@@ -761,7 +763,7 @@ export function RegistrationPolicySettings() {
                     {generatedCodes.map((code) => (
                       <div key={code} className="flex items-center justify-between p-2 bg-default-100 rounded-lg">
                         <code className="font-mono text-sm">{code}</code>
-                        <Button isIconOnly size="sm" variant="light" aria-label="Copy code" onPress={() => copyToClipboard(code)}>
+                        <Button isIconOnly size="sm" variant="light" aria-label={t('system.label_copy_code')} onPress={() => copyToClipboard(code)}>
                           <Copy size={14} />
                         </Button>
                       </div>
@@ -780,7 +782,7 @@ export function RegistrationPolicySettings() {
               ) : (
                 <div className="space-y-4">
                   <Input
-                    label="Number of codes"
+                    label={t('system.label_number_of_codes')}
                     type="number"
                     min={1}
                     max={100}
@@ -790,7 +792,7 @@ export function RegistrationPolicySettings() {
                     description="How many invite codes to generate (max 100)"
                   />
                   <Input
-                    label="Max uses per code"
+                    label={t('system.label_max_uses_per_code')}
                     type="number"
                     min={1}
                     max={1000}
@@ -805,7 +807,7 @@ export function RegistrationPolicySettings() {
                     value={generateExpiry}
                     onChange={(e) => setGenerateExpiry(e.target.value)}
                     variant="bordered"
-                    description="Codes expire at midnight on this date. Leave blank for codes that never expire."
+                    description={t('system.desc_codes_expire_at_midnight_on_this_date_l')}
                   />
                   <Input
                     label="Note (optional)"
@@ -813,7 +815,7 @@ export function RegistrationPolicySettings() {
                     value={generateNote}
                     onChange={(e) => setGenerateNote(e.target.value)}
                     variant="bordered"
-                    description="Internal note to help you remember what this batch was for"
+                    description={t('system.desc_internal_note_to_help_you_remember_what_')}
                   />
                 </div>
               )}

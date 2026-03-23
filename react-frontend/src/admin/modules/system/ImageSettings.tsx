@@ -16,8 +16,10 @@ import { useToast } from '@/contexts';
 import { PageHeader } from '../../components';
 import { adminSettings } from '../../api/adminApi';
 
+import { useTranslation } from 'react-i18next';
 export function ImageSettings() {
-  usePageTitle('Admin - Image Settings');
+  const { t } = useTranslation('admin');
+  usePageTitle(t('system.page_title'));
   const toast = useToast();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -39,7 +41,7 @@ export function ImageSettings() {
           setFormData(prev => ({ ...prev, ...res.data }));
         }
       })
-      .catch(() => toast.error('Failed to load image settings'))
+      .catch(() => toast.error(t('system.failed_to_load_image_settings')))
       .finally(() => setLoading(false));
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -48,9 +50,9 @@ export function ImageSettings() {
     setSaving(true);
     try {
       await adminSettings.updateImageSettings(formData);
-      toast.success('Image settings saved successfully');
+      toast.success(t('system.image_settings_saved_successfully'));
     } catch {
-      toast.error('Failed to save image settings');
+      toast.error(t('system.failed_to_save_image_settings'));
     } finally {
       setSaving(false);
     }
@@ -70,7 +72,7 @@ export function ImageSettings() {
 
   return (
     <div>
-      <PageHeader title="Image Settings" description="Configure image upload and processing options" />
+      <PageHeader title={t('system.image_settings_title')} description={t('system.image_settings_desc')} />
 
       <div className="space-y-4">
         <Card shadow="sm">
@@ -98,7 +100,7 @@ export function ImageSettings() {
               onValueChange={(v) => updateField('max_height', v)}
             />
             <Input
-              label="Allowed Formats"
+              label={t('system.label_allowed_formats')}
               variant="bordered"
               isReadOnly
               value={String(formData.allowed_formats || 'jpg, jpeg, png, gif, webp')}
@@ -114,28 +116,28 @@ export function ImageSettings() {
                 <p className="font-medium">Auto-Resize</p>
                 <p className="text-sm text-default-500">Automatically resize images exceeding max dimensions</p>
               </div>
-              <Switch isSelected={!!formData.auto_resize} onValueChange={(v) => updateField('auto_resize', v)} aria-label="Auto resize" />
+              <Switch isSelected={!!formData.auto_resize} onValueChange={(v) => updateField('auto_resize', v)} aria-label={t('system.label_auto_resize')} />
             </div>
             <div className="flex items-center justify-between">
               <div>
                 <p className="font-medium">Auto-Convert to WebP</p>
                 <p className="text-sm text-default-500">Convert uploaded images to WebP format</p>
               </div>
-              <Switch isSelected={!!formData.auto_webp} onValueChange={(v) => updateField('auto_webp', v)} aria-label="Auto WebP" />
+              <Switch isSelected={!!formData.auto_webp} onValueChange={(v) => updateField('auto_webp', v)} aria-label={t('system.label_auto_web_p')} />
             </div>
             <div className="flex items-center justify-between">
               <div>
                 <p className="font-medium">Strip EXIF Data</p>
                 <p className="text-sm text-default-500">Remove metadata from uploaded images for privacy</p>
               </div>
-              <Switch isSelected={!!formData.strip_exif} onValueChange={(v) => updateField('strip_exif', v)} aria-label="Strip EXIF" />
+              <Switch isSelected={!!formData.strip_exif} onValueChange={(v) => updateField('strip_exif', v)} aria-label={t('system.label_strip_e_x_i_f')} />
             </div>
             <div className="flex items-center justify-between">
               <div>
                 <p className="font-medium">Generate Thumbnails</p>
                 <p className="text-sm text-default-500">Create thumbnail versions for listing cards</p>
               </div>
-              <Switch isSelected={!!formData.generate_thumbnails} onValueChange={(v) => updateField('generate_thumbnails', v)} aria-label="Thumbnails" />
+              <Switch isSelected={!!formData.generate_thumbnails} onValueChange={(v) => updateField('generate_thumbnails', v)} aria-label={t('system.label_thumbnails')} />
             </div>
           </CardBody>
         </Card>

@@ -35,8 +35,10 @@ import { adminBroker, adminUsers } from '../../api/adminApi';
 import { DataTable, PageHeader, EmptyState, type Column } from '../../components';
 import type { MonitoredUser, AdminUser } from '../../api/types';
 
+import { useTranslation } from 'react-i18next';
 export function UserMonitoring() {
-  usePageTitle('Admin - User Monitoring');
+  const { t } = useTranslation('admin');
+  usePageTitle(t('broker.page_title'));
   const { tenantPath } = useTenant();
   const toast = useToast();
 
@@ -70,7 +72,7 @@ export function UserMonitoring() {
         setItems(res.data);
       }
     } catch {
-      toast.error('Failed to load monitored users');
+      toast.error(t('broker.failed_to_load_monitored_users'));
     } finally {
       setLoading(false);
     }
@@ -176,11 +178,11 @@ export function UserMonitoring() {
 
   const handleAddMonitoring = async () => {
     if (!selectedUser) {
-      toast.error('Please select a user');
+      toast.error(t('broker.please_select_a_user'));
       return;
     }
     if (!monitoringReason.trim()) {
-      toast.error('A reason is required');
+      toast.error(t('broker.a_reason_is_required'));
       return;
     }
     setMonitoringLoading(true);
@@ -199,7 +201,7 @@ export function UserMonitoring() {
         toast.error(res?.error || 'Failed to add user to monitoring');
       }
     } catch {
-      toast.error('Failed to add user to monitoring');
+      toast.error(t('broker.failed_to_add_user_to_monitoring'));
     } finally {
       setMonitoringLoading(false);
     }
@@ -211,13 +213,13 @@ export function UserMonitoring() {
     try {
       const res = await adminBroker.setMonitoring(userId, { under_monitoring: false });
       if (res?.success) {
-        toast.success('User removed from monitoring');
+        toast.success(t('broker.user_removed_from_monitoring'));
         loadItems();
       } else {
         toast.error(res?.error || 'Failed to remove user from monitoring');
       }
     } catch {
-      toast.error('Failed to remove user from monitoring');
+      toast.error(t('broker.failed_to_remove_user_from_monitoring'));
     } finally {
       setRemovingId(null);
     }
@@ -312,7 +314,7 @@ export function UserMonitoring() {
           color="danger"
           onPress={() => handleRemoveMonitoring(item.user_id)}
           isLoading={removingId === item.user_id}
-          aria-label="Remove from monitoring"
+          aria-label={t('broker.label_remove_from_monitoring')}
         >
           <UserMinus size={14} />
         </Button>
@@ -323,8 +325,8 @@ export function UserMonitoring() {
   return (
     <div>
       <PageHeader
-        title="User Monitoring"
-        description="Users under messaging monitoring restrictions"
+        title={t('broker.user_monitoring_title')}
+        description={t('broker.user_monitoring_desc')}
         actions={
           <div className="flex gap-2">
             <Button
@@ -352,7 +354,7 @@ export function UserMonitoring() {
         <EmptyState
           icon={Eye}
           title="No Monitored Users"
-          description="No users are currently under monitoring restrictions."
+          description={t('broker.desc_no_users_are_currently_under_monitoring_')}
         />
       ) : (
         <DataTable
@@ -396,7 +398,7 @@ export function UserMonitoring() {
                   size="sm"
                   variant="light"
                   onPress={clearSelectedUser}
-                  aria-label="Clear selection"
+                  aria-label={t('broker.label_clear_selection')}
                 >
                   <X size={14} />
                 </Button>
@@ -405,8 +407,8 @@ export function UserMonitoring() {
               <div ref={dropdownRef} className="relative">
                 <Input
                   ref={inputRef}
-                  label="Search User"
-                  placeholder="Type a name or email..."
+                  label={t('broker.label_search_user')}
+                  placeholder={t('broker.placeholder_type_a_name_or_email')}
                   variant="bordered"
                   isRequired
                   value={userSearchQuery}
@@ -465,7 +467,7 @@ export function UserMonitoring() {
 
             <Textarea
               label="Reason (required)"
-              placeholder="Reason for placing this user under monitoring..."
+              placeholder={t('broker.placeholder_reason_for_placing_this_user_under_monitoring')}
               value={monitoringReason}
               onValueChange={setMonitoringReason}
               minRows={3}
@@ -481,7 +483,7 @@ export function UserMonitoring() {
               />
             </div>
             <Select
-              label="Monitoring duration"
+              label={t('broker.label_monitoring_duration')}
               placeholder="No expiry (indefinite)"
               variant="bordered"
               selectedKeys={expiresDays ? [expiresDays] : []}

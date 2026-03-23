@@ -181,7 +181,10 @@
     "schedule_set": "Programmato per il {{date}}",
     "schedule_clear": "Annulla programmazione",
     "groups_loading": "Caricamento gruppi...",
-    "create_post": "Crea post"
+    "create_post": "Crea post",
+    "template_button": "Modello",
+    "media_drag_drop": "Clicca o trascina le foto qui",
+    "media_formats": "JPEG, PNG, GIF, WebP fino a 10MB ciascuno"
   },
   "card": {
     "edited": "modificato",
@@ -218,7 +221,7 @@
     "type_volunteer": "Volontariato",
     "type_blog": "Blog",
     "type_discussion": "Discussione",
-    "image_alt": "{{type}} image by {{name}}",
+    "image_alt": "{{type}} immagine di {{name}}",
     "post_options": "Opzioni post",
     "send_comment": "Invia commento",
     "share_action": "Condividi",

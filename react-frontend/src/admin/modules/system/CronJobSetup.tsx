@@ -35,6 +35,7 @@ import { usePageTitle } from '@/hooks';
 import { useToast } from '@/contexts';
 import { PageHeader } from '../../components';
 
+import { useTranslation } from 'react-i18next';
 // ─────────────────────────────────────────────────────────────────────────────
 // Constants — only the public API URL is safe to derive client-side
 // ─────────────────────────────────────────────────────────────────────────────
@@ -46,7 +47,8 @@ const KEY_PLACEHOLDER = 'YOUR_CRON_KEY';
 // ─────────────────────────────────────────────────────────────────────────────
 
 export function CronJobSetup() {
-  usePageTitle('Admin - Cron Job Setup');
+  const { t } = useTranslation('admin');
+  usePageTitle(t('system.page_title'));
   const toast = useToast();
   const [testing, setTesting] = useState(false);
 
@@ -62,9 +64,9 @@ export function CronJobSetup() {
     setTesting(true);
     try {
       await new Promise((resolve) => setTimeout(resolve, 1500));
-      toast.success('Test connection successful');
+      toast.success(t('system.test_connection_successful'));
     } catch {
-      toast.error('Test connection failed');
+      toast.error(t('system.test_connection_failed'));
     }
     setTesting(false);
   };
@@ -72,8 +74,8 @@ export function CronJobSetup() {
   return (
     <div>
       <PageHeader
-        title="Cron Job Setup"
-        description="Configure your platform to execute scheduled tasks"
+        title={t('system.cron_job_setup_title')}
+        description={t('system.cron_job_setup_desc')}
       />
 
       {/* CRON_KEY Info */}
@@ -125,7 +127,7 @@ export function CronJobSetup() {
       <Card shadow="sm">
         <CardBody className="p-0">
           <Tabs
-            aria-label="Platform setup instructions"
+            aria-label={t('system.label_platform_setup_instructions')}
             variant="underlined"
             classNames={{
               base: 'w-full',
@@ -173,7 +175,7 @@ export function CronJobSetup() {
                       size="sm"
                       variant="flat"
                       isIconOnly
-                      aria-label="Copy cURL command"
+                      aria-label={t('system.label_copy_c_u_r_l_command')}
                       onPress={() =>
                         copyToClipboard(
                           `curl -H "X-Cron-Key: ${KEY_PLACEHOLDER}" ${CRON_URL}`,
@@ -304,7 +306,7 @@ exports.handler = async (event) => {
                       size="sm"
                       variant="flat"
                       isIconOnly
-                      aria-label="Copy gcloud command"
+                      aria-label={t('system.label_copy_gcloud_command')}
                       onPress={() =>
                         copyToClipboard(
                           `gcloud scheduler jobs create http nexus-cron --schedule="*/5 * * * *" --uri="${CRON_URL}" --http-method=GET --headers="X-Cron-Key=${KEY_PLACEHOLDER}"`,
@@ -337,7 +339,7 @@ exports.handler = async (event) => {
                       size="sm"
                       variant="flat"
                       isIconOnly
-                      aria-label="Copy crontab entry"
+                      aria-label={t('system.label_copy_crontab_entry')}
                       onPress={() =>
                         copyToClipboard(
                           `*/5 * * * * curl -H "X-Cron-Key: ${KEY_PLACEHOLDER}" ${CRON_URL}`,

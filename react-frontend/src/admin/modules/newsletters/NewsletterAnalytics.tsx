@@ -51,6 +51,7 @@ import { usePageTitle } from '@/hooks';
 import { adminNewsletters } from '../../api/adminApi';
 import { PageHeader, StatCard } from '../../components';
 
+import { useTranslation } from 'react-i18next';
 /* ────────────────────────────────────────────────────────────────────────── */
 /*  Types                                                                    */
 /* ────────────────────────────────────────────────────────────────────────── */
@@ -132,7 +133,8 @@ function rateColor(rate: number, benchmark: number): 'success' | 'warning' | 'da
 /* ────────────────────────────────────────────────────────────────────────── */
 
 export function NewsletterAnalytics() {
-  usePageTitle('Admin - Newsletter Analytics');
+  const { t } = useTranslation('admin');
+  usePageTitle(t('newsletters.page_title'));
   const [data, setData] = useState<AnalyticsData | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -195,8 +197,8 @@ export function NewsletterAnalytics() {
   return (
     <div>
       <PageHeader
-        title="Newsletter Analytics"
-        description="Performance metrics and insights across all campaigns"
+        title={t('newsletters.newsletter_analytics_title')}
+        description={t('newsletters.newsletter_analytics_desc')}
         actions={
           <Button
             variant="flat"
@@ -212,35 +214,35 @@ export function NewsletterAnalytics() {
       {/* ── Summary Stats ─────────────────────────────────────────────── */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-5">
         <StatCard
-          label="Campaigns Sent"
+          label={t('newsletters.label_campaigns_sent')}
           value={data?.total_newsletters ?? 0}
           icon={Send}
           color="primary"
           loading={loading}
         />
         <StatCard
-          label="Emails Delivered"
+          label={t('newsletters.label_emails_delivered')}
           value={totals?.total_sent ?? data?.total_sent ?? 0}
           icon={Mail}
           color="success"
           loading={loading}
         />
         <StatCard
-          label="Avg Open Rate"
+          label={t('newsletters.label_avg_open_rate')}
           value={`${avgOpenRate}%`}
           icon={Eye}
           color="warning"
           loading={loading}
         />
         <StatCard
-          label="Avg Click Rate"
+          label={t('newsletters.label_avg_click_rate')}
           value={`${avgClickRate}%`}
           icon={MousePointer}
           color="secondary"
           loading={loading}
         />
         <StatCard
-          label="Subscribers"
+          label={t('newsletters.label_subscribers')}
           value={data?.total_subscribers ?? 0}
           icon={Users}
           color="primary"
@@ -265,28 +267,28 @@ export function NewsletterAnalytics() {
           <CardBody className="px-6 pb-6">
             <div className="grid grid-cols-2 gap-6 sm:grid-cols-3 lg:grid-cols-5">
               <EngagementStat
-                label="Unique Opens"
+                label={t('newsletters.label_unique_opens')}
                 value={totals.unique_opens}
                 color="text-primary"
               />
               <EngagementStat
-                label="Total Opens"
+                label={t('newsletters.label_total_opens')}
                 value={totals.total_opens}
                 color="text-primary"
               />
               <EngagementStat
-                label="Unique Clicks"
+                label={t('newsletters.label_unique_clicks')}
                 value={totals.unique_clicks}
                 color="text-success"
               />
               <EngagementStat
-                label="Total Clicks"
+                label={t('newsletters.label_total_clicks')}
                 value={totals.total_clicks}
                 color="text-success"
               />
               {totals.total_failed > 0 && (
                 <EngagementStat
-                  label="Failed"
+                  label={t('newsletters.label_failed')}
                   value={totals.total_failed}
                   color="text-danger"
                   icon={<AlertTriangle size={14} className="text-danger" />}
@@ -354,7 +356,7 @@ export function NewsletterAnalytics() {
             <Divider className="my-4" />
             <div className="overflow-x-auto">
               <Table
-                aria-label="Monthly performance breakdown"
+                aria-label={t('newsletters.label_monthly_performance_breakdown')}
                 removeWrapper
                 classNames={{ th: 'text-xs uppercase', td: 'py-2' }}
               >
@@ -424,7 +426,7 @@ export function NewsletterAnalytics() {
           </CardHeader>
           <CardBody className="px-0 pb-4 sm:px-2">
             <Table
-              aria-label="Top performing newsletters"
+              aria-label={t('newsletters.label_top_performing_newsletters')}
               removeWrapper
               classNames={{ th: 'text-xs uppercase', td: 'py-3' }}
             >
@@ -498,12 +500,12 @@ export function NewsletterAnalytics() {
           <CardBody className="px-6 pb-6">
             <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
               <BenchmarkCard
-                label="Open Rate"
+                label={t('newsletters.label_open_rate')}
                 yours={avgOpenRate}
                 benchmark={BENCHMARK_OPEN_RATE}
               />
               <BenchmarkCard
-                label="Click Rate"
+                label={t('newsletters.label_click_rate')}
                 yours={avgClickRate}
                 benchmark={BENCHMARK_CLICK_RATE}
               />

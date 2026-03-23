@@ -53,6 +53,7 @@ import { api } from '@/lib/api';
 import { resolveAvatarUrl } from '@/lib/helpers';
 import { StatCard, PageHeader } from '../../components';
 
+import { useTranslation } from 'react-i18next';
 // ---------------------------------------------------------------------------
 // Types
 // ---------------------------------------------------------------------------
@@ -135,7 +136,8 @@ async function exportCsv(days: string) {
 // ---------------------------------------------------------------------------
 
 export function InactiveMembersPage() {
-  usePageTitle('Inactive Members');
+  const { t } = useTranslation('admin');
+  usePageTitle(t('reports.page_title'));
 
   const toast = useToast();
 
@@ -203,7 +205,7 @@ export function InactiveMembersPage() {
         await loadData();
       }
     } catch {
-      toast.error('Detection failed');
+      toast.error(t('reports.detection_failed'));
     } finally {
       setDetecting(false);
     }
@@ -212,7 +214,7 @@ export function InactiveMembersPage() {
   // Mark notified
   const handleNotify = async () => {
     if (selectedIds.size === 0) {
-      toast.warning('Select members to mark as notified');
+      toast.warning(t('reports.select_members_to_mark_as_notified'));
       return;
     }
 
@@ -228,7 +230,7 @@ export function InactiveMembersPage() {
         await loadData();
       }
     } catch {
-      toast.error('Failed to mark members as notified');
+      toast.error(t('reports.failed_to_mark_members_as_notified'));
     } finally {
       setNotifying(false);
     }
@@ -258,8 +260,8 @@ export function InactiveMembersPage() {
   return (
     <div>
       <PageHeader
-        title="Inactive Members"
-        description="Detect and manage members who have become inactive"
+        title={t('reports.inactive_members_page_title')}
+        description={t('reports.inactive_members_page_desc')}
         actions={
           <div className="flex items-center gap-2 flex-wrap">
             <Select
@@ -270,7 +272,7 @@ export function InactiveMembersPage() {
                 if (v) setDays(String(v));
               }}
               className="w-32"
-              aria-label="Days threshold"
+              aria-label={t('reports.label_days_threshold')}
             >
               {DAYS_OPTIONS.map((opt) => (
                 <SelectItem key={opt.key}>{opt.label}</SelectItem>
@@ -284,7 +286,7 @@ export function InactiveMembersPage() {
                 setFlagType(v !== undefined ? String(v) : '');
               }}
               className="w-32"
-              aria-label="Flag type"
+              aria-label={t('reports.label_flag_type')}
             >
               {FLAG_TYPE_OPTIONS.map((opt) => (
                 <SelectItem key={opt.key}>{opt.label}</SelectItem>
@@ -324,28 +326,28 @@ export function InactiveMembersPage() {
       {/* Stats Cards */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4 mb-6">
         <StatCard
-          label="Total Flagged"
+          label={t('reports.label_total_flagged')}
           value={stats?.total_flagged ?? '\u2014'}
           icon={AlertTriangle}
           color="danger"
           loading={!stats}
         />
         <StatCard
-          label="Inactive"
+          label={t('reports.label_inactive')}
           value={stats?.inactive_count ?? '\u2014'}
           icon={UserX}
           color="warning"
           loading={!stats}
         />
         <StatCard
-          label="Dormant"
+          label={t('reports.label_dormant')}
           value={stats?.dormant_count ?? '\u2014'}
           icon={Clock}
           color="danger"
           loading={!stats}
         />
         <StatCard
-          label="Inactivity Rate"
+          label={t('reports.label_inactivity_rate')}
           value={stats ? `${(stats.inactivity_rate * 100).toFixed(1)}%` : '\u2014'}
           icon={Activity}
           color="secondary"
@@ -409,14 +411,14 @@ export function InactiveMembersPage() {
       )}
 
       {/* Members Table */}
-      <Table aria-label="Inactive members" shadow="sm">
+      <Table aria-label={t('reports.label_inactive_members')} shadow="sm">
         <TableHeader>
           <TableColumn width={40}>
             <Checkbox
               isSelected={selectedIds.size === members.length && members.length > 0}
               isIndeterminate={selectedIds.size > 0 && selectedIds.size < members.length}
               onValueChange={toggleSelectAll}
-              aria-label="Select all"
+              aria-label={t('reports.label_select_all')}
             />
           </TableColumn>
           <TableColumn>Member</TableColumn>

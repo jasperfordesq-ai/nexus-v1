@@ -28,6 +28,7 @@ import { useToast } from '@/contexts';
 import { adminGamification } from '../../api/adminApi';
 import { PageHeader } from '../../components';
 
+import { useTranslation } from 'react-i18next';
 // ─────────────────────────────────────────────────────────────────────────────
 // Constants
 // ─────────────────────────────────────────────────────────────────────────────
@@ -71,7 +72,8 @@ interface FormData {
 }
 
 export function CreateBadge() {
-  usePageTitle('Admin - Create Badge');
+  const { t } = useTranslation('admin');
+  usePageTitle(t('gamification.page_title'));
   const toast = useToast();
   const navigate = useNavigate();
 
@@ -103,7 +105,7 @@ export function CreateBadge() {
 
   const handleSave = async () => {
     if (!formData.name.trim()) {
-      toast.error('Badge name is required');
+      toast.error(t('gamification.badge_name_is_required'));
       return;
     }
 
@@ -135,8 +137,8 @@ export function CreateBadge() {
   return (
     <div>
       <PageHeader
-        title="Create Badge"
-        description="Create a new custom badge for your community"
+        title={t('gamification.create_badge_title')}
+        description={t('gamification.create_badge_desc')}
         actions={
           <Link to="/admin/custom-badges">
             <Button variant="flat" startContent={<ArrowLeft size={16} />}>
@@ -153,8 +155,8 @@ export function CreateBadge() {
         </CardHeader>
         <CardBody className="gap-4">
           <Input
-            label="Name"
-            placeholder="e.g. Community Champion"
+            label={t('gamification.label_name')}
+            placeholder={t('gamification.placeholder_eg_community_champion')}
             value={formData.name}
             onValueChange={(v) => updateField('name', v)}
             isRequired
@@ -163,7 +165,7 @@ export function CreateBadge() {
           />
 
           <Input
-            label="Slug"
+            label={t('gamification.label_slug')}
             placeholder="Auto-generated from name"
             value={formData.slug}
             onValueChange={(v) => setFormData((prev) => ({ ...prev, slug: v }))}
@@ -173,8 +175,8 @@ export function CreateBadge() {
           />
 
           <Textarea
-            label="Description"
-            placeholder="Describe what this badge is awarded for..."
+            label={t('gamification.label_description')}
+            placeholder={t('gamification.placeholder_describe_what_this_badge_is_awarded_for')}
             value={formData.description}
             onValueChange={(v) => updateField('description', v)}
             variant="bordered"
@@ -183,7 +185,7 @@ export function CreateBadge() {
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <Select
-              label="Icon"
+              label={t('gamification.label_icon')}
               selectedKeys={new Set([formData.icon])}
               onSelectionChange={(keys) => {
                 const selected = Array.from(keys)[0] as string;
@@ -197,7 +199,7 @@ export function CreateBadge() {
             </Select>
 
             <Select
-              label="Category"
+              label={t('gamification.label_category')}
               selectedKeys={new Set([formData.category])}
               onSelectionChange={(keys) => {
                 const selected = Array.from(keys)[0] as string;
@@ -213,7 +215,7 @@ export function CreateBadge() {
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <Input
-              label="XP Value"
+              label={t('gamification.label_x_p_value')}
               type="number"
               placeholder="0"
               value={String(formData.xp)}
@@ -221,7 +223,7 @@ export function CreateBadge() {
               variant="bordered"
               min={0}
               max={10000}
-              description="XP awarded when this badge is earned"
+              description={t('gamification.desc_x_p_awarded_when_this_badge_is_earned')}
             />
             <div className="flex items-center justify-between p-3 rounded-lg border border-default-200">
               <div>

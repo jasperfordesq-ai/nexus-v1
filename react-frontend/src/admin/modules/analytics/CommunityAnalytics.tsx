@@ -46,6 +46,7 @@ import { LocationMap } from '@/components/location';
 import { MAPS_ENABLED } from '@/lib/map-config';
 import { StatCard, PageHeader } from '../../components';
 
+import { useTranslation } from 'react-i18next';
 // ─────────────────────────────────────────────────────────────────────────────
 // Types
 // ─────────────────────────────────────────────────────────────────────────────
@@ -108,7 +109,8 @@ const PIE_COLORS = CHART_COLORS;
 // ─────────────────────────────────────────────────────────────────────────────
 
 export function CommunityAnalytics() {
-  usePageTitle('Community Analytics');
+  const { t } = useTranslation('admin');
+  usePageTitle(t('analytics.page_title'));
 
   const [data, setData] = useState<CommunityAnalyticsData | null>(null);
   const [loading, setLoading] = useState(true);
@@ -180,8 +182,8 @@ export function CommunityAnalytics() {
   return (
     <div>
       <PageHeader
-        title="Community Analytics"
-        description="Insights into community health, engagement, and exchange activity"
+        title={t('analytics.community_analytics_title')}
+        description={t('analytics.community_analytics_desc')}
         actions={
           <div className="flex items-center gap-2">
             <Button
@@ -233,7 +235,7 @@ export function CommunityAnalytics() {
           loading={loading}
         />
         <StatCard
-          label="Engagement Rate"
+          label={t('analytics.label_engagement_rate')}
           value={
             data
               ? `${(data.engagement_rate * 100).toFixed(1)}%`
@@ -478,7 +480,7 @@ export function CommunityAnalytics() {
             <h3 className="font-semibold">Top Earners (30 days)</h3>
           </CardHeader>
           <CardBody className="px-4 pb-4">
-            <Table aria-label="Top earners" shadow="sm" isStriped>
+            <Table aria-label={t('analytics.label_top_earners')} shadow="sm" isStriped>
               <TableHeader>
                 <TableColumn>Rank</TableColumn>
                 <TableColumn>Name</TableColumn>
@@ -508,7 +510,7 @@ export function CommunityAnalytics() {
             <h3 className="font-semibold">Top Spenders (30 days)</h3>
           </CardHeader>
           <CardBody className="px-4 pb-4">
-            <Table aria-label="Top spenders" shadow="sm" isStriped>
+            <Table aria-label={t('analytics.label_top_spenders')} shadow="sm" isStriped>
               <TableHeader>
                 <TableColumn>Rank</TableColumn>
                 <TableColumn>Name</TableColumn>
@@ -549,19 +551,19 @@ export function CommunityAnalytics() {
                 {/* Stats row */}
                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-3 mb-6">
                   <StatCard
-                    label="Members with Location"
+                    label={t('analytics.label_members_with_location')}
                     value={`${geoData.total_with_location} / ${geoData.total_members}`}
                     icon={MapPin}
                     color="primary"
                   />
                   <StatCard
-                    label="Location Coverage"
+                    label={t('analytics.label_location_coverage')}
                     value={`${geoData.coverage_percentage}%`}
                     icon={Globe}
                     color={geoData.coverage_percentage > 50 ? 'success' : 'warning'}
                   />
                   <StatCard
-                    label="Top Area"
+                    label={t('analytics.label_top_area')}
                     value={geoData.top_areas[0]?.area || 'N/A'}
                     icon={MapPin}
                     color="secondary"

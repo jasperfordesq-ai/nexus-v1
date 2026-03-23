@@ -23,6 +23,7 @@ import { useTenant, useToast } from '@/contexts';
 import { adminCrm } from '../../api/adminApi';
 import { PageHeader, ConfirmModal } from '../../components';
 
+import { useTranslation } from 'react-i18next';
 interface MemberTag {
   id: number;
   tenant_id: number;
@@ -42,7 +43,8 @@ interface TagSummary {
 type ViewMode = 'summary' | 'members';
 
 export function MemberTags() {
-  usePageTitle('Admin - Member Tags');
+  const { t } = useTranslation('admin');
+  usePageTitle(t('crm.page_title'));
   const { tenantPath } = useTenant();
   const toast = useToast();
 
@@ -135,12 +137,12 @@ export function MemberTags() {
 
   const handleAddTag = async () => {
     if (!formUserId || isNaN(Number(formUserId))) {
-      toast.error('Valid user ID is required');
+      toast.error(t('crm.valid_user_i_d_is_required'));
       return;
     }
     const tagValue = formTag.trim() || formTagSearch.trim();
     if (!tagValue) {
-      toast.error('Tag name is required');
+      toast.error(t('crm.tag_name_is_required'));
       return;
     }
     setSaving(true);
@@ -150,7 +152,7 @@ export function MemberTags() {
         tag: tagValue,
       });
       if (res.success) {
-        toast.success('Tag added');
+        toast.success(t('crm.tag_added'));
         addModal.onClose();
         if (viewMode === 'members' && tagValue === activeTag) {
           loadMembersByTag(activeTag);
@@ -158,10 +160,10 @@ export function MemberTags() {
           loadTagSummaries();
         }
       } else {
-        toast.error('Failed to add tag');
+        toast.error(t('crm.failed_to_add_tag'));
       }
     } catch {
-      toast.error('Failed to add tag');
+      toast.error(t('crm.failed_to_add_tag'));
     }
     setSaving(false);
   };
@@ -174,17 +176,17 @@ export function MemberTags() {
     try {
       const res = await adminCrm.removeTag(deleteTarget.id);
       if (res.success) {
-        toast.success('Tag removed from member');
+        toast.success(t('crm.tag_removed_from_member'));
         setDeleteTarget(null);
         if (viewMode === 'members') {
           loadMembersByTag(activeTag);
         }
         loadTagSummaries();
       } else {
-        toast.error('Failed to remove tag');
+        toast.error(t('crm.failed_to_remove_tag'));
       }
     } catch {
-      toast.error('Failed to remove tag');
+      toast.error(t('crm.failed_to_remove_tag'));
     }
     setDeleting(false);
   };
@@ -201,10 +203,10 @@ export function MemberTags() {
         setDeleteSummaryTarget(null);
         loadTagSummaries();
       } else {
-        toast.error('Failed to remove tag');
+        toast.error(t('crm.failed_to_remove_tag'));
       }
     } catch {
-      toast.error('Failed to remove tag');
+      toast.error(t('crm.failed_to_remove_tag'));
     }
     setDeleting(false);
   };
@@ -246,8 +248,8 @@ export function MemberTags() {
       {/* Search */}
       <div className="flex flex-wrap items-end gap-3 mb-6">
         <Input
-          label="Search Tags"
-          placeholder="Filter by tag name"
+          label={t('crm.label_search_tags')}
+          placeholder={t('crm.placeholder_filter_by_tag_name')}
           className="w-64"
           size="sm"
           startContent={<Search size={14} />}
@@ -414,8 +416,8 @@ export function MemberTags() {
   return (
     <div className="max-w-6xl mx-auto">
       <PageHeader
-        title="Member Tags"
-        description="Organize members with tags for CRM segmentation"
+        title={t('crm.member_tags_title')}
+        description={t('crm.member_tags_desc')}
         actions={
           <Button color="primary" startContent={<Plus size={16} />} onPress={openAddModal}>
             Add Tag
@@ -434,7 +436,7 @@ export function MemberTags() {
           </ModalHeader>
           <ModalBody className="flex flex-col gap-4">
             <Input
-              label="User ID"
+              label={t('crm.label_user_i_d')}
               placeholder="Enter the member's user ID"
               type="number"
               isRequired
@@ -443,8 +445,8 @@ export function MemberTags() {
             />
             <div className="flex flex-col gap-2">
               <Input
-                label="Tag"
-                placeholder="Type a tag name or select from suggestions"
+                label={t('crm.label_tag')}
+                placeholder={t('crm.placeholder_type_a_tag_name_or_select_from_suggestions')}
                 isRequired
                 value={formTag || formTagSearch}
                 onValueChange={(val) => {

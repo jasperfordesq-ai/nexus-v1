@@ -24,8 +24,10 @@ import { adminSuper } from '../../api/adminApi';
 import { PageHeader, ConfirmModal, StatCard } from '../../components';
 import type { FederationSystemControls as FederationSystemControlsType, FederationWhitelistEntry, FederationPartnership } from '../../api/types';
 
+import { useTranslation } from 'react-i18next';
 export function FederationControls() {
-  usePageTitle('Super Admin - Federation Controls');
+  const { t } = useTranslation('admin');
+  usePageTitle(t('super.page_title'));
   const toast = useToast();
   const toastRef = useRef(toast);
   toastRef.current = toast;
@@ -158,32 +160,32 @@ export function FederationControls() {
       </nav>
 
       <PageHeader
-        title="Federation Control Center"
-        description="System-level federation management — master controls, feature toggles, and partnership oversight"
+        title={t('super.federation_controls_title')}
+        description={t('super.federation_controls_desc')}
       />
 
       {/* Stats Row */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <StatCard
-          label="Federation Status"
+          label={t('super.label_federation_status')}
           value={controls.federation_enabled ? 'Active' : 'Disabled'}
           icon={Globe}
           color={controls.federation_enabled ? 'success' : 'danger'}
         />
         <StatCard
-          label="Whitelisted Tenants"
+          label={t('super.label_whitelisted_tenants')}
           value={whitelist.length}
           icon={Shield}
           color="primary"
         />
         <StatCard
-          label="Active Partnerships"
+          label={t('super.label_active_partnerships')}
           value={activePartnerships}
           icon={Handshake}
           color="secondary"
         />
         <StatCard
-          label="System Status"
+          label={t('super.label_system_status')}
           value={controls.is_locked_down ? 'LOCKDOWN' : 'Normal'}
           icon={controls.is_locked_down ? Lock : Unlock}
           color={controls.is_locked_down ? 'danger' : 'success'}
@@ -342,7 +344,7 @@ export function FederationControls() {
             <div className="flex gap-2">
               <Input
                 size="sm"
-                label="Tenant ID"
+                label={t('super.label_tenant_i_d')}
                 value={addTenantId}
                 onValueChange={setAddTenantId}
                 className="max-w-[120px]"
@@ -361,7 +363,7 @@ export function FederationControls() {
                     </Link>
                     {' '}<span className="text-xs text-default-400">(ID: {entry.tenant_id})</span>
                   </span>
-                  <Button size="sm" variant="light" color="danger" isIconOnly aria-label="Remove from whitelist" onPress={() => handleRemoveWhitelist(entry.tenant_id)}>
+                  <Button size="sm" variant="light" color="danger" isIconOnly aria-label={t('super.label_remove_from_whitelist')} onPress={() => handleRemoveWhitelist(entry.tenant_id)}>
                     <Trash2 size={14} />
                   </Button>
                 </div>
@@ -443,8 +445,8 @@ export function FederationControls() {
       >
         {!controls.is_locked_down && (
           <Input
-            label="Lockdown Reason"
-            placeholder="Describe reason for emergency lockdown..."
+            label={t('super.label_lockdown_reason')}
+            placeholder={t('super.placeholder_describe_reason_for_emergency_lockdown')}
             value={lockdownReason}
             onValueChange={setLockdownReason}
             className="mt-3"

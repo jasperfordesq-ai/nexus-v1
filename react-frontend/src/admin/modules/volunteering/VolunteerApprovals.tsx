@@ -17,6 +17,7 @@ import { useToast } from '@/contexts';
 import { adminVolunteering } from '../../api/adminApi';
 import { DataTable, PageHeader, EmptyState, StatusBadge, type Column } from '../../components';
 
+import { useTranslation } from 'react-i18next';
 interface VolApplication {
   id: number;
   user_id: number;
@@ -29,7 +30,8 @@ interface VolApplication {
 }
 
 export function VolunteerApprovals() {
-  usePageTitle('Admin - Volunteer Approvals');
+  const { t } = useTranslation('admin');
+  usePageTitle(t('volunteering.page_title'));
   const toast = useToast();
   const [items, setItems] = useState<VolApplication[]>([]);
   const [loading, setLoading] = useState(true);
@@ -48,7 +50,7 @@ export function VolunteerApprovals() {
         }
       }
     } catch {
-      toast.error('Failed to load approvals');
+      toast.error(t('volunteering.failed_to_load_approvals'));
       setItems([]);
     }
     setLoading(false);
@@ -61,13 +63,13 @@ export function VolunteerApprovals() {
     try {
       const res = await adminVolunteering.approveApplication(id);
       if (res.success) {
-        toast.success('Application approved');
+        toast.success(t('volunteering.application_approved'));
         loadData();
       } else {
-        toast.error('Failed to approve application');
+        toast.error(t('volunteering.failed_to_approve_application'));
       }
     } catch {
-      toast.error('Failed to approve application');
+      toast.error(t('volunteering.failed_to_approve_application'));
     } finally {
       setActionId(null);
     }
@@ -78,13 +80,13 @@ export function VolunteerApprovals() {
     try {
       const res = await adminVolunteering.declineApplication(id);
       if (res.success) {
-        toast.success('Application declined');
+        toast.success(t('volunteering.application_declined'));
         loadData();
       } else {
-        toast.error('Failed to decline application');
+        toast.error(t('volunteering.failed_to_decline_application'));
       }
     } catch {
-      toast.error('Failed to decline application');
+      toast.error(t('volunteering.failed_to_decline_application'));
     } finally {
       setActionId(null);
     }
@@ -146,8 +148,8 @@ export function VolunteerApprovals() {
   if (!loading && items.length === 0) {
     return (
       <div>
-        <PageHeader title="Volunteer Approvals" description="Review pending volunteer applications" />
-        <EmptyState icon={ClipboardCheck} title="No Pending Approvals" description="All volunteer applications have been reviewed." />
+        <PageHeader title={t('volunteering.volunteer_approvals_title')} description={t('volunteering.volunteer_approvals_desc')} />
+        <EmptyState icon={ClipboardCheck} title="No Pending Approvals" description={t('volunteering.desc_all_volunteer_applications_have_been_rev')} />
       </div>
     );
   }
@@ -155,8 +157,8 @@ export function VolunteerApprovals() {
   return (
     <div>
       <PageHeader
-        title="Volunteer Approvals"
-        description="Review pending volunteer applications"
+        title={t('volunteering.volunteer_approvals_title')}
+        description={t('volunteering.volunteer_approvals_desc')}
         actions={<Button variant="flat" startContent={<RefreshCw size={16} />} onPress={loadData} isLoading={loading}>Refresh</Button>}
       />
       <DataTable columns={columns} data={items} isLoading={loading} onRefresh={loadData} />

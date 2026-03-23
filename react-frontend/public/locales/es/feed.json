@@ -181,7 +181,10 @@
     "schedule_set": "Programada para {{date}}",
     "schedule_clear": "Eliminar programación",
     "groups_loading": "Cargando grupos...",
-    "create_post": "Crear publicación"
+    "create_post": "Crear publicación",
+    "template_button": "Plantilla",
+    "media_drag_drop": "Haz clic o arrastra fotos aquí",
+    "media_formats": "JPEG, PNG, GIF, WebP hasta 10 MB cada uno"
   },
   "card": {
     "edited": "editado",

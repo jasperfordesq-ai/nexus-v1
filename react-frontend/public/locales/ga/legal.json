@@ -378,62 +378,62 @@
     "back_to_current": "Ar ais go {{title}} Reatha"
   },
   "platform": {
-    "effective_date": "Effective {{date}}",
-    "platform_chip": "Project NEXUS Platform",
-    "provider_notice_title": "Platform Provider Notice",
-    "provider_notice_body": "This document governs the relationship between you and Project NEXUS (the platform provider). It is separate from any terms established by {{tenant}} (your community operator).",
-    "view_tenant_legal": "View {{tenant}}'s legal documents",
-    "contents": "Contents",
-    "related_documents": "Related Platform Documents",
-    "cta_title": "Questions About This Document?",
-    "cta_body": "If you have questions about this platform-level document, contact the Project NEXUS team. For questions about your community's policies, contact {{tenant}} directly.",
-    "nexus_website": "Project NEXUS Website",
-    "contact_tenant": "Contact {{tenant}}"
+    "effective_date": "I bhfeidhm {{date}}",
+    "platform_chip": "Ardán Project NEXUS",
+    "provider_notice_title": "Fógra Soláthraí Ardáin",
+    "provider_notice_body": "Rialaíonn an doiciméad seo an gaol idir tú féin agus Project NEXUS (soláthraí an ardáin). Tá sé ar leithligh ó aon téarmaí arna mbunú ag {{tenant}} (oibreoir do phobail).",
+    "view_tenant_legal": "Féach ar dhoiciméid dhlíthiúla {{tenant}}",
+    "contents": "Clár Ábhar",
+    "related_documents": "Doiciméid Ghaolmhara Ardáin",
+    "cta_title": "Ceisteanna Faoin Doiciméad Seo?",
+    "cta_body": "Má tá ceisteanna agat faoin doiciméad seo ar leibhéal an ardáin, déan teagmháil le foireann Project NEXUS. Maidir le ceisteanna faoi pholasaithe do phobail, déan teagmháil le {{tenant}} go díreach.",
+    "nexus_website": "Suíomh Gréasáin Project NEXUS",
+    "contact_tenant": "Déan teagmháil le {{tenant}}"
   },
   "platform_disclaimer": {
-    "page_title": "Platform Disclaimer",
-    "title": "Platform Disclaimer",
-    "subtitle": "Important disclaimers and liability limitations for the Project NEXUS platform",
-    "link_terms": "Platform Terms of Service",
-    "link_privacy": "Platform Privacy Policy"
+    "page_title": "Séanadh Ardáin",
+    "title": "Séanadh Ardáin",
+    "subtitle": "Séanaimh thábhachtacha agus teorainneacha dliteanais don ardán Project NEXUS",
+    "link_terms": "Téarmaí Seirbhíse an Ardáin",
+    "link_privacy": "Polasaí Príobháideachais Ardáin"
   },
   "platform_privacy": {
-    "page_title": "Platform Privacy Policy",
-    "title": "Platform Privacy Policy",
-    "subtitle": "How Project NEXUS handles data at the platform infrastructure level",
-    "link_terms": "Platform Terms of Service",
-    "link_disclaimer": "Platform Disclaimer"
+    "page_title": "Polasaí Príobháideachais Ardáin",
+    "title": "Polasaí Príobháideachais Ardáin",
+    "subtitle": "Conas a láimhseálann Project NEXUS sonraí ag leibhéal bonneagair an ardáin",
+    "link_terms": "Téarmaí Seirbhíse an Ardáin",
+    "link_disclaimer": "Séanadh Ardáin"
   },
   "platform_terms": {
-    "page_title": "Platform Terms of Service",
-    "title": "Platform Terms of Service",
-    "subtitle": "The terms governing the Project NEXUS platform infrastructure",
-    "link_privacy": "Platform Privacy Policy",
-    "link_disclaimer": "Platform Disclaimer"
+    "page_title": "Téarmaí Seirbhíse an Ardáin",
+    "title": "Téarmaí Seirbhíse an Ardáin",
+    "subtitle": "Na téarmaí a rialaíonn bonneagar ardáin Project NEXUS",
+    "link_privacy": "Polasaí Príobháideachais Ardáin",
+    "link_disclaimer": "Séanadh Ardáin"
   },
   "gate": {
-    "title": "Updated legal documents",
-    "subtitle_one": "A document has been updated. Please review and accept it to continue.",
-    "subtitle_other": "{{count}} documents have been updated. Please review and accept them to continue.",
-    "type_terms": "Terms of Service",
-    "type_privacy": "Privacy Policy",
-    "type_cookies": "Cookie Policy",
-    "type_accessibility": "Accessibility Statement",
-    "type_community_guidelines": "Community Guidelines",
-    "type_acceptable_use": "Acceptable Use Policy",
-    "updated": "Updated",
-    "read": "Read",
-    "consent_text": "By clicking Accept, you confirm you have read and agree to the documents listed above.",
-    "accept_aria": "Accept all updated legal documents and continue",
-    "accepting": "Accepting…",
-    "accept_continue": "Accept & Continue"
+    "title": "Doiciméid dhlíthiúla nuashonraithe",
+    "subtitle_one": "Tá doiciméad nuashonraithe. Athbhreithnigh agus glac leis chun leanúint ar aghaidh le do thoil.",
+    "subtitle_other": "Tá {{count}} doiciméad nuashonraithe. Athbhreithnigh agus glac leo chun leanúint ar aghaidh le do thoil.",
+    "type_terms": "Téarmaí Seirbhíse",
+    "type_privacy": "Polasaí Príobháideachais",
+    "type_cookies": "Polasaí Fianán",
+    "type_accessibility": "Ráiteas Inrochtaineachta",
+    "type_community_guidelines": "Treoirlínte Pobail",
+    "type_acceptable_use": "Polasaí Úsáide Inghlactha",
+    "updated": "Nuashonraithe",
+    "read": "Léigh",
+    "consent_text": "Trí Glacadh a chliceáil, deimhníonn tú go bhfuil na doiciméid liostaithe thuas léite agat agus go n-aontaíonn tú leo.",
+    "accept_aria": "Glac le gach doiciméad dlíthiúil nuashonraithe agus lean ar aghaidh",
+    "accepting": "Ag Glacadh…",
+    "accept_continue": "Glac & Lean Ar Aghaidh"
   },
   "custom": {
-    "effective_label": "Effective: {{date}}",
-    "contents": "Contents",
-    "view_previous_versions": "View previous versions of this document",
-    "cta_title": "Have Questions?",
-    "cta_body": "If you have any questions about this document, please contact us.",
-    "contact_us": "Contact Us"
+    "effective_label": "I bhfeidhm: {{date}}",
+    "contents": "Clár Ábhar",
+    "view_previous_versions": "Féach ar leaganacha roimhe den doiciméad seo",
+    "cta_title": "Ceisteanna Agat?",
+    "cta_body": "Má tá aon cheisteanna agat faoin doiciméad seo, déan teagmháil linn le do thoil.",
+    "contact_us": "Déan Teagmháil Linn"
   }
 }

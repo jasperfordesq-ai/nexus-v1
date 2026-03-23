@@ -16,8 +16,10 @@ import { useToast } from '@/contexts';
 import { PageHeader } from '../../components';
 import { adminSettings } from '../../api/adminApi';
 
+import { useTranslation } from 'react-i18next';
 export function FeedAlgorithm() {
-  usePageTitle('Admin - Feed Algorithm');
+  const { t } = useTranslation('admin');
+  usePageTitle(t('advanced.page_title'));
   const toast = useToast();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -38,7 +40,7 @@ export function FeedAlgorithm() {
           setFormData(prev => ({ ...prev, ...res.data }));
         }
       })
-      .catch(() => toast.error('Failed to load feed algorithm settings'))
+      .catch(() => toast.error(t('advanced.failed_to_load_feed_algorithm_settings')))
       .finally(() => setLoading(false));
   }, [toast]);
 
@@ -48,13 +50,13 @@ export function FeedAlgorithm() {
       const res = await adminSettings.updateFeedAlgorithm(formData);
 
       if (res.success) {
-        toast.success('Feed algorithm settings saved successfully');
+        toast.success(t('advanced.feed_algorithm_settings_saved_successful'));
       } else {
         const error = (res as { error?: string }).error || 'Save failed';
         toast.error(error);
       }
     } catch (err) {
-      toast.error('Failed to save feed algorithm settings');
+      toast.error(t('advanced.failed_to_save_feed_algorithm_settings'));
       console.error('Feed algorithm save error:', err);
     } finally {
       setSaving(false);
@@ -75,7 +77,7 @@ export function FeedAlgorithm() {
 
   return (
     <div>
-      <PageHeader title="Feed Algorithm" description="Configure social feed ranking and content prioritization" />
+      <PageHeader title={t('advanced.feed_algorithm_title')} description={t('advanced.feed_algorithm_desc')} />
 
       <div className="space-y-4">
         <Card shadow="sm">
@@ -83,19 +85,19 @@ export function FeedAlgorithm() {
           <CardBody className="gap-6">
             <div>
               <p className="text-sm font-medium mb-2">Recency Weight</p>
-              <Slider minValue={0} maxValue={100} value={Number(formData.recency_weight)} onChange={(v) => updateField('recency_weight', v)} step={5} label="How much to prioritize newer content" className="max-w-md" />
+              <Slider minValue={0} maxValue={100} value={Number(formData.recency_weight)} onChange={(v) => updateField('recency_weight', v)} step={5} label={t('advanced.label_how_much_to_prioritize_newer_content')} className="max-w-md" />
             </div>
             <div>
               <p className="text-sm font-medium mb-2">Engagement Weight</p>
-              <Slider minValue={0} maxValue={100} value={Number(formData.engagement_weight)} onChange={(v) => updateField('engagement_weight', v)} step={5} label="How much to prioritize liked/commented content" className="max-w-md" />
+              <Slider minValue={0} maxValue={100} value={Number(formData.engagement_weight)} onChange={(v) => updateField('engagement_weight', v)} step={5} label={t('advanced.label_how_much_to_prioritize_likedcommented_content')} className="max-w-md" />
             </div>
             <div>
               <p className="text-sm font-medium mb-2">Connection Weight</p>
-              <Slider minValue={0} maxValue={100} value={Number(formData.connection_weight)} onChange={(v) => updateField('connection_weight', v)} step={5} label="Boost content from connected users" className="max-w-md" />
+              <Slider minValue={0} maxValue={100} value={Number(formData.connection_weight)} onChange={(v) => updateField('connection_weight', v)} step={5} label={t('advanced.label_boost_content_from_connected_users')} className="max-w-md" />
             </div>
             <div>
               <p className="text-sm font-medium mb-2">Diversity Factor</p>
-              <Slider minValue={0} maxValue={100} value={Number(formData.diversity_factor)} onChange={(v) => updateField('diversity_factor', v)} step={5} label="Vary content types in the feed" className="max-w-md" />
+              <Slider minValue={0} maxValue={100} value={Number(formData.diversity_factor)} onChange={(v) => updateField('diversity_factor', v)} step={5} label={t('advanced.label_vary_content_types_in_the_feed')} className="max-w-md" />
             </div>
           </CardBody>
         </Card>
@@ -108,21 +110,21 @@ export function FeedAlgorithm() {
                 <p className="font-medium">Chronological Mode</p>
                 <p className="text-sm text-default-500">Show feed in pure chronological order (disables algorithm)</p>
               </div>
-              <Switch isSelected={!!formData.chronological_mode} onValueChange={(v) => updateField('chronological_mode', v)} aria-label="Chronological mode" />
+              <Switch isSelected={!!formData.chronological_mode} onValueChange={(v) => updateField('chronological_mode', v)} aria-label={t('advanced.label_chronological_mode')} />
             </div>
             <div className="flex items-center justify-between">
               <div>
                 <p className="font-medium">Include Polls</p>
                 <p className="text-sm text-default-500">Show polls in the main feed</p>
               </div>
-              <Switch isSelected={!!formData.include_polls} onValueChange={(v) => updateField('include_polls', v)} aria-label="Include polls" />
+              <Switch isSelected={!!formData.include_polls} onValueChange={(v) => updateField('include_polls', v)} aria-label={t('advanced.label_include_polls')} />
             </div>
             <div className="flex items-center justify-between">
               <div>
                 <p className="font-medium">Include Events</p>
                 <p className="text-sm text-default-500">Show upcoming events in the feed</p>
               </div>
-              <Switch isSelected={!!formData.include_events} onValueChange={(v) => updateField('include_events', v)} aria-label="Include events" />
+              <Switch isSelected={!!formData.include_events} onValueChange={(v) => updateField('include_events', v)} aria-label={t('advanced.label_include_events')} />
             </div>
           </CardBody>
         </Card>

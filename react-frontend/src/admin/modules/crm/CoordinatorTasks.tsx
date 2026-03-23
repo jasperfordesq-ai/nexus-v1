@@ -25,6 +25,7 @@ import { useTenant, useToast } from '@/contexts';
 import { adminCrm } from '../../api/adminApi';
 import { PageHeader } from '../../components';
 
+import { useTranslation } from 'react-i18next';
 interface Task {
   id: number;
   tenant_id: number;
@@ -106,7 +107,8 @@ function formatDateTime(dateStr: string): string {
 }
 
 export default function CoordinatorTasks() {
-  usePageTitle('Admin - Coordinator Tasks');
+  const { t } = useTranslation('admin');
+  usePageTitle(t('crm.page_title'));
   const { tenantPath } = useTenant();
   const toast = useToast();
 
@@ -160,7 +162,7 @@ export default function CoordinatorTasks() {
         }
       }
     } catch {
-      toast.error('Failed to load tasks');
+      toast.error(t('crm.failed_to_load_tasks'));
       setTasks([]);
     }
     setLoading(false);
@@ -213,7 +215,7 @@ export default function CoordinatorTasks() {
 
   const handleSave = useCallback(async () => {
     if (!formTitle.trim()) {
-      toast.error('Title is required');
+      toast.error(t('crm.title_is_required'));
       return;
     }
     setSaving(true);
@@ -229,10 +231,10 @@ export default function CoordinatorTasks() {
 
       if (editingTask) {
         await adminCrm.updateTask(editingTask.id, payload as Parameters<typeof adminCrm.updateTask>[1]);
-        toast.success('Task updated');
+        toast.success(t('crm.task_updated'));
       } else {
         await adminCrm.createTask(payload as Parameters<typeof adminCrm.createTask>[0]);
-        toast.success('Task created');
+        toast.success(t('crm.task_created'));
       }
       createModal.onClose();
       resetForm();
@@ -248,12 +250,12 @@ export default function CoordinatorTasks() {
     setDeleting(true);
     try {
       await adminCrm.deleteTask(deletingTask.id);
-      toast.success('Task deleted');
+      toast.success(t('crm.task_deleted'));
       deleteModal.onClose();
       setDeletingTask(null);
       await loadTasks();
     } catch {
-      toast.error('Failed to delete task');
+      toast.error(t('crm.failed_to_delete_task'));
     }
     setDeleting(false);
   }, [deletingTask, deleteModal, loadTasks, toast]);
@@ -264,7 +266,7 @@ export default function CoordinatorTasks() {
       toast.success(`Task marked as ${newStatus.replace('_', ' ')}`);
       await loadTasks();
     } catch {
-      toast.error('Failed to update task status');
+      toast.error(t('crm.failed_to_update_task_status'));
     }
   }, [loadTasks, toast]);
 
@@ -281,7 +283,7 @@ export default function CoordinatorTasks() {
   return (
     <div className="max-w-6xl mx-auto space-y-6">
       <PageHeader
-        title="Coordinator Tasks"
+        title={t('crm.coordinator_tasks_title')}
         description={`${total} task${total !== 1 ? 's' : ''} total`}
         actions={
           <Button color="primary" startContent={<Plus className="w-4 h-4" />} onPress={openCreate}>
@@ -310,7 +312,7 @@ export default function CoordinatorTasks() {
         {/* Priority filter */}
         <Select
           size="sm"
-          label="Priority"
+          label={t('crm.label_priority')}
           selectedKeys={[priorityFilter]}
           onChange={(e) => setPriorityFilter((e.target.value || 'all') as PriorityFilter)}
           className="max-w-[180px]"
@@ -323,8 +325,8 @@ export default function CoordinatorTasks() {
         {/* Search */}
         <Input
           size="sm"
-          label="Search"
-          placeholder="Search tasks..."
+          label={t('crm.label_search')}
+          placeholder={t('crm.placeholder_search_tasks')}
           className="max-w-[220px]"
           startContent={<Search className="w-4 h-4" />}
           value={searchQuery}
@@ -400,11 +402,11 @@ export default function CoordinatorTasks() {
                         {/* Actions dropdown */}
                         <Dropdown>
                           <DropdownTrigger>
-                            <Button isIconOnly size="sm" variant="light" aria-label="Task actions">
+                            <Button isIconOnly size="sm" variant="light" aria-label={t('crm.label_task_actions')}>
                               <MoreVertical className="w-4 h-4" />
                             </Button>
                           </DropdownTrigger>
-                          <DropdownMenu aria-label="Task actions">
+                          <DropdownMenu aria-label={t('crm.label_task_actions')}>
                             <DropdownItem
                               key="edit"
                               startContent={<Edit3 className="w-4 h-4" />}
@@ -525,23 +527,23 @@ export default function CoordinatorTasks() {
               </ModalHeader>
               <ModalBody className="gap-4">
                 <Input
-                  label="Title"
-                  placeholder="Enter task title"
+                  label={t('crm.label_title')}
+                  placeholder={t('crm.placeholder_enter_task_title')}
                   value={formTitle}
                   onValueChange={setFormTitle}
                   isRequired
                   autoFocus
                 />
                 <Textarea
-                  label="Description"
-                  placeholder="Optional description or notes"
+                  label={t('crm.label_description')}
+                  placeholder={t('crm.placeholder_optional_description_or_notes')}
                   value={formDescription}
                   onValueChange={setFormDescription}
                   minRows={3}
                 />
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <Select
-                    label="Priority"
+                    label={t('crm.label_priority')}
                     selectedKeys={[formPriority]}
                     onChange={(e) => setFormPriority(e.target.value || 'medium')}
                   >
@@ -551,7 +553,7 @@ export default function CoordinatorTasks() {
                     <SelectItem key="urgent">Urgent</SelectItem>
                   </Select>
                   <Select
-                    label="Assign To"
+                    label={t('crm.label_assign_to')}
                     selectedKeys={formAssignedTo ? [formAssignedTo] : []}
                     onChange={(e) => setFormAssignedTo(e.target.value)}
                   >
@@ -564,14 +566,14 @@ export default function CoordinatorTasks() {
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <Input
-                    label="Related Member ID"
-                    placeholder="Optional user ID"
+                    label={t('crm.label_related_member_i_d')}
+                    placeholder={t('crm.placeholder_optional_user_i_d')}
                     value={formUserId}
                     onValueChange={setFormUserId}
                     type="number"
                   />
                   <Input
-                    label="Due Date"
+                    label={t('crm.label_due_date')}
                     type="date"
                     value={formDueDate}
                     onValueChange={setFormDueDate}

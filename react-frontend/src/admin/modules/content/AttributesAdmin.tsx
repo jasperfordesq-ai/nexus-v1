@@ -34,6 +34,7 @@ import { adminAttributes, adminCategories } from '../../api/adminApi';
 import { DataTable, PageHeader, ConfirmModal, EmptyState, type Column } from '../../components';
 import type { AdminAttribute, AdminCategory } from '../../api/types';
 
+import { useTranslation } from 'react-i18next';
 // ─────────────────────────────────────────────────────────────────────────────
 // Constants
 // ─────────────────────────────────────────────────────────────────────────────
@@ -52,7 +53,8 @@ const ATTRIBUTE_TYPES = [
 // ─────────────────────────────────────────────────────────────────────────────
 
 export function AttributesAdmin() {
-  usePageTitle('Admin - Attributes');
+  const { t } = useTranslation('admin');
+  usePageTitle(t('content.page_title'));
   const toast = useToast();
 
   // Data state
@@ -135,7 +137,7 @@ export function AttributesAdmin() {
 
   const handleSave = async () => {
     if (!formData.name.trim()) {
-      toast.error('Attribute name is required');
+      toast.error(t('content.attribute_name_is_required'));
       return;
     }
 
@@ -193,7 +195,7 @@ export function AttributesAdmin() {
       setDeleteTarget(null);
       loadData();
     } else {
-      toast.error('Failed to delete attribute');
+      toast.error(t('content.failed_to_delete_attribute'));
     }
 
     setDeleting(false);
@@ -216,11 +218,11 @@ export function AttributesAdmin() {
     return (
       <Dropdown>
         <DropdownTrigger>
-          <Button isIconOnly size="sm" variant="light" aria-label="Attribute actions">
+          <Button isIconOnly size="sm" variant="light" aria-label={t('content.label_attribute_actions')}>
             <MoreVertical size={16} />
           </Button>
         </DropdownTrigger>
-        <DropdownMenu aria-label="Attribute actions" onAction={handleMenuAction}>
+        <DropdownMenu aria-label={t('content.label_attribute_actions')} onAction={handleMenuAction}>
           <DropdownItem key="edit" startContent={<Edit size={14} />}>
             Edit
           </DropdownItem>
@@ -281,8 +283,8 @@ export function AttributesAdmin() {
   return (
     <div>
       <PageHeader
-        title="Attributes"
-        description="Custom listing attributes"
+        title={t('content.attributes_admin_title')}
+        description={t('content.attributes_admin_desc')}
         actions={
           <div className="flex gap-2">
             <Button variant="flat" startContent={<RefreshCw size={16} />} onPress={loadData} isLoading={loading}>Refresh</Button>
@@ -295,7 +297,7 @@ export function AttributesAdmin() {
         <EmptyState
           icon={Tags}
           title="No Attributes"
-          description="Create custom attributes to add extra fields to listings (e.g., location type, skill level)."
+          description={t('content.desc_create_custom_attributes_to_add_extra_fi')}
           actionLabel="Create Attribute"
           onAction={openCreateModal}
         />
@@ -319,8 +321,8 @@ export function AttributesAdmin() {
           </ModalHeader>
           <ModalBody className="gap-4">
             <Input
-              label="Name"
-              placeholder="e.g. Skill Level"
+              label={t('content.label_name')}
+              placeholder={t('content.placeholder_eg_skill_level')}
               value={formData.name}
               onValueChange={(v) => setFormData((prev) => ({ ...prev, name: v }))}
               isRequired
@@ -329,7 +331,7 @@ export function AttributesAdmin() {
             />
 
             <Select
-              label="Input Type"
+              label={t('content.label_input_type')}
               selectedKeys={new Set([formData.type])}
               onSelectionChange={(keys) => {
                 const selected = Array.from(keys)[0] as string;
@@ -365,7 +367,7 @@ export function AttributesAdmin() {
                 <Switch
                   isSelected={formData.is_active}
                   onValueChange={(v) => setFormData((prev) => ({ ...prev, is_active: v }))}
-                  aria-label="Active"
+                  aria-label={t('content.label_active')}
                 />
               </div>
             )}

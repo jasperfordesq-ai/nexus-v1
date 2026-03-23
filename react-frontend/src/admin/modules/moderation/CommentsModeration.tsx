@@ -31,6 +31,7 @@ import { adminModeration } from '@/admin/api/adminApi';
 import { adminSuper } from '@/admin/api/adminApi';
 import type { AdminComment } from '@/admin/api/types';
 
+import { useTranslation } from 'react-i18next';
 const CONTENT_TYPES = [
   { label: 'All Types', value: '' },
   { label: 'Post', value: 'post' },
@@ -40,7 +41,8 @@ const CONTENT_TYPES = [
 ];
 
 export default function CommentsModeration() {
-  usePageTitle('Comments Moderation');
+  const { t } = useTranslation('admin');
+  usePageTitle(t('moderation.page_title'));
 
   const toast = useToast();
   const { user } = useAuth();
@@ -133,7 +135,7 @@ export default function CommentsModeration() {
         toast.error(response.error || 'Action failed');
       }
     } catch {
-      toast.error('An error occurred');
+      toast.error(t('moderation.an_error_occurred'));
     } finally {
       setActionLoading(false);
     }
@@ -227,7 +229,7 @@ export default function CommentsModeration() {
   return (
     <div className="space-y-6">
       <PageHeader
-        title="Comments Moderation"
+        title={t('moderation.comments_moderation_title')}
         description={isSuperAdmin ? 'Moderate comments across all tenants' : 'Moderate comments across all content types'}
         actions={
           <Button
@@ -245,8 +247,8 @@ export default function CommentsModeration() {
       {/* Filter Bar */}
       <div className="flex flex-col sm:flex-row gap-4">
         <Input
-          placeholder="Search comments or users..."
-          aria-label="Search comments"
+          placeholder={t('moderation.placeholder_search_comments_or_users')}
+          aria-label={t('moderation.label_search_comments')}
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
@@ -254,7 +256,7 @@ export default function CommentsModeration() {
           className="flex-1"
         />
         <Select
-          label="Content Type"
+          label={t('moderation.label_content_type')}
           selectedKeys={contentTypeFilter ? [contentTypeFilter] : []}
           onChange={(e) => setContentTypeFilter(e.target.value)}
           className="w-full sm:w-48"
@@ -267,7 +269,7 @@ export default function CommentsModeration() {
         </Select>
         {isSuperAdmin && (
           <Select
-            label="Tenant"
+            label={t('moderation.label_tenant')}
             selectedKeys={tenantFilter ? [tenantFilter] : []}
             onChange={(e) => setTenantFilter(e.target.value)}
             className="w-full sm:w-56"
@@ -308,7 +310,7 @@ export default function CommentsModeration() {
       )}
 
       {/* Table */}
-      <Table aria-label="Comments table">
+      <Table aria-label={t('moderation.label_comments_table')}>
         <TableHeader>
           {columns.map((col) => (
             <TableColumn key={col}>{col}</TableColumn>

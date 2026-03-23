@@ -46,6 +46,7 @@ import {
 } from '../../components';
 import type { MatchApproval, MatchApprovalStats } from '../../api/types';
 
+import { useTranslation } from 'react-i18next';
 // Score color helper
 function scoreColor(score: number): 'danger' | 'warning' | 'success' {
   if (score < 50) return 'danger';
@@ -54,7 +55,8 @@ function scoreColor(score: number): 'danger' | 'warning' | 'success' {
 }
 
 export function MatchApprovals() {
-  usePageTitle('Admin - Match Approvals');
+  const { t } = useTranslation('admin');
+  usePageTitle(t('matching.page_title'));
   const toast = useToast();
   const { tenantPath } = useTenant();
   const navigate = useNavigate();
@@ -138,7 +140,7 @@ export function MatchApprovals() {
   const handleReject = async () => {
     if (!rejectModal) return;
     if (!rejectReason.trim()) {
-      toast.error('Please provide a reason for rejection');
+      toast.error(t('matching.please_provide_a_reason_for_rejection'));
       return;
     }
 
@@ -252,7 +254,7 @@ export function MatchApprovals() {
                 color="success"
                 onPress={() => handleApprove(item)}
                 isLoading={actionLoading === item.id}
-                aria-label="Approve match"
+                aria-label={t('matching.label_approve_match')}
               >
                 <CheckCircle size={14} />
               </Button>
@@ -265,7 +267,7 @@ export function MatchApprovals() {
                   setRejectModal({ item });
                   setRejectReason('');
                 }}
-                aria-label="Reject match"
+                aria-label={t('matching.label_reject_match')}
               >
                 <XCircle size={14} />
               </Button>
@@ -276,7 +278,7 @@ export function MatchApprovals() {
             size="sm"
             variant="flat"
             onPress={() => navigate(tenantPath(`/admin/match-approvals/${item.id}`))}
-            aria-label="View match details"
+            aria-label={t('matching.label_view_match_details')}
           >
             <Eye size={14} />
           </Button>
@@ -288,35 +290,35 @@ export function MatchApprovals() {
   return (
     <div>
       <PageHeader
-        title="Match Approvals"
-        description="Review and approve broker match approvals"
+        title={t('matching.match_approvals_title')}
+        description={t('matching.match_approvals_desc')}
       />
 
       {/* Stats row */}
       <div className="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <StatCard
-          label="Pending"
+          label={t('matching.label_pending')}
           value={stats?.pending_count ?? 0}
           icon={Clock}
           color="warning"
           loading={statsLoading}
         />
         <StatCard
-          label="Approved"
+          label={t('matching.label_approved')}
           value={stats?.approved_count ?? 0}
           icon={CheckCircle}
           color="success"
           loading={statsLoading}
         />
         <StatCard
-          label="Rejected"
+          label={t('matching.label_rejected')}
           value={stats?.rejected_count ?? 0}
           icon={XCircle}
           color="danger"
           loading={statsLoading}
         />
         <StatCard
-          label="Approval Rate"
+          label={t('matching.label_approval_rate')}
           value={stats ? `${stats.approval_rate}%` : '0%'}
           icon={TrendingUp}
           color="primary"
@@ -419,8 +421,8 @@ export function MatchApprovals() {
               </div>
             )}
             <Textarea
-              label="Rejection reason"
-              placeholder="Explain why this match is being rejected..."
+              label={t('matching.label_rejection_reason')}
+              placeholder={t('matching.placeholder_explain_why_this_match_is_being_rejected')}
               value={rejectReason}
               onValueChange={setRejectReason}
               variant="bordered"

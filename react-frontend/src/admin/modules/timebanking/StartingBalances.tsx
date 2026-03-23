@@ -27,11 +27,13 @@ import { adminUsers, adminTimebanking } from '../../api/adminApi';
 import { DataTable, PageHeader, type Column } from '../../components';
 import type { AdminUser, WalletGrant } from '../../api/types';
 
+import { useTranslation } from 'react-i18next';
 // ─────────────────────────────────────────────────────────────────────────────
 // Member Search + Grant Form
 // ─────────────────────────────────────────────────────────────────────────────
 
 function GrantCreditsForm({ onGranted }: { onGranted: () => void }) {
+  const { t } = useTranslation('admin');
   const toast = useToast();
 
   const [searchQuery, setSearchQuery] = useState('');
@@ -75,16 +77,16 @@ function GrantCreditsForm({ onGranted }: { onGranted: () => void }) {
 
   const handleGrant = async () => {
     if (!selectedUser) {
-      toast.error('Please select a member');
+      toast.error(t('timebanking.please_select_a_member'));
       return;
     }
     const parsedAmount = parseFloat(amount);
     if (!parsedAmount || parsedAmount <= 0) {
-      toast.error('Please enter a valid credit amount greater than 0');
+      toast.error(t('timebanking.please_enter_a_valid_credit_amount_great'));
       return;
     }
     if (!reason.trim()) {
-      toast.error('Please provide a reason for this grant');
+      toast.error(t('timebanking.please_provide_a_reason_for_this_grant'));
       return;
     }
 
@@ -106,7 +108,7 @@ function GrantCreditsForm({ onGranted }: { onGranted: () => void }) {
         toast.error(res?.error || 'Failed to grant credits');
       }
     } catch {
-      toast.error('An unexpected error occurred');
+      toast.error(t('timebanking.an_unexpected_error_occurred'));
     } finally {
       setGranting(false);
     }
@@ -123,8 +125,8 @@ function GrantCreditsForm({ onGranted }: { onGranted: () => void }) {
         {!selectedUser ? (
           <div>
             <Input
-              label="Search Member"
-              placeholder="Search by name or email..."
+              label={t('timebanking.label_search_member')}
+              placeholder={t('timebanking.placeholder_search_by_name_or_email')}
               startContent={<Search size={16} className="text-default-400" />}
               value={searchQuery}
               onValueChange={handleSearch}
@@ -208,12 +210,12 @@ function GrantCreditsForm({ onGranted }: { onGranted: () => void }) {
           startContent={
             <Wallet size={16} className="text-default-400" />
           }
-          description="Amount of time credits to grant in hours"
+          description={t('timebanking.desc_amount_of_time_credits_to_grant_in_hours')}
         />
 
         {/* Reason */}
         <Textarea
-          label="Reason"
+          label={t('timebanking.label_reason')}
           placeholder="e.g. New member starting balance, bonus credits..."
           value={reason}
           onValueChange={setReason}
@@ -221,7 +223,7 @@ function GrantCreditsForm({ onGranted }: { onGranted: () => void }) {
           variant="bordered"
           minRows={2}
           maxRows={4}
-          description="Required. This will be recorded in the grant history."
+          description={t('timebanking.desc_required_this_will_be_recorded_in_the_g')}
         />
 
         {/* Submit */}
@@ -245,6 +247,7 @@ function GrantCreditsForm({ onGranted }: { onGranted: () => void }) {
 // ─────────────────────────────────────────────────────────────────────────────
 
 function GrantHistory({ refreshKey }: { refreshKey: number }) {
+  const { t } = useTranslation('admin');
   const toast = useToast();
 
   const [grants, setGrants] = useState<WalletGrant[]>([]);
@@ -272,7 +275,7 @@ function GrantHistory({ refreshKey }: { refreshKey: number }) {
         }
       }
     } catch {
-      toast.error('Failed to load grant history');
+      toast.error(t('timebanking.failed_to_load_grant_history'));
     } finally {
       setLoading(false);
     }
@@ -364,7 +367,8 @@ function GrantHistory({ refreshKey }: { refreshKey: number }) {
 // ─────────────────────────────────────────────────────────────────────────────
 
 export function StartingBalances() {
-  usePageTitle('Admin - Starting Balances');
+  const { t } = useTranslation('admin');
+  usePageTitle(t('timebanking.page_title'));
 
   // Key to trigger grant history refresh after new grant
   const [refreshKey, setRefreshKey] = useState(0);
@@ -376,8 +380,8 @@ export function StartingBalances() {
   return (
     <div>
       <PageHeader
-        title="Starting Balances"
-        description="Grant starting time credits to members"
+        title={t('timebanking.starting_balances_title')}
+        description={t('timebanking.starting_balances_desc')}
       />
 
       <div className="space-y-6">

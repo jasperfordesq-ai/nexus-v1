@@ -28,6 +28,7 @@ import { adminBroker } from '../../api/adminApi';
 import { PageHeader } from '../../components';
 import type { BrokerMessageDetail, ConversationMessage } from '../../api/types';
 
+import { useTranslation } from 'react-i18next';
 // ─── Copy reason chip colors ──────────────────────────────────────────────────
 
 const COPY_REASON_COLORS: Record<string, 'primary' | 'danger' | 'success' | 'warning' | 'secondary' | 'default'> = {
@@ -46,7 +47,8 @@ function formatCopyReason(reason: string): string {
 // ─── Component ────────────────────────────────────────────────────────────────
 
 export function MessageDetail() {
-  usePageTitle('Admin - Message Detail');
+  const { t } = useTranslation('admin');
+  usePageTitle(t('broker.page_title'));
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { tenantPath } = useTenant();
@@ -103,13 +105,13 @@ export function MessageDetail() {
     try {
       const res = await adminBroker.reviewMessage(Number(id));
       if (res?.success) {
-        toast.success('Message marked as reviewed');
+        toast.success(t('broker.message_marked_as_reviewed'));
         loadDetail();
       } else {
         toast.error(res?.error || 'Failed to mark message as reviewed');
       }
     } catch {
-      toast.error('Failed to mark message as reviewed');
+      toast.error(t('broker.failed_to_mark_message_as_reviewed'));
     } finally {
       setReviewLoading(false);
     }
@@ -118,14 +120,14 @@ export function MessageDetail() {
   const handleFlag = async () => {
     if (!id) return;
     if (!flagReason.trim()) {
-      toast.error('A reason is required to flag a message');
+      toast.error(t('broker.a_reason_is_required_to_flag_a_message'));
       return;
     }
     setFlagLoading(true);
     try {
       const res = await adminBroker.flagMessage(Number(id), flagReason, flagSeverity);
       if (res?.success) {
-        toast.success('Message flagged successfully');
+        toast.success(t('broker.message_flagged_successfully'));
         setFlagModalOpen(false);
         setFlagReason('');
         setFlagSeverity('concern');
@@ -134,7 +136,7 @@ export function MessageDetail() {
         toast.error(res?.error || 'Failed to flag message');
       }
     } catch {
-      toast.error('Failed to flag message');
+      toast.error(t('broker.failed_to_flag_message'));
     } finally {
       setFlagLoading(false);
     }
@@ -146,14 +148,14 @@ export function MessageDetail() {
     try {
       const res = await adminBroker.approveMessage(Number(id), approveNotes || undefined);
       if (res?.success) {
-        toast.success('Message approved and archived');
+        toast.success(t('broker.message_approved_and_archived'));
         setApproveModalOpen(false);
         navigate(tenantPath('/admin/broker-controls/messages'));
       } else {
         toast.error(res?.error || 'Failed to approve message');
       }
     } catch {
-      toast.error('Failed to approve message');
+      toast.error(t('broker.failed_to_approve_message'));
     } finally {
       setApproveLoading(false);
     }
@@ -197,7 +199,7 @@ export function MessageDetail() {
     <div className="space-y-6">
       {/* Page Header */}
       <PageHeader
-        title="Message Review"
+        title={t('broker.message_detail_title')}
         description={`Copy #${copy.id} — ${copy.sender_name} to ${copy.receiver_name}`}
         actions={
           <Button
@@ -517,7 +519,7 @@ export function MessageDetail() {
           <ModalBody>
             <Textarea
               label="Reason (required)"
-              placeholder="Describe why this message is being flagged..."
+              placeholder={t('broker.placeholder_describe_why_this_message_is_being_flagged')}
               value={flagReason}
               onValueChange={setFlagReason}
               minRows={3}
@@ -525,7 +527,7 @@ export function MessageDetail() {
               isRequired
             />
             <Select
-              label="Severity"
+              label={t('broker.label_severity')}
               selectedKeys={[flagSeverity]}
               onSelectionChange={(keys) => {
                 const val = Array.from(keys)[0] as 'info' | 'warning' | 'concern' | 'urgent';
@@ -577,7 +579,7 @@ export function MessageDetail() {
             </p>
             <Textarea
               label="Decision Notes (optional)"
-              placeholder="Add any notes about this review decision..."
+              placeholder={t('broker.placeholder_add_any_notes_about_this_review_decision')}
               value={approveNotes}
               onValueChange={setApproveNotes}
               minRows={3}

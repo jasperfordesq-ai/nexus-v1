@@ -25,6 +25,7 @@ import { useToast, useTenant } from '@/contexts';
 import { adminSuper } from '../../api/adminApi';
 import type { FederationStatusOverview } from '../../api/types';
 
+import { useTranslation } from 'react-i18next';
 interface FederationStats {
   system: {
     enabled: boolean;
@@ -120,7 +121,8 @@ function mapOverviewToStats(overview: FederationStatusOverview): FederationStats
 }
 
 export default function FederationControls() {
-  usePageTitle('Federation Controls');
+  const { t } = useTranslation('admin');
+  usePageTitle(t('super_admin.page_title'));
   const toast = useToast();
   const { tenantPath } = useTenant();
   const [stats, setStats] = useState<FederationStats | null>(null);
@@ -140,7 +142,7 @@ export default function FederationControls() {
   const handleLiftLockdown = async () => {
     const res = await adminSuper.liftLockdown();
     if (res.success) {
-      toast.success('Emergency lockdown lifted');
+      toast.success(t('super_admin.emergency_lockdown_lifted'));
       loadData();
     } else {
       toast.error(res.error || 'Failed to lift lockdown');
@@ -158,8 +160,8 @@ export default function FederationControls() {
   return (
     <div className="space-y-6">
       <PageHeader
-        title="Federation Controls"
-        description="Master controls for cross-community federation"
+        title={t('super_admin.federation_controls_title')}
+        description={t('super_admin.federation_controls_desc')}
       />
 
       {stats?.system.lockdown_active && (
@@ -297,7 +299,7 @@ export default function FederationControls() {
           </Button>
         </CardHeader>
         <CardBody>
-          <Table aria-label="Whitelisted tenants" shadow="sm" isStriped>
+          <Table aria-label={t('super_admin.label_whitelisted_tenants')} shadow="sm" isStriped>
             <TableHeader>
               <TableColumn>Tenant</TableColumn>
               <TableColumn>Domain</TableColumn>
@@ -333,7 +335,7 @@ export default function FederationControls() {
           </Button>
         </CardHeader>
         <CardBody>
-          <Table aria-label="Recent partnerships" shadow="sm" isStriped>
+          <Table aria-label={t('super_admin.label_recent_partnerships')} shadow="sm" isStriped>
             <TableHeader>
               <TableColumn>Partnership</TableColumn>
               <TableColumn>Level</TableColumn>

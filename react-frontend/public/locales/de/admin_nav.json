@@ -15,16 +15,16 @@
   "newsletters": "Newsletter",
   "settings": "Einstellungen",
   "activity_log": "Aktivitätsprotokoll",
-  "federation": "Federation",
+  "federation": "Föderation",
   "gamification": "Gamification",
-  "enterprise": "Enterprise",
-  "super_admin": "Super Admin",
+  "enterprise": "Unternehmen",
+  "super_admin": "Super-Admin",
   "back_to_site": "Zur Website",
   "logout": "Abmelden",
   "sections": {
     "content": "Inhalt",
-    "community": "Community",
-    "intelligence": "Intelligence",
+    "community": "Gemeinschaft",
+    "intelligence": "Intelligenz",
     "engagement": "Engagement",
     "system": "System"
   }

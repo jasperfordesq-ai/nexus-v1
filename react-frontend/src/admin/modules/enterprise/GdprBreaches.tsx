@@ -22,6 +22,7 @@ import { PageHeader, DataTable, StatusBadge } from '../../components';
 import type { Column } from '../../components';
 import type { GdprBreach } from '../../api/types';
 
+import { useTranslation } from 'react-i18next';
 const severityColorMap: Record<string, 'default' | 'primary' | 'warning' | 'danger'> = {
   low: 'default',
   medium: 'primary',
@@ -37,7 +38,8 @@ const SEVERITY_OPTIONS = [
 ];
 
 export function GdprBreaches() {
-  usePageTitle('Admin - Data Breaches');
+  const { t } = useTranslation('admin');
+  usePageTitle(t('enterprise.page_title'));
   const toast = useToast();
 
   const [breaches, setBreaches] = useState<GdprBreach[]>([]);
@@ -60,7 +62,7 @@ export function GdprBreaches() {
         setBreaches(Array.isArray(data) ? data : []);
       }
     } catch {
-      toast.error('Failed to load breaches');
+      toast.error(t('enterprise.failed_to_load_breaches'));
     } finally {
       setLoading(false);
     }
@@ -80,7 +82,7 @@ export function GdprBreaches() {
 
   const handleReportBreach = async () => {
     if (!breachTitle.trim()) {
-      toast.error('Title is required');
+      toast.error(t('enterprise.title_is_required'));
       return;
     }
     setReportLoading(true);
@@ -92,14 +94,14 @@ export function GdprBreaches() {
         affected_users: affectedUsers ? parseInt(affectedUsers, 10) : 0,
       });
       if (res.success) {
-        toast.success('Breach reported successfully');
+        toast.success(t('enterprise.breach_reported_successfully'));
         setReportOpen(false);
         loadData();
       } else {
-        toast.error('Failed to report breach');
+        toast.error(t('enterprise.failed_to_report_breach'));
       }
     } catch {
-      toast.error('Failed to report breach');
+      toast.error(t('enterprise.failed_to_report_breach'));
     } finally {
       setReportLoading(false);
     }
@@ -136,8 +138,8 @@ export function GdprBreaches() {
   return (
     <div>
       <PageHeader
-        title="Data Breaches"
-        description="Track and manage data breach incidents"
+        title={t('enterprise.gdpr_breaches_title')}
+        description={t('enterprise.gdpr_breaches_desc')}
         actions={
           <div className="flex gap-2">
             <Button
@@ -177,15 +179,15 @@ export function GdprBreaches() {
           </ModalHeader>
           <ModalBody className="gap-4">
             <Input
-              label="Title"
-              placeholder="Brief description of the breach"
+              label={t('enterprise.label_title')}
+              placeholder={t('enterprise.placeholder_brief_description_of_the_breach')}
               value={breachTitle}
               onValueChange={setBreachTitle}
               variant="bordered"
               isRequired
             />
             <Textarea
-              label="Description"
+              label={t('enterprise.label_description')}
               placeholder="Detailed description of what happened, what data was affected..."
               value={breachDescription}
               onValueChange={setBreachDescription}
@@ -194,7 +196,7 @@ export function GdprBreaches() {
             />
             <div className="grid grid-cols-2 gap-4">
               <Select
-                label="Severity"
+                label={t('enterprise.label_severity')}
                 selectedKeys={[breachSeverity]}
                 onSelectionChange={(keys) => {
                   const val = Array.from(keys)[0] as string;
@@ -207,7 +209,7 @@ export function GdprBreaches() {
                 ))}
               </Select>
               <Input
-                label="Affected Users"
+                label={t('enterprise.label_affected_users')}
                 placeholder="0"
                 type="number"
                 value={affectedUsers}

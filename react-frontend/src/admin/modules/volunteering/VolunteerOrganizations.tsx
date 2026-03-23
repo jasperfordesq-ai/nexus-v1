@@ -16,6 +16,7 @@ import { useToast } from '@/contexts';
 import { adminVolunteering } from '../../api/adminApi';
 import { DataTable, PageHeader, EmptyState, type Column } from '../../components';
 
+import { useTranslation } from 'react-i18next';
 interface VolOrg {
   id: number;
   org_id: number;
@@ -28,7 +29,8 @@ interface VolOrg {
 }
 
 export function VolunteerOrganizations() {
-  usePageTitle('Admin - Volunteer Organizations');
+  const { t } = useTranslation('admin');
+  usePageTitle(t('volunteering.page_title'));
   const toast = useToast();
   const [items, setItems] = useState<VolOrg[]>([]);
   const [loading, setLoading] = useState(true);
@@ -46,7 +48,7 @@ export function VolunteerOrganizations() {
         }
       }
     } catch {
-      toast.error('Failed to load organizations');
+      toast.error(t('volunteering.failed_to_load_organizations'));
       setItems([]);
     }
     setLoading(false);
@@ -70,8 +72,8 @@ export function VolunteerOrganizations() {
   if (!loading && items.length === 0) {
     return (
       <div>
-        <PageHeader title="Volunteer Organizations" description="Organizations in the volunteering program" />
-        <EmptyState icon={Building2} title="No Organizations" description="No volunteer organizations have been created yet." />
+        <PageHeader title={t('volunteering.volunteer_organizations_title')} description={t('volunteering.volunteer_organizations_desc')} />
+        <EmptyState icon={Building2} title="No Organizations" description={t('volunteering.desc_no_volunteer_organizations_have_been_cre')} />
       </div>
     );
   }
@@ -79,8 +81,8 @@ export function VolunteerOrganizations() {
   return (
     <div>
       <PageHeader
-        title="Volunteer Organizations"
-        description="Organizations in the volunteering program"
+        title={t('volunteering.volunteer_organizations_title')}
+        description={t('volunteering.volunteer_organizations_desc')}
         actions={<Button variant="flat" startContent={<RefreshCw size={16} />} onPress={loadData} isLoading={loading}>Refresh</Button>}
       />
       <DataTable columns={columns} data={items} isLoading={loading} onRefresh={loadData} />

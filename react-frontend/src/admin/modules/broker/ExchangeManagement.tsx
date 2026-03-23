@@ -29,10 +29,12 @@ import { adminBroker } from '../../api/adminApi';
 import { DataTable, StatusBadge, PageHeader, type Column } from '../../components';
 import type { ExchangeRequest } from '../../api/types';
 
+import { useTranslation } from 'react-i18next';
 type ActionType = 'approve' | 'reject';
 
 export function ExchangeManagement() {
-  usePageTitle('Admin - Exchange Management');
+  const { t } = useTranslation('admin');
+  usePageTitle(t('broker.page_title'));
   const { tenantPath } = useTenant();
   const toast = useToast();
 
@@ -63,7 +65,7 @@ export function ExchangeManagement() {
         setTotal(Number(meta?.total ?? meta?.total_items ?? res.data.length));
       }
     } catch {
-      toast.error('Failed to load exchanges');
+      toast.error(t('broker.failed_to_load_exchanges'));
     } finally {
       setLoading(false);
     }
@@ -78,7 +80,7 @@ export function ExchangeManagement() {
     const { type, item } = actionModal;
 
     if (type === 'reject' && !actionText.trim()) {
-      toast.error('A reason is required to reject an exchange');
+      toast.error(t('broker.a_reason_is_required_to_reject_an_exchan'));
       return;
     }
 
@@ -173,7 +175,7 @@ export function ExchangeManagement() {
             color="default"
             as={Link}
             to={tenantPath(`/admin/broker-controls/exchanges/${item.id}`)}
-            aria-label="View exchange details"
+            aria-label={t('broker.label_view_exchange_details')}
           >
             <Eye size={14} />
           </Button>
@@ -185,7 +187,7 @@ export function ExchangeManagement() {
                 variant="flat"
                 color="success"
                 onPress={() => openActionModal('approve', item)}
-                aria-label="Approve exchange"
+                aria-label={t('broker.label_approve_exchange')}
               >
                 <CheckCircle size={14} />
               </Button>
@@ -195,7 +197,7 @@ export function ExchangeManagement() {
                 variant="flat"
                 color="danger"
                 onPress={() => openActionModal('reject', item)}
-                aria-label="Reject exchange"
+                aria-label={t('broker.label_reject_exchange')}
               >
                 <XCircle size={14} />
               </Button>
@@ -209,8 +211,8 @@ export function ExchangeManagement() {
   return (
     <div>
       <PageHeader
-        title="Exchange Management"
-        description="Review and manage exchange requests"
+        title={t('broker.exchange_management_title')}
+        description={t('broker.exchange_management_desc')}
         actions={
           <Button
             as={Link}

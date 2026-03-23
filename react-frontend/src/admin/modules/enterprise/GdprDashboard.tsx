@@ -25,8 +25,10 @@ import { adminEnterprise } from '../../api/adminApi';
 import { StatCard, PageHeader } from '../../components';
 import type { GdprDashboardStats } from '../../api/types';
 
+import { useTranslation } from 'react-i18next';
 export function GdprDashboard() {
-  usePageTitle('Admin - GDPR Dashboard');
+  const { t } = useTranslation('admin');
+  usePageTitle(t('enterprise.page_title'));
   const { tenantPath } = useTenant();
 
   const [stats, setStats] = useState<GdprDashboardStats | null>(null);
@@ -60,8 +62,8 @@ export function GdprDashboard() {
   return (
     <div>
       <PageHeader
-        title="GDPR Dashboard"
-        description="Data protection compliance overview"
+        title={t('enterprise.gdpr_dashboard_title')}
+        description={t('enterprise.gdpr_dashboard_desc')}
         actions={
           <Button
             variant="flat"
@@ -78,28 +80,28 @@ export function GdprDashboard() {
       {/* Stats */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4 mb-6">
         <StatCard
-          label="Total Requests"
+          label={t('enterprise.label_total_requests')}
           value={stats?.total_requests ?? 0}
           icon={FileWarning}
           color="primary"
           loading={loading}
         />
         <StatCard
-          label="Pending Requests"
+          label={t('enterprise.label_pending_requests')}
           value={stats?.pending_requests ?? 0}
           icon={FileWarning}
           color="warning"
           loading={loading}
         />
         <StatCard
-          label="Consent Records"
+          label={t('enterprise.label_consent_records')}
           value={stats?.total_consents ?? 0}
           icon={UserCheck}
           color="success"
           loading={loading}
         />
         <StatCard
-          label="Data Breaches"
+          label={t('enterprise.label_data_breaches')}
           value={stats?.total_breaches ?? 0}
           icon={AlertTriangle}
           color="danger"

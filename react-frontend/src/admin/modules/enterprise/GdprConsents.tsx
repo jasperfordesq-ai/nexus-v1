@@ -18,8 +18,10 @@ import { PageHeader, DataTable } from '../../components';
 import type { Column } from '../../components';
 import type { GdprConsent } from '../../api/types';
 
+import { useTranslation } from 'react-i18next';
 export function GdprConsents() {
-  usePageTitle('Admin - GDPR Consent Records');
+  const { t } = useTranslation('admin');
+  usePageTitle(t('enterprise.page_title'));
   const toast = useToast();
 
   const [consents, setConsents] = useState<GdprConsent[]>([]);
@@ -34,7 +36,7 @@ export function GdprConsents() {
         setConsents(Array.isArray(data) ? data : []);
       }
     } catch {
-      toast.error('Failed to load consent records');
+      toast.error(t('enterprise.failed_to_load_consent_records'));
     } finally {
       setLoading(false);
     }
@@ -84,8 +86,8 @@ export function GdprConsents() {
   return (
     <div>
       <PageHeader
-        title="Consent Records"
-        description="Read-only view of user consent records"
+        title={t('enterprise.gdpr_consents_title')}
+        description={t('enterprise.gdpr_consents_desc')}
         actions={
           <Button
             variant="flat"

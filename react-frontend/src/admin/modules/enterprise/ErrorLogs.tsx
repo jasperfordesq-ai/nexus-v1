@@ -18,8 +18,10 @@ import { PageHeader, DataTable } from '../../components';
 import type { Column } from '../../components';
 import type { ErrorLogEntry } from '../../api/types';
 
+import { useTranslation } from 'react-i18next';
 export function ErrorLogs() {
-  usePageTitle('Admin - Error Logs');
+  const { t } = useTranslation('admin');
+  usePageTitle(t('enterprise.page_title'));
   const toast = useToast();
 
   const [logs, setLogs] = useState<ErrorLogEntry[]>([]);
@@ -43,7 +45,7 @@ export function ErrorLogs() {
         }
       }
     } catch {
-      toast.error('Failed to load error logs');
+      toast.error(t('enterprise.failed_to_load_error_logs'));
     } finally {
       setLoading(false);
     }
@@ -89,8 +91,8 @@ export function ErrorLogs() {
   return (
     <div>
       <PageHeader
-        title="Error Logs"
-        description="Recent error-level activity log entries"
+        title={t('enterprise.error_logs_title')}
+        description={t('enterprise.error_logs_desc')}
         actions={
           <Button
             variant="flat"

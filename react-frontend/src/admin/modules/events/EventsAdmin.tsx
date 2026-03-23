@@ -24,6 +24,7 @@ import { useTenant, useToast } from '@/contexts';
 import { api } from '@/lib/api';
 import { PageHeader, DataTable, ConfirmModal, EmptyState, type Column } from '../../components';
 
+import { useTranslation } from 'react-i18next';
 // ─────────────────────────────────────────────────────────────────────────────
 // Types
 // ─────────────────────────────────────────────────────────────────────────────
@@ -69,7 +70,8 @@ const PAGE_SIZE = 50;
 // ─────────────────────────────────────────────────────────────────────────────
 
 export function EventsAdmin() {
-  usePageTitle('Admin - Events');
+  const { t } = useTranslation('admin');
+  usePageTitle(t('events.page_title'));
   const { tenantPath } = useTenant();
   const toast = useToast();
 
@@ -103,7 +105,7 @@ export function EventsAdmin() {
         setTotal(payload.meta?.total || 0);
       }
     } catch {
-      toast.error('Failed to load events');
+      toast.error(t('events.failed_to_load_events'));
     } finally {
       setLoading(false);
     }
@@ -121,13 +123,13 @@ export function EventsAdmin() {
     try {
       const res = await api.delete(`/v2/admin/events/${confirmDelete.id}`);
       if (res?.success) {
-        toast.success('Event deleted successfully');
+        toast.success(t('events.event_deleted_successfully'));
         loadItems();
       } else {
         toast.error(res?.error || 'Failed to delete event');
       }
     } catch {
-      toast.error('An unexpected error occurred');
+      toast.error(t('events.an_unexpected_error_occurred'));
     } finally {
       setActionLoading(false);
       setConfirmDelete(null);
@@ -142,13 +144,13 @@ export function EventsAdmin() {
     try {
       const res = await api.post(`/v2/admin/events/${confirmCancel.id}/cancel`);
       if (res?.success) {
-        toast.success('Event cancelled successfully');
+        toast.success(t('events.event_cancelled_successfully'));
         loadItems();
       } else {
         toast.error(res?.error || 'Failed to cancel event');
       }
     } catch {
-      toast.error('An unexpected error occurred');
+      toast.error(t('events.an_unexpected_error_occurred'));
     } finally {
       setActionLoading(false);
       setConfirmCancel(null);
@@ -256,7 +258,7 @@ export function EventsAdmin() {
             size="sm"
             variant="flat"
             color="primary"
-            aria-label="View event"
+            aria-label={t('events.label_view_event')}
           >
             <Eye size={14} />
           </Button>
@@ -267,7 +269,7 @@ export function EventsAdmin() {
               variant="flat"
               color="warning"
               onPress={() => setConfirmCancel(item)}
-              aria-label="Cancel event"
+              aria-label={t('events.label_cancel_event')}
             >
               <XCircle size={14} />
             </Button>
@@ -278,7 +280,7 @@ export function EventsAdmin() {
             variant="flat"
             color="danger"
             onPress={() => setConfirmDelete(item)}
-            aria-label="Delete event"
+            aria-label={t('events.label_delete_event')}
           >
             <Trash2 size={14} />
           </Button>
@@ -292,8 +294,8 @@ export function EventsAdmin() {
   return (
     <div>
       <PageHeader
-        title="Events"
-        description="View and manage community events"
+        title={t('events.events_admin_title')}
+        description={t('events.events_admin_desc')}
       />
 
       <div className="mb-4">

@@ -17,6 +17,7 @@ import { useToast } from '@/contexts';
 import { adminDeliverability } from '../../api/adminApi';
 import { PageHeader, StatCard } from '../../components';
 
+import { useTranslation } from 'react-i18next';
 interface DashboardData {
   total: number;
   by_status: Record<string, number>;
@@ -32,7 +33,8 @@ interface DashboardData {
 }
 
 export function DeliverabilityDashboard() {
-  usePageTitle('Admin - Deliverability Dashboard');
+  const { t } = useTranslation('admin');
+  usePageTitle(t('deliverability.page_title'));
   const toast = useToast();
 
   const [data, setData] = useState<DashboardData | null>(null);
@@ -45,14 +47,14 @@ export function DeliverabilityDashboard() {
           setData(res.data as DashboardData);
         }
       })
-      .catch(() => toast.error('Failed to load dashboard data'))
+      .catch(() => toast.error(t('deliverability.failed_to_load_dashboard_data')))
       .finally(() => setLoading(false));
   }, [toast]);
 
   if (loading) {
     return (
       <div>
-        <PageHeader title="Deliverability Dashboard" description="Track project deliverables and milestones" />
+        <PageHeader title={t('deliverability.deliverability_dashboard_title')} description={t('deliverability.deliverability_dashboard_desc')} />
         <div className="flex justify-center py-12"><Spinner size="lg" /></div>
       </div>
     );
@@ -64,13 +66,13 @@ export function DeliverabilityDashboard() {
 
   return (
     <div>
-      <PageHeader title="Deliverability Dashboard" description="Track project deliverables and milestones" />
+      <PageHeader title={t('deliverability.deliverability_dashboard_title')} description={t('deliverability.deliverability_dashboard_desc')} />
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4 mb-6">
-        <StatCard label="Total Deliverables" value={stats.total} icon={Target} color="primary" />
-        <StatCard label="Completed" value={completed} icon={CheckCircle} color="success" />
-        <StatCard label="In Progress" value={inProgress} icon={Clock} color="warning" />
-        <StatCard label="Overdue" value={stats.overdue} icon={AlertCircle} color="danger" />
+        <StatCard label={t('deliverability.label_total_deliverables')} value={stats.total} icon={Target} color="primary" />
+        <StatCard label={t('deliverability.label_completed')} value={completed} icon={CheckCircle} color="success" />
+        <StatCard label={t('deliverability.label_in_progress')} value={inProgress} icon={Clock} color="warning" />
+        <StatCard label={t('deliverability.label_overdue')} value={stats.overdue} icon={AlertCircle} color="danger" />
       </div>
 
       <Card shadow="sm">

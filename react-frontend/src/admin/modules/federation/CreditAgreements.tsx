@@ -54,6 +54,7 @@ import { formatRelativeTime } from '@/lib/helpers';
 import { PageHeader } from '../../components';
 import { StatCard } from '../../components';
 
+import { useTranslation } from 'react-i18next';
 // ─────────────────────────────────────────────────────────────────────────────
 // Types
 // ─────────────────────────────────────────────────────────────────────────────
@@ -98,7 +99,8 @@ const STATUS_COLORS: Record<string, 'default' | 'primary' | 'success' | 'warning
 // ─────────────────────────────────────────────────────────────────────────────
 
 export function CreditAgreements() {
-  usePageTitle('Admin - Credit Agreements');
+  const { t } = useTranslation('admin');
+  usePageTitle(t('federation.page_title'));
   const toast = useToast();
   const createModal = useDisclosure();
 
@@ -136,7 +138,7 @@ export function CreditAgreements() {
       }
     } catch (err) {
       logError('CreditAgreements.load', err);
-      toast.error('Failed to load credit agreements');
+      toast.error(t('federation.failed_to_load_credit_agreements'));
     }
     setLoading(false);
   }, [toast]);
@@ -154,7 +156,7 @@ export function CreditAgreements() {
         monthly_limit: parseInt(monthlyLimit) || 100,
       });
       if (res.success) {
-        toast.success('Credit agreement created');
+        toast.success(t('federation.credit_agreement_created'));
         setSelectedPartner('');
         setExchangeRate('1.0');
         setMonthlyLimit('100');
@@ -163,7 +165,7 @@ export function CreditAgreements() {
       }
     } catch (err) {
       logError('CreditAgreements.create', err);
-      toast.error('Failed to create agreement');
+      toast.error(t('federation.failed_to_create_agreement'));
     }
     setCreating(false);
   }, [selectedPartner, exchangeRate, monthlyLimit, toast, createModal, loadData]);
@@ -192,7 +194,7 @@ export function CreditAgreements() {
   if (loading) {
     return (
       <div>
-        <PageHeader title="Credit Agreements" description="Manage inter-community credit exchange agreements" />
+        <PageHeader title={t('federation.credit_agreements_title')} description={t('federation.credit_agreements_desc')} />
         <div className="flex h-64 items-center justify-center">
           <Spinner size="lg" />
         </div>
@@ -203,8 +205,8 @@ export function CreditAgreements() {
   return (
     <div className="space-y-6">
       <PageHeader
-        title="Credit Agreements"
-        description="Manage inter-community credit exchange agreements"
+        title={t('federation.credit_agreements_title')}
+        description={t('federation.credit_agreements_desc')}
         actions={
           <div className="flex items-center gap-2">
             <Button variant="flat" size="sm" startContent={<RefreshCw size={16} />} onPress={() => loadData()}>
@@ -219,10 +221,10 @@ export function CreditAgreements() {
 
       {/* Stats */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <StatCard label="Active Agreements" value={activeCount} icon={Handshake} color="success" />
-        <StatCard label="Pending Approval" value={pendingCount} icon={AlertTriangle} color="warning" />
-        <StatCard label="Credits Sent" value={totalSent} icon={ArrowRightLeft} color="primary" />
-        <StatCard label="Credits Received" value={totalReceived} icon={TrendingUp} color="secondary" />
+        <StatCard label={t('federation.label_active_agreements')} value={activeCount} icon={Handshake} color="success" />
+        <StatCard label={t('federation.label_pending_approval')} value={pendingCount} icon={AlertTriangle} color="warning" />
+        <StatCard label={t('federation.label_credits_sent')} value={totalSent} icon={ArrowRightLeft} color="primary" />
+        <StatCard label={t('federation.label_credits_received')} value={totalReceived} icon={TrendingUp} color="secondary" />
       </div>
 
       {/* Agreements table */}
@@ -231,7 +233,7 @@ export function CreditAgreements() {
           <h3 className="text-lg font-semibold">All Agreements</h3>
         </CardHeader>
         <CardBody>
-          <Table aria-label="Credit agreements" removeWrapper>
+          <Table aria-label={t('federation.label_credit_agreements')} removeWrapper>
             <TableHeader>
               <TableColumn>PARTNER</TableColumn>
               <TableColumn>EXCHANGE RATE</TableColumn>
@@ -283,7 +285,7 @@ export function CreditAgreements() {
                           variant="flat"
                           color="success"
                           isIconOnly
-                          aria-label="Approve"
+                          aria-label={t('federation.label_approve')}
                           onPress={() => handleStatusChange(agreement.id, 'approve')}
                         >
                           <CheckCircle size={14} />
@@ -295,7 +297,7 @@ export function CreditAgreements() {
                           variant="flat"
                           color="warning"
                           isIconOnly
-                          aria-label="Suspend"
+                          aria-label={t('federation.label_suspend')}
                           onPress={() => handleStatusChange(agreement.id, 'suspend')}
                         >
                           <Pause size={14} />
@@ -307,7 +309,7 @@ export function CreditAgreements() {
                           variant="flat"
                           color="success"
                           isIconOnly
-                          aria-label="Reactivate"
+                          aria-label={t('federation.label_reactivate')}
                           onPress={() => handleStatusChange(agreement.id, 'reactivate')}
                         >
                           <Play size={14} />
@@ -319,7 +321,7 @@ export function CreditAgreements() {
                           variant="flat"
                           color="danger"
                           isIconOnly
-                          aria-label="Terminate"
+                          aria-label={t('federation.label_terminate')}
                           onPress={() => handleStatusChange(agreement.id, 'terminate')}
                         >
                           <XCircle size={14} />
@@ -345,8 +347,8 @@ export function CreditAgreements() {
               </ModalHeader>
               <ModalBody className="gap-4">
                 <Select
-                  label="Partner Community"
-                  placeholder="Select a partner"
+                  label={t('federation.label_partner_community')}
+                  placeholder={t('federation.placeholder_select_a_partner')}
                   selectedKeys={selectedPartner ? [selectedPartner] : []}
                   onSelectionChange={(keys) => {
                     const selected = Array.from(keys)[0];
@@ -360,7 +362,7 @@ export function CreditAgreements() {
 
                 <Input
                   type="number"
-                  label="Exchange Rate"
+                  label={t('federation.label_exchange_rate')}
                   description="How many of your credits equal 1 partner credit (e.g., 1.0 = 1:1)"
                   value={exchangeRate}
                   onChange={(e) => setExchangeRate(e.target.value)}
@@ -371,8 +373,8 @@ export function CreditAgreements() {
 
                 <Input
                   type="number"
-                  label="Monthly Limit"
-                  description="Maximum credits that can be exchanged per month"
+                  label={t('federation.label_monthly_limit')}
+                  description={t('federation.desc_maximum_credits_that_can_be_exchanged_pe')}
                   value={monthlyLimit}
                   onChange={(e) => setMonthlyLimit(e.target.value)}
                   startContent={<DollarSign size={14} />}

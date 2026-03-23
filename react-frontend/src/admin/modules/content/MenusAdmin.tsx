@@ -18,6 +18,7 @@ import { useTenant, useToast } from '@/contexts';
 import { adminMenus } from '../../api/adminApi';
 import { PageHeader, DataTable, EmptyState, ConfirmModal, type Column } from '../../components';
 
+import { useTranslation } from 'react-i18next';
 interface MenuItem {
   id: number;
   name: string;
@@ -28,7 +29,8 @@ interface MenuItem {
 }
 
 export function MenusAdmin() {
-  usePageTitle('Admin - Menus');
+  const { t } = useTranslation('admin');
+  usePageTitle(t('content.page_title'));
   const { tenantPath } = useTenant();
   const toast = useToast();
   const navigate = useNavigate();
@@ -58,7 +60,7 @@ export function MenusAdmin() {
         }
       }
     } catch {
-      toast.error('Failed to load menus');
+      toast.error(t('content.failed_to_load_menus'));
     } finally {
       setLoading(false);
     }
@@ -74,13 +76,13 @@ export function MenusAdmin() {
     try {
       const res = await adminMenus.delete(confirmDelete.id);
       if (res?.success) {
-        toast.success('Menu deleted successfully');
+        toast.success(t('content.menu_deleted_successfully'));
         fetchData();
       } else {
-        toast.error('Failed to delete menu');
+        toast.error(t('content.failed_to_delete_menu'));
       }
     } catch {
-      toast.error('An unexpected error occurred');
+      toast.error(t('content.an_unexpected_error_occurred'));
     } finally {
       setActionLoading(false);
       setConfirmDelete(null);
@@ -135,7 +137,7 @@ export function MenusAdmin() {
             variant="flat"
             color="primary"
             onPress={() => navigate(tenantPath(`/admin/menus/builder/${item.id}`))}
-            aria-label="Edit menu"
+            aria-label={t('content.label_edit_menu')}
           >
             <Pencil size={14} />
           </Button>
@@ -145,7 +147,7 @@ export function MenusAdmin() {
             variant="flat"
             color="danger"
             onPress={() => setConfirmDelete(item)}
-            aria-label="Delete menu"
+            aria-label={t('content.label_delete_menu')}
           >
             <Trash2 size={14} />
           </Button>
@@ -157,7 +159,7 @@ export function MenusAdmin() {
   if (loading) {
     return (
       <div>
-        <PageHeader title="Menus" description="Manage navigation menus" />
+        <PageHeader title={t('content.menus_admin_title')} description={t('content.menus_admin_desc')} />
         <div className="flex justify-center py-12"><Spinner size="lg" /></div>
       </div>
     );
@@ -166,8 +168,8 @@ export function MenusAdmin() {
   return (
     <div>
       <PageHeader
-        title="Menus"
-        description="Manage navigation menus"
+        title={t('content.menus_admin_title')}
+        description={t('content.menus_admin_desc')}
         actions={
           <Button
             color="primary"
@@ -268,7 +270,7 @@ export function MenusAdmin() {
         <EmptyState
           icon={Menu}
           title="No Custom Menus"
-          description="Create custom navigation menus for your community. Menus can be used in the header, footer, or sidebar."
+          description={t('content.desc_create_custom_navigation_menus_for_your_')}
           actionLabel="Create Menu"
           onAction={() => navigate(tenantPath('/admin/menus/builder/new'))}
         />

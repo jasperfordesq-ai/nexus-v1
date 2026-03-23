@@ -16,6 +16,7 @@ import { useToast } from '@/contexts';
 import { PageHeader } from '../../components';
 import { adminTools } from '../../api/adminApi';
 
+import { useTranslation } from 'react-i18next';
 interface TestResult {
   name: string;
   status: 'pending' | 'running' | 'pass' | 'fail';
@@ -44,7 +45,8 @@ const statusIcon = (status: string) => {
 };
 
 export function TestRunner() {
-  usePageTitle('Admin - API Test Runner');
+  const { t } = useTranslation('admin');
+  usePageTitle(t('system.page_title'));
   const toast = useToast();
   const [tests, setTests] = useState<TestResult[]>(INITIAL_TESTS);
   const [running, setRunning] = useState(false);
@@ -96,12 +98,12 @@ export function TestRunner() {
         if (failCount > 0) {
           toast.warning(`Health check complete`, `${failCount} test(s) failed`);
         } else {
-          toast.success('All health checks passed');
+          toast.success(t('system.all_health_checks_passed'));
         }
       } else {
         // API returned but no structured results; mark all as pass
         setTests(prev => prev.map(t => ({ ...t, status: 'pass' as const, duration: 0 })));
-        toast.success('Health checks completed');
+        toast.success(t('system.health_checks_completed'));
       }
     } catch {
       // On API error, mark all as failed
@@ -122,8 +124,8 @@ export function TestRunner() {
   return (
     <div>
       <PageHeader
-        title="API Test Runner"
-        description="Run API health checks and integration tests"
+        title={t('system.test_runner_title')}
+        description={t('system.test_runner_desc')}
         actions={
           <Button color="primary" startContent={<Play size={16} />} onPress={runTests} isLoading={running}>
             Run All Tests

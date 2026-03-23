@@ -53,6 +53,7 @@ import { api } from '@/lib/api';
 import { CHART_COLOR_MAP } from '@/lib/chartColors';
 import { StatCard, PageHeader } from '../../components';
 
+import { useTranslation } from 'react-i18next';
 // ---------------------------------------------------------------------------
 // Types
 // ---------------------------------------------------------------------------
@@ -151,7 +152,8 @@ function formatMonth(monthStr: string): string {
 // ---------------------------------------------------------------------------
 
 export function ImpactReport() {
-  usePageTitle('Admin - Impact Report');
+  const { t } = useTranslation('admin');
+  usePageTitle(t('impact.page_title'));
 
   const [data, setData] = useState<ImpactReportData | null>(null);
   const [loading, setLoading] = useState(true);
@@ -367,8 +369,8 @@ export function ImpactReport() {
   return (
     <div>
       <PageHeader
-        title="Impact Report"
-        description="SROI analysis, community health metrics, and impact timeline"
+        title={t('impact.impact_report_title')}
+        description={t('impact.impact_report_desc')}
         actions={
           <div className="flex items-center gap-2">
             <Select
@@ -379,7 +381,7 @@ export function ImpactReport() {
                 if (value) setMonths(Number(value));
               }}
               className="w-36"
-              aria-label="Report period"
+              aria-label={t('impact.label_report_period')}
             >
               {PERIOD_OPTIONS.map((opt) => (
                 <SelectItem key={opt.key}>{opt.label}</SelectItem>
@@ -423,28 +425,28 @@ export function ImpactReport() {
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4 mb-6">
         <StatCard
-          label="Total Hours"
+          label={t('impact.label_total_hours')}
           value={data ? data.sroi.total_hours.toFixed(1) : '\u2014'}
           icon={Clock}
           color="warning"
           loading={loading}
         />
         <StatCard
-          label="Monetary Value"
+          label={t('impact.label_monetary_value')}
           value={data ? formatCurrency(data.sroi.monetary_value) : '\u2014'}
           icon={PoundSterling}
           color="primary"
           loading={loading}
         />
         <StatCard
-          label="Social Value"
+          label={t('impact.label_social_value')}
           value={data ? formatCurrency(data.sroi.social_value) : '\u2014'}
           icon={Sparkles}
           color="success"
           loading={loading}
         />
         <StatCard
-          label="SROI Ratio"
+          label={t('impact.label_s_r_o_i_ratio')}
           value={data ? `${data.sroi.sroi_ratio}:1` : '\u2014'}
           icon={TrendingUp}
           color="secondary"
@@ -525,14 +527,14 @@ export function ImpactReport() {
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4 mb-8">
         <StatCard
-          label="Engagement Rate"
+          label={t('impact.label_engagement_rate')}
           value={data ? formatPercent(data.health.engagement_rate) : '\u2014'}
           icon={Users}
           color="primary"
           loading={loading}
         />
         <StatCard
-          label="Reciprocity Score"
+          label={t('impact.label_reciprocity_score')}
           value={data ? data.health.reciprocity_score.toFixed(2) : '\u2014'}
           icon={ArrowLeftRight}
           color="secondary"
@@ -546,7 +548,7 @@ export function ImpactReport() {
           loading={loading}
         />
         <StatCard
-          label="Activation Rate"
+          label={t('impact.label_activation_rate')}
           value={data ? formatPercent(data.health.activation_rate) : '\u2014'}
           icon={TrendingUp}
           color="success"
@@ -747,7 +749,7 @@ export function ImpactReport() {
               description="Value per hour of service (Timebanking UK default: 15.00)"
             />
             <Input
-              label="Social Multiplier"
+              label={t('impact.label_social_multiplier')}
               type="number"
               min={0.1}
               max={100}

@@ -19,6 +19,7 @@ import type { ExchangeDetail as ExchangeDetailType } from '../../api/types';
 import { PageHeader } from '../../components/PageHeader';
 import { useTenant } from '@/contexts';
 
+import { useTranslation } from 'react-i18next';
 const STATUS_COLORS: Record<string, 'warning' | 'success' | 'danger' | 'default' | 'primary'> = {
   pending_broker: 'warning',
   accepted: 'success',
@@ -29,7 +30,8 @@ const STATUS_COLORS: Record<string, 'warning' | 'success' | 'danger' | 'default'
 };
 
 export default function ExchangeDetail() {
-  usePageTitle('Admin - Exchange Detail');
+  const { t } = useTranslation('admin');
+  usePageTitle(t('broker.page_title'));
   const { id } = useParams<{ id: string }>();
   const { tenantPath } = useTenant();
   const [data, setData] = useState<ExchangeDetailType | null>(null);

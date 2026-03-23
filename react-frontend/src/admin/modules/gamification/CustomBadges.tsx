@@ -19,12 +19,14 @@ import { adminGamification } from '../../api/adminApi';
 import { PageHeader, ConfirmModal, EmptyState } from '../../components';
 import type { BadgeDefinition } from '../../api/types';
 
+import { useTranslation } from 'react-i18next';
 // ─────────────────────────────────────────────────────────────────────────────
 // Component
 // ─────────────────────────────────────────────────────────────────────────────
 
 export function CustomBadges() {
-  usePageTitle('Admin - Custom Badges');
+  const { t } = useTranslation('admin');
+  usePageTitle(t('gamification.page_title'));
   const toast = useToast();
   const navigate = useNavigate();
 
@@ -49,7 +51,7 @@ export function CustomBadges() {
       // Show only custom badges on this page
       setBadges(all.filter((b) => b.type === 'custom'));
     } else {
-      toast.error('Failed to load badges');
+      toast.error(t('gamification.failed_to_load_badges'));
     }
     setLoading(false);
   }, [toast]);
@@ -68,7 +70,7 @@ export function CustomBadges() {
       setDeleteTarget(null);
       loadBadges();
     } else {
-      toast.error('Failed to delete badge');
+      toast.error(t('gamification.failed_to_delete_badge'));
     }
 
     setDeleting(false);
@@ -77,8 +79,8 @@ export function CustomBadges() {
   return (
     <div>
       <PageHeader
-        title="Custom Badges"
-        description="Create and manage custom badges for your community"
+        title={t('gamification.custom_badges_title')}
+        description={t('gamification.custom_badges_desc')}
         actions={
           <Link to="/admin/custom-badges/create">
             <Button color="primary" startContent={<Plus size={16} />}>
@@ -111,7 +113,7 @@ export function CustomBadges() {
         <EmptyState
           icon={Award}
           title="No custom badges"
-          description="Create your first custom badge to reward community members for special achievements."
+          description={t('gamification.desc_create_your_first_custom_badge_to_reward')}
           actionLabel="Create Badge"
           onAction={() => navigate('/admin/custom-badges/create')}
         />

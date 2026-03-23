@@ -24,6 +24,7 @@ import { usePageTitle } from '@/hooks';
 import { adminNewsletters } from '../../api/adminApi';
 import { DataTable, PageHeader, EmptyState, ConfirmModal, type Column } from '../../components';
 
+import { useTranslation } from 'react-i18next';
 interface Segment {
   id: number;
   name: string;
@@ -37,7 +38,8 @@ interface Segment {
 }
 
 export function Segments() {
-  usePageTitle('Admin - Segments');
+  const { t } = useTranslation('admin');
+  usePageTitle(t('newsletters.page_title'));
   const navigate = useNavigate();
   const [items, setItems] = useState<Segment[]>([]);
   const [loading, setLoading] = useState(true);
@@ -143,11 +145,11 @@ export function Segments() {
         <div className="flex justify-end">
           <Dropdown>
             <DropdownTrigger>
-              <Button isIconOnly size="sm" variant="light" aria-label="Actions">
+              <Button isIconOnly size="sm" variant="light" aria-label={t('newsletters.label_actions')}>
                 <MoreVertical size={16} />
               </Button>
             </DropdownTrigger>
-            <DropdownMenu aria-label="Segment actions">
+            <DropdownMenu aria-label={t('newsletters.label_segment_actions')}>
               <DropdownItem
                 key="edit"
                 startContent={<Pencil size={14} />}
@@ -178,8 +180,8 @@ export function Segments() {
     return (
       <div>
         <PageHeader
-          title="Segments"
-          description="Audience segments for targeted campaigns"
+          title={t('newsletters.segments_title')}
+          description={t('newsletters.segments_desc')}
           actions={
             <Button
               color="primary"
@@ -193,7 +195,7 @@ export function Segments() {
         <EmptyState
           icon={Filter}
           title="No Segments Created"
-          description="Create audience segments to target specific groups of subscribers with tailored content."
+          description={t('newsletters.desc_create_audience_segments_to_target_speci')}
           actionLabel="Create Your First Segment"
           onAction={() => navigate('/admin/newsletters/segments/create')}
         />
@@ -204,8 +206,8 @@ export function Segments() {
   return (
     <div>
       <PageHeader
-        title="Segments"
-        description="Audience segments for targeted campaigns"
+        title={t('newsletters.segments_title')}
+        description={t('newsletters.segments_desc')}
         actions={
           <div className="flex gap-2">
             <Button

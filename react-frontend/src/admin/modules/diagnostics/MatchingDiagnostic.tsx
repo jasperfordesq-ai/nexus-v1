@@ -17,6 +17,7 @@ import { useToast } from '@/contexts';
 import { adminDiagnostics } from '../../api/adminApi';
 import { PageHeader } from '../../components';
 
+import { useTranslation } from 'react-i18next';
 interface DiagResult {
   [key: string]: unknown;
 }
@@ -31,7 +32,8 @@ interface EngineStatus {
 }
 
 export function MatchingDiagnostic() {
-  usePageTitle('Admin - Matching Diagnostic');
+  const { t } = useTranslation('admin');
+  usePageTitle(t('diagnostics.page_title'));
   const toast = useToast();
 
   const [userId, setUserId] = useState('');
@@ -50,7 +52,7 @@ export function MatchingDiagnostic() {
           setEngineStatus(res.data as EngineStatus);
         }
       })
-      .catch(() => toast.error('Failed to load engine status'))
+      .catch(() => toast.error(t('diagnostics.failed_to_load_engine_status')))
       .finally(() => setLoadingEngine(false));
   }, [toast]);
 
@@ -63,10 +65,10 @@ export function MatchingDiagnostic() {
       if (res.success && res.data) {
         setUserResult(res.data as DiagResult);
       } else {
-        toast.error('No diagnostic data found for this user');
+        toast.error(t('diagnostics.no_diagnostic_data_found_for_this_user'));
       }
     } catch {
-      toast.error('Failed to diagnose user');
+      toast.error(t('diagnostics.failed_to_diagnose_user'));
     } finally {
       setLoadingUser(false);
     }
@@ -81,10 +83,10 @@ export function MatchingDiagnostic() {
       if (res.success && res.data) {
         setListingResult(res.data as DiagResult);
       } else {
-        toast.error('No diagnostic data found for this listing');
+        toast.error(t('diagnostics.no_diagnostic_data_found_for_this_listin'));
       }
     } catch {
-      toast.error('Failed to diagnose listing');
+      toast.error(t('diagnostics.failed_to_diagnose_listing'));
     } finally {
       setLoadingListing(false);
     }
@@ -94,7 +96,7 @@ export function MatchingDiagnostic() {
 
   return (
     <div>
-      <PageHeader title="Matching Diagnostic" description="Debug and analyze matching engine results for specific users or listings" />
+      <PageHeader title={t('diagnostics.matching_diagnostic_title')} description={t('diagnostics.matching_diagnostic_desc')} />
 
       <div className="space-y-4">
         <Card shadow="sm">
@@ -102,7 +104,7 @@ export function MatchingDiagnostic() {
           <CardBody className="gap-4">
             <p className="text-sm text-default-500">Enter a user ID to see their match results, scores, and the factors contributing to each match.</p>
             <div className="flex gap-3">
-              <Input label="User ID" placeholder="e.g., 42" type="number" value={userId} onValueChange={setUserId} variant="bordered" className="max-w-xs" />
+              <Input label={t('diagnostics.label_user_i_d')} placeholder="e.g., 42" type="number" value={userId} onValueChange={setUserId} variant="bordered" className="max-w-xs" />
               <Button
                 color="primary"
                 startContent={loadingUser ? undefined : <Search size={16} />}
@@ -134,7 +136,7 @@ export function MatchingDiagnostic() {
           <CardBody className="gap-4">
             <p className="text-sm text-default-500">Enter a listing ID to see which users were matched and why.</p>
             <div className="flex gap-3">
-              <Input label="Listing ID" placeholder="e.g., 105" type="number" value={listingId} onValueChange={setListingId} variant="bordered" className="max-w-xs" />
+              <Input label={t('diagnostics.label_listing_i_d')} placeholder="e.g., 105" type="number" value={listingId} onValueChange={setListingId} variant="bordered" className="max-w-xs" />
               <Button
                 color="primary"
                 startContent={loadingListing ? undefined : <Search size={16} />}

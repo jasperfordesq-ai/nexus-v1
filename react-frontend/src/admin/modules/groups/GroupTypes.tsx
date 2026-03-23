@@ -29,8 +29,10 @@ import { adminGroups } from '@/admin/api/adminApi';
 import type { GroupType } from '@/admin/api/types';
 import GroupPolicies from './GroupPolicies';
 
+import { useTranslation } from 'react-i18next';
 export default function GroupTypes() {
-  usePageTitle('Group Types');
+  const { t } = useTranslation('admin');
+  usePageTitle(t('groups.page_title'));
   const { success, error } = useToast();
   const [types, setTypes] = useState<GroupType[]>([]);
   const [loading, setLoading] = useState(true);
@@ -142,7 +144,7 @@ export default function GroupTypes() {
       </div>
 
       <Card className="p-4">
-        <Table aria-label="Group types table">
+        <Table aria-label={t('groups.label_group_types_table')}>
           <TableHeader>
             <TableColumn>NAME</TableColumn>
             <TableColumn>ICON</TableColumn>
@@ -193,7 +195,7 @@ export default function GroupTypes() {
                       size="sm"
                       variant="flat"
                       isIconOnly
-                      aria-label="Edit group type"
+                      aria-label={t('groups.label_edit_group_type')}
                       onPress={() => openEdit(type)}
                     >
                       <Edit2 className="w-4 h-4" />
@@ -203,7 +205,7 @@ export default function GroupTypes() {
                       variant="flat"
                       color="danger"
                       isIconOnly
-                      aria-label="Delete group type"
+                      aria-label={t('groups.label_delete_group_type')}
                       onPress={() => handleDelete(type.id)}
                     >
                       <Trash2 className="w-4 h-4" />
@@ -223,26 +225,26 @@ export default function GroupTypes() {
           <ModalBody>
             <div className="space-y-4">
               <Input
-                label="Name"
-                placeholder="Enter type name"
+                label={t('groups.label_name')}
+                placeholder={t('groups.placeholder_enter_type_name')}
                 value={formData.name}
                 onValueChange={(value) => setFormData({ ...formData, name: value })}
               />
               <Textarea
-                label="Description"
-                placeholder="Optional description"
+                label={t('groups.label_description')}
+                placeholder={t('groups.placeholder_optional_description')}
                 value={formData.description}
                 onValueChange={(value) => setFormData({ ...formData, description: value })}
               />
               <Input
-                label="Icon Class"
+                label={t('groups.label_icon_class')}
                 placeholder="e.g. fa-layer-group"
                 value={formData.icon}
                 onValueChange={(value) => setFormData({ ...formData, icon: value })}
               />
               <Input
                 type="color"
-                label="Color"
+                label={t('groups.label_color')}
                 value={formData.color}
                 onValueChange={(value) => setFormData({ ...formData, color: value })}
               />
@@ -266,26 +268,26 @@ export default function GroupTypes() {
           <ModalBody>
             <div className="space-y-4">
               <Input
-                label="Name"
-                placeholder="Enter type name"
+                label={t('groups.label_name')}
+                placeholder={t('groups.placeholder_enter_type_name')}
                 value={formData.name}
                 onValueChange={(value) => setFormData({ ...formData, name: value })}
               />
               <Textarea
-                label="Description"
-                placeholder="Optional description"
+                label={t('groups.label_description')}
+                placeholder={t('groups.placeholder_optional_description')}
                 value={formData.description}
                 onValueChange={(value) => setFormData({ ...formData, description: value })}
               />
               <Input
-                label="Icon Class"
+                label={t('groups.label_icon_class')}
                 placeholder="e.g. fa-layer-group"
                 value={formData.icon}
                 onValueChange={(value) => setFormData({ ...formData, icon: value })}
               />
               <Input
                 type="color"
-                label="Color"
+                label={t('groups.label_color')}
                 value={formData.color}
                 onValueChange={(value) => setFormData({ ...formData, color: value })}
               />

@@ -37,8 +37,10 @@ import { adminSuper } from '../../api/adminApi';
 import { DataTable, PageHeader, ConfirmModal, type Column } from '../../components';
 import type { SuperAdminTenant } from '../../api/types';
 
+import { useTranslation } from 'react-i18next';
 export function TenantList() {
-  usePageTitle('Super Admin - Tenants');
+  const { t } = useTranslation('admin');
+  usePageTitle(t('super.page_title'));
   const { tenantPath } = useTenant();
   const toast = useToast();
   const navigate = useNavigate();
@@ -152,11 +154,11 @@ export function TenantList() {
     return (
       <Dropdown>
         <DropdownTrigger>
-          <Button isIconOnly size="sm" variant="light" aria-label="Tenant actions">
+          <Button isIconOnly size="sm" variant="light" aria-label={t('super.label_tenant_actions')}>
             <MoreVertical size={16} />
           </Button>
         </DropdownTrigger>
-        <DropdownMenu aria-label="Tenant actions" onAction={handleMenuAction}>
+        <DropdownMenu aria-label={t('super.label_tenant_actions')} onAction={handleMenuAction}>
           <DropdownItem key="view" startContent={<Eye size={14} />}>
             View
           </DropdownItem>
@@ -267,8 +269,8 @@ export function TenantList() {
         <span className="text-foreground">Tenants</span>
       </nav>
       <PageHeader
-        title="Tenants"
-        description="Manage all platform tenants"
+        title={t('super.tenant_list_title')}
+        description={t('super.tenant_list_desc')}
         actions={
           <div className="flex items-center gap-2">
             <Button

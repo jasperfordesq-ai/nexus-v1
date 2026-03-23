@@ -16,6 +16,7 @@ import { useToast } from '@/contexts';
 import { PageHeader } from '../../components';
 import { adminSettings } from '../../api/adminApi';
 
+import { useTranslation } from 'react-i18next';
 // Keys that map to the backend's seo_* tenant_settings rows
 const SEO_KEYS = [
   'seo_title_suffix', 'seo_meta_description', 'seo_meta_keywords',
@@ -29,7 +30,8 @@ const TENANT_KEYS = [
 ] as const;
 
 export function SeoOverview() {
-  usePageTitle('Admin - SEO Overview');
+  const { t } = useTranslation('admin');
+  usePageTitle(t('advanced.page_title'));
   const toast = useToast();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -60,7 +62,7 @@ export function SeoOverview() {
           setFormData(prev => ({ ...prev, ...seo }));
         }
       })
-      .catch(() => toast.error('Failed to load SEO settings'))
+      .catch(() => toast.error(t('advanced.failed_to_load_s_e_o_settings')))
       .finally(() => setLoading(false));
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -76,13 +78,13 @@ export function SeoOverview() {
       const res = await adminSettings.updateSeoSettings(payload);
 
       if (res.success) {
-        toast.success('SEO settings saved successfully');
+        toast.success(t('advanced.s_e_o_settings_saved_successfully'));
       } else {
         const error = (res as { error?: string }).error || 'Save failed';
         toast.error(error);
       }
     } catch (err) {
-      toast.error('Failed to save SEO settings');
+      toast.error(t('advanced.failed_to_save_s_e_o_settings'));
       console.error('SEO settings save error:', err);
     } finally {
       setSaving(false);
@@ -103,7 +105,7 @@ export function SeoOverview() {
 
   return (
     <div>
-      <PageHeader title="SEO Overview" description="Search engine optimization configuration and metrics" />
+      <PageHeader title={t('advanced.seo_overview_title')} description={t('advanced.seo_overview_desc')} />
 
       <div className="space-y-4">
         {/* Tenant-level meta (stored directly on tenants table) */}
@@ -111,29 +113,29 @@ export function SeoOverview() {
           <CardHeader><h3 className="text-lg font-semibold">Tenant Meta</h3></CardHeader>
           <CardBody className="gap-4">
             <Input
-              label="Meta Title"
-              placeholder="Your Timebank Name"
+              label={t('advanced.label_meta_title')}
+              placeholder={t('advanced.placeholder_your_timebank_name')}
               variant="bordered"
               value={String(formData.tenant_meta_title || '')}
               onValueChange={(v) => updateField('tenant_meta_title', v)}
             />
             <Input
-              label="Meta Description"
-              placeholder="A short description of your timebank..."
+              label={t('advanced.label_meta_description')}
+              placeholder={t('advanced.placeholder_a_short_description_of_your_timebank')}
               variant="bordered"
               value={String(formData.tenant_meta_description || '')}
               onValueChange={(v) => updateField('tenant_meta_description', v)}
             />
             <Input
               label="H1 Headline"
-              placeholder="Welcome to our community"
+              placeholder={t('advanced.placeholder_welcome_to_our_community')}
               variant="bordered"
               value={String(formData.tenant_h1_headline || '')}
               onValueChange={(v) => updateField('tenant_h1_headline', v)}
             />
             <Input
-              label="Hero Intro Text"
-              placeholder="Exchange skills and time with your community"
+              label={t('advanced.label_hero_intro_text')}
+              placeholder={t('advanced.placeholder_exchange_skills_and_time_with_your_community')}
               variant="bordered"
               value={String(formData.tenant_hero_intro || '')}
               onValueChange={(v) => updateField('tenant_hero_intro', v)}
@@ -146,21 +148,21 @@ export function SeoOverview() {
           <CardHeader><h3 className="text-lg font-semibold">Meta Tags</h3></CardHeader>
           <CardBody className="gap-4">
             <Input
-              label="Default Title Suffix"
+              label={t('advanced.label_default_title_suffix')}
               placeholder=" | My Timebank"
               variant="bordered"
               value={String(formData.seo_title_suffix || '')}
               onValueChange={(v) => updateField('seo_title_suffix', v)}
             />
             <Input
-              label="Global Meta Description"
-              placeholder="Community timebanking platform..."
+              label={t('advanced.label_global_meta_description')}
+              placeholder={t('advanced.placeholder_community_timebanking_platform')}
               variant="bordered"
               value={String(formData.seo_meta_description || '')}
               onValueChange={(v) => updateField('seo_meta_description', v)}
             />
             <Input
-              label="Meta Keywords"
+              label={t('advanced.label_meta_keywords')}
               placeholder="timebanking, community, exchange"
               variant="bordered"
               value={String(formData.seo_meta_keywords || '')}
@@ -177,28 +179,28 @@ export function SeoOverview() {
                 <p className="font-medium">Auto-Generate Sitemap</p>
                 <p className="text-sm text-default-500">Automatically generate and update sitemap.xml</p>
               </div>
-              <Switch isSelected={!!formData.seo_auto_sitemap} onValueChange={(v) => updateField('seo_auto_sitemap', v)} aria-label="Auto sitemap" />
+              <Switch isSelected={!!formData.seo_auto_sitemap} onValueChange={(v) => updateField('seo_auto_sitemap', v)} aria-label={t('advanced.label_auto_sitemap')} />
             </div>
             <div className="flex items-center justify-between">
               <div>
                 <p className="font-medium">Canonical URLs</p>
                 <p className="text-sm text-default-500">Add canonical URL tags to prevent duplicate content</p>
               </div>
-              <Switch isSelected={!!formData.seo_canonical_urls} onValueChange={(v) => updateField('seo_canonical_urls', v)} aria-label="Canonical URLs" />
+              <Switch isSelected={!!formData.seo_canonical_urls} onValueChange={(v) => updateField('seo_canonical_urls', v)} aria-label={t('advanced.label_canonical_u_r_ls')} />
             </div>
             <div className="flex items-center justify-between">
               <div>
                 <p className="font-medium">Open Graph Tags</p>
                 <p className="text-sm text-default-500">Add Open Graph meta tags for social sharing</p>
               </div>
-              <Switch isSelected={!!formData.seo_open_graph} onValueChange={(v) => updateField('seo_open_graph', v)} aria-label="Open Graph" />
+              <Switch isSelected={!!formData.seo_open_graph} onValueChange={(v) => updateField('seo_open_graph', v)} aria-label={t('advanced.label_open_graph')} />
             </div>
             <div className="flex items-center justify-between">
               <div>
                 <p className="font-medium">Twitter Cards</p>
                 <p className="text-sm text-default-500">Add Twitter Card meta tags for sharing on X/Twitter</p>
               </div>
-              <Switch isSelected={!!formData.seo_twitter_cards} onValueChange={(v) => updateField('seo_twitter_cards', v)} aria-label="Twitter Cards" />
+              <Switch isSelected={!!formData.seo_twitter_cards} onValueChange={(v) => updateField('seo_twitter_cards', v)} aria-label={t('advanced.label_twitter_cards')} />
             </div>
           </CardBody>
         </Card>
@@ -207,14 +209,14 @@ export function SeoOverview() {
           <CardHeader><h3 className="text-lg font-semibold">Verification &amp; Robots</h3></CardHeader>
           <CardBody className="gap-4">
             <Input
-              label="Google Search Console Verification"
+              label={t('advanced.label_google_search_console_verification')}
               placeholder="google-site-verification=..."
               variant="bordered"
               value={String(formData.seo_google_verification || '')}
               onValueChange={(v) => updateField('seo_google_verification', v)}
             />
             <Input
-              label="Bing Webmaster Verification"
+              label={t('advanced.label_bing_webmaster_verification')}
               placeholder="msvalidate.01=..."
               variant="bordered"
               value={String(formData.seo_bing_verification || '')}

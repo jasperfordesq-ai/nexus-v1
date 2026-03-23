@@ -18,8 +18,10 @@ import { adminMatching } from '../../api/adminApi';
 import { PageHeader, DataTable, StatusBadge, EmptyState, type Column } from '../../components';
 import type { MatchApproval } from '../../api/types';
 
+import { useTranslation } from 'react-i18next';
 export function SmartMatchUsers() {
-  usePageTitle('Admin - Smart Match Users');
+  const { t } = useTranslation('admin');
+  usePageTitle(t('community.page_title'));
   const toast = useToast();
 
   const [data, setData] = useState<MatchApproval[]>([]);
@@ -43,7 +45,7 @@ export function SmartMatchUsers() {
         }
       }
     } catch {
-      toast.error('Failed to load match results');
+      toast.error(t('community.failed_to_load_match_results'));
     } finally {
       setLoading(false);
     }
@@ -118,7 +120,7 @@ export function SmartMatchUsers() {
   if (loading) {
     return (
       <div>
-        <PageHeader title="Smart Match Users" description="View user-to-user and user-to-listing match results" />
+        <PageHeader title={t('community.smart_match_users_title')} description={t('community.smart_match_users_desc')} />
         <div className="flex justify-center py-12"><Spinner size="lg" /></div>
       </div>
     );
@@ -126,13 +128,13 @@ export function SmartMatchUsers() {
 
   return (
     <div>
-      <PageHeader title="Smart Match Users" description="View user-to-user and user-to-listing match results" />
+      <PageHeader title={t('community.smart_match_users_title')} description={t('community.smart_match_users_desc')} />
 
       {data.length === 0 ? (
         <EmptyState
           icon={Users}
           title="No Match Results"
-          description="Run the smart matching engine to generate user matches. Results will appear here with match scores and reasons."
+          description={t('community.desc_run_the_smart_matching_engine_to_generat')}
         />
       ) : (
         <DataTable

@@ -136,8 +136,8 @@
     "try_again": "Bain triail eile as"
   },
   "custom_page": {
-    "default_title": "Page",
-    "not_found_description": "The page you're looking for doesn't exist or is no longer available.",
-    "back_to_home": "Back to Home"
+    "default_title": "Leathanach",
+    "not_found_description": "Níl an leathanach atá á lorg agat ann nó níl sé ar fáil a thuilleadh.",
+    "back_to_home": "Ar Ais Abhaile"
   }
 }

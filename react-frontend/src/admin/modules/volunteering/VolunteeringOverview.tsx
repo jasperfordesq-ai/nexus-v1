@@ -16,6 +16,7 @@ import { useToast } from '@/contexts';
 import { adminVolunteering } from '../../api/adminApi';
 import { PageHeader, StatCard } from '../../components';
 
+import { useTranslation } from 'react-i18next';
 interface VolStats {
   total_opportunities: number;
   active_opportunities: number;
@@ -35,7 +36,8 @@ interface Opportunity {
 }
 
 export function VolunteeringOverview() {
-  usePageTitle('Admin - Volunteering');
+  const { t } = useTranslation('admin');
+  usePageTitle(t('volunteering.page_title'));
   const toast = useToast();
   const [stats, setStats] = useState<VolStats | null>(null);
   const [opportunities, setOpportunities] = useState<Opportunity[]>([]);
@@ -57,7 +59,7 @@ export function VolunteeringOverview() {
         setOpportunities(d.recent_opportunities || []);
       }
     } catch {
-      toast.error('Failed to load volunteering data');
+      toast.error(t('volunteering.failed_to_load_volunteering_data'));
       setStats(null);
       setOpportunities([]);
     }
@@ -69,21 +71,21 @@ export function VolunteeringOverview() {
   return (
     <div>
       <PageHeader
-        title="Volunteering"
-        description="Volunteer opportunity management and analytics"
+        title={t('volunteering.volunteering_overview_title')}
+        description={t('volunteering.volunteering_overview_desc')}
         actions={<Button variant="flat" startContent={<RefreshCw size={16} />} onPress={loadData} isLoading={loading}>Refresh</Button>}
       />
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 mb-6">
-        <StatCard label="Active Opportunities" value={stats?.active_opportunities ?? 0} icon={Briefcase} color="primary" loading={loading} />
-        <StatCard label="Pending Applications" value={stats?.pending_applications ?? 0} icon={Users} color="warning" loading={loading} />
-        <StatCard label="Total Hours Logged" value={stats?.total_hours_logged ?? 0} icon={Clock} color="success" loading={loading} />
+        <StatCard label={t('volunteering.label_active_opportunities')} value={stats?.active_opportunities ?? 0} icon={Briefcase} color="primary" loading={loading} />
+        <StatCard label={t('volunteering.label_pending_applications')} value={stats?.pending_applications ?? 0} icon={Users} color="warning" loading={loading} />
+        <StatCard label={t('volunteering.label_total_hours_logged')} value={stats?.total_hours_logged ?? 0} icon={Clock} color="success" loading={loading} />
       </div>
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-3 mb-6">
-        <StatCard label="Total Opportunities" value={stats?.total_opportunities ?? 0} icon={Heart} color="secondary" loading={loading} />
-        <StatCard label="Total Applications" value={stats?.total_applications ?? 0} icon={Users} color="primary" loading={loading} />
-        <StatCard label="Active Volunteers" value={stats?.active_volunteers ?? 0} icon={Users} color="success" loading={loading} />
+        <StatCard label={t('volunteering.label_total_opportunities')} value={stats?.total_opportunities ?? 0} icon={Heart} color="secondary" loading={loading} />
+        <StatCard label={t('volunteering.label_total_applications')} value={stats?.total_applications ?? 0} icon={Users} color="primary" loading={loading} />
+        <StatCard label={t('volunteering.label_active_volunteers')} value={stats?.active_volunteers ?? 0} icon={Users} color="success" loading={loading} />
       </div>
 
       <Card shadow="sm">

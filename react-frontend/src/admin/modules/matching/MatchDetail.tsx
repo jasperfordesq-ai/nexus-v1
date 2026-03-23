@@ -44,6 +44,7 @@ import { adminMatching } from '../../api/adminApi';
 import { PageHeader, StatusBadge } from '../../components';
 import type { MatchApprovalDetail } from '../../api/types';
 
+import { useTranslation } from 'react-i18next';
 // Score color helper
 function scoreColor(score: number): 'danger' | 'warning' | 'success' {
   if (score < 50) return 'danger';
@@ -60,7 +61,8 @@ function scoreLabel(score: number): string {
 }
 
 export function MatchDetail() {
-  usePageTitle('Admin - Match Detail');
+  const { t } = useTranslation('admin');
+  usePageTitle(t('matching.page_title'));
   const toast = useToast();
   const { tenantPath } = useTenant();
   const navigate = useNavigate();
@@ -114,7 +116,7 @@ export function MatchDetail() {
   const handleReject = async () => {
     if (!item) return;
     if (!rejectReason.trim()) {
-      toast.error('Please provide a reason for rejection');
+      toast.error(t('matching.please_provide_a_reason_for_rejection'));
       return;
     }
     setRejectLoading(true);
@@ -144,7 +146,7 @@ export function MatchDetail() {
     return (
       <div>
         <PageHeader
-          title="Match Detail"
+          title={t('matching.match_detail_title')}
           actions={
             <Button
               variant="flat"
@@ -467,8 +469,8 @@ export function MatchDetail() {
               The user will be notified with your reason.
             </p>
             <Textarea
-              label="Rejection reason"
-              placeholder="Explain why this match is being rejected..."
+              label={t('matching.label_rejection_reason')}
+              placeholder={t('matching.placeholder_explain_why_this_match_is_being_rejected')}
               value={rejectReason}
               onValueChange={setRejectReason}
               variant="bordered"

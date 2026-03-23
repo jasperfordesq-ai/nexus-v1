@@ -48,6 +48,7 @@ import { useToast } from '@/contexts';
 import { adminFederation } from '../../api/adminApi';
 import { PageHeader, EmptyState } from '../../components';
 
+import { useTranslation } from 'react-i18next';
 interface Community {
   id: number;
   name: string;
@@ -86,7 +87,8 @@ const partnershipStatusConfig: Record<string, { color: 'success' | 'warning' | '
 };
 
 export function PartnerDirectory() {
-  usePageTitle('Admin - Partner Directory');
+  const { t } = useTranslation('admin');
+  usePageTitle(t('federation.page_title'));
   const toast = useToast();
 
   const [communities, setCommunities] = useState<Community[]>([]);
@@ -156,7 +158,7 @@ export function PartnerDirectory() {
         toast.error(errorData?.error || 'Failed to send partnership request');
       }
     } catch {
-      toast.error('Failed to send partnership request');
+      toast.error(t('federation.failed_to_send_partnership_request'));
     } finally {
       setRequestLoading(false);
     }
@@ -200,8 +202,8 @@ export function PartnerDirectory() {
   return (
     <div>
       <PageHeader
-        title="Partner Directory"
-        description="Discover and connect with communities in the federation network"
+        title={t('federation.partner_directory_title')}
+        description={t('federation.partner_directory_desc')}
         actions={
           <Button
             variant="flat"
@@ -221,7 +223,7 @@ export function PartnerDirectory() {
             <Input
               className="flex-1"
               placeholder="Search communities by name, description, or region..."
-              aria-label="Search partner communities"
+              aria-label={t('federation.label_search_partner_communities')}
               startContent={<Search size={16} className="text-default-400" />}
               value={search}
               onValueChange={setSearch}
@@ -231,7 +233,7 @@ export function PartnerDirectory() {
             {regions.length > 0 && (
               <Select
                 className="w-full md:w-48"
-                placeholder="All Regions"
+                placeholder={t('federation.placeholder_all_regions')}
                 size="sm"
                 variant="bordered"
                 selectedKeys={regionFilter ? [regionFilter] : []}
@@ -248,7 +250,7 @@ export function PartnerDirectory() {
             {categories.length > 0 && (
               <Select
                 className="w-full md:w-48"
-                placeholder="All Categories"
+                placeholder={t('federation.placeholder_all_categories')}
                 size="sm"
                 variant="bordered"
                 selectedKeys={categoryFilter ? [categoryFilter] : []}

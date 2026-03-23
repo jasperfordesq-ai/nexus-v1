@@ -17,8 +17,10 @@ import { adminGroups } from '../../api/adminApi';
 import { PageHeader, StatCard } from '../../components';
 import type { GroupAnalyticsData } from '../../api/types';
 
+import { useTranslation } from 'react-i18next';
 export function GroupAnalytics() {
-  usePageTitle('Admin - Group Analytics');
+  const { t } = useTranslation('admin');
+  usePageTitle(t('groups.page_title'));
   const toast = useToast();
 
   const [data, setData] = useState<GroupAnalyticsData | null>(null);
@@ -33,7 +35,7 @@ export function GroupAnalytics() {
           setData(res.data as GroupAnalyticsData);
         }
       } catch {
-        toast.error('Failed to load group analytics');
+        toast.error(t('groups.failed_to_load_group_analytics'));
       } finally {
         setLoading(false);
       }
@@ -44,7 +46,7 @@ export function GroupAnalytics() {
   if (loading) {
     return (
       <div>
-        <PageHeader title="Group Analytics" description="Aggregate statistics for community groups" />
+        <PageHeader title={t('groups.group_analytics_title')} description={t('groups.group_analytics_desc')} />
         <div className="flex items-center justify-center py-20">
           <Spinner size="lg" />
         </div>
@@ -55,7 +57,7 @@ export function GroupAnalytics() {
   if (!data) {
     return (
       <div>
-        <PageHeader title="Group Analytics" description="Aggregate statistics for community groups" />
+        <PageHeader title={t('groups.group_analytics_title')} description={t('groups.group_analytics_desc')} />
         <Card>
           <CardBody className="py-10 text-center text-default-500">
             No analytics data available.
@@ -67,30 +69,30 @@ export function GroupAnalytics() {
 
   return (
     <div>
-      <PageHeader title="Group Analytics" description="Aggregate statistics for community groups" />
+      <PageHeader title={t('groups.group_analytics_title')} description={t('groups.group_analytics_desc')} />
 
       {/* Stat cards grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
         <StatCard
-          label="Total Groups"
+          label={t('groups.label_total_groups')}
           value={data.total_groups}
           icon={Users}
           color="primary"
         />
         <StatCard
-          label="Total Members"
+          label={t('groups.label_total_members')}
           value={data.total_members}
           icon={UserCheck}
           color="success"
         />
         <StatCard
-          label="Avg Members / Group"
+          label={t('groups.label_avg_members_group')}
           value={data.avg_members_per_group}
           icon={BarChart3}
           color="secondary"
         />
         <StatCard
-          label="Active Groups"
+          label={t('groups.label_active_groups')}
           value={data.active_groups}
           icon={ShieldCheck}
           color="warning"

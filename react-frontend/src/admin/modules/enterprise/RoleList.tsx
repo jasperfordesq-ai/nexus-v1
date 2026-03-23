@@ -19,8 +19,10 @@ import { PageHeader, DataTable, ConfirmModal } from '../../components';
 import type { Column } from '../../components';
 import type { Role } from '../../api/types';
 
+import { useTranslation } from 'react-i18next';
 export function RoleList() {
-  usePageTitle('Admin - Roles & Permissions');
+  const { t } = useTranslation('admin');
+  usePageTitle(t('enterprise.page_title'));
   const { tenantPath } = useTenant();
   const toast = useToast();
   const navigate = useNavigate();
@@ -39,7 +41,7 @@ export function RoleList() {
         setRoles(Array.isArray(data) ? data : []);
       }
     } catch {
-      toast.error('Failed to load roles');
+      toast.error(t('enterprise.failed_to_load_roles'));
     } finally {
       setLoading(false);
     }
@@ -56,7 +58,7 @@ export function RoleList() {
       const res = await adminEnterprise.deleteRole(deleteTarget.id);
 
       if (res.success) {
-        toast.success('Role deleted');
+        toast.success(t('enterprise.role_deleted'));
         setDeleteTarget(null);
         loadRoles();
       } else {
@@ -64,7 +66,7 @@ export function RoleList() {
         toast.error(error);
       }
     } catch (err) {
-      toast.error('Failed to delete role');
+      toast.error(t('enterprise.failed_to_delete_role'));
       console.error('Role delete error:', err);
     } finally {
       setDeleting(false);
@@ -112,7 +114,7 @@ export function RoleList() {
             size="sm"
             variant="light"
             onPress={() => navigate(tenantPath(`/admin/enterprise/roles/${role.id}/edit`))}
-            aria-label="Edit role"
+            aria-label={t('enterprise.label_edit_role')}
           >
             <Pencil size={14} />
           </Button>
@@ -123,7 +125,7 @@ export function RoleList() {
             color="danger"
             onPress={() => setDeleteTarget(role)}
             isDisabled={role.slug === 'admin' || role.slug === 'super_admin'}
-            aria-label="Delete role"
+            aria-label={t('enterprise.label_delete_role')}
           >
             <Trash2 size={14} />
           </Button>
@@ -135,8 +137,8 @@ export function RoleList() {
   return (
     <div>
       <PageHeader
-        title="Roles & Permissions"
-        description="Manage user roles and their permissions"
+        title={t('enterprise.role_list_title')}
+        description={t('enterprise.role_list_desc')}
         actions={
           <Button
             as={Link}

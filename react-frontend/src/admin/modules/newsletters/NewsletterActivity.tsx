@@ -28,6 +28,7 @@ import { useTenant, useToast } from '@/contexts';
 import { adminNewsletters } from '../../api/adminApi';
 import { PageHeader } from '../../components';
 
+import { useTranslation } from 'react-i18next';
 // ─── Types ──────────────────────────────────────────────────────────────────
 
 type ViewTab = 'activity' | 'openers' | 'clickers' | 'non-openers' | 'opened-no-click';
@@ -124,11 +125,12 @@ function downloadCsv(rows: string[][], filename: string) {
 // ─── Component ──────────────────────────────────────────────────────────────
 
 export function NewsletterActivity() {
+  const { t } = useTranslation('admin');
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { tenantPath } = useTenant();
   const toast = useToast();
-  usePageTitle('Admin - Newsletter Engagement');
+  usePageTitle(t('newsletters.page_title'));
 
   const [activeTab, setActiveTab] = useState<ViewTab>('activity');
   const [page, setPage] = useState(1);
@@ -194,7 +196,7 @@ export function NewsletterActivity() {
         }
       }
     } catch {
-      toast.error('Failed to load data');
+      toast.error(t('newsletters.failed_to_load_data'));
     }
     setLoading(false);
   }, [id, activeTab, page, activityFilter, toast]);
@@ -239,7 +241,7 @@ export function NewsletterActivity() {
   return (
     <div>
       <PageHeader
-        title="Newsletter Engagement"
+        title={t('newsletters.newsletter_activity_title')}
         description={totalCount > 0 ? `${totalCount.toLocaleString()} total records` : undefined}
         actions={
           <div className="flex gap-2">
@@ -269,7 +271,7 @@ export function NewsletterActivity() {
           <Tabs
             selectedKey={activeTab}
             onSelectionChange={(key) => setActiveTab(key as ViewTab)}
-            aria-label="Engagement view"
+            aria-label={t('newsletters.label_engagement_view')}
             color="primary"
             variant="underlined"
             classNames={{ tabList: 'flex-wrap' }}
@@ -347,7 +349,7 @@ export function NewsletterActivity() {
           {/* ── Activity Log Table ── */}
           {activeTab === 'activity' && !loading && (
             <Table
-              aria-label="Newsletter activity log"
+              aria-label={t('newsletters.label_newsletter_activity_log')}
               isStriped
               classNames={{ th: 'text-default-500 text-xs uppercase' }}
             >
@@ -397,7 +399,7 @@ export function NewsletterActivity() {
           {/* ── Openers Table ── */}
           {activeTab === 'openers' && !loading && (
             <Table
-              aria-label="Newsletter openers"
+              aria-label={t('newsletters.label_newsletter_openers')}
               isStriped
               classNames={{ th: 'text-default-500 text-xs uppercase' }}
             >
@@ -428,7 +430,7 @@ export function NewsletterActivity() {
           {/* ── Clickers Table ── */}
           {activeTab === 'clickers' && !loading && (
             <Table
-              aria-label="Newsletter clickers"
+              aria-label={t('newsletters.label_newsletter_clickers')}
               isStriped
               classNames={{ th: 'text-default-500 text-xs uppercase' }}
             >

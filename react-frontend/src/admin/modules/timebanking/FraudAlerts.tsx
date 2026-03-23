@@ -28,6 +28,7 @@ import { adminTimebanking } from '../../api/adminApi';
 import { DataTable, PageHeader, type Column } from '../../components';
 import type { FraudAlert } from '../../api/types';
 
+import { useTranslation } from 'react-i18next';
 const SEVERITY_COLOR_MAP: Record<string, 'default' | 'primary' | 'warning' | 'danger'> = {
   low: 'default',
   medium: 'primary',
@@ -51,7 +52,8 @@ const STATUS_TABS = [
 ];
 
 export function FraudAlerts() {
-  usePageTitle('Admin - Fraud Alerts');
+  const { t } = useTranslation('admin');
+  usePageTitle(t('timebanking.page_title'));
   const { tenantPath } = useTenant();
   const toast = useToast();
 
@@ -80,7 +82,7 @@ export function FraudAlerts() {
         }
       }
     } catch {
-      toast.error('Failed to load alerts');
+      toast.error(t('timebanking.failed_to_load_alerts'));
     } finally {
       setLoading(false);
     }
@@ -98,10 +100,10 @@ export function FraudAlerts() {
           toast.success(`Alert status updated to ${newStatus}`);
           loadAlerts();
         } else {
-          toast.error('Failed to update alert status');
+          toast.error(t('timebanking.failed_to_update_alert_status'));
         }
       } catch {
-        toast.error('Failed to update alert status');
+        toast.error(t('timebanking.failed_to_update_alert_status'));
       }
     },
     [loadAlerts, toast]
@@ -182,22 +184,22 @@ export function FraudAlerts() {
         render: (alert) => (
           <Dropdown>
             <DropdownTrigger>
-              <Button isIconOnly size="sm" variant="light" aria-label="Actions">
+              <Button isIconOnly size="sm" variant="light" aria-label={t('timebanking.label_actions')}>
                 <MoreVertical size={16} />
               </Button>
             </DropdownTrigger>
             <DropdownMenu
-              aria-label="Alert actions"
+              aria-label={t('timebanking.label_alert_actions')}
               onAction={(key) => handleStatusChange(alert.id, String(key))}
               disabledKeys={[alert.status]}
             >
-              <DropdownItem key="reviewing" description="Mark as under investigation">
+              <DropdownItem key="reviewing" description={t('timebanking.desc_mark_as_under_investigation')}>
                 Investigate
               </DropdownItem>
-              <DropdownItem key="resolved" description="Mark as resolved" className="text-success">
+              <DropdownItem key="resolved" description={t('timebanking.desc_mark_as_resolved')} className="text-success">
                 Resolve
               </DropdownItem>
-              <DropdownItem key="dismissed" description="Dismiss this alert" className="text-default-400">
+              <DropdownItem key="dismissed" description={t('timebanking.desc_dismiss_this_alert')} className="text-default-400">
                 Dismiss
               </DropdownItem>
             </DropdownMenu>
@@ -211,8 +213,8 @@ export function FraudAlerts() {
   return (
     <div>
       <PageHeader
-        title="Fraud Alerts"
-        description="Review and manage abuse detection alerts"
+        title={t('timebanking.fraud_alerts_title')}
+        description={t('timebanking.fraud_alerts_desc')}
         actions={
           <Button
             as={Link}
@@ -233,7 +235,7 @@ export function FraudAlerts() {
           onSelectionChange={handleTabChange}
           size="sm"
           variant="underlined"
-          aria-label="Filter by status"
+          aria-label={t('timebanking.label_filter_by_status')}
         >
           {STATUS_TABS.map((tab) => (
             <Tab key={tab.key} title={tab.label} />

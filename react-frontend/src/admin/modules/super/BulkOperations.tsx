@@ -15,8 +15,10 @@ import { adminSuper } from '../../api/adminApi';
 import { PageHeader, ConfirmModal } from '../../components';
 import type { SuperAdminTenant, SuperAdminUser, BulkOperationResult } from '../../api/types';
 
+import { useTranslation } from 'react-i18next';
 export function BulkOperations() {
-  usePageTitle('Super Admin - Bulk Operations');
+  const { t } = useTranslation('admin');
+  usePageTitle(t('super.page_title'));
   const toast = useToast();
   const { tenantPath } = useTenant();
 
@@ -127,7 +129,7 @@ export function BulkOperations() {
         <span>/</span>
         <span className="text-foreground">Bulk Operations</span>
       </nav>
-      <PageHeader title="Bulk Operations" description="Move users and update tenants in bulk" />
+      <PageHeader title={t('super.bulk_operations_title')} description={t('super.bulk_operations_desc')} />
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Bulk Move Users */}
@@ -142,7 +144,7 @@ export function BulkOperations() {
             </p>
           </CardHeader>
           <CardBody className="flex flex-col gap-4">
-            <Select label="Source Tenant" selectedKeys={sourceTenant ? [sourceTenant] : []}
+            <Select label={t('super.label_source_tenant')} selectedKeys={sourceTenant ? [sourceTenant] : []}
               onSelectionChange={(keys) => {
                 const val = String(Array.from(keys)[0] || '');
                 setSourceTenant(val);
@@ -165,7 +167,7 @@ export function BulkOperations() {
             {loading && <p className="text-center text-default-400 text-sm">Loading users...</p>}
 
             <Divider />
-            <Select label="Target Tenant" selectedKeys={targetTenant ? [targetTenant] : []}
+            <Select label={t('super.label_target_tenant')} selectedKeys={targetTenant ? [targetTenant] : []}
               onSelectionChange={(keys) => setTargetTenant(String(Array.from(keys)[0] || ''))}>
               {tenants.filter(t => String(t.id) !== sourceTenant).map(t =>
                 <SelectItem key={String(t.id)}>{t.name}</SelectItem>)}

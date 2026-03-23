@@ -22,6 +22,7 @@ import { adminGroups } from '../../api/adminApi';
 import { DataTable, PageHeader, ConfirmModal, type Column } from '../../components';
 import type { AdminGroup } from '../../api/types';
 
+import { useTranslation } from 'react-i18next';
 const statusColors: Record<string, 'success' | 'warning' | 'danger' | 'default'> = {
   active: 'success',
   pending: 'warning',
@@ -37,7 +38,8 @@ const visibilityIcons: Record<string, typeof Eye> = {
 };
 
 export function GroupList() {
-  usePageTitle('Admin - Groups');
+  const { t } = useTranslation('admin');
+  usePageTitle(t('groups.page_title'));
   const { tenantPath } = useTenant();
   const toast = useToast();
   const navigate = useNavigate();
@@ -71,7 +73,7 @@ export function GroupList() {
         }
       }
     } catch {
-      toast.error('Failed to load groups');
+      toast.error(t('groups.failed_to_load_groups'));
     } finally {
       setLoading(false);
     }
@@ -88,13 +90,13 @@ export function GroupList() {
     try {
       const res = await adminGroups.delete(confirmDelete.id);
       if (res?.success) {
-        toast.success('Group deleted successfully');
+        toast.success(t('groups.group_deleted_successfully'));
         loadItems();
       } else {
         toast.error(res?.error || 'Failed to delete group');
       }
     } catch {
-      toast.error('An unexpected error occurred');
+      toast.error(t('groups.an_unexpected_error_occurred'));
     } finally {
       setActionLoading(false);
       setConfirmDelete(null);
@@ -109,10 +111,10 @@ export function GroupList() {
         toast.success(`Group "${item.name}" ${newStatus === 'active' ? 'activated' : 'deactivated'}`);
         loadItems();
       } else {
-        toast.error('Failed to update group status');
+        toast.error(t('groups.failed_to_update_group_status'));
       }
     } catch {
-      toast.error('Failed to update group status');
+      toast.error(t('groups.failed_to_update_group_status'));
     }
   };
 
@@ -204,12 +206,12 @@ export function GroupList() {
       render: (item) => (
         <Dropdown>
           <DropdownTrigger>
-            <Button isIconOnly size="sm" variant="light" aria-label="Actions">
+            <Button isIconOnly size="sm" variant="light" aria-label={t('groups.label_actions')}>
               <MoreVertical size={16} />
             </Button>
           </DropdownTrigger>
           <DropdownMenu
-            aria-label="Group actions"
+            aria-label={t('groups.label_group_actions')}
             onAction={(key) => {
               if (key === 'view') navigate(tenantPath(`/groups/${item.id}`));
               else if (key === 'toggle-status') handleStatusToggle(item);
@@ -238,8 +240,8 @@ export function GroupList() {
   return (
     <div>
       <PageHeader
-        title="Groups"
-        description="Manage community groups and memberships"
+        title={t('groups.group_list_title')}
+        description={t('groups.group_list_desc')}
         actions={
           <div className="flex gap-2">
             <Button

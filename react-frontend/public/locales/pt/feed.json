@@ -181,7 +181,10 @@
     "schedule_set": "Agendada para {{date}}",
     "schedule_clear": "Limpar agendamento",
     "groups_loading": "A carregar grupos...",
-    "create_post": "Criar publicação"
+    "create_post": "Criar publicação",
+    "template_button": "Modelo",
+    "media_drag_drop": "Clique ou arraste fotos aqui",
+    "media_formats": "JPEG, PNG, GIF, WebP até 10MB cada"
   },
   "card": {
     "edited": "editado",

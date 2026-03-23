@@ -16,11 +16,13 @@ import { useToast } from '@/contexts';
 import { PageHeader } from '../../components';
 import { adminSettings } from '../../api/adminApi';
 
+import { useTranslation } from 'react-i18next';
 const AI_FEATURES = ['Smart Matching Suggestions', 'Content Moderation', 'Chat Assistant', 'Auto-Categorization'];
 const FEATURE_KEYS = ['smart_matching', 'content_moderation', 'chat_assistant', 'auto_categorization'];
 
 export function AiSettings() {
-  usePageTitle('Admin - AI Settings');
+  const { t } = useTranslation('admin');
+  usePageTitle(t('advanced.page_title'));
   const toast = useToast();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -43,7 +45,7 @@ export function AiSettings() {
           setFormData(prev => ({ ...prev, ...res.data }));
         }
       })
-      .catch(() => toast.error('Failed to load AI settings'))
+      .catch(() => toast.error(t('advanced.failed_to_load_a_i_settings')))
       .finally(() => setLoading(false));
   }, [toast]);
 
@@ -53,13 +55,13 @@ export function AiSettings() {
       const res = await adminSettings.updateAiConfig(formData);
 
       if (res.success) {
-        toast.success('AI settings saved successfully');
+        toast.success(t('advanced.a_i_settings_saved_successfully'));
       } else {
         const error = (res as { error?: string }).error || 'Save failed';
         toast.error(error);
       }
     } catch (err) {
-      toast.error('Failed to save AI settings');
+      toast.error(t('advanced.failed_to_save_a_i_settings'));
       console.error('AI settings save error:', err);
     } finally {
       setSaving(false);
@@ -80,7 +82,7 @@ export function AiSettings() {
 
   return (
     <div>
-      <PageHeader title="AI Settings" description="Configure AI providers and integration options" />
+      <PageHeader title={t('advanced.ai_settings_title')} description={t('advanced.ai_settings_desc')} />
 
       <div className="space-y-4">
         <Card shadow="sm">
@@ -91,10 +93,10 @@ export function AiSettings() {
                 <p className="font-medium">Enable AI Features</p>
                 <p className="text-sm text-default-500">Enable AI-powered features across the platform</p>
               </div>
-              <Switch isSelected={!!formData.enabled} onValueChange={(v) => updateField('enabled', v)} aria-label="Enable AI" />
+              <Switch isSelected={!!formData.enabled} onValueChange={(v) => updateField('enabled', v)} aria-label={t('advanced.label_enable_a_i')} />
             </div>
             <Select
-              label="AI Provider"
+              label={t('advanced.label_a_i_provider')}
               selectedKeys={[String(formData.provider || 'openai')]}
               onSelectionChange={(keys) => { const v = Array.from(keys)[0]; if (v) updateField('provider', String(v)); }}
               variant="bordered"
@@ -104,23 +106,23 @@ export function AiSettings() {
               <SelectItem key="local">Local Model</SelectItem>
             </Select>
             <Input
-              label="API Key"
+              label={t('advanced.label_a_p_i_key')}
               type="password"
               placeholder="sk-..."
               variant="bordered"
-              description="Your AI provider API key (stored encrypted)"
+              description={t('advanced.desc_your_a_i_provider_a_p_i_key_stored_encrypt')}
               value={String(formData.api_key || '')}
               onValueChange={(v) => updateField('api_key', v)}
             />
             <Input
-              label="Model"
+              label={t('advanced.label_model')}
               placeholder="gpt-4"
               variant="bordered"
               value={String(formData.model || '')}
               onValueChange={(v) => updateField('model', v)}
             />
             <Input
-              label="Max Tokens"
+              label={t('advanced.label_max_tokens')}
               type="number"
               placeholder="2048"
               variant="bordered"

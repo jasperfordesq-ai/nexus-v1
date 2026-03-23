@@ -9,6 +9,7 @@ import { Activity, Database, Zap, AlertTriangle, Clock, MemoryStick } from 'luci
 import { api } from '@/lib/api';
 import { usePageTitle } from '@/hooks/usePageTitle';
 
+import { useTranslation } from 'react-i18next';
 interface PerformanceSummary {
   slowest_requests: Array<{
     timestamp: string;
@@ -43,7 +44,8 @@ interface PerformanceSummary {
 }
 
 export default function PerformanceDashboard() {
-  usePageTitle('Performance Monitoring');
+  const { t } = useTranslation('admin');
+  usePageTitle(t('performance.page_title'));
 
   const [summary, setSummary] = useState<PerformanceSummary | null>(null);
   const [loading, setLoading] = useState(true);
@@ -365,7 +367,7 @@ export default function PerformanceDashboard() {
         <Tabs
           selectedKey={selectedTab}
           onSelectionChange={(key) => setSelectedTab(key as string)}
-          aria-label="Performance metrics"
+          aria-label={t('performance.label_performance_metrics')}
         >
           <Tab key="requests" title="Slow Requests">
             <div className="py-4">{renderSlowRequests()}</div>

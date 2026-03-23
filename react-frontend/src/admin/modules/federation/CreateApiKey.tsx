@@ -18,10 +18,12 @@ import { logError } from '@/lib/logger';
 import { adminFederation } from '../../api/adminApi';
 import { PageHeader } from '../../components';
 
+import { useTranslation } from 'react-i18next';
 const AVAILABLE_SCOPES = ['read:users', 'read:listings', 'read:transactions', 'write:messages', 'write:transactions'];
 
 export function CreateApiKey() {
-  usePageTitle('Admin - Create API Key');
+  const { t } = useTranslation('admin');
+  usePageTitle(t('federation.page_title'));
   const navigate = useNavigate();
   const { tenantPath } = useTenant();
   const toast = useToast();
@@ -56,7 +58,7 @@ export function CreateApiKey() {
       }
     } catch (err) {
       logError('CreateApiKey: failed to create API key', err);
-      toast.error('Failed to create API key. Please try again.');
+      toast.error(t('federation.failed_to_create_a_p_i_key_please_try_aga'));
     }
     setSaving(false);
   };
@@ -72,7 +74,7 @@ export function CreateApiKey() {
   if (createdKey) {
     return (
       <div>
-        <PageHeader title="API Key Created" description="Store this key securely - it will not be shown again" />
+        <PageHeader title={t('federation.create_api_key_title')} description={t('federation.create_api_key_desc')} />
         <Card shadow="sm">
           <CardBody className="gap-4">
             <div className="rounded-lg bg-success-50 border border-success-200 p-4">
@@ -92,14 +94,14 @@ export function CreateApiKey() {
   return (
     <div>
       <PageHeader
-        title="Create API Key"
-        description="Generate a new federation API key"
+        title={t('federation.create_api_key_title')}
+        description={t('federation.create_api_key_desc')}
         actions={<Button variant="flat" startContent={<ArrowLeft size={16} />} onPress={() => navigate(tenantPath('/admin/federation/api-keys'))}>Back</Button>}
       />
       <Card shadow="sm">
         <CardHeader><h3 className="text-lg font-semibold flex items-center gap-2"><Key size={20} /> New API Key</h3></CardHeader>
         <CardBody className="gap-4">
-          <Input label="Key Name" placeholder="e.g., Production Integration" value={name} onValueChange={setName} isRequired variant="bordered" />
+          <Input label={t('federation.label_key_name')} placeholder="e.g., Production Integration" value={name} onValueChange={setName} isRequired variant="bordered" />
           <div>
             <p className="text-sm font-medium mb-2">Scopes</p>
             <div className="space-y-2">

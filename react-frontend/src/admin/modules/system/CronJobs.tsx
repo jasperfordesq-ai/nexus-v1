@@ -18,6 +18,7 @@ import { adminSystem, adminCron } from '../../api/adminApi';
 import { PageHeader, StatusBadge } from '../../components';
 import type { CronJob, CronHealthMetrics } from '../../api/types';
 
+import { useTranslation } from 'react-i18next';
 // ─────────────────────────────────────────────────────────────────────────────
 // Extended type to include extra fields from the API
 // ─────────────────────────────────────────────────────────────────────────────
@@ -79,7 +80,8 @@ function timeAgo(dateStr: string | null): string {
 // ─────────────────────────────────────────────────────────────────────────────
 
 export function CronJobs() {
-  usePageTitle('Admin - Cron Jobs');
+  const { t } = useTranslation('admin');
+  usePageTitle(t('system.page_title'));
   const toast = useToast();
   const [jobs, setJobs] = useState<CronJobExtended[]>([]);
   const [loading, setLoading] = useState(true);
@@ -151,8 +153,8 @@ export function CronJobs() {
   return (
     <div>
       <PageHeader
-        title="Cron Jobs"
-        description="Scheduled task management"
+        title={t('system.cron_jobs_title')}
+        description={t('system.cron_jobs_desc')}
         actions={
           <Button
             variant="flat"

@@ -18,8 +18,10 @@ import { adminMatching } from '../../api/adminApi';
 import { PageHeader, StatCard } from '../../components';
 import type { MatchingStatsResponse } from '../../api/types';
 
+import { useTranslation } from 'react-i18next';
 export function SmartMatchMonitoring() {
-  usePageTitle('Admin - Match Monitoring');
+  const { t } = useTranslation('admin');
+  usePageTitle(t('community.page_title'));
   const toast = useToast();
 
   const [data, setData] = useState<MatchingStatsResponse | null>(null);
@@ -32,14 +34,14 @@ export function SmartMatchMonitoring() {
           setData(res.data as MatchingStatsResponse);
         }
       })
-      .catch(() => toast.error('Failed to load matching stats'))
+      .catch(() => toast.error(t('community.failed_to_load_matching_stats')))
       .finally(() => setLoading(false));
   }, [toast]);
 
   if (loading) {
     return (
       <div>
-        <PageHeader title="Match Monitoring" description="Smart matching engine performance and quality metrics" />
+        <PageHeader title={t('community.smart_match_monitoring_title')} description={t('community.smart_match_monitoring_desc')} />
         <div className="flex justify-center py-12"><Spinner size="lg" /></div>
       </div>
     );
@@ -49,29 +51,29 @@ export function SmartMatchMonitoring() {
 
   return (
     <div>
-      <PageHeader title="Match Monitoring" description="Smart matching engine performance and quality metrics" />
+      <PageHeader title={t('community.smart_match_monitoring_title')} description={t('community.smart_match_monitoring_desc')} />
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4 mb-6">
         <StatCard
-          label="Matches Generated"
+          label={t('community.label_matches_generated')}
           value={overview?.total_matches_month ?? 0}
           icon={Activity}
           color="primary"
         />
         <StatCard
-          label="Avg Match Score"
+          label={t('community.label_avg_match_score')}
           value={overview?.avg_match_score !== undefined ? `${Number(overview.avg_match_score).toFixed(1)}%` : '--'}
           icon={BarChart3}
           color="success"
         />
         <StatCard
-          label="Approval Rate"
+          label={t('community.label_approval_rate')}
           value={data?.approval_rate !== undefined ? `${Number(data.approval_rate).toFixed(0)}%` : '--'}
           icon={Activity}
           color="warning"
         />
         <StatCard
-          label="Cache Hit Rate"
+          label={t('community.label_cache_hit_rate')}
           value={overview?.cache_hit_rate !== undefined ? `${Number(overview.cache_hit_rate).toFixed(0)}%` : '--'}
           icon={Activity}
           color="secondary"

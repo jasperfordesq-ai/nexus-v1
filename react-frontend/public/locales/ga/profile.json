@@ -95,6 +95,6 @@
     "save": "Sábháil Athruithe"
   },
   "load_error": "Theip ar lodail an proifile.",
-  "listing_image_alt": "Listing image",
-  "credits_sent_success": "Credits sent to {{name}}"
+  "listing_image_alt": "Íomhá liostaithe",
+  "credits_sent_success": "Creidmheasanna seolta chuig {{name}}"
 }

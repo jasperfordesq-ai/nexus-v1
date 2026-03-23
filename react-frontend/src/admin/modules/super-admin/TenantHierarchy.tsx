@@ -43,6 +43,7 @@ import { PageHeader } from '@/admin/components/PageHeader';
 import { StatusBadge } from '@/admin/components/DataTable';
 import type { TenantHierarchyNode } from '@/admin/api/types';
 
+import { useTranslation } from 'react-i18next';
 // Local storage key for tree state
 const TREE_STATE_KEY = 'superAdminTreeState';
 
@@ -51,7 +52,8 @@ interface TreeState {
 }
 
 export function TenantHierarchy() {
-  usePageTitle('Tenant Hierarchy - Super Admin');
+  const { t } = useTranslation('admin');
+  usePageTitle(t('super_admin.page_title'));
   const toast = useToast();
   const { tenantPath } = useTenant();
 
@@ -94,13 +96,13 @@ export function TenantHierarchy() {
     try {
       const response = await adminSuper.moveTenant(tenantId, newParentId);
       if (response.success) {
-        toast.success('Tenant moved successfully');
+        toast.success(t('super_admin.tenant_moved_successfully'));
         execute();
       } else {
         toast.error(response.error || 'Failed to move tenant');
       }
     } catch {
-      toast.error('An error occurred');
+      toast.error(t('super_admin.an_error_occurred'));
     }
   };
 
@@ -222,7 +224,7 @@ export function TenantHierarchy() {
 
     // Validate: target must be a hub
     if (!targetNode.allows_subtenants) {
-      toast.error('Target tenant must be a hub (allows sub-tenants)');
+      toast.error(t('super_admin.target_tenant_must_be_a_hub_allows_sub'));
       setDraggedNode(null);
       return;
     }
@@ -235,7 +237,7 @@ export function TenantHierarchy() {
     };
 
     if (isDescendant(draggedNode, targetNode.id)) {
-      toast.error('Cannot move a tenant to one of its own descendants');
+      toast.error(t('super_admin.cannot_move_a_tenant_to_one_of_its_own_d'));
       setDraggedNode(null);
       return;
     }
@@ -354,8 +356,8 @@ export function TenantHierarchy() {
   return (
     <div className="p-6">
       <PageHeader
-        title="Tenant Hierarchy"
-        description="View and manage the tenant hierarchy tree with drag-and-drop"
+        title={t('super_admin.tenant_hierarchy_title')}
+        description={t('super_admin.tenant_hierarchy_desc')}
       />
 
       {/* Stats Cards */}
@@ -405,8 +407,8 @@ export function TenantHierarchy() {
           <div className="flex items-center gap-3 flex-wrap">
             {/* Search */}
             <Input
-              placeholder="Search by name or slug..."
-              aria-label="Search tenants"
+              placeholder={t('super_admin.placeholder_search_by_name_or_slug')}
+              aria-label={t('super_admin.label_search_tenants')}
               value={search}
               onValueChange={setSearch}
               startContent={<Search size={16} className="text-default-400" />}

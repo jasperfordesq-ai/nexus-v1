@@ -19,10 +19,12 @@ import { adminSuper } from '../../api/adminApi';
 import { DataTable, PageHeader, StatusBadge, type Column } from '../../components';
 import type { SuperAuditEntry } from '../../api/types';
 
+import { useTranslation } from 'react-i18next';
 const PAGE_SIZE = 25;
 
 export default function SuperAuditLog() {
-  usePageTitle('Super Admin - Audit Log');
+  const { t } = useTranslation('admin');
+  usePageTitle(t('super.page_title'));
   const { tenantPath } = useTenant();
 
   const [logs, setLogs] = useState<SuperAuditEntry[]>([]);
@@ -166,8 +168,8 @@ export default function SuperAuditLog() {
         <span className="text-foreground">Audit Log</span>
       </nav>
       <PageHeader
-        title="Audit Log"
-        description="Cross-tenant action history"
+        title={t('super.super_audit_log_title')}
+        description={t('super.super_audit_log_desc')}
         actions={
           <Button
             variant="flat"
@@ -184,7 +186,7 @@ export default function SuperAuditLog() {
       {/* Filters */}
       <div className="flex flex-wrap gap-3 mb-4 items-end">
         <Select
-          label="Action Type"
+          label={t('super.label_action_type')}
           size="sm"
           className="max-w-[180px]"
           selectedKeys={actionType ? [actionType] : []}
@@ -204,7 +206,7 @@ export default function SuperAuditLog() {
         </Select>
 
         <Select
-          label="Target Type"
+          label={t('super.label_target_type')}
           size="sm"
           className="max-w-[160px]"
           selectedKeys={targetType ? [targetType] : []}
@@ -220,7 +222,7 @@ export default function SuperAuditLog() {
         </Select>
 
         <Input
-          label="From Date"
+          label={t('super.label_from_date')}
           type="date"
           size="sm"
           className="max-w-[170px]"
@@ -229,7 +231,7 @@ export default function SuperAuditLog() {
         />
 
         <Input
-          label="To Date"
+          label={t('super.label_to_date')}
           type="date"
           size="sm"
           className="max-w-[170px]"
@@ -238,7 +240,7 @@ export default function SuperAuditLog() {
         />
 
         <Input
-          label="Search"
+          label={t('super.label_search')}
           size="sm"
           className="max-w-[200px]"
           value={search}

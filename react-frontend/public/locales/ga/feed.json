@@ -10,7 +10,7 @@
   "load_more": "Lódáil Tuilleadh",
   "unable_to_load": "Ní Féidir an Fotha a Lódáil",
   "try_again": "Bain Triail Eile As",
-  "session_expired": "Your session has expired. Please log in again.",
+  "session_expired": "Tá do sheisiún imithe in éag. Logáil isteach arís le do thoil.",
   "error_load": "Theip ar lódáil an fhotha.",
   "error_load_retry": "Theip ar lódáil an fhotha. Bain triail eile as.",
   "empty_title": "Níl aon phostálacha fós",
@@ -23,9 +23,9 @@
     "events": "Imeachtaí",
     "polls": "Vótaí",
     "goals": "Spriocanna",
-    "jobs": "Jobs",
-    "challenges": "Challenges",
-    "volunteering": "Volunteering",
+    "jobs": "Poist",
+    "challenges": "Dúshláin",
+    "volunteering": "Obair Dheonach",
     "blogs": "Blag",
     "discussions": "Plé"
   },
@@ -181,7 +181,10 @@
     "schedule_set": "Sceidealaithe do {{date}}",
     "schedule_clear": "Glan sceideal",
     "groups_loading": "Ag luchtú grúpaí...",
-    "create_post": "Cruthaigh postáil"
+    "create_post": "Cruthaigh postáil",
+    "template_button": "Teimpléad",
+    "media_drag_drop": "Cliceáil nó tarraing grianghraif anseo",
+    "media_formats": "JPEG, PNG, GIF, WebP suas le 10MB an ceann"
   },
   "card": {
     "edited": "curtha in eagar",
@@ -207,41 +210,41 @@
     "write_comment": "Scríobh trácht...",
     "no_comments": "Gan tráchtanna fós. Bí ar an gcéad duine chun do chuid smaointe a roinnt!",
     "admin_delete": "Scrios (Riarachán)",
-    "type_post": "Post",
-    "type_listing": "Listing",
-    "type_event": "Event",
-    "type_poll": "Poll",
-    "type_goal": "Goal",
-    "type_review": "Review",
-    "type_job": "Job",
-    "type_challenge": "Challenge",
-    "type_volunteer": "Volunteer",
-    "type_blog": "Blog",
-    "type_discussion": "Discussion",
-    "image_alt": "{{type}} image by {{name}}",
-    "post_options": "Post options",
-    "send_comment": "Send comment",
-    "share_action": "Share",
-    "shared_success": "Post shared to your feed",
-    "share_failed": "Failed to share",
-    "reaction": "reaction",
-    "reactions": "reactions",
-    "reactions_title": "Reactions",
-    "no_reactions": "No reactions yet",
-    "load_more": "Load More",
-    "and": "and",
-    "other": "other",
-    "others": "others",
-    "all": "All",
-    "post_actions": "Post actions",
-    "detail_listing": "View Listing",
-    "detail_event": "View Event",
-    "detail_goals": "View Goals",
-    "detail_profile": "View Profile",
-    "detail_job": "View Job",
-    "detail_challenge": "View Challenge",
-    "detail_volunteer": "View Opportunity",
-    "detail_blog": "Read Article"
+    "type_post": "Postáil",
+    "type_listing": "Liostú",
+    "type_event": "Imeacht",
+    "type_poll": "Pobalbhreith",
+    "type_goal": "Sprioc",
+    "type_review": "Athbhreithniú",
+    "type_job": "Post",
+    "type_challenge": "Dúshlán",
+    "type_volunteer": "Oibrí Deonach",
+    "type_blog": "Blag",
+    "type_discussion": "Plé",
+    "image_alt": "{{type}} íomhá le {{name}}",
+    "post_options": "Roghanna postála",
+    "send_comment": "Seol tuairim",
+    "share_action": "Roinn",
+    "shared_success": "Postáil roinnte ar d'fhotha",
+    "share_failed": "Theip ar roinnt",
+    "reaction": "imoibriú",
+    "reactions": "imoibrithe",
+    "reactions_title": "Imoibrithe",
+    "no_reactions": "Níl imoibrithe ann fós",
+    "load_more": "Lódáil Tuilleadh",
+    "and": "agus",
+    "other": "eile",
+    "others": "daoine eile",
+    "all": "Gach",
+    "post_actions": "Gníomhartha postála",
+    "detail_listing": "Féach ar Liostú",
+    "detail_event": "Féach ar Imeacht",
+    "detail_goals": "Féach ar Spriocanna",
+    "detail_profile": "Féach ar Phróifíl",
+    "detail_job": "Féach ar Phost",
+    "detail_challenge": "Féach ar Dhúshlán",
+    "detail_volunteer": "Féach ar Dheis",
+    "detail_blog": "Léigh an tAlt"
   },
   "hashtag": {
     "title": "Haischlib",
@@ -253,7 +256,7 @@
     "no_posts": "Gan postálacha le fáil",
     "no_posts_desc": "Níor clibeáladh aon phostálacha le #{{tag}} fós.",
     "load_more": "Lódáil Tuilleadh",
-    "page_description": "Posts tagged with #{{tag}}"
+    "page_description": "Postálacha clibeáilte le #{{tag}}"
   },
   "hashtags": {
     "title": "Haischlibeanna Treochta",
@@ -283,120 +286,120 @@
   },
   "sidebar": {
     "profile": {
-      "listings": "Listings",
-      "given": "Given",
-      "received": "Received",
-      "offers": "Offers",
-      "requests": "Requests"
+      "listings": "Liostuithe",
+      "given": "Tugtha",
+      "received": "Faighte",
+      "offers": "Tairiscintí",
+      "requests": "Iarratais"
     },
     "friends": {
-      "title": "Friends",
-      "see_all": "See All",
-      "online": "Online now",
-      "active_today": "Active today"
+      "title": "Cairde",
+      "see_all": "Féach Gach",
+      "online": "Ar líne anois",
+      "active_today": "Gníomhach inniu"
     },
     "pulse": {
-      "title": "Community Pulse",
-      "members": "Members",
-      "listings": "Listings",
-      "events": "Events",
-      "groups": "Groups"
+      "title": "Cuisle an Phobail",
+      "members": "Baill",
+      "listings": "Liostuithe",
+      "events": "Imeachtaí",
+      "groups": "Grúpaí"
     },
     "suggested": {
-      "title": "Suggested For You",
-      "see_all": "See All",
-      "by": "by {{name}}",
+      "title": "Molta Duit",
+      "see_all": "Féach Gach",
+      "by": "le {{name}}",
       "request": "Iarratas",
       "offer": "Tairiscint"
     },
     "categories": {
-      "title": "Top Categories",
-      "all_listings": "All Listings"
+      "title": "Barrchatagóirí",
+      "all_listings": "Gach Liostú"
     },
     "people": {
-      "title": "People You May Know",
-      "see_all": "See All",
-      "view": "View"
+      "title": "Daoine a d'Fhéadfá a Aithint",
+      "see_all": "Féach Gach",
+      "view": "Féach"
     },
     "events": {
-      "title": "Upcoming Events",
-      "see_all": "See All"
+      "title": "Imeachtaí Le Teacht",
+      "see_all": "Féach Gach"
     },
     "groups": {
-      "title": "Popular Groups",
-      "see_all": "See All",
-      "members": "{{count}} members"
+      "title": "Grúpaí Coitianta",
+      "see_all": "Féach Gach",
+      "members": "{{count}} ball"
     },
     "actions": {
-      "title": "Quick Actions",
-      "create_listing": "Create New Listing",
-      "create_listing_desc": "Share your skills with the community",
-      "host_event": "Host Event",
-      "create_poll": "Create Poll",
-      "set_goal": "Set Goal",
-      "groups": "Groups"
+      "title": "Meargníomhartha",
+      "create_listing": "Cruthaigh Liostú Nua",
+      "create_listing_desc": "Roinn do scileanna leis an bpobal",
+      "host_event": "Eagraigh Imeacht",
+      "create_poll": "Cruthaigh Pobalbhreith",
+      "set_goal": "Socraigh Sprioc",
+      "groups": "Grúpaí"
     },
     "by_owner": "le {{name}}",
     "offer": "Tairiscint"
   },
   "mode": {
-    "for_you": "For You",
-    "recent": "Recent",
+    "for_you": "Duit",
+    "recent": "Le Déanaí",
     "label": "Mód beatha"
   },
   "location": {
-    "global": "Global",
-    "nearby": "Near Me",
+    "global": "Domhanda",
+    "nearby": "In Aice Liom",
     "radius": "{{km}} km",
     "km": "km",
-    "add_location": "Add location in profile"
+    "add_location": "Cuir suíomh le próifíl"
   },
   "subfilter": {
-    "all": "All",
-    "offers": "Offers",
-    "requests": "Requests"
+    "all": "Gach",
+    "offers": "Tairiscintí",
+    "requests": "Iarratais"
   },
   "stories": {
-    "add": "Add Story",
-    "your_story": "Your Story",
-    "scroll_left": "Scroll stories left",
-    "scroll_right": "Scroll stories right",
-    "create_your_story": "Create your story",
-    "view_story_from": "View story from {{name}}"
+    "add": "Cuir Scéal Leis",
+    "your_story": "Do Scéal",
+    "scroll_left": "Scrollaigh scéalta ar chlé",
+    "scroll_right": "Scrollaigh scéalta ar dheis",
+    "create_your_story": "Cruthaigh do scéal",
+    "view_story_from": "Féach ar scéal ó {{name}}"
   },
   "fab": {
-    "create": "Create post"
+    "create": "Cruthaigh postáil"
   },
   "carousel": {
-    "aria_label": "Image carousel, {{current}} of {{total}}",
-    "image_of": "Image {{current}} of {{total}}",
-    "view_image": "View image {{current}} of {{total}}",
-    "previous": "Previous image",
-    "next": "Next image",
-    "go_to_image": "Go to image {{number}}",
-    "more_images": "{{count}} more images"
+    "aria_label": "Carúsal íomhánna, {{current}} as {{total}}",
+    "image_of": "Íomhá {{current}} as {{total}}",
+    "view_image": "Féach ar íomhá {{current}} as {{total}}",
+    "previous": "Íomhá roimhe",
+    "next": "Íomhá ar aghaidh",
+    "go_to_image": "Téigh chuig íomhá {{number}}",
+    "more_images": "{{count}} íomhá eile"
   },
   "lightbox": {
-    "aria_label": "Image viewer",
-    "close": "Close image viewer",
-    "counter": "{{current}} of {{total}}"
+    "aria_label": "Amharcóir íomhánna",
+    "close": "Dún amharcóir íomhánna",
+    "counter": "{{current}} as {{total}}"
   },
   "reaction": {
-    "like": "Like",
-    "love": "Love",
-    "laugh": "Laugh",
-    "wow": "Wow",
-    "sad": "Sad",
-    "celebrate": "Celebrate",
-    "clap": "Clap",
-    "time_credit": "Time Credit",
-    "click_to_remove": "{{label}} (click to remove)",
-    "react_to_post": "React to this post"
+    "like": "Maith Liom",
+    "love": "Grá",
+    "laugh": "Gáire",
+    "wow": "Úúú",
+    "sad": "Brónach",
+    "celebrate": "Ceiliúr",
+    "clap": "Bualadh Bos",
+    "time_credit": "Creidmheas Ama",
+    "click_to_remove": "{{label}} (cliceáil chun baint)",
+    "react_to_post": "Déan imoibriú ar an bpostáil seo"
   },
   "video": {
-    "select": "Add Video",
-    "too_large": "Video must be smaller than {{size}}MB",
-    "invalid_type": "Invalid video format. Supported: MP4, WebM, MOV",
-    "remove": "Remove video"
+    "select": "Cuir Físeán Leis",
+    "too_large": "Ní mór don fhíseán a bheith níos lú ná {{size}}MB",
+    "invalid_type": "Formáid físeáin neamhbhailí. Tacaithe: MP4, WebM, MOV",
+    "remove": "Bain físeán"
   }
 }

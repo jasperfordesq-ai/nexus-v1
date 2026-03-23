@@ -104,9 +104,9 @@
       "disputed": "Malartú faoi Dhíospóid",
       "fallback": "Stádas Nuashonraithe"
     },
-    "prep_time": "Preparation Time",
-    "ratings": "Ratings",
-    "rate_exchange": "Rate This Exchange"
+    "prep_time": "Am Ullmhúcháin",
+    "ratings": "Rátálacha",
+    "rate_exchange": "Rátáil an Malartú seo"
   },
   "modal": {
     "decline_title": "Diúltaigh d'Iarratas Malartaithe",

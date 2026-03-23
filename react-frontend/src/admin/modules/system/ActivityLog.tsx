@@ -17,6 +17,7 @@ import { adminSystem } from '../../api/adminApi';
 import { DataTable, PageHeader, type Column } from '../../components';
 import type { ActivityLogEntry } from '../../api/types';
 
+import { useTranslation } from 'react-i18next';
 // ─────────────────────────────────────────────────────────────────────────────
 // Action colour mapping
 // ─────────────────────────────────────────────────────────────────────────────
@@ -67,7 +68,8 @@ function formatDate(dateStr: string): string {
 // ─────────────────────────────────────────────────────────────────────────────
 
 export function ActivityLog() {
-  usePageTitle('Admin - Activity Log');
+  const { t } = useTranslation('admin');
+  usePageTitle(t('system.page_title'));
 
   const [entries, setEntries] = useState<ActivityLogEntry[]>([]);
   const [total, setTotal] = useState(0);
@@ -176,8 +178,8 @@ export function ActivityLog() {
   return (
     <div>
       <PageHeader
-        title="Activity Log"
-        description="Admin action audit trail"
+        title={t('system.activity_log_title')}
+        description={t('system.activity_log_desc')}
         actions={
           <Button
             variant="flat"

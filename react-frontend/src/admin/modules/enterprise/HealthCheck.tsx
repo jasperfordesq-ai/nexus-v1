@@ -21,8 +21,10 @@ import { adminEnterprise } from '../../api/adminApi';
 import { PageHeader } from '../../components';
 import type { HealthCheckResult } from '../../api/types';
 
+import { useTranslation } from 'react-i18next';
 export function HealthCheck() {
-  usePageTitle('Admin - Health Check');
+  const { t } = useTranslation('admin');
+  usePageTitle(t('enterprise.page_title'));
 
   const [result, setResult] = useState<HealthCheckResult | null>(null);
   const [loading, setLoading] = useState(true);
@@ -53,8 +55,8 @@ export function HealthCheck() {
   return (
     <div>
       <PageHeader
-        title="Health Check"
-        description="Quick system health status"
+        title={t('enterprise.health_check_title')}
+        description={t('enterprise.health_check_desc')}
         actions={
           <Button
             variant="flat"

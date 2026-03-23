@@ -16,6 +16,7 @@ import { adminFederation } from '../../api/adminApi';
 import { PageHeader } from '../../components';
 import { API_BASE } from '@/lib/api';
 
+import { useTranslation } from 'react-i18next';
 interface DataConfig {
   export_formats: string[];
   available_exports: Record<string, string>;
@@ -25,7 +26,8 @@ interface DataConfig {
 }
 
 export function DataManagement() {
-  usePageTitle('Admin - Federation Data Management');
+  const { t } = useTranslation('admin');
+  usePageTitle(t('federation.page_title'));
   const [config, setConfig] = useState<DataConfig | null>(null);
   const [loading, setLoading] = useState(true);
   const [exportingType, setExportingType] = useState<string | null>(null);
@@ -80,8 +82,8 @@ export function DataManagement() {
   return (
     <div>
       <PageHeader
-        title="Data Management"
-        description="Import and export federation data"
+        title={t('federation.data_management_title')}
+        description={t('federation.data_management_desc')}
         actions={<Button variant="flat" startContent={<RefreshCw size={16} />} onPress={loadData} isLoading={loading}>Refresh</Button>}
       />
 

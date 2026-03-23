@@ -500,23 +500,23 @@ export function UserEdit() {
             <CardBody className="gap-5 p-6">
               {/* Name */}
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                <Input label="First Name" placeholder="Enter first name" value={firstName} onValueChange={setFirstName}
+                <Input label={t('users.label_first_name')} placeholder={t('users.placeholder_enter_first_name')} value={firstName} onValueChange={setFirstName}
                   isRequired isInvalid={!!errors.first_name} errorMessage={errors.first_name} isDisabled={submitting} />
-                <Input label="Last Name" placeholder="Enter last name" value={lastName} onValueChange={setLastName}
+                <Input label={t('users.label_last_name')} placeholder={t('users.placeholder_enter_last_name')} value={lastName} onValueChange={setLastName}
                   isRequired isInvalid={!!errors.last_name} errorMessage={errors.last_name} isDisabled={submitting} />
               </div>
 
               {/* Email + Phone */}
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                <Input label="Email" type="email" placeholder="user@example.com" value={email} onValueChange={setEmail}
+                <Input label={t('users.label_email')} type="email" placeholder="user@example.com" value={email} onValueChange={setEmail}
                   isRequired isInvalid={!!errors.email} errorMessage={errors.email} isDisabled={submitting} />
-                <Input label="Phone" type="tel" placeholder="e.g. +1 555 123 4567" value={phone}
+                <Input label={t('users.label_phone')} type="tel" placeholder="e.g. +1 555 123 4567" value={phone}
                   onValueChange={setPhone} isDisabled={submitting} />
               </div>
 
               {/* Role + Status */}
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                <Select label="Role" placeholder="Select a role" selectedKeys={role ? [role] : []}
+                <Select label={t('users.label_role')} placeholder={t('users.placeholder_select_a_role')} selectedKeys={role ? [role] : []}
                   onSelectionChange={(keys) => setRole(Array.from(keys)[0] as string)}
                   isRequired isInvalid={!!errors.role} errorMessage={errors.role} isDisabled={submitting}>
                   <SelectItem key="member">Member</SelectItem>
@@ -526,7 +526,7 @@ export function UserEdit() {
                   <SelectItem key="admin">Admin</SelectItem>
                   <SelectItem key="tenant_admin">Tenant Admin</SelectItem>
                 </Select>
-                <Select label="Status" placeholder="Select a status" selectedKeys={status ? [status] : []}
+                <Select label={t('users.label_status')} placeholder={t('users.placeholder_select_a_status')} selectedKeys={status ? [status] : []}
                   onSelectionChange={(keys) => setStatus(Array.from(keys)[0] as string)}
                   isRequired isInvalid={!!errors.status} errorMessage={errors.status} isDisabled={submitting}>
                   <SelectItem key="active">Active</SelectItem>
@@ -539,8 +539,8 @@ export function UserEdit() {
               {/* Profile Type + Organization */}
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                 <Select
-                  label="Profile Type"
-                  placeholder="Select type"
+                  label={t('users.label_profile_type')}
+                  placeholder={t('users.placeholder_select_type')}
                   selectedKeys={[profileType]}
                   onSelectionChange={(keys) => setProfileType(Array.from(keys)[0] as 'individual' | 'organisation')}
                   isDisabled={submitting}
@@ -550,8 +550,8 @@ export function UserEdit() {
                 </Select>
                 {profileType === 'organisation' && (
                   <Input
-                    label="Organisation Name"
-                    placeholder="e.g. Community Centre"
+                    label={t('users.label_organisation_name')}
+                    placeholder={t('users.placeholder_eg_community_centre')}
                     value={organizationName}
                     onValueChange={setOrganizationName}
                     startContent={<Building2 size={14} className="text-default-400" />}
@@ -561,14 +561,14 @@ export function UserEdit() {
               </div>
 
               {/* Bio */}
-              <Textarea label="Bio" placeholder="A short biography for this user" value={bio} onValueChange={setBio}
+              <Textarea label={t('users.label_bio')} placeholder={t('users.placeholder_a_short_biography_for_this_user')} value={bio} onValueChange={setBio}
                 minRows={3} maxRows={6} isDisabled={submitting} />
 
               {/* Tagline + Location */}
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                <Input label="Tagline" placeholder="e.g. Community volunteer" value={tagline}
+                <Input label={t('users.label_tagline')} placeholder={t('users.placeholder_eg_community_volunteer')} value={tagline}
                   onValueChange={setTagline} isDisabled={submitting} />
-                <Input label="Location" placeholder="e.g. New York, USA" value={location}
+                <Input label={t('users.label_location')} placeholder="e.g. New York, USA" value={location}
                   onValueChange={setLocation} isDisabled={submitting} />
               </div>
 
@@ -993,11 +993,11 @@ export function UserEdit() {
           </ModalHeader>
           <ModalBody className="gap-4">
             <p className="text-sm text-default-500">Current balance: <strong>{user.balance ?? 0}h</strong></p>
-            <Input label="Amount" placeholder="e.g. 2 or -1.5"
-              description="Use negative values to deduct credits"
+            <Input label={t('users.label_amount')} placeholder="e.g. 2 or -1.5"
+              description={t('users.desc_use_negative_values_to_deduct_credits')}
               value={balanceAmount} onValueChange={setBalanceAmount}
               type="number" step="0.5" isDisabled={balanceLoading} />
-            <Input label="Reason" placeholder="Why are you adjusting this balance?"
+            <Input label={t('users.label_reason')} placeholder="Why are you adjusting this balance?"
               value={balanceReason} onValueChange={setBalanceReason}
               isRequired isDisabled={balanceLoading} />
           </ModalBody>
@@ -1029,7 +1029,7 @@ export function UserEdit() {
               Set a new password for <strong>{user.name}</strong>. The user will not be notified.
             </p>
             <Input
-              label="New Password"
+              label={t('users.label_new_password')}
               type="password"
               placeholder="Enter new password (min 8 characters)"
               value={newPassword}

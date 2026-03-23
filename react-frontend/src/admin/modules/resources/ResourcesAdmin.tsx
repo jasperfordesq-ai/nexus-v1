@@ -17,6 +17,7 @@ import { useToast, useTenant } from '@/contexts';
 import { api } from '@/lib/api';
 import { PageHeader, DataTable, ConfirmModal, EmptyState, type Column } from '../../components';
 
+import { useTranslation } from 'react-i18next';
 // ─────────────────────────────────────────────────────────────────────────────
 // Types
 // ─────────────────────────────────────────────────────────────────────────────
@@ -51,7 +52,8 @@ const PAGE_SIZE = 50;
 // ─────────────────────────────────────────────────────────────────────────────
 
 export function ResourcesAdmin() {
-  usePageTitle('Admin - Resources');
+  const { t } = useTranslation('admin');
+  usePageTitle(t('resources.page_title'));
   const toast = useToast();
   const { tenantPath } = useTenant();
 
@@ -83,7 +85,7 @@ export function ResourcesAdmin() {
         setTotal(payload.meta?.total || 0);
       }
     } catch {
-      toast.error('Failed to load resources');
+      toast.error(t('resources.failed_to_load_resources'));
     } finally {
       setLoading(false);
     }
@@ -102,13 +104,13 @@ export function ResourcesAdmin() {
     try {
       const res = await api.delete(`/v2/admin/resources/${confirmDelete.id}`);
       if (res?.success) {
-        toast.success('Resource deleted successfully');
+        toast.success(t('resources.resource_deleted_successfully'));
         loadItems();
       } else {
         toast.error(res?.error || 'Failed to delete resource');
       }
     } catch {
-      toast.error('An unexpected error occurred');
+      toast.error(t('resources.an_unexpected_error_occurred'));
     } finally {
       setActionLoading(false);
       setConfirmDelete(null);
@@ -203,7 +205,7 @@ export function ResourcesAdmin() {
             href={tenantPath(`/resources/${item.id}`)}
             target="_blank"
             rel="noopener noreferrer"
-            aria-label="View resource"
+            aria-label={t('resources.label_view_resource')}
           >
             <Eye size={14} />
           </Button>
@@ -213,7 +215,7 @@ export function ResourcesAdmin() {
             variant="flat"
             color="danger"
             onPress={() => setConfirmDelete(item)}
-            aria-label="Delete resource"
+            aria-label={t('resources.label_delete_resource')}
           >
             <Trash2 size={14} />
           </Button>
@@ -227,8 +229,8 @@ export function ResourcesAdmin() {
   return (
     <div>
       <PageHeader
-        title="Knowledge Base"
-        description="Manage help articles and resources"
+        title={t('resources.resources_admin_title')}
+        description={t('resources.resources_admin_desc')}
       />
 
       <div className="mb-4">

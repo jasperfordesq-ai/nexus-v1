@@ -16,8 +16,10 @@ import { adminEnterprise } from '../../api/adminApi';
 import { PageHeader } from '../../components';
 import type { SecretEntry } from '../../api/types';
 
+import { useTranslation } from 'react-i18next';
 export function SecretsVault() {
-  usePageTitle('Admin - Secrets Vault');
+  const { t } = useTranslation('admin');
+  usePageTitle(t('enterprise.page_title'));
 
   const [secrets, setSecrets] = useState<SecretEntry[]>([]);
   const [loading, setLoading] = useState(true);
@@ -46,7 +48,7 @@ export function SecretsVault() {
   return (
     <div>
       <PageHeader
-        title="Secrets Vault"
+        title={t('enterprise.secrets_vault_title')}
         description={`Environment variables overview (${setCount}/${secrets.length} configured). Values are never exposed.`}
         actions={
           <Button

@@ -415,14 +415,53 @@
   "messages.aria_send_reply": "Send reply",
   "partner_detail.federation_partner_badge": "Federation Partner",
   "hub": {},
-  "messages": {},
+  "messages": {
+    "aria_back_to_list": "Ar ais chuig liosta teachtaireachtaí",
+    "aria_read": "Léigh",
+    "aria_delivered": "Seachadta",
+    "aria_reply": "Freagair teachtaireacht",
+    "aria_send_reply": "Seol freagra"
+  },
   "onboarding": {},
   "listings": {},
-  "members": {},
+  "members": {
+    "aria_search": "Cuardaigh baill chónaidhme",
+    "aria_filter_community": "Scag de réir pobail chomhpháirtíochta",
+    "aria_filter_skills": "Scag de réir scileanna"
+  },
   "events": {},
   "partners": {},
-  "partner_detail": {},
+  "partner_detail": {
+    "federation_partner_badge": "Comhpháirtí Cónaidhme"
+  },
   "member_profile": {},
   "settings": {},
-  "connections": {}
+  "connections": {
+    "page_title": "Ceangail",
+    "breadcrumb_federation": "Cónaidhm",
+    "breadcrumb_connections": "Ceangail",
+    "title": "Ceangail Chónaidhme",
+    "subtitle": "Bainistigh do cheangail trasteorann phobail",
+    "tab_connected": "Ceangailte",
+    "tab_received": "Faighte",
+    "tab_sent": "Seolta",
+    "loading": "Ceangail á lódáil...",
+    "empty_connected": "Níl ceangail ann fós",
+    "empty_received": "Níl iarratais ar feitheamh",
+    "empty_sent": "Níl iarratais seolta ann",
+    "empty_connected_desc": "Ceangail le baill ó phobail chomhpháirtíochta chun do líonra a fhás.",
+    "empty_received_desc": "Nuair a sheolann duine iarratas ceangail chugat, beidh sé le feiceáil anseo.",
+    "empty_sent_desc": "Beidh iarratais cheangail a sheolann tú le feiceáil anseo.",
+    "browse_members": "Brabhsáil Baill Chónaidhme",
+    "unknown_member": "Ball Cónaidhme",
+    "message": "Teachtaireacht",
+    "remove": "Bain ceangal",
+    "accept": "Glac",
+    "decline": "Diúltaigh",
+    "pending": "Ar Feitheamh",
+    "accepted_success": "Ceangal glactha!",
+    "rejected_success": "Iarratas ceangail diúltaithe",
+    "removed_success": "Ceangal bainte",
+    "action_failed": "Theip ar ghníomh"
+  }
 }

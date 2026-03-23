@@ -23,9 +23,9 @@
     "events": "Veranstaltungen",
     "polls": "Umfragen",
     "goals": "Ziele",
-    "jobs": "Jobs",
-    "challenges": "Challenges",
-    "volunteering": "Volunteering",
+    "jobs": "Stellen",
+    "challenges": "Herausforderungen",
+    "volunteering": "Freiwilligenarbeit",
     "blogs": "Blog",
     "discussions": "Diskussionen"
   },
@@ -181,7 +181,10 @@
     "schedule_set": "Geplant für {{date}}",
     "schedule_clear": "Planung aufheben",
     "groups_loading": "Gruppen werden geladen...",
-    "create_post": "Beitrag erstellen"
+    "create_post": "Beitrag erstellen",
+    "template_button": "Vorlage",
+    "media_drag_drop": "Klicken oder Fotos hierher ziehen",
+    "media_formats": "JPEG, PNG, GIF, WebP bis zu 10 MB jeweils"
   },
   "card": {
     "edited": "bearbeitet",
@@ -208,14 +211,14 @@
     "no_comments": "Noch keine Kommentare. Teilen Sie als Erste Person Ihre Gedanken!",
     "admin_delete": "Löschen (Admin)",
     "type_post": "Beitrag",
-    "type_listing": "Inserat",
+    "type_listing": "Anzeige",
     "type_event": "Veranstaltung",
     "type_poll": "Umfrage",
     "type_goal": "Ziel",
-    "type_review": "Bewertung",
+    "type_review": "Überprüfung",
     "type_job": "Stelle",
     "type_challenge": "Herausforderung",
-    "type_volunteer": "Freiwillig",
+    "type_volunteer": "Freiwilliger",
     "type_blog": "Blog",
     "type_discussion": "Diskussion",
     "image_alt": "{{type}}-Bild von {{name}}",
@@ -230,17 +233,17 @@
     "no_reactions": "Noch keine Reaktionen",
     "load_more": "Mehr laden",
     "and": "und",
-    "other": "weitere",
-    "others": "weitere",
+    "other": "andere",
+    "others": "andere",
     "all": "Alle",
     "post_actions": "Beitragsaktionen",
-    "detail_listing": "Inserat anzeigen",
-    "detail_event": "Veranstaltung anzeigen",
-    "detail_goals": "Ziele anzeigen",
-    "detail_profile": "Profil anzeigen",
-    "detail_job": "Stelle anzeigen",
-    "detail_challenge": "Herausforderung anzeigen",
-    "detail_volunteer": "Möglichkeit anzeigen",
+    "detail_listing": "Anzeige ansehen",
+    "detail_event": "Veranstaltung ansehen",
+    "detail_goals": "Ziele ansehen",
+    "detail_profile": "Profil ansehen",
+    "detail_job": "Stelle ansehen",
+    "detail_challenge": "Herausforderung ansehen",
+    "detail_volunteer": "Möglichkeit ansehen",
     "detail_blog": "Artikel lesen"
   },
   "hashtag": {
@@ -283,11 +286,11 @@
   },
   "sidebar": {
     "profile": {
-      "listings": "Inserate",
+      "listings": "Anzeigen",
       "given": "Gegeben",
       "received": "Erhalten",
       "offers": "Angebote",
-      "requests": "Gesuche"
+      "requests": "Anfragen"
     },
     "friends": {
       "title": "Freunde",
@@ -296,14 +299,14 @@
       "active_today": "Heute aktiv"
     },
     "pulse": {
-      "title": "Gemeinschafts-Puls",
+      "title": "Gemeinschaftspuls",
       "members": "Mitglieder",
-      "listings": "Inserate",
+      "listings": "Anzeigen",
       "events": "Veranstaltungen",
       "groups": "Gruppen"
     },
     "suggested": {
-      "title": "Für Sie empfohlen",
+      "title": "Für Sie vorgeschlagen",
       "see_all": "Alle anzeigen",
       "by": "von {{name}}",
       "request": "Anfrage",
@@ -311,12 +314,12 @@
     },
     "categories": {
       "title": "Top-Kategorien",
-      "all_listings": "Alle Inserate"
+      "all_listings": "Alle Anzeigen"
     },
     "people": {
       "title": "Personen, die Sie kennen könnten",
       "see_all": "Alle anzeigen",
-      "view": "Anzeigen"
+      "view": "Ansehen"
     },
     "events": {
       "title": "Bevorstehende Veranstaltungen",
@@ -329,9 +332,9 @@
     },
     "actions": {
       "title": "Schnellaktionen",
-      "create_listing": "Neues Inserat erstellen",
-      "create_listing_desc": "Teilen Sie Ihre Fähigkeiten mit der Gemeinschaft",
-      "host_event": "Veranstaltung organisieren",
+      "create_listing": "Neue Anzeige erstellen",
+      "create_listing_desc": "Fähigkeiten mit der Gemeinschaft teilen",
+      "host_event": "Veranstaltung ausrichten",
       "create_poll": "Umfrage erstellen",
       "set_goal": "Ziel setzen",
       "groups": "Gruppen"
@@ -346,7 +349,7 @@
   },
   "location": {
     "global": "Global",
-    "nearby": "In meiner Nähe",
+    "nearby": "In der Nähe",
     "radius": "{{km}} km",
     "km": "km",
     "add_location": "Standort im Profil hinzufügen"
@@ -354,15 +357,15 @@
   "subfilter": {
     "all": "Alle",
     "offers": "Angebote",
-    "requests": "Gesuche"
+    "requests": "Anfragen"
   },
   "stories": {
     "add": "Story hinzufügen",
     "your_story": "Ihre Story",
     "scroll_left": "Stories nach links scrollen",
     "scroll_right": "Stories nach rechts scrollen",
-    "create_your_story": "Ihre Story erstellen",
-    "view_story_from": "Story von {{name}} anzeigen"
+    "create_your_story": "Erstelle deine Story",
+    "view_story_from": "Story von {{name}} ansehen"
   },
   "fab": {
     "create": "Beitrag erstellen"
@@ -370,15 +373,15 @@
   "carousel": {
     "aria_label": "Bildkarussell, {{current}} von {{total}}",
     "image_of": "Bild {{current}} von {{total}}",
-    "view_image": "Bild {{current}} von {{total}} anzeigen",
+    "view_image": "Bild {{current}} von {{total}} ansehen",
     "previous": "Vorheriges Bild",
     "next": "Nächstes Bild",
     "go_to_image": "Zu Bild {{number}} gehen",
     "more_images": "{{count}} weitere Bilder"
   },
   "lightbox": {
-    "aria_label": "Bildanzeige",
-    "close": "Bildanzeige schließen",
+    "aria_label": "Bildansicht",
+    "close": "Bildansicht schließen",
     "counter": "{{current}} von {{total}}"
   },
   "reaction": {
@@ -389,13 +392,13 @@
     "sad": "Traurig",
     "celebrate": "Feiern",
     "clap": "Applaus",
-    "time_credit": "Zeitguthaben",
-    "click_to_remove": "{{label}} (zum Entfernen klicken)",
+    "time_credit": "Zeitkredit",
+    "click_to_remove": "{{label}} (Klicken zum Entfernen)",
     "react_to_post": "Auf diesen Beitrag reagieren"
   },
   "video": {
     "select": "Video hinzufügen",
-    "too_large": "Das Video muss kleiner als {{size}}MB sein",
+    "too_large": "Video muss kleiner als {{size}}MB sein",
     "invalid_type": "Ungültiges Videoformat. Unterstützt: MP4, WebM, MOV",
     "remove": "Video entfernen"
   }

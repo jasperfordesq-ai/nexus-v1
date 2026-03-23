@@ -36,6 +36,7 @@ import { resolveAvatarUrl } from '@/lib/helpers';
 import { PageHeader } from '../../components';
 import { adminUsers } from '../../api/adminApi';
 
+import { useTranslation } from 'react-i18next';
 // ─────────────────────────────────────────────────────────────────────────────
 // Types
 // ─────────────────────────────────────────────────────────────────────────────
@@ -110,7 +111,8 @@ const SCORE_COMPONENTS: Array<{ key: keyof DebugScores; label: string }> = [
 // ─────────────────────────────────────────────────────────────────────────────
 
 export function MatchDebugPanel() {
-  usePageTitle('Admin - Match Debug Panel');
+  const { t } = useTranslation('admin');
+  usePageTitle(t('advanced.page_title'));
   const toast = useToast();
 
   // User search state
@@ -184,7 +186,7 @@ export function MatchDebugPanel() {
         setTotal(items.length);
       }
     } catch {
-      toast.error('Failed to load matches for this user');
+      toast.error(t('advanced.failed_to_load_matches_for_this_user'));
     } finally {
       setMatchesLoading(false);
     }
@@ -205,8 +207,8 @@ export function MatchDebugPanel() {
   return (
     <div className="space-y-6">
       <PageHeader
-        title="Match Debug Panel"
-        description="Inspect match score breakdown for any user. Shows top 10 matches with per-component scores."
+        title={t('advanced.match_debug_panel_title')}
+        description={t('advanced.match_debug_panel_desc')}
         actions={
           selectedUser ? (
             <Button
@@ -214,7 +216,7 @@ export function MatchDebugPanel() {
               isDisabled={matchesLoading}
               variant="flat"
               className="flex items-center gap-2"
-              aria-label="Reload matches"
+              aria-label={t('advanced.label_reload_matches')}
               startContent={<RefreshCw className={`w-4 h-4 ${matchesLoading ? 'animate-spin' : ''}`} />}
             >
               Reload
@@ -239,8 +241,8 @@ export function MatchDebugPanel() {
             <Input
               value={searchQuery}
               onValueChange={handleSearchChange}
-              placeholder="Search users by name or email..."
-              aria-label="Search users"
+              placeholder={t('advanced.placeholder_search_users_by_name_or_email')}
+              aria-label={t('advanced.label_search_users')}
               startContent={
                 searchLoading
                   ? <Spinner size="sm" />

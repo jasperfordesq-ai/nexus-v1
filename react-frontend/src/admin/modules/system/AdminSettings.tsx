@@ -18,6 +18,7 @@ import { PageHeader } from '../../components';
 import { adminSettings } from '../../api/adminApi';
 import type { AdminSettingsResponse } from '../../api/types';
 
+import { useTranslation } from 'react-i18next';
 // Field names match the backend's TENANT_DIRECT_COLUMNS and GENERAL_SETTING_KEYS exactly
 interface SettingsForm {
   name: string;               // tenants.name
@@ -44,7 +45,8 @@ const DEFAULT_SETTINGS: SettingsForm = {
 };
 
 export function AdminSettings() {
-  usePageTitle('Admin - Settings');
+  const { t } = useTranslation('admin');
+  usePageTitle(t('system.page_title'));
   const toast = useToast();
   const { tenant } = useTenant();
 
@@ -75,7 +77,7 @@ export function AdminSettings() {
         });
       }
     } catch {
-      toast.error('Failed to load settings');
+      toast.error(t('system.failed_to_load_settings'));
     } finally {
       setLoading(false);
     }
@@ -101,7 +103,7 @@ export function AdminSettings() {
       });
 
       if (res.success) {
-        toast.success('Settings saved');
+        toast.success(t('system.settings_saved'));
         // Reload settings to confirm persistence
         fetchSettings();
       } else {
@@ -109,7 +111,7 @@ export function AdminSettings() {
         toast.error(error);
       }
     } catch (err) {
-      toast.error('Failed to save settings');
+      toast.error(t('system.failed_to_save_settings'));
       console.error('Settings save error:', err);
     } finally {
       setSaving(false);
@@ -119,7 +121,7 @@ export function AdminSettings() {
   if (loading) {
     return (
       <div>
-        <PageHeader title="Admin Settings" description={`Settings for ${tenant?.name || 'your community'}`} />
+        <PageHeader title={t('system.admin_settings_title')} description={`Settings for ${tenant?.name || 'your community'}`} />
         <div className="flex justify-center py-16">
           <Spinner size="lg" />
         </div>
@@ -129,7 +131,7 @@ export function AdminSettings() {
 
   return (
     <div>
-      <PageHeader title="Admin Settings" description={`Settings for ${tenant?.name || 'your community'}`} />
+      <PageHeader title={t('system.admin_settings_title')} description={`Settings for ${tenant?.name || 'your community'}`} />
 
       <div className="space-y-4">
         <Card shadow="sm">
@@ -140,29 +142,29 @@ export function AdminSettings() {
           </CardHeader>
           <CardBody className="gap-4">
             <Input
-              label="Site Name"
-              placeholder="Project NEXUS"
+              label={t('system.label_site_name')}
+              placeholder={t('system.placeholder_project_n_e_x_u_s')}
               variant="bordered"
               value={form.name}
               onValueChange={(val) => setForm(prev => ({ ...prev, name: val }))}
             />
             <Textarea
-              label="Site Description"
-              placeholder="Community timebanking platform"
+              label={t('system.label_site_description')}
+              placeholder={t('system.placeholder_community_timebanking_platform')}
               variant="bordered"
               minRows={2}
               value={form.description}
               onValueChange={(val) => setForm(prev => ({ ...prev, description: val }))}
             />
             <Input
-              label="Support Email"
+              label={t('system.label_support_email')}
               placeholder="support@project-nexus.ie"
               variant="bordered"
               value={form.contact_email}
               onValueChange={(val) => setForm(prev => ({ ...prev, contact_email: val }))}
             />
             <Input
-              label="Contact Phone"
+              label={t('system.label_contact_phone')}
               placeholder="+1 555 123 4567"
               variant="bordered"
               value={form.contact_phone}
@@ -179,8 +181,8 @@ export function AdminSettings() {
           </CardHeader>
           <CardBody className="gap-4">
             <Textarea
-              label="Footer / Legal Text"
-              description="Displayed in the site footer and Legal Hub. Include your charity number, legal name, or any registration info."
+              label={t('system.label_footer_legal_text')}
+              description={t('system.desc_displayed_in_the_site_footer_and_legal_h')}
               placeholder="e.g. hOUR Timebank CLG. Registered Charity No. 20204862. Company No. 705275."
               variant="bordered"
               minRows={2}
@@ -208,7 +210,7 @@ export function AdminSettings() {
               <Switch
                 isSelected={form.registration_mode === 'open'}
                 onValueChange={(val) => setForm(prev => ({ ...prev, registration_mode: val ? 'open' : 'closed' }))}
-                aria-label="Open registration"
+                aria-label={t('system.label_open_registration')}
               />
             </div>
             <div className="flex items-center justify-between">
@@ -219,7 +221,7 @@ export function AdminSettings() {
               <Switch
                 isSelected={form.email_verification}
                 onValueChange={(val) => setForm(prev => ({ ...prev, email_verification: val }))}
-                aria-label="Email verification"
+                aria-label={t('system.label_email_verification')}
               />
             </div>
             <div className="flex items-center justify-between">
@@ -230,7 +232,7 @@ export function AdminSettings() {
               <Switch
                 isSelected={form.admin_approval}
                 onValueChange={(val) => setForm(prev => ({ ...prev, admin_approval: val }))}
-                aria-label="Admin approval"
+                aria-label={t('system.label_admin_approval')}
               />
             </div>
             <div className="flex items-center justify-between">
@@ -241,7 +243,7 @@ export function AdminSettings() {
               <Switch
                 isSelected={form.maintenance_mode}
                 onValueChange={(val) => setForm(prev => ({ ...prev, maintenance_mode: val }))}
-                aria-label="Maintenance mode"
+                aria-label={t('system.label_maintenance_mode')}
               />
             </div>
           </CardBody>

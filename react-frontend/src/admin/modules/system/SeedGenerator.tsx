@@ -16,6 +16,7 @@ import { useToast } from '@/contexts';
 import { PageHeader } from '../../components';
 import { adminTools } from '../../api/adminApi';
 
+import { useTranslation } from 'react-i18next';
 const SEED_OPTIONS = [
   { key: 'users', label: 'Users', description: 'Generate sample user accounts', count: 50 },
   { key: 'listings', label: 'Listings', description: 'Generate service offers and requests', count: 100 },
@@ -28,7 +29,8 @@ const SEED_OPTIONS = [
 ];
 
 export function SeedGenerator() {
-  usePageTitle('Admin - Seed Generator');
+  const { t } = useTranslation('admin');
+  usePageTitle(t('system.page_title'));
   const toast = useToast();
   const [selected, setSelected] = useState<string[]>([]);
   const [running, setRunning] = useState(false);
@@ -72,7 +74,7 @@ export function SeedGenerator() {
 
   return (
     <div>
-      <PageHeader title="Seed Generator" description="Generate test data for development environments" />
+      <PageHeader title={t('system.seed_generator_title')} description={t('system.seed_generator_desc')} />
 
       <div className="rounded-lg border border-warning-200 bg-warning-50 p-4 mb-4 flex items-start gap-3">
         <AlertTriangle size={20} className="text-warning shrink-0 mt-0.5" />

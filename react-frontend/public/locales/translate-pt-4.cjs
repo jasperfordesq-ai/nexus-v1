@@ -1,0 +1,182 @@
+const fs = require('fs');
+const path = require('path');
+
+const ptDir = path.join(__dirname, 'pt');
+
+function setNestedKey(obj, dotKey, value) {
+  const keys = dotKey.split('.');
+  let current = obj;
+  for (let i = 0; i < keys.length - 1; i++) {
+    if (!current[keys[i]] || typeof current[keys[i]] !== 'object') {
+      current[keys[i]] = {};
+    }
+    current = current[keys[i]];
+  }
+  current[keys[keys.length - 1]] = value;
+}
+
+function applyTranslations(filename, translations) {
+  const ptPath = path.join(ptDir, filename);
+  const ptData = JSON.parse(fs.readFileSync(ptPath, 'utf8'));
+
+  for (const [dotKey, value] of Object.entries(translations)) {
+    setNestedKey(ptData, dotKey, value);
+  }
+
+  fs.writeFileSync(ptPath, JSON.stringify(ptData, null, 2) + '\n', 'utf8');
+  console.log('Updated: ' + filename + ' (' + Object.keys(translations).length + ' keys)');
+}
+
+// ============ settings.json ============
+applyTranslations('settings.json', {
+  'profile.section_title': 'Informação do Perfil',
+  'profile.photo_label': 'Foto de Perfil',
+  'profile.photo_hint': 'JPG, PNG ou GIF. Máximo 5MB.',
+  'profile.first_name': 'Nome Próprio',
+  'profile.first_name_placeholder': 'O seu nome próprio',
+  'profile.last_name': 'Apelido',
+  'profile.last_name_placeholder': 'O seu apelido',
+  'profile.phone': 'Número de Telefone',
+  'profile.profile_type': 'Tipo de Perfil',
+  'profile.type_individual': 'Individual',
+  'profile.type_organisation': 'Organização',
+  'profile.org_name': 'Nome da Organização',
+  'profile.org_name_placeholder': 'Nome da sua organização',
+  'profile.tagline': 'Slogan',
+  'profile.tagline_placeholder': 'Uma breve descrição sobre si',
+  'profile.bio_placeholder': 'Conte aos outros sobre si...',
+  'profile.location': 'Localização',
+  'profile.location_placeholder': 'Cidade, País',
+  'profile.upload_photo_aria': 'Carregar foto de perfil',
+  'profile.change_photo_aria': 'Alterar foto de perfil',
+  'notification_prefs.new_messages': 'Novas Mensagens',
+  'notification_prefs.connection_requests': 'Pedidos de Conexão',
+  'notification_prefs.listing_activity': 'Atividade de Anúncios',
+  'notification_prefs.credit_transactions': 'Transações de Créditos',
+  'notification_prefs.new_reviews': 'Novas Avaliações',
+  'notification_prefs.gamification_digest': 'Resumo de Gamificação',
+  'notification_prefs.achievement_milestones': 'Marcos de Conquistas',
+  'notification_prefs.weekly_digest': 'Resumo Semanal',
+  'notification_prefs.payment_notifications': 'Notificações de Pagamento',
+  'notification_prefs.transfer_notifications': 'Notificações de Transferência',
+  'notification_prefs.membership_updates': 'Atualizações de Adesão',
+  'notification_prefs.admin_notifications': 'Notificações de Administração',
+  'notification_prefs.hot_match_alerts': 'Alertas de Correspondências Quentes',
+  'notification_prefs.mutual_match_alerts': 'Alertas de Correspondências Mútuas',
+  'notification_prefs.enable_push': 'Ativar Notificações Push',
+  'notification_prefs.marketing_emails': 'Emails de Marketing',
+  'privacy_prefs.profile_visibility': 'Quem pode ver o seu perfil',
+  'privacy_prefs.search_indexing': 'Indexação por Motores de Busca',
+  'privacy_prefs.allow_contact': 'Permitir Contacto',
+  'password.current': 'Palavra-passe Atual',
+  'password.new': 'Nova Palavra-passe',
+  'password.confirm': 'Confirmar Nova Palavra-passe',
+  'insurance.type_label': 'Tipo de Seguro',
+  'insurance.title': 'Certificados de Seguro',
+  'insurance.description': 'Carregue os seus certificados de seguro para verificação. Formatos aceites: PDF, JPG, PNG (máximo 10MB).',
+  'insurance.loading': 'A carregar certificados...',
+  'insurance.unknown_provider': 'Fornecedor desconhecido',
+  'insurance.expires': 'Expira {{date}}',
+  'insurance.public_liability': 'Responsabilidade Civil',
+  'insurance.professional_indemnity': 'Indemnização Profissional',
+  'insurance.employers_liability': 'Responsabilidade do Empregador',
+  'insurance.product_liability': 'Responsabilidade do Produto',
+  'insurance.personal_accident': 'Acidente Pessoal',
+  'insurance.other': 'Outro',
+  'insurance.uploading': 'A carregar...',
+  'insurance.upload_certificate': 'Carregar Certificado',
+  'tabs.profile': 'Perfil',
+  'tabs.notifications': 'Notificações',
+  'tabs.privacy': 'Privacidade',
+  'tabs.security': 'Segurança',
+  'tabs.skills': 'Competências',
+  'tabs.availability': 'Disponibilidade',
+  'tabs.linked': 'Associados',
+  'header.title': 'Definições',
+  'header.subtitle': 'Gerir as suas preferências de conta',
+  'save_changes': 'Guardar Alterações',
+  'save_preferences': 'Guardar Preferências',
+  'save_privacy': 'Guardar Definições de Privacidade',
+  'cancel': 'Cancelar',
+  'try_again': 'Tentar Novamente',
+  'notification_sections.title': 'Preferências de Notificação',
+  'notification_sections.messages_communication': 'Mensagens e Comunicação',
+  'notification_sections.activity_listings': 'Atividade e Anúncios',
+  'notification_sections.community_achievements': 'Comunidade e Conquistas',
+  'notification_sections.organisation_notifications': 'Notificações da Organização',
+  'notification_sections.match_digest': 'Emails de Resumo de Correspondências',
+  'notification_sections.push_notifications': 'Notificações Push',
+  'notification_sections.marketing_communications': 'Marketing e Comunicações',
+  'notification_descriptions.new_messages': 'Ser notificado quando receber uma nova mensagem',
+  'notification_descriptions.connection_requests': 'Pedidos e atualizações de conexão',
+  'notification_descriptions.listing_activity': 'Atualizações sobre os seus anúncios (novas respostas, etc.)',
+  'notification_descriptions.credit_transactions': 'Notificações de transações de créditos',
+  'notification_descriptions.new_reviews': 'Novas avaliações recebidas no seu perfil ou anúncios',
+  'notification_descriptions.gamification_digest': 'Resumo periódico da sua atividade e progresso de gamificação',
+  'notification_descriptions.achievement_milestones': 'Desbloqueio de emblemas, subidas de nível e notificações de conquistas',
+  'notification_descriptions.weekly_digest': 'Um resumo semanal da atividade comunitária',
+  'notification_descriptions.payment_notifications': 'Notificações de atividade de pagamento da organização',
+  'notification_descriptions.transfer_notifications': 'Notificações de transferências de créditos',
+  'notification_descriptions.membership_updates': 'Adesões, saídas e alterações de membros',
+  'notification_descriptions.admin_notifications': 'Alertas administrativos e notificações do sistema',
+  'notification_descriptions.hot_match_alerts': 'Ser notificado sobre correspondências de alta compatibilidade',
+  'notification_descriptions.mutual_match_alerts': 'Ser notificado quando alguém com quem correspondeu também corresponde consigo',
+  'notification_descriptions.enable_push': 'Receber notificações em tempo real no seu dispositivo',
+  'notification_descriptions.marketing_emails': 'Receber newsletters, promoções e atualizações da comunidade',
+  'match_digest.frequency': 'Frequência do Resumo',
+  'match_digest.frequency_description': 'Com que frequência recebe emails de resumo de correspondências',
+  'match_digest.daily': 'Diário',
+  'match_digest.weekly': 'Semanal',
+  'match_digest.fortnightly': 'Quinzenal',
+  'match_digest.never': 'Nunca',
+  'privacy_sections.title': 'Definições de Privacidade',
+  'privacy_sections.profile_visibility': 'Visibilidade do Perfil',
+  'privacy_sections.search_discovery': 'Pesquisa e Descoberta',
+  'privacy_sections.contact_preferences': 'Preferências de Contacto',
+  'privacy_descriptions.search_indexing': 'Permitir que motores de busca indexem o seu perfil',
+  'privacy_descriptions.allow_contact': 'Permitir que outros membros me contactem',
+  'visibility_options.public': 'Público - Qualquer pessoa pode ver',
+  'visibility_options.members': 'Apenas Membros - Membros da comunidade',
+  'visibility_options.connections': 'Apenas Conexões - As suas conexões',
+  'federation.title': 'Definições de Federação',
+  'federation.description': 'Gerir a sua visibilidade e preferências em comunidades parceiras',
+  'gdpr.title': 'Dados e Direitos de Privacidade',
+  'gdpr.description': 'Ao abrigo do Regulamento Geral de Proteção de Dados (RGPD), tem o direito de aceder, exportar e solicitar a eliminação dos seus dados pessoais. Estes pedidos são processados no prazo de 30 dias.',
+  'gdpr.info': 'Todos os seis direitos do titular dos dados do RGPD estão disponíveis acima. Contacte o nosso Encarregado de Proteção de Dados para quaisquer questões adicionais.',
+  'gdpr.download_title': 'Transferir Os Meus Dados',
+  'gdpr.download_desc': 'Obter uma cópia de todos os seus dados pessoais',
+  'gdpr.portability_title': 'Pedido de Portabilidade de Dados',
+  'gdpr.portability_desc': 'Exportar dados num formato legível por máquina',
+  'gdpr.deletion_title': 'Solicitar Eliminação de Dados',
+  'gdpr.deletion_desc': 'Solicitar a eliminação permanente dos seus dados',
+  'gdpr.rectification_title': 'Retificação de Dados',
+  'gdpr.rectification_desc': 'Solicitar correção de dados pessoais incorretos',
+  'gdpr.restriction_title': 'Restrição do Tratamento',
+  'gdpr.restriction_desc': 'Solicitar restrição do tratamento dos seus dados',
+  'gdpr.objection_title': 'Direito de Oposição',
+  'gdpr.objection_desc': 'Opor-se ao tratamento dos seus dados pessoais',
+  'gdpr.deletion_irreversible': 'Este pedido é irreversível',
+  'gdpr.deletion_modal_desc': 'Após a eliminação dos seus dados, não será possível recuperá-los. A sua conta e todos os dados associados serão permanentemente removidos.',
+  'gdpr.download_modal_desc': 'Prepararemos um arquivo transferível com todos os seus dados pessoais, incluindo o seu perfil, anúncios, mensagens e histórico de transações. Receberá um email com um link de transferência no prazo de 30 dias.',
+  'gdpr.portability_modal_desc': 'Exportaremos os seus dados num formato estruturado, comummente utilizado e legível por máquina (JSON/CSV). Isto permite-lhe transferir os seus dados para outro serviço. Receberá um email no prazo de 30 dias.',
+  'gdpr.rectification_modal_desc': 'Solicite a correção de quaisquer dados pessoais incorretos ou incompletos que tenhamos sobre si. Analisaremos o seu pedido e atualizaremos os registos no prazo de 30 dias.',
+  'gdpr.restriction_modal_desc': 'Solicite que restrinjamos o tratamento dos seus dados pessoais. Enquanto restrito, armazenaremos mas não trataremos ativamente os seus dados. Responderemos no prazo de 30 dias.',
+  'gdpr.objection_modal_desc': 'Oponha-se ao tratamento dos seus dados pessoais para fins específicos, como marketing direto ou criação de perfis. Analisaremos a sua oposição no prazo de 30 dias.',
+  'gdpr.confirmation_email': 'Será enviado um email de confirmação para o seu endereço de email registado.',
+  'gdpr.confirm_deletion': 'Confirmar Pedido de Eliminação',
+  'gdpr.submit_request': 'Submeter Pedido',
+  'skills.title': 'As Suas Competências',
+  'skills.description': 'Adicione competências ao seu perfil para que outros membros o possam encontrar. Os membros da comunidade podem recomendar as suas competências.',
+  'password_modal.title': 'Alterar Palavra-passe',
+  'password_modal.submit': 'Alterar Palavra-passe',
+  'logout_modal.title': 'Terminar Sessão',
+  'logout_modal.confirm_message': 'Tem a certeza de que deseja terminar sessão na sua conta?',
+  'logout_modal.submit': 'Terminar Sessão',
+  'delete_modal.title': 'Eliminar Conta',
+  'delete_modal.warning': 'Aviso: Esta ação não pode ser desfeita',
+  'delete_modal.warning_desc': 'Todos os seus dados, incluindo anúncios, mensagens e histórico de transações, serão permanentemente eliminados.',
+  'delete_modal.type_confirm': 'Escreva DELETE para confirmar:',
+  'delete_modal.submit': 'Eliminar a Minha Conta'
+});
+
+console.log('\n--- Batch 4 (settings) complete ---');

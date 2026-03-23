@@ -17,6 +17,7 @@ import { useToast } from '@/contexts';
 import { adminFederation } from '../../api/adminApi';
 import { PageHeader } from '../../components';
 
+import { useTranslation } from 'react-i18next';
 interface FedSettings {
   federation_enabled: boolean;
   tenant_id: number;
@@ -29,7 +30,8 @@ interface FedSettings {
 }
 
 export function FederationSettings() {
-  usePageTitle('Admin - Federation Settings');
+  const { t } = useTranslation('admin');
+  usePageTitle(t('federation.page_title'));
   const toast = useToast();
 
   const [data, setData] = useState<FedSettings | null>(null);
@@ -51,7 +53,7 @@ export function FederationSettings() {
         setDirty(false);
       }
     } catch {
-      toast.error('Failed to load federation settings');
+      toast.error(t('federation.failed_to_load_federation_settings'));
       setData(null);
     }
     setLoading(false);
@@ -82,14 +84,14 @@ export function FederationSettings() {
         settings: data.settings,
       });
       if (res.success) {
-        toast.success('Federation settings saved successfully');
+        toast.success(t('federation.federation_settings_saved_successfully'));
         setDirty(false);
       } else {
         const error = (res as { error?: string }).error || 'Failed to save federation settings';
         toast.error(error);
       }
     } catch {
-      toast.error('Failed to save federation settings');
+      toast.error(t('federation.failed_to_save_federation_settings'));
     } finally {
       setSaving(false);
     }
@@ -99,8 +101,8 @@ export function FederationSettings() {
     return (
       <div>
         <PageHeader
-          title="Federation Settings"
-          description="Configure cross-community federation features"
+          title={t('federation.federation_settings_title')}
+          description={t('federation.federation_settings_desc')}
         />
         <div className="flex h-64 items-center justify-center">
           <Spinner size="lg" />
@@ -113,8 +115,8 @@ export function FederationSettings() {
     return (
       <div>
         <PageHeader
-          title="Federation Settings"
-          description="Configure cross-community federation features"
+          title={t('federation.federation_settings_title')}
+          description={t('federation.federation_settings_desc')}
           actions={
             <Button variant="flat" startContent={<RefreshCw size={16} />} onPress={loadData}>
               Refresh
@@ -135,8 +137,8 @@ export function FederationSettings() {
   return (
     <div>
       <PageHeader
-        title="Federation Settings"
-        description="Configure cross-community federation features"
+        title={t('federation.federation_settings_title')}
+        description={t('federation.federation_settings_desc')}
         actions={
           <div className="flex items-center gap-2">
             <Button
@@ -173,7 +175,7 @@ export function FederationSettings() {
               <Switch
                 isSelected={data.federation_enabled}
                 onValueChange={(val) => updateField('federation_enabled', val)}
-                aria-label="Federation enabled"
+                aria-label={t('federation.label_federation_enabled')}
               />
             </div>
           </CardBody>
@@ -190,7 +192,7 @@ export function FederationSettings() {
               <Switch
                 isSelected={data.settings?.allow_inbound_partnerships ?? true}
                 onValueChange={(val) => updateField('allow_inbound_partnerships', val)}
-                aria-label="Allow inbound partnerships"
+                aria-label={t('federation.label_allow_inbound_partnerships')}
               />
             </div>
             <Divider />
@@ -202,7 +204,7 @@ export function FederationSettings() {
               <Switch
                 isSelected={data.settings?.auto_approve_partners ?? false}
                 onValueChange={(val) => updateField('auto_approve_partners', val)}
-                aria-label="Auto approve partners"
+                aria-label={t('federation.label_auto_approve_partners')}
               />
             </div>
             <Divider />
@@ -220,7 +222,7 @@ export function FederationSettings() {
                 className="w-24"
                 min={1}
                 max={100}
-                aria-label="Max partnerships"
+                aria-label={t('federation.label_max_partnerships')}
               />
             </div>
           </CardBody>

@@ -1,0 +1,1555 @@
+(optional — PDF, DOC, DOCX, max 5MB)
++1 555 123 4567
++{{count}} more
+.
+000000
+1
+1 hour
+1-10 employees
+1.5 hours
+10 km
+100 km
+11-50 employees
+161
+2,340
+201+ employees
+25 km
+30 minutes
+45 minutes
+5 km
+50 km
+51-200 employees
+64
+7-Day Trend
+847
+A confirmation email will be sent to your registered email address.
+A document has been updated. Please review and accept it to continue.
+A note to the candidate...
+A reason is required
+A short description about yourself
+A short description of what you do
+A weekly summary of community activity
+AGPL-3.0 — Copyright © 2024–{{year}} Jasper Ford
+AI Assessment
+AI Assistant
+AI Assistant Not Available
+AI Chat
+AI Generate
+AI is typing
+AI responses may not always be accurate. Verify important information.
+AND (all words)
+About the Company
+Accept
+Accept & Continue
+Accept Interview
+Accept Offer
+Accept all updated legal documents and continue
+Acceptable Use Policy
+Acceptance Rate
+Accepted
+Accepting…
+Accessibility
+Accessibility & Accommodations
+Accessibility Statement
+Accessibility needs saved successfully.
+Accommodations Required
+Account
+Achievement
+Achievement Milestones
+Achievement Unlocked!
+Action
+Action failed
+Action failed. Please try again.
+Actions
+Active
+Active Campaigns
+Active Giving Days
+Active Groups
+Active Listings
+Active today
+Activity
+Activity & Listings
+Activity Dashboard
+Add
+Add Another Need
+Add Group Member
+Add Member
+Add Reviewer
+Add Rule
+Add Slots
+Add Story
+Add Training
+Add Training Record
+Add Video
+Add Your First Need
+Add a detailed description with clear responsibilities
+Add a note (optional)
+Add a note with your donation...
+Add interview slots so candidates can self-schedule
+Add location in profile
+Add optional notes...
+Add rule
+Add skill tag
+Add skills to your profile so other members can find you. Community members can endorse your skills.
+Add skills to your profile to get personalized shift recommendations.
+Add your accessibility requirements so organizations can provide the right support.
+Add your own skills
+Add your safeguarding training records to get started.
+Admin
+Admin Notifications
+Administrative alerts and system notifications
+Advanced
+Advanced Search
+After X occurrences
+Algorithm Settings
+All
+All Done!
+All Jobs
+All Listings
+All job postings have been reviewed. New submissions will appear here.
+All six GDPR data subject rights are available above. Contact our Data Protection Officer for any additional concerns.
+All volunteer hour submissions have been reviewed.
+All your data, including listings, messages, and transaction history will be permanently deleted.
+Allow Contact
+Allow other members to contact me
+Allow search engines to index your profile
+Amount
+Amount (hours)
+An error occurred. Please try again.
+Analysing CV...
+Announcement actions
+Announcement created
+Announcement deleted
+Announcement title
+Announcements
+Anonymous
+Another Member
+Application Approved
+Application Declined
+Application Funnel
+Application Status
+Application Withdrawn
+Application approved.
+Application declined.
+Application filter
+Application sources and their success rates
+Application submitted! {{count}} skills detected from your CV.
+Application withdrawn.
+Applications
+Applications updated
+Applied
+Applied {{date}}
+Applied: {{date}}
+Apply
+Apply Benchmark
+Apply Now
+Apply for {{title}}
+Apply to {{title}}
+Approve
+Approve All
+Approve this job posting? It will be published immediately.
+Approved
+Approved Today
+Are you sure you want to book this interview slot?
+Are you sure you want to leave {{name}}? You will lose access to group discussions and files.
+Are you sure you want to log out of your account?
+Are you sure you want to reject this job posting?
+Article not found.
+Ask me anything about timebanking, your account, or this community.
+Ask me anything... (Enter to send, Shift+Enter for new line)
+Automated spam and fraud detection statistics
+Automatically create multiple occurrences
+Availability
+Available
+Available Days
+Available after saving the job
+Average Time in Stage
+Average number of days candidates spend in each pipeline stage
+Avg Score
+Avg Scorecard
+Avg. Spam Score
+Avg. Time to Fill
+Away
+Back
+Back to Home
+Back to Jobs
+Back to Knowledge Base
+Back to Messages
+Back to message list
+Badge unlocks, level ups, and achievement notifications
+Badges
+Based on your interests and activity
+Be the first to propose a volunteer project for the community!
+Be the first to share something with this group!
+Beginner
+Benchmark applied
+Benefits & Perks
+Benefits keyword
+Bio
+Biweekly (every 2 weeks)
+Blind Hiring Enabled
+Blind hiring is active. Candidate identities are hidden to reduce unconscious bias.
+Blocked
+Blog
+Book This Slot
+Booked
+Booking cancelled
+Breadcrumb
+Browse Federation Members
+Browse Jobs
+Browse Listings
+Bulk update failed
+By clicking Accept, you confirm you have read and agree to the documents listed above.
+CRITICAL
+CV / Resume
+CV file must be under 5MB
+Cache
+Cancel
+Cancel Booking
+Cancel Request
+Cancelled
+Candidate #{{number}}
+Categories
+Category
+Celebrate
+Celebrate your impact -- every hour counts
+Certificate generated!
+Certificates include all of your approved volunteer hours across every organization.
+Challenge
+Challenges
+Change Password
+Change profile photo
+Channels
+Check In
+Check-in
+Children First
+Choose a time slot for your interview
+Chrome
+City, Country
+Clap
+Clear
+Clear Filters
+Clear custom status
+Clear location filter
+Clear selection
+Click or drop file to upload CV
+Close Vacancy
+Close image viewer
+Closed
+Closes in {{count}} day
+Closes in {{count}} days
+Closing Soon
+Cognitive
+Collections
+Color
+Coming Soon
+Comma-separated skills
+Comments (30d)
+Communication
+Community
+Community & Achievements
+Community Fund
+Community Guidelines
+Community Projects
+Community Pulse
+Community Skills Directory
+Community leaders by experience
+Company Size
+Company Tagline
+Company size
+Complete your profile skills to get matched with relevant opportunities
+Completed
+Configuration
+Confirm Booking
+Confirm Deletion Request
+Confirm Donation
+Confirm New Password
+Connect
+Connect with fellow volunteers for support
+Connect with like-minded members
+Connect with members from partner communities to grow your network.
+Connected
+Connected since {{date}}
+Connection
+Connection Request
+Connection Requests
+Connection accepted!
+Connection removed
+Connection request declined
+Connection requests and updates
+Connection requests you send will appear here until they are accepted or declined.
+Connection requests you send will appear here.
+Connections
+Connections Only - Your connections
+Consider reducing frequency if feeling overwhelmed
+Contact
+Contact Preferences
+Contact Us
+Contact {{tenant}}
+Contacts
+Content
+Contents
+Conversation actions
+Conversation with {{name}}
+Conversation with {{name}}, {{count}} unread
+Cookie Policy
+Cookies
+Cookies & Tracking
+Copy Link
+Create New Listing
+Create Poll
+Create Post
+Create post
+Create your story
+Created
+Created {{date}}
+Credential Type
+Credit Transactions
+Credits sent to {{name}}
+Critical
+Cron Jobs
+Cultural Fit
+Culture Video URL
+Currency
+Current Password
+Currently: {{frequency}}
+Custom
+Daily
+Dashboard
+Data & Privacy Rights
+Data Portability Request
+Data Rectification
+Data exported successfully
+Database
+Date
+Date & Time
+Date Completed
+Date Range
+Days
+Deadline must be a future date
+Deadline today
+Decline
+Decline All
+Decline Interview
+Decline Offer
+Declined
+Delete
+Delete Account
+Delete My Account
+Delete Vacancy
+Delete this template?
+Delivered
+Deposited
+Describe the project and its goals
+Describe why this post is inappropriate...
+Describe your accessibility need...
+Description
+Description generated successfully
+Details
+Detection Flags
+Development status
+Development status: {{stage}}
+Dietary
+Digest Frequency
+Direct Application
+Disconnect
+Disconnected
+Discover
+Discover connections across listings, jobs, volunteering, and groups
+Discover skills, events, groups...
+Discussion
+Discussions
+Dismiss
+Do Not Disturb
+Document
+Documents
+Donate
+Donate Credits
+Donate anonymously
+Donate to
+Donate to Community Fund
+Donated
+Donating anonymously
+Donation failed
+Donation recorded!
+Donation sent!
+Donations
+Download
+Download CV
+Download My Data
+Download my data
+Drop CV here or click to browse
+Drop here
+Duplicate Content
+Duration
+EU Pay Transparency: Including salary ranges improves candidate quality
+Edge
+Edit message
+Effective {{date}}
+Effective: {{date}}
+Elaine
+Email
+Email Address
+Emergency Alerts
+Emergency Contact Name
+Emergency Contact Phone
+Emoji
+Employer Branding
+Employer Jobs
+Employer Onboarding
+Employer Profile
+Employer's Liability
+Enable Push Notifications
+Enable blind hiring
+End Time
+Ended
+Endorsements
+Ends
+Ends {{date}}
+Engagement
+Enter a name for this template
+Enter a valid international number (e.g. +1 555 123 4567)
+Enter member ID
+Enter the email address of the person you would like to add to this group reservation. They will receive an invitation to join.
+Enterprise
+Enterprise Suite
+Equipment
+Erase my data
+Error
+Escalated
+Event
+Event Reminder Settings
+Event Reminders
+Event Update
+Event not found
+Events
+Every 2 weeks
+Excellent
+Excessive Posting Rate
+Exchange
+Exchanges
+Exchanges This Month
+Expense Type
+Expense submitted successfully.
+Expenses
+Experience
+Expert
+Expired
+Expires
+Expires {{date}}
+Expiry Date
+Expiry Date (optional)
+Export CSV
+Export data in a machine-readable format
+FAQ
+Failed
+Failed to accept connection
+Failed to add member. They may already be in the group or the email is invalid.
+Failed to apply.
+Failed to approve application.
+Failed to approve job
+Failed to book interview slot
+Failed to cancel booking
+Failed to cancel request
+Failed to connect to the AI service. Please check your connection and try again.
+Failed to create announcement
+Failed to create interview slots
+Failed to decline application.
+Failed to decline request
+Failed to delete announcement
+Failed to delete slot
+Failed to disconnect
+Failed to flag job
+Failed to generate certificate. Please try again.
+Failed to generate description. Please try again.
+Failed to hide post
+Failed to load activity dashboard
+Failed to load alerts
+Failed to load alerts. Please try again.
+Failed to load announcements
+Failed to load applications
+Failed to load applications.
+Failed to load article. Please try again.
+Failed to load articles. Please try again.
+Failed to load bias audit report
+Failed to load candidates
+Failed to load certificates
+Failed to load connections
+Failed to load event. Please try again.
+Failed to load feed
+Failed to load group reservations.
+Failed to load history.
+Failed to load knowledge base articles.
+Failed to load recommendations
+Failed to load skill categories
+Failed to load skill categories. Please try again.
+Failed to load templates. Please try again.
+Failed to load your activity data. Please try again.
+Failed to log hours. Please try again.
+Failed to mute user
+Failed to parse CV. You can still submit your application manually.
+Failed to propose project.
+Failed to reach AI service
+Failed to record donation.
+Failed to record donation. Please try again.
+Failed to reject job
+Failed to report incident.
+Failed to report post
+Failed to save changes.
+Failed to save template
+Failed to share
+Failed to submit expense.
+Failed to submit training record.
+Failed to update announcement
+Failed to update saved listing
+Failed to update support.
+Failed to update visibility
+Failed to vote
+Failed to withdraw application.
+Featured
+Featured Challenges
+Featured listing
+Federation
+Federation Connections
+Federation Hub
+Federation Member
+Federation Partner
+Federation Settings
+Federation {{action}}
+Feed
+Feed Algorithm
+Feedback
+File
+Files
+Fill in the basic details to create your first job listing.
+Filter
+Filter by Job
+Filter by Skills
+Filter by partner community
+Filter by skills
+Find Members
+Find answers, guides, and helpful resources
+Find members to connect with and build your community network.
+Find skills, events, groups, and more in your community
+Firefox
+First Aid
+First Name
+First time posting?
+Flag for Review
+Flag this job posting for further review?
+Flagged
+Flexible
+For You
+Fortnightly
+Frequency
+Friends
+From
+From {{name}}
+Full
+Gamification
+Gamification Digest
+General
+Generate Certificate
+Generate Report
+Generate Slots
+Generate a certificate to showcase your volunteer hours.
+Generate a job description using AI based on your title, skills, and job type
+Generated
+Generating report...
+Generating...
+Geolocation is not supported by your browser
+Get Started
+Get a copy of all your personal data
+Get notified about high-compatibility matches
+Get notified when someone you matched with also matches you
+Get notified when you receive a new message
+Gift credits directly to another member
+Given
+Global
+Global reminder preferences are coming soon. In the meantime, you can set reminders on individual events from their detail page.
+Go to Jobs
+Go to image {{number}}
+Goal
+Good
+Grateful
+Great
+Great work! Your vacancy is now visible to community members.
+Group
+Group Notification
+Group Sign-ups
+Group file sharing is currently in development. Soon you will be able to upload, download, and manage files within your group.
+Groups
+Groups Joined
+Haha
+Hashtag
+Have Questions?
+Hearing
+Help us understand why you are reporting this post.
+Hide candidate names and photos during the review process to reduce bias
+Hide cover message
+Hide password
+High
+Highest Salary
+Hiring Bias Audit
+Hiring Manager
+Hiring Team
+History
+Home
+Host Event
+Hot Match Alerts
+Hot Matches
+Hours Approved
+Hours Declined
+Hours Exchanged
+Hours Given
+Hours Received
+Hours Review
+Hours approved.
+Hours declined.
+Hours logged successfully!
+How Project NEXUS handles data at the platform infrastructure level
+How are you feeling?
+How candidates progress through pipeline stages
+How do I create a listing to offer my skills?
+How does timebanking work?
+How often you receive match digest emails
+How skills alignment correlates with hiring outcomes
+How the series ends
+How's it going? Any wins or challenges?
+How's your energy level? Anything on your mind?
+Ideas
+If in stage
+If you believe this is an error, please contact your timebank coordinator.
+If you have any questions about this document, please contact us.
+If you have questions about this platform-level document, contact the Project NEXUS team. For questions about your community's policies, contact {{tenant}} directly.
+Image
+Image carousel, {{current}} of {{total}}
+Image viewer
+Image {{current}} of {{total}}
+Impact
+Impact Certificates
+Important
+Important disclaimers and liability limitations for the Project NEXUS platform
+In Person
+In a meeting
+Incident Reports
+Incident reported.
+Include salary or time credit information for transparency
+Individual
+Initiative
+Insufficient balance
+Insurance Certificates
+Insurance Type
+Intelligence
+Intermediate
+Interview
+Interview Confirmed
+Interview Declined
+Interview Requested
+Interview Slots
+Interview Type
+Interview accepted
+Interview declined
+Interview slot booked successfully!
+Interview slots created
+Interview: {{date}} ({{type}})
+Interviewer
+Invalid amount
+Invalid video format. Supported: MP4, WebM, MOV
+Investigating
+JPG, PNG or GIF. Max 5MB.
+JSON Feed
+Job
+Job Openings
+Job Preview
+Job approved and published
+Job flagged for review
+Job rejected
+Jobs
+Jobs Not Available
+Join this group to access this feature.
+Join this group to view posts and participate in conversations.
+Join to see the feed
+Join your community
+Just now
+Kanban Board
+Kanban Pipeline
+Knowledge Base
+LIVE
+Language
+Last Name
+Last active
+Last notification {{date}}
+Last seen {{time}}
+Laugh
+Leader
+Leave Group
+Leave blank if no expiry
+Legacy Admin
+Legal
+Let the employer know why...
+Like
+Likes Given (30d)
+Likes Received (30d)
+Link
+Link copied!
+Linked
+Linked to your organization
+List specific skills to attract qualified candidates
+Listing
+Listing Activity
+Listing Analytics
+Listing Update
+Listing image
+Listing removed from saved
+Listing saved
+Listings
+Load More
+Load Template
+Load more
+Loading achievements
+Loading activity data...
+Loading archived conversations
+Loading certificates...
+Loading connections...
+Loading conversations
+Loading daily reward
+Loading events
+Loading goals
+Loading groups
+Loading leaderboard
+Loading notifications
+Loading season
+Loading skills...
+Loading...
+Location
+Location access denied. Please allow location access to use this feature.
+Location not specified
+Log Out
+Love
+Low
+Lv.{{level}}
+Make a Donation
+Make my profile searchable by employers
+Make this a recurring event
+Manage Interview Slots
+Manage your account preferences
+Manage your community connections
+Manage your cross-community connections
+Manage your visibility and preferences across partner communities
+Manager
+Manual Handling
+Market rate for "{{role}}": {{currency}}{{min}} – {{currency}}{{max}} / {{type}} (median: {{currency}}{{median}})
+Marketing & Communications
+Marketing Emails
+Match Digest Emails
+Match score: {{score}}%
+MatchRank & CommunityRank
+Matches
+Matches will appear here as the system finds connections for you across the platform.
+Max salary
+Maximum
+Maximum {{max}} images
+Meals
+Medium
+Meeting Link
+Meeting Link / Location
+Member actions
+Member joins, leaves, and membership changes
+Member since
+Members
+Members Only
+Members Only - Community members
+Members with "{{skill}}"
+Membership Updates
+Mention suggestions, {{count}} results
+Menu
+Message
+Message (optional)
+Message Employer
+Message for Review
+Messages
+Messages & Communication
+Min salary
+Minimum
+Minimum salary cannot exceed maximum salary
+Mission Control
+Mobility
+Moderation Queue
+Monica
+Monthly
+Monthly Activity
+Most engaging posts this week
+Most viewed offers and requests
+Motivated
+Motivation
+Move to
+Move to stage...
+Mutual Match Alerts
+My Connections
+My Donations
+My Expenses
+My Skills
+NEW
+NORMAL
+NOT (exclude)
+Name
+Near Me
+Near me
+Need Type
+Negotiable
+Net Balance
+Never
+New Account
+New Application
+New Check-in
+New Message
+New Messages
+New Password
+New Reviews
+New reviews received on your profile or listings
+Newest
+Newsletters
+Next
+Next image
+NexusScore
+No ({{count}})
+No accessibility needs added
+No activity recorded yet.
+No applicants yet — share this listing to get more visibility
+No application data available for the selected period
+No applications yet.
+No articles found
+No automation rules yet.
+No candidates found
+No categories found
+No categories match "{{query}}"
+No certificates yet
+No chart data available
+No check-ins yet. Record your first one!
+No community projects yet
+No connections match your search.
+No connections yet
+No emergency alerts
+No expenses yet
+No giving days or donations
+No group sign-ups
+No headline set
+No hours pending review.
+No incidents reported
+No interview slots available
+No knowledge base articles have been published yet.
+No matches yet
+No members found with this skill.
+No notifications yet
+No open roles at this time
+No participants added yet
+No pending jobs
+No pending requests
+No pending requests match your search.
+No posts yet
+No reactions yet
+No recent activity
+No recommendations yet
+No safeguarding incidents have been reported.
+No saved templates
+No sent requests
+No sent requests match your search.
+No similar jobs found
+No skill categories available yet.
+No skills listed in this category yet.
+No templates available yet.
+No templates in this category.
+No templates yet
+No training records
+No users found
+No verified volunteer hours found. Hours must be approved before generating a certificate.
+No {{filter}} applications found.
+No {{source}} matches
+No {{status}} applications.
+Not interested
+Note (optional)
+Note:
+Notes
+Notes (optional)
+Notification
+Notification Preferences
+Notifications
+Notifications for credit transactions
+Notifications for credit transfers
+Notifications for organisation payment activity
+Notifications, {{count}} unread
+Number of occurrences
+Number of volunteers needed
+OR (any word)
+Object to processing of your personal data
+Object to the processing of your personal data for specific purposes, such as direct marketing or profiling. We will review your objection within 30 days.
+Offer
+Offer Accepted
+Offer Declined
+Offer accepted
+Offer declined
+Offering
+Offers
+Offline
+Okay
+On a specific date
+Once your data is deleted, it cannot be recovered. Your account and all associated data will be permanently removed.
+Online
+Online now
+Only PDF, DOC, or DOCX files are supported
+Open
+Open Roles
+Open Source
+Opportunity Closed
+Opportunity Details
+Opportunity date range
+Opportunity not found.
+Option {{number}}
+Optional
+Optional notes about this applicant...
+Options
+Organisation
+Organisation Name
+Organisation Notifications
+Organisations
+Organiser's note:
+Organization
+Organization Name
+Original
+Other
+Our onboarding wizard will guide you through posting your first job.
+Outdoor
+PDF, DOC, DOCX, XLS, XLSX, TXT, CSV, JPG, PNG, GIF, SVG (max 10MB)
+Page
+Pages
+Paid
+Parking
+Part Time
+Participant
+Participants
+Participants ({{count}})
+Password
+Pause
+Payment Notifications
+Pending
+Pending Requests
+Pending Review
+People You May Know
+Percentage of candidates rejected at each stage
+Periodic summary of your gamification activity and progress
+Personal Accident
+Personal Message
+Phone Call
+Phone Number
+Pinned
+Platform Disclaimer
+Platform Privacy Policy
+Platform Provider Notice
+Platform Terms of Service
+Play
+Please enter a recipient ID
+Please enter a valid amount.
+Please enter an amount greater than 0
+Please fill in all required fields.
+Please provide a reason
+Poll
+Popular Groups
+Popular Listings
+Popular topics in your community
+Position {{position}}
+Post
+Post Another
+Post Job
+Post Your First Job
+Post a Job
+Post actions
+Post hidden
+Post job vacancies to find the right people in your community. Whether you need paid staff, volunteers, or timebank helpers, we make it easy to connect with talented members.
+Post options
+Post reported
+Post shared to your feed
+Posted by
+Posted by {{name}}
+Posting...
+Posts (30d)
+Posts tagged with #{{tag}}
+Powered by AI
+Preference
+Preparation Time
+Preview
+Previous image
+Privacy
+Privacy Policy
+Privacy Settings
+Process analytics to identify potential hiring bias patterns
+Product Liability
+Professional Indemnity
+Profile
+Profile Information
+Profile Photo
+Profile Type
+Profile Visibility
+Progress
+Progress: {{percent}}%
+Project NEXUS Platform
+Project NEXUS Website
+Project proposed successfully!
+Project title
+Projects
+Propose
+Propose a Project
+Proposed
+Proposed Date
+Provide a reason for this action...
+Provider
+Public
+Public - Anyone can view
+Public Liability
+Push Notifications
+Pusher
+Q1
+Q2
+Q3
+Q4
+Question
+Questions About This Document?
+Quick Actions
+Quick Stats
+RSS Feed
+RSVP
+Rate
+Rate This Exchange
+Ratings
+React to this post
+Reactions
+Read
+Read Article
+Read more
+Reason
+Reason (optional)
+Receive newsletters, promotions, and community updates
+Receive real-time notifications on your device
+Received
+Recent
+Recent Activity
+Recipient ID
+Recipient required
+Recommended
+Recommended For You
+Recommended for You
+Record Check-in
+Recurrence frequency
+Referral
+Referral Applications
+Referral Conversion
+Referral link copied to clipboard!
+Refresh
+Refunded
+Regarding
+Reject
+Rejected
+Rejected Today
+Rejection Rate
+Rejection Rates by Stage
+Rejections
+Related Articles
+Related Platform Documents
+Reminder Active
+Reminder active
+Reminder set: {{frequency}}
+Remote
+Remote OK
+Remote Only
+Remove
+Remove CV
+Remove Reminder
+Remove connection
+Remove need
+Remove video
+Remove {{name}}
+Reopen
+Repeat on
+Reply message
+Report
+Report Incident
+Report Post
+Request
+Request Data Deletion
+Request cancelled
+Request correction of any inaccurate or incomplete personal data we hold about you. We will review your request and update the records within 30 days.
+Request correction of inaccurate personal data
+Request declined
+Request pending
+Request permanent deletion of your data
+Request restriction of your data processing
+Request that we restrict the processing of your personal data. While restricted, we will store but not actively process your data. We will respond within 30 days.
+Requesting
+Requests
+Required under EU Pay Transparency Directive (June 2026)
+Resolved
+Restriction of Processing
+Retry
+Review
+Review and approve job postings before they go live
+Reviewer
+Reviewer Notes
+Right to Object
+Role
+SEO Manager
+Sad
+Safari
+Safeguarding
+Salary
+Salary Offered
+Salary not specified
+Salary range required. You may check 'Salary negotiable' to omit.
+Sat
+Save
+Save Changes
+Save Preferences
+Save Privacy Settings
+Save Scorecard
+Save Template
+Save as Template
+Saved application profile found
+Saves
+Saving...
+Say hello to recent joiners
+Schedule Interview
+Score Applicant
+Scorecard saved
+Scoring Criteria
+Screening
+Scroll stories left
+Scroll stories right
+Scroll to top
+Search
+Search & Discovery
+Search Engine Indexing
+Search by name or location...
+Search by name, skills, or keywords...
+Search by name...
+Search community members who have opted in to be discovered by employers
+Search federated members
+Search job vacancies
+Search members...
+Search radius
+Search skill categories...
+Search the knowledge base
+Search the knowledge base...
+Searching candidates...
+Section {{number}}
+Security
+See All
+Select a shift (optional)
+Select all
+Select credential type
+Select size
+Select {{name}}
+Send Interview Request
+Send Job Offer
+Send Offer
+Send comment
+Send message
+Send reply
+Sent
+Sentry
+Series end date
+Service
+Session
+Set Custom Status
+Set Goal
+Set Reminder
+Set a custom status message
+Set boundaries on your availability
+Set custom status...
+Set reminder
+Set status
+Settings
+Severity
+Share
+Share & Earn
+Share via Email
+Share with team (public template)
+Share your ideas and make an impact
+Share your listing on community channels
+Share your reason...
+Share your skills with the community
+Shared time credit pool
+Shift Cancelled
+Shift Sign-up
+Show as away
+Show cover message
+Show password
+Similar Jobs
+Similar vacancy found: {{title}} ({{status}})
+Skill Tags
+Skills
+Skills Listed
+Skills Match Correlation
+Skills detected from CV
+Skills to develop:
+Skills will be extracted after submission
+Skills: {{skills}}
+Skip for now
+Slot Duration
+Slot deleted
+Smart Matching
+Smileys
+Social
+Social Prescribing
+Something went wrong loading your notifications
+Something went wrong. Please try again.
+Sort by
+Source Effectiveness
+Source Types
+Spam Detection
+Spam Score: {{score}}
+Start Date
+Start Fresh
+Start Time
+Start Wizard
+Start from Template
+Start from template (optional)
+Start new conversation
+Start participating in your community to see your activity here.
+Status
+Status History
+Stop
+Structured data feed for Google Jobs and other aggregators
+Struggling
+Sub-categories
+Submit
+Submit Application
+Submit Expense
+Submit Request
+Submitted {{date}}
+Subscribe to our job vacancy RSS feed for the latest opportunities
+Suggested For You
+Suggestions
+Super Admin
+Supplies
+Support
+Support your community's time credit pool
+Suppress notifications
+Suspicious Links
+Suspicious Patterns
+System
+System Notification
+Tagline
+Tags
+Take regular breaks between volunteer shifts
+Talent Search
+Target Volunteers
+Target: {{value}}
+Tasks
+Team member added
+Team member removed
+Technical Skills
+Tell others about yourself...
+Tell the organiser why you'd like to volunteer...
+Tell us about your organization. This information will appear on your job listings.
+Template Name
+Template deleted
+Template loaded
+Template name
+Template saved
+Template saved!
+Templates
+Terms of Service
+Thank you for your generosity.
+The AI Assistant feature is not enabled for this community. Contact your timebank administrator to learn more.
+The employer has not added interview slots yet
+The jobs feature is not enabled for this community. Contact your timebank administrator to learn more.
+The page you're looking for doesn't exist or is no longer available.
+The terms governing the Project NEXUS platform infrastructure
+This document governs the relationship between you and Project NEXUS (the platform provider). It is separate from any terms established by {{tenant}} (your community operator).
+This information helps organizations provide appropriate support and accommodations for your volunteer activities. All data is kept confidential.
+This report analyzes process metrics only. No demographic data is collected or used.
+This request is irreversible
+This slot has passed
+Time Credit
+Timebank
+Timebanking
+Tips for More Applicants
+Title
+Title and description are required.
+To
+Today
+Toggle recurring event
+Top Categories
+Top Contributors
+Top Detection Flags
+Total Analyzed
+Total Applications
+Total Claimed
+Total Donors
+Total Matches
+Total Raised
+Total Reviewed
+Total Shares
+Total Views
+Total at Stage
+Tour
+Track the status of your job and volunteer applications.
+Training
+Training Name
+Training Records
+Training Type
+Training record submitted.
+Transaction
+Transaction Complete
+Transactions
+Transactions Given
+Transactions Received
+Transfer Notifications
+Travel
+Trending Hashtags
+Trending Posts
+Try Again
+Try a different search term.
+Try adjusting your search criteria or check back later
+Try asking...
+Type
+Type DELETE to confirm:
+Type a benefit and press Enter
+Type a skill and press Enter...
+URGENT
+URL
+Unable to add member. Please check the email and try again.
+Unable to load
+Unable to load accessibility needs.
+Unable to load alerts.
+Unable to load article
+Unable to load certificates.
+Unable to load community projects.
+Unable to load donations data.
+Unable to load employer profile
+Unable to load expenses. Please try again.
+Unable to load group reservations. Please try again.
+Unable to load recommendations. Please try again.
+Unable to load safeguarding data.
+Unable to load this conversation. It may have been deleted or you may not have access.
+Unable to load this opportunity. Please try again.
+Under Review
+Under the General Data Protection Regulation (GDPR), you have the right to access, export, and request deletion of your personal data. These requests are processed within 30 days.
+Unknown
+Unknown provider
+Unpinned
+Unread
+Untitled
+Upcoming
+Upcoming Events
+Upcoming Shifts
+Updated
+Updated legal documents
+Updated {{time}}
+Updated: {{date}}
+Updates
+Updates about your listings (new responses, etc.)
+Upload Certificate
+Upload profile photo
+Upload your insurance certificates for verification. Accepted formats: PDF, JPG, PNG (max 10MB).
+Uploading...
+Usage limit reached
+Use Saved Profile
+Use template: {{title}}
+User muted
+Verified
+Verify
+Version {{number}}
+Video
+Video Call
+Video must be smaller than {{size}}MB
+View
+View Challenge
+View Event
+View Goals
+View Group
+View Job
+View Listing
+View Opportunity
+View Profile
+View all notifications
+View image {{current}} of {{total}}
+View match details
+View previous versions of this document
+View story from {{name}}
+View {{tenant}}'s legal documents
+Views (Last {{days}} Days)
+Visible to others
+Visual
+Volunteer
+Volunteering
+Vulnerable Adults
+WCAG 2.1 Level AA
+Wants
+Wants to connect with you
+Warning: This action cannot be undone
+Was this article helpful?
+We couldn't load {{feature}}. This section may be temporarily unavailable.
+We will export your data in a structured, commonly used, and machine-readable format (JSON/CSV). This allows you to transfer your data to another service. You will receive an email within 30 days.
+We will prepare a downloadable archive of all your personal data, including your profile, listings, messages, and transaction history. You will receive an email with a download link within 30 days.
+Website
+Weekly
+Weekly Applications
+Weekly Digest
+Welcome
+Welcome Our Newest Members
+Welcome to Job Posting!
+What accommodations would help you participate?
+What makes your company great?
+What skills are community members currently offering?
+What time credits do I have and how can I use them?
+What upcoming events are happening?
+What's on your mind?
+When a giving day is active, you can make donations to support your community.
+When enabled, applicant names and photos are hidden from the reviewer. Only skills, experience, and cover letter content are shown.
+When enabled, employers in your community can find your profile in talent search
+When someone sends you a connection request, it will appear here.
+Where will this take place?
+Who can see your profile
+Why you match
+Withdraw
+Withdraw application for {{title}}
+Withdrawn
+Within {{radius}}km
+Workshop
+Wow
+Write your announcement...
+XP
+XXXX-XXXX
+Yes ({{count}})
+Yesterday
+You are not authorized to view this pipeline.
+You are not part of any group shift reservations yet. Group sign-ups let you volunteer together with friends or team members.
+You do not have enough credits
+You don't have any emergency shift requests at the moment.
+You have a new message
+You have an interview scheduled
+You have applied
+You have not submitted any expense claims. Click Submit Expense to get started.
+You have reached your usage limit for now. Please try again later.
+You have received an offer!
+You have unsaved changes. Are you sure you want to leave?
+You have:
+You haven't applied to any positions yet.
+You posted this vacancy
+You received an offer!
+You've already applied
+Your Interview
+Your Matches
+Your Organization
+Your Skills
+Your Story
+Your activity overview — hours, skills, connections, and recent actions.
+Your balance: {{balance}} hours
+Your community participation at a glance.
+Your first name
+Your job has been posted!
+Your job has been submitted for review.
+Your last name
+Your opportunity
+Your organisation name
+Your profile is no longer searchable
+Your profile is now searchable
+Your session has expired. Please log in again.
+and
+bank transfer
+by {{name}}
+card
+days
+document
+e.g. "developer | engineer", "react -junior"
+e.g. +1 555 123 4567
+e.g. Acme Corp
+e.g. Community Garden Co-op
+e.g. Environment, Education
+e.g. London, New York
+e.g. Office, 123 Main St
+e.g. Senior Developer Role
+e.g. gardening, teaching, admin
+e.g. https://zoom.us/j/123456
+e.g. remote, health, pension
+h
+hOUR Timebank — 2023
+hour
+hours
+hours available
+https://...
+https://example.com
+https://example.com/image.jpg
+km
+member@example.com
+members looking to learn or receive help with this skill
+members willing to share this skill with others
+min
+offering
+open roles
+other
+others
+paypal
+reaction
+reactions
+requesting
+skilled members
+unread
+vote
+votes
+vs. previous week
+{{community}}
+{{count}} / {{max}} characters
+{{count}} Verified Hours
+{{count}} applicant(s) — scroll down to review
+{{count}} articles
+{{count}} attending
+{{count}} candidate(s) found
+{{count}} days ago
+{{count}} documents have been updated. Please review and accept them to continue.
+{{count}} donors
+{{count}} endorsement
+{{count}} endorsements
+{{count}} idea
+{{count}} ideas
+{{count}} left today
+{{count}} members
+{{count}} more images
+{{count}} needed
+{{count}} participant
+{{count}} participants
+{{count}} pending
+{{count}} post
+{{count}} result for “{{query}}”
+{{count}} results for “{{query}}”
+{{count}} selected
+{{count}} sub-article
+{{count}} sub-articles
+{{count}} unique
+{{count}} view
+{{count}} views
+{{count}} vote
+{{count}} votes
+{{count}} weeks ago
+{{count}}% match
+{{count}}d ago
+{{count}}d left
+{{count}}h ago
+{{count}}m
+{{count}}m ago
+{{current}} of {{total}}
+{{current}}/80 characters
+{{current}}/{{max}}
+{{current}}/{{max}} images
+{{days}}d
+{{km}} km
+{{label}} (click to remove)
+{{min}} - {{max}}
+{{min}} – {{max}}
+{{name}} — Messages
+{{rate}}% rate
+{{score}}% match
+{{sign}}{{amount}} time credits
+{{size}} employees
+{{type}} image by {{name}}
+{{xp}} XP total

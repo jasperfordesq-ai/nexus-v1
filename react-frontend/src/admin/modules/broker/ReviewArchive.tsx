@@ -20,8 +20,10 @@ import { adminBroker } from '../../api/adminApi';
 import { DataTable, PageHeader, type Column } from '../../components';
 import type { BrokerArchive } from '../../api/types';
 
+import { useTranslation } from 'react-i18next';
 export function ReviewArchive() {
-  usePageTitle('Admin - Review Archive');
+  const { t } = useTranslation('admin');
+  usePageTitle(t('broker.page_title'));
   const { tenantPath } = useTenant();
   const toast = useToast();
 
@@ -46,7 +48,7 @@ export function ReviewArchive() {
         setTotal(Number(meta?.total ?? meta?.total_items ?? res.data.length));
       }
     } catch {
-      toast.error('Failed to load archives');
+      toast.error(t('broker.failed_to_load_archives'));
     } finally {
       setLoading(false);
     }
@@ -148,8 +150,8 @@ export function ReviewArchive() {
   return (
     <div>
       <PageHeader
-        title="Review Archive"
-        description="Compliance archive of reviewed broker message copies"
+        title={t('broker.review_archive_title')}
+        description={t('broker.review_archive_desc')}
         actions={
           <Button
             as={Link}
@@ -177,8 +179,8 @@ export function ReviewArchive() {
 
         <Input
           className="w-full sm:max-w-xs"
-          placeholder="Search sender or receiver..."
-          aria-label="Search review archive"
+          placeholder={t('broker.placeholder_search_sender_or_receiver')}
+          aria-label={t('broker.label_search_review_archive')}
           startContent={<Search size={16} className="text-default-400" />}
           value={search}
           onValueChange={handleSearchChange}

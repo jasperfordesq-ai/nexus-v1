@@ -16,8 +16,10 @@ import { useToast } from '@/contexts';
 import { PageHeader } from '../../components';
 import { adminSettings } from '../../api/adminApi';
 
+import { useTranslation } from 'react-i18next';
 export function NativeApp() {
-  usePageTitle('Admin - Native App');
+  const { t } = useTranslation('admin');
+  usePageTitle(t('system.page_title'));
   const toast = useToast();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -40,7 +42,7 @@ export function NativeApp() {
           setFormData(prev => ({ ...prev, ...res.data }));
         }
       })
-      .catch(() => toast.error('Failed to load native app settings'))
+      .catch(() => toast.error(t('system.failed_to_load_native_app_settings')))
       .finally(() => setLoading(false));
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -49,9 +51,9 @@ export function NativeApp() {
     setSaving(true);
     try {
       await adminSettings.updateNativeAppSettings(formData);
-      toast.success('Native app settings saved successfully');
+      toast.success(t('system.native_app_settings_saved_successfully'));
     } catch {
-      toast.error('Failed to save native app settings');
+      toast.error(t('system.failed_to_save_native_app_settings'));
     } finally {
       setSaving(false);
     }
@@ -71,14 +73,14 @@ export function NativeApp() {
 
   return (
     <div>
-      <PageHeader title="Native App" description="Mobile app configuration and build settings" />
+      <PageHeader title={t('system.native_app_title')} description={t('system.native_app_desc')} />
 
       <div className="space-y-4">
         <Card shadow="sm">
           <CardHeader><h3 className="text-lg font-semibold flex items-center gap-2"><Smartphone size={20} /> App Configuration</h3></CardHeader>
           <CardBody className="gap-4">
             <Input
-              label="App Name"
+              label={t('system.label_app_name')}
               variant="bordered"
               value={String(formData.app_name || '')}
               onValueChange={(v) => updateField('app_name', v)}
@@ -96,7 +98,7 @@ export function NativeApp() {
               onValueChange={(v) => updateField('package_name', v)}
             />
             <Input
-              label="App Version"
+              label={t('system.label_app_version')}
               variant="bordered"
               value={String(formData.app_version || '')}
               onValueChange={(v) => updateField('app_version', v)}
@@ -112,23 +114,23 @@ export function NativeApp() {
                 <p className="font-medium">Enable Push Notifications</p>
                 <p className="text-sm text-default-500">Send push notifications to mobile app users</p>
               </div>
-              <Switch isSelected={!!formData.push_enabled} onValueChange={(v) => updateField('push_enabled', v)} aria-label="Push notifications" />
+              <Switch isSelected={!!formData.push_enabled} onValueChange={(v) => updateField('push_enabled', v)} aria-label={t('system.label_push_notifications')} />
             </div>
             <Input
-              label="FCM Server Key"
+              label={t('system.label_f_c_m_server_key')}
               type="password"
-              placeholder="AIza..."
+              placeholder={t('system.placeholder_a_iza')}
               variant="bordered"
-              description="Firebase Cloud Messaging server key"
+              description={t('system.desc_firebase_cloud_messaging_server_key')}
               value={String(formData.fcm_server_key || '')}
               onValueChange={(v) => updateField('fcm_server_key', v)}
             />
             <Input
-              label="APNS Key ID"
+              label={t('system.label_a_p_n_s_key_i_d')}
               type="password"
               placeholder="..."
               variant="bordered"
-              description="Apple Push Notification service key"
+              description={t('system.desc_apple_push_notification_service_key')}
               value={String(formData.apns_key_id || '')}
               onValueChange={(v) => updateField('apns_key_id', v)}
             />
@@ -143,14 +145,14 @@ export function NativeApp() {
                 <p className="font-medium">Service Worker Enabled</p>
                 <p className="text-sm text-default-500">Enable offline support and caching</p>
               </div>
-              <Switch isSelected={!!formData.service_worker_enabled} onValueChange={(v) => updateField('service_worker_enabled', v)} aria-label="Service worker" />
+              <Switch isSelected={!!formData.service_worker_enabled} onValueChange={(v) => updateField('service_worker_enabled', v)} aria-label={t('system.label_service_worker')} />
             </div>
             <div className="flex items-center justify-between">
               <div>
                 <p className="font-medium">Install Prompt</p>
                 <p className="text-sm text-default-500">Show "Add to Home Screen" prompt</p>
               </div>
-              <Switch isSelected={!!formData.install_prompt_enabled} onValueChange={(v) => updateField('install_prompt_enabled', v)} aria-label="Install prompt" />
+              <Switch isSelected={!!formData.install_prompt_enabled} onValueChange={(v) => updateField('install_prompt_enabled', v)} aria-label={t('system.label_install_prompt')} />
             </div>
           </CardBody>
         </Card>

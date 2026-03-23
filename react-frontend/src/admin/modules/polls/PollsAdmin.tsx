@@ -16,6 +16,7 @@ import { useToast } from '@/contexts';
 import { api } from '@/lib/api';
 import { DataTable, PageHeader, ConfirmModal, type Column } from '../../components';
 
+import { useTranslation } from 'react-i18next';
 // ─────────────────────────────────────────────────────────────────────────────
 // Types
 // ─────────────────────────────────────────────────────────────────────────────
@@ -47,7 +48,8 @@ const statusColors: Record<string, 'success' | 'default'> = {
 // ─────────────────────────────────────────────────────────────────────────────
 
 export function PollsAdmin() {
-  usePageTitle('Admin - Polls');
+  const { t } = useTranslation('admin');
+  usePageTitle(t('polls.page_title'));
   const toast = useToast();
 
   const [items, setItems] = useState<Poll[]>([]);
@@ -77,7 +79,7 @@ export function PollsAdmin() {
         setTotal(payload.meta?.total || 0);
       }
     } catch {
-      toast.error('Failed to load polls');
+      toast.error(t('polls.failed_to_load_polls'));
     } finally {
       setLoading(false);
     }
@@ -95,13 +97,13 @@ export function PollsAdmin() {
     try {
       const res = await api.delete(`/v2/admin/polls/${confirmDelete.id}`);
       if (res?.success) {
-        toast.success('Poll deleted successfully');
+        toast.success(t('polls.poll_deleted_successfully'));
         loadItems();
       } else {
         toast.error(res?.error || 'Failed to delete poll');
       }
     } catch {
-      toast.error('An unexpected error occurred');
+      toast.error(t('polls.an_unexpected_error_occurred'));
     } finally {
       setActionLoading(false);
       setConfirmDelete(null);
@@ -183,7 +185,7 @@ export function PollsAdmin() {
             variant="flat"
             color="primary"
             onPress={() => setDetailPoll(item)}
-            aria-label="View poll details"
+            aria-label={t('polls.label_view_poll_details')}
           >
             <Eye size={14} />
           </Button>
@@ -193,7 +195,7 @@ export function PollsAdmin() {
             variant="flat"
             color="danger"
             onPress={() => setConfirmDelete(item)}
-            aria-label="Delete poll"
+            aria-label={t('polls.label_delete_poll')}
           >
             <Trash2 size={14} />
           </Button>
@@ -207,8 +209,8 @@ export function PollsAdmin() {
   return (
     <div>
       <PageHeader
-        title="Polls"
-        description="View and manage community polls"
+        title={t('polls.polls_admin_title')}
+        description={t('polls.polls_admin_desc')}
         actions={
           <Chip variant="flat" startContent={<BarChart3 size={14} />}>
             {total} total

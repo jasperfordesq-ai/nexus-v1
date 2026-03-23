@@ -37,7 +37,7 @@
       "claim_failed": "Abholen fehlgeschlagen",
       "claim_failed_desc": "Tägliche Belohnung konnte nicht abgeholt werden.",
       "claim_error": "Etwas ist schiefgelaufen. Bitte versuchen Sie es erneut.",
-      "loading": "Loading daily reward"
+      "loading": "Tägliche Belohnung wird geladen"
     },
     "challenges": {
       "active_challenges": "Aktive Herausforderungen",
@@ -95,7 +95,7 @@
       "save_failed_desc": "Die Vitrine konnte nicht aktualisiert werden.",
       "save_error": "Etwas ist schiefgelaufen."
     },
-    "loading": "Loading achievements"
+    "loading": "Errungenschaften werden geladen"
   },
   "goals": {
     "page_title": "Ziele",
@@ -179,7 +179,7 @@
       "buddy_joined": "Sie sind jetzt ein Begleiter!",
       "buddy_failed": "Begleiter werden fehlgeschlagen"
     },
-    "loading": "Loading goals"
+    "loading": "Ziele werden geladen"
   },
   "leaderboard": {
     "page_title": "Rangliste",
@@ -220,8 +220,8 @@
       "active": "Aktiv",
       "load_failed": "Laden fehlgeschlagen",
       "load_failed_desc": "Saisonverlauf konnte nicht geladen werden.",
-      "loading": "Loading season"
+      "loading": "Saison wird geladen"
     },
-    "loading": "Loading leaderboard"
+    "loading": "Rangliste wird geladen"
   }
 }

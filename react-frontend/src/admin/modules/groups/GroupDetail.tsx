@@ -28,8 +28,10 @@ import type { AdminGroup, GroupMember as GroupMemberType } from '@/admin/api/typ
 interface AdminGroupDetail extends AdminGroup {  stats?: { total_exchanges: number; total_hours: number; active_members: number; posts_count: number; events_count: number; activity_score: number };  latitude?: number;  longitude?: number;}
 import type { GroupMember } from '@/admin/api/types';
 
+import { useTranslation } from 'react-i18next';
 export default function GroupDetail() {
-  usePageTitle('Group Detail');
+  const { t } = useTranslation('admin');
+  usePageTitle(t('groups.page_title'));
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { success, error } = useToast();
@@ -136,7 +138,7 @@ export default function GroupDetail() {
   return (
     <div className="p-6 space-y-6">
       <div className="flex items-center gap-4">
-        <Button isIconOnly variant="light" aria-label="Go back" onPress={() => navigate(-1)}>
+        <Button isIconOnly variant="light" aria-label={t('groups.label_go_back')} onPress={() => navigate(-1)}>
           <ArrowLeft className="w-5 h-5" />
         </Button>
         <div className="flex-1">
@@ -198,9 +200,9 @@ export default function GroupDetail() {
           <Card className="p-6 mt-4 space-y-4">
             {editMode ? (
               <>
-                <Input label="Name" value={formData.name} onValueChange={(v) => setFormData({ ...formData, name: v })} />
-                <Textarea label="Description" value={formData.description} onValueChange={(v) => setFormData({ ...formData, description: v })} />
-                <Input label="Location" value={formData.location} onValueChange={(v) => setFormData({ ...formData, location: v })} />
+                <Input label={t('groups.label_name')} value={formData.name} onValueChange={(v) => setFormData({ ...formData, name: v })} />
+                <Textarea label={t('groups.label_description')} value={formData.description} onValueChange={(v) => setFormData({ ...formData, description: v })} />
+                <Input label={t('groups.label_location')} value={formData.location} onValueChange={(v) => setFormData({ ...formData, location: v })} />
               </>
             ) : (
               <>
@@ -223,7 +225,7 @@ export default function GroupDetail() {
 
         <Tab key="members" title="Members">
           <Card className="p-4 mt-4">
-            <Table aria-label="Members table">
+            <Table aria-label={t('groups.label_members_table')}>
               <TableHeader>
                 <TableColumn>USER</TableColumn>
                 <TableColumn>ROLE</TableColumn>

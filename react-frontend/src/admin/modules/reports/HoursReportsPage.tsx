@@ -68,6 +68,7 @@ import { api } from '@/lib/api';
 import { CHART_COLORS, CHART_COLOR_MAP } from '@/lib/chartColors';
 import { StatCard, PageHeader } from '../../components';
 
+import { useTranslation } from 'react-i18next';
 // ---------------------------------------------------------------------------
 // Types
 // ---------------------------------------------------------------------------
@@ -158,7 +159,8 @@ async function exportCsv(exportType: string, dateFrom?: string, dateTo?: string)
 // ---------------------------------------------------------------------------
 
 export function HoursReportsPage() {
-  usePageTitle('Hours Reports');
+  const { t } = useTranslation('admin');
+  usePageTitle(t('reports.page_title'));
   const toast = useToast();
 
   const [groupBy, setGroupBy] = useState('category');
@@ -182,7 +184,7 @@ export function HoursReportsPage() {
         setSummary(res.data as HoursSummary);
       }
     } catch {
-      toast.error('Failed to load summary data');
+      toast.error(t('reports.failed_to_load_summary_data'));
     }
   }, [dateFrom, dateTo, toast]);
 
@@ -198,7 +200,7 @@ export function HoursReportsPage() {
         setData(res.data);
       }
     } catch {
-      toast.error('Failed to load report data');
+      toast.error(t('reports.failed_to_load_report_data'));
     } finally {
       setLoading(false);
     }
@@ -223,28 +225,28 @@ export function HoursReportsPage() {
   const renderSummary = () => (
     <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4 mb-6">
       <StatCard
-        label="Total Hours"
+        label={t('reports.label_total_hours')}
         value={summary ? (summary.total_hours ?? 0).toFixed(1) : '\u2014'}
         icon={Clock}
         color="warning"
         loading={!summary}
       />
       <StatCard
-        label="Total Transactions"
+        label={t('reports.label_total_transactions')}
         value={summary?.total_transactions ?? '\u2014'}
         icon={ArrowLeftRight}
         color="primary"
         loading={!summary}
       />
       <StatCard
-        label="Unique Givers"
+        label={t('reports.label_unique_givers')}
         value={summary?.unique_givers ?? '\u2014'}
         icon={Users}
         color="success"
         loading={!summary}
       />
       <StatCard
-        label="Avg Hours / Transaction"
+        label={t('reports.label_avg_hours_transaction')}
         value={summary ? (summary.avg_hours_per_transaction ?? 0).toFixed(1) : '\u2014'}
         icon={Activity}
         color="secondary"
@@ -357,8 +359,8 @@ export function HoursReportsPage() {
               if (v) setSortBy(String(v));
             }}
             className="w-40"
-            aria-label="Sort by"
-            label="Sort by"
+            aria-label={t('reports.label_sort_by')}
+            label={t('reports.label_sort_by')}
           >
             {SORT_OPTIONS.map((opt) => (
               <SelectItem key={opt.key}>{opt.label}</SelectItem>
@@ -366,7 +368,7 @@ export function HoursReportsPage() {
           </Select>
         </div>
 
-        <Table aria-label="Hours by member" shadow="sm">
+        <Table aria-label={t('reports.label_hours_by_member')} shadow="sm">
           <TableHeader>
             <TableColumn>Member</TableColumn>
             <TableColumn>Hours Given</TableColumn>
@@ -476,8 +478,8 @@ export function HoursReportsPage() {
   return (
     <div>
       <PageHeader
-        title="Hours Reports"
-        description="Analysis of hours exchanged by category, member, and time period"
+        title={t('reports.hours_reports_page_title')}
+        description={t('reports.hours_reports_page_desc')}
         actions={
           <div className="flex items-center gap-2 flex-wrap">
             <Input
@@ -485,7 +487,7 @@ export function HoursReportsPage() {
               size="sm"
               value={dateFrom}
               onValueChange={setDateFrom}
-              aria-label="From date"
+              aria-label={t('reports.label_from_date')}
               className="w-36"
               variant="bordered"
             />
@@ -494,7 +496,7 @@ export function HoursReportsPage() {
               size="sm"
               value={dateTo}
               onValueChange={setDateTo}
-              aria-label="To date"
+              aria-label={t('reports.label_to_date')}
               className="w-36"
               variant="bordered"
             />
@@ -502,7 +504,7 @@ export function HoursReportsPage() {
               variant="flat"
               startContent={<Download size={16} />}
               onPress={async () => {
-                try { await exportCsv(groupBy, dateFrom, dateTo); } catch { toast.error('Failed to export CSV'); }
+                try { await exportCsv(groupBy, dateFrom, dateTo); } catch { toast.error(t('reports.failed_to_export_c_s_v')); }
               }}
               size="sm"
             >

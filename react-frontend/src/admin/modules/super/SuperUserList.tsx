@@ -16,8 +16,10 @@ import { adminSuper } from '../../api/adminApi';
 import { DataTable, PageHeader, StatusBadge, ConfirmModal, type Column } from '../../components';
 import type { SuperAdminUser } from '../../api/types';
 
+import { useTranslation } from 'react-i18next';
 export function SuperUserList() {
-  usePageTitle('Super Admin - Users');
+  const { t } = useTranslation('admin');
+  usePageTitle(t('super.page_title'));
   const { tenantPath } = useTenant();
   const toast = useToast();
   const navigate = useNavigate();
@@ -85,7 +87,7 @@ export function SuperUserList() {
       case 'revoke-global': res = await adminSuper.revokeGlobalSuperAdmin(user.id); break;
     }
     if (res?.success) {
-      toast.success('User updated successfully');
+      toast.success(t('super.user_updated_successfully'));
       loadUsers();
     } else {
       toast.error(res?.error || 'Action failed');
@@ -161,8 +163,8 @@ export function SuperUserList() {
       key: 'actions', label: 'Actions',
       render: (user) => (
         <Dropdown>
-          <DropdownTrigger><Button isIconOnly size="sm" variant="light" aria-label="User actions"><MoreVertical size={16} /></Button></DropdownTrigger>
-          <DropdownMenu aria-label="User actions" onAction={(key) => {
+          <DropdownTrigger><Button isIconOnly size="sm" variant="light" aria-label={t('super.label_user_actions')}><MoreVertical size={16} /></Button></DropdownTrigger>
+          <DropdownMenu aria-label={t('super.label_user_actions')} onAction={(key) => {
             if (key === 'view') navigate(tenantPath(`/admin/super/users/${user.id}`));
             else if (key === 'edit') navigate(tenantPath(`/admin/super/users/${user.id}/edit`));
             else if (key === 'grant-sa') setConfirmAction({ type: 'grant-sa', user });
@@ -201,8 +203,8 @@ export function SuperUserList() {
         <span className="text-foreground">Users</span>
       </nav>
       <PageHeader
-        title="Cross-Tenant Users"
-        description="Manage users across all tenants"
+        title={t('super.super_user_list_title')}
+        description={t('super.super_user_list_desc')}
         actions={
           <Button color="primary" startContent={<Plus size={16} />}
             onPress={() => navigate(tenantPath('/admin/super/users/create'))}>
@@ -212,7 +214,7 @@ export function SuperUserList() {
       />
       <div className="mb-4 flex flex-wrap items-end gap-4">
         <Select
-          label="Filter by Tenant"
+          label={t('super.label_filter_by_tenant')}
           size="sm"
           className="max-w-xs"
           selectedKeys={tenantFilter ? [String(tenantFilter)] : []}
@@ -225,7 +227,7 @@ export function SuperUserList() {
           {tenants.map((t) => <SelectItem key={String(t.id)}>{t.name}</SelectItem>)}
         </Select>
         <Select
-          label="Filter by Role"
+          label={t('super.label_filter_by_role')}
           size="sm"
           className="max-w-xs"
           selectedKeys={roleFilter ? [roleFilter] : []}

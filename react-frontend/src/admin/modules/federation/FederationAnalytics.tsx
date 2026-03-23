@@ -15,6 +15,7 @@ import { usePageTitle } from '@/hooks';
 import { adminFederation } from '../../api/adminApi';
 import { PageHeader, StatCard } from '../../components';
 
+import { useTranslation } from 'react-i18next';
 interface FedAnalytics {
   total_partnerships: number;
   active_partnerships: number;
@@ -24,7 +25,8 @@ interface FedAnalytics {
 }
 
 export function FederationAnalytics() {
-  usePageTitle('Admin - Federation Analytics');
+  const { t } = useTranslation('admin');
+  usePageTitle(t('federation.page_title'));
   const [data, setData] = useState<FedAnalytics | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -51,15 +53,15 @@ export function FederationAnalytics() {
   return (
     <div>
       <PageHeader
-        title="Federation Analytics"
-        description="Cross-community activity and partnership metrics"
+        title={t('federation.federation_analytics_title')}
+        description={t('federation.federation_analytics_desc')}
         actions={<Button variant="flat" startContent={<RefreshCw size={16} />} onPress={loadData} isLoading={loading}>Refresh</Button>}
       />
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-5 mb-6">
-        <StatCard label="Total Partnerships" value={data?.total_partnerships ?? 0} icon={Handshake} color="primary" loading={loading} />
-        <StatCard label="Active" value={data?.active_partnerships ?? 0} icon={Handshake} color="success" loading={loading} />
-        <StatCard label="Pending Requests" value={data?.pending_requests ?? 0} icon={Clock} color="warning" loading={loading} />
+        <StatCard label={t('federation.label_total_partnerships')} value={data?.total_partnerships ?? 0} icon={Handshake} color="primary" loading={loading} />
+        <StatCard label={t('federation.label_active')} value={data?.active_partnerships ?? 0} icon={Handshake} color="success" loading={loading} />
+        <StatCard label={t('federation.label_pending_requests')} value={data?.pending_requests ?? 0} icon={Clock} color="warning" loading={loading} />
         <StatCard label="Cross-Transactions" value={data?.cross_community_transactions ?? 0} icon={ArrowRightLeft} color="secondary" loading={loading} />
         <StatCard label="Cross-Messages" value={data?.cross_community_messages ?? 0} icon={MessageSquare} color="primary" loading={loading} />
       </div>

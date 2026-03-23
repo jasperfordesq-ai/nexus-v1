@@ -17,6 +17,7 @@ import { useToast } from '@/contexts';
 import { adminPlans } from '../../api/adminApi';
 import { PageHeader, DataTable, StatusBadge, EmptyState, type Column } from '../../components';
 
+import { useTranslation } from 'react-i18next';
 interface SubscriptionItem {
   id: number;
   tenant_name: string;
@@ -29,7 +30,8 @@ interface SubscriptionItem {
 }
 
 export function Subscriptions() {
-  usePageTitle('Admin - Subscriptions');
+  const { t } = useTranslation('admin');
+  usePageTitle(t('content.page_title'));
   const toast = useToast();
 
   const [data, setData] = useState<SubscriptionItem[]>([]);
@@ -49,7 +51,7 @@ export function Subscriptions() {
         }
       }
     } catch {
-      toast.error('Failed to load subscriptions');
+      toast.error(t('content.failed_to_load_subscriptions'));
     } finally {
       setLoading(false);
     }
@@ -119,7 +121,7 @@ export function Subscriptions() {
   if (loading) {
     return (
       <div>
-        <PageHeader title="Subscriptions" description="View and manage active subscriptions" />
+        <PageHeader title={t('content.subscriptions_title')} description={t('content.subscriptions_desc')} />
         <div className="flex justify-center py-12"><Spinner size="lg" /></div>
       </div>
     );
@@ -127,13 +129,13 @@ export function Subscriptions() {
 
   return (
     <div>
-      <PageHeader title="Subscriptions" description="View and manage active subscriptions" />
+      <PageHeader title={t('content.subscriptions_title')} description={t('content.subscriptions_desc')} />
 
       {data.length === 0 ? (
         <EmptyState
           icon={CreditCard}
           title="No Active Subscriptions"
-          description="Subscriptions will appear here once members sign up for plans. Create plans first from the Plans section."
+          description={t('content.desc_subscriptions_will_appear_here_once_memb')}
         />
       ) : (
         <DataTable

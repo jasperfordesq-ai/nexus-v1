@@ -16,6 +16,7 @@ import { useToast } from '@/contexts';
 import { PageHeader } from '../../components';
 import { adminTools } from '../../api/adminApi';
 
+import { useTranslation } from 'react-i18next';
 interface WebpStats {
   total_images: number;
   webp_images: number;
@@ -23,7 +24,8 @@ interface WebpStats {
 }
 
 export function WebpConverter() {
-  usePageTitle('Admin - WebP Converter');
+  const { t } = useTranslation('admin');
+  usePageTitle(t('system.page_title'));
   const toast = useToast();
 
   const [stats, setStats] = useState<WebpStats | null>(null);
@@ -36,7 +38,7 @@ export function WebpConverter() {
       const res = await adminTools.getWebpStats();
       setStats(res.data ?? null);
     } catch {
-      toast.error('Failed to load WebP stats');
+      toast.error(t('system.failed_to_load_web_p_stats'));
     } finally {
       setLoading(false);
     }
@@ -62,8 +64,8 @@ export function WebpConverter() {
   return (
     <div>
       <PageHeader
-        title="WebP Converter"
-        description="Convert platform images to WebP format for faster loading"
+        title={t('system.webp_converter_title')}
+        description={t('system.webp_converter_desc')}
         actions={
           <Button
             color="primary"

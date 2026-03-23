@@ -35,6 +35,7 @@ import { adminMatching } from '../../api/adminApi';
 import { PageHeader, ConfirmModal } from '../../components';
 import type { SmartMatchingConfig } from '../../api/types';
 
+import { useTranslation } from 'react-i18next';
 /** Proximity band label mapping */
 const BAND_LABELS = ['Walking', 'Local', 'City', 'Regional', 'Max'];
 
@@ -61,7 +62,8 @@ const DEFAULT_CONFIG: SmartMatchingConfig = {
 };
 
 export function MatchingConfig() {
-  usePageTitle('Admin - Matching Configuration');
+  const { t } = useTranslation('admin');
+  usePageTitle(t('matching.page_title'));
   const { tenantPath } = useTenant();
   const toast = useToast();
   const navigate = useNavigate();
@@ -83,7 +85,7 @@ export function MatchingConfig() {
         setDirty(false);
       }
     } catch {
-      toast.error('Failed to load matching configuration');
+      toast.error(t('matching.failed_to_load_matching_configuration'));
     } finally {
       setLoading(false);
     }
@@ -141,13 +143,13 @@ export function MatchingConfig() {
     try {
       const res = await adminMatching.updateConfig(config);
       if (res.success) {
-        toast.success('Matching configuration saved successfully');
+        toast.success(t('matching.matching_configuration_saved_successfull'));
         setDirty(false);
       } else {
-        toast.error('Failed to save configuration');
+        toast.error(t('matching.failed_to_save_configuration'));
       }
     } catch {
-      toast.error('Failed to save configuration');
+      toast.error(t('matching.failed_to_save_configuration'));
     } finally {
       setSaving(false);
     }
@@ -163,10 +165,10 @@ export function MatchingConfig() {
         toast.success(`Match cache cleared (${cleared} entries removed)`);
         setClearModalOpen(false);
       } else {
-        toast.error('Failed to clear cache');
+        toast.error(t('matching.failed_to_clear_cache'));
       }
     } catch {
-      toast.error('Failed to clear cache');
+      toast.error(t('matching.failed_to_clear_cache'));
     } finally {
       setClearing(false);
     }
@@ -177,15 +179,15 @@ export function MatchingConfig() {
     setConfig(DEFAULT_CONFIG);
     setDirty(true);
     setResetModalOpen(false);
-    toast.info('Configuration reset to defaults (save to apply)');
+    toast.info(t('matching.configuration_reset_to_defaults_save_to'));
   }, [toast]);
 
   if (loading) {
     return (
       <div>
         <PageHeader
-          title="Matching Configuration"
-          description="Configure the smart matching algorithm"
+          title={t('matching.matching_config_title')}
+          description={t('matching.matching_config_desc')}
         />
         <div className="flex h-64 items-center justify-center">
           <Spinner size="lg" />
@@ -197,8 +199,8 @@ export function MatchingConfig() {
   return (
     <div>
       <PageHeader
-        title="Matching Configuration"
-        description="Configure the smart matching algorithm weights and proximity bands"
+        title={t('matching.matching_config_title')}
+        description={t('matching.matching_config_desc')}
         actions={
           <div className="flex items-center gap-2">
             <Button
@@ -244,7 +246,7 @@ export function MatchingConfig() {
                     setConfig((prev) => ({ ...prev, enabled: val }));
                     setDirty(true);
                   }}
-                  aria-label="Toggle smart matching"
+                  aria-label={t('matching.label_toggle_smart_matching')}
                 />
               </div>
               <Divider />
@@ -261,7 +263,7 @@ export function MatchingConfig() {
                     setConfig((prev) => ({ ...prev, broker_approval_enabled: val }));
                     setDirty(true);
                   }}
-                  aria-label="Toggle broker approval"
+                  aria-label={t('matching.label_toggle_broker_approval')}
                 />
               </div>
               <Divider />
@@ -279,7 +281,7 @@ export function MatchingConfig() {
                 />
                 <Input
                   type="number"
-                  label="Min Match Score"
+                  label={t('matching.label_min_match_score')}
                   value={String(config.min_match_score ?? 40)}
                   onValueChange={(val) => {
                     setConfig((prev) => ({ ...prev, min_match_score: parseInt(val) || 40 }));
@@ -290,7 +292,7 @@ export function MatchingConfig() {
                 />
                 <Input
                   type="number"
-                  label="Hot Match Threshold"
+                  label={t('matching.label_hot_match_threshold')}
                   value={String(config.hot_match_threshold ?? 80)}
                   onValueChange={(val) => {
                     setConfig((prev) => ({ ...prev, hot_match_threshold: parseInt(val) || 80 }));
@@ -321,43 +323,43 @@ export function MatchingConfig() {
             <div className="space-y-6">
               {/* Category Weight */}
               <WeightSlider
-                label="Category Weight"
-                description="Weight for category match alignment"
+                label={t('matching.label_category_weight')}
+                description={t('matching.desc_weight_for_category_match_alignment')}
                 value={config.category_weight}
                 onChange={(v) => updateWeight('category_weight', v)}
               />
               {/* Skill Weight */}
               <WeightSlider
-                label="Skill Weight"
-                description="Weight for skill complementarity"
+                label={t('matching.label_skill_weight')}
+                description={t('matching.desc_weight_for_skill_complementarity')}
                 value={config.skill_weight}
                 onChange={(v) => updateWeight('skill_weight', v)}
               />
               {/* Proximity Weight */}
               <WeightSlider
-                label="Proximity Weight"
-                description="Weight for geographic proximity"
+                label={t('matching.label_proximity_weight')}
+                description={t('matching.desc_weight_for_geographic_proximity')}
                 value={config.proximity_weight}
                 onChange={(v) => updateWeight('proximity_weight', v)}
               />
               {/* Freshness Weight */}
               <WeightSlider
-                label="Freshness Weight"
-                description="Weight for listing recency"
+                label={t('matching.label_freshness_weight')}
+                description={t('matching.desc_weight_for_listing_recency')}
                 value={config.freshness_weight}
                 onChange={(v) => updateWeight('freshness_weight', v)}
               />
               {/* Reciprocity Weight */}
               <WeightSlider
-                label="Reciprocity Weight"
-                description="Weight for mutual exchange potential"
+                label={t('matching.label_reciprocity_weight')}
+                description={t('matching.desc_weight_for_mutual_exchange_potential')}
                 value={config.reciprocity_weight}
                 onChange={(v) => updateWeight('reciprocity_weight', v)}
               />
               {/* Quality Weight */}
               <WeightSlider
-                label="Quality Weight"
-                description="Weight for profile completeness and ratings"
+                label={t('matching.label_quality_weight')}
+                description={t('matching.desc_weight_for_profile_completeness_and_rati')}
                 value={config.quality_weight}
                 onChange={(v) => updateWeight('quality_weight', v)}
               />
@@ -376,7 +378,7 @@ export function MatchingConfig() {
               Closer distances receive higher scores.
             </p>
             <Table
-              aria-label="Proximity bands configuration"
+              aria-label={t('matching.label_proximity_bands_configuration')}
               removeWrapper
               isCompact
             >

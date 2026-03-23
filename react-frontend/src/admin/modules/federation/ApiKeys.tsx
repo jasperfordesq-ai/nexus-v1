@@ -17,6 +17,7 @@ import { useTenant } from '@/contexts';
 import { adminFederation } from '../../api/adminApi';
 import { DataTable, PageHeader, EmptyState, type Column } from '../../components';
 
+import { useTranslation } from 'react-i18next';
 interface ApiKey {
   id: number;
   name: string;
@@ -29,7 +30,8 @@ interface ApiKey {
 }
 
 export function ApiKeys() {
-  usePageTitle('Admin - Federation API Keys');
+  const { t } = useTranslation('admin');
+  usePageTitle(t('federation.page_title'));
   const navigate = useNavigate();
   const { tenantPath } = useTenant();
   const [items, setItems] = useState<ApiKey[]>([]);
@@ -85,11 +87,11 @@ export function ApiKeys() {
     return (
       <div>
         <PageHeader
-          title="API Keys"
-          description="Federation integration API keys"
+          title={t('federation.api_keys_title')}
+          description={t('federation.api_keys_desc')}
           actions={<Button color="primary" startContent={<Plus size={16} />} onPress={() => navigate(tenantPath('/admin/federation/api-keys/create'))}>Create Key</Button>}
         />
-        <EmptyState icon={Key} title="No API Keys" description="Create an API key to enable federation integrations." actionLabel="Create API Key" onAction={() => navigate(tenantPath('/admin/federation/api-keys/create'))} />
+        <EmptyState icon={Key} title="No API Keys" description={t('federation.desc_create_an_a_p_i_key_to_enable_federation_i')} actionLabel="Create API Key" onAction={() => navigate(tenantPath('/admin/federation/api-keys/create'))} />
       </div>
     );
   }
@@ -97,8 +99,8 @@ export function ApiKeys() {
   return (
     <div>
       <PageHeader
-        title="API Keys"
-        description="Federation integration API keys"
+        title={t('federation.api_keys_title')}
+        description={t('federation.api_keys_desc')}
         actions={
           <div className="flex gap-2">
             <Button variant="flat" startContent={<RefreshCw size={16} />} onPress={loadData} isLoading={loading}>Refresh</Button>

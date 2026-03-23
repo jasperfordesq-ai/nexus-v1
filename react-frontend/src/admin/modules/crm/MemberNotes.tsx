@@ -23,6 +23,7 @@ import { useTenant, useToast } from '@/contexts';
 import { adminCrm } from '../../api/adminApi';
 import { PageHeader, ConfirmModal } from '../../components';
 
+import { useTranslation } from 'react-i18next';
 interface Note {
   id: number;
   tenant_id: number;
@@ -68,7 +69,8 @@ const CATEGORY_COLORS: Record<string, 'default' | 'primary' | 'warning' | 'succe
 const ITEMS_PER_PAGE = 20;
 
 export function MemberNotes() {
-  usePageTitle('Admin - Member Notes');
+  const { t } = useTranslation('admin');
+  usePageTitle(t('crm.page_title'));
   const { tenantPath } = useTenant();
   const toast = useToast();
   const [searchParams] = useSearchParams();
@@ -144,7 +146,7 @@ export function MemberNotes() {
 
   const handleSave = async () => {
     if (!formContent.trim()) {
-      toast.error('Note content is required');
+      toast.error(t('crm.note_content_is_required'));
       return;
     }
     setSaving(true);
@@ -156,15 +158,15 @@ export function MemberNotes() {
           is_pinned: formPinned,
         });
         if (res.success) {
-          toast.success('Note updated');
+          toast.success(t('crm.note_updated'));
           formModal.onClose();
           loadNotes();
         } else {
-          toast.error('Failed to update note');
+          toast.error(t('crm.failed_to_update_note'));
         }
       } else {
         if (!formUserId || isNaN(Number(formUserId))) {
-          toast.error('Valid user ID is required');
+          toast.error(t('crm.valid_user_i_d_is_required'));
           setSaving(false);
           return;
         }
@@ -175,15 +177,15 @@ export function MemberNotes() {
           is_pinned: formPinned,
         });
         if (res.success) {
-          toast.success('Note created');
+          toast.success(t('crm.note_created'));
           formModal.onClose();
           loadNotes();
         } else {
-          toast.error('Failed to create note');
+          toast.error(t('crm.failed_to_create_note'));
         }
       }
     } catch {
-      toast.error('Failed to save note');
+      toast.error(t('crm.failed_to_save_note'));
     }
     setSaving(false);
   };
@@ -201,10 +203,10 @@ export function MemberNotes() {
         toast.success(note.is_pinned === 1 ? 'Note unpinned' : 'Note pinned');
         loadNotes();
       } else {
-        toast.error('Failed to update pin status');
+        toast.error(t('crm.failed_to_update_pin_status'));
       }
     } catch {
-      toast.error('Failed to update pin status');
+      toast.error(t('crm.failed_to_update_pin_status'));
     }
   };
 
@@ -216,14 +218,14 @@ export function MemberNotes() {
     try {
       const res = await adminCrm.deleteNote(deleteTarget.id);
       if (res.success) {
-        toast.success('Note deleted');
+        toast.success(t('crm.note_deleted'));
         setDeleteTarget(null);
         loadNotes();
       } else {
-        toast.error('Failed to delete note');
+        toast.error(t('crm.failed_to_delete_note'));
       }
     } catch {
-      toast.error('Failed to delete note');
+      toast.error(t('crm.failed_to_delete_note'));
     }
     setDeleting(false);
   };
@@ -251,8 +253,8 @@ export function MemberNotes() {
   return (
     <div className="max-w-6xl mx-auto">
       <PageHeader
-        title="Member Notes"
-        description="Private notes about members for CRM tracking"
+        title={t('crm.member_notes_title')}
+        description={t('crm.member_notes_desc')}
         actions={
           <Button color="primary" startContent={<Plus size={16} />} onPress={openCreateModal}>
             Add Note
@@ -263,8 +265,8 @@ export function MemberNotes() {
       {/* Filters */}
       <div className="flex flex-wrap items-end gap-3 mb-6">
         <Input
-          label="Search"
-          placeholder="Search notes..."
+          label={t('crm.label_search')}
+          placeholder={t('crm.placeholder_search_notes')}
           className="w-56"
           size="sm"
           startContent={<Search size={14} />}
@@ -278,8 +280,8 @@ export function MemberNotes() {
         />
 
         <Select
-          label="Category"
-          placeholder="All categories"
+          label={t('crm.label_category')}
+          placeholder={t('crm.placeholder_all_categories')}
           className="w-48"
           size="sm"
           startContent={<Filter size={14} />}
@@ -296,8 +298,8 @@ export function MemberNotes() {
         </Select>
 
         <Input
-          label="User ID"
-          placeholder="Filter by user ID"
+          label={t('crm.label_user_i_d')}
+          placeholder={t('crm.placeholder_filter_by_user_i_d')}
           className="w-40"
           size="sm"
           type="number"
@@ -378,12 +380,12 @@ export function MemberNotes() {
                 </div>
                 <Dropdown>
                   <DropdownTrigger>
-                    <Button isIconOnly size="sm" variant="light" aria-label="Note actions">
+                    <Button isIconOnly size="sm" variant="light" aria-label={t('crm.label_note_actions')}>
                       <MoreVertical size={16} />
                     </Button>
                   </DropdownTrigger>
                   <DropdownMenu
-                    aria-label="Note actions"
+                    aria-label={t('crm.label_note_actions')}
                     onAction={(key) => {
                       if (key === 'edit') openEditModal(note);
                       else if (key === 'pin') handleTogglePin(note);
@@ -448,7 +450,7 @@ export function MemberNotes() {
           <ModalBody className="flex flex-col gap-4">
             {!editingNote && (
               <Input
-                label="User ID"
+                label={t('crm.label_user_i_d')}
                 placeholder="Enter the member's user ID"
                 type="number"
                 isRequired
@@ -457,8 +459,8 @@ export function MemberNotes() {
               />
             )}
             <Textarea
-              label="Content"
-              placeholder="Write your note about this member..."
+              label={t('crm.label_content')}
+              placeholder={t('crm.placeholder_write_your_note_about_this_member')}
               isRequired
               minRows={4}
               maxRows={10}
@@ -466,7 +468,7 @@ export function MemberNotes() {
               onValueChange={setFormContent}
             />
             <Select
-              label="Category"
+              label={t('crm.label_category')}
               selectedKeys={[formCategory]}
               onSelectionChange={(keys) => {
                 const val = Array.from(keys)[0] as CategoryKey;

@@ -378,62 +378,62 @@
     "back_to_current": "Zurueck zum aktuellen {{title}}"
   },
   "platform": {
-    "effective_date": "Effective {{date}}",
-    "platform_chip": "Project NEXUS Platform",
-    "provider_notice_title": "Platform Provider Notice",
-    "provider_notice_body": "This document governs the relationship between you and Project NEXUS (the platform provider). It is separate from any terms established by {{tenant}} (your community operator).",
-    "view_tenant_legal": "View {{tenant}}'s legal documents",
-    "contents": "Contents",
-    "related_documents": "Related Platform Documents",
-    "cta_title": "Questions About This Document?",
-    "cta_body": "If you have questions about this platform-level document, contact the Project NEXUS team. For questions about your community's policies, contact {{tenant}} directly.",
+    "effective_date": "Gültig ab {{date}}",
+    "platform_chip": "Project NEXUS Plattform",
+    "provider_notice_title": "Plattform-Anbieterhinweis",
+    "provider_notice_body": "Dieses Dokument regelt die Beziehung zwischen Ihnen und Project NEXUS (dem Plattformanbieter). Es ist von den Bedingungen von {{tenant}} (Ihrem Gemeinschaftsbetreiber) getrennt.",
+    "view_tenant_legal": "Rechtsdokumente von {{tenant}} ansehen",
+    "contents": "Inhaltsverzeichnis",
+    "related_documents": "Verwandte Plattform-Dokumente",
+    "cta_title": "Fragen zu diesem Dokument?",
+    "cta_body": "Wenn Sie Fragen zu diesem Plattform-Dokument haben, kontaktieren Sie das Project NEXUS-Team. Bei Fragen zu den Richtlinien Ihrer Gemeinschaft, kontaktieren Sie {{tenant}} direkt.",
     "nexus_website": "Project NEXUS Website",
-    "contact_tenant": "Contact {{tenant}}"
+    "contact_tenant": "{{tenant}} kontaktieren"
   },
   "platform_disclaimer": {
-    "page_title": "Platform Disclaimer",
-    "title": "Platform Disclaimer",
-    "subtitle": "Important disclaimers and liability limitations for the Project NEXUS platform",
-    "link_terms": "Platform Terms of Service",
-    "link_privacy": "Platform Privacy Policy"
+    "page_title": "Plattform-Haftungsausschluss",
+    "title": "Plattform-Haftungsausschluss",
+    "subtitle": "Wichtige Haftungsausschlüsse und Haftungsbeschränkungen für die Project NEXUS-Plattform",
+    "link_terms": "Plattform-Nutzungsbedingungen",
+    "link_privacy": "Plattform-Datenschutzrichtlinie"
   },
   "platform_privacy": {
-    "page_title": "Platform Privacy Policy",
-    "title": "Platform Privacy Policy",
-    "subtitle": "How Project NEXUS handles data at the platform infrastructure level",
-    "link_terms": "Platform Terms of Service",
-    "link_disclaimer": "Platform Disclaimer"
+    "page_title": "Plattform-Datenschutzrichtlinie",
+    "title": "Plattform-Datenschutzrichtlinie",
+    "subtitle": "Wie Project NEXUS Daten auf Plattform-Infrastrukturebene handhabt",
+    "link_terms": "Plattform-Nutzungsbedingungen",
+    "link_disclaimer": "Plattform-Haftungsausschluss"
   },
   "platform_terms": {
-    "page_title": "Platform Terms of Service",
-    "title": "Platform Terms of Service",
-    "subtitle": "The terms governing the Project NEXUS platform infrastructure",
-    "link_privacy": "Platform Privacy Policy",
-    "link_disclaimer": "Platform Disclaimer"
+    "page_title": "Plattform-Nutzungsbedingungen",
+    "title": "Plattform-Nutzungsbedingungen",
+    "subtitle": "Die Nutzungsbedingungen für die Project NEXUS-Plattforminfrastruktur",
+    "link_privacy": "Plattform-Datenschutzrichtlinie",
+    "link_disclaimer": "Plattform-Haftungsausschluss"
   },
   "gate": {
-    "title": "Updated legal documents",
-    "subtitle_one": "A document has been updated. Please review and accept it to continue.",
-    "subtitle_other": "{{count}} documents have been updated. Please review and accept them to continue.",
-    "type_terms": "Terms of Service",
-    "type_privacy": "Privacy Policy",
-    "type_cookies": "Cookie Policy",
-    "type_accessibility": "Accessibility Statement",
-    "type_community_guidelines": "Community Guidelines",
-    "type_acceptable_use": "Acceptable Use Policy",
-    "updated": "Updated",
-    "read": "Read",
-    "consent_text": "By clicking Accept, you confirm you have read and agree to the documents listed above.",
-    "accept_aria": "Accept all updated legal documents and continue",
-    "accepting": "Accepting…",
-    "accept_continue": "Accept & Continue"
+    "title": "Aktualisierte Rechtsdokumente",
+    "subtitle_one": "Ein Dokument wurde aktualisiert. Bitte überprüfen und akzeptieren Sie es, um fortzufahren.",
+    "subtitle_other": "{{count}} Dokumente wurden aktualisiert. Bitte überprüfen und akzeptieren Sie sie, um fortzufahren.",
+    "type_terms": "Nutzungsbedingungen",
+    "type_privacy": "Datenschutzrichtlinie",
+    "type_cookies": "Cookie-Richtlinie",
+    "type_accessibility": "Erklärung zur Barrierefreiheit",
+    "type_community_guidelines": "Gemeinschaftsrichtlinien",
+    "type_acceptable_use": "Richtlinie zur akzeptablen Nutzung",
+    "updated": "Aktualisiert",
+    "read": "Lesen",
+    "consent_text": "Durch Klicken auf Akzeptieren bestätigen Sie, dass Sie die oben aufgeführten Dokumente gelesen haben und ihnen zustimmen.",
+    "accept_aria": "Alle aktualisierten Rechtsdokumente akzeptieren und fortfahren",
+    "accepting": "Wird angenommen…",
+    "accept_continue": "Akzeptieren & Fortfahren"
   },
   "custom": {
-    "effective_label": "Effective: {{date}}",
-    "contents": "Contents",
-    "view_previous_versions": "View previous versions of this document",
-    "cta_title": "Have Questions?",
-    "cta_body": "If you have any questions about this document, please contact us.",
-    "contact_us": "Contact Us"
+    "effective_label": "Gültig: {{date}}",
+    "contents": "Inhaltsverzeichnis",
+    "view_previous_versions": "Vorherige Versionen dieses Dokuments ansehen",
+    "cta_title": "Haben Sie Fragen?",
+    "cta_body": "Wenn Sie Fragen zu diesem Dokument haben, kontaktieren Sie uns bitte.",
+    "contact_us": "Kontaktieren Sie uns"
   }
 }

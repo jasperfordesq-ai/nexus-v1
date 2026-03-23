@@ -28,8 +28,10 @@ import { adminTimebanking } from '../../api/adminApi';
 import { StatCard, PageHeader } from '../../components';
 import type { TimebankingStats } from '../../api/types';
 
+import { useTranslation } from 'react-i18next';
 export function TimebankingDashboard() {
-  usePageTitle('Admin - Timebanking');
+  const { t } = useTranslation('admin');
+  usePageTitle(t('timebanking.page_title'));
   const { tenantPath } = useTenant();
 
   const [stats, setStats] = useState<TimebankingStats | null>(null);
@@ -56,8 +58,8 @@ export function TimebankingDashboard() {
   return (
     <div>
       <PageHeader
-        title="Timebanking"
-        description="Transaction analytics and oversight"
+        title={t('timebanking.timebanking_dashboard_title')}
+        description={t('timebanking.timebanking_dashboard_desc')}
         actions={
           <Button
             variant="flat"
@@ -74,7 +76,7 @@ export function TimebankingDashboard() {
       {/* Stats Grid */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4 mb-6">
         <StatCard
-          label="Total Transactions"
+          label={t('timebanking.label_total_transactions')}
           value={stats?.total_transactions ?? '—'}
           icon={ArrowLeftRight}
           color="primary"
@@ -95,7 +97,7 @@ export function TimebankingDashboard() {
           loading={loading}
         />
         <StatCard
-          label="Active Alerts"
+          label={t('timebanking.label_active_alerts')}
           value={stats?.active_alerts ?? '—'}
           icon={AlertTriangle}
           color={stats?.active_alerts && stats.active_alerts > 0 ? 'danger' : 'warning'}

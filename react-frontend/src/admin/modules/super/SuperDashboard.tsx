@@ -29,8 +29,10 @@ import { adminSuper } from '../../api/adminApi';
 import { StatCard, PageHeader } from '../../components';
 import type { SuperAdminDashboardStats, SuperAdminTenant } from '../../api/types';
 
+import { useTranslation } from 'react-i18next';
 export function SuperDashboard() {
-  usePageTitle('Super Admin - Dashboard');
+  const { t } = useTranslation('admin');
+  usePageTitle(t('super.page_title'));
   const { tenantPath } = useTenant();
   const toast = useToast();
 
@@ -80,8 +82,8 @@ export function SuperDashboard() {
   return (
     <div>
       <PageHeader
-        title="Super Admin Dashboard"
-        description="Platform-wide overview and management"
+        title={t('super.super_dashboard_title')}
+        description={t('super.super_dashboard_desc')}
         actions={
           <Button
             variant="flat"
@@ -99,7 +101,7 @@ export function SuperDashboard() {
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4 mb-6">
         <Link to={tenantPath('/admin/super/tenants')} className="block">
           <StatCard
-            label="Total Tenants"
+            label={t('super.label_total_tenants')}
             value={stats?.total_tenants ?? '---'}
             icon={Building2}
             color="primary"
@@ -108,7 +110,7 @@ export function SuperDashboard() {
         </Link>
         <Link to={tenantPath('/admin/super/tenants')} className="block">
           <StatCard
-            label="Active Tenants"
+            label={t('super.label_active_tenants')}
             value={stats?.active_tenants ?? '---'}
             icon={Shield}
             color="success"
@@ -117,7 +119,7 @@ export function SuperDashboard() {
         </Link>
         <Link to={tenantPath('/admin/super/users')} className="block">
           <StatCard
-            label="Total Users"
+            label={t('super.label_total_users')}
             value={stats?.total_users ?? '---'}
             icon={Users}
             color="secondary"
@@ -125,7 +127,7 @@ export function SuperDashboard() {
           />
         </Link>
         <StatCard
-          label="Total Listings"
+          label={t('super.label_total_listings')}
           value={stats?.total_listings ?? '---'}
           icon={Globe}
           color="warning"

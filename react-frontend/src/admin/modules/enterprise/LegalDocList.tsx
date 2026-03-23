@@ -19,6 +19,7 @@ import { PageHeader, DataTable, ConfirmModal, StatusBadge } from '../../componen
 import type { Column } from '../../components';
 import type { LegalDocument } from '../../api/types';
 
+import { useTranslation } from 'react-i18next';
 /** Human-friendly labels for legal document types */
 const DOC_TYPE_LABELS: Record<string, string> = {
   terms: 'Terms of Service',
@@ -30,7 +31,8 @@ const DOC_TYPE_LABELS: Record<string, string> = {
 };
 
 export function LegalDocList() {
-  usePageTitle('Admin - Legal Documents');
+  const { t } = useTranslation('admin');
+  usePageTitle(t('enterprise.page_title'));
   const { tenantPath } = useTenant();
   const toast = useToast();
   const navigate = useNavigate();
@@ -49,7 +51,7 @@ export function LegalDocList() {
         setDocs(Array.isArray(data) ? data : []);
       }
     } catch {
-      toast.error('Failed to load legal documents');
+      toast.error(t('enterprise.failed_to_load_legal_documents'));
     } finally {
       setLoading(false);
     }
@@ -66,7 +68,7 @@ export function LegalDocList() {
       const res = await adminLegalDocs.delete(deleteTarget.id);
 
       if (res.success) {
-        toast.success('Document deleted');
+        toast.success(t('enterprise.document_deleted'));
         setDeleteTarget(null);
         loadData();
       } else {
@@ -74,7 +76,7 @@ export function LegalDocList() {
         toast.error(error);
       }
     } catch (err) {
-      toast.error('Failed to delete document');
+      toast.error(t('enterprise.failed_to_delete_document'));
       console.error('Legal document delete error:', err);
     } finally {
       setDeleting(false);
@@ -126,7 +128,7 @@ export function LegalDocList() {
             size="sm"
             variant="light"
             onPress={() => navigate(tenantPath(`/admin/legal-documents/${doc.id}/versions`))}
-            aria-label="Manage versions"
+            aria-label={t('enterprise.label_manage_versions')}
           >
             <GitBranch size={14} />
           </Button>
@@ -135,7 +137,7 @@ export function LegalDocList() {
             size="sm"
             variant="light"
             onPress={() => navigate(tenantPath(`/admin/legal-documents/${doc.id}/edit`))}
-            aria-label="Edit document"
+            aria-label={t('enterprise.label_edit_document')}
           >
             <Pencil size={14} />
           </Button>
@@ -145,7 +147,7 @@ export function LegalDocList() {
             variant="light"
             color="danger"
             onPress={() => setDeleteTarget(doc)}
-            aria-label="Delete document"
+            aria-label={t('enterprise.label_delete_document')}
           >
             <Trash2 size={14} />
           </Button>
@@ -157,8 +159,8 @@ export function LegalDocList() {
   return (
     <div>
       <PageHeader
-        title="Legal Documents"
-        description="Document versioning and compliance management"
+        title={t('enterprise.legal_doc_list_title')}
+        description={t('enterprise.legal_doc_list_desc')}
         actions={
           <Button
             as={Link}

@@ -43,6 +43,7 @@ import {
 } from '../../components';
 import { TemplatePreview } from './TemplatePreview';
 
+import { useTranslation } from 'react-i18next';
 interface Template {
   id: number;
   name: string;
@@ -70,7 +71,8 @@ const CATEGORY_COLORS: Record<string, 'primary' | 'secondary' | 'success' | 'war
 };
 
 export function Templates() {
-  usePageTitle('Admin - Templates');
+  const { t } = useTranslation('admin');
+  usePageTitle(t('newsletters.page_title'));
   const navigate = useNavigate();
   const { tenantPath } = useTenant();
   const toast = useToast();
@@ -123,7 +125,7 @@ export function Templates() {
         toast.error(res.error || 'Failed to duplicate template');
       }
     } catch {
-      toast.error('An unexpected error occurred');
+      toast.error(t('newsletters.an_unexpected_error_occurred'));
     }
   }
 
@@ -140,7 +142,7 @@ export function Templates() {
         toast.error(res.error || 'Failed to delete template');
       }
     } catch {
-      toast.error('An unexpected error occurred');
+      toast.error(t('newsletters.an_unexpected_error_occurred'));
     } finally {
       setDeleting(false);
     }
@@ -150,12 +152,12 @@ export function Templates() {
     return (
       <Dropdown>
         <DropdownTrigger>
-          <Button isIconOnly size="sm" variant="light" aria-label="Template actions">
+          <Button isIconOnly size="sm" variant="light" aria-label={t('newsletters.label_template_actions')}>
             <MoreVertical size={16} />
           </Button>
         </DropdownTrigger>
         <DropdownMenu
-          aria-label="Template actions"
+          aria-label={t('newsletters.label_template_actions')}
           onAction={(key) => {
             switch (key) {
               case 'edit':
@@ -274,8 +276,8 @@ export function Templates() {
     return (
       <div>
         <PageHeader
-          title="Templates"
-          description="Reusable email templates"
+          title={t('newsletters.templates_title')}
+          description={t('newsletters.templates_desc')}
           actions={
             <Button
               color="primary"
@@ -289,7 +291,7 @@ export function Templates() {
         <EmptyState
           icon={FileText}
           title="No Templates Created"
-          description="Create reusable email templates to speed up newsletter creation."
+          description={t('newsletters.desc_create_reusable_email_templates_to_speed')}
           actionLabel="Create Template"
           onAction={() => navigate(tenantPath('/admin/newsletters/templates/create'))}
         />
@@ -300,8 +302,8 @@ export function Templates() {
   return (
     <div>
       <PageHeader
-        title="Templates"
-        description="Reusable email templates"
+        title={t('newsletters.templates_title')}
+        description={t('newsletters.templates_desc')}
         actions={
           <div className="flex gap-2">
             <Button

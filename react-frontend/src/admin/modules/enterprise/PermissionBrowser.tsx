@@ -15,8 +15,10 @@ import { usePageTitle } from '@/hooks';
 import { adminEnterprise } from '../../api/adminApi';
 import { PageHeader } from '../../components';
 
+import { useTranslation } from 'react-i18next';
 export function PermissionBrowser() {
-  usePageTitle('Admin - Permission Browser');
+  const { t } = useTranslation('admin');
+  usePageTitle(t('enterprise.page_title'));
 
   const [permissions, setPermissions] = useState<Record<string, string[]>>({});
   const [loading, setLoading] = useState(true);
@@ -44,7 +46,7 @@ export function PermissionBrowser() {
   return (
     <div>
       <PageHeader
-        title="Permission Browser"
+        title={t('enterprise.permission_browser_title')}
         description={`${totalCount} permissions available across ${Object.keys(permissions).length} categories`}
       />
 

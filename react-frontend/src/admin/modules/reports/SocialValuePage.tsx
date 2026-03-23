@@ -64,6 +64,7 @@ import { api } from '@/lib/api';
 import { CHART_COLOR_MAP } from '@/lib/chartColors';
 import { StatCard, PageHeader } from '../../components';
 
+import { useTranslation } from 'react-i18next';
 // ---------------------------------------------------------------------------
 // Types
 // ---------------------------------------------------------------------------
@@ -198,7 +199,8 @@ async function exportCsv(dateFrom?: string, dateTo?: string) {
 // ---------------------------------------------------------------------------
 
 export function SocialValuePage() {
-  usePageTitle('Social Value Dashboard');
+  const { t } = useTranslation('admin');
+  usePageTitle(t('reports.page_title'));
   const toast = useToast();
 
   const [data, setData] = useState<SocialValueData | null>(null);
@@ -231,7 +233,7 @@ export function SocialValuePage() {
         setConfigPeriod(d.config.reporting_period);
       }
     } catch {
-      toast.error('Failed to load social value data');
+      toast.error(t('reports.failed_to_load_social_value_data'));
     } finally {
       setLoading(false);
     }
@@ -253,7 +255,7 @@ export function SocialValuePage() {
       onClose();
       await loadData();
     } catch {
-      toast.error('Failed to save configuration');
+      toast.error(t('reports.failed_to_save_configuration'));
     } finally {
       setSaving(false);
     }
@@ -269,8 +271,8 @@ export function SocialValuePage() {
   return (
     <div>
       <PageHeader
-        title="Social Value Dashboard"
-        description="Social Return on Investment (SROI) metrics and impact valuation"
+        title={t('reports.social_value_page_title')}
+        description={t('reports.social_value_page_desc')}
         actions={
           <div className="flex items-center gap-2 flex-wrap">
             <Input
@@ -278,7 +280,7 @@ export function SocialValuePage() {
               size="sm"
               value={dateFrom}
               onValueChange={setDateFrom}
-              aria-label="From date"
+              aria-label={t('reports.label_from_date')}
               className="w-36"
               variant="bordered"
             />
@@ -287,7 +289,7 @@ export function SocialValuePage() {
               size="sm"
               value={dateTo}
               onValueChange={setDateTo}
-              aria-label="To date"
+              aria-label={t('reports.label_to_date')}
               className="w-36"
               variant="bordered"
             />
@@ -303,7 +305,7 @@ export function SocialValuePage() {
               variant="flat"
               startContent={<Download size={16} />}
               onPress={async () => {
-                try { await exportCsv(dateFrom, dateTo); } catch { toast.error('Failed to export CSV'); }
+                try { await exportCsv(dateFrom, dateTo); } catch { toast.error(t('reports.failed_to_export_c_s_v')); }
               }}
               size="sm"
             >
@@ -325,28 +327,28 @@ export function SocialValuePage() {
       {/* Key Metrics */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4 mb-6">
         <StatCard
-          label="Total Hours Exchanged"
+          label={t('reports.label_total_hours_exchanged')}
           value={data ? (data.hours?.total_hours ?? 0).toFixed(1) : '\u2014'}
           icon={Clock}
           color="warning"
           loading={loading}
         />
         <StatCard
-          label="Monetary Value"
+          label={t('reports.label_monetary_value')}
           value={data ? formatCurrency(data.valuation?.monetary_value ?? 0, currency) : '\u2014'}
           icon={DollarSign}
           color="primary"
           loading={loading}
         />
         <StatCard
-          label="Social Value"
+          label={t('reports.label_social_value')}
           value={data ? formatCurrency(data.valuation?.social_value ?? 0, currency) : '\u2014'}
           icon={Sparkles}
           color="success"
           loading={loading}
         />
         <StatCard
-          label="SROI Ratio"
+          label={t('reports.label_s_r_o_i_ratio')}
           value={data ? `${data.valuation?.sroi_ratio ?? 0}:1` : '\u2014'}
           icon={TrendingUp}
           color="secondary"
@@ -357,35 +359,35 @@ export function SocialValuePage() {
       {/* Secondary Stats */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-5 mb-6">
         <StatCard
-          label="Active Members"
+          label={t('reports.label_active_members')}
           value={data?.members?.active_traders ?? '\u2014'}
           icon={Users}
           color="primary"
           loading={loading}
         />
         <StatCard
-          label="Skills Shared"
+          label={t('reports.label_skills_shared')}
           value={data?.skills?.unique_skills ?? '\u2014'}
           icon={Lightbulb}
           color="secondary"
           loading={loading}
         />
         <StatCard
-          label="Events Held"
+          label={t('reports.label_events_held')}
           value={data?.events?.total_events ?? '\u2014'}
           icon={Calendar}
           color="success"
           loading={loading}
         />
         <StatCard
-          label="Transactions"
+          label={t('reports.label_transactions')}
           value={data?.hours?.total_transactions ?? '\u2014'}
           icon={TrendingUp}
           color="warning"
           loading={loading}
         />
         <StatCard
-          label="Unique Categories"
+          label={t('reports.label_unique_categories')}
           value={data?.skills?.unique_categories ?? '\u2014'}
           icon={Award}
           color="danger"
@@ -535,7 +537,7 @@ export function SocialValuePage() {
             </p>
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <Select
-                label="Currency"
+                label={t('reports.label_currency')}
                 selectedKeys={[configCurrency]}
                 onSelectionChange={(keys) => {
                   const v = Array.from(keys)[0];
@@ -548,7 +550,7 @@ export function SocialValuePage() {
                 ))}
               </Select>
               <Input
-                label="Hour Value"
+                label={t('reports.label_hour_value')}
                 type="number"
                 min={0.01}
                 max={10000}
@@ -563,7 +565,7 @@ export function SocialValuePage() {
                 }
               />
               <Input
-                label="Social Multiplier"
+                label={t('reports.label_social_multiplier')}
                 type="number"
                 min={0.1}
                 max={100}
@@ -574,7 +576,7 @@ export function SocialValuePage() {
                 startContent={<span className="text-default-400 text-sm">x</span>}
               />
               <Select
-                label="Reporting Period"
+                label={t('reports.label_reporting_period')}
                 selectedKeys={[configPeriod]}
                 onSelectionChange={(keys) => {
                   const v = Array.from(keys)[0];

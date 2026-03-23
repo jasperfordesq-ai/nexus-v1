@@ -1,5 +1,5 @@
 {
-  "title": "Mission Control",
+  "title": "Leitstelle",
   "subtitle": "Echtzeit-Plattformübersicht und Kommandozentrale",
   "tour_btn": "Tour",
   "refresh": "Aktualisieren",
@@ -47,21 +47,21 @@
     "group_locations_desc": "Geografische Grenzen",
     "group_ranking": "Gruppenranking",
     "group_ranking_desc": "Intelligente hervorgehobene Gruppen",
-    "ai_assistant": "AI Assistant",
+    "ai_assistant": "KI-Assistent",
     "ai_assistant_desc": "KI-Anbieter konfigurieren",
-    "smart_matching": "Smart Matching",
+    "smart_matching": "Intelligente Zuordnung",
     "smart_matching_desc": "KI-gestützte Empfehlungen",
-    "feed_algorithm": "Feed Algorithm",
+    "feed_algorithm": "Feed-Algorithmus",
     "feed_algorithm_desc": "EdgeRank-Konfiguration",
-    "algorithm_settings": "Algorithm Settings",
+    "algorithm_settings": "Algorithmus-Einstellungen",
     "algorithm_settings_desc": "MatchRank & CommunityRank",
-    "timebanking": "Timebanking",
+    "timebanking": "Zeitbanking",
     "timebanking_desc": "Analysen & Organisationskonten",
-    "seo": "SEO Manager",
+    "seo": "SEO-Manager",
     "seo_desc": "Suchmaschinenoptimierung",
     "error_tracking": "404-Fehlerverfolgung",
     "error_tracking_desc": "Fehlerhafte Links überwachen",
-    "cron_jobs": "Cron Jobs",
+    "cron_jobs": "Cron-Jobs",
     "cron_jobs_desc": "Geplante Aufgaben"
   },
   "activity": {
@@ -86,7 +86,7 @@
     "settings": "Einstellungen"
   },
   "enterprise": {
-    "card_title": "Enterprise Suite",
+    "card_title": "Unternehmens-Suite",
     "card_subtitle": "Erweiterte Steuerung",
     "overview": "Übersicht",
     "gdpr": "GDPR-Konformität",
@@ -98,7 +98,7 @@
     "details": "Details",
     "database": "Datenbank",
     "cache": "Cache",
-    "queue": "Cron Jobs",
+    "queue": "Cron-Jobs",
     "api": "E-Mail-API"
   }
 }

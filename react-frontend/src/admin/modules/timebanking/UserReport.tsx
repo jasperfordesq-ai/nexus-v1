@@ -23,8 +23,10 @@ import { adminTimebanking } from '../../api/adminApi';
 import { DataTable, PageHeader, type Column } from '../../components';
 import type { UserFinancialReport as UserFinancialReportType } from '../../api/types';
 
+import { useTranslation } from 'react-i18next';
 export function UserReport() {
-  usePageTitle('Admin - User Financial Report');
+  const { t } = useTranslation('admin');
+  usePageTitle(t('timebanking.page_title'));
   const { tenantPath } = useTenant();
   const toast = useToast();
 
@@ -110,11 +112,11 @@ export function UserReport() {
     if (!adjustTarget) return;
     const amount = parseFloat(adjustAmount);
     if (isNaN(amount) || amount === 0) {
-      toast.error('Please enter a valid non-zero amount');
+      toast.error(t('timebanking.please_enter_a_valid_nonzero_amount'));
       return;
     }
     if (!adjustReason.trim()) {
-      toast.error('A reason is required for balance adjustments');
+      toast.error(t('timebanking.a_reason_is_required_for_balance_adjustm'));
       return;
     }
     setAdjustLoading(true);
@@ -125,10 +127,10 @@ export function UserReport() {
         setAdjustTarget(null);
         loadUsers();
       } else {
-        toast.error('Failed to adjust balance');
+        toast.error(t('timebanking.failed_to_adjust_balance'));
       }
     } catch {
-      toast.error('Failed to adjust balance');
+      toast.error(t('timebanking.failed_to_adjust_balance'));
     } finally {
       setAdjustLoading(false);
     }
@@ -232,8 +234,8 @@ export function UserReport() {
   return (
     <div>
       <PageHeader
-        title="User Financial Report"
-        description="Overview of user balances, earnings, and spending"
+        title={t('timebanking.user_report_title')}
+        description={t('timebanking.user_report_desc')}
         actions={
           <Button
             as={Link}
@@ -284,12 +286,12 @@ export function UserReport() {
                 value={adjustAmount}
                 onValueChange={setAdjustAmount}
                 variant="bordered"
-                description="Positive to credit, negative to debit"
+                description={t('timebanking.desc_positive_to_credit_negative_to_debit')}
                 isRequired
               />
               <Textarea
-                label="Reason"
-                placeholder="Explain why this adjustment is needed..."
+                label={t('timebanking.label_reason')}
+                placeholder={t('timebanking.placeholder_explain_why_this_adjustment_is_needed')}
                 value={adjustReason}
                 onValueChange={setAdjustReason}
                 variant="bordered"

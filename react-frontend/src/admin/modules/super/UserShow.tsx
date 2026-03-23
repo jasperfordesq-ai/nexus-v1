@@ -20,6 +20,7 @@ import { adminSuper } from '../../api/adminApi';
 import { PageHeader, ConfirmModal } from '../../components';
 import type { SuperAdminUserDetail, SuperAdminTenant } from '../../api/types';
 
+import { useTranslation } from 'react-i18next';
 type ConfirmActionType =
   | 'grant-sa'
   | 'revoke-sa'
@@ -41,7 +42,8 @@ function formatDate(dateStr: string | null | undefined): string {
 }
 
 export function UserShow() {
-  usePageTitle('Super Admin - User Details');
+  const { t } = useTranslation('admin');
+  usePageTitle(t('super.page_title'));
   const { id } = useParams<{ id: string }>();
   const { tenantPath } = useTenant();
   const toast = useToast();
@@ -96,7 +98,7 @@ export function UserShow() {
       case 'revoke-global': res = await adminSuper.revokeGlobalSuperAdmin(user.id); break;
     }
     if (res?.success) {
-      toast.success('User updated successfully');
+      toast.success(t('super.user_updated_successfully'));
       loadUser();
     } else {
       toast.error(res?.error || 'Action failed');
@@ -110,7 +112,7 @@ export function UserShow() {
     setMoveLoading(true);
     const res = await adminSuper.moveUserTenant(user.id, Number(moveTargetTenant));
     if (res?.success) {
-      toast.success('User moved to new tenant');
+      toast.success(t('super.user_moved_to_new_tenant'));
       setMoveModalOpen(false);
       setMoveTargetTenant('');
       loadUser();
@@ -125,7 +127,7 @@ export function UserShow() {
     setPromoteLoading(true);
     const res = await adminSuper.moveAndPromote(user.id, Number(promoteTargetTenant));
     if (res?.success) {
-      toast.success('User moved and promoted to Tenant Super Admin');
+      toast.success(t('super.user_moved_and_promoted_to_tenant_super_'));
       setPromoteModalOpen(false);
       setPromoteTargetTenant('');
       loadUser();
@@ -536,8 +538,8 @@ export function UserShow() {
               Select a tenant to move <strong>{user.name}</strong> to. The user will retain their current role and privileges but will belong to the new tenant.
             </p>
             <Select
-              label="Target Tenant"
-              placeholder="Select a tenant"
+              label={t('super.label_target_tenant')}
+              placeholder={t('super.placeholder_select_a_tenant')}
               selectedKeys={moveTargetTenant ? [moveTargetTenant] : []}
               onSelectionChange={(keys) => setMoveTargetTenant(String(Array.from(keys)[0] || ''))}
             >
@@ -581,8 +583,8 @@ export function UserShow() {
               </p>
             </div>
             <Select
-              label="Target Hub Tenant"
-              placeholder="Select a hub tenant"
+              label={t('super.label_target_hub_tenant')}
+              placeholder={t('super.placeholder_select_a_hub_tenant')}
               selectedKeys={promoteTargetTenant ? [promoteTargetTenant] : []}
               onSelectionChange={(keys) => setPromoteTargetTenant(String(Array.from(keys)[0] || ''))}
             >

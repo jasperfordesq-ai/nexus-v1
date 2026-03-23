@@ -28,6 +28,7 @@ import { useToast, useTenant } from '@/contexts';
 import { adminSuper } from '../../api/adminApi';
 import type { FederationWhitelistEntry, SuperAdminTenant } from '../../api/types';
 
+import { useTranslation } from 'react-i18next';
 interface WhitelistEntry {
   id: number;
   tenant_id: number;
@@ -57,7 +58,8 @@ function mapWhitelistEntry(e: FederationWhitelistEntry): WhitelistEntry {
 }
 
 export default function FederationWhitelist() {
-  usePageTitle('Federation Whitelist');
+  const { t } = useTranslation('admin');
+  usePageTitle(t('super_admin.page_title'));
   const toast = useToast();
   const { tenantPath } = useTenant();
   const [entries, setEntries] = useState<WhitelistEntry[]>([]);
@@ -88,13 +90,13 @@ export default function FederationWhitelist() {
 
   const handleAdd = async () => {
     if (!selectedTenantId) {
-      toast.error('Please select a tenant');
+      toast.error(t('super_admin.please_select_a_tenant'));
       return;
     }
 
     const res = await adminSuper.addToWhitelist(parseInt(selectedTenantId), notes || undefined);
     if (res.success) {
-      toast.success('Tenant added to whitelist');
+      toast.success(t('super_admin.tenant_added_to_whitelist'));
       setSelectedTenantId('');
       setNotes('');
       loadData();
@@ -108,7 +110,7 @@ export default function FederationWhitelist() {
     if (res.success) {
       setEntries(prev => prev.filter(e => e.tenant_id !== tenantId));
       setRemoving(null);
-      toast.success('Tenant removed from whitelist');
+      toast.success(t('super_admin.tenant_removed_from_whitelist'));
     } else {
       toast.error(res.error || 'Failed to remove tenant');
       setRemoving(null);
@@ -126,8 +128,8 @@ export default function FederationWhitelist() {
   return (
     <div className="space-y-6">
       <PageHeader
-        title="Federation Whitelist"
-        description="Manage which tenants can use federation features"
+        title={t('super_admin.federation_whitelist_title')}
+        description={t('super_admin.federation_whitelist_desc')}
       />
 
       {/* Add Form */}
@@ -140,8 +142,8 @@ export default function FederationWhitelist() {
         </CardHeader>
         <CardBody className="space-y-4">
           <Select
-            label="Tenant"
-            placeholder="Select a tenant"
+            label={t('super_admin.label_tenant')}
+            placeholder={t('super_admin.placeholder_select_a_tenant')}
             selectedKeys={selectedTenantId ? [selectedTenantId] : []}
             onChange={(e) => setSelectedTenantId(e.target.value)}
             variant="bordered"
@@ -155,7 +157,7 @@ export default function FederationWhitelist() {
 
           <Textarea
             label="Notes (Optional)"
-            placeholder="Add notes about why this tenant is being whitelisted"
+            placeholder={t('super_admin.placeholder_add_notes_about_why_this_tenant_is_being_whitelist')}
             value={notes}
             onValueChange={setNotes}
             variant="bordered"
@@ -178,7 +180,7 @@ export default function FederationWhitelist() {
           <h3 className="text-lg font-semibold">Whitelisted Tenants ({entries.length})</h3>
         </CardHeader>
         <CardBody>
-          <Table aria-label="Whitelisted tenants" shadow="sm" isStriped>
+          <Table aria-label={t('super_admin.label_whitelisted_tenants')} shadow="sm" isStriped>
             <TableHeader>
               <TableColumn>Tenant</TableColumn>
               <TableColumn>Domain</TableColumn>

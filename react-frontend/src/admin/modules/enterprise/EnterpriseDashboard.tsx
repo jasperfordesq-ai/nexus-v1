@@ -25,8 +25,10 @@ import { adminEnterprise } from '../../api/adminApi';
 import { StatCard, PageHeader } from '../../components';
 import type { EnterpriseDashboardStats } from '../../api/types';
 
+import { useTranslation } from 'react-i18next';
 export function EnterpriseDashboard() {
-  usePageTitle('Admin - Enterprise Dashboard');
+  const { t } = useTranslation('admin');
+  usePageTitle(t('enterprise.page_title'));
   const { tenantPath } = useTenant();
 
   const [stats, setStats] = useState<EnterpriseDashboardStats | null>(null);
@@ -63,8 +65,8 @@ export function EnterpriseDashboard() {
   return (
     <div>
       <PageHeader
-        title="Enterprise Dashboard"
-        description="Overview of enterprise features and system health"
+        title={t('enterprise.enterprise_dashboard_title')}
+        description={t('enterprise.enterprise_dashboard_desc')}
         actions={
           <Button
             variant="flat"
@@ -81,28 +83,28 @@ export function EnterpriseDashboard() {
       {/* Stats Grid */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4 mb-6">
         <StatCard
-          label="Total Users"
+          label={t('enterprise.label_total_users')}
           value={stats?.user_count ?? '---'}
           icon={Users}
           color="primary"
           loading={loading}
         />
         <StatCard
-          label="Roles"
+          label={t('enterprise.label_roles')}
           value={stats?.role_count ?? '---'}
           icon={Shield}
           color="secondary"
           loading={loading}
         />
         <StatCard
-          label="Pending GDPR"
+          label={t('enterprise.label_pending_g_d_p_r')}
           value={stats?.pending_gdpr_requests ?? 0}
           icon={FileWarning}
           color="warning"
           loading={loading}
         />
         <StatCard
-          label="System Health"
+          label={t('enterprise.label_system_health')}
           value={stats?.health_status ?? '---'}
           icon={HeartPulse}
           color={healthColor}

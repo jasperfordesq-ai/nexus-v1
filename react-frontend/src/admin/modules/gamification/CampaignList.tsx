@@ -25,12 +25,14 @@ import { adminGamification } from '../../api/adminApi';
 import { DataTable, PageHeader, ConfirmModal, StatusBadge, EmptyState, type Column } from '../../components';
 import type { Campaign } from '../../api/types';
 
+import { useTranslation } from 'react-i18next';
 // ─────────────────────────────────────────────────────────────────────────────
 // Component
 // ─────────────────────────────────────────────────────────────────────────────
 
 export function CampaignList() {
-  usePageTitle('Admin - Campaigns');
+  const { t } = useTranslation('admin');
+  usePageTitle(t('gamification.page_title'));
   const toast = useToast();
   const navigate = useNavigate();
 
@@ -52,7 +54,7 @@ export function CampaignList() {
         setCampaigns((data as { data: Campaign[] }).data || []);
       }
     } else {
-      toast.error('Failed to load campaigns');
+      toast.error(t('gamification.failed_to_load_campaigns'));
     }
     setLoading(false);
   }, [toast]);
@@ -71,7 +73,7 @@ export function CampaignList() {
       setDeleteTarget(null);
       loadCampaigns();
     } else {
-      toast.error('Failed to delete campaign');
+      toast.error(t('gamification.failed_to_delete_campaign'));
     }
 
     setDeleting(false);
@@ -109,11 +111,11 @@ export function CampaignList() {
     return (
       <Dropdown>
         <DropdownTrigger>
-          <Button isIconOnly size="sm" variant="light" aria-label="Campaign actions">
+          <Button isIconOnly size="sm" variant="light" aria-label={t('gamification.label_campaign_actions')}>
             <MoreVertical size={16} />
           </Button>
         </DropdownTrigger>
-        <DropdownMenu aria-label="Campaign actions" onAction={handleAction}>
+        <DropdownMenu aria-label={t('gamification.label_campaign_actions')} onAction={handleAction}>
           <DropdownItem key="edit" startContent={<Edit size={14} />}>
             Edit
           </DropdownItem>
@@ -208,8 +210,8 @@ export function CampaignList() {
   return (
     <div>
       <PageHeader
-        title="Campaigns"
-        description="Manage gamification campaigns for badge and XP distribution"
+        title={t('gamification.campaign_list_title')}
+        description={t('gamification.campaign_list_desc')}
         actions={
           <Link to="/admin/gamification/campaigns/create">
             <Button color="primary" startContent={<Plus size={16} />}>
@@ -223,7 +225,7 @@ export function CampaignList() {
         <EmptyState
           icon={Megaphone}
           title="No campaigns yet"
-          description="Create your first campaign to start awarding badges and XP to users."
+          description={t('gamification.desc_create_your_first_campaign_to_start_awar')}
           actionLabel="Create Campaign"
           onAction={() => navigate('/admin/gamification/campaigns/create')}
         />

@@ -96,8 +96,8 @@ export function CreateDeliverable() {
             onValueChange={(v) => handleChange('title', v)}
           />
           <Textarea
-            label="Description"
-            placeholder="Describe the deliverable..."
+            label={t('deliverability.label_description')}
+            placeholder={t('deliverability.placeholder_describe_the_deliverable')}
             variant="bordered"
             minRows={3}
             value={formData.description}

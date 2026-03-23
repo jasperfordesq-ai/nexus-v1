@@ -18,6 +18,7 @@ import { useTenant, useToast } from '@/contexts';
 import { adminPlans } from '../../api/adminApi';
 import { PageHeader, DataTable, EmptyState, ConfirmModal, type Column } from '../../components';
 
+import { useTranslation } from 'react-i18next';
 interface PlanItem {
   id: number;
   name: string;
@@ -29,7 +30,8 @@ interface PlanItem {
 }
 
 export function PlansAdmin() {
-  usePageTitle('Admin - Plans & Pricing');
+  const { t } = useTranslation('admin');
+  usePageTitle(t('content.page_title'));
   const { tenantPath } = useTenant();
   const toast = useToast();
   const navigate = useNavigate();
@@ -53,7 +55,7 @@ export function PlansAdmin() {
         }
       }
     } catch {
-      toast.error('Failed to load plans');
+      toast.error(t('content.failed_to_load_plans'));
     } finally {
       setLoading(false);
     }
@@ -69,13 +71,13 @@ export function PlansAdmin() {
     try {
       const res = await adminPlans.delete(confirmDelete.id);
       if (res?.success) {
-        toast.success('Plan deleted successfully');
+        toast.success(t('content.plan_deleted_successfully'));
         fetchData();
       } else {
-        toast.error('Failed to delete plan');
+        toast.error(t('content.failed_to_delete_plan'));
       }
     } catch {
-      toast.error('An unexpected error occurred');
+      toast.error(t('content.an_unexpected_error_occurred'));
     } finally {
       setActionLoading(false);
       setConfirmDelete(null);
@@ -141,7 +143,7 @@ export function PlansAdmin() {
             variant="flat"
             color="primary"
             onPress={() => navigate(tenantPath(`/admin/plans/edit/${item.id}`))}
-            aria-label="Edit plan"
+            aria-label={t('content.label_edit_plan')}
           >
             <Pencil size={14} />
           </Button>
@@ -151,7 +153,7 @@ export function PlansAdmin() {
             variant="flat"
             color="danger"
             onPress={() => setConfirmDelete(item)}
-            aria-label="Delete plan"
+            aria-label={t('content.label_delete_plan')}
           >
             <Trash2 size={14} />
           </Button>
@@ -163,7 +165,7 @@ export function PlansAdmin() {
   if (loading) {
     return (
       <div>
-        <PageHeader title="Plans & Pricing" description="Manage subscription plans and pricing tiers" />
+        <PageHeader title={t('content.plans_admin_title')} description={t('content.plans_admin_desc')} />
         <div className="flex justify-center py-12"><Spinner size="lg" /></div>
       </div>
     );
@@ -172,8 +174,8 @@ export function PlansAdmin() {
   return (
     <div>
       <PageHeader
-        title="Plans & Pricing"
-        description="Manage subscription plans and pricing tiers"
+        title={t('content.plans_admin_title')}
+        description={t('content.plans_admin_desc')}
         actions={
           <Button
             color="primary"
@@ -189,7 +191,7 @@ export function PlansAdmin() {
         <EmptyState
           icon={CreditCard}
           title="No Plans Created"
-          description="Create subscription plans to offer different tiers of access to your community platform."
+          description={t('content.desc_create_subscription_plans_to_offer_diffe')}
           actionLabel="Create Plan"
           onAction={() => navigate(tenantPath('/admin/plans/create'))}
         />

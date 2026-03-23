@@ -23,6 +23,7 @@ import { useToast } from '@/contexts';
 import { PageHeader } from '../../components';
 import { adminSettings } from '../../api/adminApi';
 
+import { useTranslation } from 'react-i18next';
 // ─── Types ────────────────────────────────────────────────────────────────────
 
 interface AlgorithmWeights {
@@ -125,7 +126,8 @@ const ALGORITHM_AREAS: Omit<AlgorithmArea, 'enabled' | 'weights'>[] = [
 // ─── Component ────────────────────────────────────────────────────────────────
 
 export function AlgorithmSettings() {
-  usePageTitle('Admin - Algorithm Settings');
+  const { t } = useTranslation('admin');
+  usePageTitle(t('advanced.page_title'));
   const toast = useToast();
 
   const [loading, setLoading] = useState(true);
@@ -155,7 +157,7 @@ export function AlgorithmSettings() {
         };
       }));
     } catch {
-      toast.error('Failed to load algorithm settings');
+      toast.error(t('advanced.failed_to_load_algorithm_settings'));
       // Initialise with defaults
       setAreas(ALGORITHM_AREAS.map(def => ({
         ...def,
@@ -228,7 +230,7 @@ export function AlgorithmSettings() {
       if ((res as { success?: boolean }).success) {
         toast.success(`${areaData.label} settings saved`);
       } else {
-        toast.error('Save failed');
+        toast.error(t('advanced.save_failed'));
       }
     } catch {
       toast.error(`Failed to save ${areaData.label}`);
@@ -248,8 +250,8 @@ export function AlgorithmSettings() {
   return (
     <div>
       <PageHeader
-        title="Algorithm Settings"
-        description="Configure EdgeRank, MatchRank, CommunityRank, and SmartMatch parameters"
+        title={t('advanced.algorithm_settings_title')}
+        description={t('advanced.algorithm_settings_desc')}
       />
 
       <div className="space-y-6">

@@ -17,8 +17,10 @@ import { adminGroups } from '../../api/adminApi';
 import { DataTable, PageHeader, EmptyState, StatusBadge, type Column } from '../../components';
 import type { GroupModerationItem } from '../../api/types';
 
+import { useTranslation } from 'react-i18next';
 export function GroupModeration() {
-  usePageTitle('Admin - Group Moderation');
+  const { t } = useTranslation('admin');
+  usePageTitle(t('groups.page_title'));
   const toast = useToast();
 
   const [items, setItems] = useState<GroupModerationItem[]>([]);
@@ -43,7 +45,7 @@ export function GroupModeration() {
         }
       }
     } catch {
-      toast.error('Failed to load moderation data');
+      toast.error(t('groups.failed_to_load_moderation_data'));
     } finally {
       setLoading(false);
     }
@@ -104,7 +106,7 @@ export function GroupModeration() {
   if (loading) {
     return (
       <div>
-        <PageHeader title="Content Moderation" description="Review reported and flagged group content" />
+        <PageHeader title={t('groups.group_moderation_title')} description={t('groups.group_moderation_desc')} />
         <div className="flex items-center justify-center py-20">
           <Spinner size="lg" />
         </div>
@@ -114,13 +116,13 @@ export function GroupModeration() {
 
   return (
     <div>
-      <PageHeader title="Content Moderation" description="Review reported and flagged group content" />
+      <PageHeader title={t('groups.group_moderation_title')} description={t('groups.group_moderation_desc')} />
 
       {items.length === 0 ? (
         <EmptyState
           icon={ShieldAlert}
           title="No Flagged Content"
-          description="There are no groups with reported or flagged content. Everything looks good."
+          description={t('groups.desc_there_are_no_groups_with_reported_or_fla')}
         />
       ) : (
         <DataTable

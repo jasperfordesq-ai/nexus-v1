@@ -17,6 +17,7 @@ import { useToast } from '@/contexts';
 import { PageHeader, EmptyState, ConfirmModal } from '../../components';
 import { adminTools } from '../../api/adminApi';
 
+import { useTranslation } from 'react-i18next';
 interface BlogBackup {
   id: number;
   filename: string;
@@ -25,7 +26,8 @@ interface BlogBackup {
 }
 
 export function BlogRestore() {
-  usePageTitle('Admin - Blog Restore');
+  const { t } = useTranslation('admin');
+  usePageTitle(t('system.page_title'));
   const toast = useToast();
 
   const [backups, setBackups] = useState<BlogBackup[]>([]);
@@ -51,7 +53,7 @@ export function BlogRestore() {
         setBackups([]);
       }
     } catch {
-      toast.error('Failed to load blog backups');
+      toast.error(t('system.failed_to_load_blog_backups'));
     } finally {
       setLoading(false);
     }
@@ -88,7 +90,7 @@ export function BlogRestore() {
   if (loading) {
     return (
       <div>
-        <PageHeader title="Blog Restore" description="Restore deleted or corrupted blog content" />
+        <PageHeader title={t('system.blog_restore_title')} description={t('system.blog_restore_desc')} />
         <div className="flex justify-center py-16">
           <Spinner size="lg" />
         </div>
@@ -98,7 +100,7 @@ export function BlogRestore() {
 
   return (
     <div>
-      <PageHeader title="Blog Restore" description="Restore deleted or corrupted blog content" />
+      <PageHeader title={t('system.blog_restore_title')} description={t('system.blog_restore_desc')} />
 
       <div className="rounded-lg border border-warning-200 bg-warning-50 p-4 mb-4 flex items-start gap-3">
         <AlertTriangle size={20} className="text-warning shrink-0 mt-0.5" />
@@ -112,7 +114,7 @@ export function BlogRestore() {
         <EmptyState
           icon={RotateCcw}
           title="No Backups Available"
-          description="Blog post backups will appear here when available. Backups are created automatically before major operations."
+          description={t('system.desc_blog_post_backups_will_appear_here_when_')}
         />
       ) : (
         <Card shadow="sm">

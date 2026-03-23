@@ -17,6 +17,7 @@ import { useToast } from '@/contexts';
 import { PageHeader } from '../../components';
 import { adminTools } from '../../api/adminApi';
 
+import { useTranslation } from 'react-i18next';
 interface AuditCheck {
   name: string;
   description: string;
@@ -31,7 +32,8 @@ const statusColorMap: Record<string, 'success' | 'warning' | 'danger' | 'default
 };
 
 export function SeoAudit() {
-  usePageTitle('Admin - SEO Audit');
+  const { t } = useTranslation('admin');
+  usePageTitle(t('advanced.page_title'));
   const toast = useToast();
 
   const [checks, setChecks] = useState<AuditCheck[]>([]);
@@ -111,8 +113,8 @@ export function SeoAudit() {
     return (
       <div>
         <PageHeader
-          title="SEO Audit"
-          description="Automated SEO health check for your platform"
+          title={t('advanced.seo_audit_title')}
+          description={t('advanced.seo_audit_desc')}
         />
         <div className="flex h-64 items-center justify-center">
           <Spinner size="lg" />
@@ -124,8 +126,8 @@ export function SeoAudit() {
   return (
     <div>
       <PageHeader
-        title="SEO Audit"
-        description="Automated SEO health check for your platform"
+        title={t('advanced.seo_audit_title')}
+        description={t('advanced.seo_audit_desc')}
         actions={
           <div className="flex items-center gap-2">
             {hasResults && (

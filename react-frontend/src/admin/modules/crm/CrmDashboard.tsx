@@ -32,6 +32,7 @@ import { API_BASE, tokenManager } from '@/lib/api';
 import { adminCrm } from '../../api/adminApi';
 import { StatCard, PageHeader } from '../../components';
 
+import { useTranslation } from 'react-i18next';
 interface CrmDashboardData {
   total_members: number;
   active_members: number;
@@ -54,7 +55,8 @@ const QUICK_ACTIONS = [
 ] as const;
 
 export function CrmDashboard() {
-  usePageTitle('Admin - Member CRM');
+  const { t } = useTranslation('admin');
+  usePageTitle(t('crm.page_title'));
   const { tenantPath } = useTenant();
   const toast = useToast();
 
@@ -69,7 +71,7 @@ export function CrmDashboard() {
         setData(res.data as CrmDashboardData);
       }
     } catch {
-      toast.error('Failed to load CRM dashboard data');
+      toast.error(t('crm.failed_to_load_c_r_m_dashboard_data'));
     } finally {
       setLoading(false);
     }
@@ -112,8 +114,8 @@ export function CrmDashboard() {
   return (
     <div className="max-w-6xl mx-auto space-y-6">
       <PageHeader
-        title="Member CRM"
-        description="Manage member relationships, notes, and follow-ups"
+        title={t('crm.crm_dashboard_title')}
+        description={t('crm.crm_dashboard_desc')}
         actions={
           <div className="flex gap-2">
             <Button
@@ -155,56 +157,56 @@ export function CrmDashboard() {
       {/* Stat Cards */}
       <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
         <StatCard
-          label="Total Members"
+          label={t('crm.label_total_members')}
           value={data?.total_members ?? 0}
           icon={Users}
           color="primary"
           loading={!data}
         />
         <StatCard
-          label="Active Members"
+          label={t('crm.label_active_members')}
           value={data?.active_members ?? 0}
           icon={Activity}
           color="success"
           loading={!data}
         />
         <StatCard
-          label="New This Month"
+          label={t('crm.label_new_this_month')}
           value={data?.new_this_month ?? 0}
           icon={UserPlus}
           color="secondary"
           loading={!data}
         />
         <StatCard
-          label="Pending Approvals"
+          label={t('crm.label_pending_approvals')}
           value={data?.pending_approvals ?? 0}
           icon={UserCheck}
           color="warning"
           loading={!data}
         />
         <StatCard
-          label="Open Tasks"
+          label={t('crm.label_open_tasks')}
           value={data?.open_tasks ?? 0}
           icon={ClipboardList}
           color="primary"
           loading={!data}
         />
         <StatCard
-          label="Overdue Tasks"
+          label={t('crm.label_overdue_tasks')}
           value={data?.overdue_tasks ?? 0}
           icon={AlertTriangle}
           color={(data?.overdue_tasks ?? 0) > 0 ? 'danger' : 'default'}
           loading={!data}
         />
         <StatCard
-          label="Member Notes"
+          label={t('crm.label_member_notes')}
           value={data?.total_notes ?? 0}
           icon={StickyNote}
           color="secondary"
           loading={!data}
         />
         <StatCard
-          label="Retention Rate"
+          label={t('crm.label_retention_rate')}
           value={data ? `${data.retention_rate}%` : '0%'}
           icon={TrendingUp}
           color="success"

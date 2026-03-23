@@ -61,6 +61,7 @@ import { formatRelativeTime } from '@/lib/helpers';
 import { PageHeader } from '../../components';
 import { StatCard } from '../../components';
 
+import { useTranslation } from 'react-i18next';
 // ─────────────────────────────────────────────────────────────────────────────
 // Types
 // ─────────────────────────────────────────────────────────────────────────────
@@ -133,7 +134,8 @@ const SEVERITY_COLORS: Record<string, 'default' | 'primary' | 'warning' | 'dange
 // ─────────────────────────────────────────────────────────────────────────────
 
 export function SafeguardingDashboard() {
-  usePageTitle('Admin - Safeguarding');
+  const { t } = useTranslation('admin');
+  usePageTitle(t('safeguarding.page_title'));
   const toast = useToast();
 
   const [activeTab, setActiveTab] = useState('flagged');
@@ -185,7 +187,7 @@ export function SafeguardingDashboard() {
       }
     } catch (err) {
       logError('SafeguardingDashboard.load', err);
-      toast.error('Failed to load safeguarding data');
+      toast.error(t('safeguarding.failed_to_load_safeguarding_data'));
     }
     setLoading(false);
   }, [toast]);
@@ -201,7 +203,7 @@ export function SafeguardingDashboard() {
         notes: reviewNotes,
       });
       if (res.success) {
-        toast.success('Message reviewed');
+        toast.success(t('safeguarding.message_reviewed'));
         setFlaggedMessages((prev) =>
           prev.map((m) => m.id === reviewTarget.id ? { ...m, is_reviewed: true, review_notes: reviewNotes } : m)
         );
@@ -213,7 +215,7 @@ export function SafeguardingDashboard() {
       }
     } catch (err) {
       logError('SafeguardingDashboard.review', err);
-      toast.error('Failed to review message');
+      toast.error(t('safeguarding.failed_to_review_message'));
     }
     setReviewing(false);
   }, [reviewTarget, reviewNotes, toast, reviewModal, loadData]);
@@ -228,7 +230,7 @@ export function SafeguardingDashboard() {
         guardian_email: guardianEmail.trim(),
       });
       if (res.success) {
-        toast.success('Guardian assignment created');
+        toast.success(t('safeguarding.guardian_assignment_created'));
         setWardEmail('');
         setGuardianEmail('');
         assignModal.onClose();
@@ -236,7 +238,7 @@ export function SafeguardingDashboard() {
       }
     } catch (err) {
       logError('SafeguardingDashboard.createAssignment', err);
-      toast.error('Failed to create assignment');
+      toast.error(t('safeguarding.failed_to_create_assignment'));
     }
     setCreating(false);
   }, [wardEmail, guardianEmail, toast, assignModal, loadData]);
@@ -245,13 +247,13 @@ export function SafeguardingDashboard() {
   const handleRevokeAssignment = useCallback(async (assignmentId: number) => {
     try {
       await api.delete(`/v2/admin/safeguarding/assignments/${assignmentId}`);
-      toast.success('Assignment revoked');
+      toast.success(t('safeguarding.assignment_revoked'));
       setAssignments((prev) =>
         prev.map((a) => a.id === assignmentId ? { ...a, status: 'revoked' as const } : a)
       );
     } catch (err) {
       logError('SafeguardingDashboard.revoke', err);
-      toast.error('Failed to revoke assignment');
+      toast.error(t('safeguarding.failed_to_revoke_assignment'));
     }
   }, [toast]);
 
@@ -268,7 +270,7 @@ export function SafeguardingDashboard() {
   if (loading) {
     return (
       <div>
-        <PageHeader title="Safeguarding" description="Monitor and manage safeguarding of vulnerable users" />
+        <PageHeader title={t('safeguarding.safeguarding_dashboard_title')} description={t('safeguarding.safeguarding_dashboard_desc')} />
         <div className="flex h-64 items-center justify-center">
           <Spinner size="lg" />
         </div>
@@ -279,8 +281,8 @@ export function SafeguardingDashboard() {
   return (
     <div className="space-y-6">
       <PageHeader
-        title="Safeguarding"
-        description="Monitor flagged messages and manage guardian assignments"
+        title={t('safeguarding.safeguarding_dashboard_title')}
+        description={t('safeguarding.safeguarding_dashboard_desc')}
         actions={
           <div className="flex items-center gap-2">
             <Button
@@ -307,15 +309,15 @@ export function SafeguardingDashboard() {
       {stats && (
         <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
           <StatCard
-            label="Unreviewed Flags"
+            label={t('safeguarding.label_unreviewed_flags')}
             value={stats.unreviewed_flags}
             icon={ShieldAlert}
             color={stats.unreviewed_flags > 0 ? 'danger' : 'success'}
           />
-          <StatCard label="Critical Flags" value={stats.critical_flags} icon={AlertTriangle} color="warning" />
-          <StatCard label="Active Assignments" value={stats.active_assignments} icon={Shield} color="primary" />
-          <StatCard label="Consented Wards" value={stats.consented_wards} icon={ShieldCheck} color="success" />
-          <StatCard label="Flags This Month" value={stats.total_flags_this_month} icon={Flag} color="secondary" />
+          <StatCard label={t('safeguarding.label_critical_flags')} value={stats.critical_flags} icon={AlertTriangle} color="warning" />
+          <StatCard label={t('safeguarding.label_active_assignments')} value={stats.active_assignments} icon={Shield} color="primary" />
+          <StatCard label={t('safeguarding.label_consented_wards')} value={stats.consented_wards} icon={ShieldCheck} color="success" />
+          <StatCard label={t('safeguarding.label_flags_this_month')} value={stats.total_flags_this_month} icon={Flag} color="secondary" />
         </div>
       )}
 
@@ -350,8 +352,8 @@ export function SafeguardingDashboard() {
           <CardHeader className="flex justify-between items-center">
             <h3 className="text-lg font-semibold">Flagged Messages</h3>
             <Input
-              placeholder="Search messages..."
-              aria-label="Search safeguarding messages"
+              placeholder={t('safeguarding.placeholder_search_messages')}
+              aria-label={t('safeguarding.label_search_safeguarding_messages')}
               size="sm"
               variant="bordered"
               className="max-w-xs"
@@ -361,7 +363,7 @@ export function SafeguardingDashboard() {
             />
           </CardHeader>
           <CardBody>
-            <Table aria-label="Flagged messages" removeWrapper>
+            <Table aria-label={t('safeguarding.label_flagged_messages')} removeWrapper>
               <TableHeader>
                 <TableColumn>SENDER</TableColumn>
                 <TableColumn>RECIPIENT</TableColumn>
@@ -453,7 +455,7 @@ export function SafeguardingDashboard() {
             </Button>
           </CardHeader>
           <CardBody>
-            <Table aria-label="Guardian assignments" removeWrapper>
+            <Table aria-label={t('safeguarding.label_guardian_assignments')} removeWrapper>
               <TableHeader>
                 <TableColumn>WARD</TableColumn>
                 <TableColumn>GUARDIAN</TableColumn>
@@ -581,7 +583,7 @@ export function SafeguardingDashboard() {
                     )}
 
                     <Textarea
-                      label="Review Notes"
+                      label={t('safeguarding.label_review_notes')}
                       placeholder="Add notes about your review (action taken, severity assessment, etc.)"
                       value={reviewNotes}
                       onChange={(e) => setReviewNotes(e.target.value)}
@@ -620,14 +622,14 @@ export function SafeguardingDashboard() {
               </ModalHeader>
               <ModalBody className="gap-4">
                 <Input
-                  label="Ward Email"
+                  label={t('safeguarding.label_ward_email')}
                   placeholder="ward@example.com"
                   value={wardEmail}
                   onChange={(e) => setWardEmail(e.target.value)}
-                  description="The vulnerable user who needs oversight"
+                  description={t('safeguarding.desc_the_vulnerable_user_who_needs_oversight')}
                 />
                 <Input
-                  label="Guardian Email"
+                  label={t('safeguarding.label_guardian_email')}
                   placeholder="guardian@example.com"
                   value={guardianEmail}
                   onChange={(e) => setGuardianEmail(e.target.value)}

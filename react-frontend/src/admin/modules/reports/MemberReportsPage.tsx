@@ -65,6 +65,7 @@ import { resolveAvatarUrl } from '@/lib/helpers';
 import { CHART_COLOR_MAP } from '@/lib/chartColors';
 import { StatCard, PageHeader } from '../../components';
 
+import { useTranslation } from 'react-i18next';
 // ---------------------------------------------------------------------------
 // Types
 // ---------------------------------------------------------------------------
@@ -175,7 +176,8 @@ async function exportCsv(reportType: string) {
 // ---------------------------------------------------------------------------
 
 export function MemberReportsPage() {
-  usePageTitle('Member Reports');
+  const { t } = useTranslation('admin');
+  usePageTitle(t('reports.page_title'));
 
   const [reportType, setReportType] = useState('active');
   const [data, setData] = useState<ReportData>(null);
@@ -219,7 +221,7 @@ export function MemberReportsPage() {
 
     return (
       <>
-        <Table aria-label="Active members" shadow="sm">
+        <Table aria-label={t('reports.label_active_members')} shadow="sm">
           <TableHeader>
             <TableColumn>Member</TableColumn>
             <TableColumn>Last Login</TableColumn>
@@ -287,7 +289,7 @@ export function MemberReportsPage() {
                 if (v) setGroupBy(String(v));
               }}
               className="w-32"
-              aria-label="Group by"
+              aria-label={t('reports.label_group_by')}
             >
               {GROUP_BY_OPTIONS.map((opt) => (
                 <SelectItem key={opt.key}>{opt.label}</SelectItem>
@@ -329,7 +331,7 @@ export function MemberReportsPage() {
           <h3 className="font-semibold">Retention Cohorts</h3>
         </CardHeader>
         <CardBody className="px-4 pb-4">
-          <Table aria-label="Retention cohorts" shadow="sm" isStriped>
+          <Table aria-label={t('reports.label_retention_cohorts')} shadow="sm" isStriped>
             <TableHeader>
               <TableColumn>Cohort</TableColumn>
               <TableColumn className="text-center">Initial</TableColumn>
@@ -388,21 +390,21 @@ export function MemberReportsPage() {
             loading={loading}
           />
           <StatCard
-            label="Trading Rate"
+            label={t('reports.label_trading_rate')}
             value={metrics ? `${(Number(metrics.trading_rate ?? 0) * 100).toFixed(1)}%` : '\u2014'}
             icon={TrendingUp}
             color="success"
             loading={loading}
           />
           <StatCard
-            label="Listing Rate"
+            label={t('reports.label_listing_rate')}
             value={metrics ? `${(Number(metrics.listing_rate ?? 0) * 100).toFixed(1)}%` : '\u2014'}
             icon={BarChart3}
             color="warning"
             loading={loading}
           />
           <StatCard
-            label="Messaging Rate"
+            label={t('reports.label_messaging_rate')}
             value={metrics ? `${(Number(metrics.messaging_rate ?? 0) * 100).toFixed(1)}%` : '\u2014'}
             icon={Activity}
             color="secondary"
@@ -462,7 +464,7 @@ export function MemberReportsPage() {
           <h3 className="font-semibold">Top Contributors</h3>
         </CardHeader>
         <CardBody className="px-4 pb-4">
-          <Table aria-label="Top contributors" shadow="sm" isStriped>
+          <Table aria-label={t('reports.label_top_contributors')} shadow="sm" isStriped>
             <TableHeader>
               <TableColumn>Rank</TableColumn>
               <TableColumn>Member</TableColumn>
@@ -509,7 +511,7 @@ export function MemberReportsPage() {
 
     return (
       <>
-        <Table aria-label="Least active members" shadow="sm">
+        <Table aria-label={t('reports.label_least_active_members')} shadow="sm">
           <TableHeader>
             <TableColumn>Member</TableColumn>
             <TableColumn>Last Login</TableColumn>
@@ -565,8 +567,8 @@ export function MemberReportsPage() {
   return (
     <div>
       <PageHeader
-        title="Member Reports"
-        description="Activity, registration trends, retention, and engagement analysis"
+        title={t('reports.member_reports_page_title')}
+        description={t('reports.member_reports_page_desc')}
         actions={
           <div className="flex items-center gap-2">
             <Select
@@ -577,7 +579,7 @@ export function MemberReportsPage() {
                 if (v) setPeriod(String(v));
               }}
               className="w-32"
-              aria-label="Period"
+              aria-label={t('reports.label_period')}
             >
               {PERIOD_OPTIONS.map((opt) => (
                 <SelectItem key={opt.key}>{opt.label}</SelectItem>

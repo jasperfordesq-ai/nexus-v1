@@ -29,8 +29,10 @@ import { adminBroker } from '../../api/adminApi';
 import { PageHeader } from '../../components';
 import type { BrokerArchiveDetail as BrokerArchiveDetailType } from '../../api/types';
 
+import { useTranslation } from 'react-i18next';
 export function ArchiveDetail() {
-  usePageTitle('Admin - Archive Detail');
+  const { t } = useTranslation('admin');
+  usePageTitle(t('broker.page_title'));
   const { id } = useParams<{ id: string }>();
   const { tenantPath } = useTenant();
   const [data, setData] = useState<BrokerArchiveDetailType | null>(null);
@@ -88,7 +90,7 @@ export function ArchiveDetail() {
   return (
     <div className="space-y-6">
       <PageHeader
-        title="Archive Detail"
+        title={t('broker.archive_detail_title')}
         actions={
           <Button
             as={Link}

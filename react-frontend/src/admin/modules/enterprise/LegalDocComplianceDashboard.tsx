@@ -37,8 +37,10 @@ import { useToast } from '@/contexts/ToastContext';
 import { adminLegalDocs } from '@/admin/api/adminApi';
 import type { ComplianceStats, UserAcceptance } from '@/admin/api/types';
 
+import { useTranslation } from 'react-i18next';
 export default function LegalDocComplianceDashboard() {
-  usePageTitle('Legal Compliance Dashboard');
+  const { t } = useTranslation('admin');
+  usePageTitle(t('enterprise.page_title'));
 
   const { success, error } = useToast();
 
@@ -230,7 +232,7 @@ export default function LegalDocComplianceDashboard() {
               <p className="text-[var(--color-text-secondary)]">No legal documents found</p>
             </div>
           ) : (
-            <Table aria-label="Document compliance table">
+            <Table aria-label={t('enterprise.label_document_compliance_table')}>
               <TableHeader>
                 <TableColumn>Document</TableColumn>
                 <TableColumn>Version</TableColumn>
@@ -326,14 +328,14 @@ export default function LegalDocComplianceDashboard() {
           <div className="flex items-end gap-4">
             <Input
               type="date"
-              label="Start Date"
+              label={t('enterprise.label_start_date')}
               value={dateRange.start}
               onChange={(e) => setDateRange({ ...dateRange, start: e.target.value })}
               className="flex-1"
             />
             <Input
               type="date"
-              label="End Date"
+              label={t('enterprise.label_end_date')}
               value={dateRange.end}
               onChange={(e) => setDateRange({ ...dateRange, end: e.target.value })}
               className="flex-1"
@@ -370,7 +372,7 @@ export default function LegalDocComplianceDashboard() {
                     <p className="text-[var(--color-text-secondary)]">No acceptances found</p>
                   </div>
                 ) : (
-                  <Table aria-label="User acceptances">
+                  <Table aria-label={t('enterprise.label_user_acceptances')}>
                     <TableHeader>
                       <TableColumn>User</TableColumn>
                       <TableColumn>Email</TableColumn>

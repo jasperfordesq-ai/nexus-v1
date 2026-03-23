@@ -37,6 +37,7 @@ import { useToast } from '@/contexts';
 import { api } from '@/lib/api';
 import { DataTable, PageHeader, ConfirmModal, type Column } from '../../components';
 
+import { useTranslation } from 'react-i18next';
 // ─────────────────────────────────────────────────────────────────────────────
 // Types
 // ─────────────────────────────────────────────────────────────────────────────
@@ -82,6 +83,7 @@ interface ChallengeActionsProps {
 }
 
 function ChallengeActions({ challenge, onStatusChange, onDelete, onView }: ChallengeActionsProps) {
+  const { t } = useTranslation('admin');
   type ActionKey = 'view' | ChallengeStatus | 'delete';
 
   const handleAction = (key: React.Key) => {
@@ -98,11 +100,11 @@ function ChallengeActions({ challenge, onStatusChange, onDelete, onView }: Chall
   return (
     <Dropdown>
       <DropdownTrigger>
-        <Button isIconOnly size="sm" variant="light" aria-label="Actions">
+        <Button isIconOnly size="sm" variant="light" aria-label={t('ideation.label_actions')}>
           <MoreVertical size={16} />
         </Button>
       </DropdownTrigger>
-      <DropdownMenu aria-label="Challenge actions" onAction={handleAction}>
+      <DropdownMenu aria-label={t('ideation.label_challenge_actions')} onAction={handleAction}>
         <DropdownItem key="view" startContent={<Eye size={14} />}>
           View Details
         </DropdownItem>
@@ -169,7 +171,8 @@ function ChallengeActions({ challenge, onStatusChange, onDelete, onView }: Chall
 // ─────────────────────────────────────────────────────────────────────────────
 
 export function IdeationAdmin() {
-  usePageTitle('Admin - Ideation');
+  const { t } = useTranslation('admin');
+  usePageTitle(t('ideation.page_title'));
   const toast = useToast();
 
   const [items, setItems] = useState<Challenge[]>([]);
@@ -201,7 +204,7 @@ export function IdeationAdmin() {
         setTotal(payload.meta?.total || 0);
       }
     } catch {
-      toast.error('Failed to load ideation challenges');
+      toast.error(t('ideation.failed_to_load_ideation_challenges'));
     } finally {
       setLoading(false);
     }
@@ -225,7 +228,7 @@ export function IdeationAdmin() {
         toast.error(res?.error || 'Failed to update challenge status');
       }
     } catch {
-      toast.error('An unexpected error occurred');
+      toast.error(t('ideation.an_unexpected_error_occurred'));
     }
   };
 
@@ -237,13 +240,13 @@ export function IdeationAdmin() {
     try {
       const res = await api.delete(`/v2/admin/ideation/${confirmDelete.id}`);
       if (res?.success) {
-        toast.success('Challenge deleted successfully');
+        toast.success(t('ideation.challenge_deleted_successfully'));
         loadItems();
       } else {
         toast.error(res?.error || 'Failed to delete challenge');
       }
     } catch {
-      toast.error('An unexpected error occurred');
+      toast.error(t('ideation.an_unexpected_error_occurred'));
     } finally {
       setActionLoading(false);
       setConfirmDelete(null);
@@ -331,8 +334,8 @@ export function IdeationAdmin() {
   return (
     <div>
       <PageHeader
-        title="Ideation Challenges"
-        description="Manage community innovation challenges and ideas"
+        title={t('ideation.ideation_admin_title')}
+        description={t('ideation.ideation_admin_desc')}
         actions={
           <div className="flex gap-2 items-center">
             <Chip variant="flat" startContent={<Lightbulb size={14} />}>
@@ -343,7 +346,7 @@ export function IdeationAdmin() {
               size="sm"
               variant="flat"
               onPress={loadItems}
-              aria-label="Refresh"
+              aria-label={t('ideation.label_refresh')}
             >
               <RefreshCw size={14} />
             </Button>

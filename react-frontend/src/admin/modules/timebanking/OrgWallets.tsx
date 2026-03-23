@@ -19,8 +19,10 @@ import { adminTimebanking } from '../../api/adminApi';
 import { DataTable, PageHeader, type Column } from '../../components';
 import type { OrgWallet } from '../../api/types';
 
+import { useTranslation } from 'react-i18next';
 export function OrgWallets() {
-  usePageTitle('Admin - Organization Wallets');
+  const { t } = useTranslation('admin');
+  usePageTitle(t('timebanking.page_title'));
   const { tenantPath } = useTenant();
   const toast = useToast();
 
@@ -40,7 +42,7 @@ export function OrgWallets() {
         }
       }
     } catch {
-      toast.error('Failed to load organization wallets');
+      toast.error(t('timebanking.failed_to_load_organization_wallets'));
     } finally {
       setLoading(false);
     }
@@ -115,8 +117,8 @@ export function OrgWallets() {
   return (
     <div>
       <PageHeader
-        title="Organization Wallets"
-        description="View organization wallet balances and activity"
+        title={t('timebanking.org_wallets_title')}
+        description={t('timebanking.org_wallets_desc')}
         actions={
           <Button
             as={Link}

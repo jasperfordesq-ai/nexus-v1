@@ -26,8 +26,10 @@ import { adminEnterprise } from '../../api/adminApi';
 import { PageHeader } from '../../components';
 import type { SystemHealth } from '../../api/types';
 
+import { useTranslation } from 'react-i18next';
 export function SystemMonitoring() {
-  usePageTitle('Admin - System Monitoring');
+  const { t } = useTranslation('admin');
+  usePageTitle(t('enterprise.page_title'));
   const { tenantPath } = useTenant();
 
   const [health, setHealth] = useState<SystemHealth | null>(null);
@@ -67,8 +69,8 @@ export function SystemMonitoring() {
   return (
     <div>
       <PageHeader
-        title="System Monitoring"
-        description="Server metrics and system health information"
+        title={t('enterprise.system_monitoring_title')}
+        description={t('enterprise.system_monitoring_desc')}
         actions={
           <div className="flex gap-2">
             <Button

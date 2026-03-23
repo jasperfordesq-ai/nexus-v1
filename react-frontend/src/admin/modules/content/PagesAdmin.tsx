@@ -18,6 +18,7 @@ import { useTenant, useToast } from '@/contexts';
 import { adminPages } from '../../api/adminApi';
 import { PageHeader, DataTable, StatusBadge, EmptyState, ConfirmModal, type Column } from '../../components';
 
+import { useTranslation } from 'react-i18next';
 interface PageItem {
   id: number;
   title: string;
@@ -30,7 +31,8 @@ interface PageItem {
 }
 
 export function PagesAdmin() {
-  usePageTitle('Admin - Pages');
+  const { t } = useTranslation('admin');
+  usePageTitle(t('content.page_title'));
   const { tenantPath, refreshTenant } = useTenant();
   const toast = useToast();
   const navigate = useNavigate();
@@ -54,7 +56,7 @@ export function PagesAdmin() {
         }
       }
     } catch {
-      toast.error('Failed to load pages');
+      toast.error(t('content.failed_to_load_pages'));
     } finally {
       setLoading(false);
     }
@@ -70,14 +72,14 @@ export function PagesAdmin() {
     try {
       const res = await adminPages.delete(confirmDelete.id);
       if (res?.success) {
-        toast.success('Page deleted successfully');
+        toast.success(t('content.page_deleted_successfully'));
         fetchData();
         refreshTenant();
       } else {
-        toast.error('Failed to delete page');
+        toast.error(t('content.failed_to_delete_page'));
       }
     } catch {
-      toast.error('An unexpected error occurred');
+      toast.error(t('content.an_unexpected_error_occurred'));
     } finally {
       setActionLoading(false);
       setConfirmDelete(null);
@@ -145,7 +147,7 @@ export function PagesAdmin() {
             variant="flat"
             color="primary"
             onPress={() => navigate(tenantPath(`/admin/pages/builder/${item.id}`))}
-            aria-label="Edit page"
+            aria-label={t('content.label_edit_page')}
           >
             <Pencil size={14} />
           </Button>
@@ -155,7 +157,7 @@ export function PagesAdmin() {
             variant="flat"
             color="danger"
             onPress={() => setConfirmDelete(item)}
-            aria-label="Delete page"
+            aria-label={t('content.label_delete_page')}
           >
             <Trash2 size={14} />
           </Button>
@@ -167,7 +169,7 @@ export function PagesAdmin() {
   if (loading) {
     return (
       <div>
-        <PageHeader title="Pages" description="Manage CMS pages" />
+        <PageHeader title={t('content.pages_admin_title')} description={t('content.pages_admin_desc')} />
         <div className="flex justify-center py-12"><Spinner size="lg" /></div>
       </div>
     );
@@ -176,8 +178,8 @@ export function PagesAdmin() {
   return (
     <div>
       <PageHeader
-        title="Pages"
-        description="Manage CMS pages"
+        title={t('content.pages_admin_title')}
+        description={t('content.pages_admin_desc')}
         actions={
           <Button
             color="primary"

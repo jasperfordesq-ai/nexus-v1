@@ -143,5 +143,8 @@
     "trend_7day": "Tendenza 7 Giorni",
     "vs_previous_week": "vs. settimana precedente",
     "views_last_days": "Visualizzazioni (Ultimi {{days}} Giorni)"
-  }
+  },
+  "detail_like": "Like",
+  "detail_liked": "Liked",
+  "detail_comments": "Comments"
 }

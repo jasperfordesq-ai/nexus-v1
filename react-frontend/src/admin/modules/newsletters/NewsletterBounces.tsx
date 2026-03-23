@@ -24,8 +24,10 @@ import { CHART_COLOR_MAP } from '@/lib/chartColors';
 import { PageHeader, ConfirmModal } from '../../components';
 import type { NewsletterBounce, SuppressionListEntry, BounceTrendsData, BounceReasonSummary } from '../../api/types';
 
+import { useTranslation } from 'react-i18next';
 export function NewsletterBounces() {
-  usePageTitle('Admin - Newsletter Bounces');
+  const { t } = useTranslation('admin');
+  usePageTitle(t('newsletters.page_title'));
   const toast = useToast();
   const [activeTab, setActiveTab] = useState('bounces');
   const [bounces, setBounces] = useState<NewsletterBounce[]>([]);
@@ -132,10 +134,10 @@ export function NewsletterBounces() {
         setUnsuppressTarget(null);
         loadSuppressionList();
       } else {
-        toast.error('Failed to unsuppress email');
+        toast.error(t('newsletters.failed_to_unsuppress_email'));
       }
     } catch {
-      toast.error('Failed to unsuppress email');
+      toast.error(t('newsletters.failed_to_unsuppress_email'));
     }
     setProcessing(false);
   };
@@ -183,8 +185,8 @@ export function NewsletterBounces() {
   return (
     <div>
       <PageHeader
-        title="Newsletter Bounces"
-        description="Bounce tracking and suppression list management"
+        title={t('newsletters.newsletter_bounces_title')}
+        description={t('newsletters.newsletter_bounces_desc')}
         actions={
           <div className="flex gap-2">
             <Button
@@ -298,7 +300,7 @@ export function NewsletterBounces() {
           <Tabs
             selectedKey={activeTab}
             onSelectionChange={(key) => setActiveTab(key as string)}
-            aria-label="Bounce tabs"
+            aria-label={t('newsletters.label_bounce_tabs')}
           >
             <Tab key="bounces" title="Recent Bounces" />
             <Tab key="suppression" title="Suppression List" />
@@ -306,8 +308,8 @@ export function NewsletterBounces() {
 
           <div className="flex gap-2 w-full">
             <Input
-              placeholder="Search by email..."
-              aria-label="Search bounced emails"
+              placeholder={t('newsletters.placeholder_search_by_email')}
+              aria-label={t('newsletters.label_search_bounced_emails')}
               value={searchQuery}
               onValueChange={setSearchQuery}
               startContent={<Search size={16} />}
@@ -315,7 +317,7 @@ export function NewsletterBounces() {
             />
             {activeTab === 'bounces' && (
               <Select
-                label="Bounce Type"
+                label={t('newsletters.label_bounce_type')}
                 selectedKeys={[typeFilter]}
                 onSelectionChange={(keys) => setTypeFilter(Array.from(keys)[0] as string)}
                 className="w-40"
@@ -330,7 +332,7 @@ export function NewsletterBounces() {
         </CardHeader>
         <CardBody>
           {activeTab === 'bounces' ? (
-            <Table aria-label="Bounces table" isStriped>
+            <Table aria-label={t('newsletters.label_bounces_table')} isStriped>
               <TableHeader>
                 <TableColumn>EMAIL</TableColumn>
                 <TableColumn>TYPE</TableColumn>
@@ -368,7 +370,7 @@ export function NewsletterBounces() {
               </TableBody>
             </Table>
           ) : (
-            <Table aria-label="Suppression list table" isStriped>
+            <Table aria-label={t('newsletters.label_suppression_list_table')} isStriped>
               <TableHeader>
                 <TableColumn>EMAIL</TableColumn>
                 <TableColumn>REASON</TableColumn>

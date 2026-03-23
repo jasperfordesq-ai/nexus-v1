@@ -60,6 +60,7 @@ import { adminMenus } from '../../api/adminApi';
 import { PageHeader, IconPicker, VisibilityRulesEditor } from '../../components';
 import type { MenuItemType, MenuLocation, VisibilityRules } from '@/types/menu';
 
+import { useTranslation } from 'react-i18next';
 // ─────────────────────────────────────────────────────────────────────────────
 // Types
 // ─────────────────────────────────────────────────────────────────────────────
@@ -118,6 +119,7 @@ interface SortableItemProps {
 }
 
 function SortableItem({ item, isSelected, onSelect, onDelete, depth = 0 }: SortableItemProps) {
+  const { t } = useTranslation('admin');
   const {
     attributes,
     listeners,
@@ -152,7 +154,7 @@ function SortableItem({ item, isSelected, onSelect, onDelete, depth = 0 }: Sorta
         className="cursor-grab active:cursor-grabbing text-default-300 hover:text-default-500 p-0.5 min-w-0 h-auto"
         {...attributes}
         {...listeners}
-        aria-label="Drag to reorder"
+        aria-label={t('content.label_drag_to_reorder')}
         onClick={(e) => e.stopPropagation()}
       >
         <GripVertical size={16} />
@@ -186,7 +188,7 @@ function SortableItem({ item, isSelected, onSelect, onDelete, depth = 0 }: Sorta
         size="sm"
         variant="light"
         onPress={onSelect}
-        aria-label="Edit item"
+        aria-label={t('content.label_edit_item')}
         onClick={(e) => e.stopPropagation()}
       >
         <Pencil size={13} />
@@ -198,7 +200,7 @@ function SortableItem({ item, isSelected, onSelect, onDelete, depth = 0 }: Sorta
         variant="light"
         color="danger"
         onPress={() => { onDelete(); }}
-        aria-label="Delete item"
+        aria-label={t('content.label_delete_item')}
         onClick={(e) => e.stopPropagation()}
       >
         <Trash2 size={13} />
@@ -212,9 +214,10 @@ function SortableItem({ item, isSelected, onSelect, onDelete, depth = 0 }: Sorta
 // ─────────────────────────────────────────────────────────────────────────────
 
 export function MenuBuilder() {
+  const { t } = useTranslation('admin');
   const { id } = useParams<{ id: string }>();
   const isEdit = id !== undefined && id !== 'new';
-  usePageTitle('Admin - Menu Builder');
+  usePageTitle(t('content.page_title'));
   const navigate = useNavigate();
   const { tenantPath } = useTenant();
   const toast = useToast();
@@ -281,7 +284,7 @@ export function MenuBuilder() {
         setMenuItems(flattenItems(items as MenuItemData[]));
       }
     } catch {
-      toast.error('Failed to load menu');
+      toast.error(t('content.failed_to_load_menu'));
     } finally {
       setLoading(false);
     }
@@ -297,11 +300,11 @@ export function MenuBuilder() {
 
   const handleSave = async () => {
     if (!formData.name.trim()) {
-      toast.warning('Menu name is required');
+      toast.warning(t('content.menu_name_is_required'));
       return;
     }
     if (!formData.location) {
-      toast.warning('Menu location is required');
+      toast.warning(t('content.menu_location_is_required'));
       return;
     }
     setSaving(true);
@@ -314,9 +317,9 @@ export function MenuBuilder() {
           is_active: formData.is_active ? 1 : 0,
         });
         if (res?.success) {
-          toast.success('Menu updated');
+          toast.success(t('content.menu_updated'));
         } else {
-          toast.error('Failed to update menu');
+          toast.error(t('content.failed_to_update_menu'));
         }
       } else {
         const res = await adminMenus.create({
@@ -342,15 +345,15 @@ export function MenuBuilder() {
               });
             }
           }
-          toast.success('Menu created');
+          toast.success(t('content.menu_created'));
           navigate(tenantPath('/admin/menus'));
           return;
         } else {
-          toast.error('Failed to create menu');
+          toast.error(t('content.failed_to_create_menu'));
         }
       }
     } catch {
-      toast.error('An unexpected error occurred');
+      toast.error(t('content.an_unexpected_error_occurred'));
     } finally {
       setSaving(false);
     }
@@ -401,16 +404,16 @@ export function MenuBuilder() {
       try {
         const res = await adminMenus.createItem(Number(id), newItem);
         if (res?.success) {
-          toast.success('Item added');
+          toast.success(t('content.item_added'));
           await loadMenu();
           // Select the new item
           const created = res.data as MenuItemData | undefined;
           if (created?.id) selectItem(created);
         } else {
-          toast.error('Failed to add item');
+          toast.error(t('content.failed_to_add_item'));
         }
       } catch {
-        toast.error('An unexpected error occurred');
+        toast.error(t('content.an_unexpected_error_occurred'));
       }
     } else {
       const localItem: MenuItemData = {
@@ -433,13 +436,13 @@ export function MenuBuilder() {
         }
         const res = await adminMenus.updateItem(selectedItemId, payload);
         if (res?.success) {
-          toast.success('Item updated');
+          toast.success(t('content.item_updated'));
           await loadMenu();
         } else {
-          toast.error('Failed to update item');
+          toast.error(t('content.failed_to_update_item'));
         }
       } catch {
-        toast.error('An unexpected error occurred');
+        toast.error(t('content.an_unexpected_error_occurred'));
       }
     } else {
       // Update locally
@@ -448,7 +451,7 @@ export function MenuBuilder() {
           item.id === selectedItemId ? { ...item, ...editForm } as MenuItemData : item
         )
       );
-      toast.success('Item updated');
+      toast.success(t('content.item_updated'));
     }
   };
 
@@ -457,14 +460,14 @@ export function MenuBuilder() {
       try {
         const res = await adminMenus.deleteItem(itemId);
         if (res?.success) {
-          toast.success('Item deleted');
+          toast.success(t('content.item_deleted'));
           if (selectedItemId === itemId) clearSelection();
           await loadMenu();
         } else {
-          toast.error('Failed to delete item');
+          toast.error(t('content.failed_to_delete_item'));
         }
       } catch {
-        toast.error('An unexpected error occurred');
+        toast.error(t('content.an_unexpected_error_occurred'));
       }
     } else {
       setMenuItems((prev) => prev.filter((i) => i.id !== itemId));
@@ -503,7 +506,7 @@ export function MenuBuilder() {
           })),
         );
       } catch {
-        toast.error('Failed to save reorder');
+        toast.error(t('content.failed_to_save_reorder'));
         await loadMenu();
       }
     }
@@ -528,7 +531,7 @@ export function MenuBuilder() {
   if (loading) {
     return (
       <div>
-        <PageHeader title="Menu Builder" description="Loading menu..." />
+        <PageHeader title={t('content.menu_builder_title')} description={t('content.menu_builder_desc')} />
         <div className="flex justify-center py-12"><Spinner size="lg" /></div>
       </div>
     );
@@ -538,7 +541,7 @@ export function MenuBuilder() {
     <div>
       <PageHeader
         title={isEdit ? 'Edit Menu' : 'New Menu'}
-        description="Build and organize navigation menu items with drag-and-drop"
+        description={t('content.menu_builder_desc')}
         actions={
           <div className="flex gap-2">
             <Button
@@ -565,7 +568,7 @@ export function MenuBuilder() {
         <CardBody>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <Input
-              label="Menu Name"
+              label={t('content.label_menu_name')}
               placeholder="e.g., Main Navigation"
               isRequired
               variant="bordered"
@@ -573,7 +576,7 @@ export function MenuBuilder() {
               onValueChange={(v) => handleChange('name', v)}
             />
             <Select
-              label="Location"
+              label={t('content.label_location')}
               isRequired
               variant="bordered"
               selectedKeys={formData.location ? [formData.location] : []}
@@ -588,8 +591,8 @@ export function MenuBuilder() {
             </Select>
             <div className="flex items-end gap-4">
               <Input
-                label="Description"
-                placeholder="Optional"
+                label={t('content.label_description')}
+                placeholder={t('content.placeholder_optional')}
                 variant="bordered"
                 value={formData.description}
                 onValueChange={(v) => handleChange('description', v)}
@@ -687,8 +690,8 @@ export function MenuBuilder() {
                 <>
                   {/* Label */}
                   <Input
-                    label="Label"
-                    placeholder="Menu item text"
+                    label={t('content.label_label')}
+                    placeholder={t('content.placeholder_menu_item_text')}
                     isRequired
                     variant="bordered"
                     size="sm"
@@ -698,7 +701,7 @@ export function MenuBuilder() {
 
                   {/* Type */}
                   <Select
-                    label="Type"
+                    label={t('content.label_type')}
                     variant="bordered"
                     size="sm"
                     selectedKeys={editForm.type ? [editForm.type] : ['link']}
@@ -726,7 +729,7 @@ export function MenuBuilder() {
                   {/* Conditional URL field */}
                   {(editForm.type === 'link' || editForm.type === 'external' || !editForm.type) && (
                     <Input
-                      label="URL"
+                      label={t('content.label_u_r_l')}
                       placeholder={editForm.type === 'external' ? 'https://example.com' : '/dashboard'}
                       variant="bordered"
                       size="sm"
@@ -737,7 +740,7 @@ export function MenuBuilder() {
 
                   {editForm.type === 'route' && (
                     <Input
-                      label="Route Name"
+                      label={t('content.label_route_name')}
                       placeholder="e.g., dashboard"
                       variant="bordered"
                       size="sm"
@@ -757,7 +760,7 @@ export function MenuBuilder() {
                   {/* Target */}
                   {editForm.type !== 'divider' && editForm.type !== 'dropdown' && (
                     <Select
-                      label="Open in"
+                      label={t('content.label_open_in')}
                       variant="bordered"
                       size="sm"
                       selectedKeys={[editForm.target || '_self']}
@@ -774,7 +777,7 @@ export function MenuBuilder() {
                   {/* Parent (for nesting under dropdown items) */}
                   {editForm.type !== 'dropdown' && parentOptions.length > 0 && (
                     <Select
-                      label="Parent item"
+                      label={t('content.label_parent_item')}
                       variant="bordered"
                       size="sm"
                       selectedKeys={editForm.parent_id ? [String(editForm.parent_id)] : []}
@@ -819,7 +822,7 @@ export function MenuBuilder() {
                   {showAdvanced && (
                     <div className="space-y-3 pl-2 border-l-2 border-default-100">
                       <Input
-                        label="CSS Class"
+                        label={t('content.label_c_s_s_class')}
                         placeholder="e.g., text-red-500"
                         variant="bordered"
                         size="sm"

@@ -32,6 +32,7 @@ import { adminNewsletters } from '../../api/adminApi';
 import { PageHeader, StatCard } from '../../components';
 import { NewsletterResend } from './NewsletterResend';
 
+import { useTranslation } from 'react-i18next';
 // ─── Types ──────────────────────────────────────────────────────────────────
 
 interface NewsletterInfo {
@@ -149,11 +150,12 @@ const DEVICE_ICONS: Record<string, typeof Monitor> = {
 // ─── Component ──────────────────────────────────────────────────────────────
 
 export function NewsletterStats() {
+  const { t } = useTranslation('admin');
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { tenantPath } = useTenant();
   const toast = useToast();
-  usePageTitle('Admin - Newsletter Stats');
+  usePageTitle(t('newsletters.page_title'));
 
   const [data, setData] = useState<StatsData | null>(null);
   const [loading, setLoading] = useState(true);
@@ -198,10 +200,10 @@ export function NewsletterStats() {
         toast.success(`Subject ${winner.toUpperCase()} selected as winner`);
         loadStats();
       } else {
-        toast.error('Failed to select winner');
+        toast.error(t('newsletters.failed_to_select_winner'));
       }
     } catch {
-      toast.error('Failed to select winner');
+      toast.error(t('newsletters.failed_to_select_winner'));
     }
     setSelectingWinner(false);
   };
@@ -228,7 +230,7 @@ export function NewsletterStats() {
     return (
       <div>
         <PageHeader
-          title="Newsletter Stats"
+          title={t('newsletters.newsletter_stats_title')}
           actions={
             <Button
               variant="flat"
@@ -258,7 +260,7 @@ export function NewsletterStats() {
     return (
       <div>
         <PageHeader
-          title="Newsletter Stats"
+          title={t('newsletters.newsletter_stats_title')}
           actions={
             <Button
               variant="flat"
@@ -294,7 +296,7 @@ export function NewsletterStats() {
       {/* ── Header ── */}
       <PageHeader
         title={newsletter.subject || newsletter.name}
-        description="Campaign performance metrics"
+        description={t('newsletters.newsletter_stats_desc')}
         actions={
           <div className="flex flex-wrap gap-2">
             <Button
@@ -359,21 +361,21 @@ export function NewsletterStats() {
       {/* ── Metrics Row (with unique counts) ── */}
       <div className="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <StatCard
-          label="Success Rate"
+          label={t('newsletters.label_success_rate')}
           value={`${engagement.success_rate}%`}
           icon={CheckCircle}
           color="success"
           description={`${delivery.delivered.toLocaleString()} delivered`}
         />
         <StatCard
-          label="Open Rate"
+          label={t('newsletters.label_open_rate')}
           value={`${engagement.open_rate}%`}
           icon={Eye}
           color="primary"
           description={`${engagement.unique_opens.toLocaleString()} unique opens`}
         />
         <StatCard
-          label="Click Rate"
+          label={t('newsletters.label_click_rate')}
           value={`${engagement.click_rate}%`}
           icon={MousePointer}
           color="warning"
@@ -396,20 +398,20 @@ export function NewsletterStats() {
         </CardHeader>
         <CardBody className="space-y-4 px-5 pb-5">
           <FunnelBar
-            label="Delivered"
+            label={t('newsletters.label_delivered')}
             value={delivery.delivered}
             total={delivery.delivered}
             color="primary"
           />
           <FunnelBar
-            label="Opened"
+            label={t('newsletters.label_opened')}
             value={engagement.unique_opens}
             total={delivery.delivered}
             color="secondary"
             rate={engagement.open_rate}
           />
           <FunnelBar
-            label="Clicked"
+            label={t('newsletters.label_clicked')}
             value={engagement.unique_clicks}
             total={delivery.delivered}
             color="success"
@@ -424,10 +426,10 @@ export function NewsletterStats() {
           <h3 className="text-lg font-semibold text-foreground">Delivery Stats</h3>
         </CardHeader>
         <CardBody className="space-y-4 px-5 pb-5">
-          <DeliveryBar label="Delivered" value={delivery.delivered} total={delivery.total_sent + delivery.pending} color="success" />
-          <DeliveryBar label="Failed" value={delivery.failed} total={delivery.total_sent + delivery.pending} color="danger" />
-          <DeliveryBar label="Bounced" value={delivery.bounced} total={delivery.total_sent + delivery.pending} color="warning" />
-          <DeliveryBar label="Pending" value={delivery.pending} total={delivery.total_sent + delivery.pending} color="default" />
+          <DeliveryBar label={t('newsletters.label_delivered')} value={delivery.delivered} total={delivery.total_sent + delivery.pending} color="success" />
+          <DeliveryBar label={t('newsletters.label_failed')} value={delivery.failed} total={delivery.total_sent + delivery.pending} color="danger" />
+          <DeliveryBar label={t('newsletters.label_bounced')} value={delivery.bounced} total={delivery.total_sent + delivery.pending} color="warning" />
+          <DeliveryBar label={t('newsletters.label_pending')} value={delivery.pending} total={delivery.total_sent + delivery.pending} color="default" />
         </CardBody>
       </Card>
 
@@ -457,7 +459,7 @@ export function NewsletterStats() {
             {/* Variant Comparison */}
             <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
               <AbVariantCard
-                label="Subject A"
+                label={t('newsletters.label_subject_a')}
                 subject={ab_test.subject_a}
                 opens={ab_test.subject_a_opens}
                 clicks={ab_test.subject_a_clicks}
@@ -469,7 +471,7 @@ export function NewsletterStats() {
                 chipColor="primary"
               />
               <AbVariantCard
-                label="Subject B"
+                label={t('newsletters.label_subject_b')}
                 subject={ab_test.subject_b}
                 opens={ab_test.subject_b_opens}
                 clicks={ab_test.subject_b_clicks}
@@ -671,7 +673,7 @@ export function NewsletterStats() {
           </CardHeader>
           <CardBody className="px-5 pb-5">
             <Table
-              aria-label="Top clicked links"
+              aria-label={t('newsletters.label_top_clicked_links')}
               removeWrapper
               classNames={{ th: 'text-default-500 text-xs uppercase' }}
             >
@@ -728,7 +730,7 @@ export function NewsletterStats() {
           <CardBody className="px-5 pb-5">
             <div className="max-h-80 overflow-y-auto">
               <Table
-                aria-label="Recent newsletter activity"
+                aria-label={t('newsletters.label_recent_newsletter_activity')}
                 removeWrapper
                 classNames={{ th: 'text-default-500 text-xs uppercase', td: 'py-2' }}
               >
@@ -798,13 +800,13 @@ export function NewsletterStats() {
                 try {
                   const res = await adminNewsletters.duplicateNewsletter(Number(id));
                   if (res.success) {
-                    toast.success('Newsletter duplicated as draft');
+                    toast.success(t('newsletters.newsletter_duplicated_as_draft'));
                     navigate(tenantPath('/admin/newsletters'));
                   } else {
-                    toast.error('Failed to duplicate');
+                    toast.error(t('newsletters.failed_to_duplicate'));
                   }
                 } catch {
-                  toast.error('Failed to duplicate');
+                  toast.error(t('newsletters.failed_to_duplicate'));
                 }
               }}
             >

@@ -50,6 +50,7 @@ import { useTenant, useToast } from '@/contexts';
 import { adminNewsletters } from '../../api/adminApi';
 import { PageHeader, StatCard, ConfirmModal } from '../../components';
 
+import { useTranslation } from 'react-i18next';
 // ─────────────────────────────────────────────────────────────────────────────
 // Types
 // ─────────────────────────────────────────────────────────────────────────────
@@ -80,7 +81,8 @@ type StatusFilter = '' | 'active' | 'pending' | 'unsubscribed';
 // ─────────────────────────────────────────────────────────────────────────────
 
 export function Subscribers() {
-  usePageTitle('Admin - Subscribers');
+  const { t } = useTranslation('admin');
+  usePageTitle(t('newsletters.page_title'));
   const { tenant } = useTenant();
   const toast = useToast();
 
@@ -197,7 +199,7 @@ export function Subscribers() {
         toast.error(res.message || 'Failed to add subscriber');
       }
     } catch {
-      toast.error('Failed to add subscriber');
+      toast.error(t('newsletters.failed_to_add_subscriber'));
     }
     setAddLoading(false);
   }, [addForm, loadData, statusFilter, searchQuery, toast]);
@@ -216,10 +218,10 @@ export function Subscribers() {
         setRemoveTarget(null);
         loadData();
       } else {
-        toast.error('Failed to remove subscriber');
+        toast.error(t('newsletters.failed_to_remove_subscriber'));
       }
     } catch {
-      toast.error('Failed to remove subscriber');
+      toast.error(t('newsletters.failed_to_remove_subscriber'));
     }
     setRemoveLoading(false);
   }, [removeTarget, loadData, toast]);
@@ -240,7 +242,7 @@ export function Subscribers() {
 
       const lines = text.split(/\r?\n/).filter((l) => l.trim());
       if (lines.length < 2) {
-        toast.warning('CSV must have a header row and at least one data row');
+        toast.warning(t('newsletters.c_s_v_must_have_a_header_row_and_at_least_'));
         return;
       }
 
@@ -248,7 +250,7 @@ export function Subscribers() {
       const header = lines[0].split(',').map((h) => h.trim().toLowerCase().replace(/"/g, ''));
       const emailIdx = header.indexOf('email');
       if (emailIdx === -1) {
-        toast.warning('CSV must have an "email" column');
+        toast.warning(t('newsletters.c_s_v_must_have_an_email_column'));
         return;
       }
       const fnIdx = header.indexOf('first_name');
@@ -286,7 +288,7 @@ export function Subscribers() {
         toast.error(res.message || 'Failed to import');
       }
     } catch {
-      toast.error('Failed to import subscribers');
+      toast.error(t('newsletters.failed_to_import_subscribers'));
     }
     setImportLoading(false);
   }, [importRows, loadData, statusFilter, searchQuery, toast]);
@@ -302,7 +304,7 @@ export function Subscribers() {
       if (res.success && Array.isArray(res.data)) {
         const rows = res.data as Array<Record<string, string>>;
         if (rows.length === 0) {
-          toast.warning('No subscribers to export');
+          toast.warning(t('newsletters.no_subscribers_to_export'));
           setExportLoading(false);
           return;
         }
@@ -321,7 +323,7 @@ export function Subscribers() {
         toast.success(`${rows.length} subscribers exported`);
       }
     } catch {
-      toast.error('Failed to export subscribers');
+      toast.error(t('newsletters.failed_to_export_subscribers'));
     }
     setExportLoading(false);
   }, [toast]);
@@ -342,7 +344,7 @@ export function Subscribers() {
         toast.error(res.message || 'Failed to sync');
       }
     } catch {
-      toast.error('Failed to sync members');
+      toast.error(t('newsletters.failed_to_sync_members'));
     }
     setSyncLoading(false);
   }, [loadData, statusFilter, searchQuery, toast]);
@@ -358,7 +360,7 @@ export function Subscribers() {
   const copySubscribeLink = useCallback(() => {
     if (!subscribeUrl) return;
     navigator.clipboard.writeText(subscribeUrl);
-    toast.success('Subscribe link copied to clipboard');
+    toast.success(t('newsletters.subscribe_link_copied_to_clipboard'));
   }, [subscribeUrl, toast]);
 
   const statusColor = (status: string): 'success' | 'warning' | 'danger' | 'default' => {
@@ -389,8 +391,8 @@ export function Subscribers() {
     <div className="space-y-6">
       {/* Header */}
       <PageHeader
-        title="Newsletter Subscribers"
-        description="Manage your newsletter subscriber list"
+        title={t('newsletters.subscribers_title')}
+        description={t('newsletters.subscribers_desc')}
         actions={
           <div className="flex items-center gap-2">
             <Button
@@ -459,16 +461,16 @@ export function Subscribers() {
       {/* Stats cards */}
       <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
         <Button variant="light" className="text-left h-auto p-0" onPress={() => handleStatusFilter('')}>
-          <StatCard label="Total Subscribers" value={stats.total} icon={Mail} color="primary" loading={loading} />
+          <StatCard label={t('newsletters.label_total_subscribers')} value={stats.total} icon={Mail} color="primary" loading={loading} />
         </Button>
         <Button variant="light" className="text-left h-auto p-0" onPress={() => handleStatusFilter('active')}>
-          <StatCard label="Active" value={stats.active} icon={CheckCircle} color="success" loading={loading} />
+          <StatCard label={t('newsletters.label_active')} value={stats.active} icon={CheckCircle} color="success" loading={loading} />
         </Button>
         <Button variant="light" className="text-left h-auto p-0" onPress={() => handleStatusFilter('pending')}>
-          <StatCard label="Pending" value={stats.pending} icon={Clock} color="warning" loading={loading} />
+          <StatCard label={t('newsletters.label_pending')} value={stats.pending} icon={Clock} color="warning" loading={loading} />
         </Button>
         <Button variant="light" className="text-left h-auto p-0" onPress={() => handleStatusFilter('unsubscribed')}>
-          <StatCard label="Unsubscribed" value={stats.unsubscribed} icon={UserX} color="danger" loading={loading} />
+          <StatCard label={t('newsletters.label_unsubscribed')} value={stats.unsubscribed} icon={UserX} color="danger" loading={loading} />
         </Button>
       </div>
 
@@ -490,8 +492,8 @@ export function Subscribers() {
         <div className="ml-auto w-full max-w-xs">
           <Input
             size="sm"
-            placeholder="Search by name or email..."
-            aria-label="Search subscribers"
+            placeholder={t('newsletters.placeholder_search_by_name_or_email')}
+            aria-label={t('newsletters.label_search_subscribers')}
             startContent={<Search size={14} className="text-default-400" />}
             value={searchInput}
             onValueChange={handleSearchChange}
@@ -503,7 +505,7 @@ export function Subscribers() {
 
       {/* Data table */}
       <Table
-        aria-label="Newsletter subscribers"
+        aria-label={t('newsletters.label_newsletter_subscribers')}
         shadow="sm"
         isStriped
         bottomContent={
@@ -578,7 +580,7 @@ export function Subscribers() {
                     variant="light"
                     color="danger"
                     size="sm"
-                    aria-label="Remove subscriber"
+                    aria-label={t('newsletters.label_remove_subscriber')}
                     onPress={() => setRemoveTarget(sub)}
                   >
                     <Trash2 size={14} />
@@ -626,7 +628,7 @@ export function Subscribers() {
           <ModalBody>
             <div className="space-y-4">
               <Input
-                label="Email"
+                label={t('newsletters.label_email')}
                 type="email"
                 placeholder="subscriber@example.com"
                 isRequired
@@ -635,14 +637,14 @@ export function Subscribers() {
                 autoFocus
               />
               <Input
-                label="First Name"
-                placeholder="Jane"
+                label={t('newsletters.label_first_name')}
+                placeholder={t('newsletters.placeholder_jane')}
                 value={addForm.first_name}
                 onValueChange={(v) => setAddForm((f) => ({ ...f, first_name: v }))}
               />
               <Input
-                label="Last Name"
-                placeholder="Doe"
+                label={t('newsletters.label_last_name')}
+                placeholder={t('newsletters.placeholder_doe')}
                 value={addForm.last_name}
                 onValueChange={(v) => setAddForm((f) => ({ ...f, last_name: v }))}
               />

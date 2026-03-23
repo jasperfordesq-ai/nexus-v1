@@ -26,6 +26,7 @@ import { PageHeader, DataTable, StatusBadge } from '../../components';
 import type { Column } from '../../components';
 import type { GdprRequest } from '../../api/types';
 
+import { useTranslation } from 'react-i18next';
 const STATUS_OPTIONS = [
   { value: 'all', label: 'All Statuses' },
   { value: 'pending', label: 'Pending' },
@@ -35,7 +36,8 @@ const STATUS_OPTIONS = [
 ];
 
 export function GdprRequests() {
-  usePageTitle('Admin - GDPR Data Requests');
+  const { t } = useTranslation('admin');
+  usePageTitle(t('enterprise.page_title'));
   const toast = useToast();
 
   const [requests, setRequests] = useState<GdprRequest[]>([]);
@@ -63,7 +65,7 @@ export function GdprRequests() {
         }
       }
     } catch {
-      toast.error('Failed to load GDPR requests');
+      toast.error(t('enterprise.failed_to_load_g_d_p_r_requests'));
     } finally {
       setLoading(false);
     }
@@ -85,7 +87,7 @@ export function GdprRequests() {
         toast.error(error);
       }
     } catch (err) {
-      toast.error('Failed to update request');
+      toast.error(t('enterprise.failed_to_update_request'));
       console.error('GDPR request update error:', err);
     }
   };
@@ -117,11 +119,11 @@ export function GdprRequests() {
       render: (r) => (
         <Dropdown>
           <DropdownTrigger>
-            <Button isIconOnly size="sm" variant="light" aria-label="Actions">
+            <Button isIconOnly size="sm" variant="light" aria-label={t('enterprise.label_actions')}>
               <MoreVertical size={14} />
             </Button>
           </DropdownTrigger>
-          <DropdownMenu aria-label="Request actions">
+          <DropdownMenu aria-label={t('enterprise.label_request_actions')}>
             <DropdownItem key="processing" onPress={() => handleStatusUpdate(r.id, 'processing')}>
               Mark Processing
             </DropdownItem>
@@ -140,8 +142,8 @@ export function GdprRequests() {
   return (
     <div>
       <PageHeader
-        title="Data Requests"
-        description="GDPR data subject requests (access, deletion, portability, rectification)"
+        title={t('enterprise.gdpr_requests_title')}
+        description={t('enterprise.gdpr_requests_desc')}
         actions={
           <Button
             variant="flat"
@@ -157,7 +159,7 @@ export function GdprRequests() {
 
       <div className="mb-4">
         <Select
-          label="Filter by status"
+          label={t('enterprise.label_filter_by_status')}
           selectedKeys={new Set([statusFilter])}
           onSelectionChange={(keys) => {
             const selected = Array.from(keys)[0] as string;

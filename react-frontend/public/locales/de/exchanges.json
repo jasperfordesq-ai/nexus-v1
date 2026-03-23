@@ -104,9 +104,9 @@
       "disputed": "Tauschgeschäft angefochten",
       "fallback": "Status aktualisiert"
     },
-    "prep_time": "Preparation Time",
-    "ratings": "Ratings",
-    "rate_exchange": "Rate This Exchange"
+    "prep_time": "Vorbereitungszeit",
+    "ratings": "Bewertungen",
+    "rate_exchange": "Diesen Tausch bewerten"
   },
   "modal": {
     "decline_title": "Tauschanfrage ablehnen",

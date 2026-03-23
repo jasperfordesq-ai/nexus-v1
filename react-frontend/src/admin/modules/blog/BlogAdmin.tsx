@@ -19,13 +19,15 @@ import { adminBlog } from '../../api/adminApi';
 import { DataTable, PageHeader, ConfirmModal, type Column } from '../../components';
 import type { AdminBlogPost } from '../../api/types';
 
+import { useTranslation } from 'react-i18next';
 const statusColors: Record<string, 'success' | 'default'> = {
   published: 'success',
   draft: 'default',
 };
 
 export function BlogAdmin() {
-  usePageTitle('Admin - Blog Posts');
+  const { t } = useTranslation('admin');
+  usePageTitle(t('blog.page_title'));
   const { tenantPath } = useTenant();
   const toast = useToast();
   const navigate = useNavigate();
@@ -59,7 +61,7 @@ export function BlogAdmin() {
         }
       }
     } catch {
-      toast.error('Failed to load blog posts');
+      toast.error(t('blog.failed_to_load_blog_posts'));
     } finally {
       setLoading(false);
     }
@@ -76,13 +78,13 @@ export function BlogAdmin() {
     try {
       const res = await adminBlog.delete(confirmDelete.id);
       if (res?.success) {
-        toast.success('Blog post deleted successfully');
+        toast.success(t('blog.blog_post_deleted_successfully'));
         loadItems();
       } else {
         toast.error(res?.error || 'Failed to delete blog post');
       }
     } catch {
-      toast.error('An unexpected error occurred');
+      toast.error(t('blog.an_unexpected_error_occurred'));
     } finally {
       setActionLoading(false);
       setConfirmDelete(null);
@@ -100,7 +102,7 @@ export function BlogAdmin() {
         toast.error(res?.error || 'Failed to toggle status');
       }
     } catch {
-      toast.error('An unexpected error occurred');
+      toast.error(t('blog.an_unexpected_error_occurred'));
     }
   };
 
@@ -172,7 +174,7 @@ export function BlogAdmin() {
             variant="flat"
             color="primary"
             onPress={() => navigate(tenantPath(`/admin/blog/edit/${item.id}`))}
-            aria-label="Edit post"
+            aria-label={t('blog.label_edit_post')}
           >
             <Pencil size={14} />
           </Button>
@@ -192,7 +194,7 @@ export function BlogAdmin() {
             variant="flat"
             color="danger"
             onPress={() => setConfirmDelete(item)}
-            aria-label="Delete post"
+            aria-label={t('blog.label_delete_post')}
           >
             <Trash2 size={14} />
           </Button>
@@ -204,8 +206,8 @@ export function BlogAdmin() {
   return (
     <div>
       <PageHeader
-        title="Blog Posts"
-        description="Create and manage blog posts"
+        title={t('blog.blog_admin_title')}
+        description={t('blog.blog_admin_desc')}
         actions={
           <Button
             color="primary"

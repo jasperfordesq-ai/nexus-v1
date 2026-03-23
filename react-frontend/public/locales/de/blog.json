@@ -13,7 +13,7 @@
   "empty_desc_filtered": "Versuchen Sie andere Suchbegriffe oder setzen Sie Ihre Filter zurück",
   "load_more": "Weitere Beiträge laden",
   "min_read": "{{count}} Min. Lesezeit",
-  "min_read_short": "{{count}}m",
+  "min_read_short": "{{count}}Min",
   "post": {
     "not_found": "Blogbeitrag nicht gefunden.",
     "not_found_desc": "Dieser Beitrag wurde möglicherweise entfernt oder der Link ist fehlerhaft.",

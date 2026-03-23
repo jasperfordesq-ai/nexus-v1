@@ -25,8 +25,10 @@ import { PageHeader } from '@/admin/components/PageHeader';
 import { DataTable, StatusBadge, type Column } from '@/admin/components/DataTable';
 import type { SuperAdminTenant } from '@/admin/api/types';
 
+import { useTranslation } from 'react-i18next';
 export function TenantListAdmin() {
-  usePageTitle('Manage Tenants - Super Admin');
+  const { t } = useTranslation('admin');
+  usePageTitle(t('super_admin.page_title'));
   const { tenantPath } = useTenant();
 
   const [search, setSearch] = useState('');
@@ -145,8 +147,8 @@ export function TenantListAdmin() {
   return (
     <div className="p-6">
       <PageHeader
-        title="Manage Tenants"
-        description="View and manage all tenants in the platform hierarchy"
+        title={t('super_admin.tenant_list_admin_title')}
+        description={t('super_admin.tenant_list_admin_desc')}
         actions={
           <Button
             as={Link}
@@ -163,7 +165,7 @@ export function TenantListAdmin() {
       {/* Filters */}
       <div className="mb-4 flex items-center gap-3 flex-wrap">
         <Select
-          label="Status"
+          label={t('super_admin.label_status')}
           size="sm"
           variant="bordered"
           selectedKeys={[statusFilter]}

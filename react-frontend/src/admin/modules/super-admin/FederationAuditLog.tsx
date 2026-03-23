@@ -31,6 +31,7 @@ import { usePageTitle } from '@/hooks/usePageTitle';
 import { adminSuper } from '../../api/adminApi';
 import type { SuperAuditEntry } from '../../api/types';
 
+import { useTranslation } from 'react-i18next';
 interface AuditEntry {
   id: number;
   level: 'critical' | 'warning' | 'info';
@@ -80,7 +81,8 @@ function mapAuditEntry(e: SuperAuditEntry): AuditEntry {
 }
 
 export default function FederationAuditLog() {
-  usePageTitle('Federation Audit Log');
+  const { t } = useTranslation('admin');
+  usePageTitle(t('super_admin.page_title'));
   const [entries, setEntries] = useState<AuditEntry[]>([]);
   const [stats, setStats] = useState<Stats>({ total: 0, critical: 0, warnings: 0, info: 0 });
   const [filters, setFilters] = useState({
@@ -176,8 +178,8 @@ export default function FederationAuditLog() {
   return (
     <div className="space-y-6">
       <PageHeader
-        title="Federation Audit Log"
-        description="Track all federation system changes and events"
+        title={t('super_admin.federation_audit_log_title')}
+        description={t('super_admin.federation_audit_log_desc')}
       />
 
       {/* Stats Cards */}
@@ -244,7 +246,7 @@ export default function FederationAuditLog() {
         <CardBody>
           <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
             <Select
-              label="Level"
+              label={t('super_admin.label_level')}
               selectedKeys={[filters.level]}
               onChange={(e) => setFilters(prev => ({ ...prev, level: e.target.value }))}
               variant="bordered"
@@ -256,7 +258,7 @@ export default function FederationAuditLog() {
             </Select>
 
             <Select
-              label="Category"
+              label={t('super_admin.label_category')}
               selectedKeys={[filters.category]}
               onChange={(e) => setFilters(prev => ({ ...prev, category: e.target.value }))}
               variant="bordered"
@@ -270,7 +272,7 @@ export default function FederationAuditLog() {
             </Select>
 
             <Input
-              label="From Date"
+              label={t('super_admin.label_from_date')}
               type="date"
               value={filters.from}
               onValueChange={(value) => setFilters(prev => ({ ...prev, from: value }))}
@@ -278,7 +280,7 @@ export default function FederationAuditLog() {
             />
 
             <Input
-              label="To Date"
+              label={t('super_admin.label_to_date')}
               type="date"
               value={filters.to}
               onValueChange={(value) => setFilters(prev => ({ ...prev, to: value }))}
@@ -286,7 +288,7 @@ export default function FederationAuditLog() {
             />
 
             <Input
-              label="Search"
+              label={t('super_admin.label_search')}
               placeholder="Search actions, actors..."
               value={filters.search}
               onValueChange={(value) => setFilters(prev => ({ ...prev, search: value }))}
@@ -294,7 +296,7 @@ export default function FederationAuditLog() {
               startContent={<Search className="w-4 h-4 text-default-400" />}
               endContent={
                 filters.search && (
-                  <Button isIconOnly variant="light" size="sm" onPress={() => setFilters(prev => ({ ...prev, search: '' }))} aria-label="Clear search" className="min-w-0 w-6 h-6">
+                  <Button isIconOnly variant="light" size="sm" onPress={() => setFilters(prev => ({ ...prev, search: '' }))} aria-label={t('super_admin.label_clear_search')} className="min-w-0 w-6 h-6">
                     <X className="w-4 h-4 text-default-400" />
                   </Button>
                 )
@@ -310,7 +312,7 @@ export default function FederationAuditLog() {
           <h3 className="text-lg font-semibold">Audit Entries ({entries.length})</h3>
         </CardHeader>
         <CardBody>
-          <Table aria-label="Federation audit log" shadow="sm" isStriped>
+          <Table aria-label={t('super_admin.label_federation_audit_log')} shadow="sm" isStriped>
             <TableHeader>
               <TableColumn>Level</TableColumn>
               <TableColumn>Action</TableColumn>
