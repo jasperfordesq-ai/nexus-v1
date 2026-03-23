@@ -47,9 +47,11 @@
     "knowledge_base": "Bunachar eolais",
     "federation_settings": "Socruithe Cónaidhme",
     "unread_notifications": "{{count}} fógra gan léamh",
-    "timebanking": "Baincéireacht ama"
+    "timebanking": "Baincéireacht ama",
+    "explore": "Féach Thart"
   },
   "nav_desc": {
+    "explore": "Aimsigh ábhar agus daoine atá ag treáil",
     "members": "Brabhsáil baill an phobail",
     "connections": "Do naisc & iarratais",
     "events": "Imeachtaí pobail atá le teacht",
