@@ -182,7 +182,8 @@ class SearchService
             foreach ($listings as $l) {
                 $allItems[] = [
                     ...$l->toArray(),
-                    'result_type' => 'listing',
+                    'type'         => 'listing',
+                    'listing_type' => $l->type,
                     'category_name' => $l->category?->name,
                 ];
             }
@@ -208,9 +209,9 @@ class SearchService
                     : trim($u->first_name . ' ' . $u->last_name);
                 $allItems[] = [
                     ...$u->toArray(),
-                    'result_type' => 'user',
-                    'name' => $name,
-                    'avatar' => $u->avatar_url,
+                    'type'    => 'user',
+                    'name'    => $name,
+                    'avatar'  => $u->avatar_url,
                     'tagline' => $u->bio,
                 ];
             }
@@ -230,7 +231,7 @@ class SearchService
             $this->applySortOrder($eq, $sort, 'start_time');
             $events = $eq->limit($limit)->get();
             foreach ($events as $e) {
-                $allItems[] = [...$e->toArray(), 'result_type' => 'event'];
+                $allItems[] = [...$e->toArray(), 'type' => 'event'];
             }
         }
 
@@ -248,7 +249,7 @@ class SearchService
             foreach ($groups as $g) {
                 $allItems[] = [
                     ...$g->toArray(),
-                    'result_type' => 'group',
+                    'type'          => 'group',
                     'members_count' => $g->active_members_count,
                 ];
             }
