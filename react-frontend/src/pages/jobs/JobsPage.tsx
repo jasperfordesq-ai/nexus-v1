@@ -14,13 +14,18 @@
  * - Post vacancy button for authenticated users
  * - Saved jobs tab (J1)
  * - Featured jobs appear first (J10)
- * - Salary display on cards (J9)
+ * - Salary display on cards with Intl.NumberFormat (J9)
+ * - Sort dropdown (newest, deadline, salary)
+ * - Remote-only toggle filter
+ * - Deadline countdown chips (within 7 days / closed)
+ * - Skills match percentage badge
+ * - Featured jobs visual distinction (ring + gradient bg)
  */
 
 import { useState, useEffect, useCallback, useRef, memo } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Button, Input, Chip, Tabs, Tab } from '@heroui/react';
+import { Button, Input, Chip, Tabs, Tab, Select, SelectItem, Switch } from '@heroui/react';
 import {
   Briefcase,
   Search,
@@ -42,6 +47,8 @@ import {
   Star,
   Edit,
   Rocket,
+  ArrowUpDown,
+  TrendingUp,
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
@@ -87,6 +94,7 @@ interface JobVacancy {
   salary_type: string | null;
   salary_currency: string | null;
   salary_negotiable: boolean;
+  match_percentage?: number | null;
 }
 
 const ITEMS_PER_PAGE = 20;
@@ -125,6 +133,8 @@ export function JobsPage() {
   const [debouncedQuery, setDebouncedQuery] = useState(searchQuery);
   const [selectedType, setSelectedType] = useState(searchParams.get('type') || 'all');
   const [selectedCommitment, setSelectedCommitment] = useState(searchParams.get('commitment') || 'all');
+  const [selectedSort, setSelectedSort] = useState(searchParams.get('sort') || 'newest');
+  const [remoteOnly, setRemoteOnly] = useState(searchParams.get('remote') === '1');
 
   const [activeTab, setActiveTab] = useState<string>(searchParams.get('tab') || 'browse');
   const [savedJobs, setSavedJobs] = useState<JobVacancy[]>([]);
@@ -163,6 +173,8 @@ export function JobsPage() {
       if (debouncedQuery) params.set('search', debouncedQuery);
       if (selectedType !== 'all') params.set('type', selectedType);
       if (selectedCommitment !== 'all') params.set('commitment', selectedCommitment);
+      if (selectedSort !== 'newest') params.set('sort', selectedSort);
+      if (remoteOnly) params.set('is_remote', '1');
       params.set('status', 'open');
       params.set('per_page', String(ITEMS_PER_PAGE));
       if (append && cursorRef.current) {
@@ -195,7 +207,7 @@ export function JobsPage() {
       setIsLoading(false);
       setIsLoadingMore(false);
     }
-  }, [debouncedQuery, selectedType, selectedCommitment, t, toast]);
+  }, [debouncedQuery, selectedType, selectedCommitment, selectedSort, remoteOnly, t, toast]);
 
   // Load vacancies when filters change (fresh load)
   // loadVacancies is intentionally excluded from deps — it depends on cursorRef,
@@ -206,7 +218,7 @@ export function JobsPage() {
       setHasMore(true);
       loadVacancies();
     }
-  }, [debouncedQuery, selectedType, selectedCommitment, activeTab]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [debouncedQuery, selectedType, selectedCommitment, selectedSort, remoteOnly, activeTab]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // J1: Load saved jobs
   useEffect(() => {
@@ -255,9 +267,11 @@ export function JobsPage() {
     if (searchQuery) params.set('q', searchQuery);
     if (selectedType !== 'all') params.set('type', selectedType);
     if (selectedCommitment !== 'all') params.set('commitment', selectedCommitment);
+    if (selectedSort !== 'newest') params.set('sort', selectedSort);
+    if (remoteOnly) params.set('remote', '1');
     if (activeTab !== 'browse') params.set('tab', activeTab);
     setSearchParams(params, { replace: true });
-  }, [searchQuery, selectedType, selectedCommitment, activeTab, setSearchParams]);
+  }, [searchQuery, selectedType, selectedCommitment, selectedSort, remoteOnly, activeTab, setSearchParams]);
 
   const loadMore = useCallback(() => {
     if (isLoadingMore || !hasMore) return;
@@ -420,6 +434,36 @@ export function JobsPage() {
               }}
             />
           </GlassCard>
+
+          {/* Sort + Remote toggle */}
+          <div className="flex flex-wrap items-center gap-3">
+            <Select
+              label={t('sort.label')}
+              selectedKeys={[selectedSort]}
+              onChange={(e) => setSelectedSort(e.target.value || 'newest')}
+              className="w-48"
+              size="sm"
+              startContent={<ArrowUpDown className="w-3.5 h-3.5 text-theme-subtle" aria-hidden="true" />}
+              classNames={{
+                trigger: 'bg-theme-elevated border-theme-default',
+                value: 'text-theme-primary',
+              }}
+              aria-label={t('sort.label')}
+            >
+              <SelectItem key="newest">{t('sort.newest')}</SelectItem>
+              <SelectItem key="deadline">{t('sort.deadline')}</SelectItem>
+              <SelectItem key="salary_desc">{t('sort.salary')}</SelectItem>
+            </Select>
+            <div className="flex items-center gap-2">
+              <Switch
+                isSelected={remoteOnly}
+                onValueChange={setRemoteOnly}
+                size="sm"
+                aria-label={t('remote_only')}
+              />
+              <span className="text-sm text-theme-muted">{t('remote_only')}</span>
+            </div>
+          </div>
 
           {/* Type Filter Chips */}
           <div className="flex flex-wrap gap-2" role="group" aria-label={t('filter_aria')}>
@@ -668,22 +712,48 @@ const JobCard = memo(function JobCard({ vacancy }: JobCardProps) {
   const deadlineDate = vacancy.deadline ? new Date(vacancy.deadline) : null;
   const isPastDeadline = deadlineDate ? deadlineDate < new Date() : false;
 
-  // J9: Format salary
+  // J9: Format salary with Intl.NumberFormat
+  const formatCurrency = (value: number) => {
+    const currency = vacancy.salary_currency || 'EUR';
+    try {
+      return new Intl.NumberFormat(undefined, {
+        style: 'currency',
+        currency,
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 0,
+      }).format(value);
+    } catch {
+      return `${currency} ${value.toLocaleString()}`;
+    }
+  };
+
   const salaryDisplay = (() => {
     if (!vacancy.salary_min && !vacancy.salary_max) return null;
-    const currency = vacancy.salary_currency || '';
+    const periodSuffix = vacancy.salary_type === 'hourly' ? `/${t('salary.hourly')}` : vacancy.salary_type === 'annual' ? `/${t('salary.annual')}` : '';
     if (vacancy.salary_min && vacancy.salary_max) {
-      return `${currency} ${vacancy.salary_min.toLocaleString()} - ${vacancy.salary_max.toLocaleString()}`;
+      return `${formatCurrency(vacancy.salary_min)} – ${formatCurrency(vacancy.salary_max)}${periodSuffix}`;
     }
-    if (vacancy.salary_min) return `${currency} ${vacancy.salary_min.toLocaleString()}+`;
-    if (vacancy.salary_max) return `${t('salary.max_only', { max: `${currency} ${vacancy.salary_max.toLocaleString()}` })}`;
+    if (vacancy.salary_min) return `${formatCurrency(vacancy.salary_min)}+${periodSuffix}`;
+    if (vacancy.salary_max) return `${t('salary.max_only', { max: formatCurrency(vacancy.salary_max) })}${periodSuffix}`;
     return null;
   })();
+
+  // Deadline countdown
+  const daysUntilDeadline = deadlineDate
+    ? Math.ceil((deadlineDate.getTime() - Date.now()) / (1000 * 60 * 60 * 24))
+    : null;
+
+  // Skills match
+  const matchColor = vacancy.match_percentage != null
+    ? vacancy.match_percentage >= 75 ? 'success' as const
+    : vacancy.match_percentage >= 50 ? 'warning' as const
+    : 'default' as const
+    : null;
 
   return (
     <Link to={tenantPath(`/jobs/${vacancy.id}`)} aria-label={vacancy.title}>
       <article>
-        <GlassCard className="p-5 hover:scale-[1.01] transition-transform">
+        <GlassCard className={`p-5 hover:scale-[1.01] transition-transform ${vacancy.is_featured ? 'ring-2 ring-warning/50 bg-gradient-to-r from-amber-500/5 to-orange-500/5' : ''}`}>
           <div className="flex gap-3 sm:gap-4">
             {/* Icon */}
             <div className="flex-shrink-0">
@@ -719,6 +789,30 @@ const JobCard = memo(function JobCard({ vacancy }: JobCardProps) {
                     {t('apply.applied')}
                   </Chip>
                 )}
+                {/* Deadline countdown chip */}
+                {daysUntilDeadline != null && daysUntilDeadline <= 0 && (
+                  <Chip size="sm" variant="flat" color="danger" className="text-xs font-medium">
+                    {t('deadline_closed')}
+                  </Chip>
+                )}
+                {daysUntilDeadline != null && daysUntilDeadline > 0 && daysUntilDeadline <= 7 && (
+                  <Chip size="sm" variant="flat" color="warning" className="text-xs font-medium">
+                    {t('deadline_countdown', { count: daysUntilDeadline })}
+                  </Chip>
+                )}
+                {/* Salary negotiable chip */}
+                {vacancy.salary_negotiable && (vacancy.salary_min || vacancy.salary_max) && (
+                  <Chip size="sm" variant="flat" color="secondary" className="text-xs">
+                    {t('salary_negotiable')}
+                  </Chip>
+                )}
+                {/* Skills match badge */}
+                {matchColor && vacancy.match_percentage != null && (
+                  <Chip size="sm" variant="flat" color={matchColor} className="text-xs font-medium"
+                    startContent={<TrendingUp className="w-3 h-3" aria-hidden="true" />}>
+                    {t('match_badge', { count: Math.round(vacancy.match_percentage) })}
+                  </Chip>
+                )}
                 {/* J1: Saved indicator */}
                 {vacancy.is_saved && (
                   <BookmarkCheck className="w-4 h-4 text-warning" aria-label={t('saved.saved')} />
@@ -751,18 +845,13 @@ const JobCard = memo(function JobCard({ vacancy }: JobCardProps) {
                   <span className="flex items-center gap-1 font-medium text-theme-primary">
                     <DollarSign className="w-4 h-4" aria-hidden="true" />
                     {salaryDisplay}
-                    {vacancy.salary_negotiable && (
-                      <span className="text-xs text-theme-subtle">({t('salary.negotiable')})</span>
-                    )}
                   </span>
                 )}
 
-                {deadlineDate && (
-                  <span className={`flex items-center gap-1 ${isPastDeadline ? 'text-danger' : ''}`}>
+                {deadlineDate && !isPastDeadline && (
+                  <span className="flex items-center gap-1">
                     <Clock className="w-4 h-4" aria-hidden="true" />
-                    {isPastDeadline
-                      ? t('deadline_passed')
-                      : `${t('deadline_label')}: ${deadlineDate.toLocaleDateString()}`}
+                    {`${t('deadline_label')}: ${deadlineDate.toLocaleDateString()}`}
                   </span>
                 )}
 

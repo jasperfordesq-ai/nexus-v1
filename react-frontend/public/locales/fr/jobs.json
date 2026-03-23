@@ -212,6 +212,31 @@
     "empty_description": "Vos candidatures apparaitront ici",
     "withdraw_aria": "Withdraw application for {{title}}"
   },
+  "withdraw": {
+    "confirm_title": "Retirer la candidature ?",
+    "confirm_message": "Êtes-vous sûr de vouloir retirer votre candidature pour {{title}} ? Cette action est irréversible.",
+    "button": "Retirer",
+    "success": "Candidature retirée",
+    "cancel": "Annuler"
+  },
+  "interview_inline": "Entretien : {{date}} ({{type}})",
+  "interview_join": "Rejoindre",
+  "offer_inline": "Offre : {{salary}}",
+  "offer_start_date": "Début : {{date}}",
+  "download_cv": "Télécharger le CV",
+  "timeline": {
+    "applied": "Candidature envoyée",
+    "pending": "En attente",
+    "screening": "Présélection",
+    "reviewed": "Examinée",
+    "interview_scheduled": "Entretien planifié",
+    "interview": "Entretien",
+    "offer_made": "Offre faite",
+    "offer": "Offre",
+    "accepted": "Acceptée",
+    "rejected": "Refusée",
+    "withdrawn": "Retirée"
+  },
   "gdpr": {
     "export_my_data": "Download my data",
     "erase_my_data": "Erase my data",
@@ -744,6 +769,30 @@
     "first_time_desc": "Our onboarding wizard will guide you through posting your first job.",
     "start_wizard": "Start Wizard"
   },
+  "preview": {
+    "title": "Job Preview",
+    "button": "Preview",
+    "posted_by": "Posted by"
+  },
+  "char_count": "{{count}} / {{max}} characters",
+  "salary_benchmark": {
+    "apply": "Apply Benchmark",
+    "applied": "Benchmark applied"
+  },
+  "unsaved_warning": "You have unsaved changes. Are you sure you want to leave?",
+  "share": {
+    "title": "Share",
+    "copy_link": "Copy Link",
+    "email": "Share via Email",
+    "copied": "Link copied!"
+  },
+  "already_applied": "You've already applied",
+  "application_status_label": "Application Status",
+  "back_to_jobs": "Back to Jobs",
+  "salary_not_specified": "Salary not specified",
+  "location_not_specified": "Location not specified",
+  "similar_jobs": "Similar Jobs",
+  "similar_jobs_empty": "No similar jobs found",
   "inline_response": {
     "interview_pending": "You have an interview scheduled",
     "interview_accept": "Accept Interview",
@@ -761,5 +810,18 @@
     "offer_declined": "Offer declined",
     "decline_reason_label": "Reason (optional)",
     "decline_reason_placeholder": "Share your reason..."
-  }
+  },
+  "sort": {
+    "label": "Sort by",
+    "newest": "Newest",
+    "deadline": "Closing Soon",
+    "salary": "Highest Salary"
+  },
+  "salary_display": "{{min}} – {{max}}",
+  "salary_negotiable": "Negotiable",
+  "deadline_countdown": "Closes in {{count}} day",
+  "deadline_countdown_plural": "Closes in {{count}} days",
+  "deadline_closed": "Closed",
+  "remote_only": "Remote Only",
+  "match_badge": "{{count}}% match"
 }

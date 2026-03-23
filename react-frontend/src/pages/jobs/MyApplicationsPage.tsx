@@ -33,6 +33,8 @@ import {
   MessageCircle,
   Video,
   Download,
+  FileDown,
+  ExternalLink,
 } from 'lucide-react';
 import { GlassCard } from '@/components/ui';
 import { useAuth, useToast, useTenant } from '@/contexts';
@@ -89,6 +91,7 @@ interface JobApplication {
   stage: string;
   message: string | null;
   reviewer_notes: string | null;
+  cv_path?: string | null;
   created_at: string;
   updated_at: string;
   vacancy: ApplicationVacancy;
@@ -136,6 +139,19 @@ const TYPE_CHIP_COLORS: Record<string, 'primary' | 'success' | 'secondary'> = {
 
 const ACTIVE_STATUSES = new Set(['applied', 'pending', 'screening', 'reviewed', 'interview', 'offer']);
 const ITEMS_PER_PAGE = 20;
+
+/** Map history statuses to timeline dot colors */
+const TIMELINE_DOT_COLORS: Record<string, string> = {
+  applied: 'bg-default-400',
+  pending: 'bg-default-400',
+  screening: 'bg-primary',
+  reviewed: 'bg-primary',
+  interview: 'bg-warning',
+  offer: 'bg-secondary',
+  accepted: 'bg-success',
+  rejected: 'bg-danger',
+  withdrawn: 'bg-default-300',
+};
 
 type FilterTab = 'all' | 'active' | 'accepted' | 'rejected';
 
@@ -308,22 +324,62 @@ function ApplicationCard({ application, onWithdraw, tenantPath, onMessageEmploye
           </blockquote>
         )}
 
-        {/* Interview section */}
+        {/* Interview section — inline details */}
         {application.interview && (
-          <div className='mt-3 p-3 rounded-lg bg-secondary-50 border border-secondary-200'>
-            <div className='flex items-center gap-2 text-sm font-medium text-secondary-700'>
-              <Video size={14} aria-hidden="true" />
-              {t('interview.proposed', 'Interview')}: {new Date(application.interview.scheduled_at).toLocaleString()}
+          <div className='mt-3 p-3 rounded-lg bg-secondary-50 dark:bg-secondary-900/20 border border-secondary-200 dark:border-secondary-800'>
+            <div className='flex flex-wrap items-center justify-between gap-2'>
+              <div className='flex items-center gap-2 text-sm font-medium text-secondary-700 dark:text-secondary-300'>
+                <Video size={14} aria-hidden="true" />
+                {t('interview_inline', 'Interview: {{date}} ({{type}})', {
+                  date: new Date(application.interview.scheduled_at).toLocaleString(undefined, {
+                    year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit',
+                  }),
+                  type: application.interview.interview_type === 'video'
+                    ? t('interview.type_video', 'Video Call')
+                    : application.interview.interview_type === 'phone'
+                    ? t('interview.type_phone', 'Phone Call')
+                    : t('interview.type_in_person', 'In Person'),
+                })}
+              </div>
+              <Chip
+                size='sm'
+                variant='flat'
+                color={application.interview.status === 'accepted' ? 'success' : application.interview.status === 'declined' ? 'danger' : 'warning'}
+              >
+                {application.interview.status === 'accepted'
+                  ? t('interview.accepted', 'Interview Confirmed')
+                  : application.interview.status === 'declined'
+                  ? t('interview.declined', 'Interview Declined')
+                  : t('interview.proposed', 'Interview Requested')}
+              </Chip>
             </div>
-            <div className='text-xs text-secondary-600 mt-1'>
-              {application.interview.interview_type === 'video'
-                ? t('interview.type_video', 'Video Call')
-                : application.interview.interview_type === 'phone'
-                ? t('interview.type_phone', 'Phone Call')
-                : t('interview.type_in_person', 'In Person')}
-              {application.interview.location_notes && ` — ${application.interview.location_notes}`}
-            </div>
-            <div className='flex gap-2 mt-2'>
+            {application.interview.duration_mins && (
+              <div className='text-xs text-secondary-600 dark:text-secondary-400 mt-1'>
+                {t('interview.duration', 'Duration')}: {application.interview.duration_mins} min
+              </div>
+            )}
+            <div className='flex flex-wrap items-center gap-2 mt-2'>
+              {/* Meeting link / location */}
+              {application.interview.interview_type === 'video' && application.interview.location_notes && (
+                <Button
+                  as='a'
+                  href={application.interview.location_notes}
+                  target='_blank'
+                  rel='noopener noreferrer'
+                  size='sm'
+                  color='primary'
+                  variant='flat'
+                  startContent={<ExternalLink size={13} aria-hidden="true" />}
+                >
+                  {t('interview_join', 'Join Meeting')}
+                </Button>
+              )}
+              {application.interview.interview_type !== 'video' && application.interview.location_notes && (
+                <span className='text-xs text-secondary-600 dark:text-secondary-400'>
+                  {application.interview.location_notes}
+                </span>
+              )}
+              {/* Accept / Decline actions for proposed */}
               {application.interview.status === 'proposed' && (
                 <>
                   {onAcceptInterview && (
@@ -340,36 +396,44 @@ function ApplicationCard({ application, onWithdraw, tenantPath, onMessageEmploye
                   )}
                 </>
               )}
-              {application.interview.status === 'accepted' && (
-                <Chip size='sm' color='success' variant='flat'>
-                  {t('interview.accepted', 'Interview Confirmed')}
-                </Chip>
-              )}
-              {application.interview.status === 'declined' && (
-                <Chip size='sm' color='danger' variant='flat'>
-                  {t('interview.declined', 'Interview Declined')}
-                </Chip>
-              )}
             </div>
           </div>
         )}
 
-        {/* Offer section */}
-        {application.offer && application.offer.status === 'pending' && (
-          <div className='mt-3 p-3 rounded-lg bg-success-50 border border-success-200'>
-            <div className='text-sm font-medium text-success-700'>
-              {t('offer.title', 'You received an offer!')}
-            </div>
-            {application.offer.salary_offered && (
-              <div className='text-sm text-success-600 mt-1'>
-                {t('offer.salary', 'Salary')}: {application.offer.salary_currency}{' '}
-                {Number(application.offer.salary_offered).toLocaleString()} /{' '}
-                {t(`salary.${application.offer.salary_type}`, application.offer.salary_type)}
+        {/* Offer section — inline details for all statuses */}
+        {application.offer && (
+          <div className={`mt-3 p-3 rounded-lg border ${
+            application.offer.status === 'pending'
+              ? 'bg-success-50 dark:bg-success-900/20 border-success-200 dark:border-success-800'
+              : application.offer.status === 'accepted'
+              ? 'bg-success-50 dark:bg-success-900/20 border-success-200 dark:border-success-800'
+              : 'bg-danger-50 dark:bg-danger-900/20 border-danger-200 dark:border-danger-800'
+          }`}>
+            <div className='flex flex-wrap items-center justify-between gap-2'>
+              <div className='text-sm font-medium text-success-700 dark:text-success-300'>
+                {application.offer.salary_offered
+                  ? t('offer_inline', 'Offer: {{salary}}', {
+                      salary: `${application.offer.salary_currency} ${Number(application.offer.salary_offered).toLocaleString()} / ${t(`salary.${application.offer.salary_type}`, application.offer.salary_type)}`,
+                    })
+                  : t('offer.title', 'You received an offer!')}
               </div>
-            )}
+              <Chip
+                size='sm'
+                variant='flat'
+                color={application.offer.status === 'accepted' ? 'success' : application.offer.status === 'rejected' ? 'danger' : 'warning'}
+              >
+                {application.offer.status === 'accepted'
+                  ? t('offer.accepted', 'Offer Accepted')
+                  : application.offer.status === 'rejected'
+                  ? t('offer.rejected', 'Offer Declined')
+                  : t('inline_response.offer_pending', 'Offer Pending')}
+              </Chip>
+            </div>
             {application.offer.start_date && (
-              <div className='text-xs text-success-600'>
-                {t('offer.start_date', 'Start Date')}: {new Date(application.offer.start_date).toLocaleDateString()}
+              <div className='text-xs text-success-600 dark:text-success-400 mt-1'>
+                {t('offer_start_date', 'Start: {{date}}', {
+                  date: new Date(application.offer.start_date).toLocaleDateString(),
+                })}
               </div>
             )}
             {application.offer.message && (
@@ -377,29 +441,40 @@ function ApplicationCard({ application, onWithdraw, tenantPath, onMessageEmploye
                 &ldquo;{application.offer.message}&rdquo;
               </p>
             )}
-            <div className='flex gap-2 mt-3'>
-              {onAcceptOffer && (
-                <Button size='sm' color='success' onPress={() => onAcceptOffer(application.offer!.id)}>
-                  {t('offer.accept', 'Accept Offer')}
-                </Button>
-              )}
-              {onRejectOffer && (
-                <Button size='sm' color='danger' variant='flat' onPress={() => onRejectOffer(application.offer!.id)}>
-                  {t('offer.reject', 'Decline')}
-                </Button>
-              )}
-            </div>
-          </div>
-        )}
-
-        {application.offer && application.offer.status === 'accepted' && (
-          <div className='mt-3'>
-            <Chip size='sm' color='success' variant='flat'>{t('offer.accepted', 'Offer Accepted')}</Chip>
+            {application.offer.status === 'pending' && (
+              <div className='flex gap-2 mt-3'>
+                {onAcceptOffer && (
+                  <Button size='sm' color='success' onPress={() => onAcceptOffer(application.offer!.id)}>
+                    {t('offer.accept', 'Accept Offer')}
+                  </Button>
+                )}
+                {onRejectOffer && (
+                  <Button size='sm' color='danger' variant='flat' onPress={() => onRejectOffer(application.offer!.id)}>
+                    {t('offer.reject', 'Decline')}
+                  </Button>
+                )}
+              </div>
+            )}
           </div>
         )}
 
         {/* Actions */}
         <div className='flex justify-end gap-2 flex-wrap'>
+          {/* Download CV */}
+          {application.cv_path && (
+            <Button
+              as='a'
+              href={application.cv_path}
+              target='_blank'
+              rel='noopener noreferrer'
+              size='sm'
+              variant='flat'
+              className='bg-theme-elevated text-theme-muted'
+              startContent={<FileDown size={13} aria-hidden="true" />}
+            >
+              {t('download_cv', 'Download CV')}
+            </Button>
+          )}
           {/* Feature 6: Message Employer */}
           {application.vacancy.creator?.id && onMessageEmployer && (
             <Button
@@ -455,30 +530,42 @@ function ApplicationCard({ application, onWithdraw, tenantPath, onMessageEmploye
               transition={{ duration: 0.2 }}
               className='overflow-hidden'>
               <div className='mt-3 pt-3 border-t border-divider'>
-                <p className='text-xs font-semibold text-default-500 uppercase tracking-wide mb-2'>{t('history.status_history', 'Status History')}</p>
+                <p className='text-xs font-semibold text-default-500 uppercase tracking-wide mb-3'>{t('history.status_history', 'Status History')}</p>
                 {historyLoading && <div className='flex justify-center py-3'><Spinner size='sm' /></div>}
                 {!historyLoading && history.length === 0 && (
                   <p className='text-xs text-default-400'>{t('history.empty')}</p>
                 )}
                 {!historyLoading && history.length > 0 && (
-                  <ol className='space-y-2'>
-                    {history.map((entry) => (
-                      <li key={entry.id} className='flex gap-2 text-xs'>
-                        <span className='shrink-0 w-1.5 h-1.5 rounded-full bg-primary/60 mt-1.5' />
-                        <div className='min-w-0'>
-                          <span className='text-default-600'>
-                            {entry.from_status
-                              ? <>{t(`application_status.${entry.from_status}`, { defaultValue: entry.from_status })} → {t(`application_status.${entry.to_status}`, { defaultValue: entry.to_status })}</>
-                              : <>{t('history.initial')}</>}
-                          </span>
-                          {entry.notes && <span className='text-default-400 italic ml-1'>— {entry.notes}</span>}
-                          <div className='text-default-400'>
-                            {new Date(entry.changed_at).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' })}
-                            {entry.changed_by_name && <span className='ml-1'>{t('history.by', 'by {{name}}', { name: entry.changed_by_name })}</span>}
+                  <ol className='relative ml-2'>
+                    {history.map((entry, idx) => {
+                      const isLast = idx === history.length - 1;
+                      const dotColor = TIMELINE_DOT_COLORS[entry.to_status] ?? 'bg-default-400';
+                      const statusKey = `timeline.${entry.to_status}` as const;
+                      return (
+                        <li key={entry.id} className='relative pl-5 pb-4 last:pb-0'>
+                          {/* Connecting line */}
+                          {!isLast && (
+                            <span className='absolute left-[3px] top-3 bottom-0 w-0.5 bg-default-200 dark:bg-default-700' aria-hidden="true" />
+                          )}
+                          {/* Dot */}
+                          <span className={`absolute left-0 top-1 w-2 h-2 rounded-full ring-2 ring-white dark:ring-default-50 ${dotColor}`} aria-hidden="true" />
+                          <div className='min-w-0'>
+                            <span className='text-xs font-medium text-default-700 dark:text-default-300'>
+                              {entry.from_status
+                                ? t(`application_status.${entry.to_status}`, { defaultValue: entry.to_status })
+                                : t(statusKey, { defaultValue: t('history.initial') })}
+                            </span>
+                            {entry.notes && (
+                              <p className='text-xs text-default-400 italic mt-0.5'>{entry.notes}</p>
+                            )}
+                            <div className='text-xs text-default-400 mt-0.5'>
+                              {new Date(entry.changed_at).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' })}
+                              {entry.changed_by_name && <span className='ml-1'>{t('history.by', 'by {{name}}', { name: entry.changed_by_name })}</span>}
+                            </div>
                           </div>
-                        </div>
-                      </li>
-                    ))}
+                        </li>
+                      );
+                    })}
                   </ol>
                 )}
               </div>
@@ -748,7 +835,7 @@ export function MyApplicationsPage() {
     try {
       const res = await api.put(`/v2/jobs/applications/${withdrawTarget.id}`, { status: 'withdrawn' });
       if (res.success) {
-        toastRef.current.success(tRef.current('application_withdrawn'));
+        toastRef.current.success(tRef.current('withdraw.success', 'Application withdrawn'));
         closeWithdraw();
         // Refresh the list
         cursorRef.current = null;
@@ -886,20 +973,20 @@ export function MyApplicationsPage() {
       {/* Withdraw confirmation modal */}
       <Modal isOpen={isWithdrawOpen} onClose={closeWithdraw} size='sm'>
         <ModalContent>
-          <ModalHeader>{t('my_applications.withdraw_title', 'Withdraw Application')}</ModalHeader>
+          <ModalHeader>{t('withdraw.confirm_title', 'Withdraw Application?')}</ModalHeader>
           <ModalBody>
             <p className='text-sm text-theme-secondary'>
-              {t('my_applications.withdraw_confirm', 'Are you sure you want to withdraw your application for {{title}}? This action cannot be undone.', {
+              {t('withdraw.confirm_message', 'Are you sure you want to withdraw your application for {{title}}? This action cannot be undone.', {
                 title: withdrawTarget?.vacancy.title ?? '',
               })}
             </p>
           </ModalBody>
           <ModalFooter>
             <Button variant='flat' onPress={closeWithdraw} isDisabled={isWithdrawing}>
-              {t('apply.cancel')}
+              {t('withdraw.cancel', 'Cancel')}
             </Button>
             <Button color='danger' onPress={confirmWithdraw} isLoading={isWithdrawing}>
-              {t('my_applications.withdraw', 'Withdraw')}
+              {t('withdraw.button', 'Withdraw')}
             </Button>
           </ModalFooter>
         </ModalContent>

@@ -41,6 +41,10 @@ import {
   Select,
   SelectItem,
   Input,
+  Dropdown,
+  DropdownTrigger,
+  DropdownMenu,
+  DropdownItem,
 } from '@heroui/react';
 import {
   Briefcase,
@@ -53,7 +57,6 @@ import {
   Trash2,
   Mail,
   Phone,
-  Wifi,
   DollarSign,
   Heart,
   Timer,
@@ -84,6 +87,8 @@ import {
   Zap,
   EyeOff,
   CalendarClock,
+  Globe,
+  Copy,
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
@@ -370,8 +375,6 @@ export function JobDetailPage() {
   const [renewDays, setRenewDays] = useState(30);
   const [isRenewing, setIsRenewing] = useState(false);
 
-  // Feature 3: Referral share
-  const [sharing, setSharing] = useState(false);
 
   // Feature 4: Pipeline rules
   const [pipelineRules, setPipelineRules] = useState<PipelineRule[]>([]);
@@ -392,6 +395,9 @@ export function JobDetailPage() {
     salary_type: string;
     currency: string;
   } | null>(null);
+
+  // Similar jobs
+  const [similarJobs, setSimilarJobs] = useState<JobVacancy[]>([]);
 
   // Inline interview/offer response (GAP 1)
   const [pendingInterview, setPendingInterview] = useState<InlineInterview | null>(null);
@@ -487,6 +493,21 @@ export function JobDetailPage() {
       .catch(() => { /* non-critical */ });
     return () => { controller.abort(); };
   }, [vacancy, isOwner]);
+
+  // Load similar jobs by category
+  useEffect(() => {
+    if (!vacancy?.category || !vacancy?.id) return;
+    const controller = new AbortController();
+    api.get<{ data: JobVacancy[] } | JobVacancy[]>(`/v2/jobs?category=${encodeURIComponent(vacancy.category)}&limit=4&exclude=${vacancy.id}`)
+      .then((res) => {
+        if (controller.signal.aborted || !res.success || !res.data) return;
+        const d = res.data;
+        const items: JobVacancy[] = Array.isArray(d) ? d : ('data' in d ? d.data : []);
+        setSimilarJobs(items.filter((j) => j.id !== vacancy.id).slice(0, 4));
+      })
+      .catch(() => { /* non-critical */ });
+    return () => { controller.abort(); };
+  }, [vacancy?.category, vacancy?.id]);
 
   // GAP 1: Load pending interview/offer for current user's application
   useEffect(() => {
@@ -812,27 +833,6 @@ export function JobDetailPage() {
     }
   };
 
-  // Feature 3: Referral share
-  const handleShare = async () => {
-    if (!id || !vacancy || sharing) return;
-    setSharing(true);
-    try {
-      const response = await api.post<{ ref_token: string }>(`/v2/jobs/${id}/referral`, {});
-      if (response.success && response.data) {
-        const refUrl =
-          window.location.origin +
-          tenantPath(`/jobs/${vacancy.id}`) +
-          `?ref=${response.data.ref_token}`;
-        await navigator.clipboard.writeText(refUrl);
-        toastRef.current.success(tRef.current('referral.copied', 'Referral link copied to clipboard!'));
-      }
-    } catch (err) {
-      logError('Failed to generate referral link', err);
-    } finally {
-      setSharing(false);
-    }
-  };
-
   // Feature 4: Load pipeline rules
   const loadPipelineRules = useCallback(async () => {
     if (!id) return;
@@ -917,7 +917,7 @@ export function JobDetailPage() {
       {/* Back nav */}
       <Link to={tenantPath('/jobs')} className="inline-flex items-center gap-2 text-theme-muted hover:text-theme-primary transition-colors">
         <ArrowLeft className="w-4 h-4" aria-hidden="true" />
-        {t('detail.browse_vacancies')}
+        {t('back_to_jobs')}
       </Link>
 
       {/* Header Card */}
@@ -997,19 +997,45 @@ export function JobDetailPage() {
               </Tooltip>
             )}
 
-            {/* Feature 3: Referral share button */}
-            {isAuthenticated && !isOwner && (
-              <Button
-                size="sm"
-                variant="flat"
-                className="bg-theme-elevated text-theme-muted"
-                startContent={<Share2 size={14} aria-hidden="true" />}
-                onPress={handleShare}
-                isLoading={sharing}
-              >
-                {t('referral.share', 'Share & Earn')}
-              </Button>
-            )}
+            {/* Share dropdown */}
+            <Dropdown>
+              <DropdownTrigger>
+                <Button
+                  size="sm"
+                  variant="flat"
+                  className="bg-theme-elevated text-theme-muted"
+                  startContent={<Share2 size={14} aria-hidden="true" />}
+                  aria-label={t('share.title')}
+                >
+                  {t('share.title')}
+                </Button>
+              </DropdownTrigger>
+              <DropdownMenu aria-label={t('share.title')}>
+                <DropdownItem
+                  key="copy"
+                  startContent={<Copy className="w-4 h-4" aria-hidden="true" />}
+                  onPress={async () => {
+                    const jobUrl = window.location.origin + tenantPath(`/jobs/${vacancy.id}`);
+                    await navigator.clipboard.writeText(jobUrl);
+                    toastRef.current.success(tRef.current('share.copied'));
+                  }}
+                >
+                  {t('share.copy_link')}
+                </DropdownItem>
+                <DropdownItem
+                  key="email"
+                  startContent={<Mail className="w-4 h-4" aria-hidden="true" />}
+                  onPress={() => {
+                    const jobUrl = window.location.origin + tenantPath(`/jobs/${vacancy.id}`);
+                    const subject = encodeURIComponent(vacancy.title);
+                    const body = encodeURIComponent(`Check out this job: ${vacancy.title}\n\n${jobUrl}`);
+                    window.open(`mailto:?subject=${subject}&body=${body}`, '_self');
+                  }}
+                >
+                  {t('share.email')}
+                </DropdownItem>
+              </DropdownMenu>
+            </Dropdown>
 
             {isOwner && (
               <>
@@ -1066,7 +1092,7 @@ export function JobDetailPage() {
         <div className="flex flex-wrap items-center gap-4 mt-4 text-sm text-theme-subtle">
           {vacancy.is_remote ? (
             <span className="flex items-center gap-1">
-              <Wifi className="w-4 h-4" aria-hidden="true" />
+              <Globe className="w-4 h-4" aria-hidden="true" />
               {t('remote')}
             </span>
           ) : vacancy.location ? (
@@ -1074,7 +1100,12 @@ export function JobDetailPage() {
               <MapPin className="w-4 h-4" aria-hidden="true" />
               {vacancy.location}
             </span>
-          ) : null}
+          ) : (
+            <span className="flex items-center gap-1 text-theme-muted">
+              <MapPin className="w-4 h-4" aria-hidden="true" />
+              {t('location_not_specified')}
+            </span>
+          )}
 
           <span className="flex items-center gap-1">
             <Eye className="w-4 h-4" aria-hidden="true" />
@@ -1109,7 +1140,12 @@ export function JobDetailPage() {
               <DollarSign className="w-4 h-4" aria-hidden="true" />
               <span className="text-xs">{t('salary.negotiable')}</span>
             </span>
-          ) : null}
+          ) : (
+            <span className="flex items-center gap-1 text-theme-muted">
+              <DollarSign className="w-4 h-4" aria-hidden="true" />
+              <span className="text-xs">{t('salary_not_specified')}</span>
+            </span>
+          )}
         </div>
 
         {/* J2: Match percentage badge */}
@@ -1700,20 +1736,20 @@ export function JobDetailPage() {
             )}
 
             {/* J9: Salary display in sidebar — EU Pay Transparency */}
-            {(formatSalary() || vacancy.salary_negotiable) && (
-              <div className="flex items-center gap-3">
-                <DollarSign className="w-4 h-4 text-theme-subtle flex-shrink-0" aria-hidden="true" />
-                <div>
-                  <p className="text-xs text-theme-subtle">{t('salary.label')}</p>
-                  {formatSalary() ? (
-                    <p className="text-sm text-theme-primary font-medium">{formatSalary()}</p>
-                  ) : null}
-                  {vacancy.salary_negotiable && (
-                    <p className="text-xs text-success">{t('salary.negotiable')}</p>
-                  )}
-                </div>
+            <div className="flex items-center gap-3">
+              <DollarSign className="w-4 h-4 text-theme-subtle flex-shrink-0" aria-hidden="true" />
+              <div>
+                <p className="text-xs text-theme-subtle">{t('salary.label')}</p>
+                {formatSalary() ? (
+                  <p className="text-sm text-theme-primary font-medium">{formatSalary()}</p>
+                ) : !vacancy.salary_negotiable ? (
+                  <p className="text-sm text-theme-muted">{t('salary_not_specified')}</p>
+                ) : null}
+                {vacancy.salary_negotiable && (
+                  <p className="text-xs text-success">{t('salary.negotiable')}</p>
+                )}
               </div>
-            )}
+            </div>
 
             {/* Feature 2: Salary benchmark widget — owners only */}
             {isOwner && benchmark && (
@@ -2162,6 +2198,56 @@ export function JobDetailPage() {
           </GlassCard>
         </div>
       )}
+
+      {/* Similar Jobs */}
+      {similarJobs.length > 0 && (
+        <div className="mt-6">
+          <h2 className="text-lg font-semibold text-theme-primary mb-4">{t('similar_jobs')}</h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            {similarJobs.map((sj) => {
+              const SjTypeIcon = TYPE_ICONS[sj.type] ?? Briefcase;
+              return (
+                <Link key={sj.id} to={tenantPath(`/jobs/${sj.id}`)}>
+                  <GlassCard className="p-4 hover:scale-[1.02] transition-transform h-full">
+                    <div className="flex items-center gap-2 mb-2">
+                      <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-500/20 to-indigo-500/20 flex items-center justify-center flex-shrink-0">
+                        <Briefcase className="w-4 h-4 text-blue-400" aria-hidden="true" />
+                      </div>
+                      <h3 className="font-medium text-theme-primary text-sm line-clamp-2">{sj.title}</h3>
+                    </div>
+                    <p className="text-xs text-theme-muted mb-2">
+                      {sj.organization?.name ?? sj.creator?.name}
+                    </p>
+                    <div className="flex flex-wrap gap-1">
+                      <Chip size="sm" variant="flat" color={TYPE_CHIP_COLORS[sj.type] ?? 'default'} className="text-xs">
+                        <span className="flex items-center gap-0.5">
+                          <SjTypeIcon className="w-3 h-3" aria-hidden="true" />
+                          {t(`type.${sj.type}`)}
+                        </span>
+                      </Chip>
+                      {sj.is_remote ? (
+                        <Chip size="sm" variant="flat" color="primary" className="text-xs">
+                          <span className="flex items-center gap-0.5">
+                            <Globe className="w-3 h-3" aria-hidden="true" />
+                            {t('remote')}
+                          </span>
+                        </Chip>
+                      ) : sj.location ? (
+                        <Chip size="sm" variant="flat" color="default" className="text-xs">
+                          <span className="flex items-center gap-0.5">
+                            <MapPin className="w-3 h-3" aria-hidden="true" />
+                            {sj.location}
+                          </span>
+                        </Chip>
+                      ) : null}
+                    </div>
+                  </GlassCard>
+                </Link>
+              );
+            })}
+          </div>
+        </div>
+      )}
     </main>
   );
 
@@ -2191,14 +2277,19 @@ export function JobDetailPage() {
           </div>
         ) : vacancy!.has_applied ? (
           <div className="space-y-3">
-            <div className="text-center">
-              <Chip
+            <div className="text-center space-y-2">
+              <Button
+                isDisabled
+                className="w-full"
                 variant="flat"
-                color={STATUS_COLORS[vacancy!.application_stage ?? vacancy!.application_status ?? 'applied'] ?? 'default'}
-                className="text-sm"
+                color="success"
+                startContent={<CheckCircle className="w-4 h-4" aria-hidden="true" />}
               >
-                {t('apply.applied')} - {t(`application_status.${vacancy!.application_stage ?? vacancy!.application_status ?? 'applied'}`)}
-              </Chip>
+                {t('already_applied')}
+              </Button>
+              <p className="text-xs text-theme-muted">
+                {t('application_status_label')}: {t(`application_status.${vacancy!.application_stage ?? vacancy!.application_status ?? 'applied'}`)}
+              </p>
             </div>
             {/* Feature 6: Message Employer button for applicants */}
             <Button

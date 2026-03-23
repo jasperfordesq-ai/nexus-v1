@@ -136,8 +136,12 @@ class MemberAvailabilityController extends BaseApiController
         $this->rateLimit('availability_search', 20, 60);
 
         $day = $this->queryInt('day');
-        if ($day === null || $day < 0 || $day > 6) {
-            return $this->respondWithError('VALIDATION_ERROR', 'day query parameter is required (0-6)', 'day', 400);
+        if ($day === null) {
+            // Default to current day of week (0=Sunday, 6=Saturday)
+            $day = (int) date('w');
+        }
+        if ($day < 0 || $day > 6) {
+            return $this->respondWithError('VALIDATION_ERROR', 'day must be between 0-6', 'day', 422);
         }
 
         $time = $this->query('time');

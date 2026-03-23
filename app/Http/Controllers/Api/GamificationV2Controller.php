@@ -353,7 +353,7 @@ class GamificationV2Controller extends BaseApiController
         $this->rateLimit('gamification_claim_challenge', 10, 60);
 
         try {
-            $challenge = $this->challengeService->getById($id);
+            $challenge = $this->challengeService->getById($id, $this->getTenantId());
 
             if (!$challenge) {
                 return $this->respondWithError('RESOURCE_NOT_FOUND', 'Challenge not found', null, 404);

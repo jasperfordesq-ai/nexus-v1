@@ -43,10 +43,14 @@ import {
   FileText,
   Sparkles,
   X,
+  Eye,
   EyeOff,
   Trash2,
   Plus,
   Search,
+  MapPin,
+  Calendar,
+  DollarSign,
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
@@ -144,7 +148,7 @@ export function CreateJobPage() {
   const navigate = useNavigate();
   const { tenantPath } = useTenant();
   const toast = useToast();
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, user } = useAuth();
 
   const isEditing = Boolean(id);
   usePageTitle(isEditing ? t('form.edit_title') : t('form.create_title'));
@@ -201,6 +205,12 @@ export function CreateJobPage() {
 
   // Blind hiring state (Agent C)
   const [blindHiring, setBlindHiring] = useState(false);
+
+  // Preview modal state
+  const [previewOpen, setPreviewOpen] = useState(false);
+
+  // Unsaved changes tracking
+  const formDirtyRef = useRef(false);
 
   // Parse skills for display
   const skillsArray = form.skills_required
@@ -316,8 +326,20 @@ export function CreateJobPage() {
     };
   }, [form.title]);
 
+  // Unsaved changes warning — beforeunload
+  useEffect(() => {
+    const handler = (e: BeforeUnloadEvent) => {
+      if (formDirtyRef.current) {
+        e.preventDefault();
+      }
+    };
+    window.addEventListener('beforeunload', handler);
+    return () => window.removeEventListener('beforeunload', handler);
+  }, []);
+
   const updateField = useCallback(<K extends keyof JobFormData>(field: K, value: JobFormData[K]) => {
     setForm((prev) => ({ ...prev, [field]: value }));
+    formDirtyRef.current = true;
     // Clear field error on change
     if (errors[field]) {
       setErrors((prev) => {
@@ -461,6 +483,7 @@ export function CreateJobPage() {
       }
 
       if (response.success) {
+        formDirtyRef.current = false;
         toastRef.current.success(isEditing ? tRef.current('form.update_success') : tRef.current('form.create_success'));
         const newId = isEditing ? id : (response.data as Record<string, unknown>)?.id;
         if (newId) {
@@ -716,19 +739,25 @@ export function CreateJobPage() {
         <div className="space-y-5">
 
           {/* Title */}
-          <Input
-            label={t('form.title_label')}
-            placeholder={t('form.title_placeholder')}
-            value={form.title}
-            onChange={(e) => updateField('title', e.target.value)}
-            isRequired
-            isInvalid={!!errors.title}
-            errorMessage={errors.title}
-            classNames={{
-              input: 'bg-transparent text-theme-primary',
-              inputWrapper: 'bg-theme-elevated border-theme-default hover:bg-theme-hover',
-            }}
-          />
+          <div>
+            <Input
+              label={t('form.title_label')}
+              placeholder={t('form.title_placeholder')}
+              value={form.title}
+              onChange={(e) => updateField('title', e.target.value.slice(0, 100))}
+              maxLength={100}
+              isRequired
+              isInvalid={!!errors.title}
+              errorMessage={errors.title}
+              classNames={{
+                input: 'bg-transparent text-theme-primary',
+                inputWrapper: 'bg-theme-elevated border-theme-default hover:bg-theme-hover',
+              }}
+            />
+            <p className={`text-xs text-right mt-1 ${form.title.length >= 100 ? 'text-danger' : form.title.length >= 90 ? 'text-warning' : 'text-theme-subtle'}`}>
+              {t('char_count', { count: form.title.length, max: 100 })}
+            </p>
+          </div>
 
           {/* Description with AI Generate Button (Agent A) */}
           <div className="space-y-2">
@@ -751,7 +780,8 @@ export function CreateJobPage() {
             <Textarea
               placeholder={t('form.description_placeholder')}
               value={form.description}
-              onValueChange={(v) => updateField('description', v)}
+              onValueChange={(v) => updateField('description', v.slice(0, 5000))}
+              maxLength={5000}
               isRequired
               isInvalid={!!errors.description}
               errorMessage={errors.description}
@@ -761,6 +791,9 @@ export function CreateJobPage() {
                 inputWrapper: 'bg-theme-elevated border-theme-default hover:bg-theme-hover',
               }}
             />
+            <p className={`text-xs text-right mt-1 ${form.description.length >= 5000 ? 'text-danger' : form.description.length >= 4500 ? 'text-warning' : 'text-theme-subtle'}`}>
+              {t('char_count', { count: form.description.length, max: 5000 })}
+            </p>
           </div>
 
           {/* Duplicate Detection Warning (Agent A) */}
@@ -1054,9 +1087,9 @@ export function CreateJobPage() {
 
           {/* Feature 2: Salary Benchmark widget */}
           {benchmark && (
-            <div className="flex items-start gap-3 bg-primary/5 rounded-lg p-3">
-              <TrendingUp className="w-4 h-4 text-primary shrink-0 mt-0.5" aria-hidden="true" />
-              <p className="text-xs text-theme-primary">
+            <div className="flex items-center gap-3 bg-primary/5 rounded-lg p-3">
+              <TrendingUp className="w-4 h-4 text-primary shrink-0" aria-hidden="true" />
+              <p className="text-xs text-theme-primary flex-1">
                 {t('benchmark.market_rate', {
                   role: benchmark.role_keyword,
                   currency: benchmark.currency,
@@ -1067,6 +1100,21 @@ export function CreateJobPage() {
                   defaultValue: `Market rate for "${benchmark.role_keyword}": ${benchmark.currency}${benchmark.salary_min.toLocaleString()} – ${benchmark.currency}${benchmark.salary_max.toLocaleString()} / ${benchmark.salary_type} (median: ${benchmark.currency}${benchmark.salary_median.toLocaleString()})`,
                 })}
               </p>
+              <Button
+                size="sm"
+                variant="flat"
+                color="primary"
+                className="shrink-0 text-xs"
+                onPress={() => {
+                  updateField('salary_min', String(benchmark.salary_min));
+                  updateField('salary_max', String(benchmark.salary_max));
+                  if (benchmark.currency) updateField('salary_currency', benchmark.currency);
+                  if (benchmark.salary_type) updateField('salary_type', benchmark.salary_type);
+                  toast.success(t('salary_benchmark.applied'));
+                }}
+              >
+                {t('salary_benchmark.apply')}
+              </Button>
             </div>
           )}
 
@@ -1288,6 +1336,15 @@ export function CreateJobPage() {
             >
               {t('form.cancel')}
             </Button>
+            <Button
+              variant="flat"
+              className="bg-theme-elevated text-theme-muted"
+              startContent={<Eye className="w-4 h-4" aria-hidden="true" />}
+              onPress={() => setPreviewOpen(true)}
+              isDisabled={!form.title.trim()}
+            >
+              {t('preview.button')}
+            </Button>
             {!isEditing && (
               <Button
                 variant="flat"
@@ -1323,6 +1380,7 @@ export function CreateJobPage() {
                     if (benefits.length > 0) payload.benefits = JSON.stringify(benefits);
                     const response = await api.post('/v2/jobs', payload);
                     if (response.success) {
+                      formDirtyRef.current = false;
                       toastRef.current.success(tRef.current('form.draft_saved', 'Draft saved'));
                       const newId = (response.data as Record<string, unknown>)?.id;
                       if (newId) {
@@ -1409,6 +1467,101 @@ export function CreateJobPage() {
               {isSavingTemplate
                 ? t('template.saving', 'Saving...')
                 : t('templates.save_button', 'Save')}
+            </Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
+
+      {/* Job Preview Modal */}
+      <Modal
+        isOpen={previewOpen}
+        onClose={() => setPreviewOpen(false)}
+        placement="center"
+        size="3xl"
+        scrollBehavior="inside"
+      >
+        <ModalContent>
+          <ModalHeader className="text-theme-primary">
+            {t('preview.title')}
+          </ModalHeader>
+          <ModalBody className="space-y-5 pb-6">
+            {/* Title */}
+            <h2 className="text-2xl font-bold text-theme-primary">
+              {form.title || t('form.title_placeholder')}
+            </h2>
+
+            {/* Type + Commitment chips */}
+            <div className="flex flex-wrap gap-2">
+              <Chip size="sm" variant="flat" color="primary">{t(`type.${form.type}`)}</Chip>
+              <Chip size="sm" variant="flat" color="secondary">{t(`commitment.${form.commitment}`)}</Chip>
+              {form.is_remote && (
+                <Chip size="sm" variant="flat" color="success" startContent={<MapPin className="w-3 h-3" />}>
+                  {t('remote')}
+                </Chip>
+              )}
+            </div>
+
+            {/* Location */}
+            {form.location && !form.is_remote && (
+              <div className="flex items-center gap-2 text-sm text-theme-muted">
+                <MapPin className="w-4 h-4" aria-hidden="true" />
+                {form.location}
+              </div>
+            )}
+
+            {/* Salary */}
+            {(form.salary_min || form.salary_max || form.salary_negotiable) && (
+              <div className="flex items-center gap-2 text-sm text-theme-muted">
+                <DollarSign className="w-4 h-4" aria-hidden="true" />
+                {form.salary_negotiable
+                  ? t('salary.negotiable')
+                  : `${form.salary_currency || ''} ${form.salary_min ? Number(form.salary_min).toLocaleString() : '?'} - ${form.salary_max ? Number(form.salary_max).toLocaleString() : '?'}${form.salary_type ? ` / ${t(`salary.${form.salary_type}`)}` : ''}`
+                }
+              </div>
+            )}
+
+            {/* Description */}
+            {form.description && (
+              <div className="space-y-2">
+                <h3 className="text-sm font-semibold text-theme-primary">{t('detail.about')}</h3>
+                <div className="text-sm text-theme-muted whitespace-pre-wrap leading-relaxed">
+                  {form.description}
+                </div>
+              </div>
+            )}
+
+            {/* Skills */}
+            {skillsArray.length > 0 && (
+              <div className="space-y-2">
+                <h3 className="text-sm font-semibold text-theme-primary">{t('detail.skills_required')}</h3>
+                <div className="flex flex-wrap gap-1.5">
+                  {skillsArray.map((skill, idx) => (
+                    <Chip key={idx} size="sm" variant="flat" color="primary" className="bg-primary/10 text-primary">
+                      {skill}
+                    </Chip>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Deadline */}
+            {form.deadline && (
+              <div className="flex items-center gap-2 text-sm text-theme-muted">
+                <Calendar className="w-4 h-4" aria-hidden="true" />
+                {t('deadline_label')}: {new Date(form.deadline).toLocaleDateString()}
+              </div>
+            )}
+
+            {/* Posted by */}
+            {user?.name && (
+              <p className="text-sm text-theme-subtle">
+                {t('preview.posted_by')}: {user.name}
+              </p>
+            )}
+          </ModalBody>
+          <ModalFooter>
+            <Button variant="flat" className="text-theme-muted" onPress={() => setPreviewOpen(false)}>
+              {t('form.cancel')}
             </Button>
           </ModalFooter>
         </ModalContent>
