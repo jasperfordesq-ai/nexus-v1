@@ -26,6 +26,11 @@ import {
   ModalBody,
   ModalFooter,
   Tooltip,
+  Dropdown,
+  DropdownTrigger,
+  DropdownMenu,
+  DropdownItem,
+  Avatar,
 } from '@heroui/react';
 import {
   Briefcase,
@@ -34,12 +39,14 @@ import {
   ChevronDown,
   ChevronUp,
   Users,
-  X as XIcon,
   TrendingUp,
   FileText,
   Sparkles,
   X,
   EyeOff,
+  Trash2,
+  Plus,
+  Search,
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
@@ -167,6 +174,11 @@ export function CreateJobPage() {
   const [teamSearchInput, setTeamSearchInput] = useState('');
   const [isAddingTeamMember, setIsAddingTeamMember] = useState(false);
   const [createdJobId, setCreatedJobId] = useState<string | null>(null);
+  const [addMemberModalOpen, setAddMemberModalOpen] = useState(false);
+  const [newMemberRole, setNewMemberRole] = useState<string>('reviewer');
+  const [memberSearchResults, setMemberSearchResults] = useState<Array<{ id: number; name: string; avatar_url: string | null }>>([]);
+  const [isMemberSearching, setIsMemberSearching] = useState(false);
+  const memberSearchDebounce = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // Salary Benchmark (Feature 2)
   const [benchmark, setBenchmark] = useState<SalaryBenchmark | null>(null);
@@ -518,7 +530,7 @@ export function CreateJobPage() {
       const response = await api.post<JobTemplate>('/v2/jobs/templates', payload);
       if (response.success && response.data) {
         setTemplates((prev) => [...prev, response.data!]);
-        toast.success(t('template.saved', 'Template saved!'));
+        toast.success(t('templates.saved', 'Template saved'));
       } else {
         toast.error(t('template.save_error', 'Failed to save template'));
       }
@@ -532,6 +544,84 @@ export function CreateJobPage() {
       setTemplateIsPublic(false);
     }
   };
+
+  // Delete a saved template
+  const handleDeleteTemplate = useCallback(async (templateId: number) => {
+    try {
+      const res = await api.delete(`/v2/jobs/templates/${templateId}`);
+      if (res.success) {
+        setTemplates((prev) => prev.filter((t) => t.id !== templateId));
+        if (selectedTemplate === String(templateId)) setSelectedTemplate('');
+        toastRef.current.success(tRef.current('templates.deleted', 'Template deleted'));
+      }
+    } catch (err) {
+      logError('Failed to delete template', err);
+    }
+  }, [selectedTemplate]);
+
+  // Member search for hiring team
+  const handleMemberSearch = useCallback((query: string) => {
+    setTeamSearchInput(query);
+    if (memberSearchDebounce.current) clearTimeout(memberSearchDebounce.current);
+    if (!query.trim()) {
+      setMemberSearchResults([]);
+      return;
+    }
+    memberSearchDebounce.current = setTimeout(async () => {
+      setIsMemberSearching(true);
+      try {
+        const res = await api.get<Array<{ id: number; name: string; avatar_url: string | null }>>(
+          `/v2/members/search?q=${encodeURIComponent(query.trim())}&limit=5`
+        );
+        if (res.success && res.data) {
+          // Filter out members already on the team
+          const existingIds = new Set(teamMembers.map((m) => m.id));
+          setMemberSearchResults((res.data as Array<{ id: number; name: string; avatar_url: string | null }>).filter((m) => !existingIds.has(m.id)));
+        }
+      } catch {
+        /* non-critical */
+      } finally {
+        setIsMemberSearching(false);
+      }
+    }, 400);
+  }, [teamMembers]);
+
+  // Add a member to the hiring team
+  const handleAddTeamMember = useCallback(async (userId: number) => {
+    const jobId = isEditing ? id : createdJobId;
+    if (!jobId) return;
+    setIsAddingTeamMember(true);
+    try {
+      const res = await api.post(`/v2/jobs/${jobId}/team`, { user_id: userId, role: newMemberRole });
+      if (res.success && res.data) {
+        setTeamMembers((prev) => [...prev, res.data as TeamMember]);
+        toastRef.current.success(tRef.current('team.added', 'Team member added'));
+        setTeamSearchInput('');
+        setMemberSearchResults([]);
+        setAddMemberModalOpen(false);
+        setNewMemberRole('reviewer');
+      }
+    } catch (err) {
+      logError('Failed to add team member', err);
+    } finally {
+      setIsAddingTeamMember(false);
+    }
+  }, [isEditing, id, createdJobId, newMemberRole]);
+
+  // Remove a member from the hiring team
+  const handleRemoveTeamMember = useCallback(async (memberId: number) => {
+    const jobId = isEditing ? id : createdJobId;
+    if (!jobId) return;
+    try {
+      const res = await api.delete(`/v2/jobs/${jobId}/team/${memberId}`);
+      if (res.success) {
+        setTeamMembers((prev) => prev.filter((m) => m.id !== memberId));
+        toastRef.current.success(tRef.current('team.removed', 'Team member removed'));
+      }
+    } catch (err) {
+      logError('Failed to remove team member', err);
+    }
+  }, [isEditing, id, createdJobId]);
 
   if (isLoading) {
     return (
@@ -561,31 +651,69 @@ export function CreateJobPage() {
 
       {/* Form */}
       <GlassCard className="p-6">
-        <h1 className="text-2xl font-bold text-theme-primary flex items-center gap-3 mb-6">
-          <Briefcase className="w-7 h-7 text-blue-400" aria-hidden="true" />
-          {isEditing ? t('form.edit_title') : t('form.create_title')}
-        </h1>
+        <div className="flex items-center justify-between mb-6">
+          <h1 className="text-2xl font-bold text-theme-primary flex items-center gap-3">
+            <Briefcase className="w-7 h-7 text-blue-400" aria-hidden="true" />
+            {isEditing ? t('form.edit_title') : t('form.create_title')}
+          </h1>
+
+          {/* Templates dropdown */}
+          {isAuthenticated && (
+            <Dropdown>
+              <DropdownTrigger>
+                <Button
+                  variant="flat"
+                  size="sm"
+                  className="bg-theme-elevated text-theme-muted"
+                  startContent={<FileText className="w-4 h-4" aria-hidden="true" />}
+                  endContent={<ChevronDown className="w-3.5 h-3.5" aria-hidden="true" />}
+                >
+                  {t('templates.title', 'Templates')}
+                </Button>
+              </DropdownTrigger>
+              <DropdownMenu
+                aria-label={t('templates.title', 'Templates')}
+                onAction={(key) => {
+                  const keyStr = String(key);
+                  if (keyStr === 'empty') return;
+                  applyTemplate(keyStr);
+                  toastRef.current.success(tRef.current('templates.loaded', 'Template loaded'));
+                }}
+              >
+                {templates.length === 0 ? (
+                  <DropdownItem key="empty" isReadOnly className="text-theme-subtle italic">
+                    {t('templates.empty', 'No saved templates')}
+                  </DropdownItem>
+                ) : (
+                  templates.map((tpl) => (
+                    <DropdownItem
+                      key={String(tpl.id)}
+                      endContent={
+                        <Button
+                          isIconOnly
+                          size="sm"
+                          variant="light"
+                          color="danger"
+                          className="min-w-6 w-6 h-6"
+                          onPress={() => {
+                            void handleDeleteTemplate(tpl.id);
+                          }}
+                          aria-label={t('templates.delete_confirm', 'Delete this template?')}
+                        >
+                          <Trash2 className="w-3.5 h-3.5" aria-hidden="true" />
+                        </Button>
+                      }
+                    >
+                      {tpl.name}
+                    </DropdownItem>
+                  ))
+                )}
+              </DropdownMenu>
+            </Dropdown>
+          )}
+        </div>
 
         <div className="space-y-5">
-          {/* Feature 3: Start from template */}
-          {templates.length > 0 && (
-            <Select
-              label={t('template.start_from', 'Start from template (optional)')}
-              selectedKeys={selectedTemplate ? [selectedTemplate] : []}
-              onChange={(e) => {
-                if (e.target.value) applyTemplate(e.target.value);
-              }}
-              startContent={<FileText className="w-4 h-4 text-theme-subtle" aria-hidden="true" />}
-              classNames={{
-                trigger: 'bg-theme-elevated border-theme-default hover:bg-theme-hover',
-                value: 'text-theme-primary',
-              }}
-            >
-              {templates.map((tpl) => (
-                <SelectItem key={String(tpl.id)}>{tpl.name}</SelectItem>
-              ))}
-            </Select>
-          )}
 
           {/* Title */}
           <Input
@@ -1060,7 +1188,7 @@ export function CreateJobPage() {
           </div>
 
           {/* Hiring Team section (only shown when editing or after creation) */}
-          {(isEditing || createdJobId) && (
+          {(isEditing || createdJobId) ? (
             <div className="border border-theme-default rounded-xl overflow-hidden">
               <button
                 type="button"
@@ -1070,7 +1198,10 @@ export function CreateJobPage() {
               >
                 <span className="font-semibold text-theme-primary text-sm flex items-center gap-2">
                   <Users size={15} aria-hidden="true" />
-                  {t('team.section')}
+                  {t('team.title', 'Hiring Team')}
+                  {teamMembers.length > 0 && (
+                    <Chip size="sm" variant="flat" color="primary" className="ml-1">{teamMembers.length}</Chip>
+                  )}
                 </span>
                 {teamOpen
                   ? <ChevronUp size={16} className="text-theme-subtle" aria-hidden="true" />
@@ -1079,83 +1210,57 @@ export function CreateJobPage() {
               </button>
               {teamOpen && (
                 <div className="p-4 space-y-4 border-t border-theme-default">
-                  {/* Current team members */}
+                  {/* Current team members as avatar + name chips */}
                   {teamMembers.length > 0 && (
-                    <div className="space-y-2">
+                    <div className="flex flex-wrap gap-2">
                       {teamMembers.map((member) => (
-                        <div key={member.id} className="flex items-center gap-3 p-2 rounded-lg bg-theme-elevated">
-                          <div className="flex-1 min-w-0">
-                            <p className="text-sm font-medium text-theme-primary">{member.name}</p>
-                            <p className="text-xs text-theme-subtle">{t(`team.role_${member.role}`, member.role)}</p>
-                          </div>
-                          <Button
-                            size="sm"
-                            variant="flat"
-                            color="danger"
-                            isIconOnly
-                            aria-label={t('team.remove')}
-                            onPress={async () => {
-                              const jobId = isEditing ? id : createdJobId;
-                              if (!jobId) return;
-                              try {
-                                const res = await api.delete(`/v2/jobs/${jobId}/team/${member.id}`);
-                                if (res.success) {
-                                  setTeamMembers((prev) => prev.filter((m) => m.id !== member.id));
-                                }
-                              } catch (err) {
-                                logError('Failed to remove team member', err);
-                              }
-                            }}
-                          >
-                            <XIcon size={14} aria-hidden="true" />
-                          </Button>
-                        </div>
+                        <Chip
+                          key={member.id}
+                          variant="flat"
+                          color="default"
+                          size="lg"
+                          avatar={
+                            <Avatar
+                              src={member.avatar_url || undefined}
+                              name={member.name}
+                              size="sm"
+                            />
+                          }
+                          onClose={() => void handleRemoveTeamMember(member.id)}
+                          classNames={{
+                            base: 'bg-theme-elevated border border-theme-default',
+                            content: 'text-theme-primary',
+                          }}
+                        >
+                          <span className="flex flex-col leading-tight">
+                            <span className="text-sm font-medium">{member.name}</span>
+                            <span className="text-xs text-theme-subtle">{t(`team.role_${member.role}`, member.role)}</span>
+                          </span>
+                        </Chip>
                       ))}
                     </div>
                   )}
 
-                  {/* Add reviewer row */}
-                  <div className="flex gap-2">
-                    <Input
-                      label={t('team.add_reviewer')}
-                      placeholder="User ID or name"
-                      value={teamSearchInput}
-                      onChange={(e) => setTeamSearchInput(e.target.value)}
-                      className="flex-1"
-                      classNames={{
-                        input: 'bg-transparent text-theme-primary',
-                        inputWrapper: 'bg-theme-elevated border-theme-default hover:bg-theme-hover',
-                      }}
-                    />
-                    <Button
-                      variant="flat"
-                      className="self-end bg-theme-elevated text-theme-muted"
-                      isLoading={isAddingTeamMember}
-                      isDisabled={!teamSearchInput.trim()}
-                      onPress={async () => {
-                        const jobId = isEditing ? id : createdJobId;
-                        if (!jobId || !teamSearchInput.trim()) return;
-                        setIsAddingTeamMember(true);
-                        try {
-                          const userId = parseInt(teamSearchInput.trim(), 10);
-                          if (isNaN(userId)) return;
-                          const res = await api.post(`/v2/jobs/${jobId}/team`, { user_id: userId, role: 'reviewer' });
-                          if (res.success && res.data) {
-                            setTeamMembers((prev) => [...prev, res.data as TeamMember]);
-                            setTeamSearchInput('');
-                          }
-                        } catch (err) {
-                          logError('Failed to add team member', err);
-                        } finally {
-                          setIsAddingTeamMember(false);
-                        }
-                      }}
-                    >
-                      {t('team.add')}
-                    </Button>
-                  </div>
+                  {/* Add Member button */}
+                  <Button
+                    size="sm"
+                    variant="flat"
+                    className="bg-theme-elevated text-theme-muted"
+                    startContent={<Plus className="w-4 h-4" aria-hidden="true" />}
+                    onPress={() => setAddMemberModalOpen(true)}
+                  >
+                    {t('team.add_member', 'Add Member')}
+                  </Button>
                 </div>
               )}
+            </div>
+          ) : (
+            /* Hint for new jobs that team is available after save */
+            <div className="flex items-center gap-3 p-3 rounded-lg bg-theme-elevated border border-theme-default">
+              <Users size={16} className="text-theme-subtle shrink-0" aria-hidden="true" />
+              <p className="text-sm text-theme-subtle">
+                {t('team.title', 'Hiring Team')} — {t('team.edit_only', 'Available after saving the job')}
+              </p>
             </div>
           )}
 
@@ -1169,7 +1274,7 @@ export function CreateJobPage() {
                 startContent={<FileText className="w-3.5 h-3.5" aria-hidden="true" />}
                 onPress={() => setSaveTemplateOpen(true)}
               >
-                {t('template.save_as', 'Save as Template')}
+                {t('templates.save', 'Save as Template')}
               </Button>
             </div>
           )}
@@ -1256,7 +1361,7 @@ export function CreateJobPage() {
         </div>
       </GlassCard>
 
-      {/* Feature 3: Save as Template Modal */}
+      {/* Save as Template Modal */}
       <Modal
         isOpen={saveTemplateOpen}
         onClose={() => setSaveTemplateOpen(false)}
@@ -1265,12 +1370,12 @@ export function CreateJobPage() {
       >
         <ModalContent>
           <ModalHeader className="text-theme-primary">
-            {t('template.save_as', 'Save as Template')}
+            {t('templates.save_title', 'Save Template')}
           </ModalHeader>
           <ModalBody className="space-y-4">
             <Input
-              label={t('template.template_name', 'Template name')}
-              placeholder={t('template.name_placeholder', 'e.g. Senior Developer Role')}
+              label={t('templates.name_label', 'Template Name')}
+              placeholder={t('templates.name_placeholder', 'Enter a name for this template')}
               value={templateName}
               onChange={(e) => setTemplateName(e.target.value)}
               isRequired
@@ -1303,7 +1408,99 @@ export function CreateJobPage() {
             >
               {isSavingTemplate
                 ? t('template.saving', 'Saving...')
-                : t('template.saved', 'Save Template')}
+                : t('templates.save_button', 'Save')}
+            </Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
+
+      {/* Add Team Member Modal */}
+      <Modal
+        isOpen={addMemberModalOpen}
+        onClose={() => {
+          setAddMemberModalOpen(false);
+          setTeamSearchInput('');
+          setMemberSearchResults([]);
+          setNewMemberRole('reviewer');
+        }}
+        placement="center"
+        size="md"
+      >
+        <ModalContent>
+          <ModalHeader className="text-theme-primary">
+            {t('team.add_member', 'Add Member')}
+          </ModalHeader>
+          <ModalBody className="space-y-4">
+            {/* Search input */}
+            <Input
+              label={t('team.search_placeholder', 'Search members...')}
+              placeholder={t('team.search_placeholder', 'Search members...')}
+              value={teamSearchInput}
+              onChange={(e) => handleMemberSearch(e.target.value)}
+              startContent={<Search className="w-4 h-4 text-theme-subtle" aria-hidden="true" />}
+              classNames={{
+                input: 'bg-transparent text-theme-primary',
+                inputWrapper: 'bg-theme-elevated border-theme-default hover:bg-theme-hover',
+              }}
+            />
+
+            {/* Role selector */}
+            <Select
+              label={t('team.role', 'Role')}
+              selectedKeys={[newMemberRole]}
+              onChange={(e) => setNewMemberRole(e.target.value)}
+              classNames={{
+                trigger: 'bg-theme-elevated border-theme-default hover:bg-theme-hover',
+                value: 'text-theme-primary',
+              }}
+            >
+              <SelectItem key="reviewer">{t('team.role_reviewer', 'Reviewer')}</SelectItem>
+              <SelectItem key="interviewer">{t('team.role_interviewer', 'Interviewer')}</SelectItem>
+              <SelectItem key="hiring_manager">{t('team.role_hiring_manager', 'Hiring Manager')}</SelectItem>
+            </Select>
+
+            {/* Search results */}
+            {isMemberSearching && (
+              <p className="text-sm text-theme-subtle">{t('detail.loading', 'Loading...')}</p>
+            )}
+            {memberSearchResults.length > 0 && (
+              <div className="space-y-2 max-h-48 overflow-y-auto">
+                {memberSearchResults.map((member) => (
+                  <div
+                    key={member.id}
+                    className={`flex items-center gap-3 p-2 rounded-lg bg-theme-elevated hover:bg-theme-hover transition-colors ${isAddingTeamMember ? 'opacity-50 pointer-events-none' : 'cursor-pointer'}`}
+                    onClick={() => void handleAddTeamMember(member.id)}
+                    role="button"
+                    tabIndex={0}
+                    onKeyDown={(e) => { if (e.key === 'Enter') void handleAddTeamMember(member.id); }}
+                  >
+                    <Avatar
+                      src={member.avatar_url || undefined}
+                      name={member.name}
+                      size="sm"
+                    />
+                    <span className="text-sm font-medium text-theme-primary flex-1">{member.name}</span>
+                    <Plus className="w-4 h-4 text-theme-subtle" aria-hidden="true" />
+                  </div>
+                ))}
+              </div>
+            )}
+            {teamSearchInput.trim() && !isMemberSearching && memberSearchResults.length === 0 && (
+              <p className="text-sm text-theme-subtle italic">{t('empty_search', 'No members match your search')}</p>
+            )}
+          </ModalBody>
+          <ModalFooter>
+            <Button
+              variant="flat"
+              className="text-theme-muted"
+              onPress={() => {
+                setAddMemberModalOpen(false);
+                setTeamSearchInput('');
+                setMemberSearchResults([]);
+                setNewMemberRole('reviewer');
+              }}
+            >
+              {t('form.cancel')}
             </Button>
           </ModalFooter>
         </ModalContent>

@@ -539,7 +539,9 @@ export function JobKanbanPage() {
       await api.post(`/v2/jobs/applications/${appId}/offer`, offerForm);
       toastRef.current.success(tRef.current('offer.send', 'Offer sent'));
       setOfferModalApp(null);
+      setOfferForm({ salary_offered: '', salary_currency: 'EUR', salary_type: 'annual', start_date: '', message: '' });
       await handleMoveCard(appId, 'offer');
+      await loadData();
     } catch (err) {
       logError('JobKanbanPage: failed to send offer', err);
       toastRef.current.error(tRef.current('detail.status_update_error'));
@@ -903,11 +905,16 @@ export function JobKanbanPage() {
               value={offerForm.start_date}
               onChange={(e) => setOfferForm((f) => ({ ...f, start_date: e.target.value }))}
             />
-            <Input
+            <Textarea
               label="Personal Message"
               placeholder="A note to the candidate..."
               value={offerForm.message}
-              onChange={(e) => setOfferForm((f) => ({ ...f, message: e.target.value }))}
+              onValueChange={(val) => setOfferForm((f) => ({ ...f, message: val }))}
+              minRows={3}
+              classNames={{
+                input: 'bg-transparent text-theme-primary',
+                inputWrapper: 'bg-theme-elevated border-theme-default',
+              }}
             />
           </ModalBody>
           <ModalFooter>

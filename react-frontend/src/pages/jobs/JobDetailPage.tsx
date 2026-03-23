@@ -200,6 +200,27 @@ interface HistoryEntry {
   notes: string | null;
 }
 
+interface InlineInterview {
+  id: number;
+  application_id: number;
+  scheduled_at: string;
+  interview_type: 'video' | 'phone' | 'in_person';
+  status: 'proposed' | 'accepted' | 'declined';
+  location_notes?: string | null;
+  duration_mins?: number;
+}
+
+interface InlineOffer {
+  id: number;
+  application_id: number;
+  salary_offered: string | null;
+  salary_currency: string;
+  salary_type: 'hourly' | 'monthly' | 'annual';
+  start_date: string | null;
+  message: string | null;
+  status: 'pending' | 'accepted' | 'rejected';
+}
+
 const TYPE_CHIP_COLORS: Record<string, 'success' | 'secondary' | 'primary'> = {
   paid: 'success',
   volunteer: 'secondary',
@@ -372,6 +393,15 @@ export function JobDetailPage() {
     currency: string;
   } | null>(null);
 
+  // Inline interview/offer response (GAP 1)
+  const [pendingInterview, setPendingInterview] = useState<InlineInterview | null>(null);
+  const [pendingOffer, setPendingOffer] = useState<InlineOffer | null>(null);
+  const [isRespondingInterview, setIsRespondingInterview] = useState(false);
+  const [isRespondingOffer, setIsRespondingOffer] = useState(false);
+  const [showDeclineInterviewModal, setShowDeclineInterviewModal] = useState(false);
+  const [showDeclineOfferModal, setShowDeclineOfferModal] = useState(false);
+  const [declineNotes, setDeclineNotes] = useState('');
+
   usePageTitle(vacancy?.title ?? t('detail.loading'));
 
   // AbortController ref to cancel stale requests
@@ -457,6 +487,123 @@ export function JobDetailPage() {
       .catch(() => { /* non-critical */ });
     return () => { controller.abort(); };
   }, [vacancy, isOwner]);
+
+  // GAP 1: Load pending interview/offer for current user's application
+  useEffect(() => {
+    if (!vacancy || !vacancy.has_applied || isOwner || !isAuthenticated) return;
+    const stage = vacancy.application_stage ?? vacancy.application_status;
+    if (stage !== 'interview' && stage !== 'offer') return;
+
+    const controller = new AbortController();
+    const load = async () => {
+      try {
+        const [interviewsRes, offersRes] = await Promise.all([
+          api.get<{ data: InlineInterview[] } | InlineInterview[]>('/v2/jobs/my-interviews'),
+          api.get<{ data: InlineOffer[] } | InlineOffer[]>('/v2/jobs/my-offers'),
+        ]);
+        if (controller.signal.aborted) return;
+
+        // Parse interviews
+        const interviews: InlineInterview[] = (() => {
+          if (!interviewsRes.success || !interviewsRes.data) return [];
+          const d = interviewsRes.data;
+          return Array.isArray(d) ? d : ('data' in d ? d.data : []);
+        })();
+
+        // Parse offers
+        const offers: InlineOffer[] = (() => {
+          if (!offersRes.success || !offersRes.data) return [];
+          const d = offersRes.data;
+          return Array.isArray(d) ? d : ('data' in d ? d.data : []);
+        })();
+
+        // Find pending interview/offer for THIS job's application
+        const myInterview = interviews.find(
+          (iv) => iv.status === 'proposed'
+        );
+        const myOffer = offers.find(
+          (of_) => of_.status === 'pending'
+        );
+
+        if (myInterview) setPendingInterview(myInterview);
+        if (myOffer) setPendingOffer(myOffer);
+      } catch {
+        // Non-critical — silent failure
+      }
+    };
+    load();
+    return () => { controller.abort(); };
+  }, [vacancy, isOwner, isAuthenticated]);
+
+  // GAP 1: Interview accept/decline handlers
+  const handleAcceptInterview = async () => {
+    if (!pendingInterview) return;
+    setIsRespondingInterview(true);
+    try {
+      await api.put(`/v2/jobs/interviews/${pendingInterview.id}/accept`, {});
+      toastRef.current.success(tRef.current('inline_response.interview_accepted', 'Interview accepted'));
+      setPendingInterview({ ...pendingInterview, status: 'accepted' });
+      loadVacancy();
+    } catch (err) {
+      logError('Failed to accept interview', err);
+      toastRef.current.error(tRef.current('something_wrong'));
+    } finally {
+      setIsRespondingInterview(false);
+    }
+  };
+
+  const handleDeclineInterview = async () => {
+    if (!pendingInterview) return;
+    setIsRespondingInterview(true);
+    try {
+      await api.put(`/v2/jobs/interviews/${pendingInterview.id}/decline`, { notes: declineNotes || undefined });
+      toastRef.current.success(tRef.current('inline_response.interview_declined', 'Interview declined'));
+      setPendingInterview({ ...pendingInterview, status: 'declined' });
+      setShowDeclineInterviewModal(false);
+      setDeclineNotes('');
+      loadVacancy();
+    } catch (err) {
+      logError('Failed to decline interview', err);
+      toastRef.current.error(tRef.current('something_wrong'));
+    } finally {
+      setIsRespondingInterview(false);
+    }
+  };
+
+  // GAP 1: Offer accept/reject handlers
+  const handleAcceptOffer = async () => {
+    if (!pendingOffer) return;
+    setIsRespondingOffer(true);
+    try {
+      await api.put(`/v2/jobs/offers/${pendingOffer.id}/accept`, {});
+      toastRef.current.success(tRef.current('inline_response.offer_accepted', 'Offer accepted'));
+      setPendingOffer({ ...pendingOffer, status: 'accepted' });
+      loadVacancy();
+    } catch (err) {
+      logError('Failed to accept offer', err);
+      toastRef.current.error(tRef.current('something_wrong'));
+    } finally {
+      setIsRespondingOffer(false);
+    }
+  };
+
+  const handleDeclineOffer = async () => {
+    if (!pendingOffer) return;
+    setIsRespondingOffer(true);
+    try {
+      await api.put(`/v2/jobs/offers/${pendingOffer.id}/reject`, { reason: declineNotes || undefined });
+      toastRef.current.success(tRef.current('inline_response.offer_declined', 'Offer declined'));
+      setPendingOffer({ ...pendingOffer, status: 'rejected' });
+      setShowDeclineOfferModal(false);
+      setDeclineNotes('');
+      loadVacancy();
+    } catch (err) {
+      logError('Failed to decline offer', err);
+      toastRef.current.error(tRef.current('something_wrong'));
+    } finally {
+      setIsRespondingOffer(false);
+    }
+  };
 
   const loadApplications = useCallback(async () => {
     if (!id) return;
@@ -1054,6 +1201,138 @@ export function JobDetailPage() {
                   {t('detail.reopen_vacancy', 'Reopen')}
                 </Button>
               )}
+            </div>
+          </div>
+        </GlassCard>
+      )}
+
+      {/* GAP 1: Inline Interview Response Card */}
+      {!isOwner && vacancy.has_applied && pendingInterview && pendingInterview.status === 'proposed' && (
+        <GlassCard className="p-5 border-l-4 border-l-secondary bg-secondary/5">
+          <div className="flex items-start gap-3">
+            <div className="w-10 h-10 rounded-lg bg-secondary/20 flex items-center justify-center flex-shrink-0">
+              <Calendar className="w-5 h-5 text-secondary" aria-hidden="true" />
+            </div>
+            <div className="flex-1 space-y-3">
+              <div>
+                <h3 className="text-base font-semibold text-theme-primary">
+                  {t('inline_response.interview_pending', 'You have an interview scheduled')}
+                </h3>
+                <div className="flex flex-wrap gap-x-4 gap-y-1 mt-2 text-sm text-theme-secondary">
+                  <span className="flex items-center gap-1">
+                    <Calendar className="w-3.5 h-3.5" aria-hidden="true" />
+                    {new Date(pendingInterview.scheduled_at).toLocaleString()}
+                  </span>
+                  <Chip size="sm" variant="flat" color="secondary">
+                    {t(`interview.type_${pendingInterview.interview_type}`, pendingInterview.interview_type)}
+                  </Chip>
+                  {pendingInterview.duration_mins && (
+                    <span className="flex items-center gap-1">
+                      <Clock className="w-3.5 h-3.5" aria-hidden="true" />
+                      {pendingInterview.duration_mins} min
+                    </span>
+                  )}
+                </div>
+                {pendingInterview.location_notes && (
+                  <p className="text-sm text-theme-muted mt-1">
+                    {pendingInterview.interview_type === 'video' ? (
+                      <a
+                        href={pendingInterview.location_notes}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-primary hover:underline"
+                      >
+                        {pendingInterview.location_notes}
+                      </a>
+                    ) : (
+                      <span className="flex items-center gap-1">
+                        <MapPin className="w-3.5 h-3.5" aria-hidden="true" />
+                        {pendingInterview.location_notes}
+                      </span>
+                    )}
+                  </p>
+                )}
+              </div>
+              <div className="flex gap-2">
+                <Button
+                  color="success"
+                  size="sm"
+                  isLoading={isRespondingInterview}
+                  onPress={handleAcceptInterview}
+                  startContent={<CheckCircle className="w-4 h-4" aria-hidden="true" />}
+                >
+                  {t('inline_response.interview_accept', 'Accept Interview')}
+                </Button>
+                <Button
+                  color="danger"
+                  variant="flat"
+                  size="sm"
+                  isDisabled={isRespondingInterview}
+                  onPress={() => { setDeclineNotes(''); setShowDeclineInterviewModal(true); }}
+                  startContent={<XCircle className="w-4 h-4" aria-hidden="true" />}
+                >
+                  {t('inline_response.interview_decline', 'Decline Interview')}
+                </Button>
+              </div>
+            </div>
+          </div>
+        </GlassCard>
+      )}
+
+      {/* GAP 1: Inline Offer Response Card */}
+      {!isOwner && vacancy.has_applied && pendingOffer && pendingOffer.status === 'pending' && (
+        <GlassCard className="p-5 border-l-4 border-l-success bg-success/5">
+          <div className="flex items-start gap-3">
+            <div className="w-10 h-10 rounded-lg bg-success/20 flex items-center justify-center flex-shrink-0">
+              <DollarSign className="w-5 h-5 text-success" aria-hidden="true" />
+            </div>
+            <div className="flex-1 space-y-3">
+              <div>
+                <h3 className="text-base font-semibold text-theme-primary">
+                  {t('inline_response.offer_pending', 'You have received an offer!')}
+                </h3>
+                <div className="flex flex-wrap gap-x-4 gap-y-1 mt-2 text-sm text-theme-secondary">
+                  {pendingOffer.salary_offered && (
+                    <span className="flex items-center gap-1 font-medium">
+                      <DollarSign className="w-3.5 h-3.5" aria-hidden="true" />
+                      {t('inline_response.offer_salary', 'Salary Offered')}: {pendingOffer.salary_currency}{pendingOffer.salary_offered}
+                      {pendingOffer.salary_type && ` / ${t(`salary.${pendingOffer.salary_type}`)}`}
+                    </span>
+                  )}
+                  {pendingOffer.start_date && (
+                    <span className="flex items-center gap-1">
+                      <Calendar className="w-3.5 h-3.5" aria-hidden="true" />
+                      {t('inline_response.offer_start_date', 'Start Date')}: {new Date(pendingOffer.start_date).toLocaleDateString()}
+                    </span>
+                  )}
+                </div>
+                {pendingOffer.message && (
+                  <p className="text-sm text-theme-muted mt-2 italic">
+                    &ldquo;{pendingOffer.message}&rdquo;
+                  </p>
+                )}
+              </div>
+              <div className="flex gap-2">
+                <Button
+                  color="success"
+                  size="sm"
+                  isLoading={isRespondingOffer}
+                  onPress={handleAcceptOffer}
+                  startContent={<CheckCircle className="w-4 h-4" aria-hidden="true" />}
+                >
+                  {t('inline_response.offer_accept', 'Accept Offer')}
+                </Button>
+                <Button
+                  color="danger"
+                  variant="flat"
+                  size="sm"
+                  isDisabled={isRespondingOffer}
+                  onPress={() => { setDeclineNotes(''); setShowDeclineOfferModal(true); }}
+                  startContent={<XCircle className="w-4 h-4" aria-hidden="true" />}
+                >
+                  {t('inline_response.offer_decline', 'Decline Offer')}
+                </Button>
+              </div>
             </div>
           </div>
         </GlassCard>
@@ -1790,6 +2069,62 @@ export function JobDetailPage() {
               </ModalFooter>
             </>
           )}
+        </ModalContent>
+      </Modal>
+
+      {/* GAP 1: Decline Interview Modal */}
+      <Modal isOpen={showDeclineInterviewModal} onClose={() => setShowDeclineInterviewModal(false)} size="sm">
+        <ModalContent>
+          <ModalHeader>{t('inline_response.interview_decline', 'Decline Interview')}</ModalHeader>
+          <ModalBody>
+            <Textarea
+              label={t('inline_response.decline_notes_label', 'Reason (optional)')}
+              placeholder={t('inline_response.decline_notes_placeholder', 'Let the employer know why...')}
+              value={declineNotes}
+              onValueChange={setDeclineNotes}
+              minRows={3}
+              classNames={{
+                input: 'bg-transparent text-theme-primary',
+                inputWrapper: 'bg-theme-elevated border-theme-default',
+              }}
+            />
+          </ModalBody>
+          <ModalFooter>
+            <Button variant="flat" onPress={() => setShowDeclineInterviewModal(false)}>
+              {t('apply.cancel')}
+            </Button>
+            <Button color="danger" isLoading={isRespondingInterview} onPress={handleDeclineInterview}>
+              {t('inline_response.interview_decline', 'Decline Interview')}
+            </Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
+
+      {/* GAP 1: Decline Offer Modal */}
+      <Modal isOpen={showDeclineOfferModal} onClose={() => setShowDeclineOfferModal(false)} size="sm">
+        <ModalContent>
+          <ModalHeader>{t('inline_response.offer_decline', 'Decline Offer')}</ModalHeader>
+          <ModalBody>
+            <Textarea
+              label={t('inline_response.decline_reason_label', 'Reason (optional)')}
+              placeholder={t('inline_response.decline_reason_placeholder', 'Share your reason...')}
+              value={declineNotes}
+              onValueChange={setDeclineNotes}
+              minRows={3}
+              classNames={{
+                input: 'bg-transparent text-theme-primary',
+                inputWrapper: 'bg-theme-elevated border-theme-default',
+              }}
+            />
+          </ModalBody>
+          <ModalFooter>
+            <Button variant="flat" onPress={() => setShowDeclineOfferModal(false)}>
+              {t('apply.cancel')}
+            </Button>
+            <Button color="danger" isLoading={isRespondingOffer} onPress={handleDeclineOffer}>
+              {t('inline_response.offer_decline', 'Decline Offer')}
+            </Button>
+          </ModalFooter>
         </ModalContent>
       </Modal>
 

@@ -386,11 +386,21 @@
   },
   "team": {
     "section": "Hiring Team",
+    "title": "Hiring Team",
     "add_reviewer": "Add Reviewer",
     "add": "Add",
+    "add_member": "Add Member",
     "remove": "Remove",
+    "remove_member": "Remove",
+    "search_placeholder": "Search members...",
+    "role": "Role",
     "role_reviewer": "Reviewer",
-    "role_manager": "Manager"
+    "role_interviewer": "Interviewer",
+    "role_hiring_manager": "Hiring Manager",
+    "role_manager": "Manager",
+    "added": "Team member added",
+    "removed": "Team member removed",
+    "edit_only": "Available after saving the job"
   },
   "search": {
     "label": "Search job vacancies",
@@ -404,6 +414,20 @@
     "company_size_filter": "Company size",
     "benefits_filter": "Benefits keyword",
     "benefits_placeholder": "e.g. remote, health, pension"
+  },
+  "templates": {
+    "title": "Templates",
+    "load": "Load Template",
+    "save": "Save as Template",
+    "save_title": "Save Template",
+    "name_label": "Template Name",
+    "name_placeholder": "Enter a name for this template",
+    "save_button": "Save",
+    "saved": "Template saved",
+    "deleted": "Template deleted",
+    "loaded": "Template loaded",
+    "empty": "No saved templates",
+    "delete_confirm": "Delete this template?"
   },
   "template": {
     "start_from": "Start from template (optional)",
@@ -719,5 +743,23 @@
     "first_time_banner": "First time posting?",
     "first_time_desc": "Our onboarding wizard will guide you through posting your first job.",
     "start_wizard": "Start Wizard"
+  },
+  "inline_response": {
+    "interview_pending": "You have an interview scheduled",
+    "interview_accept": "Accept Interview",
+    "interview_decline": "Decline Interview",
+    "interview_accepted": "Interview accepted",
+    "interview_declined": "Interview declined",
+    "decline_notes_label": "Reason (optional)",
+    "decline_notes_placeholder": "Let the employer know why...",
+    "offer_pending": "You have received an offer!",
+    "offer_salary": "Salary Offered",
+    "offer_start_date": "Start Date",
+    "offer_accept": "Accept Offer",
+    "offer_decline": "Decline Offer",
+    "offer_accepted": "Offer accepted",
+    "offer_declined": "Offer declined",
+    "decline_reason_label": "Reason (optional)",
+    "decline_reason_placeholder": "Share your reason..."
   }
 }
