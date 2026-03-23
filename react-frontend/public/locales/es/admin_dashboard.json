@@ -4,6 +4,7 @@
   "tour_btn": "Tour",
   "refresh": "Actualizar",
   "view_all_activity": "Ver Toda la Actividad",
+  "load_error": "Failed to load dashboard data",
   "tour": {
     "welcome_title": "¡Bienvenido al Centro de Control!",
     "welcome_description": "Este es tu centro de mando para gestionar tu plataforma comunitaria. Hagamos un tour rápido de las funciones principales.",
@@ -17,9 +18,15 @@
     "active_listings": "Anuncios Activos",
     "transactions": "Transacciones",
     "hours_exchanged": "Horas Intercambiadas",
-    "hours": "Horas"
+    "hours": "Horas",
+    "new_users_this_month": "New Users This Month",
+    "active_users": "Active Users",
+    "total_listings": "Total Listings",
+    "new_listings_this_month": "New Listings This Month"
   },
   "alerts": {
+    "pending_approvals": "Pending Approvals",
+    "pending_listings": "Pending Listings",
     "users_pending_one": "{{count}} Usuario Pendiente",
     "users_pending_other": "{{count}} Usuarios Pendientes",
     "users_pending_text": "Nuevos registros de miembros requieren tu revisión",
@@ -70,6 +77,11 @@
     "view_all": "Ver Todo",
     "empty": "No hay actividad reciente para mostrar"
   },
+  "trends": {
+    "card_title": "Monthly Trends",
+    "hours_suffix": "hrs",
+    "no_data": "No trend data available yet"
+  },
   "chart": {
     "title": "Volumen de Transacciones",
     "subtitle": "Actividad de los últimos 6 meses",
@@ -83,7 +95,9 @@
     "send_newsletter": "Enviar Boletín",
     "new_blog_post": "Nueva Entrada de Blog",
     "gamification": "Gamificación",
-    "settings": "Configuración"
+    "settings": "Configuración",
+    "enterprise": "Enterprise",
+    "advanced_controls": "Advanced Controls"
   },
   "enterprise": {
     "card_title": "Suite Empresarial",

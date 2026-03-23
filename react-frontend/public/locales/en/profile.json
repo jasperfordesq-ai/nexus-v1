@@ -94,5 +94,7 @@
     "phone": "Phone",
     "save": "Save Changes"
   },
-  "load_error": "Failed to load profile. Please try again."
+  "load_error": "Failed to load profile. Please try again.",
+  "listing_image_alt": "Listing image",
+  "credits_sent_success": "Credits sent to {{name}}"
 }

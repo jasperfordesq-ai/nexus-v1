@@ -24,6 +24,7 @@
   "going": "{{count}} going",
   "interested": "{{count}} interested",
   "events_in_month": "Events in {{month}}",
+  "loading_aria": "Loading events",
   "error_load_more": "Failed to load more events",
   "category": {
     "all": "All",
@@ -141,7 +142,25 @@
     "submit_create": "Create Event",
     "submit_update": "Update Event",
     "submit_saving": "Saving & uploading image...",
+    "error_not_found": "Event not found",
+    "error_load_failed": "Failed to load event. Please try again.",
     "cancel": "Cancel",
+    "recurring_toggle": "Make this a recurring event",
+    "recurring_desc": "Automatically create multiple occurrences",
+    "recurring_toggle_aria": "Toggle recurring event",
+    "recurrence_frequency": "Frequency",
+    "recurrence_frequency_aria": "Recurrence frequency",
+    "freq_daily": "Daily",
+    "freq_weekly": "Weekly",
+    "freq_biweekly": "Biweekly (every 2 weeks)",
+    "freq_monthly": "Monthly",
+    "recurrence_days": "Repeat on",
+    "recurrence_end_type": "Ends",
+    "recurrence_end_type_aria": "How the series ends",
+    "end_after_count": "After X occurrences",
+    "end_on_date": "On a specific date",
+    "recurrence_count": "Number of occurrences",
+    "recurrence_end_date": "Series end date",
     "weekday_mon": "Mon",
     "weekday_tue": "Tue",
     "weekday_wed": "Wed",
@@ -191,5 +210,10 @@
     "added_to_waitlist": "You have been added to the waitlist.",
     "waitlist_join_failed": "Failed to join waitlist.",
     "removed_from_waitlist": "You have been removed from the waitlist."
+  },
+  "reminder_settings": "Event Reminder Settings",
+  "reminder": {
+    "title": "Event Reminders",
+    "coming_soon_desc": "Global reminder preferences are coming soon. In the meantime, you can set reminders on individual events from their detail page."
   }
 }

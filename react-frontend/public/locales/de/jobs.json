@@ -3,6 +3,13 @@
   "subtitle": "Finden Sie Möglichkeiten in Ihrer Gemeinschaft",
   "create_vacancy": "Stelle ausschreiben",
   "edit_vacancy": "Stelle bearbeiten",
+  "my_postings": {
+    "title": "Meine Stellenanzeigen",
+    "empty_title": "Noch keine Stellenanzeigen",
+    "empty_description": "Veröffentlichen Sie eine Stelle, um Bewerbungen aus Ihrer Gemeinschaft zu erhalten.",
+    "view_applicants": "Bewerber ansehen",
+    "edit": "Bearbeiten"
+  },
   "search_placeholder": "Stellen durchsuchen...",
   "search_aria": "Stellenangebote durchsuchen",
   "filter_aria": "Nach Kategorie filtern",
@@ -114,21 +121,24 @@
     "open_roles_heading": "Open Roles",
     "no_roles": "No open roles at this time",
     "error": "Unable to load employer profile",
-    "employer_jobs": "Employer Jobs"
+    "employer_jobs": "Employer Jobs",
+    "employees": "{{size}} employees"
   },
   "bulk": {
     "select_action": "Move to stage...",
     "apply": "Apply",
     "clear": "Clear selection",
     "success": "Applications updated",
-    "error": "Bulk update failed"
+    "error": "Bulk update failed",
+    "selected_count": "{{count}} selected"
   },
   "history": {
     "title": "Statusverlauf",
     "changed_from": "Geändert von {{from}} zu {{to}}",
     "initial": "Bewerbung eingereicht",
     "by": "von {{name}}",
-    "empty": "Kein Verlauf verfügbar"
+    "empty": "Kein Verlauf verfügbar",
+    "status_history": "Status History"
   },
   "alerts": {
     "title": "Stellenbenachrichtigungen",
@@ -160,7 +170,11 @@
     "resubscribe_success": "Benachrichtigung fortgesetzt",
     "toggle_error": "Benachrichtigung konnte nicht umgeschaltet werden",
     "delete_error": "Benachrichtigung konnte nicht gelöscht werden",
-    "never": "Nie"
+    "never": "Nie",
+    "load_error": "Failed to load alerts. Please try again.",
+    "retry": "Retry",
+    "created_date": "Created {{date}}",
+    "last_notified": "Last notification {{date}}"
   },
   "renew": {
     "button": "Verlängern",
@@ -211,7 +225,25 @@
     "title": "Meine Bewerbungen",
     "empty_title": "Noch keine Bewerbungen",
     "empty_description": "Ihre Bewerbungen erscheinen hier",
-    "withdraw_aria": "Withdraw application for {{title}}"
+    "withdraw_aria": "Withdraw application for {{title}}",
+    "subtitle": "Track the status of your job and volunteer applications.",
+    "withdraw": "Withdraw",
+    "load_error": "Failed to load applications",
+    "withdraw_error": "Failed to withdraw application.",
+    "deadline_today": "Deadline today",
+    "days_left": "{{count}}d left",
+    "applied_date": "Applied: {{date}}",
+    "updated_date": "Updated: {{date}}",
+    "hide_cover_message": "Hide cover message",
+    "show_cover_message": "Show cover message",
+    "filter_aria": "Application filter",
+    "tab_all": "All",
+    "tab_active": "Active",
+    "tab_accepted": "Accepted",
+    "tab_rejected": "Rejected",
+    "empty_all": "You haven't applied to any positions yet.",
+    "empty_filtered": "No {{filter}} applications found.",
+    "browse_jobs": "Browse Jobs"
   },
   "withdraw": {
     "confirm_title": "Bewerbung zurückziehen?",
@@ -268,7 +300,13 @@
   "kanban": {
     "pipeline_title": "Kanban Pipeline",
     "not_authorized": "You are not authorized to view this pipeline.",
-    "download_cv": "Download CV"
+    "download_cv": "Download CV",
+    "drop_here": "Drop here",
+    "duration_90": "1.5 hours",
+    "salary_monthly": "Monthly",
+    "personal_message": "Personal Message",
+    "personal_message_placeholder": "A note to the candidate...",
+    "select_applicant": "Select {{name}}"
   },
   "apply": {
     "button": "Jetzt bewerben",
@@ -358,7 +396,8 @@
     "proposed": "Interview Requested",
     "declined": "Interview Declined",
     "accept": "Accept",
-    "decline": "Decline"
+    "decline": "Decline",
+    "minutes": "min"
   },
   "offer": {
     "title": "You received an offer!",
@@ -400,6 +439,7 @@
     "notes": "Reviewer Notes",
     "save": "Save Scorecard",
     "saved": "Scorecard saved",
+    "notes_placeholder": "Optional notes about this applicant...",
     "communication": "Communication",
     "technical": "Technical Skills",
     "cultural_fit": "Cultural Fit",
@@ -612,7 +652,13 @@
     "loading": "Searching candidates...",
     "error": "Failed to load candidates",
     "headline_placeholder": "No headline set",
-    "load_more": "Load More"
+    "load_more": "Load More",
+    "today": "Today",
+    "yesterday": "Yesterday",
+    "days_ago": "{{count}} days ago",
+    "weeks_ago": "{{count}} weeks ago",
+    "skills_description": "Comma-separated skills",
+    "skills_chip": "Skills: {{skills}}"
   },
   "resume_visibility": {
     "label": "Make my profile searchable by employers",
@@ -827,11 +873,10 @@
   "deadline_closed": "Closed",
   "remote_only": "Remote Only",
   "match_badge": "{{count}}% match",
-  "my_postings": {
-    "title": "Meine Stellenanzeigen",
-    "empty_title": "Noch keine Stellenanzeigen",
-    "empty_description": "Veröffentlichen Sie eine Stelle, um Bewerbungen aus Ihrer Gemeinschaft zu erhalten.",
-    "view_applicants": "Bewerber ansehen",
-    "edit": "Bearbeiten"
+  "feature_not_available": "Jobs Not Available",
+  "feature_not_available_desc": "The jobs feature is not enabled for this community. Contact your timebank administrator to learn more.",
+  "unknown": "Unknown",
+  "nav": {
+    "jobs": "Jobs"
   }
 }

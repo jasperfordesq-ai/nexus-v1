@@ -94,5 +94,7 @@
     "phone": "Telefono",
     "save": "Salva Modifiche"
   },
-  "load_error": "Impossibile caricare il profilo."
+  "load_error": "Impossibile caricare il profilo.",
+  "listing_image_alt": "Listing image",
+  "credits_sent_success": "Credits sent to {{name}}"
 }

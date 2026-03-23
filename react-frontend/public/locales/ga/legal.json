@@ -376,5 +376,64 @@
     "effective": "I bhfeidhm {{date}}",
     "summary_of_changes": "Achoimre ar Athrutie",
     "back_to_current": "Ar ais go {{title}} Reatha"
+  },
+  "platform": {
+    "effective_date": "Effective {{date}}",
+    "platform_chip": "Project NEXUS Platform",
+    "provider_notice_title": "Platform Provider Notice",
+    "provider_notice_body": "This document governs the relationship between you and Project NEXUS (the platform provider). It is separate from any terms established by {{tenant}} (your community operator).",
+    "view_tenant_legal": "View {{tenant}}'s legal documents",
+    "contents": "Contents",
+    "related_documents": "Related Platform Documents",
+    "cta_title": "Questions About This Document?",
+    "cta_body": "If you have questions about this platform-level document, contact the Project NEXUS team. For questions about your community's policies, contact {{tenant}} directly.",
+    "nexus_website": "Project NEXUS Website",
+    "contact_tenant": "Contact {{tenant}}"
+  },
+  "platform_disclaimer": {
+    "page_title": "Platform Disclaimer",
+    "title": "Platform Disclaimer",
+    "subtitle": "Important disclaimers and liability limitations for the Project NEXUS platform",
+    "link_terms": "Platform Terms of Service",
+    "link_privacy": "Platform Privacy Policy"
+  },
+  "platform_privacy": {
+    "page_title": "Platform Privacy Policy",
+    "title": "Platform Privacy Policy",
+    "subtitle": "How Project NEXUS handles data at the platform infrastructure level",
+    "link_terms": "Platform Terms of Service",
+    "link_disclaimer": "Platform Disclaimer"
+  },
+  "platform_terms": {
+    "page_title": "Platform Terms of Service",
+    "title": "Platform Terms of Service",
+    "subtitle": "The terms governing the Project NEXUS platform infrastructure",
+    "link_privacy": "Platform Privacy Policy",
+    "link_disclaimer": "Platform Disclaimer"
+  },
+  "gate": {
+    "title": "Updated legal documents",
+    "subtitle_one": "A document has been updated. Please review and accept it to continue.",
+    "subtitle_other": "{{count}} documents have been updated. Please review and accept them to continue.",
+    "type_terms": "Terms of Service",
+    "type_privacy": "Privacy Policy",
+    "type_cookies": "Cookie Policy",
+    "type_accessibility": "Accessibility Statement",
+    "type_community_guidelines": "Community Guidelines",
+    "type_acceptable_use": "Acceptable Use Policy",
+    "updated": "Updated",
+    "read": "Read",
+    "consent_text": "By clicking Accept, you confirm you have read and agree to the documents listed above.",
+    "accept_aria": "Accept all updated legal documents and continue",
+    "accepting": "Accepting…",
+    "accept_continue": "Accept & Continue"
+  },
+  "custom": {
+    "effective_label": "Effective: {{date}}",
+    "contents": "Contents",
+    "view_previous_versions": "View previous versions of this document",
+    "cta_title": "Have Questions?",
+    "cta_body": "If you have any questions about this document, please contact us.",
+    "contact_us": "Contact Us"
   }
 }

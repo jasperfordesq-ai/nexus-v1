@@ -110,7 +110,29 @@
     "delete_modal_title": "Supprimer le groupe",
     "delete_confirm": "Êtes-vous sûr(e) de vouloir supprimer « {{name}} » ?",
     "delete_desc": "Cette action est irréversible. Toutes les discussions, tous les membres et toutes les données du groupe seront définitivement supprimés.",
-    "delete_btn": "Supprimer le groupe"
+    "delete_btn": "Supprimer le groupe",
+    "tab_feed": "Feed",
+    "tab_files": "Files",
+    "tab_announcements": "Announcements",
+    "tab_channels": "Channels",
+    "tab_tasks": "Tasks",
+    "join_to_access_title": "Members Only",
+    "join_to_access_desc": "Join this group to access this feature.",
+    "leave_group_title": "Leave Group",
+    "leave_group_confirm": "Are you sure you want to leave {{name}}? You will lose access to group discussions and files.",
+    "report_title": "Report Post",
+    "report_description": "Help us understand why you are reporting this post.",
+    "report_reason_label": "Reason",
+    "report_reason_placeholder": "Describe why this post is inappropriate...",
+    "report_submit": "Report",
+    "join_to_see_feed_title": "Join to see the feed",
+    "join_to_see_feed_desc": "Join this group to view posts and participate in conversations.",
+    "feed_whats_on_your_mind": "What's on your mind?",
+    "feed_empty_title": "No posts yet",
+    "feed_empty_desc": "Be the first to share something with this group!",
+    "feed_create_post": "Create Post",
+    "feed_load_more": "Load More",
+    "member_actions_aria": "Member actions"
   },
   "form": {
     "create_title": "Créer un nouveau groupe",
@@ -179,7 +201,21 @@
     "delete_title": "Supprimer l'annonce",
     "delete_confirm": "Êtes-vous sûr(e) de vouloir supprimer « {{name}} » ? Cette action est irréversible.",
     "cancel": "Annuler",
-    "post": "Publier l'annonce"
+    "post": "Publier l'annonce",
+    "title_label": "Title",
+    "title_placeholder": "Announcement title",
+    "content_label": "Content",
+    "content_placeholder": "Write your announcement...",
+    "actions_aria": "Actions",
+    "dropdown_aria": "Announcement actions",
+    "load_failed": "Failed to load announcements",
+    "created": "Announcement created",
+    "create_failed": "Failed to create announcement",
+    "unpinned": "Unpinned",
+    "pinned_success": "Pinned",
+    "update_failed": "Failed to update announcement",
+    "deleted": "Announcement deleted",
+    "delete_failed": "Failed to delete announcement"
   },
   "files": {
     "heading": "Fichiers",
@@ -200,7 +236,9 @@
     "upload_failed": "Échec du téléversement du/des fichier(s)",
     "download_failed": "Échec du téléchargement du fichier",
     "file_deleted": "Fichier supprimé",
-    "delete_failed": "Échec de la suppression du fichier"
+    "delete_failed": "Échec de la suppression du fichier",
+    "coming_soon": "Coming Soon",
+    "coming_soon_description": "Group file sharing is currently in development. Soon you will be able to upload, download, and manage files within your group."
   },
   "toast": {
     "left": "Vous avez quitté le groupe",
@@ -227,8 +265,18 @@
     "role_updated": "Rôle mis à jour : {{role}}",
     "role_update_failed": "Échec de la mise à jour du rôle",
     "member_removed": "Membre retiré",
-    "member_remove_failed": "Échec du retrait du membre"
+    "member_remove_failed": "Échec du retrait du membre",
+    "feed_load_failed": "Failed to load feed",
+    "post_hidden": "Post hidden",
+    "hide_failed": "Failed to hide post",
+    "user_muted": "User muted",
+    "mute_failed": "Failed to mute user",
+    "provide_reason": "Please provide a reason",
+    "reported": "Post reported",
+    "report_failed": "Failed to report post",
+    "vote_failed": "Failed to vote"
   },
+  "loading_aria": "Loading groups",
   "load_error": "Impossible de charger les groupes.",
   "load_more_error": "Impossible de charger plus de groupes"
 }

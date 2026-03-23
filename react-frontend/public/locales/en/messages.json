@@ -85,5 +85,21 @@
   "messaging_restricted": "Your messaging has been restricted",
   "conversation_load_failed": "Unable to load this conversation. It may have been deleted or you may not have access.",
   "back_to_messages": "Back to Messages",
-  "messaging_restricted_contact": "If you believe this is an error, please contact your timebank coordinator."
+  "messaging_restricted_contact": "If you believe this is an error, please contact your timebank coordinator.",
+  "voice_pause": "Pause",
+  "voice_play": "Play",
+  "aria_edit_message": "Edit message",
+  "aria_remove_attachment": "Remove {{name}}",
+  "aria_send_message": "Send message",
+  "aria_loading_conversations": "Loading conversations",
+  "aria_loading_archived": "Loading archived conversations",
+  "aria_conversation_unread": "Conversation with {{name}}, {{count}} unread",
+  "aria_conversation": "Conversation with {{name}}",
+  "aria_conversation_actions": "Conversation actions",
+  "context_type_listing": "Listing",
+  "context_type_event": "Event",
+  "context_type_job": "Job",
+  "context_type_volunteering": "Volunteering",
+  "context_untitled": "Untitled",
+  "context_regarding": "Regarding"
 }

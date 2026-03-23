@@ -26,6 +26,41 @@
   "write_comment": "Scrivi un commento...",
   "write_reply": "Scrivi una risposta...",
   "endorsement_update_failed": "Impossibile aggiornare l'approvazione",
+  "presence": {
+    "online": "Online",
+    "away": "Away",
+    "dnd": "Do Not Disturb",
+    "offline": "Offline",
+    "just_now": "Just now",
+    "minutes_ago": "{{count}}m ago",
+    "hours_ago": "{{count}}h ago",
+    "days_ago": "{{count}}d ago",
+    "last_seen": "Last seen {{time}}"
+  },
+  "mention": {
+    "suggestions_aria": "Mention suggestions, {{count}} results",
+    "no_users": "No users found",
+    "connected": "Connected"
+  },
+  "status": {
+    "set_status": "Set status",
+    "online": "Online",
+    "online_desc": "Visible to others",
+    "away": "Away",
+    "away_desc": "Show as away",
+    "dnd": "Do Not Disturb",
+    "dnd_desc": "Suppress notifications",
+    "section_status": "Status",
+    "section_custom": "Custom",
+    "set_custom": "Set custom status...",
+    "set_custom_desc": "Set a custom status message",
+    "set_custom_title": "Set Custom Status",
+    "clear_custom": "Clear custom status",
+    "emoji_label": "Emoji",
+    "status_label": "Status",
+    "status_placeholder": "In a meeting",
+    "char_count": "{{current}}/80 characters"
+  },
   "endorse": {
     "tooltip_remove": "Rimuovi raccomandazione per {{skillName}}",
     "tooltip_endorse": "Raccomanda {{skillName}}",

@@ -134,5 +134,10 @@
     "something_went_wrong": "Une erreur est survenue",
     "error_description": "Nous n'avons pas pu traiter votre demande. Veuillez réessayer ou contacter le support.",
     "try_again": "Réessayer"
+  },
+  "custom_page": {
+    "default_title": "Page",
+    "not_found_description": "The page you're looking for doesn't exist or is no longer available.",
+    "back_to_home": "Back to Home"
   }
 }

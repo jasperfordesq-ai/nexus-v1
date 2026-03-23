@@ -10,6 +10,7 @@
   "load_more": "Load More",
   "unable_to_load": "Unable to Load Feed",
   "try_again": "Try Again",
+  "session_expired": "Your session has expired. Please log in again.",
   "error_load": "Failed to load feed.",
   "error_load_retry": "Failed to load feed. Please try again.",
   "empty_title": "No posts yet",
@@ -205,7 +206,33 @@
     "comment_action": "Comment",
     "write_comment": "Write a comment...",
     "no_comments": "No comments yet. Be the first to share your thoughts!",
-    "admin_delete": "Delete (Admin)"
+    "admin_delete": "Delete (Admin)",
+    "type_post": "Post",
+    "type_listing": "Listing",
+    "type_event": "Event",
+    "type_poll": "Poll",
+    "type_goal": "Goal",
+    "type_review": "Review",
+    "type_job": "Job",
+    "type_challenge": "Challenge",
+    "type_volunteer": "Volunteer",
+    "type_blog": "Blog",
+    "type_discussion": "Discussion",
+    "image_alt": "{{type}} image by {{name}}",
+    "post_options": "Post options",
+    "send_comment": "Send comment",
+    "share_action": "Share",
+    "shared_success": "Post shared to your feed",
+    "share_failed": "Failed to share",
+    "reaction": "reaction",
+    "reactions": "reactions",
+    "reactions_title": "Reactions",
+    "no_reactions": "No reactions yet",
+    "load_more": "Load More",
+    "and": "and",
+    "other": "other",
+    "others": "others",
+    "all": "All"
   },
   "hashtag": {
     "title": "Hashtag",
@@ -312,6 +339,7 @@
     "global": "Global",
     "nearby": "Near Me",
     "radius": "{{km}} km",
+    "km": "km",
     "add_location": "Add location in profile"
   },
   "subfilter": {
@@ -320,10 +348,41 @@
     "requests": "Requests"
   },
   "stories": {
-    "add": "Add Story"
+    "add": "Add Story",
+    "your_story": "Your Story",
+    "scroll_left": "Scroll stories left",
+    "scroll_right": "Scroll stories right",
+    "create_your_story": "Create your story",
+    "view_story_from": "View story from {{name}}"
   },
   "fab": {
     "create": "Create post"
+  },
+  "carousel": {
+    "aria_label": "Image carousel, {{current}} of {{total}}",
+    "image_of": "Image {{current}} of {{total}}",
+    "view_image": "View image {{current}} of {{total}}",
+    "previous": "Previous image",
+    "next": "Next image",
+    "go_to_image": "Go to image {{number}}",
+    "more_images": "{{count}} more images"
+  },
+  "lightbox": {
+    "aria_label": "Image viewer",
+    "close": "Close image viewer",
+    "counter": "{{current}} of {{total}}"
+  },
+  "reaction": {
+    "like": "Like",
+    "love": "Love",
+    "laugh": "Laugh",
+    "wow": "Wow",
+    "sad": "Sad",
+    "celebrate": "Celebrate",
+    "clap": "Clap",
+    "time_credit": "Time Credit",
+    "click_to_remove": "{{label}} (click to remove)",
+    "react_to_post": "React to this post"
   },
   "video": {
     "select": "Add Video",

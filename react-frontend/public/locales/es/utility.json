@@ -134,5 +134,10 @@
     "something_went_wrong": "Algo salió mal",
     "error_description": "No pudimos procesar tu solicitud. Por favor intenta de nuevo o contacta con soporte.",
     "try_again": "Intentar de nuevo"
+  },
+  "custom_page": {
+    "default_title": "Page",
+    "not_found_description": "The page you're looking for doesn't exist or is no longer available.",
+    "back_to_home": "Back to Home"
   }
 }

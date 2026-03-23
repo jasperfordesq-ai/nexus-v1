@@ -24,6 +24,7 @@
   "going": "{{count}} partecipante/i",
   "interested": "{{count}} interessato/i",
   "events_in_month": "Eventi a {{month}}",
+  "loading_aria": "Loading events",
   "error_load_more": "Impossibile caricare altri eventi",
   "category": {
     "all": "Tutti",
@@ -141,7 +142,25 @@
     "submit_create": "Crea evento",
     "submit_update": "Aggiorna evento",
     "submit_saving": "Salvataggio e caricamento immagine...",
+    "error_not_found": "Event not found",
+    "error_load_failed": "Failed to load event. Please try again.",
     "cancel": "Annulla",
+    "recurring_toggle": "Make this a recurring event",
+    "recurring_desc": "Automatically create multiple occurrences",
+    "recurring_toggle_aria": "Toggle recurring event",
+    "recurrence_frequency": "Frequency",
+    "recurrence_frequency_aria": "Recurrence frequency",
+    "freq_daily": "Daily",
+    "freq_weekly": "Weekly",
+    "freq_biweekly": "Biweekly (every 2 weeks)",
+    "freq_monthly": "Monthly",
+    "recurrence_days": "Repeat on",
+    "recurrence_end_type": "Ends",
+    "recurrence_end_type_aria": "How the series ends",
+    "end_after_count": "After X occurrences",
+    "end_on_date": "On a specific date",
+    "recurrence_count": "Number of occurrences",
+    "recurrence_end_date": "Series end date",
     "weekday_mon": "Lun",
     "weekday_tue": "Mar",
     "weekday_wed": "Mer",
@@ -191,5 +210,10 @@
     "added_to_waitlist": "Sei stato/a aggiunto/a alla lista d'attesa.",
     "waitlist_join_failed": "Impossibile iscriversi alla lista d'attesa.",
     "removed_from_waitlist": "Sei stato/a rimosso/a dalla lista d'attesa."
+  },
+  "reminder_settings": "Event Reminder Settings",
+  "reminder": {
+    "title": "Event Reminders",
+    "coming_soon_desc": "Global reminder preferences are coming soon. In the meantime, you can set reminders on individual events from their detail page."
   }
 }

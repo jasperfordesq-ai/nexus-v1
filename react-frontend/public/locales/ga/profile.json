@@ -94,5 +94,7 @@
     "phone": "Fón",
     "save": "Sábháil Athruithe"
   },
-  "load_error": "Theip ar lodail an proifile."
+  "load_error": "Theip ar lodail an proifile.",
+  "listing_image_alt": "Listing image",
+  "credits_sent_success": "Credits sent to {{name}}"
 }

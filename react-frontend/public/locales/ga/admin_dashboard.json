@@ -4,6 +4,7 @@
   "tour_btn": "Turas",
   "refresh": "Athnuaigh",
   "view_all_activity": "Féach ar Gach Gníomhaíocht",
+  "load_error": "Failed to load dashboard data",
   "tour": {
     "welcome_title": "Fáilte go dtí Lárionad Rialaithe!",
     "welcome_description": "Is é seo do lárionad ceannais chun do ardán pobail a bhainistiú. Glacaimis turas gearr ar na gnéithe tábhachtacha.",
@@ -17,9 +18,15 @@
     "active_listings": "Liostaí Gníomhacha",
     "transactions": "Idirbhearta",
     "hours_exchanged": "Uaireanta Malartaithe",
-    "hours": "Uaireanta"
+    "hours": "Uaireanta",
+    "new_users_this_month": "New Users This Month",
+    "active_users": "Active Users",
+    "total_listings": "Total Listings",
+    "new_listings_this_month": "New Listings This Month"
   },
   "alerts": {
+    "pending_approvals": "Pending Approvals",
+    "pending_listings": "Pending Listings",
     "users_pending_one": "{{count}} Úsáideoir ar Feitheamh",
     "users_pending_other": "{{count}} Úsáideoir ar Feitheamh",
     "users_pending_text": "Teastaíonn d'athbhreithniú ar chlárúcháin chomhaltaí nua",
@@ -70,6 +77,11 @@
     "view_all": "Féach ar Gach",
     "empty": "Gan gníomhaíocht le déanaí le taispeáint"
   },
+  "trends": {
+    "card_title": "Monthly Trends",
+    "hours_suffix": "hrs",
+    "no_data": "No trend data available yet"
+  },
   "chart": {
     "title": "Toirt Idirbheart",
     "subtitle": "Gníomhaíocht 6 mhí anuas",
@@ -83,7 +95,9 @@
     "send_newsletter": "Seol Nuachtlitir",
     "new_blog_post": "Postáil Bhlag Nua",
     "gamification": "Cluichíocht",
-    "settings": "Socruithe"
+    "settings": "Socruithe",
+    "enterprise": "Enterprise",
+    "advanced_controls": "Advanced Controls"
   },
   "enterprise": {
     "card_title": "Sraith Fiontraíochta",

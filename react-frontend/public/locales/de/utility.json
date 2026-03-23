@@ -134,5 +134,10 @@
     "something_went_wrong": "Etwas ist schiefgelaufen",
     "error_description": "Wir konnten Ihre Anfrage nicht verarbeiten. Bitte versuchen Sie es erneut oder kontaktieren Sie den Support.",
     "try_again": "Erneut versuchen"
+  },
+  "custom_page": {
+    "default_title": "Page",
+    "not_found_description": "The page you're looking for doesn't exist or is no longer available.",
+    "back_to_home": "Back to Home"
   }
 }

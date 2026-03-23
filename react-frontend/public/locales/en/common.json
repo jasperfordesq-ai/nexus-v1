@@ -188,7 +188,9 @@
     "switch_to_dark": "Switch to dark mode",
     "skip_to_content": "Skip to main content",
     "menu_opened": "Navigation menu opened",
-    "close": "Close"
+    "close": "Close",
+    "scroll_to_top": "Scroll to top",
+    "breadcrumb": "Breadcrumb"
   },
   "cookie_consent": {
     "banner_label": "Cookie consent",
@@ -279,5 +281,14 @@
     "new_group_desc": "Start a community group",
     "new_goal": "New Goal",
     "new_goal_desc": "Set a personal goal"
+  },
+  "loading": "Loading...",
+  "feature_error": {
+    "load_failed": "We couldn't load {{feature}}. This section may be temporarily unavailable."
+  },
+  "dev_banner": {
+    "aria_label": "Development status",
+    "status": "Development status: {{stage}}",
+    "read_more": "Read more"
   }
 }

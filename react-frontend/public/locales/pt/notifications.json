@@ -13,12 +13,6 @@
   "empty_caught_up_desc": "Leu todas as suas notificações",
   "mark_read_aria": "Marcar como lida",
   "delete_aria": "Eliminar notificação",
-  "toast": {
-    "mark_read_failed": "Falha ao marcar notificação como lida",
-    "all_read": "Todas as notificações marcadas como lidas",
-    "mark_all_failed": "Falha ao marcar todas como lidas",
-    "delete_failed": "Falha ao eliminar notificação"
-  },
   "loading_aria": "Loading notifications",
   "error_title": "Unable to load",
   "error_load": "Something went wrong loading your notifications",
@@ -41,5 +35,17 @@
     "achievement": "Achievement",
     "system": "System",
     "default": "Notification"
+  },
+  "toast": {
+    "mark_read_failed": "Falha ao marcar notificação como lida",
+    "all_read": "Todas as notificações marcadas como lidas",
+    "mark_all_failed": "Falha ao marcar todas como lidas",
+    "delete_failed": "Falha ao eliminar notificação"
+  },
+  "realtime": {
+    "new_message": "New Message",
+    "new_message_fallback": "You have a new message",
+    "transaction_complete": "Transaction Complete",
+    "transaction_amount": "{{sign}}{{amount}} time credits"
   }
 }

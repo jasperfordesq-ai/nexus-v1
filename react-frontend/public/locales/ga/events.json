@@ -24,6 +24,7 @@
   "going": "{{count}} ag dul",
   "interested": "{{count}} suim acu",
   "events_in_month": "Imeachtaí i {{month}}",
+  "loading_aria": "Loading events",
   "error_load_more": "Theip ar luchtú tuilleadh imeachtaí",
   "category": {
     "all": "Gach Ceann",
@@ -90,7 +91,7 @@
     "event_full": "Lán",
     "waitlist_count": "{{count}} ar an liosta feithimh",
     "cancel_modal_title": "Cealaigh Imeacht",
-    "cancel_confirm": "An bhfuil tú cinnte gur mhaith leat \u201c{{title}}\u201d a chealú? Cuirfear gach freastalaitheoir ar an eolas.",
+    "cancel_confirm": "An bhfuil tú cinnte gur mhaith leat “{{title}}” a chealú? Cuirfear gach freastalaitheoir ar an eolas.",
     "cancel_reason_placeholder": "Cúis le cealú (roghnach)",
     "keep_event": "Coinnigh an tImeacht",
     "cancel_event": "Cealaigh Imeacht",
@@ -141,7 +142,25 @@
     "submit_create": "Cruthaigh Imeacht",
     "submit_update": "Nuashonraigh Imeacht",
     "submit_saving": "Ag sábháil agus ag uaslódáil íomhá...",
+    "error_not_found": "Event not found",
+    "error_load_failed": "Failed to load event. Please try again.",
     "cancel": "Cealaigh",
+    "recurring_toggle": "Make this a recurring event",
+    "recurring_desc": "Automatically create multiple occurrences",
+    "recurring_toggle_aria": "Toggle recurring event",
+    "recurrence_frequency": "Frequency",
+    "recurrence_frequency_aria": "Recurrence frequency",
+    "freq_daily": "Daily",
+    "freq_weekly": "Weekly",
+    "freq_biweekly": "Biweekly (every 2 weeks)",
+    "freq_monthly": "Monthly",
+    "recurrence_days": "Repeat on",
+    "recurrence_end_type": "Ends",
+    "recurrence_end_type_aria": "How the series ends",
+    "end_after_count": "After X occurrences",
+    "end_on_date": "On a specific date",
+    "recurrence_count": "Number of occurrences",
+    "recurrence_end_date": "Series end date",
     "weekday_mon": "Lua",
     "weekday_tue": "Mái",
     "weekday_wed": "Céa",
@@ -191,5 +210,10 @@
     "added_to_waitlist": "Cuireadh ar an liosta feithimh thú.",
     "waitlist_join_failed": "Theip ar bhaint leis an liosta feithimh.",
     "removed_from_waitlist": "Baineadh den liosta feithimh thú."
+  },
+  "reminder_settings": "Event Reminder Settings",
+  "reminder": {
+    "title": "Event Reminders",
+    "coming_soon_desc": "Global reminder preferences are coming soon. In the meantime, you can set reminders on individual events from their detail page."
   }
 }

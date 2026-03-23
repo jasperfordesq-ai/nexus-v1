@@ -4,6 +4,7 @@
   "tour_btn": "Tour",
   "refresh": "Aggiorna",
   "view_all_activity": "Vedi Tutta l'Attività",
+  "load_error": "Failed to load dashboard data",
   "tour": {
     "welcome_title": "Benvenuto/a in Mission Control!",
     "welcome_description": "Questo è il Suo centro di comando per gestire la piattaforma della comunità. Facciamo un rapido tour delle funzionalità principali.",
@@ -17,9 +18,15 @@
     "active_listings": "Annunci Attivi",
     "transactions": "Transazioni",
     "hours_exchanged": "Ore Scambiate",
-    "hours": "Ore"
+    "hours": "Ore",
+    "new_users_this_month": "New Users This Month",
+    "active_users": "Active Users",
+    "total_listings": "Total Listings",
+    "new_listings_this_month": "New Listings This Month"
   },
   "alerts": {
+    "pending_approvals": "Pending Approvals",
+    "pending_listings": "Pending Listings",
     "users_pending_one": "{{count}} Utente in Attesa",
     "users_pending_other": "{{count}} Utenti in Attesa",
     "users_pending_text": "Le nuove registrazioni dei membri richiedono la Sua revisione",
@@ -70,6 +77,11 @@
     "view_all": "Vedi Tutto",
     "empty": "Nessuna attività recente da visualizzare"
   },
+  "trends": {
+    "card_title": "Monthly Trends",
+    "hours_suffix": "hrs",
+    "no_data": "No trend data available yet"
+  },
   "chart": {
     "title": "Volume delle Transazioni",
     "subtitle": "Attività degli ultimi 6 mesi",
@@ -83,7 +95,9 @@
     "send_newsletter": "Invia Newsletter",
     "new_blog_post": "Nuovo Post sul Blog",
     "gamification": "Gamification",
-    "settings": "Impostazioni"
+    "settings": "Impostazioni",
+    "enterprise": "Enterprise",
+    "advanced_controls": "Advanced Controls"
   },
   "enterprise": {
     "card_title": "Suite Enterprise",

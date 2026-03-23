@@ -26,6 +26,7 @@
     "federated_messages": "Messages fÃ©dÃ©rÃ©s",
     "federated_listings": "Annonces fÃ©dÃ©rÃ©es",
     "federated_events": "ÃvÃ©nements fÃ©dÃ©rÃ©s",
+    "federation_settings": "ParamÃ¨tres de FÃ©dÃ©ration",
     "about": "Ã propos",
     "faq": "FAQ",
     "timebanking_guide": "Guide du Timebanking",
@@ -45,12 +46,13 @@
     "skills": "CompÃ©tences",
     "nexus_score": "NexusScore",
     "knowledge_base": "Base de connaissances",
-    "federation_settings": "ParamÃ¨tres de FÃ©dÃ©ration",
     "unread_notifications": "{{count}} notifications non lues",
     "timebanking": "Banque de temps",
     "explore": "Explorer"
   },
   "nav_desc": {
+    "feed": "Fil de la communautÃ©",
+    "explore": "Découvrez du contenu et des personnes tendance",
     "members": "Parcourir les membres de la communautÃ©",
     "connections": "Vos connexions et demandes",
     "events": "ÃvÃ©nements communautaires Ã  venir",
@@ -80,6 +82,7 @@
     "federated_messages": "Messagerie intercommunautaire",
     "federated_listings": "Annonces des communautÃ©s partenaires",
     "federated_events": "ÃvÃ©nements du rÃ©seau",
+    "federation_settings": "GÃ©rez vos prÃ©fÃ©rences de fÃ©dÃ©ration",
     "about": "Ã propos de cette communautÃ©",
     "faq": "Questions frÃ©quentes",
     "timebanking_guide": "Comment fonctionne la banque de temps",
@@ -88,11 +91,8 @@
     "our_impact": "RÃ©sumÃ© de l'impact communautaire",
     "impact_report": "DonnÃ©es d'impact dÃ©taillÃ©es",
     "strategic_plan": "Notre orientation stratÃ©gique",
-    "federation_settings": "GÃ©rez vos prÃ©fÃ©rences de fÃ©dÃ©ration",
-    "feed": "Fil de la communautÃ©",
     "timebanking_listings": "Offres et demandes",
-    "messages": "Vos messages",
-    "explore": "Découvrez du contenu et des personnes tendance"
+    "messages": "Vos messages"
   },
   "user_menu": {
     "my_profile": "Mon profil",
@@ -188,7 +188,9 @@
     "switch_to_dark": "Passer en mode sombre",
     "skip_to_content": "Aller au contenu principal",
     "menu_opened": "Menu de navigation ouvert",
-    "close": "Fermer"
+    "close": "Fermer",
+    "scroll_to_top": "Scroll to top",
+    "breadcrumb": "Breadcrumb"
   },
   "cookie_consent": {
     "banner_label": "Consentement aux cookies",
@@ -279,5 +281,9 @@
     "new_group_desc": "CrÃ©er un groupe communautaire",
     "new_goal": "Nouvel objectif",
     "new_goal_desc": "DÃ©finir un objectif personnel"
+  },
+  "loading": "Loading...",
+  "feature_error": {
+    "load_failed": "We couldn't load {{feature}}. This section may be temporarily unavailable."
   }
 }

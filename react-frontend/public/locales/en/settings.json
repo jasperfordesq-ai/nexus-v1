@@ -92,7 +92,9 @@
     "bio": "Bio",
     "bio_placeholder": "Tell others about yourself...",
     "location": "Location",
-    "location_placeholder": "City, Country"
+    "location_placeholder": "City, Country",
+    "upload_photo_aria": "Upload profile photo",
+    "change_photo_aria": "Change profile photo"
   },
   "notification_prefs": {
     "new_messages": "New Messages",

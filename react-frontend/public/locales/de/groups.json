@@ -110,7 +110,29 @@
     "delete_modal_title": "Gruppe löschen",
     "delete_confirm": "Sind Sie sicher, dass Sie „{{name}}“ löschen möchten?",
     "delete_desc": "Diese Aktion kann nicht rückgängig gemacht werden. Alle Diskussionen, Mitglieder und Gruppendaten werden dauerhaft entfernt.",
-    "delete_btn": "Gruppe löschen"
+    "delete_btn": "Gruppe löschen",
+    "tab_feed": "Feed",
+    "tab_files": "Files",
+    "tab_announcements": "Announcements",
+    "tab_channels": "Channels",
+    "tab_tasks": "Tasks",
+    "join_to_access_title": "Members Only",
+    "join_to_access_desc": "Join this group to access this feature.",
+    "leave_group_title": "Leave Group",
+    "leave_group_confirm": "Are you sure you want to leave {{name}}? You will lose access to group discussions and files.",
+    "report_title": "Report Post",
+    "report_description": "Help us understand why you are reporting this post.",
+    "report_reason_label": "Reason",
+    "report_reason_placeholder": "Describe why this post is inappropriate...",
+    "report_submit": "Report",
+    "join_to_see_feed_title": "Join to see the feed",
+    "join_to_see_feed_desc": "Join this group to view posts and participate in conversations.",
+    "feed_whats_on_your_mind": "What's on your mind?",
+    "feed_empty_title": "No posts yet",
+    "feed_empty_desc": "Be the first to share something with this group!",
+    "feed_create_post": "Create Post",
+    "feed_load_more": "Load More",
+    "member_actions_aria": "Member actions"
   },
   "form": {
     "create_title": "Neue Gruppe erstellen",
@@ -179,7 +201,21 @@
     "delete_title": "Ankündigung löschen",
     "delete_confirm": "Sind Sie sicher, dass Sie \"{{name}}\" löschen möchten? Diese Aktion kann nicht rückgängig gemacht werden.",
     "cancel": "Abbrechen",
-    "post": "Ankündigung veröffentlichen"
+    "post": "Ankündigung veröffentlichen",
+    "title_label": "Title",
+    "title_placeholder": "Announcement title",
+    "content_label": "Content",
+    "content_placeholder": "Write your announcement...",
+    "actions_aria": "Actions",
+    "dropdown_aria": "Announcement actions",
+    "load_failed": "Failed to load announcements",
+    "created": "Announcement created",
+    "create_failed": "Failed to create announcement",
+    "unpinned": "Unpinned",
+    "pinned_success": "Pinned",
+    "update_failed": "Failed to update announcement",
+    "deleted": "Announcement deleted",
+    "delete_failed": "Failed to delete announcement"
   },
   "files": {
     "heading": "Dateien",
@@ -200,7 +236,9 @@
     "upload_failed": "Datei(en) konnten nicht hochgeladen werden",
     "download_failed": "Datei konnte nicht heruntergeladen werden",
     "file_deleted": "Datei gelöscht",
-    "delete_failed": "Datei konnte nicht gelöscht werden"
+    "delete_failed": "Datei konnte nicht gelöscht werden",
+    "coming_soon": "Coming Soon",
+    "coming_soon_description": "Group file sharing is currently in development. Soon you will be able to upload, download, and manage files within your group."
   },
   "toast": {
     "left": "Gruppe verlassen",
@@ -227,8 +265,18 @@
     "role_updated": "Rolle zu {{role}} aktualisiert",
     "role_update_failed": "Rolle konnte nicht aktualisiert werden",
     "member_removed": "Mitglied entfernt",
-    "member_remove_failed": "Mitglied konnte nicht entfernt werden"
+    "member_remove_failed": "Mitglied konnte nicht entfernt werden",
+    "feed_load_failed": "Failed to load feed",
+    "post_hidden": "Post hidden",
+    "hide_failed": "Failed to hide post",
+    "user_muted": "User muted",
+    "mute_failed": "Failed to mute user",
+    "provide_reason": "Please provide a reason",
+    "reported": "Post reported",
+    "report_failed": "Failed to report post",
+    "vote_failed": "Failed to vote"
   },
+  "loading_aria": "Loading groups",
   "load_error": "Gruppen konnten nicht geladen werden.",
   "load_more_error": "Weitere Gruppen konnten nicht geladen werden"
 }

@@ -41,5 +41,11 @@
     "all_read": "All notifications marked as read",
     "mark_all_failed": "Failed to mark all as read",
     "delete_failed": "Failed to delete notification"
+  },
+  "realtime": {
+    "new_message": "New Message",
+    "new_message_fallback": "You have a new message",
+    "transaction_complete": "Transaction Complete",
+    "transaction_amount": "{{sign}}{{amount}} time credits"
   }
 }

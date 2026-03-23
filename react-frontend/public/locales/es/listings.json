@@ -121,5 +121,27 @@
   "page_meta_description": "Explora servicios y solicitudes.",
   "page_meta_keywords": "anuncios, servicios, ofertas",
   "save_listing": "Guardar anuncio",
-  "unsave_listing": "Quitar anuncio"
+  "unsave_listing": "Quitar anuncio",
+  "saved_success": "Listing saved",
+  "unsaved_success": "Listing removed from saved",
+  "save_error": "Failed to update saved listing",
+  "featured": "Featured",
+  "featured_badge": "Featured listing",
+  "skill_tags": {
+    "label": "Skill Tags",
+    "placeholder": "Type a skill and press Enter...",
+    "aria_add": "Add skill tag"
+  },
+  "analytics": {
+    "title": "Listing Analytics",
+    "total_views": "Total Views",
+    "unique_viewers": "{{count}} unique",
+    "contacts": "Contacts",
+    "contact_rate": "{{rate}}% rate",
+    "saves": "Saves",
+    "save_rate": "{{rate}}% rate",
+    "trend_7day": "7-Day Trend",
+    "vs_previous_week": "vs. previous week",
+    "views_last_days": "Views (Last {{days}} Days)"
+  }
 }

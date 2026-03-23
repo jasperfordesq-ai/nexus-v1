@@ -26,6 +26,7 @@
     "federated_messages": "Mensagens Federadas",
     "federated_listings": "Anúncios Federados",
     "federated_events": "Eventos Federados",
+    "federation_settings": "Configurações de Federação",
     "about": "Sobre",
     "faq": "Perguntas Frequentes",
     "timebanking_guide": "Guia de Timebanking",
@@ -45,12 +46,13 @@
     "skills": "Competências",
     "nexus_score": "NexusScore",
     "knowledge_base": "Base de conhecimento",
-    "federation_settings": "Configurações de Federação",
     "unread_notifications": "{{count}} notificações não lidas",
     "timebanking": "Banco de tempo",
     "explore": "Explorar"
   },
   "nav_desc": {
+    "feed": "Feed da comunidade",
+    "explore": "Descubra conte�do e pessoas em tend�ncia",
     "members": "Explorar membros da comunidade",
     "connections": "As suas ligações e pedidos",
     "events": "Próximos eventos da comunidade",
@@ -80,6 +82,7 @@
     "federated_messages": "Mensagens intercomunidades",
     "federated_listings": "Anúncios de comunidades parceiras",
     "federated_events": "Eventos na rede",
+    "federation_settings": "Gerencie suas preferências de federação",
     "about": "Sobre esta comunidade",
     "faq": "Perguntas frequentes",
     "timebanking_guide": "Como funciona o banco de tempo",
@@ -88,11 +91,8 @@
     "our_impact": "Resumo do impacto comunitário",
     "impact_report": "Dados de impacto detalhados",
     "strategic_plan": "A nossa direção estratégica",
-    "federation_settings": "Gerencie suas preferências de federação",
-    "feed": "Feed da comunidade",
     "timebanking_listings": "Ofertas e pedidos",
-    "messages": "Suas mensagens",
-    "explore": "Descubra conte�do e pessoas em tend�ncia"
+    "messages": "Suas mensagens"
   },
   "user_menu": {
     "my_profile": "O Meu Perfil",
@@ -188,7 +188,9 @@
     "switch_to_dark": "Mudar para modo escuro",
     "skip_to_content": "Ir para o conteúdo principal",
     "menu_opened": "Menu de navegação aberto",
-    "close": "Fechar"
+    "close": "Fechar",
+    "scroll_to_top": "Scroll to top",
+    "breadcrumb": "Breadcrumb"
   },
   "cookie_consent": {
     "banner_label": "Consentimento de cookies",
@@ -279,5 +281,9 @@
     "new_group_desc": "Iniciar um grupo comunitário",
     "new_goal": "Novo objetivo",
     "new_goal_desc": "Definir um objetivo pessoal"
+  },
+  "loading": "Loading...",
+  "feature_error": {
+    "load_failed": "We couldn't load {{feature}}. This section may be temporarily unavailable."
   }
 }

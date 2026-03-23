@@ -26,6 +26,7 @@
     "federated_messages": "Teachtaireachtaí Cónaidhme",
     "federated_listings": "Liostaí Cónaidhme",
     "federated_events": "Imeachtaí Cónaidhme",
+    "federation_settings": "Socruithe Cónaidhme",
     "about": "Faoi",
     "faq": "Ceisteanna Coitianta",
     "timebanking_guide": "Treoir Bainc Ama",
@@ -45,12 +46,12 @@
     "skills": "Scileanna",
     "nexus_score": "NexusScore",
     "knowledge_base": "Bunachar eolais",
-    "federation_settings": "Socruithe Cónaidhme",
     "unread_notifications": "{{count}} fógra gan léamh",
     "timebanking": "Baincéireacht ama",
     "explore": "Féach Thart"
   },
   "nav_desc": {
+    "feed": "Fotha an phobail",
     "explore": "Aimsigh ábhar agus daoine atá ag treáil",
     "members": "Brabhsáil baill an phobail",
     "connections": "Do naisc & iarratais",
@@ -81,6 +82,7 @@
     "federated_messages": "Teachtaireachtaí trasnphobail",
     "federated_listings": "Fógraí ó phobail comhpháirtíochta",
     "federated_events": "Imeachtaí ar fud an líonra",
+    "federation_settings": "Bainistigh do roghanna cónaidhme",
     "about": "Maidir leis an bpobal seo",
     "faq": "Ceisteanna coitianta",
     "timebanking_guide": "Conas a oibríonn baincéireacht ama",
@@ -89,8 +91,6 @@
     "our_impact": "Achoimre ar thionchar an phobail",
     "impact_report": "Sonraí mionsonraithe tionchair",
     "strategic_plan": "Ár dtreo straitéiseach",
-    "federation_settings": "Bainistigh do roghanna cónaidhme",
-    "feed": "Fotha an phobail",
     "timebanking_listings": "Tairiscintí agus iarratais",
     "messages": "Do theachtaireachtaí"
   },
@@ -188,7 +188,9 @@
     "switch_to_dark": "Athraigh go mód dorcha",
     "skip_to_content": "Téigh go dtí an príomhábhar",
     "menu_opened": "Roghchlár nascleanúna oscailte",
-    "close": "Dún"
+    "close": "Dún",
+    "scroll_to_top": "Scroll to top",
+    "breadcrumb": "Breadcrumb"
   },
   "cookie_consent": {
     "banner_label": "Toiliú fianán",
@@ -279,5 +281,9 @@
     "new_group_desc": "Tosaigh grúpa pobail",
     "new_goal": "Sprioc Nua",
     "new_goal_desc": "Socraigh sprioc phearsanta"
+  },
+  "loading": "Loading...",
+  "feature_error": {
+    "load_failed": "We couldn't load {{feature}}. This section may be temporarily unavailable."
   }
 }

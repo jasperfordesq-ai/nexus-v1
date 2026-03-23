@@ -26,6 +26,7 @@
     "federated_messages": "Verbundene Nachrichten",
     "federated_listings": "Verbundene Inserate",
     "federated_events": "Verbundene Veranstaltungen",
+    "federation_settings": "Föderationseinstellungen",
     "about": "Über uns",
     "faq": "FAQ",
     "timebanking_guide": "Timebanking-Leitfaden",
@@ -45,12 +46,13 @@
     "skills": "Fähigkeiten",
     "nexus_score": "NexusScore",
     "knowledge_base": "Wissensdatenbank",
-    "federation_settings": "Föderationseinstellungen",
     "unread_notifications": "{{count}} ungelesene Benachrichtigungen",
     "timebanking": "Zeitbank",
     "explore": "Entdecken"
   },
   "nav_desc": {
+    "feed": "Community-Feed",
+    "explore": "Trendige Inhalte & Personen entdecken",
     "members": "Community-Mitglieder durchsuchen",
     "connections": "Ihre Verbindungen & Anfragen",
     "events": "Bevorstehende Community-Veranstaltungen",
@@ -80,6 +82,7 @@
     "federated_messages": "Community-übergreifende Nachrichten",
     "federated_listings": "Inserate aus Partnergemeinschaften",
     "federated_events": "Veranstaltungen im Netzwerk",
+    "federation_settings": "Verwalten Sie Ihre Föderationseinstellungen",
     "about": "Über diese Community",
     "faq": "Häufig gestellte Fragen",
     "timebanking_guide": "Wie Timebanking funktioniert",
@@ -88,11 +91,8 @@
     "our_impact": "Community-Wirkungsübersicht",
     "impact_report": "Detaillierte Wirkungsdaten",
     "strategic_plan": "Unsere strategische Ausrichtung",
-    "federation_settings": "Verwalten Sie Ihre Föderationseinstellungen",
-    "feed": "Community-Feed",
     "timebanking_listings": "Angebote & Gesuche",
-    "messages": "Ihre Nachrichten",
-    "explore": "Trendige Inhalte & Personen entdecken"
+    "messages": "Ihre Nachrichten"
   },
   "user_menu": {
     "my_profile": "Mein Profil",
@@ -188,7 +188,9 @@
     "switch_to_dark": "Zum dunklen Modus wechseln",
     "skip_to_content": "Zum Hauptinhalt springen",
     "menu_opened": "Navigationsmenü geöffnet",
-    "close": "Schließen"
+    "close": "Schließen",
+    "scroll_to_top": "Scroll to top",
+    "breadcrumb": "Breadcrumb"
   },
   "cookie_consent": {
     "banner_label": "Cookie-Zustimmung",
@@ -279,5 +281,9 @@
     "new_group_desc": "Eine Gemeinschaftsgruppe gründen",
     "new_goal": "Neues Ziel",
     "new_goal_desc": "Ein persönliches Ziel setzen"
+  },
+  "loading": "Loading...",
+  "feature_error": {
+    "load_failed": "We couldn't load {{feature}}. This section may be temporarily unavailable."
   }
 }

@@ -134,5 +134,10 @@
     "something_went_wrong": "Chuaigh rud éigin mícheart",
     "error_description": "Níorbh fhéidir d'iarratas a phróiseáil. Bain triail eile as nó déan teagmháil le tacaíocht.",
     "try_again": "Bain triail eile as"
+  },
+  "custom_page": {
+    "default_title": "Page",
+    "not_found_description": "The page you're looking for doesn't exist or is no longer available.",
+    "back_to_home": "Back to Home"
   }
 }
