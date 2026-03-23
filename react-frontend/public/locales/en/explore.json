@@ -58,5 +58,7 @@
     "just_now": "Just now",
     "hours_ago": "{{count}}h ago",
     "days_ago": "{{count}}d ago"
-  }
+  },
+  "error_loading": "We couldn't load the Discover page. This may be a temporary issue.",
+  "retry": "Retry"
 }

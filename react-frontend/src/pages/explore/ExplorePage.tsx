@@ -33,6 +33,8 @@ import {
   Heart,
   MessageSquare,
   TrendingUp,
+  AlertCircle,
+  RefreshCw,
 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { usePageTitle } from '@/hooks/usePageTitle';
@@ -178,7 +180,7 @@ export default function ExplorePage() {
   const { isAuthenticated } = useAuth();
   const [searchQuery, setSearchQuery] = useState('');
 
-  const { data, isLoading } = useApi<ExploreData>('/v2/explore');
+  const { data, isLoading, error, execute: retry } = useApi<ExploreData>('/v2/explore');
 
   // Fetch categories for quick-filter chips
   const { data: categories } = useApi<Array<{ id: number; name: string; slug: string; color?: string }>>(
@@ -276,6 +278,17 @@ export default function ExplorePage() {
         )}
       </motion.div>
 
+      {/* ─── API Error Banner ─────────────────────────────────────────────── */}
+      {error && !isLoading && (
+        <div className="mb-6 flex items-center gap-3 px-4 py-3 rounded-xl bg-danger-50 border border-danger-200 text-danger-700 dark:bg-danger-900/20 dark:border-danger-800 dark:text-danger-400">
+          <AlertCircle className="w-5 h-5 shrink-0" aria-hidden="true" />
+          <span className="text-sm flex-1">{t('error_loading')}</span>
+          <Button size="sm" variant="flat" color="danger" onPress={() => retry()} startContent={<RefreshCw className="w-4 h-4" />}>
+            {t('retry')}
+          </Button>
+        </div>
+      )}
+
       {/* ─── Community Stats Banner ───────────────────────────────────────── */}
       <motion.div
         initial={{ opacity: 0, scale: 0.98 }}
@@ -301,7 +314,7 @@ export default function ExplorePage() {
                 <>
                   <ExploreStatCard icon={Users} label={t('stats.members')} value={stats?.total_members ?? 0} />
                   <ExploreStatCard icon={ArrowRightLeft} label={t('stats.exchanges_this_month')} value={stats?.exchanges_this_month ?? 0} />
-                  <ExploreStatCard icon={Clock} label={t('stats.hours_exchanged')} value={stats?.hours_exchanged ?? 0} />
+                  <ExploreStatCard icon={Clock} label={t('stats.hours_exchanged')} value={stats?.hours_exchanged ?? 0} suffix="h" />
                   <ExploreStatCard icon={ListTodo} label={t('stats.active_listings')} value={stats?.active_listings ?? 0} />
                 </>
               )}
@@ -337,7 +350,7 @@ export default function ExplorePage() {
               {data!.trending_posts.map((post) => (
                 <Link
                   key={post.id}
-                  to={tenantPath('/feed')}
+                  to={tenantPath(`/feed?post=${post.id}`)}
                   className="min-w-[280px] max-w-[320px] snap-start shrink-0"
                 >
                   <Card className="h-full border border-[var(--card-border)] bg-[var(--card-bg)] hover:bg-[var(--card-hover-bg)] transition-colors">
