@@ -291,7 +291,8 @@
     "cv_dropzone_aria": "Click or drop file to upload CV",
     "cv_too_large": "CV file must be under 5MB",
     "cv_invalid_type": "Only PDF, DOC, or DOCX files are supported",
-    "message_employer": "Message Employer"
+    "message_employer": "Message Employer",
+    "cv_parse_error": "Failed to parse CV. You can still submit your application manually."
   },
   "detail": {
     "loading": "Chargement de l'offre...",
@@ -517,7 +518,8 @@
       "title_required": "Le titre est requis",
       "description_required": "La description est requise",
       "deadline_past": "Deadline must be a future date",
-      "salary_required": "Salary range required. You may check 'Salary negotiable' to omit."
+      "salary_required": "Salary range required. You may check 'Salary negotiable' to omit.",
+      "salary_range_invalid": "Minimum salary cannot exceed maximum salary"
     }
   },
   "ai_generate": {

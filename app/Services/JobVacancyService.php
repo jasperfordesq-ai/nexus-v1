@@ -212,6 +212,12 @@ class JobVacancyService
             }
         }
 
+        // Salary min cannot exceed max
+        if (!empty($data['salary_min']) && !empty($data['salary_max']) && (float)$data['salary_min'] > (float)$data['salary_max']) {
+            $this->errors[] = ['code' => 'VALIDATION_SALARY_RANGE', 'message' => 'Minimum salary cannot exceed maximum salary'];
+            return 0;
+        }
+
         $tenantId = TenantContext::getId();
 
         // Run spam detection (Agent B)
@@ -351,6 +357,14 @@ class JobVacancyService
             }
         }
 
+        // Salary min cannot exceed max
+        $finalMin = array_key_exists('salary_min', $updates) ? $updates['salary_min'] : ($vacancy->salary_min ?? null);
+        $finalMax = array_key_exists('salary_max', $updates) ? $updates['salary_max'] : ($vacancy->salary_max ?? null);
+        if (!empty($finalMin) && !empty($finalMax) && (float)$finalMin > (float)$finalMax) {
+            $this->errors[] = ['code' => 'VALIDATION_SALARY_RANGE', 'message' => 'Minimum salary cannot exceed maximum salary'];
+            return false;
+        }
+
         try {
             $vacancy->update($updates);
             return true;
@@ -404,11 +418,25 @@ class JobVacancyService
      */
     public function apply(int $jobId, int $userId, array $data = []): ?int
     {
+        $this->errors = [];
+
+        // Verify vacancy exists and is open
+        $vacancy = $this->vacancy->newQuery()->find($jobId);
+        if (!$vacancy) {
+            $this->errors[] = ['code' => 'RESOURCE_NOT_FOUND', 'message' => 'Job vacancy not found'];
+            return null;
+        }
+        if ($vacancy->status === 'closed' || $vacancy->status === 'filled') {
+            $this->errors[] = ['code' => 'VACANCY_CLOSED', 'message' => 'This vacancy is no longer accepting applications'];
+            return null;
+        }
+
         $exists = JobApplication::where('vacancy_id', $jobId)
             ->where('user_id', $userId)
             ->exists();
 
         if ($exists) {
+            $this->errors[] = ['code' => 'RESOURCE_CONFLICT', 'message' => 'You have already applied to this vacancy'];
             return null;
         }
 
@@ -602,7 +630,7 @@ class JobVacancyService
     {
         $this->errors = [];
 
-        $validStatuses = ['applied', 'pending', 'screening', 'reviewed', 'interview', 'offer', 'accepted', 'rejected', 'withdrawn'];
+        $validStatuses = ['applied', 'pending', 'screening', 'reviewed', 'shortlisted', 'interview', 'offer', 'accepted', 'rejected', 'withdrawn'];
         if (!in_array($status, $validStatuses)) {
             $this->errors[] = ['code' => 'VALIDATION_INVALID_VALUE', 'message' => 'Invalid application status'];
             return false;

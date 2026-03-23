@@ -22,7 +22,7 @@ class JobApplicationFactory extends Factory
             'user_id'        => User::factory(),
             'message'        => $this->faker->paragraph(),
             'status'         => $this->faker->randomElement(['submitted', 'under_review', 'shortlisted', 'accepted', 'rejected', 'withdrawn']),
-            'stage'          => $this->faker->optional()->randomElement(['screening', 'interview', 'offer']),
+            'stage'          => $this->faker->randomElement(['applied', 'screening', 'interview', 'offer']),
             'reviewer_notes' => null,
             'reviewed_by'    => null,
             'reviewed_at'    => null,

@@ -670,6 +670,9 @@ export function JobDetailPage() {
           },
           body: formData,
         });
+        if (!fetchResponse.ok) {
+          throw new Error(fetchResponse.statusText || 'Application failed');
+        }
         response = await fetchResponse.json() as { success: boolean; error?: string };
       } else {
         response = await api.post(`/v2/jobs/${id}/apply`, {
@@ -696,8 +699,9 @@ export function JobDetailPage() {
             } else {
               toastRef.current.success(tRef.current('apply.success'));
             }
-          } catch {
-            toastRef.current.success(tRef.current('apply.success'));
+          } catch (err) {
+            toastRef.current.error(tRef.current('apply.cv_parse_error', 'Failed to parse CV. You can still submit your application manually.'));
+            if (import.meta.env.DEV) console.warn('CV parse failed:', err);
           }
         } else {
           toastRef.current.success(tRef.current('apply.success'));
@@ -1799,7 +1803,15 @@ export function JobDetailPage() {
       </div>
 
       {/* Apply Modal */}
-      <Modal isOpen={applyModal.isOpen} onOpenChange={applyModal.onOpenChange}>
+      <Modal isOpen={applyModal.isOpen} onOpenChange={(isOpen) => {
+        if (!isOpen) {
+          setApplyMessage('');
+          setCvFile(null);
+          setCvParsed(null);
+          setUsingSavedProfile(false);
+        }
+        applyModal.onOpenChange(isOpen);
+      }}>
         <ModalContent>
           {(onClose) => (
             <>

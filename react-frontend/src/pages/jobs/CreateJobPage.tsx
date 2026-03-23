@@ -368,6 +368,11 @@ export function CreateJobPage() {
       }
     }
 
+    // Salary min cannot exceed max
+    if (form.salary_min && form.salary_max && Number(form.salary_min) > Number(form.salary_max)) {
+      newErrors.salary_range = t('form.validation.salary_range_invalid', 'Minimum salary cannot exceed maximum salary');
+    }
+
     // EU Pay Transparency: salary range required for paid jobs unless negotiable
     if (form.type === 'paid' && !form.salary_negotiable) {
       if (!form.salary_min && !form.salary_max) {
