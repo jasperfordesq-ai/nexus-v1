@@ -138,9 +138,9 @@ class StoryService
 
         // Check connections for sorting priority
         $connectionUserIds = DB::select(
-            'SELECT CASE WHEN user_id = ? THEN connected_user_id ELSE user_id END as friend_id
+            'SELECT CASE WHEN requester_id = ? THEN receiver_id ELSE requester_id END as friend_id
              FROM connections
-             WHERE (user_id = ? OR connected_user_id = ?)
+             WHERE (requester_id = ? OR receiver_id = ?)
                AND status = ?
                AND tenant_id = ?',
             [$userId, $userId, $userId, 'accepted', $tenantId]
