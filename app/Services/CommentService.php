@@ -43,12 +43,12 @@ class CommentService
         if (!empty($commentIds)) {
             $reactionRows = DB::table('comment_reactions')
                 ->whereIn('comment_id', $commentIds)
-                ->selectRaw('comment_id, emoji, COUNT(*) as count')
-                ->groupBy('comment_id', 'emoji')
+                ->selectRaw('comment_id, reaction_type, COUNT(*) as count')
+                ->groupBy('comment_id', 'reaction_type')
                 ->get();
 
             foreach ($reactionRows as $r) {
-                $reactions[$r->comment_id][$r->emoji] = (int) $r->count;
+                $reactions[$r->comment_id][$r->reaction_type] = (int) $r->count;
             }
 
             if ($currentUserId > 0) {
@@ -58,7 +58,7 @@ class CommentService
                     ->get();
 
                 foreach ($userReactionRows as $r) {
-                    $userReactions[$r->comment_id][] = $r->emoji;
+                    $userReactions[$r->comment_id][] = $r->reaction_type;
                 }
             }
         }
@@ -441,7 +441,7 @@ class CommentService
         $existing = DB::table('comment_reactions')
             ->where('comment_id', $commentId)
             ->where('user_id', $userId)
-            ->where('emoji', $emoji)
+            ->where('reaction_type', $emoji)
             ->first();
 
         if ($existing) {
@@ -452,7 +452,7 @@ class CommentService
                 'comment_id' => $commentId,
                 'user_id' => $userId,
                 'tenant_id' => $tenantId,
-                'emoji' => $emoji,
+                'reaction_type' => $emoji,
                 'created_at' => now(),
             ]);
             $action = 'added';
@@ -461,9 +461,9 @@ class CommentService
         // Aggregate updated reactions for this comment
         $reactionCounts = DB::table('comment_reactions')
             ->where('comment_id', $commentId)
-            ->selectRaw('emoji, COUNT(*) as count')
-            ->groupBy('emoji')
-            ->pluck('count', 'emoji')
+            ->selectRaw('reaction_type, COUNT(*) as count')
+            ->groupBy('reaction_type')
+            ->pluck('count', 'reaction_type')
             ->all();
 
         return [
