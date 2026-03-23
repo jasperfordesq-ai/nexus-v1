@@ -116,21 +116,21 @@
     "delete": "Löschen"
   },
   "employer": {
-    "page_title": "Employer Profile",
-    "open_roles": "open roles",
-    "open_roles_heading": "Open Roles",
-    "no_roles": "No open roles at this time",
-    "error": "Unable to load employer profile",
-    "employer_jobs": "Employer Jobs",
-    "employees": "{{size}} employees"
+    "page_title": "Arbeitgeberprofil",
+    "open_roles": "offene Stellen",
+    "open_roles_heading": "Offene Stellen",
+    "no_roles": "Derzeit keine offenen Stellen",
+    "error": "Arbeitgeberprofil konnte nicht geladen werden",
+    "employer_jobs": "Stellen des Arbeitgebers",
+    "employees": "{{size}} Mitarbeiter"
   },
   "bulk": {
-    "select_action": "Move to stage...",
-    "apply": "Apply",
-    "clear": "Clear selection",
-    "success": "Applications updated",
-    "error": "Bulk update failed",
-    "selected_count": "{{count}} selected"
+    "select_action": "In Phase verschieben...",
+    "apply": "Anwenden",
+    "clear": "Auswahl aufheben",
+    "success": "Bewerbungen aktualisiert",
+    "error": "Massenaktualisierung fehlgeschlagen",
+    "selected_count": "{{count}} ausgewählt"
   },
   "history": {
     "title": "Statusverlauf",
@@ -138,7 +138,7 @@
     "initial": "Bewerbung eingereicht",
     "by": "von {{name}}",
     "empty": "Kein Verlauf verfügbar",
-    "status_history": "Status History"
+    "status_history": "Statusverlauf"
   },
   "alerts": {
     "title": "Stellenbenachrichtigungen",
@@ -171,10 +171,10 @@
     "toggle_error": "Benachrichtigung konnte nicht umgeschaltet werden",
     "delete_error": "Benachrichtigung konnte nicht gelöscht werden",
     "never": "Nie",
-    "load_error": "Failed to load alerts. Please try again.",
-    "retry": "Retry",
-    "created_date": "Created {{date}}",
-    "last_notified": "Last notification {{date}}"
+    "load_error": "Benachrichtigungen konnten nicht geladen werden. Bitte versuchen Sie es erneut.",
+    "retry": "Erneut versuchen",
+    "created_date": "Erstellt {{date}}",
+    "last_notified": "Letzte Benachrichtigung {{date}}"
   },
   "renew": {
     "button": "Verlängern",
