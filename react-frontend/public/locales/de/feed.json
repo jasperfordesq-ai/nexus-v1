@@ -377,21 +377,21 @@
     "more_images": "{{count}} weitere Bilder"
   },
   "lightbox": {
-    "aria_label": "Image viewer",
-    "close": "Close image viewer",
-    "counter": "{{current}} of {{total}}"
+    "aria_label": "Bildanzeige",
+    "close": "Bildanzeige schließen",
+    "counter": "{{current}} von {{total}}"
   },
   "reaction": {
-    "like": "Like",
-    "love": "Love",
-    "laugh": "Laugh",
+    "like": "Gefällt mir",
+    "love": "Liebe",
+    "laugh": "Lachen",
     "wow": "Wow",
-    "sad": "Sad",
-    "celebrate": "Celebrate",
-    "clap": "Clap",
-    "time_credit": "Time Credit",
-    "click_to_remove": "{{label}} (click to remove)",
-    "react_to_post": "React to this post"
+    "sad": "Traurig",
+    "celebrate": "Feiern",
+    "clap": "Applaus",
+    "time_credit": "Zeitguthaben",
+    "click_to_remove": "{{label}} (zum Entfernen klicken)",
+    "react_to_post": "Auf diesen Beitrag reagieren"
   },
   "video": {
     "select": "Add Video",
