@@ -89,6 +89,8 @@ export interface FeedCardProps {
   currentUserId?: number;
   /** Whether the current user is an admin (shows admin delete on all posts). */
   isAdmin?: boolean;
+  /** If true, comments section is open and loaded immediately on mount. */
+  defaultShowComments?: boolean;
 }
 
 /* ───────────────────────── Type Badge Config ───────────────────────── */
@@ -277,13 +279,14 @@ const FeedCard = React.memo(function FeedCard({
   isAuthenticated,
   currentUserId,
   isAdmin,
+  defaultShowComments = false,
 }: FeedCardProps) {
   const { t } = useTranslation('feed');
   const { tenantPath } = useTenant();
   const toast = useToast();
-  const [showComments, setShowComments] = useState(false);
+  const [showComments, setShowComments] = useState(defaultShowComments);
   const [comments, setComments] = useState<FeedComment[]>([]);
-  const [isLoadingComments, setIsLoadingComments] = useState(false);
+  const [isLoadingComments, setIsLoadingComments] = useState(defaultShowComments);
   const [newComment, setNewComment] = useState('');
   const [isSubmittingComment, setIsSubmittingComment] = useState(false);
   const [localCommentsCount, setLocalCommentsCount] = useState(item.comments_count);
@@ -355,6 +358,14 @@ const FeedCard = React.memo(function FeedCard({
       setIsLoadingComments(false);
     }
   };
+
+  // Auto-load comments on mount when defaultShowComments is true
+  useEffect(() => {
+    if (defaultShowComments) {
+      loadComments();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const toggleComments = () => {
     if (!showComments) {

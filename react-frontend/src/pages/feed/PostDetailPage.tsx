@@ -202,6 +202,7 @@ export function PostDetailPage() {
             onVotePoll={handleVotePoll}
             isAuthenticated={isAuthenticated}
             currentUserId={user?.id}
+            defaultShowComments
           />
         ) : null}
       </div>
