@@ -42,10 +42,10 @@ class FeedSidebarService
 
         $connectedIds = DB::table('connections')
             ->where('tenant_id', $tenantId)
-            ->where(fn ($q) => $q->where('user_id', $userId)->orWhere('connected_user_id', $userId))
+            ->where(fn ($q) => $q->where('requester_id', $userId)->orWhere('receiver_id', $userId))
             ->where('status', 'accepted')
             ->get()
-            ->map(fn ($c) => $c->user_id === $userId ? $c->connected_user_id : $c->user_id)
+            ->map(fn ($c) => $c->requester_id === $userId ? $c->receiver_id : $c->requester_id)
             ->push($userId)
             ->unique()
             ->all();

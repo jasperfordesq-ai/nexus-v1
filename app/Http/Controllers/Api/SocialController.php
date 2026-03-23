@@ -41,6 +41,7 @@ class SocialController extends BaseApiController
         private readonly FeedRankingService $feedRankingService,
         private readonly FeedActivityService $feedActivityService,
         private readonly PollService $pollService,
+        private readonly PostMediaService $postMediaService,
     ) {}
 
     /**

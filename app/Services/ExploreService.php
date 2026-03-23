@@ -378,13 +378,12 @@ class ExploreService
                     ch.id,
                     ch.title,
                     ch.description,
-                    ch.status,
                     ch.start_date,
                     ch.end_date,
                     {$ideaCountSql} AS idea_count
                 FROM challenges ch
                 WHERE ch.tenant_id = ?
-                    AND ch.status = 'active'
+                    AND ch.is_active = 1
                 ORDER BY ch.end_date ASC
                 LIMIT 4
             ", $params);
@@ -393,7 +392,7 @@ class ExploreService
                 'id' => $row->id,
                 'title' => $row->title,
                 'description' => $row->description ? mb_substr($row->description, 0, 150) : null,
-                'status' => $row->status,
+                'status' => 'active',
                 'start_date' => $row->start_date,
                 'end_date' => $row->end_date,
                 'idea_count' => (int) $row->idea_count,
