@@ -44,4 +44,36 @@ class Tenant extends Model
     {
         return $this->hasMany(User::class);
     }
+
+    /** Return direct children of a tenant as a plain array. */
+    public static function getChildren(int $tenantId): array
+    {
+        return static::where('parent_id', $tenantId)
+            ->orderBy('name')
+            ->get(['id', 'name', 'slug', 'is_active', 'depth'])
+            ->toArray();
+    }
+
+    /**
+     * Return ancestor chain from root → tenant as a plain array.
+     * Each entry has: id, name, slug.
+     */
+    public static function getBreadcrumb(int $tenantId): array
+    {
+        $crumbs = [];
+        $current = static::find($tenantId, ['id', 'name', 'slug', 'parent_id']);
+
+        while ($current) {
+            array_unshift($crumbs, [
+                'id'   => $current->id,
+                'name' => $current->name,
+                'slug' => $current->slug,
+            ]);
+            $current = $current->parent_id
+                ? static::find($current->parent_id, ['id', 'name', 'slug', 'parent_id'])
+                : null;
+        }
+
+        return $crumbs;
+    }
 }
