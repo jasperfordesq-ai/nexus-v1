@@ -26,11 +26,11 @@
  * @see docs/TRS-001-TENANT-RESOLUTION-SPEC.md
  */
 
-import { Outlet, useLocation, Routes } from 'react-router-dom';
+import { Outlet, Routes, useLocation } from 'react-router-dom';
 import { TenantProvider, useTenant, useAuth } from '@/contexts';
 import { AuthProvider, NotificationsProvider, PusherProvider, MenuProvider } from '@/contexts';
 import { PresenceProvider } from '@/contexts/PresenceContext';
-import { RESERVED_PATHS } from '@/lib/tenant-routing';
+import { detectTenantFromUrl } from '@/lib/tenant-routing';
 import { CookieConsentBanner } from '@/components/feedback';
 import { lazy, Suspense } from 'react';
 import { Spinner } from '@heroui/react';
@@ -46,19 +46,13 @@ interface TenantShellProps {
 }
 
 export function TenantShell({ appRoutes }: TenantShellProps) {
-  const location = useLocation();
-
-  // Extract the first path segment to check if it's a tenant slug.
-  // e.g. "/hour-timebank/dashboard" → "hour-timebank"
-  // e.g. "/admin/listings" → "admin" (reserved, not a slug)
-  // e.g. "/dashboard" → "dashboard" (reserved, not a slug)
-  const segments = location.pathname.split('/').filter(Boolean);
-  const firstSegment = segments[0]?.toLowerCase();
-
-  // Only treat as a tenant slug if it's NOT a reserved path
-  const effectiveSlug = firstSegment && !RESERVED_PATHS.has(firstSegment)
-    ? firstSegment
-    : undefined;
+  // Use detectTenantFromUrl() which correctly implements TRS-001 R1–R4:
+  // - R1: Custom domain (e.g. hour-timebank.ie) → slug = null (backend resolves from Host)
+  // - R2: Subdomain of project-nexus.ie → slug from subdomain
+  // - R3: app.project-nexus.ie or localhost → slug from first path segment if not reserved
+  // - R4: No tenant → null
+  const { slug: detectedSlug } = detectTenantFromUrl();
+  const effectiveSlug = detectedSlug ?? undefined;
 
   return (
     <TenantProvider tenantSlug={effectiveSlug}>
