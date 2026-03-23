@@ -93,9 +93,14 @@ export function ImageLightbox({ media, initialIndex = 0, onClose }: ImageLightbo
     };
   }, []);
 
-  // Focus trap — focus the container on mount
+  // Focus trap — focus the container on mount, restore on close
+  const previousFocusRef = useRef<Element | null>(null);
   useEffect(() => {
+    previousFocusRef.current = document.activeElement;
     containerRef.current?.focus();
+    return () => {
+      (previousFocusRef.current as HTMLElement)?.focus?.();
+    };
   }, []);
 
   if (!current) return null;
@@ -145,9 +150,9 @@ export function ImageLightbox({ media, initialIndex = 0, onClose }: ImageLightbo
         <X className="w-6 h-6" />
       </button>
 
-      {/* Counter */}
+      {/* Counter (screen reader live region) */}
       {total > 1 && (
-        <div className="absolute top-4 left-1/2 -translate-x-1/2 z-10 text-white/80 text-sm font-medium">
+        <div className="absolute top-4 left-1/2 -translate-x-1/2 z-10 text-white/80 text-sm font-medium" aria-live="polite" aria-atomic="true">
           {currentIndex + 1} of {total}
         </div>
       )}

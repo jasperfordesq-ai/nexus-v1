@@ -88,7 +88,7 @@ export function YouTubeEmbed({ embedUrl, thumbnailUrl, title = 'Video' }: YouTub
           <button
             type="button"
             onClick={handlePlay}
-            className="absolute inset-0 w-full h-full group/play cursor-pointer bg-black"
+            className="absolute inset-0 w-full h-full group/play cursor-pointer bg-black focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)] focus:ring-inset"
             aria-label={`Play video: ${title}`}
           >
             {/* Thumbnail */}
