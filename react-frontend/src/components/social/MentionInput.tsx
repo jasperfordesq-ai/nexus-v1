@@ -98,6 +98,7 @@ export function MentionInput({
   const debounceRef = useRef<ReturnType<typeof setTimeout>>();
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const searchFn = searchMentions ?? defaultSearchMentions;
+  const searchVersionRef = useRef(0);
 
   // Cache recent results to avoid redundant API calls
   const cacheRef = useRef<Map<string, MentionSuggestion[]>>(new Map());
@@ -123,9 +124,16 @@ export function MentionInput({
 
         if (debounceRef.current) clearTimeout(debounceRef.current);
         setIsLoading(true);
+        // Clear stale suggestions while loading new results
+        setSuggestions([]);
+
+        // Version counter to discard stale responses
+        const version = ++searchVersionRef.current;
 
         debounceRef.current = setTimeout(async () => {
           const results = await searchFn(query);
+          // Only apply results if this is still the latest search
+          if (version !== searchVersionRef.current) return;
           const limited = results.slice(0, 10);
           cacheRef.current.set(query.toLowerCase(), limited);
           setSuggestions(limited);

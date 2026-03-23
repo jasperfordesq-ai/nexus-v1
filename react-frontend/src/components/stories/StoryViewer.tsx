@@ -305,11 +305,24 @@ export function StoryViewer({ storyUsers, initialUserIndex, onClose }: StoryView
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [onClose, goNext, goPrev]);
 
-  // Touch hold to pause
+  // Touch hold to pause (500ms threshold for mobile-friendly hold detection)
+  const pointerMovedRef = useRef(false);
+
   const handlePointerDown = () => {
+    pointerMovedRef.current = false;
     holdTimerRef.current = window.setTimeout(() => {
-      setIsPaused(true);
-    }, 200);
+      if (!pointerMovedRef.current) {
+        setIsPaused(true);
+      }
+    }, 500);
+  };
+
+  const handlePointerMove = () => {
+    pointerMovedRef.current = true;
+    if (holdTimerRef.current) {
+      clearTimeout(holdTimerRef.current);
+      holdTimerRef.current = null;
+    }
   };
 
   const handlePointerUp = (side: 'left' | 'right') => {
@@ -322,6 +335,9 @@ export function StoryViewer({ storyUsers, initialUserIndex, onClose }: StoryView
       setIsPaused(false);
       return;
     }
+
+    // If pointer moved (drag), don't navigate
+    if (pointerMovedRef.current) return;
 
     if (side === 'left') {
       goPrev();
@@ -549,6 +565,7 @@ export function StoryViewer({ storyUsers, initialUserIndex, onClose }: StoryView
               <button
                 className="w-1/3 h-full cursor-pointer"
                 onPointerDown={handlePointerDown}
+                onPointerMove={handlePointerMove}
                 onPointerUp={() => handlePointerUp('left')}
                 onPointerCancel={() => {
                   if (holdTimerRef.current) clearTimeout(holdTimerRef.current);
@@ -560,6 +577,7 @@ export function StoryViewer({ storyUsers, initialUserIndex, onClose }: StoryView
               <button
                 className="w-1/3 h-full cursor-pointer"
                 onPointerDown={handlePointerDown}
+                onPointerMove={handlePointerMove}
                 onPointerUp={() => handlePointerUp('right')}
                 onPointerCancel={() => {
                   if (holdTimerRef.current) clearTimeout(holdTimerRef.current);

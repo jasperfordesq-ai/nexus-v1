@@ -45,23 +45,37 @@ class MentionService
      */
     public static function resolveMentions(array $usernames, int $tenantId): array
     {
+        if (empty($usernames)) {
+            return [];
+        }
+
+        // Batch query: fetch all potential matches in one query instead of N queries
+        $users = DB::table('users')
+            ->where('tenant_id', $tenantId)
+            ->where('status', '!=', 'banned')
+            ->where(function ($q) use ($usernames) {
+                $q->whereIn('username', $usernames)
+                  ->orWhereIn('first_name', $usernames)
+                  ->orWhereIn('name', $usernames)
+                  ->orWhereIn('last_name', $usernames);
+            })
+            ->select(['id', 'username', 'first_name', 'name', 'last_name'])
+            ->get();
+
+        // Map each mentioned username to the best matching user
         $resolved = [];
-
         foreach ($usernames as $username) {
-            $user = DB::table('users')
-                ->where('tenant_id', $tenantId)
-                ->where(function ($q) use ($username) {
-                    $q->where('username', $username)
-                      ->orWhere('first_name', $username)
-                      ->orWhere('name', $username)
-                      ->orWhere('last_name', $username);
-                })
-                ->where('status', '!=', 'banned')
-                ->select(['id'])
-                ->first();
-
-            if ($user) {
-                $resolved[$username] = (int) $user->id;
+            $lowerUsername = strtolower($username);
+            foreach ($users as $user) {
+                if (
+                    strtolower($user->username ?? '') === $lowerUsername
+                    || strtolower($user->first_name ?? '') === $lowerUsername
+                    || strtolower($user->name ?? '') === $lowerUsername
+                    || strtolower($user->last_name ?? '') === $lowerUsername
+                ) {
+                    $resolved[$username] = (int) $user->id;
+                    break;
+                }
             }
         }
 
