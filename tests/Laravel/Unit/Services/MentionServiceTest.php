@@ -8,6 +8,7 @@ namespace Tests\Laravel\Unit\Services;
 
 use App\Services\MentionService;
 use Illuminate\Support\Facades\DB;
+use Mockery;
 use Tests\Laravel\TestCase;
 
 /**
@@ -290,6 +291,9 @@ class MentionServiceTest extends TestCase
             (object) ['id' => 1, 'entity_type' => 'post', 'entity_id' => 10, 'mentioner_id' => 5, 'mentioner_name' => 'Alice', 'mentioner_avatar' => null, 'seen_at' => null, 'created_at' => '2026-03-20 10:00:00'],
         ]);
 
+        DB::shouldReceive('raw')
+            ->andReturnUsing(fn ($expr) => new \Illuminate\Database\Query\Expression($expr));
+
         DB::shouldReceive('table->join->where->where->select->orderByDesc->limit->get')
             ->once()
             ->andReturn($mockItems);
@@ -307,9 +311,24 @@ class MentionServiceTest extends TestCase
     {
         $mockItems = collect([]);
 
-        DB::shouldReceive('table->join->where->where->select->orderByDesc->where->limit->get')
+        DB::shouldReceive('raw')
+            ->andReturnUsing(fn ($expr) => new \Illuminate\Database\Query\Expression($expr));
+
+        // Build a proper query builder mock since the cursor adds an extra
+        // ->where() call after the initial chain is built, which Demeter
+        // chain mocking cannot handle correctly.
+        $queryMock = Mockery::mock('stdClass');
+        $queryMock->shouldReceive('join')->andReturnSelf();
+        $queryMock->shouldReceive('where')->andReturnSelf();
+        $queryMock->shouldReceive('select')->andReturnSelf();
+        $queryMock->shouldReceive('orderByDesc')->andReturnSelf();
+        $queryMock->shouldReceive('limit')->andReturnSelf();
+        $queryMock->shouldReceive('get')->once()->andReturn($mockItems);
+
+        DB::shouldReceive('table')
             ->once()
-            ->andReturn($mockItems);
+            ->with('mentions as m')
+            ->andReturn($queryMock);
 
         $cursor = base64_encode('50');
         $result = MentionService::getMentionsForUser(1, 20, $cursor);

@@ -15,6 +15,9 @@ use Tests\Laravel\TestCase;
 /**
  * Feature tests for ReactionController — toggle, list, and reactor endpoints
  * for both post and comment reactions.
+ *
+ * Uses the unified `reactions` table (target_type, target_id, emoji).
+ * Posts are created in `feed_posts`; comments in `feed_comments`.
  */
 class ReactionControllerTest extends TestCase
 {
@@ -33,57 +36,61 @@ class ReactionControllerTest extends TestCase
     }
 
     /**
-     * Insert a post row and return its ID.
+     * Insert a feed_posts row and return its ID.
      */
     private function createPost(int $userId): int
     {
-        return DB::table('posts')->insertGetId([
+        return DB::table('feed_posts')->insertGetId([
             'tenant_id' => $this->testTenantId,
             'user_id' => $userId,
             'content' => 'Test post for reactions',
-            'type' => 'standard',
-            'status' => 'published',
+            'type' => 'post',
+            'visibility' => 'public',
             'created_at' => now(),
             'updated_at' => now(),
         ]);
     }
 
     /**
-     * Insert a comment row and return its ID.
+     * Insert a feed_comments row and return its ID.
      */
     private function createComment(int $postId, int $userId): int
     {
-        return DB::table('comments')->insertGetId([
+        return DB::table('feed_comments')->insertGetId([
             'tenant_id' => $this->testTenantId,
             'post_id' => $postId,
             'user_id' => $userId,
-            'body' => 'Test comment for reactions',
+            'content' => 'Test comment for reactions',
             'created_at' => now(),
-            'updated_at' => now(),
         ]);
     }
 
     /**
-     * Insert a reaction directly into the database.
+     * Insert a reaction directly into the reactions table for a post.
      */
     private function insertPostReaction(int $postId, int $userId, string $type = 'love'): int
     {
-        return DB::table('post_reactions')->insertGetId([
+        return DB::table('reactions')->insertGetId([
             'tenant_id' => $this->testTenantId,
-            'post_id' => $postId,
+            'target_type' => 'post',
+            'target_id' => $postId,
             'user_id' => $userId,
-            'reaction_type' => $type,
+            'emoji' => $type,
             'created_at' => now(),
         ]);
     }
 
+    /**
+     * Insert a reaction directly into the reactions table for a comment.
+     */
     private function insertCommentReaction(int $commentId, int $userId, string $type = 'love'): int
     {
-        return DB::table('comment_reactions')->insertGetId([
+        return DB::table('reactions')->insertGetId([
             'tenant_id' => $this->testTenantId,
-            'comment_id' => $commentId,
+            'target_type' => 'comment',
+            'target_id' => $commentId,
             'user_id' => $userId,
-            'reaction_type' => $type,
+            'emoji' => $type,
             'created_at' => now(),
         ]);
     }
@@ -171,16 +178,18 @@ class ReactionControllerTest extends TestCase
     public function test_toggle_post_reaction_all_valid_types(): void
     {
         $user = $this->authenticatedUser();
-        $postId = $this->createPost($user->id);
         $validTypes = ['love', 'like', 'laugh', 'wow', 'sad', 'celebrate', 'clap', 'time_credit'];
 
         foreach ($validTypes as $type) {
+            // Use a fresh post for each type to avoid cross-iteration state
+            $postId = $this->createPost($user->id);
+
             // Add
             $response = $this->apiPost("/v2/posts/{$postId}/reactions", [
                 'reaction_type' => $type,
             ]);
             $response->assertStatus(200);
-            $response->assertJsonPath('data.action', fn ($action) => in_array($action, ['added', 'updated']));
+            $response->assertJsonPath('data.action', 'added');
 
             // Remove (toggle same type)
             $response = $this->apiPost("/v2/posts/{$postId}/reactions", [
@@ -453,11 +462,12 @@ class ReactionControllerTest extends TestCase
         $postId = $this->createPost($user->id);
 
         // Insert a reaction under a different tenant directly in DB
-        DB::table('post_reactions')->insert([
+        DB::table('reactions')->insert([
             'tenant_id' => 999,
-            'post_id' => $postId,
+            'target_type' => 'post',
+            'target_id' => $postId,
             'user_id' => $user->id,
-            'reaction_type' => 'love',
+            'emoji' => 'love',
             'created_at' => now(),
         ]);
 
@@ -476,11 +486,12 @@ class ReactionControllerTest extends TestCase
         $commentId = $this->createComment($postId, $user->id);
 
         // Insert a reaction under a different tenant directly in DB
-        DB::table('comment_reactions')->insert([
+        DB::table('reactions')->insert([
             'tenant_id' => 999,
-            'comment_id' => $commentId,
+            'target_type' => 'comment',
+            'target_id' => $commentId,
             'user_id' => $user->id,
-            'reaction_type' => 'clap',
+            'emoji' => 'clap',
             'created_at' => now(),
         ]);
 

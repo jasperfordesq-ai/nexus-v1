@@ -21,7 +21,7 @@ class FeedPostFactory extends Factory
             'user_id'     => User::factory(),
             'content'     => $this->faker->paragraph(),
             'emoji'       => $this->faker->optional()->randomElement(['thumbsup', 'heart', 'celebrate', 'thinking']),
-            'image'       => $this->faker->optional()->imageUrl(800, 600),
+            'image_url'   => $this->faker->optional()->imageUrl(800, 600),
             'type'        => $this->faker->randomElement(['text', 'image', 'link', 'poll']),
             'parent_id'   => null,
             'parent_type' => null,

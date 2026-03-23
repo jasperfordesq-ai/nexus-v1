@@ -723,8 +723,8 @@ class ExploreServiceTest extends TestCase
 
         $result = $this->service->getTrendingPostsPaginated($this->testTenantId);
         // trim() on "  Jane     Doe  " = "Jane     Doe" (inner spaces preserved, outer trimmed)
-        $this->assertStringNotStartsWith(' ', $result['items'][0]['author_name']);
-        $this->assertStringNotEndsWith(' ', $result['items'][0]['author_name']);
+        $this->assertStringStartsNotWith(' ', $result['items'][0]['author_name']);
+        $this->assertStringEndsNotWith(' ', $result['items'][0]['author_name']);
     }
 
     // ------------------------------------------------------------------

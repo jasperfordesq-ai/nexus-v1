@@ -52,22 +52,24 @@ class ReactionServiceTest extends TestCase
 
     public function test_toggleReaction_adds_new_reaction(): void
     {
-        // No existing reaction
-        DB::shouldReceive('table->where->where->where->first')->once()->andReturn(null);
+        // 4 where() calls: tenant_id, target_type, target_id, user_id → first()
+        DB::shouldReceive('table->where->where->where->where->first')->once()->andReturn(null);
 
         // Insert
         DB::shouldReceive('table->insert')->once();
 
-        // getReactions is called at the end — mock the chain
-        DB::shouldReceive('table->where->where->select->groupBy->get')
+        // getReactions internal call — counts query: 3 where() calls + select + groupBy + get
+        DB::shouldReceive('table->where->where->where->select->groupBy->get')
             ->once()
-            ->andReturn(collect([(object) ['reaction_type' => 'love', 'count' => 1]]));
+            ->andReturn(collect([(object) ['emoji' => 'love', 'count' => 1]]));
 
-        DB::shouldReceive('table->where->where->where->first')
+        // getReactions — user reaction: 4 where() calls + first
+        DB::shouldReceive('table->where->where->where->where->first')
             ->once()
-            ->andReturn((object) ['reaction_type' => 'love']);
+            ->andReturn((object) ['emoji' => 'love']);
 
-        DB::shouldReceive('table->join->where->where->orderByDesc->limit->select->get->map->all')
+        // getReactions — top reactors
+        DB::shouldReceive('table->join->where->where->where->orderByDesc->limit->select->get->map->all')
             ->once()
             ->andReturn([['id' => 5, 'name' => 'Test User', 'avatar_url' => null]]);
 
@@ -80,24 +82,25 @@ class ReactionServiceTest extends TestCase
 
     public function test_toggleReaction_removes_same_type(): void
     {
-        // Existing reaction with same type
-        DB::shouldReceive('table->where->where->where->first')
+        DB::shouldReceive('table->where->where->where->where->first')
             ->once()
-            ->andReturn((object) ['id' => 42, 'reaction_type' => 'love']);
+            ->andReturn((object) ['id' => 42, 'emoji' => 'love']);
 
-        // Delete
+        // Delete: where(id)->where(tenant_id)->delete
         DB::shouldReceive('table->where->where->delete')->once();
 
-        // getReactions call
-        DB::shouldReceive('table->where->where->select->groupBy->get')
+        // getReactions — counts
+        DB::shouldReceive('table->where->where->where->select->groupBy->get')
             ->once()
             ->andReturn(collect([]));
 
-        DB::shouldReceive('table->where->where->where->first')
+        // getReactions — user reaction
+        DB::shouldReceive('table->where->where->where->where->first')
             ->once()
             ->andReturn(null);
 
-        DB::shouldReceive('table->join->where->where->orderByDesc->limit->select->get->map->all')
+        // getReactions — top reactors
+        DB::shouldReceive('table->join->where->where->where->orderByDesc->limit->select->get->map->all')
             ->once()
             ->andReturn([]);
 
@@ -109,24 +112,25 @@ class ReactionServiceTest extends TestCase
 
     public function test_toggleReaction_updates_different_type(): void
     {
-        // Existing reaction with different type
-        DB::shouldReceive('table->where->where->where->first')
+        DB::shouldReceive('table->where->where->where->where->first')
             ->once()
-            ->andReturn((object) ['id' => 42, 'reaction_type' => 'love']);
+            ->andReturn((object) ['id' => 42, 'emoji' => 'love']);
 
-        // Update
+        // Update: where(id)->where(tenant_id)->update
         DB::shouldReceive('table->where->where->update')->once();
 
-        // getReactions call
-        DB::shouldReceive('table->where->where->select->groupBy->get')
+        // getReactions — counts
+        DB::shouldReceive('table->where->where->where->select->groupBy->get')
             ->once()
-            ->andReturn(collect([(object) ['reaction_type' => 'laugh', 'count' => 1]]));
+            ->andReturn(collect([(object) ['emoji' => 'laugh', 'count' => 1]]));
 
-        DB::shouldReceive('table->where->where->where->first')
+        // getReactions — user reaction
+        DB::shouldReceive('table->where->where->where->where->first')
             ->once()
-            ->andReturn((object) ['reaction_type' => 'laugh']);
+            ->andReturn((object) ['emoji' => 'laugh']);
 
-        DB::shouldReceive('table->join->where->where->orderByDesc->limit->select->get->map->all')
+        // getReactions — top reactors
+        DB::shouldReceive('table->join->where->where->where->orderByDesc->limit->select->get->map->all')
             ->once()
             ->andReturn([]);
 
@@ -146,24 +150,14 @@ class ReactionServiceTest extends TestCase
 
     public function test_toggleReaction_works_for_comment_entity(): void
     {
-        // No existing reaction
-        DB::shouldReceive('table->where->where->where->first')->once()->andReturn(null);
-
-        // Insert (into comment_reactions)
+        DB::shouldReceive('table->where->where->where->where->first')->once()->andReturn(null);
         DB::shouldReceive('table->insert')->once();
-
-        // getReactions call chain
-        DB::shouldReceive('table->where->where->select->groupBy->get')
-            ->once()
-            ->andReturn(collect([(object) ['reaction_type' => 'clap', 'count' => 1]]));
-
-        DB::shouldReceive('table->where->where->where->first')
-            ->once()
-            ->andReturn((object) ['reaction_type' => 'clap']);
-
-        DB::shouldReceive('table->join->where->where->orderByDesc->limit->select->get->map->all')
-            ->once()
-            ->andReturn([]);
+        DB::shouldReceive('table->where->where->where->select->groupBy->get')
+            ->once()->andReturn(collect([(object) ['emoji' => 'clap', 'count' => 1]]));
+        DB::shouldReceive('table->where->where->where->where->first')
+            ->once()->andReturn((object) ['emoji' => 'clap']);
+        DB::shouldReceive('table->join->where->where->where->orderByDesc->limit->select->get->map->all')
+            ->once()->andReturn([]);
 
         $result = $this->service->toggleReaction(10, 'comment', 'clap', 5);
 
@@ -177,18 +171,18 @@ class ReactionServiceTest extends TestCase
 
     public function test_getReactions_returns_counts_and_user_reaction(): void
     {
-        DB::shouldReceive('table->where->where->select->groupBy->get')
+        DB::shouldReceive('table->where->where->where->select->groupBy->get')
             ->once()
             ->andReturn(collect([
-                (object) ['reaction_type' => 'love', 'count' => 3],
-                (object) ['reaction_type' => 'laugh', 'count' => 1],
+                (object) ['emoji' => 'love', 'count' => 3],
+                (object) ['emoji' => 'laugh', 'count' => 1],
             ]));
 
-        DB::shouldReceive('table->where->where->where->first')
+        DB::shouldReceive('table->where->where->where->where->first')
             ->once()
-            ->andReturn((object) ['reaction_type' => 'love']);
+            ->andReturn((object) ['emoji' => 'love']);
 
-        DB::shouldReceive('table->join->where->where->orderByDesc->limit->select->get->map->all')
+        DB::shouldReceive('table->join->where->where->where->orderByDesc->limit->select->get->map->all')
             ->once()
             ->andReturn([
                 ['id' => 1, 'name' => 'User One', 'avatar_url' => null],
@@ -205,11 +199,12 @@ class ReactionServiceTest extends TestCase
 
     public function test_getReactions_returns_null_user_reaction_when_no_user(): void
     {
-        DB::shouldReceive('table->where->where->select->groupBy->get')
+        DB::shouldReceive('table->where->where->where->select->groupBy->get')
             ->once()
-            ->andReturn(collect([(object) ['reaction_type' => 'love', 'count' => 2]]));
+            ->andReturn(collect([(object) ['emoji' => 'love', 'count' => 2]]));
 
-        DB::shouldReceive('table->join->where->where->orderByDesc->limit->select->get->map->all')
+        // No user query when userId is null
+        DB::shouldReceive('table->join->where->where->where->orderByDesc->limit->select->get->map->all')
             ->once()
             ->andReturn([]);
 
@@ -222,15 +217,15 @@ class ReactionServiceTest extends TestCase
 
     public function test_getReactions_returns_empty_when_no_reactions(): void
     {
-        DB::shouldReceive('table->where->where->select->groupBy->get')
+        DB::shouldReceive('table->where->where->where->select->groupBy->get')
             ->once()
             ->andReturn(collect([]));
 
-        DB::shouldReceive('table->where->where->where->first')
+        DB::shouldReceive('table->where->where->where->where->first')
             ->once()
             ->andReturn(null);
 
-        DB::shouldReceive('table->join->where->where->orderByDesc->limit->select->get->map->all')
+        DB::shouldReceive('table->join->where->where->where->orderByDesc->limit->select->get->map->all')
             ->once()
             ->andReturn([]);
 
@@ -256,11 +251,13 @@ class ReactionServiceTest extends TestCase
 
     public function test_getReactors_returns_paginated_users(): void
     {
-        DB::shouldReceive('table->join->where->where->where->count')
+        // count() — 5 where calls: join + 4 where
+        DB::shouldReceive('table->join->where->where->where->where->count')
             ->once()
             ->andReturn(5);
 
-        DB::shouldReceive('table->join->where->where->where->orderByDesc->offset->limit->select->get->map->all')
+        // paginated results — clone adds orderByDesc, offset, limit, select, get->map->all
+        DB::shouldReceive('table->join->where->where->where->where->orderByDesc->offset->limit->select->get->map->all')
             ->once()
             ->andReturn([
                 ['id' => 1, 'name' => 'User A', 'avatar_url' => null, 'reacted_at' => '2026-03-23 10:00:00'],
@@ -276,11 +273,11 @@ class ReactionServiceTest extends TestCase
 
     public function test_getReactors_returns_no_more_when_last_page(): void
     {
-        DB::shouldReceive('table->join->where->where->where->count')
+        DB::shouldReceive('table->join->where->where->where->where->count')
             ->once()
             ->andReturn(2);
 
-        DB::shouldReceive('table->join->where->where->where->orderByDesc->offset->limit->select->get->map->all')
+        DB::shouldReceive('table->join->where->where->where->where->orderByDesc->offset->limit->select->get->map->all')
             ->once()
             ->andReturn([
                 ['id' => 1, 'name' => 'User A', 'avatar_url' => null, 'reacted_at' => '2026-03-23 10:00:00'],
@@ -295,11 +292,11 @@ class ReactionServiceTest extends TestCase
 
     public function test_getReactors_returns_empty_for_no_reactions(): void
     {
-        DB::shouldReceive('table->join->where->where->where->count')
+        DB::shouldReceive('table->join->where->where->where->where->count')
             ->once()
             ->andReturn(0);
 
-        DB::shouldReceive('table->join->where->where->where->orderByDesc->offset->limit->select->get->map->all')
+        DB::shouldReceive('table->join->where->where->where->where->orderByDesc->offset->limit->select->get->map->all')
             ->once()
             ->andReturn([]);
 
@@ -319,7 +316,7 @@ class ReactionServiceTest extends TestCase
     }
 
     // ======================================================================
-    //  getReactionsForPosts (batch)
+    //  getReactionsForPosts (batch) — uses DB::select() with raw SQL
     // ======================================================================
 
     public function test_getReactionsForPosts_returns_empty_for_empty_input(): void
@@ -330,34 +327,32 @@ class ReactionServiceTest extends TestCase
 
     public function test_getReactionsForPosts_returns_grouped_counts(): void
     {
+        // Counts query
         DB::shouldReceive('select')
             ->once()
             ->andReturn([
-                (object) ['post_id' => 1, 'reaction_type' => 'love', 'count' => 3],
-                (object) ['post_id' => 1, 'reaction_type' => 'laugh', 'count' => 1],
-                (object) ['post_id' => 2, 'reaction_type' => 'wow', 'count' => 2],
+                (object) ['target_id' => 1, 'emoji' => 'love', 'count' => 3],
+                (object) ['target_id' => 1, 'emoji' => 'laugh', 'count' => 1],
+                (object) ['target_id' => 2, 'emoji' => 'wow', 'count' => 2],
             ]);
 
         // User reactions query
         DB::shouldReceive('select')
             ->once()
             ->andReturn([
-                (object) ['post_id' => 1, 'reaction_type' => 'love'],
+                (object) ['target_id' => 1, 'emoji' => 'love'],
             ]);
 
         $result = $this->service->getReactionsForPosts([1, 2, 3], 5);
 
-        // Post 1
         $this->assertEquals(['love' => 3, 'laugh' => 1], $result[1]['counts']);
         $this->assertEquals(4, $result[1]['total']);
         $this->assertEquals('love', $result[1]['user_reaction']);
 
-        // Post 2
         $this->assertEquals(['wow' => 2], $result[2]['counts']);
         $this->assertEquals(2, $result[2]['total']);
         $this->assertNull($result[2]['user_reaction']);
 
-        // Post 3 (no reactions)
         $this->assertEquals([], $result[3]['counts']);
         $this->assertEquals(0, $result[3]['total']);
         $this->assertNull($result[3]['user_reaction']);
@@ -368,10 +363,8 @@ class ReactionServiceTest extends TestCase
         DB::shouldReceive('select')
             ->once()
             ->andReturn([
-                (object) ['post_id' => 10, 'reaction_type' => 'clap', 'count' => 5],
+                (object) ['target_id' => 10, 'emoji' => 'clap', 'count' => 5],
             ]);
-
-        // No user reactions query expected when userId is null
 
         $result = $this->service->getReactionsForPosts([10], null);
 
@@ -384,11 +377,10 @@ class ReactionServiceTest extends TestCase
     {
         DB::shouldReceive('select')
             ->once()
-            ->andReturn([]); // No reactions at all
+            ->andReturn([]);
 
         $result = $this->service->getReactionsForPosts([100, 200, 300], null);
 
-        // All post IDs should be present with empty defaults
         $this->assertArrayHasKey(100, $result);
         $this->assertArrayHasKey(200, $result);
         $this->assertArrayHasKey(300, $result);

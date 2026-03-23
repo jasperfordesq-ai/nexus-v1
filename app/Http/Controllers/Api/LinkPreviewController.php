@@ -79,6 +79,12 @@ class LinkPreviewController extends BaseApiController
             return $this->respondWithError('VALIDATION_ERROR', 'Invalid URL', null, 400);
         }
 
+        // Only allow HTTP and HTTPS schemes
+        $scheme = strtolower(parse_url($url, PHP_URL_SCHEME) ?? '');
+        if (! in_array($scheme, ['http', 'https'], true)) {
+            return $this->respondWithError('VALIDATION_ERROR', 'Only http and https URLs are supported', null, 400);
+        }
+
         $preview = $this->linkPreviewService->fetchPreview($url);
 
         if ($preview === null) {

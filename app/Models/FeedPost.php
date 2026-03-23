@@ -18,7 +18,7 @@ class FeedPost extends Model
     protected $table = 'feed_posts';
 
     protected $fillable = [
-        'tenant_id', 'user_id', 'content', 'emoji', 'image', 'type',
+        'tenant_id', 'user_id', 'content', 'emoji', 'image_url', 'type',
         'parent_id', 'parent_type', 'visibility', 'group_id',
     ];
 

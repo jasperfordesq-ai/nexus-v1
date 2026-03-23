@@ -139,7 +139,13 @@ class PostMediaController extends BaseApiController
             return $this->respondWithError('FORBIDDEN', 'You can only update your own media', null, 403);
         }
 
-        $altText = $this->input('alt_text', '');
+        $altText = $this->input('alt_text');
+
+        // Laravel's ConvertEmptyStringsToNull middleware converts '' to null,
+        // so treat null as empty string when the key is present in the request.
+        if ($altText === null && request()->has('alt_text')) {
+            $altText = '';
+        }
 
         if (!is_string($altText)) {
             return $this->respondWithError('VALIDATION_ERROR', 'alt_text must be a string', 'alt_text', 422);

@@ -294,7 +294,7 @@ class LinkPreviewServiceTest extends TestCase
 
         $collection = collect([$row1, $row2]);
 
-        DB::shouldReceive('table->join->whereIn->orderBy->orderBy->select->get')
+        DB::shouldReceive('table->join->whereIn->orderBy->select->get')
             ->once()
             ->andReturn($collection);
 
