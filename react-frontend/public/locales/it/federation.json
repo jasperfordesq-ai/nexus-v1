@@ -415,14 +415,56 @@
   "messages.aria_send_reply": "Send reply",
   "partner_detail.federation_partner_badge": "Federation Partner",
   "hub": {},
-  "messages": {},
-  "onboarding": {},
+  "messages": {
+    "aria_back_to_list": "Torna alla lista messaggi",
+    "aria_read": "Letto",
+    "aria_delivered": "Consegnato",
+    "aria_reply": "Rispondi al messaggio",
+    "aria_send_reply": "Invia risposta"
+  },
+  "onboarding": {
+    "reach_label_remote_ok": "Da remoto OK"
+  },
   "listings": {},
-  "members": {},
+  "members": {
+    "reach_remote_ok": "Da remoto OK",
+    "aria_search": "Cerca membri federati",
+    "aria_filter_community": "Filtra per comunità partner",
+    "aria_filter_skills": "Filtra per competenze"
+  },
   "events": {},
   "partners": {},
-  "partner_detail": {},
+  "partner_detail": {
+    "federation_partner_badge": "Partner della Federazione"
+  },
   "member_profile": {},
   "settings": {},
-  "connections": {}
+  "connections": {
+    "page_title": "Connessioni",
+    "breadcrumb_federation": "Federazione",
+    "breadcrumb_connections": "Connessioni",
+    "title": "Connessioni Federazione",
+    "subtitle": "Gestisci le tue connessioni tra comunità",
+    "tab_connected": "Connessi",
+    "tab_received": "Ricevute",
+    "tab_sent": "Inviate",
+    "loading": "Caricamento connessioni...",
+    "empty_connected": "Nessuna connessione ancora",
+    "empty_received": "Nessuna richiesta in attesa",
+    "empty_sent": "Nessuna richiesta inviata",
+    "empty_connected_desc": "Connettiti con membri delle comunità partner per ampliare la tua rete.",
+    "empty_received_desc": "Quando qualcuno ti invia una richiesta di connessione, apparirà qui.",
+    "empty_sent_desc": "Le richieste di connessione che invii appariranno qui.",
+    "browse_members": "Esplora Membri della Federazione",
+    "unknown_member": "Membro della Federazione",
+    "message": "Messaggio",
+    "remove": "Rimuovi connessione",
+    "accept": "Accetta",
+    "decline": "Rifiuta",
+    "pending": "In attesa",
+    "accepted_success": "Connessione accettata!",
+    "rejected_success": "Richiesta di connessione rifiutata",
+    "removed_success": "Connessione rimossa",
+    "action_failed": "Azione fallita"
+  }
 }

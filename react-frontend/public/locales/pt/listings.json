@@ -122,26 +122,26 @@
   "page_meta_keywords": "anuncios, servicos, ofertas",
   "save_listing": "Guardar anúncio",
   "unsave_listing": "Remover anúncio",
-  "saved_success": "Listing saved",
-  "unsaved_success": "Listing removed from saved",
-  "save_error": "Failed to update saved listing",
-  "featured": "Featured",
-  "featured_badge": "Featured listing",
+  "saved_success": "Anúncio guardado",
+  "unsaved_success": "Anúncio removido dos guardados",
+  "save_error": "Falha ao atualizar anúncio guardado",
+  "featured": "Destacado",
+  "featured_badge": "Anúncio destacado",
   "skill_tags": {
-    "label": "Skill Tags",
-    "placeholder": "Type a skill and press Enter...",
-    "aria_add": "Add skill tag"
+    "label": "Etiquetas de Competências",
+    "placeholder": "Escreva uma competência e prima Enter...",
+    "aria_add": "Adicionar etiqueta de competência"
   },
   "analytics": {
-    "title": "Listing Analytics",
-    "total_views": "Total Views",
-    "unique_viewers": "{{count}} unique",
-    "contacts": "Contacts",
-    "contact_rate": "{{rate}}% rate",
-    "saves": "Saves",
-    "save_rate": "{{rate}}% rate",
-    "trend_7day": "7-Day Trend",
-    "vs_previous_week": "vs. previous week",
-    "views_last_days": "Views (Last {{days}} Days)"
+    "title": "Análise do Anúncio",
+    "total_views": "Visualizações Totais",
+    "unique_viewers": "{{count}} únicos",
+    "contacts": "Contactos",
+    "contact_rate": "{{rate}}% de taxa",
+    "saves": "Guardados",
+    "save_rate": "{{rate}}% de taxa",
+    "trend_7day": "Tendência de 7 Dias",
+    "vs_previous_week": "vs. semana anterior",
+    "views_last_days": "Visualizações (Últimos {{days}} Dias)"
   }
 }

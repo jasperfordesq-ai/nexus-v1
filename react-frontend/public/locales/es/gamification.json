@@ -6,7 +6,7 @@
     "unable_to_load": "No se Pudieron Cargar los Logros",
     "try_again": "Intentar de Nuevo",
     "level": "Nivel {{level}}",
-    "xp_total": "{{xp}} XP total",
+    "xp_total": "{{xp}} XP en total",
     "xp_to_next_level": "{{current}} / {{next}} XP para el siguiente nivel",
     "level_progress_aria": "Progreso de nivel",
     "badges_label": "Insignias",
@@ -37,7 +37,7 @@
       "claim_failed": "Error al Reclamar",
       "claim_failed_desc": "No se pudo reclamar la recompensa diaria.",
       "claim_error": "Algo salió mal. Por favor intenta de nuevo.",
-      "loading": "Loading daily reward"
+      "loading": "Cargando recompensa diaria"
     },
     "challenges": {
       "active_challenges": "Retos Activos",
@@ -95,7 +95,7 @@
       "save_failed_desc": "No se pudo actualizar la vitrina.",
       "save_error": "Algo salió mal."
     },
-    "loading": "Loading achievements"
+    "loading": "Cargando logros"
   },
   "goals": {
     "page_title": "Metas",
@@ -179,7 +179,7 @@
       "buddy_joined": "¡Ahora eres compañero!",
       "buddy_failed": "Error al unirse como compañero"
     },
-    "loading": "Loading goals"
+    "loading": "Cargando objetivos"
   },
   "leaderboard": {
     "page_title": "Clasificación",
@@ -220,8 +220,8 @@
       "active": "Activa",
       "load_failed": "Error al Cargar",
       "load_failed_desc": "No se pudo cargar el historial de temporadas.",
-      "loading": "Loading season"
+      "loading": "Cargando temporada"
     },
-    "loading": "Loading leaderboard"
+    "loading": "Cargando clasificación"
   }
 }

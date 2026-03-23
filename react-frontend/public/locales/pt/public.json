@@ -164,7 +164,7 @@
     "form": {
       "name_label": "Nome",
       "name_placeholder": "O seu nome",
-      "email_label": "Email",
+      "email_label": "E-mail",
       "email_placeholder": "voce@exemplo.com",
       "subject_label": "Assunto",
       "subject_placeholder": "Sobre o que é?",

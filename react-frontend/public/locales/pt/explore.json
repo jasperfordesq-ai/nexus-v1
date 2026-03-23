@@ -1,62 +1,62 @@
 {
-  "page_title": "Discover",
-  "heading": "Discover",
-  "subtitle": "Find skills, events, groups, and more in your community",
-  "search_placeholder": "Discover skills, events, groups...",
+  "page_title": "Descobrir",
+  "heading": "Descobrir",
+  "subtitle": "Encontre competências, eventos, grupos e mais na sua comunidade",
+  "search_placeholder": "Descobrir competências, eventos, grupos...",
   "stats": {
-    "members": "Members",
-    "exchanges_this_month": "Exchanges This Month",
-    "hours_exchanged": "Hours Exchanged",
-    "active_listings": "Active Listings"
+    "members": "Membros",
+    "exchanges_this_month": "Trocas Este Mês",
+    "hours_exchanged": "Horas Trocadas",
+    "active_listings": "Anúncios Ativos"
   },
   "trending_posts": {
-    "title": "Trending Posts",
-    "subtitle": "Most engaging posts this week"
+    "title": "Publicações em Destaque",
+    "subtitle": "Publicações mais envolventes desta semana"
   },
   "popular_listings": {
-    "title": "Popular Listings",
-    "subtitle": "Most viewed offers and requests"
+    "title": "Anúncios Populares",
+    "subtitle": "Ofertas e pedidos mais vistos"
   },
   "upcoming_events": {
-    "title": "Upcoming Events",
-    "subtitle": "Join your community",
+    "title": "Próximos Eventos",
+    "subtitle": "Junte-se à sua comunidade",
     "online": "Online",
-    "attending": "{{count}} attending"
+    "attending": "{{count}} a participar"
   },
   "active_groups": {
-    "title": "Active Groups",
-    "subtitle": "Connect with like-minded members",
-    "members": "{{count}} members",
-    "view_group": "View Group"
+    "title": "Grupos Ativos",
+    "subtitle": "Conecte-se com membros com interesses semelhantes",
+    "members": "{{count}} membros",
+    "view_group": "Ver Grupo"
   },
   "top_contributors": {
-    "title": "Top Contributors",
-    "subtitle": "Community leaders by experience",
-    "level": "Lv.{{level}}"
+    "title": "Principais Contribuidores",
+    "subtitle": "Líderes comunitários por experiência",
+    "level": "Nv.{{level}}"
   },
   "trending_hashtags": {
-    "title": "Trending Hashtags",
-    "subtitle": "Popular topics in your community"
+    "title": "Hashtags em Destaque",
+    "subtitle": "Tópicos populares na sua comunidade"
   },
   "recommended": {
-    "title": "Recommended For You",
-    "subtitle": "Based on your interests and activity",
-    "by_author": "by {{name}}"
+    "title": "Recomendado Para Si",
+    "subtitle": "Com base nos seus interesses e atividade",
+    "by_author": "por {{name}}"
   },
   "new_members": {
-    "title": "Welcome Our Newest Members",
-    "subtitle": "Say hello to recent joiners",
-    "connect": "Connect"
+    "title": "Bem-vindos aos Nossos Novos Membros",
+    "subtitle": "Diga olá aos novos membros",
+    "connect": "Conectar"
   },
   "featured_challenges": {
-    "title": "Featured Challenges",
-    "subtitle": "Share your ideas and make an impact",
-    "ideas_count": "{{count}} ideas",
-    "ends": "Ends {{date}}"
+    "title": "Desafios em Destaque",
+    "subtitle": "Partilhe as suas ideias e faça a diferença",
+    "ideas_count": "{{count}} ideias",
+    "ends": "Termina em {{date}}"
   },
   "time_ago": {
-    "just_now": "Just now",
-    "hours_ago": "{{count}}h ago",
-    "days_ago": "{{count}}d ago"
+    "just_now": "Agora mesmo",
+    "hours_ago": "{{count}}h atrás",
+    "days_ago": "{{count}}d atrás"
   }
 }

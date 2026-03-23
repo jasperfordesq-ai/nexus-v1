@@ -2,11 +2,9 @@
   "page_title": "Sfide di Ideazione",
   "title": "Sfide di Ideazione",
   "subtitle": "Condividi idee, vota e contribuisci a plasmare la tua comunita",
-
   "actions": {
     "retry": "Riprova"
   },
-
   "tabs": {
     "all": "Tutte",
     "open": "Aperte",
@@ -16,7 +14,6 @@
     "archived": "Archiviate",
     "favorites": "I miei preferiti"
   },
-
   "status": {
     "draft": "Bozza",
     "open": "Aperta",
@@ -25,7 +22,6 @@
     "closed": "Chiusa",
     "archived": "Archiviata"
   },
-
   "idea_status": {
     "draft": "Bozza",
     "submitted": "Inviata",
@@ -33,7 +29,6 @@
     "winner": "Vincitrice",
     "withdrawn": "Ritirata"
   },
-
   "challenge": {
     "ideas_count": "{{count}} idee",
     "ideas_count_one": "{{count}} idea",
@@ -48,7 +43,6 @@
     "outcome": "Risultato",
     "team_links": "Team di Progetto"
   },
-
   "challenges": {
     "title": "Sfide",
     "empty_title": "Nessuna Sfida Ancora",
@@ -58,7 +52,6 @@
     "load_error": "Impossibile caricare le sfide",
     "load_more": "Carica Altro"
   },
-
   "ideas": {
     "title": "Idee",
     "empty_title": "Nessuna Idea Ancora",
@@ -90,14 +83,12 @@
     "draft_created": "Creata {{date}}",
     "new_idea": "Nuova Idea"
   },
-
   "idea_detail": {
     "page_title": "Dettagli dell'Idea",
     "back_to_challenge": "Torna alla Sfida",
     "submitted_by": "Inviata da {{name}}",
     "submitted_on": "Inviata il {{date}}"
   },
-
   "comments": {
     "title": "Commenti",
     "empty_title": "Nessun Commento Ancora",
@@ -109,7 +100,6 @@
     "load_more": "Carica Altri Commenti",
     "load_error": "Impossibile caricare i commenti"
   },
-
   "form": {
     "title_label": "Titolo",
     "title_placeholder": "Inserisci un titolo chiaro e descrittivo",
@@ -142,18 +132,15 @@
     "updating": "Aggiornamento...",
     "cancel": "Annulla"
   },
-
   "create_page": {
     "page_title": "Crea Sfida",
     "title": "Crea Sfida di Ideazione",
     "subtitle": "Pubblica un problema da risolvere per la tua comunita"
   },
-
   "edit_page": {
     "page_title": "Modifica Sfida",
     "title": "Modifica Sfida di Ideazione"
   },
-
   "admin": {
     "change_status": "Cambia Stato",
     "set_open": "Apri per gli Invii",
@@ -172,7 +159,6 @@
     "status_updated": "Stato della sfida aggiornato",
     "idea_status_updated": "Stato dell'idea aggiornato"
   },
-
   "toast": {
     "challenge_created": "Sfida creata con successo",
     "challenge_updated": "Sfida aggiornata con successo",
@@ -209,7 +195,6 @@
     "template_applied": "Modello applicato con successo",
     "error_generic": "Qualcosa e andato storto. Riprova."
   },
-
   "favorites": {
     "add": "Aggiungi ai preferiti",
     "remove": "Rimuovi dai preferiti",
@@ -217,18 +202,14 @@
     "empty_title": "Nessun Preferito Ancora",
     "empty_description": "Metti un cuore su una sfida per aggiungerla ai tuoi preferiti."
   },
-
   "views": "visualizzazioni",
-
   "featured": "In Evidenza",
-
   "search": {
     "label": "Cerca sfide",
     "placeholder": "Cerca sfide per titolo o descrizione...",
     "clear_tags": "Cancella tag",
     "no_results": "Nessuna sfida corrisponde alla tua ricerca"
   },
-
   "tags": {
     "label": "Tag",
     "placeholder": "Aggiungi tag (premi Invio)",
@@ -237,54 +218,49 @@
     "skills": "Competenze Richieste",
     "general": "Tag Generali"
   },
-
   "cover_image": {
     "label": "URL Immagine di Copertina",
     "placeholder": "https://example.com/immagine.jpg",
     "helper": "Immagine banner per la sfida (consigliato 600x400)"
   },
-
   "guidance": {
     "title": "Consigli per Scrivere una Grande Sfida",
     "intro": "Una sfida ben formulata ispira idee migliori. Ecco alcuni consigli per creare una dichiarazione del problema efficace.",
     "tips": {
       "clear_problem": {
-        "title": "\uD83C\uDFAF Definisci un Problema Chiaro",
+        "title": "🎯 Definisci un Problema Chiaro",
         "description": "Indica il problema specifico che vuoi che la comunita affronti. Evita dichiarazioni vaghe o troppo ampie."
       },
       "scope": {
-        "title": "\uD83D\uDCCF Imposta un Ambito Realistico",
+        "title": "📏 Imposta un Ambito Realistico",
         "description": "Definisci limiti e vincoli chiari in modo che le idee rimangano focalizzate e realizzabili."
       },
       "criteria": {
-        "title": "\u2696\uFE0F Spiega i Criteri di Valutazione",
+        "title": "⚖️ Spiega i Criteri di Valutazione",
         "description": "Comunica ai partecipanti come verranno giudicate le idee — fattibilita, creativita, impatto o rapporto costo-efficacia."
       },
       "engagement": {
-        "title": "\uD83D\uDCA1 Incoraggia la Partecipazione",
+        "title": "💡 Incoraggia la Partecipazione",
         "description": "Usa un linguaggio accogliente. Aggiungi un premio o un riconoscimento per motivare gli invii."
       }
     },
-    "examples_toggle": "Mostra esempi di sfide forti vs. deboli \u25B8",
+    "examples_toggle": "Mostra esempi di sfide forti vs. deboli ▸",
     "example_good": {
-      "label": "\u2705 Sfida forte:",
+      "label": "✅ Sfida forte:",
       "text": "Come potremmo ridurre lo spreco alimentare nella nostra comunita del 25% nel prossimo anno? Cerchiamo idee pratiche e a basso costo che le imprese locali e i residenti possano implementare insieme."
     },
     "example_weak": {
-      "label": "\u274C Sfida debole:",
+      "label": "❌ Sfida debole:",
       "text": "Abbiamo bisogno di idee sull'ambiente.",
       "why": "Troppo vaga — nessun problema specifico, nessun vincolo, nessun criterio di successo."
     }
   },
-
   "duplicate": {
     "button": "Duplica Sfida",
     "success": "Sfida duplicata con successo",
     "error": "Impossibile duplicare la sfida"
   },
-
   "idea_image": "Immagine dell'idea",
-
   "media": {
     "title": "Allegati",
     "add": "Aggiungi Allegato",
@@ -302,7 +278,6 @@
     "delete_confirm": "Rimuovere questo allegato?",
     "empty": "Nessun allegato"
   },
-
   "convert_to_group": {
     "button": "Crea Team",
     "title": "Crea Team di Progetto dall'Idea",
@@ -318,7 +293,6 @@
     "error": "Impossibile creare il team",
     "already_converted": "Questa idea e gia stata convertita in un team"
   },
-
   "campaigns": {
     "title": "Campagne",
     "page_title": "Campagne",
@@ -330,7 +304,6 @@
     "link_challenge": "Collega Sfida",
     "unlink_challenge": "Scollega Sfida"
   },
-
   "templates": {
     "title": "Modelli di Sfida",
     "page_title": "Modelli di Sfida",
@@ -340,7 +313,6 @@
     "use_template": "Usa Questo Modello",
     "start_from_template": "Inizia da un Modello"
   },
-
   "outcomes": {
     "title": "Monitoraggio dell'Impatto",
     "page_title": "Dashboard dell'Impatto",
@@ -361,7 +333,6 @@
     "implemented_count": "Implementati",
     "in_progress_count": "In Corso"
   },
-
   "tasks": {
     "title": "Attivita",
     "status_label": "Stato",
@@ -382,7 +353,6 @@
     "overdue": "In ritardo",
     "stats": "Statistiche Attivita"
   },
-
   "documents": {
     "title": "Documenti",
     "upload": "Carica Documento",
@@ -391,7 +361,6 @@
     "delete_confirm": "Eliminare questo documento?",
     "max_size": "Dimensione max file: 10 MB"
   },
-
   "chatrooms": {
     "title": "Canali",
     "create": "Crea Canale",
@@ -403,7 +372,6 @@
     "delete_channel": "Elimina Canale",
     "delete_channel_confirm": "Eliminare questo canale e tutti i suoi messaggi?"
   },
-
   "categories": {
     "title": "Categorie",
     "manage": "Gestisci Categorie",
@@ -416,7 +384,6 @@
     "color_label": "Colore",
     "delete_confirm": "Eliminare questa categoria?"
   },
-
   "validation": {
     "title_required": "Il titolo e obbligatorio",
     "description_required": "La descrizione e obbligatoria",

@@ -7,57 +7,57 @@
   "template_created": "Meta criada a partir do modelo!",
   "template_create_failed": "Falha ao criar meta a partir do modelo.",
   "checkin": {
-    "title": "Check In",
-    "new_checkin": "New Check-in",
-    "history": "History",
-    "no_checkins": "No check-ins yet. Record your first one!",
-    "progress_label": "Progress",
-    "mood_label": "How are you feeling?",
-    "note_label": "Note (optional)",
-    "note_placeholder": "How's it going? Any wins or challenges?",
-    "cancel": "Cancel",
-    "submit": "Record Check-in",
-    "check_in_button": "Check In"
+    "title": "Check-in",
+    "new_checkin": "Novo Check-in",
+    "history": "Histórico",
+    "no_checkins": "Sem check-ins ainda. Registe o seu primeiro!",
+    "progress_label": "Progresso",
+    "mood_label": "Como se está a sentir?",
+    "note_label": "Nota (opcional)",
+    "note_placeholder": "Como vai? Alguma conquista ou desafio?",
+    "cancel": "Cancelar",
+    "submit": "Registar Check-in",
+    "check_in_button": "Check-in"
   },
   "mood": {
-    "great": "Great",
-    "good": "Good",
-    "okay": "Okay",
-    "struggling": "Struggling",
-    "motivated": "Motivated",
-    "grateful": "Grateful"
+    "great": "Ótimo",
+    "good": "Bom",
+    "okay": "Razoável",
+    "struggling": "Com Dificuldades",
+    "motivated": "Motivado",
+    "grateful": "Grato"
   },
   "reminder": {
-    "active": "Reminder Active",
-    "set": "Set Reminder",
-    "currently": "Currently: {{frequency}}",
-    "remove": "Remove Reminder",
-    "aria_active": "Reminder active",
-    "aria_set": "Set reminder",
-    "reminder_set_success": "Reminder set: {{frequency}}"
+    "active": "Lembrete Ativo",
+    "set": "Definir Lembrete",
+    "currently": "Atualmente: {{frequency}}",
+    "remove": "Remover Lembrete",
+    "aria_active": "Lembrete ativo",
+    "aria_set": "Definir lembrete",
+    "reminder_set_success": "Lembrete definido: {{frequency}}"
   },
   "frequency": {
-    "daily": "Daily",
-    "weekly": "Weekly",
-    "biweekly": "Every 2 weeks",
-    "monthly": "Monthly"
+    "daily": "Diário",
+    "weekly": "Semanal",
+    "biweekly": "Quinzenal",
+    "monthly": "Mensal"
   },
   "template": {
-    "title": "Start from Template",
-    "loading_error": "Failed to load templates. Please try again.",
-    "try_again": "Try Again",
-    "no_templates": "No templates available yet.",
-    "all_categories": "All",
-    "no_in_category": "No templates in this category.",
-    "target_label": "Target: {{value}}",
+    "title": "Começar a Partir de Modelo",
+    "loading_error": "Falha ao carregar modelos. Tente novamente.",
+    "try_again": "Tentar Novamente",
+    "no_templates": "Ainda não existem modelos disponíveis.",
+    "all_categories": "Todos",
+    "no_in_category": "Sem modelos nesta categoria.",
+    "target_label": "Meta: {{value}}",
     "duration_days": "{{days}}d",
-    "use_template_aria": "Use template: {{title}}",
-    "cancel": "Cancel"
+    "use_template_aria": "Usar modelo: {{title}}",
+    "cancel": "Cancelar"
   },
   "history": {
-    "load_failed": "Failed to load history.",
-    "retry": "Retry",
-    "no_activity": "No activity recorded yet.",
-    "progress_aria": "Progress: {{percent}}%"
+    "load_failed": "Falha ao carregar histórico.",
+    "retry": "Tentar Novamente",
+    "no_activity": "Ainda não foi registada atividade.",
+    "progress_aria": "Progresso: {{percent}}%"
   }
 }

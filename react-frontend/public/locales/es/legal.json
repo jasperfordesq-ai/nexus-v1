@@ -378,62 +378,62 @@
     "back_to_current": "Volver a {{title}} Actual"
   },
   "platform": {
-    "effective_date": "Effective {{date}}",
-    "platform_chip": "Project NEXUS Platform",
-    "provider_notice_title": "Platform Provider Notice",
-    "provider_notice_body": "This document governs the relationship between you and Project NEXUS (the platform provider). It is separate from any terms established by {{tenant}} (your community operator).",
-    "view_tenant_legal": "View {{tenant}}'s legal documents",
-    "contents": "Contents",
-    "related_documents": "Related Platform Documents",
-    "cta_title": "Questions About This Document?",
-    "cta_body": "If you have questions about this platform-level document, contact the Project NEXUS team. For questions about your community's policies, contact {{tenant}} directly.",
-    "nexus_website": "Project NEXUS Website",
-    "contact_tenant": "Contact {{tenant}}"
+    "effective_date": "Vigente desde {{date}}",
+    "platform_chip": "Plataforma Project NEXUS",
+    "provider_notice_title": "Aviso del Proveedor de la Plataforma",
+    "provider_notice_body": "Este documento rige la relación entre usted y Project NEXUS (el proveedor de la plataforma). Es independiente de las políticas de su banco de tiempo.",
+    "view_tenant_legal": "Ver documentos legales de {{tenant}}",
+    "contents": "Contenido",
+    "related_documents": "Documentos de Plataforma Relacionados",
+    "cta_title": "¿Preguntas Sobre Este Documento?",
+    "cta_body": "Si tiene preguntas sobre este documento a nivel de plataforma, contacte al equipo de Project NEXUS. Para preguntas específicas de su comunidad, contacte a su banco de tiempo.",
+    "nexus_website": "Sitio Web de Project NEXUS",
+    "contact_tenant": "Contactar a {{tenant}}"
   },
   "platform_disclaimer": {
-    "page_title": "Platform Disclaimer",
-    "title": "Platform Disclaimer",
-    "subtitle": "Important disclaimers and liability limitations for the Project NEXUS platform",
-    "link_terms": "Platform Terms of Service",
-    "link_privacy": "Platform Privacy Policy"
+    "page_title": "Descargo de Responsabilidad de la Plataforma",
+    "title": "Descargo de Responsabilidad de la Plataforma",
+    "subtitle": "Descargos de responsabilidad y limitaciones de responsabilidad importantes para la plataforma Project NEXUS",
+    "link_terms": "Términos de Servicio de la Plataforma",
+    "link_privacy": "Política de Privacidad de la Plataforma"
   },
   "platform_privacy": {
-    "page_title": "Platform Privacy Policy",
-    "title": "Platform Privacy Policy",
-    "subtitle": "How Project NEXUS handles data at the platform infrastructure level",
-    "link_terms": "Platform Terms of Service",
-    "link_disclaimer": "Platform Disclaimer"
+    "page_title": "Política de Privacidad de la Plataforma",
+    "title": "Política de Privacidad de la Plataforma",
+    "subtitle": "Cómo Project NEXUS gestiona los datos a nivel de infraestructura de la plataforma",
+    "link_terms": "Términos de Servicio de la Plataforma",
+    "link_disclaimer": "Descargo de Responsabilidad de la Plataforma"
   },
   "platform_terms": {
-    "page_title": "Platform Terms of Service",
-    "title": "Platform Terms of Service",
-    "subtitle": "The terms governing the Project NEXUS platform infrastructure",
-    "link_privacy": "Platform Privacy Policy",
-    "link_disclaimer": "Platform Disclaimer"
+    "page_title": "Términos de Servicio de la Plataforma",
+    "title": "Términos de Servicio de la Plataforma",
+    "subtitle": "Los términos que rigen la infraestructura de la plataforma Project NEXUS",
+    "link_privacy": "Política de Privacidad de la Plataforma",
+    "link_disclaimer": "Descargo de Responsabilidad de la Plataforma"
   },
   "gate": {
-    "title": "Updated legal documents",
-    "subtitle_one": "A document has been updated. Please review and accept it to continue.",
-    "subtitle_other": "{{count}} documents have been updated. Please review and accept them to continue.",
-    "type_terms": "Terms of Service",
-    "type_privacy": "Privacy Policy",
-    "type_cookies": "Cookie Policy",
-    "type_accessibility": "Accessibility Statement",
-    "type_community_guidelines": "Community Guidelines",
-    "type_acceptable_use": "Acceptable Use Policy",
-    "updated": "Updated",
-    "read": "Read",
-    "consent_text": "By clicking Accept, you confirm you have read and agree to the documents listed above.",
-    "accept_aria": "Accept all updated legal documents and continue",
-    "accepting": "Accepting…",
-    "accept_continue": "Accept & Continue"
+    "title": "Documentos legales actualizados",
+    "subtitle_one": "Un documento ha sido actualizado. Por favor, revíselo y acéptelo para continuar.",
+    "subtitle_other": "{{count}} documentos han sido actualizados. Por favor, revíselos y acéptelos para continuar.",
+    "type_terms": "Términos de Servicio",
+    "type_privacy": "Política de Privacidad",
+    "type_cookies": "Política de Cookies",
+    "type_accessibility": "Declaración de Accesibilidad",
+    "type_community_guidelines": "Normas de la Comunidad",
+    "type_acceptable_use": "Política de Uso Aceptable",
+    "updated": "Actualizado",
+    "read": "Leer",
+    "consent_text": "Al hacer clic en Aceptar, confirma que ha leído y acepta los documentos mencionados anteriormente.",
+    "accept_aria": "Aceptar todos los documentos legales actualizados y continuar",
+    "accepting": "Aceptando…",
+    "accept_continue": "Aceptar y Continuar"
   },
   "custom": {
-    "effective_label": "Effective: {{date}}",
-    "contents": "Contents",
-    "view_previous_versions": "View previous versions of this document",
-    "cta_title": "Have Questions?",
-    "cta_body": "If you have any questions about this document, please contact us.",
-    "contact_us": "Contact Us"
+    "effective_label": "Vigente: {{date}}",
+    "contents": "Contenido",
+    "view_previous_versions": "Ver versiones anteriores de este documento",
+    "cta_title": "¿Tiene Preguntas?",
+    "cta_body": "Si tiene alguna pregunta sobre este documento, por favor contáctenos.",
+    "contact_us": "Contáctenos"
   }
 }

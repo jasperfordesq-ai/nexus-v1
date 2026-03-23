@@ -104,9 +104,9 @@
       "disputed": "Scambio contestato",
       "fallback": "Stato aggiornato"
     },
-    "prep_time": "Preparation Time",
-    "ratings": "Ratings",
-    "rate_exchange": "Rate This Exchange"
+    "prep_time": "Tempo di Preparazione",
+    "ratings": "Valutazioni",
+    "rate_exchange": "Valuta Questo Scambio"
   },
   "modal": {
     "decline_title": "Rifiuta richiesta di scambio",

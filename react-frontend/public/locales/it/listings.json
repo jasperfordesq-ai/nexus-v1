@@ -122,26 +122,26 @@
   "page_meta_keywords": "annunci, servizi, offerte",
   "save_listing": "Salva annuncio",
   "unsave_listing": "Rimuovi annuncio",
-  "saved_success": "Listing saved",
-  "unsaved_success": "Listing removed from saved",
-  "save_error": "Failed to update saved listing",
-  "featured": "Featured",
-  "featured_badge": "Featured listing",
+  "saved_success": "Annuncio salvato",
+  "unsaved_success": "Annuncio rimosso dai salvati",
+  "save_error": "Impossibile aggiornare l'annuncio salvato",
+  "featured": "In Evidenza",
+  "featured_badge": "Annuncio in evidenza",
   "skill_tags": {
-    "label": "Skill Tags",
-    "placeholder": "Type a skill and press Enter...",
-    "aria_add": "Add skill tag"
+    "label": "Tag Competenze",
+    "placeholder": "Digita una competenza e premi Invio...",
+    "aria_add": "Aggiungi tag competenza"
   },
   "analytics": {
-    "title": "Listing Analytics",
-    "total_views": "Total Views",
-    "unique_viewers": "{{count}} unique",
-    "contacts": "Contacts",
-    "contact_rate": "{{rate}}% rate",
-    "saves": "Saves",
-    "save_rate": "{{rate}}% rate",
-    "trend_7day": "7-Day Trend",
-    "vs_previous_week": "vs. previous week",
-    "views_last_days": "Views (Last {{days}} Days)"
+    "title": "Analisi Annuncio",
+    "total_views": "Visualizzazioni Totali",
+    "unique_viewers": "{{count}} unici",
+    "contacts": "Contatti",
+    "contact_rate": "{{rate}}% tasso",
+    "saves": "Salvataggi",
+    "save_rate": "{{rate}}% tasso",
+    "trend_7day": "Tendenza 7 Giorni",
+    "vs_previous_week": "vs. settimana precedente",
+    "views_last_days": "Visualizzazioni (Ultimi {{days}} Giorni)"
   }
 }

@@ -10,7 +10,7 @@
   "load_more": "Carregar Mais",
   "unable_to_load": "Não Foi Possível Carregar o Feed",
   "try_again": "Tentar Novamente",
-  "session_expired": "Your session has expired. Please log in again.",
+  "session_expired": "A sua sessão expirou. Por favor, inicie sessão novamente.",
   "error_load": "Falha ao carregar o feed.",
   "error_load_retry": "Falha ao carregar o feed. Tente novamente.",
   "empty_title": "Ainda sem publicações",
@@ -23,9 +23,9 @@
     "events": "Eventos",
     "polls": "Sondagens",
     "goals": "Objetivos",
-    "jobs": "Jobs",
-    "challenges": "Challenges",
-    "volunteering": "Volunteering",
+    "jobs": "Empregos",
+    "challenges": "Desafios",
+    "volunteering": "Voluntariado",
     "blogs": "Blog",
     "discussions": "Discussões"
   },
@@ -168,7 +168,7 @@
     "template_listing_offer": "Oferecer uma competência",
     "template_listing_request": "Procurar ajuda",
     "template_event_gathering": "Encontro comunitário",
-    "template_event_workshop": "Workshop",
+    "template_event_workshop": "Oficina",
     "template_event_social": "Evento social",
     "template_goal_hours": "Dar horas este mês",
     "template_goal_skills": "Aprender uma nova competência",
@@ -207,41 +207,41 @@
     "write_comment": "Escreva um comentário...",
     "no_comments": "Ainda sem comentários. Seja o primeiro a partilhar os seus pensamentos!",
     "admin_delete": "Excluir (Admin)",
-    "type_post": "Post",
-    "type_listing": "Listing",
-    "type_event": "Event",
-    "type_poll": "Poll",
-    "type_goal": "Goal",
-    "type_review": "Review",
-    "type_job": "Job",
-    "type_challenge": "Challenge",
-    "type_volunteer": "Volunteer",
+    "type_post": "Publicação",
+    "type_listing": "Anúncio",
+    "type_event": "Evento",
+    "type_poll": "Sondagem",
+    "type_goal": "Objetivo",
+    "type_review": "Avaliação",
+    "type_job": "Emprego",
+    "type_challenge": "Desafio",
+    "type_volunteer": "Voluntário",
     "type_blog": "Blog",
-    "type_discussion": "Discussion",
-    "image_alt": "{{type}} image by {{name}}",
-    "post_options": "Post options",
-    "send_comment": "Send comment",
-    "share_action": "Share",
-    "shared_success": "Post shared to your feed",
-    "share_failed": "Failed to share",
-    "reaction": "reaction",
-    "reactions": "reactions",
-    "reactions_title": "Reactions",
-    "no_reactions": "No reactions yet",
-    "load_more": "Load More",
-    "and": "and",
-    "other": "other",
-    "others": "others",
-    "all": "All",
-    "post_actions": "Post actions",
-    "detail_listing": "View Listing",
-    "detail_event": "View Event",
-    "detail_goals": "View Goals",
-    "detail_profile": "View Profile",
-    "detail_job": "View Job",
-    "detail_challenge": "View Challenge",
-    "detail_volunteer": "View Opportunity",
-    "detail_blog": "Read Article"
+    "type_discussion": "Discussão",
+    "image_alt": "Imagem de {{type}} por {{name}}",
+    "post_options": "Opções da publicação",
+    "send_comment": "Enviar comentário",
+    "share_action": "Partilhar",
+    "shared_success": "Publicação partilhada no seu feed",
+    "share_failed": "Falha ao partilhar",
+    "reaction": "reação",
+    "reactions": "reações",
+    "reactions_title": "Reações",
+    "no_reactions": "Ainda sem reações",
+    "load_more": "Carregar Mais",
+    "and": "e",
+    "other": "outro",
+    "others": "outros",
+    "all": "Todos",
+    "post_actions": "Ações da publicação",
+    "detail_listing": "Ver Anúncio",
+    "detail_event": "Ver Evento",
+    "detail_goals": "Ver Objetivos",
+    "detail_profile": "Ver Perfil",
+    "detail_job": "Ver Emprego",
+    "detail_challenge": "Ver Desafio",
+    "detail_volunteer": "Ver Oportunidade",
+    "detail_blog": "Ler Artigo"
   },
   "hashtag": {
     "title": "Hashtag",
@@ -253,7 +253,7 @@
     "no_posts": "Nenhuma publicação encontrada",
     "no_posts_desc": "Ainda não há publicações com a etiqueta #{{tag}}.",
     "load_more": "Carregar Mais",
-    "page_description": "Posts tagged with #{{tag}}"
+    "page_description": "Publicações com a etiqueta #{{tag}}"
   },
   "hashtags": {
     "title": "Hashtags em Tendência",
@@ -283,120 +283,120 @@
   },
   "sidebar": {
     "profile": {
-      "listings": "Listings",
-      "given": "Given",
-      "received": "Received",
-      "offers": "Offers",
-      "requests": "Requests"
+      "listings": "Anúncios",
+      "given": "Oferecidas",
+      "received": "Recebidas",
+      "offers": "Ofertas",
+      "requests": "Pedidos"
     },
     "friends": {
-      "title": "Friends",
-      "see_all": "See All",
-      "online": "Online now",
-      "active_today": "Active today"
+      "title": "Amigos",
+      "see_all": "Ver Todos",
+      "online": "Online agora",
+      "active_today": "Ativo hoje"
     },
     "pulse": {
-      "title": "Community Pulse",
-      "members": "Members",
-      "listings": "Listings",
-      "events": "Events",
-      "groups": "Groups"
+      "title": "Pulso da Comunidade",
+      "members": "Membros",
+      "listings": "Anúncios",
+      "events": "Eventos",
+      "groups": "Grupos"
     },
     "suggested": {
-      "title": "Suggested For You",
-      "see_all": "See All",
-      "by": "by {{name}}",
+      "title": "Sugerido Para Si",
+      "see_all": "Ver Todos",
+      "by": "por {{name}}",
       "request": "Pedido",
       "offer": "Oferta"
     },
     "categories": {
-      "title": "Top Categories",
-      "all_listings": "All Listings"
+      "title": "Categorias Principais",
+      "all_listings": "Todos os Anúncios"
     },
     "people": {
-      "title": "People You May Know",
-      "see_all": "See All",
-      "view": "View"
+      "title": "Pessoas Que Pode Conhecer",
+      "see_all": "Ver Todos",
+      "view": "Ver"
     },
     "events": {
-      "title": "Upcoming Events",
-      "see_all": "See All"
+      "title": "Próximos Eventos",
+      "see_all": "Ver Todos"
     },
     "groups": {
-      "title": "Popular Groups",
-      "see_all": "See All",
-      "members": "{{count}} members"
+      "title": "Grupos Populares",
+      "see_all": "Ver Todos",
+      "members": "{{count}} membros"
     },
     "actions": {
-      "title": "Quick Actions",
-      "create_listing": "Create New Listing",
-      "create_listing_desc": "Share your skills with the community",
-      "host_event": "Host Event",
-      "create_poll": "Create Poll",
-      "set_goal": "Set Goal",
-      "groups": "Groups"
+      "title": "Ações Rápidas",
+      "create_listing": "Criar Novo Anúncio",
+      "create_listing_desc": "Partilhe as suas competências com a comunidade",
+      "host_event": "Organizar Evento",
+      "create_poll": "Criar Sondagem",
+      "set_goal": "Definir Objetivo",
+      "groups": "Grupos"
     },
     "by_owner": "por {{name}}",
     "offer": "Oferta"
   },
   "mode": {
-    "for_you": "For You",
-    "recent": "Recent",
+    "for_you": "Para Si",
+    "recent": "Recentes",
     "label": "Modo do feed"
   },
   "location": {
     "global": "Global",
-    "nearby": "Near Me",
+    "nearby": "Perto de Mim",
     "radius": "{{km}} km",
     "km": "km",
-    "add_location": "Add location in profile"
+    "add_location": "Adicionar localização no perfil"
   },
   "subfilter": {
-    "all": "All",
-    "offers": "Offers",
-    "requests": "Requests"
+    "all": "Todos",
+    "offers": "Ofertas",
+    "requests": "Pedidos"
   },
   "stories": {
-    "add": "Add Story",
-    "your_story": "Your Story",
-    "scroll_left": "Scroll stories left",
-    "scroll_right": "Scroll stories right",
-    "create_your_story": "Create your story",
-    "view_story_from": "View story from {{name}}"
+    "add": "Adicionar História",
+    "your_story": "A Sua História",
+    "scroll_left": "Deslizar histórias para a esquerda",
+    "scroll_right": "Deslizar histórias para a direita",
+    "create_your_story": "Crie a sua história",
+    "view_story_from": "Ver história de {{name}}"
   },
   "fab": {
-    "create": "Create post"
+    "create": "Criar publicação"
   },
   "carousel": {
-    "aria_label": "Image carousel, {{current}} of {{total}}",
-    "image_of": "Image {{current}} of {{total}}",
-    "view_image": "View image {{current}} of {{total}}",
-    "previous": "Previous image",
-    "next": "Next image",
-    "go_to_image": "Go to image {{number}}",
-    "more_images": "{{count}} more images"
+    "aria_label": "Carrossel de imagens, {{current}} de {{total}}",
+    "image_of": "Imagem {{current}} de {{total}}",
+    "view_image": "Ver imagem {{current}} de {{total}}",
+    "previous": "Imagem anterior",
+    "next": "Próxima imagem",
+    "go_to_image": "Ir para imagem {{number}}",
+    "more_images": "mais {{count}} imagens"
   },
   "lightbox": {
-    "aria_label": "Image viewer",
-    "close": "Close image viewer",
-    "counter": "{{current}} of {{total}}"
+    "aria_label": "Visualizador de imagens",
+    "close": "Fechar visualizador de imagens",
+    "counter": "{{current}} de {{total}}"
   },
   "reaction": {
-    "like": "Like",
-    "love": "Love",
-    "laugh": "Laugh",
-    "wow": "Wow",
-    "sad": "Sad",
-    "celebrate": "Celebrate",
-    "clap": "Clap",
-    "time_credit": "Time Credit",
-    "click_to_remove": "{{label}} (click to remove)",
-    "react_to_post": "React to this post"
+    "like": "Gosto",
+    "love": "Adoro",
+    "laugh": "Riso",
+    "wow": "Uau",
+    "sad": "Triste",
+    "celebrate": "Celebrar",
+    "clap": "Aplaudir",
+    "time_credit": "Crédito de Tempo",
+    "click_to_remove": "{{label}} (clique para remover)",
+    "react_to_post": "Reagir a esta publicação"
   },
   "video": {
-    "select": "Add Video",
-    "too_large": "Video must be smaller than {{size}}MB",
-    "invalid_type": "Invalid video format. Supported: MP4, WebM, MOV",
-    "remove": "Remove video"
+    "select": "Adicionar Vídeo",
+    "too_large": "O vídeo deve ter menos de {{size}}MB",
+    "invalid_type": "Formato de vídeo inválido. Suportados: MP4, WebM, MOV",
+    "remove": "Remover vídeo"
   }
 }

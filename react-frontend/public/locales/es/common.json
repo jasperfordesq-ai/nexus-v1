@@ -1,7 +1,7 @@
 {
   "nav": {
     "dashboard": "Panel",
-    "feed": "Feed",
+    "feed": "Muro",
     "listings": "Anuncios",
     "messages": "Mensajes",
     "community": "Comunidad",
@@ -101,7 +101,7 @@
     "light_mode": "Modo Claro",
     "dark_mode": "Modo Oscuro",
     "help_center": "Centro de Ayuda",
-    "admin": "Admin",
+    "admin": "Administración",
     "admin_panel": "Panel de Admin",
     "legacy_admin": "Admin Anterior",
     "log_out": "Cerrar Sesión"
@@ -168,7 +168,7 @@
     "about": "Acerca de",
     "support": "Soporte",
     "legal": "Legal",
-    "admin": "Admin",
+    "admin": "Administración",
     "account": "Cuenta",
     "language": "Idioma",
     "engage": "Participar",
@@ -189,8 +189,8 @@
     "skip_to_content": "Saltar al contenido principal",
     "menu_opened": "Menú de navegación abierto",
     "close": "Cerrar",
-    "scroll_to_top": "Scroll to top",
-    "breadcrumb": "Breadcrumb"
+    "scroll_to_top": "Ir arriba",
+    "breadcrumb": "Migas de pan"
   },
   "cookie_consent": {
     "banner_label": "Consentimiento de cookies",
@@ -282,46 +282,46 @@
     "new_goal": "Nuevo objetivo",
     "new_goal_desc": "Establecer un objetivo personal"
   },
-  "loading": "Loading...",
+  "loading": "Cargando...",
   "feature_error": {
-    "load_failed": "We couldn't load {{feature}}. This section may be temporarily unavailable."
+    "load_failed": "No pudimos cargar {{feature}}. Esta sección puede estar temporalmente no disponible."
   },
   "dev_banner": {
-    "aria_label": "Development status",
-    "status": "Development status: {{stage}}",
-    "read_more": "Read more"
+    "aria_label": "Estado de desarrollo",
+    "status": "Estado de desarrollo: {{stage}}",
+    "read_more": "Leer más"
   },
   "skills": {
-    "browse_title": "Community Skills Directory",
-    "load_failed": "Failed to load skill categories",
-    "load_failed_retry": "Failed to load skill categories. Please try again.",
-    "offering_label": "Offering",
-    "offering_desc": "members willing to share this skill with others",
-    "requesting_label": "Requesting",
-    "requesting_desc": "members looking to learn or receive help with this skill",
-    "add_your_skills": "Add your own skills",
-    "categories": "Categories",
-    "sub_categories": "Sub-categories",
-    "total_skills": "Skills Listed",
-    "search_placeholder": "Search skill categories...",
-    "no_categories": "No categories found",
-    "no_match": "No categories match \"{{query}}\"",
-    "no_categories_yet": "No skill categories available yet.",
-    "members_with_skills": "skilled members",
-    "loading_skills": "Loading skills...",
-    "skills_in_category": "Skills",
-    "offering": "offering",
-    "requesting": "requesting",
-    "no_skills_yet": "No skills listed in this category yet.",
-    "members_with": "Members with \"{{skill}}\"",
-    "offers": "Offers",
-    "wants": "Wants",
-    "no_members": "No members found with this skill.",
+    "browse_title": "Directorio de Habilidades de la Comunidad",
+    "load_failed": "No se pudieron cargar las categorías de habilidades",
+    "load_failed_retry": "No se pudieron cargar las categorías de habilidades. Por favor, inténtelo de nuevo.",
+    "offering_label": "Ofreciendo",
+    "offering_desc": "miembros dispuestos a compartir esta habilidad con otros",
+    "requesting_label": "Solicitando",
+    "requesting_desc": "miembros que buscan aprender o recibir ayuda con esta habilidad",
+    "add_your_skills": "Añade tus propias habilidades",
+    "categories": "Categorías",
+    "sub_categories": "Subcategorías",
+    "total_skills": "Habilidades Registradas",
+    "search_placeholder": "Buscar categorías de habilidades...",
+    "no_categories": "No se encontraron categorías",
+    "no_match": "Ninguna categoría coincide con \"{{query}}\"",
+    "no_categories_yet": "Aún no hay categorías de habilidades disponibles.",
+    "members_with_skills": "miembros con habilidades",
+    "loading_skills": "Cargando habilidades...",
+    "skills_in_category": "Habilidades",
+    "offering": "ofreciendo",
+    "requesting": "solicitando",
+    "no_skills_yet": "Aún no hay habilidades registradas en esta categoría.",
+    "members_with": "Miembros con \"{{skill}}\"",
+    "offers": "Ofertas",
+    "wants": "Solicitudes",
+    "no_members": "No se encontraron miembros con esta habilidad.",
     "proficiency": {
-      "beginner": "Beginner",
-      "intermediate": "Intermediate",
-      "advanced": "Advanced",
-      "expert": "Expert"
+      "beginner": "Principiante",
+      "intermediate": "Intermedio",
+      "advanced": "Avanzado",
+      "expert": "Experto"
     }
   }
 }

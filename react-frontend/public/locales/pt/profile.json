@@ -95,6 +95,6 @@
     "save": "Guardar Alterações"
   },
   "load_error": "Falha ao carregar perfil.",
-  "listing_image_alt": "Listing image",
-  "credits_sent_success": "Credits sent to {{name}}"
+  "listing_image_alt": "Imagem do anúncio",
+  "credits_sent_success": "Créditos enviados para {{name}}"
 }

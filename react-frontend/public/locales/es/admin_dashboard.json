@@ -1,7 +1,7 @@
 {
   "title": "Centro de Control",
   "subtitle": "Vista general y centro de mando en tiempo real de la plataforma",
-  "tour_btn": "Tour",
+  "tour_btn": "Visita guiada",
   "refresh": "Actualizar",
   "view_all_activity": "Ver Toda la Actividad",
   "tour": {
@@ -55,7 +55,7 @@
     "feed_algorithm_desc": "Configuración de EdgeRank",
     "algorithm_settings": "Ajustes de Algoritmo",
     "algorithm_settings_desc": "MatchRank y CommunityRank",
-    "timebanking": "Timebanking",
+    "timebanking": "Banco de Tiempo",
     "timebanking_desc": "Analíticas y billeteras de organizaciones",
     "seo": "Gestor SEO",
     "seo_desc": "Optimización de búsqueda",

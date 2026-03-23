@@ -9,9 +9,9 @@
   "last_checked": "Ultimo controllo: {{time}}",
   "no_data": "Nessun dato disponibile",
   "status": {
-    "online": "Online",
+    "online": "In linea",
     "warning": "Avviso",
-    "offline": "Offline",
+    "offline": "Non in linea",
     "all_operational": "Tutti i sistemi operativi",
     "some_attention": "Alcuni servizi richiedono attenzione",
     "issues_detected": "Problemi rilevati"

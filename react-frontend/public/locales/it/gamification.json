@@ -37,7 +37,7 @@
       "claim_failed": "Reclamo fallito",
       "claim_failed_desc": "Impossibile reclamare la ricompensa giornaliera.",
       "claim_error": "Si è verificato un errore. La preghiamo di riprovare.",
-      "loading": "Loading daily reward"
+      "loading": "Caricamento ricompensa giornaliera"
     },
     "challenges": {
       "active_challenges": "Sfide attive",
@@ -95,7 +95,7 @@
       "save_failed_desc": "Impossibile aggiornare la vetrina.",
       "save_error": "Si è verificato un errore."
     },
-    "loading": "Loading achievements"
+    "loading": "Caricamento traguardi"
   },
   "goals": {
     "page_title": "Obiettivi",
@@ -179,7 +179,7 @@
       "buddy_joined": "Ora Lei è un compagno!",
       "buddy_failed": "Impossibile diventare compagno"
     },
-    "loading": "Loading goals"
+    "loading": "Caricamento obiettivi"
   },
   "leaderboard": {
     "page_title": "Classifica",
@@ -220,8 +220,8 @@
       "active": "Attiva",
       "load_failed": "Caricamento fallito",
       "load_failed_desc": "Impossibile caricare la cronologia delle stagioni.",
-      "loading": "Loading season"
+      "loading": "Caricamento stagione"
     },
-    "loading": "Loading leaderboard"
+    "loading": "Caricamento classifica"
   }
 }

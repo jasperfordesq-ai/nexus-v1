@@ -127,7 +127,7 @@
     "add_participants_desc": "Pesquise membros e adicione-os como prestadores ou recetores. Precisa de pelo menos 1 prestador e 1 recetor.",
     "providers_count": "Prestadores ({{count}})",
     "receivers_count": "Recetores ({{count}})",
-    "no_participants_yet": "No participants added yet",
+    "no_participants_yet": "Ainda sem participantes adicionados",
     "validation_min_participants": "Precisa de pelo menos 1 prestador e 1 recetor para continuar.",
     "hour_split_preview": "Pré-visualização da Divisão de Horas",
     "hour_split_preview_desc": "Reveja como as horas serão distribuídas entre os participantes.",

@@ -189,8 +189,8 @@
     "skip_to_content": "Ir para o conteúdo principal",
     "menu_opened": "Menu de navegação aberto",
     "close": "Fechar",
-    "scroll_to_top": "Scroll to top",
-    "breadcrumb": "Breadcrumb"
+    "scroll_to_top": "Voltar ao topo",
+    "breadcrumb": "Navegação estrutural"
   },
   "cookie_consent": {
     "banner_label": "Consentimento de cookies",
@@ -282,46 +282,46 @@
     "new_goal": "Novo objetivo",
     "new_goal_desc": "Definir um objetivo pessoal"
   },
-  "loading": "Loading...",
+  "loading": "A carregar...",
   "feature_error": {
-    "load_failed": "We couldn't load {{feature}}. This section may be temporarily unavailable."
+    "load_failed": "Não foi possível carregar {{feature}}. Esta secção pode estar temporariamente indisponível."
   },
   "dev_banner": {
-    "aria_label": "Development status",
-    "status": "Development status: {{stage}}",
-    "read_more": "Read more"
+    "aria_label": "Estado de desenvolvimento",
+    "status": "Estado de desenvolvimento: {{stage}}",
+    "read_more": "Saber mais"
   },
   "skills": {
-    "browse_title": "Community Skills Directory",
-    "load_failed": "Failed to load skill categories",
-    "load_failed_retry": "Failed to load skill categories. Please try again.",
-    "offering_label": "Offering",
-    "offering_desc": "members willing to share this skill with others",
-    "requesting_label": "Requesting",
-    "requesting_desc": "members looking to learn or receive help with this skill",
-    "add_your_skills": "Add your own skills",
-    "categories": "Categories",
-    "sub_categories": "Sub-categories",
-    "total_skills": "Skills Listed",
-    "search_placeholder": "Search skill categories...",
-    "no_categories": "No categories found",
-    "no_match": "No categories match \"{{query}}\"",
-    "no_categories_yet": "No skill categories available yet.",
-    "members_with_skills": "skilled members",
-    "loading_skills": "Loading skills...",
-    "skills_in_category": "Skills",
-    "offering": "offering",
-    "requesting": "requesting",
-    "no_skills_yet": "No skills listed in this category yet.",
-    "members_with": "Members with \"{{skill}}\"",
-    "offers": "Offers",
-    "wants": "Wants",
-    "no_members": "No members found with this skill.",
+    "browse_title": "Diretório de Competências da Comunidade",
+    "load_failed": "Falha ao carregar categorias de competências",
+    "load_failed_retry": "Falha ao carregar categorias de competências. Por favor, tente novamente.",
+    "offering_label": "A Oferecer",
+    "offering_desc": "membros dispostos a partilhar esta competência com outros",
+    "requesting_label": "A Procurar",
+    "requesting_desc": "membros que pretendem aprender ou receber ajuda com esta competência",
+    "add_your_skills": "Adicione as suas próprias competências",
+    "categories": "Categorias",
+    "sub_categories": "Subcategorias",
+    "total_skills": "Competências Listadas",
+    "search_placeholder": "Pesquisar categorias de competências...",
+    "no_categories": "Nenhuma categoria encontrada",
+    "no_match": "Nenhuma categoria corresponde a \"{{query}}\"",
+    "no_categories_yet": "Ainda não existem categorias de competências disponíveis.",
+    "members_with_skills": "membros qualificados",
+    "loading_skills": "A carregar competências...",
+    "skills_in_category": "Competências",
+    "offering": "a oferecer",
+    "requesting": "a procurar",
+    "no_skills_yet": "Ainda não existem competências listadas nesta categoria.",
+    "members_with": "Membros com \"{{skill}}\"",
+    "offers": "Ofertas",
+    "wants": "Procuras",
+    "no_members": "Nenhum membro encontrado com esta competência.",
     "proficiency": {
-      "beginner": "Beginner",
-      "intermediate": "Intermediate",
-      "advanced": "Advanced",
-      "expert": "Expert"
+      "beginner": "Iniciante",
+      "intermediate": "Intermédio",
+      "advanced": "Avançado",
+      "expert": "Especialista"
     }
   }
 }

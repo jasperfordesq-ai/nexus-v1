@@ -104,9 +104,9 @@
       "disputed": "Troca Contestada",
       "fallback": "Estado Atualizado"
     },
-    "prep_time": "Preparation Time",
-    "ratings": "Ratings",
-    "rate_exchange": "Rate This Exchange"
+    "prep_time": "Tempo de Preparação",
+    "ratings": "Avaliações",
+    "rate_exchange": "Avaliar Esta Troca"
   },
   "modal": {
     "decline_title": "Recusar Pedido de Troca",

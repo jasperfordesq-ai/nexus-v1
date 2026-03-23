@@ -166,7 +166,7 @@
     "activity": "Attività",
     "partner_communities": "Comunità Partner",
     "about": "Chi Siamo",
-    "support": "Assistenza",
+    "support": "Supporto",
     "legal": "Legale",
     "admin": "Admin",
     "account": "Account",
@@ -189,8 +189,8 @@
     "skip_to_content": "Vai al contenuto principale",
     "menu_opened": "Menu di navigazione aperto",
     "close": "Chiudi",
-    "scroll_to_top": "Scroll to top",
-    "breadcrumb": "Breadcrumb"
+    "scroll_to_top": "Torna in cima",
+    "breadcrumb": "Percorso di navigazione"
   },
   "cookie_consent": {
     "banner_label": "Consenso cookie",
@@ -214,7 +214,7 @@
   },
   "footer": {
     "platform": "Piattaforma",
-    "support": "Assistenza",
+    "support": "Supporto",
     "help_center": "Centro Assistenza",
     "contact_us": "Contattaci",
     "about": "Chi Siamo",
@@ -282,46 +282,46 @@
     "new_goal": "Nuovo obiettivo",
     "new_goal_desc": "Imposta un obiettivo personale"
   },
-  "loading": "Loading...",
+  "loading": "Caricamento...",
   "feature_error": {
-    "load_failed": "We couldn't load {{feature}}. This section may be temporarily unavailable."
+    "load_failed": "Non è stato possibile caricare {{feature}}. Questa sezione potrebbe essere temporaneamente non disponibile."
   },
   "dev_banner": {
-    "aria_label": "Development status",
-    "status": "Development status: {{stage}}",
-    "read_more": "Read more"
+    "aria_label": "Stato di sviluppo",
+    "status": "Stato di sviluppo: {{stage}}",
+    "read_more": "Scopri di più"
   },
   "skills": {
-    "browse_title": "Community Skills Directory",
-    "load_failed": "Failed to load skill categories",
-    "load_failed_retry": "Failed to load skill categories. Please try again.",
-    "offering_label": "Offering",
-    "offering_desc": "members willing to share this skill with others",
-    "requesting_label": "Requesting",
-    "requesting_desc": "members looking to learn or receive help with this skill",
-    "add_your_skills": "Add your own skills",
-    "categories": "Categories",
-    "sub_categories": "Sub-categories",
-    "total_skills": "Skills Listed",
-    "search_placeholder": "Search skill categories...",
-    "no_categories": "No categories found",
-    "no_match": "No categories match \"{{query}}\"",
-    "no_categories_yet": "No skill categories available yet.",
-    "members_with_skills": "skilled members",
-    "loading_skills": "Loading skills...",
-    "skills_in_category": "Skills",
-    "offering": "offering",
-    "requesting": "requesting",
-    "no_skills_yet": "No skills listed in this category yet.",
-    "members_with": "Members with \"{{skill}}\"",
-    "offers": "Offers",
-    "wants": "Wants",
-    "no_members": "No members found with this skill.",
+    "browse_title": "Elenco Competenze della Comunità",
+    "load_failed": "Impossibile caricare le categorie di competenze",
+    "load_failed_retry": "Impossibile caricare le categorie di competenze. Riprova.",
+    "offering_label": "Offerta",
+    "offering_desc": "membri disposti a condividere questa competenza con altri",
+    "requesting_label": "Richiesta",
+    "requesting_desc": "membri che cercano di imparare o ricevere aiuto con questa competenza",
+    "add_your_skills": "Aggiungi le tue competenze",
+    "categories": "Categorie",
+    "sub_categories": "Sottocategorie",
+    "total_skills": "Competenze Elencate",
+    "search_placeholder": "Cerca categorie di competenze...",
+    "no_categories": "Nessuna categoria trovata",
+    "no_match": "Nessuna categoria corrisponde a \"{{query}}\"",
+    "no_categories_yet": "Nessuna categoria di competenze disponibile ancora.",
+    "members_with_skills": "membri con competenze",
+    "loading_skills": "Caricamento competenze...",
+    "skills_in_category": "Competenze",
+    "offering": "offerta",
+    "requesting": "richiesta",
+    "no_skills_yet": "Nessuna competenza elencata in questa categoria ancora.",
+    "members_with": "Membri con \"{{skill}}\"",
+    "offers": "Offerte",
+    "wants": "Richieste",
+    "no_members": "Nessun membro trovato con questa competenza.",
     "proficiency": {
-      "beginner": "Beginner",
-      "intermediate": "Intermediate",
-      "advanced": "Advanced",
-      "expert": "Expert"
+      "beginner": "Principiante",
+      "intermediate": "Intermedio",
+      "advanced": "Avanzato",
+      "expert": "Esperto"
     }
   }
 }

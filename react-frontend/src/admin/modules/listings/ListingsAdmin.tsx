@@ -23,6 +23,7 @@ import {
   Tooltip,
 } from '@heroui/react';
 import { CheckCircle, Trash2, Star, StarOff, Search, Plus } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { usePageTitle } from '@/hooks';
 import { useToast } from '@/contexts';
 import { adminListings } from '../../api/adminApi';
@@ -43,6 +44,7 @@ const typeColors: Record<string, 'primary' | 'secondary' | 'success' | 'warning'
 // ─────────────────────────────────────────────────────────────────────────────
 
 function FeaturedListingsPanel() {
+  const { t } = useTranslation('admin');
   const toast = useToast();
 
   const [featured, setFeatured] = useState<FeaturedListing[]>([]);
@@ -63,7 +65,7 @@ function FeaturedListingsPanel() {
         setFeatured(Array.isArray(data) ? data : []);
       }
     } catch {
-      toast.error('Failed to load featured listings');
+      toast.error(t('listings.failed_load_content'));
     } finally {
       setFeaturedLoading(false);
     }
@@ -103,15 +105,15 @@ function FeaturedListingsPanel() {
     try {
       const res = await adminListings.feature(listingId);
       if (res?.success) {
-        toast.success('Listing featured successfully');
+        toast.success(t('listings.featured_success'));
         setSearchQuery('');
         setSearchResults([]);
         loadFeatured();
       } else {
-        toast.error(res?.error || 'Failed to feature listing');
+        toast.error(res?.error || t('listings.failed_feature'));
       }
     } catch {
-      toast.error('An unexpected error occurred');
+      toast.error(t('common.unexpected_error'));
     } finally {
       setFeatureLoading(null);
     }
@@ -123,13 +125,13 @@ function FeaturedListingsPanel() {
     try {
       const res = await adminListings.unfeature(unfeatureConfirm.listing_id);
       if (res?.success) {
-        toast.success('Listing unfeatured successfully');
+        toast.success(t('listings.unfeatured_success'));
         loadFeatured();
       } else {
-        toast.error(res?.error || 'Failed to unfeature listing');
+        toast.error(res?.error || t('listings.failed_unfeature'));
       }
     } catch {
-      toast.error('An unexpected error occurred');
+      toast.error(t('common.unexpected_error'));
     } finally {
       setUnfeatureLoading(false);
       setUnfeatureConfirm(null);
@@ -143,7 +145,7 @@ function FeaturedListingsPanel() {
   const featuredColumns: Column<FeaturedListing>[] = [
     {
       key: 'title',
-      label: 'Listing Title',
+      label: t('listings.col_listing_title'),
       sortable: true,
       render: (item) => (
         <span className="font-medium text-foreground">{item.title}</span>
@@ -302,6 +304,7 @@ function FeaturedListingsPanel() {
 
 export function ListingsAdmin() {
   usePageTitle('Admin - Content');
+  useTranslation('admin');
   const toast = useToast();
 
   const [activeTab, setActiveTab] = useState('content');

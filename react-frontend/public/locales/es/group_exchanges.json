@@ -127,7 +127,7 @@
     "add_participants_desc": "Busca miembros y agrégalos como proveedores o receptores. Necesitas al menos 1 proveedor y 1 receptor.",
     "providers_count": "Proveedores ({{count}})",
     "receivers_count": "Receptores ({{count}})",
-    "no_participants_yet": "No participants added yet",
+    "no_participants_yet": "Aún no se han añadido participantes",
     "validation_min_participants": "Necesitas al menos 1 proveedor y 1 receptor para continuar.",
     "hour_split_preview": "Vista Previa del Reparto de Horas",
     "hour_split_preview_desc": "Revisa cómo se distribuirán las horas entre los participantes.",

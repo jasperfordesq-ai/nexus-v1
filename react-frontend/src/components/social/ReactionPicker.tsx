@@ -76,6 +76,7 @@ export function ReactionPicker({
   const { t } = useTranslation('feed');
   const [isPickerOpen, setIsPickerOpen] = useState(false);
   const hoverTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const closeTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const longPressTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const isLongPressRef = useRef(false);
@@ -84,6 +85,7 @@ export function ReactionPicker({
   useEffect(() => {
     return () => {
       if (hoverTimeoutRef.current) clearTimeout(hoverTimeoutRef.current);
+      if (closeTimeoutRef.current) clearTimeout(closeTimeoutRef.current);
       if (longPressTimeoutRef.current) clearTimeout(longPressTimeoutRef.current);
     };
   }, []);
@@ -91,6 +93,11 @@ export function ReactionPicker({
   /* ───── Desktop: hover with 300ms delay ───── */
 
   const handleMouseEnter = useCallback(() => {
+    // Cancel any pending close so the picker stays open
+    if (closeTimeoutRef.current) {
+      clearTimeout(closeTimeoutRef.current);
+      closeTimeoutRef.current = null;
+    }
     if (!isAuthenticated || isDisabled) return;
     hoverTimeoutRef.current = setTimeout(() => {
       setIsPickerOpen(true);
@@ -103,9 +110,10 @@ export function ReactionPicker({
       hoverTimeoutRef.current = null;
     }
     // Small delay before closing to allow moving to the picker
-    setTimeout(() => {
+    closeTimeoutRef.current = setTimeout(() => {
       setIsPickerOpen(false);
-    }, 200);
+      closeTimeoutRef.current = null;
+    }, 300);
   }, []);
 
   /* ───── Mobile: long-press ───── */
@@ -217,9 +225,13 @@ export function ReactionPicker({
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.6, y: 8 }}
             transition={{ type: 'spring', stiffness: 400, damping: 25 }}
-            className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 z-50"
+            className="absolute bottom-full left-1/2 -translate-x-1/2 pb-2 z-50"
             onMouseEnter={() => {
               if (hoverTimeoutRef.current) clearTimeout(hoverTimeoutRef.current);
+              if (closeTimeoutRef.current) {
+                clearTimeout(closeTimeoutRef.current);
+                closeTimeoutRef.current = null;
+              }
             }}
           >
             <div className="flex items-center gap-0.5 px-2 py-1.5 rounded-full bg-[var(--surface-dropdown)]/95 backdrop-blur-xl border border-[var(--border-default)] shadow-xl shadow-black/20">

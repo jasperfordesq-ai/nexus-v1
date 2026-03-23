@@ -1,5 +1,5 @@
 {
-  "title": "Mission Control",
+  "title": "Centro di Comando",
   "subtitle": "Panoramica in tempo reale della piattaforma e centro di comando",
   "tour_btn": "Tour",
   "refresh": "Aggiorna",
@@ -47,21 +47,21 @@
     "group_locations_desc": "Confini geografici",
     "group_ranking": "Classifica Gruppi",
     "group_ranking_desc": "Gruppi in evidenza intelligenti",
-    "ai_assistant": "AI Assistant",
+    "ai_assistant": "Assistente IA",
     "ai_assistant_desc": "Configura i provider AI",
-    "smart_matching": "Smart Matching",
+    "smart_matching": "Abbinamento Intelligente",
     "smart_matching_desc": "Raccomandazioni basate sull'AI",
-    "feed_algorithm": "Algoritmo del Feed",
+    "feed_algorithm": "Algoritmo Feed",
     "feed_algorithm_desc": "Configurazione EdgeRank",
     "algorithm_settings": "Impostazioni Algoritmo",
-    "algorithm_settings_desc": "MatchRank & CommunityRank",
-    "timebanking": "Timebanking",
+    "algorithm_settings_desc": "MatchRank e CommunityRank",
+    "timebanking": "Banca del Tempo",
     "timebanking_desc": "Analisi e portafogli organizzativi",
-    "seo": "SEO Manager",
+    "seo": "Gestione SEO",
     "seo_desc": "Ottimizzazione per i motori di ricerca",
     "error_tracking": "Monitoraggio Errori 404",
     "error_tracking_desc": "Monitora i link non funzionanti",
-    "cron_jobs": "Cron Jobs",
+    "cron_jobs": "Attività Pianificate",
     "cron_jobs_desc": "Attività pianificate"
   },
   "activity": {
@@ -98,7 +98,7 @@
     "details": "Dettagli",
     "database": "Database",
     "cache": "Cache",
-    "queue": "Cron Jobs",
+    "queue": "Attività Pianificate",
     "api": "API Email"
   }
 }
