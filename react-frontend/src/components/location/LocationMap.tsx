@@ -260,6 +260,7 @@ function LocationMapInner({
         zoomControl={true}
         styles={resolvedTheme === 'dark' ? DARK_MAP_STYLES : undefined}
         clickableIcons={false}
+        mapId={import.meta.env.VITE_GOOGLE_MAPS_MAP_ID || undefined}
       >
         {clusteringEnabled ? (
           <ClusteredMarkers
