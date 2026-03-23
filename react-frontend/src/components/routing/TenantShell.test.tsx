@@ -44,6 +44,8 @@ vi.mock('@/contexts', () => ({
   useToast: () => ({ success: vi.fn(), error: vi.fn(), info: vi.fn(), warning: vi.fn() }),
 }));
 
+const mockDetectTenantFromUrl = vi.fn(() => ({ slug: null, source: null }));
+
 vi.mock('@/lib/tenant-routing', () => ({
   RESERVED_PATHS: new Set([
     'login', 'register', 'dashboard', 'listings', 'events', 'groups',
@@ -51,6 +53,7 @@ vi.mock('@/lib/tenant-routing', () => ({
     'profile', 'settings', 'admin', 'admin-legacy', 'api', 'assets',
     'help', 'about', 'faq', 'terms', 'privacy',
   ]),
+  detectTenantFromUrl: (...args: unknown[]) => mockDetectTenantFromUrl(...args),
 }));
 
 vi.mock('@/components/ui', () => ({
@@ -78,6 +81,10 @@ vi.mock('@/components/ui', () => ({
 
 vi.mock('@/hooks', () => ({
   usePageTitle: vi.fn(),
+}));
+
+vi.mock('@/contexts/PresenceContext', () => ({
+  PresenceProvider: ({ children }: { children: React.ReactNode }) => <>{children}</>,
 }));
 
 vi.mock('@/components/feedback', () => ({
@@ -138,31 +145,37 @@ describe('TenantShell', () => {
 
   describe('Tenant slug detection', () => {
     it('does NOT detect slug from reserved paths like /dashboard', () => {
+      mockDetectTenantFromUrl.mockReturnValue({ slug: null, source: null });
       renderWithRouter('/dashboard');
       expect(capturedTenantSlug).toBeUndefined();
     });
 
     it('does NOT detect slug from reserved paths like /login', () => {
+      mockDetectTenantFromUrl.mockReturnValue({ slug: null, source: null });
       renderWithRouter('/login');
       expect(capturedTenantSlug).toBeUndefined();
     });
 
     it('does NOT detect slug from reserved paths like /admin', () => {
+      mockDetectTenantFromUrl.mockReturnValue({ slug: null, source: null });
       renderWithRouter('/admin');
       expect(capturedTenantSlug).toBeUndefined();
     });
 
     it('detects tenant slug from non-reserved first segment', () => {
+      mockDetectTenantFromUrl.mockReturnValue({ slug: 'hour-timebank', source: 'path' });
       renderWithRouter('/hour-timebank/dashboard');
       expect(capturedTenantSlug).toBe('hour-timebank');
     });
 
     it('detects tenant slug from a simple community path', () => {
+      mockDetectTenantFromUrl.mockReturnValue({ slug: 'my-community', source: 'path' });
       renderWithRouter('/my-community/listings');
       expect(capturedTenantSlug).toBe('my-community');
     });
 
     it('handles root path without slug', () => {
+      mockDetectTenantFromUrl.mockReturnValue({ slug: null, source: null });
       renderWithRouter('/');
       expect(capturedTenantSlug).toBeUndefined();
     });
@@ -170,11 +183,13 @@ describe('TenantShell', () => {
 
   describe('Provider wrapping', () => {
     it('renders TenantProvider', () => {
+      mockDetectTenantFromUrl.mockReturnValue({ slug: null, source: null });
       renderWithRouter('/dashboard');
       expect(screen.getByTestId('tenant-provider')).toBeInTheDocument();
     });
 
     it('renders AuthProvider', () => {
+      mockDetectTenantFromUrl.mockReturnValue({ slug: null, source: null });
       renderWithRouter('/dashboard');
       expect(screen.getByTestId('auth-provider')).toBeInTheDocument();
     });
@@ -182,6 +197,7 @@ describe('TenantShell', () => {
 
   describe('Community Not Found', () => {
     it('shows CommunityNotFound when notFoundSlug is set', () => {
+      mockDetectTenantFromUrl.mockReturnValue({ slug: 'nonexistent-community', source: 'path' });
       setupDefaultMocks({
         tenant: {
           isLoading: false,
@@ -195,6 +211,7 @@ describe('TenantShell', () => {
     });
 
     it('shows Go Home button in CommunityNotFound', () => {
+      mockDetectTenantFromUrl.mockReturnValue({ slug: 'bad-slug', source: 'path' });
       setupDefaultMocks({
         tenant: {
           isLoading: false,
@@ -207,6 +224,7 @@ describe('TenantShell', () => {
     });
 
     it('shows Find Community button in CommunityNotFound', () => {
+      mockDetectTenantFromUrl.mockReturnValue({ slug: 'bad-slug', source: 'path' });
       setupDefaultMocks({
         tenant: {
           isLoading: false,
@@ -221,6 +239,7 @@ describe('TenantShell', () => {
 
   describe('Valid tenant', () => {
     it('renders Outlet (children) when tenant is valid', () => {
+      mockDetectTenantFromUrl.mockReturnValue({ slug: null, source: null });
       setupDefaultMocks({
         tenant: {
           isLoading: false,
@@ -235,6 +254,7 @@ describe('TenantShell', () => {
     });
 
     it('does NOT show CommunityNotFound when tenant is valid', () => {
+      mockDetectTenantFromUrl.mockReturnValue({ slug: 'valid-tenant', source: 'path' });
       setupDefaultMocks({
         tenant: {
           isLoading: false,
@@ -249,6 +269,7 @@ describe('TenantShell', () => {
 
   describe('Loading state', () => {
     it('does not show CommunityNotFound while loading', () => {
+      mockDetectTenantFromUrl.mockReturnValue({ slug: 'some-slug', source: 'path' });
       setupDefaultMocks({
         tenant: {
           isLoading: true,
@@ -263,6 +284,7 @@ describe('TenantShell', () => {
 
   describe('Maintenance mode', () => {
     it('shows maintenance page for non-admin users when enabled', () => {
+      mockDetectTenantFromUrl.mockReturnValue({ slug: null, source: null });
       setupDefaultMocks({
         tenant: {
           isLoading: false,

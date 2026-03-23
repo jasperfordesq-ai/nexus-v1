@@ -143,7 +143,7 @@ describe('MessageInputArea', () => {
 
   it('renders send button when there is message text', () => {
     render(<MessageInputArea {...defaultProps} newMessage="Hello!" />);
-    expect(screen.getByLabelText('Send message')).toBeDefined();
+    expect(screen.getByLabelText('aria_send_message')).toBeDefined();
   });
 
   it('shows attachment previews', () => {

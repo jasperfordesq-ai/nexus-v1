@@ -83,8 +83,8 @@ vi.mock('@/components/compose/shared/ComposeEditor', () => ({
   default: MockEditor,
 }));
 
-vi.mock('@/components/compose/shared/MultiImageUploader', () => ({
-  MultiImageUploader: () => <div data-testid="multi-image-uploader">Images</div>,
+vi.mock('@/components/compose/MediaUploader', () => ({
+  MediaUploader: () => <div data-testid="multi-image-uploader">Images</div>,
 }));
 
 vi.mock('@/components/compose/shared/EmojiPicker', () => ({

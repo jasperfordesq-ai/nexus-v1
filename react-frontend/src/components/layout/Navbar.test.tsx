@@ -69,6 +69,11 @@ vi.mock('@/components/LanguageSwitcher', () => ({
   LanguageSwitcher: () => null,
 }));
 
+vi.mock('@/components/social', () => ({
+  PresenceIndicator: () => null,
+  StatusSelector: () => null,
+}));
+
 vi.mock('@/components/navigation', () => ({
   DesktopMenuItems: () => null,
   MobileMenuItems: () => null,

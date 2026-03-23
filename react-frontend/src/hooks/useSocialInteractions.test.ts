@@ -309,7 +309,8 @@ describe('useSocialInteractions', () => {
 
     it('returns users on success', async () => {
       const mockUsers = [{ id: 1, name: 'Alice', avatar_url: null }];
-      mockApi.post.mockResolvedValue({ success: true, data: { users: mockUsers } });
+      // searchMentions now tries V2 GET endpoint first
+      mockApi.get.mockResolvedValue({ success: true, data: mockUsers });
 
       const { result } = renderHook(() => useSocialInteractions(defaultOptions));
       let users: unknown[];

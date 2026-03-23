@@ -31,8 +31,10 @@ vi.mock('@vis.gl/react-google-maps', () => ({
   APIProvider: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
   Map: ({ children }: { children: React.ReactNode }) => <div data-testid="google-map">{children}</div>,
   Marker: ({ title }: { title?: string }) => <div data-testid="marker" data-title={title} />,
+  AdvancedMarker: ({ title }: { title?: string }) => <div data-testid="marker" data-title={title} />,
   InfoWindow: ({ children }: { children: React.ReactNode }) => <div data-testid="info-window">{children}</div>,
   useMap: vi.fn(() => ({ setCenter: vi.fn(), setZoom: vi.fn(), fitBounds: vi.fn() })),
+  useAdvancedMarkerRef: vi.fn(() => [vi.fn(), null]),
   useApiLoadingStatus: () => mockUseApiLoadingStatus(),
   APILoadingStatus: { LOADED: 'LOADED', LOADING: 'LOADING', FAILED: 'FAILED', AUTH_FAILURE: 'AUTH_FAILURE' },
 }));

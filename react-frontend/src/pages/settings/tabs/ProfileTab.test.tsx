@@ -102,14 +102,14 @@ describe('ProfileTab', () => {
 
   it('renders Save Changes button', () => {
     render(<ProfileTab {...defaultProps} />);
-    expect(screen.getByText('Save Changes')).toBeDefined();
+    expect(screen.getByText('save_changes')).toBeDefined();
   });
 
   it('calls onSave when Save Changes is clicked', async () => {
     const { userEvent } = await import('@/test/test-utils');
     const user = userEvent.setup();
     render(<ProfileTab {...defaultProps} />);
-    await user.click(screen.getByText('Save Changes'));
+    await user.click(screen.getByText('save_changes'));
     expect(defaultProps.onSave).toHaveBeenCalled();
   });
 
@@ -145,18 +145,18 @@ describe('ProfileTab', () => {
 
   it('renders change photo button', () => {
     render(<ProfileTab {...defaultProps} />);
-    expect(screen.getByLabelText('Change profile photo')).toBeDefined();
+    expect(screen.getByLabelText('profile.change_photo_aria')).toBeDefined();
   });
 
   it('shows loading state on save button when isSaving', () => {
     render(<ProfileTab {...defaultProps} isSaving={true} />);
-    const saveBtn = screen.getByText('Save Changes').closest('button');
+    const saveBtn = screen.getByText('save_changes').closest('button');
     expect(saveBtn).toBeDefined();
   });
 
   it('shows uploading state on camera button when isUploading', () => {
     render(<ProfileTab {...defaultProps} isUploading={true} />);
-    const cameraBtn = screen.getByLabelText('Change profile photo');
+    const cameraBtn = screen.getByLabelText('profile.change_photo_aria');
     // HeroUI Button renders isDisabled as data-disabled, not aria-disabled
     expect(cameraBtn).toHaveAttribute('data-disabled', 'true');
   });

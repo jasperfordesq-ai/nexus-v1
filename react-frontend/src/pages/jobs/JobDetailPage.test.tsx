@@ -251,9 +251,10 @@ describe('JobDetailPage', () => {
     });
     render(<JobDetailPage />);
     await waitFor(() => {
-      expect(screen.getByText('detail.edit')).toBeInTheDocument();
+      // Owner actions appear in both the header actions bar and the management banner
+      expect(screen.getAllByText('detail.edit').length).toBeGreaterThan(0);
     });
-    expect(screen.getByText('detail.delete')).toBeInTheDocument();
+    expect(screen.getAllByText('detail.delete').length).toBeGreaterThan(0);
   });
 
   it('shows featured badge when job is featured (J10)', async () => {
@@ -333,7 +334,8 @@ describe('JobDetailPage', () => {
     });
     render(<JobDetailPage />);
     await waitFor(() => {
-      expect(screen.getByText('detail.analytics')).toBeInTheDocument();
+      // Analytics link appears in both the header actions bar and the management banner
+      expect(screen.getAllByText('detail.analytics').length).toBeGreaterThan(0);
     });
   });
 

@@ -109,13 +109,13 @@ describe('PeopleYouMayKnowWidget', () => {
 
   it('renders online indicator for online members', () => {
     render(<PeopleYouMayKnowWidget members={sampleMembers} />);
-    expect(screen.getByLabelText('Online')).toBeInTheDocument();
+    expect(screen.getByLabelText('Online now')).toBeInTheDocument();
   });
 
   it('does not show online indicator for offline members', () => {
     const offlineMembers = [{ id: 8, name: 'Grace White', is_online: false }];
     render(<PeopleYouMayKnowWidget members={offlineMembers} />);
-    expect(screen.queryByLabelText('Online')).not.toBeInTheDocument();
+    expect(screen.queryByLabelText('Online now')).not.toBeInTheDocument();
   });
 
   it('renders View buttons for each member', () => {

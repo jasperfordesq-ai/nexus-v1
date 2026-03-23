@@ -192,7 +192,7 @@ describe('PlatformLegalPage', () => {
       />
     );
     expect(screen.getByText('Contents')).toBeInTheDocument();
-    expect(screen.getByRole('navigation', { name: /table of contents/i })).toBeInTheDocument();
+    expect(screen.getByRole('navigation', { name: /contents/i })).toBeInTheDocument();
   });
 
   it('does not render Table of Contents when less than 4 sections', () => {

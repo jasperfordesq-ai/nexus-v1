@@ -5,10 +5,25 @@
 
 /**
  * Tests for StoriesBar component
+ *
+ * StoriesBar now fetches stories from the API (not from a friends prop).
+ * It shows a "Your Story" create button and story circles for other users.
  */
 
-import { describe, it, expect, vi } from 'vitest';
-import { render, screen } from '@/test/test-utils';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { render, screen, waitFor } from '@/test/test-utils';
+
+const mockApiGet = vi.fn();
+
+vi.mock('@/lib/api', () => ({
+  api: {
+    get: (...args: unknown[]) => mockApiGet(...args),
+  },
+}));
+
+vi.mock('@/lib/logger', () => ({
+  logError: vi.fn(),
+}));
 
 vi.mock('@/contexts', () => ({
   useTenant: vi.fn(() => ({
@@ -26,74 +41,159 @@ vi.mock('@/contexts', () => ({
   useMenuContext: () => ({ headerMenus: [], mobileMenus: [], hasCustomMenus: false }),
   useFeature: vi.fn(() => true),
   useModule: vi.fn(() => true),
-  useAuth: () => ({ user: null, isAuthenticated: false, login: vi.fn(), logout: vi.fn(), register: vi.fn(), updateUser: vi.fn(), refreshUser: vi.fn(), status: 'idle', error: null }),
+  useAuth: vi.fn(() => ({
+    user: { id: 1, first_name: 'TestUser', last_name: 'Smith', avatar: '/test-avatar.png' },
+    isAuthenticated: true,
+    login: vi.fn(),
+    logout: vi.fn(),
+    register: vi.fn(),
+    updateUser: vi.fn(),
+    refreshUser: vi.fn(),
+    status: 'idle',
+    error: null,
+  })),
   useToast: () => ({ success: vi.fn(), error: vi.fn(), info: vi.fn(), warning: vi.fn() }),
 }));
 
 vi.mock('@/lib/helpers', () => ({
-  resolveAvatarUrl: vi.fn((url) => url || '/default-avatar.png'),
-  resolveAssetUrl: vi.fn((url) => url || ''),
+  resolveAvatarUrl: vi.fn((url: unknown) => url || '/default-avatar.png'),
+  resolveAssetUrl: vi.fn((url: unknown) => url || ''),
   formatRelativeTime: vi.fn(() => '2 hours ago'),
 }));
 
-import { StoriesBar } from './StoriesBar';
+vi.mock('@/components/stories/StoryViewer', () => ({
+  StoryViewer: () => <div data-testid="story-viewer" />,
+}));
 
-const mockFriends = [
-  { id: 1, name: 'Alice Smith', avatar_url: '/alice.png', is_online: true },
-  { id: 2, name: 'Bob Jones', avatar_url: '/bob.png', is_online: false },
-  { id: 3, name: 'Charlie', avatar_url: undefined, is_online: true },
+vi.mock('@/components/stories/StoryCreator', () => ({
+  StoryCreator: () => <div data-testid="story-creator" />,
+}));
+
+import { StoriesBar } from './StoriesBar';
+import { useAuth } from '@/contexts';
+
+const mockStoryUsers = [
+  {
+    user_id: 10,
+    name: 'Alice Smith',
+    first_name: 'Alice',
+    avatar_url: '/alice.png',
+    story_count: 2,
+    has_unseen: true,
+    is_own: false,
+    is_connected: true,
+    latest_at: '2026-03-23T10:00:00Z',
+  },
+  {
+    user_id: 20,
+    name: 'Bob Jones',
+    first_name: 'Bob',
+    avatar_url: '/bob.png',
+    story_count: 1,
+    has_unseen: false,
+    is_own: false,
+    is_connected: true,
+    latest_at: '2026-03-23T09:00:00Z',
+  },
 ];
 
+const authenticatedAuthReturn = {
+  user: { id: 1, first_name: 'TestUser', last_name: 'Smith', avatar: '/test-avatar.png' },
+  isAuthenticated: true,
+  login: vi.fn(),
+  logout: vi.fn(),
+  register: vi.fn(),
+  updateUser: vi.fn(),
+  refreshUser: vi.fn(),
+  status: 'idle' as const,
+  error: null,
+};
+
 describe('StoriesBar', () => {
-  it('returns null when friends array is empty', () => {
-    const { container } = render(<StoriesBar friends={[]} />);
-    // Component returns null; wrapper providers still render their container elements
+  beforeEach(() => {
+    vi.clearAllMocks();
+    mockApiGet.mockResolvedValue({ success: true, data: [] });
+    // Restore authenticated state for each test (clearAllMocks doesn't reset implementations)
+    vi.mocked(useAuth).mockReturnValue(authenticatedAuthReturn as ReturnType<typeof useAuth>);
+  });
+
+  it('returns null when user is not authenticated', async () => {
+    vi.mocked(useAuth).mockReturnValue({
+      user: null,
+      isAuthenticated: false,
+      login: vi.fn(),
+      logout: vi.fn(),
+      register: vi.fn(),
+      updateUser: vi.fn(),
+      refreshUser: vi.fn(),
+      status: 'idle',
+      error: null,
+    } as ReturnType<typeof useAuth>);
+    const { container } = render(<StoriesBar />);
+    // Not authenticated => returns null, no scrollable area rendered
     expect(container.querySelector('.overflow-x-auto')).not.toBeInTheDocument();
   });
 
-  it('returns null when friends is undefined-like', () => {
-    const { container } = render(<StoriesBar friends={[] as never} />);
-    expect(container.querySelector('.overflow-x-auto')).not.toBeInTheDocument();
+  it('shows "Your Story" create button when authenticated', async () => {
+    mockApiGet.mockResolvedValue({ success: true, data: [] });
+    render(<StoriesBar />);
+    await waitFor(() => {
+      expect(screen.getByLabelText('Create your story')).toBeInTheDocument();
+    });
   });
 
-  it('renders friend avatars', () => {
-    render(<StoriesBar friends={mockFriends} />);
-    // First names are rendered (truncated to first word if needed)
-    expect(screen.getByText('Alice')).toBeInTheDocument();
-    expect(screen.getByText('Bob')).toBeInTheDocument();
-    expect(screen.getByText('Charlie')).toBeInTheDocument();
+  it('renders story circles for story users from API', async () => {
+    mockApiGet.mockResolvedValue({ success: true, data: mockStoryUsers });
+    render(<StoriesBar />);
+    await waitFor(() => {
+      expect(screen.getByText('Alice')).toBeInTheDocument();
+      expect(screen.getByText('Bob')).toBeInTheDocument();
+    });
   });
 
-  it('renders links to friend profiles', () => {
-    render(<StoriesBar friends={mockFriends} />);
-    const links = screen.getAllByRole('link');
-    expect(links).toHaveLength(3);
-    expect(links[0]).toHaveAttribute('href', '/test/profile/1');
-    expect(links[1]).toHaveAttribute('href', '/test/profile/2');
-    expect(links[2]).toHaveAttribute('href', '/test/profile/3');
+  it('renders "Your Story" label text', async () => {
+    mockApiGet.mockResolvedValue({ success: true, data: [] });
+    render(<StoriesBar />);
+    await waitFor(() => {
+      expect(screen.getByText('Your Story')).toBeInTheDocument();
+    });
   });
 
-  it('truncates long first names', () => {
-    const friends = [
-      { id: 10, name: 'Alexandria VeryLongLastName', avatar_url: '/alex.png' },
-    ];
-    render(<StoriesBar friends={friends} />);
-    // "Alexandria" is 10 chars, truncated to 8 chars + "..."
-    expect(screen.getByText('Alexandr...')).toBeInTheDocument();
+  it('truncates long first names (max 12 chars)', async () => {
+    const longNameUser = [{
+      user_id: 99,
+      name: 'Alexandrovich Longname',
+      first_name: 'Alexandrovich',
+      avatar_url: '/alex.png',
+      story_count: 1,
+      has_unseen: true,
+      is_own: false,
+      is_connected: true,
+      latest_at: '2026-03-23T10:00:00Z',
+    }];
+    mockApiGet.mockResolvedValue({ success: true, data: longNameUser });
+    render(<StoriesBar />);
+    // "Alexandrovich" is 13 chars, truncated to 12 chars + "..."
+    await waitFor(() => {
+      expect(screen.getByText('Alexandrovic...')).toBeInTheDocument();
+    });
   });
 
-  it('shows online indicator for online friends', () => {
-    const { container } = render(<StoriesBar friends={mockFriends} />);
-    // Online indicators are span elements with green background
-    const onlineIndicators = container.querySelectorAll('.bg-green-500');
-    // Alice and Charlie are online
-    expect(onlineIndicators.length).toBe(2);
+  it('calls api.get to fetch stories', async () => {
+    render(<StoriesBar />);
+    await waitFor(() => {
+      expect(mockApiGet).toHaveBeenCalledWith('/v2/stories');
+    });
   });
 
-  it('does not show online indicator for offline friends', () => {
-    const offlineFriends = [{ id: 1, name: 'Bob', is_online: false }];
-    const { container } = render(<StoriesBar friends={offlineFriends} />);
-    const onlineIndicators = container.querySelectorAll('.bg-green-500');
-    expect(onlineIndicators.length).toBe(0);
+  it('shows gradient ring for unseen stories', async () => {
+    mockApiGet.mockResolvedValue({ success: true, data: mockStoryUsers });
+    const { container } = render(<StoriesBar />);
+    await waitFor(() => {
+      expect(screen.getByText('Alice')).toBeInTheDocument();
+    });
+    // Unseen story (Alice) gets gradient ring
+    const gradientRings = container.querySelectorAll('.bg-gradient-to-tr');
+    expect(gradientRings.length).toBeGreaterThanOrEqual(1);
   });
 });

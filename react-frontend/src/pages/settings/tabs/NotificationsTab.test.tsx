@@ -74,20 +74,20 @@ describe('NotificationsTab', () => {
 
   it('renders save preferences button', () => {
     render(<NotificationsTab {...defaultProps} />);
-    expect(screen.getByText('Save Preferences')).toBeDefined();
+    expect(screen.getByText('save_preferences')).toBeDefined();
   });
 
   it('shows error state with retry button when notificationError is set', () => {
     render(<NotificationsTab {...defaultProps} notificationError="Failed to load settings" />);
     expect(screen.getByText('Failed to load settings')).toBeDefined();
-    expect(screen.getByText('Try Again')).toBeDefined();
+    expect(screen.getByText('try_again')).toBeDefined();
   });
 
   it('calls onRetry when Try Again is clicked', async () => {
     const { userEvent } = await import('@/test/test-utils');
     const user = userEvent.setup();
     render(<NotificationsTab {...defaultProps} notificationError="Error" />);
-    await user.click(screen.getByText('Try Again'));
+    await user.click(screen.getByText('try_again'));
     expect(defaultProps.onRetry).toHaveBeenCalled();
   });
 
@@ -98,43 +98,43 @@ describe('NotificationsTab', () => {
 
   it('renders organisation notifications section when isOrganisation is true', () => {
     render(<NotificationsTab {...defaultProps} isOrganisation={true} />);
-    expect(screen.getByText('Organisation Notifications')).toBeDefined();
+    expect(screen.getByText('notification_sections.organisation_notifications')).toBeDefined();
   });
 
   it('hides organisation notifications section when isOrganisation is false', () => {
     render(<NotificationsTab {...defaultProps} isOrganisation={false} />);
-    expect(screen.queryByText('Organisation Notifications')).toBeNull();
+    expect(screen.queryByText('notification_sections.organisation_notifications')).toBeNull();
   });
 
   it('renders match digest section', () => {
     render(<NotificationsTab {...defaultProps} />);
-    expect(screen.getByText('Match Digest Emails')).toBeDefined();
-    expect(screen.getByText('Digest Frequency')).toBeDefined();
+    expect(screen.getByText('notification_sections.match_digest')).toBeDefined();
+    expect(screen.getByText('match_digest.frequency')).toBeDefined();
   });
 
   it('calls onSave when save button is clicked', async () => {
     const { userEvent } = await import('@/test/test-utils');
     const user = userEvent.setup();
     render(<NotificationsTab {...defaultProps} />);
-    await user.click(screen.getByText('Save Preferences'));
+    await user.click(screen.getByText('save_preferences'));
     expect(defaultProps.onSave).toHaveBeenCalled();
   });
 
   it('shows loading state on save button when isSaving', () => {
     render(<NotificationsTab {...defaultProps} isSaving={true} />);
     // Button should be in loading state (spinner shown, disabled)
-    const saveBtn = screen.getByText('Save Preferences').closest('button');
+    const saveBtn = screen.getByText('save_preferences').closest('button');
     expect(saveBtn).toBeDefined();
   });
 
   it('renders push notifications section', () => {
     render(<NotificationsTab {...defaultProps} />);
-    expect(screen.getByText('Push Notifications')).toBeDefined();
+    expect(screen.getByText('notification_sections.push_notifications')).toBeDefined();
   });
 
   it('renders marketing communications section', () => {
     render(<NotificationsTab {...defaultProps} />);
-    expect(screen.getByText('Marketing & Communications')).toBeDefined();
+    expect(screen.getByText('notification_sections.marketing_communications')).toBeDefined();
   });
 
   it('disables marketing toggle when marketingConsentLoading is true', () => {
