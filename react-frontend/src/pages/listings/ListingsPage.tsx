@@ -26,6 +26,7 @@ import {
   Heart,
   AlertTriangle,
   RefreshCw,
+  Loader2,
 } from 'lucide-react';
 import { GlassCard, AlgorithmLabel, ListingSkeleton, ImagePlaceholder } from '@/components/ui';
 import { FeaturedBadge } from '@/components/listings/FeaturedBadge';
@@ -34,6 +35,7 @@ import { EmptyState } from '@/components/feedback';
 import { PageMeta } from '@/components/seo';
 import { useAuth, useToast, useTenant } from '@/contexts';
 import { usePageTitle } from '@/hooks';
+import { useGeolocation } from '@/hooks/useGeolocation';
 import { api } from '@/lib/api';
 import { MAPS_ENABLED } from '@/lib/map-config';
 import { logError } from '@/lib/logger';
@@ -60,6 +62,9 @@ export function ListingsPage() {
   const [selectedCategory, setSelectedCategory] = useState(searchParams.get('category') || '');
   const [viewMode, setViewMode] = useState<ViewMode>('grid');
   const [hasMore, setHasMore] = useState(false);
+  const [nearMeEnabled, setNearMeEnabled] = useState(false);
+  const [radiusKm, setRadiusKm] = useState(25);
+  const geo = useGeolocation();
 
   // Use a ref for cursor to avoid infinite re-render loop (same pattern as FeedPage)
   const cursorRef = useRef<string | null>(null);
@@ -95,7 +100,15 @@ export function ListingsPage() {
       if (!reset && cursorRef.current) params.set('cursor', cursorRef.current);
       params.set('per_page', '20');
 
-      const response = await api.get<Listing[]>(`/v2/listings?${params}`);
+      let endpoint = '/v2/listings';
+      if (nearMeEnabled && geo.latitude !== null && geo.longitude !== null) {
+        endpoint = '/v2/listings/nearby';
+        params.set('lat', String(geo.latitude));
+        params.set('lng', String(geo.longitude));
+        params.set('radius_km', String(radiusKm));
+      }
+
+      const response = await api.get<Listing[]>(`${endpoint}?${params}`);
 
       // If this request was aborted while awaiting, discard the result
       if (controller.signal.aborted) return;
@@ -129,7 +142,7 @@ export function ListingsPage() {
         setIsLoading(false);
       }
     }
-  }, [searchQuery, selectedType, selectedCategory]);
+  }, [searchQuery, selectedType, selectedCategory, nearMeEnabled, geo.latitude, geo.longitude, radiusKm]);
 
   // Keep a ref so effects always call the latest version without depending on it
   const loadListingsRef = useRef(loadListings);
@@ -155,7 +168,7 @@ export function ListingsPage() {
   useEffect(() => {
     loadListingsRef.current(true);
     return () => { abortRef.current?.abort(); };
-  }, [searchQuery, selectedType, selectedCategory]);
+  }, [searchQuery, selectedType, selectedCategory, nearMeEnabled, geo.latitude, geo.longitude, radiusKm]);
 
   // Sync URL params with filter state (harmless if it re-runs)
   useEffect(() => {
@@ -170,6 +183,30 @@ export function ListingsPage() {
     e.preventDefault();
     loadListings(true);
   }
+
+  function handleNearMeToggle() {
+    if (nearMeEnabled) {
+      setNearMeEnabled(false);
+      return;
+    }
+    if (geo.error) {
+      toast.error(geo.error);
+      return;
+    }
+    if (geo.latitude === null) {
+      geo.requestLocation();
+    }
+    setNearMeEnabled(true);
+  }
+
+  // Auto-disable near me if geolocation fails after enabling
+  useEffect(() => {
+    if (nearMeEnabled && geo.error) {
+      toast.error(geo.error);
+      setNearMeEnabled(false);
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [geo.error, nearMeEnabled]);
 
   /**
    * Toggle save/unsave a listing with optimistic UI update.
@@ -296,6 +333,43 @@ export function ListingsPage() {
             >
               {(cat) => <SelectItem key={cat.slug}>{cat.name}</SelectItem>}
             </Select>
+
+            <Button
+              variant={nearMeEnabled ? 'solid' : 'flat'}
+              className={nearMeEnabled
+                ? 'bg-primary text-white min-h-[40px]'
+                : 'bg-theme-elevated text-theme-primary min-h-[40px]'}
+              startContent={geo.loading
+                ? <Loader2 className="w-4 h-4 animate-spin" aria-hidden="true" />
+                : <MapPin className="w-4 h-4" aria-hidden="true" />}
+              onPress={handleNearMeToggle}
+              aria-pressed={nearMeEnabled}
+              aria-label={t('near_me', 'Near me')}
+            >
+              {t('near_me', 'Near me')}
+            </Button>
+
+            {nearMeEnabled && (
+              <Select
+                aria-label={t('radius_label', 'Radius')}
+                selectedKeys={[String(radiusKm)]}
+                onSelectionChange={(keys) => {
+                  const val = keys instanceof Set ? ([...keys][0] as string) : '25';
+                  setRadiusKm(Number(val) || 25);
+                }}
+                className="w-full sm:w-32"
+                classNames={{
+                  trigger: 'bg-theme-elevated border-theme-default hover:bg-theme-hover',
+                  value: 'text-theme-primary',
+                }}
+              >
+                <SelectItem key="5">5 km</SelectItem>
+                <SelectItem key="10">10 km</SelectItem>
+                <SelectItem key="25">25 km</SelectItem>
+                <SelectItem key="50">50 km</SelectItem>
+                <SelectItem key="100">100 km</SelectItem>
+              </Select>
+            )}
 
             <div className="flex rounded-lg overflow-hidden border border-theme-default" role="group" aria-label="View mode">
               <Button

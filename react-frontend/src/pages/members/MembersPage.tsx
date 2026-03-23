@@ -25,6 +25,7 @@ import {
   AlertTriangle,
   Sparkles,
   TrendingUp,
+  Loader2,
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { GlassCard, MemberCardSkeleton, AlgorithmLabel } from '@/components/ui';
@@ -38,6 +39,7 @@ import { MAPS_ENABLED } from '@/lib/map-config';
 import { logError } from '@/lib/logger';
 import { resolveAvatarUrl } from '@/lib/helpers';
 import { usePageTitle } from '@/hooks';
+import { useGeolocation } from '@/hooks/useGeolocation';
 import type { User } from '@/types/api';
 
 type SortOption = 'name' | 'joined' | 'rating' | 'hours_given';
@@ -72,6 +74,9 @@ export function MembersPage() {
   const [viewMode, setViewMode] = useState<ViewMode>(
     (localStorage.getItem('members_view_mode') as ViewMode) || 'grid'
   );
+  const [nearMeEnabled, setNearMeEnabled] = useState(false);
+  const [radiusKm, setRadiusKm] = useState(25);
+  const geo = useGeolocation();
 
   // Refs
   const searchTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -148,7 +153,15 @@ export function MembersPage() {
         params.set('offset', membersCountRef.current.toString());
       }
 
-      const response = await api.get<User[]>(`/v2/users?${params}`);
+      let endpoint = '/v2/users';
+      if (nearMeEnabled && geo.latitude !== null && geo.longitude !== null) {
+        endpoint = '/v2/members/nearby';
+        params.set('lat', String(geo.latitude));
+        params.set('lng', String(geo.longitude));
+        params.set('radius_km', String(radiusKm));
+      }
+
+      const response = await api.get<User[]>(`${endpoint}?${params}`);
 
       if (response.success && response.data) {
         if (append) {
@@ -180,7 +193,7 @@ export function MembersPage() {
       setIsLoading(false);
       setIsLoadingMore(false);
     }
-  }, [debouncedQuery, sortBy, t, toast]);
+  }, [debouncedQuery, sortBy, t, toast, nearMeEnabled, geo.latitude, geo.longitude, radiusKm]);
 
   // Load more
   const loadMoreMembers = useCallback(() => {
@@ -196,7 +209,7 @@ export function MembersPage() {
     loadMembers();
     // Reset hasMore when filters change
     setHasMore(true);
-  }, [debouncedQuery, sortBy]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [debouncedQuery, sortBy, nearMeEnabled, geo.latitude, geo.longitude, radiusKm]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Fetch presence for visible members
   useEffect(() => {
@@ -214,6 +227,30 @@ export function MembersPage() {
     if (sortBy !== 'name') params.set('sort', sortBy);
     setSearchParams(params, { replace: true });
   }, [debouncedQuery, sortBy, setSearchParams]);
+
+  function handleNearMeToggle() {
+    if (nearMeEnabled) {
+      setNearMeEnabled(false);
+      return;
+    }
+    if (geo.error) {
+      toast.error(geo.error);
+      return;
+    }
+    if (geo.latitude === null) {
+      geo.requestLocation();
+    }
+    setNearMeEnabled(true);
+  }
+
+  // Auto-disable near me if geolocation fails after enabling
+  useEffect(() => {
+    if (nearMeEnabled && geo.error) {
+      toast.error(geo.error);
+      setNearMeEnabled(false);
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [geo.error, nearMeEnabled]);
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -338,6 +375,44 @@ export function MembersPage() {
               <SelectItem key="rating">{t('members.sort_rated')}</SelectItem>
               <SelectItem key="hours_given">{t('members.sort_active')}</SelectItem>
             </Select>
+
+            <Button
+              size="sm"
+              variant={nearMeEnabled ? 'solid' : 'flat'}
+              className={nearMeEnabled
+                ? 'bg-primary text-white'
+                : 'bg-theme-elevated text-theme-primary'}
+              startContent={geo.loading
+                ? <Loader2 className="w-4 h-4 animate-spin" aria-hidden="true" />
+                : <MapPin className="w-4 h-4" aria-hidden="true" />}
+              onPress={handleNearMeToggle}
+              aria-pressed={nearMeEnabled}
+              aria-label={t('members.near_me', 'Near me')}
+            >
+              {t('members.near_me', 'Near me')}
+            </Button>
+
+            {nearMeEnabled && (
+              <Select
+                aria-label={t('members.radius_label', 'Radius')}
+                selectedKeys={[String(radiusKm)]}
+                onSelectionChange={(keys) => {
+                  const val = keys instanceof Set ? ([...keys][0] as string) : '25';
+                  setRadiusKm(Number(val) || 25);
+                }}
+                className="w-32"
+                classNames={{
+                  trigger: 'bg-theme-elevated border-theme-default hover:bg-theme-hover',
+                  value: 'text-theme-primary',
+                }}
+              >
+                <SelectItem key="5">5 km</SelectItem>
+                <SelectItem key="10">10 km</SelectItem>
+                <SelectItem key="25">25 km</SelectItem>
+                <SelectItem key="50">50 km</SelectItem>
+                <SelectItem key="100">100 km</SelectItem>
+              </Select>
+            )}
 
             <div className="flex rounded-lg overflow-hidden border border-theme-default" role="group" aria-label="View mode">
               <Button
