@@ -12,6 +12,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { Tabs, Tab, Chip, Button, Tooltip, Avatar, Spinner, Textarea, Select, SelectItem, Card, CardBody } from '@heroui/react';
 import { Briefcase, Star, StarOff, Trash2, Eye, RefreshCw, ChevronDown, ChevronUp, Users, ClipboardList, CheckCircle2, Save } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { usePageTitle } from '@/hooks';
 import { useToast, useTenant } from '@/contexts';
 import { api } from '@/lib/api';
@@ -23,15 +24,17 @@ interface JobsMeta { page: number; per_page: number; total: number; total_pages:
 interface Applicant { id: number; name: string; avatar_url?: string; email?: string; }
 interface Application { id: number; vacancy_id: number; user_id: number; applicant: Applicant; status: string; message?: string; reviewer_notes?: string; created_at: string; updated_at?: string; }
 
-const STATUS_TABS = [{ key: 'all', label: 'All' }, { key: 'open', label: 'Open' }, { key: 'closed', label: 'Closed' }, { key: 'expired', label: 'Expired' }] as const;
+const STATUS_TAB_KEYS = ['all', 'open', 'closed', 'expired'] as const;
 const statusColorMap: Record<string, 'success' | 'default' | 'warning'> = { open: 'success', closed: 'default', expired: 'warning' };
+const STATUS_TABS = STATUS_TAB_KEYS.map((key) => ({ key, label: key.charAt(0).toUpperCase() + key.slice(1) }));
 const typeLabel: Record<string, string> = { paid: 'Paid', volunteer: 'Volunteer', timebank: 'Timebank' };
 const appStatusColor: Record<string, 'default' | 'primary' | 'warning' | 'secondary' | 'success' | 'danger'> = { applied: 'default', screening: 'primary', reviewed: 'primary', pending: 'default', interview: 'warning', offer: 'secondary', accepted: 'success', rejected: 'danger', withdrawn: 'default' };
-const APPLICATION_STAGES = [{ key: 'applied', label: 'Applied' }, { key: 'screening', label: 'Screening' }, { key: 'interview', label: 'Interview' }, { key: 'offer', label: 'Offer' }, { key: 'accepted', label: 'Accepted' }, { key: 'rejected', label: 'Rejected' }, { key: 'withdrawn', label: 'Withdrawn' }] as const;
+const APPLICATION_STAGE_KEYS = ['applied', 'screening', 'interview', 'offer', 'accepted', 'rejected', 'withdrawn'] as const;
 
 interface ApplicationCardProps { application: Application; onStatusUpdate: (appId: number, status: string, notes: string) => Promise<void>; }
 
 function ApplicationCard({ application, onStatusUpdate }: ApplicationCardProps) {
+  const { t } = useTranslation('admin');
   const [expanded, setExpanded] = useState(false);
   const [notesOpen, setNotesOpen] = useState(false);
   const [selectedStatus, setSelectedStatus] = useState(application.status);
@@ -49,31 +52,32 @@ function ApplicationCard({ application, onStatusUpdate }: ApplicationCardProps) 
             <Chip size='sm' variant='flat' color={appStatusColor[application.status] ?? 'default'} className='capitalize shrink-0'>{application.status}</Chip>
           </div>
           {application.applicant.email && <p className='text-xs text-default-500 truncate mt-0.5'>{application.applicant.email}</p>}
-          <p className='text-xs text-default-400 mt-0.5'>Applied{' '}{new Date(application.created_at).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' })}</p>
+          <p className='text-xs text-default-400 mt-0.5'>{t('jobs.applied_date')}{' '}{new Date(application.created_at).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' })}</p>
         </div>
       </div>
       {application.message && (<div><Button variant="light" size="sm" className='flex items-center gap-1 text-xs text-default-500 hover:text-default-700 h-auto p-0' onPress={() => setExpanded((v) => !v)} aria-expanded={expanded}>
-        {expanded ? <ChevronUp size={12} /> : <ChevronDown size={12} />} Cover message</Button>
+        {expanded ? <ChevronUp size={12} /> : <ChevronDown size={12} />} {t('jobs.cover_message')}</Button>
         {expanded && <p className='mt-2 text-sm text-default-700 bg-default-50 rounded-lg p-3 whitespace-pre-wrap leading-relaxed'>{application.message}</p>}
       </div>)}
       <div className='flex items-end gap-2 flex-wrap'>
         <div className='flex-1 min-w-[160px]'>
-          <Select size='sm' label='Status' selectedKeys={new Set([selectedStatus])} onSelectionChange={(keys) => { const val = Array.from(keys)[0] as string; if (val) setSelectedStatus(val); }} aria-label='Update application status' classNames={{ trigger: 'min-h-unit-10 h-10' }}>
-            {APPLICATION_STAGES.map((stage) => <SelectItem key={stage.key}>{stage.label}</SelectItem>)}
+          <Select size='sm' label={t('jobs.status_label')} selectedKeys={new Set([selectedStatus])} onSelectionChange={(keys) => { const val = Array.from(keys)[0] as string; if (val) setSelectedStatus(val); }} aria-label={t('jobs.update_status_aria')} classNames={{ trigger: 'min-h-unit-10 h-10' }}>
+            {APPLICATION_STAGE_KEYS.map((stage) => <SelectItem key={stage}>{t(`jobs.stage_${stage}`)}</SelectItem>)}
           </Select>
         </div>
-        <Tooltip content={notesOpen ? 'Hide notes' : 'Add / edit notes'}>
-          <Button isIconOnly size='sm' variant='flat' onPress={() => setNotesOpen((v) => !v)} aria-label='Toggle notes'><ClipboardList size={14} /></Button>
+        <Tooltip content={notesOpen ? t('jobs.hide_notes') : t('jobs.add_edit_notes')}>
+          <Button isIconOnly size='sm' variant='flat' onPress={() => setNotesOpen((v) => !v)} aria-label={t('jobs.toggle_notes')}><ClipboardList size={14} /></Button>
         </Tooltip>
-        <Button size='sm' color={isDirty ? 'primary' : 'default'} variant={isDirty ? 'solid' : 'flat'} isDisabled={!isDirty || saving} isLoading={saving} startContent={!saving && <Save size={13} />} onPress={handleSave}>Update</Button>
+        <Button size='sm' color={isDirty ? 'primary' : 'default'} variant={isDirty ? 'solid' : 'flat'} isDisabled={!isDirty || saving} isLoading={saving} startContent={!saving && <Save size={13} />} onPress={handleSave}>{t('jobs.update_btn')}</Button>
       </div>
-      {notesOpen && <Textarea size='sm' label='Internal notes' placeholder='Notes visible only to admins…' value={notes} onValueChange={setNotes} minRows={2} maxRows={6} classNames={{ inputWrapper: 'bg-default-50' }} />}
+      {notesOpen && <Textarea size='sm' label={t('jobs.internal_notes')} placeholder={t('jobs.notes_placeholder')} value={notes} onValueChange={setNotes} minRows={2} maxRows={6} classNames={{ inputWrapper: 'bg-default-50' }} />}
     </CardBody></Card>
   );
 }
 
 export function JobsAdmin() {
   usePageTitle('Admin - Jobs');
+  const { t } = useTranslation('admin');
   const toast = useToast();
   const { tenantPath } = useTenant();
   const [panelTab, setPanelTab] = useState<'listings' | 'applications'>('listings');
@@ -102,7 +106,7 @@ export function JobsAdmin() {
         const paginationMeta = res.meta as unknown as JobsMeta | undefined;
         setMeta(paginationMeta ?? { page: 1, per_page: 50, total: 0, total_pages: 1 });
       }
-    } catch { toast.error('Failed to load jobs'); }
+    } catch { toast.error(t('jobs.failed_load_jobs')); }
     finally { setLoading(false); }
   }, [page, status, search, toast]);
 
@@ -113,8 +117,8 @@ export function JobsAdmin() {
     try {
       const res = await api.get<Application[]>(`/v2/admin/jobs/${job.id}/applications`);
       if (res.success) { setApplications(Array.isArray(res.data) ? res.data : []); }
-      else { setAppsError((res as { error?: string }).error ?? 'Failed to load applications'); }
-    } catch { setAppsError('Failed to load applications'); }
+      else { setAppsError((res as { error?: string }).error ?? t('jobs.failed_load_applications')); }
+    } catch { setAppsError(t('jobs.failed_load_applications')); }
     finally { setAppsLoading(false); }
   }, []);
 
@@ -124,22 +128,22 @@ export function JobsAdmin() {
     try {
       const res = await api.put(`/v2/admin/jobs/applications/${appId}`, { status: newStatus, notes });
       if (res && res.success) {
-        toast.success('Application updated');
+        toast.success(t('jobs.application_updated'));
         setApplications((prev) => prev.map((appl) => appl.id === appId ? { ...appl, status: newStatus, reviewer_notes: notes } : appl));
         loadJobs();
-      } else { toast.error((res as { error?: string }).error ?? 'Failed to update application'); }
-    } catch { toast.error('An unexpected error occurred'); }
-  }, [toast, loadJobs]);
+      } else { toast.error((res as { error?: string }).error ?? t('jobs.failed_update_application')); }
+    } catch { toast.error(t('common.unexpected_error')); }
+  }, [toast, loadJobs, t]);
 
   const handleFeatureToggle = async (job: Job) => {
     try {
       const endpoint = job.is_featured ? `/v2/admin/jobs/${job.id}/unfeature` : `/v2/admin/jobs/${job.id}/feature`;
       const res = await api.post(endpoint);
       if (res && res.success) {
-        toast.success(job.is_featured ? `"${job.title}" removed from featured` : `"${job.title}" is now featured`);
+        toast.success(job.is_featured ? t('jobs.removed_featured', { title: job.title }) : t('jobs.now_featured', { title: job.title }));
         loadJobs();
-      } else { toast.error((res && (res as { error?: string }).error) || 'Failed to update featured status'); }
-    } catch { toast.error('An unexpected error occurred'); }
+      } else { toast.error((res && (res as { error?: string }).error) || t('jobs.failed_update_featured')); }
+    } catch { toast.error(t('common.unexpected_error')); }
   };
 
   const handleDelete = async () => {
@@ -147,9 +151,9 @@ export function JobsAdmin() {
     setActionLoading(true);
     try {
       const res = await api.delete(`/v2/admin/jobs/${confirmDelete.id}`);
-      if (res && res.success) { toast.success('Job deleted successfully'); loadJobs(); }
-      else { toast.error((res && (res as { error?: string }).error) || 'Failed to delete job'); }
-    } catch { toast.error('An unexpected error occurred'); }
+      if (res && res.success) { toast.success(t('jobs.job_deleted')); loadJobs(); }
+      else { toast.error((res && (res as { error?: string }).error) || t('jobs.failed_delete_job')); }
+    } catch { toast.error(t('common.unexpected_error')); }
     finally { setActionLoading(false); setConfirmDelete(null); }
   };
 
