@@ -129,7 +129,7 @@ log_errors = On\n\
 error_log = /var/log/php_errors.log\n\
 \n\
 ; Performance\n\
-memory_limit = 256M\n\
+memory_limit = 16G\n\
 max_execution_time = 60\n\
 max_input_time = 60\n\
 max_input_vars = 3000\n\
