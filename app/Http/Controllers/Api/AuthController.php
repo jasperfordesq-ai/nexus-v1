@@ -631,6 +631,15 @@ class AuthController extends BaseApiController
             }
         }
 
+        // Also trigger presence heartbeat so auth heartbeat doubles as presence ping
+        if ($userId) {
+            try {
+                \App\Services\PresenceService::heartbeat((int) $userId);
+            } catch (\Throwable) {
+                // Non-critical — presence is best-effort
+            }
+        }
+
         $response = [
             'success' => true,
             'authenticated' => true,

@@ -15,3 +15,5 @@ export type { NewMessageEvent, TypingEvent, UnreadCountEvent, FeedPostEvent } fr
 export { CookieConsentProvider, useCookieConsent, readStoredConsent } from './CookieConsentContext';
 export type { CookieConsent } from './CookieConsentContext';
 export { MenuProvider, useMenuContext } from './MenuContext';
+export { PresenceProvider, usePresence, usePresenceOptional } from './PresenceContext';
+export type { PresenceStatus, PresenceState } from './PresenceContext';

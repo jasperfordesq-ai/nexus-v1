@@ -4,81 +4,261 @@
 // See NOTICE file for attribution and acknowledgements.
 
 /**
- * StoriesBar — Horizontal scrollable friend avatars at top of feed.
+ * StoriesBar — Horizontal scrollable story circles at top of feed.
+ *
+ * Shows users with active 24-hour stories. First item is "Your Story" (create).
+ * Unseen stories have a gradient ring; seen stories have a gray ring.
+ * Clicking opens the StoryViewer overlay.
  */
 
-import { Link } from 'react-router-dom';
-import { Avatar } from '@heroui/react';
-import { useTenant } from '@/contexts';
+import { useState, useEffect, useRef, useCallback } from 'react';
+import { Avatar, Skeleton } from '@heroui/react';
+import { Plus, ChevronLeft, ChevronRight } from 'lucide-react';
+import { useAuth } from '@/contexts';
+import { api } from '@/lib/api';
+import { logError } from '@/lib/logger';
 import { resolveAvatarUrl } from '@/lib/helpers';
+import { StoryViewer } from '@/components/stories/StoryViewer';
+import { StoryCreator } from '@/components/stories/StoryCreator';
 
-export interface StoryFriend {
-  id: number;
-  user_id?: number;
+export interface StoryUser {
+  user_id: number;
   name: string;
-  first_name?: string;
+  first_name: string;
   avatar_url?: string | null;
-  is_online?: boolean;
-  story_count?: number;
-  has_unseen?: boolean;
-  is_own?: boolean;
-  is_connected?: boolean;
-  latest_at?: string;
+  story_count: number;
+  has_unseen: boolean;
+  is_own: boolean;
+  is_connected: boolean;
+  latest_at: string;
 }
-
-/** @deprecated Use StoryFriend instead */
-export type StoryUser = StoryFriend;
 
 interface StoriesBarProps {
-  friends?: StoryFriend[];
+  /** Legacy friends prop — ignored when API stories are loaded */
+  friends?: Array<{ id: number; name: string; avatar_url?: string; is_online?: boolean }>;
 }
 
-export function StoriesBar({ friends = [] }: StoriesBarProps) {
-  const { tenantPath } = useTenant();
+export function StoriesBar({ friends: _friends }: StoriesBarProps) {
+  const { user, isAuthenticated } = useAuth();
+  const [storyUsers, setStoryUsers] = useState<StoryUser[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [viewerOpen, setViewerOpen] = useState(false);
+  const [viewerStartIndex, setViewerStartIndex] = useState(0);
+  const [creatorOpen, setCreatorOpen] = useState(false);
+  const [showLeftArrow, setShowLeftArrow] = useState(false);
+  const [showRightArrow, setShowRightArrow] = useState(false);
+  const scrollRef = useRef<HTMLDivElement>(null);
 
-  if (!friends || friends.length === 0) return null;
+  const loadStories = useCallback(async () => {
+    if (!isAuthenticated) return;
+    try {
+      setIsLoading(true);
+      const response = await api.get<StoryUser[]>('/v2/stories');
+      if (response.success && response.data) {
+        setStoryUsers(Array.isArray(response.data) ? response.data : []);
+      }
+    } catch (err) {
+      logError('Failed to load stories', err);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [isAuthenticated]);
+
+  useEffect(() => {
+    loadStories();
+  }, [loadStories]);
+
+  // Scroll arrow visibility
+  const updateArrows = useCallback(() => {
+    const el = scrollRef.current;
+    if (!el) return;
+    setShowLeftArrow(el.scrollLeft > 10);
+    setShowRightArrow(el.scrollLeft + el.clientWidth < el.scrollWidth - 10);
+  }, []);
+
+  useEffect(() => {
+    const el = scrollRef.current;
+    if (!el) return;
+    updateArrows();
+    el.addEventListener('scroll', updateArrows, { passive: true });
+    window.addEventListener('resize', updateArrows);
+    return () => {
+      el.removeEventListener('scroll', updateArrows);
+      window.removeEventListener('resize', updateArrows);
+    };
+  }, [updateArrows, storyUsers]);
+
+  const scroll = (direction: 'left' | 'right') => {
+    const el = scrollRef.current;
+    if (!el) return;
+    const amount = direction === 'left' ? -200 : 200;
+    el.scrollBy({ left: amount, behavior: 'smooth' });
+  };
+
+  const handleStoryClick = (index: number) => {
+    setViewerStartIndex(index);
+    setViewerOpen(true);
+  };
+
+  const handleCreateClick = () => {
+    setCreatorOpen(true);
+  };
+
+  const handleStoryCreated = () => {
+    setCreatorOpen(false);
+    loadStories();
+  };
+
+  const handleViewerClose = () => {
+    setViewerOpen(false);
+    // Refresh to update seen/unseen state
+    loadStories();
+  };
 
   const truncateName = (name: string, max = 8): string =>
     name.length > max ? `${name.slice(0, max)}...` : name;
 
-  return (
-    <div className="w-full overflow-x-auto scrollbar-hide">
-      <div className="flex items-start gap-3 px-1 py-2 min-w-min">
-        {/* Friend avatars */}
-        {friends.map((friend) => (
-          <Link
-            key={friend.id}
-            to={tenantPath(`/profile/${friend.id}`)}
-            className="flex flex-col items-center gap-1.5 flex-shrink-0 w-16 no-underline"
-          >
-            <div className="relative">
-              {/* Gradient ring */}
-              <div className="w-14 h-14 rounded-full p-[2px] bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500">
-                <div className="w-full h-full rounded-full bg-[var(--surface-elevated)] p-[2px]">
-                  <Avatar
-                    src={resolveAvatarUrl(friend.avatar_url ?? null)}
-                    name={friend.name}
-                    className="w-full h-full"
-                    size="md"
-                  />
-                </div>
-              </div>
+  if (!isAuthenticated) return null;
 
-              {/* Online indicator */}
-              {friend.is_online && (
-                <span className="absolute bottom-0 right-0 w-3.5 h-3.5 bg-green-500 border-2 border-[var(--surface-elevated)] rounded-full" />
-              )}
+  // Show skeleton while loading
+  if (isLoading) {
+    return (
+      <div className="w-full overflow-hidden">
+        <div className="flex items-start gap-3 px-1 py-2">
+          {Array.from({ length: 6 }).map((_, i) => (
+            <div key={i} className="flex flex-col items-center gap-1.5 flex-shrink-0 w-16">
+              <Skeleton className="w-14 h-14 rounded-full" />
+              <Skeleton className="h-3 w-10 rounded" />
             </div>
-            <span
-              className="text-xs truncate w-full text-center"
-              style={{ color: 'var(--text-primary)' }}
-            >
-              {truncateName((friend.name || '').split(' ')[0])}
-            </span>
-          </Link>
-        ))}
+          ))}
+        </div>
       </div>
-    </div>
+    );
+  }
+
+  // Determine if current user has their own story in the list
+  const hasOwnStory = storyUsers.some((su) => su.is_own);
+
+  return (
+    <>
+      <div className="relative w-full group">
+        {/* Left scroll arrow */}
+        {showLeftArrow && (
+          <button
+            onClick={() => scroll('left')}
+            className="absolute left-0 top-1/2 -translate-y-1/2 z-10 w-8 h-8 rounded-full bg-[var(--surface-elevated)] shadow-md flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity border border-[var(--border-default)]"
+            aria-label="Scroll stories left"
+          >
+            <ChevronLeft className="w-4 h-4 text-[var(--text-primary)]" />
+          </button>
+        )}
+
+        {/* Right scroll arrow */}
+        {showRightArrow && (
+          <button
+            onClick={() => scroll('right')}
+            className="absolute right-0 top-1/2 -translate-y-1/2 z-10 w-8 h-8 rounded-full bg-[var(--surface-elevated)] shadow-md flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity border border-[var(--border-default)]"
+            aria-label="Scroll stories right"
+          >
+            <ChevronRight className="w-4 h-4 text-[var(--text-primary)]" />
+          </button>
+        )}
+
+        <div
+          ref={scrollRef}
+          className="w-full overflow-x-auto scrollbar-hide"
+        >
+          <div className="flex items-start gap-3 px-1 py-2 min-w-min">
+            {/* Your Story — create button */}
+            <button
+              onClick={handleCreateClick}
+              className="flex flex-col items-center gap-1.5 flex-shrink-0 w-16 group/create"
+              aria-label="Create your story"
+            >
+              <div className="relative">
+                <div className={`w-14 h-14 rounded-full p-[2px] ${
+                  hasOwnStory
+                    ? 'bg-gradient-to-tr from-yellow-400 via-red-500 to-purple-600'
+                    : 'bg-[var(--border-default)]'
+                }`}>
+                  <div className="w-full h-full rounded-full bg-[var(--surface-elevated)] p-[2px]">
+                    <Avatar
+                      src={resolveAvatarUrl(user?.avatar ?? null)}
+                      name={user?.first_name || 'You'}
+                      className="w-full h-full"
+                      size="md"
+                    />
+                  </div>
+                </div>
+                {/* Plus badge */}
+                <span className="absolute -bottom-0.5 -right-0.5 w-5 h-5 rounded-full bg-blue-500 border-2 border-[var(--surface-elevated)] flex items-center justify-center">
+                  <Plus className="w-3 h-3 text-white" />
+                </span>
+              </div>
+              <span className="text-xs truncate w-full text-center text-[var(--text-primary)]">
+                Your Story
+              </span>
+            </button>
+
+            {/* Other users' stories */}
+            {storyUsers.filter((su) => !su.is_own).map((storyUser) => {
+              // idx+1 to account for "your story" being index 0 in the viewer
+              // but actually we want the index into storyUsers array
+              const actualIndex = storyUsers.findIndex(
+                (su) => su.user_id === storyUser.user_id
+              );
+
+              return (
+                <button
+                  key={storyUser.user_id}
+                  onClick={() => handleStoryClick(actualIndex)}
+                  className="flex flex-col items-center gap-1.5 flex-shrink-0 w-16"
+                  aria-label={`View story from ${storyUser.name}`}
+                >
+                  <div className="relative">
+                    {/* Ring: gradient for unseen, gray for seen */}
+                    <div className={`w-14 h-14 rounded-full p-[2px] ${
+                      storyUser.has_unseen
+                        ? 'bg-gradient-to-tr from-yellow-400 via-red-500 to-purple-600'
+                        : 'bg-gray-300 dark:bg-gray-600'
+                    }`}>
+                      <div className="w-full h-full rounded-full bg-[var(--surface-elevated)] p-[2px]">
+                        <Avatar
+                          src={resolveAvatarUrl(storyUser.avatar_url ?? null)}
+                          name={storyUser.name}
+                          className="w-full h-full"
+                          size="md"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                  <span className="text-xs truncate w-full text-center text-[var(--text-primary)]">
+                    {truncateName((storyUser.first_name || storyUser.name || '').split(' ')[0])}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      </div>
+
+      {/* Story Viewer Overlay */}
+      {viewerOpen && storyUsers.length > 0 && (
+        <StoryViewer
+          storyUsers={storyUsers}
+          initialUserIndex={viewerStartIndex}
+          onClose={handleViewerClose}
+        />
+      )}
+
+      {/* Story Creator Overlay */}
+      {creatorOpen && (
+        <StoryCreator
+          onClose={() => setCreatorOpen(false)}
+          onCreated={handleStoryCreated}
+        />
+      )}
+    </>
   );
 }
 

@@ -117,7 +117,6 @@ export function StoryHighlights({ userId, userName, userAvatar }: StoryHighlight
       if (response.success && response.data && Array.isArray(response.data) && response.data.length > 0) {
         // Create a synthetic StoryUser for the viewer
         const syntheticUser: StoryUser = {
-          id: userId,
           user_id: userId,
           name: userName,
           first_name: userName.split(' ')[0] || userName,

@@ -55,6 +55,15 @@ Route::get('/v2/jobs/feed.xml', [\App\Http\Controllers\Api\JobFeedController::cl
 Route::get('/v2/jobs/feed.json', [\App\Http\Controllers\Api\JobFeedController::class, 'jsonFeed']);
 
 // ============================================
+// PUBLIC ROUTES — Explore / Discover
+// Supports both authenticated (personalized) and anonymous (global) access
+// ============================================
+Route::get('/v2/explore', [\App\Http\Controllers\Api\ExploreController::class, 'index']);
+Route::get('/v2/explore/trending', [\App\Http\Controllers\Api\ExploreController::class, 'trending']);
+Route::get('/v2/explore/popular-listings', [\App\Http\Controllers\Api\ExploreController::class, 'popularListings']);
+Route::get('/v2/explore/category/{slug}', [\App\Http\Controllers\Api\ExploreController::class, 'category']);
+
+// ============================================
 // Authenticated routes — Sanctum token authentication required
 // Controllers also enforce auth via $this->requireAuth() as a fallback
 // ============================================
@@ -74,6 +83,15 @@ Route::post('/v2/exchanges/{id}/start', [\App\Http\Controllers\Api\ExchangesCont
 Route::post('/v2/exchanges/{id}/complete', [\App\Http\Controllers\Api\ExchangesController::class, 'complete']);
 Route::post('/v2/exchanges/{id}/confirm', [\App\Http\Controllers\Api\ExchangesController::class, 'confirm']);
 Route::delete('/v2/exchanges/{id}', [\App\Http\Controllers\Api\ExchangesController::class, 'cancel']);
+
+// ============================================
+// Presence — Real-time online/offline status
+// ============================================
+Route::post('/v2/presence/heartbeat', [\App\Http\Controllers\Api\PresenceController::class, 'heartbeat']);
+Route::get('/v2/presence/users', [\App\Http\Controllers\Api\PresenceController::class, 'users']);
+Route::put('/v2/presence/status', [\App\Http\Controllers\Api\PresenceController::class, 'setStatus']);
+Route::put('/v2/presence/privacy', [\App\Http\Controllers\Api\PresenceController::class, 'setPrivacy']);
+Route::get('/v2/presence/online-count', [\App\Http\Controllers\Api\PresenceController::class, 'onlineCount']);
 
 // ============================================
 // MIGRATED ROUTES — Events
@@ -329,6 +347,20 @@ Route::get('/v2/feed/posts/{id}/sharers', [\App\Http\Controllers\Api\FeedSocialC
 Route::get('/v2/feed/hashtags/trending', [\App\Http\Controllers\Api\FeedSocialController::class, 'getTrendingHashtags']);
 Route::get('/v2/feed/hashtags/search', [\App\Http\Controllers\Api\FeedSocialController::class, 'searchHashtags']);
 Route::get('/v2/feed/hashtags/{tag}', [\App\Http\Controllers\Api\FeedSocialController::class, 'getHashtagPosts']);
+// Reactions (emoji reactions on posts and comments)
+Route::post('/v2/posts/{id}/reactions', [\App\Http\Controllers\Api\ReactionController::class, 'togglePostReaction']);
+Route::get('/v2/posts/{id}/reactions', [\App\Http\Controllers\Api\ReactionController::class, 'getPostReactions']);
+Route::get('/v2/posts/{id}/reactions/{type}/users', [\App\Http\Controllers\Api\ReactionController::class, 'getPostReactors']);
+Route::post('/v2/comments/{id}/reactions', [\App\Http\Controllers\Api\ReactionController::class, 'toggleCommentReaction']);
+Route::get('/v2/comments/{id}/reactions', [\App\Http\Controllers\Api\ReactionController::class, 'getCommentReactions']);
+// Link Previews
+Route::get('/v2/link-preview', [\App\Http\Controllers\Api\LinkPreviewController::class, 'show']);
+Route::post('/v2/link-preview', [\App\Http\Controllers\Api\LinkPreviewController::class, 'fetch']);
+// Post Media (carousel / multi-image)
+Route::post('/v2/posts/{id}/media', [\App\Http\Controllers\Api\PostMediaController::class, 'uploadMedia']);
+Route::put('/v2/posts/{id}/media/reorder', [\App\Http\Controllers\Api\PostMediaController::class, 'reorderMedia']);
+Route::delete('/v2/posts/media/{mediaId}', [\App\Http\Controllers\Api\PostMediaController::class, 'removeMedia']);
+Route::put('/v2/posts/media/{mediaId}/alt', [\App\Http\Controllers\Api\PostMediaController::class, 'updateAltText']);
 // Notifications
 Route::get('/v2/notifications', [\App\Http\Controllers\Api\NotificationsController::class, 'index']);
 Route::get('/v2/notifications/counts', [\App\Http\Controllers\Api\NotificationsController::class, 'counts']);
@@ -548,6 +580,8 @@ Route::post('/v2/comments', [\App\Http\Controllers\Api\CommentsController::class
 Route::put('/v2/comments/{id}', [\App\Http\Controllers\Api\CommentsController::class, 'update']);
 Route::delete('/v2/comments/{id}', [\App\Http\Controllers\Api\CommentsController::class, 'destroy']);
 Route::post('/v2/comments/{id}/reactions', [\App\Http\Controllers\Api\CommentsController::class, 'reactions']);
+Route::get('/v2/mentions/search', [\App\Http\Controllers\Api\MentionController::class, 'search']);
+Route::get('/v2/mentions/me', [\App\Http\Controllers\Api\MentionController::class, 'myMentions']);
 Route::get('/v2/blog', [\App\Http\Controllers\Api\BlogPublicController::class, 'index']);
 Route::get('/v2/blog/categories', [\App\Http\Controllers\Api\BlogPublicController::class, 'categories']);
 Route::get('/v2/blog/{slug}', [\App\Http\Controllers\Api\BlogPublicController::class, 'show']);
@@ -571,6 +605,23 @@ Route::get('/v2/kb/{id}', [\App\Http\Controllers\Api\KnowledgeBaseController::cl
 Route::put('/v2/kb/{id}', [\App\Http\Controllers\Api\KnowledgeBaseController::class, 'update']);
 Route::delete('/v2/kb/{id}', [\App\Http\Controllers\Api\KnowledgeBaseController::class, 'destroy']);
 Route::post('/v2/kb/{id}/feedback', [\App\Http\Controllers\Api\KnowledgeBaseController::class, 'feedback']);
+
+// ============================================
+// STORIES — 24-hour disappearing content
+// ============================================
+Route::get('/v2/stories', [\App\Http\Controllers\Api\StoryController::class, 'index']);
+Route::get('/v2/stories/user/{userId}', [\App\Http\Controllers\Api\StoryController::class, 'userStories']);
+Route::post('/v2/stories', [\App\Http\Controllers\Api\StoryController::class, 'store']);
+Route::post('/v2/stories/{id}/view', [\App\Http\Controllers\Api\StoryController::class, 'view']);
+Route::get('/v2/stories/{id}/viewers', [\App\Http\Controllers\Api\StoryController::class, 'viewers']);
+Route::post('/v2/stories/{id}/react', [\App\Http\Controllers\Api\StoryController::class, 'react']);
+Route::delete('/v2/stories/{id}', [\App\Http\Controllers\Api\StoryController::class, 'destroy']);
+Route::post('/v2/stories/{id}/poll/vote', [\App\Http\Controllers\Api\StoryController::class, 'pollVote']);
+Route::get('/v2/stories/highlights/{userId}', [\App\Http\Controllers\Api\StoryController::class, 'highlights']);
+Route::get('/v2/stories/highlights/{id}/stories', [\App\Http\Controllers\Api\StoryController::class, 'highlightStories']);
+Route::post('/v2/stories/highlights', [\App\Http\Controllers\Api\StoryController::class, 'createHighlight']);
+Route::post('/v2/stories/highlights/{id}/items', [\App\Http\Controllers\Api\StoryController::class, 'addHighlightItem']);
+Route::delete('/v2/stories/highlights/{id}', [\App\Http\Controllers\Api\StoryController::class, 'deleteHighlight']);
 
 // ============================================
 

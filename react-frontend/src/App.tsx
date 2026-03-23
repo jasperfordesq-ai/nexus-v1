@@ -183,6 +183,7 @@ const SkillsBrowsePage = lazyWithRetry(() => import('@/pages/skills/SkillsBrowse
 const ActivityDashboardPage = lazyWithRetry(() => import('@/pages/activity/ActivityDashboardPage'));
 const HashtagPage = lazyWithRetry(() => import('@/pages/feed/HashtagPage'));
 const HashtagsDiscoveryPage = lazyWithRetry(() => import('@/pages/feed/HashtagsDiscoveryPage'));
+const ExplorePage = lazyWithRetry(() => import('@/pages/explore/ExplorePage'));
 
 // Static Pages
 const DevelopmentStatusPage = lazyWithRetry(() => import('@/pages/public/DevelopmentStatusPage'));
@@ -272,6 +273,9 @@ function AppRoutes() {
 
         {/* Newsletter unsubscribe — public, no auth, token-based */}
         <Route path="newsletter/unsubscribe" element={<ErrorBoundary><NewsletterUnsubscribePage /></ErrorBoundary>} />
+
+        {/* Explore / Discover — curated discovery page */}
+        <Route path="explore" element={<ErrorBoundary><ExplorePage /></ErrorBoundary>} />
 
         {/* Matches — cross-module matches page (MA1) */}
         <Route path="matches" element={<ErrorBoundary><MatchesPage /></ErrorBoundary>} />

@@ -60,6 +60,8 @@ import { useFeedTracking } from '@/hooks/useFeedTracking';
 import type { FeedItem, FeedComment, PollData } from './types';
 import { getAuthor, getItemDetailPath, getItemDetailLabel } from './types';
 import { FeedContentRenderer } from './FeedContentRenderer';
+import { ImageCarousel } from './ImageCarousel';
+import { MediaGrid } from './MediaGrid';
 import { ReactionPicker, ReactionSummary, type ReactionType } from '@/components/social';
 import { LinkPreviewCard } from '@/components/social/LinkPreviewCard';import { MentionRenderer } from '@/components/social/MentionRenderer';
 
@@ -554,8 +556,22 @@ const FeedCard = React.memo(function FeedCard({
           </div>
         )}
 
-        {/* Image */}
-        {item.image_url ? (
+        {/* Media: Multi-image carousel/grid, single image, or placeholder */}
+        {item.media && item.media.length > 1 ? (
+          /* Multi-image: use grid for 2-4, carousel for 5+ */
+          <div className="mb-4 -mx-5 overflow-hidden">
+            {item.media.length <= 4 ? (
+              <MediaGrid media={item.media} className="mx-5" />
+            ) : (
+              <MediaGrid media={item.media} className="mx-5" />
+            )}
+          </div>
+        ) : item.media && item.media.length === 1 ? (
+          /* Single media item from post_media */
+          <div className="mb-4 -mx-5 overflow-hidden">
+            <ImageCarousel media={item.media} className="mx-5" />
+          </div>
+        ) : item.image_url ? (
           <div className="mb-4 -mx-5 overflow-hidden">
             {detailPath ? (
               <Link to={tenantPath(detailPath)}>

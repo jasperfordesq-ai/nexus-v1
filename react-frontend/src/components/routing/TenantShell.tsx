@@ -29,6 +29,7 @@
 import { Outlet, useLocation, Routes } from 'react-router-dom';
 import { TenantProvider, useTenant, useAuth } from '@/contexts';
 import { AuthProvider, NotificationsProvider, PusherProvider, MenuProvider } from '@/contexts';
+import { PresenceProvider } from '@/contexts/PresenceContext';
 import { RESERVED_PATHS } from '@/lib/tenant-routing';
 import { CookieConsentBanner } from '@/components/feedback';
 import { lazy, Suspense } from 'react';
@@ -64,12 +65,14 @@ export function TenantShell({ appRoutes }: TenantShellProps) {
       <AuthProvider>
         <NotificationsProvider>
           <PusherProvider>
-            <MenuProvider>
-              <TenantGuard slugPrefix={effectiveSlug} appRoutes={appRoutes}>
-                <Outlet />
-              </TenantGuard>
-              <CookieConsentBanner />
-            </MenuProvider>
+            <PresenceProvider>
+              <MenuProvider>
+                <TenantGuard slugPrefix={effectiveSlug} appRoutes={appRoutes}>
+                  <Outlet />
+                </TenantGuard>
+                <CookieConsentBanner />
+              </MenuProvider>
+            </PresenceProvider>
           </PusherProvider>
         </NotificationsProvider>
       </AuthProvider>

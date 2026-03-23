@@ -18,8 +18,10 @@ import { motion } from 'framer-motion';
 import { Input, Avatar, Badge, Button, Modal, ModalContent, ModalHeader, ModalBody, Tabs, Tab, Skeleton } from '@heroui/react';
 import { Search, MessageSquare, Circle, Plus, Loader2, Archive, RotateCcw, AlertTriangle, ArrowRightLeft, RefreshCw } from 'lucide-react';
 import { GlassCard } from '@/components/ui';
+import { PresenceIndicator } from '@/components/social';
 import { EmptyState } from '@/components/feedback';
 import { useAuth, usePusherOptional, useToast, useTenant } from '@/contexts';
+import { usePresenceOptional } from '@/contexts/PresenceContext';
 import { usePageTitle } from '@/hooks';
 import type { NewMessageEvent } from '@/contexts';
 import { api } from '@/lib/api';
@@ -191,10 +193,24 @@ export function MessagesPage() {
     };
   }, [pusher, handleNewMessage, loadConversations]);
 
+  // Presence context for online indicators
+  const presence = usePresenceOptional();
+
   // Load conversations on mount and when query params change
   useEffect(() => {
     loadConversations();
   }, [loadConversations]);
+
+  // Fetch presence for conversation participants
+  useEffect(() => {
+    if (conversations.length > 0 && presence) {
+      const userIds = conversations.map((c) => getOtherUser(c).id).filter((id) => id > 0);
+      if (userIds.length > 0) {
+        presence.fetchPresence(userIds);
+      }
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [conversations]);
 
   // Fetch messaging restriction status (broker monitoring)
   useEffect(() => {
@@ -682,12 +698,15 @@ function ConversationCard({ conversation }: ConversationCardProps) {
             isInvisible={unread_count === 0}
             placement="top-right"
           >
-            <Avatar
-              src={resolveAvatarUrl(other_user.avatar)}
-              name={other_user.name}
-              size="lg"
-              className="ring-2 ring-theme-default"
-            />
+            <div className="relative">
+              <Avatar
+                src={resolveAvatarUrl(other_user.avatar)}
+                name={other_user.name}
+                size="lg"
+                className="ring-2 ring-theme-default"
+              />
+              <PresenceIndicator userId={other_user.id} size="md" />
+            </div>
           </Badge>
 
           <div className="flex-1 min-w-0">

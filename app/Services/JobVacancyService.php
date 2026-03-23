@@ -340,9 +340,11 @@ class JobVacancyService
         }
 
         // EU Pay Transparency Directive (June 2026) compliance — salary range required unless negotiable
-        // Only validate when salary fields are being touched and type is paid
+        // Only validate when salary fields or type are being touched in this update
+        $salaryFieldsTouched = array_key_exists('salary_min', $updates) || array_key_exists('salary_max', $updates)
+            || array_key_exists('salary_negotiable', $updates) || array_key_exists('type', $updates);
         $typeAfterUpdate = $updates['type'] ?? $vacancy->type ?? null;
-        if ($typeAfterUpdate === 'paid') {
+        if ($salaryFieldsTouched && $typeAfterUpdate === 'paid') {
             $salaryNegotiable = array_key_exists('salary_negotiable', $updates)
                 ? !empty($updates['salary_negotiable'])
                 : !empty($vacancy->salary_negotiable);

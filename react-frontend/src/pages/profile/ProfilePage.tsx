@@ -52,6 +52,7 @@ import { ProfileFeed } from '@/components/profile/ProfileFeed';
 import { VerificationBadgeRow, VerificationBadgeSummary } from '@/components/verification/VerificationBadge';
 import { EndorseButton } from '@/components/endorsements/EndorseButton';
 import { AvailabilityGrid } from '@/components/availability/AvailabilityGrid';
+import { StoryHighlights } from '@/components/stories/StoryHighlights';
 import { useTranslation } from 'react-i18next';
 import { useAuth, useFeature, useToast, useTenant } from '@/contexts';
 import { usePageTitle } from '@/hooks';
@@ -697,6 +698,17 @@ export function ProfilePage() {
           color="rose"
         />
       </motion.div>
+
+      {/* Story Highlights */}
+      {profile && (
+        <motion.div variants={itemVariants}>
+          <StoryHighlights
+            userId={profile.id}
+            userName={profile.name || `${profile.first_name || ''} ${profile.last_name || ''}`.trim()}
+            userAvatar={profile.avatar_url ?? profile.avatar}
+          />
+        </motion.div>
+      )}
 
       {/* Tabs Content */}
       <motion.div variants={itemVariants}>

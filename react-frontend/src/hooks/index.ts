@@ -14,3 +14,4 @@ export { useSocialInteractions, AVAILABLE_REACTIONS } from './useSocialInteracti
 export type { SocialInteractionsOptions, LikerUser, LikersResult, MentionUser } from './useSocialInteractions';
 export { useHeaderScroll } from './useHeaderScroll';
 export type { HeaderScrollState } from './useHeaderScroll';
+export { useLinkPreview } from './useLinkPreview';

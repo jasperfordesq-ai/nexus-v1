@@ -35,7 +35,9 @@ export interface LikersResult {
 export interface MentionUser {
   id: number;
   name: string;
+  username?: string | null;
   avatar_url: string | null;
+  is_connection?: boolean;
 }
 
 export const AVAILABLE_REACTIONS = ['👍', '❤️', '😂', '😮', '😢', '🎉'] as const;
@@ -236,10 +238,13 @@ export function useSocialInteractions(options: SocialInteractionsOptions) {
   const searchMentions = useCallback(async (query: string): Promise<MentionUser[]> => {
     if (!query.trim()) return [];
     try {
-      const res = await api.post<{ users: MentionUser[] }>('/social/mention-search', { query: query.trim() });
-      if (res.success && res.data) return res.data.users ?? [];
-      // V1 shape: { status: 'success', users: [...] }
-      const raw = res as unknown as { users?: MentionUser[] };
+      // Try V2 endpoint first (GET /v2/mentions/search?q=...)
+      const res = await api.get<MentionUser[]>(`/v2/mentions/search?q=${encodeURIComponent(query.trim())}`);
+      if (res.success && res.data) return Array.isArray(res.data) ? res.data : [];
+      // Fallback to legacy V1 endpoint
+      const legacyRes = await api.post<{ users: MentionUser[] }>('/social/mention-search', { query: query.trim() });
+      if (legacyRes.success && legacyRes.data) return legacyRes.data.users ?? [];
+      const raw = legacyRes as unknown as { users?: MentionUser[] };
       return raw.users ?? [];
     } catch (err) {
       logError('Failed to search mentions', err);

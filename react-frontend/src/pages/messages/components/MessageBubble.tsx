@@ -11,6 +11,7 @@ import { SmilePlus, MoreVertical, Pencil, Trash2, Check, CheckCheck, FileText } 
 import { resolveAvatarUrl } from '@/lib/helpers';
 import type { Message } from '@/types/api';
 import { VoiceMessagePlayer } from './VoiceMessagePlayer';
+import { MessageLinkPreview } from './MessageLinkPreview';
 
 // Available reaction emojis
 const REACTION_EMOJIS = ['👍', '❤️', '😂', '😮', '😢', '🙏'];
@@ -203,6 +204,8 @@ export function MessageBubble({
                   ))}
                 </div>
               )}
+              {/* Link preview for URLs in message */}
+              <MessageLinkPreview text={message.body || message.content || ''} />
             </>
           )}
 

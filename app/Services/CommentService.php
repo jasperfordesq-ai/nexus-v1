@@ -8,6 +8,7 @@ namespace App\Services;
 
 use App\Core\TenantContext;
 use App\Models\Comment;
+use App\Services\MentionService;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
@@ -118,14 +119,25 @@ class CommentService
      */
     public static function create(string $targetType, int $targetId, int $userId, int $tenantId, array $data): Comment
     {
-        return Comment::create([
+        $content = trim($data['content']);
+
+        $comment = Comment::create([
             'target_type' => $targetType,
             'target_id' => $targetId,
             'user_id' => $userId,
             'tenant_id' => $tenantId,
-            'content' => trim($data['content']),
+            'content' => $content,
             'parent_id' => $data['parent_id'] ?? null,
         ]);
+
+        // Process @mentions in comment content
+        try {
+            MentionService::processText($content, $comment->id, 'comment', $userId);
+        } catch (\Exception $e) {
+            Log::warning("CommentService::create mention processing failed: " . $e->getMessage());
+        }
+
+        return $comment;
     }
 
     /**
@@ -141,8 +153,17 @@ class CommentService
             return false;
         }
 
-        $comment->content = trim($content);
+        $trimmedContent = trim($content);
+        $comment->content = $trimmedContent;
         $comment->save();
+
+        // Re-process @mentions
+        try {
+            MentionService::deleteMentionsForEntity($commentId, 'comment');
+            MentionService::processText($trimmedContent, $commentId, 'comment', $userId);
+        } catch (\Exception $e) {
+            Log::warning("CommentService::update mention re-processing failed: " . $e->getMessage());
+        }
 
         return true;
     }

@@ -9,6 +9,8 @@ namespace App\Services;
 use App\Models\FeedActivity;
 use App\Models\FeedPost;
 use App\Models\Like;
+use App\Services\LinkPreviewService;
+use App\Services\MentionService;
 use Illuminate\Support\Facades\DB;
 use App\Core\TenantContext;
 
@@ -271,6 +273,29 @@ class FeedService
             unset($item);
         }
 
+        // Batch load link previews for post items
+        try {
+            $postIds = [];
+            foreach ($items as $item) {
+                if ($item['type'] === 'post') {
+                    $postIds[] = (int) $item['id'];
+                }
+            }
+            if (!empty($postIds)) {
+                /** @var LinkPreviewService $linkPreviewService */
+                $linkPreviewService = app(LinkPreviewService::class);
+                $previewMap = $linkPreviewService->batchLoadPostPreviews($postIds);
+                foreach ($items as &$item) {
+                    if ($item['type'] === 'post' && isset($previewMap[$item['id']])) {
+                        $item['link_previews'] = $previewMap[$item['id']];
+                    }
+                }
+                unset($item);
+            }
+        } catch (\Exception $e) {
+            // Link preview loading should never break the feed
+        }
+
         // Generate cursor
         $nextCursor = null;
         if ($hasMore && !empty($items)) {
@@ -417,6 +442,13 @@ class FeedService
             ]);
         } catch (\Exception $e) {
             \Illuminate\Support\Facades\Log::warning("FeedService::createPost feed_activity sync failed: " . $e->getMessage());
+        }
+
+        // Process @mentions in post content
+        try {
+            MentionService::processText($content, $post->id, 'post', $userId);
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::warning("FeedService::createPost mention processing failed: " . $e->getMessage());
         }
 
         return $post->fresh(['user']);

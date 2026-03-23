@@ -22,7 +22,7 @@ import type { ComposeEditorHandle } from '../shared/ComposeEditor';
 const ComposeEditor = lazy(() =>
   import('../shared/ComposeEditor').then((m) => ({ default: m.ComposeEditor })),
 );
-import { MultiImageUploader } from '../shared/MultiImageUploader';
+import { MediaUploader, type MediaFile } from '../MediaUploader';
 import { EmojiPicker } from '../shared/EmojiPicker';
 import { VoiceInput } from '../shared/VoiceInput';
 import { CharacterCount } from '../shared/CharacterCount';
@@ -51,8 +51,7 @@ export function PostTab({ onSuccess, onClose, groupId, templateData }: TabSubmit
     { htmlContent: '', plainText: '' },
   );
 
-  const [imageFiles, setImageFiles] = useState<File[]>([]);
-  const [imagePreviews, setImagePreviews] = useState<string[]>([]);
+  const [mediaFiles, setMediaFiles] = useState<MediaFile[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Apply template data when selected from TemplatePicker
@@ -66,7 +65,7 @@ export function PostTab({ onSuccess, onClose, groupId, templateData }: TabSubmit
     }
   }, [templateData, setDraft]);
 
-  const canSubmit = draft.plainText.trim().length > 0 || imageFiles.length > 0;
+  const canSubmit = draft.plainText.trim().length > 0 || mediaFiles.length > 0;
 
   const handleHtmlChange = useCallback(
     (html: string) => setDraft((prev) => ({ ...prev, htmlContent: html })),
@@ -94,20 +93,9 @@ export function PostTab({ onSuccess, onClose, groupId, templateData }: TabSubmit
     [],
   );
 
-  // Multi-image handlers
-  const handleImageAdd = useCallback((file: File, preview: string) => {
-    setImageFiles((prev) => [...prev, file]);
-    setImagePreviews((prev) => [...prev, preview]);
-  }, []);
-
-  const handleImageRemove = useCallback((index: number) => {
-    setImageFiles((prev) => prev.filter((_, i) => i !== index));
-    setImagePreviews((prev) => prev.filter((_, i) => i !== index));
-  }, []);
-
-  const handleImageReorder = useCallback((files: File[], previews: string[]) => {
-    setImageFiles(files);
-    setImagePreviews(previews);
+  // Media handlers for the new MediaUploader
+  const handleMediaChange = useCallback((files: MediaFile[]) => {
+    setMediaFiles(files);
   }, []);
 
   const handleSubmit = async () => {
@@ -120,16 +108,21 @@ export function PostTab({ onSuccess, onClose, groupId, templateData }: TabSubmit
 
       let res;
 
-      if (imageFiles.length > 0) {
+      if (mediaFiles.length > 0) {
         // Use multipart/form-data when images are attached
         const formData = new FormData();
         formData.append('content', contentToSend);
         formData.append('visibility', 'public');
         if (groupId) formData.append('group_id', String(groupId));
 
-        // Append all images (primary + extras for future multi-image support)
-        imageFiles.forEach((file, i) => {
-          formData.append(i === 0 ? 'image' : `image_${i}`, file);
+        // Append primary image and additional media files
+        mediaFiles.forEach((item, i) => {
+          formData.append(i === 0 ? 'image' : `image_${i}`, item.file);
+        });
+
+        // Also append as media[] array for the PostMediaService
+        mediaFiles.forEach((item) => {
+          formData.append('media[]', item.file);
         });
 
         res = await api.upload('/v2/feed/posts', formData);
@@ -144,6 +137,7 @@ export function PostTab({ onSuccess, onClose, groupId, templateData }: TabSubmit
 
       if (res.success) {
         clearDraft();
+        setMediaFiles([]);
         toast.success(t('compose.post_created'));
         onClose();
         onSuccess('post');
@@ -200,15 +194,12 @@ export function PostTab({ onSuccess, onClose, groupId, templateData }: TabSubmit
       {/* Link preview */}
       <LinkPreview content={draft.plainText} />
 
-      {/* Multi-image uploader */}
-      <MultiImageUploader
-        files={imageFiles}
-        previews={imagePreviews}
-        onAdd={handleImageAdd}
-        onRemove={handleImageRemove}
-        onReorder={handleImageReorder}
-        maxImages={4}
-        onError={(msg) => toast.error(msg)}
+      {/* Multi-image uploader with drag-and-drop, alt text, reorder */}
+      <MediaUploader
+        mediaFiles={mediaFiles}
+        onMediaChange={handleMediaChange}
+        maxFiles={10}
+        maxSizeMb={10}
       />
 
       {/* Toolbar + submit row */}

@@ -60,7 +60,6 @@ import { usePageTitle } from '@/hooks';
 import { FeedCard } from '@/components/feed/FeedCard';
 import type { FeedItem, FeedFilter, PollData } from '@/components/feed/types';
 import { getAuthor } from '@/components/feed/types';
-import type { ReactionType } from '@/components/social';
 import type { Friend } from '@/components/feed/sidebar/FriendsWidget';
 
 /* ───────────────────────── Feed Card Skeleton ───────────────────────── */
@@ -124,8 +123,8 @@ export function FeedPage() {
   const [feedMode, setFeedMode] = useState<'ranking' | 'recent'>('ranking');
   // Sub-filter (e.g. listings -> offers/requests)
   const [subFilter, setSubFilter] = useState<string | null>(null);
-  // Stories friends
-  const [_storiesFriends, _setStoriesFriends] = useState<Friend[]>([]); // TODO: wire to StoriesBar
+  // Stories friends (StoriesBar now self-loads)
+  const [, setStoriesFriends] = useState<Friend[]>([]);
 
   // Compose Hub
   const { isOpen: isCreateOpen, onOpen: onCreateOpen, onClose: onCreateClose } = useDisclosure();
@@ -162,7 +161,7 @@ export function FeedPage() {
       try {
         const response = await api.get<{ friends?: Friend[] }>('/v2/feed/sidebar');
         if (response.success && response.data?.friends) {
-          _setStoriesFriends(response.data.friends);
+          setStoriesFriends(response.data.friends);
         }
       } catch (err) {
         logError('Failed to load stories friends', err);
@@ -255,8 +254,10 @@ export function FeedPage() {
     cursorRef.current = undefined;
     setPendingPostCount(0);
     loadFeedRef.current();
-    return () => { abortRef.current?.abort(); appendAbortRef.current?.abort(); };
-  // eslint-disable-next-line react-hooks/exhaustive-deps -- uses loadFeedRef to avoid reset loops
+    const currentAbort = abortRef.current;
+    const currentAppendAbort = appendAbortRef.current;
+    return () => { currentAbort?.abort(); currentAppendAbort?.abort(); };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [filter, feedMode, subFilter]);
 
   /* ───────── Real-time feed subscription ───────── */
@@ -331,82 +332,6 @@ export function FeedPage() {
                 is_liked: !fi.is_liked,
                 likes_count: fi.is_liked ? fi.likes_count - 1 : fi.likes_count + 1,
               }
-            : fi
-        )
-      );
-    }
-  }, []);
-
-  /* ───────── Emoji Reaction ───────── */
-
-  const handleReact = useCallback(async (item: FeedItem, reactionType: ReactionType) => {
-    // Optimistic update
-    const prevReactions = item.reactions ?? { counts: {}, total: 0, user_reaction: null, top_reactors: [] };
-    const currentReaction = prevReactions.user_reaction;
-    const newCounts = { ...prevReactions.counts };
-    let newTotal = prevReactions.total;
-    let newUserReaction: string | null;
-
-    if (currentReaction === reactionType) {
-      // Remove reaction
-      newCounts[reactionType] = Math.max(0, (newCounts[reactionType] ?? 0) - 1);
-      if (newCounts[reactionType] === 0) delete newCounts[reactionType];
-      newTotal = Math.max(0, newTotal - 1);
-      newUserReaction = null;
-    } else {
-      // Replace old reaction if exists
-      if (currentReaction) {
-        newCounts[currentReaction] = Math.max(0, (newCounts[currentReaction] ?? 0) - 1);
-        if (newCounts[currentReaction] === 0) delete newCounts[currentReaction];
-      } else {
-        newTotal += 1;
-      }
-      newCounts[reactionType] = (newCounts[reactionType] ?? 0) + 1;
-      newUserReaction = reactionType;
-    }
-
-    setItems((prev) =>
-      prev.map((fi) =>
-        fi.id === item.id && fi.type === item.type
-          ? {
-              ...fi,
-              reactions: {
-                ...prevReactions,
-                counts: newCounts,
-                total: newTotal,
-                user_reaction: newUserReaction,
-              },
-            }
-          : fi
-      )
-    );
-
-    try {
-      const res = await api.post<{
-        action: string;
-        reaction_type: string | null;
-        reactions: { counts: Record<string, number>; total: number; user_reaction: string | null; top_reactors: Array<{ id: number; name: string; avatar_url?: string | null }> };
-      }>(`/v2/posts/${item.id}/reactions`, {
-        reaction_type: reactionType,
-      });
-
-      if (res.success && res.data) {
-        // Apply server state
-        setItems((prev) =>
-          prev.map((fi) =>
-            fi.id === item.id && fi.type === item.type
-              ? { ...fi, reactions: res.data!.reactions }
-              : fi
-          )
-        );
-      }
-    } catch (err) {
-      logError('Failed to toggle reaction', err);
-      // Revert on error
-      setItems((prev) =>
-        prev.map((fi) =>
-          fi.id === item.id && fi.type === item.type
-            ? { ...fi, reactions: prevReactions }
             : fi
         )
       );
@@ -733,7 +658,6 @@ export function FeedPage() {
                     <FeedCard
                       item={item}
                       onToggleLike={handleToggleLike}
-                      onReact={handleReact}
                       onHidePost={handleHidePost}
                       onMuteUser={handleMuteUser}
                       onReportPost={openReportModal}

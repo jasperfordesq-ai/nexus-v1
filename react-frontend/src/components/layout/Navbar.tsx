@@ -74,6 +74,7 @@ import { SearchOverlay } from '@/components/layout/SearchOverlay';
 import { MegaMenu } from '@/components/layout/MegaMenu';
 import { NotificationFlyout } from '@/components/layout/NotificationFlyout';
 import { TenantLogo } from '@/components/branding';
+import { PresenceIndicator, StatusSelector } from '@/components/social';
 import { useHeaderScroll } from '@/hooks/useHeaderScroll';
 
 interface NavbarProps {
@@ -683,17 +684,23 @@ export function Navbar({ onMobileMenuOpen, externalSearchOpen, onSearchOpenChang
                   {/* Notification Flyout — rich popover instead of simple navigate */}
                   <NotificationFlyout />
 
+                  {/* Status Selector (small dot button) */}
+                  <StatusSelector />
+
                   {/* User Dropdown */}
                   <Dropdown placement="bottom-end" isOpen={userOpen} onOpenChange={handleUserOpenChange} shouldBlockScroll={false}>
                     <DropdownTrigger>
-                      <Avatar
-                        as="button"
-                        name={`${user?.first_name} ${user?.last_name}`}
-                        src={resolveAvatarUrl(user?.avatar_url || user?.avatar)}
-                        size="sm"
-                        className="cursor-pointer ring-2 ring-transparent hover:ring-indigo-500/50 transition-all w-8 h-8 sm:w-9 sm:h-9"
-                        showFallback
-                      />
+                      <div className="relative cursor-pointer">
+                        <Avatar
+                          as="button"
+                          name={`${user?.first_name} ${user?.last_name}`}
+                          src={resolveAvatarUrl(user?.avatar_url || user?.avatar)}
+                          size="sm"
+                          className="cursor-pointer ring-2 ring-transparent hover:ring-indigo-500/50 transition-all w-8 h-8 sm:w-9 sm:h-9"
+                          showFallback
+                        />
+                        {user?.id && <PresenceIndicator userId={user.id} size="sm" />}
+                      </div>
                     </DropdownTrigger>
                     <DropdownMenu
                       aria-label="User actions"

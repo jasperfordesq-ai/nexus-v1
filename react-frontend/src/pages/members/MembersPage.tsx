@@ -28,9 +28,11 @@ import {
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { GlassCard, MemberCardSkeleton, AlgorithmLabel } from '@/components/ui';
+import { PresenceIndicator } from '@/components/social';
 import { EntityMapView } from '@/components/location';
 import { EmptyState } from '@/components/feedback';
 import { useToast, useTenant } from '@/contexts';
+import { usePresenceOptional } from '@/contexts/PresenceContext';
 import { api } from '@/lib/api';
 import { MAPS_ENABLED } from '@/lib/map-config';
 import { logError } from '@/lib/logger';
@@ -186,12 +188,24 @@ export function MembersPage() {
     loadMembers(true);
   }, [isLoadingMore, hasMore, loadMembers]);
 
+  // Presence context for fetching online status
+  const presence = usePresenceOptional();
+
   // Load on mount and when filters change
   useEffect(() => {
     loadMembers();
     // Reset hasMore when filters change
     setHasMore(true);
   }, [debouncedQuery, sortBy]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Fetch presence for visible members
+  useEffect(() => {
+    if (members.length > 0 && presence) {
+      const userIds = members.map((m) => m.id);
+      presence.fetchPresence(userIds);
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [members]);
 
   // Update URL params
   useEffect(() => {
@@ -493,12 +507,15 @@ const MemberCard = memo(function MemberCard({ member, viewMode }: MemberCardProp
         <article aria-label={`${displayName}'s profile`}>
           <GlassCard className="p-4 hover:bg-theme-hover transition-colors">
             <div className="flex items-center gap-4">
-              <Avatar
-                src={resolveAvatarUrl(member.avatar)}
-                name={displayName}
-                size="lg"
-                className="ring-2 ring-theme-muted/20"
-              />
+              <div className="relative inline-block">
+                <Avatar
+                  src={resolveAvatarUrl(member.avatar)}
+                  name={displayName}
+                  size="lg"
+                  className="ring-2 ring-theme-muted/20"
+                />
+                <PresenceIndicator userId={member.id} size="md" />
+              </div>
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-1.5">
                   <h3 className="font-semibold text-theme-primary">{displayName}</h3>
@@ -536,11 +553,14 @@ const MemberCard = memo(function MemberCard({ member, viewMode }: MemberCardProp
     <Link to={tenantPath(`/profile/${member.id}`)}>
       <article aria-label={`${displayName}'s profile`}>
         <GlassCard className="p-5 hover:scale-[1.02] transition-transform text-center">
-          <Avatar
-            src={resolveAvatarUrl(member.avatar)}
-            name={displayName}
-            className="w-16 h-16 mx-auto ring-2 ring-theme-muted/20 mb-3"
-          />
+          <div className="relative inline-block mx-auto mb-3">
+            <Avatar
+              src={resolveAvatarUrl(member.avatar)}
+              name={displayName}
+              className="w-16 h-16 ring-2 ring-theme-muted/20"
+            />
+            <PresenceIndicator userId={member.id} size="md" />
+          </div>
           <div className="flex items-center justify-center gap-1.5">
             <h3 className="font-semibold text-theme-primary">{displayName}</h3>
           </div>

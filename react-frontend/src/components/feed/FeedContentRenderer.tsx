@@ -14,6 +14,7 @@ import DOMPurify from 'dompurify';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useTenant } from '@/contexts';
+import { MentionRenderer } from '@/components/social/MentionRenderer';
 
 /* ───────────────────────── Types ───────────────────────── */
 
@@ -60,22 +61,29 @@ function sanitizeHtml(html: string): string {
   return div.innerHTML;
 }
 
-/* ───────────────────────── Hashtag Helper ───────────────────────── */
+/* ───────────────────────── Hashtag & Mention Helper ───────────────────────── */
 
 /**
- * Render plain text with clickable #hashtags.
+ * Render plain text with clickable #hashtags and @mentions.
  */
-function TextWithHashtags({ text, tenantPath }: { text: string; tenantPath: (p: string) => string }) {
-  const hashtagRegex = /#(\w{2,})/g;
-  const parts: Array<{ type: 'text' | 'hashtag'; value: string }> = [];
+function TextWithHashtagsAndMentions({ text, tenantPath }: { text: string; tenantPath: (p: string) => string }) {
+  // Combined regex: match #hashtags and @mentions in a single pass
+  const combinedRegex = /(#(\w{2,})|@([a-zA-Z0-9_.-]+))/g;
+  const parts: Array<{ type: 'text' | 'hashtag' | 'mention'; value: string }> = [];
   let lastIndex = 0;
   let match: RegExpExecArray | null;
 
-  while ((match = hashtagRegex.exec(text)) !== null) {
+  while ((match = combinedRegex.exec(text)) !== null) {
     if (match.index > lastIndex) {
       parts.push({ type: 'text', value: text.slice(lastIndex, match.index) });
     }
-    parts.push({ type: 'hashtag', value: match[1] });
+    if (match[2]) {
+      // Hashtag match
+      parts.push({ type: 'hashtag', value: match[2] });
+    } else if (match[3]) {
+      // Mention match
+      parts.push({ type: 'mention', value: match[3] });
+    }
     lastIndex = match.index + match[0].length;
   }
   if (lastIndex < text.length) {
@@ -96,6 +104,8 @@ function TextWithHashtags({ text, tenantPath }: { text: string; tenantPath: (p: 
             >
               #{part.value}
             </Link>
+          ) : part.type === 'mention' ? (
+            <MentionRenderer text={`@${part.value}`} showUserCard={false} />
           ) : (
             part.value
           )}
@@ -146,7 +156,7 @@ export function FeedContentRenderer({
   // Plain text content (legacy) — render with whitespace preservation and clickable hashtags
   return (
     <p className="text-sm text-[var(--text-secondary)] whitespace-pre-wrap leading-relaxed">
-      <TextWithHashtags text={content} tenantPath={tenantPath} />
+      <TextWithHashtagsAndMentions text={content} tenantPath={tenantPath} />
       {truncated && detailPath && (
         <Link
           to={detailPath}

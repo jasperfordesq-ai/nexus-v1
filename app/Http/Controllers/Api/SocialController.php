@@ -10,7 +10,9 @@ use App\Services\CommentService;
 use App\Services\FeedActivityService;
 use App\Services\FeedRankingService;
 use App\Services\FeedService;
+use App\Services\LinkPreviewService;
 use App\Services\PollService;
+use App\Services\PostMediaService;
 use App\Services\SocialNotificationService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
@@ -75,9 +77,28 @@ class SocialController extends BaseApiController
 
         $result = $this->feedService->getFeed($userId, $filters);
 
-        // Strip internal cursor fields before sending response
+        // Collect post IDs for batch media loading
+        $postIds = [];
+        foreach ($result['items'] as $item) {
+            if (($item['type'] ?? '') === 'post' && !empty($item['id'])) {
+                $postIds[] = (int) $item['id'];
+            }
+        }
+
+        // Batch load media for all posts in the feed
+        $mediaByPost = [];
+        if (!empty($postIds)) {
+            $mediaByPost = $this->postMediaService->getMediaForPosts($postIds);
+        }
+
+        // Strip internal cursor fields and attach media
         foreach ($result['items'] as &$item) {
             unset($item['_activity_id'], $item['_activity_created_at']);
+
+            // Attach media array for post items
+            if (($item['type'] ?? '') === 'post' && isset($item['id'])) {
+                $item['media'] = $mediaByPost[(int) $item['id']] ?? [];
+            }
         }
         unset($item);
 
@@ -191,9 +212,9 @@ class SocialController extends BaseApiController
             $data['image_url'] = $imageUrl;
         }
 
-        $postId = $this->feedService->createPost($userId, $data);
+        $postObj = $this->feedService->createPost($userId, $data);
 
-        if ($postId === null) {
+        if ($postObj === null) {
             $errors = $this->feedService->getErrors();
             $status = 422;
 
@@ -207,8 +228,39 @@ class SocialController extends BaseApiController
             return $this->respondWithErrors($errors, $status);
         }
 
-        // Get the created post
+        $postId = (int) ($postObj->id ?? $postObj);
+
+        // Handle multi-image uploads (media[] or image_0, image_1, etc.)
+        $mediaFiles = $this->collectMediaFiles();
+        if (!empty($mediaFiles)) {
+            $this->postMediaService->attachMedia($postId, $mediaFiles);
+        }
+
+        // Process link previews from post content (async-safe, non-blocking)
+        $linkPreviews = [];
+        try {
+            $content = $data['content'] ?? '';
+            if ($content) {
+                $linkPreviewService = app(LinkPreviewService::class);
+                $linkPreviews = $linkPreviewService->processPostUrls($postId, $content);
+            }
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::debug('Link preview processing failed', [
+                'post_id' => $postId,
+                'error' => $e->getMessage(),
+            ]);
+        }
+
+        // Get the created post with media
         $post = $this->feedService->getItem('post', $postId, $userId);
+
+        if ($post) {
+            $post['media'] = $this->postMediaService->getMediaForPost($postId);
+        }
+
+        if (! empty($linkPreviews)) {
+            $post['link_previews'] = $linkPreviews;
+        }
 
         return $this->respondWithData($post, null, 201);
     }
@@ -299,9 +351,17 @@ class SocialController extends BaseApiController
                 error_log('SocialController::createPost feed_activity failed: ' . $faEx->getMessage());
             }
 
+            // Handle multi-image uploads
+            $mediaFiles = $this->collectMediaFiles();
+            $media = [];
+            if (!empty($mediaFiles)) {
+                $media = $this->postMediaService->attachMedia((int) $postId, $mediaFiles);
+            }
+
             return $this->respondWithData([
                 'status'  => 'success',
                 'post_id' => $postId,
+                'media'   => $media,
             ]);
         } catch (\Exception $e) {
             error_log("Create Post Error: " . $e->getMessage());
@@ -1236,6 +1296,35 @@ class SocialController extends BaseApiController
         $file->move($uploadDir, $filename);
 
         return '/uploads/posts/' . $filename;
+    }
+
+    /**
+     * Collect additional media files from the request.
+     *
+     * @return \Illuminate\Http\UploadedFile[]
+     */
+    private function collectMediaFiles(): array
+    {
+        $request = request();
+        $files = [];
+
+        if ($request->hasFile('media')) {
+            $mediaFiles = $request->file('media');
+            if (is_array($mediaFiles)) {
+                $files = array_merge($files, $mediaFiles);
+            } else {
+                $files[] = $mediaFiles;
+            }
+        }
+
+        for ($i = 1; $i < 10; $i++) {
+            $key = "image_{$i}";
+            if ($request->hasFile($key)) {
+                $files[] = $request->file($key);
+            }
+        }
+
+        return $files;
     }
 
     /**
