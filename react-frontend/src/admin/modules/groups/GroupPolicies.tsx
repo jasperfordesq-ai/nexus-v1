@@ -32,7 +32,8 @@ interface PolicySection {
   policies: GroupPolicy[];
 }
 
-export default function GroupPolicies({ isOpen, onClose, typeId, typeName }: GroupPoliciesProps) {
+export default function GroupPolicies({
+  isOpen, onClose, typeId, typeName }: GroupPoliciesProps) {
   const { success, error } = useToast();
   const [loading, setLoading] = useState(true);
   const [policies, setPolicies] = useState<GroupPolicy[]>([]);

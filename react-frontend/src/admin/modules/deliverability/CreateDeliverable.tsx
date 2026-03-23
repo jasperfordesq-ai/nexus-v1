@@ -31,7 +31,6 @@ interface DeliverableFormData {
 export function CreateDeliverable() {
   const { t } = useTranslation('admin');
   usePageTitle('Admin - Create Deliverable');
-  const { t } = useTranslation('admin');
   const navigate = useNavigate();
   const { tenantPath } = useTenant();
   const toast = useToast();

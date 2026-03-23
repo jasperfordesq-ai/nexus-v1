@@ -26,7 +26,6 @@ interface Application { id: number; vacancy_id: number; user_id: number; applica
 
 const STATUS_TAB_KEYS = ['all', 'open', 'closed', 'expired'] as const;
 const statusColorMap: Record<string, 'success' | 'default' | 'warning'> = { open: 'success', closed: 'default', expired: 'warning' };
-const STATUS_TABS = STATUS_TAB_KEYS.map((key) => ({ key, label: key.charAt(0).toUpperCase() + key.slice(1) }));
 const typeLabel: Record<string, string> = { paid: 'Paid', volunteer: 'Volunteer', timebank: 'Timebank' };
 const appStatusColor: Record<string, 'default' | 'primary' | 'warning' | 'secondary' | 'success' | 'danger'> = { applied: 'default', screening: 'primary', reviewed: 'primary', pending: 'default', interview: 'warning', offer: 'secondary', accepted: 'success', rejected: 'danger', withdrawn: 'default' };
 const APPLICATION_STAGE_KEYS = ['applied', 'screening', 'interview', 'offer', 'accepted', 'rejected', 'withdrawn'] as const;
@@ -108,7 +107,7 @@ export function JobsAdmin() {
       }
     } catch { toast.error(t('jobs.failed_load_jobs')); }
     finally { setLoading(false); }
-  }, [page, status, search, toast]);
+  }, [page, status, search, toast, t]);
 
   useEffect(() => { loadJobs(); }, [loadJobs]);
 
@@ -120,7 +119,7 @@ export function JobsAdmin() {
       else { setAppsError((res as { error?: string }).error ?? t('jobs.failed_load_applications')); }
     } catch { setAppsError(t('jobs.failed_load_applications')); }
     finally { setAppsLoading(false); }
-  }, []);
+  }, [t]);
 
   const handleSelectJob = useCallback((job: Job) => { setSelectedJob(job); loadApplications(job); }, [loadApplications]);
 
@@ -158,37 +157,37 @@ export function JobsAdmin() {
   };
 
   const columns: Column<Job>[] = [
-    { key: 'title', label: 'Title', sortable: true, render: (item) => <span className='font-medium text-foreground'>{item.title}</span> },
-    { key: 'organization_name', label: 'Organization / Poster', sortable: true, render: (item) => <span className='text-sm text-default-600'>{item.organization_name || item.poster_name || '--'}</span> },
-    { key: 'type', label: 'Type', sortable: true, render: (item) => <span className='text-sm text-default-600'>{typeLabel[item.type ?? ''] ?? item.type ?? '--'}</span> },
-    { key: 'applications_count', label: 'Applications', sortable: true, render: (item) => <span className='text-sm text-default-600'>{item.applications_count}</span> },
-    { key: 'views_count', label: 'Views', sortable: true, render: (item) => <span className='text-sm text-default-500'>{item.views_count}</span> },
+    { key: 'title', label: t('jobs.col_title'), sortable: true, render: (item) => <span className='font-medium text-foreground'>{item.title}</span> },
+    { key: 'organization_name', label: t('jobs.col_organization'), sortable: true, render: (item) => <span className='text-sm text-default-600'>{item.organization_name || item.poster_name || '--'}</span> },
+    { key: 'type', label: t('jobs.col_type'), sortable: true, render: (item) => <span className='text-sm text-default-600'>{typeLabel[item.type ?? ''] ?? item.type ?? '--'}</span> },
+    { key: 'applications_count', label: t('jobs.col_applications'), sortable: true, render: (item) => <span className='text-sm text-default-600'>{item.applications_count}</span> },
+    { key: 'views_count', label: t('jobs.col_views'), sortable: true, render: (item) => <span className='text-sm text-default-500'>{item.views_count}</span> },
     {
-      key: 'is_featured', label: 'Featured',
+      key: 'is_featured', label: t('jobs.col_featured'),
       render: (item) => (
-        <Tooltip content={item.is_featured ? 'Featured' : 'Not featured'}>
-          <Button isIconOnly size='sm' variant='light' onPress={() => handleFeatureToggle(item)} aria-label={item.is_featured ? 'Unfeature job' : 'Feature job'}>
+        <Tooltip content={item.is_featured ? t('jobs.featured_tooltip') : t('jobs.not_featured_tooltip')}>
+          <Button isIconOnly size='sm' variant='light' onPress={() => handleFeatureToggle(item)} aria-label={item.is_featured ? t('jobs.unfeature_job') : t('jobs.feature_job')}>
             {item.is_featured ? <Star size={16} className='text-warning fill-warning' /> : <StarOff size={16} className='text-default-400' />}
           </Button>
         </Tooltip>
       ),
     },
-    { key: 'status', label: 'Status', sortable: true, render: (item) => <Chip size='sm' variant='flat' color={statusColorMap[item.status] || 'default'} className='capitalize'>{item.status}</Chip> },
-    { key: 'deadline', label: 'Deadline', sortable: true, render: (item) => <span className='text-sm text-default-500'>{item.deadline ? new Date(item.deadline).toLocaleDateString() : '--'}</span> },
+    { key: 'status', label: t('jobs.col_status'), sortable: true, render: (item) => <Chip size='sm' variant='flat' color={statusColorMap[item.status] || 'default'} className='capitalize'>{item.status}</Chip> },
+    { key: 'deadline', label: t('jobs.col_deadline'), sortable: true, render: (item) => <span className='text-sm text-default-500'>{item.deadline ? new Date(item.deadline).toLocaleDateString() : '--'}</span> },
     {
-      key: 'actions', label: 'Actions',
+      key: 'actions', label: t('jobs.col_actions'),
       render: (item) => (
         <div className='flex gap-1'>
-          <Tooltip content='View job'>
-            <Button isIconOnly size='sm' variant='flat' color='primary' as='a' href={tenantPath(`/jobs/${item.id}`)} target='_blank' rel='noopener noreferrer' aria-label='View job'><Eye size={14} /></Button>
+          <Tooltip content={t('jobs.view_job')}>
+            <Button isIconOnly size='sm' variant='flat' color='primary' as='a' href={tenantPath(`/jobs/${item.id}`)} target='_blank' rel='noopener noreferrer' aria-label={t('jobs.view_job')}><Eye size={14} /></Button>
           </Tooltip>
-          <Tooltip content={item.is_featured ? 'Unfeature' : 'Feature'}>
+          <Tooltip content={item.is_featured ? t('common.unfeature') : t('common.feature')}>
             <Button isIconOnly size='sm' variant='flat' color='warning' onPress={() => handleFeatureToggle(item)} aria-label={item.is_featured ? 'Unfeature job' : 'Feature job'}>
               {item.is_featured ? <StarOff size={14} /> : <Star size={14} />}
             </Button>
           </Tooltip>
-          <Tooltip content='Delete'>
-            <Button isIconOnly size='sm' variant='flat' color='danger' onPress={() => setConfirmDelete(item)} aria-label='Delete job'><Trash2 size={14} /></Button>
+          <Tooltip content={t('common.delete')}>
+            <Button isIconOnly size='sm' variant='flat' color='danger' onPress={() => setConfirmDelete(item)} aria-label={t('jobs.delete_job')}><Trash2 size={14} /></Button>
           </Tooltip>
         </div>
       ),
@@ -199,11 +198,11 @@ export function JobsAdmin() {
     return (
       <div className='flex gap-4 min-h-[480px]'>
         <div className='w-64 shrink-0 flex flex-col gap-1 border-r border-divider pr-4'>
-          <p className='text-xs font-semibold text-default-500 uppercase tracking-wide mb-2 px-1'>Jobs ({items.length})</p>
+          <p className='text-xs font-semibold text-default-500 uppercase tracking-wide mb-2 px-1'>{t('jobs.jobs_count', { count: items.length })}</p>
           {loading ? (
             <div className='flex justify-center pt-8'><Spinner size='sm' /></div>
           ) : items.length === 0 ? (
-            <p className='text-sm text-default-400 px-1'>No jobs found.</p>
+            <p className='text-sm text-default-400 px-1'>{t('jobs.no_jobs_in_list')}</p>
           ) : (
             <div className='flex flex-col gap-1 overflow-y-auto max-h-[600px] pr-1'>
               {items.map((job) => {
@@ -219,7 +218,7 @@ export function JobsAdmin() {
                         isSelected ? 'text-primary-700 dark:text-primary-300' : 'text-foreground'].join(' ')}>{job.title}</p>
                       <div className='flex items-center gap-1.5 mt-1'>
                         <Users size={11} className='text-default-400 shrink-0' />
-                        <span className='text-xs text-default-500'>{job.applications_count}{' '}{job.applications_count === 1 ? 'application' : 'applications'}</span>
+                        <span className='text-xs text-default-500'>{job.applications_count === 1 ? t('jobs.application_count_one', { count: job.applications_count }) : t('jobs.application_count_other', { count: job.applications_count })}</span>
                       </div>
                       {(job.organization_name || job.poster_name) && <p className='text-xs text-default-400 truncate mt-0.5'>{job.organization_name || job.poster_name}</p>}
                     </div>
@@ -234,8 +233,8 @@ export function JobsAdmin() {
             <div className='flex flex-col items-center justify-center h-64 text-center gap-3'>
               <div className='w-14 h-14 rounded-full bg-default-100 flex items-center justify-center'><ClipboardList size={24} className='text-default-400' /></div>
               <div>
-                <p className='text-sm font-medium text-default-600'>Select a job</p>
-                <p className='text-xs text-default-400 mt-1'>Choose a job from the left to review its applications.</p>
+                <p className='text-sm font-medium text-default-600'>{t('jobs.select_job')}</p>
+                <p className='text-xs text-default-400 mt-1'>{t('jobs.select_job_hint')}</p>
               </div>
             </div>
           ) : (
@@ -243,26 +242,26 @@ export function JobsAdmin() {
               <div className='flex items-start justify-between gap-3 mb-4'>
                 <div className='min-w-0'>
                   <h3 className='font-semibold text-foreground truncate'>{selectedJob.title}</h3>
-                  <p className='text-sm text-default-500 mt-0.5'>{selectedJob.organization_name || selectedJob.poster_name || 'No organization'}{' '}&middot;{' '}<span className='capitalize'>{selectedJob.status}</span></p>
+                  <p className='text-sm text-default-500 mt-0.5'>{selectedJob.organization_name || selectedJob.poster_name || t('jobs.no_organization')}{' '}&middot;{' '}<span className='capitalize'>{selectedJob.status}</span></p>
                 </div>
-                <Button size='sm' variant='flat' startContent={<RefreshCw size={13} />} onPress={() => loadApplications(selectedJob)} isDisabled={appsLoading}>Refresh</Button>
+                <Button size='sm' variant='flat' startContent={<RefreshCw size={13} />} onPress={() => loadApplications(selectedJob)} isDisabled={appsLoading}>{t('common.refresh')}</Button>
               </div>
               {appsLoading && <div className='flex justify-center py-12'><Spinner label='Loading applications…' /></div>}
               {!appsLoading && appsError && (
                 <div className='flex flex-col items-center gap-3 py-12 text-center'>
                   <p className='text-sm text-danger'>{appsError}</p>
-                  <Button size='sm' variant='flat' color='danger' onPress={() => loadApplications(selectedJob)}>Try again</Button>
+                  <Button size='sm' variant='flat' color='danger' onPress={() => loadApplications(selectedJob)}>{t('jobs.try_again')}</Button>
                 </div>
               )}
               {!appsLoading && !appsError && applications.length === 0 && (
                 <div className='flex flex-col items-center justify-center py-12 text-center gap-3'>
                   <div className='w-12 h-12 rounded-full bg-default-100 flex items-center justify-center'><CheckCircle2 size={20} className='text-default-400' /></div>
-                  <div><p className='text-sm font-medium text-default-600'>No applications yet</p><p className='text-xs text-default-400 mt-1'>Applications for this job will appear here.</p></div>
+                  <div><p className='text-sm font-medium text-default-600'>{t('jobs.no_applications_yet')}</p><p className='text-xs text-default-400 mt-1'>{t('jobs.no_applications_hint')}</p></div>
                 </div>
               )}
               {!appsLoading && !appsError && applications.length > 0 && (
                 <div>
-                  <p className='text-xs text-default-500 mb-3'>{applications.length}{' '}{applications.length === 1 ? 'application' : 'applications'}</p>
+                  <p className='text-xs text-default-500 mb-3'>{applications.length === 1 ? t('jobs.application_count_one', { count: applications.length }) : t('jobs.application_count_other', { count: applications.length })}</p>
                   <div className='overflow-y-auto max-h-[520px] pr-1'>
                     {applications.map((appl) => <ApplicationCard key={appl.id} application={appl} onStatusUpdate={handleStatusUpdate} />)}
                   </div>
@@ -277,37 +276,37 @@ export function JobsAdmin() {
 
   return (
     <div>
-      <PageHeader title='Job Vacancies' description='Manage job listings, featured jobs, and applications'
-        actions={<Button variant='flat' startContent={<RefreshCw size={16} />} onPress={loadJobs}>Refresh</Button>}
+      <PageHeader title={t('jobs.page_title')} description={t('jobs.page_description')}
+        actions={<Button variant='flat' startContent={<RefreshCw size={16} />} onPress={loadJobs}>{t('common.refresh')}</Button>}
       />
       <div className='mb-6'>
         <Tabs selectedKey={panelTab} onSelectionChange={(key) => setPanelTab(key as 'listings' | 'applications')}
-          variant='underlined' size='md' aria-label='Jobs admin panels'>
-          <Tab key='listings' title={<div className='flex items-center gap-2'><Briefcase size={15} /><span>Job Listings</span></div>} />
-          <Tab key='applications' title={<div className='flex items-center gap-2'><Users size={15} /><span>Applications</span></div>} />
+          variant='underlined' size='md' aria-label={t('jobs.panels_aria')}>
+          <Tab key='listings' title={<div className='flex items-center gap-2'><Briefcase size={15} /><span>{t('jobs.tab_listings')}</span></div>} />
+          <Tab key='applications' title={<div className='flex items-center gap-2'><Users size={15} /><span>{t('jobs.tab_applications')}</span></div>} />
         </Tabs>
       </div>
       {panelTab === 'listings' && (
         <>
           <div className='mb-4'>
             <Tabs selectedKey={status} onSelectionChange={(_key) => { setStatus(_key as string); setPage(1); }}
-              variant='underlined' size='sm' aria-label='Filter jobs by status'>
-              {STATUS_TABS.map((tab) => <Tab key={tab.key} title={tab.label} />)}
+              variant='underlined' size='sm' aria-label={t('jobs.filter_status_aria')}>
+              {STATUS_TAB_KEYS.map((key) => <Tab key={key} title={t(`jobs.status_${key}`)} />)}
             </Tabs>
           </div>
           <DataTable columns={columns} data={items} isLoading={loading}
-            searchPlaceholder='Search jobs by title or organization...'
+            searchPlaceholder={t('jobs.search_placeholder')}
             onSearch={(sq) => { setSearch(sq); setPage(1); }}
             onRefresh={loadJobs} totalItems={meta.total} page={page} pageSize={50} onPageChange={setPage}
-            emptyContent={<EmptyState icon={Briefcase} title='No jobs found' description={search || status !== 'all' ? 'Try adjusting your search or filters' : 'No job vacancies have been posted yet'} />}
+            emptyContent={<EmptyState icon={Briefcase} title={t('jobs.no_jobs_found')} description={search || status !== 'all' ? t('jobs.no_jobs_hint_filter') : t('jobs.no_jobs_hint_empty')} />}
           />
         </>
       )}
       {panelTab === 'applications' && <ApplicationsPanel />}
       {confirmDelete && (
         <ConfirmModal isOpen={!!confirmDelete} onClose={() => setConfirmDelete(null)} onConfirm={handleDelete}
-          title='Delete Job' message={`Are you sure you want to delete "${confirmDelete.title}"? This action cannot be undone.`}
-          confirmLabel='Delete' confirmColor='danger' isLoading={actionLoading} />
+          title={t('jobs.delete_job_title')} message={t('jobs.delete_job_message', { title: confirmDelete.title })}
+          confirmLabel={t('common.delete')} confirmColor='danger' isLoading={actionLoading} />
       )}
     </div>
   );
