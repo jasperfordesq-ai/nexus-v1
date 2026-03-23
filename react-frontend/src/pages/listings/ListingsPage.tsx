@@ -26,7 +26,6 @@ import {
   Heart,
   AlertTriangle,
   RefreshCw,
-  Loader2,
 } from 'lucide-react';
 import { GlassCard, AlgorithmLabel, ListingSkeleton, ImagePlaceholder } from '@/components/ui';
 import { FeaturedBadge } from '@/components/listings/FeaturedBadge';
@@ -35,7 +34,6 @@ import { EmptyState } from '@/components/feedback';
 import { PageMeta } from '@/components/seo';
 import { useAuth, useToast, useTenant } from '@/contexts';
 import { usePageTitle } from '@/hooks';
-import { useGeolocation } from '@/hooks/useGeolocation';
 import { api } from '@/lib/api';
 import { MAPS_ENABLED } from '@/lib/map-config';
 import { logError } from '@/lib/logger';
@@ -48,7 +46,7 @@ type ViewMode = 'grid' | 'list' | 'map';
 export function ListingsPage() {
   const { t } = useTranslation('listings');
   usePageTitle(t('title'));
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, user } = useAuth();
   const { tenantPath } = useTenant();
   const toast = useToast();
   const [searchParams, setSearchParams] = useSearchParams();
@@ -64,7 +62,6 @@ export function ListingsPage() {
   const [hasMore, setHasMore] = useState(false);
   const [nearMeEnabled, setNearMeEnabled] = useState(false);
   const [radiusKm, setRadiusKm] = useState(25);
-  const geo = useGeolocation();
 
   // Use a ref for cursor to avoid infinite re-render loop (same pattern as FeedPage)
   const cursorRef = useRef<string | null>(null);
@@ -101,10 +98,10 @@ export function ListingsPage() {
       params.set('per_page', '20');
 
       let endpoint = '/v2/listings';
-      if (nearMeEnabled && geo.latitude !== null && geo.longitude !== null) {
+      if (nearMeEnabled && user?.latitude != null && user?.longitude != null) {
         endpoint = '/v2/listings/nearby';
-        params.set('lat', String(geo.latitude));
-        params.set('lon', String(geo.longitude));
+        params.set('lat', String(user.latitude));
+        params.set('lon', String(user.longitude));
         params.set('radius_km', String(radiusKm));
       }
 
@@ -142,7 +139,7 @@ export function ListingsPage() {
         setIsLoading(false);
       }
     }
-  }, [searchQuery, selectedType, selectedCategory, nearMeEnabled, geo.latitude, geo.longitude, radiusKm]);
+  }, [searchQuery, selectedType, selectedCategory, nearMeEnabled, user?.latitude, user?.longitude, radiusKm]);
 
   // Keep a ref so effects always call the latest version without depending on it
   const loadListingsRef = useRef(loadListings);
@@ -168,7 +165,7 @@ export function ListingsPage() {
   useEffect(() => {
     loadListingsRef.current(true);
     return () => { abortRef.current?.abort(); };
-  }, [searchQuery, selectedType, selectedCategory, nearMeEnabled, geo.latitude, geo.longitude, radiusKm]);
+  }, [searchQuery, selectedType, selectedCategory, nearMeEnabled, user?.latitude, user?.longitude, radiusKm]);
 
   // Sync URL params with filter state (harmless if it re-runs)
   useEffect(() => {
@@ -189,24 +186,12 @@ export function ListingsPage() {
       setNearMeEnabled(false);
       return;
     }
-    if (geo.error) {
-      toast.error(geo.error);
+    if (!user?.latitude || !user?.longitude) {
+      toast.error(t('near_me_no_location', 'Set your location in your profile to use Near me'));
       return;
-    }
-    if (geo.latitude === null) {
-      geo.requestLocation();
     }
     setNearMeEnabled(true);
   }
-
-  // Auto-disable near me if geolocation fails after enabling
-  useEffect(() => {
-    if (nearMeEnabled && geo.error) {
-      toast.error(geo.error);
-      setNearMeEnabled(false);
-    }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [geo.error, nearMeEnabled]);
 
   /**
    * Toggle save/unsave a listing with optimistic UI update.
@@ -339,9 +324,7 @@ export function ListingsPage() {
               className={nearMeEnabled
                 ? 'bg-primary text-white min-h-[40px]'
                 : 'bg-theme-elevated text-theme-primary min-h-[40px]'}
-              startContent={geo.loading
-                ? <Loader2 className="w-4 h-4 animate-spin" aria-hidden="true" />
-                : <MapPin className="w-4 h-4" aria-hidden="true" />}
+              startContent={<MapPin className="w-4 h-4" aria-hidden="true" />}
               onPress={handleNearMeToggle}
               aria-pressed={nearMeEnabled}
               aria-label={t('near_me', 'Near me')}

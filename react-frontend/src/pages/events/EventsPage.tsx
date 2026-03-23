@@ -28,7 +28,6 @@ import {
   Tag,
   Star,
   Ban,
-  Loader2,
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
@@ -39,7 +38,6 @@ import { api } from '@/lib/api';
 import { MAPS_ENABLED } from '@/lib/map-config';
 import { logError } from '@/lib/logger';
 import { usePageTitle } from '@/hooks';
-import { useGeolocation } from '@/hooks/useGeolocation';
 import type { Event } from '@/types/api';
 
 type EventFilter = 'upcoming' | 'past' | 'all';
@@ -62,7 +60,7 @@ const EVENT_CATEGORY_IDS = [
 export function EventsPage() {
   const { t } = useTranslation('events');
   usePageTitle(t('title'));
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, user } = useAuth();
   const { tenantPath } = useTenant();
   const toast = useToast();
   const [searchParams, setSearchParams] = useSearchParams();
@@ -86,7 +84,6 @@ export function EventsPage() {
   const [viewMode, setViewMode] = useState<'list' | 'map'>('list');
   const [nearMeEnabled, setNearMeEnabled] = useState(false);
   const [radiusKm, setRadiusKm] = useState(25);
-  const geo = useGeolocation();
 
   const tRef = useRef(t);
   tRef.current = t;
@@ -142,10 +139,10 @@ export function EventsPage() {
       }
 
       let endpoint = '/v2/events';
-      if (nearMeEnabled && geo.latitude !== null && geo.longitude !== null) {
+      if (nearMeEnabled && user?.latitude != null && user?.longitude != null) {
         endpoint = '/v2/events/nearby';
-        params.set('lat', String(geo.latitude));
-        params.set('lng', String(geo.longitude));
+        params.set('lat', String(user.latitude));
+        params.set('lng', String(user.longitude));
         params.set('radius_km', String(radiusKm));
       }
 
@@ -180,7 +177,7 @@ export function EventsPage() {
         setIsLoadingMore(false);
       }
     }
-  }, [debouncedQuery, filter, selectedCategory, nearMeEnabled, geo.latitude, geo.longitude, radiusKm]);
+  }, [debouncedQuery, filter, selectedCategory, nearMeEnabled, user?.latitude, user?.longitude, radiusKm]);
 
   const loadEventsRef = useRef(loadEvents);
   loadEventsRef.current = loadEvents;
@@ -195,7 +192,7 @@ export function EventsPage() {
         abortControllerRef.current.abort();
       }
     };
-  }, [debouncedQuery, filter, selectedCategory, nearMeEnabled, geo.latitude, geo.longitude, radiusKm]);
+  }, [debouncedQuery, filter, selectedCategory, nearMeEnabled, user?.latitude, user?.longitude, radiusKm]);
 
   // Update URL params
   useEffect(() => {
@@ -215,24 +212,12 @@ export function EventsPage() {
       setNearMeEnabled(false);
       return;
     }
-    if (geo.error) {
-      toast.error(geo.error);
+    if (!user?.latitude || !user?.longitude) {
+      toast.error(t('near_me_no_location', 'Set your location in your profile to use Near me'));
       return;
-    }
-    if (geo.latitude === null) {
-      geo.requestLocation();
     }
     setNearMeEnabled(true);
   }
-
-  // Auto-disable near me if geolocation fails after enabling
-  useEffect(() => {
-    if (nearMeEnabled && geo.error) {
-      toast.error(geo.error);
-      setNearMeEnabled(false);
-    }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [geo.error, nearMeEnabled]);
 
   // Group events by month
   const groupedEvents = events.reduce((groups, event) => {
@@ -305,9 +290,7 @@ export function EventsPage() {
             className={nearMeEnabled
               ? 'bg-primary text-white min-h-[40px]'
               : 'bg-theme-elevated text-theme-primary min-h-[40px]'}
-            startContent={geo.loading
-              ? <Loader2 className="w-4 h-4 animate-spin" aria-hidden="true" />
-              : <MapPin className="w-4 h-4" aria-hidden="true" />}
+            startContent={<MapPin className="w-4 h-4" aria-hidden="true" />}
             onPress={handleNearMeToggle}
             aria-pressed={nearMeEnabled}
             aria-label={t('near_me', 'Near me')}

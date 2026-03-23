@@ -25,21 +25,19 @@ import {
   AlertTriangle,
   Sparkles,
   TrendingUp,
-  Loader2,
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { GlassCard, MemberCardSkeleton, AlgorithmLabel } from '@/components/ui';
 import { PresenceIndicator } from '@/components/social';
 import { EntityMapView } from '@/components/location';
 import { EmptyState } from '@/components/feedback';
-import { useToast, useTenant } from '@/contexts';
+import { useAuth, useToast, useTenant } from '@/contexts';
 import { usePresenceOptional } from '@/contexts/PresenceContext';
 import { api } from '@/lib/api';
 import { MAPS_ENABLED } from '@/lib/map-config';
 import { logError } from '@/lib/logger';
 import { resolveAvatarUrl } from '@/lib/helpers';
 import { usePageTitle } from '@/hooks';
-import { useGeolocation } from '@/hooks/useGeolocation';
 import type { User } from '@/types/api';
 
 type SortOption = 'name' | 'joined' | 'rating' | 'hours_given';
@@ -76,7 +74,7 @@ export function MembersPage() {
   );
   const [nearMeEnabled, setNearMeEnabled] = useState(false);
   const [radiusKm, setRadiusKm] = useState(25);
-  const geo = useGeolocation();
+  const { user } = useAuth();
 
   // Refs
   const searchTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -154,10 +152,10 @@ export function MembersPage() {
       }
 
       let endpoint = '/v2/users';
-      if (nearMeEnabled && geo.latitude !== null && geo.longitude !== null) {
+      if (nearMeEnabled && user?.latitude != null && user?.longitude != null) {
         endpoint = '/v2/members/nearby';
-        params.set('lat', String(geo.latitude));
-        params.set('lon', String(geo.longitude));
+        params.set('lat', String(user.latitude));
+        params.set('lon', String(user.longitude));
         params.set('radius_km', String(radiusKm));
       }
 
@@ -193,7 +191,7 @@ export function MembersPage() {
       setIsLoading(false);
       setIsLoadingMore(false);
     }
-  }, [debouncedQuery, sortBy, t, toast, nearMeEnabled, geo.latitude, geo.longitude, radiusKm]);
+  }, [debouncedQuery, sortBy, t, toast, nearMeEnabled, user?.latitude, user?.longitude, radiusKm]);
 
   // Load more
   const loadMoreMembers = useCallback(() => {
@@ -209,7 +207,7 @@ export function MembersPage() {
     loadMembers();
     // Reset hasMore when filters change
     setHasMore(true);
-  }, [debouncedQuery, sortBy, nearMeEnabled, geo.latitude, geo.longitude, radiusKm]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [debouncedQuery, sortBy, nearMeEnabled, user?.latitude, user?.longitude, radiusKm]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Fetch presence for visible members
   useEffect(() => {
@@ -233,24 +231,12 @@ export function MembersPage() {
       setNearMeEnabled(false);
       return;
     }
-    if (geo.error) {
-      toast.error(geo.error);
+    if (!user?.latitude || !user?.longitude) {
+      toast.error(t('members.near_me_no_location', 'Set your location in your profile to use Near me'));
       return;
-    }
-    if (geo.latitude === null) {
-      geo.requestLocation();
     }
     setNearMeEnabled(true);
   }
-
-  // Auto-disable near me if geolocation fails after enabling
-  useEffect(() => {
-    if (nearMeEnabled && geo.error) {
-      toast.error(geo.error);
-      setNearMeEnabled(false);
-    }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [geo.error, nearMeEnabled]);
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -382,9 +368,7 @@ export function MembersPage() {
               className={nearMeEnabled
                 ? 'bg-primary text-white'
                 : 'bg-theme-elevated text-theme-primary'}
-              startContent={geo.loading
-                ? <Loader2 className="w-4 h-4 animate-spin" aria-hidden="true" />
-                : <MapPin className="w-4 h-4" aria-hidden="true" />}
+              startContent={<MapPin className="w-4 h-4" aria-hidden="true" />}
               onPress={handleNearMeToggle}
               aria-pressed={nearMeEnabled}
               aria-label={t('members.near_me', 'Near me')}
