@@ -116,7 +116,7 @@ export function StoriesBar({ friends: _friends }: StoriesBarProps) {
     loadStories();
   };
 
-  const truncateName = (name: string, max = 8): string =>
+  const truncateName = (name: string, max = 12): string =>
     name.length > max ? `${name.slice(0, max)}...` : name;
 
   if (!isAuthenticated) return null;

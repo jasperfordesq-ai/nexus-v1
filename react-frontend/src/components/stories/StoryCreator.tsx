@@ -367,9 +367,11 @@ export function StoryCreator({ onClose, onCreated }: StoryCreatorProps) {
                 maxLength={500}
                 minRows={2}
                 maxRows={4}
+                description={`${textContent.length}/500`}
                 classNames={{
                   input: 'text-white',
                   inputWrapper: 'border-white/20 bg-white/5',
+                  description: 'text-white/40 text-right',
                 }}
               />
 
