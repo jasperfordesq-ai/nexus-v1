@@ -1,0 +1,7 @@
+# Shell scripts must use LF — CRLF breaks shebang execution on Linux/macOS
+*.sh        text eol=lf
+.husky/*    text eol=lf
+Makefile    text eol=lf
+
+# Default behaviour for text files
+*           text=auto
