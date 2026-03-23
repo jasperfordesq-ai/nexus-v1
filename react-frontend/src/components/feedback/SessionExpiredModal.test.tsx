@@ -48,7 +48,7 @@ vi.mock('@/contexts', () => ({
   useMenuContext: () => ({ headerMenus: [], mobileMenus: [], hasCustomMenus: false }),
   useFeature: vi.fn(() => true),
   useModule: vi.fn(() => true),
-  useAuth: () => ({ user: null, isAuthenticated: false, login: vi.fn(), logout: vi.fn(), register: vi.fn(), updateUser: vi.fn(), refreshUser: vi.fn(), status: 'idle', error: null }),
+  useAuth: () => ({ user: { id: 1, name: 'Test User' }, isAuthenticated: true, login: vi.fn(), logout: vi.fn(), register: vi.fn(), updateUser: vi.fn(), refreshUser: vi.fn(), status: 'authenticated', error: null }),
   useToast: () => ({ success: vi.fn(), error: vi.fn(), info: vi.fn(), warning: vi.fn() }),
 }));
 

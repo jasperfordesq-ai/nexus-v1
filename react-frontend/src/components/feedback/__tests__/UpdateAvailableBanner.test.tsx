@@ -110,7 +110,15 @@ describe('UpdateAvailableBanner', () => {
   });
 
   it('falls back to window.location.reload() when no updateSW function', async () => {
-    const reloadSpy = vi.spyOn(window.location, 'reload').mockImplementation(vi.fn());
+    // jsdom marks location.reload as non-configurable, so vi.spyOn fails.
+    // Replace the entire location object with a spy-able version instead.
+    const reloadMock = vi.fn();
+    const originalLocation = window.location;
+    Object.defineProperty(window, 'location', {
+      writable: true,
+      value: { ...originalLocation, reload: reloadMock },
+    });
+
     (window as NexusWindow).__nexus_updatePending = true;
     (window as NexusWindow).__nexus_updateSW = null;
 
@@ -120,10 +128,14 @@ describe('UpdateAvailableBanner', () => {
     fireEvent.click(updateBtn);
 
     await waitFor(() => {
-      expect(reloadSpy).toHaveBeenCalled();
+      expect(reloadMock).toHaveBeenCalled();
     });
 
-    reloadSpy.mockRestore();
+    // Restore original location
+    Object.defineProperty(window, 'location', {
+      writable: true,
+      value: originalLocation,
+    });
   });
 
   it('clears the __nexus_updatePending flag after mounting', () => {

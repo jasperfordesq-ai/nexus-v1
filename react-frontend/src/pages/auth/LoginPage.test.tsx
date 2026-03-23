@@ -112,9 +112,8 @@ vi.mock('@/components/ui', async () => {
     GlassCard: ({ children, className }: { children: ReactNode; className?: string }) => {
       return React.createElement('div', { 'data-testid': 'glass-card', className }, children);
     },
-  };,
 
-  GlassButton: ({ children }: Record<string, unknown>) => children as never,
+    GlassButton: ({ children }: Record<string, unknown>) => children as never,
   GlassInput: () => null,
   BackToTop: () => null,
   AlgorithmLabel: () => null,
@@ -132,6 +131,7 @@ vi.mock('@/components/ui', async () => {
   NotificationSkeleton: () => null,
   ProfileHeaderSkeleton: () => null,
   SkeletonList: () => null,
+  };
 });
 
 vi.mock('@/components/seo', () => ({ PageMeta: () => null }));

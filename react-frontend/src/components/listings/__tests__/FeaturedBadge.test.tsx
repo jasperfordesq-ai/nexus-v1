@@ -49,26 +49,26 @@ describe('FeaturedBadge', () => {
 
   it('applies sm size classes by default', () => {
     const { container } = render(<FeaturedBadge />);
-    const badge = container.firstChild as HTMLElement;
+    const badge = container.querySelector('span[aria-label="Featured listing"]') as HTMLElement;
     expect(badge.className).toContain('text-[10px]');
   });
 
   it('applies md size classes when size="md"', () => {
     const { container } = render(<FeaturedBadge size="md" />);
-    const badge = container.firstChild as HTMLElement;
+    const badge = container.querySelector('span[aria-label="Featured listing"]') as HTMLElement;
     expect(badge.className).toContain('text-xs');
   });
 
   it('applies custom className to the badge', () => {
     const { container } = render(<FeaturedBadge className="absolute top-2 right-2" />);
-    const badge = container.firstChild as HTMLElement;
+    const badge = container.querySelector('span[aria-label="Featured listing"]') as HTMLElement;
     expect(badge.className).toContain('absolute');
     expect(badge.className).toContain('top-2');
   });
 
   it('has amber color classes', () => {
     const { container } = render(<FeaturedBadge />);
-    const badge = container.firstChild as HTMLElement;
+    const badge = container.querySelector('span[aria-label="Featured listing"]') as HTMLElement;
     expect(badge.className).toContain('amber');
   });
 });

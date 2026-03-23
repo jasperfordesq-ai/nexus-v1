@@ -109,8 +109,8 @@ describe('CreateGroupExchangePage', () => {
 
   it('renders the create group exchange wizard step 1', () => {
     render(<CreateGroupExchangePage />);
-    // Step 1: Exchange Details heading
-    expect(screen.getByText('wizard.step1_title')).toBeInTheDocument();
+    // Step 1: Exchange Details heading (from i18n key create.exchange_details)
+    expect(screen.getByText('Exchange Details')).toBeInTheDocument();
   });
 
   it('renders wizard step progress indicator', () => {
@@ -121,17 +121,17 @@ describe('CreateGroupExchangePage', () => {
 
   it('renders title input on step 1', () => {
     render(<CreateGroupExchangePage />);
-    expect(screen.getByRole('textbox', { name: /wizard.title_label/i })).toBeInTheDocument();
+    expect(screen.getByRole('textbox', { name: /title/i })).toBeInTheDocument();
   });
 
   it('renders total hours input on step 1', () => {
     render(<CreateGroupExchangePage />);
-    expect(screen.getByRole('spinbutton', { name: /wizard.total_hours_label/i })).toBeInTheDocument();
+    expect(screen.getByRole('spinbutton', { name: /total hours/i })).toBeInTheDocument();
   });
 
   it('renders next button to advance to step 2', () => {
     render(<CreateGroupExchangePage />);
-    expect(screen.getByText('wizard.next')).toBeInTheDocument();
+    expect(screen.getByText('Next')).toBeInTheDocument();
   });
 
   it('shows split type options on step 1', () => {

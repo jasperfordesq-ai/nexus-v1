@@ -18,14 +18,22 @@ vi.mock('framer-motion', () => ({
   AnimatePresence: ({ children }: { children?: ReactNode }) => <>{children}</>,
 }));
 
+// Stable t function to prevent infinite re-render loops
+// (component has `t` in useEffect deps)
+const stableT = (key: string, opts?: string | Record<string, unknown>) =>
+  typeof opts === 'string'
+    ? opts
+    : (opts?.defaultValue as string | undefined) ?? key;
+
+const stableTranslation = { t: stableT };
+
 vi.mock('react-i18next', () => ({
-  useTranslation: () => ({
-    t: (key: string, opts?: Record<string, unknown>) =>
-      (opts?.defaultValue as string | undefined) ?? key,
-  }),
+  useTranslation: () => stableTranslation,
 }));
 
 const mockNavigate = vi.fn();
+
+const mockUseParams = vi.fn<() => Record<string, string>>().mockReturnValue({});
 
 vi.mock('react-router-dom', async () => {
   const actual = await import('react-router-dom');
@@ -34,8 +42,10 @@ vi.mock('react-router-dom', async () => {
     ...actual,
     Link: ({ children, to, ...rest }: { children: ReactNode; to: string; [k: string]: unknown }) =>
       React.createElement('a', { href: String(to), ...rest }, children),
+    // Return the same function reference to avoid infinite re-render from useEffect deps
     useNavigate: () => mockNavigate,
-    useParams: () => ({}),
+    useParams: (...args: unknown[]) => mockUseParams(...args as []),
+    useSearchParams: () => [new URLSearchParams(), vi.fn()],
   };
 });
 
@@ -49,23 +59,30 @@ vi.mock('@/lib/api', () => ({
   },
 }));
 
+// Stable references to prevent infinite re-render loops
+// (component has `toast`, `t`, `tenantPath`, `navigate` in useEffect deps)
+const stableToast = {
+  success: vi.fn(),
+  error: vi.fn(),
+  info: vi.fn(),
+  warning: vi.fn(),
+};
+
+const stableTenantPath = (p: string) => `/test${p}`;
+const stableTenant = {
+  tenant: { id: 2, name: 'Test Tenant', slug: 'test' },
+  tenantPath: stableTenantPath,
+  hasFeature: vi.fn(() => true),
+  hasModule: vi.fn(() => true),
+};
+
 vi.mock('@/contexts', () => ({
   useAuth: vi.fn(() => ({
     user: { id: 1, first_name: 'Admin', name: 'Admin User', role: 'admin' },
     isAuthenticated: true,
   })),
-  useTenant: vi.fn(() => ({
-    tenant: { id: 2, name: 'Test Tenant', slug: 'test' },
-    tenantPath: (p: string) => `/test${p}`,
-    hasFeature: vi.fn(() => true),
-    hasModule: vi.fn(() => true),
-  })),
-  useToast: vi.fn(() => ({
-    success: vi.fn(),
-    error: vi.fn(),
-    info: vi.fn(),
-    warning: vi.fn(),
-  })),
+  useTenant: vi.fn(() => stableTenant),
+  useToast: vi.fn(() => stableToast),
 
   useTheme: () => ({ resolvedTheme: 'light', toggleTheme: vi.fn(), theme: 'system', setTheme: vi.fn() }),
   useNotifications: () => ({ unreadCount: 0, counts: {}, notifications: [], markAsRead: vi.fn(), markAllAsRead: vi.fn(), hasMore: false, loadMore: vi.fn(), isLoading: false, refresh: vi.fn() }),
@@ -84,24 +101,31 @@ vi.mock('@/lib/logger', () => ({ logError: vi.fn() }));
 import { CreateChallengePage } from './CreateChallengePage';
 
 describe('CreateChallengePage', () => {
-  beforeEach(() => {
+  beforeEach(async () => {
     vi.clearAllMocks();
+    // Restore admin user mock (test 3 overrides useAuth to return a member)
+    const { useAuth } = await import('@/contexts');
+    vi.mocked(useAuth).mockReturnValue({
+      user: { id: 1, first_name: 'Admin', name: 'Admin User', role: 'admin' },
+      isAuthenticated: true,
+    } as ReturnType<typeof useAuth>);
+    mockUseParams.mockReturnValue({});
     vi.mocked(api.get).mockResolvedValue({ success: true, data: [] });
   });
 
   it('renders the create challenge form for admins', async () => {
     render(<CreateChallengePage />);
     await waitFor(() => {
-      expect(screen.getByText('create_page.page_title')).toBeInTheDocument();
+      expect(screen.getByText('create_page.title')).toBeInTheDocument();
     });
   });
 
   it('renders title and description inputs', async () => {
     render(<CreateChallengePage />);
     await waitFor(() => {
-      expect(screen.getByText('create_page.field_title')).toBeInTheDocument();
+      expect(screen.getByText('form.title_label')).toBeInTheDocument();
     });
-    expect(screen.getByText('create_page.field_description')).toBeInTheDocument();
+    expect(screen.getByText('form.description_label')).toBeInTheDocument();
   });
 
   it('redirects non-admin users away from the page', async () => {
@@ -120,20 +144,20 @@ describe('CreateChallengePage', () => {
   it('shows template picker button', async () => {
     render(<CreateChallengePage />);
     await waitFor(() => {
-      expect(screen.getByText('create_page.use_template')).toBeInTheDocument();
+      expect(screen.getByText('templates.start_from_template')).toBeInTheDocument();
     });
   });
 
   it('shows validation error when submitting empty title', async () => {
     render(<CreateChallengePage />);
     await waitFor(() => {
-      expect(screen.getByText('create_page.page_title')).toBeInTheDocument();
+      expect(screen.getByText('create_page.title')).toBeInTheDocument();
     });
     // Submit without filling required fields
-    const submitBtn = screen.getByText('create_page.save_button');
+    const submitBtn = screen.getByText('form.create');
     submitBtn.click();
     await waitFor(() => {
-      expect(screen.getByText('create_page.title_required')).toBeInTheDocument();
+      expect(screen.getByText('validation.title_required')).toBeInTheDocument();
     });
   });
 
@@ -145,8 +169,7 @@ describe('CreateChallengePage', () => {
   });
 
   it('shows edit page title when editing an existing challenge', async () => {
-    const { useParams } = await import('react-router-dom');
-    vi.mocked(useParams).mockReturnValue({ id: '10' });
+    mockUseParams.mockReturnValue({ id: '10' });
 
     vi.mocked(api.get).mockImplementation((url: string) => {
       if (url.includes('/v2/ideation-challenges/10')) {
@@ -172,7 +195,7 @@ describe('CreateChallengePage', () => {
 
     render(<CreateChallengePage />);
     await waitFor(() => {
-      expect(screen.getByText('edit_page.page_title')).toBeInTheDocument();
+      expect(screen.getByText('edit_page.title')).toBeInTheDocument();
     });
   });
 });

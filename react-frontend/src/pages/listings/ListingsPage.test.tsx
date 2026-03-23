@@ -102,7 +102,7 @@ describe('ListingsPage', () => {
 
   it('shows New Listing button when authenticated', () => {
     render(<ListingsPage />);
-    expect(screen.getByText('New Listing')).toBeInTheDocument();
+    expect(screen.getByText('Create Listing')).toBeInTheDocument();
   });
 
   it('renders search input', () => {

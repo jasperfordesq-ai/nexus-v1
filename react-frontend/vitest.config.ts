@@ -17,14 +17,13 @@ export default defineConfig({
     pool: 'forks',
     poolOptions: {
       forks: {
-        maxForks: 1,
+        maxForks: 2,
         minForks: 1,
         isolate: true,
-        singleFork: true,
-        // Single fork runs all test files sequentially — no concurrent heap pressure
-        // gc() in setup.ts afterAll frees old module instances between files
-        // Peak heap ≈ heaviest single test file (not sum of all), stays well under limit
-        execArgv: ['--max-old-space-size=12288', '--expose-gc'],
+        singleFork: false,
+        // Each test file gets a fresh fork — prevents memory accumulation
+        // that causes hangs after ~60 files in singleFork mode
+        execArgv: ['--max-old-space-size=4096'],
       },
     },
     fileParallelism: false,

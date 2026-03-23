@@ -69,7 +69,9 @@ describe('TrendingHashtags', () => {
 
     const { container } = render(<TrendingHashtags />);
     await waitFor(() => {
-      expect(container.firstChild).toBeNull();
+      // HeroUI provider wrapper is always present, so container.firstChild is never null.
+      // Instead, verify that no hashtag-related content is rendered.
+      expect(container.textContent?.trim()).toBe('');
     });
   });
 
@@ -89,8 +91,8 @@ describe('TrendingHashtags', () => {
 
     render(<TrendingHashtags />);
     await waitFor(() => {
-      // i18n mock returns key; just verify count numbers are rendered
-      expect(screen.getByText('42')).toBeInTheDocument();
+      // i18n renders real English text e.g. "42 posts"
+      expect(screen.getByText('42 posts')).toBeInTheDocument();
     });
   });
 
@@ -140,7 +142,9 @@ describe('TrendingHashtags', () => {
 
     const { container } = render(<TrendingHashtags />);
     await waitFor(() => {
-      expect(container.firstChild).toBeNull();
+      // HeroUI provider wrapper is always present, so container.firstChild is never null.
+      // Instead, verify that no hashtag-related content is rendered.
+      expect(container.textContent?.trim()).toBe('');
     });
   });
 });
