@@ -192,6 +192,15 @@ export function TenantProvider({ children, tenantSlug }: TenantProviderProps) {
           error: null,
           notFoundSlug: null,
         });
+      } else if (response.code === 'SERVICE_UNAVAILABLE') {
+        // API is in maintenance mode — synthesise a tenant that triggers MaintenancePage
+        setSentryTenant(null);
+        setState({
+          tenant: { settings: { maintenance_mode: true } } as unknown as TenantConfig,
+          isLoading: false,
+          error: null,
+          notFoundSlug: null,
+        });
       } else {
         // Bootstrap failed — if we had a slug, this is an unknown tenant (soft 404)
         setSentryTenant(null);

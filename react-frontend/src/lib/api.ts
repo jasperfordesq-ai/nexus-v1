@@ -414,6 +414,15 @@ class ApiClient {
         };
       }
 
+      // Handle 503 Service Unavailable (maintenance mode — body may be HTML, not JSON)
+      if (response.status === 503) {
+        return {
+          success: false,
+          error: 'Service temporarily unavailable',
+          code: 'SERVICE_UNAVAILABLE',
+        };
+      }
+
       // Parse JSON response
       let data;
       try {
