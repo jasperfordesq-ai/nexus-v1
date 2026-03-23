@@ -23,7 +23,7 @@
   "commitment": {
     "all": "Tutti",
     "full_time": "Tempo Pieno",
-    "part_time": "Part Time",
+    "part_time": "Tempo Parziale",
     "flexible": "Flessibile",
     "one_off": "Una tantum"
   },
@@ -701,7 +701,7 @@
     "source_description": "Fonti delle candidature e i loro tassi di successo",
     "stage": {
       "applied": "Candidatura",
-      "screening": "Screening",
+      "screening": "Preselezione",
       "interview": "Colloquio",
       "offer": "Offerta",
       "accepted": "Accettato"

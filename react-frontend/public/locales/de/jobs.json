@@ -82,10 +82,10 @@
     "missing": "Fehlende Fähigkeiten",
     "no_skills_required": "Keine spezifischen Fähigkeiten erforderlich",
     "no_user_skills": "Fügen Sie Ihrem Profil Fähigkeiten hinzu, um Ihre Übereinstimmung zu sehen",
-    "why_you_match": "Why you match",
-    "you_have": "You have:",
-    "to_develop": "Skills to develop:",
-    "ai_summary_label": "AI Assessment"
+    "why_you_match": "Warum Sie passen",
+    "you_have": "Sie haben:",
+    "to_develop": "Zu entwickelnde Fähigkeiten:",
+    "ai_summary_label": "KI-Bewertung"
   },
   "qualified": {
     "title": "Bin ich qualifiziert?",
@@ -106,14 +106,14 @@
     "accepted": "Angenommen",
     "rejected": "Abgelehnt",
     "move_to": "Verschieben nach {{stage}}",
-    "no_rules": "No automation rules yet.",
-    "add_rule": "Add rule",
-    "trigger": "If in stage",
-    "days": "Days",
-    "action": "Action",
-    "target": "Move to",
-    "add": "Add Rule",
-    "delete": "Delete"
+    "no_rules": "Noch keine Automatisierungsregeln.",
+    "add_rule": "Regel hinzufügen",
+    "trigger": "Wenn in Phase",
+    "days": "Tage",
+    "action": "Aktion",
+    "target": "Verschieben nach",
+    "add": "Regel hinzufügen",
+    "delete": "Löschen"
   },
   "employer": {
     "page_title": "Employer Profile",
