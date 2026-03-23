@@ -52,8 +52,8 @@ export function MediaGrid({ media, className = '' }: MediaGridProps) {
         draggable={false}
       />
       {extraOverlay && extraCount > 0 && (
-        <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
-          <span className="text-white text-2xl font-bold">+{extraCount}</span>
+        <div className="absolute inset-0 bg-black/50 flex items-center justify-center" aria-label={`${extraCount} more images`}>
+          <span className="text-white text-2xl font-bold" aria-hidden="true">+{extraCount}</span>
         </div>
       )}
     </button>

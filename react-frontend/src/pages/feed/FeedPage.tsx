@@ -60,6 +60,7 @@ import { usePageTitle } from '@/hooks';
 import { FeedCard } from '@/components/feed/FeedCard';
 import type { FeedItem, FeedFilter, PollData } from '@/components/feed/types';
 import { getAuthor } from '@/components/feed/types';
+import type { ReactionType } from '@/components/social';
 import type { Friend } from '@/components/feed/sidebar/FriendsWidget';
 
 /* ───────────────────────── Feed Card Skeleton ───────────────────────── */
@@ -332,6 +333,68 @@ export function FeedPage() {
                 is_liked: !fi.is_liked,
                 likes_count: fi.is_liked ? fi.likes_count - 1 : fi.likes_count + 1,
               }
+            : fi
+        )
+      );
+    }
+  }, []);
+
+  /* ───────── Emoji Reaction ───────── */
+
+  const handleReact = useCallback(async (item: FeedItem, reactionType: ReactionType) => {
+    // Optimistic update
+    const prevReactions = item.reactions ?? { counts: {}, total: 0, user_reaction: null, top_reactors: [] };
+    const currentReaction = prevReactions.user_reaction;
+    const newCounts = { ...prevReactions.counts };
+    let newTotal = prevReactions.total;
+    let newUserReaction: string | null;
+
+    if (currentReaction === reactionType) {
+      // Remove reaction
+      newCounts[reactionType] = Math.max(0, (newCounts[reactionType] ?? 0) - 1);
+      if (newCounts[reactionType] === 0) delete newCounts[reactionType];
+      newTotal = Math.max(0, newTotal - 1);
+      newUserReaction = null;
+    } else {
+      // Switch or add reaction
+      if (currentReaction) {
+        newCounts[currentReaction] = Math.max(0, (newCounts[currentReaction] ?? 0) - 1);
+        if (newCounts[currentReaction] === 0) delete newCounts[currentReaction];
+      } else {
+        newTotal += 1;
+      }
+      newCounts[reactionType] = (newCounts[reactionType] ?? 0) + 1;
+      newUserReaction = reactionType;
+    }
+
+    setItems((prev) =>
+      prev.map((fi) =>
+        fi.id === item.id && fi.type === item.type
+          ? { ...fi, reactions: { ...prevReactions, counts: newCounts, total: newTotal, user_reaction: newUserReaction } }
+          : fi
+      )
+    );
+
+    try {
+      const res = await api.post(`/v2/posts/${item.id}/reactions`, { reaction_type: reactionType });
+      const resData = res.data as Record<string, unknown> | undefined;
+      if (resData?.reactions) {
+        const serverReactions = resData.reactions as FeedItem['reactions'];
+        setItems((prev) =>
+          prev.map((fi) =>
+            fi.id === item.id && fi.type === item.type
+              ? { ...fi, reactions: serverReactions }
+              : fi
+          )
+        );
+      }
+    } catch (err) {
+      logError('Failed to react', err);
+      // Revert on error
+      setItems((prev) =>
+        prev.map((fi) =>
+          fi.id === item.id && fi.type === item.type
+            ? { ...fi, reactions: prevReactions }
             : fi
         )
       );
@@ -658,6 +721,7 @@ export function FeedPage() {
                     <FeedCard
                       item={item}
                       onToggleLike={handleToggleLike}
+                      onReact={handleReact}
                       onHidePost={handleHidePost}
                       onMuteUser={handleMuteUser}
                       onReportPost={openReportModal}

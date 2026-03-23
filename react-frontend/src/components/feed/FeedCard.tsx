@@ -63,7 +63,8 @@ import { FeedContentRenderer } from './FeedContentRenderer';
 import { ImageCarousel } from './ImageCarousel';
 import { MediaGrid } from './MediaGrid';
 import { ReactionPicker, ReactionSummary, type ReactionType } from '@/components/social';
-import { LinkPreviewCard } from '@/components/social/LinkPreviewCard';import { MentionRenderer } from '@/components/social/MentionRenderer';
+import { LinkPreviewCard } from '@/components/social/LinkPreviewCard';
+import { MentionRenderer } from '@/components/social/MentionRenderer';
 
 /* ───────────────────────── Props ───────────────────────── */
 
