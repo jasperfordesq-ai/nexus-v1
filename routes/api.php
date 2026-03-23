@@ -579,7 +579,7 @@ Route::get('/v2/comments', [\App\Http\Controllers\Api\CommentsController::class,
 Route::post('/v2/comments', [\App\Http\Controllers\Api\CommentsController::class, 'store']);
 Route::put('/v2/comments/{id}', [\App\Http\Controllers\Api\CommentsController::class, 'update']);
 Route::delete('/v2/comments/{id}', [\App\Http\Controllers\Api\CommentsController::class, 'destroy']);
-Route::post('/v2/comments/{id}/reactions', [\App\Http\Controllers\Api\CommentsController::class, 'reactions']);
+// Note: POST /v2/comments/{id}/reactions is handled by ReactionController (line ~354)
 Route::get('/v2/mentions/search', [\App\Http\Controllers\Api\MentionController::class, 'search']);
 Route::get('/v2/mentions/me', [\App\Http\Controllers\Api\MentionController::class, 'myMentions']);
 Route::get('/v2/blog', [\App\Http\Controllers\Api\BlogPublicController::class, 'index']);
