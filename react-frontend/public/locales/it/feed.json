@@ -379,7 +379,7 @@
   "lightbox": {
     "aria_label": "Visualizzatore immagini",
     "close": "Chiudi visualizzatore immagini",
-    "counter": "{{current}} of {{total}}"
+    "counter": "{{current}} di {{total}}"
   },
   "reaction": {
     "like": "Mi Piace",

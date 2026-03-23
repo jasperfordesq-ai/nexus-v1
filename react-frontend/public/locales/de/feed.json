@@ -10,7 +10,7 @@
   "load_more": "Mehr laden",
   "unable_to_load": "Feed konnte nicht geladen werden",
   "try_again": "Erneut versuchen",
-  "session_expired": "Your session has expired. Please log in again.",
+  "session_expired": "Ihre Sitzung ist abgelaufen. Bitte melden Sie sich erneut an.",
   "error_load": "Feed konnte nicht geladen werden.",
   "error_load_retry": "Feed konnte nicht geladen werden. Bitte versuchen Sie es erneut.",
   "empty_title": "Noch keine Beiträge",
@@ -207,41 +207,41 @@
     "write_comment": "Kommentar schreiben...",
     "no_comments": "Noch keine Kommentare. Teilen Sie als Erste Person Ihre Gedanken!",
     "admin_delete": "Löschen (Admin)",
-    "type_post": "Post",
-    "type_listing": "Listing",
-    "type_event": "Event",
-    "type_poll": "Poll",
-    "type_goal": "Goal",
-    "type_review": "Review",
-    "type_job": "Job",
-    "type_challenge": "Challenge",
-    "type_volunteer": "Volunteer",
+    "type_post": "Beitrag",
+    "type_listing": "Inserat",
+    "type_event": "Veranstaltung",
+    "type_poll": "Umfrage",
+    "type_goal": "Ziel",
+    "type_review": "Bewertung",
+    "type_job": "Stelle",
+    "type_challenge": "Herausforderung",
+    "type_volunteer": "Freiwillig",
     "type_blog": "Blog",
-    "type_discussion": "Discussion",
-    "image_alt": "{{type}} image by {{name}}",
-    "post_options": "Post options",
-    "send_comment": "Send comment",
-    "share_action": "Share",
-    "shared_success": "Post shared to your feed",
-    "share_failed": "Failed to share",
-    "reaction": "reaction",
-    "reactions": "reactions",
-    "reactions_title": "Reactions",
-    "no_reactions": "No reactions yet",
-    "load_more": "Load More",
-    "and": "and",
-    "other": "other",
-    "others": "others",
-    "all": "All",
-    "post_actions": "Post actions",
-    "detail_listing": "View Listing",
-    "detail_event": "View Event",
-    "detail_goals": "View Goals",
-    "detail_profile": "View Profile",
-    "detail_job": "View Job",
-    "detail_challenge": "View Challenge",
-    "detail_volunteer": "View Opportunity",
-    "detail_blog": "Read Article"
+    "type_discussion": "Diskussion",
+    "image_alt": "{{type}}-Bild von {{name}}",
+    "post_options": "Beitragsoptionen",
+    "send_comment": "Kommentar senden",
+    "share_action": "Teilen",
+    "shared_success": "Beitrag in Ihrem Feed geteilt",
+    "share_failed": "Teilen fehlgeschlagen",
+    "reaction": "Reaktion",
+    "reactions": "Reaktionen",
+    "reactions_title": "Reaktionen",
+    "no_reactions": "Noch keine Reaktionen",
+    "load_more": "Mehr laden",
+    "and": "und",
+    "other": "weitere",
+    "others": "weitere",
+    "all": "Alle",
+    "post_actions": "Beitragsaktionen",
+    "detail_listing": "Inserat anzeigen",
+    "detail_event": "Veranstaltung anzeigen",
+    "detail_goals": "Ziele anzeigen",
+    "detail_profile": "Profil anzeigen",
+    "detail_job": "Stelle anzeigen",
+    "detail_challenge": "Herausforderung anzeigen",
+    "detail_volunteer": "Möglichkeit anzeigen",
+    "detail_blog": "Artikel lesen"
   },
   "hashtag": {
     "title": "Hashtag",
@@ -253,7 +253,7 @@
     "no_posts": "Keine Beiträge gefunden",
     "no_posts_desc": "Es wurden noch keine Beiträge mit #{{tag}} markiert.",
     "load_more": "Mehr laden",
-    "page_description": "Posts tagged with #{{tag}}"
+    "page_description": "Beiträge mit #{{tag}}"
   },
   "hashtags": {
     "title": "Trend-Hashtags",
@@ -283,78 +283,78 @@
   },
   "sidebar": {
     "profile": {
-      "listings": "Listings",
-      "given": "Given",
-      "received": "Received",
-      "offers": "Offers",
-      "requests": "Requests"
+      "listings": "Inserate",
+      "given": "Gegeben",
+      "received": "Erhalten",
+      "offers": "Angebote",
+      "requests": "Gesuche"
     },
     "friends": {
-      "title": "Friends",
-      "see_all": "See All",
-      "online": "Online now",
-      "active_today": "Active today"
+      "title": "Freunde",
+      "see_all": "Alle anzeigen",
+      "online": "Jetzt online",
+      "active_today": "Heute aktiv"
     },
     "pulse": {
-      "title": "Community Pulse",
-      "members": "Members",
-      "listings": "Listings",
-      "events": "Events",
-      "groups": "Groups"
+      "title": "Gemeinschafts-Puls",
+      "members": "Mitglieder",
+      "listings": "Inserate",
+      "events": "Veranstaltungen",
+      "groups": "Gruppen"
     },
     "suggested": {
-      "title": "Suggested For You",
-      "see_all": "See All",
-      "by": "by {{name}}",
+      "title": "Für Sie empfohlen",
+      "see_all": "Alle anzeigen",
+      "by": "von {{name}}",
       "request": "Anfrage",
       "offer": "Angebot"
     },
     "categories": {
-      "title": "Top Categories",
-      "all_listings": "All Listings"
+      "title": "Top-Kategorien",
+      "all_listings": "Alle Inserate"
     },
     "people": {
-      "title": "People You May Know",
-      "see_all": "See All",
-      "view": "View"
+      "title": "Personen, die Sie kennen könnten",
+      "see_all": "Alle anzeigen",
+      "view": "Anzeigen"
     },
     "events": {
-      "title": "Upcoming Events",
-      "see_all": "See All"
+      "title": "Bevorstehende Veranstaltungen",
+      "see_all": "Alle anzeigen"
     },
     "groups": {
-      "title": "Popular Groups",
-      "see_all": "See All",
-      "members": "{{count}} members"
+      "title": "Beliebte Gruppen",
+      "see_all": "Alle anzeigen",
+      "members": "{{count}} Mitglieder"
     },
     "actions": {
-      "title": "Quick Actions",
-      "create_listing": "Create New Listing",
-      "create_listing_desc": "Share your skills with the community",
-      "host_event": "Host Event",
-      "create_poll": "Create Poll",
-      "set_goal": "Set Goal",
-      "groups": "Groups"
+      "title": "Schnellaktionen",
+      "create_listing": "Neues Inserat erstellen",
+      "create_listing_desc": "Teilen Sie Ihre Fähigkeiten mit der Gemeinschaft",
+      "host_event": "Veranstaltung organisieren",
+      "create_poll": "Umfrage erstellen",
+      "set_goal": "Ziel setzen",
+      "groups": "Gruppen"
     },
     "by_owner": "von {{name}}",
     "offer": "Angebot"
   },
   "mode": {
-    "for_you": "For You",
-    "recent": "Recent",
+    "for_you": "Für Sie",
+    "recent": "Aktuell",
     "label": "Feed-Modus"
   },
   "location": {
     "global": "Global",
-    "nearby": "Near Me",
+    "nearby": "In meiner Nähe",
     "radius": "{{km}} km",
     "km": "km",
-    "add_location": "Add location in profile"
+    "add_location": "Standort im Profil hinzufügen"
   },
   "subfilter": {
-    "all": "All",
-    "offers": "Offers",
-    "requests": "Requests"
+    "all": "Alle",
+    "offers": "Angebote",
+    "requests": "Gesuche"
   },
   "stories": {
     "add": "Add Story",

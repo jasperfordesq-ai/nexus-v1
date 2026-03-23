@@ -81,16 +81,16 @@ class ExploreService
                     fp.created_at,
                     COALESCE(u.first_name, '') AS author_first_name,
                     COALESCE(u.last_name, '') AS author_last_name,
-                    u.avatar AS author_avatar,
+                    u.avatar_url AS author_avatar,
                     (SELECT COUNT(*) FROM post_likes pl WHERE pl.post_id = fp.id) AS likes_count,
-                    (SELECT COUNT(*) FROM comments c WHERE c.commentable_type = 'post' AND c.commentable_id = fp.id AND c.tenant_id = ?) AS comments_count,
+                    (SELECT COUNT(*) FROM comments c WHERE c.target_type = 'post' AND c.target_id = fp.id AND c.tenant_id = ?) AS comments_count,
                     (SELECT COUNT(*) FROM post_likes pl WHERE pl.post_id = fp.id)
-                        + (SELECT COUNT(*) FROM comments c WHERE c.commentable_type = 'post' AND c.commentable_id = fp.id AND c.tenant_id = ?) AS engagement
+                        + (SELECT COUNT(*) FROM comments c WHERE c.target_type = 'post' AND c.target_id = fp.id AND c.tenant_id = ?) AS engagement
                 FROM feed_posts fp
                 JOIN users u ON u.id = fp.user_id AND u.tenant_id = ?
                 WHERE fp.tenant_id = ?
-                    AND fp.created_at >= DATE_SUB(NOW(), INTERVAL 7 DAY)
-                    AND fp.is_deleted = 0
+                    AND fp.created_at >= DATE_SUB(NOW(), INTERVAL 90 DAY)
+                    AND fp.is_hidden = 0
                 ORDER BY engagement DESC, fp.created_at DESC
                 LIMIT 10
             ", [$tenantId, $tenantId, $tenantId, $tenantId]);
@@ -126,7 +126,7 @@ class ExploreService
                     l.type,
                     l.image_url,
                     l.location,
-                    l.estimated_hours,
+                    l.hours_estimate AS estimated_hours,
                     l.created_at,
                     COALESCE(l.view_count, 0) AS view_count,
                     COALESCE(l.save_count, 0) AS save_count,
@@ -136,7 +136,7 @@ class ExploreService
                     cat.color AS category_color,
                     COALESCE(u.first_name, '') AS author_first_name,
                     COALESCE(u.last_name, '') AS author_last_name,
-                    u.avatar AS author_avatar
+                    u.avatar_url AS author_avatar
                 FROM listings l
                 LEFT JOIN categories cat ON cat.id = l.category_id
                 JOIN users u ON u.id = l.user_id AND u.tenant_id = ?
@@ -181,12 +181,12 @@ class ExploreService
                     g.name,
                     g.description,
                     g.image_url,
-                    g.privacy,
+                    g.visibility AS privacy,
                     g.created_at,
-                    (SELECT COUNT(*) FROM group_members gm WHERE gm.group_id = g.id AND gm.status = 'approved') AS member_count
+                    (SELECT COUNT(*) FROM group_members gm WHERE gm.group_id = g.id AND gm.status = 'active') AS member_count
                 FROM `groups` g
                 WHERE g.tenant_id = ?
-                    AND g.status = 'active'
+                    AND g.is_active = 1
                 ORDER BY member_count DESC
                 LIMIT 6
             ", [$tenantId]);
@@ -217,18 +217,18 @@ class ExploreService
                     e.id,
                     e.title,
                     e.description,
-                    e.image_url,
-                    e.start_at,
-                    e.end_at,
+                    e.cover_image AS image_url,
+                    e.start_time AS start_at,
+                    e.end_time AS end_at,
                     e.location,
-                    e.is_online,
+                    e.allow_remote_attendance AS is_online,
                     e.max_attendees,
                     (SELECT COUNT(*) FROM event_rsvps er WHERE er.event_id = e.id AND er.status = 'going') AS rsvp_count
                 FROM events e
                 WHERE e.tenant_id = ?
-                    AND e.start_at > NOW()
-                    AND e.status = 'published'
-                ORDER BY e.start_at ASC
+                    AND e.start_time > NOW()
+                    AND e.status = 'active'
+                ORDER BY e.start_time ASC
                 LIMIT 8
             ", [$tenantId]);
 
@@ -261,7 +261,7 @@ class ExploreService
                     u.id,
                     COALESCE(u.first_name, '') AS first_name,
                     COALESCE(u.last_name, '') AS last_name,
-                    u.avatar,
+                    u.avatar_url AS avatar,
                     COALESCE(u.xp, 0) AS xp,
                     COALESCE(u.level, 1) AS level,
                     u.tagline
@@ -329,7 +329,7 @@ class ExploreService
                     u.id,
                     COALESCE(u.first_name, '') AS first_name,
                     COALESCE(u.last_name, '') AS last_name,
-                    u.avatar,
+                    u.avatar_url AS avatar,
                     u.tagline,
                     u.created_at
                 FROM users u
@@ -365,6 +365,14 @@ class ExploreService
                 return [];
             }
 
+            // Check if ideas table exists for idea_count subquery
+            $ideasExists = DB::select("SHOW TABLES LIKE 'ideas'");
+            $ideaCountSql = !empty($ideasExists)
+                ? "(SELECT COUNT(*) FROM ideas i WHERE i.challenge_id = ch.id AND i.tenant_id = ?)"
+                : "0";
+
+            $params = !empty($ideasExists) ? [$tenantId, $tenantId] : [$tenantId];
+
             $rows = DB::select("
                 SELECT
                     ch.id,
@@ -373,13 +381,13 @@ class ExploreService
                     ch.status,
                     ch.start_date,
                     ch.end_date,
-                    (SELECT COUNT(*) FROM ideas i WHERE i.challenge_id = ch.id AND i.tenant_id = ?) AS idea_count
+                    {$ideaCountSql} AS idea_count
                 FROM challenges ch
                 WHERE ch.tenant_id = ?
                     AND ch.status = 'active'
                 ORDER BY ch.end_date ASC
                 LIMIT 4
-            ", [$tenantId, $tenantId]);
+            ", $params);
 
             return array_map(fn($row) => [
                 'id' => $row->id,
@@ -408,12 +416,12 @@ class ExploreService
             );
 
             $exchangesThisMonth = DB::selectOne(
-                "SELECT COUNT(*) AS cnt FROM transactions WHERE tenant_id = ? AND created_at >= DATE_FORMAT(NOW(), '%Y-%m-01')",
+                "SELECT COUNT(*) AS cnt FROM transactions WHERE tenant_id = ? AND status = 'completed' AND created_at >= DATE_FORMAT(NOW(), '%Y-%m-01')",
                 [$tenantId]
             );
 
             $hoursExchanged = DB::selectOne(
-                "SELECT COALESCE(SUM(amount), 0) AS total FROM transactions WHERE tenant_id = ? AND type = 'debit' AND status = 'completed'",
+                "SELECT COALESCE(SUM(amount), 0) AS total FROM transactions WHERE tenant_id = ? AND status = 'completed'",
                 [$tenantId]
             );
 
@@ -468,7 +476,7 @@ class ExploreService
                         cat.slug AS category_slug,
                         COALESCE(u.first_name, '') AS author_first_name,
                         COALESCE(u.last_name, '') AS author_last_name,
-                        u.avatar AS author_avatar,
+                        u.avatar_url AS author_avatar,
                         NULL AS match_reason
                     FROM listings l
                     LEFT JOIN categories cat ON cat.id = l.category_id
@@ -503,7 +511,7 @@ class ExploreService
                     cat.slug AS category_slug,
                     COALESCE(u.first_name, '') AS author_first_name,
                     COALESCE(u.last_name, '') AS author_last_name,
-                    u.avatar AS author_avatar
+                    u.avatar_url AS author_avatar
                 FROM listings l
                 LEFT JOIN categories cat ON cat.id = l.category_id
                 JOIN users u ON u.id = l.user_id AND u.tenant_id = ?
@@ -547,8 +555,8 @@ class ExploreService
                 SELECT COUNT(*) AS cnt
                 FROM feed_posts fp
                 WHERE fp.tenant_id = ?
-                    AND fp.created_at >= DATE_SUB(NOW(), INTERVAL 7 DAY)
-                    AND fp.is_deleted = 0
+                    AND fp.created_at >= DATE_SUB(NOW(), INTERVAL 90 DAY)
+                    AND fp.is_hidden = 0
             ", [$tenantId]);
 
             $rows = DB::select("
@@ -560,17 +568,17 @@ class ExploreService
                     fp.created_at,
                     COALESCE(u.first_name, '') AS author_first_name,
                     COALESCE(u.last_name, '') AS author_last_name,
-                    u.avatar AS author_avatar,
+                    u.avatar_url AS author_avatar,
                     (SELECT COUNT(*) FROM post_likes pl WHERE pl.post_id = fp.id) AS likes_count,
-                    (SELECT COUNT(*) FROM comments c WHERE c.commentable_type = 'post' AND c.commentable_id = fp.id AND c.tenant_id = ?) AS comments_count
+                    (SELECT COUNT(*) FROM comments c WHERE c.target_type = 'post' AND c.target_id = fp.id AND c.tenant_id = ?) AS comments_count
                 FROM feed_posts fp
                 JOIN users u ON u.id = fp.user_id AND u.tenant_id = ?
                 WHERE fp.tenant_id = ?
-                    AND fp.created_at >= DATE_SUB(NOW(), INTERVAL 7 DAY)
-                    AND fp.is_deleted = 0
+                    AND fp.created_at >= DATE_SUB(NOW(), INTERVAL 90 DAY)
+                    AND fp.is_hidden = 0
                 ORDER BY (
                     (SELECT COUNT(*) FROM post_likes pl WHERE pl.post_id = fp.id)
-                    + (SELECT COUNT(*) FROM comments c WHERE c.commentable_type = 'post' AND c.commentable_id = fp.id AND c.tenant_id = ?)
+                    + (SELECT COUNT(*) FROM comments c WHERE c.target_type = 'post' AND c.target_id = fp.id AND c.tenant_id = ?)
                 ) DESC, fp.created_at DESC
                 LIMIT ? OFFSET ?
             ", [$tenantId, $tenantId, $tenantId, $tenantId, $perPage, $offset]);
@@ -618,7 +626,7 @@ class ExploreService
                     l.description,
                     l.image_url,
                     l.location,
-                    l.estimated_hours,
+                    l.hours_estimate AS estimated_hours,
                     l.created_at,
                     COALESCE(l.view_count, 0) AS view_count,
                     COALESCE(l.save_count, 0) AS save_count,
@@ -627,7 +635,7 @@ class ExploreService
                     cat.color AS category_color,
                     COALESCE(u.first_name, '') AS author_first_name,
                     COALESCE(u.last_name, '') AS author_last_name,
-                    u.avatar AS author_avatar
+                    u.avatar_url AS author_avatar
                 FROM listings l
                 LEFT JOIN categories cat ON cat.id = l.category_id
                 JOIN users u ON u.id = l.user_id AND u.tenant_id = ?
@@ -695,12 +703,12 @@ class ExploreService
                     l.description,
                     l.image_url,
                     l.location,
-                    l.estimated_hours,
+                    l.hours_estimate AS estimated_hours,
                     l.created_at,
                     COALESCE(l.view_count, 0) AS view_count,
                     COALESCE(u.first_name, '') AS author_first_name,
                     COALESCE(u.last_name, '') AS author_last_name,
-                    u.avatar AS author_avatar
+                    u.avatar_url AS author_avatar
                 FROM listings l
                 JOIN users u ON u.id = l.user_id AND u.tenant_id = ?
                 WHERE l.tenant_id = ?

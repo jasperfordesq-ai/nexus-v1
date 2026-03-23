@@ -5,7 +5,7 @@
   "live": "LIVE",
   "active": "Attivo",
   "completed": "Completato",
-  "new": "NEW",
+  "new": "NUOVO",
   "last_checked": "Ultimo controllo: {{time}}",
   "no_data": "Nessun dato disponibile",
   "status": {
