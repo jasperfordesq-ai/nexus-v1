@@ -9,9 +9,9 @@ fi
 
 # PHPUnit (blocking)
 if command -v powershell.exe >/dev/null 2>&1; then
-  powershell.exe -Command "docker exec nexus-php-app vendor/bin/phpunit --testsuite Unit,Services --no-progress"
+  powershell.exe -Command "docker exec nexus-php-app php -d memory_limit=4G vendor/bin/phpunit --testsuite Unit,Services --no-progress"
 elif command -v docker >/dev/null 2>&1; then
-  docker exec nexus-php-app vendor/bin/phpunit --testsuite Unit,Services --no-progress
+  docker exec nexus-php-app php -d memory_limit=4G vendor/bin/phpunit --testsuite Unit,Services --no-progress
 fi
 
 # i18n drift check + React TypeScript check + build
