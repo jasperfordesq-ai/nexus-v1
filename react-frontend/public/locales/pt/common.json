@@ -47,7 +47,8 @@
     "knowledge_base": "Base de conhecimento",
     "federation_settings": "Configurações de Federação",
     "unread_notifications": "{{count}} notificações não lidas",
-    "timebanking": "Banco de tempo"
+    "timebanking": "Banco de tempo",
+    "explore": "Explorar"
   },
   "nav_desc": {
     "members": "Explorar membros da comunidade",
@@ -90,7 +91,8 @@
     "federation_settings": "Gerencie suas preferências de federação",
     "feed": "Feed da comunidade",
     "timebanking_listings": "Ofertas e pedidos",
-    "messages": "Suas mensagens"
+    "messages": "Suas mensagens",
+    "explore": "Descubra conte�do e pessoas em tend�ncia"
   },
   "user_menu": {
     "my_profile": "O Meu Perfil",
