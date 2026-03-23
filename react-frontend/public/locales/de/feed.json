@@ -204,7 +204,8 @@
     "view_comments": "Kommentare anzeigen",
     "comment_action": "Kommentieren",
     "write_comment": "Kommentar schreiben...",
-    "no_comments": "Noch keine Kommentare. Teilen Sie als Erste Person Ihre Gedanken!"
+    "no_comments": "Noch keine Kommentare. Teilen Sie als Erste Person Ihre Gedanken!",
+    "admin_delete": "Löschen (Admin)"
   },
   "hashtag": {
     "title": "Hashtag",

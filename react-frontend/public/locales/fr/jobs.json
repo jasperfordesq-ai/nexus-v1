@@ -826,5 +826,12 @@
   "deadline_countdown_plural": "Closes in {{count}} days",
   "deadline_closed": "Closed",
   "remote_only": "Remote Only",
-  "match_badge": "{{count}}% match"
+  "match_badge": "{{count}}% match",
+  "my_postings": {
+    "title": "Mes offres",
+    "empty_title": "Aucune offre publiée",
+    "empty_description": "Publiez une offre pour commencer à recevoir des candidatures de votre communauté.",
+    "view_applicants": "Voir les candidats",
+    "edit": "Modifier"
+  }
 }

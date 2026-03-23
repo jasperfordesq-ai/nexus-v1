@@ -826,5 +826,12 @@
   "deadline_countdown_plural": "Closes in {{count}} days",
   "deadline_closed": "Closed",
   "remote_only": "Remote Only",
-  "match_badge": "{{count}}% match"
+  "match_badge": "{{count}}% match",
+  "my_postings": {
+    "title": "Meine Stellenanzeigen",
+    "empty_title": "Noch keine Stellenanzeigen",
+    "empty_description": "Veröffentlichen Sie eine Stelle, um Bewerbungen aus Ihrer Gemeinschaft zu erhalten.",
+    "view_applicants": "Bewerber ansehen",
+    "edit": "Bearbeiten"
+  }
 }

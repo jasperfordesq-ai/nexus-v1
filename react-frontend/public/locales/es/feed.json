@@ -204,7 +204,8 @@
     "view_comments": "Ver comentarios",
     "comment_action": "Comentar",
     "write_comment": "Escribe un comentario...",
-    "no_comments": "Aún no hay comentarios. ¡Sé el primero en compartir tus pensamientos!"
+    "no_comments": "Aún no hay comentarios. ¡Sé el primero en compartir tus pensamientos!",
+    "admin_delete": "Eliminar (Admin)"
   },
   "hashtag": {
     "title": "Hashtag",

@@ -826,5 +826,12 @@
   "deadline_countdown_plural": "Closes in {{count}} days",
   "deadline_closed": "Closed",
   "remote_only": "Remote Only",
-  "match_badge": "{{count}}% match"
+  "match_badge": "{{count}}% match",
+  "my_postings": {
+    "title": "Minhas publicações",
+    "empty_title": "Nenhuma publicação ainda",
+    "empty_description": "Publique uma vaga para começar a receber candidaturas da sua comunidade.",
+    "view_applicants": "Ver candidatos",
+    "edit": "Editar"
+  }
 }

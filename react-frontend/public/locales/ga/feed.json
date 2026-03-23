@@ -204,7 +204,8 @@
     "view_comments": "Féach ar thráchtanna",
     "comment_action": "Trácht",
     "write_comment": "Scríobh trácht...",
-    "no_comments": "Gan tráchtanna fós. Bí ar an gcéad duine chun do chuid smaointe a roinnt!"
+    "no_comments": "Gan tráchtanna fós. Bí ar an gcéad duine chun do chuid smaointe a roinnt!",
+    "admin_delete": "Scrios (Riarachán)"
   },
   "hashtag": {
     "title": "Haischlib",
