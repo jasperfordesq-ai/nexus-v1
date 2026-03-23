@@ -159,7 +159,8 @@
     "keywords_description": "Palavras-chave separadas por vírgula",
     "resubscribe_success": "Alerta retomado",
     "toggle_error": "Falha ao alternar alerta",
-    "delete_error": "Falha ao eliminar alerta"
+    "delete_error": "Falha ao eliminar alerta",
+    "never": "Nunca"
   },
   "renew": {
     "button": "Renovar",

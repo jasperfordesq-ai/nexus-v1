@@ -122,6 +122,19 @@ export function BiasAuditPage() {
   const tRef = useRef(t);
   tRef.current = t;
 
+  // Date range validation: keep dateFrom <= dateTo
+  useEffect(() => {
+    if (dateFrom && dateTo && dateFrom > dateTo) {
+      setDateTo(dateFrom);
+    }
+  }, [dateFrom]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  useEffect(() => {
+    if (dateFrom && dateTo && dateTo < dateFrom) {
+      setDateFrom(dateTo);
+    }
+  }, [dateTo]); // eslint-disable-line react-hooks/exhaustive-deps
+
   // Load available jobs for the filter dropdown
   useEffect(() => {
     let cancelled = false;

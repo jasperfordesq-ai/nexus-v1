@@ -159,7 +159,8 @@
     "keywords_description": "Palabras clave separadas por comas",
     "resubscribe_success": "Alerta reanudada",
     "toggle_error": "Error al alternar la alerta",
-    "delete_error": "Error al eliminar la alerta"
+    "delete_error": "Error al eliminar la alerta",
+    "never": "Nunca"
   },
   "renew": {
     "button": "Renovar",

@@ -159,7 +159,8 @@
     "keywords_description": "Parole chiave separate da virgola",
     "resubscribe_success": "Avviso ripreso",
     "toggle_error": "Impossibile cambiare lo stato dell'avviso",
-    "delete_error": "Impossibile eliminare l'avviso"
+    "delete_error": "Impossibile eliminare l'avviso",
+    "never": "Mai"
   },
   "renew": {
     "button": "Rinnova",

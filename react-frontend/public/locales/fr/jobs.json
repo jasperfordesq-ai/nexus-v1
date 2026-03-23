@@ -159,7 +159,8 @@
     "keywords_description": "Mots-cles separes par des virgules",
     "resubscribe_success": "Alerte reprise",
     "toggle_error": "Echec du basculement de l'alerte",
-    "delete_error": "Echec de la suppression de l'alerte"
+    "delete_error": "Echec de la suppression de l'alerte",
+    "never": "Jamais"
   },
   "renew": {
     "button": "Renouveler",

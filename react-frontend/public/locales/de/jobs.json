@@ -159,7 +159,8 @@
     "keywords_description": "Kommagetrennte Schlüsselwörter",
     "resubscribe_success": "Benachrichtigung fortgesetzt",
     "toggle_error": "Benachrichtigung konnte nicht umgeschaltet werden",
-    "delete_error": "Benachrichtigung konnte nicht gelöscht werden"
+    "delete_error": "Benachrichtigung konnte nicht gelöscht werden",
+    "never": "Nie"
   },
   "renew": {
     "button": "Verlängern",

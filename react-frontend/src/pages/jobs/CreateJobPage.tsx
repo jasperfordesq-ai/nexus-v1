@@ -398,7 +398,7 @@ export function CreateJobPage() {
       const response = await api.post<{ description: string }>('/v2/jobs/generate-description', payload);
 
       if (response.success && response.data) {
-        const desc = (response.data as Record<string, unknown>).description as string;
+        const desc = ((response.data as Record<string, unknown>)?.description ?? '') as string;
         if (desc) {
           setForm((prev) => ({ ...prev, description: desc }));
           toastRef.current.success(tRef.current('ai_generate.success'));
@@ -1409,7 +1409,7 @@ export function CreateJobPage() {
               className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
               onPress={handleSubmit}
               isLoading={isSubmitting}
-              isDisabled={!form.title.trim() || !form.description.trim()}
+              isDisabled={isSubmitting || !form.title.trim() || !form.description.trim()}
             >
               {isSubmitting
                 ? (isEditing ? t('form.updating') : t('form.creating'))
@@ -1548,7 +1548,7 @@ export function CreateJobPage() {
             {form.deadline && (
               <div className="flex items-center gap-2 text-sm text-theme-muted">
                 <Calendar className="w-4 h-4" aria-hidden="true" />
-                {t('deadline_label')}: {new Date(form.deadline).toLocaleDateString()}
+                {t('deadline_label')}: {form.deadline ? new Date(form.deadline).toLocaleDateString() : ''}
               </div>
             )}
 

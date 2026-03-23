@@ -159,7 +159,8 @@
     "keywords_description": "Comma-separated keywords",
     "resubscribe_success": "Alert resumed",
     "toggle_error": "Failed to toggle alert",
-    "delete_error": "Failed to delete alert"
+    "delete_error": "Failed to delete alert",
+    "never": "Never"
   },
   "renew": {
     "button": "Renew",

@@ -159,7 +159,8 @@
     "keywords_description": "Eochairfhocail scartha le camóga",
     "resubscribe_success": "Foláireamh atosaithe",
     "toggle_error": "Theip ar athrú an fholáirimh",
-    "delete_error": "Theip ar scriosadh an fholáirimh"
+    "delete_error": "Theip ar scriosadh an fholáirimh",
+    "never": "Riamh"
   },
   "renew": {
     "button": "Athnuaigh",

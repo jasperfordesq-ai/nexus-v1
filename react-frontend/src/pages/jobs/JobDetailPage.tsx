@@ -313,6 +313,12 @@ interface PipelineRule {
   last_run_at: string | null;
 }
 
+function parseArrayResponse<T>(data: unknown): T[] {
+  if (Array.isArray(data)) return data;
+  if (data && typeof data === 'object' && 'data' in data) return (data as { data: T[] }).data ?? [];
+  return [];
+}
+
 export function JobDetailPage() {
   const { t } = useTranslation('jobs');
   const { id } = useParams<{ id: string }>();
@@ -490,7 +496,7 @@ export function JobDetailPage() {
           setBenchmark(res.data);
         }
       })
-      .catch(() => { /* non-critical */ });
+      .catch((err) => { if (import.meta.env.DEV) console.warn('Non-critical:', err); });
     return () => { controller.abort(); };
   }, [vacancy, isOwner]);
 
@@ -501,11 +507,10 @@ export function JobDetailPage() {
     api.get<{ data: JobVacancy[] } | JobVacancy[]>(`/v2/jobs?category=${encodeURIComponent(vacancy.category)}&limit=4&exclude=${vacancy.id}`)
       .then((res) => {
         if (controller.signal.aborted || !res.success || !res.data) return;
-        const d = res.data;
-        const items: JobVacancy[] = Array.isArray(d) ? d : ('data' in d ? d.data : []);
+        const items = parseArrayResponse<JobVacancy>(res.data);
         setSimilarJobs(items.filter((j) => j.id !== vacancy.id).slice(0, 4));
       })
-      .catch(() => { /* non-critical */ });
+      .catch((err) => { if (import.meta.env.DEV) console.warn('Non-critical:', err); });
     return () => { controller.abort(); };
   }, [vacancy?.category, vacancy?.id]);
 
@@ -525,18 +530,14 @@ export function JobDetailPage() {
         if (controller.signal.aborted) return;
 
         // Parse interviews
-        const interviews: InlineInterview[] = (() => {
-          if (!interviewsRes.success || !interviewsRes.data) return [];
-          const d = interviewsRes.data;
-          return Array.isArray(d) ? d : ('data' in d ? d.data : []);
-        })();
+        const interviews: InlineInterview[] = interviewsRes.success && interviewsRes.data
+          ? parseArrayResponse<InlineInterview>(interviewsRes.data)
+          : [];
 
         // Parse offers
-        const offers: InlineOffer[] = (() => {
-          if (!offersRes.success || !offersRes.data) return [];
-          const d = offersRes.data;
-          return Array.isArray(d) ? d : ('data' in d ? d.data : []);
-        })();
+        const offers: InlineOffer[] = offersRes.success && offersRes.data
+          ? parseArrayResponse<InlineOffer>(offersRes.data)
+          : [];
 
         // Find pending interview/offer for THIS job's application
         const myInterview = interviews.find(
@@ -704,7 +705,7 @@ export function JobDetailPage() {
         applyModal.onClose();
         // Feature 5: Silently update saved cover letter (best-effort, no await blocking)
         if (applyMessage.trim()) {
-          api.put('/v2/jobs/saved-profile', { headline: '', cover_text: applyMessage.trim() }).catch(() => {});
+          api.put('/v2/jobs/saved-profile', { headline: '', cover_text: applyMessage.trim() }).catch((err) => { if (import.meta.env.DEV) console.warn('Non-critical:', err); });
         }
         setApplyMessage('');
         setCvFile(null);
@@ -1609,7 +1610,7 @@ export function JobDetailPage() {
                         color="danger"
                         variant="flat"
                         onPress={() =>
-                          api.delete(`/v2/jobs/pipeline-rules/${rule.id}`).then(() => loadPipelineRules()).catch(() => {})
+                          api.delete(`/v2/jobs/pipeline-rules/${rule.id}`).then(() => loadPipelineRules()).catch((err) => { if (import.meta.env.DEV) console.warn('Non-critical:', err); })
                         }
                       >
                         {t('pipeline.delete', 'Delete')}
