@@ -187,8 +187,7 @@ export default function ExplorePage() {
     '/v2/categories?type=listing'
   );
 
-  const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSearch = () => {
     if (searchQuery.trim()) {
       navigate(tenantPath(`/search?q=${encodeURIComponent(searchQuery.trim())}`));
     }
@@ -242,21 +241,33 @@ export default function ExplorePage() {
           {t('subtitle')}
         </p>
 
-        <form onSubmit={handleSearch} className="max-w-2xl mx-auto mb-4">
+        <form
+          onSubmit={(e) => { e.preventDefault(); handleSearch(); }}
+          className="max-w-2xl mx-auto mb-4 flex gap-2"
+        >
           <Input
             size="lg"
             variant="bordered"
             placeholder={t('search_placeholder')}
             value={searchQuery}
             onValueChange={setSearchQuery}
-            startContent={<Search className="w-5 h-5 text-[var(--text-muted)]" />}
+            startContent={<Search className="w-5 h-5 text-[var(--text-muted)]" aria-hidden="true" />}
             classNames={{
               inputWrapper: 'bg-[var(--glass-bg)] border-[var(--glass-border)] backdrop-blur-md',
             }}
             onKeyDown={(e) => {
-              if (e.key === 'Enter') handleSearch(e);
+              if (e.key === 'Enter') handleSearch();
             }}
           />
+          <Button
+            type="submit"
+            color="primary"
+            size="lg"
+            className="shrink-0"
+            aria-label={t('search_placeholder')}
+          >
+            <Search className="w-5 h-5" aria-hidden="true" />
+          </Button>
         </form>
 
         {/* Category quick-filter chips */}

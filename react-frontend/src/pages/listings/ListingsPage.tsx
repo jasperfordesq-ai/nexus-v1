@@ -271,7 +271,7 @@ export function ListingsPage() {
             <Select
               aria-label={t('filter_category_label')}
               placeholder={t('filter_category_label')}
-              selectedKeys={selectedCategory && categories.length > 0 ? [selectedCategory] : []}
+              selectedKeys={selectedCategory ? [selectedCategory] : []}
               onChange={(e) => setSelectedCategory(e.target.value)}
               className="w-full sm:w-44"
               classNames={{
