@@ -183,6 +183,7 @@ const SkillsBrowsePage = lazyWithRetry(() => import('@/pages/skills/SkillsBrowse
 const ActivityDashboardPage = lazyWithRetry(() => import('@/pages/activity/ActivityDashboardPage'));
 const HashtagPage = lazyWithRetry(() => import('@/pages/feed/HashtagPage'));
 const HashtagsDiscoveryPage = lazyWithRetry(() => import('@/pages/feed/HashtagsDiscoveryPage'));
+const PostDetailPage = lazyWithRetry(() => import('@/pages/feed/PostDetailPage'));
 const ExplorePage = lazyWithRetry(() => import('@/pages/explore/ExplorePage'));
 
 // Static Pages
@@ -794,6 +795,13 @@ function AppRoutes() {
             <FeatureGate module="feed" redirect="/dashboard">
               <FeatureErrorBoundary featureName="Feed">
                 <FeedPage />
+              </FeatureErrorBoundary>
+            </FeatureGate>
+          } />
+          <Route path="feed/posts/:id" element={
+            <FeatureGate module="feed" redirect="/dashboard">
+              <FeatureErrorBoundary featureName="Feed">
+                <PostDetailPage />
               </FeatureErrorBoundary>
             </FeatureGate>
           } />

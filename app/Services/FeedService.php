@@ -107,6 +107,11 @@ class FeedService
             $query->where('feed_activity.group_id', (int) $groupId);
         }
 
+        if (isset($filters['post_id'])) {
+            $query->where('feed_activity.source_id', (int) $filters['post_id'])
+                  ->where('feed_activity.source_type', 'post');
+        }
+
         if ($subtype !== null) {
             $query->whereRaw(
                 "JSON_UNQUOTE(JSON_EXTRACT(feed_activity.metadata, '$.listing_type')) = ?",

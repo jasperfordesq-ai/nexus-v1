@@ -325,6 +325,7 @@ Route::get('/v2/wallet/user-search', [\App\Http\Controllers\Api\WalletController
 Route::get('/v2/wallet/pending-count', [\App\Http\Controllers\Api\WalletController::class, 'pendingCount']);
 // Feed
 Route::get('/v2/feed', [\App\Http\Controllers\Api\SocialController::class, 'feedV2']);
+Route::get('/v2/feed/posts/{id}', [\App\Http\Controllers\Api\SocialController::class, 'showPost']);
 Route::post('/v2/feed/posts', [\App\Http\Controllers\Api\SocialController::class, 'createPostV2']);
 Route::post('/v2/feed/like', [\App\Http\Controllers\Api\SocialController::class, 'likeV2']);
 Route::post('/v2/feed/polls', [\App\Http\Controllers\Api\SocialController::class, 'createPollV2']);

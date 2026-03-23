@@ -111,6 +111,34 @@ class SocialController extends BaseApiController
         );
     }
 
+    // -----------------------------------------------------------------
+    //  GET /api/v2/feed/posts/{id}
+    // -----------------------------------------------------------------
+
+    /**
+     * Fetch a single feed post by its ID (feed_posts.id / feed_activity.source_id).
+     * Returns the same shape as a feed item from feedV2.
+     */
+    public function showPost(int $id): JsonResponse
+    {
+        $userId = $this->getOptionalUserId();
+
+        $result = $this->feedService->getFeed($userId, ['post_id' => $id, 'limit' => 1]);
+
+        if (empty($result['items'])) {
+            return $this->respondWithError('NOT_FOUND', 'Post not found', null, 404);
+        }
+
+        $item = $result['items'][0];
+
+        $mediaByPost = $this->postMediaService->getMediaForPosts([$id]);
+        $item['media'] = $mediaByPost[$id] ?? [];
+
+        unset($item['_activity_id'], $item['_activity_created_at']);
+
+        return $this->respondWithData($item);
+    }
+
     /**
      * POST /api/v2/feed/like
      *

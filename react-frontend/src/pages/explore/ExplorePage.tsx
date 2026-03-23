@@ -361,7 +361,7 @@ export default function ExplorePage() {
               {data!.trending_posts.map((post) => (
                 <Link
                   key={post.id}
-                  to={tenantPath(`/feed?post=${post.id}`)}
+                  to={tenantPath(`/feed/posts/${post.id}`)}
                   className="min-w-[280px] max-w-[320px] snap-start shrink-0"
                 >
                   <Card className="h-full border border-[var(--card-border)] bg-[var(--card-bg)] hover:bg-[var(--card-hover-bg)] transition-colors">
