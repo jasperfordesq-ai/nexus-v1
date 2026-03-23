@@ -24,12 +24,13 @@ class PresenceController extends BaseApiController
      * POST /v2/presence/heartbeat
      *
      * Client sends this every 60 seconds while the tab is focused.
-     * Rate-limited to 2 per minute per user.
+     * Rate-limited to 6 per minute per user (allows initial ping + tab-focus
+     * events + the 60 s interval without triggering 429s).
      */
     public function heartbeat(): JsonResponse
     {
         $userId = $this->requireAuth();
-        $this->rateLimit('presence_heartbeat', 2, 60);
+        $this->rateLimit('presence_heartbeat', 6, 60);
 
         PresenceService::heartbeat($userId);
 
