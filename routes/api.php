@@ -411,6 +411,9 @@ Route::delete('/v2/jobs/pipeline-rules/{id}', [\App\Http\Controllers\Api\JobVaca
 Route::post('/v2/jobs/{id}/pipeline-rules/run', [\App\Http\Controllers\Api\JobVacanciesController::class, 'runPipelineRules']);
 // Bulk application actions
 Route::post('/v2/jobs/{id}/applications/bulk-status', [\App\Http\Controllers\Api\JobVacanciesController::class, 'bulkUpdateApplicationStatus']);
+// Static literal routes MUST come before {id} wildcard to avoid mismatching
+Route::get('/v2/jobs/my-interviews', [\App\Http\Controllers\Api\JobVacanciesController::class, 'myInterviews']);
+Route::get('/v2/jobs/my-offers', [\App\Http\Controllers\Api\JobVacanciesController::class, 'myOffers']);
 Route::get('/v2/jobs/{id}', [\App\Http\Controllers\Api\JobVacanciesController::class, 'show']);
 Route::put('/v2/jobs/{id}', [\App\Http\Controllers\Api\JobVacanciesController::class, 'update']);
 Route::delete('/v2/jobs/{id}', [\App\Http\Controllers\Api\JobVacanciesController::class, 'destroy']);
@@ -427,15 +430,13 @@ Route::post('/v2/jobs/{id}/feature', [\App\Http\Controllers\Api\JobVacanciesCont
 Route::delete('/v2/jobs/{id}/feature', [\App\Http\Controllers\Api\JobVacanciesController::class, 'unfeatureJob']);
 Route::put('/v2/jobs/applications/{id}', [\App\Http\Controllers\Api\JobVacanciesController::class, 'updateApplication']);
 Route::get('/v2/jobs/applications/{id}/history', [\App\Http\Controllers\Api\JobVacanciesController::class, 'applicationHistory']);
-// Interviews — static literal routes first to avoid conflict with {id} wildcard
-Route::get('/v2/jobs/my-interviews', [\App\Http\Controllers\Api\JobVacanciesController::class, 'myInterviews']);
+// Interviews
 Route::post('/v2/jobs/applications/{id}/interview', [\App\Http\Controllers\Api\JobVacanciesController::class, 'proposeInterview']);
 Route::put('/v2/jobs/interviews/{id}/accept', [\App\Http\Controllers\Api\JobVacanciesController::class, 'acceptInterview']);
 Route::put('/v2/jobs/interviews/{id}/decline', [\App\Http\Controllers\Api\JobVacanciesController::class, 'declineInterview']);
 Route::delete('/v2/jobs/interviews/{id}', [\App\Http\Controllers\Api\JobVacanciesController::class, 'cancelInterview']);
 Route::get('/v2/jobs/{id}/interviews', [\App\Http\Controllers\Api\JobVacanciesController::class, 'getInterviews']);
-// Offers — static literal routes first to avoid conflict with {id} wildcard
-Route::get('/v2/jobs/my-offers', [\App\Http\Controllers\Api\JobVacanciesController::class, 'myOffers']);
+// Offers
 Route::post('/v2/jobs/applications/{id}/offer', [\App\Http\Controllers\Api\JobVacanciesController::class, 'createOffer']);
 Route::put('/v2/jobs/offers/{id}/accept', [\App\Http\Controllers\Api\JobVacanciesController::class, 'acceptOffer']);
 Route::put('/v2/jobs/offers/{id}/reject', [\App\Http\Controllers\Api\JobVacanciesController::class, 'rejectOffer']);
