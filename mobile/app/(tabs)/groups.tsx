@@ -25,8 +25,8 @@ import { useDebounce } from '@/lib/hooks/useDebounce';
 import { usePaginatedApi } from '@/lib/hooks/usePaginatedApi';
 import { usePrimaryColor } from '@/lib/hooks/useTenant';
 import { useTheme, type Theme } from '@/lib/hooks/useTheme';
+import { withAlpha } from '@/lib/utils/color';
 import OfflineBanner from '@/components/OfflineBanner';
-import LoadingSpinner from '@/components/ui/LoadingSpinner';
 import { SkeletonBox } from '@/components/ui/Skeleton';
 
 type FilterValue = 'all' | 'public' | 'private';
@@ -108,7 +108,7 @@ function GroupCard({ item, primary, theme, t, onPress }: GroupCardProps) {
           {item.is_featured && (
             <View
               style={{
-                backgroundColor: primary + '20',
+                backgroundColor: withAlpha(primary, 0.13),
                 borderRadius: 6,
                 paddingHorizontal: 7,
                 paddingVertical: 2,
@@ -303,6 +303,10 @@ export default function GroupsScreen() {
             <View style={styles.footer}>
               <ActivityIndicator size="small" color={theme.textMuted} />
             </View>
+          ) : !hasMore && items.length > 0 && !isLoading ? (
+            <View style={styles.footer}>
+              <Text style={styles.endOfListText}>{t('common:endOfList')}</Text>
+            </View>
           ) : null
         }
         contentContainerStyle={styles.list}
@@ -362,5 +366,6 @@ function makeStyles(theme: Theme) {
     retryBtn: { paddingHorizontal: 20, paddingVertical: 10 },
     emptyText: { color: theme.textMuted, fontSize: 14, textAlign: 'center' },
     footer: { paddingVertical: 16, alignItems: 'center' },
+    endOfListText: { fontSize: 13, color: theme.textMuted },
   });
 }

@@ -27,6 +27,7 @@ import {
 import { usePaginatedApi } from '@/lib/hooks/usePaginatedApi';
 import { usePrimaryColor } from '@/lib/hooks/useTenant';
 import { useTheme, type Theme } from '@/lib/hooks/useTheme';
+import { withAlpha } from '@/lib/utils/color';
 import Avatar from '@/components/ui/Avatar';
 import LoadingSpinner from '@/components/ui/LoadingSpinner';
 
@@ -57,7 +58,7 @@ function OrganisationCard({
           <View style={styles.nameRow}>
             <Text style={styles.cardName} numberOfLines={1}>{item.name}</Text>
             {item.verified ? (
-              <View style={[styles.verifiedBadge, { backgroundColor: primary + '1a' }]}>
+              <View style={[styles.verifiedBadge, { backgroundColor: withAlpha(primary, 0.10) }]}>
                 <Ionicons name="checkmark-circle" size={12} color={primary} />
                 <Text style={[styles.verifiedText, { color: primary }]}>{t('verified')}</Text>
               </View>

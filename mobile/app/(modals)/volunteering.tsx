@@ -27,6 +27,7 @@ import {
 import { usePaginatedApi } from '@/lib/hooks/usePaginatedApi';
 import { usePrimaryColor } from '@/lib/hooks/useTenant';
 import { useTheme, type Theme } from '@/lib/hooks/useTheme';
+import { withAlpha } from '@/lib/utils/color';
 import LoadingSpinner from '@/components/ui/LoadingSpinner';
 
 // ---------------------------------------------------------------------------
@@ -81,7 +82,7 @@ function OpportunityCard({
       {/* Meta row: location / remote, hours */}
       <View style={styles.cardMeta}>
         {item.is_remote ? (
-          <View style={[styles.remoteBadge, { backgroundColor: primary + '1a' }]}>
+          <View style={[styles.remoteBadge, { backgroundColor: withAlpha(primary, 0.10) }]}>
             <Text style={[styles.remoteBadgeText, { color: primary }]}>{t('remote')}</Text>
           </View>
         ) : item.location ? (

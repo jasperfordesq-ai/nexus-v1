@@ -24,6 +24,7 @@ import { api } from '@/lib/api/client';
 import { useApi } from '@/lib/hooks/useApi';
 import { usePrimaryColor } from '@/lib/hooks/useTenant';
 import { useTheme, type Theme } from '@/lib/hooks/useTheme';
+import { withAlpha } from '@/lib/utils/color';
 import { API_V2 } from '@/lib/constants';
 
 interface NotificationPrefs {
@@ -226,7 +227,7 @@ function SettingRow({
         value={value}
         onValueChange={onToggle}
         disabled={disabled}
-        trackColor={{ false: theme.border, true: primary + '80' }}
+        trackColor={{ false: theme.border, true: withAlpha(primary, 0.50) }}
         thumbColor={value ? primary : theme.surface}
       />
     </View>

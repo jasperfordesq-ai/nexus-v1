@@ -27,7 +27,6 @@ import { usePrimaryColor } from '@/lib/hooks/useTenant';
 import { useTheme, type Theme } from '@/lib/hooks/useTheme';
 import ExchangeCard from '@/components/ExchangeCard';
 import OfflineBanner from '@/components/OfflineBanner';
-import LoadingSpinner from '@/components/ui/LoadingSpinner';
 import { ExchangeCardSkeleton } from '@/components/ui/Skeleton';
 
 /** Extractor for cursor-based ExchangeListResponse. */
@@ -129,6 +128,10 @@ export default function ExchangesScreen() {
             <View style={styles.footer}>
               <ActivityIndicator size="small" color={theme.textMuted} />
             </View>
+          ) : !hasMore && items.length > 0 && !isLoading ? (
+            <View style={styles.footer}>
+              <Text style={styles.endOfListText}>{t('common:endOfList')}</Text>
+            </View>
           ) : null
         }
         contentContainerStyle={styles.list}
@@ -175,5 +178,6 @@ function makeStyles(theme: Theme) {
     retryBtn: { paddingHorizontal: 20, paddingVertical: 10 },
     emptyText: { color: theme.textMuted, fontSize: 14, textAlign: 'center' },
     footer: { paddingVertical: 16, alignItems: 'center' },
+    endOfListText: { fontSize: 13, color: theme.textMuted },
   });
 }

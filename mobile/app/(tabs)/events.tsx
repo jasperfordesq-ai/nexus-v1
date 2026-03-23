@@ -5,6 +5,7 @@
 
 import { useState, useCallback, useMemo } from 'react';
 import {
+  ActivityIndicator,
   View,
   Text,
   FlatList,
@@ -22,7 +23,7 @@ import { getEvents, type Event, type EventsResponse } from '@/lib/api/events';
 import { usePaginatedApi } from '@/lib/hooks/usePaginatedApi';
 import { usePrimaryColor } from '@/lib/hooks/useTenant';
 import { useTheme, type Theme } from '@/lib/hooks/useTheme';
-import LoadingSpinner from '@/components/ui/LoadingSpinner';
+import { withAlpha } from '@/lib/utils/color';
 import { EventCardSkeleton } from '@/components/ui/Skeleton';
 
 function extractEventsPage(r: EventsResponse) {
@@ -120,7 +121,17 @@ export default function EventsScreen() {
               </View>
             )
           }
-          ListFooterComponent={isLoadingMore ? <View style={{ marginVertical: 16 }}><LoadingSpinner size="small" /></View> : null}
+          ListFooterComponent={
+            isLoadingMore ? (
+              <View style={styles.footer}>
+                <ActivityIndicator size="small" color={theme.textMuted} />
+              </View>
+            ) : !hasMore && items.length > 0 && !isLoading ? (
+              <View style={styles.footer}>
+                <Text style={styles.endOfListText}>{t('common:endOfList')}</Text>
+              </View>
+            ) : null
+          }
           contentContainerStyle={items.length === 0 ? { flex: 1 } : { paddingBottom: 24 }}
         />
       )}
@@ -162,8 +173,8 @@ function EventCard({
       accessibilityLabel={event.title}
     >
       {/* Date badge */}
-      {/* primary + '15' = 8% opacity variant for light background */}
-      <View style={[cardStyles.dateBadge, { backgroundColor: primary + '15' }]}>
+      {/* 8% opacity variant for light background */}
+      <View style={[cardStyles.dateBadge, { backgroundColor: withAlpha(primary, 0.08) }]}>
         <Text style={[cardStyles.dateMonth, { color: primary }]}>{month}</Text>
         <Text style={[cardStyles.dateDay, { color: primary }]}>{day}</Text>
       </View>
@@ -198,7 +209,7 @@ function EventCard({
           </View>
 
           {event.category && (
-            <View style={[cardStyles.categoryPill, { backgroundColor: (event.category.color ?? primary) + '20' }]}>
+            <View style={[cardStyles.categoryPill, { backgroundColor: withAlpha(event.category.color ?? primary, 0.13) }]}>
               <Text style={[cardStyles.categoryText, { color: event.category.color ?? primary }]}>
                 {event.category.name}
               </Text>
@@ -206,7 +217,7 @@ function EventCard({
           )}
 
           {event.user_rsvp === 'going' && (
-            <View style={[cardStyles.rsvpBadge, { backgroundColor: primary + '20' }]}>
+            <View style={[cardStyles.rsvpBadge, { backgroundColor: withAlpha(primary, 0.13) }]}>
               <Text style={[cardStyles.rsvpBadgeText, { color: primary }]}>{t('going')}</Text>
             </View>
           )}
@@ -259,5 +270,7 @@ function makeStyles(theme: Theme) {
     emptyText: { fontSize: 15, color: theme.textMuted },
     errorText: { fontSize: 15, color: theme.textMuted, marginBottom: 12 },
     retryBtn: { paddingHorizontal: 20, paddingVertical: 10 },
+    footer: { paddingVertical: 16, alignItems: 'center' as const },
+    endOfListText: { fontSize: 13, color: theme.textMuted },
   });
 }

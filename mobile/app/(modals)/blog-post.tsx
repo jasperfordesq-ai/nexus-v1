@@ -23,6 +23,7 @@ import { getBlogPost, type BlogPost } from '@/lib/api/blog';
 import { useApi } from '@/lib/hooks/useApi';
 import { usePrimaryColor } from '@/lib/hooks/useTenant';
 import { useTheme, type Theme } from '@/lib/hooks/useTheme';
+import { withAlpha } from '@/lib/utils/color';
 import Avatar from '@/components/ui/Avatar';
 import LoadingSpinner from '@/components/ui/LoadingSpinner';
 
@@ -145,7 +146,7 @@ export default function BlogPostScreen() {
 
         {/* Category */}
         {post.category ? (
-          <View style={[styles.categoryPill, { backgroundColor: primary + '20' }]}>
+          <View style={[styles.categoryPill, { backgroundColor: withAlpha(primary, 0.13) }]}>
             <Text style={[styles.categoryText, { color: primary }]}>{post.category}</Text>
           </View>
         ) : null}

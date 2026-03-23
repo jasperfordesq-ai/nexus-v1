@@ -25,6 +25,7 @@ import LoadingSpinner from '@/components/ui/LoadingSpinner';
 import { usePaginatedApi } from '@/lib/hooks/usePaginatedApi';
 import { usePrimaryColor } from '@/lib/hooks/useTenant';
 import { useTheme, type Theme } from '@/lib/hooks/useTheme';
+import { withAlpha } from '@/lib/utils/color';
 
 function extractBlogPage(response: BlogListResponse) {
   return {
@@ -76,7 +77,7 @@ export default function BlogScreen() {
             )}
             <View style={styles.cardBody}>
               {item.category ? (
-                <View style={[styles.categoryPill, { backgroundColor: primary + '20' }]}>
+                <View style={[styles.categoryPill, { backgroundColor: withAlpha(primary, 0.13) }]}>
                   <Text style={[styles.categoryText, { color: primary }]}>{item.category}</Text>
                 </View>
               ) : null}

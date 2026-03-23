@@ -38,5 +38,6 @@
     "member": "Membre",
     "friend": "là",
     "you": "Vous"
-  }
+  },
+  "endOfList": "Vous avez atteint la fin"
 }

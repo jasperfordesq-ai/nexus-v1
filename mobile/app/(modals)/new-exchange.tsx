@@ -24,6 +24,7 @@ import { createExchange, type ExchangeType } from '@/lib/api/exchanges';
 import { ApiResponseError } from '@/lib/api/client';
 import { usePrimaryColor } from '@/lib/hooks/useTenant';
 import { useTheme, type Theme } from '@/lib/hooks/useTheme';
+import { withAlpha } from '@/lib/utils/color';
 import { useApi } from '@/lib/hooks/useApi';
 import { api } from '@/lib/api/client';
 import { API_V2 } from '@/lib/constants';
@@ -210,7 +211,7 @@ export default function NewExchangeModal() {
                     key={cat.id}
                     style={[
                       styles.categoryChip,
-                      selected && { backgroundColor: primary + '18', borderColor: primary },
+                      selected && { backgroundColor: withAlpha(primary, 0.09), borderColor: primary },
                     ]}
                     onPress={() => setCategoryId(cat.id)}
                     activeOpacity={0.7}

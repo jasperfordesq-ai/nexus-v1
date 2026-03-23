@@ -25,6 +25,7 @@ import { getGroup, joinGroup, leaveGroup, type GroupDetail } from '@/lib/api/gro
 import { useApi } from '@/lib/hooks/useApi';
 import { usePrimaryColor } from '@/lib/hooks/useTenant';
 import { useTheme, type Theme } from '@/lib/hooks/useTheme';
+import { withAlpha } from '@/lib/utils/color';
 import Avatar from '@/components/ui/Avatar';
 import LoadingSpinner from '@/components/ui/LoadingSpinner';
 
@@ -206,7 +207,7 @@ export default function GroupDetailScreen() {
             <Ionicons name="share-outline" size={22} color={primary} />
           </TouchableOpacity>
           {group.is_featured && (
-            <View style={[styles.badge, { backgroundColor: primary + '20' }]}>
+            <View style={[styles.badge, { backgroundColor: withAlpha(primary, 0.13) }]}>
               <Text style={[styles.badgeText, { color: primary }]}>{t('featured')}</Text>
             </View>
           )}

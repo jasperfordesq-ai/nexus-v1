@@ -28,6 +28,7 @@ import type { JobVacancy } from '@/lib/api/jobs';
 import { useApi } from '@/lib/hooks/useApi';
 import { usePrimaryColor } from '@/lib/hooks/useTenant';
 import { useTheme, type Theme } from '@/lib/hooks/useTheme';
+import { withAlpha } from '@/lib/utils/color';
 import Avatar from '@/components/ui/Avatar';
 import LoadingSpinner from '@/components/ui/LoadingSpinner';
 
@@ -442,7 +443,7 @@ export default function JobDetailScreen() {
                       paddingHorizontal: 12,
                       paddingVertical: 8,
                       borderRadius: 20,
-                      backgroundColor: primary + '1a',
+                      backgroundColor: withAlpha(primary, 0.10),
                       alignSelf: 'flex-start',
                       marginBottom: 12,
                     }}

@@ -3,9 +3,11 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useCallback } from 'react';
 import {
+  ActivityIndicator,
   FlatList,
+  RefreshControl,
   SafeAreaView,
   ScrollView,
   StyleSheet,
@@ -18,15 +20,24 @@ import { router } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
 
-import { search, type SearchResult, type SearchResultType } from '@/lib/api/search';
-import { useApi } from '@/lib/hooks/useApi';
+import { search, type SearchResult, type SearchResultType, type SearchResponse } from '@/lib/api/search';
+import { usePaginatedApi } from '@/lib/hooks/usePaginatedApi';
 import { useDebounce } from '@/lib/hooks/useDebounce';
 import { usePrimaryColor } from '@/lib/hooks/useTenant';
 import { useTheme, type Theme } from '@/lib/hooks/useTheme';
+import { withAlpha } from '@/lib/utils/color';
 import { SkeletonBox } from '@/components/ui/Skeleton';
 import OfflineBanner from '@/components/OfflineBanner';
 
 type FilterOption = SearchResultType | 'all';
+
+function extractSearchPage(response: SearchResponse) {
+  return {
+    items: response.data,
+    cursor: response.meta.cursor ?? null,
+    hasMore: response.meta.has_more,
+  };
+}
 
 const TYPE_ICONS: Record<SearchResultType, React.ComponentProps<typeof Ionicons>['name']> = {
   user: 'person-outline',
@@ -89,13 +100,22 @@ export default function SearchScreen() {
 
   const activeType = activeFilter === 'all' ? undefined : activeFilter;
 
-  const { data, isLoading, error } = useApi(
-    () => search(debouncedQuery, null, activeType),
-    [debouncedQuery, activeFilter],
-    { enabled: debouncedQuery.trim().length > 0 },
+  const fetchSearch = useCallback(
+    (cursor: string | null) => {
+      if (!debouncedQuery.trim()) {
+        return Promise.resolve({ data: [], meta: { total: 0, has_more: false, cursor: null } } as SearchResponse);
+      }
+      return search(debouncedQuery, cursor, activeType);
+    },
+    [debouncedQuery, activeType],
   );
 
-  const results = data?.data ?? [];
+  const { items: results, isLoading, isLoadingMore, error, hasMore, loadMore, refresh } =
+    usePaginatedApi<SearchResult, SearchResponse>(
+      fetchSearch,
+      extractSearchPage,
+      [debouncedQuery, activeFilter],
+    );
 
   const filters: FilterOption[] = ['all', 'user', 'listing', 'event', 'group', 'blog_post'];
 
@@ -115,7 +135,7 @@ export default function SearchScreen() {
         accessibilityRole="button"
         accessibilityLabel={item.title}
       >
-        <View style={[styles.iconWrap, { backgroundColor: primary + '18' }]}>
+        <View style={[styles.iconWrap, { backgroundColor: withAlpha(primary, 0.09) }]}>
           <Ionicons name={icon} size={20} color={primary} />
         </View>
         <View style={styles.resultText}>
@@ -132,7 +152,7 @@ export default function SearchScreen() {
   }
 
   function renderEmpty() {
-    if (isLoading && debouncedQuery.trim().length > 0) {
+    if (isLoading && debouncedQuery.trim().length > 0 && results.length === 0) {
       return (
         <>
           <SearchResultSkeleton theme={theme} />
@@ -229,6 +249,27 @@ export default function SearchScreen() {
         keyExtractor={(item) => `${item.type}-${item.id}`}
         renderItem={renderResult}
         ListEmptyComponent={renderEmpty}
+        onEndReached={loadMore}
+        onEndReachedThreshold={0.3}
+        refreshControl={
+          <RefreshControl
+            refreshing={isLoading && results.length > 0}
+            onRefresh={refresh}
+            tintColor={primary}
+            colors={[primary]}
+          />
+        }
+        ListFooterComponent={
+          isLoadingMore ? (
+            <View style={styles.footer}>
+              <ActivityIndicator size="small" color={theme.textMuted} />
+            </View>
+          ) : !hasMore && results.length > 0 && !isLoading ? (
+            <View style={styles.footer}>
+              <Text style={styles.endOfListText}>{t('common:endOfList')}</Text>
+            </View>
+          ) : null
+        }
         contentContainerStyle={results.length === 0 ? styles.listEmptyContainer : styles.list}
         keyboardShouldPersistTaps="handled"
       />
@@ -309,5 +350,7 @@ function makeStyles(theme: Theme) {
     },
     emptyText: { fontSize: 15, color: theme.textMuted, textAlign: 'center' },
     errorText: { fontSize: 15, color: theme.error, textAlign: 'center' },
+    footer: { paddingVertical: 16, alignItems: 'center' as const },
+    endOfListText: { fontSize: 13, color: theme.textMuted },
   });
 }

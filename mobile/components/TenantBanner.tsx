@@ -8,6 +8,7 @@ import { View, Text, Image, StyleSheet } from 'react-native';
 
 import { useTenant, usePrimaryColor } from '@/lib/hooks/useTenant';
 import { useTheme, type Theme } from '@/lib/hooks/useTheme';
+import { withAlpha } from '@/lib/utils/color';
 
 /**
  * Displays the current tenant's name and logo in a compact header banner.
@@ -22,7 +23,7 @@ export default function TenantBanner() {
   if (!tenant) return null;
 
   return (
-    <View style={[styles.banner, { borderBottomColor: primary + '20' }]}>
+    <View style={[styles.banner, { borderBottomColor: withAlpha(primary, 0.13) }]}>
       {tenant.branding.logo_url ? (
         <Image
           source={{ uri: tenant.branding.logo_url }}

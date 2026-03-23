@@ -48,5 +48,6 @@
   "no": "No",
   "search": "Search",
   "filter": "Filter",
-  "clear": "Clear"
+  "clear": "Clear",
+  "endOfList": "You've reached the end"
 }

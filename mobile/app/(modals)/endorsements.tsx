@@ -32,6 +32,7 @@ import { useApi } from '@/lib/hooks/useApi';
 import { useAuth } from '@/lib/hooks/useAuth';
 import { usePrimaryColor } from '@/lib/hooks/useTenant';
 import { useTheme, type Theme } from '@/lib/hooks/useTheme';
+import { withAlpha } from '@/lib/utils/color';
 import Avatar from '@/components/ui/Avatar';
 import LoadingSpinner from '@/components/ui/LoadingSpinner';
 
@@ -160,7 +161,7 @@ export default function EndorsementsScreen() {
           <Avatar uri={item.endorsed_by.avatar} name={item.endorsed_by.name} size={40} />
           <View style={styles.endorsementBody}>
             <Text style={styles.endorserName}>{item.endorsed_by.name}</Text>
-            <View style={[styles.skillBadge, { backgroundColor: primary + '20' }]}>
+            <View style={[styles.skillBadge, { backgroundColor: withAlpha(primary, 0.13) }]}>
               <Text style={[styles.skillBadgeText, { color: primary }]}>{item.skill.name}</Text>
             </View>
             {item.message ? (

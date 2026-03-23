@@ -12,6 +12,7 @@ import { useTranslation } from 'react-i18next';
 import { voteFeedPoll, type PollData } from '@/lib/api/feed';
 import { usePrimaryColor } from '@/lib/hooks/useTenant';
 import { useTheme, type Theme } from '@/lib/hooks/useTheme';
+import { withAlpha } from '@/lib/utils/color';
 
 interface PollCardProps {
   pollData: PollData;
@@ -219,7 +220,7 @@ function resultStyles(theme: Theme, primary: string) {
       borderRadius: 9,
     },
     fillBarSelected: {
-      backgroundColor: primary + '20',
+      backgroundColor: withAlpha(primary, 0.13),
     },
     optionContent: {
       flexDirection: 'row',

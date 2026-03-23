@@ -25,6 +25,7 @@ import { getOrganisation } from '@/lib/api/organisations';
 import { useApi } from '@/lib/hooks/useApi';
 import { usePrimaryColor } from '@/lib/hooks/useTenant';
 import { useTheme, type Theme } from '@/lib/hooks/useTheme';
+import { withAlpha } from '@/lib/utils/color';
 import Avatar from '@/components/ui/Avatar';
 import LoadingSpinner from '@/components/ui/LoadingSpinner';
 
@@ -128,7 +129,7 @@ export default function OrganisationDetailScreen() {
               </TouchableOpacity>
             </View>
             {organisation.verified ? (
-              <View style={[styles.verifiedBadge, { backgroundColor: primary + '1a' }]}>
+              <View style={[styles.verifiedBadge, { backgroundColor: withAlpha(primary, 0.10) }]}>
                 <Ionicons name="checkmark-circle" size={14} color={primary} />
                 <Text style={[styles.verifiedText, { color: primary }]}>{t('verified')}</Text>
               </View>

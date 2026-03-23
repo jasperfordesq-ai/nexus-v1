@@ -29,6 +29,7 @@ import {
 import { useApi } from '@/lib/hooks/useApi';
 import { usePrimaryColor } from '@/lib/hooks/useTenant';
 import { useTheme, type Theme } from '@/lib/hooks/useTheme';
+import { withAlpha } from '@/lib/utils/color';
 import Avatar from '@/components/ui/Avatar';
 import LoadingSpinner from '@/components/ui/LoadingSpinner';
 
@@ -116,7 +117,7 @@ function BadgeCard({
 
   return (
     <View style={[styles.badgeCard, { borderColor: badge.is_earned ? primary : theme.borderSubtle }]}>
-      <View style={[styles.badgeIconWrap, { backgroundColor: badge.is_earned ? primary + '20' : theme.surface }]}>
+      <View style={[styles.badgeIconWrap, { backgroundColor: badge.is_earned ? withAlpha(primary, 0.13) : theme.surface }]}>
         <Ionicons
           name={(badge.icon as React.ComponentProps<typeof Ionicons>['name']) ?? 'ribbon-outline'}
           size={28}
@@ -151,7 +152,7 @@ function LeaderboardRow({
   t: (key: string, opts?: Record<string, unknown>) => string;
 }) {
   return (
-    <View style={[styles.lbRow, isCurrentUser && { backgroundColor: primary + '15', borderRadius: 10 }]}>
+    <View style={[styles.lbRow, isCurrentUser && { backgroundColor: withAlpha(primary, 0.08), borderRadius: 10 }]}>
       <Text style={[styles.lbRank, { color: isCurrentUser ? primary : theme.textSecondary }]}>
         #{entry.rank}
       </Text>
@@ -302,7 +303,7 @@ export default function GamificationScreen() {
                 {periods.map((p) => (
                   <TouchableOpacity
                     key={p.key}
-                    style={[styles.periodPill, period === p.key && { backgroundColor: primary + '25', borderColor: primary }]}
+                    style={[styles.periodPill, period === p.key && { backgroundColor: withAlpha(primary, 0.15), borderColor: primary }]}
                     onPress={() => { void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light); setPeriod(p.key); }}
                     activeOpacity={0.8}
                     accessibilityRole="button"

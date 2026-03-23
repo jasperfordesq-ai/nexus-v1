@@ -51,7 +51,7 @@ export default function HomeScreen() {
     [],
   );
 
-  const { items, isLoading, isLoadingMore, error, loadMore, refresh } =
+  const { items, isLoading, isLoadingMore, error, hasMore, loadMore, refresh } =
     usePaginatedApi<FeedItemType, FeedResponse>(fetchFeed, extractFeedPage);
 
   const { data: countsData } = useApi(() => getNotificationCounts());
@@ -126,6 +126,10 @@ export default function HomeScreen() {
             <View style={styles.footer}>
               <ActivityIndicator size="small" color={theme.textSecondary} />
             </View>
+          ) : !hasMore && items.length > 0 && !isLoading ? (
+            <View style={styles.footer}>
+              <Text style={styles.endOfListText}>{t('common:endOfList')}</Text>
+            </View>
           ) : null
         }
         contentContainerStyle={styles.list}
@@ -167,5 +171,6 @@ function makeStyles(theme: Theme) {
     emptyTitle: { color: theme.text, fontSize: 17, fontWeight: '600', textAlign: 'center', marginBottom: 8 },
     emptySubText: { color: theme.textSecondary, fontSize: 14, textAlign: 'center', lineHeight: 20 },
     footer: { paddingVertical: 16, alignItems: 'center' },
+    endOfListText: { fontSize: 13, color: theme.textMuted },
   });
 }
