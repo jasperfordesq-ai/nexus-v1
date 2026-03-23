@@ -290,5 +290,38 @@
     "aria_label": "Development status",
     "status": "Development status: {{stage}}",
     "read_more": "Read more"
+  },
+  "skills": {
+    "browse_title": "Community Skills Directory",
+    "load_failed": "Failed to load skill categories",
+    "load_failed_retry": "Failed to load skill categories. Please try again.",
+    "offering_label": "Offering",
+    "offering_desc": "members willing to share this skill with others",
+    "requesting_label": "Requesting",
+    "requesting_desc": "members looking to learn or receive help with this skill",
+    "add_your_skills": "Add your own skills",
+    "categories": "Categories",
+    "sub_categories": "Sub-categories",
+    "total_skills": "Skills Listed",
+    "search_placeholder": "Search skill categories...",
+    "no_categories": "No categories found",
+    "no_match": "No categories match \"{{query}}\"",
+    "no_categories_yet": "No skill categories available yet.",
+    "members_with_skills": "skilled members",
+    "loading_skills": "Loading skills...",
+    "skills_in_category": "Skills",
+    "offering": "offering",
+    "requesting": "requesting",
+    "no_skills_yet": "No skills listed in this category yet.",
+    "members_with": "Members with \"{{skill}}\"",
+    "offers": "Offers",
+    "wants": "Wants",
+    "no_members": "No members found with this skill.",
+    "proficiency": {
+      "beginner": "Beginner",
+      "intermediate": "Intermediate",
+      "advanced": "Advanced",
+      "expert": "Expert"
+    }
   }
 }

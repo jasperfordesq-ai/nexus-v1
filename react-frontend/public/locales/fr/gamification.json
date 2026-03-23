@@ -36,7 +36,8 @@
       "claimed_message": "Vous avez gagné {{xp}} XP !",
       "claim_failed": "Échec de la réclamation",
       "claim_failed_desc": "Impossible de réclamer la récompense quotidienne.",
-      "claim_error": "Une erreur est survenue. Veuillez réessayer."
+      "claim_error": "Une erreur est survenue. Veuillez réessayer.",
+      "loading": "Loading daily reward"
     },
     "challenges": {
       "active_challenges": "Défis actifs",
@@ -93,7 +94,8 @@
       "save_failed": "Échec de l'enregistrement",
       "save_failed_desc": "Impossible de mettre à jour la vitrine.",
       "save_error": "Une erreur est survenue."
-    }
+    },
+    "loading": "Loading achievements"
   },
   "goals": {
     "page_title": "Objectifs",
@@ -176,7 +178,8 @@
       "progress_failed": "Impossible de mettre à jour la progression",
       "buddy_joined": "Vous êtes maintenant partenaire !",
       "buddy_failed": "Impossible de devenir partenaire"
-    }
+    },
+    "loading": "Loading goals"
   },
   "leaderboard": {
     "page_title": "Classement",
@@ -216,7 +219,9 @@
       "history": "Historique des saisons",
       "active": "Active",
       "load_failed": "Échec du chargement",
-      "load_failed_desc": "Impossible de charger l'historique des saisons."
-    }
+      "load_failed_desc": "Impossible de charger l'historique des saisons.",
+      "loading": "Loading season"
+    },
+    "loading": "Loading leaderboard"
   }
 }

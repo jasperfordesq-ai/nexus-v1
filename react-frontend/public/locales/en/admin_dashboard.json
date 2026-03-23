@@ -1,10 +1,9 @@
 {
-  "title": "Dashboard",
-  "subtitle": "Overview of your community platform",
+  "title": "Mission Control",
+  "subtitle": "Real-time platform overview and command center",
   "tour_btn": "Tour",
   "refresh": "Refresh",
   "view_all_activity": "View All Activity",
-  "load_error": "Failed to load dashboard data",
   "tour": {
     "welcome_title": "Welcome to Mission Control!",
     "welcome_description": "This is your command center for managing your community platform. Let's take a quick tour of the key features.",
@@ -14,19 +13,13 @@
   "stats": {
     "users_online": "Users Online",
     "active_sessions": "Active Sessions",
-    "total_members": "Total Users",
+    "total_members": "Total Members",
     "active_listings": "Active Listings",
     "transactions": "Transactions",
     "hours_exchanged": "Hours Exchanged",
-    "hours": "Hours",
-    "new_users_this_month": "New Users This Month",
-    "active_users": "Active Users",
-    "total_listings": "Total Listings",
-    "new_listings_this_month": "New Listings This Month"
+    "hours": "Hours"
   },
   "alerts": {
-    "pending_approvals": "Pending Approvals",
-    "pending_listings": "Pending Listings",
     "users_pending_one": "{{count}} User Pending",
     "users_pending_other": "{{count}} Users Pending",
     "users_pending_text": "New member registrations require your review",
@@ -72,15 +65,10 @@
     "cron_jobs_desc": "Scheduled tasks"
   },
   "activity": {
-    "card_title": "Recent Activity",
+    "card_title": "Real-time Activity",
     "card_subtitle": "Latest events in your community",
-    "view_all": "View all",
-    "empty": "No recent activity"
-  },
-  "trends": {
-    "card_title": "Monthly Trends",
-    "hours_suffix": "hrs",
-    "no_data": "No trend data available yet"
+    "view_all": "View All",
+    "empty": "No recent activity to display"
   },
   "chart": {
     "title": "Transaction Volume",
@@ -95,9 +83,7 @@
     "send_newsletter": "Send Newsletter",
     "new_blog_post": "New Blog Post",
     "gamification": "Gamification",
-    "settings": "Settings",
-    "enterprise": "Enterprise",
-    "advanced_controls": "Advanced Controls"
+    "settings": "Settings"
   },
   "enterprise": {
     "card_title": "Enterprise Suite",

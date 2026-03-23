@@ -36,7 +36,8 @@
       "claimed_message": "Thuill tú {{xp}} XP!",
       "claim_failed": "Theip ar Éileamh",
       "claim_failed_desc": "Ní fhéadfaí duais laethúil a éileamh.",
-      "claim_error": "Chuaigh rud éigin mícheart. Bain triail eile as."
+      "claim_error": "Chuaigh rud éigin mícheart. Bain triail eile as.",
+      "loading": "Loading daily reward"
     },
     "challenges": {
       "active_challenges": "Dúshláin Ghníomhacha",
@@ -93,7 +94,8 @@
       "save_failed": "Theip ar Shábháil",
       "save_failed_desc": "Ní fhéadfaí an taispeántas a nuashonrú.",
       "save_error": "Chuaigh rud éigin mícheart."
-    }
+    },
+    "loading": "Loading achievements"
   },
   "goals": {
     "page_title": "Spriocanna",
@@ -176,7 +178,8 @@
       "progress_failed": "Theip ar dhul chun cinn a nuashonrú",
       "buddy_joined": "Is cara thú anois!",
       "buddy_failed": "Theip ar bheith i do chara"
-    }
+    },
+    "loading": "Loading goals"
   },
   "leaderboard": {
     "page_title": "Clár Ceannairí",
@@ -216,7 +219,9 @@
       "history": "Stair Séasúir",
       "active": "Gníomhach",
       "load_failed": "Theip ar Lódáil",
-      "load_failed_desc": "Ní fhéadfaí stair séasúir a lódáil."
-    }
+      "load_failed_desc": "Ní fhéadfaí stair séasúir a lódáil.",
+      "loading": "Loading season"
+    },
+    "loading": "Loading leaderboard"
   }
 }

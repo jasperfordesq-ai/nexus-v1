@@ -413,5 +413,16 @@
   "messages.aria_delivered": "Delivered",
   "messages.aria_reply": "Reply message",
   "messages.aria_send_reply": "Send reply",
-  "partner_detail.federation_partner_badge": "Federation Partner"
+  "partner_detail.federation_partner_badge": "Federation Partner",
+  "hub": {},
+  "messages": {},
+  "onboarding": {},
+  "listings": {},
+  "members": {},
+  "events": {},
+  "partners": {},
+  "partner_detail": {},
+  "member_profile": {},
+  "settings": {},
+  "connections": {}
 }

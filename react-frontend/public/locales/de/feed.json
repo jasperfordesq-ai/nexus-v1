@@ -232,7 +232,16 @@
     "and": "and",
     "other": "other",
     "others": "others",
-    "all": "All"
+    "all": "All",
+    "post_actions": "Post actions",
+    "detail_listing": "View Listing",
+    "detail_event": "View Event",
+    "detail_goals": "View Goals",
+    "detail_profile": "View Profile",
+    "detail_job": "View Job",
+    "detail_challenge": "View Challenge",
+    "detail_volunteer": "View Opportunity",
+    "detail_blog": "Read Article"
   },
   "hashtag": {
     "title": "Hashtag",

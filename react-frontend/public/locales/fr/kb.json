@@ -27,5 +27,8 @@
   "related_articles": "Related Articles",
   "feedback.question": "Was this article helpful?",
   "feedback.yes": "Yes ({{count}})",
-  "feedback.no": "No ({{count}})"
+  "feedback.no": "No ({{count}})",
+  "error": {},
+  "empty": {},
+  "feedback": {}
 }

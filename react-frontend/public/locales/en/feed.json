@@ -220,6 +220,7 @@
     "type_discussion": "Discussion",
     "image_alt": "{{type}} image by {{name}}",
     "post_options": "Post options",
+    "post_actions": "Post actions",
     "send_comment": "Send comment",
     "share_action": "Share",
     "shared_success": "Post shared to your feed",
@@ -232,7 +233,15 @@
     "and": "and",
     "other": "other",
     "others": "others",
-    "all": "All"
+    "all": "All",
+    "detail_listing": "View Listing",
+    "detail_event": "View Event",
+    "detail_goals": "View Goals",
+    "detail_profile": "View Profile",
+    "detail_job": "View Job",
+    "detail_challenge": "View Challenge",
+    "detail_volunteer": "View Opportunity",
+    "detail_blog": "Read Article"
   },
   "hashtag": {
     "title": "Hashtag",

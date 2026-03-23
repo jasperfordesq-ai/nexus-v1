@@ -26,6 +26,7 @@
     "locked": "Locked",
     "daily_reward": {
       "title": "Daily Reward",
+      "loading": "Loading daily reward",
       "come_back_tomorrow": "Come back tomorrow for {{xp}} XP!",
       "day_streak": "{{count}} day streak",
       "claim_today": "Claim {{xp}} XP today!",
@@ -80,6 +81,7 @@
       "load_failed": "Load Failed",
       "load_failed_desc": "Could not load the XP shop."
     },
+    "loading": "Loading achievements",
     "showcase": {
       "manage_title": "Manage Badge Showcase",
       "select_badges": "Select up to 5 badges to showcase on your profile. ({{count}}/5 selected)",
@@ -98,6 +100,7 @@
   "goals": {
     "page_title": "Goals",
     "title": "Goals",
+    "loading": "Loading goals",
     "subtitle": "Set goals and track your progress",
     "new_goal": "New Goal",
     "from_template": "From Template",
@@ -184,6 +187,7 @@
     "subtitle": "See who's leading the community",
     "unable_to_load": "Unable to Load Leaderboard",
     "try_again": "Try Again",
+    "loading": "Loading leaderboard",
     "empty_title": "No rankings yet",
     "empty_description": "Start earning {{type}} to appear on the leaderboard!",
     "your_rank": "Your rank: #{{position}} of {{total}} members",
@@ -215,6 +219,7 @@
       "hide_history": "Hide Season History",
       "history": "Season History",
       "active": "Active",
+      "loading": "Loading season",
       "load_failed": "Load Failed",
       "load_failed_desc": "Could not load season history."
     }

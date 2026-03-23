@@ -4,7 +4,6 @@
   "tour_btn": "Tour",
   "refresh": "Aktualisieren",
   "view_all_activity": "Alle Aktivitäten anzeigen",
-  "load_error": "Failed to load dashboard data",
   "tour": {
     "welcome_title": "Willkommen bei Mission Control!",
     "welcome_description": "Dies ist Ihre Kommandozentrale zur Verwaltung Ihrer Gemeinschaftsplattform. Lassen Sie uns die wichtigsten Funktionen kurz vorstellen.",
@@ -18,15 +17,9 @@
     "active_listings": "Aktive Inserate",
     "transactions": "Transaktionen",
     "hours_exchanged": "Getauschte Stunden",
-    "hours": "Stunden",
-    "new_users_this_month": "New Users This Month",
-    "active_users": "Active Users",
-    "total_listings": "Total Listings",
-    "new_listings_this_month": "New Listings This Month"
+    "hours": "Stunden"
   },
   "alerts": {
-    "pending_approvals": "Pending Approvals",
-    "pending_listings": "Pending Listings",
     "users_pending_one": "{{count}} Benutzer ausstehend",
     "users_pending_other": "{{count}} Benutzer ausstehend",
     "users_pending_text": "Neue Mitgliederregistrierungen erfordern Ihre Prüfung",
@@ -77,11 +70,6 @@
     "view_all": "Alle anzeigen",
     "empty": "Keine aktuellen Aktivitäten zum Anzeigen"
   },
-  "trends": {
-    "card_title": "Monthly Trends",
-    "hours_suffix": "hrs",
-    "no_data": "No trend data available yet"
-  },
   "chart": {
     "title": "Transaktionsvolumen",
     "subtitle": "Aktivität der letzten 6 Monate",
@@ -95,9 +83,7 @@
     "send_newsletter": "Newsletter senden",
     "new_blog_post": "Neuer Blog-Beitrag",
     "gamification": "Gamification",
-    "settings": "Einstellungen",
-    "enterprise": "Enterprise",
-    "advanced_controls": "Advanced Controls"
+    "settings": "Einstellungen"
   },
   "enterprise": {
     "card_title": "Enterprise Suite",
