@@ -88,7 +88,7 @@ class ListingService
         if (!empty($filters['category_slug'])) {
             $catId = DB::table('categories')
                 ->where('slug', $filters['category_slug'])
-                ->where('type', 'listings')
+                ->where('type', 'listing')
                 ->where('tenant_id', \App\Core\TenantContext::getId())
                 ->value('id');
             if ($catId) {
@@ -230,7 +230,7 @@ class ListingService
         if (!empty($filters['category_slug'])) {
             $catId = DB::table('categories')
                 ->where('slug', $filters['category_slug'])
-                ->where('type', 'listings')
+                ->where('type', 'listing')
                 ->where('tenant_id', \App\Core\TenantContext::getId())
                 ->value('id');
             if ($catId) {
