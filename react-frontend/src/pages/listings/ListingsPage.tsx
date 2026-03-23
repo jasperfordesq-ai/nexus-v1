@@ -7,7 +7,7 @@
  * Listings Page - Browse all listings
  */
 
-import { useState, useEffect, useCallback, memo, useRef } from 'react';
+import { useState, useEffect, useCallback, memo, useRef, useMemo } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
@@ -134,6 +134,13 @@ export function ListingsPage() {
   // Keep a ref so effects always call the latest version without depending on it
   const loadListingsRef = useRef(loadListings);
   loadListingsRef.current = loadListings;
+
+  // Stable items array for the category Select — memoized so HeroUI's
+  // collection doesn't rebuild on every render (new array ref = rebuild = selected key lost)
+  const categoryItems = useMemo(
+    () => [{ slug: 'all', name: t('filter_all_categories') }, ...categories],
+    [categories, t],
+  );
 
   // Load categories once on mount
   useEffect(() => {
@@ -274,10 +281,10 @@ export function ListingsPage() {
             <Select
               aria-label={t('filter_category_label')}
               placeholder={t('filter_category_label')}
-              selectedKeys={selectedCategory ? [selectedCategory] : []}
+              selectedKeys={[selectedCategory || 'all']}
               onSelectionChange={(keys) => {
-                const val = keys instanceof Set ? ([...keys][0] as string ?? '') : '';
-                setSelectedCategory(val);
+                const val = keys instanceof Set ? ([...keys][0] as string) : 'all';
+                setSelectedCategory(val === 'all' ? '' : (val || ''));
               }}
               className="w-full sm:w-44"
               classNames={{
@@ -285,7 +292,7 @@ export function ListingsPage() {
                 value: 'text-theme-primary',
               }}
               startContent={<Tag className="w-4 h-4 text-theme-subtle" />}
-              items={[{ slug: '', name: t('filter_all_categories') }, ...categories]}
+              items={categoryItems}
             >
               {(cat) => <SelectItem key={cat.slug}>{cat.name}</SelectItem>}
             </Select>
