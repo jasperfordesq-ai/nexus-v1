@@ -84,7 +84,7 @@ class PollService
             ->get()
             ->map(fn ($o) => [
                 'id'    => $o->id,
-                'text'  => $o->option_text,
+                'text'  => $o->label,
                 'votes' => (int) DB::table('poll_votes')->where('option_id', $o->id)->count(),
             ])->all();
 

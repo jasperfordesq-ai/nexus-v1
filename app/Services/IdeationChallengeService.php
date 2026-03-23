@@ -61,7 +61,11 @@ class IdeationChallengeService
         }
 
         return [
-            'items'    => $items->map(fn ($i) => (array) $i)->values()->all(),
+            'items'    => $items->map(function ($i) {
+                $item = (array) $i;
+                $item['tags'] = isset($item['tags']) ? (json_decode($item['tags'], true) ?? []) : [];
+                return $item;
+            })->values()->all(),
             'cursor'   => $hasMore && $items->isNotEmpty() ? base64_encode((string) $items->last()->id) : null,
             'has_more' => $hasMore,
         ];
