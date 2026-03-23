@@ -3,6 +3,13 @@
   "subtitle": "Find opportunities in your community",
   "create_vacancy": "Post Vacancy",
   "edit_vacancy": "Edit Vacancy",
+  "my_postings": {
+    "title": "My Postings",
+    "empty_title": "No postings yet",
+    "empty_description": "Post a vacancy to start receiving applications from your community.",
+    "view_applicants": "View Applicants",
+    "edit": "Edit"
+  },
   "search_placeholder": "Search vacancies...",
   "search_aria": "Search job vacancies",
   "filter_aria": "Filter by category",

@@ -48,7 +48,7 @@ class JobGdprService
 
             $alerts = JobAlert::where('tenant_id', $tenantId)
                 ->where('user_id', $userId)
-                ->get(['id','keywords','job_type','commitment','location_text','is_active','created_at'])
+                ->get(['id','keywords','type','commitment','location','is_active','created_at'])
                 ->toArray();
 
             $savedProfile = JobSavedProfile::where('tenant_id', $tenantId)

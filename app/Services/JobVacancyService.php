@@ -175,7 +175,7 @@ class JobVacancyService
     /**
      * Get a single job vacancy by ID with optional userId for has_applied/is_saved checks.
      */
-    public function legacyGetById(int $id, ?int $userId = null): ?array
+    public function legacyGetById(int|string $id, ?int $userId = null): ?array
     {
         $job = $this->vacancy->newQuery()
             ->leftJoin('organizations as o', 'job_vacancies.organization_id', '=', 'o.id')
