@@ -1810,7 +1810,7 @@ export function JobDetailPage() {
           setCvParsed(null);
           setUsingSavedProfile(false);
         }
-        applyModal.onOpenChange(isOpen);
+        if (isOpen) applyModal.onOpen(); else applyModal.onClose();
       }}>
         <ModalContent>
           {(onClose) => (

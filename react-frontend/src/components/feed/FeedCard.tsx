@@ -60,13 +60,17 @@ import { useFeedTracking } from '@/hooks/useFeedTracking';
 import type { FeedItem, FeedComment, PollData } from './types';
 import { getAuthor, getItemDetailPath, getItemDetailLabel } from './types';
 import { FeedContentRenderer } from './FeedContentRenderer';
+import { ReactionPicker, ReactionSummary, type ReactionType } from '@/components/social';
+import { LinkPreviewCard } from '@/components/social/LinkPreviewCard';import { MentionRenderer } from '@/components/social/MentionRenderer';
 
 /* ───────────────────────── Props ───────────────────────── */
 
 export interface FeedCardProps {
   item: FeedItem;
-  /** Called with the feed item when the user toggles the like button. */
+  /** Called with the feed item when the user toggles the like button (legacy). */
   onToggleLike: (item: FeedItem) => void;
+  /** Called when the user reacts to a post with an emoji reaction. */
+  onReact?: (item: FeedItem, reactionType: ReactionType) => void;
   /** Called with the feed item when the user hides a post. */
   onHidePost: (item: FeedItem) => void;
   /** Called with the feed item when the user mutes the post author. */
@@ -200,7 +204,7 @@ export const CommentItem = React.memo(function CommentItem({ comment }: CommentI
               <span className="text-[10px] text-[var(--text-subtle)] italic">({t('card.edited')})</span>
             )}
           </div>
-          <p className="text-xs text-[var(--text-secondary)] mt-0.5 whitespace-pre-wrap leading-relaxed">{comment.content}</p>
+          <p className="text-xs text-[var(--text-secondary)] mt-0.5 whitespace-pre-wrap leading-relaxed"><MentionRenderer text={comment.content} showUserCard={false} /></p>
         </div>
         <div className="flex items-center gap-3 mt-1 px-1">
           <span className="text-[10px] text-[var(--text-subtle)]">
@@ -260,6 +264,7 @@ export const CommentItem = React.memo(function CommentItem({ comment }: CommentI
 const FeedCard = React.memo(function FeedCard({
   item,
   onToggleLike,
+  onReact,
   onHidePost,
   onMuteUser,
   onReportPost,
@@ -529,6 +534,7 @@ const FeedCard = React.memo(function FeedCard({
           />
         </div>
 
+{/* Link Previews */}        {item.link_previews && item.link_previews.length > 0 && (          <div className={`mb-4 ${item.link_previews.length > 1 ? 'space-y-2' : ''}`}>            {item.link_previews.map((lp) => (              <LinkPreviewCard                key={lp.url}                preview={lp}                compact={item.link_previews!.length > 1}              />            ))}          </div>        )}
         {/* Event/Listing metadata */}
         {(item.type === 'event' || item.type === 'listing') && (item.start_date || item.location) && (
           <div className="mb-4 flex flex-wrap items-center gap-x-4 gap-y-1.5 text-xs text-[var(--text-muted)]">
@@ -690,11 +696,19 @@ const FeedCard = React.memo(function FeedCard({
           </div>
         )}
 
-        {/* Stats Row */}
-        {(item.likes_count > 0 || localCommentsCount > 0) && (
+        {/* Stats Row — Reactions + Comments Count */}
+        {((item.reactions?.total ?? item.likes_count) > 0 || localCommentsCount > 0) && (
           <div className="flex items-center justify-between text-xs text-[var(--text-subtle)] mb-3">
             <span>
-              {item.likes_count > 0 && (
+              {item.reactions && item.reactions.total > 0 ? (
+                <ReactionSummary
+                  counts={item.reactions.counts}
+                  total={item.reactions.total}
+                  topReactors={item.reactions.top_reactors}
+                  entityType="post"
+                  entityId={item.id}
+                />
+              ) : item.likes_count > 0 ? (
                 <span className="flex items-center gap-1.5">
                   <span className="flex -space-x-0.5">
                     <span className="w-4 h-4 rounded-full bg-gradient-to-br from-rose-500 to-pink-500 flex items-center justify-center">
@@ -703,7 +717,7 @@ const FeedCard = React.memo(function FeedCard({
                   </span>
                   {item.likes_count} {item.likes_count === 1 ? t('card.like') : t('card.likes')}
                 </span>
-              )}
+              ) : null}
             </span>
             {localCommentsCount > 0 && (
               <Button
@@ -723,26 +737,35 @@ const FeedCard = React.memo(function FeedCard({
 
         {/* Action Buttons */}
         <div className="flex items-center justify-around -mx-1">
-          <Tooltip content={item.is_liked ? t('card.unlike') : t('card.like_action')} delay={400} closeDelay={0} size="sm">
-            <Button
+          {onReact ? (
+            <ReactionPicker
+              userReaction={(item.reactions?.user_reaction as ReactionType | null) ?? null}
+              onReact={(type) => onReact(item, type)}
+              isAuthenticated={isAuthenticated}
               size="sm"
-              variant="light"
-              className={`flex-1 max-w-[140px] ${item.is_liked
-                ? 'text-rose-500 font-medium'
-                : 'text-[var(--text-muted)] hover:text-rose-500'
-              } transition-colors`}
-              startContent={
-                <Heart
-                  className={`w-[18px] h-[18px] transition-all ${item.is_liked ? 'fill-rose-500 text-rose-500 scale-110' : ''}`}
-                  aria-hidden="true"
-                />
-              }
-              onPress={isAuthenticated ? () => onToggleLike(item) : undefined}
-              isDisabled={!isAuthenticated}
-            >
-              {t('card.like_action')}
-            </Button>
-          </Tooltip>
+            />
+          ) : (
+            <Tooltip content={item.is_liked ? t('card.unlike') : t('card.like_action')} delay={400} closeDelay={0} size="sm">
+              <Button
+                size="sm"
+                variant="light"
+                className={`flex-1 max-w-[140px] ${item.is_liked
+                  ? 'text-rose-500 font-medium'
+                  : 'text-[var(--text-muted)] hover:text-rose-500'
+                } transition-colors`}
+                startContent={
+                  <Heart
+                    className={`w-[18px] h-[18px] transition-all ${item.is_liked ? 'fill-rose-500 text-rose-500 scale-110' : ''}`}
+                    aria-hidden="true"
+                  />
+                }
+                onPress={isAuthenticated ? () => onToggleLike(item) : undefined}
+                isDisabled={!isAuthenticated}
+              >
+                {t('card.like_action')}
+              </Button>
+            </Tooltip>
+          )}
 
           <Tooltip content={t('card.view_comments')} delay={400} closeDelay={0} size="sm">
             <Button

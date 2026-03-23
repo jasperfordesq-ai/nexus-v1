@@ -1,0 +1,254 @@
+// Copyright © 2024–2026 Jasper Ford
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Author: Jasper Ford
+// See NOTICE file for attribution and acknowledgements.
+
+/**
+ * ImageLightbox — Fullscreen image viewer overlay.
+ *
+ * - Left/right navigation arrows
+ * - Keyboard navigation (ArrowLeft/ArrowRight, Escape to close)
+ * - Swipe gestures on mobile via Framer Motion
+ * - Dark backdrop with blur
+ * - Image counter "3 of 7"
+ * - Focus trap
+ */
+
+import { useState, useEffect, useCallback, useRef } from 'react';
+import { motion, AnimatePresence, type PanInfo } from 'framer-motion';
+import { X, ChevronLeft, ChevronRight } from 'lucide-react';
+import { createPortal } from 'react-dom';
+import { resolveAssetUrl } from '@/lib/helpers';
+import type { PostMedia } from './types';
+
+interface ImageLightboxProps {
+  media: PostMedia[];
+  initialIndex?: number;
+  onClose: () => void;
+}
+
+const SWIPE_THRESHOLD = 80;
+
+export function ImageLightbox({ media, initialIndex = 0, onClose }: ImageLightboxProps) {
+  const [currentIndex, setCurrentIndex] = useState(initialIndex);
+  const [direction, setDirection] = useState(0);
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  const total = media.length;
+  const current = media[currentIndex];
+
+  const goNext = useCallback(() => {
+    if (currentIndex < total - 1) {
+      setDirection(1);
+      setCurrentIndex((i) => i + 1);
+    }
+  }, [currentIndex, total]);
+
+  const goPrev = useCallback(() => {
+    if (currentIndex > 0) {
+      setDirection(-1);
+      setCurrentIndex((i) => i - 1);
+    }
+  }, [currentIndex]);
+
+  const handleDragEnd = useCallback(
+    (_: MouseEvent | TouchEvent | PointerEvent, info: PanInfo) => {
+      if (info.offset.x < -SWIPE_THRESHOLD) {
+        goNext();
+      } else if (info.offset.x > SWIPE_THRESHOLD) {
+        goPrev();
+      }
+    },
+    [goNext, goPrev],
+  );
+
+  // Keyboard navigation
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => {
+      switch (e.key) {
+        case 'Escape':
+          onClose();
+          break;
+        case 'ArrowRight':
+          e.preventDefault();
+          goNext();
+          break;
+        case 'ArrowLeft':
+          e.preventDefault();
+          goPrev();
+          break;
+      }
+    };
+
+    document.addEventListener('keydown', handler);
+    return () => document.removeEventListener('keydown', handler);
+  }, [onClose, goNext, goPrev]);
+
+  // Lock body scroll when lightbox is open
+  useEffect(() => {
+    const prevOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    return () => {
+      document.body.style.overflow = prevOverflow;
+    };
+  }, []);
+
+  // Focus trap — focus the container on mount
+  useEffect(() => {
+    containerRef.current?.focus();
+  }, []);
+
+  if (!current) return null;
+
+  const slideVariants = {
+    enter: (dir: number) => ({
+      x: dir > 0 ? '50%' : '-50%',
+      opacity: 0,
+      scale: 0.95,
+    }),
+    center: {
+      x: 0,
+      opacity: 1,
+      scale: 1,
+    },
+    exit: (dir: number) => ({
+      x: dir > 0 ? '-50%' : '50%',
+      opacity: 0,
+      scale: 0.95,
+    }),
+  };
+
+  const lightboxContent = (
+    <motion.div
+      ref={containerRef}
+      className="fixed inset-0 z-50 bg-black/90 backdrop-blur-lg flex items-center justify-center"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      transition={{ duration: 0.2 }}
+      onClick={onClose}
+      role="dialog"
+      aria-modal="true"
+      aria-label="Image viewer"
+      tabIndex={-1}
+    >
+      {/* Close button */}
+      <button
+        type="button"
+        className="absolute top-4 right-4 z-10 bg-white/10 backdrop-blur-sm text-white rounded-full p-2.5 hover:bg-white/20 transition-colors focus:outline-none focus:ring-2 focus:ring-white/50"
+        onClick={(e) => {
+          e.stopPropagation();
+          onClose();
+        }}
+        aria-label="Close image viewer"
+      >
+        <X className="w-6 h-6" />
+      </button>
+
+      {/* Counter */}
+      {total > 1 && (
+        <div className="absolute top-4 left-1/2 -translate-x-1/2 z-10 text-white/80 text-sm font-medium">
+          {currentIndex + 1} of {total}
+        </div>
+      )}
+
+      {/* Image container */}
+      <div
+        className="relative w-full h-full flex items-center justify-center px-16 py-16"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <AnimatePresence initial={false} custom={direction} mode="popLayout">
+          <motion.img
+            key={currentIndex}
+            src={resolveAssetUrl(current.file_url)}
+            alt={current.alt_text || `Image ${currentIndex + 1} of ${total}`}
+            className="max-w-full max-h-full object-contain select-none rounded-lg"
+            custom={direction}
+            variants={slideVariants}
+            initial="enter"
+            animate="center"
+            exit="exit"
+            transition={{
+              x: { type: 'spring', stiffness: 300, damping: 30 },
+              opacity: { duration: 0.15 },
+              scale: { duration: 0.15 },
+            }}
+            drag="x"
+            dragConstraints={{ left: 0, right: 0 }}
+            dragElastic={0.3}
+            onDragEnd={handleDragEnd}
+            draggable={false}
+          />
+        </AnimatePresence>
+      </div>
+
+      {/* Alt text */}
+      {current.alt_text && (
+        <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-10 max-w-lg text-center">
+          <p className="text-white/70 text-sm bg-black/40 backdrop-blur-sm px-4 py-2 rounded-lg">
+            {current.alt_text}
+          </p>
+        </div>
+      )}
+
+      {/* Left arrow */}
+      {currentIndex > 0 && (
+        <button
+          type="button"
+          className="absolute left-4 top-1/2 -translate-y-1/2 z-10 bg-white/10 backdrop-blur-sm text-white rounded-full p-3 hover:bg-white/20 transition-colors focus:outline-none focus:ring-2 focus:ring-white/50"
+          onClick={(e) => {
+            e.stopPropagation();
+            goPrev();
+          }}
+          aria-label="Previous image"
+        >
+          <ChevronLeft className="w-6 h-6" />
+        </button>
+      )}
+
+      {/* Right arrow */}
+      {currentIndex < total - 1 && (
+        <button
+          type="button"
+          className="absolute right-4 top-1/2 -translate-y-1/2 z-10 bg-white/10 backdrop-blur-sm text-white rounded-full p-3 hover:bg-white/20 transition-colors focus:outline-none focus:ring-2 focus:ring-white/50"
+          onClick={(e) => {
+            e.stopPropagation();
+            goNext();
+          }}
+          aria-label="Next image"
+        >
+          <ChevronRight className="w-6 h-6" />
+        </button>
+      )}
+
+      {/* Dot indicators */}
+      {total > 1 && (
+        <div className="absolute bottom-12 left-1/2 -translate-x-1/2 z-10 flex items-center gap-2">
+          {media.map((_, idx) => (
+            <button
+              key={idx}
+              type="button"
+              className={`w-2.5 h-2.5 rounded-full transition-all ${
+                idx === currentIndex
+                  ? 'bg-white scale-110'
+                  : 'bg-white/40 hover:bg-white/60'
+              }`}
+              onClick={(e) => {
+                e.stopPropagation();
+                setDirection(idx > currentIndex ? 1 : -1);
+                setCurrentIndex(idx);
+              }}
+              aria-label={`Go to image ${idx + 1}`}
+              aria-current={idx === currentIndex ? 'true' : undefined}
+            />
+          ))}
+        </div>
+      )}
+    </motion.div>
+  );
+
+  return createPortal(
+    <AnimatePresence>{lightboxContent}</AnimatePresence>,
+    document.body,
+  );
+}

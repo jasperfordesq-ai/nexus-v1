@@ -12,18 +12,28 @@ import { Avatar } from '@heroui/react';
 import { useTenant } from '@/contexts';
 import { resolveAvatarUrl } from '@/lib/helpers';
 
-interface StoryFriend {
+export interface StoryFriend {
   id: number;
+  user_id?: number;
   name: string;
-  avatar_url?: string;
+  first_name?: string;
+  avatar_url?: string | null;
   is_online?: boolean;
+  story_count?: number;
+  has_unseen?: boolean;
+  is_own?: boolean;
+  is_connected?: boolean;
+  latest_at?: string;
 }
+
+/** @deprecated Use StoryFriend instead */
+export type StoryUser = StoryFriend;
 
 interface StoriesBarProps {
-  friends: StoryFriend[];
+  friends?: StoryFriend[];
 }
 
-export function StoriesBar({ friends }: StoriesBarProps) {
+export function StoriesBar({ friends = [] }: StoriesBarProps) {
   const { tenantPath } = useTenant();
 
   if (!friends || friends.length === 0) return null;

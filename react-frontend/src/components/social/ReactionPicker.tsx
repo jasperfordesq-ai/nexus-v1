@@ -1,0 +1,292 @@
+// Copyright © 2024–2026 Jasper Ford
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Author: Jasper Ford
+// See NOTICE file for attribution and acknowledgements.
+
+/**
+ * ReactionPicker — Animated emoji reaction picker for posts and comments.
+ *
+ * Appears on hover (desktop, 300ms delay) or long-press (mobile).
+ * Shows 8 reaction types in a glassmorphism popup bar above the trigger button.
+ * Selecting a reaction replaces the button text/icon with the chosen emoji.
+ * Tapping the same reaction again removes it.
+ */
+
+import { useState, useRef, useCallback, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Button, Tooltip } from '@heroui/react';
+import { Heart, Clock } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
+
+/* ───────────────────────── Reaction Config ───────────────────────── */
+
+export type ReactionType = 'love' | 'like' | 'laugh' | 'wow' | 'sad' | 'celebrate' | 'clap' | 'time_credit';
+
+export interface ReactionConfig {
+  type: ReactionType;
+  emoji: string;
+  label: string;
+}
+
+export const REACTION_CONFIGS: ReactionConfig[] = [
+  { type: 'like', emoji: '\uD83D\uDC4D', label: 'Like' },
+  { type: 'love', emoji: '\u2764\uFE0F', label: 'Love' },
+  { type: 'laugh', emoji: '\uD83D\uDE02', label: 'Laugh' },
+  { type: 'wow', emoji: '\uD83D\uDE2E', label: 'Wow' },
+  { type: 'sad', emoji: '\uD83D\uDE22', label: 'Sad' },
+  { type: 'celebrate', emoji: '\uD83C\uDF89', label: 'Celebrate' },
+  { type: 'clap', emoji: '\uD83D\uDC4F', label: 'Clap' },
+  { type: 'time_credit', emoji: '\u23F0', label: 'Time Credit' },
+];
+
+/** Map from reaction type to its emoji */
+export const REACTION_EMOJI_MAP: Record<ReactionType, string> = Object.fromEntries(
+  REACTION_CONFIGS.map((r) => [r.type, r.emoji])
+) as Record<ReactionType, string>;
+
+/** Map from reaction type to its label */
+export const REACTION_LABEL_MAP: Record<ReactionType, string> = Object.fromEntries(
+  REACTION_CONFIGS.map((r) => [r.type, r.label])
+) as Record<ReactionType, string>;
+
+/* ───────────────────────── Props ───────────────────────── */
+
+export interface ReactionPickerProps {
+  /** Currently selected reaction type (null if none) */
+  userReaction: ReactionType | null;
+  /** Called when a reaction is selected or deselected */
+  onReact: (type: ReactionType) => void;
+  /** Whether the user is authenticated */
+  isAuthenticated: boolean;
+  /** Whether the picker is disabled (e.g. during API call) */
+  isDisabled?: boolean;
+  /** Size variant */
+  size?: 'sm' | 'md';
+}
+
+/* ───────────────────────── Component ───────────────────────── */
+
+export function ReactionPicker({
+  userReaction,
+  onReact,
+  isAuthenticated,
+  isDisabled = false,
+  size = 'md',
+}: ReactionPickerProps) {
+  const { t } = useTranslation('feed');
+  const [isPickerOpen, setIsPickerOpen] = useState(false);
+  const hoverTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const longPressTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const isLongPressRef = useRef(false);
+
+  // Cleanup timeouts on unmount
+  useEffect(() => {
+    return () => {
+      if (hoverTimeoutRef.current) clearTimeout(hoverTimeoutRef.current);
+      if (longPressTimeoutRef.current) clearTimeout(longPressTimeoutRef.current);
+    };
+  }, []);
+
+  /* ───── Desktop: hover with 300ms delay ───── */
+
+  const handleMouseEnter = useCallback(() => {
+    if (!isAuthenticated || isDisabled) return;
+    hoverTimeoutRef.current = setTimeout(() => {
+      setIsPickerOpen(true);
+    }, 300);
+  }, [isAuthenticated, isDisabled]);
+
+  const handleMouseLeave = useCallback(() => {
+    if (hoverTimeoutRef.current) {
+      clearTimeout(hoverTimeoutRef.current);
+      hoverTimeoutRef.current = null;
+    }
+    // Small delay before closing to allow moving to the picker
+    setTimeout(() => {
+      setIsPickerOpen(false);
+    }, 200);
+  }, []);
+
+  /* ───── Mobile: long-press ───── */
+
+  const handleTouchStart = useCallback(() => {
+    if (!isAuthenticated || isDisabled) return;
+    isLongPressRef.current = false;
+    longPressTimeoutRef.current = setTimeout(() => {
+      isLongPressRef.current = true;
+      setIsPickerOpen(true);
+    }, 500);
+  }, [isAuthenticated, isDisabled]);
+
+  const handleTouchEnd = useCallback(() => {
+    if (longPressTimeoutRef.current) {
+      clearTimeout(longPressTimeoutRef.current);
+      longPressTimeoutRef.current = null;
+    }
+  }, []);
+
+  /* ───── Select reaction ───── */
+
+  const handleSelectReaction = useCallback(
+    (type: ReactionType) => {
+      onReact(type);
+      setIsPickerOpen(false);
+    },
+    [onReact]
+  );
+
+  /* ───── Quick tap on button (no picker) ───── */
+
+  const handleQuickTap = useCallback(() => {
+    if (!isAuthenticated || isDisabled) return;
+    // If long press just fired, ignore
+    if (isLongPressRef.current) {
+      isLongPressRef.current = false;
+      return;
+    }
+    // Quick tap: toggle like (default reaction)
+    if (userReaction) {
+      // Remove current reaction
+      onReact(userReaction);
+    } else {
+      // Add default "like" reaction
+      onReact('like');
+    }
+  }, [isAuthenticated, isDisabled, userReaction, onReact]);
+
+  /* ───── Close picker when clicking outside ───── */
+
+  useEffect(() => {
+    if (!isPickerOpen) return;
+
+    const handleClickOutside = (e: MouseEvent) => {
+      if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
+        setIsPickerOpen(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [isPickerOpen]);
+
+  /* ───── Button content based on current reaction ───── */
+
+  const currentConfig = userReaction ? REACTION_CONFIGS.find((r) => r.type === userReaction) : null;
+
+  const buttonLabel = currentConfig ? currentConfig.label : t('card.like_action', 'Like');
+  const buttonEmoji = currentConfig ? currentConfig.emoji : null;
+
+  // Color based on reaction type
+  const getReactionColor = (type: ReactionType | null): string => {
+    if (!type) return 'text-[var(--text-muted)] hover:text-rose-500';
+    switch (type) {
+      case 'love':
+        return 'text-rose-500 font-medium';
+      case 'like':
+        return 'text-blue-500 font-medium';
+      case 'laugh':
+        return 'text-amber-500 font-medium';
+      case 'wow':
+        return 'text-amber-500 font-medium';
+      case 'sad':
+        return 'text-blue-400 font-medium';
+      case 'celebrate':
+        return 'text-emerald-500 font-medium';
+      case 'clap':
+        return 'text-orange-500 font-medium';
+      case 'time_credit':
+        return 'text-purple-500 font-medium';
+      default:
+        return 'text-[var(--text-muted)]';
+    }
+  };
+
+  return (
+    <div
+      ref={containerRef}
+      className="relative"
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
+    >
+      {/* Picker popup */}
+      <AnimatePresence>
+        {isPickerOpen && (
+          <motion.div
+            initial={{ opacity: 0, scale: 0.6, y: 8 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.6, y: 8 }}
+            transition={{ type: 'spring', stiffness: 400, damping: 25 }}
+            className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 z-50"
+            onMouseEnter={() => {
+              if (hoverTimeoutRef.current) clearTimeout(hoverTimeoutRef.current);
+            }}
+          >
+            <div className="flex items-center gap-0.5 px-2 py-1.5 rounded-full bg-[var(--surface-dropdown)]/95 backdrop-blur-xl border border-[var(--border-default)] shadow-xl shadow-black/20">
+              {REACTION_CONFIGS.map((config) => (
+                <Tooltip
+                  key={config.type}
+                  content={config.label}
+                  delay={200}
+                  closeDelay={0}
+                  size="sm"
+                  placement="top"
+                >
+                  <motion.button
+                    whileHover={{ scale: 1.35, y: -4 }}
+                    whileTap={{ scale: 0.9 }}
+                    transition={{ type: 'spring', stiffness: 500, damping: 20 }}
+                    className={`w-9 h-9 flex items-center justify-center rounded-full cursor-pointer text-xl transition-colors
+                      ${userReaction === config.type
+                        ? 'bg-[var(--surface-active)] ring-2 ring-[var(--color-primary)]/40'
+                        : 'hover:bg-[var(--surface-hover)]'
+                      }`}
+                    onClick={() => handleSelectReaction(config.type)}
+                    aria-label={config.label}
+                    type="button"
+                  >
+                    {config.type === 'time_credit' ? (
+                      <Clock className="w-5 h-5 text-purple-400" aria-hidden="true" />
+                    ) : (
+                      <span role="img" aria-label={config.label}>{config.emoji}</span>
+                    )}
+                  </motion.button>
+                </Tooltip>
+              ))}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Main reaction button */}
+      <Button
+        size={size}
+        variant="light"
+        className={`flex-1 max-w-[140px] ${getReactionColor(userReaction)} transition-colors`}
+        startContent={
+          buttonEmoji ? (
+            userReaction === 'time_credit' ? (
+              <Clock className="w-[18px] h-[18px]" aria-hidden="true" />
+            ) : (
+              <span className="text-lg leading-none" aria-hidden="true">{buttonEmoji}</span>
+            )
+          ) : (
+            <Heart
+              className={`w-[18px] h-[18px] transition-all ${userReaction === 'love' ? 'fill-rose-500 text-rose-500 scale-110' : ''}`}
+              aria-hidden="true"
+            />
+          )
+        }
+        onPress={handleQuickTap}
+        onTouchStart={handleTouchStart}
+        onTouchEnd={handleTouchEnd}
+        isDisabled={!isAuthenticated || isDisabled}
+        aria-label={userReaction ? `${buttonLabel} (click to remove)` : 'React to this post'}
+      >
+        {buttonLabel}
+      </Button>
+    </div>
+  );
+}
+
+export default ReactionPicker;

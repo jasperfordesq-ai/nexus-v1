@@ -6,6 +6,19 @@
 export type FeedFilter = 'all' | 'posts' | 'listings' | 'events' | 'polls' | 'goals' | 'jobs' | 'challenges' | 'volunteering' | 'blogs' | 'discussions';
 export type PostMode = 'text' | 'poll';
 
+/** A single media attachment (image/video) on a post. */
+export interface PostMedia {
+  id: number;
+  media_type: 'image' | 'video';
+  file_url: string;
+  thumbnail_url: string | null;
+  alt_text: string | null;
+  width: number | null;
+  height: number | null;
+  file_size: number | null;
+  display_order: number;
+}
+
 export interface FeedItem {
   id: number;
   content: string;
@@ -25,6 +38,8 @@ export interface FeedItem {
   comments_count: number;
   is_liked: boolean;
   image_url?: string;
+  /** Multi-image media attachments (carousel). */
+  media?: PostMedia[];
   poll_data?: PollData;
   rating?: number;
   receiver?: {
@@ -47,6 +62,25 @@ export interface FeedItem {
   credits_offered?: number;
   /** Volunteer-specific: organization name */
   organization?: string;
+  /** Reaction data (replaces simple like system) */
+  reactions?: {
+    counts: Record<string, number>;
+    total: number;
+    user_reaction: string | null;
+    top_reactors?: Array<{ id: number; name: string; avatar_url?: string | null }>;
+  };
+  /** Link previews attached to posts */
+  link_previews?: Array<{
+    url: string;
+    title?: string | null;
+    description?: string | null;
+    image_url?: string | null;
+    site_name?: string | null;
+    favicon_url?: string | null;
+    domain?: string | null;
+    content_type?: string | null;
+    embed_html?: string | null;
+  }>;
 }
 
 export interface PollData {
@@ -121,7 +155,7 @@ export function getItemDetailPath(item: FeedItem): string | null {
   }
 }
 
-/** Human-readable label for the "View …" CTA */
+/** Human-readable label for the "View ..." CTA */
 export function getItemDetailLabel(item: FeedItem): string | null {
   switch (item.type) {
     case 'listing':
