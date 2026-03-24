@@ -59,19 +59,18 @@ class SafeguardingSecurityTest extends TestCase
         ]);
         Sanctum::actingAs($viewer, ['*']);
 
-        $response = $this->apiGet("/v2/users/{$target->id}/profile");
+        $response = $this->apiGet("/v2/users/{$target->id}");
 
-        if ($response->getStatusCode() === 200) {
-            $body = $response->getContent();
-            $this->assertStringNotContainsString('safeguarding_notes', $body);
-            $this->assertStringNotContainsString('SENSITIVE', $body);
-            $this->assertStringNotContainsString('works_with_vulnerable_adults', $body);
-            $this->assertStringNotContainsString('works_with_children', $body);
-            $this->assertStringNotContainsString('vetting_status', $body);
-            $this->assertStringNotContainsString('safeguarding_reviewed_by', $body);
-            $this->assertStringNotContainsString('user_safeguarding_preferences', $body);
-            $this->assertStringNotContainsString('test_vulnerable', $body);
-        }
+        // Whether 200 or other, the response body must never contain safeguarding data
+        $body = $response->getContent();
+        $this->assertStringNotContainsString('safeguarding_notes', $body);
+        $this->assertStringNotContainsString('SENSITIVE', $body);
+        $this->assertStringNotContainsString('works_with_vulnerable_adults', $body);
+        $this->assertStringNotContainsString('works_with_children', $body);
+        $this->assertStringNotContainsString('vetting_status', $body);
+        $this->assertStringNotContainsString('safeguarding_reviewed_by', $body);
+        $this->assertStringNotContainsString('user_safeguarding_preferences', $body);
+        $this->assertStringNotContainsString('test_vulnerable', $body);
     }
 
     public function test_member_cannot_read_another_members_safeguarding_data(): void
@@ -84,7 +83,8 @@ class SafeguardingSecurityTest extends TestCase
         ]);
         Sanctum::actingAs($viewer, ['*']);
 
-        $response = $this->apiGet("/v2/admin/users/{$target->id}/safeguarding");
+        // Member trying to access admin safeguarding endpoints should be blocked
+        $response = $this->apiGet("/v2/admin/safeguarding/member-preferences");
         $this->assertContains($response->getStatusCode(), [401, 403]);
     }
 
@@ -154,11 +154,10 @@ class SafeguardingSecurityTest extends TestCase
 
         $response = $this->apiGet('/v2/members?search=' . urlencode($target->first_name ?? $target->name));
 
-        if ($response->getStatusCode() === 200) {
-            $body = $response->getContent();
-            $this->assertStringNotContainsString('safeguarding_notes', $body);
-            $this->assertStringNotContainsString('works_with_vulnerable_adults', $body);
-            $this->assertStringNotContainsString('user_safeguarding_preferences', $body);
-        }
+        // Whether 200 or other, search results must never contain safeguarding data
+        $body = $response->getContent();
+        $this->assertStringNotContainsString('safeguarding_notes', $body);
+        $this->assertStringNotContainsString('works_with_vulnerable_adults', $body);
+        $this->assertStringNotContainsString('user_safeguarding_preferences', $body);
     }
 }

@@ -42,6 +42,8 @@ class OnboardingRegressionTest extends TestCase
             'status' => 'active',
             'is_approved' => true,
             'onboarding_completed' => false,
+            'avatar_url' => 'https://example.com/photo.jpg',
+            'bio' => 'A test bio that is long enough to pass validation.',
         ]);
         Sanctum::actingAs($user, ['*']);
 
@@ -53,7 +55,7 @@ class OnboardingRegressionTest extends TestCase
         $response = $this->apiGet('/v2/onboarding/config');
         $this->assertEquals(200, $response->getStatusCode());
 
-        // Completion should still work
+        // Completion should still work (user has avatar+bio)
         $response = $this->apiPost('/v2/onboarding/complete', [
             'interests' => [],
         ]);
@@ -66,6 +68,8 @@ class OnboardingRegressionTest extends TestCase
             'status' => 'active',
             'is_approved' => true,
             'onboarding_completed' => false,
+            'avatar_url' => 'https://example.com/photo.jpg',
+            'bio' => 'A test bio that is long enough to pass validation.',
         ]);
         Sanctum::actingAs($user, ['*']);
 
