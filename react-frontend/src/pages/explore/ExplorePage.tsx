@@ -3,8 +3,8 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import { useState, useCallback } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { useState, useCallback, useEffect } from 'react';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import {
   Card,
@@ -14,6 +14,8 @@ import {
   Chip,
   Input,
   Skeleton,
+  Tabs,
+  Tab,
 } from '@heroui/react';
 import {
   Search,
@@ -35,12 +37,24 @@ import {
   TrendingUp,
   AlertCircle,
   RefreshCw,
+  Navigation,
+  BookOpen,
+  HandHeart,
+  Building2,
+  BarChart3,
+  Wrench,
+  FolderOpen,
+  Briefcase,
+  X,
+  History,
+  Trash2,
 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { usePageTitle } from '@/hooks/usePageTitle';
 import { useApi } from '@/hooks/useApi';
 import { useTenant, useAuth } from '@/contexts';
 import { resolveAvatarUrl } from '@/lib/helpers';
+import apiClient from '@/lib/api';
 import { ExploreSection, ExploreStatCard, HorizontalScroll } from '@/components/explore';
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -145,6 +159,101 @@ interface RecommendedListing {
   author_name: string;
   author_avatar: string | null;
   match_reason: string | null;
+  match_score: number | null;
+  distance_km: number | null;
+}
+
+interface NearYouListing {
+  id: number;
+  title: string;
+  type: string;
+  image_url: string | null;
+  location: string | null;
+  category_name: string;
+  category_slug: string;
+  author_name: string;
+  author_avatar: string | null;
+  distance_km: number;
+}
+
+interface SuggestedConnection {
+  id: number;
+  name: string;
+  avatar: string | null;
+  tagline: string | null;
+  reason: string | null;
+}
+
+interface BlogPost {
+  id: number;
+  title: string;
+  slug: string;
+  excerpt: string | null;
+  image_url: string | null;
+  published_at: string;
+  reading_time: number;
+  view_count: number;
+  author_name: string;
+  author_avatar: string | null;
+}
+
+interface VolunteeringOpportunity {
+  id: number;
+  title: string;
+  description: string | null;
+  location: string | null;
+  skills_needed: string | null;
+  org_name: string;
+  org_logo: string | null;
+  application_count: number;
+  created_at: string;
+}
+
+interface Organisation {
+  id: number;
+  name: string;
+  description: string | null;
+  logo_url: string | null;
+  website_url: string | null;
+  opportunity_count: number;
+}
+
+interface ActivePoll {
+  id: number;
+  question: string;
+  description: string | null;
+  author_name: string;
+  option_count: number;
+  vote_count: number;
+  closes_at: string | null;
+  created_at: string;
+}
+
+interface InDemandSkill {
+  skill_name: string;
+  request_count: number;
+  offer_count: number;
+}
+
+interface FeaturedResource {
+  id: number;
+  title: string;
+  description: string | null;
+  resource_type: string | null;
+  url: string | null;
+  view_count: number;
+  category_name: string;
+}
+
+interface JobVacancy {
+  id: number;
+  title: string;
+  description: string | null;
+  location: string | null;
+  org_name: string;
+  application_count: number;
+  deadline: string | null;
+  created_at: string;
 }
 
 interface CommunityStats {
@@ -165,6 +274,62 @@ interface ExploreData {
   featured_challenges: FeaturedChallenge[];
   community_stats: CommunityStats;
   recommended_listings: RecommendedListing[];
+  // Phase 1+2 — new sections
+  near_you_listings: NearYouListing[];
+  suggested_connections: SuggestedConnection[];
+  trending_blog_posts: BlogPost[];
+  volunteering_opportunities: VolunteeringOpportunity[];
+  active_organisations: Organisation[];
+  active_polls: ActivePoll[];
+  in_demand_skills: InDemandSkill[];
+  featured_resources: FeaturedResource[];
+  latest_jobs: JobVacancy[];
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Recently Viewed helpers (localStorage)
+// ─────────────────────────────────────────────────────────────────────────────
+
+interface RecentlyViewedItem {
+  id: string;
+  type: string;
+  title: string;
+  image_url: string | null;
+  url: string;
+}
+
+const RECENTLY_VIEWED_KEY = 'nexus:recently_viewed';
+const MAX_RECENTLY_VIEWED = 10;
+
+function getRecentlyViewed(): RecentlyViewedItem[] {
+  try {
+    const raw = localStorage.getItem(RECENTLY_VIEWED_KEY);
+    if (!raw) return [];
+    const parsed = JSON.parse(raw);
+    if (!Array.isArray(parsed)) return [];
+    return parsed.slice(0, MAX_RECENTLY_VIEWED);
+  } catch {
+    return [];
+  }
+}
+
+function clearRecentlyViewed(): void {
+  try {
+    localStorage.removeItem(RECENTLY_VIEWED_KEY);
+  } catch {
+    // Ignore storage errors
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Tab definitions
+// ─────────────────────────────────────────────────────────────────────────────
+
+const VALID_TABS = ['all', 'for_you', 'listings', 'people', 'events', 'groups'] as const;
+type ExploreTab = (typeof VALID_TABS)[number];
+
+function isValidTab(value: string | null): value is ExploreTab {
+  return value != null && (VALID_TABS as readonly string[]).includes(value);
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -180,6 +345,41 @@ export default function ExplorePage() {
   const { isAuthenticated } = useAuth();
   const [searchQuery, setSearchQuery] = useState('');
 
+  // ── Tab navigation (persisted in URL ?tab=...) ──────────────────────────
+  const [searchParams, setSearchParams] = useSearchParams();
+  const tabFromUrl = searchParams.get('tab');
+  const activeTab: ExploreTab = isValidTab(tabFromUrl) ? tabFromUrl : 'all';
+
+  const handleTabChange = useCallback((key: React.Key) => {
+    const newTab = String(key) as ExploreTab;
+    setSearchParams((prev: URLSearchParams) => {
+      const next = new URLSearchParams(prev);
+      if (newTab === 'all') {
+        next.delete('tab');
+      } else {
+        next.set('tab', newTab);
+      }
+      return next;
+    }, { replace: true });
+  }, [setSearchParams]);
+
+  // ── Recently viewed items (localStorage) ─────────────────────────────────
+  const [recentlyViewed, setRecentlyViewed] = useState<RecentlyViewedItem[]>([]);
+
+  useEffect(() => {
+    setRecentlyViewed(getRecentlyViewed());
+  }, []);
+
+  const handleClearRecentlyViewed = useCallback(() => {
+    clearRecentlyViewed();
+    setRecentlyViewed([]);
+  }, []);
+
+  // Helper to check if a section should show for the current tab
+  const showSection = useCallback((...tabs: ExploreTab[]) => {
+    return activeTab === 'all' || tabs.includes(activeTab);
+  }, [activeTab]);
+
   const { data, isLoading, error, execute: retry } = useApi<ExploreData>('/v2/explore');
 
   // Fetch categories for quick-filter chips
@@ -192,6 +392,19 @@ export default function ExplorePage() {
       navigate(tenantPath(`/search?q=${encodeURIComponent(searchQuery.trim())}`));
     }
   };
+
+  // Track explore interactions for recommendation learning
+  const trackInteraction = useCallback((itemType: string, itemId: number, action: string) => {
+    if (!isAuthenticated) return;
+    apiClient.post('/v2/explore/track', { item_type: itemType, item_id: itemId, action }).catch(() => {});
+  }, [isAuthenticated]);
+
+  // Dismiss a recommended item
+  const [dismissedIds, setDismissedIds] = useState<Set<number>>(new Set());
+  const handleDismiss = useCallback((itemType: string, itemId: number, reason?: string) => {
+    setDismissedIds(prev => new Set(prev).add(itemId));
+    apiClient.post('/v2/explore/dismiss', { item_type: itemType, item_id: itemId, reason }).catch(() => {});
+  }, []);
 
   const stats = data?.community_stats;
 
@@ -289,6 +502,28 @@ export default function ExplorePage() {
         )}
       </motion.div>
 
+      {/* ─── Tab Navigation ──────────────────────────────────────────────── */}
+      <div className="flex justify-center mb-8">
+        <Tabs
+          selectedKey={activeTab}
+          onSelectionChange={handleTabChange}
+          variant="underlined"
+          color="primary"
+          classNames={{
+            tabList: 'gap-4 flex-wrap',
+            tab: 'text-sm sm:text-base',
+          }}
+          aria-label={t('tabs.all')}
+        >
+          <Tab key="all" title={t('tabs.all')} />
+          <Tab key="for_you" title={t('tabs.for_you')} />
+          <Tab key="listings" title={t('tabs.listings')} />
+          <Tab key="people" title={t('tabs.people')} />
+          <Tab key="events" title={t('tabs.events')} />
+          <Tab key="groups" title={t('tabs.groups')} />
+        </Tabs>
+      </div>
+
       {/* ─── API Error Banner ─────────────────────────────────────────────── */}
       {error && !isLoading && (
         <div className="mb-6 flex items-center gap-3 px-4 py-3 rounded-xl bg-danger-50 border border-danger-200 text-danger-700 dark:bg-danger-900/20 dark:border-danger-800 dark:text-danger-400">
@@ -300,8 +535,8 @@ export default function ExplorePage() {
         </div>
       )}
 
-      {/* ─── Community Stats Banner ───────────────────────────────────────── */}
-      <motion.div
+      {/* ─── Community Stats Banner (All tab only) ────────────────────────── */}
+      {activeTab === 'all' && <motion.div
         initial={{ opacity: 0, scale: 0.98 }}
         animate={{ opacity: 1, scale: 1 }}
         transition={{ duration: 0.5, delay: 0.1 }}
@@ -332,10 +567,10 @@ export default function ExplorePage() {
             </div>
           </CardBody>
         </Card>
-      </motion.div>
+      </motion.div>}
 
       {/* ─── Trending Posts ────────────────────────────────────────────────── */}
-      {(isLoading || (data?.trending_posts && data.trending_posts.length > 0)) && (
+      {showSection('all') && (isLoading || (data?.trending_posts && data.trending_posts.length > 0)) && (
         <ExploreSection
           title={t('trending_posts.title')}
           subtitle={t('trending_posts.subtitle')}
@@ -405,7 +640,7 @@ export default function ExplorePage() {
       )}
 
       {/* ─── Popular Listings Grid ────────────────────────────────────────── */}
-      {(isLoading || (data?.popular_listings && data.popular_listings.length > 0)) && (
+      {showSection('all', 'listings') && (isLoading || (data?.popular_listings && data.popular_listings.length > 0)) && (
         <ExploreSection
           title={t('popular_listings.title')}
           subtitle={t('popular_listings.subtitle')}
@@ -487,7 +722,7 @@ export default function ExplorePage() {
       )}
 
       {/* ─── Upcoming Events ──────────────────────────────────────────────── */}
-      {hasFeature('events') && (isLoading || (data?.upcoming_events && data.upcoming_events.length > 0)) && (
+      {showSection('all', 'events') && hasFeature('events') && (isLoading || (data?.upcoming_events && data.upcoming_events.length > 0)) && (
         <ExploreSection
           title={t('upcoming_events.title')}
           subtitle={t('upcoming_events.subtitle')}
@@ -557,7 +792,7 @@ export default function ExplorePage() {
       )}
 
       {/* ─── Active Groups ────────────────────────────────────────────────── */}
-      {hasFeature('groups') && (isLoading || (data?.active_groups && data.active_groups.length > 0)) && (
+      {showSection('all', 'groups') && hasFeature('groups') && (isLoading || (data?.active_groups && data.active_groups.length > 0)) && (
         <ExploreSection
           title={t('active_groups.title')}
           subtitle={t('active_groups.subtitle')}
@@ -621,7 +856,7 @@ export default function ExplorePage() {
       )}
 
       {/* ─── Top Contributors ─────────────────────────────────────────────── */}
-      {hasFeature('gamification') && (isLoading || (data?.top_contributors && data.top_contributors.length > 0)) && (
+      {showSection('all', 'people') && hasFeature('gamification') && (isLoading || (data?.top_contributors && data.top_contributors.length > 0)) && (
         <ExploreSection
           title={t('top_contributors.title')}
           subtitle={t('top_contributors.subtitle')}
@@ -675,7 +910,7 @@ export default function ExplorePage() {
       )}
 
       {/* ─── Trending Hashtags ────────────────────────────────────────────── */}
-      {(isLoading || (data?.trending_hashtags && data.trending_hashtags.length > 0)) && (
+      {showSection('all') && (isLoading || (data?.trending_hashtags && data.trending_hashtags.length > 0)) && (
         <ExploreSection
           title={t('trending_hashtags.title')}
           subtitle={t('trending_hashtags.subtitle')}
@@ -710,42 +945,266 @@ export default function ExplorePage() {
       )}
 
       {/* ─── Recommended For You ──────────────────────────────────────────── */}
-      {isAuthenticated && data?.recommended_listings && data.recommended_listings.length > 0 && (
+      {showSection('all', 'for_you', 'listings') && isAuthenticated && data?.recommended_listings && data.recommended_listings.length > 0 && (
         <ExploreSection
           title={t('recommended.title')}
           subtitle={t('recommended.subtitle')}
           seeAllLink={tenantPath('/matches')}
         >
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {data.recommended_listings.slice(0, 6).map((listing) => (
-              <Link key={listing.id} to={tenantPath(`/listings/${listing.id}`)}>
+            {data.recommended_listings
+              .filter((l) => !dismissedIds.has(l.id))
+              .slice(0, 6)
+              .map((listing) => (
+              <div key={listing.id} className="relative group">
+                <Link
+                  to={tenantPath(`/listings/${listing.id}`)}
+                  onClick={() => trackInteraction('listing', listing.id, 'click')}
+                >
+                  <Card className="h-full border border-[var(--card-border)] bg-[var(--card-bg)] hover:bg-[var(--card-hover-bg)] transition-colors">
+                    <CardBody className="p-4 gap-3">
+                      <div className="flex items-center gap-2">
+                        {listing.match_reason && (
+                          <Chip size="sm" variant="flat" color="secondary" className="text-xs">
+                            <TrendingUp className="w-3 h-3 mr-1 inline" />
+                            {listing.match_reason}
+                          </Chip>
+                        )}
+                        {listing.match_score != null && listing.match_score > 0 && (
+                          <Chip size="sm" variant="solid" color="primary" className="text-xs ml-auto">
+                            {t('match_score', { score: Math.round(listing.match_score) })}
+                          </Chip>
+                        )}
+                      </div>
+                      <div className="flex items-start gap-3">
+                        <Avatar
+                          src={resolveAvatarUrl(listing.author_avatar)}
+                          name={listing.author_name}
+                          size="sm"
+                          className="shrink-0 mt-0.5"
+                        />
+                        <div className="min-w-0">
+                          <h3 className="text-sm font-semibold text-[var(--text-primary)] line-clamp-2">
+                            {listing.title}
+                          </h3>
+                          <p className="text-xs text-[var(--text-muted)]">
+                            {t('recommended.by_author', { name: listing.author_name })}
+                          </p>
+                          <div className="flex items-center gap-2 mt-1">
+                            {listing.category_name && (
+                              <Chip size="sm" variant="flat" className="text-[10px]">
+                                {listing.category_name}
+                              </Chip>
+                            )}
+                            {listing.distance_km != null && (
+                              <span className="text-[10px] text-[var(--text-muted)] flex items-center gap-0.5">
+                                <Navigation className="w-2.5 h-2.5" />
+                                {listing.distance_km} km
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    </CardBody>
+                  </Card>
+                </Link>
+                {/* Dismiss button */}
+                <button
+                  className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity p-1 rounded-full bg-[var(--surface-elevated)] hover:bg-[var(--surface-hover)]"
+                  onClick={(e) => { e.preventDefault(); handleDismiss('listing', listing.id, 'not_relevant'); }}
+                  aria-label={t('dismiss')}
+                >
+                  <X className="w-3.5 h-3.5 text-[var(--text-muted)]" />
+                </button>
+              </div>
+            ))}
+          </div>
+        </ExploreSection>
+      )}
+
+      {/* ─── Near You (Phase 1) ──────────────────────────────────────────── */}
+      {showSection('all', 'for_you') && isAuthenticated && data?.near_you_listings && data.near_you_listings.length > 0 && (
+        <ExploreSection
+          title={t('near_you.title')}
+          subtitle={t('near_you.subtitle')}
+          seeAllLink={tenantPath('/listings?sort=nearby')}
+        >
+          <HorizontalScroll>
+            {data.near_you_listings.map((listing) => (
+              <Link
+                key={listing.id}
+                to={tenantPath(`/listings/${listing.id}`)}
+                className="min-w-[260px] max-w-[300px] snap-start shrink-0"
+                onClick={() => trackInteraction('listing', listing.id, 'click')}
+              >
                 <Card className="h-full border border-[var(--card-border)] bg-[var(--card-bg)] hover:bg-[var(--card-hover-bg)] transition-colors">
                   <CardBody className="p-4 gap-3">
-                    {listing.match_reason && (
-                      <Chip size="sm" variant="flat" color="secondary" className="text-xs">
-                        <TrendingUp className="w-3 h-3 mr-1 inline" />
-                        {listing.match_reason}
-                      </Chip>
-                    )}
-                    <div className="flex items-start gap-3">
+                    <div className="flex items-center gap-2 text-xs text-[var(--color-primary)] font-medium">
+                      <Navigation className="w-3.5 h-3.5" />
+                      {t('near_you.distance', { distance: listing.distance_km })}
+                    </div>
+                    <h3 className="text-sm font-semibold text-[var(--text-primary)] line-clamp-2">
+                      {listing.title}
+                    </h3>
+                    <div className="flex items-center gap-2">
                       <Avatar
                         src={resolveAvatarUrl(listing.author_avatar)}
                         name={listing.author_name}
                         size="sm"
-                        className="shrink-0 mt-0.5"
+                        className="shrink-0"
                       />
-                      <div className="min-w-0">
-                        <h3 className="text-sm font-semibold text-[var(--text-primary)] line-clamp-2">
-                          {listing.title}
+                      <span className="text-xs text-[var(--text-muted)] truncate">{listing.author_name}</span>
+                    </div>
+                    {listing.category_name && (
+                      <Chip size="sm" variant="flat" className="text-xs">{listing.category_name}</Chip>
+                    )}
+                  </CardBody>
+                </Card>
+              </Link>
+            ))}
+          </HorizontalScroll>
+        </ExploreSection>
+      )}
+
+      {/* ─── Suggested Connections (Phase 1) ────────────────────────────── */}
+      {showSection('all', 'people') && isAuthenticated && data?.suggested_connections && data.suggested_connections.length > 0 && (
+        <ExploreSection
+          title={t('suggested_connections.title')}
+          subtitle={t('suggested_connections.subtitle')}
+          seeAllLink={tenantPath('/members')}
+        >
+          <HorizontalScroll>
+            {data.suggested_connections.map((member) => (
+              <div
+                key={member.id}
+                className="flex flex-col items-center gap-2 min-w-[130px] snap-start shrink-0 p-3"
+              >
+                <Link to={tenantPath(`/profile/${member.id}`)}>
+                  <Avatar
+                    src={resolveAvatarUrl(member.avatar)}
+                    name={member.name}
+                    size="lg"
+                    className="w-16 h-16"
+                  />
+                </Link>
+                <Link
+                  to={tenantPath(`/profile/${member.id}`)}
+                  className="text-xs font-medium text-[var(--text-primary)] text-center truncate max-w-[120px] hover:underline"
+                >
+                  {member.name}
+                </Link>
+                {member.reason && (
+                  <span className="text-[10px] text-[var(--color-primary)] text-center">
+                    {member.reason === 'Recommended for you' ? t('suggested_connections.recommended')
+                      : member.reason === 'Similar interests' ? t('suggested_connections.similar')
+                      : t('suggested_connections.mutual')}
+                  </span>
+                )}
+                <Button
+                  size="sm"
+                  variant="flat"
+                  color="primary"
+                  className="text-xs h-7 px-3"
+                  startContent={<UserPlus className="w-3 h-3" />}
+                  onPress={() => navigate(tenantPath(`/messages/new/${member.id}`))}
+                >
+                  {t('suggested_connections.connect')}
+                </Button>
+              </div>
+            ))}
+          </HorizontalScroll>
+        </ExploreSection>
+      )}
+
+      {/* ─── Blog Posts (Phase 2) ──────────────────────────────────────── */}
+      {showSection('all') && hasFeature('blog') && data?.trending_blog_posts && data.trending_blog_posts.length > 0 && (
+        <ExploreSection
+          title={t('blog_posts.title')}
+          subtitle={t('blog_posts.subtitle')}
+          seeAllLink={tenantPath('/blog')}
+        >
+          <HorizontalScroll>
+            {data.trending_blog_posts.map((post) => (
+              <Link
+                key={post.id}
+                to={tenantPath(`/blog/${post.slug}`)}
+                className="min-w-[280px] max-w-[320px] snap-start shrink-0"
+              >
+                <Card className="h-full border border-[var(--card-border)] bg-[var(--card-bg)] hover:bg-[var(--card-hover-bg)] transition-colors">
+                  <CardBody className="p-4 gap-3">
+                    {post.image_url ? (
+                      <img
+                        src={post.image_url}
+                        alt={post.title}
+                        className="w-full h-28 object-cover rounded-lg"
+                        loading="lazy"
+                      />
+                    ) : (
+                      <div className="w-full h-28 rounded-lg bg-gradient-to-br from-[var(--color-primary)]/10 to-[var(--color-secondary)]/10 flex items-center justify-center">
+                        <BookOpen className="w-8 h-8 text-[var(--color-primary)]" />
+                      </div>
+                    )}
+                    <h3 className="text-sm font-semibold text-[var(--text-primary)] line-clamp-2">
+                      {post.title}
+                    </h3>
+                    <div className="flex items-center gap-3 text-xs text-[var(--text-muted)]">
+                      <span className="flex items-center gap-1">
+                        <Clock className="w-3.5 h-3.5" />
+                        {t('blog_posts.read_time', { count: post.reading_time || 3 })}
+                      </span>
+                      <span className="flex items-center gap-1">
+                        <Eye className="w-3.5 h-3.5" />
+                        {t('blog_posts.views', { count: post.view_count })}
+                      </span>
+                    </div>
+                  </CardBody>
+                </Card>
+              </Link>
+            ))}
+          </HorizontalScroll>
+        </ExploreSection>
+      )}
+
+      {/* ─── Volunteering Opportunities (Phase 2) ──────────────────────── */}
+      {showSection('all') && hasFeature('volunteering') && data?.volunteering_opportunities && data.volunteering_opportunities.length > 0 && (
+        <ExploreSection
+          title={t('volunteering.title')}
+          subtitle={t('volunteering.subtitle')}
+          seeAllLink={tenantPath('/volunteering')}
+        >
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            {data.volunteering_opportunities.map((opp) => (
+              <Link key={opp.id} to={tenantPath(`/volunteering/opportunities/${opp.id}`)}>
+                <Card className="h-full border border-[var(--card-border)] bg-[var(--card-bg)] hover:bg-[var(--card-hover-bg)] transition-colors">
+                  <CardBody className="p-4 gap-3">
+                    <div className="flex items-start gap-3">
+                      <div className="flex items-center justify-center w-10 h-10 rounded-xl bg-[var(--color-success)]/10 shrink-0">
+                        <HandHeart className="w-5 h-5 text-[var(--color-success)]" />
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <h3 className="text-sm font-semibold text-[var(--text-primary)] line-clamp-1">
+                          {opp.title}
                         </h3>
-                        <p className="text-xs text-[var(--text-muted)]">
-                          {t('recommended.by_author', { name: listing.author_name })}
-                        </p>
-                        {listing.category_name && (
-                          <Chip size="sm" variant="flat" className="text-[10px] mt-1">
-                            {listing.category_name}
-                          </Chip>
+                        {opp.org_name && (
+                          <p className="text-xs text-[var(--text-muted)]">{opp.org_name}</p>
                         )}
+                        {opp.description && (
+                          <p className="text-xs text-[var(--text-secondary)] line-clamp-2 mt-1">
+                            {opp.description}
+                          </p>
+                        )}
+                        <div className="flex items-center gap-3 mt-2 text-xs text-[var(--text-muted)]">
+                          {opp.location && (
+                            <span className="flex items-center gap-1">
+                              <MapPin className="w-3 h-3" />
+                              <span className="truncate max-w-[100px]">{opp.location}</span>
+                            </span>
+                          )}
+                          <span className="flex items-center gap-1">
+                            <Users className="w-3 h-3" />
+                            {t('volunteering.applications', { count: opp.application_count })}
+                          </span>
+                        </div>
                       </div>
                     </div>
                   </CardBody>
@@ -756,8 +1215,247 @@ export default function ExplorePage() {
         </ExploreSection>
       )}
 
+      {/* ─── Active Polls (Phase 2) ────────────────────────────────────── */}
+      {showSection('all') && hasFeature('polls') && data?.active_polls && data.active_polls.length > 0 && (
+        <ExploreSection
+          title={t('polls.title')}
+          subtitle={t('polls.subtitle')}
+          seeAllLink={tenantPath('/polls')}
+        >
+          <HorizontalScroll>
+            {data.active_polls.map((poll) => (
+              <Link
+                key={poll.id}
+                to={tenantPath(`/polls/${poll.id}`)}
+                className="min-w-[260px] max-w-[300px] snap-start shrink-0"
+              >
+                <Card className="h-full border border-[var(--card-border)] bg-[var(--card-bg)] hover:bg-[var(--card-hover-bg)] transition-colors">
+                  <CardBody className="p-4 gap-3">
+                    <div className="flex items-center gap-2">
+                      <BarChart3 className="w-4 h-4 text-[var(--color-primary)]" />
+                      <span className="text-xs text-[var(--text-muted)]">
+                        {t('polls.options', { count: poll.option_count })}
+                      </span>
+                    </div>
+                    <h3 className="text-sm font-semibold text-[var(--text-primary)] line-clamp-2">
+                      {poll.question}
+                    </h3>
+                    <div className="flex items-center justify-between text-xs text-[var(--text-muted)]">
+                      <span>{t('polls.votes', { count: poll.vote_count })}</span>
+                      {poll.closes_at && (
+                        <span>{t('polls.closes', { date: formatDate(poll.closes_at) })}</span>
+                      )}
+                    </div>
+                    <Button size="sm" variant="flat" color="primary" className="w-full">
+                      {t('polls.vote_now')}
+                    </Button>
+                  </CardBody>
+                </Card>
+              </Link>
+            ))}
+          </HorizontalScroll>
+        </ExploreSection>
+      )}
+
+      {/* ─── Skills In Demand (Phase 2) ────────────────────────────────── */}
+      {showSection('all') && data?.in_demand_skills && data.in_demand_skills.length > 0 && (
+        <ExploreSection
+          title={t('in_demand_skills.title')}
+          subtitle={t('in_demand_skills.subtitle')}
+          seeAllLink={tenantPath('/skills')}
+        >
+          <div className="flex flex-wrap gap-2">
+            {data.in_demand_skills.map((skill) => (
+              <Chip
+                key={skill.skill_name}
+                variant="flat"
+                size="md"
+                startContent={<Wrench className="w-3.5 h-3.5" />}
+                className="cursor-pointer hover:bg-[var(--surface-hover)] transition-colors"
+                onClick={() => navigate(tenantPath(`/search?q=${encodeURIComponent(skill.skill_name)}`))}
+              >
+                {skill.skill_name}
+                <span className="ml-1 text-[var(--text-muted)] text-xs">
+                  ({t('in_demand_skills.requested', { count: skill.request_count })})
+                </span>
+              </Chip>
+            ))}
+          </div>
+        </ExploreSection>
+      )}
+
+      {/* ─── Organisations (Phase 2) ───────────────────────────────────── */}
+      {showSection('all') && hasFeature('organisations') && data?.active_organisations && data.active_organisations.length > 0 && (
+        <ExploreSection
+          title={t('organisations.title')}
+          subtitle={t('organisations.subtitle')}
+          seeAllLink={tenantPath('/organisations')}
+        >
+          <HorizontalScroll>
+            {data.active_organisations.map((org) => (
+              <Link
+                key={org.id}
+                to={tenantPath(`/organisations/${org.id}`)}
+                className="min-w-[220px] max-w-[260px] snap-start shrink-0"
+              >
+                <Card className="h-full border border-[var(--card-border)] bg-[var(--card-bg)] hover:bg-[var(--card-hover-bg)] transition-colors">
+                  <CardBody className="p-4 gap-3 items-center text-center">
+                    <Avatar
+                      src={org.logo_url ? resolveAvatarUrl(org.logo_url) : undefined}
+                      name={org.name}
+                      size="lg"
+                      className="w-14 h-14"
+                      fallback={<Building2 className="w-6 h-6" />}
+                    />
+                    <h3 className="text-sm font-semibold text-[var(--text-primary)] line-clamp-1">
+                      {org.name}
+                    </h3>
+                    {org.description && (
+                      <p className="text-xs text-[var(--text-secondary)] line-clamp-2">{org.description}</p>
+                    )}
+                    <span className="text-xs text-[var(--text-muted)]">
+                      {t('organisations.opportunities', { count: org.opportunity_count })}
+                    </span>
+                  </CardBody>
+                </Card>
+              </Link>
+            ))}
+          </HorizontalScroll>
+        </ExploreSection>
+      )}
+
+      {/* ─── Job Opportunities (Phase 2) ───────────────────────────────── */}
+      {showSection('all') && hasFeature('job_vacancies') && data?.latest_jobs && data.latest_jobs.length > 0 && (
+        <ExploreSection
+          title={t('jobs.title')}
+          subtitle={t('jobs.subtitle')}
+          seeAllLink={tenantPath('/jobs')}
+        >
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            {data.latest_jobs.map((job) => (
+              <Link key={job.id} to={tenantPath(`/jobs/${job.id}`)}>
+                <Card className="h-full border border-[var(--card-border)] bg-[var(--card-bg)] hover:bg-[var(--card-hover-bg)] transition-colors">
+                  <CardBody className="p-4 gap-2">
+                    <div className="flex items-start gap-3">
+                      <div className="flex items-center justify-center w-10 h-10 rounded-xl bg-[var(--color-primary)]/10 shrink-0">
+                        <Briefcase className="w-5 h-5 text-[var(--color-primary)]" />
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <h3 className="text-sm font-semibold text-[var(--text-primary)] line-clamp-1">
+                          {job.title}
+                        </h3>
+                        {job.org_name && (
+                          <p className="text-xs text-[var(--text-muted)]">{job.org_name}</p>
+                        )}
+                        <div className="flex items-center gap-3 mt-1 text-xs text-[var(--text-muted)]">
+                          {job.location && (
+                            <span className="flex items-center gap-1">
+                              <MapPin className="w-3 h-3" />
+                              <span className="truncate max-w-[80px]">{job.location}</span>
+                            </span>
+                          )}
+                          {job.deadline && (
+                            <span>{t('jobs.deadline', { date: formatDate(job.deadline) })}</span>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  </CardBody>
+                </Card>
+              </Link>
+            ))}
+          </div>
+        </ExploreSection>
+      )}
+
+      {/* ─── Featured Resources (Phase 2) ──────────────────────────────── */}
+      {showSection('all') && hasFeature('resources') && data?.featured_resources && data.featured_resources.length > 0 && (
+        <ExploreSection
+          title={t('resources.title')}
+          subtitle={t('resources.subtitle')}
+          seeAllLink={tenantPath('/resources')}
+        >
+          <HorizontalScroll>
+            {data.featured_resources.map((resource) => (
+              <Link
+                key={resource.id}
+                to={tenantPath(`/resources/${resource.id}`)}
+                className="min-w-[220px] max-w-[260px] snap-start shrink-0"
+              >
+                <Card className="h-full border border-[var(--card-border)] bg-[var(--card-bg)] hover:bg-[var(--card-hover-bg)] transition-colors">
+                  <CardBody className="p-4 gap-3">
+                    <FolderOpen className="w-6 h-6 text-[var(--color-secondary)]" />
+                    <h3 className="text-sm font-semibold text-[var(--text-primary)] line-clamp-2">
+                      {resource.title}
+                    </h3>
+                    {resource.category_name && (
+                      <Chip size="sm" variant="flat" className="text-xs">{resource.category_name}</Chip>
+                    )}
+                    <span className="text-xs text-[var(--text-muted)]">
+                      {t('resources.views', { count: resource.view_count })}
+                    </span>
+                  </CardBody>
+                </Card>
+              </Link>
+            ))}
+          </HorizontalScroll>
+        </ExploreSection>
+      )}
+
+      {/* ─── Recently Viewed (localStorage, client-side) ─────────────────── */}
+      {showSection('all', 'for_you') && recentlyViewed.length > 0 && (
+        <ExploreSection
+          title={t('recently_viewed.title')}
+          subtitle={t('recently_viewed.subtitle')}
+        >
+          <div className="flex items-center justify-end mb-2 -mt-2">
+            <Button
+              size="sm"
+              variant="light"
+              color="danger"
+              startContent={<Trash2 className="w-3.5 h-3.5" />}
+              onPress={handleClearRecentlyViewed}
+            >
+              {t('recently_viewed.clear')}
+            </Button>
+          </div>
+          <HorizontalScroll>
+            {recentlyViewed.map((item) => (
+              <Link
+                key={`${item.type}-${item.id}`}
+                to={item.url}
+                className="min-w-[200px] max-w-[240px] snap-start shrink-0"
+              >
+                <Card className="h-full border border-[var(--card-border)] bg-[var(--card-bg)] hover:bg-[var(--card-hover-bg)] transition-colors">
+                  <CardBody className="p-4 gap-3">
+                    {item.image_url ? (
+                      <img
+                        src={item.image_url}
+                        alt={item.title}
+                        className="w-full h-24 object-cover rounded-lg"
+                        loading="lazy"
+                      />
+                    ) : (
+                      <div className="w-full h-24 rounded-lg bg-[var(--surface-elevated)] flex items-center justify-center">
+                        <History className="w-6 h-6 text-[var(--text-subtle)]" />
+                      </div>
+                    )}
+                    <h3 className="text-sm font-semibold text-[var(--text-primary)] line-clamp-2">
+                      {item.title}
+                    </h3>
+                    <Chip size="sm" variant="flat" className="text-xs capitalize">
+                      {item.type}
+                    </Chip>
+                  </CardBody>
+                </Card>
+              </Link>
+            ))}
+          </HorizontalScroll>
+        </ExploreSection>
+      )}
+
       {/* ─── New Members ──────────────────────────────────────────────────── */}
-      {(isLoading || (data?.new_members && data.new_members.length > 0)) && (
+      {showSection('all', 'people') && (isLoading || (data?.new_members && data.new_members.length > 0)) && (
         <ExploreSection
           title={t('new_members.title')}
           subtitle={t('new_members.subtitle')}
@@ -818,7 +1516,7 @@ export default function ExplorePage() {
       )}
 
       {/* ─── Featured Challenges ──────────────────────────────────────────── */}
-      {hasFeature('ideation_challenges') && data?.featured_challenges && data.featured_challenges.length > 0 && (
+      {showSection('all') && hasFeature('ideation_challenges') && data?.featured_challenges && data.featured_challenges.length > 0 && (
         <ExploreSection
           title={t('featured_challenges.title')}
           subtitle={t('featured_challenges.subtitle')}

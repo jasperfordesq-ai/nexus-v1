@@ -59,6 +59,7 @@ Route::get('/v2/jobs/feed.json', [\App\Http\Controllers\Api\JobFeedController::c
 // Supports both authenticated (personalized) and anonymous (global) access
 // ============================================
 Route::get('/v2/explore', [\App\Http\Controllers\Api\ExploreController::class, 'index']);
+Route::get('/v2/explore/for-you', [\App\Http\Controllers\Api\ExploreController::class, 'forYou']);
 Route::get('/v2/explore/trending', [\App\Http\Controllers\Api\ExploreController::class, 'trending']);
 Route::get('/v2/explore/popular-listings', [\App\Http\Controllers\Api\ExploreController::class, 'popularListings']);
 Route::get('/v2/explore/category/{slug}', [\App\Http\Controllers\Api\ExploreController::class, 'category']);
@@ -68,6 +69,12 @@ Route::get('/v2/explore/category/{slug}', [\App\Http\Controllers\Api\ExploreCont
 // Controllers also enforce auth via $this->requireAuth() as a fallback
 // ============================================
 Route::middleware('auth:sanctum')->group(function () {
+
+// Explore — authenticated actions (tracking, dismissals, experiments)
+Route::post('/v2/explore/track', [\App\Http\Controllers\Api\ExploreController::class, 'track']);
+Route::post('/v2/explore/dismiss', [\App\Http\Controllers\Api\ExploreController::class, 'dismiss']);
+Route::get('/v2/explore/experiments', [\App\Http\Controllers\Api\ExploreController::class, 'experiments']);
+Route::get('/v2/explore/analytics', [\App\Http\Controllers\Api\ExploreController::class, 'analytics']);
 
 // MIGRATED ROUTES — Exchanges
 // Source: httpdocs/routes/exchanges.php
@@ -618,11 +625,21 @@ Route::get('/v2/stories/{id}/viewers', [\App\Http\Controllers\Api\StoryControlle
 Route::post('/v2/stories/{id}/react', [\App\Http\Controllers\Api\StoryController::class, 'react']);
 Route::delete('/v2/stories/{id}', [\App\Http\Controllers\Api\StoryController::class, 'destroy']);
 Route::post('/v2/stories/{id}/poll/vote', [\App\Http\Controllers\Api\StoryController::class, 'pollVote']);
+Route::post('/v2/stories/{id}/reply', [\App\Http\Controllers\Api\StoryController::class, 'reply']);
 Route::get('/v2/stories/highlights/{userId}', [\App\Http\Controllers\Api\StoryController::class, 'highlights']);
 Route::get('/v2/stories/highlights/{id}/stories', [\App\Http\Controllers\Api\StoryController::class, 'highlightStories']);
 Route::post('/v2/stories/highlights', [\App\Http\Controllers\Api\StoryController::class, 'createHighlight']);
 Route::post('/v2/stories/highlights/{id}/items', [\App\Http\Controllers\Api\StoryController::class, 'addHighlightItem']);
 Route::delete('/v2/stories/highlights/{id}', [\App\Http\Controllers\Api\StoryController::class, 'deleteHighlight']);
+Route::put('/v2/stories/highlights/reorder', [\App\Http\Controllers\Api\StoryController::class, 'reorderHighlights']);
+Route::put('/v2/stories/highlights/{id}', [\App\Http\Controllers\Api\StoryController::class, 'updateHighlight']);
+Route::delete('/v2/stories/highlights/{id}/items/{storyId}', [\App\Http\Controllers\Api\StoryController::class, 'removeHighlightItem']);
+Route::get('/v2/stories/archive', [\App\Http\Controllers\Api\StoryController::class, 'archive']);
+Route::get('/v2/stories/close-friends', [\App\Http\Controllers\Api\StoryController::class, 'closeFriends']);
+Route::post('/v2/stories/close-friends', [\App\Http\Controllers\Api\StoryController::class, 'addCloseFriend']);
+Route::delete('/v2/stories/close-friends/{friendId}', [\App\Http\Controllers\Api\StoryController::class, 'removeCloseFriend']);
+Route::post('/v2/stories/{id}/analytics', [\App\Http\Controllers\Api\StoryController::class, 'trackAnalytics']);
+Route::get('/v2/stories/{id}/analytics', [\App\Http\Controllers\Api\StoryController::class, 'getAnalytics']);
 
 // ============================================
 

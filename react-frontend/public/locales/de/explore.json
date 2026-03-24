@@ -60,5 +60,81 @@
     "days_ago": "vor {{count}}T"
   },
   "error_loading": "Die Entdecken-Seite konnte nicht geladen werden. Dies könnte ein vorübergehendes Problem sein.",
-  "retry": "Erneut versuchen"
+  "retry": "Erneut versuchen",
+  "near_you": {
+    "title": "In Ihrer Nähe",
+    "subtitle": "Anzeigen in der Nähe Ihres Standorts",
+    "distance": "{{distance}} km entfernt"
+  },
+  "suggested_connections": {
+    "title": "Personen, die Sie kennen könnten",
+    "subtitle": "Vernetzen Sie sich mit Mitgliedern, die Ihre Interessen teilen",
+    "connect": "Verbinden",
+    "mutual": "Gemeinsame Verbindungen",
+    "similar": "Ähnliche Interessen",
+    "recommended": "Für Sie empfohlen"
+  },
+  "blog_posts": {
+    "title": "Aus dem Blog",
+    "subtitle": "Neueste Geschichten aus Ihrer Gemeinschaft",
+    "read_time": "{{count}} Min. Lesezeit",
+    "views": "{{count}} Aufrufe"
+  },
+  "volunteering": {
+    "title": "Freiwilligenmöglichkeiten",
+    "subtitle": "Machen Sie einen Unterschied in Ihrer Gemeinschaft",
+    "applications": "{{count}} beworben",
+    "view_opportunity": "Möglichkeit ansehen"
+  },
+  "organisations": {
+    "title": "Organisationen",
+    "subtitle": "Gemeinschaftspartner mit Wirkung",
+    "opportunities": "{{count}} Möglichkeiten"
+  },
+  "polls": {
+    "title": "Aktive Umfragen",
+    "subtitle": "Sagen Sie Ihre Meinung zu Gemeinschaftsthemen",
+    "votes": "{{count}} Stimmen",
+    "options": "{{count}} Optionen",
+    "vote_now": "Jetzt abstimmen",
+    "closes": "Endet am {{date}}"
+  },
+  "in_demand_skills": {
+    "title": "Gefragte Fähigkeiten",
+    "subtitle": "Die meistgefragten Fähigkeiten in Ihrer Gemeinschaft",
+    "requested": "{{count}} suchen",
+    "offered": "{{count}} bieten an",
+    "you_can_help": "Sie können helfen!"
+  },
+  "resources": {
+    "title": "Empfohlene Ressourcen",
+    "subtitle": "Anleitungen und Materialien für Ihre Gemeinschaft",
+    "views": "{{count}} Aufrufe"
+  },
+  "jobs": {
+    "title": "Stellenangebote",
+    "subtitle": "Neueste Stellen von Gemeinschaftspartnern",
+    "applications": "{{count}} beworben",
+    "deadline": "Frist: {{date}}"
+  },
+  "tabs": {
+    "all": "Alle",
+    "for_you": "Für Sie",
+    "listings": "Anzeigen",
+    "people": "Personen",
+    "events": "Veranstaltungen",
+    "groups": "Gruppen"
+  },
+  "recently_viewed": {
+    "title": "Zuletzt angesehen",
+    "subtitle": "Artikel, die Sie kürzlich angesehen haben",
+    "clear": "Löschen"
+  },
+  "match_score": "{{score}}% Übereinstimmung",
+  "dismiss": "Nicht interessiert",
+  "dismiss_reasons": {
+    "not_relevant": "Nicht relevant",
+    "already_seen": "Bereits gesehen",
+    "not_interested": "Kein Interesse daran"
+  }
 }

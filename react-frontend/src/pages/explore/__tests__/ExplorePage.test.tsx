@@ -80,7 +80,37 @@ const mockExploreData = {
   ],
   featured_challenges: [],
   community_stats: { total_members: 100, exchanges_this_month: 25, hours_exchanged: 150, active_listings: 42 },
-  recommended_listings: [],
+  recommended_listings: [
+    { id: 200, title: 'Recommended Item', type: 'offer', image_url: null, location: null, category_name: 'Tech', category_slug: 'tech', author_name: 'Eve', author_avatar: null, match_reason: 'Skills match your expertise', match_score: 85, distance_km: 3.2 },
+  ],
+  // Phase 1+2 — new sections
+  near_you_listings: [
+    { id: 300, title: 'Nearby Listing', type: 'offer', image_url: null, location: 'Park', category_name: 'Gardening', category_slug: 'gardening', author_name: 'Frank', author_avatar: null, distance_km: 2.5 },
+  ],
+  suggested_connections: [
+    { id: 400, name: 'Suggested User', avatar: null, tagline: 'Loves coding', reason: 'Similar interests' },
+  ],
+  trending_blog_posts: [
+    { id: 500, title: 'Blog Post', slug: 'blog-post', excerpt: 'An excerpt', image_url: null, published_at: '2026-03-22T10:00:00Z', reading_time: 5, view_count: 100, author_name: 'Grace', author_avatar: null },
+  ],
+  volunteering_opportunities: [
+    { id: 600, title: 'Help at Shelter', description: 'Volunteer work', location: 'City', skills_needed: 'care', org_name: 'Shelter Org', org_logo: null, application_count: 3, created_at: '2026-03-22T10:00:00Z' },
+  ],
+  active_organisations: [
+    { id: 700, name: 'Community Org', description: 'Helping people', logo_url: null, website_url: null, opportunity_count: 5 },
+  ],
+  active_polls: [
+    { id: 800, question: 'Best feature?', description: null, author_name: 'Admin', option_count: 4, vote_count: 20, closes_at: null, created_at: '2026-03-22T10:00:00Z' },
+  ],
+  in_demand_skills: [
+    { skill_name: 'Gardening', request_count: 15, offer_count: 8 },
+  ],
+  featured_resources: [
+    { id: 900, title: 'Getting Started Guide', description: 'How to use the platform', resource_type: 'guide', url: null, view_count: 50, category_name: 'Guides' },
+  ],
+  latest_jobs: [
+    { id: 1000, title: 'Community Manager', description: 'Join our team', location: 'Remote', org_name: 'HQ', application_count: 7, deadline: '2026-04-01T00:00:00Z', created_at: '2026-03-22T10:00:00Z' },
+  ],
 };
 
 const mockState = {
@@ -137,6 +167,10 @@ vi.mock('@/lib/helpers', () => ({
   resolveAssetUrl: (url: string | null) => url || '',
 }));
 
+vi.mock('@/lib/api', () => ({
+  default: { post: vi.fn().mockResolvedValue({}) },
+}));
+
 vi.mock('@/components/explore', () => ({
   ExploreSection: ({ children, title, subtitle }: { children: React.ReactNode; title: string; subtitle?: string }) => (
     <section>
@@ -171,6 +205,7 @@ vi.mock('react-router-dom', async () => {
   return {
     ...actual,
     useNavigate: () => vi.fn(),
+    useSearchParams: () => [new URLSearchParams(), vi.fn()],
     Link: ({ children, to }: { children: React.ReactNode; to: string }) => <a href={to}>{children}</a>,
   };
 });
@@ -316,5 +351,80 @@ describe('ExplorePage', () => {
     // "Tech" may still appear in the popular listings section (category chip),
     // but the category quick-filter chips section (with "Art") should be gone
     expect(screen.queryByText('Art')).not.toBeInTheDocument();
+  });
+
+  // ── Phase 1+2 new section tests ─────────────────────────────────────────
+
+  it('renders recommended listings with match score', () => {
+    render(<ExplorePage />);
+    expect(screen.getByText('recommended.title')).toBeInTheDocument();
+    expect(screen.getByText('Recommended Item')).toBeInTheDocument();
+    expect(screen.getByText('Skills match your expertise')).toBeInTheDocument();
+  });
+
+  it('renders near you listings section for authenticated users', () => {
+    render(<ExplorePage />);
+    expect(screen.getByText('near_you.title')).toBeInTheDocument();
+    expect(screen.getByText('Nearby Listing')).toBeInTheDocument();
+  });
+
+  it('renders suggested connections section', () => {
+    render(<ExplorePage />);
+    expect(screen.getByText('suggested_connections.title')).toBeInTheDocument();
+    expect(screen.getByText('Suggested User')).toBeInTheDocument();
+  });
+
+  it('renders blog posts section when feature is enabled', () => {
+    render(<ExplorePage />);
+    expect(screen.getByText('blog_posts.title')).toBeInTheDocument();
+    expect(screen.getByText('Blog Post')).toBeInTheDocument();
+  });
+
+  it('renders volunteering section when feature is enabled', () => {
+    render(<ExplorePage />);
+    expect(screen.getByText('volunteering.title')).toBeInTheDocument();
+    expect(screen.getByText('Help at Shelter')).toBeInTheDocument();
+  });
+
+  it('renders active polls section', () => {
+    render(<ExplorePage />);
+    expect(screen.getByText('polls.title')).toBeInTheDocument();
+    expect(screen.getByText('Best feature?')).toBeInTheDocument();
+  });
+
+  it('renders in-demand skills section', () => {
+    render(<ExplorePage />);
+    expect(screen.getByText('in_demand_skills.title')).toBeInTheDocument();
+    // "Gardening" appears in both near_you and in_demand_skills sections
+    expect(screen.getAllByText('Gardening').length).toBeGreaterThanOrEqual(1);
+  });
+
+  it('renders organisations section', () => {
+    render(<ExplorePage />);
+    expect(screen.getByText('organisations.title')).toBeInTheDocument();
+    expect(screen.getByText('Community Org')).toBeInTheDocument();
+  });
+
+  it('renders job opportunities section', () => {
+    render(<ExplorePage />);
+    expect(screen.getByText('jobs.title')).toBeInTheDocument();
+    expect(screen.getByText('Community Manager')).toBeInTheDocument();
+  });
+
+  it('renders featured resources section', () => {
+    render(<ExplorePage />);
+    expect(screen.getByText('resources.title')).toBeInTheDocument();
+    expect(screen.getByText('Getting Started Guide')).toBeInTheDocument();
+  });
+
+  it('hides new Phase 2 sections when features are disabled', () => {
+    mockHasFeature.mockReturnValue(false);
+    render(<ExplorePage />);
+    expect(screen.queryByText('blog_posts.title')).not.toBeInTheDocument();
+    expect(screen.queryByText('volunteering.title')).not.toBeInTheDocument();
+    expect(screen.queryByText('organisations.title')).not.toBeInTheDocument();
+    expect(screen.queryByText('polls.title')).not.toBeInTheDocument();
+    expect(screen.queryByText('jobs.title')).not.toBeInTheDocument();
+    expect(screen.queryByText('resources.title')).not.toBeInTheDocument();
   });
 });

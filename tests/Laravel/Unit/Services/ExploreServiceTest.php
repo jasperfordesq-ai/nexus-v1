@@ -8,6 +8,8 @@ namespace Tests\Laravel\Unit\Services;
 
 use App\Core\TenantContext;
 use App\Services\ExploreService;
+use App\Services\MatchLearningService;
+use App\Services\SmartMatchingEngine;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -26,7 +28,12 @@ class ExploreServiceTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $this->service = new ExploreService();
+        $mockEngine = \Mockery::mock(SmartMatchingEngine::class);
+        $mockEngine->shouldReceive('findMatchesForUser')->andReturn([]);
+        $mockLearning = \Mockery::mock(MatchLearningService::class);
+        $mockLearning->shouldReceive('getHistoricalBoost')->andReturn(0.0);
+        $mockLearning->shouldReceive('recordInteraction')->andReturn(true);
+        $this->service = new ExploreService($mockEngine, $mockLearning);
     }
 
     // ------------------------------------------------------------------
@@ -35,28 +42,23 @@ class ExploreServiceTest extends TestCase
 
     public function test_getExploreData_returns_all_sections(): void
     {
-        // Let the cache miss so it queries DB
-        Cache::shouldReceive('get')
-            ->with("nexus:explore:{$this->testTenantId}:global")
-            ->once()
-            ->andReturn(null);
+        // Per-section caching: each section checks its own cache key
+        Cache::shouldReceive('get')->andReturn(null);
+        Cache::shouldReceive('put')->zeroOrMoreTimes();
 
-        Cache::shouldReceive('get')
-            ->with("nexus:explore:{$this->testTenantId}:1")
-            ->once()
-            ->andReturn(null);
-
-        // Global data queries — each private method does a DB::select/selectOne
-        // Return empty results for all to pass through
+        // DB calls for all sections — return empty
         DB::shouldReceive('select')->andReturn([]);
         DB::shouldReceive('selectOne')->andReturn((object) ['cnt' => 0, 'total' => 0]);
-
-        // Cache::put for both global and user data
-        Cache::shouldReceive('put')->twice();
+        DB::shouldReceive('table')->andReturn(\Mockery::mock(\Illuminate\Database\Query\Builder::class, function ($mock) {
+            $mock->shouldReceive('where')->andReturnSelf();
+            $mock->shouldReceive('pluck')->andReturn(collect([]));
+            $mock->shouldReceive('get')->andReturn(collect([]));
+        }));
 
         $result = $this->service->getExploreData(1);
 
         $this->assertIsArray($result);
+        // Original sections
         $this->assertArrayHasKey('trending_posts', $result);
         $this->assertArrayHasKey('popular_listings', $result);
         $this->assertArrayHasKey('active_groups', $result);
@@ -67,123 +69,61 @@ class ExploreServiceTest extends TestCase
         $this->assertArrayHasKey('featured_challenges', $result);
         $this->assertArrayHasKey('community_stats', $result);
         $this->assertArrayHasKey('recommended_listings', $result);
+        // Phase 1+2 new sections
+        $this->assertArrayHasKey('near_you_listings', $result);
+        $this->assertArrayHasKey('suggested_connections', $result);
+        $this->assertArrayHasKey('trending_blog_posts', $result);
+        $this->assertArrayHasKey('volunteering_opportunities', $result);
+        $this->assertArrayHasKey('active_organisations', $result);
+        $this->assertArrayHasKey('active_polls', $result);
+        $this->assertArrayHasKey('in_demand_skills', $result);
+        $this->assertArrayHasKey('featured_resources', $result);
+        $this->assertArrayHasKey('latest_jobs', $result);
+        // Phase 5 — categories included
+        $this->assertArrayHasKey('categories', $result);
     }
 
-    public function test_getExploreData_uses_global_cache_when_available(): void
+    public function test_getExploreData_uses_per_section_cache(): void
     {
-        $cachedGlobal = [
-            'trending_posts' => [['id' => 1, 'excerpt' => 'Cached post']],
-            'popular_listings' => [],
-            'active_groups' => [],
-            'upcoming_events' => [],
-            'top_contributors' => [],
-            'trending_hashtags' => [],
-            'new_members' => [],
-            'featured_challenges' => [],
-            'community_stats' => ['total_members' => 42],
-        ];
+        // When a section is cached, it returns cached data without DB query
+        $cachedPosts = [['id' => 1, 'excerpt' => 'Cached post']];
 
         Cache::shouldReceive('get')
-            ->with("nexus:explore:{$this->testTenantId}:global")
-            ->once()
-            ->andReturn($cachedGlobal);
+            ->with("nexus:explore:{$this->testTenantId}:trending_posts")
+            ->andReturn($cachedPosts);
 
-        Cache::shouldReceive('get')
-            ->with("nexus:explore:{$this->testTenantId}:1")
-            ->once()
-            ->andReturn(['recommended_listings' => []]);
+        // Other sections: cache miss
+        Cache::shouldReceive('get')->andReturn(null);
+        Cache::shouldReceive('put')->zeroOrMoreTimes();
 
-        // No Cache::put calls because data was cached
-        Cache::shouldReceive('put')->never();
+        DB::shouldReceive('select')->andReturn([]);
+        DB::shouldReceive('selectOne')->andReturn((object) ['cnt' => 0, 'total' => 0]);
+        DB::shouldReceive('table')->andReturn(\Mockery::mock(\Illuminate\Database\Query\Builder::class, function ($mock) {
+            $mock->shouldReceive('where')->andReturnSelf();
+            $mock->shouldReceive('pluck')->andReturn(collect([]));
+            $mock->shouldReceive('get')->andReturn(collect([]));
+        }));
 
         $result = $this->service->getExploreData(1);
 
-        $this->assertEquals(42, $result['community_stats']['total_members']);
-        $this->assertCount(1, $result['trending_posts']);
+        // Trending posts should use cached value
+        $this->assertEquals($cachedPosts, $result['trending_posts']);
     }
 
-    public function test_getExploreData_caches_global_data_for_5_minutes(): void
+    public function test_getExploreData_unauthenticated_returns_empty_personalized(): void
     {
-        Cache::shouldReceive('get')
-            ->with("nexus:explore:{$this->testTenantId}:global")
-            ->once()
-            ->andReturn(null);
-
-        Cache::shouldReceive('get')
-            ->with("nexus:explore:{$this->testTenantId}:0")
-            ->once()
-            ->andReturn(null);
-
+        Cache::shouldReceive('get')->andReturn(null);
+        Cache::shouldReceive('put')->zeroOrMoreTimes();
         DB::shouldReceive('select')->andReturn([]);
         DB::shouldReceive('selectOne')->andReturn((object) ['cnt' => 0, 'total' => 0]);
-
-        // Verify cache TTL is 300 seconds
-        Cache::shouldReceive('put')
-            ->with("nexus:explore:{$this->testTenantId}:global", \Mockery::type('array'), 300)
-            ->once();
-
-        Cache::shouldReceive('put')
-            ->with("nexus:explore:{$this->testTenantId}:0", \Mockery::type('array'), 300)
-            ->once();
-
-        $this->service->getExploreData(0);
-    }
-
-    public function test_getExploreData_per_user_cache_key_differs(): void
-    {
-        $globalData = [
-            'trending_posts' => [],
-            'popular_listings' => [],
-            'active_groups' => [],
-            'upcoming_events' => [],
-            'top_contributors' => [],
-            'trending_hashtags' => [],
-            'new_members' => [],
-            'featured_challenges' => [],
-            'community_stats' => [],
-        ];
-
-        // First call for user 10
-        Cache::shouldReceive('get')
-            ->with("nexus:explore:{$this->testTenantId}:global")
-            ->once()
-            ->andReturn($globalData);
-
-        Cache::shouldReceive('get')
-            ->with("nexus:explore:{$this->testTenantId}:10")
-            ->once()
-            ->andReturn(null);
-
-        DB::shouldReceive('select')->andReturn([]);
-
-        Cache::shouldReceive('put')
-            ->with("nexus:explore:{$this->testTenantId}:10", \Mockery::type('array'), 300)
-            ->once();
-
-        $this->service->getExploreData(10);
-    }
-
-    public function test_getExploreData_unauthenticated_uses_user_id_0(): void
-    {
-        Cache::shouldReceive('get')
-            ->with("nexus:explore:{$this->testTenantId}:global")
-            ->once()
-            ->andReturn(null);
-
-        Cache::shouldReceive('get')
-            ->with("nexus:explore:{$this->testTenantId}:0")
-            ->once()
-            ->andReturn(null);
-
-        DB::shouldReceive('select')->andReturn([]);
-        DB::shouldReceive('selectOne')->andReturn((object) ['cnt' => 0, 'total' => 0]);
-
-        Cache::shouldReceive('put')->twice();
 
         $result = $this->service->getExploreData(0);
 
         $this->assertIsArray($result);
         $this->assertArrayHasKey('recommended_listings', $result);
+        $this->assertEquals([], $result['recommended_listings']);
+        $this->assertEquals([], $result['near_you_listings']);
+        $this->assertEquals([], $result['suggested_connections']);
     }
 
     // ------------------------------------------------------------------
@@ -605,24 +545,17 @@ class ExploreServiceTest extends TestCase
 
     public function test_getExploreData_returns_empty_sections_on_db_failure(): void
     {
-        Cache::shouldReceive('get')
-            ->with("nexus:explore:{$this->testTenantId}:global")
-            ->once()
-            ->andReturn(null);
+        Cache::shouldReceive('get')->andReturn(null);
 
         // All DB calls throw
         DB::shouldReceive('select')->andThrow(new \RuntimeException('DB down'));
         DB::shouldReceive('selectOne')->andThrow(new \RuntimeException('DB down'));
+        DB::shouldReceive('table')->andThrow(new \RuntimeException('DB down'));
 
         // Expect warning logs for each failed section
         Log::shouldReceive('warning')->zeroOrMoreTimes();
 
-        Cache::shouldReceive('put')->twice();
-
-        Cache::shouldReceive('get')
-            ->with("nexus:explore:{$this->testTenantId}:0")
-            ->once()
-            ->andReturn(null);
+        Cache::shouldReceive('put')->zeroOrMoreTimes();
 
         $result = $this->service->getExploreData(0);
 
@@ -632,6 +565,60 @@ class ExploreServiceTest extends TestCase
         $this->assertEquals([], $result['trending_posts']);
         // community_stats returns zeroed structure on failure
         $this->assertEquals(0, $result['community_stats']['total_members']);
+    }
+
+    // ------------------------------------------------------------------
+    //  getForYouFeed()
+    // ------------------------------------------------------------------
+
+    public function test_getForYouFeed_returns_paginated_structure(): void
+    {
+        Cache::shouldReceive('get')->andReturn(null);
+        Cache::shouldReceive('put')->zeroOrMoreTimes();
+        DB::shouldReceive('select')->andReturn([]);
+        DB::shouldReceive('selectOne')->andReturn((object) ['cnt' => 0, 'total' => 0]);
+        DB::shouldReceive('table')->andReturn(\Mockery::mock(\Illuminate\Database\Query\Builder::class, function ($mock) {
+            $mock->shouldReceive('where')->andReturnSelf();
+            $mock->shouldReceive('pluck')->andReturn(collect([]));
+            $mock->shouldReceive('get')->andReturn(collect([]));
+        }));
+
+        $result = $this->service->getForYouFeed($this->testTenantId, 1, 1, 20);
+
+        $this->assertArrayHasKey('items', $result);
+        $this->assertArrayHasKey('total', $result);
+        $this->assertArrayHasKey('page', $result);
+        $this->assertArrayHasKey('per_page', $result);
+        $this->assertEquals(1, $result['page']);
+        $this->assertEquals(20, $result['per_page']);
+    }
+
+    public function test_getForYouFeed_unauthenticated_returns_popular_mix(): void
+    {
+        Cache::shouldReceive('get')->andReturn(null);
+        Cache::shouldReceive('put')->zeroOrMoreTimes();
+        DB::shouldReceive('select')->andReturn([]);
+        DB::shouldReceive('selectOne')->andReturn((object) ['cnt' => 0, 'total' => 0]);
+
+        $result = $this->service->getForYouFeed($this->testTenantId, 0, 1, 20);
+
+        $this->assertArrayHasKey('items', $result);
+        $this->assertIsArray($result['items']);
+    }
+
+    public function test_getForYouFeed_handles_db_error_gracefully(): void
+    {
+        Cache::shouldReceive('get')->andReturn(null);
+        DB::shouldReceive('select')->andThrow(new \RuntimeException('DB down'));
+        DB::shouldReceive('selectOne')->andThrow(new \RuntimeException('DB down'));
+        DB::shouldReceive('table')->andThrow(new \RuntimeException('DB down'));
+        Log::shouldReceive('warning')->zeroOrMoreTimes();
+        Cache::shouldReceive('put')->zeroOrMoreTimes();
+
+        $result = $this->service->getForYouFeed($this->testTenantId, 1, 1, 20);
+
+        $this->assertEquals([], $result['items']);
+        $this->assertEquals(0, $result['total']);
     }
 
     // ------------------------------------------------------------------

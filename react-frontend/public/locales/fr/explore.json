@@ -60,5 +60,81 @@
     "days_ago": "Il y a {{count}} j"
   },
   "error_loading": "Impossible de charger la page Découvrir. Il peut s'agir d'un problème temporaire.",
-  "retry": "Réessayer"
+  "retry": "Réessayer",
+  "near_you": {
+    "title": "Près de Vous",
+    "subtitle": "Annonces proches de votre emplacement",
+    "distance": "à {{distance}} km"
+  },
+  "suggested_connections": {
+    "title": "Personnes que Vous Pourriez Connaître",
+    "subtitle": "Connectez-vous avec des membres qui partagent vos intérêts",
+    "connect": "Se connecter",
+    "mutual": "Connexions mutuelles",
+    "similar": "Intérêts similaires",
+    "recommended": "Recommandé pour vous"
+  },
+  "blog_posts": {
+    "title": "Du Blog",
+    "subtitle": "Dernières actualités de votre communauté",
+    "read_time": "{{count}} min de lecture",
+    "views": "{{count}} vues"
+  },
+  "volunteering": {
+    "title": "Opportunités de Bénévolat",
+    "subtitle": "Faites une différence dans votre communauté",
+    "applications": "{{count}} candidatures",
+    "view_opportunity": "Voir l'opportunité"
+  },
+  "organisations": {
+    "title": "Organisations",
+    "subtitle": "Partenaires communautaires qui font la différence",
+    "opportunities": "{{count}} opportunités"
+  },
+  "polls": {
+    "title": "Sondages Actifs",
+    "subtitle": "Donnez votre avis sur les sujets communautaires",
+    "votes": "{{count}} votes",
+    "options": "{{count}} options",
+    "vote_now": "Voter Maintenant",
+    "closes": "Se termine le {{date}}"
+  },
+  "in_demand_skills": {
+    "title": "Compétences Recherchées",
+    "subtitle": "Les compétences les plus demandées dans votre communauté",
+    "requested": "{{count}} demandent",
+    "offered": "{{count}} proposent",
+    "you_can_help": "Vous pouvez aider !"
+  },
+  "resources": {
+    "title": "Ressources en Vedette",
+    "subtitle": "Guides et documents pour votre communauté",
+    "views": "{{count}} vues"
+  },
+  "jobs": {
+    "title": "Offres d'Emploi",
+    "subtitle": "Dernières ouvertures de partenaires communautaires",
+    "applications": "{{count}} candidatures",
+    "deadline": "Date limite : {{date}}"
+  },
+  "tabs": {
+    "all": "Tout",
+    "for_you": "Pour Vous",
+    "listings": "Annonces",
+    "people": "Personnes",
+    "events": "Événements",
+    "groups": "Groupes"
+  },
+  "recently_viewed": {
+    "title": "Vus Récemment",
+    "subtitle": "Éléments que vous avez consultés récemment",
+    "clear": "Effacer"
+  },
+  "match_score": "{{score}}% de correspondance",
+  "dismiss": "Pas intéressé",
+  "dismiss_reasons": {
+    "not_relevant": "Pas pertinent",
+    "already_seen": "Déjà vu",
+    "not_interested": "Pas intéressé par ceci"
+  }
 }

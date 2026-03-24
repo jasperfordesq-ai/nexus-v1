@@ -60,5 +60,81 @@
     "days_ago": "{{count}}d ago"
   },
   "error_loading": "We couldn't load the Discover page. This may be a temporary issue.",
-  "retry": "Retry"
+  "retry": "Retry",
+  "near_you": {
+    "title": "Near You",
+    "subtitle": "Listings close to your location",
+    "distance": "{{distance}} km away"
+  },
+  "suggested_connections": {
+    "title": "People You May Know",
+    "subtitle": "Connect with members who share your interests",
+    "connect": "Connect",
+    "mutual": "Mutual connections",
+    "similar": "Similar interests",
+    "recommended": "Recommended for you"
+  },
+  "blog_posts": {
+    "title": "From the Blog",
+    "subtitle": "Latest stories from your community",
+    "read_time": "{{count}} min read",
+    "views": "{{count}} views"
+  },
+  "volunteering": {
+    "title": "Volunteer Opportunities",
+    "subtitle": "Make a difference in your community",
+    "applications": "{{count}} applied",
+    "view_opportunity": "View Opportunity"
+  },
+  "organisations": {
+    "title": "Organisations",
+    "subtitle": "Community partners making an impact",
+    "opportunities": "{{count}} opportunities"
+  },
+  "polls": {
+    "title": "Active Polls",
+    "subtitle": "Have your say on community topics",
+    "votes": "{{count}} votes",
+    "options": "{{count}} options",
+    "vote_now": "Vote Now",
+    "closes": "Closes {{date}}"
+  },
+  "in_demand_skills": {
+    "title": "Skills In Demand",
+    "subtitle": "Most requested skills in your community",
+    "requested": "{{count}} requesting",
+    "offered": "{{count}} offering",
+    "you_can_help": "You can help!"
+  },
+  "resources": {
+    "title": "Featured Resources",
+    "subtitle": "Guides and materials for your community",
+    "views": "{{count}} views"
+  },
+  "jobs": {
+    "title": "Job Opportunities",
+    "subtitle": "Latest openings from community partners",
+    "applications": "{{count}} applied",
+    "deadline": "Deadline: {{date}}"
+  },
+  "tabs": {
+    "all": "All",
+    "for_you": "For You",
+    "listings": "Listings",
+    "people": "People",
+    "events": "Events",
+    "groups": "Groups"
+  },
+  "recently_viewed": {
+    "title": "Recently Viewed",
+    "subtitle": "Items you've looked at recently",
+    "clear": "Clear"
+  },
+  "match_score": "{{score}}% match",
+  "dismiss": "Not interested",
+  "dismiss_reasons": {
+    "not_relevant": "Not relevant",
+    "already_seen": "Already seen",
+    "not_interested": "Not interested in this"
+  }
 }

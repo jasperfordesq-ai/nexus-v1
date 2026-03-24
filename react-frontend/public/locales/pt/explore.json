@@ -60,5 +60,81 @@
     "days_ago": "{{count}}d atrás"
   },
   "error_loading": "Não foi possível carregar a página Descobrir. Este pode ser um problema temporário.",
-  "retry": "Tentar novamente"
+  "retry": "Tentar novamente",
+  "near_you": {
+    "title": "Perto de Si",
+    "subtitle": "Anúncios perto da sua localização",
+    "distance": "a {{distance}} km"
+  },
+  "suggested_connections": {
+    "title": "Pessoas que Pode Conhecer",
+    "subtitle": "Conecte-se com membros que partilham os seus interesses",
+    "connect": "Conectar",
+    "mutual": "Conexões mútuas",
+    "similar": "Interesses semelhantes",
+    "recommended": "Recomendado para si"
+  },
+  "blog_posts": {
+    "title": "Do Blog",
+    "subtitle": "Últimas histórias da sua comunidade",
+    "read_time": "{{count}} min de leitura",
+    "views": "{{count}} visualizações"
+  },
+  "volunteering": {
+    "title": "Oportunidades de Voluntariado",
+    "subtitle": "Faça a diferença na sua comunidade",
+    "applications": "{{count}} candidaturas",
+    "view_opportunity": "Ver Oportunidade"
+  },
+  "organisations": {
+    "title": "Organizações",
+    "subtitle": "Parceiros comunitários que fazem a diferença",
+    "opportunities": "{{count}} oportunidades"
+  },
+  "polls": {
+    "title": "Sondagens Ativas",
+    "subtitle": "Dê a sua opinião sobre temas da comunidade",
+    "votes": "{{count}} votos",
+    "options": "{{count}} opções",
+    "vote_now": "Votar Agora",
+    "closes": "Encerra em {{date}}"
+  },
+  "in_demand_skills": {
+    "title": "Competências em Procura",
+    "subtitle": "As competências mais procuradas na sua comunidade",
+    "requested": "{{count}} a procurar",
+    "offered": "{{count}} a oferecer",
+    "you_can_help": "Pode ajudar!"
+  },
+  "resources": {
+    "title": "Recursos em Destaque",
+    "subtitle": "Guias e materiais para a sua comunidade",
+    "views": "{{count}} visualizações"
+  },
+  "jobs": {
+    "title": "Oportunidades de Emprego",
+    "subtitle": "Últimas vagas de parceiros comunitários",
+    "applications": "{{count}} candidaturas",
+    "deadline": "Prazo: {{date}}"
+  },
+  "tabs": {
+    "all": "Tudo",
+    "for_you": "Para Si",
+    "listings": "Anúncios",
+    "people": "Pessoas",
+    "events": "Eventos",
+    "groups": "Grupos"
+  },
+  "recently_viewed": {
+    "title": "Vistos Recentemente",
+    "subtitle": "Itens que visualizou recentemente",
+    "clear": "Limpar"
+  },
+  "match_score": "{{score}}% de correspondência",
+  "dismiss": "Não tenho interesse",
+  "dismiss_reasons": {
+    "not_relevant": "Não é relevante",
+    "already_seen": "Já visto",
+    "not_interested": "Não tenho interesse nisto"
+  }
 }

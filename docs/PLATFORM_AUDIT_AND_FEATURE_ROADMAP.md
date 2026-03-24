@@ -729,17 +729,20 @@ Project NEXUS is a **multi-tenant, enterprise-grade community platform** with ti
 
 ---
 
-#### 5. Discover / Explore Page
-**Why:** Instagram's Explore and TikTok's For You Page are the primary discovery mechanisms. NEXUS has search but no curated discovery experience. Users should be able to browse trending content, popular listings, active communities, and recommended matches in a single, visually engaging page.
+#### 5. ✅ Discover / Explore Page — IMPLEMENTED (2026-03-24)
+**Status:** Implemented with 20 sections, 6-signal recommendation algorithm, and full i18n.
 
-**Scope:**
-- "Explore" page with sections: Trending Posts, Popular Listings, Active Groups, Upcoming Events, Top Contributors, Featured Challenges
-- Algorithmic feed based on interests, location, and activity
-- Category-based browsing (like Instagram Explore categories)
-- "For You" personalization using existing match preferences and category affinity
-- Trending topics/hashtags prominently displayed
+**What was delivered:**
+- 20 content sections: Trending Posts, Popular Listings, Active Groups, Upcoming Events, Top Contributors, Trending Hashtags, Featured Challenges, Community Stats, Recommended For You, Near You, Suggested Connections, Blog Posts, Volunteering, Organisations, Active Polls, Skills In Demand, Featured Resources, Job Opportunities, New Members, category chips
+- **Algorithm pipeline:** SmartMatchingEngine (6-signal: category, skill, proximity, freshness, reciprocity, quality) + CollaborativeFilteringService (user-user CF) + KNN pre-computed recs + MatchLearningService (historical boost/penalty) + dismissed/muted filtering
+- Location-based "Near You" with Haversine distance + learned distance preference
+- Interaction tracking endpoint (`POST /v2/explore/track`) feeding back into MatchLearningService
+- Dismiss/hide functionality (`POST /v2/explore/dismiss`) with cache invalidation
+- Category-based browsing via quick-filter chips + `/v2/explore/category/{slug}`
+- Full i18n in 7 languages, Framer Motion animations, skeleton loading states, feature gating
+- 25 Vitest frontend tests passing
 
-**Effort:** Medium (1-2 weeks) — much of the data/API already exists
+**Remaining (see [EXPLORE_ROADMAP.md](EXPLORE_ROADMAP.md)):** Tab navigation, infinite scroll, unified "For You" mixed feed, trending velocity detection, A/B testing framework
 
 ---
 
@@ -1060,7 +1063,7 @@ Based on impact vs effort analysis, the recommended implementation order:
 | 22 | Live Streaming | 🔴 High | Very Large | Platform differentiator |
 | 23 | Collaborative Docs | 🟡 Medium | Large | Group utility |
 | 24 | Dark Mode Enhancements | 🟢 Low | Small | Polish |
-| 25 | Explore / "For You" Algorithm | 🔴 High | Large | Algorithmic discovery |
+| 25 | ~~Explore / "For You" Algorithm~~ | ✅ Done | Large | **Implemented 2026-03-24** — SmartMatchingEngine, CollaborativeFiltering, KNN, 20 sections. See [EXPLORE_ROADMAP.md](EXPLORE_ROADMAP.md) |
 
 ---
 

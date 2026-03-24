@@ -60,5 +60,81 @@
     "days_ago": "{{count}}l ó shin"
   },
   "error_loading": "Níorbh fhéidir leathanach Aimsigh a luchtú. D'fhéadfadh sé seo a bheith ina fhadhb shealadach.",
-  "retry": "Atriail"
+  "retry": "Atriail",
+  "near_you": {
+    "title": "In Aice Leat",
+    "subtitle": "Liostuithe gar do do shuíomh",
+    "distance": "{{distance}} km ar shiúl"
+  },
+  "suggested_connections": {
+    "title": "Daoine a d'Fhéadfá Aithne a Chur Orthu",
+    "subtitle": "Ceangail le baill a roinneann do spéiseanna",
+    "connect": "Ceangail",
+    "mutual": "Ceangail choitianta",
+    "similar": "Spéiseanna cosúla",
+    "recommended": "Molta duit"
+  },
+  "blog_posts": {
+    "title": "Ón mBlag",
+    "subtitle": "Na scéalta is déanaí ó do phobal",
+    "read_time": "{{count}} nóim léitheoireachta",
+    "views": "{{count}} amharc"
+  },
+  "volunteering": {
+    "title": "Deiseanna Oibre Deonaí",
+    "subtitle": "Déan difríocht i do phobal",
+    "applications": "{{count}} iarratas",
+    "view_opportunity": "Féach ar Dheis"
+  },
+  "organisations": {
+    "title": "Eagraíochtaí",
+    "subtitle": "Comhpháirtithe pobail ag déanamh tionchar",
+    "opportunities": "{{count}} deis"
+  },
+  "polls": {
+    "title": "Pobalbhreitheanna Gníomhacha",
+    "subtitle": "Abair do thuairim ar ábhair phobail",
+    "votes": "{{count}} vóta",
+    "options": "{{count}} rogha",
+    "vote_now": "Vótáil Anois",
+    "closes": "Ag dúnadh {{date}}"
+  },
+  "in_demand_skills": {
+    "title": "Scileanna atá ag Teastáil",
+    "subtitle": "Na scileanna is mó éileamh i do phobal",
+    "requested": "{{count}} ag iarraidh",
+    "offered": "{{count}} ag tairiscint",
+    "you_can_help": "Is féidir leat cabhrú!"
+  },
+  "resources": {
+    "title": "Acmhainní Roghnaithe",
+    "subtitle": "Treoracha agus ábhair do do phobal",
+    "views": "{{count}} amharc"
+  },
+  "jobs": {
+    "title": "Deiseanna Fostaíochta",
+    "subtitle": "Na folúntais is déanaí ó chomhpháirtithe pobail",
+    "applications": "{{count}} iarratas",
+    "deadline": "Spriocdháta: {{date}}"
+  },
+  "tabs": {
+    "all": "Gach rud",
+    "for_you": "Duit Féin",
+    "listings": "Liostuithe",
+    "people": "Daoine",
+    "events": "Imeachtaí",
+    "groups": "Grúpaí"
+  },
+  "recently_viewed": {
+    "title": "Feicthe le Déanaí",
+    "subtitle": "Rudaí ar fhéach tú orthu le déanaí",
+    "clear": "Glan"
+  },
+  "match_score": "{{score}}% meaitseáil",
+  "dismiss": "Níl spéis agam",
+  "dismiss_reasons": {
+    "not_relevant": "Níl sé ábhartha",
+    "already_seen": "Feicthe cheana",
+    "not_interested": "Níl spéis agam sa mhéid seo"
+  }
 }

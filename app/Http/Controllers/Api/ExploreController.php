@@ -6,8 +6,11 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Core\TenantContext;
 use App\Services\ExploreService;
+use App\Services\MatchLearningService;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\DB;
 
 /**
  * ExploreController — Discover/Explore page API endpoints.
@@ -19,6 +22,8 @@ use Illuminate\Http\JsonResponse;
  *   GET  /api/v2/explore/trending           trending()
  *   GET  /api/v2/explore/popular-listings   popularListings()
  *   GET  /api/v2/explore/category/{slug}    category()
+ *   POST /api/v2/explore/track              track()
+ *   POST /api/v2/explore/dismiss            dismiss()
  */
 class ExploreController extends BaseApiController
 {
@@ -26,6 +31,7 @@ class ExploreController extends BaseApiController
 
     public function __construct(
         private readonly ExploreService $exploreService,
+        private readonly MatchLearningService $matchLearning,
     ) {}
 
     /**
@@ -44,6 +50,27 @@ class ExploreController extends BaseApiController
         }
 
         return $this->respondWithData($data);
+    }
+
+    /**
+     * Get the unified "For You" mixed content feed.
+     * Returns a paginated feed mixing posts, listings, events, groups, members, and blogs.
+     */
+    public function forYou(): JsonResponse
+    {
+        $userId = $this->getOptionalUserId();
+        $tenantId = $this->getTenantId();
+        $page = $this->queryInt('page', 1, 1);
+        $perPage = $this->queryInt('per_page', 20, 1, 50);
+
+        $result = $this->exploreService->getForYouFeed($tenantId, $userId ?? 0, $page, $perPage);
+
+        return $this->respondWithPaginatedCollection(
+            $result['items'],
+            $result['total'],
+            $result['page'],
+            $result['per_page']
+        );
     }
 
     /**
@@ -105,5 +132,115 @@ class ExploreController extends BaseApiController
             $result['page'],
             $result['per_page'],
         );
+    }
+
+    /**
+     * Track an explore interaction (impression, click, save, dwell).
+     * Feeds into MatchLearningService for future recommendation quality.
+     */
+    public function track(): JsonResponse
+    {
+        $userId = $this->requireUserId();
+        $input = $this->getJsonInput();
+
+        $itemType = $input['item_type'] ?? null; // listing, post, event, group, member
+        $itemId = (int) ($input['item_id'] ?? 0);
+        $action = $input['action'] ?? 'view'; // impression, click, save, dwell
+
+        if (!$itemId || !$itemType) {
+            return $this->respondWithError('INVALID_INPUT', 'item_type and item_id are required', null, 422);
+        }
+
+        // Map explore actions to match_history actions
+        $actionMap = [
+            'impression' => 'impression',
+            'click' => 'view',
+            'save' => 'save',
+            'dwell' => 'view',
+        ];
+        $historyAction = $actionMap[$action] ?? 'view';
+
+        // Only record listing interactions in match_history (other types can be extended later)
+        if ($itemType === 'listing') {
+            $this->matchLearning->recordInteraction($userId, $itemId, $historyAction, [
+                'source' => 'explore',
+                'original_action' => $action,
+            ]);
+        }
+
+        return $this->respondWithData(['tracked' => true]);
+    }
+
+    /**
+     * Dismiss an explore recommendation. Stores in match_dismissals and
+     * invalidates the user's personalized explore cache.
+     */
+    public function dismiss(): JsonResponse
+    {
+        $userId = $this->requireUserId();
+        $tenantId = $this->getTenantId();
+        $input = $this->getJsonInput();
+
+        $itemType = $input['item_type'] ?? 'listing';
+        $itemId = (int) ($input['item_id'] ?? 0);
+        $reason = $input['reason'] ?? null; // not_relevant, already_seen, not_interested
+
+        if (!$itemId) {
+            return $this->respondWithError('INVALID_INPUT', 'item_id is required', null, 422);
+        }
+
+        try {
+            if ($itemType === 'listing') {
+                // Record dismissal
+                DB::table('match_dismissals')->insertOrIgnore([
+                    'tenant_id' => $tenantId,
+                    'user_id' => $userId,
+                    'listing_id' => $itemId,
+                    'reason' => $reason,
+                    'created_at' => now(),
+                ]);
+
+                // Also record in match_history for learning
+                $this->matchLearning->recordInteraction($userId, $itemId, 'dismiss', [
+                    'source' => 'explore',
+                    'reason' => $reason,
+                ]);
+            }
+
+            // Invalidate user's personalized explore cache
+            $cacheKey = "nexus:explore:{$tenantId}:{$userId}";
+            \Illuminate\Support\Facades\Cache::forget($cacheKey);
+
+            return $this->respondWithData(['dismissed' => true]);
+        } catch (\Throwable $e) {
+            return $this->respondWithError('DISMISS_FAILED', 'Failed to dismiss item', null, 500);
+        }
+    }
+
+    /**
+     * Get explore analytics for admin dashboard (Phase 6.2).
+     * Returns interaction stats, dismissal data, and cache status.
+     */
+    public function analytics(): JsonResponse
+    {
+        $this->requireAdmin();
+        $tenantId = $this->getTenantId();
+
+        $data = $this->exploreService->getExploreAnalytics($tenantId);
+
+        return $this->respondWithData($data);
+    }
+
+    /**
+     * Get the current user's A/B experiment cohort (Phase 6.3).
+     */
+    public function experiments(): JsonResponse
+    {
+        $userId = $this->requireUserId();
+        $tenantId = $this->getTenantId();
+
+        $data = $this->exploreService->getUserExperimentCohort($tenantId, $userId);
+
+        return $this->respondWithData($data);
     }
 }

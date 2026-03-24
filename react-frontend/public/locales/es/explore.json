@@ -60,5 +60,81 @@
     "days_ago": "hace {{count}}d"
   },
   "error_loading": "No se pudo cargar la página Descubrir. Es posible que sea un problema temporal.",
-  "retry": "Reintentar"
+  "retry": "Reintentar",
+  "near_you": {
+    "title": "Cerca de Ti",
+    "subtitle": "Anuncios cerca de tu ubicación",
+    "distance": "a {{distance}} km"
+  },
+  "suggested_connections": {
+    "title": "Personas que Quizás Conozcas",
+    "subtitle": "Conéctate con miembros que comparten tus intereses",
+    "connect": "Conectar",
+    "mutual": "Conexiones mutuas",
+    "similar": "Intereses similares",
+    "recommended": "Recomendado para ti"
+  },
+  "blog_posts": {
+    "title": "Del Blog",
+    "subtitle": "Últimas historias de tu comunidad",
+    "read_time": "{{count}} min de lectura",
+    "views": "{{count}} vistas"
+  },
+  "volunteering": {
+    "title": "Oportunidades de Voluntariado",
+    "subtitle": "Marca la diferencia en tu comunidad",
+    "applications": "{{count}} postulados",
+    "view_opportunity": "Ver Oportunidad"
+  },
+  "organisations": {
+    "title": "Organizaciones",
+    "subtitle": "Socios comunitarios que generan impacto",
+    "opportunities": "{{count}} oportunidades"
+  },
+  "polls": {
+    "title": "Encuestas Activas",
+    "subtitle": "Opina sobre temas de la comunidad",
+    "votes": "{{count}} votos",
+    "options": "{{count}} opciones",
+    "vote_now": "Votar Ahora",
+    "closes": "Cierra el {{date}}"
+  },
+  "in_demand_skills": {
+    "title": "Habilidades en Demanda",
+    "subtitle": "Las habilidades más solicitadas en tu comunidad",
+    "requested": "{{count}} solicitando",
+    "offered": "{{count}} ofreciendo",
+    "you_can_help": "¡Puedes ayudar!"
+  },
+  "resources": {
+    "title": "Recursos Destacados",
+    "subtitle": "Guías y materiales para tu comunidad",
+    "views": "{{count}} vistas"
+  },
+  "jobs": {
+    "title": "Oportunidades de Empleo",
+    "subtitle": "Últimas vacantes de socios comunitarios",
+    "applications": "{{count}} postulados",
+    "deadline": "Fecha límite: {{date}}"
+  },
+  "tabs": {
+    "all": "Todo",
+    "for_you": "Para Ti",
+    "listings": "Anuncios",
+    "people": "Personas",
+    "events": "Eventos",
+    "groups": "Grupos"
+  },
+  "recently_viewed": {
+    "title": "Vistos Recientemente",
+    "subtitle": "Elementos que has visto recientemente",
+    "clear": "Limpiar"
+  },
+  "match_score": "{{score}}% de coincidencia",
+  "dismiss": "No me interesa",
+  "dismiss_reasons": {
+    "not_relevant": "No es relevante",
+    "already_seen": "Ya lo vi",
+    "not_interested": "No me interesa esto"
+  }
 }
