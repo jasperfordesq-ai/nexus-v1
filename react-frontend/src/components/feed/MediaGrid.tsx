@@ -15,7 +15,7 @@
  * Click any image to open the full carousel lightbox starting from that image.
  */
 
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { resolveAssetUrl } from '@/lib/helpers';
 import type { PostMedia } from './types';
@@ -38,6 +38,12 @@ export function MediaGrid({ media, className = '' }: MediaGridProps) {
     setLightboxIndex(index);
   };
 
+  const [loadedImages, setLoadedImages] = useState<Set<number>>(new Set());
+
+  const handleImageLoad = useCallback((index: number) => {
+    setLoadedImages((prev) => new Set(prev).add(index));
+  }, []);
+
   const renderImage = (item: PostMedia, index: number, extraOverlay = false) => (
     <button
       key={item.id}
@@ -46,12 +52,19 @@ export function MediaGrid({ media, className = '' }: MediaGridProps) {
       onClick={() => openLightbox(index)}
       aria-label={item.alt_text || t('carousel.view_image', 'View image {{current}} of {{total}}', { current: index + 1, total })}
     >
+      {/* Shimmer skeleton while image loads */}
+      {!loadedImages.has(index) && (
+        <div className="absolute inset-0 bg-[var(--color-surface)] animate-pulse" />
+      )}
       <img
-        src={resolveAssetUrl(item.file_url)}
+        src={resolveAssetUrl(item.thumbnail_url || item.file_url)}
         alt={item.alt_text || t('carousel.image_of', 'Image {{current}} of {{total}}', { current: index + 1, total })}
-        className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
+        className={`w-full h-full object-cover hover:scale-105 transition-transform duration-300 ${
+          loadedImages.has(index) ? 'opacity-100' : 'opacity-0'
+        }`}
         loading={index === 0 ? 'eager' : 'lazy'}
         draggable={false}
+        onLoad={() => handleImageLoad(index)}
       />
       {extraOverlay && extraCount > 0 && (
         <div className="absolute inset-0 bg-black/50 flex items-center justify-center" aria-label={t('carousel.more_images', '{{count}} more images', { count: extraCount })}>

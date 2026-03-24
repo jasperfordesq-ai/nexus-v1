@@ -262,7 +262,8 @@ class SocialController extends BaseApiController
         // Handle multi-image uploads (media[] or image_0, image_1, etc.)
         $mediaFiles = $this->collectMediaFiles();
         if (!empty($mediaFiles)) {
-            $this->postMediaService->attachMedia($postId, $mediaFiles);
+            $altTexts = request()->input('alt_texts', []);
+            $this->postMediaService->attachMedia($postId, $mediaFiles, is_array($altTexts) ? $altTexts : []);
         }
 
         // Process link previews from post content (async-safe, non-blocking)
@@ -384,7 +385,8 @@ class SocialController extends BaseApiController
             $mediaFiles = $this->collectMediaFiles();
             $media = [];
             if (!empty($mediaFiles)) {
-                $media = $this->postMediaService->attachMedia((int) $postId, $mediaFiles);
+                $altTexts = request()->input('alt_texts', []);
+                $media = $this->postMediaService->attachMedia((int) $postId, $mediaFiles, is_array($altTexts) ? $altTexts : []);
             }
 
             return $this->respondWithData([

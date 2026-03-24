@@ -73,7 +73,8 @@ class PostMediaController extends BaseApiController
             return $this->respondWithError('VALIDATION_ERROR', 'No media files provided', 'media', 422);
         }
 
-        $media = $this->postMediaService->attachMedia($id, $files);
+        $altTexts = $this->input('alt_texts') ?? [];
+        $media = $this->postMediaService->attachMedia($id, $files, is_array($altTexts) ? $altTexts : []);
 
         if (empty($media)) {
             return $this->respondWithError('UPLOAD_FAILED', 'No files were uploaded successfully. Maximum 10 images per post.', null, 422);

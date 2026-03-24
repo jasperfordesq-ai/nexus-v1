@@ -576,7 +576,7 @@ const FeedCard = React.memo(function FeedCard({
             {item.media.length <= 4 ? (
               <MediaGrid media={item.media} className="mx-5" />
             ) : (
-              <MediaGrid media={item.media} className="mx-5" />
+              <ImageCarousel media={item.media} className="mx-5" />
             )}
           </div>
         ) : item.media && item.media.length === 1 ? (

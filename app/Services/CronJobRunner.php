@@ -33,6 +33,7 @@ use App\Services\ListingExpiryService;
 use App\Services\ListingExpiryReminderService;
 use App\Services\JobVacancyService;
 use App\Services\RecurringShiftService;
+use App\Services\StoryService;
 
 /**
  * Executes scheduled cron jobs (digests, newsletters, cleanup, matching, etc.).
@@ -685,7 +686,7 @@ class CronJobRunner
      *   Every 30 min: Geocode batch, warm match cache
      *   Hourly :00:   Hot matches, gamification campaigns, abuse detection, session/token cleanup
      *   Hourly :30:   Challenge expiry check
-     *   00:00:        Daily cleanup, leaderboard snapshot
+     *   00:00:        Daily cleanup, story cleanup, leaderboard snapshot
      *   01:00:        Streak milestones
      *   03:00:        Gamification daily tasks
      *   06:00:        Recurring shift generation
@@ -809,6 +810,13 @@ class CronJobRunner
                 $taskNum++;
                 echo "\n[{$taskNum}] Running daily cleanup...\n";
                 echo $this->runSubTask('cleanup', fn() => $this->cleanupInternal());
+
+                $taskNum++;
+                echo "\n[{$taskNum}] Story cleanup (expire + media purge)...\n";
+                echo $this->runSubTask('story-cleanup', function () {
+                    (new StoryService())->cleanupExpired();
+                    echo "   Story cleanup complete.\n";
+                });
 
                 $taskNum++;
                 echo "\n[{$taskNum}] Leaderboard snapshot...\n";

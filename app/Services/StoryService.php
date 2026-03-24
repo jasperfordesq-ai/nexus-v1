@@ -7,6 +7,10 @@
 namespace App\Services;
 
 use App\Core\TenantContext;
+use App\Models\Notification;
+use App\Services\MessageService;
+use App\Services\NotificationDispatcher;
+use App\Services\RealtimeService;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
@@ -73,9 +77,18 @@ class StoryService
             $textStyle = json_encode($data['text_style']);
         }
 
+        $videoDuration = null;
+        if ($mediaType === 'video' && !empty($data['video_duration'])) {
+            $videoDuration = (float) $data['video_duration'];
+            // For video stories, default display duration to video length (capped at 30s)
+            $duration = min(max((int) ceil($videoDuration), 3), 30);
+        }
+
+        $audience = $data['audience'] ?? 'everyone';
+
         DB::insert(
-            'INSERT INTO stories (tenant_id, user_id, media_type, media_url, thumbnail_url, text_content, text_style, background_color, background_gradient, duration, poll_question, poll_options, expires_at, created_at)
-             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())',
+            'INSERT INTO stories (tenant_id, user_id, media_type, media_url, thumbnail_url, text_content, text_style, background_color, background_gradient, duration, video_duration, poll_question, poll_options, audience, expires_at, created_at)
+             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())',
             [
                 $tenantId,
                 $userId,
@@ -87,13 +100,26 @@ class StoryService
                 $data['background_color'] ?? null,
                 $data['background_gradient'] ?? null,
                 $duration,
+                $videoDuration,
                 $data['poll_question'] ?? null,
                 $pollOptions,
+                $audience,
                 $expiresAt,
             ]
         );
 
         $storyId = DB::getPdo()->lastInsertId();
+
+        // Notify the user's connections about the new story (non-blocking)
+        try {
+            $this->notifyConnections($userId, (int) $storyId);
+        } catch (\Throwable $e) {
+            Log::warning('StoryService: Failed to notify connections for story', [
+                'story_id' => $storyId,
+                'user_id' => $userId,
+                'error' => $e->getMessage(),
+            ]);
+        }
 
         return $this->getStoryById((int) $storyId);
     }
@@ -113,6 +139,8 @@ class StoryService
         $tenantId = TenantContext::getId();
 
         // Get all users with active stories in this tenant
+        // Respects audience: 'everyone' visible to all, 'connections' to connections only,
+        // 'close_friends' to close friends only. Own stories always visible.
         $rows = DB::select(
             'SELECT
                 s.user_id,
@@ -128,12 +156,24 @@ class StoryService
              WHERE s.tenant_id = ?
                AND s.is_active = 1
                AND s.expires_at > NOW()
+               AND (
+                   s.user_id = ?
+                   OR COALESCE(s.audience, \'everyone\') = \'everyone\'
+                   OR (COALESCE(s.audience, \'everyone\') = \'connections\' AND EXISTS (
+                       SELECT 1 FROM connections c
+                       WHERE ((c.requester_id = s.user_id AND c.receiver_id = ?) OR (c.receiver_id = s.user_id AND c.requester_id = ?))
+                         AND c.status = \'accepted\' AND c.tenant_id = ?
+                   ))
+                   OR (COALESCE(s.audience, \'everyone\') = \'close_friends\' AND EXISTS (
+                       SELECT 1 FROM close_friends cf WHERE cf.user_id = s.user_id AND cf.friend_id = ? AND cf.tenant_id = ?
+                   ))
+               )
              GROUP BY s.user_id, u.first_name, u.last_name, u.avatar_url
              ORDER BY
                 (s.user_id = ?) DESC,
                 unseen_count DESC,
                 latest_story_at DESC',
-            [$userId, $tenantId, $userId]
+            [$userId, $tenantId, $userId, $userId, $userId, $tenantId, $userId, $tenantId, $userId]
         );
 
         // Check connections for sorting priority
@@ -299,7 +339,7 @@ class StoryService
 
         // Verify story belongs to this tenant
         $story = DB::selectOne(
-            'SELECT id FROM stories WHERE id = ? AND tenant_id = ? AND is_active = 1 AND expires_at > NOW()',
+            'SELECT id, user_id FROM stories WHERE id = ? AND tenant_id = ? AND is_active = 1 AND expires_at > NOW()',
             [$storyId, $tenantId]
         );
 
@@ -316,6 +356,52 @@ class StoryService
             'INSERT INTO story_reactions (story_id, user_id, reaction_type, created_at) VALUES (?, ?, ?, NOW())',
             [$storyId, $userId, $reactionType]
         );
+
+        // Notify story owner about the reaction (skip self-reactions)
+        if ($story->user_id !== $userId) {
+            try {
+                $emojiMap = [
+                    'heart' => "\u{2764}\u{FE0F}",
+                    'laugh' => "\u{1F602}",
+                    'wow'   => "\u{1F62E}",
+                    'fire'  => "\u{1F525}",
+                    'clap'  => "\u{1F44F}",
+                    'sad'   => "\u{1F622}",
+                ];
+                $emoji = $emojiMap[$reactionType] ?? $reactionType;
+
+                $reactor = DB::selectOne(
+                    'SELECT first_name, last_name FROM users WHERE id = ? AND tenant_id = ?',
+                    [$userId, $tenantId]
+                );
+                $reactorName = $reactor ? trim($reactor->first_name . ' ' . $reactor->last_name) : 'Someone';
+
+                $content = "{$reactorName} reacted {$emoji} to your story";
+
+                NotificationDispatcher::dispatch(
+                    $story->user_id,
+                    'global',
+                    null,
+                    'story_reaction',
+                    $content,
+                    '/feed',
+                    null
+                );
+
+                RealtimeService::broadcastNotification($story->user_id, [
+                    'type'    => 'story_reaction',
+                    'message' => $content,
+                    'link'    => '/feed',
+                ]);
+            } catch (\Throwable $e) {
+                // Notification failure should not break the reaction
+                \Log::warning('Failed to send story reaction notification', [
+                    'story_id' => $storyId,
+                    'reactor'  => $userId,
+                    'error'    => $e->getMessage(),
+                ]);
+            }
+        }
     }
 
     /**
@@ -582,10 +668,22 @@ class StoryService
     }
 
     /**
-     * Cron job: deactivate expired stories and clean up old media.
+     * Cron job: archive expired stories, deactivate them, and clean up old media.
      */
     public function cleanupExpired(): void
     {
+        // Archive expired stories before deactivating (auto-save for highlight curation)
+        $archived = DB::affectingStatement(
+            'INSERT IGNORE INTO story_archive (tenant_id, user_id, original_story_id, media_type, media_url, thumbnail_url, text_content, text_style, background_color, background_gradient, duration, video_duration, poll_question, poll_options, view_count, original_created_at)
+             SELECT tenant_id, user_id, id, media_type, media_url, thumbnail_url, text_content, text_style, background_color, background_gradient, duration, video_duration, poll_question, poll_options, view_count, created_at
+             FROM stories
+             WHERE is_active = 1 AND expires_at <= NOW()'
+        );
+
+        if ($archived > 0) {
+            Log::info("StoryService: Archived {$archived} expired stories");
+        }
+
         // Deactivate expired stories
         $deactivated = DB::update(
             'UPDATE stories SET is_active = 0 WHERE is_active = 1 AND expires_at <= NOW()'
@@ -637,9 +735,421 @@ class StoryService
         return "/{$dir}/{$filename}";
     }
 
+    /**
+     * Reply to a story via DM.
+     *
+     * Creates a direct message to the story owner with story context attached.
+     *
+     * @param int $storyId
+     * @param int $senderId The user sending the reply
+     * @param string $body The reply message text
+     * @return array The created message
+     *
+     * @throws \RuntimeException if story not found, expired, or self-reply
+     */
+    public function replyToStory(int $storyId, int $senderId, string $body): array
+    {
+        $tenantId = TenantContext::getId();
+
+        // Verify story exists, is active, and belongs to this tenant
+        $story = DB::selectOne(
+            'SELECT id, user_id FROM stories WHERE id = ? AND tenant_id = ? AND is_active = 1 AND expires_at > NOW()',
+            [$storyId, $tenantId]
+        );
+
+        if (!$story) {
+            throw new \RuntimeException('Story not found or has expired');
+        }
+
+        $storyOwnerId = (int) $story->user_id;
+
+        // Prevent self-reply
+        if ($senderId === $storyOwnerId) {
+            throw new \RuntimeException('You cannot reply to your own story');
+        }
+
+        // Send message with story context
+        $message = MessageService::send($senderId, [
+            'recipient_id' => $storyOwnerId,
+            'body' => $body,
+            'context_type' => 'story',
+            'context_id' => $storyId,
+        ]);
+
+        if (isset($message['error'])) {
+            throw new \RuntimeException($message['error']);
+        }
+
+        return $message;
+    }
+
+    // ────────────────────────────────────────────────────────────────────────
+    // Story Archive
+    // ────────────────────────────────────────────────────────────────────────
+
+    /**
+     * Get archived stories for a user (for highlight curation after expiry).
+     *
+     * @param int $userId
+     * @param int $limit
+     * @param int $offset
+     * @return array
+     */
+    public function getArchivedStories(int $userId, int $limit = 50, int $offset = 0): array
+    {
+        $tenantId = TenantContext::getId();
+
+        $stories = DB::select(
+            'SELECT * FROM story_archive
+             WHERE tenant_id = ? AND user_id = ?
+             ORDER BY original_created_at DESC
+             LIMIT ? OFFSET ?',
+            [$tenantId, $userId, $limit, $offset]
+        );
+
+        return array_map(fn($s) => [
+            'id' => (int) $s->id,
+            'original_story_id' => (int) $s->original_story_id,
+            'media_type' => $s->media_type,
+            'media_url' => $s->media_url,
+            'thumbnail_url' => $s->thumbnail_url,
+            'text_content' => $s->text_content,
+            'background_gradient' => $s->background_gradient,
+            'duration' => (int) $s->duration,
+            'view_count' => (int) $s->view_count,
+            'created_at' => $s->original_created_at,
+            'archived_at' => $s->archived_at,
+        ], $stories);
+    }
+
+    // ────────────────────────────────────────────────────────────────────────
+    // Close Friends
+    // ────────────────────────────────────────────────────────────────────────
+
+    /**
+     * Get a user's close friends list.
+     *
+     * @param int $userId
+     * @return array
+     */
+    public function getCloseFriends(int $userId): array
+    {
+        $tenantId = TenantContext::getId();
+
+        return DB::select(
+            'SELECT cf.friend_id, u.first_name, u.last_name, u.avatar_url, cf.created_at
+             FROM close_friends cf
+             JOIN users u ON u.id = cf.friend_id
+             WHERE cf.tenant_id = ? AND cf.user_id = ?
+             ORDER BY u.first_name ASC',
+            [$tenantId, $userId]
+        );
+    }
+
+    /**
+     * Add a user to close friends list.
+     *
+     * @param int $userId
+     * @param int $friendId
+     */
+    public function addCloseFriend(int $userId, int $friendId): void
+    {
+        $tenantId = TenantContext::getId();
+
+        DB::statement(
+            'INSERT IGNORE INTO close_friends (user_id, friend_id, tenant_id) VALUES (?, ?, ?)',
+            [$userId, $friendId, $tenantId]
+        );
+    }
+
+    /**
+     * Remove a user from close friends list.
+     *
+     * @param int $userId
+     * @param int $friendId
+     */
+    public function removeCloseFriend(int $userId, int $friendId): void
+    {
+        $tenantId = TenantContext::getId();
+
+        DB::delete(
+            'DELETE FROM close_friends WHERE user_id = ? AND friend_id = ? AND tenant_id = ?',
+            [$userId, $friendId, $tenantId]
+        );
+    }
+
+    // ────────────────────────────────────────────────────────────────────────
+    // Story Analytics
+    // ────────────────────────────────────────────────────────────────────────
+
+    /**
+     * Track a story analytics event.
+     *
+     * @param int $storyId
+     * @param int $viewerId
+     * @param string $eventType One of: view_start, view_complete, tap_forward, tap_back, tap_exit, swipe_next, swipe_prev
+     * @param int|null $watchDurationMs Time spent viewing in milliseconds
+     */
+    public function trackAnalytics(int $storyId, int $viewerId, string $eventType, ?int $watchDurationMs = null): void
+    {
+        $allowed = ['view_start', 'view_complete', 'tap_forward', 'tap_back', 'tap_exit', 'swipe_next', 'swipe_prev'];
+        if (!in_array($eventType, $allowed)) {
+            return;
+        }
+
+        DB::insert(
+            'INSERT INTO story_analytics (story_id, viewer_id, event_type, watch_duration_ms) VALUES (?, ?, ?, ?)',
+            [$storyId, $viewerId, $eventType, $watchDurationMs]
+        );
+    }
+
+    /**
+     * Get analytics summary for a story (owner only).
+     *
+     * @param int $storyId
+     * @param int $ownerId
+     * @return array
+     *
+     * @throws \RuntimeException if not owner
+     */
+    public function getStoryAnalytics(int $storyId, int $ownerId): array
+    {
+        $tenantId = TenantContext::getId();
+
+        $story = DB::selectOne(
+            'SELECT id, user_id, view_count FROM stories WHERE id = ? AND tenant_id = ?',
+            [$storyId, $tenantId]
+        );
+
+        if (!$story || (int) $story->user_id !== $ownerId) {
+            throw new \RuntimeException('Story not found or you are not the owner');
+        }
+
+        // Event counts
+        $events = DB::select(
+            'SELECT event_type, COUNT(*) as cnt FROM story_analytics WHERE story_id = ? GROUP BY event_type',
+            [$storyId]
+        );
+
+        $counts = [];
+        foreach ($events as $e) {
+            $counts[$e->event_type] = (int) $e->cnt;
+        }
+
+        // Average watch duration
+        $avgDuration = DB::selectOne(
+            'SELECT AVG(watch_duration_ms) as avg_ms FROM story_analytics WHERE story_id = ? AND watch_duration_ms IS NOT NULL',
+            [$storyId]
+        );
+
+        // Completion rate
+        $starts = $counts['view_start'] ?? 0;
+        $completes = $counts['view_complete'] ?? 0;
+        $completionRate = $starts > 0 ? round(($completes / $starts) * 100, 1) : 0;
+
+        return [
+            'story_id' => $storyId,
+            'view_count' => (int) $story->view_count,
+            'events' => $counts,
+            'completion_rate' => $completionRate,
+            'avg_watch_duration_ms' => $avgDuration->avg_ms ? (int) round($avgDuration->avg_ms) : null,
+            'tap_forward_count' => $counts['tap_forward'] ?? 0,
+            'tap_back_count' => $counts['tap_back'] ?? 0,
+            'exit_count' => $counts['tap_exit'] ?? 0,
+        ];
+    }
+
+    /**
+     * Update a highlight's title.
+     */
+    public function updateHighlight(int $highlightId, int $userId, string $title): array
+    {
+        $tenantId = TenantContext::getId();
+
+        $affected = DB::update(
+            'UPDATE story_highlights SET title = ? WHERE id = ? AND user_id = ? AND tenant_id = ?',
+            [$title, $highlightId, $userId, $tenantId]
+        );
+
+        if ($affected === 0) {
+            throw new \RuntimeException('Highlight not found or you are not the owner');
+        }
+
+        return $this->getHighlightById($highlightId);
+    }
+
+    /**
+     * Remove a story from a highlight.
+     */
+    public function removeFromHighlight(int $highlightId, int $storyId, int $userId): void
+    {
+        $tenantId = TenantContext::getId();
+
+        // Verify ownership
+        $highlight = DB::selectOne(
+            'SELECT id FROM story_highlights WHERE id = ? AND user_id = ? AND tenant_id = ?',
+            [$highlightId, $userId, $tenantId]
+        );
+
+        if (!$highlight) {
+            throw new \RuntimeException('Highlight not found or you are not the owner');
+        }
+
+        DB::delete(
+            'DELETE FROM story_highlight_items WHERE highlight_id = ? AND story_id = ?',
+            [$highlightId, $storyId]
+        );
+    }
+
+    /**
+     * Reorder highlights for a user.
+     * @param array $order Array of highlight IDs in desired order
+     */
+    public function reorderHighlights(int $userId, array $order): void
+    {
+        $tenantId = TenantContext::getId();
+
+        foreach ($order as $position => $highlightId) {
+            DB::update(
+                'UPDATE story_highlights SET display_order = ? WHERE id = ? AND user_id = ? AND tenant_id = ?',
+                [$position, (int) $highlightId, $userId, $tenantId]
+            );
+        }
+    }
+
+    /**
+     * Save stickers for a story.
+     * @param int $storyId
+     * @param int $userId Must be story owner
+     * @param array $stickers Array of sticker data
+     */
+    public function saveStickers(int $storyId, int $userId, array $stickers): void
+    {
+        $tenantId = TenantContext::getId();
+
+        // Verify ownership
+        $story = DB::selectOne(
+            'SELECT id FROM stories WHERE id = ? AND user_id = ? AND tenant_id = ?',
+            [$storyId, $userId, $tenantId]
+        );
+
+        if (!$story) {
+            throw new \RuntimeException('Story not found or you are not the owner');
+        }
+
+        // Clear existing stickers
+        DB::delete('DELETE FROM story_stickers WHERE story_id = ?', [$storyId]);
+
+        // Insert new stickers
+        foreach ($stickers as $s) {
+            $type = $s['sticker_type'] ?? 'emoji';
+            $allowed = ['mention', 'location', 'link', 'emoji', 'text_tag'];
+            if (!in_array($type, $allowed)) continue;
+
+            DB::insert(
+                'INSERT INTO story_stickers (story_id, sticker_type, content, metadata, position_x, position_y, rotation, scale) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
+                [
+                    $storyId,
+                    $type,
+                    $s['content'] ?? '',
+                    isset($s['metadata']) ? json_encode($s['metadata']) : null,
+                    (float) ($s['position_x'] ?? 50),
+                    (float) ($s['position_y'] ?? 50),
+                    (float) ($s['rotation'] ?? 0),
+                    (float) ($s['scale'] ?? 1),
+                ]
+            );
+        }
+    }
+
+    /**
+     * Get stickers for a story.
+     */
+    public function getStickers(int $storyId): array
+    {
+        $stickers = DB::select(
+            'SELECT * FROM story_stickers WHERE story_id = ? ORDER BY id ASC',
+            [$storyId]
+        );
+
+        return array_map(fn($s) => [
+            'id' => (int) $s->id,
+            'sticker_type' => $s->sticker_type,
+            'content' => $s->content,
+            'metadata' => $s->metadata ? json_decode($s->metadata, true) : null,
+            'position_x' => (float) $s->position_x,
+            'position_y' => (float) $s->position_y,
+            'rotation' => (float) $s->rotation,
+            'scale' => (float) $s->scale,
+        ], $stickers);
+    }
+
     // ────────────────────────────────────────────────────────────────────────
     // Private helpers
     // ────────────────────────────────────────────────────────────────────────
+
+    /**
+     * Notify a user's accepted connections about a new story.
+     *
+     * Sends both an in-app notification (via NotificationDispatcher) and
+     * a real-time broadcast (via RealtimeService) to each connected user.
+     *
+     * @param int $userId  The story author
+     * @param int $storyId The newly created story ID
+     */
+    private function notifyConnections(int $userId, int $storyId): void
+    {
+        $tenantId = TenantContext::getId();
+
+        // Get the story author's name
+        $user = DB::selectOne(
+            'SELECT first_name, last_name FROM users WHERE id = ? AND tenant_id = ?',
+            [$userId, $tenantId]
+        );
+
+        if (!$user) {
+            return;
+        }
+
+        $userName = trim(($user->first_name ?? '') . ' ' . ($user->last_name ?? ''));
+
+        // Get all accepted connections for this user (tenant-scoped)
+        $connections = DB::select(
+            'SELECT CASE WHEN requester_id = ? THEN receiver_id ELSE requester_id END as friend_id
+             FROM connections
+             WHERE (requester_id = ? OR receiver_id = ?)
+               AND status = ?
+               AND tenant_id = ?',
+            [$userId, $userId, $userId, 'accepted', $tenantId]
+        );
+
+        $content = "{$userName} shared a new story";
+        $link = '/feed';
+
+        foreach ($connections as $connection) {
+            $friendId = (int) $connection->friend_id;
+
+            // In-app notification + email routing
+            NotificationDispatcher::dispatch(
+                $friendId,
+                'global',
+                null,
+                'new_story',
+                $content,
+                $link,
+                null
+            );
+
+            // Real-time push via Pusher
+            RealtimeService::broadcastNotification($friendId, [
+                'type' => 'new_story',
+                'message' => $content,
+                'link' => $link,
+                'story_id' => $storyId,
+                'user_id' => $userId,
+            ]);
+        }
+    }
 
     private function getStoryById(int $storyId): array
     {
@@ -695,6 +1205,7 @@ class StoryService
             'background_color' => $story->background_color,
             'background_gradient' => $story->background_gradient,
             'duration' => (int) $story->duration,
+            'video_duration' => isset($story->video_duration) ? (float) $story->video_duration : null,
             'view_count' => (int) $story->view_count,
             'is_viewed' => (bool) ($story->is_viewed ?? false),
             'expires_at' => $story->expires_at,
@@ -717,6 +1228,9 @@ class StoryService
             $result['poll_options'] = $story->poll_options ? json_decode($story->poll_options, true) : [];
             $result['poll_results'] = $this->getPollResults((int) $story->id);
         }
+
+        // Include stickers
+        $result['stickers'] = $this->getStickers((int) $story->id);
 
         return $result;
     }

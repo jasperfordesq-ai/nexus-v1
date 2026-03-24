@@ -223,13 +223,23 @@ class MessageService
             return ['error' => 'Message body is required'];
         }
 
-        $message = new Message([
+        $attributes = [
             'sender_id'      => $senderId,
             'receiver_id'    => $receiverId,
             'body'           => $content,
             'is_read'        => false,
             'created_at'     => now(),
-        ]);
+        ];
+
+        // Pass through contextual messaging fields if provided
+        if (!empty($data['context_type'])) {
+            $attributes['context_type'] = $data['context_type'];
+        }
+        if (!empty($data['context_id'])) {
+            $attributes['context_id'] = (int) $data['context_id'];
+        }
+
+        $message = new Message($attributes);
 
         $message->save();
 

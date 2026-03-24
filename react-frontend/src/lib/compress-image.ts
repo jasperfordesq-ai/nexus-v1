@@ -29,6 +29,11 @@ export async function compressImage(
     return file;
   }
 
+  // Skip compression for GIFs (preserves animation) and WebP (already efficient)
+  if (file.type === 'image/gif' || file.type === 'image/webp') {
+    return file;
+  }
+
   // Load the image into an HTMLImageElement
   const img = await loadImage(file);
 

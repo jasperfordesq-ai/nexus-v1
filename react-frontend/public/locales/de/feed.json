@@ -182,6 +182,11 @@
     "schedule_clear": "Planung aufheben",
     "groups_loading": "Gruppen werden geladen...",
     "create_post": "Beitrag erstellen",
+    "alt_text_placeholder": "Dieses Bild beschreiben...",
+    "alt_text_label": "Alternativtext für Bild",
+    "media_rejected": "{{count}} Datei(en) übersprungen (falscher Typ oder zu groß)",
+    "media_compression_failed": "{{count}} Bild(er) konnten nicht verarbeitet werden",
+    "media_upload_error": "Bilder konnten nicht verarbeitet werden",
     "template_button": "Vorlage",
     "media_drag_drop": "Klicken oder Fotos hierher ziehen",
     "media_formats": "JPEG, PNG, GIF, WebP bis zu 10 MB jeweils"
@@ -382,7 +387,8 @@
   "lightbox": {
     "aria_label": "Bildansicht",
     "close": "Bildansicht schließen",
-    "counter": "{{current}} von {{total}}"
+    "counter": "{{current}} von {{total}}",
+    "download": "Bild herunterladen"
   },
   "reaction": {
     "like": "Gefällt mir",

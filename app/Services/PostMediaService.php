@@ -38,11 +38,12 @@ class PostMediaService
     /**
      * Attach uploaded media files to a post.
      *
-     * @param int            $postId The post ID to attach media to.
-     * @param UploadedFile[] $files  Array of uploaded files.
+     * @param int            $postId   The post ID to attach media to.
+     * @param UploadedFile[] $files    Array of uploaded files.
+     * @param string[]       $altTexts Optional alt texts, indexed to match $files.
      * @return array The created media records.
      */
-    public function attachMedia(int $postId, array $files): array
+    public function attachMedia(int $postId, array $files, array $altTexts = []): array
     {
         $tenantId = TenantContext::getId();
 
@@ -117,9 +118,15 @@ class PostMediaService
                 $ext = self::ALLOWED_TYPES[$mime][0];
             }
 
+            // Capture file size before move (temp file won't exist after)
+            $fileSize = $file->getSize();
+
             // Generate unique filename
             $filename = 'media_' . bin2hex(random_bytes(16)) . '.' . $ext;
             $file->move($uploadDir, $filename);
+
+            // Strip EXIF metadata (GPS location, camera info) for privacy
+            $this->stripExifData($uploadDir . '/' . $filename, $mime);
 
             $fileUrl = "/uploads/posts/{$tenantId}/{$postId}/{$filename}";
 
@@ -136,6 +143,7 @@ class PostMediaService
             }
 
             $displayOrder = $maxOrder + $index + 1;
+            $altText = $altTexts[$index] ?? null;
 
             $mediaId = DB::table('post_media')->insertGetId([
                 'tenant_id'     => $tenantId,
@@ -143,10 +151,10 @@ class PostMediaService
                 'media_type'    => 'image',
                 'file_url'      => $fileUrl,
                 'thumbnail_url' => $thumbnailUrl,
-                'alt_text'      => null,
+                'alt_text'      => $altText ? mb_substr($altText, 0, 500) : null,
                 'width'         => $width,
                 'height'        => $height,
-                'file_size'     => $file->getSize(),
+                'file_size'     => $fileSize,
                 'display_order' => $displayOrder,
                 'created_at'    => now(),
             ]);
@@ -156,10 +164,10 @@ class PostMediaService
                 'media_type'    => 'image',
                 'file_url'      => $fileUrl,
                 'thumbnail_url' => $thumbnailUrl,
-                'alt_text'      => null,
+                'alt_text'      => $altText ? mb_substr($altText, 0, 500) : null,
                 'width'         => $width,
                 'height'        => $height,
-                'file_size'     => $file->getSize(),
+                'file_size'     => $fileSize,
                 'display_order' => $displayOrder,
             ];
         }
@@ -391,6 +399,29 @@ class PostMediaService
         } catch (\Exception $e) {
             Log::warning("PostMediaService::generateThumbnail failed: " . $e->getMessage());
             return null;
+        }
+    }
+
+    /**
+     * Strip EXIF metadata from JPEG images to remove GPS location and camera data.
+     * Re-encodes via GD which naturally drops EXIF. No-op for non-JPEG types.
+     */
+    private function stripExifData(string $filePath, string $mimeType): void
+    {
+        if ($mimeType !== 'image/jpeg') {
+            return;
+        }
+
+        try {
+            $source = @imagecreatefromjpeg($filePath);
+            if (!$source) {
+                return;
+            }
+
+            imagejpeg($source, $filePath, 95);
+            imagedestroy($source);
+        } catch (\Exception $e) {
+            Log::debug("PostMediaService::stripExifData failed: " . $e->getMessage());
         }
     }
 

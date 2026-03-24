@@ -115,14 +115,10 @@ export function PostTab({ onSuccess, onClose, groupId, templateData }: TabSubmit
         formData.append('visibility', 'public');
         if (groupId) formData.append('group_id', String(groupId));
 
-        // Append primary image and additional media files
-        mediaFiles.forEach((item, i) => {
-          formData.append(i === 0 ? 'image' : `image_${i}`, item.file);
-        });
-
-        // Also append as media[] array for the PostMediaService
+        // Append media files and alt texts for PostMediaService
         mediaFiles.forEach((item) => {
           formData.append('media[]', item.file);
+          formData.append('alt_texts[]', item.altText || '');
         });
 
         res = await api.upload('/v2/feed/posts', formData);
@@ -200,6 +196,7 @@ export function PostTab({ onSuccess, onClose, groupId, templateData }: TabSubmit
         onMediaChange={handleMediaChange}
         maxFiles={10}
         maxSizeMb={10}
+        onError={(msg) => toast.error(msg)}
       />
 
       {/* Toolbar + submit row */}

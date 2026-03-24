@@ -26,8 +26,9 @@ import {
   Play,
   ChevronLeft,
   ChevronRight,
+  Send,
 } from 'lucide-react';
-import { useAuth } from '@/contexts';
+import { useAuth, useToast } from '@/contexts';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
 import { resolveAvatarUrl, resolveAssetUrl } from '@/lib/helpers';
@@ -40,7 +41,7 @@ import type { StoryUser } from '@/components/feed/StoriesBar';
 interface Story {
   id: number;
   user_id: number;
-  media_type: 'image' | 'text' | 'poll';
+  media_type: 'image' | 'text' | 'poll' | 'video';
   media_url?: string | null;
   thumbnail_url?: string | null;
   text_content?: string | null;
@@ -48,6 +49,7 @@ interface Story {
   background_color?: string | null;
   background_gradient?: string | null;
   duration: number;
+  video_duration?: number | null;
   view_count: number;
   is_viewed: boolean;
   expires_at: string;
@@ -61,6 +63,16 @@ interface Story {
   poll_question?: string;
   poll_options?: string[];
   poll_results?: { votes: Record<number, number>; total_votes: number };
+  stickers?: Array<{
+    id: number;
+    sticker_type: 'mention' | 'location' | 'link' | 'emoji' | 'text_tag';
+    content: string;
+    metadata?: Record<string, unknown> | null;
+    position_x: number;
+    position_y: number;
+    rotation: number;
+    scale: number;
+  }>;
 }
 
 interface StoryViewerProps {
@@ -129,6 +141,7 @@ function timeAgo(dateStr: string): string {
 
 export function StoryViewer({ storyUsers, initialUserIndex, onClose }: StoryViewerProps) {
   const { user: currentUser } = useAuth();
+  const toast = useToast();
   const [currentUserIdx, setCurrentUserIdx] = useState(initialUserIndex);
   const [currentStoryIdx, setCurrentStoryIdx] = useState(0);
   const [stories, setStories] = useState<Story[]>([]);
@@ -141,11 +154,17 @@ export function StoryViewer({ storyUsers, initialUserIndex, onClose }: StoryView
   const [hasVoted, setHasVoted] = useState(false);
   const [pollResults, setPollResults] = useState<{ votes: Record<number, number>; total_votes: number } | null>(null);
   const [reactedWith, setReactedWith] = useState<string | null>(null);
+  const [replyText, setReplyText] = useState('');
+  const [isSendingReply, setIsSendingReply] = useState(false);
+
+  const [showDoubleTapHeart, setShowDoubleTapHeart] = useState(false);
 
   const progressTimerRef = useRef<number | null>(null);
   const progressStartRef = useRef(0);
   const holdTimerRef = useRef<number | null>(null);
   const preloadedImages = useRef<Set<string>>(new Set());
+  const lastTapRef = useRef<number>(0);
+  const touchStartRef = useRef<{ x: number; y: number; time: number } | null>(null);
 
   const currentUserStory = storyUsers[currentUserIdx];
   const currentStory = stories[currentStoryIdx];
@@ -189,10 +208,16 @@ export function StoryViewer({ storyUsers, initialUserIndex, onClose }: StoryView
     }
   }, [currentUserIdx, currentUserStory, loadUserStories]);
 
-  // Mark story as viewed
+  // Mark story as viewed + track analytics
+  const storyViewStartRef = useRef<number>(0);
   useEffect(() => {
-    if (currentStory && !isOwner) {
-      api.post(`/v2/stories/${currentStory.id}/view`).catch(() => {});
+    if (currentStory) {
+      storyViewStartRef.current = Date.now();
+      if (!isOwner) {
+        api.post(`/v2/stories/${currentStory.id}/view`).catch(() => {});
+      }
+      // Track view_start
+      api.post(`/v2/stories/${currentStory.id}/analytics`, { event_type: 'view_start' }).catch(() => {});
     }
   }, [currentStory, isOwner]);
 
@@ -254,8 +279,25 @@ export function StoryViewer({ storyUsers, initialUserIndex, onClose }: StoryView
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentStory, isPaused, isLoadingStories, hasVoted]);
 
+  // Track analytics helper (fire-and-forget)
+  const trackEvent = useCallback((eventType: string) => {
+    if (!currentStory) return;
+    const watchMs = storyViewStartRef.current ? Date.now() - storyViewStartRef.current : undefined;
+    api.post(`/v2/stories/${currentStory.id}/analytics`, {
+      event_type: eventType,
+      watch_duration_ms: watchMs,
+    }).catch(() => {});
+  }, [currentStory]);
+
   // Navigation
   const goNext = useCallback(() => {
+    // Track: view_complete if at end of story, tap_forward if manual advance
+    if (progress >= 0.99) {
+      trackEvent('view_complete');
+    } else {
+      trackEvent('tap_forward');
+    }
+
     if (currentStoryIdx < stories.length - 1) {
       setCurrentStoryIdx((prev) => prev + 1);
       setProgress(0);
@@ -267,9 +309,10 @@ export function StoryViewer({ storyUsers, initialUserIndex, onClose }: StoryView
     } else {
       onClose();
     }
-  }, [currentStoryIdx, stories.length, currentUserIdx, storyUsers.length, onClose]);
+  }, [currentStoryIdx, stories.length, currentUserIdx, storyUsers.length, onClose, trackEvent, progress]);
 
   const goPrev = useCallback(() => {
+    trackEvent('tap_back');
     if (currentStoryIdx > 0) {
       setCurrentStoryIdx((prev) => prev - 1);
       setProgress(0);
@@ -358,6 +401,47 @@ export function StoryViewer({ storyUsers, initialUserIndex, onClose }: StoryView
     }
   };
 
+  // Double-tap to react with heart
+  const handleDoubleTap = useCallback(() => {
+    if (!currentStory || isOwner || reactedWith) return;
+    setShowDoubleTapHeart(true);
+    handleReaction('heart');
+    setTimeout(() => setShowDoubleTapHeart(false), 1000);
+  }, [currentStory, isOwner, reactedWith, handleReaction]);
+
+  // Swipe down to close
+  const handleTouchStart = useCallback((e: React.TouchEvent) => {
+    const touch = e.touches[0];
+    touchStartRef.current = { x: touch.clientX, y: touch.clientY, time: Date.now() };
+  }, []);
+
+  const handleTouchEnd = useCallback((e: React.TouchEvent) => {
+    if (!touchStartRef.current) return;
+    const touch = e.changedTouches[0];
+    const dx = touch.clientX - touchStartRef.current.x;
+    const dy = touch.clientY - touchStartRef.current.y;
+    const dt = Date.now() - touchStartRef.current.time;
+    touchStartRef.current = null;
+
+    // Only count fast swipes (< 300ms, > 80px)
+    if (dt > 300) return;
+
+    // Swipe down to close
+    if (dy > 80 && Math.abs(dx) < 50) {
+      onClose();
+      return;
+    }
+
+    // Swipe left → next user, swipe right → prev user
+    if (Math.abs(dx) > 80 && Math.abs(dy) < 50) {
+      if (dx < 0 && currentUserIdx < storyUsers.length - 1) {
+        setCurrentUserIdx((prev) => prev + 1);
+      } else if (dx > 0 && currentUserIdx > 0) {
+        setCurrentUserIdx((prev) => prev - 1);
+      }
+    }
+  }, [onClose, currentUserIdx, storyUsers.length]);
+
   // Poll voting
   const handlePollVote = async (optionIndex: number) => {
     if (!currentStory || hasVoted) return;
@@ -400,6 +484,24 @@ export function StoryViewer({ storyUsers, initialUserIndex, onClose }: StoryView
       goNext();
     } catch (err) {
       logError('Failed to delete story', err);
+    }
+  };
+
+  // Reply to story via DM
+  const handleReply = async () => {
+    if (!currentStory || !replyText.trim() || isSendingReply) return;
+    setIsSendingReply(true);
+    setIsPaused(true);
+    try {
+      await api.post(`/v2/stories/${currentStory.id}/reply`, { body: replyText.trim() });
+      toast.success('Reply sent!');
+      setReplyText('');
+    } catch (err) {
+      logError('Failed to send story reply', err);
+      toast.error('Failed to send reply');
+    } finally {
+      setIsSendingReply(false);
+      setIsPaused(false);
     }
   };
 
@@ -469,6 +571,103 @@ export function StoryViewer({ storyUsers, initialUserIndex, onClose }: StoryView
                         </p>
                       </div>
                     )}
+                    {/* Stickers */}
+                    {currentStory.stickers?.map((sticker) => (
+                      <div
+                        key={sticker.id}
+                        className="absolute pointer-events-none z-10"
+                        style={{
+                          left: `${sticker.position_x}%`,
+                          top: `${sticker.position_y}%`,
+                          transform: `translate(-50%, -50%) rotate(${sticker.rotation}deg) scale(${sticker.scale})`,
+                        }}
+                      >
+                        {sticker.sticker_type === 'mention' && (
+                          <span className="bg-white/20 backdrop-blur rounded-full px-3 py-1 text-white text-sm font-semibold">
+                            @{sticker.content}
+                          </span>
+                        )}
+                        {sticker.sticker_type === 'location' && (
+                          <span className="bg-white/20 backdrop-blur rounded-lg px-3 py-1.5 text-white text-sm flex items-center gap-1">
+                            {sticker.content}
+                          </span>
+                        )}
+                        {sticker.sticker_type === 'link' && (
+                          <span className="bg-white/20 backdrop-blur rounded-lg px-3 py-1.5 text-white text-sm underline">
+                            {sticker.content}
+                          </span>
+                        )}
+                        {sticker.sticker_type === 'emoji' && (
+                          <span className="text-4xl">{sticker.content}</span>
+                        )}
+                        {sticker.sticker_type === 'text_tag' && (
+                          <span className="bg-black/40 backdrop-blur rounded-lg px-3 py-1.5 text-white text-sm font-bold">
+                            {sticker.content}
+                          </span>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                {/* Video story */}
+                {currentStory.media_type === 'video' && currentStory.media_url && (
+                  <div className="w-full h-full bg-black">
+                    <video
+                      key={currentStory.id}
+                      src={resolveAssetUrl(currentStory.media_url)}
+                      className="w-full h-full object-cover"
+                      autoPlay
+                      playsInline
+                      muted={false}
+                      onPlay={() => setIsPaused(false)}
+                      onPause={() => setIsPaused(true)}
+                      onEnded={goNext}
+                    />
+                    {/* Text overlay */}
+                    {currentStory.text_content && (
+                      <div className="absolute inset-0 flex items-center justify-center p-8">
+                        <p className="text-white text-xl font-semibold text-center drop-shadow-lg max-w-sm">
+                          {currentStory.text_content}
+                        </p>
+                      </div>
+                    )}
+                    {/* Stickers */}
+                    {currentStory.stickers?.map((sticker) => (
+                      <div
+                        key={sticker.id}
+                        className="absolute pointer-events-none z-10"
+                        style={{
+                          left: `${sticker.position_x}%`,
+                          top: `${sticker.position_y}%`,
+                          transform: `translate(-50%, -50%) rotate(${sticker.rotation}deg) scale(${sticker.scale})`,
+                        }}
+                      >
+                        {sticker.sticker_type === 'mention' && (
+                          <span className="bg-white/20 backdrop-blur rounded-full px-3 py-1 text-white text-sm font-semibold">
+                            @{sticker.content}
+                          </span>
+                        )}
+                        {sticker.sticker_type === 'location' && (
+                          <span className="bg-white/20 backdrop-blur rounded-lg px-3 py-1.5 text-white text-sm flex items-center gap-1">
+                            {sticker.content}
+                          </span>
+                        )}
+                        {sticker.sticker_type === 'link' && (
+                          <span className="bg-white/20 backdrop-blur rounded-lg px-3 py-1.5 text-white text-sm underline">
+                            {sticker.content}
+                          </span>
+                        )}
+                        {sticker.sticker_type === 'emoji' && (
+                          <span className="text-4xl">{sticker.content}</span>
+                        )}
+                        {sticker.sticker_type === 'text_tag' && (
+                          <span className="bg-black/40 backdrop-blur rounded-lg px-3 py-1.5 text-white text-sm font-bold">
+                            {sticker.content}
+                          </span>
+                        )}
+                      </div>
+                    ))}
                   </div>
                 )}
 
@@ -491,6 +690,42 @@ export function StoryViewer({ storyUsers, initialUserIndex, onClose }: StoryView
                     >
                       {currentStory.text_content}
                     </p>
+                    {/* Stickers */}
+                    {currentStory.stickers?.map((sticker) => (
+                      <div
+                        key={sticker.id}
+                        className="absolute pointer-events-none z-10"
+                        style={{
+                          left: `${sticker.position_x}%`,
+                          top: `${sticker.position_y}%`,
+                          transform: `translate(-50%, -50%) rotate(${sticker.rotation}deg) scale(${sticker.scale})`,
+                        }}
+                      >
+                        {sticker.sticker_type === 'mention' && (
+                          <span className="bg-white/20 backdrop-blur rounded-full px-3 py-1 text-white text-sm font-semibold">
+                            @{sticker.content}
+                          </span>
+                        )}
+                        {sticker.sticker_type === 'location' && (
+                          <span className="bg-white/20 backdrop-blur rounded-lg px-3 py-1.5 text-white text-sm flex items-center gap-1">
+                            {sticker.content}
+                          </span>
+                        )}
+                        {sticker.sticker_type === 'link' && (
+                          <span className="bg-white/20 backdrop-blur rounded-lg px-3 py-1.5 text-white text-sm underline">
+                            {sticker.content}
+                          </span>
+                        )}
+                        {sticker.sticker_type === 'emoji' && (
+                          <span className="text-4xl">{sticker.content}</span>
+                        )}
+                        {sticker.sticker_type === 'text_tag' && (
+                          <span className="bg-black/40 backdrop-blur rounded-lg px-3 py-1.5 text-white text-sm font-bold">
+                            {sticker.content}
+                          </span>
+                        )}
+                      </div>
+                    ))}
                   </div>
                 )}
 
@@ -560,8 +795,27 @@ export function StoryViewer({ storyUsers, initialUserIndex, onClose }: StoryView
               </div>
             )}
 
+            {/* Double-tap heart animation */}
+            <AnimatePresence>
+              {showDoubleTapHeart && (
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.3 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 1.5 }}
+                  transition={{ duration: 0.4 }}
+                  className="absolute inset-0 flex items-center justify-center z-40 pointer-events-none"
+                >
+                  <span className="text-7xl drop-shadow-lg">{'\u2764\uFE0F'}</span>
+                </motion.div>
+              )}
+            </AnimatePresence>
+
             {/* Tap zones */}
-            <div className="absolute inset-0 flex z-10">
+            <div
+              className="absolute inset-0 flex z-10"
+              onTouchStart={handleTouchStart}
+              onTouchEnd={handleTouchEnd}
+            >
               <button
                 className="w-1/3 h-full cursor-pointer"
                 onPointerDown={handlePointerDown}
@@ -573,7 +827,19 @@ export function StoryViewer({ storyUsers, initialUserIndex, onClose }: StoryView
                 }}
                 aria-label="Previous story"
               />
-              <div className="w-1/3 h-full" />
+              <button
+                className="w-1/3 h-full cursor-pointer"
+                onClick={() => {
+                  const now = Date.now();
+                  if (now - lastTapRef.current < 300) {
+                    handleDoubleTap();
+                    lastTapRef.current = 0;
+                  } else {
+                    lastTapRef.current = now;
+                  }
+                }}
+                aria-label="Double-tap to react"
+              />
               <button
                 className="w-1/3 h-full cursor-pointer"
                 onPointerDown={handlePointerDown}
@@ -692,6 +958,33 @@ export function StoryViewer({ storyUsers, initialUserIndex, onClose }: StoryView
                   <Eye className="w-4 h-4" />
                   <span className="text-sm">{currentStory.view_count}</span>
                 </button>
+              )}
+
+              {/* Reply input */}
+              {!isOwner && currentStory && currentStory.media_type !== 'poll' && (
+                <div className="flex items-center gap-2 mb-3">
+                  <input
+                    type="text"
+                    value={replyText}
+                    onChange={(e) => setReplyText(e.target.value)}
+                    placeholder="Reply to story..."
+                    className="flex-1 bg-white/10 border border-white/20 rounded-full px-4 py-2 text-white text-sm placeholder:text-white/40 outline-none focus:border-white/40"
+                    onKeyDown={(e) => { if (e.key === 'Enter' && replyText.trim()) handleReply(); }}
+                    onFocus={() => setIsPaused(true)}
+                    onBlur={() => { if (!replyText.trim()) setIsPaused(false); }}
+                    maxLength={500}
+                  />
+                  {replyText.trim() && (
+                    <button
+                      onClick={handleReply}
+                      disabled={isSendingReply}
+                      className="p-2 rounded-full bg-white/10 hover:bg-white/20 transition-colors"
+                      aria-label="Send reply"
+                    >
+                      <Send className="w-4 h-4 text-white" />
+                    </button>
+                  )}
+                </div>
               )}
 
               {/* Reactions */}

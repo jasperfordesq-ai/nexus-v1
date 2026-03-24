@@ -640,6 +640,7 @@ Route::post('/v2/stories/close-friends', [\App\Http\Controllers\Api\StoryControl
 Route::delete('/v2/stories/close-friends/{friendId}', [\App\Http\Controllers\Api\StoryController::class, 'removeCloseFriend']);
 Route::post('/v2/stories/{id}/analytics', [\App\Http\Controllers\Api\StoryController::class, 'trackAnalytics']);
 Route::get('/v2/stories/{id}/analytics', [\App\Http\Controllers\Api\StoryController::class, 'getAnalytics']);
+Route::post('/v2/stories/{id}/stickers', [\App\Http\Controllers\Api\StoryController::class, 'saveStickers']);
 
 // ============================================
 

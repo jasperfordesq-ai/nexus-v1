@@ -182,6 +182,11 @@
     "schedule_clear": "Glan sceideal",
     "groups_loading": "Ag luchtú grúpaí...",
     "create_post": "Cruthaigh postáil",
+    "alt_text_placeholder": "Déan cur síos ar an íomhá seo...",
+    "alt_text_label": "Téacs malartach don íomhá",
+    "media_rejected": "{{count}} comhad curtha ar leataobh (cineál mícheart nó ró-mhór)",
+    "media_compression_failed": "Theip ar {{count}} íomhá a phróiseáil",
+    "media_upload_error": "Theip ar íomhánna a phróiseáil",
     "template_button": "Teimpléad",
     "media_drag_drop": "Cliceáil nó tarraing grianghraif anseo",
     "media_formats": "JPEG, PNG, GIF, WebP suas le 10MB an ceann"
@@ -382,7 +387,8 @@
   "lightbox": {
     "aria_label": "Amharcóir íomhánna",
     "close": "Dún amharcóir íomhánna",
-    "counter": "{{current}} as {{total}}"
+    "counter": "{{current}} as {{total}}",
+    "download": "Íoslódáil íomhá"
   },
   "reaction": {
     "like": "Maith Liom",

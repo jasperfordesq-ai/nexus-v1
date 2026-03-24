@@ -27,6 +27,7 @@ class Message extends Model
         'body', 'is_read', 'is_edited', 'edited_at',
         'is_deleted_sender', 'is_deleted_receiver',
         'read_at', 'created_at',
+        'context_type', 'context_id',
     ];
 
     protected $casts = [

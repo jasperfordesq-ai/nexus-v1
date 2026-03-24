@@ -9,6 +9,7 @@
  * Each highlight shows a cover image circle + title.
  * Owner sees a "+" button to create new highlights.
  * Clicking opens the highlight stories in the StoryViewer.
+ * Owner can edit title, remove stories from highlight, and reorder highlights.
  */
 
 import { useState, useEffect, useCallback } from 'react';
@@ -23,7 +24,7 @@ import {
   Input,
   useDisclosure,
 } from '@heroui/react';
-import { Plus, X } from 'lucide-react';
+import { Plus, X, Pencil, Trash2 } from 'lucide-react';
 import { useAuth, useToast } from '@/contexts';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
@@ -88,6 +89,15 @@ export function StoryHighlights({ userId, userName, userAvatar }: StoryHighlight
   const { isOpen: isCreateOpen, onOpen: onCreateOpen, onClose: onCreateClose } = useDisclosure();
   const [newTitle, setNewTitle] = useState('');
   const [isCreating, setIsCreating] = useState(false);
+
+  // Edit highlight state
+  const { isOpen: isEditOpen, onOpen: onEditOpen, onClose: onEditClose } = useDisclosure();
+  const [editingHighlight, setEditingHighlight] = useState<Highlight | null>(null);
+  const [editTitle, setEditTitle] = useState('');
+  const [editStories, setEditStories] = useState<HighlightStory[]>([]);
+  const [isEditLoading, setIsEditLoading] = useState(false);
+  const [isSavingTitle, setIsSavingTitle] = useState(false);
+  const [removingStoryId, setRemovingStoryId] = useState<number | null>(null);
 
   const isOwner = currentUser?.id === userId;
 
@@ -175,6 +185,93 @@ export function StoryHighlights({ userId, userName, userAvatar }: StoryHighlight
     }
   };
 
+  // ── Edit highlight handlers ──────────────────────────────────────────────
+
+  const handleEditClick = async (highlight: Highlight, e: React.MouseEvent) => {
+    e.stopPropagation();
+    setEditingHighlight(highlight);
+    setEditTitle(highlight.title);
+    setEditStories([]);
+    setIsEditLoading(true);
+    onEditOpen();
+
+    // Load stories in this highlight
+    try {
+      const response = await api.get<HighlightStory[]>(
+        `/v2/stories/highlights/${highlight.id}/stories`
+      );
+      if (response.success && response.data) {
+        setEditStories(Array.isArray(response.data) ? response.data : []);
+      }
+    } catch (err) {
+      logError('Failed to load highlight stories for editing', err);
+    } finally {
+      setIsEditLoading(false);
+    }
+  };
+
+  const handleSaveTitle = async () => {
+    if (!editingHighlight || !editTitle.trim() || isSavingTitle) return;
+    if (editTitle.trim() === editingHighlight.title) return; // No change
+
+    setIsSavingTitle(true);
+    try {
+      const response = await api.put(`/v2/stories/highlights/${editingHighlight.id}`, {
+        title: editTitle.trim(),
+      });
+      if (response.success) {
+        toast.success('Highlight title updated');
+        // Update local state
+        setHighlights((prev) =>
+          prev.map((h) => (h.id === editingHighlight.id ? { ...h, title: editTitle.trim() } : h))
+        );
+        setEditingHighlight((prev) => (prev ? { ...prev, title: editTitle.trim() } : prev));
+      } else {
+        toast.error('Failed to update title');
+      }
+    } catch (err) {
+      logError('Failed to update highlight title', err);
+      toast.error('Failed to update title');
+    } finally {
+      setIsSavingTitle(false);
+    }
+  };
+
+  const handleRemoveStory = async (storyId: number) => {
+    if (!editingHighlight || removingStoryId !== null) return;
+
+    setRemovingStoryId(storyId);
+    try {
+      const response = await api.delete(
+        `/v2/stories/highlights/${editingHighlight.id}/items/${storyId}`
+      );
+      if (response.success) {
+        setEditStories((prev) => prev.filter((s) => s.id !== storyId));
+        // Update story count in highlights list
+        setHighlights((prev) =>
+          prev.map((h) =>
+            h.id === editingHighlight.id ? { ...h, story_count: Math.max(0, h.story_count - 1) } : h
+          )
+        );
+        toast.success('Story removed from highlight');
+      } else {
+        toast.error('Failed to remove story');
+      }
+    } catch (err) {
+      logError('Failed to remove story from highlight', err);
+      toast.error('Failed to remove story');
+    } finally {
+      setRemovingStoryId(null);
+    }
+  };
+
+  const handleEditClose = () => {
+    onEditClose();
+    setEditingHighlight(null);
+    setEditTitle('');
+    setEditStories([]);
+  };
+
   // Show skeleton while loading
   if (isLoading) {
     return (
@@ -240,15 +337,26 @@ export function StoryHighlights({ userId, userName, userAvatar }: StoryHighlight
                 {highlight.title}
               </span>
 
-              {/* Delete button for owner */}
+              {/* Owner action buttons */}
               {isOwner && (
-                <button
-                  onClick={(e) => handleDeleteHighlight(highlight.id, e)}
-                  className="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-red-500 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
-                  aria-label={`Delete highlight: ${highlight.title}`}
-                >
-                  <X className="w-3 h-3" />
-                </button>
+                <>
+                  {/* Edit button */}
+                  <button
+                    onClick={(e) => handleEditClick(highlight, e)}
+                    className="absolute -top-1 -left-1 w-5 h-5 rounded-full bg-[var(--color-primary)] text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                    aria-label={`Edit highlight: ${highlight.title}`}
+                  >
+                    <Pencil className="w-3 h-3" />
+                  </button>
+                  {/* Delete button */}
+                  <button
+                    onClick={(e) => handleDeleteHighlight(highlight.id, e)}
+                    className="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-red-500 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                    aria-label={`Delete highlight: ${highlight.title}`}
+                  >
+                    <X className="w-3 h-3" />
+                  </button>
+                </>
               )}
             </button>
           ))}
@@ -284,6 +392,114 @@ export function StoryHighlights({ userId, userName, userAvatar }: StoryHighlight
               isDisabled={!newTitle.trim()}
             >
               Create
+            </Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
+
+      {/* Edit Highlight Modal */}
+      <Modal isOpen={isEditOpen} onClose={handleEditClose} size="md">
+        <ModalContent>
+          <ModalHeader>Edit Highlight</ModalHeader>
+          <ModalBody className="gap-4">
+            {/* Title editing */}
+            <div className="flex gap-2 items-end">
+              <Input
+                value={editTitle}
+                onValueChange={setEditTitle}
+                label="Highlight Title"
+                variant="bordered"
+                maxLength={100}
+                className="flex-1"
+              />
+              <Button
+                color="primary"
+                size="sm"
+                onPress={handleSaveTitle}
+                isLoading={isSavingTitle}
+                isDisabled={!editTitle.trim() || editTitle.trim() === editingHighlight?.title}
+              >
+                Save
+              </Button>
+            </div>
+
+            {/* Stories list */}
+            <div>
+              <p className="text-sm font-medium text-[var(--text-primary)] mb-2">
+                Stories in this highlight
+              </p>
+              {isEditLoading ? (
+                <div className="flex flex-col gap-2">
+                  {Array.from({ length: 3 }).map((_, i) => (
+                    <Skeleton key={i} className="h-14 w-full rounded-lg" />
+                  ))}
+                </div>
+              ) : editStories.length === 0 ? (
+                <p className="text-sm text-[var(--text-muted)] py-4 text-center">
+                  No stories in this highlight yet.
+                </p>
+              ) : (
+                <div className="flex flex-col gap-2 max-h-64 overflow-y-auto">
+                  {editStories.map((story) => (
+                    <div
+                      key={story.id}
+                      className="flex items-center gap-3 p-2 rounded-lg bg-[var(--surface-default)] border border-[var(--border-default)]"
+                    >
+                      {/* Story preview thumbnail */}
+                      <div className="w-10 h-10 rounded-lg overflow-hidden flex-shrink-0 bg-[var(--surface-elevated)]">
+                        {story.media_url ? (
+                          <img
+                            src={resolveAssetUrl(story.media_url)}
+                            alt="Story"
+                            className="w-full h-full object-cover"
+                          />
+                        ) : (
+                          <div
+                            className="w-full h-full flex items-center justify-center text-xs"
+                            style={{
+                              background: story.background_gradient || story.background_color || 'var(--surface-elevated)',
+                            }}
+                          >
+                            {story.media_type === 'text' ? 'Aa' : story.media_type === 'poll' ? '?' : ''}
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Story info */}
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm text-[var(--text-primary)] truncate">
+                          {story.text_content
+                            ? story.text_content.substring(0, 40) + (story.text_content.length > 40 ? '...' : '')
+                            : story.poll_question
+                              ? story.poll_question.substring(0, 40)
+                              : `${story.media_type.charAt(0).toUpperCase()}${story.media_type.slice(1)} story`}
+                        </p>
+                        <p className="text-xs text-[var(--text-muted)]">
+                          {new Date(story.created_at).toLocaleDateString()}
+                        </p>
+                      </div>
+
+                      {/* Remove button */}
+                      <Button
+                        size="sm"
+                        variant="light"
+                        color="danger"
+                        isIconOnly
+                        isLoading={removingStoryId === story.id}
+                        onPress={() => handleRemoveStory(story.id)}
+                        aria-label="Remove story from highlight"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </Button>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </ModalBody>
+          <ModalFooter>
+            <Button variant="light" onPress={handleEditClose}>
+              Done
             </Button>
           </ModalFooter>
         </ModalContent>

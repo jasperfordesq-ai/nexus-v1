@@ -16,7 +16,7 @@
 
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { motion, AnimatePresence, type PanInfo } from 'framer-motion';
-import { X, ChevronLeft, ChevronRight } from 'lucide-react';
+import { X, ChevronLeft, ChevronRight, Download } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { createPortal } from 'react-dom';
 import { resolveAssetUrl } from '@/lib/helpers';
@@ -139,18 +139,29 @@ export function ImageLightbox({ media, initialIndex = 0, onClose }: ImageLightbo
       aria-label={t('lightbox.aria_label', 'Image viewer')}
       tabIndex={-1}
     >
-      {/* Close button */}
-      <button
-        type="button"
-        className="absolute top-4 right-4 z-10 bg-white/10 backdrop-blur-sm text-white rounded-full p-2.5 hover:bg-white/20 transition-colors focus:outline-none focus:ring-2 focus:ring-white/50"
-        onClick={(e) => {
-          e.stopPropagation();
-          onClose();
-        }}
-        aria-label={t('lightbox.close', 'Close image viewer')}
-      >
-        <X className="w-6 h-6" />
-      </button>
+      {/* Top-right controls: download + close */}
+      <div className="absolute top-4 right-4 z-10 flex items-center gap-2">
+        <a
+          href={resolveAssetUrl(current.file_url)}
+          download
+          className="bg-white/10 backdrop-blur-sm text-white rounded-full p-2.5 hover:bg-white/20 transition-colors focus:outline-none focus:ring-2 focus:ring-white/50"
+          onClick={(e) => e.stopPropagation()}
+          aria-label={t('lightbox.download', 'Download image')}
+        >
+          <Download className="w-5 h-5" />
+        </a>
+        <button
+          type="button"
+          className="bg-white/10 backdrop-blur-sm text-white rounded-full p-2.5 hover:bg-white/20 transition-colors focus:outline-none focus:ring-2 focus:ring-white/50"
+          onClick={(e) => {
+            e.stopPropagation();
+            onClose();
+          }}
+          aria-label={t('lightbox.close', 'Close image viewer')}
+        >
+          <X className="w-6 h-6" />
+        </button>
+      </div>
 
       {/* Counter (screen reader live region) */}
       {total > 1 && (
@@ -228,27 +239,53 @@ export function ImageLightbox({ media, initialIndex = 0, onClose }: ImageLightbo
         </button>
       )}
 
-      {/* Dot indicators */}
+      {/* Dot indicators — collapses to max 7 visible dots for 8+ images */}
       {total > 1 && (
         <div className="absolute bottom-12 left-1/2 -translate-x-1/2 z-10 flex items-center gap-2">
-          {media.map((_, idx) => (
-            <button
-              key={idx}
-              type="button"
-              className={`w-2.5 h-2.5 rounded-full transition-all ${
-                idx === currentIndex
-                  ? 'bg-white scale-110'
-                  : 'bg-white/40 hover:bg-white/60'
-              }`}
-              onClick={(e) => {
-                e.stopPropagation();
-                setDirection(idx > currentIndex ? 1 : -1);
-                setCurrentIndex(idx);
-              }}
-              aria-label={t('carousel.go_to_image', 'Go to image {{number}}', { number: idx + 1 })}
-              aria-current={idx === currentIndex ? 'true' : undefined}
-            />
-          ))}
+          {media.map((_, idx) => {
+            // For 8+ images, only show dots near the current index (Instagram-style)
+            if (total > 7) {
+              const distance = Math.abs(idx - currentIndex);
+              if (distance > 3) return null;
+              const scale = distance <= 1 ? '' : distance === 2 ? 'scale-75' : 'scale-50 opacity-50';
+              return (
+                <button
+                  key={idx}
+                  type="button"
+                  className={`w-2.5 h-2.5 rounded-full transition-all ${scale} ${
+                    idx === currentIndex
+                      ? 'bg-white scale-110'
+                      : 'bg-white/40 hover:bg-white/60'
+                  }`}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setDirection(idx > currentIndex ? 1 : -1);
+                    setCurrentIndex(idx);
+                  }}
+                  aria-label={t('carousel.go_to_image', 'Go to image {{number}}', { number: idx + 1 })}
+                  aria-current={idx === currentIndex ? 'true' : undefined}
+                />
+              );
+            }
+            return (
+              <button
+                key={idx}
+                type="button"
+                className={`w-2.5 h-2.5 rounded-full transition-all ${
+                  idx === currentIndex
+                    ? 'bg-white scale-110'
+                    : 'bg-white/40 hover:bg-white/60'
+                }`}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setDirection(idx > currentIndex ? 1 : -1);
+                  setCurrentIndex(idx);
+                }}
+                aria-label={t('carousel.go_to_image', 'Go to image {{number}}', { number: idx + 1 })}
+                aria-current={idx === currentIndex ? 'true' : undefined}
+              />
+            );
+          })}
         </div>
       )}
     </motion.div>

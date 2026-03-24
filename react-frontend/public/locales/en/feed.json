@@ -184,7 +184,12 @@
     "schedule_set": "Scheduled for {{date}}",
     "schedule_clear": "Clear schedule",
     "groups_loading": "Loading groups...",
-    "create_post": "Create post"
+    "create_post": "Create post",
+    "alt_text_placeholder": "Describe this image...",
+    "alt_text_label": "Alt text for image",
+    "media_rejected": "{{count}} file(s) skipped (wrong type or too large)",
+    "media_compression_failed": "{{count}} image(s) failed to process",
+    "media_upload_error": "Failed to process images"
   },
   "card": {
     "edited": "edited",
@@ -382,7 +387,8 @@
   "lightbox": {
     "aria_label": "Image viewer",
     "close": "Close image viewer",
-    "counter": "{{current}} of {{total}}"
+    "counter": "{{current}} of {{total}}",
+    "download": "Download image"
   },
   "reaction": {
     "like": "Like",

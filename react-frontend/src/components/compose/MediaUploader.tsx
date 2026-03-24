@@ -48,6 +48,7 @@ export interface MediaUploaderProps {
   mediaFiles: MediaFile[];
   maxFiles?: number;
   maxSizeMb?: number;
+  onError?: (msg: string) => void;
 }
 
 /* ------------------------------------------------------------------ */
@@ -69,6 +70,7 @@ function SortableMediaItem({
   onRemove,
   onAltTextChange,
 }: SortableMediaItemProps) {
+  const { t } = useTranslation('feed');
   const [showAltInput, setShowAltInput] = useState(false);
   const {
     attributes,
@@ -155,14 +157,14 @@ function SortableMediaItem({
           <Input
             size="sm"
             variant="bordered"
-            placeholder="Describe this image..."
+            placeholder={t('compose.alt_text_placeholder', 'Describe this image...')}
             value={item.altText}
             onChange={(e) => onAltTextChange(index, e.target.value)}
             classNames={{
               input: 'text-white text-xs',
               inputWrapper: 'border-white/30 bg-transparent min-h-8 h-8',
             }}
-            aria-label="Alt text for image"
+            aria-label={t('compose.alt_text_label', 'Alt text for image')}
             maxLength={500}
             onKeyDown={(e) => {
               if (e.key === 'Enter') setShowAltInput(false);
@@ -183,6 +185,7 @@ export function MediaUploader({
   mediaFiles,
   maxFiles = 10,
   maxSizeMb = 10,
+  onError,
 }: MediaUploaderProps) {
   const { t } = useTranslation('feed');
   const inputRef = useRef<HTMLInputElement>(null);
@@ -196,39 +199,64 @@ export function MediaUploader({
   const processFiles = useCallback(
     async (fileList: FileList | File[]) => {
       const availableSlots = maxFiles - mediaFiles.length;
-      if (availableSlots <= 0) return;
+      if (availableSlots <= 0) {
+        onError?.(t('compose.images_max', { max: maxFiles }));
+        return;
+      }
 
       const filesToProcess = Array.from(fileList).slice(0, availableSlots);
-      const validFiles = filesToProcess.filter((f) => {
-        if (!f.type.startsWith('image/')) return false;
-        if (f.size > maxSizeMb * 1024 * 1024) return false;
-        return true;
-      });
+      const rejected = filesToProcess.filter(
+        (f) => !f.type.startsWith('image/') || f.size > maxSizeMb * 1024 * 1024,
+      );
+      const validFiles = filesToProcess.filter(
+        (f) => f.type.startsWith('image/') && f.size <= maxSizeMb * 1024 * 1024,
+      );
+
+      if (rejected.length > 0) {
+        onError?.(t('compose.media_rejected', {
+          count: rejected.length,
+          defaultValue: '{{count}} file(s) skipped (wrong type or too large)',
+        }));
+      }
 
       if (validFiles.length === 0) return;
 
       setCompressing(true);
       try {
         const newItems: MediaFile[] = [];
+        let failedCount = 0;
 
         for (const file of validFiles) {
-          const compressed = await compressImage(file);
-          const preview = await readFileAsDataUrl(compressed);
-          newItems.push({
-            file: compressed,
-            preview,
-            altText: '',
-          });
+          try {
+            const compressed = await compressImage(file);
+            const preview = await readFileAsDataUrl(compressed);
+            newItems.push({
+              file: compressed,
+              preview,
+              altText: '',
+            });
+          } catch {
+            failedCount++;
+          }
         }
 
-        onMediaChange([...mediaFiles, ...newItems]);
+        if (newItems.length > 0) {
+          onMediaChange([...mediaFiles, ...newItems]);
+        }
+
+        if (failedCount > 0) {
+          onError?.(t('compose.media_compression_failed', {
+            count: failedCount,
+            defaultValue: '{{count}} image(s) failed to process',
+          }));
+        }
       } catch {
-        // Silently fail — individual file errors shouldn't block others
+        onError?.(t('compose.media_upload_error', 'Failed to process images'));
       } finally {
         setCompressing(false);
       }
     },
-    [maxFiles, maxSizeMb, mediaFiles, onMediaChange],
+    [maxFiles, maxSizeMb, mediaFiles, onMediaChange, onError, t],
   );
 
   const handleFileChange = useCallback(

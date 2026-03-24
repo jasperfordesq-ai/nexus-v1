@@ -182,6 +182,11 @@
     "schedule_clear": "Limpar agendamento",
     "groups_loading": "A carregar grupos...",
     "create_post": "Criar publicação",
+    "alt_text_placeholder": "Descrever esta imagem...",
+    "alt_text_label": "Texto alternativo para a imagem",
+    "media_rejected": "{{count}} ficheiro(s) ignorado(s) (tipo incorreto ou demasiado grande)",
+    "media_compression_failed": "{{count}} imagem(ns) não foram processadas",
+    "media_upload_error": "Falha ao processar imagens",
     "template_button": "Modelo",
     "media_drag_drop": "Clique ou arraste fotos aqui",
     "media_formats": "JPEG, PNG, GIF, WebP até 10MB cada"
@@ -382,7 +387,8 @@
   "lightbox": {
     "aria_label": "Visualizador de imagens",
     "close": "Fechar visualizador de imagens",
-    "counter": "{{current}} de {{total}}"
+    "counter": "{{current}} de {{total}}",
+    "download": "Transferir imagem"
   },
   "reaction": {
     "like": "Gosto",
