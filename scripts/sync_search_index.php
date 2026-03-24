@@ -158,10 +158,14 @@ exit($totalErrors > 0 ? 1 : 0);
 function syncListings(int $tenantId, bool $dryRun): array
 {
     $rows = array_map(fn($r) => (array) $r, DB::select(
-        "SELECT l.id, l.tenant_id, l.title, l.description, l.location, l.status,
-                CONCAT(u.first_name, ' ', u.last_name) as author_name
+        "SELECT l.id, l.tenant_id, l.user_id, l.category_id, l.type,
+                l.title, l.description, l.location, l.status,
+                UNIX_TIMESTAMP(l.created_at) as created_at,
+                CONCAT(u.first_name, ' ', u.last_name) as author_name,
+                COALESCE(c.name, '') as category_name
          FROM listings l
          LEFT JOIN users u ON l.user_id = u.id
+         LEFT JOIN categories c ON c.id = l.category_id
          WHERE l.tenant_id = ? AND l.status = 'active'
          ORDER BY l.id",
         [$tenantId]
