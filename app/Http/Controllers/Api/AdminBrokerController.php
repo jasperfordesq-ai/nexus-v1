@@ -154,6 +154,24 @@ class AdminBrokerController extends BaseApiController
             $safeguardingAlerts = (int) ($row->cnt ?? 0);
         } catch (\Exception $e) { \Illuminate\Support\Facades\Log::warning('[AdminBroker] Dashboard query failed: ' . $e->getMessage()); }
 
+        $onboardingSafeguardingFlags = 0;
+        try {
+            $row = DB::selectOne(
+                "SELECT COUNT(DISTINCT usp.user_id) as cnt
+                 FROM user_safeguarding_preferences usp
+                 JOIN tenant_safeguarding_options tso ON tso.id = usp.option_id
+                 WHERE usp.tenant_id = ? AND usp.revoked_at IS NULL AND tso.is_active = 1
+                 AND tso.triggers IS NOT NULL
+                 AND NOT EXISTS (
+                     SELECT 1 FROM activity_log al
+                     WHERE al.entity_type = 'user' AND al.entity_id = usp.user_id
+                     AND al.action = 'safeguarding_flag_reviewed'
+                 )",
+                [$effectiveTenantId ?? TenantContext::getId()]
+            );
+            $onboardingSafeguardingFlags = (int) ($row->cnt ?? 0);
+        } catch (\Exception $e) { \Illuminate\Support\Facades\Log::warning('[AdminBroker] Dashboard query failed: ' . $e->getMessage()); }
+
         $recentActivity = [];
         try {
             $actWhere = $effectiveTenantId !== null ? 'al.tenant_id = ?' : '1=1';
@@ -183,6 +201,7 @@ class AdminBrokerController extends BaseApiController
             'vetting_pending' => $vettingPending,
             'vetting_expiring' => $vettingExpiring,
             'safeguarding_alerts' => $safeguardingAlerts,
+            'onboarding_safeguarding_flags' => $onboardingSafeguardingFlags,
             'recent_activity' => $recentActivity,
         ]);
     }

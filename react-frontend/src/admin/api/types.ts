@@ -815,6 +815,7 @@ export interface BrokerDashboardStats {
   vetting_pending: number;
   vetting_expiring: number;
   safeguarding_alerts: number;
+  onboarding_safeguarding_flags: number;
   recent_activity: BrokerActivityEntry[];
 }
 

@@ -7,6 +7,7 @@
 namespace App\Services;
 
 use App\Models\User;
+use App\Services\OnboardingConfigService;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
@@ -97,6 +98,15 @@ class UserService
 
         if (! $user) {
             return null;
+        }
+
+        // Check onboarding visibility gating (admin-configurable)
+        // If the viewer is looking at someone else's profile, check if the target
+        // meets the tenant's visibility requirements (onboarding complete, avatar, bio).
+        if ($viewerId !== $userId) {
+            if (!OnboardingConfigService::isProfileVisible(null, $userId)) {
+                return null;
+            }
         }
 
         // Check privacy settings

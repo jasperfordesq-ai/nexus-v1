@@ -118,6 +118,15 @@ interface DashboardStats {
   critical_flags: number;
 }
 
+interface MemberSafeguardingEntry {
+  user_id: number;
+  user_name: string;
+  user_avatar?: string | null;
+  options: { option_key: string; label: string; }[];
+  consent_given_at: string;
+  has_triggers: boolean;
+}
+
 // ─────────────────────────────────────────────────────────────────────────────
 // Helpers
 // ─────────────────────────────────────────────────────────────────────────────
@@ -145,6 +154,9 @@ export function SafeguardingDashboard() {
   const [assignments, setAssignments] = useState<GuardianAssignment[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
 
+  // Member safeguarding preferences from onboarding
+  const [memberPreferences, setMemberPreferences] = useState<MemberSafeguardingEntry[]>([]);
+
   // Review modal
   const reviewModal = useDisclosure();
   const [reviewTarget, setReviewTarget] = useState<FlaggedMessage | null>(null);
@@ -161,10 +173,11 @@ export function SafeguardingDashboard() {
   const loadData = useCallback(async () => {
     setLoading(true);
     try {
-      const [statsRes, flagsRes, assignmentsRes] = await Promise.all([
+      const [statsRes, flagsRes, assignmentsRes, prefsRes] = await Promise.all([
         api.get('/v2/admin/safeguarding/dashboard'),
         api.get('/v2/admin/safeguarding/flagged-messages'),
         api.get('/v2/admin/safeguarding/assignments'),
+        api.get<MemberSafeguardingEntry[]>('/v2/admin/safeguarding/member-preferences'),
       ]);
 
       if (statsRes.success) {
@@ -184,6 +197,11 @@ export function SafeguardingDashboard() {
         setAssignments(
           Array.isArray(payload) ? payload : (payload as { assignments?: GuardianAssignment[] })?.assignments ?? []
         );
+      }
+
+      if (prefsRes.success) {
+        const payload = prefsRes.data;
+        setMemberPreferences(Array.isArray(payload) ? payload : []);
       }
     } catch (err) {
       logError('SafeguardingDashboard.load', err);
@@ -341,6 +359,15 @@ export function SafeguardingDashboard() {
             <span className="flex items-center gap-2">
               <Users size={16} />
               Guardian Assignments ({assignments.filter((a) => a.status === 'active').length})
+            </span>
+          }
+        />
+        <Tab
+          key="preferences"
+          title={
+            <span className="flex items-center gap-2">
+              <Shield size={16} />
+              Member Preferences ({memberPreferences.length})
             </span>
           }
         />
@@ -521,6 +548,73 @@ export function SafeguardingDashboard() {
                 ))}
               </TableBody>
             </Table>
+          </CardBody>
+        </Card>
+      )}
+
+      {/* Member Safeguarding Preferences Tab */}
+      {activeTab === 'preferences' && (
+        <Card shadow="sm">
+          <CardHeader className="flex justify-between items-center">
+            <div>
+              <h3 className="text-lg font-semibold">Member Safeguarding Preferences</h3>
+              <p className="text-sm text-default-500">Members who indicated safeguarding needs during onboarding</p>
+            </div>
+          </CardHeader>
+          <CardBody>
+            {memberPreferences.length === 0 ? (
+              <div className="text-center py-8 text-default-400">
+                <Shield size={40} className="mx-auto mb-2 opacity-40" />
+                <p>No members have submitted safeguarding preferences yet.</p>
+                <p className="text-sm mt-1">This tab populates when members select safeguarding options during onboarding.</p>
+              </div>
+            ) : (
+              <Table aria-label="Member safeguarding preferences">
+                <TableHeader>
+                  <TableColumn>MEMBER</TableColumn>
+                  <TableColumn>SELECTED OPTIONS</TableColumn>
+                  <TableColumn>TRIGGERS</TableColumn>
+                  <TableColumn>DATE</TableColumn>
+                </TableHeader>
+                <TableBody>
+                  {memberPreferences.map((entry) => (
+                    <TableRow key={entry.user_id}>
+                      <TableCell>
+                        <div className="flex items-center gap-2">
+                          <Avatar
+                            src={entry.user_avatar || undefined}
+                            name={entry.user_name}
+                            size="sm"
+                          />
+                          <span className="font-medium text-sm">{entry.user_name}</span>
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex flex-wrap gap-1">
+                          {entry.options.map((opt) => (
+                            <Chip key={opt.option_key} size="sm" variant="flat" color="primary">
+                              {opt.label}
+                            </Chip>
+                          ))}
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        {entry.has_triggers ? (
+                          <Chip size="sm" variant="flat" color="warning">Active</Chip>
+                        ) : (
+                          <Chip size="sm" variant="flat" color="default">None</Chip>
+                        )}
+                      </TableCell>
+                      <TableCell>
+                        <span className="text-sm text-default-500">
+                          {formatRelativeTime(entry.consent_given_at)}
+                        </span>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            )}
           </CardBody>
         </Card>
       )}

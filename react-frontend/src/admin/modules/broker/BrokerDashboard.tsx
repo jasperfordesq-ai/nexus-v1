@@ -191,6 +191,13 @@ export function BrokerDashboard() {
           color="danger"
           loading={loading}
         />
+        <StatCard
+          label="Onboarding Flags"
+          value={stats?.onboarding_safeguarding_flags ?? '—'}
+          icon={ShieldAlert}
+          color="warning"
+          loading={loading}
+        />
       </div>
 
       {/* Quick Links */}

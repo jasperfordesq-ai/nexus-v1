@@ -295,6 +295,86 @@ class AdminSafeguardingController extends BaseApiController
     }
 
     // ============================================
+    // MEMBER SAFEGUARDING PREFERENCES
+    // ============================================
+
+    /**
+     * GET /v2/admin/safeguarding/member-preferences
+     *
+     * Returns all members who have selected safeguarding options during onboarding.
+     * Grouped by user, with their selected options and trigger status.
+     * Access is audit-logged.
+     */
+    public function memberPreferences(): JsonResponse
+    {
+        $adminId = $this->requireAdmin();
+        $tenantId = \App\Core\TenantContext::getId();
+
+        try {
+            $rows = DB::select(
+                "SELECT
+                    u.id as user_id,
+                    CONCAT(COALESCE(u.first_name, ''), ' ', COALESCE(u.last_name, '')) as user_name,
+                    u.avatar_url as user_avatar,
+                    usp.consent_given_at,
+                    tso.option_key,
+                    tso.label as option_label,
+                    tso.triggers
+                 FROM user_safeguarding_preferences usp
+                 JOIN users u ON u.id = usp.user_id
+                 JOIN tenant_safeguarding_options tso ON tso.id = usp.option_id
+                 WHERE usp.tenant_id = ? AND usp.revoked_at IS NULL AND tso.is_active = 1
+                 ORDER BY usp.consent_given_at DESC, u.id, tso.sort_order",
+                [$tenantId]
+            );
+
+            // Group by user
+            $grouped = [];
+            foreach ($rows as $row) {
+                $uid = (int) $row->user_id;
+                if (!isset($grouped[$uid])) {
+                    $grouped[$uid] = [
+                        'user_id' => $uid,
+                        'user_name' => trim($row->user_name),
+                        'user_avatar' => $row->user_avatar,
+                        'consent_given_at' => $row->consent_given_at,
+                        'options' => [],
+                        'has_triggers' => false,
+                    ];
+                }
+                $triggers = json_decode($row->triggers ?? '{}', true) ?: [];
+                $hasTriggers = !empty(array_filter($triggers, fn ($v) => $v === true));
+                $grouped[$uid]['options'][] = [
+                    'option_key' => $row->option_key,
+                    'label' => $row->option_label,
+                ];
+                if ($hasTriggers) {
+                    $grouped[$uid]['has_triggers'] = true;
+                }
+            }
+
+            // Audit log this access
+            DB::table('activity_log')->insert([
+                'user_id' => $adminId,
+                'action' => 'safeguarding_preferences_list_viewed',
+                'action_type' => 'safeguarding',
+                'entity_type' => 'tenant',
+                'entity_id' => $tenantId,
+                'details' => json_encode(['members_count' => count($grouped)]),
+                'ip_address' => request()?->ip(),
+                'created_at' => now(),
+            ]);
+
+            return $this->respondWithData(array_values($grouped));
+        } catch (\Illuminate\Database\QueryException $e) {
+            if ($this->isTableNotFound($e)) {
+                return $this->respondWithData([]);
+            }
+            throw $e;
+        }
+    }
+
+    // ============================================
     // HELPERS
     // ============================================
 
