@@ -730,7 +730,12 @@ class StoryService
         $dir = "uploads/stories/{$tenantId}/{$userId}";
         $filename = uniqid('story_') . '_' . time() . '.' . $file->getClientOriginalExtension();
 
-        $file->move(public_path($dir), $filename);
+        // Store in httpdocs/ (Apache document root), not public/ (Laravel default)
+        $targetDir = base_path("httpdocs/{$dir}");
+        if (!is_dir($targetDir)) {
+            mkdir($targetDir, 0755, true);
+        }
+        $file->move($targetDir, $filename);
 
         return "/{$dir}/{$filename}";
     }
@@ -1241,8 +1246,8 @@ class StoryService
             return;
         }
 
-        // Convert URL path to filesystem path
-        $path = public_path(ltrim($url, '/'));
+        // Convert URL path to filesystem path (httpdocs is the doc root, not public/)
+        $path = base_path('httpdocs/' . ltrim($url, '/'));
 
         if (file_exists($path)) {
             try {
