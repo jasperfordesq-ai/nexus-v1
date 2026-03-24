@@ -28,26 +28,6 @@ interface ImageCarouselProps {
 
 const SWIPE_THRESHOLD = 50;
 
-/** Image with shimmer skeleton while loading */
-function ImageWithSkeleton(props: React.ImgHTMLAttributes<HTMLImageElement>) {
-  const [loaded, setLoaded] = useState(false);
-  return (
-    <div className="relative w-full">
-      {!loaded && (
-        <div className="absolute inset-0 bg-[var(--color-surface)] animate-pulse rounded" />
-      )}
-      <img
-        {...props}
-        className={`${props.className ?? ''} transition-opacity duration-200 ${loaded ? 'opacity-100' : 'opacity-0'}`}
-        onLoad={(e) => {
-          setLoaded(true);
-          props.onLoad?.(e);
-        }}
-      />
-    </div>
-  );
-}
-
 export function ImageCarousel({ media, className = '' }: ImageCarouselProps) {
   const { t } = useTranslation('feed');
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -146,7 +126,7 @@ export function ImageCarousel({ media, className = '' }: ImageCarouselProps) {
               className="w-full cursor-pointer"
               onClick={() => setLightboxOpen(true)}
             >
-              <ImageWithSkeleton
+              <img
                 src={resolveAssetUrl(current.file_url)}
                 alt={current.alt_text || t('carousel.image_of', 'Image {{current}} of {{total}}', { current: currentIndex + 1, total })}
                 className="w-full max-h-[500px] sm:max-h-[500px] max-sm:max-h-[400px] object-contain select-none"
