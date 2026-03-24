@@ -54,6 +54,7 @@ import { useToast, useTenant, useAuth } from '@/contexts';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
 import { resolveAvatarUrl } from '@/lib/helpers';
+import { SafeguardingStep } from './SafeguardingStep';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Types
@@ -102,6 +103,12 @@ export function OnboardingPage() {
 
   // Get the slug for the current step number
   const currentStepSlug = configSteps[currentStep - 1]?.slug ?? '';
+
+  // Check if a step is required by slug
+  const isStepRequired = useCallback(
+    (slug: string) => configSteps.find(s => s.slug === slug)?.required ?? false,
+    [configSteps]
+  );
   const [slideDirection, setSlideDirection] = useState(1);
 
   // Step 2: Profile photo + bio
@@ -1060,7 +1067,18 @@ export function OnboardingPage() {
             </div>
           )}
 
-          {/* ─── Step 5: Confirm + Create ─── */}
+          {/* ─── Safeguarding Step (conditional — only when admin enables it) ─── */}
+          {currentStepSlug === 'safeguarding' && (
+            <SafeguardingStep
+              onNext={goNextAnimated}
+              onBack={goBackAnimated}
+              onSkip={!isStepRequired('safeguarding') ? goNextAnimated : undefined}
+              isRequired={isStepRequired('safeguarding')}
+              introText={onboardingConfig.safeguarding_intro_text}
+            />
+          )}
+
+          {/* ─── Confirm + Complete ─── */}
           {currentStepSlug === 'confirm' && (
             <div className="space-y-6">
               {/* Profile preview card */}
