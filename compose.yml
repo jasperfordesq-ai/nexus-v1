@@ -176,6 +176,7 @@ services:
       - /app/node_modules
     environment:
       - NODE_ENV=development
+      - DOCKER_ENV=1
       - VITE_API_URL=http://app:80
       - VITE_DEFAULT_TENANT_ID=2
       # Google Maps key is loaded from react-frontend/.env.local (gitignored)

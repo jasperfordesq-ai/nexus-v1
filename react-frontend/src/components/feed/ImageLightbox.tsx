@@ -128,7 +128,7 @@ export function ImageLightbox({ media, initialIndex = 0, onClose }: ImageLightbo
   const lightboxContent = (
     <motion.div
       ref={containerRef}
-      className="fixed inset-0 z-50 bg-black/90 backdrop-blur-lg flex items-center justify-center"
+      className="fixed inset-0 z-[1000] bg-black/90 backdrop-blur-lg flex items-center justify-center"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
@@ -139,29 +139,29 @@ export function ImageLightbox({ media, initialIndex = 0, onClose }: ImageLightbo
       aria-label={t('lightbox.aria_label', 'Image viewer')}
       tabIndex={-1}
     >
-      {/* Top-right controls: download + close */}
-      <div className="absolute top-4 right-4 z-10 flex items-center gap-2">
-        <a
-          href={resolveAssetUrl(current.file_url)}
-          download
-          className="bg-white/10 backdrop-blur-sm text-white rounded-full p-2.5 hover:bg-white/20 transition-colors focus:outline-none focus:ring-2 focus:ring-white/50"
-          onClick={(e) => e.stopPropagation()}
-          aria-label={t('lightbox.download', 'Download image')}
-        >
-          <Download className="w-5 h-5" />
-        </a>
-        <button
-          type="button"
-          className="bg-white/10 backdrop-blur-sm text-white rounded-full p-2.5 hover:bg-white/20 transition-colors focus:outline-none focus:ring-2 focus:ring-white/50"
-          onClick={(e) => {
-            e.stopPropagation();
-            onClose();
-          }}
-          aria-label={t('lightbox.close', 'Close image viewer')}
-        >
-          <X className="w-6 h-6" />
-        </button>
-      </div>
+      {/* Close button — large, high contrast, always visible */}
+      <button
+        type="button"
+        className="absolute top-4 right-4 z-10 bg-white/90 text-black rounded-full p-2.5 hover:bg-white transition-colors shadow-lg focus:outline-none focus:ring-2 focus:ring-white/50"
+        onClick={(e) => {
+          e.stopPropagation();
+          onClose();
+        }}
+        aria-label={t('lightbox.close', 'Close image viewer')}
+      >
+        <X className="w-6 h-6 stroke-[2.5]" />
+      </button>
+
+      {/* Download button — top-left */}
+      <a
+        href={resolveAssetUrl(current.file_url)}
+        download
+        className="absolute top-4 left-4 z-10 bg-black/40 backdrop-blur-sm text-white rounded-full p-2.5 hover:bg-black/60 transition-colors focus:outline-none focus:ring-2 focus:ring-white/50"
+        onClick={(e) => e.stopPropagation()}
+        aria-label={t('lightbox.download', 'Download image')}
+      >
+        <Download className="w-5 h-5" />
+      </a>
 
       {/* Counter (screen reader live region) */}
       {total > 1 && (

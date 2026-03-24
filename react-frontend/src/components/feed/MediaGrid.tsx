@@ -52,6 +52,11 @@ export function MediaGrid({ media, className = '' }: MediaGridProps) {
         className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
         loading={index === 0 ? 'eager' : 'lazy'}
         draggable={false}
+        onError={(e) => {
+          const img = e.target as HTMLImageElement;
+          const fullUrl = resolveAssetUrl(item.file_url);
+          if (img.src !== fullUrl) img.src = fullUrl;
+        }}
       />
       {extraOverlay && extraCount > 0 && (
         <div className="absolute inset-0 bg-black/50 flex items-center justify-center" aria-label={t('carousel.more_images', '{{count}} more images', { count: extraCount })}>
