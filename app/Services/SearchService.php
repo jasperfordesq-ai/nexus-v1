@@ -174,6 +174,42 @@ class SearchService
     }
 
     /**
+     * Search listings in Meilisearch and return matching IDs + estimated total.
+     *
+     * Returns null when Meilisearch is unavailable — callers should fall back to SQL.
+     * Pass limit=0 (or limit=1) to get only the total count without IDs.
+     *
+     * @param  array<string> $extraFilters  Additional Meilisearch filter strings
+     * @return array{ids: int[], total: int}|null
+     */
+    public static function searchListingIds(
+        string $term,
+        int $tenantId,
+        array $extraFilters = [],
+        int $limit = 20,
+        int $offset = 0,
+    ): ?array {
+        if (!static::isAvailable()) {
+            return null;
+        }
+        try {
+            $filterParts = ["tenant_id = {$tenantId}", "status = 'active'", ...$extraFilters];
+            $result = static::client()->index('listings')->search($term, [
+                'filter'               => implode(' AND ', $filterParts),
+                'limit'                => max(0, $limit),
+                'offset'               => $offset,
+                'attributesToRetrieve' => ['id'],
+            ]);
+            return [
+                'ids'   => array_column($result->getHits(), 'id'),
+                'total' => $result->getEstimatedTotalHits() ?? count($result->getHits()),
+            ];
+        } catch (\Throwable) {
+            return null;
+        }
+    }
+
+    /**
      * Remove a listing from the Meilisearch index.
      * Silently skips if Meilisearch is unavailable.
      */

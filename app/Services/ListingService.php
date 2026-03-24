@@ -8,6 +8,7 @@ namespace App\Services;
 
 use App\Models\Listing;
 use App\Models\User;
+use App\Services\SearchService;
 use Illuminate\Contracts\Pagination\CursorPaginator;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
@@ -59,6 +60,96 @@ class ListingService
         $currentUserId = ! empty($filters['current_user_id'])
             ? (int) $filters['current_user_id']
             : null;
+
+        // ── Meilisearch search path ──────────────────────────────────────────
+        // When a search term is present and Meilisearch is available, use it for
+        // typo-tolerant, relevance-ranked ID retrieval, then hydrate from SQL.
+        // Falls through to the SQL path below if Meilisearch is unavailable.
+        if (!empty($filters['search'])) {
+            $tenantId = \App\Core\TenantContext::getId();
+
+            // Decode Meilisearch offset cursor (format: "meili:<offset>")
+            $meiliOffset = 0;
+            if ($cursor !== null) {
+                $decoded = base64_decode($cursor, true);
+                if ($decoded !== false && str_starts_with($decoded, 'meili:')) {
+                    $meiliOffset = (int) substr($decoded, 6);
+                }
+            }
+
+            // Filters expressible in Meilisearch
+            $meiliFilters = [];
+            if (!empty($filters['category_id'])) {
+                $meiliFilters[] = 'category_id = ' . (int) $filters['category_id'];
+            }
+            if (!empty($filters['type']) && is_string($filters['type'])) {
+                $meiliFilters[] = "type = '{$filters['type']}'";
+            }
+
+            $meiliResult = SearchService::searchListingIds(
+                $filters['search'], $tenantId, $meiliFilters, $limit + 1, $meiliOffset
+            );
+
+            if ($meiliResult !== null) {
+                $ids     = $meiliResult['ids'];
+                $hasMore = count($ids) > $limit;
+                if ($hasMore) {
+                    array_pop($ids);
+                }
+
+                if (empty($ids)) {
+                    return ['items' => [], 'cursor' => null, 'has_more' => false];
+                }
+
+                $q = Listing::query()
+                    ->with(['user:id,first_name,last_name,organization_name,profile_type,avatar_url,tagline',
+                            'category:id,name,color,slug'])
+                    ->whereIn('id', $ids);
+
+                // Multi-type arrays can't be expressed in the Meilisearch filter above
+                if (!empty($filters['type']) && is_array($filters['type'])) {
+                    $q->whereIn('type', $filters['type']);
+                }
+
+                // Skills are not a Meilisearch attribute — apply in SQL post-filter
+                if (!empty($filters['skills'])) {
+                    $skills = is_array($filters['skills'])
+                        ? $filters['skills']
+                        : explode(',', $filters['skills']);
+                    $skills = array_map(fn($s) => strtolower(trim($s)), array_filter($skills));
+                    if (!empty($skills)) {
+                        $q->whereHas('skillTags', fn(Builder $sq) => $sq->whereIn('tag', $skills));
+                    }
+                }
+
+                $listingsById = $q->get()->keyBy('id');
+
+                $savedIds = [];
+                if ($currentUserId && $listingsById->isNotEmpty()) {
+                    $savedIds = DB::table('user_saved_listings')
+                        ->where('user_id', $currentUserId)
+                        ->whereIn('listing_id', $listingsById->keys())
+                        ->pluck('listing_id')->flip()->all();
+                }
+
+                // Preserve Meilisearch relevance order
+                $items = [];
+                foreach ($ids as $id) {
+                    $listing = $listingsById[$id] ?? null;
+                    if ($listing) {
+                        $items[] = self::formatListingItem($listing, $savedIds, $currentUserId);
+                    }
+                }
+
+                return [
+                    'items'    => $items,
+                    'cursor'   => $hasMore ? base64_encode('meili:' . ($meiliOffset + $limit)) : null,
+                    'has_more' => $hasMore,
+                ];
+            }
+            // Meilisearch unavailable — fall through to SQL path
+        }
+        // ── End Meilisearch path ─────────────────────────────────────────────
 
         $query = Listing::query()
             ->with(['user:id,first_name,last_name,organization_name,profile_type,avatar_url,tagline',
@@ -162,33 +253,9 @@ class ListingService
                 ->all();
         }
 
-        $result = $items->map(function (Listing $listing) use ($savedIds, $currentUserId) {
-            $data = $listing->toArray();
-
-            // Build user sub-object matching the React contract
-            $user = $listing->user;
-            $data['user'] = $user ? [
-                'id'         => $user->id,
-                'name'       => ($user->profile_type === 'organisation' && $user->organization_name)
-                                    ? $user->organization_name
-                                    : trim($user->first_name . ' ' . $user->last_name),
-                'avatar'     => $user->avatar_url,
-                'avatar_url' => $user->avatar_url,
-                'tagline'    => $user->tagline,
-            ] : null;
-
-            // Category
-            $cat = $listing->category;
-            $data['category_name'] = $cat?->name;
-            $data['category_color'] = $cat?->color;
-
-            // Favorited flag
-            if ($currentUserId) {
-                $data['is_favorited'] = isset($savedIds[$listing->id]);
-            }
-
-            return $data;
-        })->all();
+        $result = $items->map(
+            fn(Listing $listing) => self::formatListingItem($listing, $savedIds, $currentUserId)
+        )->all();
 
         return [
             'items'    => array_values($result),
@@ -198,12 +265,57 @@ class ListingService
     }
 
     /**
+     * Shape a Listing model into the array contract expected by the React frontend.
+     */
+    private static function formatListingItem(Listing $listing, array $savedIds, ?int $currentUserId): array
+    {
+        $data = $listing->toArray();
+
+        $user = $listing->user;
+        $data['user'] = $user ? [
+            'id'         => $user->id,
+            'name'       => ($user->profile_type === 'organisation' && $user->organization_name)
+                                ? $user->organization_name
+                                : trim($user->first_name . ' ' . $user->last_name),
+            'avatar'     => $user->avatar_url,
+            'avatar_url' => $user->avatar_url,
+            'tagline'    => $user->tagline,
+        ] : null;
+
+        $cat = $listing->category;
+        $data['category_name']  = $cat?->name;
+        $data['category_color'] = $cat?->color;
+
+        if ($currentUserId) {
+            $data['is_favorited'] = isset($savedIds[$listing->id]);
+        }
+
+        return $data;
+    }
+
+    /**
      * Count total listings matching filters (without cursor/limit).
      *
      * Accepts the same filter array as getAll(), but ignores cursor and limit.
      */
     public static function countAll(array $filters = []): int
     {
+        // Use Meilisearch's estimated total when a search term is present
+        if (!empty($filters['search'])) {
+            $tenantId     = \App\Core\TenantContext::getId();
+            $meiliFilters = [];
+            if (!empty($filters['category_id'])) {
+                $meiliFilters[] = 'category_id = ' . (int) $filters['category_id'];
+            }
+            if (!empty($filters['type']) && is_string($filters['type'])) {
+                $meiliFilters[] = "type = '{$filters['type']}'";
+            }
+            $meiliResult = SearchService::searchListingIds($filters['search'], $tenantId, $meiliFilters, 1, 0);
+            if ($meiliResult !== null) {
+                return $meiliResult['total'];
+            }
+        }
+
         $query = Listing::query();
 
         // Status filter
