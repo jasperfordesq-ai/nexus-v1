@@ -49,6 +49,7 @@ import {
 import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
 import { usePageTitle } from '@/hooks';
+import { useOnboardingConfig } from '@/hooks/useOnboardingConfig';
 import { useToast, useTenant, useAuth } from '@/contexts';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
@@ -66,11 +67,6 @@ interface Category {
   color: string | null;
 }
 
-const TOTAL_STEPS = 5;
-const MIN_BIO_LENGTH = 10;
-
-const STEP_LABEL_KEYS = ['step_welcome', 'step_profile', 'step_interests', 'step_skills', 'step_confirm'];
-
 // ─────────────────────────────────────────────────────────────────────────────
 // Component
 // ─────────────────────────────────────────────────────────────────────────────
@@ -83,11 +79,29 @@ export function OnboardingPage() {
   const toast = useToast();
   const { user, refreshUser } = useAuth();
 
+  // ── Admin-configurable onboarding settings ────────────────────────────────
+  const { config: onboardingConfig, steps: configSteps, isLoading: configLoading } = useOnboardingConfig();
+
+  // Derive dynamic constants from config (fall back to safe defaults)
+  const TOTAL_STEPS = configSteps.length || 5;
+  const MIN_BIO_LENGTH = onboardingConfig.bio_min_length || 10;
+  const STEP_LABEL_KEYS = configSteps.map(s => `step_${s.slug}`);
+
   const tenantName = tenant?.branding?.name || tenant?.name || 'our community';
 
   // ── State ──────────────────────────────────────────────────────────────────
 
   const [currentStep, setCurrentStep] = useState(1);
+
+  // Map step slugs to 1-based indices for compatibility with existing step rendering
+  const stepSlugToIndex = useMemo(() => {
+    const map = new Map<string, number>();
+    configSteps.forEach((s, i) => map.set(s.slug, i + 1));
+    return map;
+  }, [configSteps]);
+
+  // Get the slug for the current step number
+  const currentStepSlug = configSteps[currentStep - 1]?.slug ?? '';
   const [slideDirection, setSlideDirection] = useState(1);
 
   // Step 2: Profile photo + bio
@@ -139,6 +153,11 @@ export function OnboardingPage() {
   // ── If user already has photo+bio but onboarding_completed is false,
   //    skip ahead to step 3 so they don't re-do profile setup ────────────
 
+  // If user already has photo+bio but onboarding_completed is false,
+  // skip ahead past the profile step so they don't re-do it
+  const profileStepIdx = stepSlugToIndex.get('profile') ?? 2;
+  const nextAfterProfile = profileStepIdx + 1;
+
   const initialSkipDone = useRef(false);
   useEffect(() => {
     if (
@@ -146,13 +165,15 @@ export function OnboardingPage() {
       user?.avatar_url &&
       user?.bio &&
       user.bio.trim().length >= MIN_BIO_LENGTH &&
-      currentStep <= 2
+      currentStep <= profileStepIdx
     ) {
       initialSkipDone.current = true;
-      setCurrentStep(3);
-      setVisitedSteps(new Set([1, 2, 3]));
+      setCurrentStep(nextAfterProfile);
+      const visited = new Set<number>();
+      for (let i = 1; i <= nextAfterProfile; i++) visited.add(i);
+      setVisitedSteps(visited);
     }
-  }, [user?.avatar_url, user?.bio, currentStep]);
+  }, [user?.avatar_url, user?.bio, currentStep, profileStepIdx, nextAfterProfile]);
 
   // ── Load categories when reaching step 3 ───────────────────────────────
 
@@ -355,10 +376,10 @@ export function OnboardingPage() {
       if (!response.success) {
         // Surface the backend error clearly
         const message = response.error || t('toast_something_went_wrong');
-        // If it's a profile-related issue, guide back to step 2
+        // If it's a profile-related issue, guide back to profile step
         if (message.toLowerCase().includes('photo') || message.toLowerCase().includes('bio')) {
           toast.error(t('toast_profile_incomplete'), message);
-          goToStep(2);
+          goToStep(profileStepIdx);
         } else {
           toast.error(t('toast_setup_failed'), message);
         }
@@ -395,7 +416,7 @@ export function OnboardingPage() {
         const message = response.error || t('toast_something_went_wrong');
         if (message.toLowerCase().includes('photo') || message.toLowerCase().includes('bio')) {
           toast.error(t('toast_profile_incomplete'), message);
-          goToStep(2);
+          goToStep(profileStepIdx);
         } else {
           toast.error(t('toast_setup_failed'), message);
         }
@@ -493,6 +514,16 @@ export function OnboardingPage() {
     return null;
   }
 
+  // ── Wait for onboarding config to load ─────────────────────────────────
+
+  if (configLoading) {
+    return (
+      <div className="flex items-center justify-center py-20">
+        <Spinner size="lg" />
+      </div>
+    );
+  }
+
   // ── Main Render ────────────────────────────────────────────────────────────
 
   return (
@@ -530,14 +561,15 @@ export function OnboardingPage() {
             // Only allow clicking to visited steps or the current step
             // Never allow skipping step 2 (profile) if incomplete
             if (step <= currentStep || visitedSteps.has(step)) {
-              if (step > 2 && !profileStepComplete) {
+              if (step > profileStepIdx && !profileStepComplete) {
                 toast.error(t('toast_complete_profile_first'), t('toast_photo_bio_required'));
-                goToStep(2);
+                goToStep(profileStepIdx);
                 return;
               }
               goToStep(step);
             }
           }}
+          stepLabelKeys={STEP_LABEL_KEYS}
         />
       </motion.div>
 
@@ -553,7 +585,7 @@ export function OnboardingPage() {
           transition={{ duration: 0.2, ease: 'easeInOut' }}
         >
           {/* ─── Step 1: Welcome ─── */}
-          {currentStep === 1 && (
+          {currentStepSlug === 'welcome' && (
             <div className="space-y-6">
               <GlassCard className="p-8 text-center">
                 <div className="flex items-center justify-center gap-4 mb-6">
@@ -630,7 +662,7 @@ export function OnboardingPage() {
           )}
 
           {/* ─── Step 2: Your Profile (MANDATORY — photo + bio) ─── */}
-          {currentStep === 2 && (
+          {currentStepSlug === 'profile' && (
             <div className="space-y-6">
               <GlassCard className="p-6">
                 <h2 className="text-lg font-semibold text-theme-primary mb-1 flex items-center gap-2">
@@ -787,7 +819,7 @@ export function OnboardingPage() {
           )}
 
           {/* ─── Step 3: Select Interests (OPTIONAL) ─── */}
-          {currentStep === 3 && (
+          {currentStepSlug === 'interests' && (
             <div className="space-y-6">
               <GlassCard className="p-6">
                 <h2 className="text-lg font-semibold text-theme-primary mb-1 flex items-center gap-2">
@@ -884,7 +916,7 @@ export function OnboardingPage() {
           )}
 
           {/* ─── Step 4: Your Skills (OPTIONAL — shows ALL categories) ─── */}
-          {currentStep === 4 && (
+          {currentStepSlug === 'skills' && (
             <div className="space-y-6">
               {/* Offers section */}
               <GlassCard className="p-6">
@@ -1029,7 +1061,7 @@ export function OnboardingPage() {
           )}
 
           {/* ─── Step 5: Confirm + Create ─── */}
-          {currentStep === 5 && (
+          {currentStepSlug === 'confirm' && (
             <div className="space-y-6">
               {/* Profile preview card */}
               <GlassCard className="p-6">
@@ -1060,7 +1092,7 @@ export function OnboardingPage() {
                     <Button
                       variant="light"
                       size="sm"
-                      onPress={() => goToStep(2)}
+                      onPress={() => goToStep(profileStepIdx)}
                       className="text-xs text-emerald-600 dark:text-emerald-400 hover:underline mt-1 h-auto p-0 min-w-0"
                     >
                       {t('edit_profile')}
@@ -1183,9 +1215,10 @@ interface StepIndicatorProps {
   visitedSteps: Set<number>;
   completedSteps: Set<number>;
   onStepClick: (step: number) => void;
+  stepLabelKeys: string[];
 }
 
-function StepIndicator({ currentStep, totalSteps, visitedSteps, completedSteps, onStepClick }: StepIndicatorProps) {
+function StepIndicator({ currentStep, totalSteps, visitedSteps, completedSteps, onStepClick, stepLabelKeys }: StepIndicatorProps) {
   const { t } = useTranslation('onboarding');
   return (
     <div className="flex items-center justify-between">
@@ -1202,7 +1235,7 @@ function StepIndicator({ currentStep, totalSteps, visitedSteps, completedSteps, 
             <Button
               variant="light"
               onPress={() => isClickable && onStepClick(step)}
-              aria-label={t('aria_step', { step, label: t(STEP_LABEL_KEYS[i]), status: isCompleted ? t('aria_completed') : isCurrent ? t('aria_current') : '' })}
+              aria-label={t('aria_step', { step, label: t(stepLabelKeys[i]), status: isCompleted ? t('aria_completed') : isCurrent ? t('aria_current') : '' })}
               aria-current={isCurrent ? 'step' : undefined}
               isDisabled={!isClickable}
               className={`
@@ -1233,7 +1266,7 @@ function StepIndicator({ currentStep, totalSteps, visitedSteps, completedSteps, 
                   ${isCurrent ? 'text-emerald-600 dark:text-emerald-400' : 'text-theme-subtle'}
                 `}
               >
-                {t(STEP_LABEL_KEYS[i])}
+                {t(stepLabelKeys[i])}
               </span>
             </Button>
 

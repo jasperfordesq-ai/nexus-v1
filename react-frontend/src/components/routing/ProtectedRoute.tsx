@@ -28,7 +28,7 @@ const LEGAL_GATE_BYPASS_SEGMENTS = new Set([
 
 export function ProtectedRoute({ children }: ProtectedRouteProps) {
   const { isAuthenticated, isLoading, status, user } = useAuth();
-  const { tenantPath } = useTenant();
+  const { tenantPath, tenant } = useTenant();
   const location = useLocation();
   const { hasPending, pendingDocs, acceptAll, isAccepting, isLoading: legalLoading } = useLegalGate();
 
@@ -42,15 +42,20 @@ export function ProtectedRoute({ children }: ProtectedRouteProps) {
     return <Navigate to={tenantPath('/login')} state={{ from: location.pathname }} replace />;
   }
 
-  // Redirect to onboarding only if the flag is not set.
-  // onboarding_completed is the authoritative source of truth — the backend
-  // already requires avatar+bio before it will set this flag, so we do not
-  // need to re-check those fields here. Doing so caused a regression where
-  // users who edited their profile (removed avatar or bio) were permanently
-  // sent back to onboarding on every login.
+  // Redirect to onboarding only if the flag is not set AND onboarding is
+  // both enabled and mandatory for this tenant. onboarding_completed is the
+  // authoritative source of truth — the backend already requires avatar+bio
+  // before it will set this flag.
+  //
+  // The tenant bootstrap payload includes onboarding settings. When
+  // onboarding.enabled=false or onboarding.mandatory=false, we skip the
+  // redirect entirely so members can use the platform without onboarding.
   const pathSegments = location.pathname.replace(/\/+$/, '').split('/');
   const lastSegment = pathSegments[pathSegments.length - 1];
-  const needsOnboarding = user && !user.onboarding_completed;
+  const onboardingSettings = tenant?.settings as Record<string, unknown> | undefined;
+  const onboardingEnabled = onboardingSettings?.onboarding_enabled !== false;
+  const onboardingMandatory = onboardingSettings?.onboarding_mandatory !== false;
+  const needsOnboarding = user && !user.onboarding_completed && onboardingEnabled && onboardingMandatory;
   if (needsOnboarding && lastSegment !== 'onboarding') {
     return <Navigate to={tenantPath('/onboarding')} replace />;
   }

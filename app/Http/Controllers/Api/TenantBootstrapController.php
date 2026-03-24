@@ -294,6 +294,10 @@ class TenantBootstrapController extends BaseApiController
 
         $data['settings'] = $this->buildGeneralSettings((int) $tenant['id']);
 
+        // Add onboarding module flags to bootstrap (non-sensitive, safe for public payload)
+        $data['settings']['onboarding_enabled'] = $this->getOnboardingSetting((int) $tenant['id'], 'onboarding.enabled', '1') === '1';
+        $data['settings']['onboarding_mandatory'] = $this->getOnboardingSetting((int) $tenant['id'], 'onboarding.mandatory', '1') === '1';
+
         $data['compliance'] = [
             'vetting_enabled' => $this->brokerControlConfigService->isVettingEnabled(),
             'insurance_enabled' => $this->brokerControlConfigService->isInsuranceEnabled(),
@@ -338,6 +342,22 @@ class TenantBootstrapController extends BaseApiController
         }
 
         return $settings;
+    }
+
+    /**
+     * Read a single onboarding setting with a default fallback.
+     */
+    private function getOnboardingSetting(int $tenantId, string $key, string $default): string
+    {
+        try {
+            $row = DB::table('tenant_settings')
+                ->where('tenant_id', $tenantId)
+                ->where('setting_key', $key)
+                ->value('setting_value');
+            return $row !== null ? (string) $row : $default;
+        } catch (\Throwable $e) {
+            return $default;
+        }
     }
 
     private function buildMenuPages(int $tenantId): array
