@@ -29,6 +29,8 @@ interface PresenceIndicatorProps {
   size?: 'sm' | 'md' | 'lg';
   /** Custom class for positioning override */
   className?: string;
+  /** Show a dot even when offline (gray dot). Default: false (hides when offline). */
+  showOffline?: boolean;
 }
 
 /**
@@ -87,6 +89,7 @@ export const PresenceIndicator = memo(function PresenceIndicator({
   userId,
   size = 'md',
   className,
+  showOffline = false,
 }: PresenceIndicatorProps) {
   const { t } = useTranslation('social');
   const presence = usePresenceOptional();
@@ -96,8 +99,11 @@ export const PresenceIndicator = memo(function PresenceIndicator({
     return presence.getPresence(userId);
   }, [presence, userId]);
 
-  // Don't render anything if presence is unavailable or user is offline
-  if (!presenceState || presenceState.status === 'offline') {
+  // Don't render anything if presence is unavailable
+  if (!presenceState) return null;
+
+  // Hide offline users unless showOffline is set
+  if (presenceState.status === 'offline' && !showOffline) {
     return null;
   }
 

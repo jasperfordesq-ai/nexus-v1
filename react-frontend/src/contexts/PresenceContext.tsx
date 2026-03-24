@@ -149,7 +149,21 @@ export function PresenceProvider({ children }: PresenceProviderProps) {
       return;
     }
 
-    // Send initial heartbeat
+    // Optimistically mark current user as online immediately so the indicator
+    // shows green right away without waiting for the server round-trip.
+    setOnlineUsers((prev) => {
+      if (prev.has(user.id)) return prev; // keep existing cached data
+      const next = new Map(prev);
+      next.set(user.id, {
+        status: 'online',
+        last_seen_at: new Date().toISOString(),
+        custom_status: null,
+        status_emoji: null,
+      });
+      return next;
+    });
+
+    // Send initial heartbeat (server-side status syncs via subsequent heartbeats)
     sendHeartbeat();
 
     // Set up recurring heartbeat

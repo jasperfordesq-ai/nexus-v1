@@ -699,7 +699,7 @@ export function Navbar({ onMobileMenuOpen, externalSearchOpen, onSearchOpenChang
                           className="cursor-pointer ring-2 ring-transparent hover:ring-indigo-500/50 transition-all w-8 h-8 sm:w-9 sm:h-9"
                           showFallback
                         />
-                        {user?.id && <PresenceIndicator userId={user.id} size="sm" />}
+                        {user?.id && <PresenceIndicator userId={user.id} size="lg" showOffline />}
                       </div>
                     </DropdownTrigger>
                     <DropdownMenu

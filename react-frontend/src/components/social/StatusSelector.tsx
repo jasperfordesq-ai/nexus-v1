@@ -108,24 +108,33 @@ export function StatusSelector({ children }: StatusSelectorProps) {
     return <>{children}</>;
   }
 
+  const currentStatusKey = currentStatus?.status ?? 'offline';
+  const statusColorClass =
+    currentStatusKey === 'online'
+      ? 'fill-green-500 text-green-500'
+      : currentStatusKey === 'away'
+        ? 'fill-yellow-500 text-yellow-500'
+        : currentStatusKey === 'dnd'
+          ? 'fill-red-500 text-red-500'
+          : 'fill-gray-400 text-gray-400';
+  const statusLabel =
+    currentStatusKey === 'online'
+      ? t('status.online', 'Online')
+      : currentStatusKey === 'away'
+        ? t('status.away', 'Away')
+        : currentStatusKey === 'dnd'
+          ? t('status.dnd', 'DND')
+          : t('status.offline', 'Offline');
+
   const trigger = children ?? (
     <Button
       variant="light"
       size="sm"
-      className="min-w-0 px-2 gap-1"
+      className="min-w-0 px-2 gap-1.5"
       aria-label={t('status.set_status', 'Set status')}
     >
-      <Circle
-        className={`w-2.5 h-2.5 ${
-          currentStatus?.status === 'online'
-            ? 'fill-green-500 text-green-500'
-            : currentStatus?.status === 'away'
-              ? 'fill-yellow-500 text-yellow-500'
-              : currentStatus?.status === 'dnd'
-                ? 'fill-red-500 text-red-500'
-                : 'fill-gray-400 text-gray-400'
-        }`}
-      />
+      <Circle className={`w-3.5 h-3.5 ${statusColorClass}`} />
+      <span className="text-xs font-medium hidden sm:block">{statusLabel}</span>
     </Button>
   );
 
