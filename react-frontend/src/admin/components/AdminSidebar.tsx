@@ -192,6 +192,7 @@ function useAdminNav(): NavSection[] {
           { label: t('insurance_certificates'), href: '/admin/broker-controls/insurance', icon: FileCheck },
           { label: t('review_archive'), href: '/admin/broker-controls/archives', icon: Archive },
           { label: t('safeguarding'), href: '/admin/safeguarding', icon: ShieldCheck },
+          { label: t('safeguarding_options'), href: '/admin/safeguarding-options', icon: Shield },
         ],
       },
       {
@@ -297,6 +298,7 @@ function useAdminNav(): NavSection[] {
         icon: Settings,
         items: [
           { label: t('settings'), href: '/admin/settings', icon: Settings },
+          { label: t('onboarding_settings'), href: '/admin/onboarding-settings', icon: Sparkles },
           { label: t('tenant_features'), href: '/admin/tenant-features', icon: Cog },
           { label: t('cron_jobs'), href: '/admin/cron-jobs', icon: Timer },
           { label: t('cron_logs'), href: '/admin/cron-jobs/logs', icon: FileText },

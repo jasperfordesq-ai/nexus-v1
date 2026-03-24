@@ -142,6 +142,10 @@ const Neighborhoods = lazy(() => import('./modules/federation/Neighborhoods'));
 
 // Safeguarding module
 const SafeguardingDashboard = lazy(() => import('./modules/safeguarding/SafeguardingDashboard'));
+const SafeguardingOptionsAdmin = lazy(() => import('./modules/safeguarding/SafeguardingOptionsAdmin'));
+
+// Onboarding module
+const OnboardingSettings = lazy(() => import('./modules/system/OnboardingSettings'));
 
 // Advanced/SEO module
 const AiSettings = lazy(() => import('./modules/advanced/AiSettings'));
@@ -395,10 +399,12 @@ export function AdminRoutes() {
 
       {/* ─── SAFEGUARDING ─── */}
       <Route path="safeguarding" element={<Lazy><SafeguardingDashboard /></Lazy>} />
+      <Route path="safeguarding-options" element={<Lazy><SafeguardingOptionsAdmin /></Lazy>} />
 
       {/* ─── SYSTEM ─── */}
       <Route path="settings" element={<Lazy><AdminSettings /></Lazy>} />
       <Route path="settings/registration-policy" element={<Lazy><RegistrationPolicySettings /></Lazy>} />
+      <Route path="onboarding-settings" element={<Lazy><OnboardingSettings /></Lazy>} />
       <Route path="tenant-features" element={<Lazy><TenantFeatures /></Lazy>} />
       <Route path="cron-jobs" element={<Lazy><CronJobs /></Lazy>} />
       <Route path="cron-jobs/logs" element={<Lazy><CronJobLogs /></Lazy>} />
