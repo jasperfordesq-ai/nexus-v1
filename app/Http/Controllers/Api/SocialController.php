@@ -1316,7 +1316,7 @@ class SocialController extends BaseApiController
             return null;
         }
 
-        $uploadDir = public_path('uploads/posts');
+        $uploadDir = base_path('httpdocs/uploads/posts');
         if (! is_dir($uploadDir)) {
             mkdir($uploadDir, 0755, true);
         }
@@ -1379,7 +1379,7 @@ class SocialController extends BaseApiController
             : '0';
 
         $rows = DB::select(
-            "SELECT p.id, p.content, p.image as image_url, p.created_at, p.likes_count, p.user_id,
+            "SELECT p.id, p.content, p.image_url, p.created_at, p.likes_count, p.user_id,
                     'post' as type,
                     COALESCE(u.name, CONCAT(u.first_name, ' ', u.last_name)) as author_name,
                     u.avatar_url as author_avatar,
@@ -1408,7 +1408,7 @@ class SocialController extends BaseApiController
             : '0';
 
         $rows = DB::select(
-            "SELECT p.id, p.content, p.image as image_url, p.created_at, p.likes_count,
+            "SELECT p.id, p.content, p.image_url, p.created_at, p.likes_count,
                     'post' as type,
                     COALESCE(u.name, CONCAT(u.first_name, ' ', u.last_name)) as author_name,
                     u.avatar_url as author_avatar,
@@ -1446,7 +1446,7 @@ class SocialController extends BaseApiController
             $postLimit = ($filter === 'posts') ? $limit : 30;
 
             $rows = DB::select(
-                "SELECT p.id, p.content, p.image as image_url, p.created_at, p.likes_count,
+                "SELECT p.id, p.content, p.image_url, p.created_at, p.likes_count,
                         'post' as type,
                         COALESCE(u.name, CONCAT(u.first_name, ' ', u.last_name)) as author_name,
                         u.avatar_url as author_avatar,

@@ -549,7 +549,7 @@ class FeedService
         switch ($type) {
             case 'post':
                 $rows = DB::select(
-                    "SELECT p.id, p.content, p.image as image_url, p.created_at, p.likes_count, p.user_id,
+                    "SELECT p.id, p.content, p.image_url, p.created_at, p.likes_count, p.user_id,
                            'post' as type,
                            COALESCE(u.name, CONCAT(u.first_name, ' ', u.last_name)) as author_name,
                            u.avatar_url as author_avatar,

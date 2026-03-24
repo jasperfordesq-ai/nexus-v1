@@ -110,6 +110,11 @@ export default defineConfig(({ command }) => ({
         target: process.env.VITE_API_URL || 'http://localhost:8090',
         changeOrigin: true,
       },
+      // Proxy uploaded assets (images, media) to PHP backend
+      '/uploads': {
+        target: process.env.VITE_API_URL || 'http://localhost:8090',
+        changeOrigin: true,
+      },
       // Proxy health check
       '/health.php': {
         target: process.env.VITE_API_URL || 'http://localhost:8090',

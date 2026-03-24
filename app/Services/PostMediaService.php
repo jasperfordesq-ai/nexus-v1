@@ -67,7 +67,7 @@ class PostMediaService
             ->where('post_id', $postId)
             ->max('display_order');
 
-        $uploadDir = public_path("uploads/posts/{$tenantId}/{$postId}");
+        $uploadDir = base_path("httpdocs/uploads/posts/{$tenantId}/{$postId}");
         if (!is_dir($uploadDir)) {
             mkdir($uploadDir, 0755, true);
         }
@@ -430,7 +430,7 @@ class PostMediaService
      */
     private function deleteFileFromDisk(string $urlPath): void
     {
-        $fullPath = public_path($urlPath);
+        $fullPath = base_path('httpdocs' . $urlPath);
         if (file_exists($fullPath)) {
             @unlink($fullPath);
         }

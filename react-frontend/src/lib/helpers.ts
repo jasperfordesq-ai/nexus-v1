@@ -14,7 +14,7 @@ import { logError } from './logger';
  * API Base URL for resolving relative image/asset URLs
  * This is the PHP backend URL where uploads are stored
  */
-const API_ASSET_BASE = import.meta.env.VITE_API_BASE?.replace(/\/api$/, '') || 'https://api.project-nexus.ie';
+const API_ASSET_BASE = import.meta.env.VITE_API_BASE?.replace(/\/api$/, '') || (import.meta.env.DEV ? '' : 'https://api.project-nexus.ie');
 
 /**
  * Resolve a relative URL to an absolute URL pointing to the API server.
