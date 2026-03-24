@@ -79,31 +79,54 @@ class PollService
 
         $data = $poll->toArray();
 
-        $data['options'] = DB::table('poll_options')
+        $optionRows = DB::table('poll_options')
             ->where('poll_id', $id)
             ->get()
             ->map(fn ($o) => [
-                'id'    => $o->id,
-                'text'  => $o->label,
-                'votes' => (int) DB::table('poll_votes')->where('option_id', $o->id)->count(),
+                'id'         => $o->id,
+                'label'      => $o->label,
+                'vote_count' => (int) DB::table('poll_votes')->where('option_id', $o->id)->count(),
             ])->all();
 
-        $data['total_votes'] = array_sum(array_column($data['options'], 'votes'));
+        $totalVotes = array_sum(array_column($optionRows, 'vote_count'));
+
+        $data['options'] = array_map(function (array $opt) use ($totalVotes) {
+            $opt['percentage'] = $totalVotes > 0
+                ? round(($opt['vote_count'] / $totalVotes) * 100, 1)
+                : 0;
+            return $opt;
+        }, $optionRows);
+
+        $data['total_votes'] = $totalVotes;
 
         $data['has_voted'] = $currentUserId
             ? DB::table('poll_votes')->where('poll_id', $id)->where('user_id', $currentUserId)->exists()
             : false;
 
-        $data['user_voted_option'] = null;
+        $votedOptionId = null;
         if ($currentUserId) {
             $vote = DB::table('poll_votes')
                 ->where('poll_id', $id)
                 ->where('user_id', $currentUserId)
                 ->first();
-            $data['user_voted_option'] = $vote ? (int) $vote->option_id : null;
+            $votedOptionId = $vote ? (int) $vote->option_id : null;
         }
+        $data['voted_option_id'] = $votedOptionId;
 
         $data['poll_type'] = $data['poll_type'] ?? 'standard';
+
+        // Compute status for frontend
+        $endDate = $poll->end_date ?? $poll->expires_at ?? null;
+        $data['status'] = ($poll->is_active && (! $endDate || now()->lt($endDate))) ? 'open' : 'closed';
+        $data['expires_at'] = $endDate ? (string) $endDate : null;
+
+        // Normalise creator field from loaded user relation
+        $user = $poll->user;
+        $data['creator'] = $user ? [
+            'id'         => (int) $user->id,
+            'name'       => trim(($user->first_name ?? '') . ' ' . ($user->last_name ?? '')),
+            'avatar_url' => $user->avatar_url ?? null,
+        ] : ['id' => (int) $poll->user_id, 'name' => 'Unknown', 'avatar_url' => null];
 
         return $data;
     }
@@ -128,9 +151,9 @@ class PollService
             if (! empty($data['options'])) {
                 foreach ($data['options'] as $text) {
                     DB::table('poll_options')->insert([
-                        'poll_id'     => $poll->id,
-                        'option_text' => trim($text),
-                        'created_at'  => now(),
+                        'poll_id'    => $poll->id,
+                        'label'      => trim($text),
+                        'created_at' => now(),
                     ]);
                 }
             }
