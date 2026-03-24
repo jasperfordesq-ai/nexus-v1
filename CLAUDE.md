@@ -515,4 +515,13 @@ sudo bash scripts/safe-deploy.sh quick      # Quick deploy (frontend + PHP resta
 sudo bash scripts/safe-deploy.sh rollback   # Rollback to last successful
 sudo bash scripts/safe-deploy.sh status     # Check deployment status
 bash scripts/purge-cloudflare-cache.sh      # Cache purge only
+
+# Meilisearch — re-sync search index (run from LOCAL machine via SSH)
+# scripts/ is NOT volume-mounted in the PHP container, so must docker cp before exec
+# Run after: bulk listing imports, data migrations, or any Meilisearch data loss
+ssh -i "C:\ssh-keys\project-nexus.pem" -o RequestTTY=force azureuser@20.224.171.253 \
+  "sudo docker exec nexus-php-app mkdir -p /var/www/html/scripts && \
+   sudo docker cp /opt/nexus-php/scripts/sync_search_index.php \
+     nexus-php-app:/var/www/html/scripts/sync_search_index.php && \
+   sudo docker exec nexus-php-app php scripts/sync_search_index.php --all-tenants"
 ```
