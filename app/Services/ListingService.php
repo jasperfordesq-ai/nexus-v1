@@ -79,11 +79,27 @@ class ListingService
 
             // Filters expressible in Meilisearch
             $meiliFilters = [];
+
             if (!empty($filters['category_id'])) {
                 $meiliFilters[] = 'category_id = ' . (int) $filters['category_id'];
+            } elseif (!empty($filters['category_slug'])) {
+                // Resolve slug → id so Meilisearch can apply the category filter
+                $catId = DB::table('categories')
+                    ->where('slug', $filters['category_slug'])
+                    ->where('type', 'listing')
+                    ->where('tenant_id', $tenantId)
+                    ->value('id');
+                if ($catId) {
+                    $meiliFilters[] = 'category_id = ' . $catId;
+                }
             }
+
             if (!empty($filters['type']) && is_string($filters['type'])) {
                 $meiliFilters[] = "type = '{$filters['type']}'";
+            }
+
+            if (!empty($filters['user_id'])) {
+                $meiliFilters[] = 'user_id = ' . (int) $filters['user_id'];
             }
 
             $meiliResult = SearchService::searchListingIds(
@@ -306,9 +322,21 @@ class ListingService
             $meiliFilters = [];
             if (!empty($filters['category_id'])) {
                 $meiliFilters[] = 'category_id = ' . (int) $filters['category_id'];
+            } elseif (!empty($filters['category_slug'])) {
+                $catId = DB::table('categories')
+                    ->where('slug', $filters['category_slug'])
+                    ->where('type', 'listing')
+                    ->where('tenant_id', $tenantId)
+                    ->value('id');
+                if ($catId) {
+                    $meiliFilters[] = 'category_id = ' . $catId;
+                }
             }
             if (!empty($filters['type']) && is_string($filters['type'])) {
                 $meiliFilters[] = "type = '{$filters['type']}'";
+            }
+            if (!empty($filters['user_id'])) {
+                $meiliFilters[] = 'user_id = ' . (int) $filters['user_id'];
             }
             $meiliResult = SearchService::searchListingIds($filters['search'], $tenantId, $meiliFilters, 1, 0);
             if ($meiliResult !== null) {

@@ -85,7 +85,7 @@ class SearchService
             'listings' => [
                 'pk'         => 'id',
                 'searchable' => ['title', 'description', 'location', 'author_name', 'category_name'],
-                'filterable' => ['tenant_id', 'status', 'category_id', 'type'],
+                'filterable' => ['tenant_id', 'status', 'category_id', 'type', 'user_id'],
                 'sortable'   => ['created_at'],
             ],
             'users' => [
@@ -130,6 +130,7 @@ class SearchService
         $doc = $listing instanceof Listing ? [
             'id'            => $listing->id,
             'tenant_id'     => $listing->tenant_id,
+            'user_id'       => $listing->user_id,
             'title'         => $listing->title ?? '',
             'description'   => $listing->description ?? '',
             'location'      => $listing->location ?? '',
