@@ -205,7 +205,7 @@ export function SafeguardingStep({ onNext, onBack, onSkip, isRequired, introText
         <div className="p-4 rounded-lg bg-theme-elevated mb-5">
           <p className="text-sm text-theme-secondary leading-relaxed">
             {introText || t('safeguarding_intro',
-              'We want to make sure everyone feels safe in our community. The information below helps our coordinators arrange safe and appropriate exchanges for you. Your responses are confidential and only visible to community coordinators — never on your public profile.'
+              'Your safety matters to us. If you consider yourself a vulnerable adult, or if you would like additional support when using this community, please let us know below. Our coordinators can arrange safeguarded exchanges, mediate contact on your behalf, and ensure you are matched with appropriately vetted members. Your responses are confidential and only visible to community coordinators — never on your public profile.'
             )}
           </p>
         </div>
