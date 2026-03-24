@@ -234,6 +234,7 @@ use App\Services\WebAuthnChallengeStore;
 use App\Services\WebPushService;
 use App\Services\WebhookDispatchService;
 use App\Services\AI\AIServiceFactory;
+use App\Observers\ListingObserver;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -1014,6 +1015,8 @@ class AppServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
+        Listing::observe(ListingObserver::class);
+
         // SAFETY: Prevent migrate:fresh/refresh from wiping the main database.
         // Only nexus_test may be wiped. This guards against accidental data loss
         // from RefreshDatabase in tests or manual artisan commands.

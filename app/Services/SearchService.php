@@ -214,7 +214,7 @@ class SearchService
      * Remove a listing from the Meilisearch index.
      * Silently skips if Meilisearch is unavailable.
      */
-    public function removeListing(int $listingId): void
+    public static function removeListing(int $listingId): void
     {
         if (!static::isAvailable()) {
             return;
