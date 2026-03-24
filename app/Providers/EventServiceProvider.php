@@ -10,11 +10,13 @@ use App\Events\ConnectionRequested;
 use App\Events\JobVacancyCreated;
 use App\Events\ListingCreated;
 use App\Events\MessageSent;
+use App\Events\SafeguardingFlaggedEvent;
 use App\Events\TransactionCompleted;
 use App\Events\UserRegistered;
 use App\Listeners\NotifyConnectionRequest;
 use App\Listeners\NotifyJobAlertSubscribers;
 use App\Listeners\NotifyMessageReceived;
+use App\Listeners\NotifySafeguardingStaff;
 use App\Listeners\SendWelcomeNotification;
 use App\Listeners\UpdateFeedOnListingCreated;
 use App\Listeners\UpdateWalletBalance;
@@ -57,6 +59,10 @@ class EventServiceProvider extends ServiceProvider
 
         JobVacancyCreated::class => [
             NotifyJobAlertSubscribers::class,
+        ],
+
+        SafeguardingFlaggedEvent::class => [
+            NotifySafeguardingStaff::class,
         ],
     ];
 

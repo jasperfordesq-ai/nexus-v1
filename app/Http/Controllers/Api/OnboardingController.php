@@ -9,12 +9,15 @@ namespace App\Http\Controllers\Api;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
 use App\Core\TenantContext;
+use App\Services\OnboardingConfigService;
 use App\Services\OnboardingService;
+use App\Services\SafeguardingPreferenceService;
 
 /**
  * OnboardingController -- New member onboarding flow.
  *
- * All methods now use Laravel DI services (no legacy static calls).
+ * Supports admin-configurable steps, safeguarding preferences, and
+ * listing creation modes. All methods are tenant-scoped.
  */
 class OnboardingController extends BaseApiController
 {
@@ -109,6 +112,81 @@ class OnboardingController extends BaseApiController
             'message'          => 'Onboarding complete!',
             'listings_created' => count($listingIds),
             'listing_ids'      => $listingIds,
+        ]);
+    }
+
+    /** GET onboarding/config — tenant onboarding configuration for the frontend */
+    public function getConfig(): JsonResponse
+    {
+        $this->requireAuth();
+        $tenantId = TenantContext::getId();
+
+        $config = OnboardingConfigService::getConfig($tenantId);
+        $steps = OnboardingConfigService::getActiveSteps($tenantId);
+
+        return $this->respondWithData([
+            'config' => $config,
+            'steps' => $steps,
+        ]);
+    }
+
+    /** GET onboarding/safeguarding-options — active safeguarding options for member */
+    public function safeguardingOptions(): JsonResponse
+    {
+        $this->requireAuth();
+        $tenantId = TenantContext::getId();
+
+        $options = SafeguardingPreferenceService::getOptionsForTenant($tenantId);
+
+        // Strip internal fields — members see label, description, type, required, select_options only
+        $memberOptions = array_map(fn ($opt) => [
+            'id' => $opt['id'],
+            'option_key' => $opt['option_key'],
+            'option_type' => $opt['option_type'],
+            'label' => $opt['label'],
+            'description' => $opt['description'],
+            'help_url' => $opt['help_url'],
+            'is_required' => $opt['is_required'],
+            'select_options' => $opt['select_options'],
+        ], $options);
+
+        return $this->respondWithData($memberOptions);
+    }
+
+    /** POST onboarding/safeguarding — save member safeguarding preferences */
+    public function saveSafeguarding(): JsonResponse
+    {
+        $userId = $this->requireAuth();
+
+        $preferences = $this->input('preferences', []);
+        if (!is_array($preferences) || empty($preferences)) {
+            return $this->respondWithError(
+                'VALIDATION_ERROR',
+                'preferences must be a non-empty array of {option_id, value}',
+                'preferences',
+                422
+            );
+        }
+
+        // Validate each preference has required fields
+        foreach ($preferences as $idx => $pref) {
+            if (empty($pref['option_id'])) {
+                return $this->respondWithError(
+                    'VALIDATION_ERROR',
+                    "preferences[{$idx}].option_id is required",
+                    'preferences',
+                    422
+                );
+            }
+        }
+
+        $ipAddress = request()?->ip();
+
+        SafeguardingPreferenceService::saveUserPreferences($userId, $preferences, $ipAddress);
+
+        return $this->respondWithData([
+            'message' => 'Safeguarding preferences saved',
+            'preferences_count' => count($preferences),
         ]);
     }
 }

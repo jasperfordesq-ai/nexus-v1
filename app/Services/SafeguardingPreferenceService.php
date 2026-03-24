@@ -1,0 +1,390 @@
+<?php
+// Copyright © 2024–2026 Jasper Ford
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Author: Jasper Ford
+// See NOTICE file for attribution and acknowledgements.
+
+namespace App\Services;
+
+use App\Core\TenantContext;
+use App\Models\TenantSafeguardingOption;
+use App\Models\UserSafeguardingPreference;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+
+/**
+ * CRUD for tenant safeguarding options and member preferences.
+ *
+ * All access to member preferences is audit-logged. This service also handles
+ * country preset application and integrates with SafeguardingTriggerService
+ * to activate broker protections when preferences are saved.
+ */
+class SafeguardingPreferenceService
+{
+    // =========================================================================
+    // Tenant Safeguarding Options (Admin CRUD)
+    // =========================================================================
+
+    /**
+     * Get all active safeguarding options for a tenant, ordered by sort_order.
+     */
+    public static function getOptionsForTenant(?int $tenantId = null): array
+    {
+        $tenantId = $tenantId ?? TenantContext::getId();
+
+        return TenantSafeguardingOption::where('tenant_id', $tenantId)
+            ->active()
+            ->get()
+            ->map(fn ($opt) => $opt->toArray())
+            ->all();
+    }
+
+    /**
+     * Get ALL options for a tenant (including inactive), for admin management.
+     */
+    public static function getAllOptionsForTenant(?int $tenantId = null): array
+    {
+        $tenantId = $tenantId ?? TenantContext::getId();
+
+        return TenantSafeguardingOption::where('tenant_id', $tenantId)
+            ->orderBy('sort_order')
+            ->get()
+            ->map(fn ($opt) => $opt->toArray())
+            ->all();
+    }
+
+    /**
+     * Create a new safeguarding option for a tenant.
+     */
+    public static function createOption(int $tenantId, array $data): TenantSafeguardingOption
+    {
+        $option = TenantSafeguardingOption::create([
+            'tenant_id' => $tenantId,
+            'option_key' => $data['option_key'],
+            'option_type' => $data['option_type'] ?? 'checkbox',
+            'label' => $data['label'],
+            'description' => $data['description'] ?? null,
+            'help_url' => $data['help_url'] ?? null,
+            'sort_order' => $data['sort_order'] ?? 0,
+            'is_active' => $data['is_active'] ?? true,
+            'is_required' => $data['is_required'] ?? false,
+            'select_options' => $data['select_options'] ?? null,
+            'triggers' => $data['triggers'] ?? [],
+            'preset_source' => $data['preset_source'] ?? null,
+        ]);
+
+        self::logActivity(null, 'safeguarding_option_created', 'safeguarding_option', $option->id, [
+            'option_key' => $option->option_key,
+            'label' => $option->label,
+        ]);
+
+        return $option;
+    }
+
+    /**
+     * Update an existing safeguarding option.
+     */
+    public static function updateOption(int $optionId, array $data): bool
+    {
+        $option = TenantSafeguardingOption::find($optionId);
+        if (!$option) {
+            return false;
+        }
+
+        $fillable = ['label', 'description', 'help_url', 'sort_order', 'is_active', 'is_required', 'option_type', 'select_options', 'triggers'];
+        $updates = array_intersect_key($data, array_flip($fillable));
+
+        $option->update($updates);
+
+        self::logActivity(null, 'safeguarding_option_updated', 'safeguarding_option', $optionId, [
+            'option_key' => $option->option_key,
+            'changes' => array_keys($updates),
+        ]);
+
+        return true;
+    }
+
+    /**
+     * Soft-delete (deactivate) a safeguarding option. Keeps data for audit trail.
+     */
+    public static function deleteOption(int $optionId): bool
+    {
+        $option = TenantSafeguardingOption::find($optionId);
+        if (!$option) {
+            return false;
+        }
+
+        $option->update(['is_active' => false]);
+
+        self::logActivity(null, 'safeguarding_option_deleted', 'safeguarding_option', $optionId, [
+            'option_key' => $option->option_key,
+        ]);
+
+        return true;
+    }
+
+    /**
+     * Reorder options for a tenant.
+     *
+     * @param array $order Array of [id => sort_order]
+     */
+    public static function reorderOptions(int $tenantId, array $order): void
+    {
+        foreach ($order as $optionId => $sortOrder) {
+            TenantSafeguardingOption::where('id', (int) $optionId)
+                ->where('tenant_id', $tenantId)
+                ->update(['sort_order' => (int) $sortOrder]);
+        }
+    }
+
+    // =========================================================================
+    // Country Preset Application
+    // =========================================================================
+
+    /**
+     * Apply a country preset to a tenant. Uses INSERT IGNORE to avoid
+     * overwriting existing custom options with the same option_key.
+     *
+     * @return array List of option_keys that were created (not already existing)
+     */
+    public static function applyCountryPreset(int $tenantId, string $presetKey): array
+    {
+        $presets = config('safeguarding_presets', []);
+        $preset = $presets[$presetKey] ?? null;
+
+        if (!$preset || empty($preset['options'])) {
+            return [];
+        }
+
+        $created = [];
+        $sortOrder = 0;
+
+        foreach ($preset['options'] as $opt) {
+            $sortOrder += 10;
+
+            // INSERT IGNORE — won't overwrite existing option_keys
+            $existing = TenantSafeguardingOption::where('tenant_id', $tenantId)
+                ->where('option_key', $opt['option_key'])
+                ->first();
+
+            if ($existing) {
+                continue; // Don't overwrite admin customisations
+            }
+
+            TenantSafeguardingOption::create([
+                'tenant_id' => $tenantId,
+                'option_key' => $opt['option_key'],
+                'option_type' => $opt['option_type'] ?? 'checkbox',
+                'label' => $opt['label'],
+                'description' => $opt['description'] ?? null,
+                'sort_order' => $sortOrder,
+                'is_active' => true,
+                'is_required' => false,
+                'triggers' => $opt['triggers'] ?? [],
+                'preset_source' => $presetKey,
+            ]);
+
+            $created[] = $opt['option_key'];
+        }
+
+        self::logActivity(null, 'safeguarding_preset_applied', 'tenant', $tenantId, [
+            'preset' => $presetKey,
+            'options_created' => $created,
+        ]);
+
+        return $created;
+    }
+
+    /**
+     * Get available country presets (for admin UI dropdown).
+     */
+    public static function getAvailablePresets(): array
+    {
+        $presets = config('safeguarding_presets', []);
+        $result = [];
+
+        foreach ($presets as $key => $preset) {
+            $result[] = [
+                'key' => $key,
+                'name' => $preset['name'] ?? $key,
+                'vetting_authority' => $preset['vetting_authority'] ?? '',
+                'help_text' => $preset['help_text'] ?? '',
+                'option_count' => count($preset['options'] ?? []),
+            ];
+        }
+
+        return $result;
+    }
+
+    // =========================================================================
+    // User Safeguarding Preferences (Member CRUD)
+    // =========================================================================
+
+    /**
+     * Get a user's safeguarding preferences. ALWAYS audit-logged.
+     *
+     * @param int $accessorId Who is reading this data
+     * @param string $accessorRole admin, broker, or member
+     * @param string $context Why the data is being accessed (e.g., 'onboarding_review', 'broker_dashboard')
+     */
+    public static function getUserPreferences(
+        int $tenantId,
+        int $userId,
+        int $accessorId,
+        string $accessorRole,
+        string $context = 'api_request'
+    ): array {
+        // Audit log every read
+        self::logActivity($accessorId, 'safeguarding_preferences_viewed', 'user', $userId, [
+            'accessor_role' => $accessorRole,
+            'context' => $context,
+        ]);
+
+        return UserSafeguardingPreference::where('tenant_id', $tenantId)
+            ->where('user_id', $userId)
+            ->active()
+            ->with('option')
+            ->get()
+            ->map(fn ($pref) => [
+                'id' => $pref->id,
+                'option_id' => $pref->option_id,
+                'option_key' => $pref->option?->option_key,
+                'option_label' => $pref->option?->label,
+                'selected_value' => $pref->selected_value,
+                'notes' => $pref->notes,
+                'consent_given_at' => $pref->consent_given_at?->toISOString(),
+            ])
+            ->all();
+    }
+
+    /**
+     * Save a user's safeguarding preferences from onboarding.
+     * Records GDPR consent per option. Triggers broker protections.
+     *
+     * @param array $preferences Array of [{option_id, value, notes?}]
+     * @param string|null $ipAddress User's IP for consent record
+     */
+    public static function saveUserPreferences(
+        int $userId,
+        array $preferences,
+        ?string $ipAddress = null
+    ): void {
+        $tenantId = TenantContext::getId();
+        $now = now();
+
+        DB::beginTransaction();
+        try {
+            foreach ($preferences as $pref) {
+                $optionId = (int) ($pref['option_id'] ?? 0);
+                $value = (string) ($pref['value'] ?? '1');
+                $notes = $pref['notes'] ?? null;
+
+                if ($optionId <= 0) {
+                    continue;
+                }
+
+                // Validate option exists and belongs to this tenant
+                $option = TenantSafeguardingOption::where('id', $optionId)
+                    ->where('tenant_id', $tenantId)
+                    ->where('is_active', true)
+                    ->first();
+
+                if (!$option) {
+                    continue;
+                }
+
+                // Upsert preference with consent timestamp
+                UserSafeguardingPreference::updateOrCreate(
+                    [
+                        'tenant_id' => $tenantId,
+                        'user_id' => $userId,
+                        'option_id' => $optionId,
+                    ],
+                    [
+                        'selected_value' => $value,
+                        'notes' => $notes,
+                        'consent_given_at' => $now,
+                        'consent_ip' => $ipAddress,
+                        'revoked_at' => null, // Re-consent clears any previous revocation
+                    ]
+                );
+            }
+
+            DB::commit();
+        } catch (\Throwable $e) {
+            DB::rollBack();
+            throw $e;
+        }
+
+        // Audit log
+        self::logActivity($userId, 'safeguarding_preferences_updated', 'user', $userId, [
+            'options_count' => count($preferences),
+        ]);
+
+        // Activate broker protections based on triggers
+        SafeguardingTriggerService::activateTriggersForUser($userId, $tenantId);
+    }
+
+    /**
+     * Revoke a specific preference (member withdraws consent).
+     */
+    public static function revokePreference(int $userId, int $optionId): bool
+    {
+        $tenantId = TenantContext::getId();
+
+        $pref = UserSafeguardingPreference::where('tenant_id', $tenantId)
+            ->where('user_id', $userId)
+            ->where('option_id', $optionId)
+            ->whereNull('revoked_at')
+            ->first();
+
+        if (!$pref) {
+            return false;
+        }
+
+        $pref->update(['revoked_at' => now()]);
+
+        self::logActivity($userId, 'safeguarding_consent_revoked', 'user', $userId, [
+            'option_id' => $optionId,
+        ]);
+
+        // Re-evaluate triggers (may deactivate protections)
+        SafeguardingTriggerService::activateTriggersForUser($userId, $tenantId);
+
+        return true;
+    }
+
+    // =========================================================================
+    // Audit Logging
+    // =========================================================================
+
+    /**
+     * Log safeguarding-related activity to the activity_log table.
+     */
+    private static function logActivity(
+        ?int $userId,
+        string $action,
+        string $entityType,
+        ?int $entityId,
+        array $details = []
+    ): void {
+        try {
+            DB::table('activity_log')->insert([
+                'user_id' => $userId,
+                'action' => $action,
+                'action_type' => 'safeguarding',
+                'entity_type' => $entityType,
+                'entity_id' => $entityId,
+                'details' => json_encode($details),
+                'ip_address' => request()?->ip(),
+                'user_agent' => request()?->userAgent(),
+                'created_at' => now(),
+            ]);
+        } catch (\Throwable $e) {
+            Log::error('SafeguardingPreferenceService: failed to log activity', [
+                'action' => $action,
+                'error' => $e->getMessage(),
+            ]);
+        }
+    }
+}

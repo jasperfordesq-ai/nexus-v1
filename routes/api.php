@@ -739,6 +739,19 @@ Route::get('/v2/admin/config/languages', [\App\Http\Controllers\Api\AdminConfigC
 Route::put('/v2/admin/config/languages', [\App\Http\Controllers\Api\AdminConfigController::class, 'updateLanguageConfig']);
 Route::get('/v2/admin/config/native-app', [\App\Http\Controllers\Api\AdminConfigController::class, 'getNativeAppConfig']);
 Route::put('/v2/admin/config/native-app', [\App\Http\Controllers\Api\AdminConfigController::class, 'updateNativeAppConfig']);
+// ── Admin: Onboarding Module Configuration ─────────────────────────────────
+Route::get('/v2/admin/config/onboarding', [\App\Http\Controllers\Api\AdminOnboardingConfigController::class, 'getConfig']);
+Route::put('/v2/admin/config/onboarding', [\App\Http\Controllers\Api\AdminOnboardingConfigController::class, 'updateConfig']);
+Route::get('/v2/admin/config/onboarding/presets', [\App\Http\Controllers\Api\AdminOnboardingConfigController::class, 'getPresets']);
+Route::post('/v2/admin/config/onboarding/apply-preset', [\App\Http\Controllers\Api\AdminOnboardingConfigController::class, 'applyPreset']);
+
+// ── Admin: Safeguarding Options CRUD ────────────────────────────────────────
+Route::get('/v2/admin/safeguarding/options', [\App\Http\Controllers\Api\AdminSafeguardingOptionsController::class, 'index']);
+Route::post('/v2/admin/safeguarding/options', [\App\Http\Controllers\Api\AdminSafeguardingOptionsController::class, 'store']);
+Route::put('/v2/admin/safeguarding/options/reorder', [\App\Http\Controllers\Api\AdminSafeguardingOptionsController::class, 'reorder']);
+Route::put('/v2/admin/safeguarding/options/{id}', [\App\Http\Controllers\Api\AdminSafeguardingOptionsController::class, 'update']);
+Route::delete('/v2/admin/safeguarding/options/{id}', [\App\Http\Controllers\Api\AdminSafeguardingOptionsController::class, 'destroy']);
+
 Route::get('/v2/admin/system/cron-jobs', [\App\Http\Controllers\Api\AdminConfigController::class, 'getCronJobs']);
 Route::post('/v2/admin/system/cron-jobs/{id}/run', [\App\Http\Controllers\Api\AdminConfigController::class, 'runCronJob']);
 Route::get('/v2/admin/system/cron-jobs/logs', [\App\Http\Controllers\Api\AdminCronController::class, 'getLogs']);
@@ -1370,7 +1383,10 @@ Route::middleware(['auth:sanctum', 'admin'])->group(function () {
     Route::put('/v2/admin/impact-report/config', [\App\Http\Controllers\Api\AdminImpactReportController::class, 'updateConfig']);
 });
 Route::get('/v2/onboarding/status', [\App\Http\Controllers\Api\OnboardingController::class, 'status']);
+Route::get('/v2/onboarding/config', [\App\Http\Controllers\Api\OnboardingController::class, 'getConfig']);
 Route::get('/v2/onboarding/categories', [\App\Http\Controllers\Api\OnboardingController::class, 'categories']);
+Route::get('/v2/onboarding/safeguarding-options', [\App\Http\Controllers\Api\OnboardingController::class, 'safeguardingOptions']);
+Route::post('/v2/onboarding/safeguarding', [\App\Http\Controllers\Api\OnboardingController::class, 'saveSafeguarding']);
 Route::post('/v2/onboarding/complete', [\App\Http\Controllers\Api\OnboardingController::class, 'complete']);
 Route::get('/v2/group-exchanges', [\App\Http\Controllers\Api\GroupExchangeController::class, 'index']);
 Route::post('/v2/group-exchanges', [\App\Http\Controllers\Api\GroupExchangeController::class, 'store']);
