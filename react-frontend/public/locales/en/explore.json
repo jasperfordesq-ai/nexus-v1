@@ -136,5 +136,16 @@
     "not_relevant": "Not relevant",
     "already_seen": "Already seen",
     "not_interested": "Not interested in this"
-  }
+  },
+  "loading": "Loading discover content...",
+  "sections_loaded": "Discover content loaded",
+  "for_you_empty": "Interact with listings, posts, and events to get personalised recommendations.",
+  "end_of_feed": "You're all caught up!",
+  "empty_listings": "No listings to show yet. Be the first to create one!",
+  "empty_people": "No members to show yet. Invite someone to join!",
+  "empty_events": "No upcoming events. Create one to bring your community together!",
+  "empty_groups": "No active groups yet. Start a group around your interests!",
+  "create_listing": "Create Listing",
+  "create_event": "Create Event",
+  "create_group": "Create Group"
 }

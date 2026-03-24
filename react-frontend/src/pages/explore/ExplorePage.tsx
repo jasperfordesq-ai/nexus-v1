@@ -3,7 +3,7 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import {
@@ -284,6 +284,7 @@ interface ExploreData {
   in_demand_skills: InDemandSkill[];
   featured_resources: FeaturedResource[];
   latest_jobs: JobVacancy[];
+  categories?: Array<{ id: number; name: string; slug: string; color?: string }>;
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -330,6 +331,47 @@ type ExploreTab = (typeof VALID_TABS)[number];
 
 function isValidTab(value: string | null): value is ExploreTab {
   return value != null && (VALID_TABS as readonly string[]).includes(value);
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// For You feed item (from /v2/explore/for-you)
+// ─────────────────────────────────────────────────────────────────────────────
+
+interface ForYouItem {
+  content_type: 'listing' | 'post' | 'event' | 'group' | 'member' | 'blog';
+  id: number;
+  title: string;
+  subtitle: string | null;
+  image_url: string | null;
+  meta: string | null;
+  url: string;
+  score: number;
+  created_at: string | null;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Empty state component
+// ─────────────────────────────────────────────────────────────────────────────
+
+function EmptyState({ icon: Icon, message, cta, onAction }: {
+  icon: React.ElementType;
+  message: string;
+  cta?: string;
+  onAction?: () => void;
+}) {
+  return (
+    <div className="flex flex-col items-center justify-center py-12 text-center">
+      <div className="w-16 h-16 rounded-full bg-[var(--surface-elevated)] flex items-center justify-center mb-4">
+        <Icon className="w-8 h-8 text-[var(--text-subtle)]" />
+      </div>
+      <p className="text-sm text-[var(--text-muted)] max-w-xs">{message}</p>
+      {cta && onAction && (
+        <Button size="sm" color="primary" variant="flat" className="mt-3" onPress={onAction}>
+          {cta}
+        </Button>
+      )}
+    </div>
+  );
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -382,10 +424,62 @@ export default function ExplorePage() {
 
   const { data, isLoading, error, execute: retry } = useApi<ExploreData>('/v2/explore');
 
-  // Fetch categories for quick-filter chips
+  // Fetch categories for quick-filter chips (fallback — also included in explore response now)
   const { data: categories } = useApi<Array<{ id: number; name: string; slug: string; color?: string }>>(
     '/v2/categories?type=listing'
   );
+  // Prefer categories from explore response (Phase 5 — eliminates 2nd API call)
+  const effectiveCategories: Array<{ id: number; name: string; slug: string; color?: string }> | null | undefined = data?.categories ?? categories;
+
+  // ── For You infinite scroll feed ──────────────────────────────────────────
+  const [forYouItems, setForYouItems] = useState<ForYouItem[]>([]);
+  const [forYouPage, setForYouPage] = useState(1);
+  const [forYouLoading, setForYouLoading] = useState(false);
+  const [forYouHasMore, setForYouHasMore] = useState(true);
+  const forYouSentinelRef = useRef<HTMLDivElement>(null);
+
+  // Fetch For You feed when tab is active
+  const loadForYouPage = useCallback(async (page: number, reset = false) => {
+    if (forYouLoading) return;
+    setForYouLoading(true);
+    try {
+      const res = await apiClient.get<{ items: ForYouItem[]; total: number }>(`/v2/explore/for-you?page=${page}&per_page=15`);
+      const result = res.data ?? { items: [], total: 0 };
+      const items: ForYouItem[] = result.items ?? [];
+      setForYouItems(prev => reset ? items : [...prev, ...items]);
+      setForYouHasMore(items.length > 0 && (reset ? items.length : forYouItems.length + items.length) < (result.total ?? 0));
+      setForYouPage(page);
+    } catch {
+      // Non-critical
+    } finally {
+      setForYouLoading(false);
+    }
+  }, [forYouLoading, forYouItems.length]);
+
+  // Load first page when switching to For You tab
+  useEffect(() => {
+    if (activeTab === 'for_you' && forYouItems.length === 0 && !forYouLoading) {
+      loadForYouPage(1, true);
+    }
+  }, [activeTab]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Infinite scroll via IntersectionObserver
+  useEffect(() => {
+    if (activeTab !== 'for_you' || !forYouHasMore || forYouLoading) return;
+    const sentinel = forYouSentinelRef.current;
+    if (!sentinel) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0]?.isIntersecting && forYouHasMore && !forYouLoading) {
+          loadForYouPage(forYouPage + 1);
+        }
+      },
+      { rootMargin: '200px' }
+    );
+    observer.observe(sentinel);
+    return () => observer.disconnect();
+  }, [activeTab, forYouPage, forYouHasMore, forYouLoading, loadForYouPage]);
 
   const handleSearch = () => {
     if (searchQuery.trim()) {
@@ -484,9 +578,9 @@ export default function ExplorePage() {
         </form>
 
         {/* Category quick-filter chips */}
-        {categories && categories.length > 0 && (
+        {effectiveCategories && effectiveCategories.length > 0 && (
           <div className="flex flex-wrap justify-center gap-2">
-            {categories.slice(0, 8).map((cat) => (
+            {effectiveCategories.slice(0, 8).map((cat) => (
               <Chip
                 key={cat.id}
                 variant="flat"
@@ -503,25 +597,28 @@ export default function ExplorePage() {
       </motion.div>
 
       {/* ─── Tab Navigation ──────────────────────────────────────────────── */}
-      <div className="flex justify-center mb-8">
-        <Tabs
-          selectedKey={activeTab}
-          onSelectionChange={handleTabChange}
-          variant="underlined"
-          color="primary"
-          classNames={{
-            tabList: 'gap-4 flex-wrap',
-            tab: 'text-sm sm:text-base',
-          }}
-          aria-label={t('tabs.all')}
-        >
-          <Tab key="all" title={t('tabs.all')} />
-          <Tab key="for_you" title={t('tabs.for_you')} />
-          <Tab key="listings" title={t('tabs.listings')} />
-          <Tab key="people" title={t('tabs.people')} />
-          <Tab key="events" title={t('tabs.events')} />
-          <Tab key="groups" title={t('tabs.groups')} />
-        </Tabs>
+      <div className="w-full overflow-x-auto mb-8 -mx-4 px-4 sm:mx-0 sm:px-0">
+        <div className="flex justify-center min-w-max">
+          <Tabs
+            selectedKey={activeTab}
+            onSelectionChange={handleTabChange}
+            variant="underlined"
+            color="primary"
+            classNames={{
+              tabList: 'gap-1 sm:gap-4',
+              tab: 'text-sm sm:text-base px-3 sm:px-4',
+              cursor: 'bg-primary',
+            }}
+            aria-label="Explore content tabs"
+          >
+            <Tab key="all" title={t('tabs.all')} />
+            <Tab key="for_you" title={t('tabs.for_you')} />
+            <Tab key="listings" title={t('tabs.listings')} />
+            <Tab key="people" title={t('tabs.people')} />
+            <Tab key="events" title={t('tabs.events')} />
+            <Tab key="groups" title={t('tabs.groups')} />
+          </Tabs>
+        </div>
       </div>
 
       {/* ─── API Error Banner ─────────────────────────────────────────────── */}
@@ -532,6 +629,88 @@ export default function ExplorePage() {
           <Button size="sm" variant="flat" color="danger" onPress={() => retry()} startContent={<RefreshCw className="w-4 h-4" />}>
             {t('retry')}
           </Button>
+        </div>
+      )}
+
+      {/* ─── aria-live region for screen readers ─────────────────────────── */}
+      <div className="sr-only" aria-live="polite" aria-atomic="true">
+        {isLoading ? t('loading') : data ? t('sections_loaded') : ''}
+      </div>
+
+      {/* ─── For You Infinite Scroll Feed ──────────────────────────────────── */}
+      {activeTab === 'for_you' && (
+        <div className="mb-10">
+          {forYouItems.length > 0 ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              {forYouItems.map((item, idx) => (
+                <Link
+                  key={`${item.content_type}-${item.id}-${idx}`}
+                  to={tenantPath(item.url)}
+                  onClick={() => trackInteraction(item.content_type, item.id, 'click')}
+                >
+                  <Card className="h-full border border-[var(--card-border)] bg-[var(--card-bg)] hover:bg-[var(--card-hover-bg)] transition-colors">
+                    <CardBody className="p-4 gap-3">
+                      <div className="flex items-center gap-2">
+                        <Chip size="sm" variant="flat" className="text-xs capitalize">
+                          {item.content_type}
+                        </Chip>
+                        {item.meta && (
+                          <span className="text-xs text-[var(--text-muted)] truncate">{item.meta}</span>
+                        )}
+                      </div>
+                      {item.image_url && (
+                        <img
+                          src={item.image_url}
+                          alt={item.title}
+                          className="w-full h-32 object-cover rounded-lg"
+                          loading="lazy"
+                        />
+                      )}
+                      <h3 className="text-sm font-semibold text-[var(--text-primary)] line-clamp-2">
+                        {item.title}
+                      </h3>
+                      {item.subtitle && (
+                        <p className="text-xs text-[var(--text-muted)] truncate">{item.subtitle}</p>
+                      )}
+                    </CardBody>
+                  </Card>
+                </Link>
+              ))}
+            </div>
+          ) : !forYouLoading ? (
+            <EmptyState
+              icon={TrendingUp}
+              message={t('for_you_empty', 'Interact with listings, posts, and events to get personalised recommendations.')}
+              cta={t('tabs.all')}
+              onAction={() => handleTabChange('all')}
+            />
+          ) : null}
+
+          {/* Loading indicator */}
+          {forYouLoading && (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mt-4">
+              {Array.from({ length: 3 }).map((_, i) => (
+                <Card key={i}>
+                  <CardBody className="p-4 gap-3">
+                    <Skeleton className="w-16 h-5 rounded" />
+                    <Skeleton className="w-full h-32 rounded-lg" />
+                    <Skeleton className="w-3/4 h-5 rounded" />
+                    <Skeleton className="w-1/2 h-4 rounded" />
+                  </CardBody>
+                </Card>
+              ))}
+            </div>
+          )}
+
+          {/* Infinite scroll sentinel */}
+          {forYouHasMore && <div ref={forYouSentinelRef} className="h-4" />}
+
+          {/* End of feed */}
+          {!forYouHasMore && forYouItems.length > 0 && (
+            <p className="text-center text-sm text-[var(--text-muted)] mt-6">
+              {t('end_of_feed', "You're all caught up!")}
+            </p>
+          )}
         </div>
       )}
 
@@ -1572,6 +1751,20 @@ export default function ExplorePage() {
             ))}
           </div>
         </ExploreSection>
+      )}
+
+      {/* ─── Empty states for filtered tabs ──────────────────────────────── */}
+      {!isLoading && activeTab === 'listings' && !data?.popular_listings?.length && !data?.recommended_listings?.length && (
+        <EmptyState icon={ListTodo} message={t('empty_listings', 'No listings to show yet. Be the first to create one!')} cta={t('create_listing', 'Create Listing')} onAction={() => navigate(tenantPath('/listings/new'))} />
+      )}
+      {!isLoading && activeTab === 'people' && !data?.suggested_connections?.length && !data?.new_members?.length && !data?.top_contributors?.length && (
+        <EmptyState icon={Users} message={t('empty_people', 'No members to show yet. Invite someone to join!')} />
+      )}
+      {!isLoading && activeTab === 'events' && !data?.upcoming_events?.length && (
+        <EmptyState icon={Calendar} message={t('empty_events', 'No upcoming events. Create one to bring your community together!')} cta={t('create_event', 'Create Event')} onAction={() => navigate(tenantPath('/events/new'))} />
+      )}
+      {!isLoading && activeTab === 'groups' && !data?.active_groups?.length && (
+        <EmptyState icon={Users} message={t('empty_groups', 'No active groups yet. Start a group around your interests!')} cta={t('create_group', 'Create Group')} onAction={() => navigate(tenantPath('/groups/new'))} />
       )}
     </div>
   );
