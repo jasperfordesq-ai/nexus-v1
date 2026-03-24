@@ -388,8 +388,12 @@
     "title": "Estado de desenvolvimento: {{stage}}",
     "where_we_are": {
       "title": "Onde estamos agora",
-      "paragraph1": "O Project NEXUS está atualmente em Release Candidate (RC) — a fase final antes de declarar Disponibilidade Geral. A plataforma está funcionalmente completa para V1 e está a funcionar em direto em múltiplas comunidades ativas em todo o mundo. O nosso foco é agora o robustecimento da estabilidade, otimização do desempenho e resolução de problemas em casos extremos antes do lançamento público completo.",
-      "paragraph2": "Tudo o que vê aqui corre em infraestrutura de produção (Azure, Cloudflare, MariaDB, Redis). Os seus dados são reais e tratados com o mesmo cuidado que qualquer sistema em direto. Não se trata de um ambiente de demonstração ou sandbox."
+      "paragraph1": "Esta plataforma nasceu em meados de dezembro de 2025, com o desenvolvimento a começar por volta do 15/12/2025.",
+      "paragraph2": "Cresceu rapidamente num curto espaço de tempo. Por volta do 15/02/2026, grande parte do trabalho anterior tanto no frontend como no backend foi intencionalmente descartado e reescrito para que a plataforma pudesse ser reconstruída sobre bases mais sólidas.",
+      "paragraph3": "Por volta do 24/02/2026, decidimos reescrever o frontend em React. O frontend é a parte que as pessoas veem e com a qual interagem — um pouco como o corpo da plataforma. Fizemos essa mudança para criar uma experiência de utilizador mais limpa e flexível construída sobre componentes reutilizáveis, melhorar a capacidade de resposta em diferentes dispositivos — especialmente em telemóveis — e tornar a interface mais fácil de melhorar e manter à medida que a plataforma cresce.",
+      "paragraph4": "Por volta do 17/03/2026, decidimos reescrever o backend em Laravel. O backend é a parte que trabalha nos bastidores — um pouco como o cérebro da plataforma. Fizemos essa mudança para dar à plataforma uma base mais forte e mais fácil de manter, com melhor estrutura para autenticação, validação, processamento em segundo plano, cache e produtividade do programador a longo prazo.",
+      "paragraph5": "A 24/03/2026, esta continua a ser uma plataforma muito nova que está a evoluir rapidamente. A maioria das funcionalidades essenciais já está implementada, mas algumas partes ainda estão a ser refinadas enquanto o novo frontend e o novo backend são ligados entre si e polidos.",
+      "paragraph6": "Estamos também a trabalhar em segundo plano numa aplicação dedicada para telemóveis, que deverá estar disponível em breve."
     },
     "whats_stable": {
       "title": "O que está estável e funcional",

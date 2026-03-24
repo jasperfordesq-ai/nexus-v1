@@ -388,8 +388,12 @@
     "title": "Development status: {{stage}}",
     "where_we_are": {
       "title": "Where we are now",
-      "paragraph1": "We've basically rewired the brains of Project NEXUS to Laravel. While this short-term transition could cause a few problems and the ride might be a bit bumpy over the next few days, in the long term it makes us an enterprise-grade platform. It's for the overall good of the community.",
-      "paragraph2": "We encourage everyone to bug test the platform and report issues back to us. Rest assured, we are building the best platform we can possibly build, and Laravel is the absolute industry standard for the backend. For those less technical: the \"body\" (front end) has been completely replaced with React, and the \"brains\" (back end) has been completely replaced with Laravel. This platform is very, very new!"
+      "paragraph1": "This platform was born in the middle of December 2025, with development beginning around 15/12/2025.",
+      "paragraph2": "It grew quickly in a short space of time. By around 15/02/2026, much of the earlier work on both the front end and the back end had been intentionally scrapped and rewritten so the platform could be rebuilt on stronger foundations.",
+      "paragraph3": "Around 24/02/2026, we decided to rewrite the front end in React. The front end is the part people see and interact with — a bit like the body of the platform. We made that change to create a cleaner and more flexible user experience built on reusable components, improve responsiveness across devices — especially on mobile — and make the interface easier to improve and maintain as the platform grows.",
+      "paragraph4": "Around 17/03/2026, we decided to rewrite the back end in Laravel. The back end is the part working behind the scenes — a bit like the brain of the platform. We made that change to give the platform a stronger and more maintainable foundation, with better structure for authentication, validation, background processing, caching, and long-term developer productivity.",
+      "paragraph5": "As of 24/03/2026, this remains a very new platform that is evolving quickly. Most core functionality is already in place, but some parts are still being refined as the new front end and new back end are connected together and polished.",
+      "paragraph6": "We are also working on a dedicated mobile phone app in the background, which should be available soon."
     },
     "whats_stable": {
       "title": "What's stable and working",

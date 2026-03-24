@@ -288,7 +288,8 @@
   },
   "dev_banner": {
     "aria_label": "Development status",
-    "status": "Development status: {{stage}}",
+    "status": "{{stage}}",
+    "summary": "This platform is new and you are viewing it in preview mode.",
     "read_more": "Read more"
   },
   "skills": {

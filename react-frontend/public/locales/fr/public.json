@@ -388,8 +388,12 @@
     "title": "Statut de développement : {{stage}}",
     "where_we_are": {
       "title": "Où nous en sommes",
-      "paragraph1": "Project NEXUS est actuellement en Release Candidate (RC) — l'étape finale avant de déclarer la disponibilité générale. La plateforme est fonctionnellement complète pour la V1 et fonctionne en direct dans plusieurs communautés actives dans le monde entier. Notre focus est désormais sur le durcissement de la stabilité, l'optimisation des performances et la résolution des problèmes en cas limites avant le lancement public complet.",
-      "paragraph2": "Tout ce que vous voyez ici fonctionne sur une infrastructure de production (Azure, Cloudflare, MariaDB, Redis). Vos données sont réelles et traitées avec le même soin que n'importe quel système en direct. Il ne s'agit pas d'un environnement de démonstration ou de bac à sable."
+      "paragraph1": "Cette plateforme est née au milieu du mois de décembre 2025, le développement ayant commencé aux alentours du 15/12/2025.",
+      "paragraph2": "Elle a grandi rapidement en peu de temps. Vers le 15/02/2026, une grande partie du travail antérieur tant sur le frontend que sur le backend a été intentionnellement abandonnée et réécrite afin que la plateforme puisse être reconstruite sur des bases plus solides.",
+      "paragraph3": "Vers le 24/02/2026, nous avons décidé de réécrire le frontend en React. Le frontend est la partie que les gens voient et avec laquelle ils interagissent — un peu comme le corps de la plateforme. Nous avons fait ce changement pour créer une expérience utilisateur plus propre et plus flexible basée sur des composants réutilisables, améliorer la réactivité sur les différents appareils — en particulier sur mobile — et rendre l'interface plus facile à améliorer et à maintenir à mesure que la plateforme se développe.",
+      "paragraph4": "Vers le 17/03/2026, nous avons décidé de réécrire le backend en Laravel. Le backend est la partie qui travaille en coulisses — un peu comme le cerveau de la plateforme. Nous avons fait ce changement pour donner à la plateforme une base plus solide et plus maintenable, avec une meilleure structure pour l'authentification, la validation, le traitement en arrière-plan, la mise en cache et la productivité des développeurs à long terme.",
+      "paragraph5": "Au 24/03/2026, il s'agit toujours d'une plateforme très récente qui évolue rapidement. La plupart des fonctionnalités essentielles sont déjà en place, mais certaines parties sont encore en cours de perfectionnement alors que le nouveau frontend et le nouveau backend sont connectés entre eux et peaufinés.",
+      "paragraph6": "Nous travaillons également en arrière-plan sur une application dédiée pour téléphones mobiles, qui devrait être disponible prochainement."
     },
     "whats_stable": {
       "title": "Ce qui est stable et fonctionnel",

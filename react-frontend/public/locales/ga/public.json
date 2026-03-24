@@ -388,8 +388,12 @@
     "title": "Stádas forbartha: {{stage}}",
     "where_we_are": {
       "title": "Cá bhfuilimid anois",
-      "paragraph1": "Tá Project NEXUS faoi láthair in Iarrthóir Eisiúna (RC) — an chéim dheireanach roimh Infhaighteacht Ghinearálta a fhógairt. Tá an t-ardán iomlán ó thaobh gnéithe de do V1 agus tá sé ar siúl i measc il-phobail ghníomhacha ar fud an domhain. Tá ár bhfócas anois ar chrua-dhaingniú cobhsaíochta, tiúnadh feidhmíochta, agus saincheisteanna cás-imeallach a réiteach roimh an seoladh poiblí iomlán.",
-      "paragraph2": "Tá gach rud a fheiceann tú anseo ag rith ar bhonneagar táirgthe (Azure, Cloudflare, MariaDB, Redis). Tá do shonraí fíor agus caitear leo le cúram mar aon chóras beo. Ní timpeallacht taispeána nó bosca gainimh é seo."
+      "paragraph1": "Rugadh an t-ardán seo i lár mhí na Nollag 2025, agus thosaigh an fhorbairt timpeall an 15/12/2025.",
+      "paragraph2": "D'fhás sé go tapa i dtréimhse ghearr ama. Faoin 15/02/2026, bhí cuid mhór den obair a rinneadh roimhe sin ar an gcomhéadan agus ar an gcúlchóras araon curtha ar ceal agus athscríofa d'aon ghnó ionas go bhféadfaí an t-ardán a atógáil ar bhunsraitheanna níos láidre.",
+      "paragraph3": "Timpeall an 24/02/2026, shocraíomar an comhéadan a athscríobh i React. Is é an comhéadan an chuid a fheiceann daoine agus a n-idirghníomhaíonn siad léi — beagáinín cosúil le corp an ardáin. Rinneamar an t-athrú sin chun eispéireas úsáideora níos glaine agus níos solúbtha a chruthú bunaithe ar chomhpháirteanna in-athúsáidte, freagracht ar feadh gléasanna éagsúla a fheabhsú — go háirithe ar fhóin phóca — agus an comhéadan a dhéanamh níos éasca le feabhsú agus le cothabháil de réir mar a fhásann an t-ardán.",
+      "paragraph4": "Timpeall an 17/03/2026, shocraíomar an cúlchóras a athscríobh i Laravel. Is é an cúlchóras an chuid a oibríonn taobh thiar den stáitse — beagáinín cosúil le hinchinn an ardáin. Rinneamar an t-athrú sin chun bunsraith níos láidre agus níos incothaithe a thabhairt don ardán, le struchtúr níos fearr don fhíordheimhniú, bailíochtú, próiseáil sa chúlra, taisceadh, agus táirgiúlacht fhorbróra fadtéarmach.",
+      "paragraph5": "Ón 24/03/2026 i leith, is ardán fíor-nua é seo fós atá ag forbairt go tapa. Tá formhór na príomhfheidhmiúlachta i bhfeidhm cheana féin, ach tá codanna áirithe fós á mbeachtú agus an comhéadan nua agus an cúlchóras nua á nascadh le chéile agus á snoí.",
+      "paragraph6": "Táimid ag obair freisin ar aip thiomnaithe d'fhóin phóca sa chúlra, ar cheart go mbeadh sí ar fáil go luath."
     },
     "whats_stable": {
       "title": "Cad atá cobhsaí agus ag obair",

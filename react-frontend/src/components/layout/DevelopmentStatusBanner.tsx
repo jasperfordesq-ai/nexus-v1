@@ -30,9 +30,9 @@ export function DevelopmentStatusBanner() {
       <p className="text-amber-900 dark:text-amber-100 text-xs flex items-center justify-center gap-1.5 flex-wrap">
         <FlaskConical className="w-3.5 h-3.5 shrink-0" aria-hidden="true" />
         <span>
-          <span className="font-semibold">{t('dev_banner.status', { stage: RELEASE_STATUS.stageLabel, defaultValue: `Development status: ${RELEASE_STATUS.stageLabel}` })}</span>
+          <span className="font-semibold">{RELEASE_STATUS.stageLabel}</span>
           {' — '}
-          {RELEASE_STATUS.stageSummary}
+          {t('dev_banner.summary', { defaultValue: RELEASE_STATUS.stageSummary })}
         </span>
         <Link
           to={RELEASE_STATUS.readMorePath}

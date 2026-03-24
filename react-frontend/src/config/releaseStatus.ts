@@ -16,7 +16,7 @@
 export const RELEASE_STATUS = {
   stageKey: 'rc' as const,
   stageLabel: 'Release Candidate (RC)',
-  stageSummary: "We've rewired the brains of NEXUS to Laravel. Expect a bumpy ride for a few days!",
+  stageSummary: 'This platform is new and you are viewing it in preview mode.',
   readMorePath: '/development-status',
 } as const;
 

@@ -288,7 +288,8 @@
   },
   "dev_banner": {
     "aria_label": "Estado de desenvolvimento",
-    "status": "Estado de desenvolvimento: {{stage}}",
+    "status": "{{stage}}",
+    "summary": "Esta plataforma é nova e está a vê-la em modo de pré-visualização.",
     "read_more": "Saber mais"
   },
   "skills": {

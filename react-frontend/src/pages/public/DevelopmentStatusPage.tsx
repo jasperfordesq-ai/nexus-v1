@@ -47,12 +47,11 @@ export function DevelopmentStatusPage() {
         </CardHeader>
         <Divider />
         <CardBody className="space-y-3 text-sm text-foreground-600">
-          <p>
-            {t('dev_status.where_we_are.paragraph1')}
-          </p>
-          <p>
-            {t('dev_status.where_we_are.paragraph2')}
-          </p>
+          {(['paragraph1','paragraph2','paragraph3','paragraph4','paragraph5','paragraph6'] as const).map((key) => (
+            <p key={key}>
+              {t(`dev_status.where_we_are.${key}`)}
+            </p>
+          ))}
         </CardBody>
       </Card>
 

@@ -29,7 +29,7 @@ describe('DevelopmentStatusBanner', () => {
 
   it('renders the stage summary text', () => {
     renderBanner();
-    expect(screen.getByText(/bumpy ride/i)).toBeTruthy();
+    expect(screen.getByText(/preview mode/i)).toBeTruthy();
   });
 
   it('renders a "Read more" link', () => {
