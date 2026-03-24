@@ -597,28 +597,29 @@ export default function ExplorePage() {
       </motion.div>
 
       {/* ─── Tab Navigation ──────────────────────────────────────────────── */}
-      <div className="w-full overflow-x-auto mb-8 -mx-4 px-4 sm:mx-0 sm:px-0">
-        <div className="flex justify-center min-w-max">
-          <Tabs
-            selectedKey={activeTab}
-            onSelectionChange={handleTabChange}
-            variant="underlined"
-            color="primary"
-            classNames={{
-              tabList: 'gap-1 sm:gap-4',
-              tab: 'text-sm sm:text-base px-3 sm:px-4',
-              cursor: 'bg-primary',
-            }}
-            aria-label="Explore content tabs"
-          >
-            <Tab key="all" title={t('tabs.all')} />
-            <Tab key="for_you" title={t('tabs.for_you')} />
-            <Tab key="listings" title={t('tabs.listings')} />
-            <Tab key="people" title={t('tabs.people')} />
-            <Tab key="events" title={t('tabs.events')} />
-            <Tab key="groups" title={t('tabs.groups')} />
-          </Tabs>
-        </div>
+      <div className="flex justify-center mb-8">
+        <Tabs
+          selectedKey={activeTab}
+          onSelectionChange={handleTabChange}
+          variant="underlined"
+          color="primary"
+          size="lg"
+          classNames={{
+            base: 'w-full sm:w-auto',
+            tabList: 'w-full sm:w-auto gap-0 sm:gap-2 justify-center border-b border-[var(--border-default)]',
+            tab: 'text-sm sm:text-base px-3 sm:px-5 h-10',
+            cursor: 'bg-primary',
+            tabContent: 'group-data-[selected=true]:text-primary',
+          }}
+          aria-label="Explore content tabs"
+        >
+          <Tab key="all" title={t('tabs.all')} />
+          <Tab key="for_you" title={t('tabs.for_you')} />
+          <Tab key="listings" title={t('tabs.listings')} />
+          <Tab key="people" title={t('tabs.people')} />
+          <Tab key="events" title={t('tabs.events')} />
+          <Tab key="groups" title={t('tabs.groups')} />
+        </Tabs>
       </div>
 
       {/* ─── API Error Banner ─────────────────────────────────────────────── */}
