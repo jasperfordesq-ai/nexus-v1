@@ -9,6 +9,7 @@ namespace App\Services;
 use App\Core\TenantContext;
 use App\Models\Category;
 use App\Models\Listing;
+use App\Services\OnboardingConfigService;
 use App\Models\User;
 use App\Models\UserInterest;
 use Illuminate\Support\Facades\DB;
@@ -178,31 +179,96 @@ class OnboardingService
     }
 
     /**
-     * Auto-create listings from selected skills.
+     * Auto-create listings from selected skills, respecting admin config.
      *
-     * DISABLED (2026-03-24): Auto-creation of active listings from onboarding
-     * was producing generic, low-quality directory posts that spammed the
-     * directory with entries like "I can help with Gardening". Skills and
-     * interests are still saved to user_interests; members create proper
-     * listings manually from the dashboard after onboarding.
+     * Modes (controlled by onboarding.listing_creation_mode tenant setting):
+     *   - disabled:        No listings created (default — safe)
+     *   - suggestions_only: Returns suggestion data but creates nothing (for dashboard)
+     *   - draft:           Creates listings with status='draft' (only visible to owner)
+     *   - pending_review:  Creates with moderation_status='pending_review' (admin approves)
+     *   - active:          Creates as active (not recommended — original spam behavior)
      *
-     * @see https://github.com/jasperfordesq-ai/nexus-v1 — onboarding audit
-     * @return array Always returns empty array (no listings created)
+     * Respects onboarding.listing_max_auto cap (0-10).
+     *
+     * @return array List of created listing IDs (empty for disabled/suggestions_only)
      */
     public static function autoCreateListings(int $userId, array $offers, array $needs): array
     {
-        // Listing auto-creation is disabled. Skills/interests are saved
-        // separately via saveInterests() and saveSkills(). Members create
-        // their own listings with meaningful titles and descriptions.
-        if (!empty($offers) || !empty($needs)) {
-            Log::info('Onboarding: auto-listing creation skipped (disabled)', [
-                'user_id' => $userId,
-                'offers_count' => count($offers),
-                'needs_count' => count($needs),
-            ]);
+        $tenantId = TenantContext::getId();
+        $mode = OnboardingConfigService::getListingCreationMode($tenantId);
+        $maxListings = OnboardingConfigService::getListingMaxAuto($tenantId);
+
+        // Disabled mode — no listings created (safe default)
+        if ($mode === 'disabled' || $mode === 'suggestions_only') {
+            if (!empty($offers) || !empty($needs)) {
+                Log::info('Onboarding: listing creation skipped', [
+                    'user_id' => $userId,
+                    'mode' => $mode,
+                    'offers_count' => count($offers),
+                    'needs_count' => count($needs),
+                ]);
+            }
+            return [];
         }
 
-        return [];
+        // Cap total listings
+        $allItems = [];
+        foreach ($offers as $catId) {
+            $allItems[] = ['type' => 'offer', 'category_id' => (int) $catId];
+        }
+        foreach ($needs as $catId) {
+            $allItems[] = ['type' => 'request', 'category_id' => (int) $catId];
+        }
+        $allItems = array_slice($allItems, 0, $maxListings);
+
+        if (empty($allItems)) {
+            return [];
+        }
+
+        // Get category names for titles
+        $catIds = array_unique(array_column($allItems, 'category_id'));
+        $categories = Category::whereIn('id', $catIds)->pluck('name', 'id')->all();
+
+        $createdIds = [];
+
+        // Determine status based on mode
+        $status = match ($mode) {
+            'draft' => 'draft',
+            'pending_review' => 'active', // Active but with moderation_status = pending_review
+            'active' => 'active',
+            default => 'draft',
+        };
+        $moderationStatus = $mode === 'pending_review' ? 'pending_review' : null;
+
+        foreach ($allItems as $item) {
+            $catName = $categories[$item['category_id']] ?? 'Service';
+            $isOffer = $item['type'] === 'offer';
+
+            $listing = Listing::create([
+                'tenant_id' => $tenantId,
+                'title' => $isOffer ? "I can help with {$catName}" : "Looking for help with {$catName}",
+                'description' => $isOffer
+                    ? "I'm available to help with {$catName}. Get in touch to arrange!"
+                    : "I'm looking for someone who can help me with {$catName}.",
+                'type' => $item['type'],
+                'category_id' => $item['category_id'],
+                'user_id' => $userId,
+                'status' => $status,
+                'moderation_status' => $moderationStatus,
+            ]);
+
+            $createdIds[] = $listing->id;
+        }
+
+        Log::info('Onboarding: listings created', [
+            'user_id' => $userId,
+            'mode' => $mode,
+            'count' => count($createdIds),
+            'status' => $status,
+            'moderation' => $moderationStatus,
+        ]);
+
+        return $createdIds;
     }
 
     /**
