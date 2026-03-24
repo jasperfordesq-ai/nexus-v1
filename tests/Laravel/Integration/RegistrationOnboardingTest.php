@@ -233,6 +233,85 @@ class RegistrationOnboardingTest extends TestCase
         $this->assertTrue((bool) $user->onboarding_completed);
     }
 
+    public function test_onboarding_does_not_auto_create_listings(): void
+    {
+        $user = User::factory()->forTenant($this->testTenantId)->create([
+            'status'               => 'active',
+            'is_approved'          => true,
+            'onboarding_completed' => false,
+        ]);
+
+        Sanctum::actingAs($user, ['*']);
+
+        $categories = Category::where('tenant_id', $this->testTenantId)->pluck('id')->toArray();
+
+        // Complete onboarding with offers and needs selected
+        $response = $this->apiPost('/v2/onboarding/complete', [
+            'interests' => array_slice($categories, 0, 2),
+            'offers'    => array_slice($categories, 0, 2),
+            'needs'     => array_slice($categories, 0, 1),
+        ]);
+
+        $this->assertContains($response->getStatusCode(), [200, 201]);
+
+        // Verify onboarding completed
+        $user->refresh();
+        $this->assertTrue((bool) $user->onboarding_completed);
+
+        // Verify NO listings were auto-created (auto-creation is disabled)
+        $listingCount = Listing::where('user_id', $user->id)
+            ->where('tenant_id', $this->testTenantId)
+            ->count();
+        $this->assertEquals(0, $listingCount, 'Onboarding should NOT auto-create listings');
+
+        // Verify response reports zero listings created
+        $data = $response->json('data') ?? $response->json();
+        $responseData = $data['data'] ?? $data;
+        $this->assertEquals(0, $responseData['listings_created'] ?? 0);
+    }
+
+    public function test_onboarding_still_saves_interests_and_skills(): void
+    {
+        $user = User::factory()->forTenant($this->testTenantId)->create([
+            'status'               => 'active',
+            'is_approved'          => true,
+            'onboarding_completed' => false,
+        ]);
+
+        Sanctum::actingAs($user, ['*']);
+
+        $categories = Category::where('tenant_id', $this->testTenantId)->pluck('id')->toArray();
+
+        $response = $this->apiPost('/v2/onboarding/complete', [
+            'interests' => array_slice($categories, 0, 2),
+            'offers'    => array_slice($categories, 0, 1),
+            'needs'     => array_slice($categories, 0, 1),
+        ]);
+
+        $this->assertContains($response->getStatusCode(), [200, 201]);
+
+        // Verify interests were saved
+        $interestCount = DB::table('user_interests')
+            ->where('user_id', $user->id)
+            ->where('interest_type', 'interest')
+            ->count();
+        $this->assertGreaterThanOrEqual(1, $interestCount, 'Interests should be saved');
+
+        // Verify skill offers were saved
+        $offerCount = DB::table('user_interests')
+            ->where('user_id', $user->id)
+            ->where('interest_type', 'skill_offer')
+            ->count();
+        $this->assertGreaterThanOrEqual(1, $offerCount, 'Skill offers should be saved');
+
+        // Verify skill needs were saved
+        $needCount = DB::table('user_interests')
+            ->where('user_id', $user->id)
+            ->where('interest_type', 'skill_need')
+            ->count();
+        $this->assertGreaterThanOrEqual(1, $needCount, 'Skill needs should be saved');
+    }
+
     // =========================================================================
     // First Listing After Onboarding
     // =========================================================================

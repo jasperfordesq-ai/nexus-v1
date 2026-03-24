@@ -35,7 +35,6 @@ import {
   Heart,
   HandHeart,
   HelpCircle,
-  ListChecks,
   Rocket,
   Camera,
   UserCircle,
@@ -343,8 +342,6 @@ export function OnboardingPage() {
 
   // ── Completion handler ───────────────────────────────────────────────────
 
-  const totalListingsToCreate = skillOffers.length + skillNeeds.length;
-
   const handleComplete = useCallback(async () => {
     try {
       setIsSubmitting(true);
@@ -368,8 +365,6 @@ export function OnboardingPage() {
         return;
       }
 
-      const listingsCreated = (response.data as { listings_created?: number })?.listings_created ?? 0;
-
       // Show completion celebration
       setIsComplete(true);
 
@@ -378,14 +373,7 @@ export function OnboardingPage() {
 
       // Brief delay for the celebration animation, then navigate
       setTimeout(() => {
-        if (listingsCreated > 0) {
-          toast.success(
-            t('toast_welcome_aboard'),
-            t('toast_listings_created', { count: listingsCreated })
-          );
-        } else {
-          toast.success(t('toast_welcome_aboard'), t('toast_profile_all_set'));
-        }
+        toast.success(t('toast_welcome_aboard'), t('toast_profile_all_set'));
         navigate(tenantPath('/dashboard'));
       }, 1800);
     } catch (error) {
@@ -1120,35 +1108,6 @@ export function OnboardingPage() {
                 </div>
               </GlassCard>
 
-              {/* Listings preview */}
-              {totalListingsToCreate > 0 && (
-                <GlassCard className="p-6">
-                  <h2 className="text-base font-semibold text-theme-primary mb-3 flex items-center gap-2">
-                    <ListChecks
-                      className="w-5 h-5 text-emerald-600 dark:text-emerald-400"
-                      aria-hidden="true"
-                    />
-                    {t('listings_to_create', { count: totalListingsToCreate })}
-                  </h2>
-                  <div className="space-y-2">
-                    {skillOffers.map((catId) => (
-                      <ListingPreviewItem
-                        key={`offer-${catId}`}
-                        type="offer"
-                        name={getCategoryName(catId)}
-                      />
-                    ))}
-                    {skillNeeds.map((catId) => (
-                      <ListingPreviewItem
-                        key={`need-${catId}`}
-                        type="need"
-                        name={getCategoryName(catId)}
-                      />
-                    ))}
-                  </div>
-                </GlassCard>
-              )}
-
               {/* Action buttons */}
               <div className="flex items-center justify-between gap-3">
                 <Button
@@ -1161,17 +1120,15 @@ export function OnboardingPage() {
                 </Button>
 
                 <div className="flex items-center gap-3">
-                  {totalListingsToCreate === 0 && (
-                    <Button
-                      variant="light"
-                      className="text-theme-subtle"
-                      onPress={handleSkip}
-                      isDisabled={isSubmitting}
-                      endContent={<SkipForward className="w-4 h-4" aria-hidden="true" />}
-                    >
-                      {t('skip_for_now')}
-                    </Button>
-                  )}
+                  <Button
+                    variant="light"
+                    className="text-theme-subtle"
+                    onPress={handleSkip}
+                    isDisabled={isSubmitting}
+                    endContent={<SkipForward className="w-4 h-4" aria-hidden="true" />}
+                  >
+                    {t('skip_for_now')}
+                  </Button>
                   <Button
                     size="lg"
                     className="bg-gradient-to-r from-emerald-500 to-teal-600 text-white font-semibold shadow-lg shadow-emerald-500/20"
@@ -1183,7 +1140,7 @@ export function OnboardingPage() {
                       )
                     }
                   >
-                    {totalListingsToCreate > 0 ? t('complete_setup') : t('finish')}
+                    {t('finish')}
                   </Button>
                 </div>
               </div>
@@ -1377,32 +1334,6 @@ function SummarySection({ icon, title, items, getCategoryName, chipColor, emptyT
         ) : (
           <p className="text-theme-subtle text-sm italic">{emptyText}</p>
         )}
-      </div>
-    </div>
-  );
-}
-
-// ── Listing Preview Item (Step 5) ────────────────────────────────────────────
-
-function ListingPreviewItem({ type, name }: { type: 'offer' | 'need'; name: string }) {
-  const { t } = useTranslation('onboarding');
-  const isOffer = type === 'offer';
-  return (
-    <div className="flex items-center gap-3 p-3 rounded-lg bg-theme-elevated">
-      <div className={`p-2 rounded-lg flex-shrink-0 ${isOffer ? 'bg-emerald-500/20' : 'bg-amber-500/20'}`}>
-        {isOffer ? (
-          <HandHeart className="w-4 h-4 text-emerald-500" aria-hidden="true" />
-        ) : (
-          <HelpCircle className="w-4 h-4 text-amber-500" aria-hidden="true" />
-        )}
-      </div>
-      <div className="min-w-0">
-        <p className="font-medium text-theme-primary text-sm">
-          {isOffer ? t('listing_offer_help', { name }) : t('listing_need_help', { name })}
-        </p>
-        <p className="text-xs text-theme-subtle">
-          {isOffer ? t('listing_type_offer') : t('listing_type_request')}
-        </p>
       </div>
     </div>
   );

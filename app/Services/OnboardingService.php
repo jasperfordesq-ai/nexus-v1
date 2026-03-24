@@ -180,67 +180,29 @@ class OnboardingService
     /**
      * Auto-create listings from selected skills.
      *
-     * @return array List of created listing IDs
+     * DISABLED (2026-03-24): Auto-creation of active listings from onboarding
+     * was producing generic, low-quality directory posts that spammed the
+     * directory with entries like "I can help with Gardening". Skills and
+     * interests are still saved to user_interests; members create proper
+     * listings manually from the dashboard after onboarding.
+     *
+     * @see https://github.com/jasperfordesq-ai/nexus-v1 — onboarding audit
+     * @return array Always returns empty array (no listings created)
      */
     public static function autoCreateListings(int $userId, array $offers, array $needs): array
     {
-        $tenantId = TenantContext::getId();
-        $createdIds = [];
-
-        // Get category names for listing titles
-        $allCatIds = array_unique(array_merge(
-            array_map('intval', $offers),
-            array_map('intval', $needs)
-        ));
-
-        $categories = [];
-        if (!empty($allCatIds)) {
-            $categories = Category::whereIn('id', $allCatIds)
-                ->pluck('name', 'id')
-                ->all();
-        }
-
-        // Create offer listings
-        foreach ($offers as $catId) {
-            $catId = (int) $catId;
-            $catName = $categories[$catId] ?? 'Service';
-            $title = "I can help with {$catName}";
-            $description = "I'm available to help with {$catName}. Get in touch to arrange!";
-
-            $listing = Listing::create([
-                'tenant_id' => $tenantId,
-                'title' => $title,
-                'description' => $description,
-                'type' => 'offer',
-                'category_id' => $catId,
+        // Listing auto-creation is disabled. Skills/interests are saved
+        // separately via saveInterests() and saveSkills(). Members create
+        // their own listings with meaningful titles and descriptions.
+        if (!empty($offers) || !empty($needs)) {
+            Log::info('Onboarding: auto-listing creation skipped (disabled)', [
                 'user_id' => $userId,
-                'status' => 'active',
+                'offers_count' => count($offers),
+                'needs_count' => count($needs),
             ]);
-
-            $createdIds[] = $listing->id;
         }
 
-        // Create request listings
-        foreach ($needs as $catId) {
-            $catId = (int) $catId;
-            $catName = $categories[$catId] ?? 'Service';
-            $title = "Looking for help with {$catName}";
-            $description = "I'm looking for someone who can help me with {$catName}.";
-
-            $listing = Listing::create([
-                'tenant_id' => $tenantId,
-                'title' => $title,
-                'description' => $description,
-                'type' => 'request',
-                'category_id' => $catId,
-                'user_id' => $userId,
-                'status' => 'active',
-            ]);
-
-            $createdIds[] = $listing->id;
-        }
-
-        return $createdIds;
+        return [];
     }
 
     /**
