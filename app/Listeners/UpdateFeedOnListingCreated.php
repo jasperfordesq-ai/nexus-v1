@@ -8,6 +8,7 @@ namespace App\Listeners;
 
 use App\Events\ListingCreated;
 use App\Models\FeedActivity;
+use App\Services\SearchService;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
@@ -41,7 +42,7 @@ class UpdateFeedOnListingCreated implements ShouldQueue
                 'created_at'  => now(),
             ]);
 
-            // Note: Search indexing skipped — SearchService has no indexing method yet
+            SearchService::indexListing($event->listing);
         } catch (\Throwable $e) {
             Log::error('UpdateFeedOnListingCreated listener failed', [
                 'listing_id' => $event->listing->id ?? null,

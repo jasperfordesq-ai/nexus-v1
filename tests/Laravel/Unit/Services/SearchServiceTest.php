@@ -31,9 +31,11 @@ class SearchServiceTest extends TestCase
 
     // ── isAvailable ──
 
-    public function test_isAvailable_returns_false(): void
+    public function test_isAvailable_returns_false_when_meilisearch_not_running(): void
     {
-        $this->assertFalse($this->service->isAvailable());
+        // In the test environment Meilisearch is not running, so isAvailable() must
+        // return false (the SQL LIKE fallback will be used for all searches).
+        $this->assertFalse(SearchService::isAvailable());
     }
 
     // ── suggestions ──
@@ -96,16 +98,18 @@ class SearchServiceTest extends TestCase
 
     // ── indexListing / removeListing ──
 
-    public function test_indexListing_is_noop(): void
+    public function test_indexListing_skips_when_meilisearch_unavailable(): void
     {
+        // isAvailable() returns false in test env → indexListing silently skips
         $listing = Mockery::mock(Listing::class);
-        $this->service->indexListing($listing);
-        $this->assertTrue(true); // no exception
+        SearchService::indexListing($listing);
+        $this->assertTrue(true); // no exception thrown
     }
 
-    public function test_removeListing_is_noop(): void
+    public function test_removeListing_skips_when_meilisearch_unavailable(): void
     {
+        // isAvailable() returns false in test env → removeListing silently skips
         $this->service->removeListing(1);
-        $this->assertTrue(true);
+        $this->assertTrue(true); // no exception thrown
     }
 }

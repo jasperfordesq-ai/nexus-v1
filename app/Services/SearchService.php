@@ -13,24 +13,185 @@ use App\Models\User;
 use Illuminate\Database\Eloquent\Builder;
 use App\Core\TenantContext;
 use Illuminate\Support\Facades\DB;
+use Meilisearch\Client as MeilisearchClient;
 
 /**
- * SearchService — Laravel DI-based unified search service.
+ * SearchService — unified search across users, listings, events, and groups.
  *
- * Provides a single search() method that queries across users, listings,
- * events, and groups using basic LIKE matching. Can be extended with
- * Meilisearch/Scout integration later.
+ * Uses Meilisearch when available (fast, typo-tolerant, ranked results),
+ * with automatic SQL LIKE fallback when Meilisearch is unreachable.
  *
- * Uses Eloquent LIKE-based matching; can be extended with Meilisearch/Scout later.
+ * Meilisearch indexes: `listings`, `users` (events/groups use SQL fallback until
+ * indexEvent/indexGroup methods and a sync pass are added).
+ *
+ * Availability is cached per PHP process/request via a static property, so the
+ * health-check ping only happens once per request.
  */
 class SearchService
 {
+    /** @var bool|null Cached availability result — null means not yet checked. */
+    private static ?bool $available = null;
+
     public function __construct(
         private readonly User $user,
         private readonly Listing $listing,
         private readonly Event $event,
         private readonly Group $group,
     ) {}
+
+    // =========================================================================
+    // Meilisearch client & availability
+    // =========================================================================
+
+    private static function client(): MeilisearchClient
+    {
+        return new MeilisearchClient(
+            env('MEILISEARCH_HOST', 'http://meilisearch:7700'),
+            env('MEILISEARCH_KEY') ?: null,
+        );
+    }
+
+    /**
+     * Check if Meilisearch is reachable. Result is cached for the process lifetime.
+     * Can be called statically (sync script) or on an instance (DI controller).
+     */
+    public static function isAvailable(): bool
+    {
+        if (static::$available !== null) {
+            return static::$available;
+        }
+        try {
+            static::client()->health();
+            static::$available = true;
+        } catch (\Throwable) {
+            static::$available = false;
+        }
+        return static::$available;
+    }
+
+    // =========================================================================
+    // Index management
+    // =========================================================================
+
+    /**
+     * Create and configure the `listings` and `users` Meilisearch indexes.
+     * Idempotent — safe to call repeatedly. Called by sync_search_index.php.
+     */
+    public static function ensureIndexes(): void
+    {
+        $client = static::client();
+
+        $configs = [
+            'listings' => [
+                'pk'         => 'id',
+                'searchable' => ['title', 'description', 'location', 'author_name', 'category_name'],
+                'filterable' => ['tenant_id', 'status', 'category_id', 'type'],
+                'sortable'   => ['created_at'],
+            ],
+            'users' => [
+                'pk'         => 'id',
+                'searchable' => ['first_name', 'last_name', 'organization_name', 'bio'],
+                'filterable' => ['tenant_id', 'status', 'profile_type'],
+                'sortable'   => ['created_at'],
+            ],
+        ];
+
+        foreach ($configs as $name => $cfg) {
+            try {
+                $client->createIndex($name, ['primaryKey' => $cfg['pk']]);
+            } catch (\Throwable) {
+                // Index already exists — update settings only
+            }
+            $idx = $client->index($name);
+            $idx->updateSearchableAttributes($cfg['searchable']);
+            $idx->updateFilterableAttributes($cfg['filterable']);
+            $idx->updateSortableAttributes($cfg['sortable']);
+        }
+
+        // Mark as available since we just communicated with Meilisearch successfully
+        static::$available = true;
+    }
+
+    // =========================================================================
+    // Document indexing
+    // =========================================================================
+
+    /**
+     * Index a listing into Meilisearch.
+     * Silently skips if Meilisearch is unavailable.
+     * Accepts an Eloquent Listing model or a plain array (from sync script).
+     */
+    public static function indexListing(array|Listing $listing): void
+    {
+        if (!static::isAvailable()) {
+            return;
+        }
+
+        $doc = $listing instanceof Listing ? [
+            'id'            => $listing->id,
+            'tenant_id'     => $listing->tenant_id,
+            'title'         => $listing->title ?? '',
+            'description'   => $listing->description ?? '',
+            'location'      => $listing->location ?? '',
+            'status'        => $listing->status ?? 'active',
+            'type'          => $listing->type,
+            'category_id'   => $listing->category_id,
+            'category_name' => $listing->category?->name ?? '',
+            'author_name'   => $listing->user
+                ? trim($listing->user->first_name . ' ' . $listing->user->last_name)
+                : '',
+            'created_at'    => $listing->created_at?->timestamp ?? 0,
+        ] : $listing;
+
+        static::client()->index('listings')->addDocuments([$doc]);
+    }
+
+    /**
+     * Index a user into Meilisearch.
+     * Silently skips if Meilisearch is unavailable.
+     * Accepts an Eloquent User model or a plain array (from sync script).
+     */
+    public static function indexUser(array|User $user): void
+    {
+        if (!static::isAvailable()) {
+            return;
+        }
+
+        $doc = $user instanceof User ? [
+            'id'                => $user->id,
+            'tenant_id'         => $user->tenant_id,
+            'first_name'        => $user->first_name ?? '',
+            'last_name'         => $user->last_name ?? '',
+            'organization_name' => $user->organization_name ?? '',
+            'bio'               => $user->bio ?? '',
+            'status'            => $user->status ?? 'active',
+            'profile_type'      => $user->profile_type ?? 'individual',
+            'avatar_url'        => $user->avatar_url ?? '',
+            'created_at'        => $user->created_at?->timestamp ?? 0,
+        ] : $user;
+
+        static::client()->index('users')->addDocuments([$doc]);
+    }
+
+    /**
+     * Remove a listing from the Meilisearch index.
+     * Silently skips if Meilisearch is unavailable.
+     */
+    public function removeListing(int $listingId): void
+    {
+        if (!static::isAvailable()) {
+            return;
+        }
+        try {
+            static::client()->index('listings')->deleteDocument($listingId);
+        } catch (\Throwable) {
+            // Non-critical — document may already be absent
+        }
+    }
+
+    // =========================================================================
+    // Search
+    // =========================================================================
 
     /**
      * Unified search across multiple content types.
@@ -43,7 +204,87 @@ class SearchService
     public function search(string $term, ?string $type = null, int $limit = 10): array
     {
         $limit = min($limit, 50);
-        $like = '%' . $term . '%';
+
+        if (static::isAvailable()) {
+            return $this->searchViaMeilisearch($term, $type, $limit);
+        }
+
+        return $this->searchViaSQL($term, $type, $limit);
+    }
+
+    private function searchViaMeilisearch(string $term, ?string $type, int $limit): array
+    {
+        $client   = static::client();
+        $tenantId = TenantContext::getId();
+        $results  = [];
+
+        if ($type === null || $type === 'users') {
+            $hits = $client->index('users')->search($term, [
+                'filter'               => "tenant_id = {$tenantId} AND status != 'banned'",
+                'limit'                => $limit,
+                'attributesToRetrieve' => ['id', 'first_name', 'last_name', 'avatar_url', 'organization_name', 'profile_type', 'bio'],
+            ])->getHits();
+
+            $results['users'] = array_map(function (array $h) {
+                $name = ($h['profile_type'] ?? '') === 'organisation' && !empty($h['organization_name'])
+                    ? $h['organization_name']
+                    : trim(($h['first_name'] ?? '') . ' ' . ($h['last_name'] ?? ''));
+                return [...$h, 'result_type' => 'user', 'name' => $name, 'avatar' => $h['avatar_url'] ?? null, 'tagline' => $h['bio'] ?? null];
+            }, $hits);
+        }
+
+        if ($type === null || $type === 'listings') {
+            $hits = $client->index('listings')->search($term, [
+                'filter' => "tenant_id = {$tenantId} AND status = 'active'",
+                'limit'  => $limit,
+            ])->getHits();
+
+            $results['listings'] = array_map(fn(array $h) => [...$h, 'result_type' => 'listing'], $hits);
+        }
+
+        // Events and groups fall back to SQL — not yet indexed in Meilisearch
+        if ($type === null || $type === 'events') {
+            $like = '%' . $term . '%';
+            $results['events'] = $this->event->newQuery()
+                ->with(['user:id,first_name,last_name,avatar_url'])
+                ->where(function (Builder $q) use ($like) {
+                    $q->where('title', 'LIKE', $like)
+                      ->orWhere('description', 'LIKE', $like)
+                      ->orWhere('location', 'LIKE', $like);
+                })
+                ->where('start_time', '>=', now())
+                ->orderBy('start_time')
+                ->limit($limit)
+                ->get()
+                ->map(fn (Event $e) => [...$e->toArray(), 'result_type' => 'event'])
+                ->all();
+        }
+
+        if ($type === null || $type === 'groups') {
+            $like = '%' . $term . '%';
+            $results['groups'] = $this->group->newQuery()
+                ->withCount('activeMembers')
+                ->where(function (Builder $q) use ($like) {
+                    $q->where('name', 'LIKE', $like)
+                      ->orWhere('description', 'LIKE', $like);
+                })
+                ->orderByDesc('id')
+                ->limit($limit)
+                ->get()
+                ->map(fn (Group $g) => [
+                    ...$g->toArray(),
+                    'result_type'   => 'group',
+                    'members_count' => $g->active_members_count,
+                ])
+                ->all();
+        }
+
+        return $results;
+    }
+
+    private function searchViaSQL(string $term, ?string $type, int $limit): array
+    {
+        $like    = '%' . $term . '%';
         $results = [];
 
         if ($type === null || $type === 'users') {
@@ -64,7 +305,7 @@ class SearchService
                     'name' => ($u->profile_type === 'organisation' && $u->organization_name)
                         ? $u->organization_name
                         : trim($u->first_name . ' ' . $u->last_name),
-                    'avatar' => $u->avatar_url,
+                    'avatar'  => $u->avatar_url,
                     'tagline' => $u->bio,
                 ])
                 ->all();
@@ -85,7 +326,7 @@ class SearchService
                 ->get()
                 ->map(fn (Listing $l) => [
                     ...$l->toArray(),
-                    'result_type' => 'listing',
+                    'result_type'   => 'listing',
                     'category_name' => $l->category?->name,
                 ])
                 ->all();
@@ -119,7 +360,7 @@ class SearchService
                 ->get()
                 ->map(fn (Group $g) => [
                     ...$g->toArray(),
-                    'result_type' => 'group',
+                    'result_type'   => 'group',
                     'members_count' => $g->active_members_count,
                 ])
                 ->all();
@@ -128,13 +369,14 @@ class SearchService
         return $results;
     }
 
+    // =========================================================================
+    // Unified search (cursor-paginated, flattened results)
+    // =========================================================================
+
     /**
      * Unified search with cursor pagination and flattened results.
      *
-     * Used by the SearchController to produce a single paginated list
-     * matching the legacy UnifiedSearchService contract.
-     *
-     * @param string   $term    Search query (min 2 chars)
+     * @param string   $term    Search query (min 2 chars recommended)
      * @param int|null $userId  Optional authenticated user
      * @param array    $filters type, cursor, limit, category_id, sort, skills
      * @return array{items: array, cursor: string|null, has_more: bool, total: int, query: string}
@@ -142,14 +384,99 @@ class SearchService
     public function unifiedSearch(string $term, ?int $userId = null, array $filters = []): array
     {
         $limit = min((int) ($filters['limit'] ?? 20), 50);
-        $type = $filters['type'] ?? 'all';
-        $cursor = $filters['cursor'] ?? null;
-        $sort = $filters['sort'] ?? 'relevance';
+        $type  = $filters['type'] ?? 'all';
+        $sort  = $filters['sort'] ?? 'relevance';
 
-        $like = '%' . $term . '%';
+        if (static::isAvailable()) {
+            return $this->unifiedSearchViaMeilisearch($term, $filters, $limit, $type, $sort);
+        }
+
+        return $this->unifiedSearchViaSQL($term, $filters, $limit, $type, $sort);
+    }
+
+    private function unifiedSearchViaMeilisearch(string $term, array $filters, int $limit, string $type, string $sort): array
+    {
+        $client   = static::client();
+        $tenantId = TenantContext::getId();
+        $allItems = [];
+        $like     = '%' . $term . '%';
+
+        if ($type === 'all' || $type === 'listings') {
+            $filterParts = ["tenant_id = {$tenantId}", "status = 'active'"];
+            if (!empty($filters['category_id'])) {
+                $filterParts[] = 'category_id = ' . (int) $filters['category_id'];
+            }
+            $hits = $client->index('listings')->search($term, [
+                'filter' => implode(' AND ', $filterParts),
+                'limit'  => $limit,
+            ])->getHits();
+            foreach ($hits as $h) {
+                $allItems[] = [...$h, 'type' => 'listing', 'listing_type' => $h['type'] ?? null];
+            }
+        }
+
+        if ($type === 'all' || $type === 'users') {
+            $hits = $client->index('users')->search($term, [
+                'filter'               => "tenant_id = {$tenantId} AND status != 'banned'",
+                'limit'                => $limit,
+                'attributesToRetrieve' => ['id', 'first_name', 'last_name', 'avatar_url', 'organization_name', 'profile_type', 'bio', 'created_at'],
+            ])->getHits();
+            foreach ($hits as $h) {
+                $name = ($h['profile_type'] ?? '') === 'organisation' && !empty($h['organization_name'])
+                    ? $h['organization_name']
+                    : trim(($h['first_name'] ?? '') . ' ' . ($h['last_name'] ?? ''));
+                $allItems[] = [...$h, 'type' => 'user', 'name' => $name, 'avatar' => $h['avatar_url'] ?? null, 'tagline' => $h['bio'] ?? null];
+            }
+        }
+
+        // Events and groups use SQL fallback until Meilisearch indexing is extended to them
+        if ($type === 'all' || $type === 'events') {
+            $eq = $this->event->newQuery()
+                ->with(['user:id,first_name,last_name,avatar_url'])
+                ->where(function (Builder $q) use ($like) {
+                    $q->where('title', 'LIKE', $like)
+                      ->orWhere('description', 'LIKE', $like)
+                      ->orWhere('location', 'LIKE', $like);
+                })
+                ->where('start_time', '>=', now());
+
+            $this->applySortOrder($eq, $sort, 'start_time');
+            foreach ($eq->limit($limit)->get() as $e) {
+                $allItems[] = [...$e->toArray(), 'type' => 'event'];
+            }
+        }
+
+        if ($type === 'all' || $type === 'groups') {
+            $gq = $this->group->newQuery()
+                ->withCount('activeMembers')
+                ->where(function (Builder $q) use ($like) {
+                    $q->where('name', 'LIKE', $like)
+                      ->orWhere('description', 'LIKE', $like);
+                });
+
+            $this->applySortOrder($gq, $sort);
+            foreach ($gq->limit($limit)->get() as $g) {
+                $allItems[] = [...$g->toArray(), 'type' => 'group', 'members_count' => $g->active_members_count];
+            }
+        }
+
+        $total   = count($allItems);
+        $hasMore = $total > $limit;
+
+        return [
+            'items'    => $hasMore ? array_slice($allItems, 0, $limit) : $allItems,
+            'cursor'   => null,
+            'has_more' => $hasMore,
+            'total'    => $total,
+            'query'    => $term,
+        ];
+    }
+
+    private function unifiedSearchViaSQL(string $term, array $filters, int $limit, string $type, string $sort): array
+    {
+        $like     = '%' . $term . '%';
         $allItems = [];
 
-        // Listings
         if ($type === 'all' || $type === 'listings') {
             $lq = $this->listing->newQuery()
                 ->with(['user:id,first_name,last_name,avatar_url', 'category:id,name,color'])
@@ -161,35 +488,29 @@ class SearchService
                     $q->whereNull('status')->orWhere('status', 'active');
                 });
 
-            if (! empty($filters['category_id'])) {
+            if (!empty($filters['category_id'])) {
                 $lq->where('category_id', (int) $filters['category_id']);
             }
 
-            if (! empty($filters['skills'])) {
-                $skills = is_array($filters['skills'])
-                    ? $filters['skills']
-                    : explode(',', $filters['skills']);
+            if (!empty($filters['skills'])) {
+                $skills = is_array($filters['skills']) ? $filters['skills'] : explode(',', $filters['skills']);
                 $skills = array_map(fn ($s) => strtolower(trim($s)), array_filter($skills));
-                if (! empty($skills)) {
-                    $lq->whereHas('skillTags', function (Builder $q) use ($skills) {
-                        $q->whereIn('tag', $skills);
-                    });
+                if (!empty($skills)) {
+                    $lq->whereHas('skillTags', fn (Builder $q) => $q->whereIn('tag', $skills));
                 }
             }
 
             $this->applySortOrder($lq, $sort);
-            $listings = $lq->limit($limit)->get();
-            foreach ($listings as $l) {
+            foreach ($lq->limit($limit)->get() as $l) {
                 $allItems[] = [
                     ...$l->toArray(),
-                    'type'         => 'listing',
-                    'listing_type' => $l->type,
+                    'type'          => 'listing',
+                    'listing_type'  => $l->type,
                     'category_name' => $l->category?->name,
                 ];
             }
         }
 
-        // Users
         if ($type === 'all' || $type === 'users') {
             $uq = $this->user->newQuery()
                 ->where(function (Builder $q) use ($like) {
@@ -202,8 +523,7 @@ class SearchService
                 ->select('id', 'first_name', 'last_name', 'avatar_url', 'organization_name', 'profile_type', 'bio', 'created_at');
 
             $this->applySortOrder($uq, $sort);
-            $users = $uq->limit($limit)->get();
-            foreach ($users as $u) {
+            foreach ($uq->limit($limit)->get() as $u) {
                 $name = ($u->profile_type === 'organisation' && $u->organization_name)
                     ? $u->organization_name
                     : trim($u->first_name . ' ' . $u->last_name);
@@ -217,7 +537,6 @@ class SearchService
             }
         }
 
-        // Events
         if ($type === 'all' || $type === 'events') {
             $eq = $this->event->newQuery()
                 ->with(['user:id,first_name,last_name,avatar_url'])
@@ -229,13 +548,11 @@ class SearchService
                 ->where('start_time', '>=', now());
 
             $this->applySortOrder($eq, $sort, 'start_time');
-            $events = $eq->limit($limit)->get();
-            foreach ($events as $e) {
+            foreach ($eq->limit($limit)->get() as $e) {
                 $allItems[] = [...$e->toArray(), 'type' => 'event'];
             }
         }
 
-        // Groups
         if ($type === 'all' || $type === 'groups') {
             $gq = $this->group->newQuery()
                 ->withCount('activeMembers')
@@ -245,8 +562,7 @@ class SearchService
                 });
 
             $this->applySortOrder($gq, $sort);
-            $groups = $gq->limit($limit)->get();
-            foreach ($groups as $g) {
+            foreach ($gq->limit($limit)->get() as $g) {
                 $allItems[] = [
                     ...$g->toArray(),
                     'type'          => 'group',
@@ -255,14 +571,11 @@ class SearchService
             }
         }
 
-        $total = count($allItems);
+        $total   = count($allItems);
         $hasMore = $total > $limit;
-        if ($hasMore) {
-            $allItems = array_slice($allItems, 0, $limit);
-        }
 
         return [
-            'items'    => $allItems,
+            'items'    => $hasMore ? array_slice($allItems, 0, $limit) : $allItems,
             'cursor'   => null,
             'has_more' => $hasMore,
             'total'    => $total,
@@ -270,10 +583,12 @@ class SearchService
         ];
     }
 
+    // =========================================================================
+    // Suggestions (autocomplete)
+    // =========================================================================
+
     /**
      * Get autocomplete suggestions for a partial query.
-     *
-     * Returns a few results from each type for quick display.
      *
      * @return array{listings: array, users: array, events: array, groups: array}
      */
@@ -283,12 +598,64 @@ class SearchService
             return ['listings' => [], 'users' => [], 'events' => [], 'groups' => []];
         }
 
+        if (static::isAvailable()) {
+            return $this->suggestionsViaMeilisearch($term, $limit);
+        }
+
+        return $this->suggestionsViaSQL($term, $limit);
+    }
+
+    private function suggestionsViaMeilisearch(string $term, int $limit): array
+    {
+        $client   = static::client();
+        $tenantId = TenantContext::getId();
+
+        $listings = $client->index('listings')->search($term, [
+            'filter'               => "tenant_id = {$tenantId} AND status = 'active'",
+            'limit'                => $limit,
+            'attributesToRetrieve' => ['id', 'title', 'type'],
+        ])->getHits();
+
+        $userHits = $client->index('users')->search($term, [
+            'filter'               => "tenant_id = {$tenantId} AND status != 'banned'",
+            'limit'                => $limit,
+            'attributesToRetrieve' => ['id', 'first_name', 'last_name', 'avatar_url', 'organization_name', 'profile_type'],
+        ])->getHits();
+        $users = array_map(function (array $h) {
+            $name = ($h['profile_type'] ?? '') === 'organisation' && !empty($h['organization_name'])
+                ? $h['organization_name']
+                : trim(($h['first_name'] ?? '') . ' ' . ($h['last_name'] ?? ''));
+            return [...$h, 'name' => $name];
+        }, $userHits);
+
+        // Events and groups via SQL — not yet indexed in Meilisearch
+        $like   = '%' . $term . '%';
+        $events = $this->event->newQuery()
+            ->where('title', 'LIKE', $like)
+            ->where('start_time', '>=', now())
+            ->select('id', 'title', 'start_time')
+            ->orderBy('start_time')
+            ->limit($limit)
+            ->get()
+            ->toArray();
+
+        $groups = $this->group->newQuery()
+            ->where('name', 'LIKE', $like)
+            ->select('id', 'name')
+            ->orderByDesc('id')
+            ->limit($limit)
+            ->get()
+            ->toArray();
+
+        return compact('listings', 'users', 'events', 'groups');
+    }
+
+    private function suggestionsViaSQL(string $term, int $limit): array
+    {
         $like = '%' . $term . '%';
 
         $listings = $this->listing->newQuery()
-            ->where(function (Builder $q) use ($like) {
-                $q->where('title', 'LIKE', $like);
-            })
+            ->where('title', 'LIKE', $like)
             ->where(function (Builder $q) {
                 $q->whereNull('status')->orWhere('status', 'active');
             })
@@ -336,10 +703,14 @@ class SearchService
         return compact('listings', 'users', 'events', 'groups');
     }
 
+    // =========================================================================
+    // Trending
+    // =========================================================================
+
     /**
      * Get trending search terms from the search_logs table.
      *
-     * @param int $days  Look back period
+     * @param int $days  Look-back period in days
      * @param int $limit Max terms to return
      * @return array Array of {term, count}
      */
@@ -355,40 +726,15 @@ class SearchService
                 ->limit($limit)
                 ->get()
                 ->toArray();
-        } catch (\Exception $e) {
-            // search_logs table may not exist yet
+        } catch (\Exception) {
             return [];
         }
     }
 
-    /**
-     * Apply sort order to a query builder.
-     */
-    private function applySortOrder(Builder $query, string $sort, string $dateColumn = 'created_at'): void
-    {
-        match ($sort) {
-            'newest' => $query->orderByDesc($dateColumn),
-            'oldest' => $query->orderBy($dateColumn),
-            default  => $query->orderByDesc('id'),
-        };
-    }
+    // =========================================================================
+    // Static user search (used by UsersController member list)
+    // =========================================================================
 
-    /**
-     * Check if the search service (Meilisearch) is available.
-     *
-     * Returns false — Meilisearch integration is not yet ported to Laravel.
-     * The Eloquent LIKE-based search in this service is the active implementation.
-     */
-    public function isAvailable(): bool
-    {
-        return false;
-    }
-
-    /**
-     * Search users by name using LIKE matching.
-     *
-     * @return array Array of user IDs matching the query
-     */
     public static function searchUsersStatic(string $query, int $tenantId, int $limit = 200, array $extraFilters = []): array|false
     {
         $like = '%' . $query . '%';
@@ -405,25 +751,16 @@ class SearchService
             ->all();
     }
 
-    /**
-     * Index a listing for search.
-     *
-     * Placeholder: When Meilisearch/Scout is configured, index here.
-     * For now, the LIKE-based search doesn't need indexing.
-     */
-    public function indexListing(Listing $listing): void
-    {
-        // Placeholder: When Meilisearch/Scout is configured, index here.
-        // For now, the LIKE-based search doesn't need indexing.
-    }
+    // =========================================================================
+    // Private helpers
+    // =========================================================================
 
-    /**
-     * Remove a listing from the search index.
-     *
-     * Placeholder: When Meilisearch/Scout is configured, remove here.
-     */
-    public function removeListing(int $listingId): void
+    private function applySortOrder(Builder $query, string $sort, string $dateColumn = 'created_at'): void
     {
-        // Placeholder: When Meilisearch/Scout is configured, remove here.
+        match ($sort) {
+            'newest' => $query->orderByDesc($dateColumn),
+            'oldest' => $query->orderBy($dateColumn),
+            default  => $query->orderByDesc('id'),
+        };
     }
 }
