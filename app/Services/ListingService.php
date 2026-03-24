@@ -102,6 +102,15 @@ class ListingService
                 $meiliFilters[] = 'user_id = ' . (int) $filters['user_id'];
             }
 
+            if (!empty($filters['skills'])) {
+                $skills = is_array($filters['skills'])
+                    ? $filters['skills']
+                    : explode(',', $filters['skills']);
+                foreach (array_filter(array_map(fn($s) => strtolower(trim($s)), $skills)) as $skill) {
+                    $meiliFilters[] = "skill_tags = '" . str_replace("'", "\\'", $skill) . "'";
+                }
+            }
+
             $meiliResult = SearchService::searchListingIds(
                 $filters['search'], $tenantId, $meiliFilters, $limit + 1, $meiliOffset
             );
@@ -125,17 +134,6 @@ class ListingService
                 // Multi-type arrays can't be expressed in the Meilisearch filter above
                 if (!empty($filters['type']) && is_array($filters['type'])) {
                     $q->whereIn('type', $filters['type']);
-                }
-
-                // Skills are not a Meilisearch attribute — apply in SQL post-filter
-                if (!empty($filters['skills'])) {
-                    $skills = is_array($filters['skills'])
-                        ? $filters['skills']
-                        : explode(',', $filters['skills']);
-                    $skills = array_map(fn($s) => strtolower(trim($s)), array_filter($skills));
-                    if (!empty($skills)) {
-                        $q->whereHas('skillTags', fn(Builder $sq) => $sq->whereIn('tag', $skills));
-                    }
                 }
 
                 $listingsById = $q->get()->keyBy('id');

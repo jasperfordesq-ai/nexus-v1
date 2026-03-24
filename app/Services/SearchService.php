@@ -85,7 +85,7 @@ class SearchService
             'listings' => [
                 'pk'         => 'id',
                 'searchable' => ['title', 'description', 'location', 'author_name', 'category_name'],
-                'filterable' => ['tenant_id', 'status', 'category_id', 'type', 'user_id'],
+                'filterable' => ['tenant_id', 'status', 'category_id', 'type', 'user_id', 'skill_tags'],
                 'sortable'   => ['created_at'],
             ],
             'users' => [
@@ -141,6 +141,7 @@ class SearchService
             'author_name'   => $listing->user
                 ? trim($listing->user->first_name . ' ' . $listing->user->last_name)
                 : '',
+            'skill_tags'    => $listing->skillTags->pluck('tag')->all(),
             'created_at'    => $listing->created_at?->timestamp ?? 0,
         ] : $listing;
 

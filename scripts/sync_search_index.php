@@ -162,14 +162,26 @@ function syncListings(int $tenantId, bool $dryRun): array
                 l.title, l.description, l.location, l.status,
                 UNIX_TIMESTAMP(l.created_at) as created_at,
                 CONCAT(u.first_name, ' ', u.last_name) as author_name,
-                COALESCE(c.name, '') as category_name
+                COALESCE(c.name, '') as category_name,
+                GROUP_CONCAT(lst.tag ORDER BY lst.tag SEPARATOR ',') as skill_tags_csv
          FROM listings l
          LEFT JOIN users u ON l.user_id = u.id
          LEFT JOIN categories c ON c.id = l.category_id
+         LEFT JOIN listing_skill_tags lst ON lst.listing_id = l.id
          WHERE l.tenant_id = ? AND l.status = 'active'
+         GROUP BY l.id, l.tenant_id, l.user_id, l.category_id, l.type,
+                  l.title, l.description, l.location, l.status, l.created_at,
+                  u.first_name, u.last_name, c.name
          ORDER BY l.id",
         [$tenantId]
     ));
+
+    // Convert skill_tags_csv string to array for Meilisearch
+    $rows = array_map(function (array $row): array {
+        $row['skill_tags'] = array_values(array_filter(explode(',', $row['skill_tags_csv'] ?? '')));
+        unset($row['skill_tags_csv']);
+        return $row;
+    }, $rows);
 
     $total = count($rows);
 
