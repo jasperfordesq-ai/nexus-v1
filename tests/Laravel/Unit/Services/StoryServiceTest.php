@@ -30,6 +30,11 @@ class StoryServiceTest extends TestCase
 
     public function test_create_throws_when_max_active_stories_reached(): void
     {
+        // DB::transaction() executes the closure — mock it to pass through
+        DB::shouldReceive('transaction')
+            ->once()
+            ->andReturnUsing(fn (callable $cb) => $cb());
+
         DB::shouldReceive('selectOne')
             ->once()
             ->andReturn((object) ['cnt' => 30]);
@@ -42,7 +47,12 @@ class StoryServiceTest extends TestCase
 
     public function test_create_text_story_inserts_record(): void
     {
-        // Active count check
+        // DB::transaction() executes the closure
+        DB::shouldReceive('transaction')
+            ->once()
+            ->andReturnUsing(fn (callable $cb) => $cb());
+
+        // Active count check (inside transaction, with FOR UPDATE)
         DB::shouldReceive('selectOne')
             ->once()
             ->andReturn((object) ['cnt' => 0]);
@@ -94,10 +104,7 @@ class StoryServiceTest extends TestCase
 
     public function test_create_poll_story_requires_question(): void
     {
-        DB::shouldReceive('selectOne')
-            ->once()
-            ->andReturn((object) ['cnt' => 0]);
-
+        // Poll validation happens before the transaction — no DB calls needed
         $this->expectException(\RuntimeException::class);
         $this->expectExceptionMessage('Poll question is required');
 
@@ -109,9 +116,6 @@ class StoryServiceTest extends TestCase
 
     public function test_create_poll_story_requires_2_to_4_options(): void
     {
-        DB::shouldReceive('selectOne')
-            ->once()
-            ->andReturn((object) ['cnt' => 0]);
 
         $this->expectException(\RuntimeException::class);
         $this->expectExceptionMessage('Poll stories require 2 to 4 options');
@@ -125,6 +129,11 @@ class StoryServiceTest extends TestCase
 
     public function test_create_clamps_duration(): void
     {
+        // DB::transaction() executes the closure
+        DB::shouldReceive('transaction')
+            ->once()
+            ->andReturnUsing(fn (callable $cb) => $cb());
+
         DB::shouldReceive('selectOne')
             ->once()
             ->andReturn((object) ['cnt' => 0]);

@@ -44,22 +44,11 @@ class StoryService
     {
         $tenantId = TenantContext::getId();
 
-        // Check active story limit
-        $activeCount = DB::selectOne(
-            'SELECT COUNT(*) as cnt FROM stories WHERE tenant_id = ? AND user_id = ? AND is_active = 1 AND expires_at > NOW()',
-            [$tenantId, $userId]
-        );
-
-        if (($activeCount->cnt ?? 0) >= self::MAX_ACTIVE_STORIES) {
-            throw new \RuntimeException('Maximum active stories limit reached (' . self::MAX_ACTIVE_STORIES . ')');
-        }
-
+        // Validate data outside transaction (fast fail before locking)
         $mediaType = $data['media_type'] ?? 'image';
         $duration = min(max((int) ($data['duration'] ?? 5), 3), 30);
-
         $expiresAt = now()->addHours(self::STORY_LIFETIME_HOURS)->format('Y-m-d H:i:s');
 
-        // Validate poll data
         $pollOptions = null;
         if ($mediaType === 'poll') {
             if (empty($data['poll_question'])) {
@@ -80,35 +69,53 @@ class StoryService
         $videoDuration = null;
         if ($mediaType === 'video' && !empty($data['video_duration'])) {
             $videoDuration = (float) $data['video_duration'];
-            // For video stories, default display duration to video length (capped at 30s)
             $duration = min(max((int) ceil($videoDuration), 3), 30);
         }
 
         $audience = $data['audience'] ?? 'everyone';
 
-        DB::insert(
-            'INSERT INTO stories (tenant_id, user_id, media_type, media_url, thumbnail_url, text_content, text_style, background_color, background_gradient, duration, video_duration, poll_question, poll_options, audience, expires_at, created_at)
-             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())',
-            [
-                $tenantId,
-                $userId,
-                $mediaType,
-                $data['media_url'] ?? null,
-                $data['thumbnail_url'] ?? null,
-                $data['text_content'] ?? null,
-                $textStyle,
-                $data['background_color'] ?? null,
-                $data['background_gradient'] ?? null,
-                $duration,
-                $videoDuration,
-                $data['poll_question'] ?? null,
-                $pollOptions,
-                $audience,
-                $expiresAt,
-            ]
-        );
+        // Atomic check-and-insert: transaction with locking read prevents
+        // concurrent requests from bypassing the 30-story limit.
+        $storyId = DB::transaction(function () use (
+            $tenantId, $userId, $mediaType, $data, $textStyle, $duration,
+            $videoDuration, $pollOptions, $audience, $expiresAt
+        ) {
+            // Locking count — blocks concurrent inserts for this user until commit
+            $activeCount = DB::selectOne(
+                'SELECT COUNT(*) as cnt FROM stories WHERE tenant_id = ? AND user_id = ? AND is_active = 1 AND expires_at > NOW() FOR UPDATE',
+                [$tenantId, $userId]
+            );
 
-        $storyId = DB::getPdo()->lastInsertId();
+            if (($activeCount->cnt ?? 0) >= self::MAX_ACTIVE_STORIES) {
+                throw new \RuntimeException('Maximum active stories limit reached (' . self::MAX_ACTIVE_STORIES . ')');
+            }
+
+            DB::insert(
+                'INSERT INTO stories (tenant_id, user_id, media_type, media_url, thumbnail_url, text_content, text_style, background_color, background_gradient, duration, video_duration, poll_question, poll_options, audience, expires_at, created_at)
+                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())',
+                [
+                    $tenantId,
+                    $userId,
+                    $mediaType,
+                    $data['media_url'] ?? null,
+                    $data['thumbnail_url'] ?? null,
+                    $data['text_content'] ?? null,
+                    $textStyle,
+                    $data['background_color'] ?? null,
+                    $data['background_gradient'] ?? null,
+                    $duration,
+                    $videoDuration,
+                    $data['poll_question'] ?? null,
+                    $pollOptions,
+                    $audience,
+                    $expiresAt,
+                ]
+            );
+
+            return DB::getPdo()->lastInsertId();
+        });
+
+        $storyId = (int) $storyId;
 
         // Notify the user's connections about the new story (non-blocking)
         try {
@@ -226,20 +233,43 @@ class StoryService
     public function getUserStories(int $userId, ?int $viewerId = null): array
     {
         $tenantId = TenantContext::getId();
+        $viewerInt = $viewerId ? (int) $viewerId : 0;
+
+        // If the viewer is the story owner, show all their stories (no audience filter).
+        // Otherwise, enforce audience visibility (everyone / connections / close_friends).
+        $audienceClause = '';
+        $audienceParams = [];
+
+        if ($viewerInt && $viewerInt !== $userId) {
+            $audienceClause = '
+               AND (
+                   COALESCE(s.audience, \'everyone\') = \'everyone\'
+                   OR (COALESCE(s.audience, \'everyone\') = \'connections\' AND EXISTS (
+                       SELECT 1 FROM connections c
+                       WHERE ((c.requester_id = s.user_id AND c.receiver_id = ?) OR (c.receiver_id = s.user_id AND c.requester_id = ?))
+                         AND c.status = \'accepted\' AND c.tenant_id = ?
+                   ))
+                   OR (COALESCE(s.audience, \'everyone\') = \'close_friends\' AND EXISTS (
+                       SELECT 1 FROM close_friends cf WHERE cf.user_id = s.user_id AND cf.friend_id = ? AND cf.tenant_id = ?
+                   ))
+               )';
+            $audienceParams = [$viewerInt, $viewerInt, $tenantId, $viewerInt, $tenantId];
+        }
 
         $stories = DB::select(
             'SELECT s.*,
                     u.first_name, u.last_name, u.avatar_url,
-                    ' . ($viewerId ? 'CASE WHEN sv.id IS NOT NULL THEN 1 ELSE 0 END as is_viewed' : '0 as is_viewed') . '
+                    ' . ($viewerInt ? 'CASE WHEN sv.id IS NOT NULL THEN 1 ELSE 0 END as is_viewed' : '0 as is_viewed') . '
              FROM stories s
              JOIN users u ON u.id = s.user_id
-             ' . ($viewerId ? 'LEFT JOIN story_views sv ON sv.story_id = s.id AND sv.viewer_id = ' . (int) $viewerId : '') . '
+             ' . ($viewerInt ? 'LEFT JOIN story_views sv ON sv.story_id = s.id AND sv.viewer_id = ' . $viewerInt : '') . '
              WHERE s.tenant_id = ?
                AND s.user_id = ?
                AND s.is_active = 1
                AND s.expires_at > NOW()
+               ' . $audienceClause . '
              ORDER BY s.created_at ASC',
-            [$tenantId, $userId]
+            array_merge([$tenantId, $userId], $audienceParams)
         );
 
         return array_map(fn($s) => $this->formatStory($s), $stories);
