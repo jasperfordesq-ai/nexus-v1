@@ -250,23 +250,25 @@ export default function FederationSystemControls() {
           </div>
 
           {/* Max Level */}
-          <div>
-            <Select
-              label={t('super.label_maximum_partnership_level')}
-              selectedKeys={[controls.max_level.toString()]}
-              onSelectionChange={(keys) => {
-                const selected = Array.from(keys)[0];
-                if (selected) handleToggleControl('max_level', parseInt(String(selected)));
-              }}
-              variant="bordered"
-              description={t('super.desc_highest_level_allowed_for_new_partnershi')}
-            >
-              <SelectItem key="1">Level 1 - Profiles Only</SelectItem>
-              <SelectItem key="2">Level 2 - Profiles + Messaging</SelectItem>
-              <SelectItem key="3">Level 3 - Profiles + Messaging + Transactions</SelectItem>
-              <SelectItem key="4">Level 4 - Full Integration</SelectItem>
-            </Select>
-          </div>
+          {!loading && (
+            <div>
+              <Select
+                label={t('super.label_maximum_partnership_level')}
+                selectedKeys={[controls.max_level.toString()]}
+                onSelectionChange={(keys) => {
+                  const selected = Array.from(keys)[0];
+                  if (selected) handleToggleControl('max_level', parseInt(String(selected)));
+                }}
+                variant="bordered"
+                description={t('super.desc_highest_level_allowed_for_new_partnershi')}
+              >
+                <SelectItem key="1">Level 1 - Profiles Only</SelectItem>
+                <SelectItem key="2">Level 2 - Profiles + Messaging</SelectItem>
+                <SelectItem key="3">Level 3 - Profiles + Messaging + Transactions</SelectItem>
+                <SelectItem key="4">Level 4 - Full Integration</SelectItem>
+              </Select>
+            </div>
+          )}
         </CardBody>
       </Card>
 

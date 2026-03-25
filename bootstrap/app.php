@@ -37,6 +37,10 @@ $app = Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware) {
+        // EnsureCorsHeaders runs as the outermost middleware to guarantee
+        // CORS headers on ALL responses, including 401/403 from auth middleware.
+        $middleware->prepend(\App\Http\Middleware\EnsureCorsHeaders::class);
+
         $middleware->api(prepend: [
             \App\Http\Middleware\SecurityHeaders::class,
             \App\Http\Middleware\ResolveTenant::class,

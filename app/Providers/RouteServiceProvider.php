@@ -58,6 +58,15 @@ class RouteServiceProvider extends ServiceProvider
                 ->prefix('api')
                 ->group(base_path('routes/api.php'));
 
+            // Cron endpoint — no /api prefix (external callers hit /cron/run-all directly)
+            // CronJobRunner authenticates via CRON_KEY query param or X-Cron-Key header.
+            Route::get('/cron/run-all', function () {
+                $runner = app(\App\Services\CronJobRunner::class);
+                $runner->runAll();
+                // runAll() outputs directly via echo — return empty to avoid double output
+                return '';
+            });
+
             // Channel authorization routes for broadcasting
             if (file_exists(base_path('routes/channels.php'))) {
                 require base_path('routes/channels.php');
