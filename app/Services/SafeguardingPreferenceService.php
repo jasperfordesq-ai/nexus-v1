@@ -58,6 +58,11 @@ class SafeguardingPreferenceService
      */
     public static function createOption(int $tenantId, array $data): TenantSafeguardingOption
     {
+        $data['label'] = strip_tags(trim($data['label']));
+        if (isset($data['description'])) {
+            $data['description'] = strip_tags(trim($data['description']));
+        }
+
         $option = TenantSafeguardingOption::create([
             'tenant_id' => $tenantId,
             'option_key' => $data['option_key'],
@@ -86,18 +91,39 @@ class SafeguardingPreferenceService
      */
     public static function updateOption(int $optionId, array $data): bool
     {
-        $option = TenantSafeguardingOption::find($optionId);
+        $option = TenantSafeguardingOption::where('id', $optionId)
+            ->where('tenant_id', TenantContext::getId())
+            ->first();
         if (!$option) {
             return false;
         }
 
         $fillable = ['label', 'description', 'help_url', 'sort_order', 'is_active', 'is_required', 'option_type', 'select_options', 'triggers'];
         $updates = array_intersect_key($data, array_flip($fillable));
+        if (isset($updates['label'])) {
+            $updates['label'] = strip_tags(trim($updates['label']));
+        }
+        if (isset($updates['description'])) {
+            $updates['description'] = strip_tags(trim($updates['description']));
+        }
         if (array_key_exists('help_url', $updates)) {
             $updates['help_url'] = self::validateUrl($updates['help_url']);
         }
 
         $option->update($updates);
+
+        // Invalidate trigger cache for affected users when option activation changes
+        if (array_key_exists('is_active', $updates)) {
+            $affectedUserIds = \App\Models\UserSafeguardingPreference::where('option_id', $optionId)
+                ->whereNull('revoked_at')
+                ->distinct()
+                ->pluck('user_id');
+
+            $tenantId = TenantContext::getId();
+            foreach ($affectedUserIds as $userId) {
+                \Illuminate\Support\Facades\Cache::forget("safeguarding_triggers:{$tenantId}:{$userId}");
+            }
+        }
 
         self::logActivity(null, 'safeguarding_option_updated', 'safeguarding_option', $optionId, [
             'option_key' => $option->option_key,
@@ -112,12 +138,25 @@ class SafeguardingPreferenceService
      */
     public static function deleteOption(int $optionId): bool
     {
-        $option = TenantSafeguardingOption::find($optionId);
+        $option = TenantSafeguardingOption::where('id', $optionId)
+            ->where('tenant_id', TenantContext::getId())
+            ->first();
         if (!$option) {
             return false;
         }
 
         $option->update(['is_active' => false]);
+
+        // Invalidate trigger cache for affected users
+        $affectedUserIds = \App\Models\UserSafeguardingPreference::where('option_id', $optionId)
+            ->whereNull('revoked_at')
+            ->distinct()
+            ->pluck('user_id');
+
+        $tenantId = TenantContext::getId();
+        foreach ($affectedUserIds as $userId) {
+            \Illuminate\Support\Facades\Cache::forget("safeguarding_triggers:{$tenantId}:{$userId}");
+        }
 
         self::logActivity(null, 'safeguarding_option_deleted', 'safeguarding_option', $optionId, [
             'option_key' => $option->option_key,

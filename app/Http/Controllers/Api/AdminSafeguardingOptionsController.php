@@ -82,6 +82,11 @@ class AdminSafeguardingOptionsController extends BaseApiController
             return $this->respondWithError('VALIDATION_ERROR', 'triggers must be a JSON object', 'triggers', 422);
         }
 
+        $existingCount = \App\Models\TenantSafeguardingOption::where('tenant_id', $tenantId)->count();
+        if ($existingCount >= 50) {
+            return $this->respondWithError('LIMIT_EXCEEDED', 'Maximum 50 safeguarding options per tenant', null, 422);
+        }
+
         try {
             $option = SafeguardingPreferenceService::createOption($tenantId, $data);
             return $this->respondWithData($option->toArray(), 201);
@@ -137,6 +142,16 @@ class AdminSafeguardingOptionsController extends BaseApiController
         $order = $this->input('order', []);
         if (empty($order) || !is_array($order)) {
             return $this->respondWithError('VALIDATION_ERROR', 'order must be a non-empty object of {id: sort_order}', 'order', 422);
+        }
+
+        // Validate all option IDs belong to current tenant
+        $submittedIds = array_map('intval', array_keys($order));
+        $validCount = \App\Models\TenantSafeguardingOption::where('tenant_id', $tenantId)
+            ->whereIn('id', $submittedIds)
+            ->count();
+
+        if ($validCount !== count($submittedIds)) {
+            return $this->respondWithError('VALIDATION_ERROR', 'One or more option IDs are invalid', 'order', 422);
         }
 
         SafeguardingPreferenceService::reorderOptions($tenantId, $order);

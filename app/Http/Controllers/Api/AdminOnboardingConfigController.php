@@ -135,6 +135,8 @@ class AdminOnboardingConfigController extends BaseApiController
             } elseif (in_array($key, ['bio_min_length', 'listing_max_auto'], true)) {
                 $value = (string) (int) $value;
                 $type = 'integer';
+            } elseif (in_array($key, ['welcome_text', 'help_text', 'safeguarding_intro_text'], true)) {
+                $value = strip_tags(trim((string) $value));
             } else {
                 $value = (string) $value;
             }
