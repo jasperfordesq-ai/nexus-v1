@@ -84,11 +84,16 @@ class OnboardingControllerTest extends TestCase
 
     public function test_complete_marks_onboarding_done(): void
     {
-        $this->authenticatedUser();
+        $user = User::factory()->forTenant($this->testTenantId)->create([
+            'status' => 'active',
+            'is_approved' => true,
+            'avatar_url' => 'https://example.com/photo.jpg',
+            'bio' => 'A valid bio that is long enough to pass validation.',
+        ]);
+        Sanctum::actingAs($user, ['*']);
 
         $response = $this->apiPost('/v2/onboarding/complete', [
-            'categories' => [1, 2],
-            'bio' => 'I love timebanking!',
+            'interests' => [],
         ]);
 
         $this->assertContains($response->getStatusCode(), [200, 201]);
@@ -115,22 +120,18 @@ class OnboardingControllerTest extends TestCase
         Sanctum::actingAs($user, ['*']);
 
         // Insert a category belonging to a different tenant (999)
-        $otherCatId = DB::table('categories')->insertGetId([
-            'tenant_id' => 999,
-            'name' => 'Cross-Tenant Category',
-            'slug' => 'cross-tenant-cat-' . uniqid(),
-            'created_at' => now(),
-            'updated_at' => now(),
-        ]);
+        DB::insert(
+            "INSERT INTO categories (tenant_id, name, slug, created_at) VALUES (?, ?, ?, NOW())",
+            [999, 'Cross-Tenant Category', 'cross-tenant-cat-' . uniqid()]
+        );
+        $otherCatId = (int) DB::getPdo()->lastInsertId();
 
         // Insert a category belonging to the test tenant
-        $validCatId = DB::table('categories')->insertGetId([
-            'tenant_id' => $this->testTenantId,
-            'name' => 'Valid Category',
-            'slug' => 'valid-cat-' . uniqid(),
-            'created_at' => now(),
-            'updated_at' => now(),
-        ]);
+        DB::insert(
+            "INSERT INTO categories (tenant_id, name, slug, created_at) VALUES (?, ?, ?, NOW())",
+            [$this->testTenantId, 'Valid Category', 'valid-cat-' . uniqid()]
+        );
+        $validCatId = (int) DB::getPdo()->lastInsertId();
 
         $response = $this->apiPost('/v2/onboarding/complete', [
             'interests' => [$otherCatId, $validCatId],
@@ -169,11 +170,7 @@ class OnboardingControllerTest extends TestCase
         ]);
 
         $response->assertStatus(422);
-        $response->assertJson([
-            'error' => [
-                'code' => 'VALIDATION_REQUIRED_FIELD',
-            ],
-        ]);
+        $response->assertJsonPath('errors.0.code', 'VALIDATION_REQUIRED_FIELD');
     }
 
     public function test_complete_validates_bio_required(): void
@@ -192,10 +189,6 @@ class OnboardingControllerTest extends TestCase
         ]);
 
         $response->assertStatus(422);
-        $response->assertJson([
-            'error' => [
-                'code' => 'VALIDATION_REQUIRED_FIELD',
-            ],
-        ]);
+        $response->assertJsonPath('errors.0.code', 'VALIDATION_REQUIRED_FIELD');
     }
 }
