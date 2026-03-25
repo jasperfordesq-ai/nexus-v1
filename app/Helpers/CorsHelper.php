@@ -249,12 +249,15 @@ class CorsHelper
     }
 
     /**
-     * Get the list of allowed origins.
+     * Get the list of allowed origins (static + dynamic tenant domains).
      *
      * @return array List of allowed origins
      */
     public static function getAllowedOrigins(): array
     {
-        return self::getConfiguredOrigins();
+        return array_values(array_unique(array_merge(
+            self::getConfiguredOrigins(),
+            self::getTenantDomainOrigins()
+        )));
     }
 }

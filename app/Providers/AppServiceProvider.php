@@ -1017,6 +1017,18 @@ class AppServiceProvider extends ServiceProvider
     {
         Listing::observe(ListingObserver::class);
 
+        // Dynamically merge CorsHelper's full origin list (including tenant custom
+        // domains from DB) into Laravel's HandleCors config. This ensures custom
+        // tenant domains like hour-timebank.ie pass CORS validation.
+        try {
+            $corsOrigins = config('cors.allowed_origins', []);
+            $helperOrigins = \App\Helpers\CorsHelper::getAllowedOrigins();
+            $merged = array_values(array_unique(array_merge($corsOrigins, $helperOrigins)));
+            config(['cors.allowed_origins' => $merged]);
+        } catch (\Throwable $e) {
+            // CorsHelper may fail if DB isn't ready (e.g., during migrations) — non-fatal
+        }
+
         // SAFETY: Prevent migrate:fresh/refresh from wiping the main database.
         // Only nexus_test may be wiped. This guards against accidental data loss
         // from RefreshDatabase in tests or manual artisan commands.
