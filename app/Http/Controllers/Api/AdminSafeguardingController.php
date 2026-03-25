@@ -243,13 +243,11 @@ class AdminSafeguardingController extends BaseApiController
         try {
             $id = DB::table('safeguarding_assignments')->insertGetId([
                 'tenant_id' => $tenantId,
-                'user_id' => $validated['user_id'],
-                'assignee_id' => $validated['assignee_id'],
-                'type' => $validated['type'],
-                'status' => 'active',
+                'ward_user_id' => $validated['user_id'],
+                'guardian_user_id' => $validated['assignee_id'],
+                'assigned_by' => $this->requireAdmin(),
+                'assigned_at' => now(),
                 'notes' => $validated['notes'] ?? null,
-                'created_at' => now(),
-                'updated_at' => now(),
             ]);
 
             $assignment = DB::table('safeguarding_assignments')

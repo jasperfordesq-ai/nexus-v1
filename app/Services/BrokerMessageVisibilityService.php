@@ -103,7 +103,9 @@ class BrokerMessageVisibilityService
     {
         $tenantId = TenantContext::getId();
 
-        $message = Message::find($messageId);
+        $message = Message::where('id', $messageId)
+            ->where('tenant_id', $tenantId)
+            ->first();
         if (!$message) {
             return null;
         }
@@ -406,7 +408,8 @@ class BrokerMessageVisibilityService
 
     private function getTenantBrokerAdminIds(): array
     {
-        return User::whereIn('role', ['admin', 'tenant_admin', 'super_admin'])
+        return User::where('tenant_id', TenantContext::getId())
+            ->whereIn('role', ['admin', 'tenant_admin', 'super_admin'])
             ->where('status', 'active')
             ->pluck('id')
             ->map(fn ($id) => (int) $id)

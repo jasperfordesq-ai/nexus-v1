@@ -66,8 +66,17 @@ class OnboardingController extends BaseApiController
     {
         $userId = $this->requireAuth();
 
-        // Verify profile photo and bio are present
+        // Prevent double-completion (race condition)
         $user = \App\Models\User::findById($userId);
+        if (!empty($user['onboarding_completed'])) {
+            return $this->respondWithData([
+                'message' => 'Onboarding already completed',
+                'listings_created' => 0,
+                'listing_ids' => [],
+            ]);
+        }
+
+        // Verify profile photo and bio are present
         if (empty($user['avatar_url'])) {
             return $this->respondWithError(
                 'VALIDATION_REQUIRED_FIELD',

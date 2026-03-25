@@ -89,6 +89,7 @@ class OnboardingControllerTest extends TestCase
             'is_approved' => true,
             'avatar_url' => 'https://example.com/photo.jpg',
             'bio' => 'A valid bio that is long enough to pass validation.',
+            'onboarding_completed' => false,
         ]);
         Sanctum::actingAs($user, ['*']);
 
@@ -116,6 +117,7 @@ class OnboardingControllerTest extends TestCase
             'is_approved' => true,
             'avatar_url' => 'https://example.com/photo.jpg',
             'bio' => 'A valid bio that is long enough to pass validation.',
+            'onboarding_completed' => false,
         ]);
         Sanctum::actingAs($user, ['*']);
 
@@ -151,17 +153,13 @@ class OnboardingControllerTest extends TestCase
 
     public function test_complete_validates_avatar_required(): void
     {
-        User::factory()->forTenant($this->testTenantId)->create([
+        $user = User::factory()->forTenant($this->testTenantId)->create([
             'status' => 'active',
             'is_approved' => true,
             'avatar_url' => null,
             'bio' => 'A valid bio that is long enough to pass validation.',
+            'onboarding_completed' => false,
         ]);
-
-        $user = User::where('avatar_url', null)
-            ->where('tenant_id', $this->testTenantId)
-            ->latest('id')
-            ->first();
 
         Sanctum::actingAs($user, ['*']);
 
@@ -180,6 +178,7 @@ class OnboardingControllerTest extends TestCase
             'is_approved' => true,
             'avatar_url' => 'https://example.com/photo.jpg',
             'bio' => null,
+            'onboarding_completed' => false,
         ]);
 
         Sanctum::actingAs($user, ['*']);

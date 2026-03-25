@@ -528,6 +528,13 @@ export function OnboardingPage() {
     );
   }
 
+  // ── Guard against invalid step (e.g. config removed a step mid-session) ──
+
+  if (!currentStepSlug) {
+    goToStep(1);
+    return null;
+  }
+
   // ── Main Render ────────────────────────────────────────────────────────────
 
   return (
@@ -562,6 +569,8 @@ export function OnboardingPage() {
             skillNeeds,
           })}
           onStepClick={(step) => {
+            // Verify step still exists in config
+            if (!configSteps[step - 1]?.slug) return;
             // Only allow clicking to visited steps or the current step
             // Never allow skipping step 2 (profile) if incomplete
             if (step <= currentStep || visitedSteps.has(step)) {
@@ -1182,6 +1191,7 @@ export function OnboardingPage() {
                     className="bg-gradient-to-r from-emerald-500 to-teal-600 text-white font-semibold shadow-lg shadow-emerald-500/20"
                     onPress={handleComplete}
                     isLoading={isSubmitting}
+                    isDisabled={isSubmitting}
                     startContent={
                       !isSubmitting && (
                         <Rocket className="w-5 h-5" aria-hidden="true" />
