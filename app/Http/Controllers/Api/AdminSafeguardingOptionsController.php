@@ -82,6 +82,19 @@ class AdminSafeguardingOptionsController extends BaseApiController
             return $this->respondWithError('VALIDATION_ERROR', 'triggers must be a JSON object', 'triggers', 422);
         }
 
+        // Validate select_options structure when option_type is 'select'
+        if ($data['option_type'] === 'select') {
+            $selectOptions = $data['select_options'];
+            if (!is_array($selectOptions) || empty($selectOptions)) {
+                return $this->respondWithError('VALIDATION_ERROR', 'select_options must be a non-empty array for select type', 'select_options', 422);
+            }
+            foreach ($selectOptions as $idx => $opt) {
+                if (!is_array($opt) || !isset($opt['value']) || !isset($opt['label'])) {
+                    return $this->respondWithError('VALIDATION_ERROR', "select_options[{$idx}] must have 'value' and 'label' keys", 'select_options', 422);
+                }
+            }
+        }
+
         $existingCount = \App\Models\TenantSafeguardingOption::where('tenant_id', $tenantId)->count();
         if ($existingCount >= 50) {
             return $this->respondWithError('LIMIT_EXCEEDED', 'Maximum 50 safeguarding options per tenant', null, 422);

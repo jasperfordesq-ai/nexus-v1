@@ -66,34 +66,6 @@ class OnboardingController extends BaseApiController
     {
         $userId = $this->requireAuth();
 
-        // Prevent double-completion (race condition)
-        $user = \App\Models\User::findById($userId);
-        if (!empty($user['onboarding_completed'])) {
-            return $this->respondWithData([
-                'message' => 'Onboarding already completed',
-                'listings_created' => 0,
-                'listing_ids' => [],
-            ]);
-        }
-
-        // Verify profile photo and bio are present
-        if (empty($user['avatar_url'])) {
-            return $this->respondWithError(
-                'VALIDATION_REQUIRED_FIELD',
-                'Profile photo is required to complete onboarding',
-                'avatar_url',
-                422
-            );
-        }
-        if (empty(trim($user['bio'] ?? ''))) {
-            return $this->respondWithError(
-                'VALIDATION_REQUIRED_FIELD',
-                'Bio is required to complete onboarding',
-                'bio',
-                422
-            );
-        }
-
         $interests = $this->input('interests', []);
         $offers = $this->input('offers', []);
         $needs = $this->input('needs', []);
@@ -118,9 +90,44 @@ class OnboardingController extends BaseApiController
             $needs = array_values(array_filter($needs, fn ($id) => isset($validSet[$id])));
         }
 
-        // All-or-nothing: wrap in transaction
+        // All-or-nothing: wrap in transaction with row-level lock to prevent double-completion
         DB::beginTransaction();
         try {
+            // Lock user row to prevent concurrent completion (TOCTOU race condition)
+            $user = DB::selectOne(
+                "SELECT id, avatar_url, bio, onboarding_completed FROM users WHERE id = ? FOR UPDATE",
+                [$userId]
+            );
+
+            if (!empty($user->onboarding_completed)) {
+                DB::rollback();
+                return $this->respondWithData([
+                    'message' => 'Onboarding already completed',
+                    'listings_created' => 0,
+                    'listing_ids' => [],
+                ]);
+            }
+
+            // Verify profile photo and bio are present
+            if (empty($user->avatar_url)) {
+                DB::rollback();
+                return $this->respondWithError(
+                    'VALIDATION_REQUIRED_FIELD',
+                    'Profile photo is required to complete onboarding',
+                    'avatar_url',
+                    422
+                );
+            }
+            if (empty(trim($user->bio ?? ''))) {
+                DB::rollback();
+                return $this->respondWithError(
+                    'VALIDATION_REQUIRED_FIELD',
+                    'Bio is required to complete onboarding',
+                    'bio',
+                    422
+                );
+            }
+
             $this->onboardingService->saveInterests($userId, $interests);
             $this->onboardingService->saveSkills($userId, $offers, $needs);
             $listingIds = $this->onboardingService->autoCreateListings($userId, $offers, $needs);
