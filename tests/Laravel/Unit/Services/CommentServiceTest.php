@@ -110,7 +110,8 @@ class CommentServiceTest extends TestCase
 
     public function test_toggleReaction_adds_reaction(): void
     {
-        DB::shouldReceive('table')->with('comment_reactions')->andReturnSelf();
+        // toggleReaction now uses the unified 'reactions' table
+        DB::shouldReceive('table')->with('reactions')->andReturnSelf();
         DB::shouldReceive('where')->andReturnSelf();
         DB::shouldReceive('first')->andReturnNull();
         DB::shouldReceive('insert')->once();
