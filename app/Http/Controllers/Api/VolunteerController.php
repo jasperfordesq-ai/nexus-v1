@@ -1099,7 +1099,12 @@ class VolunteerController extends BaseApiController
         $this->rateLimit('vol_expense_submit', 10, 60);
 
         $data = $this->getAllInput();
-        $result = $this->volunteerExpenseService->submitExpense($userId, $data);
+
+        try {
+            $result = $this->volunteerExpenseService->submitExpense($userId, $data);
+        } catch (\InvalidArgumentException $e) {
+            return $this->respondWithError('VALIDATION_ERROR', $e->getMessage(), null, 422);
+        }
 
         if (isset($result['error'])) {
             return $this->respondWithError('VALIDATION_ERROR', $result['error'], null, 422);

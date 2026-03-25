@@ -23,6 +23,7 @@ import { DataTable, PageHeader, ConfirmModal, type Column } from '../../componen
 import type { AdminGroup } from '../../api/types';
 
 import { useTranslation } from 'react-i18next';
+import { resolveAssetUrl } from '@/lib/helpers';
 const statusColors: Record<string, 'success' | 'warning' | 'danger' | 'default'> = {
   active: 'success',
   pending: 'warning',
@@ -126,7 +127,7 @@ export function GroupList() {
       render: (item) => (
         <div className="flex items-center gap-3">
           <Avatar
-            src={item.image_url || undefined}
+            src={item.image_url ? resolveAssetUrl(item.image_url) : undefined}
             name={item.name}
             size="sm"
             className="shrink-0"

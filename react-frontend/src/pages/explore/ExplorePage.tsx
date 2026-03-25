@@ -53,7 +53,7 @@ import { motion } from 'framer-motion';
 import { usePageTitle } from '@/hooks/usePageTitle';
 import { useApi } from '@/hooks/useApi';
 import { useTenant, useAuth } from '@/contexts';
-import { resolveAvatarUrl } from '@/lib/helpers';
+import { resolveAvatarUrl, resolveAssetUrl } from '@/lib/helpers';
 import apiClient from '@/lib/api';
 import { ExploreSection, ExploreStatCard, HorizontalScroll } from '@/components/explore';
 
@@ -661,7 +661,7 @@ export default function ExplorePage() {
                       </div>
                       {item.image_url && (
                         <img
-                          src={item.image_url}
+                          src={resolveAssetUrl(item.image_url)}
                           alt={item.title}
                           className="w-full h-32 object-cover rounded-lg"
                           loading="lazy"
@@ -846,7 +846,7 @@ export default function ExplorePage() {
                     <CardBody className="p-4 gap-3">
                       {listing.image_url ? (
                         <img
-                          src={listing.image_url}
+                          src={resolveAssetUrl(listing.image_url)}
                           alt={listing.title}
                           className="w-full h-32 object-cover rounded-lg"
                           loading="lazy"
@@ -1610,7 +1610,7 @@ export default function ExplorePage() {
                   <CardBody className="p-4 gap-3">
                     {item.image_url ? (
                       <img
-                        src={item.image_url}
+                        src={resolveAssetUrl(item.image_url)}
                         alt={item.title}
                         className="w-full h-24 object-cover rounded-lg"
                         loading="lazy"

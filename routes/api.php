@@ -65,6 +65,22 @@ Route::get('/v2/explore/popular-listings', [\App\Http\Controllers\Api\ExploreCon
 Route::get('/v2/explore/category/{slug}', [\App\Http\Controllers\Api\ExploreController::class, 'category']);
 
 // ============================================
+// Categories — public read-only (used by listings, explore, search pages)
+// ============================================
+Route::get('/v2/categories', function (\Illuminate\Http\Request $request) {
+    $type = $request->query('type', 'listing');
+    $allowed = ['listing', 'event', 'volunteering', 'resource'];
+    if (!in_array($type, $allowed, true)) {
+        $type = 'listing';
+    }
+    $categories = \App\Models\Category::where('type', $type)
+        ->where('tenant_id', \App\Core\TenantContext::getId())
+        ->orderBy('name')
+        ->get();
+    return response()->json(['data' => $categories]);
+});
+
+// ============================================
 // Authenticated routes — Sanctum token authentication required
 // Controllers also enforce auth via $this->requireAuth() as a fallback
 // ============================================
@@ -122,19 +138,7 @@ Route::post('/v2/events/{id}/image', [\App\Http\Controllers\Api\EventsController
 // ============================================
 // MIGRATED ROUTES — Listings (controller routes only)
 // Source: httpdocs/routes/listings.php
-// Categories endpoint (migrated from legacy closure)
-Route::get('/v2/categories', function (\Illuminate\Http\Request $request) {
-    $type = $request->query('type', 'listing');
-    $allowed = ['listing', 'event', 'volunteering', 'resource'];
-    if (!in_array($type, $allowed, true)) {
-        $type = 'listing';
-    }
-    $categories = \App\Models\Category::where('type', $type)
-        ->where('tenant_id', \App\Core\TenantContext::getId())
-        ->orderBy('name')
-        ->get();
-    return response()->json(['data' => $categories]);
-});
+// NOTE: Categories endpoint moved to public routes (above auth:sanctum group)
 // ============================================
 // FUTURE: When ready to use new Laravel controllers, replace:
 //   [\Nexus\Controllers\Api\ListingsApiController::class, 'index']
