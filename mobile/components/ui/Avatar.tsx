@@ -10,25 +10,37 @@ interface AvatarProps {
   uri: string | null | undefined;
   name: string | null | undefined;
   size?: number;
+  showOnline?: boolean;
 }
 
-/**
- * Displays a user avatar.
- * Falls back to a coloured circle with initials when no image is provided.
- */
-export default function Avatar({ uri, name, size = 40 }: AvatarProps) {
+export default function Avatar({ uri, name, size = 40, showOnline = false }: AvatarProps) {
   const primary = usePrimaryColor();
   const initials = getInitials(name);
 
   const sizeStyle = { width: size, height: size, borderRadius: size / 2 };
 
+  const onlineDot = showOnline ? (
+    <View
+      style={[
+        styles.onlineDot,
+        {
+          right: 0,
+          bottom: 0,
+        },
+      ]}
+    />
+  ) : null;
+
   if (uri) {
     return (
-      <Image
-        source={{ uri }}
-        style={[styles.image, sizeStyle]}
-        accessibilityLabel={`${name} avatar`}
-      />
+      <View style={sizeStyle}>
+        <Image
+          source={{ uri }}
+          style={[styles.image, sizeStyle]}
+          accessibilityLabel={`${name} avatar`}
+        />
+        {onlineDot}
+      </View>
     );
   }
 
@@ -39,6 +51,7 @@ export default function Avatar({ uri, name, size = 40 }: AvatarProps) {
       accessibilityRole="image"
     >
       <Text style={[styles.initials, { fontSize: size * 0.36 }]}>{initials}</Text>
+      {onlineDot}
     </View>
   );
 }
@@ -55,4 +68,13 @@ const styles = StyleSheet.create({
   image: { resizeMode: 'cover' },
   fallback: { justifyContent: 'center', alignItems: 'center' },
   initials: { color: '#fff', fontWeight: '700' },
+  onlineDot: {
+    position: 'absolute',
+    width: 10,
+    height: 10,
+    borderRadius: 5,
+    backgroundColor: '#22c55e',
+    borderWidth: 2,
+    borderColor: '#fff',
+  },
 });

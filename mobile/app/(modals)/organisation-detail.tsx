@@ -10,12 +10,12 @@ import {
   ScrollView,
   RefreshControl,
   StyleSheet,
-  SafeAreaView,
   TouchableOpacity,
   Linking,
   Alert,
   Share,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { useLocalSearchParams, router, useNavigation } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
@@ -26,8 +26,11 @@ import { useApi } from '@/lib/hooks/useApi';
 import { usePrimaryColor } from '@/lib/hooks/useTenant';
 import { useTheme, type Theme } from '@/lib/hooks/useTheme';
 import { withAlpha } from '@/lib/utils/color';
+import { TYPOGRAPHY } from '@/lib/styles/typography';
+import { SPACING, RADIUS } from '@/lib/styles/spacing';
 import Avatar from '@/components/ui/Avatar';
 import LoadingSpinner from '@/components/ui/LoadingSpinner';
+import ModalErrorBoundary from '@/components/ModalErrorBoundary';
 
 const WEB_URL = 'https://app.project-nexus.ie';
 
@@ -56,7 +59,7 @@ export default function OrganisationDetailScreen() {
 
   if (isNaN(orgId) || orgId <= 0) {
     return (
-      <SafeAreaView style={styles.center}>
+      <SafeAreaView style={styles.center} edges={['bottom']}>
         <Text style={styles.errorText}>{t('detail.invalidId')}</Text>
         <TouchableOpacity onPress={() => router.back()} style={{ marginTop: 12 }}>
           <Text style={{ color: primary, fontSize: 15, fontWeight: '600' }}>{t('detail.goBack')}</Text>
@@ -67,7 +70,7 @@ export default function OrganisationDetailScreen() {
 
   if (isLoading) {
     return (
-      <SafeAreaView style={styles.center}>
+      <SafeAreaView style={styles.center} edges={['bottom']}>
         <LoadingSpinner />
       </SafeAreaView>
     );
@@ -75,7 +78,7 @@ export default function OrganisationDetailScreen() {
 
   if (!organisation) {
     return (
-      <SafeAreaView style={styles.center}>
+      <SafeAreaView style={styles.center} edges={['bottom']}>
         <Text style={styles.errorText}>{t('detail.notFound')}</Text>
         <TouchableOpacity onPress={() => router.back()} style={{ marginTop: 12 }}>
           <Text style={{ color: primary, fontSize: 15, fontWeight: '600' }}>{t('detail.goBack')}</Text>
@@ -105,7 +108,8 @@ export default function OrganisationDetailScreen() {
   }
 
   return (
-    <SafeAreaView style={styles.container}>
+    <ModalErrorBoundary>
+    <SafeAreaView style={styles.container} edges={['bottom']}>
       <ScrollView
         contentContainerStyle={styles.content}
         refreshControl={
@@ -190,6 +194,7 @@ export default function OrganisationDetailScreen() {
         ) : null}
       </ScrollView>
     </SafeAreaView>
+    </ModalErrorBoundary>
   );
 }
 
@@ -207,41 +212,41 @@ function makeStyles(theme: Theme) {
   return StyleSheet.create({
     container: { flex: 1, backgroundColor: theme.bg },
     center: { flex: 1, alignItems: 'center', justifyContent: 'center' },
-    content: { padding: 20, paddingBottom: 48 },
+    content: { padding: SPACING.xl - 12, paddingBottom: SPACING.xxl },
     header: {
       flexDirection: 'row',
       alignItems: 'center',
-      gap: 16,
-      marginBottom: 20,
+      gap: SPACING.md,
+      marginBottom: SPACING.xl - 12,
     },
     headerText: {
       flex: 1,
-      gap: 6,
+      gap: SPACING.sm - 2,
     },
-    name: { fontSize: 22, fontWeight: '700', color: theme.text },
+    name: { ...TYPOGRAPHY.h2, color: theme.text },
     verifiedBadge: {
       flexDirection: 'row',
       alignItems: 'center',
-      gap: 4,
+      gap: SPACING.xs,
       alignSelf: 'flex-start',
-      borderRadius: 6,
-      paddingHorizontal: 8,
+      borderRadius: RADIUS.sm,
+      paddingHorizontal: SPACING.sm,
       paddingVertical: 3,
     },
-    verifiedText: { fontSize: 12, fontWeight: '600' },
+    verifiedText: { ...TYPOGRAPHY.caption, fontWeight: '600' },
     statsCard: {
       flexDirection: 'row',
       backgroundColor: theme.surface,
-      borderRadius: 14,
-      padding: 16,
-      marginBottom: 16,
+      borderRadius: RADIUS.lg,
+      padding: SPACING.md,
+      marginBottom: SPACING.md,
       borderWidth: 1,
       borderColor: theme.borderSubtle,
     },
     statItem: {
       flex: 1,
       alignItems: 'center',
-      gap: 4,
+      gap: SPACING.xs,
     },
     statValue: {
       fontSize: 20,
@@ -249,45 +254,45 @@ function makeStyles(theme: Theme) {
       color: theme.text,
     },
     statLabel: {
-      fontSize: 12,
+      ...TYPOGRAPHY.caption,
       color: theme.textSecondary,
       textAlign: 'center',
     },
     statDivider: {
       width: 1,
       backgroundColor: theme.border,
-      marginVertical: 4,
+      marginVertical: SPACING.xs,
     },
     metaCard: {
       backgroundColor: theme.surface,
-      borderRadius: 14,
-      padding: 14,
+      borderRadius: RADIUS.lg,
+      padding: RADIUS.lg,
       borderWidth: 1,
       borderColor: theme.borderSubtle,
-      marginBottom: 16,
+      marginBottom: SPACING.md,
     },
-    metaText: { fontSize: 14, color: theme.text },
-    section: { marginBottom: 20 },
+    metaText: { ...TYPOGRAPHY.label, color: theme.text },
+    section: { marginBottom: SPACING.xl - 12 },
     sectionTitle: {
-      fontSize: 12,
+      ...TYPOGRAPHY.caption,
       fontWeight: '700',
       color: theme.textSecondary,
       textTransform: 'uppercase',
       letterSpacing: 0.6,
-      marginBottom: 10,
+      marginBottom: SPACING.sm + 2,
     },
-    description: { fontSize: 15, color: theme.text, lineHeight: 22 },
+    description: { ...TYPOGRAPHY.body, color: theme.text },
     websiteButton: {
       flexDirection: 'row',
       alignItems: 'center',
       justifyContent: 'center',
-      gap: 8,
-      borderRadius: 12,
+      gap: SPACING.sm,
+      borderRadius: SPACING.sm + 4,
       paddingVertical: 13,
       borderWidth: 1.5,
-      marginTop: 4,
+      marginTop: SPACING.xs,
     },
-    websiteButtonText: { fontSize: 15, fontWeight: '600' },
-    errorText: { fontSize: 15, color: theme.textMuted },
+    websiteButtonText: { ...TYPOGRAPHY.button },
+    errorText: { ...TYPOGRAPHY.body, color: theme.textMuted },
   });
 }

@@ -9,6 +9,8 @@ import { View, Text, Image, StyleSheet } from 'react-native';
 import { useTenant, usePrimaryColor } from '@/lib/hooks/useTenant';
 import { useTheme, type Theme } from '@/lib/hooks/useTheme';
 import { withAlpha } from '@/lib/utils/color';
+import { TYPOGRAPHY } from '@/lib/styles/typography';
+import { SPACING } from '@/lib/styles/spacing';
 
 /**
  * Displays the current tenant's name and logo in a compact header banner.
@@ -53,9 +55,9 @@ function makeStyles(theme: Theme) {
     banner: {
       flexDirection: 'row',
       alignItems: 'center',
-      paddingHorizontal: 16,
-      paddingVertical: 10,
-      gap: 12,
+      paddingHorizontal: SPACING.md,
+      paddingVertical: SPACING.sm + 2,
+      gap: SPACING.sm + 4,
       borderBottomWidth: 1,
       backgroundColor: theme.surface,
     },
@@ -63,12 +65,12 @@ function makeStyles(theme: Theme) {
     logoPlaceholder: {
       width: 36,
       height: 36,
-      borderRadius: 8,
+      borderRadius: SPACING.sm,
       justifyContent: 'center',
       alignItems: 'center',
     },
-    logoInitial: { color: '#fff', fontWeight: '700', fontSize: 18 },
-    tenantName: { fontSize: 15, fontWeight: '700', color: theme.text },
-    tagline: { fontSize: 12, color: theme.textSecondary },
+    logoInitial: { ...TYPOGRAPHY.h3, color: '#fff' },
+    tenantName: { ...TYPOGRAPHY.body, fontWeight: '700', color: theme.text },
+    tagline: { ...TYPOGRAPHY.caption, color: theme.textSecondary },
   });
 }

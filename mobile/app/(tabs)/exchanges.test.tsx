@@ -75,9 +75,13 @@ jest.mock('@/lib/api/exchanges', () => ({
   getExchanges: jest.fn(),
 }));
 
-jest.mock('@/components/ExchangeCard', () => ({ exchange }: { exchange: { id: number; title: string } }) => {
-  const { Text } = require('react-native');
-  return <Text>{exchange.title}</Text>;
+jest.mock('@/components/ExchangeCard', () => {
+  const MockExchangeCard = ({ exchange }: { exchange: { id: number; title: string } }) => {
+    const { Text } = require('react-native');
+    return <Text>{exchange.title}</Text>;
+  };
+  MockExchangeCard.displayName = 'MockExchangeCard';
+  return MockExchangeCard;
 });
 
 jest.mock('@/components/OfflineBanner', () => () => null);

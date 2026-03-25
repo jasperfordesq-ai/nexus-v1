@@ -6,7 +6,6 @@
 import { useEffect, useMemo } from 'react';
 import {
   Linking,
-  SafeAreaView,
   ScrollView,
   Share,
   StyleSheet,
@@ -14,6 +13,7 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { router, useLocalSearchParams, useNavigation } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
@@ -23,8 +23,11 @@ import { getFederationPartner } from '@/lib/api/federation';
 import { useApi } from '@/lib/hooks/useApi';
 import { usePrimaryColor } from '@/lib/hooks/useTenant';
 import { useTheme, type Theme } from '@/lib/hooks/useTheme';
+import { TYPOGRAPHY } from '@/lib/styles/typography';
+import { SPACING, RADIUS } from '@/lib/styles/spacing';
 import Avatar from '@/components/ui/Avatar';
 import LoadingSpinner from '@/components/ui/LoadingSpinner';
+import ModalErrorBoundary from '@/components/ModalErrorBoundary';
 
 const WEB_URL = 'https://app.project-nexus.ie';
 
@@ -53,7 +56,7 @@ export default function FederationPartnerScreen() {
 
   if (safeId === 0) {
     return (
-      <SafeAreaView style={styles.center}>
+      <SafeAreaView style={styles.center} edges={['bottom']}>
         <Text style={styles.errorText}>{t('detail.notFound')}</Text>
         <TouchableOpacity onPress={() => router.back()} style={{ marginTop: 12 }}>
           <Text style={{ color: primary, fontSize: 15, fontWeight: '600' }}>
@@ -66,7 +69,7 @@ export default function FederationPartnerScreen() {
 
   if (isLoading) {
     return (
-      <SafeAreaView style={styles.center}>
+      <SafeAreaView style={styles.center} edges={['bottom']}>
         <LoadingSpinner />
       </SafeAreaView>
     );
@@ -74,7 +77,7 @@ export default function FederationPartnerScreen() {
 
   if (!partner) {
     return (
-      <SafeAreaView style={styles.center}>
+      <SafeAreaView style={styles.center} edges={['bottom']}>
         <Text style={styles.errorText}>{t('detail.notFound')}</Text>
         <TouchableOpacity onPress={() => router.back()} style={{ marginTop: 12 }}>
           <Text style={{ color: primary, fontSize: 15, fontWeight: '600' }}>
@@ -102,7 +105,8 @@ export default function FederationPartnerScreen() {
   });
 
   return (
-    <SafeAreaView style={styles.container}>
+    <ModalErrorBoundary>
+    <SafeAreaView style={styles.container} edges={['bottom']}>
       <ScrollView contentContainerStyle={styles.content}>
         {/* Logo + name + share */}
         <View style={styles.heroSection}>
@@ -131,7 +135,7 @@ export default function FederationPartnerScreen() {
         <View style={styles.statsCard}>
           <View style={styles.statItem}>
             <Ionicons name="people-outline" size={20} color={primary} />
-            <Text style={styles.statValue}>{partner.member_count.toLocaleString()}</Text>
+            <Text style={styles.statValue}>{(partner.member_count ?? 0).toLocaleString()}</Text>
             <Text style={styles.statLabel}>{t('detail.members')}</Text>
           </View>
           <View style={styles.statDivider} />
@@ -171,6 +175,7 @@ export default function FederationPartnerScreen() {
         ) : null}
       </ScrollView>
     </SafeAreaView>
+    </ModalErrorBoundary>
   );
 }
 
@@ -178,44 +183,43 @@ function makeStyles(theme: Theme) {
   return StyleSheet.create({
     container: { flex: 1, backgroundColor: theme.bg },
     center: { flex: 1, alignItems: 'center', justifyContent: 'center' },
-    content: { padding: 20, paddingBottom: 48 },
+    content: { padding: SPACING.xl - 12, paddingBottom: SPACING.xxl },
     heroSection: {
       alignItems: 'center',
-      gap: 10,
-      marginBottom: 20,
+      gap: SPACING.sm + 2,
+      marginBottom: SPACING.xl - 12,
     },
     partnerName: {
-      fontSize: 22,
-      fontWeight: '700',
+      ...TYPOGRAPHY.h2,
       color: theme.text,
       textAlign: 'center',
     },
     metaRow: {
       flexDirection: 'row',
       alignItems: 'center',
-      gap: 4,
+      gap: SPACING.xs,
     },
     metaText: {
-      fontSize: 13,
+      ...TYPOGRAPHY.bodySmall,
       color: theme.textSecondary,
     },
     statsCard: {
       flexDirection: 'row',
       alignItems: 'center',
       backgroundColor: theme.surface,
-      borderRadius: 14,
-      padding: 16,
-      marginBottom: 20,
+      borderRadius: RADIUS.lg,
+      padding: SPACING.md,
+      marginBottom: SPACING.xl - 12,
       borderWidth: 1,
       borderColor: theme.borderSubtle,
     },
     statItem: {
       flex: 1,
       alignItems: 'center',
-      gap: 4,
+      gap: SPACING.xs,
     },
     statValue: {
-      fontSize: 18,
+      ...TYPOGRAPHY.h3,
       fontWeight: '700',
       color: theme.text,
       textAlign: 'center',
@@ -228,40 +232,38 @@ function makeStyles(theme: Theme) {
       width: 1,
       height: 40,
       backgroundColor: theme.border,
-      marginHorizontal: 8,
+      marginHorizontal: SPACING.sm,
     },
     section: {
-      marginBottom: 20,
+      marginBottom: SPACING.xl - 12,
     },
     sectionTitle: {
-      fontSize: 12,
+      ...TYPOGRAPHY.caption,
       fontWeight: '700',
       color: theme.textSecondary,
       textTransform: 'uppercase',
       letterSpacing: 0.6,
-      marginBottom: 8,
+      marginBottom: SPACING.sm,
     },
     description: {
-      fontSize: 15,
+      ...TYPOGRAPHY.body,
       color: theme.text,
-      lineHeight: 22,
     },
     websiteButton: {
       flexDirection: 'row',
       alignItems: 'center',
       justifyContent: 'center',
-      gap: 8,
-      borderRadius: 12,
-      paddingVertical: 14,
-      marginTop: 4,
+      gap: SPACING.sm,
+      borderRadius: SPACING.sm + 4,
+      paddingVertical: RADIUS.lg,
+      marginTop: SPACING.xs,
     },
     websiteButtonText: {
-      fontSize: 15,
-      fontWeight: '600',
+      ...TYPOGRAPHY.button,
       color: '#fff', // contrast on primary
     },
     errorText: {
-      fontSize: 15,
+      ...TYPOGRAPHY.body,
       color: theme.textMuted,
     },
   });

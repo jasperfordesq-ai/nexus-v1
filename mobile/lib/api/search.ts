@@ -32,15 +32,19 @@ export interface SearchResponse {
  * Full-text search across users, listings, events, groups, and blog posts.
  * Supports cursor-based pagination and optional type filtering.
  */
-export function search(
+export async function search(
   query: string,
   cursor: string | null,
   type?: SearchResultType,
 ): Promise<SearchResponse> {
-  return api.get<SearchResponse>(`${API_V2}/search`, {
+  const response = await api.get<SearchResponse>(`${API_V2}/search`, {
     q: query,
     per_page: '20',
     ...(cursor ? { cursor } : {}),
     ...(type ? { type } : {}),
   });
+  return {
+    data: Array.isArray(response?.data) ? response.data : [],
+    meta: response?.meta ?? { total: 0, has_more: false, cursor: null },
+  };
 }

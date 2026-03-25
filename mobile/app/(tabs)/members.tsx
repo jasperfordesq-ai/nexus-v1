@@ -8,13 +8,13 @@ import {
   ActivityIndicator,
   FlatList,
   RefreshControl,
-  SafeAreaView,
   StyleSheet,
   Text,
   TextInput,
   TouchableOpacity,
   View,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 
 import { useTranslation } from 'react-i18next';
@@ -26,6 +26,8 @@ import { usePrimaryColor } from '@/lib/hooks/useTenant';
 import { useTheme, type Theme } from '@/lib/hooks/useTheme';
 import MemberCard from '@/components/MemberCard';
 import { SkeletonBox } from '@/components/ui/Skeleton';
+import { TYPOGRAPHY } from '@/lib/styles/typography';
+import { SPACING, RADIUS } from '@/lib/styles/spacing';
 
 /** Inline skeleton for a member card row. */
 function MemberCardSkeleton({ theme }: { theme: Theme }) {
@@ -48,7 +50,7 @@ function MemberCardSkeleton({ theme }: { theme: Theme }) {
 
 /** Extractor for offset-based MemberListResponse — encodes next offset as cursor string. */
 function extractMembersPage(response: MemberListResponse) {
-  const nextOffset = response.meta.offset + response.meta.per_page;
+  const nextOffset = response.meta.offset + response.data.length;
   return {
     items: response.data,
     cursor: response.meta.has_more ? String(nextOffset) : null,
@@ -65,7 +67,10 @@ export default function MembersScreen() {
   const debouncedSearch = useDebounce(search, 400);
 
   const fetchMembers = useCallback(
-    (cursor: string | null) => getMembers(cursor ? Number(cursor) : 0, debouncedSearch || undefined),
+    (cursor: string | null) => {
+      const offset = cursor ? Number(cursor) : 0;
+      return getMembers(Number.isFinite(offset) ? offset : 0, debouncedSearch || undefined);
+    },
     [debouncedSearch],
   );
 
@@ -115,7 +120,7 @@ export default function MembersScreen() {
             <View style={styles.centered}>
               <Text style={styles.errorText}>{error}</Text>
               <TouchableOpacity onPress={() => void refresh()} style={styles.retryBtn}>
-                <Text style={{ color: primary, fontWeight: '600', fontSize: 15 }}>{t('common:buttons.retry')}</Text>
+                <Text style={{ color: primary, ...TYPOGRAPHY.button }}>{t('common:buttons.retry')}</Text>
               </TouchableOpacity>
             </View>
           ) : (
@@ -146,30 +151,30 @@ function makeStyles(theme: Theme) {
   return StyleSheet.create({
     container: { flex: 1, backgroundColor: theme.bg },
     header: {
-      paddingHorizontal: 16,
-      paddingTop: 16,
-      paddingBottom: 8,
+      paddingHorizontal: SPACING.md,
+      paddingTop: SPACING.md,
+      paddingBottom: SPACING.sm,
     },
-    title: { fontSize: 22, fontWeight: '700', color: theme.text },
+    title: { ...TYPOGRAPHY.h2, color: theme.text },
     searchContainer: {
       flexDirection: 'row',
       alignItems: 'center',
       backgroundColor: theme.surface,
-      marginHorizontal: 16,
-      marginBottom: 8,
-      borderRadius: 10,
+      marginHorizontal: SPACING.md,
+      marginBottom: SPACING.sm,
+      borderRadius: RADIUS.md,
       borderWidth: 1,
       borderColor: theme.border,
       paddingHorizontal: 12,
     },
-    searchIcon: { marginRight: 8 },
-    searchInput: { flex: 1, paddingVertical: 10, fontSize: 15, color: theme.text },
-    list: { paddingBottom: 24 },
-    centered: { flex: 1, justifyContent: 'center', alignItems: 'center', padding: 32 },
-    errorText: { color: theme.error, fontSize: 14, textAlign: 'center', marginBottom: 12 },
+    searchIcon: { marginRight: SPACING.sm },
+    searchInput: { flex: 1, paddingVertical: 10, ...TYPOGRAPHY.body, color: theme.text },
+    list: { paddingBottom: SPACING.lg },
+    centered: { flex: 1, justifyContent: 'center', alignItems: 'center', padding: SPACING.xl },
+    errorText: { ...TYPOGRAPHY.label, fontWeight: '400', color: theme.error, textAlign: 'center', marginBottom: 12 },
     retryBtn: { paddingHorizontal: 20, paddingVertical: 10 },
-    emptyText: { color: theme.textMuted, fontSize: 14, textAlign: 'center' },
-    footer: { paddingVertical: 16, alignItems: 'center' },
-    endOfListText: { fontSize: 13, color: theme.textMuted },
+    emptyText: { ...TYPOGRAPHY.label, fontWeight: '400', color: theme.textMuted, textAlign: 'center' },
+    footer: { paddingVertical: SPACING.md, alignItems: 'center' },
+    endOfListText: { ...TYPOGRAPHY.bodySmall, color: theme.textMuted },
   });
 }

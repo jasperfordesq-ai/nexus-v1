@@ -9,16 +9,18 @@ import {
   Text,
   ScrollView,
   StyleSheet,
-  SafeAreaView,
   Alert,
   KeyboardAvoidingView,
   Platform,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { router, useNavigation } from 'expo-router';
 import * as Haptics from 'expo-haptics';
 
 import { useTranslation } from 'react-i18next';
 
+import { TYPOGRAPHY } from '@/lib/styles/typography';
+import { SPACING, RADIUS } from '@/lib/styles/spacing';
 import { updateProfile, type UpdateProfilePayload } from '@/lib/api/profile';
 import { type User } from '@/lib/api/auth';
 import { useAuth } from '@/lib/hooks/useAuth';
@@ -225,17 +227,17 @@ export default function EditProfileScreen() {
 function makeStyles(theme: Theme) {
   return StyleSheet.create({
     container: { flex: 1, backgroundColor: theme.bg },
-    content: { padding: 20, paddingBottom: 48 },
+    content: { padding: 20, paddingBottom: SPACING.xxl },
     fieldGroup: { marginBottom: 18 },
     label: {
-      fontSize: 13,
+      ...TYPOGRAPHY.bodySmall,
       fontWeight: '600',
       color: theme.textSecondary,
       textTransform: 'uppercase',
       letterSpacing: 0.5,
-      marginBottom: 6,
+      marginBottom: RADIUS.sm,
     },
     bioInput: { height: 100, textAlignVertical: 'top' },
-    saveBtn: { marginTop: 8, borderRadius: 10 },
+    saveBtn: { marginTop: SPACING.sm, borderRadius: RADIUS.md },
   });
 }

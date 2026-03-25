@@ -26,7 +26,12 @@ export function formatDate(date: string | Date): string {
  * @param short - If true, returns compact format (e.g. "5m") instead of "5m ago"
  */
 export function formatRelativeTime(iso: string, short = false): string {
-  const diff = Date.now() - new Date(iso).getTime();
+  if (!iso) return short ? 'now' : 'just now';
+
+  const parsed = new Date(iso);
+  if (isNaN(parsed.getTime())) return short ? 'now' : 'just now';
+
+  const diff = Date.now() - parsed.getTime();
   const minutes = Math.floor(diff / 60_000);
 
   if (minutes < 1) return short ? 'now' : 'just now';
@@ -39,5 +44,5 @@ export function formatRelativeTime(iso: string, short = false): string {
   if (short) return `${days}d`;
   if (days < 7) return `${days}d ago`;
 
-  return new Date(iso).toLocaleDateString();
+  return parsed.toLocaleDateString();
 }

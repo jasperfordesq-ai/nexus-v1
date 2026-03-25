@@ -20,6 +20,7 @@
     "title": "Gan comhráití fós",
     "subtitle": "Ceangail le baill le teachtaireachtaí a sheoladh"
   },
+  "deleteConfirm": "Scrios comhrá le {{name}}?",
   "errors": {
     "sendFailed": "Theip ar an teachtaireacht a sheoladh. Tapáil le triail arís.",
     "loadFailed": "Níorbh fhéidir teachtaireachtaí a luchtú."

@@ -9,7 +9,6 @@ import {
   Text,
   FlatList,
   StyleSheet,
-  SafeAreaView,
   TouchableOpacity,
   TextInput,
   Alert,
@@ -18,11 +17,14 @@ import {
   Platform,
   RefreshControl,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
 import { useTranslation } from 'react-i18next';
 
+import { TYPOGRAPHY } from '@/lib/styles/typography';
+import { SPACING, RADIUS } from '@/lib/styles/spacing';
 import {
   getGoals,
   createGoal,
@@ -32,7 +34,9 @@ import {
 import { useApi } from '@/lib/hooks/useApi';
 import { usePrimaryColor } from '@/lib/hooks/useTenant';
 import { useTheme, type Theme } from '@/lib/hooks/useTheme';
+import EmptyState from '@/components/ui/EmptyState';
 import LoadingSpinner from '@/components/ui/LoadingSpinner';
+import ModalErrorBoundary from '@/components/ModalErrorBoundary';
 
 // ─── Goal Card ────────────────────────────────────────────────────────────────
 
@@ -304,6 +308,7 @@ export default function GoalsScreen() {
   }
 
   return (
+    <ModalErrorBoundary>
     <SafeAreaView style={styles.container}>
       <KeyboardAvoidingView
         style={styles.flex}
@@ -338,11 +343,13 @@ export default function GoalsScreen() {
                 {error ? (
                   <Text style={styles.errorText}>{error}</Text>
                 ) : (
-                  <View style={styles.emptyState}>
-                    <Ionicons name="flag-outline" size={48} color={theme.textMuted} />
-                    <Text style={styles.emptyTitle}>{t('goals:noGoals')}</Text>
-                    <Text style={styles.emptySubtitle}>{t('goals:noGoalsHint')}</Text>
-                  </View>
+                  <EmptyState
+                    icon="flag-outline"
+                    title={t('goals:noGoals')}
+                    subtitle={t('goals:noGoalsHint')}
+                    actionLabel={t('goals:addGoal')}
+                    onAction={() => setShowForm(true)}
+                  />
                 )}
               </View>
             ) : null
@@ -362,6 +369,7 @@ export default function GoalsScreen() {
         />
       </KeyboardAvoidingView>
     </SafeAreaView>
+    </ModalErrorBoundary>
   );
 }
 
@@ -372,13 +380,13 @@ function makeStyles(theme: Theme) {
     container: { flex: 1, backgroundColor: theme.bg },
     flex: { flex: 1 },
     center: { flex: 1, alignItems: 'center', justifyContent: 'center' },
-    listContent: { padding: 16, paddingBottom: 40 },
+    listContent: { padding: SPACING.md, paddingBottom: 40 },
 
     // Goal card
     goalCard: {
       backgroundColor: theme.surface,
-      borderRadius: 14,
-      padding: 14,
+      borderRadius: RADIUS.lg,
+      padding: RADIUS.lg,
       borderWidth: 1,
       borderColor: theme.borderSubtle,
     },
@@ -386,20 +394,20 @@ function makeStyles(theme: Theme) {
       flexDirection: 'row',
       alignItems: 'flex-start',
       justifyContent: 'space-between',
-      gap: 8,
-      marginBottom: 10,
+      gap: SPACING.sm,
+      marginBottom: RADIUS.md,
     },
-    goalTitle: { flex: 1, fontSize: 15, fontWeight: '600', color: theme.text },
+    goalTitle: { flex: 1, ...TYPOGRAPHY.body, fontWeight: '600', color: theme.text },
     statusBadge: {
       borderWidth: 1,
-      borderRadius: 6,
-      paddingHorizontal: 8,
+      borderRadius: RADIUS.sm,
+      paddingHorizontal: SPACING.sm,
       paddingVertical: 3,
     },
     statusText: { fontSize: 11, fontWeight: '600' },
 
     // Progress
-    progressRow: { marginBottom: 8 },
+    progressRow: { marginBottom: SPACING.sm },
     progressTrack: {
       height: 6,
       borderRadius: 3,
@@ -408,14 +416,14 @@ function makeStyles(theme: Theme) {
       marginBottom: 4,
     },
     progressFill: { height: 6, borderRadius: 3 },
-    progressLabel: { fontSize: 12, color: theme.textSecondary },
+    progressLabel: { ...TYPOGRAPHY.caption, color: theme.textSecondary },
 
     // Due date
-    dueDateRow: { flexDirection: 'row', alignItems: 'center', gap: 5, marginBottom: 8 },
-    dueDateText: { fontSize: 12, color: theme.textMuted },
+    dueDateRow: { flexDirection: 'row', alignItems: 'center', gap: 5, marginBottom: SPACING.sm },
+    dueDateText: { ...TYPOGRAPHY.caption, color: theme.textMuted },
 
     // Actions
-    actionRow: { flexDirection: 'row', gap: 10, marginTop: 4 },
+    actionRow: { flexDirection: 'row', gap: RADIUS.md, marginTop: 4 },
     actionBtn: {
       flex: 1,
       flexDirection: 'row',
@@ -423,55 +431,52 @@ function makeStyles(theme: Theme) {
       justifyContent: 'center',
       gap: 5,
       borderWidth: 1,
-      borderRadius: 8,
+      borderRadius: SPACING.sm,
       paddingVertical: 7,
     },
-    actionBtnText: { fontSize: 13, fontWeight: '600' },
+    actionBtnText: { ...TYPOGRAPHY.bodySmall, fontWeight: '600' },
 
     // Create form
     formCard: {
       backgroundColor: theme.surface,
-      borderRadius: 14,
-      padding: 16,
-      marginBottom: 16,
+      borderRadius: RADIUS.lg,
+      padding: SPACING.md,
+      marginBottom: SPACING.md,
       borderWidth: 1,
       borderColor: theme.border,
     },
-    formTitle: { fontSize: 16, fontWeight: '700', color: theme.text, marginBottom: 14 },
-    formLabel: { fontSize: 12, fontWeight: '600', color: theme.textSecondary, marginBottom: 5 },
+    formTitle: { fontSize: 16, fontWeight: '700', color: theme.text, marginBottom: RADIUS.lg },
+    formLabel: { ...TYPOGRAPHY.caption, fontWeight: '600', color: theme.textSecondary, marginBottom: 5 },
     formInput: {
       borderWidth: 1,
-      borderRadius: 10,
+      borderRadius: RADIUS.md,
       paddingHorizontal: 12,
-      paddingVertical: 10,
-      fontSize: 15,
+      paddingVertical: RADIUS.md,
+      fontSize: TYPOGRAPHY.body.fontSize,
       backgroundColor: theme.bg,
       marginBottom: 12,
     },
-    formActions: { flexDirection: 'row', gap: 10, marginTop: 4 },
+    formActions: { flexDirection: 'row', gap: RADIUS.md, marginTop: 4 },
     cancelBtn: {
       flex: 1,
       alignItems: 'center',
       paddingVertical: 11,
-      borderRadius: 10,
+      borderRadius: RADIUS.md,
       borderWidth: 1,
       borderColor: theme.border,
     },
-    cancelBtnText: { fontSize: 14, fontWeight: '600' },
+    cancelBtnText: { ...TYPOGRAPHY.label, fontWeight: '600' },
     submitBtn: {
       flex: 2,
       alignItems: 'center',
       justifyContent: 'center',
       paddingVertical: 11,
-      borderRadius: 10,
+      borderRadius: RADIUS.md,
     },
-    submitBtnText: { fontSize: 14, fontWeight: '700', color: '#fff' }, // contrast on primary
+    submitBtnText: { ...TYPOGRAPHY.label, fontWeight: '700', color: '#fff' }, // contrast on primary
 
     // Empty / error
-    emptyWrap: { paddingTop: 48, alignItems: 'center' },
-    emptyState: { alignItems: 'center', gap: 10 },
-    emptyTitle: { fontSize: 16, fontWeight: '600', color: theme.text, textAlign: 'center' },
-    emptySubtitle: { fontSize: 14, color: theme.textMuted, textAlign: 'center', maxWidth: 260 },
-    errorText: { fontSize: 14, color: theme.error, textAlign: 'center' },
+    emptyWrap: { paddingTop: SPACING.xxl, alignItems: 'center' },
+    errorText: { ...TYPOGRAPHY.label, color: theme.error, textAlign: 'center' },
   });
 }

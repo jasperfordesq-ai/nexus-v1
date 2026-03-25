@@ -169,7 +169,7 @@ export function getMatchPercentage(
  */
 export async function getMyInterviews(): Promise<JobInterview[]> {
   const response = await api.get<{ data: JobInterview[] }>(`${API_V2}/jobs/my-interviews`);
-  return (response as { data: JobInterview[] }).data ?? [];
+  return Array.isArray(response?.data) ? response.data : [];
 }
 
 /**
@@ -201,7 +201,7 @@ export async function declineInterview(interviewId: number): Promise<boolean> {
  */
 export async function getMyOffers(): Promise<JobOffer[]> {
   const response = await api.get<{ data: JobOffer[] }>(`${API_V2}/jobs/my-offers`);
-  return (response as { data: JobOffer[] }).data ?? [];
+  return Array.isArray(response?.data) ? response.data : [];
 }
 
 /**
@@ -234,7 +234,7 @@ export async function rejectOffer(offerId: number): Promise<boolean> {
 export async function getSavedProfile(): Promise<{ cv_filename?: string; cover_text?: string } | null> {
   try {
     const response = await api.get<{ profile?: { cv_filename?: string; cover_text?: string } }>(`${API_V2}/jobs/saved-profile`);
-    return (response as { profile?: { cv_filename?: string; cover_text?: string } }).profile ?? null;
+    return response?.profile ?? null;
   } catch {
     return null;
   }

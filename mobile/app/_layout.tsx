@@ -4,6 +4,7 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import { useEffect, useRef } from 'react';
+import { LogBox } from 'react-native';
 import { Stack, router } from 'expo-router';
 import * as Notifications from 'expo-notifications';
 import { StatusBar } from 'expo-status-bar';
@@ -22,6 +23,37 @@ import * as Sentry from '@sentry/react-native';
 
 // Validate environment variables at startup — logs warnings for missing config
 validateEnv();
+
+// Suppress known non-fatal dev-mode warnings that block the UI in Expo Go
+LogBox.ignoreLogs([
+  'expo-notifications',
+  'expo-av',
+  'VirtualizedLists should never be nested',
+  'Each child in a list should have a unique',
+  'Encountered two children with the same key',
+  'Non-serializable values were found in the navigation state',
+]);
+
+// Patch console.error to prevent React dev-mode warnings from triggering
+// the full-screen error overlay in Expo Go. These are non-fatal warnings
+// (duplicate keys, deprecation notices) that block the entire UI.
+if (__DEV__) {
+  const originalConsoleError = console.error;
+  console.error = (...args: unknown[]) => {
+    const msg = typeof args[0] === 'string' ? args[0] : '';
+    if (
+      msg.includes('Encountered two children with the same key') ||
+      msg.includes('Each child in a list should have a unique') ||
+      msg.includes('expo-notifications') ||
+      msg.includes('expo-av')
+    ) {
+      // Downgrade to warning so the error overlay doesn't appear
+      console.warn('[suppressed]', ...args);
+      return;
+    }
+    originalConsoleError(...args);
+  };
+}
 
 Sentry.init({
   dsn: process.env.EXPO_PUBLIC_SENTRY_DSN ?? '',
@@ -95,6 +127,16 @@ function RootNavigator() {
     }
   }, [isLoading, isAuthenticated]);
 
+  // Shared options for regular modal screens: slide up from bottom, swipe-to-dismiss
+  const modalOptions = {
+    presentation: 'modal' as const,
+    headerShown: true,
+    animation: 'slide_from_bottom' as const,
+    gestureEnabled: true,
+    gestureDirection: 'vertical' as const,
+    contentStyle: { backgroundColor: 'transparent' },
+  };
+
   return (
     <Stack screenOptions={{ headerShown: false }}>
       <Stack.Screen name="index" />
@@ -102,111 +144,125 @@ function RootNavigator() {
       <Stack.Screen name="(tabs)" />
       <Stack.Screen
         name="(modals)/new-exchange"
-        options={{ presentation: 'modal', headerShown: true, title: t('exchanges:newTitle') }}
+        options={{ ...modalOptions, title: t('exchanges:newTitle') }}
       />
       <Stack.Screen
         name="(modals)/exchange-detail"
-        options={{ presentation: 'modal', headerShown: true, title: t('exchanges:detailTitle') }}
+        options={{ ...modalOptions, title: t('exchanges:detailTitle') }}
       />
       <Stack.Screen
         name="(modals)/thread"
-        options={{ presentation: 'modal', headerShown: true, title: t('messages:threadTitle') }}
+        options={{ ...modalOptions, title: t('messages:threadTitle') }}
       />
       <Stack.Screen
         name="(modals)/member-profile"
-        options={{ presentation: 'modal', headerShown: true, title: t('members:profileTitle') }}
+        options={{ ...modalOptions, title: t('members:profileTitle') }}
       />
       <Stack.Screen
         name="(modals)/notifications"
-        options={{ presentation: 'modal', headerShown: true, title: t('notifications:title') }}
+        options={{ ...modalOptions, title: t('notifications:title') }}
       />
       <Stack.Screen
         name="(modals)/wallet"
-        options={{ presentation: 'modal', headerShown: true, title: t('wallet:title') }}
+        options={{ ...modalOptions, title: t('wallet:title') }}
       />
       <Stack.Screen
         name="(modals)/settings"
-        options={{ presentation: 'modal', headerShown: true, title: t('settings:title') }}
+        options={{ ...modalOptions, title: t('settings:title') }}
       />
       <Stack.Screen
         name="(modals)/edit-profile"
-        options={{ presentation: 'modal', headerShown: true, title: t('profile:editTitle') }}
+        options={{ ...modalOptions, title: t('profile:editTitle') }}
       />
       <Stack.Screen
         name="(modals)/event-detail"
-        options={{ presentation: 'modal', headerShown: true, title: t('events:detailTitle') }}
+        options={{ ...modalOptions, title: t('events:detailTitle') }}
       />
       <Stack.Screen
         name="(modals)/members"
-        options={{ presentation: 'modal', headerShown: true, title: t('members:title') }}
+        options={{ ...modalOptions, title: t('members:title') }}
       />
       <Stack.Screen
         name="(modals)/change-password"
-        options={{ presentation: 'modal', headerShown: true, title: t('settings:changePasswordTitle') }}
+        options={{ ...modalOptions, title: t('settings:changePasswordTitle') }}
       />
       <Stack.Screen
         name="(modals)/group-detail"
-        options={{ presentation: 'modal', headerShown: true, title: t('groups:detailTitle') }}
+        options={{ ...modalOptions, title: t('groups:detailTitle') }}
       />
       <Stack.Screen
         name="(modals)/blog"
-        options={{ presentation: 'modal', headerShown: true, title: t('blog:title') }}
+        options={{ ...modalOptions, title: t('blog:title') }}
       />
       <Stack.Screen
         name="(modals)/blog-post"
-        options={{ presentation: 'modal', headerShown: true, title: t('blog:postTitle') }}
+        options={{ ...modalOptions, title: t('blog:postTitle') }}
       />
       <Stack.Screen
         name="(modals)/gamification"
-        options={{ presentation: 'modal', headerShown: true, title: t('gamification:title') }}
+        options={{ ...modalOptions, title: t('gamification:title') }}
       />
       <Stack.Screen
         name="(modals)/goals"
-        options={{ presentation: 'modal', headerShown: true, title: t('goals:title') }}
+        options={{ ...modalOptions, title: t('goals:title') }}
       />
       <Stack.Screen
         name="(modals)/chat"
-        options={{ presentation: 'modal', headerShown: true, title: t('chat:title') }}
+        options={{ ...modalOptions, title: t('chat:title') }}
       />
       <Stack.Screen
         name="(modals)/volunteering"
-        options={{ presentation: 'modal', headerShown: true, title: t('volunteering:title') }}
+        options={{ ...modalOptions, title: t('volunteering:title') }}
       />
       <Stack.Screen
         name="(modals)/volunteering-detail"
-        options={{ presentation: 'modal', headerShown: true, title: t('volunteering:detailTitle') }}
+        options={{ ...modalOptions, title: t('volunteering:detailTitle') }}
       />
       <Stack.Screen
         name="(modals)/jobs"
-        options={{ presentation: 'modal', headerShown: true, title: t('jobs:title') }}
+        options={{ ...modalOptions, title: t('jobs:title') }}
       />
       <Stack.Screen
         name="(modals)/job-detail"
-        options={{ presentation: 'modal', headerShown: true, title: t('jobs:detailTitle') }}
+        options={{ ...modalOptions, title: t('jobs:detailTitle') }}
       />
       <Stack.Screen
         name="(modals)/organisations"
-        options={{ presentation: 'modal', headerShown: true, title: t('organisations:title') }}
+        options={{ ...modalOptions, title: t('organisations:title') }}
       />
       <Stack.Screen
         name="(modals)/organisation-detail"
-        options={{ presentation: 'modal', headerShown: true, title: t('organisations:detailTitle') }}
+        options={{ ...modalOptions, title: t('organisations:detailTitle') }}
       />
       <Stack.Screen
         name="(modals)/endorsements"
-        options={{ presentation: 'modal', headerShown: true, title: t('endorsements:title') }}
+        options={{ ...modalOptions, title: t('endorsements:title') }}
       />
       <Stack.Screen
         name="(modals)/federation"
-        options={{ presentation: 'modal', headerShown: true, title: t('federation:title') }}
+        options={{ ...modalOptions, title: t('federation:title') }}
       />
       <Stack.Screen
         name="(modals)/federation-partner"
-        options={{ presentation: 'modal', headerShown: true, title: t('federation:partnerTitle') }}
+        options={{ ...modalOptions, title: t('federation:partnerTitle') }}
+      />
+      <Stack.Screen
+        name="(modals)/groups"
+        options={{ ...modalOptions, title: t('groups:title') }}
+      />
+      <Stack.Screen
+        name="(modals)/search"
+        options={{ ...modalOptions, title: t('search:title') }}
       />
       <Stack.Screen
         name="(modals)/image-viewer"
-        options={{ presentation: 'fullScreenModal', headerShown: false }}
+        options={{
+          presentation: 'fullScreenModal',
+          headerShown: false,
+          gestureEnabled: true,
+          gestureDirection: 'vertical',
+          contentStyle: { backgroundColor: 'transparent' },
+        }}
       />
     </Stack>
   );

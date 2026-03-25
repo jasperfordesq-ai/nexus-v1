@@ -50,7 +50,7 @@ describe('getOpportunities', () => {
   it('calls the correct endpoint with no params on first page', async () => {
     (api.get as jest.Mock).mockResolvedValue(mockVolunteeringResponse);
     const result = await getOpportunities(null);
-    expect(api.get).toHaveBeenCalledWith('/api/v2/volunteering', {});
+    expect(api.get).toHaveBeenCalledWith('/api/v2/volunteering/opportunities', {});
     expect(result.data).toHaveLength(1);
     expect(result.meta.has_more).toBe(false);
   });
@@ -58,7 +58,7 @@ describe('getOpportunities', () => {
   it('includes cursor when provided', async () => {
     (api.get as jest.Mock).mockResolvedValue(mockVolunteeringResponse);
     await getOpportunities('cursor-vol-1');
-    expect(api.get).toHaveBeenCalledWith('/api/v2/volunteering', { cursor: 'cursor-vol-1' });
+    expect(api.get).toHaveBeenCalledWith('/api/v2/volunteering/opportunities', { cursor: 'cursor-vol-1' });
   });
 
   it('omits cursor when null', async () => {
@@ -71,7 +71,7 @@ describe('getOpportunities', () => {
   it('includes search param when provided', async () => {
     (api.get as jest.Mock).mockResolvedValue(mockVolunteeringResponse);
     await getOpportunities(null, 'gardening');
-    expect(api.get).toHaveBeenCalledWith('/api/v2/volunteering', { search: 'gardening' });
+    expect(api.get).toHaveBeenCalledWith('/api/v2/volunteering/opportunities', { search: 'gardening' });
   });
 
   it('omits search when not provided', async () => {
@@ -84,7 +84,7 @@ describe('getOpportunities', () => {
   it('includes cursor and search together', async () => {
     (api.get as jest.Mock).mockResolvedValue(mockVolunteeringResponse);
     await getOpportunities('cursor-2', 'teaching');
-    expect(api.get).toHaveBeenCalledWith('/api/v2/volunteering', {
+    expect(api.get).toHaveBeenCalledWith('/api/v2/volunteering/opportunities', {
       cursor: 'cursor-2',
       search: 'teaching',
     });
@@ -97,7 +97,7 @@ describe('getOpportunity', () => {
   it('calls the correct endpoint with the opportunity ID', async () => {
     (api.get as jest.Mock).mockResolvedValue({ data: mockOpportunity });
     const result = await getOpportunity(3);
-    expect(api.get).toHaveBeenCalledWith('/api/v2/volunteering/3');
+    expect(api.get).toHaveBeenCalledWith('/api/v2/volunteering/opportunities/3');
     expect(result.data.title).toBe('Community Garden Helper');
     expect(result.data.status).toBe('open');
   });
@@ -109,7 +109,7 @@ describe('expressInterest', () => {
   it('sends POST to the correct interest endpoint with empty body', async () => {
     (api.post as jest.Mock).mockResolvedValue({ message: 'Interest registered' });
     const result = await expressInterest(3);
-    expect(api.post).toHaveBeenCalledWith('/api/v2/volunteering/3/interest', {});
+    expect(api.post).toHaveBeenCalledWith('/api/v2/volunteering/opportunities/3/apply', {});
     expect(result.message).toBe('Interest registered');
   });
 });

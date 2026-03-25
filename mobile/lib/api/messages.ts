@@ -6,30 +6,67 @@
 import { api } from '@/lib/api/client';
 import { API_V2 } from '@/lib/constants';
 
+/** Helper to compute a display name from API user objects that may have
+ *  `name`, `first_name`/`last_name`, or `organization_name`. */
+export function displayName(user: {
+  name?: string | null;
+  first_name?: string | null;
+  last_name?: string | null;
+  organization_name?: string | null;
+} | null | undefined): string {
+  if (!user) return 'Unknown';
+  if (user.name) return user.name;
+  if (user.organization_name) return user.organization_name;
+  const first = user.first_name ?? '';
+  const last = user.last_name ?? '';
+  const full = `${first} ${last}`.trim();
+  return full || 'Unknown';
+}
+
+export interface ConversationOtherUser {
+  id: number;
+  name?: string | null;
+  first_name?: string | null;
+  last_name?: string | null;
+  organization_name?: string | null;
+  avatar_url: string | null;
+  is_online?: boolean;
+}
+
 export interface Conversation {
   id: number;
-  other_user: {
-    id: number;
-    name: string;
-    avatar_url: string | null;
-    is_online: boolean;
-  };
+  other_user: ConversationOtherUser;
+  /** The API returns `last_message` with `content` (not `body`) and `sender_id` (not `is_own`). */
   last_message: {
-    body: string;
+    id?: number;
+    body?: string;
+    content?: string;
+    sender_id?: number;
     created_at: string;
-    is_own: boolean;
+    is_own?: boolean;
+    is_read?: boolean;
   } | null;
   unread_count: number;
+  /** The authenticated user's ID, populated from conversation metadata. */
+  sender_id?: number;
+}
+
+export interface MessageSender {
+  id: number;
+  name?: string | null;
+  first_name?: string | null;
+  last_name?: string | null;
+  organization_name?: string | null;
+  avatar_url?: string | null;
 }
 
 export interface Message {
   id: number;
   body: string;
-  sender: {
-    id: number;
-    name: string;
-    avatar_url: string | null;
-  };
+  sender: MessageSender;
+  sender_id?: number;
+  receiver_id?: number;
+  receiver?: MessageSender | null;
   created_at: string;
   is_own: boolean;
   is_voice: boolean;
@@ -91,6 +128,11 @@ export async function getOrCreateThread(otherUserId: number): Promise<MessageLis
     }
     throw err;
   }
+}
+
+/** DELETE /api/v2/messages/conversations/:conversationId — delete a conversation */
+export function deleteConversation(conversationId: number): Promise<void> {
+  return api.delete(`${API_V2}/messages/conversations/${conversationId}`);
 }
 
 /** POST /api/v2/messages — send a message to a recipient */

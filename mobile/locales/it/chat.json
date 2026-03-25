@@ -5,5 +5,6 @@
   "empty": "Inizia una conversazione con l'assistente IA.",
   "error": "Impossibile inviare il messaggio.",
   "thinking": "Sto pensando…",
+  "timeout": "La risposta sta impiegando troppo tempo. Riprova.",
   "disclaimer": "Le risposte dell'IA potrebbero non essere sempre accurate."
 }

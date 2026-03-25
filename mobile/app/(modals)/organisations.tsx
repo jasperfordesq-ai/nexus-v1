@@ -12,8 +12,8 @@ import {
   TouchableOpacity,
   RefreshControl,
   StyleSheet,
-  SafeAreaView,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { router, useNavigation } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
@@ -28,8 +28,12 @@ import { usePaginatedApi } from '@/lib/hooks/usePaginatedApi';
 import { usePrimaryColor } from '@/lib/hooks/useTenant';
 import { useTheme, type Theme } from '@/lib/hooks/useTheme';
 import { withAlpha } from '@/lib/utils/color';
+import { TYPOGRAPHY } from '@/lib/styles/typography';
+import { SPACING, RADIUS } from '@/lib/styles/spacing';
 import Avatar from '@/components/ui/Avatar';
+import EmptyState from '@/components/ui/EmptyState';
 import LoadingSpinner from '@/components/ui/LoadingSpinner';
+import ModalErrorBoundary from '@/components/ModalErrorBoundary';
 
 // ---------------------------------------------------------------------------
 // Inline card component
@@ -127,6 +131,13 @@ export default function OrganisationsScreen() {
     setCommittedSearch('');
   }
 
+  // Clean up debounce timer on unmount
+  useEffect(() => {
+    return () => {
+      if (debounceRef.current) clearTimeout(debounceRef.current);
+    };
+  }, []);
+
   const fetchFn = useCallback(
     (cursor: string | null) => getOrganisations(cursor, committedSearch || undefined),
     [committedSearch],
@@ -165,7 +176,8 @@ export default function OrganisationsScreen() {
   );
 
   return (
-    <SafeAreaView style={styles.container}>
+    <ModalErrorBoundary>
+    <SafeAreaView style={styles.container} edges={['bottom']}>
       {/* Search bar */}
       <View style={styles.searchBar}>
         <Ionicons name="search-outline" size={18} color={theme.textMuted} style={styles.searchIcon} />
@@ -182,7 +194,7 @@ export default function OrganisationsScreen() {
           accessibilityLabel={t('searchPlaceholder')}
         />
         {search.length > 0 && (
-          <TouchableOpacity onPress={handleClear} hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}>
+          <TouchableOpacity onPress={handleClear} hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }} accessibilityLabel={t('common:actions.clear', 'Clear search')} accessibilityRole="button">
             <Ionicons name="close-circle" size={18} color={theme.textMuted} />
           </TouchableOpacity>
         )}
@@ -212,9 +224,10 @@ export default function OrganisationsScreen() {
               </TouchableOpacity>
             </View>
           ) : (
-            <View style={styles.centered}>
-              <Text style={styles.emptyText}>{t('empty')}</Text>
-            </View>
+            <EmptyState
+              icon="business-outline"
+              title={t('empty')}
+            />
           )
         }
         ListFooterComponent={
@@ -227,6 +240,7 @@ export default function OrganisationsScreen() {
         contentContainerStyle={styles.list}
       />
     </SafeAreaView>
+    </ModalErrorBoundary>
   );
 }
 
@@ -240,48 +254,48 @@ function makeStyles(theme: Theme) {
     searchBar: {
       flexDirection: 'row',
       alignItems: 'center',
-      marginHorizontal: 16,
-      marginVertical: 12,
-      paddingHorizontal: 12,
+      marginHorizontal: SPACING.md,
+      marginVertical: SPACING.sm + 4,
+      paddingHorizontal: SPACING.sm + 4,
       height: 42,
       backgroundColor: theme.surface,
-      borderRadius: 10,
-      gap: 8,
+      borderRadius: RADIUS.md,
+      gap: SPACING.sm,
     },
     searchIcon: { flexShrink: 0 },
     searchInput: {
       flex: 1,
-      fontSize: 15,
+      ...TYPOGRAPHY.body,
       color: theme.text,
       paddingVertical: 0,
     },
-    list: { flexGrow: 1, paddingHorizontal: 16, paddingBottom: 32 },
+    list: { flexGrow: 1, paddingHorizontal: SPACING.md, paddingBottom: SPACING.xl },
     card: {
       backgroundColor: theme.surface,
-      borderRadius: 14,
-      padding: 14,
-      marginBottom: 12,
+      borderRadius: RADIUS.lg,
+      padding: RADIUS.lg,
+      marginBottom: SPACING.sm + 4,
       borderWidth: 1,
       borderColor: theme.borderSubtle,
-      gap: 10,
+      gap: SPACING.sm + 2,
     },
     cardHeader: {
       flexDirection: 'row',
       alignItems: 'center',
-      gap: 12,
+      gap: SPACING.sm + 4,
     },
     cardHeaderContent: {
       flex: 1,
-      gap: 4,
+      gap: SPACING.xs,
     },
     nameRow: {
       flexDirection: 'row',
       alignItems: 'center',
-      gap: 6,
+      gap: SPACING.sm - 2,
       flexWrap: 'wrap',
     },
     cardName: {
-      fontSize: 15,
+      ...TYPOGRAPHY.body,
       fontWeight: '600',
       color: theme.text,
       flexShrink: 1,
@@ -290,9 +304,9 @@ function makeStyles(theme: Theme) {
       flexDirection: 'row',
       alignItems: 'center',
       gap: 3,
-      borderRadius: 6,
-      paddingHorizontal: 6,
-      paddingVertical: 2,
+      borderRadius: RADIUS.sm,
+      paddingHorizontal: SPACING.sm - 2,
+      paddingVertical: SPACING.xxs,
     },
     verifiedText: {
       fontSize: 11,
@@ -301,25 +315,25 @@ function makeStyles(theme: Theme) {
     locationRow: {
       flexDirection: 'row',
       alignItems: 'center',
-      gap: 4,
+      gap: SPACING.xs,
     },
     locationText: {
-      fontSize: 13,
+      ...TYPOGRAPHY.bodySmall,
       color: theme.textMuted,
       flex: 1,
     },
     countsRow: {
       flexDirection: 'row',
       alignItems: 'center',
-      gap: 8,
+      gap: SPACING.sm,
     },
     countItem: {
       flexDirection: 'row',
       alignItems: 'center',
-      gap: 4,
+      gap: SPACING.xs,
     },
     countText: {
-      fontSize: 12,
+      ...TYPOGRAPHY.caption,
       color: theme.textSecondary,
     },
     countDot: {
@@ -329,10 +343,9 @@ function makeStyles(theme: Theme) {
       backgroundColor: theme.textMuted,
     },
     centered: { flex: 1, justifyContent: 'center', alignItems: 'center', padding: 40 },
-    errorText: { color: theme.error, fontSize: 14, textAlign: 'center' },
-    emptyText: { color: theme.textSecondary, fontSize: 15, textAlign: 'center' },
-    retryButton: { marginTop: 12 },
-    retryText: { fontSize: 15, fontWeight: '600' },
-    footerLoader: { paddingVertical: 16 },
+    errorText: { color: theme.error, ...TYPOGRAPHY.label, textAlign: 'center' },
+    retryButton: { marginTop: SPACING.sm + 4 },
+    retryText: { ...TYPOGRAPHY.button },
+    footerLoader: { paddingVertical: SPACING.md },
   });
 }

@@ -10,11 +10,11 @@ import {
   ScrollView,
   RefreshControl,
   StyleSheet,
-  SafeAreaView,
   TouchableOpacity,
   Alert,
   Share,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { useLocalSearchParams, router, useNavigation } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
@@ -24,8 +24,11 @@ import { getOpportunity, expressInterest } from '@/lib/api/volunteering';
 import { useApi } from '@/lib/hooks/useApi';
 import { usePrimaryColor } from '@/lib/hooks/useTenant';
 import { useTheme, type Theme } from '@/lib/hooks/useTheme';
+import { TYPOGRAPHY } from '@/lib/styles/typography';
+import { SPACING, RADIUS } from '@/lib/styles/spacing';
 import Avatar from '@/components/ui/Avatar';
 import LoadingSpinner from '@/components/ui/LoadingSpinner';
+import ModalErrorBoundary from '@/components/ModalErrorBoundary';
 
 const WEB_URL = 'https://app.project-nexus.ie';
 
@@ -67,7 +70,7 @@ export default function VolunteeringDetailScreen() {
 
   if (isNaN(opportunityId) || opportunityId <= 0) {
     return (
-      <SafeAreaView style={styles.center}>
+      <SafeAreaView style={styles.center} edges={['bottom']}>
         <Text style={styles.errorText}>{t('detail.invalidId')}</Text>
         <TouchableOpacity onPress={() => router.back()} style={{ marginTop: 12 }}>
           <Text style={{ color: primary, fontSize: 15, fontWeight: '600' }}>{t('detail.goBack')}</Text>
@@ -94,7 +97,7 @@ export default function VolunteeringDetailScreen() {
 
   if (isLoading) {
     return (
-      <SafeAreaView style={styles.center}>
+      <SafeAreaView style={styles.center} edges={['bottom']}>
         <LoadingSpinner />
       </SafeAreaView>
     );
@@ -102,7 +105,7 @@ export default function VolunteeringDetailScreen() {
 
   if (!opportunity) {
     return (
-      <SafeAreaView style={styles.center}>
+      <SafeAreaView style={styles.center} edges={['bottom']}>
         <Text style={styles.errorText}>{t('detail.notFound')}</Text>
         <TouchableOpacity onPress={() => router.back()} style={{ marginTop: 12 }}>
           <Text style={{ color: primary, fontSize: 15, fontWeight: '600' }}>{t('detail.goBack')}</Text>
@@ -129,7 +132,8 @@ export default function VolunteeringDetailScreen() {
     : null;
 
   return (
-    <SafeAreaView style={styles.container}>
+    <ModalErrorBoundary>
+    <SafeAreaView style={styles.container} edges={['bottom']}>
       <ScrollView
         contentContainerStyle={styles.content}
         refreshControl={
@@ -204,11 +208,11 @@ export default function VolunteeringDetailScreen() {
         </View>
 
         {/* Skills */}
-        {opportunity.skills_needed.length > 0 ? (
+        {(opportunity.skills_needed ?? []).length > 0 ? (
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>{t('skills')}</Text>
             <View style={styles.skillsRow}>
-              {opportunity.skills_needed.map((skill) => (
+              {(opportunity.skills_needed ?? []).map((skill) => (
                 <View key={skill} style={[styles.skillPill, { backgroundColor: theme.surface, borderColor: theme.border }]}>
                   <Text style={styles.skillText}>{skill}</Text>
                 </View>
@@ -249,6 +253,7 @@ export default function VolunteeringDetailScreen() {
         </TouchableOpacity>
       </ScrollView>
     </SafeAreaView>
+    </ModalErrorBoundary>
   );
 }
 
@@ -285,61 +290,61 @@ function makeStyles(theme: Theme) {
   return StyleSheet.create({
     container: { flex: 1, backgroundColor: theme.bg },
     center: { flex: 1, alignItems: 'center', justifyContent: 'center' },
-    content: { padding: 20, paddingBottom: 48 },
+    content: { padding: SPACING.xl - 12, paddingBottom: SPACING.xxl },
     titleRow: {
       flexDirection: 'row',
       alignItems: 'flex-start',
-      gap: 10,
-      marginBottom: 16,
+      gap: SPACING.sm + 2,
+      marginBottom: SPACING.md,
     },
-    title: { flex: 1, fontSize: 22, fontWeight: '700', color: theme.text },
+    title: { flex: 1, ...TYPOGRAPHY.h2, color: theme.text },
     statusBadge: {
-      borderRadius: 6,
-      paddingHorizontal: 8,
-      paddingVertical: 4,
+      borderRadius: RADIUS.sm,
+      paddingHorizontal: SPACING.sm,
+      paddingVertical: SPACING.xs,
       alignSelf: 'flex-start',
     },
     statusText: { fontSize: 11, fontWeight: '600' },
     metaCard: {
       backgroundColor: theme.surface,
-      borderRadius: 14,
-      padding: 14,
-      gap: 10,
+      borderRadius: RADIUS.lg,
+      padding: RADIUS.lg,
+      gap: SPACING.sm + 2,
       borderWidth: 1,
       borderColor: theme.borderSubtle,
-      marginBottom: 20,
+      marginBottom: SPACING.xl - 12,
     },
-    section: { marginBottom: 20 },
+    section: { marginBottom: SPACING.xl - 12 },
     sectionTitle: {
-      fontSize: 12,
+      ...TYPOGRAPHY.caption,
       fontWeight: '700',
       color: theme.textSecondary,
       textTransform: 'uppercase',
       letterSpacing: 0.6,
-      marginBottom: 10,
+      marginBottom: SPACING.sm + 2,
     },
-    orgRow: { flexDirection: 'row', alignItems: 'center', gap: 12 },
-    orgName: { fontSize: 15, fontWeight: '600', color: theme.text },
-    skillsRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
+    orgRow: { flexDirection: 'row', alignItems: 'center', gap: SPACING.sm + 4 },
+    orgName: { ...TYPOGRAPHY.body, fontWeight: '600', color: theme.text },
+    skillsRow: { flexDirection: 'row', flexWrap: 'wrap', gap: SPACING.sm },
     skillPill: {
-      borderRadius: 8,
-      paddingHorizontal: 10,
+      borderRadius: SPACING.sm,
+      paddingHorizontal: SPACING.sm + 2,
       paddingVertical: 5,
       borderWidth: 1,
     },
-    skillText: { fontSize: 13, color: theme.text },
-    description: { fontSize: 15, color: theme.text, lineHeight: 22 },
+    skillText: { ...TYPOGRAPHY.bodySmall, color: theme.text },
+    description: { ...TYPOGRAPHY.body, color: theme.text },
     interestButton: {
       flexDirection: 'row',
       alignItems: 'center',
       justifyContent: 'center',
-      gap: 8,
-      borderRadius: 12,
-      paddingVertical: 14,
-      marginTop: 8,
+      gap: SPACING.sm,
+      borderRadius: SPACING.sm + 4,
+      paddingVertical: RADIUS.lg,
+      marginTop: SPACING.sm,
     },
     interestButtonDisabled: { opacity: 0.75 },
     interestButtonText: { fontSize: 16, fontWeight: '700', color: '#fff' }, // contrast on primary
-    errorText: { fontSize: 15, color: theme.textMuted },
+    errorText: { ...TYPOGRAPHY.body, color: theme.textMuted },
   });
 }

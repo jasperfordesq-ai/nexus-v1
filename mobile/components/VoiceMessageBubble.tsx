@@ -6,6 +6,9 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, ActivityIndicator } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+// TODO: Migrate from expo-av to expo-audio when SDK 55+ is adopted.
+// expo-av is deprecated but expo-audio's API differs significantly (useAudioPlayer hook-based).
+// The deprecation warning is suppressed via LogBox in _layout.tsx.
 import { Audio, type AVPlaybackStatus } from 'expo-av';
 
 import { useTranslation } from 'react-i18next';

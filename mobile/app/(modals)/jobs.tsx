@@ -12,14 +12,16 @@ import {
   TouchableOpacity,
   RefreshControl,
   StyleSheet,
-  SafeAreaView,
   ScrollView,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { router, useNavigation } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
 import { useTranslation } from 'react-i18next';
 
+import { TYPOGRAPHY } from '@/lib/styles/typography';
+import { SPACING, RADIUS } from '@/lib/styles/spacing';
 import {
   getJobs,
   getMyApplications,
@@ -36,7 +38,9 @@ import { usePaginatedApi } from '@/lib/hooks/usePaginatedApi';
 import { usePrimaryColor } from '@/lib/hooks/useTenant';
 import { useTheme, type Theme } from '@/lib/hooks/useTheme';
 import { withAlpha } from '@/lib/utils/color';
+import EmptyState from '@/components/ui/EmptyState';
 import LoadingSpinner from '@/components/ui/LoadingSpinner';
+import ModalErrorBoundary from '@/components/ModalErrorBoundary';
 
 // ---------------------------------------------------------------------------
 // Type filter options
@@ -99,10 +103,10 @@ function JobCard({
     return null;
   })();
 
-  const visibleSkills = item.skills_required.slice(0, 3);
+  const visibleSkills = (item.skills_required ?? []).slice(0, 3);
 
   return (
-    <TouchableOpacity style={styles.card} onPress={onPress} activeOpacity={0.75}>
+    <TouchableOpacity style={styles.card} onPress={onPress} activeOpacity={0.75} accessibilityRole="button" accessibilityLabel={item.title}>
       {/* Featured badge */}
       {item.is_featured ? (
         <View style={styles.featuredBadge}>
@@ -174,7 +178,7 @@ function JobCard({
               <Text style={styles.skillText}>{skill}</Text>
             </View>
           ))}
-          {item.skills_required.length > 3 ? (
+          {(item.skills_required ?? []).length > 3 ? (
             <View style={[styles.skillPill, { backgroundColor: theme.bg }]}>
               <Text style={styles.skillText}>+{item.skills_required.length - 3}</Text>
             </View>
@@ -277,6 +281,8 @@ function ApplicationCard({
                 if (ok) onInterviewAccepted(interview.id);
               }}
               activeOpacity={0.8}
+              accessibilityRole="button"
+              accessibilityLabel={t('applications.accept_interview')}
             >
               <Text style={{ fontSize: 13, fontWeight: '600', color: '#fff' }}>{/* contrast on primary */}
                 {t('applications.accept_interview')}
@@ -292,6 +298,8 @@ function ApplicationCard({
                 if (ok) onInterviewDeclined(interview.id);
               }}
               activeOpacity={0.8}
+              accessibilityRole="button"
+              accessibilityLabel={t('applications.decline_interview')}
             >
               <Text style={{ fontSize: 13, fontWeight: '600', color: theme.error }}>
                 {t('applications.decline_interview')}
@@ -326,6 +334,8 @@ function ApplicationCard({
                 if (ok) onOfferAccepted(offer.id);
               }}
               activeOpacity={0.8}
+              accessibilityRole="button"
+              accessibilityLabel={t('applications.accept_offer')}
             >
               <Text style={{ fontSize: 13, fontWeight: '600', color: '#fff' }}>{/* contrast on primary */}
                 {t('applications.accept_offer')}
@@ -341,6 +351,8 @@ function ApplicationCard({
                 if (ok) onOfferRejected(offer.id);
               }}
               activeOpacity={0.8}
+              accessibilityRole="button"
+              accessibilityLabel={t('applications.decline_offer')}
             >
               <Text style={{ fontSize: 13, fontWeight: '600', color: theme.error }}>
                 {t('applications.decline_offer')}
@@ -396,6 +408,13 @@ export default function JobsScreen() {
     setSearch('');
     setCommittedSearch('');
   }
+
+  // Clean up debounce timer on unmount
+  useEffect(() => {
+    return () => {
+      if (debounceRef.current) clearTimeout(debounceRef.current);
+    };
+  }, []);
 
   // Browse tab — paginated job list
   const jobFetchFn = useCallback(
@@ -517,12 +536,16 @@ export default function JobsScreen() {
   );
 
   return (
-    <SafeAreaView style={styles.container}>
+    <ModalErrorBoundary>
+    <SafeAreaView style={styles.container} edges={['bottom']}>
       {/* Tab bar */}
       <View style={styles.tabBar}>
         <TouchableOpacity
           style={[styles.tab, activeTab === 'browse' && { borderBottomColor: primary, borderBottomWidth: 2 }]}
           onPress={() => setActiveTab('browse')}
+          accessibilityRole="tab"
+          accessibilityState={{ selected: activeTab === 'browse' }}
+          accessibilityLabel={t('tabs.browse')}
         >
           <Text style={[styles.tabText, activeTab === 'browse' && { color: primary }]}>
             {t('tabs.browse')}
@@ -534,6 +557,9 @@ export default function JobsScreen() {
             activeTab === 'myApplications' && { borderBottomColor: primary, borderBottomWidth: 2 },
           ]}
           onPress={() => setActiveTab('myApplications')}
+          accessibilityRole="tab"
+          accessibilityState={{ selected: activeTab === 'myApplications' }}
+          accessibilityLabel={t('tabs.myApplications')}
         >
           <Text style={[styles.tabText, activeTab === 'myApplications' && { color: primary }]}>
             {t('tabs.myApplications')}
@@ -567,6 +593,8 @@ export default function JobsScreen() {
               <TouchableOpacity
                 onPress={handleClear}
                 hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+                accessibilityLabel={t('common:actions.clear', 'Clear search')}
+                accessibilityRole="button"
               >
                 <Ionicons name="close-circle" size={18} color={theme.textMuted} />
               </TouchableOpacity>
@@ -652,10 +680,11 @@ export default function JobsScreen() {
                   </TouchableOpacity>
                 </View>
               ) : (
-                <View style={styles.centered}>
-                  <Text style={styles.emptyText}>{t('empty')}</Text>
-                  <Text style={styles.emptyHint}>{t('emptyHint')}</Text>
-                </View>
+                <EmptyState
+                  icon="briefcase-outline"
+                  title={t('empty')}
+                  subtitle={t('emptyHint')}
+                />
               )
             }
             ListFooterComponent={
@@ -693,10 +722,11 @@ export default function JobsScreen() {
                 </TouchableOpacity>
               </View>
             ) : (
-              <View style={styles.centered}>
-                <Text style={styles.emptyText}>{t('applications.empty')}</Text>
-                <Text style={styles.emptyHint}>{t('applications.emptyHint')}</Text>
-              </View>
+              <EmptyState
+                icon="document-text-outline"
+                title={t('applications.empty')}
+                subtitle={t('applications.emptyHint')}
+              />
             )
           }
           ListFooterComponent={
@@ -710,6 +740,7 @@ export default function JobsScreen() {
         />
       )}
     </SafeAreaView>
+    </ModalErrorBoundary>
   );
 }
 
@@ -734,46 +765,46 @@ function makeStyles(theme: Theme) {
       borderBottomColor: 'transparent',
     },
     tabText: {
-      fontSize: 14,
+      ...TYPOGRAPHY.label,
       fontWeight: '600',
       color: theme.textSecondary,
     },
     searchBar: {
       flexDirection: 'row',
       alignItems: 'center',
-      marginHorizontal: 16,
+      marginHorizontal: SPACING.md,
       marginVertical: 12,
       paddingHorizontal: 12,
       height: 42,
       backgroundColor: theme.surface,
-      borderRadius: 10,
-      gap: 8,
+      borderRadius: RADIUS.md,
+      gap: SPACING.sm,
     },
     searchIcon: { flexShrink: 0 },
     searchInput: {
       flex: 1,
-      fontSize: 15,
+      fontSize: TYPOGRAPHY.body.fontSize,
       color: theme.text,
       paddingVertical: 0,
     },
     filtersScroll: { flexShrink: 0 },
     filtersContent: {
-      paddingHorizontal: 16,
-      paddingBottom: 10,
-      gap: 8,
+      paddingHorizontal: SPACING.md,
+      paddingBottom: RADIUS.md,
+      gap: SPACING.sm,
       flexDirection: 'row',
       alignItems: 'center',
     },
     filterChip: {
       paddingHorizontal: 12,
-      paddingVertical: 6,
-      borderRadius: 20,
+      paddingVertical: RADIUS.sm,
+      borderRadius: RADIUS.xl,
       borderWidth: 1,
       borderColor: theme.border,
       backgroundColor: theme.surface,
     },
     filterChipText: {
-      fontSize: 12,
+      ...TYPOGRAPHY.caption,
       fontWeight: '600',
       color: theme.textSecondary,
     },
@@ -783,30 +814,30 @@ function makeStyles(theme: Theme) {
       backgroundColor: theme.border,
       marginHorizontal: 4,
     },
-    list: { flexGrow: 1, paddingHorizontal: 16, paddingBottom: 32, paddingTop: 4 },
+    list: { flexGrow: 1, paddingHorizontal: SPACING.md, paddingBottom: SPACING.xl, paddingTop: 4 },
     card: {
       backgroundColor: theme.surface,
-      borderRadius: 14,
-      padding: 14,
+      borderRadius: RADIUS.lg,
+      padding: RADIUS.lg,
       marginBottom: 12,
       borderWidth: 1,
       borderColor: theme.borderSubtle,
-      gap: 8,
+      gap: SPACING.sm,
     },
     appCard: {
       backgroundColor: theme.surface,
-      borderRadius: 14,
-      padding: 14,
+      borderRadius: RADIUS.lg,
+      padding: RADIUS.lg,
       marginBottom: 12,
       borderWidth: 1,
       borderColor: theme.borderSubtle,
-      gap: 8,
+      gap: SPACING.sm,
     },
     featuredBadge: {
       alignSelf: 'flex-start',
       backgroundColor: theme.warning + '33',
-      borderRadius: 6,
-      paddingHorizontal: 8,
+      borderRadius: RADIUS.sm,
+      paddingHorizontal: SPACING.sm,
       paddingVertical: 3,
     },
     featuredText: {
@@ -823,13 +854,13 @@ function makeStyles(theme: Theme) {
     },
     cardTitle: {
       flex: 1,
-      fontSize: 15,
+      ...TYPOGRAPHY.body,
       fontWeight: '600',
       color: theme.text,
     },
     typeBadge: {
-      borderRadius: 6,
-      paddingHorizontal: 8,
+      borderRadius: RADIUS.sm,
+      paddingHorizontal: SPACING.sm,
       paddingVertical: 3,
       alignSelf: 'flex-start',
     },
@@ -838,7 +869,7 @@ function makeStyles(theme: Theme) {
       fontWeight: '600',
     },
     cardOrg: {
-      fontSize: 13,
+      ...TYPOGRAPHY.bodySmall,
       color: theme.textSecondary,
     },
     cardMeta: {
@@ -848,8 +879,8 @@ function makeStyles(theme: Theme) {
       alignItems: 'center',
     },
     remoteBadge: {
-      borderRadius: 6,
-      paddingHorizontal: 8,
+      borderRadius: RADIUS.sm,
+      paddingHorizontal: SPACING.sm,
       paddingVertical: 3,
     },
     remoteBadgeText: {
@@ -862,7 +893,7 @@ function makeStyles(theme: Theme) {
       gap: 4,
     },
     metaText: {
-      fontSize: 12,
+      ...TYPOGRAPHY.caption,
       color: theme.textMuted,
     },
     skillsRow: {
@@ -871,8 +902,8 @@ function makeStyles(theme: Theme) {
       gap: 6,
     },
     skillPill: {
-      borderRadius: 6,
-      paddingHorizontal: 8,
+      borderRadius: RADIUS.sm,
+      paddingHorizontal: SPACING.sm,
       paddingVertical: 3,
       borderWidth: 1,
       borderColor: theme.border,
@@ -882,11 +913,9 @@ function makeStyles(theme: Theme) {
       color: theme.textSecondary,
     },
     centered: { flex: 1, justifyContent: 'center', alignItems: 'center', padding: 40 },
-    errorText: { color: theme.error, fontSize: 14, textAlign: 'center' },
-    emptyText: { color: theme.textSecondary, fontSize: 15, textAlign: 'center' },
-    emptyHint: { color: theme.textMuted, fontSize: 13, textAlign: 'center', marginTop: 6 },
+    errorText: { ...TYPOGRAPHY.label, color: theme.error, textAlign: 'center' },
     retryButton: { marginTop: 12 },
-    retryText: { fontSize: 15, fontWeight: '600' },
-    footerLoader: { paddingVertical: 16 },
+    retryText: { ...TYPOGRAPHY.body, fontWeight: '600' },
+    footerLoader: { paddingVertical: SPACING.md },
   });
 }

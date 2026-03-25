@@ -29,6 +29,7 @@ export default function ExchangeCard({ exchange }: ExchangeCardProps) {
   }
 
   const hours = exchange.hours_estimate ?? 0;
+  const user = exchange.user ?? { id: 0, name: '?', avatar_url: null };
 
   return (
     <TouchableOpacity
@@ -36,7 +37,7 @@ export default function ExchangeCard({ exchange }: ExchangeCardProps) {
       onPress={openDetail}
       activeOpacity={0.85}
       accessibilityRole="button"
-      accessibilityLabel={exchange.title}
+      accessibilityLabel={exchange.title ?? ''}
     >
       <Card style={styles.card}>
         {/* Header row */}
@@ -60,20 +61,20 @@ export default function ExchangeCard({ exchange }: ExchangeCardProps) {
 
         {/* Title */}
         <Text style={styles.title} numberOfLines={2}>
-          {exchange.title}
+          {exchange.title ?? ''}
         </Text>
 
         {/* Footer: user info + category */}
         <View style={styles.footer}>
-          <Avatar uri={exchange.user.avatar_url} name={exchange.user.name} size={24} />
+          <Avatar uri={user.avatar_url} name={user.name} size={24} />
           <Text style={styles.userName} numberOfLines={1}>
-            {exchange.user.name}
+            {user.name}
           </Text>
-          {exchange.category_name && (
+          {exchange.category_name ? (
             <Text style={styles.category}>
               {exchange.category_name}
             </Text>
-          )}
+          ) : null}
         </View>
       </Card>
     </TouchableOpacity>

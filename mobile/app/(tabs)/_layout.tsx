@@ -3,7 +3,8 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
+import { Animated, StyleSheet, View } from 'react-native';
 import { Tabs, usePathname } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -11,9 +12,66 @@ import { useTranslation } from 'react-i18next';
 
 import { usePrimaryColor } from '@/lib/hooks/useTenant';
 import { useTheme } from '@/lib/hooks/useTheme';
+import { useApi } from '@/lib/hooks/useApi';
+import { getNotificationCounts } from '@/lib/api/notifications';
 import { useRealtimeContext } from '@/lib/context/RealtimeContext';
 
 type IoniconName = React.ComponentProps<typeof Ionicons>['name'];
+
+/** Animated badge that scales in with a spring when it appears. */
+function TabBadge({ count }: { count: number }) {
+  const scale = useRef(new Animated.Value(0)).current;
+  const primary = usePrimaryColor();
+
+  useEffect(() => {
+    if (count > 0) {
+      scale.setValue(0);
+      Animated.spring(scale, {
+        toValue: 1,
+        friction: 5,
+        tension: 80,
+        useNativeDriver: true,
+      }).start();
+    } else {
+      scale.setValue(0);
+    }
+  }, [count, scale]);
+
+  if (count <= 0) return null;
+
+  return (
+    <Animated.View
+      style={[
+        badgeStyles.badge,
+        { backgroundColor: primary, transform: [{ scale }] },
+      ]}
+    >
+      <Animated.Text style={badgeStyles.badgeText}>
+        {count > 99 ? '99+' : count}
+      </Animated.Text>
+    </Animated.View>
+  );
+}
+
+const badgeStyles = StyleSheet.create({
+  badge: {
+    position: 'absolute',
+    top: -4,
+    right: -10,
+    minWidth: 18,
+    height: 18,
+    borderRadius: 9,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingHorizontal: 4,
+  },
+  badgeText: {
+    color: '#fff',
+    fontSize: 10,
+    fontWeight: '700',
+    textAlign: 'center',
+  },
+});
 
 interface TabConfig {
   name: string;
@@ -37,6 +95,12 @@ export default function TabsLayout() {
   const { unreadMessages, resetUnread } = useRealtimeContext();
   const pathname = usePathname();
   const insets = useSafeAreaInsets();
+
+  // Fetch notification counts for the messages badge
+  const { data: countsData } = useApi(() => getNotificationCounts());
+  const apiUnread = countsData?.data?.messages ?? 0;
+  // Prefer real-time count from Pusher; fall back to API count
+  const messagesBadgeCount = unreadMessages > 0 ? unreadMessages : apiUnread;
 
   // Clear the badge whenever the user navigates to the Messages tab
   useEffect(() => {
@@ -71,14 +135,17 @@ export default function TabsLayout() {
           name={name}
           options={{
             title: t(i18nKey),
-            tabBarBadge: name === 'messages' && unreadMessages > 0 ? unreadMessages : undefined,
-            tabBarBadgeStyle: name === 'messages' && unreadMessages > 0 ? { backgroundColor: primary } : undefined,
             tabBarIcon: ({ focused, color, size }) => (
-              <Ionicons
-                name={focused ? iconFocused : icon}
-                size={size}
-                color={color}
-              />
+              <View style={{ position: 'relative' }}>
+                <Ionicons
+                  name={focused ? iconFocused : icon}
+                  size={size}
+                  color={color}
+                />
+                {name === 'messages' && (
+                  <TabBadge count={messagesBadgeCount} />
+                )}
+              </View>
             ),
           }}
         />

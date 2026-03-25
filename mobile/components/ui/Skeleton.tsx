@@ -13,6 +13,7 @@ import {
 } from 'react-native';
 
 import { useTheme } from '@/lib/hooks/useTheme';
+import { SPACING, RADIUS } from '@/lib/styles/spacing';
 
 // ---------------------------------------------------------------------------
 // Shared animation hook
@@ -61,7 +62,7 @@ interface SkeletonBoxProps {
 export function SkeletonBox({
   width = '100%',
   height = 14,
-  borderRadius = 6,
+  borderRadius = RADIUS.sm,
   style,
 }: SkeletonBoxProps): React.JSX.Element {
   const opacity = useShimmerAnimation();
@@ -213,11 +214,11 @@ export function ProfileSkeleton(): React.JSX.Element {
 const styles = StyleSheet.create({
   // FeedItemSkeleton
   feedCard: {
-    borderRadius: 14,
-    padding: 14,
-    marginHorizontal: 16,
-    marginVertical: 6,
-    gap: 8,
+    borderRadius: RADIUS.lg,
+    padding: RADIUS.lg,
+    marginHorizontal: SPACING.md,
+    marginVertical: SPACING.sm - 2,
+    gap: SPACING.sm,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.06,
@@ -227,7 +228,7 @@ const styles = StyleSheet.create({
   row: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 10,
+    gap: SPACING.sm + 2,
   },
   avatar36: {
     width: 36,
@@ -236,16 +237,16 @@ const styles = StyleSheet.create({
   },
   headerText: {
     flex: 1,
-    gap: 6,
+    gap: SPACING.sm - 2,
   },
 
   // ConversationSkeleton
   conversationRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    gap: 12,
+    paddingHorizontal: SPACING.md,
+    paddingVertical: SPACING.sm + 4,
+    gap: SPACING.sm + 4,
   },
   avatar48: {
     width: 48,
@@ -254,16 +255,16 @@ const styles = StyleSheet.create({
   },
   conversationText: {
     flex: 1,
-    gap: 8,
+    gap: SPACING.sm,
   },
 
   // EventCardSkeleton
   eventRow: {
     flexDirection: 'row',
     alignItems: 'flex-start',
-    gap: 12,
-    padding: 14,
-    borderRadius: 14,
+    gap: SPACING.sm + 4,
+    padding: RADIUS.lg,
+    borderRadius: RADIUS.lg,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.06,
@@ -273,20 +274,20 @@ const styles = StyleSheet.create({
   dateBadge: {
     width: 48,
     height: 52,
-    borderRadius: 8,
+    borderRadius: SPACING.sm,
   },
   eventContent: {
     flex: 1,
-    gap: 8,
+    gap: SPACING.sm,
   },
 
   // ExchangeCardSkeleton
   exchangeCard: {
-    borderRadius: 14,
-    padding: 14,
-    marginHorizontal: 16,
-    marginVertical: 6,
-    gap: 10,
+    borderRadius: RADIUS.lg,
+    padding: RADIUS.lg,
+    marginHorizontal: SPACING.md,
+    marginVertical: SPACING.sm - 2,
+    gap: SPACING.sm + 2,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.06,
@@ -295,8 +296,8 @@ const styles = StyleSheet.create({
   },
 
   // ProfileSkeleton
-  profileContainer: { paddingHorizontal: 24, paddingTop: 32 },
+  profileContainer: { paddingHorizontal: SPACING.lg, paddingTop: SPACING.xl },
   profileCenter: { alignItems: 'center' },
   profileAvatar: { width: 88, height: 88, borderRadius: 44 },
-  profileActions: { gap: 12, marginTop: 24 },
+  profileActions: { gap: SPACING.sm + 4, marginTop: SPACING.lg },
 });

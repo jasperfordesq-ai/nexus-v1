@@ -12,8 +12,8 @@ import {
   TouchableOpacity,
   RefreshControl,
   StyleSheet,
-  SafeAreaView,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { router, useNavigation } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
@@ -28,7 +28,11 @@ import { usePaginatedApi } from '@/lib/hooks/usePaginatedApi';
 import { usePrimaryColor } from '@/lib/hooks/useTenant';
 import { useTheme, type Theme } from '@/lib/hooks/useTheme';
 import { withAlpha } from '@/lib/utils/color';
+import { TYPOGRAPHY } from '@/lib/styles/typography';
+import { SPACING, RADIUS } from '@/lib/styles/spacing';
+import EmptyState from '@/components/ui/EmptyState';
 import LoadingSpinner from '@/components/ui/LoadingSpinner';
+import ModalErrorBoundary from '@/components/ModalErrorBoundary';
 
 // ---------------------------------------------------------------------------
 // Inline card component
@@ -60,7 +64,7 @@ function OpportunityCard({
     ? t('deadline', { date: new Date(item.deadline).toLocaleDateString('default', { month: 'short', day: 'numeric', year: 'numeric' }) })
     : null;
 
-  const visibleSkills = item.skills_needed.slice(0, 3);
+  const visibleSkills = (item.skills_needed ?? []).slice(0, 3);
 
   return (
     <TouchableOpacity style={styles.card} onPress={onPress} activeOpacity={0.75} accessibilityRole="button" accessibilityLabel={item.title}>
@@ -115,7 +119,7 @@ function OpportunityCard({
               <Text style={styles.skillText}>{skill}</Text>
             </View>
           ))}
-          {item.skills_needed.length > 3 ? (
+          {(item.skills_needed ?? []).length > 3 ? (
             <View style={[styles.skillPill, { backgroundColor: theme.bg }]}>
               <Text style={styles.skillText}>+{item.skills_needed.length - 3}</Text>
             </View>
@@ -159,6 +163,13 @@ export default function VolunteeringScreen() {
     setCommittedSearch('');
   }
 
+  // Clean up debounce timer on unmount
+  useEffect(() => {
+    return () => {
+      if (debounceRef.current) clearTimeout(debounceRef.current);
+    };
+  }, []);
+
   const fetchFn = useCallback(
     (cursor: string | null) => getOpportunities(cursor, committedSearch || undefined),
     [committedSearch],
@@ -197,7 +208,8 @@ export default function VolunteeringScreen() {
   );
 
   return (
-    <SafeAreaView style={styles.container}>
+    <ModalErrorBoundary>
+    <SafeAreaView style={styles.container} edges={['bottom']}>
       {/* Search bar */}
       <View style={styles.searchBar}>
         <Ionicons name="search-outline" size={18} color={theme.textMuted} style={styles.searchIcon} />
@@ -214,7 +226,7 @@ export default function VolunteeringScreen() {
           accessibilityLabel={t('searchPlaceholder')}
         />
         {search.length > 0 && (
-          <TouchableOpacity onPress={handleClear} hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}>
+          <TouchableOpacity onPress={handleClear} hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }} accessibilityLabel={t('common:actions.clear', 'Clear search')} accessibilityRole="button">
             <Ionicons name="close-circle" size={18} color={theme.textMuted} />
           </TouchableOpacity>
         )}
@@ -244,9 +256,10 @@ export default function VolunteeringScreen() {
               </TouchableOpacity>
             </View>
           ) : (
-            <View style={styles.centered}>
-              <Text style={styles.emptyText}>{t('empty')}</Text>
-            </View>
+            <EmptyState
+              icon="heart-outline"
+              title={t('empty')}
+            />
           )
         }
         ListFooterComponent={
@@ -259,6 +272,7 @@ export default function VolunteeringScreen() {
         contentContainerStyle={styles.list}
       />
     </SafeAreaView>
+    </ModalErrorBoundary>
   );
 }
 
@@ -272,45 +286,45 @@ function makeStyles(theme: Theme) {
     searchBar: {
       flexDirection: 'row',
       alignItems: 'center',
-      marginHorizontal: 16,
-      marginVertical: 12,
-      paddingHorizontal: 12,
+      marginHorizontal: SPACING.md,
+      marginVertical: SPACING.sm + 4,
+      paddingHorizontal: SPACING.sm + 4,
       height: 42,
       backgroundColor: theme.surface,
-      borderRadius: 10,
-      gap: 8,
+      borderRadius: RADIUS.md,
+      gap: SPACING.sm,
     },
     searchIcon: { flexShrink: 0 },
     searchInput: {
       flex: 1,
-      fontSize: 15,
+      ...TYPOGRAPHY.body,
       color: theme.text,
       paddingVertical: 0,
     },
-    list: { flexGrow: 1, paddingHorizontal: 16, paddingBottom: 32 },
+    list: { flexGrow: 1, paddingHorizontal: SPACING.md, paddingBottom: SPACING.xl },
     card: {
       backgroundColor: theme.surface,
-      borderRadius: 14,
-      padding: 14,
-      marginBottom: 12,
+      borderRadius: RADIUS.lg,
+      padding: RADIUS.lg,
+      marginBottom: SPACING.sm + 4,
       borderWidth: 1,
       borderColor: theme.borderSubtle,
-      gap: 8,
+      gap: SPACING.sm,
     },
     cardTitleRow: {
       flexDirection: 'row',
       alignItems: 'flex-start',
-      gap: 8,
+      gap: SPACING.sm,
     },
     cardTitle: {
       flex: 1,
-      fontSize: 15,
+      ...TYPOGRAPHY.body,
       fontWeight: '600',
       color: theme.text,
     },
     statusBadge: {
-      borderRadius: 6,
-      paddingHorizontal: 8,
+      borderRadius: RADIUS.sm,
+      paddingHorizontal: SPACING.sm,
       paddingVertical: 3,
       alignSelf: 'flex-start',
     },
@@ -319,18 +333,18 @@ function makeStyles(theme: Theme) {
       fontWeight: '600',
     },
     cardOrg: {
-      fontSize: 13,
+      ...TYPOGRAPHY.bodySmall,
       color: theme.textSecondary,
     },
     cardMeta: {
       flexDirection: 'row',
       flexWrap: 'wrap',
-      gap: 8,
+      gap: SPACING.sm,
       alignItems: 'center',
     },
     remoteBadge: {
-      borderRadius: 6,
-      paddingHorizontal: 8,
+      borderRadius: RADIUS.sm,
+      paddingHorizontal: SPACING.sm,
       paddingVertical: 3,
     },
     remoteBadgeText: {
@@ -340,20 +354,20 @@ function makeStyles(theme: Theme) {
     metaItem: {
       flexDirection: 'row',
       alignItems: 'center',
-      gap: 4,
+      gap: SPACING.xs,
     },
     metaText: {
-      fontSize: 12,
+      ...TYPOGRAPHY.caption,
       color: theme.textMuted,
     },
     skillsRow: {
       flexDirection: 'row',
       flexWrap: 'wrap',
-      gap: 6,
+      gap: SPACING.sm - 2,
     },
     skillPill: {
-      borderRadius: 6,
-      paddingHorizontal: 8,
+      borderRadius: RADIUS.sm,
+      paddingHorizontal: SPACING.sm,
       paddingVertical: 3,
       borderWidth: 1,
       borderColor: theme.border,
@@ -363,10 +377,9 @@ function makeStyles(theme: Theme) {
       color: theme.textSecondary,
     },
     centered: { flex: 1, justifyContent: 'center', alignItems: 'center', padding: 40 },
-    errorText: { color: theme.error, fontSize: 14, textAlign: 'center' },
-    emptyText: { color: theme.textSecondary, fontSize: 15, textAlign: 'center' },
-    retryButton: { marginTop: 12 },
-    retryText: { fontSize: 15, fontWeight: '600' },
-    footerLoader: { paddingVertical: 16 },
+    errorText: { color: theme.error, ...TYPOGRAPHY.label, textAlign: 'center' },
+    retryButton: { marginTop: SPACING.sm + 4 },
+    retryText: { ...TYPOGRAPHY.button },
+    footerLoader: { paddingVertical: SPACING.md },
   });
 }

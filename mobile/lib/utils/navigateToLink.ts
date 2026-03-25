@@ -18,6 +18,7 @@ export function navigateToLink(link: string | null): void {
   if (id && isNaN(Number(id))) return;
   switch (section) {
     case 'exchanges':
+    case 'listings':
       if (id) router.push({ pathname: '/(modals)/exchange-detail', params: { id } });
       break;
     case 'events':

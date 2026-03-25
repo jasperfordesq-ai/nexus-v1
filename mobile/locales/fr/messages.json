@@ -20,6 +20,7 @@
     "title": "Aucune conversation",
     "subtitle": "Connectez-vous avec des membres pour envoyer des messages"
   },
+  "deleteConfirm": "Supprimer la conversation avec {{name}} ?",
   "errors": {
     "sendFailed": "Échec de l'envoi. Appuyez pour réessayer.",
     "loadFailed": "Impossible de charger les messages."

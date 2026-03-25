@@ -7,6 +7,8 @@ import { StyleSheet, Text, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { useNetworkStatus } from '@/lib/hooks/useNetworkStatus';
 import { useTheme } from '@/lib/hooks/useTheme';
+import { TYPOGRAPHY } from '@/lib/styles/typography';
+import { SPACING } from '@/lib/styles/spacing';
 
 /**
  * Renders a sticky warning banner when the device has no connectivity.
@@ -29,13 +31,13 @@ export default function OfflineBanner() {
 const styles = StyleSheet.create({
   banner: {
     borderBottomWidth: 1,
-    paddingVertical: 8,
-    paddingHorizontal: 16,
+    paddingVertical: SPACING.sm,
+    paddingHorizontal: SPACING.md,
     alignItems: 'center',
     zIndex: 100,
   },
   text: {
-    fontSize: 13,
+    ...TYPOGRAPHY.bodySmall,
     fontWeight: '600',
   },
 });

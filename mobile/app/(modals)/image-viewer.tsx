@@ -19,6 +19,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
 
 import { useTheme, type Theme } from '@/lib/hooks/useTheme';
+import { SPACING, RADIUS } from '@/lib/styles/spacing';
 
 export default function ImageViewerScreen() {
   const { t } = useTranslation('home');
@@ -101,12 +102,12 @@ function makeStyles(_theme: Theme) {
     },
     closeButton: {
       position: 'absolute',
-      top: 8,
-      right: 16,
+      top: SPACING.sm,
+      right: SPACING.md,
       zIndex: 10,
       width: 40,
       height: 40,
-      borderRadius: 20,
+      borderRadius: RADIUS.full,
       backgroundColor: 'rgba(0,0,0,0.5)',
       alignItems: 'center',
       justifyContent: 'center',
@@ -125,10 +126,10 @@ function makeStyles(_theme: Theme) {
     },
     shareButton: {
       alignSelf: 'center',
-      marginBottom: 16,
+      marginBottom: SPACING.md,
       width: 48,
       height: 48,
-      borderRadius: 24,
+      borderRadius: RADIUS.full,
       backgroundColor: 'rgba(255,255,255,0.2)',
       alignItems: 'center',
       justifyContent: 'center',

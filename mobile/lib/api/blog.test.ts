@@ -91,10 +91,10 @@ describe('getBlogPosts', () => {
 describe('getBlogPost', () => {
   beforeEach(() => { jest.clearAllMocks(); });
 
-  it('calls the correct endpoint with the post ID', async () => {
+  it('calls the correct endpoint with the post slug', async () => {
     (api.get as jest.Mock).mockResolvedValue({ data: mockPost });
-    const result = await getBlogPost(10);
-    expect(api.get).toHaveBeenCalledWith('/api/v2/blog/10');
+    const result = await getBlogPost('how-timebanking-works');
+    expect(api.get).toHaveBeenCalledWith('/api/v2/blog/how-timebanking-works');
     expect(result.data.title).toBe('How Timebanking Works');
     expect(result.data.slug).toBe('how-timebanking-works');
   });

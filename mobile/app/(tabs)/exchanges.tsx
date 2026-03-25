@@ -8,13 +8,13 @@ import {
   ActivityIndicator,
   FlatList,
   RefreshControl,
-  SafeAreaView,
   StyleSheet,
   Text,
   TextInput,
   TouchableOpacity,
   View,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
@@ -27,7 +27,10 @@ import { usePrimaryColor } from '@/lib/hooks/useTenant';
 import { useTheme, type Theme } from '@/lib/hooks/useTheme';
 import ExchangeCard from '@/components/ExchangeCard';
 import OfflineBanner from '@/components/OfflineBanner';
+import EmptyState from '@/components/ui/EmptyState';
 import { ExchangeCardSkeleton } from '@/components/ui/Skeleton';
+import { TYPOGRAPHY } from '@/lib/styles/typography';
+import { SPACING, RADIUS } from '@/lib/styles/spacing';
 
 /** Extractor for cursor-based ExchangeListResponse. */
 function extractExchangePage(response: ExchangeListResponse) {
@@ -114,13 +117,14 @@ export default function ExchangesScreen() {
             <View style={styles.centered}>
               <Text style={styles.errorText}>{error}</Text>
               <TouchableOpacity onPress={() => void refresh()} style={styles.retryBtn}>
-                <Text style={{ color: primary, fontWeight: '600', fontSize: 15 }}>{t('common:buttons.retry')}</Text>
+                <Text style={{ color: primary, ...TYPOGRAPHY.button }}>{t('common:buttons.retry')}</Text>
               </TouchableOpacity>
             </View>
           ) : (
-            <View style={styles.centered}>
-              <Text style={styles.emptyText}>{t('empty')}</Text>
-            </View>
+            <EmptyState
+              icon="swap-horizontal-outline"
+              title={t('empty')}
+            />
           )
         }
         ListFooterComponent={
@@ -147,11 +151,11 @@ function makeStyles(theme: Theme) {
       flexDirection: 'row',
       alignItems: 'center',
       justifyContent: 'space-between',
-      paddingHorizontal: 16,
-      paddingTop: 16,
-      paddingBottom: 8,
+      paddingHorizontal: SPACING.md,
+      paddingTop: SPACING.md,
+      paddingBottom: SPACING.sm,
     },
-    title: { fontSize: 22, fontWeight: '700', color: theme.text },
+    title: { ...TYPOGRAPHY.h2, color: theme.text },
     newButton: {
       width: 36,
       height: 36,
@@ -163,21 +167,21 @@ function makeStyles(theme: Theme) {
       flexDirection: 'row',
       alignItems: 'center',
       backgroundColor: theme.surface,
-      marginHorizontal: 16,
-      marginBottom: 8,
-      borderRadius: 10,
+      marginHorizontal: SPACING.md,
+      marginBottom: SPACING.sm,
+      borderRadius: RADIUS.md,
       borderWidth: 1,
       borderColor: theme.border,
       paddingHorizontal: 12,
     },
-    searchIcon: { marginRight: 8 },
-    searchInput: { flex: 1, paddingVertical: 10, fontSize: 15, color: theme.text },
-    list: { paddingBottom: 24 },
-    centered: { flex: 1, justifyContent: 'center', alignItems: 'center', padding: 32 },
-    errorText: { color: theme.error, fontSize: 14, textAlign: 'center', marginBottom: 12 },
+    searchIcon: { marginRight: SPACING.sm },
+    searchInput: { flex: 1, paddingVertical: 10, ...TYPOGRAPHY.body, color: theme.text },
+    list: { paddingBottom: SPACING.lg },
+    centered: { flex: 1, justifyContent: 'center', alignItems: 'center', padding: SPACING.xl },
+    errorText: { ...TYPOGRAPHY.label, fontWeight: '400', color: theme.error, textAlign: 'center', marginBottom: 12 },
     retryBtn: { paddingHorizontal: 20, paddingVertical: 10 },
-    emptyText: { color: theme.textMuted, fontSize: 14, textAlign: 'center' },
-    footer: { paddingVertical: 16, alignItems: 'center' },
-    endOfListText: { fontSize: 13, color: theme.textMuted },
+    emptyText: { ...TYPOGRAPHY.label, fontWeight: '400', color: theme.textMuted, textAlign: 'center' },
+    footer: { paddingVertical: SPACING.md, alignItems: 'center' },
+    endOfListText: { ...TYPOGRAPHY.bodySmall, color: theme.textMuted },
   });
 }

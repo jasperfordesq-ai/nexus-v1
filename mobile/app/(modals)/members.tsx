@@ -12,8 +12,8 @@ import {
   TouchableOpacity,
   RefreshControl,
   StyleSheet,
-  SafeAreaView,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { router, useNavigation } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
@@ -27,6 +27,7 @@ import { useTheme, type Theme } from '@/lib/hooks/useTheme';
 import Avatar from '@/components/ui/Avatar';
 import LoadingSpinner from '@/components/ui/LoadingSpinner';
 import { SkeletonBox } from '@/components/ui/Skeleton';
+import ModalErrorBoundary from '@/components/ModalErrorBoundary';
 
 export default function MembersScreen() {
   const { t } = useTranslation('members');
@@ -84,7 +85,7 @@ export default function MembersScreen() {
   );
 
   const { items, isLoading, isLoadingMore, error, hasMore, loadMore, refresh } =
-    usePaginatedApi<Member, MemberListResponse>(fetchFn, extractor);
+    usePaginatedApi<Member, MemberListResponse>(fetchFn, extractor, [committedSearch]);
 
   function renderItem({ item }: { item: Member }) {
     return (
@@ -94,7 +95,7 @@ export default function MembersScreen() {
           void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
           router.push({
             pathname: '/(modals)/member-profile',
-            params: { id: item.id, name: item.name },
+            params: { id: String(item.id), name: item.name },
           });
         }}
         activeOpacity={0.7}
@@ -114,6 +115,7 @@ export default function MembersScreen() {
   }
 
   return (
+    <ModalErrorBoundary>
     <SafeAreaView style={styles.container}>
       {/* Search bar */}
       <View style={styles.searchBar}>
@@ -131,7 +133,7 @@ export default function MembersScreen() {
           accessibilityLabel={t('search.placeholder')}
         />
         {search.length > 0 && (
-          <TouchableOpacity onPress={handleClear} hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}>
+          <TouchableOpacity onPress={handleClear} hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }} accessibilityLabel={t('common:actions.clear', 'Clear search')} accessibilityRole="button">
             <Ionicons name="close-circle" size={18} color={theme.textMuted} />
           </TouchableOpacity>
         )}
@@ -179,6 +181,7 @@ export default function MembersScreen() {
         contentContainerStyle={styles.list}
       />
     </SafeAreaView>
+    </ModalErrorBoundary>
   );
 }
 
@@ -187,7 +190,6 @@ export default function MembersScreen() {
 // ---------------------------------------------------------------------------
 
 function MemberRowSkeleton(): React.JSX.Element {
-  const theme = useTheme();
   return (
     <View style={skeletonRowStyle}>
       <SkeletonBox width={46} height={46} borderRadius={23} />

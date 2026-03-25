@@ -7,25 +7,27 @@ import { useState, useEffect, useMemo } from 'react';
 import {
   View,
   Text,
-  Switch,
   ScrollView,
   TouchableOpacity,
   StyleSheet,
-  SafeAreaView,
   Alert,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { router, useNavigation } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
 import Constants from 'expo-constants';
 import { useTranslation } from 'react-i18next';
 
+import { TYPOGRAPHY } from '@/lib/styles/typography';
+import { SPACING, RADIUS } from '@/lib/styles/spacing';
 import { api } from '@/lib/api/client';
 import { useApi } from '@/lib/hooks/useApi';
 import { usePrimaryColor } from '@/lib/hooks/useTenant';
 import { useTheme, type Theme } from '@/lib/hooks/useTheme';
-import { withAlpha } from '@/lib/utils/color';
 import { API_V2 } from '@/lib/constants';
+import Toggle from '@/components/ui/Toggle';
+import ModalErrorBoundary from '@/components/ModalErrorBoundary';
 
 interface NotificationPrefs {
   email_messages: boolean;
@@ -64,7 +66,7 @@ export default function SettingsScreen() {
 
   async function toggle(key: keyof NotificationPrefs) {
     if (!current) return;
-    void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    // Haptic feedback is handled by the Toggle component
     const updated = { ...current, [key]: !current[key] };
     setPrefs(updated);
     setSaving(true);
@@ -80,6 +82,7 @@ export default function SettingsScreen() {
   }
 
   return (
+    <ModalErrorBoundary>
     <SafeAreaView style={styles.container}>
       <ScrollView contentContainerStyle={styles.content}>
 
@@ -167,7 +170,10 @@ export default function SettingsScreen() {
           <TouchableOpacity
             style={styles.settingRow}
             activeOpacity={0.7}
-            onPress={() => router.push('/(modals)/change-password')}
+            onPress={() => {
+              void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+              router.push('/(modals)/change-password');
+            }}
             accessibilityLabel={t('changePassword')}
             accessibilityRole="button"
           >
@@ -181,6 +187,7 @@ export default function SettingsScreen() {
         </Text>
       </ScrollView>
     </SafeAreaView>
+    </ModalErrorBoundary>
   );
 }
 
@@ -207,8 +214,6 @@ function SettingRow({
   label,
   value,
   onToggle,
-  primary,
-  theme,
   disabled,
   styles,
 }: {
@@ -222,13 +227,11 @@ function SettingRow({
 }) {
   return (
     <View style={styles.settingRow}>
-      <Text style={styles.settingLabel}>{label}</Text>
-      <Switch
+      <Toggle
+        label={label}
         value={value}
         onValueChange={onToggle}
         disabled={disabled}
-        trackColor={{ false: theme.border, true: withAlpha(primary, 0.50) }}
-        thumbColor={value ? primary : theme.surface}
       />
     </View>
   );
@@ -237,20 +240,20 @@ function SettingRow({
 function makeStyles(theme: Theme) {
   return StyleSheet.create({
     container: { flex: 1, backgroundColor: theme.bg },
-    content: { padding: 20, paddingBottom: 48 },
-    section: { marginBottom: 24 },
+    content: { padding: 20, paddingBottom: SPACING.xxl },
+    section: { marginBottom: SPACING.lg },
     sectionTitle: {
-      fontSize: 12,
+      ...TYPOGRAPHY.caption,
       fontWeight: '700',
       color: theme.textMuted,
       textTransform: 'uppercase',
       letterSpacing: 0.6,
-      marginBottom: 8,
+      marginBottom: SPACING.sm,
       paddingHorizontal: 4,
     },
     sectionCard: {
       backgroundColor: theme.surface,
-      borderRadius: 14,
+      borderRadius: RADIUS.lg,
       overflow: 'hidden',
       borderWidth: 1,
       borderColor: theme.borderSubtle,
@@ -259,27 +262,27 @@ function makeStyles(theme: Theme) {
       flexDirection: 'row',
       alignItems: 'center',
       justifyContent: 'space-between',
-      paddingHorizontal: 16,
+      paddingHorizontal: SPACING.md,
       paddingVertical: 13,
       borderBottomWidth: 1,
       borderBottomColor: theme.borderSubtle,
     },
-    settingLabel: { fontSize: 15, color: theme.text },
+    settingLabel: { ...TYPOGRAPHY.body, color: theme.text },
     aboutRow: {
       flexDirection: 'row',
       justifyContent: 'space-between',
-      paddingHorizontal: 16,
+      paddingHorizontal: SPACING.md,
       paddingVertical: 13,
       borderBottomWidth: 1,
       borderBottomColor: theme.borderSubtle,
     },
-    aboutLabel: { fontSize: 15, color: theme.text },
-    aboutValue: { fontSize: 15, color: theme.textSecondary },
+    aboutLabel: { ...TYPOGRAPHY.body, color: theme.text },
+    aboutValue: { ...TYPOGRAPHY.body, color: theme.textSecondary },
     attribution: {
       fontSize: 11,
       color: theme.textMuted,
       textAlign: 'center',
-      marginTop: 16,
+      marginTop: SPACING.md,
     },
   });
 }

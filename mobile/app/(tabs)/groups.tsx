@@ -8,13 +8,13 @@ import {
   ActivityIndicator,
   FlatList,
   RefreshControl,
-  SafeAreaView,
   StyleSheet,
   Text,
   TextInput,
   TouchableOpacity,
   View,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
@@ -27,7 +27,10 @@ import { usePrimaryColor } from '@/lib/hooks/useTenant';
 import { useTheme, type Theme } from '@/lib/hooks/useTheme';
 import { withAlpha } from '@/lib/utils/color';
 import OfflineBanner from '@/components/OfflineBanner';
+import EmptyState from '@/components/ui/EmptyState';
 import { SkeletonBox } from '@/components/ui/Skeleton';
+import { TYPOGRAPHY } from '@/lib/styles/typography';
+import { SPACING, RADIUS } from '@/lib/styles/spacing';
 
 type FilterValue = 'all' | 'public' | 'private';
 
@@ -46,7 +49,7 @@ function extractGroupPage(response: GroupsResponse) {
 
 function GroupCardSkeleton({ theme }: { theme: Theme }) {
   return (
-    <View style={{ backgroundColor: theme.surface, borderRadius: 14, padding: 14, marginHorizontal: 16, marginVertical: 6 }}>
+    <View style={{ backgroundColor: theme.surface, borderRadius: RADIUS.lg, padding: 14, marginHorizontal: SPACING.md, marginVertical: 6 }}>
       <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 8 }}>
         <SkeletonBox width="55%" height={16} />
         <SkeletonBox width={48} height={16} />
@@ -76,9 +79,9 @@ function GroupCard({ item, primary, theme, t, onPress }: GroupCardProps) {
       style={[
         {
           backgroundColor: theme.surface,
-          borderRadius: 14,
+          borderRadius: RADIUS.lg,
           padding: 14,
-          marginHorizontal: 16,
+          marginHorizontal: SPACING.md,
           marginVertical: 6,
           borderWidth: 1,
           borderColor: theme.border,
@@ -87,7 +90,7 @@ function GroupCard({ item, primary, theme, t, onPress }: GroupCardProps) {
       onPress={onPress}
       activeOpacity={0.8}
       accessibilityRole="button"
-      accessibilityLabel={item.name}
+      accessibilityLabel={item.name ?? ''}
     >
       {/* Name row */}
       <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 6 }}>
@@ -98,7 +101,7 @@ function GroupCard({ item, primary, theme, t, onPress }: GroupCardProps) {
           style={{ marginRight: 5 }}
         />
         <Text
-          style={{ flex: 1, fontSize: 16, fontWeight: '700', color: theme.text }}
+          style={{ flex: 1, fontSize: 16, fontWeight: '700', color: theme.text } as const}
           numberOfLines={1}
         >
           {item.name}
@@ -109,9 +112,9 @@ function GroupCard({ item, primary, theme, t, onPress }: GroupCardProps) {
             <View
               style={{
                 backgroundColor: withAlpha(primary, 0.13),
-                borderRadius: 6,
+                borderRadius: RADIUS.sm,
                 paddingHorizontal: 7,
-                paddingVertical: 2,
+                paddingVertical: SPACING.xxs,
               }}
             >
               <Text style={{ fontSize: 11, fontWeight: '600', color: primary }}>
@@ -123,9 +126,9 @@ function GroupCard({ item, primary, theme, t, onPress }: GroupCardProps) {
             <View
               style={{
                 backgroundColor: theme.successBg,
-                borderRadius: 6,
+                borderRadius: RADIUS.sm,
                 paddingHorizontal: 7,
-                paddingVertical: 2,
+                paddingVertical: SPACING.xxs,
               }}
             >
               <Text style={{ fontSize: 11, fontWeight: '600', color: theme.success }}>
@@ -139,7 +142,7 @@ function GroupCard({ item, primary, theme, t, onPress }: GroupCardProps) {
       {/* Description */}
       {item.description ? (
         <Text
-          style={{ fontSize: 14, color: theme.textSecondary, lineHeight: 20, marginBottom: 8 }}
+          style={{ ...TYPOGRAPHY.label, fontWeight: '400', color: theme.textSecondary, lineHeight: 20, marginBottom: SPACING.sm }}
           numberOfLines={2}
         >
           {item.description}
@@ -147,10 +150,10 @@ function GroupCard({ item, primary, theme, t, onPress }: GroupCardProps) {
       ) : null}
 
       {/* Meta: member count */}
-      <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
+      <View style={{ flexDirection: 'row', alignItems: 'center', gap: SPACING.xs }}>
         <Ionicons name="people-outline" size={13} color={theme.textMuted} />
-        <Text style={{ fontSize: 13, color: theme.textMuted }}>
-          {t('members', { count: item.member_count })}
+        <Text style={{ ...TYPOGRAPHY.bodySmall, color: theme.textMuted }}>
+          {t('members', { count: item.member_count ?? 0 })}
         </Text>
       </View>
     </TouchableOpacity>
@@ -236,7 +239,10 @@ export default function GroupsScreen() {
                 ? { backgroundColor: primary, borderColor: primary }
                 : { backgroundColor: theme.surface, borderColor: theme.border },
             ]}
-            onPress={() => setFilter(opt.value)}
+            onPress={() => {
+              void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+              setFilter(opt.value);
+            }}
             activeOpacity={0.8}
             accessibilityRole="button"
             accessibilityLabel={opt.label}
@@ -287,15 +293,16 @@ export default function GroupsScreen() {
             <View style={styles.centered}>
               <Text style={styles.errorText}>{error}</Text>
               <TouchableOpacity onPress={() => void refresh()} style={styles.retryBtn}>
-                <Text style={{ color: primary, fontWeight: '600', fontSize: 15 }}>
+                <Text style={{ color: primary, ...TYPOGRAPHY.button }}>
                   {t('common:buttons.retry')}
                 </Text>
               </TouchableOpacity>
             </View>
           ) : (
-            <View style={styles.centered}>
-              <Text style={styles.emptyText}>{t('empty')}</Text>
-            </View>
+            <EmptyState
+              icon="people-outline"
+              title={t('empty')}
+            />
           )
         }
         ListFooterComponent={
@@ -322,11 +329,11 @@ function makeStyles(theme: Theme) {
       flexDirection: 'row',
       alignItems: 'center',
       justifyContent: 'space-between',
-      paddingHorizontal: 16,
-      paddingTop: 16,
-      paddingBottom: 8,
+      paddingHorizontal: SPACING.md,
+      paddingTop: SPACING.md,
+      paddingBottom: SPACING.sm,
     },
-    title: { fontSize: 22, fontWeight: '700', color: theme.text },
+    title: { ...TYPOGRAPHY.h2, color: theme.text },
     newButton: {
       width: 36,
       height: 36,
@@ -338,34 +345,34 @@ function makeStyles(theme: Theme) {
       flexDirection: 'row',
       alignItems: 'center',
       backgroundColor: theme.surface,
-      marginHorizontal: 16,
-      marginBottom: 8,
-      borderRadius: 10,
+      marginHorizontal: SPACING.md,
+      marginBottom: SPACING.sm,
+      borderRadius: RADIUS.md,
       borderWidth: 1,
       borderColor: theme.border,
       paddingHorizontal: 12,
     },
-    searchIcon: { marginRight: 8 },
-    searchInput: { flex: 1, paddingVertical: 10, fontSize: 15, color: theme.text },
+    searchIcon: { marginRight: SPACING.sm },
+    searchInput: { flex: 1, paddingVertical: 10, ...TYPOGRAPHY.body, color: theme.text },
     filterRow: {
       flexDirection: 'row',
-      gap: 8,
-      paddingHorizontal: 16,
-      marginBottom: 8,
+      gap: SPACING.sm,
+      paddingHorizontal: SPACING.md,
+      marginBottom: SPACING.sm,
     },
     filterPill: {
-      borderRadius: 20,
+      borderRadius: RADIUS.xl,
       borderWidth: 1,
       paddingHorizontal: 14,
       paddingVertical: 6,
     },
-    filterPillText: { fontSize: 13, fontWeight: '600' },
-    list: { paddingBottom: 24 },
-    centered: { flex: 1, justifyContent: 'center', alignItems: 'center', padding: 32 },
-    errorText: { color: theme.error, fontSize: 14, textAlign: 'center', marginBottom: 12 },
+    filterPillText: { ...TYPOGRAPHY.buttonSmall },
+    list: { paddingBottom: SPACING.lg },
+    centered: { flex: 1, justifyContent: 'center', alignItems: 'center', padding: SPACING.xl },
+    errorText: { ...TYPOGRAPHY.label, fontWeight: '400', color: theme.error, textAlign: 'center', marginBottom: 12 },
     retryBtn: { paddingHorizontal: 20, paddingVertical: 10 },
-    emptyText: { color: theme.textMuted, fontSize: 14, textAlign: 'center' },
-    footer: { paddingVertical: 16, alignItems: 'center' },
-    endOfListText: { fontSize: 13, color: theme.textMuted },
+    emptyText: { ...TYPOGRAPHY.label, fontWeight: '400', color: theme.textMuted, textAlign: 'center' },
+    footer: { paddingVertical: SPACING.md, alignItems: 'center' },
+    endOfListText: { ...TYPOGRAPHY.bodySmall, color: theme.textMuted },
   });
 }

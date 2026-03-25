@@ -47,7 +47,7 @@ describe('getOrganisations', () => {
   it('calls the correct endpoint with no params on first page', async () => {
     (api.get as jest.Mock).mockResolvedValue(mockOrganisationsResponse);
     const result = await getOrganisations(null);
-    expect(api.get).toHaveBeenCalledWith('/api/v2/organisations', {});
+    expect(api.get).toHaveBeenCalledWith('/api/v2/volunteering/organisations', {});
     expect(result.data).toHaveLength(1);
     expect(result.meta.has_more).toBe(false);
   });
@@ -55,7 +55,7 @@ describe('getOrganisations', () => {
   it('includes cursor when provided', async () => {
     (api.get as jest.Mock).mockResolvedValue(mockOrganisationsResponse);
     await getOrganisations('cursor-org-1');
-    expect(api.get).toHaveBeenCalledWith('/api/v2/organisations', { cursor: 'cursor-org-1' });
+    expect(api.get).toHaveBeenCalledWith('/api/v2/volunteering/organisations', { cursor: 'cursor-org-1' });
   });
 
   it('omits cursor when null', async () => {
@@ -68,7 +68,7 @@ describe('getOrganisations', () => {
   it('includes search param when provided', async () => {
     (api.get as jest.Mock).mockResolvedValue(mockOrganisationsResponse);
     await getOrganisations(null, 'care');
-    expect(api.get).toHaveBeenCalledWith('/api/v2/organisations', { search: 'care' });
+    expect(api.get).toHaveBeenCalledWith('/api/v2/volunteering/organisations', { search: 'care' });
   });
 
   it('omits search when not provided', async () => {
@@ -81,7 +81,7 @@ describe('getOrganisations', () => {
   it('includes cursor and search together', async () => {
     (api.get as jest.Mock).mockResolvedValue(mockOrganisationsResponse);
     await getOrganisations('cursor-3', 'housing');
-    expect(api.get).toHaveBeenCalledWith('/api/v2/organisations', {
+    expect(api.get).toHaveBeenCalledWith('/api/v2/volunteering/organisations', {
       cursor: 'cursor-3',
       search: 'housing',
     });
@@ -94,7 +94,7 @@ describe('getOrganisation', () => {
   it('calls the correct endpoint with the organisation ID', async () => {
     (api.get as jest.Mock).mockResolvedValue({ data: mockOrganisation });
     const result = await getOrganisation(5);
-    expect(api.get).toHaveBeenCalledWith('/api/v2/organisations/5');
+    expect(api.get).toHaveBeenCalledWith('/api/v2/volunteering/organisations/5');
     expect(result.data.name).toBe('Community Care Ltd');
     expect(result.data.verified).toBe(true);
   });

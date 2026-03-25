@@ -3,7 +3,7 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import { useState, useRef, useCallback, useMemo } from 'react';
+import { useState, useRef, useCallback, useEffect, useMemo } from 'react';
 import {
   View,
   Text,
@@ -13,20 +13,20 @@ import {
   KeyboardAvoidingView,
   Platform,
   StyleSheet,
-  SafeAreaView,
   ActivityIndicator,
   RefreshControl,
   Keyboard,
   Alert,
 } from 'react-native';
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useLocalSearchParams, useNavigation } from 'expo-router';
-import { useEffect } from 'react';
 import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
 
 import { useTranslation } from 'react-i18next';
-import { getThread, getOrCreateThread, sendMessage, type Message } from '@/lib/api/messages';
+import { getThread, getOrCreateThread, sendMessage, displayName, type Message } from '@/lib/api/messages';
 import { useApi } from '@/lib/hooks/useApi';
+import { useAuth } from '@/lib/hooks/useAuth';
 import { usePrimaryColor } from '@/lib/hooks/useTenant';
 import { useTheme, type Theme } from '@/lib/hooks/useTheme';
 import { useRealtimeContext } from '@/lib/context/RealtimeContext';
@@ -34,6 +34,8 @@ import Avatar from '@/components/ui/Avatar';
 import VoiceMessageBubble from '@/components/VoiceMessageBubble';
 import LoadingSpinner from '@/components/ui/LoadingSpinner';
 import OfflineBanner from '@/components/OfflineBanner';
+import TypingIndicator from '@/components/TypingIndicator';
+import ModalErrorBoundary from '@/components/ModalErrorBoundary';
 
 export default function ThreadScreen() {
   const { t } = useTranslation('messages');
@@ -45,8 +47,10 @@ export default function ThreadScreen() {
     recipientId: string;
     name: string;
   }>();
+  const { user: authUser } = useAuth();
   const primary = usePrimaryColor();
   const theme = useTheme();
+  const insets = useSafeAreaInsets();
   const styles = useMemo(() => makeStyles(theme), [theme]);
   const navigation = useNavigation();
 
@@ -86,10 +90,17 @@ export default function ThreadScreen() {
   useEffect(() => {
     if (!isValidId) return;
     if (data?.data) {
-      // API returns oldest-first; FlatList is inverted so we reverse for display
-      setMessages([...data.data].reverse());
+      // API returns oldest-first; FlatList is inverted so we reverse for display.
+      // The API may not include `is_own` — compute it from sender_id vs authUser.id.
+      const currentUserId = authUser?.id;
+      const enriched = data.data.map((m) => ({
+        ...m,
+        is_own: m.is_own ?? (currentUserId != null && m.sender_id === currentUserId),
+        sender: m.sender ?? { id: m.sender_id ?? 0, first_name: null, last_name: null, avatar_url: null },
+      }));
+      setMessages([...enriched].reverse());
     }
-  }, [data, isValidId]);
+  }, [data, isValidId, authUser?.id]);
 
   // Live incoming messages via Pusher
   useEffect(() => {
@@ -102,17 +113,10 @@ export default function ThreadScreen() {
     });
   }, [safeConversationId, subscribeToMessages, isValidId]);
 
-  if (!isValidId) {
-    return (
-      <SafeAreaView style={styles.centered}>
-        <Text style={styles.errorText}>{t('thread.invalidConversation')}</Text>
-      </SafeAreaView>
-    );
-  }
-
   // The recipient's user ID — we already have it from nav params.
   // Also check API metadata as a secondary source.
   const resolvedRecipientId: number | null = (() => {
+    if (!isValidId) return null;
     // Primary: from navigation params (always available)
     if (safeConversationId > 0) return safeConversationId;
     // Fallback: API metadata
@@ -121,7 +125,7 @@ export default function ThreadScreen() {
     if (metaId) return metaId;
     // Last resort: pick sender id from any incoming message
     const incoming = data?.data?.find((m) => !m.is_own);
-    return incoming?.sender.id ?? null;
+    return incoming?.sender?.id ?? incoming?.sender_id ?? null;
   })();
 
   const handleSend = useCallback(async () => {
@@ -167,12 +171,21 @@ export default function ThreadScreen() {
     }
   }, [isSending, resolvedRecipientId]);
 
+  if (!isValidId) {
+    return (
+      <SafeAreaView style={styles.centered}>
+        <Text style={styles.errorText}>{t('thread.invalidConversation')}</Text>
+      </SafeAreaView>
+    );
+  }
+
   function renderMessage({ item }: { item: Message }) {
     const isOwn = item.is_own;
+    const senderName = displayName(item.sender);
     return (
       <View style={[styles.bubbleRow, isOwn ? styles.bubbleRowOwn : styles.bubbleRowOther]}>
         {!isOwn && (
-          <Avatar uri={item.sender.avatar_url} name={item.sender.name} size={28} />
+          <Avatar uri={item.sender?.avatar_url ?? null} name={senderName} size={28} />
         )}
         <View
           style={[
@@ -234,6 +247,7 @@ export default function ThreadScreen() {
   }
 
   return (
+    <ModalErrorBoundary>
     <SafeAreaView style={styles.container}>
       <OfflineBanner />
       <KeyboardAvoidingView
@@ -258,7 +272,10 @@ export default function ThreadScreen() {
           }
         />
 
-        <View style={styles.inputRow}>
+        {/* Typing indicator — wire up via Pusher later */}
+        <TypingIndicator visible={false} />
+
+        <View style={[styles.inputRow, { paddingBottom: Math.max(10, insets.bottom) }]}>
           <TextInput
             style={styles.input}
             value={inputText}
@@ -286,6 +303,7 @@ export default function ThreadScreen() {
         </View>
       </KeyboardAvoidingView>
     </SafeAreaView>
+    </ModalErrorBoundary>
   );
 }
 

@@ -8,13 +8,13 @@ import {
   Alert,
   FlatList,
   RefreshControl,
-  SafeAreaView,
   StyleSheet,
   Text,
   TextInput,
   TouchableOpacity,
   View,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
@@ -33,8 +33,12 @@ import { useAuth } from '@/lib/hooks/useAuth';
 import { usePrimaryColor } from '@/lib/hooks/useTenant';
 import { useTheme, type Theme } from '@/lib/hooks/useTheme';
 import { withAlpha } from '@/lib/utils/color';
+import { TYPOGRAPHY } from '@/lib/styles/typography';
+import { SPACING, RADIUS } from '@/lib/styles/spacing';
 import Avatar from '@/components/ui/Avatar';
+import EmptyState from '@/components/ui/EmptyState';
 import LoadingSpinner from '@/components/ui/LoadingSpinner';
+import ModalErrorBoundary from '@/components/ModalErrorBoundary';
 
 type Tab = 'skills' | 'endorsements';
 
@@ -178,6 +182,7 @@ export default function EndorsementsScreen() {
   const isLoading = activeTab === 'skills' ? skillsLoading : endorsementsLoading;
 
   return (
+    <ModalErrorBoundary>
     <SafeAreaView style={styles.container}>
       {/* Tab toggle */}
       <View style={styles.tabRow}>
@@ -281,7 +286,10 @@ export default function EndorsementsScreen() {
             </View>
           }
           ListEmptyComponent={
-            <Text style={styles.emptyText}>{t('noSkills')}</Text>
+            <EmptyState
+              icon="construct-outline"
+              title={t('noSkills')}
+            />
           }
         />
       ) : (
@@ -299,11 +307,15 @@ export default function EndorsementsScreen() {
             />
           }
           ListEmptyComponent={
-            <Text style={styles.emptyText}>{t('noEndorsements')}</Text>
+            <EmptyState
+              icon="ribbon-outline"
+              title={t('noEndorsements')}
+            />
           }
         />
       )}
     </SafeAreaView>
+    </ModalErrorBoundary>
   );
 }
 
@@ -313,21 +325,21 @@ function makeStyles(theme: Theme) {
     center: { flex: 1, alignItems: 'center', justifyContent: 'center' },
     tabRow: {
       flexDirection: 'row',
-      gap: 8,
-      padding: 16,
-      paddingBottom: 8,
+      gap: SPACING.sm,
+      padding: SPACING.md,
+      paddingBottom: SPACING.sm,
     },
     tabPill: {
       flex: 1,
-      borderRadius: 20,
-      paddingVertical: 8,
+      borderRadius: RADIUS.xl,
+      paddingVertical: SPACING.sm,
       alignItems: 'center',
       backgroundColor: theme.surface,
       borderWidth: 1,
       borderColor: theme.border,
     },
     tabLabel: {
-      fontSize: 14,
+      ...TYPOGRAPHY.label,
       fontWeight: '600',
       color: theme.textSecondary,
     },
@@ -335,127 +347,121 @@ function makeStyles(theme: Theme) {
       color: '#fff', // contrast on primary
     },
     listContent: {
-      padding: 16,
-      paddingTop: 8,
-      paddingBottom: 48,
+      padding: SPACING.md,
+      paddingTop: SPACING.sm,
+      paddingBottom: SPACING.xxl,
     },
     addSkillHeader: {
-      marginBottom: 12,
+      marginBottom: SPACING.sm + 4,
     },
     addSkillButton: {
       flexDirection: 'row',
       alignItems: 'center',
-      gap: 6,
+      gap: SPACING.sm - 2,
       borderWidth: 1,
-      borderRadius: 10,
-      paddingVertical: 10,
-      paddingHorizontal: 14,
+      borderRadius: RADIUS.md,
+      paddingVertical: SPACING.sm + 2,
+      paddingHorizontal: RADIUS.lg,
       alignSelf: 'flex-start',
     },
     addSkillButtonText: {
-      fontSize: 14,
+      ...TYPOGRAPHY.label,
       fontWeight: '600',
     },
     addSkillForm: {
       flexDirection: 'row',
       alignItems: 'center',
-      gap: 8,
+      gap: SPACING.sm,
     },
     skillInput: {
       flex: 1,
       borderWidth: 1,
-      borderRadius: 10,
-      paddingHorizontal: 12,
+      borderRadius: RADIUS.md,
+      paddingHorizontal: SPACING.sm + 4,
       paddingVertical: 9,
-      fontSize: 14,
+      ...TYPOGRAPHY.label,
       color: theme.text,
       backgroundColor: theme.surface,
     },
     addBtn: {
-      borderRadius: 10,
-      paddingHorizontal: 14,
+      borderRadius: RADIUS.md,
+      paddingHorizontal: RADIUS.lg,
       paddingVertical: 9,
     },
     addBtnText: {
-      fontSize: 14,
+      ...TYPOGRAPHY.label,
       fontWeight: '600',
       color: '#fff', // contrast on primary
     },
     cancelBtn: {
-      padding: 4,
+      padding: SPACING.xs,
     },
     skillRow: {
       flexDirection: 'row',
       alignItems: 'center',
       backgroundColor: theme.surface,
-      borderRadius: 12,
-      padding: 14,
+      borderRadius: SPACING.sm + 4,
+      padding: RADIUS.lg,
       borderWidth: 1,
       borderColor: theme.borderSubtle,
     },
     skillInfo: {
       flex: 1,
-      gap: 2,
+      gap: SPACING.xxs,
     },
     skillName: {
-      fontSize: 15,
+      ...TYPOGRAPHY.body,
       fontWeight: '600',
       color: theme.text,
     },
     skillCategory: {
-      fontSize: 12,
+      ...TYPOGRAPHY.caption,
       color: theme.textSecondary,
     },
     endorseCount: {
-      fontSize: 12,
+      ...TYPOGRAPHY.caption,
       color: theme.textSecondary,
-      marginTop: 2,
+      marginTop: SPACING.xxs,
     },
     removeBtn: {
-      padding: 6,
+      padding: SPACING.sm - 2,
     },
     endorsementCard: {
       flexDirection: 'row',
-      gap: 12,
+      gap: SPACING.sm + 4,
       backgroundColor: theme.surface,
-      borderRadius: 12,
-      padding: 14,
+      borderRadius: SPACING.sm + 4,
+      padding: RADIUS.lg,
       borderWidth: 1,
       borderColor: theme.borderSubtle,
     },
     endorsementBody: {
       flex: 1,
-      gap: 4,
+      gap: SPACING.xs,
     },
     endorserName: {
-      fontSize: 14,
+      ...TYPOGRAPHY.label,
       fontWeight: '600',
       color: theme.text,
     },
     skillBadge: {
       alignSelf: 'flex-start',
-      borderRadius: 6,
-      paddingHorizontal: 8,
-      paddingVertical: 2,
+      borderRadius: RADIUS.sm,
+      paddingHorizontal: SPACING.sm,
+      paddingVertical: SPACING.xxs,
     },
     skillBadgeText: {
-      fontSize: 12,
+      ...TYPOGRAPHY.caption,
       fontWeight: '600',
     },
     endorsementMessage: {
-      fontSize: 13,
+      ...TYPOGRAPHY.bodySmall,
       color: theme.textSecondary,
-      lineHeight: 18,
     },
     endorsementDate: {
       fontSize: 11,
       color: theme.textMuted,
     },
-    emptyText: {
-      fontSize: 14,
-      color: theme.textMuted,
-      textAlign: 'center',
-      marginTop: 32,
-    },
+    // emptyText removed — now handled by EmptyState component
   });
 }

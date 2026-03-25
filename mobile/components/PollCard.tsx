@@ -13,6 +13,8 @@ import { voteFeedPoll, type PollData } from '@/lib/api/feed';
 import { usePrimaryColor } from '@/lib/hooks/useTenant';
 import { useTheme, type Theme } from '@/lib/hooks/useTheme';
 import { withAlpha } from '@/lib/utils/color';
+import { TYPOGRAPHY } from '@/lib/styles/typography';
+import { SPACING, RADIUS } from '@/lib/styles/spacing';
 
 interface PollCardProps {
   pollData: PollData;
@@ -25,20 +27,25 @@ export default function PollCard({ pollData, itemId, onVoted }: PollCardProps) {
   const primary = usePrimaryColor();
   const theme = useTheme();
   const styles = useMemo(() => makeStyles(theme, primary), [theme, primary]);
+  const rStyles = useMemo(() => makeResultStyles(theme, primary), [theme, primary]);
+  const vStyles = useMemo(() => makeVotableStyles(theme), [theme]);
 
-  const [poll, setPoll] = useState<PollData>(pollData);
+  const safePollData = pollData && pollData.options ? pollData : null;
+  const [poll, setPoll] = useState<PollData | null>(safePollData);
   const [isVoting, setIsVoting] = useState(false);
 
   // Keep local poll in sync if parent updates pollData prop
   useEffect(() => {
-    setPoll(pollData);
+    if (pollData && pollData.options) {
+      setPoll(pollData);
+    }
   }, [pollData]);
 
-  const hasVoted = poll.user_vote_option_id !== null;
-  const showResults = hasVoted || !poll.is_active;
+  const hasVoted = poll ? poll.user_vote_option_id !== null : false;
+  const showResults = hasVoted || (poll ? !poll.is_active : false);
 
   const handleVote = useCallback(async (optionId: number) => {
-    if (isVoting || hasVoted || !poll.is_active) return;
+    if (!poll || isVoting || hasVoted || !poll.is_active) return;
 
     void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     setIsVoting(true);
@@ -74,6 +81,8 @@ export default function PollCard({ pollData, itemId, onVoted }: PollCardProps) {
     }
   }, [isVoting, hasVoted, poll, itemId, onVoted]);
 
+  if (!poll || !poll.options?.length) return null;
+
   return (
     <View style={styles.container}>
       <Text style={styles.question}>{poll.question}</Text>
@@ -85,7 +94,8 @@ export default function PollCard({ pollData, itemId, onVoted }: PollCardProps) {
           showResults={showResults}
           isUserVote={poll.user_vote_option_id === option.id}
           primary={primary}
-          theme={theme}
+          rStyles={rStyles}
+          vStyles={vStyles}
           onPress={() => handleVote(option.id)}
           disabled={isVoting || hasVoted || !poll.is_active}
         />
@@ -114,12 +124,13 @@ interface PollOptionRowProps {
   showResults: boolean;
   isUserVote: boolean;
   primary: string;
-  theme: ReturnType<typeof useTheme>;
+  rStyles: ReturnType<typeof makeResultStyles>;
+  vStyles: ReturnType<typeof makeVotableStyles>;
   onPress: () => void;
   disabled: boolean;
 }
 
-function PollOptionRow({ option, showResults, isUserVote, primary, theme, onPress, disabled }: PollOptionRowProps) {
+function PollOptionRow({ option, showResults, isUserVote, rStyles, vStyles, onPress, disabled }: PollOptionRowProps) {
   const fillAnim = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
@@ -143,27 +154,27 @@ function PollOptionRow({ option, showResults, isUserVote, primary, theme, onPres
     return (
       <View
         style={[
-          resultStyles(theme, primary).optionContainer,
-          isUserVote && resultStyles(theme, primary).optionContainerSelected,
+          rStyles.optionContainer,
+          isUserVote && rStyles.optionContainerSelected,
         ]}
       >
         <Animated.View
           style={[
-            resultStyles(theme, primary).fillBar,
-            isUserVote && resultStyles(theme, primary).fillBarSelected,
+            rStyles.fillBar,
+            isUserVote && rStyles.fillBarSelected,
             { width: fillWidth },
           ]}
         />
-        <View style={resultStyles(theme, primary).optionContent}>
+        <View style={rStyles.optionContent}>
           <Text style={[
-            resultStyles(theme, primary).optionText,
-            isUserVote && resultStyles(theme, primary).optionTextSelected,
+            rStyles.optionText,
+            isUserVote && rStyles.optionTextSelected,
           ]}>
             {option.text}
           </Text>
           <Text style={[
-            resultStyles(theme, primary).percentageText,
-            isUserVote && resultStyles(theme, primary).percentageTextSelected,
+            rStyles.percentageText,
+            isUserVote && rStyles.percentageTextSelected,
           ]}>
             {option.percentage}%
           </Text>
@@ -174,34 +185,34 @@ function PollOptionRow({ option, showResults, isUserVote, primary, theme, onPres
 
   return (
     <TouchableOpacity
-      style={votableStyles(theme).optionContainer}
+      style={vStyles.optionContainer}
       onPress={onPress}
       disabled={disabled}
       activeOpacity={0.7}
       accessibilityRole="button"
       accessibilityLabel={option.text}
     >
-      <Text style={votableStyles(theme).optionText}>{option.text}</Text>
+      <Text style={vStyles.optionText}>{option.text}</Text>
     </TouchableOpacity>
   );
 }
 
 function makeStyles(theme: Theme, primary: string) {
   return StyleSheet.create({
-    container: { gap: 8 },
-    question: { fontSize: 15, fontWeight: '600', color: theme.text },
-    footer: { flexDirection: 'row', alignItems: 'center', gap: 8, marginTop: 2 },
-    totalVotes: { fontSize: 13, color: theme.textMuted },
+    container: { gap: SPACING.sm },
+    question: { ...TYPOGRAPHY.body, fontWeight: '600', color: theme.text },
+    footer: { flexDirection: 'row', alignItems: 'center', gap: SPACING.sm, marginTop: SPACING.xxs },
+    totalVotes: { ...TYPOGRAPHY.bodySmall, color: theme.textMuted },
     votedBadge: { flexDirection: 'row', alignItems: 'center', gap: 3 },
-    votedText: { fontSize: 12, fontWeight: '600' },
-    closedText: { fontSize: 12, color: theme.textMuted, fontStyle: 'italic' },
+    votedText: { ...TYPOGRAPHY.caption, fontWeight: '600' },
+    closedText: { ...TYPOGRAPHY.caption, color: theme.textMuted, fontStyle: 'italic' },
   });
 }
 
-function resultStyles(theme: Theme, primary: string) {
+function makeResultStyles(theme: Theme, primary: string) {
   return StyleSheet.create({
     optionContainer: {
-      borderRadius: 10,
+      borderRadius: RADIUS.md,
       borderWidth: 1,
       borderColor: theme.borderSubtle,
       overflow: 'hidden',
@@ -217,7 +228,7 @@ function resultStyles(theme: Theme, primary: string) {
       left: 0,
       bottom: 0,
       backgroundColor: theme.borderSubtle,
-      borderRadius: 9,
+      borderRadius: RADIUS.md - 1,
     },
     fillBarSelected: {
       backgroundColor: withAlpha(primary, 0.13),
@@ -226,11 +237,11 @@ function resultStyles(theme: Theme, primary: string) {
       flexDirection: 'row',
       justifyContent: 'space-between',
       alignItems: 'center',
-      paddingHorizontal: 14,
-      paddingVertical: 10,
+      paddingHorizontal: SPACING.lg - 10,
+      paddingVertical: SPACING.sm + 2,
     },
     optionText: {
-      fontSize: 14,
+      ...TYPOGRAPHY.label,
       color: theme.text,
       flex: 1,
     },
@@ -239,10 +250,10 @@ function resultStyles(theme: Theme, primary: string) {
       color: primary,
     },
     percentageText: {
-      fontSize: 13,
+      ...TYPOGRAPHY.bodySmall,
       fontWeight: '600',
       color: theme.textSecondary,
-      marginLeft: 8,
+      marginLeft: SPACING.sm,
     },
     percentageTextSelected: {
       color: primary,
@@ -250,19 +261,19 @@ function resultStyles(theme: Theme, primary: string) {
   });
 }
 
-function votableStyles(theme: Theme) {
+function makeVotableStyles(theme: Theme) {
   return StyleSheet.create({
     optionContainer: {
-      borderRadius: 10,
+      borderRadius: RADIUS.md,
       borderWidth: 1,
       borderColor: theme.border,
-      paddingHorizontal: 14,
-      paddingVertical: 10,
+      paddingHorizontal: SPACING.lg - 10,
+      paddingVertical: SPACING.sm + 2,
       minHeight: 44,
       justifyContent: 'center',
     },
     optionText: {
-      fontSize: 14,
+      ...TYPOGRAPHY.label,
       color: theme.text,
     },
   });

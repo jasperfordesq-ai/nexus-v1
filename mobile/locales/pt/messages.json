@@ -20,6 +20,7 @@
     "title": "Sem conversas ainda",
     "subtitle": "Ligue-se a membros para começar a enviar mensagens"
   },
+  "deleteConfirm": "Eliminar conversa com {{name}}?",
   "errors": {
     "sendFailed": "Falha ao enviar. Toque para tentar novamente.",
     "loadFailed": "Não foi possível carregar as mensagens."

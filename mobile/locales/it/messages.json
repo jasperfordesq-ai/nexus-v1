@@ -20,6 +20,7 @@
     "title": "Nessuna conversazione",
     "subtitle": "Connettiti con i membri per iniziare a scrivere"
   },
+  "deleteConfirm": "Eliminare la conversazione con {{name}}?",
   "errors": {
     "sendFailed": "Invio fallito. Tocca per riprovare.",
     "loadFailed": "Impossibile caricare i messaggi."

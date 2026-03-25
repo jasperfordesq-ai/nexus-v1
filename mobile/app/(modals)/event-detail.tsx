@@ -9,7 +9,6 @@ import {
   Text,
   ScrollView,
   StyleSheet,
-  SafeAreaView,
   TouchableOpacity,
   Alert,
   Linking,
@@ -17,17 +16,21 @@ import {
   ActivityIndicator,
   Share,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { useLocalSearchParams, router, useNavigation } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
 import { useTranslation } from 'react-i18next';
 
-import { getEvent, rsvpEvent, removeRsvp, type Event } from '@/lib/api/events';
+import { TYPOGRAPHY } from '@/lib/styles/typography';
+import { SPACING, RADIUS } from '@/lib/styles/spacing';
+import { getEvent, rsvpEvent, removeRsvp } from '@/lib/api/events';
 import { useApi } from '@/lib/hooks/useApi';
 import { usePrimaryColor } from '@/lib/hooks/useTenant';
 import { useTheme, type Theme } from '@/lib/hooks/useTheme';
 import Avatar from '@/components/ui/Avatar';
 import LoadingSpinner from '@/components/ui/LoadingSpinner';
+import ModalErrorBoundary from '@/components/ModalErrorBoundary';
 
 const WEB_URL = 'https://app.project-nexus.ie';
 
@@ -56,7 +59,7 @@ export default function EventDetailScreen() {
 
   if (isNaN(eventId) || eventId <= 0) {
     return (
-      <SafeAreaView style={styles.center}>
+      <SafeAreaView style={styles.center} edges={['bottom']}>
         <Text style={styles.errorText}>{t('detail.invalidId')}</Text>
         <TouchableOpacity onPress={() => router.back()} style={{ marginTop: 12 }}>
           <Text style={{ color: primary, fontSize: 15, fontWeight: '600' }}>{t('detail.goBack')}</Text>
@@ -113,8 +116,12 @@ export default function EventDetailScreen() {
     setUpdating(true);
     try {
       const result = await rsvpEvent(event.id, status);
-      setRsvp(result.data.rsvp);
-      setRsvpCounts(result.data.rsvp_counts);
+      if (result?.data?.rsvp) {
+        setRsvp(result.data.rsvp);
+      }
+      if (result?.data?.rsvp_counts) {
+        setRsvpCounts(result.data.rsvp_counts);
+      }
     } catch {
       Alert.alert(t('common:errors.alertTitle'), t('rsvpError'));
     } finally {
@@ -124,7 +131,7 @@ export default function EventDetailScreen() {
 
   if (isLoading) {
     return (
-      <SafeAreaView style={styles.center}>
+      <SafeAreaView style={styles.center} edges={['bottom']}>
         <LoadingSpinner />
       </SafeAreaView>
     );
@@ -132,7 +139,7 @@ export default function EventDetailScreen() {
 
   if (!event) {
     return (
-      <SafeAreaView style={styles.center}>
+      <SafeAreaView style={styles.center} edges={['bottom']}>
         <Text style={styles.errorText}>{t('detail.notFound')}</Text>
         <TouchableOpacity onPress={() => router.back()} style={{ marginTop: 12 }}>
           <Text style={{ color: primary, fontSize: 15, fontWeight: '600' }}>{t('detail.goBack')}</Text>
@@ -141,14 +148,18 @@ export default function EventDetailScreen() {
     );
   }
 
-  const start = new Date(event.start_date);
-  const dateStr = start.toLocaleDateString('default', {
-    weekday: 'long', month: 'long', day: 'numeric', year: 'numeric',
-  });
-  const timeStr = start.toLocaleTimeString('default', { hour: '2-digit', minute: '2-digit' });
+  const start = event.start_date ? new Date(event.start_date) : null;
+  const isValidDate = start && !isNaN(start.getTime());
+  const dateStr = isValidDate
+    ? start.toLocaleDateString('default', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' })
+    : '—';
+  const timeStr = isValidDate
+    ? start.toLocaleTimeString('default', { hour: '2-digit', minute: '2-digit' })
+    : '—';
 
   return (
-    <SafeAreaView style={styles.container}>
+    <ModalErrorBoundary>
+    <SafeAreaView style={styles.container} edges={['bottom']}>
       <ScrollView
         contentContainerStyle={styles.content}
         refreshControl={
@@ -239,15 +250,18 @@ export default function EventDetailScreen() {
         ) : null}
 
         {/* Organizer */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>{t('detail.organizer')}</Text>
-          <View style={styles.organizerRow}>
-            <Avatar uri={event.organizer.avatar} name={event.organizer.name} size={36} />
-            <Text style={styles.organizerName}>{event.organizer.name}</Text>
+        {event.organizer ? (
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>{t('detail.organizer')}</Text>
+            <View style={styles.organizerRow}>
+              <Avatar uri={event.organizer.avatar ?? undefined} name={event.organizer.name ?? '?'} size={36} />
+              <Text style={styles.organizerName}>{event.organizer.name ?? t('common:unknown')}</Text>
+            </View>
           </View>
-        </View>
+        ) : null}
       </ScrollView>
     </SafeAreaView>
+    </ModalErrorBoundary>
   );
 }
 
@@ -272,7 +286,7 @@ function MetaRow({
       activeOpacity={onPress ? 0.7 : 1}
     >
       <Ionicons name={icon} size={16} color={tint ?? theme.textSecondary} />
-      <Text style={[{ fontSize: 14, color: theme.text, flex: 1 }, tint ? { color: tint } : null]}>{text}</Text>
+      <Text style={[{ ...TYPOGRAPHY.label, color: theme.text, flex: 1 }, tint ? { color: tint } : null]}>{text}</Text>
     </TouchableOpacity>
   );
 }
@@ -318,7 +332,7 @@ function RsvpButton({
       ) : (
         <Ionicons name={icon} size={16} color={iconColor} />
       )}
-      <Text style={[{ fontSize: 14, fontWeight: '600' as const, color: theme.textSecondary }, selected && { color: '#fff' }]}>{label}</Text>{/* contrast on primary */}
+      <Text style={[{ ...TYPOGRAPHY.label, fontWeight: '600' as const, color: theme.textSecondary }, selected && { color: '#fff' }]}>{label}</Text>{/* contrast on primary */}
     </TouchableOpacity>
   );
 }
@@ -333,7 +347,7 @@ function rsvpBtnBase(theme: Theme) {
     justifyContent: 'center' as const,
     gap: 6,
     borderWidth: 1,
-    borderRadius: 10,
+    borderRadius: RADIUS.md,
     paddingVertical: 12,
     backgroundColor: theme.surface,
   };
@@ -344,35 +358,35 @@ function makeStyles(theme: Theme) {
     container: { flex: 1, backgroundColor: theme.bg },
     center: { flex: 1, alignItems: 'center', justifyContent: 'center' },
     content: { padding: 20, paddingBottom: 48 },
-    title: { fontSize: 22, fontWeight: '700', color: theme.text, marginBottom: 10 },
-    categoryPill: { alignSelf: 'flex-start', borderRadius: 8, paddingHorizontal: 10, paddingVertical: 4, marginBottom: 16 },
-    categoryText: { fontSize: 12, fontWeight: '600' },
+    title: { ...TYPOGRAPHY.h2, color: theme.text, marginBottom: 10 },
+    categoryPill: { alignSelf: 'flex-start', borderRadius: SPACING.sm, paddingHorizontal: 10, paddingVertical: 4, marginBottom: SPACING.md },
+    categoryText: { ...TYPOGRAPHY.caption, fontWeight: '600' },
     metaCard: {
       backgroundColor: theme.surface,
-      borderRadius: 14,
-      padding: 14,
+      borderRadius: RADIUS.lg,
+      padding: RADIUS.lg,
       gap: 10,
       borderWidth: 1,
       borderColor: theme.borderSubtle,
-      marginBottom: 16,
+      marginBottom: SPACING.md,
     },
-    attendeesRow: { flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: 16 },
-    attendeesText: { fontSize: 14, color: theme.textSecondary, flex: 1 },
-    fullBadge: { backgroundColor: theme.errorBg, borderRadius: 6, paddingHorizontal: 8, paddingVertical: 2 },
+    attendeesRow: { flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: SPACING.md },
+    attendeesText: { ...TYPOGRAPHY.label, color: theme.textSecondary, flex: 1 },
+    fullBadge: { backgroundColor: theme.errorBg, borderRadius: RADIUS.sm, paddingHorizontal: SPACING.sm, paddingVertical: 2 },
     fullBadgeText: { fontSize: 11, fontWeight: '600', color: theme.error },
-    rsvpRow: { flexDirection: 'row', gap: 12, marginBottom: 24 },
-    section: { marginBottom: 24 },
+    rsvpRow: { flexDirection: 'row', gap: 12, marginBottom: SPACING.lg },
+    section: { marginBottom: SPACING.lg },
     sectionTitle: {
-      fontSize: 12,
+      ...TYPOGRAPHY.caption,
       fontWeight: '700',
       color: theme.textSecondary,
       textTransform: 'uppercase',
       letterSpacing: 0.6,
       marginBottom: 10,
     },
-    description: { fontSize: 15, color: theme.text, lineHeight: 22 },
+    description: { ...TYPOGRAPHY.body, color: theme.text },
     organizerRow: { flexDirection: 'row', alignItems: 'center', gap: 12 },
-    organizerName: { fontSize: 15, fontWeight: '600', color: theme.text },
-    errorText: { fontSize: 15, color: theme.textMuted },
+    organizerName: { ...TYPOGRAPHY.body, fontWeight: '600', color: theme.text },
+    errorText: { ...TYPOGRAPHY.body, color: theme.textMuted },
   });
 }

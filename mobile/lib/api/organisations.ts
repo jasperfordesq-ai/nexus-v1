@@ -28,22 +28,22 @@ export interface OrganisationsResponse {
 }
 
 /**
- * GET /api/v2/organisations — list organisations for the current tenant.
+ * GET /api/v2/volunteering/organisations — list organisations for the current tenant.
  * Supports cursor-based pagination and optional full-text search.
  */
 export function getOrganisations(
   cursor: string | null,
   search?: string,
 ): Promise<OrganisationsResponse> {
-  return api.get<OrganisationsResponse>(`${API_V2}/organisations`, {
+  return api.get<OrganisationsResponse>(`${API_V2}/volunteering/organisations`, {
     ...(cursor ? { cursor } : {}),
     ...(search ? { search } : {}),
   });
 }
 
 /**
- * GET /api/v2/organisations/{id} — get a single organisation by ID.
+ * GET /api/v2/volunteering/organisations/{id} — get a single organisation by ID.
  */
 export function getOrganisation(id: number): Promise<{ data: Organisation }> {
-  return api.get<{ data: Organisation }>(`${API_V2}/organisations/${id}`);
+  return api.get<{ data: Organisation }>(`${API_V2}/volunteering/organisations/${id}`);
 }

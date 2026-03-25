@@ -8,12 +8,12 @@ import {
   View,
   Text,
   TouchableOpacity,
-  ScrollView,
   StyleSheet,
-  SafeAreaView,
   Alert,
   RefreshControl,
+  Animated,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import {
@@ -22,7 +22,7 @@ import {
   MediaTypeOptions,
 } from 'expo-image-picker';
 import * as Haptics from 'expo-haptics';
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { useAuth } from '@/lib/hooks/useAuth';
@@ -34,10 +34,12 @@ import { api } from '@/lib/api/client';
 import { API_V2 } from '@/lib/constants';
 import Avatar from '@/components/ui/Avatar';
 import { ProfileSkeleton } from '@/components/ui/Skeleton';
+import { TYPOGRAPHY } from '@/lib/styles/typography';
+import { SPACING, RADIUS } from '@/lib/styles/spacing';
 
-const EXPLORE_ITEMS: Array<{ labelKey: string; route: string; icon: React.ComponentProps<typeof Ionicons>['name'] }> = [
-  { labelKey: 'groups',        route: '/(tabs)/groups',            icon: 'people-outline' },
-  { labelKey: 'search',        route: '/(tabs)/search',            icon: 'search-outline' },
+const EXPLORE_ITEMS: { labelKey: string; route: string; icon: React.ComponentProps<typeof Ionicons>['name'] }[] = [
+  { labelKey: 'groups',        route: '/(modals)/groups',           icon: 'people-outline' },
+  { labelKey: 'search',        route: '/(modals)/search',           icon: 'search-outline' },
   { labelKey: 'aiChat',        route: '/(modals)/chat',            icon: 'chatbubbles-outline' },
   { labelKey: 'achievements',  route: '/(modals)/gamification',    icon: 'trophy-outline' },
   { labelKey: 'myGoals',       route: '/(modals)/goals',           icon: 'flag-outline' },
@@ -56,6 +58,19 @@ export default function ProfileScreen() {
   const styles = useMemo(() => makeStyles(theme), [theme]);
   const [uploading, setUploading] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
+  const scrollY = useRef(new Animated.Value(0)).current;
+
+  const avatarScale = scrollY.interpolate({
+    inputRange: [0, 150],
+    outputRange: [1, 0.7],
+    extrapolate: 'clamp',
+  });
+
+  const headerBgOpacity = scrollY.interpolate({
+    inputRange: [0, 100],
+    outputRange: [0, 1],
+    extrapolate: 'clamp',
+  });
 
   async function handleRefresh() {
     setRefreshing(true);
@@ -140,13 +155,20 @@ export default function ProfileScreen() {
   }
 
   // balance is only present on the full User (from /users/me), not the LoginUser
-  const balance = 'balance' in user ? (user as User).balance : null;
+  const rawBalance = 'balance' in user ? (user as User).balance : null;
+  const balance = typeof rawBalance === 'number' && Number.isFinite(rawBalance) ? rawBalance : null;
   const bio = 'bio' in user ? (user as User).bio : null;
 
   return (
     <SafeAreaView style={styles.container}>
-      <ScrollView
+      <Animated.View style={[styles.stickyHeader, { opacity: headerBgOpacity }]} pointerEvents="none" />
+      <Animated.ScrollView
         contentContainerStyle={styles.content}
+        scrollEventThrottle={16}
+        onScroll={Animated.event(
+          [{ nativeEvent: { contentOffset: { y: scrollY } } }],
+          { useNativeDriver: true },
+        )}
         refreshControl={
           <RefreshControl
             refreshing={refreshing}
@@ -165,6 +187,7 @@ export default function ProfileScreen() {
             accessibilityLabel={t('changePhoto')}
             accessibilityRole="button"
           >
+            <Animated.View style={{ transform: [{ scale: avatarScale }] }}>
             <Avatar uri={user.avatar_url} name={displayName} size={88} />
             <View style={styles.cameraOverlay}>
               {uploading ? (
@@ -174,6 +197,7 @@ export default function ProfileScreen() {
                 <Ionicons name="camera-outline" size={20} color="#fff" />
               )}
             </View>
+            </Animated.View>
           </TouchableOpacity>
           <Text style={styles.name}>{displayName}</Text>
           <Text style={styles.email}>{user.email}</Text>
@@ -282,7 +306,7 @@ export default function ProfileScreen() {
         <Text style={styles.attribution}>
           {t('common:attribution')}
         </Text>
-      </ScrollView>
+      </Animated.ScrollView>
     </SafeAreaView>
   );
 }
@@ -290,8 +314,17 @@ export default function ProfileScreen() {
 function makeStyles(theme: Theme) {
   return StyleSheet.create({
     container: { flex: 1, backgroundColor: theme.bg },
-    content: { paddingHorizontal: 24, paddingTop: 32, paddingBottom: 48 },
-    avatarSection: { alignItems: 'center', marginBottom: 24 },
+    stickyHeader: {
+      position: 'absolute',
+      top: 0,
+      left: 0,
+      right: 0,
+      height: 100,
+      backgroundColor: theme.surface,
+      zIndex: 1,
+    },
+    content: { paddingHorizontal: SPACING.lg, paddingTop: SPACING.xl, paddingBottom: SPACING.xxl },
+    avatarSection: { alignItems: 'center', marginBottom: SPACING.lg },
     avatarWrapper: { position: 'relative' },
     cameraOverlay: {
       position: 'absolute',
@@ -299,46 +332,46 @@ function makeStyles(theme: Theme) {
       right: 0,
       backgroundColor: 'rgba(0,0,0,0.5)', // overlay
       borderRadius: 12,
-      padding: 4,
+      padding: SPACING.xs,
     },
-    name: { fontSize: 22, fontWeight: '700', color: theme.text, marginTop: 12 },
-    email: { fontSize: 14, color: theme.textSecondary, marginTop: 2 },
+    name: { ...TYPOGRAPHY.h2, color: theme.text, marginTop: 12 },
+    email: { ...TYPOGRAPHY.label, fontWeight: '400', color: theme.textSecondary, marginTop: SPACING.xxs },
     balanceCard: {
       borderWidth: 2,
-      borderRadius: 14,
+      borderRadius: RADIUS.lg,
       padding: 20,
       alignItems: 'center',
       backgroundColor: theme.surface,
-      marginBottom: 24,
+      marginBottom: SPACING.lg,
     },
-    balanceLabel: { fontSize: 13, color: theme.textSecondary, marginBottom: 4 },
+    balanceLabel: { ...TYPOGRAPHY.bodySmall, color: theme.textSecondary, marginBottom: SPACING.xs },
     balanceValue: { fontSize: 36, fontWeight: '700' },
-    section: { marginBottom: 24 },
-    sectionTitle: { fontSize: 13, fontWeight: '600', color: theme.textSecondary, marginBottom: 6, textTransform: 'uppercase', letterSpacing: 0.5 },
-    bio: { fontSize: 15, color: theme.text, lineHeight: 22 },
+    section: { marginBottom: SPACING.lg },
+    sectionTitle: { ...TYPOGRAPHY.bodySmall, fontWeight: '600', color: theme.textSecondary, marginBottom: 6, textTransform: 'uppercase', letterSpacing: 0.5 },
+    bio: { ...TYPOGRAPHY.body, color: theme.text },
     actions: { gap: 12 },
     actionButton: {
       borderWidth: 1,
-      borderRadius: 10,
+      borderRadius: RADIUS.md,
       paddingVertical: 13,
       alignItems: 'center',
       backgroundColor: theme.surface,
     },
-    actionButtonText: { fontSize: 15, fontWeight: '600', color: theme.text },
+    actionButtonText: { ...TYPOGRAPHY.button, color: theme.text },
     logoutButton: { borderColor: theme.error, backgroundColor: theme.errorBg },
-    logoutText: { fontSize: 15, fontWeight: '600', color: theme.error },
-    exploreSection: { marginTop: 24, marginBottom: 24 },
+    logoutText: { ...TYPOGRAPHY.button, color: theme.error },
+    exploreSection: { marginTop: SPACING.lg, marginBottom: SPACING.lg },
     exploreButton: {
       flexDirection: 'row',
       alignItems: 'center',
       gap: 10,
       borderWidth: 1,
-      borderRadius: 10,
+      borderRadius: RADIUS.md,
       paddingVertical: 12,
-      paddingHorizontal: 16,
+      paddingHorizontal: SPACING.md,
       backgroundColor: theme.surface,
     },
-    exploreButtonText: { fontSize: 15, fontWeight: '600' },
+    exploreButtonText: { ...TYPOGRAPHY.button },
     attribution: {
       fontSize: 11,
       color: theme.textMuted,
@@ -349,10 +382,10 @@ function makeStyles(theme: Theme) {
       flex: 1,
       justifyContent: 'center',
       alignItems: 'center',
-      padding: 32,
+      padding: SPACING.xl,
     },
-    errorText: { color: theme.error, fontSize: 15, textAlign: 'center', marginBottom: 12 },
+    errorText: { ...TYPOGRAPHY.body, color: theme.error, textAlign: 'center', marginBottom: 12 },
     retryBtn: { paddingHorizontal: 20, paddingVertical: 10 },
-    retryText: { fontWeight: '600', fontSize: 15 },
+    retryText: { ...TYPOGRAPHY.button },
   });
 }

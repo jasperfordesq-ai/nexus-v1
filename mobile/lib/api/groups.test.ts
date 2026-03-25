@@ -136,6 +136,6 @@ describe('leaveGroup', () => {
   it('sends DELETE to the correct leave endpoint', async () => {
     (api.delete as jest.Mock).mockResolvedValue(undefined);
     await leaveGroup(7);
-    expect(api.delete).toHaveBeenCalledWith('/api/v2/groups/7/leave');
+    expect(api.delete).toHaveBeenCalledWith('/api/v2/groups/7/membership');
   });
 });

@@ -13,22 +13,22 @@ import {
   ScrollView,
   KeyboardAvoidingView,
   Platform,
-  SafeAreaView,
   StyleSheet,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { router, useNavigation } from 'expo-router';
 import * as Haptics from 'expo-haptics';
 import { useTranslation } from 'react-i18next';
 
 import { createExchange, type ExchangeType } from '@/lib/api/exchanges';
-import { ApiResponseError } from '@/lib/api/client';
+import { ApiResponseError, api } from '@/lib/api/client';
 import { usePrimaryColor } from '@/lib/hooks/useTenant';
 import { useTheme, type Theme } from '@/lib/hooks/useTheme';
 import { withAlpha } from '@/lib/utils/color';
 import { useApi } from '@/lib/hooks/useApi';
-import { api } from '@/lib/api/client';
 import { API_V2 } from '@/lib/constants';
 import OfflineBanner from '@/components/OfflineBanner';
+import ModalErrorBoundary from '@/components/ModalErrorBoundary';
 
 interface Category {
   id: number;
@@ -111,7 +111,8 @@ export default function NewExchangeModal() {
   }
 
   return (
-    <SafeAreaView style={styles.flex}>
+    <ModalErrorBoundary>
+    <SafeAreaView style={styles.flex} edges={['bottom']}>
     <KeyboardAvoidingView
       style={{ flex: 1 }}
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
@@ -247,6 +248,7 @@ export default function NewExchangeModal() {
       </ScrollView>
     </KeyboardAvoidingView>
     </SafeAreaView>
+    </ModalErrorBoundary>
   );
 }
 

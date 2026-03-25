@@ -7,12 +7,12 @@ import { useCallback, useEffect, useMemo } from 'react';
 import {
   ActivityIndicator,
   FlatList,
-  SafeAreaView,
   StyleSheet,
   Text,
   TouchableOpacity,
   View,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { router, useNavigation } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
@@ -27,8 +27,12 @@ import { useApi } from '@/lib/hooks/useApi';
 import { usePaginatedApi } from '@/lib/hooks/usePaginatedApi';
 import { usePrimaryColor } from '@/lib/hooks/useTenant';
 import { useTheme, type Theme } from '@/lib/hooks/useTheme';
+import { TYPOGRAPHY } from '@/lib/styles/typography';
+import { SPACING, RADIUS } from '@/lib/styles/spacing';
 import Avatar from '@/components/ui/Avatar';
+import EmptyState from '@/components/ui/EmptyState';
 import LoadingSpinner from '@/components/ui/LoadingSpinner';
+import ModalErrorBoundary from '@/components/ModalErrorBoundary';
 
 export default function FederationScreen() {
   const { t } = useTranslation('federation');
@@ -107,7 +111,7 @@ export default function FederationScreen() {
             <View style={styles.metaRow}>
               <Ionicons name="people-outline" size={13} color={theme.textSecondary} />
               <Text style={styles.metaText}>
-                {item.member_count.toLocaleString()}
+                {(item.member_count ?? 0).toLocaleString()}
               </Text>
             </View>
             <Text style={styles.connectedSince}>
@@ -133,22 +137,22 @@ export default function FederationScreen() {
     return (
       <View style={styles.statsCard}>
         <StatColumn
-          value={stats.partner_count}
-          label={t('stats.partners', { count: stats.partner_count })}
+          value={stats.partner_count ?? 0}
+          label={t('stats.partners', { count: stats.partner_count ?? 0 })}
           primary={primary}
           theme={theme}
         />
         <View style={styles.statDivider} />
         <StatColumn
-          value={stats.federated_members}
-          label={t('stats.members', { count: stats.federated_members })}
+          value={stats.federated_members ?? 0}
+          label={t('stats.members', { count: stats.federated_members ?? 0 })}
           primary={primary}
           theme={theme}
         />
         <View style={styles.statDivider} />
         <StatColumn
-          value={stats.cross_community_exchanges}
-          label={t('stats.exchanges', { count: stats.cross_community_exchanges })}
+          value={stats.cross_community_exchanges ?? 0}
+          label={t('stats.exchanges', { count: stats.cross_community_exchanges ?? 0 })}
           primary={primary}
           theme={theme}
         />
@@ -158,14 +162,15 @@ export default function FederationScreen() {
 
   if (partnersLoading) {
     return (
-      <SafeAreaView style={styles.center}>
+      <SafeAreaView style={styles.center} edges={['bottom']}>
         <LoadingSpinner />
       </SafeAreaView>
     );
   }
 
   return (
-    <SafeAreaView style={styles.container}>
+    <ModalErrorBoundary>
+    <SafeAreaView style={styles.container} edges={['bottom']}>
       <FlatList
         data={partners}
         keyExtractor={(item) => String(item.id)}
@@ -178,7 +183,10 @@ export default function FederationScreen() {
           </>
         }
         ListEmptyComponent={
-          <Text style={styles.emptyText}>{t('empty')}</Text>
+          <EmptyState
+            icon="globe-outline"
+            title={t('empty')}
+          />
         }
         ListFooterComponent={
           isLoadingMore ? (
@@ -191,6 +199,7 @@ export default function FederationScreen() {
         refreshing={partnersLoading && partners.length > 0}
       />
     </SafeAreaView>
+    </ModalErrorBoundary>
   );
 }
 
@@ -206,8 +215,8 @@ function StatColumn({
   theme: Theme;
 }) {
   return (
-    <View style={{ flex: 1, alignItems: 'center', gap: 4 }}>
-      <Text style={{ fontSize: 22, fontWeight: '700', color: primary }}>
+    <View style={{ flex: 1, alignItems: 'center', gap: SPACING.xs }}>
+      <Text style={{ ...TYPOGRAPHY.h2, color: primary }}>
         {value.toLocaleString()}
       </Text>
       <Text
@@ -224,14 +233,14 @@ function makeStyles(theme: Theme) {
   return StyleSheet.create({
     container: { flex: 1, backgroundColor: theme.bg },
     center: { flex: 1, alignItems: 'center', justifyContent: 'center' },
-    listContent: { padding: 16, paddingBottom: 48 },
+    listContent: { padding: SPACING.md, paddingBottom: SPACING.xxl },
     statsCard: {
       flexDirection: 'row',
       alignItems: 'center',
       backgroundColor: theme.surface,
-      borderRadius: 16,
-      padding: 16,
-      marginBottom: 20,
+      borderRadius: SPACING.md,
+      padding: SPACING.md,
+      marginBottom: SPACING.xl - 12,
       borderWidth: 1,
       borderColor: theme.borderSubtle,
     },
@@ -239,56 +248,51 @@ function makeStyles(theme: Theme) {
       width: 1,
       height: 40,
       backgroundColor: theme.border,
-      marginHorizontal: 8,
+      marginHorizontal: SPACING.sm,
     },
     sectionTitle: {
-      fontSize: 12,
+      ...TYPOGRAPHY.caption,
       fontWeight: '700',
       color: theme.textSecondary,
       textTransform: 'uppercase',
       letterSpacing: 0.6,
-      marginBottom: 12,
+      marginBottom: SPACING.sm + 4,
     },
     partnerCard: {
       flexDirection: 'row',
       alignItems: 'center',
       backgroundColor: theme.surface,
-      borderRadius: 14,
-      padding: 14,
-      marginBottom: 10,
+      borderRadius: RADIUS.lg,
+      padding: RADIUS.lg,
+      marginBottom: SPACING.sm + 2,
       borderWidth: 1,
       borderColor: theme.borderSubtle,
-      gap: 12,
+      gap: SPACING.sm + 4,
     },
     partnerInfo: {
       flex: 1,
       gap: 3,
     },
     partnerName: {
-      fontSize: 15,
+      ...TYPOGRAPHY.body,
       fontWeight: '600',
       color: theme.text,
     },
     metaRow: {
       flexDirection: 'row',
       alignItems: 'center',
-      gap: 4,
+      gap: SPACING.xs,
     },
     metaText: {
-      fontSize: 12,
+      ...TYPOGRAPHY.caption,
       color: theme.textSecondary,
       flex: 1,
     },
     connectedSince: {
       fontSize: 11,
       color: theme.textMuted,
-      marginTop: 2,
+      marginTop: SPACING.xxs,
     },
-    emptyText: {
-      fontSize: 14,
-      color: theme.textMuted,
-      textAlign: 'center',
-      marginTop: 32,
-    },
+    // emptyText removed — now handled by EmptyState component
   });
 }

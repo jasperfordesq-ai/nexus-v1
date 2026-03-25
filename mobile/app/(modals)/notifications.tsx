@@ -11,13 +11,15 @@ import {
   TouchableOpacity,
   RefreshControl,
   StyleSheet,
-  SafeAreaView,
   Alert,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import * as Haptics from 'expo-haptics';
 import { useNavigation } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 
+import { TYPOGRAPHY } from '@/lib/styles/typography';
+import { SPACING, RADIUS } from '@/lib/styles/spacing';
 import {
   getNotifications,
   markAllRead,
@@ -28,9 +30,12 @@ import { useApi } from '@/lib/hooks/useApi';
 import { usePrimaryColor } from '@/lib/hooks/useTenant';
 import { useTheme, type Theme } from '@/lib/hooks/useTheme';
 import Avatar from '@/components/ui/Avatar';
+import Badge from '@/components/ui/Badge';
+import EmptyState from '@/components/ui/EmptyState';
 import LoadingSpinner from '@/components/ui/LoadingSpinner';
 import { navigateToLink } from '@/lib/utils/navigateToLink';
 import { formatRelativeTime } from '@/lib/utils/formatRelativeTime';
+import ModalErrorBoundary from '@/components/ModalErrorBoundary';
 
 export default function NotificationsScreen() {
   const { t } = useTranslation('notifications');
@@ -85,7 +90,7 @@ export default function NotificationsScreen() {
         onPress={() => {
           void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
           void markRead(item.id).then(() => refresh()).catch(console.warn);
-          navigateToLink(item.link);
+          navigateToLink(item.link ?? null);
         }}
         activeOpacity={0.7}
         accessibilityLabel={item.is_read ? label : t('unreadItem', { label })}
@@ -104,11 +109,21 @@ export default function NotificationsScreen() {
         <View style={styles.content}>
           {item.title && <Text style={styles.title} numberOfLines={1}>{item.title}</Text>}
           <Text style={styles.message} numberOfLines={2}>{item.message}</Text>
-          <Text style={styles.time}>
-            {(Date.now() - new Date(item.created_at).getTime()) < 60_000
-              ? t('justNow')
-              : formatRelativeTime(item.created_at)}
-          </Text>
+          <View style={styles.metaRow}>
+            <Text style={styles.time}>
+              {(Date.now() - new Date(item.created_at).getTime()) < 60_000
+                ? t('justNow')
+                : formatRelativeTime(item.created_at)}
+            </Text>
+            {item.category ? (
+              <Badge
+                label={categoryLabel(item.category, t)}
+                color={categoryColor(item.category, theme.textMuted, theme)}
+                size="sm"
+                variant="outline"
+              />
+            ) : null}
+          </View>
         </View>
 
         {!item.is_read && <View style={[styles.unreadDot, { backgroundColor: primary }]} />}
@@ -117,7 +132,8 @@ export default function NotificationsScreen() {
   }
 
   return (
-    <SafeAreaView style={styles.container}>
+    <ModalErrorBoundary>
+    <SafeAreaView style={styles.container} edges={['bottom']}>
       {/* Header */}
       <View style={styles.header}>
         <View style={styles.headerLeft}>
@@ -162,24 +178,46 @@ export default function NotificationsScreen() {
               </TouchableOpacity>
             </View>
           ) : (
-            <View style={styles.centered} accessibilityLabel={t('allCaughtUp')}>
-              <Text style={styles.emptyTitle}>{t('allCaughtUp')}</Text>
-              <Text style={styles.emptySubText}>{t('allCaughtUpSub')}</Text>
-            </View>
+            <EmptyState
+              icon="notifications-off-outline"
+              title={t('allCaughtUp')}
+              subtitle={t('allCaughtUpSub')}
+            />
           )
         }
         contentContainerStyle={styles.list}
       />
     </SafeAreaView>
+    </ModalErrorBoundary>
   );
 }
 
-function categoryColor(category: string, fallback: string, theme: Theme): string {
+function categoryLabel(category: string, t: (key: string) => string): string {
+  const labels: Record<string, string> = {
+    message: t('category.message'),
+    transaction: t('category.transaction'),
+    social: t('category.social'),
+    system: t('category.system'),
+    event: t('category.event'),
+    group: t('category.group'),
+    listing: t('category.listing'),
+    connection: t('category.connection'),
+    mention: t('category.mention'),
+  };
+  return labels[category] ?? category;
+}
+
+function categoryColor(category: string | undefined | null, fallback: string, theme: Theme): string {
   switch (category) {
     case 'message':     return theme.info;
     case 'transaction': return theme.success;
     case 'social':      return '#8B5CF6'; // intentional purple — no equivalent token
     case 'system':      return theme.warning;
+    case 'event':       return '#F59E0B';
+    case 'group':       return '#06B6D4';
+    case 'listing':     return '#10B981';
+    case 'connection':  return '#EC4899';
+    case 'mention':     return '#6366F1';
     default:            return fallback;
   }
 }
@@ -191,27 +229,27 @@ function makeStyles(theme: Theme) {
       flexDirection: 'row',
       alignItems: 'center',
       justifyContent: 'space-between',
-      paddingHorizontal: 16,
-      paddingTop: 16,
-      paddingBottom: 8,
+      paddingHorizontal: SPACING.md,
+      paddingTop: SPACING.md,
+      paddingBottom: SPACING.sm,
     },
-    headerLeft: { flexDirection: 'row', alignItems: 'center', gap: 8 },
-    heading: { fontSize: 22, fontWeight: '700', color: theme.text },
+    headerLeft: { flexDirection: 'row', alignItems: 'center', gap: SPACING.sm },
+    heading: { ...TYPOGRAPHY.h2, color: theme.text },
     badge: {
       minWidth: 20,
       height: 20,
-      borderRadius: 10,
+      borderRadius: RADIUS.md,
       justifyContent: 'center',
       alignItems: 'center',
       paddingHorizontal: 5,
     },
     badgeText: { color: '#fff', fontSize: 11, fontWeight: '700' }, // contrast on primary
-    markAll: { fontSize: 14, fontWeight: '600' },
+    markAll: { ...TYPOGRAPHY.label, fontWeight: '600' },
     list: { flexGrow: 1 },
     row: {
       flexDirection: 'row',
       alignItems: 'flex-start',
-      paddingHorizontal: 16,
+      paddingHorizontal: SPACING.md,
       paddingVertical: 12,
       gap: 12,
     },
@@ -228,9 +266,10 @@ function makeStyles(theme: Theme) {
       borderColor: theme.surface,
     },
     content: { flex: 1 },
-    title: { fontSize: 14, fontWeight: '700', color: theme.text, marginBottom: 2 },
-    message: { fontSize: 14, color: theme.textSecondary, lineHeight: 20 },
-    time: { fontSize: 12, color: theme.textMuted, marginTop: 4 },
+    title: { ...TYPOGRAPHY.label, fontWeight: '700', color: theme.text, marginBottom: 2 },
+    message: { ...TYPOGRAPHY.label, color: theme.textSecondary, lineHeight: 20 },
+    metaRow: { flexDirection: 'row' as const, alignItems: 'center' as const, gap: SPACING.sm, marginTop: 4 },
+    time: { ...TYPOGRAPHY.caption, color: theme.textMuted },
     unreadDot: {
       width: 8,
       height: 8,
@@ -240,9 +279,8 @@ function makeStyles(theme: Theme) {
     },
     separator: { height: 1, backgroundColor: theme.borderSubtle },
     centered: { flex: 1, justifyContent: 'center', alignItems: 'center', padding: 40 },
-    errorText: { color: theme.error, fontSize: 14, textAlign: 'center', marginBottom: 12 },
-    retryBtn: { paddingHorizontal: 20, paddingVertical: 10 },
-    emptyTitle: { color: theme.text, fontSize: 17, fontWeight: '600', textAlign: 'center', marginBottom: 8 },
-    emptySubText: { color: theme.textSecondary, fontSize: 14, textAlign: 'center', lineHeight: 20 },
+    errorText: { ...TYPOGRAPHY.label, color: theme.error, textAlign: 'center', marginBottom: 12 },
+    retryBtn: { paddingHorizontal: 20, paddingVertical: RADIUS.md },
+    // emptyTitle and emptySubText removed — now handled by EmptyState component
   });
 }

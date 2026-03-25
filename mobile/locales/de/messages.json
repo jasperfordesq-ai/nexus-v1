@@ -20,6 +20,7 @@
     "title": "Noch keine Unterhaltungen",
     "subtitle": "Verbinde dich mit Mitgliedern, um Nachrichten zu senden"
   },
+  "deleteConfirm": "Unterhaltung mit {{name}} löschen?",
   "errors": {
     "sendFailed": "Nachricht konnte nicht gesendet werden. Tippe zum Wiederholen.",
     "loadFailed": "Nachrichten konnten nicht geladen werden."

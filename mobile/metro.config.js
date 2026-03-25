@@ -3,18 +3,18 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
+// eslint-disable-next-line @typescript-eslint/no-require-imports
 const { getDefaultConfig } = require('expo/metro-config');
-const exclusionList = require('metro-config/src/defaults/exclusionList');
 
 const config = getDefaultConfig(__dirname);
 
 // Exclude test files and jest setup from the Metro bundle.
 // Without this, Metro picks up *.test.ts(x) files which import
 // @testing-library/react-native — a test-only package that cannot be bundled.
-config.resolver.blockList = exclusionList([
+config.resolver.blockList = [
   /.*\.test\.[jt]sx?$/,
   /.*\.spec\.[jt]sx?$/,
   /jest-setup\.[jt]s$/,
-]);
+];
 
 module.exports = config;

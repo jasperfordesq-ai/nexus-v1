@@ -107,6 +107,20 @@ export function toggleLike(targetType: string, targetId: number): Promise<{ data
   });
 }
 
+export interface BookmarkResult {
+  bookmarked: boolean;
+}
+
+/**
+ * POST /api/v2/feed/bookmark — toggle bookmark/save on a feed item.
+ */
+export function toggleBookmark(targetType: string, targetId: number): Promise<{ data: BookmarkResult }> {
+  return api.post<{ data: BookmarkResult }>(`${API_V2}/feed/bookmark`, {
+    target_type: targetType,
+    target_id: targetId,
+  });
+}
+
 /**
  * GET /api/v2/feed/polls/:pollId — fetch current poll state.
  */

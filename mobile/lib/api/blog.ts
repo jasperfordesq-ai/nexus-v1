@@ -49,9 +49,9 @@ export function getBlogPosts(
 }
 
 /**
- * GET /api/v2/blog/:id
- * Retrieve a single blog post by its numeric ID.
+ * GET /api/v2/blog/:slug
+ * Retrieve a single blog post by its slug.
  */
-export function getBlogPost(id: number): Promise<{ data: BlogPost }> {
-  return api.get<{ data: BlogPost }>(`${API_V2}/blog/${id}`);
+export function getBlogPost(slug: string): Promise<{ data: BlogPost }> {
+  return api.get<{ data: BlogPost }>(`${API_V2}/blog/${slug}`);
 }

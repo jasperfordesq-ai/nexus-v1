@@ -3,29 +3,32 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import { useCallback, useMemo } from 'react';
+import { useCallback, useEffect, useMemo } from 'react';
 import {
   FlatList,
   Image,
   RefreshControl,
-  SafeAreaView,
   StyleSheet,
   Text,
   TouchableOpacity,
   View,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { router, useNavigation } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
 import { useTranslation } from 'react-i18next';
-import { useEffect } from 'react';
 
+import { TYPOGRAPHY } from '@/lib/styles/typography';
+import { SPACING, RADIUS } from '@/lib/styles/spacing';
 import { getBlogPosts, type BlogPost, type BlogListResponse } from '@/lib/api/blog';
+import EmptyState from '@/components/ui/EmptyState';
 import LoadingSpinner from '@/components/ui/LoadingSpinner';
 import { usePaginatedApi } from '@/lib/hooks/usePaginatedApi';
 import { usePrimaryColor } from '@/lib/hooks/useTenant';
 import { useTheme, type Theme } from '@/lib/hooks/useTheme';
 import { withAlpha } from '@/lib/utils/color';
+import ModalErrorBoundary from '@/components/ModalErrorBoundary';
 
 function extractBlogPage(response: BlogListResponse) {
   return {
@@ -55,7 +58,8 @@ export default function BlogScreen() {
     usePaginatedApi<BlogPost, BlogListResponse>(fetchPosts, extractBlogPage, []);
 
   return (
-    <SafeAreaView style={styles.container}>
+    <ModalErrorBoundary>
+    <SafeAreaView style={styles.container} edges={['bottom']}>
       <FlatList<BlogPost>
         data={items}
         keyExtractor={(item) => String(item.id)}
@@ -65,7 +69,7 @@ export default function BlogScreen() {
             activeOpacity={0.8}
             onPress={() => {
               void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-              router.push({ pathname: '/(modals)/blog-post', params: { id: String(item.id) } });
+              router.push({ pathname: '/(modals)/blog-post', params: { id: item.slug } });
             }}
           >
             {item.cover_image ? (
@@ -86,7 +90,7 @@ export default function BlogScreen() {
                 <Text style={styles.excerpt} numberOfLines={2}>{item.excerpt}</Text>
               ) : null}
               <View style={styles.meta}>
-                <Text style={styles.metaText}>{item.author.name}</Text>
+                <Text style={styles.metaText}>{item.author?.name ?? ''}</Text>
                 {item.reading_time_minutes ? (
                   <Text style={styles.metaText}>
                     {t('readingTime', { minutes: item.reading_time_minutes })}
@@ -116,9 +120,10 @@ export default function BlogScreen() {
               </TouchableOpacity>
             </View>
           ) : (
-            <View style={styles.centered}>
-              <Text style={styles.emptyText}>{t('empty')}</Text>
-            </View>
+            <EmptyState
+              icon="newspaper-outline"
+              title={t('empty')}
+            />
           )
         }
         ListFooterComponent={
@@ -131,18 +136,19 @@ export default function BlogScreen() {
         contentContainerStyle={styles.list}
       />
     </SafeAreaView>
+    </ModalErrorBoundary>
   );
 }
 
 function makeStyles(theme: Theme) {
   return StyleSheet.create({
     container: { flex: 1, backgroundColor: theme.bg },
-    list: { paddingBottom: 24 },
+    list: { paddingBottom: SPACING.lg },
     card: {
       backgroundColor: theme.surface,
-      marginHorizontal: 16,
+      marginHorizontal: SPACING.md,
       marginTop: 12,
-      borderRadius: 14,
+      borderRadius: RADIUS.lg,
       overflow: 'hidden',
       borderWidth: 1,
       borderColor: theme.borderSubtle,
@@ -153,23 +159,22 @@ function makeStyles(theme: Theme) {
       justifyContent: 'center',
       alignItems: 'center',
     },
-    cardBody: { padding: 14 },
+    cardBody: { padding: RADIUS.lg },
     categoryPill: {
       alignSelf: 'flex-start',
-      borderRadius: 6,
-      paddingHorizontal: 8,
+      borderRadius: RADIUS.sm,
+      paddingHorizontal: SPACING.sm,
       paddingVertical: 2,
-      marginBottom: 8,
+      marginBottom: SPACING.sm,
     },
     categoryText: { fontSize: 11, fontWeight: '600' },
-    postTitle: { fontSize: 16, fontWeight: '700', color: theme.text, marginBottom: 6 },
-    excerpt: { fontSize: 14, color: theme.textSecondary, lineHeight: 20, marginBottom: 10 },
+    postTitle: { fontSize: 16, fontWeight: '700', color: theme.text, marginBottom: RADIUS.sm },
+    excerpt: { ...TYPOGRAPHY.label, color: theme.textSecondary, lineHeight: 20, marginBottom: RADIUS.md },
     meta: { flexDirection: 'row', gap: 12 },
-    metaText: { fontSize: 12, color: theme.textMuted },
-    centered: { flex: 1, justifyContent: 'center', alignItems: 'center', padding: 32 },
-    errorText: { color: theme.error, fontSize: 14, textAlign: 'center', marginBottom: 12 },
-    retryBtn: { paddingHorizontal: 20, paddingVertical: 10 },
-    emptyText: { color: theme.textMuted, fontSize: 14, textAlign: 'center' },
-    footer: { paddingVertical: 16, alignItems: 'center' },
+    metaText: { ...TYPOGRAPHY.caption, color: theme.textMuted },
+    centered: { flex: 1, justifyContent: 'center', alignItems: 'center', padding: SPACING.xl },
+    errorText: { ...TYPOGRAPHY.label, color: theme.error, textAlign: 'center', marginBottom: 12 },
+    retryBtn: { paddingHorizontal: 20, paddingVertical: RADIUS.md },
+    footer: { paddingVertical: SPACING.md, alignItems: 'center' },
   });
 }

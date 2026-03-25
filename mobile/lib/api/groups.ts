@@ -70,8 +70,8 @@ export function joinGroup(id: number): Promise<{ message: string }> {
 }
 
 /**
- * DELETE /api/v2/groups/{id}/leave — leave a group.
+ * DELETE /api/v2/groups/{id}/membership — leave a group.
  */
 export function leaveGroup(id: number): Promise<void> {
-  return api.delete<void>(`${API_V2}/groups/${id}/leave`);
+  return api.delete<void>(`${API_V2}/groups/${id}/membership`);
 }

@@ -10,10 +10,10 @@ import {
   Text,
   FlatList,
   StyleSheet,
-  SafeAreaView,
   TouchableOpacity,
   RefreshControl,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
@@ -24,7 +24,10 @@ import { usePaginatedApi } from '@/lib/hooks/usePaginatedApi';
 import { usePrimaryColor } from '@/lib/hooks/useTenant';
 import { useTheme, type Theme } from '@/lib/hooks/useTheme';
 import { withAlpha } from '@/lib/utils/color';
+import EmptyState from '@/components/ui/EmptyState';
 import { EventCardSkeleton } from '@/components/ui/Skeleton';
+import { TYPOGRAPHY } from '@/lib/styles/typography';
+import { SPACING, RADIUS } from '@/lib/styles/spacing';
 
 function extractEventsPage(r: EventsResponse) {
   return {
@@ -57,7 +60,10 @@ export default function EventsScreen() {
   } = usePaginatedApi<Event, EventsResponse>(fetcher, extractEventsPage, [when]);
 
   function handleTabChange(tab: 'upcoming' | 'past') {
-    if (tab !== when) setWhen(tab);
+    if (tab !== when) {
+      void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+      setWhen(tab);
+    }
   }
 
   return (
@@ -116,9 +122,10 @@ export default function EventsScreen() {
                 <EventCardSkeleton />
               </>
             ) : (
-              <View style={styles.center}>
-                <Text style={styles.emptyText}>{t('noEvents', { when: t(when).toLowerCase() })}</Text>
-              </View>
+              <EmptyState
+                icon="calendar-outline"
+                title={t('noEvents', { when: t(when).toLowerCase() })}
+              />
             )
           }
           ListFooterComponent={
@@ -156,10 +163,11 @@ function EventCard({
   cardStyles: Styles;
   onPress: () => void;
 }) {
-  const start = new Date(event.start_date);
-  const month = start.toLocaleString('default', { month: 'short' });
-  const day = start.getDate();
-  const time = start.toLocaleTimeString('default', { hour: '2-digit', minute: '2-digit' });
+  const start = event.start_date ? new Date(event.start_date) : null;
+  const isValidDate = start && !isNaN(start.getTime());
+  const month = isValidDate ? start.toLocaleString('default', { month: 'short' }) : '—';
+  const day = isValidDate ? start.getDate() : '—';
+  const time = isValidDate ? start.toLocaleTimeString('default', { hour: '2-digit', minute: '2-digit' }) : '—';
 
   return (
     <TouchableOpacity
@@ -170,7 +178,7 @@ function EventCard({
       }}
       activeOpacity={0.8}
       accessibilityRole="button"
-      accessibilityLabel={event.title}
+      accessibilityLabel={event.title ?? ''}
     >
       {/* Date badge */}
       {/* 8% opacity variant for light background */}
@@ -205,7 +213,7 @@ function EventCard({
         <View style={cardStyles.footerRow}>
           <View style={cardStyles.rsvpPill}>
             <Ionicons name="people-outline" size={12} color={theme.textSecondary} />
-            <Text style={cardStyles.rsvpText}>{t('goingCount', { count: event.rsvp_counts.going })}</Text>
+            <Text style={cardStyles.rsvpText}>{t('goingCount', { count: event.rsvp_counts?.going ?? 0 })}</Text>
           </View>
 
           {event.category && (
@@ -235,42 +243,42 @@ function makeStyles(theme: Theme) {
     center: { flex: 1, alignItems: 'center', justifyContent: 'center' },
     tabs: { flexDirection: 'row', backgroundColor: theme.surface, borderBottomWidth: 1, borderBottomColor: theme.borderSubtle },
     tab: { flex: 1, paddingVertical: 14, alignItems: 'center' },
-    tabText: { fontSize: 14, color: theme.textSecondary },
+    tabText: { ...TYPOGRAPHY.label, fontWeight: '400', color: theme.textSecondary },
     card: {
       flexDirection: 'row',
       backgroundColor: theme.surface,
-      marginHorizontal: 16,
+      marginHorizontal: SPACING.md,
       marginTop: 12,
-      borderRadius: 14,
+      borderRadius: RADIUS.lg,
       padding: 14,
       gap: 12,
       borderWidth: 1,
       borderColor: theme.borderSubtle,
     },
     dateBadge: {
-      width: 48,
+      width: SPACING.xxl,
       height: 52,
-      borderRadius: 10,
+      borderRadius: RADIUS.md,
       alignItems: 'center',
       justifyContent: 'center',
     },
     dateMonth: { fontSize: 11, fontWeight: '600', textTransform: 'uppercase' },
-    dateDay: { fontSize: 22, fontWeight: '700', lineHeight: 26 },
-    cardContent: { flex: 1, gap: 4 },
-    cardTitle: { fontSize: 15, fontWeight: '600', color: theme.text, marginBottom: 2 },
-    metaRow: { flexDirection: 'row', alignItems: 'center', gap: 4 },
-    metaText: { fontSize: 12, color: theme.textSecondary, flex: 1 },
-    footerRow: { flexDirection: 'row', alignItems: 'center', gap: 8, marginTop: 4, flexWrap: 'wrap' },
+    dateDay: { ...TYPOGRAPHY.h2, lineHeight: 26 },
+    cardContent: { flex: 1, gap: SPACING.xs },
+    cardTitle: { ...TYPOGRAPHY.button, color: theme.text, marginBottom: SPACING.xxs },
+    metaRow: { flexDirection: 'row', alignItems: 'center', gap: SPACING.xs },
+    metaText: { ...TYPOGRAPHY.caption, color: theme.textSecondary, flex: 1 },
+    footerRow: { flexDirection: 'row', alignItems: 'center', gap: SPACING.sm, marginTop: SPACING.xs, flexWrap: 'wrap' },
     rsvpPill: { flexDirection: 'row', alignItems: 'center', gap: 3 },
     rsvpText: { fontSize: 11, color: theme.textSecondary },
-    categoryPill: { borderRadius: 6, paddingHorizontal: 7, paddingVertical: 2 },
+    categoryPill: { borderRadius: RADIUS.sm, paddingHorizontal: 7, paddingVertical: SPACING.xxs },
     categoryText: { fontSize: 11, fontWeight: '600' },
-    rsvpBadge: { borderRadius: 6, paddingHorizontal: 7, paddingVertical: 2 },
+    rsvpBadge: { borderRadius: RADIUS.sm, paddingHorizontal: 7, paddingVertical: SPACING.xxs },
     rsvpBadgeText: { fontSize: 11, fontWeight: '600' },
-    emptyText: { fontSize: 15, color: theme.textMuted },
-    errorText: { fontSize: 15, color: theme.textMuted, marginBottom: 12 },
+    emptyText: { ...TYPOGRAPHY.body, color: theme.textMuted },
+    errorText: { ...TYPOGRAPHY.body, color: theme.textMuted, marginBottom: 12 },
     retryBtn: { paddingHorizontal: 20, paddingVertical: 10 },
-    footer: { paddingVertical: 16, alignItems: 'center' as const },
-    endOfListText: { fontSize: 13, color: theme.textMuted },
+    footer: { paddingVertical: SPACING.md, alignItems: 'center' as const },
+    endOfListText: { ...TYPOGRAPHY.bodySmall, color: theme.textMuted },
   });
 }

@@ -6,6 +6,12 @@
 import { useCallback, useEffect, useRef, useState, type DependencyList } from 'react';
 import { ApiResponseError } from '@/lib/api/client';
 
+/** HTTP status codes worth retrying (transient server/network errors). */
+const RETRYABLE_STATUSES = new Set([500, 502, 503, 504]);
+
+/** Delay before a single retry attempt (ms). */
+const RETRY_DELAY_MS = 2000;
+
 export interface PaginatedApiState<TItem> {
   items: TItem[];
   isLoading: boolean;
@@ -77,6 +83,12 @@ export function usePaginatedApi<TItem, TResponse>(
   // Set to false when the component unmounts so we never set state after unmount.
   const isMountedRef = useRef(true);
 
+  // Tracks whether the initial load has already been retried (max 1 retry).
+  const retryCountRef = useRef(0);
+
+  // Holds the retry timer so it can be cancelled on unmount.
+  const retryTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
   useEffect(() => {
     isMountedRef.current = true;
     return () => {
@@ -117,6 +129,24 @@ export function usePaginatedApi<TItem, TResponse>(
       } catch (err) {
         if (!isMountedRef.current) return;
 
+        // On transient errors during initial load, retry once after a delay
+        if (isInitial && retryCountRef.current < 1) {
+          const isTransient =
+            (err instanceof ApiResponseError && RETRYABLE_STATUSES.has(err.status)) ||
+            !(err instanceof ApiResponseError);
+
+          if (isTransient) {
+            retryCountRef.current += 1;
+            isFetchingRef.current = false; // allow the retry fetch to proceed
+            retryTimerRef.current = setTimeout(() => {
+              if (isMountedRef.current) {
+                void fetchPage(cursor, true);
+              }
+            }, RETRY_DELAY_MS);
+            return;
+          }
+        }
+
         if (err instanceof ApiResponseError) {
           setError(err.message);
         } else {
@@ -142,19 +172,35 @@ export function usePaginatedApi<TItem, TResponse>(
   // Initial load on mount, and reset + re-fetch when deps change.
   useEffect(() => {
     cursorRef.current = null;
+    retryCountRef.current = 0;
     void fetchPage(null, true);
+
+    return () => {
+      // Cancel any pending retry when deps change or component unmounts
+      if (retryTimerRef.current) {
+        clearTimeout(retryTimerRef.current);
+        retryTimerRef.current = null;
+      }
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, deps ?? []);
 
-  /** Append the next page to the list. No-op if already fetching or no more pages. */
+  /** Append the next page to the list. No-op if already fetching, still loading, or no more pages. */
   const loadMore = useCallback(() => {
-    if (!hasMore || isFetchingRef.current) return;
+    if (!hasMore || isFetchingRef.current || isLoadingMore || isLoading) return;
     void fetchPage(cursorRef.current, false);
-  }, [hasMore, fetchPage]);
+  }, [hasMore, isLoadingMore, isLoading, fetchPage]);
 
   /** Reset to the first page and replace the item list. */
   const refresh = useCallback(() => {
     cursorRef.current = null;
+    retryCountRef.current = 0; // allow retry again on manual refresh
+    // Allow refresh to proceed even if a previous fetch is in-flight
+    isFetchingRef.current = false;
+    if (retryTimerRef.current) {
+      clearTimeout(retryTimerRef.current);
+      retryTimerRef.current = null;
+    }
     void fetchPage(null, true);
   }, [fetchPage]);
 

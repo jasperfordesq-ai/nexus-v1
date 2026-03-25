@@ -131,7 +131,7 @@ async function request<T>(
     headers['Authorization'] = `Bearer ${token}`;
   }
 
-  if (tenantSlug) {
+  if (tenantSlug && tenantSlug.trim()) {
     // The PHP API resolves the tenant from this header on non-subdomain routes
     headers['X-Tenant-Slug'] = tenantSlug;
   }

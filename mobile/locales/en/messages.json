@@ -23,6 +23,7 @@
     "tapToRecord": "Hold to record"
   },
   "newMessage": "New message",
+  "deleteConfirm": "Delete conversation with {{name}}?",
   "empty": {
     "title": "No conversations yet",
     "subtitle": "Connect with members to start messaging"

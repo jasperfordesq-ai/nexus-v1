@@ -15,6 +15,7 @@
     },
     "ios": {
       "bundleIdentifier": "ie.hour.nexus",
+      "buildNumber": "1",
       "supportsTablet": false,
       "associatedDomains": [
         "applinks:app.project-nexus.ie"
@@ -26,6 +27,7 @@
       }
     },
     "android": {
+      "versionCode": 1,
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#006FEE"
@@ -75,7 +77,8 @@
             "useFrameworks": "static"
           }
         }
-      ]
+      ],
+      "@sentry/react-native"
     ],
     "experiments": {
       "typedRoutes": true

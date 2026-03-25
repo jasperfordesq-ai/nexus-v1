@@ -82,9 +82,13 @@ jest.mock('@/lib/api/notifications', () => ({
   getNotificationCounts: jest.fn(),
 }));
 
-jest.mock('@/components/FeedItem', () => ({ item }: { item: { id: number; content?: string } }) => {
-  const { Text } = require('react-native');
-  return <Text>{item.content ?? `feed-item-${item.id}`}</Text>;
+jest.mock('@/components/FeedItem', () => {
+  const MockFeedItem = ({ item }: { item: { id: number; content?: string } }) => {
+    const { Text } = require('react-native');
+    return <Text>{item.content ?? `feed-item-${item.id}`}</Text>;
+  };
+  MockFeedItem.displayName = 'MockFeedItem';
+  return MockFeedItem;
 });
 
 jest.mock('@/components/OfflineBanner', () => () => null);

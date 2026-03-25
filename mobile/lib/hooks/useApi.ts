@@ -6,6 +6,12 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { ApiResponseError } from '@/lib/api/client';
 
+/** HTTP status codes worth retrying (transient server/network errors). */
+const RETRYABLE_STATUSES = new Set([500, 502, 503, 504]);
+
+/** Delay before a single retry attempt (ms). */
+const RETRY_DELAY_MS = 2000;
+
 interface UseApiOptions {
   /** When false, the fetch is skipped entirely. Defaults to true. */
   enabled?: boolean;
@@ -64,34 +70,52 @@ export function useApi<T>(
     }
 
     let cancelled = false;
+    let retryTimer: ReturnType<typeof setTimeout> | null = null;
 
-    async function run() {
-      setIsLoading(true);
-      setError(null);
+    async function run(isRetry: boolean) {
+      if (!isRetry) {
+        setIsLoading(true);
+        setError(null);
+      }
       try {
         const result = await fetchFnRef.current();
         if (!cancelled && isMountedRef.current) {
           setData(result);
-        }
-      } catch (err) {
-        if (!cancelled && isMountedRef.current) {
-          if (err instanceof ApiResponseError) {
-            setError(err.message);
-          } else {
-            setError('An unexpected error occurred.');
-          }
-        }
-      } finally {
-        if (!cancelled && isMountedRef.current) {
           setIsLoading(false);
         }
+      } catch (err) {
+        if (cancelled || !isMountedRef.current) return;
+
+        // Determine if the error is transient and worth retrying
+        const isTransient =
+          (err instanceof ApiResponseError && RETRYABLE_STATUSES.has(err.status)) ||
+          !(err instanceof ApiResponseError); // network errors, timeouts, etc.
+
+        if (isTransient && !isRetry) {
+          // Schedule a single retry
+          retryTimer = setTimeout(() => {
+            if (!cancelled && isMountedRef.current) {
+              void run(true);
+            }
+          }, RETRY_DELAY_MS);
+          return;
+        }
+
+        // No more retries — surface the error
+        if (err instanceof ApiResponseError) {
+          setError(err.message);
+        } else {
+          setError('An unexpected error occurred.');
+        }
+        setIsLoading(false);
       }
     }
 
-    void run();
+    void run(false);
 
     return () => {
       cancelled = true;
+      if (retryTimer) clearTimeout(retryTimer);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [...deps, refreshToken, enabled]);

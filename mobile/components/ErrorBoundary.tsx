@@ -6,10 +6,6 @@
 import React from 'react';
 import { Text, TouchableOpacity, View } from 'react-native';
 import * as Sentry from '@sentry/react-native';
-import { useTranslation } from 'react-i18next';
-
-import { useTheme } from '@/lib/hooks/useTheme';
-import { usePrimaryColor } from '@/lib/hooks/useTenant';
 
 interface Props {
   children: React.ReactNode;
@@ -21,12 +17,12 @@ interface State {
   error: Error | null;
 }
 
-/** Functional fallback UI that can use hooks for theme-aware colors. */
+/**
+ * Fallback UI — must NOT use any context hooks (useTheme, useTenant, etc.)
+ * because the ErrorBoundary sits OUTSIDE all providers in the component tree.
+ * Uses hardcoded colors to guarantee it always renders.
+ */
 function ErrorFallback({ onReset }: { onReset: () => void }) {
-  const { t } = useTranslation('common');
-  const theme = useTheme();
-  const primary = usePrimaryColor();
-
   return (
     <View
       style={{
@@ -34,32 +30,32 @@ function ErrorFallback({ onReset }: { onReset: () => void }) {
         alignItems: 'center',
         justifyContent: 'center',
         padding: 24,
-        backgroundColor: theme.bg,
+        backgroundColor: '#fff',
       }}
     >
       <Text
         style={{
           fontSize: 16,
           fontWeight: '600',
-          color: theme.text,
+          color: '#1a1a1a',
           marginBottom: 16,
           textAlign: 'center',
         }}
       >
-        {t('errors.generic')}
+        Something went wrong
       </Text>
       <TouchableOpacity
         style={{
           paddingVertical: 10,
           paddingHorizontal: 24,
-          backgroundColor: primary,
+          backgroundColor: '#006FEE',
           borderRadius: 8,
         }}
         onPress={onReset}
         accessibilityRole="button"
-        accessibilityLabel={t('buttons.retry')}
+        accessibilityLabel="Retry"
       >
-        <Text style={{ fontSize: 14, fontWeight: '600', color: '#fff' /* contrast on primary */ }}>{t('buttons.retry')}</Text>
+        <Text style={{ fontSize: 14, fontWeight: '600', color: '#fff' }}>Retry</Text>
       </TouchableOpacity>
     </View>
   );
@@ -81,8 +77,7 @@ export default class ErrorBoundary extends React.Component<Props, State> {
   }
 
   componentDidCatch(error: Error, info: React.ErrorInfo): void {
-    // Log to an error reporting service in the future
-    console.error('[ErrorBoundary] Caught error:', error, info.componentStack);
+    console.error('ErrorBoundary caught:', error, info.componentStack);
     Sentry.captureException(error, { extra: { componentStack: info.componentStack } });
   }
 

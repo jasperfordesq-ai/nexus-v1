@@ -10,14 +10,16 @@ import {
   FlatList,
   RefreshControl,
   StyleSheet,
-  SafeAreaView,
   TouchableOpacity,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
 import { useTranslation } from 'react-i18next';
 
+import { TYPOGRAPHY } from '@/lib/styles/typography';
+import { SPACING, RADIUS } from '@/lib/styles/spacing';
 import {
   getGamificationProfile,
   getBadges,
@@ -32,6 +34,7 @@ import { useTheme, type Theme } from '@/lib/hooks/useTheme';
 import { withAlpha } from '@/lib/utils/color';
 import Avatar from '@/components/ui/Avatar';
 import LoadingSpinner from '@/components/ui/LoadingSpinner';
+import ModalErrorBoundary from '@/components/ModalErrorBoundary';
 
 type Tab = 'badges' | 'leaderboard';
 type LeaderboardPeriod = 'weekly' | 'monthly' | 'all_time';
@@ -239,6 +242,7 @@ export default function GamificationScreen() {
   }
 
   return (
+    <ModalErrorBoundary>
     <SafeAreaView style={styles.container}>
       <FlatList<LeaderboardEntry | Badge | 'header' | 'tabs' | 'period-selector' | 'empty'>
         refreshControl={
@@ -354,6 +358,7 @@ export default function GamificationScreen() {
         </View>
       )}
     </SafeAreaView>
+    </ModalErrorBoundary>
   );
 }
 
@@ -363,12 +368,12 @@ function makeStyles(theme: Theme) {
   return StyleSheet.create({
     container: { flex: 1, backgroundColor: theme.bg },
     center: { flex: 1, alignItems: 'center', justifyContent: 'center' },
-    listContent: { paddingHorizontal: 16, paddingBottom: 40 },
+    listContent: { paddingHorizontal: SPACING.md, paddingBottom: 40 },
 
     // Profile card
     profileCard: {
       borderWidth: 2,
-      borderRadius: 16,
+      borderRadius: SPACING.md,
       padding: 18,
       backgroundColor: theme.surface,
       marginTop: 20,
@@ -382,15 +387,15 @@ function makeStyles(theme: Theme) {
       marginBottom: 12,
     },
     levelBadge: {
-      borderRadius: 8,
+      borderRadius: SPACING.sm,
       paddingHorizontal: 10,
       paddingVertical: 4,
     },
-    levelBadgeText: { fontSize: 13, fontWeight: '700', color: '#fff' }, // contrast on primary
-    rankText: { fontSize: 13, fontWeight: '600' },
-    unrankedText: { fontSize: 13, color: theme.textMuted },
+    levelBadgeText: { ...TYPOGRAPHY.bodySmall, fontWeight: '700', color: '#fff' }, // contrast on primary
+    rankText: { ...TYPOGRAPHY.bodySmall, fontWeight: '600' },
+    unrankedText: { ...TYPOGRAPHY.bodySmall, color: theme.textMuted },
     streakRow: { flexDirection: 'row', alignItems: 'center', gap: 4, marginLeft: 'auto' },
-    streakText: { fontSize: 13, color: theme.textSecondary },
+    streakText: { ...TYPOGRAPHY.bodySmall, color: theme.textSecondary },
     xpValue: { fontSize: 32, fontWeight: '700', marginBottom: 10 },
     xpBarTrack: {
       height: 8,
@@ -400,7 +405,7 @@ function makeStyles(theme: Theme) {
       marginBottom: 6,
     },
     xpBarFill: { height: 8, borderRadius: 4 },
-    nextLevelText: { fontSize: 12, color: theme.textMuted, marginTop: 2 },
+    nextLevelText: { ...TYPOGRAPHY.caption, color: theme.textMuted, marginTop: 2 },
 
     // Tabs
     tabRow: {
@@ -418,7 +423,7 @@ function makeStyles(theme: Theme) {
       borderColor: theme.border,
     },
     tabPillText: {
-      fontSize: 14,
+      ...TYPOGRAPHY.label,
       fontWeight: '600',
       color: theme.textSecondary,
     },
@@ -433,13 +438,13 @@ function makeStyles(theme: Theme) {
       flex: 1,
       alignItems: 'center',
       paddingVertical: 7,
-      borderRadius: 10,
+      borderRadius: RADIUS.md,
       borderWidth: 1,
       borderColor: theme.border,
       backgroundColor: theme.surface,
     },
     periodPillText: {
-      fontSize: 12,
+      ...TYPOGRAPHY.caption,
       fontWeight: '600',
       color: theme.textSecondary,
     },
@@ -447,10 +452,10 @@ function makeStyles(theme: Theme) {
     // Badge card
     badgeCard: {
       borderWidth: 1,
-      borderRadius: 14,
-      padding: 14,
+      borderRadius: RADIUS.lg,
+      padding: RADIUS.lg,
       backgroundColor: theme.surface,
-      marginBottom: 10,
+      marginBottom: RADIUS.md,
       alignItems: 'center',
     },
     badgeIconWrap: {
@@ -461,7 +466,7 @@ function makeStyles(theme: Theme) {
       justifyContent: 'center',
       marginBottom: 8,
     },
-    badgeName: { fontSize: 14, fontWeight: '600', textAlign: 'center', marginBottom: 4 },
+    badgeName: { ...TYPOGRAPHY.label, fontWeight: '600', textAlign: 'center', marginBottom: 4 },
     badgeEarnedDate: { fontSize: 11, color: theme.textMuted, textAlign: 'center' },
     badgeLockedText: { fontSize: 11, color: theme.textMuted, textAlign: 'center' },
 
@@ -474,11 +479,11 @@ function makeStyles(theme: Theme) {
       paddingHorizontal: 6,
       marginBottom: 4,
     },
-    lbRank: { fontSize: 14, fontWeight: '700', minWidth: 32, textAlign: 'center' },
+    lbRank: { ...TYPOGRAPHY.label, fontWeight: '700', minWidth: SPACING.xl, textAlign: 'center' },
     lbBody: { flex: 1, marginLeft: 4 },
-    lbName: { fontSize: 15, fontWeight: '600', color: theme.text },
-    lbMeta: { fontSize: 12, color: theme.textMuted, marginTop: 2 },
-    lbXp: { fontSize: 14, fontWeight: '700' },
+    lbName: { ...TYPOGRAPHY.body, fontWeight: '600', color: theme.text },
+    lbMeta: { ...TYPOGRAPHY.caption, color: theme.textMuted, marginTop: 2 },
+    lbXp: { ...TYPOGRAPHY.label, fontWeight: '700' },
 
     // Loading overlay for leaderboard period switch
     lbLoadingOverlay: {
@@ -489,6 +494,6 @@ function makeStyles(theme: Theme) {
 
     // Empty
     emptyWrap: { paddingTop: 40, alignItems: 'center' },
-    emptyText: { fontSize: 14, color: theme.textMuted },
+    emptyText: { ...TYPOGRAPHY.label, color: theme.textMuted },
   });
 }

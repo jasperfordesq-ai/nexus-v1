@@ -8,12 +8,12 @@ import {
   Alert,
   KeyboardAvoidingView,
   Platform,
-  SafeAreaView,
   ScrollView,
   StyleSheet,
   Text,
   View,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { router, useNavigation } from 'expo-router';
 import * as Haptics from 'expo-haptics';
 
@@ -22,6 +22,8 @@ import { useTranslation } from 'react-i18next';
 import { updatePassword } from '@/lib/api/profile';
 import { usePrimaryColor } from '@/lib/hooks/useTenant';
 import { useTheme, type Theme } from '@/lib/hooks/useTheme';
+import { TYPOGRAPHY } from '@/lib/styles/typography';
+import { SPACING } from '@/lib/styles/spacing';
 import Input from '@/components/ui/Input';
 import Button from '@/components/ui/Button';
 import OfflineBanner from '@/components/OfflineBanner';
@@ -161,15 +163,15 @@ function makeStyles(theme: Theme) {
   return StyleSheet.create({
     container: { flex: 1, backgroundColor: theme.bg },
     flex: { flex: 1 },
-    content: { padding: 24, paddingBottom: 48 },
+    content: { padding: SPACING.lg, paddingBottom: SPACING.xxl },
     hint: {
-      fontSize: 14,
+      ...TYPOGRAPHY.label,
       color: theme.textSecondary,
-      marginBottom: 24,
+      marginBottom: SPACING.lg,
       lineHeight: 20,
     },
-    form: { marginBottom: 24 },
-    saveButton: { marginTop: 8 },
-    fieldError: { color: theme.error, fontSize: 12, marginTop: 4, marginBottom: 4 },
+    form: { marginBottom: SPACING.lg },
+    saveButton: { marginTop: SPACING.sm },
+    fieldError: { color: theme.error, ...TYPOGRAPHY.caption, marginTop: SPACING.xs, marginBottom: SPACING.xs },
   });
 }

@@ -5,5 +5,6 @@
   "empty": "Starte eine Unterhaltung mit dem KI-Assistenten.",
   "error": "Nachricht konnte nicht gesendet werden.",
   "thinking": "Denkt nach…",
+  "timeout": "Die Antwort dauert zu lange. Bitte versuche es erneut.",
   "disclaimer": "KI-Antworten sind möglicherweise nicht immer korrekt."
 }

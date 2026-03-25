@@ -19,9 +19,9 @@ export function getConnectionStatus(userId: number): Promise<{ data: ConnectionS
   return api.get<{ data: ConnectionStatus }>(`${API_V2}/connections/status/${userId}`);
 }
 
-/** POST /api/v2/connections — send connection request */
+/** POST /api/v2/connections/request — send connection request */
 export function sendConnectionRequest(userId: number): Promise<{ data: { status: string; connection_id: number; message: string } }> {
-  return api.post<{ data: { status: string; connection_id: number; message: string } }>(`${API_V2}/connections`, { user_id: userId });
+  return api.post<{ data: { status: string; connection_id: number; message: string } }>(`${API_V2}/connections/request`, { user_id: userId });
 }
 
 /** POST /api/v2/connections/{id}/accept */

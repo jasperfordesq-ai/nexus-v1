@@ -9,7 +9,6 @@ import {
   Text,
   ScrollView,
   StyleSheet,
-  SafeAreaView,
   TouchableOpacity,
   Alert,
   Modal,
@@ -18,11 +17,14 @@ import {
   Platform,
   Share,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { useLocalSearchParams, router, useNavigation } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
 import { useTranslation } from 'react-i18next';
 
+import { TYPOGRAPHY } from '@/lib/styles/typography';
+import { SPACING, RADIUS } from '@/lib/styles/spacing';
 import { getJobDetail, applyToJob, saveJob, unsaveJob, getSavedProfile } from '@/lib/api/jobs';
 import type { JobVacancy } from '@/lib/api/jobs';
 import { useApi } from '@/lib/hooks/useApi';
@@ -31,6 +33,7 @@ import { useTheme, type Theme } from '@/lib/hooks/useTheme';
 import { withAlpha } from '@/lib/utils/color';
 import Avatar from '@/components/ui/Avatar';
 import LoadingSpinner from '@/components/ui/LoadingSpinner';
+import ModalErrorBoundary from '@/components/ModalErrorBoundary';
 
 const WEB_URL = 'https://app.project-nexus.ie';
 
@@ -81,12 +84,14 @@ export default function JobDetailScreen() {
     if (!applyModalVisible) return;
     getSavedProfile().then((profile) => {
       setSavedProfile(profile);
+    }).catch(() => {
+      // Silently ignore — saved profile is optional
     });
   }, [applyModalVisible]);
 
   if (safeId === 0) {
     return (
-      <SafeAreaView style={styles.center}>
+      <SafeAreaView style={styles.center} edges={['bottom']}>
         <Text style={styles.errorText}>{t('detail.invalidId', 'Invalid job ID.')}</Text>
         <TouchableOpacity onPress={() => router.back()} style={{ marginTop: 12 }}>
           <Text style={{ color: primary, fontSize: 15, fontWeight: '600' }}>
@@ -99,7 +104,7 @@ export default function JobDetailScreen() {
 
   if (isLoading) {
     return (
-      <SafeAreaView style={styles.center}>
+      <SafeAreaView style={styles.center} edges={['bottom']}>
         <LoadingSpinner />
       </SafeAreaView>
     );
@@ -107,7 +112,7 @@ export default function JobDetailScreen() {
 
   if (!job) {
     return (
-      <SafeAreaView style={styles.center}>
+      <SafeAreaView style={styles.center} edges={['bottom']}>
         <Text style={styles.errorText}>{t('detail.notFound', 'Job not found.')}</Text>
         <TouchableOpacity onPress={() => router.back()} style={{ marginTop: 12 }}>
           <Text style={{ color: primary, fontSize: 15, fontWeight: '600' }}>
@@ -224,7 +229,8 @@ export default function JobDetailScreen() {
   })();
 
   return (
-    <SafeAreaView style={styles.container}>
+    <ModalErrorBoundary>
+    <SafeAreaView style={styles.container} edges={['bottom']}>
       <ScrollView contentContainerStyle={styles.content}>
         {/* Title */}
         <View style={styles.titleRow}>
@@ -316,11 +322,11 @@ export default function JobDetailScreen() {
         </View>
 
         {/* Skills */}
-        {job.skills_required.length > 0 ? (
+        {(job.skills_required ?? []).length > 0 ? (
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>{t('detail.skills')}</Text>
             <View style={styles.skillsRow}>
-              {job.skills_required.map((skill) => (
+              {(job.skills_required ?? []).map((skill) => (
                 <View
                   key={skill}
                   style={[styles.skillPill, { backgroundColor: theme.surface, borderColor: theme.border }]}
@@ -497,6 +503,7 @@ export default function JobDetailScreen() {
         </KeyboardAvoidingView>
       </Modal>
     </SafeAreaView>
+    </ModalErrorBoundary>
   );
 }
 
@@ -518,7 +525,7 @@ function MetaRow({
   return (
     <View style={metaRowStyle}>
       <Ionicons name={icon} size={16} color={tint ?? theme.textSecondary} />
-      <Text style={{ fontSize: 14, color: tint ?? theme.text, flex: 1 }}>{text}</Text>
+      <Text style={{ ...TYPOGRAPHY.label, color: tint ?? theme.text, flex: 1 }}>{text}</Text>
     </View>
   );
 }
@@ -544,7 +551,7 @@ function makeStyles(theme: Theme) {
       gap: 10,
       marginBottom: 16,
     },
-    title: { flex: 1, fontSize: 22, fontWeight: '700', color: theme.text },
+    title: { flex: 1, ...TYPOGRAPHY.h2, color: theme.text },
     matchBadge: {
       borderRadius: 8,
       paddingHorizontal: 8,
@@ -552,21 +559,21 @@ function makeStyles(theme: Theme) {
       alignSelf: 'flex-start',
       borderWidth: 1,
     },
-    matchText: { fontSize: 12, fontWeight: '700' },
+    matchText: { ...TYPOGRAPHY.caption, fontWeight: '700' },
     section: { marginBottom: 20 },
     sectionTitle: {
-      fontSize: 12,
+      ...TYPOGRAPHY.caption,
       fontWeight: '700',
       color: theme.textSecondary,
       textTransform: 'uppercase',
       letterSpacing: 0.6,
-      marginBottom: 10,
+      marginBottom: RADIUS.md,
     },
     orgRow: { flexDirection: 'row', alignItems: 'center', gap: 12 },
-    orgName: { fontSize: 15, fontWeight: '600', color: theme.text },
+    orgName: { ...TYPOGRAPHY.body, fontWeight: '600', color: theme.text },
     statusBadge: {
-      borderRadius: 6,
-      paddingHorizontal: 8,
+      borderRadius: RADIUS.sm,
+      paddingHorizontal: SPACING.sm,
       paddingVertical: 3,
       alignSelf: 'flex-start',
       marginTop: 4,
@@ -574,22 +581,22 @@ function makeStyles(theme: Theme) {
     statusText: { fontSize: 11, fontWeight: '600' },
     metaCard: {
       backgroundColor: theme.surface,
-      borderRadius: 14,
-      padding: 14,
-      gap: 10,
+      borderRadius: RADIUS.lg,
+      padding: RADIUS.lg,
+      gap: RADIUS.md,
       borderWidth: 1,
       borderColor: theme.borderSubtle,
       marginBottom: 20,
     },
-    skillsRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
+    skillsRow: { flexDirection: 'row', flexWrap: 'wrap', gap: SPACING.sm },
     skillPill: {
       borderRadius: 8,
       paddingHorizontal: 10,
       paddingVertical: 5,
       borderWidth: 1,
     },
-    skillText: { fontSize: 13, color: theme.text },
-    description: { fontSize: 15, color: theme.text, lineHeight: 22 },
+    skillText: { ...TYPOGRAPHY.bodySmall, color: theme.text },
+    description: { ...TYPOGRAPHY.body, color: theme.text },
     actions: {
       flexDirection: 'row',
       gap: 12,
@@ -605,7 +612,7 @@ function makeStyles(theme: Theme) {
       paddingVertical: 14,
       borderWidth: 1.5,
     },
-    saveButtonText: { fontSize: 15, fontWeight: '600' },
+    saveButtonText: { ...TYPOGRAPHY.body, fontWeight: '600' },
     applyButton: {
       flex: 2,
       flexDirection: 'row',
@@ -616,14 +623,14 @@ function makeStyles(theme: Theme) {
       paddingVertical: 14,
     },
     applyButtonText: { fontSize: 16, fontWeight: '700', color: '#fff' }, // contrast on primary
-    errorText: { fontSize: 15, color: theme.textMuted },
+    errorText: { ...TYPOGRAPHY.body, color: theme.textMuted },
     // Modal
     modalHeader: {
       flexDirection: 'row',
       alignItems: 'center',
       justifyContent: 'space-between',
       paddingHorizontal: 20,
-      paddingVertical: 16,
+      paddingVertical: SPACING.md,
       borderBottomWidth: 1,
       borderBottomColor: theme.borderSubtle,
     },
@@ -643,7 +650,7 @@ function makeStyles(theme: Theme) {
       borderWidth: 1,
       borderRadius: 12,
       padding: 12,
-      fontSize: 15,
+      fontSize: TYPOGRAPHY.body.fontSize,
       minHeight: 140,
       marginTop: 8,
     },
@@ -654,16 +661,15 @@ function makeStyles(theme: Theme) {
       padding: 40,
     },
     successTitle: {
-      fontSize: 22,
-      fontWeight: '700',
+      ...TYPOGRAPHY.h2,
       color: theme.text,
       marginTop: 20,
     },
     successMessage: {
-      fontSize: 15,
+      ...TYPOGRAPHY.body,
       color: theme.textSecondary,
       textAlign: 'center',
-      marginTop: 8,
+      marginTop: SPACING.sm,
     },
   });
 }

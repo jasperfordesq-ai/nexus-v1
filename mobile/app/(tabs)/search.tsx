@@ -8,7 +8,6 @@ import {
   ActivityIndicator,
   FlatList,
   RefreshControl,
-  SafeAreaView,
   ScrollView,
   StyleSheet,
   Text,
@@ -16,8 +15,10 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
+import * as Haptics from 'expo-haptics';
 import { useTranslation } from 'react-i18next';
 
 import { search, type SearchResult, type SearchResultType, type SearchResponse } from '@/lib/api/search';
@@ -28,6 +29,8 @@ import { useTheme, type Theme } from '@/lib/hooks/useTheme';
 import { withAlpha } from '@/lib/utils/color';
 import { SkeletonBox } from '@/components/ui/Skeleton';
 import OfflineBanner from '@/components/OfflineBanner';
+import { TYPOGRAPHY } from '@/lib/styles/typography';
+import { SPACING, RADIUS } from '@/lib/styles/spacing';
 
 type FilterOption = SearchResultType | 'all';
 
@@ -130,7 +133,10 @@ export default function SearchScreen() {
     return (
       <TouchableOpacity
         style={styles.resultRow}
-        onPress={() => navigateToResult(item)}
+        onPress={() => {
+          void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+          navigateToResult(item);
+        }}
         activeOpacity={0.75}
         accessibilityRole="button"
         accessibilityLabel={item.title}
@@ -227,7 +233,10 @@ export default function SearchScreen() {
                   ? { backgroundColor: primary, borderColor: primary }
                   : { backgroundColor: theme.surface, borderColor: theme.border },
               ]}
-              onPress={() => setActiveFilter(f)}
+              onPress={() => {
+                void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                setActiveFilter(f);
+              }}
               activeOpacity={0.75}
               accessibilityRole="button"
               accessibilityState={{ selected: active }}
@@ -281,43 +290,43 @@ function makeStyles(theme: Theme) {
   return StyleSheet.create({
     container: { flex: 1, backgroundColor: theme.bg },
     header: {
-      paddingHorizontal: 16,
-      paddingTop: 16,
-      paddingBottom: 8,
+      paddingHorizontal: SPACING.md,
+      paddingTop: SPACING.md,
+      paddingBottom: SPACING.sm,
     },
-    title: { fontSize: 22, fontWeight: '700', color: theme.text },
+    title: { ...TYPOGRAPHY.h2, color: theme.text },
     searchContainer: {
       flexDirection: 'row',
       alignItems: 'center',
       backgroundColor: theme.surface,
-      marginHorizontal: 16,
-      marginBottom: 8,
-      borderRadius: 10,
+      marginHorizontal: SPACING.md,
+      marginBottom: SPACING.sm,
+      borderRadius: RADIUS.md,
       borderWidth: 1,
       borderColor: theme.border,
       paddingHorizontal: 12,
     },
-    searchIcon: { marginRight: 8 },
-    searchInput: { flex: 1, paddingVertical: 10, fontSize: 15, color: theme.text },
+    searchIcon: { marginRight: SPACING.sm },
+    searchInput: { flex: 1, paddingVertical: 10, ...TYPOGRAPHY.body, color: theme.text },
     filterRow: {
-      paddingHorizontal: 16,
+      paddingHorizontal: SPACING.md,
       paddingBottom: 10,
-      gap: 8,
+      gap: SPACING.sm,
       flexDirection: 'row',
     },
     filterPill: {
-      borderRadius: 20,
+      borderRadius: RADIUS.xl,
       borderWidth: 1,
       paddingHorizontal: 14,
       paddingVertical: 6,
     },
-    filterText: { fontSize: 13, fontWeight: '600' },
-    list: { paddingBottom: 24 },
+    filterText: { ...TYPOGRAPHY.buttonSmall },
+    list: { paddingBottom: SPACING.lg },
     listEmptyContainer: { flex: 1 },
     resultRow: {
       flexDirection: 'row',
       alignItems: 'center',
-      paddingHorizontal: 16,
+      paddingHorizontal: SPACING.md,
       paddingVertical: 12,
       borderBottomWidth: StyleSheet.hairlineWidth,
       borderBottomColor: theme.borderSubtle,
@@ -325,18 +334,18 @@ function makeStyles(theme: Theme) {
     iconWrap: {
       width: 40,
       height: 40,
-      borderRadius: 20,
+      borderRadius: RADIUS.xl,
       justifyContent: 'center',
       alignItems: 'center',
       marginRight: 12,
     },
-    resultText: { flex: 1, marginRight: 8 },
-    resultTitle: { fontSize: 15, fontWeight: '600', color: theme.text },
-    resultSubtitle: { fontSize: 13, color: theme.textSecondary, marginTop: 2 },
+    resultText: { flex: 1, marginRight: SPACING.sm },
+    resultTitle: { ...TYPOGRAPHY.button, color: theme.text },
+    resultSubtitle: { ...TYPOGRAPHY.bodySmall, color: theme.textSecondary, marginTop: SPACING.xxs },
     typePill: {
-      paddingHorizontal: 8,
+      paddingHorizontal: SPACING.sm,
       paddingVertical: 3,
-      borderRadius: 6,
+      borderRadius: RADIUS.sm,
       backgroundColor: theme.surface,
       borderWidth: 1,
       borderColor: theme.border,
@@ -346,11 +355,11 @@ function makeStyles(theme: Theme) {
       flex: 1,
       justifyContent: 'center',
       alignItems: 'center',
-      padding: 48,
+      padding: SPACING.xxl,
     },
-    emptyText: { fontSize: 15, color: theme.textMuted, textAlign: 'center' },
-    errorText: { fontSize: 15, color: theme.error, textAlign: 'center' },
-    footer: { paddingVertical: 16, alignItems: 'center' as const },
-    endOfListText: { fontSize: 13, color: theme.textMuted },
+    emptyText: { ...TYPOGRAPHY.body, color: theme.textMuted, textAlign: 'center' },
+    errorText: { ...TYPOGRAPHY.body, color: theme.error, textAlign: 'center' },
+    footer: { paddingVertical: SPACING.md, alignItems: 'center' as const },
+    endOfListText: { ...TYPOGRAPHY.bodySmall, color: theme.textMuted },
   });
 }

@@ -9,18 +9,20 @@ import {
   ScrollView,
   TouchableOpacity,
   StyleSheet,
-  SafeAreaView,
   RefreshControl,
   Share,
   Alert,
   ActivityIndicator,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { useLocalSearchParams, useNavigation, router } from 'expo-router';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Ionicons } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
 import * as Haptics from 'expo-haptics';
 
+import { TYPOGRAPHY } from '@/lib/styles/typography';
+import { SPACING, RADIUS } from '@/lib/styles/spacing';
 import { getMember } from '@/lib/api/members';
 import {
   getConnectionStatus,
@@ -35,6 +37,7 @@ import { usePrimaryColor } from '@/lib/hooks/useTenant';
 import { useTheme, type Theme } from '@/lib/hooks/useTheme';
 import Avatar from '@/components/ui/Avatar';
 import LoadingSpinner from '@/components/ui/LoadingSpinner';
+import ModalErrorBoundary from '@/components/ModalErrorBoundary';
 
 const WEB_URL = 'https://app.project-nexus.ie';
 
@@ -220,6 +223,7 @@ export default function MemberProfileScreen() {
   }
 
   return (
+    <ModalErrorBoundary>
     <SafeAreaView style={styles.container}>
       <ScrollView
         contentContainerStyle={styles.scroll}
@@ -269,7 +273,7 @@ export default function MemberProfileScreen() {
         <View style={styles.statsRow}>
           <View style={styles.statItem}>
             <Text style={[styles.statValue, { color: primary }]}>
-              {(member.total_hours_given ?? member.time_balance).toFixed(0)}
+              {(member.total_hours_given ?? member.time_balance ?? 0).toFixed(0)}
             </Text>
             <Text style={styles.statLabel}>{t('profile.hoursGiven')}</Text>
           </View>
@@ -359,7 +363,7 @@ export default function MemberProfileScreen() {
         {/* Skills */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>{t('profile.skills')}</Text>
-          {member.skills?.length > 0 ? (
+          {(member.skills?.length ?? 0) > 0 ? (
             <View style={styles.skillsWrap}>
               {member.skills.map((skill) => (
                 <View key={skill} style={[styles.skillChip, { borderColor: primary }]}>
@@ -373,9 +377,11 @@ export default function MemberProfileScreen() {
         </View>
 
         {/* Member since */}
-        <Text style={styles.joinedText}>
-          {t('profile.memberSince', { date: formatDate(member.joined_at) })}
-        </Text>
+        {member.joined_at ? (
+          <Text style={styles.joinedText}>
+            {t('profile.memberSince', { date: formatDate(member.joined_at) })}
+          </Text>
+        ) : null}
 
       </ScrollView>
 
@@ -419,67 +425,73 @@ export default function MemberProfileScreen() {
         </View>
       </View>
     </SafeAreaView>
+    </ModalErrorBoundary>
   );
 }
 
 function formatDate(iso: string): string {
-  return new Date(iso).toLocaleDateString(undefined, {
-    year: 'numeric',
-    month: 'long',
-  });
+  try {
+    const d = new Date(iso);
+    if (isNaN(d.getTime())) return iso;
+    return d.toLocaleDateString(undefined, {
+      year: 'numeric',
+      month: 'long',
+    });
+  } catch {
+    return iso;
+  }
 }
 
 function makeStyles(theme: Theme, primary: string) {
   return StyleSheet.create({
     container: { flex: 1, backgroundColor: theme.surface },
-    centered: { flex: 1, justifyContent: 'center', alignItems: 'center', padding: 32 },
-    errorText: { color: theme.error, fontSize: 14, textAlign: 'center' },
-    scroll: { paddingBottom: 24 },
+    centered: { flex: 1, justifyContent: 'center', alignItems: 'center', padding: SPACING.xl },
+    errorText: { ...TYPOGRAPHY.label, color: theme.error, textAlign: 'center' },
+    scroll: { paddingBottom: SPACING.lg },
     heroSection: {
       alignItems: 'center',
-      paddingTop: 24,
-      paddingHorizontal: 24,
-      paddingBottom: 16,
-      gap: 8,
+      paddingTop: SPACING.lg,
+      paddingHorizontal: SPACING.lg,
+      paddingBottom: SPACING.md,
+      gap: SPACING.sm,
     },
-    identityRow: { flexDirection: 'row', alignItems: 'center', gap: 8, flexWrap: 'wrap', justifyContent: 'center' },
-    name: { fontSize: 22, fontWeight: '700', color: theme.text, textAlign: 'center' },
+    identityRow: { flexDirection: 'row', alignItems: 'center', gap: SPACING.sm, flexWrap: 'wrap', justifyContent: 'center' },
+    name: { ...TYPOGRAPHY.h2, color: theme.text, textAlign: 'center' },
     verifiedBadge: {
       backgroundColor: theme.successBg,
       borderRadius: 12,
       paddingHorizontal: 10,
       paddingVertical: 3,
     },
-    verifiedText: { color: theme.success, fontSize: 12, fontWeight: '600' },
+    verifiedText: { ...TYPOGRAPHY.caption, color: theme.success, fontWeight: '600' },
     rating: { fontSize: 16, color: theme.warning, fontWeight: '600' },
     bio: {
-      fontSize: 14,
+      ...TYPOGRAPHY.label,
       color: theme.textSecondary,
       textAlign: 'center',
-      lineHeight: 20,
     },
-    location: { fontSize: 13, color: theme.textMuted },
+    location: { ...TYPOGRAPHY.bodySmall, color: theme.textMuted },
     statsRow: {
       flexDirection: 'row',
-      marginHorizontal: 24,
-      marginTop: 8,
-      marginBottom: 16,
+      marginHorizontal: SPACING.lg,
+      marginTop: SPACING.sm,
+      marginBottom: SPACING.md,
       borderWidth: 1,
       borderColor: theme.border,
       borderRadius: 12,
       overflow: 'hidden',
     },
-    statItem: { flex: 1, alignItems: 'center', paddingVertical: 16 },
+    statItem: { flex: 1, alignItems: 'center', paddingVertical: SPACING.md },
     statDivider: { width: 1, backgroundColor: theme.border },
     statValue: { fontSize: 24, fontWeight: '700' },
-    statLabel: { fontSize: 12, color: theme.textMuted, marginTop: 2 },
+    statLabel: { ...TYPOGRAPHY.caption, color: theme.textMuted, marginTop: 2 },
     /* Connection action buttons */
     connectionRow: {
       flexDirection: 'row',
       justifyContent: 'center',
       alignItems: 'center',
-      paddingHorizontal: 24,
-      marginBottom: 16,
+      paddingHorizontal: SPACING.lg,
+      marginBottom: SPACING.md,
     },
     connectButton: {
       flexDirection: 'row',
@@ -492,17 +504,17 @@ function makeStyles(theme: Theme, primary: string) {
       paddingVertical: 10,
       paddingHorizontal: 24,
     },
-    connectButtonText: { color: primary, fontSize: 15, fontWeight: '600' },
+    connectButtonText: { ...TYPOGRAPHY.body, color: primary, fontWeight: '600' },
     pendingBadge: {
       flexDirection: 'row',
       alignItems: 'center',
-      gap: 6,
+      gap: RADIUS.sm,
       backgroundColor: theme.borderSubtle,
       borderRadius: 12,
-      paddingVertical: 10,
+      paddingVertical: RADIUS.md,
       paddingHorizontal: 20,
     },
-    pendingText: { color: theme.textMuted, fontSize: 14, fontWeight: '500' },
+    pendingText: { ...TYPOGRAPHY.label, color: theme.textMuted },
     respondRow: {
       flexDirection: 'row',
       gap: 12,
@@ -515,7 +527,7 @@ function makeStyles(theme: Theme, primary: string) {
       justifyContent: 'center',
       alignItems: 'center',
     },
-    acceptButtonText: { color: '#fff', fontSize: 15, fontWeight: '600' },
+    acceptButtonText: { ...TYPOGRAPHY.body, color: '#fff', fontWeight: '600' },
     declineButton: {
       borderWidth: 1.5,
       borderColor: theme.border,
@@ -525,7 +537,7 @@ function makeStyles(theme: Theme, primary: string) {
       justifyContent: 'center',
       alignItems: 'center',
     },
-    declineButtonText: { color: theme.textSecondary, fontSize: 15, fontWeight: '600' },
+    declineButtonText: { ...TYPOGRAPHY.body, color: theme.textSecondary, fontWeight: '600' },
     connectedBadge: {
       flexDirection: 'row',
       alignItems: 'center',
@@ -535,26 +547,26 @@ function makeStyles(theme: Theme, primary: string) {
       paddingVertical: 10,
       paddingHorizontal: 20,
     },
-    connectedText: { color: theme.success, fontSize: 14, fontWeight: '600' },
-    section: { paddingHorizontal: 24, marginBottom: 16 },
-    sectionTitle: { fontSize: 15, fontWeight: '600', color: theme.text, marginBottom: 10 },
-    skillsWrap: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
+    connectedText: { ...TYPOGRAPHY.label, color: theme.success, fontWeight: '600' },
+    section: { paddingHorizontal: SPACING.lg, marginBottom: SPACING.md },
+    sectionTitle: { ...TYPOGRAPHY.body, fontWeight: '600', color: theme.text, marginBottom: 10 },
+    skillsWrap: { flexDirection: 'row', flexWrap: 'wrap', gap: SPACING.sm },
     skillChip: {
       borderWidth: 1,
       borderRadius: 8,
       paddingHorizontal: 12,
       paddingVertical: 4,
     },
-    skillText: { fontSize: 13, fontWeight: '500' },
-    emptyStateText: { fontSize: 13, color: theme.textMuted, fontStyle: 'italic' },
+    skillText: { ...TYPOGRAPHY.bodySmall, fontWeight: '500' },
+    emptyStateText: { ...TYPOGRAPHY.bodySmall, color: theme.textMuted, fontStyle: 'italic' },
     joinedText: {
-      fontSize: 12,
+      ...TYPOGRAPHY.caption,
       color: theme.textMuted,
       textAlign: 'center',
-      paddingHorizontal: 24,
+      paddingHorizontal: SPACING.lg,
     },
     footer: {
-      padding: 16,
+      padding: SPACING.md,
       borderTopWidth: 1,
       borderTopColor: theme.border,
       backgroundColor: theme.surface,
@@ -575,7 +587,7 @@ function makeStyles(theme: Theme, primary: string) {
       borderRadius: 12,
       paddingHorizontal: 16,
     },
-    footerConnectText: { color: primary, fontSize: 15, fontWeight: '600' },
+    footerConnectText: { ...TYPOGRAPHY.body, color: primary, fontWeight: '600' },
     messageButton: {
       height: 48,
       borderRadius: 12,

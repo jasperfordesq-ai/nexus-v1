@@ -37,29 +37,29 @@ export interface VolunteeringResponse {
 }
 
 /**
- * GET /api/v2/volunteering — list volunteering opportunities for the current tenant.
+ * GET /api/v2/volunteering/opportunities — list volunteering opportunities for the current tenant.
  * Supports cursor-based pagination and optional full-text search.
  */
 export function getOpportunities(
   cursor: string | null,
   search?: string,
 ): Promise<VolunteeringResponse> {
-  return api.get<VolunteeringResponse>(`${API_V2}/volunteering`, {
+  return api.get<VolunteeringResponse>(`${API_V2}/volunteering/opportunities`, {
     ...(cursor ? { cursor } : {}),
     ...(search ? { search } : {}),
   });
 }
 
 /**
- * GET /api/v2/volunteering/{id} — get a single volunteering opportunity by ID.
+ * GET /api/v2/volunteering/opportunities/{id} — get a single volunteering opportunity by ID.
  */
 export function getOpportunity(id: number): Promise<{ data: VolunteerOpportunity }> {
-  return api.get<{ data: VolunteerOpportunity }>(`${API_V2}/volunteering/${id}`);
+  return api.get<{ data: VolunteerOpportunity }>(`${API_V2}/volunteering/opportunities/${id}`);
 }
 
 /**
- * POST /api/v2/volunteering/{id}/interest — express interest in an opportunity.
+ * POST /api/v2/volunteering/opportunities/{id}/apply — apply for an opportunity.
  */
 export function expressInterest(id: number): Promise<{ message: string }> {
-  return api.post<{ message: string }>(`${API_V2}/volunteering/${id}/interest`, {});
+  return api.post<{ message: string }>(`${API_V2}/volunteering/opportunities/${id}/apply`, {});
 }

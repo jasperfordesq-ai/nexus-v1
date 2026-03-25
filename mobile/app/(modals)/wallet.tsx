@@ -11,16 +11,22 @@ import {
   FlatList,
   RefreshControl,
   StyleSheet,
-  SafeAreaView,
   ActivityIndicator,
+  TouchableOpacity,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import * as Haptics from 'expo-haptics';
 import { useTranslation } from 'react-i18next';
 
+import { TYPOGRAPHY } from '@/lib/styles/typography';
+import { SPACING, RADIUS } from '@/lib/styles/spacing';
 import { useApi } from '@/lib/hooks/useApi';
 import { usePrimaryColor } from '@/lib/hooks/useTenant';
 import { useTheme, type Theme } from '@/lib/hooks/useTheme';
 import { getWalletBalance, getWalletTransactions, type TransactionItem } from '@/lib/api/wallet';
 import Avatar from '@/components/ui/Avatar';
+import EmptyState from '@/components/ui/EmptyState';
+import ModalErrorBoundary from '@/components/ModalErrorBoundary';
 
 // Helpers
 
@@ -54,18 +60,26 @@ function TransactionRow({
   const isCredit = item.type === 'credit';
   const sign = isCredit ? '+' : '\u2212';
   const amountColor = isCredit ? theme.success : theme.error;
+  const otherName = item.other_user?.name ?? t('system');
+  const otherAvatar = item.other_user?.avatar_url ?? null;
 
   return (
-    <View style={styles.row}>
+    <TouchableOpacity
+      style={styles.row}
+      activeOpacity={0.8}
+      onPress={() => void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light)}
+      accessibilityRole="button"
+      accessibilityLabel={`${otherName}, ${sign}${(item.amount ?? 0).toFixed(1)} ${t('hrs')}`}
+    >
       <Avatar
-        uri={item.other_user.avatar_url}
-        name={item.other_user.name}
+        uri={otherAvatar}
+        name={otherName}
         size={44}
       />
 
       <View style={styles.rowBody}>
         <Text style={styles.rowName} numberOfLines={1}>
-          {item.other_user.name}
+          {otherName}
         </Text>
         {item.description ? (
           <Text style={styles.rowDesc} numberOfLines={2}>
@@ -77,7 +91,7 @@ function TransactionRow({
 
       <View style={styles.rowRight}>
         <Text style={[styles.rowAmount, { color: amountColor }]}>
-          {sign}{item.amount.toFixed(1)} {t('hrs')}
+          {sign}{(item.amount ?? 0).toFixed(1)} {t('hrs')}
         </Text>
         {item.status !== 'completed' && (
           <View style={[styles.statusBadge, { borderColor: primary }]}>
@@ -87,7 +101,7 @@ function TransactionRow({
           </View>
         )}
       </View>
-    </View>
+    </TouchableOpacity>
   );
 }
 
@@ -143,7 +157,7 @@ export default function WalletModal() {
       ) : (
         <>
           <Text style={[styles.balanceValue, { color: primary }]}>
-            {balance !== null ? balance.toFixed(1) : '\u2014'}
+            {balance !== null ? (Number(balance) || 0).toFixed(1) : '\u2014'}
           </Text>
           <Text style={styles.balanceLabel}>{t('timeCredits')}</Text>
         </>
@@ -156,12 +170,16 @@ export default function WalletModal() {
       {txError ? (
         <Text style={styles.errorText}>{txError}</Text>
       ) : (
-        <Text style={styles.emptyText}>{t('noTransactions')}</Text>
+        <EmptyState
+          icon="wallet-outline"
+          title={t('noTransactions')}
+        />
       )}
     </View>
   );
 
   return (
+    <ModalErrorBoundary>
     <SafeAreaView style={styles.container}>
       <FlatList<TransactionItem>
         data={transactions}
@@ -183,50 +201,50 @@ export default function WalletModal() {
         }
       />
     </SafeAreaView>
+    </ModalErrorBoundary>
   );
 }
 
 function makeStyles(theme: Theme) {
   return StyleSheet.create({
     container: { flex: 1, backgroundColor: theme.bg },
-    listContent: { paddingHorizontal: 16, paddingBottom: 32 },
+    listContent: { paddingHorizontal: SPACING.md, paddingBottom: SPACING.xl },
     balanceCard: {
       borderWidth: 2,
-      borderRadius: 16,
+      borderRadius: SPACING.md,
       paddingVertical: 28,
-      paddingHorizontal: 24,
+      paddingHorizontal: SPACING.lg,
       alignItems: 'center',
       backgroundColor: theme.surface,
       marginTop: 20,
-      marginBottom: 24,
+      marginBottom: SPACING.lg,
     },
     balanceValue: { fontSize: 48, fontWeight: '700', lineHeight: 56 },
-    balanceLabel: { fontSize: 14, color: theme.textSecondary, marginTop: 4 },
+    balanceLabel: { ...TYPOGRAPHY.label, color: theme.textSecondary, marginTop: 4 },
     row: {
       flexDirection: 'row',
       alignItems: 'flex-start',
-      paddingVertical: 14,
+      paddingVertical: RADIUS.lg,
       paddingHorizontal: 4,
       backgroundColor: theme.surface,
       borderRadius: 12,
     },
-    rowBody: { flex: 1, marginLeft: 12, marginRight: 8 },
-    rowName: { fontSize: 15, fontWeight: '600', color: theme.text },
-    rowDesc: { fontSize: 13, color: theme.textSecondary, marginTop: 2, lineHeight: 18 },
-    rowDate: { fontSize: 12, color: theme.textMuted, marginTop: 4 },
+    rowBody: { flex: 1, marginLeft: 12, marginRight: SPACING.sm },
+    rowName: { ...TYPOGRAPHY.body, fontWeight: '600', color: theme.text },
+    rowDesc: { ...TYPOGRAPHY.bodySmall, color: theme.textSecondary, marginTop: 2 },
+    rowDate: { ...TYPOGRAPHY.caption, color: theme.textMuted, marginTop: 4 },
     rowRight: { alignItems: 'flex-end', justifyContent: 'center', minWidth: 72 },
     rowAmount: { fontSize: 16, fontWeight: '700' },
     statusBadge: {
       borderWidth: 1,
       borderRadius: 4,
-      paddingHorizontal: 6,
+      paddingHorizontal: RADIUS.sm,
       paddingVertical: 2,
       marginTop: 4,
     },
-    statusText: { fontSize: 10, fontWeight: '600', textTransform: 'capitalize' },
-    separator: { height: 8 },
-    emptyWrap: { paddingTop: 48, alignItems: 'center' },
-    emptyText: { fontSize: 14, color: theme.textMuted },
-    errorText: { fontSize: 14, color: theme.error, textAlign: 'center' },
+    statusText: { ...TYPOGRAPHY.badge, fontWeight: '600', textTransform: 'capitalize' },
+    separator: { height: SPACING.sm },
+    emptyWrap: { paddingTop: SPACING.xxl, alignItems: 'center' },
+    errorText: { ...TYPOGRAPHY.label, color: theme.error, textAlign: 'center' },
   });
 }

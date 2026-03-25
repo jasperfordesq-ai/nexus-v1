@@ -7,7 +7,6 @@ import { useEffect, useMemo, useCallback } from 'react';
 import {
   Image,
   RefreshControl,
-  SafeAreaView,
   ScrollView,
   Share,
   StyleSheet,
@@ -15,10 +14,13 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { useLocalSearchParams, router, useNavigation } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
 
+import { TYPOGRAPHY } from '@/lib/styles/typography';
+import { SPACING, RADIUS } from '@/lib/styles/spacing';
 import { getBlogPost, type BlogPost } from '@/lib/api/blog';
 import { useApi } from '@/lib/hooks/useApi';
 import { usePrimaryColor } from '@/lib/hooks/useTenant';
@@ -26,6 +28,7 @@ import { useTheme, type Theme } from '@/lib/hooks/useTheme';
 import { withAlpha } from '@/lib/utils/color';
 import Avatar from '@/components/ui/Avatar';
 import LoadingSpinner from '@/components/ui/LoadingSpinner';
+import ModalErrorBoundary from '@/components/ModalErrorBoundary';
 
 const WEB_URL = 'https://app.project-nexus.ie';
 
@@ -49,20 +52,19 @@ export default function BlogPostScreen() {
     navigation.setOptions({ title: t('detail.title') });
   }, [navigation, t]);
 
-  const postId = Number(id);
-  const safeId = isNaN(postId) || postId <= 0 ? 0 : postId;
+  const slug = id?.trim() || '';
 
   const { data, isLoading, refresh } = useApi(
-    () => getBlogPost(safeId),
-    [safeId],
-    { enabled: safeId > 0 },
+    () => getBlogPost(slug),
+    [slug],
+    { enabled: slug.length > 0 },
   );
 
   const post: BlogPost | null = data?.data ?? null;
 
-  if (isNaN(postId) || postId <= 0) {
+  if (!slug) {
     return (
-      <SafeAreaView style={styles.center}>
+      <SafeAreaView style={styles.center} edges={['bottom']}>
         <Text style={styles.errorText}>{t('detail.invalidId')}</Text>
         <TouchableOpacity onPress={() => router.back()} style={{ marginTop: 12 }}>
           <Text style={{ color: primary, fontSize: 15, fontWeight: '600' }}>{t('detail.goBack')}</Text>
@@ -73,7 +75,7 @@ export default function BlogPostScreen() {
 
   if (isLoading) {
     return (
-      <SafeAreaView style={styles.center}>
+      <SafeAreaView style={styles.center} edges={['bottom']}>
         <LoadingSpinner />
       </SafeAreaView>
     );
@@ -81,7 +83,7 @@ export default function BlogPostScreen() {
 
   if (!post) {
     return (
-      <SafeAreaView style={styles.center}>
+      <SafeAreaView style={styles.center} edges={['bottom']}>
         <Text style={styles.errorText}>{t('detail.notFound')}</Text>
         <TouchableOpacity onPress={() => router.back()} style={{ marginTop: 12 }}>
           <Text style={{ color: primary, fontSize: 15, fontWeight: '600' }}>{t('detail.goBack')}</Text>
@@ -90,14 +92,15 @@ export default function BlogPostScreen() {
     );
   }
 
-  const publishedDate = new Date(post.published_at).toLocaleDateString('default', {
+  const publishedDate = post.published_at ? new Date(post.published_at).toLocaleDateString('default', {
     year: 'numeric',
     month: 'long',
     day: 'numeric',
-  });
+  }) : '';
 
   return (
-    <SafeAreaView style={styles.container}>
+    <ModalErrorBoundary>
+    <SafeAreaView style={styles.container} edges={['bottom']}>
       <ScrollView
         contentContainerStyle={styles.content}
         showsVerticalScrollIndicator={false}
@@ -120,9 +123,9 @@ export default function BlogPostScreen() {
 
         {/* Author row */}
         <View style={styles.authorRow}>
-          <Avatar uri={post.author.avatar} name={post.author.name} size={36} />
+          <Avatar uri={post.author?.avatar ?? null} name={post.author?.name ?? '?'} size={36} />
           <View style={styles.authorMeta}>
-            <Text style={styles.authorName}>{t('by', { name: post.author.name })}</Text>
+            <Text style={styles.authorName}>{t('by', { name: post.author?.name ?? '?' })}</Text>
             <Text style={styles.dateText}>{publishedDate}</Text>
           </View>
           {post.reading_time_minutes ? (
@@ -152,9 +155,9 @@ export default function BlogPostScreen() {
         ) : null}
 
         {/* Tags */}
-        {post.tags.length > 0 ? (
+        {(post.tags ?? []).length > 0 ? (
           <View style={styles.tagsRow}>
-            {post.tags.map((tag) => (
+            {(post.tags ?? []).map((tag) => (
               <View key={tag} style={styles.tagPill}>
                 <Text style={styles.tagText}>{tag}</Text>
               </View>
@@ -178,6 +181,7 @@ export default function BlogPostScreen() {
         ) : null}
       </ScrollView>
     </SafeAreaView>
+    </ModalErrorBoundary>
   );
 }
 
@@ -185,31 +189,30 @@ function makeStyles(theme: Theme) {
   return StyleSheet.create({
     container: { flex: 1, backgroundColor: theme.bg },
     center: { flex: 1, alignItems: 'center', justifyContent: 'center' },
-    content: { paddingBottom: 48 },
+    content: { paddingBottom: SPACING.xxl },
     coverImage: {
       width: '100%',
       height: 200,
       backgroundColor: theme.surface,
     },
     title: {
-      fontSize: 22,
-      fontWeight: '700',
+      ...TYPOGRAPHY.h2,
       color: theme.text,
       paddingHorizontal: 20,
       paddingTop: 20,
-      marginBottom: 16,
+      marginBottom: SPACING.md,
       lineHeight: 30,
     },
     authorRow: {
       flexDirection: 'row',
       alignItems: 'center',
       paddingHorizontal: 20,
-      marginBottom: 16,
-      gap: 10,
+      marginBottom: SPACING.md,
+      gap: RADIUS.md,
     },
     authorMeta: { flex: 1 },
-    authorName: { fontSize: 14, fontWeight: '600', color: theme.text },
-    dateText: { fontSize: 12, color: theme.textMuted, marginTop: 2 },
+    authorName: { ...TYPOGRAPHY.label, fontWeight: '600', color: theme.text },
+    dateText: { ...TYPOGRAPHY.caption, color: theme.textMuted, marginTop: 2 },
     readingTimeBadge: {
       flexDirection: 'row',
       alignItems: 'center',
@@ -221,33 +224,33 @@ function makeStyles(theme: Theme) {
       paddingHorizontal: 8,
       paddingVertical: 4,
     },
-    readingTimeText: { fontSize: 12, color: theme.textSecondary },
+    readingTimeText: { ...TYPOGRAPHY.caption, color: theme.textSecondary },
     shareButton: { padding: 4 },
     categoryPill: {
       alignSelf: 'flex-start',
-      borderRadius: 8,
+      borderRadius: SPACING.sm,
       paddingHorizontal: 10,
       paddingVertical: 4,
       marginHorizontal: 20,
       marginBottom: 12,
     },
-    categoryText: { fontSize: 12, fontWeight: '600' },
+    categoryText: { ...TYPOGRAPHY.caption, fontWeight: '600' },
     tagsRow: {
       flexDirection: 'row',
       flexWrap: 'wrap',
       paddingHorizontal: 20,
-      gap: 8,
+      gap: SPACING.sm,
       marginBottom: 20,
     },
     tagPill: {
-      borderRadius: 6,
+      borderRadius: RADIUS.sm,
       backgroundColor: theme.surface,
       borderWidth: 1,
       borderColor: theme.border,
-      paddingHorizontal: 8,
+      paddingHorizontal: SPACING.sm,
       paddingVertical: 4,
     },
-    tagText: { fontSize: 12, color: theme.textSecondary },
+    tagText: { ...TYPOGRAPHY.caption, color: theme.textSecondary },
     content_body: {
       fontSize: 16,
       color: theme.text,
@@ -268,7 +271,7 @@ function makeStyles(theme: Theme) {
       borderRadius: 8,
       padding: 12,
     },
-    previewNoteText: { fontSize: 13, fontWeight: '500', flex: 1 },
-    errorText: { fontSize: 15, color: theme.textMuted },
+    previewNoteText: { ...TYPOGRAPHY.bodySmall, fontWeight: '500', flex: 1 },
+    errorText: { ...TYPOGRAPHY.body, color: theme.textMuted },
   });
 }
