@@ -27,7 +27,7 @@ export function VideoPlayer({ media, className = '' }: VideoPlayerProps) {
   const { t } = useTranslation('feed');
   const videoRef = useRef<HTMLVideoElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
-  const [isPlaying, setIsPlaying] = useState(false);
+  const [, setIsPlaying] = useState(false);
   const [isMuted, setIsMuted] = useState(true);
   const [showPlayOverlay, setShowPlayOverlay] = useState(true);
 
