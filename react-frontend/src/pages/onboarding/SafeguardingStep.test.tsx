@@ -213,4 +213,126 @@ describe('SafeguardingStep', () => {
       expect((cb as HTMLInputElement).checked).toBe(false);
     });
   });
+
+  // ── Checkbox state change ───────────────────────────────────────────────
+
+  it('toggles checkbox selection when clicking an option', async () => {
+    const { userEvent } = await import('@/test/test-utils');
+    const user = userEvent.setup();
+
+    render(<SafeguardingStep {...defaultProps} />);
+
+    await waitFor(() => {
+      expect(screen.getByText('I consider myself a vulnerable adult')).toBeInTheDocument();
+    });
+
+    // Find the first checkbox
+    const checkboxes = document.querySelectorAll('input[type="checkbox"]');
+    expect(checkboxes.length).toBeGreaterThanOrEqual(1);
+    const firstCheckbox = checkboxes[0] as HTMLInputElement;
+
+    // Initially unchecked
+    expect(firstCheckbox.checked).toBe(false);
+
+    // Click the option container (the div with role="button")
+    const optionButton = screen.getByText('I consider myself a vulnerable adult').closest('[role="button"]');
+    expect(optionButton).toBeTruthy();
+    await user.click(optionButton!);
+
+    // Should now be checked
+    await waitFor(() => {
+      expect(firstCheckbox.checked).toBe(true);
+    });
+
+    // Click again to deselect
+    await user.click(optionButton!);
+    await waitFor(() => {
+      expect(firstCheckbox.checked).toBe(false);
+    });
+  });
+
+  // ── Required option validation ──────────────────────────────────────────
+
+  it('shows error toast when required options are not selected', async () => {
+    const REQUIRED_OPTIONS = [
+      {
+        id: 10,
+        option_key: 'required_consent',
+        option_type: 'checkbox' as const,
+        label: 'I acknowledge the community guidelines',
+        description: 'You must accept this to proceed.',
+        help_url: null,
+        is_required: true,
+      },
+      {
+        id: 11,
+        option_key: 'optional_support',
+        option_type: 'checkbox' as const,
+        label: 'I would like extra support',
+        description: null,
+        help_url: null,
+        is_required: false,
+      },
+    ];
+
+    mockGet.mockResolvedValue({ success: true, data: REQUIRED_OPTIONS });
+
+    const { userEvent } = await import('@/test/test-utils');
+    const user = userEvent.setup();
+
+    render(<SafeguardingStep {...defaultProps} isRequired={true} onSkip={undefined} />);
+
+    await waitFor(() => {
+      expect(screen.getByText('I acknowledge the community guidelines')).toBeInTheDocument();
+    });
+
+    // Click Continue WITHOUT selecting the required option
+    await user.click(screen.getByText('Continue'));
+
+    // Should show error toast about required options
+    await waitFor(() => {
+      expect(stableToastValue.error).toHaveBeenCalledWith(
+        'Required options',
+        expect.stringContaining('I acknowledge the community guidelines')
+      );
+    });
+
+    // onNext should NOT have been called
+    expect(defaultProps.onNext).not.toHaveBeenCalled();
+  });
+
+  // ── Saves selections to API ─────────────────────────────────────────────
+
+  it('calls POST /v2/onboarding/safeguarding with selected options', async () => {
+    const { userEvent } = await import('@/test/test-utils');
+    const user = userEvent.setup();
+
+    render(<SafeguardingStep {...defaultProps} />);
+
+    await waitFor(() => {
+      expect(screen.getByText('I consider myself a vulnerable adult')).toBeInTheDocument();
+    });
+
+    // Select the first option
+    const optionButton = screen.getByText('I consider myself a vulnerable adult').closest('[role="button"]');
+    await user.click(optionButton!);
+
+    // Button label should change to "Save & Continue" when something is selected
+    await waitFor(() => {
+      expect(screen.getByText('Save & Continue')).toBeInTheDocument();
+    });
+
+    // Click Save & Continue
+    await user.click(screen.getByText('Save & Continue'));
+
+    // Should call POST /v2/onboarding/safeguarding with the selected option
+    await waitFor(() => {
+      expect(mockPost).toHaveBeenCalledWith('/v2/onboarding/safeguarding', {
+        preferences: [{ option_id: 1, value: '1' }],
+      });
+    });
+
+    // onNext should have been called after successful save
+    expect(defaultProps.onNext).toHaveBeenCalled();
+  });
 });

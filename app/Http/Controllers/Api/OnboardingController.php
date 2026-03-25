@@ -94,6 +94,21 @@ class OnboardingController extends BaseApiController
         $offers = is_array($offers) ? array_filter(array_map('intval', $offers), fn ($id) => $id > 0) : [];
         $needs = is_array($needs) ? array_filter(array_map('intval', $needs), fn ($id) => $id > 0) : [];
 
+        // Validate category IDs belong to current tenant
+        $tenantId = TenantContext::getId();
+        if (!empty($interests) || !empty($offers) || !empty($needs)) {
+            $allCatIds = array_unique(array_merge($interests, $offers, $needs));
+            $validCatIds = DB::table('categories')
+                ->where('tenant_id', $tenantId)
+                ->whereIn('id', $allCatIds)
+                ->pluck('id')
+                ->all();
+            $validSet = array_flip($validCatIds);
+            $interests = array_values(array_filter($interests, fn ($id) => isset($validSet[$id])));
+            $offers = array_values(array_filter($offers, fn ($id) => isset($validSet[$id])));
+            $needs = array_values(array_filter($needs, fn ($id) => isset($validSet[$id])));
+        }
+
         // All-or-nothing: wrap in transaction
         DB::beginTransaction();
         try {

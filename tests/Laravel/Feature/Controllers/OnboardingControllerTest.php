@@ -8,6 +8,7 @@ namespace Tests\Laravel\Feature\Controllers;
 
 use Tests\Laravel\TestCase;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Support\Facades\DB;
 use Laravel\Sanctum\Sanctum;
 use App\Models\User;
 
@@ -91,5 +92,110 @@ class OnboardingControllerTest extends TestCase
         ]);
 
         $this->assertContains($response->getStatusCode(), [200, 201]);
+    }
+
+    public function test_complete_rejects_unauthenticated(): void
+    {
+        // No Sanctum::actingAs — request is unauthenticated
+        $response = $this->apiPost('/v2/onboarding/complete', [
+            'interests' => [1, 2],
+        ]);
+
+        $response->assertStatus(401);
+    }
+
+    public function test_complete_filters_cross_tenant_category_ids(): void
+    {
+        $user = User::factory()->forTenant($this->testTenantId)->create([
+            'status' => 'active',
+            'is_approved' => true,
+            'avatar_url' => 'https://example.com/photo.jpg',
+            'bio' => 'A valid bio that is long enough to pass validation.',
+        ]);
+        Sanctum::actingAs($user, ['*']);
+
+        // Insert a category belonging to a different tenant (999)
+        $otherCatId = DB::table('categories')->insertGetId([
+            'tenant_id' => 999,
+            'name' => 'Cross-Tenant Category',
+            'slug' => 'cross-tenant-cat-' . uniqid(),
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        // Insert a category belonging to the test tenant
+        $validCatId = DB::table('categories')->insertGetId([
+            'tenant_id' => $this->testTenantId,
+            'name' => 'Valid Category',
+            'slug' => 'valid-cat-' . uniqid(),
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        $response = $this->apiPost('/v2/onboarding/complete', [
+            'interests' => [$otherCatId, $validCatId],
+        ]);
+
+        $response->assertStatus(200);
+
+        // Verify only the valid tenant category was saved as an interest
+        $savedInterests = DB::table('user_interests')
+            ->where('user_id', $user->id)
+            ->pluck('category_id')
+            ->all();
+
+        $this->assertContains($validCatId, $savedInterests);
+        $this->assertNotContains($otherCatId, $savedInterests);
+    }
+
+    public function test_complete_validates_avatar_required(): void
+    {
+        User::factory()->forTenant($this->testTenantId)->create([
+            'status' => 'active',
+            'is_approved' => true,
+            'avatar_url' => null,
+            'bio' => 'A valid bio that is long enough to pass validation.',
+        ]);
+
+        $user = User::where('avatar_url', null)
+            ->where('tenant_id', $this->testTenantId)
+            ->latest('id')
+            ->first();
+
+        Sanctum::actingAs($user, ['*']);
+
+        $response = $this->apiPost('/v2/onboarding/complete', [
+            'interests' => [1],
+        ]);
+
+        $response->assertStatus(422);
+        $response->assertJson([
+            'error' => [
+                'code' => 'VALIDATION_REQUIRED_FIELD',
+            ],
+        ]);
+    }
+
+    public function test_complete_validates_bio_required(): void
+    {
+        $user = User::factory()->forTenant($this->testTenantId)->create([
+            'status' => 'active',
+            'is_approved' => true,
+            'avatar_url' => 'https://example.com/photo.jpg',
+            'bio' => null,
+        ]);
+
+        Sanctum::actingAs($user, ['*']);
+
+        $response = $this->apiPost('/v2/onboarding/complete', [
+            'interests' => [1],
+        ]);
+
+        $response->assertStatus(422);
+        $response->assertJson([
+            'error' => [
+                'code' => 'VALIDATION_REQUIRED_FIELD',
+            ],
+        ]);
     }
 }

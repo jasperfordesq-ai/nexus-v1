@@ -227,7 +227,7 @@ class OnboardingService
 
         // Get category names for titles
         $catIds = array_unique(array_column($allItems, 'category_id'));
-        $categories = Category::whereIn('id', $catIds)->pluck('name', 'id')->all();
+        $categories = Category::where('tenant_id', $tenantId)->whereIn('id', $catIds)->pluck('name', 'id')->all();
 
         $createdIds = [];
 
@@ -293,7 +293,7 @@ class OnboardingService
      */
     public static function getRecommendations(int $tenantId): array
     {
-        $categories = Category::orderBy('name')
+        $categories = Category::where('tenant_id', $tenantId)->orderBy('name')
             ->select(['id', 'name', 'slug', 'color'])
             ->get()
             ->map(fn ($c) => $c->toArray())

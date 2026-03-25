@@ -64,7 +64,7 @@ class SafeguardingPreferenceService
             'option_type' => $data['option_type'] ?? 'checkbox',
             'label' => $data['label'],
             'description' => $data['description'] ?? null,
-            'help_url' => $data['help_url'] ?? null,
+            'help_url' => self::validateUrl($data['help_url'] ?? null),
             'sort_order' => $data['sort_order'] ?? 0,
             'is_active' => $data['is_active'] ?? true,
             'is_required' => $data['is_required'] ?? false,
@@ -93,6 +93,9 @@ class SafeguardingPreferenceService
 
         $fillable = ['label', 'description', 'help_url', 'sort_order', 'is_active', 'is_required', 'option_type', 'select_options', 'triggers'];
         $updates = array_intersect_key($data, array_flip($fillable));
+        if (array_key_exists('help_url', $updates)) {
+            $updates['help_url'] = self::validateUrl($updates['help_url']);
+        }
 
         $option->update($updates);
 
@@ -357,6 +360,21 @@ class SafeguardingPreferenceService
     // =========================================================================
     // Audit Logging
     // =========================================================================
+
+    /**
+     * Validate a URL is HTTP(S) — reject javascript: and other schemes.
+     */
+    private static function validateUrl(?string $url): ?string
+    {
+        if ($url === null || trim($url) === '') {
+            return null;
+        }
+        $url = trim($url);
+        if (preg_match('#^https?://#i', $url)) {
+            return $url;
+        }
+        return null;
+    }
 
     /**
      * Log safeguarding-related activity to the activity_log table.

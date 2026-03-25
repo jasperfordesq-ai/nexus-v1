@@ -8,13 +8,15 @@
  */
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, waitFor } from '@/test/test-utils';
+import { render, screen, waitFor, fireEvent } from '@/test/test-utils';
 
 // Mock API module
 vi.mock('@/lib/api', () => ({
   api: {
     get: vi.fn().mockResolvedValue({ success: true, data: [], meta: {} }),
     post: vi.fn().mockResolvedValue({ success: true, data: { listings_created: 0 } }),
+    put: vi.fn().mockResolvedValue({ success: true, data: {} }),
+    upload: vi.fn().mockResolvedValue({ success: true, data: { avatar_url: '/uploads/avatar.jpg' } }),
   },
   tokenManager: { getTenantId: vi.fn() },
 }));
@@ -58,6 +60,44 @@ vi.mock('@/contexts/ToastContext', () => ({
 }));
 
 vi.mock('@/hooks', () => ({ usePageTitle: vi.fn() }));
+vi.mock('@/hooks/useOnboardingConfig', () => ({
+  useOnboardingConfig: vi.fn(() => ({
+    config: {
+      enabled: true,
+      mandatory: true,
+      step_welcome_enabled: true,
+      step_profile_enabled: true,
+      step_profile_required: true,
+      step_interests_enabled: true,
+      step_interests_required: false,
+      step_skills_enabled: true,
+      step_skills_required: false,
+      step_safeguarding_enabled: false,
+      step_safeguarding_required: false,
+      step_confirm_enabled: true,
+      avatar_required: true,
+      bio_required: true,
+      bio_min_length: 10,
+      listing_creation_mode: 'disabled',
+      listing_max_auto: 3,
+      require_completion_for_visibility: false,
+      require_avatar_for_visibility: false,
+      require_bio_for_visibility: false,
+      welcome_text: null,
+      help_text: null,
+      safeguarding_intro_text: null,
+      country_preset: 'custom',
+    },
+    steps: [
+      { slug: 'welcome', label: 'Welcome', required: false },
+      { slug: 'profile', label: 'Your Profile', required: true },
+      { slug: 'interests', label: 'Interests', required: false },
+      { slug: 'skills', label: 'Skills', required: false },
+      { slug: 'confirm', label: 'Confirm', required: true },
+    ],
+    isLoading: false,
+  })),
+}));
 vi.mock('@/lib/logger', () => ({ logError: vi.fn() }));
 
 vi.mock('@/components/ui', () => ({
@@ -85,6 +125,7 @@ vi.mock('@/components/ui', () => ({
 
 vi.mock('framer-motion', () => {  const motionProps = new Set(['variants', 'initial', 'animate', 'layout', 'transition', 'exit', 'whileHover', 'whileTap', 'whileInView', 'viewport', 'custom']);  const filterMotion = (props: Record<string, unknown>) => {    const filtered: Record<string, unknown> = {};    for (const [k, v] of Object.entries(props)) {      if (!motionProps.has(k)) filtered[k] = v;    }    return filtered;  };  return {    motion: {      div: ({ children, ...props }: Record<string, unknown>) => <div {...filterMotion(props)}>{children}</div>,    },    AnimatePresence: ({ children }: { children: React.ReactNode }) => children,  };});
 
+import { api } from '@/lib/api';
 import { OnboardingPage } from './OnboardingPage';
 
 describe('OnboardingPage', () => {
@@ -190,5 +231,174 @@ describe('OnboardingPage', () => {
     // Instead, let's just verify the step 2 content renders correctly.
     expect(screen.getByText('Your Profile')).toBeInTheDocument();
     expect(screen.getByText(/Add a photo and tell the community about yourself/)).toBeInTheDocument();
+  });
+
+  // ── Avatar upload validation ────────────────────────────────────────────
+
+  it('rejects non-image files in avatar upload', async () => {
+    const { userEvent } = await import('@/test/test-utils');
+    const user = userEvent.setup();
+
+    render(<OnboardingPage />);
+
+    // Navigate step 1 -> 2 (Profile)
+    await user.click(screen.getByText("Let's Get Started"));
+    await waitFor(() => {
+      expect(screen.getByRole('button', { name: /Step 2: Profile \(current\)/ })).toBeInTheDocument();
+    });
+
+    // Find the hidden file input and trigger onChange with a non-image file
+    const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement;
+    expect(fileInput).toBeTruthy();
+
+    const pdfFile = new File(['fake-content'], 'document.pdf', { type: 'application/pdf' });
+    // Use fireEvent.change since userEvent.upload may not work on hidden inputs
+    fireEvent.change(fileInput, { target: { files: [pdfFile] } });
+
+    // Should show error toast — processAvatarFile checks file.type.startsWith('image/')
+    await waitFor(() => {
+      expect(stableToastValue.error).toHaveBeenCalled();
+    });
+    // Upload API should NOT have been called
+    expect(api.upload).not.toHaveBeenCalled();
+  });
+
+  it('rejects files larger than 5MB in avatar upload', async () => {
+    const { userEvent } = await import('@/test/test-utils');
+    const user = userEvent.setup();
+
+    render(<OnboardingPage />);
+
+    // Navigate step 1 -> 2 (Profile)
+    await user.click(screen.getByText("Let's Get Started"));
+    await waitFor(() => {
+      expect(screen.getByRole('button', { name: /Step 2: Profile \(current\)/ })).toBeInTheDocument();
+    });
+
+    const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement;
+    expect(fileInput).toBeTruthy();
+
+    // Create a file > 5MB (5 * 1024 * 1024 + 1 bytes)
+    const largeContent = new Uint8Array(5 * 1024 * 1024 + 1);
+    const largeFile = new File([largeContent], 'huge-photo.jpg', { type: 'image/jpeg' });
+    fireEvent.change(fileInput, { target: { files: [largeFile] } });
+
+    // Should show error toast for file too large
+    await waitFor(() => {
+      expect(stableToastValue.error).toHaveBeenCalled();
+    });
+    // Upload API should NOT have been called
+    expect(api.upload).not.toHaveBeenCalled();
+  });
+
+  // ── Bio validation ──────────────────────────────────────────────────────
+
+  it('keeps Next button disabled when bio is shorter than MIN_BIO_LENGTH', async () => {
+    const { useAuth } = await import('@/contexts');
+    // Give the user an avatar so the avatar check passes, but bio is short
+    vi.mocked(useAuth).mockReturnValue({
+      user: { id: 1, first_name: 'Test', name: 'Test User', onboarding_completed: false, avatar_url: '/uploads/avatar.jpg', bio: '' },
+      isAuthenticated: true,
+      refreshUser: vi.fn().mockResolvedValue(undefined),
+    } as unknown as ReturnType<typeof useAuth>);
+
+    const { userEvent } = await import('@/test/test-utils');
+    const user = userEvent.setup();
+
+    render(<OnboardingPage />);
+
+    // Navigate step 1 -> 2 (Profile)
+    await user.click(screen.getByText("Let's Get Started"));
+    await waitFor(() => {
+      expect(screen.getByRole('button', { name: /Step 2: Profile \(current\)/ })).toBeInTheDocument();
+    });
+
+    // The user has avatar but empty bio — Next button should be disabled
+    // because profileStepComplete requires hasAvatar && hasBio (>= MIN_BIO_LENGTH chars)
+    const nextButton = screen.getByText('Next').closest('button');
+    expect(nextButton).toBeTruthy();
+    expect(nextButton).toBeDisabled();
+  });
+
+  // ── API error handling ──────────────────────────────────────────────────
+
+  it('shows error toast when /v2/onboarding/complete fails', async () => {
+    const { useAuth } = await import('@/contexts');
+    // User has avatar + bio so they can reach the confirm step
+    vi.mocked(useAuth).mockReturnValue({
+      user: { id: 1, first_name: 'Test', name: 'Test User', onboarding_completed: false, avatar_url: '/uploads/avatar.jpg', bio: 'A bio that is long enough to pass validation checks.' },
+      isAuthenticated: true,
+      refreshUser: vi.fn().mockResolvedValue(undefined),
+    } as unknown as ReturnType<typeof useAuth>);
+
+    // Make the /v2/onboarding/complete call fail
+    vi.mocked(api.post).mockResolvedValue({ success: false, error: 'Server error' } as never);
+
+    const { userEvent } = await import('@/test/test-utils');
+    const user = userEvent.setup();
+
+    render(<OnboardingPage />);
+
+    // The user has avatar+bio, so the component auto-skips to step 3 (interests).
+    // Navigate forward through interests -> skills -> confirm
+    await waitFor(() => {
+      // Should have auto-skipped past profile to interests (step 3)
+      expect(screen.getByRole('button', { name: /Step 3.*\(current\)/ })).toBeInTheDocument();
+    });
+
+    // Click through interests step (optional, just click Next/Skip)
+    const skipOrNext = screen.queryByText('Skip') || screen.queryByText('Next');
+    if (skipOrNext) {
+      await user.click(skipOrNext);
+    }
+
+    // Now on skills step — skip again
+    await waitFor(() => {
+      expect(screen.getByRole('button', { name: /Step 4.*\(current\)/ })).toBeInTheDocument();
+    });
+    const skipOrNext2 = screen.queryByText('Skip') || screen.queryByText('Next');
+    if (skipOrNext2) {
+      await user.click(skipOrNext2);
+    }
+
+    // Now on confirm step — click "Complete Setup" or equivalent
+    await waitFor(() => {
+      expect(screen.getByRole('button', { name: /Step 5.*\(current\)/ })).toBeInTheDocument();
+    });
+    const completeBtn = screen.queryByText(/Complete Setup|Finish|Complete/);
+    if (completeBtn) {
+      await user.click(completeBtn);
+    }
+
+    // Should show error toast from the failed API call
+    await waitFor(() => {
+      expect(stableToastValue.error).toHaveBeenCalled();
+    });
+  });
+
+  // ── Profile step blocks advancement ─────────────────────────────────────
+
+  it('disables Next button on profile step when avatar and bio are missing', async () => {
+    // Default mock user has NO avatar_url and NO bio — should be blocked at step 2
+    const { userEvent } = await import('@/test/test-utils');
+    const user = userEvent.setup();
+
+    render(<OnboardingPage />);
+
+    // Navigate step 1 -> 2 (Profile)
+    await user.click(screen.getByText("Let's Get Started"));
+    await waitFor(() => {
+      expect(screen.getByRole('button', { name: /Step 2: Profile \(current\)/ })).toBeInTheDocument();
+    });
+
+    // The Next button should be disabled because profileStepComplete is false
+    // (no avatar_url and no bio on the default mock user)
+    const nextButton = screen.getByText('Next').closest('button');
+    expect(nextButton).toBeTruthy();
+    expect(nextButton).toBeDisabled();
+
+    // Clicking a disabled button should NOT advance to step 3
+    // (HeroUI Button with isDisabled prevents onPress from firing)
+    expect(screen.getByRole('button', { name: /Step 2: Profile \(current\)/ })).toBeInTheDocument();
   });
 });

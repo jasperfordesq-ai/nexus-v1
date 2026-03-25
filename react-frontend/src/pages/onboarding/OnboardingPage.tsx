@@ -368,22 +368,20 @@ export function OnboardingPage() {
     [categoryMap]
   );
 
-  // ── Completion handler ───────────────────────────────────────────────────
+  // ── Shared onboarding submission logic ──────────────────────────────────
 
-  const handleComplete = useCallback(async () => {
+  const submitOnboarding = useCallback(async (interests: number[], offers: number[], needs: number[]) => {
     try {
       setIsSubmitting(true);
 
       const response = await api.post('/v2/onboarding/complete', {
-        interests: selectedInterests,
-        offers: skillOffers,
-        needs: skillNeeds,
+        interests,
+        offers,
+        needs,
       });
 
       if (!response.success) {
-        // Surface the backend error clearly
         const message = response.error || t('toast_something_went_wrong');
-        // If it's a profile-related issue, guide back to profile step
         if (message.toLowerCase().includes('photo') || message.toLowerCase().includes('bio')) {
           toast.error(t('toast_profile_incomplete'), message);
           goToStep(profileStepIdx);
@@ -393,13 +391,9 @@ export function OnboardingPage() {
         return;
       }
 
-      // Show completion celebration
       setIsComplete(true);
-
-      // Refresh user state so ProtectedRoute sees onboarding_completed = true
       await refreshUser();
 
-      // Brief delay for the celebration animation, then navigate
       setTimeout(() => {
         toast.success(t('toast_welcome_aboard'), t('toast_profile_all_set'));
         navigate(tenantPath('/dashboard'));
@@ -410,40 +404,19 @@ export function OnboardingPage() {
     } finally {
       setIsSubmitting(false);
     }
-  }, [skillOffers, skillNeeds, toast, navigate, tenantPath, refreshUser, goToStep, selectedInterests, t]);
+  }, [toast, navigate, tenantPath, refreshUser, goToStep, profileStepIdx, t]);
+
+  // ── Completion handler ───────────────────────────────────────────────────
+
+  const handleComplete = useCallback(async () => {
+    await submitOnboarding(selectedInterests, skillOffers, skillNeeds);
+  }, [submitOnboarding, selectedInterests, skillOffers, skillNeeds]);
 
   // ── Skip handler (skips interests/skills — photo+bio already done) ──────
 
   const handleSkip = useCallback(async () => {
-    try {
-      setIsSubmitting(true);
-      const response = await api.post('/v2/onboarding/complete', { interests: [], offers: [], needs: [] });
-
-      if (!response.success) {
-        const message = response.error || t('toast_something_went_wrong');
-        if (message.toLowerCase().includes('photo') || message.toLowerCase().includes('bio')) {
-          toast.error(t('toast_profile_incomplete'), message);
-          goToStep(profileStepIdx);
-        } else {
-          toast.error(t('toast_setup_failed'), message);
-        }
-        return;
-      }
-
-      setIsComplete(true);
-      await refreshUser();
-
-      setTimeout(() => {
-        toast.success(t('toast_welcome_aboard'), t('toast_profile_all_set'));
-        navigate(tenantPath('/dashboard'));
-      }, 1800);
-    } catch (error) {
-      logError('Failed to skip onboarding', error);
-      toast.error(t('toast_setup_failed'), t('toast_something_went_wrong'));
-    } finally {
-      setIsSubmitting(false);
-    }
-  }, [navigate, tenantPath, refreshUser, toast, goToStep, t]);
+    await submitOnboarding([], [], []);
+  }, [submitOnboarding]);
 
   // ── Animation variants ─────────────────────────────────────────────────
 

@@ -1383,12 +1383,15 @@ Route::middleware(['auth:sanctum', 'admin'])->group(function () {
     Route::get('/v2/admin/impact-report', [\App\Http\Controllers\Api\AdminImpactReportController::class, 'index']);
     Route::put('/v2/admin/impact-report/config', [\App\Http\Controllers\Api\AdminImpactReportController::class, 'updateConfig']);
 });
-Route::get('/v2/onboarding/status', [\App\Http\Controllers\Api\OnboardingController::class, 'status']);
-Route::get('/v2/onboarding/config', [\App\Http\Controllers\Api\OnboardingController::class, 'getConfig']);
-Route::get('/v2/onboarding/categories', [\App\Http\Controllers\Api\OnboardingController::class, 'categories']);
-Route::get('/v2/onboarding/safeguarding-options', [\App\Http\Controllers\Api\OnboardingController::class, 'safeguardingOptions']);
-Route::post('/v2/onboarding/safeguarding', [\App\Http\Controllers\Api\OnboardingController::class, 'saveSafeguarding']);
-Route::post('/v2/onboarding/complete', [\App\Http\Controllers\Api\OnboardingController::class, 'complete']);
+// ── Onboarding — Sanctum auth required ───────────────────────────────────────
+Route::middleware('auth:sanctum')->group(function () {
+    Route::get('/v2/onboarding/status', [\App\Http\Controllers\Api\OnboardingController::class, 'status']);
+    Route::get('/v2/onboarding/config', [\App\Http\Controllers\Api\OnboardingController::class, 'getConfig']);
+    Route::get('/v2/onboarding/categories', [\App\Http\Controllers\Api\OnboardingController::class, 'categories']);
+    Route::get('/v2/onboarding/safeguarding-options', [\App\Http\Controllers\Api\OnboardingController::class, 'safeguardingOptions']);
+    Route::post('/v2/onboarding/safeguarding', [\App\Http\Controllers\Api\OnboardingController::class, 'saveSafeguarding'])->middleware('throttle:5,1');
+    Route::post('/v2/onboarding/complete', [\App\Http\Controllers\Api\OnboardingController::class, 'complete'])->middleware('throttle:5,1');
+});
 Route::get('/v2/group-exchanges', [\App\Http\Controllers\Api\GroupExchangeController::class, 'index']);
 Route::post('/v2/group-exchanges', [\App\Http\Controllers\Api\GroupExchangeController::class, 'store']);
 Route::get('/v2/group-exchanges/{id}', [\App\Http\Controllers\Api\GroupExchangeController::class, 'show']);
