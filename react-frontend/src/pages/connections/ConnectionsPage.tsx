@@ -369,7 +369,11 @@ export default function ConnectionsPage() {
   const { tenantPath } = useTenant();
   const { success: toastSuccess, error: toastError, info: toastInfo } = useToast();
 
-  const abortRef = useRef<AbortController | null>(null);
+  const abortRefs = useRef<Record<string, AbortController | null>>({
+    accepted: null,
+    pending_received: null,
+    pending_sent: null,
+  });
   const toastErrorRef = useRef(toastError);
   toastErrorRef.current = toastError;
   const tRef = useRef(t);
@@ -415,9 +419,9 @@ export default function ConnectionsPage() {
   };
 
   const fetchConnections = useCallback(async (status: TabKey, cursor?: string | null) => {
-    abortRef.current?.abort();
+    abortRefs.current[status]?.abort();
     const controller = new AbortController();
-    abortRef.current = controller;
+    abortRefs.current[status] = controller;
 
     const isInitial = !cursor;
     if (isInitial) {
@@ -463,7 +467,11 @@ export default function ConnectionsPage() {
     void fetchConnectionsRef.current('accepted');
     void fetchConnectionsRef.current('pending_received');
     void fetchConnectionsRef.current('pending_sent');
-    return () => { abortRef.current?.abort(); };
+    return () => {
+      abortRefs.current.accepted?.abort();
+      abortRefs.current.pending_received?.abort();
+      abortRefs.current.pending_sent?.abort();
+    };
   }, []);
 
   const markActing = (id: number, acting: boolean) => {

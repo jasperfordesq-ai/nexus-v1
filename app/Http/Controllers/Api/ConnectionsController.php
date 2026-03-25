@@ -52,7 +52,7 @@ class ConnectionsController extends BaseApiController
             $filters['cursor'] = $this->query('cursor');
         }
 
-        $result = $this->connectionService->getAll($userId, $filters);
+        $result = $this->connectionService->getConnections($userId, $filters);
 
         return $this->respondWithCollection(
             $result['items'],

@@ -35,8 +35,8 @@ class ConnectionService
 
         $query = Connection::query()
             ->with([
-                'requester:id,first_name,last_name,avatar_url,organization_name,profile_type,last_active_at',
-                'receiver:id,first_name,last_name,avatar_url,organization_name,profile_type,last_active_at',
+                'requester:id,name,first_name,last_name,avatar_url,organization_name,profile_type,last_active_at,location,bio',
+                'receiver:id,name,first_name,last_name,avatar_url,organization_name,profile_type,last_active_at,location,bio',
             ])
             ->where('status', $status);
 
@@ -318,8 +318,8 @@ class ConnectionService
 
         $query = Connection::query()
             ->with([
-                'requester:id,first_name,last_name,avatar_url,organization_name,profile_type,last_active_at',
-                'receiver:id,first_name,last_name,avatar_url,organization_name,profile_type,last_active_at',
+                'requester:id,name,first_name,last_name,avatar_url,organization_name,profile_type,last_active_at,location,bio',
+                'receiver:id,name,first_name,last_name,avatar_url,organization_name,profile_type,last_active_at,location,bio',
             ]);
 
         if ($status === 'pending_sent') {
