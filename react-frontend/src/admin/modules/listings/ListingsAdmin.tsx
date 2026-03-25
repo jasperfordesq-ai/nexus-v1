@@ -22,7 +22,7 @@ import {
   Spinner,
   Tooltip,
 } from '@heroui/react';
-import { CheckCircle, Trash2, Star, StarOff, Search, Plus } from 'lucide-react';
+import { CheckCircle, XCircle, Trash2, Star, StarOff, Search, Plus } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { usePageTitle } from '@/hooks';
 import { useToast } from '@/contexts';
@@ -315,7 +315,7 @@ export function ListingsAdmin() {
   const [status, setStatus] = useState('all');
   const [search, setSearch] = useState('');
   const [confirmAction, setConfirmAction] = useState<{
-    type: 'approve' | 'delete';
+    type: 'approve' | 'reject' | 'delete';
     item: AdminListing;
   } | null>(null);
   const [actionLoading, setActionLoading] = useState(false);
@@ -355,12 +355,17 @@ export function ListingsAdmin() {
     setActionLoading(true);
     try {
       const { type, item } = confirmAction;
-      const res = type === 'approve'
-        ? await adminListings.approve(item.id)
-        : await adminListings.delete(item.id);
+      let res;
+      if (type === 'approve') {
+        res = await adminListings.approve(item.id);
+      } else if (type === 'reject') {
+        res = await adminListings.reject(item.id);
+      } else {
+        res = await adminListings.delete(item.id);
+      }
 
       if (res?.success) {
-        toast.success(`Content ${type}d successfully`);
+        toast.success(`Content ${type}${type === 'delete' ? 'd' : 'ed'} successfully`);
         loadItems();
       } else {
         toast.error(res?.error || `Failed to ${type} content`);
@@ -439,16 +444,28 @@ export function ListingsAdmin() {
       render: (item) => (
         <div className="flex gap-1">
           {item.status === 'pending' && (
-            <Button
-              isIconOnly
-              size="sm"
-              variant="flat"
-              color="success"
-              onPress={() => setConfirmAction({ type: 'approve', item })}
-              aria-label={t('listings.label_approve')}
-            >
-              <CheckCircle size={14} />
-            </Button>
+            <>
+              <Button
+                isIconOnly
+                size="sm"
+                variant="flat"
+                color="success"
+                onPress={() => setConfirmAction({ type: 'approve', item })}
+                aria-label={t('listings.label_approve')}
+              >
+                <CheckCircle size={14} />
+              </Button>
+              <Button
+                isIconOnly
+                size="sm"
+                variant="flat"
+                color="danger"
+                onPress={() => setConfirmAction({ type: 'reject', item })}
+                aria-label="Reject"
+              >
+                <XCircle size={14} />
+              </Button>
+            </>
           )}
           <Tooltip content={item.is_featured ? 'Unfeature' : 'Feature'}>
             <Button
@@ -542,13 +559,15 @@ export function ListingsAdmin() {
               isOpen={!!confirmAction}
               onClose={() => setConfirmAction(null)}
               onConfirm={handleAction}
-              title={confirmAction.type === 'approve' ? 'Approve Content' : 'Delete Content'}
+              title={confirmAction.type === 'approve' ? 'Approve Content' : confirmAction.type === 'reject' ? 'Reject Content' : 'Delete Content'}
               message={
                 confirmAction.type === 'approve'
                   ? `Approve "${confirmAction.item.title}"? It will become visible to all users.`
-                  : `Delete "${confirmAction.item.title}"? This cannot be undone.`
+                  : confirmAction.type === 'reject'
+                    ? `Reject "${confirmAction.item.title}"? The author will be notified.`
+                    : `Delete "${confirmAction.item.title}"? This cannot be undone.`
               }
-              confirmLabel={confirmAction.type === 'approve' ? 'Approve' : 'Delete'}
+              confirmLabel={confirmAction.type === 'approve' ? 'Approve' : confirmAction.type === 'reject' ? 'Reject' : 'Delete'}
               confirmColor={confirmAction.type === 'approve' ? 'primary' : 'danger'}
               isLoading={actionLoading}
             />

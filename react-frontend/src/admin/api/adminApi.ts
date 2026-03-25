@@ -283,6 +283,9 @@ export const adminListings = {
   approve: (id: number) =>
     api.post(`/v2/admin/listings/${id}/approve`),
 
+  reject: (id: number, reason?: string) =>
+    api.post(`/v2/admin/listings/${id}/reject`, reason ? { reason } : {}),
+
   feature: (id: number) =>
     api.post(`/v2/admin/listings/${id}/feature`),
 
