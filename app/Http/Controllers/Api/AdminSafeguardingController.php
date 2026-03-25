@@ -164,7 +164,7 @@ class AdminSafeguardingController extends BaseApiController
         $tenantId = $this->getTenantId();
 
         $validated = $request->validate([
-            'action' => 'required|string|max:50',
+            'action' => 'required|in:pending,approved,rejected,resolved',
             'notes' => 'nullable|string|max:2000',
         ]);
 
@@ -224,6 +224,21 @@ class AdminSafeguardingController extends BaseApiController
             'type' => 'required|string|max:100',
             'notes' => 'nullable|string|max:2000',
         ]);
+
+        // Validate both users belong to current tenant
+        $userExists = \App\Models\User::where('id', $validated['user_id'])
+            ->where('tenant_id', $tenantId)
+            ->exists();
+        $assigneeExists = \App\Models\User::where('id', $validated['assignee_id'])
+            ->where('tenant_id', $tenantId)
+            ->exists();
+
+        if (!$userExists) {
+            return $this->respondWithError('INVALID_USER', 'User not found in this tenant', 'user_id', 404);
+        }
+        if (!$assigneeExists) {
+            return $this->respondWithError('INVALID_USER', 'Assignee not found in this tenant', 'assignee_id', 404);
+        }
 
         try {
             $id = DB::table('safeguarding_assignments')->insertGetId([

@@ -111,6 +111,9 @@ export function OnboardingPage() {
   );
   const [slideDirection, setSlideDirection] = useState(1);
 
+  // Focus management for step transitions (accessibility)
+  const stepContentRef = useRef<HTMLDivElement>(null);
+
   // Step 2: Profile photo + bio
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [isUploadingAvatar, setIsUploadingAvatar] = useState(false);
@@ -136,6 +139,12 @@ export function OnboardingPage() {
   // Track which steps have been visited (for stepper)
   const [visitedSteps, setVisitedSteps] = useState<Set<number>>(new Set([1]));
 
+  // Guard against state updates after unmount
+  const mountedRef = useRef(true);
+  useEffect(() => {
+    return () => { mountedRef.current = false; };
+  }, []);
+
   // ── Redirect if fully completed (onboarding done + has photo + has bio) ───
   // Skip redirect when isComplete is true so the celebration animation plays
   // fully before the setTimeout navigates to dashboard.
@@ -156,6 +165,15 @@ export function OnboardingPage() {
     // Only run on mount and when user.bio changes
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user?.bio]);
+
+  // ── Move focus to step content on step change (screen reader accessibility) ──
+
+  useEffect(() => {
+    // Move focus to step content for screen reader users
+    if (stepContentRef.current) {
+      stepContentRef.current.focus();
+    }
+  }, [currentStep]);
 
   // ── If user already has photo+bio but onboarding_completed is false,
   //    skip ahead to step 3 so they don't re-do profile setup ────────────
@@ -243,9 +261,11 @@ export function OnboardingPage() {
       formData.append('avatar', file);
 
       const response = await api.upload<{ avatar_url: string }>('/v2/users/me/avatar', formData);
+      if (!mountedRef.current) return;
 
       if (response.success && response.data) {
         await refreshUser();
+        if (!mountedRef.current) return;
         toast.success(t('toast_photo_uploaded'), t('toast_photo_uploaded_desc'));
       } else {
         toast.error(t('toast_upload_failed'), response.error || t('toast_upload_failed_desc'));
@@ -302,9 +322,11 @@ export function OnboardingPage() {
     try {
       setIsSavingProfile(true);
       const response = await api.put('/v2/users/me', { bio: bio.trim() });
+      if (!mountedRef.current) return;
 
       if (response.success) {
         await refreshUser();
+        if (!mountedRef.current) return;
         goNextAnimated();
       } else {
         toast.error(t('toast_save_failed'), t('toast_save_failed_desc'));
@@ -380,6 +402,8 @@ export function OnboardingPage() {
         needs,
       });
 
+      if (!mountedRef.current) return;
+
       if (!response.success) {
         const message = response.error || t('toast_something_went_wrong');
         if (message.toLowerCase().includes('photo') || message.toLowerCase().includes('bio')) {
@@ -393,6 +417,7 @@ export function OnboardingPage() {
 
       setIsComplete(true);
       await refreshUser();
+      if (!mountedRef.current) return;
 
       setTimeout(() => {
         toast.success(t('toast_welcome_aboard'), t('toast_profile_all_set'));
@@ -554,6 +579,7 @@ export function OnboardingPage() {
       </motion.div>
 
       {/* Step Content */}
+      <div ref={stepContentRef} tabIndex={-1} className="outline-none" aria-live="polite" aria-label={`Step ${currentStep} of ${TOTAL_STEPS}`}>
       <AnimatePresence mode="wait" custom={slideDirection}>
         <motion.div
           key={currentStep}
@@ -1171,6 +1197,7 @@ export function OnboardingPage() {
           )}
         </motion.div>
       </AnimatePresence>
+      </div>
     </div>
   );
 }
