@@ -444,6 +444,284 @@ class ExploreControllerTest extends TestCase
     }
 
     // ------------------------------------------------------------------
+    //  FOR YOU — GET /api/v2/explore/for-you
+    // ------------------------------------------------------------------
+
+    public function test_for_you_returns_200_for_authenticated_user(): void
+    {
+        $this->authenticatedUser();
+
+        $response = $this->apiGet('/v2/explore/for-you');
+
+        $response->assertStatus(200);
+        $response->assertJsonStructure(['data']);
+    }
+
+    public function test_for_you_returns_paginated_results(): void
+    {
+        $this->authenticatedUser();
+
+        $response = $this->apiGet('/v2/explore/for-you');
+
+        $response->assertStatus(200);
+        $response->assertJsonStructure([
+            'data',
+            'meta' => ['current_page', 'per_page', 'total', 'total_pages', 'has_more'],
+        ]);
+    }
+
+    public function test_for_you_supports_page_parameter(): void
+    {
+        $this->authenticatedUser();
+
+        $response = $this->apiGet('/v2/explore/for-you?page=2&per_page=5');
+
+        $response->assertStatus(200);
+        $meta = $response->json('meta');
+        $this->assertEquals(2, $meta['current_page']);
+        $this->assertEquals(5, $meta['per_page']);
+    }
+
+    public function test_for_you_works_for_unauthenticated_user(): void
+    {
+        // forYou uses getOptionalUserId — should still return data without auth
+        $response = $this->apiGet('/v2/explore/for-you');
+
+        $response->assertStatus(200);
+        $response->assertJsonStructure(['data']);
+    }
+
+    public function test_for_you_defaults_to_page_1_per_page_20(): void
+    {
+        $this->authenticatedUser();
+
+        $response = $this->apiGet('/v2/explore/for-you');
+
+        $response->assertStatus(200);
+        $meta = $response->json('meta');
+        $this->assertEquals(1, $meta['current_page']);
+        $this->assertEquals(20, $meta['per_page']);
+    }
+
+    public function test_for_you_clamps_per_page_to_max_50(): void
+    {
+        $this->authenticatedUser();
+
+        $response = $this->apiGet('/v2/explore/for-you?per_page=200');
+
+        $response->assertStatus(200);
+        $meta = $response->json('meta');
+        $this->assertEquals(50, $meta['per_page']);
+    }
+
+    public function test_for_you_page_beyond_results_returns_empty(): void
+    {
+        $this->authenticatedUser();
+
+        $response = $this->apiGet('/v2/explore/for-you?page=9999');
+
+        $response->assertStatus(200);
+        $items = $response->json('data');
+        $this->assertIsArray($items);
+        $this->assertCount(0, $items);
+    }
+
+    // ------------------------------------------------------------------
+    //  TRACK — POST /api/v2/explore/track
+    // ------------------------------------------------------------------
+
+    public function test_track_requires_authentication(): void
+    {
+        $response = $this->apiPost('/v2/explore/track', [
+            'item_type' => 'listing',
+            'item_id' => 1,
+            'action' => 'click',
+        ]);
+
+        $response->assertStatus(401);
+    }
+
+    public function test_track_returns_success_on_valid_input(): void
+    {
+        $this->authenticatedUser();
+
+        $response = $this->apiPost('/v2/explore/track', [
+            'item_type' => 'listing',
+            'item_id' => 1,
+            'action' => 'click',
+        ]);
+
+        $response->assertStatus(200);
+        $response->assertJsonPath('data.tracked', true);
+    }
+
+    public function test_track_validates_required_item_type_and_item_id(): void
+    {
+        $this->authenticatedUser();
+
+        // Missing both item_type and item_id
+        $response = $this->apiPost('/v2/explore/track', []);
+
+        $response->assertStatus(422);
+    }
+
+    public function test_track_rejects_missing_item_id(): void
+    {
+        $this->authenticatedUser();
+
+        $response = $this->apiPost('/v2/explore/track', [
+            'item_type' => 'listing',
+        ]);
+
+        $response->assertStatus(422);
+    }
+
+    public function test_track_rejects_missing_item_type(): void
+    {
+        $this->authenticatedUser();
+
+        $response = $this->apiPost('/v2/explore/track', [
+            'item_id' => 1,
+        ]);
+
+        $response->assertStatus(422);
+    }
+
+    public function test_track_accepts_all_valid_actions(): void
+    {
+        $this->authenticatedUser();
+
+        $validActions = ['impression', 'click', 'save', 'dwell'];
+
+        foreach ($validActions as $action) {
+            $response = $this->apiPost('/v2/explore/track', [
+                'item_type' => 'listing',
+                'item_id' => 1,
+                'action' => $action,
+            ]);
+
+            $response->assertStatus(200);
+            $response->assertJsonPath('data.tracked', true);
+        }
+    }
+
+    public function test_track_defaults_action_to_view(): void
+    {
+        $this->authenticatedUser();
+
+        // No action provided — should default to 'view'
+        $response = $this->apiPost('/v2/explore/track', [
+            'item_type' => 'listing',
+            'item_id' => 1,
+        ]);
+
+        $response->assertStatus(200);
+        $response->assertJsonPath('data.tracked', true);
+    }
+
+    public function test_track_accepts_non_listing_item_types(): void
+    {
+        $this->authenticatedUser();
+
+        $types = ['post', 'event', 'group', 'member'];
+
+        foreach ($types as $type) {
+            $response = $this->apiPost('/v2/explore/track', [
+                'item_type' => $type,
+                'item_id' => 1,
+                'action' => 'click',
+            ]);
+
+            $response->assertStatus(200);
+            $response->assertJsonPath('data.tracked', true);
+        }
+    }
+
+    // ------------------------------------------------------------------
+    //  DISMISS — POST /api/v2/explore/dismiss
+    // ------------------------------------------------------------------
+
+    public function test_dismiss_requires_authentication(): void
+    {
+        $response = $this->apiPost('/v2/explore/dismiss', [
+            'item_type' => 'listing',
+            'item_id' => 1,
+        ]);
+
+        $response->assertStatus(401);
+    }
+
+    public function test_dismiss_returns_success_on_valid_input(): void
+    {
+        $this->authenticatedUser();
+
+        $response = $this->apiPost('/v2/explore/dismiss', [
+            'item_type' => 'listing',
+            'item_id' => 1,
+            'reason' => 'not_relevant',
+        ]);
+
+        $response->assertStatus(200);
+        $response->assertJsonPath('data.dismissed', true);
+    }
+
+    public function test_dismiss_validates_required_item_id(): void
+    {
+        $this->authenticatedUser();
+
+        // Missing item_id
+        $response = $this->apiPost('/v2/explore/dismiss', []);
+
+        $response->assertStatus(422);
+    }
+
+    public function test_dismiss_works_without_reason(): void
+    {
+        $this->authenticatedUser();
+
+        $response = $this->apiPost('/v2/explore/dismiss', [
+            'item_type' => 'listing',
+            'item_id' => 2,
+        ]);
+
+        $response->assertStatus(200);
+        $response->assertJsonPath('data.dismissed', true);
+    }
+
+    public function test_dismiss_defaults_item_type_to_listing(): void
+    {
+        $this->authenticatedUser();
+
+        // No item_type provided — should default to 'listing'
+        $response = $this->apiPost('/v2/explore/dismiss', [
+            'item_id' => 1,
+        ]);
+
+        $response->assertStatus(200);
+        $response->assertJsonPath('data.dismissed', true);
+    }
+
+    public function test_dismiss_is_idempotent(): void
+    {
+        $this->authenticatedUser();
+
+        $payload = [
+            'item_type' => 'listing',
+            'item_id' => 1,
+            'reason' => 'not_interested',
+        ];
+
+        // Dismiss the same item twice — should succeed both times (insertOrIgnore)
+        $response1 = $this->apiPost('/v2/explore/dismiss', $payload);
+        $response1->assertStatus(200);
+        $response1->assertJsonPath('data.dismissed', true);
+
+        $response2 = $this->apiPost('/v2/explore/dismiss', $payload);
+        $response2->assertStatus(200);
+        $response2->assertJsonPath('data.dismissed', true);
+    }
+
+    // ------------------------------------------------------------------
     //  TENANT ISOLATION
     // ------------------------------------------------------------------
 
