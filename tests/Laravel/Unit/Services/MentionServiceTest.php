@@ -325,6 +325,28 @@ class MentionServiceTest extends TestCase
         $this->assertTrue(true);
     }
 
+    public function test_deleteMentionsForEntity_handles_comment_entity_type(): void
+    {
+        DB::shouldReceive('table->where->where->where->delete')
+            ->once()
+            ->andReturn(1);
+
+        MentionService::deleteMentionsForEntity(10, 'comment');
+
+        $this->assertTrue(true);
+    }
+
+    public function test_deleteMentionsForEntity_handles_no_matching_records(): void
+    {
+        DB::shouldReceive('table->where->where->where->delete')
+            ->once()
+            ->andReturn(0);
+
+        MentionService::deleteMentionsForEntity(999, 'message');
+
+        $this->assertTrue(true);
+    }
+
     // ------------------------------------------------------------------
     //  markAsSeen
     // ------------------------------------------------------------------
