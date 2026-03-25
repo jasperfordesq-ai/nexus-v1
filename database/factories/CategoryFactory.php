@@ -24,10 +24,7 @@ class CategoryFactory extends Factory
             'slug'       => Str::slug($name),
             'color'      => $this->faker->hexColor(),
             'type'       => $this->faker->randomElement(['listing', 'event', 'blog', 'resource']),
-            'icon'       => $this->faker->optional()->randomElement(['home', 'heart', 'star', 'book', 'tool']),
             'parent_id'  => null,
-            'sort_order' => $this->faker->numberBetween(1, 50),
-            'status'     => 'active',
         ];
     }
 

@@ -19,14 +19,14 @@ class Category extends Model
 
     protected $table = 'categories';
 
+    public const UPDATED_AT = null;
+
     protected $fillable = [
         'tenant_id', 'name', 'slug', 'color', 'type',
-        'icon', 'parent_id', 'sort_order', 'status',
+        'parent_id',
     ];
 
-    protected $casts = [
-        'sort_order' => 'integer',
-    ];
+    protected $casts = [];
 
     public function listings(): HasMany
     {

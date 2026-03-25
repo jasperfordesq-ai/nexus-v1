@@ -64,7 +64,6 @@ interface Category {
   id: number;
   name: string;
   slug: string | null;
-  icon: string | null;
   color: string | null;
 }
 
