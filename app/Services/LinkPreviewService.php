@@ -544,6 +544,28 @@ class LinkPreviewService
                         $result['description'] = $content;
                     }
                     break;
+                // Twitter Card fallbacks (used by X/Twitter and many sites without OG tags)
+                case 'twitter:title':
+                    if (! $result['title']) {
+                        $result['title'] = $content;
+                    }
+                    break;
+                case 'twitter:description':
+                    if (! $result['description']) {
+                        $result['description'] = $content;
+                    }
+                    break;
+                case 'twitter:image':
+                case 'twitter:image:src':
+                    if (! $result['image_url']) {
+                        $result['image_url'] = $this->resolveUrl($content, $url);
+                    }
+                    break;
+                case 'twitter:site':
+                    if (! $result['site_name']) {
+                        $result['site_name'] = $content;
+                    }
+                    break;
             }
         }
 
@@ -642,10 +664,42 @@ class LinkPreviewService
 
         // Vimeo
         if (preg_match('/vimeo\.com/i', $domain)) {
-            $preview['content_type'] = 'video';
+            $videoId = $this->extractVimeoVideoId($url);
+            if ($videoId) {
+                $preview['content_type'] = 'video';
+                $preview['embed_html'] = 'https://player.vimeo.com/video/' . $videoId;
+
+                // Fetch Vimeo thumbnail via oEmbed if no OG image
+                if (! $preview['image_url']) {
+                    try {
+                        $oembedResponse = Http::timeout(3)->get('https://vimeo.com/api/oembed.json', [
+                            'url' => $url,
+                            'width' => 640,
+                        ]);
+                        if ($oembedResponse->ok()) {
+                            $oembed = $oembedResponse->json();
+                            $preview['image_url'] = $oembed['thumbnail_url'] ?? null;
+                        }
+                    } catch (\Throwable $e) {
+                        // Non-critical: Vimeo thumbnail fetch failed
+                    }
+                }
+            }
         }
 
         return $preview;
+    }
+
+    /**
+     * Extract Vimeo video ID from URL.
+     */
+    private function extractVimeoVideoId(string $url): ?string
+    {
+        if (preg_match('/vimeo\.com\/(\d+)/', $url, $matches)) {
+            return $matches[1];
+        }
+
+        return null;
     }
 
     /**

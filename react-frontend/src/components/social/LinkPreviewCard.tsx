@@ -125,7 +125,7 @@ export function LinkPreviewCard({ preview, compact = false }: LinkPreviewCardPro
             <div className="w-20 h-20 flex-shrink-0 overflow-hidden">
               <img
                 src={imageUrl}
-                alt=""
+                alt={title ? `Preview for ${title}` : `Preview from ${domain}`}
                 className="w-full h-full object-cover"
                 loading="lazy"
                 onError={() => setImageError(true)}
@@ -140,7 +140,7 @@ export function LinkPreviewCard({ preview, compact = false }: LinkPreviewCardPro
               {faviconUrl ? (
                 <img
                   src={faviconUrl}
-                  alt=""
+                  alt={`${siteName || domain} icon`}
                   className="w-3.5 h-3.5 rounded-sm flex-shrink-0"
                   loading="lazy"
                   onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
@@ -193,7 +193,7 @@ export function LinkPreviewCard({ preview, compact = false }: LinkPreviewCardPro
           <div className="w-full overflow-hidden" style={{ aspectRatio: '2 / 1' }}>
             <img
               src={imageUrl}
-              alt=""
+              alt={title ? `Preview for ${title}` : `Preview from ${domain}`}
               className="w-full h-full object-cover group-hover/link:scale-[1.02] transition-transform duration-500"
               loading="lazy"
               onError={() => setImageError(true)}
@@ -208,7 +208,7 @@ export function LinkPreviewCard({ preview, compact = false }: LinkPreviewCardPro
             {faviconUrl ? (
               <img
                 src={faviconUrl}
-                alt=""
+                alt={`${siteName || domain} icon`}
                 className="w-4 h-4 rounded-sm flex-shrink-0"
                 loading="lazy"
                 onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}

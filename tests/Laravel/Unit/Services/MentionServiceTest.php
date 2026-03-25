@@ -92,6 +92,20 @@ class MentionServiceTest extends TestCase
         $this->assertNotEmpty($result);
     }
 
+    public function test_extractMentions_does_not_match_at_sign_only(): void
+    {
+        $result = MentionService::extractMentions('Just an @ sign and more @ symbols');
+
+        $this->assertEmpty($result);
+    }
+
+    public function test_extractMentions_does_not_match_at_followed_by_space(): void
+    {
+        $result = MentionService::extractMentions('Hello @ world @ everyone');
+
+        $this->assertEmpty($result);
+    }
+
     // ------------------------------------------------------------------
     //  resolveMentions
     // ------------------------------------------------------------------
@@ -154,6 +168,36 @@ class MentionServiceTest extends TestCase
         $result = MentionService::resolveMentions(['nonexistent'], $this->testTenantId);
 
         $this->assertEmpty($result);
+    }
+
+    public function test_resolveMentions_excludes_banned_users(): void
+    {
+        // The DB query includes `->where('status', '!=', 'banned')`, so banned users
+        // are filtered out at the database level. An empty result means the only
+        // matching user was banned.
+        DB::shouldReceive('table->where->where->where->select->get')
+            ->once()
+            ->andReturn(collect([]));
+
+        $result = MentionService::resolveMentions(['banned_user'], $this->testTenantId);
+
+        $this->assertEmpty($result);
+    }
+
+    public function test_resolveMentions_resolves_multiple_usernames(): void
+    {
+        DB::shouldReceive('table->where->where->where->select->get')
+            ->once()
+            ->andReturn(collect([
+                (object) ['id' => 10, 'username' => 'alice', 'first_name' => 'Alice', 'name' => 'Alice', 'last_name' => 'Smith'],
+                (object) ['id' => 20, 'username' => 'bob', 'first_name' => 'Bob', 'name' => 'Bob', 'last_name' => 'Jones'],
+            ]));
+
+        $result = MentionService::resolveMentions(['alice', 'bob'], $this->testTenantId);
+
+        $this->assertCount(2, $result);
+        $this->assertEquals(10, $result['alice']);
+        $this->assertEquals(20, $result['bob']);
     }
 
     // ------------------------------------------------------------------
@@ -237,6 +281,32 @@ class MentionServiceTest extends TestCase
         $result = MentionService::processText('Hello @unknown', 1, 'post', 1);
 
         $this->assertEquals(0, $result);
+    }
+
+    public function test_processText_returns_count_of_created_mentions(): void
+    {
+        // resolveMentions: returns two matched users
+        DB::shouldReceive('table->where->where->where->select->get')
+            ->once()
+            ->andReturn(collect([
+                (object) ['id' => 10, 'username' => 'alice', 'first_name' => 'Alice', 'name' => 'Alice', 'last_name' => 'Smith'],
+                (object) ['id' => 20, 'username' => 'bob', 'first_name' => 'Bob', 'name' => 'Bob', 'last_name' => 'Jones'],
+            ]));
+
+        // createMentions: lookup mentioner name
+        DB::shouldReceive('table->where->where->select->first')
+            ->once()
+            ->andReturn((object) ['name' => 'Charlie', 'first_name' => 'Charlie']);
+
+        // createMentions: insert mention record (called twice, once per resolved user)
+        DB::shouldReceive('table->insert')->twice();
+
+        // Notification::createNotification uses DB internally — allow insertGetId
+        DB::shouldReceive('table->insertGetId')->andReturn(1);
+
+        $result = MentionService::processText('Hey @alice and @bob!', 1, 'post', 5);
+
+        $this->assertEquals(2, $result);
     }
 
     // ------------------------------------------------------------------

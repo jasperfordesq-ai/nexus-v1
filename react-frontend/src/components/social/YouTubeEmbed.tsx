@@ -95,7 +95,7 @@ export function YouTubeEmbed({ embedUrl, thumbnailUrl, title = 'Video' }: YouTub
             {thumbnail && (
               <img
                 src={thumbnail}
-                alt=""
+                alt={`Thumbnail for ${title}`}
                 className="w-full h-full object-cover opacity-90 group-hover/play:opacity-100 transition-opacity"
                 loading="lazy"
               />
@@ -111,9 +111,9 @@ export function YouTubeEmbed({ embedUrl, thumbnailUrl, title = 'Video' }: YouTub
               </div>
             </div>
 
-            {/* YouTube branding in corner */}
+            {/* Video platform branding in corner */}
             <div className="absolute bottom-2 right-2 px-2 py-0.5 rounded bg-black/60 text-white text-[10px] font-medium">
-              YouTube
+              {embedUrl.includes('vimeo') ? 'Vimeo' : 'YouTube'}
             </div>
           </button>
         )}

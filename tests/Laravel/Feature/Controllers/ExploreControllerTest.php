@@ -16,10 +16,13 @@ use Tests\Laravel\TestCase;
  * Feature tests for ExploreController — discover/explore page API endpoints.
  *
  * Endpoints:
- *   GET /api/v2/explore                    index (public, optional auth)
- *   GET /api/v2/explore/trending           trending (public)
- *   GET /api/v2/explore/popular-listings   popularListings (public)
- *   GET /api/v2/explore/category/{slug}    category (public)
+ *   GET  /api/v2/explore                    index (public, optional auth)
+ *   GET  /api/v2/explore/for-you            forYou (public, optional auth)
+ *   GET  /api/v2/explore/trending           trending (public)
+ *   GET  /api/v2/explore/popular-listings   popularListings (public)
+ *   GET  /api/v2/explore/category/{slug}    category (public)
+ *   POST /api/v2/explore/track              track (auth required)
+ *   POST /api/v2/explore/dismiss            dismiss (auth required)
  */
 class ExploreControllerTest extends TestCase
 {
