@@ -4,7 +4,8 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import { useState, useMemo, useRef, useCallback } from 'react';
-import { View, Text, Image, TouchableOpacity, StyleSheet, Animated, Share } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, Animated, Share } from 'react-native';
+import { Image } from 'expo-image';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import * as Haptics from 'expo-haptics';
@@ -242,7 +243,7 @@ export default function FeedItem({ item }: FeedItemProps) {
               accessibilityLabel={t('feedTypes.post')}
               accessibilityRole="imagebutton"
             >
-              <Image source={{ uri: item.image_url }} style={styles.feedImage} resizeMode="cover" />
+              <Image source={{ uri: item.image_url }} style={styles.feedImage} contentFit="cover" />
             </TouchableOpacity>
           ) : null}
 

@@ -98,15 +98,22 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             const response = await getMe();
             setUser(response.data);
             await storage.setJson(STORAGE_KEYS.USER_DATA, response.data);
-          } catch {
-            // Token is revoked — clear session and redirect to login
-            await Promise.all([
-              storage.remove(STORAGE_KEYS.AUTH_TOKEN),
-              storage.remove(STORAGE_KEYS.REFRESH_TOKEN),
-              storage.remove(STORAGE_KEYS.USER_DATA),
-            ]);
-            setToken(null);
-            setUser(null);
+          } catch (err: unknown) {
+            // Only clear session on 401 (token revoked). For network errors,
+            // timeouts, or any other failure, keep the cached user so the app
+            // remains usable offline.
+            const status = (err as { status?: number })?.status
+              ?? (err as { response?: { status?: number } })?.response?.status;
+            if (status === 401) {
+              await Promise.all([
+                storage.remove(STORAGE_KEYS.AUTH_TOKEN),
+                storage.remove(STORAGE_KEYS.REFRESH_TOKEN),
+                storage.remove(STORAGE_KEYS.USER_DATA),
+              ]);
+              setToken(null);
+              setUser(null);
+            }
+            // Non-401 errors (network down, timeout, etc.) — keep cached user
           }
           return;
         }

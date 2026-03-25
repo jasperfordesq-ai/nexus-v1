@@ -11,10 +11,12 @@ const config = getDefaultConfig(__dirname);
 // Exclude test files and jest setup from the Metro bundle.
 // Without this, Metro picks up *.test.ts(x) files which import
 // @testing-library/react-native — a test-only package that cannot be bundled.
+// Use [/\\] to match both forward slashes (Unix) and backslashes (Windows)
+// since Metro may pass absolute paths with either separator.
 config.resolver.blockList = [
-  /.*\.test\.[jt]sx?$/,
-  /.*\.spec\.[jt]sx?$/,
-  /jest-setup\.[jt]s$/,
+  /.*[/\\].*\.test\.[jt]sx?$/,
+  /.*[/\\].*\.spec\.[jt]sx?$/,
+  /.*[/\\]jest-setup\.[jt]s$/,
 ];
 
 module.exports = config;

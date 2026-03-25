@@ -3,7 +3,8 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import { View, Text, Image, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet } from 'react-native';
+import { Image } from 'expo-image';
 import { usePrimaryColor } from '@/lib/hooks/useTenant';
 
 interface AvatarProps {
@@ -37,6 +38,7 @@ export default function Avatar({ uri, name, size = 40, showOnline = false }: Ava
         <Image
           source={{ uri }}
           style={[styles.image, sizeStyle]}
+          contentFit="cover"
           accessibilityLabel={`${name} avatar`}
         />
         {onlineDot}
@@ -65,7 +67,7 @@ function getInitials(name: string | null | undefined): string {
 }
 
 const styles = StyleSheet.create({
-  image: { resizeMode: 'cover' },
+  image: {},
   fallback: { justifyContent: 'center', alignItems: 'center' },
   initials: { color: '#fff', fontWeight: '700' },
   onlineDot: {
