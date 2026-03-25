@@ -902,10 +902,10 @@ export function JobDetailPage() {
     const typeLabel = vacancy.salary_type ? ` / ${t(`salary.${vacancy.salary_type}`)}` : '';
     if (vacancy.salary_min && vacancy.salary_max) {
       // Use en-dash for range — clear EU Pay Transparency format
-      return `${currency}${vacancy.salary_min.toLocaleString()} \u2013 ${currency}${vacancy.salary_max.toLocaleString()}${typeLabel}`;
+      return `${currency}${Number(vacancy.salary_min).toLocaleString()} \u2013 ${currency}${Number(vacancy.salary_max).toLocaleString()}${typeLabel}`;
     }
-    if (vacancy.salary_min) return `${t('salary.min_only', { min: `${currency}${vacancy.salary_min.toLocaleString()}` })}${typeLabel}`;
-    if (vacancy.salary_max) return `${t('salary.max_only', { max: `${currency}${vacancy.salary_max.toLocaleString()}` })}${typeLabel}`;
+    if (vacancy.salary_min) return `${t('salary.min_only', { min: `${currency}${Number(vacancy.salary_min).toLocaleString()}` })}${typeLabel}`;
+    if (vacancy.salary_max) return `${t('salary.max_only', { max: `${currency}${Number(vacancy.salary_max).toLocaleString()}` })}${typeLabel}`;
     return null;
   };
 
@@ -967,17 +967,17 @@ export function JobDetailPage() {
             {/* Poster info */}
             <div className="flex items-center gap-2 mt-3">
               <Avatar
-                name={vacancy.creator.name}
-                src={resolveAvatarUrl(vacancy.creator.avatar_url)}
+                name={vacancy.creator?.name}
+                src={resolveAvatarUrl(vacancy.creator?.avatar_url)}
                 size="sm"
                 isBordered
               />
               <div>
                 <p className="text-sm text-theme-primary font-medium">
-                  {vacancy.organization?.name ?? vacancy.creator.name}
+                  {vacancy.organization?.name ?? vacancy.creator?.name}
                 </p>
                 <p className="text-xs text-theme-subtle">
-                  {t('posted_by')} {vacancy.creator.name} &middot; {new Date(vacancy.created_at).toLocaleDateString()}
+                  {t('posted_by')} {vacancy.creator?.name} &middot; {vacancy.created_at ? new Date(vacancy.created_at).toLocaleDateString() : ''}
                 </p>
               </div>
             </div>
@@ -1764,11 +1764,11 @@ export function JobDetailPage() {
                   {t('benchmark.market_rate', {
                     role: benchmark.role_keyword,
                     currency: benchmark.currency,
-                    min: benchmark.salary_min.toLocaleString(),
-                    max: benchmark.salary_max.toLocaleString(),
+                    min: (benchmark.salary_min ?? 0).toLocaleString(),
+                    max: (benchmark.salary_max ?? 0).toLocaleString(),
                     type: benchmark.salary_type,
-                    median: benchmark.salary_median.toLocaleString(),
-                    defaultValue: `Market rate for "${benchmark.role_keyword}": ${benchmark.currency}${benchmark.salary_min.toLocaleString()} – ${benchmark.currency}${benchmark.salary_max.toLocaleString()} / ${benchmark.salary_type} (median: ${benchmark.currency}${benchmark.salary_median.toLocaleString()})`,
+                    median: (benchmark.salary_median ?? 0).toLocaleString(),
+                    defaultValue: `Market rate for "${benchmark.role_keyword}": ${benchmark.currency}${(benchmark.salary_min ?? 0).toLocaleString()} – ${benchmark.currency}${(benchmark.salary_max ?? 0).toLocaleString()} / ${benchmark.salary_type} (median: ${benchmark.currency}${(benchmark.salary_median ?? 0).toLocaleString()})`,
                   })}
                 </p>
               </div>
@@ -2309,7 +2309,7 @@ export function JobDetailPage() {
               variant="flat"
               startContent={<MessageCircle size={16} aria-hidden="true" />}
               className="w-full bg-theme-elevated text-theme-muted"
-              onPress={() => navigate(tenantPath(`/messages?user=${vacancy!.creator.id}&context=job&context_id=${vacancy!.id}`))}
+              onPress={() => navigate(tenantPath(`/messages?user=${vacancy!.creator?.id}&context=job&context_id=${vacancy!.id}`))}
             >
               {t('apply.message_employer', 'Message Employer')}
             </Button>
