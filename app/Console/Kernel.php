@@ -43,6 +43,16 @@ class Kernel extends ConsoleKernel
             ->dailyAt('08:00')
             ->name('job-expiry-notifications')
             ->withoutOverlapping();
+
+        $schedule->command('safeguarding:clear-expired-monitoring')
+            ->daily()
+            ->withoutOverlapping()
+            ->name('safeguarding-clear-expired-monitoring');
+
+        $schedule->command('safeguarding:purge-message-copies')
+            ->weekly()
+            ->withoutOverlapping()
+            ->name('safeguarding-purge-message-copies');
     }
 
     /**

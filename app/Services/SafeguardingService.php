@@ -52,8 +52,8 @@ class SafeguardingService
         }
 
         // Check both users exist in tenant
-        $guardianExists = User::where('id', $guardianUserId)->where('status', 'active')->exists();
-        $wardExists = User::where('id', $wardUserId)->where('status', 'active')->exists();
+        $guardianExists = User::where('id', $guardianUserId)->where('tenant_id', TenantContext::getId())->where('status', 'active')->exists();
+        $wardExists = User::where('id', $wardUserId)->where('tenant_id', TenantContext::getId())->where('status', 'active')->exists();
 
         if (!$guardianExists) {
             $this->errors[] = ['code' => 'NOT_FOUND', 'message' => 'Guardian user not found'];
@@ -79,6 +79,11 @@ class SafeguardingService
                     'notes' => $notes,
                 ]
             );
+
+            $this->logActivity($assignedBy, 'safeguarding_assignment_created', 'safeguarding_assignment', null, [
+                'guardian_user_id' => $guardianUserId,
+                'ward_user_id' => $wardUserId,
+            ]);
 
             return ['success' => true, 'message' => 'Safeguarding assignment created'];
         } catch (\Throwable $e) {
@@ -114,6 +119,9 @@ class SafeguardingService
             $this->assignment->newQuery()
                 ->where('id', $assignmentId)
                 ->update(['revoked_at' => now()]);
+
+            $this->logActivity($revokedBy, 'safeguarding_assignment_revoked', 'safeguarding_assignment', $assignmentId);
+
             return true;
         } catch (\Throwable $e) {
             Log::error('SafeguardingService::revokeAssignment error: ' . $e->getMessage());
@@ -210,6 +218,11 @@ class SafeguardingService
                 ->where('tenant_id', $tenantId)
                 ->first();
 
+            $this->logActivity($userId, 'safeguarding_training_recorded', 'safeguarding_training', $id, [
+                'training_type' => $trainingType,
+                'training_name' => $data['training_name'] ?? '',
+            ]);
+
             return $record ? (array) $record : [];
         } catch (\Throwable $e) {
             Log::error('SafeguardingService::recordTraining error: ' . $e->getMessage());
@@ -267,6 +280,9 @@ class SafeguardingService
                     'verified_at' => now(),
                     'updated_at' => now(),
                 ]);
+
+            $this->logActivity($adminId, 'safeguarding_training_verified', 'safeguarding_training', $recordId);
+
             return true;
         } catch (\Throwable $e) {
             Log::error('SafeguardingService::verifyTraining error: ' . $e->getMessage());
@@ -290,6 +306,11 @@ class SafeguardingService
                     'notes' => $reason,
                     'updated_at' => now(),
                 ]);
+
+            $this->logActivity($adminId, 'safeguarding_training_rejected', 'safeguarding_training', $recordId, [
+                'reason' => $reason,
+            ]);
+
             return true;
         } catch (\Throwable $e) {
             Log::error('SafeguardingService::rejectTraining error: ' . $e->getMessage());
@@ -342,6 +363,12 @@ class SafeguardingService
                 ->where('id', $id)
                 ->where('tenant_id', $tenantId)
                 ->first();
+
+            $this->logActivity($reporterId, 'safeguarding_incident_reported', 'safeguarding_incident', $id, [
+                'severity' => $severity,
+                'incident_type' => $incidentType,
+                'title' => $data['title'] ?? '',
+            ]);
 
             return $record ? (array) $record : [];
         } catch (\Throwable $e) {
@@ -435,6 +462,14 @@ class SafeguardingService
     public function updateIncident(int $incidentId, array $data, int $adminId, int $tenantId): bool
     {
         try {
+            // Validate status enum if provided
+            if (isset($data['status'])) {
+                $validStatuses = ['open', 'investigating', 'resolved', 'closed'];
+                if (!in_array($data['status'], $validStatuses, true)) {
+                    return false;
+                }
+            }
+
             $allowedFields = ['status', 'action_taken', 'resolution_notes', 'assigned_to', 'severity'];
             $updates = [];
 
@@ -458,6 +493,8 @@ class SafeguardingService
                 ->where('id', $incidentId)
                 ->where('tenant_id', $tenantId)
                 ->update($updates);
+
+            $this->logActivity($adminId, 'safeguarding_incident_updated', 'safeguarding_incident', $incidentId, $updates);
 
             return true;
         } catch (\Throwable $e) {
@@ -483,6 +520,28 @@ class SafeguardingService
         } catch (\Throwable $e) {
             Log::error('SafeguardingService::assignDlp error: ' . $e->getMessage());
             return false;
+        }
+    }
+
+    // =========================================================================
+    // AUDIT LOGGING
+    // =========================================================================
+
+    private function logActivity(int $userId, string $action, string $entityType, ?int $entityId, array $details = []): void
+    {
+        try {
+            DB::table('activity_log')->insert([
+                'user_id' => $userId,
+                'action' => $action,
+                'action_type' => 'safeguarding',
+                'entity_type' => $entityType,
+                'entity_id' => $entityId,
+                'details' => json_encode($details),
+                'ip_address' => request()?->ip(),
+                'created_at' => now(),
+            ]);
+        } catch (\Throwable $e) {
+            Log::error('SafeguardingService: failed to log activity', ['action' => $action, 'error' => $e->getMessage()]);
         }
     }
 }

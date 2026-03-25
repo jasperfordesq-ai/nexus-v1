@@ -17,6 +17,8 @@ class BrokerMessageCopy extends Model
 
     protected $table = 'broker_message_copies';
 
+    public $timestamps = false;
+
     protected $fillable = [
         'tenant_id', 'original_message_id', 'conversation_key',
         'sender_id', 'receiver_id', 'message_body', 'sent_at',

@@ -141,35 +141,37 @@ class SafeguardingTriggerService
             );
         }
 
-        // Sync user-level safeguarding flags
-        $user = User::find($userId);
-        if ($user) {
-            $updates = [];
-            if ($triggers['restricts_matching']) {
-                // Check if any of the selected options specifically flag children or vulnerable adults
-                $prefs = UserSafeguardingPreference::where('tenant_id', $tenantId)
-                    ->where('user_id', $userId)
-                    ->active()
-                    ->with('option')
-                    ->get();
+        // Sync user-level safeguarding flags (transactional to keep flags consistent)
+        DB::transaction(function () use ($userId, $tenantId, $triggers) {
+            $user = User::find($userId);
+            if ($user) {
+                $updates = [];
+                if ($triggers['restricts_matching']) {
+                    // Check if any of the selected options specifically flag children or vulnerable adults
+                    $prefs = UserSafeguardingPreference::where('tenant_id', $tenantId)
+                        ->where('user_id', $userId)
+                        ->active()
+                        ->with('option')
+                        ->get();
 
-                foreach ($prefs as $pref) {
-                    $key = $pref->option?->option_key;
-                    if ($key === 'works_with_children') {
-                        $updates['works_with_children'] = true;
-                    }
-                    if ($key === 'works_with_vulnerable_adults') {
-                        $updates['works_with_vulnerable_adults'] = true;
-                    }
-                    if ($key === 'requires_home_visits') {
-                        $updates['requires_home_visits'] = true;
+                    foreach ($prefs as $pref) {
+                        $key = $pref->option?->option_key;
+                        if ($key === 'works_with_children') {
+                            $updates['works_with_children'] = true;
+                        }
+                        if ($key === 'works_with_vulnerable_adults') {
+                            $updates['works_with_vulnerable_adults'] = true;
+                        }
+                        if ($key === 'requires_home_visits') {
+                            $updates['requires_home_visits'] = true;
+                        }
                     }
                 }
+                if (!empty($updates)) {
+                    User::where('id', $userId)->update($updates);
+                }
             }
-            if (!empty($updates)) {
-                User::where('id', $userId)->update($updates);
-            }
-        }
+        });
 
         // Notify admins/brokers if any trigger requires it
         if ($needsNotification) {
@@ -181,6 +183,26 @@ class SafeguardingTriggerService
                     'error' => $e->getMessage(),
                 ]);
             }
+        }
+
+        // Audit log trigger activation
+        try {
+            DB::table('activity_log')->insert([
+                'user_id' => $userId,
+                'action' => 'safeguarding_triggers_activated',
+                'action_type' => 'safeguarding',
+                'entity_type' => 'user',
+                'entity_id' => $userId,
+                'details' => json_encode([
+                    'needs_monitoring' => $needsMonitoring,
+                    'needs_broker_approval' => $needsBrokerApproval,
+                    'triggers' => $triggers,
+                ]),
+                'ip_address' => request()?->ip(),
+                'created_at' => now(),
+            ]);
+        } catch (\Throwable $e) {
+            Log::error('Failed to log trigger activation', ['error' => $e->getMessage()]);
         }
     }
 

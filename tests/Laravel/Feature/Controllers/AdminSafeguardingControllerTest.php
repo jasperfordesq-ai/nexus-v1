@@ -8,6 +8,7 @@ namespace Tests\Laravel\Feature\Controllers;
 
 use App\Models\User;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Support\Facades\DB;
 use Laravel\Sanctum\Sanctum;
 use Tests\Laravel\TestCase;
 
@@ -164,5 +165,127 @@ class AdminSafeguardingControllerTest extends TestCase
         ]);
 
         $response->assertStatus(403);
+    }
+
+    // ================================================================
+    // DASHBOARD — structured data assertions
+    // ================================================================
+
+    public function test_dashboard_returns_structured_data(): void
+    {
+        $admin = User::factory()->forTenant($this->testTenantId)->admin()->create();
+        Sanctum::actingAs($admin);
+
+        $response = $this->apiGet('/v2/admin/safeguarding/dashboard');
+
+        $response->assertStatus(200);
+        $response->assertJsonStructure([
+            'data' => [
+                'total_flagged',
+                'pending_review',
+                'active_assignments',
+                'resolved',
+            ],
+        ]);
+
+        // Verify all keys are numeric (even if zero)
+        $data = $response->json('data');
+        $this->assertIsInt($data['total_flagged']);
+        $this->assertIsInt($data['pending_review']);
+        $this->assertIsInt($data['active_assignments']);
+        $this->assertIsInt($data['resolved']);
+        $this->assertGreaterThanOrEqual(0, $data['total_flagged']);
+        $this->assertGreaterThanOrEqual(0, $data['pending_review']);
+        $this->assertGreaterThanOrEqual(0, $data['active_assignments']);
+        $this->assertGreaterThanOrEqual(0, $data['resolved']);
+    }
+
+    // ================================================================
+    // MEMBER PREFERENCES — consent data and structure
+    // ================================================================
+
+    public function test_member_preferences_returns_consent_data(): void
+    {
+        $admin = User::factory()->forTenant($this->testTenantId)->admin()->create();
+        Sanctum::actingAs($admin);
+
+        // Create a user with safeguarding preferences
+        $member = User::factory()->forTenant($this->testTenantId)->create([
+            'status' => 'active',
+            'is_approved' => true,
+        ]);
+
+        $optionId = DB::table('tenant_safeguarding_options')->insertGetId([
+            'tenant_id' => $this->testTenantId,
+            'option_key' => 'consent_test_' . uniqid(),
+            'option_type' => 'checkbox',
+            'label' => 'Test Consent Option',
+            'is_active' => 1,
+            'sort_order' => 0,
+            'triggers' => json_encode([]),
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        $consentTime = now()->format('Y-m-d H:i:s');
+        DB::table('user_safeguarding_preferences')->insert([
+            'tenant_id' => $this->testTenantId,
+            'user_id' => $member->id,
+            'option_id' => $optionId,
+            'selected_value' => '1',
+            'consent_given_at' => $consentTime,
+            'consent_ip' => '127.0.0.1',
+            'created_at' => now(),
+        ]);
+
+        $response = $this->apiGet('/v2/admin/safeguarding/member-preferences');
+
+        $response->assertStatus(200);
+
+        $data = $response->json('data');
+        $this->assertIsArray($data);
+        $this->assertNotEmpty($data, 'Should return at least one member with preferences');
+
+        // Find the member we created
+        $memberData = collect($data)->firstWhere('user_id', $member->id);
+        $this->assertNotNull($memberData, 'Our test member should appear in the results');
+        $this->assertNotNull($memberData['consent_given_at'], 'consent_given_at should be included');
+        $this->assertArrayHasKey('options', $memberData);
+        $this->assertNotEmpty($memberData['options'], 'Options list should not be empty');
+
+        // Verify option labels are present
+        $optionLabels = array_column($memberData['options'], 'label');
+        $this->assertContains('Test Consent Option', $optionLabels, 'Option label should be present in response');
+    }
+
+    // ================================================================
+    // MEMBER PREFERENCES — audit log on access
+    // ================================================================
+
+    public function test_member_preferences_access_creates_audit_log(): void
+    {
+        $admin = User::factory()->forTenant($this->testTenantId)->admin()->create();
+        Sanctum::actingAs($admin);
+
+        // Clear any pre-existing audit logs for this action
+        DB::table('activity_log')
+            ->where('action', 'safeguarding_preferences_list_viewed')
+            ->where('user_id', $admin->id)
+            ->delete();
+
+        $response = $this->apiGet('/v2/admin/safeguarding/member-preferences');
+
+        $response->assertStatus(200);
+
+        // Verify audit log was created
+        $log = DB::table('activity_log')
+            ->where('action', 'safeguarding_preferences_list_viewed')
+            ->where('user_id', $admin->id)
+            ->first();
+
+        $this->assertNotNull($log, 'Accessing member-preferences should create an audit log entry');
+        $this->assertEquals('safeguarding', $log->action_type);
+        $this->assertEquals('tenant', $log->entity_type);
+        $this->assertNotNull($log->created_at);
     }
 }
