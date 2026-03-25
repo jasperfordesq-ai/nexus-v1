@@ -42,6 +42,13 @@ import { useToast } from '@/contexts';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
 
+interface Organisation {
+  id: number;
+  name: string;
+  status: string;
+  member_role: string;
+}
+
 /* ───────────────────────── Types ───────────────────────── */
 
 type ExpenseType = 'travel' | 'meals' | 'supplies' | 'equipment' | 'parking' | 'other';
@@ -88,6 +95,10 @@ export function ExpensesTab() {
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  // Organisation state
+  const [organisations, setOrganisations] = useState<Organisation[]>([]);
+  const [formOrgId, setFormOrgId] = useState('');
+
   // Form state
   const [formType, setFormType] = useState<ExpenseType>('travel');
   const [formAmount, setFormAmount] = useState('');
@@ -131,6 +142,16 @@ export function ExpensesTab() {
 
   useEffect(() => {
     loadRef.current();
+    // Load organisations for the expense form
+    api.get<Organisation[]>('/v2/volunteering/my-organisations').then((res) => {
+      if (res.success && res.data) {
+        const orgs = Array.isArray(res.data) ? res.data : [];
+        setOrganisations(orgs);
+        if (orgs.length === 1) {
+          setFormOrgId(orgs[0].id.toString());
+        }
+      }
+    }).catch((err) => logError('Failed to load organisations', err));
     return () => { abortRef.current?.abort(); };
   }, []);
 
@@ -151,16 +172,18 @@ export function ExpensesTab() {
     setFormAmount('');
     setFormCurrency('');
     setFormDescription('');
+    if (organisations.length !== 1) setFormOrgId('');
   };
 
   const handleSubmit = async (onClose: () => void) => {
-    if (!formAmount || !formDescription) {
+    if (!formOrgId || !formAmount || !formDescription) {
       toast.error(t('expenses.fill_required', 'Please fill in all required fields.'));
       return;
     }
     try {
       setIsSubmitting(true);
       const response = await api.post('/v2/volunteering/expenses', {
+        organization_id: parseInt(formOrgId, 10),
         expense_type: formType,
         amount: parseFloat(formAmount),
         currency: formCurrency,
@@ -172,7 +195,7 @@ export function ExpensesTab() {
         onClose();
         load();
       } else {
-        toast.error(t('expenses.submit_error', 'Failed to submit expense.'));
+        toast.error(response.error || t('expenses.submit_error', 'Failed to submit expense.'));
       }
     } catch (err) {
       logError('Failed to submit expense', err);
@@ -304,6 +327,22 @@ export function ExpensesTab() {
             <>
               <ModalHeader className="text-theme-primary">{t('expenses.modal_title', 'Submit Expense')}</ModalHeader>
               <ModalBody className="gap-4">
+                {organisations.length > 1 && (
+                  <Select
+                    label={t('expenses.form.organisation', 'Organisation')}
+                    selectedKeys={formOrgId ? [formOrgId] : []}
+                    onSelectionChange={(keys) => {
+                      const val = Array.from(keys)[0] as string;
+                      if (val) setFormOrgId(val);
+                    }}
+                    variant="bordered"
+                    isRequired
+                  >
+                    {organisations.map((org) => (
+                      <SelectItem key={org.id.toString()}>{org.name}</SelectItem>
+                    ))}
+                  </Select>
+                )}
                 <Select
                   label={t('expenses.form.type', 'Expense Type')}
                   selectedKeys={[formType]}
