@@ -105,6 +105,8 @@ export function TenantForm() {
   const [loading, setLoading] = useState(isEdit);
   const [saving, setSaving] = useState(false);
   const [parentTenants, setParentTenants] = useState<SuperAdminTenant[]>([]);
+  // Preserve the full original configuration JSON so save doesn't wipe unmanaged keys
+  const [originalConfiguration, setOriginalConfiguration] = useState<Record<string, unknown>>({});
 
   // Form state
   const [form, setForm] = useState({
@@ -173,6 +175,9 @@ export function TenantForm() {
       const res = await adminSuper.getTenant(Number(id));
       if (res.success && res.data) {
         const tenant = res.data as SuperAdminTenantDetail;
+        // Preserve the full configuration so save merges rather than overwrites
+        const fullConfig = (tenant.configuration ?? {}) as Record<string, unknown>;
+        setOriginalConfiguration(fullConfig);
         setForm({
           name: tenant.name || '',
           slug: tenant.slug || '',
@@ -260,15 +265,24 @@ export function TenantForm() {
         delete payload.parent_id;
       }
 
-      // Merge language + legal settings into configuration JSON
-      const existingConfig = (payload.configuration ?? {}) as Record<string, unknown>;
-      payload.configuration = {
-        ...existingConfig,
+      // Merge language + legal settings into configuration JSON, preserving all existing keys
+      // (modules, federation, broker_controls, footer_text, etc.)
+      const mergedConfig: Record<string, unknown> = {
+        ...originalConfiguration,
         default_language: form.default_language,
         supported_languages: form.supported_languages,
-        ...(form.privacy_text.trim() ? { privacy_text: form.privacy_text } : {}),
-        ...(form.terms_text.trim() ? { terms_text: form.terms_text } : {}),
       };
+      if (form.privacy_text.trim()) {
+        mergedConfig.privacy_text = form.privacy_text;
+      } else {
+        delete mergedConfig.privacy_text;
+      }
+      if (form.terms_text.trim()) {
+        mergedConfig.terms_text = form.terms_text;
+      } else {
+        delete mergedConfig.terms_text;
+      }
+      payload.configuration = mergedConfig;
       delete payload.default_language;
       delete payload.supported_languages;
       delete payload.privacy_text;
