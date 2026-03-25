@@ -140,8 +140,8 @@ class ExploreController extends BaseApiController
      */
     public function track(): JsonResponse
     {
-        $userId = $this->requireUserId();
-        $input = $this->getJsonInput();
+        $userId = $this->requireAuth();
+        $input = request()->all();
 
         $itemType = $input['item_type'] ?? null; // listing, post, event, group, member
         $itemId = (int) ($input['item_id'] ?? 0);
@@ -149,6 +149,12 @@ class ExploreController extends BaseApiController
 
         if (!$itemId || !$itemType) {
             return $this->respondWithError('INVALID_INPUT', 'item_type and item_id are required', null, 422);
+        }
+
+        // Validate item_type against allowlist to prevent cache poisoning / log injection
+        $validItemTypes = ['listing', 'post', 'event', 'group', 'member', 'job', 'vol_opportunity', 'blog'];
+        if (!in_array($itemType, $validItemTypes, true)) {
+            return $this->respondWithError('INVALID_INPUT', 'Invalid item_type', 'item_type', 422);
         }
 
         // Map explore actions to match_history actions
@@ -177,9 +183,9 @@ class ExploreController extends BaseApiController
      */
     public function dismiss(): JsonResponse
     {
-        $userId = $this->requireUserId();
+        $userId = $this->requireAuth();
         $tenantId = $this->getTenantId();
-        $input = $this->getJsonInput();
+        $input = request()->all();
 
         $itemType = $input['item_type'] ?? 'listing';
         $itemId = (int) ($input['item_id'] ?? 0);
@@ -236,7 +242,7 @@ class ExploreController extends BaseApiController
      */
     public function experiments(): JsonResponse
     {
-        $userId = $this->requireUserId();
+        $userId = $this->requireAuth();
         $tenantId = $this->getTenantId();
 
         $data = $this->exploreService->getUserExperimentCohort($tenantId, $userId);

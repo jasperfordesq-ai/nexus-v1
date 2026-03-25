@@ -176,11 +176,8 @@ export function ImageLightbox({ media, initialIndex = 0, onClose }: ImageLightbo
         onClick={(e) => e.stopPropagation()}
       >
         <AnimatePresence initial={false} custom={direction} mode="popLayout">
-          <motion.img
+          <motion.div
             key={currentIndex}
-            src={resolveAssetUrl(current.file_url)}
-            alt={current.alt_text || t('carousel.image_of', 'Image {{current}} of {{total}}', { current: currentIndex + 1, total })}
-            className="max-w-full max-h-full object-contain select-none rounded-lg"
             custom={direction}
             variants={slideVariants}
             initial="enter"
@@ -195,8 +192,28 @@ export function ImageLightbox({ media, initialIndex = 0, onClose }: ImageLightbo
             dragConstraints={{ left: 0, right: 0 }}
             dragElastic={0.3}
             onDragEnd={handleDragEnd}
-            draggable={false}
-          />
+            className="flex items-center justify-center max-w-full max-h-full"
+          >
+            {current.media_type === 'video' ? (
+              <video
+                src={resolveAssetUrl(current.file_url)}
+                poster={current.thumbnail_url ? resolveAssetUrl(current.thumbnail_url) : undefined}
+                controls
+                autoPlay
+                playsInline
+                className="max-w-full max-h-full object-contain select-none rounded-lg"
+                aria-label={current.alt_text || t('carousel.video_of', 'Video {{current}} of {{total}}', { current: currentIndex + 1, total })}
+                onClick={(e) => e.stopPropagation()}
+              />
+            ) : (
+              <img
+                src={resolveAssetUrl(current.file_url)}
+                alt={current.alt_text || t('carousel.image_of', 'Image {{current}} of {{total}}', { current: currentIndex + 1, total })}
+                className="max-w-full max-h-full object-contain select-none rounded-lg"
+                draggable={false}
+              />
+            )}
+          </motion.div>
         </AnimatePresence>
       </div>
 

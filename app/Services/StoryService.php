@@ -484,12 +484,15 @@ class StoryService
      */
     public function getPollResults(int $storyId): array
     {
+        $tenantId = TenantContext::getId();
+
         $votes = DB::select(
-            'SELECT option_index, COUNT(*) as vote_count
-             FROM story_poll_votes
-             WHERE story_id = ?
-             GROUP BY option_index',
-            [$storyId]
+            'SELECT spv.option_index, COUNT(*) as vote_count
+             FROM story_poll_votes spv
+             INNER JOIN stories s ON spv.story_id = s.id AND s.tenant_id = ?
+             WHERE spv.story_id = ?
+             GROUP BY spv.option_index',
+            [$tenantId, $storyId]
         );
 
         $results = [];

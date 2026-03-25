@@ -40,10 +40,11 @@ class PostMediaService
 
     /** Allowed video MIME types and their extensions */
     private const ALLOWED_VIDEO_TYPES = [
-        'video/mp4'       => ['mp4'],
-        'video/webm'      => ['webm'],
-        'video/ogg'       => ['ogg', 'ogv'],
-        'video/quicktime' => ['mov'],
+        'video/mp4'          => ['mp4'],
+        'video/webm'         => ['webm'],
+        'video/x-matroska'   => ['webm', 'mkv'],
+        'video/ogg'          => ['ogg', 'ogv'],
+        'video/quicktime'    => ['mov'],
     ];
 
     /**

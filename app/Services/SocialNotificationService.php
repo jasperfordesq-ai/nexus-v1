@@ -396,6 +396,13 @@ class SocialNotificationService
                         ->value('reviewer_id');
                     return $userId ? (int) $userId : null;
 
+                case 'comment':
+                    $userId = DB::table('comments')
+                        ->where('id', $contentId)
+                        ->where('tenant_id', $tenantId)
+                        ->value('user_id');
+                    return $userId ? (int) $userId : null;
+
                 default:
                     return null;
             }
