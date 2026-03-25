@@ -33,6 +33,8 @@ export function SuperUserList() {
   const [superAdminsOnly, setSuperAdminsOnly] = useState(false);
   const [page, setPage] = useState(1);
 
+  const [lastRefreshed, setLastRefreshed] = useState<Date | null>(null);
+
   const [confirmAction, setConfirmAction] = useState<{
     type: 'grant-sa' | 'revoke-sa' | 'grant-global' | 'revoke-global' | 'move';
     user: SuperAdminUser;
@@ -52,6 +54,7 @@ export function SuperUserList() {
       });
       if (res.success && res.data) {
         setUsers(Array.isArray(res.data) ? res.data : []);
+        setLastRefreshed(new Date());
       } else if (!res.success) {
         toast.error(`Users: ${res.error || 'Failed to load user list'}`);
       }
@@ -206,10 +209,17 @@ export function SuperUserList() {
         title={t('super.super_user_list_title')}
         description={t('super.super_user_list_desc')}
         actions={
-          <Button color="primary" startContent={<Plus size={16} />}
-            onPress={() => navigate(tenantPath('/admin/super/users/create'))}>
-            Create User
-          </Button>
+          <div className="flex items-center gap-2">
+            {lastRefreshed && (
+              <span className="text-xs text-default-400">
+                Updated {lastRefreshed.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+              </span>
+            )}
+            <Button color="primary" startContent={<Plus size={16} />}
+              onPress={() => navigate(tenantPath('/admin/super/users/create'))}>
+              Create User
+            </Button>
+          </div>
         }
       />
       <div className="mb-4 flex flex-wrap items-end gap-4">

@@ -157,6 +157,10 @@ class TenantVisibilityService
                 ->where('tenant_id', $tenantId)
                 ->count();
 
+            $row['listing_count'] = (int) DB::table('listings')
+                ->where('tenant_id', $tenantId)
+                ->count();
+
             // Add child count
             $row['child_count'] = (int) DB::table('tenants')
                 ->where('parent_id', $tenantId)

@@ -14,6 +14,8 @@ import { Card, CardBody, Button, Chip, Spinner } from '@heroui/react';
 import {
   ChevronRight,
   ChevronDown,
+  ChevronsDownUp,
+  ChevronsUpDown,
   Building2,
   Users,
   RefreshCw,
@@ -32,10 +34,12 @@ interface TreeNodeProps {
   node: TenantHierarchyNode;
   depth: number;
   onNavigate: (id: number) => void;
+  expandedIds: Set<number>;
+  onToggle: (id: number) => void;
 }
 
-function TreeNode({ node, depth, onNavigate }: TreeNodeProps) {
-  const [expanded, setExpanded] = useState(depth < 2);
+function TreeNode({ node, depth, onNavigate, expandedIds, onToggle }: TreeNodeProps) {
+  const expanded = expandedIds.has(node.id);
   const hasChildren = node.children && node.children.length > 0;
 
   return (
@@ -50,7 +54,7 @@ function TreeNode({ node, depth, onNavigate }: TreeNodeProps) {
             size="sm"
             variant="light"
             aria-label={expanded ? "Collapse" : "Expand"}
-            onPress={() => setExpanded(!expanded)}
+            onPress={() => onToggle(node.id)}
             className="shrink-0"
           >
             {expanded ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
@@ -98,6 +102,8 @@ function TreeNode({ node, depth, onNavigate }: TreeNodeProps) {
               node={child}
               depth={depth + 1}
               onNavigate={onNavigate}
+              expandedIds={expandedIds}
+              onToggle={onToggle}
             />
           ))}
         </div>
@@ -115,13 +121,52 @@ export function TenantHierarchy() {
 
   const [hierarchy, setHierarchy] = useState<TenantHierarchyNode[]>([]);
   const [loading, setLoading] = useState(true);
+  const [expandedIds, setExpandedIds] = useState<Set<number>>(new Set());
+
+  const collectAllIds = useCallback((nodes: TenantHierarchyNode[]): number[] => {
+    const ids: number[] = [];
+    const walk = (list: TenantHierarchyNode[]) => {
+      for (const n of list) {
+        if (n.children && n.children.length > 0) {
+          ids.push(n.id);
+          walk(n.children);
+        }
+      }
+    };
+    walk(nodes);
+    return ids;
+  }, []);
+
+  const handleToggle = useCallback((id: number) => {
+    setExpandedIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  }, []);
+
+  const expandAll = useCallback(() => {
+    setExpandedIds(new Set(collectAllIds(hierarchy)));
+  }, [hierarchy, collectAllIds]);
+
+  const collapseAll = useCallback(() => {
+    setExpandedIds(new Set());
+  }, []);
 
   const loadHierarchy = useCallback(async () => {
     setLoading(true);
     try {
       const res = await adminSuper.getHierarchy();
       if (res.success && res.data) {
-        setHierarchy(Array.isArray(res.data) ? res.data : []);
+        const data = Array.isArray(res.data) ? res.data : [];
+        setHierarchy(data);
+        // Auto-expand top-level nodes (depth < 2)
+        const initialIds: number[] = [];
+        for (const node of data) {
+          if (node.children && node.children.length > 0) initialIds.push(node.id);
+        }
+        setExpandedIds(new Set(initialIds));
       }
     } catch {
       toast.error(t('super.failed_to_load_hierarchy'));
@@ -151,6 +196,22 @@ export function TenantHierarchy() {
         description={t('super.tenant_hierarchy_desc')}
         actions={
           <div className="flex items-center gap-2">
+            <Button
+              variant="flat"
+              startContent={<ChevronsUpDown size={16} />}
+              onPress={expandAll}
+              size="sm"
+            >
+              Expand All
+            </Button>
+            <Button
+              variant="flat"
+              startContent={<ChevronsDownUp size={16} />}
+              onPress={collapseAll}
+              size="sm"
+            >
+              Collapse All
+            </Button>
             <Button
               as={Link}
               to={tenantPath('/admin/super/tenants')}
@@ -203,6 +264,8 @@ export function TenantHierarchy() {
                 node={node}
                 depth={0}
                 onNavigate={handleNavigate}
+                expandedIds={expandedIds}
+                onToggle={handleToggle}
               />
             ))}
           </CardBody>

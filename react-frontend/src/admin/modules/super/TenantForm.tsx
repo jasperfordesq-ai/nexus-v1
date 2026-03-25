@@ -404,6 +404,8 @@ export function TenantForm() {
                   const arr = Array.from(keys);
                   updateField('parent_id', arr.length > 0 ? String(arr[0]) : '');
                 }}
+                isDisabled={isEdit}
+                description={isEdit ? 'Use "Move Tenant" on the detail page to change parent' : undefined}
               >
                 {parentTenants
                   .filter((t) => String(t.id) !== id)

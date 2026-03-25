@@ -99,7 +99,7 @@ export function SuperDashboard() {
 
       {/* Stats Grid */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4 mb-6">
-        <Link to={tenantPath('/admin/super/tenants')} className="block">
+        <Link to={tenantPath('/admin/super/tenants')} className="block cursor-pointer hover:scale-[1.02] transition-transform">
           <StatCard
             label={t('super.label_total_tenants')}
             value={stats?.total_tenants ?? '---'}
@@ -108,7 +108,7 @@ export function SuperDashboard() {
             loading={loading}
           />
         </Link>
-        <Link to={tenantPath('/admin/super/tenants')} className="block">
+        <Link to={tenantPath('/admin/super/tenants')} className="block cursor-pointer hover:scale-[1.02] transition-transform">
           <StatCard
             label={t('super.label_active_tenants')}
             value={stats?.active_tenants ?? '---'}
@@ -117,7 +117,7 @@ export function SuperDashboard() {
             loading={loading}
           />
         </Link>
-        <Link to={tenantPath('/admin/super/users')} className="block">
+        <Link to={tenantPath('/admin/super/users')} className="block cursor-pointer hover:scale-[1.02] transition-transform">
           <StatCard
             label={t('super.label_total_users')}
             value={stats?.total_users ?? '---'}
@@ -126,13 +126,15 @@ export function SuperDashboard() {
             loading={loading}
           />
         </Link>
-        <StatCard
-          label={t('super.label_total_listings')}
-          value={stats?.total_listings ?? '---'}
-          icon={Globe}
-          color="warning"
-          loading={loading}
-        />
+        <Link to={tenantPath('/admin/super/tenants')} className="block cursor-pointer hover:scale-[1.02] transition-transform">
+          <StatCard
+            label={t('super.label_total_listings')}
+            value={stats?.total_listings ?? '---'}
+            icon={Globe}
+            color="warning"
+            loading={loading}
+          />
+        </Link>
       </div>
 
       {/* Quick Actions */}

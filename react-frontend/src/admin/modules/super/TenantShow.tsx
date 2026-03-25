@@ -49,6 +49,7 @@ import {
   Linkedin,
   Youtube,
   UserPlus,
+  UserMinus,
   Plus,
   MoveRight,
   Power,
@@ -98,6 +99,7 @@ export function TenantShow() {
     role: 'admin',
   });
   const [addingAdmin, setAddingAdmin] = useState(false);
+  const [removingAdminId, setRemovingAdminId] = useState<number | null>(null);
   const [actionLoading, setActionLoading] = useState(false);
 
   // Guard ref to prevent Switch onValueChange re-entry (HeroUI fires on programmatic isSelected changes)
@@ -220,6 +222,23 @@ export function TenantShow() {
       toast.error(message);
     }
     setAddingAdmin(false);
+  };
+
+  const handleRemoveAdmin = async (admin: { id: number; name: string }) => {
+    if (!window.confirm(`Demote "${admin.name}" to member? They will lose admin access.`)) return;
+    setRemovingAdminId(admin.id);
+    try {
+      const res = await adminSuper.updateUser(admin.id, { role: 'member' });
+      if (res.success) {
+        toast.success(`${admin.name} demoted to member`);
+        loadTenant();
+      } else {
+        toast.error(res.error || 'Failed to remove admin');
+      }
+    } catch {
+      toast.error(t('super.an_error_occurred'));
+    }
+    setRemovingAdminId(null);
   };
 
   useEffect(() => {
@@ -728,23 +747,36 @@ export function TenantShow() {
                 <ul className="space-y-2">
                   {tenant.admins.map((admin) => (
                     <li key={admin.id}>
-                      <Link
-                        to={tenantPath(`/admin/super/users/${admin.id}`)}
-                        className="flex items-center gap-3 rounded-lg p-2 hover:bg-default-100 transition-colors"
-                      >
-                        <Avatar
-                          name={admin.name}
+                      <div className="flex items-center gap-3 rounded-lg p-2 hover:bg-default-100 transition-colors">
+                        <Link
+                          to={tenantPath(`/admin/super/users/${admin.id}`)}
+                          className="flex items-center gap-3 min-w-0 flex-1"
+                        >
+                          <Avatar
+                            name={admin.name}
+                            size="sm"
+                            className="shrink-0"
+                          />
+                          <div className="min-w-0 flex-1">
+                            <p className="text-sm font-medium text-foreground truncate">{admin.name}</p>
+                            <p className="text-xs text-default-400 truncate">{admin.email}</p>
+                          </div>
+                          <Chip variant="flat" size="sm" className="capitalize">
+                            {admin.role}
+                          </Chip>
+                        </Link>
+                        <Button
+                          isIconOnly
                           size="sm"
-                          className="shrink-0"
-                        />
-                        <div className="min-w-0 flex-1">
-                          <p className="text-sm font-medium text-foreground truncate">{admin.name}</p>
-                          <p className="text-xs text-default-400 truncate">{admin.email}</p>
-                        </div>
-                        <Chip variant="flat" size="sm" className="capitalize">
-                          {admin.role}
-                        </Chip>
-                      </Link>
+                          variant="light"
+                          color="danger"
+                          isLoading={removingAdminId === admin.id}
+                          onPress={() => handleRemoveAdmin(admin)}
+                          aria-label={`Remove ${admin.name} as admin`}
+                        >
+                          <UserMinus size={14} />
+                        </Button>
+                      </div>
                     </li>
                   ))}
                 </ul>

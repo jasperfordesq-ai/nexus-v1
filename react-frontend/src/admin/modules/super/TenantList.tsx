@@ -50,6 +50,8 @@ export function TenantList() {
   const [filter, setFilter] = useState('all');
   const [search, setSearch] = useState('');
 
+  const [lastRefreshed, setLastRefreshed] = useState<Date | null>(null);
+
   const [confirmAction, setConfirmAction] = useState<{
     type: 'delete' | 'deactivate' | 'reactivate' | 'toggle-hub';
     tenant: SuperAdminTenant;
@@ -68,6 +70,7 @@ export function TenantList() {
       const res = await adminSuper.listTenants(params as { search?: string; is_active?: boolean; hub?: boolean });
       if (res.success && res.data) {
         setTenants(Array.isArray(res.data) ? res.data : []);
+        setLastRefreshed(new Date());
       } else if (!res.success) {
         toast.error(`Tenants: ${res.error || 'Failed to load tenant list'}`);
       }
@@ -273,6 +276,11 @@ export function TenantList() {
         description={t('super.tenant_list_desc')}
         actions={
           <div className="flex items-center gap-2">
+            {lastRefreshed && (
+              <span className="text-xs text-default-400">
+                Updated {lastRefreshed.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+              </span>
+            )}
             <Button
               as={Link}
               to={tenantPath('/admin/super/tenants/hierarchy')}

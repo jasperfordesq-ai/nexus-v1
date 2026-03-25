@@ -721,6 +721,16 @@ class AdminSuperController extends BaseApiController
             [$id]
         );
 
+        SuperAdminAuditService::log(
+            'global_super_admin_granted',
+            'user',
+            $id,
+            ($user['first_name'] ?? '') . ' ' . ($user['last_name'] ?? ''),
+            ['is_super_admin' => 0],
+            ['is_super_admin' => 1],
+            "Granted global super admin to user #{$id}"
+        );
+
         return $this->respondWithData(['granted' => true, 'user_id' => $id, 'level' => 'global']);
     }
 
@@ -747,6 +757,16 @@ class AdminSuperController extends BaseApiController
         }
 
         DB::update("UPDATE users SET is_super_admin = 0 WHERE id = ?", [$id]);
+
+        SuperAdminAuditService::log(
+            'global_super_admin_revoked',
+            'user',
+            $id,
+            ($user['first_name'] ?? '') . ' ' . ($user['last_name'] ?? ''),
+            ['is_super_admin' => 1],
+            ['is_super_admin' => 0],
+            "Revoked global super admin from user #{$id}"
+        );
 
         return $this->respondWithData(['revoked' => true, 'user_id' => $id, 'level' => 'global']);
     }
