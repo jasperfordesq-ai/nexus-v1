@@ -43,14 +43,17 @@
     "closedBadge": "Closed",
     "closesToday": "Closes today",
     "closesIn": "Closes in {{count}} days",
-    "goBack": "Go back",
+    "goBack": "Go Back",
     "notFound": "Job not found.",
     "invalidId": "Invalid job ID.",
     "saveError": "Could not update saved state.",
     "timeCredits": "{{count}} time credits",
     "salaryAnnual": "year",
     "salaryMonthly": "month",
-    "salaryHourly": "hour"
+    "salaryHourly": "hour",
+    "share": "Share",
+    "closesIn_one": "Closes in {{count}} day",
+    "timeCredits_one": "{{count}} time credit"
   },
   "apply": {
     "title": "Apply for {{jobTitle}}",

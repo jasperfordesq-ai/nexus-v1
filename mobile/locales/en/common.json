@@ -20,6 +20,10 @@
     "confirm": "Confirm",
     "loadMore": "Load more"
   },
+  "actions": {
+    "clear": "Clear search",
+    "retry": "Retry"
+  },
   "errors": {
     "generic": "Something went wrong. Please try again.",
     "network": "Network error. Please check your connection.",

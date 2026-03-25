@@ -50,7 +50,10 @@
     "timeCredits": "{{count}} créditos de tempo",
     "salaryAnnual": "ano",
     "salaryMonthly": "mês",
-    "salaryHourly": "hora"
+    "salaryHourly": "hora",
+    "share": "Partilhar",
+    "closesIn_one": "Encerra em {{count}} dia",
+    "timeCredits_one": "{{count}} crédito de tempo"
   },
   "apply": {
     "title": "Candidatar-se a {{jobTitle}}",
@@ -61,6 +64,11 @@
     "success": "Candidatura enviada!",
     "successMessage": "Sua candidatura foi enviada. Boa sorte!",
     "error": "Falha ao enviar a candidatura"
+  },
+  "saved_profile": {
+    "found": "Perfil de candidatura guardado encontrado",
+    "use": "Usar carta de apresentação guardada",
+    "start_fresh": "Começar de novo"
   },
   "applications": {
     "empty": "Nenhuma candidatura ainda",

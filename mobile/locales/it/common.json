@@ -20,6 +20,10 @@
     "confirm": "Conferma",
     "loadMore": "Carica altro"
   },
+  "actions": {
+    "clear": "Cancella ricerca",
+    "retry": "Riprova"
+  },
   "errors": {
     "generic": "Qualcosa è andato storto. Riprova.",
     "network": "Errore di rete. Controlla la connessione.",

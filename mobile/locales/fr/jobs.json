@@ -50,7 +50,10 @@
     "timeCredits": "{{count}} crédits temps",
     "salaryAnnual": "an",
     "salaryMonthly": "mois",
-    "salaryHourly": "heure"
+    "salaryHourly": "heure",
+    "share": "Partager",
+    "closesIn_one": "Clôture dans {{count}} jour",
+    "timeCredits_one": "{{count}} crédit temps"
   },
   "apply": {
     "title": "Postuler à {{jobTitle}}",
@@ -61,6 +64,11 @@
     "success": "Candidature envoyée !",
     "successMessage": "Votre candidature a été transmise. Bonne chance !",
     "error": "Échec de l'envoi de la candidature"
+  },
+  "saved_profile": {
+    "found": "Profil de candidature sauvegardé trouvé",
+    "use": "Utiliser la lettre de motivation sauvegardée",
+    "start_fresh": "Recommencer"
   },
   "applications": {
     "empty": "Aucune candidature pour le moment",

@@ -95,7 +95,7 @@ export default function JobDetailScreen() {
         <Text style={styles.errorText}>{t('detail.invalidId', 'Invalid job ID.')}</Text>
         <TouchableOpacity onPress={() => router.back()} style={{ marginTop: 12 }}>
           <Text style={{ color: primary, fontSize: 15, fontWeight: '600' }}>
-            {t('detail.goBack', 'Go back')}
+            {t('detail.goBack', 'Go Back')}
           </Text>
         </TouchableOpacity>
       </SafeAreaView>
@@ -116,7 +116,7 @@ export default function JobDetailScreen() {
         <Text style={styles.errorText}>{t('detail.notFound', 'Job not found.')}</Text>
         <TouchableOpacity onPress={() => router.back()} style={{ marginTop: 12 }}>
           <Text style={{ color: primary, fontSize: 15, fontWeight: '600' }}>
-            {t('detail.goBack', 'Go back')}
+            {t('detail.goBack', 'Go Back')}
           </Text>
         </TouchableOpacity>
       </SafeAreaView>
@@ -431,7 +431,7 @@ export default function JobDetailScreen() {
                   style={[styles.applyButton, { backgroundColor: primary, marginTop: 24 }]}
                   onPress={handleCloseModal}
                 >
-                  <Text style={styles.applyButtonText}>{t('detail.goBack', 'Done')}</Text>
+                  <Text style={styles.applyButtonText}>{t('detail.goBack', 'Go Back')}</Text>
                 </TouchableOpacity>
               </View>
             ) : (

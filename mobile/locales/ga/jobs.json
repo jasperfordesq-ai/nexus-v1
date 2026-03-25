@@ -50,7 +50,10 @@
     "timeCredits": "{{count}} creidmheas ama",
     "salaryAnnual": "bliain",
     "salaryMonthly": "mí",
-    "salaryHourly": "uair"
+    "salaryHourly": "uair",
+    "share": "Roinn",
+    "closesIn_one": "Dúnann i {{count}} lá",
+    "timeCredits_one": "{{count}} creidmheas ama"
   },
   "apply": {
     "title": "Iarratas ar {{jobTitle}}",
@@ -61,6 +64,11 @@
     "success": "Iarratas curtha isteach!",
     "successMessage": "Seoladh d'iarratas. Ádh mór ort!",
     "error": "Theip ar sheoladh an iarratais"
+  },
+  "saved_profile": {
+    "found": "Próifíl iarratais sábháilte aimsithe",
+    "use": "Úsáid litir chlúdaigh shábháilte",
+    "start_fresh": "Tosaigh ón tús"
   },
   "applications": {
     "empty": "Gan iarratas fós",

@@ -20,6 +20,10 @@
     "confirm": "Confirmar",
     "loadMore": "Cargar más"
   },
+  "actions": {
+    "clear": "Borrar búsqueda",
+    "retry": "Reintentar"
+  },
   "errors": {
     "generic": "Algo salió mal. Por favor, inténtalo de nuevo.",
     "network": "Error de red. Comprueba tu conexión.",

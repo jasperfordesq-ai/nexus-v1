@@ -50,7 +50,10 @@
     "timeCredits": "{{count}} créditos de tiempo",
     "salaryAnnual": "año",
     "salaryMonthly": "mes",
-    "salaryHourly": "hora"
+    "salaryHourly": "hora",
+    "share": "Compartir",
+    "closesIn_one": "Cierra en {{count}} día",
+    "timeCredits_one": "{{count}} crédito de tiempo"
   },
   "apply": {
     "title": "Solicitar {{jobTitle}}",
@@ -61,6 +64,11 @@
     "success": "¡Solicitud enviada!",
     "successMessage": "Tu solicitud ha sido enviada. ¡Buena suerte!",
     "error": "Error al enviar la solicitud"
+  },
+  "saved_profile": {
+    "found": "Perfil de solicitud guardado encontrado",
+    "use": "Usar carta de presentación guardada",
+    "start_fresh": "Empezar de cero"
   },
   "applications": {
     "empty": "Aún no hay solicitudes",

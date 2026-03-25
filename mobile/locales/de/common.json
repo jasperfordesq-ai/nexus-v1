@@ -20,6 +20,10 @@
     "confirm": "Bestätigen",
     "loadMore": "Mehr laden"
   },
+  "actions": {
+    "clear": "Suche löschen",
+    "retry": "Erneut versuchen"
+  },
   "errors": {
     "generic": "Etwas ist schiefgelaufen. Bitte versuche es erneut.",
     "network": "Netzwerkfehler. Bitte überprüfe deine Verbindung.",

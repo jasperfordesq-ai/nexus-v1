@@ -676,7 +676,7 @@ export default function JobsScreen() {
                 <View style={styles.centered}>
                   <Text style={styles.errorText}>{jobsError}</Text>
                   <TouchableOpacity onPress={refreshJobs} style={styles.retryButton}>
-                    <Text style={[styles.retryText, { color: primary }]}>{t('retry')}</Text>
+                    <Text style={[styles.retryText, { color: primary }]}>{t('retry', 'Retry')}</Text>
                   </TouchableOpacity>
                 </View>
               ) : (
@@ -718,7 +718,7 @@ export default function JobsScreen() {
               <View style={styles.centered}>
                 <Text style={styles.errorText}>{appsError}</Text>
                 <TouchableOpacity onPress={refreshApps} style={styles.retryButton}>
-                  <Text style={[styles.retryText, { color: primary }]}>{t('retry')}</Text>
+                  <Text style={[styles.retryText, { color: primary }]}>{t('retry', 'Retry')}</Text>
                 </TouchableOpacity>
               </View>
             ) : (

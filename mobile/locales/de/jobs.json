@@ -50,7 +50,10 @@
     "timeCredits": "{{count}} Zeitgutschriften",
     "salaryAnnual": "Jahr",
     "salaryMonthly": "Monat",
-    "salaryHourly": "Stunde"
+    "salaryHourly": "Stunde",
+    "share": "Teilen",
+    "closesIn_one": "Endet in {{count}} Tag",
+    "timeCredits_one": "{{count}} Zeitgutschrift"
   },
   "apply": {
     "title": "Für {{jobTitle}} bewerben",
@@ -61,6 +64,11 @@
     "success": "Bewerbung abgeschickt!",
     "successMessage": "Ihre Bewerbung wurde gesendet. Viel Erfolg!",
     "error": "Bewerbung konnte nicht gesendet werden"
+  },
+  "saved_profile": {
+    "found": "Gespeichertes Bewerbungsprofil gefunden",
+    "use": "Gespeichertes Anschreiben verwenden",
+    "start_fresh": "Neu beginnen"
   },
   "applications": {
     "empty": "Noch keine Bewerbungen",

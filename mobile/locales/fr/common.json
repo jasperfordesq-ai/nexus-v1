@@ -20,6 +20,10 @@
     "confirm": "Confirmer",
     "loadMore": "Charger plus"
   },
+  "actions": {
+    "clear": "Effacer la recherche",
+    "retry": "Réessayer"
+  },
   "errors": {
     "generic": "Une erreur s'est produite. Veuillez réessayer.",
     "network": "Erreur réseau. Vérifiez votre connexion.",
