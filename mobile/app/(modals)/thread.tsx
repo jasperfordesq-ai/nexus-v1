@@ -38,6 +38,14 @@ import TypingIndicator from '@/components/TypingIndicator';
 import ModalErrorBoundary from '@/components/ModalErrorBoundary';
 
 export default function ThreadScreen() {
+  return (
+    <ModalErrorBoundary>
+      <ThreadScreenInner />
+    </ModalErrorBoundary>
+  );
+}
+
+function ThreadScreenInner() {
   const { t } = useTranslation('messages');
   // `id` = other user's ID (used by conversation list — existing conversation)
   // `recipientId` = other user's ID (used by member-profile / exchange-detail — may be new conversation)
@@ -247,7 +255,6 @@ export default function ThreadScreen() {
   }
 
   return (
-    <ModalErrorBoundary>
     <SafeAreaView style={styles.container}>
       <OfflineBanner />
       <KeyboardAvoidingView
@@ -303,7 +310,6 @@ export default function ThreadScreen() {
         </View>
       </KeyboardAvoidingView>
     </SafeAreaView>
-    </ModalErrorBoundary>
   );
 }
 

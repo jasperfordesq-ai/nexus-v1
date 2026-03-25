@@ -9,6 +9,7 @@ import React, {
   useContext,
   useEffect,
   useMemo,
+  useRef,
   useState,
 } from 'react';
 import { router } from 'expo-router';
@@ -65,6 +66,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<AnyUser | null>(null);
   const [token, setToken] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  /** Track whether push notifications were successfully registered */
+  const isPushRegisteredRef = useRef(false);
 
   /** Called by the API client when it receives a 401 response */
   const handleUnauthorized = useCallback(() => {
@@ -80,7 +83,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   // On app start: restore cached user immediately, then re-validate in background.
   // This avoids blocking the UI on a slow network — the app renders from cache first.
   useEffect(() => {
+    let isMounted = true;
+
     async function restoreSession() {
+      if (!isMounted) return;
       setIsLoading(true);
       try {
         const storedToken = await storage.get(STORAGE_KEYS.AUTH_TOKEN);
@@ -89,6 +95,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         // Show cached user data immediately so the app doesn't block on network
         const cachedUser = await storage.getJson<AnyUser>(STORAGE_KEYS.USER_DATA);
         if (cachedUser) {
+          if (!isMounted) return;
           setToken(storedToken);
           setUser(cachedUser);
           setIsLoading(false);
@@ -96,9 +103,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           // Re-validate token with /users/me in the background
           try {
             const response = await getMe();
+            if (!isMounted) return;
             setUser(response.data);
             await storage.setJson(STORAGE_KEYS.USER_DATA, response.data);
           } catch (err: unknown) {
+            if (!isMounted) return;
             // Only clear session on 401 (token revoked). For network errors,
             // timeouts, or any other failure, keep the cached user so the app
             // remains usable offline.
@@ -110,6 +119,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                 storage.remove(STORAGE_KEYS.REFRESH_TOKEN),
                 storage.remove(STORAGE_KEYS.USER_DATA),
               ]);
+              if (!isMounted) return;
               setToken(null);
               setUser(null);
             }
@@ -120,24 +130,33 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
         // No cached user — must validate with network before proceeding
         const response = await getMe();
+        if (!isMounted) return;
         setToken(storedToken);
         setUser(response.data);
         await storage.setJson(STORAGE_KEYS.USER_DATA, response.data);
       } catch {
+        if (!isMounted) return;
         // Token invalid and no cache — clear everything
         await Promise.all([
           storage.remove(STORAGE_KEYS.AUTH_TOKEN),
           storage.remove(STORAGE_KEYS.REFRESH_TOKEN),
           storage.remove(STORAGE_KEYS.USER_DATA),
         ]);
+        if (!isMounted) return;
         setToken(null);
         setUser(null);
       } finally {
-        setIsLoading(false);
+        if (isMounted) {
+          setIsLoading(false);
+        }
       }
     }
 
     void restoreSession();
+
+    return () => {
+      isMounted = false;
+    };
   }, []);
 
   const login = useCallback(async (payload: LoginPayload) => {
@@ -156,7 +175,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     router.replace('/(tabs)/home');
 
     // Register device for push notifications (non-blocking, best-effort)
-    void registerForPushNotifications();
+    registerForPushNotifications()
+      .then(() => { isPushRegisteredRef.current = true; })
+      .catch(() => { /* best-effort */ });
   }, []);
 
   const setSession = useCallback((newToken: string, newUser: AnyUser) => {
@@ -171,10 +192,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const logout = useCallback(async () => {
     // Unregister push token BEFORE server logout — the server call invalidates the
     // auth token, so push unregister must happen first to avoid a silent 401 failure.
-    try {
-      await unregisterPushNotifications();
-    } catch {
-      // Best-effort — continue with logout even if push unregister fails
+    if (isPushRegisteredRef.current) {
+      try {
+        await unregisterPushNotifications();
+        isPushRegisteredRef.current = false;
+      } catch {
+        // Best-effort — continue with logout even if push unregister fails
+      }
     }
 
     try {

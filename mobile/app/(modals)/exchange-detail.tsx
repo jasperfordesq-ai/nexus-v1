@@ -33,6 +33,14 @@ import LoadingSpinner from '@/components/ui/LoadingSpinner';
 import ModalErrorBoundary from '@/components/ModalErrorBoundary';
 
 export default function ExchangeDetailModal() {
+  return (
+    <ModalErrorBoundary>
+      <ExchangeDetailModalInner />
+    </ModalErrorBoundary>
+  );
+}
+
+function ExchangeDetailModalInner() {
   const { t } = useTranslation('exchanges');
   const navigation = useNavigation();
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -124,7 +132,6 @@ export default function ExchangeDetailModal() {
   }
 
   return (
-    <ModalErrorBoundary>
     <SafeAreaView style={styles.container} edges={['bottom']}>
       <ScrollView
         contentContainerStyle={styles.content}
@@ -209,7 +216,6 @@ export default function ExchangeDetailModal() {
         )}
       </ScrollView>
     </SafeAreaView>
-    </ModalErrorBoundary>
   );
 }
 

@@ -108,6 +108,14 @@ function TransactionRow({
 // Screen
 
 export default function WalletModal() {
+  return (
+    <ModalErrorBoundary>
+      <WalletModalInner />
+    </ModalErrorBoundary>
+  );
+}
+
+function WalletModalInner() {
   const { t } = useTranslation('wallet');
   const navigation = useNavigation();
   const primary = usePrimaryColor();
@@ -179,7 +187,6 @@ export default function WalletModal() {
   );
 
   return (
-    <ModalErrorBoundary>
     <SafeAreaView style={styles.container}>
       <FlatList<TransactionItem>
         data={transactions}
@@ -201,7 +208,6 @@ export default function WalletModal() {
         }
       />
     </SafeAreaView>
-    </ModalErrorBoundary>
   );
 }
 

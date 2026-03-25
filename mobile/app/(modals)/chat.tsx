@@ -79,6 +79,14 @@ function MessageBubble({
 // ─── Screen ───────────────────────────────────────────────────────────────────
 
 export default function ChatScreen() {
+  return (
+    <ModalErrorBoundary>
+      <ChatScreenInner />
+    </ModalErrorBoundary>
+  );
+}
+
+function ChatScreenInner() {
   const { t } = useTranslation('chat');
   const navigation = useNavigation();
   const primary = usePrimaryColor();
@@ -199,7 +207,6 @@ export default function ChatScreen() {
   );
 
   return (
-    <ModalErrorBoundary>
       <SafeAreaView style={styles.container}>
         <KeyboardAvoidingView
           style={styles.flex}
@@ -257,7 +264,6 @@ export default function ChatScreen() {
           <Text style={[styles.disclaimer, { paddingBottom: Math.max(SPACING.sm, insets.bottom) }]}>{t('chat:disclaimer')}</Text>
         </KeyboardAvoidingView>
       </SafeAreaView>
-    </ModalErrorBoundary>
   );
 }
 

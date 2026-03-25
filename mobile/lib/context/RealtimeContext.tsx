@@ -59,6 +59,8 @@ export function RealtimeProvider({ children }: { children: React.ReactNode }) {
   const appStateRef = useRef<AppStateStatus>(AppState.currentState);
   /** conversation_id → set of handlers listening for new messages */
   const messageListenersRef = useRef<Map<number, Set<MessageHandler>>>(new Map());
+  /** Track whether the refresh callback is currently registered */
+  const refreshCallbackRegisteredRef = useRef(false);
 
   // Seed unread count from REST API whenever auth state changes
   useEffect(() => {
@@ -110,7 +112,7 @@ export function RealtimeProvider({ children }: { children: React.ReactNode }) {
             // Also dispatch by sender's user ID — the thread screen subscribes
             // using the other user's ID (not the conversation row ID)
             const senderId = rawPayload.message.sender?.id;
-            if (senderId && senderId !== rawPayload.conversation_id) {
+            if (senderId) {
               const senderListeners = listeners.get(senderId);
               if (senderListeners && senderListeners.size > 0) {
                 hasActiveListener = true;
@@ -140,7 +142,14 @@ export function RealtimeProvider({ children }: { children: React.ReactNode }) {
   // Re-fetch unread count when the app returns to the foreground,
   // and reconnect Pusher if it dropped while backgrounded.
   useEffect(() => {
-    if (!isAuthenticated) return;
+    if (!isAuthenticated) {
+      // Explicitly unregister refresh callback when auth is lost
+      if (refreshCallbackRegisteredRef.current) {
+        unregisterRefreshCallback();
+        refreshCallbackRegisteredRef.current = false;
+      }
+      return;
+    }
 
     function refreshCounts() {
       api
@@ -167,10 +176,12 @@ export function RealtimeProvider({ children }: { children: React.ReactNode }) {
 
     // Push notifications: silent data pushes also trigger a count refresh
     registerRefreshCallback(refreshCounts);
+    refreshCallbackRegisteredRef.current = true;
 
     return () => {
       appStateSubscription.remove();
       unregisterRefreshCallback();
+      refreshCallbackRegisteredRef.current = false;
     };
   }, [isAuthenticated]);
 

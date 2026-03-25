@@ -35,6 +35,14 @@ import ModalErrorBoundary from '@/components/ModalErrorBoundary';
 const WEB_URL = 'https://app.project-nexus.ie';
 
 export default function EventDetailScreen() {
+  return (
+    <ModalErrorBoundary>
+      <EventDetailScreenInner />
+    </ModalErrorBoundary>
+  );
+}
+
+function EventDetailScreenInner() {
   const { t } = useTranslation('events');
   const navigation = useNavigation();
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -158,7 +166,6 @@ export default function EventDetailScreen() {
     : '—';
 
   return (
-    <ModalErrorBoundary>
     <SafeAreaView style={styles.container} edges={['bottom']}>
       <ScrollView
         contentContainerStyle={styles.content}
@@ -261,7 +268,6 @@ export default function EventDetailScreen() {
         ) : null}
       </ScrollView>
     </SafeAreaView>
-    </ModalErrorBoundary>
   );
 }
 

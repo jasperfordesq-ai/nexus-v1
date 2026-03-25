@@ -58,6 +58,14 @@ interface MemberProfile {
 }
 
 export default function MemberProfileScreen() {
+  return (
+    <ModalErrorBoundary>
+      <MemberProfileScreenInner />
+    </ModalErrorBoundary>
+  );
+}
+
+function MemberProfileScreenInner() {
   const { t } = useTranslation('members');
   const { id } = useLocalSearchParams<{ id: string }>();
   const primary = usePrimaryColor();
@@ -222,7 +230,6 @@ export default function MemberProfileScreen() {
   }
 
   return (
-    <ModalErrorBoundary>
     <SafeAreaView style={styles.container}>
       <ScrollView
         contentContainerStyle={styles.scroll}
@@ -424,7 +431,6 @@ export default function MemberProfileScreen() {
         </View>
       </View>
     </SafeAreaView>
-    </ModalErrorBoundary>
   );
 }
 

@@ -35,6 +35,14 @@ import ModalErrorBoundary from '@/components/ModalErrorBoundary';
 const WEB_URL = 'https://app.project-nexus.ie';
 
 export default function GroupDetailScreen() {
+  return (
+    <ModalErrorBoundary>
+      <GroupDetailScreenInner />
+    </ModalErrorBoundary>
+  );
+}
+
+function GroupDetailScreenInner() {
   const { t } = useTranslation('groups');
   const navigation = useNavigation();
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -185,7 +193,6 @@ export default function GroupDetailScreen() {
   const displayDescription = group.long_description ?? group.description;
 
   return (
-    <ModalErrorBoundary>
     <SafeAreaView style={styles.container} edges={['bottom']}>
       <ScrollView
         contentContainerStyle={styles.content}
@@ -311,7 +318,6 @@ export default function GroupDetailScreen() {
         ) : null}
       </ScrollView>
     </SafeAreaView>
-    </ModalErrorBoundary>
   );
 }
 
