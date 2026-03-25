@@ -3,9 +3,8 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import { api, ApiResponseError } from '@/lib/api/client';
-import { API_V2, API_BASE_URL, DEFAULT_TENANT, STORAGE_KEYS, TIMEOUTS } from '@/lib/constants';
-import { storage } from '@/lib/storage';
+import { api } from '@/lib/api/client';
+import { API_V2 } from '@/lib/constants';
 import { type User } from '@/lib/api/auth';
 
 export interface UpdateProfilePayload {
@@ -39,9 +38,11 @@ export function updatePassword(payload: UpdatePasswordPayload): Promise<void> {
 
 /**
  * POST /api/v2/users/me/avatar — multipart form data upload.
+ * Uses the centralized API client which handles auth token refresh,
+ * tenant slug, error formatting, and the upload timeout (60s).
  * Returns the updated avatar URL.
  */
-export async function updateAvatar(uri: string): Promise<{ data: { avatar_url: string } }> {
+export function updateAvatar(uri: string): Promise<{ data: { avatar_url: string } }> {
   const formData = new FormData();
   const filename = uri.split('/').pop() ?? 'avatar.jpg';
   const match = /\.(\w+)$/.exec(filename);
@@ -49,42 +50,5 @@ export async function updateAvatar(uri: string): Promise<{ data: { avatar_url: s
   // FormData accepts this shape in React Native
   formData.append('avatar', { uri, name: filename, type } as unknown as Blob);
 
-  // Use raw fetch — Content-Type must NOT be set so React Native sets multipart boundary
-  const token = await storage.get(STORAGE_KEYS.AUTH_TOKEN);
-  const tenant = await storage.get(STORAGE_KEYS.TENANT_SLUG) ?? DEFAULT_TENANT;
-
-  // Apply timeout to prevent hanging uploads
-  const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), TIMEOUTS.API_REQUEST);
-
-  let response: Response;
-  try {
-    response = await fetch(`${API_BASE_URL}/api/v2/users/me/avatar`, {
-      method: 'POST',
-      headers: {
-        Authorization: `Bearer ${token}`,
-        'X-Tenant-Slug': tenant,
-      },
-      body: formData,
-      signal: controller.signal,
-    });
-  } catch (err) {
-    clearTimeout(timeoutId);
-    if (err instanceof Error && err.name === 'AbortError') {
-      throw new ApiResponseError(0, 'Upload timed out. Please try again.');
-    }
-    throw new ApiResponseError(0, 'Network error. Please check your connection.');
-  }
-  clearTimeout(timeoutId);
-
-  if (!response.ok) {
-    let message = 'Avatar upload failed';
-    try {
-      const errBody = await response.json() as { message?: string };
-      if (errBody?.message) message = errBody.message;
-    } catch { /* response may not be JSON */ }
-    if (response.status === 413) message = 'Image is too large. Please choose a smaller photo.';
-    throw new ApiResponseError(response.status, message);
-  }
-  return response.json() as Promise<{ data: { avatar_url: string } }>;
+  return api.upload<{ data: { avatar_url: string } }>(`${API_V2}/users/me/avatar`, formData);
 }

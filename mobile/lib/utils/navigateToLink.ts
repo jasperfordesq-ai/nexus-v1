@@ -38,11 +38,27 @@ export function navigateToLink(link: string | null): void {
     case 'groups':
       if (id) router.push({ pathname: '/(modals)/group-detail', params: { id } });
       break;
+    case 'jobs':
+      if (id) router.push({ pathname: '/(modals)/job-detail', params: { id } });
+      else router.push('/(modals)/jobs');
+      break;
+    case 'job':
+      if (id) router.push({ pathname: '/(modals)/job-detail', params: { id } });
+      else router.push('/(modals)/jobs');
+      break;
     case 'organisations':
+    case 'organizations':
       if (id) router.push({ pathname: '/(modals)/organisation-detail', params: { id } });
+      else router.push('/(modals)/organisations');
+      break;
+    case 'organisation':
+    case 'organization':
+      if (id) router.push({ pathname: '/(modals)/organisation-detail', params: { id } });
+      else router.push('/(modals)/organisations');
       break;
     case 'volunteering':
       if (id) router.push({ pathname: '/(modals)/volunteering-detail', params: { id } });
+      else router.push('/(modals)/volunteering');
       break;
     case 'goals':
       router.push('/(modals)/goals');

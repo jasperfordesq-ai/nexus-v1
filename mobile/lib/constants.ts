@@ -51,3 +51,6 @@ export const API_V2 = '/api/v2';
 /** Web app URL for share links and deep linking */
 export const APP_URL: string =
   process.env.EXPO_PUBLIC_APP_URL ?? 'https://app.project-nexus.ie';
+
+/** Forgot password URL — opened in the device browser from the login screen */
+export const FORGOT_PASSWORD_URL = `${APP_URL}/forgot-password`;

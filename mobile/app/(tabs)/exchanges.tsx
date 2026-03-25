@@ -3,7 +3,7 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import { useCallback, useState, useMemo } from 'react';
+import { useCallback, useEffect, useRef, useState, useMemo } from 'react';
 import {
   ActivityIndicator,
   FlatList,
@@ -32,10 +32,17 @@ import { ExchangeCardSkeleton } from '@/components/ui/Skeleton';
 import { TYPOGRAPHY } from '@/lib/styles/typography';
 import { SPACING, RADIUS } from '@/lib/styles/spacing';
 
-/** Extractor for cursor-based ExchangeListResponse. */
+/** Extractor for cursor-based ExchangeListResponse with deduplication. */
 function extractExchangePage(response: ExchangeListResponse) {
+  // Deduplicate — the API can return the same item across page boundaries
+  const seen = new Set<number>();
+  const unique = response.data.filter((item) => {
+    if (seen.has(item.id)) return false;
+    seen.add(item.id);
+    return true;
+  });
   return {
-    items: response.data,
+    items: unique,
     cursor: response.meta.cursor,
     hasMore: response.meta.has_more,
   };
@@ -59,6 +66,24 @@ export default function ExchangesScreen() {
 
   const { items, isLoading, isLoadingMore, error, hasMore, loadMore, refresh } =
     usePaginatedApi<Exchange, ExchangeListResponse>(fetchExchanges, extractExchangePage, [debouncedSearch]);
+
+  // Dedicated pull-to-refresh state (mirrors home.tsx pattern)
+  const [isRefreshing, setIsRefreshing] = useState(false);
+  const wasRefreshingRef = useRef(false);
+
+  const handleRefresh = useCallback(() => {
+    setIsRefreshing(true);
+    wasRefreshingRef.current = true;
+    refresh();
+  }, [refresh]);
+
+  // Clear the pull-to-refresh spinner once loading finishes
+  useEffect(() => {
+    if (wasRefreshingRef.current && !isLoading) {
+      wasRefreshingRef.current = false;
+      setIsRefreshing(false);
+    }
+  }, [isLoading]);
 
   return (
     <SafeAreaView style={styles.container}>
@@ -102,7 +127,7 @@ export default function ExchangesScreen() {
         keyExtractor={(item) => String(item.id)}
         renderItem={({ item }) => <ExchangeCard exchange={item} />}
         refreshControl={
-          <RefreshControl refreshing={isLoading && items.length > 0} onRefresh={refresh} tintColor={primary} colors={[primary]} />
+          <RefreshControl refreshing={isRefreshing} onRefresh={handleRefresh} tintColor={primary} colors={[primary]} />
         }
         onEndReached={() => { if (hasMore) loadMore(); }}
         onEndReachedThreshold={0.3}

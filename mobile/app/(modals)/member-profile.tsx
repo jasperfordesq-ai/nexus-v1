@@ -38,8 +38,7 @@ import { useTheme, type Theme } from '@/lib/hooks/useTheme';
 import Avatar from '@/components/ui/Avatar';
 import LoadingSpinner from '@/components/ui/LoadingSpinner';
 import ModalErrorBoundary from '@/components/ModalErrorBoundary';
-
-const WEB_URL = 'https://app.project-nexus.ie';
+import { APP_URL } from '@/lib/constants';
 
 /** Extended member shape returned by the single-member endpoint */
 interface MemberProfile {
@@ -187,7 +186,7 @@ export default function MemberProfileScreen() {
     void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     try {
       await Share.share({
-        message: `${member.name} — ${WEB_URL}/members/${member.id}`,
+        message: `${member.name} — ${APP_URL}/members/${member.id}`,
       });
     } catch { /* ignore */ }
   }

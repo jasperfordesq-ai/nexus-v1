@@ -29,11 +29,10 @@ import { useAuth } from '@/lib/hooks/useAuth';
 import { ApiResponseError } from '@/lib/api/client';
 import { usePrimaryColor } from '@/lib/hooks/useTenant';
 import { useTheme, type Theme } from '@/lib/hooks/useTheme';
+import { FORGOT_PASSWORD_URL } from '@/lib/constants';
 
 /** White text used on primary-colored backgrounds for guaranteed contrast */
 const PRIMARY_CONTRAST_TEXT = '#FFFFFF'; // contrast text on primary
-
-const FORGOT_PASSWORD_URL = 'https://app.project-nexus.ie/forgot-password';
 
 function makeLoginSchema(t: (key: string) => string) {
   return z.object({

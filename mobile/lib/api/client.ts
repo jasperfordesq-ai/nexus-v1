@@ -154,10 +154,17 @@ async function request<T>(
     storage.get(STORAGE_KEYS.TENANT_SLUG),
   ]);
 
+  const isFormData = typeof FormData !== 'undefined' && body instanceof FormData;
+
   const headers: Record<string, string> = {
-    'Content-Type': 'application/json',
     Accept: 'application/json',
   };
+
+  // Do NOT set Content-Type for FormData — React Native sets the multipart
+  // boundary automatically. For all other requests use JSON.
+  if (!isFormData) {
+    headers['Content-Type'] = 'application/json';
+  }
 
   if (token) {
     headers['Authorization'] = `Bearer ${token}`;
@@ -177,7 +184,7 @@ async function request<T>(
     response = await fetch(url.toString(), {
       method,
       headers,
-      body: body !== undefined ? JSON.stringify(body) : undefined,
+      body: body !== undefined ? (isFormData ? (body as BodyInit) : JSON.stringify(body)) : undefined,
       signal: controller.signal,
     });
   } catch (err) {
@@ -195,7 +202,9 @@ async function request<T>(
     const newToken = await attemptTokenRefresh();
     if (newToken) {
       // Retry the original request with the refreshed token
-      const retryHeaders = { ...headers, Authorization: `Bearer ${newToken}` };
+      const retryHeaders: Record<string, string> = { ...headers, Authorization: `Bearer ${newToken}` };
+      // For FormData, ensure Content-Type is not set (let React Native set multipart boundary)
+      if (isFormData) delete retryHeaders['Content-Type'];
       const retryController = new AbortController();
       const retryTimeoutId = setTimeout(() => retryController.abort(), requestTimeout);
       let retryRes: Response;
@@ -203,7 +212,7 @@ async function request<T>(
         retryRes = await fetch(url.toString(), {
           method,
           headers: retryHeaders,
-          body: body !== undefined ? JSON.stringify(body) : undefined,
+          body: body !== undefined ? (isFormData ? (body as BodyInit) : JSON.stringify(body)) : undefined,
           signal: retryController.signal,
         });
       } catch (retryErr) {
