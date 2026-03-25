@@ -77,7 +77,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     registerUnauthorizedCallback(handleUnauthorized);
   }, [handleUnauthorized]);
 
-  // On app start: restore stored token and validate it with /users/me
+  // On app start: restore cached user immediately, then re-validate in background.
+  // This avoids blocking the UI on a slow network — the app renders from cache first.
   useEffect(() => {
     async function restoreSession() {
       setIsLoading(true);
@@ -85,14 +86,38 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         const storedToken = await storage.get(STORAGE_KEYS.AUTH_TOKEN);
         if (!storedToken) return;
 
-        // Validate token with /users/me BEFORE exposing auth state.
-        // This prevents briefly showing authenticated UI for revoked sessions.
+        // Show cached user data immediately so the app doesn't block on network
+        const cachedUser = await storage.getJson<AnyUser>(STORAGE_KEYS.USER_DATA);
+        if (cachedUser) {
+          setToken(storedToken);
+          setUser(cachedUser);
+          setIsLoading(false);
+
+          // Re-validate token with /users/me in the background
+          try {
+            const response = await getMe();
+            setUser(response.data);
+            await storage.setJson(STORAGE_KEYS.USER_DATA, response.data);
+          } catch {
+            // Token is revoked — clear session and redirect to login
+            await Promise.all([
+              storage.remove(STORAGE_KEYS.AUTH_TOKEN),
+              storage.remove(STORAGE_KEYS.REFRESH_TOKEN),
+              storage.remove(STORAGE_KEYS.USER_DATA),
+            ]);
+            setToken(null);
+            setUser(null);
+          }
+          return;
+        }
+
+        // No cached user — must validate with network before proceeding
         const response = await getMe();
         setToken(storedToken);
         setUser(response.data);
         await storage.setJson(STORAGE_KEYS.USER_DATA, response.data);
       } catch {
-        // Token invalid — clear everything
+        // Token invalid and no cache — clear everything
         await Promise.all([
           storage.remove(STORAGE_KEYS.AUTH_TOKEN),
           storage.remove(STORAGE_KEYS.REFRESH_TOKEN),

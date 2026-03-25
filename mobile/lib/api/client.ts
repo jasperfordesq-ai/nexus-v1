@@ -104,16 +104,38 @@ async function attemptTokenRefresh(): Promise<string | null> {
   }
 }
 
+/** Resolve the appropriate timeout for a given HTTP method */
+function getTimeoutForMethod(method: RequestMethod, isUpload = false): number {
+  if (isUpload) return TIMEOUTS.API_UPLOAD;
+  if (method === 'GET') return TIMEOUTS.API_GET;
+  return TIMEOUTS.API_MUTATION;
+}
+
+interface RequestOptions {
+  params?: Record<string, string>;
+  /** Override the default per-method timeout (ms) */
+  timeout?: number;
+  /** Mark as file upload to use the longer upload timeout */
+  isUpload?: boolean;
+}
+
 async function request<T>(
   method: RequestMethod,
   endpoint: string,
   body?: unknown,
-  params?: Record<string, string>,
+  paramsOrOptions?: Record<string, string> | RequestOptions,
 ): Promise<T> {
+  // Support both legacy params-only signature and new options object
+  const options: RequestOptions =
+    paramsOrOptions && ('timeout' in paramsOrOptions || 'isUpload' in paramsOrOptions || 'params' in paramsOrOptions)
+      ? (paramsOrOptions as RequestOptions)
+      : { params: paramsOrOptions as Record<string, string> | undefined };
+
+  const requestTimeout = options.timeout ?? getTimeoutForMethod(method, options.isUpload);
   // Build URL with optional query params
   const url = new URL(`${API_BASE_URL}${endpoint}`);
-  if (params) {
-    Object.entries(params).forEach(([k, v]) => url.searchParams.set(k, v));
+  if (options.params) {
+    Object.entries(options.params).forEach(([k, v]) => url.searchParams.set(k, v));
   }
 
   // Gather auth token and active tenant
@@ -138,7 +160,7 @@ async function request<T>(
 
   // Abort controller for timeout support
   const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), TIMEOUTS.API_REQUEST);
+  const timeoutId = setTimeout(() => controller.abort(), requestTimeout);
 
   let response: Response;
   try {
@@ -165,7 +187,7 @@ async function request<T>(
       // Retry the original request with the refreshed token
       const retryHeaders = { ...headers, Authorization: `Bearer ${newToken}` };
       const retryController = new AbortController();
-      const retryTimeoutId = setTimeout(() => retryController.abort(), TIMEOUTS.API_REQUEST);
+      const retryTimeoutId = setTimeout(() => retryController.abort(), requestTimeout);
       let retryRes: Response;
       try {
         retryRes = await fetch(url.toString(), {
@@ -236,7 +258,7 @@ async function request<T>(
  */
 export const api = {
   get<T>(endpoint: string, params?: Record<string, string>): Promise<T> {
-    return request<T>('GET', endpoint, undefined, params);
+    return request<T>('GET', endpoint, undefined, { params });
   },
 
   post<T>(endpoint: string, body?: unknown): Promise<T> {
@@ -253,5 +275,10 @@ export const api = {
 
   delete<T>(endpoint: string): Promise<T> {
     return request<T>('DELETE', endpoint);
+  },
+
+  /** POST with file-upload timeout (60s) for large payloads */
+  upload<T>(endpoint: string, body?: unknown): Promise<T> {
+    return request<T>('POST', endpoint, body, { isUpload: true });
   },
 };

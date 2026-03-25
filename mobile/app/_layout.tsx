@@ -34,27 +34,6 @@ LogBox.ignoreLogs([
   'Non-serializable values were found in the navigation state',
 ]);
 
-// Patch console.error to prevent React dev-mode warnings from triggering
-// the full-screen error overlay in Expo Go. These are non-fatal warnings
-// (duplicate keys, deprecation notices) that block the entire UI.
-if (__DEV__) {
-  const originalConsoleError = console.error;
-  console.error = (...args: unknown[]) => {
-    const msg = typeof args[0] === 'string' ? args[0] : '';
-    if (
-      msg.includes('Encountered two children with the same key') ||
-      msg.includes('Each child in a list should have a unique') ||
-      msg.includes('expo-notifications') ||
-      msg.includes('expo-av')
-    ) {
-      // Downgrade to warning so the error overlay doesn't appear
-      console.warn('[suppressed]', ...args);
-      return;
-    }
-    originalConsoleError(...args);
-  };
-}
-
 Sentry.init({
   dsn: process.env.EXPO_PUBLIC_SENTRY_DSN ?? '',
   // Sample 10% of traces in production to reduce Sentry quota usage
