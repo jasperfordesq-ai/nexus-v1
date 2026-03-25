@@ -124,15 +124,28 @@ export function ImageCarousel({ media, className = '' }: ImageCarouselProps) {
               dragElastic={0.3}
               onDragEnd={handleDragEnd}
               className="w-full cursor-pointer"
-              onClick={() => setLightboxOpen(true)}
+              onClick={current.media_type === 'video' ? undefined : () => setLightboxOpen(true)}
             >
-              <img
-                src={resolveAssetUrl(current.file_url)}
-                alt={current.alt_text || t('carousel.image_of', 'Image {{current}} of {{total}}', { current: currentIndex + 1, total })}
-                className="w-full max-h-[500px] sm:max-h-[500px] max-sm:max-h-[400px] object-contain select-none"
-                draggable={false}
-                loading={currentIndex === 0 ? 'eager' : 'lazy'}
-              />
+              {current.media_type === 'video' ? (
+                <video
+                  src={resolveAssetUrl(current.file_url)}
+                  poster={current.thumbnail_url ? resolveAssetUrl(current.thumbnail_url) : undefined}
+                  controls
+                  playsInline
+                  preload="metadata"
+                  className="w-full max-h-[500px] sm:max-h-[500px] max-sm:max-h-[400px] object-contain select-none"
+                  aria-label={current.alt_text || t('carousel.video_of', 'Video {{current}} of {{total}}', { current: currentIndex + 1, total })}
+                  onClick={(e) => e.stopPropagation()}
+                />
+              ) : (
+                <img
+                  src={resolveAssetUrl(current.file_url)}
+                  alt={current.alt_text || t('carousel.image_of', 'Image {{current}} of {{total}}', { current: currentIndex + 1, total })}
+                  className="w-full max-h-[500px] sm:max-h-[500px] max-sm:max-h-[400px] object-contain select-none"
+                  draggable={false}
+                  loading={currentIndex === 0 ? 'eager' : 'lazy'}
+                />
+              )}
             </motion.div>
           </AnimatePresence>
         </div>

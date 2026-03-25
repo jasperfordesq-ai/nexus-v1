@@ -16,6 +16,7 @@
  */
 
 import { useState } from 'react';
+import { Play } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { resolveAssetUrl } from '@/lib/helpers';
 import type { PostMedia } from './types';
@@ -38,26 +39,45 @@ export function MediaGrid({ media, className = '' }: MediaGridProps) {
     setLightboxIndex(index);
   };
 
-  const renderImage = (item: PostMedia, index: number, extraOverlay = false) => (
+  const renderMedia = (item: PostMedia, index: number, extraOverlay = false) => (
     <button
       key={item.id}
       type="button"
       className="relative w-full h-full overflow-hidden focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)] focus:ring-inset"
       onClick={() => openLightbox(index)}
-      aria-label={item.alt_text || t('carousel.view_image', 'View image {{current}} of {{total}}', { current: index + 1, total })}
+      aria-label={item.alt_text || t(item.media_type === 'video' ? 'carousel.view_video' : 'carousel.view_image', 'View {{type}} {{current}} of {{total}}', { type: item.media_type, current: index + 1, total })}
     >
-      <img
-        src={resolveAssetUrl(item.thumbnail_url || item.file_url)}
-        alt={item.alt_text || t('carousel.image_of', 'Image {{current}} of {{total}}', { current: index + 1, total })}
-        className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
-        loading={index === 0 ? 'eager' : 'lazy'}
-        draggable={false}
-        onError={(e) => {
-          const img = e.target as HTMLImageElement;
-          const fullUrl = resolveAssetUrl(item.file_url);
-          if (img.src !== fullUrl) img.src = fullUrl;
-        }}
-      />
+      {item.media_type === 'video' ? (
+        <>
+          <video
+            src={resolveAssetUrl(item.file_url)}
+            poster={item.thumbnail_url ? resolveAssetUrl(item.thumbnail_url) : undefined}
+            muted
+            playsInline
+            preload="metadata"
+            className="w-full h-full object-cover"
+          />
+          {/* Play icon overlay for video thumbnails in grid */}
+          <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+            <div className="bg-black/40 backdrop-blur-sm rounded-full p-2">
+              <Play className="w-5 h-5 text-white fill-white" aria-hidden="true" />
+            </div>
+          </div>
+        </>
+      ) : (
+        <img
+          src={resolveAssetUrl(item.thumbnail_url || item.file_url)}
+          alt={item.alt_text || t('carousel.image_of', 'Image {{current}} of {{total}}', { current: index + 1, total })}
+          className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
+          loading={index === 0 ? 'eager' : 'lazy'}
+          draggable={false}
+          onError={(e) => {
+            const img = e.target as HTMLImageElement;
+            const fullUrl = resolveAssetUrl(item.file_url);
+            if (img.src !== fullUrl) img.src = fullUrl;
+          }}
+        />
+      )}
       {extraOverlay && extraCount > 0 && (
         <div className="absolute inset-0 bg-black/50 flex items-center justify-center" aria-label={t('carousel.more_images', '{{count}} more images', { count: extraCount })}>
           <span className="text-white text-2xl font-bold" aria-hidden="true">+{extraCount}</span>
@@ -71,8 +91,8 @@ export function MediaGrid({ media, className = '' }: MediaGridProps) {
       // Side-by-side 50/50
       return (
         <div className={`grid grid-cols-2 gap-1 rounded-xl overflow-hidden ${className}`}>
-          <div className="aspect-square">{renderImage(displayMedia[0], 0)}</div>
-          <div className="aspect-square">{renderImage(displayMedia[1], 1)}</div>
+          <div className="aspect-square">{renderMedia(displayMedia[0], 0)}</div>
+          <div className="aspect-square">{renderMedia(displayMedia[1], 1)}</div>
         </div>
       );
     }
@@ -81,10 +101,10 @@ export function MediaGrid({ media, className = '' }: MediaGridProps) {
       // One large left (60%) + two stacked right (40%)
       return (
         <div className={`grid grid-cols-5 gap-1 rounded-xl overflow-hidden ${className}`} style={{ height: '24rem' }}>
-          <div className="col-span-3 h-full">{renderImage(displayMedia[0], 0)}</div>
+          <div className="col-span-3 h-full">{renderMedia(displayMedia[0], 0)}</div>
           <div className="col-span-2 grid grid-rows-2 gap-1 h-full">
-            <div>{renderImage(displayMedia[1], 1)}</div>
-            <div>{renderImage(displayMedia[2], 2)}</div>
+            <div>{renderMedia(displayMedia[1], 1)}</div>
+            <div>{renderMedia(displayMedia[2], 2)}</div>
           </div>
         </div>
       );
@@ -93,11 +113,11 @@ export function MediaGrid({ media, className = '' }: MediaGridProps) {
     // 4+ images: 2x2 grid, with +N overlay on 4th if 5+
     return (
       <div className={`grid grid-cols-2 gap-1 rounded-xl overflow-hidden ${className}`}>
-        <div className="aspect-square">{renderImage(displayMedia[0], 0)}</div>
-        <div className="aspect-square">{renderImage(displayMedia[1], 1)}</div>
-        <div className="aspect-square">{renderImage(displayMedia[2], 2)}</div>
+        <div className="aspect-square">{renderMedia(displayMedia[0], 0)}</div>
+        <div className="aspect-square">{renderMedia(displayMedia[1], 1)}</div>
+        <div className="aspect-square">{renderMedia(displayMedia[2], 2)}</div>
         <div className="aspect-square">
-          {renderImage(displayMedia[3], 3, total > 4)}
+          {renderMedia(displayMedia[3], 3, total > 4)}
         </div>
       </div>
     );

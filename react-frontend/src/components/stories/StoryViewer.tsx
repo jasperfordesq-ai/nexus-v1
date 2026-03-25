@@ -28,6 +28,7 @@ import {
   ChevronRight,
   Send,
 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { useAuth, useToast } from '@/contexts';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
@@ -125,14 +126,14 @@ function resolveGradient(gradient: string | null | undefined): string {
 // Time formatting
 // ─────────────────────────────────────────────────────────────────────────────
 
-function timeAgo(dateStr: string): string {
+function timeAgo(dateStr: string, t: (key: string, opts?: Record<string, unknown>) => string): string {
   const diff = Date.now() - new Date(dateStr).getTime();
   const mins = Math.floor(diff / 60000);
-  if (mins < 1) return 'Just now';
-  if (mins < 60) return `${mins}m ago`;
+  if (mins < 1) return t('viewer.time_just_now');
+  if (mins < 60) return t('viewer.time_minutes_ago', { count: mins });
   const hours = Math.floor(mins / 60);
-  if (hours < 24) return `${hours}h ago`;
-  return `${Math.floor(hours / 24)}d ago`;
+  if (hours < 24) return t('viewer.time_hours_ago', { count: hours });
+  return t('viewer.time_days_ago', { count: Math.floor(hours / 24) });
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -140,6 +141,7 @@ function timeAgo(dateStr: string): string {
 // ─────────────────────────────────────────────────────────────────────────────
 
 export function StoryViewer({ storyUsers, initialUserIndex, onClose }: StoryViewerProps) {
+  const { t } = useTranslation('stories');
   const { user: currentUser } = useAuth();
   const toast = useToast();
   const [currentUserIdx, setCurrentUserIdx] = useState(initialUserIndex);
@@ -494,11 +496,11 @@ export function StoryViewer({ storyUsers, initialUserIndex, onClose }: StoryView
     setIsPaused(true);
     try {
       await api.post(`/v2/stories/${currentStory.id}/reply`, { body: replyText.trim() });
-      toast.success('Reply sent!');
+      toast.success(t('viewer.reply_sent'));
       setReplyText('');
     } catch (err) {
       logError('Failed to send story reply', err);
-      toast.error('Failed to send reply');
+      toast.error(t('viewer.reply_error'));
     } finally {
       setIsSendingReply(false);
       setIsPaused(false);
@@ -512,14 +514,14 @@ export function StoryViewer({ storyUsers, initialUserIndex, onClose }: StoryView
       className="fixed inset-0 z-[9999] bg-black flex items-center justify-center"
       role="dialog"
       aria-modal="true"
-      aria-label={`Story from ${currentUserStory.name}`}
+      aria-label={t('viewer.story_from', { name: currentUserStory.name })}
     >
       {/* Desktop: previous user arrow */}
       {currentUserIdx > 0 && (
         <button
           className="absolute left-4 top-1/2 -translate-y-1/2 z-50 w-10 h-10 rounded-full bg-white/10 backdrop-blur flex items-center justify-center hover:bg-white/20 transition-colors hidden md:flex"
           onClick={() => setCurrentUserIdx((prev) => prev - 1)}
-          aria-label="Previous user"
+          aria-label={t('viewer.previous_user')}
         >
           <ChevronLeft className="w-5 h-5 text-white" />
         </button>
@@ -530,7 +532,7 @@ export function StoryViewer({ storyUsers, initialUserIndex, onClose }: StoryView
         <button
           className="absolute right-4 top-1/2 -translate-y-1/2 z-50 w-10 h-10 rounded-full bg-white/10 backdrop-blur flex items-center justify-center hover:bg-white/20 transition-colors hidden md:flex"
           onClick={() => setCurrentUserIdx((prev) => prev + 1)}
-          aria-label="Next user"
+          aria-label={t('viewer.next_user')}
         >
           <ChevronRight className="w-5 h-5 text-white" />
         </button>
@@ -896,7 +898,7 @@ export function StoryViewer({ storyUsers, initialUserIndex, onClose }: StoryView
                 </p>
                 {currentStory && (
                   <p className="text-white/60 text-xs">
-                    {timeAgo(currentStory.created_at)}
+                    {timeAgo(currentStory.created_at, t)}
                   </p>
                 )}
               </div>
@@ -940,7 +942,7 @@ export function StoryViewer({ storyUsers, initialUserIndex, onClose }: StoryView
               <button
                 onClick={onClose}
                 className="p-1.5 rounded-full hover:bg-white/10 transition-colors"
-                aria-label="Close story viewer"
+                aria-label={t('viewer.close')}
               >
                 <X className="w-5 h-5 text-white" />
               </button>
@@ -1030,7 +1032,7 @@ export function StoryViewer({ storyUsers, initialUserIndex, onClose }: StoryView
               <button
                 onClick={() => { setShowViewers(false); setIsPaused(false); }}
                 className="p-1 rounded-full hover:bg-white/10 transition-colors"
-                aria-label="Close viewers list"
+                aria-label={t('viewer.viewers_close')}
               >
                 <X className="w-4 h-4 text-white" />
               </button>
@@ -1049,7 +1051,7 @@ export function StoryViewer({ storyUsers, initialUserIndex, onClose }: StoryView
                     />
                     <div className="flex-1 min-w-0">
                       <p className="text-white text-sm font-medium truncate">{v.name}</p>
-                      <p className="text-white/40 text-xs">{timeAgo(v.viewed_at)}</p>
+                      <p className="text-white/40 text-xs">{timeAgo(v.viewed_at, t)}</p>
                     </div>
                   </div>
                 ))

@@ -27,22 +27,28 @@ CREATE TABLE IF NOT EXISTS stories (
 
 CREATE TABLE IF NOT EXISTS story_views (
     id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    tenant_id INT NOT NULL,
     story_id BIGINT UNSIGNED NOT NULL,
     viewer_id INT UNSIGNED NOT NULL,
     viewed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     UNIQUE KEY uk_story_viewer (story_id, viewer_id),
     KEY idx_story_views (story_id),
-    KEY idx_viewer (viewer_id)
+    KEY idx_viewer (viewer_id),
+    KEY idx_story_views_tenant (tenant_id),
+    FOREIGN KEY (tenant_id) REFERENCES tenants(id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS story_reactions (
     id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    tenant_id INT NOT NULL,
     story_id BIGINT UNSIGNED NOT NULL,
     user_id INT UNSIGNED NOT NULL,
     reaction_type VARCHAR(20) NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     KEY idx_story_reactions (story_id),
-    FOREIGN KEY (story_id) REFERENCES stories(id) ON DELETE CASCADE
+    KEY idx_story_reactions_tenant (tenant_id),
+    FOREIGN KEY (story_id) REFERENCES stories(id) ON DELETE CASCADE,
+    FOREIGN KEY (tenant_id) REFERENCES tenants(id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS story_highlights (
@@ -68,10 +74,13 @@ CREATE TABLE IF NOT EXISTS story_highlight_items (
 
 CREATE TABLE IF NOT EXISTS story_poll_votes (
     id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    tenant_id INT NOT NULL,
     story_id BIGINT UNSIGNED NOT NULL,
     user_id INT UNSIGNED NOT NULL,
     option_index TINYINT UNSIGNED NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     UNIQUE KEY uk_story_poll_vote (story_id, user_id),
-    FOREIGN KEY (story_id) REFERENCES stories(id) ON DELETE CASCADE
+    KEY idx_story_poll_votes_tenant (tenant_id),
+    FOREIGN KEY (story_id) REFERENCES stories(id) ON DELETE CASCADE,
+    FOREIGN KEY (tenant_id) REFERENCES tenants(id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

@@ -13,7 +13,7 @@ CREATE TABLE IF NOT EXISTS user_presence (
     hide_presence TINYINT(1) NOT NULL DEFAULT 0,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    PRIMARY KEY (user_id),
+    PRIMARY KEY (tenant_id, user_id),
     KEY idx_tenant_status (tenant_id, status),
     KEY idx_last_seen (tenant_id, last_seen_at),
     FOREIGN KEY (tenant_id) REFERENCES tenants(id) ON DELETE CASCADE

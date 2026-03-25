@@ -7,7 +7,10 @@
 namespace App\Http\Controllers\Api;
 
 use App\Services\ReactionService;
+use App\Services\RealtimeService;
+use App\Services\SocialNotificationService;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Log;
 
 /**
  * ReactionController — Handles emoji reactions on posts and comments.
@@ -54,6 +57,12 @@ class ReactionController extends BaseApiController
 
         try {
             $result = $this->reactionService->toggleReaction($id, 'post', $reactionType, $userId);
+
+            // Notify the post owner (only on 'added', not 'removed' or 'updated')
+            if ($result['action'] === 'added') {
+                $this->notifyReaction($userId, 'post', $id, $reactionType);
+            }
+
             return $this->respondWithData($result);
         } catch (\Exception $e) {
             return $this->respondWithError('REACTION_ERROR', 'Failed to toggle reaction', null, 500);
@@ -131,6 +140,12 @@ class ReactionController extends BaseApiController
 
         try {
             $result = $this->reactionService->toggleReaction($id, 'comment', $reactionType, $userId);
+
+            // Notify the comment owner (only on 'added')
+            if ($result['action'] === 'added') {
+                $this->notifyReaction($userId, 'comment', $id, $reactionType);
+            }
+
             return $this->respondWithData($result);
         } catch (\Exception $e) {
             return $this->respondWithError('REACTION_ERROR', 'Failed to toggle reaction', null, 500);
@@ -151,6 +166,48 @@ class ReactionController extends BaseApiController
             return $this->respondWithData($reactions);
         } catch (\Exception $e) {
             return $this->respondWithError('REACTION_ERROR', 'Failed to get reactions', null, 500);
+        }
+    }
+
+    // ========================================================================
+    // Private Helpers
+    // ========================================================================
+
+    /**
+     * Send a notification + Pusher broadcast when a user reacts to content.
+     *
+     * Non-critical: wrapped in try-catch so notification failures don't block
+     * the reaction response.
+     */
+    private function notifyReaction(int $actorId, string $targetType, int $targetId, string $reactionType): void
+    {
+        try {
+            $contentOwnerId = SocialNotificationService::getContentOwnerId($targetType, $targetId);
+
+            // Don't notify if reacting to own content
+            if (!$contentOwnerId || $contentOwnerId === $actorId) {
+                return;
+            }
+
+            // Create in-app notification (bell icon)
+            SocialNotificationService::notifyLike(
+                $contentOwnerId,
+                $actorId,
+                $targetType,
+                $targetId,
+                $reactionType
+            );
+
+            // Broadcast to Pusher for real-time update
+            RealtimeService::broadcastNotification($contentOwnerId, [
+                'type' => 'reaction',
+                'target_type' => $targetType,
+                'target_id' => $targetId,
+                'reaction_type' => $reactionType,
+                'actor_id' => $actorId,
+            ]);
+        } catch (\Throwable $e) {
+            Log::debug("Reaction notification error (non-critical): " . $e->getMessage());
         }
     }
 }

@@ -62,6 +62,7 @@ import { getAuthor, getItemDetailPath, getItemDetailLabel } from './types';
 import { FeedContentRenderer } from './FeedContentRenderer';
 import { ImageCarousel } from './ImageCarousel';
 import { MediaGrid } from './MediaGrid';
+import { VideoPlayer } from './VideoPlayer';
 import { ReactionPicker, ReactionSummary, type ReactionType } from '@/components/social';
 import { LinkPreviewCard } from '@/components/social/LinkPreviewCard';
 import { MentionRenderer } from '@/components/social/MentionRenderer';
@@ -569,9 +570,9 @@ const FeedCard = React.memo(function FeedCard({
           </div>
         )}
 
-        {/* Media: Multi-image carousel/grid, single image, or placeholder */}
+        {/* Media: Multi-image carousel/grid, single image/video, or placeholder */}
         {item.media && item.media.length > 1 ? (
-          /* Multi-image: use grid for 2-4, carousel for 5+ */
+          /* Multi-media: use grid for 2-4, carousel for 5+ */
           <div className="mb-4 -mx-5 overflow-hidden">
             {item.media.length <= 4 ? (
               <MediaGrid media={item.media} className="mx-5" />
@@ -580,9 +581,13 @@ const FeedCard = React.memo(function FeedCard({
             )}
           </div>
         ) : item.media && item.media.length === 1 ? (
-          /* Single media item from post_media */
+          /* Single media item — use VideoPlayer for video, ImageCarousel for image */
           <div className="mb-4 -mx-5 overflow-hidden">
-            <ImageCarousel media={item.media} className="mx-5" />
+            {item.media[0].media_type === 'video' ? (
+              <VideoPlayer media={item.media[0]} className="mx-5" />
+            ) : (
+              <ImageCarousel media={item.media} className="mx-5" />
+            )}
           </div>
         ) : item.image_url ? (
           <div className="mb-4 -mx-5 overflow-hidden">

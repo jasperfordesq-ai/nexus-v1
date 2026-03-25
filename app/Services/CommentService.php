@@ -41,24 +41,26 @@ class CommentService
         $userReactions = [];
 
         if (!empty($commentIds)) {
-            $reactionRows = DB::table('comment_reactions')
-                ->whereIn('comment_id', $commentIds)
-                ->selectRaw('comment_id, reaction_type, COUNT(*) as count')
-                ->groupBy('comment_id', 'reaction_type')
+            $reactionRows = DB::table('reactions')
+                ->where('target_type', 'comment')
+                ->whereIn('target_id', $commentIds)
+                ->selectRaw('target_id, emoji, COUNT(*) as count')
+                ->groupBy('target_id', 'emoji')
                 ->get();
 
             foreach ($reactionRows as $r) {
-                $reactions[$r->comment_id][$r->reaction_type] = (int) $r->count;
+                $reactions[$r->target_id][$r->emoji] = (int) $r->count;
             }
 
             if ($currentUserId > 0) {
-                $userReactionRows = DB::table('comment_reactions')
-                    ->whereIn('comment_id', $commentIds)
+                $userReactionRows = DB::table('reactions')
+                    ->where('target_type', 'comment')
+                    ->whereIn('target_id', $commentIds)
                     ->where('user_id', $currentUserId)
                     ->get();
 
                 foreach ($userReactionRows as $r) {
-                    $userReactions[$r->comment_id][] = $r->reaction_type;
+                    $userReactions[$r->target_id][] = $r->emoji;
                 }
             }
         }
@@ -438,32 +440,49 @@ class CommentService
      */
     public static function toggleReaction(int $userId, int $tenantId, int $commentId, string $emoji): array
     {
-        $existing = DB::table('comment_reactions')
-            ->where('comment_id', $commentId)
+        $existing = DB::table('reactions')
+            ->where('tenant_id', $tenantId)
+            ->where('target_type', 'comment')
+            ->where('target_id', $commentId)
             ->where('user_id', $userId)
-            ->where('reaction_type', $emoji)
             ->first();
 
         if ($existing) {
-            DB::table('comment_reactions')->where('id', $existing->id)->delete();
-            $action = 'removed';
+            if ($existing->emoji === $emoji) {
+                // Same type: remove
+                DB::table('reactions')
+                    ->where('id', $existing->id)
+                    ->where('tenant_id', $tenantId)
+                    ->delete();
+                $action = 'removed';
+            } else {
+                // Different type: update
+                DB::table('reactions')
+                    ->where('id', $existing->id)
+                    ->where('tenant_id', $tenantId)
+                    ->update(['emoji' => $emoji, 'created_at' => now()]);
+                $action = 'updated';
+            }
         } else {
-            DB::table('comment_reactions')->insert([
-                'comment_id' => $commentId,
-                'user_id' => $userId,
-                'tenant_id' => $tenantId,
-                'reaction_type' => $emoji,
-                'created_at' => now(),
+            DB::table('reactions')->insert([
+                'tenant_id'   => $tenantId,
+                'target_type' => 'comment',
+                'target_id'   => $commentId,
+                'user_id'     => $userId,
+                'emoji'       => $emoji,
+                'created_at'  => now(),
             ]);
             $action = 'added';
         }
 
         // Aggregate updated reactions for this comment
-        $reactionCounts = DB::table('comment_reactions')
-            ->where('comment_id', $commentId)
-            ->selectRaw('reaction_type, COUNT(*) as count')
-            ->groupBy('reaction_type')
-            ->pluck('count', 'reaction_type')
+        $reactionCounts = DB::table('reactions')
+            ->where('tenant_id', $tenantId)
+            ->where('target_type', 'comment')
+            ->where('target_id', $commentId)
+            ->selectRaw('emoji, COUNT(*) as count')
+            ->groupBy('emoji')
+            ->pluck('count', 'emoji')
             ->all();
 
         return [

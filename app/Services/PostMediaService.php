@@ -21,18 +21,29 @@ class PostMediaService
     /** Maximum number of media items per post */
     private const MAX_MEDIA_PER_POST = 10;
 
-    /** Maximum file size in bytes (10MB) */
-    private const MAX_FILE_SIZE = 10 * 1024 * 1024;
+    /** Maximum file size in bytes for images (10MB) */
+    private const MAX_IMAGE_SIZE = 10 * 1024 * 1024;
+
+    /** Maximum file size in bytes for videos (100MB) */
+    private const MAX_VIDEO_SIZE = 100 * 1024 * 1024;
 
     /** Thumbnail max width in pixels */
     private const THUMBNAIL_WIDTH = 400;
 
-    /** Allowed MIME types and their extensions */
-    private const ALLOWED_TYPES = [
+    /** Allowed image MIME types and their extensions */
+    private const ALLOWED_IMAGE_TYPES = [
         'image/jpeg' => ['jpg', 'jpeg'],
         'image/png'  => ['png'],
         'image/gif'  => ['gif'],
         'image/webp' => ['webp'],
+    ];
+
+    /** Allowed video MIME types and their extensions */
+    private const ALLOWED_VIDEO_TYPES = [
+        'video/mp4'       => ['mp4'],
+        'video/webm'      => ['webm'],
+        'video/ogg'       => ['ogg', 'ogv'],
+        'video/quicktime' => ['mov'],
     ];
 
     /**
@@ -84,18 +95,12 @@ class PostMediaService
                 continue;
             }
 
-            // Validate file size
-            if ($file->getSize() > self::MAX_FILE_SIZE) {
-                Log::warning("PostMediaService: File exceeds max size", [
-                    'post_id' => $postId,
-                    'size' => $file->getSize(),
-                ]);
-                continue;
-            }
+            $mime = $file->getMimeType();
+            $isImage = isset(self::ALLOWED_IMAGE_TYPES[$mime]);
+            $isVideo = isset(self::ALLOWED_VIDEO_TYPES[$mime]);
 
             // Validate MIME type
-            $mime = $file->getMimeType();
-            if (!isset(self::ALLOWED_TYPES[$mime])) {
+            if (!$isImage && !$isVideo) {
                 Log::warning("PostMediaService: Invalid MIME type", [
                     'post_id' => $postId,
                     'mime' => $mime,
@@ -103,19 +108,36 @@ class PostMediaService
                 continue;
             }
 
-            // Validate it's a real image
-            $imageInfo = @getimagesize($file->getPathname());
-            if ($imageInfo === false) {
+            // Validate file size (different limits for image vs video)
+            $maxSize = $isVideo ? self::MAX_VIDEO_SIZE : self::MAX_IMAGE_SIZE;
+            if ($file->getSize() > $maxSize) {
+                Log::warning("PostMediaService: File exceeds max size", [
+                    'post_id' => $postId,
+                    'size' => $file->getSize(),
+                    'limit' => $maxSize,
+                ]);
                 continue;
             }
 
-            $width = $imageInfo[0];
-            $height = $imageInfo[1];
+            $mediaType = $isVideo ? 'video' : 'image';
+            $allowedExts = $isVideo ? self::ALLOWED_VIDEO_TYPES[$mime] : self::ALLOWED_IMAGE_TYPES[$mime];
+            $width = null;
+            $height = null;
+
+            if ($isImage) {
+                // Validate it's a real image
+                $imageInfo = @getimagesize($file->getPathname());
+                if ($imageInfo === false) {
+                    continue;
+                }
+                $width = $imageInfo[0];
+                $height = $imageInfo[1];
+            }
 
             // Determine extension
             $ext = strtolower($file->getClientOriginalExtension());
-            if (!in_array($ext, self::ALLOWED_TYPES[$mime], true)) {
-                $ext = self::ALLOWED_TYPES[$mime][0];
+            if (!in_array($ext, $allowedExts, true)) {
+                $ext = $allowedExts[0];
             }
 
             // Capture file size before move (temp file won't exist after)
@@ -125,21 +147,26 @@ class PostMediaService
             $filename = 'media_' . bin2hex(random_bytes(16)) . '.' . $ext;
             $file->move($uploadDir, $filename);
 
-            // Strip EXIF metadata (GPS location, camera info) for privacy
-            $this->stripExifData($uploadDir . '/' . $filename, $mime);
+            // Strip EXIF metadata (GPS location, camera info) for privacy — images only
+            if ($isImage) {
+                $this->stripExifData($uploadDir . '/' . $filename, $mime);
+            }
 
             $fileUrl = "/uploads/posts/{$tenantId}/{$postId}/{$filename}";
 
-            // Generate thumbnail
-            $thumbnailUrl = $this->generateThumbnail(
-                $uploadDir . '/' . $filename,
-                $thumbDir,
-                $filename,
-                $mime
-            );
+            // Generate thumbnail — images only (video thumbnails require FFmpeg, deferred)
+            $thumbnailUrl = null;
+            if ($isImage) {
+                $thumbnailUrl = $this->generateThumbnail(
+                    $uploadDir . '/' . $filename,
+                    $thumbDir,
+                    $filename,
+                    $mime
+                );
 
-            if ($thumbnailUrl) {
-                $thumbnailUrl = "/uploads/posts/{$tenantId}/{$postId}/thumbs/{$filename}";
+                if ($thumbnailUrl) {
+                    $thumbnailUrl = "/uploads/posts/{$tenantId}/{$postId}/thumbs/{$filename}";
+                }
             }
 
             $displayOrder = $maxOrder + $index + 1;
@@ -148,7 +175,7 @@ class PostMediaService
             $mediaId = DB::table('post_media')->insertGetId([
                 'tenant_id'     => $tenantId,
                 'post_id'       => $postId,
-                'media_type'    => 'image',
+                'media_type'    => $mediaType,
                 'file_url'      => $fileUrl,
                 'thumbnail_url' => $thumbnailUrl,
                 'alt_text'      => $altText ? mb_substr($altText, 0, 500) : null,
@@ -161,7 +188,7 @@ class PostMediaService
 
             $results[] = [
                 'id'            => (int) $mediaId,
-                'media_type'    => 'image',
+                'media_type'    => $mediaType,
                 'file_url'      => $fileUrl,
                 'thumbnail_url' => $thumbnailUrl,
                 'alt_text'      => $altText ? mb_substr($altText, 0, 500) : null,

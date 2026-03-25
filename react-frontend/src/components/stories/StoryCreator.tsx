@@ -40,6 +40,7 @@ import {
   Pencil,
   Eraser,
 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { useToast } from '@/contexts';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
@@ -89,6 +90,7 @@ interface StoryCreatorProps {
 }
 
 export function StoryCreator({ onClose, onCreated }: StoryCreatorProps) {
+  const { t } = useTranslation('stories');
   const toast = useToast();
   const [mode, setMode] = useState<StoryMode>('text');
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -146,12 +148,12 @@ export function StoryCreator({ onClose, onCreated }: StoryCreatorProps) {
     if (!file) return;
 
     if (!file.type.startsWith('image/')) {
-      toast.error('Please select an image file');
+      toast.error(t('creator.error_image_type'));
       return;
     }
 
     if (file.size > 10 * 1024 * 1024) {
-      toast.error('Image must be less than 10MB');
+      toast.error(t('creator.error_image_size'));
       return;
     }
 
@@ -164,7 +166,7 @@ export function StoryCreator({ onClose, onCreated }: StoryCreatorProps) {
       reader.readAsDataURL(compressed);
     } catch (err) {
       logError('Failed to process image', err);
-      toast.error('Failed to process image');
+      toast.error(t('creator.error_process'));
     }
   }, [toast]);
 
@@ -174,12 +176,12 @@ export function StoryCreator({ onClose, onCreated }: StoryCreatorProps) {
     if (!file) return;
 
     if (!file.type.startsWith('video/')) {
-      toast.error('Please select a video file');
+      toast.error(t('creator.error_video_type'));
       return;
     }
 
     if (file.size > 50 * 1024 * 1024) {
-      toast.error('Video must be less than 50MB');
+      toast.error(t('creator.error_video_size'));
       return;
     }
 
@@ -211,7 +213,7 @@ export function StoryCreator({ onClose, onCreated }: StoryCreatorProps) {
       }
     } catch (err) {
       logError('Camera access failed', err);
-      toast.error('Could not access camera. Please check permissions.');
+      toast.error(t('creator.error_camera'));
     }
   }, [cameraFacing, mode, toast]);
 
@@ -397,25 +399,25 @@ export function StoryCreator({ onClose, onCreated }: StoryCreatorProps) {
 
     // Validation
     if (mode === 'photo' && !selectedImage) {
-      toast.error('Please select an image');
+      toast.error(t('creator.error_select_image'));
       return;
     }
     if (mode === 'video' && !selectedVideo) {
-      toast.error('Please select a video');
+      toast.error(t('creator.error_select_video'));
       return;
     }
     if (mode === 'text' && !textContent.trim()) {
-      toast.error('Please enter some text');
+      toast.error(t('creator.error_enter_text'));
       return;
     }
     if (mode === 'poll') {
       if (!pollQuestion.trim()) {
-        toast.error('Please enter a poll question');
+        toast.error(t('creator.error_poll_question'));
         return;
       }
       const filledOptions = pollOptions.filter((o) => o.trim());
       if (filledOptions.length < 2) {
-        toast.error('Please provide at least 2 poll options');
+        toast.error(t('creator.error_poll_options'));
         return;
       }
     }
@@ -484,11 +486,11 @@ export function StoryCreator({ onClose, onCreated }: StoryCreatorProps) {
         }
       }
 
-      toast.success('Story shared!');
+      toast.success(t('creator.success'));
       onCreated();
     } catch (err) {
       logError('Failed to create story', err);
-      toast.error(err instanceof Error ? err.message : 'Failed to create story');
+      toast.error(err instanceof Error ? err.message : t('creator.error_create'));
     } finally {
       setIsSubmitting(false);
     }
@@ -521,19 +523,19 @@ export function StoryCreator({ onClose, onCreated }: StoryCreatorProps) {
       className="fixed inset-0 z-[9999] bg-black flex flex-col"
       role="dialog"
       aria-modal="true"
-      aria-label="Create story"
+      aria-label={t('creator.title')}
     >
       {/* Header */}
       <div className="flex items-center justify-between px-4 py-3 z-10">
         <button
           onClick={onClose}
           className="p-2 rounded-full hover:bg-white/10 transition-colors"
-          aria-label="Close creator"
+          aria-label={t('creator.close')}
         >
           <X className="w-5 h-5 text-white" />
         </button>
 
-        <h2 className="text-white font-semibold text-lg">Create Story</h2>
+        <h2 className="text-white font-semibold text-lg">{t('creator.title')}</h2>
 
         <div className="w-9" /> {/* Spacer for centering */}
       </div>
@@ -541,10 +543,10 @@ export function StoryCreator({ onClose, onCreated }: StoryCreatorProps) {
       {/* Mode tabs */}
       <div className="flex items-center gap-1 px-4 pb-3">
         {([
-          { key: 'photo' as StoryMode, icon: Camera, label: 'Photo' },
-          { key: 'video' as StoryMode, icon: Video, label: 'Video' },
-          { key: 'text' as StoryMode, icon: Type, label: 'Text' },
-          { key: 'poll' as StoryMode, icon: BarChart3, label: 'Poll' },
+          { key: 'photo' as StoryMode, icon: Camera, label: t('creator.mode_photo') },
+          { key: 'video' as StoryMode, icon: Video, label: t('creator.mode_video') },
+          { key: 'text' as StoryMode, icon: Type, label: t('creator.mode_text') },
+          { key: 'poll' as StoryMode, icon: BarChart3, label: t('creator.mode_poll') },
         ]).map(({ key, icon: Icon, label }) => (
           <button
             key={key}
