@@ -360,9 +360,8 @@ export function TenantForm() {
                   setSlugAutoGen(false);
                   updateField('slug', v.toLowerCase().replace(/[^a-z0-9-]/g, ''));
                 }}
-                isRequired={!isEdit}
-                isDisabled={isEdit}
-                description={isEdit ? 'Slug cannot be changed after creation' : slugAutoGen ? 'Auto-generated from name. Edit to customize.' : 'URL-safe identifier'}
+                isRequired
+                description={slugAutoGen ? 'Auto-generated from name. Edit to customize.' : 'URL-safe identifier. Changing this updates the tenant URL path.'}
               />
               <Input
                 label="Domain"
