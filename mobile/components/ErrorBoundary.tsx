@@ -77,12 +77,13 @@ export default class ErrorBoundary extends React.Component<Props, State> {
   }
 
   componentDidCatch(error: Error, info: React.ErrorInfo): void {
+    // Always report to Sentry so errors are tracked in all environments
+    Sentry.captureException(error, {
+      extra: { componentStack: info.componentStack },
+    });
+
     if (__DEV__) {
       console.error('ErrorBoundary caught:', error, info.componentStack);
-    } else {
-      Sentry.captureException(error, {
-        extra: { componentStack: info.componentStack },
-      });
     }
   }
 

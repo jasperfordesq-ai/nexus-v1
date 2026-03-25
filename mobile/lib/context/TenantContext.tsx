@@ -27,7 +27,10 @@ const TenantContext = createContext<TenantContextValue | null>(null);
 const FALLBACK_PRIMARY = '#006FEE';
 
 export function TenantProvider({ children }: { children: React.ReactNode }) {
-  const [tenantSlug, setSlug] = useState<string>(DEFAULT_TENANT);
+  // Start with null slug to indicate "not yet read from storage".
+  // This prevents a flicker where the default tenant config renders briefly
+  // before the stored tenant slug is read from SecureStore/AsyncStorage.
+  const [tenantSlug, setSlug] = useState<string | null>(null);
   const [tenant, setTenant] = useState<TenantConfig | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -47,7 +50,9 @@ export function TenantProvider({ children }: { children: React.ReactNode }) {
     }
   }, []);
 
-  // Restore previously selected tenant on app start
+  // Restore previously selected tenant on app start — read storage FIRST,
+  // then set slug and load config, so the initial render never shows the
+  // wrong tenant.
   useEffect(() => {
     async function init() {
       const stored = await storage.get(STORAGE_KEYS.TENANT_SLUG);
@@ -80,16 +85,22 @@ export function TenantProvider({ children }: { children: React.ReactNode }) {
     [tenant],
   );
 
+  // Use the resolved slug once storage has been read, otherwise fall back
+  // to DEFAULT_TENANT for the public context value type (string, not null).
+  const resolvedSlug = tenantSlug ?? DEFAULT_TENANT;
+
   const value = useMemo<TenantContextValue>(
     () => ({
       tenant,
-      tenantSlug,
-      isLoading,
+      tenantSlug: resolvedSlug,
+      // Stay in loading state until the stored slug has been read from storage
+      // AND the tenant config has been fetched — prevents flicker.
+      isLoading: isLoading || tenantSlug === null,
       hasFeature,
       hasModule,
       setTenantSlug,
     }),
-    [tenant, tenantSlug, isLoading, hasFeature, hasModule, setTenantSlug],
+    [tenant, resolvedSlug, isLoading, tenantSlug, hasFeature, hasModule, setTenantSlug],
   );
 
   return <TenantContext.Provider value={value}>{children}</TenantContext.Provider>;

@@ -46,62 +46,72 @@ export function registerUnauthorizedCallback(cb: () => void): void {
 
 /**
  * Silently refresh the access token using the stored refresh token.
- * Concurrent refresh attempts are collapsed into a single request.
- * Returns the new access token, or null if refresh fails.
+ * Concurrent refresh attempts are collapsed into a single request —
+ * the first 401 starts the refresh, all others wait for the same promise.
+ * Once the refresh resolves, EVERY waiter receives the new token and
+ * retries its original request (handled by the caller in `request()`).
+ *
+ * A short grace window (_refreshPromise stays populated for 2 s after
+ * completion) prevents a second refresh attempt when a late 401 arrives
+ * just after the refresh finished but before the retry response returns.
  */
-let _isRefreshing = false;
-let _refreshWaiters: Array<(token: string | null) => void> = [];
+let _refreshPromise: Promise<string | null> | null = null;
+let _refreshGraceTimer: ReturnType<typeof setTimeout> | null = null;
 
 async function attemptTokenRefresh(): Promise<string | null> {
-  // Collapse concurrent refresh calls into one
-  if (_isRefreshing) {
-    return new Promise<string | null>((resolve) => {
-      _refreshWaiters.push(resolve);
-    });
+  // If a refresh is in progress (or recently completed), reuse its promise
+  if (_refreshPromise) {
+    return _refreshPromise;
   }
 
-  _isRefreshing = true;
-  const notify = (token: string | null) => {
-    _refreshWaiters.forEach((r) => r(token));
-    _refreshWaiters = [];
-    _isRefreshing = false;
-  };
+  _refreshPromise = (async (): Promise<string | null> => {
+    try {
+      const [storedRefresh, tenantSlug] = await Promise.all([
+        storage.get(STORAGE_KEYS.REFRESH_TOKEN),
+        storage.get(STORAGE_KEYS.TENANT_SLUG),
+      ]);
+      if (!storedRefresh) return null;
 
-  try {
-    const [storedRefresh, tenantSlug] = await Promise.all([
-      storage.get(STORAGE_KEYS.REFRESH_TOKEN),
-      storage.get(STORAGE_KEYS.TENANT_SLUG),
-    ]);
-    if (!storedRefresh) { notify(null); return null; }
+      const headers: Record<string, string> = {
+        'Content-Type': 'application/json',
+        Accept: 'application/json',
+      };
+      if (tenantSlug) headers['X-Tenant-Slug'] = tenantSlug;
 
-    const headers: Record<string, string> = {
-      'Content-Type': 'application/json',
-      Accept: 'application/json',
-    };
-    if (tenantSlug) headers['X-Tenant-Slug'] = tenantSlug;
+      const res = await fetch(`${API_BASE_URL}/api/auth/refresh-token`, {
+        method: 'POST',
+        headers,
+        body: JSON.stringify({ refresh_token: storedRefresh }),
+      });
 
-    const res = await fetch(`${API_BASE_URL}/api/auth/refresh-token`, {
-      method: 'POST',
-      headers,
-      body: JSON.stringify({ refresh_token: storedRefresh }),
-    });
+      if (!res.ok) return null;
 
-    if (!res.ok) { notify(null); return null; }
+      const data = await res.json() as { access_token?: string; token?: string; refresh_token?: string };
+      const newToken = data.access_token ?? data.token ?? null;
+      if (!newToken) return null;
 
-    const data = await res.json() as { access_token?: string; token?: string; refresh_token?: string };
-    const newToken = data.access_token ?? data.token ?? null;
-    if (!newToken) { notify(null); return null; }
+      const saves: Promise<void>[] = [storage.set(STORAGE_KEYS.AUTH_TOKEN, newToken)];
+      if (data.refresh_token) saves.push(storage.set(STORAGE_KEYS.REFRESH_TOKEN, data.refresh_token));
+      await Promise.all(saves);
 
-    const saves: Promise<void>[] = [storage.set(STORAGE_KEYS.AUTH_TOKEN, newToken)];
-    if (data.refresh_token) saves.push(storage.set(STORAGE_KEYS.REFRESH_TOKEN, data.refresh_token));
-    await Promise.all(saves);
+      return newToken;
+    } catch {
+      return null;
+    }
+  })();
 
-    notify(newToken);
-    return newToken;
-  } catch {
-    notify(null);
-    return null;
-  }
+  // After the promise settles, keep it cached briefly so that late 401s
+  // arriving right after the refresh still get the new token instead of
+  // triggering a second (doomed) refresh.
+  _refreshPromise.finally(() => {
+    if (_refreshGraceTimer) clearTimeout(_refreshGraceTimer);
+    _refreshGraceTimer = setTimeout(() => {
+      _refreshPromise = null;
+      _refreshGraceTimer = null;
+    }, 2000);
+  });
+
+  return _refreshPromise;
 }
 
 /** Resolve the appropriate timeout for a given HTTP method */

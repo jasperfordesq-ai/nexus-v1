@@ -74,15 +74,6 @@ function RootNavigator() {
   const { t } = useTranslation();
   const { isLoading, isAuthenticated } = useAuthContext();
 
-  useEffect(() => {
-    if (isLoading) return;
-    if (isAuthenticated) {
-      router.replace('/(tabs)/home');
-    } else {
-      router.replace('/(auth)/login');
-    }
-  }, [isLoading, isAuthenticated]);
-
   // Queue deep link from push notification taps — only navigate once auth resolves.
   const pendingDeepLinkRef = useRef<string | null>(null);
 
@@ -96,13 +87,21 @@ function RootNavigator() {
     return () => subscription.remove();
   }, []);
 
-  // Process queued deep link only after auth state is resolved and user is authenticated
+  // Auth redirect — check for a pending deep link BEFORE defaulting to home.
+  // This prevents the race condition where router.replace('/(tabs)/home')
+  // fires before the deep link effect has a chance to navigate.
   useEffect(() => {
-    if (isLoading || !isAuthenticated) return;
-    const link = pendingDeepLinkRef.current;
-    if (link) {
-      pendingDeepLinkRef.current = null;
-      navigateToLink(link);
+    if (isLoading) return;
+    if (isAuthenticated) {
+      const pendingLink = pendingDeepLinkRef.current;
+      if (pendingLink) {
+        pendingDeepLinkRef.current = null;
+        navigateToLink(pendingLink);
+      } else {
+        router.replace('/(tabs)/home');
+      }
+    } else {
+      router.replace('/(auth)/login');
     }
   }, [isLoading, isAuthenticated]);
 
