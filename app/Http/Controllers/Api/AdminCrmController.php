@@ -82,7 +82,7 @@ class AdminCrmController extends BaseApiController
         $tenantId = $this->getTenantId();
         $contact = DB::selectOne('SELECT id FROM crm_contacts WHERE id = ? AND tenant_id = ?', [$id, $tenantId]);
         if ($contact === null) { return $this->respondWithError('NOT_FOUND', 'Contact not found', null, 404); }
-        $notes = DB::select('SELECT * FROM crm_notes WHERE contact_id = ? ORDER BY created_at DESC', [$id]);
+        $notes = DB::select('SELECT * FROM crm_notes WHERE contact_id = ? AND tenant_id = ? ORDER BY created_at DESC', [$id, $tenantId]);
         return $this->respondWithData($notes);
     }
 
@@ -703,7 +703,7 @@ class AdminCrmController extends BaseApiController
         $params = [];
         $countParams = [];
         $safeDays = (int) $days;
-        $dayFilter = $safeDays > 0 ? " DATE_SUB(NOW(), INTERVAL {$safeDays} DAY)" : null;
+        $useDayFilter = $safeDays > 0;
 
         // 1. Logins
         if (!$type || $type === 'login') {
@@ -712,7 +712,7 @@ class AdminCrmController extends BaseApiController
                      FROM users u WHERE u.tenant_id = ? AND u.last_login_at IS NOT NULL";
             $p = [$tenantId]; $cp = [$tenantId];
             if ($userId) { $sql .= " AND u.id = ?"; $p[] = $userId; $cp[] = $userId; }
-            if ($dayFilter) { $sql .= " AND u.last_login_at >= {$dayFilter}"; }
+            if ($useDayFilter) { $sql .= " AND u.last_login_at >= DATE_SUB(NOW(), INTERVAL ? DAY)"; $p[] = $safeDays; $cp[] = $safeDays; }
             $unions[] = $sql; $params = array_merge($params, $p); $countParams = array_merge($countParams, $cp);
         }
 
@@ -723,7 +723,7 @@ class AdminCrmController extends BaseApiController
                      FROM users u WHERE u.tenant_id = ?";
             $p = [$tenantId]; $cp = [$tenantId];
             if ($userId) { $sql .= " AND u.id = ?"; $p[] = $userId; $cp[] = $userId; }
-            if ($dayFilter) { $sql .= " AND u.created_at >= {$dayFilter}"; }
+            if ($useDayFilter) { $sql .= " AND u.created_at >= DATE_SUB(NOW(), INTERVAL ? DAY)"; $p[] = $safeDays; $cp[] = $safeDays; }
             $unions[] = $sql; $params = array_merge($params, $p); $countParams = array_merge($countParams, $cp);
         }
 
@@ -736,7 +736,7 @@ class AdminCrmController extends BaseApiController
                          FROM listings l LEFT JOIN users u ON u.id = l.user_id WHERE l.tenant_id = ?";
                 $p = [$tenantId]; $cp = [$tenantId];
                 if ($userId) { $sql .= " AND l.user_id = ?"; $p[] = $userId; $cp[] = $userId; }
-                if ($dayFilter) { $sql .= " AND l.created_at >= {$dayFilter}"; }
+                if ($useDayFilter) { $sql .= " AND l.created_at >= DATE_SUB(NOW(), INTERVAL ? DAY)"; $p[] = $safeDays; $cp[] = $safeDays; }
                 $unions[] = $sql; $params = array_merge($params, $p); $countParams = array_merge($countParams, $cp);
             } catch (\Throwable $e) {}
         }
@@ -751,7 +751,7 @@ class AdminCrmController extends BaseApiController
                          WHERE t.tenant_id = ? AND t.status = 'completed'";
                 $p = [$tenantId]; $cp = [$tenantId];
                 if ($userId) { $sql .= " AND t.sender_id = ?"; $p[] = $userId; $cp[] = $userId; }
-                if ($dayFilter) { $sql .= " AND t.created_at >= {$dayFilter}"; }
+                if ($useDayFilter) { $sql .= " AND t.created_at >= DATE_SUB(NOW(), INTERVAL ? DAY)"; $p[] = $safeDays; $cp[] = $safeDays; }
                 $unions[] = $sql; $params = array_merge($params, $p); $countParams = array_merge($countParams, $cp);
             } catch (\Throwable $e) {}
         }
@@ -766,7 +766,7 @@ class AdminCrmController extends BaseApiController
                          WHERE mn.tenant_id = ?";
                 $p = [$tenantId]; $cp = [$tenantId];
                 if ($userId) { $sql .= " AND mn.user_id = ?"; $p[] = $userId; $cp[] = $userId; }
-                if ($dayFilter) { $sql .= " AND mn.created_at >= {$dayFilter}"; }
+                if ($useDayFilter) { $sql .= " AND mn.created_at >= DATE_SUB(NOW(), INTERVAL ? DAY)"; $p[] = $safeDays; $cp[] = $safeDays; }
                 $unions[] = $sql; $params = array_merge($params, $p); $countParams = array_merge($countParams, $cp);
             } catch (\Throwable $e) {}
         }
@@ -780,7 +780,7 @@ class AdminCrmController extends BaseApiController
                          FROM coordinator_tasks ct LEFT JOIN users u ON u.id = ct.created_by WHERE ct.tenant_id = ?";
                 $p = [$tenantId]; $cp = [$tenantId];
                 if ($userId) { $sql .= " AND ct.created_by = ?"; $p[] = $userId; $cp[] = $userId; }
-                if ($dayFilter) { $sql .= " AND ct.created_at >= {$dayFilter}"; }
+                if ($useDayFilter) { $sql .= " AND ct.created_at >= DATE_SUB(NOW(), INTERVAL ? DAY)"; $p[] = $safeDays; $cp[] = $safeDays; }
                 $unions[] = $sql; $params = array_merge($params, $p); $countParams = array_merge($countParams, $cp);
             } catch (\Throwable $e) {}
         }
@@ -795,7 +795,7 @@ class AdminCrmController extends BaseApiController
                          INNER JOIN `groups` g ON g.id = gm.group_id AND g.tenant_id = ? WHERE 1=1";
                 $p = [$tenantId]; $cp = [$tenantId];
                 if ($userId) { $sql .= " AND gm.user_id = ?"; $p[] = $userId; $cp[] = $userId; }
-                if ($dayFilter) { $sql .= " AND gm.created_at >= {$dayFilter}"; }
+                if ($useDayFilter) { $sql .= " AND gm.created_at >= DATE_SUB(NOW(), INTERVAL ? DAY)"; $p[] = $safeDays; $cp[] = $safeDays; }
                 $unions[] = $sql; $params = array_merge($params, $p); $countParams = array_merge($countParams, $cp);
             } catch (\Throwable $e) {}
         }
@@ -807,7 +807,7 @@ class AdminCrmController extends BaseApiController
                      FROM users u WHERE u.tenant_id = ? AND u.updated_at > u.created_at";
             $p = [$tenantId]; $cp = [$tenantId];
             if ($userId) { $sql .= " AND u.id = ?"; $p[] = $userId; $cp[] = $userId; }
-            if ($dayFilter) { $sql .= " AND u.updated_at >= {$dayFilter}"; }
+            if ($useDayFilter) { $sql .= " AND u.updated_at >= DATE_SUB(NOW(), INTERVAL ? DAY)"; $p[] = $safeDays; $cp[] = $safeDays; }
             $unions[] = $sql; $params = array_merge($params, $p); $countParams = array_merge($countParams, $cp);
         }
 

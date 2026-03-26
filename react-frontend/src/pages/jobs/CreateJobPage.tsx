@@ -1630,7 +1630,7 @@ export function CreateJobPage() {
                     onClick={() => void handleAddTeamMember(member.id)}
                     role="button"
                     tabIndex={0}
-                    onKeyDown={(e) => { if (e.key === 'Enter') void handleAddTeamMember(member.id); }}
+                    onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); void handleAddTeamMember(member.id); } }}
                   >
                     <Avatar
                       src={member.avatar_url || undefined}

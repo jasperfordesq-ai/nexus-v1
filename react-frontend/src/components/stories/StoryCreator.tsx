@@ -677,7 +677,7 @@ export function StoryCreator({ onClose, onCreated }: StoryCreatorProps) {
                         >
                           <img
                             src={imagePreview}
-                            alt=""
+                            alt={`${f.label} filter preview`}
                             className="w-full h-full object-cover"
                             style={{ filter: f.css }}
                           />

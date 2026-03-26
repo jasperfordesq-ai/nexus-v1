@@ -63,10 +63,12 @@ class EventsController extends BaseApiController
 
         $result = $this->eventService->getAll($filters);
 
-        // Add user's RSVP status to each event if logged in
-        if ($userId) {
+        // Batch-load user RSVP statuses (single query instead of N+1)
+        if ($userId && !empty($result['items'])) {
+            $eventIds = array_column($result['items'], 'id');
+            $rsvpMap = $this->eventService->getUserRsvpsBatch($eventIds, $userId);
             foreach ($result['items'] as &$event) {
-                $event['user_rsvp'] = $this->eventService->getUserRsvp($event['id'], $userId);
+                $event['user_rsvp'] = $rsvpMap[(int) $event['id']] ?? null;
             }
         }
 

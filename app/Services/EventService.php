@@ -330,6 +330,31 @@ class EventService
     }
 
     /**
+     * Batch-load user RSVP statuses for multiple events (avoids N+1).
+     *
+     * @param  int[] $eventIds
+     * @return array<int, string> Map of event_id => status
+     */
+    public static function getUserRsvpsBatch(array $eventIds, int $userId): array
+    {
+        if (empty($eventIds)) {
+            return [];
+        }
+        $tenantId = \App\Core\TenantContext::getId();
+        $placeholders = implode(',', array_fill(0, count($eventIds), '?'));
+        $params = array_merge($eventIds, [$userId, $tenantId]);
+        $rows = DB::select(
+            "SELECT event_id, status FROM event_rsvps WHERE event_id IN ({$placeholders}) AND user_id = ? AND tenant_id = ?",
+            $params
+        );
+        $map = [];
+        foreach ($rows as $row) {
+            $map[(int) $row->event_id] = $row->status;
+        }
+        return $map;
+    }
+
+    /**
      * RSVP to an event with capacity enforcement.
      */
     public static function rsvp(int $eventId, int $userId, string $status): bool

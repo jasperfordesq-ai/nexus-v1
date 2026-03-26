@@ -89,6 +89,34 @@ class GroupService
     }
 
     /**
+     * Batch-load viewer membership data for multiple groups (avoids N+1).
+     *
+     * @param  int[] $groupIds
+     * @return array<int, array{status: string, role: string|null, is_admin: bool}> Map of group_id => membership
+     */
+    public static function getViewerMembershipsBatch(array $groupIds, int $userId): array
+    {
+        if (empty($groupIds)) {
+            return [];
+        }
+        $placeholders = implode(',', array_fill(0, count($groupIds), '?'));
+        $params = array_merge($groupIds, [$userId]);
+        $rows = DB::select(
+            "SELECT group_id, status, role FROM group_members WHERE group_id IN ({$placeholders}) AND user_id = ?",
+            $params
+        );
+        $map = [];
+        foreach ($rows as $row) {
+            $map[(int) $row->group_id] = [
+                'status'   => $row->status ?? 'none',
+                'role'     => $row->role,
+                'is_admin' => in_array($row->role ?? '', ['admin', 'owner']),
+            ];
+        }
+        return $map;
+    }
+
+    /**
      * Get a single group by ID.
      */
     public static function getById(int $id, ?int $currentUserId = null): ?array

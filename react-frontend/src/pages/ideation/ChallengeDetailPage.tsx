@@ -1333,6 +1333,7 @@ export function ChallengeDetailPage() {
                       }}
                       onKeyDown={(e) => {
                         if (e.key === 'Enter' || e.key === ' ') {
+                          e.preventDefault();
                           setEditingDraftId(draft.id);
                           setNewIdea({ title: draft.title, description: draft.description });
                         }

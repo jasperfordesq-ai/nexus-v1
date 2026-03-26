@@ -68,7 +68,7 @@ function TreeNode({ node, depth, onNavigate, expandedIds, onToggle }: TreeNodePr
           onClick={() => onNavigate(node.id)}
           role="button"
           tabIndex={0}
-          onKeyDown={(e) => { if (e.key === 'Enter') onNavigate(node.id); }}
+          onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onNavigate(node.id); } }}
         >
           <Building2 size={18} className="text-primary shrink-0" />
           <div className="min-w-0 flex-1">

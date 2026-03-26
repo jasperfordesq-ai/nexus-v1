@@ -1882,7 +1882,7 @@ export function JobDetailPage() {
                       role="button"
                       tabIndex={0}
                       aria-label={t('apply.cv_dropzone_aria', 'Click or drop file to upload CV')}
-                      onKeyDown={(e) => e.key === 'Enter' && cvInputRef.current?.click()}
+                      onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); cvInputRef.current?.click(); } }}
                     >
                       {cvFile ? (
                         <div className="flex items-center justify-center gap-2 text-sm text-foreground">

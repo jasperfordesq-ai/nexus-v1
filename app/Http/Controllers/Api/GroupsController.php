@@ -63,13 +63,12 @@ class GroupsController extends BaseApiController
 
         $result = $this->groupService->getAll($filters);
 
-        // Add user's membership status to each group if logged in
-        if ($userId) {
+        // Batch-load viewer memberships (single query instead of N+1)
+        if ($userId && !empty($result['items'])) {
+            $groupIds = array_column($result['items'], 'id');
+            $membershipMap = $this->groupService->getViewerMembershipsBatch($groupIds, $userId);
             foreach ($result['items'] as &$group) {
-                $fullGroup = $this->groupService->getById($group['id'], $userId);
-                if ($fullGroup) {
-                    $group['viewer_membership'] = $fullGroup['viewer_membership'] ?? null;
-                }
+                $group['viewer_membership'] = $membershipMap[(int) $group['id']] ?? null;
             }
         }
 
