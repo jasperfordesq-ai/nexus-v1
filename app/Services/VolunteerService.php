@@ -112,6 +112,15 @@ class VolunteerService
      */
     public static function apply(int $opportunityId, int $userId, array $data = []): VolApplication
     {
+        // Verify opportunity exists and is active within the current tenant
+        $opportunity = VolOpportunity::where('id', $opportunityId)
+            ->where('is_active', true)
+            ->first();
+
+        if (!$opportunity) {
+            throw new \RuntimeException('Opportunity not found or is not active.');
+        }
+
         $application = VolApplication::create([
             'opportunity_id' => $opportunityId,
             'user_id'        => $userId,

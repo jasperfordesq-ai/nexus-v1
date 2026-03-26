@@ -1439,8 +1439,8 @@ Route::post('/v2/events/{id}/series', [\App\Http\Controllers\Api\EventsControlle
 Route::get('/v2/volunteering/recommended-shifts', [\App\Http\Controllers\Api\VolunteerController::class, 'recommendedShifts']);
 Route::get('/v2/volunteering/certificates', [\App\Http\Controllers\Api\VolunteerController::class, 'myCertificates']);
 Route::post('/v2/volunteering/certificates', [\App\Http\Controllers\Api\VolunteerController::class, 'generateCertificate']);
-Route::get('/v2/volunteering/certificates/verify/{code}', [\App\Http\Controllers\Api\VolunteerController::class, 'verifyCertificate']);
-Route::get('/v2/volunteering/certificates/{code}/html', [\App\Http\Controllers\Api\VolunteerController::class, 'certificateHtml']);
+Route::get('/v2/volunteering/certificates/verify/{code}', [\App\Http\Controllers\Api\VolunteerController::class, 'verifyCertificate'])->withoutMiddleware('auth:sanctum');
+Route::get('/v2/volunteering/certificates/{code}/html', [\App\Http\Controllers\Api\VolunteerController::class, 'certificateHtml'])->withoutMiddleware('auth:sanctum');
 Route::get('/v2/volunteering/credentials', [\App\Http\Controllers\Api\VolunteerController::class, 'myCredentials']);
 Route::post('/v2/volunteering/credentials', [\App\Http\Controllers\Api\VolunteerController::class, 'uploadCredential']);
 Route::delete('/v2/volunteering/credentials/{id}', [\App\Http\Controllers\Api\VolunteerController::class, 'deleteCredential']);
@@ -1477,7 +1477,7 @@ Route::post('/v2/volunteering/expenses', [\App\Http\Controllers\Api\VolunteerCon
 Route::get('/v2/volunteering/expenses/{id}', [\App\Http\Controllers\Api\VolunteerController::class, 'getExpense']);
 Route::get('/v2/volunteering/guardian-consents', [\App\Http\Controllers\Api\VolunteerController::class, 'myGuardianConsents']);
 Route::post('/v2/volunteering/guardian-consents', [\App\Http\Controllers\Api\VolunteerController::class, 'requestGuardianConsent']);
-Route::get('/v2/volunteering/guardian-consents/verify/{token}', [\App\Http\Controllers\Api\VolunteerController::class, 'verifyGuardianConsent']);
+Route::get('/v2/volunteering/guardian-consents/verify/{token}', [\App\Http\Controllers\Api\VolunteerController::class, 'verifyGuardianConsent'])->withoutMiddleware('auth:sanctum');
 Route::delete('/v2/volunteering/guardian-consents/{id}', [\App\Http\Controllers\Api\VolunteerController::class, 'withdrawGuardianConsent']);
 Route::get('/v2/volunteering/training', [\App\Http\Controllers\Api\VolunteerController::class, 'myTraining']);
 Route::post('/v2/volunteering/training', [\App\Http\Controllers\Api\VolunteerController::class, 'recordTraining']);

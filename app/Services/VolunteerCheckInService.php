@@ -28,6 +28,9 @@ class VolunteerCheckInService
     /** @var array<int, array{code: string, message: string}> */
     private array $errors = [];
 
+    /** @var array<int, array{code: string, message: string}> */
+    private static array $staticErrors = [];
+
     public function __construct()
     {
     }
@@ -64,13 +67,16 @@ class VolunteerCheckInService
     public static function checkIn(int $tenantId, int $opportunityId, int $userId): bool
     {
         try {
-            $shift = VolShift::where('opportunity_id', $opportunityId)->first();
+            $shift = VolShift::where('opportunity_id', $opportunityId)
+                ->where('tenant_id', $tenantId)
+                ->first();
             if (!$shift) {
                 return false;
             }
 
             $checkin = VolShiftCheckin::where('shift_id', $shift->id)
                 ->where('user_id', $userId)
+                ->where('tenant_id', $tenantId)
                 ->first();
 
             if (!$checkin) {
@@ -104,7 +110,9 @@ class VolunteerCheckInService
         $this->clearErrors();
 
         try {
-            $checkin = VolShiftCheckin::where('qr_token', $token)->first();
+            $checkin = VolShiftCheckin::where('qr_token', $token)
+                ->where('tenant_id', TenantContext::getId())
+                ->first();
 
             if (!$checkin) {
                 $this->addError('NOT_FOUND', 'Check-in record not found for this token.');
@@ -135,13 +143,16 @@ class VolunteerCheckInService
     public static function checkOutLegacy(int $tenantId, int $opportunityId, int $userId, ?float $hours = null): bool
     {
         try {
-            $shift = VolShift::where('opportunity_id', $opportunityId)->first();
+            $shift = VolShift::where('opportunity_id', $opportunityId)
+                ->where('tenant_id', $tenantId)
+                ->first();
             if (!$shift) {
                 return false;
             }
 
             $checkin = VolShiftCheckin::where('shift_id', $shift->id)
                 ->where('user_id', $userId)
+                ->where('tenant_id', $tenantId)
                 ->where('status', 'checked_in')
                 ->first();
 
@@ -167,7 +178,9 @@ class VolunteerCheckInService
     public static function getCheckIns(int $tenantId, int $opportunityId): array
     {
         try {
-            $shiftIds = VolShift::where('opportunity_id', $opportunityId)->pluck('id');
+            $shiftIds = VolShift::where('opportunity_id', $opportunityId)
+                ->where('tenant_id', $tenantId)
+                ->pluck('id');
 
             return VolShiftCheckin::with('user')
                 ->whereIn('shift_id', $shiftIds)
@@ -197,7 +210,9 @@ class VolunteerCheckInService
     public static function isCheckedIn(int $tenantId, int $opportunityId, int $userId): bool
     {
         try {
-            $shiftIds = VolShift::where('opportunity_id', $opportunityId)->pluck('id');
+            $shiftIds = VolShift::where('opportunity_id', $opportunityId)
+                ->where('tenant_id', $tenantId)
+                ->pluck('id');
 
             return VolShiftCheckin::whereIn('shift_id', $shiftIds)
                 ->where('user_id', $userId)
@@ -221,6 +236,7 @@ class VolunteerCheckInService
 
         $hasApproved = VolApplication::where('shift_id', $shiftId)
             ->where('user_id', $userId)
+            ->where('tenant_id', $tenantId)
             ->where('status', 'approved')
             ->exists();
 
@@ -230,6 +246,7 @@ class VolunteerCheckInService
 
         $checkin = VolShiftCheckin::where('shift_id', $shiftId)
             ->where('user_id', $userId)
+            ->where('tenant_id', $tenantId)
             ->first();
 
         if (!$checkin) {
@@ -259,7 +276,7 @@ class VolunteerCheckInService
      */
     public static function generateToken(int $shiftId, int $volunteerId): ?string
     {
-        self::$errors = [];
+        self::$staticErrors = [];
         $tenantId = TenantContext::getId();
 
         // Check volunteer is approved for this shift
@@ -269,7 +286,7 @@ class VolunteerCheckInService
             ->exists();
 
         if (!$hasApproved) {
-            self::$errors[] = ['code' => 'FORBIDDEN', 'message' => 'Volunteer is not approved for this shift.'];
+            self::$staticErrors[] = ['code' => 'FORBIDDEN', 'message' => 'Volunteer is not approved for this shift.'];
             return null;
         }
 
@@ -302,6 +319,7 @@ class VolunteerCheckInService
     public static function getShiftIdByToken(string $token, int $tenantId): ?int
     {
         $shiftId = VolShiftCheckin::where('qr_token', $token)
+            ->where('tenant_id', $tenantId)
             ->value('shift_id');
 
         return $shiftId !== null ? (int) $shiftId : null;
@@ -319,6 +337,7 @@ class VolunteerCheckInService
 
         $checkin = VolShiftCheckin::with(['shift', 'user'])
             ->where('qr_token', $token)
+            ->where('tenant_id', TenantContext::getId())
             ->first();
 
         if (!$checkin) {
@@ -385,6 +404,7 @@ class VolunteerCheckInService
     public static function getUserIdByToken(string $token): ?int
     {
         $userId = VolShiftCheckin::where('qr_token', $token)
+            ->where('tenant_id', TenantContext::getId())
             ->value('user_id');
 
         return $userId !== null ? (int) $userId : null;

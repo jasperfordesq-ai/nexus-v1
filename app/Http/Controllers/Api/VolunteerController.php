@@ -127,7 +127,11 @@ class VolunteerController extends BaseApiController
         $userId = $this->getUserId();
         $this->rateLimit('volunteering_apply', 20, 60);
         $data = ['message' => trim($this->input('message', '')), 'shift_id' => $this->inputInt('shift_id') ?: null];
-        $application = $this->volunteerService->apply($id, $userId, $data);
+        try {
+            $application = $this->volunteerService->apply($id, $userId, $data);
+        } catch (\RuntimeException $e) {
+            return $this->respondWithError('NOT_FOUND', $e->getMessage(), null, 404);
+        }
         return $this->respondWithData($application, null, 201);
     }
 
@@ -262,7 +266,9 @@ class VolunteerController extends BaseApiController
 
         $action = $this->input('action');
         $orgNote = trim((string) ($this->input('org_note') ?? ''));
-        if (!$action) return $this->respondWithError('VALIDATION_ERROR', 'Action is required (approve or decline)', 'action', 400);
+        if (!$action || !in_array($action, ['approve', 'decline'], true)) {
+            return $this->respondWithError('VALIDATION_ERROR', 'Action must be approve or decline', 'action', 400);
+        }
 
         $success = $this->volunteerService->handleApplication((int) $id, $userId, $action, $orgNote);
         if (!$success) {
@@ -372,7 +378,9 @@ class VolunteerController extends BaseApiController
         $this->rateLimit('volunteering_verify_hours', 30, 60);
 
         $action = $this->input('action');
-        if (!$action) return $this->respondWithError('VALIDATION_ERROR', 'Action is required (approve or decline)', 'action', 400);
+        if (!$action || !in_array($action, ['approve', 'decline'], true)) {
+            return $this->respondWithError('VALIDATION_ERROR', 'Action must be approve or decline', 'action', 400);
+        }
 
         $success = $this->volunteerService->verifyHours((int) $id, $userId, $action);
         if (!$success) {
@@ -432,9 +440,13 @@ class VolunteerController extends BaseApiController
         $rating = $this->inputInt('rating');
         $comment = trim($this->input('comment', ''));
 
-        if (!$targetType) return $this->respondWithError('VALIDATION_ERROR', 'Target type is required', 'target_type', 400);
+        if (!$targetType || !in_array($targetType, ['organization', 'user'], true)) {
+            return $this->respondWithError('VALIDATION_ERROR', 'Target type must be organization or user', 'target_type', 400);
+        }
         if (!$targetId) return $this->respondWithError('VALIDATION_ERROR', 'Target ID is required', 'target_id', 400);
-        if (!$rating) return $this->respondWithError('VALIDATION_ERROR', 'Rating is required', 'rating', 400);
+        if (!$rating || $rating < 1 || $rating > 5) {
+            return $this->respondWithError('VALIDATION_ERROR', 'Rating must be between 1 and 5', 'rating', 400);
+        }
 
         $reviewId = $this->volunteerService->createReview($userId, $targetType, $targetId, $rating, $comment);
         if ($reviewId === null) {
@@ -669,13 +681,12 @@ class VolunteerController extends BaseApiController
         $this->rateLimit('volunteering_checkin_get', 60, 60);
         $shiftId = (int) $id;
 
-        $tenantId = TenantContext::getId();
-        $checkin = $this->volunteerCheckInService->getUserCheckIn($userId, $shiftId, $tenantId);
+        $checkin = $this->volunteerCheckInService->getUserCheckIn($shiftId, $userId);
 
         if (!$checkin) {
-            $token = $this->volunteerCheckInService->generateToken($shiftId, $tenantId);
+            $token = VolunteerCheckInService::generateToken($shiftId, $userId);
             if ($token) {
-                $checkin = $this->volunteerCheckInService->getUserCheckIn($userId, $shiftId, $tenantId);
+                $checkin = $this->volunteerCheckInService->getUserCheckIn($shiftId, $userId);
             }
         }
 

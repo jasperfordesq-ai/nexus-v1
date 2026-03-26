@@ -34,7 +34,7 @@ class VolunteerCheckInServiceTest extends TestCase
     public function test_checkOut_returns_false_when_token_not_found(): void
     {
         $mock = Mockery::mock('alias:' . VolShiftCheckin::class);
-        $mock->shouldReceive('where')->with('qr_token', 'bad-token')->andReturnSelf();
+        $mock->shouldReceive('where')->andReturnSelf();
         $mock->shouldReceive('first')->andReturn(null);
 
         $result = $this->service->checkOut('bad-token');
