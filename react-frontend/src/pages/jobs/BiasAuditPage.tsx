@@ -142,8 +142,10 @@ export function BiasAuditPage() {
       try {
         const response = await api.get<{ items: JobOption[] }>('/v2/jobs?per_page=100&status=open');
         if (!cancelled && response.success && response.data) {
-          const items = (response.data as unknown as { items: JobOption[] }).items ||
-            (Array.isArray(response.data) ? response.data : []);
+          const raw = response.data as Record<string, unknown> | JobOption[];
+          const items: JobOption[] = Array.isArray(raw) ? raw
+            : Array.isArray((raw as Record<string, unknown>)?.items) ? (raw as Record<string, unknown>).items as JobOption[]
+            : [];
           setJobs(items);
         }
       } catch {

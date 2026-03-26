@@ -481,7 +481,8 @@ export function JobKanbanPage() {
   };
 
   const handleDownloadCv = (appId: number, applicantName: string) => {
-    const token = localStorage.getItem('nexus_access_token');
+    let token: string | null = null;
+    try { token = localStorage.getItem('nexus_access_token'); } catch { /* private browsing */ }
     // Open CV download URL in a new tab
     const url = `${API_BASE}/v2/jobs/applications/${appId}/cv`;
     const link = document.createElement('a');

@@ -75,13 +75,17 @@ class JobVacanciesController extends BaseApiController
             'limit' => $this->queryInt('per_page', 20, 1, 100),
         ];
 
-        if ($this->query('status')) {
+        $validStatuses = ['open', 'closed', 'filled', 'draft', 'expired', 'pending_review'];
+        $validTypes = ['paid', 'volunteer', 'internship', 'timebank'];
+        $validCommitments = ['full_time', 'part_time', 'one_off', 'flexible'];
+
+        if ($this->query('status') && in_array($this->query('status'), $validStatuses, true)) {
             $filters['status'] = $this->query('status');
         }
-        if ($this->query('type')) {
+        if ($this->query('type') && in_array($this->query('type'), $validTypes, true)) {
             $filters['type'] = $this->query('type');
         }
-        if ($this->query('commitment')) {
+        if ($this->query('commitment') && in_array($this->query('commitment'), $validCommitments, true)) {
             $filters['commitment'] = $this->query('commitment');
         }
         if ($this->query('category')) {

@@ -465,8 +465,8 @@ export function JobDetailPage() {
         if (response.success && response.data) {
           setMatchResult(response.data);
         }
-      } catch {
-        // Non-critical
+      } catch (err) {
+        if (import.meta.env.DEV) console.warn('Match load failed:', err);
       }
     };
     loadMatch();
@@ -479,8 +479,8 @@ export function JobDetailPage() {
       try {
         const qualRes = await api.get<QualificationData>(`/v2/jobs/${id}/qualified`);
         if (qualRes.success && qualRes.data) setQualificationData(qualRes.data as QualificationData);
-      } catch {
-        // Non-critical
+      } catch (err) {
+        if (import.meta.env.DEV) console.warn('Qualification load failed:', err);
       }
     };
     loadQualData();
@@ -659,8 +659,12 @@ export function JobDetailPage() {
         formData.append('message', applyMessage || '');
         formData.append('cv', cvFile);
         // Fetch directly for multipart — api client uses JSON by default
-        const token = localStorage.getItem('nexus_access_token');
-        const tenantId = localStorage.getItem('nexus_tenant_id');
+        let token: string | null = null;
+        let tenantId: string | null = null;
+        try {
+          token = localStorage.getItem('nexus_access_token');
+          tenantId = localStorage.getItem('nexus_tenant_id');
+        } catch { /* private browsing */ }
         const apiBase = import.meta.env.VITE_API_BASE || '/api';
         const fetchResponse = await fetch(`${apiBase}/v2/jobs/${id}/apply`, {
           method: 'POST',
@@ -890,6 +894,16 @@ export function JobDetailPage() {
     );
   }
 
+  // JSON-LD structured data — inject via textContent (XSS-safe, avoids dangerouslySetInnerHTML)
+  useEffect(() => {
+    if (!vacancy) return;
+    const script = document.createElement('script');
+    script.type = 'application/ld+json';
+    script.textContent = buildJobPostingSchema(vacancy, tenantPath);
+    document.head.appendChild(script);
+    return () => { script.remove(); };
+  }, [vacancy, tenantPath]);
+
   const deadlineDate = vacancy.deadline ? new Date(vacancy.deadline) : null;
   const isPastDeadline = deadlineDate ? deadlineDate < new Date() : false;
   const TypeIcon = TYPE_ICONS[vacancy.type] ?? Briefcase;
@@ -911,14 +925,6 @@ export function JobDetailPage() {
 
   return (
     <main className="space-y-6">
-      {/* JSON-LD structured data */}
-      {vacancy && (
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: buildJobPostingSchema(vacancy, tenantPath) }}
-        />
-      )}
-
       {/* Back nav */}
       <Link to={tenantPath('/jobs')} className="inline-flex items-center gap-2 text-theme-muted hover:text-theme-primary transition-colors">
         <ArrowLeft className="w-4 h-4" aria-hidden="true" />
@@ -1491,7 +1497,7 @@ export function JobDetailPage() {
                 )}
               </div>
               <div className="flex flex-wrap gap-2">
-                {vacancy.skills.map((skill, idx) => {
+                {(vacancy.skills ?? []).map((skill, idx) => {
                   // J2: Color skills based on match
                   const isMatched = matchResult?.matched?.includes(skill.toLowerCase());
                   const isMissing = matchResult?.missing?.includes(skill.toLowerCase());

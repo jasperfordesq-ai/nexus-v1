@@ -6,6 +6,7 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\HasTenantScope;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -13,11 +14,12 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class JobApplication extends Model
 {
-    use HasFactory;
+    use HasFactory, HasTenantScope;
 
     protected $table = 'job_vacancy_applications';
 
     protected $fillable = [
+        'tenant_id',
         'vacancy_id',
         'user_id',
         'message',
@@ -32,6 +34,7 @@ class JobApplication extends Model
     ];
 
     protected $casts = [
+        'tenant_id' => 'integer',
         'vacancy_id' => 'integer',
         'user_id' => 'integer',
         'reviewed_by' => 'integer',

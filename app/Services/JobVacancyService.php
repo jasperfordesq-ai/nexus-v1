@@ -142,7 +142,7 @@ class JobVacancyService
             $items->pop();
         }
 
-        $enriched = $items->map(fn ($item) => $this->enrichVacancy($item, $userId))->values()->all();
+        $enriched = $this->enrichVacancyBatch($items, $userId);
 
         return [
             'items' => $enriched,
@@ -167,7 +167,8 @@ class JobVacancyService
         }
 
         $data = $this->enrichVacancy($job);
-        $data['applications_count'] = (int) JobApplication::where('vacancy_id', $id)->count();
+        $data['applications_count'] = (int) JobApplication::where('tenant_id', TenantContext::getId())
+            ->where('vacancy_id', $id)->count();
 
         return $data;
     }
@@ -400,8 +401,9 @@ class JobVacancyService
         }
 
         try {
-            // Delete applications first
-            JobApplication::where('vacancy_id', $id)->delete();
+            // Delete applications first (tenant-scoped via HasTenantScope + explicit)
+            JobApplication::where('tenant_id', TenantContext::getId())
+                ->where('vacancy_id', $id)->delete();
             $vacancy->delete();
             return true;
         } catch (\Throwable $e) {
@@ -433,7 +435,8 @@ class JobVacancyService
             return null;
         }
 
-        $exists = JobApplication::where('vacancy_id', $jobId)
+        $exists = JobApplication::where('tenant_id', TenantContext::getId())
+            ->where('vacancy_id', $jobId)
             ->where('user_id', $userId)
             ->exists();
 
@@ -592,6 +595,7 @@ class JobVacancyService
         $isBlindHiring = (bool) ($vacancy->blind_hiring ?? false);
 
         $applications = JobApplication::with(['applicant:id,first_name,last_name,avatar_url,email'])
+            ->where('tenant_id', TenantContext::getId())
             ->where('vacancy_id', $jobId)
             ->orderByDesc('created_at')
             ->get();
@@ -638,7 +642,9 @@ class JobVacancyService
             return false;
         }
 
-        $application = JobApplication::with(['vacancy'])->find($applicationId);
+        $application = JobApplication::with(['vacancy'])
+            ->where('tenant_id', TenantContext::getId())
+            ->find($applicationId);
         if (!$application) {
             $this->errors[] = ['code' => 'RESOURCE_NOT_FOUND', 'message' => 'Application not found'];
             return false;
@@ -895,7 +901,7 @@ class JobVacancyService
             $vacancies->pop();
         }
 
-        $enriched = $vacancies->map(fn ($v) => $this->enrichVacancy($v, $userId))->values()->all();
+        $enriched = $this->enrichVacancyBatch($vacancies, $userId);
 
         return [
             'items' => $enriched,
@@ -1154,7 +1160,9 @@ class JobVacancyService
         $this->errors = [];
         $tenantId = TenantContext::getId();
 
-        $application = JobApplication::with(['vacancy'])->find($applicationId);
+        $application = JobApplication::with(['vacancy'])
+            ->where('tenant_id', $tenantId)
+            ->find($applicationId);
         if (!$application || !$application->vacancy || (int) $application->vacancy->tenant_id !== $tenantId) {
             $this->errors[] = ['code' => 'RESOURCE_NOT_FOUND', 'message' => 'Application not found'];
             return null;
@@ -1256,7 +1264,8 @@ class JobVacancyService
 
         $timeToFill = null;
         if ($vacancy['status'] === 'filled') {
-            $acceptedAt = JobApplication::where('vacancy_id', $jobId)
+            $acceptedAt = JobApplication::where('tenant_id', TenantContext::getId())
+                ->where('vacancy_id', $jobId)
                 ->where('status', 'accepted')
                 ->min('reviewed_at');
             if ($acceptedAt) {
@@ -1395,7 +1404,8 @@ class JobVacancyService
         }
 
         // 2. Get open vacancies in this tenant, excluding applied-to and own postings
-        $appliedIds = JobApplication::where('user_id', $userId)
+        $appliedIds = JobApplication::where('tenant_id', TenantContext::getId())
+            ->where('user_id', $userId)
             ->pluck('vacancy_id')
             ->toArray();
 
@@ -1420,14 +1430,13 @@ class JobVacancyService
             return [];
         }
 
-        // 3. Score each vacancy by skill overlap, using same fuzzy matching as calculateMatchPercentage()
-        $scored = $vacancies->map(function ($vacancy) use ($userId, $userSkills) {
-            $data = $this->enrichVacancy($vacancy, $userId);
+        // 3. Batch-enrich all vacancies (2 queries instead of 2×N)
+        $enrichedList = $this->enrichVacancyBatch($vacancies, $userId);
 
-            $requiredSkills = [];
-            if (!empty($vacancy->skills_required)) {
-                $requiredSkills = array_values(array_filter(array_map(fn ($s) => strtolower(trim($s)), explode(',', $vacancy->skills_required))));
-            }
+        // 4. Score each vacancy by skill overlap, using same fuzzy matching as calculateMatchPercentage()
+        $scored = collect($enrichedList)->map(function (array $data) use ($userSkills) {
+            $requiredSkills = $data['skills'] ?? [];
+            $requiredSkills = array_map('strtolower', $requiredSkills);
 
             $score = 0;
             if (!empty($requiredSkills) && !empty($userSkills)) {
@@ -1455,7 +1464,7 @@ class JobVacancyService
             return $data;
         });
 
-        // 4. Sort by match_score DESC (jobs with higher skill overlap first)
+        // 5. Sort by match_score DESC (jobs with higher skill overlap first)
         $sorted = $scored->sortByDesc('match_score')->values()->take($limit)->all();
 
         return $sorted;
@@ -1475,9 +1484,59 @@ class JobVacancyService
     }
 
     /**
-     * Enrich a vacancy array with formatted fields.
+     * Batch-enrich a collection of vacancies, pre-fetching applied/saved status in 2 queries instead of 2×N.
+     *
+     * @param \Illuminate\Support\Collection $items Collection of vacancy models/rows
+     * @param int|null $userId Authenticated user ID (null = skip applied/saved checks)
+     * @return array[] Enriched vacancy arrays
      */
-    private function enrichVacancyArray(array $data, ?int $userId = null): array
+    private function enrichVacancyBatch($items, ?int $userId = null): array
+    {
+        $ids = $items->pluck('id')->filter()->map(fn ($id) => (int) $id)->all();
+
+        $appliedMap = [];
+        $savedSet = [];
+
+        if ($userId && !empty($ids)) {
+            $tenantId = TenantContext::getId();
+
+            // Batch: user's applications for these vacancies
+            $applications = DB::table('job_vacancy_applications as jva')
+                ->join('job_vacancies as jv', 'jva.vacancy_id', '=', 'jv.id')
+                ->where('jv.tenant_id', $tenantId)
+                ->whereIn('jva.vacancy_id', $ids)
+                ->where('jva.user_id', $userId)
+                ->select('jva.vacancy_id', 'jva.status', 'jva.stage')
+                ->get();
+
+            foreach ($applications as $app) {
+                $appliedMap[(int) $app->vacancy_id] = $app;
+            }
+
+            // Batch: user's saved jobs for these vacancies
+            $savedSet = SavedJob::whereIn('job_id', $ids)
+                ->where('user_id', $userId)
+                ->pluck('job_id')
+                ->map(fn ($id) => (int) $id)
+                ->flip()
+                ->all();
+        }
+
+        return $items->map(fn ($item) => $this->enrichVacancyArray(
+            is_array($item) ? $item : $item->toArray(),
+            $userId,
+            $appliedMap,
+            $savedSet,
+        ))->values()->all();
+    }
+
+    /**
+     * Enrich a vacancy array with formatted fields.
+     *
+     * @param array|null $appliedMap Pre-fetched applied status keyed by vacancy_id (null = query per row)
+     * @param array|null $savedSet Pre-fetched saved job_ids as keys (null = query per row)
+     */
+    private function enrichVacancyArray(array $data, ?int $userId = null, ?array $appliedMap = null, ?array $savedSet = null): array
     {
         // Format creator info
         $data['creator'] = [
@@ -1521,21 +1580,33 @@ class JobVacancyService
 
         // Check if user has applied / saved
         if ($userId) {
-            $application = DB::table('job_vacancy_applications as jva')
-                ->join('job_vacancies as jv', 'jva.vacancy_id', '=', 'jv.id')
-                ->where('jv.tenant_id', $data['tenant_id'])
-                ->where('jva.vacancy_id', $data['id'])
-                ->where('jva.user_id', $userId)
-                ->select('jva.id', 'jva.status', 'jva.stage')
-                ->first();
+            if ($appliedMap !== null) {
+                // Batch mode — use pre-fetched data (no extra queries)
+                $application = $appliedMap[$data['id']] ?? null;
+            } else {
+                // Single-item mode — query per row (used by getById/legacyGetById)
+                $application = DB::table('job_vacancy_applications as jva')
+                    ->join('job_vacancies as jv', 'jva.vacancy_id', '=', 'jv.id')
+                    ->where('jv.tenant_id', $data['tenant_id'])
+                    ->where('jva.vacancy_id', $data['id'])
+                    ->where('jva.user_id', $userId)
+                    ->select('jva.id', 'jva.status', 'jva.stage')
+                    ->first();
+            }
 
             $data['has_applied'] = !empty($application);
             $data['application_status'] = $application->status ?? null;
             $data['application_stage'] = $application->stage ?? $application->status ?? null;
 
-            $data['is_saved'] = SavedJob::where('job_id', $data['id'])
-                ->where('user_id', $userId)
-                ->exists();
+            if ($savedSet !== null) {
+                // Batch mode
+                $data['is_saved'] = isset($savedSet[$data['id']]);
+            } else {
+                // Single-item mode
+                $data['is_saved'] = SavedJob::where('job_id', $data['id'])
+                    ->where('user_id', $userId)
+                    ->exists();
+            }
         } else {
             $data['has_applied'] = false;
             $data['application_status'] = null;
