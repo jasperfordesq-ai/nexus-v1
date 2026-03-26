@@ -23,8 +23,9 @@ return new class extends Migration
             return;
         }
 
-        $sm = DB::connection()->getDoctrineSchemaManager();
-        $existing = array_keys($sm->listTableIndexes('job_vacancy_applications'));
+        $existing = collect(Schema::getIndexes('job_vacancy_applications'))
+            ->pluck('name')
+            ->all();
 
         // (tenant_id, vacancy_id) — most common query pattern
         if (!in_array('idx_jva_tenant_vacancy', $existing, true)) {
@@ -48,8 +49,9 @@ return new class extends Migration
             return;
         }
 
-        $sm = DB::connection()->getDoctrineSchemaManager();
-        $existing = array_keys($sm->listTableIndexes('job_vacancy_applications'));
+        $existing = collect(Schema::getIndexes('job_vacancy_applications'))
+            ->pluck('name')
+            ->all();
 
         foreach (['idx_jva_tenant_vacancy', 'idx_jva_tenant_user', 'idx_jva_tenant_status_created'] as $idx) {
             if (in_array($idx, $existing, true)) {
