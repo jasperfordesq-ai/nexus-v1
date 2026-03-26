@@ -919,13 +919,9 @@ class UsersController extends BaseApiController
         }
         unset($user);
 
-        $memberRanking = app(MemberRankingService::class);
-        if (!$request->has('sort') && $memberRanking->isEnabled() && !empty($users)) {
-            $users = $memberRanking->rankMembers($users, $viewerId, ['search' => $search]);
-        }
-
+        // Clean up internal fields before returning
         $users = array_map(static function (array $u): array {
-            unset($u['_community_rank'], $u['_score_breakdown'], $u['hours_given'], $u['offer_count'], $u['request_count'], $u['last_login_at']);
+            unset($u['hours_given'], $u['offer_count'], $u['request_count'], $u['last_login_at']);
             return $u;
         }, $users);
 

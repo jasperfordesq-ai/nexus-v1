@@ -94,21 +94,23 @@ function ThreadScreenInner() {
     }
   }, [name, navigation, isValidId]);
 
-  // Populate messages from API response
-  useEffect(() => {
-    if (!isValidId) return;
-    if (data?.data) {
-      // API returns oldest-first; FlatList is inverted so we reverse for display.
-      // The API may not include `is_own` — compute it from sender_id vs authUser.id.
-      const currentUserId = authUser?.id;
-      const enriched = data.data.map((m) => ({
-        ...m,
-        is_own: m.is_own ?? (currentUserId != null && m.sender_id === currentUserId),
-        sender: m.sender ?? { id: m.sender_id ?? 0, first_name: null, last_name: null, avatar_url: null },
-      }));
-      setMessages([...enriched].reverse());
-    }
+  // Populate messages from API response — memoize the enrichment to avoid
+  // recreating the array on every render (only recomputes when data changes).
+  const enrichedMessages = useMemo(() => {
+    if (!isValidId || !data?.data) return null;
+    const currentUserId = authUser?.id;
+    return data.data.map((m) => ({
+      ...m,
+      is_own: m.is_own ?? (currentUserId != null && m.sender_id === currentUserId),
+      sender: m.sender ?? { id: m.sender_id ?? 0, first_name: null, last_name: null, avatar_url: null },
+    })).reverse();
   }, [data, isValidId, authUser?.id]);
+
+  useEffect(() => {
+    if (enrichedMessages) {
+      setMessages(enrichedMessages);
+    }
+  }, [enrichedMessages]);
 
   // Live incoming messages via Pusher
   useEffect(() => {
@@ -259,8 +261,8 @@ function ThreadScreenInner() {
       <OfflineBanner />
       <KeyboardAvoidingView
         style={styles.flex}
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-        keyboardVerticalOffset={Platform.OS === 'ios' ? 90 : 0}
+        behavior="padding"
+        keyboardVerticalOffset={Platform.OS === 'ios' ? 90 : 30}
       >
         <FlatList<Message>
           ref={flatListRef}

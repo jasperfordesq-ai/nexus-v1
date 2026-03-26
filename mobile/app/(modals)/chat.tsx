@@ -210,8 +210,8 @@ function ChatScreenInner() {
       <SafeAreaView style={styles.container}>
         <KeyboardAvoidingView
           style={styles.flex}
-          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-          keyboardVerticalOffset={Platform.OS === 'ios' ? 88 : 0}
+          behavior="padding"
+          keyboardVerticalOffset={Platform.OS === 'ios' ? 88 : 30}
         >
           {/* Message list — inverted so newest messages appear at bottom */}
           {messages.length === 0 ? (

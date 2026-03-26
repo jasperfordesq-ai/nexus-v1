@@ -42,7 +42,7 @@ export function getMembers(
   search?: string,
 ): Promise<MemberListResponse> {
   const params: Record<string, string> = { offset: String(offset) };
-  if (search) params.search = search;
+  if (search) params.q = search;
   return api.get<MemberListResponse>(`${API_V2}/users`, params);
 }
 

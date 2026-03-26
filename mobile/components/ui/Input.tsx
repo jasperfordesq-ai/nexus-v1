@@ -9,6 +9,8 @@ import {
   Text,
   TextInput,
   Animated,
+  type NativeSyntheticEvent,
+  type TargetedEvent,
   type TextInputProps,
   StyleSheet,
 } from 'react-native';
@@ -28,6 +30,8 @@ export default function Input({
   leftIcon,
   rightIcon,
   style,
+  onFocus: onFocusProp,
+  onBlur: onBlurProp,
   ...rest
 }: InputProps) {
   const primary = usePrimaryColor();
@@ -38,7 +42,7 @@ export default function Input({
   const scaleAnim = useRef(new Animated.Value(1)).current;
 
   const handleFocus = useCallback(
-    (e: any) => {
+    (e: NativeSyntheticEvent<TargetedEvent>) => {
       Animated.parallel([
         Animated.timing(focusAnim, {
           toValue: 1,
@@ -51,13 +55,13 @@ export default function Input({
           useNativeDriver: true,
         }),
       ]).start();
-      rest.onFocus?.(e);
+      onFocusProp?.(e);
     },
-    [focusAnim, scaleAnim, rest.onFocus],
+    [focusAnim, scaleAnim, onFocusProp],
   );
 
   const handleBlur = useCallback(
-    (e: any) => {
+    (e: NativeSyntheticEvent<TargetedEvent>) => {
       Animated.parallel([
         Animated.timing(focusAnim, {
           toValue: 0,
@@ -70,9 +74,9 @@ export default function Input({
           useNativeDriver: true,
         }),
       ]).start();
-      rest.onBlur?.(e);
+      onBlurProp?.(e);
     },
-    [focusAnim, scaleAnim, rest.onBlur],
+    [focusAnim, scaleAnim, onBlurProp],
   );
 
   const animatedBorderColor = focusAnim.interpolate({
@@ -101,9 +105,9 @@ export default function Input({
             style,
           ]}
           placeholderTextColor={theme.textMuted}
+          {...rest}
           onFocus={handleFocus}
           onBlur={handleBlur}
-          {...rest}
         />
         {rightIcon && <View style={styles.rightIcon}>{rightIcon}</View>}
       </Animated.View>
