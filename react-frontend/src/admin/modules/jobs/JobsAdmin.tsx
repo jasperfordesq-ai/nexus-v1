@@ -102,7 +102,8 @@ export function JobsAdmin() {
       const res = await api.get<Job[]>(`/v2/admin/jobs?${params.toString()}`);
       if (res.success) {
         setItems(Array.isArray(res.data) ? res.data : []);
-        const paginationMeta: JobsMeta | undefined = res.meta ? { page: Number((res.meta as Record<string, unknown>).page) || 1, per_page: Number((res.meta as Record<string, unknown>).per_page) || 50, total: Number((res.meta as Record<string, unknown>).total) || 0, total_pages: Number((res.meta as Record<string, unknown>).total_pages) || 1 } : undefined;
+        const m = res.meta as unknown as Record<string, unknown> | undefined;
+        const paginationMeta: JobsMeta | undefined = m ? { page: Number(m.page) || 1, per_page: Number(m.per_page) || 50, total: Number(m.total) || 0, total_pages: Number(m.total_pages) || 1 } : undefined;
         setMeta(paginationMeta ?? { page: 1, per_page: 50, total: 0, total_pages: 1 });
       }
     } catch { toast.error(t('jobs.failed_load_jobs')); }
