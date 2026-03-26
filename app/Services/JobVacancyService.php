@@ -435,26 +435,41 @@ class JobVacancyService
             return null;
         }
 
-        $exists = JobApplication::where('tenant_id', TenantContext::getId())
-            ->where('vacancy_id', $jobId)
-            ->where('user_id', $userId)
-            ->exists();
+        // Use transaction + row lock to prevent duplicate applications from concurrent requests
+        $application = null;
+        try {
+            $application = DB::transaction(function () use ($jobId, $userId, $data) {
+                $exists = JobApplication::where('tenant_id', TenantContext::getId())
+                    ->where('vacancy_id', $jobId)
+                    ->where('user_id', $userId)
+                    ->lockForUpdate()
+                    ->exists();
 
-        if ($exists) {
-            $this->errors[] = ['code' => 'RESOURCE_CONFLICT', 'message' => 'You have already applied to this vacancy'];
+                if ($exists) {
+                    return false;
+                }
+
+                return JobApplication::create([
+                    'vacancy_id' => $jobId,
+                    'user_id' => $userId,
+                    'message' => $data['cover_letter'] ?? null,
+                    'cv_path' => $data['cv_path'] ?? null,
+                    'cv_filename' => $data['cv_filename'] ?? null,
+                    'cv_size' => isset($data['cv_size']) ? (int) $data['cv_size'] : null,
+                    'status' => 'pending',
+                    'stage' => 'applied',
+                ]);
+            });
+        } catch (\Throwable $e) {
+            Log::error('Job application failed', ['error' => $e->getMessage(), 'vacancy_id' => $jobId, 'user_id' => $userId]);
+            $this->errors[] = ['code' => 'SERVER_ERROR', 'message' => 'Failed to submit application'];
             return null;
         }
 
-        $application = JobApplication::create([
-            'vacancy_id' => $jobId,
-            'user_id' => $userId,
-            'message' => $data['cover_letter'] ?? null,
-            'cv_path' => $data['cv_path'] ?? null,
-            'cv_filename' => $data['cv_filename'] ?? null,
-            'cv_size' => isset($data['cv_size']) ? (int) $data['cv_size'] : null,
-            'status' => 'pending',
-            'stage' => 'applied',
-        ]);
+        if ($application === false) {
+            $this->errors[] = ['code' => 'RESOURCE_CONFLICT', 'message' => 'You have already applied to this vacancy'];
+            return null;
+        }
 
         // Log initial application in history
         $this->logApplicationHistory($application->id, null, 'applied', $userId, 'Application submitted');
@@ -1748,8 +1763,12 @@ class JobVacancyService
             return 0;
         }
         if ((int) $vacancy['user_id'] !== $userId) {
-            $this->errors[] = ['code' => 'RESOURCE_FORBIDDEN', 'message' => 'Access denied'];
-            return 0;
+            $user = User::where('id', $userId)->first(['id', 'role']);
+            $isAdmin = $user && in_array($user->role, ['admin', 'super_admin', 'tenant_admin']);
+            if (!$isAdmin) {
+                $this->errors[] = ['code' => 'RESOURCE_FORBIDDEN', 'message' => 'Access denied'];
+                return 0;
+            }
         }
 
         $allowed = ['applied','screening','reviewed','interview','offer','accepted','rejected','withdrawn'];

@@ -17,6 +17,7 @@ import { motion } from 'framer-motion';
 import {
   Button,
   Avatar,
+  Checkbox,
   Chip,
   Spinner,
   Modal,
@@ -142,13 +143,12 @@ function AppKanbanCard({ application, onDragStart, onDownloadCv, onScheduleInter
         {/* Selection checkbox */}
         {onSelect && (
           <div className="flex items-center gap-2 mb-2">
-            <input
-              type="checkbox"
-              checked={isSelected ?? false}
-              onChange={(e) => onSelect(application.id, e.target.checked)}
-              className="w-4 h-4 accent-primary cursor-pointer"
+            <Checkbox
+              isSelected={isSelected ?? false}
+              onValueChange={(checked) => onSelect(application.id, checked)}
+              size="sm"
               aria-label={t('kanban.select_applicant', 'Select {{name}}', { name: application.applicant.name })}
-              onClick={(e) => e.stopPropagation()}
+              onClick={(e: React.MouseEvent) => e.stopPropagation()}
             />
           </div>
         )}

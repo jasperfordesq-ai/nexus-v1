@@ -301,10 +301,15 @@ function StepWelcome({ onNext }: { onNext: () => void }) {
 }
 
 // Step 2: Organization Profile
+interface OnboardingUser {
+  id: number;
+  organization_name?: string;
+  organization?: { id?: number; name?: string } | null;
+}
+
 interface StepOrgProps {
   state: WizardState;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  user: any;
+  user: OnboardingUser | null;
   onChange: (updates: Partial<WizardState>) => void;
   onNext: () => void;
   onBack: () => void;

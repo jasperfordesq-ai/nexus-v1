@@ -334,7 +334,7 @@ class JobVacanciesController extends BaseApiController
 
         if (!$isApplicant && !$isPoster) {
             $user = \App\Models\User::where('id', $userId)->first(['id', 'role']);
-            $isAdmin = $user && in_array($user->role, ['admin', 'super_admin', 'tenant_admin', 'god']);
+            $isAdmin = $user && in_array($user->role, ['admin', 'super_admin', 'tenant_admin']);
             if (!$isAdmin) {
                 return $this->respondWithError('RESOURCE_FORBIDDEN', 'Access denied', null, 403);
             }
@@ -348,12 +348,11 @@ class JobVacanciesController extends BaseApiController
             return $this->respondWithError('RESOURCE_NOT_FOUND', 'CV file not found', null, 404);
         }
 
-        $filename = $application->cv_filename ?? basename($application->cv_path);
+        $filename = preg_replace('/[^a-zA-Z0-9._\- ]/', '_', $application->cv_filename ?? basename($application->cv_path));
 
         return response()->download(
             Storage::disk('local')->path($application->cv_path),
-            $filename,
-            ['Content-Disposition' => 'attachment; filename="' . $filename . '"']
+            $filename
         );
     }
 
@@ -1267,6 +1266,7 @@ class JobVacanciesController extends BaseApiController
     /** GET /v2/jobs/{id}/applications/export-csv */
     public function exportApplicationsCsv(int $id): \Illuminate\Http\Response|JsonResponse
     {
+        $this->rateLimit('jobs_export_csv', 10, 60);
         $userId = $this->getUserId();
 
         $csv = $this->jobService->exportApplicationsCsv($id, $userId);
@@ -1332,6 +1332,10 @@ class JobVacanciesController extends BaseApiController
 
         if (empty($ids) || !$status) {
             return $this->respondWithError('VALIDATION_ERROR', 'application_ids and status are required', null, 422);
+        }
+
+        if (count($ids) > 1000) {
+            return $this->respondWithError('VALIDATION_ERROR', 'Maximum 1000 application IDs per request', null, 422);
         }
 
         $count  = $this->jobService->bulkUpdateApplicationStatus($id, $userId, $ids, $status);
