@@ -853,6 +853,17 @@ export function JobDetailPage() {
     }
   }, [id]);
 
+  // JSON-LD structured data — inject via textContent (XSS-safe, avoids dangerouslySetInnerHTML)
+  // Must be before any early returns to satisfy Rules of Hooks
+  useEffect(() => {
+    if (!vacancy) return;
+    const script = document.createElement('script');
+    script.type = 'application/ld+json';
+    script.textContent = buildJobPostingSchema(vacancy, tenantPath);
+    document.head.appendChild(script);
+    return () => { script.remove(); };
+  }, [vacancy, tenantPath]);
+
   // Loading state
   if (isLoading) {
     return (
@@ -893,16 +904,6 @@ export function JobDetailPage() {
       />
     );
   }
-
-  // JSON-LD structured data — inject via textContent (XSS-safe, avoids dangerouslySetInnerHTML)
-  useEffect(() => {
-    if (!vacancy) return;
-    const script = document.createElement('script');
-    script.type = 'application/ld+json';
-    script.textContent = buildJobPostingSchema(vacancy, tenantPath);
-    document.head.appendChild(script);
-    return () => { script.remove(); };
-  }, [vacancy, tenantPath]);
 
   const deadlineDate = vacancy.deadline ? new Date(vacancy.deadline) : null;
   const isPastDeadline = deadlineDate ? deadlineDate < new Date() : false;
