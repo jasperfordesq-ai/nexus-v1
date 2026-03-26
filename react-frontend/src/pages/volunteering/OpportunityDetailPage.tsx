@@ -17,6 +17,7 @@ import { motion } from 'framer-motion';
 import {
   Button,
   Avatar,
+  Card,
   Checkbox,
   Chip,
   Input,
@@ -48,6 +49,7 @@ import {
   ClipboardList,
   MessageSquare,
   ChevronDown,
+  QrCode,
 } from 'lucide-react';
 import { GlassCard } from '@/components/ui';
 import { LoadingScreen } from '@/components/feedback';
@@ -136,6 +138,152 @@ function statusColor(status: string): 'warning' | 'success' | 'danger' | 'defaul
   if (status === 'approved') return 'success';
   if (status === 'declined') return 'danger';
   return 'default';
+}
+
+/* ─────────────────── Shift Check-in Panel ─────────────────── */
+
+interface CheckinData {
+  qr_token: string;
+  qr_url: string;
+  status: 'pending' | 'checked_in' | 'checked_out';
+  checked_in_at: string | null;
+  checked_out_at: string | null;
+}
+
+function checkinStatusColor(status: string): 'warning' | 'success' | 'default' {
+  if (status === 'checked_in') return 'success';
+  if (status === 'checked_out') return 'default';
+  return 'warning';
+}
+
+interface ShiftCheckinPanelProps {
+  shifts: Shift[];
+}
+
+function ShiftCheckinPanel({ shifts }: ShiftCheckinPanelProps) {
+  const { t } = useTranslation('volunteering');
+  const [checkins, setCheckins] = useState<Record<number, CheckinData>>({});
+  const [loading, setLoading] = useState(true);
+  const [errorShifts, setErrorShifts] = useState<Set<number>>(new Set());
+
+  useEffect(() => {
+    let cancelled = false;
+
+    async function fetchCheckins() {
+      setLoading(true);
+      const results: Record<number, CheckinData> = {};
+      const errors = new Set<number>();
+
+      await Promise.all(
+        shifts.map(async (shift) => {
+          try {
+            const response = await api.get<CheckinData>(
+              `/v2/volunteering/shifts/${shift.id}/checkin`
+            );
+            if (!cancelled && response.success && response.data) {
+              results[shift.id] = response.data;
+            } else {
+              errors.add(shift.id);
+            }
+          } catch {
+            errors.add(shift.id);
+          }
+        })
+      );
+
+      if (!cancelled) {
+        setCheckins(results);
+        setErrorShifts(errors);
+        setLoading(false);
+      }
+    }
+
+    if (shifts.length > 0) {
+      fetchCheckins();
+    } else {
+      setLoading(false);
+    }
+
+    return () => { cancelled = true; };
+  }, [shifts]);
+
+  // Only render if we have at least one successful check-in response
+  const checkinEntries = Object.entries(checkins);
+  if (loading) {
+    return (
+      <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15 }}>
+        <GlassCard className="p-6">
+          <div className="flex justify-center py-6">
+            <Spinner size="md" />
+          </div>
+        </GlassCard>
+      </motion.div>
+    );
+  }
+
+  if (checkinEntries.length === 0) return null;
+
+  return (
+    <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15 }}>
+      <GlassCard className="p-6 space-y-4">
+        <h2 className="text-lg font-semibold text-theme-primary flex items-center gap-2">
+          <QrCode className="w-5 h-5 text-indigo-400" aria-hidden="true" />
+          {t('check_in.title', 'Shift Check-in')}
+        </h2>
+        <p className="text-sm text-theme-muted">
+          {t('check_in.instructions', 'Show this QR code to your shift coordinator when you arrive.')}
+        </p>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          {checkinEntries.map(([shiftIdStr, checkin]) => {
+            const shiftId = Number(shiftIdStr);
+            const shift = shifts.find((s) => s.id === shiftId);
+            const statusLabel =
+              checkin.status === 'checked_in'
+                ? t('check_in.status_checked_in', 'Checked In')
+                : checkin.status === 'checked_out'
+                  ? t('check_in.status_checked_out', 'Checked Out')
+                  : t('check_in.status_pending', 'Pending');
+
+            return (
+              <Card key={shiftId} className="p-4">
+                {shift && (
+                  <p className="text-sm font-medium text-theme-primary mb-2">
+                    {formatShortDate(shift.start_time)} &middot; {formatTime(shift.start_time)}–{formatTime(shift.end_time)}
+                  </p>
+                )}
+                <div className="flex flex-col items-center gap-3">
+                  <img
+                    src={`https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(checkin.qr_url)}`}
+                    alt={t('check_in.qr_alt', 'QR code for check-in')}
+                    className="w-48 h-48 rounded-lg bg-white p-1"
+                    loading="lazy"
+                  />
+                  <Chip color={checkinStatusColor(checkin.status)} variant="flat">
+                    {statusLabel}
+                  </Chip>
+                  {checkin.checked_in_at && (
+                    <p className="text-sm text-theme-muted">
+                      {t('check_in.checked_in_at', 'Checked in: {{time}}', { time: formatTime(checkin.checked_in_at) })}
+                    </p>
+                  )}
+                  {checkin.checked_out_at && (
+                    <p className="text-sm text-theme-muted">
+                      {t('check_in.checked_out_at', 'Checked out: {{time}}', { time: formatTime(checkin.checked_out_at) })}
+                    </p>
+                  )}
+                </div>
+              </Card>
+            );
+          })}
+        </div>
+        {errorShifts.size > 0 && errorShifts.size < shifts.length && (
+          <p className="text-xs text-theme-subtle">
+            {t('check_in.some_unavailable', 'Check-in QR codes are not yet available for some shifts.')}
+          </p>
+        )}
+      </GlassCard>
+    </motion.div>
+  );
 }
 
 /* ─────────────────── Applications Panel ─────────────────── */
@@ -728,6 +876,11 @@ export function OpportunityDetailPage() {
             </div>
           </GlassCard>
         </motion.div>
+      )}
+
+      {/* QR Check-in — approved volunteers only */}
+      {opp.has_applied && opp.application?.status === 'approved' && opp.shifts && opp.shifts.length > 0 && (
+        <ShiftCheckinPanel shifts={opp.shifts} />
       )}
 
       {/* Applications management — owner only */}

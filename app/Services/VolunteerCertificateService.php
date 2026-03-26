@@ -200,28 +200,47 @@ class VolunteerCertificateService
     }
 
     /**
-     * Get all certificates for a user.
+     * Get all certificates for a user with cursor pagination.
+     *
+     * @return array{items: array, cursor: string|null, has_more: bool}
      */
-    public static function getUserCertificates(int $userId): array
+    public static function getUserCertificates(int $userId, array $filters = []): array
     {
         $tenantId = TenantContext::getId();
+        $limit = min((int) ($filters['limit'] ?? 20), 50);
+        $cursor = $filters['cursor'] ?? null;
 
-        return DB::table('vol_certificates')
+        $query = DB::table('vol_certificates')
             ->where('user_id', $userId)
-            ->where('tenant_id', $tenantId)
-            ->orderByDesc('generated_at')
-            ->get()
-            ->map(fn ($row) => [
-                'id' => (int) $row->id,
-                'verification_code' => $row->verification_code,
-                'total_hours' => round((float) $row->total_hours, 2),
-                'date_range' => ['start' => $row->date_range_start, 'end' => $row->date_range_end],
-                'verification_url' => config('app.url', 'https://api.project-nexus.ie') . '/api/v2/volunteering/certificates/verify/' . $row->verification_code,
-                'organizations' => json_decode($row->organizations, true) ?? [],
-                'generated_at' => $row->generated_at,
-                'downloaded_at' => $row->downloaded_at,
-            ])
-            ->all();
+            ->where('tenant_id', $tenantId);
+
+        if ($cursor !== null && ($cid = base64_decode($cursor, true)) !== false) {
+            $query->where('id', '<', (int) $cid);
+        }
+
+        $query->orderByDesc('id');
+        $items = $query->limit($limit + 1)->get();
+        $hasMore = $items->count() > $limit;
+        if ($hasMore) {
+            $items->pop();
+        }
+
+        $mapped = $items->map(fn ($row) => [
+            'id' => (int) $row->id,
+            'verification_code' => $row->verification_code,
+            'total_hours' => round((float) $row->total_hours, 2),
+            'date_range' => ['start' => $row->date_range_start, 'end' => $row->date_range_end],
+            'verification_url' => config('app.url', 'https://api.project-nexus.ie') . '/api/v2/volunteering/certificates/verify/' . $row->verification_code,
+            'organizations' => json_decode($row->organizations, true) ?? [],
+            'generated_at' => $row->generated_at,
+            'downloaded_at' => $row->downloaded_at,
+        ]);
+
+        return [
+            'items'    => $mapped->all(),
+            'cursor'   => $hasMore && $items->isNotEmpty() ? base64_encode((string) $items->last()->id) : null,
+            'has_more' => $hasMore,
+        ];
     }
 
     /**

@@ -219,14 +219,18 @@ class VolunteerEmergencyAlertService
     }
 
     /**
-     * Get active alerts for a user (ones they've been notified about).
+     * Get active alerts for a user (ones they've been notified about) with cursor pagination.
      *
      * @param int $userId User ID
-     * @return array Active alerts
+     * @param array $filters Optional: limit, cursor
+     * @return array{items: array, cursor: string|null, has_more: bool}
      */
-    public static function getUserAlerts(int $userId): array
+    public static function getUserAlerts(int $userId, array $filters = []): array
     {
-        $alerts = VolEmergencyAlert::query()
+        $limit = min((int) ($filters['limit'] ?? 20), 50);
+        $cursor = $filters['cursor'] ?? null;
+
+        $query = VolEmergencyAlert::query()
             ->join('vol_emergency_alert_recipients as r', 'r.alert_id', '=', 'vol_emergency_alerts.id')
             ->join('vol_shifts as s', 'vol_emergency_alerts.shift_id', '=', 's.id')
             ->join('vol_opportunities as o', 's.opportunity_id', '=', 'o.id')
@@ -234,8 +238,6 @@ class VolunteerEmergencyAlertService
             ->join('users as u', 'vol_emergency_alerts.created_by', '=', 'u.id')
             ->where('r.user_id', $userId)
             ->where('vol_emergency_alerts.status', 'active')
-            ->orderByRaw("CASE vol_emergency_alerts.priority WHEN 'critical' THEN 0 WHEN 'urgent' THEN 1 ELSE 2 END")
-            ->orderByDesc('vol_emergency_alerts.created_at')
             ->select([
                 'vol_emergency_alerts.*',
                 'r.response as my_response',
@@ -246,10 +248,20 @@ class VolunteerEmergencyAlertService
                 'o.location as opp_location',
                 'org.name as org_name',
                 'u.name as coordinator_name',
-            ])
-            ->get();
+            ]);
 
-        return $alerts->map(fn ($a) => [
+        if ($cursor !== null && ($cid = base64_decode($cursor, true)) !== false) {
+            $query->where('vol_emergency_alerts.id', '<', (int) $cid);
+        }
+
+        $query->orderByDesc('vol_emergency_alerts.id');
+        $items = $query->limit($limit + 1)->get();
+        $hasMore = $items->count() > $limit;
+        if ($hasMore) {
+            $items->pop();
+        }
+
+        $mapped = $items->map(fn ($a) => [
             'id' => $a->id,
             'priority' => $a->priority,
             'message' => $a->message,
@@ -272,7 +284,13 @@ class VolunteerEmergencyAlertService
             ],
             'expires_at' => $a->expires_at?->toDateTimeString(),
             'created_at' => $a->created_at?->toDateTimeString(),
-        ])->toArray();
+        ]);
+
+        return [
+            'items'    => $mapped->toArray(),
+            'cursor'   => $hasMore && $items->isNotEmpty() ? base64_encode((string) $items->last()->id) : null,
+            'has_more' => $hasMore,
+        ];
     }
 
     /**

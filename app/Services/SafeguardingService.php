@@ -164,23 +164,41 @@ class SafeguardingService
     // =========================================================================
 
     /**
-     * Get all training records for a user.
+     * Get all training records for a user with cursor pagination.
+     *
+     * @return array{items: array, cursor: string|null, has_more: bool}
      */
-    public function getTrainingForUser(int $userId, int $tenantId): array
+    public function getTrainingForUser(int $userId, int $tenantId, array $filters = []): array
     {
+        $limit = min((int) ($filters['limit'] ?? 20), 50);
+        $cursor = $filters['cursor'] ?? null;
+
         try {
-            return DB::table('vol_safeguarding_training as st')
+            $query = DB::table('vol_safeguarding_training as st')
                 ->leftJoin('users as v', 'st.verified_by', '=', 'v.id')
                 ->where('st.user_id', $userId)
                 ->where('st.tenant_id', $tenantId)
-                ->select('st.*', 'v.name as verified_by_name')
-                ->orderByDesc('st.completed_at')
-                ->get()
-                ->map(fn ($r) => (array) $r)
-                ->all();
+                ->select('st.*', 'v.name as verified_by_name');
+
+            if ($cursor !== null && ($cid = base64_decode($cursor, true)) !== false) {
+                $query->where('st.id', '<', (int) $cid);
+            }
+
+            $query->orderByDesc('st.id');
+            $items = $query->limit($limit + 1)->get();
+            $hasMore = $items->count() > $limit;
+            if ($hasMore) {
+                $items->pop();
+            }
+
+            return [
+                'items'    => $items->map(fn ($r) => (array) $r)->all(),
+                'cursor'   => $hasMore && $items->isNotEmpty() ? base64_encode((string) $items->last()->id) : null,
+                'has_more' => $hasMore,
+            ];
         } catch (\Throwable $e) {
             Log::error('SafeguardingService::getTrainingForUser error: ' . $e->getMessage());
-            return [];
+            return ['items' => [], 'cursor' => null, 'has_more' => false];
         }
     }
 

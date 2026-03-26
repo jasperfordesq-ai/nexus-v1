@@ -144,45 +144,101 @@ class VolunteerService
     }
 
     /**
-     * Get applications submitted by a user.
+     * Get applications submitted by a user with cursor pagination.
+     *
+     * @return array{items: array, cursor: string|null, has_more: bool}
      */
-    public static function getMyApplications(int $userId): array
+    public static function getMyApplications(int $userId, array $filters = []): array
     {
-        return VolApplication::query()
+        $limit = min((int) ($filters['limit'] ?? 20), 50);
+        $cursor = $filters['cursor'] ?? null;
+
+        $query = VolApplication::query()
             ->with(['opportunity:id,title,status', 'opportunity.organization:id,name'])
-            ->where('user_id', $userId)
-            ->orderByDesc('created_at')
-            ->get()
-            ->toArray();
+            ->where('user_id', $userId);
+
+        if ($cursor !== null && ($cid = base64_decode($cursor, true)) !== false) {
+            $query->where('id', '<', (int) $cid);
+        }
+
+        $query->orderByDesc('id');
+        $items = $query->limit($limit + 1)->get();
+        $hasMore = $items->count() > $limit;
+        if ($hasMore) {
+            $items->pop();
+        }
+
+        return [
+            'items'    => $items->toArray(),
+            'cursor'   => $hasMore && $items->isNotEmpty() ? base64_encode((string) $items->last()->id) : null,
+            'has_more' => $hasMore,
+        ];
     }
 
     /**
-     * Get shifts the user is signed up for.
+     * Get shifts the user is signed up for with cursor pagination.
+     *
+     * @return array{items: array, cursor: string|null, has_more: bool}
      */
-    public static function getMyShifts(int $userId): array
+    public static function getMyShifts(int $userId, array $filters = []): array
     {
-        return DB::table('vol_shift_signups as ss')
+        $limit = min((int) ($filters['limit'] ?? 20), 50);
+        $cursor = $filters['cursor'] ?? null;
+
+        $query = DB::table('vol_shift_signups as ss')
             ->join('vol_shifts as s', 'ss.shift_id', '=', 's.id')
             ->join('vol_opportunities as o', 's.opportunity_id', '=', 'o.id')
             ->where('ss.user_id', $userId)
-            ->select('s.*', 'o.title as opportunity_title', 'o.location')
-            ->orderBy('s.start_time')
-            ->get()
-            ->map(fn ($i) => (array) $i)
-            ->all();
+            ->select('s.*', 'o.title as opportunity_title', 'o.location');
+
+        if ($cursor !== null && ($cid = base64_decode($cursor, true)) !== false) {
+            $query->where('s.id', '<', (int) $cid);
+        }
+
+        $query->orderByDesc('s.id');
+        $items = $query->limit($limit + 1)->get();
+        $hasMore = $items->count() > $limit;
+        if ($hasMore) {
+            $items->pop();
+        }
+
+        return [
+            'items'    => $items->map(fn ($i) => (array) $i)->all(),
+            'cursor'   => $hasMore && $items->isNotEmpty() ? base64_encode((string) $items->last()->id) : null,
+            'has_more' => $hasMore,
+        ];
     }
 
     /**
-     * Get logged hours for a user.
+     * Get logged hours for a user with cursor pagination.
+     *
+     * @return array{items: array, cursor: string|null, has_more: bool}
      */
-    public static function getMyHours(int $userId): array
+    public static function getMyHours(int $userId, array $filters = []): array
     {
-        return VolLog::query()
+        $limit = min((int) ($filters['limit'] ?? 20), 50);
+        $cursor = $filters['cursor'] ?? null;
+
+        $query = VolLog::query()
             ->with(['organization:id,name', 'opportunity:id,title'])
-            ->where('user_id', $userId)
-            ->orderByDesc('date_logged')
-            ->get()
-            ->toArray();
+            ->where('user_id', $userId);
+
+        if ($cursor !== null && ($cid = base64_decode($cursor, true)) !== false) {
+            $query->where('id', '<', (int) $cid);
+        }
+
+        $query->orderByDesc('id');
+        $items = $query->limit($limit + 1)->get();
+        $hasMore = $items->count() > $limit;
+        if ($hasMore) {
+            $items->pop();
+        }
+
+        return [
+            'items'    => $items->toArray(),
+            'cursor'   => $hasMore && $items->isNotEmpty() ? base64_encode((string) $items->last()->id) : null,
+            'has_more' => $hasMore,
+        ];
     }
 
     /**
@@ -971,22 +1027,42 @@ class VolunteerService
     // ========================================
 
     /**
-     * Get organisations the current user owns or is admin of.
+     * Get organisations the current user owns or is admin of, with cursor pagination.
+     *
+     * @return array{items: array, cursor: string|null, has_more: bool}
      */
-    public static function getMyOrganizations(int $userId): array
+    public static function getMyOrganizations(int $userId, array $filters = []): array
     {
         $tenantId = self::getTenantId();
+        $limit = min((int) ($filters['limit'] ?? 20), 50);
+        $cursorId = self::decodeCursor($filters['cursor'] ?? null);
 
-        $rows = DB::select("
+        $sql = "
             SELECT vo.*, om.role as member_role
             FROM vol_organizations vo
             JOIN org_members om ON om.organization_id = vo.id AND om.tenant_id = vo.tenant_id
             WHERE om.user_id = ? AND om.tenant_id = ? AND om.status = 'active'
-            ORDER BY vo.name ASC
-        ", [$userId, $tenantId]);
+        ";
+        $params = [$userId, $tenantId];
 
-        return array_map(function ($org) {
-            return [
+        if ($cursorId) {
+            $sql .= " AND vo.id < ?";
+            $params[] = $cursorId;
+        }
+
+        $sql .= " ORDER BY vo.id DESC LIMIT " . ($limit + 1);
+
+        $rows = DB::select($sql, $params);
+        $hasMore = count($rows) > $limit;
+        if ($hasMore) {
+            array_pop($rows);
+        }
+
+        $items = [];
+        $lastId = null;
+        foreach ($rows as $org) {
+            $lastId = $org->id;
+            $items[] = [
                 'id'            => (int) $org->id,
                 'name'          => $org->name,
                 'description'   => $org->description ?? null,
@@ -997,7 +1073,13 @@ class VolunteerService
                 'website'       => $org->website ?? null,
                 'created_at'    => $org->created_at ?? null,
             ];
-        }, $rows);
+        }
+
+        return [
+            'items'    => $items,
+            'cursor'   => ($hasMore && $lastId) ? base64_encode((string) $lastId) : null,
+            'has_more' => $hasMore,
+        ];
     }
 
     /**

@@ -143,8 +143,8 @@ type VolunteerTab = 'opportunities' | 'applications' | 'hours' | 'recommended' |
 /* ───────────────────────── Main Component ───────────────────────── */
 
 export function VolunteeringPage() {
-  const { t } = useTranslation('community');
-  usePageTitle(t('volunteering.page_title'));
+  const { t } = useTranslation('volunteering');
+  usePageTitle(t('page_title'));
   const { isAuthenticated } = useAuth();
   const { tenantPath, hasFeature } = useTenant();
   const [searchParams] = useSearchParams();
@@ -175,9 +175,9 @@ export function VolunteeringPage() {
         <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-rose-100 to-orange-100 dark:from-rose-900/30 dark:to-orange-900/30 flex items-center justify-center mb-4">
           <Heart className="w-8 h-8 text-rose-500" aria-hidden="true" />
         </div>
-        <h2 className="text-xl font-semibold text-[var(--color-text)] mb-2">{t('volunteering.feature_not_available', 'Volunteering Not Available')}</h2>
+        <h2 className="text-xl font-semibold text-[var(--color-text)] mb-2">{t('feature_not_available', 'Volunteering Not Available')}</h2>
         <p className="text-[var(--color-text-muted)] max-w-sm">
-          {t('volunteering.feature_not_available_desc', 'The volunteering feature is not enabled for this community. Contact your timebank administrator to learn more.')}
+          {t('feature_not_available_desc', 'The volunteering feature is not enabled for this community. Contact your timebank administrator to learn more.')}
         </p>
       </div>
     );
@@ -191,9 +191,9 @@ export function VolunteeringPage() {
         <div>
           <h1 className="text-2xl font-bold text-theme-primary flex items-center gap-3">
             <Heart className="w-7 h-7 text-rose-400" aria-hidden="true" />
-            {t('volunteering.heading')}
+            {t('heading')}
           </h1>
-          <p className="text-theme-muted mt-1">{t('volunteering.subtitle')}</p>
+          <p className="text-theme-muted mt-1">{t('subtitle')}</p>
         </div>
         <div className="flex gap-2 flex-wrap">
           {hasApprovedOrg && (
@@ -202,7 +202,7 @@ export function VolunteeringPage() {
                 className="bg-gradient-to-r from-rose-500 to-pink-600 text-white"
                 startContent={<Plus className="w-4 h-4" aria-hidden="true" />}
               >
-                {t('volunteering.post_opportunity')}
+                {t('post_opportunity')}
               </Button>
             </Link>
           )}
@@ -211,157 +211,209 @@ export function VolunteeringPage() {
               className="bg-gradient-to-r from-rose-500 to-pink-600 text-white"
               startContent={<Building2 className="w-4 h-4" aria-hidden="true" />}
             >
-              {t('volunteering.browse_organisations')}
+              {t('browse_organisations')}
             </Button>
           </Link>
         </div>
       </div>
 
       {/* Tabs */}
-      <div className="flex gap-2 flex-wrap">
+      <div className="flex gap-2 flex-wrap" role="tablist" aria-label="Volunteering sections">
         <Button
+          role="tab"
+          id="vol-tab-opportunities"
+          aria-selected={tab === 'opportunities'}
           variant={tab === 'opportunities' ? 'solid' : 'flat'}
           className={tab === 'opportunities' ? 'bg-gradient-to-r from-rose-500 to-pink-600 text-white' : 'bg-theme-elevated text-theme-muted'}
           onPress={() => setTab('opportunities')}
           startContent={<Briefcase className="w-4 h-4" aria-hidden="true" />}
         >
-          {t('volunteering.tab_opportunities')}
+          {t('tab_opportunities')}
         </Button>
         {isAuthenticated && (
           <>
             <Button
+              role="tab"
+              id="vol-tab-applications"
+              aria-selected={tab === 'applications'}
               variant={tab === 'applications' ? 'solid' : 'flat'}
               className={tab === 'applications' ? 'bg-gradient-to-r from-rose-500 to-pink-600 text-white' : 'bg-theme-elevated text-theme-muted'}
               onPress={() => setTab('applications')}
               startContent={<Send className="w-4 h-4" aria-hidden="true" />}
             >
-              {t('volunteering.tab_applications')}
+              {t('tab_applications')}
             </Button>
             <Button
+              role="tab"
+              id="vol-tab-hours"
+              aria-selected={tab === 'hours'}
               variant={tab === 'hours' ? 'solid' : 'flat'}
               className={tab === 'hours' ? 'bg-gradient-to-r from-rose-500 to-pink-600 text-white' : 'bg-theme-elevated text-theme-muted'}
               onPress={() => setTab('hours')}
               startContent={<Timer className="w-4 h-4" aria-hidden="true" />}
             >
-              {t('volunteering.tab_hours')}
+              {t('tab_hours')}
             </Button>
             <Button
+              role="tab"
+              id="vol-tab-recommended"
+              aria-selected={tab === 'recommended'}
               variant={tab === 'recommended' ? 'solid' : 'flat'}
               className={tab === 'recommended' ? 'bg-gradient-to-r from-rose-500 to-pink-600 text-white' : 'bg-theme-elevated text-theme-muted'}
               onPress={() => setTab('recommended')}
               startContent={<Sparkles className="w-4 h-4" aria-hidden="true" />}
             >
-              {t('volunteering.tab_for_you', 'For You')}
+              {t('tab_for_you', 'For You')}
             </Button>
             <Button
+              role="tab"
+              id="vol-tab-certificates"
+              aria-selected={tab === 'certificates'}
               variant={tab === 'certificates' ? 'solid' : 'flat'}
               className={tab === 'certificates' ? 'bg-gradient-to-r from-rose-500 to-pink-600 text-white' : 'bg-theme-elevated text-theme-muted'}
               onPress={() => setTab('certificates')}
               startContent={<Award className="w-4 h-4" aria-hidden="true" />}
             >
-              {t('volunteering.tab_certificates', 'Certificates')}
+              {t('tab_certificates', 'Certificates')}
             </Button>
             <Button
+              role="tab"
+              id="vol-tab-alerts"
+              aria-selected={tab === 'alerts'}
               variant={tab === 'alerts' ? 'solid' : 'flat'}
               className={tab === 'alerts' ? 'bg-gradient-to-r from-rose-500 to-pink-600 text-white' : 'bg-theme-elevated text-theme-muted'}
               onPress={() => setTab('alerts')}
               startContent={<Siren className="w-4 h-4" aria-hidden="true" />}
             >
-              {t('volunteering.tab_alerts', 'Alerts')}
+              {t('tab_alerts', 'Alerts')}
             </Button>
             <Button
+              role="tab"
+              id="vol-tab-wellbeing"
+              aria-selected={tab === 'wellbeing'}
               variant={tab === 'wellbeing' ? 'solid' : 'flat'}
               className={tab === 'wellbeing' ? 'bg-gradient-to-r from-rose-500 to-pink-600 text-white' : 'bg-theme-elevated text-theme-muted'}
               onPress={() => setTab('wellbeing')}
               startContent={<Smile className="w-4 h-4" aria-hidden="true" />}
             >
-              {t('volunteering.tab_wellbeing', 'Wellbeing')}
+              {t('tab_wellbeing', 'Wellbeing')}
             </Button>
             <Button
+              role="tab"
+              id="vol-tab-credentials"
+              aria-selected={tab === 'credentials'}
               variant={tab === 'credentials' ? 'solid' : 'flat'}
               className={tab === 'credentials' ? 'bg-gradient-to-r from-rose-500 to-pink-600 text-white' : 'bg-theme-elevated text-theme-muted'}
               onPress={() => setTab('credentials')}
               startContent={<ShieldCheck className="w-4 h-4" aria-hidden="true" />}
             >
-              {t('volunteering.tab_credentials', 'Credentials')}
+              {t('tab_credentials', 'Credentials')}
             </Button>
             <Button
+              role="tab"
+              id="vol-tab-waitlist"
+              aria-selected={tab === 'waitlist'}
               variant={tab === 'waitlist' ? 'solid' : 'flat'}
               className={tab === 'waitlist' ? 'bg-gradient-to-r from-rose-500 to-pink-600 text-white' : 'bg-theme-elevated text-theme-muted'}
               onPress={() => setTab('waitlist')}
               startContent={<Clock className="w-4 h-4" aria-hidden="true" />}
             >
-              {t('volunteering.tab_waitlist', 'Waitlist')}
+              {t('tab_waitlist', 'Waitlist')}
             </Button>
             <Button
+              role="tab"
+              id="vol-tab-swaps"
+              aria-selected={tab === 'swaps'}
               variant={tab === 'swaps' ? 'solid' : 'flat'}
               className={tab === 'swaps' ? 'bg-gradient-to-r from-rose-500 to-pink-600 text-white' : 'bg-theme-elevated text-theme-muted'}
               onPress={() => setTab('swaps')}
               startContent={<ArrowLeftRight className="w-4 h-4" aria-hidden="true" />}
             >
-              {t('volunteering.tab_swap_requests', 'Swap Requests')}
+              {t('tab_swap_requests', 'Swap Requests')}
             </Button>
             <Button
+              role="tab"
+              id="vol-tab-group-signups"
+              aria-selected={tab === 'group-signups'}
               variant={tab === 'group-signups' ? 'solid' : 'flat'}
               className={tab === 'group-signups' ? 'bg-gradient-to-r from-rose-500 to-pink-600 text-white' : 'bg-theme-elevated text-theme-muted'}
               onPress={() => setTab('group-signups')}
               startContent={<Users className="w-4 h-4" aria-hidden="true" />}
             >
-              {t('volunteering.tab_group_signups', 'Group Sign-ups')}
+              {t('tab_group_signups', 'Group Sign-ups')}
             </Button>
             <Button
+              role="tab"
+              id="vol-tab-hours-review"
+              aria-selected={tab === 'hours-review'}
               variant={tab === 'hours-review' ? 'solid' : 'flat'}
               className={tab === 'hours-review' ? 'bg-gradient-to-r from-rose-500 to-pink-600 text-white' : 'bg-theme-elevated text-theme-muted'}
               onPress={() => setTab('hours-review')}
               startContent={<ClipboardCheck className="w-4 h-4" aria-hidden="true" />}
             >
-              {t('volunteering.tab_hours_review', 'Hours Review')}
+              {t('tab_hours_review', 'Hours Review')}
             </Button>
             <Button
+              role="tab"
+              id="vol-tab-expenses"
+              aria-selected={tab === 'expenses'}
               variant={tab === 'expenses' ? 'solid' : 'flat'}
               className={tab === 'expenses' ? 'bg-gradient-to-r from-rose-500 to-pink-600 text-white' : 'bg-theme-elevated text-theme-muted'}
               onPress={() => setTab('expenses')}
               startContent={<Receipt className="w-4 h-4" aria-hidden="true" />}
             >
-              {t('volunteering.tab_expenses', 'Expenses')}
+              {t('tab_expenses', 'Expenses')}
             </Button>
             <Button
+              role="tab"
+              id="vol-tab-safeguarding"
+              aria-selected={tab === 'safeguarding'}
               variant={tab === 'safeguarding' ? 'solid' : 'flat'}
               className={tab === 'safeguarding' ? 'bg-gradient-to-r from-rose-500 to-pink-600 text-white' : 'bg-theme-elevated text-theme-muted'}
               onPress={() => setTab('safeguarding')}
               startContent={<Shield className="w-4 h-4" aria-hidden="true" />}
             >
-              {t('volunteering.tab_safeguarding', 'Safeguarding')}
+              {t('tab_safeguarding', 'Safeguarding')}
             </Button>
             <Button
+              role="tab"
+              id="vol-tab-community-projects"
+              aria-selected={tab === 'community-projects'}
               variant={tab === 'community-projects' ? 'solid' : 'flat'}
               className={tab === 'community-projects' ? 'bg-gradient-to-r from-rose-500 to-pink-600 text-white' : 'bg-theme-elevated text-theme-muted'}
               onPress={() => setTab('community-projects')}
               startContent={<Lightbulb className="w-4 h-4" aria-hidden="true" />}
             >
-              {t('volunteering.tab_community_projects', 'Projects')}
+              {t('tab_community_projects', 'Projects')}
             </Button>
             <Button
+              role="tab"
+              id="vol-tab-donations"
+              aria-selected={tab === 'donations'}
               variant={tab === 'donations' ? 'solid' : 'flat'}
               className={tab === 'donations' ? 'bg-gradient-to-r from-rose-500 to-pink-600 text-white' : 'bg-theme-elevated text-theme-muted'}
               onPress={() => setTab('donations')}
               startContent={<HandHeart className="w-4 h-4" aria-hidden="true" />}
             >
-              {t('volunteering.tab_donations', 'Donations')}
+              {t('tab_donations', 'Donations')}
             </Button>
             <Button
+              role="tab"
+              id="vol-tab-accessibility"
+              aria-selected={tab === 'accessibility'}
               variant={tab === 'accessibility' ? 'solid' : 'flat'}
               className={tab === 'accessibility' ? 'bg-gradient-to-r from-rose-500 to-pink-600 text-white' : 'bg-theme-elevated text-theme-muted'}
               onPress={() => setTab('accessibility')}
               startContent={<Accessibility className="w-4 h-4" aria-hidden="true" />}
             >
-              {t('volunteering.tab_accessibility', 'Accessibility')}
+              {t('tab_accessibility', 'Accessibility')}
             </Button>
           </>
         )}
       </div>
 
       {/* Tab Content */}
+      <div role="tabpanel" aria-labelledby={`vol-tab-${tab}`}>
       {tab === 'opportunities' && <OpportunitiesTab />}
       {tab === 'applications' && <ApplicationsTab />}
       {tab === 'hours' && <HoursTab />}
@@ -381,6 +433,7 @@ export function VolunteeringPage() {
         {tab === 'donations' && <DonationsTab />}
         {tab === 'accessibility' && <AccessibilityTab />}
       </Suspense>
+      </div>
     </div>
   );
 }
@@ -388,7 +441,7 @@ export function VolunteeringPage() {
 /* ───────────────────────── Opportunities Tab ───────────────────────── */
 
 function OpportunitiesTab() {
-  const { t } = useTranslation('community');
+  const { t } = useTranslation('volunteering');
   const { isAuthenticated } = useAuth();
   const toast = useToast();
   const [opportunities, setOpportunities] = useState<Opportunity[]>([]);
@@ -443,12 +496,12 @@ function OpportunitiesTab() {
         cursorRef.current = newCursor;
         setCursor(newCursor);
       } else {
-        if (!append) setError(tRef.current('volunteering.error_load_opportunities'));
+        if (!append) setError(tRef.current('error_load_opportunities'));
       }
     } catch (err) {
       if (controller.signal.aborted) return;
       logError('Failed to load opportunities', err);
-      if (!append) setError(tRef.current('volunteering.error_load_opportunities_retry'));
+      if (!append) setError(tRef.current('error_load_opportunities_retry'));
     } finally {
       if (!controller.signal.aborted) {
         setIsLoading(false);
@@ -476,17 +529,17 @@ function OpportunitiesTab() {
       });
 
       if (response.success) {
-        toast.success(t('volunteering.applied_success', 'Successfully applied!'));
+        toast.success(t('applied_success', 'Successfully applied!'));
         onClose();
         setApplyMessage('');
         setSelectedOpportunity(null);
         loadOpportunities();
       } else {
-        toast.error(response.error || t('volunteering.apply_error', 'Failed to apply'));
+        toast.error(response.error || t('apply_error', 'Failed to apply'));
       }
     } catch (err) {
       logError('Failed to apply', err);
-      toast.error(t('volunteering.apply_error', 'Something went wrong. Please try again.'));
+      toast.error(t('apply_error', 'Something went wrong. Please try again.'));
     } finally {
       setIsApplying(false);
     }
@@ -503,11 +556,11 @@ function OpportunitiesTab() {
       {/* Search */}
       <div className="w-full sm:max-w-md">
         <Input
-          placeholder={t('volunteering.search_placeholder')}
+          placeholder={t('search_placeholder')}
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           startContent={<Search className="w-4 h-4 text-theme-muted" aria-hidden="true" />}
-          aria-label={t('volunteering.search_placeholder')}
+          aria-label={t('search_placeholder')}
           classNames={{
             input: 'bg-transparent text-theme-primary',
             inputWrapper: 'bg-theme-elevated border-theme-default',
@@ -519,14 +572,14 @@ function OpportunitiesTab() {
       {error && !isLoading && (
         <GlassCard className="p-8 text-center">
           <AlertTriangle className="w-12 h-12 text-amber-500 mx-auto mb-4" aria-hidden="true" />
-          <h2 className="text-lg font-semibold text-theme-primary mb-2">{t('volunteering.unable_to_load_opportunities')}</h2>
+          <h2 className="text-lg font-semibold text-theme-primary mb-2">{t('unable_to_load_opportunities')}</h2>
           <p className="text-theme-muted mb-4">{error}</p>
           <Button
             className="bg-gradient-to-r from-rose-500 to-pink-600 text-white"
             startContent={<RefreshCw className="w-4 h-4" aria-hidden="true" />}
             onPress={() => loadOpportunities()}
           >
-            {t('volunteering.try_again')}
+            {t('try_again')}
           </Button>
         </GlassCard>
       )}
@@ -548,8 +601,8 @@ function OpportunitiesTab() {
           ) : opportunities.length === 0 ? (
             <EmptyState
               icon={<Briefcase className="w-12 h-12" aria-hidden="true" />}
-              title={t('volunteering.no_opportunities_found')}
-              description={searchQuery ? t('volunteering.try_different_search') : t('volunteering.no_opportunities_available')}
+              title={t('no_opportunities_found')}
+              description={searchQuery ? t('try_different_search') : t('no_opportunities_available')}
             />
           ) : (
             <div className="space-y-4">
@@ -569,7 +622,7 @@ function OpportunitiesTab() {
                     className="bg-theme-elevated text-theme-muted"
                     onPress={() => loadOpportunities(true)}
                   >
-                    {t('volunteering.load_more')}
+                    {t('load_more')}
                   </Button>
                 </div>
               )}
@@ -584,7 +637,7 @@ function OpportunitiesTab() {
       }}>
         <ModalContent>
           <ModalHeader className="text-theme-primary">
-            {t('volunteering.apply_to_volunteer')}
+            {t('apply_to_volunteer')}
           </ModalHeader>
           <ModalBody className="space-y-4">
             {selectedOpportunity && (
@@ -594,8 +647,8 @@ function OpportunitiesTab() {
               </div>
             )}
             <Textarea
-              label={t('volunteering.cover_message_label')}
-              placeholder={t('volunteering.cover_message_placeholder')}
+              label={t('cover_message_label')}
+              placeholder={t('cover_message_placeholder')}
               value={applyMessage}
               onChange={(e) => setApplyMessage(e.target.value)}
               classNames={{
@@ -605,13 +658,13 @@ function OpportunitiesTab() {
             />
           </ModalBody>
           <ModalFooter>
-            <Button variant="flat" onPress={onClose} className="text-theme-muted">{t('volunteering.cancel')}</Button>
+            <Button variant="flat" onPress={onClose} className="text-theme-muted">{t('cancel')}</Button>
             <Button
               className="bg-gradient-to-r from-rose-500 to-pink-600 text-white"
               onPress={handleApply}
               isLoading={isApplying}
             >
-              {t('volunteering.submit_application')}
+              {t('submit_application')}
             </Button>
           </ModalFooter>
         </ModalContent>
@@ -628,7 +681,7 @@ interface OpportunityCardProps {
 }
 
 function OpportunityCard({ opportunity, onApply }: OpportunityCardProps) {
-  const { t } = useTranslation('community');
+  const { t } = useTranslation('volunteering');
   const { tenantPath } = useTenant();
   const navigate = useNavigate();
   const startDate = opportunity.start_date ? new Date(opportunity.start_date) : null;
@@ -676,7 +729,7 @@ function OpportunityCard({ opportunity, onApply }: OpportunityCardProps) {
             )}
             {opportunity.is_remote && (
               <Chip size="sm" variant="flat" color="primary" startContent={<Globe className="w-3 h-3" />}>
-                {t('volunteering.remote')}
+                {t('remote')}
               </Chip>
             )}
             {startDate && (
@@ -701,7 +754,7 @@ function OpportunityCard({ opportunity, onApply }: OpportunityCardProps) {
 
           {opportunity.has_applied && (
             <Chip size="sm" color="success" variant="flat" className="mt-2" startContent={<CheckCircle className="w-3 h-3" />}>
-              {t('volunteering.applied')}
+              {t('applied')}
             </Chip>
           )}
         </div>
@@ -715,7 +768,7 @@ function OpportunityCard({ opportunity, onApply }: OpportunityCardProps) {
             onPress={() => navigate(tenantPath(`/volunteering/opportunities/${opportunity.id}`))}
             endContent={<ChevronRight className="w-4 h-4" aria-hidden="true" />}
           >
-            {t('volunteering.view_details', 'View Details')}
+            {t('view_details', 'View Details')}
           </Button>
           {onApply && (
             <Button
@@ -724,7 +777,7 @@ function OpportunityCard({ opportunity, onApply }: OpportunityCardProps) {
               onPress={onApply}
               endContent={<Send className="w-4 h-4" aria-hidden="true" />}
             >
-              {t('volunteering.apply')}
+              {t('apply')}
             </Button>
           )}
         </div>
@@ -736,7 +789,7 @@ function OpportunityCard({ opportunity, onApply }: OpportunityCardProps) {
 /* ───────────────────────── Applications Tab ───────────────────────── */
 
 function ApplicationsTab() {
-  const { t } = useTranslation('community');
+  const { t } = useTranslation('volunteering');
   const toast = useToast();
   const { tenantPath } = useTenant();
   const [applications, setApplications] = useState<Application[]>([]);
@@ -785,12 +838,12 @@ function ApplicationsTab() {
         cursorRef.current = newCursor;
         setCursor(newCursor);
       } else {
-        if (!append) setError(tRef.current('volunteering.error_load_applications'));
+        if (!append) setError(tRef.current('error_load_applications'));
       }
     } catch (err) {
       if (controller.signal.aborted) return;
       logError('Failed to load applications', err);
-      if (!append) setError(tRef.current('volunteering.error_load_applications_retry'));
+      if (!append) setError(tRef.current('error_load_applications_retry'));
     } finally {
       if (!controller.signal.aborted) {
         setIsLoading(false);
@@ -812,14 +865,14 @@ function ApplicationsTab() {
     try {
       const response = await api.delete(`/v2/volunteering/applications/${applicationId}`);
       if (response.success) {
-        toast.success(t('volunteering.withdraw_success', 'Application withdrawn.'));
+        toast.success(t('withdraw_success', 'Application withdrawn.'));
         loadApplications();
       } else {
-        toast.error(response.error || t('volunteering.withdraw_failed', 'Failed to withdraw application.'));
+        toast.error(response.error || t('withdraw_failed', 'Failed to withdraw application.'));
       }
     } catch (err) {
       logError('Failed to withdraw application', err);
-      toast.error(t('volunteering.withdraw_failed', 'Failed to withdraw application.'));
+      toast.error(t('withdraw_failed', 'Failed to withdraw application.'));
     }
   };
 
@@ -851,7 +904,7 @@ function ApplicationsTab() {
             className={statusFilter === s ? 'bg-gradient-to-r from-rose-500 to-pink-600 text-white' : 'bg-theme-elevated text-theme-muted'}
             onPress={() => setStatusFilter(s)}
           >
-            {s ? t('volunteering.status_' + s) : t('volunteering.filter_all')}
+            {s ? t('status_' + s) : t('filter_all')}
           </Button>
         ))}
       </div>
@@ -866,7 +919,7 @@ function ApplicationsTab() {
             startContent={<RefreshCw className="w-4 h-4" aria-hidden="true" />}
             onPress={() => loadApplications()}
           >
-            {t('volunteering.try_again')}
+            {t('try_again')}
           </Button>
         </GlassCard>
       )}
@@ -887,8 +940,8 @@ function ApplicationsTab() {
           ) : applications.length === 0 ? (
             <EmptyState
               icon={<Send className="w-12 h-12" aria-hidden="true" />}
-              title={t('volunteering.no_applications')}
-              description={statusFilter ? t('volunteering.no_status_applications', { status: statusFilter }) : t('volunteering.no_applications_yet')}
+              title={t('no_applications')}
+              description={statusFilter ? t('no_status_applications', { status: statusFilter }) : t('no_applications_yet')}
             />
           ) : (
             <div className="space-y-4">
@@ -905,7 +958,7 @@ function ApplicationsTab() {
                             variant="flat"
                             startContent={statusIcon(app.status)}
                           >
-                            {t('volunteering.status_' + app.status)}
+                            {t('status_' + app.status)}
                           </Chip>
                         </div>
 
@@ -939,7 +992,7 @@ function ApplicationsTab() {
                         )}
 
                         <p className="text-xs text-theme-subtle mt-2">
-                          {t('volunteering.applied_on', { date: new Date(app.created_at).toLocaleDateString() })}
+                          {t('applied_on', { date: new Date(app.created_at).toLocaleDateString() })}
                         </p>
                       </div>
 
@@ -950,7 +1003,7 @@ function ApplicationsTab() {
                           color="danger"
                           onPress={() => handleWithdraw(app.id)}
                         >
-                          {t('volunteering.withdraw')}
+                          {t('withdraw')}
                         </Button>
                       )}
                     </div>
@@ -965,7 +1018,7 @@ function ApplicationsTab() {
                     className="bg-theme-elevated text-theme-muted"
                     onPress={() => loadApplications(true)}
                   >
-                    {t('volunteering.load_more')}
+                    {t('load_more')}
                   </Button>
                 </div>
               )}
@@ -980,7 +1033,7 @@ function ApplicationsTab() {
 /* ───────────────────────── Hours Tab ───────────────────────── */
 
 function HoursTab() {
-  const { t } = useTranslation('community');
+  const { t } = useTranslation('volunteering');
   const toast = useToast();
   const [summary, setSummary] = useState<HoursSummary | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -1010,7 +1063,7 @@ function HoursTab() {
       if (summaryRes.success && summaryRes.data) {
         setSummary(summaryRes.data);
       } else {
-        setError(t('volunteering.error_load_hours'));
+        setError(t('error_load_hours'));
       }
 
       if (orgsRes.success && orgsRes.data) {
@@ -1018,7 +1071,7 @@ function HoursTab() {
       }
     } catch (err) {
       logError('Failed to load hours summary', err);
-      setError(t('volunteering.error_load_hours_retry'));
+      setError(t('error_load_hours_retry'));
     } finally {
       setIsLoading(false);
     }
@@ -1041,16 +1094,16 @@ function HoursTab() {
       });
 
       if (response.success) {
-        toast.success(t('volunteering.hours_logged_success', 'Hours logged successfully!'));
+        toast.success(t('hours_logged_success', 'Hours logged successfully!'));
         onClose();
         setLogForm({ organization_id: '', date: new Date().toISOString().split('T')[0], hours: '', description: '' });
         loadSummary();
       } else {
-        toast.error(response.error || t('volunteering.hours_log_failed', 'Failed to log hours. Please try again.'));
+        toast.error(response.error || t('hours_log_failed', 'Failed to log hours. Please try again.'));
       }
     } catch (err) {
       logError('Failed to log hours', err);
-      toast.error(t('volunteering.hours_log_failed', 'Failed to log hours. Please try again.'));
+      toast.error(t('hours_log_failed', 'Failed to log hours. Please try again.'));
     } finally {
       setIsLogging(false);
     }
@@ -1067,7 +1120,7 @@ function HoursTab() {
           startContent={<Plus className="w-4 h-4" aria-hidden="true" />}
           onPress={onOpen}
         >
-          {t('volunteering.log_hours')}
+          {t('log_hours')}
         </Button>
       </div>
 
@@ -1081,7 +1134,7 @@ function HoursTab() {
             startContent={<RefreshCw className="w-4 h-4" aria-hidden="true" />}
             onPress={() => loadSummary()}
           >
-            {t('volunteering.try_again')}
+            {t('try_again')}
           </Button>
         </GlassCard>
       )}
@@ -1109,7 +1162,7 @@ function HoursTab() {
                     </div>
                     <div>
                       <p className="text-2xl font-bold text-theme-primary">{summary.total_verified}</p>
-                      <p className="text-xs text-theme-muted">{t('volunteering.verified_hours')}</p>
+                      <p className="text-xs text-theme-muted">{t('verified_hours')}</p>
                     </div>
                   </div>
                 </GlassCard>
@@ -1121,7 +1174,7 @@ function HoursTab() {
                     </div>
                     <div>
                       <p className="text-2xl font-bold text-theme-primary">{summary.total_pending}</p>
-                      <p className="text-xs text-theme-muted">{t('volunteering.pending_hours')}</p>
+                      <p className="text-xs text-theme-muted">{t('pending_hours')}</p>
                     </div>
                   </div>
                 </GlassCard>
@@ -1133,7 +1186,7 @@ function HoursTab() {
                     </div>
                     <div>
                       <p className="text-2xl font-bold text-theme-primary">{totalHours}</p>
-                      <p className="text-xs text-theme-muted">{t('volunteering.total_hours')}</p>
+                      <p className="text-xs text-theme-muted">{t('total_hours')}</p>
                     </div>
                   </div>
                 </GlassCard>
@@ -1143,8 +1196,8 @@ function HoursTab() {
               {totalHours > 0 && (
                 <GlassCard className="p-5">
                   <div className="flex justify-between text-sm text-theme-muted mb-2">
-                    <span>{t('volunteering.progress')}</span>
-                    <span>{t('volunteering.hours_of_goal', { current: totalHours, goal: Math.ceil(totalHours / 50) * 50 })}</span>
+                    <span>{t('progress')}</span>
+                    <span>{t('hours_of_goal', { current: totalHours, goal: Math.ceil(totalHours / 50) * 50 })}</span>
                   </div>
                   <Progress
                     value={(totalHours / (Math.ceil(totalHours / 50) * 50)) * 100}
@@ -1153,7 +1206,7 @@ function HoursTab() {
                       track: 'bg-theme-hover',
                     }}
                     size="md"
-                    aria-label={t('volunteering.hours_progress_aria', { hours: totalHours })}
+                    aria-label={t('hours_progress_aria', { hours: totalHours })}
                   />
                 </GlassCard>
               )}
@@ -1163,7 +1216,7 @@ function HoursTab() {
                 <GlassCard className="p-5">
                   <h3 className="font-semibold text-theme-primary mb-4 flex items-center gap-2">
                     <Building2 className="w-4 h-4 text-rose-400" aria-hidden="true" />
-                    {t('volunteering.hours_by_organization')}
+                    {t('hours_by_organization')}
                   </h3>
                   <div className="space-y-3">
                     {(summary.by_organization ?? []).map((org, i) => (
@@ -1181,7 +1234,7 @@ function HoursTab() {
                 <GlassCard className="p-5">
                   <h3 className="font-semibold text-theme-primary mb-4 flex items-center gap-2">
                     <Calendar className="w-4 h-4 text-rose-400" aria-hidden="true" />
-                    {t('volunteering.hours_by_month')}
+                    {t('hours_by_month')}
                   </h3>
                   <div className="space-y-3">
                     {(summary.by_month ?? []).map((month, i) => (
@@ -1199,14 +1252,14 @@ function HoursTab() {
               {totalHours === 0 && (
                 <EmptyState
                   icon={<Timer className="w-12 h-12" aria-hidden="true" />}
-                  title={t('volunteering.no_hours_logged')}
-                  description={t('volunteering.no_hours_description')}
+                  title={t('no_hours_logged')}
+                  description={t('no_hours_description')}
                   action={
                     <Button
                       className="bg-gradient-to-r from-rose-500 to-pink-600 text-white"
                       onPress={onOpen}
                     >
-                      {t('volunteering.log_hours')}
+                      {t('log_hours')}
                     </Button>
                   }
                 />
@@ -1221,11 +1274,11 @@ function HoursTab() {
         base: 'bg-content1 border border-theme-default',
       }}>
         <ModalContent>
-          <ModalHeader className="text-theme-primary">{t('volunteering.log_volunteering_hours')}</ModalHeader>
+          <ModalHeader className="text-theme-primary">{t('log_volunteering_hours')}</ModalHeader>
           <ModalBody className="space-y-4">
             <Select
-              label={t('volunteering.organisation_label')}
-              placeholder={t('volunteering.select_organisation')}
+              label={t('organisation_label')}
+              placeholder={t('select_organisation')}
               selectedKeys={logForm.organization_id ? new Set([logForm.organization_id]) : new Set()}
               onSelectionChange={(keys) => { const val = Array.from(keys)[0] as string; if (val) setLogForm((prev) => ({ ...prev, organization_id: val })); }}
               isRequired
@@ -1241,7 +1294,7 @@ function HoursTab() {
             </Select>
             <Input
               type="date"
-              label={t('volunteering.date_label')}
+              label={t('date_label')}
               value={logForm.date}
               onChange={(e) => setLogForm((prev) => ({ ...prev, date: e.target.value }))}
               isRequired
@@ -1252,8 +1305,8 @@ function HoursTab() {
             />
             <Input
               type="number"
-              label={t('volunteering.hours_label')}
-              placeholder={t('volunteering.hours_placeholder')}
+              label={t('hours_label')}
+              placeholder={t('hours_placeholder')}
               value={logForm.hours}
               onChange={(e) => setLogForm((prev) => ({ ...prev, hours: e.target.value }))}
               isRequired
@@ -1263,8 +1316,8 @@ function HoursTab() {
               }}
             />
             <Textarea
-              label={t('volunteering.description_label')}
-              placeholder={t('volunteering.description_placeholder')}
+              label={t('description_label')}
+              placeholder={t('description_placeholder')}
               value={logForm.description}
               onChange={(e) => setLogForm((prev) => ({ ...prev, description: e.target.value }))}
               classNames={{
@@ -1274,14 +1327,14 @@ function HoursTab() {
             />
           </ModalBody>
           <ModalFooter>
-            <Button variant="flat" onPress={onClose} className="text-theme-muted">{t('volunteering.cancel')}</Button>
+            <Button variant="flat" onPress={onClose} className="text-theme-muted">{t('cancel')}</Button>
             <Button
               className="bg-gradient-to-r from-rose-500 to-pink-600 text-white"
               onPress={handleLogHours}
               isLoading={isLogging}
               isDisabled={!logForm.hours || !logForm.date || !logForm.organization_id}
             >
-              {t('volunteering.log_hours')}
+              {t('log_hours')}
             </Button>
           </ModalFooter>
         </ModalContent>
