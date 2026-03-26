@@ -153,7 +153,7 @@ function FeaturedListingsPanel() {
     },
     {
       key: 'type',
-      label: 'Type',
+      label: t('listings.type'),
       sortable: true,
       render: (item) => (
         <Chip size="sm" variant="flat" color={typeColors[item.type] || 'default'} className="capitalize">
@@ -163,12 +163,12 @@ function FeaturedListingsPanel() {
     },
     {
       key: 'user_name',
-      label: 'Author',
+      label: t('listings.author'),
       sortable: true,
     },
     {
       key: 'featured_at',
-      label: 'Featured Date',
+      label: t('listings.featured_date'),
       sortable: true,
       render: (item) => (
         <span className="text-sm text-default-500">
@@ -178,7 +178,7 @@ function FeaturedListingsPanel() {
     },
     {
       key: 'featured_by',
-      label: 'Featured By',
+      label: t('listings.featured_by'),
       render: (item) => (
         <span className="text-sm text-default-500">
           {item.featured_by || '—'}
@@ -187,7 +187,7 @@ function FeaturedListingsPanel() {
     },
     {
       key: 'actions',
-      label: 'Actions',
+      label: t('listings.actions'),
       render: (item) => (
         <Button
           size="sm"
@@ -196,7 +196,7 @@ function FeaturedListingsPanel() {
           startContent={<StarOff size={14} />}
           onPress={() => setUnfeatureConfirm(item)}
         >
-          Unfeature
+          {t('listings.unfeature')}
         </Button>
       ),
     },
@@ -209,7 +209,7 @@ function FeaturedListingsPanel() {
         <CardBody className="p-4">
           <h3 className="text-sm font-semibold text-foreground mb-3 flex items-center gap-2">
             <Plus size={16} />
-            Feature a Listing
+            {t('listings.feature_listing')}
           </h3>
           <Input
             placeholder={t('listings.placeholder_search_active_listings_to_feature')}
@@ -238,7 +238,7 @@ function FeaturedListingsPanel() {
                       {listing.title}
                     </p>
                     <p className="text-xs text-default-500">
-                      by {listing.user_name} &middot;{' '}
+                      {t('listings.by_author', { name: listing.user_name })} &middot;{' '}
                       <span className="capitalize">{listing.type}</span>
                     </p>
                   </div>
@@ -250,7 +250,7 @@ function FeaturedListingsPanel() {
                     isLoading={featureLoading === listing.id}
                     onPress={() => handleFeature(listing.id)}
                   >
-                    Feature
+                    {t('listings.feature')}
                   </Button>
                 </div>
               ))}
@@ -258,7 +258,7 @@ function FeaturedListingsPanel() {
           )}
           {searchQuery.length >= 2 && !searching && filteredResults.length === 0 && searchResults.length === 0 && (
             <p className="text-sm text-default-400 text-center py-2">
-              No active listings found matching &ldquo;{searchQuery}&rdquo;
+              {t('listings.no_active_listings_found', { query: searchQuery })}
             </p>
           )}
         </CardBody>
@@ -268,7 +268,7 @@ function FeaturedListingsPanel() {
       <div>
         <h3 className="text-sm font-semibold text-foreground mb-3 flex items-center gap-2">
           <Star size={16} className="text-warning" />
-          Currently Featured ({featured.length})
+          {t('listings.currently_featured', { count: featured.length })}
         </h3>
         <DataTable
           columns={featuredColumns}
@@ -277,7 +277,7 @@ function FeaturedListingsPanel() {
           isLoading={featuredLoading}
           searchable={false}
           onRefresh={loadFeatured}
-          emptyContent="No featured listings. Use the search above to feature a listing."
+          emptyContent={t('listings.no_featured_listings')}
         />
       </div>
 
@@ -287,9 +287,9 @@ function FeaturedListingsPanel() {
           isOpen={!!unfeatureConfirm}
           onClose={() => setUnfeatureConfirm(null)}
           onConfirm={handleUnfeature}
-          title="Remove from Featured"
-          message={`Remove "${unfeatureConfirm.title}" from featured listings? It will no longer appear in the featured section.`}
-          confirmLabel="Unfeature"
+          title={t('listings.remove_from_featured')}
+          message={t('listings.remove_from_featured_message', { title: unfeatureConfirm.title })}
+          confirmLabel={t('listings.unfeature')}
           confirmColor="warning"
           isLoading={unfeatureLoading}
         />
@@ -303,8 +303,8 @@ function FeaturedListingsPanel() {
 // ─────────────────────────────────────────────────────────────────────────────
 
 export function ListingsAdmin() {
-  usePageTitle('Admin - Content');
   const { t } = useTranslation('admin');
+  usePageTitle(t('listings.page_title'));
   const toast = useToast();
 
   const [activeTab, setActiveTab] = useState('content');
@@ -365,10 +365,10 @@ export function ListingsAdmin() {
       }
 
       if (res?.success) {
-        toast.success(`Content ${type}${type === 'delete' ? 'd' : 'ed'} successfully`);
+        toast.success(t(`listings.content_${type}_success`));
         loadItems();
       } else {
-        toast.error(res?.error || `Failed to ${type} content`);
+        toast.error(res?.error || t(`listings.content_${type}_failed`));
       }
     } catch {
       toast.error(t('listings.an_unexpected_error_occurred'));
@@ -386,12 +386,12 @@ export function ListingsAdmin() {
       if (res?.success) {
         toast.success(
           item.is_featured
-            ? `"${item.title}" removed from featured`
-            : `"${item.title}" is now featured`
+            ? t('listings.removed_from_featured', { title: item.title })
+            : t('listings.now_featured', { title: item.title })
         );
         loadItems();
       } else {
-        toast.error(res?.error || 'Failed to update featured status');
+        toast.error(res?.error || t('listings.failed_update_featured'));
       }
     } catch {
       toast.error(t('listings.an_unexpected_error_occurred'));
@@ -401,7 +401,7 @@ export function ListingsAdmin() {
   const columns: Column<AdminListing>[] = [
     {
       key: 'title',
-      label: 'Title',
+      label: t('listings.col_listing_title'),
       sortable: true,
       render: (item) => (
         <span className="font-medium text-foreground">{item.title}</span>
@@ -409,7 +409,7 @@ export function ListingsAdmin() {
     },
     {
       key: 'type',
-      label: 'Type',
+      label: t('listings.type'),
       sortable: true,
       render: (item) => (
         <Chip size="sm" variant="flat" color={typeColors[item.type] || 'default'} className="capitalize">
@@ -419,18 +419,18 @@ export function ListingsAdmin() {
     },
     {
       key: 'user_name',
-      label: 'Author',
+      label: t('listings.author'),
       sortable: true,
     },
     {
       key: 'status',
-      label: 'Status',
+      label: t('listings.status'),
       sortable: true,
       render: (item) => <StatusBadge status={item.status} />,
     },
     {
       key: 'created_at',
-      label: 'Created',
+      label: t('listings.created'),
       sortable: true,
       render: (item) => (
         <span className="text-sm text-default-500">
@@ -440,7 +440,7 @@ export function ListingsAdmin() {
     },
     {
       key: 'actions',
-      label: 'Actions',
+      label: t('listings.actions'),
       render: (item) => (
         <div className="flex gap-1">
           {item.status === 'pending' && (
@@ -461,20 +461,20 @@ export function ListingsAdmin() {
                 variant="flat"
                 color="danger"
                 onPress={() => setConfirmAction({ type: 'reject', item })}
-                aria-label="Reject"
+                aria-label={t('listings.label_reject')}
               >
                 <XCircle size={14} />
               </Button>
             </>
           )}
-          <Tooltip content={item.is_featured ? 'Unfeature' : 'Feature'}>
+          <Tooltip content={item.is_featured ? t('listings.unfeature') : t('listings.feature')}>
             <Button
               isIconOnly
               size="sm"
               variant="flat"
               color="warning"
               onPress={() => handleFeatureToggle(item)}
-              aria-label={item.is_featured ? 'Unfeature listing' : 'Feature listing'}
+              aria-label={item.is_featured ? t('listings.unfeature_listing') : t('listings.feature_listing')}
             >
               {item.is_featured ? <Star size={14} className="fill-warning" /> : <StarOff size={14} />}
             </Button>
@@ -511,13 +511,13 @@ export function ListingsAdmin() {
           size="sm"
           classNames={{ tabList: 'mb-4' }}
         >
-          <Tab key="content" title="Content" />
+          <Tab key="content" title={t('listings.tab_content')} />
           <Tab
             key="featured"
             title={
               <div className="flex items-center gap-1.5">
                 <Star size={14} />
-                Featured
+                {t('listings.tab_featured')}
               </div>
             }
           />
@@ -534,10 +534,10 @@ export function ListingsAdmin() {
               variant="underlined"
               size="sm"
             >
-              <Tab key="all" title="All" />
-              <Tab key="pending" title="Pending" />
-              <Tab key="active" title="Active" />
-              <Tab key="inactive" title="Inactive" />
+              <Tab key="all" title={t('listings.filter_all')} />
+              <Tab key="pending" title={t('listings.filter_pending')} />
+              <Tab key="active" title={t('listings.filter_active')} />
+              <Tab key="inactive" title={t('listings.filter_inactive')} />
             </Tabs>
           </div>
 
@@ -545,7 +545,7 @@ export function ListingsAdmin() {
             columns={columns}
             data={items}
             isLoading={loading}
-            searchPlaceholder="Search content..."
+            searchPlaceholder={t('listings.search_content')}
             onSearch={(q) => { setSearch(q); setPage(1); }}
             onRefresh={loadItems}
             totalItems={total}
@@ -559,15 +559,15 @@ export function ListingsAdmin() {
               isOpen={!!confirmAction}
               onClose={() => setConfirmAction(null)}
               onConfirm={handleAction}
-              title={confirmAction.type === 'approve' ? 'Approve Content' : confirmAction.type === 'reject' ? 'Reject Content' : 'Delete Content'}
+              title={confirmAction.type === 'approve' ? t('listings.approve_content') : confirmAction.type === 'reject' ? t('listings.reject_content') : t('listings.delete_content')}
               message={
                 confirmAction.type === 'approve'
-                  ? `Approve "${confirmAction.item.title}"? It will become visible to all users.`
+                  ? t('listings.approve_content_message', { title: confirmAction.item.title })
                   : confirmAction.type === 'reject'
-                    ? `Reject "${confirmAction.item.title}"? The author will be notified.`
-                    : `Delete "${confirmAction.item.title}"? This cannot be undone.`
+                    ? t('listings.reject_content_message', { title: confirmAction.item.title })
+                    : t('listings.delete_content_message', { title: confirmAction.item.title })
               }
-              confirmLabel={confirmAction.type === 'approve' ? 'Approve' : confirmAction.type === 'reject' ? 'Reject' : 'Delete'}
+              confirmLabel={confirmAction.type === 'approve' ? t('listings.approve') : confirmAction.type === 'reject' ? t('listings.reject') : t('listings.delete')}
               confirmColor={confirmAction.type === 'approve' ? 'primary' : 'danger'}
               isLoading={actionLoading}
             />

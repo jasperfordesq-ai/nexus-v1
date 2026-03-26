@@ -133,14 +133,14 @@ document.addEventListener('DOMContentLoaded', () => EnterpriseToast.init());
         'breach_reported': ['Data breach reported', 'warning'],
         'consent_recorded': ['Consent recorded successfully', 'success'],
     };
-    const msg = <?= json_encode(htmlspecialchars($_GET['msg'], ENT_QUOTES, 'UTF-8'), JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) ?>;
+    const msg = <?= json_encode($_GET['msg'], JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) ?>;
     const [text, type] = messages[msg] || ['Unknown message', 'info'];
     setTimeout(() => EnterpriseToast.show(text, type), 100);
 })();
 <?php endif; ?>
 
 <?php if (!empty($_GET['error'])): ?>
-setTimeout(() => EnterpriseToast.error(<?= json_encode(htmlspecialchars($_GET['error'], ENT_QUOTES, 'UTF-8'), JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) ?>), 100);
+setTimeout(() => EnterpriseToast.error(<?= json_encode($_GET['error'], JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) ?>), 100);
 <?php endif; ?>
 </script>
 

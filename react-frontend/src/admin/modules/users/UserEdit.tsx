@@ -124,7 +124,7 @@ export function UserEdit() {
 
   const [errors, setErrors] = useState<Record<string, string>>({});
 
-  usePageTitle(user ? `Admin - Edit ${user.name}` : 'Admin - Edit User');
+  usePageTitle(user ? t('user_edit.page_title_with_name', { name: user.name }) : t('user_edit.page_title'));
 
   const loadUser = useCallback(async () => {
     if (!id) return;
@@ -458,8 +458,8 @@ export function UserEdit() {
   return (
     <div>
       <PageHeader
-        title={`Edit User: ${user.name}`}
-        description={`ID: ${user.id} | Joined: ${new Date(user.created_at).toLocaleDateString()}`}
+        title={t('user_edit.edit_user_name', { name: user.name })}
+        description={t('user_edit.user_id_joined', { id: user.id, date: new Date(user.created_at).toLocaleDateString() })}
         actions={
           <div className="flex items-center gap-2">
             {canImpersonate && (
@@ -492,7 +492,7 @@ export function UserEdit() {
                   <h3 className="text-lg font-semibold text-foreground">{user.name}</h3>
                   <p className="text-sm text-default-500">{user.email}</p>
                   {user.balance !== undefined && (
-                    <p className="text-xs text-default-400 mt-0.5">Balance: {user.balance}h</p>
+                    <p className="text-xs text-default-400 mt-0.5">{t('user_edit.balance_label', { balance: user.balance })}</p>
                   )}
                 </div>
               </div>
@@ -519,20 +519,20 @@ export function UserEdit() {
                 <Select label={t('users.label_role')} placeholder={t('users.placeholder_select_a_role')} selectedKeys={role ? [role] : []}
                   onSelectionChange={(keys) => setRole(Array.from(keys)[0] as string)}
                   isRequired isInvalid={!!errors.role} errorMessage={errors.role} isDisabled={submitting}>
-                  <SelectItem key="member">Member</SelectItem>
-                  <SelectItem key="broker">Broker</SelectItem>
-                  <SelectItem key="moderator">Moderator</SelectItem>
-                  <SelectItem key="newsletter_admin">Newsletter Admin</SelectItem>
-                  <SelectItem key="admin">Admin</SelectItem>
-                  <SelectItem key="tenant_admin">Tenant Admin</SelectItem>
+                  <SelectItem key="member">{t('user_edit.role_member')}</SelectItem>
+                  <SelectItem key="broker">{t('user_edit.role_broker')}</SelectItem>
+                  <SelectItem key="moderator">{t('user_edit.role_moderator')}</SelectItem>
+                  <SelectItem key="newsletter_admin">{t('user_edit.role_newsletter_admin')}</SelectItem>
+                  <SelectItem key="admin">{t('user_edit.role_admin')}</SelectItem>
+                  <SelectItem key="tenant_admin">{t('user_edit.role_tenant_admin')}</SelectItem>
                 </Select>
                 <Select label={t('users.label_status')} placeholder={t('users.placeholder_select_a_status')} selectedKeys={status ? [status] : []}
                   onSelectionChange={(keys) => setStatus(Array.from(keys)[0] as string)}
                   isRequired isInvalid={!!errors.status} errorMessage={errors.status} isDisabled={submitting}>
-                  <SelectItem key="active">Active</SelectItem>
-                  <SelectItem key="pending">Pending</SelectItem>
-                  <SelectItem key="suspended">Suspended</SelectItem>
-                  <SelectItem key="banned">Banned</SelectItem>
+                  <SelectItem key="active">{t('user_edit.status_active')}</SelectItem>
+                  <SelectItem key="pending">{t('user_edit.status_pending')}</SelectItem>
+                  <SelectItem key="suspended">{t('user_edit.status_suspended')}</SelectItem>
+                  <SelectItem key="banned">{t('user_edit.status_banned')}</SelectItem>
                 </Select>
               </div>
 
@@ -545,8 +545,8 @@ export function UserEdit() {
                   onSelectionChange={(keys) => setProfileType(Array.from(keys)[0] as 'individual' | 'organisation')}
                   isDisabled={submitting}
                 >
-                  <SelectItem key="individual">Individual</SelectItem>
-                  <SelectItem key="organisation">Organisation</SelectItem>
+                  <SelectItem key="individual">{t('user_edit.profile_type_individual')}</SelectItem>
+                  <SelectItem key="organisation">{t('user_edit.profile_type_organisation')}</SelectItem>
                 </Select>
                 {profileType === 'organisation' && (
                   <Input
@@ -780,7 +780,7 @@ export function UserEdit() {
                           {consent.name || consent.consent_type.replace(/_/g, ' ')}
                         </p>
                         {consent.is_required && (
-                          <Chip size="sm" variant="flat" color="warning">Required</Chip>
+                          <Chip size="sm" variant="flat" color="warning">{t('user_edit.required')}</Chip>
                         )}
                       </div>
                       {consent.description && (
@@ -788,10 +788,10 @@ export function UserEdit() {
                       )}
                       <p className="text-xs text-default-400 mt-1">
                         {consent.consent_given
-                          ? `Consented${consent.given_at ? ` on ${new Date(consent.given_at).toLocaleDateString()}` : ''}`
+                          ? (consent.given_at ? t('user_edit.consented_on', { date: new Date(consent.given_at).toLocaleDateString() }) : t('user_edit.consented'))
                           : consent.withdrawn_at
-                            ? `Withdrawn on ${new Date(consent.withdrawn_at).toLocaleDateString()}`
-                            : 'Not consented'
+                            ? t('user_edit.withdrawn_on', { date: new Date(consent.withdrawn_at).toLocaleDateString() })
+                            : t('user_edit.not_consented')
                         }
                         {consent.consent_version && ` (v${consent.consent_version})`}
                       </p>
@@ -801,7 +801,7 @@ export function UserEdit() {
                       variant="flat"
                       color={consent.consent_given ? 'success' : 'danger'}
                     >
-                      {consent.consent_given ? 'Given' : 'Not Given'}
+                      {consent.consent_given ? t('user_edit.consent_given') : t('user_edit.consent_not_given')}
                     </Chip>
                   </div>
                 ))}
@@ -866,8 +866,8 @@ export function UserEdit() {
                               {vr.vetting_type.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase())}
                             </p>
                             <p className="text-xs text-default-400">
-                              {vr.reference_number || 'No reference'}
-                              {vr.expiry_date ? ` — Expires ${new Date(vr.expiry_date).toLocaleDateString()}` : ''}
+                              {vr.reference_number || t('user_edit.no_reference')}
+                              {vr.expiry_date ? ` — ${t('user_edit.expires', { date: new Date(vr.expiry_date).toLocaleDateString() })}` : ''}
                             </p>
                           </div>
                           <Chip
@@ -886,7 +886,7 @@ export function UserEdit() {
                         </div>
                       ))}
                       {vettingRecords.length > 3 && (
-                        <p className="text-xs text-default-400">+ {vettingRecords.length - 3} more records</p>
+                        <p className="text-xs text-default-400">{t('user_edit.more_records', { count: vettingRecords.length - 3 })}</p>
                       )}
                     </div>
                   ) : (
@@ -935,8 +935,8 @@ export function UserEdit() {
                               {ic.insurance_type.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase())}
                             </p>
                             <p className="text-xs text-default-400">
-                              {ic.provider_name || 'Unknown provider'}
-                              {ic.expiry_date ? ` — Expires ${new Date(ic.expiry_date).toLocaleDateString()}` : ''}
+                              {ic.provider_name || t('user_edit.unknown_provider')}
+                              {ic.expiry_date ? ` — ${t('user_edit.expires', { date: new Date(ic.expiry_date).toLocaleDateString() })}` : ''}
                             </p>
                           </div>
                           <Chip
@@ -955,7 +955,7 @@ export function UserEdit() {
                         </div>
                       ))}
                       {insuranceRecords.length > 3 && (
-                        <p className="text-xs text-default-400">+ {insuranceRecords.length - 3} more certificates</p>
+                        <p className="text-xs text-default-400">{t('user_edit.more_certificates', { count: insuranceRecords.length - 3 })}</p>
                       )}
                     </div>
                   ) : (
@@ -992,7 +992,7 @@ export function UserEdit() {
             {t('user_edit.adjust_time_credits')}
           </ModalHeader>
           <ModalBody className="gap-4">
-            <p className="text-sm text-default-500">Current balance: <strong>{user.balance ?? 0}h</strong></p>
+            <p className="text-sm text-default-500">{t('user_edit.current_balance_value', { balance: user.balance ?? 0 })}</p>
             <Input label={t('users.label_amount')} placeholder="e.g. 2 or -1.5"
               description={t('users.desc_use_negative_values_to_deduct_credits')}
               value={balanceAmount} onValueChange={setBalanceAmount}
@@ -1005,7 +1005,7 @@ export function UserEdit() {
             <Button variant="flat"
               onPress={() => { setBalanceModalOpen(false); setBalanceAmount(''); setBalanceReason(''); }}
               isDisabled={balanceLoading}>
-              Cancel
+              {t('cancel')}
             </Button>
             <Button color="primary" onPress={handleAdjustBalance} isLoading={balanceLoading}
               isDisabled={!balanceAmount.trim() || !balanceReason.trim()}>
@@ -1026,23 +1026,23 @@ export function UserEdit() {
           </ModalHeader>
           <ModalBody className="gap-4">
             <p className="text-sm text-default-500">
-              Set a new password for <strong>{user.name}</strong>. The user will not be notified.
+              {t('user_edit.set_password_description', { name: user.name })}
             </p>
             <Input
               label={t('users.label_new_password')}
               type="password"
-              placeholder="Enter new password (min 8 characters)"
+              placeholder={t('user_edit.password_placeholder')}
               value={newPassword}
               onValueChange={setNewPassword}
               isDisabled={passwordLoading}
-              description="Minimum 8 characters"
+              description={t('user_edit.password_min_chars')}
             />
           </ModalBody>
           <ModalFooter>
             <Button variant="flat"
               onPress={() => { setPasswordModalOpen(false); setNewPassword(''); }}
               isDisabled={passwordLoading}>
-              Cancel
+              {t('cancel')}
             </Button>
             <Button color="primary" onPress={handleSetPassword} isLoading={passwordLoading}
               isDisabled={newPassword.length < 8}>

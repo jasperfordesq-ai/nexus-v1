@@ -62,8 +62,10 @@ foreach ($permissions as $perm) {
 }
 
 // Get stats
-$totalPerms = $db->query("SELECT COUNT(*) as c FROM permissions")->fetch()['c'];
-$dangerousPerms = $db->query("SELECT COUNT(*) as c FROM permissions WHERE is_dangerous = 1")->fetch()['c'];
+$result = $db->query("SELECT COUNT(*) as c FROM permissions")->fetch();
+$totalPerms = $result['c'] ?? 0;
+$result = $db->query("SELECT COUNT(*) as c FROM permissions WHERE is_dangerous = 1")->fetch();
+$dangerousPerms = $result['c'] ?? 0;
 ?>
 
 <style>

@@ -34,25 +34,26 @@ import { adminSuper } from '@/admin/api/adminApi';
 import type { AdminReport, ModerationStats } from '@/admin/api/types';
 
 import { useTranslation } from 'react-i18next';
-const CONTENT_TYPES = [
-  { label: 'All Types', value: '' },
-  { label: 'Post', value: 'post' },
-  { label: 'Comment', value: 'comment' },
-  { label: 'Review', value: 'review' },
-  { label: 'User', value: 'user' },
-  { label: 'Listing', value: 'listing' },
-];
-
-const STATUS_FILTERS = [
-  { label: 'All Status', value: '' },
-  { label: 'Pending', value: 'pending' },
-  { label: 'Resolved', value: 'resolved' },
-  { label: 'Dismissed', value: 'dismissed' },
-];
 
 export default function ReportsManagement() {
   const { t } = useTranslation('admin');
   usePageTitle(t('moderation.page_title'));
+
+  const CONTENT_TYPES = [
+    { label: t('moderation.filter_all_types'), value: '' },
+    { label: t('moderation.content_type_post'), value: 'post' },
+    { label: t('moderation.content_type_comment'), value: 'comment' },
+    { label: t('moderation.content_type_review'), value: 'review' },
+    { label: t('moderation.content_type_user'), value: 'user' },
+    { label: t('moderation.content_type_listing'), value: 'listing' },
+  ];
+
+  const STATUS_FILTERS = [
+    { label: t('moderation.filter_all_status'), value: '' },
+    { label: t('moderation.status_pending'), value: 'pending' },
+    { label: t('moderation.status_resolved'), value: 'resolved' },
+    { label: t('moderation.status_dismissed'), value: 'dismissed' },
+  ];
 
   const toast = useToast();
   const { user } = useAuth();
@@ -147,14 +148,14 @@ export default function ReportsManagement() {
       if (response.success) {
         toast.success(
           confirmAction.type === 'resolve'
-            ? 'Report resolved successfully'
-            : 'Report dismissed successfully'
+            ? t('moderation.report_resolved_successfully')
+            : t('moderation.report_dismissed_successfully')
         );
         setConfirmAction(null);
         execute();
         refetchStats();
       } else {
-        toast.error(response.error || 'Action failed');
+        toast.error(response.error || t('moderation.action_failed'));
       }
     } catch {
       toast.error(t('moderation.an_error_occurred'));
@@ -209,13 +210,13 @@ export default function ReportsManagement() {
       </TableCell>,
       <TableCell key="status">
         {report.status === 'pending' && (
-          <Chip size="sm" color="warning" variant="flat">Pending</Chip>
+          <Chip size="sm" color="warning" variant="flat">{t('moderation.status_pending')}</Chip>
         )}
         {report.status === 'resolved' && (
-          <Chip size="sm" color="success" variant="flat">Resolved</Chip>
+          <Chip size="sm" color="success" variant="flat">{t('moderation.status_resolved')}</Chip>
         )}
         {report.status === 'dismissed' && (
-          <Chip size="sm" color="default" variant="flat">Dismissed</Chip>
+          <Chip size="sm" color="default" variant="flat">{t('moderation.status_dismissed')}</Chip>
         )}
       </TableCell>,
       <TableCell key="created">
@@ -233,7 +234,7 @@ export default function ReportsManagement() {
               startContent={<CheckCircle2 className="w-4 h-4" />}
               onPress={() => setConfirmAction({ type: 'resolve', report })}
             >
-              Resolve
+              {t('moderation.resolve')}
             </Button>
             <Button
               size="sm"
@@ -242,13 +243,13 @@ export default function ReportsManagement() {
               startContent={<XCircle className="w-4 h-4" />}
               onPress={() => setConfirmAction({ type: 'dismiss', report })}
             >
-              Dismiss
+              {t('moderation.dismiss')}
             </Button>
           </div>
         )}
         {report.status !== 'pending' && (
           <div className="text-sm text-default-400">
-            {report.resolved_by && `By ${report.resolved_by}`}
+            {report.resolved_by && t('moderation.resolved_by', { name: report.resolved_by })}
           </div>
         )}
       </TableCell>
@@ -259,14 +260,14 @@ export default function ReportsManagement() {
 
   // Determine columns based on super admin status
   const columns = isSuperAdmin
-    ? ['REPORTER', 'TENANT', 'CONTENT TYPE', 'REASON', 'DESCRIPTION', 'STATUS', 'CREATED', 'ACTIONS']
-    : ['REPORTER', 'CONTENT TYPE', 'REASON', 'DESCRIPTION', 'STATUS', 'CREATED', 'ACTIONS'];
+    ? [t('moderation.col_reporter'), t('moderation.col_tenant'), t('moderation.col_content_type'), t('moderation.col_reason'), t('moderation.col_description'), t('moderation.col_status'), t('moderation.col_created'), t('moderation.col_actions')]
+    : [t('moderation.col_reporter'), t('moderation.col_content_type'), t('moderation.col_reason'), t('moderation.col_description'), t('moderation.col_status'), t('moderation.col_created'), t('moderation.col_actions')];
 
   return (
     <div className="space-y-6">
       <PageHeader
         title={t('moderation.reports_management_title')}
-        description={isSuperAdmin ? 'Manage reports across all tenants' : 'Manage user-submitted reports and flagged content'}
+        description={isSuperAdmin ? t('moderation.reports_desc_super') : t('moderation.reports_desc')}
         actions={
           <Button
             color="primary"
@@ -278,7 +279,7 @@ export default function ReportsManagement() {
             }}
             isLoading={isLoading}
           >
-            Refresh
+            {t('moderation.refresh')}
           </Button>
         }
       />
@@ -293,7 +294,7 @@ export default function ReportsManagement() {
               </div>
               <div>
                 <p className="text-2xl font-bold">{(stats.reports_pending ?? 0) + (stats.reports_resolved ?? 0) + (stats.reports_dismissed ?? 0)}</p>
-                <p className="text-sm text-default-500">Total Reports</p>
+                <p className="text-sm text-default-500">{t('moderation.total_reports')}</p>
               </div>
             </CardBody>
           </Card>
@@ -304,7 +305,7 @@ export default function ReportsManagement() {
               </div>
               <div>
                 <p className="text-2xl font-bold">{stats.reports_pending ?? 0}</p>
-                <p className="text-sm text-default-500">Pending</p>
+                <p className="text-sm text-default-500">{t('moderation.status_pending')}</p>
               </div>
             </CardBody>
           </Card>
@@ -315,7 +316,7 @@ export default function ReportsManagement() {
               </div>
               <div>
                 <p className="text-2xl font-bold">{stats.reports_resolved ?? 0}</p>
-                <p className="text-sm text-default-500">Resolved</p>
+                <p className="text-sm text-default-500">{t('moderation.status_resolved')}</p>
               </div>
             </CardBody>
           </Card>
@@ -326,7 +327,7 @@ export default function ReportsManagement() {
               </div>
               <div>
                 <p className="text-2xl font-bold">{stats.reports_dismissed ?? 0}</p>
-                <p className="text-sm text-default-500">Dismissed</p>
+                <p className="text-sm text-default-500">{t('moderation.status_dismissed')}</p>
               </div>
             </CardBody>
           </Card>
@@ -376,7 +377,7 @@ export default function ReportsManagement() {
             className="w-full sm:w-56"
           >
             {[
-              <SelectItem key="all">All Tenants</SelectItem>,
+              <SelectItem key="all">{t('moderation.filter_all_tenants')}</SelectItem>,
               ...tenants.map((t) => (
                 <SelectItem key={t.id.toString()}>
                   {t.name}
@@ -387,10 +388,10 @@ export default function ReportsManagement() {
         )}
         <div className="flex gap-2">
           <Button color="primary" onPress={handleSearch}>
-            Apply
+            {t('moderation.apply')}
           </Button>
           <Button variant="flat" onPress={handleClear}>
-            Clear
+            {t('moderation.clear')}
           </Button>
         </div>
       </div>
@@ -398,15 +399,15 @@ export default function ReportsManagement() {
       {/* Results Count */}
       {meta && (
         <div className="text-sm text-default-500">
-          Showing {reports.length} of {meta.total ?? reports.length} reports
-          {isSuperAdmin && !activeTenant && ' (all tenants)'}
+          {t('moderation.showing_count', { shown: reports.length, total: meta.total ?? reports.length, item: t('moderation.items_reports') })}
+          {isSuperAdmin && !activeTenant && ` (${t('moderation.all_tenants')})`}
         </div>
       )}
 
       {/* Error State */}
       {error && (
         <div className="bg-danger-50 dark:bg-danger-950 text-danger border border-danger rounded-lg p-4">
-          Failed to load reports. Please try again.
+          {t('moderation.failed_to_load_reports')}
         </div>
       )}
 
@@ -424,8 +425,8 @@ export default function ReportsManagement() {
           emptyContent={
             <div className="text-center py-8 text-default-400">
               {activeSearch || activeType || activeStatus
-                ? 'No reports match your filters'
-                : 'No reports to review'}
+                ? t('moderation.no_reports_match_filters')
+                : t('moderation.no_reports_to_review')}
             </div>
           }
         >
@@ -455,13 +456,13 @@ export default function ReportsManagement() {
         isOpen={!!confirmAction}
         onClose={() => setConfirmAction(null)}
         onConfirm={handleAction}
-        title={confirmAction?.type === 'resolve' ? 'Resolve Report' : 'Dismiss Report'}
+        title={confirmAction?.type === 'resolve' ? t('moderation.resolve_report') : t('moderation.dismiss_report')}
         message={
           confirmAction?.type === 'resolve'
-            ? `Are you sure you want to mark this report${isSuperAdmin && confirmAction?.report ? ` from ${confirmAction.report.tenant_name}` : ''} as resolved? This indicates you have taken appropriate action.`
-            : `Are you sure you want to dismiss this report${isSuperAdmin && confirmAction?.report ? ` from ${confirmAction.report.tenant_name}` : ''}? This indicates no action is needed.`
+            ? t('moderation.confirm_resolve_report', { tenant: isSuperAdmin && confirmAction?.report ? ` from ${confirmAction.report.tenant_name}` : '' })
+            : t('moderation.confirm_dismiss_report', { tenant: isSuperAdmin && confirmAction?.report ? ` from ${confirmAction.report.tenant_name}` : '' })
         }
-        confirmLabel={confirmAction?.type === 'resolve' ? 'Resolve Report' : 'Dismiss Report'}
+        confirmLabel={confirmAction?.type === 'resolve' ? t('moderation.resolve_report') : t('moderation.dismiss_report')}
         confirmColor={confirmAction?.type === 'resolve' ? 'primary' : 'warning'}
         isLoading={actionLoading}
       />

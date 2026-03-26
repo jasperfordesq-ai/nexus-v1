@@ -58,6 +58,10 @@ import type {
   GroupAnalyticsData,
   GroupModerationItem,
   GroupType,
+  GroupPolicy,
+  GroupMember,
+  GroupRecommendation,
+  FeaturedGroup,
   EnterpriseDashboardStats,
   Role,
   GdprDashboardStats,
@@ -74,6 +78,13 @@ import type {
   VersionComparison,
   ComplianceStats,
   UserAcceptance,
+  Newsletter,
+  NewsletterBounce,
+  SuppressionListEntry,
+  ResendInfo,
+  SendTimeData,
+  NewsletterDiagnostics,
+  BounceTrendsData,
   SuperAdminDashboardStats,
   SuperAdminTenant,
   SuperAdminTenantDetail,
@@ -168,38 +179,38 @@ export const adminUsers = {
     api.put<AdminUser>(`/v2/admin/users/${id}`, data),
 
   delete: (id: number) =>
-    api.delete(`/v2/admin/users/${id}`),
+    api.delete<{ success: boolean }>(`/v2/admin/users/${id}`),
 
   approve: (id: number) =>
-    api.post(`/v2/admin/users/${id}/approve`),
+    api.post<{ success: boolean }>(`/v2/admin/users/${id}/approve`),
 
   suspend: (id: number, reason?: string) =>
-    api.post(`/v2/admin/users/${id}/suspend`, { reason }),
+    api.post<{ success: boolean }>(`/v2/admin/users/${id}/suspend`, { reason }),
 
   ban: (id: number, reason?: string) =>
-    api.post(`/v2/admin/users/${id}/ban`, { reason }),
+    api.post<{ success: boolean }>(`/v2/admin/users/${id}/ban`, { reason }),
 
   reactivate: (id: number) =>
-    api.post(`/v2/admin/users/${id}/reactivate`),
+    api.post<{ success: boolean }>(`/v2/admin/users/${id}/reactivate`),
 
   reset2fa: (id: number, reason: string) =>
-    api.post(`/v2/admin/users/${id}/reset-2fa`, { reason }),
+    api.post<{ success: boolean }>(`/v2/admin/users/${id}/reset-2fa`, { reason }),
 
   addBadge: (userId: number, badgeSlug: string) =>
-    api.post(`/v2/admin/users/${userId}/badges`, { badge_slug: badgeSlug }),
+    api.post<{ success: boolean }>(`/v2/admin/users/${userId}/badges`, { badge_slug: badgeSlug }),
 
   removeBadge: (userId: number, badgeId: number) =>
-    api.delete(`/v2/admin/users/${userId}/badges/${badgeId}`),
+    api.delete<{ success: boolean }>(`/v2/admin/users/${userId}/badges/${badgeId}`),
 
   recheckAllBadges: () =>
-    api.post('/v2/admin/users/badges/recheck-all'),
+    api.post<{ success: boolean }>('/v2/admin/users/badges/recheck-all'),
 
   impersonate: (userId: number) =>
-    api.post(`/v2/admin/users/${userId}/impersonate`),
+    api.post<{ token: string }>(`/v2/admin/users/${userId}/impersonate`),
   setSuperAdmin: (userId: number, grant: boolean) =>
-    api.put(`/v2/admin/users/${userId}/super-admin`, { grant }),
+    api.put<{ success: boolean }>(`/v2/admin/users/${userId}/super-admin`, { grant }),
   setGlobalSuperAdmin: (userId: number, grant: boolean) =>
-    api.put(`/v2/admin/users/${userId}/global-super-admin`, { grant }),
+    api.put<{ success: boolean }>(`/v2/admin/users/${userId}/global-super-admin`, { grant }),
 
   recheckUserBadges: (userId: number) =>
     api.post<{ rechecked: boolean; user_id: number; badges: import('./types').AdminBadge[] }>(`/v2/admin/users/${userId}/badges/recheck`),
@@ -208,13 +219,13 @@ export const adminUsers = {
     api.get<import('./types').UserConsent[]>(`/v2/admin/users/${userId}/consents`),
 
   setPassword: (userId: number, password: string) =>
-    api.post(`/v2/admin/users/${userId}/password`, { password }),
+    api.post<{ success: boolean }>(`/v2/admin/users/${userId}/password`, { password }),
 
   sendPasswordReset: (userId: number) =>
-    api.post(`/v2/admin/users/${userId}/send-password-reset`),
+    api.post<{ success: boolean }>(`/v2/admin/users/${userId}/send-password-reset`),
 
   sendWelcomeEmail: (userId: number) =>
-    api.post(`/v2/admin/users/${userId}/send-welcome-email`),
+    api.post<{ success: boolean }>(`/v2/admin/users/${userId}/send-welcome-email`),
 
   importUsers: (file: File, options?: { default_role?: string }) => {
     const formData = new FormData();
@@ -238,22 +249,22 @@ export const adminConfig = {
     api.get<TenantConfig>('/v2/admin/config'),
 
   updateFeature: (feature: string, enabled: boolean) =>
-    api.put('/v2/admin/config/features', { feature, enabled }),
+    api.put<{ success: boolean }>('/v2/admin/config/features', { feature, enabled }),
 
   updateModule: (module: string, enabled: boolean) =>
-    api.put('/v2/admin/config/modules', { module, enabled }),
+    api.put<{ success: boolean }>('/v2/admin/config/modules', { module, enabled }),
 
   getCacheStats: () =>
     api.get<CacheStats>('/v2/admin/cache/stats'),
 
   clearCache: (type: 'all' | 'tenant' = 'tenant') =>
-    api.post('/v2/admin/cache/clear', { type }),
+    api.post<{ success: boolean }>('/v2/admin/cache/clear', { type }),
 
   getJobs: () =>
     api.get<BackgroundJob[]>('/v2/admin/background-jobs'),
 
   runJob: (jobId: string) =>
-    api.post(`/v2/admin/background-jobs/${jobId}/run`),
+    api.post<{ success: boolean }>(`/v2/admin/background-jobs/${jobId}/run`),
 
   getLanguageConfig: () =>
     api.get<{ default_language: string; supported_languages: string[] }>(
@@ -281,19 +292,19 @@ export const adminListings = {
     ),
 
   approve: (id: number) =>
-    api.post(`/v2/admin/listings/${id}/approve`),
+    api.post<{ success: boolean }>(`/v2/admin/listings/${id}/approve`),
 
   reject: (id: number, reason?: string) =>
-    api.post(`/v2/admin/listings/${id}/reject`, reason ? { reason } : {}),
+    api.post<{ success: boolean }>(`/v2/admin/listings/${id}/reject`, reason ? { reason } : {}),
 
   feature: (id: number) =>
-    api.post(`/v2/admin/listings/${id}/feature`),
+    api.post<{ success: boolean }>(`/v2/admin/listings/${id}/feature`),
 
   unfeature: (id: number) =>
-    api.delete(`/v2/admin/listings/${id}/feature`),
+    api.delete<{ success: boolean }>(`/v2/admin/listings/${id}/feature`),
 
   delete: (id: number) =>
-    api.delete(`/v2/admin/listings/${id}`),
+    api.delete<{ success: boolean }>(`/v2/admin/listings/${id}`),
 
   // Featured listings
   getFeatured: () =>
@@ -315,7 +326,7 @@ export const adminCategories = {
     api.put<AdminCategory>(`/v2/admin/categories/${id}`, data),
 
   delete: (id: number) =>
-    api.delete(`/v2/admin/categories/${id}`),
+    api.delete<{ success: boolean }>(`/v2/admin/categories/${id}`),
 };
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -333,7 +344,7 @@ export const adminAttributes = {
     api.put<AdminAttribute>(`/v2/admin/attributes/${id}`, data),
 
   delete: (id: number) =>
-    api.delete(`/v2/admin/attributes/${id}`),
+    api.delete<{ success: boolean }>(`/v2/admin/attributes/${id}`),
 };
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -345,10 +356,10 @@ export const adminGamification = {
     api.get<GamificationStats>('/v2/admin/gamification/stats'),
 
   recheckAll: () =>
-    api.post('/v2/admin/gamification/recheck-all'),
+    api.post<{ success: boolean }>('/v2/admin/gamification/recheck-all'),
 
   bulkAward: (badgeSlug: string, userIds: number[]) =>
-    api.post('/v2/admin/gamification/bulk-award', { badge_slug: badgeSlug, user_ids: userIds }),
+    api.post<{ success: boolean; awarded: number }>('/v2/admin/gamification/bulk-award', { badge_slug: badgeSlug, user_ids: userIds }),
 
   listCampaigns: () =>
     api.get<Campaign[]>('/v2/admin/gamification/campaigns'),
@@ -360,7 +371,7 @@ export const adminGamification = {
     api.put<Campaign>(`/v2/admin/gamification/campaigns/${id}`, data),
 
   deleteCampaign: (id: number) =>
-    api.delete(`/v2/admin/gamification/campaigns/${id}`),
+    api.delete<{ success: boolean }>(`/v2/admin/gamification/campaigns/${id}`),
 
   listBadges: () =>
     api.get<BadgeDefinition[]>('/v2/admin/gamification/badges'),
@@ -369,7 +380,7 @@ export const adminGamification = {
     api.post<BadgeDefinition>('/v2/admin/gamification/badges', data),
 
   deleteBadge: (id: number) =>
-    api.delete(`/v2/admin/gamification/badges/${id}`),
+    api.delete<{ success: boolean }>(`/v2/admin/gamification/badges/${id}`),
 };
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -381,7 +392,7 @@ export const adminMatching = {
     api.get<SmartMatchingConfig>('/v2/admin/matching/config'),
 
   updateConfig: (data: Partial<SmartMatchingConfig>) =>
-    api.put('/v2/admin/matching/config', data),
+    api.put<{ success: boolean }>('/v2/admin/matching/config', data),
 
   getMatchingStats: () =>
     api.get<MatchingStatsResponse>('/v2/admin/matching/stats'),
@@ -398,13 +409,13 @@ export const adminMatching = {
     api.get<MatchApprovalStats>(`/v2/admin/matching/approvals/stats?days=${days}`),
 
   approveMatch: (id: number, notes?: string) =>
-    api.post(`/v2/admin/matching/approvals/${id}/approve`, { notes }),
+    api.post<{ success: boolean }>(`/v2/admin/matching/approvals/${id}/approve`, { notes }),
 
   rejectMatch: (id: number, reason: string) =>
-    api.post(`/v2/admin/matching/approvals/${id}/reject`, { reason }),
+    api.post<{ success: boolean }>(`/v2/admin/matching/approvals/${id}/reject`, { reason }),
 
   clearCache: () =>
-    api.post('/v2/admin/matching/cache/clear'),
+    api.post<{ success: boolean }>('/v2/admin/matching/cache/clear'),
 };
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -421,10 +432,10 @@ export const adminTimebanking = {
     ),
 
   updateAlertStatus: (id: number, status: string) =>
-    api.put(`/v2/admin/timebanking/alerts/${id}`, { status }),
+    api.put<{ success: boolean }>(`/v2/admin/timebanking/alerts/${id}`, { status }),
 
   adjustBalance: (userId: number, amount: number, reason: string) =>
-    api.post('/v2/admin/timebanking/adjust-balance', { user_id: userId, amount, reason }),
+    api.post<{ success: boolean }>('/v2/admin/timebanking/adjust-balance', { user_id: userId, amount, reason }),
 
   getOrgWallets: () =>
     api.get<OrgWallet[]>('/v2/admin/timebanking/org-wallets'),
@@ -486,7 +497,7 @@ export const adminTimebanking = {
     ),
 
   grantCredits: (data: { user_id: number; amount: number; reason: string }) =>
-    api.post('/v2/admin/wallet/grant', data),
+    api.post<{ success: boolean }>('/v2/admin/wallet/grant', data),
 };
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -509,10 +520,10 @@ export const adminBlog = {
     api.put<AdminBlogPost>(`/v2/admin/blog/${id}`, data),
 
   delete: (id: number) =>
-    api.delete(`/v2/admin/blog/${id}`),
+    api.delete<{ success: boolean }>(`/v2/admin/blog/${id}`),
 
   toggleStatus: (id: number) =>
-    api.post(`/v2/admin/blog/${id}/toggle-status`),
+    api.post<{ success: boolean }>(`/v2/admin/blog/${id}/toggle-status`),
 };
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -529,10 +540,10 @@ export const adminBroker = {
     ),
 
   approveExchange: (id: number, notes?: string) =>
-    api.post(`/v2/admin/broker/exchanges/${id}/approve`, { notes }),
+    api.post<{ success: boolean }>(`/v2/admin/broker/exchanges/${id}/approve`, { notes }),
 
   rejectExchange: (id: number, reason: string) =>
-    api.post(`/v2/admin/broker/exchanges/${id}/reject`, { reason }),
+    api.post<{ success: boolean }>(`/v2/admin/broker/exchanges/${id}/reject`, { reason }),
 
   getRiskTags: (params: { risk_level?: string } = {}) =>
     api.get<RiskTag[]>(`/v2/admin/broker/risk-tags${buildQuery(params)}`),
@@ -546,16 +557,16 @@ export const adminBroker = {
     api.get<{ count: number }>('/v2/admin/broker/messages/unreviewed-count'),
 
   reviewMessage: (id: number) =>
-    api.post(`/v2/admin/broker/messages/${id}/review`),
+    api.post<{ success: boolean }>(`/v2/admin/broker/messages/${id}/review`),
 
   getMonitoring: () =>
     api.get<MonitoredUser[]>('/v2/admin/broker/monitoring'),
 
   flagMessage: (id: number, reason: string, severity: 'info' | 'warning' | 'concern' | 'urgent') =>
-    api.post(`/v2/admin/broker/messages/${id}/flag`, { reason, severity }),
+    api.post<{ success: boolean }>(`/v2/admin/broker/messages/${id}/flag`, { reason, severity }),
 
   setMonitoring: (userId: number, data: { under_monitoring: boolean; reason?: string; messaging_disabled?: boolean; expires_days?: number }) =>
-    api.post(`/v2/admin/broker/monitoring/${userId}`, data),
+    api.post<{ success: boolean }>(`/v2/admin/broker/monitoring/${userId}`, data),
 
   saveRiskTag: (listingId: number, data: {
     risk_level: 'low' | 'medium' | 'high' | 'critical';
@@ -565,10 +576,10 @@ export const adminBroker = {
     requires_approval?: boolean;
     insurance_required?: boolean;
     dbs_required?: boolean;
-  }) => api.post(`/v2/admin/broker/risk-tags/${listingId}`, data),
+  }) => api.post<{ success: boolean }>(`/v2/admin/broker/risk-tags/${listingId}`, data),
 
   removeRiskTag: (listingId: number) =>
-    api.delete(`/v2/admin/broker/risk-tags/${listingId}`),
+    api.delete<{ success: boolean }>(`/v2/admin/broker/risk-tags/${listingId}`),
 
   getConfiguration: () =>
     api.get<BrokerConfig>('/v2/admin/broker/configuration'),
@@ -583,7 +594,7 @@ export const adminBroker = {
     api.get<BrokerMessageDetail>(`/v2/admin/broker/messages/${id}`),
 
   approveMessage: (id: number, notes?: string) =>
-    api.post(`/v2/admin/broker/messages/${id}/approve`, { notes }),
+    api.post<{ success: boolean }>(`/v2/admin/broker/messages/${id}/approve`, { notes }),
 
   getArchives: (params: { page?: number; decision?: string; search?: string; from?: string; to?: string } = {}) =>
     api.get<PaginatedResponse<BrokerArchive>>(
@@ -611,90 +622,79 @@ export const adminGroups = {
     api.get<GroupApproval[]>('/v2/admin/groups/approvals'),
 
   approveMember: (id: number) =>
-    api.post(`/v2/admin/groups/approvals/${id}/approve`),
+    api.post<{ success: boolean }>(`/v2/admin/groups/approvals/${id}/approve`),
 
   rejectMember: (id: number) =>
-    api.post(`/v2/admin/groups/approvals/${id}/reject`),
+    api.post<{ success: boolean }>(`/v2/admin/groups/approvals/${id}/reject`),
 
   getModeration: () =>
     api.get<GroupModerationItem[]>('/v2/admin/groups/moderation'),
 
   updateStatus: (id: number, status: 'active' | 'inactive') =>
-    api.put(`/v2/admin/groups/${id}/status`, { status }),
+    api.put<{ success: boolean }>(`/v2/admin/groups/${id}/status`, { status }),
 
   delete: (id: number) =>
-    api.delete(`/v2/admin/groups/${id}`),
+    api.delete<{ success: boolean }>(`/v2/admin/groups/${id}`),
 
   // Group types
   getGroupTypes: () =>
-    api.get('/v2/admin/groups/types'),
+    api.get<GroupType[]>('/v2/admin/groups/types'),
 
   createGroupType: (data: Partial<GroupType>) =>
-    api.post('/v2/admin/groups/types', data),
+    api.post<GroupType>('/v2/admin/groups/types', data),
 
   updateGroupType: (id: number, data: Partial<GroupType>) =>
-    api.put(`/v2/admin/groups/types/${id}`, data),
+    api.put<GroupType>(`/v2/admin/groups/types/${id}`, data),
 
   deleteGroupType: (id: number) =>
-    api.delete(`/v2/admin/groups/types/${id}`),
+    api.delete<{ success: boolean }>(`/v2/admin/groups/types/${id}`),
 
   // Policies
   getPolicies: (typeId: number) =>
-    api.get(`/v2/admin/groups/types/${typeId}/policies`),
+    api.get<GroupPolicy[]>(`/v2/admin/groups/types/${typeId}/policies`),
 
   setPolicy: (typeId: number, key: string, value: unknown) =>
-    api.put(`/v2/admin/groups/types/${typeId}/policies`, { key, value }),
+    api.put<{ success: boolean }>(`/v2/admin/groups/types/${typeId}/policies`, { key, value }),
 
   // Group detail
   getGroup: (id: number) =>
-    api.get(`/v2/admin/groups/${id}`),
+    api.get<AdminGroup>(`/v2/admin/groups/${id}`),
 
   updateGroup: (id: number, data: unknown) =>
-    api.put(`/v2/admin/groups/${id}`, data),
+    api.put<AdminGroup>(`/v2/admin/groups/${id}`, data),
 
-  getMembers: (groupId: number, params?: { role?: string; limit?: number; offset?: number }) => {
-    const query = new URLSearchParams();
-    if (params?.role) query.append('role', params.role);
-    if (params?.limit) query.append('limit', params.limit.toString());
-    if (params?.offset) query.append('offset', params.offset.toString());
-    const qs = query.toString();
-    return api.get(`/v2/admin/groups/${groupId}/members${qs ? `?${qs}` : ''}`);
-  },
+  getMembers: (groupId: number, params?: { role?: string; limit?: number; offset?: number }) =>
+    api.get<GroupMember[]>(`/v2/admin/groups/${groupId}/members${buildQuery(params || {})}`),
 
   promoteMember: (groupId: number, userId: number) =>
-    api.post(`/v2/admin/groups/${groupId}/members/${userId}/promote`, {}),
+    api.post<{ success: boolean }>(`/v2/admin/groups/${groupId}/members/${userId}/promote`, {}),
 
   demoteMember: (groupId: number, userId: number) =>
-    api.post(`/v2/admin/groups/${groupId}/members/${userId}/demote`, {}),
+    api.post<{ success: boolean }>(`/v2/admin/groups/${groupId}/members/${userId}/demote`, {}),
 
   kickMember: (groupId: number, userId: number) =>
-    api.delete(`/v2/admin/groups/${groupId}/members/${userId}`),
+    api.delete<{ success: boolean }>(`/v2/admin/groups/${groupId}/members/${userId}`),
 
   // Geocoding
   geocodeGroup: (groupId: number) =>
-    api.post(`/v2/admin/groups/${groupId}/geocode`, {}),
+    api.post<{ success: boolean }>(`/v2/admin/groups/${groupId}/geocode`, {}),
 
   batchGeocode: () =>
-    api.post('/v2/admin/groups/batch-geocode', {}),
+    api.post<{ success: boolean; geocoded: number }>('/v2/admin/groups/batch-geocode', {}),
 
   // Recommendations
-  getRecommendationData: (params?: { limit?: number; offset?: number }) => {
-    const query = new URLSearchParams();
-    if (params?.limit) query.append('limit', params.limit.toString());
-    if (params?.offset) query.append('offset', params.offset.toString());
-    const qs = query.toString();
-    return api.get(`/v2/admin/groups/recommendations${qs ? `?${qs}` : ''}`);
-  },
+  getRecommendationData: (params?: { limit?: number; offset?: number }) =>
+    api.get<{ recommendations: GroupRecommendation[]; stats: { total: number; avg_score: number; join_rate: number } }>(`/v2/admin/groups/recommendations${buildQuery(params || {})}`),
 
   // Ranking
   getFeaturedGroups: () =>
-    api.get('/v2/admin/groups/featured'),
+    api.get<FeaturedGroup[]>('/v2/admin/groups/featured'),
 
   updateFeaturedGroups: () =>
-    api.post('/v2/admin/groups/featured/update', {}),
+    api.post<{ success: boolean }>('/v2/admin/groups/featured/update', {}),
 
   toggleFeatured: (groupId: number) =>
-    api.put(`/v2/admin/groups/${groupId}/toggle-featured`, {}),
+    api.put<{ success: boolean }>(`/v2/admin/groups/${groupId}/toggle-featured`, {}),
 };
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -706,7 +706,7 @@ export const adminSystem = {
     api.get<CronJob[]>('/v2/admin/system/cron-jobs'),
 
   runCronJob: (id: number) =>
-    api.post(`/v2/admin/system/cron-jobs/${id}/run`),
+    api.post<{ success: boolean }>(`/v2/admin/system/cron-jobs/${id}/run`),
 
   getActivityLog: (params: { page?: number; limit?: number } = {}) =>
     api.get<PaginatedResponse<ActivityLogEntry>>(
@@ -729,13 +729,13 @@ export const adminEnterprise = {
     api.get<Role>(`/v2/admin/enterprise/roles/${id}`),
 
   createRole: (data: { name: string; description: string; permissions: string[] }) =>
-    api.post('/v2/admin/enterprise/roles', data),
+    api.post<Role>('/v2/admin/enterprise/roles', data),
 
   updateRole: (id: number, data: Partial<Role>) =>
-    api.put(`/v2/admin/enterprise/roles/${id}`, data),
+    api.put<Role>(`/v2/admin/enterprise/roles/${id}`, data),
 
   deleteRole: (id: number) =>
-    api.delete(`/v2/admin/enterprise/roles/${id}`),
+    api.delete<{ success: boolean }>(`/v2/admin/enterprise/roles/${id}`),
 
   getPermissions: () =>
     api.get<Record<string, string[]>>('/v2/admin/enterprise/permissions'),
@@ -749,7 +749,7 @@ export const adminEnterprise = {
     ),
 
   updateGdprRequest: (id: number, data: { status: string; notes?: string }) =>
-    api.put(`/v2/admin/enterprise/gdpr/requests/${id}`, data),
+    api.put<{ success: boolean }>(`/v2/admin/enterprise/gdpr/requests/${id}`, data),
 
   getGdprConsents: () =>
     api.get<GdprConsent[]>('/v2/admin/enterprise/gdpr/consents'),
@@ -758,7 +758,7 @@ export const adminEnterprise = {
     api.get<GdprBreach[]>('/v2/admin/enterprise/gdpr/breaches'),
 
   createBreach: (data: { title: string; description?: string; severity?: string; affected_users?: number }) =>
-    api.post('/v2/admin/enterprise/gdpr/breaches', data),
+    api.post<GdprBreach>('/v2/admin/enterprise/gdpr/breaches', data),
 
   getGdprAudit: () =>
     api.get<GdprAuditEntry[]>('/v2/admin/enterprise/gdpr/audit'),
@@ -778,7 +778,7 @@ export const adminEnterprise = {
     api.get<Record<string, unknown>>('/v2/admin/enterprise/config'),
 
   updateConfig: (data: Record<string, unknown>) =>
-    api.put('/v2/admin/enterprise/config', data),
+    api.put<{ success: boolean }>('/v2/admin/enterprise/config', data),
 
   getSecrets: () =>
     api.get<SecretEntry[]>('/v2/admin/enterprise/config/secrets'),
@@ -799,17 +799,17 @@ export const adminLegalDocs = {
     api.post<LegalDocument>('/v2/admin/legal-documents', data),
 
   update: (id: number, data: Record<string, unknown>) =>
-    api.put(`/v2/admin/legal-documents/${id}`, data),
+    api.put<LegalDocument>(`/v2/admin/legal-documents/${id}`, data),
 
   delete: (id: number) =>
-    api.delete(`/v2/admin/legal-documents/${id}`),
+    api.delete<{ success: boolean }>(`/v2/admin/legal-documents/${id}`),
 
   // Version Management
   getVersions: (docId: number) =>
     api.get<LegalDocumentVersion[]>(`/v2/admin/legal-documents/${docId}/versions`),
 
   compareVersions: (docId: number, v1: number, v2: number) =>
-    api.get<VersionComparison>(`/v2/admin/legal-documents/${docId}/versions/compare?v1=${v1}&v2=${v2}`),
+    api.get<VersionComparison>(`/v2/admin/legal-documents/${docId}/versions/compare${buildQuery({ v1, v2 })}`),
 
   createVersion: (docId: number, data: { version_number: string; version_label?: string; content: string; summary_of_changes?: string; effective_date: string; is_draft?: boolean }) =>
     api.post<{ id: number }>(`/v2/admin/legal-documents/${docId}/versions`, data),
@@ -825,14 +825,14 @@ export const adminLegalDocs = {
 
   // Compliance & Acceptance Tracking
   getComplianceStats: (docId?: number) =>
-    api.get<ComplianceStats>(`/v2/admin/legal-documents/compliance${docId ? `?doc_id=${docId}` : ''}`),
+    api.get<ComplianceStats>(`/v2/admin/legal-documents/compliance${buildQuery({ doc_id: docId })}`),
 
   getAcceptances: (versionId: number, limit = 50, offset = 0) =>
-    api.get<UserAcceptance[]>(`/v2/admin/legal-documents/versions/${versionId}/acceptances?limit=${limit}&offset=${offset}`),
+    api.get<UserAcceptance[]>(`/v2/admin/legal-documents/versions/${versionId}/acceptances${buildQuery({ limit, offset })}`),
 
   exportAcceptances: (docId: number, startDate?: string, endDate?: string) => {
     const query = buildQuery({ start_date: startDate, end_date: endDate });
-    return api.get(`/v2/admin/legal-documents/${docId}/acceptances/export${query}`);
+    return api.get<{ data: unknown }>(`/v2/admin/legal-documents/${docId}/acceptances/export${query}`);
   },
 
   // Notifications
@@ -849,139 +849,139 @@ export const adminLegalDocs = {
 
 export const adminNewsletters = {
   list: (params: { page?: number; status?: string } = {}) =>
-    api.get(`/v2/admin/newsletters${buildQuery(params)}`),
+    api.get<PaginatedResponse<Newsletter>>(`/v2/admin/newsletters${buildQuery(params)}`),
 
-  get: (id: number) => api.get(`/v2/admin/newsletters/${id}`),
+  get: (id: number) => api.get<Newsletter & Record<string, unknown>>(`/v2/admin/newsletters/${id}`),
 
   create: (data: Record<string, unknown>) =>
-    api.post('/v2/admin/newsletters', data),
+    api.post<Newsletter>('/v2/admin/newsletters', data),
 
   update: (id: number, data: Record<string, unknown>) =>
-    api.put(`/v2/admin/newsletters/${id}`, data),
+    api.put<Newsletter>(`/v2/admin/newsletters/${id}`, data),
 
-  delete: (id: number) => api.delete(`/v2/admin/newsletters/${id}`),
+  delete: (id: number) => api.delete<{ success: boolean }>(`/v2/admin/newsletters/${id}`),
 
   getSubscribers: (params?: { page?: number; per_page?: number; status?: string; search?: string }) =>
-    api.get(`/v2/admin/newsletters/subscribers${params ? buildQuery(params) : ''}`),
+    api.get<PaginatedResponse<{ id: number; email: string; first_name?: string; last_name?: string; status: string; subscribed_at: string }>>(`/v2/admin/newsletters/subscribers${buildQuery(params || {})}`),
 
   addSubscriber: (data: { email: string; first_name?: string; last_name?: string }) =>
-    api.post('/v2/admin/newsletters/subscribers', data),
+    api.post<{ success: boolean }>('/v2/admin/newsletters/subscribers', data),
 
   removeSubscriber: (id: number) =>
-    api.delete(`/v2/admin/newsletters/subscribers/${id}`),
+    api.delete<{ success: boolean }>(`/v2/admin/newsletters/subscribers/${id}`),
 
   importSubscribers: (rows: Array<{ email: string; first_name?: string; last_name?: string }>) =>
-    api.post('/v2/admin/newsletters/subscribers/import', { rows }),
+    api.post<{ imported: number; skipped: number; errors: string[] }>('/v2/admin/newsletters/subscribers/import', { rows }),
 
   exportSubscribers: () =>
-    api.get('/v2/admin/newsletters/subscribers/export'),
+    api.get<{ data: unknown }>('/v2/admin/newsletters/subscribers/export'),
 
   syncMembers: () =>
-    api.post('/v2/admin/newsletters/subscribers/sync', {}),
+    api.post<{ synced: number }>('/v2/admin/newsletters/subscribers/sync', {}),
 
-  getSegments: () => api.get('/v2/admin/newsletters/segments'),
+  getSegments: () => api.get<Array<{ id: number; name: string; rules: Record<string, unknown>; subscriber_count: number; created_at: string }>>('/v2/admin/newsletters/segments'),
 
-  getSegment: (id: number) => api.get(`/v2/admin/newsletters/segments/${id}`),
+  getSegment: (id: number) => api.get<{ id: number; name: string; rules: Record<string, unknown>; subscriber_count: number; created_at: string }>(`/v2/admin/newsletters/segments/${id}`),
 
   createSegment: (data: Record<string, unknown>) =>
-    api.post('/v2/admin/newsletters/segments', data),
+    api.post<{ id: number; name: string }>('/v2/admin/newsletters/segments', data),
 
   updateSegment: (id: number, data: Record<string, unknown>) =>
-    api.put(`/v2/admin/newsletters/segments/${id}`, data),
+    api.put<{ success: boolean }>(`/v2/admin/newsletters/segments/${id}`, data),
 
-  deleteSegment: (id: number) => api.delete(`/v2/admin/newsletters/segments/${id}`),
+  deleteSegment: (id: number) => api.delete<{ success: boolean }>(`/v2/admin/newsletters/segments/${id}`),
 
   previewSegment: (rules: Record<string, unknown>) =>
-    api.post('/v2/admin/newsletters/segments/preview', rules),
+    api.post<{ matching_count: number; count?: number; sample?: Array<{ id: number; email: string; name: string }> }>('/v2/admin/newsletters/segments/preview', rules),
 
-  getSegmentSuggestions: () => api.get('/v2/admin/newsletters/segments/suggestions'),
+  getSegmentSuggestions: () => api.get<Array<{ name: string; description: string; match_type: string; rules: Array<{ field: string; operator: string; value: string }>; estimated_count: number }>>('/v2/admin/newsletters/segments/suggestions'),
 
-  getTemplates: () => api.get('/v2/admin/newsletters/templates'),
+  getTemplates: () => api.get<Array<{ id: number; name: string; subject: string; content: string; created_at: string }>>('/v2/admin/newsletters/templates'),
 
-  getTemplate: (id: number) => api.get(`/v2/admin/newsletters/templates/${id}`),
+  getTemplate: (id: number) => api.get<{ id: number; name: string; subject: string; content: string; created_at: string }>(`/v2/admin/newsletters/templates/${id}`),
 
   createTemplate: (data: Record<string, unknown>) =>
-    api.post('/v2/admin/newsletters/templates', data),
+    api.post<{ id: number; name: string }>('/v2/admin/newsletters/templates', data),
 
   updateTemplate: (id: number, data: Record<string, unknown>) =>
-    api.put(`/v2/admin/newsletters/templates/${id}`, data),
+    api.put<{ success: boolean }>(`/v2/admin/newsletters/templates/${id}`, data),
 
-  deleteTemplate: (id: number) => api.delete(`/v2/admin/newsletters/templates/${id}`),
+  deleteTemplate: (id: number) => api.delete<{ success: boolean }>(`/v2/admin/newsletters/templates/${id}`),
 
   duplicateTemplate: (id: number) =>
-    api.post(`/v2/admin/newsletters/templates/${id}/duplicate`, {}),
+    api.post<{ id: number; name: string }>(`/v2/admin/newsletters/templates/${id}/duplicate`, {}),
 
-  previewTemplate: (id: number) => api.get(`/v2/admin/newsletters/templates/${id}/preview`),
+  previewTemplate: (id: number) => api.get<{ html: string }>(`/v2/admin/newsletters/templates/${id}/preview`),
 
-  getAnalytics: () => api.get('/v2/admin/newsletters/analytics'),
+  getAnalytics: () => api.get<{ total_sent: number; total_opened: number; total_clicked: number; avg_open_rate: number; avg_click_rate: number }>('/v2/admin/newsletters/analytics'),
 
   // Bounce management
   getBounces: (params: { limit?: number; offset?: number; type?: string; startDate?: string; endDate?: string } = {}) =>
-    api.get(`/v2/admin/newsletters/bounces${buildQuery(params)}`),
+    api.get<PaginatedResponse<NewsletterBounce>>(`/v2/admin/newsletters/bounces${buildQuery(params)}`),
 
-  getSuppressionList: () => api.get('/v2/admin/newsletters/suppression-list'),
+  getSuppressionList: () => api.get<SuppressionListEntry[]>('/v2/admin/newsletters/suppression-list'),
 
   unsuppress: (email: string) =>
-    api.post(`/v2/admin/newsletters/suppression-list/${encodeURIComponent(email)}/unsuppress`, {}),
+    api.post<{ success: boolean }>(`/v2/admin/newsletters/suppression-list/${encodeURIComponent(email)}/unsuppress`, {}),
 
   suppress: (email: string) =>
-    api.post(`/v2/admin/newsletters/suppression-list/${encodeURIComponent(email)}/suppress`, {}),
+    api.post<{ success: boolean }>(`/v2/admin/newsletters/suppression-list/${encodeURIComponent(email)}/suppress`, {}),
 
   // Resend workflow
   getResendInfo: (newsletterId: number) =>
-    api.get(`/v2/admin/newsletters/${newsletterId}/resend-info`),
+    api.get<ResendInfo>(`/v2/admin/newsletters/${newsletterId}/resend-info`),
 
   resend: (newsletterId: number, options: { target: string; segment_id?: number; subject_override?: string }) =>
-    api.post(`/v2/admin/newsletters/${newsletterId}/resend`, options),
+    api.post<{ success: boolean }>(`/v2/admin/newsletters/${newsletterId}/resend`, options),
 
   // Send-time optimizer
   getSendTimeData: (params?: { days?: number }) =>
-    api.get(`/v2/admin/newsletters/send-time-optimizer${params ? buildQuery(params) : ''}`),
+    api.get<SendTimeData>(`/v2/admin/newsletters/send-time-optimizer${buildQuery(params || {})}`),
 
   // Diagnostics
-  getDiagnostics: () => api.get('/v2/admin/newsletters/diagnostics'),
+  getDiagnostics: () => api.get<NewsletterDiagnostics>('/v2/admin/newsletters/diagnostics'),
   getBounceTrends: (params?: { weeks?: number }) =>
-    api.get(`/v2/admin/newsletters/bounce-trends${params?.weeks ? `?weeks=${params.weeks}` : ''}`),
+    api.get<BounceTrendsData>(`/v2/admin/newsletters/bounce-trends${buildQuery(params || {})}`),
 
   // Per-campaign stats
-  getStats: (id: number) => api.get(`/v2/admin/newsletters/${id}/stats`),
+  getStats: (id: number) => api.get<{ total_sent: number; total_opened: number; total_clicked: number; open_rate: number; click_rate: number }>(`/v2/admin/newsletters/${id}/stats`),
 
   selectAbWinner: (id: number, winner: 'a' | 'b') =>
-    api.post(`/v2/admin/newsletters/${id}/ab-winner`, { winner }),
+    api.post<{ success: boolean }>(`/v2/admin/newsletters/${id}/ab-winner`, { winner }),
 
   // Send workflow
   sendNewsletter: (id: number) =>
-    api.post(`/v2/admin/newsletters/${id}/send`, {}),
+    api.post<{ success: boolean }>(`/v2/admin/newsletters/${id}/send`, {}),
 
   sendTest: (id: number) =>
-    api.post(`/v2/admin/newsletters/${id}/send-test`, {}),
+    api.post<{ success: boolean }>(`/v2/admin/newsletters/${id}/send-test`, {}),
 
   getRecipientCount: (params: { target_audience: string; segment_id?: number }) =>
-    api.post('/v2/admin/newsletters/recipient-count', params),
+    api.post<{ count: number }>('/v2/admin/newsletters/recipient-count', params),
 
   // Duplicate
   duplicateNewsletter: (id: number) =>
-    api.post(`/v2/admin/newsletters/${id}/duplicate`, {}),
+    api.post<Newsletter>(`/v2/admin/newsletters/${id}/duplicate`, {}),
 
   // Activity log
   getActivity: (id: number, params?: { page?: number; per_page?: number; type?: string }) =>
-    api.get(`/v2/admin/newsletters/${id}/activity${params ? buildQuery(params) : ''}`),
+    api.get<PaginatedResponse<{ id: number; type: string; description: string; created_at: string }>>(`/v2/admin/newsletters/${id}/activity${buildQuery(params || {})}`),
 
   // Per-subscriber engagement lists
   getOpeners: (id: number, params?: { page?: number; per_page?: number }) =>
-    api.get(`/v2/admin/newsletters/${id}/openers${params ? buildQuery(params) : ''}`),
+    api.get<PaginatedResponse<{ email: string; name: string; opened_at: string }>>(`/v2/admin/newsletters/${id}/openers${buildQuery(params || {})}`),
 
   getClickers: (id: number, params?: { page?: number; per_page?: number }) =>
-    api.get(`/v2/admin/newsletters/${id}/clickers${params ? buildQuery(params) : ''}`),
+    api.get<PaginatedResponse<{ email: string; name: string; clicked_at: string }>>(`/v2/admin/newsletters/${id}/clickers${buildQuery(params || {})}`),
 
   getNonOpeners: (id: number, params?: { page?: number; per_page?: number }) =>
-    api.get(`/v2/admin/newsletters/${id}/non-openers${params ? buildQuery(params) : ''}`),
+    api.get<PaginatedResponse<{ email: string; name: string }>>(`/v2/admin/newsletters/${id}/non-openers${buildQuery(params || {})}`),
 
   getOpenersNoClick: (id: number, params?: { page?: number; per_page?: number }) =>
-    api.get(`/v2/admin/newsletters/${id}/openers-no-click${params ? buildQuery(params) : ''}`),
+    api.get<PaginatedResponse<{ email: string; name: string; opened_at: string }>>(`/v2/admin/newsletters/${id}/openers-no-click${buildQuery(params || {})}`),
 
   getEmailClients: (id: number) =>
-    api.get(`/v2/admin/newsletters/${id}/email-clients`),
+    api.get<Array<{ client: string; count: number; percentage: number }>>(`/v2/admin/newsletters/${id}/email-clients`),
 };
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -989,17 +989,17 @@ export const adminNewsletters = {
 // ─────────────────────────────────────────────────────────────────────────────
 
 export const adminVolunteering = {
-  getOverview: () => api.get('/v2/admin/volunteering'),
+  getOverview: () => api.get<{ total_opportunities: number; active_volunteers: number; pending_approvals: number; total_hours: number }>('/v2/admin/volunteering'),
 
-  getApprovals: () => api.get('/v2/admin/volunteering/approvals'),
+  getApprovals: () => api.get<Array<{ id: number; user_id: number; user_name: string; opportunity_id: number; opportunity_title: string; status: string; created_at: string }>>('/v2/admin/volunteering/approvals'),
 
   approveApplication: (id: number) =>
-    api.post('/v2/admin/volunteering/approvals/' + id + '/approve', {}),
+    api.post<{ success: boolean }>(`/v2/admin/volunteering/approvals/${id}/approve`, {}),
 
   declineApplication: (id: number) =>
-    api.post('/v2/admin/volunteering/approvals/' + id + '/decline', {}),
+    api.post<{ success: boolean }>(`/v2/admin/volunteering/approvals/${id}/decline`, {}),
 
-  getOrganizations: () => api.get('/v2/admin/volunteering/organizations'),
+  getOrganizations: () => api.get<Array<{ id: number; name: string; opportunity_count: number; volunteer_count: number }>>('/v2/admin/volunteering/organizations'),
 };
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -1007,48 +1007,41 @@ export const adminVolunteering = {
 // ─────────────────────────────────────────────────────────────────────────────
 
 export const adminFederation = {
-  getSettings: () => api.get('/v2/admin/federation/settings'),
+  getSettings: () => api.get<FederationSystemControls>('/v2/admin/federation/settings'),
 
   updateSettings: (data: Record<string, unknown>) =>
-    api.put('/v2/admin/federation/settings', data),
+    api.put<{ success: boolean }>('/v2/admin/federation/settings', data),
 
-  getPartnerships: () => api.get('/v2/admin/federation/partnerships'),
+  getPartnerships: () => api.get<FederationPartnership[]>('/v2/admin/federation/partnerships'),
 
   approvePartnership: (id: number) =>
-    api.post('/v2/admin/federation/partnerships/' + id + '/approve', {}),
+    api.post<{ success: boolean }>(`/v2/admin/federation/partnerships/${id}/approve`, {}),
 
   rejectPartnership: (id: number) =>
-    api.post('/v2/admin/federation/partnerships/' + id + '/reject', {}),
+    api.post<{ success: boolean }>(`/v2/admin/federation/partnerships/${id}/reject`, {}),
 
   terminatePartnership: (id: number) =>
-    api.post('/v2/admin/federation/partnerships/' + id + '/terminate', {}),
+    api.post<{ success: boolean }>(`/v2/admin/federation/partnerships/${id}/terminate`, {}),
 
-  getDirectory: (params?: { search?: string; region?: string; category?: string; exclude_partnered?: boolean }) => {
-    const qs = new URLSearchParams();
-    if (params?.search) qs.set('search', params.search);
-    if (params?.region) qs.set('region', params.region);
-    if (params?.category) qs.set('category', params.category);
-    if (params?.exclude_partnered) qs.set('exclude_partnered', '1');
-    const suffix = qs.toString() ? '?' + qs.toString() : '';
-    return api.get('/v2/admin/federation/directory' + suffix);
-  },
+  getDirectory: (params?: { search?: string; region?: string; category?: string; exclude_partnered?: boolean }) =>
+    api.get<Array<{ id: number; name: string; slug: string; domain: string; description?: string; region?: string }>>(`/v2/admin/federation/directory${buildQuery(params || {})}`),
 
   requestPartnership: (targetTenantId: number, notes?: string) =>
-    api.post('/v2/admin/federation/partnerships/request', { target_tenant_id: targetTenantId, notes }),
+    api.post<{ success: boolean }>('/v2/admin/federation/partnerships/request', { target_tenant_id: targetTenantId, notes }),
 
-  getProfile: () => api.get('/v2/admin/federation/directory/profile'),
+  getProfile: () => api.get<{ id: number; name: string; description?: string; region?: string; category?: string; is_visible: boolean }>('/v2/admin/federation/directory/profile'),
 
   updateProfile: (data: Record<string, unknown>) =>
-    api.put('/v2/admin/federation/directory/profile', data),
+    api.put<{ success: boolean }>('/v2/admin/federation/directory/profile', data),
 
-  getAnalytics: () => api.get('/v2/admin/federation/analytics'),
+  getAnalytics: () => api.get<{ total_partnerships: number; active_partnerships: number; cross_tenant_transactions: number; cross_tenant_messages: number }>('/v2/admin/federation/analytics'),
 
-  getApiKeys: () => api.get('/v2/admin/federation/api-keys'),
+  getApiKeys: () => api.get<Array<{ id: number; name: string; key_prefix: string; scopes: string[]; created_at: string; last_used_at?: string }>>('/v2/admin/federation/api-keys'),
 
   createApiKey: (data: { name: string; scopes?: string[] }) =>
-    api.post('/v2/admin/federation/api-keys', data),
+    api.post<{ id: number; key: string; name: string }>('/v2/admin/federation/api-keys', data),
 
-  getDataManagement: () => api.get('/v2/admin/federation/data'),
+  getDataManagement: () => api.get<{ shared_data_types: string[]; data_retention_days: number }>('/v2/admin/federation/data'),
 };
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -1057,12 +1050,12 @@ export const adminFederation = {
 
 export const adminPages = {
   list: () => api.get<Array<{ id: number; title: string; slug: string; status: string; sort_order: number; show_in_menu: number; menu_location: string; menu_order: number; created_at: string }>>('/v2/admin/pages'),
-  get: (id: number) => api.get('/v2/admin/pages/' + id),
+  get: (id: number) => api.get<{ id: number; title: string; slug: string; content: string; status: string; meta_description?: string; show_in_menu: number; menu_location: string; menu_order: number; created_at: string }>(`/v2/admin/pages/${id}`),
   create: (data: { title: string; content?: string; meta_description?: string; status?: string; show_in_menu?: number; menu_location?: string; menu_order?: number }) =>
-    api.post('/v2/admin/pages', data),
+    api.post<{ id: number }>('/v2/admin/pages', data),
   update: (id: number, data: Record<string, unknown>) =>
-    api.put('/v2/admin/pages/' + id, data),
-  delete: (id: number) => api.delete('/v2/admin/pages/' + id),
+    api.put<{ success: boolean }>(`/v2/admin/pages/${id}`, data),
+  delete: (id: number) => api.delete<{ success: boolean }>(`/v2/admin/pages/${id}`),
 };
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -1071,20 +1064,20 @@ export const adminPages = {
 
 export const adminMenus = {
   list: () => api.get<Array<{ id: number; name: string; slug: string; location: string; is_active: boolean; item_count: number }>>('/v2/admin/menus'),
-  get: (id: number) => api.get('/v2/admin/menus/' + id),
+  get: (id: number) => api.get<{ id: number; name: string; slug: string; location: string; description?: string; is_active: boolean; item_count: number }>(`/v2/admin/menus/${id}`),
   create: (data: { name: string; location: string; description?: string }) =>
-    api.post('/v2/admin/menus', data),
+    api.post<{ id: number }>('/v2/admin/menus', data),
   update: (id: number, data: Record<string, unknown>) =>
-    api.put('/v2/admin/menus/' + id, data),
-  delete: (id: number) => api.delete('/v2/admin/menus/' + id),
-  getItems: (menuId: number) => api.get('/v2/admin/menus/' + menuId + '/items'),
+    api.put<{ success: boolean }>(`/v2/admin/menus/${id}`, data),
+  delete: (id: number) => api.delete<{ success: boolean }>(`/v2/admin/menus/${id}`),
+  getItems: (menuId: number) => api.get<Array<{ id: number; label: string; url: string; sort_order: number; parent_id: number | null }>>(`/v2/admin/menus/${menuId}/items`),
   createItem: (menuId: number, data: Record<string, unknown>) =>
-    api.post('/v2/admin/menus/' + menuId + '/items', data),
+    api.post<{ id: number }>(`/v2/admin/menus/${menuId}/items`, data),
   updateItem: (itemId: number, data: Record<string, unknown>) =>
-    api.put('/v2/admin/menu-items/' + itemId, data),
-  deleteItem: (itemId: number) => api.delete('/v2/admin/menu-items/' + itemId),
+    api.put<{ success: boolean }>(`/v2/admin/menu-items/${itemId}`, data),
+  deleteItem: (itemId: number) => api.delete<{ success: boolean }>(`/v2/admin/menu-items/${itemId}`),
   reorderItems: (menuId: number, items: Array<{ id: number; sort_order: number; parent_id?: number | null }>) =>
-    api.post('/v2/admin/menus/' + menuId + '/items/reorder', { items }),
+    api.post<{ success: boolean }>(`/v2/admin/menus/${menuId}/items/reorder`, { items }),
 };
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -1093,13 +1086,13 @@ export const adminMenus = {
 
 export const adminPlans = {
   list: () => api.get<Array<{ id: number; name: string; slug: string; tier_level: number; price_monthly: number; price_yearly: number; is_active: boolean }>>('/v2/admin/plans'),
-  get: (id: number) => api.get('/v2/admin/plans/' + id),
+  get: (id: number) => api.get<{ id: number; name: string; slug: string; description?: string; tier_level: number; price_monthly: number; price_yearly: number; max_menus?: number; max_menu_items?: number; features?: string[]; allowed_layouts?: string[]; is_active: boolean }>(`/v2/admin/plans/${id}`),
   create: (data: { name: string; description?: string; price_monthly?: number; price_yearly?: number; tier_level?: number; max_menus?: number; max_menu_items?: number; features?: string[]; allowed_layouts?: string[]; is_active?: boolean }) =>
-    api.post('/v2/admin/plans', data),
+    api.post<{ id: number }>('/v2/admin/plans', data),
   update: (id: number, data: Record<string, unknown>) =>
-    api.put('/v2/admin/plans/' + id, data),
-  delete: (id: number) => api.delete('/v2/admin/plans/' + id),
-  getSubscriptions: () => api.get('/v2/admin/subscriptions'),
+    api.put<{ success: boolean }>(`/v2/admin/plans/${id}`, data),
+  delete: (id: number) => api.delete<{ success: boolean }>(`/v2/admin/plans/${id}`),
+  getSubscriptions: () => api.get<Array<{ id: number; tenant_id: number; tenant_name: string; plan_id: number; plan_name: string; status: string; created_at: string }>>('/v2/admin/subscriptions'),
 };
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -1107,18 +1100,20 @@ export const adminPlans = {
 // ─────────────────────────────────────────────────────────────────────────────
 
 export const adminDeliverability = {
+  // Consumer casts to local DashboardData type
   getDashboard: () => api.get('/v2/admin/deliverability/dashboard'),
   list: (params: { page?: number; status?: string; priority?: string } = {}) =>
-    api.get('/v2/admin/deliverability' + buildQuery(params)),
-  get: (id: number) => api.get('/v2/admin/deliverability/' + id),
+    api.get<PaginatedResponse<{ id: number; title: string; description?: string; priority: string; status: string; due_date?: string; assigned_to?: number; created_at: string }>>(`/v2/admin/deliverability${buildQuery(params)}`),
+  get: (id: number) => api.get<{ id: number; title: string; description?: string; priority: string; status: string; due_date?: string; assigned_to?: number; comments: Array<{ id: number; comment_text: string; comment_type?: string; created_at: string }>; created_at: string }>(`/v2/admin/deliverability/${id}`),
   create: (data: { title: string; description?: string; priority?: string; status?: string; due_date?: string; assigned_to?: number }) =>
-    api.post('/v2/admin/deliverability', data),
+    api.post<{ id: number }>('/v2/admin/deliverability', data),
   update: (id: number, data: Record<string, unknown>) =>
-    api.put('/v2/admin/deliverability/' + id, data),
-  delete: (id: number) => api.delete('/v2/admin/deliverability/' + id),
+    api.put<{ success: boolean }>(`/v2/admin/deliverability/${id}`, data),
+  delete: (id: number) => api.delete<{ success: boolean }>(`/v2/admin/deliverability/${id}`),
+  // Consumer casts to local AnalyticsData type
   getAnalytics: () => api.get('/v2/admin/deliverability/analytics'),
   addComment: (id: number, data: { comment_text: string; comment_type?: string }) =>
-    api.post('/v2/admin/deliverability/' + id + '/comments', data),
+    api.post<{ id: number }>(`/v2/admin/deliverability/${id}/comments`, data),
 };
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -1127,11 +1122,11 @@ export const adminDeliverability = {
 
 export const adminDiagnostics = {
   diagnoseUser: (userId: number) =>
-    api.get('/v2/admin/matching/stats?user_id=' + userId),
+    api.get<Record<string, unknown>>(`/v2/admin/matching/stats${buildQuery({ user_id: userId })}`),
   diagnoseListing: (listingId: number) =>
-    api.get('/v2/admin/matching/stats?listing_id=' + listingId),
-  getMatchingStats: () => api.get('/v2/admin/matching/stats'),
-  getNexusScoreStats: () => api.get('/v2/admin/gamification/stats'),
+    api.get<Record<string, unknown>>(`/v2/admin/matching/stats${buildQuery({ listing_id: listingId })}`),
+  getMatchingStats: () => api.get<Record<string, unknown>>('/v2/admin/matching/stats'),
+  getNexusScoreStats: () => api.get<GamificationStats>('/v2/admin/gamification/stats'),
 };
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -1140,30 +1135,30 @@ export const adminDiagnostics = {
 
 export const adminSettings = {
   get: () => api.get<import('./types').AdminSettingsResponse>('/v2/admin/settings'),
-  update: (data: Record<string, unknown>) => api.put('/v2/admin/settings', data),
+  update: (data: Record<string, unknown>) => api.put<{ success: boolean }>('/v2/admin/settings', data),
 
   getAiConfig: () => api.get<Record<string, unknown>>('/v2/admin/config/ai'),
-  updateAiConfig: (data: Record<string, unknown>) => api.put('/v2/admin/config/ai', data),
+  updateAiConfig: (data: Record<string, unknown>) => api.put<{ success: boolean }>('/v2/admin/config/ai', data),
 
   getFeedAlgorithm: () => api.get<Record<string, unknown>>('/v2/admin/config/feed-algorithm'),
-  updateFeedAlgorithm: (data: Record<string, unknown>) => api.put('/v2/admin/config/feed-algorithm', data),
+  updateFeedAlgorithm: (data: Record<string, unknown>) => api.put<{ success: boolean }>('/v2/admin/config/feed-algorithm', data),
 
   getAlgorithmConfig: () => api.get<Record<string, unknown>>('/v2/admin/config/algorithms'),
-  updateAlgorithmConfig: (area: string, data: Record<string, unknown>) => api.put(`/v2/admin/config/algorithm/${area}`, data),
+  updateAlgorithmConfig: (area: string, data: Record<string, unknown>) => api.put<{ success: boolean }>(`/v2/admin/config/algorithm/${area}`, data),
   getAlgorithmHealth: () => api.get<Record<string, unknown>>('/v2/admin/config/algorithm-health'),
 
   getImageSettings: () => api.get<Record<string, unknown>>('/v2/admin/config/images'),
-  updateImageSettings: (data: Record<string, unknown>) => api.put('/v2/admin/config/images', data),
+  updateImageSettings: (data: Record<string, unknown>) => api.put<{ success: boolean }>('/v2/admin/config/images', data),
 
   getSeoSettings: () => api.get<Record<string, unknown>>('/v2/admin/config/seo'),
-  updateSeoSettings: (data: Record<string, unknown>) => api.put('/v2/admin/config/seo', data),
+  updateSeoSettings: (data: Record<string, unknown>) => api.put<{ success: boolean }>('/v2/admin/config/seo', data),
 
   getNativeAppSettings: () => api.get<Record<string, unknown>>('/v2/admin/config/native-app'),
-  updateNativeAppSettings: (data: Record<string, unknown>) => api.put('/v2/admin/config/native-app', data),
+  updateNativeAppSettings: (data: Record<string, unknown>) => api.put<{ success: boolean }>('/v2/admin/config/native-app', data),
 
   getEmailConfig: () => api.get<Record<string, unknown>>('/v2/admin/email/config'),
-  updateEmailConfig: (data: Record<string, unknown>) => api.put('/v2/admin/email/config', data),
-  testEmailProvider: (data: { to: string }) => api.post('/v2/admin/email/test-provider', data),
+  updateEmailConfig: (data: Record<string, unknown>) => api.put<{ success: boolean }>('/v2/admin/email/config', data),
+  testEmailProvider: (data: { to: string }) => api.post<{ success: boolean; message: string }>('/v2/admin/email/test-provider', data),
 };
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -1173,22 +1168,22 @@ export const adminSettings = {
 export const adminTools = {
   getRedirects: () => api.get<Array<{ id: number; from_url: string; to_url: string; status_code: number; hits: number; created_at: string }>>('/v2/admin/tools/redirects'),
   createRedirect: (data: { from_url: string; to_url: string; status_code?: number }) =>
-    api.post('/v2/admin/tools/redirects', data),
-  deleteRedirect: (id: number) => api.delete('/v2/admin/tools/redirects/' + id),
+    api.post<{ id: number }>('/v2/admin/tools/redirects', data),
+  deleteRedirect: (id: number) => api.delete<{ success: boolean }>(`/v2/admin/tools/redirects/${id}`),
 
   get404Errors: (page = 1, perPage = 50) =>
     api.get<{ items: Array<{ id: number; url: string; referrer: string; hits: number; first_seen: string; last_seen: string }>; total: number; page: number; per_page: number }>(
       `/v2/admin/tools/404-errors?page=${page}&per_page=${perPage}`
     ),
-  delete404Error: (id: number) => api.delete('/v2/admin/tools/404-errors/' + id),
+  delete404Error: (id: number) => api.delete<{ success: boolean }>(`/v2/admin/tools/404-errors/${id}`),
 
   runHealthCheck: () => api.post<Array<{ name: string; status: string; duration_ms: number; error?: string }>>('/v2/admin/tools/health-check'),
 
   getWebpStats: () => api.get<{ total_images: number; webp_images: number; pending_conversion: number }>('/v2/admin/tools/webp-stats'),
-  runWebpConversion: () => api.post('/v2/admin/tools/webp-convert'),
+  runWebpConversion: () => api.post<{ converted: number }>('/v2/admin/tools/webp-convert'),
 
   runSeedGenerator: (data: { types: string[]; counts: Record<string, number> }) =>
-    api.post('/v2/admin/tools/seed', data),
+    api.post<{ success: boolean; created: Record<string, number> }>('/v2/admin/tools/seed', data),
 
   getBlogBackups: () => api.get<Array<{ id: number; filename: string; created_at: string; size: string }>>('/v2/admin/tools/blog-backups'),
 
@@ -1225,19 +1220,19 @@ export const adminSuper = {
     api.post<{ tenant_id: number }>('/v2/admin/super/tenants', data),
 
   updateTenant: (id: number, data: UpdateTenantPayload) =>
-    api.put('/v2/admin/super/tenants/' + id, data),
+    api.put<{ success: boolean }>(`/v2/admin/super/tenants/${id}`, data),
 
   deleteTenant: (id: number, hardDelete = false) =>
-    api.delete(`/v2/admin/super/tenants/${id}${hardDelete ? '?hard=1' : ''}`),
+    api.delete<{ success: boolean }>(`/v2/admin/super/tenants/${id}${hardDelete ? '?hard=1' : ''}`),
 
   reactivateTenant: (id: number) =>
-    api.post(`/v2/admin/super/tenants/${id}/reactivate`),
+    api.post<{ success: boolean }>(`/v2/admin/super/tenants/${id}/reactivate`),
 
   toggleHub: (id: number, enable: boolean) =>
-    api.post(`/v2/admin/super/tenants/${id}/toggle-hub`, { enable }),
+    api.post<{ success: boolean }>(`/v2/admin/super/tenants/${id}/toggle-hub`, { enable }),
 
   moveTenant: (id: number, newParentId: number) =>
-    api.post(`/v2/admin/super/tenants/${id}/move`, { new_parent_id: newParentId }),
+    api.post<{ success: boolean }>(`/v2/admin/super/tenants/${id}/move`, { new_parent_id: newParentId }),
 
   // Users (Cross-Tenant)
   listUsers: (params: SuperUserListParams = {}) =>
@@ -1250,25 +1245,25 @@ export const adminSuper = {
     api.post<{ user_id: number }>('/v2/admin/super/users', data),
 
   updateUser: (id: number, data: Record<string, unknown>) =>
-    api.put(`/v2/admin/super/users/${id}`, data),
+    api.put<{ success: boolean }>(`/v2/admin/super/users/${id}`, data),
 
   grantSuperAdmin: (userId: number) =>
-    api.post(`/v2/admin/super/users/${userId}/grant-super-admin`),
+    api.post<{ success: boolean }>(`/v2/admin/super/users/${userId}/grant-super-admin`),
 
   revokeSuperAdmin: (userId: number) =>
-    api.post(`/v2/admin/super/users/${userId}/revoke-super-admin`),
+    api.post<{ success: boolean }>(`/v2/admin/super/users/${userId}/revoke-super-admin`),
 
   grantGlobalSuperAdmin: (userId: number) =>
-    api.post(`/v2/admin/super/users/${userId}/grant-global-super-admin`),
+    api.post<{ success: boolean }>(`/v2/admin/super/users/${userId}/grant-global-super-admin`),
 
   revokeGlobalSuperAdmin: (userId: number) =>
-    api.post(`/v2/admin/super/users/${userId}/revoke-global-super-admin`),
+    api.post<{ success: boolean }>(`/v2/admin/super/users/${userId}/revoke-global-super-admin`),
 
   moveUserTenant: (userId: number, newTenantId: number) =>
-    api.post(`/v2/admin/super/users/${userId}/move-tenant`, { new_tenant_id: newTenantId }),
+    api.post<{ success: boolean }>(`/v2/admin/super/users/${userId}/move-tenant`, { new_tenant_id: newTenantId }),
 
   moveAndPromote: (userId: number, targetTenantId: number) =>
-    api.post(`/v2/admin/super/users/${userId}/move-and-promote`, { target_tenant_id: targetTenantId }),
+    api.post<{ success: boolean }>(`/v2/admin/super/users/${userId}/move-and-promote`, { target_tenant_id: targetTenantId }),
 
   // Bulk Operations
   bulkMoveUsers: (data: BulkMoveUsersPayload) =>
@@ -1289,37 +1284,37 @@ export const adminSuper = {
     api.get<FederationSystemControls>('/v2/admin/super/federation/system-controls'),
 
   updateSystemControls: (data: Partial<FederationSystemControls>) =>
-    api.put('/v2/admin/super/federation/system-controls', data),
+    api.put<{ success: boolean }>('/v2/admin/super/federation/system-controls', data),
 
   emergencyLockdown: (reason: string) =>
-    api.post('/v2/admin/super/federation/emergency-lockdown', { reason }),
+    api.post<{ success: boolean }>('/v2/admin/super/federation/emergency-lockdown', { reason }),
 
   liftLockdown: () =>
-    api.post('/v2/admin/super/federation/lift-lockdown'),
+    api.post<{ success: boolean }>('/v2/admin/super/federation/lift-lockdown'),
 
   getWhitelist: () =>
     api.get<FederationWhitelistEntry[]>('/v2/admin/super/federation/whitelist'),
 
   addToWhitelist: (tenantId: number, notes?: string) =>
-    api.post('/v2/admin/super/federation/whitelist', { tenant_id: tenantId, notes }),
+    api.post<{ success: boolean }>('/v2/admin/super/federation/whitelist', { tenant_id: tenantId, notes }),
 
   removeFromWhitelist: (tenantId: number) =>
-    api.delete(`/v2/admin/super/federation/whitelist/${tenantId}`),
+    api.delete<{ success: boolean }>(`/v2/admin/super/federation/whitelist/${tenantId}`),
 
   getFederationPartnerships: () =>
     api.get<FederationPartnership[]>('/v2/admin/super/federation/partnerships'),
 
   suspendPartnership: (id: number, reason: string) =>
-    api.post(`/v2/admin/super/federation/partnerships/${id}/suspend`, { reason }),
+    api.post<{ success: boolean }>(`/v2/admin/super/federation/partnerships/${id}/suspend`, { reason }),
 
   terminatePartnership: (id: number, reason: string) =>
-    api.post(`/v2/admin/super/federation/partnerships/${id}/terminate`, { reason }),
+    api.post<{ success: boolean }>(`/v2/admin/super/federation/partnerships/${id}/terminate`, { reason }),
 
   getTenantFederationFeatures: (tenantId: number) =>
     api.get<TenantFederationFeatures>(`/v2/admin/super/federation/tenant/${tenantId}/features`),
 
   updateTenantFederationFeature: (tenantId: number, feature: string, enabled: boolean) =>
-    api.put(`/v2/admin/super/federation/tenant/${tenantId}/features`, { feature, enabled }),
+    api.put<{ success: boolean }>(`/v2/admin/super/federation/tenant/${tenantId}/features`, { feature, enabled }),
 };
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -1327,8 +1322,8 @@ export const adminSuper = {
 // ─────────────────────────────────────────────────────────────────────────────
 
 export const adminCommunityAnalytics = {
-  getData: () => api.get('/v2/admin/community-analytics'),
-  exportCsv: () => api.get('/v2/admin/community-analytics/export'),
+  getData: () => api.get<{ members: Record<string, unknown>; activity: Record<string, unknown>; engagement: Record<string, unknown> }>('/v2/admin/community-analytics'),
+  exportCsv: () => api.get<{ data: unknown }>('/v2/admin/community-analytics/export'),
 };
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -1336,9 +1331,9 @@ export const adminCommunityAnalytics = {
 // ─────────────────────────────────────────────────────────────────────────────
 
 export const adminImpactReport = {
-  getData: (months = 12) => api.get(`/v2/admin/impact-report?months=${months}`),
+  getData: (months = 12) => api.get<{ total_hours: number; economic_value: number; social_impact: number; members_active: number; monthly_data: Array<{ month: string; hours: number; value: number }> }>(`/v2/admin/impact-report${buildQuery({ months })}`),
   updateConfig: (data: { hourly_value?: number; social_multiplier?: number }) =>
-    api.put('/v2/admin/impact-report/config', data),
+    api.put<{ success: boolean }>('/v2/admin/impact-report/config', data),
 };
 
 // ─────────────────────────────────────────────────────────────────────────────

@@ -85,7 +85,8 @@ if ($filterToDate) {
 $countSql = "SELECT COUNT(*) as total FROM (" . $sql . ") as subquery";
 $stmt = $db->prepare($countSql);
 $stmt->execute($params);
-$totalRecords = $stmt->fetch()['total'];
+$result = $stmt->fetch();
+$totalRecords = $result['total'] ?? 0;
 $totalPages = ceil($totalRecords / $perPage);
 
 // Add pagination (use direct values for LIMIT/OFFSET as they can't be parameterized properly)
@@ -97,10 +98,10 @@ $logs = $stmt->fetchAll();
 
 // Get statistics
 $stats = [
-    'total_today' => $db->query("SELECT COUNT(*) as count FROM permission_audit_log WHERE DATE(created_at) = CURDATE()")->fetch()['count'],
-    'grants_today' => $db->query("SELECT COUNT(*) as count FROM permission_audit_log WHERE DATE(created_at) = CURDATE() AND event_type = 'role_assigned'")->fetch()['count'],
-    'checks_today' => $db->query("SELECT COUNT(*) as count FROM permission_audit_log WHERE DATE(created_at) = CURDATE() AND event_type = 'permission_check'")->fetch()['count'],
-    'denials_today' => $db->query("SELECT COUNT(*) as count FROM permission_audit_log WHERE DATE(created_at) = CURDATE() AND event_type = 'permission_check' AND result = 'denied'")->fetch()['count']
+    'total_today' => (($r = $db->query("SELECT COUNT(*) as count FROM permission_audit_log WHERE DATE(created_at) = CURDATE()")->fetch()) ? $r['count'] : 0),
+    'grants_today' => (($r = $db->query("SELECT COUNT(*) as count FROM permission_audit_log WHERE DATE(created_at) = CURDATE() AND event_type = 'role_assigned'")->fetch()) ? $r['count'] : 0),
+    'checks_today' => (($r = $db->query("SELECT COUNT(*) as count FROM permission_audit_log WHERE DATE(created_at) = CURDATE() AND event_type = 'permission_check'")->fetch()) ? $r['count'] : 0),
+    'denials_today' => (($r = $db->query("SELECT COUNT(*) as count FROM permission_audit_log WHERE DATE(created_at) = CURDATE() AND event_type = 'permission_check' AND result = 'denied'")->fetch()) ? $r['count'] : 0)
 ];
 
 // Get unique event types for filter

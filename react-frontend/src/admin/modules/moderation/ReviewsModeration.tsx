@@ -32,18 +32,19 @@ import { adminSuper } from '@/admin/api/adminApi';
 import type { AdminReview } from '@/admin/api/types';
 
 import { useTranslation } from 'react-i18next';
-const RATING_FILTERS = [
-  { label: 'All Ratings', value: '' },
-  { label: '5 Stars', value: '5' },
-  { label: '4 Stars', value: '4' },
-  { label: '3 Stars', value: '3' },
-  { label: '2 Stars', value: '2' },
-  { label: '1 Star', value: '1' },
-];
 
 export default function ReviewsModeration() {
   const { t } = useTranslation('admin');
   usePageTitle(t('moderation.page_title'));
+
+  const RATING_FILTERS = [
+    { label: t('moderation.filter_all_ratings'), value: '' },
+    { label: t('moderation.rating_5_stars'), value: '5' },
+    { label: t('moderation.rating_4_stars'), value: '4' },
+    { label: t('moderation.rating_3_stars'), value: '3' },
+    { label: t('moderation.rating_2_stars'), value: '2' },
+    { label: t('moderation.rating_1_star'), value: '1' },
+  ];
 
   const toast = useToast();
   const { user } = useAuth();
@@ -132,15 +133,15 @@ export default function ReviewsModeration() {
       if (response.success) {
         toast.success(
           confirmAction.type === 'flag'
-            ? 'Review flagged successfully'
+            ? t('moderation.review_flagged_successfully')
             : confirmAction.type === 'hide'
-            ? 'Review hidden successfully'
-            : 'Review deleted successfully'
+            ? t('moderation.review_hidden_successfully')
+            : t('moderation.review_deleted_successfully')
         );
         setConfirmAction(null);
         execute();
       } else {
-        toast.error(response.error || 'Action failed');
+        toast.error(response.error || t('moderation.action_failed'));
       }
     } catch {
       toast.error(t('moderation.an_error_occurred'));
@@ -213,16 +214,16 @@ export default function ReviewsModeration() {
           <p className="text-sm line-clamp-2">{review.content}</p>
           {review.is_flagged && (
             <Chip size="sm" color="warning" variant="flat" className="mt-1">
-              Flagged
+              {t('moderation.flagged')}
             </Chip>
           )}
         </div>
       </TableCell>,
       <TableCell key="status">
         {review.is_hidden ? (
-          <Chip size="sm" color="warning" variant="flat">Hidden</Chip>
+          <Chip size="sm" color="warning" variant="flat">{t('moderation.hidden')}</Chip>
         ) : (
-          <Chip size="sm" color="success" variant="flat">Visible</Chip>
+          <Chip size="sm" color="success" variant="flat">{t('moderation.visible')}</Chip>
         )}
       </TableCell>,
       <TableCell key="created">
@@ -240,7 +241,7 @@ export default function ReviewsModeration() {
               startContent={<Flag className="w-4 h-4" />}
               onPress={() => setConfirmAction({ type: 'flag', review })}
             >
-              Flag
+              {t('moderation.flag')}
             </Button>
           )}
           {!review.is_hidden && (
@@ -251,7 +252,7 @@ export default function ReviewsModeration() {
               startContent={<EyeOff className="w-4 h-4" />}
               onPress={() => setConfirmAction({ type: 'hide', review })}
             >
-              Hide
+              {t('moderation.hide')}
             </Button>
           )}
           <Button
@@ -261,7 +262,7 @@ export default function ReviewsModeration() {
             startContent={<Trash2 className="w-4 h-4" />}
             onPress={() => setConfirmAction({ type: 'delete', review })}
           >
-            Delete
+            {t('moderation.delete')}
           </Button>
         </div>
       </TableCell>
@@ -272,14 +273,14 @@ export default function ReviewsModeration() {
 
   // Determine columns based on super admin status
   const columns = isSuperAdmin
-    ? ['REVIEWER', 'REVIEWEE', 'TENANT', 'RATING', 'COMMENT', 'STATUS', 'CREATED', 'ACTIONS']
-    : ['REVIEWER', 'REVIEWEE', 'RATING', 'COMMENT', 'STATUS', 'CREATED', 'ACTIONS'];
+    ? [t('moderation.col_reviewer'), t('moderation.col_reviewee'), t('moderation.col_tenant'), t('moderation.col_rating'), t('moderation.col_comment'), t('moderation.col_status'), t('moderation.col_created'), t('moderation.col_actions')]
+    : [t('moderation.col_reviewer'), t('moderation.col_reviewee'), t('moderation.col_rating'), t('moderation.col_comment'), t('moderation.col_status'), t('moderation.col_created'), t('moderation.col_actions')];
 
   return (
     <div className="space-y-6">
       <PageHeader
         title={t('moderation.reviews_moderation_title')}
-        description={isSuperAdmin ? 'Moderate member reviews across all tenants' : 'Moderate member reviews and ratings'}
+        description={isSuperAdmin ? t('moderation.reviews_desc_super') : t('moderation.reviews_desc')}
         actions={
           <Button
             color="primary"
@@ -288,7 +289,7 @@ export default function ReviewsModeration() {
             onPress={() => execute()}
             isLoading={isLoading}
           >
-            Refresh
+            {t('moderation.refresh')}
           </Button>
         }
       />
@@ -324,7 +325,7 @@ export default function ReviewsModeration() {
             className="w-full sm:w-56"
           >
             {[
-              <SelectItem key="all">All Tenants</SelectItem>,
+              <SelectItem key="all">{t('moderation.filter_all_tenants')}</SelectItem>,
               ...tenants.map((t) => (
                 <SelectItem key={t.id.toString()}>
                   {t.name}
@@ -335,10 +336,10 @@ export default function ReviewsModeration() {
         )}
         <div className="flex gap-2">
           <Button color="primary" onPress={handleSearch}>
-            Apply
+            {t('moderation.apply')}
           </Button>
           <Button variant="flat" onPress={handleClear}>
-            Clear
+            {t('moderation.clear')}
           </Button>
         </div>
       </div>
@@ -346,15 +347,15 @@ export default function ReviewsModeration() {
       {/* Stats */}
       {meta && (
         <div className="text-sm text-default-500">
-          Showing {reviews.length} of {meta.total ?? reviews.length} reviews
-          {isSuperAdmin && !activeTenant && ' (all tenants)'}
+          {t('moderation.showing_count', { shown: reviews.length, total: meta.total ?? reviews.length, item: t('moderation.items_reviews') })}
+          {isSuperAdmin && !activeTenant && ` (${t('moderation.all_tenants')})`}
         </div>
       )}
 
       {/* Error State */}
       {error && (
         <div className="bg-danger-50 dark:bg-danger-950 text-danger border border-danger rounded-lg p-4">
-          Failed to load reviews. Please try again.
+          {t('moderation.failed_to_load_reviews')}
         </div>
       )}
 
@@ -372,8 +373,8 @@ export default function ReviewsModeration() {
           emptyContent={
             <div className="text-center py-8 text-default-400">
               {activeSearch || activeRating
-                ? 'No reviews match your filters'
-                : 'No reviews to moderate'}
+                ? t('moderation.no_reviews_match_filters')
+                : t('moderation.no_reviews_to_moderate')}
             </div>
           }
         >
@@ -405,24 +406,24 @@ export default function ReviewsModeration() {
         onConfirm={handleAction}
         title={
           confirmAction?.type === 'flag'
-            ? 'Flag Review'
+            ? t('moderation.flag_review')
             : confirmAction?.type === 'hide'
-            ? 'Hide Review'
-            : 'Delete Review'
+            ? t('moderation.hide_review')
+            : t('moderation.delete_review')
         }
         message={
           confirmAction?.type === 'flag'
-            ? `Are you sure you want to flag this review${isSuperAdmin && confirmAction?.review ? ` from ${confirmAction.review.tenant_name}` : ''} for admin attention?`
+            ? t('moderation.confirm_flag_review', { tenant: isSuperAdmin && confirmAction?.review ? ` from ${confirmAction.review.tenant_name}` : '' })
             : confirmAction?.type === 'hide'
-            ? `Are you sure you want to hide this review${isSuperAdmin && confirmAction?.review ? ` from ${confirmAction.review.tenant_name}` : ''}? It will no longer be visible to members.`
-            : `Are you sure you want to permanently delete this review${isSuperAdmin && confirmAction?.review ? ` from ${confirmAction.review.tenant_name}` : ''}? This action cannot be undone.`
+            ? t('moderation.confirm_hide_review', { tenant: isSuperAdmin && confirmAction?.review ? ` from ${confirmAction.review.tenant_name}` : '' })
+            : t('moderation.confirm_delete_review', { tenant: isSuperAdmin && confirmAction?.review ? ` from ${confirmAction.review.tenant_name}` : '' })
         }
         confirmLabel={
           confirmAction?.type === 'flag'
-            ? 'Flag Review'
+            ? t('moderation.flag_review')
             : confirmAction?.type === 'hide'
-            ? 'Hide Review'
-            : 'Delete Review'
+            ? t('moderation.hide_review')
+            : t('moderation.delete_review')
         }
         confirmColor={
           confirmAction?.type === 'delete' ? 'danger' : 'warning'

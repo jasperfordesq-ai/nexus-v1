@@ -86,20 +86,7 @@ interface InactivityStats {
 // Constants
 // ---------------------------------------------------------------------------
 
-const DAYS_OPTIONS = [
-  { key: '30', label: '30 days' },
-  { key: '60', label: '60 days' },
-  { key: '90', label: '90 days' },
-  { key: '180', label: '180 days' },
-  { key: '365', label: '365 days' },
-];
-
-const FLAG_TYPE_OPTIONS = [
-  { key: '', label: 'All Types' },
-  { key: 'inactive', label: 'Inactive' },
-  { key: 'dormant', label: 'Dormant' },
-  { key: 'at_risk', label: 'At Risk' },
-];
+// DAYS_OPTIONS and FLAG_TYPE_OPTIONS are defined inside the component to access t()
 
 const FLAG_COLORS: Record<string, 'warning' | 'danger' | 'secondary'> = {
   inactive: 'warning',
@@ -139,6 +126,21 @@ export function InactiveMembersPage() {
   const { t } = useTranslation('admin');
   usePageTitle(t('reports.page_title'));
 
+  const DAYS_OPTIONS = [
+    { key: '30', label: t('reports.period_30_days') },
+    { key: '60', label: t('reports.period_60_days') },
+    { key: '90', label: t('reports.period_90_days') },
+    { key: '180', label: t('reports.period_180_days') },
+    { key: '365', label: t('reports.period_365_days') },
+  ];
+
+  const FLAG_TYPE_OPTIONS = [
+    { key: '', label: t('reports.flag_all_types') },
+    { key: 'inactive', label: t('reports.flag_inactive') },
+    { key: 'dormant', label: t('reports.flag_dormant') },
+    { key: 'at_risk', label: t('reports.flag_at_risk') },
+  ];
+
   const toast = useToast();
 
   const [members, setMembers] = useState<InactiveMember[]>([]);
@@ -175,8 +177,9 @@ export function InactiveMembersPage() {
         const tp = meta?.total_pages ?? d.pagination?.total_pages ?? 1;
         setTotalPages(Math.max(1, tp));
       }
-    } catch {
-      // Silently handle
+    } catch (err) {
+      console.error('Failed to load inactive members:', err);
+      toast.error('Failed to load inactive members');
     } finally {
       setLoading(false);
     }
@@ -201,10 +204,11 @@ export function InactiveMembersPage() {
       if (res.data) {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const result = res.data as any;
-        toast.success(`Detection complete: ${result.flagged ?? 0} members flagged`);
+        toast.success(t('reports.detection_complete', { count: result.flagged ?? 0 }));
         await loadData();
       }
-    } catch {
+    } catch (err) {
+      console.error('Detection failed:', err);
       toast.error(t('reports.detection_failed'));
     } finally {
       setDetecting(false);
@@ -225,11 +229,12 @@ export function InactiveMembersPage() {
       if (res.data) {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const result = res.data as any;
-        toast.success(result.message || `${result.updated} members marked as notified`);
+        toast.success(result.message || t('reports.members_marked_notified', { count: result.updated }));
         setSelectedIds(new Set());
         await loadData();
       }
-    } catch {
+    } catch (err) {
+      console.error('Failed to mark members as notified:', err);
       toast.error(t('reports.failed_to_mark_members_as_notified'));
     } finally {
       setNotifying(false);
@@ -300,7 +305,7 @@ export function InactiveMembersPage() {
               isLoading={detecting}
               size="sm"
             >
-              Run Detection
+              {t('reports.run_detection')}
             </Button>
             <Button
               variant="flat"
@@ -308,7 +313,7 @@ export function InactiveMembersPage() {
               onPress={() => exportCsv(days)}
               size="sm"
             >
-              Export CSV
+              {t('reports.export_csv')}
             </Button>
             <Button
               variant="flat"
@@ -317,7 +322,7 @@ export function InactiveMembersPage() {
               isLoading={loading}
               size="sm"
             >
-              Refresh
+              {t('reports.refresh')}
             </Button>
           </div>
         }
@@ -359,7 +364,7 @@ export function InactiveMembersPage() {
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-3 mb-6">
         <Card shadow="sm">
           <CardBody className="p-4">
-            <p className="text-sm text-default-500">Active Members</p>
+            <p className="text-sm text-default-500">{t('reports.active_members')}</p>
             <p className="text-2xl font-bold text-foreground">
               {stats?.total_active_members?.toLocaleString() ?? '\u2014'}
             </p>
@@ -367,7 +372,7 @@ export function InactiveMembersPage() {
         </Card>
         <Card shadow="sm">
           <CardBody className="p-4">
-            <p className="text-sm text-default-500">At Risk</p>
+            <p className="text-sm text-default-500">{t('reports.at_risk')}</p>
             <p className="text-2xl font-bold text-warning">
               {stats?.at_risk_count?.toLocaleString() ?? '\u2014'}
             </p>
@@ -375,7 +380,7 @@ export function InactiveMembersPage() {
         </Card>
         <Card shadow="sm">
           <CardBody className="p-4">
-            <p className="text-sm text-default-500">Already Notified</p>
+            <p className="text-sm text-default-500">{t('reports.already_notified')}</p>
             <p className="text-2xl font-bold text-foreground">
               {stats?.notified_count?.toLocaleString() ?? '\u2014'}
             </p>
@@ -388,7 +393,7 @@ export function InactiveMembersPage() {
         <Card shadow="sm" className="mb-4">
           <CardBody className="flex flex-row items-center gap-4 p-3">
             <span className="text-sm font-medium text-foreground">
-              {selectedIds.size} member{selectedIds.size !== 1 ? 's' : ''} selected
+              {t('reports.members_selected', { count: selectedIds.size })}
             </span>
             <Button
               color="primary"
@@ -397,14 +402,14 @@ export function InactiveMembersPage() {
               onPress={handleNotify}
               isLoading={notifying}
             >
-              Mark as Notified
+              {t('reports.mark_as_notified')}
             </Button>
             <Button
               variant="flat"
               size="sm"
               onPress={() => setSelectedIds(new Set())}
             >
-              Clear Selection
+              {t('reports.clear_selection')}
             </Button>
           </CardBody>
         </Card>
@@ -421,15 +426,15 @@ export function InactiveMembersPage() {
               aria-label={t('reports.label_select_all')}
             />
           </TableColumn>
-          <TableColumn>Member</TableColumn>
-          <TableColumn>Flag Type</TableColumn>
-          <TableColumn>Days Inactive</TableColumn>
-          <TableColumn>Last Activity</TableColumn>
-          <TableColumn>Last Login</TableColumn>
-          <TableColumn>Notified</TableColumn>
+          <TableColumn>{t('reports.col_member')}</TableColumn>
+          <TableColumn>{t('reports.col_flag_type')}</TableColumn>
+          <TableColumn>{t('reports.col_days_inactive')}</TableColumn>
+          <TableColumn>{t('reports.col_last_activity')}</TableColumn>
+          <TableColumn>{t('reports.col_last_login')}</TableColumn>
+          <TableColumn>{t('reports.col_notified')}</TableColumn>
         </TableHeader>
         <TableBody
-          emptyContent="No inactive members found. Run detection to scan."
+          emptyContent={t('reports.no_inactive_members_run_detection')}
           isLoading={loading}
           loadingContent={<Spinner />}
         >
@@ -457,19 +462,19 @@ export function InactiveMembersPage() {
                   variant="flat"
                   color={FLAG_COLORS[m.flag_type] ?? 'default'}
                 >
-                  {m.flag_type.replace('_', ' ')}
+                  {t(`reports.flag_${m.flag_type}`)}
                 </Chip>
               </TableCell>
               <TableCell>
                 <span className={`text-sm font-medium ${m.days_inactive > 180 ? 'text-danger' : m.days_inactive > 90 ? 'text-warning' : 'text-default-600'}`}>
-                  {m.days_inactive} days
+                  {t('reports.days_count', { count: m.days_inactive })}
                 </span>
               </TableCell>
               <TableCell className="text-sm text-default-600">
-                {m.last_activity ? new Date(m.last_activity).toLocaleDateString() : 'Never'}
+                {m.last_activity ? new Date(m.last_activity).toLocaleDateString() : t('reports.never')}
               </TableCell>
               <TableCell className="text-sm text-default-600">
-                {m.last_login ? new Date(m.last_login).toLocaleDateString() : 'Never'}
+                {m.last_login ? new Date(m.last_login).toLocaleDateString() : t('reports.never')}
               </TableCell>
               <TableCell>
                 {m.notified_at ? (
@@ -477,7 +482,7 @@ export function InactiveMembersPage() {
                     {new Date(m.notified_at).toLocaleDateString()}
                   </Chip>
                 ) : (
-                  <Chip size="sm" variant="flat" color="default">Not yet</Chip>
+                  <Chip size="sm" variant="flat" color="default">{t('reports.not_yet')}</Chip>
                 )}
               </TableCell>
             </TableRow>

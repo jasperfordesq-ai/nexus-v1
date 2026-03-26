@@ -121,8 +121,17 @@ interface TopContributor {
   listings_count: number;
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-type ReportData = any;
+interface ReportData extends Partial<EngagementMetrics> {
+  members?: ActiveMember[];
+  data?: ActiveMember[];
+  total?: number;
+  pagination?: { total?: number };
+  trends?: RegistrationTrend[];
+  registrations?: RegistrationTrend[];
+  cohorts?: RetentionCohort[];
+  retention?: RetentionCohort[];
+  contributors?: TopContributor[];
+}
 
 // ---------------------------------------------------------------------------
 // Chart tooltip style
@@ -135,19 +144,7 @@ const tooltipStyle = {
   color: 'hsl(var(--heroui-foreground))',
 };
 
-const GROUP_BY_OPTIONS = [
-  { key: 'daily', label: 'Daily' },
-  { key: 'weekly', label: 'Weekly' },
-  { key: 'monthly', label: 'Monthly' },
-];
-
-const PERIOD_OPTIONS = [
-  { key: '30', label: '30 days' },
-  { key: '60', label: '60 days' },
-  { key: '90', label: '90 days' },
-  { key: '180', label: '180 days' },
-  { key: '365', label: '365 days' },
-];
+// GROUP_BY_OPTIONS and PERIOD_OPTIONS are defined inside the component to access t()
 
 // ---------------------------------------------------------------------------
 // CSV Export helper
@@ -179,8 +176,22 @@ export function MemberReportsPage() {
   const { t } = useTranslation('admin');
   usePageTitle(t('reports.page_title'));
 
+  const GROUP_BY_OPTIONS = [
+    { key: 'daily', label: t('reports.group_by_daily') },
+    { key: 'weekly', label: t('reports.group_by_weekly') },
+    { key: 'monthly', label: t('reports.group_by_monthly') },
+  ];
+
+  const PERIOD_OPTIONS = [
+    { key: '30', label: t('reports.period_30_days') },
+    { key: '60', label: t('reports.period_60_days') },
+    { key: '90', label: t('reports.period_90_days') },
+    { key: '180', label: t('reports.period_180_days') },
+    { key: '365', label: t('reports.period_365_days') },
+  ];
+
   const [reportType, setReportType] = useState('active');
-  const [data, setData] = useState<ReportData>(null);
+  const [data, setData] = useState<ReportData | null>(null);
   const [loading, setLoading] = useState(true);
   const [period, setPeriod] = useState('30');
   const [groupBy, setGroupBy] = useState('monthly');
@@ -223,15 +234,15 @@ export function MemberReportsPage() {
       <>
         <Table aria-label={t('reports.label_active_members')} shadow="sm">
           <TableHeader>
-            <TableColumn>Member</TableColumn>
-            <TableColumn>Last Login</TableColumn>
-            <TableColumn>Transactions</TableColumn>
-            <TableColumn>Hours Given</TableColumn>
-            <TableColumn>Hours Received</TableColumn>
-            <TableColumn>Joined</TableColumn>
+            <TableColumn>{t('reports.col_member')}</TableColumn>
+            <TableColumn>{t('reports.col_last_login')}</TableColumn>
+            <TableColumn>{t('reports.col_transactions')}</TableColumn>
+            <TableColumn>{t('reports.col_hours_given')}</TableColumn>
+            <TableColumn>{t('reports.col_hours_received')}</TableColumn>
+            <TableColumn>{t('reports.col_joined')}</TableColumn>
           </TableHeader>
           <TableBody
-            emptyContent="No active members found"
+            emptyContent={t('reports.no_active_members_found')}
             isLoading={loading}
             loadingContent={<Spinner />}
           >
@@ -248,7 +259,7 @@ export function MemberReportsPage() {
                 </TableCell>
                 <TableCell>
                   <span className="text-sm text-default-600">
-                    {m.last_login ? new Date(m.last_login).toLocaleDateString() : 'Never'}
+                    {m.last_login ? new Date(m.last_login).toLocaleDateString() : t('reports.never')}
                   </span>
                 </TableCell>
                 <TableCell>
@@ -279,7 +290,7 @@ export function MemberReportsPage() {
       <Card shadow="sm">
         <CardHeader className="flex items-center gap-2 px-4 pt-4 pb-0">
           <TrendingUp size={18} className="text-success" />
-          <h3 className="font-semibold">Registration Trends</h3>
+          <h3 className="font-semibold">{t('reports.registration_trends')}</h3>
           <div className="ml-auto">
             <Select
               size="sm"
@@ -308,12 +319,12 @@ export function MemberReportsPage() {
                 <YAxis tick={{ fontSize: 12 }} tickLine={false} allowDecimals={false} />
                 <Tooltip contentStyle={tooltipStyle} />
                 <Legend />
-                <Bar dataKey="count" name="New Registrations" fill={CHART_COLOR_MAP.success} radius={[4, 4, 0, 0]} />
+                <Bar dataKey="count" name={t('reports.new_registrations')} fill={CHART_COLOR_MAP.success} radius={[4, 4, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
           ) : (
             <p className="flex h-[350px] items-center justify-center text-sm text-default-400">
-              No registration data available
+              {t('reports.no_registration_data')}
             </p>
           )}
         </CardBody>
@@ -328,21 +339,21 @@ export function MemberReportsPage() {
       <Card shadow="sm">
         <CardHeader className="flex items-center gap-2 px-4 pt-4 pb-0">
           <UserCheck size={18} className="text-primary" />
-          <h3 className="font-semibold">Retention Cohorts</h3>
+          <h3 className="font-semibold">{t('reports.retention_cohorts')}</h3>
         </CardHeader>
         <CardBody className="px-4 pb-4">
           <Table aria-label={t('reports.label_retention_cohorts')} shadow="sm" isStriped>
             <TableHeader>
-              <TableColumn>Cohort</TableColumn>
-              <TableColumn className="text-center">Initial</TableColumn>
-              <TableColumn className="text-center">Month 1</TableColumn>
-              <TableColumn className="text-center">Month 2</TableColumn>
-              <TableColumn className="text-center">Month 3</TableColumn>
-              <TableColumn className="text-center">Month 6</TableColumn>
-              <TableColumn className="text-center">Month 12</TableColumn>
+              <TableColumn>{t('reports.col_cohort')}</TableColumn>
+              <TableColumn className="text-center">{t('reports.col_initial')}</TableColumn>
+              <TableColumn className="text-center">{t('reports.col_month_1')}</TableColumn>
+              <TableColumn className="text-center">{t('reports.col_month_2')}</TableColumn>
+              <TableColumn className="text-center">{t('reports.col_month_3')}</TableColumn>
+              <TableColumn className="text-center">{t('reports.col_month_6')}</TableColumn>
+              <TableColumn className="text-center">{t('reports.col_month_12')}</TableColumn>
             </TableHeader>
             <TableBody
-              emptyContent="No retention data available"
+              emptyContent={t('reports.no_retention_data')}
               isLoading={loading}
               loadingContent={<Spinner />}
             >
@@ -377,13 +388,13 @@ export function MemberReportsPage() {
   };
 
   const renderEngagement = () => {
-    const metrics = data as EngagementMetrics | null;
+    const metrics = data;
 
     return (
       <div className="space-y-6">
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
           <StatCard
-            label="Login Rate (30d)"
+            label={t('reports.label_login_rate')}
             value={metrics ? `${(Number(metrics.login_rate ?? 0) * 100).toFixed(1)}%` : '\u2014'}
             icon={Users}
             color="primary"
@@ -415,7 +426,7 @@ export function MemberReportsPage() {
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
           <Card shadow="sm">
             <CardBody className="p-4">
-              <p className="text-sm text-default-500">Active (30d) / Total</p>
+              <p className="text-sm text-default-500">{t('reports.active_30d_total')}</p>
               {loading ? (
                 <div className="mt-1 h-7 w-20 animate-pulse rounded bg-default-200" />
               ) : (
@@ -427,7 +438,7 @@ export function MemberReportsPage() {
           </Card>
           <Card shadow="sm">
             <CardBody className="p-4">
-              <p className="text-sm text-default-500">Avg Sessions / User</p>
+              <p className="text-sm text-default-500">{t('reports.avg_sessions_per_user')}</p>
               {loading ? (
                 <div className="mt-1 h-7 w-20 animate-pulse rounded bg-default-200" />
               ) : (
@@ -439,7 +450,7 @@ export function MemberReportsPage() {
           </Card>
           <Card shadow="sm">
             <CardBody className="p-4">
-              <p className="text-sm text-default-500">Avg Transactions / User</p>
+              <p className="text-sm text-default-500">{t('reports.avg_transactions_per_user')}</p>
               {loading ? (
                 <div className="mt-1 h-7 w-20 animate-pulse rounded bg-default-200" />
               ) : (
@@ -461,20 +472,20 @@ export function MemberReportsPage() {
       <Card shadow="sm">
         <CardHeader className="flex items-center gap-2 px-4 pt-4 pb-0">
           <Trophy size={18} className="text-warning" />
-          <h3 className="font-semibold">Top Contributors</h3>
+          <h3 className="font-semibold">{t('reports.top_contributors')}</h3>
         </CardHeader>
         <CardBody className="px-4 pb-4">
           <Table aria-label={t('reports.label_top_contributors')} shadow="sm" isStriped>
             <TableHeader>
-              <TableColumn>Rank</TableColumn>
-              <TableColumn>Member</TableColumn>
-              <TableColumn className="text-right">Given</TableColumn>
-              <TableColumn className="text-right">Received</TableColumn>
-              <TableColumn className="text-right">Transactions</TableColumn>
-              <TableColumn className="text-right">Listings</TableColumn>
+              <TableColumn>{t('reports.col_rank')}</TableColumn>
+              <TableColumn>{t('reports.col_member')}</TableColumn>
+              <TableColumn className="text-right">{t('reports.col_given')}</TableColumn>
+              <TableColumn className="text-right">{t('reports.col_received')}</TableColumn>
+              <TableColumn className="text-right">{t('reports.col_transactions')}</TableColumn>
+              <TableColumn className="text-right">{t('reports.col_listings')}</TableColumn>
             </TableHeader>
             <TableBody
-              emptyContent="No contributor data available"
+              emptyContent={t('reports.no_contributor_data')}
               isLoading={loading}
               loadingContent={<Spinner />}
             >
@@ -513,13 +524,13 @@ export function MemberReportsPage() {
       <>
         <Table aria-label={t('reports.label_least_active_members')} shadow="sm">
           <TableHeader>
-            <TableColumn>Member</TableColumn>
-            <TableColumn>Last Login</TableColumn>
-            <TableColumn>Transactions</TableColumn>
-            <TableColumn>Joined</TableColumn>
+            <TableColumn>{t('reports.col_member')}</TableColumn>
+            <TableColumn>{t('reports.col_last_login')}</TableColumn>
+            <TableColumn>{t('reports.col_transactions')}</TableColumn>
+            <TableColumn>{t('reports.col_joined')}</TableColumn>
           </TableHeader>
           <TableBody
-            emptyContent="No inactive members found"
+            emptyContent={t('reports.no_inactive_members_found')}
             isLoading={loading}
             loadingContent={<Spinner />}
           >
@@ -540,7 +551,7 @@ export function MemberReportsPage() {
                     variant="flat"
                     color={m.last_login ? 'default' : 'danger'}
                   >
-                    {m.last_login ? new Date(m.last_login).toLocaleDateString() : 'Never'}
+                    {m.last_login ? new Date(m.last_login).toLocaleDateString() : t('reports.never')}
                   </Chip>
                 </TableCell>
                 <TableCell className="text-sm">{m.transaction_count}</TableCell>
@@ -591,7 +602,7 @@ export function MemberReportsPage() {
               onPress={() => exportCsv(reportType)}
               size="sm"
             >
-              Export CSV
+              {t('reports.export_csv')}
             </Button>
             <Button
               variant="flat"
@@ -600,7 +611,7 @@ export function MemberReportsPage() {
               isLoading={loading}
               size="sm"
             >
-              Refresh
+              {t('reports.refresh')}
             </Button>
           </div>
         }
@@ -613,12 +624,12 @@ export function MemberReportsPage() {
         color="primary"
         classNames={{ tabList: 'mb-4' }}
       >
-        <Tab key="active" title={<span className="flex items-center gap-1.5"><Users size={14} /> Active</span>} />
-        <Tab key="registrations" title={<span className="flex items-center gap-1.5"><TrendingUp size={14} /> Registrations</span>} />
-        <Tab key="retention" title={<span className="flex items-center gap-1.5"><UserCheck size={14} /> Retention</span>} />
-        <Tab key="engagement" title={<span className="flex items-center gap-1.5"><Activity size={14} /> Engagement</span>} />
-        <Tab key="top_contributors" title={<span className="flex items-center gap-1.5"><Trophy size={14} /> Top Contributors</span>} />
-        <Tab key="least_active" title={<span className="flex items-center gap-1.5"><UserX size={14} /> Least Active</span>} />
+        <Tab key="active" title={<span className="flex items-center gap-1.5"><Users size={14} /> {t('reports.tab_active')}</span>} />
+        <Tab key="registrations" title={<span className="flex items-center gap-1.5"><TrendingUp size={14} /> {t('reports.tab_registrations')}</span>} />
+        <Tab key="retention" title={<span className="flex items-center gap-1.5"><UserCheck size={14} /> {t('reports.tab_retention')}</span>} />
+        <Tab key="engagement" title={<span className="flex items-center gap-1.5"><Activity size={14} /> {t('reports.tab_engagement')}</span>} />
+        <Tab key="top_contributors" title={<span className="flex items-center gap-1.5"><Trophy size={14} /> {t('reports.tab_top_contributors')}</span>} />
+        <Tab key="least_active" title={<span className="flex items-center gap-1.5"><UserX size={14} /> {t('reports.tab_least_active')}</span>} />
       </Tabs>
 
       {reportType === 'active' && renderActiveMembers()}

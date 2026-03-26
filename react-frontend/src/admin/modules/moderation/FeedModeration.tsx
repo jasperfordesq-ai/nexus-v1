@@ -32,32 +32,32 @@ import { adminSuper } from '@/admin/api/adminApi';
 import type { AdminFeedPost } from '@/admin/api/types';
 
 import { useTranslation } from 'react-i18next';
-const POST_TYPES = [
-  { label: 'All Types', value: '' },
-  { label: 'Text Post', value: 'post' },
-  { label: 'Poll', value: 'poll' },
-  { label: 'Event', value: 'event' },
-  { label: 'Listing', value: 'listing' },
-  { label: 'Goal', value: 'goal' },
-  { label: 'Review', value: 'review' },
-  { label: 'Job', value: 'job' },
-  { label: 'Challenge', value: 'challenge' },
-  { label: 'Volunteer', value: 'volunteer' },
-  { label: 'Blog', value: 'blog' },
-  { label: 'Discussion', value: 'discussion' },
-];
 
 export default function FeedModeration() {
   const { t } = useTranslation('admin');
   usePageTitle(t('moderation.page_title'));
 
+  const POST_TYPES = [
+    { label: t('moderation.filter_all_types'), value: '' },
+    { label: t('moderation.post_type_text'), value: 'post' },
+    { label: t('moderation.post_type_poll'), value: 'poll' },
+    { label: t('moderation.content_type_event'), value: 'event' },
+    { label: t('moderation.content_type_listing'), value: 'listing' },
+    { label: t('moderation.post_type_goal'), value: 'goal' },
+    { label: t('moderation.content_type_review'), value: 'review' },
+    { label: t('moderation.post_type_job'), value: 'job' },
+    { label: t('moderation.post_type_challenge'), value: 'challenge' },
+    { label: t('moderation.post_type_volunteer'), value: 'volunteer' },
+    { label: t('moderation.post_type_blog'), value: 'blog' },
+    { label: t('moderation.post_type_discussion'), value: 'discussion' },
+  ];
+
   const toast = useToast();
   const { user } = useAuth();
-  const userRecord = user as Record<string, unknown> | null;
   const isSuperAdmin =
-    (user?.role as string) === 'super_admin' ||
-    userRecord?.is_super_admin === true ||
-    userRecord?.is_tenant_super_admin === true;
+    user?.role === 'super_admin' ||
+    user?.is_super_admin === true ||
+    user?.is_tenant_super_admin === true;
 
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState('');
@@ -134,13 +134,13 @@ export default function FeedModeration() {
       if (response.success) {
         toast.success(
           confirmAction.type === 'hide'
-            ? 'Post hidden successfully'
-            : 'Post deleted successfully'
+            ? t('moderation.post_hidden_successfully')
+            : t('moderation.post_deleted_successfully')
         );
         setConfirmAction(null);
         execute();
       } else {
-        toast.error(response.error || 'Action failed');
+        toast.error(response.error || t('moderation.action_failed'));
       }
     } catch {
       toast.error(t('moderation.an_error_occurred'));
@@ -187,7 +187,7 @@ export default function FeedModeration() {
           <p className="text-sm line-clamp-2">{post.content}</p>
           {post.is_flagged && (
             <Chip size="sm" color="warning" variant="flat" className="mt-1">
-              Flagged
+              {t('moderation.flagged')}
             </Chip>
           )}
         </div>
@@ -199,9 +199,9 @@ export default function FeedModeration() {
       </TableCell>,
       <TableCell key="status">
         {post.is_hidden ? (
-          <Chip size="sm" color="warning" variant="flat">Hidden</Chip>
+          <Chip size="sm" color="warning" variant="flat">{t('moderation.hidden')}</Chip>
         ) : (
-          <Chip size="sm" color="success" variant="flat">Visible</Chip>
+          <Chip size="sm" color="success" variant="flat">{t('moderation.visible')}</Chip>
         )}
       </TableCell>,
       <TableCell key="created">
@@ -219,7 +219,7 @@ export default function FeedModeration() {
               startContent={<EyeOff className="w-4 h-4" />}
               onPress={() => setConfirmAction({ type: 'hide', post })}
             >
-              Hide
+              {t('moderation.hide')}
             </Button>
           )}
           <Button
@@ -229,7 +229,7 @@ export default function FeedModeration() {
             startContent={<Trash2 className="w-4 h-4" />}
             onPress={() => setConfirmAction({ type: 'delete', post })}
           >
-            Delete
+            {t('moderation.delete')}
           </Button>
         </div>
       </TableCell>
@@ -240,14 +240,14 @@ export default function FeedModeration() {
 
   // Determine columns based on super admin status
   const columns = isSuperAdmin
-    ? ['USER', 'TENANT', 'CONTENT', 'TYPE', 'STATUS', 'CREATED', 'ACTIONS']
-    : ['USER', 'CONTENT', 'TYPE', 'STATUS', 'CREATED', 'ACTIONS'];
+    ? [t('moderation.col_user'), t('moderation.col_tenant'), t('moderation.col_content'), t('moderation.col_type'), t('moderation.col_status'), t('moderation.col_created'), t('moderation.col_actions')]
+    : [t('moderation.col_user'), t('moderation.col_content'), t('moderation.col_type'), t('moderation.col_status'), t('moderation.col_created'), t('moderation.col_actions')];
 
   return (
     <div className="space-y-6">
       <PageHeader
         title={t('moderation.feed_moderation_title')}
-        description={isSuperAdmin ? 'Moderate feed posts across all tenants' : 'Moderate feed posts across your community'}
+        description={isSuperAdmin ? t('moderation.feed_desc_super') : t('moderation.feed_desc')}
         actions={
           <Button
             color="primary"
@@ -256,7 +256,7 @@ export default function FeedModeration() {
             onPress={() => execute()}
             isLoading={isLoading}
           >
-            Refresh
+            {t('moderation.refresh')}
           </Button>
         }
       />
@@ -292,7 +292,7 @@ export default function FeedModeration() {
             className="w-full sm:w-56"
           >
             {[
-              <SelectItem key="all">All Tenants</SelectItem>,
+              <SelectItem key="all">{t('moderation.filter_all_tenants')}</SelectItem>,
               ...tenants.map((t) => (
                 <SelectItem key={t.id.toString()}>
                   {t.name}
@@ -303,10 +303,10 @@ export default function FeedModeration() {
         )}
         <div className="flex gap-2">
           <Button color="primary" onPress={handleSearch}>
-            Apply
+            {t('moderation.apply')}
           </Button>
           <Button variant="flat" onPress={handleClear}>
-            Clear
+            {t('moderation.clear')}
           </Button>
         </div>
       </div>
@@ -314,15 +314,15 @@ export default function FeedModeration() {
       {/* Stats */}
       {meta && (
         <div className="text-sm text-default-500">
-          Showing {posts.length} of {meta.total ?? posts.length} posts
-          {isSuperAdmin && !activeTenant && ' (all tenants)'}
+          {t('moderation.showing_count', { shown: posts.length, total: meta.total ?? posts.length, item: t('moderation.items_posts') })}
+          {isSuperAdmin && !activeTenant && ` (${t('moderation.all_tenants')})`}
         </div>
       )}
 
       {/* Error State */}
       {error && (
         <div className="bg-danger-50 dark:bg-danger-950 text-danger border border-danger rounded-lg p-4">
-          Failed to load posts. Please try again.
+          {t('moderation.failed_to_load_posts')}
         </div>
       )}
 
@@ -339,7 +339,7 @@ export default function FeedModeration() {
           loadingContent={<Spinner />}
           emptyContent={
             <div className="text-center py-8 text-default-400">
-              {activeSearch || activeType ? 'No posts match your filters' : 'No posts to moderate'}
+              {activeSearch || activeType ? t('moderation.no_posts_match_filters') : t('moderation.no_posts_to_moderate')}
             </div>
           }
         >
@@ -369,13 +369,13 @@ export default function FeedModeration() {
         isOpen={!!confirmAction}
         onClose={() => setConfirmAction(null)}
         onConfirm={handleAction}
-        title={confirmAction?.type === 'hide' ? 'Hide Post' : 'Delete Post'}
+        title={confirmAction?.type === 'hide' ? t('moderation.hide_post') : t('moderation.delete_post')}
         message={
           confirmAction?.type === 'hide'
-            ? `Are you sure you want to hide this post${isSuperAdmin && confirmAction?.post ? ` from ${confirmAction.post.tenant_name}` : ''}? It will no longer be visible to members.`
-            : `Are you sure you want to permanently delete this post${isSuperAdmin && confirmAction?.post ? ` from ${confirmAction.post.tenant_name}` : ''}? This action cannot be undone.`
+            ? t('moderation.confirm_hide_post', { tenant: isSuperAdmin && confirmAction?.post ? ` from ${confirmAction.post.tenant_name}` : '' })
+            : t('moderation.confirm_delete_post', { tenant: isSuperAdmin && confirmAction?.post ? ` from ${confirmAction.post.tenant_name}` : '' })
         }
-        confirmLabel={confirmAction?.type === 'hide' ? 'Hide Post' : 'Delete Post'}
+        confirmLabel={confirmAction?.type === 'hide' ? t('moderation.hide_post') : t('moderation.delete_post')}
         confirmColor={confirmAction?.type === 'hide' ? 'warning' : 'danger'}
         isLoading={actionLoading}
       />

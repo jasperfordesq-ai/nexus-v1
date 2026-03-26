@@ -32,25 +32,25 @@ import { adminSuper } from '@/admin/api/adminApi';
 import type { AdminComment } from '@/admin/api/types';
 
 import { useTranslation } from 'react-i18next';
-const CONTENT_TYPES = [
-  { label: 'All Types', value: '' },
-  { label: 'Post', value: 'post' },
-  { label: 'Listing', value: 'listing' },
-  { label: 'Event', value: 'event' },
-  { label: 'Group', value: 'group' },
-];
 
 export default function CommentsModeration() {
   const { t } = useTranslation('admin');
   usePageTitle(t('moderation.page_title'));
 
+  const CONTENT_TYPES = [
+    { label: t('moderation.filter_all_types'), value: '' },
+    { label: t('moderation.content_type_post'), value: 'post' },
+    { label: t('moderation.content_type_listing'), value: 'listing' },
+    { label: t('moderation.content_type_event'), value: 'event' },
+    { label: t('moderation.content_type_group'), value: 'group' },
+  ];
+
   const toast = useToast();
   const { user } = useAuth();
-  const userRecord = user as Record<string, unknown> | null;
   const isSuperAdmin =
-    (user?.role as string) === 'super_admin' ||
-    userRecord?.is_super_admin === true ||
-    userRecord?.is_tenant_super_admin === true;
+    user?.role === 'super_admin' ||
+    user?.is_super_admin === true ||
+    user?.is_tenant_super_admin === true;
 
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState('');
@@ -76,8 +76,9 @@ export default function CommentsModeration() {
           name: String(t.name || 'Unknown'),
         })));
       }
-    }).catch(() => {
-      // Tenant list is optional; silently fail
+    }).catch((err) => {
+      console.error('Failed to load tenants:', err);
+      toast.error(t('moderation.failed_to_load_tenants'));
     });
   }, [isSuperAdmin]);
 
@@ -126,13 +127,13 @@ export default function CommentsModeration() {
       if (response.success) {
         toast.success(
           confirmAction.type === 'hide'
-            ? 'Comment hidden successfully'
-            : 'Comment deleted successfully'
+            ? t('moderation.comment_hidden_successfully')
+            : t('moderation.comment_deleted_successfully')
         );
         setConfirmAction(null);
         execute();
       } else {
-        toast.error(response.error || 'Action failed');
+        toast.error(response.error || t('moderation.action_failed'));
       }
     } catch {
       toast.error(t('moderation.an_error_occurred'));
@@ -179,7 +180,7 @@ export default function CommentsModeration() {
           <p className="text-sm line-clamp-2">{comment.content}</p>
           {comment.is_flagged && (
             <Chip size="sm" color="warning" variant="flat" className="mt-1">
-              Flagged
+              {t('moderation.flagged')}
             </Chip>
           )}
         </div>
@@ -203,7 +204,7 @@ export default function CommentsModeration() {
             startContent={<EyeOff className="w-4 h-4" />}
             onPress={() => setConfirmAction({ type: 'hide', comment })}
           >
-            Hide
+            {t('moderation.hide')}
           </Button>
           <Button
             size="sm"
@@ -212,7 +213,7 @@ export default function CommentsModeration() {
             startContent={<Trash2 className="w-4 h-4" />}
             onPress={() => setConfirmAction({ type: 'delete', comment })}
           >
-            Delete
+            {t('moderation.delete')}
           </Button>
         </div>
       </TableCell>
@@ -223,14 +224,14 @@ export default function CommentsModeration() {
 
   // Determine columns based on super admin status
   const columns = isSuperAdmin
-    ? ['USER', 'TENANT', 'COMMENT', 'CONTENT TYPE', 'CREATED', 'ACTIONS']
-    : ['USER', 'COMMENT', 'CONTENT TYPE', 'CREATED', 'ACTIONS'];
+    ? [t('moderation.col_user'), t('moderation.col_tenant'), t('moderation.col_comment'), t('moderation.col_content_type'), t('moderation.col_created'), t('moderation.col_actions')]
+    : [t('moderation.col_user'), t('moderation.col_comment'), t('moderation.col_content_type'), t('moderation.col_created'), t('moderation.col_actions')];
 
   return (
     <div className="space-y-6">
       <PageHeader
         title={t('moderation.comments_moderation_title')}
-        description={isSuperAdmin ? 'Moderate comments across all tenants' : 'Moderate comments across all content types'}
+        description={isSuperAdmin ? t('moderation.comments_desc_super') : t('moderation.comments_desc')}
         actions={
           <Button
             color="primary"
@@ -239,7 +240,7 @@ export default function CommentsModeration() {
             onPress={() => execute()}
             isLoading={isLoading}
           >
-            Refresh
+            {t('moderation.refresh')}
           </Button>
         }
       />
@@ -275,7 +276,7 @@ export default function CommentsModeration() {
             className="w-full sm:w-56"
           >
             {[
-              <SelectItem key="all">All Tenants</SelectItem>,
+              <SelectItem key="all">{t('moderation.filter_all_tenants')}</SelectItem>,
               ...tenants.map((t) => (
                 <SelectItem key={t.id.toString()}>
                   {t.name}
@@ -286,10 +287,10 @@ export default function CommentsModeration() {
         )}
         <div className="flex gap-2">
           <Button color="primary" onPress={handleSearch}>
-            Apply
+            {t('moderation.apply')}
           </Button>
           <Button variant="flat" onPress={handleClear}>
-            Clear
+            {t('moderation.clear')}
           </Button>
         </div>
       </div>
@@ -297,15 +298,15 @@ export default function CommentsModeration() {
       {/* Stats */}
       {meta && (
         <div className="text-sm text-default-500">
-          Showing {comments.length} of {meta.total ?? comments.length} comments
-          {isSuperAdmin && !activeTenant && ' (all tenants)'}
+          {t('moderation.showing_count', { shown: comments.length, total: meta.total ?? comments.length, item: t('moderation.items_comments') })}
+          {isSuperAdmin && !activeTenant && ` (${t('moderation.all_tenants')})`}
         </div>
       )}
 
       {/* Error State */}
       {error && (
         <div className="bg-danger-50 dark:bg-danger-950 text-danger border border-danger rounded-lg p-4">
-          Failed to load comments. Please try again.
+          {t('moderation.failed_to_load_comments')}
         </div>
       )}
 
@@ -323,8 +324,8 @@ export default function CommentsModeration() {
           emptyContent={
             <div className="text-center py-8 text-default-400">
               {activeSearch || activeContentType
-                ? 'No comments match your filters'
-                : 'No comments to moderate'}
+                ? t('moderation.no_comments_match_filters')
+                : t('moderation.no_comments_to_moderate')}
             </div>
           }
         >
@@ -354,13 +355,13 @@ export default function CommentsModeration() {
         isOpen={!!confirmAction}
         onClose={() => setConfirmAction(null)}
         onConfirm={handleAction}
-        title={confirmAction?.type === 'hide' ? 'Hide Comment' : 'Delete Comment'}
+        title={confirmAction?.type === 'hide' ? t('moderation.hide_comment') : t('moderation.delete_comment')}
         message={
           confirmAction?.type === 'hide'
-            ? `Are you sure you want to hide this comment${isSuperAdmin && confirmAction?.comment ? ` from ${confirmAction.comment.tenant_name}` : ''}? It will no longer be visible to members.`
-            : `Are you sure you want to permanently delete this comment${isSuperAdmin && confirmAction?.comment ? ` from ${confirmAction.comment.tenant_name}` : ''}? This action cannot be undone.`
+            ? t('moderation.confirm_hide_comment', { tenant: isSuperAdmin && confirmAction?.comment ? ` from ${confirmAction.comment.tenant_name}` : '' })
+            : t('moderation.confirm_delete_comment', { tenant: isSuperAdmin && confirmAction?.comment ? ` from ${confirmAction.comment.tenant_name}` : '' })
         }
-        confirmLabel={confirmAction?.type === 'hide' ? 'Hide Comment' : 'Delete Comment'}
+        confirmLabel={confirmAction?.type === 'hide' ? t('moderation.hide_comment') : t('moderation.delete_comment')}
         confirmColor={confirmAction?.type === 'hide' ? 'warning' : 'danger'}
         isLoading={actionLoading}
       />
