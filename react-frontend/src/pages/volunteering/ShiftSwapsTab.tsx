@@ -69,7 +69,7 @@ interface ShiftSwap {
 /* ───────────────────────── Component ───────────────────────── */
 
 export function ShiftSwapsTab() {
-  const { t } = useTranslation('community');
+  const { t } = useTranslation('volunteering');
   const toast = useToast();
   const [swaps, setSwaps] = useState<ShiftSwap[]>([]);
   const [isLoading, setIsLoading] = useState(true);

@@ -106,7 +106,7 @@ function getStatusLabel(status: string, t: (key: string, defaultValue: string) =
 /* ───────────────────────── Main Component ───────────────────────── */
 
 export function CredentialVerificationTab() {
-  const { t } = useTranslation('community');
+  const { t } = useTranslation('volunteering');
   const [credentials, setCredentials] = useState<Credential[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);

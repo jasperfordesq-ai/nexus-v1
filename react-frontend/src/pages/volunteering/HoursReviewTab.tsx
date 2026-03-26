@@ -217,11 +217,7 @@ export function HoursReviewTab() {
               <div className="flex flex-wrap items-center gap-2">
                 <span className="font-semibold text-[var(--color-text)]">{entry.user.name}</span>
                 <Chip size="sm" color={statusColor(entry.status)} variant="flat">
-                  {entry.status === 'pending'
-                    ? 'Pending'
-                    : entry.status === 'approved'
-                    ? 'Approved'
-                    : 'Declined'}
+                  {t(`status_${entry.status}`, entry.status.charAt(0).toUpperCase() + entry.status.slice(1))}
                 </Chip>
               </div>
 
@@ -238,7 +234,7 @@ export function HoursReviewTab() {
               <div className="flex flex-wrap items-center gap-3 text-sm">
                 <span className="flex items-center gap-1 text-rose-500 font-medium">
                   <Clock className="w-3.5 h-3.5 shrink-0" aria-hidden="true" />
-                  {entry.hours} {entry.hours === 1 ? 'hour' : 'hours'}
+                  {entry.hours} {entry.hours === 1 ? t('hour', 'hour') : t('hours', 'hours')}
                 </span>
                 <span className="text-[var(--color-text-muted)]">{formatDate(entry.date)}</span>
               </div>
@@ -259,9 +255,9 @@ export function HoursReviewTab() {
                 isLoading={inFlight && entry.status === 'approved'}
                 startContent={!inFlight ? <CheckCircle className="w-4 h-4" aria-hidden="true" /> : undefined}
                 onPress={() => handleAction(entry.id, 'approve')}
-                aria-label={'Approve hours for ' + entry.user.name}
+                aria-label={t('hours_review.approve_aria', 'Approve hours for {{name}}', { name: entry.user.name })}
               >
-                Approve
+                {t('hours_review.approve', 'Approve')}
               </Button>
               <Button
                 size="sm"
@@ -271,9 +267,9 @@ export function HoursReviewTab() {
                 isLoading={inFlight && entry.status === 'declined'}
                 startContent={!inFlight ? <XCircle className="w-4 h-4" aria-hidden="true" /> : undefined}
                 onPress={() => handleAction(entry.id, 'decline')}
-                aria-label={'Decline hours for ' + entry.user.name}
+                aria-label={t('hours_review.decline_aria', 'Decline hours for {{name}}', { name: entry.user.name })}
               >
-                Decline
+                {t('hours_review.decline', 'Decline')}
               </Button>
             </div>
           </GlassCard>

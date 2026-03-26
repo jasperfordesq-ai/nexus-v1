@@ -9,6 +9,7 @@ namespace App\Http\Controllers\Api;
 use App\Services\VolunteerService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 use App\Core\TenantContext;
 
 /**
@@ -35,12 +36,7 @@ class AdminVolunteerController extends BaseApiController
         if (!in_array($table, self::ALLOWED_TABLES, true)) {
             return false;
         }
-        try {
-            DB::select("SELECT 1 FROM `{$table}` LIMIT 1");
-            return true;
-        } catch (\Exception $e) {
-            return false;
-        }
+        return Schema::hasTable($table);
     }
 
     private function columnExists(string $table, string $column): bool
@@ -115,7 +111,8 @@ class AdminVolunteerController extends BaseApiController
                 }
             }
 
-            $sql .= " ORDER BY opp.created_at DESC, opp.id DESC LIMIT " . ($perPage + 1);
+            $sql .= " ORDER BY opp.created_at DESC, opp.id DESC LIMIT ?";
+            $params[] = $perPage + 1;
 
             $results = DB::select($sql, $params);
             $rows = array_map(fn($r) => (array)$r, $results);
@@ -176,7 +173,8 @@ class AdminVolunteerController extends BaseApiController
                 }
             }
 
-            $sql .= " ORDER BY a.created_at DESC, a.id DESC LIMIT " . ($perPage + 1);
+            $sql .= " ORDER BY a.created_at DESC, a.id DESC LIMIT ?";
+            $params[] = $perPage + 1;
 
             $results = DB::select($sql, $params);
             $rows = array_map(fn($r) => (array)$r, $results);
