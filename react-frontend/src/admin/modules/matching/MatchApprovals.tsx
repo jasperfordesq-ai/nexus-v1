@@ -340,7 +340,7 @@ export function MatchApprovals() {
           <Tab key="pending" title={
             <div className="flex items-center gap-2">
               <Clock size={14} />
-              <span>Pending</span>
+              <span>{t('matching.tab_pending')}</span>
               {stats && stats.pending_count > 0 && (
                 <Chip size="sm" variant="flat" color="warning">
                   {stats.pending_count}
@@ -351,19 +351,19 @@ export function MatchApprovals() {
           <Tab key="approved" title={
             <div className="flex items-center gap-2">
               <CheckCircle size={14} />
-              <span>Approved</span>
+              <span>{t('matching.tab_approved')}</span>
             </div>
           } />
           <Tab key="rejected" title={
             <div className="flex items-center gap-2">
               <XCircle size={14} />
-              <span>Rejected</span>
+              <span>{t('matching.tab_rejected')}</span>
             </div>
           } />
           <Tab key="all" title={
             <div className="flex items-center gap-2">
               <Users size={14} />
-              <span>All</span>
+              <span>{t('matching.tab_all')}</span>
             </div>
           } />
         </Tabs>

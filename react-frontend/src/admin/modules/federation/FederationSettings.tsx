@@ -119,15 +119,15 @@ export function FederationSettings() {
           description={t('federation.federation_settings_desc')}
           actions={
             <Button variant="flat" startContent={<RefreshCw size={16} />} onPress={loadData}>
-              Refresh
+              {t('federation.refresh')}
             </Button>
           }
         />
         <Card shadow="sm">
           <CardBody className="flex flex-col items-center py-8 text-default-400">
             <Network size={40} className="mb-2" />
-            <p>Federation feature is not enabled for this tenant.</p>
-            <p className="text-xs">Enable it from Tenant Features to configure settings.</p>
+            <p>{t('federation.not_enabled_for_tenant')}</p>
+            <p className="text-xs">{t('federation.enable_from_tenant_features')}</p>
           </CardBody>
         </Card>
       </div>
@@ -147,7 +147,7 @@ export function FederationSettings() {
               onPress={loadData}
               size="sm"
             >
-              Refresh
+              {t('federation.refresh')}
             </Button>
             <Button
               color="primary"
@@ -157,7 +157,7 @@ export function FederationSettings() {
               isDisabled={!dirty}
               size="sm"
             >
-              Save Changes
+              {t('federation.save_changes')}
             </Button>
           </div>
         }
@@ -165,12 +165,12 @@ export function FederationSettings() {
 
       <div className="space-y-4">
         <Card shadow="sm">
-          <CardHeader><h3 className="text-lg font-semibold">Federation Status</h3></CardHeader>
+          <CardHeader><h3 className="text-lg font-semibold">{t('federation.federation_status')}</h3></CardHeader>
           <CardBody>
             <div className="flex items-center justify-between">
               <div>
-                <p className="font-medium">Federation Enabled</p>
-                <p className="text-sm text-default-500">Allow this community to participate in the federation network</p>
+                <p className="font-medium">{t('federation.federation_enabled')}</p>
+                <p className="text-sm text-default-500">{t('federation.federation_enabled_desc')}</p>
               </div>
               <Switch
                 isSelected={data.federation_enabled}
@@ -182,12 +182,12 @@ export function FederationSettings() {
         </Card>
 
         <Card shadow="sm">
-          <CardHeader><h3 className="text-lg font-semibold">Partnership Preferences</h3></CardHeader>
+          <CardHeader><h3 className="text-lg font-semibold">{t('federation.partnership_preferences')}</h3></CardHeader>
           <CardBody className="space-y-4">
             <div className="flex items-center justify-between">
               <div>
-                <p className="font-medium">Allow Inbound Partnerships</p>
-                <p className="text-sm text-default-500">Other communities can request to partner with you</p>
+                <p className="font-medium">{t('federation.allow_inbound_partnerships')}</p>
+                <p className="text-sm text-default-500">{t('federation.allow_inbound_partnerships_desc')}</p>
               </div>
               <Switch
                 isSelected={data.settings?.allow_inbound_partnerships ?? true}
@@ -198,8 +198,8 @@ export function FederationSettings() {
             <Divider />
             <div className="flex items-center justify-between">
               <div>
-                <p className="font-medium">Auto-Approve Partners</p>
-                <p className="text-sm text-default-500">Automatically approve incoming partnership requests</p>
+                <p className="font-medium">{t('federation.auto_approve_partners')}</p>
+                <p className="text-sm text-default-500">{t('federation.auto_approve_partners_desc')}</p>
               </div>
               <Switch
                 isSelected={data.settings?.auto_approve_partners ?? false}
@@ -210,8 +210,8 @@ export function FederationSettings() {
             <Divider />
             <div className="flex items-center justify-between gap-4">
               <div>
-                <p className="font-medium">Max Partnerships</p>
-                <p className="text-sm text-default-500">Maximum number of active partnerships allowed</p>
+                <p className="font-medium">{t('federation.max_partnerships')}</p>
+                <p className="text-sm text-default-500">{t('federation.max_partnerships_desc')}</p>
               </div>
               <Input
                 type="number"

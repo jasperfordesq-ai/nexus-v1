@@ -55,11 +55,11 @@ export function EnterpriseDashboard() {
   const healthColor = stats?.health_status === 'healthy' ? 'success' : stats?.health_status === 'degraded' ? 'warning' : 'danger';
 
   const quickLinks = [
-    { label: 'Roles & Permissions', href: tenantPath('/admin/enterprise/roles'), icon: Shield },
-    { label: 'GDPR Dashboard', href: tenantPath('/admin/enterprise/gdpr'), icon: FileWarning },
-    { label: 'System Monitoring', href: tenantPath('/admin/enterprise/monitoring'), icon: HeartPulse },
-    { label: 'System Configuration', href: tenantPath('/admin/enterprise/config'), icon: Shield },
-    { label: 'Legal Documents', href: tenantPath('/admin/legal-documents'), icon: FileWarning },
+    { label: t('enterprise.link_roles_permissions'), href: tenantPath('/admin/enterprise/roles'), icon: Shield },
+    { label: t('enterprise.link_gdpr_dashboard'), href: tenantPath('/admin/enterprise/gdpr'), icon: FileWarning },
+    { label: t('enterprise.link_system_monitoring'), href: tenantPath('/admin/enterprise/monitoring'), icon: HeartPulse },
+    { label: t('enterprise.link_system_configuration'), href: tenantPath('/admin/enterprise/config'), icon: Shield },
+    { label: t('enterprise.link_legal_documents'), href: tenantPath('/admin/legal-documents'), icon: FileWarning },
   ];
 
   return (
@@ -75,7 +75,7 @@ export function EnterpriseDashboard() {
             isLoading={loading}
             size="sm"
           >
-            Refresh
+            {t('common.refresh')}
           </Button>
         }
       />
@@ -115,7 +115,7 @@ export function EnterpriseDashboard() {
       {/* Quick Links */}
       <Card shadow="sm">
         <CardBody className="p-4">
-          <h3 className="text-lg font-semibold text-foreground mb-4">Quick Links</h3>
+          <h3 className="text-lg font-semibold text-foreground mb-4">{t('enterprise.quick_links')}</h3>
           {loading ? (
             <div className="flex justify-center py-8">
               <Spinner />

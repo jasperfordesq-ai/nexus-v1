@@ -53,10 +53,10 @@ export function GamificationHub() {
     const res = await adminGamification.recheckAll();
     if (res.success) {
       const data = res.data as { users_checked?: number; message?: string } | undefined;
-      toast.success(data?.message || 'Badge recheck completed');
+      toast.success(data?.message || t('gamification.badge_recheck_completed'));
       loadStats();
     } else {
-      toast.error(res.error || 'Badge recheck failed');
+      toast.error(res.error || t('gamification.badge_recheck_failed'));
     }
     setRechecking(false);
   };
@@ -76,7 +76,7 @@ export function GamificationHub() {
             onPress={handleRecheckAll}
             isLoading={rechecking}
           >
-            Recheck All Badges
+            {t('gamification.recheck_all_badges')}
           </Button>
         }
       />
@@ -118,8 +118,8 @@ export function GamificationHub() {
         <Card shadow="sm" className="lg:col-span-2">
           <CardHeader className="flex items-center justify-between pb-0">
             <div>
-              <h3 className="text-lg font-semibold text-foreground">Badge Distribution</h3>
-              <p className="text-sm text-default-500">Top 10 most awarded badges</p>
+              <h3 className="text-lg font-semibold text-foreground">{t('gamification.badge_distribution')}</h3>
+              <p className="text-sm text-default-500">{t('gamification.top_10_badges')}</p>
             </div>
           </CardHeader>
           <CardBody>
@@ -149,7 +149,7 @@ export function GamificationHub() {
             ) : (
               <div className="flex flex-col items-center justify-center py-12 text-center">
                 <Award size={40} className="text-default-300 mb-2" />
-                <p className="text-default-500">No badges awarded yet</p>
+                <p className="text-default-500">{t('gamification.no_badges_awarded')}</p>
               </div>
             )}
           </CardBody>
@@ -158,7 +158,7 @@ export function GamificationHub() {
         {/* Quick Links */}
         <Card shadow="sm">
           <CardHeader className="pb-0">
-            <h3 className="text-lg font-semibold text-foreground">Quick Links</h3>
+            <h3 className="text-lg font-semibold text-foreground">{t('gamification.quick_links')}</h3>
           </CardHeader>
           <CardBody className="gap-3">
             <Link to="../gamification/campaigns" className="block">
@@ -168,8 +168,8 @@ export function GamificationHub() {
                     <Megaphone size={20} />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="font-medium text-foreground">Campaigns</p>
-                    <p className="text-xs text-default-500">Manage badge campaigns</p>
+                    <p className="font-medium text-foreground">{t('gamification.campaigns')}</p>
+                    <p className="text-xs text-default-500">{t('gamification.manage_badge_campaigns')}</p>
                   </div>
                   <ArrowRight size={16} className="text-default-400" />
                 </CardBody>
@@ -183,8 +183,8 @@ export function GamificationHub() {
                     <Award size={20} />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="font-medium text-foreground">Custom Badges</p>
-                    <p className="text-xs text-default-500">Create and manage badges</p>
+                    <p className="font-medium text-foreground">{t('gamification.custom_badges')}</p>
+                    <p className="text-xs text-default-500">{t('gamification.create_and_manage_badges')}</p>
                   </div>
                   <ArrowRight size={16} className="text-default-400" />
                 </CardBody>
@@ -198,8 +198,8 @@ export function GamificationHub() {
                     <BarChart3 size={20} />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="font-medium text-foreground">Analytics</p>
-                    <p className="text-xs text-default-500">Gamification insights</p>
+                    <p className="font-medium text-foreground">{t('gamification.analytics')}</p>
+                    <p className="text-xs text-default-500">{t('gamification.gamification_insights')}</p>
                   </div>
                   <ArrowRight size={16} className="text-default-400" />
                 </CardBody>

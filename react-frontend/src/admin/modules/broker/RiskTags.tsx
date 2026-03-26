@@ -607,7 +607,7 @@ export function RiskTagsPage() {
             <Button variant="flat" onPress={closeModal}>
               Cancel
             </Button>
-            <Button color="primary" onPress={handleSave} isLoading={saving}>
+            <Button color="primary" onPress={handleSave} isLoading={saving} isDisabled={saving}>
               {editingTag ? 'Update Tag' : 'Create Tag'}
             </Button>
           </ModalFooter>

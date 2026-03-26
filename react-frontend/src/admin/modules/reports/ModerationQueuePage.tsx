@@ -100,6 +100,17 @@ interface ModerationStats {
   }>;
 }
 
+interface ModerationQueueResponse {
+  data?: ModerationItem[];
+  items?: ModerationItem[];
+  pagination?: { total_pages: number };
+}
+
+interface ApiResponseWithMeta {
+  data?: unknown;
+  meta?: { total_pages?: number };
+}
+
 interface ModerationSettings {
   enabled: boolean;
   require_post: boolean;
@@ -194,11 +205,9 @@ export function ModerationQueuePage() {
         if (Array.isArray(d)) {
           setItems(d as ModerationItem[]);
         } else {
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          const obj = d as any;
+          const obj = d as ModerationQueueResponse;
           setItems(obj.data ?? obj.items ?? []);
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          const meta = (res as any).meta as Record<string, number> | undefined;
+          const meta = (res as ApiResponseWithMeta).meta;
           setTotalPages(Math.max(1, meta?.total_pages ?? obj.pagination?.total_pages ?? 1));
         }
       }
@@ -348,6 +357,7 @@ export function ModerationQueuePage() {
               startContent={<RefreshCw size={16} />}
               onPress={() => { loadQueue(); loadStats(); }}
               isLoading={loading}
+              isDisabled={loading}
               size="sm"
             >
               {t('moderation.refresh')}
@@ -536,6 +546,7 @@ export function ModerationQueuePage() {
                       isIconOnly
                       onPress={() => handleApprove(item.id)}
                       isLoading={actionLoading === item.id}
+                      isDisabled={actionLoading !== null}
                       aria-label={t('reports.label_approve')}
                     >
                       <CheckCircle size={16} />
@@ -547,6 +558,7 @@ export function ModerationQueuePage() {
                       isIconOnly
                       onPress={() => openRejectModal(item.id)}
                       isLoading={actionLoading === item.id}
+                      isDisabled={actionLoading !== null}
                       aria-label={t('reports.label_reject')}
                     >
                       <XCircle size={16} />
@@ -590,7 +602,7 @@ export function ModerationQueuePage() {
           </ModalBody>
           <ModalFooter>
             <Button variant="flat" onPress={onRejectClose}>{t('moderation.cancel')}</Button>
-            <Button color="danger" onPress={handleReject} isLoading={actionLoading !== null}>
+            <Button color="danger" onPress={handleReject} isLoading={actionLoading !== null} isDisabled={actionLoading !== null}>
               {t('moderation.reject_content')}
             </Button>
           </ModalFooter>
@@ -668,7 +680,7 @@ export function ModerationQueuePage() {
           </ModalBody>
           <ModalFooter>
             <Button variant="flat" onPress={onSettingsClose}>{t('moderation.cancel')}</Button>
-            <Button color="primary" onPress={handleSaveSettings} isLoading={savingSettings}>
+            <Button color="primary" onPress={handleSaveSettings} isLoading={savingSettings} isDisabled={savingSettings}>
               {t('moderation.save_settings')}
             </Button>
           </ModalFooter>

@@ -540,7 +540,7 @@ export function MenuBuilder() {
   return (
     <div>
       <PageHeader
-        title={isEdit ? 'Edit Menu' : 'New Menu'}
+        title={isEdit ? `${t('breadcrumbs.edit')} ${t('breadcrumbs.menus')}` : `${t('breadcrumbs.create')} ${t('breadcrumbs.menus')}`}
         description={t('content.menu_builder_desc')}
         actions={
           <div className="flex gap-2">
@@ -549,7 +549,7 @@ export function MenuBuilder() {
               startContent={<ArrowLeft size={16} />}
               onPress={() => navigate(tenantPath('/admin/menus'))}
             >
-              Back
+              {t('common.back')}
             </Button>
             <Button
               color="primary"
@@ -557,7 +557,7 @@ export function MenuBuilder() {
               onPress={handleSave}
               isLoading={saving}
             >
-              {isEdit ? 'Save' : 'Create'} Menu
+              {isEdit ? t('federation.save_changes') : `${t('breadcrumbs.create')} ${t('breadcrumbs.menus')}`}
             </Button>
           </div>
         }
@@ -569,7 +569,7 @@ export function MenuBuilder() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <Input
               label={t('content.label_menu_name')}
-              placeholder="e.g., Main Navigation"
+              placeholder={t('content.placeholder_menu_item_text')}
               isRequired
               variant="bordered"
               value={formData.name}
@@ -603,7 +603,7 @@ export function MenuBuilder() {
                 onValueChange={(v) => handleChange('is_active', v)}
                 size="sm"
               >
-                <span className="text-sm">Active</span>
+                <span className="text-sm">{t('content.label_active')}</span>
               </Switch>
             </div>
           </div>
@@ -616,7 +616,7 @@ export function MenuBuilder() {
           <Card shadow="sm">
             <CardHeader className="flex items-center justify-between">
               <h3 className="text-lg font-semibold flex items-center gap-2">
-                <Menu size={20} /> Menu Items
+                <Menu size={20} /> {t('content.menu_builder_title')}
                 <Chip size="sm" variant="flat">{menuItems.length}</Chip>
               </h3>
               <Button
@@ -626,21 +626,21 @@ export function MenuBuilder() {
                 startContent={<Plus size={14} />}
                 onPress={handleAddItem}
               >
-                Add Item
+                {t('federation.add')}
               </Button>
             </CardHeader>
             <CardBody>
               {menuItems.length === 0 ? (
                 <div className="flex flex-col items-center py-12 text-default-400">
                   <Menu size={40} className="mb-3" />
-                  <p className="text-sm mb-3">No menu items yet</p>
+                  <p className="text-sm mb-3">{t('no_data')}</p>
                   <Button
                     size="sm"
                     color="primary"
                     startContent={<Plus size={14} />}
                     onPress={handleAddItem}
                   >
-                    Add First Item
+                    {t('federation.add')}
                   </Button>
                 </div>
               ) : (
@@ -677,14 +677,14 @@ export function MenuBuilder() {
           <Card shadow="sm" className="sticky top-20">
             <CardHeader>
               <h3 className="text-lg font-semibold">
-                {selectedItemId ? 'Edit Item' : 'Item Editor'}
+                {selectedItemId ? t('content.label_edit_item') : t('content.menu_builder_title')}
               </h3>
             </CardHeader>
             <CardBody className="gap-3">
               {!selectedItemId ? (
                 <div className="flex flex-col items-center py-8 text-default-400">
                   <Pencil size={32} className="mb-3" />
-                  <p className="text-sm">Select an item to edit, or add a new one</p>
+                  <p className="text-sm">{t('content.menu_builder_desc')}</p>
                 </div>
               ) : (
                 <>
@@ -769,8 +769,8 @@ export function MenuBuilder() {
                         if (sel) setEditForm((f) => ({ ...f, target: sel }));
                       }}
                     >
-                      <SelectItem key="_self">Same window</SelectItem>
-                      <SelectItem key="_blank">New tab</SelectItem>
+                      <SelectItem key="_self">{t('content.same_window', 'Same window')}</SelectItem>
+                      <SelectItem key="_blank">{t('content.new_tab', 'New tab')}</SelectItem>
                     </Select>
                   )}
 
@@ -787,7 +787,7 @@ export function MenuBuilder() {
                       }}
                     >
                       {[
-                        { key: '', label: 'None (top level)' },
+                        { key: '', label: t('content.none_top_level', 'None (top level)') },
                         ...parentOptions,
                       ].map((opt) => (
                         <SelectItem key={opt.key}>{opt.label}</SelectItem>
@@ -803,7 +803,7 @@ export function MenuBuilder() {
                   >
                     <span className="text-sm flex items-center gap-1.5">
                       {editForm.is_active ? <Eye size={14} /> : <EyeOff size={14} />}
-                      {editForm.is_active ? 'Visible' : 'Hidden'}
+                      {editForm.is_active ? t('moderation.visible', 'Visible') : t('moderation.hidden', 'Hidden')}
                     </span>
                   </Switch>
 
@@ -816,7 +816,7 @@ export function MenuBuilder() {
                     onPress={() => setShowAdvanced(!showAdvanced)}
                   >
                     {showAdvanced ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
-                    Advanced options
+                    {t('content.advanced_options', 'Advanced options')}
                   </Button>
 
                   {showAdvanced && (
@@ -847,14 +847,14 @@ export function MenuBuilder() {
                       className="flex-1"
                       onPress={handleUpdateItem}
                     >
-                      Save Item
+                      {t('federation.save_changes')}
                     </Button>
                     <Button
                       variant="flat"
                       size="sm"
                       onPress={clearSelection}
                     >
-                      Cancel
+                      {t('cancel')}
                     </Button>
                   </div>
                 </>

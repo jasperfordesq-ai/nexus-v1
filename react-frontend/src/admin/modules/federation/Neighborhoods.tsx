@@ -228,10 +228,10 @@ export function Neighborhoods() {
         actions={
           <div className="flex items-center gap-2">
             <Button variant="flat" size="sm" startContent={<RefreshCw size={16} />} onPress={() => loadData()}>
-              Refresh
+              {t('federation.refresh')}
             </Button>
             <Button color="primary" size="sm" startContent={<Plus size={16} />} onPress={createModal.onOpen}>
-              New Neighborhood
+              {t('federation.new_neighborhood')}
             </Button>
           </div>
         }
@@ -250,15 +250,15 @@ export function Neighborhoods() {
         <Card shadow="sm">
           <CardBody className="flex flex-col items-center py-12 text-default-400">
             <MapPin size={48} className="mb-4" />
-            <p className="text-lg font-medium">No neighborhoods yet</p>
-            <p className="text-sm">Create a neighborhood to group communities for collaboration.</p>
+            <p className="text-lg font-medium">{t('federation.no_neighborhoods_yet')}</p>
+            <p className="text-sm">{t('federation.no_neighborhoods_desc')}</p>
             <Button
               color="primary"
               className="mt-4"
               startContent={<Plus size={16} />}
               onPress={createModal.onOpen}
             >
-              Create Neighborhood
+              {t('federation.create_neighborhood')}
             </Button>
           </CardBody>
         </Card>
@@ -292,15 +292,15 @@ export function Neighborhoods() {
                 <div className="flex items-center gap-4 text-sm text-default-500">
                   <span className="flex items-center gap-1">
                     <Building2 size={14} />
-                    {neighborhood.tenants.length} communities
+                    {t('federation.communities_count', { count: neighborhood.tenants.length })}
                   </span>
                   <span className="flex items-center gap-1">
                     <Users size={14} />
-                    {neighborhood.total_members} members
+                    {t('federation.members_count', { count: neighborhood.total_members })}
                   </span>
                   <span className="flex items-center gap-1">
                     <Calendar size={14} />
-                    {neighborhood.shared_events_count} shared events
+                    {t('federation.shared_events_count', { count: neighborhood.shared_events_count })}
                   </span>
                 </div>
 
@@ -309,7 +309,7 @@ export function Neighborhoods() {
                 {/* Tenants list */}
                 <div className="space-y-2">
                   <div className="flex items-center justify-between">
-                    <span className="text-sm font-medium text-default-600">Communities</span>
+                    <span className="text-sm font-medium text-default-600">{t('federation.communities')}</span>
                     <Button
                       size="sm"
                       variant="flat"
@@ -319,12 +319,12 @@ export function Neighborhoods() {
                         addTenantModal.onOpen();
                       }}
                     >
-                      Add
+                      {t('federation.add')}
                     </Button>
                   </div>
 
                   {neighborhood.tenants.length === 0 ? (
-                    <p className="text-sm text-default-400 py-2">No communities in this neighborhood yet.</p>
+                    <p className="text-sm text-default-400 py-2">{t('federation.no_communities_in_neighborhood')}</p>
                   ) : (
                     <div className="space-y-1.5">
                       {neighborhood.tenants.map((tenant) => (
@@ -341,7 +341,7 @@ export function Neighborhoods() {
                             <div>
                               <p className="text-sm font-medium">{tenant.name}</p>
                               <p className="text-xs text-default-400">
-                                {tenant.member_count} members · {tenant.slug}
+                                {t('federation.members_count', { count: tenant.member_count })} · {tenant.slug}
                               </p>
                             </div>
                           </div>
@@ -350,7 +350,7 @@ export function Neighborhoods() {
                             variant="light"
                             isIconOnly
                             color="danger"
-                            aria-label={`Remove ${tenant.name}`}
+                            aria-label={t('federation.remove_name', { name: tenant.name })}
                             onPress={() => handleRemoveTenant(neighborhood.id, tenant.id)}
                           >
                             <X size={14} />
@@ -362,7 +362,7 @@ export function Neighborhoods() {
                 </div>
 
                 <div className="text-xs text-default-400 pt-1">
-                  Created {formatRelativeTime(neighborhood.created_at)}
+                  {t('federation.created_time', { time: formatRelativeTime(neighborhood.created_at) })}
                 </div>
               </CardBody>
             </Card>
@@ -377,12 +377,12 @@ export function Neighborhoods() {
             <>
               <ModalHeader className="flex items-center gap-2">
                 <MapPin size={20} />
-                New Neighborhood
+                {t('federation.new_neighborhood')}
               </ModalHeader>
               <ModalBody className="gap-4">
                 <Input
                   label={t('federation.label_name')}
-                  placeholder="e.g., Greater London Area"
+                  placeholder={t('federation.placeholder_neighborhood_name')}
                   value={newName}
                   onChange={(e) => setNewName(e.target.value)}
                 />
@@ -395,14 +395,14 @@ export function Neighborhoods() {
                 />
               </ModalBody>
               <ModalFooter>
-                <Button variant="flat" onPress={onClose}>Cancel</Button>
+                <Button variant="flat" onPress={onClose}>{t('federation.cancel')}</Button>
                 <Button
                   color="primary"
                   isLoading={creating}
                   isDisabled={!newName.trim()}
                   onPress={handleCreate}
                 >
-                  Create
+                  {t('federation.create')}
                 </Button>
               </ModalFooter>
             </>
@@ -417,7 +417,7 @@ export function Neighborhoods() {
             <>
               <ModalHeader className="flex items-center gap-2">
                 <UserPlus size={20} />
-                Add Community to {addToNeighborhood?.name}
+                {t('federation.add_community_to', { name: addToNeighborhood?.name })}
               </ModalHeader>
               <ModalBody>
                 <Select
@@ -437,14 +437,14 @@ export function Neighborhoods() {
                 </Select>
               </ModalBody>
               <ModalFooter>
-                <Button variant="flat" onPress={onClose}>Cancel</Button>
+                <Button variant="flat" onPress={onClose}>{t('federation.cancel')}</Button>
                 <Button
                   color="primary"
                   isLoading={addingTenant}
                   isDisabled={!selectedTenantId}
                   onPress={handleAddTenant}
                 >
-                  Add Community
+                  {t('federation.add_community')}
                 </Button>
               </ModalFooter>
             </>

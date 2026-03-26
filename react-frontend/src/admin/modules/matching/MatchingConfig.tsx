@@ -37,7 +37,7 @@ import type { SmartMatchingConfig } from '../../api/types';
 
 import { useTranslation } from 'react-i18next';
 /** Proximity band label mapping */
-const BAND_LABELS = ['Walking', 'Local', 'City', 'Regional', 'Max'];
+const BAND_LABEL_KEYS = ['matching.band_walking', 'matching.band_local', 'matching.band_city', 'matching.band_regional', 'matching.band_max'];
 
 /** Default config for reset */
 const DEFAULT_CONFIG: SmartMatchingConfig = {
@@ -135,7 +135,7 @@ export function MatchingConfig() {
   /** Save config to API */
   const handleSave = useCallback(async () => {
     if (!totalValid) {
-      toast.error(`Weights must sum to approximately 100% (currently ${totalPct}%)`);
+      toast.error(t('matching.weights_must_sum_to_100', { pct: totalPct }));
       return;
     }
 
@@ -162,7 +162,7 @@ export function MatchingConfig() {
       const res = await adminMatching.clearCache();
       if (res.success) {
         const cleared = (res.data as { entries_cleared?: number })?.entries_cleared ?? 0;
-        toast.success(`Match cache cleared (${cleared} entries removed)`);
+        toast.success(t('matching.cache_cleared', { count: cleared }));
         setClearModalOpen(false);
       } else {
         toast.error(t('matching.failed_to_clear_cache'));
@@ -209,7 +209,7 @@ export function MatchingConfig() {
               onPress={() => navigate(tenantPath('/admin/smart-matching'))}
               size="sm"
             >
-              Back
+              {t('matching.back')}
             </Button>
             <Button
               color="primary"
@@ -219,7 +219,7 @@ export function MatchingConfig() {
               isDisabled={!dirty}
               size="sm"
             >
-              Save Changes
+              {t('matching.save_changes')}
             </Button>
           </div>
         }
@@ -229,15 +229,15 @@ export function MatchingConfig() {
         {/* Algorithm Toggles */}
         <Card shadow="sm">
           <CardHeader className="px-4 pt-4 pb-0">
-            <h3 className="font-semibold">Algorithm Settings</h3>
+            <h3 className="font-semibold">{t('matching.algorithm_settings')}</h3>
           </CardHeader>
           <CardBody className="px-4 pb-4">
             <div className="space-y-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-medium">Smart Matching Enabled</p>
+                  <p className="text-sm font-medium">{t('matching.smart_matching_enabled')}</p>
                   <p className="text-xs text-default-500">
-                    Enable or disable the matching algorithm for this community
+                    {t('matching.smart_matching_enabled_desc')}
                   </p>
                 </div>
                 <Switch
@@ -252,9 +252,9 @@ export function MatchingConfig() {
               <Divider />
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-medium">Broker Approval Required</p>
+                  <p className="text-sm font-medium">{t('matching.broker_approval_required')}</p>
                   <p className="text-xs text-default-500">
-                    Require broker review before matches are shown to users
+                    {t('matching.broker_approval_required_desc')}
                   </p>
                 </div>
                 <Switch
@@ -270,7 +270,7 @@ export function MatchingConfig() {
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
                 <Input
                   type="number"
-                  label="Max Distance (km)"
+                  label={t('matching.label_max_distance')}
                   value={String(config.max_distance_km ?? 50)}
                   onValueChange={(val) => {
                     setConfig((prev) => ({ ...prev, max_distance_km: parseInt(val) || 50 }));
@@ -309,14 +309,14 @@ export function MatchingConfig() {
         {/* Algorithm Weights */}
         <Card shadow="sm">
           <CardHeader className="flex items-center justify-between px-4 pt-4 pb-0">
-            <h3 className="font-semibold">Algorithm Weights</h3>
+            <h3 className="font-semibold">{t('matching.algorithm_weights')}</h3>
             <span
               className={`text-sm font-medium ${
                 totalValid ? 'text-success' : 'text-danger'
               }`}
             >
-              Total: {totalPct}%
-              {!totalValid && ' (should be ~100%)'}
+              {t('matching.total')}: {totalPct}%
+              {!totalValid && ` (${t('matching.should_be_100')})`}
             </span>
           </CardHeader>
           <CardBody className="px-4 pb-4">
@@ -370,12 +370,11 @@ export function MatchingConfig() {
         {/* Proximity Bands */}
         <Card shadow="sm">
           <CardHeader className="px-4 pt-4 pb-0">
-            <h3 className="font-semibold">Proximity Bands</h3>
+            <h3 className="font-semibold">{t('matching.proximity_bands')}</h3>
           </CardHeader>
           <CardBody className="px-4 pb-4">
             <p className="text-sm text-default-500 mb-4">
-              Configure distance thresholds and their corresponding score multipliers.
-              Closer distances receive higher scores.
+              {t('matching.proximity_bands_desc')}
             </p>
             <Table
               aria-label={t('matching.label_proximity_bands_configuration')}
@@ -383,16 +382,16 @@ export function MatchingConfig() {
               isCompact
             >
               <TableHeader>
-                <TableColumn>BAND</TableColumn>
-                <TableColumn>DISTANCE (km)</TableColumn>
-                <TableColumn>SCORE</TableColumn>
+                <TableColumn>{t('matching.col_band')}</TableColumn>
+                <TableColumn>{t('matching.col_distance_km')}</TableColumn>
+                <TableColumn>{t('matching.col_score')}</TableColumn>
               </TableHeader>
               <TableBody>
                 {(config.proximity_bands || []).map((band, i) => (
                   <TableRow key={i}>
                     <TableCell>
                       <span className="text-sm font-medium">
-                        {BAND_LABELS[i] ?? `Band ${i + 1}`}
+                        {BAND_LABEL_KEYS[i] ? t(BAND_LABEL_KEYS[i]) : `Band ${i + 1}`}
                       </span>
                     </TableCell>
                     <TableCell>
@@ -405,7 +404,7 @@ export function MatchingConfig() {
                         variant="bordered"
                         size="sm"
                         className="w-24"
-                        aria-label={`${BAND_LABELS[i] ?? `Band ${i + 1}`} distance`}
+                        aria-label={`${BAND_LABEL_KEYS[i] ? t(BAND_LABEL_KEYS[i]) : `Band ${i + 1}`} distance`}
                       />
                     </TableCell>
                     <TableCell>
@@ -421,7 +420,7 @@ export function MatchingConfig() {
                         step={0.1}
                         min={0}
                         max={1}
-                        aria-label={`${BAND_LABELS[i] ?? `Band ${i + 1}`} score`}
+                        aria-label={`${BAND_LABEL_KEYS[i] ? t(BAND_LABEL_KEYS[i]) : `Band ${i + 1}`} score`}
                       />
                     </TableCell>
                   </TableRow>
@@ -434,7 +433,7 @@ export function MatchingConfig() {
         {/* Cache Management & Actions */}
         <Card shadow="sm">
           <CardHeader className="px-4 pt-4 pb-0">
-            <h3 className="font-semibold">Cache Management</h3>
+            <h3 className="font-semibold">{t('matching.cache_management')}</h3>
           </CardHeader>
           <CardBody className="px-4 pb-4">
             <div className="flex flex-wrap gap-3">
@@ -444,7 +443,7 @@ export function MatchingConfig() {
                 startContent={<Trash2 size={16} />}
                 onPress={() => setClearModalOpen(true)}
               >
-                Clear Match Cache
+                {t('matching.clear_match_cache')}
               </Button>
               <Button
                 color="warning"
@@ -452,7 +451,7 @@ export function MatchingConfig() {
                 startContent={<RotateCcw size={16} />}
                 onPress={() => setResetModalOpen(true)}
               >
-                Reset to Defaults
+                {t('matching.reset_to_defaults')}
               </Button>
             </div>
           </CardBody>
@@ -464,9 +463,9 @@ export function MatchingConfig() {
         isOpen={clearModalOpen}
         onClose={() => setClearModalOpen(false)}
         onConfirm={handleClearCache}
-        title="Clear Match Cache"
-        message="This will remove all cached matches for this tenant. New matches will be recalculated on next request. This action cannot be undone."
-        confirmLabel="Clear Cache"
+        title={t('matching.clear_match_cache')}
+        message={t('matching.clear_cache_confirm')}
+        confirmLabel={t('matching.clear_cache_btn')}
         confirmColor="danger"
         isLoading={clearing}
       />
@@ -476,9 +475,9 @@ export function MatchingConfig() {
         isOpen={resetModalOpen}
         onClose={() => setResetModalOpen(false)}
         onConfirm={handleReset}
-        title="Reset to Defaults"
-        message="This will reset all algorithm weights and settings to their default values. You will still need to save to apply the changes."
-        confirmLabel="Reset"
+        title={t('matching.reset_to_defaults')}
+        message={t('matching.reset_defaults_confirm')}
+        confirmLabel={t('matching.reset_btn')}
         confirmColor="warning"
       />
     </div>

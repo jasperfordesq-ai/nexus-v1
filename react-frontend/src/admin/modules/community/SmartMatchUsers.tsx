@@ -58,7 +58,7 @@ export function SmartMatchUsers() {
   const columns: Column<MatchApproval>[] = [
     {
       key: 'user_1_name',
-      label: 'User 1',
+      label: t('community.col_user_1'),
       sortable: true,
       render: (item) => (
         <div>
@@ -69,7 +69,7 @@ export function SmartMatchUsers() {
     },
     {
       key: 'user_2_name',
-      label: 'User 2',
+      label: t('community.col_user_2'),
       sortable: true,
       render: (item) => (
         <div>
@@ -80,14 +80,14 @@ export function SmartMatchUsers() {
     },
     {
       key: 'listing_title',
-      label: 'Listing',
+      label: t('community.col_listing'),
       render: (item) => (
         <span className="text-sm text-default-500">{item.listing_title || '--'}</span>
       ),
     },
     {
       key: 'match_score',
-      label: 'Score',
+      label: t('community.col_score'),
       sortable: true,
       render: (item) => (
         <Chip
@@ -101,13 +101,13 @@ export function SmartMatchUsers() {
     },
     {
       key: 'status',
-      label: 'Status',
+      label: t('community.col_status'),
       sortable: true,
       render: (item) => <StatusBadge status={item.status} />,
     },
     {
       key: 'created_at',
-      label: 'Date',
+      label: t('community.col_date'),
       sortable: true,
       render: (item) => (
         <span className="text-sm text-default-500">
@@ -133,14 +133,14 @@ export function SmartMatchUsers() {
       {data.length === 0 ? (
         <EmptyState
           icon={Users}
-          title="No Match Results"
+          title={t('community.no_match_results')}
           description={t('community.desc_run_the_smart_matching_engine_to_generat')}
         />
       ) : (
         <DataTable
           columns={columns}
           data={data}
-          searchPlaceholder="Search matches..."
+          searchPlaceholder={t('community.search_matches_placeholder')}
           onRefresh={fetchData}
           totalItems={total}
           page={page}

@@ -309,7 +309,7 @@ export function SafeguardingDashboard() {
               startContent={<RefreshCw size={16} />}
               onPress={() => loadData()}
             >
-              Refresh
+              {t('safeguarding.refresh')}
             </Button>
             <Button
               color="primary"
@@ -317,7 +317,7 @@ export function SafeguardingDashboard() {
               startContent={<UserPlus size={16} />}
               onPress={assignModal.onOpen}
             >
-              New Assignment
+              {t('safeguarding.new_assignment')}
             </Button>
           </div>
         }
@@ -349,7 +349,7 @@ export function SafeguardingDashboard() {
           title={
             <span className="flex items-center gap-2">
               <MessageSquare size={16} />
-              Flagged Messages ({flaggedMessages.filter((m) => !m.is_reviewed).length})
+              {t('safeguarding.tab_flagged_messages', { count: flaggedMessages.filter((m) => !m.is_reviewed).length })}
             </span>
           }
         />
@@ -358,7 +358,7 @@ export function SafeguardingDashboard() {
           title={
             <span className="flex items-center gap-2">
               <Users size={16} />
-              Guardian Assignments ({assignments.filter((a) => a.status === 'active').length})
+              {t('safeguarding.tab_guardian_assignments', { count: assignments.filter((a) => a.status === 'active').length })}
             </span>
           }
         />
@@ -367,7 +367,7 @@ export function SafeguardingDashboard() {
           title={
             <span className="flex items-center gap-2">
               <Shield size={16} />
-              Member Preferences ({memberPreferences.length})
+              {t('safeguarding.tab_member_preferences', { count: memberPreferences.length })}
             </span>
           }
         />
@@ -377,7 +377,7 @@ export function SafeguardingDashboard() {
       {activeTab === 'flagged' && (
         <Card shadow="sm">
           <CardHeader className="flex justify-between items-center">
-            <h3 className="text-lg font-semibold">Flagged Messages</h3>
+            <h3 className="text-lg font-semibold">{t('safeguarding.flagged_messages')}</h3>
             <Input
               placeholder={t('safeguarding.placeholder_search_messages')}
               aria-label={t('safeguarding.label_search_safeguarding_messages')}
@@ -392,16 +392,16 @@ export function SafeguardingDashboard() {
           <CardBody>
             <Table aria-label={t('safeguarding.label_flagged_messages')} removeWrapper>
               <TableHeader>
-                <TableColumn>SENDER</TableColumn>
-                <TableColumn>RECIPIENT</TableColumn>
-                <TableColumn>MESSAGE</TableColumn>
-                <TableColumn>SEVERITY</TableColumn>
-                <TableColumn>REASON</TableColumn>
-                <TableColumn>DATE</TableColumn>
-                <TableColumn>STATUS</TableColumn>
-                <TableColumn>ACTIONS</TableColumn>
+                <TableColumn>{t('safeguarding.col_sender')}</TableColumn>
+                <TableColumn>{t('safeguarding.col_recipient')}</TableColumn>
+                <TableColumn>{t('safeguarding.col_message')}</TableColumn>
+                <TableColumn>{t('safeguarding.col_severity')}</TableColumn>
+                <TableColumn>{t('safeguarding.col_reason')}</TableColumn>
+                <TableColumn>{t('safeguarding.col_date')}</TableColumn>
+                <TableColumn>{t('safeguarding.col_status')}</TableColumn>
+                <TableColumn>{t('safeguarding.col_actions')}</TableColumn>
               </TableHeader>
-              <TableBody emptyContent="No flagged messages found.">
+              <TableBody emptyContent={t('safeguarding.no_flagged_messages')}>
                 {filteredFlags.map((flag) => (
                   <TableRow key={flag.id}>
                     <TableCell>
@@ -435,11 +435,11 @@ export function SafeguardingDashboard() {
                     <TableCell>
                       {flag.is_reviewed ? (
                         <Chip size="sm" color="success" variant="flat" startContent={<CheckCircle size={12} />}>
-                          Reviewed
+                          {t('safeguarding.reviewed')}
                         </Chip>
                       ) : (
                         <Chip size="sm" color="warning" variant="flat" startContent={<Clock size={12} />}>
-                          Pending
+                          {t('safeguarding.pending')}
                         </Chip>
                       )}
                     </TableCell>
@@ -455,7 +455,7 @@ export function SafeguardingDashboard() {
                             reviewModal.onOpen();
                           }}
                         >
-                          Review
+                          {t('safeguarding.review')}
                         </Button>
                       )}
                     </TableCell>
@@ -471,28 +471,28 @@ export function SafeguardingDashboard() {
       {activeTab === 'assignments' && (
         <Card shadow="sm">
           <CardHeader className="flex justify-between items-center">
-            <h3 className="text-lg font-semibold">Guardian Assignments</h3>
+            <h3 className="text-lg font-semibold">{t('safeguarding.guardian_assignments')}</h3>
             <Button
               size="sm"
               color="primary"
               startContent={<UserPlus size={14} />}
               onPress={assignModal.onOpen}
             >
-              New Assignment
+              {t('safeguarding.new_assignment')}
             </Button>
           </CardHeader>
           <CardBody>
             <Table aria-label={t('safeguarding.label_guardian_assignments')} removeWrapper>
               <TableHeader>
-                <TableColumn>WARD</TableColumn>
-                <TableColumn>GUARDIAN</TableColumn>
-                <TableColumn>STATUS</TableColumn>
-                <TableColumn>CONSENT</TableColumn>
-                <TableColumn>CREATED</TableColumn>
-                <TableColumn>EXPIRES</TableColumn>
-                <TableColumn>ACTIONS</TableColumn>
+                <TableColumn>{t('safeguarding.col_ward')}</TableColumn>
+                <TableColumn>{t('safeguarding.col_guardian')}</TableColumn>
+                <TableColumn>{t('safeguarding.col_status')}</TableColumn>
+                <TableColumn>{t('safeguarding.col_consent')}</TableColumn>
+                <TableColumn>{t('safeguarding.col_created')}</TableColumn>
+                <TableColumn>{t('safeguarding.col_expires')}</TableColumn>
+                <TableColumn>{t('safeguarding.col_actions')}</TableColumn>
               </TableHeader>
-              <TableBody emptyContent="No guardian assignments found.">
+              <TableBody emptyContent={t('safeguarding.no_guardian_assignments')}>
                 {assignments.map((assignment) => (
                   <TableRow key={assignment.id}>
                     <TableCell>
@@ -528,7 +528,7 @@ export function SafeguardingDashboard() {
                     </TableCell>
                     <TableCell>
                       <span className="text-sm text-default-400">
-                        {assignment.expires_at ? formatRelativeTime(assignment.expires_at) : 'Never'}
+                        {assignment.expires_at ? formatRelativeTime(assignment.expires_at) : t('safeguarding.never')}
                       </span>
                     </TableCell>
                     <TableCell>
@@ -540,7 +540,7 @@ export function SafeguardingDashboard() {
                           startContent={<UserMinus size={14} />}
                           onPress={() => handleRevokeAssignment(assignment.id)}
                         >
-                          Revoke
+                          {t('safeguarding.revoke')}
                         </Button>
                       )}
                     </TableCell>
@@ -557,24 +557,24 @@ export function SafeguardingDashboard() {
         <Card shadow="sm">
           <CardHeader className="flex justify-between items-center">
             <div>
-              <h3 className="text-lg font-semibold">Member Safeguarding Preferences</h3>
-              <p className="text-sm text-default-500">Members who indicated safeguarding needs during onboarding</p>
+              <h3 className="text-lg font-semibold">{t('safeguarding.member_safeguarding_preferences')}</h3>
+              <p className="text-sm text-default-500">{t('safeguarding.member_preferences_desc')}</p>
             </div>
           </CardHeader>
           <CardBody>
             {memberPreferences.length === 0 ? (
               <div className="text-center py-8 text-default-400">
                 <Shield size={40} className="mx-auto mb-2 opacity-40" />
-                <p>No members have submitted safeguarding preferences yet.</p>
-                <p className="text-sm mt-1">This tab populates when members select safeguarding options during onboarding.</p>
+                <p>{t('safeguarding.no_member_preferences')}</p>
+                <p className="text-sm mt-1">{t('safeguarding.no_member_preferences_desc')}</p>
               </div>
             ) : (
-              <Table aria-label="Member safeguarding preferences">
+              <Table aria-label={t('safeguarding.member_safeguarding_preferences')}>
                 <TableHeader>
-                  <TableColumn>MEMBER</TableColumn>
-                  <TableColumn>SELECTED OPTIONS</TableColumn>
-                  <TableColumn>TRIGGERS</TableColumn>
-                  <TableColumn>DATE</TableColumn>
+                  <TableColumn>{t('safeguarding.col_member')}</TableColumn>
+                  <TableColumn>{t('safeguarding.col_selected_options')}</TableColumn>
+                  <TableColumn>{t('safeguarding.col_triggers')}</TableColumn>
+                  <TableColumn>{t('safeguarding.col_date')}</TableColumn>
                 </TableHeader>
                 <TableBody>
                   {memberPreferences.map((entry) => (
@@ -600,9 +600,9 @@ export function SafeguardingDashboard() {
                       </TableCell>
                       <TableCell>
                         {entry.has_triggers ? (
-                          <Chip size="sm" variant="flat" color="warning">Active</Chip>
+                          <Chip size="sm" variant="flat" color="warning">{t('safeguarding.active')}</Chip>
                         ) : (
-                          <Chip size="sm" variant="flat" color="default">None</Chip>
+                          <Chip size="sm" variant="flat" color="default">{t('safeguarding.none')}</Chip>
                         )}
                       </TableCell>
                       <TableCell>
@@ -630,16 +630,16 @@ export function SafeguardingDashboard() {
             <>
               <ModalHeader className="flex items-center gap-2">
                 <Eye size={20} />
-                Review Flagged Message
+                {t('safeguarding.review_flagged_message')}
               </ModalHeader>
               <ModalBody className="gap-4">
                 {reviewTarget && (
                   <>
                     <div className="p-4 rounded-lg bg-default-100">
                       <div className="flex items-center gap-2 mb-2">
-                        <span className="text-sm font-medium">From:</span>
+                        <span className="text-sm font-medium">{t('safeguarding.from')}:</span>
                         <span className="text-sm">{reviewTarget.sender.name}</span>
-                        <span className="text-sm text-default-400 mx-1">to</span>
+                        <span className="text-sm text-default-400 mx-1">{t('safeguarding.to')}</span>
                         <span className="text-sm">{reviewTarget.recipient.name}</span>
                       </div>
                       <Divider className="my-2" />
@@ -650,13 +650,13 @@ export function SafeguardingDashboard() {
 
                     <div className="flex items-center gap-4">
                       <div>
-                        <span className="text-sm text-default-500">Severity:</span>{' '}
+                        <span className="text-sm text-default-500">{t('safeguarding.severity')}:</span>{' '}
                         <Chip size="sm" color={SEVERITY_COLORS[reviewTarget.severity]} variant="flat">
                           {reviewTarget.severity}
                         </Chip>
                       </div>
                       <div>
-                        <span className="text-sm text-default-500">Reason:</span>{' '}
+                        <span className="text-sm text-default-500">{t('safeguarding.reason')}:</span>{' '}
                         <span className="text-sm">{reviewTarget.flag_reason}</span>
                       </div>
                     </div>
@@ -664,12 +664,12 @@ export function SafeguardingDashboard() {
                     {reviewTarget.ward_name && (
                       <div className="flex items-center gap-2 text-sm">
                         <Shield size={14} className="text-primary" />
-                        <span className="text-default-500">Ward:</span>
+                        <span className="text-default-500">{t('safeguarding.ward')}:</span>
                         <span>{reviewTarget.ward_name}</span>
                         {reviewTarget.guardian_name && (
                           <>
                             <span className="text-default-400 mx-1">|</span>
-                            <span className="text-default-500">Guardian:</span>
+                            <span className="text-default-500">{t('safeguarding.guardian')}:</span>
                             <span>{reviewTarget.guardian_name}</span>
                           </>
                         )}
@@ -678,7 +678,7 @@ export function SafeguardingDashboard() {
 
                     <Textarea
                       label={t('safeguarding.label_review_notes')}
-                      placeholder="Add notes about your review (action taken, severity assessment, etc.)"
+                      placeholder={t('safeguarding.placeholder_review_notes')}
                       value={reviewNotes}
                       onChange={(e) => setReviewNotes(e.target.value)}
                       minRows={3}
@@ -687,14 +687,14 @@ export function SafeguardingDashboard() {
                 )}
               </ModalBody>
               <ModalFooter>
-                <Button variant="flat" onPress={onClose}>Cancel</Button>
+                <Button variant="flat" onPress={onClose}>{t('safeguarding.cancel')}</Button>
                 <Button
                   color="primary"
                   isLoading={reviewing}
                   startContent={<CheckCircle size={16} />}
                   onPress={handleReview}
                 >
-                  Mark as Reviewed
+                  {t('safeguarding.mark_as_reviewed')}
                 </Button>
               </ModalFooter>
             </>
@@ -712,7 +712,7 @@ export function SafeguardingDashboard() {
             <>
               <ModalHeader className="flex items-center gap-2">
                 <UserPlus size={20} />
-                Create Guardian Assignment
+                {t('safeguarding.create_guardian_assignment')}
               </ModalHeader>
               <ModalBody className="gap-4">
                 <Input
@@ -727,18 +727,18 @@ export function SafeguardingDashboard() {
                   placeholder="guardian@example.com"
                   value={guardianEmail}
                   onChange={(e) => setGuardianEmail(e.target.value)}
-                  description="The user who will monitor the ward's messages"
+                  description={t('safeguarding.desc_guardian_monitors_messages')}
                 />
               </ModalBody>
               <ModalFooter>
-                <Button variant="flat" onPress={onClose}>Cancel</Button>
+                <Button variant="flat" onPress={onClose}>{t('safeguarding.cancel')}</Button>
                 <Button
                   color="primary"
                   isLoading={creating}
                   isDisabled={!wardEmail.trim() || !guardianEmail.trim()}
                   onPress={handleCreateAssignment}
                 >
-                  Create Assignment
+                  {t('safeguarding.create_assignment')}
                 </Button>
               </ModalFooter>
             </>

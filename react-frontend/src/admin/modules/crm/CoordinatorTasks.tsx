@@ -57,19 +57,19 @@ interface AdminMember {
 type StatusFilter = 'all' | 'pending' | 'in_progress' | 'completed';
 type PriorityFilter = 'all' | 'low' | 'medium' | 'high' | 'urgent';
 
-const STATUS_TABS: { key: StatusFilter; label: string }[] = [
-  { key: 'all', label: 'All' },
-  { key: 'pending', label: 'Pending' },
-  { key: 'in_progress', label: 'In Progress' },
-  { key: 'completed', label: 'Completed' },
+const STATUS_TABS: { key: StatusFilter; labelKey: string }[] = [
+  { key: 'all', labelKey: 'crm.status_all' },
+  { key: 'pending', labelKey: 'crm.status_pending' },
+  { key: 'in_progress', labelKey: 'crm.status_in_progress' },
+  { key: 'completed', labelKey: 'crm.status_completed' },
 ];
 
-const PRIORITY_OPTIONS: { key: PriorityFilter; label: string }[] = [
-  { key: 'all', label: 'All Priorities' },
-  { key: 'low', label: 'Low' },
-  { key: 'medium', label: 'Medium' },
-  { key: 'high', label: 'High' },
-  { key: 'urgent', label: 'Urgent' },
+const PRIORITY_OPTIONS: { key: PriorityFilter; labelKey: string }[] = [
+  { key: 'all', labelKey: 'crm.priority_all' },
+  { key: 'low', labelKey: 'crm.priority_low' },
+  { key: 'medium', labelKey: 'crm.priority_medium' },
+  { key: 'high', labelKey: 'crm.priority_high' },
+  { key: 'urgent', labelKey: 'crm.priority_urgent' },
 ];
 
 const PRIORITY_COLOR_MAP: Record<string, 'default' | 'primary' | 'warning' | 'danger'> = {
@@ -240,7 +240,7 @@ export default function CoordinatorTasks() {
       resetForm();
       await loadTasks();
     } catch {
-      toast.error(editingTask ? 'Failed to update task' : 'Failed to create task');
+      toast.error(editingTask ? t('crm.failed_to_update_task') : t('crm.failed_to_create_task'));
     }
     setSaving(false);
   }, [formTitle, formDescription, formPriority, formAssignedTo, formUserId, formDueDate, editingTask, createModal, resetForm, loadTasks, toast]);
@@ -263,7 +263,7 @@ export default function CoordinatorTasks() {
   const handleStatusChange = useCallback(async (task: Task, newStatus: Task['status']) => {
     try {
       await adminCrm.updateTask(task.id, { status: newStatus });
-      toast.success(`Task marked as ${newStatus.replace('_', ' ')}`);
+      toast.success(t('crm.task_status_changed', { status: newStatus.replace('_', ' ') }));
       await loadTasks();
     } catch {
       toast.error(t('crm.failed_to_update_task_status'));
@@ -284,10 +284,10 @@ export default function CoordinatorTasks() {
     <div className="max-w-6xl mx-auto space-y-6">
       <PageHeader
         title={t('crm.coordinator_tasks_title')}
-        description={`${total} task${total !== 1 ? 's' : ''} total`}
+        description={t('crm.tasks_total', { count: total })}
         actions={
           <Button color="primary" startContent={<Plus className="w-4 h-4" />} onPress={openCreate}>
-            Create Task
+            {t('crm.create_task')}
           </Button>
         }
       />
@@ -304,7 +304,7 @@ export default function CoordinatorTasks() {
               color={statusFilter === tab.key ? 'primary' : 'default'}
               onPress={() => setStatusFilter(tab.key)}
             >
-              {tab.label}
+              {t(tab.labelKey)}
             </Button>
           ))}
         </div>
@@ -318,7 +318,7 @@ export default function CoordinatorTasks() {
           className="max-w-[180px]"
         >
           {PRIORITY_OPTIONS.map((opt) => (
-            <SelectItem key={opt.key}>{opt.label}</SelectItem>
+            <SelectItem key={opt.key}>{t(opt.labelKey)}</SelectItem>
           ))}
         </Select>
 
@@ -339,7 +339,7 @@ export default function CoordinatorTasks() {
       {/* Loading */}
       {loading && (
         <div className="flex justify-center py-12">
-          <Spinner size="lg" label="Loading tasks..." />
+          <Spinner size="lg" label={t('crm.loading_tasks')} />
         </div>
       )}
 
@@ -348,11 +348,11 @@ export default function CoordinatorTasks() {
         <Card>
           <CardBody className="py-12 text-center">
             <ClipboardList className="w-12 h-12 mx-auto text-default-300 mb-4" />
-            <p className="text-default-500 text-lg font-medium">No tasks found</p>
+            <p className="text-default-500 text-lg font-medium">{t('crm.no_tasks_found')}</p>
             <p className="text-default-400 text-sm mt-1">
               {statusFilter !== 'all' || priorityFilter !== 'all'
-                ? 'Try adjusting your filters'
-                : 'Create your first task to get started'}
+                ? t('crm.no_tasks_hint_filtered')
+                : t('crm.no_tasks_hint_default')}
             </p>
           </CardBody>
         </Card>
@@ -412,28 +412,28 @@ export default function CoordinatorTasks() {
                               startContent={<Edit3 className="w-4 h-4" />}
                               onPress={() => openEdit(task)}
                             >
-                              Edit
+                              {t('crm.action_edit')}
                             </DropdownItem>
                             <DropdownItem
                               key="complete"
                               startContent={<CheckCircle className="w-4 h-4" />}
                               onPress={() => handleStatusChange(task, 'completed')}
                             >
-                              Mark Complete
+                              {t('crm.action_mark_complete')}
                             </DropdownItem>
                             <DropdownItem
                               key="in_progress"
                               startContent={<Clock className="w-4 h-4" />}
                               onPress={() => handleStatusChange(task, 'in_progress')}
                             >
-                              Mark In Progress
+                              {t('crm.action_mark_in_progress')}
                             </DropdownItem>
                             <DropdownItem
                               key="cancel"
                               startContent={<AlertTriangle className="w-4 h-4" />}
                               onPress={() => handleStatusChange(task, 'cancelled')}
                             >
-                              Cancel
+                              {t('crm.action_cancel')}
                             </DropdownItem>
                             <DropdownItem
                               key="delete"
@@ -442,7 +442,7 @@ export default function CoordinatorTasks() {
                               startContent={<Trash2 className="w-4 h-4" />}
                               onPress={() => openDeleteConfirm(task)}
                             >
-                              Delete
+                              {t('crm.action_delete')}
                             </DropdownItem>
                           </DropdownMenu>
                         </Dropdown>
@@ -465,7 +465,7 @@ export default function CoordinatorTasks() {
                           >
                             <Calendar className="w-3 h-3" />
                             {overdue && <AlertTriangle className="w-3 h-3" />}
-                            Due {formatDate(task.due_date)}
+                            {t('crm.due_date_prefix')} {formatDate(task.due_date)}
                           </span>
                         )}
 
@@ -488,11 +488,11 @@ export default function CoordinatorTasks() {
                               size="sm"
                               className="w-5 h-5"
                             />
-                            <span>Related: {task.user_name}</span>
+                            <span>{t('crm.related_prefix')} {task.user_name}</span>
                           </Link>
                         )}
                         <span className="text-xs text-default-400">
-                          Created by {task.created_by_name} &middot; {formatDateTime(task.created_at)}
+                          {t('crm.created_by_prefix')} {task.created_by_name} &middot; {formatDateTime(task.created_at)}
                         </span>
                       </div>
                     </div>
@@ -523,7 +523,7 @@ export default function CoordinatorTasks() {
             <>
               <ModalHeader className="flex items-center gap-2">
                 {editingTask ? <Edit3 className="w-5 h-5" /> : <Plus className="w-5 h-5" />}
-                {editingTask ? 'Edit Task' : 'Create Task'}
+                {editingTask ? t('crm.edit_task_title') : t('crm.create_task_title')}
               </ModalHeader>
               <ModalBody className="gap-4">
                 <Input
@@ -547,10 +547,10 @@ export default function CoordinatorTasks() {
                     selectedKeys={[formPriority]}
                     onChange={(e) => setFormPriority(e.target.value || 'medium')}
                   >
-                    <SelectItem key="low">Low</SelectItem>
-                    <SelectItem key="medium">Medium</SelectItem>
-                    <SelectItem key="high">High</SelectItem>
-                    <SelectItem key="urgent">Urgent</SelectItem>
+                    <SelectItem key="low">{t('crm.priority_low')}</SelectItem>
+                    <SelectItem key="medium">{t('crm.priority_medium')}</SelectItem>
+                    <SelectItem key="high">{t('crm.priority_high')}</SelectItem>
+                    <SelectItem key="urgent">{t('crm.priority_urgent')}</SelectItem>
                   </Select>
                   <Select
                     label={t('crm.label_assign_to')}
@@ -582,10 +582,10 @@ export default function CoordinatorTasks() {
               </ModalBody>
               <ModalFooter>
                 <Button variant="flat" onPress={onClose} isDisabled={saving}>
-                  Cancel
+                  {t('crm.cancel_button')}
                 </Button>
-                <Button color="primary" onPress={handleSave} isLoading={saving}>
-                  {editingTask ? 'Update Task' : 'Create Task'}
+                <Button color="primary" onPress={handleSave} isLoading={saving} isDisabled={saving}>
+                  {editingTask ? t('crm.update_task') : t('crm.create_task')}
                 </Button>
               </ModalFooter>
             </>
@@ -600,20 +600,20 @@ export default function CoordinatorTasks() {
             <>
               <ModalHeader className="flex items-center gap-2 text-danger">
                 <Trash2 className="w-5 h-5" />
-                Delete Task
+                {t('crm.delete_task_title')}
               </ModalHeader>
               <ModalBody>
                 <p>
-                  Are you sure you want to delete{' '}
-                  <strong>{deletingTask?.title}</strong>? This action cannot be undone.
+                  {t('crm.delete_task_confirm')}
+                  {deletingTask && <strong> ({deletingTask.title})</strong>}
                 </p>
               </ModalBody>
               <ModalFooter>
                 <Button variant="flat" onPress={onClose} isDisabled={deleting}>
-                  Cancel
+                  {t('crm.cancel_button')}
                 </Button>
-                <Button color="danger" onPress={handleDelete} isLoading={deleting}>
-                  Delete
+                <Button color="danger" onPress={handleDelete} isLoading={deleting} isDisabled={deleting}>
+                  {t('crm.delete_button')}
                 </Button>
               </ModalFooter>
             </>

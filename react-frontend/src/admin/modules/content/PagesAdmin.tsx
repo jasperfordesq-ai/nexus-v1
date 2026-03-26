@@ -89,7 +89,7 @@ export function PagesAdmin() {
   const columns: Column<PageItem>[] = [
     {
       key: 'title',
-      label: 'Title',
+      label: t('content.label_name'),
       sortable: true,
       render: (item) => (
         <Button
@@ -104,19 +104,19 @@ export function PagesAdmin() {
     },
     {
       key: 'slug',
-      label: 'Slug',
+      label: t('federation.col_slug'),
       sortable: true,
       render: (item) => <span className="text-sm text-default-500">/{item.slug}</span>,
     },
     {
       key: 'status',
-      label: 'Status',
+      label: t('listings.status'),
       sortable: true,
       render: (item) => <StatusBadge status={item.status || 'draft'} />,
     },
     {
       key: 'show_in_menu',
-      label: 'In Menu',
+      label: t('content.in_menu', 'In Menu'),
       sortable: true,
       render: (item) => item.show_in_menu ? (
         <Chip size="sm" variant="flat" color="primary">
@@ -128,7 +128,7 @@ export function PagesAdmin() {
     },
     {
       key: 'created_at',
-      label: 'Created',
+      label: t('listings.created'),
       sortable: true,
       render: (item) => (
         <span className="text-sm text-default-500">
@@ -138,7 +138,7 @@ export function PagesAdmin() {
     },
     {
       key: 'actions',
-      label: 'Actions',
+      label: t('listings.actions'),
       render: (item) => (
         <div className="flex gap-1">
           <Button
@@ -186,7 +186,7 @@ export function PagesAdmin() {
             startContent={<Plus size={16} />}
             onPress={() => navigate(tenantPath('/admin/pages/builder/new'))}
           >
-            Create Page
+            {t('breadcrumbs.create')} {t('breadcrumbs.pages')}
           </Button>
         }
       />
@@ -194,16 +194,16 @@ export function PagesAdmin() {
       {data.length === 0 ? (
         <EmptyState
           icon={FileText}
-          title="No Pages Created"
-          description="Create custom CMS pages for your community. Pages can be used for about, terms, privacy policy, and other static content."
-          actionLabel="Create Page"
+          title={t('no_data')}
+          description={t('content.pages_admin_desc')}
+          actionLabel={`${t('breadcrumbs.create')} ${t('breadcrumbs.pages')}`}
           onAction={() => navigate(tenantPath('/admin/pages/builder/new'))}
         />
       ) : (
         <DataTable
           columns={columns}
           data={data}
-          searchPlaceholder="Search pages..."
+          searchPlaceholder={t('data_table.search', 'Search pages...')}
           onRefresh={fetchData}
         />
       )}
@@ -213,9 +213,9 @@ export function PagesAdmin() {
           isOpen={!!confirmDelete}
           onClose={() => setConfirmDelete(null)}
           onConfirm={handleDelete}
-          title="Delete Page"
-          message={`Are you sure you want to delete "${confirmDelete.title}"? This action cannot be undone.`}
-          confirmLabel="Delete"
+          title={`${t('common.delete')} ${t('breadcrumbs.pages')}`}
+          message={t('gamification.confirm_delete_campaign', { name: confirmDelete.title })}
+          confirmLabel={t('common.delete')}
           confirmColor="danger"
           isLoading={actionLoading}
         />

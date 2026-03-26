@@ -68,7 +68,7 @@ export function TimebankingDashboard() {
             isLoading={loading}
             size="sm"
           >
-            Refresh
+            {t('common.refresh')}
           </Button>
         }
       />
@@ -83,14 +83,14 @@ export function TimebankingDashboard() {
           loading={loading}
         />
         <StatCard
-          label="Total Volume (hrs)"
+          label={t('timebanking.label_total_volume')}
           value={stats?.total_volume ?? '—'}
           icon={TrendingUp}
           color="success"
           loading={loading}
         />
         <StatCard
-          label="Avg Transaction (hrs)"
+          label={t('timebanking.label_avg_transaction')}
           value={stats?.avg_transaction ?? '—'}
           icon={Wallet}
           color="secondary"
@@ -111,7 +111,7 @@ export function TimebankingDashboard() {
         <Card shadow="sm">
           <CardHeader className="flex items-center gap-2 px-4 pt-4 pb-0">
             <TrendingUp size={18} className="text-success" />
-            <h3 className="font-semibold">Top Earners</h3>
+            <h3 className="font-semibold">{t('timebanking.top_earners')}</h3>
           </CardHeader>
           <CardBody className="px-4 pb-4">
             {loading ? (
@@ -144,7 +144,7 @@ export function TimebankingDashboard() {
               </div>
             ) : (
               <p className="py-8 text-center text-sm text-default-400">
-                No transaction data available
+                {t('timebanking.no_transaction_data')}
               </p>
             )}
           </CardBody>
@@ -154,7 +154,7 @@ export function TimebankingDashboard() {
         <Card shadow="sm">
           <CardHeader className="flex items-center gap-2 px-4 pt-4 pb-0">
             <Wallet size={18} className="text-warning" />
-            <h3 className="font-semibold">Top Spenders</h3>
+            <h3 className="font-semibold">{t('timebanking.top_spenders')}</h3>
           </CardHeader>
           <CardBody className="px-4 pb-4">
             {loading ? (
@@ -187,7 +187,7 @@ export function TimebankingDashboard() {
               </div>
             ) : (
               <p className="py-8 text-center text-sm text-default-400">
-                No transaction data available
+                {t('timebanking.no_transaction_data')}
               </p>
             )}
           </CardBody>
@@ -197,7 +197,7 @@ export function TimebankingDashboard() {
       {/* Quick Links */}
       <Card shadow="sm">
         <CardHeader className="px-4 pt-4 pb-0">
-          <h3 className="font-semibold">Quick Links</h3>
+          <h3 className="font-semibold">{t('timebanking.quick_links')}</h3>
         </CardHeader>
         <CardBody className="px-4 pb-4">
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
@@ -211,7 +211,7 @@ export function TimebankingDashboard() {
             >
               <div className="flex items-center gap-2">
                 <AlertTriangle size={18} />
-                <span>Fraud Alerts</span>
+                <span>{t('timebanking.fraud_alerts_title')}</span>
               </div>
             </Button>
 
@@ -225,7 +225,7 @@ export function TimebankingDashboard() {
             >
               <div className="flex items-center gap-2">
                 <Users size={18} />
-                <span>User Report</span>
+                <span>{t('timebanking.user_report_title')}</span>
               </div>
             </Button>
 
@@ -239,7 +239,7 @@ export function TimebankingDashboard() {
             >
               <div className="flex items-center gap-2">
                 <Building2 size={18} />
-                <span>Organization Wallets</span>
+                <span>{t('timebanking.org_wallets_title')}</span>
               </div>
             </Button>
           </div>

@@ -30,12 +30,7 @@ const severityColorMap: Record<string, 'default' | 'primary' | 'warning' | 'dang
   critical: 'danger',
 };
 
-const SEVERITY_OPTIONS = [
-  { value: 'low', label: 'Low' },
-  { value: 'medium', label: 'Medium' },
-  { value: 'high', label: 'High' },
-  { value: 'critical', label: 'Critical' },
-];
+const SEVERITY_KEYS = ['low', 'medium', 'high', 'critical'] as const;
 
 export function GdprBreaches() {
   const { t } = useTranslation('admin');
@@ -108,11 +103,11 @@ export function GdprBreaches() {
   };
 
   const columns: Column<GdprBreach>[] = [
-    { key: 'id', label: 'ID', sortable: true },
-    { key: 'title', label: 'Title', sortable: true },
+    { key: 'id', label: t('enterprise.col_id'), sortable: true },
+    { key: 'title', label: t('enterprise.label_title'), sortable: true },
     {
       key: 'severity',
-      label: 'Severity',
+      label: t('enterprise.label_severity'),
       sortable: true,
       render: (b) => (
         <Chip size="sm" variant="flat" color={severityColorMap[b.severity] || 'default'} className="capitalize">
@@ -122,14 +117,14 @@ export function GdprBreaches() {
     },
     {
       key: 'status',
-      label: 'Status',
+      label: t('enterprise.col_status'),
       sortable: true,
       render: (b) => <StatusBadge status={b.status} />,
     },
-    { key: 'description', label: 'Description' },
+    { key: 'description', label: t('enterprise.col_description') },
     {
       key: 'reported_at',
-      label: 'Reported',
+      label: t('enterprise.col_reported'),
       sortable: true,
       render: (b) => b.reported_at ? new Date(b.reported_at).toLocaleDateString() : '---',
     },
@@ -149,7 +144,7 @@ export function GdprBreaches() {
               isLoading={loading}
               size="sm"
             >
-              Refresh
+              {t('common.refresh')}
             </Button>
             <Button
               color="danger"
@@ -157,7 +152,7 @@ export function GdprBreaches() {
               onPress={openReportModal}
               size="sm"
             >
-              Report Breach
+              {t('enterprise.report_breach')}
             </Button>
           </div>
         }
@@ -168,14 +163,14 @@ export function GdprBreaches() {
         data={breaches}
         isLoading={loading}
         searchable={false}
-        emptyContent="No data breaches recorded"
+        emptyContent={t('enterprise.no_data_breaches')}
       />
 
       <Modal isOpen={reportOpen} onClose={() => setReportOpen(false)} size="lg">
         <ModalContent>
           <ModalHeader className="flex items-center gap-2">
             <AlertTriangle size={20} className="text-danger" />
-            Report Data Breach
+            {t('enterprise.report_data_breach')}
           </ModalHeader>
           <ModalBody className="gap-4">
             <Input
@@ -188,7 +183,7 @@ export function GdprBreaches() {
             />
             <Textarea
               label={t('enterprise.label_description')}
-              placeholder="Detailed description of what happened, what data was affected..."
+              placeholder={t('enterprise.placeholder_breach_description')}
               value={breachDescription}
               onValueChange={setBreachDescription}
               variant="bordered"
@@ -204,8 +199,8 @@ export function GdprBreaches() {
                 }}
                 variant="bordered"
               >
-                {SEVERITY_OPTIONS.map((opt) => (
-                  <SelectItem key={opt.value}>{opt.label}</SelectItem>
+                {SEVERITY_KEYS.map((key) => (
+                  <SelectItem key={key}>{t(`common.${key}`)}</SelectItem>
                 ))}
               </Select>
               <Input
@@ -220,10 +215,10 @@ export function GdprBreaches() {
           </ModalBody>
           <ModalFooter>
             <Button variant="flat" onPress={() => setReportOpen(false)} isDisabled={reportLoading}>
-              Cancel
+              {t('cancel')}
             </Button>
-            <Button color="danger" onPress={handleReportBreach} isLoading={reportLoading}>
-              Report Breach
+            <Button color="danger" onPress={handleReportBreach} isLoading={reportLoading} isDisabled={reportLoading}>
+              {t('enterprise.report_breach')}
             </Button>
           </ModalFooter>
         </ModalContent>

@@ -99,13 +99,13 @@ function GrantCreditsForm({ onGranted }: { onGranted: () => void }) {
       });
 
       if (res?.success) {
-        toast.success(`Granted ${parsedAmount}h to ${selectedUser.name}`);
+        toast.success(t('timebanking.granted_credits', { amount: parsedAmount, name: selectedUser.name }));
         setSelectedUser(null);
         setAmount('');
         setReason('');
         onGranted();
       } else {
-        toast.error(res?.error || 'Failed to grant credits');
+        toast.error(res?.error || t('timebanking.failed_to_grant_credits'));
       }
     } catch {
       toast.error(t('timebanking.an_unexpected_error_occurred'));
@@ -118,7 +118,7 @@ function GrantCreditsForm({ onGranted }: { onGranted: () => void }) {
     <Card shadow="sm">
       <CardHeader className="flex items-center gap-2 px-4 pt-4 pb-0">
         <Plus size={18} className="text-primary" />
-        <h3 className="font-semibold">Grant Starting Credits</h3>
+        <h3 className="font-semibold">{t('timebanking.grant_starting_credits')}</h3>
       </CardHeader>
       <CardBody className="px-4 pb-4 space-y-4">
         {/* Member search */}
@@ -156,7 +156,7 @@ function GrantCreditsForm({ onGranted }: { onGranted: () => void }) {
                       </p>
                     </div>
                     <div className="text-right shrink-0 ml-3">
-                      <p className="text-xs text-default-500">Balance</p>
+                      <p className="text-xs text-default-500">{t('timebanking.col_balance')}</p>
                       <p className="text-sm font-semibold text-foreground">
                         {user.balance}h
                       </p>
@@ -167,7 +167,7 @@ function GrantCreditsForm({ onGranted }: { onGranted: () => void }) {
             )}
             {searchQuery.length >= 2 && !searching && searchResults.length === 0 && (
               <p className="text-sm text-default-400 text-center py-2 mt-2">
-                No members found matching &ldquo;{searchQuery}&rdquo;
+                {t('timebanking.no_members_found', { query: searchQuery })}
               </p>
             )}
           </div>
@@ -182,7 +182,7 @@ function GrantCreditsForm({ onGranted }: { onGranted: () => void }) {
                   {selectedUser.name}
                 </p>
                 <p className="text-xs text-default-500">
-                  {selectedUser.email} &middot; Current balance: {selectedUser.balance}h
+                  {selectedUser.email} &middot; {t('timebanking.current_balance')}: {selectedUser.balance}h
                 </p>
               </div>
             </div>
@@ -191,15 +191,15 @@ function GrantCreditsForm({ onGranted }: { onGranted: () => void }) {
               variant="flat"
               onPress={() => setSelectedUser(null)}
             >
-              Change
+              {t('timebanking.change')}
             </Button>
           </div>
         )}
 
         {/* Amount input */}
         <Input
-          label="Credit Amount (hours)"
-          placeholder="e.g. 5"
+          label={t('timebanking.label_credit_amount')}
+          placeholder={t('timebanking.placeholder_credit_amount')}
           type="number"
           min="0.25"
           step="0.25"
@@ -216,7 +216,7 @@ function GrantCreditsForm({ onGranted }: { onGranted: () => void }) {
         {/* Reason */}
         <Textarea
           label={t('timebanking.label_reason')}
-          placeholder="e.g. New member starting balance, bonus credits..."
+          placeholder={t('timebanking.placeholder_grant_reason')}
           value={reason}
           onValueChange={setReason}
           size="sm"
@@ -235,7 +235,7 @@ function GrantCreditsForm({ onGranted }: { onGranted: () => void }) {
           isDisabled={!selectedUser || !amount || !reason.trim()}
           className="w-full sm:w-auto"
         >
-          Grant Credits
+          {t('timebanking.grant_credits')}
         </Button>
       </CardBody>
     </Card>
@@ -289,7 +289,7 @@ function GrantHistory({ refreshKey }: { refreshKey: number }) {
   const columns: Column<WalletGrant>[] = [
     {
       key: 'user_name',
-      label: 'Member',
+      label: t('timebanking.col_member'),
       sortable: true,
       render: (item) => (
         <div>
@@ -300,7 +300,7 @@ function GrantHistory({ refreshKey }: { refreshKey: number }) {
     },
     {
       key: 'amount',
-      label: 'Amount',
+      label: t('timebanking.col_amount'),
       sortable: true,
       render: (item) => (
         <Chip size="sm" variant="flat" color="success">
@@ -310,7 +310,7 @@ function GrantHistory({ refreshKey }: { refreshKey: number }) {
     },
     {
       key: 'reason',
-      label: 'Reason',
+      label: t('timebanking.label_reason'),
       render: (item) => (
         <span className="text-sm text-default-600 line-clamp-2">
           {item.reason}
@@ -319,7 +319,7 @@ function GrantHistory({ refreshKey }: { refreshKey: number }) {
     },
     {
       key: 'granted_by',
-      label: 'Granted By',
+      label: t('timebanking.col_granted_by'),
       sortable: true,
       render: (item) => (
         <span className="text-sm text-default-500">
@@ -329,7 +329,7 @@ function GrantHistory({ refreshKey }: { refreshKey: number }) {
     },
     {
       key: 'created_at',
-      label: 'Date',
+      label: t('timebanking.col_date'),
       sortable: true,
       render: (item) => (
         <span className="text-sm text-default-500">
@@ -343,20 +343,20 @@ function GrantHistory({ refreshKey }: { refreshKey: number }) {
     <div>
       <h3 className="text-sm font-semibold text-foreground mb-3 flex items-center gap-2">
         <History size={16} className="text-secondary" />
-        Grant History
+        {t('timebanking.grant_history')}
       </h3>
       <DataTable
         columns={columns}
         data={grants}
         isLoading={loading}
-        searchPlaceholder="Search grants by member name or email..."
+        searchPlaceholder={t('timebanking.search_grants_placeholder')}
         onSearch={(q) => { setSearch(q); setPage(1); }}
         onRefresh={loadGrants}
         totalItems={total}
         page={page}
         pageSize={20}
         onPageChange={setPage}
-        emptyContent="No credit grants have been made yet."
+        emptyContent={t('timebanking.no_credit_grants')}
       />
     </div>
   );

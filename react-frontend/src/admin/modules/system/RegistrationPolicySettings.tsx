@@ -64,79 +64,22 @@ interface InviteCodesResponse {
   total: number;
 }
 
-const REGISTRATION_MODES = [
-  {
-    key: 'open',
-    label: 'Open Registration',
-    description: 'Anyone can register and access the platform immediately. Best for public communities that want maximum growth.',
-    icon: Globe,
-    color: 'success' as const,
-  },
-  {
-    key: 'open_with_approval',
-    label: 'Open + Admin Approval',
-    description: 'Users can register, but an admin must approve each account before they can access the platform. Good for communities that want to vet members.',
-    icon: UserCheck,
-    color: 'primary' as const,
-  },
-  {
-    key: 'verified_identity',
-    label: 'Identity Verification Required',
-    description: 'Users must pass an automated identity check (document scan, selfie match) through a third-party provider before activation. Ideal for high-trust communities.',
-    icon: ShieldCheck,
-    color: 'secondary' as const,
-  },
-  {
-    key: 'invite_only',
-    label: 'Invite Only',
-    description: 'Registration is closed to the public. Only users with a valid invite code can create an account. Best for private or controlled-growth communities.',
-    icon: Lock,
-    color: 'warning' as const,
-  },
-  {
-    key: 'waitlist',
-    label: 'Waitlist',
-    description: 'Users sign up for a waitlist and are activated in order when capacity allows. Useful for managing growth or staged rollouts.',
-    icon: Clock,
-    color: 'default' as const,
-  },
-  {
-    key: 'government_id',
-    label: 'Government / Digital ID (Coming Soon)',
-    description: 'Users authenticate via government-issued digital identity (e.g. EUDI Wallet, UK Digital Identity Trust Framework). This mode is a placeholder for future integration.',
-    icon: Shield,
-    color: 'default' as const,
-  },
-];
+const REGISTRATION_MODE_ICONS: Record<string, typeof Globe> = {
+  open: Globe,
+  open_with_approval: UserCheck,
+  verified_identity: ShieldCheck,
+  invite_only: Lock,
+  waitlist: Clock,
+  government_id: Shield,
+};
 
-const VERIFICATION_LEVELS = [
-  { key: 'none', label: 'None', description: 'No document verification required.' },
-  { key: 'document_only', label: 'Document Only', description: 'Users upload an ID document (passport, driving licence, national ID). The provider checks authenticity.' },
-  { key: 'document_selfie', label: 'Document + Selfie', description: 'Users upload an ID document AND take a live selfie. The provider compares the face to the document photo. Strongest automated check.' },
-  { key: 'reusable_digital_id', label: 'Reusable Digital ID', description: 'One-time verification that issues a reusable credential. Users can present it across services without re-verifying.' },
-  { key: 'manual_review', label: 'Manual Review', description: 'Documents are submitted and queued for manual admin review instead of automated checking.' },
-];
-
-const POST_VERIFICATION_ACTIONS = [
-  { key: 'activate', label: 'Activate Automatically', description: 'User is activated as soon as verification passes. Fastest onboarding experience.' },
-  { key: 'admin_approval', label: 'Admin Approval After Verification', description: 'Even after passing verification, an admin must manually approve the user. Double layer of security.' },
-  { key: 'limited_access', label: 'Limited Access While Pending', description: 'User gets basic read-only access while waiting for full admin approval. Reduces friction.' },
-  { key: 'reject_on_fail', label: 'Reject on Failure', description: 'If verification fails, the user account is automatically deactivated. Strictest policy.' },
-];
-
-const FALLBACK_MODES = [
-  { key: 'none', label: 'No Fallback (Pause Registration)', description: 'If the verification provider is unavailable, new registrations are paused until it recovers.' },
-  { key: 'admin_review', label: 'Fall Back to Admin Review', description: 'If the provider is down, users are queued for manual admin approval instead.' },
-  { key: 'native_registration', label: 'Fall Back to Standard Registration', description: 'If the provider is down, allow standard registration without verification as a temporary measure.' },
-];
-
-// Helper: provider descriptions for the credential cards
-const PROVIDER_DESCRIPTIONS: Record<string, string> = {
-  stripe_identity: 'Stripe Identity verifies government-issued IDs with document + selfie matching. Requires a Stripe account with Identity enabled.',
-  veriff: 'Veriff provides AI-powered identity verification with global document coverage. Sign up at veriff.com for API credentials.',
-  jumio: 'Jumio offers enterprise-grade identity proofing with liveness detection. Contact Jumio sales for API access.',
-  onfido: 'Onfido uses AI and biometrics to verify real identity from 195 countries. Sign up at onfido.com for API keys.',
-  idenfy: 'iDenfy provides automated KYC/AML identity verification. Register at idenfy.com for sandbox and production keys.',
+const REGISTRATION_MODE_COLORS: Record<string, 'success' | 'primary' | 'secondary' | 'warning' | 'default'> = {
+  open: 'success',
+  open_with_approval: 'primary',
+  verified_identity: 'secondary',
+  invite_only: 'warning',
+  waitlist: 'default',
+  government_id: 'default',
 };
 
 export function RegistrationPolicySettings() {
@@ -166,6 +109,44 @@ export function RegistrationPolicySettings() {
   const [generating, setGenerating] = useState(false);
   const [generatedCodes, setGeneratedCodes] = useState<string[]>([]);
   const generateModal = useDisclosure();
+
+  const REGISTRATION_MODES = [
+    { key: 'open', label: t('system.reg.mode_open'), description: t('system.reg.mode_open_desc'), icon: REGISTRATION_MODE_ICONS.open, color: REGISTRATION_MODE_COLORS.open },
+    { key: 'open_with_approval', label: t('system.reg.mode_open_approval'), description: t('system.reg.mode_open_approval_desc'), icon: REGISTRATION_MODE_ICONS.open_with_approval, color: REGISTRATION_MODE_COLORS.open_with_approval },
+    { key: 'verified_identity', label: t('system.reg.mode_verified'), description: t('system.reg.mode_verified_desc'), icon: REGISTRATION_MODE_ICONS.verified_identity, color: REGISTRATION_MODE_COLORS.verified_identity },
+    { key: 'invite_only', label: t('system.reg.mode_invite'), description: t('system.reg.mode_invite_desc'), icon: REGISTRATION_MODE_ICONS.invite_only, color: REGISTRATION_MODE_COLORS.invite_only },
+    { key: 'waitlist', label: t('system.reg.mode_waitlist'), description: t('system.reg.mode_waitlist_desc'), icon: REGISTRATION_MODE_ICONS.waitlist, color: REGISTRATION_MODE_COLORS.waitlist },
+    { key: 'government_id', label: t('system.reg.mode_gov_id'), description: t('system.reg.mode_gov_id_desc'), icon: REGISTRATION_MODE_ICONS.government_id, color: REGISTRATION_MODE_COLORS.government_id },
+  ];
+
+  const VERIFICATION_LEVELS = [
+    { key: 'none', label: t('system.reg.level_none'), description: t('system.reg.level_none_desc') },
+    { key: 'document_only', label: t('system.reg.level_document'), description: t('system.reg.level_document_desc') },
+    { key: 'document_selfie', label: t('system.reg.level_document_selfie'), description: t('system.reg.level_document_selfie_desc') },
+    { key: 'reusable_digital_id', label: t('system.reg.level_reusable'), description: t('system.reg.level_reusable_desc') },
+    { key: 'manual_review', label: t('system.reg.level_manual'), description: t('system.reg.level_manual_desc') },
+  ];
+
+  const POST_VERIFICATION_ACTIONS = [
+    { key: 'activate', label: t('system.reg.post_activate'), description: t('system.reg.post_activate_desc') },
+    { key: 'admin_approval', label: t('system.reg.post_admin_approval'), description: t('system.reg.post_admin_approval_desc') },
+    { key: 'limited_access', label: t('system.reg.post_limited'), description: t('system.reg.post_limited_desc') },
+    { key: 'reject_on_fail', label: t('system.reg.post_reject'), description: t('system.reg.post_reject_desc') },
+  ];
+
+  const FALLBACK_MODES = [
+    { key: 'none', label: t('system.reg.fallback_none'), description: t('system.reg.fallback_none_desc') },
+    { key: 'admin_review', label: t('system.reg.fallback_admin'), description: t('system.reg.fallback_admin_desc') },
+    { key: 'native_registration', label: t('system.reg.fallback_native'), description: t('system.reg.fallback_native_desc') },
+  ];
+
+  const PROVIDER_DESCRIPTIONS: Record<string, string> = {
+    stripe_identity: t('system.reg.provider_stripe'),
+    veriff: t('system.reg.provider_veriff'),
+    jumio: t('system.reg.provider_jumio'),
+    onfido: t('system.reg.provider_onfido'),
+    idenfy: t('system.reg.provider_idenfy'),
+  };
 
   const fetchData = useCallback(async () => {
     setLoading(true);
@@ -233,7 +214,7 @@ export function RegistrationPolicySettings() {
       if (input.api_key) body.api_key = input.api_key;
       if (input.webhook_secret) body.webhook_secret = input.webhook_secret;
       await api.put(`/v2/admin/identity/provider-credentials/${slug}`, body);
-      toast.success(`${providers.find(p => p.slug === slug)?.name || 'Provider'} credentials saved and encrypted`);
+      toast.success(t('system.reg.credentials_saved', { provider: providers.find(p => p.slug === slug)?.name || t('system.reg.provider') }));
       setCredentialInputs(prev => ({ ...prev, [slug]: { api_key: '', webhook_secret: '' } }));
       fetchData();
     } catch {
@@ -265,7 +246,7 @@ export function RegistrationPolicySettings() {
       if (res.data?.codes) {
         setGeneratedCodes(res.data.codes);
         fetchInviteCodes();
-        toast.success(`Generated ${res.data.codes.length} invite code(s)`);
+        toast.success(t('system.reg.codes_generated', { count: res.data.codes.length }));
       }
     } catch {
       toast.error(t('system.failed_to_generate_invite_codes'));
@@ -298,7 +279,7 @@ export function RegistrationPolicySettings() {
   if (loading || !policy) {
     return (
       <div>
-        <PageHeader title={t('system.registration_policy_settings_title')} description={`Control how new members join ${tenant?.name || 'your community'}`} />
+        <PageHeader title={t('system.registration_policy_settings_title')} description={t('system.reg.page_description', { name: tenant?.name || t('system.reg.your_community') })} />
         <div className="flex justify-center py-16"><Spinner size="lg" /></div>
       </div>
     );
@@ -306,7 +287,7 @@ export function RegistrationPolicySettings() {
 
   return (
     <div>
-      <PageHeader title={t('system.registration_policy_settings_title')} description={`Control how new members join ${tenant?.name || 'your community'}`} />
+      <PageHeader title={t('system.registration_policy_settings_title')} description={t('system.reg.page_description', { name: tenant?.name || t('system.reg.your_community') })} />
 
       <div className="space-y-6">
 
@@ -315,10 +296,10 @@ export function RegistrationPolicySettings() {
           <CardHeader className="pb-0">
             <div>
               <h3 className="text-lg font-semibold flex items-center gap-2">
-                <ShieldCheck size={20} className="text-primary" /> Registration Method
+                <ShieldCheck size={20} className="text-primary" /> {t('system.reg.registration_method')}
               </h3>
               <p className="text-sm text-default-500 mt-1">
-                Choose how new users join your community. This controls the entire registration flow, from sign-up form to account activation.
+                {t('system.reg.registration_method_desc')}
               </p>
             </div>
           </CardHeader>
@@ -350,23 +331,21 @@ export function RegistrationPolicySettings() {
             {policy.registration_mode === 'government_id' && (
               <div className="flex items-center gap-2 p-3 rounded-lg bg-warning-50 text-warning-700 dark:bg-warning-900/20 dark:text-warning-400">
                 <AlertTriangle size={16} className="shrink-0" />
-                <span className="text-sm">Government/Digital ID integration is a future feature. Select a different mode for now, or it will behave like admin approval.</span>
+                <span className="text-sm">{t('system.reg.gov_id_future')}</span>
               </div>
             )}
 
             {policy.registration_mode === 'waitlist' && (
               <div className="flex items-center gap-2 p-3 rounded-lg bg-primary-50 text-primary-700 dark:bg-primary-900/20 dark:text-primary-400">
                 <Users size={16} className="shrink-0" />
-                <span className="text-sm">Users will join a queue when they register. You can activate them from the Members admin page in the order they signed up.</span>
+                <span className="text-sm">{t('system.reg.waitlist_info')}</span>
               </div>
             )}
 
             {policy.registration_mode === 'verified_identity' && availableProviderCount === 0 && (
               <div className="flex items-center gap-2 p-3 rounded-lg bg-danger-50 text-danger-700 dark:bg-danger-900/20 dark:text-danger-400">
                 <AlertTriangle size={16} className="shrink-0" />
-                <span className="text-sm">
-                  <strong>No verification providers are available.</strong> You need to configure API credentials for at least one provider below before identity verification will work.
-                </span>
+                <span className="text-sm">{t('system.reg.no_providers_warning')}</span>
               </div>
             )}
           </CardBody>
@@ -378,10 +357,10 @@ export function RegistrationPolicySettings() {
             <CardHeader className="pb-0">
               <div>
                 <h3 className="text-lg font-semibold flex items-center gap-2">
-                  <UserCheck size={20} className="text-secondary" /> Verification Settings
+                  <UserCheck size={20} className="text-secondary" /> {t('system.reg.verification_settings')}
                 </h3>
                 <p className="text-sm text-default-500 mt-1">
-                  Configure how identity verification works — which provider to use, what level of checking, and what happens after verification.
+                  {t('system.reg.verification_settings_desc')}
                 </p>
               </div>
             </CardHeader>
@@ -396,8 +375,8 @@ export function RegistrationPolicySettings() {
                 variant="bordered"
                 description={
                   availableProviderCount > 0
-                    ? `${availableProviderCount} provider(s) available. Configure API keys in the "Provider API Credentials" section below.`
-                    : 'No providers available yet. Add API credentials in the section below to enable a provider.'
+                    ? t('system.reg.providers_available', { count: availableProviderCount })
+                    : t('system.reg.no_providers_yet')
                 }
               >
                 {providers.map((p) => (
@@ -405,9 +384,9 @@ export function RegistrationPolicySettings() {
                     <div className="flex items-center gap-2">
                       <span>{p.name}</span>
                       {p.available ? (
-                        <Chip size="sm" color="success" variant="flat">Available</Chip>
+                        <Chip size="sm" color="success" variant="flat">{t('system.reg.available')}</Chip>
                       ) : (
-                        <Chip size="sm" color="danger" variant="flat">Unavailable</Chip>
+                        <Chip size="sm" color="danger" variant="flat">{t('system.reg.unavailable')}</Chip>
                       )}
                     </div>
                   </SelectItem>
@@ -475,17 +454,16 @@ export function RegistrationPolicySettings() {
           <CardHeader className="pb-0">
             <div>
               <h3 className="text-lg font-semibold flex items-center gap-2">
-                <Mail size={20} className="text-primary" /> Email Verification
+                <Mail size={20} className="text-primary" /> {t('system.reg.email_verification')}
               </h3>
             </div>
           </CardHeader>
           <CardBody>
             <div className="flex items-center justify-between gap-4">
               <div>
-                <p className="font-medium">Require Email Verification</p>
+                <p className="font-medium">{t('system.reg.require_email')}</p>
                 <p className="text-sm text-default-500">
-                  Users must click a confirmation link sent to their email before they can access the platform.
-                  Recommended for all registration modes to prevent fake accounts.
+                  {t('system.reg.require_email_desc')}
                 </p>
               </div>
               <Switch
@@ -506,7 +484,7 @@ export function RegistrationPolicySettings() {
             onPress={handleSave}
             isLoading={saving}
           >
-            Save Registration Policy
+            {t('system.reg.save_policy')}
           </Button>
         </div>
 
@@ -519,24 +497,21 @@ export function RegistrationPolicySettings() {
               <div className="w-full">
                 <div className="flex items-center justify-between">
                   <h3 className="text-lg font-semibold flex items-center gap-2">
-                    <Key size={20} className="text-warning" /> Identity Verification Providers
+                    <Key size={20} className="text-warning" /> {t('system.reg.identity_providers')}
                   </h3>
                   <div className="flex items-center gap-2">
                     {configuredProviderCount > 0 && (
                       <Chip size="sm" color="success" variant="flat" startContent={<CheckCircle2 size={12} />}>
-                        {configuredProviderCount} configured
+                        {t('system.reg.n_configured', { count: configuredProviderCount })}
                       </Chip>
                     )}
                     <Chip size="sm" color={availableProviderCount > 0 ? 'success' : 'default'} variant="flat">
-                      {availableProviderCount} available
+                      {t('system.reg.n_available', { count: availableProviderCount })}
                     </Chip>
                   </div>
                 </div>
                 <p className="text-sm text-default-500 mt-1">
-                  To use identity verification, you need an account with at least one provider below.
-                  Enter your API credentials here — they are encrypted at rest using AES-256-GCM and are never
-                  exposed in API responses. Once credentials are saved, the provider will show as &quot;Available&quot;
-                  and can be selected as your verification provider.
+                  {t('system.reg.provider_credentials_desc')}
                 </p>
               </div>
             </CardHeader>
@@ -556,9 +531,9 @@ export function RegistrationPolicySettings() {
                         <div className="flex items-center gap-2 flex-wrap">
                           <span className="font-medium">{p.name}</span>
                           {p.has_credentials ? (
-                            <Chip size="sm" color="success" variant="flat" startContent={<CheckCircle2 size={12} />}>Credentials Saved</Chip>
+                            <Chip size="sm" color="success" variant="flat" startContent={<CheckCircle2 size={12} />}>{t('system.reg.credentials_saved_chip')}</Chip>
                           ) : (
-                            <Chip size="sm" color="default" variant="flat">Not Configured</Chip>
+                            <Chip size="sm" color="default" variant="flat">{t('system.reg.not_configured')}</Chip>
                           )}
                           {p.available ? (
                             <Chip size="sm" color="success" variant="dot">Available</Chip>
@@ -576,22 +551,22 @@ export function RegistrationPolicySettings() {
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                           <Input
                             label={t('system.label_a_p_i_key_secret_key')}
-                            placeholder={p.has_credentials ? '(saved — enter new value to replace)' : 'Enter your API key'}
+                            placeholder={p.has_credentials ? t('system.reg.placeholder_saved') : t('system.reg.placeholder_api_key')}
                             value={inputs.api_key}
                             onChange={(e) => setCredentialInputs(prev => ({ ...prev, [p.slug]: { ...inputs, api_key: e.target.value } }))}
                             type={visibility.api_key ? 'text' : 'password'}
                             variant="bordered"
                             size="sm"
-                            description="Your provider's API key or secret key"
+                            description={t('system.reg.api_key_desc')}
                             endContent={
-                              <Button isIconOnly size="sm" variant="light" aria-label={visibility.api_key ? "Hide API key" : "Show API key"} onPress={() => setCredentialVisibility(prev => ({ ...prev, [p.slug]: { ...visibility, api_key: !visibility.api_key } }))}>
+                              <Button isIconOnly size="sm" variant="light" aria-label={visibility.api_key ? t('system.reg.hide_api_key') : t('system.reg.show_api_key')} onPress={() => setCredentialVisibility(prev => ({ ...prev, [p.slug]: { ...visibility, api_key: !visibility.api_key } }))}>
                                 {visibility.api_key ? <EyeOff size={14} /> : <Eye size={14} />}
                               </Button>
                             }
                           />
                           <Input
                             label={t('system.label_webhook_secret')}
-                            placeholder={p.has_credentials ? '(saved — enter new value to replace)' : 'Enter your webhook secret'}
+                            placeholder={p.has_credentials ? t('system.reg.placeholder_saved') : t('system.reg.placeholder_webhook')}
                             value={inputs.webhook_secret}
                             onChange={(e) => setCredentialInputs(prev => ({ ...prev, [p.slug]: { ...inputs, webhook_secret: e.target.value } }))}
                             type={visibility.webhook_secret ? 'text' : 'password'}
@@ -599,7 +574,7 @@ export function RegistrationPolicySettings() {
                             size="sm"
                             description={t('system.desc_used_to_verify_incoming_webhook_payloads')}
                             endContent={
-                              <Button isIconOnly size="sm" variant="light" aria-label={visibility.webhook_secret ? "Hide webhook secret" : "Show webhook secret"} onPress={() => setCredentialVisibility(prev => ({ ...prev, [p.slug]: { ...visibility, webhook_secret: !visibility.webhook_secret } }))}>
+                              <Button isIconOnly size="sm" variant="light" aria-label={visibility.webhook_secret ? t('system.reg.hide_webhook') : t('system.reg.show_webhook')} onPress={() => setCredentialVisibility(prev => ({ ...prev, [p.slug]: { ...visibility, webhook_secret: !visibility.webhook_secret } }))}>
                                 {visibility.webhook_secret ? <EyeOff size={14} /> : <Eye size={14} />}
                               </Button>
                             }
@@ -616,7 +591,7 @@ export function RegistrationPolicySettings() {
                                 startContent={<Trash2 size={14} />}
                                 onPress={() => handleDeleteCredentials(p.slug)}
                               >
-                                Remove Credentials
+                                {t('system.reg.remove_credentials')}
                               </Button>
                             )}
                           </div>
@@ -628,7 +603,7 @@ export function RegistrationPolicySettings() {
                               isLoading={isSaving}
                               onPress={() => handleSaveCredentials(p.slug)}
                             >
-                              Save Credentials
+                              {t('system.reg.save_credentials')}
                             </Button>
                           )}
                         </div>
@@ -642,15 +617,15 @@ export function RegistrationPolicySettings() {
                 <div className="flex items-start gap-2 p-3 rounded-lg bg-default-100 dark:bg-default-50/10">
                   <HelpCircle size={16} className="text-default-500 shrink-0 mt-0.5" />
                   <div className="text-sm text-default-600 dark:text-default-400">
-                    <p className="font-medium">How to get API credentials</p>
+                    <p className="font-medium">{t('system.reg.how_to_get_credentials')}</p>
                     <ol className="list-decimal list-inside space-y-1 mt-1">
-                      <li>Sign up for an account with your chosen provider (e.g. Stripe, Veriff, Onfido)</li>
-                      <li>Navigate to their developer dashboard and create API keys</li>
-                      <li>Copy your API Key and Webhook Secret into the fields above</li>
-                      <li>Click &quot;Save Credentials&quot; — the provider will immediately become available</li>
+                      <li>{t('system.reg.credential_step_1')}</li>
+                      <li>{t('system.reg.credential_step_2')}</li>
+                      <li>{t('system.reg.credential_step_3')}</li>
+                      <li>{t('system.reg.credential_step_4')}</li>
                     </ol>
                     <p className="mt-2 text-default-500">
-                      You only need to configure <strong>one</strong> provider. Credentials are stored encrypted and can be updated or removed at any time.
+                      {t('system.reg.credential_note')}
                     </p>
                   </div>
                 </div>
@@ -665,10 +640,10 @@ export function RegistrationPolicySettings() {
             <CardHeader className="flex justify-between items-center">
               <div>
                 <h3 className="text-lg font-semibold flex items-center gap-2">
-                  <Ticket size={20} className="text-warning" /> Invite Codes
+                  <Ticket size={20} className="text-warning" /> {t('system.reg.invite_codes')}
                 </h3>
                 <p className="text-sm text-default-500 mt-1">
-                  Generate and manage invite codes for your community. Share codes with people you want to invite — they will enter the code during registration.
+                  {t('system.reg.invite_codes_desc')}
                 </p>
               </div>
               <Button
@@ -677,7 +652,7 @@ export function RegistrationPolicySettings() {
                 startContent={<Plus size={14} />}
                 onPress={() => { setGeneratedCodes([]); setGenerateCount(1); setGenerateMaxUses(1); setGenerateExpiry(''); setGenerateNote(''); generateModal.onOpen(); }}
               >
-                Generate Codes
+                {t('system.reg.generate_codes')}
               </Button>
             </CardHeader>
             <CardBody>
@@ -686,18 +661,18 @@ export function RegistrationPolicySettings() {
               ) : inviteCodes.length === 0 ? (
                 <div className="text-center py-8">
                   <Ticket size={32} className="mx-auto text-default-300 mb-2" />
-                  <p className="text-sm text-default-500">No invite codes generated yet.</p>
-                  <p className="text-xs text-default-400 mt-1">Click &quot;Generate Codes&quot; to create your first invite codes.</p>
+                  <p className="text-sm text-default-500">{t('system.reg.no_invite_codes')}</p>
+                  <p className="text-xs text-default-400 mt-1">{t('system.reg.no_invite_codes_hint')}</p>
                 </div>
               ) : (
                 <Table aria-label={t('system.label_invite_codes')} removeWrapper>
                   <TableHeader>
-                    <TableColumn>Code</TableColumn>
-                    <TableColumn>Uses</TableColumn>
-                    <TableColumn>Status</TableColumn>
-                    <TableColumn>Note</TableColumn>
-                    <TableColumn>Expires</TableColumn>
-                    <TableColumn>Actions</TableColumn>
+                    <TableColumn>{t('system.reg.col_code')}</TableColumn>
+                    <TableColumn>{t('system.reg.col_uses')}</TableColumn>
+                    <TableColumn>{t('system.reg.col_status')}</TableColumn>
+                    <TableColumn>{t('system.reg.col_note')}</TableColumn>
+                    <TableColumn>{t('system.reg.col_expires')}</TableColumn>
+                    <TableColumn>{t('system.reg.col_actions')}</TableColumn>
                   </TableHeader>
                   <TableBody>
                     {inviteCodes.map((ic) => (
@@ -717,19 +692,19 @@ export function RegistrationPolicySettings() {
                         </TableCell>
                         <TableCell>
                           {!ic.is_active ? (
-                            <Chip size="sm" color="default" variant="flat">Deactivated</Chip>
+                            <Chip size="sm" color="default" variant="flat">{t('system.reg.deactivated')}</Chip>
                           ) : ic.uses_count >= ic.max_uses ? (
-                            <Chip size="sm" color="warning" variant="flat">Exhausted</Chip>
+                            <Chip size="sm" color="warning" variant="flat">{t('system.reg.exhausted')}</Chip>
                           ) : ic.expires_at && new Date(ic.expires_at) < new Date() ? (
-                            <Chip size="sm" color="warning" variant="flat">Expired</Chip>
+                            <Chip size="sm" color="warning" variant="flat">{t('system.reg.expired')}</Chip>
                           ) : (
-                            <Chip size="sm" color="success" variant="flat">Active</Chip>
+                            <Chip size="sm" color="success" variant="flat">{t('active')}</Chip>
                           )}
                         </TableCell>
                         <TableCell><span className="text-sm text-default-500">{ic.note || '—'}</span></TableCell>
                         <TableCell>
                           <span className="text-sm text-default-500">
-                            {ic.expires_at ? new Date(ic.expires_at).toLocaleDateString() : 'Never'}
+                            {ic.expires_at ? new Date(ic.expires_at).toLocaleDateString() : t('system.reg.never')}
                           </span>
                         </TableCell>
                         <TableCell>
@@ -745,7 +720,7 @@ export function RegistrationPolicySettings() {
                 </Table>
               )}
               {inviteCodesTotal > 0 && (
-                <p className="text-xs text-default-400 mt-2">{inviteCodesTotal} total code(s)</p>
+                <p className="text-xs text-default-400 mt-2">{t('system.reg.total_codes', { count: inviteCodesTotal })}</p>
               )}
             </CardBody>
           </Card>
@@ -754,11 +729,11 @@ export function RegistrationPolicySettings() {
         {/* Generate Codes Modal */}
         <Modal isOpen={generateModal.isOpen} onOpenChange={generateModal.onOpenChange} size="md">
           <ModalContent>
-            <ModalHeader>Generate Invite Codes</ModalHeader>
+            <ModalHeader>{t('system.reg.generate_invite_codes')}</ModalHeader>
             <ModalBody>
               {generatedCodes.length > 0 ? (
                 <div className="space-y-2">
-                  <p className="text-sm text-default-500">Generated {generatedCodes.length} code(s). Share these with the people you want to invite:</p>
+                  <p className="text-sm text-default-500">{t('system.reg.generated_share', { count: generatedCodes.length })}</p>
                   <div className="space-y-1">
                     {generatedCodes.map((code) => (
                       <div key={code} className="flex items-center justify-between p-2 bg-default-100 rounded-lg">
@@ -776,7 +751,7 @@ export function RegistrationPolicySettings() {
                     startContent={<Copy size={14} />}
                     className="mt-2"
                   >
-                    Copy All Codes
+                    {t('system.reg.copy_all_codes')}
                   </Button>
                 </div>
               ) : (
@@ -789,7 +764,7 @@ export function RegistrationPolicySettings() {
                     value={String(generateCount)}
                     onChange={(e) => setGenerateCount(Math.max(1, Math.min(100, parseInt(e.target.value) || 1)))}
                     variant="bordered"
-                    description="How many invite codes to generate (max 100)"
+                    description={t('system.reg.generate_count_desc')}
                   />
                   <Input
                     label={t('system.label_max_uses_per_code')}
@@ -799,10 +774,10 @@ export function RegistrationPolicySettings() {
                     value={String(generateMaxUses)}
                     onChange={(e) => setGenerateMaxUses(Math.max(1, Math.min(1000, parseInt(e.target.value) || 1)))}
                     variant="bordered"
-                    description="Set to 1 for single-use codes, or higher for shared codes"
+                    description={t('system.reg.max_uses_desc')}
                   />
                   <Input
-                    label="Expiry date (optional)"
+                    label={t('system.reg.expiry_date')}
                     type="date"
                     value={generateExpiry}
                     onChange={(e) => setGenerateExpiry(e.target.value)}
@@ -810,8 +785,8 @@ export function RegistrationPolicySettings() {
                     description={t('system.desc_codes_expire_at_midnight_on_this_date_l')}
                   />
                   <Input
-                    label="Note (optional)"
-                    placeholder="e.g. March 2026 onboarding batch"
+                    label={t('system.reg.note_optional')}
+                    placeholder={t('system.reg.note_placeholder')}
                     value={generateNote}
                     onChange={(e) => setGenerateNote(e.target.value)}
                     variant="bordered"
@@ -822,11 +797,11 @@ export function RegistrationPolicySettings() {
             </ModalBody>
             <ModalFooter>
               <Button variant="flat" onPress={generateModal.onClose}>
-                {generatedCodes.length > 0 ? 'Done' : 'Cancel'}
+                {generatedCodes.length > 0 ? t('system.reg.done') : t('cancel')}
               </Button>
               {generatedCodes.length === 0 && (
-                <Button color="primary" onPress={handleGenerateInviteCodes} isLoading={generating}>
-                  Generate
+                <Button color="primary" onPress={handleGenerateInviteCodes} isLoading={generating} isDisabled={generating}>
+                  {t('system.reg.generate')}
                 </Button>
               )}
             </ModalFooter>
@@ -839,37 +814,36 @@ export function RegistrationPolicySettings() {
             <div className="flex gap-3">
               <Info size={20} className="text-primary shrink-0 mt-0.5" />
               <div className="text-sm space-y-2">
-                <p className="font-semibold text-base">Understanding Registration Modes</p>
+                <p className="font-semibold text-base">{t('system.reg.understanding_modes')}</p>
                 <div className="space-y-2 text-default-700 dark:text-default-300">
                   <div className="flex items-start gap-2">
                     <Globe size={14} className="shrink-0 mt-1 text-success" />
-                    <p><strong>Open Registration</strong> — Lowest friction. Users sign up and are active immediately. Good for public communities prioritising growth.</p>
+                    <p>{t('system.reg.info_open')}</p>
                   </div>
                   <div className="flex items-start gap-2">
                     <UserCheck size={14} className="shrink-0 mt-1 text-primary" />
-                    <p><strong>Open + Admin Approval</strong> — Users register but stay pending until an admin manually approves them. Balances accessibility with control.</p>
+                    <p>{t('system.reg.info_open_approval')}</p>
                   </div>
                   <div className="flex items-start gap-2">
                     <ShieldCheck size={14} className="shrink-0 mt-1 text-secondary" />
-                    <p><strong>Identity Verification</strong> — Users must pass automated ID checks (document scan, selfie match) via a third-party provider. Highest trust level for automated onboarding.</p>
+                    <p>{t('system.reg.info_verified')}</p>
                   </div>
                   <div className="flex items-start gap-2">
                     <Lock size={14} className="shrink-0 mt-1 text-warning" />
-                    <p><strong>Invite Only</strong> — Registration is closed. Only users with a valid invite code can join. Best for private communities or controlled rollouts.</p>
+                    <p>{t('system.reg.info_invite')}</p>
                   </div>
                   <div className="flex items-start gap-2">
                     <Clock size={14} className="shrink-0 mt-1 text-default-500" />
-                    <p><strong>Waitlist</strong> — Users join a queue and are activated in order. Useful for managing capacity or creating exclusivity during launch.</p>
+                    <p>{t('system.reg.info_waitlist')}</p>
                   </div>
                   <div className="flex items-start gap-2">
                     <Shield size={14} className="shrink-0 mt-1 text-default-400" />
-                    <p><strong>Government/Digital ID</strong> — Future feature. Will support government-issued digital identity credentials (EUDI Wallet, UK trust framework, etc.).</p>
+                    <p>{t('system.reg.info_gov_id')}</p>
                   </div>
                 </div>
                 <Divider className="my-2" />
                 <p className="text-default-500">
-                  <strong>Tip:</strong> You can change modes at any time. Existing users are not affected — only new registrations use the updated policy.
-                  Email verification is independent of the registration mode and can be enabled alongside any method.
+                  {t('system.reg.tip_change_modes')}
                 </p>
               </div>
             </div>

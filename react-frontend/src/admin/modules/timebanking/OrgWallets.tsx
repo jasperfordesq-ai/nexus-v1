@@ -56,7 +56,7 @@ export function OrgWallets() {
     () => [
       {
         key: 'org_name',
-        label: 'Organization',
+        label: t('timebanking.col_organization'),
         sortable: true,
         render: (wallet) => (
           <span className="text-sm font-medium">{wallet.org_name}</span>
@@ -64,7 +64,7 @@ export function OrgWallets() {
       },
       {
         key: 'balance',
-        label: 'Balance',
+        label: t('timebanking.col_balance'),
         sortable: true,
         render: (wallet) => (
           <span className="text-sm font-semibold">
@@ -74,7 +74,7 @@ export function OrgWallets() {
       },
       {
         key: 'total_in',
-        label: 'Total In',
+        label: t('timebanking.col_total_in'),
         sortable: true,
         render: (wallet) => (
           <span className="text-sm text-success">
@@ -84,7 +84,7 @@ export function OrgWallets() {
       },
       {
         key: 'total_out',
-        label: 'Total Out',
+        label: t('timebanking.col_total_out'),
         sortable: true,
         render: (wallet) => (
           <span className="text-sm text-danger">
@@ -94,7 +94,7 @@ export function OrgWallets() {
       },
       {
         key: 'member_count',
-        label: 'Members',
+        label: t('timebanking.col_members'),
         sortable: true,
         render: (wallet) => (
           <span className="text-sm">{wallet.member_count}</span>
@@ -102,7 +102,7 @@ export function OrgWallets() {
       },
       {
         key: 'created_at',
-        label: 'Created',
+        label: t('timebanking.col_created'),
         sortable: true,
         render: (wallet) => (
           <span className="text-sm text-default-500">
@@ -127,7 +127,7 @@ export function OrgWallets() {
             startContent={<ArrowLeft size={16} />}
             size="sm"
           >
-            Back to Timebanking
+            {t('timebanking.back_to_timebanking')}
           </Button>
         }
       />
@@ -141,7 +141,7 @@ export function OrgWallets() {
         emptyContent={
           <div className="flex flex-col items-center gap-2 py-8">
             <Building2 size={32} className="text-default-300" />
-            <p className="text-sm text-default-400">No organization wallets found</p>
+            <p className="text-sm text-default-400">{t('timebanking.no_org_wallets')}</p>
           </div>
         }
       />

@@ -76,7 +76,7 @@ export function DeliverabilityDashboard() {
       </div>
 
       <Card shadow="sm">
-        <CardHeader><h3 className="text-lg font-semibold">Recent Activity</h3></CardHeader>
+        <CardHeader><h3 className="text-lg font-semibold">{t('deliverability.recent_activity')}</h3></CardHeader>
         <CardBody>
           {stats.recent_activity && stats.recent_activity.length > 0 ? (
             <div className="space-y-3">
@@ -97,7 +97,7 @@ export function DeliverabilityDashboard() {
           ) : (
             <div className="flex flex-col items-center py-8 text-default-400">
               <Target size={40} className="mb-3" />
-              <p>Deliverability tracking will appear here once deliverables are created.</p>
+              <p>{t('deliverability.empty_dashboard')}</p>
             </div>
           )}
         </CardBody>

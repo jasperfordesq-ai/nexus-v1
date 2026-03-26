@@ -81,7 +81,7 @@ export function GamificationAnalytics() {
         actions={
           <Link to="../gamification">
             <Button variant="flat" startContent={<ArrowLeft size={16} />}>
-              Back to Hub
+              {t('gamification.back_to_hub')}
             </Button>
           </Link>
         }
@@ -124,8 +124,8 @@ export function GamificationAnalytics() {
         <Card shadow="sm">
           <CardHeader className="pb-0">
             <div>
-              <h3 className="text-lg font-semibold text-foreground">Badge Distribution</h3>
-              <p className="text-sm text-default-500">Top 10 most awarded badges</p>
+              <h3 className="text-lg font-semibold text-foreground">{t('gamification.badge_distribution')}</h3>
+              <p className="text-sm text-default-500">{t('gamification.top_10_badges')}</p>
             </div>
           </CardHeader>
           <CardBody>
@@ -155,7 +155,7 @@ export function GamificationAnalytics() {
             ) : (
               <div className="flex flex-col items-center justify-center py-12 text-center">
                 <Award size={40} className="text-default-300 mb-2" />
-                <p className="text-default-500">No badges awarded yet</p>
+                <p className="text-default-500">{t('gamification.no_badges_awarded')}</p>
               </div>
             )}
           </CardBody>
@@ -165,7 +165,7 @@ export function GamificationAnalytics() {
         <Card shadow="sm">
           <CardHeader className="pb-0">
             <div>
-              <h3 className="text-lg font-semibold text-foreground">Badge Catalogue</h3>
+              <h3 className="text-lg font-semibold text-foreground">{t('gamification.badge_catalogue')}</h3>
               <p className="text-sm text-default-500">
                 {badges.length} total badges ({builtInBadges.length} built-in, {customBadges.length} custom)
               </p>
@@ -206,7 +206,7 @@ export function GamificationAnalytics() {
             ) : (
               <div className="flex flex-col items-center justify-center py-12 text-center">
                 <Award size={40} className="text-default-300 mb-2" />
-                <p className="text-default-500">No badges defined</p>
+                <p className="text-default-500">{t('gamification.no_badges_defined')}</p>
               </div>
             )}
           </CardBody>

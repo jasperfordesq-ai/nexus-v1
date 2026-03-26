@@ -108,7 +108,7 @@ export function SystemConfig() {
               onPress={loadData}
               size="sm"
             >
-              Reload
+              {t('enterprise.reload')}
             </Button>
             <Button
               color="primary"
@@ -117,7 +117,7 @@ export function SystemConfig() {
               isLoading={saving}
               size="sm"
             >
-              Save Changes
+              {t('enterprise.save_changes')}
             </Button>
           </div>
         }
@@ -126,7 +126,7 @@ export function SystemConfig() {
       {configKeys.length === 0 ? (
         <Card shadow="sm">
           <CardBody className="py-16 text-center">
-            <p className="text-default-500">No configuration keys found</p>
+            <p className="text-default-500">{t('enterprise.no_configuration_keys')}</p>
           </CardBody>
         </Card>
       ) : (

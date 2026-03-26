@@ -72,6 +72,26 @@ interface InactiveMember {
   flagged_at: string;
 }
 
+interface InactiveListResponse {
+  members?: InactiveMember[];
+  stats?: InactivityStats | null;
+  pagination?: { total_pages: number };
+}
+
+interface ApiResponseWithMeta {
+  data?: unknown;
+  meta?: { total_pages?: number };
+}
+
+interface DetectionResult {
+  flagged?: number;
+}
+
+interface NotifyResult {
+  message?: string;
+  updated?: number;
+}
+
 interface InactivityStats {
   total_active_members: number;
   total_flagged: number;
@@ -166,14 +186,12 @@ export function InactiveMembersPage() {
 
       const res = await api.get(`/v2/admin/members/inactive?${params}`);
       if (res.data) {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const d = res.data as any;
+        const d = res.data as InactiveListResponse;
         setMembers(d.members ?? []);
         setStats(d.stats ?? null);
 
         // Pagination from meta or data
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const meta = (res as any).meta as Record<string, number> | undefined;
+        const meta = (res as ApiResponseWithMeta).meta;
         const tp = meta?.total_pages ?? d.pagination?.total_pages ?? 1;
         setTotalPages(Math.max(1, tp));
       }
@@ -202,8 +220,7 @@ export function InactiveMembersPage() {
         threshold_days: parseInt(days, 10),
       });
       if (res.data) {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const result = res.data as any;
+        const result = res.data as DetectionResult;
         toast.success(t('reports.detection_complete', { count: result.flagged ?? 0 }));
         await loadData();
       }
@@ -227,8 +244,7 @@ export function InactiveMembersPage() {
       const userIds = Array.from(selectedIds);
       const res = await api.post('/v2/admin/members/inactive/notify', { user_ids: userIds });
       if (res.data) {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const result = res.data as any;
+        const result = res.data as NotifyResult;
         toast.success(result.message || t('reports.members_marked_notified', { count: result.updated }));
         setSelectedIds(new Set());
         await loadData();
@@ -303,6 +319,7 @@ export function InactiveMembersPage() {
               startContent={<Scan size={16} />}
               onPress={handleDetect}
               isLoading={detecting}
+              isDisabled={detecting}
               size="sm"
             >
               {t('reports.run_detection')}
@@ -320,6 +337,7 @@ export function InactiveMembersPage() {
               startContent={<RefreshCw size={16} />}
               onPress={loadData}
               isLoading={loading}
+              isDisabled={loading}
               size="sm"
             >
               {t('reports.refresh')}
@@ -401,6 +419,7 @@ export function InactiveMembersPage() {
               startContent={<Bell size={14} />}
               onPress={handleNotify}
               isLoading={notifying}
+              isDisabled={notifying}
             >
               {t('reports.mark_as_notified')}
             </Button>

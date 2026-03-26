@@ -89,16 +89,16 @@ export function SeoAudit() {
         const failCount = newChecks.filter(c => c.status === 'fail').length;
 
         const parts: string[] = [];
-        if (passCount > 0) parts.push(`${passCount} passed`);
-        if (warnCount > 0) parts.push(`${warnCount} warning${warnCount !== 1 ? 's' : ''}`);
-        if (failCount > 0) parts.push(`${failCount} failed`);
+        if (passCount > 0) parts.push(t('advanced.passed_count', { count: passCount }));
+        if (warnCount > 0) parts.push(t('advanced.warnings_count', { count: warnCount }));
+        if (failCount > 0) parts.push(t('advanced.failed_count', { count: failCount }));
 
-        toast.success('SEO audit complete', parts.join(', ') + '.');
+        toast.success(t('advanced.seo_audit_complete'), parts.join(', ') + '.');
       } else {
-        toast.error('SEO audit failed', 'The server did not return results.');
+        toast.error(t('advanced.seo_audit_failed'), t('advanced.seo_audit_no_results'));
       }
     } catch {
-      toast.error('SEO audit failed', 'An error occurred while running the audit.');
+      toast.error(t('advanced.seo_audit_failed'), t('advanced.seo_audit_error'));
     } finally {
       setRunning(false);
     }
@@ -137,7 +137,7 @@ export function SeoAudit() {
                 onPress={loadAudit}
                 size="sm"
               >
-                Reload Results
+                {t('advanced.reload_results')}
               </Button>
             )}
             <Button
@@ -146,7 +146,7 @@ export function SeoAudit() {
               onPress={handleRunAudit}
               isLoading={running}
             >
-              Run Audit
+              {t('advanced.run_audit')}
             </Button>
           </div>
         }
@@ -154,12 +154,12 @@ export function SeoAudit() {
 
       {hasResults && (
         <div className="flex flex-wrap items-center gap-2 mb-4">
-          {passCount > 0 && <Chip color="success" variant="flat">{passCount} passed</Chip>}
-          {warnCount > 0 && <Chip color="warning" variant="flat">{warnCount} warnings</Chip>}
-          {failCount > 0 && <Chip color="danger" variant="flat">{failCount} failed</Chip>}
+          {passCount > 0 && <Chip color="success" variant="flat">{t('advanced.passed_count', { count: passCount })}</Chip>}
+          {warnCount > 0 && <Chip color="warning" variant="flat">{t('advanced.warnings_count', { count: warnCount })}</Chip>}
+          {failCount > 0 && <Chip color="danger" variant="flat">{t('advanced.failed_count', { count: failCount })}</Chip>}
           {lastRunAt && (
             <span className="text-xs text-default-400 ml-2">
-              Last run: {new Date(lastRunAt).toLocaleString()}
+              {t('advanced.last_run', { time: new Date(lastRunAt).toLocaleString() })}
             </span>
           )}
         </div>
@@ -168,15 +168,15 @@ export function SeoAudit() {
       <Card shadow="sm">
         <CardHeader>
           <h3 className="text-lg font-semibold flex items-center gap-2">
-            <ClipboardCheck size={20} /> Audit Results
+            <ClipboardCheck size={20} /> {t('advanced.audit_results')}
           </h3>
         </CardHeader>
         <CardBody>
           {!hasResults ? (
             <div className="flex flex-col items-center py-8 text-default-400">
               <ClipboardCheck size={40} className="mb-2" />
-              <p className="font-medium">No audit results yet</p>
-              <p className="text-sm mt-1">Click "Run Audit" to perform an SEO health check on your platform.</p>
+              <p className="font-medium">{t('advanced.no_audit_results')}</p>
+              <p className="text-sm mt-1">{t('advanced.no_audit_results_desc')}</p>
             </div>
           ) : (
             <div className="space-y-3">

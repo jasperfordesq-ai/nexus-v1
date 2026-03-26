@@ -15,6 +15,7 @@ import {
   Input,
   Divider,
 } from '@heroui/react';
+import { useTranslation } from 'react-i18next';
 import { useToast } from '@/contexts/ToastContext';
 import { adminGroups } from '@/admin/api/adminApi';
 import type { GroupPolicy } from '@/admin/api/types';
@@ -34,6 +35,7 @@ interface PolicySection {
 
 export default function GroupPolicies({
   isOpen, onClose, typeId, typeName }: GroupPoliciesProps) {
+  const { t } = useTranslation('admin');
   const { success, error } = useToast();
   const [loading, setLoading] = useState(true);
   const [policies, setPolicies] = useState<GroupPolicy[]>([]);
@@ -47,7 +49,7 @@ export default function GroupPolicies({
       setPolicies(data);
       organizePolicies(data);
     } catch {
-      error('Failed to load policies');
+      error(t('groups.failed_to_load_policies'));
     } finally {
       setLoading(false);
     }
@@ -72,32 +74,32 @@ export default function GroupPolicies({
     const organized: PolicySection[] = [
       {
         category: 'features',
-        title: 'Features',
+        title: t('groups.policy_features'),
         policies: categoryMap.get('features') || [],
       },
       {
         category: 'moderation',
-        title: 'Moderation',
+        title: t('groups.policy_moderation'),
         policies: categoryMap.get('moderation') || [],
       },
       {
         category: 'membership',
-        title: 'Membership',
+        title: t('groups.policy_membership'),
         policies: categoryMap.get('membership') || [],
       },
       {
         category: 'creation',
-        title: 'Creation',
+        title: t('groups.policy_creation'),
         policies: categoryMap.get('creation') || [],
       },
       {
         category: 'content',
-        title: 'Content',
+        title: t('groups.policy_content'),
         policies: categoryMap.get('content') || [],
       },
       {
         category: 'notifications',
-        title: 'Notifications',
+        title: t('groups.policy_notifications'),
         policies: categoryMap.get('notifications') || [],
       },
     ].filter((section) => section.policies.length > 0);
@@ -108,7 +110,7 @@ export default function GroupPolicies({
   const handlePolicyChange = async (policy: GroupPolicy, newValue: string | number | boolean) => {
     try {
       await adminGroups.setPolicy(typeId, policy.key, newValue);
-      success('Policy updated');
+      success(t('groups.policy_updated'));
 
       // Update local state
       const updatedPolicies = policies.map((p) =>
@@ -117,7 +119,7 @@ export default function GroupPolicies({
       setPolicies(updatedPolicies);
       organizePolicies(updatedPolicies);
     } catch {
-      error('Failed to update policy');
+      error(t('groups.failed_to_update_policy'));
     }
   };
 
@@ -165,15 +167,15 @@ export default function GroupPolicies({
       <ModalContent>
         <ModalHeader>
           <div>
-            <div className="text-lg font-semibold">Group Policies</div>
+            <div className="text-lg font-semibold">{t('groups.group_policies')}</div>
             <div className="text-sm font-normal text-gray-500 mt-1">{typeName}</div>
           </div>
         </ModalHeader>
         <ModalBody>
           {loading ? (
-            <div className="text-center py-8 text-gray-500">Loading policies...</div>
+            <div className="text-center py-8 text-gray-500">{t('groups.loading_policies')}</div>
           ) : sections.length === 0 ? (
-            <div className="text-center py-8 text-gray-500">No policies configured</div>
+            <div className="text-center py-8 text-gray-500">{t('groups.no_policies_configured')}</div>
           ) : (
             <div className="space-y-6">
               {sections.map((section) => (
@@ -207,7 +209,7 @@ export default function GroupPolicies({
         </ModalBody>
         <ModalFooter>
           <Button variant="light" onPress={onClose}>
-            Close
+            {t('close')}
           </Button>
         </ModalFooter>
       </ModalContent>

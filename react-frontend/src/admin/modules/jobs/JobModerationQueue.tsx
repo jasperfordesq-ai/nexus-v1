@@ -83,6 +83,7 @@ interface SpamStats {
 
 type ModerationAction = 'approve' | 'reject' | 'flag';
 
+// Flag labels are resolved via t() in the component; this is a fallback map
 const FLAG_LABELS: Record<string, string> = {
   duplicate_content: 'Duplicate Content',
   suspicious_links: 'Suspicious Links',
@@ -99,8 +100,8 @@ function getSpamScoreColor(score: number): 'success' | 'warning' | 'danger' | 'd
 }
 
 export function JobModerationQueue() {
-  usePageTitle('Admin - Job Moderation');
   const { t } = useTranslation('jobs');
+  usePageTitle(t('moderation.title', 'Moderation Queue'));
   const toast = useToast();
 
   // State
@@ -222,7 +223,7 @@ export function JobModerationQueue() {
             startContent={<RefreshCw size={16} />}
             onPress={() => { loadPendingJobs(); loadStats(); }}
           >
-            Refresh
+            {t('moderation.refresh', 'Refresh')}
           </Button>
         }
       />
@@ -310,7 +311,7 @@ export function JobModerationQueue() {
       {/* Pending Jobs List */}
       {loading ? (
         <div className="flex justify-center py-16">
-          <Spinner label="Loading moderation queue..." />
+          <Spinner label={t('moderation.loading', 'Loading moderation queue...')} />
         </div>
       ) : pendingJobs.length === 0 ? (
         <EmptyState
@@ -355,7 +356,7 @@ export function JobModerationQueue() {
 
                     {/* Description preview */}
                     <p className="text-sm text-default-600 line-clamp-3 mb-2">
-                      {job.description || 'No description provided'}
+                      {job.description || t('moderation.no_description', 'No description provided')}
                     </p>
 
                     {/* Meta chips */}
@@ -379,7 +380,7 @@ export function JobModerationQueue() {
                         <Tooltip content={
                           job.spam_flags && job.spam_flags.length > 0
                             ? `Flags: ${job.spam_flags.map((f) => FLAG_LABELS[f] ?? f).join(', ')}`
-                            : 'No specific flags'
+                            : t('moderation.no_flags', 'No specific flags')
                         }>
                           <Chip
                             size="sm"
@@ -478,7 +479,7 @@ export function JobModerationQueue() {
                     variant="flat"
                     onPress={() => setActionModal({ isOpen: false, action: 'approve', job: null })}
                   >
-                    Cancel
+                    {t('moderation.cancel', 'Cancel')}
                   </Button>
                   <Button
                     color={config.color}

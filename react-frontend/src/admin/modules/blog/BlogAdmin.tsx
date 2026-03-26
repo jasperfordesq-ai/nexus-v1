@@ -81,7 +81,7 @@ export function BlogAdmin() {
         toast.success(t('blog.blog_post_deleted_successfully'));
         loadItems();
       } else {
-        toast.error(res?.error || 'Failed to delete blog post');
+        toast.error(res?.error || t('blog.an_unexpected_error_occurred'));
       }
     } catch {
       toast.error(t('blog.an_unexpected_error_occurred'));
@@ -95,11 +95,10 @@ export function BlogAdmin() {
     try {
       const res = await adminBlog.toggleStatus(post.id);
       if (res?.success) {
-        const newStatus = post.status === 'published' ? 'draft' : 'published';
-        toast.success(`Post "${post.title}" is now ${newStatus}`);
+        toast.success(t('content.item_updated'));
         loadItems();
       } else {
-        toast.error(res?.error || 'Failed to toggle status');
+        toast.error(res?.error || t('blog.an_unexpected_error_occurred'));
       }
     } catch {
       toast.error(t('blog.an_unexpected_error_occurred'));
@@ -109,7 +108,7 @@ export function BlogAdmin() {
   const columns: Column<AdminBlogPost>[] = [
     {
       key: 'title',
-      label: 'Title',
+      label: t('content.label_name'),
       sortable: true,
       render: (item) => (
         <Button
@@ -124,7 +123,7 @@ export function BlogAdmin() {
     },
     {
       key: 'status',
-      label: 'Status',
+      label: t('listings.status'),
       sortable: true,
       render: (item) => (
         <Chip
@@ -139,15 +138,15 @@ export function BlogAdmin() {
     },
     {
       key: 'author_name',
-      label: 'Author',
+      label: t('listings.author'),
       sortable: true,
       render: (item) => (
-        <span className="text-sm text-default-600">{item.author_name || 'Unknown'}</span>
+        <span className="text-sm text-default-600">{item.author_name || t('blog.unknown', 'Unknown')}</span>
       ),
     },
     {
       key: 'category_name',
-      label: 'Category',
+      label: t('breadcrumbs.categories'),
       sortable: true,
       render: (item) => (
         <span className="text-sm text-default-500">{item.category_name || '--'}</span>
@@ -155,7 +154,7 @@ export function BlogAdmin() {
     },
     {
       key: 'created_at',
-      label: 'Created',
+      label: t('listings.created'),
       sortable: true,
       render: (item) => (
         <span className="text-sm text-default-500">
@@ -165,7 +164,7 @@ export function BlogAdmin() {
     },
     {
       key: 'actions',
-      label: 'Actions',
+      label: t('listings.actions'),
       render: (item) => (
         <div className="flex gap-1">
           <Button
@@ -184,7 +183,7 @@ export function BlogAdmin() {
             variant="flat"
             color={item.status === 'published' ? 'warning' : 'success'}
             onPress={() => handleToggleStatus(item)}
-            aria-label={item.status === 'published' ? 'Unpublish' : 'Publish'}
+            aria-label={item.status === 'published' ? t('blog.unpublish', 'Unpublish') : t('blog.publish', 'Publish')}
           >
             <ToggleLeft size={14} />
           </Button>
@@ -214,7 +213,7 @@ export function BlogAdmin() {
             startContent={<Plus size={16} />}
             onPress={() => navigate(tenantPath('/admin/blog/create'))}
           >
-            Create Post
+            {t('breadcrumbs.create')} {t('breadcrumbs.blog')}
           </Button>
         }
       />
@@ -226,9 +225,9 @@ export function BlogAdmin() {
           variant="underlined"
           size="sm"
         >
-          <Tab key="all" title="All" />
-          <Tab key="published" title="Published" />
-          <Tab key="draft" title="Draft" />
+          <Tab key="all" title={t('listings.filter_all')} />
+          <Tab key="published" title={t('content.published', 'Published')} />
+          <Tab key="draft" title={t('content.draft', 'Draft')} />
         </Tabs>
       </div>
 
@@ -236,7 +235,7 @@ export function BlogAdmin() {
         columns={columns}
         data={items}
         isLoading={loading}
-        searchPlaceholder="Search blog posts..."
+        searchPlaceholder={t('data_table.search', 'Search blog posts...')}
         onSearch={(q) => { setSearch(q); setPage(1); }}
         onRefresh={loadItems}
         totalItems={total}
@@ -250,9 +249,9 @@ export function BlogAdmin() {
           isOpen={!!confirmDelete}
           onClose={() => setConfirmDelete(null)}
           onConfirm={handleDelete}
-          title="Delete Blog Post"
-          message={`Are you sure you want to delete "${confirmDelete.title}"? This action cannot be undone.`}
-          confirmLabel="Delete"
+          title={`${t('common.delete')} ${t('breadcrumbs.blog')}`}
+          message={t('gamification.confirm_delete_campaign', { name: confirmDelete.title })}
+          confirmLabel={t('common.delete')}
           confirmColor="danger"
           isLoading={actionLoading}
         />

@@ -199,7 +199,7 @@ export function MemberTags() {
     try {
       const res = await adminCrm.bulkRemoveTag(deleteSummaryTarget.tag);
       if (res.success) {
-        toast.success(`Tag "${deleteSummaryTarget.tag}" removed from all members`);
+        toast.success(t('crm.tag_removed_all', { tag: deleteSummaryTarget.tag }));
         setDeleteSummaryTarget(null);
         loadTagSummaries();
       } else {
@@ -262,7 +262,7 @@ export function MemberTags() {
             variant="flat"
             onPress={() => setSummarySearch('')}
           >
-            Clear
+            {t('crm.clear')}
           </Button>
         )}
       </div>
@@ -270,17 +270,17 @@ export function MemberTags() {
       {/* Tag Grid */}
       {summaryLoading ? (
         <div className="flex justify-center py-16">
-          <Spinner size="lg" label="Loading tags..." />
+          <Spinner size="lg" label={t('crm.loading_tags')} />
         </div>
       ) : filteredSummaries.length === 0 ? (
         <Card>
           <CardBody className="flex flex-col items-center py-16 text-center">
             <Tag size={48} className="text-default-300 mb-4" />
-            <p className="text-default-500 text-lg font-medium">No tags found</p>
+            <p className="text-default-500 text-lg font-medium">{t('crm.no_tags_found')}</p>
             <p className="text-default-400 text-sm mt-1">
               {summarySearch
-                ? 'Try adjusting your search'
-                : 'Create the first tag for a member'}
+                ? t('crm.no_tags_hint_search')
+                : t('crm.no_tags_hint_default')}
             </p>
           </CardBody>
         </Card>
@@ -315,7 +315,7 @@ export function MemberTags() {
                 <div className="flex items-center gap-2">
                   <Users size={14} className="text-default-400" />
                   <Chip size="sm" variant="flat" color="primary">
-                    {ts.member_count} {ts.member_count === 1 ? 'member' : 'members'}
+                    {ts.member_count === 1 ? t('crm.member_count', { count: ts.member_count }) : t('crm.members_count', { count: ts.member_count })}
                   </Chip>
                 </div>
               </CardBody>
@@ -337,28 +337,28 @@ export function MemberTags() {
           startContent={<ArrowLeft size={16} />}
           onPress={backToSummary}
         >
-          Back to All Tags
+          {t('crm.back_to_all_tags')}
         </Button>
       </div>
 
       <div className="flex items-center gap-3 mb-6">
         <Tag size={20} className="text-primary" />
         <h2 className="text-xl font-semibold">
-          Members tagged &ldquo;{activeTag}&rdquo;
+          {t('crm.members_tagged')} &ldquo;{activeTag}&rdquo;
         </h2>
       </div>
 
       {membersLoading ? (
         <div className="flex justify-center py-16">
-          <Spinner size="lg" label="Loading members..." />
+          <Spinner size="lg" label={t('crm.loading_members')} />
         </div>
       ) : memberTags.length === 0 ? (
         <Card>
           <CardBody className="flex flex-col items-center py-16 text-center">
             <Users size={48} className="text-default-300 mb-4" />
-            <p className="text-default-500 text-lg font-medium">No members with this tag</p>
+            <p className="text-default-500 text-lg font-medium">{t('crm.no_members_with_tag')}</p>
             <p className="text-default-400 text-sm mt-1">
-              Add this tag to members using the Add Tag button
+              {t('crm.no_members_hint')}
             </p>
           </CardBody>
         </Card>
@@ -420,7 +420,7 @@ export function MemberTags() {
         description={t('crm.member_tags_desc')}
         actions={
           <Button color="primary" startContent={<Plus size={16} />} onPress={openAddModal}>
-            Add Tag
+            {t('crm.add_tag')}
           </Button>
         }
       />
@@ -432,12 +432,12 @@ export function MemberTags() {
         <ModalContent>
           <ModalHeader className="flex items-center gap-2">
             <Tag size={20} />
-            Add Tag
+            {t('crm.add_tag_title')}
           </ModalHeader>
           <ModalBody className="flex flex-col gap-4">
             <Input
               label={t('crm.label_user_i_d')}
-              placeholder="Enter the member's user ID"
+              placeholder={t('crm.placeholder_enter_user_id')}
               type="number"
               isRequired
               value={formUserId}
@@ -476,10 +476,10 @@ export function MemberTags() {
           </ModalBody>
           <ModalFooter>
             <Button variant="flat" onPress={addModal.onClose} isDisabled={saving}>
-              Cancel
+              {t('crm.cancel_button')}
             </Button>
-            <Button color="primary" onPress={handleAddTag} isLoading={saving}>
-              Add Tag
+            <Button color="primary" onPress={handleAddTag} isLoading={saving} isDisabled={saving}>
+              {t('crm.add_tag')}
             </Button>
           </ModalFooter>
         </ModalContent>
@@ -490,9 +490,9 @@ export function MemberTags() {
         isOpen={!!deleteTarget}
         onClose={() => setDeleteTarget(null)}
         onConfirm={handleDeleteMemberTag}
-        title="Remove Tag"
-        message={`Are you sure you want to remove the tag "${deleteTarget?.tag}" from ${deleteTarget?.user_name || `User #${deleteTarget?.user_id}`}? This action cannot be undone.`}
-        confirmLabel="Remove"
+        title={t('crm.remove_tag_title')}
+        message={t('crm.remove_tag_confirm', { tag: deleteTarget?.tag || '', name: deleteTarget?.user_name || `User #${deleteTarget?.user_id}` })}
+        confirmLabel={t('crm.remove_button')}
         confirmColor="danger"
         isLoading={deleting}
       />
@@ -502,9 +502,9 @@ export function MemberTags() {
         isOpen={!!deleteSummaryTarget}
         onClose={() => setDeleteSummaryTarget(null)}
         onConfirm={handleDeleteSummaryTag}
-        title="Remove Tag Entirely"
-        message={`Are you sure you want to remove the tag "${deleteSummaryTarget?.tag}" from all ${deleteSummaryTarget?.member_count} ${deleteSummaryTarget?.member_count === 1 ? 'member' : 'members'}? This action cannot be undone.`}
-        confirmLabel="Remove All"
+        title={t('crm.remove_tag_all_title')}
+        message={t('crm.remove_tag_all_confirm', { tag: deleteSummaryTarget?.tag || '', count: deleteSummaryTarget?.member_count || 0, memberWord: (deleteSummaryTarget?.member_count === 1 ? 'member' : 'members') })}
+        confirmLabel={t('crm.remove_all_button')}
         confirmColor="danger"
         isLoading={deleting}
       />

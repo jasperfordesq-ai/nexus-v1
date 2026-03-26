@@ -55,21 +55,21 @@ export function FederationAnalytics() {
       <PageHeader
         title={t('federation.federation_analytics_title')}
         description={t('federation.federation_analytics_desc')}
-        actions={<Button variant="flat" startContent={<RefreshCw size={16} />} onPress={loadData} isLoading={loading}>Refresh</Button>}
+        actions={<Button variant="flat" startContent={<RefreshCw size={16} />} onPress={loadData} isLoading={loading}>{t('federation.refresh')}</Button>}
       />
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-5 mb-6">
         <StatCard label={t('federation.label_total_partnerships')} value={data?.total_partnerships ?? 0} icon={Handshake} color="primary" loading={loading} />
         <StatCard label={t('federation.label_active')} value={data?.active_partnerships ?? 0} icon={Handshake} color="success" loading={loading} />
         <StatCard label={t('federation.label_pending_requests')} value={data?.pending_requests ?? 0} icon={Clock} color="warning" loading={loading} />
-        <StatCard label="Cross-Transactions" value={data?.cross_community_transactions ?? 0} icon={ArrowRightLeft} color="secondary" loading={loading} />
-        <StatCard label="Cross-Messages" value={data?.cross_community_messages ?? 0} icon={MessageSquare} color="primary" loading={loading} />
+        <StatCard label={t('federation.label_cross_transactions')} value={data?.cross_community_transactions ?? 0} icon={ArrowRightLeft} color="secondary" loading={loading} />
+        <StatCard label={t('federation.label_cross_messages')} value={data?.cross_community_messages ?? 0} icon={MessageSquare} color="primary" loading={loading} />
       </div>
 
       <Card shadow="sm">
         <CardBody className="flex flex-col items-center justify-center py-12 text-center">
           <BarChart3 size={48} className="text-default-300 mb-3" />
-          <p className="text-default-500">Detailed federation analytics and charts will appear here as partnership activity grows.</p>
+          <p className="text-default-500">{t('federation.analytics_placeholder')}</p>
         </CardBody>
       </Card>
     </div>

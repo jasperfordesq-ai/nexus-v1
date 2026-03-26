@@ -62,7 +62,7 @@ export function RoleList() {
         setDeleteTarget(null);
         loadRoles();
       } else {
-        const error = (res as { error?: string }).error || 'Failed to delete role';
+        const error = (res as { error?: string }).error || t('enterprise.failed_to_delete_role');
         toast.error(error);
       }
     } catch (err) {
@@ -76,7 +76,7 @@ export function RoleList() {
   const columns: Column<Role>[] = [
     {
       key: 'name',
-      label: 'Name',
+      label: t('enterprise.col_name'),
       sortable: true,
       render: (role) => (
         <div className="flex items-center gap-2">
@@ -85,20 +85,20 @@ export function RoleList() {
         </div>
       ),
     },
-    { key: 'slug', label: 'Slug', sortable: true },
-    { key: 'description', label: 'Description' },
+    { key: 'slug', label: t('enterprise.col_slug'), sortable: true },
+    { key: 'description', label: t('enterprise.col_description') },
     {
       key: 'permissions',
-      label: 'Permissions',
+      label: t('enterprise.col_permissions'),
       render: (role) => (
         <Chip size="sm" variant="flat" color="primary">
-          {role.permissions?.length ?? 0} permissions
+          {role.permissions?.length ?? 0} {t('enterprise.permissions_count_label')}
         </Chip>
       ),
     },
     {
       key: 'users_count',
-      label: 'Users',
+      label: t('enterprise.col_users'),
       sortable: true,
       render: (role) => (
         <span className="text-sm">{role.users_count ?? 0}</span>
@@ -106,7 +106,7 @@ export function RoleList() {
     },
     {
       key: 'actions',
-      label: 'Actions',
+      label: t('enterprise.col_actions'),
       render: (role) => (
         <div className="flex items-center gap-1">
           <Button
@@ -147,7 +147,7 @@ export function RoleList() {
             startContent={<Plus size={16} />}
             size="sm"
           >
-            Create Role
+            {t('enterprise.create_role')}
           </Button>
         }
       />
@@ -158,16 +158,16 @@ export function RoleList() {
         isLoading={loading}
         onRefresh={loadRoles}
         searchable={false}
-        emptyContent="No roles found. Create your first role to get started."
+        emptyContent={t('enterprise.no_roles_found')}
       />
 
       <ConfirmModal
         isOpen={!!deleteTarget}
         onClose={() => setDeleteTarget(null)}
         onConfirm={handleDelete}
-        title="Delete Role"
-        message={`Are you sure you want to delete the "${deleteTarget?.name}" role? This action cannot be undone.`}
-        confirmLabel="Delete"
+        title={t('enterprise.delete_role_title')}
+        message={t('enterprise.delete_role_confirm', { name: deleteTarget?.name })}
+        confirmLabel={t('common.delete')}
         confirmColor="danger"
         isLoading={deleting}
       />

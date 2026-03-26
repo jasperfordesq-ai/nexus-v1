@@ -47,13 +47,13 @@ export function GdprAuditLog() {
   }, [loadData]);
 
   const columns: Column<GdprAuditEntry>[] = [
-    { key: 'id', label: 'ID', sortable: true },
-    { key: 'user_name', label: 'User', sortable: true },
-    { key: 'action', label: 'Action', sortable: true },
-    { key: 'description', label: 'Description' },
+    { key: 'id', label: t('enterprise.col_id'), sortable: true },
+    { key: 'user_name', label: t('enterprise.col_user'), sortable: true },
+    { key: 'action', label: t('enterprise.col_action'), sortable: true },
+    { key: 'description', label: t('enterprise.col_description') },
     {
       key: 'created_at',
-      label: 'Date',
+      label: t('enterprise.col_date'),
       sortable: true,
       render: (e) => new Date(e.created_at).toLocaleString(),
     },
@@ -72,7 +72,7 @@ export function GdprAuditLog() {
             isLoading={loading}
             size="sm"
           >
-            Refresh
+            {t('common.refresh')}
           </Button>
         }
       />
@@ -82,7 +82,7 @@ export function GdprAuditLog() {
         data={entries}
         isLoading={loading}
         searchable={false}
-        emptyContent="No GDPR audit entries found"
+        emptyContent={t('enterprise.no_gdpr_audit_entries')}
       />
     </div>
   );

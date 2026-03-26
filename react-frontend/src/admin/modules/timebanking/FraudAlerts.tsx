@@ -43,13 +43,7 @@ const STATUS_COLOR_MAP: Record<string, 'default' | 'primary' | 'success' | 'warn
   dismissed: 'default',
 };
 
-const STATUS_TABS = [
-  { key: 'all', label: 'All' },
-  { key: 'new', label: 'Open' },
-  { key: 'reviewing', label: 'Investigating' },
-  { key: 'resolved', label: 'Resolved' },
-  { key: 'dismissed', label: 'Dismissed' },
-];
+const STATUS_TAB_KEYS = ['all', 'new', 'reviewing', 'resolved', 'dismissed'] as const;
 
 export function FraudAlerts() {
   const { t } = useTranslation('admin');
@@ -97,7 +91,7 @@ export function FraudAlerts() {
       try {
         const res = await adminTimebanking.updateAlertStatus(alertId, newStatus);
         if (res.success) {
-          toast.success(`Alert status updated to ${newStatus}`);
+          toast.success(t('timebanking.alert_status_updated', { status: newStatus }));
           loadAlerts();
         } else {
           toast.error(t('timebanking.failed_to_update_alert_status'));
@@ -118,7 +112,7 @@ export function FraudAlerts() {
     () => [
       {
         key: 'user_name',
-        label: 'User',
+        label: t('timebanking.col_user'),
         render: (alert) => (
           <Link
             to={tenantPath(`/admin/users/${alert.user_id}/edit`)}
@@ -130,7 +124,7 @@ export function FraudAlerts() {
       },
       {
         key: 'alert_type',
-        label: 'Alert Type',
+        label: t('timebanking.col_alert_type'),
         sortable: true,
         render: (alert) => (
           <span className="text-sm capitalize">
@@ -140,7 +134,7 @@ export function FraudAlerts() {
       },
       {
         key: 'severity',
-        label: 'Severity',
+        label: t('timebanking.col_severity'),
         sortable: true,
         render: (alert) => (
           <Chip
@@ -155,7 +149,7 @@ export function FraudAlerts() {
       },
       {
         key: 'status',
-        label: 'Status',
+        label: t('timebanking.col_status'),
         sortable: true,
         render: (alert) => (
           <Chip
@@ -170,7 +164,7 @@ export function FraudAlerts() {
       },
       {
         key: 'created_at',
-        label: 'Date',
+        label: t('timebanking.col_date'),
         sortable: true,
         render: (alert) => (
           <span className="text-sm text-default-500">
@@ -180,7 +174,7 @@ export function FraudAlerts() {
       },
       {
         key: 'actions',
-        label: 'Actions',
+        label: t('timebanking.label_actions'),
         render: (alert) => (
           <Dropdown>
             <DropdownTrigger>
@@ -194,13 +188,13 @@ export function FraudAlerts() {
               disabledKeys={[alert.status]}
             >
               <DropdownItem key="reviewing" description={t('timebanking.desc_mark_as_under_investigation')}>
-                Investigate
+                {t('timebanking.action_investigate')}
               </DropdownItem>
               <DropdownItem key="resolved" description={t('timebanking.desc_mark_as_resolved')} className="text-success">
-                Resolve
+                {t('timebanking.action_resolve')}
               </DropdownItem>
               <DropdownItem key="dismissed" description={t('timebanking.desc_dismiss_this_alert')} className="text-default-400">
-                Dismiss
+                {t('timebanking.action_dismiss')}
               </DropdownItem>
             </DropdownMenu>
           </Dropdown>
@@ -223,7 +217,7 @@ export function FraudAlerts() {
             startContent={<ArrowLeft size={16} />}
             size="sm"
           >
-            Back to Timebanking
+            {t('timebanking.back_to_timebanking')}
           </Button>
         }
       />
@@ -237,8 +231,8 @@ export function FraudAlerts() {
           variant="underlined"
           aria-label={t('timebanking.label_filter_by_status')}
         >
-          {STATUS_TABS.map((tab) => (
-            <Tab key={tab.key} title={tab.label} />
+          {STATUS_TAB_KEYS.map((key) => (
+            <Tab key={key} title={t(`timebanking.tab_${key}`)} />
           ))}
         </Tabs>
       </div>
@@ -257,7 +251,7 @@ export function FraudAlerts() {
         emptyContent={
           <div className="flex flex-col items-center gap-2 py-8">
             <AlertTriangle size={32} className="text-default-300" />
-            <p className="text-sm text-default-400">No fraud alerts found</p>
+            <p className="text-sm text-default-400">{t('timebanking.no_fraud_alerts')}</p>
           </div>
         }
       />

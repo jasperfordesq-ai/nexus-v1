@@ -17,6 +17,7 @@ import { usePageTitle } from '@/hooks';
 import { useTenant, useToast } from '@/contexts';
 import { adminPlans } from '../../api/adminApi';
 import { PageHeader } from '../../components';
+import { useTranslation } from 'react-i18next';
 
 interface PlanFormData {
   name: string;
@@ -32,9 +33,10 @@ interface PlanFormData {
 }
 
 export function PlanForm() {
+  const { t } = useTranslation('admin');
   const { id } = useParams<{ id: string }>();
   const isEdit = Boolean(id);
-  usePageTitle(`Admin - ${isEdit ? 'Edit' : 'Create'} Plan`);
+  usePageTitle(`Admin - ${isEdit ? t('breadcrumbs.edit') : t('breadcrumbs.create')} ${t('breadcrumbs.plans')}`);
   const navigate = useNavigate();
   const { tenantPath } = useTenant();
   const toast = useToast();
@@ -74,7 +76,7 @@ export function PlanForm() {
             });
           }
         })
-        .catch(() => toast.error('Failed to load plan'))
+        .catch(() => toast.error(t('content.failed_to_load_plans')))
         .finally(() => setLoading(false));
     }
   }, [id, isEdit, toast]);
@@ -85,7 +87,7 @@ export function PlanForm() {
 
   const handleSave = async () => {
     if (!formData.name.trim()) {
-      toast.warning('Plan name is required');
+      toast.warning(t('content.plan_name_required', 'Plan name is required'));
       return;
     }
     setSaving(true);
@@ -114,22 +116,22 @@ export function PlanForm() {
       if (isEdit) {
         const res = await adminPlans.update(Number(id), payload);
         if (res?.success) {
-          toast.success('Plan updated successfully');
+          toast.success(t('content.plan_updated', 'Plan updated successfully'));
           navigate(tenantPath('/admin/plans'));
         } else {
-          toast.error('Failed to update plan');
+          toast.error(t('content.failed_to_delete_plan', 'Failed to update plan'));
         }
       } else {
         const res = await adminPlans.create(payload);
         if (res?.success) {
-          toast.success('Plan created successfully');
+          toast.success(t('content.plan_created', 'Plan created successfully'));
           navigate(tenantPath('/admin/plans'));
         } else {
-          toast.error('Failed to create plan');
+          toast.error(t('content.failed_to_load_plans', 'Failed to create plan'));
         }
       }
     } catch {
-      toast.error('An unexpected error occurred');
+      toast.error(t('content.an_unexpected_error_occurred'));
     } finally {
       setSaving(false);
     }
@@ -138,7 +140,7 @@ export function PlanForm() {
   if (loading) {
     return (
       <div>
-        <PageHeader title={isEdit ? 'Edit Plan' : 'Create Plan'} description="Loading plan..." />
+        <PageHeader title={isEdit ? `${t('breadcrumbs.edit')} ${t('breadcrumbs.plans')}` : `${t('breadcrumbs.create')} ${t('breadcrumbs.plans')}`} description={t('federation.loading')} />
         <div className="flex justify-center py-12"><Spinner size="lg" /></div>
       </div>
     );
@@ -147,25 +149,25 @@ export function PlanForm() {
   return (
     <div>
       <PageHeader
-        title={isEdit ? 'Edit Plan' : 'Create Plan'}
-        description={isEdit ? 'Update plan details' : 'Create a new subscription plan'}
-        actions={<Button variant="flat" startContent={<ArrowLeft size={16} />} onPress={() => navigate(tenantPath('/admin/plans'))}>Back</Button>}
+        title={isEdit ? `${t('breadcrumbs.edit')} ${t('breadcrumbs.plans')}` : `${t('breadcrumbs.create')} ${t('breadcrumbs.plans')}`}
+        description={isEdit ? t('content.plans_admin_desc') : t('content.desc_create_subscription_plans_to_offer_diffe')}
+        actions={<Button variant="flat" startContent={<ArrowLeft size={16} />} onPress={() => navigate(tenantPath('/admin/plans'))}>{t('common.back')}</Button>}
       />
 
       <Card shadow="sm">
-        <CardHeader><h3 className="text-lg font-semibold flex items-center gap-2"><CreditCard size={20} /> Plan Details</h3></CardHeader>
+        <CardHeader><h3 className="text-lg font-semibold flex items-center gap-2"><CreditCard size={20} /> {t('content.plans_admin_title')}</h3></CardHeader>
         <CardBody className="gap-4">
           <Input
-            label="Plan Name"
-            placeholder="e.g., Pro"
+            label={t('content.label_name')}
+            placeholder={t('content.placeholder_eg_skill_level', 'e.g., Pro')}
             isRequired
             variant="bordered"
             value={formData.name}
             onValueChange={(v) => handleChange('name', v)}
           />
           <Textarea
-            label="Description"
-            placeholder="Plan features and benefits..."
+            label={t('content.label_description')}
+            placeholder={t('content.placeholder_optional')}
             variant="bordered"
             minRows={3}
             value={formData.description}
@@ -173,7 +175,7 @@ export function PlanForm() {
           />
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <Input
-              label="Monthly Price"
+              label={t('content.monthly_price', 'Monthly Price')}
               type="number"
               placeholder="9.99"
               variant="bordered"
@@ -182,7 +184,7 @@ export function PlanForm() {
               onValueChange={(v) => handleChange('price_monthly', v)}
             />
             <Input
-              label="Annual Price"
+              label={t('content.annual_price', 'Annual Price')}
               type="number"
               placeholder="99.99"
               variant="bordered"
@@ -192,70 +194,70 @@ export function PlanForm() {
             />
           </div>
           <Input
-            label="Tier Level"
+            label={t('content.tier_level', 'Tier Level')}
             type="number"
             placeholder="1"
             variant="bordered"
-            description="Higher tier = more features (0 = free, 1 = basic, 2 = pro, etc.)"
+            description={t('content.tier_level_desc', 'Higher tier = more features (0 = free, 1 = basic, 2 = pro, etc.)')}
             value={formData.tier_level}
             onValueChange={(v) => handleChange('tier_level', v)}
           />
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <Input
-              label="Max Menus"
+              label={t('content.max_menus', 'Max Menus')}
               type="number"
               placeholder="e.g., 10"
               variant="bordered"
-              description="Maximum navigation menus allowed"
+              description={t('content.max_menus_desc', 'Maximum navigation menus allowed')}
               value={formData.max_menus}
               onValueChange={(v) => handleChange('max_menus', v)}
             />
             <Input
-              label="Max Menu Items"
+              label={t('content.max_menu_items', 'Max Menu Items')}
               type="number"
               placeholder="e.g., 50"
               variant="bordered"
-              description="Maximum menu items allowed"
+              description={t('content.max_menu_items_desc', 'Maximum menu items allowed')}
               value={formData.max_menu_items}
               onValueChange={(v) => handleChange('max_menu_items', v)}
             />
           </div>
           <Input
-            label="Features"
-            placeholder="e.g., events, groups, gamification"
+            label={t('content.features', 'Features')}
+            placeholder={t('content.placeholder_features', 'e.g., events, groups, gamification')}
             variant="bordered"
-            description="Comma-separated list of feature slugs included in this plan"
+            description={t('content.features_desc', 'Comma-separated list of feature slugs included in this plan')}
             value={formData.features}
             onValueChange={(v) => handleChange('features', v)}
           />
           <Input
-            label="Allowed Layouts"
-            placeholder="e.g., modern, civicone"
+            label={t('content.allowed_layouts', 'Allowed Layouts')}
+            placeholder={t('content.placeholder_layouts', 'e.g., modern, civicone')}
             variant="bordered"
-            description="Comma-separated list of layout/theme slugs available to this plan"
+            description={t('content.layouts_desc', 'Comma-separated list of layout/theme slugs available to this plan')}
             value={formData.allowed_layouts}
             onValueChange={(v) => handleChange('allowed_layouts', v)}
           />
           <div className="flex items-center justify-between">
             <div>
-              <p className="font-medium">Active</p>
-              <p className="text-sm text-default-500">Make this plan available for purchase</p>
+              <p className="font-medium">{t('content.label_active')}</p>
+              <p className="text-sm text-default-500">{t('content.plan_active_desc', 'Make this plan available for purchase')}</p>
             </div>
             <Switch
               isSelected={formData.is_active}
               onValueChange={(v) => handleChange('is_active', v)}
-              aria-label="Active"
+              aria-label={t('content.label_active')}
             />
           </div>
           <div className="flex justify-end gap-2 pt-2">
-            <Button variant="flat" onPress={() => navigate(tenantPath('/admin/plans'))}>Cancel</Button>
+            <Button variant="flat" onPress={() => navigate(tenantPath('/admin/plans'))}>{t('cancel')}</Button>
             <Button
               color="primary"
               startContent={<Save size={16} />}
               onPress={handleSave}
               isLoading={saving}
             >
-              {isEdit ? 'Update' : 'Create'} Plan
+              {isEdit ? t('federation.save_changes') : `${t('breadcrumbs.create')} ${t('breadcrumbs.plans')}`}
             </Button>
           </div>
         </CardBody>

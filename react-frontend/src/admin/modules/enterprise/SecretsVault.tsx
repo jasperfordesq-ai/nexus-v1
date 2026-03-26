@@ -49,7 +49,7 @@ export function SecretsVault() {
     <div>
       <PageHeader
         title={t('enterprise.secrets_vault_title')}
-        description={`Environment variables overview (${setCount}/${secrets.length} configured). Values are never exposed.`}
+        description={t('enterprise.secrets_vault_desc', { configured: setCount, total: secrets.length })}
         actions={
           <Button
             variant="flat"
@@ -58,7 +58,7 @@ export function SecretsVault() {
             isLoading={loading}
             size="sm"
           >
-            Refresh
+            {t('common.refresh')}
           </Button>
         }
       />
@@ -85,11 +85,11 @@ export function SecretsVault() {
                   </span>
                   {secret.is_set ? (
                     <Chip size="sm" variant="flat" color="success" startContent={<CheckCircle size={12} />}>
-                      Set
+                      {t('enterprise.set')}
                     </Chip>
                   ) : (
                     <Chip size="sm" variant="flat" color="danger" startContent={<XCircle size={12} />}>
-                      Missing
+                      {t('enterprise.missing')}
                     </Chip>
                   )}
                 </div>

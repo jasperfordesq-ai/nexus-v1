@@ -78,12 +78,12 @@ export function CreateApiKey() {
         <Card shadow="sm">
           <CardBody className="gap-4">
             <div className="rounded-lg bg-success-50 border border-success-200 p-4">
-              <p className="text-sm font-medium text-success-700 mb-2">Your new API key:</p>
+              <p className="text-sm font-medium text-success-700 mb-2">{t('federation.your_new_api_key')}</p>
               <code className="block break-all text-sm bg-white p-3 rounded border">{createdKey}</code>
             </div>
             <div className="flex gap-2">
-              <Button variant="flat" startContent={<Copy size={16} />} onPress={handleCopy}>{copied ? 'Copied!' : 'Copy Key'}</Button>
-              <Button color="primary" onPress={() => navigate(tenantPath('/admin/federation/api-keys'))}>Done</Button>
+              <Button variant="flat" startContent={<Copy size={16} />} onPress={handleCopy}>{copied ? t('federation.copied') : t('federation.copy_key')}</Button>
+              <Button color="primary" onPress={() => navigate(tenantPath('/admin/federation/api-keys'))}>{t('federation.done')}</Button>
             </div>
           </CardBody>
         </Card>
@@ -96,14 +96,14 @@ export function CreateApiKey() {
       <PageHeader
         title={t('federation.create_api_key_title')}
         description={t('federation.create_api_key_desc')}
-        actions={<Button variant="flat" startContent={<ArrowLeft size={16} />} onPress={() => navigate(tenantPath('/admin/federation/api-keys'))}>Back</Button>}
+        actions={<Button variant="flat" startContent={<ArrowLeft size={16} />} onPress={() => navigate(tenantPath('/admin/federation/api-keys'))}>{t('federation.back')}</Button>}
       />
       <Card shadow="sm">
-        <CardHeader><h3 className="text-lg font-semibold flex items-center gap-2"><Key size={20} /> New API Key</h3></CardHeader>
+        <CardHeader><h3 className="text-lg font-semibold flex items-center gap-2"><Key size={20} /> {t('federation.new_api_key')}</h3></CardHeader>
         <CardBody className="gap-4">
-          <Input label={t('federation.label_key_name')} placeholder="e.g., Production Integration" value={name} onValueChange={setName} isRequired variant="bordered" />
+          <Input label={t('federation.label_key_name')} placeholder={t('federation.placeholder_key_name')} value={name} onValueChange={setName} isRequired variant="bordered" />
           <div>
-            <p className="text-sm font-medium mb-2">Scopes</p>
+            <p className="text-sm font-medium mb-2">{t('federation.scopes')}</p>
             <div className="space-y-2">
               {AVAILABLE_SCOPES.map(scope => (
                 <Checkbox key={scope} isSelected={scopes.includes(scope)} onValueChange={() => toggleScope(scope)}>
@@ -113,8 +113,8 @@ export function CreateApiKey() {
             </div>
           </div>
           <div className="flex justify-end gap-2 pt-2">
-            <Button variant="flat" onPress={() => navigate(tenantPath('/admin/federation/api-keys'))}>Cancel</Button>
-            <Button color="primary" onPress={handleSubmit} isLoading={saving} isDisabled={!name.trim()}>Create Key</Button>
+            <Button variant="flat" onPress={() => navigate(tenantPath('/admin/federation/api-keys'))}>{t('federation.cancel')}</Button>
+            <Button color="primary" onPress={handleSubmit} isLoading={saving} isDisabled={!name.trim()}>{t('federation.create_key')}</Button>
           </div>
         </CardBody>
       </Card>

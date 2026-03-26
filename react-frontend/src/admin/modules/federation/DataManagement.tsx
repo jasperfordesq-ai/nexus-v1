@@ -84,12 +84,12 @@ export function DataManagement() {
       <PageHeader
         title={t('federation.data_management_title')}
         description={t('federation.data_management_desc')}
-        actions={<Button variant="flat" startContent={<RefreshCw size={16} />} onPress={loadData} isLoading={loading}>Refresh</Button>}
+        actions={<Button variant="flat" startContent={<RefreshCw size={16} />} onPress={loadData} isLoading={loading}>{t('federation.refresh')}</Button>}
       />
 
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
         <Card shadow="sm">
-          <CardHeader><h3 className="text-lg font-semibold flex items-center gap-2"><Download size={20} /> Export Data</h3></CardHeader>
+          <CardHeader><h3 className="text-lg font-semibold flex items-center gap-2"><Download size={20} /> {t('federation.export_data')}</h3></CardHeader>
           <CardBody>
             {config?.available_exports ? (
               <div className="space-y-3">
@@ -99,37 +99,37 @@ export function DataManagement() {
                       <p className="font-medium capitalize">{key}</p>
                       <p className="text-xs text-default-400">{label}</p>
                     </div>
-                    <Button size="sm" variant="flat" startContent={<Download size={14} />} isLoading={exportingType === key} onPress={() => handleExport(key)}>Export</Button>
+                    <Button size="sm" variant="flat" startContent={<Download size={14} />} isLoading={exportingType === key} onPress={() => handleExport(key)}>{t('federation.export')}</Button>
                   </div>
                 ))}
                 <p className="text-xs text-default-400">
-                  Formats: {config.export_formats?.join(', ') || 'JSON, CSV'}
+                  {t('federation.formats')}: {config.export_formats?.join(', ') || 'JSON, CSV'}
                 </p>
                 {config.last_export_at && (
-                  <p className="text-xs text-default-400">Last export: {new Date(config.last_export_at).toLocaleDateString()}</p>
+                  <p className="text-xs text-default-400">{t('federation.last_export')}: {new Date(config.last_export_at).toLocaleDateString()}</p>
                 )}
               </div>
             ) : (
               <div className="flex flex-col items-center py-6 text-default-400">
                 <Database size={32} className="mb-2" />
-                <p className="text-sm">Export configuration loading...</p>
+                <p className="text-sm">{t('federation.export_config_loading')}</p>
               </div>
             )}
           </CardBody>
         </Card>
 
         <Card shadow="sm">
-          <CardHeader><h3 className="text-lg font-semibold flex items-center gap-2"><Upload size={20} /> Import Data</h3></CardHeader>
+          <CardHeader><h3 className="text-lg font-semibold flex items-center gap-2"><Upload size={20} /> {t('federation.import_data')}</h3></CardHeader>
           <CardBody>
             <div className="flex flex-col items-center py-8 text-default-400">
               <Upload size={40} className="mb-3" />
-              <p className="text-sm font-medium">Import Users</p>
-              <p className="text-xs text-center max-w-xs mt-1">Upload a CSV file to bulk import users from a partner community.</p>
+              <p className="text-sm font-medium">{t('federation.import_users')}</p>
+              <p className="text-xs text-center max-w-xs mt-1">{t('federation.import_users_desc')}</p>
               <Button size="sm" variant="flat" className="mt-4" isDisabled={!config?.import_supported}>
-                Upload CSV
+                {t('federation.upload_csv')}
               </Button>
               {config?.last_import_at && (
-                <p className="text-xs text-default-400 mt-2">Last import: {new Date(config.last_import_at).toLocaleDateString()}</p>
+                <p className="text-xs text-default-400 mt-2">{t('federation.last_import')}: {new Date(config.last_import_at).toLocaleDateString()}</p>
               )}
             </div>
           </CardBody>

@@ -456,9 +456,7 @@ export function UserList() {
           <ModalBody>
             {!importResults ? (
               <div className="flex flex-col gap-4">
-                <p className="text-sm text-default-500">
-                  Upload a CSV file with columns: <strong>first_name</strong>, <strong>last_name</strong>, <strong>email</strong>, phone (optional), role (optional).
-                </p>
+                <p className="text-sm text-default-500" dangerouslySetInnerHTML={{ __html: t('users.import_csv_description') }} />
 
                 <div className="flex items-center gap-2">
                   <Button
@@ -510,7 +508,7 @@ export function UserList() {
                     </div>
                   )}
                   <span className="text-sm text-default-400">
-                    of {importResults.total_rows} rows
+                    {t('users.import_total_rows', { count: importResults.total_rows })}
                   </span>
                 </div>
 

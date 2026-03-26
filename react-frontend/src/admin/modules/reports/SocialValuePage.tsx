@@ -594,7 +594,7 @@ export function SocialValuePage() {
             <Button variant="flat" onPress={onClose}>
               Cancel
             </Button>
-            <Button color="primary" onPress={handleSaveConfig} isLoading={saving}>
+            <Button color="primary" onPress={handleSaveConfig} isLoading={saving} isDisabled={saving}>
               Save Configuration
             </Button>
           </ModalFooter>

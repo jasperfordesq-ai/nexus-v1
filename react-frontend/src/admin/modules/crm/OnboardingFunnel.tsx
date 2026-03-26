@@ -78,7 +78,7 @@ export default function OnboardingFunnel() {
       const res = await adminCrm.getFunnel();
       setData(res.data as FunnelData);
     } catch {
-      setError('Failed to load onboarding funnel data.');
+      setError(t('crm.failed_to_load_onboarding_funnel_data'));
       toast.error(t('crm.failed_to_load_onboarding_funnel_data'));
     } finally {
       setLoading(false);
@@ -92,7 +92,7 @@ export default function OnboardingFunnel() {
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
-        <Spinner size="lg" label="Loading funnel data..." />
+        <Spinner size="lg" label={t('crm.loading_funnel')} />
       </div>
     );
   }
@@ -106,7 +106,7 @@ export default function OnboardingFunnel() {
         />
         <Card>
           <CardBody>
-            <p className="text-danger">{error || 'No data available.'}</p>
+            <p className="text-danger">{error || t('crm.no_data_available')}</p>
           </CardBody>
         </Card>
       </div>
@@ -141,11 +141,11 @@ export default function OnboardingFunnel() {
             <Filter className="w-5 h-5 text-primary" />
           </div>
           <div>
-            <h3 className="text-lg font-semibold">Member Funnel</h3>
+            <h3 className="text-lg font-semibold">{t('crm.member_funnel_title')}</h3>
             <p className="text-sm text-default-500">
               {stages.length > 0
-                ? `${stages[0].count.toLocaleString()} registered members`
-                : 'No stages available'}
+                ? t('crm.registered_members', { count: stages[0].count })
+                : t('crm.no_stages_available')}
             </p>
           </div>
         </CardHeader>
@@ -171,7 +171,7 @@ export default function OnboardingFunnel() {
                       <ArrowDown className="w-3 h-3" />
                       <span className="flex items-center gap-1">
                         <TrendingDown className="w-3 h-3 text-danger" />
-                        {dropOff.toLocaleString()} dropped off
+                        {t('crm.dropped_off', { count: dropOff })}
                       </span>
                       <ArrowDown className="w-3 h-3" />
                     </div>
@@ -213,7 +213,7 @@ export default function OnboardingFunnel() {
           {stages.length >= 2 && (
             <div className="mt-6 pt-4 border-t border-divider text-center">
               <p className="text-sm text-default-500">
-                Overall conversion (
+                {t('crm.overall_conversion')} (
                 {stages[0].name} to {stages[stages.length - 1].name})
               </p>
               <p className="text-2xl font-bold mt-1">
@@ -239,9 +239,9 @@ export default function OnboardingFunnel() {
               <TrendingDown className="w-5 h-5 text-warning" />
             </div>
             <div>
-              <h3 className="text-lg font-semibold">Stage-to-Stage Conversion</h3>
+              <h3 className="text-lg font-semibold">{t('crm.stage_conversion_title')}</h3>
               <p className="text-sm text-default-500">
-                Drop-off rates between each onboarding step
+                {t('crm.stage_conversion_desc')}
               </p>
             </div>
           </CardHeader>
@@ -271,7 +271,7 @@ export default function OnboardingFunnel() {
 
               {conversions.length === 0 && (
                 <p className="text-sm text-default-400 text-center py-4">
-                  Not enough stages to compute conversion rates.
+                  {t('crm.not_enough_stages')}
                 </p>
               )}
             </div>
@@ -285,9 +285,9 @@ export default function OnboardingFunnel() {
               <Users className="w-5 h-5 text-primary" />
             </div>
             <div>
-              <h3 className="text-lg font-semibold">Monthly Registrations</h3>
+              <h3 className="text-lg font-semibold">{t('crm.monthly_registrations_title')}</h3>
               <p className="text-sm text-default-500">
-                New member signups over the last 6 months
+                {t('crm.monthly_registrations_desc')}
               </p>
             </div>
           </CardHeader>
@@ -327,7 +327,7 @@ export default function OnboardingFunnel() {
                     // eslint-disable-next-line @typescript-eslint/no-explicit-any
                     formatter={(value: any) => [
                       Number(value).toLocaleString(),
-                      'Registrations',
+                      t('crm.registrations_label'),
                     ]}
                   />
                   <Area
@@ -341,7 +341,7 @@ export default function OnboardingFunnel() {
               </ResponsiveContainer>
             ) : (
               <p className="text-sm text-default-400 text-center py-10">
-                No registration data available.
+                {t('crm.no_registration_data')}
               </p>
             )}
           </CardBody>

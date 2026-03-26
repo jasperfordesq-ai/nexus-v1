@@ -1008,7 +1008,7 @@ export function UserEdit() {
               {t('cancel')}
             </Button>
             <Button color="primary" onPress={handleAdjustBalance} isLoading={balanceLoading}
-              isDisabled={!balanceAmount.trim() || !balanceReason.trim()}>
+              isDisabled={!balanceAmount.trim() || !balanceReason.trim() || balanceLoading}>
               {t('user_edit.apply_adjustment')}
             </Button>
           </ModalFooter>
@@ -1045,7 +1045,7 @@ export function UserEdit() {
               {t('cancel')}
             </Button>
             <Button color="primary" onPress={handleSetPassword} isLoading={passwordLoading}
-              isDisabled={newPassword.length < 8}>
+              isDisabled={newPassword.length < 8 || passwordLoading}>
               {t('user_edit.set_password')}
             </Button>
           </ModalFooter>

@@ -28,6 +28,7 @@ import { usePageTitle } from '@/hooks';
 import { useToast } from '@/contexts';
 import { adminGamification } from '../../api/adminApi';
 import { PageHeader } from '../../components';
+import { useTranslation } from 'react-i18next';
 import type { Campaign, BadgeDefinition } from '../../api/types';
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -83,9 +84,10 @@ const INITIAL_FORM: FormData = {
 };
 
 export function CampaignForm() {
+  const { t } = useTranslation('admin');
   const { id } = useParams<{ id: string }>();
   const isEdit = !!id;
-  usePageTitle(isEdit ? 'Admin - Edit Campaign' : 'Admin - Create Campaign');
+  usePageTitle(isEdit ? t('gamification.edit_campaign_title') : t('gamification.create_campaign_title'));
   const toast = useToast();
   const navigate = useNavigate();
 
@@ -140,7 +142,7 @@ export function CampaignForm() {
           schedule: '',
         });
       } else {
-        toast.error('Campaign not found');
+        toast.error(t('gamification.campaign_not_found'));
         navigate('/admin/gamification/campaigns');
       }
     }
@@ -159,7 +161,7 @@ export function CampaignForm() {
 
   const handleSave = async () => {
     if (!formData.name.trim()) {
-      toast.error('Campaign name is required');
+      toast.error(t('gamification.campaign_name_required'));
       return;
     }
 
@@ -179,23 +181,23 @@ export function CampaignForm() {
     if (isEdit) {
       const res = await adminGamification.updateCampaign(Number(id), payload);
       if (res.success) {
-        toast.success('Campaign updated');
+        toast.success(t('gamification.campaign_updated'));
         navigate('/admin/gamification/campaigns');
       } else {
         const errorMsg = (res as { error?: string }).error
           || (res as { errors?: Array<{ message: string }> }).errors?.[0]?.message
-          || 'Failed to update campaign';
+          || t('gamification.failed_to_update_campaign');
         toast.error(errorMsg);
       }
     } else {
       const res = await adminGamification.createCampaign(payload);
       if (res.success) {
-        toast.success('Campaign created');
+        toast.success(t('gamification.campaign_created'));
         navigate('/admin/gamification/campaigns');
       } else {
         const errorMsg = (res as { error?: string }).error
           || (res as { errors?: Array<{ message: string }> }).errors?.[0]?.message
-          || 'Failed to create campaign';
+          || t('gamification.failed_to_create_campaign');
         toast.error(errorMsg);
       }
     }
@@ -214,12 +216,12 @@ export function CampaignForm() {
   return (
     <div>
       <PageHeader
-        title={isEdit ? 'Edit Campaign' : 'Create Campaign'}
-        description={isEdit ? 'Update campaign settings' : 'Set up a new gamification campaign'}
+        title={isEdit ? t('gamification.edit_campaign') : t('gamification.create_campaign')}
+        description={isEdit ? t('gamification.edit_campaign_desc') : t('gamification.create_campaign_desc')}
         actions={
           <Link to="/admin/gamification/campaigns">
             <Button variant="flat" startContent={<ArrowLeft size={16} />}>
-              Back to Campaigns
+              {t('gamification.back_to_campaigns')}
             </Button>
           </Link>
         }
@@ -227,12 +229,12 @@ export function CampaignForm() {
 
       <Card shadow="sm" className="max-w-2xl">
         <CardHeader className="pb-0">
-          <h3 className="text-lg font-semibold text-foreground">Campaign Details</h3>
+          <h3 className="text-lg font-semibold text-foreground">{t('gamification.campaign_details')}</h3>
         </CardHeader>
         <CardBody className="gap-4">
           <Input
-            label="Name"
-            placeholder="e.g. New Year Badge Drive"
+            label={t('gamification.label_name')}
+            placeholder={t('gamification.placeholder_campaign_name')}
             value={formData.name}
             onValueChange={(v) => updateField('name', v)}
             isRequired
@@ -241,8 +243,8 @@ export function CampaignForm() {
           />
 
           <Textarea
-            label="Description"
-            placeholder="Describe the purpose of this campaign..."
+            label={t('gamification.label_description')}
+            placeholder={t('gamification.placeholder_campaign_desc')}
             value={formData.description}
             onValueChange={(v) => updateField('description', v)}
             variant="bordered"
@@ -251,7 +253,7 @@ export function CampaignForm() {
 
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <Select
-              label="Status"
+              label={t('gamification.label_status')}
               selectedKeys={new Set([formData.status])}
               onSelectionChange={(keys) => {
                 const selected = Array.from(keys)[0] as string;
@@ -265,7 +267,7 @@ export function CampaignForm() {
             </Select>
 
             <Select
-              label="Campaign Type"
+              label={t('gamification.label_campaign_type')}
               selectedKeys={new Set([formData.type])}
               onSelectionChange={(keys) => {
                 const selected = Array.from(keys)[0] as string;
@@ -280,7 +282,7 @@ export function CampaignForm() {
           </div>
 
           <Select
-            label="Badge to Award"
+            label={t('gamification.label_badge_to_award')}
             selectedKeys={formData.badge_key ? new Set([formData.badge_key]) : new Set()}
             onSelectionChange={(keys) => {
               const selected = Array.from(keys)[0] as string;
@@ -288,7 +290,7 @@ export function CampaignForm() {
             }}
             variant="bordered"
             isLoading={loadingBadges}
-            placeholder="Select a badge (optional)"
+            placeholder={t('gamification.placeholder_select_badge')}
           >
             {badges.map((badge) => (
               <SelectItem key={badge.key} textValue={badge.name}>
@@ -301,17 +303,17 @@ export function CampaignForm() {
           </Select>
 
           <Input
-            label="XP Amount"
+            label={t('gamification.label_xp_amount')}
             type="number"
             placeholder="0"
             value={formData.xp_amount}
             onValueChange={(v) => updateField('xp_amount', v)}
             variant="bordered"
-            description="Bonus XP to award to qualifying users"
+            description={t('gamification.desc_bonus_xp')}
           />
 
           <Select
-            label="Target Audience"
+            label={t('gamification.label_target_audience')}
             selectedKeys={new Set([formData.target_audience])}
             onSelectionChange={(keys) => {
               const selected = Array.from(keys)[0] as string;
@@ -326,14 +328,14 @@ export function CampaignForm() {
 
           {formData.type === 'recurring' && (
             <Select
-              label="Schedule"
+              label={t('gamification.label_schedule')}
               selectedKeys={formData.schedule ? new Set([formData.schedule]) : new Set()}
               onSelectionChange={(keys) => {
                 const selected = Array.from(keys)[0] as string;
                 updateField('schedule', selected || '');
               }}
               variant="bordered"
-              placeholder="Select frequency"
+              placeholder={t('gamification.placeholder_select_frequency')}
             >
               <SelectItem key="daily">Daily</SelectItem>
               <SelectItem key="weekly">Weekly</SelectItem>
@@ -343,7 +345,7 @@ export function CampaignForm() {
 
           <div className="flex justify-end gap-2 pt-2">
             <Link to="/admin/gamification/campaigns">
-              <Button variant="flat" isDisabled={saving}>Cancel</Button>
+              <Button variant="flat" isDisabled={saving}>{t('gamification.cancel')}</Button>
             </Link>
             <Button
               color="primary"
@@ -351,7 +353,7 @@ export function CampaignForm() {
               onPress={handleSave}
               isLoading={saving}
             >
-              {isEdit ? 'Save Changes' : 'Create Campaign'}
+              {isEdit ? t('gamification.save_changes') : t('gamification.create_campaign')}
             </Button>
           </div>
         </CardBody>

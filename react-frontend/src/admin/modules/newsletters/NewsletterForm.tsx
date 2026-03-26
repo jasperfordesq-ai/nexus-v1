@@ -508,7 +508,7 @@ export function NewsletterForm() {
                   <span className="text-sm text-default-400">Unable to calculate</span>
                 )}
               </div>
-              <Button size="sm" variant="flat" onPress={fetchRecipientCount} isLoading={recipientLoading}>
+              <Button size="sm" variant="flat" onPress={fetchRecipientCount} isLoading={recipientLoading} isDisabled={recipientLoading}>
                 Refresh Count
               </Button>
             </CardBody>

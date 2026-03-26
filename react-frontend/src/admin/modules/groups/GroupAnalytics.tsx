@@ -60,7 +60,7 @@ export function GroupAnalytics() {
         <PageHeader title={t('groups.group_analytics_title')} description={t('groups.group_analytics_desc')} />
         <Card>
           <CardBody className="py-10 text-center text-default-500">
-            No analytics data available.
+            {t('groups.no_analytics_data')}
           </CardBody>
         </Card>
       </div>
@@ -105,8 +105,7 @@ export function GroupAnalytics() {
           <CardBody className="flex flex-row items-center gap-3 py-3">
             <Clock size={20} className="text-warning shrink-0" />
             <p className="text-sm text-foreground">
-              <span className="font-semibold">{data.pending_approvals}</span> pending membership
-              {data.pending_approvals === 1 ? ' request' : ' requests'} awaiting review.
+              {t('groups.pending_approvals_message', { count: data.pending_approvals })}
             </p>
           </CardBody>
         </Card>
@@ -115,11 +114,11 @@ export function GroupAnalytics() {
       {/* Most active groups */}
       <Card>
         <CardHeader className="pb-2">
-          <h3 className="text-lg font-semibold text-foreground">Most Active Groups</h3>
+          <h3 className="text-lg font-semibold text-foreground">{t('groups.most_active_groups')}</h3>
         </CardHeader>
         <CardBody>
           {data.most_active_groups.length === 0 ? (
-            <p className="text-sm text-default-500 py-4 text-center">No groups found.</p>
+            <p className="text-sm text-default-500 py-4 text-center">{t('groups.no_groups_found')}</p>
           ) : (
             <div className="divide-y divide-default-100">
               {data.most_active_groups.map((group, index) => (
@@ -132,7 +131,7 @@ export function GroupAnalytics() {
                   </div>
                   <div className="flex items-center gap-1.5 text-sm text-default-500">
                     <Users size={14} />
-                    <span>{group.member_count} members</span>
+                    <span>{t('groups.member_count', { count: group.member_count })}</span>
                   </div>
                 </div>
               ))}

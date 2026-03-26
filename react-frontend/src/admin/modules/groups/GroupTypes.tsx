@@ -54,7 +54,7 @@ export default function GroupTypes() {
       const response = await adminGroups.getGroupTypes();
       setTypes((response.data as GroupType[]) || []);
     } catch {
-      error('Failed to load group types');
+      error(t('groups.failed_to_load_group_types'));
     } finally {
       setLoading(false);
     }
@@ -66,50 +66,50 @@ export default function GroupTypes() {
 
   const handleCreate = async () => {
     if (!formData.name.trim()) {
-      error('Name is required');
+      error(t('groups.name_is_required'));
       return;
     }
 
     try {
       await adminGroups.createGroupType(formData);
-      success('Group type created');
+      success(t('groups.group_type_created'));
       onCreateClose();
       setFormData({ name: '', description: '', icon: 'fa-layer-group', color: '#6366f1' });
       loadTypes();
     } catch {
-      error('Failed to create group type');
+      error(t('groups.failed_to_create_group_type'));
     }
   };
 
   const handleEdit = async () => {
     if (!selectedType || !formData.name.trim()) {
-      error('Name is required');
+      error(t('groups.name_is_required'));
       return;
     }
 
     try {
       await adminGroups.updateGroupType(selectedType.id, formData);
-      success('Group type updated');
+      success(t('groups.group_type_updated'));
       onEditClose();
       setSelectedType(null);
       setFormData({ name: '', description: '', icon: 'fa-layer-group', color: '#6366f1' });
       loadTypes();
     } catch {
-      error('Failed to update group type');
+      error(t('groups.failed_to_update_group_type'));
     }
   };
 
   const handleDelete = async (id: number) => {
-    if (!confirm('Are you sure you want to delete this group type?')) {
+    if (!confirm(t('groups.confirm_delete_group_type'))) {
       return;
     }
 
     try {
       await adminGroups.deleteGroupType(id);
-      success('Group type deleted');
+      success(t('groups.group_type_deleted'));
       loadTypes();
     } catch {
-      error('Failed to delete group type');
+      error(t('groups.failed_to_delete_group_type'));
     }
   };
 
@@ -133,28 +133,28 @@ export default function GroupTypes() {
     <div className="p-6 space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold">Group Types</h1>
+          <h1 className="text-2xl font-bold">{t('groups.group_types_title')}</h1>
           <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
-            Manage group types and their policies
+            {t('groups.group_types_desc')}
           </p>
         </div>
         <Button color="primary" startContent={<Plus className="w-4 h-4" />} onPress={onCreateOpen}>
-          Create Type
+          {t('groups.create_type')}
         </Button>
       </div>
 
       <Card className="p-4">
         <Table aria-label={t('groups.label_group_types_table')}>
           <TableHeader>
-            <TableColumn>NAME</TableColumn>
-            <TableColumn>ICON</TableColumn>
-            <TableColumn>GROUPS</TableColumn>
-            <TableColumn>POLICIES</TableColumn>
-            <TableColumn>CREATED</TableColumn>
-            <TableColumn>ACTIONS</TableColumn>
+            <TableColumn>{t('groups.col_name')}</TableColumn>
+            <TableColumn>{t('groups.col_icon')}</TableColumn>
+            <TableColumn>{t('groups.col_groups')}</TableColumn>
+            <TableColumn>{t('groups.col_policies')}</TableColumn>
+            <TableColumn>{t('groups.col_created')}</TableColumn>
+            <TableColumn>{t('groups.col_actions')}</TableColumn>
           </TableHeader>
           <TableBody
-            emptyContent={loading ? 'Loading...' : 'No group types found'}
+            emptyContent={loading ? t('groups.loading') : t('groups.no_group_types_found')}
             items={types}
           >
             {(type) => (
@@ -189,7 +189,7 @@ export default function GroupTypes() {
                       startContent={<Settings className="w-3 h-3" />}
                       onPress={() => openPolicies(type)}
                     >
-                      Policies
+                      {t('groups.policies')}
                     </Button>
                     <Button
                       size="sm"
@@ -221,7 +221,7 @@ export default function GroupTypes() {
       {/* Create Modal */}
       <Modal isOpen={isCreateOpen} onClose={onCreateClose}>
         <ModalContent>
-          <ModalHeader>Create Group Type</ModalHeader>
+          <ModalHeader>{t('groups.create_group_type')}</ModalHeader>
           <ModalBody>
             <div className="space-y-4">
               <Input
@@ -252,10 +252,10 @@ export default function GroupTypes() {
           </ModalBody>
           <ModalFooter>
             <Button variant="light" onPress={onCreateClose}>
-              Cancel
+              {t('cancel')}
             </Button>
             <Button color="primary" onPress={handleCreate}>
-              Create
+              {t('groups.create')}
             </Button>
           </ModalFooter>
         </ModalContent>
@@ -264,7 +264,7 @@ export default function GroupTypes() {
       {/* Edit Modal */}
       <Modal isOpen={isEditOpen} onClose={onEditClose}>
         <ModalContent>
-          <ModalHeader>Edit Group Type</ModalHeader>
+          <ModalHeader>{t('groups.edit_group_type')}</ModalHeader>
           <ModalBody>
             <div className="space-y-4">
               <Input
@@ -295,10 +295,10 @@ export default function GroupTypes() {
           </ModalBody>
           <ModalFooter>
             <Button variant="light" onPress={onEditClose}>
-              Cancel
+              {t('cancel')}
             </Button>
             <Button color="primary" onPress={handleEdit}>
-              Save
+              {t('groups.save')}
             </Button>
           </ModalFooter>
         </ModalContent>

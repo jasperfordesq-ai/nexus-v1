@@ -92,7 +92,7 @@ export function MenusAdmin() {
   const columns: Column<MenuItem>[] = [
     {
       key: 'name',
-      label: 'Name',
+      label: t('content.label_name'),
       sortable: true,
       render: (item) => (
         <Button
@@ -107,28 +107,28 @@ export function MenusAdmin() {
     },
     {
       key: 'location',
-      label: 'Location',
+      label: t('content.label_location'),
       sortable: true,
       render: (item) => <span className="text-sm text-default-500 capitalize">{item.location || '--'}</span>,
     },
     {
       key: 'item_count',
-      label: 'Items',
+      label: t('content.items', 'Items'),
       sortable: true,
       render: (item) => <span className="text-sm text-default-600">{item.item_count ?? 0}</span>,
     },
     {
       key: 'is_active',
-      label: 'Active',
+      label: t('content.label_active'),
       render: (item) => (
         <Chip size="sm" variant="flat" color={item.is_active ? 'success' : 'default'}>
-          {item.is_active ? 'Active' : 'Inactive'}
+          {item.is_active ? t('content.label_active') : t('reports.label_inactive', 'Inactive')}
         </Chip>
       ),
     },
     {
       key: 'actions',
-      label: 'Actions',
+      label: t('listings.actions'),
       render: (item) => (
         <div className="flex gap-1">
           <Button
@@ -176,7 +176,7 @@ export function MenusAdmin() {
             startContent={<Plus size={16} />}
             onPress={() => navigate(tenantPath('/admin/menus/builder/new'))}
           >
-            Create Menu
+            {t('breadcrumbs.create')} {t('breadcrumbs.menus')}
           </Button>
         }
       />
@@ -269,16 +269,16 @@ export function MenusAdmin() {
       {data.length === 0 ? (
         <EmptyState
           icon={Menu}
-          title="No Custom Menus"
+          title={t('no_data')}
           description={t('content.desc_create_custom_navigation_menus_for_your_')}
-          actionLabel="Create Menu"
+          actionLabel={`${t('breadcrumbs.create')} ${t('breadcrumbs.menus')}`}
           onAction={() => navigate(tenantPath('/admin/menus/builder/new'))}
         />
       ) : (
         <DataTable
           columns={columns}
           data={filteredData}
-          searchPlaceholder="Search menus..."
+          searchPlaceholder={t('data_table.search', 'Search menus...')}
           onRefresh={fetchData}
         />
       )}
@@ -288,9 +288,9 @@ export function MenusAdmin() {
           isOpen={!!confirmDelete}
           onClose={() => setConfirmDelete(null)}
           onConfirm={handleDelete}
-          title="Delete Menu"
-          message={`Are you sure you want to delete "${confirmDelete.name}"? This action cannot be undone.`}
-          confirmLabel="Delete"
+          title={`${t('common.delete')} ${t('breadcrumbs.menus')}`}
+          message={t('gamification.confirm_delete_campaign', { name: confirmDelete.name })}
+          confirmLabel={t('common.delete')}
           confirmColor="danger"
           isLoading={actionLoading}
         />

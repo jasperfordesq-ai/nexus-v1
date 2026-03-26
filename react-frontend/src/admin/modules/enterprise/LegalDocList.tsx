@@ -21,13 +21,13 @@ import type { LegalDocument } from '../../api/types';
 
 import { useTranslation } from 'react-i18next';
 /** Human-friendly labels for legal document types */
-const DOC_TYPE_LABELS: Record<string, string> = {
-  terms: 'Terms of Service',
-  privacy: 'Privacy Policy',
-  cookies: 'Cookie Policy',
-  accessibility: 'Accessibility',
-  community_guidelines: 'Community Guidelines',
-  acceptable_use: 'Acceptable Use',
+const DOC_TYPE_KEYS: Record<string, string> = {
+  terms: 'enterprise.legal_doc_form.type_terms',
+  privacy: 'enterprise.legal_doc_form.type_privacy',
+  cookies: 'enterprise.legal_doc_form.type_cookies',
+  accessibility: 'enterprise.legal_doc_form.type_accessibility',
+  community_guidelines: 'enterprise.legal_doc_form.type_community_guidelines',
+  acceptable_use: 'enterprise.legal_doc_form.type_acceptable_use',
 };
 
 export function LegalDocList() {
@@ -72,7 +72,7 @@ export function LegalDocList() {
         setDeleteTarget(null);
         loadData();
       } else {
-        const error = (res as { error?: string }).error || 'Failed to delete document';
+        const error = (res as { error?: string }).error || t('enterprise.failed_to_delete_document');
         toast.error(error);
       }
     } catch (err) {
@@ -86,7 +86,7 @@ export function LegalDocList() {
   const columns: Column<LegalDocument>[] = [
     {
       key: 'title',
-      label: 'Title',
+      label: t('enterprise.label_title'),
       sortable: true,
       render: (doc) => (
         <div className="flex items-center gap-2">
@@ -97,30 +97,30 @@ export function LegalDocList() {
     },
     {
       key: 'type',
-      label: 'Type',
+      label: t('enterprise.col_type'),
       sortable: true,
       render: (doc) => (
         <Chip size="sm" variant="flat" color="primary">
-          {DOC_TYPE_LABELS[doc.type] ?? doc.type}
+          {DOC_TYPE_KEYS[doc.type] ? t(DOC_TYPE_KEYS[doc.type]) : doc.type}
         </Chip>
       ),
     },
-    { key: 'version', label: 'Version', render: (doc) => doc.version || '1.0' },
+    { key: 'version', label: t('enterprise.col_version'), render: (doc) => doc.version || '1.0' },
     {
       key: 'status',
-      label: 'Status',
+      label: t('enterprise.col_status'),
       sortable: true,
       render: (doc) => <StatusBadge status={doc.status} />,
     },
     {
       key: 'updated_at',
-      label: 'Last Updated',
+      label: t('enterprise.col_last_updated'),
       sortable: true,
       render: (doc) => doc.updated_at ? new Date(doc.updated_at).toLocaleDateString() : '---',
     },
     {
       key: 'actions',
-      label: 'Actions',
+      label: t('enterprise.col_actions'),
       render: (doc) => (
         <div className="flex items-center gap-1">
           <Button
@@ -169,7 +169,7 @@ export function LegalDocList() {
             startContent={<Plus size={16} />}
             size="sm"
           >
-            Create Document
+            {t('enterprise.create_document')}
           </Button>
         }
       />
@@ -180,16 +180,16 @@ export function LegalDocList() {
         isLoading={loading}
         onRefresh={loadData}
         searchable={false}
-        emptyContent="No legal documents found. Create your first document."
+        emptyContent={t('enterprise.no_legal_documents')}
       />
 
       <ConfirmModal
         isOpen={!!deleteTarget}
         onClose={() => setDeleteTarget(null)}
         onConfirm={handleDelete}
-        title="Delete Document"
-        message={`Are you sure you want to delete "${deleteTarget?.title}"? This action cannot be undone.`}
-        confirmLabel="Delete"
+        title={t('enterprise.delete_document_title')}
+        message={t('enterprise.delete_document_confirm', { title: deleteTarget?.title })}
+        confirmLabel={t('common.delete')}
         confirmColor="danger"
         isLoading={deleting}
       />

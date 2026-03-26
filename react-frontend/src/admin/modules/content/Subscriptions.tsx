@@ -64,31 +64,31 @@ export function Subscriptions() {
   const columns: Column<SubscriptionItem>[] = [
     {
       key: 'tenant_name',
-      label: 'Tenant',
+      label: t('content.tenant', 'Tenant'),
       sortable: true,
       render: (item) => <span className="font-medium">{item.tenant_name || '--'}</span>,
     },
     {
       key: 'plan_name',
-      label: 'Plan',
+      label: t('breadcrumbs.plans'),
       sortable: true,
       render: (item) => <span className="text-sm text-default-600">{item.plan_name || '--'}</span>,
     },
     {
       key: 'status',
-      label: 'Status',
+      label: t('listings.status'),
       sortable: true,
       render: (item) => <StatusBadge status={item.status || 'inactive'} />,
     },
     {
       key: 'plan_tier_level',
-      label: 'Tier',
+      label: t('content.tier', 'Tier'),
       sortable: true,
       render: (item) => <span className="text-sm text-default-500">{item.plan_tier_level ?? '--'}</span>,
     },
     {
       key: 'starts_at',
-      label: 'Started',
+      label: t('content.started', 'Started'),
       sortable: true,
       render: (item) => (
         <span className="text-sm text-default-500">
@@ -98,7 +98,7 @@ export function Subscriptions() {
     },
     {
       key: 'expires_at',
-      label: 'Expires',
+      label: t('users.expires', 'Expires'),
       sortable: true,
       render: (item) => (
         <span className="text-sm text-default-500">
@@ -108,7 +108,7 @@ export function Subscriptions() {
     },
     {
       key: 'trial_ends_at',
-      label: 'Trial Ends',
+      label: t('content.trial_ends', 'Trial Ends'),
       sortable: true,
       render: (item) => (
         <span className="text-sm text-default-500">
@@ -134,14 +134,14 @@ export function Subscriptions() {
       {data.length === 0 ? (
         <EmptyState
           icon={CreditCard}
-          title="No Active Subscriptions"
+          title={t('no_data')}
           description={t('content.desc_subscriptions_will_appear_here_once_memb')}
         />
       ) : (
         <DataTable
           columns={columns}
           data={data}
-          searchPlaceholder="Search subscriptions..."
+          searchPlaceholder={t('data_table.search', 'Search subscriptions...')}
           onRefresh={fetchData}
         />
       )}

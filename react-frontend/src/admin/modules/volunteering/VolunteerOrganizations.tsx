@@ -57,14 +57,14 @@ export function VolunteerOrganizations() {
   useEffect(() => { loadData(); }, [loadData]);
 
   const columns: Column<VolOrg>[] = [
-    { key: 'org_name', label: 'Organization', sortable: true },
-    { key: 'member_count', label: 'Members', sortable: true },
+    { key: 'org_name', label: t('volunteering.col_organization'), sortable: true },
+    { key: 'member_count', label: t('volunteering.col_members'), sortable: true },
     {
-      key: 'balance', label: 'Balance',
+      key: 'balance', label: t('volunteering.col_balance'),
       render: (item) => <span>{item.balance?.toLocaleString() ?? 0} hrs</span>,
     },
     {
-      key: 'created_at', label: 'Created', sortable: true,
+      key: 'created_at', label: t('volunteering.col_created'), sortable: true,
       render: (item) => <span className="text-sm text-default-500">{item.created_at ? new Date(item.created_at).toLocaleDateString() : '--'}</span>,
     },
   ];
@@ -73,7 +73,7 @@ export function VolunteerOrganizations() {
     return (
       <div>
         <PageHeader title={t('volunteering.volunteer_organizations_title')} description={t('volunteering.volunteer_organizations_desc')} />
-        <EmptyState icon={Building2} title="No Organizations" description={t('volunteering.desc_no_volunteer_organizations_have_been_cre')} />
+        <EmptyState icon={Building2} title={t('volunteering.no_organizations')} description={t('volunteering.desc_no_volunteer_organizations_have_been_cre')} />
       </div>
     );
   }
@@ -83,7 +83,7 @@ export function VolunteerOrganizations() {
       <PageHeader
         title={t('volunteering.volunteer_organizations_title')}
         description={t('volunteering.volunteer_organizations_desc')}
-        actions={<Button variant="flat" startContent={<RefreshCw size={16} />} onPress={loadData} isLoading={loading}>Refresh</Button>}
+        actions={<Button variant="flat" startContent={<RefreshCw size={16} />} onPress={loadData} isLoading={loading}>{t('common.refresh')}</Button>}
       />
       <DataTable columns={columns} data={items} isLoading={loading} onRefresh={loadData} />
     </div>

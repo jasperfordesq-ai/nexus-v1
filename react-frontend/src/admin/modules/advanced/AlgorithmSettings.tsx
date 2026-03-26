@@ -228,12 +228,12 @@ export function AlgorithmSettings() {
       const payload = { enabled: areaData.enabled, ...areaData.weights };
       const res = await adminSettings.updateAlgorithmConfig(areaData.area, payload);
       if ((res as { success?: boolean }).success) {
-        toast.success(`${areaData.label} settings saved`);
+        toast.success(t('advanced.area_settings_saved', { area: areaData.label }));
       } else {
         toast.error(t('advanced.save_failed'));
       }
     } catch {
-      toast.error(`Failed to save ${areaData.label}`);
+      toast.error(t('advanced.failed_to_save_area', { area: areaData.label }));
     } finally {
       setSaving(null);
     }
@@ -273,7 +273,7 @@ export function AlgorithmSettings() {
                 size="sm"
                 aria-label={`Enable ${areaData.label}`}
               >
-                {areaData.enabled ? 'Enabled' : 'Disabled'}
+                {areaData.enabled ? t('advanced.enabled') : t('advanced.disabled')}
               </Switch>
             </CardHeader>
 
@@ -310,8 +310,9 @@ export function AlgorithmSettings() {
                     startContent={<Save size={14} />}
                     onPress={() => handleSave(areaData)}
                     isLoading={saving === areaData.area}
+                    isDisabled={saving === areaData.area}
                   >
-                    Save {areaData.label}
+                    {t('advanced.save_area', { area: areaData.label })}
                   </Button>
                 </div>
               </CardBody>
@@ -320,7 +321,7 @@ export function AlgorithmSettings() {
             {!areaData.enabled && (
               <CardBody>
                 <p className="text-sm text-foreground-400 italic">
-                  Algorithm disabled — default SQL ordering is used instead.
+                  {t('advanced.algorithm_disabled_msg')}
                 </p>
                 <div className="flex justify-end mt-3">
                   <Button
@@ -329,8 +330,9 @@ export function AlgorithmSettings() {
                     startContent={<Save size={14} />}
                     onPress={() => handleSave(areaData)}
                     isLoading={saving === areaData.area}
+                    isDisabled={saving === areaData.area}
                   >
-                    Save {areaData.label}
+                    {t('advanced.save_area', { area: areaData.label })}
                   </Button>
                 </div>
               </CardBody>
@@ -344,9 +346,9 @@ export function AlgorithmSettings() {
             <div className="flex items-center gap-3">
               <Activity size={20} className="text-primary" />
               <div>
-                <h3 className="text-base font-semibold">Algorithm Health</h3>
+                <h3 className="text-base font-semibold">{t('advanced.algorithm_health_title')}</h3>
                 <p className="text-sm text-foreground-500">
-                  Infrastructure status — FULLTEXT indexes, training data, embeddings
+                  {t('advanced.algorithm_health_desc')}
                 </p>
               </div>
             </div>
@@ -357,7 +359,7 @@ export function AlgorithmSettings() {
               onPress={loadHealth}
               isDisabled={healthLoading}
             >
-              Refresh
+              {t('analytics.refresh')}
             </Button>
           </CardHeader>
 
@@ -371,7 +373,7 @@ export function AlgorithmSettings() {
                 {/* FULLTEXT */}
                 <div>
                   <p className="text-sm font-semibold mb-2 flex items-center gap-2">
-                    <Database size={14} /> MySQL FULLTEXT Indexes
+                    <Database size={14} /> {t('advanced.fulltext_indexes_title')}
                   </p>
                   <div className="flex flex-wrap gap-2">
                     {([
@@ -402,21 +404,21 @@ export function AlgorithmSettings() {
                 {/* Collaborative Filtering */}
                 <div>
                   <p className="text-sm font-semibold mb-2 flex items-center gap-2">
-                    <Settings size={14} /> Collaborative Filtering Training Data
+                    <Settings size={14} /> {t('advanced.collaborative_filtering_title')}
                   </p>
                   <div className="flex flex-wrap gap-3 text-sm">
                     <span>
                       <span className="font-medium">{health.collaborative_filtering.listing_interactions.toLocaleString()}</span>
-                      <span className="text-foreground-500 ml-1">listing saves</span>
+                      <span className="text-foreground-500 ml-1">{t('advanced.listing_saves')}</span>
                     </span>
                     <span>
                       <span className="font-medium">{health.collaborative_filtering.member_interactions.toLocaleString()}</span>
-                      <span className="text-foreground-500 ml-1">member transactions</span>
+                      <span className="text-foreground-500 ml-1">{t('advanced.member_transactions')}</span>
                     </span>
                   </div>
                   {health.collaborative_filtering.listing_interactions < 10 && (
                     <p className="text-xs text-foreground-400 mt-1">
-                      CF needs ≥10 interactions to produce meaningful recommendations.
+                      {t('advanced.cf_min_hint')}
                     </p>
                   )}
                 </div>
@@ -426,23 +428,23 @@ export function AlgorithmSettings() {
                 {/* Embeddings */}
                 <div>
                   <p className="text-sm font-semibold mb-2 flex items-center gap-2">
-                    <Cpu size={14} /> Semantic Embeddings (OpenAI)
+                    <Cpu size={14} /> {t('advanced.semantic_embeddings_title')}
                   </p>
                   <div className="flex flex-wrap gap-3 text-sm">
                     <span>
                       <span className="font-medium">{health.embeddings.listing_count.toLocaleString()}</span>
-                      <span className="text-foreground-500 ml-1">listings</span>
+                      <span className="text-foreground-500 ml-1">{t('advanced.label_listings')}</span>
                     </span>
                     <span>
                       <span className="font-medium">{health.embeddings.user_count.toLocaleString()}</span>
-                      <span className="text-foreground-500 ml-1">users</span>
+                      <span className="text-foreground-500 ml-1">{t('advanced.label_users')}</span>
                     </span>
                     <Chip
                       size="sm"
                       color={health.embeddings.total > 0 ? 'success' : 'default'}
                       variant="flat"
                     >
-                      {health.embeddings.total} total
+                      {t('advanced.total_count', { count: health.embeddings.total })}
                     </Chip>
                   </div>
                   {health.embeddings.total === 0 && (
@@ -457,7 +459,7 @@ export function AlgorithmSettings() {
                     <Divider />
                     <div>
                       <p className="text-sm font-semibold mb-2 flex items-center gap-2">
-                        <Search size={14} /> Search Engine
+                        <Search size={14} /> {t('advanced.search_engine_title')}
                       </p>
                       <div className="flex flex-wrap gap-2">
                         <Chip
@@ -466,7 +468,7 @@ export function AlgorithmSettings() {
                           variant="flat"
                           startContent={health.search.meilisearch_available ? <CheckCircle size={12} /> : <XCircle size={12} />}
                         >
-                          Meilisearch {health.search.meilisearch_available ? 'online' : 'offline (using FULLTEXT fallback)'}
+                          {health.search.meilisearch_available ? t('advanced.meilisearch_online') : t('advanced.meilisearch_offline')}
                         </Chip>
                       </div>
                       {!health.search.meilisearch_available && (
@@ -481,7 +483,7 @@ export function AlgorithmSettings() {
             )}
 
             {!health && !healthLoading && (
-              <p className="text-sm text-foreground-400">Health data unavailable — check API connectivity.</p>
+              <p className="text-sm text-foreground-400">{t('advanced.health_unavailable')}</p>
             )}
           </CardBody>
         </Card>

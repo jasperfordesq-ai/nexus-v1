@@ -123,7 +123,7 @@ export function UserReport() {
     try {
       const res = await adminTimebanking.adjustBalance(adjustTarget.id, amount, adjustReason.trim());
       if (res.success) {
-        toast.success(`Balance adjusted by ${amount > 0 ? '+' : ''}${amount}h for ${adjustTarget.name}`);
+        toast.success(t('timebanking.balance_adjusted', { amount: `${amount > 0 ? '+' : ''}${amount}`, name: adjustTarget.name }));
         setAdjustTarget(null);
         loadUsers();
       } else {
@@ -140,7 +140,7 @@ export function UserReport() {
     () => [
       {
         key: 'name',
-        label: 'Name',
+        label: t('timebanking.col_name'),
         sortable: true,
         render: (user) => (
           <div className="flex items-center gap-3">
@@ -164,7 +164,7 @@ export function UserReport() {
       },
       {
         key: 'balance',
-        label: 'Balance',
+        label: t('timebanking.col_balance'),
         sortable: true,
         render: (user) => (
           <span className="text-sm font-semibold">
@@ -174,7 +174,7 @@ export function UserReport() {
       },
       {
         key: 'total_earned',
-        label: 'Total Earned',
+        label: t('timebanking.col_total_earned'),
         sortable: true,
         render: (user) => (
           <span className="text-sm text-success">
@@ -184,7 +184,7 @@ export function UserReport() {
       },
       {
         key: 'total_spent',
-        label: 'Total Spent',
+        label: t('timebanking.col_total_spent'),
         sortable: true,
         render: (user) => (
           <span className="text-sm text-danger">
@@ -194,7 +194,7 @@ export function UserReport() {
       },
       {
         key: 'transaction_count',
-        label: 'Transactions',
+        label: t('timebanking.col_transactions'),
         sortable: true,
         render: (user) => (
           <span className="text-sm">{user.transaction_count}</span>
@@ -202,7 +202,7 @@ export function UserReport() {
       },
       {
         key: 'actions' as keyof UserFinancialReportType,
-        label: 'Actions',
+        label: t('timebanking.label_actions'),
         render: (user) => (
           <div className="flex gap-1">
             <Button
@@ -212,13 +212,13 @@ export function UserReport() {
               startContent={<PlusCircle size={14} />}
               onPress={() => openAdjustModal(user)}
             >
-              Adjust
+              {t('timebanking.adjust')}
             </Button>
             <Button
               size="sm"
               variant="light"
               isIconOnly
-              aria-label={`Download statement for ${user.name}`}
+              aria-label={t('timebanking.download_statement_for', { name: user.name })}
               isLoading={downloadingId === user.id}
               onPress={() => handleDownloadStatement(user.id)}
             >
@@ -244,7 +244,7 @@ export function UserReport() {
             startContent={<ArrowLeft size={16} />}
             size="sm"
           >
-            Back to Timebanking
+            {t('timebanking.back_to_timebanking')}
           </Button>
         }
       />
@@ -254,7 +254,7 @@ export function UserReport() {
         data={users}
         isLoading={loading}
         searchable
-        searchPlaceholder="Search users by name..."
+        searchPlaceholder={t('timebanking.search_users_placeholder')}
         totalItems={total}
         page={page}
         pageSize={20}
@@ -264,7 +264,7 @@ export function UserReport() {
         emptyContent={
           <div className="flex flex-col items-center gap-2 py-8">
             <Users size={32} className="text-default-300" />
-            <p className="text-sm text-default-400">No users found</p>
+            <p className="text-sm text-default-400">{t('timebanking.no_users_found')}</p>
           </div>
         }
       />
@@ -273,15 +273,15 @@ export function UserReport() {
         <Modal isOpen={!!adjustTarget} onClose={() => setAdjustTarget(null)} size="md">
           <ModalContent>
             <ModalHeader>
-              Adjust Balance — {adjustTarget.name}
+              {t('timebanking.adjust_balance_for', { name: adjustTarget.name })}
             </ModalHeader>
             <ModalBody className="gap-4">
               <p className="text-sm text-default-500">
-                Current balance: <strong>{adjustTarget.balance}h</strong>
+                {t('timebanking.current_balance')}: <strong>{adjustTarget.balance}h</strong>
               </p>
               <Input
-                label="Amount (hours)"
-                placeholder="e.g., 5 or -3"
+                label={t('timebanking.label_amount_hours')}
+                placeholder={t('timebanking.placeholder_amount_hours')}
                 type="number"
                 value={adjustAmount}
                 onValueChange={setAdjustAmount}
@@ -301,10 +301,10 @@ export function UserReport() {
             </ModalBody>
             <ModalFooter>
               <Button variant="flat" onPress={() => setAdjustTarget(null)} isDisabled={adjustLoading}>
-                Cancel
+                {t('cancel')}
               </Button>
-              <Button color="primary" onPress={handleAdjustBalance} isLoading={adjustLoading}>
-                Adjust Balance
+              <Button color="primary" onPress={handleAdjustBalance} isLoading={adjustLoading} isDisabled={adjustLoading}>
+                {t('timebanking.adjust_balance')}
               </Button>
             </ModalFooter>
           </ModalContent>

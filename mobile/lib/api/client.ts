@@ -58,7 +58,7 @@ export function registerUnauthorizedCallback(cb: () => void): void {
 let _refreshPromise: Promise<string | null> | null = null;
 let _refreshGraceTimer: ReturnType<typeof setTimeout> | null = null;
 
-async function attemptTokenRefresh(): Promise<string | null> {
+export async function attemptTokenRefresh(): Promise<string | null> {
   // If a refresh is in progress (or recently completed), reuse its promise
   if (_refreshPromise) {
     return _refreshPromise;

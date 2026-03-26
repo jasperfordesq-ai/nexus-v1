@@ -98,6 +98,12 @@ interface PeriodHours {
   unique_receivers: number;
 }
 
+interface HoursReportData {
+  categories?: CategoryHours[];
+  members?: MemberHours[];
+  periods?: PeriodHours[];
+}
+
 interface HoursSummary {
   period?: { from: string; to: string };
   total_hours: number;
@@ -164,8 +170,7 @@ export function HoursReportsPage() {
   const toast = useToast();
 
   const [groupBy, setGroupBy] = useState('category');
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const [data, setData] = useState<any>(null);
+  const [data, setData] = useState<HoursReportData | null>(null);
   const [summary, setSummary] = useState<HoursSummary | null>(null);
   const [loading, setLoading] = useState(true);
   const [dateFrom, setDateFrom] = useState('');
@@ -325,8 +330,9 @@ export function HoursReportsPage() {
                   </Pie>
                   <Tooltip
                     contentStyle={tooltipStyle}
-                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                    formatter={((value: number, name: string) => [`${(value ?? 0).toFixed(1)} hours`, name]) as any}
+                    formatter={(value: number | undefined, name: string | undefined) =>
+                      [`${(value ?? 0).toFixed(1)} hours`, name ?? '']
+                    }
                   />
                 </PieChart>
               </ResponsiveContainer>
@@ -515,6 +521,7 @@ export function HoursReportsPage() {
               startContent={<RefreshCw size={16} />}
               onPress={() => { loadSummary(); loadData(); }}
               isLoading={loading}
+              isDisabled={loading}
               size="sm"
             >
               Refresh

@@ -62,10 +62,10 @@ export function GroupApprovals() {
     try {
       const res = await adminGroups.approveMember(item.id);
       if (res?.success) {
-        toast.success(`Approved ${item.user_name} for "${item.group_name}"`);
+        toast.success(t('groups.approved_member', { user: item.user_name, group: item.group_name }));
         loadItems();
       } else {
-        toast.error(res?.error || 'Failed to approve membership');
+        toast.error(res?.error || t('groups.failed_to_approve_membership'));
       }
     } catch {
       toast.error(t('groups.an_unexpected_error_occurred'));
@@ -80,10 +80,10 @@ export function GroupApprovals() {
     try {
       const res = await adminGroups.rejectMember(confirmReject.id);
       if (res?.success) {
-        toast.success(`Rejected ${confirmReject.user_name} for "${confirmReject.group_name}"`);
+        toast.success(t('groups.rejected_member', { user: confirmReject.user_name, group: confirmReject.group_name }));
         loadItems();
       } else {
-        toast.error(res?.error || 'Failed to reject membership');
+        toast.error(res?.error || t('groups.failed_to_reject_membership'));
       }
     } catch {
       toast.error(t('groups.an_unexpected_error_occurred'));
@@ -96,7 +96,7 @@ export function GroupApprovals() {
   const columns: Column<GroupApproval>[] = [
     {
       key: 'user_name',
-      label: 'User',
+      label: t('groups.col_user'),
       sortable: true,
       render: (item) => (
         <span className="font-medium text-foreground">{item.user_name}</span>
@@ -104,7 +104,7 @@ export function GroupApprovals() {
     },
     {
       key: 'group_name',
-      label: 'Group',
+      label: t('groups.col_group'),
       sortable: true,
       render: (item) => (
         <span className="text-sm text-default-600">{item.group_name}</span>
@@ -112,16 +112,16 @@ export function GroupApprovals() {
     },
     {
       key: 'status',
-      label: 'Status',
+      label: t('groups.col_status'),
       render: () => (
         <Chip size="sm" variant="flat" color="warning" className="capitalize">
-          pending
+          {t('groups.pending')}
         </Chip>
       ),
     },
     {
       key: 'created_at',
-      label: 'Requested',
+      label: t('groups.col_requested'),
       sortable: true,
       render: (item) => (
         <span className="text-sm text-default-500">
@@ -131,7 +131,7 @@ export function GroupApprovals() {
     },
     {
       key: 'actions',
-      label: 'Actions',
+      label: t('groups.col_actions'),
       render: (item) => (
         <div className="flex gap-1">
           <Button
@@ -179,7 +179,7 @@ export function GroupApprovals() {
       {items.length === 0 ? (
         <EmptyState
           icon={UserPlus}
-          title="No Pending Approvals"
+          title={t('groups.no_pending_approvals')}
           description={t('groups.desc_all_membership_requests_have_been_review')}
         />
       ) : (
@@ -187,7 +187,7 @@ export function GroupApprovals() {
           columns={columns}
           data={items}
           isLoading={loading}
-          searchPlaceholder="Search approvals..."
+          searchPlaceholder={t('groups.search_approvals_placeholder')}
           onRefresh={loadItems}
         />
       )}
@@ -197,9 +197,9 @@ export function GroupApprovals() {
           isOpen={!!confirmReject}
           onClose={() => setConfirmReject(null)}
           onConfirm={handleReject}
-          title="Reject Membership"
-          message={`Are you sure you want to reject ${confirmReject.user_name}'s request to join "${confirmReject.group_name}"?`}
-          confirmLabel="Reject"
+          title={t('groups.reject_membership')}
+          message={t('groups.confirm_reject_membership', { user: confirmReject.user_name, group: confirmReject.group_name })}
+          confirmLabel={t('groups.reject')}
           confirmColor="danger"
           isLoading={actionLoading === confirmReject.id}
         />

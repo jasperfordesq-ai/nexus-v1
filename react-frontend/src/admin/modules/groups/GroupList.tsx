@@ -94,7 +94,7 @@ export function GroupList() {
         toast.success(t('groups.group_deleted_successfully'));
         loadItems();
       } else {
-        toast.error(res?.error || 'Failed to delete group');
+        toast.error(res?.error || t('groups.failed_to_delete_group'));
       }
     } catch {
       toast.error(t('groups.an_unexpected_error_occurred'));
@@ -109,7 +109,7 @@ export function GroupList() {
     try {
       const res = await adminGroups.updateStatus(item.id, newStatus);
       if (res?.success) {
-        toast.success(`Group "${item.name}" ${newStatus === 'active' ? 'activated' : 'deactivated'}`);
+        toast.success(t('groups.group_status_changed', { name: item.name, status: newStatus }));
         loadItems();
       } else {
         toast.error(t('groups.failed_to_update_group_status'));
@@ -122,7 +122,7 @@ export function GroupList() {
   const columns: Column<AdminGroup>[] = [
     {
       key: 'name',
-      label: 'Group',
+      label: t('groups.col_group'),
       sortable: true,
       render: (item) => (
         <div className="flex items-center gap-3">
@@ -145,7 +145,7 @@ export function GroupList() {
     },
     {
       key: 'status',
-      label: 'Status',
+      label: t('groups.col_status'),
       sortable: true,
       render: (item) => (
         <Chip
@@ -160,7 +160,7 @@ export function GroupList() {
     },
     {
       key: 'visibility',
-      label: 'Visibility',
+      label: t('groups.col_visibility'),
       sortable: true,
       render: (item) => {
         const Icon = visibilityIcons[item.visibility] || Eye;
@@ -174,7 +174,7 @@ export function GroupList() {
     },
     {
       key: 'member_count',
-      label: 'Members',
+      label: t('groups.col_members'),
       sortable: true,
       render: (item) => (
         <div className="flex items-center gap-1.5">
@@ -185,15 +185,15 @@ export function GroupList() {
     },
     {
       key: 'creator_name',
-      label: 'Creator',
+      label: t('groups.col_creator'),
       sortable: true,
       render: (item) => (
-        <span className="text-sm text-default-600">{item.creator_name || 'Unknown'}</span>
+        <span className="text-sm text-default-600">{item.creator_name || t('groups.unknown')}</span>
       ),
     },
     {
       key: 'created_at',
-      label: 'Created',
+      label: t('groups.col_created'),
       sortable: true,
       render: (item) => (
         <span className="text-sm text-default-500">
@@ -203,7 +203,7 @@ export function GroupList() {
     },
     {
       key: 'actions',
-      label: 'Actions',
+      label: t('groups.col_actions'),
       render: (item) => (
         <Dropdown>
           <DropdownTrigger>
@@ -220,17 +220,17 @@ export function GroupList() {
             }}
           >
             <DropdownItem key="view" startContent={<Eye size={14} />}>
-              View Group
+              {t('groups.view_group')}
             </DropdownItem>
             <DropdownItem
               key="toggle-status"
               startContent={item.status === 'active' ? <PowerOff size={14} /> : <Power size={14} />}
               className={item.status === 'active' ? 'text-warning' : 'text-success'}
             >
-              {item.status === 'active' ? 'Deactivate' : 'Activate'}
+              {item.status === 'active' ? t('groups.deactivate') : t('groups.activate')}
             </DropdownItem>
             <DropdownItem key="delete" startContent={<Trash2 size={14} />} className="text-danger" color="danger">
-              Delete
+              {t('common.delete')}
             </DropdownItem>
           </DropdownMenu>
         </Dropdown>
@@ -250,14 +250,14 @@ export function GroupList() {
               size="sm"
               onPress={() => navigate(tenantPath('/admin/groups/analytics'))}
             >
-              Analytics
+              {t('groups.analytics')}
             </Button>
             <Button
               variant="flat"
               size="sm"
               onPress={() => navigate(tenantPath('/admin/groups/approvals'))}
             >
-              Approvals
+              {t('groups.approvals')}
             </Button>
           </div>
         }
@@ -270,11 +270,11 @@ export function GroupList() {
           variant="underlined"
           size="sm"
         >
-          <Tab key="all" title="All" />
-          <Tab key="active" title="Active" />
-          <Tab key="pending" title="Pending" />
-          <Tab key="inactive" title="Inactive" />
-          <Tab key="archived" title="Archived" />
+          <Tab key="all" title={t('groups.tab_all')} />
+          <Tab key="active" title={t('groups.tab_active')} />
+          <Tab key="pending" title={t('groups.tab_pending')} />
+          <Tab key="inactive" title={t('groups.tab_inactive')} />
+          <Tab key="archived" title={t('groups.tab_archived')} />
         </Tabs>
       </div>
 
@@ -282,7 +282,7 @@ export function GroupList() {
         columns={columns}
         data={items}
         isLoading={loading}
-        searchPlaceholder="Search groups..."
+        searchPlaceholder={t('groups.search_groups_placeholder')}
         onSearch={(q) => { setSearch(q); setPage(1); }}
         onRefresh={loadItems}
         totalItems={total}
@@ -296,9 +296,9 @@ export function GroupList() {
           isOpen={!!confirmDelete}
           onClose={() => setConfirmDelete(null)}
           onConfirm={handleDelete}
-          title="Delete Group"
-          message={`Are you sure you want to delete "${confirmDelete.name}"? This will also remove all memberships. This action cannot be undone.`}
-          confirmLabel="Delete"
+          title={t('groups.delete_group')}
+          message={t('groups.confirm_delete_group', { name: confirmDelete.name })}
+          confirmLabel={t('common.delete')}
           confirmColor="danger"
           isLoading={actionLoading}
         />

@@ -65,7 +65,7 @@ export function HealthCheck() {
             isLoading={loading}
             size="sm"
           >
-            Refresh
+            {t('common.refresh')}
           </Button>
         }
       />
@@ -83,7 +83,7 @@ export function HealthCheck() {
                 <HeartPulse size={28} className={`text-${statusColor}`} />
               </div>
               <div>
-                <h3 className="text-lg font-bold text-foreground">System Status</h3>
+                <h3 className="text-lg font-bold text-foreground">{t('enterprise.system_status')}</h3>
                 <Chip size="sm" variant="flat" color={statusColor} className="mt-1 capitalize">
                   {result.status}
                 </Chip>
@@ -104,7 +104,7 @@ export function HealthCheck() {
                   <div className="min-w-0 flex-1">
                     <p className="font-medium text-foreground">{check.name}</p>
                     <p className="text-xs text-default-500">
-                      {check.status === 'ok' ? 'Operational' : 'Failed'}
+                      {check.status === 'ok' ? t('enterprise.operational') : t('enterprise.failed')}
                       {check.free && ` | Free: ${check.free}`}
                       {check.total && ` / Total: ${check.total}`}
                     </p>

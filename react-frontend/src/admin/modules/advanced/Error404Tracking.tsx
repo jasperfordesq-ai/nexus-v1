@@ -76,7 +76,7 @@ export function Error404Tracking() {
         setDeleteTarget(null);
         await fetchErrors();
       } else {
-        const error = (res as { error?: string }).error || 'Failed to delete 404 entry';
+        const error = (res as { error?: string }).error || t('advanced.failed_to_delete_404_entry');
         toast.error(error);
       }
     } catch (err) {
@@ -90,7 +90,7 @@ export function Error404Tracking() {
   const columns: Column<Error404Entry>[] = [
     {
       key: 'url',
-      label: 'URL',
+      label: t('advanced.col_url'),
       sortable: true,
       render: (item) => (
         <span className="font-mono text-sm break-all">{item.url}</span>
@@ -98,7 +98,7 @@ export function Error404Tracking() {
     },
     {
       key: 'referrer',
-      label: 'Referrer',
+      label: t('advanced.col_referrer'),
       sortable: true,
       render: (item) => (
         <span className="text-sm text-default-500 break-all">
@@ -106,10 +106,10 @@ export function Error404Tracking() {
         </span>
       ),
     },
-    { key: 'hits', label: 'Hits', sortable: true },
+    { key: 'hits', label: t('advanced.col_hits'), sortable: true },
     {
       key: 'last_seen',
-      label: 'Last Seen',
+      label: t('advanced.col_last_seen'),
       sortable: true,
       render: (item) => new Date(item.last_seen).toLocaleDateString(),
     },
@@ -123,7 +123,7 @@ export function Error404Tracking() {
           color="danger"
           size="sm"
           onPress={() => setDeleteTarget(item)}
-          aria-label="Dismiss 404 entry"
+          aria-label={t('advanced.dismiss_404_entry')}
         >
           <Trash2 size={16} />
         </Button>
@@ -149,7 +149,7 @@ export function Error404Tracking() {
       {errors.length === 0 ? (
         <EmptyState
           icon={AlertTriangle}
-          title="No 404 Errors Tracked"
+          title={t('advanced.no_404_errors')}
           description={t('advanced.desc_when_visitors_hit_missing_pages_they_wi')}
         />
       ) : (
@@ -169,9 +169,9 @@ export function Error404Tracking() {
         isOpen={!!deleteTarget}
         onClose={() => setDeleteTarget(null)}
         onConfirm={handleDelete}
-        title="Dismiss 404 Entry"
-        message={`Dismiss the 404 error for "${deleteTarget?.url}"? It will be removed from tracking.`}
-        confirmLabel="Dismiss"
+        title={t('advanced.dismiss_404_title')}
+        message={t('advanced.dismiss_404_message', { url: deleteTarget?.url })}
+        confirmLabel={t('advanced.dismiss')}
         confirmColor="danger"
         isLoading={deleting}
       />

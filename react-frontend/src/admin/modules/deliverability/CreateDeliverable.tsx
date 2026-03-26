@@ -30,7 +30,7 @@ interface DeliverableFormData {
 
 export function CreateDeliverable() {
   const { t } = useTranslation('admin');
-  usePageTitle('Admin - Create Deliverable');
+  usePageTitle(t('deliverability.create_title'));
   const navigate = useNavigate();
   const { tenantPath } = useTenant();
   const toast = useToast();
@@ -152,8 +152,9 @@ export function CreateDeliverable() {
               startContent={<Save size={16} />}
               onPress={handleSave}
               isLoading={saving}
+              isDisabled={saving}
             >
-              Create Deliverable
+              {t('deliverability.save_deliverable')}
             </Button>
           </div>
         </CardBody>

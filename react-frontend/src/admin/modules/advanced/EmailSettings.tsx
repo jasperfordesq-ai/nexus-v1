@@ -12,7 +12,7 @@ import { useState, useEffect } from 'react';
 import { Card, CardBody, CardHeader, Input, Button, Select, SelectItem, Spinner, Chip } from '@heroui/react';
 import { Mail, Save, Send, Shield, Globe, Copy, Check } from 'lucide-react';
 import { usePageTitle } from '@/hooks';
-import { useToast, useTenant } from '@/contexts';
+import { useToast } from '@/contexts';
 import { PageHeader } from '../../components';
 import { adminSettings } from '../../api/adminApi';
 import type { ApiResponse } from '@/lib/api';
@@ -80,7 +80,6 @@ export function EmailSettings() {
   const { t } = useTranslation('admin');
   usePageTitle(t('advanced.page_title'));
   const toast = useToast();
-  const { tenant } = useTenant();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [testing, setTesting] = useState(false);
@@ -162,7 +161,7 @@ export function EmailSettings() {
       if (res.data?.success) {
         toast.success(t('advanced.email_settings_saved_successfully'));
       } else {
-        toast.error(res.error || 'Save failed');
+        toast.error(res.error || t('advanced.save_failed'));
       }
     } catch {
       toast.error(t('advanced.failed_to_save_email_settings'));
@@ -182,9 +181,9 @@ export function EmailSettings() {
 
       if (res.data?.success) {
         const provider = res.data.provider ? String(res.data.provider).toUpperCase() : '';
-        toast.success(provider ? `Test email sent via ${provider}` : 'Test email sent successfully');
+        toast.success(provider ? t('advanced.test_email_sent_via', { provider }) : t('advanced.test_email_sent'));
       } else {
-        toast.error(res.error || 'Test email failed');
+        toast.error(res.error || t('advanced.save_failed'));
       }
     } catch {
       toast.error(t('advanced.failed_to_send_test_email'));
@@ -209,7 +208,7 @@ export function EmailSettings() {
   };
 
   const secretHint = (isSet: boolean) =>
-    isSet ? 'Already saved — leave unchanged to keep current value' : undefined;
+    isSet ? t('advanced.secret_already_saved') : undefined;
 
   const { provider } = formData;
 
@@ -223,19 +222,19 @@ export function EmailSettings() {
 
   return (
     <div>
-      <PageHeader title={t('advanced.email_settings_title')} description={`Configure email delivery providers and settings for ${tenant?.name || 'this tenant'}`} />
+      <PageHeader title={t('advanced.email_settings_title')} description={t('advanced.email_settings_desc')} />
 
       <div className="space-y-4">
         {/* Provider Selection */}
         <Card shadow="sm">
           <CardHeader>
             <h3 className="text-lg font-semibold flex items-center gap-2">
-              <Mail size={20} /> Email Provider
+              <Mail size={20} /> {t('advanced.email_provider_heading')}
             </h3>
           </CardHeader>
           <CardBody className="gap-4">
             <div className="flex items-center gap-3">
-              <span className="text-sm text-default-500">Active Provider:</span>
+              <span className="text-sm text-default-500">{t('advanced.active_provider')}</span>
               <Chip color="primary" variant="flat">
                 {PROVIDERS.find(p => p.key === provider)?.label || provider}
               </Chip>
@@ -261,7 +260,7 @@ export function EmailSettings() {
           <Card shadow="sm">
             <CardHeader>
               <h3 className="text-lg font-semibold flex items-center gap-2">
-                <Shield size={20} /> SendGrid Configuration
+                <Shield size={20} /> {t('advanced.sendgrid_configuration')}
               </h3>
             </CardHeader>
             <CardBody className="gap-4">
@@ -270,7 +269,7 @@ export function EmailSettings() {
                 type="password"
                 placeholder={t('advanced.placeholder_s_gxxxxx')}
                 variant="bordered"
-                description={secretHint(formData._sendgrid_api_key_set) || 'Your SendGrid API key (stored encrypted)'}
+                description={secretHint(formData._sendgrid_api_key_set) || t('advanced.sendgrid_api_key_desc')}
                 value={formData.sendgrid_api_key}
                 onValueChange={(v) => updateField('sendgrid_api_key', v)}
               />
@@ -292,7 +291,7 @@ export function EmailSettings() {
                 <div className="space-y-1">
                   <div className="flex items-center justify-between">
                     <p className="text-sm font-medium text-default-700">
-                      Webhook URL <span className="text-xs text-default-400 ml-1">(paste into SendGrid Event Webhook settings)</span>
+                      {t('advanced.webhook_url_label')} <span className="text-xs text-default-400 ml-1">{t('advanced.webhook_url_hint')}</span>
                     </p>
                     <Button
                       size="sm"
@@ -301,7 +300,7 @@ export function EmailSettings() {
                       onPress={handleCopyWebhook}
                       color={copied ? 'success' : 'default'}
                     >
-                      {copied ? 'Copied' : 'Copy'}
+                      {copied ? t('advanced.copied') : t('advanced.copy')}
                     </Button>
                   </div>
                   <p className="text-sm text-default-500 bg-default-100 rounded-lg px-3 py-2 font-mono break-all select-all">
@@ -318,7 +317,7 @@ export function EmailSettings() {
           <Card shadow="sm">
             <CardHeader>
               <h3 className="text-lg font-semibold flex items-center gap-2">
-                <Globe size={20} /> Gmail API Configuration
+                <Globe size={20} /> {t('advanced.gmail_api_configuration')}
               </h3>
             </CardHeader>
             <CardBody className="gap-4">
@@ -369,7 +368,7 @@ export function EmailSettings() {
           <Card shadow="sm">
             <CardHeader>
               <h3 className="text-lg font-semibold flex items-center gap-2">
-                <Globe size={20} /> SMTP Configuration
+                <Globe size={20} /> {t('advanced.smtp_configuration')}
               </h3>
             </CardHeader>
             <CardBody className="gap-4">
@@ -438,18 +437,18 @@ export function EmailSettings() {
           <Card shadow="sm">
             <CardHeader>
               <h3 className="text-lg font-semibold flex items-center gap-2">
-                <Globe size={20} /> Platform Default
+                <Globe size={20} /> {t('advanced.platform_default_heading')}
               </h3>
             </CardHeader>
             <CardBody>
               <p className="text-sm text-default-500">
-                Using the platform default email provider:{' '}
+                {t('advanced.platform_default_desc')}{' '}
                 <Chip size="sm" variant="flat" color="secondary">
-                  {formData.platform_default.provider || 'Not configured'}
+                  {formData.platform_default.provider || t('advanced.not_configured')}
                 </Chip>
               </p>
               <p className="text-sm text-default-400 mt-2">
-                The platform default provider is configured at the server level. Select a different provider above to use a custom configuration for this tenant.
+                {t('advanced.platform_default_hint')}
               </p>
             </CardBody>
           </Card>
@@ -459,12 +458,12 @@ export function EmailSettings() {
         <Card shadow="sm">
           <CardHeader>
             <h3 className="text-lg font-semibold flex items-center gap-2">
-              <Send size={20} /> Test Email
+              <Send size={20} /> {t('advanced.test_email_heading')}
             </h3>
           </CardHeader>
           <CardBody className="gap-4">
             <p className="text-sm text-default-400">
-              Save your settings first, then send a test email to verify delivery.
+              {t('advanced.test_email_hint')}
             </p>
             <Input
               label={t('advanced.label_test_email_address')}
@@ -479,7 +478,7 @@ export function EmailSettings() {
               onPress={handleTestEmail}
               isLoading={testing}
             >
-              Send Test Email
+              {t('advanced.send_test_email')}
             </Button>
           </CardBody>
         </Card>
@@ -491,8 +490,9 @@ export function EmailSettings() {
             startContent={<Save size={16} />}
             onPress={handleSave}
             isLoading={saving}
+            isDisabled={saving}
           >
-            Save Settings
+            {t('advanced.save_settings')}
           </Button>
         </div>
       </div>

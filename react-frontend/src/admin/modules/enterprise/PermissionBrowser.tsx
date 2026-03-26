@@ -47,7 +47,7 @@ export function PermissionBrowser() {
     <div>
       <PageHeader
         title={t('enterprise.permission_browser_title')}
-        description={`${totalCount} permissions available across ${Object.keys(permissions).length} categories`}
+        description={t('enterprise.permission_browser_desc', { count: totalCount, categories: Object.keys(permissions).length })}
       />
 
       {loading ? (

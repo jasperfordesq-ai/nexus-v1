@@ -17,8 +17,8 @@ import { PageHeader } from '../../components';
 import { adminSettings } from '../../api/adminApi';
 
 import { useTranslation } from 'react-i18next';
-const AI_FEATURES = ['Smart Matching Suggestions', 'Content Moderation', 'Chat Assistant', 'Auto-Categorization'];
 const FEATURE_KEYS = ['smart_matching', 'content_moderation', 'chat_assistant', 'auto_categorization'];
+const FEATURE_I18N_KEYS = ['advanced.feature_smart_matching', 'advanced.feature_content_moderation', 'advanced.feature_chat_assistant', 'advanced.feature_auto_categorization'];
 
 export function AiSettings() {
   const { t } = useTranslation('admin');
@@ -57,7 +57,7 @@ export function AiSettings() {
       if (res.success) {
         toast.success(t('advanced.a_i_settings_saved_successfully'));
       } else {
-        const error = (res as { error?: string }).error || 'Save failed';
+        const error = (res as { error?: string }).error || t('advanced.save_failed');
         toast.error(error);
       }
     } catch (err) {
@@ -86,12 +86,12 @@ export function AiSettings() {
 
       <div className="space-y-4">
         <Card shadow="sm">
-          <CardHeader><h3 className="text-lg font-semibold flex items-center gap-2"><Bot size={20} /> AI Integration</h3></CardHeader>
+          <CardHeader><h3 className="text-lg font-semibold flex items-center gap-2"><Bot size={20} /> {t('advanced.ai_integration_heading')}</h3></CardHeader>
           <CardBody className="gap-4">
             <div className="flex items-center justify-between">
               <div>
-                <p className="font-medium">Enable AI Features</p>
-                <p className="text-sm text-default-500">Enable AI-powered features across the platform</p>
+                <p className="font-medium">{t('advanced.enable_ai_features')}</p>
+                <p className="text-sm text-default-500">{t('advanced.enable_ai_features_desc')}</p>
               </div>
               <Switch isSelected={!!formData.enabled} onValueChange={(v) => updateField('enabled', v)} aria-label={t('advanced.label_enable_a_i')} />
             </div>
@@ -133,16 +133,16 @@ export function AiSettings() {
         </Card>
 
         <Card shadow="sm">
-          <CardHeader><h3 className="text-lg font-semibold">AI Features</h3></CardHeader>
+          <CardHeader><h3 className="text-lg font-semibold">{t('advanced.ai_features_heading')}</h3></CardHeader>
           <CardBody className="space-y-3">
-            {AI_FEATURES.map((feature, index) => (
-              <div key={feature} className="flex items-center justify-between py-1">
-                <p className="text-sm">{feature}</p>
+            {FEATURE_KEYS.map((featureKey, index) => (
+              <div key={featureKey} className="flex items-center justify-between py-1">
+                <p className="text-sm">{t(FEATURE_I18N_KEYS[index])}</p>
                 <Switch
                   size="sm"
-                  isSelected={!!formData[FEATURE_KEYS[index]]}
-                  onValueChange={(v) => updateField(FEATURE_KEYS[index], v)}
-                  aria-label={feature}
+                  isSelected={!!formData[featureKey]}
+                  onValueChange={(v) => updateField(featureKey, v)}
+                  aria-label={t(FEATURE_I18N_KEYS[index])}
                 />
               </div>
             ))}
@@ -150,7 +150,7 @@ export function AiSettings() {
         </Card>
 
         <div className="flex justify-end">
-          <Button color="primary" startContent={<Save size={16} />} onPress={handleSave} isLoading={saving}>Save Settings</Button>
+          <Button color="primary" startContent={<Save size={16} />} onPress={handleSave} isLoading={saving} isDisabled={saving}>{t('advanced.save_settings')}</Button>
         </div>
       </div>
     </div>

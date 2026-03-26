@@ -94,7 +94,7 @@ export function Redirects() {
         onAddClose();
         await fetchRedirects();
       } else {
-        const error = (res as { error?: string }).error || 'Failed to create redirect';
+        const error = (res as { error?: string }).error || t('advanced.failed_to_create_redirect');
         toast.error(error);
       }
     } catch (err) {
@@ -116,7 +116,7 @@ export function Redirects() {
         setDeleteTarget(null);
         await fetchRedirects();
       } else {
-        const error = (res as { error?: string }).error || 'Failed to delete redirect';
+        const error = (res as { error?: string }).error || t('advanced.failed_to_delete_redirect');
         toast.error(error);
       }
     } catch (err) {
@@ -128,20 +128,20 @@ export function Redirects() {
   };
 
   const columns: Column<Redirect>[] = [
-    { key: 'from_url', label: 'From URL', sortable: true },
-    { key: 'to_url', label: 'To URL', sortable: true },
+    { key: 'from_url', label: t('advanced.col_from_url'), sortable: true },
+    { key: 'to_url', label: t('advanced.col_to_url'), sortable: true },
     {
       key: 'status_code',
-      label: 'Status Code',
+      label: t('advanced.col_status_code'),
       sortable: true,
       render: (item) => (
         <span className="font-mono text-sm">{item.status_code}</span>
       ),
     },
-    { key: 'hits', label: 'Hits', sortable: true },
+    { key: 'hits', label: t('advanced.col_hits'), sortable: true },
     {
       key: 'created_at',
-      label: 'Created',
+      label: t('advanced.col_created'),
       sortable: true,
       render: (item) => new Date(item.created_at).toLocaleDateString(),
     },
@@ -181,7 +181,7 @@ export function Redirects() {
         description={t('advanced.redirects_desc')}
         actions={
           <Button color="primary" startContent={<Plus size={16} />} onPress={onAddOpen}>
-            Add Redirect
+            {t('advanced.add_redirect')}
           </Button>
         }
       />
@@ -189,9 +189,9 @@ export function Redirects() {
       {redirects.length === 0 ? (
         <EmptyState
           icon={ArrowRightLeft}
-          title="No Redirects Configured"
-          description="Add URL redirects to handle moved or renamed pages. Supports 301 (permanent) and 302 (temporary) redirects."
-          actionLabel="Add Redirect"
+          title={t('advanced.no_redirects')}
+          description={t('advanced.no_redirects_desc')}
+          actionLabel={t('advanced.add_redirect')}
           onAction={onAddOpen}
         />
       ) : (
@@ -206,7 +206,7 @@ export function Redirects() {
       {/* Add Redirect Modal */}
       <Modal isOpen={isAddOpen} onClose={onAddClose} size="lg">
         <ModalContent>
-          <ModalHeader>Add Redirect</ModalHeader>
+          <ModalHeader>{t('advanced.add_redirect')}</ModalHeader>
           <ModalBody className="gap-4">
             <Input
               label={t('advanced.label_from_u_r_l')}
@@ -233,16 +233,16 @@ export function Redirects() {
                 if (selected) setStatusCode(String(selected));
               }}
             >
-              <SelectItem key="301">301 - Permanent Redirect</SelectItem>
-              <SelectItem key="302">302 - Temporary Redirect</SelectItem>
+              <SelectItem key="301">{t('advanced.status_301')}</SelectItem>
+              <SelectItem key="302">{t('advanced.status_302')}</SelectItem>
             </Select>
           </ModalBody>
           <ModalFooter>
             <Button variant="flat" onPress={onAddClose} isDisabled={saving}>
-              Cancel
+              {t('advanced.cancel')}
             </Button>
-            <Button color="primary" onPress={handleAdd} isLoading={saving}>
-              Create Redirect
+            <Button color="primary" onPress={handleAdd} isLoading={saving} isDisabled={saving}>
+              {t('advanced.create_redirect')}
             </Button>
           </ModalFooter>
         </ModalContent>
@@ -253,9 +253,9 @@ export function Redirects() {
         isOpen={!!deleteTarget}
         onClose={() => setDeleteTarget(null)}
         onConfirm={handleDelete}
-        title="Delete Redirect"
-        message={`Are you sure you want to delete the redirect from "${deleteTarget?.from_url}"? This action cannot be undone.`}
-        confirmLabel="Delete"
+        title={t('advanced.delete_redirect_title')}
+        message={t('advanced.delete_redirect_message', { url: deleteTarget?.from_url })}
+        confirmLabel={t('advanced.delete')}
         confirmColor="danger"
         isLoading={deleting}
       />

@@ -26,7 +26,7 @@ export default function GroupRanking() {
       const response = await adminGroups.getFeaturedGroups();
       setGroups((response.data as FeaturedGroup[]) || []);
     } catch {
-      error('Failed to load featured groups');
+      error(t('groups.failed_to_load_featured_groups'));
     } finally {
       setLoading(false);
     }
@@ -40,10 +40,10 @@ export default function GroupRanking() {
     try {
       setUpdating(true);
       await adminGroups.updateFeaturedGroups();
-      success('Rankings updated successfully');
+      success(t('groups.rankings_updated'));
       loadGroups();
     } catch {
-      error('Failed to update rankings');
+      error(t('groups.failed_to_update_rankings'));
     } finally {
       setUpdating(false);
     }
@@ -52,10 +52,10 @@ export default function GroupRanking() {
   const handleToggleFeatured = async (groupId: number) => {
     try {
       await adminGroups.toggleFeatured(groupId);
-      success('Featured status updated');
+      success(t('groups.featured_status_updated'));
       loadGroups();
     } catch {
-      error('Failed to update featured status');
+      error(t('groups.failed_to_update_featured_status'));
     }
   };
 
@@ -63,9 +63,9 @@ export default function GroupRanking() {
     <div className="p-6 space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold">Group Ranking</h1>
+          <h1 className="text-2xl font-bold">{t('groups.group_ranking_title')}</h1>
           <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
-            Manage featured groups and ranking algorithm
+            {t('groups.group_ranking_desc')}
           </p>
         </div>
         <Button
@@ -74,21 +74,21 @@ export default function GroupRanking() {
           onPress={handleUpdateRankings}
           isLoading={updating}
         >
-          Auto-Update Rankings
+          {t('groups.auto_update_rankings')}
         </Button>
       </div>
 
       <Card className="p-4">
         <Table aria-label={t('groups.label_featured_groups_table')}>
           <TableHeader>
-            <TableColumn>GROUP</TableColumn>
-            <TableColumn>MEMBERS</TableColumn>
-            <TableColumn>ENGAGEMENT</TableColumn>
-            <TableColumn>GEO DIVERSITY</TableColumn>
-            <TableColumn>TOTAL SCORE</TableColumn>
-            <TableColumn>FEATURED</TableColumn>
+            <TableColumn>{t('groups.col_group')}</TableColumn>
+            <TableColumn>{t('groups.col_members')}</TableColumn>
+            <TableColumn>{t('groups.col_engagement')}</TableColumn>
+            <TableColumn>{t('groups.col_geo_diversity')}</TableColumn>
+            <TableColumn>{t('groups.col_total_score')}</TableColumn>
+            <TableColumn>{t('groups.col_featured')}</TableColumn>
           </TableHeader>
-          <TableBody emptyContent={loading ? 'Loading...' : 'No groups found'}>
+          <TableBody emptyContent={loading ? t('groups.loading') : t('groups.no_groups_found')}>
             {groups.map((group) => (
               <TableRow key={group.group_id}>
                 <TableCell>
@@ -136,16 +136,16 @@ export default function GroupRanking() {
       </Card>
 
       <Card className="p-6">
-        <h2 className="text-lg font-semibold mb-3">Ranking Algorithm</h2>
+        <h2 className="text-lg font-semibold mb-3">{t('groups.ranking_algorithm_title')}</h2>
         <div className="space-y-2 text-sm text-gray-600 dark:text-gray-400">
           <p>
-            <strong>Total Score = </strong>
-            (Member Count × 10) + (Engagement Score) + (Geographic Diversity)
+            <strong>{t('groups.total_score_formula_label')}</strong>
+            {t('groups.total_score_formula')}
           </p>
-          <p><strong>Engagement Score:</strong> Based on recent activity (posts, events, discussions)</p>
-          <p><strong>Geographic Diversity:</strong> Measured by unique locations of members</p>
+          <p><strong>{t('groups.engagement_score_label')}</strong> {t('groups.engagement_score_desc')}</p>
+          <p><strong>{t('groups.geographic_diversity_label')}</strong> {t('groups.geographic_diversity_desc')}</p>
           <p className="text-xs mt-4">
-            The algorithm automatically updates featured groups based on these metrics. Manual overrides are possible using the toggle switches.
+            {t('groups.ranking_algorithm_note')}
           </p>
         </div>
       </Card>

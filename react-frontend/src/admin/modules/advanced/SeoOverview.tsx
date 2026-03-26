@@ -80,7 +80,7 @@ export function SeoOverview() {
       if (res.success) {
         toast.success(t('advanced.s_e_o_settings_saved_successfully'));
       } else {
-        const error = (res as { error?: string }).error || 'Save failed';
+        const error = (res as { error?: string }).error || t('advanced.save_failed');
         toast.error(error);
       }
     } catch (err) {
@@ -110,7 +110,7 @@ export function SeoOverview() {
       <div className="space-y-4">
         {/* Tenant-level meta (stored directly on tenants table) */}
         <Card shadow="sm">
-          <CardHeader><h3 className="text-lg font-semibold">Tenant Meta</h3></CardHeader>
+          <CardHeader><h3 className="text-lg font-semibold">{t('advanced.tenant_meta_heading')}</h3></CardHeader>
           <CardBody className="gap-4">
             <Input
               label={t('advanced.label_meta_title')}
@@ -127,7 +127,7 @@ export function SeoOverview() {
               onValueChange={(v) => updateField('tenant_meta_description', v)}
             />
             <Input
-              label="H1 Headline"
+              label={t('advanced.label_h1_headline')}
               placeholder={t('advanced.placeholder_welcome_to_our_community')}
               variant="bordered"
               value={String(formData.tenant_h1_headline || '')}
@@ -145,7 +145,7 @@ export function SeoOverview() {
 
         {/* Global SEO settings (stored in tenant_settings) */}
         <Card shadow="sm">
-          <CardHeader><h3 className="text-lg font-semibold">Meta Tags</h3></CardHeader>
+          <CardHeader><h3 className="text-lg font-semibold">{t('advanced.meta_tags_heading')}</h3></CardHeader>
           <CardBody className="gap-4">
             <Input
               label={t('advanced.label_default_title_suffix')}
@@ -172,33 +172,33 @@ export function SeoOverview() {
         </Card>
 
         <Card shadow="sm">
-          <CardHeader><h3 className="text-lg font-semibold">SEO Features</h3></CardHeader>
+          <CardHeader><h3 className="text-lg font-semibold">{t('advanced.seo_features_heading')}</h3></CardHeader>
           <CardBody className="space-y-3">
             <div className="flex items-center justify-between">
               <div>
-                <p className="font-medium">Auto-Generate Sitemap</p>
-                <p className="text-sm text-default-500">Automatically generate and update sitemap.xml</p>
+                <p className="font-medium">{t('advanced.auto_generate_sitemap')}</p>
+                <p className="text-sm text-default-500">{t('advanced.auto_generate_sitemap_desc')}</p>
               </div>
               <Switch isSelected={!!formData.seo_auto_sitemap} onValueChange={(v) => updateField('seo_auto_sitemap', v)} aria-label={t('advanced.label_auto_sitemap')} />
             </div>
             <div className="flex items-center justify-between">
               <div>
-                <p className="font-medium">Canonical URLs</p>
-                <p className="text-sm text-default-500">Add canonical URL tags to prevent duplicate content</p>
+                <p className="font-medium">{t('advanced.canonical_urls')}</p>
+                <p className="text-sm text-default-500">{t('advanced.canonical_urls_desc')}</p>
               </div>
               <Switch isSelected={!!formData.seo_canonical_urls} onValueChange={(v) => updateField('seo_canonical_urls', v)} aria-label={t('advanced.label_canonical_u_r_ls')} />
             </div>
             <div className="flex items-center justify-between">
               <div>
-                <p className="font-medium">Open Graph Tags</p>
-                <p className="text-sm text-default-500">Add Open Graph meta tags for social sharing</p>
+                <p className="font-medium">{t('advanced.open_graph_tags')}</p>
+                <p className="text-sm text-default-500">{t('advanced.open_graph_tags_desc')}</p>
               </div>
               <Switch isSelected={!!formData.seo_open_graph} onValueChange={(v) => updateField('seo_open_graph', v)} aria-label={t('advanced.label_open_graph')} />
             </div>
             <div className="flex items-center justify-between">
               <div>
-                <p className="font-medium">Twitter Cards</p>
-                <p className="text-sm text-default-500">Add Twitter Card meta tags for sharing on X/Twitter</p>
+                <p className="font-medium">{t('advanced.twitter_cards')}</p>
+                <p className="text-sm text-default-500">{t('advanced.twitter_cards_desc')}</p>
               </div>
               <Switch isSelected={!!formData.seo_twitter_cards} onValueChange={(v) => updateField('seo_twitter_cards', v)} aria-label={t('advanced.label_twitter_cards')} />
             </div>
@@ -206,7 +206,7 @@ export function SeoOverview() {
         </Card>
 
         <Card shadow="sm">
-          <CardHeader><h3 className="text-lg font-semibold">Verification &amp; Robots</h3></CardHeader>
+          <CardHeader><h3 className="text-lg font-semibold">{t('advanced.verification_robots_heading')}</h3></CardHeader>
           <CardBody className="gap-4">
             <Input
               label={t('advanced.label_google_search_console_verification')}
@@ -223,7 +223,7 @@ export function SeoOverview() {
               onValueChange={(v) => updateField('seo_bing_verification', v)}
             />
             <Input
-              label="Custom robots.txt Content"
+              label={t('advanced.custom_robots_txt')}
               placeholder="User-agent: *&#10;Disallow: /admin/"
               variant="bordered"
               value={String(formData.seo_robots_txt || '')}
@@ -233,7 +233,7 @@ export function SeoOverview() {
         </Card>
 
         <div className="flex justify-end">
-          <Button color="primary" startContent={<Save size={16} />} onPress={handleSave} isLoading={saving}>Save SEO Settings</Button>
+          <Button color="primary" startContent={<Save size={16} />} onPress={handleSave} isLoading={saving} isDisabled={saving}>{t('advanced.save_seo_settings')}</Button>
         </div>
       </div>
     </div>

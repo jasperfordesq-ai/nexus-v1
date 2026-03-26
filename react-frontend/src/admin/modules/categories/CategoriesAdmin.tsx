@@ -162,13 +162,13 @@ export function CategoriesAdmin() {
       });
 
       if (res.success) {
-        toast.success(`Category "${formData.name.trim()}" updated`);
+        toast.success(t('content.item_updated'));
         closeModal();
         loadCategories();
       } else {
         const errorMsg = (res as { error?: string }).error
           || (res as { errors?: Array<{ message: string }> }).errors?.[0]?.message
-          || 'Failed to update category';
+          || t('categories.failed_to_load_categories');
         toast.error(errorMsg);
       }
     } else {
@@ -180,13 +180,13 @@ export function CategoriesAdmin() {
       });
 
       if (res.success) {
-        toast.success(`Category "${formData.name.trim()}" created`);
+        toast.success(t('content.item_added'));
         closeModal();
         loadCategories();
       } else {
         const errorMsg = (res as { error?: string }).error
           || (res as { errors?: Array<{ message: string }> }).errors?.[0]?.message
-          || 'Failed to create category';
+          || t('categories.failed_to_load_categories');
         toast.error(errorMsg);
       }
     }
@@ -202,11 +202,7 @@ export function CategoriesAdmin() {
 
     const res = await adminCategories.delete(deleteTarget.id);
     if (res.success) {
-      const unassigned = (res.data as { listings_unassigned?: number } | undefined)?.listings_unassigned || 0;
-      const msg = unassigned > 0
-        ? `Category "${deleteTarget.name}" deleted. ${unassigned} listing(s) unassigned.`
-        : `Category "${deleteTarget.name}" deleted`;
-      toast.success(msg);
+      toast.success(t('content.item_deleted'));
       setDeleteTarget(null);
       loadCategories();
     } else {
@@ -239,10 +235,10 @@ export function CategoriesAdmin() {
         </DropdownTrigger>
         <DropdownMenu aria-label={t('categories.label_category_actions')} onAction={handleMenuAction}>
           <DropdownItem key="edit" startContent={<Edit size={14} />}>
-            Edit
+            {t('breadcrumbs.edit')}
           </DropdownItem>
           <DropdownItem key="delete" startContent={<Trash2 size={14} />} className="text-danger" color="danger">
-            Delete
+            {t('common.delete')}
           </DropdownItem>
         </DropdownMenu>
       </Dropdown>
@@ -254,7 +250,7 @@ export function CategoriesAdmin() {
   const columns: Column<AdminCategory>[] = [
     {
       key: 'name',
-      label: 'Name',
+      label: t('categories.label_name'),
       sortable: true,
       render: (cat) => (
         <div className="flex items-center gap-3">
@@ -268,14 +264,14 @@ export function CategoriesAdmin() {
     },
     {
       key: 'slug',
-      label: 'Slug',
+      label: t('federation.col_slug'),
       render: (cat) => (
         <span className="text-sm text-default-500 font-mono">{cat.slug}</span>
       ),
     },
     {
       key: 'type',
-      label: 'Type',
+      label: t('categories.label_type'),
       sortable: true,
       render: (cat) => (
         <Chip size="sm" variant="flat" color={TYPE_COLORS[cat.type] || 'default'}>
@@ -285,7 +281,7 @@ export function CategoriesAdmin() {
     },
     {
       key: 'listing_count',
-      label: 'Listings',
+      label: t('breadcrumbs.listings'),
       sortable: true,
       render: (cat) => (
         <Chip size="sm" variant="flat" color={cat.listing_count > 0 ? 'primary' : 'default'}>
@@ -295,7 +291,7 @@ export function CategoriesAdmin() {
     },
     {
       key: 'created_at',
-      label: 'Created',
+      label: t('listings.created'),
       sortable: true,
       render: (cat) => (
         <span className="text-sm text-default-500">
@@ -305,7 +301,7 @@ export function CategoriesAdmin() {
     },
     {
       key: 'actions',
-      label: 'Actions',
+      label: t('listings.actions'),
       render: (cat) => <CategoryActionsMenu category={cat} />,
     },
   ];
@@ -323,7 +319,7 @@ export function CategoriesAdmin() {
             startContent={<Plus size={16} />}
             onPress={openCreateModal}
           >
-            Add Category
+            {t('federation.add')} {t('breadcrumbs.categories')}
           </Button>
         }
       />
@@ -336,24 +332,20 @@ export function CategoriesAdmin() {
           variant="underlined"
           size="sm"
         >
-          <Tab key="all" title="All Types" />
-          <Tab key="listing" title="Listings" />
-          <Tab key="event" title="Events" />
-          <Tab key="blog" title="Blog" />
-          <Tab key="vol_opportunity" title="Volunteering" />
+          <Tab key="all" title={t('listings.filter_all')} />
+          <Tab key="listing" title={t('breadcrumbs.listings')} />
+          <Tab key="event" title={t('categories.events', 'Events')} />
+          <Tab key="blog" title={t('breadcrumbs.blog')} />
+          <Tab key="vol_opportunity" title={t('categories.volunteering', 'Volunteering')} />
         </Tabs>
       </div>
 
       {categories.length === 0 && !loading ? (
         <EmptyState
           icon={FolderOpen}
-          title="No categories found"
-          description={
-            typeFilter !== 'all'
-              ? `No ${TYPE_LABELS[typeFilter] || typeFilter} categories exist yet.`
-              : 'Create your first category to organise content.'
-          }
-          actionLabel="Add Category"
+          title={t('no_data')}
+          description={t('categories.categories_admin_desc')}
+          actionLabel={`${t('federation.add')} ${t('breadcrumbs.categories')}`}
           onAction={openCreateModal}
         />
       ) : (
@@ -361,9 +353,9 @@ export function CategoriesAdmin() {
           columns={columns}
           data={categories}
           isLoading={loading}
-          searchPlaceholder="Search categories..."
+          searchPlaceholder={t('data_table.search', 'Search categories...')}
           onRefresh={loadCategories}
-          emptyContent="No categories match your search"
+          emptyContent={t('no_data')}
         />
       )}
 
@@ -372,12 +364,12 @@ export function CategoriesAdmin() {
         <ModalContent>
           <ModalHeader className="flex items-center gap-2">
             <Tag size={20} />
-            {editingCategory ? 'Edit Category' : 'Create Category'}
+            {editingCategory ? `${t('breadcrumbs.edit')} ${t('breadcrumbs.categories')}` : `${t('breadcrumbs.create')} ${t('breadcrumbs.categories')}`}
           </ModalHeader>
           <ModalBody className="gap-4">
             <Input
               label={t('categories.label_name')}
-              placeholder="e.g. Arts & Crafts"
+              placeholder={t('categories.placeholder_name', 'e.g. Arts & Crafts')}
               value={formData.name}
               onValueChange={(v) => setFormData((prev) => ({ ...prev, name: v }))}
               isRequired
@@ -434,10 +426,10 @@ export function CategoriesAdmin() {
           </ModalBody>
           <ModalFooter>
             <Button variant="flat" onPress={closeModal} isDisabled={saving}>
-              Cancel
+              {t('cancel')}
             </Button>
-            <Button color="primary" onPress={handleSave} isLoading={saving}>
-              {editingCategory ? 'Save Changes' : 'Create Category'}
+            <Button color="primary" onPress={handleSave} isLoading={saving} isDisabled={saving}>
+              {editingCategory ? t('federation.save_changes') : `${t('breadcrumbs.create')} ${t('breadcrumbs.categories')}`}
             </Button>
           </ModalFooter>
         </ModalContent>
@@ -449,13 +441,9 @@ export function CategoriesAdmin() {
           isOpen={!!deleteTarget}
           onClose={() => setDeleteTarget(null)}
           onConfirm={handleDelete}
-          title="Delete Category"
-          message={
-            deleteTarget.listing_count > 0
-              ? `Are you sure you want to delete "${deleteTarget.name}"? This category has ${deleteTarget.listing_count} listing(s) assigned. They will be unassigned from this category.`
-              : `Are you sure you want to delete "${deleteTarget.name}"? This action cannot be undone.`
-          }
-          confirmLabel="Delete"
+          title={`${t('common.delete')} ${t('breadcrumbs.categories')}`}
+          message={t('gamification.confirm_delete_campaign', { name: deleteTarget.name })}
+          confirmLabel={t('common.delete')}
           confirmColor="danger"
           isLoading={deleting}
         />

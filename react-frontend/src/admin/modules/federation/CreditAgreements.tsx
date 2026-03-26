@@ -175,12 +175,12 @@ export function CreditAgreements() {
     try {
       const res = await api.post(`/v2/admin/federation/credit-agreements/${agreementId}/${action}`);
       if (res.success) {
-        toast.success(`Agreement ${action}d`);
+        toast.success(t('federation.agreement_action_success', { action }));
         loadData();
       }
     } catch (err) {
       logError('CreditAgreements.statusChange', err);
-      toast.error(`Failed to ${action} agreement`);
+      toast.error(t('federation.agreement_action_failed', { action }));
     }
   }, [toast, loadData]);
 
@@ -210,10 +210,10 @@ export function CreditAgreements() {
         actions={
           <div className="flex items-center gap-2">
             <Button variant="flat" size="sm" startContent={<RefreshCw size={16} />} onPress={() => loadData()}>
-              Refresh
+              {t('federation.refresh')}
             </Button>
             <Button color="primary" size="sm" startContent={<Plus size={16} />} onPress={createModal.onOpen}>
-              New Agreement
+              {t('federation.new_agreement')}
             </Button>
           </div>
         }
@@ -230,21 +230,21 @@ export function CreditAgreements() {
       {/* Agreements table */}
       <Card shadow="sm">
         <CardHeader>
-          <h3 className="text-lg font-semibold">All Agreements</h3>
+          <h3 className="text-lg font-semibold">{t('federation.all_agreements')}</h3>
         </CardHeader>
         <CardBody>
           <Table aria-label={t('federation.label_credit_agreements')} removeWrapper>
             <TableHeader>
-              <TableColumn>PARTNER</TableColumn>
-              <TableColumn>EXCHANGE RATE</TableColumn>
-              <TableColumn>MONTHLY LIMIT</TableColumn>
-              <TableColumn>BALANCE</TableColumn>
-              <TableColumn>SENT / RECEIVED</TableColumn>
-              <TableColumn>STATUS</TableColumn>
-              <TableColumn>CREATED</TableColumn>
-              <TableColumn>ACTIONS</TableColumn>
+              <TableColumn>{t('federation.col_partner')}</TableColumn>
+              <TableColumn>{t('federation.col_exchange_rate')}</TableColumn>
+              <TableColumn>{t('federation.col_monthly_limit')}</TableColumn>
+              <TableColumn>{t('federation.col_balance')}</TableColumn>
+              <TableColumn>{t('federation.col_sent_received')}</TableColumn>
+              <TableColumn>{t('federation.col_status')}</TableColumn>
+              <TableColumn>{t('federation.col_created')}</TableColumn>
+              <TableColumn>{t('federation.col_actions')}</TableColumn>
             </TableHeader>
-            <TableBody emptyContent="No credit agreements found. Create one to start exchanging credits with partner communities.">
+            <TableBody emptyContent={t('federation.no_credit_agreements')}>
               {agreements.map((agreement) => (
                 <TableRow key={agreement.id}>
                   <TableCell>
@@ -257,7 +257,7 @@ export function CreditAgreements() {
                     <span className="text-sm font-mono">{agreement.exchange_rate}:1</span>
                   </TableCell>
                   <TableCell>
-                    <span className="text-sm">{agreement.monthly_limit} credits</span>
+                    <span className="text-sm">{t('federation.credits_count', { count: agreement.monthly_limit })}</span>
                   </TableCell>
                   <TableCell>
                     <span className={`text-sm font-medium ${agreement.current_balance >= 0 ? 'text-success' : 'text-danger'}`}>
@@ -343,7 +343,7 @@ export function CreditAgreements() {
             <>
               <ModalHeader className="flex items-center gap-2">
                 <Handshake size={20} />
-                New Credit Agreement
+                {t('federation.new_credit_agreement')}
               </ModalHeader>
               <ModalBody className="gap-4">
                 <Select
@@ -363,7 +363,7 @@ export function CreditAgreements() {
                 <Input
                   type="number"
                   label={t('federation.label_exchange_rate')}
-                  description="How many of your credits equal 1 partner credit (e.g., 1.0 = 1:1)"
+                  description={t('federation.exchange_rate_description')}
                   value={exchangeRate}
                   onChange={(e) => setExchangeRate(e.target.value)}
                   startContent={<ArrowRightLeft size={14} />}
@@ -382,14 +382,14 @@ export function CreditAgreements() {
                 />
               </ModalBody>
               <ModalFooter>
-                <Button variant="flat" onPress={onClose}>Cancel</Button>
+                <Button variant="flat" onPress={onClose}>{t('federation.cancel')}</Button>
                 <Button
                   color="primary"
                   isLoading={creating}
                   isDisabled={!selectedPartner}
                   onPress={handleCreate}
                 >
-                  Create Agreement
+                  {t('federation.create_agreement')}
                 </Button>
               </ModalFooter>
             </>

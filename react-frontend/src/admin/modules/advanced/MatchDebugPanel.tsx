@@ -90,20 +90,20 @@ function scoreColor(value: number): ProgressColor {
   return 'default';
 }
 
-const SOURCE_LABELS: Record<string, string> = {
-  listing: 'Listing',
-  job: 'Job',
-  volunteering: 'Volunteering',
-  group: 'Group',
+const SOURCE_I18N_KEYS: Record<string, string> = {
+  listing: 'advanced.source_listing',
+  job: 'advanced.source_job',
+  volunteering: 'advanced.source_volunteering',
+  group: 'advanced.source_group',
 };
 
-const SCORE_COMPONENTS: Array<{ key: keyof DebugScores; label: string }> = [
-  { key: 'category', label: 'Category' },
-  { key: 'skill', label: 'Skill' },
-  { key: 'proximity', label: 'Proximity' },
-  { key: 'freshness', label: 'Freshness' },
-  { key: 'reciprocity', label: 'Reciprocity' },
-  { key: 'quality', label: 'Quality' },
+const SCORE_COMPONENTS: Array<{ key: keyof DebugScores; i18nKey: string }> = [
+  { key: 'category', i18nKey: 'advanced.score_category' },
+  { key: 'skill', i18nKey: 'advanced.score_skill' },
+  { key: 'proximity', i18nKey: 'advanced.score_proximity' },
+  { key: 'freshness', i18nKey: 'advanced.score_freshness' },
+  { key: 'reciprocity', i18nKey: 'advanced.score_reciprocity' },
+  { key: 'quality', i18nKey: 'advanced.score_quality' },
 ];
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -219,7 +219,7 @@ export function MatchDebugPanel() {
               aria-label={t('advanced.label_reload_matches')}
               startContent={<RefreshCw className={`w-4 h-4 ${matchesLoading ? 'animate-spin' : ''}`} />}
             >
-              Reload
+              {t('advanced.reload')}
             </Button>
           ) : undefined
         }
@@ -232,8 +232,8 @@ export function MatchDebugPanel() {
             <Target className="w-5 h-5 text-primary" />
           </div>
           <div>
-            <p className="text-sm font-semibold text-foreground">Select a User</p>
-            <p className="text-xs text-default-500">Search by name or email to inspect their matches</p>
+            <p className="text-sm font-semibold text-foreground">{t('advanced.select_a_user')}</p>
+            <p className="text-xs text-default-500">{t('advanced.select_a_user_desc')}</p>
           </div>
         </CardHeader>
         <CardBody>
@@ -288,7 +288,7 @@ export function MatchDebugPanel() {
           {/* Selected user pill */}
           {selectedUser && (
             <div className="mt-4 flex items-center gap-2">
-              <span className="text-sm text-default-500">Inspecting:</span>
+              <span className="text-sm text-default-500">{t('advanced.inspecting')}</span>
               <div className="flex items-center gap-2 bg-primary/10 rounded-full px-3 py-1">
                 <Avatar
                   src={resolveAvatarUrl(selectedUser.avatar_url)}
@@ -314,7 +314,7 @@ export function MatchDebugPanel() {
         <div className="flex justify-center py-16">
           <div className="flex flex-col items-center gap-3">
             <Spinner size="lg" />
-            <p className="text-sm text-default-500">Loading match scores...</p>
+            <p className="text-sm text-default-500">{t('advanced.loading_match_scores')}</p>
           </div>
         </div>
       )}
@@ -327,10 +327,9 @@ export function MatchDebugPanel() {
               <div className="p-4 rounded-full bg-default-100">
                 <Sparkles className="w-8 h-8 text-default-400" />
               </div>
-              <p className="font-semibold text-foreground">No matches found</p>
+              <p className="font-semibold text-foreground">{t('advanced.no_matches_found')}</p>
               <p className="text-sm text-default-500 max-w-sm">
-                This user has no matches above the minimum score threshold,
-                or they have an incomplete profile (no skills or interests).
+                {t('advanced.no_matches_desc')}
               </p>
             </div>
           </CardBody>
@@ -345,9 +344,9 @@ export function MatchDebugPanel() {
               <div className="p-4 rounded-full bg-default-100">
                 <User className="w-8 h-8 text-default-400" />
               </div>
-              <p className="font-semibold text-foreground">No user selected</p>
+              <p className="font-semibold text-foreground">{t('advanced.no_user_selected')}</p>
               <p className="text-sm text-default-500">
-                Search for a user above to view their match score breakdown.
+                {t('advanced.no_user_selected_desc')}
               </p>
             </div>
           </CardBody>
@@ -382,7 +381,7 @@ export function MatchDebugPanel() {
                           : match.source_type === 'volunteering' ? 'danger'
                           : 'success'}
                       >
-                        {SOURCE_LABELS[match.source_type] ?? match.source_type}
+                        {t(SOURCE_I18N_KEYS[match.source_type] ?? match.source_type)}
                       </Chip>
                       {match.category && (
                         <Chip size="sm" variant="bordered" className="text-xs">
@@ -429,7 +428,7 @@ export function MatchDebugPanel() {
                 {/* Overall score bar */}
                 <div>
                   <div className="flex justify-between text-xs text-default-500 mb-1">
-                    <span className="font-medium">Overall Match Score</span>
+                    <span className="font-medium">{t('advanced.overall_match_score')}</span>
                     <span>{match.match_score}%</span>
                   </div>
                   <Progress
@@ -443,14 +442,14 @@ export function MatchDebugPanel() {
                 {/* Per-component score breakdown */}
                 {match._debug_scores && (
                   <div>
-                    <p className="text-xs font-medium text-default-500 mb-2">Score Breakdown</p>
+                    <p className="text-xs font-medium text-default-500 mb-2">{t('advanced.score_breakdown')}</p>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-3">
-                      {SCORE_COMPONENTS.map(({ key, label }) => {
+                      {SCORE_COMPONENTS.map(({ key, i18nKey }) => {
                         const value = match._debug_scores![key] ?? 0;
                         return (
                           <div key={key}>
                             <div className="flex justify-between text-xs mb-1">
-                              <span className="text-default-500">{label}</span>
+                              <span className="text-default-500">{t(i18nKey)}</span>
                               <span className={`font-medium ${
                                 value >= 70 ? 'text-success'
                                 : value >= 40 ? 'text-warning'
@@ -464,7 +463,7 @@ export function MatchDebugPanel() {
                               value={value}
                               color={scoreColor(value)}
                               size="sm"
-                              aria-label={`${label} score: ${value}`}
+                              aria-label={`${t(i18nKey)} score: ${value}`}
                             />
                           </div>
                         );
@@ -476,15 +475,14 @@ export function MatchDebugPanel() {
                 {/* Debug scores not available notice */}
                 {!match._debug_scores && (
                   <p className="text-xs text-default-400 italic">
-                    Detailed score breakdown not available for this match type.
-                    Only listings returned from SmartMatchingEngine include per-component scores.
+                    {t('advanced.no_debug_scores')}
                   </p>
                 )}
 
                 {/* Match reasons */}
                 {match.reasons && match.reasons.length > 0 && (
                   <div>
-                    <p className="text-xs font-medium text-default-500 mb-2">Match Reasons</p>
+                    <p className="text-xs font-medium text-default-500 mb-2">{t('advanced.match_reasons')}</p>
                     <div className="flex flex-wrap gap-1.5">
                       {match.reasons.map((reason, i) => (
                         <Chip key={i} size="sm" variant="flat" color="primary" className="text-xs">

@@ -292,6 +292,7 @@ export function TenantFeatures() {
                   color="primary"
                   size="sm"
                   isLoading={savingLang}
+                  isDisabled={savingLang}
                   onPress={handleSaveLanguages}
                 >
                   Save Changes

@@ -27,13 +27,7 @@ import type { Column } from '../../components';
 import type { GdprRequest } from '../../api/types';
 
 import { useTranslation } from 'react-i18next';
-const STATUS_OPTIONS = [
-  { value: 'all', label: 'All Statuses' },
-  { value: 'pending', label: 'Pending' },
-  { value: 'processing', label: 'Processing' },
-  { value: 'completed', label: 'Completed' },
-  { value: 'rejected', label: 'Rejected' },
-];
+const STATUS_OPTION_KEYS = ['all', 'pending', 'processing', 'completed', 'rejected'] as const;
 
 export function GdprRequests() {
   const { t } = useTranslation('admin');
@@ -80,10 +74,10 @@ export function GdprRequests() {
       const res = await adminEnterprise.updateGdprRequest(id, { status: newStatus });
 
       if (res.success) {
-        toast.success(`Request updated to ${newStatus}`);
+        toast.success(t('enterprise.request_updated', { status: newStatus }));
         loadData();
       } else {
-        const error = (res as { error?: string }).error || 'Update failed';
+        const error = (res as { error?: string }).error || t('enterprise.update_failed');
         toast.error(error);
       }
     } catch (err) {
@@ -93,29 +87,29 @@ export function GdprRequests() {
   };
 
   const columns: Column<GdprRequest>[] = [
-    { key: 'id', label: 'ID', sortable: true },
-    { key: 'user_name', label: 'User', sortable: true },
+    { key: 'id', label: t('enterprise.col_id'), sortable: true },
+    { key: 'user_name', label: t('enterprise.col_user'), sortable: true },
     {
       key: 'type',
-      label: 'Type',
+      label: t('enterprise.col_type'),
       sortable: true,
       render: (r) => <span className="capitalize">{r.type}</span>,
     },
     {
       key: 'status',
-      label: 'Status',
+      label: t('enterprise.col_status'),
       sortable: true,
       render: (r) => <StatusBadge status={r.status} />,
     },
     {
       key: 'created_at',
-      label: 'Created',
+      label: t('enterprise.col_created'),
       sortable: true,
       render: (r) => new Date(r.created_at).toLocaleDateString(),
     },
     {
       key: 'actions',
-      label: 'Actions',
+      label: t('enterprise.col_actions'),
       render: (r) => (
         <Dropdown>
           <DropdownTrigger>
@@ -125,13 +119,13 @@ export function GdprRequests() {
           </DropdownTrigger>
           <DropdownMenu aria-label={t('enterprise.label_request_actions')}>
             <DropdownItem key="processing" onPress={() => handleStatusUpdate(r.id, 'processing')}>
-              Mark Processing
+              {t('enterprise.mark_processing')}
             </DropdownItem>
             <DropdownItem key="completed" onPress={() => handleStatusUpdate(r.id, 'completed')}>
-              Mark Completed
+              {t('enterprise.mark_completed')}
             </DropdownItem>
             <DropdownItem key="rejected" className="text-danger" color="danger" onPress={() => handleStatusUpdate(r.id, 'rejected')}>
-              Reject
+              {t('enterprise.reject')}
             </DropdownItem>
           </DropdownMenu>
         </Dropdown>
@@ -152,7 +146,7 @@ export function GdprRequests() {
             isLoading={loading}
             size="sm"
           >
-            Refresh
+            {t('common.refresh')}
           </Button>
         }
       />
@@ -170,8 +164,8 @@ export function GdprRequests() {
           size="sm"
           variant="bordered"
         >
-          {STATUS_OPTIONS.map((opt) => (
-            <SelectItem key={opt.value}>{opt.label}</SelectItem>
+          {STATUS_OPTION_KEYS.map((key) => (
+            <SelectItem key={key}>{t(`enterprise.status_${key}`)}</SelectItem>
           ))}
         </Select>
       </div>
@@ -184,7 +178,7 @@ export function GdprRequests() {
         page={page}
         onPageChange={setPage}
         searchable={false}
-        emptyContent="No GDPR requests found"
+        emptyContent={t('enterprise.no_gdpr_requests')}
       />
     </div>
   );

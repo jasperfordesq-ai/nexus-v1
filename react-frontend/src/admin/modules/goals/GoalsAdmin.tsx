@@ -137,10 +137,10 @@ export function GoalsAdmin() {
     try {
       const res = await api.delete(`/v2/admin/goals/${confirmDelete.id}`);
       if (res?.success) {
-        toast.success(`Goal "${confirmDelete.title}" deleted`);
+        toast.success(t('goals.goal_deleted', { title: confirmDelete.title }));
         loadGoals();
       } else {
-        toast.error(res?.error || 'Failed to delete goal');
+        toast.error(res?.error || t('goals.failed_to_delete_goal'));
       }
     } catch {
       toast.error(t('goals.an_unexpected_error_occurred'));
@@ -178,7 +178,7 @@ export function GoalsAdmin() {
             onPress={loadGoals}
             isDisabled={loading}
           >
-            Refresh
+            {t('common.refresh')}
           </Button>
         }
       />
@@ -197,7 +197,7 @@ export function GoalsAdmin() {
           className="max-w-md"
         />
         <Button color="primary" variant="flat" onPress={handleSearch}>
-          Search
+          {t('goals.search')}
         </Button>
       </div>
 
@@ -206,14 +206,14 @@ export function GoalsAdmin() {
         <CardBody className="p-0">
           {loading ? (
             <div className="flex items-center justify-center py-16">
-              <Spinner size="lg" label="Loading goals..." />
+              <Spinner size="lg" label={t('goals.loading_goals')} />
             </div>
           ) : goals.length === 0 ? (
             <div className="flex flex-col items-center justify-center gap-3 py-16 text-default-400">
               <Target size={48} />
-              <p className="text-lg font-medium">No goals found</p>
+              <p className="text-lg font-medium">{t('goals.no_goals_found')}</p>
               <p className="text-sm">
-                {search ? 'Try adjusting your search terms.' : 'No goals have been created yet.'}
+                {search ? t('goals.try_adjusting_search') : t('goals.no_goals_created_yet')}
               </p>
             </div>
           ) : (
@@ -223,14 +223,14 @@ export function GoalsAdmin() {
               isStriped
             >
               <TableHeader>
-                <TableColumn>TITLE</TableColumn>
-                <TableColumn>MEMBER</TableColumn>
-                <TableColumn>TARGET</TableColumn>
-                <TableColumn>PROGRESS</TableColumn>
-                <TableColumn>STATUS</TableColumn>
-                <TableColumn>BUDDY</TableColumn>
-                <TableColumn>CREATED</TableColumn>
-                <TableColumn>ACTIONS</TableColumn>
+                <TableColumn>{t('goals.col_title')}</TableColumn>
+                <TableColumn>{t('goals.col_member')}</TableColumn>
+                <TableColumn>{t('goals.col_target')}</TableColumn>
+                <TableColumn>{t('goals.col_progress')}</TableColumn>
+                <TableColumn>{t('goals.col_status')}</TableColumn>
+                <TableColumn>{t('goals.col_buddy')}</TableColumn>
+                <TableColumn>{t('goals.col_created')}</TableColumn>
+                <TableColumn>{t('goals.col_actions')}</TableColumn>
               </TableHeader>
               <TableBody>
                 {goals.map((goal) => (
@@ -274,7 +274,7 @@ export function GoalsAdmin() {
                         variant="flat"
                         color={goal.has_buddy ? 'success' : 'default'}
                       >
-                        {goal.has_buddy ? 'Yes' : 'No'}
+                        {goal.has_buddy ? t('goals.yes') : t('goals.no')}
                       </Chip>
                     </TableCell>
                     <TableCell>
@@ -316,7 +316,7 @@ export function GoalsAdmin() {
       {meta.total_pages > 1 && (
         <div className="mt-4 flex items-center justify-between">
           <span className="text-sm text-default-500">
-            Showing {goals.length} of {meta.total} goals
+            {t('goals.showing_of_total', { count: goals.length, total: meta.total })}
           </span>
           <Pagination
             total={meta.total_pages}
@@ -333,9 +333,9 @@ export function GoalsAdmin() {
           isOpen={!!confirmDelete}
           onClose={() => setConfirmDelete(null)}
           onConfirm={handleDelete}
-          title="Delete Goal"
-          message={`Are you sure you want to delete "${confirmDelete.title}"? This action cannot be undone.`}
-          confirmLabel="Delete"
+          title={t('goals.delete_goal')}
+          message={t('goals.confirm_delete_goal', { title: confirmDelete.title })}
+          confirmLabel={t('common.delete')}
           confirmColor="danger"
           isLoading={deleteLoading}
         />

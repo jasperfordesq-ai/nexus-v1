@@ -94,7 +94,7 @@ export function VolunteerApprovals() {
 
   const columns: Column<VolApplication>[] = [
     {
-      key: 'applicant', label: 'Applicant', sortable: true,
+      key: 'applicant', label: t('volunteering.col_applicant'), sortable: true,
       render: (item) => (
         <div className="flex items-center gap-3">
           <Avatar name={`${item.first_name} ${item.last_name}`} size="sm" />
@@ -105,17 +105,17 @@ export function VolunteerApprovals() {
         </div>
       ),
     },
-    { key: 'opportunity_title', label: 'Opportunity', sortable: true },
+    { key: 'opportunity_title', label: t('volunteering.col_opportunity'), sortable: true },
     {
-      key: 'status', label: 'Status',
+      key: 'status', label: t('volunteering.col_status'),
       render: (item) => <StatusBadge status={item.status} />,
     },
     {
-      key: 'created_at', label: 'Applied', sortable: true,
+      key: 'created_at', label: t('volunteering.col_applied'), sortable: true,
       render: (item) => <span className="text-sm text-default-500">{item.created_at ? new Date(item.created_at).toLocaleDateString() : '--'}</span>,
     },
     {
-      key: 'actions', label: 'Actions',
+      key: 'actions', label: t('volunteering.col_actions'),
       render: (item) => (
         <div className="flex gap-1">
           <Button
@@ -127,7 +127,7 @@ export function VolunteerApprovals() {
             isLoading={actionId === item.id}
             isDisabled={actionId !== null && actionId !== item.id}
           >
-            Approve
+            {t('volunteering.approve')}
           </Button>
           <Button
             size="sm"
@@ -138,7 +138,7 @@ export function VolunteerApprovals() {
             isLoading={actionId === item.id}
             isDisabled={actionId !== null && actionId !== item.id}
           >
-            Decline
+            {t('volunteering.decline')}
           </Button>
         </div>
       ),
@@ -149,7 +149,7 @@ export function VolunteerApprovals() {
     return (
       <div>
         <PageHeader title={t('volunteering.volunteer_approvals_title')} description={t('volunteering.volunteer_approvals_desc')} />
-        <EmptyState icon={ClipboardCheck} title="No Pending Approvals" description={t('volunteering.desc_all_volunteer_applications_have_been_rev')} />
+        <EmptyState icon={ClipboardCheck} title={t('volunteering.no_pending_approvals')} description={t('volunteering.desc_all_volunteer_applications_have_been_rev')} />
       </div>
     );
   }
@@ -159,7 +159,7 @@ export function VolunteerApprovals() {
       <PageHeader
         title={t('volunteering.volunteer_approvals_title')}
         description={t('volunteering.volunteer_approvals_desc')}
-        actions={<Button variant="flat" startContent={<RefreshCw size={16} />} onPress={loadData} isLoading={loading}>Refresh</Button>}
+        actions={<Button variant="flat" startContent={<RefreshCw size={16} />} onPress={loadData} isLoading={loading}>{t('common.refresh')}</Button>}
       />
       <DataTable columns={columns} data={items} isLoading={loading} onRefresh={loadData} />
     </div>

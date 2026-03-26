@@ -46,12 +46,12 @@ interface CrmDashboardData {
 }
 
 const QUICK_ACTIONS = [
-  { label: 'Member Notes', path: '/admin/crm/notes', icon: StickyNote, color: 'text-primary bg-primary/10' },
-  { label: 'CRM Tasks', path: '/admin/crm/tasks', icon: ClipboardList, color: 'text-warning bg-warning/10' },
-  { label: 'Member Tags', path: '/admin/crm/tags', icon: Tag, color: 'text-secondary bg-secondary/10' },
-  { label: 'Activity Timeline', path: '/admin/crm/timeline', icon: Activity, color: 'text-danger bg-danger/10' },
-  { label: 'Onboarding Funnel', path: '/admin/crm/funnel', icon: TrendingUp, color: 'text-success bg-success/10' },
-  { label: 'All Members', path: '/admin/users', icon: Users, color: 'text-default bg-default/10' },
+  { labelKey: 'crm.qa_member_notes', path: '/admin/crm/notes', icon: StickyNote, color: 'text-primary bg-primary/10' },
+  { labelKey: 'crm.qa_crm_tasks', path: '/admin/crm/tasks', icon: ClipboardList, color: 'text-warning bg-warning/10' },
+  { labelKey: 'crm.qa_member_tags', path: '/admin/crm/tags', icon: Tag, color: 'text-secondary bg-secondary/10' },
+  { labelKey: 'crm.qa_activity_timeline', path: '/admin/crm/timeline', icon: Activity, color: 'text-danger bg-danger/10' },
+  { labelKey: 'crm.qa_onboarding_funnel', path: '/admin/crm/funnel', icon: TrendingUp, color: 'text-success bg-success/10' },
+  { labelKey: 'crm.qa_all_members', path: '/admin/users', icon: Users, color: 'text-default bg-default/10' },
 ] as const;
 
 export function CrmDashboard() {
@@ -93,9 +93,9 @@ export function CrmDashboard() {
       a.download = `crm-${type}-${new Date().toISOString().slice(0, 10)}.csv`;
       a.click();
       URL.revokeObjectURL(a.href);
-      toast.success(`${type} exported successfully`);
+      toast.success(t('crm.export_success', { type }));
     } catch {
-      toast.error(`Failed to export ${type}`);
+      toast.error(t('crm.export_failed', { type }));
     }
   }, [toast]);
 
@@ -106,7 +106,7 @@ export function CrmDashboard() {
   if (loading) {
     return (
       <div className="flex min-h-[400px] items-center justify-center">
-        <Spinner size="lg" label="Loading CRM dashboard..." />
+        <Spinner size="lg" label={t('crm.loading_dashboard')} />
       </div>
     );
   }
@@ -124,7 +124,7 @@ export function CrmDashboard() {
               startContent={<Download size={14} />}
               onPress={() => handleExport('dashboard')}
             >
-              Export Stats
+              {t('crm.export_stats')}
             </Button>
             <Button
               variant="flat"
@@ -132,7 +132,7 @@ export function CrmDashboard() {
               startContent={<Download size={14} />}
               onPress={() => handleExport('notes')}
             >
-              Export Notes
+              {t('crm.export_notes')}
             </Button>
             <Button
               variant="flat"
@@ -140,7 +140,7 @@ export function CrmDashboard() {
               startContent={<Download size={14} />}
               onPress={() => handleExport('tasks')}
             >
-              Export Tasks
+              {t('crm.export_tasks')}
             </Button>
             <Button
               variant="flat"
@@ -148,7 +148,7 @@ export function CrmDashboard() {
               onPress={loadDashboard}
               isLoading={loading}
             >
-              Refresh
+              {t('crm.refresh')}
             </Button>
           </div>
         }
@@ -219,8 +219,8 @@ export function CrmDashboard() {
         {/* Quick Actions */}
         <Card shadow="sm">
           <CardHeader className="flex-col items-start px-4 pb-0 pt-4">
-            <h3 className="text-lg font-semibold text-foreground">Quick Actions</h3>
-            <p className="text-sm text-default-500">Jump to common CRM tasks</p>
+            <h3 className="text-lg font-semibold text-foreground">{t('crm.quick_actions_title')}</h3>
+            <p className="text-sm text-default-500">{t('crm.quick_actions_desc')}</p>
           </CardHeader>
           <CardBody className="gap-3 px-4 pb-4 pt-3">
             {QUICK_ACTIONS.map((action) => {
@@ -239,7 +239,7 @@ export function CrmDashboard() {
                     <span className={`flex h-8 w-8 items-center justify-center rounded-lg ${action.color}`}>
                       <Icon size={16} />
                     </span>
-                    <span>{action.label}</span>
+                    <span>{t(action.labelKey)}</span>
                   </span>
                 </Button>
               );
@@ -250,8 +250,8 @@ export function CrmDashboard() {
         {/* Activity Summary */}
         <Card shadow="sm">
           <CardHeader className="flex-col items-start px-4 pb-0 pt-4">
-            <h3 className="text-lg font-semibold text-foreground">Activity Summary</h3>
-            <p className="text-sm text-default-500">Overview of member engagement</p>
+            <h3 className="text-lg font-semibold text-foreground">{t('crm.activity_summary_title')}</h3>
+            <p className="text-sm text-default-500">{t('crm.activity_summary_desc')}</p>
           </CardHeader>
           <CardBody className="gap-4 px-4 pb-4 pt-3">
             <div className="flex items-center justify-between rounded-lg bg-default-50 p-3">
@@ -260,8 +260,8 @@ export function CrmDashboard() {
                   <Activity size={20} />
                 </div>
                 <div>
-                  <p className="text-sm font-medium text-foreground">Active in last 30 days</p>
-                  <p className="text-xs text-default-500">Members who logged in recently</p>
+                  <p className="text-sm font-medium text-foreground">{t('crm.active_in_last_30')}</p>
+                  <p className="text-xs text-default-500">{t('crm.members_logged_in_recently')}</p>
                 </div>
               </div>
               <Chip color="success" variant="flat" size="lg">
@@ -275,8 +275,8 @@ export function CrmDashboard() {
                   <UserPlus size={20} />
                 </div>
                 <div>
-                  <p className="text-sm font-medium text-foreground">New this month</p>
-                  <p className="text-xs text-default-500">Signups in current month</p>
+                  <p className="text-sm font-medium text-foreground">{t('crm.new_this_month_summary')}</p>
+                  <p className="text-xs text-default-500">{t('crm.signups_in_current_month')}</p>
                 </div>
               </div>
               <Chip color="secondary" variant="flat" size="lg">
@@ -290,8 +290,8 @@ export function CrmDashboard() {
                   <AlertTriangle size={20} />
                 </div>
                 <div>
-                  <p className="text-sm font-medium text-foreground">Never logged in</p>
-                  <p className="text-xs text-default-500">Members who have not signed in</p>
+                  <p className="text-sm font-medium text-foreground">{t('crm.never_logged_in')}</p>
+                  <p className="text-xs text-default-500">{t('crm.members_not_signed_in')}</p>
                 </div>
               </div>
               <Chip color="warning" variant="flat" size="lg">
@@ -305,8 +305,8 @@ export function CrmDashboard() {
                   <TrendingUp size={20} />
                 </div>
                 <div>
-                  <p className="text-sm font-medium text-foreground">Retention rate</p>
-                  <p className="text-xs text-default-500">Members active vs total</p>
+                  <p className="text-sm font-medium text-foreground">{t('crm.retention_rate_summary')}</p>
+                  <p className="text-xs text-default-500">{t('crm.members_active_vs_total')}</p>
                 </div>
               </div>
               <Chip

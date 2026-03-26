@@ -56,10 +56,10 @@ export function ErrorLogs() {
   }, [loadData]);
 
   const columns: Column<ErrorLogEntry>[] = [
-    { key: 'id', label: 'ID', sortable: true },
+    { key: 'id', label: t('enterprise.col_id'), sortable: true },
     {
       key: 'action',
-      label: 'Action',
+      label: t('enterprise.col_action'),
       sortable: true,
       render: (entry) => (
         <Chip size="sm" variant="flat" color="danger">
@@ -67,22 +67,22 @@ export function ErrorLogs() {
         </Chip>
       ),
     },
-    { key: 'description', label: 'Description' },
+    { key: 'description', label: t('enterprise.col_description') },
     {
       key: 'user_name',
-      label: 'User',
+      label: t('enterprise.col_user'),
       render: (entry) => entry.user_name || '---',
     },
     {
       key: 'ip_address',
-      label: 'IP',
+      label: t('enterprise.col_ip'),
       render: (entry) => (
         <span className="text-xs font-mono">{entry.ip_address || '---'}</span>
       ),
     },
     {
       key: 'created_at',
-      label: 'Date',
+      label: t('enterprise.col_date'),
       sortable: true,
       render: (entry) => new Date(entry.created_at).toLocaleString(),
     },
@@ -101,7 +101,7 @@ export function ErrorLogs() {
             isLoading={loading}
             size="sm"
           >
-            Refresh
+            {t('common.refresh')}
           </Button>
         }
       />
@@ -114,7 +114,7 @@ export function ErrorLogs() {
         page={page}
         onPageChange={setPage}
         searchable={false}
-        emptyContent="No error logs found"
+        emptyContent={t('enterprise.no_error_logs')}
       />
     </div>
   );

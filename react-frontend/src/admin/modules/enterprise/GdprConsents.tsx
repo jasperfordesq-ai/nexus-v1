@@ -47,11 +47,11 @@ export function GdprConsents() {
   }, [loadData]);
 
   const columns: Column<GdprConsent>[] = [
-    { key: 'id', label: 'ID', sortable: true },
-    { key: 'user_name', label: 'User', sortable: true },
+    { key: 'id', label: t('enterprise.col_id'), sortable: true },
+    { key: 'user_name', label: t('enterprise.col_user'), sortable: true },
     {
       key: 'consent_type',
-      label: 'Type',
+      label: t('enterprise.col_type'),
       sortable: true,
       render: (c) => (
         <Chip size="sm" variant="flat" color="primary" className="capitalize">
@@ -61,23 +61,23 @@ export function GdprConsents() {
     },
     {
       key: 'consented',
-      label: 'Consented',
+      label: t('enterprise.col_consented'),
       render: (c) =>
         c.consented ? (
           <div className="flex items-center gap-1 text-success">
             <CheckCircle size={14} />
-            <span className="text-sm">Yes</span>
+            <span className="text-sm">{t('enterprise.yes')}</span>
           </div>
         ) : (
           <div className="flex items-center gap-1 text-danger">
             <XCircle size={14} />
-            <span className="text-sm">No</span>
+            <span className="text-sm">{t('enterprise.no')}</span>
           </div>
         ),
     },
     {
       key: 'created_at',
-      label: 'Date',
+      label: t('enterprise.col_date'),
       sortable: true,
       render: (c) => new Date(c.consented_at || c.created_at).toLocaleDateString(),
     },
@@ -96,7 +96,7 @@ export function GdprConsents() {
             isLoading={loading}
             size="sm"
           >
-            Refresh
+            {t('common.refresh')}
           </Button>
         }
       />
@@ -106,7 +106,7 @@ export function GdprConsents() {
         data={consents}
         isLoading={loading}
         searchable={false}
-        emptyContent="No consent records found"
+        emptyContent={t('enterprise.no_consent_records')}
       />
     </div>
   );

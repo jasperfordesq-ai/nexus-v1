@@ -85,14 +85,14 @@ export function PlansAdmin() {
   };
 
   const formatPrice = (price: number) => {
-    if (price === 0 || price === null || price === undefined) return 'Free';
+    if (price === 0 || price === null || price === undefined) return t('content.free', 'Free');
     return `EUR ${Number(price).toFixed(2)}`;
   };
 
   const columns: Column<PlanItem>[] = [
     {
       key: 'name',
-      label: 'Name',
+      label: t('content.label_name'),
       sortable: true,
       render: (item) => (
         <Button
@@ -107,34 +107,34 @@ export function PlansAdmin() {
     },
     {
       key: 'tier_level',
-      label: 'Tier',
+      label: t('content.tier', 'Tier'),
       sortable: true,
       render: (item) => <span className="text-sm text-default-600">{item.tier_level ?? '--'}</span>,
     },
     {
       key: 'price_monthly',
-      label: 'Monthly Price',
+      label: t('content.monthly_price', 'Monthly Price'),
       sortable: true,
       render: (item) => <span className="text-sm text-default-600">{formatPrice(item.price_monthly)}</span>,
     },
     {
       key: 'price_yearly',
-      label: 'Annual Price',
+      label: t('content.annual_price', 'Annual Price'),
       sortable: true,
       render: (item) => <span className="text-sm text-default-600">{formatPrice(item.price_yearly)}</span>,
     },
     {
       key: 'is_active',
-      label: 'Active',
+      label: t('content.label_active'),
       render: (item) => (
         <Chip size="sm" variant="flat" color={item.is_active ? 'success' : 'default'}>
-          {item.is_active ? 'Active' : 'Inactive'}
+          {item.is_active ? t('content.label_active') : t('reports.label_inactive', 'Inactive')}
         </Chip>
       ),
     },
     {
       key: 'actions',
-      label: 'Actions',
+      label: t('listings.actions'),
       render: (item) => (
         <div className="flex gap-1">
           <Button
@@ -182,7 +182,7 @@ export function PlansAdmin() {
             startContent={<Plus size={16} />}
             onPress={() => navigate(tenantPath('/admin/plans/create'))}
           >
-            Create Plan
+            {t('breadcrumbs.create')} {t('breadcrumbs.plans')}
           </Button>
         }
       />
@@ -190,16 +190,16 @@ export function PlansAdmin() {
       {data.length === 0 ? (
         <EmptyState
           icon={CreditCard}
-          title="No Plans Created"
+          title={t('no_data')}
           description={t('content.desc_create_subscription_plans_to_offer_diffe')}
-          actionLabel="Create Plan"
+          actionLabel={`${t('breadcrumbs.create')} ${t('breadcrumbs.plans')}`}
           onAction={() => navigate(tenantPath('/admin/plans/create'))}
         />
       ) : (
         <DataTable
           columns={columns}
           data={data}
-          searchPlaceholder="Search plans..."
+          searchPlaceholder={t('data_table.search', 'Search plans...')}
           onRefresh={fetchData}
         />
       )}
@@ -209,9 +209,9 @@ export function PlansAdmin() {
           isOpen={!!confirmDelete}
           onClose={() => setConfirmDelete(null)}
           onConfirm={handleDelete}
-          title="Delete Plan"
-          message={`Are you sure you want to delete "${confirmDelete.name}"? This action cannot be undone.`}
-          confirmLabel="Delete"
+          title={`${t('common.delete')} ${t('breadcrumbs.plans')}`}
+          message={t('gamification.confirm_delete_campaign', { name: confirmDelete.name })}
+          confirmLabel={t('common.delete')}
           confirmColor="danger"
           isLoading={actionLoading}
         />

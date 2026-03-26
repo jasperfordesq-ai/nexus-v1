@@ -122,12 +122,12 @@ export function CreateBadge() {
     });
 
     if (res.success) {
-      toast.success(`Badge "${formData.name.trim()}" created`);
+      toast.success(t('gamification.badge_created', { name: formData.name.trim() }));
       navigate('/admin/custom-badges');
     } else {
       const errorMsg = (res as { error?: string }).error
         || (res as { errors?: Array<{ message: string }> }).errors?.[0]?.message
-        || 'Failed to create badge';
+        || t('gamification.failed_to_create_badge');
       toast.error(errorMsg);
     }
 
@@ -142,7 +142,7 @@ export function CreateBadge() {
         actions={
           <Link to="/admin/custom-badges">
             <Button variant="flat" startContent={<ArrowLeft size={16} />}>
-              Back to Badges
+              {t('gamification.back_to_badges')}
             </Button>
           </Link>
         }
@@ -151,7 +151,7 @@ export function CreateBadge() {
       <Card shadow="sm" className="max-w-2xl">
         <CardHeader className="flex items-center gap-2 pb-0">
           <Award size={20} className="text-success" />
-          <h3 className="text-lg font-semibold text-foreground">Badge Details</h3>
+          <h3 className="text-lg font-semibold text-foreground">{t('gamification.badge_details')}</h3>
         </CardHeader>
         <CardBody className="gap-4">
           <Input
@@ -166,11 +166,11 @@ export function CreateBadge() {
 
           <Input
             label={t('gamification.label_slug')}
-            placeholder="Auto-generated from name"
+            placeholder={t('gamification.placeholder_auto_generated')}
             value={formData.slug}
             onValueChange={(v) => setFormData((prev) => ({ ...prev, slug: v }))}
             variant="bordered"
-            description="URL-safe identifier. Auto-generated from the name."
+            description={t('gamification.desc_slug')}
             classNames={{ input: 'font-mono text-sm' }}
           />
 
@@ -227,8 +227,8 @@ export function CreateBadge() {
             />
             <div className="flex items-center justify-between p-3 rounded-lg border border-default-200">
               <div>
-                <p className="text-sm font-medium">Active</p>
-                <p className="text-xs text-default-400">Badge can be earned by users</p>
+                <p className="text-sm font-medium">{t('gamification.active')}</p>
+                <p className="text-xs text-default-400">{t('gamification.active_badge_desc')}</p>
               </div>
               <Switch
                 isSelected={formData.is_active}
@@ -240,21 +240,21 @@ export function CreateBadge() {
 
           {/* Preview */}
           <div className="rounded-lg border border-default-200 p-4">
-            <p className="text-xs text-default-500 mb-2 uppercase tracking-wider font-semibold">Preview</p>
+            <p className="text-xs text-default-500 mb-2 uppercase tracking-wider font-semibold">{t('gamification.preview')}</p>
             <div className="flex items-center gap-3">
               <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-success/10 text-success">
                 <Award size={24} />
               </div>
               <div>
-                <p className="font-semibold text-foreground">{formData.name || 'Badge Name'}</p>
-                <p className="text-sm text-default-500">{formData.description || 'Badge description will appear here'}</p>
+                <p className="font-semibold text-foreground">{formData.name || t('gamification.badge_name_placeholder')}</p>
+                <p className="text-sm text-default-500">{formData.description || t('gamification.badge_desc_placeholder')}</p>
               </div>
             </div>
           </div>
 
           <div className="flex justify-end gap-2 pt-2">
             <Link to="/admin/custom-badges">
-              <Button variant="flat" isDisabled={saving}>Cancel</Button>
+              <Button variant="flat" isDisabled={saving}>{t('gamification.cancel')}</Button>
             </Link>
             <Button
               color="primary"
@@ -262,7 +262,7 @@ export function CreateBadge() {
               onPress={handleSave}
               isLoading={saving}
             >
-              Create Badge
+              {t('gamification.create_badge')}
             </Button>
           </div>
         </CardBody>

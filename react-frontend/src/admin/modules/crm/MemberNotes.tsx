@@ -47,12 +47,12 @@ interface NotesMeta {
 }
 
 const CATEGORIES = [
-  { key: 'general', label: 'General' },
-  { key: 'outreach', label: 'Outreach' },
-  { key: 'support', label: 'Support' },
-  { key: 'onboarding', label: 'Onboarding' },
-  { key: 'concern', label: 'Concern' },
-  { key: 'follow_up', label: 'Follow Up' },
+  { key: 'general', labelKey: 'crm.category_general' },
+  { key: 'outreach', labelKey: 'crm.category_outreach' },
+  { key: 'support', labelKey: 'crm.category_support' },
+  { key: 'onboarding', labelKey: 'crm.category_onboarding' },
+  { key: 'concern', labelKey: 'crm.category_concern' },
+  { key: 'follow_up', labelKey: 'crm.category_follow_up' },
 ] as const;
 
 type CategoryKey = typeof CATEGORIES[number]['key'];
@@ -200,7 +200,7 @@ export function MemberNotes() {
         is_pinned: note.is_pinned !== 1,
       });
       if (res.success) {
-        toast.success(note.is_pinned === 1 ? 'Note unpinned' : 'Note pinned');
+        toast.success(note.is_pinned === 1 ? t('crm.note_unpinned') : t('crm.note_pinned'));
         loadNotes();
       } else {
         toast.error(t('crm.failed_to_update_pin_status'));
@@ -245,7 +245,7 @@ export function MemberNotes() {
 
   const getCategoryLabel = (key: string) => {
     const cat = CATEGORIES.find(c => c.key === key);
-    return cat ? cat.label : key;
+    return cat ? t(cat.labelKey) : key;
   };
 
   // ----- Render -----
@@ -257,7 +257,7 @@ export function MemberNotes() {
         description={t('crm.member_notes_desc')}
         actions={
           <Button color="primary" startContent={<Plus size={16} />} onPress={openCreateModal}>
-            Add Note
+            {t('crm.add_note')}
           </Button>
         }
       />
@@ -293,7 +293,7 @@ export function MemberNotes() {
           }}
         >
           {CATEGORIES.map(cat => (
-            <SelectItem key={cat.key}>{cat.label}</SelectItem>
+            <SelectItem key={cat.key}>{t(cat.labelKey)}</SelectItem>
           ))}
         </Select>
 
@@ -322,7 +322,7 @@ export function MemberNotes() {
               setPage(1);
             }}
           >
-            Clear Filters
+            {t('crm.clear_filters')}
           </Button>
         )}
       </div>
@@ -330,17 +330,17 @@ export function MemberNotes() {
       {/* Content */}
       {loading ? (
         <div className="flex justify-center py-16">
-          <Spinner size="lg" label="Loading notes..." />
+          <Spinner size="lg" label={t('crm.loading_notes')} />
         </div>
       ) : notes.length === 0 ? (
         <Card>
           <CardBody className="flex flex-col items-center py-16 text-center">
             <StickyNote size={48} className="text-default-300 mb-4" />
-            <p className="text-default-500 text-lg font-medium">No notes found</p>
+            <p className="text-default-500 text-lg font-medium">{t('crm.no_notes_found')}</p>
             <p className="text-default-400 text-sm mt-1">
               {filterCategory || filterUserId
-                ? 'Try adjusting your filters'
-                : 'Create the first note for a member'}
+                ? t('crm.no_notes_hint_filtered')
+                : t('crm.no_notes_hint_default')}
             </p>
           </CardBody>
         </Card>
@@ -393,10 +393,10 @@ export function MemberNotes() {
                     }}
                   >
                     <DropdownItem key="edit" startContent={<Edit3 size={14} />}>
-                      Edit
+                      {t('crm.note_action_edit')}
                     </DropdownItem>
                     <DropdownItem key="pin" startContent={<Pin size={14} />}>
-                      {note.is_pinned === 1 ? 'Unpin' : 'Pin'}
+                      {note.is_pinned === 1 ? t('crm.note_action_unpin') : t('crm.note_action_pin')}
                     </DropdownItem>
                     <DropdownItem
                       key="delete"
@@ -404,7 +404,7 @@ export function MemberNotes() {
                       className="text-danger"
                       color="danger"
                     >
-                      Delete
+                      {t('crm.note_action_delete')}
                     </DropdownItem>
                   </DropdownMenu>
                 </Dropdown>
@@ -412,13 +412,13 @@ export function MemberNotes() {
               <CardBody className="pt-0">
                 <p className="text-default-700 whitespace-pre-wrap">{note.content}</p>
                 <div className="flex items-center gap-2 mt-3 text-xs text-default-400">
-                  <span>By {note.author_name}</span>
+                  <span>{t('crm.note_by')} {note.author_name}</span>
                   <span>·</span>
                   <span>{formatDate(note.created_at)}</span>
                   {note.updated_at !== note.created_at && (
                     <>
                       <span>·</span>
-                      <span>edited {formatDate(note.updated_at)}</span>
+                      <span>{t('crm.note_edited')} {formatDate(note.updated_at)}</span>
                     </>
                   )}
                 </div>
@@ -445,13 +445,13 @@ export function MemberNotes() {
         <ModalContent>
           <ModalHeader className="flex items-center gap-2">
             <StickyNote size={20} />
-            {editingNote ? 'Edit Note' : 'Add Note'}
+            {editingNote ? t('crm.edit_note_title') : t('crm.add_note_title')}
           </ModalHeader>
           <ModalBody className="flex flex-col gap-4">
             {!editingNote && (
               <Input
                 label={t('crm.label_user_i_d')}
-                placeholder="Enter the member's user ID"
+                placeholder={t('crm.placeholder_enter_user_id')}
                 type="number"
                 isRequired
                 value={formUserId}
@@ -476,7 +476,7 @@ export function MemberNotes() {
               }}
             >
               {CATEGORIES.map(cat => (
-                <SelectItem key={cat.key}>{cat.label}</SelectItem>
+                <SelectItem key={cat.key}>{t(cat.labelKey)}</SelectItem>
               ))}
             </Select>
             <div className="flex items-center gap-2">
@@ -487,16 +487,16 @@ export function MemberNotes() {
                 startContent={<Pin size={14} />}
                 onPress={() => setFormPinned(!formPinned)}
               >
-                {formPinned ? 'Pinned' : 'Pin this note'}
+                {formPinned ? t('crm.pin_button_pinned') : t('crm.pin_button_unpin')}
               </Button>
             </div>
           </ModalBody>
           <ModalFooter>
             <Button variant="flat" onPress={formModal.onClose} isDisabled={saving}>
-              Cancel
+              {t('crm.cancel_button')}
             </Button>
-            <Button color="primary" onPress={handleSave} isLoading={saving}>
-              {editingNote ? 'Update Note' : 'Create Note'}
+            <Button color="primary" onPress={handleSave} isLoading={saving} isDisabled={saving}>
+              {editingNote ? t('crm.update_note') : t('crm.create_note')}
             </Button>
           </ModalFooter>
         </ModalContent>
@@ -507,9 +507,9 @@ export function MemberNotes() {
         isOpen={!!deleteTarget}
         onClose={() => setDeleteTarget(null)}
         onConfirm={handleDelete}
-        title="Delete Note"
-        message={`Are you sure you want to delete this note about ${deleteTarget?.user_name || 'this member'}? This action cannot be undone.`}
-        confirmLabel="Delete"
+        title={t('crm.delete_note_title')}
+        message={t('crm.delete_note_confirm', { name: deleteTarget?.user_name || 'this member' })}
+        confirmLabel={t('crm.delete_button')}
         confirmColor="danger"
         isLoading={deleting}
       />

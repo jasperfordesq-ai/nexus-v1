@@ -55,14 +55,14 @@ export function SystemMonitoring() {
 
   const metrics = health
     ? [
-        { label: 'PHP Version', value: health.php_version, icon: Cpu, color: 'primary' },
-        { label: 'Memory Usage', value: health.memory_usage, icon: Server, color: 'warning' },
-        { label: 'Memory Limit', value: health.memory_limit, icon: Server, color: 'default' },
-        { label: 'Database Size', value: health.db_size, icon: Database, color: 'success' },
-        { label: 'Redis Memory', value: health.redis_memory, icon: HardDrive, color: 'secondary' },
-        { label: 'DB Uptime', value: health.uptime, icon: Clock, color: 'primary' },
-        { label: 'Server Time', value: health.server_time, icon: Clock, color: 'default' },
-        { label: 'Operating System', value: health.os, icon: Cpu, color: 'default' },
+        { label: t('enterprise.metric_php_version'), value: health.php_version, icon: Cpu, color: 'primary' },
+        { label: t('enterprise.metric_memory_usage'), value: health.memory_usage, icon: Server, color: 'warning' },
+        { label: t('enterprise.metric_memory_limit'), value: health.memory_limit, icon: Server, color: 'default' },
+        { label: t('enterprise.metric_database_size'), value: health.db_size, icon: Database, color: 'success' },
+        { label: t('enterprise.metric_redis_memory'), value: health.redis_memory, icon: HardDrive, color: 'secondary' },
+        { label: t('enterprise.metric_db_uptime'), value: health.uptime, icon: Clock, color: 'primary' },
+        { label: t('enterprise.metric_server_time'), value: health.server_time, icon: Clock, color: 'default' },
+        { label: t('enterprise.metric_operating_system'), value: health.os, icon: Cpu, color: 'default' },
       ]
     : [];
 
@@ -80,7 +80,7 @@ export function SystemMonitoring() {
               size="sm"
               endContent={<ArrowRight size={14} />}
             >
-              Health Check
+              {t('enterprise.health_check')}
             </Button>
             <Button
               as={Link}
@@ -89,7 +89,7 @@ export function SystemMonitoring() {
               size="sm"
               endContent={<ArrowRight size={14} />}
             >
-              Error Logs
+              {t('enterprise.error_logs')}
             </Button>
             <Button
               variant="flat"
@@ -98,7 +98,7 @@ export function SystemMonitoring() {
               isLoading={loading}
               size="sm"
             >
-              Refresh
+              {t('common.refresh')}
             </Button>
           </div>
         }
@@ -111,14 +111,14 @@ export function SystemMonitoring() {
           variant="flat"
           color={health?.db_connected ? 'success' : 'danger'}
         >
-          Database: {health?.db_connected ? 'Connected' : 'Disconnected'}
+          {t('enterprise.database')}: {health?.db_connected ? t('enterprise.connected') : t('enterprise.disconnected')}
         </Chip>
         <Chip
           size="sm"
           variant="flat"
           color={health?.redis_connected ? 'success' : 'danger'}
         >
-          Redis: {health?.redis_connected ? 'Connected' : 'Disconnected'}
+          {t('enterprise.redis')}: {health?.redis_connected ? t('enterprise.connected') : t('enterprise.disconnected')}
         </Chip>
       </div>
 

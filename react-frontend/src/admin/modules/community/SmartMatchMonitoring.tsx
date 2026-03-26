@@ -82,55 +82,55 @@ export function SmartMatchMonitoring() {
 
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
         <Card shadow="sm">
-          <CardHeader><h3 className="text-lg font-semibold">Engine Status</h3></CardHeader>
+          <CardHeader><h3 className="text-lg font-semibold">{t('community.engine_status')}</h3></CardHeader>
           <CardBody>
             {data ? (
               <div className="space-y-3">
                 <div className="flex items-center justify-between py-1 border-b border-default-100">
-                  <span className="text-sm text-default-500">Broker Approval</span>
-                  <span className="text-sm font-medium">{data.broker_approval_enabled ? 'Enabled' : 'Disabled'}</span>
+                  <span className="text-sm text-default-500">{t('community.broker_approval')}</span>
+                  <span className="text-sm font-medium">{data.broker_approval_enabled ? t('community.enabled') : t('community.disabled')}</span>
                 </div>
                 <div className="flex items-center justify-between py-1 border-b border-default-100">
-                  <span className="text-sm text-default-500">Pending Approvals</span>
+                  <span className="text-sm text-default-500">{t('community.pending_approvals')}</span>
                   <span className="text-sm font-medium">{data.pending_approvals ?? 0}</span>
                 </div>
                 <div className="flex items-center justify-between py-1 border-b border-default-100">
-                  <span className="text-sm text-default-500">Approved (Total)</span>
+                  <span className="text-sm text-default-500">{t('community.approved_total')}</span>
                   <span className="text-sm font-medium">{data.approved_count ?? 0}</span>
                 </div>
                 <div className="flex items-center justify-between py-1 border-b border-default-100">
-                  <span className="text-sm text-default-500">Rejected (Total)</span>
+                  <span className="text-sm text-default-500">{t('community.rejected_total')}</span>
                   <span className="text-sm font-medium">{data.rejected_count ?? 0}</span>
                 </div>
                 <div className="flex items-center justify-between py-1 border-b border-default-100">
-                  <span className="text-sm text-default-500">Matches Today</span>
+                  <span className="text-sm text-default-500">{t('community.matches_today')}</span>
                   <span className="text-sm font-medium">{overview?.total_matches_today ?? 0}</span>
                 </div>
                 <div className="flex items-center justify-between py-1 border-b border-default-100">
-                  <span className="text-sm text-default-500">Matches This Week</span>
+                  <span className="text-sm text-default-500">{t('community.matches_this_week')}</span>
                   <span className="text-sm font-medium">{overview?.total_matches_week ?? 0}</span>
                 </div>
                 <div className="flex items-center justify-between py-1 border-b border-default-100">
-                  <span className="text-sm text-default-500">Hot Matches</span>
+                  <span className="text-sm text-default-500">{t('community.hot_matches')}</span>
                   <span className="text-sm font-medium">{overview?.hot_matches_count ?? 0}</span>
                 </div>
                 <div className="flex items-center justify-between py-1">
-                  <span className="text-sm text-default-500">Active Matching Users</span>
+                  <span className="text-sm text-default-500">{t('community.active_matching_users')}</span>
                   <span className="text-sm font-medium">{overview?.active_users_matching ?? 0}</span>
                 </div>
               </div>
             ) : (
               <div className="flex flex-col items-center py-8 text-default-400">
                 <Activity size={40} className="mb-3" />
-                <p>Matching engine monitoring data will appear here when the engine has been run.</p>
-                <p className="text-xs mt-1">Configure the matching algorithm from Smart Matching settings.</p>
+                <p>{t('community.no_monitoring_data')}</p>
+                <p className="text-xs mt-1">{t('community.configure_matching_hint')}</p>
               </div>
             )}
           </CardBody>
         </Card>
 
         <Card shadow="sm">
-          <CardHeader><h3 className="text-lg font-semibold">Score Distribution</h3></CardHeader>
+          <CardHeader><h3 className="text-lg font-semibold">{t('community.score_distribution')}</h3></CardHeader>
           <CardBody>
             {data?.score_distribution && Object.keys(data.score_distribution).length > 0 ? (
               <div className="space-y-3">
@@ -144,7 +144,7 @@ export function SmartMatchMonitoring() {
             ) : (
               <div className="flex flex-col items-center py-8 text-default-400">
                 <BarChart3 size={40} className="mb-3" />
-                <p className="text-sm">Score distribution will appear here once matches are generated.</p>
+                <p className="text-sm">{t('community.no_score_distribution')}</p>
               </div>
             )}
           </CardBody>

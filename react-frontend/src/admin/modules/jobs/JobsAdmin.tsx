@@ -75,8 +75,8 @@ function ApplicationCard({ application, onStatusUpdate }: ApplicationCardProps) 
 }
 
 export function JobsAdmin() {
-  usePageTitle('Admin - Jobs');
   const { t } = useTranslation('admin');
+  usePageTitle(t('jobs.page_title'));
   const toast = useToast();
   const { tenantPath } = useTenant();
   const [panelTab, setPanelTab] = useState<'listings' | 'applications'>('listings');

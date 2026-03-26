@@ -62,7 +62,7 @@ export function Partnerships() {
     try {
       const res = await adminFederation.approvePartnership(item.id);
       if (res.success) {
-        toast.success(`Partnership with "${item.partner_name}" approved`);
+        toast.success(t('federation.partnership_approved', { name: item.partner_name }));
         loadData();
       } else {
         toast.error(t('federation.failed_to_approve_partnership'));
@@ -79,7 +79,7 @@ export function Partnerships() {
     try {
       const res = await adminFederation.rejectPartnership(item.id);
       if (res.success) {
-        toast.success(`Partnership with "${item.partner_name}" rejected`);
+        toast.success(t('federation.partnership_rejected', { name: item.partner_name }));
         loadData();
       } else {
         toast.error(t('federation.failed_to_reject_partnership'));
@@ -97,7 +97,7 @@ export function Partnerships() {
     try {
       const res = await adminFederation.terminatePartnership(terminateTarget.id);
       if (res.success) {
-        toast.success(`Partnership with "${terminateTarget.partner_name}" terminated`);
+        toast.success(t('federation.partnership_terminated', { name: terminateTarget.partner_name }));
         setTerminateTarget(null);
         loadData();
       } else {
@@ -111,18 +111,18 @@ export function Partnerships() {
   };
 
   const columns: Column<Partnership>[] = [
-    { key: 'partner_name', label: 'Partner Community', sortable: true },
-    { key: 'partner_slug', label: 'Slug' },
+    { key: 'partner_name', label: t('federation.col_partner_community'), sortable: true },
+    { key: 'partner_slug', label: t('federation.col_slug') },
     {
-      key: 'status', label: 'Status',
+      key: 'status', label: t('federation.col_status'),
       render: (item) => <StatusBadge status={item.status} />,
     },
     {
-      key: 'created_at', label: 'Since', sortable: true,
+      key: 'created_at', label: t('federation.col_since'), sortable: true,
       render: (item) => <span className="text-sm text-default-500">{item.created_at ? new Date(item.created_at).toLocaleDateString() : '--'}</span>,
     },
     {
-      key: 'actions', label: 'Actions',
+      key: 'actions', label: t('federation.col_actions'),
       render: (item) => (
         <Dropdown>
           <DropdownTrigger>
@@ -145,17 +145,17 @@ export function Partnerships() {
             {(action) => {
               if (action.key === 'approve') return (
                 <DropdownItem key="approve" startContent={<CheckCircle size={14} />} className="text-success">
-                  Approve
+                  {t('federation.approve')}
                 </DropdownItem>
               );
               if (action.key === 'reject') return (
                 <DropdownItem key="reject" startContent={<XCircle size={14} />} className="text-danger" color="danger">
-                  Reject
+                  {t('federation.reject')}
                 </DropdownItem>
               );
               return (
                 <DropdownItem key="terminate" startContent={<Ban size={14} />} className="text-danger" color="danger">
-                  Terminate
+                  {t('federation.terminate')}
                 </DropdownItem>
               );
             }}
@@ -169,7 +169,7 @@ export function Partnerships() {
     return (
       <div>
         <PageHeader title={t('federation.partnerships_title')} description={t('federation.partnerships_desc')} />
-        <EmptyState icon={Handshake} title="No Partnerships" description={t('federation.desc_no_federation_partnerships_have_been_est')} />
+        <EmptyState icon={Handshake} title={t('federation.no_partnerships')} description={t('federation.desc_no_federation_partnerships_have_been_est')} />
       </div>
     );
   }
@@ -179,7 +179,7 @@ export function Partnerships() {
       <PageHeader
         title={t('federation.partnerships_title')}
         description={t('federation.partnerships_desc')}
-        actions={<Button variant="flat" startContent={<RefreshCw size={16} />} onPress={loadData} isLoading={loading}>Refresh</Button>}
+        actions={<Button variant="flat" startContent={<RefreshCw size={16} />} onPress={loadData} isLoading={loading}>{t('federation.refresh')}</Button>}
       />
       <DataTable columns={columns} data={items} isLoading={loading} onRefresh={loadData} />
 
@@ -188,9 +188,9 @@ export function Partnerships() {
           isOpen={!!terminateTarget}
           onClose={() => setTerminateTarget(null)}
           onConfirm={handleTerminate}
-          title="Terminate Partnership"
-          message={`Are you sure you want to terminate the partnership with "${terminateTarget.partner_name}"? This cannot be undone.`}
-          confirmLabel="Terminate"
+          title={t('federation.terminate_partnership')}
+          message={t('federation.terminate_partnership_confirm', { name: terminateTarget.partner_name })}
+          confirmLabel={t('federation.terminate')}
           confirmColor="danger"
           isLoading={actionLoading}
         />

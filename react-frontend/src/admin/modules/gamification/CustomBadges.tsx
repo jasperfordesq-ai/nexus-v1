@@ -66,7 +66,7 @@ export function CustomBadges() {
 
     const res = await adminGamification.deleteBadge(deleteTarget.id);
     if (res.success) {
-      toast.success(`Badge "${deleteTarget.name}" deleted`);
+      toast.success(t('gamification.badge_deleted_msg', { name: deleteTarget.name }));
       setDeleteTarget(null);
       loadBadges();
     } else {
@@ -84,7 +84,7 @@ export function CustomBadges() {
         actions={
           <Link to="/admin/custom-badges/create">
             <Button color="primary" startContent={<Plus size={16} />}>
-              Create Badge
+              {t('gamification.create_badge')}
             </Button>
           </Link>
         }
@@ -112,9 +112,9 @@ export function CustomBadges() {
       ) : badges.length === 0 ? (
         <EmptyState
           icon={Award}
-          title="No custom badges"
+          title={t('gamification.no_custom_badges')}
           description={t('gamification.desc_create_your_first_custom_badge_to_reward')}
-          actionLabel="Create Badge"
+          actionLabel={t('gamification.create_badge')}
           onAction={() => navigate('/admin/custom-badges/create')}
         />
       ) : (
@@ -159,13 +159,13 @@ export function CustomBadges() {
           isOpen={!!deleteTarget}
           onClose={() => setDeleteTarget(null)}
           onConfirm={handleDelete}
-          title="Delete Badge"
+          title={t('gamification.delete_badge')}
           message={
             deleteTarget.awarded_count > 0
-              ? `Are you sure you want to delete "${deleteTarget.name}"? This badge has been awarded to ${deleteTarget.awarded_count} user(s). Their badge records will be removed.`
-              : `Are you sure you want to delete "${deleteTarget.name}"? This action cannot be undone.`
+              ? t('gamification.confirm_delete_badge_awarded', { name: deleteTarget.name, count: deleteTarget.awarded_count })
+              : t('gamification.confirm_delete_badge', { name: deleteTarget.name })
           }
-          confirmLabel="Delete"
+          confirmLabel={t('gamification.delete')}
           confirmColor="danger"
           isLoading={deleting}
         />

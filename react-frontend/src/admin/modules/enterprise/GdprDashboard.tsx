@@ -53,10 +53,10 @@ export function GdprDashboard() {
   }, [loadData]);
 
   const links = [
-    { label: 'Data Requests', href: tenantPath('/admin/enterprise/gdpr/requests'), icon: FileWarning, description: 'View and process data subject requests' },
-    { label: 'Consent Records', href: tenantPath('/admin/enterprise/gdpr/consents'), icon: UserCheck, description: 'Review consent records and preferences' },
-    { label: 'Data Breaches', href: tenantPath('/admin/enterprise/gdpr/breaches'), icon: AlertTriangle, description: 'Track and manage data breach incidents' },
-    { label: 'GDPR Audit Log', href: tenantPath('/admin/enterprise/gdpr/audit'), icon: ClipboardList, description: 'Review GDPR-related audit trail' },
+    { label: t('enterprise.link_data_requests'), href: tenantPath('/admin/enterprise/gdpr/requests'), icon: FileWarning, description: t('enterprise.link_data_requests_desc') },
+    { label: t('enterprise.link_consent_records'), href: tenantPath('/admin/enterprise/gdpr/consents'), icon: UserCheck, description: t('enterprise.link_consent_records_desc') },
+    { label: t('enterprise.link_data_breaches'), href: tenantPath('/admin/enterprise/gdpr/breaches'), icon: AlertTriangle, description: t('enterprise.link_data_breaches_desc') },
+    { label: t('enterprise.link_gdpr_audit_log'), href: tenantPath('/admin/enterprise/gdpr/audit'), icon: ClipboardList, description: t('enterprise.link_gdpr_audit_log_desc') },
   ];
 
   return (
@@ -72,7 +72,7 @@ export function GdprDashboard() {
             isLoading={loading}
             size="sm"
           >
-            Refresh
+            {t('common.refresh')}
           </Button>
         }
       />

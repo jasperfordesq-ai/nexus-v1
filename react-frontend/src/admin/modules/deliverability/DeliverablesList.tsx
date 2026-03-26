@@ -88,13 +88,13 @@ export function DeliverablesList() {
   const columns: Column<DeliverableItem>[] = [
     {
       key: 'title',
-      label: 'Title',
+      label: t('deliverability.col_title'),
       sortable: true,
       render: (item) => <span className="font-medium">{item.title}</span>,
     },
     {
       key: 'priority',
-      label: 'Priority',
+      label: t('deliverability.col_priority'),
       sortable: true,
       render: (item) => (
         <StatusBadge status={item.priority || 'medium'} />
@@ -102,18 +102,18 @@ export function DeliverablesList() {
     },
     {
       key: 'status',
-      label: 'Status',
+      label: t('deliverability.col_status'),
       sortable: true,
       render: (item) => <StatusBadge status={item.status || 'planned'} />,
     },
     {
       key: 'assigned_to',
-      label: 'Assigned To',
+      label: t('deliverability.col_assigned_to'),
       render: (item) => <span className="text-sm text-default-500">{item.assigned_to || '--'}</span>,
     },
     {
       key: 'due_date',
-      label: 'Due Date',
+      label: t('deliverability.col_due_date'),
       sortable: true,
       render: (item) => (
         <span className="text-sm text-default-500">
@@ -123,7 +123,7 @@ export function DeliverablesList() {
     },
     {
       key: 'actions',
-      label: 'Actions',
+      label: t('deliverability.col_actions'),
       render: (item) => (
         <div className="flex gap-1">
           {/* TODO: Edit deliverable page not yet implemented (backend PUT /v2/admin/deliverability/{id} exists) */}
@@ -162,7 +162,7 @@ export function DeliverablesList() {
             startContent={<Plus size={16} />}
             onPress={() => navigate(tenantPath('/admin/deliverability/create'))}
           >
-            Create Deliverable
+            {t('deliverability.create_deliverable')}
           </Button>
         }
       />
@@ -170,16 +170,16 @@ export function DeliverablesList() {
       {data.length === 0 ? (
         <EmptyState
           icon={Target}
-          title="No Deliverables"
+          title={t('deliverability.no_deliverables')}
           description={t('deliverability.desc_create_deliverables_to_track_project_mil')}
-          actionLabel="Create Deliverable"
+          actionLabel={t('deliverability.create_deliverable')}
           onAction={() => navigate(tenantPath('/admin/deliverability/create'))}
         />
       ) : (
         <DataTable
           columns={columns}
           data={data}
-          searchPlaceholder="Search deliverables..."
+          searchPlaceholder={t('deliverability.search_deliverables')}
           onRefresh={fetchData}
         />
       )}
@@ -189,9 +189,9 @@ export function DeliverablesList() {
           isOpen={!!confirmDelete}
           onClose={() => setConfirmDelete(null)}
           onConfirm={handleDelete}
-          title="Delete Deliverable"
-          message={`Are you sure you want to delete "${confirmDelete.title}"? This action cannot be undone.`}
-          confirmLabel="Delete"
+          title={t('deliverability.delete_deliverable_title')}
+          message={t('deliverability.delete_deliverable_message', { title: confirmDelete.title })}
+          confirmLabel={t('advanced.delete')}
           confirmColor="danger"
           isLoading={actionLoading}
         />

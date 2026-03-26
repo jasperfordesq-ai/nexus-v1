@@ -43,15 +43,9 @@ interface TimelineMeta {
   pages: number;
 }
 
-const ACTIVITY_TYPES = [
-  { key: 'login', label: 'Login' },
-  { key: 'signup', label: 'Signup' },
-  { key: 'listing_created', label: 'Listing Created' },
-  { key: 'exchange_completed', label: 'Exchange Completed' },
-  { key: 'note_added', label: 'Note Added' },
-  { key: 'task_created', label: 'Task Created' },
-  { key: 'profile_updated', label: 'Profile Updated' },
-  { key: 'group_joined', label: 'Group Joined' },
+const ACTIVITY_TYPE_KEYS = [
+  'login', 'signup', 'listing_created', 'exchange_completed',
+  'note_added', 'task_created', 'profile_updated', 'group_joined',
 ] as const;
 
 
@@ -77,11 +71,11 @@ const ACTIVITY_DOT_COLOR_MAP: Record<string, string> = {
   group_joined: 'bg-warning',
 };
 
-const DATE_RANGE_OPTIONS = [
-  { key: '7', label: 'Last 7 days' },
-  { key: '30', label: 'Last 30 days' },
-  { key: '90', label: 'Last 90 days' },
-  { key: '', label: 'All time' },
+const DATE_RANGE_KEYS = [
+  { key: '7', labelKey: 'crm.date_range_7' },
+  { key: '30', labelKey: 'crm.date_range_30' },
+  { key: '90', labelKey: 'crm.date_range_90' },
+  { key: '', labelKey: 'crm.date_range_all' },
 ] as const;
 
 const ITEMS_PER_PAGE = 25;
@@ -107,11 +101,6 @@ function getActivityIcon(type: string) {
     default:
       return <Activity size={16} />;
   }
-}
-
-function getActivityLabel(type: string): string {
-  const found = ACTIVITY_TYPES.find(t => t.key === type);
-  return found ? found.label : type.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
 }
 
 function formatDateTime(dateStr: string): string {
@@ -144,6 +133,12 @@ export function ActivityTimeline() {
   usePageTitle(t('crm.page_title'));
   const { tenantPath } = useTenant();
   const [searchParams] = useSearchParams();
+
+  const getActivityLabel = (type: string): string => {
+    const key = `crm.activity_type_${type}`;
+    const translated = t(key);
+    return translated !== key ? translated : type.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+  };
 
   // State
   const [entries, setEntries] = useState<TimelineEntry[]>([]);
@@ -202,7 +197,7 @@ export function ActivityTimeline() {
             onPress={() => loadTimeline()}
             isDisabled={loading}
           >
-            Refresh
+            {t('crm.refresh')}
           </Button>
         }
       />
@@ -236,8 +231,8 @@ export function ActivityTimeline() {
             setPage(1);
           }}
         >
-          {ACTIVITY_TYPES.map(t => (
-            <SelectItem key={t.key}>{t.label}</SelectItem>
+          {ACTIVITY_TYPE_KEYS.map(key => (
+            <SelectItem key={key}>{t(`crm.activity_type_${key}`)}</SelectItem>
           ))}
         </Select>
 
@@ -252,8 +247,8 @@ export function ActivityTimeline() {
             setPage(1);
           }}
         >
-          {DATE_RANGE_OPTIONS.map(opt => (
-            <SelectItem key={opt.key}>{opt.label}</SelectItem>
+          {DATE_RANGE_KEYS.map(opt => (
+            <SelectItem key={opt.key}>{t(opt.labelKey)}</SelectItem>
           ))}
         </Select>
 
@@ -263,7 +258,7 @@ export function ActivityTimeline() {
             variant="flat"
             onPress={handleClearFilters}
           >
-            Clear Filters
+            {t('crm.clear_filters')}
           </Button>
         )}
       </div>
@@ -271,17 +266,17 @@ export function ActivityTimeline() {
       {/* Content */}
       {loading ? (
         <div className="flex justify-center py-16">
-          <Spinner size="lg" label="Loading activity..." />
+          <Spinner size="lg" label={t('crm.loading_activity')} />
         </div>
       ) : entries.length === 0 ? (
         <Card>
           <CardBody className="flex flex-col items-center py-16 text-center">
             <Activity size={48} className="text-default-300 mb-4" />
-            <p className="text-default-500 text-lg font-medium">No activity found</p>
+            <p className="text-default-500 text-lg font-medium">{t('crm.no_activity_found')}</p>
             <p className="text-default-400 text-sm mt-1">
               {hasActiveFilters
-                ? 'Try adjusting your filters or expanding the date range'
-                : 'Member activity will appear here as it happens'}
+                ? t('crm.no_activity_hint_filtered')
+                : t('crm.no_activity_hint_default')}
             </p>
           </CardBody>
         </Card>

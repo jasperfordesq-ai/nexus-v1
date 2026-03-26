@@ -107,7 +107,7 @@ export function ResourcesAdmin() {
         toast.success(t('resources.resource_deleted_successfully'));
         loadItems();
       } else {
-        toast.error(res?.error || 'Failed to delete resource');
+        toast.error(res?.error || t('resources.an_unexpected_error_occurred'));
       }
     } catch {
       toast.error(t('resources.an_unexpected_error_occurred'));
@@ -122,7 +122,7 @@ export function ResourcesAdmin() {
   const columns: Column<Resource>[] = [
     {
       key: 'title',
-      label: 'Title',
+      label: t('content.label_name'),
       sortable: true,
       render: (item) => (
         <span className="font-medium text-foreground">{item.title}</span>
@@ -130,7 +130,7 @@ export function ResourcesAdmin() {
     },
     {
       key: 'category',
-      label: 'Category',
+      label: t('breadcrumbs.categories'),
       sortable: true,
       render: (item) => (
         <span className="text-sm text-default-500">{item.category || '--'}</span>
@@ -138,15 +138,15 @@ export function ResourcesAdmin() {
     },
     {
       key: 'author_name',
-      label: 'Author',
+      label: t('listings.author'),
       sortable: true,
       render: (item) => (
-        <span className="text-sm text-default-600">{item.author_name || 'Unknown'}</span>
+        <span className="text-sm text-default-600">{item.author_name || t('resources.unknown', 'Unknown')}</span>
       ),
     },
     {
       key: 'views',
-      label: 'Views',
+      label: t('resources.views', 'Views'),
       sortable: true,
       render: (item) => (
         <div className="flex items-center gap-1 text-sm text-default-500">
@@ -157,7 +157,7 @@ export function ResourcesAdmin() {
     },
     {
       key: 'helpful_votes',
-      label: 'Helpful',
+      label: t('resources.helpful', 'Helpful'),
       sortable: true,
       render: (item) => (
         <div className="flex items-center gap-1 text-sm text-default-500">
@@ -168,7 +168,7 @@ export function ResourcesAdmin() {
     },
     {
       key: 'status',
-      label: 'Status',
+      label: t('listings.status'),
       sortable: true,
       render: (item) => (
         <Chip
@@ -183,7 +183,7 @@ export function ResourcesAdmin() {
     },
     {
       key: 'updated_at',
-      label: 'Updated',
+      label: t('resources.updated', 'Updated'),
       sortable: true,
       render: (item) => (
         <span className="text-sm text-default-500">
@@ -193,7 +193,7 @@ export function ResourcesAdmin() {
     },
     {
       key: 'actions',
-      label: 'Actions',
+      label: t('listings.actions'),
       render: (item) => (
         <div className="flex gap-1">
           <Button
@@ -240,9 +240,9 @@ export function ResourcesAdmin() {
           variant="underlined"
           size="sm"
         >
-          <Tab key="all" title="All" />
-          <Tab key="published" title="Published" />
-          <Tab key="draft" title="Draft" />
+          <Tab key="all" title={t('listings.filter_all')} />
+          <Tab key="published" title={t('content.published', 'Published')} />
+          <Tab key="draft" title={t('content.draft', 'Draft')} />
         </Tabs>
       </div>
 
@@ -250,7 +250,7 @@ export function ResourcesAdmin() {
         columns={columns}
         data={items}
         isLoading={loading}
-        searchPlaceholder="Search resources..."
+        searchPlaceholder={t('data_table.search', 'Search resources...')}
         onSearch={(q) => { setSearch(q); setPage(1); }}
         onRefresh={loadItems}
         totalItems={total}
@@ -260,8 +260,8 @@ export function ResourcesAdmin() {
         emptyContent={
           <EmptyState
             icon={BookOpen}
-            title="No resources found"
-            description={search ? 'Try adjusting your search or filters' : 'No knowledge base articles have been created yet'}
+            title={t('no_data')}
+            description={t('resources.resources_admin_desc')}
           />
         }
       />
@@ -271,9 +271,9 @@ export function ResourcesAdmin() {
           isOpen={!!confirmDelete}
           onClose={() => setConfirmDelete(null)}
           onConfirm={handleDelete}
-          title="Delete Resource"
-          message={`Are you sure you want to delete "${confirmDelete.title}"? This action cannot be undone.`}
-          confirmLabel="Delete"
+          title={`${t('common.delete')} ${t('resources.page_title')}`}
+          message={t('gamification.confirm_delete_campaign', { name: confirmDelete.title })}
+          confirmLabel={t('common.delete')}
           confirmColor="danger"
           isLoading={actionLoading}
         />

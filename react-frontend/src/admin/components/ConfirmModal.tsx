@@ -62,6 +62,7 @@ export function ConfirmModal({
             color={confirmColor}
             onPress={onConfirm}
             isLoading={isLoading}
+            isDisabled={isLoading}
           >
             {confirmLabel}
           </Button>

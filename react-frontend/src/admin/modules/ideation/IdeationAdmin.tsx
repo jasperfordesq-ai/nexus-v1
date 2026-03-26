@@ -106,14 +106,14 @@ function ChallengeActions({ challenge, onStatusChange, onDelete, onView }: Chall
       </DropdownTrigger>
       <DropdownMenu aria-label={t('ideation.label_challenge_actions')} onAction={handleAction}>
         <DropdownItem key="view" startContent={<Eye size={14} />}>
-          View Details
+          {t('ideation.view_details')}
         </DropdownItem>
         <DropdownItem
           key="draft"
           startContent={<FileEdit size={14} />}
           className={challenge.status !== 'draft' ? '' : 'hidden'}
         >
-          Mark as Draft
+          {t('ideation.mark_as_draft')}
         </DropdownItem>
         <DropdownItem
           key="open"
@@ -121,7 +121,7 @@ function ChallengeActions({ challenge, onStatusChange, onDelete, onView }: Chall
           color="success"
           className={challenge.status !== 'open' ? 'text-success' : 'hidden'}
         >
-          Mark as Open
+          {t('ideation.mark_as_open')}
         </DropdownItem>
         <DropdownItem
           key="voting"
@@ -129,7 +129,7 @@ function ChallengeActions({ challenge, onStatusChange, onDelete, onView }: Chall
           color="primary"
           className={challenge.status !== 'voting' ? 'text-primary' : 'hidden'}
         >
-          Mark as Voting
+          {t('ideation.mark_as_voting')}
         </DropdownItem>
         <DropdownItem
           key="evaluating"
@@ -137,21 +137,21 @@ function ChallengeActions({ challenge, onStatusChange, onDelete, onView }: Chall
           color="warning"
           className={challenge.status !== 'evaluating' ? 'text-warning' : 'hidden'}
         >
-          Mark as Evaluating
+          {t('ideation.mark_as_evaluating')}
         </DropdownItem>
         <DropdownItem
           key="closed"
           startContent={<XCircle size={14} />}
           className={challenge.status !== 'closed' ? '' : 'hidden'}
         >
-          Mark as Closed
+          {t('ideation.mark_as_closed')}
         </DropdownItem>
         <DropdownItem
           key="archived"
           startContent={<Archive size={14} />}
           className={challenge.status !== 'archived' ? '' : 'hidden'}
         >
-          Mark as Archived
+          {t('ideation.mark_as_archived')}
         </DropdownItem>
         <DropdownItem
           key="delete"
@@ -159,7 +159,7 @@ function ChallengeActions({ challenge, onStatusChange, onDelete, onView }: Chall
           className="text-danger"
           color="danger"
         >
-          Delete
+          {t('common.delete')}
         </DropdownItem>
       </DropdownMenu>
     </Dropdown>
@@ -222,10 +222,10 @@ export function IdeationAdmin() {
         status: newStatus,
       });
       if (res?.success) {
-        toast.success(`Challenge "${challenge.title}" marked as ${newStatus}`);
+        toast.success(t('ideation.challenge_status_changed', { title: challenge.title, status: newStatus }));
         loadItems();
       } else {
-        toast.error(res?.error || 'Failed to update challenge status');
+        toast.error(res?.error || t('ideation.failed_to_update_challenge_status'));
       }
     } catch {
       toast.error(t('ideation.an_unexpected_error_occurred'));
@@ -243,7 +243,7 @@ export function IdeationAdmin() {
         toast.success(t('ideation.challenge_deleted_successfully'));
         loadItems();
       } else {
-        toast.error(res?.error || 'Failed to delete challenge');
+        toast.error(res?.error || t('ideation.failed_to_delete_challenge'));
       }
     } catch {
       toast.error(t('ideation.an_unexpected_error_occurred'));
@@ -258,7 +258,7 @@ export function IdeationAdmin() {
   const columns: Column<Challenge>[] = [
     {
       key: 'title',
-      label: 'Title',
+      label: t('ideation.col_title'),
       sortable: true,
       render: (item) => (
         <span className="font-medium text-foreground line-clamp-1">{item.title}</span>
@@ -266,15 +266,15 @@ export function IdeationAdmin() {
     },
     {
       key: 'creator_name',
-      label: 'Creator',
+      label: t('ideation.col_creator'),
       sortable: true,
       render: (item) => (
-        <span className="text-sm text-default-600">{item.creator_name || 'Unknown'}</span>
+        <span className="text-sm text-default-600">{item.creator_name || t('ideation.unknown')}</span>
       ),
     },
     {
       key: 'ideas_count',
-      label: 'Ideas',
+      label: t('ideation.col_ideas'),
       sortable: true,
       render: (item) => (
         <span className="text-sm text-default-600">{item.ideas_count}</span>
@@ -282,7 +282,7 @@ export function IdeationAdmin() {
     },
     {
       key: 'status',
-      label: 'Status',
+      label: t('ideation.col_status'),
       sortable: true,
       render: (item) => (
         <Chip
@@ -297,7 +297,7 @@ export function IdeationAdmin() {
     },
     {
       key: 'start_date',
-      label: 'Start Date',
+      label: t('ideation.col_start_date'),
       sortable: true,
       render: (item) => (
         <span className="text-sm text-default-500">
@@ -307,7 +307,7 @@ export function IdeationAdmin() {
     },
     {
       key: 'end_date',
-      label: 'End Date',
+      label: t('ideation.col_end_date'),
       sortable: true,
       render: (item) => (
         <span className="text-sm text-default-500">
@@ -317,7 +317,7 @@ export function IdeationAdmin() {
     },
     {
       key: 'actions',
-      label: 'Actions',
+      label: t('ideation.col_actions'),
       render: (item) => (
         <ChallengeActions
           challenge={item}
@@ -339,7 +339,7 @@ export function IdeationAdmin() {
         actions={
           <div className="flex gap-2 items-center">
             <Chip variant="flat" startContent={<Lightbulb size={14} />}>
-              {total} total
+              {t('ideation.total_count', { count: total })}
             </Chip>
             <Button
               isIconOnly
@@ -364,13 +364,13 @@ export function IdeationAdmin() {
           variant="underlined"
           size="sm"
         >
-          <Tab key="all" title="All" />
-          <Tab key="draft" title="Draft" />
-          <Tab key="open" title="Open" />
-          <Tab key="voting" title="Voting" />
-          <Tab key="evaluating" title="Evaluating" />
-          <Tab key="closed" title="Closed" />
-          <Tab key="archived" title="Archived" />
+          <Tab key="all" title={t('ideation.tab_all')} />
+          <Tab key="draft" title={t('ideation.tab_draft')} />
+          <Tab key="open" title={t('ideation.tab_open')} />
+          <Tab key="voting" title={t('ideation.tab_voting')} />
+          <Tab key="evaluating" title={t('ideation.tab_evaluating')} />
+          <Tab key="closed" title={t('ideation.tab_closed')} />
+          <Tab key="archived" title={t('ideation.tab_archived')} />
         </Tabs>
       </div>
 
@@ -378,7 +378,7 @@ export function IdeationAdmin() {
         columns={columns}
         data={items}
         isLoading={loading}
-        searchPlaceholder="Search challenges..."
+        searchPlaceholder={t('ideation.search_challenges_placeholder')}
         onSearch={(q) => {
           setSearch(q);
           setPage(1);
@@ -396,9 +396,9 @@ export function IdeationAdmin() {
           isOpen={!!confirmDelete}
           onClose={() => setConfirmDelete(null)}
           onConfirm={handleDelete}
-          title="Delete Challenge"
-          message={`Are you sure you want to delete "${confirmDelete.title}"? All associated ideas will also be removed. This action cannot be undone.`}
-          confirmLabel="Delete"
+          title={t('ideation.delete_challenge')}
+          message={t('ideation.confirm_delete_challenge', { title: confirmDelete.title })}
+          confirmLabel={t('common.delete')}
           confirmColor="danger"
           isLoading={actionLoading}
         />
@@ -410,29 +410,29 @@ export function IdeationAdmin() {
           isOpen={!!detailItem}
           onClose={() => setDetailItem(null)}
           onConfirm={() => setDetailItem(null)}
-          title="Challenge Details"
+          title={t('ideation.challenge_details')}
           message=""
-          confirmLabel="Close"
+          confirmLabel={t('close')}
           confirmColor="primary"
         >
           <div className="space-y-3">
             <div>
-              <span className="text-sm font-medium text-default-500">Title</span>
+              <span className="text-sm font-medium text-default-500">{t('ideation.title')}</span>
               <p className="text-foreground">{detailItem.title}</p>
             </div>
             <div className="flex gap-6">
               <div>
-                <span className="text-sm font-medium text-default-500">Creator</span>
-                <p className="text-foreground">{detailItem.creator_name || 'Unknown'}</p>
+                <span className="text-sm font-medium text-default-500">{t('ideation.creator')}</span>
+                <p className="text-foreground">{detailItem.creator_name || t('ideation.unknown')}</p>
               </div>
               <div>
-                <span className="text-sm font-medium text-default-500">Ideas</span>
+                <span className="text-sm font-medium text-default-500">{t('ideation.ideas')}</span>
                 <p className="text-foreground">{detailItem.ideas_count}</p>
               </div>
             </div>
             <div className="flex gap-6">
               <div>
-                <span className="text-sm font-medium text-default-500">Status</span>
+                <span className="text-sm font-medium text-default-500">{t('ideation.status')}</span>
                 <p>
                   <Chip
                     size="sm"
@@ -445,7 +445,7 @@ export function IdeationAdmin() {
                 </p>
               </div>
               <div>
-                <span className="text-sm font-medium text-default-500">Start Date</span>
+                <span className="text-sm font-medium text-default-500">{t('ideation.start_date')}</span>
                 <p className="text-foreground">
                   {detailItem.start_date
                     ? new Date(detailItem.start_date).toLocaleDateString()
@@ -453,7 +453,7 @@ export function IdeationAdmin() {
                 </p>
               </div>
               <div>
-                <span className="text-sm font-medium text-default-500">End Date</span>
+                <span className="text-sm font-medium text-default-500">{t('ideation.end_date')}</span>
                 <p className="text-foreground">
                   {detailItem.end_date
                     ? new Date(detailItem.end_date).toLocaleDateString()
@@ -462,7 +462,7 @@ export function IdeationAdmin() {
               </div>
             </div>
             <div>
-              <span className="text-sm font-medium text-default-500">Created</span>
+              <span className="text-sm font-medium text-default-500">{t('ideation.created')}</span>
               <p className="text-foreground">
                 {new Date(detailItem.created_at).toLocaleString()}
               </p>

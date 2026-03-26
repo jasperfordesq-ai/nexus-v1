@@ -140,15 +140,15 @@ export function MyProfile() {
           description={t('federation.my_profile_desc')}
           actions={
             <Button variant="flat" startContent={<RefreshCw size={16} />} onPress={loadData}>
-              Refresh
+              {t('federation.refresh')}
             </Button>
           }
         />
         <Card shadow="sm">
           <CardBody className="flex flex-col items-center py-8 text-default-400">
             <Building size={40} className="mb-2" />
-            <p>Federation profile not available</p>
-            <p className="text-xs mt-1">Enable federation from Tenant Features to create a profile.</p>
+            <p>{t('federation.profile_not_available')}</p>
+            <p className="text-xs mt-1">{t('federation.enable_federation_to_create_profile')}</p>
           </CardBody>
         </Card>
       </div>
@@ -168,7 +168,7 @@ export function MyProfile() {
               onPress={loadData}
               size="sm"
             >
-              Refresh
+              {t('federation.refresh')}
             </Button>
             <Button
               color="primary"
@@ -178,14 +178,14 @@ export function MyProfile() {
               isDisabled={!dirty}
               size="sm"
             >
-              Save Changes
+              {t('federation.save_changes')}
             </Button>
           </div>
         }
       />
 
       <Card shadow="sm">
-        <CardHeader><h3 className="text-lg font-semibold">Community Profile</h3></CardHeader>
+        <CardHeader><h3 className="text-lg font-semibold">{t('federation.community_profile')}</h3></CardHeader>
         <CardBody className="gap-4">
           <Input
             label={t('federation.label_community_name')}
@@ -199,7 +199,7 @@ export function MyProfile() {
             value={profile.slug}
             isReadOnly
             variant="bordered"
-            description="URL-safe identifier (cannot be changed)"
+            description={t('federation.slug_description')}
           />
           <Input
             label={t('federation.label_contact_email')}
@@ -216,7 +216,7 @@ export function MyProfile() {
             onValueChange={(val) => { setWebsite(val); markDirty(); }}
             variant="bordered"
             placeholder="https://"
-            description="Your community's website URL"
+            description={t('federation.website_description')}
           />
           <Textarea
             label={t('federation.label_description')}
@@ -232,8 +232,8 @@ export function MyProfile() {
             value={categories}
             onValueChange={(val) => { setCategories(val); markDirty(); }}
             variant="bordered"
-            placeholder="e.g. timebanking, community, volunteering"
-            description="Comma-separated list of categories your community participates in"
+            placeholder={t('federation.placeholder_categories')}
+            description={t('federation.categories_description')}
           />
         </CardBody>
       </Card>

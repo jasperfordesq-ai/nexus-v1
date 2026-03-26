@@ -69,7 +69,7 @@ export function CampaignList() {
 
     const res = await adminGamification.deleteCampaign(deleteTarget.id);
     if (res.success) {
-      toast.success(`Campaign "${deleteTarget.name}" deleted`);
+      toast.success(t('gamification.campaign_deleted', { name: deleteTarget.name }));
       setDeleteTarget(null);
       loadCampaigns();
     } else {
@@ -82,10 +82,10 @@ export function CampaignList() {
   const handleStatusChange = async (campaign: Campaign, newStatus: Campaign['status']) => {
     const res = await adminGamification.updateCampaign(campaign.id, { status: newStatus });
     if (res.success) {
-      toast.success(`Campaign "${campaign.name}" ${newStatus === 'active' ? 'activated' : newStatus === 'paused' ? 'paused' : 'updated'}`);
+      toast.success(t('gamification.campaign_status_changed', { name: campaign.name }));
       loadCampaigns();
     } else {
-      toast.error(`Failed to update campaign status`);
+      toast.error(t('gamification.failed_to_update_status'));
     }
   };
 
@@ -117,7 +117,7 @@ export function CampaignList() {
         </DropdownTrigger>
         <DropdownMenu aria-label={t('gamification.label_campaign_actions')} onAction={handleAction}>
           <DropdownItem key="edit" startContent={<Edit size={14} />}>
-            Edit
+            {t('gamification.edit')}
           </DropdownItem>
           <DropdownItem
             key="activate"
@@ -125,7 +125,7 @@ export function CampaignList() {
             color="success"
             className={campaign.status === 'draft' ? 'text-success' : 'hidden'}
           >
-            Activate
+            {t('gamification.activate')}
           </DropdownItem>
           <DropdownItem
             key="pause"
@@ -133,7 +133,7 @@ export function CampaignList() {
             color="warning"
             className={campaign.status === 'active' ? 'text-warning' : 'hidden'}
           >
-            Pause
+            {t('gamification.pause')}
           </DropdownItem>
           <DropdownItem
             key="resume"
@@ -141,10 +141,10 @@ export function CampaignList() {
             color="success"
             className={campaign.status === 'paused' ? 'text-success' : 'hidden'}
           >
-            Resume
+            {t('gamification.resume')}
           </DropdownItem>
           <DropdownItem key="delete" startContent={<Trash2 size={14} />} className="text-danger" color="danger">
-            Delete
+            {t('gamification.delete')}
           </DropdownItem>
         </DropdownMenu>
       </Dropdown>
@@ -154,7 +154,7 @@ export function CampaignList() {
   const columns: Column<Campaign>[] = [
     {
       key: 'name',
-      label: 'Name',
+      label: t('gamification.col_name'),
       sortable: true,
       render: (c) => (
         <span className="font-medium text-foreground">{c.name}</span>
@@ -162,20 +162,20 @@ export function CampaignList() {
     },
     {
       key: 'status',
-      label: 'Status',
+      label: t('gamification.col_status'),
       sortable: true,
       render: (c) => <StatusBadge status={c.status} />,
     },
     {
       key: 'badge_name',
-      label: 'Badge',
+      label: t('gamification.col_badge'),
       render: (c) => (
         <span className="text-sm text-default-600">{c.badge_name || c.badge_key || '—'}</span>
       ),
     },
     {
       key: 'target_audience',
-      label: 'Target',
+      label: t('gamification.col_target'),
       render: (c) => (
         <span className="text-sm text-default-600 capitalize">
           {(c.target_audience || '').replace(/_/g, ' ')}
@@ -184,7 +184,7 @@ export function CampaignList() {
     },
     {
       key: 'total_awards',
-      label: 'Awards',
+      label: t('gamification.col_awards'),
       sortable: true,
       render: (c) => (
         <span className="text-sm text-foreground">{c.total_awards ?? 0}</span>
@@ -192,7 +192,7 @@ export function CampaignList() {
     },
     {
       key: 'created_at',
-      label: 'Created',
+      label: t('gamification.col_created'),
       sortable: true,
       render: (c) => (
         <span className="text-sm text-default-500">
@@ -202,7 +202,7 @@ export function CampaignList() {
     },
     {
       key: 'actions',
-      label: 'Actions',
+      label: t('gamification.col_actions'),
       render: (c) => <CampaignActions campaign={c} />,
     },
   ];
@@ -215,7 +215,7 @@ export function CampaignList() {
         actions={
           <Link to="/admin/gamification/campaigns/create">
             <Button color="primary" startContent={<Plus size={16} />}>
-              Create Campaign
+              {t('gamification.create_campaign')}
             </Button>
           </Link>
         }
@@ -224,9 +224,9 @@ export function CampaignList() {
       {campaigns.length === 0 && !loading ? (
         <EmptyState
           icon={Megaphone}
-          title="No campaigns yet"
+          title={t('gamification.no_campaigns_yet')}
           description={t('gamification.desc_create_your_first_campaign_to_start_awar')}
-          actionLabel="Create Campaign"
+          actionLabel={t('gamification.create_campaign')}
           onAction={() => navigate('/admin/gamification/campaigns/create')}
         />
       ) : (
@@ -234,9 +234,9 @@ export function CampaignList() {
           columns={columns}
           data={campaigns}
           isLoading={loading}
-          searchPlaceholder="Search campaigns..."
+          searchPlaceholder={t('gamification.search_campaigns')}
           onRefresh={loadCampaigns}
-          emptyContent="No campaigns match your search"
+          emptyContent={t('gamification.no_campaigns_match_search')}
         />
       )}
 
@@ -246,9 +246,9 @@ export function CampaignList() {
           isOpen={!!deleteTarget}
           onClose={() => setDeleteTarget(null)}
           onConfirm={handleDelete}
-          title="Delete Campaign"
-          message={`Are you sure you want to delete "${deleteTarget.name}"? This action cannot be undone.`}
-          confirmLabel="Delete"
+          title={t('gamification.delete_campaign')}
+          message={t('gamification.confirm_delete_campaign', { name: deleteTarget.name })}
+          confirmLabel={t('gamification.delete')}
           confirmColor="danger"
           isLoading={deleting}
         />

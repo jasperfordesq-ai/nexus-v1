@@ -73,7 +73,7 @@ export function VolunteeringOverview() {
       <PageHeader
         title={t('volunteering.volunteering_overview_title')}
         description={t('volunteering.volunteering_overview_desc')}
-        actions={<Button variant="flat" startContent={<RefreshCw size={16} />} onPress={loadData} isLoading={loading}>Refresh</Button>}
+        actions={<Button variant="flat" startContent={<RefreshCw size={16} />} onPress={loadData} isLoading={loading}>{t('common.refresh')}</Button>}
       />
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 mb-6">
@@ -89,12 +89,12 @@ export function VolunteeringOverview() {
       </div>
 
       <Card shadow="sm">
-        <CardHeader><h3 className="text-lg font-semibold">Recent Opportunities</h3></CardHeader>
+        <CardHeader><h3 className="text-lg font-semibold">{t('volunteering.recent_opportunities')}</h3></CardHeader>
         <CardBody>
           {opportunities.length === 0 ? (
             <div className="flex flex-col items-center py-8 text-default-400">
               <Heart size={40} className="mb-2" />
-              <p>No volunteer opportunities yet</p>
+              <p>{t('volunteering.no_opportunities_yet')}</p>
             </div>
           ) : (
             <div className="space-y-3">
@@ -102,7 +102,7 @@ export function VolunteeringOverview() {
                 <div key={opp.id} className="flex items-center justify-between rounded-lg border border-default-200 p-3">
                   <div>
                     <p className="font-medium">{opp.title}</p>
-                    <p className="text-xs text-default-400">by {opp.first_name} {opp.last_name}</p>
+                    <p className="text-xs text-default-400">{t('volunteering.by_name', { name: `${opp.first_name} ${opp.last_name}` })}</p>
                   </div>
                   <Chip size="sm" variant="flat" color={['active', 'open'].includes(opp.status) ? 'success' : 'default'} className="capitalize">{opp.status}</Chip>
                 </div>

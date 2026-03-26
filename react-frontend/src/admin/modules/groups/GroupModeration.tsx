@@ -58,7 +58,7 @@ export function GroupModeration() {
   const columns: Column<GroupModerationItem>[] = [
     {
       key: 'name',
-      label: 'Group',
+      label: t('groups.col_group'),
       sortable: true,
       render: (item) => (
         <span className="font-medium text-foreground">{item.name}</span>
@@ -66,13 +66,13 @@ export function GroupModeration() {
     },
     {
       key: 'status',
-      label: 'Status',
+      label: t('groups.col_status'),
       sortable: true,
       render: (item) => <StatusBadge status={item.status} />,
     },
     {
       key: 'report_count',
-      label: 'Reports',
+      label: t('groups.col_reports'),
       sortable: true,
       render: (item) => (
         <div className="flex items-center gap-1.5">
@@ -83,17 +83,17 @@ export function GroupModeration() {
               color="danger"
               startContent={<Flag size={12} />}
             >
-              {item.report_count} {item.report_count === 1 ? 'report' : 'reports'}
+              {t('groups.report_count', { count: item.report_count })}
             </Chip>
           ) : (
-            <span className="text-sm text-default-400">None</span>
+            <span className="text-sm text-default-400">{t('groups.none')}</span>
           )}
         </div>
       ),
     },
     {
       key: 'created_at',
-      label: 'Created',
+      label: t('groups.col_created'),
       sortable: true,
       render: (item) => (
         <span className="text-sm text-default-500">
@@ -121,7 +121,7 @@ export function GroupModeration() {
       {items.length === 0 ? (
         <EmptyState
           icon={ShieldAlert}
-          title="No Flagged Content"
+          title={t('groups.no_flagged_content')}
           description={t('groups.desc_there_are_no_groups_with_reported_or_fla')}
         />
       ) : (
@@ -129,7 +129,7 @@ export function GroupModeration() {
           columns={columns}
           data={items}
           isLoading={loading}
-          searchPlaceholder="Search flagged groups..."
+          searchPlaceholder={t('groups.search_flagged_placeholder')}
           onRefresh={loadItems}
         />
       )}
