@@ -16,7 +16,7 @@ use Illuminate\Support\Facades\Mail;
 use Mockery;
 
 /**
- * @runInSeparateProcess
+ * @runTestsInSeparateProcesses
  * @preserveGlobalState disabled
  */
 class JobExpiryNotificationServiceTest extends TestCase
@@ -138,10 +138,9 @@ class JobExpiryNotificationServiceTest extends TestCase
         $vacancy = Mockery::mock();
         $vacancy->id = 10;
         $vacancy->title = 'Developer';
-        $vacancy->user_id = null; // causes notification to be skipped
+        $vacancy->user_id = 5; // triggers Notification call
         $vacancy->creator = null;
         $vacancy->deadline = now()->addDays(3);
-        $vacancy->shouldReceive('getAttribute')->with('deadline')->andThrow(new \Exception('Bad date'));
 
         $builder = Mockery::mock();
         $builder->shouldReceive('where')->andReturnSelf();
@@ -152,6 +151,10 @@ class JobExpiryNotificationServiceTest extends TestCase
 
         $mock = Mockery::mock('alias:' . JobVacancy::class);
         $mock->shouldReceive('with')->andReturn($builder);
+
+        // Notification throws — inner catch logs warning and continues
+        $notifMock = Mockery::mock('alias:' . Notification::class);
+        $notifMock->shouldReceive('createNotification')->andThrow(new \RuntimeException('DB error'));
 
         $result = JobExpiryNotificationService::notifyExpiringSoon();
         $this->assertIsInt($result);

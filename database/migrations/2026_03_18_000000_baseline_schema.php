@@ -51,6 +51,9 @@ return new class extends Migration
             fn(string $s) => strlen($s) > 5
         );
 
+        // Disable FK checks so tables can be created in any order
+        DB::unprepared('SET FOREIGN_KEY_CHECKS=0');
+
         foreach ($statements as $statement) {
             // Skip MySQL directives and empty statements
             if (str_starts_with($statement, '/*') || str_starts_with($statement, '--')) {
@@ -58,6 +61,8 @@ return new class extends Migration
             }
             DB::unprepared($statement);
         }
+
+        DB::unprepared('SET FOREIGN_KEY_CHECKS=1');
     }
 
     public function down(): void

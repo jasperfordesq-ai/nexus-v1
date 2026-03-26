@@ -67,7 +67,7 @@ class JobExpiryNotificationService
         return $notified;
     }
 
-    private static function sendExpiryEmail(User $user, JobVacancy $vacancy, int $daysLeft): void
+    private static function sendExpiryEmail(User $user, object $vacancy, int $daysLeft): void
     {
         $name      = htmlspecialchars($user->first_name ?? 'there');
         $title     = htmlspecialchars($vacancy->title);
