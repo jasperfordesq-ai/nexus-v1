@@ -58,6 +58,12 @@
   "status_declined": "Abgelehnt",
   "hour": "Stunde",
   "hours": "Stunden",
+  "hours_review": {
+    "approve": "Approve",
+    "decline": "Decline",
+    "approve_aria": "Approve hours for {{name}}",
+    "decline_aria": "Decline hours for {{name}}"
+  },
   "expenses": {
     "heading": "Meine Ausgaben",
     "submit": "Ausgabe einreichen",

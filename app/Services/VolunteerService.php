@@ -121,6 +121,16 @@ class VolunteerService
             throw new \RuntimeException('Opportunity not found or is not active.');
         }
 
+        // Prevent duplicate applications
+        $existing = VolApplication::where('opportunity_id', $opportunityId)
+            ->where('user_id', $userId)
+            ->whereIn('status', ['pending', 'approved'])
+            ->exists();
+
+        if ($existing) {
+            throw new \RuntimeException('You have already applied to this opportunity.');
+        }
+
         $application = VolApplication::create([
             'opportunity_id' => $opportunityId,
             'user_id'        => $userId,
@@ -188,6 +198,10 @@ class VolunteerService
             ->where('status', 'pending')
             ->sum('hours');
 
+        $declined = VolLog::where('user_id', $userId)
+            ->where('status', 'rejected')
+            ->sum('hours');
+
         $totalLogs = VolLog::where('user_id', $userId)->count();
 
         $thisMonth = VolLog::where('user_id', $userId)
@@ -195,7 +209,31 @@ class VolunteerService
             ->where('date_logged', '>=', now()->startOfMonth())
             ->sum('hours');
 
+        $byOrg = VolLog::where('user_id', $userId)
+            ->where('status', 'approved')
+            ->join('vol_organizations', 'vol_logs.organization_id', '=', 'vol_organizations.id')
+            ->selectRaw('vol_organizations.name, SUM(vol_logs.hours) as hours')
+            ->groupBy('vol_organizations.id', 'vol_organizations.name')
+            ->get()
+            ->map(fn ($r) => ['name' => $r->name, 'hours' => round((float) $r->hours, 2)])
+            ->toArray();
+
+        $byMonth = VolLog::where('user_id', $userId)
+            ->where('status', 'approved')
+            ->selectRaw("DATE_FORMAT(date_logged, '%Y-%m') as month, SUM(hours) as hours")
+            ->groupByRaw("DATE_FORMAT(date_logged, '%Y-%m')")
+            ->orderBy('month')
+            ->get()
+            ->map(fn ($r) => ['month' => $r->month, 'hours' => round((float) $r->hours, 2)])
+            ->toArray();
+
         return [
+            'total_verified'       => round((float) $total, 2),
+            'total_pending'        => round((float) $pending, 2),
+            'total_declined'       => round((float) $declined, 2),
+            'by_organization'      => $byOrg,
+            'by_month'             => $byMonth,
+            // Backward-compatible fields
             'total_approved_hours' => round((float) $total, 2),
             'pending_hours'        => round((float) $pending, 2),
             'this_month_hours'     => round((float) $thisMonth, 2),

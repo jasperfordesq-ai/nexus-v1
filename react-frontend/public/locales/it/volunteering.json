@@ -58,6 +58,12 @@
   "status_declined": "Rifiutato",
   "hour": "ora",
   "hours": "ore",
+  "hours_review": {
+    "approve": "Approve",
+    "decline": "Decline",
+    "approve_aria": "Approve hours for {{name}}",
+    "decline_aria": "Decline hours for {{name}}"
+  },
   "expenses": {
     "heading": "Le Mie Spese",
     "submit": "Invia Spesa",

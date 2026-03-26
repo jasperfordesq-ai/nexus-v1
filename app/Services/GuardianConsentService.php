@@ -123,6 +123,32 @@ class GuardianConsentService
             'created_at' => now(),
         ]);
 
+        // Send consent email to guardian
+        $tenant = TenantContext::get();
+        $tenantSlug = $tenant['slug'] ?? '';
+        $verifyUrl = config('app.frontend_url', 'https://app.project-nexus.ie')
+            . '/' . $tenantSlug
+            . '/volunteering/guardian-consent/verify/' . $consentToken;
+
+        try {
+            \Illuminate\Support\Facades\Mail::raw(
+                "Dear {$guardianData['guardian_name']},\n\n"
+                . "A minor in your care has requested your consent to participate in volunteering activities on Project NEXUS.\n\n"
+                . "To grant your consent, please visit the following link:\n"
+                . "{$verifyUrl}\n\n"
+                . "This link will expire in " . self::CONSENT_EXPIRY_DAYS . " days.\n\n"
+                . "If you did not expect this request, you can safely ignore this email.\n\n"
+                . "Regards,\nProject NEXUS",
+                function ($message) use ($guardianData) {
+                    $message->to($guardianData['guardian_email'], $guardianData['guardian_name'])
+                            ->subject('Guardian Consent Request — Project NEXUS');
+                }
+            );
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::warning('Failed to send guardian consent email: ' . $e->getMessage());
+            // Don't fail the request — consent record is still created
+        }
+
         return [
             'id' => $id,
             'minor_user_id' => $minorUserId,

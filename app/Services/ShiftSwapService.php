@@ -256,13 +256,19 @@ class ShiftSwapService
             ->join('users as tu', 'sr.to_user_id', '=', 'tu.id')
             ->join('vol_shifts as fs', 'sr.from_shift_id', '=', 'fs.id')
             ->join('vol_shifts as ts', 'sr.to_shift_id', '=', 'ts.id')
+            ->leftJoin('vol_opportunities as fo', 'fs.opportunity_id', '=', 'fo.id')
+            ->leftJoin('vol_organizations as forg', 'fo.organization_id', '=', 'forg.id')
+            ->leftJoin('vol_opportunities as to_opp', 'ts.opportunity_id', '=', 'to_opp.id')
+            ->leftJoin('vol_organizations as torg', 'to_opp.organization_id', '=', 'torg.id')
             ->where('sr.tenant_id', $tenantId)
             ->select(
                 'sr.*',
                 'fu.name as from_user_name', 'fu.avatar_url as from_user_avatar',
                 'tu.name as to_user_name', 'tu.avatar_url as to_user_avatar',
                 'fs.start_time as from_shift_start', 'fs.end_time as from_shift_end',
-                'ts.start_time as to_shift_start', 'ts.end_time as to_shift_end'
+                'ts.start_time as to_shift_start', 'ts.end_time as to_shift_end',
+                'fo.title as from_opp_title', 'forg.name as from_org_name',
+                'to_opp.title as to_opp_title', 'torg.name as to_org_name'
             );
 
         if ($direction === 'incoming') {
@@ -281,29 +287,33 @@ class ShiftSwapService
         return $requests->map(function ($r) use ($userId) {
             return [
                 'id'                       => (int) $r->id,
-                'direction'                => (int) $r->from_user_id === $userId ? 'outgoing' : 'incoming',
+                'direction'                => (int) $r->from_user_id === $userId ? 'sent' : 'received',
                 'status'                   => $r->status,
                 'message'                  => $r->message,
                 'requires_admin_approval'  => (bool) $r->requires_admin_approval,
-                'from_user' => [
+                'requester' => [
                     'id'         => (int) $r->from_user_id,
                     'name'       => $r->from_user_name,
                     'avatar_url' => $r->from_user_avatar,
                 ],
-                'to_user' => [
+                'recipient' => [
                     'id'         => (int) $r->to_user_id,
                     'name'       => $r->to_user_name,
                     'avatar_url' => $r->to_user_avatar,
                 ],
-                'from_shift' => [
-                    'id'         => (int) $r->from_shift_id,
-                    'start_time' => $r->from_shift_start,
-                    'end_time'   => $r->from_shift_end,
+                'original_shift' => [
+                    'id'                => (int) $r->from_shift_id,
+                    'start_time'        => $r->from_shift_start,
+                    'end_time'          => $r->from_shift_end,
+                    'opportunity_title' => $r->from_opp_title ?? null,
+                    'organization_name' => $r->from_org_name ?? null,
                 ],
-                'to_shift' => [
-                    'id'         => (int) $r->to_shift_id,
-                    'start_time' => $r->to_shift_start,
-                    'end_time'   => $r->to_shift_end,
+                'proposed_shift' => [
+                    'id'                => (int) $r->to_shift_id,
+                    'start_time'        => $r->to_shift_start,
+                    'end_time'          => $r->to_shift_end,
+                    'opportunity_title' => $r->to_opp_title ?? null,
+                    'organization_name' => $r->to_org_name ?? null,
                 ],
                 'created_at' => $r->created_at,
             ];

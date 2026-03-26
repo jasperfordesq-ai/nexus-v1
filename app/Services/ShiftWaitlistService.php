@@ -119,21 +119,23 @@ class ShiftWaitlistService
         }
 
         try {
-            // Cancel the entry
-            DB::table('vol_shift_waitlist')
-                ->where('id', $entry->id)
-                ->where('tenant_id', $tenantId)
-                ->update(['status' => 'cancelled']);
+            return DB::transaction(function () use ($entry, $shiftId, $tenantId) {
+                // Cancel the entry
+                DB::table('vol_shift_waitlist')
+                    ->where('id', $entry->id)
+                    ->where('tenant_id', $tenantId)
+                    ->update(['status' => 'cancelled']);
 
-            // Reorder remaining positions
-            DB::table('vol_shift_waitlist')
-                ->where('shift_id', $shiftId)
-                ->where('status', 'waiting')
-                ->where('position', '>', $entry->position)
-                ->where('tenant_id', $tenantId)
-                ->decrement('position');
+                // Reorder remaining positions
+                DB::table('vol_shift_waitlist')
+                    ->where('shift_id', $shiftId)
+                    ->where('status', 'waiting')
+                    ->where('position', '>', $entry->position)
+                    ->where('tenant_id', $tenantId)
+                    ->decrement('position');
 
-            return true;
+                return true;
+            });
         } catch (\Exception $e) {
             Log::error('ShiftWaitlistService::leave error: ' . $e->getMessage());
             self::$errors[] = ['code' => 'SERVER_ERROR', 'message' => 'Failed to leave waitlist'];

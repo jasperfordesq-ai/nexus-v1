@@ -58,6 +58,12 @@
   "status_declined": "Refusé",
   "hour": "heure",
   "hours": "heures",
+  "hours_review": {
+    "approve": "Approve",
+    "decline": "Decline",
+    "approve_aria": "Approve hours for {{name}}",
+    "decline_aria": "Decline hours for {{name}}"
+  },
   "expenses": {
     "heading": "Mes dépenses",
     "submit": "Soumettre une dépense",

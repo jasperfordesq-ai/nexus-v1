@@ -143,8 +143,8 @@ class VolunteerCertificateService
             'id' => (int) $id,
             'verification_code' => $verificationCode,
             'total_hours' => round($totalHours, 2),
-            'date_range_start' => $dateRangeStart,
-            'date_range_end' => $dateRangeEnd,
+            'date_range' => ['start' => $dateRangeStart, 'end' => $dateRangeEnd],
+            'verification_url' => config('app.url', 'https://api.project-nexus.ie') . '/api/v2/volunteering/certificates/verify/' . $verificationCode,
             'organizations' => $orgs,
             'user_name' => $user ? trim($user->first_name . ' ' . $user->last_name) : 'Volunteer',
             'generated_at' => now()->toIso8601String(),
@@ -190,8 +190,8 @@ class VolunteerCertificateService
             'id' => (int) $cert->id,
             'verification_code' => $cert->verification_code,
             'total_hours' => round((float) $cert->total_hours, 2),
-            'date_range_start' => $cert->date_range_start,
-            'date_range_end' => $cert->date_range_end,
+            'date_range' => ['start' => $cert->date_range_start, 'end' => $cert->date_range_end],
+            'verification_url' => config('app.url', 'https://api.project-nexus.ie') . '/api/v2/volunteering/certificates/verify/' . $cert->verification_code,
             'organizations' => json_decode($cert->organizations, true) ?? [],
             'user_name' => trim($cert->first_name . ' ' . $cert->last_name),
             'generated_at' => $cert->generated_at,
@@ -215,8 +215,8 @@ class VolunteerCertificateService
                 'id' => (int) $row->id,
                 'verification_code' => $row->verification_code,
                 'total_hours' => round((float) $row->total_hours, 2),
-                'date_range_start' => $row->date_range_start,
-                'date_range_end' => $row->date_range_end,
+                'date_range' => ['start' => $row->date_range_start, 'end' => $row->date_range_end],
+                'verification_url' => config('app.url', 'https://api.project-nexus.ie') . '/api/v2/volunteering/certificates/verify/' . $row->verification_code,
                 'organizations' => json_decode($row->organizations, true) ?? [],
                 'generated_at' => $row->generated_at,
                 'downloaded_at' => $row->downloaded_at,
@@ -238,8 +238,8 @@ class VolunteerCertificateService
 
         $userName = htmlspecialchars($cert['user_name'], ENT_QUOTES, 'UTF-8');
         $hours = $cert['total_hours'];
-        $dateFrom = htmlspecialchars($cert['date_range_start'], ENT_QUOTES, 'UTF-8');
-        $dateTo = htmlspecialchars($cert['date_range_end'], ENT_QUOTES, 'UTF-8');
+        $dateFrom = htmlspecialchars($cert['date_range']['start'], ENT_QUOTES, 'UTF-8');
+        $dateTo = htmlspecialchars($cert['date_range']['end'], ENT_QUOTES, 'UTF-8');
         $verifyCode = htmlspecialchars($cert['verification_code'], ENT_QUOTES, 'UTF-8');
 
         $orgRows = '';

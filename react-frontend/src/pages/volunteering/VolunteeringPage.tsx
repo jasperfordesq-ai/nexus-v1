@@ -200,7 +200,7 @@ export function VolunteeringPage() {
             <Link to={tenantPath('/volunteering/create')}>
               <Button
                 className="bg-gradient-to-r from-rose-500 to-pink-600 text-white"
-                startContent={<Plus className="w-4 h-4" />}
+                startContent={<Plus className="w-4 h-4" aria-hidden="true" />}
               >
                 {t('volunteering.post_opportunity')}
               </Button>
@@ -1008,13 +1008,13 @@ function HoursTab() {
       ]);
 
       if (summaryRes.success && summaryRes.data) {
-        setSummary(summaryRes.data as HoursSummary);
+        setSummary(summaryRes.data);
       } else {
         setError(t('volunteering.error_load_hours'));
       }
 
       if (orgsRes.success && orgsRes.data) {
-        setOrganisations(Array.isArray(orgsRes.data) ? orgsRes.data as Organization[] : []);
+        setOrganisations(Array.isArray(orgsRes.data) ? orgsRes.data : []);
       }
     } catch (err) {
       logError('Failed to load hours summary', err);

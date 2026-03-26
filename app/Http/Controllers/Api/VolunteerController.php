@@ -29,6 +29,7 @@ use App\Services\VolunteerMatchingService;
 use App\Services\VolunteerReminderService;
 use App\Services\WebhookDispatchService;
 use App\Core\TenantContext;
+use App\Models\VolApplication;
 
 /**
  * VolunteerController -- Volunteering opportunities, applications, shifts, hours, and organisations.
@@ -105,7 +106,7 @@ class VolunteerController extends BaseApiController
     {
         $this->ensureFeature();
         $this->rateLimit('volunteering_show', 120, 60);
-        $opportunity = $this->volunteerService->getById((int) $id);
+        $opportunity = $this->volunteerService->getOpportunityById((int) $id, Auth::id());
         if (!$opportunity) return $this->respondWithError('NOT_FOUND', 'Opportunity not found', null, 404);
         return $this->respondWithData($opportunity);
     }
@@ -127,6 +128,16 @@ class VolunteerController extends BaseApiController
         $userId = $this->getUserId();
         $this->rateLimit('volunteering_apply', 20, 60);
         $data = ['message' => trim($this->input('message', '')), 'shift_id' => $this->inputInt('shift_id') ?: null];
+
+        // Check for duplicate application
+        $existing = VolApplication::where('opportunity_id', $id)
+            ->where('user_id', $userId)
+            ->whereIn('status', ['pending', 'approved'])
+            ->exists();
+        if ($existing) {
+            return $this->respondWithError('ALREADY_EXISTS', 'You have already applied to this opportunity', null, 409);
+        }
+
         try {
             $application = $this->volunteerService->apply($id, $userId, $data);
         } catch (\RuntimeException $e) {
@@ -574,6 +585,15 @@ class VolunteerController extends BaseApiController
             $errors = $this->shiftSwapService->getErrors();
             return $this->respondWithErrors($errors, $this->getErrorStatus($errors));
         }
+
+        if ($action === 'accept') {
+            // Check if the swap went to admin_pending instead of being directly accepted
+            $actualStatus = DB::table('vol_shift_swap_requests')->where('id', (int) $id)->value('status');
+            if ($actualStatus === 'admin_pending') {
+                return $this->respondWithData(['id' => (int) $id, 'status' => 'admin_pending', 'message' => 'Swap accepted but requires admin approval']);
+            }
+        }
+
         return $this->respondWithData(['id' => (int) $id, 'status' => $action === 'accept' ? 'accepted' : 'rejected']);
     }
 
@@ -713,9 +733,9 @@ class VolunteerController extends BaseApiController
             return $this->respondWithError('FORBIDDEN', 'You do not have permission to verify check-ins for this shift', null, 403);
         }
 
-        $result = $this->volunteerCheckInService->verifyCheckIn(['token' => $token], $tenantId);
+        $result = $this->volunteerCheckInService->verifyCheckIn($token);
 
-        if ($result === false) {
+        if ($result === null) {
             return $this->respondWithError('NOT_FOUND', 'Check-in not found or already completed', null, 404);
         }
 
@@ -771,8 +791,7 @@ class VolunteerController extends BaseApiController
             return $this->respondWithError('FORBIDDEN', 'You do not have permission to view check-ins for this shift', null, 403);
         }
 
-        $tenantId = TenantContext::getId();
-        $checkins = $this->volunteerCheckInService->getShiftCheckIns($shiftId, $tenantId);
+        $checkins = $this->volunteerCheckInService->getShiftCheckIns($shiftId);
         return $this->respondWithData(['checkins' => $checkins]);
     }
 
@@ -1197,7 +1216,14 @@ class VolunteerController extends BaseApiController
             'date_to' => $this->query('date_to'),
         ];
 
-        $csv = $this->volunteerExpenseService->exportExpenses($filters);
+        $rows = $this->volunteerExpenseService->exportExpenses(TenantContext::getId(), $filters);
+        $csv = '';
+        if (!empty($rows)) {
+            $csv .= implode(',', array_keys((array) $rows[0])) . "\n";
+            foreach ($rows as $row) {
+                $csv .= implode(',', array_map(fn($v) => '"' . str_replace('"', '""', (string)$v) . '"', array_values((array) $row))) . "\n";
+            }
+        }
 
         return response($csv, 200)
             ->header('Content-Type', 'text/csv')
@@ -1209,8 +1235,7 @@ class VolunteerController extends BaseApiController
         $this->ensureFeature();
         $this->requireAdmin();
 
-        $orgId = $this->query('organization_id') ? (int) $this->query('organization_id') : null;
-        $policies = $this->volunteerExpenseService->getPolicies($orgId);
+        $policies = $this->volunteerExpenseService->getPolicies(TenantContext::getId());
         return $this->respondWithData($policies);
     }
 
@@ -1238,7 +1263,7 @@ class VolunteerController extends BaseApiController
             return $this->respondWithError('VALIDATION_ERROR', 'At least one policy field is required (e.g., max_amount, requires_receipt, auto_approve_below, description, enabled)', null, 422);
         }
 
-        $result = $this->volunteerExpenseService->updatePolicy($data);
+        $result = $this->volunteerExpenseService->updatePolicy((int)($data['id'] ?? 0), $data, TenantContext::getId());
         return $this->respondWithData(['success' => $result]);
     }
 
@@ -1268,7 +1293,7 @@ class VolunteerController extends BaseApiController
         try {
             $result = $this->guardianConsentService->requestConsent($userId, $data, $opportunityId);
             return $this->respondWithData($result, null, 201);
-        } catch (\RuntimeException $e) {
+        } catch (\InvalidArgumentException $e) {
             return $this->respondWithError('VALIDATION_ERROR', $e->getMessage(), null, 422);
         }
     }

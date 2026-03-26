@@ -58,6 +58,12 @@
   "status_declined": "Diúltaithe",
   "hour": "uair",
   "hours": "uaireanta",
+  "hours_review": {
+    "approve": "Approve",
+    "decline": "Decline",
+    "approve_aria": "Approve hours for {{name}}",
+    "decline_aria": "Decline hours for {{name}}"
+  },
   "expenses": {
     "heading": "Mo Chostais",
     "submit": "Cuir Costas Isteach",

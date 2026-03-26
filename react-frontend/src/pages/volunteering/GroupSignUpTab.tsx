@@ -150,9 +150,29 @@ export function GroupSignUpTab() {
       setIsAdding(true);
       setAddError(null);
 
+      // Resolve email to user_id via member search
+      const searchRes = await api.get<{ id: number; email: string }[]>(
+        `/v2/members?search=${encodeURIComponent(newMemberEmail.trim())}&per_page=5`
+      );
+
+      if (!searchRes.success || !Array.isArray(searchRes.data)) {
+        setAddError(tRef.current('group_signup.lookup_error', 'Unable to look up member. Please try again.'));
+        return;
+      }
+
+      const emailLower = newMemberEmail.trim().toLowerCase();
+      const matchedUser = searchRes.data.find(
+        (u) => u.email?.toLowerCase() === emailLower
+      );
+
+      if (!matchedUser) {
+        setAddError(tRef.current('group_signup.no_member_found', 'No member found with that email address.'));
+        return;
+      }
+
       const response = await api.post(
         `/v2/volunteering/group-reservations/${selectedReservationId}/members`,
-        { email: newMemberEmail.trim() }
+        { user_id: matchedUser.id }
       );
 
       if (response.success) {

@@ -28,6 +28,7 @@ import {
   RefreshCw,
   Send,
   Inbox,
+  Ban,
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
@@ -138,6 +139,24 @@ export function ShiftSwapsTab() {
     } catch (err) {
       logError('Failed to accept shift swap', err);
       toastRef.current.error(tRef.current('swaps.accept_failed', 'Failed to accept swap request.'));
+    } finally {
+      setActioningId(null);
+    }
+  };
+
+  const handleCancel = async (swapId: number) => {
+    try {
+      setActioningId(swapId);
+      const response = await api.delete(`/v2/volunteering/swaps/${swapId}`);
+      if (response.success) {
+        setSwaps((prev) => prev.filter((s) => s.id !== swapId));
+        toastRef.current.success(tRef.current('swaps.cancel_success', 'Swap request cancelled.'));
+      } else {
+        toastRef.current.error(tRef.current('swaps.cancel_failed', 'Failed to cancel swap request.'));
+      }
+    } catch (err) {
+      logError('Failed to cancel shift swap', err);
+      toastRef.current.error(tRef.current('swaps.cancel_failed', 'Failed to cancel swap request.'));
     } finally {
       setActioningId(null);
     }
@@ -403,6 +422,22 @@ export function ShiftSwapsTab() {
                         isLoading={actioningId === swap.id}
                       >
                         {t('swaps.reject', 'Reject')}
+                      </Button>
+                    </div>
+                  )}
+
+                  {/* Cancel button for sent pending swaps */}
+                  {swap.direction === 'sent' && swap.status === 'pending' && (
+                    <div className="flex flex-col gap-2 flex-shrink-0">
+                      <Button
+                        size="sm"
+                        variant="flat"
+                        color="danger"
+                        startContent={<Ban className="w-4 h-4" aria-hidden="true" />}
+                        onPress={() => handleCancel(swap.id)}
+                        isLoading={actioningId === swap.id}
+                      >
+                        {t('swaps.cancel', 'Cancel')}
                       </Button>
                     </div>
                   )}
