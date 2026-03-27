@@ -72,6 +72,17 @@ if (import.meta.env.PROD) {
     setInterval(() => {
       updateSW();
     }, 5 * 60 * 1000);
+
+    // Check for updates whenever the app comes back to the foreground.
+    // This is the primary fix for mobile: users switch apps constantly, and
+    // the 5-min interval only fires while the app is active. visibilitychange
+    // fires on every app switch, triggering registration.update() which does
+    // the actual network fetch for a new SW version.
+    document.addEventListener('visibilitychange', () => {
+      if (document.visibilityState === 'visible') {
+        updateSW();
+      }
+    });
   }).catch(() => {
     // PWA registration is optional � app works without it
   });

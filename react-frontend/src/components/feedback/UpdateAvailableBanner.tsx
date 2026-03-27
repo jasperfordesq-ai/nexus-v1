@@ -75,6 +75,19 @@ export function UpdateAvailableBanner() {
     checkAndShow();
   }, [location.pathname, checkAndShow]);
 
+  // Re-check when the app comes back to the foreground (mobile app-switch).
+  // main.tsx triggers registration.update() on visibilitychange; this hook
+  // surfaces the banner if a waiting SW already exists at that moment.
+  useEffect(() => {
+    function handleVisibilityChange() {
+      if (document.visibilityState === 'visible') {
+        checkAndShow();
+      }
+    }
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
+  }, [checkAndShow]);
+
   function handleUpdate() {
     setUpdating(true);
 
