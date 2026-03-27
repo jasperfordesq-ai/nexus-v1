@@ -38,6 +38,8 @@ class MessageService
 
         // Get the latest message ID per conversation partner
         $tenantId = app('tenant.id');
+        $showArchived = (bool) ($filters['archived'] ?? false);
+
         $latestIds = DB::table('messages')
             ->selectRaw('
                 MAX(id) as latest_id,
@@ -46,6 +48,18 @@ class MessageService
             ->where('tenant_id', $tenantId)
             ->where(function ($q) use ($userId) {
                 $q->where('sender_id', $userId)->orWhere('receiver_id', $userId);
+            })
+            ->when(!$showArchived, function ($q) use ($userId) {
+                // Inbox: exclude messages archived by the current user
+                $q->whereRaw('NOT (sender_id = ? AND archived_by_sender IS NOT NULL)', [$userId])
+                  ->whereRaw('NOT (receiver_id = ? AND archived_by_receiver IS NOT NULL)', [$userId]);
+            })
+            ->when($showArchived, function ($q) use ($userId) {
+                // Archive tab: only messages archived by the current user
+                $q->where(function ($q2) use ($userId) {
+                    $q2->whereRaw('(sender_id = ? AND archived_by_sender IS NOT NULL)', [$userId])
+                       ->orWhereRaw('(receiver_id = ? AND archived_by_receiver IS NOT NULL)', [$userId]);
+                });
             })
             ->groupByRaw('CASE WHEN sender_id = ? THEN receiver_id ELSE sender_id END', [$userId])
             ->orderByDesc('latest_id');
