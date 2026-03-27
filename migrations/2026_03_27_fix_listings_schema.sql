@@ -29,6 +29,15 @@ DEALLOCATE PREPARE stmt;
 -- Fix 2: Add FK constraints on listing_views and listing_contacts
 -- ---------------------------------------------------------------------------
 
+-- First, align column types: listings.id is int(11) signed, but listing_views/contacts
+-- have listing_id as int(10) unsigned. FK requires exact type match.
+-- Also clean up any orphaned rows before adding constraints.
+DELETE lv FROM listing_views lv LEFT JOIN listings l ON lv.listing_id = l.id WHERE l.id IS NULL;
+DELETE lc FROM listing_contacts lc LEFT JOIN listings l ON lc.listing_id = l.id WHERE l.id IS NULL;
+
+ALTER TABLE listing_views MODIFY COLUMN listing_id int(11) NOT NULL;
+ALTER TABLE listing_contacts MODIFY COLUMN listing_id int(11) NOT NULL;
+
 -- FK: listing_views.listing_id → listings.id (ON DELETE CASCADE)
 SET @exists = (SELECT COUNT(1) FROM information_schema.table_constraints
                WHERE table_schema = DATABASE()

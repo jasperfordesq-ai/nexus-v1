@@ -16,6 +16,8 @@ use App\Core\TenantContext;
 use App\Models\User;
 use App\Services\MemberRankingService;
 use App\Services\OnboardingConfigService;
+use App\Services\GamificationService;
+use App\Models\UserBadge;
 
 /**
  * UsersController - User profiles, settings, preferences, sessions.
@@ -72,6 +74,18 @@ class UsersController extends BaseApiController
         }
 
         $profile = $this->userService->getOwnProfile($userId);
+
+        // Check if profile is now complete and award XP (one-time, guarded by awardXP)
+        try {
+            $hasName = !empty($profile['first_name']) && !empty($profile['last_name']);
+            $hasBio = !empty($profile['bio']);
+            $hasAvatar = !empty($profile['avatar_url']);
+            if ($hasName && $hasBio && $hasAvatar) {
+                \App\Services\GamificationService::awardXP($userId, \App\Services\GamificationService::XP_VALUES['complete_profile'], 'complete_profile', 'Completed profile');
+            }
+        } catch (\Throwable $e) {
+            \Log::warning('Gamification XP award failed', ['action' => 'complete_profile', 'user' => $userId, 'error' => $e->getMessage()]);
+        }
 
         return $this->respondWithData($profile);
     }
@@ -903,6 +917,7 @@ class UsersController extends BaseApiController
                        u.avatar_url as avatar, u.bio as tagline,
                        u.location, u.latitude, u.longitude,
                        u.created_at, u.last_login_at, u.is_verified,
+                       COALESCE(u.xp, 0) as xp, COALESCE(u.level, 1) as level,
                        (SELECT AVG(rating) FROM reviews WHERE receiver_id = u.id AND tenant_id = u.tenant_id) as rating,
                        (SELECT COALESCE(SUM(amount), 0) FROM transactions WHERE sender_id = u.id AND status = 'completed' AND tenant_id = u.tenant_id) as total_hours_given,
                        (SELECT COALESCE(SUM(amount), 0) FROM transactions WHERE receiver_id = u.id AND status = 'completed' AND tenant_id = u.tenant_id) as total_hours_received,
@@ -926,8 +941,52 @@ class UsersController extends BaseApiController
             $user['offer_count'] = (int) $user['offer_count'];
             $user['request_count'] = (int) $user['request_count'];
             $user['is_verified'] = (bool) $user['is_verified'];
+            $user['xp'] = (int) $user['xp'];
+            $user['level'] = (int) $user['level'];
         }
         unset($user);
+
+        // Enrich with showcased badges if gamification is enabled
+        if (TenantContext::hasFeature('gamification')) {
+            $userIds = array_column($users, 'id');
+            if (!empty($userIds)) {
+                $placeholders = implode(',', array_fill(0, count($userIds), '?'));
+                $badgeRows = DB::select(
+                    "SELECT user_id, badge_key, name, icon
+                     FROM user_badges
+                     WHERE user_id IN ($placeholders) AND tenant_id = ? AND is_showcased = 1
+                     ORDER BY showcase_order ASC",
+                    array_merge(array_map('intval', $userIds), [$tenantId])
+                );
+
+                // Group badges by user_id (max 3 per user)
+                $badgesByUser = [];
+                foreach ($badgeRows as $row) {
+                    $uid = (int) $row->user_id;
+                    if (!isset($badgesByUser[$uid])) {
+                        $badgesByUser[$uid] = [];
+                    }
+                    if (count($badgesByUser[$uid]) < 3) {
+                        $def = GamificationService::getBadgeByKey($row->badge_key);
+                        $badgesByUser[$uid][] = [
+                            'badge_key' => $row->badge_key,
+                            'name'      => $def['name'] ?? $row->name ?? $row->badge_key,
+                            'icon'      => $def['icon'] ?? $row->icon ?? '',
+                        ];
+                    }
+                }
+
+                foreach ($users as &$user) {
+                    $user['showcased_badges'] = $badgesByUser[$user['id']] ?? [];
+                }
+                unset($user);
+            }
+        } else {
+            foreach ($users as &$user) {
+                $user['showcased_badges'] = [];
+            }
+            unset($user);
+        }
 
         // Clean up internal fields before returning
         $users = array_map(static function (array $u): array {

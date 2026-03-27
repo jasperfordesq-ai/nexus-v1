@@ -114,6 +114,24 @@ class GoalsController extends BaseApiController
         $result = $goal->toArray();
         $result['is_owner'] = true;
 
+        // Record feed activity (only for public goals)
+        if (!empty($data['is_public']) || ($goal->is_public ?? false)) {
+            try {
+                app(\App\Services\FeedActivityService::class)->recordActivity(
+                    \App\Core\TenantContext::getId(),
+                    $userId,
+                    'goal',
+                    $goal->id,
+                    [
+                        'title'   => $data['title'] ?? null,
+                        'content' => $data['description'] ?? null,
+                    ]
+                );
+            } catch (\Throwable $e) {
+                \Log::warning('Feed activity recording failed', ['type' => 'goal', 'id' => $goal->id, 'error' => $e->getMessage()]);
+            }
+        }
+
         return $this->respondWithData($result, null, 201);
     }
 
@@ -196,6 +214,13 @@ class GoalsController extends BaseApiController
 
         if (! $goal) {
             return $this->respondWithError('RESOURCE_NOT_FOUND', 'Goal not found or not owned', null, 404);
+        }
+
+        // Award XP for completing a goal
+        try {
+            \App\Services\GamificationService::awardXP($userId, \App\Services\GamificationService::XP_VALUES['complete_goal'], 'complete_goal', 'Completed a goal');
+        } catch (\Throwable $e) {
+            \Log::warning('Gamification XP award failed', ['action' => 'complete_goal', 'user' => $userId, 'error' => $e->getMessage()]);
         }
 
         $data = $goal->toArray();

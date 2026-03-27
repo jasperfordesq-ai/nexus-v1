@@ -13,7 +13,16 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Button, Skeleton, Divider } from '@heroui/react';
+import {
+  Button,
+  Modal,
+  ModalContent,
+  ModalHeader,
+  ModalBody,
+  ModalFooter,
+  Textarea,
+  useDisclosure,
+} from '@heroui/react';
 import {
   Hash,
   ArrowLeft,
@@ -21,47 +30,34 @@ import {
   AlertTriangle,
   TrendingUp,
   Sparkles,
+  Flag,
 } from 'lucide-react';
 import { GlassCard } from '@/components/ui';
 import { PageMeta } from '@/components/seo';
 import { EmptyState } from '@/components/feedback';
 import { FeedCard } from '@/components/feed/FeedCard';
+import { FeedSkeleton } from '@/components/feed/FeedSkeleton';
 import type { FeedItem, PollData } from '@/components/feed/types';
 import { getAuthor } from '@/components/feed/types';
 import { useTranslation } from 'react-i18next';
-import { useAuth, useTenant } from '@/contexts';
+import { useAuth, useTenant, useToast } from '@/contexts';
 import { usePageTitle } from '@/hooks';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
-
-// Skeleton
-function FeedSkeleton() {
-  return (
-    <GlassCard className="p-5">
-      <div className="flex items-center gap-3 mb-4">
-        <Skeleton className="w-10 h-10 rounded-full" />
-        <div className="flex-1">
-          <Skeleton className="h-4 w-28 rounded mb-2" />
-          <Skeleton className="h-3 w-20 rounded" />
-        </div>
-      </div>
-      <Skeleton className="h-4 w-full rounded mb-2" />
-      <Skeleton className="h-4 w-4/5 rounded mb-4" />
-      <Divider />
-      <div className="flex gap-4 pt-3">
-        <Skeleton className="h-8 w-20 rounded-lg" />
-        <Skeleton className="h-8 w-24 rounded-lg" />
-      </div>
-    </GlassCard>
-  );
-}
 
 export function HashtagPage() {
   const { t } = useTranslation('feed');
   const { tag } = useParams<{ tag: string }>();
   const { tenantPath } = useTenant();
   const { isAuthenticated, user } = useAuth();
+  const toast = useToast();
   usePageTitle(tag ? `#${tag}` : t('hashtag.title'));
+
+  // Report modal
+  const { isOpen: isReportOpen, onOpen: onReportOpen, onClose: onReportClose } = useDisclosure();
+  const [reportPostId, setReportPostId] = useState<number | null>(null);
+  const [reportReason, setReportReason] = useState('');
+  const [isReporting, setIsReporting] = useState(false);
 
   const [items, setItems] = useState<FeedItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -190,6 +186,34 @@ export function HashtagPage() {
     } catch { /* ignore */ }
   };
 
+  const openReportModal = useCallback((item: FeedItem) => {
+    setReportPostId(item.id);
+    setReportReason('');
+    onReportOpen();
+  }, [onReportOpen]);
+
+  const handleReport = async () => {
+    if (!reportPostId || !reportReason.trim()) {
+      toast.error(t('toast.provide_reason', 'Please provide a reason'));
+      return;
+    }
+    try {
+      setIsReporting(true);
+      await api.post(`/v2/feed/posts/${reportPostId}/report`, {
+        reason: reportReason.trim(),
+      });
+      onReportClose();
+      setReportPostId(null);
+      setReportReason('');
+      toast.success(t('toast.reported', 'Post reported'));
+    } catch (err) {
+      logError('Failed to report post', err);
+      toast.error(t('toast.report_failed', 'Failed to report post'));
+    } finally {
+      setIsReporting(false);
+    }
+  };
+
   return (
     <>
     <PageMeta
@@ -261,7 +285,7 @@ export function HashtagPage() {
                       onToggleLike={() => handleToggleLike(item)}
                       onHidePost={() => handleHidePost(item.id)}
                       onMuteUser={() => handleMuteUser(getAuthor(item).id)}
-                      onReportPost={() => {}}
+                      onReportPost={openReportModal}
                       onDeletePost={() => handleDeletePost(item)}
                       onVotePoll={handleVotePoll}
                       isAuthenticated={isAuthenticated}
@@ -289,6 +313,63 @@ export function HashtagPage() {
         </>
       )}
     </div>
+
+    {/* Report Post Modal */}
+    <Modal
+      isOpen={isReportOpen}
+      onClose={onReportClose}
+      classNames={{
+        base: 'bg-[var(--glass-bg)] backdrop-blur-xl border border-[var(--glass-border)]',
+        backdrop: 'bg-black/60 backdrop-blur-sm',
+      }}
+    >
+      <ModalContent>
+        <ModalHeader className="text-[var(--text-primary)]">
+          <div className="flex items-center gap-3">
+            <div className="w-8 h-8 rounded-lg bg-danger/10 flex items-center justify-center">
+              <Flag className="w-4 h-4 text-danger" aria-hidden="true" />
+            </div>
+            {t('report.title', 'Report Post')}
+          </div>
+        </ModalHeader>
+        <ModalBody>
+          <p className="text-sm text-[var(--text-muted)] mb-3">
+            {t('report.description', 'Please describe why you are reporting this post.')}
+          </p>
+          <Textarea
+            label={t('report.reason_label', 'Reason')}
+            placeholder={t('report.reason_placeholder', 'Describe the issue...')}
+            value={reportReason}
+            onChange={(e) => setReportReason(e.target.value)}
+            minRows={3}
+            classNames={{
+              input: 'bg-transparent text-[var(--text-primary)]',
+              inputWrapper: 'bg-[var(--surface-elevated)] border-[var(--border-default)]',
+            }}
+            autoFocus
+          />
+        </ModalBody>
+        <ModalFooter>
+          <Button
+            variant="flat"
+            onPress={onReportClose}
+            className="text-[var(--text-muted)]"
+          >
+            {t('report.cancel', 'Cancel')}
+          </Button>
+          <Button
+            color="danger"
+            variant="flat"
+            onPress={handleReport}
+            isLoading={isReporting}
+            isDisabled={!reportReason.trim()}
+            className="font-medium"
+          >
+            {t('report.submit', 'Report')}
+          </Button>
+        </ModalFooter>
+      </ModalContent>
+    </Modal>
     </>
   );
 }

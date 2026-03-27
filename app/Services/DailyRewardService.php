@@ -106,7 +106,7 @@ class DailyRewardService
                     'login_streak'      => $currentStreak,
                     'last_daily_reward' => $today,
                     'longest_streak'    => $longestStreak,
-                    'xp'                => DB::raw("xp + {$totalXp}"),
+                    'xp'                => DB::raw('xp + ' . (int) $totalXp),
                 ]);
 
             // Log XP award

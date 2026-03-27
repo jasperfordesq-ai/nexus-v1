@@ -1153,7 +1153,7 @@ export function AchievementsPage() {
     } catch (err) {
       if (controller.signal.aborted) return;
       logError('Failed to load achievements', err);
-      setError('Failed to load achievements. Please try again.');
+      setError(tRef.current('achievements.unable_to_load', 'Failed to load achievements. Please try again.'));
     } finally {
       setIsLoading(false);
     }
@@ -1387,9 +1387,9 @@ export function AchievementsPage() {
                             }}
                             items={[
                               { key: 'all', label: t('achievements.all_types') },
-                              ...availableTypes.map((t) => ({
-                                key: t,
-                                label: t.charAt(0).toUpperCase() + t.slice(1),
+                              ...availableTypes.map((badgeType) => ({
+                                key: badgeType,
+                                label: badgeType.charAt(0).toUpperCase() + badgeType.slice(1),
                               })),
                             ]}
                           >

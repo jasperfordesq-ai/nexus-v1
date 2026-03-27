@@ -7,6 +7,7 @@
 namespace App\Http\Controllers\Api;
 
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use App\Core\TenantContext;
 
@@ -29,28 +30,34 @@ class FeedSidebarController extends BaseApiController
         $tenantId = $this->getTenantId();
 
         try {
-            $members = (int) DB::table('users')->where('tenant_id', $tenantId)->count();
-            $listings = (int) DB::table('listings')
-                ->where('tenant_id', $tenantId)
-                ->where('status', 'active')
-                ->count();
+            $cacheKey = "community_stats:{$tenantId}";
 
-            $events = 0;
-            try {
-                $events = (int) DB::table('events')->where('tenant_id', $tenantId)->count();
-            } catch (\Exception $e) { /* table may not exist */ }
+            $stats = Cache::remember($cacheKey, 120, function () use ($tenantId) {
+                $members = (int) DB::table('users')->where('tenant_id', $tenantId)->count();
+                $listings = (int) DB::table('listings')
+                    ->where('tenant_id', $tenantId)
+                    ->where('status', 'active')
+                    ->count();
 
-            $groups = 0;
-            try {
-                $groups = (int) DB::table('groups')->where('tenant_id', $tenantId)->count();
-            } catch (\Exception $e) { /* table may not exist */ }
+                $events = 0;
+                try {
+                    $events = (int) DB::table('events')->where('tenant_id', $tenantId)->count();
+                } catch (\Exception $e) { /* table may not exist */ }
 
-            return $this->respondWithData([
-                'members'  => $members,
-                'listings' => $listings,
-                'events'   => $events,
-                'groups'   => $groups,
-            ]);
+                $groups = 0;
+                try {
+                    $groups = (int) DB::table('groups')->where('tenant_id', $tenantId)->count();
+                } catch (\Exception $e) { /* table may not exist */ }
+
+                return [
+                    'members'  => $members,
+                    'listings' => $listings,
+                    'events'   => $events,
+                    'groups'   => $groups,
+                ];
+            });
+
+            return $this->respondWithData($stats);
         } catch (\Throwable $e) {
             report($e);
             return $this->respondWithError('INTERNAL_ERROR', 'Failed to load community stats', null, 500);
@@ -78,7 +85,7 @@ class FeedSidebarController extends BaseApiController
                         $q->where('requester_id', $userId)
                           ->orWhere('receiver_id', $userId);
                     })
-                    ->select(DB::raw("CASE WHEN requester_id = {$userId} THEN receiver_id ELSE requester_id END as connected_id"))
+                    ->selectRaw("CASE WHEN requester_id = ? THEN receiver_id ELSE requester_id END as connected_id", [$userId])
                     ->pluck('connected_id')
                     ->all();
                 $connectedIds = array_merge($connectedIds, array_map('intval', $connections));
@@ -130,15 +137,19 @@ class FeedSidebarController extends BaseApiController
 
         $data = [];
 
-        // 1. Community stats
+        // 1. Community stats (cached — these rarely change and run 4 COUNT queries)
         try {
-            $stats = [
-                'members'  => (int) DB::table('users')->where('tenant_id', $tenantId)->count(),
-                'listings' => (int) DB::table('listings')->where('tenant_id', $tenantId)->where('status', 'active')->count(),
-            ];
-            try { $stats['events'] = (int) DB::table('events')->where('tenant_id', $tenantId)->count(); } catch (\Exception $e) { $stats['events'] = 0; }
-            try { $stats['groups'] = (int) DB::table('groups')->where('tenant_id', $tenantId)->count(); } catch (\Exception $e) { $stats['groups'] = 0; }
-            $data['community_stats'] = $stats;
+            $cacheKey = "sidebar_community_stats:{$tenantId}";
+
+            $data['community_stats'] = Cache::remember($cacheKey, 120, function () use ($tenantId) {
+                $stats = [
+                    'members'  => (int) DB::table('users')->where('tenant_id', $tenantId)->count(),
+                    'listings' => (int) DB::table('listings')->where('tenant_id', $tenantId)->where('status', 'active')->count(),
+                ];
+                try { $stats['events'] = (int) DB::table('events')->where('tenant_id', $tenantId)->count(); } catch (\Exception $e) { $stats['events'] = 0; }
+                try { $stats['groups'] = (int) DB::table('groups')->where('tenant_id', $tenantId)->count(); } catch (\Exception $e) { $stats['groups'] = 0; }
+                return $stats;
+            });
         } catch (\Throwable $e) {
             $data['community_stats'] = ['members' => 0, 'listings' => 0, 'events' => 0, 'groups' => 0];
         }
@@ -225,7 +236,9 @@ class FeedSidebarController extends BaseApiController
             // 6. Friends (connections)
             try {
                 $data['friends'] = DB::table('connections as c')
-                    ->join('users as u', DB::raw("CASE WHEN c.requester_id = {$userId} THEN c.receiver_id ELSE c.requester_id END"), '=', 'u.id')
+                    ->join('users as u', function ($join) use ($userId) {
+                        $join->whereRaw("u.id = CASE WHEN c.requester_id = ? THEN c.receiver_id ELSE c.requester_id END", [$userId]);
+                    })
                     ->where(function ($q) use ($userId) {
                         $q->where('c.requester_id', $userId)->orWhere('c.receiver_id', $userId);
                     })
@@ -268,7 +281,7 @@ class FeedSidebarController extends BaseApiController
                         ->where(function ($q) use ($userId) {
                             $q->where('requester_id', $userId)->orWhere('receiver_id', $userId);
                         })
-                        ->select(DB::raw("CASE WHEN requester_id = {$userId} THEN receiver_id ELSE requester_id END as cid"))
+                        ->selectRaw("CASE WHEN requester_id = ? THEN receiver_id ELSE requester_id END as cid", [$userId])
                         ->pluck('cid')
                         ->all();
                     $connectedIds = array_merge($connectedIds, array_map('intval', $cids));

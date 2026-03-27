@@ -63,6 +63,7 @@ class StreakService
     {
         return UserStreak::query()
             ->join('users', 'user_streaks.user_id', '=', 'users.id')
+            ->where('users.tenant_id', $tenantId)
             ->where('user_streaks.streak_type', 'login')
             ->where('user_streaks.current_streak', '>', 0)
             ->select([

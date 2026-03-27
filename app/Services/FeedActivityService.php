@@ -7,6 +7,7 @@
 namespace App\Services;
 
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use App\Core\TenantContext;
 
 /**
@@ -24,7 +25,7 @@ class FeedActivityService
     private const VALID_TYPES = [
         'post', 'listing', 'event', 'poll', 'goal',
         'review', 'job', 'challenge', 'volunteer',
-        'blog', 'discussion',
+        'blog', 'discussion', 'badge_earned', 'level_up',
     ];
 
     public function __construct()
@@ -72,7 +73,7 @@ class FeedActivityService
             );
             return true;
         } catch (\Exception $e) {
-            error_log("FeedActivityService::logActivity error: " . $e->getMessage());
+            Log::error("FeedActivityService::logActivity error: " . $e->getMessage());
             return false;
         }
     }
@@ -105,7 +106,7 @@ class FeedActivityService
     public function recordActivity(int $tenantId, int $userId, string $sourceType, int $sourceId, array $data = []): void
     {
         if (!in_array($sourceType, self::VALID_TYPES, true)) {
-            error_log("FeedActivityService::recordActivity invalid source_type: {$sourceType}");
+            Log::error("FeedActivityService::recordActivity invalid source_type: {$sourceType}");
             return;
         }
 

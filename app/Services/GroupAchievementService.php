@@ -6,6 +6,7 @@
 
 namespace App\Services;
 
+use App\Core\TenantContext;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
@@ -63,10 +64,25 @@ class GroupAchievementService
     }
 
     /**
+     * Verify a group belongs to the current tenant.
+     */
+    private static function verifyGroupTenant(int $groupId): bool
+    {
+        return DB::table('groups')
+            ->where('id', $groupId)
+            ->where('tenant_id', TenantContext::getId())
+            ->exists();
+    }
+
+    /**
      * Get all achievements for a group with progress info.
      */
     public static function getGroupAchievements($groupId)
     {
+        if (!self::verifyGroupTenant((int) $groupId)) {
+            return [];
+        }
+
         $earned = self::getEarnedAchievements($groupId);
         $earnedKeys = array_column($earned, 'achievement_key');
 
@@ -146,6 +162,10 @@ class GroupAchievementService
      */
     public static function getEarnedAchievements($groupId)
     {
+        if (!self::verifyGroupTenant((int) $groupId)) {
+            return [];
+        }
+
         try {
             return array_map(
                 fn ($row) => (array) $row,
@@ -168,6 +188,10 @@ class GroupAchievementService
      */
     public static function checkAndAwardAchievements($groupId)
     {
+        if (!self::verifyGroupTenant((int) $groupId)) {
+            return [];
+        }
+
         $newAchievements = [];
 
         foreach (self::GROUP_ACHIEVEMENTS as $key => $achievement) {
@@ -200,6 +224,10 @@ class GroupAchievementService
      */
     public static function awardAchievement($groupId, $achievementKey, $achievement)
     {
+        if (!self::verifyGroupTenant((int) $groupId)) {
+            return false;
+        }
+
         try {
             DB::table('group_achievement_progress')->updateOrInsert(
                 ['group_id' => $groupId, 'achievement_key' => $achievementKey],

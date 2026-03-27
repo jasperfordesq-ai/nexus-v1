@@ -77,6 +77,13 @@ class FeedController extends BaseApiController
 
         $post = $this->feedService->createPost($userId, $this->getAllInput());
 
+        // Award XP for creating a post
+        try {
+            \App\Services\GamificationService::awardXP($userId, \App\Services\GamificationService::XP_VALUES['create_post'], 'create_post', 'Created a feed post');
+        } catch (\Throwable $e) {
+            \Log::warning('Gamification XP award failed', ['action' => 'create_post', 'user' => $userId, 'error' => $e->getMessage()]);
+        }
+
         return $this->respondWithData($post, null, 201);
     }
 
@@ -110,6 +117,7 @@ class FeedController extends BaseApiController
     public function hidePost(): JsonResponse
     {
         $userId = $this->requireAuth();
+        $this->rateLimit('feed_moderate', 30, 60);
 
         $postId = (int) ($this->input('post_id', 0));
 
@@ -121,6 +129,7 @@ class FeedController extends BaseApiController
             DB::table('user_hidden_posts')->insertOrIgnore([
                 'user_id'    => $userId,
                 'post_id'    => $postId,
+                'tenant_id'  => $this->getTenantId(),
                 'created_at' => now(),
             ]);
 
@@ -140,6 +149,7 @@ class FeedController extends BaseApiController
     public function muteUser(): JsonResponse
     {
         $userId = $this->requireAuth();
+        $this->rateLimit('feed_moderate', 30, 60);
 
         $mutedUserId = (int) ($this->input('user_id', 0));
 
@@ -151,6 +161,7 @@ class FeedController extends BaseApiController
             DB::table('user_muted_users')->insertOrIgnore([
                 'user_id'       => $userId,
                 'muted_user_id' => $mutedUserId,
+                'tenant_id'     => $this->getTenantId(),
                 'created_at'    => now(),
             ]);
 
@@ -170,12 +181,23 @@ class FeedController extends BaseApiController
     public function reportPost(): JsonResponse
     {
         $userId = $this->requireAuth();
+        $this->rateLimit('feed_moderate', 30, 60);
 
         $postId = (int) ($this->input('post_id', 0));
         $targetType = $this->input('target_type', 'post');
 
         if ($postId <= 0) {
             return $this->respondWithError('INVALID_INPUT', 'Invalid post ID');
+        }
+
+        // Prevent duplicate reports from the same user
+        $existing = DB::table('reports')
+            ->where('target_id', $postId)
+            ->where('reporter_id', $userId)
+            ->where('tenant_id', $this->getTenantId())
+            ->exists();
+        if ($existing) {
+            return $this->respondWithError('DUPLICATE', 'Already reported', null, 409);
         }
 
         try {

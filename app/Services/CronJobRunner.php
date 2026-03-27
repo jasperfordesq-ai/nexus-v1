@@ -2009,8 +2009,8 @@ class CronJobRunner
             $this->forEachTenant(function ($tenantId, $slug) {
                 if (!TenantContext::hasFeature('gamification')) return;
 
-                $result = GamificationEmailService::sendWeeklyDigests();
-                echo "   [$slug] Sent {$result['sent']}, skipped {$result['skipped']}, failed {$result['failed']}.\n";
+                $result = app(GamificationEmailService::class)->sendWeeklyDigests();
+                echo "   [$slug] Sent {$result['sent']}, skipped {$result['skipped']}, errors {$result['errors']}.\n";
             });
             echo "   Gamification weekly digest complete.\n";
         } catch (\Throwable $e) {

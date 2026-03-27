@@ -904,7 +904,7 @@ export function ChallengeDetailPage() {
             {isAdmin && (
               <Dropdown>
                 <DropdownTrigger>
-                  <Button isIconOnly variant="flat" size="sm" aria-label="Challenge actions">
+                  <Button isIconOnly variant="flat" size="sm" aria-label={t('challenge_detail.actions', { defaultValue: 'Challenge actions' })}>
                     <MoreVertical className="w-4 h-4" />
                   </Button>
                 </DropdownTrigger>

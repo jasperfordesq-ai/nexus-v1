@@ -167,7 +167,7 @@ export function GamificationAnalytics() {
             <div>
               <h3 className="text-lg font-semibold text-foreground">{t('gamification.badge_catalogue')}</h3>
               <p className="text-sm text-default-500">
-                {badges.length} total badges ({builtInBadges.length} built-in, {customBadges.length} custom)
+                {t('gamification.total_badges', { total: badges.length, builtIn: builtInBadges.length, custom: customBadges.length, defaultValue: '{{total}} total badges ({{builtIn}} built-in, {{custom}} custom)' })}
               </p>
             </div>
           </CardHeader>
@@ -188,18 +188,18 @@ export function GamificationAnalytics() {
                       <span className="text-sm font-medium text-foreground truncate">{badge.name}</span>
                       {badge.type === 'custom' && (
                         <span className="text-[10px] uppercase tracking-wider text-success bg-success/10 px-1.5 py-0.5 rounded font-semibold">
-                          Custom
+                          {t('gamification.custom', { defaultValue: 'Custom' })}
                         </span>
                       )}
                     </div>
                     <span className="text-xs text-default-500 whitespace-nowrap">
-                      {badge.awarded_count} awarded
+                      {t('gamification.awarded_count', { count: badge.awarded_count, defaultValue: '{{count}} awarded' })}
                     </span>
                   </div>
                 ))}
                 {badges.length > 20 && (
                   <p className="text-center text-xs text-default-400 pt-2">
-                    and {badges.length - 20} more...
+                    {t('gamification.and_more', { count: badges.length - 20, defaultValue: 'and {{count}} more...' })}
                   </p>
                 )}
               </div>

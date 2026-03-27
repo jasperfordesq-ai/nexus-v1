@@ -126,11 +126,21 @@ class AdminFeedController extends BaseApiController
                     COALESCE(NULLIF(u.name, ''), CONCAT(u.first_name, ' ', u.last_name)) as user_name,
                     u.avatar_url as user_avatar,
                     t.name as tenant_name,
-                    (SELECT COUNT(*) FROM comments WHERE target_type = fa.source_type AND target_id = fa.source_id AND tenant_id = fa.tenant_id) as comments_count,
-                    (SELECT COUNT(*) FROM likes WHERE target_type = fa.source_type AND target_id = fa.source_id AND tenant_id = fa.tenant_id) as likes_count
+                    COALESCE(cc.comments_count, 0) as comments_count,
+                    COALESCE(lc.likes_count, 0) as likes_count
              FROM feed_activity fa
              LEFT JOIN users u ON fa.user_id = u.id
              LEFT JOIN tenants t ON fa.tenant_id = t.id
+             LEFT JOIN (
+                 SELECT target_type, target_id, tenant_id, COUNT(*) as comments_count
+                 FROM comments
+                 GROUP BY target_type, target_id, tenant_id
+             ) cc ON cc.target_type = fa.source_type AND cc.target_id = fa.source_id AND cc.tenant_id = fa.tenant_id
+             LEFT JOIN (
+                 SELECT target_type, target_id, tenant_id, COUNT(*) as likes_count
+                 FROM likes
+                 GROUP BY target_type, target_id, tenant_id
+             ) lc ON lc.target_type = fa.source_type AND lc.target_id = fa.source_id AND lc.tenant_id = fa.tenant_id
              WHERE {$where}
              ORDER BY fa.created_at DESC
              LIMIT ? OFFSET ?",

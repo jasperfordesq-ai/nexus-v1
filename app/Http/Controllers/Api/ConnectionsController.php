@@ -159,6 +159,17 @@ class ConnectionsController extends BaseApiController
             return $this->respondWithError('NOT_FOUND', 'Connection request not found', null, 404);
         }
 
+        // Award XP to both users for making a connection
+        try {
+            \App\Services\GamificationService::awardXP($userId, \App\Services\GamificationService::XP_VALUES['make_connection'], 'make_connection', 'Accepted a connection');
+            $otherUserId = ($connection->sender_id === $userId) ? $connection->receiver_id : $connection->sender_id;
+            \App\Services\GamificationService::awardXP($otherUserId, \App\Services\GamificationService::XP_VALUES['make_connection'], 'make_connection', 'Connection accepted');
+            \App\Services\GamificationService::runAllBadgeChecks($userId);
+            \App\Services\GamificationService::runAllBadgeChecks($otherUserId);
+        } catch (\Throwable $e) {
+            \Log::warning('Gamification XP award failed', ['action' => 'make_connection', 'user' => $userId, 'error' => $e->getMessage()]);
+        }
+
         return $this->respondWithData([
             'connection_id' => $connection->id,
             'status'        => 'connected',

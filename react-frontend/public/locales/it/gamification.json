@@ -95,7 +95,8 @@
       "save_failed_desc": "Impossibile aggiornare la vetrina.",
       "save_error": "Si è verificato un errore."
     },
-    "loading": "Caricamento traguardi"
+    "loading": "Caricamento traguardi",
+    "load_error": "Impossibile caricare i risultati. Riprova."
   },
   "goals": {
     "page_title": "Obiettivi",
@@ -222,6 +223,11 @@
       "load_failed_desc": "Impossibile caricare la cronologia delle stagioni.",
       "loading": "Caricamento stagione"
     },
+    "season_unavailable": "Dati della stagione non disponibili",
+    "season_unavailable_desc": "Impossibile caricare le informazioni sulla stagione. Le classifiche qui sotto sono ancora disponibili.",
+    "session_expired": "La sessione è scaduta. Effettua nuovamente l'accesso.",
+    "load_error": "Impossibile caricare la classifica. Riprova.",
+    "type_nexus_score": "NexusScore",
     "loading": "Caricamento classifica"
   }
 }

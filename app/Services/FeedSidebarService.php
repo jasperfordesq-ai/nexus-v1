@@ -7,6 +7,7 @@
 namespace App\Services;
 
 use App\Core\TenantContext;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 
 /**
@@ -23,14 +24,17 @@ class FeedSidebarService
     public function communityStats(): array
     {
         $tenantId = TenantContext::getId();
+        $cacheKey = "feed_sidebar_stats:{$tenantId}";
 
-        return [
-            'total_members'    => (int) DB::table('users')->where('tenant_id', $tenantId)->where('status', 'active')->count(),
-            'total_hours'      => (float) DB::table('transactions')->where('tenant_id', $tenantId)->where('status', 'completed')->sum('amount'),
-            'total_listings'   => (int) DB::table('listings')->where('tenant_id', $tenantId)->where(fn ($q) => $q->whereNull('status')->orWhere('status', 'active'))->count(),
-            'total_events'     => (int) DB::table('events')->where('tenant_id', $tenantId)->where('status', 'published')->count(),
-            'active_exchanges' => (int) DB::table('exchange_requests')->where('tenant_id', $tenantId)->whereIn('status', ['accepted', 'in_progress'])->count(),
-        ];
+        return Cache::remember($cacheKey, 120, function () use ($tenantId) {
+            return [
+                'total_members'    => (int) DB::table('users')->where('tenant_id', $tenantId)->where('status', 'active')->count(),
+                'total_hours'      => (float) DB::table('transactions')->where('tenant_id', $tenantId)->where('status', 'completed')->sum('amount'),
+                'total_listings'   => (int) DB::table('listings')->where('tenant_id', $tenantId)->where(fn ($q) => $q->whereNull('status')->orWhere('status', 'active'))->count(),
+                'total_events'     => (int) DB::table('events')->where('tenant_id', $tenantId)->where('status', 'published')->count(),
+                'active_exchanges' => (int) DB::table('exchange_requests')->where('tenant_id', $tenantId)->whereIn('status', ['accepted', 'in_progress'])->count(),
+            ];
+        });
     }
 
     /**

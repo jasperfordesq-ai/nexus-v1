@@ -147,6 +147,32 @@ class ReviewsController extends BaseApiController
             return $this->respondWithError($code, $msg, null, $status);
         }
 
+        // Award XP for leaving a review
+        try {
+            \App\Services\GamificationService::awardXP($userId, \App\Services\GamificationService::XP_VALUES['leave_review'], 'leave_review', 'Left a review');
+        } catch (\Throwable $e) {
+            \Log::warning('Gamification XP award failed', ['action' => 'leave_review', 'user' => $userId, 'error' => $e->getMessage()]);
+        }
+
+        // Record feed activity
+        try {
+            app(\App\Services\FeedActivityService::class)->recordActivity(
+                \App\Core\TenantContext::getId(),
+                $userId,
+                'review',
+                (int) ($review['id'] ?? 0),
+                [
+                    'content'  => $review['comment'] ?? null,
+                    'metadata' => [
+                        'rating'      => $review['rating'] ?? null,
+                        'receiver_id' => $review['receiver_id'] ?? null,
+                    ],
+                ]
+            );
+        } catch (\Throwable $e) {
+            \Log::warning('Feed activity recording failed', ['type' => 'review', 'id' => $review['id'] ?? 0, 'error' => $e->getMessage()]);
+        }
+
         return $this->respondWithData($review, null, 201);
     }
 

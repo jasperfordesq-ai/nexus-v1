@@ -23,14 +23,17 @@ class FeedSocialService
      */
     public function sharePost(int $postId, int $userId, ?string $comment = null): int
     {
-        $shareId = DB::table('feed_shares')->insertGetId([
-            'post_id'    => $postId,
-            'user_id'    => $userId,
-            'comment'    => $comment,
-            'created_at' => now(),
+        $tenantId = TenantContext::getId();
+
+        $shareId = DB::table('post_shares')->insertGetId([
+            'original_post_id' => $postId,
+            'user_id'          => $userId,
+            'tenant_id'        => $tenantId,
+            'comment'          => $comment,
+            'created_at'       => now(),
         ]);
 
-        DB::table('feed_posts')->where('id', $postId)->where('tenant_id', TenantContext::getId())->increment('share_count');
+        DB::table('feed_posts')->where('id', $postId)->where('tenant_id', $tenantId)->increment('share_count');
 
         return $shareId;
     }
@@ -41,13 +44,16 @@ class FeedSocialService
     public function getTrendingHashtags(int $days = 7, int $limit = 10): array
     {
         $since = now()->subDays($days);
+        $tenantId = TenantContext::getId();
 
-        return DB::table('feed_hashtags as fh')
-            ->join('feed_posts as fp', 'fh.post_id', '=', 'fp.id')
-            ->where('fp.tenant_id', TenantContext::getId())
+        return DB::table('post_hashtags as ph')
+            ->join('hashtags as h', 'ph.hashtag_id', '=', 'h.id')
+            ->join('feed_posts as fp', 'ph.post_id', '=', 'fp.id')
+            ->where('ph.tenant_id', $tenantId)
+            ->where('fp.tenant_id', $tenantId)
             ->where('fp.created_at', '>=', $since)
-            ->select('fh.hashtag', DB::raw('COUNT(*) as usage_count'))
-            ->groupBy('fh.hashtag')
+            ->select('h.tag as hashtag', DB::raw('COUNT(*) as usage_count'))
+            ->groupBy('h.tag')
             ->orderByDesc('usage_count')
             ->limit($limit)
             ->get()
@@ -64,12 +70,15 @@ class FeedSocialService
     {
         $limit = min((int) ($filters['limit'] ?? 20), 100);
         $cursor = $filters['cursor'] ?? null;
+        $tenantId = TenantContext::getId();
 
         $query = DB::table('feed_posts as fp')
-            ->join('feed_hashtags as fh', 'fp.id', '=', 'fh.post_id')
+            ->join('post_hashtags as ph', 'fp.id', '=', 'ph.post_id')
+            ->join('hashtags as h', 'ph.hashtag_id', '=', 'h.id')
             ->leftJoin('users as u', 'fp.user_id', '=', 'u.id')
-            ->where('fp.tenant_id', TenantContext::getId())
-            ->where('fh.hashtag', strtolower(ltrim($hashtag, '#')))
+            ->where('fp.tenant_id', $tenantId)
+            ->where('ph.tenant_id', $tenantId)
+            ->where('h.tag', strtolower(ltrim($hashtag, '#')))
             ->select('fp.*', 'u.first_name', 'u.last_name', 'u.avatar_url');
 
         if ($cursor !== null) {

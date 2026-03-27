@@ -116,7 +116,7 @@ class EmailVerificationController extends BaseApiController
         // Award gamification points if available
         try {
             if (class_exists('\App\Models\Gamification')) {
-                \App\Models\Gamification::awardPoints($userId, 10, 'Verified email address');
+                \App\Models\Gamification::awardPoints($userId, 'email_verified', 10, 'Verified email address');
             }
         } catch (\Throwable $e) {
             // Gamification is optional

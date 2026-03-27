@@ -20,7 +20,7 @@ class Gamification extends Model
     // Legacy Gamification model is a utility class that updates users.points
     // There is no dedicated gamification table — XP is tracked on the users table
     // This model maps to the gamification_actions table for action logging
-    protected $table = 'gamification_actions';
+    protected $table = 'gamifications';
 
     protected $fillable = [
         'tenant_id',
@@ -51,7 +51,7 @@ class Gamification extends Model
                 ->where('id', $userId)
                 ->where('tenant_id', $tenantId)
                 ->update([
-                    'points' => DB::raw("points + {$points}"),
+                    'points' => DB::raw('points + ' . (int) $points),
                 ]);
         } catch (\Exception $e) {
             // Column may not exist — silently fail

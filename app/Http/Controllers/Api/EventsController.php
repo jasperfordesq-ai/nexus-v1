@@ -173,6 +173,31 @@ class EventsController extends BaseApiController
 
         $event = $this->eventService->getById($eventId, $userId);
 
+        // Award XP for creating an event
+        try {
+            \App\Services\GamificationService::awardXP($userId, \App\Services\GamificationService::XP_VALUES['create_event'], 'create_event', 'Created an event');
+        } catch (\Throwable $e) {
+            \Log::warning('Gamification XP award failed', ['action' => 'create_event', 'user' => $userId, 'error' => $e->getMessage()]);
+        }
+
+        // Record feed activity
+        try {
+            app(\App\Services\FeedActivityService::class)->recordActivity(
+                TenantContext::getId(),
+                $userId,
+                'event',
+                $eventId,
+                [
+                    'title'    => $data['title'] ?? null,
+                    'content'  => $data['description'] ?? null,
+                    'image_url' => $event['image_url'] ?? null,
+                    'group_id' => $data['group_id'] ?? null,
+                ]
+            );
+        } catch (\Throwable $e) {
+            \Log::warning('Feed activity recording failed', ['type' => 'event', 'id' => $eventId, 'error' => $e->getMessage()]);
+        }
+
         return $this->respondWithData($event, null, 201);
     }
 
@@ -308,6 +333,15 @@ class EventsController extends BaseApiController
             $this->eventNotificationService->notifyRsvp($id, $userId, $status);
         } catch (\Throwable $e) {
             error_log("RSVP notification error: " . $e->getMessage());
+        }
+
+        // Award XP when user RSVPs as 'going'
+        if ($status === 'going') {
+            try {
+                \App\Services\GamificationService::awardXP($userId, \App\Services\GamificationService::XP_VALUES['attend_event'], 'attend_event', 'RSVPed to an event');
+            } catch (\Throwable $e) {
+                \Log::warning('Gamification XP award failed', ['action' => 'attend_event', 'user' => $userId, 'error' => $e->getMessage()]);
+            }
         }
 
         return $this->respondWithData([

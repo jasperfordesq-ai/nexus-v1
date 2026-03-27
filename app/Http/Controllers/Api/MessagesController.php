@@ -128,6 +128,13 @@ class MessagesController extends BaseApiController
             return $this->respondWithErrors($errors, 422);
         }
 
+        // Award XP for sending a message
+        try {
+            \App\Services\GamificationService::awardXP($userId, \App\Services\GamificationService::XP_VALUES['send_message'], 'send_message', 'Sent a message');
+        } catch (\Throwable $e) {
+            \Log::warning('Gamification XP award failed', ['action' => 'send_message', 'user' => $userId, 'error' => $e->getMessage()]);
+        }
+
         return $this->respondWithData($message, null, 201);
     }
 

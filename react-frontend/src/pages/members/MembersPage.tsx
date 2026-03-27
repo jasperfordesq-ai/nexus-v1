@@ -10,7 +10,7 @@
 import { useState, useEffect, useCallback, useRef, memo } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Input, Select, SelectItem, Avatar, Button, Chip } from '@heroui/react';
+import { Input, Select, SelectItem, Avatar, Button, Chip, Tooltip } from '@heroui/react';
 import {
   Search,
   Users,
@@ -31,7 +31,7 @@ import { GlassCard, MemberCardSkeleton, AlgorithmLabel } from '@/components/ui';
 import { PresenceIndicator } from '@/components/social';
 import { EntityMapView } from '@/components/location';
 import { EmptyState } from '@/components/feedback';
-import { useAuth, useToast, useTenant } from '@/contexts';
+import { useAuth, useToast, useTenant, useFeature } from '@/contexts';
 import { usePresenceOptional } from '@/contexts/PresenceContext';
 import { api } from '@/lib/api';
 import { MAPS_ENABLED } from '@/lib/map-config';
@@ -555,10 +555,15 @@ interface MemberCardProps {
 const MemberCard = memo(function MemberCard({ member, viewMode }: MemberCardProps) {
   const { t } = useTranslation('common');
   const { tenantPath } = useTenant();
+  const hasGamification = useFeature('gamification');
+
   // Handle empty names gracefully - fallback to "Member" or first_name/last_name
   const displayName = member.name?.trim()
     || `${member.first_name || ''} ${member.last_name || ''}`.trim()
     || t('members.fallback_name');
+
+  const level = member.level ?? 0;
+  const showcasedBadges = member.showcased_badges ?? [];
 
   if (viewMode === 'list') {
     return (
@@ -578,6 +583,20 @@ const MemberCard = memo(function MemberCard({ member, viewMode }: MemberCardProp
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-1.5">
                   <h3 className="font-semibold text-theme-primary">{displayName}</h3>
+                  {hasGamification && level > 0 && (
+                    <Chip size="sm" variant="flat" className="bg-indigo-100 dark:bg-indigo-900/40 text-indigo-700 dark:text-indigo-300 text-xs h-5 min-w-0">
+                      {t('common.level_short', { level, defaultValue: 'Lv. {{level}}' })}
+                    </Chip>
+                  )}
+                  {hasGamification && showcasedBadges.length > 0 && (
+                    <span className="flex items-center gap-0.5 ml-1" aria-label={t('members.showcased_badges', { defaultValue: 'Showcased badges' })}>
+                      {showcasedBadges.map((badge) => (
+                        <Tooltip key={badge.badge_key} content={badge.name}>
+                          <span className="text-base leading-none cursor-default" aria-label={badge.name}>{badge.icon || '🏆'}</span>
+                        </Tooltip>
+                      ))}
+                    </span>
+                  )}
                 </div>
                 {member.tagline && (
                   <p className="text-sm text-theme-subtle truncate">{member.tagline}</p>
@@ -622,7 +641,21 @@ const MemberCard = memo(function MemberCard({ member, viewMode }: MemberCardProp
           </div>
           <div className="flex items-center justify-center gap-1.5">
             <h3 className="font-semibold text-theme-primary">{displayName}</h3>
+            {hasGamification && level > 0 && (
+              <Chip size="sm" variant="flat" className="bg-indigo-100 dark:bg-indigo-900/40 text-indigo-700 dark:text-indigo-300 text-xs h-5 min-w-0">
+                {t('common.level_short', { level, defaultValue: 'Lv. {{level}}' })}
+              </Chip>
+            )}
           </div>
+          {hasGamification && showcasedBadges.length > 0 && (
+            <div className="flex items-center justify-center gap-1 mt-1.5" aria-label={t('members.showcased_badges', { defaultValue: 'Showcased badges' })}>
+              {showcasedBadges.map((badge) => (
+                <Tooltip key={badge.badge_key} content={badge.name}>
+                  <span className="text-lg leading-none cursor-default" aria-label={badge.name}>{badge.icon || '🏆'}</span>
+                </Tooltip>
+              ))}
+            </div>
+          )}
           {member.tagline && (
             <p className="text-sm text-theme-subtle line-clamp-1 mt-1">{member.tagline}</p>
           )}

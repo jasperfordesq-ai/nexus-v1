@@ -194,7 +194,7 @@ export function CreateBadge() {
               variant="bordered"
             >
               {ICON_OPTIONS.map((opt) => (
-                <SelectItem key={opt.key}>{opt.label}</SelectItem>
+                <SelectItem key={opt.key}>{t(`gamification.icon_${opt.key}`, { defaultValue: opt.label })}</SelectItem>
               ))}
             </Select>
 
@@ -208,7 +208,7 @@ export function CreateBadge() {
               variant="bordered"
             >
               {CATEGORY_OPTIONS.map((opt) => (
-                <SelectItem key={opt.key}>{opt.label}</SelectItem>
+                <SelectItem key={opt.key}>{t(`gamification.category_${opt.key}`, { defaultValue: opt.label })}</SelectItem>
               ))}
             </Select>
           </div>

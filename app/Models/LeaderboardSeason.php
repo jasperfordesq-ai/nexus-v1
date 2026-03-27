@@ -9,31 +9,32 @@ namespace App\Models;
 use App\Models\Concerns\HasTenantScope;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 
-class Challenge extends Model
+class LeaderboardSeason extends Model
 {
     use HasFactory, HasTenantScope;
 
-    protected $table = 'challenges';
+    protected $table = 'leaderboard_seasons';
+
+    const UPDATED_AT = null;
 
     protected $fillable = [
-        'tenant_id', 'title', 'description', 'challenge_type', 'action_type',
-        'target_count', 'xp_reward', 'badge_reward',
-        'start_date', 'end_date',
+        'tenant_id',
+        'name',
+        'season_type',
+        'start_date',
+        'end_date',
         'is_active',
+        'is_finalized',
+        'status',
+        'rewards',
     ];
 
     protected $casts = [
-        'target_count' => 'integer',
-        'xp_reward' => 'integer',
-        'is_active' => 'boolean',
         'start_date' => 'date',
         'end_date' => 'date',
+        'is_active' => 'boolean',
+        'is_finalized' => 'boolean',
+        'rewards' => 'array',
     ];
-
-    public function progress(): HasMany
-    {
-        return $this->hasMany(UserChallengeProgress::class);
-    }
 }

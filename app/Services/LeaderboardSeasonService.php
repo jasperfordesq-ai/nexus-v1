@@ -69,7 +69,7 @@ class LeaderboardSeasonService
         }
 
         if (empty($rankings)) {
-            $season = DB::table('leaderboard_seasons')->where('id', $seasonId)->first();
+            $season = DB::table('leaderboard_seasons')->where('id', $seasonId)->where('tenant_id', TenantContext::getId())->first();
             if ($season) {
                 $rankings = $this->calculateSeasonRankings($tenantId);
             }
@@ -123,6 +123,25 @@ class LeaderboardSeasonService
                          ON DUPLICATE KEY UPDATE final_rank = ?, rewards_claimed = 1",
                         [$seasonId, $userId, $seasonXp, $position, $position]
                     );
+
+                    // Actually award XP and badges to the user
+                    try {
+                        if (!empty($reward['xp']) && (int) $reward['xp'] > 0) {
+                            $description = sprintf('Season reward — rank #%d in "%s"', $position, $season->name);
+                            GamificationService::awardXP($userId, (int) $reward['xp'], 'season_reward', $description);
+                        }
+
+                        if (!empty($reward['badge'])) {
+                            GamificationService::awardBadgeByKey($userId, $reward['badge']);
+                        }
+                    } catch (\Throwable $e) {
+                        Log::warning('[LeaderboardSeason] Reward distribution failed', [
+                            'user_id' => $userId,
+                            'season_id' => $seasonId,
+                            'rank' => $position,
+                            'error' => $e->getMessage(),
+                        ]);
+                    }
                 }
             }
 

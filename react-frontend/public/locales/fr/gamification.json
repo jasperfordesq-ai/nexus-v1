@@ -95,7 +95,8 @@
       "save_failed_desc": "Impossible de mettre à jour la vitrine.",
       "save_error": "Une erreur est survenue."
     },
-    "loading": "Loading achievements"
+    "loading": "Loading achievements",
+    "load_error": "Échec du chargement des réalisations. Veuillez réessayer."
   },
   "goals": {
     "page_title": "Objectifs",
@@ -222,6 +223,11 @@
       "load_failed_desc": "Impossible de charger l'historique des saisons.",
       "loading": "Loading season"
     },
+    "season_unavailable": "Données de saison indisponibles",
+    "season_unavailable_desc": "Impossible de charger les informations de saison. Le classement ci-dessous est toujours disponible.",
+    "session_expired": "Votre session a expiré. Veuillez vous reconnecter.",
+    "load_error": "Échec du chargement du classement. Veuillez réessayer.",
+    "type_nexus_score": "NexusScore",
     "loading": "Loading leaderboard"
   }
 }

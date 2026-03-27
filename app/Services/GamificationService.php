@@ -6,6 +6,7 @@
 
 namespace App\Services;
 
+use App\Core\TenantContext;
 use App\Models\Connection;
 use App\Models\Event;
 use App\Models\EventRsvp;
@@ -23,6 +24,8 @@ use App\Models\UserXpLog;
 use App\Models\VolLog;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use App\Services\FeedActivityService;
+use App\Services\GamificationRealtimeService;
 
 /**
  * GamificationService — Eloquent-based service for gamification.
@@ -56,6 +59,9 @@ class GamificationService
     public const LEVEL_THRESHOLDS = [
         1 => 0, 2 => 100, 3 => 300, 4 => 600, 5 => 1000,
         6 => 1500, 7 => 2200, 8 => 3000, 9 => 4000, 10 => 5500,
+        11 => 7500, 12 => 10000, 13 => 13000, 14 => 16500, 15 => 20500,
+        16 => 25000, 17 => 30000, 18 => 36000, 19 => 43000, 20 => 51000,
+        21 => 60000, 22 => 70000, 23 => 82000, 24 => 95000, 25 => 110000,
     ];
 
     /**
@@ -192,31 +198,26 @@ class GamificationService
      */
     public static function claimDailyReward(int $userId, ?int $tenantId = null): ?array
     {
-        $today = now()->toDateString();
+        // Delegate to DailyRewardService — the canonical daily reward implementation
+        // with streak tracking, milestone bonuses, and proper tenant scoping.
+        $tenantId = $tenantId ?? TenantContext::getId();
+        $result = DailyRewardService::claim($tenantId, $userId);
 
-        $alreadyClaimed = DB::table('activity_log')
-            ->where('user_id', $userId)
-            ->where('action_type', 'daily_login')
-            ->whereDate('created_at', $today)
-            ->exists();
-
-        if ($alreadyClaimed) {
+        if ($result === null) {
             return null;
         }
 
-        $xp = self::XP_VALUES['daily_login'];
-
-        User::query()->where('id', $userId)->increment('xp', $xp);
-
-        DB::table('activity_log')->insert([
-            'user_id'     => $userId,
-            'action'      => 'Claimed daily login reward',
-            'action_type' => 'daily_login',
-            'created_at'  => now(),
-            'updated_at'  => now(),
-        ]);
-
-        return ['claimed' => true, 'reward' => ['xp' => $xp]];
+        // Adapt return format for callers expecting the legacy shape
+        return [
+            'claimed'         => true,
+            'reward'          => [
+                'xp'              => $result['xp_earned'],
+                'base_xp'         => $result['base_xp'],
+                'milestone_bonus' => $result['milestone_bonus'],
+                'streak_day'      => $result['streak_day'],
+                'longest_streak'  => $result['longest_streak'],
+            ],
+        ];
     }
 
     // =========================================================================
@@ -393,7 +394,7 @@ class GamificationService
             'badge_key' => $badge['key'],
             'name'      => $badge['name'],
             'icon'      => $badge['icon'],
-        ])->save();
+        ]);
 
         // Create notification
         Notification::create([
@@ -402,6 +403,32 @@ class GamificationService
             'message' => "You earned the '{$badge['name']}' badge! {$badge['icon']}",
             'link'    => '/profile',
         ]);
+
+        // Broadcast badge earned event
+        try {
+            app(GamificationRealtimeService::class)->broadcastBadgeEarned($userId, $badge);
+        } catch (\Throwable $e) {
+            Log::debug('Gamification broadcast failed', ['error' => $e->getMessage()]);
+        }
+
+        // Create feed activity post for badge earned
+        try {
+            $tenantId = TenantContext::getId();
+            /** @var FeedActivityService $feedActivityService */
+            $feedActivityService = app(FeedActivityService::class);
+            $feedActivityService->logActivity($tenantId, $userId, 'badge_earned', [
+                'source_id' => 0,
+                'title' => $badge['name'],
+                'content' => "Earned the \"{$badge['name']}\" badge!",
+                'metadata' => [
+                    'badge_key' => $badge['key'],
+                    'badge_name' => $badge['name'],
+                    'badge_icon' => $badge['icon'],
+                ],
+            ]);
+        } catch (\Throwable $e) {
+            Log::warning('GamificationService: feed activity for badge_earned failed: ' . $e->getMessage());
+        }
 
         // Award XP for earning badge
         self::awardXP($userId, self::XP_VALUES['earn_badge'], 'earn_badge', "Badge: {$badge['name']}");
@@ -456,6 +483,13 @@ class GamificationService
                 User::query()->where('id', $userId)->increment('xp', $amount);
             });
 
+            // Broadcast XP gained event
+            try {
+                app(GamificationRealtimeService::class)->broadcastXPGained($userId, $amount, $action);
+            } catch (\Throwable $e) {
+                Log::debug('Gamification broadcast failed', ['error' => $e->getMessage()]);
+            }
+
             // Check for level up (outside transaction — non-critical)
             self::checkLevelUp($userId);
         } catch (\Throwable $e) {
@@ -490,6 +524,30 @@ class GamificationService
                     'link'    => '/profile',
                 ]);
 
+                // Broadcast level up event
+                try {
+                    app(GamificationRealtimeService::class)->broadcastLevelUp($userId, $newLevel);
+                } catch (\Throwable $e) {
+                    Log::debug('Gamification broadcast failed', ['error' => $e->getMessage()]);
+                }
+
+                // Create feed activity post for level up
+                try {
+                    $tenantId = TenantContext::getId();
+                    /** @var FeedActivityService $feedActivityService */
+                    $feedActivityService = app(FeedActivityService::class);
+                    $feedActivityService->logActivity($tenantId, $userId, 'level_up', [
+                        'source_id' => 0,
+                        'title' => "Level $newLevel",
+                        'content' => "Reached Level $newLevel!",
+                        'metadata' => [
+                            'new_level' => $newLevel,
+                        ],
+                    ]);
+                } catch (\Throwable $e) {
+                    Log::warning('GamificationService: feed activity for level_up failed: ' . $e->getMessage());
+                }
+
                 // Milestone bonus XP
                 $milestones = [5 => 50, 10 => 100, 15 => 150, 20 => 200, 25 => 300, 30 => 400, 50 => 500, 100 => 1000];
                 if (isset($milestones[$newLevel])) {
@@ -497,7 +555,7 @@ class GamificationService
                 }
 
                 // Check level badges
-                self::checkStreakBadges($userId, $newLevel);
+                self::checkLevelBadges($userId, $newLevel);
             }
         } catch (\Throwable $e) {
             Log::error('Level Up Check Error: ' . $e->getMessage());
@@ -554,13 +612,16 @@ class GamificationService
         self::checkListingBadges($userId);
         self::checkConnectionBadges($userId);
         self::checkMessageBadges($userId);
+        self::checkReviewBadges($userId);
         self::checkEventBadges($userId, 'attend');
         self::checkEventBadges($userId, 'host');
         self::checkGroupBadges($userId, 'join');
+        self::checkGroupBadges($userId, 'create');
         self::checkPostBadges($userId);
         self::checkLikesBadges($userId);
         self::checkProfileBadge($userId);
         self::checkMembershipBadges($userId);
+        self::checkVolOrgBadges($userId);
     }
 
     /**
@@ -570,6 +631,18 @@ class GamificationService
     {
         foreach (self::getStaticBadgeDefinitions() as $def) {
             if ($def['type'] === 'streak' && $streakLength >= $def['threshold']) {
+                self::awardBadge($userId, $def);
+            }
+        }
+    }
+
+    /**
+     * Check and award level badges.
+     */
+    public static function checkLevelBadges(int $userId, int $level): void
+    {
+        foreach (self::getStaticBadgeDefinitions() as $def) {
+            if ($def['type'] === 'level' && $level >= $def['threshold']) {
                 self::awardBadge($userId, $def);
             }
         }
@@ -797,6 +870,38 @@ class GamificationService
             if ($def['type'] === 'membership' && $days >= $def['threshold']) {
                 self::awardBadge($userId, $def);
             }
+        }
+    }
+
+    private static function checkReviewBadges(int $userId): void
+    {
+        $reviewsGiven = (int) Review::where('reviewer_id', $userId)->count();
+        $fiveStarReceived = (int) Review::where('receiver_id', $userId)->where('rating', 5)->count();
+
+        foreach (self::getStaticBadgeDefinitions() as $def) {
+            if ($def['type'] === 'review_given' && $reviewsGiven >= $def['threshold']) {
+                self::awardBadge($userId, $def);
+            }
+            if ($def['type'] === '5star' && $fiveStarReceived >= $def['threshold']) {
+                self::awardBadge($userId, $def);
+            }
+        }
+    }
+
+    private static function checkVolOrgBadges(int $userId): void
+    {
+        try {
+            $count = (int) DB::table('vol_organisations')
+                ->where('created_by', $userId)
+                ->count();
+
+            foreach (self::getStaticBadgeDefinitions() as $def) {
+                if ($def['type'] === 'vol_org' && $count >= $def['threshold']) {
+                    self::awardBadge($userId, $def);
+                }
+            }
+        } catch (\Throwable $e) {
+            // vol_organisations table may not exist
         }
     }
 

@@ -174,7 +174,7 @@ class AchievementAnalyticsService
             ->where('u.tenant_id', $tenantId)
             ->select([
                 'u.id', 'u.first_name', 'u.last_name', 'u.avatar_url', 'u.xp', 'u.level',
-                DB::raw('(SELECT COUNT(*) FROM user_badges WHERE user_id = u.id) as badge_count'),
+                DB::raw('(SELECT COUNT(*) FROM user_badges WHERE user_id = u.id AND tenant_id = ' . ((int) $tenantId) . ') as badge_count'),
             ])
             ->orderByDesc('u.xp')
             ->limit($limit)

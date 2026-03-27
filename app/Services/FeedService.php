@@ -31,6 +31,7 @@ class FeedService
         'polls' => 'poll', 'goals' => 'goal', 'jobs' => 'job',
         'challenges' => 'challenge', 'volunteering' => 'volunteer',
         'blogs' => 'blog', 'discussions' => 'discussion',
+        'badge_earned' => 'badge_earned', 'level_up' => 'level_up',
     ];
 
     public function __construct(
@@ -119,6 +120,65 @@ class FeedService
             );
         }
 
+        // Exclude admin-hidden posts
+        $query->where('feed_activity.is_hidden', false);
+
+        // Exclude posts hidden by current user (both legacy and V2 tables)
+        if ($currentUserId) {
+            $query->whereNotExists(function ($sub) use ($currentUserId) {
+                $sub->select(DB::raw(1))
+                    ->from('feed_hidden')
+                    ->whereColumn('feed_hidden.post_id', 'feed_activity.source_id')
+                    ->whereColumn('feed_hidden.post_type', 'feed_activity.source_type')
+                    ->where('feed_hidden.user_id', $currentUserId);
+            });
+            $query->whereNotExists(function ($sub) use ($currentUserId) {
+                $sub->select(DB::raw(1))
+                    ->from('user_hidden_posts')
+                    ->whereColumn('user_hidden_posts.post_id', 'feed_activity.source_id')
+                    ->where('user_hidden_posts.user_id', $currentUserId);
+            });
+        }
+
+        // Exclude muted users (both legacy and V2 tables)
+        if ($currentUserId) {
+            $query->whereNotExists(function ($sub) use ($currentUserId) {
+                $sub->select(DB::raw(1))
+                    ->from('feed_muted_users')
+                    ->whereColumn('feed_muted_users.muted_user_id', 'feed_activity.user_id')
+                    ->where('feed_muted_users.user_id', $currentUserId);
+            });
+            $query->whereNotExists(function ($sub) use ($currentUserId) {
+                $sub->select(DB::raw(1))
+                    ->from('user_muted_users')
+                    ->whereColumn('user_muted_users.muted_user_id', 'feed_activity.user_id')
+                    ->where('user_muted_users.user_id', $currentUserId);
+            });
+        }
+
+        // Hide private group posts from non-members (unless viewing a specific group feed)
+        $tenantId = TenantContext::getId();
+        if (!isset($filters['group_id']) && $currentUserId) {
+            $query->where(function ($q) use ($currentUserId, $tenantId) {
+                $q->whereNull('feed_activity.group_id')
+                  ->orWhereExists(function ($sub) use ($currentUserId, $tenantId) {
+                      $sub->select(DB::raw(1))
+                          ->from('group_members')
+                          ->whereColumn('group_members.group_id', 'feed_activity.group_id')
+                          ->where('group_members.user_id', $currentUserId)
+                          ->where('group_members.tenant_id', $tenantId)
+                          ->where('group_members.status', 'active');
+                  })
+                  ->orWhereExists(function ($sub) use ($tenantId) {
+                      $sub->select(DB::raw(1))
+                          ->from('groups')
+                          ->whereColumn('groups.id', 'feed_activity.group_id')
+                          ->where('groups.tenant_id', $tenantId)
+                          ->where('groups.privacy', 'public');
+                  });
+            });
+        }
+
         // Cursor pagination by (created_at, id) tuple
         if ($cursorCreatedAt !== null && $cursorActivityId !== null) {
             $query->where(function ($q) use ($cursorCreatedAt, $cursorActivityId) {
@@ -154,7 +214,6 @@ class FeedService
 
         // Batch load like counts
         $likeCounts = [];
-        $tenantId = TenantContext::getId();
         foreach ($sourcesByType as $sType => $sIds) {
             $counts = DB::table('likes')
                 ->selectRaw('target_id, COUNT(*) as cnt')
@@ -186,7 +245,6 @@ class FeedService
         // Batch load liked status for current user
         $likedSet = [];
         if ($currentUserId) {
-            $tenantId = TenantContext::getId();
             foreach ($sourcesByType as $sType => $sIds) {
                 $liked = DB::table('likes')
                     ->where('user_id', $currentUserId)
@@ -244,6 +302,11 @@ class FeedService
                 'ideas_count' => isset($meta['ideas_count']) ? (int) $meta['ideas_count'] : null,
                 // Listing metadata
                 'listing_type' => $meta['listing_type'] ?? null,
+                // Gamification metadata
+                'badge_key' => $meta['badge_key'] ?? null,
+                'badge_name' => $meta['badge_name'] ?? null,
+                'badge_icon' => $meta['badge_icon'] ?? null,
+                'new_level' => isset($meta['new_level']) ? (int) $meta['new_level'] : null,
                 // Volunteer metadata
                 'credits_offered' => isset($meta['credits_offered']) ? (int) $meta['credits_offered'] : null,
                 'organization' => $meta['organization'] ?? null,
@@ -269,6 +332,7 @@ class FeedService
         if (!empty($receiverIds)) {
             $nameMap = DB::table('users')
                 ->whereIn('id', array_unique($receiverIds))
+                ->where('tenant_id', $tenantId)
                 ->pluck(DB::raw("COALESCE(name, CONCAT(first_name, ' ', last_name))"), 'id');
             foreach ($items as &$item) {
                 if ($item['type'] === 'review' && isset($item['receiver']['id'])) {
@@ -354,6 +418,7 @@ class FeedService
         // Load poll options
         $options = DB::table('poll_options')
             ->whereIn('poll_id', $pollIds)
+            ->where('tenant_id', $tenantId)
             ->get();
 
         $optionsByPoll = $options->groupBy('poll_id');
@@ -362,6 +427,7 @@ class FeedService
         $voteCounts = DB::table('poll_votes')
             ->selectRaw('poll_id, option_id, COUNT(*) as cnt')
             ->whereIn('poll_id', $pollIds)
+            ->where('tenant_id', $tenantId)
             ->groupBy('poll_id', 'option_id')
             ->get();
 
@@ -376,6 +442,7 @@ class FeedService
             $votes = DB::table('poll_votes')
                 ->where('user_id', $userId)
                 ->whereIn('poll_id', $pollIds)
+                ->where('tenant_id', $tenantId)
                 ->pluck('option_id', 'poll_id');
             $userVotes = $votes->all();
         }
@@ -406,8 +473,10 @@ class FeedService
 
     /**
      * Create a feed post.
+     *
+     * @return FeedPost|array FeedPost on success, error array on validation failure
      */
-    public function createPost(int $userId, array $data): FeedPost
+    public function createPost(int $userId, array $data): FeedPost|array
     {
         $tenantId = TenantContext::getId();
         $content = trim($data['content'] ?? '');
@@ -415,12 +484,16 @@ class FeedService
         $visibility = $data['visibility'] ?? 'public';
         $groupId = !empty($data['group_id']) ? (int) $data['group_id'] : null;
 
+        if (empty($content) && empty($image)) {
+            return ['error' => 'Post must have content or an image'];
+        }
+
         $post = $this->feedPost->newInstance([
             'user_id'     => $userId,
             'tenant_id'   => $tenantId,
             'content'     => $content,
             'emoji'       => $data['emoji'] ?? null,
-            'image'       => $image,
+            'image_url'   => $image,
             'type'        => 'post',
             'parent_type' => $data['parent_type'] ?? null,
             'parent_id'   => $data['parent_id'] ?? null,
@@ -489,9 +562,10 @@ class FeedService
 
         // Validate group membership if posting to group
         if ($groupId > 0) {
+            $tenantId = TenantContext::getId();
             $isMember = DB::selectOne(
-                "SELECT 1 FROM group_members WHERE group_id = ? AND user_id = ? AND status = 'active'",
-                [$groupId, $userId]
+                "SELECT 1 FROM group_members WHERE group_id = ? AND user_id = ? AND tenant_id = ? AND status = 'active'",
+                [$groupId, $userId, $tenantId]
             );
             if (!$isMember) {
                 $this->errors[] = ['code' => 'FORBIDDEN', 'message' => 'You must be a group member to post'];
@@ -504,12 +578,12 @@ class FeedService
 
             if ($groupId > 0) {
                 DB::insert(
-                    "INSERT INTO feed_posts (user_id, tenant_id, content, image, likes_count, visibility, group_id, created_at) VALUES (?, ?, ?, ?, 0, ?, ?, NOW())",
+                    "INSERT INTO feed_posts (user_id, tenant_id, content, image_url, likes_count, visibility, group_id, created_at) VALUES (?, ?, ?, ?, 0, ?, ?, NOW())",
                     [$userId, $tenantId, $content, $imageUrl, $visibility, $groupId]
                 );
             } else {
                 DB::insert(
-                    "INSERT INTO feed_posts (user_id, tenant_id, content, image, likes_count, visibility, created_at) VALUES (?, ?, ?, ?, 0, ?, NOW())",
+                    "INSERT INTO feed_posts (user_id, tenant_id, content, image_url, likes_count, visibility, created_at) VALUES (?, ?, ?, ?, 0, ?, NOW())",
                     [$userId, $tenantId, $content, $imageUrl, $visibility]
                 );
             }

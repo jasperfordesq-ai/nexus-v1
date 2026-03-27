@@ -95,7 +95,8 @@
       "save_failed": "Save Failed",
       "save_failed_desc": "Could not update showcase.",
       "save_error": "Something went wrong."
-    }
+    },
+    "load_error": "Failed to load achievements. Please try again."
   },
   "goals": {
     "page_title": "Goals",
@@ -222,6 +223,11 @@
       "loading": "Loading season",
       "load_failed": "Load Failed",
       "load_failed_desc": "Could not load season history."
-    }
+    },
+    "season_unavailable": "Season data unavailable",
+    "season_unavailable_desc": "Could not load season information. Rankings below are still available.",
+    "session_expired": "Your session has expired. Please log in again.",
+    "load_error": "Failed to load leaderboard. Please try again.",
+    "type_nexus_score": "NexusScore"
   }
 }

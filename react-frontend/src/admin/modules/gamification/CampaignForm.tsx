@@ -262,7 +262,7 @@ export function CampaignForm() {
               variant="bordered"
             >
               {STATUS_OPTIONS.map((opt) => (
-                <SelectItem key={opt.key}>{opt.label}</SelectItem>
+                <SelectItem key={opt.key}>{t(`gamification.status_${opt.key}`, { defaultValue: opt.label })}</SelectItem>
               ))}
             </Select>
 
@@ -276,7 +276,7 @@ export function CampaignForm() {
               variant="bordered"
             >
               {TYPE_OPTIONS.map((opt) => (
-                <SelectItem key={opt.key}>{opt.label}</SelectItem>
+                <SelectItem key={opt.key}>{t(`gamification.type_${opt.key}`, { defaultValue: opt.label })}</SelectItem>
               ))}
             </Select>
           </div>
@@ -322,7 +322,7 @@ export function CampaignForm() {
             variant="bordered"
           >
             {AUDIENCE_OPTIONS.map((opt) => (
-              <SelectItem key={opt.key}>{opt.label}</SelectItem>
+              <SelectItem key={opt.key}>{t(`gamification.audience_${opt.key}`, { defaultValue: opt.label })}</SelectItem>
             ))}
           </Select>
 

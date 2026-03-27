@@ -9,6 +9,7 @@ namespace App\Http\Controllers\Api;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
 use App\Core\TenantContext;
+use App\Models\User;
 use App\Services\GamificationService;
 use App\Services\AchievementCampaignService;
 
@@ -116,7 +117,7 @@ class AdminGamificationController extends BaseApiController
             );
             $id = (int) DB::getPdo()->lastInsertId();
 
-            return $this->respondWithData(['id' => $id, 'key' => 'custom_' . $id, 'name' => $name, 'description' => $description, 'icon' => $icon, 'type' => 'custom'], null, 201);
+            return $this->respondWithData(['id' => $id, 'key' => $badgeKey, 'name' => $name, 'description' => $description, 'icon' => $icon, 'type' => 'custom'], null, 201);
         } catch (\Throwable $e) {
             return $this->respondWithError('SERVER_ERROR', 'Failed to create badge', null, 500);
         }
@@ -134,7 +135,8 @@ class AdminGamificationController extends BaseApiController
                 return $this->respondWithError('NOT_FOUND', 'Badge not found', null, 404);
             }
 
-            try { DB::delete("DELETE FROM user_badges WHERE badge_key = ? AND user_id IN (SELECT id FROM users WHERE tenant_id = ?)", ['custom_' . $id, $tenantId]); } catch (\Throwable $e) {}
+            $actualKey = $badge->badge_key ?? ('custom_' . $id);
+            try { DB::delete("DELETE FROM user_badges WHERE badge_key = ? AND user_id IN (SELECT id FROM users WHERE tenant_id = ?)", [$actualKey, $tenantId]); } catch (\Throwable $e) {}
             DB::delete("DELETE FROM custom_badges WHERE id = ? AND tenant_id = ?", [$id, $tenantId]);
 
             return $this->respondWithData(['deleted' => true]);
@@ -243,12 +245,19 @@ class AdminGamificationController extends BaseApiController
         if (empty($badgeSlug)) return $this->respondWithError('VALIDATION_ERROR', 'Badge slug is required', 'badge_slug', 422);
         if (empty($userIds) || !is_array($userIds)) return $this->respondWithError('VALIDATION_ERROR', 'User IDs array is required', 'user_ids', 422);
 
+        // Filter user_ids to only include users belonging to the current tenant
+        $tenantId = TenantContext::getId();
+        $validUserIds = User::where('tenant_id', $tenantId)
+            ->whereIn('id', $userIds)
+            ->pluck('id')
+            ->toArray();
+
         $awarded = 0; $errors = [];
-        foreach ($userIds as $userId) {
+        foreach ($validUserIds as $userId) {
             try { $this->gamificationService->awardBadgeByKey((int) $userId, $badgeSlug); $awarded++; }
             catch (\Throwable $e) { $errors[] = "User {$userId}: " . $e->getMessage(); }
         }
 
-        return $this->respondWithData(['awarded' => $awarded, 'total_requested' => count($userIds), 'errors' => $errors]);
+        return $this->respondWithData(['awarded' => $awarded, 'total_requested' => count($validUserIds), 'errors' => $errors]);
     }
 }

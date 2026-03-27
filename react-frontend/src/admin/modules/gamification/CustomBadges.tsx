@@ -129,7 +129,7 @@ export function CustomBadges() {
                   <div className="flex-1 min-w-0">
                     <h4 className="font-semibold text-foreground truncate">{badge.name}</h4>
                     <p className="text-xs text-default-500 mt-0.5">
-                      {badge.awarded_count} user{badge.awarded_count !== 1 ? 's' : ''} awarded
+                      {t('gamification.users_awarded', { count: badge.awarded_count, defaultValue: '{{count}} users awarded' })}
                     </p>
                   </div>
                   <Button

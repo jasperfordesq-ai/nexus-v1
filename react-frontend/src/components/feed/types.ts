@@ -33,7 +33,7 @@ export interface FeedItem {
     avatar_url?: string;
   };
   created_at: string;
-  type: 'post' | 'listing' | 'event' | 'poll' | 'goal' | 'review' | 'job' | 'challenge' | 'volunteer' | 'blog' | 'discussion';
+  type: 'post' | 'listing' | 'event' | 'poll' | 'goal' | 'review' | 'job' | 'challenge' | 'volunteer' | 'blog' | 'discussion' | 'badge_earned' | 'level_up';
   likes_count: number;
   comments_count: number;
   is_liked: boolean;
@@ -62,6 +62,14 @@ export interface FeedItem {
   credits_offered?: number;
   /** Volunteer-specific: organization name */
   organization?: string;
+  /** Badge-earned-specific: badge key */
+  badge_key?: string;
+  /** Badge-earned-specific: badge name */
+  badge_name?: string;
+  /** Badge-earned-specific: badge icon (emoji) */
+  badge_icon?: string;
+  /** Level-up-specific: new level number */
+  new_level?: number;
   /** Reaction data (replaces simple like system) */
   reactions?: {
     counts: Record<string, number>;
@@ -149,6 +157,8 @@ export function getItemDetailPath(item: FeedItem): string | null {
     case 'blog':
       return `/blog/${item.id}`;
     case 'discussion':
+    case 'badge_earned':
+    case 'level_up':
       return null;
     default:
       return null;

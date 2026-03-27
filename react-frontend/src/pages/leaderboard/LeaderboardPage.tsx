@@ -396,7 +396,7 @@ export function LeaderboardPage() {
     } catch (err) {
       if (controller.signal.aborted) return;
       logError('Failed to load leaderboard', err);
-      setError('Failed to load leaderboard. Please try again.');
+      setError(tRef.current('leaderboard.load_error', 'Failed to load leaderboard. Please try again.'));
     } finally {
       setIsLoading(false);
     }

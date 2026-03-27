@@ -45,6 +45,7 @@ export interface User {
   rating?: number;
   xp?: number;
   level?: number;
+  showcased_badges?: ShowcasedBadge[];
   phone?: string;
   profile_type?: 'individual' | 'organisation';
   organization_name?: string;
@@ -921,6 +922,12 @@ export interface GamificationProfile {
   badges_earned: number;
   badges_total: number;
   recent_achievements: Achievement[];
+}
+
+export interface ShowcasedBadge {
+  badge_key: string;
+  name: string;
+  icon: string;
 }
 
 export interface Badge {

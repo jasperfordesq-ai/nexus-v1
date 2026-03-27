@@ -49,6 +49,8 @@ import {
   Repeat2,
   BookOpen,
   Users,
+  Trophy,
+  Zap,
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { GlassCard, ImagePlaceholder } from '@/components/ui';
@@ -157,6 +159,18 @@ const typeConfig = {
     color: 'secondary' as const,
     icon: <Users className="w-3 h-3" aria-hidden="true" />,
     gradient: 'from-fuchsia-500/10 to-purple-500/10',
+  },
+  badge_earned: {
+    labelKey: 'card.type_badge_earned',
+    color: 'warning' as const,
+    icon: <Trophy className="w-3 h-3" aria-hidden="true" />,
+    gradient: 'from-yellow-500/10 to-amber-500/10',
+  },
+  level_up: {
+    labelKey: 'card.type_level_up',
+    color: 'success' as const,
+    icon: <Zap className="w-3 h-3" aria-hidden="true" />,
+    gradient: 'from-emerald-500/10 to-teal-500/10',
   },
 };
 
@@ -712,6 +726,38 @@ const FeedCard = React.memo(function FeedCard({
               {item.content && (
                 <p className="text-sm text-[var(--text-secondary)] italic leading-relaxed">&ldquo;{item.content}&rdquo;</p>
               )}
+            </CardBody>
+          </Card>
+        )}
+
+        {/* Badge Earned Display */}
+        {item.type === 'badge_earned' && (
+          <Card shadow="none" className="mb-4 bg-gradient-to-br from-yellow-500/10 to-amber-500/10 border border-yellow-500/20">
+            <CardBody className="p-4 text-center">
+              <div className="text-4xl mb-2" aria-hidden="true">{item.badge_icon || '\uD83C\uDFC6'}</div>
+              <p className="text-sm font-semibold text-[var(--text-primary)]">
+                {t('card.badge_earned_message', {
+                  name: author.name,
+                  badge: item.badge_name || item.title || '',
+                  defaultValue: '{{name}} earned the "{{badge}}" badge!',
+                })}
+              </p>
+            </CardBody>
+          </Card>
+        )}
+
+        {/* Level Up Display */}
+        {item.type === 'level_up' && (
+          <Card shadow="none" className="mb-4 bg-gradient-to-br from-emerald-500/10 to-teal-500/10 border border-emerald-500/20">
+            <CardBody className="p-4 text-center">
+              <div className="text-4xl mb-2" aria-hidden="true">{'\u2B50'}</div>
+              <p className="text-sm font-semibold text-[var(--text-primary)]">
+                {t('card.level_up_message', {
+                  name: author.name,
+                  level: item.new_level || item.title?.replace('Level ', '') || '',
+                  defaultValue: '{{name}} reached Level {{level}}!',
+                })}
+              </p>
             </CardBody>
           </Card>
         )}

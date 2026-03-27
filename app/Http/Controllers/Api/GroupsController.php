@@ -126,6 +126,13 @@ class GroupsController extends BaseApiController
 
         $group = $this->groupService->getById($groupId, $userId);
 
+        // Award XP for creating a group
+        try {
+            \App\Services\GamificationService::awardXP($userId, \App\Services\GamificationService::XP_VALUES['create_group'], 'create_group', 'Created a group');
+        } catch (\Throwable $e) {
+            \Log::warning('Gamification XP award failed', ['action' => 'create_group', 'user' => $userId, 'error' => $e->getMessage()]);
+        }
+
         return $this->respondWithData($group, null, 201);
     }
 
@@ -232,6 +239,15 @@ class GroupsController extends BaseApiController
             }
         } catch (\Throwable $e) {
             error_log("Group join notification error: " . $e->getMessage());
+        }
+
+        // Award XP when user actually joins (not just pending request)
+        if ($status === 'active') {
+            try {
+                \App\Services\GamificationService::awardXP($userId, \App\Services\GamificationService::XP_VALUES['join_group'], 'join_group', 'Joined a group');
+            } catch (\Throwable $e) {
+                \Log::warning('Gamification XP award failed', ['action' => 'join_group', 'user' => $userId, 'error' => $e->getMessage()]);
+            }
         }
 
         return $this->respondWithData([
@@ -449,6 +465,15 @@ class GroupsController extends BaseApiController
             }
         } catch (\Throwable $e) {
             error_log("Group request notification error: " . $e->getMessage());
+        }
+
+        // Award XP to the requester when their join request is accepted
+        if ($action === 'accept') {
+            try {
+                \App\Services\GamificationService::awardXP($requesterId, \App\Services\GamificationService::XP_VALUES['join_group'], 'join_group', 'Joined a group (request accepted)');
+            } catch (\Throwable $e) {
+                \Log::warning('Gamification XP award failed', ['action' => 'join_group', 'user' => $requesterId, 'error' => $e->getMessage()]);
+            }
         }
 
         return $this->respondWithData([

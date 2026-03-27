@@ -502,11 +502,11 @@ export function IdeaDetailPage() {
             {(isAdmin || isOwner) && (
               <Dropdown>
                 <DropdownTrigger>
-                  <Button isIconOnly variant="flat" size="sm" aria-label="Idea actions">
+                  <Button isIconOnly variant="flat" size="sm" aria-label={t('idea_detail.actions', { defaultValue: 'Idea actions' })}>
                     <MoreVertical className="w-4 h-4" />
                   </Button>
                 </DropdownTrigger>
-                <DropdownMenu aria-label="Idea actions" items={dropdownItems}>
+                <DropdownMenu aria-label={t('idea_detail.actions', { defaultValue: 'Idea actions' })} items={dropdownItems}>
                   {(item) => (
                     <DropdownItem
                       key={item.key}

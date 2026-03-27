@@ -145,6 +145,22 @@ class IdeationChallengesController extends BaseApiController
 
         $challenge = $this->challengeService->getById($challengeId);
 
+        // Record feed activity
+        try {
+            app(\App\Services\FeedActivityService::class)->recordActivity(
+                TenantContext::getId(),
+                $userId,
+                'challenge',
+                $challengeId,
+                [
+                    'title'   => $data['title'] ?? null,
+                    'content' => $data['description'] ?? null,
+                ]
+            );
+        } catch (\Throwable $e) {
+            \Log::warning('Feed activity recording failed', ['type' => 'challenge', 'id' => $challengeId, 'error' => $e->getMessage()]);
+        }
+
         return $this->respondWithData($challenge, null, 201);
     }
 
@@ -769,6 +785,7 @@ class IdeationChallengesController extends BaseApiController
     /** POST /api/v2/ideation-campaigns/{id}/challenges */
     public function linkChallengeToCampaign($id): JsonResponse
     {
+        $this->requireAdmin();
         $this->ensureFeature();
         $userId = $this->getUserId();
         $this->rateLimit('ideation_campaign', 20, 60);
@@ -793,6 +810,7 @@ class IdeationChallengesController extends BaseApiController
     /** DELETE /api/v2/ideation-campaigns/{id}/challenges/{challengeId} */
     public function unlinkChallengeFromCampaign($id, $challengeId): JsonResponse
     {
+        $this->requireAdmin();
         $this->ensureFeature();
         $userId = $this->getUserId();
         $this->rateLimit('ideation_campaign', 20, 60);

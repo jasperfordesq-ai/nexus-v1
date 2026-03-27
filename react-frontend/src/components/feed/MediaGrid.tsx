@@ -100,7 +100,7 @@ export function MediaGrid({ media, className = '' }: MediaGridProps) {
     if (total === 3) {
       // One large left (60%) + two stacked right (40%)
       return (
-        <div className={`grid grid-cols-5 gap-1 rounded-xl overflow-hidden ${className}`} style={{ height: '24rem' }}>
+        <div className={`grid grid-cols-5 gap-1 rounded-xl overflow-hidden h-96 ${className}`}>
           <div className="col-span-3 h-full">{renderMedia(displayMedia[0], 0)}</div>
           <div className="col-span-2 grid grid-rows-2 gap-1 h-full">
             <div>{renderMedia(displayMedia[1], 1)}</div>

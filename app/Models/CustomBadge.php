@@ -9,31 +9,37 @@ namespace App\Models;
 use App\Models\Concerns\HasTenantScope;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-class Challenge extends Model
+class CustomBadge extends Model
 {
     use HasFactory, HasTenantScope;
 
-    protected $table = 'challenges';
+    protected $table = 'custom_badges';
 
     protected $fillable = [
-        'tenant_id', 'title', 'description', 'challenge_type', 'action_type',
-        'target_count', 'xp_reward', 'badge_reward',
-        'start_date', 'end_date',
+        'tenant_id',
+        'badge_key',
+        'name',
+        'description',
+        'icon',
+        'icon_url',
+        'badge_type',
+        'trigger_type',
+        'trigger_condition',
+        'xp_reward',
         'is_active',
+        'created_by',
     ];
 
     protected $casts = [
-        'target_count' => 'integer',
         'xp_reward' => 'integer',
         'is_active' => 'boolean',
-        'start_date' => 'date',
-        'end_date' => 'date',
+        'claimed_at' => 'datetime',
     ];
 
-    public function progress(): HasMany
+    public function creator(): BelongsTo
     {
-        return $this->hasMany(UserChallengeProgress::class);
+        return $this->belongsTo(User::class, 'created_by');
     }
 }

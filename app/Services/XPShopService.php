@@ -147,7 +147,7 @@ class XPShopService
                 ->where('id', $userId)
                 ->where('tenant_id', $tenantId)
                 ->where('xp', '>=', $item->xp_cost)
-                ->update(['xp' => DB::raw("xp - {$item->xp_cost}")]);
+                ->update(['xp' => DB::raw('xp - ' . (int) $item->xp_cost)]);
 
             if ($affected === 0) {
                 DB::rollBack();

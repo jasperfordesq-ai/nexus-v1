@@ -106,6 +106,22 @@ class PollsController extends BaseApiController
         $poll = $this->pollService->create($userId, $data);
         $result = $this->pollService->getById($poll->id, $userId);
 
+        // Record feed activity
+        try {
+            app(\App\Services\FeedActivityService::class)->recordActivity(
+                \App\Core\TenantContext::getId(),
+                $userId,
+                'poll',
+                $poll->id,
+                [
+                    'title'    => $data['question'] ?? null,
+                    'group_id' => $data['group_id'] ?? null,
+                ]
+            );
+        } catch (\Throwable $e) {
+            \Log::warning('Feed activity recording failed', ['type' => 'poll', 'id' => $poll->id, 'error' => $e->getMessage()]);
+        }
+
         return $this->respondWithData($result, null, 201);
     }
 
@@ -166,6 +182,13 @@ class PollsController extends BaseApiController
 
         if (! $success) {
             return $this->respondWithError('RESOURCE_CONFLICT', 'Already voted on this poll', null, 409);
+        }
+
+        // Award XP for voting on a poll
+        try {
+            \App\Services\GamificationService::awardXP($userId, \App\Services\GamificationService::XP_VALUES['vote_poll'], 'vote_poll', 'Voted on a poll');
+        } catch (\Throwable $e) {
+            \Log::warning('Gamification XP award failed', ['action' => 'vote_poll', 'user' => $userId, 'error' => $e->getMessage()]);
         }
 
         $poll = $this->pollService->getById($id, $userId);

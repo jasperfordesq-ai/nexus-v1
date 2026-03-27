@@ -26,8 +26,6 @@ import {
   ModalBody,
   ModalFooter,
   useDisclosure,
-  Skeleton,
-  Divider,
 } from '@heroui/react';
 import {
   Newspaper,
@@ -58,34 +56,10 @@ import { logError } from '@/lib/logger';
 import { resolveAvatarUrl } from '@/lib/helpers';
 import { usePageTitle } from '@/hooks';
 import { FeedCard } from '@/components/feed/FeedCard';
+import { FeedSkeleton } from '@/components/feed/FeedSkeleton';
 import type { FeedItem, FeedFilter, PollData } from '@/components/feed/types';
 import { getAuthor } from '@/components/feed/types';
 import type { ReactionType } from '@/components/social';
-import type { Friend } from '@/components/feed/sidebar/FriendsWidget';
-
-/* ───────────────────────── Feed Card Skeleton ───────────────────────── */
-
-function FeedSkeleton() {
-  return (
-    <GlassCard className="p-5">
-      <div className="flex items-center gap-3 mb-4">
-        <Skeleton className="w-10 h-10 rounded-full" />
-        <div className="flex-1">
-          <Skeleton className="h-4 w-28 rounded mb-2" />
-          <Skeleton className="h-3 w-20 rounded" />
-        </div>
-      </div>
-      <Skeleton className="h-4 w-full rounded mb-2" />
-      <Skeleton className="h-4 w-4/5 rounded mb-4" />
-      <Skeleton className="h-40 w-full rounded-xl mb-4" />
-      <Divider />
-      <div className="flex gap-4 pt-3">
-        <Skeleton className="h-8 w-20 rounded-lg" />
-        <Skeleton className="h-8 w-24 rounded-lg" />
-      </div>
-    </GlassCard>
-  );
-}
 
 /* ───────────────────────── Sidebar Error Boundary ───────────────────────── */
 
@@ -124,8 +98,6 @@ export function FeedPage() {
   const [feedMode, setFeedMode] = useState<'ranking' | 'recent'>('ranking');
   // Sub-filter (e.g. listings -> offers/requests)
   const [subFilter, setSubFilter] = useState<string | null>(null);
-  // Stories friends (StoriesBar now self-loads)
-  const [, setStoriesFriends] = useState<Friend[]>([]);
 
   // Compose Hub
   const { isOpen: isCreateOpen, onOpen: onCreateOpen, onClose: onCreateClose } = useDisclosure();
@@ -154,22 +126,6 @@ export function FeedPage() {
   // Stable ref for loadFeed — avoids including it in useEffect deps which causes reset loops
   const loadFeedRef = useRef<(append?: boolean) => Promise<void>>(null!);
 
-
-  // Load friends for StoriesBar
-  useEffect(() => {
-    if (!isAuthenticated) return;
-    const loadFriends = async () => {
-      try {
-        const response = await api.get<{ friends?: Friend[] }>('/v2/feed/sidebar');
-        if (response.success && response.data?.friends) {
-          setStoriesFriends(response.data.friends);
-        }
-      } catch (err) {
-        logError('Failed to load stories friends', err);
-      }
-    };
-    loadFriends();
-  }, [isAuthenticated]);
 
   const loadFeed = useCallback(async (append = false) => {
     // Use separate abort controllers so fresh loads don't cancel appends
