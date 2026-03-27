@@ -1353,6 +1353,8 @@
     "placeholder_select_type": "Select type",
     "search_placeholder": "Search users by name or email...",
     "suspended": "Suspended",
+    "never_logged_in": "Never Logged In",
+    "onboarding_incomplete": "Onboarding Incomplete",
     "title": "Users",
     "user_action_failed": "User action failed",
     "user_action_success": "User action completed successfully",

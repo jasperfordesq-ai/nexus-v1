@@ -416,6 +416,8 @@ export function UserList() {
           <Tab key="active" title={t('users.active')} />
           <Tab key="suspended" title={t('users.suspended')} />
           <Tab key="banned" title={t('users.banned')} />
+          <Tab key="never_logged_in" title={t('users.never_logged_in')} />
+          <Tab key="onboarding_incomplete" title={t('users.onboarding_incomplete')} />
         </Tabs>
       </div>
 

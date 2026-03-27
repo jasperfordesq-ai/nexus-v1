@@ -77,6 +77,12 @@ class AdminUsersController extends BaseApiController
                 case 'banned':
                     $conditions[] = "u.status = 'banned'";
                     break;
+                case 'never_logged_in':
+                    $conditions[] = 'u.is_approved = 1 AND u.last_login_at IS NULL';
+                    break;
+                case 'onboarding_incomplete':
+                    $conditions[] = 'u.is_approved = 1 AND (u.onboarding_completed = 0 OR u.onboarding_completed IS NULL)';
+                    break;
             }
         }
 
@@ -116,7 +122,7 @@ class AdminUsersController extends BaseApiController
                     ELSE CONCAT(COALESCE(u.first_name, ''), ' ', COALESCE(u.last_name, ''))
                 END as name,
                 u.email, u.avatar_url, u.location, u.role, u.is_approved, u.is_super_admin, u.is_tenant_super_admin,
-                u.status, u.created_at, u.last_active_at, u.profile_type, u.organization_name,
+                u.status, u.created_at, u.last_active_at, u.last_login_at, u.onboarding_completed, u.profile_type, u.organization_name,
                 u.tenant_id,
                 t.name as tenant_name,
                 COALESCE(u.balance, 0) as balance,
@@ -159,6 +165,8 @@ class AdminUsersController extends BaseApiController
                 'has_2fa_enabled' => false,
                 'created_at' => $row->created_at,
                 'last_active_at' => $row->last_active_at ?? null,
+                'last_login_at' => $row->last_login_at ?? null,
+                'onboarding_completed' => (bool) ($row->onboarding_completed ?? false),
             ];
         }, $users);
 

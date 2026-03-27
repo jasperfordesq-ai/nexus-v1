@@ -128,6 +128,8 @@ export interface AdminUser {
   badges_count?: number;
   created_at: string;
   last_active_at?: string | null;
+  last_login_at?: string | null;
+  onboarding_completed?: boolean;
 }
 
 export interface AdminUserDetail extends AdminUser {
@@ -154,7 +156,7 @@ export interface AdminBadge {
 export interface UserListParams {
   page?: number;
   limit?: number;
-  status?: 'all' | 'active' | 'pending' | 'suspended' | 'banned';
+  status?: 'all' | 'active' | 'pending' | 'suspended' | 'banned' | 'never_logged_in' | 'onboarding_incomplete';
   role?: string;
   search?: string;
   sort?: string;
