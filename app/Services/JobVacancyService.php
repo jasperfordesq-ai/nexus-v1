@@ -395,6 +395,41 @@ class JobVacancyService
             return false;
         }
 
+        // Re-analyze spam score on content changes (mirrors create() logic)
+        $spamRelevantFields = ['title', 'description', 'tagline', 'location', 'contact_email', 'contact_phone'];
+        $hasSpamRelevantChange = !empty(array_intersect(array_keys($updates), $spamRelevantFields));
+        if ($hasSpamRelevantChange) {
+            try {
+                $tenantId = TenantContext::getId();
+                $mergedData = array_merge($vacancy->toArray(), $updates);
+                $spamResult = JobSpamDetectionService::analyzeJob($mergedData, $userId, $tenantId);
+
+                $updates['spam_score'] = $spamResult['score'];
+                $updates['spam_flags'] = !empty($spamResult['flags']) ? $spamResult['flags'] : null;
+
+                // If spam action escalates to 'block', close the vacancy
+                if ($spamResult['action'] === 'block') {
+                    $updates['status'] = 'closed';
+                    $updates['moderation_status'] = 'rejected';
+                    Log::warning("Job #{$id} auto-blocked after update by spam detection (score: {$spamResult['score']})", [
+                        'tenant_id' => $tenantId,
+                        'user_id' => $userId,
+                        'flags' => $spamResult['flags'],
+                    ]);
+                } elseif ($spamResult['action'] === 'flag') {
+                    $updates['moderation_status'] = 'pending_review';
+                    Log::info("Job #{$id} auto-flagged after update for moderation (score: {$spamResult['score']})", [
+                        'tenant_id' => $tenantId,
+                        'user_id' => $userId,
+                        'flags' => $spamResult['flags'],
+                    ]);
+                }
+            } catch (\Throwable $e) {
+                Log::warning('JobVacancyService::update spam re-analysis failed: ' . $e->getMessage());
+                // Non-fatal — proceed with update without spam re-scoring
+            }
+        }
+
         try {
             $vacancy->update($updates);
             return true;

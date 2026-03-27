@@ -11,6 +11,10 @@ use App\Services\JobBiasAuditService;
 use Illuminate\Support\Facades\DB;
 use Mockery;
 
+/**
+ * @runTestsInSeparateProcesses
+ * @preserveGlobalState disabled
+ */
 class JobBiasAuditServiceTest extends TestCase
 {
     private JobBiasAuditService $service;

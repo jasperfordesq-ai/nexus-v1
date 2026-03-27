@@ -10,6 +10,7 @@ use App\Core\TenantContext;
 use App\Models\JobVacancy;
 use App\Models\JobVacancyTeam;
 use App\Models\Notification;
+use App\Models\User;
 use Illuminate\Support\Facades\Log;
 
 class JobTeamService
@@ -29,6 +30,11 @@ class JobTeamService
 
             // Don't add the owner themselves
             if ($targetUserId === $ownerUserId) return false;
+
+            // Verify target user exists in the same tenant
+            if (!User::where('id', $targetUserId)->where('tenant_id', $tenantId)->exists()) {
+                return false;
+            }
 
             $member = JobVacancyTeam::updateOrCreate(
                 ['vacancy_id' => $vacancyId, 'user_id' => $targetUserId],

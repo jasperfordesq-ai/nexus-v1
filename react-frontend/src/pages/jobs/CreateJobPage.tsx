@@ -466,9 +466,9 @@ export function CreateJobPage() {
       if (form.contact_phone.trim()) payload.contact_phone = form.contact_phone.trim();
       if (form.deadline) payload.deadline = form.deadline;
 
-      // J9: Salary fields
-      if (form.salary_min) payload.salary_min = parseFloat(form.salary_min);
-      if (form.salary_max) payload.salary_max = parseFloat(form.salary_max);
+      // J9: Salary fields — strip commas/spaces before parsing to handle locale formats like "50,000"
+      if (form.salary_min) payload.salary_min = parseFloat(form.salary_min.replace(/[,\s]/g, ''));
+      if (form.salary_max) payload.salary_max = parseFloat(form.salary_max.replace(/[,\s]/g, ''));
       if (form.salary_type) payload.salary_type = form.salary_type;
       if (form.salary_currency.trim()) payload.salary_currency = form.salary_currency.trim();
       payload.salary_negotiable = form.salary_negotiable;
@@ -1374,8 +1374,8 @@ export function CreateJobPage() {
                     if (form.contact_email.trim()) payload.contact_email = form.contact_email.trim();
                     if (form.contact_phone.trim()) payload.contact_phone = form.contact_phone.trim();
                     if (form.deadline) payload.deadline = form.deadline;
-                    if (form.salary_min) payload.salary_min = parseFloat(form.salary_min);
-                    if (form.salary_max) payload.salary_max = parseFloat(form.salary_max);
+                    if (form.salary_min) payload.salary_min = parseFloat(form.salary_min.replace(/[,\s]/g, ''));
+                    if (form.salary_max) payload.salary_max = parseFloat(form.salary_max.replace(/[,\s]/g, ''));
                     if (form.salary_type) payload.salary_type = form.salary_type;
                     if (form.salary_currency.trim()) payload.salary_currency = form.salary_currency.trim();
                     payload.salary_negotiable = form.salary_negotiable;

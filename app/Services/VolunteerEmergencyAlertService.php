@@ -419,7 +419,8 @@ class VolunteerEmergencyAlertService
 
         $requiredSkills = [];
         if ($skillsJson) {
-            $requiredSkills = json_decode($skillsJson, true) ?: [];
+            $decoded = json_decode($skillsJson, true);
+            $requiredSkills = is_array($decoded) ? $decoded : [];
         }
 
         $notifiedCount = 0;
@@ -431,12 +432,22 @@ class VolunteerEmergencyAlertService
             if (!empty($requiredSkills)) {
                 $userSkillsRaw = $candidate->skills ?? '';
                 $userSkills = array_filter(array_map('trim', explode(',', $userSkillsRaw)));
-                $matches = array_intersect(
-                    array_map('strtolower', $userSkills),
-                    array_map('strtolower', $requiredSkills)
-                );
+                $hasMatch = false;
 
-                if (empty($matches)) {
+                foreach ($requiredSkills as $requiredSkill) {
+                    $requiredSkill = trim($requiredSkill);
+                    if ($requiredSkill === '') {
+                        continue;
+                    }
+                    foreach ($userSkills as $userSkill) {
+                        if (preg_match('/\b' . preg_quote($requiredSkill, '/') . '\b/i', $userSkill)) {
+                            $hasMatch = true;
+                            break 2;
+                        }
+                    }
+                }
+
+                if (!$hasMatch) {
                     continue;
                 }
             }

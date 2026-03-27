@@ -15,7 +15,7 @@ use Illuminate\Support\Facades\Log;
 use Mockery;
 
 /**
- * @runInSeparateProcess
+ * @runTestsInSeparateProcesses
  * @preserveGlobalState disabled
  */
 class JobTeamServiceTest extends TestCase

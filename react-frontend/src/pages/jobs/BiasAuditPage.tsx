@@ -49,7 +49,7 @@ import {
 } from 'recharts';
 import { GlassCard } from '@/components/ui';
 import { EmptyState } from '@/components/feedback';
-import { useTenant } from '@/contexts';
+import { useAuth, useTenant } from '@/contexts';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
 import { usePageTitle } from '@/hooks';
@@ -104,7 +104,10 @@ const FUNNEL_COLORS = [
 export function BiasAuditPage() {
   const { t } = useTranslation('jobs');
   const { tenantPath } = useTenant();
+  const { user } = useAuth();
   usePageTitle(t('bias_audit.title'));
+
+  const isAdmin = user?.is_admin === true || user?.role === 'admin' || user?.role === 'tenant_admin' || user?.role === 'super_admin' || user?.is_super_admin === true;
 
   const [report, setReport] = useState<BiasAuditData | null>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -191,6 +194,24 @@ export function BiasAuditPage() {
     loadReport();
     return () => { abortRef.current?.abort(); };
   }, [loadReport]);
+
+  if (!isAdmin) {
+    return (
+      <div className="space-y-6">
+        <Link
+          to={tenantPath('/jobs')}
+          className="inline-flex items-center gap-2 text-theme-muted hover:text-theme-primary transition-colors"
+        >
+          <ArrowLeft className="w-4 h-4" aria-hidden="true" />
+          {t('title')}
+        </Link>
+        <EmptyState
+          icon={<ShieldCheck className="w-12 h-12" aria-hidden="true" />}
+          title={t('bias_audit.access_denied', 'Access denied')}
+        />
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">

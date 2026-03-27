@@ -82,7 +82,9 @@ class VolunteerService
     {
         return VolOpportunity::query()
             ->with(['creator', 'organization', 'category', 'shifts', 'applications'])
-            ->find($id);
+            ->where('id', $id)
+            ->where('tenant_id', TenantContext::getId())
+            ->first();
     }
 
     /**
@@ -741,6 +743,7 @@ class VolunteerService
         self::$errors = [];
         $tenantId = self::getTenantId();
 
+        // Check user has approved application for this opportunity (outside lock — read-only pre-check)
         $shift = DB::selectOne("SELECT * FROM vol_shifts WHERE id = ? AND tenant_id = ?", [$shiftId, $tenantId]);
         if (!$shift) {
             self::$errors[] = ['code' => 'NOT_FOUND', 'message' => 'Shift not found'];
@@ -749,7 +752,6 @@ class VolunteerService
 
         $opportunityId = (int) $shift->opportunity_id;
 
-        // Check user has approved application for this opportunity
         $app = DB::selectOne(
             "SELECT id FROM vol_applications WHERE opportunity_id = ? AND user_id = ? AND status = 'approved' AND tenant_id = ?",
             [$opportunityId, $userId, $tenantId]
@@ -760,29 +762,44 @@ class VolunteerService
             return false;
         }
 
-        // Check capacity
-        $signupCount = (int) DB::selectOne(
-            "SELECT COUNT(*) as cnt FROM vol_applications WHERE shift_id = ? AND status = 'approved' AND tenant_id = ?",
-            [$shiftId, $tenantId]
-        )->cnt;
-
-        if ($shift->capacity && $signupCount >= (int) $shift->capacity) {
-            self::$errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'This shift is at capacity'];
-            return false;
-        }
-
         // Check shift hasn't passed
         if (strtotime($shift->start_time) < time()) {
             self::$errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'This shift has already started'];
             return false;
         }
 
+        // Atomic capacity check + signup inside a transaction with row lock
         try {
-            DB::update(
-                "UPDATE vol_applications SET shift_id = ? WHERE id = ? AND tenant_id = ?",
-                [$shiftId, $app->id, $tenantId]
-            );
-            return true;
+            return DB::transaction(function () use ($shiftId, $tenantId, $app) {
+                // Lock the shift row to prevent concurrent signups from exceeding capacity
+                $lockedShift = DB::selectOne(
+                    "SELECT * FROM vol_shifts WHERE id = ? AND tenant_id = ? FOR UPDATE",
+                    [$shiftId, $tenantId]
+                );
+
+                if (!$lockedShift) {
+                    self::$errors[] = ['code' => 'NOT_FOUND', 'message' => 'Shift not found'];
+                    return false;
+                }
+
+                // Re-check capacity under the lock
+                $signupCount = (int) DB::selectOne(
+                    "SELECT COUNT(*) as cnt FROM vol_applications WHERE shift_id = ? AND status = 'approved' AND tenant_id = ?",
+                    [$shiftId, $tenantId]
+                )->cnt;
+
+                if ($lockedShift->capacity && $signupCount >= (int) $lockedShift->capacity) {
+                    self::$errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'This shift is at capacity'];
+                    return false;
+                }
+
+                DB::update(
+                    "UPDATE vol_applications SET shift_id = ? WHERE id = ? AND tenant_id = ?",
+                    [$shiftId, $app->id, $tenantId]
+                );
+
+                return true;
+            });
         } catch (\Exception $e) {
             error_log("VolunteerService::signUpForShift error: " . $e->getMessage());
             self::$errors[] = ['code' => 'SERVER_ERROR', 'message' => 'Failed to sign up for shift'];
@@ -1150,29 +1167,46 @@ class VolunteerService
             return null;
         }
 
-        $slug = self::generateOrgSlug($name, $tenantId);
+        // Wrap in transaction with retry to handle slug race conditions
+        $maxRetries = 3;
+        for ($attempt = 1; $attempt <= $maxRetries; $attempt++) {
+            try {
+                return DB::transaction(function () use ($tenantId, $userId, $name, $description, $contactEmail, $website) {
+                    $slug = self::generateOrgSlug($name, $tenantId);
 
-        try {
-            DB::insert(
-                "INSERT INTO vol_organizations (tenant_id, user_id, name, description, contact_email, website, slug, status, created_at)
-                 VALUES (?, ?, ?, ?, ?, ?, ?, 'pending', NOW())",
-                [$tenantId, $userId, $name, $description, $contactEmail, $website ?: null, $slug]
-            );
+                    DB::insert(
+                        "INSERT INTO vol_organizations (tenant_id, user_id, name, description, contact_email, website, slug, status, created_at)
+                         VALUES (?, ?, ?, ?, ?, ?, ?, 'pending', NOW())",
+                        [$tenantId, $userId, $name, $description, $contactEmail, $website ?: null, $slug]
+                    );
 
-            $orgId = (int) DB::getPdo()->lastInsertId();
+                    $orgId = (int) DB::getPdo()->lastInsertId();
 
-            // Initialize owner membership
-            DB::insert(
-                "INSERT INTO org_members (tenant_id, organization_id, user_id, role, status, created_at) VALUES (?, ?, ?, 'owner', 'active', NOW())",
-                [$tenantId, $orgId, $userId]
-            );
+                    // Initialize owner membership
+                    DB::insert(
+                        "INSERT INTO org_members (tenant_id, organization_id, user_id, role, status, created_at) VALUES (?, ?, ?, 'owner', 'active', NOW())",
+                        [$tenantId, $orgId, $userId]
+                    );
 
-            return $orgId;
-        } catch (\Exception $e) {
-            error_log("VolunteerService::createOrganization error: " . $e->getMessage());
-            self::$errors[] = ['code' => 'SERVER_ERROR', 'message' => 'Failed to register organisation'];
-            return null;
+                    return $orgId;
+                });
+            } catch (\Illuminate\Database\QueryException $e) {
+                // Retry on duplicate slug (integrity constraint violation)
+                if ($attempt >= $maxRetries || $e->getCode() !== '23000') {
+                    error_log("VolunteerService::createOrganization error: " . $e->getMessage());
+                    self::$errors[] = ['code' => 'SERVER_ERROR', 'message' => 'Failed to register organisation'];
+                    return null;
+                }
+                // Retry — generateOrgSlug will pick a new suffix on next attempt
+            } catch (\Exception $e) {
+                error_log("VolunteerService::createOrganization error: " . $e->getMessage());
+                self::$errors[] = ['code' => 'SERVER_ERROR', 'message' => 'Failed to register organisation'];
+                return null;
+            }
         }
+
+        self::$errors[] = ['code' => 'SERVER_ERROR', 'message' => 'Failed to register organisation'];
+        return null;
     }
 
     /**

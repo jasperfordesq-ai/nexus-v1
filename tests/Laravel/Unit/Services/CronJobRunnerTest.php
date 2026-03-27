@@ -8,6 +8,10 @@ namespace Tests\Laravel\Unit\Services;
 
 use Tests\Laravel\TestCase;
 
+/**
+ * @runTestsInSeparateProcesses
+ * @preserveGlobalState disabled
+ */
 class CronJobRunnerTest extends TestCase
 {
     public function test_cron_job_runner_exists(): void

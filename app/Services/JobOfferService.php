@@ -116,6 +116,15 @@ class JobOfferService
                 return false;
             }
 
+            // Check if the offer has expired
+            if ($offer->expires_at && now()->greaterThan($offer->expires_at)) {
+                Log::info('JobOfferService::accept rejected — offer expired', [
+                    'offer_id'   => $offerId,
+                    'expires_at' => $offer->expires_at,
+                ]);
+                return false;
+            }
+
             $offer->update([
                 'status'       => 'accepted',
                 'responded_at' => now(),  // column added via 2026_03_27_000000 migration

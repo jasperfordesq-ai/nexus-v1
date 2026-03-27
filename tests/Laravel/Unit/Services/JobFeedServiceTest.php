@@ -13,7 +13,7 @@ use Illuminate\Support\Facades\Cache;
 use Mockery;
 
 /**
- * @runInSeparateProcess
+ * @runTestsInSeparateProcesses
  * @preserveGlobalState disabled
  */
 class JobFeedServiceTest extends TestCase

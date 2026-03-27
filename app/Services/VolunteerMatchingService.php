@@ -7,6 +7,7 @@
 namespace App\Services;
 
 use App\Core\TenantContext;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
 /**
@@ -151,6 +152,11 @@ class VolunteerMatchingService
      */
     public function suggestOpportunities(int $tenantId, int $userId, int $limit = 10): array
     {
+        // Defense-in-depth: ensure the requesting user can only see their own suggestions
+        if (Auth::id() !== $userId) {
+            return [];
+        }
+
         // Get user skills
         $userSkills = DB::table('user_skills')
             ->where('tenant_id', $tenantId)

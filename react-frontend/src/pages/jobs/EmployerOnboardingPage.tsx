@@ -161,8 +161,8 @@ export function EmployerOnboardingPage() {
         deadline: state.jobDeadline || null,
       };
 
-      if (state.jobSalaryMin) payload.salary_min = parseFloat(state.jobSalaryMin);
-      if (state.jobSalaryMax) payload.salary_max = parseFloat(state.jobSalaryMax);
+      if (state.jobSalaryMin) payload.salary_min = parseFloat(state.jobSalaryMin.replace(/[,\s]/g, ''));
+      if (state.jobSalaryMax) payload.salary_max = parseFloat(state.jobSalaryMax.replace(/[,\s]/g, ''));
       if (state.jobSalaryCurrency) payload.salary_currency = state.jobSalaryCurrency;
       payload.salary_negotiable = state.jobSalaryNegotiable;
 
@@ -170,6 +170,7 @@ export function EmployerOnboardingPage() {
       if (response.success && response.data) {
         const jobId = response.data.id;
         updateState({ createdJobId: jobId, step: 3 });
+        try { localStorage.removeItem(STORAGE_KEY); } catch { /* ignore */ }
         toast.success(t('form.create_success'));
       } else {
         toast.error(response.error || t('form.create_error'));

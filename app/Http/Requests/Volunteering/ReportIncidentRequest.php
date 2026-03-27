@@ -21,7 +21,7 @@ class ReportIncidentRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'incident_type' => ['required', 'string'],
+            'incident_type' => ['required', 'string', 'in:safety,harassment,injury,misconduct,safeguarding,discrimination,property_damage,other'],
             'description' => ['required', 'string', 'min:20'],
             'severity' => ['required', 'in:low,medium,high,critical'],
             'location' => ['nullable', 'string'],

@@ -12,6 +12,10 @@ use Illuminate\Database\Eloquent\Builder;
 use Mockery;
 use Tests\Laravel\TestCase;
 
+/**
+ * @runTestsInSeparateProcesses
+ * @preserveGlobalState disabled
+ */
 class JobInterviewSchedulingServiceTest extends TestCase
 {
     private JobInterviewSchedulingService $service;

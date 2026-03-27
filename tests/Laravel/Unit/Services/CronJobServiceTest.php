@@ -11,6 +11,10 @@ use App\Services\CronJobService;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
+/**
+ * @runTestsInSeparateProcesses
+ * @preserveGlobalState disabled
+ */
 class CronJobServiceTest extends TestCase
 {
     private CronJobService $service;

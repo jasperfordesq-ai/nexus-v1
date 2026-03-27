@@ -94,6 +94,12 @@ export function GroupSignUpTab() {
   const [isAdding, setIsAdding] = useState(false);
   const [addError, setAddError] = useState<string | null>(null);
 
+  // Debounced member search state
+  const [searchResults, setSearchResults] = useState<{ id: number; name: string; email: string }[]>([]);
+  const [isSearching, setIsSearching] = useState(false);
+  const searchDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const searchAbortRef = useRef<AbortController | null>(null);
+
   // AbortController ref to cancel stale requests
   const abortRef = useRef<AbortController | null>(null);
 
@@ -136,12 +142,61 @@ export function GroupSignUpTab() {
     load();
   }, [load]);
 
+  const searchMembers = useCallback((query: string) => {
+    // Clear any pending debounce
+    if (searchDebounceRef.current) clearTimeout(searchDebounceRef.current);
+
+    if (!query.trim() || query.trim().length < 2) {
+      setSearchResults([]);
+      setIsSearching(false);
+      return;
+    }
+
+    setIsSearching(true);
+    searchDebounceRef.current = setTimeout(async () => {
+      // Abort any in-flight search request
+      searchAbortRef.current?.abort();
+      const controller = new AbortController();
+      searchAbortRef.current = controller;
+
+      try {
+        const searchRes = await api.get<{ id: number; name: string; email: string }[]>(
+          `/v2/users?search=${encodeURIComponent(query.trim())}&per_page=5`
+        );
+        if (controller.signal.aborted) return;
+        if (searchRes.success && Array.isArray(searchRes.data)) {
+          setSearchResults(searchRes.data);
+        } else {
+          setSearchResults([]);
+        }
+      } catch (err) {
+        if (controller.signal.aborted) return;
+        logError('Member search failed', err);
+        setSearchResults([]);
+      } finally {
+        if (!controller.signal.aborted) {
+          setIsSearching(false);
+        }
+      }
+    }, 300);
+  }, []);
+
   const openAddMemberModal = (reservationId: number) => {
     setSelectedReservationId(reservationId);
     setNewMemberEmail('');
     setAddError(null);
+    setSearchResults([]);
+    setIsSearching(false);
     onOpen();
   };
+
+  // Clean up debounce timer and abort controller on unmount
+  useEffect(() => {
+    return () => {
+      if (searchDebounceRef.current) clearTimeout(searchDebounceRef.current);
+      searchAbortRef.current?.abort();
+    };
+  }, []);
 
   const handleAddMember = async () => {
     if (!selectedReservationId || !newMemberEmail.trim()) return;
@@ -150,20 +205,27 @@ export function GroupSignUpTab() {
       setIsAdding(true);
       setAddError(null);
 
-      // Resolve email to user_id via member search
-      const searchRes = await api.get<{ id: number; email: string }[]>(
-        `/v2/users?search=${encodeURIComponent(newMemberEmail.trim())}&per_page=5`
-      );
+      // Use cached search results if available, otherwise do a fresh lookup
+      let matchedUser: { id: number; email: string } | undefined;
+      const emailLower = newMemberEmail.trim().toLowerCase();
 
-      if (!searchRes.success || !Array.isArray(searchRes.data)) {
-        setAddError(tRef.current('group_signup.lookup_error', 'Unable to look up member. Please try again.'));
-        return;
+      if (searchResults.length > 0) {
+        matchedUser = searchResults.find((u) => u.email?.toLowerCase() === emailLower);
       }
 
-      const emailLower = newMemberEmail.trim().toLowerCase();
-      const matchedUser = searchRes.data.find(
-        (u) => u.email?.toLowerCase() === emailLower
-      );
+      // Fall back to a direct search if no cached match
+      if (!matchedUser) {
+        const searchRes = await api.get<{ id: number; email: string }[]>(
+          `/v2/users?search=${encodeURIComponent(newMemberEmail.trim())}&per_page=5`
+        );
+
+        if (!searchRes.success || !Array.isArray(searchRes.data)) {
+          setAddError(tRef.current('group_signup.lookup_error', 'Unable to look up member. Please try again.'));
+          return;
+        }
+
+        matchedUser = searchRes.data.find((u) => u.email?.toLowerCase() === emailLower);
+      }
 
       if (!matchedUser) {
         setAddError(tRef.current('group_signup.no_member_found', 'No member found with that email address.'));
@@ -179,6 +241,7 @@ export function GroupSignUpTab() {
         toastRef.current.success(tRef.current('group_signup.member_added', 'Member added to the group.'));
         onClose();
         setNewMemberEmail('');
+        setSearchResults([]);
         load();
       } else {
         setAddError(tRef.current('group_signup.add_member_error', 'Failed to add member. They may already be in the group or the email is invalid.'));
@@ -413,13 +476,38 @@ export function GroupSignUpTab() {
               label={t('group_signup.email_label', 'Email Address')}
               placeholder={t('group_signup.email_placeholder', 'member@example.com')}
               value={newMemberEmail}
-              onChange={(e) => setNewMemberEmail(e.target.value)}
+              onChange={(e) => {
+                const val = e.target.value;
+                setNewMemberEmail(val);
+                searchMembers(val);
+              }}
               isRequired
               classNames={{
                 input: 'bg-transparent text-theme-primary',
                 inputWrapper: 'bg-theme-elevated border-theme-default',
               }}
             />
+            {isSearching && (
+              <p className="text-xs text-theme-subtle">{t('group_signup.searching', 'Searching...')}</p>
+            )}
+            {!isSearching && searchResults.length > 0 && (
+              <div className="space-y-1">
+                {searchResults.map((user) => (
+                  <button
+                    key={user.id}
+                    type="button"
+                    className="w-full text-left px-3 py-2 rounded-lg bg-theme-elevated hover:bg-theme-hover text-sm text-theme-primary transition-colors"
+                    onClick={() => {
+                      setNewMemberEmail(user.email);
+                      setSearchResults([]);
+                    }}
+                  >
+                    <span className="font-medium">{user.name}</span>
+                    <span className="text-theme-subtle ml-2">{user.email}</span>
+                  </button>
+                ))}
+              </div>
+            )}
             {addError && (
               <p className="text-sm text-danger">{addError}</p>
             )}

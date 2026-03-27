@@ -67,7 +67,7 @@ class VolunteerExpenseController extends BaseApiController
     {
         $this->ensureFeature();
         $userId = $this->getUserId();
-        $this->rateLimit('vol_expense_submit', 10, 60);
+        $this->rateLimit('vol_expense_submit', 10, 3600);
 
         $data = $this->getAllInput();
 

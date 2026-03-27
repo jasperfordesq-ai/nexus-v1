@@ -315,7 +315,10 @@ export function ExpensesTab() {
       {/* Submit Modal */}
       <Modal
         isOpen={isOpen}
-        onOpenChange={onOpenChange}
+        onOpenChange={(open) => {
+          if (!open) resetForm();
+          onOpenChange();
+        }}
         classNames={{
           base: 'bg-content1 border border-theme-default',
           header: 'border-b border-theme-default',

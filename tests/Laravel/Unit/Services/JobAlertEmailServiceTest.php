@@ -15,6 +15,10 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use Mockery;
 
+/**
+ * @runTestsInSeparateProcesses
+ * @preserveGlobalState disabled
+ */
 class JobAlertEmailServiceTest extends TestCase
 {
     // ── sendImmediateAlert ──────────────────────────────────────

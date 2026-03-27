@@ -790,6 +790,8 @@ export function JobDetailPage() {
     if (!id) return;
     setIsLoadingQualification(true);
     qualifiedModal.onOpen();
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 30000);
     try {
       const response = await api.get<QualificationResult>(`/v2/jobs/${id}/qualified`);
       if (response.success && response.data) {
@@ -798,6 +800,7 @@ export function JobDetailPage() {
     } catch (err) {
       logError('Failed to load qualification', err);
     } finally {
+      clearTimeout(timeout);
       setIsLoadingQualification(false);
     }
   };
