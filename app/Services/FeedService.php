@@ -128,8 +128,8 @@ class FeedService
             $query->whereNotExists(function ($sub) use ($currentUserId) {
                 $sub->select(DB::raw(1))
                     ->from('feed_hidden')
-                    ->whereColumn('feed_hidden.post_id', 'feed_activity.source_id')
-                    ->whereColumn('feed_hidden.post_type', 'feed_activity.source_type')
+                    ->whereColumn('feed_hidden.target_id', 'feed_activity.source_id')
+                    ->whereColumn('feed_hidden.target_type', 'feed_activity.source_type')
                     ->where('feed_hidden.user_id', $currentUserId);
             });
             $query->whereNotExists(function ($sub) use ($currentUserId) {

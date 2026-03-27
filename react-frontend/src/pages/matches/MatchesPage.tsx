@@ -334,7 +334,7 @@ export function MatchesPage() {
                         </div>
 
                         {/* Match reasons */}
-                        {match.reasons.length > 0 && (
+                        {Array.isArray(match.reasons) && match.reasons.length > 0 && (
                           <div className="flex flex-wrap gap-1.5">
                             {match.reasons.slice(0, 3).map((reason, i) => (
                               <Chip key={i} size="sm" variant="dot" color="primary" className="text-xs">
