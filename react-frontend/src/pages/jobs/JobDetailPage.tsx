@@ -654,30 +654,11 @@ export function JobDetailPage() {
     try {
       let response;
       if (cvFile) {
-        // Use FormData for multipart upload
+        // Use api.upload() for multipart — handles auth, tenant ID, and CSRF token automatically
         const formData = new FormData();
         formData.append('message', applyMessage || '');
         formData.append('cv', cvFile);
-        // Fetch directly for multipart — api client uses JSON by default
-        let token: string | null = null;
-        let tenantId: string | null = null;
-        try {
-          token = localStorage.getItem('nexus_access_token');
-          tenantId = localStorage.getItem('nexus_tenant_id');
-        } catch { /* private browsing */ }
-        const apiBase = import.meta.env.VITE_API_BASE || '/api';
-        const fetchResponse = await fetch(`${apiBase}/v2/jobs/${id}/apply`, {
-          method: 'POST',
-          headers: {
-            ...(token ? { Authorization: `Bearer ${token}` } : {}),
-            ...(tenantId ? { 'X-Tenant-ID': tenantId } : {}),
-          },
-          body: formData,
-        });
-        if (!fetchResponse.ok) {
-          throw new Error(fetchResponse.statusText || 'Application failed');
-        }
-        response = await fetchResponse.json() as { success: boolean; error?: string };
+        response = await api.upload(`/v2/jobs/${id}/apply`, formData);
       } else {
         response = await api.post(`/v2/jobs/${id}/apply`, {
           message: applyMessage || null,

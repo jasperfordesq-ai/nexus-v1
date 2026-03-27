@@ -125,16 +125,32 @@ class JobVacancyService
                 );
         }
 
+        $query->orderByRaw('(CASE WHEN job_vacancies.is_featured = 1 AND (job_vacancies.featured_until IS NULL OR job_vacancies.featured_until > NOW()) THEN 0 ELSE 1 END) ASC')
+            ->orderByDesc('job_vacancies.created_at')
+            ->orderByDesc('job_vacancies.id');
+
+        // Offset-based pagination (used by admin panel, supports total count)
+        if (array_key_exists('offset', $filters)) {
+            $limit = min((int) ($filters['limit'] ?? 50), 200);
+            $offset = max(0, (int) $filters['offset']);
+            $total = (clone $query)->count();
+            $items = $query->offset($offset)->limit($limit)->get();
+            $enriched = $this->enrichVacancyBatch($items, $userId);
+            return [
+                'items' => $enriched,
+                'cursor' => null,
+                'has_more' => ($offset + $limit) < $total,
+                'total' => $total,
+            ];
+        }
+
+        // Cursor-based pagination (default for all other callers)
         if ($cursor !== null) {
             $cursorId = base64_decode($cursor, true);
             if ($cursorId !== false) {
                 $query->where('job_vacancies.id', '<', (int) $cursorId);
             }
         }
-
-        $query->orderByRaw('(CASE WHEN job_vacancies.is_featured = 1 AND (job_vacancies.featured_until IS NULL OR job_vacancies.featured_until > NOW()) THEN 0 ELSE 1 END) ASC')
-            ->orderByDesc('job_vacancies.created_at')
-            ->orderByDesc('job_vacancies.id');
 
         $items = $query->limit($limit + 1)->get();
         $hasMore = $items->count() > $limit;

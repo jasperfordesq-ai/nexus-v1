@@ -35,18 +35,17 @@ class AdminJobsController extends BaseApiController
         $page = $this->queryInt('page', 1, 1);
         $limit = $this->queryInt('limit', 50, 1, 200);
 
-        $filters = ['limit' => 10000];
+        $filters = [
+            'limit'  => $limit,
+            'offset' => ($page - 1) * $limit,
+        ];
         if ($this->query('status')) $filters['status'] = $this->query('status');
         if ($this->query('search')) $filters['search'] = $this->query('search');
 
         $result = $this->jobVacancyService->getAll($filters);
-        $allItems = $result['items'] ?? [];
+        $total  = $result['total'] ?? 0;
 
-        $total = count($allItems);
-        $offset = ($page - 1) * $limit;
-        $paged = array_slice($allItems, $offset, $limit);
-
-        return $this->respondWithPaginatedCollection($paged, $total, $page, $limit);
+        return $this->respondWithPaginatedCollection($result['items'], $total, $page, $limit);
     }
 
     /** GET /api/v2/admin/jobs/{id} */
