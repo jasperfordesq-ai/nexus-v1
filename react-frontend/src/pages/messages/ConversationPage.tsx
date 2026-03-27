@@ -107,6 +107,7 @@ export function ConversationPage() {
   const [isLoadingOlder, setIsLoadingOlder] = useState(false);
   const [isOtherUserTyping, setIsOtherUserTyping] = useState(false);
   const [showArchiveModal, setShowArchiveModal] = useState(false);
+  const [deleteScope, setDeleteScope] = useState<'self' | 'everyone'>('self');
   const [isArchiving, setIsArchiving] = useState(false);
   const [isDocumentVisible, setIsDocumentVisible] = useState(true);
   // Voice recording state
@@ -583,23 +584,27 @@ export function ConversationPage() {
   }
 
   /**
-   * Archive the conversation (soft delete for current user only)
+   * Delete the conversation — 'self' hides from current user only; 'everyone' hides from both.
    */
-  async function archiveConversation() {
+  async function deleteConversation(scope: 'self' | 'everyone') {
     if (!id || isArchiving) return;
 
     try {
       setIsArchiving(true);
-      const response = await api.delete(`/v2/messages/conversations/${id}`);
+      const response = await api.delete(`/v2/messages/conversations/${id}`, { data: { scope } });
 
       if (response.success) {
-        toast.success(t('conversation_archived'), t('conversation_archived_desc'));
+        if (scope === 'everyone') {
+          toast.success(t('conversation_deleted_everyone'), t('conversation_deleted_everyone_desc'));
+        } else {
+          toast.success(t('conversation_archived'), t('conversation_archived_desc'));
+        }
         navigate(tenantPath('/messages'));
       } else {
         throw new Error(response.error || t('archive_failed'));
       }
     } catch (error) {
-      logError('Failed to archive conversation', error);
+      logError('Failed to delete conversation', error);
       toast.error(t('error_title'), t('archive_failed'));
     } finally {
       setIsArchiving(false);
@@ -1207,13 +1212,22 @@ export function ConversationPage() {
               </DropdownTrigger>
               <DropdownMenu aria-label={t('aria_conversation_actions')}>
                 <DropdownItem
-                  key="archive"
+                  key="delete_self"
                   startContent={<Trash2 className="w-4 h-4" />}
                   className="text-danger"
                   color="danger"
-                  onPress={() => setShowArchiveModal(true)}
+                  onPress={() => { setDeleteScope('self'); setShowArchiveModal(true); }}
                 >
-                  {t('archive_title')}
+                  {t('delete_conversation_for_me')}
+                </DropdownItem>
+                <DropdownItem
+                  key="delete_everyone"
+                  startContent={<Trash2 className="w-4 h-4" />}
+                  className="text-danger"
+                  color="danger"
+                  onPress={() => { setDeleteScope('everyone'); setShowArchiveModal(true); }}
+                >
+                  {t('delete_conversation_for_everyone')}
                 </DropdownItem>
               </DropdownMenu>
             </Dropdown>
@@ -1469,14 +1483,15 @@ export function ConversationPage() {
       >
         <ModalContent>
           <ModalHeader className="text-theme-primary">
-            {t('archive_title')}
+            {deleteScope === 'everyone'
+              ? t('delete_conversation_for_everyone')
+              : t('delete_conversation_for_me')}
           </ModalHeader>
           <ModalBody>
             <p className="text-theme-muted">
-              {t('archive_confirm_prompt', { name: other_user.name })}
-            </p>
-            <p className="text-theme-subtle text-sm mt-2">
-              {t('archive_confirm_body')}
+              {deleteScope === 'everyone'
+                ? t('delete_conversation_everyone_prompt', { name: other_user.name })
+                : t('delete_conversation_self_prompt', { name: other_user.name })}
             </p>
           </ModalBody>
           <ModalFooter>
@@ -1489,10 +1504,10 @@ export function ConversationPage() {
             </Button>
             <Button
               color="danger"
-              onPress={archiveConversation}
+              onPress={() => deleteConversation(deleteScope)}
               isLoading={isArchiving}
             >
-              {t('archive_confirm')}
+              {t('delete_confirm')}
             </Button>
           </ModalFooter>
         </ModalContent>

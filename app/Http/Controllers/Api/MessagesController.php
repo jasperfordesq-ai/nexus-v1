@@ -179,6 +179,10 @@ class MessagesController extends BaseApiController
 
     /**
      * DELETE /api/v2/messages/conversations/{id}
+     *
+     * Accepts optional body: { "scope": "self" | "everyone" }
+     * "self" (default) — hides from current user's inbox only (restorable).
+     * "everyone"       — hides from both users' inboxes.
      */
     public function archiveConversation($id): JsonResponse
     {
@@ -191,17 +195,21 @@ class MessagesController extends BaseApiController
             return $this->respondWithError('NOT_FOUND', 'Conversation not found', null, 404);
         }
 
-        $success = $this->messageService->archiveConversation($id, $userId);
+        $scope = in_array($this->input('scope'), ['self', 'everyone'], true)
+            ? $this->input('scope')
+            : 'self';
+
+        $success = $this->messageService->archiveConversation($id, $userId, $scope);
 
         if (!$success) {
             $errors = $this->messageService->getErrors();
             if (!empty($errors)) {
                 return $this->respondWithErrors($errors, 500);
             }
-            return $this->respondWithError('ARCHIVE_FAILED', 'Failed to archive conversation', null, 500);
+            return $this->respondWithError('ARCHIVE_FAILED', 'Failed to delete conversation', null, 500);
         }
 
-        return $this->respondWithData(['success' => true, 'message' => 'Conversation archived']);
+        return $this->respondWithData(['success' => true, 'message' => 'Conversation deleted']);
     }
 
     /**

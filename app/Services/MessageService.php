@@ -337,9 +337,12 @@ class MessageService
     /**
      * Archive a conversation with another user.
      *
+     * @param string $scope 'self'     — hides from current user's inbox only (restorable).
+     *                      'everyone' — hides from both users' inboxes.
+     *
      * Uses per-user archival columns so each user can independently archive.
      */
-    public static function archiveConversation(int $otherUserId, int $userId): int
+    public static function archiveConversation(int $otherUserId, int $userId, string $scope = 'self'): int
     {
         $tenantId = app('tenant.id');
         $now = now();
@@ -362,7 +365,24 @@ class MessageService
                 ->delete();
         }
 
-        // Archive messages where user is the sender
+        if ($scope === 'everyone') {
+            // Hide from both users' inboxes in one pass
+            $totalUpdated += DB::table('messages')
+                ->where('tenant_id', $tenantId)
+                ->where('sender_id', $userId)
+                ->where('receiver_id', $otherUserId)
+                ->update(['archived_by_sender' => $now, 'archived_by_receiver' => $now]);
+
+            $totalUpdated += DB::table('messages')
+                ->where('tenant_id', $tenantId)
+                ->where('sender_id', $otherUserId)
+                ->where('receiver_id', $userId)
+                ->update(['archived_by_sender' => $now, 'archived_by_receiver' => $now]);
+
+            return $totalUpdated;
+        }
+
+        // scope = 'self': archive from current user's view only
         $totalUpdated += DB::table('messages')
             ->where('tenant_id', $tenantId)
             ->where('sender_id', $userId)
@@ -370,7 +390,6 @@ class MessageService
             ->whereNull('archived_by_sender')
             ->update(['archived_by_sender' => $now]);
 
-        // Archive messages where user is the receiver
         $totalUpdated += DB::table('messages')
             ->where('tenant_id', $tenantId)
             ->where('sender_id', $otherUserId)
