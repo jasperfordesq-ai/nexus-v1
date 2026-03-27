@@ -156,4 +156,18 @@ abstract class TestCase extends BaseTestCase
     {
         return $this->deleteJson('/api' . $uri, $data, $this->withTenantHeader($headers));
     }
+
+    /**
+     * Tear down the test environment.
+     *
+     * Calls Mockery::close() to reset the Mockery container after each test class.
+     * Without this, Mockery accumulates generated mock class definitions across test
+     * classes and throws "Cannot redeclare" fatal errors when the same class is mocked
+     * by more than one test file in the same PHP process.
+     */
+    protected function tearDown(): void
+    {
+        parent::tearDown();
+        \Mockery::close();
+    }
 }

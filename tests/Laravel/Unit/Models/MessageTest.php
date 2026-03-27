@@ -39,6 +39,7 @@ class MessageTest extends TestCase
             'body', 'is_read', 'is_edited', 'edited_at',
             'is_deleted_sender', 'is_deleted_receiver',
             'read_at', 'created_at',
+            'context_type', 'context_id',
         ];
         $this->assertEquals($expected, $this->model->getFillable());
     }

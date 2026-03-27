@@ -46,10 +46,10 @@ class VolEmergencyAlertRecipientTest extends TestCase
         $this->assertEquals('datetime', $casts['responded_at']);
     }
 
-    public function test_does_not_use_has_tenant_scope(): void
+    public function test_uses_has_tenant_scope(): void
     {
         $traits = class_uses_recursive(VolEmergencyAlertRecipient::class);
-        $this->assertNotContains(\App\Models\Concerns\HasTenantScope::class, $traits);
+        $this->assertContains(\App\Models\Concerns\HasTenantScope::class, $traits);
     }
 
     public function test_alert_relationship(): void
