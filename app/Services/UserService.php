@@ -105,6 +105,7 @@ class UserService
         // meets the tenant's visibility requirements (onboarding complete, avatar, bio).
         if ($viewerId !== $userId) {
             if (!OnboardingConfigService::isProfileVisible(null, $userId)) {
+                self::setError('PROFILE_INCOMPLETE', 'This member\'s profile is not yet complete');
                 return null;
             }
         }
@@ -176,7 +177,7 @@ class UserService
         $limit = min($limit, 100);
         $like = '%' . $term . '%';
 
-        $items = User::query()
+        $query = User::query()
             ->where(function (Builder $q) use ($like) {
                 $q->where('first_name', 'LIKE', $like)
                   ->orWhere('last_name', 'LIKE', $like)
@@ -186,8 +187,12 @@ class UserService
             })
             ->where('status', '!=', 'banned')
             ->orderByDesc('id')
-            ->limit($limit + 1)
-            ->get();
+            ->limit($limit + 1);
+
+        // Apply onboarding visibility gating
+        OnboardingConfigService::applyVisibilityScope($query);
+
+        $items = $query->get();
 
         $hasMore = $items->count() > $limit;
         if ($hasMore) {
@@ -504,6 +509,9 @@ class UserService
         if ($currentUserId) {
             $query->where('id', '!=', $currentUserId);
         }
+
+        // Apply onboarding visibility gating
+        OnboardingConfigService::applyVisibilityScope($query);
 
         $items = $query->limit($limit + 1)->get();
 

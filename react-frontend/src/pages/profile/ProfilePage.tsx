@@ -134,6 +134,7 @@ export function ProfilePage() {
   const [listings, setListings] = useState<Listing[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [errorCode, setErrorCode] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState('about');
   const [connectionStatus, setConnectionStatus] = useState<ConnectionStatus>('none');
   const [connectionId, setConnectionId] = useState<number | null>(null);
@@ -176,6 +177,7 @@ export function ProfilePage() {
     try {
       setIsLoading(true);
       setError(null);
+      setErrorCode(null);
 
       const requests: Promise<unknown>[] = [
         api.get<UserType>(`/v2/users/${profileId}`),
@@ -260,7 +262,13 @@ export function ProfilePage() {
           });
         }
       } else {
-        setError(tRef.current('not_found'));
+        const resCode = (profileRes as { code?: string }).code;
+        setErrorCode(resCode ?? null);
+        setError(
+          resCode === 'PROFILE_INCOMPLETE'
+            ? tRef.current('profile_incomplete')
+            : tRef.current('not_found'),
+        );
         return;
       }
       if (listingsRes.success && listingsRes.data) {
@@ -420,13 +428,13 @@ export function ProfilePage() {
     );
   }
 
-  // Profile not found
+  // Profile not found or incomplete
   if (!profile) {
     return (
       <EmptyState
         icon={<User className="w-12 h-12" aria-hidden="true" />}
-        title={t('not_found')}
-        description={t('not_found_desc')}
+        title={errorCode === 'PROFILE_INCOMPLETE' ? t('profile_incomplete') : t('not_found')}
+        description={errorCode === 'PROFILE_INCOMPLETE' ? t('profile_incomplete_desc') : t('not_found_desc')}
         action={
           <Link to={tenantPath('/members')}>
             <Button

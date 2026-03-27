@@ -15,6 +15,7 @@ use App\Services\MailchimpService;
 use App\Core\TenantContext;
 use App\Models\User;
 use App\Services\MemberRankingService;
+use App\Services\OnboardingConfigService;
 
 /**
  * UsersController - User profiles, settings, preferences, sessions.
@@ -90,6 +91,9 @@ class UsersController extends BaseApiController
                 $errorCode = $errors[0]['code'] ?? 'NOT_FOUND';
                 if ($errorCode === 'FORBIDDEN') {
                     return $this->respondWithErrors($errors, 403);
+                }
+                if ($errorCode === 'PROFILE_INCOMPLETE') {
+                    return $this->respondWithError('PROFILE_INCOMPLETE', 'This member\'s profile is not yet complete', null, 404);
                 }
             }
             return $this->respondWithError('NOT_FOUND', 'User not found', null, 404);
@@ -885,6 +889,12 @@ class UsersController extends BaseApiController
         if ($viewerId) {
             $whereClause .= ' AND u.id != ?';
             $params[] = $viewerId;
+        }
+
+        // Apply onboarding visibility gating (admin-configurable per tenant)
+        $visibilityConditions = OnboardingConfigService::getVisibilitySqlConditions($tenantId);
+        foreach ($visibilityConditions as $condition) {
+            $whereClause .= " AND ($condition)";
         }
 
         $totalCount = (int) DB::selectOne("SELECT COUNT(*) as total FROM users u WHERE $whereClause", $params)->total;

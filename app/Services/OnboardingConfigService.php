@@ -189,6 +189,65 @@ class OnboardingConfigService
     }
 
     /**
+     * Apply profile visibility filters to an Eloquent User query builder.
+     *
+     * Uses the same config as isProfileVisible() but as query-level conditions
+     * so member lists, search, and nearby exclude hidden profiles efficiently.
+     *
+     * @param \Illuminate\Database\Eloquent\Builder $query  User query builder
+     * @param int|null $tenantId  Tenant ID (defaults to current tenant)
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
+    public static function applyVisibilityScope($query, ?int $tenantId = null)
+    {
+        $config = self::getConfig($tenantId);
+
+        if ($config['require_completion_for_visibility']) {
+            $query->where('onboarding_completed', true);
+        }
+
+        if ($config['require_avatar_for_visibility']) {
+            $query->where('avatar_url', '!=', '')->whereNotNull('avatar_url');
+        }
+
+        if ($config['require_bio_for_visibility']) {
+            $query->where('bio', '!=', '')->whereNotNull('bio');
+        }
+
+        return $query;
+    }
+
+    /**
+     * Get SQL WHERE clauses for profile visibility filtering (raw queries).
+     *
+     * Returns an array of SQL condition strings to AND into a WHERE clause.
+     * The table alias defaults to 'u' to match UsersController::index().
+     *
+     * @param int|null $tenantId  Tenant ID (defaults to current tenant)
+     * @param string   $alias     Table alias (default 'u')
+     * @return string[]
+     */
+    public static function getVisibilitySqlConditions(?int $tenantId = null, string $alias = 'u'): array
+    {
+        $config = self::getConfig($tenantId);
+        $conditions = [];
+
+        if ($config['require_completion_for_visibility']) {
+            $conditions[] = "{$alias}.onboarding_completed = 1";
+        }
+
+        if ($config['require_avatar_for_visibility']) {
+            $conditions[] = "{$alias}.avatar_url IS NOT NULL AND {$alias}.avatar_url != ''";
+        }
+
+        if ($config['require_bio_for_visibility']) {
+            $conditions[] = "{$alias}.bio IS NOT NULL AND TRIM({$alias}.bio) != ''";
+        }
+
+        return $conditions;
+    }
+
+    /**
      * Get the listing creation mode for a tenant.
      */
     public static function getListingCreationMode(?int $tenantId = null): string
