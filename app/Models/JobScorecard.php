@@ -9,6 +9,7 @@ namespace App\Models;
 use App\Models\Concerns\HasTenantScope;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class JobScorecard extends Model
 {
@@ -26,4 +27,14 @@ class JobScorecard extends Model
         'total_score' => 'float',
         'max_score'   => 'float',
     ];
+
+    public function reviewer(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'reviewer_id');
+    }
+
+    public function application(): BelongsTo
+    {
+        return $this->belongsTo(JobApplication::class, 'application_id');
+    }
 }
