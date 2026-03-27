@@ -591,7 +591,7 @@ export function ConversationPage() {
 
     try {
       setIsArchiving(true);
-      const response = await api.delete(`/v2/messages/conversations/${id}`, { data: { scope } });
+      const response = await api.delete(`/v2/messages/conversations/${id}?scope=${scope}`);
 
       if (response.success) {
         if (scope === 'everyone') {
@@ -1074,7 +1074,7 @@ export function ConversationPage() {
     setPendingDeleteId(null);
 
     try {
-      const response = await api.delete(`/v2/messages/${messageId}`, { data: { scope } });
+      const response = await api.delete(`/v2/messages/${messageId}?scope=${scope}`);
 
       if (response.success) {
         if (scope === 'self') {

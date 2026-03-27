@@ -121,11 +121,11 @@ Here's the full breakdown:
 
 This is where it gets exciting.
 
-We're actively developing a **Federation API** designed to connect Project NEXUS with other timebanking platforms around the world. The vision is simple but ambitious: **a global time bank where external federation partners can discover each other, exchange services, and trade time credits across platforms and across borders.**
+**V1 ships with a fully working Federation API** — live today, connecting Project NEXUS communities with each other and with other timebanking platforms around the world. The vision is simple but ambitious: **a global time bank where external federation partners can discover each other, exchange services, and trade time credits across platforms and across borders.**
 
 Imagine a member in Dublin helping someone in São Paulo with web design, while a member in Tokyo teaches Irish students origami — all through interconnected timebanking platforms, all valuing every hour equally.
 
-The Federation API will enable:
+The Federation API — available in V1 right now — enables:
 - **Cross-platform discovery** — Find members and services on partner timebanking platforms globally
 - **Interoperable time credit exchange** — Trade time credits between different timebanking systems seamlessly
 - **Federation Neighborhoods** — Geographically grouped clusters of federated communities for regional coordination
@@ -134,7 +134,7 @@ The Federation API will enable:
 - **Global marketplace** — A unified view of offers and requests spanning multiple platforms and communities
 - **Trust & verification** — Federated reputation and review systems that travel with members across platforms
 
-This isn't just about connecting NEXUS communities to each other — it's about building the **open infrastructure for a worldwide timebanking economy.** We're inviting timebanking platforms, community currency projects, and mutual aid networks everywhere to join us in defining this standard together.
+This isn't just about connecting NEXUS communities to each other — it's about building the **open infrastructure for a worldwide timebanking economy.** V2 will extend and deepen this foundation further. We're inviting timebanking platforms, community currency projects, and mutual aid networks everywhere to join us in defining this standard together.
 
 ---
 
@@ -176,8 +176,7 @@ While V1 represents years of refinement and real-world use, we're already buildi
 - Modern microservices architecture (ASP.NET Core 8 + React 18)
 - Enhanced scalability for global networks
 - Advanced AI integration for matching and insights
-- **The Federation API** — purpose-built for global interoperability between timebanking platforms
-- Improved federation protocols for cross-platform credit exchange
+- **Extended Federation Protocol** — building on V1's Federation API with deeper cross-platform credit exchange, richer interoperability standards, and expanded global network capabilities
 - Next-generation UX patterns
 
 V2 is also fully open source from day one. Follow along, contribute ideas, or just watch the journey:
