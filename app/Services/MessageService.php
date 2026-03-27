@@ -544,6 +544,7 @@ class MessageService
                 ->update([
                     'is_deleted'  => true,
                     'body'        => '[Message deleted]',
+                    'reactions'   => null,
                     'deleted_at'  => now(),
                 ]);
         } else {
@@ -586,40 +587,42 @@ class MessageService
             return null;
         }
 
-        $reactions = [];
-        $rawReactions = DB::table('messages')->where('id', $messageId)->value('reactions');
-        if (! empty($rawReactions)) {
-            $reactions = json_decode($rawReactions, true) ?? [];
-        }
-
-        $userReactions = $reactions['_users'] ?? [];
-        $userKey = "{$userId}_{$emoji}";
-
-        $wasAdded = false;
-        if (isset($userReactions[$userKey])) {
-            // Remove
-            unset($userReactions[$userKey]);
-            if (isset($reactions[$emoji]) && $reactions[$emoji] > 0) {
-                $reactions[$emoji]--;
-                if ($reactions[$emoji] <= 0) {
-                    unset($reactions[$emoji]);
-                }
+        return DB::transaction(function () use ($messageId, $userId, $emoji) {
+            $reactions = [];
+            $rawReactions = DB::table('messages')->where('id', $messageId)->lockForUpdate()->value('reactions');
+            if (! empty($rawReactions)) {
+                $reactions = json_decode($rawReactions, true) ?? [];
             }
-        } else {
-            // Add
-            $userReactions[$userKey] = true;
-            $reactions[$emoji] = ($reactions[$emoji] ?? 0) + 1;
-            $wasAdded = true;
-        }
 
-        $reactions['_users'] = $userReactions;
+            $userReactions = $reactions['_users'] ?? [];
+            $userKey = "{$userId}_{$emoji}";
 
-        DB::table('messages')
-            ->where('id', $messageId)
-            ->where('tenant_id', app('tenant.id'))
-            ->update(['reactions' => json_encode($reactions)]);
+            $wasAdded = false;
+            if (isset($userReactions[$userKey])) {
+                // Remove
+                unset($userReactions[$userKey]);
+                if (isset($reactions[$emoji]) && $reactions[$emoji] > 0) {
+                    $reactions[$emoji]--;
+                    if ($reactions[$emoji] <= 0) {
+                        unset($reactions[$emoji]);
+                    }
+                }
+            } else {
+                // Add
+                $userReactions[$userKey] = true;
+                $reactions[$emoji] = ($reactions[$emoji] ?? 0) + 1;
+                $wasAdded = true;
+            }
 
-        return $wasAdded;
+            $reactions['_users'] = $userReactions;
+
+            DB::table('messages')
+                ->where('id', $messageId)
+                ->where('tenant_id', app('tenant.id'))
+                ->update(['reactions' => json_encode($reactions)]);
+
+            return $wasAdded;
+        });
     }
 
     // -----------------------------------------------------------------

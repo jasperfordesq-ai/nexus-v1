@@ -13,6 +13,7 @@ use App\Core\Mailer;
 use App\Core\TenantContext;
 use App\Models\Message;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 /**
  * VoiceMessageController -- Voice message recording and storage.
@@ -110,7 +111,8 @@ class VoiceMessageController extends BaseApiController
                 'duration'   => $audioResult['duration'],
             ], null, 201);
         } catch (\Exception $e) {
-            return $this->respondWithError('UPLOAD_FAILED', $e->getMessage(), 'audio', 400);
+            Log::error('Voice message store failed', ['error' => $e->getMessage(), 'trace' => $e->getTraceAsString()]);
+            return $this->respondWithError('UPLOAD_FAILED', 'Failed to upload audio file', 'audio', 400);
         }
     }
 }

@@ -178,9 +178,12 @@ class ContextualMessageService
 
     private function getListingContext(int $id): ?array
     {
+        $tenantId = TenantContext::getId();
+
         $row = DB::table('listings as l')
             ->join('users as u', 'l.user_id', '=', 'u.id')
             ->where('l.id', $id)
+            ->where('l.tenant_id', $tenantId)
             ->select('l.id', 'l.title', 'l.type', 'l.description', 'u.name as user_name')
             ->first();
 
@@ -200,7 +203,9 @@ class ContextualMessageService
 
     private function getEventContext(int $id): ?array
     {
-        $row = DB::table('events')->where('id', $id)->first(['id', 'title', 'start_time', 'location']);
+        $tenantId = TenantContext::getId();
+
+        $row = DB::table('events')->where('id', $id)->where('tenant_id', $tenantId)->first(['id', 'title', 'start_time', 'location']);
 
         if (!$row) {
             return null;
@@ -223,9 +228,12 @@ class ContextualMessageService
 
     private function getJobContext(int $id): ?array
     {
+        $tenantId = TenantContext::getId();
+
         $row = DB::table('job_vacancies as j')
             ->leftJoin('organizations as o', 'j.organization_id', '=', 'o.id')
             ->where('j.id', $id)
+            ->where('j.tenant_id', $tenantId)
             ->select('j.id', 'j.title', 'j.location', 'o.name as org_name')
             ->first();
 
@@ -245,9 +253,12 @@ class ContextualMessageService
 
     private function getVolunteeringContext(int $id): ?array
     {
+        $tenantId = TenantContext::getId();
+
         $row = DB::table('volunteer_opportunities as v')
             ->leftJoin('organizations as o', 'v.organization_id', '=', 'o.id')
             ->where('v.id', $id)
+            ->where('v.tenant_id', $tenantId)
             ->select('v.id', 'v.title', 'v.location', 'o.name as org_name')
             ->first();
 
@@ -267,7 +278,9 @@ class ContextualMessageService
 
     private function getGroupContext(int $id): ?array
     {
-        $row = DB::table('groups')->where('id', $id)->first(['id', 'name', 'description']);
+        $tenantId = TenantContext::getId();
+
+        $row = DB::table('groups')->where('id', $id)->where('tenant_id', $tenantId)->first(['id', 'name', 'description']);
 
         if (!$row) {
             return null;

@@ -12,6 +12,7 @@ use App\Services\BrokerMessageVisibilityService;
 use App\Core\AudioUploader;
 use App\Core\TenantContext;
 use App\Models\Message;
+use Illuminate\Support\Facades\Log;
 
 /**
  * MessagesController - Conversations, direct messaging, reactions.
@@ -121,6 +122,10 @@ class MessagesController extends BaseApiController
             return $this->respondWithError('VALIDATION_ERROR', 'Message body or voice message is required', 'body', 422);
         }
 
+        if (strlen($body) > 10000) {
+            return $this->respondWithError('VALIDATION_ERROR', 'Message is too long (max 10000 characters)', 'body', 400);
+        }
+
         $message = $this->messageService->send($userId, $data);
 
         if (!$message) {
@@ -144,6 +149,7 @@ class MessagesController extends BaseApiController
     public function markRead(int $id): JsonResponse
     {
         $userId = $this->requireAuth();
+        $this->rateLimit('messages_mark_read', 60, 60);
         $otherUserId = $id;
 
         $count = $this->messageService->markAsRead($otherUserId, $userId);
@@ -373,7 +379,8 @@ class MessagesController extends BaseApiController
             $deleted = Message::deleteConversation($tenantId, $userId, $otherUserId);
             return $this->success(['deleted' => $deleted]);
         } catch (\Throwable $e) {
-            return $this->error($e->getMessage(), 500);
+            Log::error('Failed to delete conversation', ['error' => $e->getMessage(), 'user' => $userId, 'other_user' => $otherUserId]);
+            return $this->error('Failed to delete conversation', 500);
         }
     }
 
@@ -383,6 +390,7 @@ class MessagesController extends BaseApiController
     public function getReactionsBatch(): JsonResponse
     {
         $this->requireAuth();
+        $this->rateLimit('messages_reactions_batch', 30, 60);
 
         $idsParam = $this->query('ids', '');
         if (empty($idsParam)) {
@@ -401,7 +409,8 @@ class MessagesController extends BaseApiController
             $reactions = Message::getReactionsBatch($ids);
             return $this->success(['reactions' => $reactions]);
         } catch (\Throwable $e) {
-            return $this->error($e->getMessage(), 500);
+            Log::error('Failed to fetch reactions batch', ['error' => $e->getMessage(), 'ids' => $ids]);
+            return $this->error('Failed to fetch reactions', 500);
         }
     }
 
@@ -474,7 +483,8 @@ class MessagesController extends BaseApiController
                 'duration'  => $audioResult['duration'],
             ]);
         } catch (\Exception $e) {
-            return $this->respondWithError('UPLOAD_FAILED', 'Failed to upload audio: ' . $e->getMessage(), 'audio', 400);
+            Log::error('Voice upload failed', ['error' => $e->getMessage(), 'trace' => $e->getTraceAsString()]);
+            return $this->respondWithError('UPLOAD_FAILED', 'Failed to upload audio file', 'audio', 400);
         }
     }
 
@@ -527,7 +537,8 @@ class MessagesController extends BaseApiController
 
             return $this->respondWithData($message, null, 201);
         } catch (\Exception $e) {
-            return $this->respondWithError('UPLOAD_FAILED', 'Failed to send voice message: ' . $e->getMessage(), 'voice_message', 400);
+            Log::error('Voice message send failed', ['error' => $e->getMessage(), 'trace' => $e->getTraceAsString()]);
+            return $this->respondWithError('UPLOAD_FAILED', 'Failed to send voice message', 'voice_message', 400);
         }
     }
 

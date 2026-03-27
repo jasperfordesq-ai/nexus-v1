@@ -9,7 +9,6 @@ namespace App\Listeners;
 use App\Events\MessageSent;
 use App\Services\NotificationDispatcher;
 use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
 /**
@@ -24,37 +23,46 @@ class NotifyMessageReceived implements ShouldQueue
 
     /**
      * Handle the event.
+     *
+     * Messages are 1-to-1 direct messages with sender_id and receiver_id
+     * on the Message model. The recipient is simply the receiver_id.
      */
     public function handle(MessageSent $event): void
     {
         try {
+            $message = $event->message;
             $senderId = $event->sender->id;
+            $recipientId = (int) $message->receiver_id;
+
+            if ($recipientId === $senderId || $recipientId <= 0) {
+                Log::warning('NotifyMessageReceived: invalid recipient', [
+                    'sender_id' => $senderId,
+                    'receiver_id' => $recipientId,
+                    'message_id' => $message->id ?? null,
+                    'tenant_id' => $event->tenantId,
+                ]);
+                return;
+            }
+
             $senderName = $event->sender->first_name ?? $event->sender->name ?? 'Someone';
-
-            // Find all other participants in the conversation (not the sender)
-            $recipientIds = DB::table('conversation_participants')
-                ->where('conversation_id', $event->conversationId)
-                ->where('user_id', '!=', $senderId)
-                ->pluck('user_id');
-
-            $link = '/messages/' . $event->conversationId;
+            $link = '/messages/' . $senderId;
             $content = "{$senderName} sent you a message";
 
-            foreach ($recipientIds as $recipientId) {
-                NotificationDispatcher::dispatch(
-                    (int) $recipientId,
-                    'global',
-                    null,
-                    'new_message',
-                    $content,
-                    $link,
-                    null
-                );
-            }
+            NotificationDispatcher::dispatch(
+                $recipientId,
+                'global',
+                null,
+                'new_message',
+                $content,
+                $link,
+                null
+            );
         } catch (\Throwable $e) {
             Log::error('NotifyMessageReceived listener failed', [
-                'conversation_id' => $event->conversationId ?? null,
+                'message_id' => $event->message->id ?? null,
                 'sender_id' => $event->sender->id ?? null,
+                'receiver_id' => $event->message->receiver_id ?? null,
+                'tenant_id' => $event->tenantId ?? null,
                 'error' => $e->getMessage(),
                 'trace' => $e->getTraceAsString(),
             ]);

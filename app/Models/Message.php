@@ -158,13 +158,13 @@ class Message extends Model
             }
 
             $content = "{$senderName} sent you a message: {$preview}";
-            $link = "/messages/{$senderId}";
 
             $receiverName = $receiver->first_name ?? 'there';
             $tenant = TenantContext::get();
             $tenantName = $tenant['name'] ?? 'Project NEXUS';
             $baseUrl = TenantContext::getFrontendUrl();
             $slugPrefix = TenantContext::getSlugPrefix();
+            $link = "{$slugPrefix}/messages/{$senderId}";
 
             $htmlBody = <<<HTML
 <div style="font-family: system-ui, -apple-system, sans-serif; max-width: 600px; margin: 0 auto;">
@@ -178,7 +178,7 @@ class Message extends Model
             <p style="color: #1e293b; margin: 0; font-style: italic;">"{$preview}"</p>
         </div>
         <div style="text-align: center; margin-top: 24px;">
-            <a href="{$baseUrl}{$slugPrefix}{$link}" style="display: inline-block; background: linear-gradient(135deg, #6366f1, #8b5cf6); color: white; padding: 12px 32px; border-radius: 8px; text-decoration: none; font-weight: 600;">
+            <a href="{$baseUrl}{$link}" style="display: inline-block; background: linear-gradient(135deg, #6366f1, #8b5cf6); color: white; padding: 12px 32px; border-radius: 8px; text-decoration: none; font-weight: 600;">
                 Read Message
             </a>
         </div>
