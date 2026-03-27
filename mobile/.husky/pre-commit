@@ -7,3 +7,4 @@ echo "Running type check..."
 npm run type-check
 echo "Running lint..."
 npm run lint || echo "⚠️  Mobile lint failed (eslint-plugin-react compat issue) — non-blocking"
+exit 0
