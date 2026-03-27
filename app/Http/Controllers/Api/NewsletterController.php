@@ -6,8 +6,10 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Models\NewsletterAnalytics;
 use App\Services\NewsletterService;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Response;
 use Illuminate\Support\Facades\DB;
 
 /**
@@ -135,5 +137,42 @@ class NewsletterController extends BaseApiController
         }
 
         return $this->respondWithError('SERVER_ERROR', 'Unable to process your request. Please try again.', null, 500);
+    }
+
+    /**
+     * GET /v2/newsletter/pixel/{token}
+     *
+     * Tracking pixel — records an email open event and returns a 1×1
+     * transparent GIF. No authentication required; the token identifies
+     * the specific queue entry (unsubscribe_token used as tracking key).
+     */
+    public function trackOpen(string $token): Response
+    {
+        // 1×1 transparent GIF
+        $gif = base64_decode('R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7');
+
+        try {
+            $queue = DB::table('newsletter_queue')
+                ->where('unsubscribe_token', $token)
+                ->first(['newsletter_id', 'email']);
+
+            if ($queue instanceof \stdClass) {
+                NewsletterAnalytics::recordOpen(
+                    (int) $queue->newsletter_id,
+                    null,
+                    (string) $queue->email,
+                    request()->header('User-Agent'),
+                    request()->ip()
+                );
+            }
+        } catch (\Throwable) {
+            // Never break email rendering over a tracking failure
+        }
+
+        return response($gif, 200, [
+            'Content-Type'  => 'image/gif',
+            'Cache-Control' => 'no-store, no-cache, must-revalidate, max-age=0',
+            'Pragma'        => 'no-cache',
+        ]);
     }
 }

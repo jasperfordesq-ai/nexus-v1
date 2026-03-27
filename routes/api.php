@@ -1377,6 +1377,7 @@ Route::post('/messages/reaction', [\App\Http\Controllers\Api\MessagesController:
 Route::get('/messages/reactions-batch', [\App\Http\Controllers\Api\MessagesController::class, 'getReactionsBatch']);
 Route::get('/admin/users/search', [\App\Http\Controllers\Api\AdminTimebankingController::class, 'userSearchApi'])->middleware(['auth:sanctum', 'admin']);
 Route::post('/v2/newsletter/unsubscribe', [\App\Http\Controllers\Api\NewsletterController::class, 'unsubscribe']);
+Route::get('/v2/newsletter/pixel/{token}', [\App\Http\Controllers\Api\NewsletterController::class, 'trackOpen']);
 Route::post('/gdpr/consent', [\App\Http\Controllers\Api\GdprController::class, 'updateConsent']);
 Route::post('/gdpr/request', [\App\Http\Controllers\Api\GdprController::class, 'createRequest']);
 Route::post('/gdpr/delete-account', [\App\Http\Controllers\Api\GdprController::class, 'deleteAccount']);

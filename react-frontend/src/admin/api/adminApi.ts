@@ -951,10 +951,10 @@ export const adminNewsletters = {
 
   // Send workflow
   sendNewsletter: (id: number) =>
-    api.post<{ success: boolean }>(`/v2/admin/newsletters/${id}/send`, {}),
+    api.post<{ queued: number; status: string; message: string }>(`/v2/admin/newsletters/${id}/send`, {}),
 
   sendTest: (id: number) =>
-    api.post<{ success: boolean }>(`/v2/admin/newsletters/${id}/send-test`, {}),
+    api.post<{ sent_to: string; message: string }>(`/v2/admin/newsletters/${id}/send-test`, {}),
 
   getRecipientCount: (params: { target_audience: string; segment_id?: number }) =>
     api.post<{ count: number }>('/v2/admin/newsletters/recipient-count', params),

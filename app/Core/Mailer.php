@@ -210,18 +210,18 @@ class Mailer
      * @param string|null $replyTo Reply-To address (optional)
      * @return bool
      */
-    public function send($to, $subject, $body, $cc = null, $replyTo = null): bool
+    public function send($to, $subject, $body, $cc = null, $replyTo = null, ?string $unsubscribeUrl = null): bool
     {
         // Route based on configured driver
         if ($this->driver === 'sendgrid') {
-            $result = $this->sendViaSendGrid($to, $subject, $body, $cc, $replyTo);
+            $result = $this->sendViaSendGrid($to, $subject, $body, $cc, $replyTo, $unsubscribeUrl);
             if ($result) {
                 return true;
             }
 
             if (!empty($this->host) && !empty($this->username)) {
                 error_log("Mailer: SendGrid failed, falling back to SMTP for: $to");
-                return $this->sendViaSmtp($to, $subject, $body, $cc, $replyTo);
+                return $this->sendViaSmtp($to, $subject, $body, $cc, $replyTo, $unsubscribeUrl);
             }
 
             error_log("Mailer: SendGrid failed and no SMTP fallback configured. Email not sent to: $to");
@@ -229,27 +229,27 @@ class Mailer
         }
 
         if ($this->driver === 'gmail_api') {
-            $result = $this->sendViaGmailApi($to, $subject, $body, $cc, $replyTo);
+            $result = $this->sendViaGmailApi($to, $subject, $body, $cc, $replyTo, $unsubscribeUrl);
             if ($result) {
                 return true;
             }
 
             if (!empty($this->host) && !empty($this->username)) {
                 error_log("Mailer: Gmail API failed, falling back to SMTP for: $to");
-                return $this->sendViaSmtp($to, $subject, $body, $cc, $replyTo);
+                return $this->sendViaSmtp($to, $subject, $body, $cc, $replyTo, $unsubscribeUrl);
             }
 
             error_log("Mailer: Gmail API failed and no SMTP fallback configured. Email not sent to: $to");
             return false;
         }
 
-        return $this->sendViaSmtp($to, $subject, $body, $cc, $replyTo);
+        return $this->sendViaSmtp($to, $subject, $body, $cc, $replyTo, $unsubscribeUrl);
     }
 
     /**
      * Send email via SendGrid Web API v3.
      */
-    private function sendViaSendGrid($to, $subject, $body, $cc = null, $replyTo = null): bool
+    private function sendViaSendGrid($to, $subject, $body, $cc = null, $replyTo = null, ?string $unsubscribeUrl = null): bool
     {
         try {
             $email = new \SendGrid\Mail\Mail();
@@ -279,6 +279,11 @@ class Mailer
                 $email->addHeader('X-Nexus-Tenant', (string) $this->tenantId);
             }
 
+            if ($unsubscribeUrl) {
+                $email->addHeader('List-Unsubscribe', '<' . $unsubscribeUrl . '>');
+                $email->addHeader('List-Unsubscribe-Post', 'List-Unsubscribe=One-Click');
+            }
+
             $sendgrid = new \SendGrid($this->sendgridApiKey);
             $response = $sendgrid->send($email);
 
@@ -301,7 +306,7 @@ class Mailer
     /**
      * Send email via Gmail API using OAuth 2.0.
      */
-    private function sendViaGmailApi($to, $subject, $body, $cc = null, $replyTo = null)
+    private function sendViaGmailApi($to, $subject, $body, $cc = null, $replyTo = null, ?string $unsubscribeUrl = null)
     {
         try {
             $accessToken = $this->getGmailAccessToken();
@@ -309,7 +314,7 @@ class Mailer
                 throw new \Exception("Failed to get Gmail API access token");
             }
 
-            $rawEmail = $this->buildRawEmail($to, $subject, $body, $cc, $replyTo);
+            $rawEmail = $this->buildRawEmail($to, $subject, $body, $cc, $replyTo, $unsubscribeUrl);
             $encodedEmail = $this->base64urlEncode($rawEmail);
 
             $url = 'https://gmail.googleapis.com/gmail/v1/users/me/messages/send';
@@ -497,7 +502,7 @@ class Mailer
         return rtrim(strtr(base64_encode($data), '+/', '-_'), '=');
     }
 
-    private function buildRawEmail($to, $subject, $body, $cc = null, $replyTo = null)
+    private function buildRawEmail($to, $subject, $body, $cc = null, $replyTo = null, ?string $unsubscribeUrl = null)
     {
         $boundary = 'boundary_' . md5(uniqid(time()));
 
@@ -520,6 +525,10 @@ class Mailer
         $headers[] = 'Content-Type: multipart/alternative; boundary="' . $boundary . '"';
         $headers[] = 'Date: ' . date('r');
         $headers[] = 'Message-ID: <' . md5(uniqid(time())) . '@' . parse_url($_ENV['APP_URL'] ?? 'localhost', PHP_URL_HOST) . '>';
+        if ($unsubscribeUrl) {
+            $headers[] = 'List-Unsubscribe: <' . $unsubscribeUrl . '>';
+            $headers[] = 'List-Unsubscribe-Post: List-Unsubscribe=One-Click';
+        }
 
         $message = implode("\r\n", $headers) . "\r\n\r\n";
 
@@ -538,12 +547,12 @@ class Mailer
         return $message;
     }
 
-    private function sendViaSmtp($to, $subject, $body, $cc = null, $replyTo = null)
+    private function sendViaSmtp($to, $subject, $body, $cc = null, $replyTo = null, ?string $unsubscribeUrl = null)
     {
         try {
             $this->connect();
             $this->auth();
-            $this->sendData($to, $subject, $body, $cc, $replyTo);
+            $this->sendData($to, $subject, $body, $cc, $replyTo, $unsubscribeUrl);
             $this->quit();
             return true;
         } catch (\Exception $e) {
@@ -594,7 +603,7 @@ class Mailer
         $this->read();
     }
 
-    private function sendData($to, $subject, $body, $cc = null, $replyTo = null)
+    private function sendData($to, $subject, $body, $cc = null, $replyTo = null, ?string $unsubscribeUrl = null)
     {
         $this->write("MAIL FROM: <{$this->fromEmail}>");
         $this->read();
@@ -617,7 +626,12 @@ class Mailer
         if ($replyTo) {
             $headers .= "Reply-To: $replyTo\r\n";
         }
-        $headers .= "Subject: $subject\r\n";
+        // RFC 2047: encode subject so non-ASCII characters survive SMTP transport
+        $headers .= "Subject: =?UTF-8?B?" . base64_encode($subject) . "?=\r\n";
+        if ($unsubscribeUrl) {
+            $headers .= "List-Unsubscribe: <$unsubscribeUrl>\r\n";
+            $headers .= "List-Unsubscribe-Post: List-Unsubscribe=One-Click\r\n";
+        }
 
         $this->write($headers . "\r\n" . $body . "\r\n.");
         $this->read();

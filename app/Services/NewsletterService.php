@@ -196,7 +196,7 @@ class NewsletterService
             ->where('id', $tenantId)
             ->value('name') ?? 'Community';
 
-        $mailer = new \App\Core\Mailer();
+        $mailer = new \App\Core\Mailer($tenantId);
 
         $pending = DB::table('newsletter_queue')
             ->where('newsletter_id', $newsletterId)
@@ -226,7 +226,12 @@ class NewsletterService
 
                 $subject = $newsletter->subject;
 
-                $success = $mailer->send($item->email, $subject, $emailHtml);
+                $apiUrl = rtrim(config('app.url', ''), '/');
+                $unsubscribeUrl = $unsubscribeToken
+                    ? $apiUrl . '/newsletter/unsubscribe?token=' . $unsubscribeToken
+                    : null;
+
+                $success = $mailer->send($item->email, $subject, $emailHtml, null, null, $unsubscribeUrl);
 
                 if ($success) {
                     DB::table('newsletter_queue')
@@ -265,10 +270,13 @@ class NewsletterService
             'total_failed' => (int) ($stats->failed ?? 0),
         ]);
 
-        // If queue is complete, mark newsletter as sent
+        // If queue is complete, mark newsletter as sent (or failed if nothing went out)
         if (((int) ($stats->pending ?? 0)) === 0) {
+            $totalSent   = (int) ($stats->sent ?? 0);
+            $totalFailed = (int) ($stats->failed ?? 0);
+            $finalStatus = ($totalSent === 0 && $totalFailed > 0) ? 'failed' : 'sent';
             $newsletter->update([
-                'status' => 'sent',
+                'status'  => $finalStatus,
                 'sent_at' => now(),
             ]);
         }
@@ -341,6 +349,16 @@ class NewsletterService
             $content = self::personalizeContent($content, $recipient);
         }
 
+        // Replace global tokens that are the same for every recipient in this send
+        $unsubscribeLink = $unsubscribeToken
+            ? '<a href="' . $apiUrl . '/newsletter/unsubscribe?token=' . $unsubscribeToken . '" style="color:#6366f1;">Unsubscribe</a>'
+            : '';
+        $content = str_replace(
+            ['{{tenant_name}}', '{{unsubscribe_link}}'],
+            [$tenantName, $unsubscribeLink],
+            $content
+        );
+
         // Build unsubscribe URL
         if ($unsubscribeToken) {
             $unsubscribeUrl = $apiUrl . '/newsletter/unsubscribe?token=' . $unsubscribeToken;
@@ -350,6 +368,18 @@ class NewsletterService
         } else {
             $unsubscribeUrl = $frontendUrl . '/settings';
             $unsubscribeLinks = '<a href="' . $unsubscribeUrl . '" style="color: #6b7280; text-decoration: underline;">Manage Email Preferences</a>';
+        }
+
+        // Tracking pixel (1×1 transparent GIF) — only when we have a token
+        $pixelHtml = '';
+        if ($unsubscribeToken) {
+            $pixelUrl = $apiUrl . '/v2/newsletter/pixel/' . rawurlencode($unsubscribeToken);
+            $pixelHtml = '<img src="' . $pixelUrl . '" width="1" height="1" border="0" alt=""'
+                . ' style="height:1px!important;width:1px!important;border-width:0!important;'
+                . 'margin-top:0!important;margin-bottom:0!important;'
+                . 'margin-right:0!important;margin-left:0!important;'
+                . 'padding-top:0!important;padding-bottom:0!important;'
+                . 'padding-right:0!important;padding-left:0!important;display:block;" />';
         }
 
         return <<<HTML
@@ -440,6 +470,7 @@ class NewsletterService
             </td>
         </tr>
     </table>
+    {$pixelHtml}
 </body>
 </html>
 HTML;
@@ -478,7 +509,7 @@ HTML;
             return 0;
         }
 
-        $rules = $segment->rules; // Cast to array via $casts
+        $rules = self::normalizeSegmentRules($segment->rules, $segment->match_type ?? 'all');
 
         return self::countUsersByRules($rules);
     }
@@ -614,7 +645,7 @@ HTML;
             return [];
         }
 
-        $rules = $segment->rules;
+        $rules = self::normalizeSegmentRules($segment->rules, $segment->match_type ?? 'all');
         $users = self::queryUsersByRules($rules);
 
         $tenantId = TenantContext::getId();
@@ -646,6 +677,34 @@ HTML;
     // =========================================================================
     // SEGMENT RULE EVALUATION
     // =========================================================================
+
+    /**
+     * Normalize segment rules to the {match, conditions} format expected by
+     * queryUsersByRules() / countUsersByRules().
+     *
+     * React saves rules as a flat array [{field, operator, value}, ...] alongside
+     * a separate match_type column. The service query methods expect the nested
+     * format {match: 'all'|'any', conditions: [...]}.
+     */
+    private static function normalizeSegmentRules(mixed $rules, string $matchType = 'all'): array
+    {
+        if (!is_array($rules)) {
+            return ['match' => $matchType, 'conditions' => []];
+        }
+
+        // Already in nested format: {match: ..., conditions: [...]}
+        if (isset($rules['conditions'])) {
+            // Ensure match key reflects the segment's match_type column
+            $rules['match'] = $rules['match'] ?? $matchType;
+            return $rules;
+        }
+
+        // Flat array format [{field, operator, value}, ...] — wrap it
+        return [
+            'match' => $matchType,
+            'conditions' => array_values($rules),
+        ];
+    }
 
     /**
      * Query users matching segment rules.
@@ -987,6 +1046,18 @@ HTML;
                 ->get();
 
             foreach ($newsletters as $newsletter) {
+                // Atomically claim by flipping status from 'scheduled' → 'sending'.
+                // If another cron process already claimed this newsletter the UPDATE
+                // will match 0 rows and we skip it, preventing duplicate sends.
+                $claimed = DB::table('newsletters')
+                    ->where('id', $newsletter->id)
+                    ->where('status', 'scheduled')
+                    ->update(['status' => 'sending', 'updated_at' => now()]);
+
+                if (!$claimed) {
+                    continue;
+                }
+
                 try {
                     $service = app(self::class);
                     $service->sendNow(
@@ -997,6 +1068,11 @@ HTML;
                     $processed++;
                 } catch (\Exception $e) {
                     Log::error("Failed to process scheduled newsletter {$newsletter->id}: " . $e->getMessage());
+                    // Revert status so it can be retried
+                    DB::table('newsletters')
+                        ->where('id', $newsletter->id)
+                        ->where('status', 'sending')
+                        ->update(['status' => 'scheduled', 'updated_at' => now()]);
                 }
             }
         } catch (\Exception $e) {

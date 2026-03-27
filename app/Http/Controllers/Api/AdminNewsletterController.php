@@ -2424,7 +2424,7 @@ class AdminNewsletterController extends BaseApiController
 
             $subject = '[TEST] ' . ($newsletter->subject ?? 'No Subject');
 
-            $sent = (new \App\Core\Mailer())->send($admin->email, $subject, $html);
+            $sent = (new \App\Core\Mailer($tenantId))->send($admin->email, $subject, $html);
 
             if ($sent) {
                 return $this->respondWithData([

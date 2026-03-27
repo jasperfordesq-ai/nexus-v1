@@ -10,10 +10,15 @@ use App\Models\Concerns\HasTenantScope;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Support\Facades\DB;
 
 class NewsletterBounce extends Model
 {
     use HasFactory, HasTenantScope;
+
+    public const BOUNCE_SOFT = 'soft';
+    public const BOUNCE_HARD = 'hard';
+    public const BOUNCE_COMPLAINT = 'complaint';
 
     protected $table = 'newsletter_bounces';
 
@@ -33,5 +38,39 @@ class NewsletterBounce extends Model
     public function newsletter(): BelongsTo
     {
         return $this->belongsTo(Newsletter::class);
+    }
+
+    /**
+     * Record a bounce event and auto-suppress hard bounces / complaints.
+     */
+    public static function record(
+        int $tenantId,
+        string $email,
+        ?int $newsletterId,
+        ?int $queueId,
+        string $bounceType,
+        string $reason = '',
+        string $code = ''
+    ): void {
+        DB::table('newsletter_bounces')->insert([
+            'tenant_id'    => $tenantId,
+            'email'        => $email,
+            'newsletter_id' => $newsletterId,
+            'queue_id'     => $queueId,
+            'bounce_type'  => $bounceType,
+            'bounce_reason' => $reason,
+            'bounce_code'  => $code,
+            'bounced_at'   => now(),
+        ]);
+
+        // Auto-suppress on hard bounce or spam complaint
+        if ($bounceType === self::BOUNCE_HARD || $bounceType === self::BOUNCE_COMPLAINT) {
+            DB::insert(
+                "INSERT INTO newsletter_suppression_list (tenant_id, email, reason, bounce_count)
+                 VALUES (?, ?, ?, 1)
+                 ON DUPLICATE KEY UPDATE suppressed_at = NOW(), bounce_count = bounce_count + 1",
+                [$tenantId, $email, $bounceType === self::BOUNCE_COMPLAINT ? 'complaint' : 'hard_bounce']
+            );
+        }
     }
 }

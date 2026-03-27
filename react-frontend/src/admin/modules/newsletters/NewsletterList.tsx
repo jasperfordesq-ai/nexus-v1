@@ -114,8 +114,7 @@ export function NewsletterList() {
     try {
       const res = await adminNewsletters.sendNewsletter(sendTarget.id);
       if (res.success) {
-        const data = res.data as { queued?: number; message?: string };
-        toast.success(data.message || 'Newsletter queued for sending');
+        toast.success(res.data?.message || 'Newsletter queued for sending');
         setSendTarget(null);
         loadData();
       } else {

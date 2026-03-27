@@ -306,8 +306,7 @@ export function NewsletterForm() {
 
       const res = await adminNewsletters.sendNewsletter(savedId);
       if (res.success) {
-        const data = res.data as { queued?: number; message?: string };
-        toast.success(data.message || `Newsletter queued for ${data.queued || 0} recipients`);
+        toast.success(res.data?.message || `Newsletter queued for ${res.data?.queued || 0} recipients`);
         setConfirmSendOpen(false);
         navigate(tenantPath(`/admin/newsletters/${id}/stats`));
       } else {
@@ -335,8 +334,7 @@ export function NewsletterForm() {
 
       const res = await adminNewsletters.sendTest(savedId);
       if (res.success) {
-        const data = res.data as { sent_to?: string; message?: string };
-        toast.success(data.message || `Test email sent to ${data.sent_to}`);
+        toast.success(res.data?.message || `Test email sent to ${res.data?.sent_to}`);
       } else {
         toast.error((res as { error?: string }).error || 'Failed to send test email');
       }
