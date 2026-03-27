@@ -318,8 +318,11 @@ HTML;
         }
 
         try {
+            $tenantId = TenantContext::getId();
+
             DB::table('vol_certificates')
                 ->where('verification_code', $code)
+                ->where('tenant_id', $tenantId)
                 ->whereNull('downloaded_at')
                 ->update(['downloaded_at' => now()]);
         } catch (\Throwable $e) {

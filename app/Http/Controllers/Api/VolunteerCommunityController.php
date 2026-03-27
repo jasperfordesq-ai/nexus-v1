@@ -638,7 +638,7 @@ class VolunteerCommunityController extends BaseApiController
             'date_to' => $this->query('date_to'),
         ];
 
-        $csv = $this->volunteerDonationService->exportDonations($filters);
+        $csv = $this->volunteerDonationService->exportDonations(TenantContext::getId(), $filters);
 
         return response($csv, 200)
             ->header('Content-Type', 'text/csv')

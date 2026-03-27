@@ -11,6 +11,7 @@ use App\Models\VolLog;
 use App\Models\VolOpportunity;
 use App\Models\VolOrganization;
 use App\Models\VolShift;
+use App\Core\TenantContext;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\DB;
 
@@ -185,10 +186,13 @@ class VolunteerService
         $limit = min((int) ($filters['limit'] ?? 20), 50);
         $cursor = $filters['cursor'] ?? null;
 
+        $tenantId = TenantContext::getId();
+
         $query = DB::table('vol_shift_signups as ss')
             ->join('vol_shifts as s', 'ss.shift_id', '=', 's.id')
             ->join('vol_opportunities as o', 's.opportunity_id', '=', 'o.id')
             ->where('ss.user_id', $userId)
+            ->where('o.tenant_id', $tenantId)
             ->select('s.*', 'o.title as opportunity_title', 'o.location');
 
         if ($cursor !== null && ($cid = base64_decode($cursor, true)) !== false) {

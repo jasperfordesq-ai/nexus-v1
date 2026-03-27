@@ -327,6 +327,11 @@ export function ExpensesTab() {
             <>
               <ModalHeader className="text-theme-primary">{t('expenses.modal_title', 'Submit Expense')}</ModalHeader>
               <ModalBody className="gap-4">
+                {organisations.length === 0 && (
+                  <p className="text-sm text-danger">
+                    {t('expenses.no_organisation', 'You must belong to an organisation to submit expenses.')}
+                  </p>
+                )}
                 {organisations.length > 1 && (
                   <Select
                     label={t('expenses.form.organisation', 'Organisation')}
@@ -394,6 +399,7 @@ export function ExpensesTab() {
                   className="bg-gradient-to-r from-rose-500 to-pink-600 text-white"
                   onPress={() => handleSubmit(onClose)}
                   isLoading={isSubmitting}
+                  isDisabled={organisations.length === 0}
                 >
                   {t('expenses.submit_button', 'Submit')}
                 </Button>

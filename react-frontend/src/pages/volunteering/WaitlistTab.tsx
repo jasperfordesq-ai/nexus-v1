@@ -63,7 +63,7 @@ interface WaitlistEntry {
 /* ───────────────────────── Component ───────────────────────── */
 
 export function WaitlistTab() {
-  const { t } = useTranslation('community');
+  const { t } = useTranslation('volunteering');
   const toast = useToast();
   const [entries, setEntries] = useState<WaitlistEntry[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -248,7 +248,7 @@ export function WaitlistTab() {
                         {' - '}
                         {new Date(entry.shift.end_time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                       </span>
-                      {entry.shift.capacity && (
+                      {entry.shift.capacity != null && (
                         <span className="flex items-center gap-1">
                           <Users className="w-3 h-3" aria-hidden="true" />
                           {t('waitlist.spots', '{{count}} spots', { count: entry.shift.capacity })}

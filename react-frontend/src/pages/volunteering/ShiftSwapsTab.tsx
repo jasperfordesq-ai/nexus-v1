@@ -337,16 +337,16 @@ export function ShiftSwapsTab() {
                         variant="flat"
                         color={statusColor(swap.status)}
                       >
-                        {swap.status.charAt(0).toUpperCase() + swap.status.slice(1)}
+                        {t('swaps.status_' + swap.status, swap.status.charAt(0).toUpperCase() + swap.status.slice(1))}
                       </Chip>
                       {swap.direction === 'sent' && (
                         <span className="text-xs text-theme-subtle">
-                          To: {swap.recipient.name}
+                          {t('swaps.to', 'To:')} {swap.recipient.name}
                         </span>
                       )}
                       {swap.direction === 'received' && (
                         <span className="text-xs text-theme-subtle">
-                          From: {swap.requester.name}
+                          {t('swaps.from', 'From:')} {swap.requester.name}
                         </span>
                       )}
                     </div>

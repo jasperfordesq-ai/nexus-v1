@@ -257,7 +257,7 @@ class VolunteerExpenseService
     {
         $query = VolExpense::query()
             ->join('users as u', 'vol_expenses.user_id', '=', 'u.id')
-            ->join('vol_organizations as org', 'vol_expenses.organization_id', '=', 'org.id')
+            ->leftJoin('vol_organizations as org', 'vol_expenses.organization_id', '=', 'org.id')
             ->select([
                 'vol_expenses.id',
                 'u.first_name',

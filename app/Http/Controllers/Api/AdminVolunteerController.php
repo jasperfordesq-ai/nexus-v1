@@ -7,6 +7,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Services\VolunteerService;
+use App\Services\VolunteerReminderService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
@@ -23,6 +24,7 @@ class AdminVolunteerController extends BaseApiController
 
     public function __construct(
         private readonly VolunteerService $volunteerService,
+        private readonly VolunteerReminderService $volunteerReminderService,
     ) {}
 
     private const ALLOWED_TABLES = [
@@ -346,9 +348,9 @@ class AdminVolunteerController extends BaseApiController
                  FROM vol_applications va
                  INNER JOIN vol_opportunities vo ON va.opportunity_id = vo.id
                  LEFT JOIN users u ON va.user_id = u.id
-                 WHERE vo.tenant_id = ? AND va.status = 'pending'
+                 WHERE vo.tenant_id = ? AND va.tenant_id = ? AND va.status = 'pending'
                  ORDER BY va.created_at DESC LIMIT 50",
-                [$tenantId]
+                [$tenantId, $tenantId]
             );
             return $this->respondWithData(array_map(fn($r) => (array)$r, $results));
         } catch (\Exception $e) {
@@ -464,7 +466,20 @@ class AdminVolunteerController extends BaseApiController
     {
         $this->requireSuperAdmin();
 
-        $sent = $this->volunteerService->sendShiftReminders();
+        $tenantId = TenantContext::getId();
+
+        // Send reminders for all active opportunities in this tenant
+        $opportunityIds = DB::table('vol_opportunities')
+            ->where('tenant_id', $tenantId)
+            ->where('is_active', 1)
+            ->whereIn('status', ['open', 'active'])
+            ->pluck('id');
+
+        $sent = 0;
+        foreach ($opportunityIds as $oppId) {
+            $sent += VolunteerReminderService::sendReminders($tenantId, (int) $oppId);
+        }
+
         return $this->respondWithData(['reminders_sent' => $sent]);
     }
 

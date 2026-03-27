@@ -63,7 +63,7 @@ export function EmergencyAlertsTab() {
   const [alerts, setAlerts] = useState<EmergencyAlert[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [respondingTo, setRespondingTo] = useState<number | null>(null);
+  const [respondingTo, setRespondingTo] = useState<{ id: number; action: 'accepted' | 'declined' } | null>(null);
 
   // AbortController ref to cancel stale requests
   const abortRef = useRef<AbortController | null>(null);
@@ -109,7 +109,7 @@ export function EmergencyAlertsTab() {
 
   const handleRespond = async (alertId: number, response: 'accepted' | 'declined') => {
     try {
-      setRespondingTo(alertId);
+      setRespondingTo({ id: alertId, action: response });
       const result = await api.put(`/v2/volunteering/emergency-alerts/${alertId}`, { response });
       if (result.success) {
         toastRef.current.success(response === 'accepted' ? tRef.current('emergency.alert_accepted', 'Alert accepted.') : tRef.current('emergency.alert_declined', 'Alert declined.'));
@@ -261,7 +261,8 @@ export function EmergencyAlertsTab() {
                           className="bg-gradient-to-r from-emerald-500 to-green-600 text-white"
                           startContent={<CheckCircle className="w-4 h-4" aria-hidden="true" />}
                           onPress={() => handleRespond(alert.id, 'accepted')}
-                          isLoading={respondingTo === alert.id}
+                          isLoading={respondingTo?.id === alert.id && respondingTo?.action === 'accepted'}
+                          isDisabled={respondingTo?.id === alert.id}
                         >
                           {t('emergency.accept', 'Accept')}
                         </Button>
@@ -271,7 +272,8 @@ export function EmergencyAlertsTab() {
                           color="danger"
                           startContent={<XCircle className="w-4 h-4" aria-hidden="true" />}
                           onPress={() => handleRespond(alert.id, 'declined')}
-                          isLoading={respondingTo === alert.id}
+                          isLoading={respondingTo?.id === alert.id && respondingTo?.action === 'declined'}
+                          isDisabled={respondingTo?.id === alert.id}
                         >
                           {t('emergency.decline', 'Decline')}
                         </Button>

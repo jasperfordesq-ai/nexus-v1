@@ -322,12 +322,12 @@ class VolunteerWellbeingController extends BaseApiController
         $userId = $this->getUserId();
         $this->rateLimit('vol_incidents_list', 30, 60);
 
-        $filters = [
-            'reported_by' => $userId,
-            'status' => $this->query('status'),
-        ];
+        $tenantId = TenantContext::getId();
+        $status = $this->query('status');
+        $page = $this->queryInt('page', 1, 1, 1000);
+        $perPage = $this->queryInt('per_page', 20, 1, 50);
 
-        $result = $this->safeguardingService->getIncidents($filters);
+        $result = $this->safeguardingService->getIncidents($tenantId, $status, $page, $perPage);
         return $this->respondWithData($result);
     }
 
@@ -359,15 +359,12 @@ class VolunteerWellbeingController extends BaseApiController
         $this->ensureFeature();
         $this->requireAdmin();
 
-        $filters = [
-            'status' => $this->query('status'),
-            'severity' => $this->query('severity'),
-            'organization_id' => $this->query('organization_id') ? (int) $this->query('organization_id') : null,
-            'cursor' => $this->query('cursor'),
-            'limit' => $this->queryInt('per_page', 20, 1, 50),
-        ];
+        $tenantId = TenantContext::getId();
+        $status = $this->query('status');
+        $page = $this->queryInt('page', 1, 1, 1000);
+        $perPage = $this->queryInt('per_page', 20, 1, 50);
 
-        $result = $this->safeguardingService->getIncidents($filters);
+        $result = $this->safeguardingService->getIncidents($tenantId, $status, $page, $perPage);
         return $this->respondWithData($result);
     }
 
@@ -446,16 +443,11 @@ class VolunteerWellbeingController extends BaseApiController
         $this->ensureFeature();
         $this->requireAdmin();
 
-        $filters = [
-            'status' => $this->query('status'),
-            'training_type' => $this->query('training_type'),
-            'user_id' => $this->query('user_id') ? (int) $this->query('user_id') : null,
-            'cursor' => $this->query('cursor'),
-            'limit' => $this->queryInt('per_page', 20, 1, 50),
-        ];
-
         $tenantId = TenantContext::getId();
-        $result = $this->safeguardingService->getTrainingForAdmin($tenantId);
+        $page = $this->queryInt('page', 1, 1, 1000);
+        $perPage = $this->queryInt('per_page', 20, 1, 50);
+
+        $result = $this->safeguardingService->getTrainingForAdmin($tenantId, $page, $perPage);
         return $this->respondWithData($result);
     }
 

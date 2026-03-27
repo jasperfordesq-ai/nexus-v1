@@ -55,7 +55,7 @@ export function HoursReviewTab() {
   const [isLoading, setIsLoading] = useState(true);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
   const [hasMore, setHasMore] = useState(false);
-  const [cursor, setCursor] = useState<string | null>(null);
+  const cursorRef = useRef<string | null>(null);
   const [actionInFlight, setActionInFlight] = useState<Set<number>>(new Set());
 
   // AbortController ref to cancel stale requests
@@ -81,7 +81,7 @@ export function HoursReviewTab() {
 
       const params = new URLSearchParams();
       params.set('per_page', '20');
-      if (append && cursor) params.set('cursor', cursor);
+      if (append && cursorRef.current) params.set('cursor', cursorRef.current);
 
       const response = await api.get<PendingHoursResponse>(
         `/v2/volunteering/hours/pending-review?${params}`,
@@ -95,7 +95,7 @@ export function HoursReviewTab() {
         } else {
           setEntries(items);
         }
-        setCursor(nextCursor);
+        cursorRef.current = nextCursor;
         setHasMore(has_more);
       }
     } catch (err) {
@@ -108,8 +108,7 @@ export function HoursReviewTab() {
       setIsLoading(false);
       setIsLoadingMore(false);
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [cursor]);
+  }, []);
 
   useEffect(() => {
     loadEntries();

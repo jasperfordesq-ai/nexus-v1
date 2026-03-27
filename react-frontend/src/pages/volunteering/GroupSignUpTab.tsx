@@ -152,7 +152,7 @@ export function GroupSignUpTab() {
 
       // Resolve email to user_id via member search
       const searchRes = await api.get<{ id: number; email: string }[]>(
-        `/v2/members?search=${encodeURIComponent(newMemberEmail.trim())}&per_page=5`
+        `/v2/users?search=${encodeURIComponent(newMemberEmail.trim())}&per_page=5`
       );
 
       if (!searchRes.success || !Array.isArray(searchRes.data)) {

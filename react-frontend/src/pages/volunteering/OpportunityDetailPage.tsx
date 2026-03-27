@@ -541,7 +541,7 @@ function ApplicationsPanel({ opportunityId }: ApplicationsPanelProps) {
                   <div className="flex flex-wrap items-center gap-2">
                     <span className="font-medium text-theme-primary text-sm">{app.user.name}</span>
                     <Chip size="sm" variant="flat" color={statusColor(app.status)}>
-                      {app.status}
+                      {t('status_' + app.status, app.status)}
                     </Chip>
                   </div>
                   {app.message && (

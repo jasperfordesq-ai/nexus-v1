@@ -469,7 +469,11 @@ class VolunteerController extends BaseApiController
         $this->getUserId();
         $this->rateLimit('volunteering_legacy_list', 60, 60);
 
-        $opps = VolOpportunity::search(TenantContext::getId(), '');
-        return $this->respondWithCollection($opps);
+        $opportunities = VolOpportunity::where('tenant_id', TenantContext::getId())
+            ->where('status', 'active')
+            ->orderBy('created_at', 'desc')
+            ->limit(50)
+            ->get();
+        return $this->respondWithCollection($opportunities);
     }
 }

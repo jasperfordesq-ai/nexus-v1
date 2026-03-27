@@ -111,7 +111,7 @@ function getRiskColor(risk: string): 'success' | 'warning' | 'danger' {
 /* ───────────────────────── Main Component ───────────────────────── */
 
 export function WellbeingTab() {
-  const { t } = useTranslation('community');
+  const { t } = useTranslation('volunteering');
   const toast = useToast();
   const moodOptions = getMoodOptions(t);
   const [data, setData] = useState<WellbeingData | null>(null);

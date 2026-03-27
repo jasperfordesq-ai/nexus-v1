@@ -153,6 +153,7 @@ export function VolunteeringPage() {
   const [hasApprovedOrg, setHasApprovedOrg] = useState(false);
 
   useEffect(() => {
+    if (!hasFeature('volunteering')) return;
     let cancelled = false;
     if (isAuthenticated) {
       api.get<Array<{ status: string; member_role: string }>>('/v2/volunteering/my-organisations')
@@ -166,7 +167,7 @@ export function VolunteeringPage() {
         .catch(() => { /* silent — button just won't show */ });
     }
     return () => { cancelled = true; };
-  }, [isAuthenticated]);
+  }, [isAuthenticated, hasFeature]);
 
   // Feature gate
   if (!hasFeature('volunteering')) {
@@ -987,7 +988,7 @@ function ApplicationsTab() {
                         {(app.status === 'approved' || app.status === 'declined') && app.org_note && (
                           <p className="text-xs text-theme-muted flex items-start gap-1 mt-1">
                             <MessageSquare className="w-3.5 h-3.5 flex-shrink-0 mt-0.5 text-theme-subtle" aria-hidden="true" />
-                            <span><span className="text-theme-subtle">Organiser's note: </span>{app.org_note}</span>
+                            <span><span className="text-theme-subtle">{t('organiser_note', "Organiser's note:")} </span>{app.org_note}</span>
                           </p>
                         )}
 

@@ -139,29 +139,45 @@ export function CommunityProjectsTab() {
   }, []);
 
   const toggleSupport = async (project: Project) => {
+    const previousState = { has_supported: project.has_supported, supporter_count: project.supporter_count };
     try {
       setTogglingId(project.id);
-      if (project.has_supported) {
-        await api.delete(`/v2/volunteering/community-projects/${project.id}/support`);
-        setProjects((prev) =>
-          prev.map((p) =>
-            p.id === project.id
+      // Optimistic update
+      setProjects((prev) =>
+        prev.map((p) =>
+          p.id === project.id
+            ? project.has_supported
               ? { ...p, has_supported: false, supporter_count: p.supporter_count - 1 }
-              : p,
-          ),
-        );
-      } else {
-        await api.post(`/v2/volunteering/community-projects/${project.id}/support`, {});
+              : { ...p, has_supported: true, supporter_count: p.supporter_count + 1 }
+            : p,
+        ),
+      );
+
+      const response = project.has_supported
+        ? await api.delete(`/v2/volunteering/community-projects/${project.id}/support`)
+        : await api.post(`/v2/volunteering/community-projects/${project.id}/support`, {});
+
+      if (!response.success) {
+        // Revert optimistic update
         setProjects((prev) =>
           prev.map((p) =>
             p.id === project.id
-              ? { ...p, has_supported: true, supporter_count: p.supporter_count + 1 }
+              ? { ...p, has_supported: previousState.has_supported, supporter_count: previousState.supporter_count }
               : p,
           ),
         );
+        toast.error(t('community_projects.support_failed', 'Failed to update support.'));
       }
     } catch (err) {
       logError('Failed to toggle project support', err);
+      // Revert optimistic update
+      setProjects((prev) =>
+        prev.map((p) =>
+          p.id === project.id
+            ? { ...p, has_supported: previousState.has_supported, supporter_count: previousState.supporter_count }
+            : p,
+        ),
+      );
       toast.error(t('community_projects.support_failed', 'Failed to update support.'));
     } finally {
       setTogglingId(null);

@@ -420,6 +420,7 @@ class VolunteerCheckInService
     {
         return VolShiftCheckin::with('user')
             ->where('shift_id', $shiftId)
+            ->where('tenant_id', TenantContext::getId())
             ->orderBy('created_at', 'asc')
             ->get()
             ->map(fn ($c) => [

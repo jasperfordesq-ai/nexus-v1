@@ -55,7 +55,7 @@ const initialFormData: FormData = {
 };
 
 export default function CreateOpportunityPage() {
-  const { t } = useTranslation('community');
+  const { t } = useTranslation('volunteering');
   usePageTitle(t('volunteering.create_opportunity_title'));
   const navigate = useNavigate();
   const { tenantPath } = useTenant();
