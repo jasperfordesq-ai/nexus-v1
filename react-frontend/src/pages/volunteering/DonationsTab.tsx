@@ -461,7 +461,7 @@ export function DonationsTab() {
                       variant={form.payment_method === pm ? 'solid' : 'flat'}
                       color={form.payment_method === pm ? 'primary' : 'default'}
                       className="cursor-pointer"
-                      onPress={() => setForm((f) => ({ ...f, payment_method: pm }))}
+                      onClick={() => setForm((f) => ({ ...f, payment_method: pm }))}
                     >
                       {t(`donations.payment_methods.${pm}`, pm.replace('_', ' '))}
                     </Chip>
