@@ -131,7 +131,7 @@ export function HoursReviewTab() {
       const response = await api.put(`/v2/volunteering/hours/${entryId}/verify`, { action });
 
       if (response.success) {
-        toastRef.current.success(action === 'approve' ? 'Hours approved.' : 'Hours declined.');
+        toastRef.current.success(action === 'approve' ? tRef.current('hours_approved') : tRef.current('hours_declined'));
         setTimeout(() => {
           setEntries((prev) => prev.filter((e) => e.id !== entryId));
         }, 800);
@@ -139,7 +139,7 @@ export function HoursReviewTab() {
         setEntries((prev) =>
           prev.map((e) => (e.id === entryId ? { ...e, status: 'pending' } : e)),
         );
-        toastRef.current.error(response.error ?? 'Action failed. Please try again.');
+        toastRef.current.error(response.error ?? tRef.current('something_wrong'));
       }
     } catch (err) {
       logError('Failed to verify hours', err);
@@ -190,9 +190,9 @@ export function HoursReviewTab() {
         <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-rose-100 to-pink-100 dark:from-rose-900/30 dark:to-pink-900/30 flex items-center justify-center">
           <Clock className="w-7 h-7 text-rose-400" aria-hidden="true" />
         </div>
-        <p className="text-[var(--color-text)] font-semibold text-lg">No hours pending review.</p>
+        <p className="text-[var(--color-text)] font-semibold text-lg">{t('no_pending_hours')}</p>
         <p className="text-[var(--color-text-muted)] text-sm max-w-xs">
-          All volunteer hour submissions have been reviewed.
+          {t('all_hours_reviewed')}
         </p>
       </GlassCard>
     );
@@ -285,7 +285,7 @@ export function HoursReviewTab() {
             startContent={!isLoadingMore ? <ChevronDown className="w-4 h-4" aria-hidden="true" /> : undefined}
             onPress={() => loadEntries(true)}
           >
-            Load more
+            {t('load_more')}
           </Button>
         </div>
       )}

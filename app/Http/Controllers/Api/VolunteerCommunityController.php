@@ -176,7 +176,11 @@ class VolunteerCommunityController extends BaseApiController
 
         if ($action === 'accept') {
             // Check if the swap went to admin_pending instead of being directly accepted
-            $actualStatus = DB::table('vol_shift_swap_requests')->where('id', (int) $id)->value('status');
+            // Scope by tenant_id to prevent cross-tenant status disclosure (IDOR)
+            $actualStatus = DB::table('vol_shift_swap_requests')
+                ->where('id', (int) $id)
+                ->where('tenant_id', TenantContext::getId())
+                ->value('status');
             if ($actualStatus === 'admin_pending') {
                 return $this->respondWithData(['id' => (int) $id, 'status' => 'admin_pending', 'message' => 'Swap accepted but requires admin approval']);
             }

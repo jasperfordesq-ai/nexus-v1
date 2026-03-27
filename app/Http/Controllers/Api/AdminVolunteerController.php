@@ -157,8 +157,8 @@ class AdminVolunteerController extends BaseApiController
                     FROM vol_applications a
                     INNER JOIN vol_opportunities vo ON a.opportunity_id = vo.id
                     LEFT JOIN users u ON a.user_id = u.id
-                    WHERE vo.tenant_id = ?";
-            $params = [$tenantId];
+                    WHERE vo.tenant_id = ? AND a.tenant_id = ?";
+            $params = [$tenantId, $tenantId];
 
             if ($status && in_array($status, ['pending', 'approved', 'declined', 'withdrawn'], true)) {
                 $sql .= " AND a.status = ?";
