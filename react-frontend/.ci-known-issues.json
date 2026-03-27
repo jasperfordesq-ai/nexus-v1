@@ -1,0 +1,76 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "description": "Pre-existing CI issues tracked for incremental resolution. Generated 2026-03-27.",
+  "lastUpdated": "2026-03-27",
+  "summary": {
+    "eslintErrors": 0,
+    "eslintWarnings": 298,
+    "typescriptErrors": 0,
+    "phpunitFailures": 0,
+    "buildErrors": 0,
+    "phpstanErrors": 123
+  },
+  "eslint": {
+    "status": "passing",
+    "threshold": "--max-warnings 1000",
+    "warningsByRule": {
+      "react-hooks/exhaustive-deps": {
+        "count": 142,
+        "severity": "warning",
+        "category": "pre-existing",
+        "notes": "Missing dependencies in useEffect/useCallback/useMemo. Many are intentional (e.g., constants outside render). Fix incrementally."
+      },
+      "@typescript-eslint/no-unused-vars": {
+        "count": 80,
+        "severity": "warning",
+        "category": "pre-existing",
+        "notes": "Unused variables in tests (mock destructuring) and some source files. Mostly test boilerplate."
+      },
+      "@typescript-eslint/no-explicit-any": {
+        "count": 76,
+        "severity": "warning",
+        "category": "pre-existing",
+        "notes": "Explicit 'any' types in admin modules and older code. Replace with proper types incrementally."
+      },
+      "@typescript-eslint/no-require-imports": {
+        "count": 10,
+        "severity": "warning",
+        "category": "pre-existing",
+        "notes": "require() in test files for mocking. Convert to ESM imports where possible."
+      }
+    },
+    "configFix": {
+      "date": "2026-03-27",
+      "description": "Disabled no-undef rule for TypeScript files (TS compiler handles this). Added ignores for Node.js utility scripts (translate-*, scripts/, lighthouserc.cjs). This resolved 96 false-positive errors.",
+      "commit": "pending"
+    }
+  },
+  "phpstan": {
+    "status": "warning-only (non-blocking)",
+    "level": 3,
+    "errors": 123,
+    "category": "pre-existing",
+    "notes": "PHPStan runs as warning-only in CI and pre-push hook. Fix errors before promoting to blocking gate."
+  },
+  "phpunit": {
+    "status": "passing",
+    "tests": 188,
+    "assertions": 1083,
+    "suite": "Unit",
+    "knownIssues": [
+      {
+        "description": "JobApplicationTest has 2 stale test failures (fillable fields + HasTenantScope assertion)",
+        "category": "pre-existing",
+        "suite": "Services (not in Unit suite)"
+      }
+    ]
+  },
+  "typescript": {
+    "status": "passing",
+    "errors": 0
+  },
+  "viteBuild": {
+    "status": "passing",
+    "warnings": ["Some chunks > 500 kB (index, vendor-heroui) — code-splitting improvements tracked separately"]
+  }
+}
