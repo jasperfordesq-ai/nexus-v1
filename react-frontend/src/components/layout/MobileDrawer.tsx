@@ -63,7 +63,9 @@ import {
   Activity,
   Sun,
   Moon,
+  FlaskConical,
 } from 'lucide-react';
+import { RELEASE_STATUS } from '@/config/releaseStatus';
 import { TenantLogo } from '@/components/branding';
 import { useTranslation } from 'react-i18next';
 import { useAuth, useTenant, useNotifications, useCookieConsent, useTheme } from '@/contexts';
@@ -469,6 +471,15 @@ export function MobileDrawer({ isOpen, onClose, onSearchOpen }: MobileDrawerProp
                       {t('user_menu.help_center')}
                     </Button>
                   )}
+                  <Button
+                    variant="light"
+                    size="sm"
+                    className="text-amber-600 dark:text-amber-400 hover:text-amber-700 dark:hover:text-amber-300 h-8 min-w-0 px-2 gap-1.5 text-xs"
+                    onPress={() => { onClose(); navigate(RELEASE_STATUS.readMorePath); }}
+                  >
+                    <FlaskConical className="w-3.5 h-3.5" aria-hidden="true" />
+                    {t('dev_banner.dev_notice', 'Dev Notice')}
+                  </Button>
                   {!isAuthenticated && (
                     <Button
                       variant="light"
