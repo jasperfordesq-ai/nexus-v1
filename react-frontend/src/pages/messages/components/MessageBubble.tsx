@@ -224,8 +224,8 @@ export function MessageBubble({
                 <SmilePlus className="w-3 h-3 text-theme-muted" aria-hidden="true" />
               </Button>
 
-              {/* Edit/Delete button (only for own messages) */}
-              {isOwn && !isVoiceMessage && (
+              {/* Edit/Delete button — shown for all messages (receiver can delete for themselves or everyone) */}
+              {!isVoiceMessage && (
                 <Button
                   isIconOnly
                   size="sm"
@@ -272,7 +272,7 @@ export function MessageBubble({
           )}
 
           {/* Message menu (edit/delete) */}
-          {showMessageMenu && isOwn && (
+          {showMessageMenu && (
             <div
               ref={messageMenuRef}
               className={`
@@ -283,19 +283,21 @@ export function MessageBubble({
               role="menu"
               aria-label={t('aria_message_options')}
             >
-              <Button
-                variant="light"
-                size="sm"
-                className="justify-start text-sm text-theme-muted"
-                startContent={<Pencil className="w-3 h-3" aria-hidden="true" />}
-                onPress={() => {
-                  onEdit?.(message);
-                  setShowMessageMenu(false);
-                }}
-                role="menuitem"
-              >
-                {t('message_edit')}
-              </Button>
+              {isOwn && (
+                <Button
+                  variant="light"
+                  size="sm"
+                  className="justify-start text-sm text-theme-muted"
+                  startContent={<Pencil className="w-3 h-3" aria-hidden="true" />}
+                  onPress={() => {
+                    onEdit?.(message);
+                    setShowMessageMenu(false);
+                  }}
+                  role="menuitem"
+                >
+                  {t('message_edit')}
+                </Button>
+              )}
               <Button
                 variant="light"
                 size="sm"
