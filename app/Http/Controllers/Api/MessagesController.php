@@ -278,6 +278,10 @@ class MessagesController extends BaseApiController
 
     /**
      * DELETE /api/v2/messages/{id}
+     *
+     * Accepts optional body: { "scope": "self" | "everyone" }
+     * "everyone" (default) — blanks message for both parties.
+     * "self"               — hides message from current user's view only.
      */
     public function deleteMessage($id): JsonResponse
     {
@@ -285,7 +289,11 @@ class MessagesController extends BaseApiController
         $userId = $this->requireAuth();
         $this->rateLimit('messages_delete', 20, 60);
 
-        $success = $this->messageService->deleteMessage($id, $userId);
+        $scope = in_array($this->input('scope'), ['self', 'everyone'], true)
+            ? $this->input('scope')
+            : 'everyone';
+
+        $success = $this->messageService->deleteMessage($id, $userId, $scope);
 
         if (!$success) {
             $errors = $this->messageService->getErrors();

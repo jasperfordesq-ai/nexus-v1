@@ -101,5 +101,11 @@
   "context_type_job": "Job",
   "context_type_volunteering": "Volunteering",
   "context_untitled": "Untitled",
-  "context_regarding": "Regarding"
+  "context_regarding": "Regarding",
+  "delete_message_title": "Delete Message",
+  "delete_message_body": "How would you like to delete this message?",
+  "delete_for_me": "Delete for me",
+  "delete_for_everyone": "Delete for everyone",
+  "message_removed_self": "Message removed",
+  "message_removed_self_subtitle": "Message removed from your view."
 }

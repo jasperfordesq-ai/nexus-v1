@@ -101,5 +101,11 @@
   "context_type_job": "Post",
   "context_type_volunteering": "Obair Dheonach",
   "context_untitled": "Gan Teideal",
-  "context_regarding": "Maidir Le"
+  "context_regarding": "Maidir Le",
+  "delete_message_title": "Scrios Teachtaireacht",
+  "delete_message_body": "Conas ba mhaith leat an teachtaireacht seo a scriosadh?",
+  "delete_for_me": "Scrios domsa amháin",
+  "delete_for_everyone": "Scrios do chách",
+  "message_removed_self": "Teachtaireacht bainte",
+  "message_removed_self_subtitle": "Teachtaireacht bainte ó d'amharc."
 }

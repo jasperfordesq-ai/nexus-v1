@@ -101,5 +101,11 @@
   "context_type_job": "Emploi",
   "context_type_volunteering": "Bénévolat",
   "context_untitled": "Sans titre",
-  "context_regarding": "Concernant"
+  "context_regarding": "Concernant",
+  "delete_message_title": "Supprimer le message",
+  "delete_message_body": "Comment souhaitez-vous supprimer ce message ?",
+  "delete_for_me": "Supprimer pour moi uniquement",
+  "delete_for_everyone": "Supprimer pour tout le monde",
+  "message_removed_self": "Message supprimé",
+  "message_removed_self_subtitle": "Message supprimé de votre vue."
 }

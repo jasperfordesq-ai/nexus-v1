@@ -134,6 +134,7 @@ export function ConversationPage() {
   // Edit/delete state
   const [editingMessageId, setEditingMessageId] = useState<number | null>(null);
   const [editingText, setEditingText] = useState('');
+  const [pendingDeleteId, setPendingDeleteId] = useState<number | null>(null);
 
   // Safeguarding notice state (reappears on reload)
   const [isSafeguardingDismissed, setIsSafeguardingDismissed] = useState(false);
@@ -1060,25 +1061,39 @@ export function ConversationPage() {
   }
 
   /**
-   * Delete a message
+   * Execute a scoped message delete after the user picks an option in the modal.
    */
-  async function deleteMessage(messageId: number) {
+  async function executeDelete(scope: 'self' | 'everyone') {
+    if (pendingDeleteId === null) return;
+    const messageId = pendingDeleteId;
+    setPendingDeleteId(null);
+
     try {
-      const response = await api.delete(`/v2/messages/${messageId}`);
+      const response = await api.delete(`/v2/messages/${messageId}`, { data: { scope } });
 
       if (response.success) {
-        setConversation((prev) => {
-          if (!prev) return null;
-          return {
-            ...prev,
-            messages: prev.messages.map((msg) =>
-              msg.id === messageId
-                ? { ...msg, body: t('message_deleted_placeholder'), is_deleted: true }
-                : msg
-            ),
-          };
-        });
-        toast.success(t('message_deleted'), t('message_deleted_subtitle'));
+        if (scope === 'self') {
+          // Remove from this user's view entirely
+          setConversation((prev) => {
+            if (!prev) return null;
+            return { ...prev, messages: prev.messages.filter((msg) => msg.id !== messageId) };
+          });
+          toast.success(t('message_removed_self'), t('message_removed_self_subtitle'));
+        } else {
+          // Show deleted placeholder to both parties
+          setConversation((prev) => {
+            if (!prev) return null;
+            return {
+              ...prev,
+              messages: prev.messages.map((msg) =>
+                msg.id === messageId
+                  ? { ...msg, body: t('message_deleted_placeholder'), is_deleted: true }
+                  : msg
+              ),
+            };
+          });
+          toast.success(t('message_deleted'), t('message_deleted_subtitle'));
+        }
       }
     } catch (error) {
       logError('Failed to delete message', error);
@@ -1380,7 +1395,7 @@ export function ConversationPage() {
                   isHighlighted={searchResults.includes(message.id)}
                   highlightQuery={searchQuery}
                   onEdit={startEditing}
-                  onDelete={deleteMessage}
+                  onDelete={(id) => setPendingDeleteId(id)}
                   isEditing={editingMessageId === message.id}
                   editingText={editingMessageId === message.id ? editingText : ''}
                   onEditingTextChange={setEditingText}
@@ -1478,6 +1493,38 @@ export function ConversationPage() {
               isLoading={isArchiving}
             >
               {t('archive_confirm')}
+            </Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
+
+      {/* Delete Message Modal */}
+      <Modal
+        isOpen={pendingDeleteId !== null}
+        onOpenChange={(open) => { if (!open) setPendingDeleteId(null); }}
+        classNames={{
+          base: 'bg-content1 border border-theme-default',
+          header: 'border-b border-theme-default',
+          body: 'py-6',
+          footer: 'border-t border-theme-default',
+        }}
+      >
+        <ModalContent>
+          <ModalHeader className="text-theme-primary">
+            {t('delete_message_title')}
+          </ModalHeader>
+          <ModalBody>
+            <p className="text-theme-muted text-sm">{t('delete_message_body')}</p>
+          </ModalBody>
+          <ModalFooter className="flex-col gap-2">
+            <Button color="danger" variant="flat" fullWidth onPress={() => executeDelete('everyone')}>
+              {t('delete_for_everyone')}
+            </Button>
+            <Button variant="bordered" fullWidth onPress={() => executeDelete('self')}>
+              {t('delete_for_me')}
+            </Button>
+            <Button variant="light" fullWidth onPress={() => setPendingDeleteId(null)}>
+              {t('cancel')}
             </Button>
           </ModalFooter>
         </ModalContent>

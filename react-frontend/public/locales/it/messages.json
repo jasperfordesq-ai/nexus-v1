@@ -101,5 +101,11 @@
   "context_type_job": "Lavoro",
   "context_type_volunteering": "Volontariato",
   "context_untitled": "Senza titolo",
-  "context_regarding": "Riguardante"
+  "context_regarding": "Riguardante",
+  "delete_message_title": "Elimina messaggio",
+  "delete_message_body": "Come vuoi eliminare questo messaggio?",
+  "delete_for_me": "Elimina solo per me",
+  "delete_for_everyone": "Elimina per tutti",
+  "message_removed_self": "Messaggio rimosso",
+  "message_removed_self_subtitle": "Messaggio rimosso dalla tua vista."
 }

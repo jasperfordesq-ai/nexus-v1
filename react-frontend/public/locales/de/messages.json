@@ -101,5 +101,11 @@
   "context_type_job": "Stelle",
   "context_type_volunteering": "Freiwilligenarbeit",
   "context_untitled": "Ohne Titel",
-  "context_regarding": "Bezüglich"
+  "context_regarding": "Bezüglich",
+  "delete_message_title": "Nachricht löschen",
+  "delete_message_body": "Wie möchten Sie diese Nachricht löschen?",
+  "delete_for_me": "Nur für mich löschen",
+  "delete_for_everyone": "Für alle löschen",
+  "message_removed_self": "Nachricht entfernt",
+  "message_removed_self_subtitle": "Nachricht aus Ihrer Ansicht entfernt."
 }

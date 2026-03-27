@@ -150,7 +150,9 @@ class MessageService
                 'sender:id,first_name,last_name,avatar_url',
                 'receiver:id,first_name,last_name,avatar_url',
             ])
-            ->betweenUsers($userId, $partnerId);
+            ->betweenUsers($userId, $partnerId)
+            ->whereRaw('NOT (sender_id = ? AND is_deleted_sender = 1)', [$userId])
+            ->whereRaw('NOT (receiver_id = ? AND is_deleted_receiver = 1)', [$userId]);
 
         if ($cursor !== null) {
             $cursorId = base64_decode($cursor, true);
@@ -456,8 +458,11 @@ class MessageService
 
     /**
      * Delete a message (soft delete).
+     *
+     * @param string $scope 'everyone' — blanks body, shows placeholder to both parties (sender or receiver can do this).
+     *                      'self'     — hides message from current user's view only; other party unaffected.
      */
-    public static function deleteMessage(int $messageId, int $userId): bool
+    public static function deleteMessage(int $messageId, int $userId, string $scope = 'everyone'): bool
     {
         self::$errors = [];
 
@@ -469,18 +474,40 @@ class MessageService
             return false;
         }
 
-        if ((int) $message->sender_id !== $userId) {
-            self::$errors[] = ['code' => 'FORBIDDEN', 'message' => 'You can only delete your own messages'];
+        $isSender   = (int) $message->sender_id   === $userId;
+        $isReceiver = (int) $message->receiver_id === $userId;
+
+        if (! $isSender && ! $isReceiver) {
+            self::$errors[] = ['code' => 'FORBIDDEN', 'message' => 'You are not a participant in this conversation'];
             return false;
         }
 
-        // Check if is_deleted column exists for soft delete
+        $tenantId = app('tenant.id');
+
+        if ($scope === 'self') {
+            // Per-user hide: only affects current user's view, body unchanged
+            if ($isSender) {
+                DB::table('messages')
+                    ->where('id', $messageId)
+                    ->where('tenant_id', $tenantId)
+                    ->update(['is_deleted_sender' => true]);
+            } else {
+                DB::table('messages')
+                    ->where('id', $messageId)
+                    ->where('tenant_id', $tenantId)
+                    ->update(['is_deleted_receiver' => true]);
+            }
+
+            return true;
+        }
+
+        // scope = 'everyone': blank body for both parties
         $hasDeleted = DB::getSchemaBuilder()->hasColumn('messages', 'is_deleted');
 
         if ($hasDeleted) {
             DB::table('messages')
                 ->where('id', $messageId)
-                ->where('tenant_id', app('tenant.id'))
+                ->where('tenant_id', $tenantId)
                 ->update([
                     'is_deleted'  => true,
                     'body'        => '[Message deleted]',
