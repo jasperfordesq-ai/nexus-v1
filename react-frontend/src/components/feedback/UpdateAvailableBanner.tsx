@@ -9,16 +9,31 @@
  * Instead of automatically reloading (which interrupted users mid-typing),
  * this banner lets the user choose when to apply the update.
  * The update is applied by activating the waiting service worker and reloading.
+ *
+ * Detection strategy (handles mobile PWA "killed and reopened" case):
+ *  1. Global flag (__nexus_updatePending) set by main.tsx onNeedRefresh — covers
+ *     the case where the event fires before React mounts.
+ *  2. Custom event (nexus:sw_update_available) — covers normal in-session detection.
+ *  3. Direct registration.waiting check on mount and route change — covers mobile
+ *     where the app is killed/reopened: sessionStorage is wiped but the waiting
+ *     SW persists, and onNeedRefresh never re-fires.
  */
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { motion, AnimatePresence } from 'framer-motion';
 import { RefreshCw, X } from 'lucide-react';
 import { Button } from '@heroui/react';
 
-const SW_UPDATE_KEY = 'nexus_sw_update_pending';
+async function hasWaitingSW(): Promise<boolean> {
+  try {
+    const reg = await navigator.serviceWorker?.getRegistration();
+    return !!reg?.waiting;
+  } catch {
+    return false;
+  }
+}
 
 export function UpdateAvailableBanner() {
   const { t } = useTranslation('common');
@@ -26,13 +41,22 @@ export function UpdateAvailableBanner() {
   const [updating, setUpdating] = useState(false);
   const location = useLocation();
 
+  const checkAndShow = useCallback(() => {
+    hasWaitingSW().then((waiting) => {
+      if (waiting) setShowBanner(true);
+    });
+  }, []);
+
   useEffect(() => {
-    // Fix race condition: if onNeedRefresh fired before React mounted,
-    // the custom event was missed. Check the global flag or sessionStorage.
-    if ((window as NexusWindow).__nexus_updatePending || sessionStorage.getItem(SW_UPDATE_KEY) === '1') {
+    // Cover race condition: onNeedRefresh fired before React mounted
+    if ((window as NexusWindow).__nexus_updatePending) {
       (window as NexusWindow).__nexus_updatePending = false;
       setShowBanner(true);
     }
+
+    // Direct SW check on mount — this is what catches the mobile "reopened after
+    // being killed" case where sessionStorage is gone but waiting SW still exists.
+    checkAndShow();
 
     function handleUpdateAvailable() {
       setShowBanner(true);
@@ -42,19 +66,16 @@ export function UpdateAvailableBanner() {
     return () => {
       window.removeEventListener('nexus:sw_update_available', handleUpdateAvailable);
     };
-  }, []);
+  }, [checkAndShow]);
 
-  // Re-show on route change if the update was dismissed but not yet applied.
-  // The SW stays in waiting state until the user clicks "Update Now", so we
-  // surface the banner again on every navigation rather than letting it vanish.
+  // Re-check on every route change. If the user dismissed the banner but the
+  // SW is still waiting, re-surface it. Uses direct SW check (not sessionStorage)
+  // so it works across app restarts on mobile.
   useEffect(() => {
-    if (sessionStorage.getItem(SW_UPDATE_KEY) === '1') {
-      setShowBanner(true);
-    }
-  }, [location.pathname]);
+    checkAndShow();
+  }, [location.pathname, checkAndShow]);
 
   function handleUpdate() {
-    sessionStorage.removeItem(SW_UPDATE_KEY);
     setUpdating(true);
 
     // Call the updateSW function stored by main.tsx to activate the new SW + reload.
