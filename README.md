@@ -1,8 +1,8 @@
 # Project NEXUS
 
-> **Release Preview** — This is an early public release of Project NEXUS. The platform is functional and in active use, but some areas of the codebase are still being cleaned up. The legacy PHP backend is being progressively replaced. Contributions and feedback are welcome.
+> **Production-Ready V1** — Project NEXUS V1 is in active production use. The platform runs on Laravel 12 + PHP 8.2+ with a React 18 frontend. Contributions and feedback are welcome.
 
-A modern, multi-tenant community time banking platform built with PHP 8.2+, React 18, and MariaDB.
+A modern, multi-tenant community time banking platform built with Laravel 12 + PHP 8.2+, React 18, and MariaDB.
 
 ## What is Time Banking?
 
@@ -19,12 +19,13 @@ Time banking is a community-based system where members exchange services using t
 - **Gamification** — Badges, achievements, XP, leaderboards, and challenges
 - **Volunteering** — Volunteer opportunities and hour logging
 - **Blog & Resources** — Community news and shared resource library
-- **Federation** — Multi-community network with cross-community exchanges
+- **Federation API** — Multi-community network with cross-community exchanges and federated identity
 - **Smart Matching** — AI-powered matching of members and listings
 - **Exchange Workflow** — Broker-approved service exchange lifecycle
 - **Multi-Tenant** — Run multiple communities from one platform, each with its own branding and configuration
-- **PWA & Mobile** — Progressive Web App with Capacitor Android support
+- **PWA & Native Mobile** — Progressive Web App plus Capacitor native apps (iOS & Android)
 - **Real-Time** — Pusher WebSockets for live updates, FCM for mobile push
+- **Internationalisation** — 7 supported languages: English, Irish (Gaeilge), German, French, Italian, Portuguese, Spanish
 - **Light/Dark Theme** — System-aware theme with per-user preference
 
 ## Tech Stack
@@ -32,9 +33,11 @@ Time banking is a community-based system where members exchange services using t
 | Layer | Technology |
 |-------|-----------|
 | **Frontend** | React 18 + TypeScript + HeroUI + Tailwind CSS 4 |
-| **Backend API** | PHP 8.2+ (custom MVC framework) |
+| **Backend API** | Laravel 12 + PHP 8.2+ |
 | **Database** | MariaDB 10.11 |
 | **Cache** | Redis 7+ |
+| **Search** | Meilisearch |
+| **CDN** | Cloudflare |
 | **Real-Time** | Pusher (WebSockets) + Firebase Cloud Messaging |
 | **Dev Environment** | Docker Compose |
 | **Icons** | Lucide React |
@@ -52,36 +55,41 @@ cd nexus-v1
 # Copy the example environment file and fill in your values
 cp .env.docker.example .env.docker
 
-# Import the database schema
-# (after containers are running, import schema.sql into the MariaDB container)
-
 # Start with Docker
 docker compose up -d
+
+# Run Laravel migrations to set up the database schema
+docker exec nexus-php-app php artisan migrate
 
 # Access the application
 # React Frontend: http://localhost:5173
 # PHP API:        http://localhost:8090
 # Sales Site:     http://localhost:3001
+
+# Mobile app (iOS/Android) — see mobile/ directory for Capacitor setup
 ```
 
 ## Database Setup
 
-A clean database schema is provided at [schema.sql](schema.sql). After starting Docker:
+Run Laravel migrations after starting Docker to create the schema:
 
 ```bash
-docker exec -i nexus-php-db mysql -unexus -p'YOUR_DB_PASS' nexus < schema.sql
+docker exec nexus-php-app php artisan migrate
 ```
+
+A legacy schema dump is also available at [schema.sql](schema.sql) if needed for reference. For production migrations, see the [deployment guide](docs/DEPLOYMENT.md).
 
 ## Project Status
 
-This is a **release preview**. The platform is in active production use, but the codebase is still evolving:
+This is **production-ready V1**. The platform is in active production use:
 
 - The **React frontend** (`react-frontend/`) is the primary and active UI
-- The **PHP backend** (`src/`) provides the API — some legacy patterns remain and are being modernised
-- The **legacy PHP admin views** (`views/`) are being progressively replaced by the React admin panel
+- The **Laravel 12 backend** provides the API — all services are native Laravel implementations
+- The **legacy PHP admin views** (`views/`) remain for `/admin-legacy/` and `/super-admin/`; the React admin panel handles all other admin UI
+- The **mobile app** (`mobile/`) is a Capacitor project targeting iOS and Android
 - **Tests** are in `tests/` — coverage is growing with each release
 
-We welcome contributors who are comfortable working with a codebase in active development.
+We welcome contributors who are comfortable working with a modern Laravel + React codebase.
 
 ## Credits and Origins
 
@@ -149,10 +157,10 @@ Project NEXUS is being actively developed across two codebases:
 
 | Version | Stack | Repository |
 | ------- | ----- | --------- |
-| **V1** (this repo) | PHP 8.2+ / React 18 / MariaDB | [nexus-v1](https://github.com/jasperfordesq-ai/nexus-v1) |
+| **V1** (this repo) | Laravel 12 + PHP 8.2+ / React 18 / MariaDB | [nexus-v1](https://github.com/jasperfordesq-ai/nexus-v1) |
 | **V2** | ASP.NET Core 8 / React 18 / PostgreSQL | [api.project-nexus.net](https://github.com/jasperfordesq-ai/api.project-nexus.net) |
 
-V1 is the original platform — functional, in production, and the foundation of all Project NEXUS communities. V2 is a new backend being built alongside V1, progressively replacing the PHP API using the [Strangler Fig pattern](https://martinfowler.com/bliki/StranglerFigApplication.html). Both share the same React frontend and design system.
+V1 is the original platform — functional, in production, and the foundation of all Project NEXUS communities. It runs on Laravel 12 + PHP 8.2+ with a React 18 frontend. V2 is a new backend being built alongside V1, progressively replacing the PHP API using the [Strangler Fig pattern](https://martinfowler.com/bliki/StranglerFigApplication.html). Both share the same React frontend and design system.
 
 ## Source Code
 

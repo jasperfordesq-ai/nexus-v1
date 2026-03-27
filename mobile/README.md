@@ -84,6 +84,9 @@ The default tenant (`EXPO_PUBLIC_DEFAULT_TENANT`) is `hour-timebank` — change 
 | HTTP | Native `fetch` with typed wrapper (`lib/api/client.ts`) |
 | State | React Context + hooks (no external state library) |
 | Icons | `@expo/vector-icons` (Ionicons) |
+| Authentication | Password + WebAuthn / Passkeys (platform authenticator) |
+| Real-time messaging | Pusher WebSockets (private channels, end-to-end encrypted transport) |
+| Push notifications | Firebase Cloud Messaging (FCM) via Expo Notifications |
 
 ### Directory Layout
 
@@ -117,6 +120,10 @@ mobile/
 4. On login → POST credentials → store JWT → redirect to tabs
 5. On 401 from any API call → clear credentials → redirect to login (handled globally in `lib/api/client.ts`)
 
+#### WebAuthn / Passkeys
+
+The app supports passkey-based authentication via the device platform authenticator (Face ID, Touch ID, Windows Hello, etc.). The WebAuthn flow uses the platform's built-in credential manager — no third-party biometrics library is required. Passkeys are registered and verified through the standard NEXUS WebAuthn API endpoints (`/api/v2/webauthn/register/*` and `/api/v2/webauthn/authenticate/*`). See `lib/security/pinning.ts` for certificate-pinning applied to all WebAuthn and API calls.
+
 ### Multi-Tenancy
 
 Every API request includes an `X-Tenant-Slug` header (set by `lib/api/client.ts` from storage). `TenantContext` loads the tenant's config and branding on startup and exposes `hasFeature(key)` for conditional UI.
@@ -143,5 +150,7 @@ Configure `eas.json` before submitting. See [Expo EAS docs](https://docs.expo.de
 ## Notes
 
 - **No business logic in the app** — all logic lives in the PHP API
-- **AGPL-3.0 attribution** is displayed in the Profile screen footer as required by Section 7(b)
+- **Real-time messaging** — Pusher WebSocket channels are established after login and torn down on logout. Private channels use server-side auth (`/api/v2/pusher/auth`).
+- **Push notifications** — FCM tokens are registered on login via `POST /api/v2/notifications/device-token` and deregistered on logout. Requires `google-services.json` (Android) and `GoogleService-Info.plist` (iOS) in the project root before any EAS build.
+- **AGPL-3.0 attribution** is displayed in the Profile/About screen as required by Section 7(b) and Section 13. The attribution notice must include: (a) a copyright notice (© 2024–2026 Jasper Ford), and (b) a visible link to the public source repository at <https://github.com/jasperfordesq-ai/nexus-v1>. AGPL Section 13 specifically requires that network-accessible software provide a prominent "Corresponding Source" link — the GitHub repo URL satisfies this requirement.
 - Replace `assets/` placeholder images before any public build

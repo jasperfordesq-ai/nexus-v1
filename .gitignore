@@ -33,6 +33,8 @@ CLAUDE.md
 /*.md
 !README.md
 !CONTRIBUTORS.md
+!CONTRIBUTING.md
+!CHANGELOG.md
 
 # ─── Scripts & Migrations (internal, contain credentials/emails) ──────────────
 /scripts/*
