@@ -22,6 +22,7 @@
 !/docs/DEPLOYMENT.md
 !/docs/SYSTEM_AUDIT_*.md
 !/docs/API_REFERENCE.md
+!/docs/OPEN_SOURCE_ANNOUNCEMENT_EMAIL.md
 
 # ─── AI Assistant Config (contains sensitive project context) ─────────────────
 CLAUDE.md
