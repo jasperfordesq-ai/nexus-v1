@@ -767,9 +767,10 @@ class JobVacancyService
 
         try {
             SavedJob::create([
-                'user_id' => $userId,
-                'job_id' => $id,
-                'saved_at' => now(),
+                'tenant_id' => TenantContext::getId(),
+                'user_id'   => $userId,
+                'job_id'    => $id,
+                'saved_at'  => now(),
             ]);
             return true;
         } catch (\Throwable $e) {
