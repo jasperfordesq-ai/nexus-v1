@@ -177,6 +177,7 @@ export function WellbeingTab() {
       });
 
       if (response.success) {
+        toastRef.current.success(tRef.current('wellbeing.checkin_success', 'Mood check-in recorded!'));
         onClose();
         setSelectedMood(3);
         setCheckinNote('');

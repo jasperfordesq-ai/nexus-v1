@@ -148,7 +148,7 @@ export function DonationsTab() {
         setGivingDays(days);
       }
       if (donationsRes.success && donationsRes.data) {
-        const dPayload = donationsRes.data as Record<string, unknown>;
+        const dPayload = donationsRes.data as unknown as Record<string, unknown>;
         const items = Array.isArray(dPayload.items)
           ? (dPayload.items as Donation[])
           : Array.isArray(donationsRes.data)

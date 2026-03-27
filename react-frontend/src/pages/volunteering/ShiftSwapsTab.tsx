@@ -173,6 +173,7 @@ export function ShiftSwapsTab() {
         setSwaps((prev) =>
           prev.map((s) => (s.id === rejectTarget ? { ...s, status: 'rejected' as const } : s))
         );
+        toastRef.current.success(tRef.current('swaps.reject_success', 'Swap request rejected.'));
       } else {
         toastRef.current.error(tRef.current('swaps.reject_failed', 'Failed to reject swap request.'));
       }
