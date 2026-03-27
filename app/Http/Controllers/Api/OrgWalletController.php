@@ -89,6 +89,24 @@ class OrgWalletController extends BaseApiController
             return $this->respondWithError('VALIDATION_ERROR', 'Amount must be positive', 'amount');
         }
 
+        // Verify requesting user is an owner/admin of the source organization (or site admin)
+        $userRow = DB::selectOne(
+            'SELECT role FROM users WHERE id = ? AND tenant_id = ?',
+            [$userId, $tenantId]
+        );
+        $isSiteAdmin = $userRow && in_array($userRow->role ?? '', ['super_admin', 'admin', 'tenant_admin']);
+
+        if (!$isSiteAdmin) {
+            $orgRole = DB::selectOne(
+                'SELECT role FROM org_members WHERE organization_id = ? AND user_id = ? AND tenant_id = ? AND status = ?',
+                [$fromOrgId, $userId, $tenantId, 'active']
+            );
+
+            if (!$orgRole || !in_array($orgRole->role, ['owner', 'admin'])) {
+                return $this->respondWithError('FORBIDDEN', 'You do not have permission to transfer from this organization', null, 403);
+            }
+        }
+
         $fromWallet = DB::selectOne(
             'SELECT balance FROM org_wallets WHERE org_id = ? AND tenant_id = ?',
             [$fromOrgId, $tenantId]

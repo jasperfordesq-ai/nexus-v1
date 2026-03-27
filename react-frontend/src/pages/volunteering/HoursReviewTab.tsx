@@ -204,7 +204,16 @@ export function HoursReviewTab() {
         const isActioned = entry.status !== 'pending';
 
         return (
-          <GlassCard key={entry.id} className="flex flex-col sm:flex-row sm:items-start gap-4 p-4">
+          <GlassCard
+            key={entry.id}
+            className={`flex flex-col sm:flex-row sm:items-start gap-4 p-4 transition-all duration-300 ${
+              isActioned && !inFlight
+                ? entry.status === 'approved'
+                  ? 'ring-2 ring-emerald-500/40 bg-emerald-500/5'
+                  : 'ring-2 ring-danger/40 bg-danger/5 opacity-70'
+                : ''
+            }`}
+          >
             <Avatar
               src={resolveAvatarUrl(entry.user.avatar_url) || undefined}
               name={entry.user.name}

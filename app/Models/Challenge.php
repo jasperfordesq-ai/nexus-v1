@@ -17,6 +17,8 @@ class Challenge extends Model
 
     protected $table = 'challenges';
 
+    const UPDATED_AT = null;
+
     protected $fillable = [
         'tenant_id', 'title', 'description', 'challenge_type', 'action_type',
         'target_count', 'xp_reward', 'badge_reward',

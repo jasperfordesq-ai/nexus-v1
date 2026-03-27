@@ -9,6 +9,7 @@ namespace App\Models;
 use App\Models\Concerns\HasTenantScope;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class AchievementCampaign extends Model
 {
@@ -16,10 +17,14 @@ class AchievementCampaign extends Model
 
     protected $table = 'achievement_campaigns';
 
+    const UPDATED_AT = null;
+
     protected $fillable = [
         'tenant_id', 'name', 'description', 'campaign_type', 'badge_key',
-        'xp_amount', 'target_audience', 'audience_config', 'schedule',
-        'status', 'activated_at', 'last_run_at', 'total_awards',
+        'xp_amount', 'target_criteria', 'schedule_type', 'scheduled_at',
+        'recurrence_pattern', 'status', 'created_by',
+        'executed_at', 'target_audience', 'audience_config', 'schedule',
+        'activated_at', 'last_run_at', 'total_awards',
     ];
 
     protected $casts = [
@@ -28,5 +33,12 @@ class AchievementCampaign extends Model
         'audience_config' => 'array',
         'activated_at' => 'datetime',
         'last_run_at' => 'datetime',
+        'scheduled_at' => 'datetime',
+        'executed_at' => 'datetime',
     ];
+
+    public function creator(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'created_by');
+    }
 }

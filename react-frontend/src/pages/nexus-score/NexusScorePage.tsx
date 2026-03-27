@@ -7,7 +7,7 @@
  * NexusScore Page — personal reputation score breakdown with 6-category detail
  */
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { Progress, Chip, Button, Spinner } from '@heroui/react';
 import {
@@ -167,27 +167,44 @@ export default function NexusScorePage() {
   const [error, setError]       = useState<string | null>(null);
   const [refreshing, setRefreshing] = useState(false);
 
+  // Stable refs for t/toast to avoid re-fetching on language change
+  const tRef = useRef(t);
+  tRef.current = t;
+  const toastRef = useRef(toast);
+  toastRef.current = toast;
+
+  // AbortController ref for stale request cancellation
+  const abortRef = useRef<AbortController | null>(null);
+
   const load = useCallback(async (silent = false) => {
+    abortRef.current?.abort();
+    const controller = new AbortController();
+    abortRef.current = controller;
+
     if (!silent) setLoading(true);
     else setRefreshing(true);
     setError(null);
 
     try {
       const res = await api.get<NexusScoreData>('/v2/gamification/nexus-score');
+      if (controller.signal.aborted) return;
       if (res.success && res.data) {
         setData(res.data);
       } else {
-        setError(res.error ?? t('nexus_score.load_error', 'Could not load your NexusScore. Please try again.'));
+        setError(res.error ?? tRef.current('nexus_score.load_error', 'Could not load your NexusScore. Please try again.'));
       }
     } catch (err) {
+      if (controller.signal.aborted) return;
       logError('NexusScorePage.load', err);
-      setError(t('nexus_score.load_error', 'Could not load your NexusScore. Please try again.'));
-      if (silent) toast.error(t('nexus_score.refresh_error', 'Refresh failed'));
+      setError(tRef.current('nexus_score.load_error', 'Could not load your NexusScore. Please try again.'));
+      if (silent) toastRef.current.error(tRef.current('nexus_score.refresh_error', 'Refresh failed'));
     } finally {
-      setLoading(false);
-      setRefreshing(false);
+      if (!controller.signal.aborted) {
+        setLoading(false);
+        setRefreshing(false);
+      }
     }
-  }, [t, toast]);
+  }, []);
 
   useEffect(() => { load(); }, [load]);
 
@@ -218,7 +235,7 @@ export default function NexusScorePage() {
   const tierConfig = getTierConfig(data.tier.name);
 
   // Next tier threshold
-  const currentTierIndex = TIERS.findIndex(t => t.name === data.tier.name);
+  const currentTierIndex = TIERS.findIndex(tier => tier.name === data.tier.name);
   const nextTier = TIERS[currentTierIndex + 1];
   const pointsToNext = nextTier ? nextTier.min - data.total_score : 0;
 

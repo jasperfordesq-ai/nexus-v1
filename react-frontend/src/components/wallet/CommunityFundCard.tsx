@@ -7,9 +7,9 @@
  * CommunityFundCard - Displays community fund balance and recent activity
  */
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Button } from '@heroui/react';
-import { Landmark, TrendingUp, TrendingDown, Heart } from 'lucide-react';
+import { Landmark, TrendingUp, TrendingDown, Heart, AlertTriangle, RefreshCw } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
 import { api } from '@/lib/api';
@@ -25,28 +25,59 @@ export function CommunityFundCard({ onDonateClick, compact = false }: CommunityF
   const { t } = useTranslation('wallet');
   const [fund, setFund] = useState<CommunityFundBalance | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(false);
+
+  const loadFund = useCallback(async () => {
+    try {
+      setIsLoading(true);
+      setError(false);
+      const response = await api.get<CommunityFundBalance>('/v2/wallet/community-fund');
+      if (response.success && response.data) {
+        setFund(response.data);
+      } else {
+        setError(true);
+      }
+    } catch (err) {
+      logError('Failed to load community fund', err);
+      setError(true);
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
 
   useEffect(() => {
-    async function loadFund() {
-      try {
-        const response = await api.get<CommunityFundBalance>('/v2/wallet/community-fund');
-        if (response.success && response.data) {
-          setFund(response.data);
-        }
-      } catch (err) {
-        logError('Failed to load community fund', err);
-      } finally {
-        setIsLoading(false);
-      }
-    }
     loadFund();
-  }, []);
+  }, [loadFund]);
 
   if (isLoading) {
     return (
       <GlassCard className="p-4 animate-pulse">
         <div className="h-8 bg-theme-hover rounded w-1/3 mb-2" />
         <div className="h-6 bg-theme-hover rounded w-1/2" />
+      </GlassCard>
+    );
+  }
+
+  if (error) {
+    return (
+      <GlassCard className="p-4">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="p-2 rounded-lg bg-gradient-to-br from-amber-500/20 to-orange-500/20">
+              <AlertTriangle className="w-5 h-5 text-amber-400" />
+            </div>
+            <p className="text-sm text-theme-muted">{t('error.load_community_fund')}</p>
+          </div>
+          <Button
+            size="sm"
+            variant="flat"
+            className="bg-theme-elevated text-theme-muted"
+            startContent={<RefreshCw className="w-3 h-3" />}
+            onPress={loadFund}
+          >
+            {t('try_again')}
+          </Button>
+        </div>
       </GlassCard>
     );
   }

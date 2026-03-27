@@ -35,8 +35,8 @@ class BadgeTest extends \Tests\Laravel\TestCase
     {
         $model = new UserBadge();
         $expected = [
-            'user_id', 'badge_key', 'name', 'icon',
-            'is_showcased', 'showcase_order',
+            'tenant_id', 'user_id', 'badge_key', 'name', 'title', 'icon',
+            'is_showcased', 'showcase_order', 'earned_at',
         ];
         $this->assertEquals($expected, $model->getFillable());
     }
@@ -47,6 +47,7 @@ class BadgeTest extends \Tests\Laravel\TestCase
         $casts = $model->getCasts();
         $this->assertEquals('boolean', $casts['is_showcased']);
         $this->assertEquals('integer', $casts['showcase_order']);
+        $this->assertEquals('datetime', $casts['earned_at']);
     }
 
     public function testCreatedAtConstantIsAwardedAt(): void

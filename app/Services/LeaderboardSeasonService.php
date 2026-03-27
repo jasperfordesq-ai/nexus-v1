@@ -57,6 +57,7 @@ class LeaderboardSeasonService
                 $rankings = DB::table('season_rankings as sr')
                     ->join('users as u', 'sr.user_id', '=', 'u.id')
                     ->where('sr.season_id', $seasonId)
+                    ->where('u.tenant_id', $tenantId)
                     ->select('sr.*', 'u.first_name', 'u.last_name', 'u.avatar_url', 'u.level')
                     ->orderByDesc('sr.season_xp')
                     ->limit($limit)
@@ -69,7 +70,7 @@ class LeaderboardSeasonService
         }
 
         if (empty($rankings)) {
-            $season = DB::table('leaderboard_seasons')->where('id', $seasonId)->where('tenant_id', TenantContext::getId())->first();
+            $season = DB::table('leaderboard_seasons')->where('id', $seasonId)->where('tenant_id', $tenantId)->first();
             if ($season) {
                 $rankings = $this->calculateSeasonRankings($tenantId);
             }
@@ -92,7 +93,7 @@ class LeaderboardSeasonService
             return false;
         }
 
-        $rewards = json_decode($season->rewards, true);
+        $rewards = json_decode($season->rewards ?? '{}', true) ?: [];
         $rankings = $this->getSeasonLeaderboard($tenantId, $seasonId, 100);
 
         DB::beginTransaction();
@@ -256,6 +257,15 @@ class LeaderboardSeasonService
         }
 
         if (!$seasonId) {
+            return null;
+        }
+
+        // Verify season belongs to current tenant
+        $seasonRow = DB::table('leaderboard_seasons')
+            ->where('id', $seasonId)
+            ->where('tenant_id', $tenantId)
+            ->first();
+        if (!$seasonRow) {
             return null;
         }
 

@@ -9,6 +9,7 @@
 
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import {
   Button,
@@ -25,9 +26,11 @@ import {
   AlertTriangle,
   Target,
   Zap,
+  ExternalLink,
 } from 'lucide-react';
 import { GlassCard } from '@/components/ui';
 import { EmptyState } from '@/components/feedback';
+import { useTenant } from '@/contexts';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
 
@@ -55,6 +58,8 @@ interface RecommendedShift {
 
 export function RecommendedShiftsTab() {
   const { t } = useTranslation('volunteering');
+  const navigate = useNavigate();
+  const { tenantPath } = useTenant();
   const [shifts, setShifts] = useState<RecommendedShift[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -237,7 +242,7 @@ export function RecommendedShiftsTab() {
                     )}
                   </div>
 
-                  <div className="flex-shrink-0 text-center">
+                  <div className="flex-shrink-0 flex flex-col items-center gap-2">
                     <div className="w-14 h-14 relative">
                       <Progress
                         value={item.match_score}
@@ -253,6 +258,14 @@ export function RecommendedShiftsTab() {
                         aria-label={`${item.match_score}% match`}
                       />
                     </div>
+                    <Button
+                      size="sm"
+                      className="bg-gradient-to-r from-rose-500 to-pink-600 text-white"
+                      endContent={<ExternalLink className="w-3 h-3" aria-hidden="true" />}
+                      onPress={() => navigate(tenantPath(`/volunteering/opportunities/${item.opportunity.id}`))}
+                    >
+                      {t('recommendations.view_opportunity', 'View')}
+                    </Button>
                   </div>
                 </div>
               </GlassCard>

@@ -41,13 +41,8 @@ export function CustomBadges() {
     setLoading(true);
     const res = await adminGamification.listBadges();
     if (res.success && res.data) {
-      const data = res.data as unknown;
-      let all: BadgeDefinition[] = [];
-      if (Array.isArray(data)) {
-        all = data;
-      } else if (data && typeof data === 'object' && 'data' in data) {
-        all = (data as { data: BadgeDefinition[] }).data || [];
-      }
+      // res.data is already unwrapped by the API client — never double-unwrap
+      const all: BadgeDefinition[] = Array.isArray(res.data) ? res.data : [];
       // Show only custom badges on this page
       setBadges(all.filter((b) => b.type === 'custom'));
     } else {

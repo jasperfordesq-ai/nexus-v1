@@ -151,9 +151,10 @@ class VolunteerController extends BaseApiController
         $this->rateLimit('volunteering_apply', 20, 60);
         $data = ['message' => trim($this->input('message', '')), 'shift_id' => $this->inputInt('shift_id') ?: null];
 
-        // Check for duplicate application
+        // Check for duplicate application (tenant-scoped to prevent cross-tenant leaks)
         $existing = VolApplication::where('opportunity_id', $id)
             ->where('user_id', $userId)
+            ->where('tenant_id', TenantContext::getId())
             ->whereIn('status', ['pending', 'approved'])
             ->exists();
         if ($existing) {

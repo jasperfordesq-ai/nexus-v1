@@ -94,11 +94,13 @@ interface Challenge {
   title: string;
   description: string;
   reward_xp: number;
-  progress: number;
-  target: number;
-  deadline: string | null;
-  status: 'active' | 'completed' | 'claimed' | 'expired';
-  type: string;
+  user_progress: number;
+  target_count: number;
+  end_date: string | null;
+  is_completed: boolean;
+  reward_claimed: boolean;
+  progress_percent: number;
+  challenge_type: string;
 }
 
 interface BadgeCollection {
@@ -122,11 +124,13 @@ interface ShopItem {
   name: string;
   description: string;
   cost_xp: number;
-  type: string;
-  image_url: string | null;
-  available: boolean;
-  owned: boolean;
-  stock: number | null;
+  xp_cost: number;
+  item_type: string;
+  icon: string | null;
+  can_purchase: boolean;
+  user_purchases: number;
+  stock_limit: number | null;
+  is_active: boolean;
 }
 
 interface DailyRewardStatus {
@@ -185,17 +189,18 @@ function DailyRewardWidget() {
   const claimReward = async () => {
     try {
       setIsClaiming(true);
-      const res = await api.post<{ xp_earned: number; new_streak: number }>('/v2/gamification/daily-reward');
+      const res = await api.post<{ claimed: boolean; reward: { xp_earned: number; streak_day: number } }>('/v2/gamification/daily-reward');
       if (res.success) {
         setJustClaimed(true);
-        toastRef.current.success(tRef.current('achievements.daily_reward.claimed_title'), tRef.current('achievements.daily_reward.claimed_message', { xp: status?.reward_xp ?? 0 }));
+        const reward = (res.data as { claimed: boolean; reward: { xp_earned: number; streak_day: number } } | undefined)?.reward;
+        toastRef.current.success(tRef.current('achievements.daily_reward.claimed_title'), tRef.current('achievements.daily_reward.claimed_message', { xp: reward?.xp_earned ?? status?.reward_xp ?? 0 }));
         // Update status
         setStatus((prev) =>
           prev
             ? {
                 ...prev,
                 claimed_today: true,
-                current_streak: (res.data as unknown as { new_streak: number })?.new_streak ?? prev.current_streak + 1,
+                current_streak: reward?.streak_day ?? prev.current_streak + 1,
               }
             : prev
         );
@@ -393,7 +398,7 @@ function ChallengesTab() {
       if (res.success) {
         toastRef.current.success(tRef.current('achievements.challenges.reward_claimed'), tRef.current('achievements.challenges.reward_claimed_desc'));
         setChallenges((prev) =>
-          prev.map((c) => (c.id === challengeId ? { ...c, status: 'claimed' as const } : c))
+          prev.map((c) => (c.id === challengeId ? { ...c, reward_claimed: true } : c))
         );
       } else {
         toastRef.current.error(tRef.current('achievements.challenges.claim_failed'), res.error ?? tRef.current('achievements.challenges.claim_failed_desc'));
@@ -448,8 +453,8 @@ function ChallengesTab() {
     );
   }
 
-  const activeChallenges = challenges.filter((c) => c.status === 'active');
-  const completedChallenges = challenges.filter((c) => c.status === 'completed' || c.status === 'claimed');
+  const activeChallenges = challenges.filter((c) => !c.is_completed && !c.reward_claimed);
+  const completedChallenges = challenges.filter((c) => c.is_completed || c.reward_claimed);
 
   return (
     <div className="space-y-6 mt-4">
@@ -467,8 +472,8 @@ function ChallengesTab() {
             className="space-y-3"
           >
             {activeChallenges.map((challenge) => {
-              const progressPct = challenge.target > 0
-                ? Math.min(100, Math.round((challenge.progress / challenge.target) * 100))
+              const progressPct = challenge.target_count > 0
+                ? Math.min(100, Math.round((challenge.user_progress / challenge.target_count) * 100))
                 : 0;
 
               return (
@@ -498,11 +503,11 @@ function ChallengesTab() {
                           aria-label={`Challenge progress: ${progressPct}%`}
                         />
                         <div className="flex items-center justify-between text-xs text-theme-subtle">
-                          <span>{challenge.progress} / {challenge.target}</span>
-                          {challenge.deadline && (
+                          <span>{challenge.user_progress} / {challenge.target_count}</span>
+                          {challenge.end_date && (
                             <span className="flex items-center gap-1">
                               <Clock className="w-3 h-3" aria-hidden="true" />
-                              {new Date(challenge.deadline).toLocaleDateString()}
+                              {new Date(challenge.end_date).toLocaleDateString()}
                             </span>
                           )}
                         </div>
@@ -539,7 +544,7 @@ function ChallengesTab() {
                     <div className="flex-1 min-w-0">
                       <div className="flex items-start justify-between gap-2 mb-1">
                         <h4 className="font-semibold text-theme-primary">{challenge.title}</h4>
-                        {challenge.status === 'completed' ? (
+                        {challenge.is_completed && !challenge.reward_claimed ? (
                           <Button
                             size="sm"
                             className="bg-gradient-to-r from-emerald-500 to-green-600 text-white"
@@ -776,6 +781,11 @@ function XpShopTab({ userXp }: { userXp: number }) {
       if (controller.signal.aborted) return;
       if (res.success && res.data) {
         setItems(Array.isArray(res.data) ? res.data : []);
+        // Update XP from shop meta if available (more current than profile)
+        const metaXp = (res.meta as { user_xp?: number } | undefined)?.user_xp;
+        if (metaXp !== undefined && metaXp !== null) {
+          setCurrentXp(metaXp);
+        }
       }
     } catch (err) {
       if (controller.signal.aborted) return;
@@ -791,8 +801,9 @@ function XpShopTab({ userXp }: { userXp: number }) {
   }, [loadShop]);
 
   const purchaseItem = async (item: ShopItem) => {
-    if (currentXp < item.cost_xp) {
-      toastRef.current.warning(tRef.current('achievements.shop.not_enough_xp'), tRef.current('achievements.shop.not_enough_xp_desc', { xp: item.cost_xp - currentXp }));
+    const cost = item.cost_xp ?? item.xp_cost ?? 0;
+    if (currentXp < cost) {
+      toastRef.current.warning(tRef.current('achievements.shop.not_enough_xp'), tRef.current('achievements.shop.not_enough_xp_desc', { xp: cost - currentXp }));
       return;
     }
 
@@ -802,9 +813,9 @@ function XpShopTab({ userXp }: { userXp: number }) {
       if (res.success) {
         toastRef.current.success(tRef.current('achievements.shop.purchase_complete'), tRef.current('achievements.shop.purchase_complete_desc', { name: item.name }));
         setItems((prev) =>
-          prev.map((i) => (i.id === item.id ? { ...i, owned: true } : i))
+          prev.map((i) => (i.id === item.id ? { ...i, user_purchases: (i.user_purchases ?? 0) + 1, can_purchase: false } : i))
         );
-        setCurrentXp((prev) => prev - item.cost_xp);
+        setCurrentXp((prev) => prev - cost);
       } else {
         toastRef.current.error(tRef.current('achievements.shop.purchase_failed'), res.error ?? tRef.current('achievements.shop.purchase_failed_desc'));
       }
@@ -874,22 +885,26 @@ function XpShopTab({ userXp }: { userXp: number }) {
           className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"
         >
           {items.map((item) => {
-            const canAfford = currentXp >= item.cost_xp;
-            const isAvailable = item.available && !item.owned && (item.stock === null || item.stock > 0);
+            const cost = item.cost_xp ?? item.xp_cost ?? 0;
+            const canAfford = currentXp >= cost;
+            const isOwned = (item.user_purchases ?? 0) > 0;
+            const isAvailable = item.can_purchase && !isOwned;
 
             return (
               <motion.div key={item.id} variants={itemVariants}>
                 <GlassCard
-                  className={`p-5 text-center ${item.owned ? 'opacity-70' : ''}`}
-                  hoverable={!item.owned}
+                  className={`p-5 text-center ${isOwned ? 'opacity-70' : ''}`}
+                  hoverable={!isOwned}
                 >
                   {/* Item icon */}
                   <div className="w-14 h-14 mx-auto mb-3 rounded-lg bg-gradient-to-br from-indigo-500/20 to-purple-500/20 flex items-center justify-center">
-                    {item.type === 'badge' ? (
+                    {item.icon ? (
+                      <span className="text-2xl">{item.icon}</span>
+                    ) : item.item_type === 'badge' ? (
                       <Medal className="w-7 h-7 text-amber-400" aria-hidden="true" />
-                    ) : item.type === 'title' ? (
+                    ) : item.item_type === 'title' ? (
                       <Crown className="w-7 h-7 text-purple-400" aria-hidden="true" />
-                    ) : item.type === 'theme' ? (
+                    ) : item.item_type === 'theme' ? (
                       <Sparkles className="w-7 h-7 text-indigo-400" aria-hidden="true" />
                     ) : (
                       <Package className="w-7 h-7 text-indigo-400" aria-hidden="true" />
@@ -907,15 +922,15 @@ function XpShopTab({ userXp }: { userXp: number }) {
                       variant="flat"
                     >
                       <Gem className="w-3 h-3 inline mr-1" aria-hidden="true" />
-                      {item.cost_xp.toLocaleString()} XP
+                      {cost.toLocaleString()} XP
                     </Chip>
-                    {item.stock !== null && !item.owned && (
-                      <p className="text-xs text-theme-subtle mt-1">{t('achievements.shop.stock_left', { count: item.stock })}</p>
+                    {item.stock_limit !== null && item.stock_limit !== undefined && !isOwned && (
+                      <p className="text-xs text-theme-subtle mt-1">{t('achievements.shop.stock_left', { count: item.stock_limit })}</p>
                     )}
                   </div>
 
                   {/* Action */}
-                  {item.owned ? (
+                  {isOwned ? (
                     <Chip color="success" variant="flat">
                       <CheckCircle className="w-3 h-3 inline mr-1" aria-hidden="true" />
                       {t('achievements.shop.owned')}
@@ -1136,7 +1151,7 @@ export function AchievementsPage() {
       // Load profile and badges in parallel
       const [profileRes, badgesRes] = await Promise.all([
         api.get<GamificationProfile>('/v2/gamification/profile'),
-        api.get<{ data: BadgeEntry[]; meta: { total: number; available_types: string[] } }>('/v2/gamification/badges'),
+        api.get<BadgeEntry[]>('/v2/gamification/badges'),
       ]);
 
       if (controller.signal.aborted) return;

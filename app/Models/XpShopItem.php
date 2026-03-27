@@ -16,6 +16,8 @@ class XpShopItem extends Model
 
     protected $table = 'xp_shop_items';
 
+    const UPDATED_AT = null;
+
     protected $fillable = [
         'tenant_id', 'item_key', 'name', 'description', 'icon',
         'item_type', 'xp_cost', 'stock_limit', 'per_user_limit',

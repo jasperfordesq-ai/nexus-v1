@@ -64,7 +64,7 @@ export function VolunteeringOverview() {
       setOpportunities([]);
     }
     setLoading(false);
-  }, [toast]);
+  }, [toast, t]);
 
   useEffect(() => { loadData(); }, [loadData]);
 

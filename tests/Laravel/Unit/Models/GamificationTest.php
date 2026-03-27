@@ -8,7 +8,6 @@ namespace Tests\Laravel\Unit\Models;
 
 use App\Models\Concerns\HasTenantScope;
 use App\Models\Gamification;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Tests\Laravel\TestCase;
 
 class GamificationTest extends TestCase
@@ -16,23 +15,18 @@ class GamificationTest extends TestCase
     public function test_table_name(): void
     {
         $model = new Gamification();
-        $this->assertEquals('gamification_actions', $model->getTable());
+        $this->assertEquals('gamifications', $model->getTable());
     }
 
-    public function test_fillable_contains_expected_fields(): void
+    public function test_fillable_is_empty(): void
     {
         $model = new Gamification();
-        $expected = [
-            'tenant_id', 'user_id', 'action', 'points', 'reason',
-        ];
-        $this->assertEquals($expected, $model->getFillable());
+        $this->assertEquals([], $model->getFillable());
     }
 
-    public function test_casts_contain_correct_types(): void
+    public function test_updated_at_is_null(): void
     {
-        $model = new Gamification();
-        $casts = $model->getCasts();
-        $this->assertEquals('integer', $casts['points']);
+        $this->assertNull(Gamification::UPDATED_AT);
     }
 
     public function test_uses_has_tenant_scope_trait(): void
@@ -43,9 +37,11 @@ class GamificationTest extends TestCase
         );
     }
 
-    public function test_user_relationship_returns_belongs_to(): void
+    public function test_award_points_method_exists(): void
     {
-        $model = new Gamification();
-        $this->assertInstanceOf(BelongsTo::class, $model->user());
+        $this->assertTrue(
+            method_exists(Gamification::class, 'awardPoints'),
+            'Gamification::awardPoints() should exist'
+        );
     }
 }

@@ -170,7 +170,7 @@ export default function CreateOpportunityPage() {
         className="max-w-2xl mx-auto space-y-6"
       >
         <Breadcrumbs items={[
-          { label: t('volunteering.heading'), href: '/volunteering' },
+          { label: t('volunteering.heading'), href: tenantPath('/volunteering') },
           { label: t('volunteering.create_opportunity_title') },
         ]} />
 
@@ -207,7 +207,7 @@ export default function CreateOpportunityPage() {
     >
       {/* Breadcrumbs */}
       <Breadcrumbs items={[
-        { label: t('volunteering.heading'), href: '/volunteering' },
+        { label: t('volunteering.heading'), href: tenantPath('/volunteering') },
         { label: t('volunteering.create_opportunity_title') },
       ]} />
 

@@ -41,6 +41,7 @@ class BadgeService
         $exists = $this->userBadge->newQuery()
             ->where('user_id', $userId)
             ->where('badge_id', $badgeId)
+            ->where('tenant_id', $tenantId)
             ->exists();
 
         if ($exists) {

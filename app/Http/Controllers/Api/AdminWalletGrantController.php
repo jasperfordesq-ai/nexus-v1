@@ -135,20 +135,23 @@ class AdminWalletGrantController extends BaseApiController
             return $this->respondWithError('USER_NOT_FOUND', 'User not found in this tenant', 'user_id', 404);
         }
 
-        // Insert transaction
-        DB::insert(
-            "INSERT INTO transactions (tenant_id, sender_id, receiver_id, amount, transaction_type, description, status, created_at)
-             VALUES (?, ?, ?, ?, 'admin_grant', ?, 'completed', NOW())",
-            [$tenantId, $adminId, $userId, $amount, $reason ?? 'Admin credit grant']
-        );
+        // Atomic: insert transaction + update balance
+        $grantId = DB::transaction(function () use ($tenantId, $adminId, $userId, $amount, $reason) {
+            DB::insert(
+                "INSERT INTO transactions (tenant_id, sender_id, receiver_id, amount, transaction_type, description, status, created_at)
+                 VALUES (?, ?, ?, ?, 'admin_grant', ?, 'completed', NOW())",
+                [$tenantId, $adminId, $userId, $amount, $reason ?? 'Admin credit grant']
+            );
 
-        $grantId = (int) DB::getPdo()->lastInsertId();
+            $id = (int) DB::getPdo()->lastInsertId();
 
-        // Update user's balance
-        DB::update(
-            "UPDATE users SET balance = balance + ? WHERE id = ? AND tenant_id = ?",
-            [$amount, $userId, $tenantId]
-        );
+            DB::update(
+                "UPDATE users SET balance = balance + ? WHERE id = ? AND tenant_id = ?",
+                [$amount, $userId, $tenantId]
+            );
+
+            return $id;
+        });
 
         return $this->respondWithData([
             'grant' => [

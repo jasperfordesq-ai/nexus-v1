@@ -404,8 +404,8 @@ class VolunteerService
             FROM vol_opportunities opp
             JOIN vol_organizations org ON opp.organization_id = org.id
             LEFT JOIN categories cat ON opp.category_id = cat.id
-            WHERE opp.id = ? AND org.tenant_id = ?
-        ", [$id, $tenantId]);
+            WHERE opp.id = ? AND opp.tenant_id = ? AND org.tenant_id = ?
+        ", [$id, $tenantId, $tenantId]);
 
         if (!$opp) {
             return null;
@@ -1014,6 +1014,17 @@ class VolunteerService
             return false;
         }
 
+        if ($log->status !== 'pending') {
+            self::$errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'Only pending hours can be verified'];
+            return false;
+        }
+
+        // Prevent users from approving their own hours
+        if ((int) $log->user_id === $adminUserId) {
+            self::$errors[] = ['code' => 'FORBIDDEN', 'message' => 'You cannot verify your own logged hours'];
+            return false;
+        }
+
         // Verify admin owns or is admin of the org
         $org = DB::selectOne("SELECT * FROM vol_organizations WHERE id = ? AND tenant_id = ?", [(int) $log->organization_id, $tenantId]);
         if (!$org) {
@@ -1292,6 +1303,22 @@ class VolunteerService
             return null;
         }
 
+        // Prevent self-review
+        if ($targetType === 'user' && $targetId === $reviewerId) {
+            self::$errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'You cannot review yourself'];
+            return null;
+        }
+
+        // Prevent duplicate reviews
+        $existingReview = DB::selectOne(
+            "SELECT id FROM vol_reviews WHERE reviewer_id = ? AND target_type = ? AND target_id = ? AND tenant_id = ?",
+            [$reviewerId, $targetType, $targetId, $tenantId]
+        );
+        if ($existingReview) {
+            self::$errors[] = ['code' => 'ALREADY_EXISTS', 'message' => 'You have already reviewed this ' . $targetType];
+            return null;
+        }
+
         // Verify target exists and reviewer has history
         if ($targetType === 'organization') {
             $org = DB::selectOne("SELECT id FROM vol_organizations WHERE id = ? AND tenant_id = ?", [$targetId, $tenantId]);
@@ -1416,7 +1443,7 @@ class VolunteerService
             return true;
         }
 
-        $siteRole = DB::selectOne("SELECT role FROM users WHERE id = ?", [$userId]);
+        $siteRole = DB::selectOne("SELECT role FROM users WHERE id = ? AND tenant_id = ?", [$userId, self::getTenantId()]);
         if ($siteRole && in_array($siteRole->role, ['super_admin', 'admin', 'tenant_admin'], true)) {
             return true;
         }

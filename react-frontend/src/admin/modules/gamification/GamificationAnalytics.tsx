@@ -43,23 +43,15 @@ export function GamificationAnalytics() {
     ]);
 
     if (statsRes.success && statsRes.data) {
-      const data = statsRes.data as unknown;
-      if (data && typeof data === 'object' && 'data' in data) {
-        setStats((data as { data: GamificationStats }).data);
-      } else {
-        setStats(data as GamificationStats);
-      }
+      // res.data is already unwrapped by the API client — never double-unwrap
+      setStats(statsRes.data as GamificationStats);
     } else {
       toast.error(t('gamification.failed_to_load_gamification_stats'));
     }
 
     if (badgesRes.success && badgesRes.data) {
-      const data = badgesRes.data as unknown;
-      if (Array.isArray(data)) {
-        setBadges(data);
-      } else if (data && typeof data === 'object' && 'data' in data) {
-        setBadges((data as { data: BadgeDefinition[] }).data || []);
-      }
+      // res.data is already unwrapped by the API client — never double-unwrap
+      setBadges(Array.isArray(badgesRes.data) ? badgesRes.data : []);
     }
 
     setLoading(false);

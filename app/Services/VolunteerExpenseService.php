@@ -213,6 +213,12 @@ class VolunteerExpenseService
             throw new \InvalidArgumentException("Review status must be 'approved' or 'rejected'.");
         }
 
+        // Prevent admins from approving their own expenses
+        $expense = VolExpense::find($id);
+        if ($expense && (int) $expense->user_id === $reviewerId) {
+            throw new \InvalidArgumentException("You cannot review your own expense.");
+        }
+
         $affected = VolExpense::where('id', $id)
             ->where('status', 'pending')
             ->update([
@@ -256,6 +262,7 @@ class VolunteerExpenseService
     public static function exportExpenses(int $tenantId, ?array $filters): array
     {
         $query = VolExpense::query()
+            ->where('vol_expenses.tenant_id', $tenantId)
             ->join('users as u', 'vol_expenses.user_id', '=', 'u.id')
             ->leftJoin('vol_organizations as org', 'vol_expenses.organization_id', '=', 'org.id')
             ->select([

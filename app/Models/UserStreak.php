@@ -17,7 +17,7 @@ class UserStreak extends Model
 
     protected $table = 'user_streaks';
 
-    public $timestamps = false;
+    const CREATED_AT = null;
 
     protected $fillable = [
         'tenant_id', 'user_id', 'streak_type',

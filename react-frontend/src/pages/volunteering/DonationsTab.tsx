@@ -48,10 +48,13 @@ interface GivingDay {
   description: string;
   goal_amount: number;
   raised_amount: number;
-  donor_count: number;
-  starts_at: string;
-  ends_at: string;
-  status: 'active' | 'upcoming' | 'ended';
+  donor_count?: number;
+  start_date: string;
+  end_date: string;
+  starts_at?: string;
+  ends_at?: string;
+  is_active?: boolean;
+  status?: 'active' | 'upcoming' | 'ended';
 }
 
 interface GivingDayStats {
@@ -63,11 +66,14 @@ interface GivingDayStats {
 interface Donation {
   id: number;
   amount: number;
+  currency?: string;
   payment_method: string;
   message: string | null;
-  anonymous: boolean;
+  anonymous?: boolean;
+  is_anonymous?: boolean;
   status: 'pending' | 'completed' | 'failed' | 'refunded';
-  giving_day_title: string;
+  giving_day_id?: number | null;
+  giving_day_title?: string;
   created_at: string;
 }
 
@@ -142,14 +148,19 @@ export function DonationsTab() {
         setGivingDays(days);
       }
       if (donationsRes.success && donationsRes.data) {
-        const items = Array.isArray(donationsRes.data) ? donationsRes.data : [];
+        const dPayload = donationsRes.data as Record<string, unknown>;
+        const items = Array.isArray(dPayload.items)
+          ? (dPayload.items as Donation[])
+          : Array.isArray(donationsRes.data)
+            ? (donationsRes.data as unknown as Donation[])
+            : [];
         setDonations(items);
       }
 
       // Compute aggregate stats from giving days data
       const totalRaised = days.reduce((sum, d) => sum + (Number(d.raised_amount) || 0), 0);
       const totalDonors = days.reduce((sum, d) => sum + (Number(d.donor_count) || 0), 0);
-      const activeCampaigns = days.filter((d) => d.status === 'active').length;
+      const activeCampaigns = days.filter((d) => d.status === 'active' || d.is_active).length;
       setStats({ total_raised: totalRaised, total_donors: totalDonors, active_campaigns: activeCampaigns });
     } catch (err) {
       if (controller.signal.aborted) return;
@@ -189,7 +200,7 @@ export function DonationsTab() {
         amount: parseFloat(form.amount),
         payment_method: form.payment_method,
         message: form.message || null,
-        anonymous: form.anonymous,
+        is_anonymous: form.anonymous,
       });
 
       if (response.success) {
@@ -329,8 +340,8 @@ export function DonationsTab() {
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2 mb-2">
                           <h4 className="font-semibold text-theme-primary text-lg">{day.title}</h4>
-                          <Chip size="sm" color={day.status === 'active' ? 'success' : 'default'} variant="flat">
-                            {t(`donations.day_status.${day.status}`, day.status)}
+                          <Chip size="sm" color={(day.status === 'active' || day.is_active) ? 'success' : 'default'} variant="flat">
+                            {t(`donations.day_status.${day.status ?? (day.is_active ? 'active' : 'ended')}`, day.status ?? (day.is_active ? 'Active' : 'Ended'))}
                           </Chip>
                         </div>
                         {day.description && (
@@ -350,11 +361,11 @@ export function DonationsTab() {
                           </span>
                           <span className="flex items-center gap-1">
                             <Users className="w-3 h-3" aria-hidden="true" />
-                            {t('donations.donors_count', '{{count}} donors', { count: day.donor_count })}
+                            {t('donations.donors_count', '{{count}} donors', { count: day.donor_count ?? 0 })}
                           </span>
                           <span className="flex items-center gap-1">
                             <Calendar className="w-3 h-3" aria-hidden="true" />
-                            {new Date(day.ends_at).toLocaleDateString()}
+                            {new Date(day.ends_at ?? day.end_date).toLocaleDateString()}
                           </span>
                         </div>
                       </div>
@@ -399,14 +410,14 @@ export function DonationsTab() {
                         <Chip size="sm" color={STATUS_COLOR[d.status] || 'default'} variant="flat">
                           {t(`donations.status.${d.status}`, d.status)}
                         </Chip>
-                        {d.anonymous && (
+                        {(d.anonymous ?? d.is_anonymous) && (
                           <Chip size="sm" variant="flat" startContent={<EyeOff className="w-3 h-3" />}>
                             {t('donations.anonymous', 'Anonymous')}
                           </Chip>
                         )}
                       </div>
                       <div className="flex flex-wrap items-center gap-3 text-xs text-theme-subtle">
-                        <span>{d.giving_day_title}</span>
+                        {d.giving_day_title && <span>{d.giving_day_title}</span>}
                         <span className="flex items-center gap-1">
                           <CreditCard className="w-3 h-3" aria-hidden="true" />
                           {t(`donations.payment_methods.${d.payment_method}`, d.payment_method.replace('_', ' '))}

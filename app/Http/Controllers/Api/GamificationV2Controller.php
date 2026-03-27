@@ -360,7 +360,7 @@ class GamificationV2Controller extends BaseApiController
             }
 
             $progressRow = DB::selectOne(
-                "SELECT * FROM challenge_progress WHERE challenge_id = ? AND user_id = ? AND tenant_id = ?",
+                "SELECT * FROM user_challenge_progress WHERE challenge_id = ? AND user_id = ? AND tenant_id = ?",
                 [$id, $userId, $this->getTenantId()]
             );
             $progress = $progressRow ? (array)$progressRow : null;
@@ -369,12 +369,16 @@ class GamificationV2Controller extends BaseApiController
                 return $this->respondWithError('CHALLENGE_NOT_STARTED', 'You have not started this challenge', null, 400);
             }
 
-            if ($progress['status'] === 'claimed') {
+            if (!empty($progress['reward_claimed'])) {
                 return $this->respondWithError('CHALLENGE_ALREADY_CLAIMED', 'You have already claimed this reward', null, 400);
             }
 
+            if (empty($progress['completed_at'])) {
+                return $this->respondWithError('CHALLENGE_NOT_COMPLETED', 'You have not completed this challenge yet', null, 400);
+            }
+
             DB::update(
-                "UPDATE challenge_progress SET status = 'claimed', claimed_at = NOW() WHERE challenge_id = ? AND user_id = ? AND tenant_id = ?",
+                "UPDATE user_challenge_progress SET reward_claimed = 1 WHERE challenge_id = ? AND user_id = ? AND tenant_id = ?",
                 [$id, $userId, $this->getTenantId()]
             );
 
@@ -484,7 +488,7 @@ class GamificationV2Controller extends BaseApiController
         }
 
         try {
-            $result = $this->xpShopService->purchase($userId, $itemId);
+            $result = $this->xpShopService->purchaseItem($userId, $itemId);
 
             if ($result['success'] ?? false) {
                 return $this->respondWithData($result);
@@ -512,8 +516,8 @@ class GamificationV2Controller extends BaseApiController
             return $this->respondWithError('VALIDATION_INVALID_FORMAT', 'badge_keys must be an array', 'badge_keys', 400);
         }
 
-        if (count($badgeKeys) > 5) {
-            return $this->respondWithError('VALIDATION_ERROR', 'Maximum 5 badges can be showcased', 'badge_keys', 400);
+        if (count($badgeKeys) > 3) {
+            return $this->respondWithError('VALIDATION_ERROR', 'Maximum 3 badges can be showcased', 'badge_keys', 400);
         }
 
         $userBadges = UserBadge::getForUser($userId);

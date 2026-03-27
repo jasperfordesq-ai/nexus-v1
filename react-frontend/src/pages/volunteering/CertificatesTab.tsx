@@ -75,8 +75,15 @@ export function CertificatesTab() {
 
       if (controller.signal.aborted) return;
       if (response.success && response.data) {
-        const payload = response.data as { certificates?: Certificate[] } | Certificate[];
-        setCertificates(Array.isArray(payload) ? payload : (payload.certificates ?? []));
+        const payload = response.data as Record<string, unknown>;
+        const items = Array.isArray(payload.items)
+          ? (payload.items as Certificate[])
+          : Array.isArray(payload.certificates)
+            ? (payload.certificates as Certificate[])
+            : Array.isArray(response.data)
+              ? (response.data as unknown as Certificate[])
+              : [];
+        setCertificates(items);
       } else {
         setError(tRef.current('certificates.error_load', 'Failed to load certificates'));
       }

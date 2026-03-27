@@ -444,6 +444,38 @@ class SafeguardingService
     }
 
     /**
+     * Get incidents reported by a specific user (non-admin view).
+     *
+     * @param int $userId   The reporter's user ID
+     * @param int $tenantId Tenant ID
+     * @return array{items: array, total: int}
+     */
+    public function getIncidentsByReporter(int $userId, int $tenantId): array
+    {
+        try {
+            $items = DB::table('vol_safeguarding_incidents as si')
+                ->where('si.tenant_id', $tenantId)
+                ->where('si.reported_by', $userId)
+                ->leftJoin('vol_organizations as org', 'si.organization_id', '=', 'org.id')
+                ->select(
+                    'si.id', 'si.incident_type', 'si.description', 'si.status',
+                    'si.severity', 'si.created_at', 'si.updated_at',
+                    'org.name as organization_name'
+                )
+                ->orderByDesc('si.created_at')
+                ->limit(100)
+                ->get()
+                ->map(fn ($row) => (array) $row)
+                ->all();
+
+            return ['items' => $items, 'total' => count($items)];
+        } catch (\Throwable $e) {
+            Log::error('SafeguardingService::getIncidentsByReporter error: ' . $e->getMessage());
+            return ['items' => [], 'total' => 0];
+        }
+    }
+
+    /**
      * Get a single safeguarding incident by ID.
      */
     public function getIncident(int $incidentId, int $tenantId): ?array

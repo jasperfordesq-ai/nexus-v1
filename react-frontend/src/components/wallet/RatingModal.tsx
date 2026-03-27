@@ -84,11 +84,11 @@ export function RatingModal({ isOpen, onClose, exchangeId, otherPartyName, onRat
     >
       <ModalContent>
         <ModalHeader className="text-theme-primary">
-          Rate Your Exchange
+          {t('rating.title')}
         </ModalHeader>
         <ModalBody>
           <p className="text-theme-muted mb-4">
-            How was your exchange{otherPartyName ? ` with ${otherPartyName}` : ''}?
+            {otherPartyName ? t('rating.prompt_with_name', { name: otherPartyName }) : t('rating.prompt')}
           </p>
 
           {/* Star Rating */}
@@ -118,17 +118,17 @@ export function RatingModal({ isOpen, onClose, exchangeId, otherPartyName, onRat
 
           {displayRating > 0 && (
             <p className="text-center text-sm text-theme-muted mb-4">
-              {displayRating === 1 && 'Poor'}
-              {displayRating === 2 && 'Fair'}
-              {displayRating === 3 && 'Good'}
-              {displayRating === 4 && 'Very Good'}
-              {displayRating === 5 && 'Excellent'}
+              {displayRating === 1 && t('rating.poor')}
+              {displayRating === 2 && t('rating.fair')}
+              {displayRating === 3 && t('rating.good')}
+              {displayRating === 4 && t('rating.very_good')}
+              {displayRating === 5 && t('rating.excellent')}
             </p>
           )}
 
           <Textarea
-            label="Comment (optional)"
-            placeholder="Share your experience..."
+            label={t('rating.comment_label')}
+            placeholder={t('rating.comment_placeholder')}
             value={comment}
             onChange={(e) => setComment(e.target.value)}
             maxLength={500}
@@ -144,7 +144,7 @@ export function RatingModal({ isOpen, onClose, exchangeId, otherPartyName, onRat
             onPress={onClose}
             className="bg-theme-elevated text-theme-primary"
           >
-            Skip
+            {t('rating.skip')}
           </Button>
           <Button
             color="warning"
@@ -153,7 +153,7 @@ export function RatingModal({ isOpen, onClose, exchangeId, otherPartyName, onRat
             isDisabled={rating === 0}
             startContent={<Star className="w-4 h-4" />}
           >
-            Submit Rating
+            {t('rating.submit')}
           </Button>
         </ModalFooter>
       </ModalContent>

@@ -47,12 +47,8 @@ export function CampaignList() {
     setLoading(true);
     const res = await adminGamification.listCampaigns();
     if (res.success && res.data) {
-      const data = res.data as unknown;
-      if (Array.isArray(data)) {
-        setCampaigns(data);
-      } else if (data && typeof data === 'object' && 'data' in data) {
-        setCampaigns((data as { data: Campaign[] }).data || []);
-      }
+      // res.data is already unwrapped by the API client — never double-unwrap
+      setCampaigns(Array.isArray(res.data) ? res.data : []);
     } else {
       toast.error(t('gamification.failed_to_load_campaigns'));
     }

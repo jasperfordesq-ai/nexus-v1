@@ -187,6 +187,65 @@ class CommunityFundService
     }
 
     /**
+     * Get paginated community fund transactions for the current tenant.
+     *
+     * @param int $limit Max records to return
+     * @param int $offset Offset for pagination
+     * @return array{items: array, total: int}
+     */
+    public function getTransactions(int $limit = 20, int $offset = 0): array
+    {
+        $tenantId = TenantContext::getId();
+        $fund = self::getOrCreateFund();
+
+        $total = (int) DB::table('community_fund_transactions')
+            ->where('tenant_id', $tenantId)
+            ->where('fund_id', $fund['id'])
+            ->count();
+
+        $rows = DB::table('community_fund_transactions as cft')
+            ->leftJoin('users as u', 'cft.user_id', '=', 'u.id')
+            ->leftJoin('users as admin', 'cft.admin_id', '=', 'admin.id')
+            ->where('cft.tenant_id', $tenantId)
+            ->where('cft.fund_id', $fund['id'])
+            ->orderByDesc('cft.created_at')
+            ->offset($offset)
+            ->limit($limit)
+            ->select(
+                'cft.id',
+                'cft.type',
+                'cft.amount',
+                'cft.balance_after',
+                'cft.description',
+                'cft.user_id',
+                'cft.admin_id',
+                'cft.created_at',
+                DB::raw("CONCAT(u.first_name, ' ', u.last_name) as user_name"),
+                'u.avatar_url as user_avatar',
+                DB::raw("CONCAT(admin.first_name, ' ', admin.last_name) as admin_name")
+            )
+            ->get();
+
+        $items = $rows->map(function ($row) {
+            return [
+                'id' => (int) $row->id,
+                'type' => $row->type,
+                'amount' => round((float) $row->amount, 2),
+                'balance_after' => round((float) $row->balance_after, 2),
+                'description' => $row->description ?? '',
+                'user_id' => $row->user_id ? (int) $row->user_id : null,
+                'user_name' => trim($row->user_name ?? ''),
+                'user_avatar' => $row->user_avatar ?? '',
+                'admin_id' => $row->admin_id ? (int) $row->admin_id : null,
+                'admin_name' => trim($row->admin_name ?? ''),
+                'created_at' => $row->created_at,
+            ];
+        })->all();
+
+        return ['items' => $items, 'total' => $total];
+    }
+
+    /**
      * Member donates credits to the community fund.
      */
     public static function receiveDonation(int $donorId, float $amount, string $message = ''): array

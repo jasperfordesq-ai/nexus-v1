@@ -17,6 +17,9 @@ class UserXpPurchase extends Model
 
     protected $table = 'user_xp_purchases';
 
+    const CREATED_AT = 'purchased_at';
+    const UPDATED_AT = null;
+
     protected $fillable = [
         'tenant_id', 'user_id', 'item_id', 'xp_spent', 'is_active', 'expires_at',
     ];
@@ -25,6 +28,7 @@ class UserXpPurchase extends Model
         'xp_spent' => 'integer',
         'is_active' => 'boolean',
         'expires_at' => 'datetime',
+        'purchased_at' => 'datetime',
     ];
 
     public function item(): BelongsTo

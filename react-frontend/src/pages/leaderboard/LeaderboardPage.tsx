@@ -10,7 +10,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Button, Avatar, Select, SelectItem, Chip, Progress, Skeleton } from '@heroui/react';
+import { Button, Avatar, Select, SelectItem, Chip, Skeleton } from '@heroui/react';
 import {
   Trophy,
   Medal,
@@ -62,28 +62,44 @@ interface LeaderboardMeta {
   total_entries: number;
 }
 
-interface Season {
+/**
+ * Raw season row from GET /v2/gamification/seasons.
+ * Backend returns DB rows: status='active'|'completed', rewards as JSON string,
+ * no `description` or `is_active` fields.
+ */
+interface SeasonRow {
   id: number;
   name: string;
-  description: string;
   start_date: string;
   end_date: string;
-  is_active: boolean;
-  rewards: {
-    tier: string;
-    description: string;
-    min_rank: number;
-  }[];
+  status: string;
+  rewards: string | Record<string, unknown> | null;
 }
 
-interface CurrentSeason extends Season {
-  user_data: {
-    rank: number | null;
-    xp_earned: number;
-    tier: string | null;
-    progress_percentage: number;
+/**
+ * GET /v2/gamification/seasons/current returns:
+ * { season: {...}, user_rank, user_data, leaderboard, rewards, days_remaining,
+ *   is_ending_soon, total_participants }
+ */
+interface CurrentSeasonResponse {
+  season: {
+    id: number;
+    name: string;
+    start_date: string;
+    end_date: string;
+    status: string;
+    rewards: string | Record<string, unknown> | null;
   } | null;
+  user_rank: Record<string, unknown> | null;
+  user_data: {
+    xp_earned: number;
+    rank: number | null;
+    position: number | null;
+  } | null;
+  leaderboard: unknown[];
+  rewards: Record<string, unknown> | null;
   days_remaining: number;
+  is_ending_soon: boolean;
   total_participants: number;
 }
 
@@ -94,11 +110,11 @@ interface CurrentSeason extends Season {
 function SeasonCard() {
   const { t } = useTranslation('gamification');
   const toast = useToast();
-  const [season, setSeason] = useState<CurrentSeason | null>(null);
+  const [season, setSeason] = useState<CurrentSeasonResponse | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [seasonError, setSeasonError] = useState(false);
   const [showAllSeasons, setShowAllSeasons] = useState(false);
-  const [allSeasons, setAllSeasons] = useState<Season[]>([]);
+  const [allSeasons, setAllSeasons] = useState<SeasonRow[]>([]);
   const [loadingAllSeasons, setLoadingAllSeasons] = useState(false);
 
   // AbortController ref to cancel stale requests
@@ -118,10 +134,10 @@ function SeasonCard() {
     try {
       setIsLoading(true);
       setSeasonError(false);
-      const res = await api.get<CurrentSeason>('/v2/gamification/seasons/current');
+      const res = await api.get<CurrentSeasonResponse>('/v2/gamification/seasons/current');
       if (controller.signal.aborted) return;
       if (res.success && res.data) {
-        setSeason(res.data as unknown as CurrentSeason);
+        setSeason(res.data);
       } else if (!res.success) {
         logError('Failed to load current season', res.error);
         setSeasonError(true);
@@ -146,7 +162,7 @@ function SeasonCard() {
     }
     try {
       setLoadingAllSeasons(true);
-      const res = await api.get<Season[]>('/v2/gamification/seasons');
+      const res = await api.get<SeasonRow[]>('/v2/gamification/seasons');
       if (res.success && res.data) {
         setAllSeasons(Array.isArray(res.data) ? res.data : []);
       }
@@ -197,14 +213,22 @@ function SeasonCard() {
     );
   }
 
-  if (!season) return null;
+  // Backend returns { season: null } when no season exists
+  if (!season || !season.season) return null;
 
-  const tierColors: Record<string, string> = {
-    gold: 'text-yellow-400',
-    silver: 'text-gray-300',
-    bronze: 'text-amber-600',
-    unranked: 'text-theme-subtle',
-  };
+  const seasonInfo = season.season;
+  const userData = season.user_data;
+
+  // Parse rewards: backend stores as JSON string in the DB, but the controller
+  // returns the parsed object in `season.rewards` (top-level, already decoded).
+  // Shape: { 1: {xp,badge,title}, 2: {...}, 'top10': {...}, ... }
+  const rewardMap = season.rewards ?? {};
+  const rewardEntries = Object.entries(rewardMap).filter(
+    ([, v]) => v && typeof v === 'object'
+  );
+
+  // Derive user position: backend sends rank or position
+  const userPosition = userData?.position ?? userData?.rank;
 
   return (
     <div className="space-y-3">
@@ -213,11 +237,8 @@ function SeasonCard() {
           <div>
             <h3 className="text-lg font-semibold text-theme-primary flex items-center gap-2">
               <Flame className="w-5 h-5 text-purple-400" aria-hidden="true" />
-              {season.name}
+              {seasonInfo.name}
             </h3>
-            {season.description && (
-              <p className="text-sm text-theme-muted mt-1">{season.description}</p>
-            )}
           </div>
           <Chip size="sm" color="secondary" variant="flat" className="flex-shrink-0">
             <Calendar className="w-3 h-3 inline mr-1" aria-hidden="true" />
@@ -227,57 +248,42 @@ function SeasonCard() {
 
         {/* Season date range */}
         <p className="text-xs text-theme-subtle mb-3">
-          {new Date(season.start_date).toLocaleDateString()} &mdash; {new Date(season.end_date).toLocaleDateString()}
+          {new Date(seasonInfo.start_date).toLocaleDateString()} &mdash; {new Date(seasonInfo.end_date).toLocaleDateString()}
           {' '}&middot; {t('leaderboard.season.participants', { count: season.total_participants })}
         </p>
 
         {/* User's season progress */}
-        {season.user_data && (
+        {userData && (
           <div className="bg-theme-hover/50 rounded-lg p-3 mb-3">
             <div className="flex items-center justify-between mb-2">
               <span className="text-sm font-medium text-theme-primary">{t('leaderboard.season.your_progress')}</span>
               <div className="flex items-center gap-2">
-                {season.user_data.tier && (
-                  <Chip size="sm" variant="flat" className={tierColors[season.user_data.tier] ?? 'text-theme-subtle'}>
-                    <Crown className="w-3 h-3 inline mr-1" aria-hidden="true" />
-                    {season.user_data.tier.charAt(0).toUpperCase() + season.user_data.tier.slice(1)}
-                  </Chip>
-                )}
-                {season.user_data.rank && (
-                  <span className="text-sm font-bold text-indigo-400">#{season.user_data.rank}</span>
+                {userPosition && (
+                  <span className="text-sm font-bold text-indigo-400">#{userPosition}</span>
                 )}
               </div>
             </div>
-            <Progress
-              value={season.user_data.progress_percentage ?? 0}
-              classNames={{
-                indicator: 'bg-gradient-to-r from-purple-500 to-pink-500',
-                track: 'bg-theme-hover',
-              }}
-              size="sm"
-              aria-label={t('leaderboard.season.progress_aria')}
-            />
             <p className="text-xs text-theme-subtle mt-1">
-              {t('leaderboard.season.xp_earned', { xp: (season.user_data.xp_earned ?? 0).toLocaleString() })}
+              {t('leaderboard.season.xp_earned', { xp: (userData.xp_earned ?? 0).toLocaleString() })}
             </p>
           </div>
         )}
 
         {/* Reward tiers */}
-        {season.rewards && season.rewards.length > 0 && (
+        {rewardEntries.length > 0 && (
           <div className="space-y-1">
             <p className="text-xs font-medium text-theme-muted mb-1">{t('leaderboard.season.rewards')}</p>
             <div className="flex flex-wrap gap-2">
-              {season.rewards.map((reward) => (
-                <Chip
-                  key={reward.tier}
-                  size="sm"
-                  variant="flat"
-                  className={tierColors[reward.tier] ?? ''}
-                >
-                  {reward.tier.charAt(0).toUpperCase() + reward.tier.slice(1)}: {reward.description}
-                </Chip>
-              ))}
+              {rewardEntries.map(([key, value]) => {
+                const reward = value as Record<string, unknown>;
+                const label = (reward.title as string) ?? `Rank ${key}`;
+                const xp = reward.xp ? `${reward.xp} XP` : '';
+                return (
+                  <Chip key={key} size="sm" variant="flat">
+                    {label}{xp ? ` — ${xp}` : ''}
+                  </Chip>
+                );
+              })}
             </div>
           </div>
         )}
@@ -310,33 +316,36 @@ function SeasonCard() {
             {t('leaderboard.season.history')}
           </h4>
           <div className="space-y-2">
-            {allSeasons.map((s) => (
-              <div
-                key={s.id}
-                className={`flex items-center justify-between p-2 rounded-lg ${
-                  s.is_active ? 'bg-purple-500/10 border border-purple-500/30' : 'bg-theme-hover/30'
-                }`}
-              >
-                <div className="flex items-center gap-2 min-w-0">
-                  {s.is_active ? (
-                    <Flame className="w-4 h-4 text-purple-400 flex-shrink-0" aria-hidden="true" />
-                  ) : (
-                    <Calendar className="w-4 h-4 text-theme-subtle flex-shrink-0" aria-hidden="true" />
-                  )}
-                  <div className="min-w-0">
-                    <p className="text-sm font-medium text-theme-primary truncate">
-                      {s.name}
-                      {s.is_active && (
-                        <Chip size="sm" color="secondary" variant="flat" className="ml-2">{t('leaderboard.season.active')}</Chip>
-                      )}
-                    </p>
-                    <p className="text-xs text-theme-subtle">
-                      {new Date(s.start_date).toLocaleDateString()} - {new Date(s.end_date).toLocaleDateString()}
-                    </p>
+            {allSeasons.map((s) => {
+              const isActive = s.status === 'active';
+              return (
+                <div
+                  key={s.id}
+                  className={`flex items-center justify-between p-2 rounded-lg ${
+                    isActive ? 'bg-purple-500/10 border border-purple-500/30' : 'bg-theme-hover/30'
+                  }`}
+                >
+                  <div className="flex items-center gap-2 min-w-0">
+                    {isActive ? (
+                      <Flame className="w-4 h-4 text-purple-400 flex-shrink-0" aria-hidden="true" />
+                    ) : (
+                      <Calendar className="w-4 h-4 text-theme-subtle flex-shrink-0" aria-hidden="true" />
+                    )}
+                    <div className="min-w-0">
+                      <p className="text-sm font-medium text-theme-primary truncate">
+                        {s.name}
+                        {isActive && (
+                          <Chip size="sm" color="secondary" variant="flat" className="ml-2">{t('leaderboard.season.active')}</Chip>
+                        )}
+                      </p>
+                      <p className="text-xs text-theme-subtle">
+                        {new Date(s.start_date).toLocaleDateString()} - {new Date(s.end_date).toLocaleDateString()}
+                      </p>
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </GlassCard>
       )}
@@ -380,7 +389,7 @@ export function LeaderboardPage() {
       params.set('type', type);
       params.set('limit', '50');
 
-      const response = await api.get<{ data: LeaderboardEntry[]; meta: LeaderboardMeta }>(
+      const response = await api.get<LeaderboardEntry[]>(
         `/v2/gamification/leaderboard?${params}`
       );
 

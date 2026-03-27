@@ -9,7 +9,6 @@ namespace App\Models;
 use App\Models\Concerns\HasTenantScope;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Support\Facades\DB;
 use App\Core\TenantContext;
 
@@ -18,26 +17,15 @@ class Gamification extends Model
     use HasFactory, HasTenantScope;
 
     // Legacy Gamification model is a utility class that updates users.points
-    // There is no dedicated gamification table — XP is tracked on the users table
-    // This model maps to the gamification_actions table for action logging
+    // The gamifications table has only id + created_at — it is a stub table.
+    // XP is tracked on the users table directly via awardPoints().
     protected $table = 'gamifications';
 
-    protected $fillable = [
-        'tenant_id',
-        'user_id',
-        'action',
-        'points',
-        'reason',
-    ];
+    const UPDATED_AT = null;
 
-    protected $casts = [
-        'points' => 'integer',
-    ];
+    protected $fillable = [];
 
-    public function user(): BelongsTo
-    {
-        return $this->belongsTo(User::class);
-    }
+    protected $casts = [];
 
     /**
      * Award points to a user for an action.

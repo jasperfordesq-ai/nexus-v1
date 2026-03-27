@@ -1,27 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/10.5/phpunit.xsd" bootstrap="tests/bootstrap.php" colors="true" cacheDirectory=".phpunit.cache" executionOrder="depends,defects" requireCoverageMetadata="false" beStrictAboutCoverageMetadata="false" beStrictAboutOutputDuringTests="true" failOnRisky="true" failOnWarning="true" stopOnFailure="false">
   <testsuites>
-    <testsuite name="Unit">
-      <directory suffix="Test.php">tests/Unit</directory>
-    </testsuite>
-    <testsuite name="Integration">
-      <directory suffix="Test.php">tests/Integration</directory>
-    </testsuite>
-    <testsuite name="Feature">
-      <directory suffix="Test.php">tests/Feature</directory>
-    </testsuite>
-    <testsuite name="Models">
-      <directory suffix="Test.php">tests/Models</directory>
-    </testsuite>
-    <testsuite name="Services">
-      <directory suffix="Test.php">tests/Services</directory>
-    </testsuite>
-    <testsuite name="Enterprise">
-      <directory suffix="Test.php">tests/Enterprise</directory>
-    </testsuite>
-    <testsuite name="Middleware">
-      <directory suffix="Test.php">tests/Middleware</directory>
-    </testsuite>
     <testsuite name="Laravel">
       <directory suffix="Test.php">tests/Laravel</directory>
       <exclude>tests/Laravel/Migrated</exclude>

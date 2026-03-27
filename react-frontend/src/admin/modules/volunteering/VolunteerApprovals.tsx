@@ -54,7 +54,7 @@ export function VolunteerApprovals() {
       setItems([]);
     }
     setLoading(false);
-  }, [toast]);
+  }, [toast, t]);
 
   useEffect(() => { loadData(); }, [loadData]);
 

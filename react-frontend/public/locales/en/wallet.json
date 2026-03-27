@@ -64,7 +64,9 @@
   },
   "error": {
     "load_balance": "Failed to load wallet balance",
-    "load_wallet": "Failed to load wallet data. Please try again."
+    "load_wallet": "Failed to load wallet data. Please try again.",
+    "session_expired": "Your session has expired. Please log in again.",
+    "load_community_fund": "Could not load community fund"
   },
   "no_members_found": "No members found",
   "donate": "Donate",
@@ -100,6 +102,20 @@
   "community_fund_hours": "hours available",
   "community_fund_deposited": "Deposited",
   "community_fund_withdrawn": "Withdrawn",
+  "rating": {
+    "title": "Rate Your Exchange",
+    "prompt": "How was your exchange?",
+    "prompt_with_name": "How was your exchange with {{name}}?",
+    "poor": "Poor",
+    "fair": "Fair",
+    "good": "Good",
+    "very_good": "Very Good",
+    "excellent": "Excellent",
+    "comment_label": "Comment (optional)",
+    "comment_placeholder": "Share your experience...",
+    "skip": "Skip",
+    "submit": "Submit Rating"
+  },
   "available_balance": "Available Balance",
   "recipient": "Recipient",
   "remove_recipient": "Remove recipient",

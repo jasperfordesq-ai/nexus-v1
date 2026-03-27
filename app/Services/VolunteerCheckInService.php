@@ -184,6 +184,7 @@ class VolunteerCheckInService
 
             return VolShiftCheckin::with('user')
                 ->whereIn('shift_id', $shiftIds)
+                ->where('tenant_id', $tenantId)
                 ->orderBy('created_at', 'asc')
                 ->get()
                 ->map(fn ($c) => [
@@ -216,6 +217,7 @@ class VolunteerCheckInService
 
             return VolShiftCheckin::whereIn('shift_id', $shiftIds)
                 ->where('user_id', $userId)
+                ->where('tenant_id', $tenantId)
                 ->where('status', 'checked_in')
                 ->exists();
         } catch (\Exception $e) {
@@ -279,9 +281,10 @@ class VolunteerCheckInService
         self::$staticErrors = [];
         $tenantId = TenantContext::getId();
 
-        // Check volunteer is approved for this shift
+        // Check volunteer is approved for this shift (tenant-scoped)
         $hasApproved = VolApplication::where('shift_id', $shiftId)
             ->where('user_id', $volunteerId)
+            ->where('tenant_id', $tenantId)
             ->where('status', 'approved')
             ->exists();
 
@@ -290,9 +293,10 @@ class VolunteerCheckInService
             return null;
         }
 
-        // Check for existing token
+        // Check for existing token (tenant-scoped)
         $existing = VolShiftCheckin::where('shift_id', $shiftId)
             ->where('user_id', $volunteerId)
+            ->where('tenant_id', $tenantId)
             ->whereNotNull('qr_token')
             ->value('qr_token');
 

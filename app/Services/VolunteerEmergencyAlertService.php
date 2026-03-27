@@ -355,6 +355,7 @@ class VolunteerEmergencyAlertService
         self::$errors = [];
 
         $alert = VolEmergencyAlert::where('id', $alertId)
+            ->where('tenant_id', $tenantId)
             ->where('created_by', $userId)
             ->where('status', 'active')
             ->first();

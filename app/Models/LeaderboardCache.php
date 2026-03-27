@@ -17,7 +17,7 @@ class LeaderboardCache extends Model
 
     protected $table = 'leaderboard_cache';
 
-    public $timestamps = false;
+    const CREATED_AT = null;
 
     protected $fillable = [
         'tenant_id',
@@ -26,13 +26,11 @@ class LeaderboardCache extends Model
         'period',
         'score',
         'rank_position',
-        'updated_at',
     ];
 
     protected $casts = [
         'score' => 'decimal:2',
         'rank_position' => 'integer',
-        'updated_at' => 'datetime',
     ];
 
     public function user(): BelongsTo

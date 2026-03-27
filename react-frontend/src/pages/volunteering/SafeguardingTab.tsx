@@ -56,10 +56,16 @@ export function SafeguardingTab() {
 
     try {
       setIsLoading(true); setError(null);
-      const [tRes, iRes] = await Promise.all([api.get<Training[]>('/v2/volunteering/training'), api.get<Incident[]>('/v2/volunteering/incidents')]);
+      const [tRes, iRes] = await Promise.all([api.get<{ items: Training[]; cursor?: string | null; has_more?: boolean }>('/v2/volunteering/training'), api.get<{ items: Incident[]; total?: number; page?: number; per_page?: number }>('/v2/volunteering/incidents')]);
       if (controller.signal.aborted) return;
-      if (tRes.success && tRes.data) setTrainings(tRes.data as Training[]);
-      if (iRes.success && iRes.data) setIncidents(iRes.data as Incident[]);
+      if (tRes.success && tRes.data) {
+        const tPayload = tRes.data as Record<string, unknown>;
+        setTrainings(Array.isArray(tPayload.items) ? tPayload.items as Training[] : Array.isArray(tRes.data) ? tRes.data as unknown as Training[] : []);
+      }
+      if (iRes.success && iRes.data) {
+        const iPayload = iRes.data as Record<string, unknown>;
+        setIncidents(Array.isArray(iPayload.items) ? iPayload.items as Incident[] : Array.isArray(iRes.data) ? iRes.data as unknown as Incident[] : []);
+      }
     } catch (err) { if (controller.signal.aborted) return; logError('Failed to load safeguarding data', err); setError(tRef.current('safeguarding.load_error', 'Unable to load safeguarding data.')); }
     finally { setIsLoading(false); }
   }, []);

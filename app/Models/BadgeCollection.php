@@ -17,6 +17,8 @@ class BadgeCollection extends Model
 
     protected $table = 'badge_collections';
 
+    const UPDATED_AT = null;
+
     protected $fillable = [
         'tenant_id', 'collection_key', 'name', 'description',
         'icon', 'bonus_xp', 'bonus_badge_key', 'display_order',

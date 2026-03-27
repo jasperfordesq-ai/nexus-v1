@@ -236,9 +236,12 @@ class XPShopService
             return false;
         }
 
+        $tenantId = TenantContext::getId();
+
         if ($item['stock_limit'] !== null) {
             $totalPurchases = DB::table('user_xp_purchases')
                 ->where('item_id', $item['id'])
+                ->where('tenant_id', $tenantId)
                 ->count();
             if ($totalPurchases >= $item['stock_limit']) {
                 return false;
@@ -249,6 +252,7 @@ class XPShopService
             $userPurchases = DB::table('user_xp_purchases')
                 ->where('user_id', $userId)
                 ->where('item_id', $item['id'])
+                ->where('tenant_id', $tenantId)
                 ->count();
             if ($userPurchases >= $item['per_user_limit']) {
                 return false;
@@ -275,9 +279,12 @@ class XPShopService
             return 'Not enough XP';
         }
 
+        $tenantId = TenantContext::getId();
+
         if ($item['stock_limit'] !== null) {
             $totalPurchases = DB::table('user_xp_purchases')
                 ->where('item_id', $item['id'])
+                ->where('tenant_id', $tenantId)
                 ->count();
             if ($totalPurchases >= $item['stock_limit']) {
                 return 'Out of stock';
@@ -288,6 +295,7 @@ class XPShopService
             $userPurchases = DB::table('user_xp_purchases')
                 ->where('user_id', $userId)
                 ->where('item_id', $item['id'])
+                ->where('tenant_id', $tenantId)
                 ->count();
             if ($userPurchases >= $item['per_user_limit']) {
                 return 'Already owned';

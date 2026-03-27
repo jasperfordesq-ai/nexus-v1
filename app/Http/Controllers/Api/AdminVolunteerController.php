@@ -226,6 +226,10 @@ class AdminVolunteerController extends BaseApiController
                 return $this->respondWithError('NOT_FOUND', 'Hours log not found', null, 404);
             }
 
+            if ($log->status !== 'pending') {
+                return $this->respondWithError('VALIDATION_ERROR', 'Only pending hours can be verified', null, 422);
+            }
+
             $newStatus = $action === 'approve' ? 'approved' : 'declined';
             DB::update(
                 "UPDATE vol_logs SET status = ?, updated_at = NOW() WHERE id = ? AND tenant_id = ?",
@@ -412,12 +416,16 @@ class AdminVolunteerController extends BaseApiController
             $app = DB::selectOne(
                 "SELECT va.id, va.status, va.user_id, vo.title as opportunity_title
                  FROM vol_applications va INNER JOIN vol_opportunities vo ON va.opportunity_id = vo.id
-                 WHERE va.id = ? AND vo.tenant_id = ?",
-                [$id, $tenantId]
+                 WHERE va.id = ? AND va.tenant_id = ? AND vo.tenant_id = ?",
+                [$id, $tenantId, $tenantId]
             );
 
             if (!$app) {
                 return $this->respondWithError('NOT_FOUND', 'Application not found', null, 404);
+            }
+
+            if ($app->status !== 'pending') {
+                return $this->respondWithError('VALIDATION_ERROR', 'Only pending applications can be approved', null, 422);
             }
 
             DB::update("UPDATE vol_applications SET status = 'approved', updated_at = NOW() WHERE id = ? AND tenant_id = ?", [$id, $tenantId]);
@@ -444,13 +452,17 @@ class AdminVolunteerController extends BaseApiController
 
         try {
             $app = DB::selectOne(
-                "SELECT va.id FROM vol_applications va INNER JOIN vol_opportunities vo ON va.opportunity_id = vo.id
-                 WHERE va.id = ? AND vo.tenant_id = ?",
-                [$id, $tenantId]
+                "SELECT va.id, va.status FROM vol_applications va INNER JOIN vol_opportunities vo ON va.opportunity_id = vo.id
+                 WHERE va.id = ? AND va.tenant_id = ? AND vo.tenant_id = ?",
+                [$id, $tenantId, $tenantId]
             );
 
             if (!$app) {
                 return $this->respondWithError('NOT_FOUND', 'Application not found', null, 404);
+            }
+
+            if ($app->status !== 'pending') {
+                return $this->respondWithError('VALIDATION_ERROR', 'Only pending applications can be declined', null, 422);
             }
 
             DB::update("UPDATE vol_applications SET status = 'declined', updated_at = NOW() WHERE id = ? AND tenant_id = ?", [$id, $tenantId]);

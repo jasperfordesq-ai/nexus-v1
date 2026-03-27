@@ -7,6 +7,7 @@
 namespace App\Http\Controllers\Api;
 
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\DB;
 use App\Services\MemberVerificationBadgeService;
 
 /**
@@ -36,6 +37,17 @@ class MemberVerificationBadgeController extends BaseApiController
     public function getUserBadges(int $id): JsonResponse
     {
         $this->rateLimit('verification_badges', 30, 60);
+
+        // Verify the target user belongs to the current tenant
+        $tenantId = $this->getTenantId();
+        $userExists = DB::table('users')
+            ->where('id', $id)
+            ->where('tenant_id', $tenantId)
+            ->exists();
+
+        if (!$userExists) {
+            return $this->respondWithError('RESOURCE_NOT_FOUND', 'User not found', null, 404);
+        }
 
         $badges = $this->memberVerificationBadgeService->getUserBadges($id);
 

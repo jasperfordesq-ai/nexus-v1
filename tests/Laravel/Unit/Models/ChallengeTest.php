@@ -25,9 +25,9 @@ class ChallengeTest extends TestCase
         $model = new Challenge();
         $expected = [
             'tenant_id', 'title', 'description', 'challenge_type', 'action_type',
-            'target_count', 'xp_reward', 'badge_reward', 'category',
-            'start_date', 'end_date', 'starts_at', 'ends_at',
-            'status', 'is_active',
+            'target_count', 'xp_reward', 'badge_reward',
+            'start_date', 'end_date',
+            'is_active',
         ];
         $this->assertEquals($expected, $model->getFillable());
     }
@@ -41,6 +41,11 @@ class ChallengeTest extends TestCase
         $this->assertEquals('boolean', $casts['is_active']);
         $this->assertEquals('date', $casts['start_date']);
         $this->assertEquals('date', $casts['end_date']);
+    }
+
+    public function test_updated_at_is_null(): void
+    {
+        $this->assertNull(Challenge::UPDATED_AT);
     }
 
     public function test_uses_has_tenant_scope_trait(): void

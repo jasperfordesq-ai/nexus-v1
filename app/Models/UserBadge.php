@@ -23,17 +23,21 @@ class UserBadge extends Model
     const UPDATED_AT = null;
 
     protected $fillable = [
+        'tenant_id',
         'user_id',
         'badge_key',
         'name',
+        'title',
         'icon',
         'is_showcased',
         'showcase_order',
+        'earned_at',
     ];
 
     protected $casts = [
         'is_showcased' => 'boolean',
         'showcase_order' => 'integer',
+        'earned_at' => 'datetime',
     ];
 
     public function user(): BelongsTo

@@ -323,11 +323,22 @@ class VolunteerWellbeingController extends BaseApiController
         $this->rateLimit('vol_incidents_list', 30, 60);
 
         $tenantId = TenantContext::getId();
-        $status = $this->query('status');
-        $page = $this->queryInt('page', 1, 1, 1000);
-        $perPage = $this->queryInt('per_page', 20, 1, 50);
 
-        $result = $this->safeguardingService->getIncidents($tenantId, $status, $page, $perPage);
+        // Non-admin users can only see incidents they reported.
+        // Full list is available via adminIncidents() which requires admin role.
+        $user = Auth::user();
+        $role = $user->role ?? 'member';
+        $isAdmin = in_array($role, ['admin', 'tenant_admin', 'super_admin', 'god'], true);
+
+        if ($isAdmin) {
+            $status = $this->query('status');
+            $page = $this->queryInt('page', 1, 1, 1000);
+            $perPage = $this->queryInt('per_page', 20, 1, 50);
+            $result = $this->safeguardingService->getIncidents($tenantId, $status, $page, $perPage);
+        } else {
+            $result = $this->safeguardingService->getIncidentsByReporter($userId, $tenantId);
+        }
+
         return $this->respondWithData($result);
     }
 

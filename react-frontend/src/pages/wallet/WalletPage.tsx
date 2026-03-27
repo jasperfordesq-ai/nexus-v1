@@ -395,7 +395,7 @@ export function WalletPage() {
           {/* Filter Tabs */}
           <Tabs
             selectedKey={filter}
-            onSelectionChange={(key) => { setFilter(key as TransactionFilter); setTxCursor(null); }}
+            onSelectionChange={(key) => { setFilter(key as TransactionFilter); setTxCursor(null); setHasMoreTransactions(true); }}
             classNames={{
               tabList: 'bg-theme-elevated p-1 rounded-lg',
               cursor: 'bg-theme-hover',

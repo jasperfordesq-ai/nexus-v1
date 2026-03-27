@@ -56,8 +56,17 @@ class ChallengeService
      */
     public static function getById(int $id, int $tenantId): ?array
     {
-        $challenge = Challenge::query()->find($id);
-        return $challenge ? $challenge->toArray() : null;
+        $challenge = Challenge::query()
+            ->where('id', $id)
+            ->first();
+        if (!$challenge) {
+            return null;
+        }
+        // Verify tenant match (HasTenantScope should handle this, but be explicit)
+        if ((int) $challenge->tenant_id !== $tenantId) {
+            return null;
+        }
+        return $challenge->toArray();
     }
 
     /**
@@ -91,6 +100,15 @@ class ChallengeService
      */
     public static function claim(int $challengeId, int $userId, int $tenantId): bool
     {
+        // Verify user belongs to this tenant
+        $userInTenant = DB::table('users')
+            ->where('id', $userId)
+            ->where('tenant_id', $tenantId)
+            ->exists();
+        if (!$userInTenant) {
+            return false;
+        }
+
         $challenge = Challenge::query()
             ->where('id', $challengeId)
             ->where('status', 'active')
@@ -224,19 +242,25 @@ class ChallengeService
                         $prog->save();
                     }
 
-                    // Check if just completed
+                    // Check if just completed — mark complete but do NOT auto-claim reward
+                    // Users claim rewards explicitly via POST /v2/gamification/challenges/{id}/claim
                     if ($newCount >= $challenge->target_count && ! $prog->completed_at) {
                         $prog->completed_at = now();
-                        $prog->reward_claimed = true;
                         $prog->save();
 
                         $completed[] = $challenge->toArray();
                     }
                 });
 
-                // Award rewards outside transaction for completed challenges
+                // Notify user of completion — rewards are claimed explicitly via
+                // POST /v2/gamification/challenges/{id}/claim to prevent double-award
                 if (! empty($completed) && $completed[array_key_last($completed)]['id'] === $challenge->id) {
-                    self::awardChallengeReward($userId, $challenge);
+                    Notification::create([
+                        'user_id' => $userId,
+                        'type'    => 'achievement',
+                        'message' => "Challenge Complete! You finished '{$challenge->title}' — claim your reward!",
+                        'link'    => '/achievements',
+                    ]);
                 }
             } catch (\Throwable $e) {
                 Log::error('ChallengeService::updateProgress error: ' . $e->getMessage());

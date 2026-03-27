@@ -109,9 +109,10 @@ class VolunteerDonationService
         $isAnonymous = !empty($data['is_anonymous']) ? 1 : 0;
         $opportunityId = isset($data['opportunity_id']) ? (int) $data['opportunity_id'] : null;
         $givingDayId = isset($data['giving_day_id']) ? (int) $data['giving_day_id'] : null;
-        $status = in_array($data['status'] ?? '', ['pending', 'completed'], true)
-            ? $data['status']
-            : 'pending';
+        // Donations always start as 'pending' — only payment webhooks or admin actions
+        // should mark them 'completed'. Allowing caller-controlled status would let
+        // users bypass payment verification and inflate giving-day totals.
+        $status = 'pending';
 
         if ($amount <= 0) {
             throw new \InvalidArgumentException('Donation amount must be greater than zero.');
@@ -298,6 +299,7 @@ class VolunteerDonationService
     public static function exportDonations(int $tenantId, ?array $filters): array
     {
         $query = VolDonation::query()
+            ->where('tenant_id', $tenantId)
             ->select([
                 'id', 'user_id', 'opportunity_id', 'giving_day_id',
                 'amount', 'currency', 'payment_method', 'payment_reference',
@@ -312,6 +314,12 @@ class VolunteerDonationService
         }
         if (!empty($filters['status']) && in_array($filters['status'], self::VALID_STATUSES, true)) {
             $query->where('status', $filters['status']);
+        }
+        if (!empty($filters['date_from'])) {
+            $query->where('created_at', '>=', $filters['date_from']);
+        }
+        if (!empty($filters['date_to'])) {
+            $query->where('created_at', '<=', $filters['date_to']);
         }
 
         return $query->orderByDesc('created_at')

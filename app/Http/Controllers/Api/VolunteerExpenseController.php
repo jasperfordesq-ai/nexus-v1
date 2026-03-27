@@ -132,10 +132,14 @@ class VolunteerExpenseController extends BaseApiController
             return $this->respondWithError('VALIDATION_ERROR', 'Invalid status. Must be one of: ' . implode(', ', $allowedStatuses), 'status', 422);
         }
 
-        if ($status === 'paid') {
-            $result = $this->volunteerExpenseService->markPaid((int) $id, $adminId, $data['payment_reference'] ?? null);
-        } else {
-            $result = $this->volunteerExpenseService->reviewExpense((int) $id, $adminId, $status, $data['review_notes'] ?? null);
+        try {
+            if ($status === 'paid') {
+                $result = $this->volunteerExpenseService->markPaid((int) $id, $adminId, $data['payment_reference'] ?? null);
+            } else {
+                $result = $this->volunteerExpenseService->reviewExpense((int) $id, $adminId, $status, $data['review_notes'] ?? null);
+            }
+        } catch (\InvalidArgumentException $e) {
+            return $this->respondWithError('FORBIDDEN', $e->getMessage(), null, 403);
         }
 
         if (!$result) {

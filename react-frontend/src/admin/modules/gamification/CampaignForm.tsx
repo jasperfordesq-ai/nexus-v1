@@ -103,12 +103,8 @@ export function CampaignForm() {
       setLoadingBadges(true);
       const res = await adminGamification.listBadges();
       if (res.success && res.data) {
-        const data = res.data as unknown;
-        if (Array.isArray(data)) {
-          setBadges(data);
-        } else if (data && typeof data === 'object' && 'data' in data) {
-          setBadges((data as { data: BadgeDefinition[] }).data || []);
-        }
+        // res.data is already unwrapped by the API client — never double-unwrap
+        setBadges(Array.isArray(res.data) ? res.data : []);
       }
       setLoadingBadges(false);
     })();
@@ -121,13 +117,8 @@ export function CampaignForm() {
 
     const res = await adminGamification.listCampaigns();
     if (res.success && res.data) {
-      const data = res.data as unknown;
-      let campaigns: Campaign[] = [];
-      if (Array.isArray(data)) {
-        campaigns = data;
-      } else if (data && typeof data === 'object' && 'data' in data) {
-        campaigns = (data as { data: Campaign[] }).data || [];
-      }
+      // res.data is already unwrapped by the API client — never double-unwrap
+      const campaigns: Campaign[] = Array.isArray(res.data) ? res.data : [];
 
       const campaign = campaigns.find((c) => c.id === Number(id));
       if (campaign) {

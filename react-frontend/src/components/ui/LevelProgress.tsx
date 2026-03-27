@@ -19,7 +19,10 @@ export interface LevelProgressProps {
 }
 
 export function LevelProgress({ currentXP, requiredXP, level, compact = false }: LevelProgressProps) {
-  const percentage = requiredXP > 0 ? Math.min(Math.round((currentXP / requiredXP) * 100), 100) : 0;
+  // Guard against negative or NaN values from malformed backend data
+  const safeCurrentXP = Math.max(0, currentXP ?? 0);
+  const safeRequiredXP = Math.max(0, requiredXP ?? 0);
+  const percentage = safeRequiredXP > 0 ? Math.min(Math.round((safeCurrentXP / safeRequiredXP) * 100), 100) : 0;
 
   return (
     <div className="space-y-2">
@@ -27,11 +30,18 @@ export function LevelProgress({ currentXP, requiredXP, level, compact = false }:
         <div className="flex justify-between items-center">
           <span className="text-theme-primary font-medium">Level {level}</span>
           <span className="text-theme-subtle text-sm">
-            {currentXP.toLocaleString()} / {requiredXP.toLocaleString()} XP
+            {safeCurrentXP.toLocaleString()} / {safeRequiredXP.toLocaleString()} XP
           </span>
         </div>
       )}
-      <div className="relative h-3 bg-theme-elevated rounded-full overflow-hidden border border-[var(--border-default)]">
+      <div
+        className="relative h-3 bg-theme-elevated rounded-full overflow-hidden border border-[var(--border-default)]"
+        role="progressbar"
+        aria-valuenow={percentage}
+        aria-valuemin={0}
+        aria-valuemax={100}
+        aria-label={`Level ${level} progress: ${percentage}%`}
+      >
         <div
           className="absolute inset-y-0 left-0 bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 rounded-full transition-all duration-500"
           style={{ width: `${percentage}%` }}
@@ -41,7 +51,7 @@ export function LevelProgress({ currentXP, requiredXP, level, compact = false }:
       {compact && (
         <div className="flex justify-between text-xs">
           <span className="text-theme-muted">
-            {currentXP.toLocaleString()} / {requiredXP.toLocaleString()} XP
+            {safeCurrentXP.toLocaleString()} / {safeRequiredXP.toLocaleString()} XP
           </span>
           <span className="text-theme-primary font-medium">{percentage}%</span>
         </div>

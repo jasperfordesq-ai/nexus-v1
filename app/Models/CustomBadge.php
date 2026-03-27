@@ -30,12 +30,12 @@ class CustomBadge extends Model
         'xp_reward',
         'is_active',
         'created_by',
+        'category',
     ];
 
     protected $casts = [
         'xp_reward' => 'integer',
         'is_active' => 'boolean',
-        'claimed_at' => 'datetime',
     ];
 
     public function creator(): BelongsTo

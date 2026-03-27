@@ -21,7 +21,7 @@ class Transaction extends Model
 
     protected $fillable = [
         'tenant_id', 'sender_id', 'receiver_id', 'amount', 'description',
-        'status', 'source_match_id', 'deleted_for_sender', 'deleted_for_receiver',
+        'transaction_type', 'status', 'source_match_id', 'deleted_for_sender', 'deleted_for_receiver',
     ];
 
     protected $casts = [

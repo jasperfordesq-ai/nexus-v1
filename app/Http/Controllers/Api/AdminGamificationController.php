@@ -8,6 +8,7 @@ namespace App\Http\Controllers\Api;
 
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use App\Core\TenantContext;
 use App\Models\User;
 use App\Services\GamificationService;
@@ -178,7 +179,8 @@ class AdminGamificationController extends BaseApiController
             ]);
             return $this->respondWithData(['id' => (int) $id, 'name' => $name, 'status' => 'draft'], null, 201);
         } catch (\Throwable $e) {
-            return $this->respondWithError('SERVER_ERROR', 'Failed to create campaign: ' . $e->getMessage(), null, 500);
+            Log::error('Failed to create campaign: ' . $e->getMessage());
+            return $this->respondWithError('SERVER_ERROR', 'Failed to create campaign', null, 500);
         }
     }
 
@@ -206,7 +208,8 @@ class AdminGamificationController extends BaseApiController
             ]);
             return $this->respondWithData(['id' => $id, 'updated' => true]);
         } catch (\Throwable $e) {
-            return $this->respondWithError('SERVER_ERROR', 'Failed to update campaign: ' . $e->getMessage(), null, 500);
+            Log::error('Failed to update campaign: ' . $e->getMessage());
+            return $this->respondWithError('SERVER_ERROR', 'Failed to update campaign', null, 500);
         }
     }
 
@@ -231,7 +234,8 @@ class AdminGamificationController extends BaseApiController
             foreach ($users as $user) { $this->gamificationService->runAllBadgeChecks((int) $user->id); $checked++; }
             return $this->respondWithData(['users_checked' => $checked, 'message' => "Badge recheck completed for {$checked} users"]);
         } catch (\Throwable $e) {
-            return $this->respondWithError('SERVER_ERROR', 'Badge recheck failed: ' . $e->getMessage(), null, 500);
+            Log::error('Badge recheck failed: ' . $e->getMessage());
+            return $this->respondWithError('SERVER_ERROR', 'Badge recheck failed', null, 500);
         }
     }
 

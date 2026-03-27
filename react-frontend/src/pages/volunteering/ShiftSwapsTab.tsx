@@ -133,6 +133,7 @@ export function ShiftSwapsTab() {
         setSwaps((prev) =>
           prev.map((s) => (s.id === swapId ? { ...s, status: 'accepted' as const } : s))
         );
+        toastRef.current.success(tRef.current('swaps.accept_success', 'Swap request accepted.'));
       } else {
         toastRef.current.error(tRef.current('swaps.accept_failed', 'Failed to accept swap request.'));
       }
