@@ -25,6 +25,7 @@ import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 import { useApiErrorHandler } from '@/hooks';
 import { useHeaderScroll } from '@/hooks/useHeaderScroll';
 import { useAppUpdate } from '@/hooks/useAppUpdate';
+import { useVersionCheck } from '@/hooks/useVersionCheck';
 
 interface LayoutProps {
   /**
@@ -60,6 +61,10 @@ export function Layout({
 
   // Listen for API errors and display toast notifications
   useApiErrorHandler();
+
+  // Poll build-info.json for deploy detection — SW-independent fallback that
+  // rescues users with stale/broken service workers on all browsers.
+  useVersionCheck();
 
   // Scroll state for dynamic padding — when utility bar hides, reduce top padding
   const { isUtilityBarVisible } = useHeaderScroll(48);

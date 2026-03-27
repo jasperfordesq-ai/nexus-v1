@@ -23,6 +23,22 @@ export default defineConfig(({ command }) => ({
   plugins: [
     react(),
     tailwindcss(),
+    // Emit /build-info.json into the dist root at build time.
+    // This file is NOT in the workbox precache glob patterns (*.{js,css,html,...}),
+    // so old service workers pass fetch requests for it straight to nginx.
+    // nginx serves it with no-cache (location / rule). The useVersionCheck hook
+    // polls this file to detect deploys independently of SW update mechanics,
+    // rescuing users who have a stale or broken service worker.
+    {
+      name: 'nexus:build-info',
+      generateBundle() {
+        this.emitFile({
+          type: 'asset',
+          fileName: 'build-info.json',
+          source: JSON.stringify({ commit: commitHash }),
+        });
+      },
+    },
     VitePWA({
       registerType: 'prompt',
       // Don't inject SW registration into index.html automatically —
