@@ -100,7 +100,9 @@ class AdminTimebankingController extends BaseApiController
                 $sql .= " AND a.status = ?";
                 $params[] = $status;
             }
-            $sql .= " ORDER BY CASE a.severity WHEN 'critical' THEN 1 WHEN 'high' THEN 2 WHEN 'medium' THEN 3 WHEN 'low' THEN 4 END, a.created_at DESC LIMIT {$perPage} OFFSET {$offset}";
+            $sql .= " ORDER BY CASE a.severity WHEN 'critical' THEN 1 WHEN 'high' THEN 2 WHEN 'medium' THEN 3 WHEN 'low' THEN 4 END, a.created_at DESC LIMIT ? OFFSET ?";
+            $params[] = $perPage;
+            $params[] = $offset;
 
             $items = DB::select($sql, $params);
         } catch (\Throwable $e) {}
@@ -163,33 +165,62 @@ class AdminTimebankingController extends BaseApiController
         if ($amount == 0) return $this->respondWithError('VALIDATION_ERROR', 'amount must be non-zero', 'amount', 400);
         if (empty($reason)) return $this->respondWithError('VALIDATION_ERROR', 'reason is required', 'reason', 400);
 
+        // Verify user exists (non-locking read for early 404)
         $user = DB::selectOne("SELECT id, first_name, last_name, balance FROM users WHERE id = ? AND tenant_id = ?", [$userId, $tenantId]);
         if (!$user) return $this->respondWithError('NOT_FOUND', 'User not found', null, 404);
 
-        $currentBalance = (float) ($user->balance ?? 0);
-        $newBalance = $currentBalance + $amount;
+        try {
+            $result = DB::transaction(function () use ($userId, $tenantId, $adminId, $amount, $reason) {
+                // Lock the user row to prevent concurrent balance modifications (race condition fix)
+                $lockedUser = DB::selectOne(
+                    "SELECT id, first_name, last_name, balance FROM users WHERE id = ? AND tenant_id = ? FOR UPDATE",
+                    [$userId, $tenantId]
+                );
 
-        if ($newBalance < 0) {
-            return $this->respondWithError('INSUFFICIENT_BALANCE', 'Adjustment would result in negative balance', null, 400);
-        }
+                if (!$lockedUser) {
+                    throw new \RuntimeException('User not found');
+                }
 
-        DB::update("UPDATE users SET balance = ?, updated_at = NOW() WHERE id = ? AND tenant_id = ?", [$newBalance, $userId, $tenantId]);
+                $currentBalance = (float) ($lockedUser->balance ?? 0);
+                $newBalance = $currentBalance + $amount;
 
-        $absAmount = abs($amount);
-        if ($amount > 0) {
-            DB::insert("INSERT INTO transactions (tenant_id, sender_id, receiver_id, amount, description, status, created_at) VALUES (?, ?, ?, ?, ?, 'completed', NOW())",
-                [$tenantId, $adminId, $userId, $absAmount, '[Admin Adjustment] ' . $reason]);
-        } else {
-            DB::insert("INSERT INTO transactions (tenant_id, sender_id, receiver_id, amount, description, status, created_at) VALUES (?, ?, ?, ?, ?, 'completed', NOW())",
-                [$tenantId, $userId, $adminId, $absAmount, '[Admin Adjustment] ' . $reason]);
+                if ($newBalance < 0) {
+                    throw new \DomainException('Adjustment would result in negative balance');
+                }
+
+                // Atomic balance update using relative arithmetic
+                DB::update(
+                    "UPDATE users SET balance = balance + ?, updated_at = NOW() WHERE id = ? AND tenant_id = ?",
+                    [$amount, $userId, $tenantId]
+                );
+
+                $absAmount = abs($amount);
+                if ($amount > 0) {
+                    DB::insert("INSERT INTO transactions (tenant_id, sender_id, receiver_id, amount, description, status, created_at) VALUES (?, ?, ?, ?, ?, 'completed', NOW())",
+                        [$tenantId, $adminId, $userId, $absAmount, '[Admin Adjustment] ' . $reason]);
+                } else {
+                    DB::insert("INSERT INTO transactions (tenant_id, sender_id, receiver_id, amount, description, status, created_at) VALUES (?, ?, ?, ?, ?, 'completed', NOW())",
+                        [$tenantId, $userId, $adminId, $absAmount, '[Admin Adjustment] ' . $reason]);
+                }
+
+                return [
+                    'previous_balance' => $currentBalance,
+                    'new_balance' => $newBalance,
+                    'user_name' => trim($lockedUser->first_name . ' ' . $lockedUser->last_name),
+                ];
+            });
+        } catch (\DomainException $e) {
+            return $this->respondWithError('INSUFFICIENT_BALANCE', $e->getMessage(), null, 400);
+        } catch (\Throwable $e) {
+            return $this->respondWithError('SERVER_ERROR', 'Failed to adjust balance: ' . $e->getMessage(), null, 500);
         }
 
         return $this->respondWithData([
             'user_id' => $userId,
-            'user_name' => trim($user->first_name . ' ' . $user->last_name),
-            'previous_balance' => $currentBalance,
+            'user_name' => $result['user_name'],
+            'previous_balance' => $result['previous_balance'],
             'adjustment' => $amount,
-            'new_balance' => $newBalance,
+            'new_balance' => $result['new_balance'],
         ]);
     }
 
@@ -202,52 +233,44 @@ class AdminTimebankingController extends BaseApiController
         $wallets = [];
 
         try {
+            // Single query with LEFT JOINed aggregates — eliminates N+1 per-org queries
             $rowResults = DB::select(
                 "SELECT ow.id, ow.organization_id as org_id, ow.balance,
                         ow.created_at, vo.name as org_name,
-                        COUNT(om.id) as member_count
+                        COUNT(DISTINCT om.id) as member_count,
+                        COALESCE(ot_in.total_in, 0) as total_in,
+                        COALESCE(ot_out.total_out, 0) as total_out
                  FROM org_wallets ow
                  JOIN vol_organizations vo ON ow.organization_id = vo.id
                  LEFT JOIN org_members om ON om.organization_id = ow.organization_id AND om.status = 'active'
+                 LEFT JOIN (
+                     SELECT organization_id, ROUND(SUM(amount), 1) as total_in
+                     FROM org_transactions
+                     WHERE tenant_id = ? AND receiver_type = 'organization'
+                     GROUP BY organization_id
+                 ) ot_in ON ot_in.organization_id = ow.organization_id
+                 LEFT JOIN (
+                     SELECT organization_id, ROUND(SUM(amount), 1) as total_out
+                     FROM org_transactions
+                     WHERE tenant_id = ? AND sender_type = 'organization'
+                     GROUP BY organization_id
+                 ) ot_out ON ot_out.organization_id = ow.organization_id
                  WHERE ow.tenant_id = ?
-                 GROUP BY ow.id
+                 GROUP BY ow.id, ow.organization_id, ow.balance, ow.created_at, vo.name, ot_in.total_in, ot_out.total_out
                  ORDER BY ow.balance DESC",
-                [$tenantId]
+                [$tenantId, $tenantId, $tenantId]
             );
-            $rows = array_map(fn($r) => (array)$r, $rowResults);
 
-            foreach ($rows as $row) {
-                $orgId = (int) $row['org_id'];
-
-                $totalIn = 0;
-                $totalOut = 0;
-                try {
-                    $inRow = DB::selectOne(
-                        "SELECT COALESCE(SUM(amount), 0) as total FROM org_transactions
-                         WHERE tenant_id = ? AND organization_id = ? AND receiver_type = 'organization' AND receiver_id = ?",
-                        [$tenantId, $orgId, $orgId]
-                    );
-                    $totalIn = round((float) ($inRow->total ?? 0), 1);
-                } catch (\Throwable $e) {}
-
-                try {
-                    $outRow = DB::selectOne(
-                        "SELECT COALESCE(SUM(amount), 0) as total FROM org_transactions
-                         WHERE tenant_id = ? AND organization_id = ? AND sender_type = 'organization' AND sender_id = ?",
-                        [$tenantId, $orgId, $orgId]
-                    );
-                    $totalOut = round((float) ($outRow->total ?? 0), 1);
-                } catch (\Throwable $e) {}
-
+            foreach ($rowResults as $row) {
                 $wallets[] = [
-                    'id' => (int) $row['id'],
-                    'org_id' => $orgId,
-                    'org_name' => $row['org_name'] ?? 'Unknown',
-                    'balance' => round((float) ($row['balance'] ?? 0), 1),
-                    'total_in' => $totalIn,
-                    'total_out' => $totalOut,
-                    'member_count' => (int) ($row['member_count'] ?? 0),
-                    'created_at' => $row['created_at'] ?? '',
+                    'id' => (int) $row->id,
+                    'org_id' => (int) $row->org_id,
+                    'org_name' => $row->org_name ?? 'Unknown',
+                    'balance' => round((float) ($row->balance ?? 0), 1),
+                    'total_in' => round((float) ($row->total_in ?? 0), 1),
+                    'total_out' => round((float) ($row->total_out ?? 0), 1),
+                    'member_count' => (int) ($row->member_count ?? 0),
+                    'created_at' => $row->created_at ?? '',
                 ];
             }
         } catch (\Throwable $e) {}
@@ -297,8 +320,8 @@ class AdminTimebankingController extends BaseApiController
              ) spent ON spent.sender_id = u.id
              WHERE {$where}
              ORDER BY u.balance DESC
-             LIMIT {$perPage} OFFSET {$offset}",
-            array_merge([$tenantId, $tenantId], $params)
+             LIMIT ? OFFSET ?",
+            array_merge([$tenantId, $tenantId], $params, [$perPage, $offset])
         );
         $users = array_map(fn($r) => (array)$r, $userResults);
 

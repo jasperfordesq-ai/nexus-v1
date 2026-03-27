@@ -332,7 +332,10 @@ export function ListingsAdmin() {
         const data = res.data as unknown;
         if (Array.isArray(data)) {
           setItems(data);
-          setTotal(data.length);
+          // Use meta.total from the paginated response envelope for correct pagination.
+          // Falling back to data.length only if meta is unavailable (non-paginated response).
+          const metaTotal = (res.meta as Record<string, unknown> | undefined)?.total;
+          setTotal(typeof metaTotal === 'number' ? metaTotal : data.length);
         } else if (data && typeof data === 'object') {
           const pd = data as { data: AdminListing[]; meta?: { total: number } };
           setItems(pd.data || []);

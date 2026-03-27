@@ -137,6 +137,7 @@ export interface AdminUserDetail extends AdminUser {
   tagline?: string;
   location?: string;
   phone?: string;
+  profile_type?: 'individual' | 'organisation';
   organization_name?: string;
   badges: AdminBadge[];
   permissions?: string[];
@@ -1070,7 +1071,9 @@ export interface GroupModerationItem {
 export interface PaginatedResponse<T> {
   data: T[];
   meta: {
-    page: number;
+    current_page: number;
+    /** @deprecated Use current_page — kept for backwards compatibility */
+    page?: number;
     total_pages: number;
     per_page: number;
     total: number;

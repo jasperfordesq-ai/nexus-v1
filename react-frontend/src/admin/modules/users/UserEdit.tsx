@@ -59,10 +59,10 @@ export function UserEdit() {
   const toast = useToast();
   const navigate = useNavigate();
   const { user: currentUser } = useAuth();
-  const isSuperAdmin = (currentUser as Record<string, unknown> | null)?.is_super_admin === true
-    || (currentUser as Record<string, unknown> | null)?.is_tenant_super_admin === true
-    || (currentUser?.role as string) === 'super_admin';
-  const isGod = (currentUser as Record<string, unknown> | null)?.is_god === true;
+  const isSuperAdmin = currentUser?.is_super_admin === true
+    || currentUser?.is_tenant_super_admin === true
+    || currentUser?.role === 'super_admin';
+  const isGod = currentUser?.is_god === true;
 
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
@@ -138,16 +138,13 @@ export function UserEdit() {
         setFirstName(userData.first_name || '');
         setLastName(userData.last_name || '');
         setEmail(userData.email || '');
-        setPhone((userData as unknown as Record<string, unknown>).phone as string || '');
+        setPhone(userData.phone || '');
         setRole(userData.role || 'member');
         setStatus(userData.status || 'active');
         setBio(userData.bio || '');
         setTagline(userData.tagline || '');
         setLocation(userData.location || '');
-        setProfileType(
-          (userData as unknown as Record<string, unknown>).profile_type as 'individual' | 'organisation'
-          || 'individual'
-        );
+        setProfileType(userData.profile_type || 'individual');
         setOrganizationName(userData.organization_name || '');
         setIsTenantSuperAdmin(userData.is_tenant_super_admin || false);
         setIsGlobalSuperAdmin(userData.is_super_admin || false);

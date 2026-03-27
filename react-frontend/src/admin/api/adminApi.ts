@@ -653,14 +653,14 @@ export const adminGroups = {
   getPolicies: (typeId: number) =>
     api.get<GroupPolicy[]>(`/v2/admin/groups/types/${typeId}/policies`),
 
-  setPolicy: (typeId: number, key: string, value: unknown) =>
+  setPolicy: (typeId: number, key: string, value: string | number | boolean) =>
     api.put<{ success: boolean }>(`/v2/admin/groups/types/${typeId}/policies`, { key, value }),
 
   // Group detail
   getGroup: (id: number) =>
     api.get<AdminGroup>(`/v2/admin/groups/${id}`),
 
-  updateGroup: (id: number, data: unknown) =>
+  updateGroup: (id: number, data: Partial<Pick<AdminGroup, 'name' | 'description' | 'location' | 'status'>>) =>
     api.put<AdminGroup>(`/v2/admin/groups/${id}`, data),
 
   getMembers: (groupId: number, params?: { role?: string; limit?: number; offset?: number }) =>

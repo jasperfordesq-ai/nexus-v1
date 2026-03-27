@@ -111,17 +111,16 @@ class AdminAnalyticsService
             ->count();
 
         // Active traders (unique senders + receivers in last 30 days)
-        $senderIds = DB::table('transactions')
-            ->where('tenant_id', $tenantId)
-            ->where('created_at', '>=', $thirtyDaysAgo)
-            ->pluck('sender_id');
-
-        $receiverIds = DB::table('transactions')
-            ->where('tenant_id', $tenantId)
-            ->where('created_at', '>=', $thirtyDaysAgo)
-            ->pluck('receiver_id');
-
-        $activeTraders = $senderIds->merge($receiverIds)->unique()->count();
+        // Uses SQL UNION + COUNT(DISTINCT) instead of loading all IDs into PHP memory
+        $activeTradersRow = DB::selectOne(
+            "SELECT COUNT(DISTINCT user_id) as cnt FROM (
+                SELECT sender_id as user_id FROM transactions WHERE tenant_id = ? AND created_at >= ?
+                UNION
+                SELECT receiver_id as user_id FROM transactions WHERE tenant_id = ? AND created_at >= ?
+            ) as active_users",
+            [$tenantId, $thirtyDaysAgo, $tenantId, $thirtyDaysAgo]
+        );
+        $activeTraders = (int) ($activeTradersRow->cnt ?? 0);
 
         $avgTxnSize = (float) DB::table('transactions')
             ->where('tenant_id', $tenantId)

@@ -135,7 +135,8 @@ class AdminToolsController extends BaseApiController
                 "SELECT id, url, referer, hit_count, first_seen_at, last_seen_at, resolved
                  FROM error_404_log WHERE resolved = 0
                  ORDER BY hit_count DESC, last_seen_at DESC
-                 LIMIT {$perPage} OFFSET {$offset}"
+                 LIMIT ? OFFSET ?",
+                [$perPage, $offset]
             );
 
             $formatted = array_map(fn($r) => [

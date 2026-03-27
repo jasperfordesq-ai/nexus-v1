@@ -229,9 +229,25 @@ class AdminGamificationController extends BaseApiController
         $this->requireAdmin();
         $tenantId = $this->getTenantId();
         try {
-            $users = DB::select("SELECT id FROM users WHERE tenant_id = ? AND is_approved = 1", [$tenantId]);
+            // Process in chunks to avoid loading all user IDs at once and to limit
+            // memory usage. Each chunk processes 100 users before fetching the next batch.
             $checked = 0;
-            foreach ($users as $user) { $this->gamificationService->runAllBadgeChecks((int) $user->id); $checked++; }
+            $lastId = 0;
+            $chunkSize = 100;
+
+            do {
+                $users = DB::select(
+                    "SELECT id FROM users WHERE tenant_id = ? AND is_approved = 1 AND id > ? ORDER BY id ASC LIMIT ?",
+                    [$tenantId, $lastId, $chunkSize]
+                );
+
+                foreach ($users as $user) {
+                    $this->gamificationService->runAllBadgeChecks((int) $user->id);
+                    $checked++;
+                    $lastId = (int) $user->id;
+                }
+            } while (count($users) === $chunkSize);
+
             return $this->respondWithData(['users_checked' => $checked, 'message' => "Badge recheck completed for {$checked} users"]);
         } catch (\Throwable $e) {
             Log::error('Badge recheck failed: ' . $e->getMessage());

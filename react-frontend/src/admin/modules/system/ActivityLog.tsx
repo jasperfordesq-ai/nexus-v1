@@ -85,7 +85,8 @@ export function ActivityLog() {
         const data = res.data as unknown;
         if (Array.isArray(data)) {
           setEntries(data);
-          setTotal(data.length);
+          const metaTotal = (res.meta as Record<string, unknown> | undefined)?.total;
+          setTotal(typeof metaTotal === 'number' ? metaTotal : data.length);
         } else if (data && typeof data === 'object') {
           const paginatedData = data as { data: ActivityLogEntry[]; meta?: { total: number } };
           setEntries(paginatedData.data || []);

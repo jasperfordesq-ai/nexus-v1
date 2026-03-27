@@ -102,9 +102,14 @@ export default function LegalDocComplianceDashboard() {
         dateRange.end || undefined
       );
 
-      if (response) {
-        // Create download link for blob
-        const url = window.URL.createObjectURL(response as unknown as Blob);
+      if (response.success && response.data) {
+        // Convert API response data to a downloadable CSV blob
+        const exportData = response.data;
+        const csvContent = typeof exportData === 'string'
+          ? exportData
+          : JSON.stringify(exportData);
+        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+        const url = window.URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
         a.download = `acceptances_${docId}_${Date.now()}.csv`;
@@ -115,7 +120,7 @@ export default function LegalDocComplianceDashboard() {
 
         success('Export downloaded successfully');
       } else {
-        error('Failed to export acceptances');
+        error(response.error || 'Failed to export acceptances');
       }
     } catch {
       error('Failed to export acceptances');

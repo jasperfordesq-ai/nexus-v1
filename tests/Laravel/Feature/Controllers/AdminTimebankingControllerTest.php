@@ -177,6 +177,86 @@ class AdminTimebankingControllerTest extends TestCase
         $response->assertStatus(403);
     }
 
+    public function test_adjust_balance_creates_transaction_record(): void
+    {
+        $admin = User::factory()->forTenant($this->testTenantId)->admin()->create();
+        $user = User::factory()->forTenant($this->testTenantId)->create(['balance' => 10.0]);
+        Sanctum::actingAs($admin);
+
+        $response = $this->apiPost('/v2/admin/timebanking/adjust-balance', [
+            'user_id' => $user->id,
+            'amount' => 5.0,
+            'reason' => 'Transaction integrity test',
+        ]);
+
+        $response->assertStatus(200);
+
+        // Verify balance was updated
+        $updatedUser = \Illuminate\Support\Facades\DB::selectOne(
+            'SELECT balance FROM users WHERE id = ?',
+            [$user->id]
+        );
+        $this->assertEquals(15.0, (float) $updatedUser->balance);
+
+        // Verify transaction record was created
+        $txn = \Illuminate\Support\Facades\DB::selectOne(
+            "SELECT * FROM transactions WHERE tenant_id = ? AND receiver_id = ? AND description LIKE '%Transaction integrity test%'",
+            [$this->testTenantId, $user->id]
+        );
+        $this->assertNotNull($txn, 'Transaction record must exist after balance adjustment');
+        $this->assertEquals(5.0, (float) $txn->amount);
+    }
+
+    public function test_adjust_balance_rejects_negative_result(): void
+    {
+        $admin = User::factory()->forTenant($this->testTenantId)->admin()->create();
+        $user = User::factory()->forTenant($this->testTenantId)->create(['balance' => 3.0]);
+        Sanctum::actingAs($admin);
+
+        $response = $this->apiPost('/v2/admin/timebanking/adjust-balance', [
+            'user_id' => $user->id,
+            'amount' => -10.0,
+            'reason' => 'Overdraft test',
+        ]);
+
+        $response->assertStatus(400);
+
+        // Verify balance was NOT changed (transaction rolled back)
+        $updatedUser = \Illuminate\Support\Facades\DB::selectOne(
+            'SELECT balance FROM users WHERE id = ?',
+            [$user->id]
+        );
+        $this->assertEquals(3.0, (float) $updatedUser->balance);
+    }
+
+    public function test_adjust_balance_negative_amount_creates_correct_transaction(): void
+    {
+        $admin = User::factory()->forTenant($this->testTenantId)->admin()->create();
+        $user = User::factory()->forTenant($this->testTenantId)->create(['balance' => 20.0]);
+        Sanctum::actingAs($admin);
+
+        $response = $this->apiPost('/v2/admin/timebanking/adjust-balance', [
+            'user_id' => $user->id,
+            'amount' => -5.0,
+            'reason' => 'Deduction test',
+        ]);
+
+        $response->assertStatus(200);
+        $data = $response->json('data');
+        $this->assertEquals(20.0, $data['previous_balance']);
+        $this->assertEquals(15.0, $data['new_balance']);
+        $this->assertEquals(-5.0, $data['adjustment']);
+
+        // Verify transaction: user is sender (deduction), admin is receiver
+        $txn = \Illuminate\Support\Facades\DB::selectOne(
+            "SELECT * FROM transactions WHERE tenant_id = ? AND sender_id = ? AND description LIKE '%Deduction test%'",
+            [$this->testTenantId, $user->id]
+        );
+        $this->assertNotNull($txn);
+        $this->assertEquals($admin->id, (int) $txn->receiver_id);
+        $this->assertEquals(5.0, (float) $txn->amount);
+    }
+
     // ================================================================
     // ORG WALLETS — GET /v2/admin/timebanking/org-wallets
     // ================================================================

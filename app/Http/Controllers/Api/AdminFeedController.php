@@ -119,6 +119,8 @@ class AdminFeedController extends BaseApiController
             $params
         )->total;
 
+        // Use correlated subqueries instead of full-table GROUP BY derived tables
+        // to avoid materializing the entire comments/likes tables on every request
         $rows = DB::select(
             "SELECT fa.id as activity_id, fa.source_type, fa.source_id, fa.user_id,
                     fa.tenant_id, fa.title, fa.content, fa.image_url,
@@ -126,21 +128,11 @@ class AdminFeedController extends BaseApiController
                     COALESCE(NULLIF(u.name, ''), CONCAT(u.first_name, ' ', u.last_name)) as user_name,
                     u.avatar_url as user_avatar,
                     t.name as tenant_name,
-                    COALESCE(cc.comments_count, 0) as comments_count,
-                    COALESCE(lc.likes_count, 0) as likes_count
+                    (SELECT COUNT(*) FROM comments c WHERE c.target_type = fa.source_type AND c.target_id = fa.source_id AND c.tenant_id = fa.tenant_id) as comments_count,
+                    (SELECT COUNT(*) FROM likes l WHERE l.target_type = fa.source_type AND l.target_id = fa.source_id AND l.tenant_id = fa.tenant_id) as likes_count
              FROM feed_activity fa
              LEFT JOIN users u ON fa.user_id = u.id
              LEFT JOIN tenants t ON fa.tenant_id = t.id
-             LEFT JOIN (
-                 SELECT target_type, target_id, tenant_id, COUNT(*) as comments_count
-                 FROM comments
-                 GROUP BY target_type, target_id, tenant_id
-             ) cc ON cc.target_type = fa.source_type AND cc.target_id = fa.source_id AND cc.tenant_id = fa.tenant_id
-             LEFT JOIN (
-                 SELECT target_type, target_id, tenant_id, COUNT(*) as likes_count
-                 FROM likes
-                 GROUP BY target_type, target_id, tenant_id
-             ) lc ON lc.target_type = fa.source_type AND lc.target_id = fa.source_id AND lc.tenant_id = fa.tenant_id
              WHERE {$where}
              ORDER BY fa.created_at DESC
              LIMIT ? OFFSET ?",

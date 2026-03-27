@@ -129,13 +129,13 @@ export function PageBuilder() {
         show_in_menu: formData.show_in_menu ? 1 : 0,
       };
       if (isEdit) {
-        const res = await adminPages.update(Number(id), payload as unknown as Record<string, unknown>);
+        const res = await adminPages.update(Number(id), payload as Record<string, unknown>);
         if (res?.success) {
           toast.success(t('content.page_updated', 'Page updated successfully'));
           refreshTenant();
           navigate(tenantPath('/admin/pages'));
         } else {
-          toast.error((res as unknown as Record<string, unknown>)?.error as string || t('content.an_unexpected_error_occurred'));
+          toast.error(res?.error || t('content.an_unexpected_error_occurred'));
         }
       } else {
         const res = await adminPages.create(payload);
@@ -144,7 +144,7 @@ export function PageBuilder() {
           refreshTenant();
           navigate(tenantPath('/admin/pages'));
         } else {
-          toast.error((res as unknown as Record<string, unknown>)?.error as string || t('content.an_unexpected_error_occurred'));
+          toast.error(res?.error || t('content.an_unexpected_error_occurred'));
         }
       }
     } catch {

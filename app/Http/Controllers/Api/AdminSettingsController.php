@@ -46,15 +46,26 @@ class AdminSettingsController extends BaseApiController
         $tenantId = $this->getTenantId();
         $data = $this->getAllInput();
 
+        if (empty($data)) {
+            return $this->respondWithError('VALIDATION_ERROR', 'No settings provided', null, 422);
+        }
+
+        // Validate setting keys: alphanumeric + underscores/dots only, max 100 chars
+        $updated = 0;
         foreach ($data as $key => $value) {
+            if (!is_string($key) || !preg_match('/^[a-zA-Z][a-zA-Z0-9_.]{0,99}$/', $key)) {
+                continue; // Skip invalid keys silently
+            }
+            $stringValue = is_array($value) ? json_encode($value) : (string) $value;
             DB::statement(
                 'INSERT INTO tenant_settings (tenant_id, setting_key, setting_value) VALUES (?, ?, ?)
                  ON DUPLICATE KEY UPDATE setting_value = VALUES(setting_value)',
-                [$tenantId, $key, $value]
+                [$tenantId, $key, $stringValue]
             );
+            $updated++;
         }
 
-        return $this->respondWithData(['updated' => count($data)]);
+        return $this->respondWithData(['updated' => $updated]);
     }
 
     /** GET /api/v2/admin/settings/features */

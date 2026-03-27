@@ -273,12 +273,31 @@ class AdminUsersController extends BaseApiController
         $updates = [];
         $params = [];
 
+        // SECURITY: Restrict role values to prevent privilege escalation (SEC-007)
+        $allowedRoles = ['member', 'admin', 'broker'];
+        // Only super admins can assign elevated roles
+        if (isset($input['role']) && in_array($input['role'], ['tenant_admin', 'super_admin', 'god'], true)) {
+            if (!$this->isCallerSuperAdmin($adminId)) {
+                return $this->respondWithError('AUTH_INSUFFICIENT_PERMISSIONS', 'Only super admins can assign elevated roles', null, 403);
+            }
+            // Super admins can also assign tenant_admin
+            $allowedRoles = array_merge($allowedRoles, ['tenant_admin']);
+            // super_admin and god roles should only be managed via dedicated endpoints
+            if (in_array($input['role'], ['super_admin', 'god'], true)) {
+                return $this->respondWithError('VALIDATION_ERROR', 'Use the dedicated super-admin endpoints to manage super admin privileges', null, 422);
+            }
+        }
+
         $fieldMap = ['first_name', 'last_name', 'email', 'role', 'location', 'phone', 'bio', 'tagline', 'organization_name'];
         foreach ($fieldMap as $field) {
             if (isset($input[$field])) {
                 $value = is_string($input[$field]) ? trim($input[$field]) : $input[$field];
                 if ($field === 'email' && !filter_var($value, FILTER_VALIDATE_EMAIL)) {
                     return $this->respondWithError('VALIDATION_ERROR', 'Invalid email', 'email', 422);
+                }
+                // SECURITY: Validate role against allowed values
+                if ($field === 'role' && !in_array($value, $allowedRoles, true)) {
+                    return $this->respondWithError('VALIDATION_ERROR', 'Invalid role value', 'role', 422);
                 }
                 $updates[] = "{$field} = ?";
                 $params[] = $value;
@@ -335,6 +354,12 @@ class AdminUsersController extends BaseApiController
         $password = $input['password'] ?? '';
         $role = $input['role'] ?? 'member';
         $location = trim($input['location'] ?? '');
+
+        // SECURITY: Restrict role to prevent privilege escalation via user creation (SEC-009)
+        $allowedRoles = ['member', 'admin', 'broker'];
+        if (!in_array($role, $allowedRoles, true)) {
+            return $this->respondWithError('VALIDATION_ERROR', 'Invalid role. Allowed: ' . implode(', ', $allowedRoles), 'role', 422);
+        }
 
         // Auto-generate password if not provided
         if (empty($password)) {
@@ -642,7 +667,8 @@ class AdminUsersController extends BaseApiController
             ActivityLog::log($adminId, 'admin_award_badge', "Awarded badge '{$badgeSlug}' to user #{$id}");
             return $this->respondWithData(['awarded' => true, 'user_id' => $id, 'badge_slug' => $badgeSlug], null, 201);
         } catch (\Throwable $e) {
-            return $this->respondWithError('SERVER_ERROR', 'Failed to award badge: ' . $e->getMessage(), null, 500);
+            error_log("[AdminUsers] Failed to award badge to user #{$id}: " . $e->getMessage());
+            return $this->respondWithError('SERVER_ERROR', 'Failed to award badge', null, 500);
         }
     }
 
@@ -702,7 +728,8 @@ class AdminUsersController extends BaseApiController
 
             return $this->respondWithData(['rechecked' => true, 'user_id' => $id, 'badges' => $badges]);
         } catch (\Throwable $e) {
-            return $this->respondWithError('SERVER_ERROR', 'Badge recheck failed: ' . $e->getMessage(), null, 500);
+            error_log("[AdminUsers] Badge recheck failed for user #{$id}: " . $e->getMessage());
+            return $this->respondWithError('SERVER_ERROR', 'Badge recheck failed', null, 500);
         }
     }
 
@@ -824,6 +851,7 @@ class AdminUsersController extends BaseApiController
     public function setSuperAdmin($id): JsonResponse
     {
         $adminId = $this->requireAdmin();
+        $tenantId = $this->getTenantId();
         $id = (int) $id;
 
         // Only super admins can grant/revoke tenant super admin status
@@ -839,25 +867,26 @@ class AdminUsersController extends BaseApiController
         $grant = (bool) ($this->input('grant', false));
 
         try {
+            // SECURITY: Scope user lookup by tenant_id to prevent cross-tenant IDOR
             $user = DB::selectOne(
-                "SELECT id, email, first_name, last_name, tenant_id FROM users WHERE id = ?",
-                [$id]
+                "SELECT id, email, first_name, last_name, tenant_id FROM users WHERE id = ? AND tenant_id = ?",
+                [$id, $tenantId]
             );
 
             if (!$user) {
                 return $this->respondWithError('NOT_FOUND', 'User not found', null, 404);
             }
 
-            // Set is_tenant_super_admin (hierarchy-scoped) and role to tenant_admin
+            // SECURITY: Scope UPDATE by tenant_id to prevent cross-tenant modification
             if ($grant) {
                 DB::update(
-                    "UPDATE users SET is_tenant_super_admin = 1, role = 'tenant_admin' WHERE id = ?",
-                    [$id]
+                    "UPDATE users SET is_tenant_super_admin = 1, role = 'tenant_admin' WHERE id = ? AND tenant_id = ?",
+                    [$id, $tenantId]
                 );
             } else {
                 DB::update(
-                    "UPDATE users SET is_tenant_super_admin = 0 WHERE id = ?",
-                    [$id]
+                    "UPDATE users SET is_tenant_super_admin = 0 WHERE id = ? AND tenant_id = ?",
+                    [$id, $tenantId]
                 );
             }
 
@@ -875,6 +904,7 @@ class AdminUsersController extends BaseApiController
     public function setGlobalSuperAdmin($id): JsonResponse
     {
         $adminId = $this->requireAdmin();
+        $tenantId = $this->getTenantId();
         $id = (int) $id;
 
         // Only god users can set global super admin
@@ -890,18 +920,20 @@ class AdminUsersController extends BaseApiController
         $grant = (bool) ($this->input('grant', false));
 
         try {
+            // SECURITY: Scope user lookup by tenant_id to prevent cross-tenant IDOR
             $user = DB::selectOne(
-                "SELECT id, email, first_name, last_name, tenant_id FROM users WHERE id = ?",
-                [$id]
+                "SELECT id, email, first_name, last_name, tenant_id FROM users WHERE id = ? AND tenant_id = ?",
+                [$id, $tenantId]
             );
 
             if (!$user) {
                 return $this->respondWithError('NOT_FOUND', 'User not found', null, 404);
             }
 
+            // SECURITY: Scope UPDATE by tenant_id to prevent cross-tenant modification
             DB::update(
-                "UPDATE users SET is_super_admin = ? WHERE id = ?",
-                [$grant ? 1 : 0, $id]
+                "UPDATE users SET is_super_admin = ? WHERE id = ? AND tenant_id = ?",
+                [$grant ? 1 : 0, $id, $tenantId]
             );
 
             $action = $grant ? 'grant_global_super_admin' : 'revoke_global_super_admin';
@@ -972,7 +1004,8 @@ class AdminUsersController extends BaseApiController
 
             return $this->respondWithData(['sent' => true, 'id' => $id]);
         } catch (\Throwable $e) {
-            return $this->respondWithError('SERVER_ERROR', 'Failed to send password reset email: ' . $e->getMessage(), null, 500);
+            error_log("[AdminUsers] Failed to send password reset email for user #{$id}: " . $e->getMessage());
+            return $this->respondWithError('SERVER_ERROR', 'Failed to send password reset email', null, 500);
         }
     }
 
@@ -1034,7 +1067,8 @@ class AdminUsersController extends BaseApiController
 
             return $this->respondWithData(['sent' => true, 'id' => $id]);
         } catch (\Throwable $e) {
-            return $this->respondWithError('SERVER_ERROR', 'Failed to send welcome email: ' . $e->getMessage(), null, 500);
+            error_log("[AdminUsers] Failed to send welcome email for user #{$id}: " . $e->getMessage());
+            return $this->respondWithError('SERVER_ERROR', 'Failed to send welcome email', null, 500);
         }
     }
 
@@ -1086,6 +1120,12 @@ class AdminUsersController extends BaseApiController
         $results = ['imported' => 0, 'skipped' => 0, 'errors' => []];
         $row = 1;
         $defaultRole = request()->input('default_role', 'member');
+
+        // SECURITY: Restrict allowed roles for CSV import to prevent privilege escalation (SEC-008)
+        $allowedImportRoles = ['member', 'admin', 'broker'];
+        if (!in_array($defaultRole, $allowedImportRoles, true)) {
+            $defaultRole = 'member';
+        }
 
         while (($data = fgetcsv($handle)) !== false) {
             $row++;
@@ -1141,7 +1181,8 @@ class AdminUsersController extends BaseApiController
                         $email,
                         $hashedPassword,
                         trim($record['phone'] ?? ''),
-                        $record['role'] ?? $defaultRole,
+                        // SECURITY: Validate per-row role against allowlist (SEC-008)
+                        in_array($record['role'] ?? $defaultRole, $allowedImportRoles, true) ? ($record['role'] ?? $defaultRole) : $defaultRole,
                     ]
                 );
 

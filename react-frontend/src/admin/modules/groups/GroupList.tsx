@@ -66,7 +66,8 @@ export function GroupList() {
         const data = res.data as unknown;
         if (Array.isArray(data)) {
           setItems(data);
-          setTotal(data.length);
+          const metaTotal = (res.meta as Record<string, unknown> | undefined)?.total;
+          setTotal(typeof metaTotal === 'number' ? metaTotal : data.length);
         } else if (data && typeof data === 'object') {
           const pd = data as { data: AdminGroup[]; meta?: { total: number } };
           setItems(pd.data || []);

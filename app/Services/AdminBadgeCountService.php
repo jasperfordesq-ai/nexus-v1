@@ -134,10 +134,16 @@ class AdminBadgeCountService
     private function count404Errors(): int
     {
         try {
-            return (int) DB::table('error_404_log')
+            $query = DB::table('error_404_log')
                 ->where('resolved', 0)
-                ->where('last_seen_at', '>', DB::raw('DATE_SUB(NOW(), INTERVAL 7 DAY)'))
-                ->count();
+                ->where('last_seen_at', '>', DB::raw('DATE_SUB(NOW(), INTERVAL 7 DAY)'));
+
+            // Scope by tenant_id if the column exists (cross-tenant data leak fix)
+            if (\Illuminate\Support\Facades\Schema::hasColumn('error_404_log', 'tenant_id')) {
+                $query->where('tenant_id', TenantContext::getId());
+            }
+
+            return (int) $query->count();
         } catch (\Exception $e) {
             return 0;
         }

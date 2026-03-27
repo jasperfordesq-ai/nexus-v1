@@ -64,7 +64,7 @@ class AdminSettingsControllerTest extends TestCase
         Sanctum::actingAs($admin);
 
         $response = $this->apiPut('/v2/admin/settings', [
-            'test_setting_key' => 'test_value',
+            'timezone' => 'UTC',
         ]);
 
         $response->assertStatus(200);
@@ -90,5 +90,41 @@ class AdminSettingsControllerTest extends TestCase
         ]);
 
         $response->assertStatus(401);
+    }
+
+    public function test_update_settings_rejects_empty_body(): void
+    {
+        $admin = User::factory()->forTenant($this->testTenantId)->admin()->create();
+        Sanctum::actingAs($admin);
+
+        $response = $this->apiPut('/v2/admin/settings', []);
+
+        $response->assertStatus(422);
+    }
+
+    public function test_update_settings_rejects_unknown_keys(): void
+    {
+        $admin = User::factory()->forTenant($this->testTenantId)->admin()->create();
+        Sanctum::actingAs($admin);
+
+        // AdminConfigController (which handles the route) validates keys against an allowlist
+        $response = $this->apiPut('/v2/admin/settings', [
+            "'; DROP TABLE users; --" => 'malicious',
+        ]);
+
+        $response->assertStatus(422);
+    }
+
+    public function test_update_settings_saves_valid_keys(): void
+    {
+        $admin = User::factory()->forTenant($this->testTenantId)->admin()->create();
+        Sanctum::actingAs($admin);
+
+        // Use keys from AdminConfigController::GENERAL_SETTING_KEYS
+        $response = $this->apiPut('/v2/admin/settings', [
+            'timezone' => 'Europe/London',
+        ]);
+
+        $response->assertStatus(200);
     }
 }

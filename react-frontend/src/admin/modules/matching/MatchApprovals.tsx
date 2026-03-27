@@ -93,7 +93,8 @@ export function MatchApprovals() {
         setTotal(pd.meta?.total || 0);
       } else if (Array.isArray(data)) {
         setItems(data);
-        setTotal(data.length);
+        const metaTotal = (res.meta as Record<string, unknown> | undefined)?.total;
+        setTotal(typeof metaTotal === 'number' ? metaTotal : data.length);
       }
     }
     setLoading(false);
