@@ -94,7 +94,7 @@ class IdeationChallengeService
         }
 
         $data = (array) $challenge;
-        $data['ideas_count'] = (int) DB::table('ideation_ideas')->where('challenge_id', $id)->count();
+        $data['ideas_count'] = (int) DB::table('challenge_ideas')->where('challenge_id', $id)->count();
 
         return $data;
     }
@@ -336,7 +336,7 @@ class IdeationChallengeService
      */
     public function submitIdea(int $challengeId, int $userId, array $data): int
     {
-        return DB::table('ideation_ideas')->insertGetId([
+        return DB::table('challenge_ideas')->insertGetId([
             'challenge_id' => $challengeId,
             'user_id'      => $userId,
             'title'        => trim($data['title']),
@@ -357,14 +357,14 @@ class IdeationChallengeService
         $cursor = $filters['cursor'] ?? null;
         $sort   = $filters['sort'] ?? 'votes';
 
-        $query = DB::table('ideation_ideas as i')
+        $query = DB::table('challenge_ideas as i')
             ->leftJoin('users as u', 'i.user_id', '=', 'u.id')
             ->where('i.challenge_id', $challengeId)
             ->select('i.*', 'u.first_name', 'u.last_name', 'u.avatar_url');
 
         // Add vote count subquery
         $query->selectSub(
-            DB::table('ideation_votes')->whereColumn('idea_id', 'i.id')->selectRaw('COUNT(*)'),
+            DB::table('challenge_idea_votes')->whereColumn('idea_id', 'i.id')->selectRaw('COUNT(*)'),
             'vote_count'
         );
 
@@ -620,16 +620,16 @@ class IdeationChallengeService
      */
     public function vote(int $ideaId, int $userId): array
     {
-        $existing = DB::table('ideation_votes')
+        $existing = DB::table('challenge_idea_votes')
             ->where('idea_id', $ideaId)
             ->where('user_id', $userId)
             ->first();
 
         if ($existing) {
-            DB::table('ideation_votes')->where('id', $existing->id)->delete();
+            DB::table('challenge_idea_votes')->where('id', $existing->id)->delete();
             $voted = false;
         } else {
-            DB::table('ideation_votes')->insert([
+            DB::table('challenge_idea_votes')->insert([
                 'idea_id'    => $ideaId,
                 'user_id'    => $userId,
                 'created_at' => now(),
@@ -637,7 +637,7 @@ class IdeationChallengeService
             $voted = true;
         }
 
-        $count = (int) DB::table('ideation_votes')->where('idea_id', $ideaId)->count();
+        $count = (int) DB::table('challenge_idea_votes')->where('idea_id', $ideaId)->count();
 
         return ['voted' => $voted, 'vote_count' => $count];
     }
