@@ -253,10 +253,11 @@ export function TransferModal({
       size="md"
       scrollBehavior="inside"
       classNames={{
-        base: 'bg-theme-solid border border-theme-default',
+        wrapper: 'z-[400]',
+        base: 'bg-theme-solid border border-theme-default max-sm:m-0 max-sm:rounded-none max-sm:w-screen max-sm:max-w-none max-sm:h-[100dvh] max-sm:max-h-none',
         header: 'border-b border-theme-default',
         body: 'py-4',
-        footer: 'border-t border-theme-default',
+        footer: 'border-t border-theme-default max-sm:pb-[env(safe-area-inset-bottom,0px)]',
       }}
     >
       <ModalContent className="bg-theme-solid">
@@ -264,20 +265,20 @@ export function TransferModal({
           <>
             <ModalHeader className="text-xl font-semibold text-theme-primary flex items-center gap-2">
               <Send className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
-              Send Credits
+              {t('send_credits')}
             </ModalHeader>
 
             <ModalBody className="space-y-5 py-4">
               {/* Balance Display */}
               <div className="bg-theme-elevated rounded-lg p-3 flex justify-between items-center">
-                <span className="text-theme-muted text-sm">Available Balance</span>
-                <span className="text-theme-primary font-semibold">{currentBalance} hours</span>
+                <span className="text-theme-muted text-sm">{t('available_balance')}</span>
+                <span className="text-theme-primary font-semibold">{currentBalance} {t('hours').toLowerCase()}</span>
               </div>
 
               {/* Recipient Search */}
               <div className="space-y-2">
                 <label className="text-sm font-medium text-theme-muted">
-                  Recipient <span className="text-red-500 dark:text-red-400">*</span>
+                  {t('recipient')} <span className="text-red-500 dark:text-red-400">*</span>
                 </label>
 
                 {formData.recipient ? (
@@ -305,7 +306,7 @@ export function TransferModal({
                       isIconOnly
                       onPress={handleClearRecipient}
                       className="text-theme-subtle hover:text-theme-primary transition-colors p-1 min-w-0 h-auto"
-                      aria-label="Remove recipient"
+                      aria-label={t('remove_recipient')}
                     >
                       <X className="w-4 h-4" />
                     </Button>
@@ -316,8 +317,8 @@ export function TransferModal({
                     <Input
                       ref={searchInputRef}
                       type="text"
-                      placeholder="Search by name or username..."
-                      aria-label="Search recipient"
+                      placeholder={t('search_placeholder')}
+                      aria-label={t('search_recipient')}
                       value={searchQuery}
                       onValueChange={handleSearchChange}
                       onFocus={() => searchResults.length > 0 && setShowResults(true)}
@@ -351,7 +352,7 @@ export function TransferModal({
                           exit={{ opacity: 0, y: -10 }}
                           className="absolute top-full left-0 right-0 mt-2 bg-content1 border border-theme-default rounded-lg shadow-xl overflow-hidden z-50 max-h-60 overflow-y-auto"
                           role="listbox"
-                          aria-label="Search results"
+                          aria-label={t('search_results')}
                         >
                           {searchResults.map((user) => (
                             <Button
@@ -397,12 +398,12 @@ export function TransferModal({
               {/* Amount Input */}
               <div className="space-y-2">
                 <label className="text-sm font-medium text-theme-muted">
-                  Amount (hours) <span className="text-red-500 dark:text-red-400">*</span>
+                  {t('amount_hours')} <span className="text-red-500 dark:text-red-400">*</span>
                 </label>
                 <Input
                   type="number"
                   placeholder="0"
-                  aria-label="Amount in hours"
+                  aria-label={t('amount_in_hours')}
                   min="0.25"
                   step="0.25"
                   value={formData.amount}
@@ -410,7 +411,7 @@ export function TransferModal({
                     setFormData((prev) => ({ ...prev, amount: value }));
                     setError(null);
                   }}
-                  endContent={<span className="text-theme-subtle text-sm">hours</span>}
+                  endContent={<span className="text-theme-subtle text-sm">{t('hours').toLowerCase()}</span>}
                   classNames={{
                     input: `bg-transparent text-theme-primary text-lg font-semibold ${isOverBalance ? 'text-red-500 dark:text-red-400' : ''}`,
                     inputWrapper: `bg-theme-elevated border-theme-default hover:bg-theme-hover ${isOverBalance ? 'border-red-500/50' : ''}`,
@@ -419,7 +420,7 @@ export function TransferModal({
                 {isOverBalance && (
                   <p className="text-red-500 dark:text-red-400 text-sm flex items-center gap-1">
                     <AlertCircle className="w-3 h-3" />
-                    Exceeds available balance
+                    {t('exceeds_balance')}
                   </p>
                 )}
               </div>
@@ -433,10 +434,10 @@ export function TransferModal({
               {/* Description Input */}
               <div className="space-y-2">
                 <label className="text-sm font-medium text-theme-muted">
-                  Description <span className="text-theme-subtle">(optional)</span>
+                  {t('csv.description')} <span className="text-theme-subtle">({t('optional')})</span>
                 </label>
                 <Textarea
-                  placeholder="What is this transfer for?"
+                  placeholder={t('description_placeholder')}
                   value={formData.description}
                   onValueChange={(value) =>
                     setFormData((prev) => ({ ...prev, description: value }))
@@ -467,13 +468,13 @@ export function TransferModal({
                 <div className="bg-indigo-500/10 border border-indigo-500/30 rounded-lg p-4">
                   <p className="text-theme-muted text-sm">
                     You are about to send{' '}
-                    <span className="font-semibold text-theme-primary">{parsedAmount} hours</span> to{' '}
+                    <span className="font-semibold text-theme-primary">{parsedAmount} {t('hours').toLowerCase()}</span> to{' '}
                     <span className="font-semibold text-theme-primary">
                       {formData.recipient.first_name} {formData.recipient.last_name}
                     </span>
                   </p>
                   <p className="text-theme-subtle text-xs mt-1">
-                    Your new balance will be {(currentBalance - parsedAmount).toFixed(2)} hours
+                    {t('new_balance_after', { balance: (currentBalance - parsedAmount).toFixed(2) })}
                   </p>
                 </div>
               )}
@@ -486,7 +487,7 @@ export function TransferModal({
                 onPress={onModalClose}
                 isDisabled={isSubmitting}
               >
-                Cancel
+                {t('cancel')}
               </Button>
               <Button
                 className="flex-1 bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
@@ -495,7 +496,7 @@ export function TransferModal({
                 isDisabled={!formData.recipient || !parsedAmount || isOverBalance}
                 onPress={handleSubmit}
               >
-                Send Credits
+                {t('send_credits')}
               </Button>
             </ModalFooter>
           </>

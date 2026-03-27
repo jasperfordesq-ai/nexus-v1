@@ -99,5 +99,17 @@
   "community_fund_desc": "Linn creidmheasa ama comhroinnte",
   "community_fund_hours": "uaireanta ar fáil",
   "community_fund_deposited": "Taiscthe",
-  "community_fund_withdrawn": "Tarraingthe Siar"
+  "community_fund_withdrawn": "Tarraingthe Siar",
+  "available_balance": "Iarmhéid ar Fáil",
+  "recipient": "Faighteoir",
+  "remove_recipient": "Bain an faighteoir",
+  "search_placeholder": "Cuardaigh de réir ainm nó ainm úsáideora...",
+  "search_recipient": "Cuardaigh faighteoir",
+  "search_results": "Torthaí cuardaigh",
+  "amount_hours": "Méid (uaireanta)",
+  "amount_in_hours": "Méid in uaireanta",
+  "exceeds_balance": "Thar an iarmhéid ar fáil",
+  "optional": "roghnach",
+  "description_placeholder": "Cad is aidhm leis an aistriú seo?",
+  "new_balance_after": "Beidh d'iarmhéid nua {{balance}} uair"
 }

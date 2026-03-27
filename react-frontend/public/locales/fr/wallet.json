@@ -99,5 +99,17 @@
   "community_fund_desc": "Fonds partagé de crédits-temps",
   "community_fund_hours": "heures disponibles",
   "community_fund_deposited": "Déposé",
-  "community_fund_withdrawn": "Retiré"
+  "community_fund_withdrawn": "Retiré",
+  "available_balance": "Solde disponible",
+  "recipient": "Destinataire",
+  "remove_recipient": "Supprimer le destinataire",
+  "search_placeholder": "Rechercher par nom ou nom d'utilisateur...",
+  "search_recipient": "Rechercher un destinataire",
+  "search_results": "Résultats de recherche",
+  "amount_hours": "Montant (heures)",
+  "amount_in_hours": "Montant en heures",
+  "exceeds_balance": "Dépasse le solde disponible",
+  "optional": "optionnel",
+  "description_placeholder": "À quoi sert ce transfert ?",
+  "new_balance_after": "Votre nouveau solde sera de {{balance}} heures"
 }

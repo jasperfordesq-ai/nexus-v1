@@ -99,5 +99,17 @@
   "community_fund_desc": "Gemeinsamer Zeitkreditpool",
   "community_fund_hours": "Stunden verfügbar",
   "community_fund_deposited": "Eingezahlt",
-  "community_fund_withdrawn": "Zurückgezogen"
+  "community_fund_withdrawn": "Zurückgezogen",
+  "available_balance": "Verfügbares Guthaben",
+  "recipient": "Empfänger",
+  "remove_recipient": "Empfänger entfernen",
+  "search_placeholder": "Nach Name oder Benutzername suchen...",
+  "search_recipient": "Empfänger suchen",
+  "search_results": "Suchergebnisse",
+  "amount_hours": "Betrag (Stunden)",
+  "amount_in_hours": "Betrag in Stunden",
+  "exceeds_balance": "Übersteigt das verfügbare Guthaben",
+  "optional": "optional",
+  "description_placeholder": "Wofür ist diese Überweisung?",
+  "new_balance_after": "Ihr neues Guthaben beträgt {{balance}} Stunden"
 }

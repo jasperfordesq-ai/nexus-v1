@@ -99,5 +99,17 @@
   "community_fund_desc": "Shared time credit pool",
   "community_fund_hours": "hours available",
   "community_fund_deposited": "Deposited",
-  "community_fund_withdrawn": "Withdrawn"
+  "community_fund_withdrawn": "Withdrawn",
+  "available_balance": "Available Balance",
+  "recipient": "Recipient",
+  "remove_recipient": "Remove recipient",
+  "search_placeholder": "Search by name or username...",
+  "search_recipient": "Search recipient",
+  "search_results": "Search results",
+  "amount_hours": "Amount (hours)",
+  "amount_in_hours": "Amount in hours",
+  "exceeds_balance": "Exceeds available balance",
+  "optional": "optional",
+  "description_placeholder": "What is this transfer for?",
+  "new_balance_after": "Your new balance will be {{balance}} hours"
 }

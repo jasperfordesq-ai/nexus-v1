@@ -99,5 +99,17 @@
   "community_fund_desc": "Fondo crediti tempo condiviso",
   "community_fund_hours": "ore disponibili",
   "community_fund_deposited": "Depositato",
-  "community_fund_withdrawn": "Prelevato"
+  "community_fund_withdrawn": "Prelevato",
+  "available_balance": "Saldo disponibile",
+  "recipient": "Destinatario",
+  "remove_recipient": "Rimuovi destinatario",
+  "search_placeholder": "Cerca per nome o nome utente...",
+  "search_recipient": "Cerca destinatario",
+  "search_results": "Risultati della ricerca",
+  "amount_hours": "Importo (ore)",
+  "amount_in_hours": "Importo in ore",
+  "exceeds_balance": "Supera il saldo disponibile",
+  "optional": "opzionale",
+  "description_placeholder": "A cosa serve questo trasferimento?",
+  "new_balance_after": "Il tuo nuovo saldo sarà {{balance}} ore"
 }

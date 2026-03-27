@@ -99,5 +99,17 @@
   "community_fund_desc": "Fondo compartido de créditos de tiempo",
   "community_fund_hours": "horas disponibles",
   "community_fund_deposited": "Depositado",
-  "community_fund_withdrawn": "Retirado"
+  "community_fund_withdrawn": "Retirado",
+  "available_balance": "Saldo disponible",
+  "recipient": "Destinatario",
+  "remove_recipient": "Eliminar destinatario",
+  "search_placeholder": "Buscar por nombre o nombre de usuario...",
+  "search_recipient": "Buscar destinatario",
+  "search_results": "Resultados de búsqueda",
+  "amount_hours": "Importe (horas)",
+  "amount_in_hours": "Importe en horas",
+  "exceeds_balance": "Supera el saldo disponible",
+  "optional": "opcional",
+  "description_placeholder": "¿Para qué es esta transferencia?",
+  "new_balance_after": "Tu nuevo saldo será de {{balance}} horas"
 }
