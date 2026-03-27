@@ -199,15 +199,8 @@ class MessagesController extends BaseApiController
             ? $this->input('scope')
             : 'self';
 
-        $success = $this->messageService->archiveConversation($id, $userId, $scope);
-
-        if (!$success) {
-            $errors = $this->messageService->getErrors();
-            if (!empty($errors)) {
-                return $this->respondWithErrors($errors, 500);
-            }
-            return $this->respondWithError('ARCHIVE_FAILED', 'Failed to delete conversation', null, 500);
-        }
+        // Returns int (rows updated) — 0 is valid when already archived (idempotent)
+        $this->messageService->archiveConversation($id, $userId, $scope);
 
         return $this->respondWithData(['success' => true, 'message' => 'Conversation deleted']);
     }
