@@ -537,6 +537,8 @@ const ListingCard = memo(function ListingCard({ listing, viewMode, isSaving, onT
                 src={imageUrl}
                 alt={listing.title || 'Listing image'}
                 className="w-16 h-16 rounded-lg object-cover shrink-0"
+                width={64}
+                height={64}
                 loading="lazy"
               />
             ) : (
@@ -609,6 +611,8 @@ const ListingCard = memo(function ListingCard({ listing, viewMode, isSaving, onT
             src={imageUrl}
             alt={listing.title || 'Listing image'}
             className="w-full h-36 object-cover"
+            width={800}
+            height={450}
             loading="lazy"
           />
         ) : (

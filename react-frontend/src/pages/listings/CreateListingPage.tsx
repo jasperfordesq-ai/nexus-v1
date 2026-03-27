@@ -22,6 +22,7 @@ import {
   X,
 } from 'lucide-react';
 import { PlaceAutocompleteInput } from '@/components/location';
+import { SkillTagsInput } from '@/components/listings/SkillTagsInput';
 import { GlassCard } from '@/components/ui';
 import { Breadcrumbs } from '@/components/navigation';
 import { LoadingScreen } from '@/components/feedback';
@@ -41,6 +42,7 @@ interface FormData {
   location: string;
   latitude?: number;
   longitude?: number;
+  skill_tags: string[];
 }
 
 const initialFormData: FormData = {
@@ -50,6 +52,7 @@ const initialFormData: FormData = {
   category_id: '',
   hours_estimate: '1',
   location: '',
+  skill_tags: [],
 };
 
 export function CreateListingPage() {
@@ -107,6 +110,7 @@ export function CreateListingPage() {
             location: listing.location || '',
             latitude: listing.latitude ?? undefined,
             longitude: listing.longitude ?? undefined,
+            skill_tags: Array.isArray(listing.skill_tags) ? listing.skill_tags : [],
           });
           if (listing.image_url) {
             setExistingImageUrl(listing.image_url);
@@ -166,6 +170,7 @@ export function CreateListingPage() {
         ...formData,
         category_id: parseInt(formData.category_id),
         hours_estimate: parseFloat(formData.hours_estimate),
+        skill_tags: formData.skill_tags,
       };
 
       let listingId = id;
@@ -338,6 +343,12 @@ export function CreateListingPage() {
               ))}
             </Select>
           </div>
+
+          {/* Skill Tags */}
+          <SkillTagsInput
+            tags={formData.skill_tags}
+            onChange={(tags) => setFormData((prev) => ({ ...prev, skill_tags: tags }))}
+          />
 
           {/* Hours & Location */}
           <div className="grid sm:grid-cols-2 gap-4">

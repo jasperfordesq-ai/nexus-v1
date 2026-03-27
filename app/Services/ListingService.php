@@ -6,6 +6,7 @@
 
 namespace App\Services;
 
+use App\Events\ListingCreated;
 use App\Models\Listing;
 use App\Models\User;
 use App\Services\SearchService;
@@ -623,6 +624,7 @@ class ListingService
     {
         return DB::table('user_saved_listings')
             ->where('user_id', $userId)
+            ->where('tenant_id', \App\Core\TenantContext::getId())
             ->pluck('listing_id')
             ->map(fn ($id) => (int) $id)
             ->all();
@@ -689,7 +691,7 @@ class ListingService
             }
         }
 
-        return DB::transaction(function () use ($userId, $data) {
+        $listing = DB::transaction(function () use ($userId, $data) {
             $listing = new Listing([
                 'user_id'               => $userId,
                 'title'                 => trim($data['title']),
@@ -718,6 +720,15 @@ class ListingService
 
             return $listing->fresh(['user', 'category', 'skillTags']);
         });
+
+        // Dispatch event after DB transaction commits — triggers feed activity,
+        // WebSocket broadcast, and Meilisearch indexing.
+        $user = User::find($userId);
+        if ($user) {
+            event(new ListingCreated($listing, $user, \App\Core\TenantContext::getId()));
+        }
+
+        return $listing;
     }
 
     /**

@@ -22,7 +22,29 @@ class AdminListingsServiceTest extends TestCase
 
     public function test_getPending_returns_expected_structure(): void
     {
-        $this->markTestIncomplete('Requires integration test — uses DB query builder with joins');
+        $mockQuery = \Mockery::mock('Illuminate\Database\Query\Builder');
+        $mockQuery->shouldReceive('leftJoin')->andReturnSelf();
+        $mockQuery->shouldReceive('where')->andReturnSelf();
+        $mockQuery->shouldReceive('select')->andReturnSelf();
+        $mockQuery->shouldReceive('count')->andReturn(2);
+        $mockQuery->shouldReceive('orderByDesc')->andReturnSelf();
+        $mockQuery->shouldReceive('offset')->andReturnSelf();
+        $mockQuery->shouldReceive('limit')->andReturnSelf();
+        $mockQuery->shouldReceive('get')->andReturn(collect([
+            (object) ['id' => 1, 'title' => 'Pending One', 'status' => 'pending', 'author_name' => 'Alice'],
+            (object) ['id' => 2, 'title' => 'Pending Two', 'status' => 'pending', 'author_name' => 'Bob'],
+        ]));
+
+        DB::shouldReceive('table')->with('listings as l')->andReturn($mockQuery);
+
+        $result = $this->service->getPending(2);
+
+        $this->assertArrayHasKey('items', $result);
+        $this->assertArrayHasKey('total', $result);
+        $this->assertCount(2, $result['items']);
+        $this->assertEquals(2, $result['total']);
+        $this->assertEquals('Pending One', $result['items'][0]['title']);
+        $this->assertEquals('Alice', $result['items'][0]['author_name']);
     }
 
     public function test_approve_returns_true_on_success(): void

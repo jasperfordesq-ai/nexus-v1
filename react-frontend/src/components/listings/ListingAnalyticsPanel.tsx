@@ -10,8 +10,8 @@
  */
 
 import { useState, useEffect, useCallback } from 'react';
-import { Spinner } from '@heroui/react';
-import { Eye, MessageCircle, Heart, TrendingUp, TrendingDown } from 'lucide-react';
+import { Spinner, Button } from '@heroui/react';
+import { Eye, MessageCircle, Heart, TrendingUp, TrendingDown, AlertTriangle, RefreshCw } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
 import { api } from '@/lib/api';
@@ -26,16 +26,19 @@ export function ListingAnalyticsPanel({ listingId }: ListingAnalyticsPanelProps)
   const { t } = useTranslation('listings');
   const [analytics, setAnalytics] = useState<ListingAnalytics | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(false);
 
   const loadAnalytics = useCallback(async () => {
     try {
       setIsLoading(true);
+      setError(false);
       const response = await api.get<ListingAnalytics>(`/v2/listings/${listingId}/analytics?days=30`);
       if (response.success && response.data) {
         setAnalytics(response.data);
       }
-    } catch (error) {
-      logError('Failed to load listing analytics', error);
+    } catch (err) {
+      logError('Failed to load listing analytics', err);
+      setError(true);
     } finally {
       setIsLoading(false);
     }
@@ -50,6 +53,27 @@ export function ListingAnalyticsPanel({ listingId }: ListingAnalyticsPanelProps)
       <GlassCard className="p-6">
         <div className="flex items-center justify-center py-8">
           <Spinner size="lg" />
+        </div>
+      </GlassCard>
+    );
+  }
+
+  if (error) {
+    return (
+      <GlassCard className="p-6">
+        <div className="flex flex-col items-center justify-center py-6 text-center">
+          <AlertTriangle className="w-10 h-10 text-amber-500 mb-3" aria-hidden="true" />
+          <p className="text-theme-muted mb-4">
+            {t('analytics.load_error', 'Failed to load analytics data.')}
+          </p>
+          <Button
+            variant="flat"
+            className="bg-theme-elevated text-theme-primary"
+            startContent={<RefreshCw className="w-4 h-4" aria-hidden="true" />}
+            onPress={loadAnalytics}
+          >
+            {t('analytics.retry', 'Retry')}
+          </Button>
         </div>
       </GlassCard>
     );

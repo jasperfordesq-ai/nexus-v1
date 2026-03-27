@@ -168,6 +168,31 @@ class ListingsController extends BaseApiController
 
         $result = $this->listingService->getById($listing->id);
 
+        // Award XP for creating a listing
+        try {
+            \App\Services\GamificationService::awardXP($userId, \App\Services\GamificationService::XP_VALUES['create_listing'], 'create_listing', 'Created a listing');
+            \App\Services\GamificationService::runAllBadgeChecks($userId);
+        } catch (\Throwable $e) {
+            \Log::warning('Gamification XP award failed', ['action' => 'create_listing', 'user' => $userId, 'error' => $e->getMessage()]);
+        }
+
+        // Record feed activity
+        try {
+            app(\App\Services\FeedActivityService::class)->recordActivity(
+                \App\Core\TenantContext::getId(),
+                $userId,
+                'listing',
+                $listing->id,
+                [
+                    'title'     => $data['title'] ?? null,
+                    'content'   => $data['description'] ?? null,
+                    'image_url' => $result['image_url'] ?? null,
+                ]
+            );
+        } catch (\Throwable $e) {
+            \Log::warning('Feed activity recording failed', ['type' => 'listing', 'id' => $listing->id, 'error' => $e->getMessage()]);
+        }
+
         return $this->respondWithData($result, null, 201);
     }
 
@@ -232,6 +257,13 @@ class ListingsController extends BaseApiController
 
         if (!$success) {
             return $this->respondWithError('DELETE_FAILED', 'Failed to delete listing', null, 400);
+        }
+
+        // Clean up feed entry for deleted listing
+        try {
+            app(\App\Services\FeedActivityService::class)->removeActivity('listing', $id);
+        } catch (\Throwable $e) {
+            \Log::warning('Feed cleanup failed for deleted listing', ['listing_id' => $id, 'error' => $e->getMessage()]);
         }
 
         return $this->noContent();
@@ -443,6 +475,7 @@ class ListingsController extends BaseApiController
     {
         $id = (int) $id;
         $userId = $this->requireAuth();
+        $this->rateLimit('listing_analytics', 60, 60);
 
         $listing = $this->listingService->getById($id);
         if (!$listing) {
@@ -467,6 +500,7 @@ class ListingsController extends BaseApiController
     {
         $id = (int) $id;
         $userId = $this->requireAuth();
+        $this->rateLimit('listing_tags', 30, 60);
 
         $listing = $this->listingService->getById($id);
         if (!$listing) {

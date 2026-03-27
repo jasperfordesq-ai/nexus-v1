@@ -51,7 +51,10 @@
     "image_formats": "JPG, PNG, WebP — max 8 MB",
     "image_too_large": "L'immagine non deve superare gli 8 MB",
     "save_error_title": "Impossibile salvare l'annuncio",
-    "save_error_subtitle": "Verifichi le informazioni inserite e riprovi."
+    "save_error_subtitle": "Verifichi le informazioni inserite e riprovi.",
+    "load_error": "Impossibile caricare l'annuncio",
+    "update_success": "Annuncio aggiornato con successo",
+    "create_success": "Annuncio creato con successo"
   },
   "page_subtitle": "Sfoglia i servizi e le richieste della comunità",
   "search_placeholder": "Cerca per titolo, descrizione, località o nome...",
@@ -144,7 +147,14 @@
     "vs_previous_week": "vs. settimana precedente",
     "views_last_days": "Visualizzazioni (Ultimi {{days}} Giorni)"
   },
-  "detail_like": "Like",
-  "detail_liked": "Liked",
-  "detail_comments": "Comments"
+  "near_me": "Vicino a me",
+  "near_me_no_location": "Attiva la posizione per utilizzare questa funzione",
+  "radius_label": "Raggio di ricerca",
+  "like": "mi piace",
+  "likes": "mi piace",
+  "comment": "commento",
+  "comments": "commenti",
+  "detail_like": "Mi Piace",
+  "detail_liked": "Piaciuto",
+  "detail_comments": "Commenti"
 }

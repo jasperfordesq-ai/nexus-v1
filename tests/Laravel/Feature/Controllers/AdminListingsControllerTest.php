@@ -187,4 +187,95 @@ class AdminListingsControllerTest extends TestCase
 
         $response->assertStatus(403);
     }
+
+    // ================================================================
+    // APPROVE — Success path
+    // ================================================================
+
+    public function test_admin_can_approve_listing(): void
+    {
+        $admin = User::factory()->forTenant($this->testTenantId)->admin()->create();
+        $user = User::factory()->forTenant($this->testTenantId)->create();
+        Sanctum::actingAs($admin);
+
+        DB::table('listings')->insert([
+            'id' => 50001,
+            'tenant_id' => $this->testTenantId,
+            'user_id' => $user->id,
+            'title' => 'Pending Listing',
+            'description' => 'Awaiting approval',
+            'type' => 'offer',
+            'status' => 'pending',
+            'created_at' => now(),
+        ]);
+
+        $response = $this->apiPost('/v2/admin/listings/50001/approve');
+
+        $response->assertStatus(200);
+        $response->assertJsonFragment(['approved' => true, 'id' => 50001]);
+
+        // Verify the listing status changed in the database
+        $this->assertDatabaseHas('listings', [
+            'id' => 50001,
+            'status' => 'active',
+        ]);
+    }
+
+    // ================================================================
+    // FEATURE — POST /v2/admin/listings/{id}/feature
+    // ================================================================
+
+    public function test_admin_can_feature_listing(): void
+    {
+        $admin = User::factory()->forTenant($this->testTenantId)->admin()->create();
+        $user = User::factory()->forTenant($this->testTenantId)->create();
+        Sanctum::actingAs($admin);
+
+        DB::table('listings')->insert([
+            'id' => 50002,
+            'tenant_id' => $this->testTenantId,
+            'user_id' => $user->id,
+            'title' => 'Feature Me',
+            'description' => 'Should be featured',
+            'type' => 'offer',
+            'status' => 'active',
+            'created_at' => now(),
+        ]);
+
+        $response = $this->apiPost('/v2/admin/listings/50002/feature', [
+            'days' => 7,
+        ]);
+
+        $response->assertStatus(200);
+        $response->assertJsonFragment(['featured' => true, 'id' => 50002]);
+    }
+
+    // ================================================================
+    // UNFEATURE — DELETE /v2/admin/listings/{id}/feature
+    // ================================================================
+
+    public function test_admin_can_unfeature_listing(): void
+    {
+        $admin = User::factory()->forTenant($this->testTenantId)->admin()->create();
+        $user = User::factory()->forTenant($this->testTenantId)->create();
+        Sanctum::actingAs($admin);
+
+        DB::table('listings')->insert([
+            'id' => 50003,
+            'tenant_id' => $this->testTenantId,
+            'user_id' => $user->id,
+            'title' => 'Unfeature Me',
+            'description' => 'Should be unfeatured',
+            'type' => 'offer',
+            'status' => 'active',
+            'is_featured' => true,
+            'featured_until' => now()->addDays(7),
+            'created_at' => now(),
+        ]);
+
+        $response = $this->apiDelete('/v2/admin/listings/50003/feature');
+
+        $response->assertStatus(200);
+        $response->assertJsonFragment(['featured' => false, 'id' => 50003]);
+    }
 }

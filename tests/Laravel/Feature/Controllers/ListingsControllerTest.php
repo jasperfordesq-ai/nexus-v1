@@ -403,4 +403,86 @@ class ListingsControllerTest extends TestCase
         $response->assertStatus(200);
         $response->assertJsonStructure(['data']);
     }
+
+    // ================================================================
+    // CROSS-TENANT ISOLATION — UPDATE
+    // ================================================================
+
+    public function test_user_cannot_update_listing_from_different_tenant(): void
+    {
+        // Create a listing in tenant 999 (the "other" tenant)
+        $otherUser = User::factory()->forTenant(999)->create();
+        $listing = Listing::factory()->forTenant(999)->create([
+            'user_id' => $otherUser->id,
+            'title' => 'Other Tenant Listing',
+        ]);
+
+        // Authenticate as a user in the default test tenant
+        $this->authenticatedUser();
+
+        $response = $this->apiPut("/v2/listings/{$listing->id}", [
+            'title' => 'Cross-Tenant Hijack Attempt',
+        ]);
+
+        // Should be blocked — listing not visible to this tenant
+        $this->assertContains($response->getStatusCode(), [403, 404]);
+    }
+
+    // ================================================================
+    // CROSS-TENANT ISOLATION — DELETE
+    // ================================================================
+
+    public function test_user_cannot_delete_listing_from_different_tenant(): void
+    {
+        // Create a listing in tenant 999
+        $otherUser = User::factory()->forTenant(999)->create();
+        $listing = Listing::factory()->forTenant(999)->create([
+            'user_id' => $otherUser->id,
+        ]);
+
+        // Authenticate as a user in the default test tenant
+        $this->authenticatedUser();
+
+        $response = $this->apiDelete("/v2/listings/{$listing->id}");
+
+        // Should be blocked — listing not visible to this tenant
+        $this->assertContains($response->getStatusCode(), [403, 404]);
+    }
+
+    // ================================================================
+    // CROSS-TENANT ISOLATION — SAVED LISTINGS
+    // ================================================================
+
+    public function test_saved_listings_are_tenant_scoped(): void
+    {
+        // Create and save a listing in tenant 999
+        $otherUser = User::factory()->forTenant(999)->create();
+        $otherListing = Listing::factory()->forTenant(999)->create([
+            'user_id' => $otherUser->id,
+        ]);
+
+        // Manually insert a saved-listing record for the other tenant
+        DB::table('saved_listings')->insertOrIgnore([
+            'user_id' => $otherUser->id,
+            'listing_id' => $otherListing->id,
+            'tenant_id' => 999,
+            'created_at' => now(),
+        ]);
+
+        // Authenticate as a user in the default test tenant
+        $user = $this->authenticatedUser();
+
+        $response = $this->apiGet('/v2/listings/saved');
+
+        $response->assertStatus(200);
+
+        // The saved listings response should not include the other tenant's listing
+        $data = $response->json('data');
+        $this->assertIsArray($data);
+        foreach ($data as $saved) {
+            if (isset($saved['id'])) {
+                $this->assertNotEquals($otherListing->id, $saved['id']);
+            }
+        }
+    }
 }

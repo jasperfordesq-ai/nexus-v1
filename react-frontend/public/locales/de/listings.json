@@ -51,7 +51,10 @@
     "image_formats": "JPG, PNG, WebP — max. 8 MB",
     "image_too_large": "Das Bild darf maximal 8 MB groß sein",
     "save_error_title": "Inserat konnte nicht gespeichert werden",
-    "save_error_subtitle": "Bitte überprüfen Sie Ihre Angaben und versuchen Sie es erneut."
+    "save_error_subtitle": "Bitte überprüfen Sie Ihre Angaben und versuchen Sie es erneut.",
+    "load_error": "Inserat konnte nicht geladen werden",
+    "update_success": "Inserat erfolgreich aktualisiert",
+    "create_success": "Inserat erfolgreich erstellt"
   },
   "page_subtitle": "Dienstleistungen und Gesuche der Gemeinschaft durchsuchen",
   "search_placeholder": "Nach Titel, Beschreibung, Standort oder Name suchen...",
@@ -109,11 +112,11 @@
   "renew_error": "Inserat konnte nicht erneuert werden",
   "detail_analytics": "Analysen",
   "detail_renew": "Inserat erneuern",
-  "detail_extend": "Verlangern",
-  "detail_skills": "Fahigkeiten",
+  "detail_extend": "Verlängern",
+  "detail_skills": "Fähigkeiten",
   "detail_hours": "{{count}} Stunden",
   "detail_expired_on": "Abgelaufen am {{date}}",
-  "detail_expires_on": "Lauft ab am {{date}}",
+  "detail_expires_on": "Läuft ab am {{date}}",
   "detail_renewed_count_one": "{{count}} Mal erneuert",
   "detail_renewed_count_other": "{{count}} Mal erneuert",
   "load_error": "Inserate konnten nicht geladen werden.",
@@ -124,7 +127,7 @@
   "unsave_listing": "Eintrag nicht mehr speichern",
   "saved_success": "Anzeige gespeichert",
   "unsaved_success": "Anzeige aus Gespeicherten entfernt",
-  "save_error": "Failed to update saved listing",
+  "save_error": "Gespeichertes Inserat konnte nicht aktualisiert werden",
   "featured": "Empfohlen",
   "featured_badge": "Empfohlene Anzeige",
   "skill_tags": {
@@ -144,7 +147,14 @@
     "vs_previous_week": "ggü. Vorwoche",
     "views_last_days": "Aufrufe (letzte {{days}} Tage)"
   },
-  "detail_like": "Like",
-  "detail_liked": "Liked",
-  "detail_comments": "Comments"
+  "near_me": "In meiner Nähe",
+  "near_me_no_location": "Standort aktivieren, um diese Funktion zu nutzen",
+  "radius_label": "Suchradius",
+  "like": "Gefällt mir",
+  "likes": "Gefällt mir",
+  "comment": "Kommentar",
+  "comments": "Kommentare",
+  "detail_like": "Gefällt mir",
+  "detail_liked": "Gefällt mir",
+  "detail_comments": "Kommentare"
 }

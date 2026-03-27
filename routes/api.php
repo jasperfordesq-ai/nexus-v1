@@ -163,6 +163,9 @@ Route::post('/v2/listings/{id}/save', [\App\Http\Controllers\Api\ListingsControl
 Route::delete('/v2/listings/{id}/save', [\App\Http\Controllers\Api\ListingsController::class, 'unsaveListing']);
 Route::post('/v2/listings/{id}/image', [\App\Http\Controllers\Api\ListingsController::class, 'uploadImage']);
 Route::delete('/v2/listings/{id}/image', [\App\Http\Controllers\Api\ListingsController::class, 'deleteImage']);
+Route::post('/v2/listings/{id}/renew', [\App\Http\Controllers\Api\ListingsController::class, 'renew']);
+Route::get('/v2/listings/{id}/analytics', [\App\Http\Controllers\Api\ListingsController::class, 'analytics']);
+Route::put('/v2/listings/{id}/tags', [\App\Http\Controllers\Api\ListingsController::class, 'setSkillTags']);
 
 // ============================================
 // MIGRATED ROUTES — Messages
@@ -1551,9 +1554,6 @@ Route::middleware(['auth:sanctum', 'admin'])->group(function () {
     Route::get('/v2/admin/moderation/settings', [\App\Http\Controllers\Api\AdminAnalyticsReportsController::class, 'moderationSettings']);
     Route::put('/v2/admin/moderation/settings', [\App\Http\Controllers\Api\AdminAnalyticsReportsController::class, 'updateModerationSettings']);
 });
-Route::post('/v2/listings/{id}/renew', [\App\Http\Controllers\Api\ListingsController::class, 'renew']);
-Route::get('/v2/listings/{id}/analytics', [\App\Http\Controllers\Api\ListingsController::class, 'analytics']);
-Route::put('/v2/listings/{id}/tags', [\App\Http\Controllers\Api\ListingsController::class, 'setSkillTags']);
 Route::middleware(['auth:sanctum', 'admin'])->group(function () {
     Route::post('/v2/admin/listings/{id}/feature', [\App\Http\Controllers\Api\AdminListingsController::class, 'feature']);
     Route::delete('/v2/admin/listings/{id}/feature', [\App\Http\Controllers\Api\AdminListingsController::class, 'unfeature']);

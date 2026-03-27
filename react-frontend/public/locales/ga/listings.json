@@ -51,7 +51,10 @@
     "image_formats": "JPG, PNG, WebP — uasmh. 8 MB",
     "image_too_large": "Ní mór don íomhá a bheith faoi 8 MB",
     "save_error_title": "Theip ar shábháil an liosta",
-    "save_error_subtitle": "Seiceáil do chuid eolais agus bain triail eile as."
+    "save_error_subtitle": "Seiceáil do chuid eolais agus bain triail eile as.",
+    "load_error": "Theip ar an liosta a luchtú",
+    "update_success": "Liosta nuashonraithe go rathúil",
+    "create_success": "Liosta cruthaithe go rathúil"
   },
   "page_subtitle": "Brabhsáil seirbhísí agus iarratais ón bpobal",
   "search_placeholder": "Cuardaigh de réir teideal, cur síos, suíomh nó ainm...",
@@ -144,7 +147,14 @@
     "vs_previous_week": "vs. an tseachtain roimhe",
     "views_last_days": "Amhairc ({{days}} Lá Deiridh)"
   },
-  "detail_like": "Like",
-  "detail_liked": "Liked",
-  "detail_comments": "Comments"
+  "near_me": "In aice liom",
+  "near_me_no_location": "Cumasaigh suíomh chun an ghné seo a úsáid",
+  "radius_label": "Raon cuardaigh",
+  "like": "maith liom",
+  "likes": "is maith leo",
+  "comment": "nóta tráchta",
+  "comments": "nótaí tráchta",
+  "detail_like": "Is Maith Liom",
+  "detail_liked": "Is Maith Liom É",
+  "detail_comments": "Nótaí Tráchta"
 }
