@@ -21,24 +21,24 @@ class JobOffer extends Model
         'tenant_id',
         'vacancy_id',
         'application_id',
-        'salary_offered',
-        'salary_currency',
-        'salary_type',
-        'start_date',
-        'message',
+        'user_id',
         'status',
-        'responded_at',
+        'details',
+        'salary_offered',
+        'start_date',
         'expires_at',
+        'responded_at',
     ];
 
     protected $casts = [
         'tenant_id'      => 'integer',
         'vacancy_id'     => 'integer',
         'application_id' => 'integer',
+        'user_id'        => 'integer',
         'salary_offered' => 'float',
         'start_date'     => 'date',
-        'responded_at'   => 'datetime',
         'expires_at'     => 'datetime',
+        'responded_at'   => 'datetime',
     ];
 
     public function vacancy(): BelongsTo
@@ -49,5 +49,10 @@ class JobOffer extends Model
     public function application(): BelongsTo
     {
         return $this->belongsTo(JobApplication::class, 'application_id');
+    }
+
+    public function applicant(): BelongsTo
+    {
+        return $this->belongsTo(\App\Models\User::class, 'user_id');
     }
 }

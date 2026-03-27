@@ -29,7 +29,7 @@ class JobApplicationTest extends TestCase
     public function test_fillable_contains_expected_fields(): void
     {
         $expected = [
-            'vacancy_id', 'user_id', 'message', 'cv_path', 'cv_filename', 'cv_size',
+            'tenant_id', 'vacancy_id', 'user_id', 'message', 'cv_path', 'cv_filename', 'cv_size',
             'status', 'stage', 'reviewer_notes', 'reviewed_by', 'reviewed_at',
         ];
         $this->assertEquals($expected, $this->model->getFillable());
@@ -38,16 +38,17 @@ class JobApplicationTest extends TestCase
     public function test_casts_are_correct(): void
     {
         $casts = $this->model->getCasts();
+        $this->assertEquals('integer', $casts['tenant_id']);
         $this->assertEquals('integer', $casts['vacancy_id']);
         $this->assertEquals('integer', $casts['user_id']);
         $this->assertEquals('integer', $casts['reviewed_by']);
         $this->assertEquals('datetime', $casts['reviewed_at']);
     }
 
-    public function test_does_not_use_has_tenant_scope(): void
+    public function test_uses_has_tenant_scope(): void
     {
         $traits = class_uses_recursive(JobApplication::class);
-        $this->assertNotContains(\App\Models\Concerns\HasTenantScope::class, $traits);
+        $this->assertContains(\App\Models\Concerns\HasTenantScope::class, $traits);
     }
 
     public function test_vacancy_relationship(): void

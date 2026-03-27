@@ -59,7 +59,18 @@ class JobVacancyService
             ->select('job_vacancies.*', 'o.name as organization_name', 'o.logo_url as organization_logo');
 
         if (!empty($filters['status'])) {
-            $query->where('job_vacancies.status', $filters['status']);
+            $status = $filters['status'];
+            if ($status === 'expired') {
+                // Expired = deadline has passed and vacancy is still open
+                $query->where('job_vacancies.status', 'open')
+                      ->whereNotNull('job_vacancies.deadline')
+                      ->where('job_vacancies.deadline', '<', now());
+            } elseif ($status === 'pending_review') {
+                // Pending review = awaiting moderation approval
+                $query->where('job_vacancies.moderation_status', 'pending');
+            } else {
+                $query->where('job_vacancies.status', $status);
+            }
         }
         if (!empty($filters['type'])) {
             $query->where('job_vacancies.type', $filters['type']);

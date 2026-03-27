@@ -59,11 +59,10 @@ class JobOfferService
                 'tenant_id'      => $tenantId,
                 'vacancy_id'     => (int) $application->vacancy_id,
                 'application_id' => $applicationId,
+                'user_id'        => (int) $application->user_id,
                 'salary_offered' => isset($data['salary_offered']) ? (float) $data['salary_offered'] : null,
-                'salary_currency' => $data['salary_currency'] ?? 'EUR',
-                'salary_type'    => $data['salary_type'] ?? null,
                 'start_date'     => $data['start_date'] ?? null,
-                'message'        => isset($data['message']) ? trim($data['message']) : null,
+                'details'        => isset($data['message']) ? trim($data['message']) : (isset($data['details']) ? trim($data['details']) : null),
                 'status'         => 'pending',
                 'expires_at'     => $data['expires_at'] ?? null,
             ]);
@@ -119,7 +118,7 @@ class JobOfferService
 
             $offer->update([
                 'status'       => 'accepted',
-                'responded_at' => now(),
+                'responded_at' => now(),  // column added via 2026_03_27_000000 migration
             ]);
 
             // Update application status to accepted
@@ -198,7 +197,7 @@ class JobOfferService
 
             $offer->update([
                 'status'       => 'rejected',
-                'responded_at' => now(),
+                'responded_at' => now(),  // column added via 2026_03_27_000000 migration
             ]);
 
             // Notify the job poster
