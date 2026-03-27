@@ -75,7 +75,7 @@ class IdeationChallengeServiceTest extends TestCase
         DB::shouldReceive('where')->andReturnSelf();
         DB::shouldReceive('first')->andReturn((object) ['id' => 1, 'title' => 'Challenge']);
 
-        DB::shouldReceive('table')->with('ideation_ideas')->andReturnSelf();
+        DB::shouldReceive('table')->with('challenge_ideas')->andReturnSelf();
         DB::shouldReceive('where')->andReturnSelf();
         DB::shouldReceive('count')->andReturn(5);
 
