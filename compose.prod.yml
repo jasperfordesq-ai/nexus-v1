@@ -91,9 +91,12 @@ services:
       args:
         VITE_API_BASE: https://api.project-nexus.ie/api
         VITE_GOOGLE_MAPS_API_KEY: ${GOOGLE_MAPS_API_KEY:-}
+        VITE_GOOGLE_MAPS_MAP_ID: ${GOOGLE_MAPS_MAP_ID:-}
         VITE_SENTRY_DSN: ${SENTRY_DSN_REACT:-}
         VITE_SENTRY_ENVIRONMENT: production
         VITE_SENTRY_TRACES_SAMPLE_RATE: ${SENTRY_TRACES_SAMPLE_RATE:-0.1}
+        VITE_PUSHER_KEY: ${PUSHER_KEY:-}
+        VITE_PUSHER_CLUSTER: ${PUSHER_CLUSTER:-eu}
         VITE_GIPHY_API_KEY: ${GIPHY_API_KEY:-}
         BUILD_COMMIT: ${BUILD_COMMIT:-unknown}
     image: nexus-react-prod:latest
