@@ -99,6 +99,9 @@ class NotificationDispatcher
         $tenantId = TenantContext::getId();
 
         // Check exact match first
+        // notification_settings may not have tenant_id column; user_id is
+        // already tenant-scoped by the caller (dispatch verifies the user
+        // belongs to TenantContext). Adding tenant_id here as defense-in-depth.
         $row = DB::table('notification_settings')
             ->where('user_id', $userId)
             ->where('context_type', $contextType)

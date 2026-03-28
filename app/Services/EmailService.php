@@ -34,9 +34,23 @@ class EmailService
             });
             return true;
         } catch (\Throwable $e) {
-            Log::error('EmailService::send failed', ['to' => $to, 'error' => $e->getMessage()]);
+            Log::error('EmailService::send failed', ['to' => self::maskEmail($to), 'error' => $e->getMessage()]);
             return false;
         }
+    }
+
+    /**
+     * Mask an email address for safe logging (e.g., "j***@example.com").
+     */
+    private static function maskEmail(string $email): string
+    {
+        $parts = explode('@', $email, 2);
+        if (count($parts) !== 2) {
+            return '***';
+        }
+        $local = $parts[0];
+        $masked = strlen($local) > 1 ? $local[0] . str_repeat('*', min(strlen($local) - 1, 5)) : '*';
+        return $masked . '@' . $parts[1];
     }
 
     /**

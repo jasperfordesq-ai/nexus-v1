@@ -30,7 +30,7 @@ class Transaction extends Model
     protected $hidden = ['tenant_id'];
 
     protected $casts = [
-        'amount' => 'integer',
+        'amount' => 'decimal:2',
         'deleted_for_sender' => 'boolean',
         'deleted_for_receiver' => 'boolean',
     ];

@@ -30,6 +30,12 @@ class EmailTemplate
         $btnUrl = null,
         $tenantName = 'Project NEXUS'
     ): string {
+        // Escape title/subtitle to prevent HTML injection from user-controlled values
+        // (e.g., user names interpolated into subtitle). $body is intentionally HTML.
+        $title = htmlspecialchars($title, ENT_QUOTES, 'UTF-8');
+        $subtitle = htmlspecialchars($subtitle, ENT_QUOTES, 'UTF-8');
+        $tenantName = htmlspecialchars($tenantName, ENT_QUOTES, 'UTF-8');
+
         // Theme colors
         $brandColor = '#6366f1';
         $brandColorDark = '#4f46e5';

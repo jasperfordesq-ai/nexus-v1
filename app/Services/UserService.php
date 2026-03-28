@@ -193,7 +193,11 @@ class UserService
                   ->orWhere('organization_name', 'LIKE', $like)
                   ->orWhereRaw("CONCAT(first_name, ' ', last_name) LIKE ?", [$like]);
             })
-            ->where('status', '!=', 'banned')
+            ->whereNotIn('status', ['banned', 'suspended', 'deleted'])
+            ->where(function (Builder $q) {
+                $q->where('privacy_search', true)
+                  ->orWhereNull('privacy_search');
+            })
             ->orderByDesc('id')
             ->limit($limit + 1);
 

@@ -121,6 +121,7 @@ class UsersController extends BaseApiController
      */
     public function search(): JsonResponse
     {
+        $this->rateLimit('user_search', 60, 60);
         $q = $this->query('q', '');
         $limit = $this->queryInt('limit', 20, 1, 100);
 
@@ -786,6 +787,28 @@ class UsersController extends BaseApiController
             if (!$contextId) {
                 return $this->error('Context ID required', 400);
             }
+            $contextId = (int) $contextId;
+
+            // Validate context_id belongs to the user's tenant
+            $tenantId = TenantContext::getId();
+            if ($contextType === 'group') {
+                $exists = DB::table('groups')
+                    ->where('id', $contextId)
+                    ->where('tenant_id', $tenantId)
+                    ->exists();
+                if (!$exists) {
+                    return $this->error('Invalid group ID', 400);
+                }
+            } elseif ($contextType === 'thread') {
+                // Verify user is a participant in this thread
+                $exists = DB::table('message_threads')
+                    ->where('id', $contextId)
+                    ->where('tenant_id', $tenantId)
+                    ->exists();
+                if (!$exists) {
+                    return $this->error('Invalid thread ID', 400);
+                }
+            }
         }
 
         try {
@@ -963,6 +986,7 @@ class UsersController extends BaseApiController
      */
     public function index(): JsonResponse
     {
+        $this->rateLimit('member_directory', 60, 60);
         $request = request();
         $tenantId = $this->getTenantId();
         $viewerId = $this->getOptionalUserId();
@@ -1012,6 +1036,9 @@ class UsersController extends BaseApiController
             $whereClause .= ' AND u.id != ?';
             $params[] = $viewerId;
         }
+
+        // Respect privacy_search setting — hide users who opted out of search
+        $whereClause .= ' AND (u.privacy_search = 1 OR u.privacy_search IS NULL)';
 
         // Apply onboarding visibility gating (admin-configurable per tenant)
         $visibilityConditions = OnboardingConfigService::getVisibilitySqlConditions($tenantId);

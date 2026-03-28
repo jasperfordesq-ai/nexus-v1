@@ -647,9 +647,49 @@ class AdminConfigController extends BaseApiController
             $kvUpdates['welcome_credits'] = (string) $wc;
         }
 
+        // Validate max_upload_size_mb — prevent dangerously large values
+        if (isset($kvUpdates['max_upload_size_mb'])) {
+            $maxMb = (int) $kvUpdates['max_upload_size_mb'];
+            if ($maxMb < 1 || $maxMb > 50) {
+                return $this->respondWithError('VALIDATION_ERROR', 'max_upload_size_mb must be between 1 and 50', 'max_upload_size_mb', 422);
+            }
+            $kvUpdates['max_upload_size_mb'] = (string) $maxMb;
+        }
+
+        // Validate items_per_page — prevent abuse
+        if (isset($kvUpdates['items_per_page'])) {
+            $ipp = (int) $kvUpdates['items_per_page'];
+            if ($ipp < 5 || $ipp > 100) {
+                return $this->respondWithError('VALIDATION_ERROR', 'items_per_page must be between 5 and 100', 'items_per_page', 422);
+            }
+            $kvUpdates['items_per_page'] = (string) $ipp;
+        }
+
+        // Validate maintenance_mode — must be a boolean
+        if (isset($kvUpdates['maintenance_mode'])) {
+            if (!in_array((string) $kvUpdates['maintenance_mode'], ['true', 'false', '1', '0'], true)) {
+                return $this->respondWithError('VALIDATION_ERROR', 'maintenance_mode must be a boolean value', 'maintenance_mode', 422);
+            }
+        }
+
+        // Validate registration_mode — restricted values
+        if (isset($kvUpdates['registration_mode'])) {
+            if (!in_array($kvUpdates['registration_mode'], ['open', 'closed', 'invite_only'], true)) {
+                return $this->respondWithError('VALIDATION_ERROR', 'registration_mode must be one of: open, closed, invite_only', 'registration_mode', 422);
+            }
+        }
+
         foreach ($kvUpdates as $key => $value) {
             $this->upsertSetting($tenantId, 'general.' . $key, (string) $value, $adminId);
         }
+
+        // Audit log for settings changes
+        \Illuminate\Support\Facades\Log::info('Admin config settings updated', [
+            'admin_id' => $adminId,
+            'tenant_id' => $tenantId,
+            'direct_columns' => array_keys($directUpdates),
+            'settings' => array_keys($kvUpdates),
+        ]);
 
         $this->redisCache->delete('tenant_bootstrap', $tenantId);
 

@@ -481,11 +481,12 @@ HTML;
      */
     private static function personalizeContent(string $content, array $recipient): string
     {
+        // Escape user-provided values to prevent stored XSS in newsletter emails
         $replacements = [
-            '{{first_name}}' => $recipient['first_name'] ?? '',
-            '{{last_name}}' => $recipient['last_name'] ?? '',
-            '{{name}}' => $recipient['name'] ?? '',
-            '{{email}}' => $recipient['email'] ?? '',
+            '{{first_name}}' => htmlspecialchars($recipient['first_name'] ?? '', ENT_QUOTES, 'UTF-8'),
+            '{{last_name}}' => htmlspecialchars($recipient['last_name'] ?? '', ENT_QUOTES, 'UTF-8'),
+            '{{name}}' => htmlspecialchars($recipient['name'] ?? '', ENT_QUOTES, 'UTF-8'),
+            '{{email}}' => htmlspecialchars($recipient['email'] ?? '', ENT_QUOTES, 'UTF-8'),
         ];
 
         return str_replace(array_keys($replacements), array_values($replacements), $content);
@@ -557,11 +558,20 @@ HTML;
             case 'both':
                 $seen = [];
 
-                // Add subscribers first
+                // Add active subscribers first
                 $subscribers = DB::table('newsletter_subscribers')
                     ->where('tenant_id', $tenantId)
                     ->where('status', 'active')
                     ->get();
+
+                // Also collect unsubscribed emails to exclude members who opted out
+                $unsubscribedEmails = DB::table('newsletter_subscribers')
+                    ->where('tenant_id', $tenantId)
+                    ->where('status', 'unsubscribed')
+                    ->pluck('email')
+                    ->map(fn($e) => strtolower($e))
+                    ->flip()
+                    ->all();
 
                 foreach ($subscribers as $sub) {
                     $email = strtolower($sub->email);
@@ -576,7 +586,7 @@ HTML;
                     ];
                 }
 
-                // Add members not already in subscribers
+                // Add members not already in subscribers and not unsubscribed
                 $users = DB::table('users')
                     ->where('tenant_id', $tenantId)
                     ->where('is_approved', 1)
@@ -586,7 +596,7 @@ HTML;
 
                 foreach ($users as $user) {
                     $email = strtolower($user->email);
-                    if (isset($seen[$email])) {
+                    if (isset($seen[$email]) || isset($unsubscribedEmails[$email])) {
                         continue;
                     }
 
@@ -603,6 +613,15 @@ HTML;
 
             case 'all_members':
             default:
+                // Collect emails that have explicitly unsubscribed so we can exclude them
+                $unsubscribedEmails = DB::table('newsletter_subscribers')
+                    ->where('tenant_id', $tenantId)
+                    ->where('status', 'unsubscribed')
+                    ->pluck('email')
+                    ->map(fn($e) => strtolower($e))
+                    ->flip()
+                    ->all();
+
                 $users = DB::table('users')
                     ->where('tenant_id', $tenantId)
                     ->where('is_approved', 1)
@@ -611,6 +630,11 @@ HTML;
                     ->get(['id', 'email', 'name', 'first_name', 'last_name']);
 
                 foreach ($users as $user) {
+                    // Skip users who have unsubscribed from newsletters
+                    if (isset($unsubscribedEmails[strtolower($user->email)])) {
+                        continue;
+                    }
+
                     // Look up subscriber record for unsubscribe token
                     $subscriber = DB::table('newsletter_subscribers')
                         ->where('tenant_id', $tenantId)
@@ -651,8 +675,22 @@ HTML;
         $tenantId = TenantContext::getId();
         $recipients = [];
 
+        // Collect unsubscribed emails to exclude from segment sends
+        $unsubscribedEmails = DB::table('newsletter_subscribers')
+            ->where('tenant_id', $tenantId)
+            ->where('status', 'unsubscribed')
+            ->pluck('email')
+            ->map(fn($e) => strtolower($e))
+            ->flip()
+            ->all();
+
         foreach ($users as $user) {
             if (empty($user->email)) {
+                continue;
+            }
+
+            // Skip users who have unsubscribed from newsletters
+            if (isset($unsubscribedEmails[strtolower($user->email)])) {
                 continue;
             }
 

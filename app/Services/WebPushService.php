@@ -29,8 +29,10 @@ class WebPushService
     public function sendToUser($userId, $title, $body, $link = null, $type = 'general', $options = []): bool
     {
         try {
+            $tenantId = \App\Core\TenantContext::getId();
             $subscriptions = DB::table('push_subscriptions')
                 ->where('user_id', $userId)
+                ->where('tenant_id', $tenantId)
                 ->get();
 
             if ($subscriptions->isEmpty()) {

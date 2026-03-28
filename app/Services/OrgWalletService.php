@@ -182,6 +182,7 @@ class OrgWalletService
 
         $now = now();
         $requestId = DB::table('org_transfer_requests')->insertGetId([
+            'tenant_id' => $tenantId,
             'organization_id' => $orgId,
             'requester_id' => $requesterId,
             'recipient_id' => $recipientId,
@@ -268,6 +269,7 @@ class OrgWalletService
             // Record transaction
             $now = now();
             DB::table('org_transactions')->insert([
+                'tenant_id' => $tenantId,
                 'organization_id' => $request->organization_id,
                 'user_id' => $request->recipient_id,
                 'type' => 'transfer_out',
@@ -359,18 +361,20 @@ class OrgWalletService
             return ['success' => false, 'message' => 'Amount must be greater than zero'];
         }
 
-        // Check admin/owner role
-        if ($adminId !== null) {
-            $adminMember = DB::table('org_members')
-                ->where('organization_id', $orgId)
-                ->where('user_id', $adminId)
-                ->where('status', 'active')
-                ->whereIn('role', ['admin', 'owner'])
-                ->first();
+        // Check admin/owner role — adminId is required for authorization
+        if ($adminId === null) {
+            return ['success' => false, 'message' => 'Admin user ID is required for direct transfers'];
+        }
 
-            if (! $adminMember) {
-                return ['success' => false, 'message' => 'Only admin or owner can perform direct transfers'];
-            }
+        $adminMember = DB::table('org_members')
+            ->where('organization_id', $orgId)
+            ->where('user_id', $adminId)
+            ->where('status', 'active')
+            ->whereIn('role', ['admin', 'owner'])
+            ->first();
+
+        if (! $adminMember) {
+            return ['success' => false, 'message' => 'Only admin or owner can perform direct transfers'];
         }
 
         $tenantId = TenantContext::getId();
@@ -402,6 +406,7 @@ class OrgWalletService
             // Record transaction
             $now = now();
             DB::table('org_transactions')->insert([
+                'tenant_id' => $tenantId,
                 'organization_id' => $orgId,
                 'user_id' => $recipientId,
                 'type' => 'direct_transfer',

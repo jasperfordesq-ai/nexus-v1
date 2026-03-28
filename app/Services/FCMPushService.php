@@ -132,13 +132,21 @@ class FCMPushService
 
     /**
      * Unregister (delete) a device token.
+     *
+     * When userId is provided, only deletes the token if it belongs to that user
+     * (prevents one user from removing another user's push registration).
      */
-    public function unregisterDevice(string $token): bool
+    public function unregisterDevice(string $token, ?int $userId = null): bool
     {
         try {
-            $deleted = DB::table('fcm_device_tokens')
-                ->where('token', $token)
-                ->delete();
+            $query = DB::table('fcm_device_tokens')
+                ->where('token', $token);
+
+            if ($userId !== null) {
+                $query->where('user_id', $userId);
+            }
+
+            $deleted = $query->delete();
 
             return $deleted > 0;
         } catch (\Throwable $e) {

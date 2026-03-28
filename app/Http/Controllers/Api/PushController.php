@@ -36,12 +36,11 @@ class PushController extends BaseApiController
     public function subscribe(): JsonResponse
     {
         $userId = $this->requireAuth();
-        $tenantId = $this->getTenantId();
         $data = $this->getAllInput();
 
-        $subscription = $this->pushService->subscribe($userId, $tenantId, $data);
+        $result = $this->pushService->subscribe($userId, $data);
 
-        return $this->respondWithData($subscription, null, 201);
+        return $this->respondWithData(['subscribed' => $result], null, 201);
     }
 
     /**
@@ -67,7 +66,7 @@ class PushController extends BaseApiController
      */
     public function vapidKey(): JsonResponse
     {
-        $key = $this->pushService->getVapidPublicKey();
+        $key = $this->pushService->getVapidKey();
 
         return $this->respondWithData(['vapid_public_key' => $key]);
     }
@@ -249,8 +248,10 @@ class PushController extends BaseApiController
             return $this->respondWithError('VALIDATION_ERROR', 'Token is required', 'token', 400);
         }
 
+        $userId = $this->getOptionalUserId();
+
         try {
-            $result = $this->fcmPushService->unregisterDevice($token);
+            $result = $this->fcmPushService->unregisterDevice($token, $userId);
 
             return $this->respondWithData([
                 'unregistered' => $result,

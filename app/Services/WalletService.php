@@ -182,6 +182,11 @@ class WalletService
             throw new \RuntimeException('Cannot transfer to yourself');
         }
 
+        // Reject transfers to banned, suspended, or inactive accounts
+        if (in_array($receiver->status, ['banned', 'suspended', 'inactive', 'deactivated'], true)) {
+            throw new \RuntimeException('Recipient account is not active');
+        }
+
         $txn = DB::transaction(function () use ($senderId, $receiver, $amount, $description) {
             /** @var User $sender */
             $sender = $this->user->newQuery()->lockForUpdate()->findOrFail($senderId);

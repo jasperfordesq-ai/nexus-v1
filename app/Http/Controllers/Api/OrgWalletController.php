@@ -107,17 +107,19 @@ class OrgWalletController extends BaseApiController
             }
         }
 
-        $fromWallet = DB::selectOne(
-            'SELECT balance FROM org_wallets WHERE org_id = ? AND tenant_id = ?',
-            [$fromOrgId, $tenantId]
-        );
-
-        if ($fromWallet === null || $fromWallet->balance < $amount) {
-            return $this->respondWithError('INSUFFICIENT_BALANCE', 'Insufficient balance for transfer');
-        }
-
         DB::beginTransaction();
         try {
+            // Lock the source wallet row to prevent TOCTOU race conditions
+            $fromWallet = DB::selectOne(
+                'SELECT balance FROM org_wallets WHERE org_id = ? AND tenant_id = ? FOR UPDATE',
+                [$fromOrgId, $tenantId]
+            );
+
+            if ($fromWallet === null || (float) $fromWallet->balance < $amount) {
+                DB::rollBack();
+                return $this->respondWithError('INSUFFICIENT_BALANCE', 'Insufficient balance for transfer');
+            }
+
             DB::update('UPDATE org_wallets SET balance = balance - ? WHERE org_id = ? AND tenant_id = ?', [$amount, $fromOrgId, $tenantId]);
             DB::statement(
                 'INSERT INTO org_wallets (org_id, tenant_id, balance, currency) VALUES (?, ?, ?, ?)

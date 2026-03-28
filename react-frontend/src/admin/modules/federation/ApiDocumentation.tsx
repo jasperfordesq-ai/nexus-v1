@@ -336,18 +336,20 @@ const ENDPOINTS: EndpointDef[] = [
     response: `{
   "success": true,
   "timestamp": "2026-03-28T12:00:00+00:00",
-  "id": 45,
-  "username": "jane_doe",
-  "name": "Jane Doe",
-  "avatar": "https://...",
-  "bio": "Community organiser",
-  "skills": ["gardening", "tutoring"],
-  "location": "Cork",
-  "timebank": { "id": 3, "name": "Dublin Time Exchange" },
-  "service_reach": "regional",
-  "accepts_messages": true,
-  "accepts_transactions": true,
-  "joined": "2024-03-10 09:00:00"
+  "data": {
+    "id": 45,
+    "username": "jane_doe",
+    "name": "Jane Doe",
+    "avatar": "https://...",
+    "bio": "Community organiser",
+    "skills": ["gardening", "tutoring"],
+    "location": "Cork",
+    "timebank": { "id": 3, "name": "Dublin Time Exchange" },
+    "service_reach": "regional",
+    "accepts_messages": true,
+    "accepts_transactions": true,
+    "joined": "2024-03-10 09:00:00"
+  }
 }`,
   },
   {
@@ -392,21 +394,23 @@ const ENDPOINTS: EndpointDef[] = [
     response: `{
   "success": true,
   "timestamp": "2026-03-28T12:00:00+00:00",
-  "id": 201,
-  "title": "Guitar Lessons",
-  "description": "30-minute beginner guitar sessions",
-  "type": "offer",
-  "category": "Music",
-  "rate": "1.0",
-  "owner": {
-    "id": 45,
-    "name": "Jane Doe",
-    "avatar": "https://...",
-    "location": "Cork"
-  },
-  "timebank": { "id": 3, "name": "Dublin Time Exchange" },
-  "created_at": "2025-08-20 14:30:00",
-  "updated_at": "2025-09-01 10:00:00"
+  "data": {
+    "id": 201,
+    "title": "Guitar Lessons",
+    "description": "30-minute beginner guitar sessions",
+    "type": "offer",
+    "category": "Music",
+    "rate": "1.0",
+    "owner": {
+      "id": 45,
+      "name": "Jane Doe",
+      "avatar": "https://...",
+      "location": "Cork"
+    },
+    "timebank": { "id": 3, "name": "Dublin Time Exchange" },
+    "created_at": "2025-08-20 14:30:00",
+    "updated_at": "2025-09-01 10:00:00"
+  }
 }`,
   },
   {
@@ -553,23 +557,25 @@ const ENDPOINTS: EndpointDef[] = [
     response: `{
   "success": true,
   "timestamp": "2026-03-28T12:00:00+00:00",
-  "id": 567,
-  "amount": 1.5,
-  "status": "completed",
-  "description": "Guitar lesson - 1.5 hours",
-  "sender": {
-    "id": 12,
-    "name": "John Smith",
-    "tenant_id": 2,
-    "tenant_name": "Hour Timebank"
-  },
-  "receiver": {
-    "id": 45,
-    "name": "Jane Doe",
-    "tenant_id": 3,
-    "tenant_name": "Dublin Time Exchange"
-  },
-  "created_at": "2025-09-15 14:30:00"
+  "data": {
+    "id": 567,
+    "amount": 2,
+    "status": "completed",
+    "description": "Guitar lesson - 2 hours",
+    "sender": {
+      "id": 12,
+      "name": "John Smith",
+      "tenant_id": 2,
+      "tenant_name": "Hour Timebank"
+    },
+    "receiver": {
+      "id": 45,
+      "name": "Jane Doe",
+      "tenant_id": 3,
+      "tenant_name": "Dublin Time Exchange"
+    },
+    "created_at": "2025-09-15 14:30:00"
+  }
 }`,
   },
   {
@@ -894,12 +900,10 @@ function ErrorCodesTab() {
         All error responses follow a consistent JSON format:
       </p>
       <CodeBlock>{`{
-  "success": false,
-  "error": {
-    "code": "ERROR_CODE",
-    "message": "Human-readable description of what went wrong",
-    "status": 400
-  }
+  "error": true,
+  "code": "ERROR_CODE",
+  "message": "Human-readable description of what went wrong",
+  "timestamp": "2026-03-28T12:00:00+00:00"
 }`}</CodeBlock>
 
       <Table aria-label="Error codes">

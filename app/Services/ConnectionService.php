@@ -93,6 +93,27 @@ class ConnectionService
             throw new \RuntimeException('Cannot connect with yourself');
         }
 
+        // Check if either user has blocked the other
+        $blocked = DB::table('user_blocks')
+            ->where(function ($q) use ($requesterId, $receiverId) {
+                $q->where(function ($inner) use ($requesterId, $receiverId) {
+                    $inner->where('user_id', $requesterId)->where('blocked_user_id', $receiverId);
+                })->orWhere(function ($inner) use ($requesterId, $receiverId) {
+                    $inner->where('user_id', $receiverId)->where('blocked_user_id', $requesterId);
+                });
+            })
+            ->exists();
+        if ($blocked) {
+            throw new \RuntimeException('Cannot send connection request to this user');
+        }
+
+        // Verify receiver exists in the same tenant
+        $receiverTenantId = DB::table('users')->where('id', $receiverId)->value('tenant_id');
+        $requesterTenantId = DB::table('users')->where('id', $requesterId)->value('tenant_id');
+        if (!$receiverTenantId || !$requesterTenantId || $receiverTenantId !== $requesterTenantId) {
+            throw new \RuntimeException('User not found');
+        }
+
         return DB::transaction(function () use ($requesterId, $receiverId) {
             // Lock both user rows (in consistent order to prevent deadlocks) to serialize
             // concurrent connection requests between the same pair of users

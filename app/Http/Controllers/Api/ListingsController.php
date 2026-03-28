@@ -153,6 +153,8 @@ class ListingsController extends BaseApiController
         $this->rateLimit('listing_create', 10, 60);
 
         $data = $this->getAllInput();
+        // image_url must go through the dedicated uploadImage endpoint — strip from user input
+        unset($data['image_url']);
 
         try {
             $listing = $this->listingService->create($userId, $data);
@@ -205,16 +207,18 @@ class ListingsController extends BaseApiController
         $userId = $this->requireAuth();
         $this->rateLimit('listing_update', 20, 60);
 
-        // Verify ownership
-        $existing = $this->listingService->getById($id);
+        // Verify ownership or admin
+        $existing = $this->listingService->getById($id, false, $userId);
         if (!$existing) {
             return $this->respondWithError('NOT_FOUND', 'Listing not found', null, 404);
         }
-        if ((int) ($existing['user_id'] ?? 0) !== $userId) {
+        if (!$this->listingService->canModify($existing, $userId)) {
             return $this->respondWithError('FORBIDDEN', 'You can only edit your own listings', null, 403);
         }
 
         $data = $this->getAllInput();
+        // image_url must go through the dedicated uploadImage endpoint — strip from user input
+        unset($data['image_url']);
 
         try {
             $this->listingService->update($id, $data);
@@ -244,12 +248,12 @@ class ListingsController extends BaseApiController
         $userId = $this->requireAuth();
         $this->rateLimit('listing_delete', 10, 60);
 
-        // Verify ownership
-        $existing = $this->listingService->getById($id);
+        // Verify ownership or admin
+        $existing = $this->listingService->getById($id, false, $userId);
         if (!$existing) {
             return $this->respondWithError('NOT_FOUND', 'Listing not found', null, 404);
         }
-        if ((int) ($existing['user_id'] ?? 0) !== $userId) {
+        if (!$this->listingService->canModify($existing, $userId)) {
             return $this->respondWithError('FORBIDDEN', 'You can only delete your own listings', null, 403);
         }
 

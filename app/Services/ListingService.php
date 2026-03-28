@@ -130,7 +130,10 @@ class ListingService
                 $q = Listing::query()
                     ->with(['user:id,first_name,last_name,organization_name,profile_type,avatar_url,tagline',
                             'category:id,name,color,slug'])
-                    ->whereIn('id', $ids);
+                    ->whereIn('id', $ids)
+                    ->where(function (Builder $sq) {
+                        $sq->whereNull('status')->orWhere('status', 'active');
+                    });
 
                 // Multi-type arrays can't be expressed in the Meilisearch filter above
                 if (!empty($filters['type']) && is_array($filters['type'])) {
@@ -143,6 +146,7 @@ class ListingService
                 if ($currentUserId && $listingsById->isNotEmpty()) {
                     $savedIds = DB::table('user_saved_listings')
                         ->where('user_id', $currentUserId)
+                        ->where('tenant_id', $tenantId)
                         ->whereIn('listing_id', $listingsById->keys())
                         ->pluck('listing_id')->flip()->all();
                 }
@@ -262,6 +266,7 @@ class ListingService
         if ($currentUserId && $items->isNotEmpty()) {
             $savedIds = DB::table('user_saved_listings')
                 ->where('user_id', $currentUserId)
+                ->where('tenant_id', \App\Core\TenantContext::getId())
                 ->whereIn('listing_id', $items->pluck('id'))
                 ->pluck('listing_id')
                 ->flip()
@@ -497,6 +502,7 @@ class ListingService
                 $data['is_favorited'] = DB::table('user_saved_listings')
                     ->where('listing_id', $id)
                     ->where('user_id', $currentUserId)
+                    ->where('tenant_id', $tenantId)
                     ->exists();
             } catch (\Throwable $e) {
                 // Table may not exist
@@ -692,6 +698,7 @@ class ListingService
         DB::table('user_saved_listings')
             ->where('user_id', $userId)
             ->where('listing_id', $listingId)
+            ->where('tenant_id', \App\Core\TenantContext::getId())
             ->delete();
     }
 
@@ -778,6 +785,21 @@ class ListingService
 
         /** @var Listing $listing */
         $listing = Listing::query()->findOrFail($id);
+
+        // Validate status transitions — prevent un-deleting or setting invalid statuses
+        if (isset($data['status'])) {
+            $validStatuses = ['active', 'draft', 'pending', 'suspended', 'expired'];
+            $currentStatus = $listing->status ?? 'active';
+
+            if (!in_array($data['status'], $validStatuses, true)) {
+                throw ValidationException::withMessages(['status' => ['Invalid status value.']]);
+            }
+            // Deleted or suspended listings cannot be reactivated by non-admin callers
+            // (admin reactivation should go through a dedicated admin endpoint)
+            if (in_array($currentStatus, ['deleted', 'suspended'], true) && $data['status'] === 'active') {
+                throw ValidationException::withMessages(['status' => ['Cannot reactivate a ' . $currentStatus . ' listing.']]);
+            }
+        }
 
         $allowed = [
             'title', 'description', 'type', 'category_id', 'image_url',
@@ -921,7 +943,8 @@ class ListingService
             $rules['type']        = 'sometimes|in:offer,request';
         }
 
-        $rules['category_id']          = 'sometimes|nullable|integer|exists:categories,id';
+        $tenantId = \App\Core\TenantContext::getId();
+        $rules['category_id']          = "sometimes|nullable|integer|exists:categories,id,tenant_id,{$tenantId}";
         $rules['federated_visibility'] = 'sometimes|in:none,listed,bookable';
         $rules['hours_estimate']       = 'sometimes|nullable|numeric|min:0';
 
