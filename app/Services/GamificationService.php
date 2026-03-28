@@ -389,12 +389,17 @@ class GamificationService
             return;
         }
 
-        UserBadge::create([
-            'user_id'   => $userId,
-            'badge_key' => $badge['key'],
-            'name'      => $badge['name'],
-            'icon'      => $badge['icon'],
-        ]);
+        try {
+            UserBadge::create([
+                'user_id'   => $userId,
+                'badge_key' => $badge['key'],
+                'name'      => $badge['name'],
+                'icon'      => $badge['icon'],
+            ]);
+        } catch (\Illuminate\Database\UniqueConstraintViolationException $e) {
+            // Badge already exists (race condition or cross-tenant duplicate) — skip silently
+            return;
+        }
 
         // Create notification
         Notification::create([
