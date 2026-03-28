@@ -135,9 +135,7 @@ export function NotificationFlyout() {
         >
           <Bell className="w-4 h-4 sm:w-5 sm:h-5" aria-hidden="true" />
           {unreadCount > 0 && (
-            <span className="absolute -top-0.5 -right-0.5 flex items-center justify-center min-w-[16px] h-4 px-1 text-[10px] font-bold text-white bg-danger rounded-full leading-none">
-              {unreadCount > 99 ? '99+' : unreadCount}
-            </span>
+            <span className="absolute top-0.5 right-0.5 w-2 h-2 bg-danger rounded-full" />
           )}
         </Button>
       </PopoverTrigger>
