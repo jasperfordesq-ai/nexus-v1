@@ -161,6 +161,10 @@ class AdminFederationWebhooksController extends BaseApiController
             if (!str_starts_with($url, 'https://')) {
                 return $this->respondWithError('VALIDATION_ERROR', 'URL must use HTTPS', 'url', 422);
             }
+            // SSRF protection: reject URLs targeting private/internal IPs
+            if (\App\Services\WebhookDispatchService::isPrivateUrl($url)) {
+                return $this->respondWithError('VALIDATION_ERROR', 'URL must not target private or internal IP addresses', 'url', 422);
+            }
             $updates['url'] = $url;
         }
 
@@ -264,6 +268,11 @@ class AdminFederationWebhooksController extends BaseApiController
 
         if (!$webhook) {
             return $this->respondWithError('NOT_FOUND', 'Webhook not found', null, 404);
+        }
+
+        // SSRF protection: re-check at dispatch time (DNS rebinding defense)
+        if (\App\Services\WebhookDispatchService::isPrivateUrl($webhook->url)) {
+            return $this->respondWithError('VALIDATION_ERROR', 'Webhook URL resolves to a private or internal IP address', 'url', 422);
         }
 
         $payload = [
@@ -435,6 +444,11 @@ class AdminFederationWebhooksController extends BaseApiController
 
         if (!$webhook) {
             return $this->respondWithError('NOT_FOUND', 'Parent webhook not found', null, 404);
+        }
+
+        // SSRF protection: re-check at dispatch time (DNS rebinding defense)
+        if (\App\Services\WebhookDispatchService::isPrivateUrl($webhook->url)) {
+            return $this->respondWithError('VALIDATION_ERROR', 'Webhook URL resolves to a private or internal IP address', 'url', 422);
         }
 
         // Re-send the original payload

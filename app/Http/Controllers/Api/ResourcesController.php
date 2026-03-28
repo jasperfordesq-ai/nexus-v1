@@ -182,7 +182,8 @@ class ResourcesController extends BaseApiController
         }
 
         $maxSize = 10 * 1024 * 1024; // 10MB
-        $allowedExts = ['pdf', 'doc', 'docx', 'xls', 'xlsx', 'txt', 'csv', 'jpg', 'png', 'gif', 'svg'];
+        // SVG intentionally excluded — XSS vector (can contain inline JS)
+        $allowedExts = ['pdf', 'doc', 'docx', 'xls', 'xlsx', 'txt', 'csv', 'jpg', 'png', 'gif', 'webp'];
 
         if ($file->getSize() > $maxSize) {
             return $this->respondWithError('FILE_TOO_LARGE', 'File exceeds 10MB limit', 'file', 400);
@@ -193,8 +194,16 @@ class ResourcesController extends BaseApiController
             return $this->respondWithError('FILE_TYPE_NOT_ALLOWED', 'File type not allowed', 'file', 400);
         }
 
-        // Generate unique filename
-        $filename = md5(uniqid((string) $userId, true)) . '.' . $ext;
+        // Double-check MIME type via file content inspection (not just extension)
+        // Blocks HTML/SVG/PHP disguised as allowed extensions
+        $detectedMime = $file->getMimeType();
+        $blockedMimes = ['text/html', 'application/xhtml+xml', 'image/svg+xml', 'application/x-httpd-php'];
+        if ($detectedMime && in_array($detectedMime, $blockedMimes, true)) {
+            return $this->respondWithError('FILE_TYPE_NOT_ALLOWED', 'This file type is not allowed (HTML/SVG/PHP)', 'file', 400);
+        }
+
+        // Generate secure unique filename (cryptographic randomness)
+        $filename = bin2hex(random_bytes(16)) . '.' . $ext;
 
         // Ensure upload directory exists
         $uploadDir = base_path('httpdocs/uploads/' . $tenantId . '/resources');

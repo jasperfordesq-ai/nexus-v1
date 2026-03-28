@@ -123,6 +123,19 @@ class AudioUploader
             throw new \Exception("Audio file too large. Maximum 10MB allowed.");
         }
 
+        // Verify actual MIME type of decoded content matches claimed type
+        $tmpFile = tempnam(sys_get_temp_dir(), 'audio_verify_');
+        try {
+            file_put_contents($tmpFile, $audioData);
+            $finfo = new \finfo(FILEINFO_MIME_TYPE);
+            $actualMime = $finfo->file($tmpFile);
+            if (!in_array($actualMime, self::$allowedTypes)) {
+                throw new \Exception("Audio content does not match allowed types. Detected: {$actualMime}");
+            }
+        } finally {
+            @unlink($tmpFile);
+        }
+
         // Duration validation
         if ($duration > self::$maxDuration) {
             throw new \Exception("Voice message too long. Maximum 5 minutes allowed.");

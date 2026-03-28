@@ -285,6 +285,12 @@ class JobVacanciesController extends BaseApiController
             if ($file->getSize() > 5 * 1024 * 1024) {
                 return $this->respondWithError('VALIDATION_FILE_TOO_LARGE', 'File too large. Maximum 5MB', 'cv', 422);
             }
+            // MIME content inspection — block HTML/SVG/PHP disguised as document extensions
+            $detectedMime = $file->getMimeType();
+            $blockedMimes = ['text/html', 'application/xhtml+xml', 'image/svg+xml', 'application/x-httpd-php'];
+            if ($detectedMime && in_array($detectedMime, $blockedMimes, true)) {
+                return $this->respondWithError('VALIDATION_INVALID_VALUE', 'This file type is not allowed', 'cv', 422);
+            }
             $cvPath = $file->store("job-applications/{$tenantId}", 'local');
             $cvFilename = $file->getClientOriginalName();
             $cvSize = $file->getSize();

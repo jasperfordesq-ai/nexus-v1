@@ -149,9 +149,9 @@ class TeamDocumentService
         ];
         $ext = $extMap[$mimeType] ?? 'bin';
 
-        // Store file
-        $uploadDir = "uploads/team_documents/{$tenantId}/{$groupId}";
-        $filename = 'doc_' . time() . '_' . bin2hex(random_bytes(4)) . '.' . $ext;
+        // Store file — anchored to httpdocs/ to ensure consistent path resolution
+        $uploadDir = base_path("httpdocs/uploads/team_documents/{$tenantId}/{$groupId}");
+        $filename = 'doc_' . time() . '_' . bin2hex(random_bytes(8)) . '.' . $ext;
 
         if (!is_dir($uploadDir)) {
             mkdir($uploadDir, 0755, true);
@@ -167,12 +167,13 @@ class TeamDocumentService
         }
 
         $displayTitle = $title ?: ($fileData['name'] ?? $filename);
+        $publicPath = "/uploads/team_documents/{$tenantId}/{$groupId}/{$filename}";
 
         $id = DB::table('team_documents')->insertGetId([
             'group_id' => $groupId,
             'tenant_id' => $tenantId,
             'title' => $displayTitle,
-            'file_path' => $destPath,
+            'file_path' => $publicPath,
             'file_type' => $mimeType,
             'file_size' => (int) $fileSize,
             'uploaded_by' => $userId,

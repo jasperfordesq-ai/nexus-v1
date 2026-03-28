@@ -20,10 +20,12 @@ return new class extends Migration
                 $table->id();
                 $table->string('event_id', 255);
                 $table->string('event_type', 100);
+                $table->string('status', 20)->default('processing'); // processing, processed, failed
                 $table->timestamp('processed_at')->useCurrent();
 
                 $table->unique('event_id', 'uk_event_id');
                 $table->index('event_type', 'idx_event_type');
+                $table->index('status', 'idx_status');
             });
         }
     }

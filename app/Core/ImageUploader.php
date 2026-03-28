@@ -55,6 +55,15 @@ class ImageUploader
         if ($imageInfo === false) {
             throw new \Exception("File is not a valid image.");
         }
+
+        // Decompression bomb protection — reject images with extreme pixel counts
+        // A 10000x10000 RGBA image = 400MB in memory; limit to ~25 megapixels
+        $maxPixels = 25000000; // 25 megapixels (e.g. 5000x5000)
+        $pixelCount = ($imageInfo[0] ?? 0) * ($imageInfo[1] ?? 0);
+        if ($pixelCount > $maxPixels) {
+            throw new \Exception("Image dimensions too large ({$imageInfo[0]}x{$imageInfo[1]}). Maximum 25 megapixels allowed.");
+        }
+
         if ($file['size'] > self::$maxSize) {
             throw new \Exception("File too large. Max 8MB.");
         }

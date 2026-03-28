@@ -19,8 +19,21 @@ if (file_exists(__DIR__ . '/../.maintenance')) {
         // CORS headers must be sent here — without them the browser blocks the
         // 503 response entirely (CORS violation) and the React frontend never
         // sees the status code, so the maintenance page is never shown.
+        // SECURITY: Only reflect known origins, not arbitrary ones (open CORS reflection
+        // with Allow-Credentials is a vulnerability even on a 503 page).
         $origin = $_SERVER['HTTP_ORIGIN'] ?? '';
-        if ($origin !== '') {
+        $allowedOrigins = [
+            'https://app.project-nexus.ie',
+            'https://hour-timebank.ie',
+            'https://www.hour-timebank.ie',
+            'https://timebank.global',
+            'https://www.timebank.global',
+            'https://nexuscivic.ie',
+            'https://www.nexuscivic.ie',
+            'http://localhost:5173',
+            'http://localhost:3000',
+        ];
+        if ($origin !== '' && in_array($origin, $allowedOrigins, true)) {
             header('Access-Control-Allow-Origin: ' . $origin);
             header('Access-Control-Allow-Credentials: true');
             header('Vary: Origin');

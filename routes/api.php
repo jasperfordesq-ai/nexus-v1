@@ -31,12 +31,10 @@ Route::pattern('id', '[0-9]+');
 // ==========================================================================
 
 // Health check -- confirms Laravel routing is operational
+// NOTE: Do NOT expose framework version or tenant_id — this endpoint is public.
 Route::get('/laravel/health', function () {
     return response()->json([
         'status' => 'ok',
-        'framework' => 'laravel',
-        'version' => app()->version(),
-        'tenant_id' => \App\Core\TenantContext::getId(),
     ]);
 });
 

@@ -142,8 +142,10 @@ class IdenfyProvider implements IdentityVerificationProviderInterface
 
         $signature = $headers['Idenfy-Signature'] ?? $headers['idenfy-signature'] ?? '';
         if (!$signature) {
-            // iDenfy uses basic auth for webhook verification in some setups
-            return true;
+            // SECURITY: Reject webhooks without a signature header.
+            // If iDenfy is configured with basic auth instead of HMAC, that should
+            // be handled at the HTTP/reverse-proxy level, not by skipping verification.
+            return false;
         }
 
         $expectedSignature = hash_hmac('sha256', $rawBody, $secret);

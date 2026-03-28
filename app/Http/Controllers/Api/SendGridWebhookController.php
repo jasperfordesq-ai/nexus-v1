@@ -81,6 +81,11 @@ class SendGridWebhookController extends BaseApiController
                 if (!hash_equals($expectedSecret, (string) $providedSecret)) {
                     return $this->respondWithError('UNAUTHORIZED', 'Invalid webhook secret', null, 401);
                 }
+            } else {
+                // SECURITY: If neither ECDSA key nor shared secret is configured,
+                // reject all requests. Never accept unauthenticated webhooks.
+                Log::error('SendGrid webhook: No authentication configured (set SENDGRID_WEBHOOK_VERIFICATION_KEY or SENDGRID_WEBHOOK_SECRET)');
+                return $this->respondWithError('UNAUTHORIZED', 'Webhook authentication not configured', null, 401);
             }
         }
 

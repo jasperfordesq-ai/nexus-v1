@@ -64,16 +64,23 @@ class StripeWebhookController extends BaseApiController
             ->where('event_id', $eventId)
             ->first();
 
-        if ($existing) {
+        if ($existing && $existing->status === 'processed') {
             return $this->respondWithData(['received' => true]);
         }
 
-        // Record the event for idempotency
-        DB::table('stripe_webhook_events')->insert([
-            'event_id' => $eventId,
-            'event_type' => $event->type,
-            'processed_at' => now(),
-        ]);
+        // Record the event as "processing" for idempotency (or update if retrying a failed event)
+        if ($existing) {
+            DB::table('stripe_webhook_events')
+                ->where('event_id', $eventId)
+                ->update(['status' => 'processing', 'processed_at' => now()]);
+        } else {
+            DB::table('stripe_webhook_events')->insert([
+                'event_id' => $eventId,
+                'event_type' => $event->type,
+                'status' => 'processing',
+                'processed_at' => now(),
+            ]);
+        }
 
         // Dispatch to the appropriate handler
         try {
@@ -89,6 +96,11 @@ class StripeWebhookController extends BaseApiController
                 default => Log::info("Stripe webhook: unhandled event type {$event->type}"),
             };
         } catch (\Exception $e) {
+            // Mark as failed so Stripe retries can be re-processed
+            DB::table('stripe_webhook_events')
+                ->where('event_id', $eventId)
+                ->update(['status' => 'failed']);
+
             Log::error("Stripe webhook handler error for {$event->type}", [
                 'event_id' => $eventId,
                 'error' => $e->getMessage(),
@@ -101,6 +113,11 @@ class StripeWebhookController extends BaseApiController
                 500
             );
         }
+
+        // Mark as successfully processed
+        DB::table('stripe_webhook_events')
+            ->where('event_id', $eventId)
+            ->update(['status' => 'processed']);
 
         return $this->respondWithData(['received' => true]);
     }

@@ -133,6 +133,18 @@ class PostMediaService
                 }
                 $width = $imageInfo[0];
                 $height = $imageInfo[1];
+
+                // Decompression bomb protection — reject images with extreme pixel counts
+                // A 10000x10000 RGBA image = 400MB in memory
+                $maxPixels = 25000000; // 25 megapixels
+                if (($width * $height) > $maxPixels) {
+                    Log::warning("PostMediaService: Image too large in pixels", [
+                        'post_id' => $postId,
+                        'width' => $width,
+                        'height' => $height,
+                    ]);
+                    continue;
+                }
             }
 
             // Determine extension
@@ -455,10 +467,22 @@ class PostMediaService
 
     /**
      * Delete a file from disk given a public URL path.
+     * Uses realpath() to prevent path traversal attacks.
      */
     private function deleteFileFromDisk(string $urlPath): void
     {
-        $fullPath = base_path('httpdocs' . $urlPath);
+        if (empty($urlPath) || !str_starts_with($urlPath, '/uploads/')) {
+            return;
+        }
+
+        $uploadsDir = realpath(base_path('httpdocs/uploads'));
+        $fullPath = realpath(base_path('httpdocs' . $urlPath));
+
+        // Ensure the resolved path is within the uploads directory
+        if (!$fullPath || !$uploadsDir || !str_starts_with($fullPath, $uploadsDir)) {
+            return;
+        }
+
         if (file_exists($fullPath)) {
             @unlink($fullPath);
         }

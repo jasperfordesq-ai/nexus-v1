@@ -1,14 +1,17 @@
-# robots.txt for hour-timebank.ie
-# Last updated: 2026-01-14
+# robots.txt for api.project-nexus.ie (PHP API backend)
+# Last updated: 2026-03-28
 
 User-agent: *
 Allow: /
 
 # Block admin and private areas
 Disallow: /admin/
+Disallow: /admin-legacy/
 Disallow: /super-admin/
 Disallow: /cron/
 Disallow: /api/
+Disallow: /laravel/health
+Disallow: /health.php
 
 # Block user-specific pages (not useful for search)
 Disallow: /login
@@ -50,5 +53,4 @@ Disallow: /
 User-agent: Applebot-Extended
 Disallow: /
 
-# Sitemap
-Sitemap: https://hour-timebank.ie/sitemap.xml
+# Sitemap — API backend has no sitemap; the frontend app and sales site have their own robots.txt

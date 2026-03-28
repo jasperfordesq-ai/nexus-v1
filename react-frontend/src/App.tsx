@@ -278,10 +278,6 @@ function AppRoutes() {
         {/* Explore / Discover — curated discovery page */}
         <Route path="explore" element={<ErrorBoundary><ExplorePage /></ErrorBoundary>} />
 
-        {/* Matches — cross-module matches page (MA1) */}
-        <Route path="matches" element={<ErrorBoundary><MatchesPage /></ErrorBoundary>} />
-        <Route path="matches/preferences" element={<Navigate to="settings" replace />} />
-
         {/* Tenant 2 (hOUR Timebank) specific pages — redirect other tenants to /about */}
         <Route path="partner" element={<ErrorBoundary><TenantSlugGate slug="hour-timebank"><PartnerPage /></TenantSlugGate></ErrorBoundary>} />
         <Route path="social-prescribing" element={<ErrorBoundary><TenantSlugGate slug="hour-timebank"><SocialPrescribingPage /></TenantSlugGate></ErrorBoundary>} />
@@ -923,6 +919,10 @@ function AppRoutes() {
               </FeatureErrorBoundary>
             </FeatureGate>
           } />
+
+          {/* Matches — cross-module matches page (MA1, requires auth) */}
+          <Route path="matches" element={<ErrorBoundary><MatchesPage /></ErrorBoundary>} />
+          <Route path="matches/preferences" element={<Navigate to="settings" replace />} />
         </Route>
       </Route>
 

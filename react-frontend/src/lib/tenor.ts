@@ -66,6 +66,7 @@ export async function searchGifs(query: string, limit = 20): Promise<TenorGif[]>
     const params = new URLSearchParams({
       q: query,
       key,
+      client_key: 'project_nexus',
       limit: String(limit),
       media_filter: 'gif,tinygif',
     });
@@ -97,6 +98,7 @@ export async function featured(limit = 20): Promise<TenorGif[]> {
   try {
     const params = new URLSearchParams({
       key,
+      client_key: 'project_nexus',
       limit: String(limit),
       media_filter: 'gif,tinygif',
     });

@@ -84,17 +84,17 @@ class UserInsuranceController extends BaseApiController
             }
 
             // Store file — derive extension from validated MIME type (not user filename)
-            $uploadDir = "uploads/insurance/{$tenantId}/{$userId}";
+            $uploadDir = base_path("httpdocs/uploads/insurance/{$tenantId}/{$userId}");
             $extMap = ['application/pdf' => 'pdf', 'image/jpeg' => 'jpg', 'image/png' => 'png'];
             $ext = $extMap[$mimeType] ?? 'bin';
-            $filename = 'cert_' . time() . '_' . bin2hex(random_bytes(4)) . '.' . $ext;
+            $filename = 'cert_' . time() . '_' . bin2hex(random_bytes(8)) . '.' . $ext;
 
             if (!is_dir($uploadDir)) {
                 mkdir($uploadDir, 0755, true);
             }
 
             $file->move($uploadDir, $filename);
-            $filePath = "{$uploadDir}/{$filename}";
+            $filePath = "/uploads/insurance/{$tenantId}/{$userId}/{$filename}";
         }
 
         try {

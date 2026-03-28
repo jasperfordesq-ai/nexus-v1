@@ -237,8 +237,14 @@ class WebhookDispatchService
         $tenantId = TenantContext::getId();
 
         // Validate URL if provided
-        if (isset($data['url']) && !filter_var($data['url'], FILTER_VALIDATE_URL)) {
-            throw new \InvalidArgumentException('A valid webhook URL is required.');
+        if (isset($data['url'])) {
+            if (!filter_var($data['url'], FILTER_VALIDATE_URL)) {
+                throw new \InvalidArgumentException('A valid webhook URL is required.');
+            }
+            // SSRF protection: reject URLs targeting private/internal IPs at update time
+            if (self::isPrivateUrl($data['url'])) {
+                throw new \InvalidArgumentException('Webhook URL must not target private or internal IP addresses.');
+            }
         }
 
         $updateData = [];
@@ -411,6 +417,12 @@ class WebhookDispatchService
                     ->first();
 
                 if (!$webhook) {
+                    continue;
+                }
+
+                // SSRF protection: re-check on retry (DNS rebinding defense)
+                if (self::isPrivateUrl($webhook->url)) {
+                    Log::warning('WebhookDispatchService: SSRF blocked on retry — private URL', ['url' => $webhook->url]);
                     continue;
                 }
 

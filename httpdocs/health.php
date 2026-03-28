@@ -11,11 +11,10 @@
 
 header('Content-Type: application/json');
 
-// Basic checks
+// Basic checks — do NOT expose php_version or internal details to the public internet
 $health = [
     'status' => 'healthy',
     'timestamp' => date('c'),
-    'php_version' => PHP_VERSION,
 ];
 
 // Check database connection (optional)

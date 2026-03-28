@@ -780,8 +780,24 @@ class StoryService
      */
     public function uploadMedia(\Illuminate\Http\UploadedFile $file, int $tenantId, int $userId): string
     {
+        // Defense-in-depth: validate even though controller already checks
+        $allowedMimes = [
+            'image/jpeg', 'image/png', 'image/gif', 'image/webp',
+            'video/mp4', 'video/webm', 'video/ogg', 'video/quicktime',
+        ];
+        $detectedMime = $file->getMimeType();
+        if (!in_array($detectedMime, $allowedMimes, true)) {
+            throw new \RuntimeException('Invalid media type: ' . ($detectedMime ?? 'unknown'));
+        }
+
         $dir = "uploads/stories/{$tenantId}/{$userId}";
-        $filename = uniqid('story_') . '_' . time() . '.' . $file->getClientOriginalExtension();
+        // Derive extension from validated MIME type (not user-supplied filename)
+        $extMap = [
+            'image/jpeg' => 'jpg', 'image/png' => 'png', 'image/gif' => 'gif', 'image/webp' => 'webp',
+            'video/mp4' => 'mp4', 'video/webm' => 'webm', 'video/ogg' => 'ogg', 'video/quicktime' => 'mov',
+        ];
+        $ext = $extMap[$detectedMime] ?? 'bin';
+        $filename = 'story_' . bin2hex(random_bytes(16)) . '.' . $ext;
 
         // Store in httpdocs/ (Apache document root), not public/ (Laravel default)
         $targetDir = base_path("httpdocs/{$dir}");
