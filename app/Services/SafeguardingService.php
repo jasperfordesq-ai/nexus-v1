@@ -403,6 +403,9 @@ class SafeguardingService
                 'title' => $data['title'] ?? '',
             ]);
 
+            // Notify all admins/brokers of new incident (legally required for high/critical)
+            $this->notifyAdminsOfIncident($tenantId, $reporterId, $id, $data['title'] ?? '', $severity, $incidentType);
+
             return $record ? (array) $record : [];
         } catch (\Throwable $e) {
             Log::error('SafeguardingService::reportIncident error: ' . $e->getMessage());
@@ -554,12 +557,29 @@ class SafeguardingService
 
             $updates['updated_at'] = now();
 
+            // Get current incident state for comparison
+            $currentIncident = DB::table('vol_safeguarding_incidents')
+                ->where('id', $incidentId)
+                ->where('tenant_id', $tenantId)
+                ->first();
+
             DB::table('vol_safeguarding_incidents')
                 ->where('id', $incidentId)
                 ->where('tenant_id', $tenantId)
                 ->update($updates);
 
             $this->logActivity($adminId, 'safeguarding_incident_updated', 'safeguarding_incident', $incidentId, $updates);
+
+            // Notify reporter and assigned DLP of status changes
+            if (isset($data['status']) && $currentIncident) {
+                $this->notifyIncidentStatusChange(
+                    $tenantId,
+                    $incidentId,
+                    (int) $currentIncident->reported_by,
+                    $currentIncident->assigned_to ? (int) $currentIncident->assigned_to : null,
+                    $data['status']
+                );
+            }
 
             return true;
         } catch (\Throwable $e) {
@@ -574,6 +594,29 @@ class SafeguardingService
     public function assignDlp(int $incidentId, int $dlpUserId, int $adminId, int $tenantId): bool
     {
         try {
+            // Validate the DLP user exists in this tenant and has an appropriate role
+            $dlpUser = User::where('id', $dlpUserId)
+                ->where('tenant_id', $tenantId)
+                ->where('status', 'active')
+                ->first();
+
+            if (!$dlpUser) {
+                Log::warning('SafeguardingService::assignDlp: DLP user not found in tenant', [
+                    'dlp_user_id' => $dlpUserId, 'tenant_id' => $tenantId,
+                ]);
+                return false;
+            }
+
+            // Verify the incident exists
+            $incident = DB::table('vol_safeguarding_incidents')
+                ->where('id', $incidentId)
+                ->where('tenant_id', $tenantId)
+                ->first();
+
+            if (!$incident) {
+                return false;
+            }
+
             DB::table('vol_safeguarding_incidents')
                 ->where('id', $incidentId)
                 ->where('tenant_id', $tenantId)
@@ -581,10 +624,126 @@ class SafeguardingService
                     'assigned_to' => $dlpUserId,
                     'updated_at' => now(),
                 ]);
+
+            $this->logActivity($adminId, 'safeguarding_dlp_assigned', 'safeguarding_incident', $incidentId, [
+                'dlp_user_id' => $dlpUserId,
+            ]);
+
+            // Notify the assigned DLP
+            try {
+                \App\Models\Notification::create([
+                    'tenant_id' => $tenantId,
+                    'user_id' => $dlpUserId,
+                    'type' => 'safeguarding_assignment',
+                    'message' => "You have been assigned as the Designated Liaison Person for safeguarding incident #{$incidentId}",
+                    'link' => '/admin/safeguarding',
+                    'is_read' => false,
+                ]);
+            } catch (\Throwable $notifError) {
+                Log::warning('SafeguardingService::assignDlp: failed to notify DLP', ['error' => $notifError->getMessage()]);
+            }
+
             return true;
         } catch (\Throwable $e) {
             Log::error('SafeguardingService::assignDlp error: ' . $e->getMessage());
             return false;
+        }
+    }
+
+    // =========================================================================
+    // INCIDENT NOTIFICATIONS
+    // =========================================================================
+
+    /**
+     * Notify all admins/brokers of a new safeguarding incident.
+     */
+    private function notifyAdminsOfIncident(int $tenantId, int $reporterId, int $incidentId, string $title, string $severity, string $type): void
+    {
+        try {
+            $reporter = User::find($reporterId);
+            $reporterName = $reporter ? trim(($reporter->first_name ?? '') . ' ' . ($reporter->last_name ?? '')) : 'A member';
+
+            $staffUsers = DB::select(
+                "SELECT id, email FROM users WHERE tenant_id = ? AND role IN ('admin', 'tenant_admin', 'broker', 'super_admin') AND status = 'active'",
+                [$tenantId]
+            );
+
+            $severityLabel = strtoupper($severity);
+            $message = "[{$severityLabel}] Safeguarding incident reported by {$reporterName}: {$title}";
+
+            foreach ($staffUsers as $staff) {
+                \App\Models\Notification::create([
+                    'tenant_id' => $tenantId,
+                    'user_id' => $staff->id,
+                    'type' => 'safeguarding_flag',
+                    'message' => $message,
+                    'link' => '/admin/safeguarding',
+                    'is_read' => false,
+                ]);
+
+                // Send email for high/critical incidents
+                if (in_array($severity, ['high', 'critical']) && !empty($staff->email)) {
+                    try {
+                        $emailService = app(\App\Services\EmailService::class);
+                        $emailService->send(
+                            $staff->email,
+                            "[NEXUS] {$severityLabel} Safeguarding Incident — {$title}",
+                            "A {$severity} safeguarding incident ({$type}) has been reported by {$reporterName}.\n\n"
+                            . "Title: {$title}\n"
+                            . "Severity: {$severityLabel}\n\n"
+                            . "Please review this immediately in the admin panel.\n"
+                            . "This is an automated notification from the platform safeguarding system.\n"
+                        );
+                    } catch (\Throwable $emailError) {
+                        Log::error('SafeguardingService: failed to email admin about incident', [
+                            'staff_id' => $staff->id, 'error' => $emailError->getMessage(),
+                        ]);
+                    }
+                }
+            }
+        } catch (\Throwable $e) {
+            Log::error('SafeguardingService::notifyAdminsOfIncident error: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Notify reporter and DLP when an incident status changes.
+     */
+    private function notifyIncidentStatusChange(int $tenantId, int $incidentId, int $reporterId, ?int $dlpUserId, string $newStatus): void
+    {
+        try {
+            $statusLabels = [
+                'open' => 'opened',
+                'investigating' => 'under investigation',
+                'resolved' => 'resolved',
+                'closed' => 'closed',
+            ];
+            $label = $statusLabels[$newStatus] ?? $newStatus;
+            $message = "Your safeguarding incident #{$incidentId} has been marked as {$label}";
+
+            // Notify reporter
+            \App\Models\Notification::create([
+                'tenant_id' => $tenantId,
+                'user_id' => $reporterId,
+                'type' => 'safeguarding_flag',
+                'message' => $message,
+                'link' => '/safeguarding/incidents',
+                'is_read' => false,
+            ]);
+
+            // Notify assigned DLP if different from reporter
+            if ($dlpUserId && $dlpUserId !== $reporterId) {
+                \App\Models\Notification::create([
+                    'tenant_id' => $tenantId,
+                    'user_id' => $dlpUserId,
+                    'type' => 'safeguarding_assignment',
+                    'message' => "Safeguarding incident #{$incidentId} status changed to {$label}",
+                    'link' => '/admin/safeguarding',
+                    'is_read' => false,
+                ]);
+            }
+        } catch (\Throwable $e) {
+            Log::error('SafeguardingService::notifyIncidentStatusChange error: ' . $e->getMessage());
         }
     }
 

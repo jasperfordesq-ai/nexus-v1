@@ -123,6 +123,7 @@ class VettingService
             $query = DB::table('vetting_records')
                 ->join('users', 'vetting_records.user_id', '=', 'users.id')
                 ->where('vetting_records.tenant_id', $tenantId)
+                ->whereNull('vetting_records.deleted_at')
                 ->select([
                     'vetting_records.*',
                     'users.first_name', 'users.last_name', 'users.email',
@@ -293,8 +294,20 @@ class VettingService
     {
         $tenantId = TenantContext::getId();
 
-        $allowed = ['reference_number', 'issue_date', 'expiry_date', 'notes', 'document_url'];
+        $allowed = [
+            'reference_number', 'issue_date', 'expiry_date', 'notes', 'document_url',
+            'status', 'vetting_type',
+            'works_with_children', 'works_with_vulnerable_adults', 'requires_enhanced_check',
+        ];
         $updates = collect($data)->only($allowed)->all();
+
+        // Cast booleans to int for DB storage
+        foreach (['works_with_children', 'works_with_vulnerable_adults', 'requires_enhanced_check'] as $boolField) {
+            if (array_key_exists($boolField, $updates)) {
+                $updates[$boolField] = (int) $updates[$boolField];
+            }
+        }
+
         $updates['updated_at'] = now();
 
         $affected = DB::table('vetting_records')
@@ -371,16 +384,19 @@ class VettingService
     }
 
     /**
-     * Delete a vetting record.
+     * Soft-delete a vetting record (preserves audit trail for legal compliance).
+     *
+     * Vetting records (DBS checks, Garda vetting) are legally-mandated documents
+     * that must be retained. Hard deletion would destroy the audit trail.
      */
     public function delete(int $id): bool
     {
         $tenantId = TenantContext::getId();
 
-        // Get user_id before deletion for status sync
         $record = DB::table('vetting_records')
             ->where('id', $id)
             ->where('tenant_id', $tenantId)
+            ->whereNull('deleted_at')
             ->first();
 
         if (!$record) {
@@ -390,7 +406,11 @@ class VettingService
         $affected = DB::table('vetting_records')
             ->where('id', $id)
             ->where('tenant_id', $tenantId)
-            ->delete();
+            ->update([
+                'deleted_at' => now(),
+                'status' => 'revoked',
+                'updated_at' => now(),
+            ]);
 
         if ($affected > 0) {
             $this->syncUserVettingStatus((int) $record->user_id);

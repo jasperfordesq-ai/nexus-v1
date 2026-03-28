@@ -128,6 +128,27 @@ class OnboardingController extends BaseApiController
                 );
             }
 
+            // Validate safeguarding step completion if required
+            $steps = OnboardingConfigService::getActiveSteps($tenantId);
+            $safeguardingStep = collect($steps)->firstWhere('key', 'safeguarding');
+            if ($safeguardingStep && ($safeguardingStep['is_required'] ?? false)) {
+                $hasPreferences = DB::table('user_safeguarding_preferences')
+                    ->where('tenant_id', $tenantId)
+                    ->where('user_id', $userId)
+                    ->whereNull('revoked_at')
+                    ->exists();
+
+                if (!$hasPreferences) {
+                    DB::rollback();
+                    return $this->respondWithError(
+                        'VALIDATION_REQUIRED_STEP',
+                        'The safeguarding step must be completed before finishing onboarding',
+                        'safeguarding',
+                        422
+                    );
+                }
+            }
+
             $this->onboardingService->saveInterests($userId, $interests);
             $this->onboardingService->saveSkills($userId, $offers, $needs);
             $listingIds = $this->onboardingService->autoCreateListings($userId, $offers, $needs);

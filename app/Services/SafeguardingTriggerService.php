@@ -162,8 +162,8 @@ class SafeguardingTriggerService
                         if ($key === 'works_with_vulnerable_adults') {
                             $updates['works_with_vulnerable_adults'] = true;
                         }
-                        if ($key === 'requires_home_visits') {
-                            $updates['requires_home_visits'] = true;
+                        if ($key === 'no_home_visits') {
+                            $updates['no_home_visits'] = true;
                         }
                     }
                 }

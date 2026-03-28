@@ -410,7 +410,7 @@ class BrokerMessageVisibilityService
     private function getTenantBrokerAdminIds(): array
     {
         return User::where('tenant_id', TenantContext::getId())
-            ->whereIn('role', ['admin', 'tenant_admin', 'super_admin'])
+            ->whereIn('role', ['admin', 'tenant_admin', 'broker', 'super_admin'])
             ->where('status', 'active')
             ->pluck('id')
             ->map(fn ($id) => (int) $id)

@@ -29,6 +29,7 @@ class NotificationService
         'groups'       => ['group_invite', 'group_join', 'group_post', 'federation_group_join'],
         'listings'     => ['listing', 'listing_interest', 'listing_match', 'listing_expiry', 'hot_match', 'mutual_match'],
         'jobs'         => ['job_application', 'job_application_status'],
+        'safeguarding' => ['safeguarding_flag', 'safeguarding_assignment', 'broker_review', 'safeguarding_incident'],
         'system'       => ['system', 'announcement', 'welcome', 'badge', 'achievement', 'level_up'],
     ];
 

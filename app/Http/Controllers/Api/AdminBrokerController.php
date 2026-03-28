@@ -178,7 +178,7 @@ class AdminBrokerController extends BaseApiController
             $actParams = $effectiveTenantId !== null ? [$effectiveTenantId] : [];
             $recentActivity = DB::select(
                 "SELECT al.*, u.first_name, u.last_name, t.name as tenant_name
-                 FROM activity_logs al
+                 FROM activity_log al
                  LEFT JOIN users u ON u.id = al.user_id
                  LEFT JOIN tenants t ON al.tenant_id = t.id
                  WHERE {$actWhere} AND al.action_type IN (
