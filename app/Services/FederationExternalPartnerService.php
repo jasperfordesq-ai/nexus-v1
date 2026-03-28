@@ -24,7 +24,7 @@ class FederationExternalPartnerService
     /**
      * Valid status values for external partners.
      */
-    private const VALID_STATUSES = ['active', 'inactive', 'suspended', 'error'];
+    private const VALID_STATUSES = ['pending', 'active', 'suspended', 'failed'];
 
     /**
      * Credential fields that must be encrypted at rest.
@@ -147,8 +147,10 @@ class FederationExternalPartnerService
                 "INSERT INTO federation_external_partners
                  (tenant_id, name, description, base_url, api_path, api_key, auth_method,
                   signing_secret, oauth_client_id, oauth_client_secret, oauth_token_url,
+                  allow_member_search, allow_listing_search, allow_messaging,
+                  allow_transactions, allow_events, allow_groups,
                   status, created_by, created_at)
-                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'pending', ?, NOW())",
+                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'pending', ?, NOW())",
                 [
                     $tenantId,
                     $data['name'],
@@ -161,6 +163,12 @@ class FederationExternalPartnerService
                     $data['oauth_client_id'] ?? null,
                     $oauthClientSecret,
                     $data['oauth_token_url'] ?? null,
+                    (int) ($data['allow_member_search'] ?? 1),
+                    (int) ($data['allow_listing_search'] ?? 1),
+                    (int) ($data['allow_messaging'] ?? 1),
+                    (int) ($data['allow_transactions'] ?? 1),
+                    (int) ($data['allow_events'] ?? 0),
+                    (int) ($data['allow_groups'] ?? 0),
                     $userId,
                 ]
             );

@@ -31,6 +31,7 @@ class VolDonation extends Model
         'is_anonymous',
         'status',
         'created_at',
+        'stripe_payment_intent_id',
     ];
 
     protected $casts = [

@@ -219,16 +219,17 @@ class FederationExternalApiClient
         if ($lastException) {
             self::recordFailure($partnerId);
             $errorMsg = 'Request failed: ' . $lastException->getMessage();
-            self::logApiCall($partnerId, $endpoint, $method, 0, false, $elapsed, $errorMsg);
+            self::logApiCall($partnerId, $endpoint, $method, 0, false, $elapsed, $errorMsg, $body ?: null);
             return ['success' => false, 'error' => $errorMsg, 'status_code' => 0];
         }
 
         $statusCode = $lastResponse->status();
+        $rawResponseBody = $lastResponse->body();
 
         if ($lastResponse->successful()) {
             self::recordSuccess($partnerId);
             $responseData = $lastResponse->json() ?? [];
-            self::logApiCall($partnerId, $endpoint, $method, $statusCode, true, $elapsed);
+            self::logApiCall($partnerId, $endpoint, $method, $statusCode, true, $elapsed, null, $body ?: null, $rawResponseBody);
             return ['success' => true, 'data' => $responseData, 'status_code' => $statusCode];
         }
 
@@ -236,7 +237,7 @@ class FederationExternalApiClient
         self::recordFailure($partnerId);
         $errorBody = $lastResponse->json('message') ?? $lastResponse->body();
         $errorMsg = "HTTP {$statusCode}: " . (is_string($errorBody) ? substr($errorBody, 0, 500) : json_encode($errorBody));
-        self::logApiCall($partnerId, $endpoint, $method, $statusCode, false, $elapsed, $errorMsg);
+        self::logApiCall($partnerId, $endpoint, $method, $statusCode, false, $elapsed, $errorMsg, $body ?: null, $rawResponseBody);
 
         return ['success' => false, 'error' => $errorMsg, 'status_code' => $statusCode];
     }
@@ -306,9 +307,15 @@ class FederationExternalApiClient
      */
     private static function generateHmacSignature(string $secret, string $method, string $url, string $timestamp, string $body): string
     {
+        // Use path + query string (not full URL) to match the inbound middleware's
+        // verifyHmacSignature() which uses $_SERVER['REQUEST_URI'] (path only).
+        $path = parse_url($url, PHP_URL_PATH) ?? '/';
+        $query = parse_url($url, PHP_URL_QUERY);
+        $pathWithQuery = $query ? $path . '?' . $query : $path;
+
         $stringToSign = implode("\n", [
             strtoupper($method),
-            $url,
+            $pathWithQuery,
             $timestamp,
             $body,
         ]);
@@ -439,14 +446,18 @@ class FederationExternalApiClient
         int $statusCode,
         bool $success,
         float $responseTime,
-        ?string $errorMessage = null
+        ?string $errorMessage = null,
+        ?string $requestBody = null,
+        ?string $responseBody = null
     ): void {
         try {
             DB::table('federation_external_partner_logs')->insert([
                 'partner_id' => $partnerId,
                 'endpoint' => substr($endpoint, 0, 500),
                 'method' => strtoupper($method),
+                'request_body' => $requestBody ? substr($requestBody, 0, 10000) : null,
                 'response_code' => $statusCode ?: null,
+                'response_body' => $responseBody ? substr($responseBody, 0, 10000) : null,
                 'response_time_ms' => (int) round($responseTime),
                 'success' => $success ? 1 : 0,
                 'error_message' => $errorMessage ? substr($errorMessage, 0, 65535) : null,

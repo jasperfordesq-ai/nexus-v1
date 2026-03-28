@@ -47,7 +47,8 @@
         "rubix/ml": "^2.0",
         "sendgrid/sendgrid": "^8.1",
         "sentry/sentry": "^4.0",
-        "spomky-labs/otphp": "^11.4"
+        "spomky-labs/otphp": "^11.4",
+        "stripe/stripe-php": "^16.0"
     },
     "require-dev": {
         "brianium/paratest": "^7.4",

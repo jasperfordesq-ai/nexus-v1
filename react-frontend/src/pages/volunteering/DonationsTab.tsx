@@ -39,6 +39,7 @@ import { EmptyState } from '@/components/feedback';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
 import { useToast } from '@/contexts';
+import { DonationCheckout } from '@/components/donations/DonationCheckout';
 
 /* ───────────────────────── Types ───────────────────────── */
 
@@ -107,6 +108,12 @@ export function DonationsTab() {
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
+  const {
+    isOpen: isCheckoutOpen,
+    onOpen: onCheckoutOpen,
+    onClose: onCheckoutClose,
+  } = useDisclosure();
+  const [checkoutGivingDayId, setCheckoutGivingDayId] = useState<number | undefined>();
   const toast = useToast();
 
   // AbortController ref to cancel stale requests
@@ -174,6 +181,11 @@ export function DonationsTab() {
   useEffect(() => {
     load();
   }, [load]);
+
+  const openStripeCheckout = (dayId?: number) => {
+    setCheckoutGivingDayId(dayId);
+    onCheckoutOpen();
+  };
 
   const openDonateModal = (dayId?: number) => {
     setForm({
@@ -254,6 +266,15 @@ export function DonationsTab() {
             onPress={() => openDonateModal()}
           >
             {t('donations.donate', 'Donate')}
+          </Button>
+          <Button
+            size="sm"
+            variant="bordered"
+            className="border-rose-500 text-rose-500"
+            startContent={<CreditCard className="w-4 h-4" aria-hidden="true" />}
+            onPress={() => openStripeCheckout()}
+          >
+            {t('donations.donate_with_card', 'Donate with Card')}
           </Button>
         </div>
       </div>
@@ -369,14 +390,25 @@ export function DonationsTab() {
                           </span>
                         </div>
                       </div>
-                      <Button
-                        size="sm"
-                        className="bg-gradient-to-r from-rose-500 to-pink-600 text-white flex-shrink-0"
-                        startContent={<Heart className="w-4 h-4" aria-hidden="true" />}
-                        onPress={() => openDonateModal(day.id)}
-                      >
-                        {t('donations.donate', 'Donate')}
-                      </Button>
+                      <div className="flex flex-col gap-2 flex-shrink-0">
+                        <Button
+                          size="sm"
+                          className="bg-gradient-to-r from-rose-500 to-pink-600 text-white"
+                          startContent={<Heart className="w-4 h-4" aria-hidden="true" />}
+                          onPress={() => openDonateModal(day.id)}
+                        >
+                          {t('donations.donate', 'Donate')}
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="bordered"
+                          className="border-rose-500 text-rose-500"
+                          startContent={<CreditCard className="w-4 h-4" aria-hidden="true" />}
+                          onPress={() => openStripeCheckout(day.id)}
+                        >
+                          {t('donations.donate_with_card', 'Donate with Card')}
+                        </Button>
+                      </div>
                     </div>
                   </GlassCard>
                 </motion.div>
@@ -438,6 +470,14 @@ export function DonationsTab() {
           </motion.div>
         </div>
       )}
+
+      {/* Stripe Checkout Modal */}
+      <DonationCheckout
+        isOpen={isCheckoutOpen}
+        onClose={onCheckoutClose}
+        givingDayId={checkoutGivingDayId}
+        onDonationComplete={load}
+      />
 
       {/* Donate Modal */}
       <Modal

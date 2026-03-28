@@ -27,6 +27,7 @@ interface SubscriptionItem {
   starts_at: string;
   expires_at: string;
   trial_ends_at: string | null;
+  stripe_subscription_id: string | null;
 }
 
 export function Subscriptions() {
@@ -113,6 +114,16 @@ export function Subscriptions() {
       render: (item) => (
         <span className="text-sm text-default-500">
           {item.trial_ends_at ? new Date(item.trial_ends_at).toLocaleDateString() : '--'}
+        </span>
+      ),
+    },
+    {
+      key: 'stripe_subscription_id',
+      label: t('content.stripe_subscription_id', 'Stripe ID'),
+      sortable: true,
+      render: (item) => (
+        <span className="text-xs text-default-400 font-mono">
+          {item.stripe_subscription_id || '--'}
         </span>
       ),
     },

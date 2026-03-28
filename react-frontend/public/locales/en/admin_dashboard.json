@@ -10,7 +10,6 @@
     "back": "Back",
     "next": "Next"
   },
-  "load_error": "Failed to load dashboard data",
   "stats": {
     "users_online": "Users Online",
     "active_sessions": "Active Sessions",
@@ -18,11 +17,7 @@
     "active_listings": "Active Listings",
     "transactions": "Transactions",
     "hours_exchanged": "Hours Exchanged",
-    "hours": "Hours",
-    "new_users_this_month": "New Users This Month",
-    "active_users": "Active Users",
-    "total_listings": "Total Listings",
-    "new_listings_this_month": "New Listings This Month"
+    "hours": "Hours"
   },
   "alerts": {
     "users_pending_one": "{{count}} User Pending",
@@ -33,9 +28,7 @@
     "listings_pending_text": "New listings awaiting moderation",
     "orgs_pending_one": "{{count}} Organization Pending",
     "orgs_pending_other": "{{count}} Organizations Pending",
-    "orgs_pending_text": "Volunteering organizations awaiting approval",
-    "pending_approvals": "Users awaiting approval",
-    "pending_listings": "Listings awaiting moderation"
+    "orgs_pending_text": "Volunteering organizations awaiting approval"
   },
   "modules": {
     "section_title": "Platform Modules",
@@ -82,11 +75,6 @@
     "subtitle": "Last 6 months activity",
     "dataset_label": "Hours Exchanged"
   },
-  "trends": {
-    "card_title": "Monthly Trends",
-    "hours_suffix": "hrs",
-    "no_data": "No trend data available"
-  },
   "quick_actions": {
     "card_title": "Quick Actions",
     "card_subtitle": "Common tasks",
@@ -95,9 +83,7 @@
     "send_newsletter": "Send Newsletter",
     "new_blog_post": "New Blog Post",
     "gamification": "Gamification",
-    "settings": "Settings",
-    "enterprise": "Enterprise",
-    "advanced_controls": "Advanced Controls"
+    "settings": "Settings"
   },
   "enterprise": {
     "card_title": "Enterprise Suite",

@@ -8,9 +8,11 @@ namespace App\Http\Controllers\Api;
 
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use App\Core\TenantContext;
 use App\Models\ActivityLog;
 use App\Services\RedisCache;
+use App\Services\StripeSubscriptionService;
 
 /**
  * AdminContentController -- Content moderation, pages, menus, plans, subscriptions.
@@ -700,9 +702,21 @@ class AdminContentController extends BaseApiController
              (int)($input['is_active'] ?? 1)]
         );
 
+        $newPlanId = (int) DB::getPdo()->lastInsertId();
+
+        // Sync to Stripe (non-blocking — don't fail plan creation if Stripe is unreachable)
+        try {
+            StripeSubscriptionService::syncPlanToStripe($newPlanId);
+        } catch (\Exception $e) {
+            Log::warning('Stripe sync failed after plan creation', [
+                'plan_id' => $newPlanId,
+                'error' => $e->getMessage(),
+            ]);
+        }
+
         $result = DB::selectOne(
             "SELECT id, name, slug, description, tier_level, features, allowed_layouts, max_menus, max_menu_items, price_monthly, price_yearly, is_active, created_at, updated_at
-             FROM pay_plans WHERE id = ?", [DB::getPdo()->lastInsertId()]
+             FROM pay_plans WHERE id = ?", [$newPlanId]
         );
 
         $plan = $result ? (array)$result : null;
@@ -752,6 +766,16 @@ class AdminContentController extends BaseApiController
 
         DB::update("UPDATE pay_plans SET " . implode(', ', $updates) . " WHERE id = ?", $params);
 
+        // Sync to Stripe (non-blocking — don't fail plan update if Stripe is unreachable)
+        try {
+            StripeSubscriptionService::syncPlanToStripe($id);
+        } catch (\Exception $e) {
+            Log::warning('Stripe sync failed after plan update', [
+                'plan_id' => $id,
+                'error' => $e->getMessage(),
+            ]);
+        }
+
         $result = DB::selectOne(
             "SELECT id, name, slug, description, tier_level, features, allowed_layouts, max_menus, max_menu_items, price_monthly, price_yearly, is_active, created_at, updated_at
              FROM pay_plans WHERE id = ?", [$id]
@@ -796,7 +820,8 @@ class AdminContentController extends BaseApiController
 
         $subscriptions = array_map(fn($r) => (array)$r, DB::select(
             "SELECT tpa.id, tpa.tenant_id, tpa.pay_plan_id, tpa.status, tpa.starts_at, tpa.expires_at,
-                    tpa.trial_ends_at, tpa.created_at, tpa.updated_at,
+                    tpa.trial_ends_at, tpa.stripe_subscription_id, tpa.stripe_current_period_end,
+                    tpa.created_at, tpa.updated_at,
                     pp.name AS plan_name, pp.slug AS plan_slug, pp.tier_level AS plan_tier_level,
                     t.name AS tenant_name
              FROM tenant_plan_assignments tpa

@@ -231,6 +231,12 @@ const SuperPartnerships = lazy(() => import('./modules/super/SuperPartnerships')
 const FederationAuditLog = lazy(() => import('./modules/super/FederationAuditLog'));
 const FederationTenantFeatures = lazy(() => import('./modules/super/FederationTenantFeatures'));
 
+// Billing module
+const BillingPage = lazy(() => import('./modules/billing/BillingPage'));
+const PlanSelector = lazy(() => import('./modules/billing/PlanSelector'));
+const InvoiceHistory = lazy(() => import('./modules/billing/InvoiceHistory'));
+const CheckoutReturn = lazy(() => import('./modules/billing/CheckoutReturn'));
+
 // Content module
 const PagesAdmin = lazy(() => import('./modules/content/PagesAdmin'));
 const PageBuilder = lazy(() => import('./modules/content/PageBuilder'));
@@ -348,6 +354,12 @@ export function AdminRoutes() {
       <Route path="seo/redirects" element={<Lazy><Redirects /></Lazy>} />
       <Route path="404-errors" element={<Lazy><Error404Tracking /></Lazy>} />
       <Route path="match-debug" element={<Lazy><MatchDebugPanel /></Lazy>} />
+
+      {/* ─── BILLING ─── */}
+      <Route path="billing" element={<Lazy><BillingPage /></Lazy>} />
+      <Route path="billing/plans" element={<Lazy><PlanSelector /></Lazy>} />
+      <Route path="billing/invoices" element={<Lazy><InvoiceHistory /></Lazy>} />
+      <Route path="billing/checkout-return" element={<Lazy><CheckoutReturn /></Lazy>} />
 
       {/* ─── FINANCIAL ─── */}
       <Route path="timebanking" element={<Lazy><TimebankingDashboard /></Lazy>} />

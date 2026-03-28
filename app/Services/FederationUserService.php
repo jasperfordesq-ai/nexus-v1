@@ -200,7 +200,7 @@ class FederationUserService
             }
 
             $control = DB::table('federation_system_control')
-                ->where('tenant_id', $user->tenant_id)
+                ->where('id', 1)
                 ->first();
 
             return $control && (bool) ($control->federation_enabled ?? false);

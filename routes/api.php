@@ -658,6 +658,10 @@ Route::post('/v2/stories/{id}/stickers', [\App\Http\Controllers\Api\StoryControl
 
 // ============================================
 
+// Stripe donation payment routes
+Route::post('/v2/donations/payment-intent', [\App\Http\Controllers\Api\DonationPaymentController::class, 'createPaymentIntent']);
+Route::get('/v2/donations/{id}/receipt', [\App\Http\Controllers\Api\DonationPaymentController::class, 'getDonationReceipt']);
+
 }); // End Route::middleware('auth:sanctum')
 
 // ============================================
@@ -1028,6 +1032,7 @@ Route::get('/v2/admin/volunteering/giving-days', [\App\Http\Controllers\Api\Volu
 Route::post('/v2/admin/volunteering/giving-days', [\App\Http\Controllers\Api\VolunteerCommunityController::class, 'createGivingDay']);
 Route::put('/v2/admin/volunteering/giving-days/{id}', [\App\Http\Controllers\Api\VolunteerCommunityController::class, 'updateGivingDay']);
 Route::get('/v2/admin/volunteering/donations/export', [\App\Http\Controllers\Api\VolunteerCommunityController::class, 'exportDonations']);
+Route::post('/v2/admin/donations/{id}/refund', [\App\Http\Controllers\Api\DonationPaymentController::class, 'adminRefund']);
 Route::get('/v2/admin/events', [\App\Http\Controllers\Api\AdminEventsController::class, 'index']);
 Route::get('/v2/admin/events/{id}', [\App\Http\Controllers\Api\AdminEventsController::class, 'show']);
 Route::delete('/v2/admin/events/{id}', [\App\Http\Controllers\Api\AdminEventsController::class, 'destroy']);
@@ -1131,6 +1136,11 @@ Route::get('/v2/admin/plans/{id}', [\App\Http\Controllers\Api\AdminContentContro
 Route::put('/v2/admin/plans/{id}', [\App\Http\Controllers\Api\AdminContentController::class, 'updatePlan']);
 Route::delete('/v2/admin/plans/{id}', [\App\Http\Controllers\Api\AdminContentController::class, 'deletePlan']);
 Route::get('/v2/admin/subscriptions', [\App\Http\Controllers\Api\AdminContentController::class, 'getSubscriptions']);
+// Billing — Stripe subscription management
+Route::get('/v2/admin/billing/subscription', [\App\Http\Controllers\Api\AdminBillingController::class, 'getSubscription']);
+Route::post('/v2/admin/billing/checkout', [\App\Http\Controllers\Api\AdminBillingController::class, 'createCheckoutSession']);
+Route::post('/v2/admin/billing/portal', [\App\Http\Controllers\Api\AdminBillingController::class, 'createPortalSession']);
+Route::get('/v2/admin/billing/invoices', [\App\Http\Controllers\Api\AdminBillingController::class, 'getInvoices']);
 Route::get('/v2/admin/tools/redirects', [\App\Http\Controllers\Api\AdminToolsController::class, 'getRedirects']);
 Route::post('/v2/admin/tools/redirects', [\App\Http\Controllers\Api\AdminToolsController::class, 'createRedirect']);
 Route::delete('/v2/admin/tools/redirects/{id}', [\App\Http\Controllers\Api\AdminToolsController::class, 'deleteRedirect']);
@@ -1712,3 +1722,9 @@ Route::post('/webhooks/sendgrid/events', [\App\Http\Controllers\Api\SendGridWebh
 // Identity verification provider webhooks (e.g., Onfido, Jumio)
 // Must be public — providers send callbacks without Sanctum tokens.
 Route::post('/v2/webhooks/identity/{provider_slug}', [\App\Http\Controllers\Api\IdentityWebhookController::class, 'handleWebhook'])->middleware('throttle:60,1');
+
+// Stripe webhook (no auth, no CSRF — signature verified in controller)
+Route::post('/v2/webhooks/stripe', [\App\Http\Controllers\Api\StripeWebhookController::class, 'handleWebhook'])->middleware('throttle:120,1');
+
+// Public billing — available plans (pricing page, no auth required)
+Route::get('/v2/billing/plans', [\App\Http\Controllers\Api\AdminBillingController::class, 'getPlansPublic']);

@@ -38,12 +38,12 @@ class FederationPartnershipService
         int $federationLevel = self::LEVEL_DISCOVERY,
         ?string $notes = null
     ): array {
-        $check = FederationFeatureService::isOperationAllowed('profiles', $requestingTenantId);
+        $check = app(FederationFeatureService::class)->isOperationAllowed('profiles', $requestingTenantId);
         if (!$check['allowed']) {
             return ['success' => false, 'error' => $check['reason']];
         }
 
-        $targetCheck = FederationFeatureService::isTenantFeatureEnabled(
+        $targetCheck = app(FederationFeatureService::class)->isTenantFeatureEnabled(
             FederationFeatureService::TENANT_APPEAR_IN_DIRECTORY,
             $targetTenantId
         );

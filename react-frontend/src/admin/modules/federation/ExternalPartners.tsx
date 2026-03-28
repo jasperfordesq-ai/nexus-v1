@@ -94,8 +94,6 @@ interface PartnerFormData {
   signing_secret: string;
   oauth_client_id: string;
   oauth_client_secret: string;
-  contact_email: string;
-  contact_name: string;
   allow_member_search: boolean;
   allow_listing_search: boolean;
   allow_messaging: boolean;
@@ -145,8 +143,6 @@ const EMPTY_FORM: PartnerFormData = {
   signing_secret: '',
   oauth_client_id: '',
   oauth_client_secret: '',
-  contact_email: '',
-  contact_name: '',
   allow_member_search: true,
   allow_listing_search: true,
   allow_messaging: false,
@@ -233,8 +229,6 @@ export function ExternalPartners() {
       signing_secret: '',
       oauth_client_id: '',
       oauth_client_secret: '',
-      contact_email: '',
-      contact_name: '',
       allow_member_search: partner.allow_member_search,
       allow_listing_search: partner.allow_listing_search,
       allow_messaging: partner.allow_messaging,
@@ -273,9 +267,6 @@ export function ExternalPartners() {
       if (form.signing_secret) payload.signing_secret = form.signing_secret;
       if (form.oauth_client_id) payload.oauth_client_id = form.oauth_client_id;
       if (form.oauth_client_secret) payload.oauth_client_secret = form.oauth_client_secret;
-      if (form.contact_email) payload.contact_email = form.contact_email;
-      if (form.contact_name) payload.contact_name = form.contact_name;
-
       let res;
       if (editingId) {
         res = await api.put(`/v2/admin/federation/external-partners/${editingId}`, payload);
@@ -580,21 +571,6 @@ export function ExternalPartners() {
                     />
                   </>
                 )}
-
-                {/* Contact fields */}
-                <div className="grid grid-cols-2 gap-4">
-                  <Input
-                    label={t('federation.label_contact_name', 'Contact Name')}
-                    value={form.contact_name}
-                    onValueChange={(v) => updateForm('contact_name', v)}
-                  />
-                  <Input
-                    label={t('federation.label_contact_email', 'Contact Email')}
-                    type="email"
-                    value={form.contact_email}
-                    onValueChange={(v) => updateForm('contact_email', v)}
-                  />
-                </div>
 
                 {/* Feature toggles */}
                 <div className="space-y-3 pt-2">

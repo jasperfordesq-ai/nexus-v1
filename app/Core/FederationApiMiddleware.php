@@ -76,7 +76,7 @@ class FederationApiMiddleware
             return false;
         }
 
-        $partnerId = $payload['_partner']['id'] ?? null;
+        $partnerId = $payload['sub'] ?? null;
 
         if (!$partnerId) {
             self::sendError(401, 'Token missing partner information', 'INVALID_TOKEN');
@@ -85,7 +85,7 @@ class FederationApiMiddleware
 
         // Verify partner is still active in DB (may have been revoked since token issuance)
         $dbPartner = DB::selectOne("
-            SELECT id, status FROM federation_api_keys
+            SELECT id, name, tenant_id, status, permissions FROM federation_api_keys
             WHERE id = ? AND status = 'active'
             AND (expires_at IS NULL OR expires_at > NOW())
         ", [$partnerId]);
@@ -98,12 +98,13 @@ class FederationApiMiddleware
 
         $partner = [
             'id' => $partnerId,
-            'tenant_id' => $payload['_partner']['tenant_id'],
-            'name' => $payload['_partner']['name'],
-            'permissions' => json_encode($payload['scope'] ?? []),
+            'tenant_id' => $payload['tenant_id'] ?? ($dbPartner->tenant_id ?? null),
+            'name' => $payload['aud'] ?? ($dbPartner->name ?? 'JWT Partner'),
+            'permissions' => json_encode($payload['scopes'] ?? []),
             'status' => 'active',
+            'auth_method' => 'jwt',
             'jwt_subject' => $payload['sub'],
-            'jwt_issuer' => $payload['iss']
+            'jwt_issuer' => $payload['iss'] ?? null,
         ];
 
         if (!self::checkRateLimit($partnerId)) {

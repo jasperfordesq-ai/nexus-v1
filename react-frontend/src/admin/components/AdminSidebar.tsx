@@ -281,6 +281,7 @@ function useAdminNav(): NavSection[] {
           { label: t('org_wallets'), href: '/admin/timebanking/org-wallets', icon: Wallet },
           { label: t('starting_balances'), href: '/admin/timebanking/starting-balances', icon: Wallet },
           { label: t('plans_pricing'), href: '/admin/plans', icon: CreditCard },
+          { label: t('billing'), href: '/admin/billing', icon: CreditCard },
         ],
       },
       {

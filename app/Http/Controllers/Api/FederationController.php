@@ -474,13 +474,13 @@ class FederationController extends BaseApiController
         $perPage = min(100, max(1, (int) request()->query('per_page', 20)));
 
         if ($isExternal) {
-            $sql = "SELECT SQL_CALC_FOUND_ROWS l.id, l.title, l.description, l.type, l.category, l.price as rate, l.created_at, l.user_id, u.first_name, u.last_name, u.avatar_url as avatar, l.tenant_id, t.name as timebank_name
-                    FROM listings l JOIN users u ON u.id = l.user_id JOIN tenants t ON t.id = l.tenant_id JOIN federation_user_settings fus ON fus.user_id = l.user_id
+            $sql = "SELECT SQL_CALC_FOUND_ROWS l.id, l.title, l.description, l.type, l.category_id, c.name as category_name, l.price as rate, l.created_at, l.user_id, u.first_name, u.last_name, u.avatar_url as avatar, l.tenant_id, t.name as timebank_name
+                    FROM listings l JOIN users u ON u.id = l.user_id JOIN tenants t ON t.id = l.tenant_id JOIN federation_user_settings fus ON fus.user_id = l.user_id LEFT JOIN categories c ON c.id = l.category_id
                     WHERE l.status = 'active' AND l.tenant_id = ? AND fus.federation_optin = 1";
             $params = [$partnerTenantId];
         } else {
-            $sql = "SELECT SQL_CALC_FOUND_ROWS l.id, l.title, l.description, l.type, l.category, l.price as rate, l.created_at, l.user_id, u.first_name, u.last_name, u.avatar_url as avatar, l.tenant_id, t.name as timebank_name
-                    FROM listings l JOIN users u ON u.id = l.user_id JOIN tenants t ON t.id = l.tenant_id JOIN federation_user_settings fus ON fus.user_id = l.user_id
+            $sql = "SELECT SQL_CALC_FOUND_ROWS l.id, l.title, l.description, l.type, l.category_id, c.name as category_name, l.price as rate, l.created_at, l.user_id, u.first_name, u.last_name, u.avatar_url as avatar, l.tenant_id, t.name as timebank_name
+                    FROM listings l JOIN users u ON u.id = l.user_id JOIN tenants t ON t.id = l.tenant_id JOIN federation_user_settings fus ON fus.user_id = l.user_id LEFT JOIN categories c ON c.id = l.category_id
                     JOIN federation_partnerships fp ON ((fp.tenant_id = ? AND fp.partner_tenant_id = l.tenant_id) OR (fp.partner_tenant_id = ? AND fp.tenant_id = l.tenant_id))
                     WHERE l.status = 'active' AND fus.federation_optin = 1 AND fp.status = 'active' AND l.tenant_id != ?";
             $params = [$partnerTenantId, $partnerTenantId, $partnerTenantId];
@@ -489,7 +489,7 @@ class FederationController extends BaseApiController
         if (!empty($query)) { $sql .= " AND (l.title LIKE ? OR l.description LIKE ?)"; $term = "%{$query}%"; array_push($params, $term, $term); }
         if (!empty($type) && in_array($type, ['offer', 'request'])) { $sql .= " AND l.type = ?"; $params[] = $type; }
         if ($timebankId) { $sql .= " AND l.tenant_id = ?"; $params[] = $timebankId; }
-        if (!empty($category)) { $sql .= " AND l.category = ?"; $params[] = $category; }
+        if (!empty($category)) { $sql .= " AND l.category_id = ?"; $params[] = $category; }
 
         $sql .= " ORDER BY l.created_at DESC LIMIT ?, ?";
         $params[] = (int) (($page - 1) * $perPage);
@@ -502,7 +502,7 @@ class FederationController extends BaseApiController
 
         $formatted = array_map(fn($l) => [
             'id' => (int) $l['id'], 'title' => $l['title'], 'description' => $l['description'],
-            'type' => $l['type'], 'category' => $l['category'], 'rate' => $l['rate'],
+            'type' => $l['type'], 'category' => $l['category_name'] ?? null, 'category_id' => $l['category_id'] ? (int) $l['category_id'] : null, 'rate' => $l['rate'],
             'owner' => ['id' => (int) $l['user_id'], 'name' => trim($l['first_name'] . ' ' . $l['last_name']), 'avatar' => $l['avatar'] ?: null],
             'timebank' => ['id' => (int) $l['tenant_id'], 'name' => $l['timebank_name']],
             'created_at' => $l['created_at'],
@@ -523,15 +523,15 @@ class FederationController extends BaseApiController
 
         if ($isExternal) {
             $stmt = $db->prepare("
-                SELECT l.id, l.title, l.description, l.type, l.status, l.category, l.price, l.user_id, l.tenant_id, l.created_at, l.updated_at, u.first_name, u.last_name, u.avatar_url as avatar, u.location, t.name as timebank_name
-                FROM listings l JOIN users u ON u.id = l.user_id JOIN tenants t ON t.id = l.tenant_id JOIN federation_user_settings fus ON fus.user_id = l.user_id
+                SELECT l.id, l.title, l.description, l.type, l.status, l.category_id, c.name as category_name, l.price, l.user_id, l.tenant_id, l.created_at, l.updated_at, u.first_name, u.last_name, u.avatar_url as avatar, u.location, t.name as timebank_name
+                FROM listings l JOIN users u ON u.id = l.user_id JOIN tenants t ON t.id = l.tenant_id JOIN federation_user_settings fus ON fus.user_id = l.user_id LEFT JOIN categories c ON c.id = l.category_id
                 WHERE l.id = ? AND l.tenant_id = ? AND l.status = 'active' AND fus.federation_optin = 1
             ");
             $stmt->execute([$id, $partnerTenantId]);
         } else {
             $stmt = $db->prepare("
-                SELECT l.id, l.title, l.description, l.type, l.status, l.category, l.price, l.user_id, l.tenant_id, l.created_at, l.updated_at, u.first_name, u.last_name, u.avatar_url as avatar, u.location, t.name as timebank_name
-                FROM listings l JOIN users u ON u.id = l.user_id JOIN tenants t ON t.id = l.tenant_id JOIN federation_user_settings fus ON fus.user_id = l.user_id
+                SELECT l.id, l.title, l.description, l.type, l.status, l.category_id, c.name as category_name, l.price, l.user_id, l.tenant_id, l.created_at, l.updated_at, u.first_name, u.last_name, u.avatar_url as avatar, u.location, t.name as timebank_name
+                FROM listings l JOIN users u ON u.id = l.user_id JOIN tenants t ON t.id = l.tenant_id JOIN federation_user_settings fus ON fus.user_id = l.user_id LEFT JOIN categories c ON c.id = l.category_id
                 JOIN federation_partnerships fp ON ((fp.tenant_id = ? AND fp.partner_tenant_id = l.tenant_id) OR (fp.partner_tenant_id = ? AND fp.tenant_id = l.tenant_id))
                 WHERE l.id = ? AND l.status = 'active' AND fus.federation_optin = 1 AND fp.status = 'active'
             ");
@@ -545,7 +545,7 @@ class FederationController extends BaseApiController
 
         return $this->fedSuccess(['data' => [
             'id' => (int) $listing['id'], 'title' => $listing['title'], 'description' => $listing['description'],
-            'type' => $listing['type'], 'category' => $listing['category'], 'rate' => $listing['rate'] ?? $listing['price'] ?? null,
+            'type' => $listing['type'], 'category' => $listing['category_name'] ?? null, 'category_id' => $listing['category_id'] ? (int) $listing['category_id'] : null, 'rate' => $listing['rate'] ?? $listing['price'] ?? null,
             'owner' => ['id' => (int) $listing['user_id'], 'name' => trim($listing['first_name'] . ' ' . $listing['last_name']), 'avatar' => $listing['avatar'] ?: null, 'location' => $listing['location']],
             'timebank' => ['id' => (int) $listing['tenant_id'], 'name' => $listing['timebank_name']],
             'created_at' => $listing['created_at'], 'updated_at' => $listing['updated_at'] ?? null,

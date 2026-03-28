@@ -79,20 +79,25 @@ export function FederationControls() {
   };
 
   const handleLockdown = async () => {
-    if (controls?.emergency_lockdown_active) {
-      const res = await adminSuper.liftLockdown();
-      if (res?.success) { toastRef.current.success(t('super.lockdown_lifted', 'Lockdown lifted')); loadData(); }
-      else toastRef.current.error(t('super.failed_to_lift_lockdown', 'Failed to lift lockdown'));
-    } else {
-      if (!lockdownReason.trim()) {
-        toastRef.current.error(t('super.please_provide_a_reason_for_the_lockdown', 'Please provide a reason for the lockdown'));
-        return;
+    try {
+      if (controls?.emergency_lockdown_active) {
+        const res = await adminSuper.liftLockdown();
+        if (res?.success) { toastRef.current.success(t('super.lockdown_lifted', 'Lockdown lifted')); loadData(); }
+        else toastRef.current.error(t('super.failed_to_lift_lockdown', 'Failed to lift lockdown'));
+      } else {
+        if (!lockdownReason.trim()) {
+          toastRef.current.error(t('super.please_provide_a_reason_for_the_lockdown', 'Please provide a reason for the lockdown'));
+          return;
+        }
+        const res = await adminSuper.emergencyLockdown(lockdownReason);
+        if (res?.success) { toastRef.current.success(t('super.lockdown_activated', 'Lockdown activated')); loadData(); }
+        else toastRef.current.error(t('super.failed_to_activate_lockdown', 'Failed to activate lockdown'));
       }
-      const res = await adminSuper.emergencyLockdown(lockdownReason);
-      if (res?.success) { toastRef.current.success(t('super.lockdown_activated', 'Lockdown activated')); loadData(); }
-      else toastRef.current.error(t('super.failed_to_activate_lockdown', 'Failed to activate lockdown'));
+    } catch (err) {
+      toastRef.current.error(t('super.lockdown_action_failed', 'Lockdown action failed') + `: ${err instanceof Error ? err.message : ''}`);
+    } finally {
+      setLockdownConfirm(false);
     }
-    setLockdownConfirm(false);
   };
 
   const handleAddWhitelist = async () => {

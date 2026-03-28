@@ -376,8 +376,8 @@ class FederationSearchService
                 $partnersQueried++;
                 $results = FederationExternalApiClient::fetchMembers($partnerId, $filters);
 
-                if (is_array($results)) {
-                    foreach ($results as $member) {
+                if (isset($results['success']) && $results['success'] && !empty($results['data'])) {
+                    foreach ($results['data'] as $member) {
                         $member['partner_id'] = $partnerId;
                         $member['partner_name'] = $partnerName;
                         $allMembers[] = $member;
@@ -464,8 +464,8 @@ class FederationSearchService
                 $partnersQueried++;
                 $results = FederationExternalApiClient::fetchListings($partnerId, $filters);
 
-                if (is_array($results)) {
-                    foreach ($results as $listing) {
+                if (isset($results['success']) && $results['success'] && !empty($results['data'])) {
+                    foreach ($results['data'] as $listing) {
                         $listing['partner_id'] = $partnerId;
                         $listing['partner_name'] = $partnerName;
                         $allListings[] = $listing;

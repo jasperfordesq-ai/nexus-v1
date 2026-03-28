@@ -58,7 +58,7 @@ class AdminFederationController extends BaseApiController
     public function timebanks(): JsonResponse
     {
         $this->requireAdmin();
-        $timebanks = DB::select('SELECT id, name, slug, domain FROM tenants WHERE status = ? ORDER BY name', ['active']);
+        $timebanks = DB::select('SELECT id, name, slug, domain FROM tenants WHERE is_active = 1 ORDER BY name');
         return $this->respondWithData($timebanks);
     }
 
@@ -224,7 +224,7 @@ class AdminFederationController extends BaseApiController
             if ($partner->status !== 'pending') {
                 return $this->respondWithError('INVALID_STATE', 'Only pending partnerships can be rejected (current: ' . $partner->status . ')', null, 409);
             }
-            DB::update("UPDATE federation_partnerships SET status = 'rejected', updated_at = NOW() WHERE id = ? AND (tenant_id = ? OR partner_tenant_id = ?)", [$id, $tenantId, $tenantId]);
+            DB::update("UPDATE federation_partnerships SET status = 'terminated', updated_at = NOW() WHERE id = ? AND (tenant_id = ? OR partner_tenant_id = ?)", [$id, $tenantId, $tenantId]);
             return $this->respondWithData(['message' => 'Partnership rejected']);
         } catch (\Exception $e) { return $this->respondWithError('UPDATE_FAILED', 'Failed to reject partnership'); }
     }

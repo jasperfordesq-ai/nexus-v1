@@ -1041,7 +1041,7 @@ export const adminFederation = {
   createApiKey: (data: { name: string; scopes?: string[] }) =>
     api.post<{ id: number; key: string; name: string }>('/v2/admin/federation/api-keys', data),
 
-  getDataManagement: () => api.get<{ shared_data_types: string[]; data_retention_days: number }>('/v2/admin/federation/data'),
+  getDataManagement: () => api.get<{ export_formats: string[]; available_exports: Record<string, string>; import_supported: boolean; last_export_at: string | null; last_import_at: string | null }>('/v2/admin/federation/data'),
 
   getActivityFeed: (params?: {
     limit?: number;

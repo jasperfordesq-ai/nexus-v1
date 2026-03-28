@@ -181,6 +181,7 @@ export function CreditAgreements() {
     action: 'suspend' | 'terminate';
     partnerName: string;
   } | null>(null);
+  const [actionLoading, setActionLoading] = useState(false);
 
   // AbortController for cancelling in-flight requests
   const abortControllerRef = useRef<AbortController | null>(null);
@@ -810,10 +811,16 @@ export function CreditAgreements() {
       <ConfirmModal
         isOpen={!!pendingAction}
         onClose={() => setPendingAction(null)}
+        isLoading={actionLoading}
         onConfirm={async () => {
           if (pendingAction) {
-            await handleStatusChange(pendingAction.agreementId, pendingAction.action);
-            setPendingAction(null);
+            setActionLoading(true);
+            try {
+              await handleStatusChange(pendingAction.agreementId, pendingAction.action);
+            } finally {
+              setActionLoading(false);
+              setPendingAction(null);
+            }
           }
         }}
         title={
