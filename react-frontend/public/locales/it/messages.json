@@ -114,5 +114,12 @@
   "delete_for_me": "Elimina solo per me",
   "delete_for_everyone": "Elimina per tutti",
   "message_removed_self": "Messaggio rimosso",
-  "message_removed_self_subtitle": "Messaggio rimosso dalla tua vista."
+  "message_removed_self_subtitle": "Messaggio rimosso dalla tua vista.",
+  "voice": {
+    "show_transcript": "Mostra trascrizione",
+    "hide_transcript": "Nascondi trascrizione",
+    "translate": "Traduci",
+    "translating": "Traduzione in corso...",
+    "translation_failed": "Traduzione non riuscita"
+  }
 }

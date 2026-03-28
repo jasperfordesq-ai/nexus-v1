@@ -20,13 +20,17 @@ class VolDonation extends Model
     public $timestamps = false;
 
     protected $fillable = [
+        'tenant_id',
         'user_id',
         'opportunity_id',
+        'community_project_id',
         'giving_day_id',
         'amount',
         'currency',
         'payment_method',
         'payment_reference',
+        'donor_name',
+        'donor_email',
         'message',
         'is_anonymous',
         'status',

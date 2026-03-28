@@ -324,5 +324,12 @@
       "advanced": "Erweitert",
       "expert": "Experte"
     }
+  },
+  "gif": {
+    "search_placeholder": "GIFs suchen...",
+    "trending": "Beliebt",
+    "no_results": "Keine GIFs gefunden",
+    "powered_by": "Unterstützt von Tenor",
+    "button_label": "GIF hinzufügen"
   }
 }

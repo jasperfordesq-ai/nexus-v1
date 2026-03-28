@@ -324,5 +324,12 @@
       "advanced": "Ardleibhéal",
       "expert": "Saineolaí"
     }
+  },
+  "gif": {
+    "search_placeholder": "Cuardaigh GIFanna...",
+    "trending": "Ag Treáil",
+    "no_results": "Níor aimsíodh GIFanna",
+    "powered_by": "Cumhachtaithe ag Tenor",
+    "button_label": "Cuir GIF leis"
   }
 }

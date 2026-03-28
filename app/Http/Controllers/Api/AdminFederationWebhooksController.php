@@ -53,6 +53,7 @@ class AdminFederationWebhooksController extends BaseApiController
         try {
             $webhooks = DB::table('federation_webhooks')
                 ->where('tenant_id', $tenantId)
+                ->select('id', 'tenant_id', 'url', 'events', 'status', 'description', 'consecutive_failures', 'last_triggered_at', 'last_success_at', 'last_failure_at', 'last_failure_reason', 'created_by', 'created_at', 'updated_at')
                 ->orderByDesc('created_at')
                 ->get()
                 ->map(function ($row) {
@@ -85,6 +86,11 @@ class AdminFederationWebhooksController extends BaseApiController
         }
         if (!str_starts_with($url, 'https://')) {
             return $this->respondWithError('VALIDATION_ERROR', 'URL must use HTTPS', 'url', 422);
+        }
+
+        // SSRF protection: reject URLs targeting private/internal IPs
+        if (\App\Services\WebhookDispatchService::isPrivateUrl($url)) {
+            return $this->respondWithError('VALIDATION_ERROR', 'URL must not target private or internal IP addresses', 'url', 422);
         }
 
         // Validate events
@@ -450,8 +456,7 @@ class AdminFederationWebhooksController extends BaseApiController
                     'X-Nexus-Webhook-Id' => (string) $webhook->id,
                     'X-Nexus-Retry' => 'true',
                 ])
-                ->withBody($payloadJson, 'application/json')
-                ->post($webhook->url);
+                ->post($webhook->url, json_decode($payloadJson, true));
 
             $responseCode = $response->status();
             $responseBody = $response->body();

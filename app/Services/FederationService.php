@@ -27,7 +27,7 @@ class FederationService
                   ->orWhere('fp.partner_tenant_id', $tenantId);
             })
             ->where('fp.status', 'active')
-            ->select('t.id', 't.name', 't.slug', 't.city', 't.country', 'fp.approved_at')
+            ->select('t.id', 't.name', 't.slug', 'fp.approved_at')
             ->get()
             ->map(fn ($r) => (array) $r)
             ->all();

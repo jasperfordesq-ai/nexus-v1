@@ -49,7 +49,8 @@ class FederationJwtService
         $payload = [
             'iss' => config('app.url', 'project-nexus'),
             'sub' => $userId,
-            'aud' => $platformId,
+            'aud' => config('app.url', 'project-nexus'),
+            'client_id' => $platformId,
             'iat' => $now,
             'exp' => $now + $lifetime,
             'nbf' => $now,
@@ -261,7 +262,7 @@ class FederationJwtService
             // Generate token
             $tokenData = self::generateToken(
                 $clientId,
-                'api_key_' . $apiKey->id,
+                (string) $apiKey->id,
                 (int) $apiKey->tenant_id,
                 $scopes
             );

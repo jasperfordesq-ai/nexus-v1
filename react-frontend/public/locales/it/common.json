@@ -324,5 +324,12 @@
       "advanced": "Avanzato",
       "expert": "Esperto"
     }
+  },
+  "gif": {
+    "search_placeholder": "Cerca GIF...",
+    "trending": "Di tendenza",
+    "no_results": "Nessuna GIF trovata",
+    "powered_by": "Fornito da Tenor",
+    "button_label": "Aggiungi GIF"
   }
 }

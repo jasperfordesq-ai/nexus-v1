@@ -114,5 +114,12 @@
   "delete_for_me": "Scrios domsa amháin",
   "delete_for_everyone": "Scrios do chách",
   "message_removed_self": "Teachtaireacht bainte",
-  "message_removed_self_subtitle": "Teachtaireacht bainte ó d'amharc."
+  "message_removed_self_subtitle": "Teachtaireacht bainte ó d'amharc.",
+  "voice": {
+    "show_transcript": "Taispeáin an trascríbhinn",
+    "hide_transcript": "Folaigh an trascríbhinn",
+    "translate": "Aistrigh",
+    "translating": "Ag aistriú...",
+    "translation_failed": "Theip ar an aistriúchán"
+  }
 }

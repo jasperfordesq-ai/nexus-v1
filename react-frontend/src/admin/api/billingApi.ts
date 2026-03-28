@@ -20,8 +20,8 @@ export interface Plan {
   slug: string;
   description: string;
   tier_level: number;
-  monthly_price: number;
-  yearly_price: number;
+  price_monthly: number;
+  price_yearly: number;
   features: string[];
   is_active: boolean;
 }

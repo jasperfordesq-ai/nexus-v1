@@ -138,7 +138,7 @@ export function PlanSelector() {
             {plans.map((plan) => {
               const isCurrent = isCurrentPlan(plan);
               const price =
-                billingInterval === 'monthly' ? plan.monthly_price : plan.yearly_price;
+                billingInterval === 'monthly' ? plan.price_monthly : plan.price_yearly;
 
               return (
                 <Card

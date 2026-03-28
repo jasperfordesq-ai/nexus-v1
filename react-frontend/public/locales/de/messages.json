@@ -114,5 +114,12 @@
   "delete_for_me": "Nur für mich löschen",
   "delete_for_everyone": "Für alle löschen",
   "message_removed_self": "Nachricht entfernt",
-  "message_removed_self_subtitle": "Nachricht aus Ihrer Ansicht entfernt."
+  "message_removed_self_subtitle": "Nachricht aus Ihrer Ansicht entfernt.",
+  "voice": {
+    "show_transcript": "Transkript anzeigen",
+    "hide_transcript": "Transkript ausblenden",
+    "translate": "Übersetzen",
+    "translating": "Wird übersetzt...",
+    "translation_failed": "Übersetzung fehlgeschlagen"
+  }
 }

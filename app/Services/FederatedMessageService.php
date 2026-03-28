@@ -61,10 +61,12 @@ class FederatedMessageService
             // Check active federation partnership between tenants
             $senderTenantId = $sender->tenant_id;
             $partnershipActive = DB::table('federation_partnerships')
-                ->where(function ($q) use ($senderTenantId, $receiverTenantId) {
-                    $q->where('tenant_id', $senderTenantId)->where('partner_tenant_id', $receiverTenantId);
-                })->orWhere(function ($q) use ($senderTenantId, $receiverTenantId) {
-                    $q->where('tenant_id', $receiverTenantId)->where('partner_tenant_id', $senderTenantId);
+                ->where(function ($outer) use ($senderTenantId, $receiverTenantId) {
+                    $outer->where(function ($q) use ($senderTenantId, $receiverTenantId) {
+                        $q->where('tenant_id', $senderTenantId)->where('partner_tenant_id', $receiverTenantId);
+                    })->orWhere(function ($q) use ($senderTenantId, $receiverTenantId) {
+                        $q->where('tenant_id', $receiverTenantId)->where('partner_tenant_id', $senderTenantId);
+                    });
                 })
                 ->where('status', 'active')
                 ->where('messaging_enabled', 1)

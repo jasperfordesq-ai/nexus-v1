@@ -732,7 +732,7 @@ class AdminFederationController extends BaseApiController
                     }
                     $rows = array_map(fn($r) => (array)$r, DB::select("
                         SELECT u.id, u.first_name, u.last_name, u.email, u.username,
-                               fus.federation_optin, fus.privacy_level, fus.service_reach,
+                               fus.federation_optin, fus.profile_visible_federated, fus.service_reach,
                                fus.created_at, fus.updated_at
                         FROM federation_user_settings fus
                         JOIN users u ON u.id = fus.user_id
@@ -748,7 +748,7 @@ class AdminFederationController extends BaseApiController
                     }
                     $rows = array_map(fn($r) => (array)$r, DB::select("
                         SELECT fp.id, t1.name AS tenant_name, t2.name AS partner_name,
-                               fp.status, fp.level, fp.created_at, fp.updated_at
+                               fp.status, fp.federation_level, fp.created_at, fp.updated_at
                         FROM federation_partnerships fp
                         LEFT JOIN tenants t1 ON t1.id = fp.tenant_id
                         LEFT JOIN tenants t2 ON t2.id = fp.partner_tenant_id
@@ -778,8 +778,8 @@ class AdminFederationController extends BaseApiController
                         return $this->respondWithError('NO_DATA', 'Federation audit log table not found', null, 404);
                     }
                     $rows = array_map(fn($r) => (array)$r, DB::select("
-                        SELECT id, action, category, level, actor_user_id,
-                               source_tenant_id, target_tenant_id, details, created_at
+                        SELECT id, action_type, category, level, actor_user_id,
+                               source_tenant_id, target_tenant_id, data, created_at
                         FROM federation_audit_log
                         WHERE source_tenant_id = ? OR target_tenant_id = ?
                         ORDER BY created_at DESC LIMIT 5000
