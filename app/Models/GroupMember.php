@@ -6,19 +6,18 @@
 
 namespace App\Models;
 
-use App\Models\Concerns\HasTenantScope;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class GroupMember extends Model
 {
-    use HasFactory, HasTenantScope;
+    use HasFactory;
 
     protected $table = 'group_members';
 
     protected $fillable = [
-        'tenant_id', 'group_id', 'user_id', 'role', 'status',
+        'group_id', 'user_id', 'role', 'status',
     ];
 
     public function group(): BelongsTo
