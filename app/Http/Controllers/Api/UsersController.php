@@ -288,6 +288,89 @@ class UsersController extends BaseApiController
     }
 
     /**
+     * PUT /api/v2/users/me/theme-preferences
+     */
+    public function updateThemePreferences(): JsonResponse
+    {
+        $userId = $this->requireAuth();
+        $this->rateLimit('theme_prefs_update', 30, 60);
+
+        $data = $this->getAllInput();
+
+        // Validate accent_color (hex color)
+        $accentColor = $data['accent_color'] ?? null;
+        if ($accentColor !== null && !preg_match('/^#[0-9a-fA-F]{6}$/', $accentColor)) {
+            return $this->respondWithError(
+                'VALIDATION_ERROR',
+                'Invalid accent_color. Must be a valid hex color (e.g. #6366f1)',
+                'accent_color',
+                400
+            );
+        }
+
+        // Validate font_size
+        $fontSize = $data['font_size'] ?? null;
+        $validFontSizes = ['small', 'medium', 'large'];
+        if ($fontSize !== null && !in_array($fontSize, $validFontSizes, true)) {
+            return $this->respondWithError(
+                'VALIDATION_ERROR',
+                'Invalid font_size. Must be one of: small, medium, large',
+                'font_size',
+                400
+            );
+        }
+
+        // Validate density
+        $density = $data['density'] ?? null;
+        $validDensities = ['compact', 'comfortable', 'spacious'];
+        if ($density !== null && !in_array($density, $validDensities, true)) {
+            return $this->respondWithError(
+                'VALIDATION_ERROR',
+                'Invalid density. Must be one of: compact, comfortable, spacious',
+                'density',
+                400
+            );
+        }
+
+        // Validate high_contrast
+        $highContrast = $data['high_contrast'] ?? null;
+        if ($highContrast !== null && !is_bool($highContrast)) {
+            // Accept truthy/falsy values
+            $highContrast = filter_var($highContrast, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
+            if ($highContrast === null) {
+                return $this->respondWithError(
+                    'VALIDATION_ERROR',
+                    'Invalid high_contrast. Must be a boolean',
+                    'high_contrast',
+                    400
+                );
+            }
+        }
+
+        // Build preferences JSON
+        $preferences = [
+            'accent_color'  => $accentColor ?? '#6366f1',
+            'font_size'     => $fontSize ?? 'medium',
+            'density'       => $density ?? 'comfortable',
+            'high_contrast' => (bool) ($highContrast ?? false),
+        ];
+
+        $success = DB::table('users')
+            ->where('id', $userId)
+            ->where('tenant_id', TenantContext::getId())
+            ->update(['theme_preferences' => json_encode($preferences)]);
+
+        if ($success === false) {
+            return $this->respondWithError('UPDATE_FAILED', 'Failed to update theme preferences', null, 500);
+        }
+
+        return $this->respondWithData([
+            'message'           => 'Theme preferences updated',
+            'theme_preferences' => $preferences,
+        ]);
+    }
+
+    /**
      * PUT /api/v2/users/me/language
      */
     public function updateLanguage(): JsonResponse

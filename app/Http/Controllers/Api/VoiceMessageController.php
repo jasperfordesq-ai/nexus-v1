@@ -12,6 +12,7 @@ use App\Core\EmailTemplate;
 use App\Core\Mailer;
 use App\Core\TenantContext;
 use App\Models\Message;
+use App\Services\TranscriptionService;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
@@ -79,6 +80,43 @@ class VoiceMessageController extends BaseApiController
                 $audioResult['duration']
             );
 
+            // Transcribe the audio file (non-blocking — failures are logged, not thrown)
+            $transcript = null;
+            $transcriptLanguage = null;
+            try {
+                // Resolve the audio file path for transcription
+                $audioPath = $audioResult['local_path'] ?? null;
+                if (!$audioPath && isset($audioResult['url'])) {
+                    // If only URL available, download to temp file for transcription
+                    $audioPath = sys_get_temp_dir() . '/' . uniqid('voice_') . '.webm';
+                    $audioContent = @file_get_contents($audioResult['url']);
+                    if ($audioContent !== false) {
+                        file_put_contents($audioPath, $audioContent);
+                    }
+                }
+
+                if ($audioPath && file_exists($audioPath)) {
+                    $transcription = TranscriptionService::transcribe($audioPath);
+                    if ($transcription && !empty($transcription['text'])) {
+                        $transcript = $transcription['text'];
+                        $transcriptLanguage = $transcription['language'] ?? 'en';
+
+                        DB::table('messages')
+                            ->where('id', $messageId)
+                            ->where('tenant_id', $tenantId)
+                            ->update([
+                                'transcript'          => $transcript,
+                                'transcript_language' => $transcriptLanguage,
+                            ]);
+                    }
+                }
+            } catch (\Throwable $e) {
+                Log::warning('Voice message transcription failed', [
+                    'message_id' => $messageId,
+                    'error'      => $e->getMessage(),
+                ]);
+            }
+
             // Send email notification for voice message
             $sender = DB::table('users')->where('id', $senderId)->where('tenant_id', \App\Core\TenantContext::getId())->select('name')->first();
             $receiver = DB::table('users')->where('id', $receiverId)->where('tenant_id', \App\Core\TenantContext::getId())->select('name', 'email')->first();
@@ -105,10 +143,12 @@ class VoiceMessageController extends BaseApiController
             }
 
             return $this->respondWithData([
-                'success'    => true,
-                'message_id' => $messageId,
-                'audio_url'  => $audioResult['url'],
-                'duration'   => $audioResult['duration'],
+                'success'              => true,
+                'message_id'           => $messageId,
+                'audio_url'            => $audioResult['url'],
+                'duration'             => $audioResult['duration'],
+                'transcript'           => $transcript,
+                'transcript_language'  => $transcriptLanguage,
             ], null, 201);
         } catch (\Exception $e) {
             Log::error('Voice message store failed', ['error' => $e->getMessage(), 'trace' => $e->getTraceAsString()]);

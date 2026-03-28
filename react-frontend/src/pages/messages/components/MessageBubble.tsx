@@ -7,8 +7,9 @@ import { useState, useEffect, useRef, type ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
 import { Button, Avatar, Input } from '@heroui/react';
-import { SmilePlus, MoreVertical, Pencil, Trash2, Check, CheckCheck, FileText } from 'lucide-react';
+import { SmilePlus, MoreVertical, Pencil, Trash2, Check, CheckCheck, FileText, Languages } from 'lucide-react';
 import { resolveAvatarUrl } from '@/lib/helpers';
+import { api } from '@/lib/api';
 import type { Message } from '@/types/api';
 import { VoiceMessagePlayer } from './VoiceMessagePlayer';
 import { MessageLinkPreview } from './MessageLinkPreview';
@@ -58,9 +59,11 @@ export function MessageBubble({
   onSaveEdit,
   onCancelEdit,
 }: MessageBubbleProps) {
-  const { t } = useTranslation('messages');
+  const { t, i18n } = useTranslation('messages');
   const [showReactionPicker, setShowReactionPicker] = useState(false);
   const [showMessageMenu, setShowMessageMenu] = useState(false);
+  const [translatedText, setTranslatedText] = useState<string | null>(null);
+  const [isTranslating, setIsTranslating] = useState(false);
   const reactionPickerRef = useRef<HTMLDivElement>(null);
   const messageMenuRef = useRef<HTMLDivElement>(null);
   const isVoiceMessage = message.is_voice || message.audio_url;
@@ -86,6 +89,23 @@ export function MessageBubble({
   // Parse reactions from message (format: { emoji: count, ... } or array)
   const reactions = message.reactions || {};
   const hasReactions = Object.keys(reactions).length > 0;
+
+  // Translate a voice message transcript
+  async function handleTranslate() {
+    if (isTranslating || !message.transcript) return;
+    setIsTranslating(true);
+    try {
+      const targetLanguage = i18n.language || 'en';
+      const response = await api.post<{ translated_text: string }>(`/v2/messages/${message.id}/translate`, {
+        target_language: targetLanguage,
+      });
+      setTranslatedText(response.data?.translated_text ?? '');
+    } catch {
+      setTranslatedText(t('voice.translation_failed'));
+    } finally {
+      setIsTranslating(false);
+    }
+  }
 
   // Highlight search terms in message body
   function highlightText(text: string): ReactNode {
@@ -161,7 +181,33 @@ export function MessageBubble({
             /* Deleted message */
             <p className="text-sm opacity-40 italic">{t('message_deleted_placeholder')}</p>
           ) : isVoiceMessage ? (
-            <VoiceMessagePlayer audioUrl={message.audio_url} />
+            <div>
+              <VoiceMessagePlayer
+                audioUrl={message.audio_url}
+                transcript={message.transcript}
+                transcriptLanguage={message.transcript_language}
+              />
+              {/* Translate button for voice messages with transcripts */}
+              {message.transcript && (
+                <div className="mt-1">
+                  <Button
+                    size="sm"
+                    variant="light"
+                    className="h-6 min-w-0 px-2 text-xs opacity-60 hover:opacity-100 gap-1"
+                    onPress={handleTranslate}
+                    isDisabled={isTranslating}
+                    startContent={<Languages className="w-3 h-3" aria-hidden="true" />}
+                  >
+                    {isTranslating ? t('voice.translating') : t('voice.translate')}
+                  </Button>
+                  {translatedText && (
+                    <p className="text-xs opacity-70 mt-1 whitespace-pre-wrap leading-relaxed italic">
+                      {translatedText}
+                    </p>
+                  )}
+                </div>
+              )}
+            </div>
           ) : (
             <>
               {(message.body || message.content) && (

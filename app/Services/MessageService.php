@@ -377,6 +377,52 @@ class MessageService
     }
 
     // -----------------------------------------------------------------
+    //  Schema introspection cache (avoids INFORMATION_SCHEMA queries per request)
+    // -----------------------------------------------------------------
+
+    /** @var bool|null Cached result of schema introspection for archived columns */
+    private static ?bool $hasArchivedColumns = null;
+
+    /** @var bool|null Cached result of schema introspection for is_deleted column */
+    private static ?bool $hasDeletedColumn = null;
+
+    /** @var bool|null Cached result of schema introspection for reactions column */
+    private static ?bool $hasReactionsColumn = null;
+
+    /**
+     * Check if messages table has archived columns (cached per-request).
+     */
+    private static function hasArchivedColumns(): bool
+    {
+        if (self::$hasArchivedColumns === null) {
+            self::$hasArchivedColumns = DB::getSchemaBuilder()->hasColumn('messages', 'archived_by_sender');
+        }
+        return self::$hasArchivedColumns;
+    }
+
+    /**
+     * Check if messages table has is_deleted column (cached per-request).
+     */
+    private static function hasDeletedColumn(): bool
+    {
+        if (self::$hasDeletedColumn === null) {
+            self::$hasDeletedColumn = DB::getSchemaBuilder()->hasColumn('messages', 'is_deleted');
+        }
+        return self::$hasDeletedColumn;
+    }
+
+    /**
+     * Check if messages table has reactions column (cached per-request).
+     */
+    private static function hasReactionsColumn(): bool
+    {
+        if (self::$hasReactionsColumn === null) {
+            self::$hasReactionsColumn = DB::getSchemaBuilder()->hasColumn('messages', 'reactions');
+        }
+        return self::$hasReactionsColumn;
+    }
+
+    // -----------------------------------------------------------------
     //  Archive / Unarchive
     // -----------------------------------------------------------------
 
@@ -394,10 +440,7 @@ class MessageService
         $now = now();
         $totalUpdated = 0;
 
-        // Check if archived columns exist
-        $hasArchived = DB::getSchemaBuilder()->hasColumn('messages', 'archived_by_sender');
-
-        if (! $hasArchived) {
+        if (! self::hasArchivedColumns()) {
             // Fall back to hard delete if columns don't exist
             return DB::table('messages')
                 ->where('tenant_id', $tenantId)
@@ -453,8 +496,7 @@ class MessageService
     {
         $tenantId = app('tenant.id');
 
-        $hasArchived = DB::getSchemaBuilder()->hasColumn('messages', 'archived_by_sender');
-        if (! $hasArchived) {
+        if (! self::hasArchivedColumns()) {
             return 0;
         }
 
@@ -505,7 +547,7 @@ class MessageService
 
         $message->body = $newBody;
 
-        if (in_array('is_edited', $message->getFillable()) || DB::getSchemaBuilder()->hasColumn('messages', 'is_edited')) {
+        if (in_array('is_edited', $message->getFillable(), true)) {
             $message->is_edited = true;
             $message->edited_at = now();
         }
@@ -567,9 +609,7 @@ class MessageService
         }
 
         // scope = 'everyone': blank body for both parties
-        $hasDeleted = DB::getSchemaBuilder()->hasColumn('messages', 'is_deleted');
-
-        if ($hasDeleted) {
+        if (self::hasDeletedColumn()) {
             DB::table('messages')
                 ->where('id', $messageId)
                 ->where('tenant_id', $tenantId)
@@ -613,8 +653,7 @@ class MessageService
             return null;
         }
 
-        $hasReactions = DB::getSchemaBuilder()->hasColumn('messages', 'reactions');
-        if (! $hasReactions) {
+        if (! self::hasReactionsColumn()) {
             self::$errors[] = ['code' => 'FEATURE_UNAVAILABLE', 'message' => 'Reactions feature not yet enabled'];
             return null;
         }

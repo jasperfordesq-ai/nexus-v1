@@ -9,8 +9,10 @@ namespace App\Http\Controllers\Api;
 use Illuminate\Http\JsonResponse;
 use App\Services\MessageService;
 use App\Services\BrokerMessageVisibilityService;
+use App\Services\TranscriptionService;
 use App\Core\AudioUploader;
 use App\Models\Message;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
 /**
@@ -532,11 +534,86 @@ class MessagesController extends BaseApiController
                 return $this->respondWithErrors($errors, 422);
             }
 
+            // Transcribe the audio (non-blocking — failures are logged, not thrown)
+            try {
+                $audioPath = $file->getRealPath();
+                if ($audioPath && file_exists($audioPath)) {
+                    $transcription = TranscriptionService::transcribe($audioPath);
+                    if ($transcription && !empty($transcription['text'])) {
+                        $messageId = $message['id'] ?? $message['message_id'] ?? null;
+                        if ($messageId) {
+                            DB::table('messages')
+                                ->where('id', $messageId)
+                                ->where('tenant_id', \App\Core\TenantContext::getId())
+                                ->update([
+                                    'transcript'          => $transcription['text'],
+                                    'transcript_language' => $transcription['language'] ?? 'en',
+                                ]);
+                            $message['transcript'] = $transcription['text'];
+                            $message['transcript_language'] = $transcription['language'] ?? 'en';
+                        }
+                    }
+                }
+            } catch (\Throwable $e) {
+                Log::warning('Voice message transcription failed', [
+                    'error' => $e->getMessage(),
+                ]);
+            }
+
             return $this->respondWithData($message, null, 201);
         } catch (\Exception $e) {
             Log::error('Voice message send failed', ['error' => $e->getMessage(), 'trace' => $e->getTraceAsString()]);
             return $this->respondWithError('UPLOAD_FAILED', 'Failed to send voice message', 'voice_message', 400);
         }
+    }
+
+    /**
+     * POST /api/v2/messages/{id}/translate
+     *
+     * Translate a voice message transcript to the requested target language.
+     * User must be the sender or receiver of the message.
+     */
+    public function translateTranscript(int $id): JsonResponse
+    {
+        $userId = $this->requireAuth();
+        $this->rateLimit('messages_translate', 20, 60);
+
+        $targetLanguage = request()->input('target_language', '');
+        if (empty($targetLanguage)) {
+            return $this->respondWithError('VALIDATION_ERROR', 'Target language is required', 'target_language', 400);
+        }
+
+        $tenantId = \App\Core\TenantContext::getId();
+
+        // Fetch the message — user must be sender or receiver
+        $message = DB::table('messages')
+            ->where('id', $id)
+            ->where('tenant_id', $tenantId)
+            ->where(function ($q) use ($userId) {
+                $q->where('sender_id', $userId)
+                  ->orWhere('receiver_id', $userId);
+            })
+            ->first();
+
+        if (!$message) {
+            return $this->respondWithError('NOT_FOUND', 'Message not found', null, 404);
+        }
+
+        if (empty($message->transcript)) {
+            return $this->respondWithError('NO_TRANSCRIPT', 'This message has no transcript to translate', null, 422);
+        }
+
+        $fromLanguage = $message->transcript_language ?? 'en';
+
+        $translatedText = TranscriptionService::translate($message->transcript, $fromLanguage, $targetLanguage);
+
+        if ($translatedText === null) {
+            return $this->respondWithError('TRANSLATION_FAILED', 'Translation failed. Please try again.', null, 500);
+        }
+
+        return $this->respondWithData([
+            'translated_text' => $translatedText,
+        ]);
     }
 
 }

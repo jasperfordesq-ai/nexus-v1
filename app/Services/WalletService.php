@@ -33,30 +33,24 @@ class WalletService
         /** @var User|null $user */
         $user = $this->user->newQuery()->find($userId);
 
-        $totalEarned = (float) $this->transaction->newQuery()
-            ->where('receiver_id', $userId)
-            ->completed()
-            ->sum('amount');
-
-        $totalSpent = (float) $this->transaction->newQuery()
-            ->where('sender_id', $userId)
-            ->completed()
-            ->sum('amount');
-
-        $pendingIncoming = (float) $this->transaction->newQuery()
-            ->where('receiver_id', $userId)
-            ->where('status', 'pending')
-            ->sum('amount');
-
-        $pendingOutgoing = (float) $this->transaction->newQuery()
-            ->where('sender_id', $userId)
-            ->where('status', 'pending')
-            ->sum('amount');
-
-        $txCount = $this->transaction->newQuery()
+        // Single query to compute all balance aggregates (replaces 5 separate queries)
+        $stats = $this->transaction->newQuery()
             ->where(fn (Builder $q) => $q->where('sender_id', $userId)->orWhere('receiver_id', $userId))
-            ->completed()
-            ->count();
+            ->selectRaw(
+                "SUM(CASE WHEN receiver_id = ? AND status = 'completed' THEN amount ELSE 0 END) as total_earned,
+                 SUM(CASE WHEN sender_id = ? AND status = 'completed' THEN amount ELSE 0 END) as total_spent,
+                 SUM(CASE WHEN receiver_id = ? AND status = 'pending' THEN amount ELSE 0 END) as pending_incoming,
+                 SUM(CASE WHEN sender_id = ? AND status = 'pending' THEN amount ELSE 0 END) as pending_outgoing,
+                 COUNT(CASE WHEN status = 'completed' THEN 1 END) as tx_count",
+                [$userId, $userId, $userId, $userId]
+            )
+            ->first();
+
+        $totalEarned = (float) ($stats->total_earned ?? 0);
+        $totalSpent = (float) ($stats->total_spent ?? 0);
+        $pendingIncoming = (float) ($stats->pending_incoming ?? 0);
+        $pendingOutgoing = (float) ($stats->pending_outgoing ?? 0);
+        $txCount = (int) ($stats->tx_count ?? 0);
 
         return [
             'balance'           => (float) ($user->balance ?? 0),

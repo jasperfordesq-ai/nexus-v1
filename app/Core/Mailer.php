@@ -212,6 +212,12 @@ class Mailer
      */
     public function send($to, $subject, $body, $cc = null, $replyTo = null, ?string $unsubscribeUrl = null): bool
     {
+        // Sanitize header-injectable values — strip CR/LF to prevent email header injection
+        $to = self::sanitizeHeaderValue($to);
+        $subject = self::sanitizeHeaderValue($subject);
+        $cc = $cc !== null ? self::sanitizeHeaderValue($cc) : null;
+        $replyTo = $replyTo !== null ? self::sanitizeHeaderValue($replyTo) : null;
+
         // Route based on configured driver
         if ($this->driver === 'sendgrid') {
             $result = $this->sendViaSendGrid($to, $subject, $body, $cc, $replyTo, $unsubscribeUrl);
@@ -706,5 +712,16 @@ class Mailer
     public function getProviderType(): string
     {
         return $this->driver;
+    }
+
+    /**
+     * Sanitize a value used in email headers to prevent header injection.
+     *
+     * Strips carriage returns and line feeds which could be used to inject
+     * additional headers (e.g., BCC, additional To, or arbitrary headers).
+     */
+    private static function sanitizeHeaderValue(string $value): string
+    {
+        return str_replace(["\r", "\n", "\0"], '', $value);
     }
 }

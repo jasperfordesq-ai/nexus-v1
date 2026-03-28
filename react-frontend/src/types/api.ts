@@ -425,6 +425,8 @@ export interface Message {
   is_voice?: boolean;     // True if voice message
   audio_url?: string;
   audio_duration?: number;
+  transcript?: string;
+  transcript_language?: string;
   sender?: {
     id: number;
     name: string;
@@ -676,6 +678,9 @@ export interface Event {
   // E1: Recurrence
   parent_event_id?: number | null;
   is_recurring?: boolean;
+  // INF6: Video conferencing
+  video_url?: string | null;
+  allow_remote_attendance?: boolean;
   // E3: Waitlist
   waitlist_count?: number;
   rsvp_counts?: {

@@ -18,7 +18,7 @@ class Connection extends Model
     protected $table = 'connections';
 
     protected $fillable = [
-        'tenant_id', 'requester_id', 'receiver_id', 'status',
+        'requester_id', 'receiver_id', 'status',
     ];
 
     protected $casts = [

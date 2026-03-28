@@ -49,4 +49,23 @@ class ConnectionRequested implements ShouldBroadcast
     {
         return 'connection.requested';
     }
+
+    /**
+     * Data to broadcast — only include fields the frontend needs.
+     * Prevents leaking full User models (email, phone, etc.)
+     * and full Connection model internals.
+     *
+     * @return array<string, mixed>
+     */
+    public function broadcastWith(): array
+    {
+        return [
+            'id'           => $this->connection->id,
+            'requester_id' => $this->requester->id,
+            'requester_name' => trim(
+                ($this->requester->first_name ?? '') . ' ' . ($this->requester->last_name ?? '')
+            ) ?: ($this->requester->name ?? 'Someone'),
+            'created_at'   => $this->connection->created_at?->toISOString(),
+        ];
+    }
 }

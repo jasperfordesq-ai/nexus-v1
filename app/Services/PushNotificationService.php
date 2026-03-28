@@ -18,6 +18,9 @@ class PushNotificationService
     /**
      * Subscribe a device for push notifications.
      *
+     * Tenant-scoped: stores the current tenant_id so push notifications
+     * are only sent to subscriptions belonging to the correct tenant.
+     *
      * @param array{endpoint: string, keys: array{p256dh: string, auth: string}} $subscription
      */
     public function subscribe(int $userId, array $subscription): bool
@@ -26,6 +29,8 @@ class PushNotificationService
         if (empty($endpoint)) {
             return false;
         }
+
+        $tenantId = \App\Core\TenantContext::getId();
 
         $existing = DB::table('push_subscriptions')
             ->where('user_id', $userId)
@@ -37,6 +42,7 @@ class PushNotificationService
                 ->where('user_id', $userId)
                 ->where('endpoint', $endpoint)
                 ->update([
+                    'tenant_id'  => $tenantId,
                     'p256dh_key' => $subscription['keys']['p256dh'] ?? null,
                     'auth_token' => $subscription['keys']['auth'] ?? null,
                     'updated_at' => now(),
@@ -46,6 +52,7 @@ class PushNotificationService
 
         DB::table('push_subscriptions')->insert([
             'user_id'    => $userId,
+            'tenant_id'  => $tenantId,
             'endpoint'   => $endpoint,
             'p256dh_key' => $subscription['keys']['p256dh'] ?? null,
             'auth_token' => $subscription['keys']['auth'] ?? null,

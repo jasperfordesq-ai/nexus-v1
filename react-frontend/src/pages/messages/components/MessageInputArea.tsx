@@ -9,6 +9,7 @@ import { Button, Textarea } from '@heroui/react';
 import { Send, Mic, Square, Paperclip, X, FileText, AlertTriangle } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useTenant } from '@/contexts';
+import { GifPicker } from '@/components/compose/GifPicker';
 import { VoiceMessagePlayer } from './VoiceMessagePlayer';
 
 export interface AttachmentPreview {
@@ -47,6 +48,8 @@ export interface MessageInputAreaProps {
   fileInputRef: RefObject<HTMLInputElement>;
   onFileSelect: (e: ChangeEvent<HTMLInputElement>) => void;
   onRemoveAttachment: (index: number) => void;
+  // GIF picker
+  onGifSelect?: (gifUrl: string) => void;
 }
 
 /**
@@ -83,6 +86,7 @@ export function MessageInputArea({
   fileInputRef,
   onFileSelect,
   onRemoveAttachment,
+  onGifSelect,
 }: MessageInputAreaProps) {
   const { t } = useTranslation('messages');
   const navigate = useNavigate();
@@ -230,6 +234,10 @@ export function MessageInputArea({
           >
             <Paperclip className="w-4 h-4" />
           </Button>
+          {/* GIF picker */}
+          {onGifSelect && (
+            <GifPicker onSelect={onGifSelect} />
+          )}
           <Textarea
             placeholder={t('type_placeholder')}
             value={newMessage}

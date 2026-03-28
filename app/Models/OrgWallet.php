@@ -17,7 +17,7 @@ class OrgWallet extends Model
     protected $table = 'org_wallets';
 
     protected $fillable = [
-        'tenant_id', 'organization_id', 'balance',
+        'organization_id',
     ];
 
     protected $casts = [

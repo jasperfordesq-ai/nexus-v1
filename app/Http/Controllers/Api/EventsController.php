@@ -8,6 +8,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Services\EventService;
 use App\Services\EventNotificationService;
+use App\Models\Poll;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
 use App\Core\TenantContext;
@@ -171,6 +172,13 @@ class EventsController extends BaseApiController
             return $this->respondWithErrors($errors, $status);
         }
 
+        // Link polls to this event
+        if (! empty($data['poll_ids']) && is_array($data['poll_ids'])) {
+            Poll::query()
+                ->whereIn('id', array_map('intval', $data['poll_ids']))
+                ->update(['event_id' => $eventId]);
+        }
+
         $event = $this->eventService->getById($eventId, $userId);
 
         // Award XP for creating an event
@@ -227,6 +235,18 @@ class EventsController extends BaseApiController
                 }
             }
             return $this->respondWithErrors($errors, $status);
+        }
+
+        // Update poll associations
+        if (array_key_exists('poll_ids', $data)) {
+            // Unlink existing polls from this event
+            Poll::query()->where('event_id', $id)->update(['event_id' => null]);
+            // Link new polls
+            if (! empty($data['poll_ids']) && is_array($data['poll_ids'])) {
+                Poll::query()
+                    ->whereIn('id', array_map('intval', $data['poll_ids']))
+                    ->update(['event_id' => $id]);
+            }
         }
 
         // Notify attendees of meaningful changes

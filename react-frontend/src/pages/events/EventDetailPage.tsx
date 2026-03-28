@@ -50,6 +50,8 @@ import {
   Repeat,
   ArrowRight,
   CalendarRange,
+  Video,
+  BarChart3,
 } from 'lucide-react';
 import { GlassCard } from '@/components/ui';
 import { Breadcrumbs } from '@/components/navigation';
@@ -63,6 +65,26 @@ import { resolveAvatarUrl, resolveAssetUrl } from '@/lib/helpers';
 import type { Event, User, RsvpResponse } from '@/types/api';
 
 type RsvpOption = 'going' | 'interested' | 'not_going';
+
+interface PollOption {
+  id: number;
+  text: string;
+  label: string;
+  vote_count: number;
+  percentage: number;
+}
+
+interface EventPoll {
+  id: number;
+  question: string;
+  description?: string;
+  status: 'open' | 'closed';
+  total_votes: number;
+  has_voted: boolean;
+  voted_option_id: number | null;
+  options: PollOption[];
+  creator?: { id: number; name: string; avatar_url?: string | null };
+}
 
 interface AttendeeWithCheckIn extends User {
   checked_in?: boolean;
@@ -97,6 +119,9 @@ export function EventDetailPage() {
   const [waitlistPosition, setWaitlistPosition] = useState<number | null>(null);
   const [seriesEvents, setSeriesEvents] = useState<Event[]>([]);
   const [isLoadingSeriesEvents, setIsLoadingSeriesEvents] = useState(false);
+  const [eventPolls, setEventPolls] = useState<EventPoll[]>([]);
+  const [isLoadingPolls, setIsLoadingPolls] = useState(false);
+  const [votingPollId, setVotingPollId] = useState<number | null>(null);
 
   // AbortController ref to cancel stale requests
   const abortRef = useRef<AbortController | null>(null);
@@ -183,6 +208,48 @@ export function EventDetailPage() {
     fetchSeriesEvents();
     return () => { cancelled = true; };
   }, [event]);
+
+  // Fetch polls linked to this event
+  useEffect(() => {
+    if (!id) return;
+
+    let cancelled = false;
+    async function fetchEventPolls() {
+      setIsLoadingPolls(true);
+      try {
+        const res = await api.get<{ items?: EventPoll[] }>(`/v2/polls?event_id=${id}&status=all&limit=50`);
+        if (!cancelled && res.success && res.data) {
+          const items = Array.isArray(res.data) ? res.data : (res.data.items ?? []);
+          setEventPolls(items);
+        }
+      } catch (err) {
+        logError('Failed to load event polls', err);
+      } finally {
+        if (!cancelled) setIsLoadingPolls(false);
+      }
+    }
+
+    fetchEventPolls();
+    return () => { cancelled = true; };
+  }, [id]);
+
+  async function handlePollVote(pollId: number, optionId: number) {
+    try {
+      setVotingPollId(pollId);
+      const res = await api.post<EventPoll>(`/v2/polls/${pollId}/vote`, { option_id: optionId });
+      if (res.success && res.data) {
+        setEventPolls((prev) =>
+          prev.map((p) => (p.id === pollId ? { ...p, ...res.data! } : p))
+        );
+        toastRef.current.success(t('polls.vote_success'));
+      }
+    } catch (err) {
+      logError('Failed to vote on poll', err);
+      toastRef.current.error(t('polls.vote_failed'));
+    } finally {
+      setVotingPollId(null);
+    }
+  }
 
   async function handleRsvp(newStatus: RsvpOption) {
     if (!event || !isAuthenticated) return;
@@ -567,6 +634,15 @@ export function EventDetailPage() {
           </div>
         )}
 
+        {/* INF6: Remote attendance badge */}
+        {event.allow_remote_attendance && (
+          <div className="mb-4">
+            <Chip variant="flat" color="primary" size="sm" startContent={<Video className="w-3 h-3" aria-hidden="true" />}>
+              {t('detail.remote_attendance_available')}
+            </Chip>
+          </div>
+        )}
+
         {/* E7: Series link (navigable) */}
         {event.series && (
           <div className="mb-4 flex flex-wrap items-center gap-2">
@@ -787,6 +863,100 @@ export function EventDetailPage() {
                       {event.organizer.first_name} {event.organizer.last_name}
                     </span>
                   </div>
+                </div>
+              )}
+
+              {/* Event Polls */}
+              {!isLoadingPolls && eventPolls.length > 0 && (
+                <div className="mb-8">
+                  <h2 className="text-lg font-semibold text-theme-primary mb-4 flex items-center gap-2">
+                    <BarChart3 className="w-5 h-5 text-indigo-600 dark:text-indigo-400" aria-hidden="true" />
+                    {t('polls.title')}
+                  </h2>
+                  <div className="space-y-4">
+                    {eventPolls.map((poll) => (
+                      <Card
+                        key={poll.id}
+                        className="bg-theme-elevated border border-theme-default"
+                      >
+                        <CardBody className="p-4 space-y-3">
+                          <div className="flex items-start justify-between gap-2">
+                            <h3 className="text-theme-primary font-medium">{poll.question}</h3>
+                            <Chip
+                              size="sm"
+                              variant="flat"
+                              color={poll.status === 'open' ? 'success' : 'default'}
+                            >
+                              {poll.status === 'open' ? t('polls.status_open') : t('polls.status_closed')}
+                            </Chip>
+                          </div>
+                          {poll.description && (
+                            <p className="text-theme-muted text-sm">{poll.description}</p>
+                          )}
+
+                          {/* Show results if voted or poll is closed */}
+                          {(poll.has_voted || poll.status === 'closed') ? (
+                            <div className="space-y-2">
+                              {poll.options.map((opt) => (
+                                <div key={opt.id} className="space-y-1">
+                                  <div className="flex items-center justify-between text-sm">
+                                    <span className={`text-theme-primary ${poll.voted_option_id === opt.id ? 'font-semibold' : ''}`}>
+                                      {opt.label || opt.text}
+                                      {poll.voted_option_id === opt.id && (
+                                        <CheckCircle2 className="w-3.5 h-3.5 inline ml-1 text-emerald-500" aria-hidden="true" />
+                                      )}
+                                    </span>
+                                    <span className="text-theme-subtle">{opt.percentage}%</span>
+                                  </div>
+                                  <div className="w-full h-2 rounded-full bg-theme-hover overflow-hidden">
+                                    <div
+                                      className="h-full rounded-full bg-gradient-to-r from-indigo-500 to-purple-600 transition-all duration-500"
+                                      style={{ width: `${opt.percentage}%` }}
+                                    />
+                                  </div>
+                                </div>
+                              ))}
+                              <p className="text-xs text-theme-subtle mt-2">
+                                {t('polls.total_votes', { count: poll.total_votes })}
+                              </p>
+                            </div>
+                          ) : (
+                            <div className="space-y-2">
+                              {poll.options.map((opt) => (
+                                <Button
+                                  key={opt.id}
+                                  variant="flat"
+                                  className="w-full justify-start bg-theme-hover text-theme-primary hover:bg-indigo-500/20 transition-colors"
+                                  onPress={() => handlePollVote(poll.id, opt.id)}
+                                  isLoading={votingPollId === poll.id}
+                                  isDisabled={votingPollId !== null}
+                                >
+                                  {opt.label || opt.text}
+                                </Button>
+                              ))}
+                            </div>
+                          )}
+
+                          {/* Link to full poll page */}
+                          <Link to={tenantPath(`/polls/${poll.id}`)} className="block">
+                            <Button
+                              variant="light"
+                              size="sm"
+                              className="text-indigo-500 dark:text-indigo-400 p-0"
+                            >
+                              {t('polls.view_full')}
+                            </Button>
+                          </Link>
+                        </CardBody>
+                      </Card>
+                    ))}
+                  </div>
+                </div>
+              )}
+              {isLoadingPolls && (
+                <div className="mb-8 space-y-3">
+                  <Skeleton className="w-48 h-6 rounded-lg" />
+                  <Skeleton className="w-full h-32 rounded-lg" />
                 </div>
               )}
 
@@ -1052,6 +1222,20 @@ export function EventDetailPage() {
             >
               {t('detail.share')}
             </Button>
+
+            {/* INF6: Join Meeting button */}
+            {event.video_url && (
+              <Button
+                as="a"
+                href={event.video_url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="bg-gradient-to-r from-blue-500 to-cyan-500 text-white"
+                startContent={<Video className="w-4 h-4" aria-hidden="true" />}
+              >
+                {t('detail.join_meeting')}
+              </Button>
+            )}
 
             {/* Online event link */}
             {event.online_url && (

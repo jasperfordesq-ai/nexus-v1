@@ -18,13 +18,13 @@ class CommunityFundTransaction extends Model
     protected $table = 'community_fund_transactions';
 
     protected $fillable = [
-        'tenant_id', 'fund_id', 'user_id', 'type', 'amount',
+        'fund_id', 'user_id', 'type', 'amount',
         'balance_after', 'description', 'admin_id',
     ];
 
     protected $casts = [
-        'amount' => 'float',
-        'balance_after' => 'float',
+        'amount' => 'decimal:2',
+        'balance_after' => 'decimal:2',
     ];
 
     public function user(): BelongsTo

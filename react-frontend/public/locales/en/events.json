@@ -99,7 +99,9 @@
     "leave_waitlist": "Leave Waitlist",
     "other_series_events": "Other events in this series",
     "view_all_series": "View all {{count}} events in series",
-    "no_other_series_events": "No other events found in this series."
+    "no_other_series_events": "No other events found in this series.",
+    "remote_attendance_available": "Remote attendance available",
+    "join_meeting": "Join Meeting"
   },
   "card": {
     "cancelled": "Cancelled",
@@ -145,6 +147,11 @@
     "error_not_found": "Event not found",
     "error_load_failed": "Failed to load event. Please try again.",
     "cancel": "Cancel",
+    "remote_attendance_toggle": "Allow remote attendance",
+    "remote_attendance_desc": "Let attendees join via video conferencing",
+    "remote_attendance_toggle_aria": "Toggle remote attendance",
+    "video_url_label": "Meeting Link",
+    "video_url_placeholder": "https://zoom.us/j/... or https://meet.google.com/...",
     "recurring_toggle": "Make this a recurring event",
     "recurring_desc": "Automatically create multiple occurrences",
     "recurring_toggle_aria": "Toggle recurring event",
@@ -189,7 +196,10 @@
       "updated": "Event updated",
       "image_failed": "Event created but image upload failed",
       "error": "Something went wrong"
-    }
+    },
+    "attach_polls_label": "Attach Polls (optional)",
+    "attach_polls_placeholder": "Select polls to attach...",
+    "attach_polls_hint": "Attach existing community polls to this event."
   },
   "toast": {
     "rsvp_removed": "RSVP removed",
@@ -215,5 +225,14 @@
   "reminder": {
     "title": "Event Reminders",
     "coming_soon_desc": "Global reminder preferences are coming soon. In the meantime, you can set reminders on individual events from their detail page."
+  },
+  "polls": {
+    "title": "Event Polls",
+    "status_open": "Open",
+    "status_closed": "Closed",
+    "total_votes": "{{count}} votes",
+    "vote_success": "Vote recorded!",
+    "vote_failed": "Failed to record vote",
+    "view_full": "View full poll"
   }
 }

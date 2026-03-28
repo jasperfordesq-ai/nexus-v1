@@ -548,14 +548,12 @@ jobs:
       #   run: docker compose -f compose.ci.yml down -v
 
   # ─────────────────────────────────────────────────────────────────
-  # Stage 8: Accessibility Checks (warning only)
+  # Stage 8: Accessibility Checks (blocking)
   # ─────────────────────────────────────────────────────────────────
   accessibility-check:
     name: Accessibility Audit (WCAG 2.1 AA)
     runs-on: ubuntu-latest
     needs: [react-build]
-    # Warning-only: does not block CI, but creates annotations
-    continue-on-error: true
 
     steps:
       - uses: actions/checkout@v4

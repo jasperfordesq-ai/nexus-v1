@@ -19,12 +19,13 @@ class Poll extends Model
     protected $table = 'polls';
 
     protected $fillable = [
-        'tenant_id', 'user_id', 'question', 'description',
+        'tenant_id', 'user_id', 'event_id', 'question', 'description',
         'end_date', 'is_active', 'category', 'poll_type',
     ];
 
     protected $casts = [
         'user_id'   => 'integer',
+        'event_id'  => 'integer',
         'end_date'  => 'datetime',
         'is_active' => 'boolean',
     ];
@@ -32,6 +33,11 @@ class Poll extends Model
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function event(): BelongsTo
+    {
+        return $this->belongsTo(Event::class);
     }
 
     public function options(): HasMany

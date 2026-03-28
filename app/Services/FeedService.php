@@ -12,6 +12,7 @@ use App\Models\Like;
 use App\Services\LinkPreviewService;
 use App\Services\MentionService;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use App\Core\TenantContext;
 
 /**
@@ -508,45 +509,69 @@ class FeedService
             return ['error' => 'Post must have content or an image'];
         }
 
+        // Determine publish status: scheduled, draft, or published
+        $publishStatus = $data['publish_status'] ?? 'published';
+        $scheduledAt = $data['scheduled_at'] ?? null;
+
+        if ($publishStatus === 'scheduled' && empty($scheduledAt)) {
+            return ['error' => 'Scheduled posts must have a scheduled_at date'];
+        }
+
+        if ($publishStatus === 'scheduled' && $scheduledAt) {
+            $scheduledTime = \Carbon\Carbon::parse($scheduledAt);
+            if ($scheduledTime->isPast()) {
+                // If the scheduled time is in the past, publish immediately
+                $publishStatus = 'published';
+                $scheduledAt = null;
+            }
+        }
+
         $post = $this->feedPost->newInstance([
-            'user_id'     => $userId,
-            'tenant_id'   => $tenantId,
-            'content'     => $content,
-            'emoji'       => $data['emoji'] ?? null,
-            'image_url'   => $image,
-            'type'        => 'post',
-            'parent_type' => $data['parent_type'] ?? null,
-            'parent_id'   => $data['parent_id'] ?? null,
-            'visibility'  => $visibility,
-            'group_id'    => $groupId,
+            'user_id'        => $userId,
+            'tenant_id'      => $tenantId,
+            'content'        => $content,
+            'emoji'          => $data['emoji'] ?? null,
+            'image_url'      => $image,
+            'type'           => 'post',
+            'parent_type'    => $data['parent_type'] ?? null,
+            'parent_id'      => $data['parent_id'] ?? null,
+            'visibility'     => $visibility,
+            'group_id'       => $groupId,
+            'publish_status' => $publishStatus,
+            'scheduled_at'   => $scheduledAt,
         ]);
 
         $post->save();
 
-        // Also record in feed_activity so the post appears in the main feed
-        try {
-            DB::table('feed_activity')->insertOrIgnore([
-                'tenant_id'   => $tenantId,
-                'user_id'     => $userId,
-                'source_type' => 'post',
-                'source_id'   => $post->id,
-                'group_id'    => $groupId,
-                'title'       => null,
-                'content'     => $content,
-                'image_url'   => $image,
-                'metadata'    => null,
-                'is_visible'  => true,
-                'created_at'  => $post->created_at,
-            ]);
-        } catch (\Exception $e) {
-            \Illuminate\Support\Facades\Log::warning("FeedService::createPost feed_activity sync failed: " . $e->getMessage());
+        // Only record in feed_activity for immediately published posts;
+        // scheduled/draft posts are added to feed_activity when published
+        if ($publishStatus === 'published') {
+            try {
+                DB::table('feed_activity')->insertOrIgnore([
+                    'tenant_id'   => $tenantId,
+                    'user_id'     => $userId,
+                    'source_type' => 'post',
+                    'source_id'   => $post->id,
+                    'group_id'    => $groupId,
+                    'title'       => null,
+                    'content'     => $content,
+                    'image_url'   => $image,
+                    'metadata'    => null,
+                    'is_visible'  => true,
+                    'created_at'  => $post->created_at,
+                ]);
+            } catch (\Exception $e) {
+                Log::warning("FeedService::createPost feed_activity sync failed: " . $e->getMessage());
+            }
         }
 
-        // Process @mentions in post content
-        try {
-            MentionService::processText($content, $post->id, 'post', $userId);
-        } catch (\Exception $e) {
-            \Illuminate\Support\Facades\Log::warning("FeedService::createPost mention processing failed: " . $e->getMessage());
+        // Process @mentions in post content (only for published posts)
+        if ($publishStatus === 'published') {
+            try {
+                MentionService::processText($content, $post->id, 'post', $userId);
+            } catch (\Exception $e) {
+                Log::warning("FeedService::createPost mention processing failed: " . $e->getMessage());
+            }
         }
 
         return $post->fresh(['user']);
@@ -650,7 +675,7 @@ class FeedService
                            (SELECT COUNT(*) FROM comments WHERE target_type = 'post' AND target_id = p.id) as comments_count
                     FROM feed_posts p
                     JOIN users u ON p.user_id = u.id
-                    WHERE p.id = ? AND p.tenant_id = ?",
+                    WHERE p.id = ? AND p.tenant_id = ? AND (p.publish_status = 'published' OR p.publish_status IS NULL)",
                     [$id, $tenantId]
                 );
                 $items = array_map(fn($r) => (array) $r, $rows);
@@ -723,6 +748,93 @@ class FeedService
             'is_liked' => $isLiked,
             'created_at' => $item['created_at'],
         ];
+    }
+
+    /**
+     * Publish all scheduled posts whose scheduled_at time has passed.
+     *
+     * Called every minute by the scheduler. Processes all tenants.
+     *
+     * @return int Number of posts published
+     */
+    public function publishScheduledPosts(): int
+    {
+        $posts = FeedPost::where('publish_status', 'scheduled')
+            ->where('scheduled_at', '<=', now())
+            ->get();
+
+        $count = 0;
+
+        foreach ($posts as $post) {
+            try {
+                $post->update([
+                    'publish_status' => 'published',
+                    'created_at'     => now(), // Set created_at to publish time so it appears fresh in feed
+                ]);
+
+                // Insert into feed_activity so the post appears in the main feed
+                DB::table('feed_activity')->insertOrIgnore([
+                    'tenant_id'   => $post->tenant_id,
+                    'user_id'     => $post->user_id,
+                    'source_type' => 'post',
+                    'source_id'   => $post->id,
+                    'group_id'    => $post->group_id,
+                    'title'       => null,
+                    'content'     => $post->content,
+                    'image_url'   => $post->image_url,
+                    'metadata'    => null,
+                    'is_visible'  => true,
+                    'created_at'  => now(),
+                ]);
+
+                // Process @mentions now that the post is live
+                try {
+                    MentionService::processText($post->content ?? '', $post->id, 'post', $post->user_id);
+                } catch (\Exception $e) {
+                    Log::warning("publishScheduledPosts mention processing failed for post {$post->id}: " . $e->getMessage());
+                }
+
+                $count++;
+            } catch (\Exception $e) {
+                Log::error("publishScheduledPosts failed for post {$post->id}: " . $e->getMessage());
+            }
+        }
+
+        if ($count > 0) {
+            Log::info("publishScheduledPosts: published {$count} scheduled post(s)");
+        }
+
+        return $count;
+    }
+
+    /**
+     * Get scheduled posts for a specific user.
+     *
+     * @return array{items: array}
+     */
+    public function getScheduledPosts(int $userId): array
+    {
+        $tenantId = TenantContext::getId();
+
+        $posts = FeedPost::where('user_id', $userId)
+            ->where('tenant_id', $tenantId)
+            ->where('publish_status', 'scheduled')
+            ->orderBy('scheduled_at', 'asc')
+            ->get();
+
+        $items = [];
+        foreach ($posts as $post) {
+            $items[] = [
+                'id'             => $post->id,
+                'content'        => $post->content,
+                'image_url'      => $post->image_url,
+                'publish_status' => $post->publish_status,
+                'scheduled_at'   => $post->scheduled_at?->toIso8601String(),
+                'created_at'     => $post->created_at?->toIso8601String(),
+            ];
+        }
+
+        return ['items' => $items];
     }
 
     /**

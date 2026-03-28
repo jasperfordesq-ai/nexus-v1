@@ -22,11 +22,9 @@ class User extends Authenticatable
     protected $table = 'users';
 
     protected $fillable = [
-        'tenant_id', 'name', 'first_name', 'last_name', 'email', 'username',
-        'password_hash',
+        'name', 'first_name', 'last_name', 'email', 'username',
         'status', 'avatar_url', 'bio', 'location', 'latitude', 'longitude',
         'phone', 'is_verified', 'is_approved',
-        'balance',
         'onboarding_completed',
         'profile_type', 'organization_name', 'totp_enabled',
         'notification_preferences',
@@ -35,6 +33,7 @@ class User extends Authenticatable
 
     protected $hidden = [
         'password_hash', 'totp_secret', 'totp_backup_codes',
+        'remember_token', 'api_token', 'verification_token', 'two_factor_secret',
     ];
 
     protected $appends = ['avatar', 'tagline'];

@@ -25,7 +25,7 @@ class Notification extends Model
     public $timestamps = false;
 
     protected $fillable = [
-        'tenant_id', 'user_id', 'type', 'message',
+        'user_id', 'type', 'message',
         'link', 'is_read', 'created_at',
     ];
 

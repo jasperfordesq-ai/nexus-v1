@@ -51,4 +51,23 @@ class TransactionCompleted implements ShouldBroadcast
     {
         return 'transaction.completed';
     }
+
+    /**
+     * Data to broadcast — only include fields the frontend needs.
+     * Prevents leaking full User models (email, phone, balance, etc.)
+     * and full Transaction model (internal notes, admin fields).
+     *
+     * @return array<string, mixed>
+     */
+    public function broadcastWith(): array
+    {
+        return [
+            'id'          => $this->transaction->id,
+            'amount'      => $this->transaction->amount,
+            'description' => $this->transaction->description,
+            'sender_id'   => $this->sender->id,
+            'receiver_id' => $this->receiver->id,
+            'created_at'  => $this->transaction->created_at?->toISOString(),
+        ];
+    }
 }

@@ -70,6 +70,10 @@ export interface FeedItem {
   badge_icon?: string;
   /** Level-up-specific: new level number */
   new_level?: number;
+  /** Scheduling: publish status (published, scheduled, draft) */
+  publish_status?: 'published' | 'scheduled' | 'draft';
+  /** Scheduling: when the post is scheduled to be published */
+  scheduled_at?: string;
   /** Reaction data (replaces simple like system) */
   reactions?: {
     counts: Record<string, number>;

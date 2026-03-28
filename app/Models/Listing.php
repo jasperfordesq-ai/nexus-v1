@@ -22,7 +22,6 @@ class Listing extends Model
     protected $table = 'listings';
 
     protected $fillable = [
-        'tenant_id',
         'user_id',
         'category_id',
         'title',

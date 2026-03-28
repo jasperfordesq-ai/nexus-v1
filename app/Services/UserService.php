@@ -680,6 +680,7 @@ class UserService
             $profile['preferred_language']       = $user->preferred_language ?? 'en';
             $profile['has_2fa_enabled']          = (bool) ($user->totp_enabled ?? false);
             $profile['preferred_theme']          = $user->preferred_theme ?? 'system';
+            $profile['theme_preferences']        = $user->theme_preferences ? json_decode($user->theme_preferences, true) : null;
         }
 
         return $profile;

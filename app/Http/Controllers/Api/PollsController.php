@@ -52,6 +52,9 @@ class PollsController extends BaseApiController
         if ($this->query('category')) {
             $filters['category'] = $this->query('category');
         }
+        if ($this->query('event_id')) {
+            $filters['event_id'] = $this->queryInt('event_id');
+        }
 
         $result = $this->pollService->getAll($filters);
 

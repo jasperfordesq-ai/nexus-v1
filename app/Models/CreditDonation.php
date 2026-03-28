@@ -18,7 +18,7 @@ class CreditDonation extends Model
     protected $table = 'credit_donations';
 
     protected $fillable = [
-        'tenant_id', 'donor_id', 'recipient_type', 'recipient_id',
+        'donor_id', 'recipient_type', 'recipient_id',
         'amount', 'message', 'transaction_id',
     ];
 

@@ -282,6 +282,13 @@
     "new_goal": "New Goal",
     "new_goal_desc": "Set a personal goal"
   },
+  "gif": {
+    "search_placeholder": "Search GIFs...",
+    "trending": "Trending",
+    "no_results": "No GIFs found",
+    "powered_by": "Powered by Tenor",
+    "button_label": "Add GIF"
+  },
   "loading": "Loading...",
   "feature_error": {
     "load_failed": "We couldn't load {{feature}}. This section may be temporarily unavailable."

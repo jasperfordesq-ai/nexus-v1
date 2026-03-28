@@ -20,7 +20,7 @@ class OrgTransaction extends Model
     const UPDATED_AT = null;
 
     protected $fillable = [
-        'tenant_id', 'organization_id', 'transfer_request_id',
+        'organization_id', 'transfer_request_id',
         'sender_type', 'sender_id', 'receiver_type', 'receiver_id',
         'amount', 'description',
     ];
@@ -30,7 +30,7 @@ class OrgTransaction extends Model
         'transfer_request_id' => 'integer',
         'sender_id' => 'integer',
         'receiver_id' => 'integer',
-        'amount' => 'float',
+        'amount' => 'decimal:2',
     ];
 
     public function organization(): BelongsTo

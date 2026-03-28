@@ -270,3 +270,83 @@ html[data-theme="light"] {
 html[data-theme="dark"] {
   color-scheme: dark;
 }
+
+/* ─────────────────────────────────────────────
+   APPEARANCE PREFERENCES
+   Accent color, font size, density, high contrast
+   ───────────────────────────────────────────── */
+:root {
+  /* Accent color — overridden by ThemeContext at runtime */
+  --accent-color: #6366f1;
+
+  /* Font size base — small=14px, medium=16px, large=18px */
+  --font-size-base: 16px;
+
+  /* Spacing multiplier — compact=0.75, comfortable=1, spacious=1.25 */
+  --spacing-multiplier: 1;
+}
+
+/* Apply font size scaling to body text */
+html {
+  font-size: var(--font-size-base);
+}
+
+/* Accent color fallbacks — use var(--accent-color) where brand primary is used */
+:root {
+  --accent-color-hover: color-mix(in srgb, var(--accent-color) 85%, white);
+  --accent-color-subtle: color-mix(in srgb, var(--accent-color) 20%, transparent);
+  --accent-glow: color-mix(in srgb, var(--accent-color) 50%, transparent);
+  --accent-glow-subtle: color-mix(in srgb, var(--accent-color) 25%, transparent);
+  --accent-glow-intense: color-mix(in srgb, var(--accent-color) 70%, transparent);
+}
+
+/* ─────────────────────────────────────────────
+   HIGH CONTRAST MODE
+   Increases borders, text contrast, focus indicators
+   ───────────────────────────────────────────── */
+html[data-high-contrast="true"] {
+  /* Dark theme high contrast */
+  --border-default: rgba(255, 255, 255, 0.25);
+  --border-hover: rgba(255, 255, 255, 0.40);
+  --border-focus: rgba(99, 102, 241, 0.8);
+
+  --text-muted: rgba(255, 255, 255, 0.8);
+  --text-subtle: rgba(255, 255, 255, 0.65);
+
+  --glass-border: rgba(255, 255, 255, 0.25);
+  --glass-border-hover: rgba(255, 255, 255, 0.40);
+  --glass-border-focus: rgba(255, 255, 255, 0.50);
+
+  --card-border: rgba(255, 255, 255, 0.20);
+  --input-border: rgba(255, 255, 255, 0.25);
+  --input-focus-border: rgba(99, 102, 241, 0.8);
+}
+
+html[data-high-contrast="true"][data-theme="light"] {
+  /* Light theme high contrast */
+  --border-default: rgba(0, 0, 0, 0.20);
+  --border-hover: rgba(0, 0, 0, 0.35);
+  --border-focus: rgba(79, 70, 229, 0.8);
+
+  --text-muted: #334155;
+  --text-subtle: #475569;
+
+  --glass-border: rgba(0, 0, 0, 0.20);
+  --glass-border-hover: rgba(0, 0, 0, 0.30);
+  --glass-border-focus: rgba(79, 70, 229, 0.6);
+
+  --card-border: rgba(0, 0, 0, 0.15);
+  --input-border: rgba(0, 0, 0, 0.25);
+  --input-focus-border: rgba(79, 70, 229, 0.8);
+}
+
+/* High contrast: increase border widths and use solid borders */
+html[data-high-contrast="true"] *:not(svg):not(path) {
+  border-style: solid !important;
+}
+
+/* High contrast: stronger focus ring */
+html[data-high-contrast="true"] :focus-visible {
+  outline-width: 3px !important;
+  outline-offset: 2px !important;
+}

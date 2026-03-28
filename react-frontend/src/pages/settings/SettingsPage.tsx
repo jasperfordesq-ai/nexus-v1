@@ -93,6 +93,7 @@ import { resolveAvatarUrl } from '@/lib/helpers';
 import { usePageTitle } from '@/hooks';
 import { useTranslation } from 'react-i18next';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
+import { AppearanceSettings } from '@/components/settings/AppearanceSettings';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Types
@@ -1154,6 +1155,15 @@ export function SettingsPage() {
                 </div>
               </div>
             </div>
+          </GlassCard>
+
+          {/* ── Appearance Preferences ── */}
+          <GlassCard className="p-6">
+            <h2 className="text-lg font-semibold text-theme-primary mb-6 flex items-center gap-2">
+              <Sparkles className="w-5 h-5 text-indigo-500" aria-hidden="true" />
+              {t('appearance_prefs.title')}
+            </h2>
+            <AppearanceSettings />
           </GlassCard>
           </div>
         )}

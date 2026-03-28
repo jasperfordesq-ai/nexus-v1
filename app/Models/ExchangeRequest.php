@@ -19,7 +19,7 @@ class ExchangeRequest extends Model
     protected $table = 'exchange_requests';
 
     protected $fillable = [
-        'tenant_id', 'listing_id', 'requester_id', 'provider_id',
+        'listing_id', 'requester_id', 'provider_id',
         'proposed_hours', 'requester_notes', 'status',
         'broker_id', 'broker_notes',
         'requester_confirmed_at', 'requester_confirmed_hours',

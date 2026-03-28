@@ -22,7 +22,7 @@ class Group extends Model
     protected $table = 'groups';
 
     protected $fillable = [
-        'tenant_id', 'owner_id', 'name', 'description', 'image_url',
+        'owner_id', 'name', 'description', 'image_url',
         'cover_image_url', 'visibility', 'location', 'latitude', 'longitude',
         'type_id', 'parent_id', 'is_featured', 'has_children',
         'cached_member_count', 'federated_visibility',

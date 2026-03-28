@@ -21,6 +21,7 @@ import {
   useEffect,
   useState,
   useCallback,
+  useMemo,
   useRef,
   type ReactNode,
 } from 'react';
@@ -312,14 +313,17 @@ export function PresenceProvider({ children }: PresenceProviderProps) {
     }
   }, []);
 
-  const value: PresenceContextValue = {
-    onlineUsers,
-    onlineCount,
-    setStatus,
-    setPrivacy,
-    fetchPresence,
-    getPresence,
-  };
+  const value = useMemo<PresenceContextValue>(
+    () => ({
+      onlineUsers,
+      onlineCount,
+      setStatus,
+      setPrivacy,
+      fetchPresence,
+      getPresence,
+    }),
+    [onlineUsers, onlineCount, setStatus, setPrivacy, fetchPresence, getPresence]
+  );
 
   return (
     <PresenceContext.Provider value={value}>

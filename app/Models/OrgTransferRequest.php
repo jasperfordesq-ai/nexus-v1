@@ -19,7 +19,7 @@ class OrgTransferRequest extends Model
     protected $table = 'org_transfer_requests';
 
     protected $fillable = [
-        'tenant_id', 'organization_id', 'requester_id', 'recipient_id',
+        'organization_id', 'requester_id', 'recipient_id',
         'amount', 'description', 'status', 'approved_by', 'approved_at',
         'rejection_reason',
     ];
@@ -29,7 +29,7 @@ class OrgTransferRequest extends Model
         'requester_id' => 'integer',
         'recipient_id' => 'integer',
         'approved_by' => 'integer',
-        'amount' => 'float',
+        'amount' => 'decimal:2',
         'approved_at' => 'datetime',
     ];
 

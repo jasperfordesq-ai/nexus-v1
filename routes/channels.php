@@ -48,6 +48,26 @@ Broadcast::channel('tenant.{tenantId}.group.{groupId}', function (User $user, in
         ->exists();
 });
 
+// Private feed channel — any authenticated member in the tenant
+Broadcast::channel('tenant.{tenantId}.feed', function (User $user, int $tenantId) {
+    return $user->tenant_id === $tenantId;
+});
+
+// Private chat channel — only the two participants (deterministic ID pair)
+Broadcast::channel('tenant.{tenantId}.chat.{chatId}', function (User $user, int $tenantId, string $chatId) {
+    if ($user->tenant_id !== $tenantId) {
+        return false;
+    }
+    // chatId is "{smallerUserId}-{largerUserId}" — user must be one of them
+    $parts = explode('-', $chatId);
+    if (count($parts) !== 2) {
+        return false;
+    }
+    $userA = (int) $parts[0];
+    $userB = (int) $parts[1];
+    return $user->id === $userA || $user->id === $userB;
+});
+
 // Presence channel for online members in a tenant
 Broadcast::channel('tenant.{tenantId}.presence', function (User $user, int $tenantId) {
     if ($user->tenant_id !== $tenantId) {

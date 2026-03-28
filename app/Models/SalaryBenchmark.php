@@ -6,15 +6,18 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\HasTenantScope;
 use Illuminate\Database\Eloquent\Model;
 
 class SalaryBenchmark extends Model
 {
+    use HasTenantScope;
+
     public $timestamps = false;
     protected $table = 'salary_benchmarks';
 
     protected $fillable = [
-        'tenant_id','role_keyword','industry','location',
+        'role_keyword','industry','location',
         'salary_min','salary_max','salary_median','salary_type',
         'currency','year','source',
     ];

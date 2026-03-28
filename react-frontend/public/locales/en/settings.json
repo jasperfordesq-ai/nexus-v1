@@ -369,5 +369,23 @@
     "add_failed": "Failed to add linked account",
     "remove_failed": "Failed to remove",
     "approve_failed": "Failed to approve"
+  },
+  "appearance_prefs": {
+    "title": "Appearance Preferences",
+    "accent_color": "Accent Color",
+    "accent_color_desc": "Choose the accent color used throughout the interface",
+    "select_color": "Select {{color}} as accent color",
+    "font_size": "Font Size",
+    "font_size_desc": "Adjust the base text size across the interface",
+    "font_small": "S",
+    "font_medium": "M",
+    "font_large": "L",
+    "density": "Layout Density",
+    "density_desc": "Control the spacing and padding of interface elements",
+    "density_compact": "Compact",
+    "density_comfortable": "Comfortable",
+    "density_spacious": "Spacious",
+    "high_contrast": "High Contrast",
+    "high_contrast_desc": "Increase borders, text contrast, and focus indicators for better accessibility"
   }
 }

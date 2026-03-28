@@ -27,6 +27,8 @@ import {
   X,
   Tag,
   Repeat,
+  Video,
+  BarChart3,
 } from 'lucide-react';
 import { GlassCard } from '@/components/ui';
 import { Breadcrumbs } from '@/components/navigation';
@@ -60,6 +62,9 @@ interface FormData {
   longitude?: number;
   max_attendees: string;
   category: string;
+  // Video conferencing
+  allowRemoteAttendance: boolean;
+  videoUrl: string;
   // Recurrence
   isRecurring: boolean;
   recurrenceFrequency: RecurrenceFrequency;
@@ -82,6 +87,8 @@ const initialFormData: FormData = {
   location: '',
   max_attendees: '',
   category: '',
+  allowRemoteAttendance: false,
+  videoUrl: '',
   isRecurring: false,
   recurrenceFrequency: 'weekly',
   recurrenceDays: [],
@@ -160,6 +167,11 @@ export function CreateEventPage() {
   const [isUploadingImage, setIsUploadingImage] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  // Poll attachment state
+  const [availablePolls, setAvailablePolls] = useState<{ id: number; question: string }[]>([]);
+  const [selectedPollIds, setSelectedPollIds] = useState<Set<string>>(new Set());
+  const [isLoadingPolls, setIsLoadingPolls] = useState(false);
+
   const loadEvent = useCallback(async () => {
     if (!id) return;
 
@@ -184,6 +196,8 @@ export function CreateEventPage() {
           longitude: event.coordinates?.lng,
           max_attendees: event.max_attendees?.toString() || '',
           category: event.category_name || '',
+          allowRemoteAttendance: !!event.allow_remote_attendance,
+          videoUrl: event.video_url || '',
           // Recurrence fields default (editing a recurring event is not supported yet)
           isRecurring: false,
           recurrenceFrequency: 'weekly',
@@ -212,6 +226,37 @@ export function CreateEventPage() {
       loadEvent();
     }
   }, [isEditing, loadEvent]);
+
+  // Load available polls for attachment
+  useEffect(() => {
+    let cancelled = false;
+    async function fetchPolls() {
+      setIsLoadingPolls(true);
+      try {
+        const res = await api.get<{ items?: { id: number; question: string; event_id?: number | null }[] }>(
+          '/v2/polls?status=all&limit=100'
+        );
+        if (!cancelled && res.success && res.data) {
+          const items = Array.isArray(res.data) ? res.data : (res.data.items ?? []);
+          setAvailablePolls(items.map((p) => ({ id: p.id, question: p.question })));
+
+          // If editing, pre-select polls linked to this event
+          if (isEditing && id) {
+            const linked = items.filter((p) => p.event_id === Number(id));
+            if (linked.length > 0) {
+              setSelectedPollIds(new Set(linked.map((p) => String(p.id))));
+            }
+          }
+        }
+      } catch {
+        // Non-critical — poll attachment is optional
+      } finally {
+        if (!cancelled) setIsLoadingPolls(false);
+      }
+    }
+    fetchPolls();
+    return () => { cancelled = true; };
+  }, [isEditing, id]);
 
   function handleImageSelect(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
@@ -377,6 +422,8 @@ export function CreateEventPage() {
         latitude: formData.latitude,
         longitude: formData.longitude,
         max_attendees: formData.max_attendees ? parseInt(formData.max_attendees) : null,
+        allow_remote_attendance: formData.allowRemoteAttendance,
+        video_url: formData.allowRemoteAttendance && formData.videoUrl.trim() ? formData.videoUrl.trim() : null,
       };
 
       if (formData.category) {
@@ -387,6 +434,14 @@ export function CreateEventPage() {
           // Category is a slug string (e.g. 'workshop') — send as category_name
           payload.category_name = formData.category;
         }
+      }
+
+      // Attached polls
+      if (selectedPollIds.size > 0) {
+        payload.poll_ids = Array.from(selectedPollIds).map(Number);
+      } else if (isEditing) {
+        // Explicitly send empty array to unlink all polls when editing
+        payload.poll_ids = [];
       }
 
       // Recurrence
@@ -907,6 +962,84 @@ export function CreateEventPage() {
               />
             </div>
           </div>
+
+          {/* Remote Attendance / Video Conferencing */}
+          <div className="space-y-4">
+            <div className="flex items-center justify-between p-4 rounded-xl bg-theme-elevated border border-theme-default">
+              <div className="flex items-center gap-3">
+                <div className="p-2 rounded-lg bg-blue-500/20">
+                  <Video className="w-5 h-5 text-blue-600 dark:text-blue-400" aria-hidden="true" />
+                </div>
+                <div>
+                  <p className="font-medium text-theme-primary">
+                    {t('form.remote_attendance_toggle')}
+                  </p>
+                  <p className="text-sm text-theme-subtle">
+                    {t('form.remote_attendance_desc')}
+                  </p>
+                </div>
+              </div>
+              <Switch
+                aria-label={t('form.remote_attendance_toggle_aria')}
+                isSelected={formData.allowRemoteAttendance}
+                onValueChange={(checked) => setFormData((prev) => ({ ...prev, allowRemoteAttendance: checked }))}
+                classNames={{
+                  wrapper: 'group-data-[selected=true]:bg-blue-500',
+                }}
+              />
+            </div>
+
+            {formData.allowRemoteAttendance && (
+              <motion.div
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: 'auto' }}
+                exit={{ opacity: 0, height: 0 }}
+              >
+                <Input
+                  label={t('form.video_url_label')}
+                  placeholder={t('form.video_url_placeholder')}
+                  value={formData.videoUrl}
+                  onChange={(e) => setFormData((prev) => ({ ...prev, videoUrl: e.target.value }))}
+                  startContent={<Video className="w-4 h-4 text-theme-subtle" aria-hidden="true" />}
+                  classNames={{
+                    input: 'bg-transparent text-theme-primary',
+                    inputWrapper: 'bg-theme-elevated border-theme-default',
+                    label: 'text-theme-muted',
+                  }}
+                />
+              </motion.div>
+            )}
+          </div>
+
+          {/* Attach Polls */}
+          {availablePolls.length > 0 && (
+            <div>
+              <Select
+                label={t('form.attach_polls_label')}
+                placeholder={t('form.attach_polls_placeholder')}
+                selectionMode="multiple"
+                selectedKeys={selectedPollIds}
+                onSelectionChange={(keys) => setSelectedPollIds(new Set(Array.from(keys).map(String)))}
+                isLoading={isLoadingPolls}
+                startContent={<BarChart3 className="w-4 h-4 text-theme-subtle" aria-hidden="true" />}
+                classNames={{
+                  trigger: 'bg-theme-elevated border-theme-default',
+                  label: 'text-theme-muted',
+                  value: 'text-theme-primary',
+                  popoverContent: 'bg-content1 border border-theme-default',
+                }}
+              >
+                {availablePolls.map((poll) => (
+                  <SelectItem key={String(poll.id)}>
+                    {poll.question}
+                  </SelectItem>
+                ))}
+              </Select>
+              <p className="text-xs text-theme-subtle mt-1">
+                {t('form.attach_polls_hint')}
+              </p>
+            </div>
+          )}
 
           {/* Submit */}
           <div className="flex gap-3 pt-4">

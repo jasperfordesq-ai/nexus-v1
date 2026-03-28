@@ -15,7 +15,7 @@
  * Automatically subscribes to user-specific and conversation channels.
  */
 
-import { createContext, useContext, useEffect, useState, useCallback, useRef, type ReactNode } from 'react';
+import { createContext, useContext, useEffect, useState, useCallback, useMemo, useRef, type ReactNode } from 'react';
 import Pusher, { type Channel } from 'pusher-js';
 import { useAuth } from './AuthContext';
 import { api, tokenManager } from '@/lib/api';
@@ -339,16 +339,19 @@ export function PusherProvider({ children }: PusherProviderProps) {
     }
   }, []);
 
-  const value: PusherContextValue = {
-    isConnected,
-    subscribeToConversation,
-    unsubscribeFromConversation,
-    onNewMessage,
-    onTyping,
-    onUnreadCount,
-    onFeedPost,
-    sendTyping,
-  };
+  const value = useMemo<PusherContextValue>(
+    () => ({
+      isConnected,
+      subscribeToConversation,
+      unsubscribeFromConversation,
+      onNewMessage,
+      onTyping,
+      onUnreadCount,
+      onFeedPost,
+      sendTyping,
+    }),
+    [isConnected, subscribeToConversation, unsubscribeFromConversation, onNewMessage, onTyping, onUnreadCount, onFeedPost, sendTyping]
+  );
 
   return (
     <PusherContext.Provider value={value}>

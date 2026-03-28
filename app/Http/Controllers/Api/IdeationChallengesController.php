@@ -1070,6 +1070,48 @@ class IdeationChallengesController extends BaseApiController
         return $this->noContent();
     }
 
+    /** POST /api/v2/groups/{groupId}/chatrooms/{chatroomId}/pin/{messageId} */
+    public function pinChatroomMessage($groupId, $chatroomId, $messageId): JsonResponse
+    {
+        $this->ensureFeature();
+        $userId = $this->getUserId();
+        $this->rateLimit('chatroom_pin', 20, 60);
+
+        $success = $this->groupChatroomService->pinMessage((int) $chatroomId, (int) $messageId, $userId);
+
+        if (!$success) {
+            $errors = $this->groupChatroomService->getErrors();
+            return $this->respondWithErrors($errors, $this->resolveErrorStatus($errors));
+        }
+
+        return $this->respondWithData(['pinned' => true], null, 201);
+    }
+
+    /** DELETE /api/v2/groups/{groupId}/chatrooms/{chatroomId}/pin/{messageId} */
+    public function unpinChatroomMessage($groupId, $chatroomId, $messageId): JsonResponse
+    {
+        $this->ensureFeature();
+        $userId = $this->getUserId();
+        $this->rateLimit('chatroom_pin', 20, 60);
+
+        $success = $this->groupChatroomService->unpinMessage((int) $chatroomId, (int) $messageId, $userId);
+
+        if (!$success) {
+            $errors = $this->groupChatroomService->getErrors();
+            return $this->respondWithErrors($errors, $this->resolveErrorStatus($errors));
+        }
+
+        return $this->noContent();
+    }
+
+    /** GET /api/v2/groups/{groupId}/chatrooms/{chatroomId}/pinned */
+    public function pinnedChatroomMessages($groupId, $chatroomId): JsonResponse
+    {
+        $this->ensureFeature();
+        $pinned = $this->groupChatroomService->getPinnedMessages((int) $chatroomId);
+        return $this->respondWithData($pinned);
+    }
+
     // ========================================
     // TEAM TASK ENDPOINTS — now native
     // ========================================

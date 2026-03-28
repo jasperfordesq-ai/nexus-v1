@@ -106,11 +106,13 @@ class PusherService
     /**
      * Get the private channel name for a specific user.
      *
-     * Convention: private-user.{userId}
+     * Convention: private-tenant.{tenantId}.user.{userId}
+     * Must match the React frontend PusherContext subscription format.
      */
     public function getUserChannel(int $userId): string
     {
-        return "private-user.{$userId}";
+        $tenantId = \App\Core\TenantContext::getId();
+        return "private-tenant.{$tenantId}.user.{$userId}";
     }
 
     /**
@@ -200,7 +202,12 @@ class PusherService
      *
      * Access rules:
      *   - private-user.{N} — only user N
-     *   - private-tenant.{T}.* — any user with tenant T as current tenant
+     *   - private-tenant.{T}.user.{N} — only user N in tenant T
+     *   - private-tenant.{T}.chat.{A}-{B} — only users A or B in tenant T
+     *   - private-tenant.{T}.feed — any user in tenant T
+     *   - private-tenant.{T}.presence — any user in tenant T
+     *   - private-tenant.{T}.conversation.* — any user in tenant T (further checked by Broadcast::channel())
+     *   - private-tenant.{T}.group.* — any user in tenant T (further checked by Broadcast::channel())
      */
     private function canAccessPrivateChannel(string $channelName, int $userId): bool
     {
@@ -209,11 +216,38 @@ class PusherService
             return (int) $matches[1] === $userId;
         }
 
-        // Tenant channel: private-tenant.{tenantId}.*
-        if (preg_match('/^private-tenant\.(\d+)/', $channelName, $matches)) {
+        // Tenant-scoped channels: verify tenant membership first
+        if (preg_match('/^private-tenant\.(\d+)\.(.+)$/', $channelName, $matches)) {
             $channelTenantId = (int) $matches[1];
             $currentTenantId = \App\Core\TenantContext::getId();
-            return $channelTenantId === $currentTenantId;
+            if ($channelTenantId !== $currentTenantId) {
+                return false;
+            }
+
+            $suffix = $matches[2];
+
+            // User-specific channel: user.{N} — only that user
+            if (preg_match('/^user\.(\d+)$/', $suffix, $userMatch)) {
+                return (int) $userMatch[1] === $userId;
+            }
+
+            // Chat channel: chat.{A}-{B} — only participants A or B
+            // This prevents eavesdropping on private conversations
+            if (preg_match('/^chat\.(\d+)-(\d+)$/', $suffix, $chatMatch)) {
+                $userA = (int) $chatMatch[1];
+                $userB = (int) $chatMatch[2];
+                return $userId === $userA || $userId === $userB;
+            }
+
+            // Tenant-wide channels (feed, presence): any authenticated tenant member
+            if (in_array($suffix, ['feed', 'presence'], true)) {
+                return true;
+            }
+
+            // Conversation and group channels: tenant membership check here,
+            // participant-level checks handled by Broadcast::channel() rules
+            // in routes/channels.php
+            return true;
         }
 
         // Unknown channel pattern — deny by default

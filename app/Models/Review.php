@@ -20,7 +20,7 @@ class Review extends Model
     protected $table = 'reviews';
 
     protected $fillable = [
-        'tenant_id', 'reviewer_id', 'receiver_id', 'transaction_id',
+        'reviewer_id', 'receiver_id', 'transaction_id',
         'group_id', 'rating', 'comment', 'status',
     ];
 

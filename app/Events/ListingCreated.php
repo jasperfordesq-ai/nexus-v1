@@ -8,8 +8,8 @@ namespace App\Events;
 
 use App\Models\Listing;
 use App\Models\User;
-use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\InteractsWithSockets;
+use Illuminate\Broadcasting\PrivateChannel;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
@@ -33,12 +33,15 @@ class ListingCreated implements ShouldBroadcast
     /**
      * Get the channels the event should broadcast on.
      *
-     * @return array<int, Channel>
+     * Uses PrivateChannel so only authenticated tenant members receive feed
+     * updates — a public Channel would allow unauthenticated eavesdropping.
+     *
+     * @return array<int, PrivateChannel>
      */
     public function broadcastOn(): array
     {
         return [
-            new Channel("tenant.{$this->tenantId}.feed"),
+            new PrivateChannel("tenant.{$this->tenantId}.feed"),
         ];
     }
 
@@ -48,5 +51,27 @@ class ListingCreated implements ShouldBroadcast
     public function broadcastAs(): string
     {
         return 'listing.created';
+    }
+
+    /**
+     * Data to broadcast — only include fields the frontend needs.
+     * Prevents leaking full Listing model (internal flags, admin notes)
+     * and full User model (email, phone, etc.).
+     *
+     * @return array<string, mixed>
+     */
+    public function broadcastWith(): array
+    {
+        return [
+            'id'          => $this->listing->id,
+            'title'       => $this->listing->title,
+            'type'        => $this->listing->type,
+            'description' => \Illuminate\Support\Str::limit($this->listing->description ?? '', 200),
+            'user_id'     => $this->user->id,
+            'user_name'   => trim(
+                ($this->user->first_name ?? '') . ' ' . ($this->user->last_name ?? '')
+            ) ?: ($this->user->name ?? 'Member'),
+            'created_at'  => $this->listing->created_at?->toISOString(),
+        ];
     }
 }

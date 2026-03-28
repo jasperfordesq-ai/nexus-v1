@@ -89,6 +89,7 @@ The NGC folder (`C:\Users\{user}\AppData\Local\Microsoft\Ngc`) must exist — th
 | [sales-site/CLAUDE.md](sales-site/CLAUDE.md) | Sales site stack conventions |
 | [docs/PHP_CONVENTIONS.md](docs/PHP_CONVENTIONS.md) | PHP code patterns, services/models reference |
 | [docs/API_REFERENCE.md](docs/API_REFERENCE.md) | V2 API endpoints (50+) |
+| [docs/ROADMAP.md](docs/ROADMAP.md) | Consolidated feature roadmap (single source of truth) |
 | [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md) | Deployment guide (Azure production) |
 | [docs/REGRESSION_PREVENTION.md](docs/REGRESSION_PREVENTION.md) | 7-layer regression prevention system |
 | [docs/QA_AUDIT_AND_TEST_PLAN.md](docs/QA_AUDIT_AND_TEST_PLAN.md) | Master QA document |

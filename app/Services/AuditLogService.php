@@ -451,7 +451,7 @@ class AuditLogService
             return DB::table('org_audit_log')
                 ->where('tenant_id', $tenantId)
                 ->where('organization_id', $organizationId)
-                ->where('created_at', '>=', DB::raw("DATE_SUB(NOW(), INTERVAL {$days} DAY)"))
+                ->where('created_at', '>=', DB::raw("DATE_SUB(NOW(), INTERVAL " . ((int) $days) . " DAY)"))
                 ->select('action', DB::raw('COUNT(*) as count'))
                 ->groupBy('action')
                 ->orderByDesc('count')
@@ -558,7 +558,7 @@ class AuditLogService
     {
         try {
             return DB::table('org_audit_log')
-                ->where('created_at', '<', DB::raw("DATE_SUB(NOW(), INTERVAL {$daysToKeep} DAY)"))
+                ->where('created_at', '<', DB::raw("DATE_SUB(NOW(), INTERVAL " . ((int) $daysToKeep) . " DAY)"))
                 ->delete();
         } catch (\Exception $e) {
             Log::warning('AuditLogService: Cleanup failed - ' . $e->getMessage());

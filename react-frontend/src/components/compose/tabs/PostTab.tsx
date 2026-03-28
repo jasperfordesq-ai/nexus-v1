@@ -9,7 +9,10 @@
  */
 
 import { useState, useCallback, useEffect, useRef, lazy, Suspense } from 'react';
-import { Button, Avatar, Spinner } from '@heroui/react';
+import { Button, Avatar, Spinner, DatePicker, TimeInput, Popover, PopoverTrigger, PopoverContent } from '@heroui/react';
+import type { DateInputValue, TimeInputValue } from '@heroui/react';
+import { today, getLocalTimeZone } from '@internationalized/date';
+import { Calendar, X } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useAuth, useToast } from '@/contexts';
 import { useDraftPersistence } from '@/hooks';
@@ -24,6 +27,7 @@ const ComposeEditor = lazy(() =>
 );
 import { MediaUploader, type MediaFile } from '../MediaUploader';
 import { EmojiPicker } from '../shared/EmojiPicker';
+import { GifPicker } from '../GifPicker';
 import { VoiceInput } from '../shared/VoiceInput';
 import { CharacterCount } from '../shared/CharacterCount';
 import { LinkPreview } from '../shared/LinkPreview';
@@ -31,6 +35,17 @@ import { useComposeSubmit } from '../ComposeSubmitContext';
 import type { TabSubmitProps } from '../types';
 
 const MAX_CONTENT_CHARS = 5000;
+
+/** Convert DateInputValue + optional TimeInputValue to ISO string */
+function toScheduleIso(date: DateInputValue, time: TimeInputValue | null): string {
+  const dateStr = date.toString(); // "2026-02-21"
+  if (time) {
+    const h = String(time.hour).padStart(2, '0');
+    const m = String(time.minute).padStart(2, '0');
+    return `${dateStr}T${h}:${m}:00`;
+  }
+  return `${dateStr}T00:00:00`;
+}
 
 interface PostDraft {
   htmlContent: string;
@@ -52,7 +67,13 @@ export function PostTab({ onSuccess, onClose, groupId, templateData }: TabSubmit
   );
 
   const [mediaFiles, setMediaFiles] = useState<MediaFile[]>([]);
+  const [selectedGifUrl, setSelectedGifUrl] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [scheduleDate, setScheduleDate] = useState<DateInputValue | null>(null);
+  const [scheduleTime, setScheduleTime] = useState<TimeInputValue | null>(null);
+  const [isScheduleOpen, setIsScheduleOpen] = useState(false);
+
+  const isScheduled = scheduleDate !== null;
 
   // Apply template data when selected from TemplatePicker
   useEffect(() => {
@@ -65,7 +86,7 @@ export function PostTab({ onSuccess, onClose, groupId, templateData }: TabSubmit
     }
   }, [templateData, setDraft]);
 
-  const canSubmit = draft.plainText.trim().length > 0 || mediaFiles.length > 0;
+  const canSubmit = draft.plainText.trim().length > 0 || mediaFiles.length > 0 || selectedGifUrl !== null;
 
   const handleHtmlChange = useCallback(
     (html: string) => setDraft((prev) => ({ ...prev, htmlContent: html })),
@@ -104,9 +125,20 @@ export function PostTab({ onSuccess, onClose, groupId, templateData }: TabSubmit
     setIsSubmitting(true);
     try {
       // Decide content: use HTML if it's rich, plain text otherwise
-      const contentToSend = draft.htmlContent || draft.plainText.trim();
+      // Append GIF URL if one was selected
+      const baseContent = draft.htmlContent || draft.plainText.trim();
+      const contentToSend = selectedGifUrl
+        ? `${baseContent}\n${selectedGifUrl}`.trim()
+        : baseContent;
 
       let res;
+
+      // Build scheduling payload
+      const schedulePayload: Record<string, string> = {};
+      if (isScheduled && scheduleDate) {
+        schedulePayload.publish_status = 'scheduled';
+        schedulePayload.scheduled_at = toScheduleIso(scheduleDate, scheduleTime);
+      }
 
       if (mediaFiles.length > 0) {
         // Use multipart/form-data when images are attached
@@ -114,6 +146,10 @@ export function PostTab({ onSuccess, onClose, groupId, templateData }: TabSubmit
         formData.append('content', contentToSend);
         formData.append('visibility', 'public');
         if (groupId) formData.append('group_id', String(groupId));
+        if (schedulePayload.publish_status) {
+          formData.append('publish_status', schedulePayload.publish_status);
+          formData.append('scheduled_at', schedulePayload.scheduled_at);
+        }
 
         // Append media files and alt texts for PostMediaService
         mediaFiles.forEach((item) => {
@@ -128,13 +164,17 @@ export function PostTab({ onSuccess, onClose, groupId, templateData }: TabSubmit
           content: contentToSend,
           visibility: 'public',
           ...(groupId ? { group_id: groupId } : {}),
+          ...schedulePayload,
         });
       }
 
       if (res.success) {
         clearDraft();
         setMediaFiles([]);
-        toast.success(t('compose.post_created'));
+        setSelectedGifUrl(null);
+        setScheduleDate(null);
+        setScheduleTime(null);
+        toast.success(isScheduled ? t('compose.post_scheduled') : t('compose.post_created'));
         onClose();
         onSuccess('post');
       } else {
@@ -199,11 +239,98 @@ export function PostTab({ onSuccess, onClose, groupId, templateData }: TabSubmit
         onError={(msg) => toast.error(msg)}
       />
 
+      {/* GIF preview */}
+      {selectedGifUrl && (
+        <div className="relative inline-block">
+          <img
+            src={selectedGifUrl}
+            alt="Selected GIF"
+            className="max-w-[240px] max-h-[200px] rounded-lg border border-[var(--border-default)]"
+          />
+          <button
+            type="button"
+            onClick={() => setSelectedGifUrl(null)}
+            className="absolute -top-1.5 -right-1.5 w-5 h-5 flex items-center justify-center bg-red-500 rounded-full text-white hover:bg-red-600 transition-colors"
+            aria-label={t('compose.cancel')}
+          >
+            <X className="w-3 h-3" />
+          </button>
+        </div>
+      )}
+
+      {/* Schedule indicator */}
+      {isScheduled && scheduleDate && (
+        <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-primary-50 dark:bg-primary-900/20 text-primary-700 dark:text-primary-300 text-sm">
+          <Calendar className="w-4 h-4 flex-shrink-0" />
+          <span>{t('compose.schedule_set', { date: toScheduleIso(scheduleDate, scheduleTime) })}</span>
+          <button
+            type="button"
+            onClick={() => { setScheduleDate(null); setScheduleTime(null); }}
+            className="ml-auto p-0.5 rounded hover:bg-primary-100 dark:hover:bg-primary-800/30"
+            aria-label={t('compose.schedule_clear')}
+          >
+            <X className="w-3.5 h-3.5" />
+          </button>
+        </div>
+      )}
+
       {/* Toolbar + submit row */}
       <div className={`flex items-center justify-between pt-1 ${isMobile ? 'sticky bottom-0 bg-[var(--surface-base)] py-3 border-t border-[var(--border-default)]' : ''}`}>
         <div className="flex items-center gap-1">
           <EmojiPicker onSelect={handleEmojiSelect} />
+          <GifPicker onSelect={setSelectedGifUrl} />
           <VoiceInput onTranscript={handleVoiceTranscript} />
+          <Popover isOpen={isScheduleOpen} onOpenChange={setIsScheduleOpen} placement="top-start">
+            <PopoverTrigger>
+              <Button
+                variant="light"
+                size="sm"
+                isIconOnly
+                aria-label={t('compose.schedule_label')}
+                className={isScheduled ? 'text-primary' : 'text-[var(--text-muted)]'}
+              >
+                <Calendar className="w-5 h-5" />
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="p-4 w-72 space-y-3">
+              <p className="text-sm font-medium text-[var(--text-primary)]">{t('compose.schedule_label')}</p>
+              <DatePicker
+                label={t('compose.schedule_date_label')}
+                variant="bordered"
+                size="sm"
+                value={scheduleDate}
+                onChange={setScheduleDate}
+                minValue={today(getLocalTimeZone())}
+                granularity="day"
+              />
+              <TimeInput
+                label={t('compose.schedule_time_label')}
+                variant="bordered"
+                size="sm"
+                value={scheduleTime}
+                onChange={setScheduleTime}
+              />
+              <div className="flex gap-2 justify-end">
+                {isScheduled && (
+                  <Button
+                    variant="flat"
+                    size="sm"
+                    onPress={() => { setScheduleDate(null); setScheduleTime(null); setIsScheduleOpen(false); }}
+                  >
+                    {t('compose.schedule_clear')}
+                  </Button>
+                )}
+                <Button
+                  color="primary"
+                  size="sm"
+                  isDisabled={!scheduleDate}
+                  onPress={() => setIsScheduleOpen(false)}
+                >
+                  {t('compose.schedule_confirm')}
+                </Button>
+              </div>
+            </PopoverContent>
+          </Popover>
         </div>
 
         {!isMobile && (
@@ -223,7 +350,7 @@ export function PostTab({ onSuccess, onClose, groupId, templateData }: TabSubmit
               isLoading={isSubmitting}
               isDisabled={!canSubmit}
             >
-              {t('compose.post_button')}
+              {isScheduled ? t('compose.schedule_button') : t('compose.post_button')}
             </Button>
           </div>
         )}

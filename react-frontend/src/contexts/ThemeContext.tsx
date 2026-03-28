@@ -11,6 +11,7 @@
  * - localStorage persistence
  * - Backend sync for authenticated users
  * - Smooth theme transitions
+ * - Accent color, font size, density, and high contrast preferences
  */
 
 import {
@@ -20,6 +21,7 @@ import {
   useEffect,
   useCallback,
   useMemo,
+  useRef,
   type ReactNode,
 } from 'react';
 import { api, tokenManager } from '@/lib/api';
@@ -31,6 +33,15 @@ import { logWarn } from '@/lib/logger';
 
 export type ThemeMode = 'light' | 'dark' | 'system';
 export type ResolvedTheme = 'light' | 'dark';
+export type FontSize = 'small' | 'medium' | 'large';
+export type Density = 'compact' | 'comfortable' | 'spacious';
+
+export interface ThemePreferences {
+  accentColor: string;
+  fontSize: FontSize;
+  density: Density;
+  highContrast: boolean;
+}
 
 interface ThemeState {
   theme: ThemeMode;
@@ -38,9 +49,13 @@ interface ThemeState {
   isInitialized: boolean;
 }
 
-interface ThemeContextValue extends ThemeState {
+interface ThemeContextValue extends ThemeState, ThemePreferences {
   setTheme: (theme: ThemeMode) => Promise<void>;
   toggleTheme: () => Promise<void>;
+  setAccentColor: (color: string) => void;
+  setFontSize: (size: FontSize) => void;
+  setDensity: (density: Density) => void;
+  setHighContrast: (enabled: boolean) => void;
   isLoading: boolean;
 }
 
@@ -49,7 +64,27 @@ interface ThemeContextValue extends ThemeState {
 // ─────────────────────────────────────────────────────────────────────────────
 
 const THEME_STORAGE_KEY = 'nexus_theme';
+const THEME_PREFS_STORAGE_KEY = 'nexus_theme_preferences';
 const DEFAULT_THEME: ThemeMode = 'dark';
+
+const DEFAULT_PREFERENCES: ThemePreferences = {
+  accentColor: '#6366f1',
+  fontSize: 'medium',
+  density: 'comfortable',
+  highContrast: false,
+};
+
+const FONT_SIZE_MAP: Record<FontSize, string> = {
+  small: '14px',
+  medium: '16px',
+  large: '18px',
+};
+
+const SPACING_MULTIPLIER_MAP: Record<Density, string> = {
+  compact: '0.75',
+  comfortable: '1',
+  spacious: '1.25',
+};
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Helpers
@@ -89,6 +124,17 @@ function applyThemeToDOM(resolvedTheme: ResolvedTheme): void {
   }
 }
 
+function applyPreferencesToDOM(prefs: ThemePreferences): void {
+  if (typeof document === 'undefined') return;
+
+  const html = document.documentElement;
+
+  html.style.setProperty('--accent-color', prefs.accentColor);
+  html.style.setProperty('--font-size-base', FONT_SIZE_MAP[prefs.fontSize]);
+  html.style.setProperty('--spacing-multiplier', SPACING_MULTIPLIER_MAP[prefs.density]);
+  html.setAttribute('data-high-contrast', String(prefs.highContrast));
+}
+
 function getStoredTheme(): ThemeMode | null {
   if (typeof localStorage === 'undefined') return null;
   const stored = localStorage.getItem(THEME_STORAGE_KEY);
@@ -101,6 +147,30 @@ function getStoredTheme(): ThemeMode | null {
 function storeTheme(theme: ThemeMode): void {
   if (typeof localStorage === 'undefined') return;
   localStorage.setItem(THEME_STORAGE_KEY, theme);
+}
+
+function getStoredPreferences(): ThemePreferences | null {
+  if (typeof localStorage === 'undefined') return null;
+  try {
+    const stored = localStorage.getItem(THEME_PREFS_STORAGE_KEY);
+    if (stored) {
+      const parsed = JSON.parse(stored);
+      return {
+        accentColor: parsed.accentColor ?? DEFAULT_PREFERENCES.accentColor,
+        fontSize: parsed.fontSize ?? DEFAULT_PREFERENCES.fontSize,
+        density: parsed.density ?? DEFAULT_PREFERENCES.density,
+        highContrast: parsed.highContrast ?? DEFAULT_PREFERENCES.highContrast,
+      };
+    }
+  } catch {
+    // Ignore malformed JSON
+  }
+  return null;
+}
+
+function storePreferences(prefs: ThemePreferences): void {
+  if (typeof localStorage === 'undefined') return;
+  localStorage.setItem(THEME_PREFS_STORAGE_KEY, JSON.stringify(prefs));
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -126,8 +196,14 @@ export function ThemeProvider({
     // Try to get stored theme, fall back to default
     return getStoredTheme() ?? defaultTheme;
   });
+  const [preferences, setPreferences] = useState<ThemePreferences>(() => {
+    return getStoredPreferences() ?? { ...DEFAULT_PREFERENCES };
+  });
   const [isLoading, setIsLoading] = useState(false);
   const [isInitialized, setIsInitialized] = useState(false);
+
+  // Debounce timer for backend sync
+  const syncTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // Resolve the actual theme (handles 'system' mode)
   const resolvedTheme = useMemo<ResolvedTheme>(() => {
@@ -139,6 +215,41 @@ export function ThemeProvider({
     applyThemeToDOM(resolvedTheme);
     setIsInitialized(true);
   }, [resolvedTheme]);
+
+  // Apply preferences to DOM when they change
+  useEffect(() => {
+    applyPreferencesToDOM(preferences);
+  }, [preferences]);
+
+  // Load preferences from backend on mount (if authenticated)
+  useEffect(() => {
+    if (!tokenManager.getAccessToken()) return;
+
+    let cancelled = false;
+    (async () => {
+      try {
+        const response = await api.get('/v2/users/me');
+        if (cancelled) return;
+        const data = response.data as Record<string, unknown> | undefined;
+        const themePrefs = data?.theme_preferences as Record<string, unknown> | undefined;
+        if (themePrefs) {
+          const serverPrefs: ThemePreferences = {
+            accentColor: (themePrefs.accent_color as string) ?? DEFAULT_PREFERENCES.accentColor,
+            fontSize: (themePrefs.font_size as FontSize) ?? DEFAULT_PREFERENCES.fontSize,
+            density: (themePrefs.density as Density) ?? DEFAULT_PREFERENCES.density,
+            highContrast: (themePrefs.high_contrast as boolean) ?? DEFAULT_PREFERENCES.highContrast,
+          };
+          setPreferences(serverPrefs);
+          storePreferences(serverPrefs);
+          applyPreferencesToDOM(serverPrefs);
+        }
+      } catch {
+        // Silently ignore — local preferences still apply
+      }
+    })();
+
+    return () => { cancelled = true; };
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Listen for system preference changes (only relevant when theme is 'system')
   useEffect(() => {
@@ -156,6 +267,28 @@ export function ThemeProvider({
     mediaQuery.addEventListener('change', handleChange);
     return () => mediaQuery.removeEventListener('change', handleChange);
   }, [theme]);
+
+  // Sync preferences to backend (debounced)
+  const syncPreferencesToBackend = useCallback((prefs: ThemePreferences) => {
+    if (!tokenManager.getAccessToken()) return;
+
+    if (syncTimerRef.current) {
+      clearTimeout(syncTimerRef.current);
+    }
+
+    syncTimerRef.current = setTimeout(async () => {
+      try {
+        await api.put('/v2/users/me/theme-preferences', {
+          accent_color: prefs.accentColor,
+          font_size: prefs.fontSize,
+          density: prefs.density,
+          high_contrast: prefs.highContrast,
+        });
+      } catch (error) {
+        logWarn('Failed to persist theme preferences to backend:', error);
+      }
+    }, 500);
+  }, []);
 
   // Set theme with persistence
   const setTheme = useCallback(async (newTheme: ThemeMode) => {
@@ -182,6 +315,43 @@ export function ThemeProvider({
     await setTheme(nextTheme);
   }, [resolvedTheme, setTheme]);
 
+  // Preference setters
+  const setAccentColor = useCallback((color: string) => {
+    setPreferences((prev) => {
+      const next = { ...prev, accentColor: color };
+      storePreferences(next);
+      syncPreferencesToBackend(next);
+      return next;
+    });
+  }, [syncPreferencesToBackend]);
+
+  const setFontSize = useCallback((size: FontSize) => {
+    setPreferences((prev) => {
+      const next = { ...prev, fontSize: size };
+      storePreferences(next);
+      syncPreferencesToBackend(next);
+      return next;
+    });
+  }, [syncPreferencesToBackend]);
+
+  const setDensity = useCallback((density: Density) => {
+    setPreferences((prev) => {
+      const next = { ...prev, density };
+      storePreferences(next);
+      syncPreferencesToBackend(next);
+      return next;
+    });
+  }, [syncPreferencesToBackend]);
+
+  const setHighContrast = useCallback((enabled: boolean) => {
+    setPreferences((prev) => {
+      const next = { ...prev, highContrast: enabled };
+      storePreferences(next);
+      syncPreferencesToBackend(next);
+      return next;
+    });
+  }, [syncPreferencesToBackend]);
+
   // Context value
   const value = useMemo<ThemeContextValue>(
     () => ({
@@ -191,8 +361,17 @@ export function ThemeProvider({
       setTheme,
       toggleTheme,
       isLoading,
+      accentColor: preferences.accentColor,
+      fontSize: preferences.fontSize,
+      density: preferences.density,
+      highContrast: preferences.highContrast,
+      setAccentColor,
+      setFontSize,
+      setDensity,
+      setHighContrast,
     }),
-    [theme, resolvedTheme, isInitialized, setTheme, toggleTheme, isLoading]
+    [theme, resolvedTheme, isInitialized, setTheme, toggleTheme, isLoading,
+     preferences, setAccentColor, setFontSize, setDensity, setHighContrast]
   );
 
   return (

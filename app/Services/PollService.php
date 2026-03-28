@@ -49,6 +49,10 @@ class PollService
             $query->where('category', $filters['category']);
         }
 
+        if (! empty($filters['event_id'])) {
+            $query->where('event_id', (int) $filters['event_id']);
+        }
+
         if ($cursor !== null && ($cid = base64_decode($cursor, true)) !== false) {
             $query->where('id', '<', (int) $cid);
         }
@@ -141,6 +145,7 @@ class PollService
         return DB::transaction(function () use ($userId, $data) {
             $poll = new Poll([
                 'user_id'     => $userId,
+                'event_id'    => $data['event_id'] ?? null,
                 'question'    => trim($data['question']),
                 'description' => trim($data['description'] ?? ''),
                 'end_date'    => $data['expires_at'] ?? $data['end_date'] ?? null,

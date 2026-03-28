@@ -16,6 +16,12 @@ import { MemoryRouter } from 'react-router-dom';
 import { EmptyState } from '@/components/feedback/EmptyState';
 import { GlassCard } from '@/components/ui/GlassCard';
 import { GlassButton } from '@/components/ui/GlassButton';
+import { GlassInput } from '@/components/ui/GlassInput';
+import { Breadcrumbs } from '@/components/navigation/Breadcrumbs';
+import { BackToTop } from '@/components/ui/BackToTop';
+import { LoadingScreen } from '@/components/feedback/LoadingScreen';
+import { LevelProgress } from '@/components/ui/LevelProgress';
+import { ImagePlaceholder } from '@/components/ui/ImagePlaceholder';
 
 // ─── Mocks ────────────────────────────────────────────────────────────────────
 
@@ -47,6 +53,42 @@ vi.mock('react-i18next', () => ({
   }),
   Trans: ({ children }: { children: unknown }) => children,
   initReactI18next: { type: '3rdParty', init: () => {} },
+}));
+
+vi.mock('i18next', () => ({
+  default: {
+    t: (key: string, opts?: Record<string, unknown>) =>
+      (opts as { defaultValue?: string } | undefined)?.defaultValue ?? key,
+    language: 'en',
+    changeLanguage: () => Promise.resolve(),
+  },
+  __esModule: true,
+}));
+
+vi.mock('@/contexts', () => ({
+  useTenant: () => ({
+    tenant: { id: 2, name: 'Test Timebank', slug: 'test-timebank' },
+    tenantSlug: 'test-timebank',
+    tenantPath: (path: string) => `/test-timebank${path}`,
+    hasFeature: () => true,
+    hasModule: () => true,
+    features: {},
+    modules: {},
+    branding: {},
+    isLoading: false,
+    error: null,
+    notFoundSlug: null,
+    refreshTenant: () => Promise.resolve(),
+  }),
+  useFeature: () => true,
+  useModule: () => true,
+  useCookieConsent: () => ({
+    consent: { analytics: false, marketing: false },
+    showBanner: false,
+    acceptAll: () => {},
+    rejectAll: () => {},
+    updateConsent: () => {},
+  }),
 }));
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
@@ -129,5 +171,121 @@ describe('Accessibility: skip link markup', () => {
     const link = container.querySelector('a[href="#main-content"]');
     expect(link).not.toBeNull();
     expect(link?.textContent).toBe('Skip to main content');
+  });
+});
+
+// ─── New accessibility tests ────────────────────────────────────────────────
+
+describe('Accessibility: GlassInput', () => {
+  it('has no violations with a label', async () => {
+    const { container } = withProviders(
+      <GlassInput label="Email address" type="email" />
+    );
+    const results = await axe(container);
+    expect(results).toHaveNoViolations();
+  });
+
+  it('has no violations with an error message', async () => {
+    const { container } = withProviders(
+      <GlassInput label="Username" error="Username is required" />
+    );
+    const results = await axe(container);
+    expect(results).toHaveNoViolations();
+  });
+
+  it('has no violations when disabled', async () => {
+    const { container } = withProviders(
+      <GlassInput label="Disabled field" isDisabled />
+    );
+    const results = await axe(container);
+    expect(results).toHaveNoViolations();
+  });
+});
+
+describe('Accessibility: Breadcrumbs', () => {
+  it('has no violations with multiple items', async () => {
+    const { container } = withProviders(
+      <Breadcrumbs
+        items={[
+          { label: 'Events', href: '/events' },
+          { label: 'Community Meetup' },
+        ]}
+      />
+    );
+    const results = await axe(container);
+    expect(results).toHaveNoViolations();
+  });
+
+  it('has no violations without home icon', async () => {
+    const { container } = withProviders(
+      <Breadcrumbs
+        items={[{ label: 'Settings' }]}
+        showHome={false}
+      />
+    );
+    const results = await axe(container);
+    expect(results).toHaveNoViolations();
+  });
+});
+
+describe('Accessibility: BackToTop', () => {
+  it('has no violations when rendered (button hidden by default)', async () => {
+    const { container } = withProviders(<BackToTop />);
+    const results = await axe(container);
+    expect(results).toHaveNoViolations();
+  });
+});
+
+describe('Accessibility: LoadingScreen', () => {
+  it('has no violations with default message', async () => {
+    const { container } = withProviders(
+      <LoadingScreen />
+    );
+    const results = await axe(container);
+    expect(results).toHaveNoViolations();
+  });
+
+  it('has no violations with custom message', async () => {
+    const { container } = withProviders(
+      <LoadingScreen message="Fetching your data..." />
+    );
+    const results = await axe(container);
+    expect(results).toHaveNoViolations();
+  });
+});
+
+describe('Accessibility: LevelProgress', () => {
+  it('has no violations in default mode', async () => {
+    const { container } = withProviders(
+      <LevelProgress currentXP={250} requiredXP={500} level={3} />
+    );
+    const results = await axe(container);
+    expect(results).toHaveNoViolations();
+  });
+
+  it('has no violations in compact mode', async () => {
+    const { container } = withProviders(
+      <LevelProgress currentXP={100} requiredXP={200} level={1} compact />
+    );
+    const results = await axe(container);
+    expect(results).toHaveNoViolations();
+  });
+});
+
+describe('Accessibility: ImagePlaceholder', () => {
+  it('has no violations with default props', async () => {
+    const { container } = withProviders(
+      <ImagePlaceholder />
+    );
+    const results = await axe(container);
+    expect(results).toHaveNoViolations();
+  });
+
+  it('has no violations with small size', async () => {
+    const { container } = withProviders(
+      <ImagePlaceholder size="sm" />
+    );
+    const results = await axe(container);
+    expect(results).toHaveNoViolations();
   });
 });

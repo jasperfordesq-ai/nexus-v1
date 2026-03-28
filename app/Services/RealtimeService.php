@@ -77,12 +77,16 @@ class RealtimeService
 
     /**
      * Broadcast a notification to a user's private channel.
+     *
+     * Uses tenant-scoped channel naming to match the React frontend
+     * PusherContext subscription format: private-tenant.{tenantId}.user.{userId}
      */
     public static function broadcastNotification(int $userId, array $data): bool
     {
         try {
             $service = new self();
-            return $service->broadcast("private-user.{$userId}", 'notification', $data);
+            $tenantId = \App\Core\TenantContext::getId();
+            return $service->broadcast("private-tenant.{$tenantId}.user.{$userId}", 'notification', $data);
         } catch (\Throwable $e) {
             Log::error('RealtimeService::broadcastNotification failed', ['error' => $e->getMessage()]);
             return false;

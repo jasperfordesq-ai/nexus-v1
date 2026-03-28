@@ -119,6 +119,16 @@ class SocialController extends BaseApiController
      * Fetch a single feed post by its ID (feed_posts.id / feed_activity.source_id).
      * Returns the same shape as a feed item from feedV2.
      */
+    /**
+     * Get the current user's scheduled posts.
+     */
+    public function scheduledPosts(): JsonResponse
+    {
+        $userId = $this->requireAuth();
+        $result = $this->feedService->getScheduledPosts($userId);
+        return $this->respondWithData($result);
+    }
+
     public function showPost(int $id): JsonResponse
     {
         $userId = $this->getOptionalUserId();

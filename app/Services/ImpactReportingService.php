@@ -32,7 +32,7 @@ class ImpactReportingService
 
         $data = DB::table('transactions')
             ->where('tenant_id', $tenantId)
-            ->where('created_at', '>=', DB::raw("DATE_SUB(NOW(), INTERVAL {$months} MONTH)"))
+            ->where('created_at', '>=', DB::raw("DATE_SUB(NOW(), INTERVAL " . ((int) $months) . " MONTH)"))
             ->select([
                 DB::raw('COALESCE(SUM(amount), 0) as total_hours'),
                 DB::raw('COUNT(*) as total_transactions'),
@@ -147,7 +147,7 @@ class ImpactReportingService
 
         $timeline = DB::table('transactions')
             ->where('tenant_id', $tenantId)
-            ->where('created_at', '>=', DB::raw("DATE_SUB(NOW(), INTERVAL {$months} MONTH)"))
+            ->where('created_at', '>=', DB::raw("DATE_SUB(NOW(), INTERVAL " . ((int) $months) . " MONTH)"))
             ->select([
                 DB::raw("DATE_FORMAT(created_at, '%Y-%m') as month"),
                 DB::raw('COALESCE(SUM(amount), 0) as hours_exchanged'),
@@ -166,7 +166,7 @@ class ImpactReportingService
         // Monthly new users
         $usersByMonth = DB::table('users')
             ->where('tenant_id', $tenantId)
-            ->where('created_at', '>=', DB::raw("DATE_SUB(NOW(), INTERVAL {$months} MONTH)"))
+            ->where('created_at', '>=', DB::raw("DATE_SUB(NOW(), INTERVAL " . ((int) $months) . " MONTH)"))
             ->select([
                 DB::raw("DATE_FORMAT(created_at, '%Y-%m') as month"),
                 DB::raw('COUNT(*) as new_users'),

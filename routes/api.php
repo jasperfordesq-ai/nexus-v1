@@ -1246,10 +1246,13 @@ Route::get('/v2/admin/crm/export/dashboard', [\App\Http\Controllers\Api\AdminCrm
 // ============================================
 Route::get('/push/vapid-key', [\App\Http\Controllers\Api\PushController::class, 'vapidKey']);
 Route::get('/push/vapid-public-key', [\App\Http\Controllers\Api\PushController::class, 'vapidKey']);
-Route::post('/auth/heartbeat', [\App\Http\Controllers\Api\AuthController::class, 'heartbeat']);
-Route::get('/auth/check-session', [\App\Http\Controllers\Api\AuthController::class, 'checkSession']);
-Route::post('/auth/refresh-session', [\App\Http\Controllers\Api\AuthController::class, 'refreshSession']);
-Route::post('/auth/restore-session', [\App\Http\Controllers\Api\AuthController::class, 'restoreSession']);
+// Session management — rate-limited to prevent abuse (30 req/min per IP)
+Route::middleware('throttle:30,1')->group(function () {
+    Route::post('/auth/heartbeat', [\App\Http\Controllers\Api\AuthController::class, 'heartbeat']);
+    Route::get('/auth/check-session', [\App\Http\Controllers\Api\AuthController::class, 'checkSession']);
+    Route::post('/auth/refresh-session', [\App\Http\Controllers\Api\AuthController::class, 'refreshSession']);
+    Route::post('/auth/restore-session', [\App\Http\Controllers\Api\AuthController::class, 'restoreSession']);
+});
 // Rate-limited auth endpoints (10 requests/minute per IP — brute force protection)
 Route::middleware('throttle:10,1')->group(function () {
     Route::post('/auth/login', [\App\Http\Controllers\Api\AuthController::class, 'login']);
@@ -1266,14 +1269,19 @@ Route::middleware('throttle:10,1')->group(function () {
     Route::post('/auth/resend-verification-by-email', [\App\Http\Controllers\Api\EmailVerificationController::class, 'resendVerificationByEmail']);
 });
 
-// Non-rate-limited auth utilities
-Route::post('/auth/logout', [\App\Http\Controllers\Api\AuthController::class, 'logout']);
-Route::post('/auth/refresh-token', [\App\Http\Controllers\Api\AuthController::class, 'refreshToken']);
-Route::post('/auth/validate-token', [\App\Http\Controllers\Api\AuthController::class, 'validateToken']);
-Route::get('/auth/validate-token', [\App\Http\Controllers\Api\AuthController::class, 'validateToken']);
-Route::get('/auth/csrf-token', [\App\Http\Controllers\Api\AuthController::class, 'getCsrfToken']);
-Route::get('/v2/csrf-token', [\App\Http\Controllers\Api\AuthController::class, 'getCsrfToken']);
-Route::get('/csrf-token', [\App\Http\Controllers\Api\AuthController::class, 'getCsrfToken']);
+// Auth utilities — rate-limited to prevent token enumeration/abuse (30 req/min per IP)
+Route::middleware('throttle:30,1')->group(function () {
+    Route::post('/auth/logout', [\App\Http\Controllers\Api\AuthController::class, 'logout']);
+    Route::post('/auth/refresh-token', [\App\Http\Controllers\Api\AuthController::class, 'refreshToken']);
+    Route::post('/auth/validate-token', [\App\Http\Controllers\Api\AuthController::class, 'validateToken']);
+    Route::get('/auth/validate-token', [\App\Http\Controllers\Api\AuthController::class, 'validateToken']);
+});
+// CSRF tokens are high-frequency, rate-limit more generously (60 req/min per IP)
+Route::middleware('throttle:60,1')->group(function () {
+    Route::get('/auth/csrf-token', [\App\Http\Controllers\Api\AuthController::class, 'getCsrfToken']);
+    Route::get('/v2/csrf-token', [\App\Http\Controllers\Api\AuthController::class, 'getCsrfToken']);
+    Route::get('/csrf-token', [\App\Http\Controllers\Api\AuthController::class, 'getCsrfToken']);
+});
 
 // Newsletter unsubscribe/tracking — public (recipients may not be logged in)
 Route::post('/v2/newsletter/unsubscribe', [\App\Http\Controllers\Api\NewsletterController::class, 'unsubscribe'])->middleware('throttle:30,1');
@@ -1666,9 +1674,12 @@ Route::get('/v1/federation/members', [\App\Http\Controllers\Api\FederationContro
 Route::get('/v1/federation/members/{id}', [\App\Http\Controllers\Api\FederationController::class, 'member']);
 Route::get('/v1/federation/listings', [\App\Http\Controllers\Api\FederationController::class, 'listings']);
 Route::get('/v1/federation/listings/{id}', [\App\Http\Controllers\Api\FederationController::class, 'listing']);
-Route::post('/v1/federation/messages', [\App\Http\Controllers\Api\FederationController::class, 'sendMessage']);
-Route::post('/v1/federation/transactions', [\App\Http\Controllers\Api\FederationController::class, 'createTransaction']);
-Route::post('/v1/federation/oauth/token', [\App\Http\Controllers\Api\FederationController::class, 'oauthToken']);
+// Write operations rate-limited to prevent abuse (20 req/min per IP)
+Route::middleware('throttle:20,1')->group(function () {
+    Route::post('/v1/federation/messages', [\App\Http\Controllers\Api\FederationController::class, 'sendMessage']);
+    Route::post('/v1/federation/transactions', [\App\Http\Controllers\Api\FederationController::class, 'createTransaction']);
+});
+Route::post('/v1/federation/oauth/token', [\App\Http\Controllers\Api\FederationController::class, 'oauthToken'])->middleware('throttle:10,1');
 Route::post('/v1/federation/webhooks/test', [\App\Http\Controllers\Api\FederationController::class, 'testWebhook']);
 
 // ============================================
@@ -1696,8 +1707,8 @@ Route::middleware('auth:sanctum')->group(function () {
 // SendGrid sends event notifications directly to this endpoint;
 // it cannot authenticate via Sanctum tokens.
 // ============================================
-Route::post('/webhooks/sendgrid/events', [\App\Http\Controllers\Api\SendGridWebhookController::class, 'events']);
+Route::post('/webhooks/sendgrid/events', [\App\Http\Controllers\Api\SendGridWebhookController::class, 'events'])->middleware('throttle:120,1');
 
 // Identity verification provider webhooks (e.g., Onfido, Jumio)
 // Must be public — providers send callbacks without Sanctum tokens.
-Route::post('/v2/webhooks/identity/{provider_slug}', [\App\Http\Controllers\Api\IdentityWebhookController::class, 'handleWebhook']);
+Route::post('/v2/webhooks/identity/{provider_slug}', [\App\Http\Controllers\Api\IdentityWebhookController::class, 'handleWebhook'])->middleware('throttle:60,1');

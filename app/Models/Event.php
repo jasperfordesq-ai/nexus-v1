@@ -21,10 +21,11 @@ class Event extends Model
     protected $table = 'events';
 
     protected $fillable = [
-        'tenant_id', 'user_id', 'title', 'description', 'location',
+        'user_id', 'title', 'description', 'location',
         'latitude', 'longitude', 'start_time', 'end_time', 'group_id',
         'category_id', 'max_attendees', 'is_online', 'online_link',
-        'image_url', 'federated_visibility',
+        'image_url', 'federated_visibility', 'video_url',
+        'allow_remote_attendance',
     ];
 
     protected $casts = [
@@ -34,6 +35,7 @@ class Event extends Model
         'end_time' => 'datetime',
         'max_attendees' => 'integer',
         'is_online' => 'boolean',
+        'allow_remote_attendance' => 'boolean',
     ];
 
     /**
@@ -71,6 +73,11 @@ class Event extends Model
     public function rsvps(): HasMany
     {
         return $this->hasMany(EventRsvp::class);
+    }
+
+    public function polls(): HasMany
+    {
+        return $this->hasMany(Poll::class);
     }
 
     public function scopeUpcoming(Builder $query): Builder

@@ -23,10 +23,11 @@ class Message extends Model
     public $timestamps = false;
 
     protected $fillable = [
-        'tenant_id', 'sender_id', 'receiver_id', 'listing_id',
+        'sender_id', 'receiver_id', 'listing_id',
         'body', 'is_read', 'is_edited', 'edited_at',
         'is_deleted_sender', 'is_deleted_receiver',
         'is_deleted', 'is_voice', 'audio_url', 'audio_duration',
+        'transcript', 'transcript_language',
         'read_at', 'created_at',
         'context_type', 'context_id',
     ];

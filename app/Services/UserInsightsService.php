@@ -48,6 +48,7 @@ class UserInsightsService
             ->where('tenant_id', $tenantId)
             ->value('balance') ?? 0);
 
+        $userIdInt = (int) $userId;
         $monthStats = DB::table('transactions')
             ->where('tenant_id', $tenantId)
             ->where(function ($q) use ($userId) {
@@ -56,12 +57,13 @@ class UserInsightsService
             })
             ->whereYear('created_at', now()->year)
             ->whereMonth('created_at', now()->month)
-            ->select([
-                DB::raw("SUM(CASE WHEN receiver_id = {$userId} THEN amount ELSE 0 END) as earned_this_month"),
-                DB::raw("SUM(CASE WHEN sender_id = {$userId} THEN amount ELSE 0 END) as spent_this_month"),
-                DB::raw("COUNT(CASE WHEN receiver_id = {$userId} THEN 1 END) as received_count"),
-                DB::raw("COUNT(CASE WHEN sender_id = {$userId} THEN 1 END) as sent_count"),
-            ])
+            ->selectRaw(
+                "SUM(CASE WHEN receiver_id = ? THEN amount ELSE 0 END) as earned_this_month,
+                 SUM(CASE WHEN sender_id = ? THEN amount ELSE 0 END) as spent_this_month,
+                 COUNT(CASE WHEN receiver_id = ? THEN 1 END) as received_count,
+                 COUNT(CASE WHEN sender_id = ? THEN 1 END) as sent_count",
+                [$userIdInt, $userIdInt, $userIdInt, $userIdInt]
+            )
             ->first();
 
         $totalTransactions = (int) DB::table('transactions')

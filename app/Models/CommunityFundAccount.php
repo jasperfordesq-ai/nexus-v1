@@ -17,14 +17,13 @@ class CommunityFundAccount extends Model
     protected $table = 'community_fund_accounts';
 
     protected $fillable = [
-        'tenant_id', 'balance', 'total_deposited', 'total_withdrawn',
-        'total_donated', 'description',
+        'description',
     ];
 
     protected $casts = [
-        'balance' => 'float',
-        'total_deposited' => 'float',
-        'total_withdrawn' => 'float',
-        'total_donated' => 'float',
+        'balance' => 'decimal:2',
+        'total_deposited' => 'decimal:2',
+        'total_withdrawn' => 'decimal:2',
+        'total_donated' => 'decimal:2',
     ];
 }

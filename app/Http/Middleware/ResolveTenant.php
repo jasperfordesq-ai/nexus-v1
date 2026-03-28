@@ -13,21 +13,50 @@ use Symfony\Component\HttpFoundation\Response;
 
 class ResolveTenant
 {
+    /**
+     * Paths that are exempt from tenant resolution (health checks, etc.).
+     */
+    private const EXEMPT_PATHS = [
+        '/up',
+        '/api/laravel/health',
+    ];
+
     public function handle(Request $request, Closure $next): Response
     {
+        // Skip tenant resolution for exempt paths
+        $path = $request->getPathInfo();
+        foreach (self::EXEMPT_PATHS as $exempt) {
+            if ($path === $exempt) {
+                return $next($request);
+            }
+        }
+
         if (!TenantContext::getId()) {
             try {
                 TenantContext::resolve();
             } catch (\Throwable $e) {
-                return response()->json(['error' => 'Unable to resolve tenant'], 400);
+                return response()->json([
+                    'errors' => [
+                        ['code' => 'tenant_resolution_failed', 'message' => 'Unable to resolve tenant'],
+                    ],
+                    'success' => false,
+                ], 400, ['API-Version' => '2.0']);
             }
         }
 
-        // Bind tenant.id into Laravel's container for services that use app('tenant.id')
+        // After resolution, verify we have a valid tenant ID
         $tenantId = TenantContext::getId();
-        if ($tenantId) {
-            app()->instance('tenant.id', $tenantId);
+        if (!$tenantId) {
+            return response()->json([
+                'errors' => [
+                    ['code' => 'tenant_required', 'message' => 'A valid tenant context is required for this request'],
+                ],
+                'success' => false,
+            ], 400, ['API-Version' => '2.0']);
         }
+
+        // Bind tenant.id into Laravel's container for services that use app('tenant.id')
+        app()->instance('tenant.id', $tenantId);
 
         return $next($request);
     }

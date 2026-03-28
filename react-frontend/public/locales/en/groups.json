@@ -278,5 +278,19 @@
   },
   "loading_aria": "Loading groups",
   "load_error": "Failed to load groups. Please try again.",
-  "load_more_error": "Failed to load more groups"
+  "load_more_error": "Failed to load more groups",
+  "chatrooms": {
+    "private_label": "Private",
+    "show_pinned": "Show pinned messages",
+    "pinned_messages": "Pinned Messages",
+    "pin": "Pin message",
+    "unpin": "Unpin message",
+    "pinned_success": "Message pinned",
+    "unpinned_success": "Message unpinned",
+    "pin_failed": "Failed to pin message",
+    "unpin_failed": "Failed to unpin message",
+    "category_general": "General",
+    "category_announcements": "Announcements",
+    "category_off_topic": "Off-topic"
+  }
 }

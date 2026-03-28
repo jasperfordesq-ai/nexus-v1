@@ -1002,6 +1002,63 @@ export function ConversationPage() {
   }
 
   /**
+   * Send a GIF as a message (body contains the GIF URL)
+   */
+  async function handleGifSelect(gifUrl: string) {
+    if (!targetId || isSending) return;
+    if (messagingRestriction?.messaging_disabled) {
+      toast.error(t('error'), t('messaging_restricted'));
+      return;
+    }
+
+    try {
+      setIsSending(true);
+      const payload: Record<string, unknown> = {
+        recipient_id: parseInt(targetId, 10),
+        body: gifUrl,
+      };
+
+      if (listingId && isNewConversation) {
+        payload.listing_id = listingId;
+      }
+      if (contextType && contextId && isNewConversation) {
+        payload.context_type = contextType;
+        payload.context_id = contextId;
+      }
+
+      const response = await api.post<Message>('/v2/messages', payload);
+
+      if (response.success && response.data) {
+        const sentMessage = response.data;
+        lastMessageIdRef.current = sentMessage.id;
+
+        setConversation((prev) => {
+          if (!prev) return null;
+          return {
+            ...prev,
+            messages: [...prev.messages, sentMessage],
+          };
+        });
+
+        if (isNewConversation) {
+          setIsNewConversation(false);
+        }
+
+        setTimeout(() => scrollToBottom(), 50);
+      } else {
+        logError('GIF message send failed', response);
+        toast.error(t('error_title'), response.error || t('send_error'));
+        refreshRestrictionStatus();
+      }
+    } catch (error) {
+      logError('Failed to send GIF message', error);
+      toast.error(t('error_title'), t('send_error'));
+    } finally {
+      setIsSending(false);
+    }
+  }
+
+  /**
    * Scroll to a specific message by ID
    */
   function scrollToMessage(messageId: number) {
@@ -1466,6 +1523,7 @@ export function ConversationPage() {
           fileInputRef={fileInputRef}
           onFileSelect={handleFileSelect}
           onRemoveAttachment={removeAttachment}
+          onGifSelect={handleGifSelect}
         />
       </GlassCard>
 

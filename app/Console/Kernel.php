@@ -8,6 +8,7 @@
 namespace App\Console;
 
 use App\Services\CronJobRunner;
+use App\Services\FeedService;
 use App\Services\JobExpiryNotificationService;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
@@ -58,6 +59,13 @@ class Kernel extends ConsoleKernel
             ->daily()
             ->withoutOverlapping()
             ->name('federation-purge-external-logs');
+
+        $schedule->call(function () {
+            app(FeedService::class)->publishScheduledPosts();
+        })
+            ->everyMinute()
+            ->withoutOverlapping(5)
+            ->name('feed:publish-scheduled-posts');
     }
 
     /**

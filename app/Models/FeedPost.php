@@ -20,6 +20,7 @@ class FeedPost extends Model
     protected $fillable = [
         'tenant_id', 'user_id', 'content', 'emoji', 'image_url', 'type',
         'parent_id', 'parent_type', 'visibility', 'group_id',
+        'scheduled_at', 'publish_status',
     ];
 
     protected $casts = [
@@ -30,6 +31,7 @@ class FeedPost extends Model
         'comments_count' => 'integer',
         'is_pinned' => 'boolean',
         'is_hidden' => 'boolean',
+        'scheduled_at' => 'datetime',
     ];
 
     public function user(): BelongsTo
