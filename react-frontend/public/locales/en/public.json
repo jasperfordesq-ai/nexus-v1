@@ -382,7 +382,8 @@
     "description": "is currently undergoing scheduled maintenance to improve your experience.",
     "apology": "We apologize for any inconvenience. Please check back in a little while.",
     "thanks": "Thank you for your patience!",
-    "admin_login": "Admin Login"
+    "admin_login": "Admin Login",
+    "deploy_notice": "This platform is still being actively built, so there may be phases of rapid deployments. During these times, the server automatically enters maintenance mode. This normally only lasts about five minutes while new changes are being applied."
   },
   "dev_status": {
     "title": "Development status: {{stage}}",

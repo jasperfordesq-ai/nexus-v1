@@ -382,7 +382,8 @@
     "description": "tá cothabháil sceidealaithe ar siúl faoi láthair chun do thaithí a fheabhsú.",
     "apology": "Gabh ár leithscéal as aon mhíchaoithiúlacht. Seiceáil ar ais i gceann tamaillín le do thoil.",
     "thanks": "Go raibh maith agat as d'fhoighne!",
-    "admin_login": "Logáil Isteach Riaracháin"
+    "admin_login": "Logáil Isteach Riaracháin",
+    "deploy_notice": "Tá an t-ardán seo fós á thógáil go gníomhach, mar sin d'fhéadfadh tréimhsí imscartha tapa a bheith ann. Le linn na dtréimhsí sin, téann an freastalaí isteach i mód cothabhála go huathoibríoch. De ghnáth ní mhaireann sé seo ach timpeall cúig nóiméad agus athruithe nua á gcur i bhfeidhm."
   },
   "dev_status": {
     "title": "Stádas forbartha: {{stage}}",

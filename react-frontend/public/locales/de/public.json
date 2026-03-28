@@ -382,7 +382,8 @@
     "description": "wird derzeit planmässig gewartet, um Ihre Erfahrung zu verbessern.",
     "apology": "Wir entschuldigen uns für etwaige Unannehmlichkeiten. Bitte schauen Sie in Kürze wieder vorbei.",
     "thanks": "Vielen Dank für Ihre Geduld!",
-    "admin_login": "Admin-Anmeldung"
+    "admin_login": "Admin-Anmeldung",
+    "deploy_notice": "Diese Plattform wird noch aktiv entwickelt, daher kann es Phasen mit häufigen Deployments geben. In diesen Zeiten wechselt der Server automatisch in den Wartungsmodus. Dies dauert normalerweise nur etwa fünf Minuten, während neue Änderungen eingespielt werden."
   },
   "dev_status": {
     "title": "Entwicklungsstatus: {{stage}}",

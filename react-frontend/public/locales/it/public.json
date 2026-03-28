@@ -382,7 +382,8 @@
     "description": "è attualmente in manutenzione programmata per migliorare la Sua esperienza.",
     "apology": "Ci scusiamo per l'inconveniente. La preghiamo di tornare tra poco.",
     "thanks": "Grazie per la Sua pazienza!",
-    "admin_login": "Accesso amministratore"
+    "admin_login": "Accesso amministratore",
+    "deploy_notice": "Questa piattaforma è ancora in fase di sviluppo attivo, quindi potrebbero esserci fasi di distribuzione rapida. Durante questi periodi, il server entra automaticamente in modalità manutenzione. Questo normalmente dura solo circa cinque minuti mentre vengono applicati i nuovi aggiornamenti."
   },
   "dev_status": {
     "title": "Stato di sviluppo: {{stage}}",

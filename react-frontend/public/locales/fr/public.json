@@ -382,7 +382,8 @@
     "description": "est actuellement en maintenance planifiée pour améliorer votre expérience.",
     "apology": "Nous nous excusons pour tout désagrément. Veuillez revenir dans un moment.",
     "thanks": "Merci de votre patience !",
-    "admin_login": "Connexion administrateur"
+    "admin_login": "Connexion administrateur",
+    "deploy_notice": "Cette plateforme est encore en cours de développement actif, il peut donc y avoir des phases de déploiements rapides. Pendant ces périodes, le serveur passe automatiquement en mode maintenance. Cela ne dure normalement qu'environ cinq minutes pendant l'application des nouvelles modifications."
   },
   "dev_status": {
     "title": "Statut de développement : {{stage}}",

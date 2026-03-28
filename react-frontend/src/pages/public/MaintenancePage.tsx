@@ -9,7 +9,7 @@
  */
 
 import { Card, CardBody, Button } from '@heroui/react';
-import { Wrench, LogIn } from 'lucide-react';
+import { Wrench, LogIn, Info } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useTenant } from '@/contexts';
 import { tenantPath } from '@/lib/tenant-routing';
@@ -45,6 +45,15 @@ export function MaintenancePage() {
             <p className="text-default-500">
               {t('maintenance.apology')}
             </p>
+          </div>
+
+          <div className="rounded-lg bg-primary-50 dark:bg-primary-950/30 border border-primary-200 dark:border-primary-800 px-4 py-3 text-left">
+            <div className="flex gap-3 items-start">
+              <Info size={18} className="text-primary-500 mt-0.5 shrink-0" />
+              <p className="text-sm text-default-600">
+                {t('maintenance.deploy_notice')}
+              </p>
+            </div>
           </div>
 
           <div className="text-sm text-default-400 mt-4">
