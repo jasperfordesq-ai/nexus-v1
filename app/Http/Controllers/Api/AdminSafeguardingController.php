@@ -155,6 +155,7 @@ class AdminSafeguardingController extends BaseApiController
                     'bmc.reviewed_by as reviewed_by_id',
                     DB::raw("COALESCE(reviewer.name, CONCAT(COALESCE(reviewer.first_name, ''), ' ', COALESCE(reviewer.last_name, ''))) as reviewed_by_name"),
                     'bmc.reviewed_at',
+                    'bmc.review_notes',
                     'bmc.created_at',
                 ])
                 ->orderByDesc('bmc.flagged')
@@ -187,7 +188,7 @@ class AdminSafeguardingController extends BaseApiController
                         'flag_reason' => $row->copy_reason ?? 'unknown',
                         'is_reviewed' => $row->reviewed_at !== null,
                         'reviewed_by' => $row->reviewed_by_name ? trim($row->reviewed_by_name) : null,
-                        'review_notes' => null,
+                        'review_notes' => $row->review_notes ?? null,
                         'reviewed_at' => $row->reviewed_at,
                         'created_at' => $row->created_at,
                     ];
@@ -299,7 +300,9 @@ class AdminSafeguardingController extends BaseApiController
                 ->where('id', $id)
                 ->where('tenant_id', $tenantId)
                 ->whereNull('reviewed_at')
-                ->update($updateData);
+                ->update(array_merge($updateData, [
+                    'review_notes' => !empty($notes) ? $notes : null,
+                ]));
 
             if ($affected === 0) {
                 return $this->respondWithError(
@@ -429,11 +432,12 @@ class AdminSafeguardingController extends BaseApiController
                 'created_at' => now(),
             ]);
 
-            // Notify the ward and guardian
+            // Notify both the ward and guardian
             try {
                 $wardUser = \App\Models\User::find($wardId);
                 $guardianUser = \App\Models\User::find($guardianId);
 
+                // Notify guardian
                 \App\Models\Notification::create([
                     'tenant_id' => $tenantId,
                     'user_id' => $guardianId,
@@ -442,8 +446,18 @@ class AdminSafeguardingController extends BaseApiController
                     'link' => '/admin/safeguarding',
                     'is_read' => false,
                 ]);
+
+                // Notify ward — they must know a guardian has been assigned
+                \App\Models\Notification::create([
+                    'tenant_id' => $tenantId,
+                    'user_id' => $wardId,
+                    'type' => 'safeguarding_assignment',
+                    'message' => ($guardianUser->name ?? 'A community coordinator') . ' has been assigned as your safeguarding support contact. You can give or revoke consent in your settings.',
+                    'link' => '/settings/safeguarding',
+                    'is_read' => false,
+                ]);
             } catch (\Throwable $e) {
-                \Illuminate\Support\Facades\Log::warning('Failed to notify guardian of assignment', ['error' => $e->getMessage()]);
+                \Illuminate\Support\Facades\Log::warning('Failed to notify ward/guardian of assignment', ['error' => $e->getMessage()]);
             }
 
             return $this->respondWithData(['id' => $id, 'created' => true]);

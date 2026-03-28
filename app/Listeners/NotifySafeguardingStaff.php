@@ -23,6 +23,13 @@ use Illuminate\Support\Facades\Log;
  */
 class NotifySafeguardingStaff implements ShouldQueue
 {
+    /**
+     * Retry up to 3 times with exponential backoff.
+     * Safeguarding notifications are legally critical — must not be silently lost.
+     */
+    public int $tries = 3;
+    public array $backoff = [10, 60, 300];
+
     public function __construct()
     {
         //
@@ -105,7 +112,21 @@ class NotifySafeguardingStaff implements ShouldQueue
                 'error' => $e->getMessage(),
                 'trace' => $e->getTraceAsString(),
             ]);
+            // Re-throw so Laravel queue retries (safeguarding notifications are legally critical)
+            throw $e;
         }
+    }
+
+    /**
+     * Handle a listener failure — log for monitoring.
+     */
+    public function failed(SafeguardingFlaggedEvent $event, \Throwable $exception): void
+    {
+        Log::critical('NotifySafeguardingStaff: PERMANENTLY FAILED after all retries', [
+            'user_id' => $event->userId,
+            'tenant_id' => $event->tenantId,
+            'error' => $exception->getMessage(),
+        ]);
     }
 
     private function sendEmail(object $staff, string $memberName, array $optionLabels, int $flaggedUserId, int $tenantId): void

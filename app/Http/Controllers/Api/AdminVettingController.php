@@ -223,6 +223,16 @@ class AdminVettingController extends BaseApiController
                 return $this->respondWithError('INVALID_STATUS', 'Record is already verified');
             }
 
+            // Require reference number for verification (legal compliance)
+            if (empty($existing['reference_number'])) {
+                return $this->respondWithError(
+                    'VALIDATION_ERROR',
+                    'A reference number is required before a vetting record can be verified',
+                    'reference_number',
+                    422
+                );
+            }
+
             $this->vettingService->verify($id, $adminId);
             ActivityLog::log($adminId, 'vetting_record_verified', "Verified vetting record #{$id} for {$existing['first_name']} {$existing['last_name']}", false, null, 'admin', 'vetting_record', $id);
 

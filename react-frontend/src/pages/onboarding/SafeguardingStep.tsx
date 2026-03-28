@@ -18,6 +18,8 @@ import { useState, useEffect, useCallback } from 'react';
 import {
   Button,
   Checkbox,
+  Select,
+  SelectItem,
   Spinner,
 } from '@heroui/react';
 import {
@@ -43,6 +45,7 @@ interface SafeguardingOption {
   description: string | null;
   help_url: string | null;
   is_required: boolean;
+  select_options: string | null; // JSON array of {value, label} for select type
 }
 
 interface SafeguardingStepProps {
@@ -63,6 +66,7 @@ export function SafeguardingStep({ onNext, onBack, onSkip, isRequired, introText
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [selections, setSelections] = useState<Record<number, boolean>>({});
+  const [selectValues, setSelectValues] = useState<Record<number, string>>({});
 
   // ── Load safeguarding options from API ────────────────────────────────────
 
@@ -108,13 +112,25 @@ export function SafeguardingStep({ onNext, onBack, onSkip, isRequired, introText
       return;
     }
 
-    // Build preferences array — only send selected options
-    const selectedPrefs = Object.entries(selections)
+    // Build preferences array — send checkbox selections and select values
+    const selectedPrefs: Array<{ option_id: number; value: string }> = [];
+
+    // Checkbox options
+    Object.entries(selections)
       .filter(([, selected]) => selected)
-      .map(([optionId]) => ({
-        option_id: parseInt(optionId),
-        value: '1',
-      }));
+      .forEach(([optionId]) => {
+        selectedPrefs.push({ option_id: parseInt(optionId), value: '1' });
+      });
+
+    // Select options with a chosen value
+    Object.entries(selectValues)
+      .filter(([, value]) => value !== '')
+      .forEach(([optionId, value]) => {
+        // Don't double-add if already in checkbox selections
+        if (!selections[parseInt(optionId)]) {
+          selectedPrefs.push({ option_id: parseInt(optionId), value });
+        }
+      });
 
     if (selectedPrefs.length === 0 && !isRequired) {
       // Nothing selected and step is not required — just proceed
@@ -232,9 +248,9 @@ export function SafeguardingStep({ onNext, onBack, onSkip, isRequired, introText
                 }
               `}
               onClick={() => option.option_type === 'checkbox' && toggleOption(option.id)}
-              role="button"
-              tabIndex={0}
-              onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggleOption(option.id); } }}
+              role={option.option_type === 'checkbox' ? 'button' : undefined}
+              tabIndex={option.option_type === 'checkbox' ? 0 : undefined}
+              onKeyDown={(e) => { if (option.option_type === 'checkbox' && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); toggleOption(option.id); } }}
             >
               <div className="flex items-start gap-3">
                 {option.option_type === 'checkbox' && (
@@ -257,6 +273,31 @@ export function SafeguardingStep({ onNext, onBack, onSkip, isRequired, introText
                       {option.description}
                     </p>
                   )}
+                  {/* Select dropdown for 'select' type options */}
+                  {option.option_type === 'select' && (() => {
+                    let selectOpts: Array<{ value: string; label: string }> = [];
+                    try {
+                      selectOpts = JSON.parse(option.select_options || '[]');
+                    } catch { /* ignore parse errors */ }
+                    return selectOpts.length > 0 ? (
+                      <Select
+                        label={t('safeguarding.select_option', 'Choose an option')}
+                        size="sm"
+                        variant="bordered"
+                        className="mt-2 max-w-xs"
+                        selectedKeys={selectValues[option.id] ? [selectValues[option.id]] : []}
+                        onSelectionChange={(keys) => {
+                          const value = Array.from(keys)[0] as string || '';
+                          setSelectValues(prev => ({ ...prev, [option.id]: value }));
+                        }}
+                        onClick={(e) => e.stopPropagation()}
+                      >
+                        {selectOpts.map((so) => (
+                          <SelectItem key={so.value}>{so.label}</SelectItem>
+                        ))}
+                      </Select>
+                    ) : null;
+                  })()}
                   {option.help_url && (
                     <a
                       href={option.help_url}
