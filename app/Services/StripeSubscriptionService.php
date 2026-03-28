@@ -475,21 +475,42 @@ class StripeSubscriptionService
      */
     public static function getSubscriptionDetails(int $tenantId): ?array
     {
-        $result = DB::selectOne(
-            "SELECT tpa.id, tpa.tenant_id, tpa.pay_plan_id, tpa.status,
-                    tpa.starts_at, tpa.expires_at, tpa.trial_ends_at,
-                    tpa.stripe_subscription_id, tpa.stripe_current_period_end,
-                    tpa.created_at, tpa.updated_at,
-                    pp.name AS plan_name, pp.slug AS plan_slug,
-                    pp.tier_level AS plan_tier_level, pp.description AS plan_description,
-                    pp.price_monthly, pp.price_yearly
-             FROM tenant_plan_assignments tpa
-             JOIN pay_plans pp ON pp.id = tpa.pay_plan_id
-             WHERE tpa.tenant_id = ?
-             ORDER BY tpa.created_at DESC
-             LIMIT 1",
-            [$tenantId]
-        );
+        try {
+            $result = DB::selectOne(
+                "SELECT tpa.id, tpa.tenant_id, tpa.pay_plan_id, tpa.status,
+                        tpa.starts_at, tpa.expires_at, tpa.trial_ends_at,
+                        tpa.stripe_subscription_id, tpa.stripe_current_period_end,
+                        tpa.created_at, tpa.updated_at,
+                        pp.name AS plan_name, pp.slug AS plan_slug,
+                        pp.tier_level AS plan_tier_level, pp.description AS plan_description,
+                        pp.price_monthly, pp.price_yearly
+                 FROM tenant_plan_assignments tpa
+                 JOIN pay_plans pp ON pp.id = tpa.pay_plan_id
+                 WHERE tpa.tenant_id = ?
+                 ORDER BY tpa.created_at DESC
+                 LIMIT 1",
+                [$tenantId]
+            );
+        } catch (\Exception $e) {
+            // Fallback if Stripe columns don't exist yet (migration not run)
+            Log::warning('getSubscriptionDetails: Stripe columns may not exist, falling back', [
+                'error' => $e->getMessage(),
+            ]);
+            $result = DB::selectOne(
+                "SELECT tpa.id, tpa.tenant_id, tpa.pay_plan_id, tpa.status,
+                        tpa.starts_at, tpa.expires_at, tpa.trial_ends_at,
+                        tpa.created_at, tpa.updated_at,
+                        pp.name AS plan_name, pp.slug AS plan_slug,
+                        pp.tier_level AS plan_tier_level, pp.description AS plan_description,
+                        pp.price_monthly, pp.price_yearly
+                 FROM tenant_plan_assignments tpa
+                 JOIN pay_plans pp ON pp.id = tpa.pay_plan_id
+                 WHERE tpa.tenant_id = ?
+                 ORDER BY tpa.created_at DESC
+                 LIMIT 1",
+                [$tenantId]
+            );
+        }
 
         if (!$result) {
             return null;

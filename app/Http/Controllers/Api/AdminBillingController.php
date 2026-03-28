@@ -139,7 +139,15 @@ class AdminBillingController extends BaseApiController
 
         foreach ($plans as &$plan) {
             if (isset($plan['features'])) {
-                $plan['features'] = json_decode($plan['features'], true) ?: [];
+                $decoded = json_decode($plan['features'], true) ?: [];
+                // Features may be stored as {"listings": true, "groups": true} (object)
+                // or as ["listings", "groups"] (array). Normalize to string[] for frontend.
+                if (is_array($decoded) && !array_is_list($decoded)) {
+                    // Object format — extract keys where value is truthy
+                    $plan['features'] = array_keys(array_filter($decoded));
+                } else {
+                    $plan['features'] = array_values($decoded);
+                }
             }
         }
         unset($plan);
