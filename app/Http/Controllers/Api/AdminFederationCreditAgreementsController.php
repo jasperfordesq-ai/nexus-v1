@@ -154,6 +154,153 @@ class AdminFederationCreditAgreementsController extends BaseApiController
     }
 
     /**
+     * GET /api/v2/admin/federation/credit-agreements/{id}/transactions
+     *
+     * List recent transactions for a specific credit agreement.
+     */
+    public function transactions(int $id): JsonResponse
+    {
+        $this->requireAdmin();
+        $tenantId = $this->getTenantId();
+
+        try {
+            // Verify agreement belongs to this tenant
+            $agreement = DB::selectOne(
+                "SELECT * FROM federation_credit_agreements WHERE id = ? AND (from_tenant_id = ? OR to_tenant_id = ?)",
+                [$id, $tenantId, $tenantId]
+            );
+
+            if (!$agreement) {
+                return $this->respondWithError('NOT_FOUND', 'Credit agreement not found', null, 404);
+            }
+
+            $fromId = (int) $agreement->from_tenant_id;
+            $toId = (int) $agreement->to_tenant_id;
+
+            // Query federation_transactions between the two tenants
+            try {
+                $transactions = DB::select(
+                    "SELECT ft.id, ft.sender_tenant_id, ft.receiver_tenant_id,
+                            ft.sender_user_id, ft.receiver_user_id,
+                            ft.amount, ft.description, ft.status,
+                            ft.created_at, ft.completed_at,
+                            t1.name as sender_tenant_name, t2.name as receiver_tenant_name
+                     FROM federation_transactions ft
+                     LEFT JOIN tenants t1 ON ft.sender_tenant_id = t1.id
+                     LEFT JOIN tenants t2 ON ft.receiver_tenant_id = t2.id
+                     WHERE ((ft.sender_tenant_id = ? AND ft.receiver_tenant_id = ?)
+                         OR (ft.sender_tenant_id = ? AND ft.receiver_tenant_id = ?))
+                     ORDER BY ft.created_at DESC
+                     LIMIT 50",
+                    [$fromId, $toId, $toId, $fromId]
+                );
+
+                // Calculate usage this month
+                $monthUsage = DB::selectOne(
+                    "SELECT COALESCE(SUM(amount), 0) as total
+                     FROM federation_transactions
+                     WHERE ((sender_tenant_id = ? AND receiver_tenant_id = ?)
+                         OR (sender_tenant_id = ? AND receiver_tenant_id = ?))
+                       AND status = 'completed'
+                       AND created_at >= DATE_FORMAT(NOW(), '%Y-%m-01')",
+                    [$fromId, $toId, $toId, $fromId]
+                );
+
+                return $this->respondWithData([
+                    'transactions' => array_map(fn($r) => (array) $r, $transactions),
+                    'month_usage' => (float) ($monthUsage->total ?? 0),
+                    'monthly_limit' => $agreement->max_monthly_credits !== null ? (float) $agreement->max_monthly_credits : null,
+                ]);
+            } catch (\Exception $e) {
+                // federation_transactions table may not exist
+                return $this->respondWithData([
+                    'transactions' => [],
+                    'month_usage' => 0,
+                    'monthly_limit' => $agreement->max_monthly_credits !== null ? (float) $agreement->max_monthly_credits : null,
+                ]);
+            }
+        } catch (\Exception $e) {
+            return $this->respondWithError('FETCH_FAILED', 'Failed to load transactions', null, 500);
+        }
+    }
+
+    /**
+     * GET /api/v2/admin/federation/credit-balances
+     *
+     * Net credit balance per partner and overall.
+     */
+    public function balances(): JsonResponse
+    {
+        $this->requireAdmin();
+        $tenantId = $this->getTenantId();
+
+        try {
+            $agreements = DB::select(
+                "SELECT fca.id, fca.from_tenant_id, fca.to_tenant_id, fca.status,
+                        fca.exchange_rate, fca.max_monthly_credits,
+                        t1.name as from_tenant_name, t2.name as to_tenant_name
+                 FROM federation_credit_agreements fca
+                 LEFT JOIN tenants t1 ON fca.from_tenant_id = t1.id
+                 LEFT JOIN tenants t2 ON fca.to_tenant_id = t2.id
+                 WHERE (fca.from_tenant_id = ? OR fca.to_tenant_id = ?) AND fca.status = 'active'",
+                [$tenantId, $tenantId]
+            );
+
+            $balances = [];
+            $netTotal = 0.0;
+
+            foreach ($agreements as $agreement) {
+                $fromId = (int) $agreement->from_tenant_id;
+                $toId = (int) $agreement->to_tenant_id;
+                $isFrom = $fromId === $tenantId;
+                $partnerName = $isFrom ? $agreement->to_tenant_name : $agreement->from_tenant_name;
+                $partnerId = $isFrom ? $toId : $fromId;
+
+                // Calculate net balance: positive = they owe us, negative = we owe them
+                $sent = 0.0;
+                $received = 0.0;
+
+                try {
+                    $sentRow = DB::selectOne(
+                        "SELECT COALESCE(SUM(amount), 0) as total FROM federation_transactions
+                         WHERE sender_tenant_id = ? AND receiver_tenant_id = ? AND status = 'completed'",
+                        [$tenantId, $partnerId]
+                    );
+                    $sent = (float) ($sentRow->total ?? 0);
+
+                    $receivedRow = DB::selectOne(
+                        "SELECT COALESCE(SUM(amount), 0) as total FROM federation_transactions
+                         WHERE sender_tenant_id = ? AND receiver_tenant_id = ? AND status = 'completed'",
+                        [$partnerId, $tenantId]
+                    );
+                    $received = (float) ($receivedRow->total ?? 0);
+                } catch (\Exception $e) {
+                    // federation_transactions may not exist
+                }
+
+                $balance = $received - $sent; // positive = they sent us more than we sent them
+                $netTotal += $balance;
+
+                $balances[] = [
+                    'agreement_id' => (int) $agreement->id,
+                    'partner_tenant_id' => $partnerId,
+                    'partner_name' => $partnerName ?? '',
+                    'credits_sent' => $sent,
+                    'credits_received' => $received,
+                    'net_balance' => $balance,
+                ];
+            }
+
+            return $this->respondWithData([
+                'balances' => $balances,
+                'net_total' => $netTotal,
+            ]);
+        } catch (\Exception $e) {
+            return $this->respondWithData(['balances' => [], 'net_total' => 0]);
+        }
+    }
+
+    /**
      * GET /api/v2/admin/federation/partners
      *
      * List active federation partners for the current tenant.

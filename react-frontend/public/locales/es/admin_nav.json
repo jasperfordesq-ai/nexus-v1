@@ -112,6 +112,7 @@
   "federation_directory": "Directorio",
   "federation_analytics": "Análisis de Federación",
   "federation_api_keys": "Claves API",
+  "federation_api_docs": "Documentación API",
   "super_dashboard": "Panel Super",
   "super_tenants": "Todos los Inquilinos",
   "super_hierarchy": "Jerarquía de Inquilinos",

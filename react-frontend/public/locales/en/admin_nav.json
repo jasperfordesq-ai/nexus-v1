@@ -112,6 +112,7 @@
   "federation_directory": "Directory",
   "federation_analytics": "Federation Analytics",
   "federation_api_keys": "API Keys",
+  "federation_api_docs": "API Documentation",
   "super_dashboard": "Super Dashboard",
   "super_tenants": "All Tenants",
   "super_hierarchy": "Tenant Hierarchy",

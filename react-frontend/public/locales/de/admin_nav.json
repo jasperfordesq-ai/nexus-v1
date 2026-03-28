@@ -112,6 +112,7 @@
   "federation_directory": "Verzeichnis",
   "federation_analytics": "Föderationsanalytik",
   "federation_api_keys": "API-Schlüssel",
+  "federation_api_docs": "API-Dokumentation",
   "super_dashboard": "Super-Dashboard",
   "super_tenants": "Alle Mandanten",
   "super_hierarchy": "Mandantenhierarchie",

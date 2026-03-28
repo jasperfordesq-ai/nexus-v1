@@ -1042,6 +1042,57 @@ export const adminFederation = {
     api.post<{ id: number; key: string; name: string }>('/v2/admin/federation/api-keys', data),
 
   getDataManagement: () => api.get<{ shared_data_types: string[]; data_retention_days: number }>('/v2/admin/federation/data'),
+
+  getActivityFeed: (params?: {
+    limit?: number;
+    cursor?: string;
+    event_type?: string;
+    partner_tenant_id?: number;
+    date_from?: string;
+    date_to?: string;
+    search?: string;
+  }) => api.get<{
+    items: Array<{
+      id: number;
+      type: string;
+      category: string;
+      level: string;
+      description: string;
+      detail: string | null;
+      actor_name: string | null;
+      actor_user_id: number | null;
+      direction: 'inbound' | 'outbound';
+      partner_tenant_id: number | null;
+      partner_tenant_name: string | null;
+      partner_tenant_slug: string | null;
+      timestamp: string;
+      data: Record<string, unknown>;
+    }>;
+    total: number;
+    has_more: boolean;
+    next_cursor: string | null;
+  }>(`/v2/admin/federation/activity${buildQuery(params || {})}`),
+
+  getPartnershipDetail: (id: number) =>
+    api.get<Record<string, unknown>>(`/v2/admin/federation/partnerships/${id}`),
+
+  counterProposePartnership: (id: number, data: { level: number; permissions: Record<string, boolean>; message?: string }) =>
+    api.post<{ success: boolean }>(`/v2/admin/federation/partnerships/${id}/counter-propose`, data),
+
+  updatePartnershipPermissions: (id: number, permissions: Record<string, boolean>) =>
+    api.put<{ success: boolean }>(`/v2/admin/federation/partnerships/${id}/permissions`, { permissions }),
+
+  getPartnershipAuditLog: (id: number) =>
+    api.get<Array<Record<string, unknown>>>(`/v2/admin/federation/partnerships/${id}/audit-log`),
+
+  getPartnershipStats: (id: number) =>
+    api.get<{ messages_exchanged: number; transactions_completed: number; connections_made: number }>(`/v2/admin/federation/partnerships/${id}/stats`),
+
+  getCreditAgreementTransactions: (id: number) =>
+    api.get<{ transactions: Array<Record<string, unknown>>; month_usage: number; monthly_limit: number | null }>(`/v2/admin/federation/credit-agreements/${id}/transactions`),
+
+  getCreditBalances: () =>
+    api.get<{ balances: Array<{ agreement_id: number; partner_tenant_id: number; partner_name: string; credits_sent: number; credits_received: number; net_balance: number }>; net_total: number }>('/v2/admin/federation/credit-balances'),
 };
 
 // ─────────────────────────────────────────────────────────────────────────────

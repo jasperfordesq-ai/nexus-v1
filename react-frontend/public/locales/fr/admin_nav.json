@@ -112,6 +112,7 @@
   "federation_directory": "Annuaire",
   "federation_analytics": "Analyse de fédération",
   "federation_api_keys": "Clés API",
+  "federation_api_docs": "Documentation API",
   "super_dashboard": "Super tableau de bord",
   "super_tenants": "Tous les locataires",
   "super_hierarchy": "Hiérarchie des locataires",

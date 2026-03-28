@@ -185,6 +185,7 @@ Route::delete('/v2/messages/conversations/{id}', [\App\Http\Controllers\Api\Mess
 Route::get('/v2/messages/{id}', [\App\Http\Controllers\Api\MessagesController::class, 'show']);
 Route::put('/v2/messages/{id}/read', [\App\Http\Controllers\Api\MessagesController::class, 'markRead']);
 Route::post('/v2/messages/{id}/reactions', [\App\Http\Controllers\Api\MessagesController::class, 'toggleReaction']);
+Route::post('/v2/messages/{id}/translate', [\App\Http\Controllers\Api\MessagesController::class, 'translateTranscript']);
 Route::put('/v2/messages/{id}', [\App\Http\Controllers\Api\MessagesController::class, 'update']);
 Route::delete('/v2/messages/{id}', [\App\Http\Controllers\Api\MessagesController::class, 'deleteMessage']);
 Route::delete('/v2/conversations/{id}', [\App\Http\Controllers\Api\MessagesController::class, 'archive']);
@@ -240,6 +241,7 @@ Route::put('/v2/users/me', [\App\Http\Controllers\Api\UsersController::class, 'u
 Route::get('/v2/users/me/preferences', [\App\Http\Controllers\Api\UsersController::class, 'getPreferences']);
 Route::put('/v2/users/me/preferences', [\App\Http\Controllers\Api\UsersController::class, 'updatePreferences']);
 Route::put('/v2/users/me/theme', [\App\Http\Controllers\Api\UsersController::class, 'updateTheme']);
+Route::put('/v2/users/me/theme-preferences', [\App\Http\Controllers\Api\UsersController::class, 'updateThemePreferences']);
 Route::put('/v2/users/me/language', [\App\Http\Controllers\Api\UsersController::class, 'updateLanguage']);
 Route::post('/v2/users/me/avatar', [\App\Http\Controllers\Api\UsersController::class, 'updateAvatar']);
 Route::post('/v2/users/me/password', [\App\Http\Controllers\Api\UsersController::class, 'updatePassword']);
@@ -348,6 +350,7 @@ Route::post('/v2/feed/like', [\App\Http\Controllers\Api\SocialController::class,
 Route::post('/v2/feed/polls', [\App\Http\Controllers\Api\SocialController::class, 'createPollV2']);
 Route::get('/v2/feed/polls/{id}', [\App\Http\Controllers\Api\SocialController::class, 'getPollV2']);
 Route::post('/v2/feed/polls/{id}/vote', [\App\Http\Controllers\Api\SocialController::class, 'votePollV2']);
+Route::get('/v2/feed/posts/scheduled', [\App\Http\Controllers\Api\SocialController::class, 'scheduledPosts']);
 Route::post('/v2/feed/posts/{id}/hide', [\App\Http\Controllers\Api\SocialController::class, 'hidePostV2']);
 Route::post('/v2/feed/posts/{id}/report', [\App\Http\Controllers\Api\SocialController::class, 'reportPostV2']);
 Route::delete('/v2/feed/posts/{id}', [\App\Http\Controllers\Api\SocialController::class, 'deletePostV2']);
@@ -1065,10 +1068,16 @@ Route::post('/v2/admin/federation/partnerships/{id}/approve', [\App\Http\Control
 Route::post('/v2/admin/federation/partnerships/{id}/reject', [\App\Http\Controllers\Api\AdminFederationController::class, 'rejectPartnership']);
 Route::post('/v2/admin/federation/partnerships/{id}/terminate', [\App\Http\Controllers\Api\AdminFederationController::class, 'terminatePartnership']);
 Route::post('/v2/admin/federation/partnerships/request', [\App\Http\Controllers\Api\AdminFederationController::class, 'requestPartnership']);
+Route::get('/v2/admin/federation/partnerships/{id}', [\App\Http\Controllers\Api\AdminFederationController::class, 'partnershipDetail']);
+Route::post('/v2/admin/federation/partnerships/{id}/counter-propose', [\App\Http\Controllers\Api\AdminFederationController::class, 'counterProposePartnership']);
+Route::put('/v2/admin/federation/partnerships/{id}/permissions', [\App\Http\Controllers\Api\AdminFederationController::class, 'updatePartnershipPermissions']);
+Route::get('/v2/admin/federation/partnerships/{id}/audit-log', [\App\Http\Controllers\Api\AdminFederationController::class, 'partnershipAuditLog']);
+Route::get('/v2/admin/federation/partnerships/{id}/stats', [\App\Http\Controllers\Api\AdminFederationController::class, 'partnershipStats']);
 Route::get('/v2/admin/federation/directory', [\App\Http\Controllers\Api\AdminFederationController::class, 'directory']);
 Route::get('/v2/admin/federation/directory/profile', [\App\Http\Controllers\Api\AdminFederationController::class, 'profile']);
 Route::put('/v2/admin/federation/directory/profile', [\App\Http\Controllers\Api\AdminFederationController::class, 'updateProfile']);
 Route::get('/v2/admin/federation/analytics', [\App\Http\Controllers\Api\AdminFederationController::class, 'analytics']);
+Route::get('/v2/admin/federation/activity', [\App\Http\Controllers\Api\AdminFederationController::class, 'activityFeed']);
 Route::get('/v2/admin/federation/api-keys', [\App\Http\Controllers\Api\AdminFederationController::class, 'apiKeys']);
 Route::post('/v2/admin/federation/api-keys', [\App\Http\Controllers\Api\AdminFederationController::class, 'createApiKey']);
 Route::get('/v2/admin/federation/data', [\App\Http\Controllers\Api\AdminFederationController::class, 'dataManagement']);
@@ -1082,6 +1091,8 @@ Route::delete('/v2/admin/federation/neighborhoods/{id}/tenants/{tenantId}', [\Ap
 Route::get('/v2/admin/federation/credit-agreements', [\App\Http\Controllers\Api\AdminFederationCreditAgreementsController::class, 'index']);
 Route::post('/v2/admin/federation/credit-agreements', [\App\Http\Controllers\Api\AdminFederationCreditAgreementsController::class, 'store']);
 Route::post('/v2/admin/federation/credit-agreements/{id}/{action}', [\App\Http\Controllers\Api\AdminFederationCreditAgreementsController::class, 'action']);
+Route::get('/v2/admin/federation/credit-agreements/{id}/transactions', [\App\Http\Controllers\Api\AdminFederationCreditAgreementsController::class, 'transactions']);
+Route::get('/v2/admin/federation/credit-balances', [\App\Http\Controllers\Api\AdminFederationCreditAgreementsController::class, 'balances']);
 Route::get('/v2/admin/federation/partners', [\App\Http\Controllers\Api\AdminFederationCreditAgreementsController::class, 'partners']);
 // External federation partners
 Route::get('/v2/admin/federation/external-partners', [\App\Http\Controllers\Api\AdminFederationExternalPartnersController::class, 'index']);
@@ -1090,6 +1101,14 @@ Route::put('/v2/admin/federation/external-partners/{id}', [\App\Http\Controllers
 Route::delete('/v2/admin/federation/external-partners/{id}', [\App\Http\Controllers\Api\AdminFederationExternalPartnersController::class, 'destroy']);
 Route::post('/v2/admin/federation/external-partners/{id}/health-check', [\App\Http\Controllers\Api\AdminFederationExternalPartnersController::class, 'healthCheck']);
 Route::get('/v2/admin/federation/external-partners/{id}/logs', [\App\Http\Controllers\Api\AdminFederationExternalPartnersController::class, 'logs']);
+// Federation webhooks
+Route::get('/v2/admin/federation/webhooks', [\App\Http\Controllers\Api\AdminFederationWebhooksController::class, 'index']);
+Route::post('/v2/admin/federation/webhooks', [\App\Http\Controllers\Api\AdminFederationWebhooksController::class, 'store']);
+Route::put('/v2/admin/federation/webhooks/{id}', [\App\Http\Controllers\Api\AdminFederationWebhooksController::class, 'update']);
+Route::delete('/v2/admin/federation/webhooks/{id}', [\App\Http\Controllers\Api\AdminFederationWebhooksController::class, 'destroy']);
+Route::post('/v2/admin/federation/webhooks/{id}/test', [\App\Http\Controllers\Api\AdminFederationWebhooksController::class, 'test']);
+Route::get('/v2/admin/federation/webhooks/{id}/logs', [\App\Http\Controllers\Api\AdminFederationWebhooksController::class, 'logs']);
+Route::post('/v2/admin/federation/webhook-logs/{id}/retry', [\App\Http\Controllers\Api\AdminFederationWebhooksController::class, 'retry']);
 // NOTE: Federation user routes moved to auth-only group (not admin-only)
 Route::get('/v2/admin/pages', [\App\Http\Controllers\Api\AdminContentController::class, 'getPages']);
 Route::post('/v2/admin/pages', [\App\Http\Controllers\Api\AdminContentController::class, 'createPage']);
@@ -1554,6 +1573,9 @@ Route::delete('/v2/group-chatrooms/{id}', [\App\Http\Controllers\Api\IdeationCha
 Route::get('/v2/group-chatrooms/{id}/messages', [\App\Http\Controllers\Api\IdeationChallengesController::class, 'chatroomMessages']);
 Route::post('/v2/group-chatrooms/{id}/messages', [\App\Http\Controllers\Api\IdeationChallengesController::class, 'postChatroomMessage']);
 Route::delete('/v2/group-chatroom-messages/{id}', [\App\Http\Controllers\Api\IdeationChallengesController::class, 'deleteChatroomMessage']);
+Route::post('/v2/groups/{groupId}/chatrooms/{chatroomId}/pin/{messageId}', [\App\Http\Controllers\Api\IdeationChallengesController::class, 'pinChatroomMessage']);
+Route::delete('/v2/groups/{groupId}/chatrooms/{chatroomId}/pin/{messageId}', [\App\Http\Controllers\Api\IdeationChallengesController::class, 'unpinChatroomMessage']);
+Route::get('/v2/groups/{groupId}/chatrooms/{chatroomId}/pinned', [\App\Http\Controllers\Api\IdeationChallengesController::class, 'pinnedChatroomMessages']);
 Route::get('/v2/groups/{id}/tasks', [\App\Http\Controllers\Api\IdeationChallengesController::class, 'listTasks']);
 Route::post('/v2/groups/{id}/tasks', [\App\Http\Controllers\Api\IdeationChallengesController::class, 'createTask']);
 Route::get('/v2/team-tasks/{id}', [\App\Http\Controllers\Api\IdeationChallengesController::class, 'showTask']);

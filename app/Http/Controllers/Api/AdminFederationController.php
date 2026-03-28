@@ -6,6 +6,8 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Services\FederationActivityService;
+use App\Services\FederationAuditService;
 use App\Services\FederationDirectoryService;
 use App\Services\FederationPartnershipService;
 use Illuminate\Http\JsonResponse;
@@ -240,6 +242,170 @@ class AdminFederationController extends BaseApiController
         } catch (\Exception $e) { return $this->respondWithError('REQUEST_FAILED', 'Failed to send partnership request'); }
     }
 
+    /** GET /api/v2/admin/federation/partnerships/{id} — Full partnership detail */
+    public function partnershipDetail($id): JsonResponse
+    {
+        $this->requireAdmin();
+        $tenantId = TenantContext::getId();
+        $id = (int) $id;
+
+        if (!$id || !$this->tableExists('federation_partnerships')) {
+            return $this->respondWithError('NOT_FOUND', 'Partnership not found', null, 404);
+        }
+
+        try {
+            $partnership = $this->federationPartnershipService->getPartnershipById($id, $tenantId);
+            if (!$partnership) {
+                return $this->respondWithError('NOT_FOUND', 'Partnership not found', null, 404);
+            }
+
+            $isInitiator = (int) $partnership['tenant_id'] === $tenantId;
+            $partnerTenantId = $isInitiator ? (int) $partnership['partner_tenant_id'] : (int) $partnership['tenant_id'];
+            $partnerName = $isInitiator ? ($partnership['partner_name'] ?? '') : ($partnership['tenant_name'] ?? '');
+
+            $partnership['is_initiator'] = $isInitiator;
+            $partnership['resolved_partner_tenant_id'] = $partnerTenantId;
+            $partnership['resolved_partner_name'] = $partnerName;
+
+            return $this->respondWithData($partnership);
+        } catch (\Exception $e) {
+            return $this->respondWithError('FETCH_FAILED', 'Failed to load partnership detail', null, 500);
+        }
+    }
+
+    /** POST /api/v2/admin/federation/partnerships/{id}/counter-propose */
+    public function counterProposePartnership($id): JsonResponse
+    {
+        $adminId = $this->requireAdmin();
+        $id = (int) $id;
+        $input = $this->getAllInput();
+
+        $level = (int) ($input['level'] ?? FederationPartnershipService::LEVEL_DISCOVERY);
+        $permissions = $input['permissions'] ?? [];
+        $message = isset($input['message']) ? substr(trim($input['message']), 0, 1000) : null;
+
+        if ($level < 1 || $level > 4) {
+            return $this->respondWithError('VALIDATION_ERROR', 'Level must be between 1 and 4', 'level');
+        }
+
+        try {
+            $result = FederationPartnershipService::counterPropose($id, $adminId, $level, $permissions, $message);
+            if ($result['success']) {
+                return $this->respondWithData($result);
+            }
+            return $this->respondWithError('COUNTER_PROPOSE_FAILED', $result['error'] ?? 'Failed to counter-propose');
+        } catch (\Exception $e) {
+            return $this->respondWithError('COUNTER_PROPOSE_FAILED', 'Failed to send counter-proposal');
+        }
+    }
+
+    /** PUT /api/v2/admin/federation/partnerships/{id}/permissions */
+    public function updatePartnershipPermissions($id): JsonResponse
+    {
+        $adminId = $this->requireAdmin();
+        $id = (int) $id;
+        $input = $this->getAllInput();
+        $permissions = $input['permissions'] ?? [];
+
+        try {
+            $result = FederationPartnershipService::updatePermissions($id, $adminId, $permissions);
+            if ($result['success']) {
+                return $this->respondWithData($result);
+            }
+            return $this->respondWithError('UPDATE_FAILED', $result['error'] ?? 'Failed to update permissions');
+        } catch (\Exception $e) {
+            return $this->respondWithError('UPDATE_FAILED', 'Failed to update partnership permissions');
+        }
+    }
+
+    /** GET /api/v2/admin/federation/partnerships/{id}/audit-log */
+    public function partnershipAuditLog($id): JsonResponse
+    {
+        $this->requireAdmin();
+        $tenantId = TenantContext::getId();
+        $id = (int) $id;
+
+        if (!$this->tableExists('federation_audit_log') || !$this->tableExists('federation_partnerships')) {
+            return $this->respondWithData([]);
+        }
+
+        try {
+            $partnership = DB::selectOne(
+                "SELECT tenant_id, partner_tenant_id FROM federation_partnerships WHERE id = ? AND (tenant_id = ? OR partner_tenant_id = ?)",
+                [$id, $tenantId, $tenantId]
+            );
+            if (!$partnership) {
+                return $this->respondWithError('NOT_FOUND', 'Partnership not found', null, 404);
+            }
+
+            $t1 = (int) $partnership->tenant_id;
+            $t2 = (int) $partnership->partner_tenant_id;
+
+            $logs = DB::select(
+                "SELECT fal.*, u.first_name, u.last_name
+                 FROM federation_audit_log fal
+                 LEFT JOIN users u ON fal.actor_user_id = u.id
+                 WHERE fal.category = 'partnership'
+                   AND ((fal.source_tenant_id = ? AND fal.target_tenant_id = ?)
+                     OR (fal.source_tenant_id = ? AND fal.target_tenant_id = ?))
+                 ORDER BY fal.created_at DESC
+                 LIMIT 50",
+                [$t1, $t2, $t2, $t1]
+            );
+
+            return $this->respondWithData(array_map(fn($r) => (array)$r, $logs));
+        } catch (\Exception $e) {
+            return $this->respondWithData([]);
+        }
+    }
+
+    /** GET /api/v2/admin/federation/partnerships/{id}/stats */
+    public function partnershipStats($id): JsonResponse
+    {
+        $this->requireAdmin();
+        $tenantId = TenantContext::getId();
+        $id = (int) $id;
+
+        $stats = ['messages_exchanged' => 0, 'transactions_completed' => 0, 'connections_made' => 0];
+
+        try {
+            $partnership = DB::selectOne(
+                "SELECT tenant_id, partner_tenant_id FROM federation_partnerships WHERE id = ? AND (tenant_id = ? OR partner_tenant_id = ?)",
+                [$id, $tenantId, $tenantId]
+            );
+            if (!$partnership) {
+                return $this->respondWithError('NOT_FOUND', 'Partnership not found', null, 404);
+            }
+
+            $t1 = (int) $partnership->tenant_id;
+            $t2 = (int) $partnership->partner_tenant_id;
+
+            if ($this->tableExists('federation_messages')) {
+                try {
+                    $row = DB::selectOne(
+                        "SELECT COUNT(*) as total FROM federation_messages WHERE (sender_tenant_id = ? AND receiver_tenant_id = ?) OR (sender_tenant_id = ? AND receiver_tenant_id = ?)",
+                        [$t1, $t2, $t2, $t1]
+                    );
+                    $stats['messages_exchanged'] = (int) ($row->total ?? 0);
+                } catch (\Exception $e) {}
+            }
+
+            if ($this->tableExists('federation_transactions')) {
+                try {
+                    $row = DB::selectOne(
+                        "SELECT COUNT(*) as total FROM federation_transactions WHERE (sender_tenant_id = ? AND receiver_tenant_id = ?) OR (sender_tenant_id = ? AND receiver_tenant_id = ?)",
+                        [$t1, $t2, $t2, $t1]
+                    );
+                    $stats['transactions_completed'] = (int) ($row->total ?? 0);
+                } catch (\Exception $e) {}
+            }
+
+            return $this->respondWithData($stats);
+        } catch (\Exception $e) {
+            return $this->respondWithData($stats);
+        }
+    }
+
     // ─────────────────────────────────────────────────────────────────────────
     // Directory & Profile
     // ─────────────────────────────────────────────────────────────────────────
@@ -328,6 +494,153 @@ class AdminFederationController extends BaseApiController
             try { $row = DB::selectOne("SELECT COUNT(*) as total FROM federation_messages WHERE sender_tenant_id = ? OR receiver_tenant_id = ?", [$tenantId, $tenantId]); $data['cross_community_messages'] = (int)($row->total ?? 0); } catch (\Exception $e) {}
         }
         return $this->respondWithData($data);
+    }
+
+    // ─────────────────────────────────────────────────────────────────────────
+    // Activity Feed
+    // ─────────────────────────────────────────────────────────────────────────
+
+    /** GET /api/v2/admin/federation/activity */
+    public function activityFeed(): JsonResponse
+    {
+        $this->requireAdmin();
+        $tenantId = TenantContext::getId();
+
+        if (!$this->tableExists('federation_audit_log')) {
+            return $this->respondWithData(['items' => [], 'total' => 0, 'has_more' => false]);
+        }
+
+        $request = request();
+        $limit = min(max((int) $request->input('limit', 25), 1), 100);
+        $cursor = $request->input('cursor'); // ISO timestamp for cursor-based pagination
+        $eventTypes = $request->input('event_type'); // comma-separated
+        $partnerTenantId = $request->input('partner_tenant_id');
+        $dateFrom = $request->input('date_from');
+        $dateTo = $request->input('date_to');
+        $search = $request->input('search');
+
+        try {
+            $query = DB::table('federation_audit_log')
+                ->where(function ($q) use ($tenantId) {
+                    $q->where('source_tenant_id', $tenantId)
+                      ->orWhere('target_tenant_id', $tenantId);
+                });
+
+            // Filter by event types
+            if (!empty($eventTypes)) {
+                $types = array_filter(array_map('trim', explode(',', $eventTypes)));
+                if (!empty($types)) {
+                    $query->whereIn('action_type', $types);
+                }
+            }
+
+            // Filter by partner tenant
+            if (!empty($partnerTenantId)) {
+                $partnerId = (int) $partnerTenantId;
+                $query->where(function ($q) use ($partnerId) {
+                    $q->where('source_tenant_id', $partnerId)
+                      ->orWhere('target_tenant_id', $partnerId);
+                });
+            }
+
+            // Date range filters
+            if (!empty($dateFrom)) {
+                $query->where('created_at', '>=', $dateFrom . ' 00:00:00');
+            }
+            if (!empty($dateTo)) {
+                $query->where('created_at', '<=', $dateTo . ' 23:59:59');
+            }
+
+            // Search filter
+            if (!empty($search)) {
+                $term = '%' . $search . '%';
+                $query->where(function ($q) use ($term) {
+                    $q->where('actor_name', 'LIKE', $term)
+                      ->orWhere('action_type', 'LIKE', $term)
+                      ->orWhere('data', 'LIKE', $term);
+                });
+            }
+
+            // Cursor-based pagination
+            if (!empty($cursor)) {
+                $query->where('created_at', '<', $cursor);
+            }
+
+            // Get total count (without cursor) for stats
+            $countQuery = DB::table('federation_audit_log')
+                ->where(function ($q) use ($tenantId) {
+                    $q->where('source_tenant_id', $tenantId)
+                      ->orWhere('target_tenant_id', $tenantId);
+                });
+            $total = $countQuery->count();
+
+            $rows = $query->orderByDesc('created_at')
+                ->limit($limit + 1) // fetch one extra to detect has_more
+                ->get();
+
+            $hasMore = $rows->count() > $limit;
+            $items = $rows->take($limit);
+
+            // Collect partner tenant IDs for batch lookup
+            $partnerIds = [];
+            foreach ($items as $row) {
+                $pid = ((int) $row->source_tenant_id === $tenantId)
+                    ? $row->target_tenant_id
+                    : $row->source_tenant_id;
+                if ($pid) {
+                    $partnerIds[(int) $pid] = true;
+                }
+            }
+
+            // Batch fetch partner tenant names
+            $tenantNames = [];
+            if (!empty($partnerIds)) {
+                $ids = array_keys($partnerIds);
+                $placeholders = implode(',', array_fill(0, count($ids), '?'));
+                $tenants = DB::select("SELECT id, name, slug FROM tenants WHERE id IN ({$placeholders})", $ids);
+                foreach ($tenants as $t) {
+                    $tenantNames[(int) $t->id] = ['name' => $t->name, 'slug' => $t->slug];
+                }
+            }
+
+            // Format items
+            $formatted = $items->map(function ($row) use ($tenantId, $tenantNames) {
+                $data = $row->data ? json_decode($row->data, true) : [];
+                $isIncoming = ((int) $row->target_tenant_id === $tenantId);
+                $partnerTid = $isIncoming ? (int) $row->source_tenant_id : (int) $row->target_tenant_id;
+
+                return [
+                    'id' => (int) $row->id,
+                    'type' => $row->action_type,
+                    'category' => $row->category ?? 'system',
+                    'level' => $row->level ?? 'info',
+                    'description' => FederationAuditService::getActionLabel($row->action_type),
+                    'detail' => $data['description'] ?? ($data['preview'] ?? null),
+                    'actor_name' => $row->actor_name,
+                    'actor_user_id' => $row->actor_user_id ? (int) $row->actor_user_id : null,
+                    'direction' => $isIncoming ? 'inbound' : 'outbound',
+                    'partner_tenant_id' => $partnerTid ?: null,
+                    'partner_tenant_name' => $tenantNames[$partnerTid]['name'] ?? null,
+                    'partner_tenant_slug' => $tenantNames[$partnerTid]['slug'] ?? null,
+                    'timestamp' => $row->created_at,
+                    'data' => $data,
+                ];
+            })->values()->all();
+
+            $nextCursor = $hasMore && !empty($formatted)
+                ? $formatted[count($formatted) - 1]['timestamp']
+                : null;
+
+            return $this->respondWithData([
+                'items' => $formatted,
+                'total' => $total,
+                'has_more' => $hasMore,
+                'next_cursor' => $nextCursor,
+            ]);
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error('[AdminFederation] activityFeed error: ' . $e->getMessage());
+            return $this->respondWithData(['items' => [], 'total' => 0, 'has_more' => false]);
+        }
     }
 
     public function apiKeys(): JsonResponse

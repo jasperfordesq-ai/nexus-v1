@@ -82,6 +82,11 @@ import {
   Briefcase,
   BookOpen,
   Cpu,
+  Handshake,
+  Database,
+  MapPin,
+  FileSearch,
+  Webhook,
   type LucideIcon,
 } from 'lucide-react';
 
@@ -320,9 +325,15 @@ function useAdminNav(): NavSection[] {
           { label: t('federation_settings'), href: '/admin/federation', icon: Settings },
           { label: t('federation_partnerships'), href: '/admin/federation/partnerships', icon: ArrowLeftRight },
           { label: t('federation_directory'), href: '/admin/federation/directory', icon: Globe },
+          { label: t('federation_credit_agreements'), href: '/admin/federation/credit-agreements', icon: Handshake },
+          { label: t('federation_neighborhoods'), href: '/admin/federation/neighborhoods', icon: MapPin },
           { label: t('federation_analytics'), href: '/admin/federation/analytics', icon: BarChart3 },
           { label: t('federation_api_keys'), href: '/admin/federation/api-keys', icon: Key },
+          { label: t('federation_api_docs'), href: '/admin/federation/api-docs', icon: BookOpen },
           { label: t('federation_external_partners'), href: '/admin/federation/external-partners', icon: Globe },
+          { label: t('federation_webhooks'), href: '/admin/federation/webhooks', icon: Webhook },
+          { label: t('federation_activity'), href: '/admin/federation/activity', icon: Activity },
+          { label: t('federation_data_management'), href: '/admin/federation/data', icon: Database },
         ],
       });
     }
@@ -341,6 +352,10 @@ function useAdminNav(): NavSection[] {
           { label: t('super_bulk_operations'), href: '/admin/super/bulk', icon: ListChecks },
           { label: t('super_audit_log'), href: '/admin/super/audit', icon: ScrollText },
           { label: t('super_federation_controls'), href: '/admin/super/federation', icon: Globe },
+          { label: t('super_federation_system_controls'), href: '/admin/super/federation/system-controls', icon: Settings },
+          { label: t('super_federation_whitelist'), href: '/admin/super/federation/whitelist', icon: Shield },
+          { label: t('super_federation_partnerships'), href: '/admin/super/federation/partnerships', icon: Handshake },
+          { label: t('super_federation_audit'), href: '/admin/super/federation/audit', icon: FileSearch },
         ],
       });
     }
