@@ -182,6 +182,7 @@ export function LoginPage() {
 
   // Handle tenant selection from dropdown
   const handleTenantChange = (keys: unknown) => {
+    if (!(keys instanceof Set)) return;
     const selectedKeys = keys as Set<string>;
     const tenantId = Array.from(selectedKeys)[0] || '';
     setSelectedTenantId(tenantId);

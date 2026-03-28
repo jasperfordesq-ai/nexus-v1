@@ -31,7 +31,7 @@ class TokenService
      */
     private function getSecretKey(): string
     {
-        $secret = config('app.jwt_secret') ?: env('JWT_SECRET');
+        $secret = config('app.jwt_secret');
 
         if (!$secret) {
             $appKey = config('app.key');

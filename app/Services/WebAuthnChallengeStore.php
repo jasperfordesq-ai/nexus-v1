@@ -128,7 +128,7 @@ class WebAuthnChallengeStore
             return ['valid' => false, 'error' => 'Challenge not found or expired'];
         }
 
-        if ($data['challenge'] !== $expectedChallenge) {
+        if (!hash_equals($data['challenge'], $expectedChallenge)) {
             return ['valid' => false, 'error' => 'Challenge mismatch'];
         }
 
@@ -242,7 +242,11 @@ class WebAuthnChallengeStore
             @mkdir($dir, 0700, true);
         }
 
-        return file_put_contents($file, json_encode($data)) !== false;
+        $result = file_put_contents($file, json_encode($data)) !== false;
+        if ($result) {
+            chmod($file, 0600);
+        }
+        return $result;
     }
 
     /**

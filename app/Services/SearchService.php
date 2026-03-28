@@ -775,6 +775,7 @@ class SearchService
 
     public static function searchUsersStatic(string $query, int $tenantId, int $limit = 200, array $extraFilters = []): array|false
     {
+        $limit = min($limit, 200);
         $like = '%' . $query . '%';
         return User::where('tenant_id', $tenantId)
             ->where(function ($q) use ($like) {

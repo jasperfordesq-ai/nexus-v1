@@ -105,6 +105,12 @@ class FederationPartnershipService
             return ['success' => false, 'error' => 'Partnership is not pending approval'];
         }
 
+        // Only the receiving tenant can approve
+        $tenantId = TenantContext::getId();
+        if ((int) $partnership['partner_tenant_id'] !== $tenantId) {
+            return ['success' => false, 'error' => 'Only the receiving tenant can approve a partnership request'];
+        }
+
         $defaultPermissions = self::getDefaultPermissions($partnership['federation_level']);
         $permissions = array_merge($defaultPermissions, $permissions);
 
@@ -242,6 +248,12 @@ class FederationPartnershipService
             return ['success' => false, 'error' => 'Partnership not found'];
         }
 
+        // Only the receiving tenant can reject
+        $tenantId = TenantContext::getId();
+        if ((int) $partnership['partner_tenant_id'] !== $tenantId) {
+            return ['success' => false, 'error' => 'Only the receiving tenant can reject a partnership request'];
+        }
+
         try {
             DB::table('federation_partnerships')->where('id', $partnershipId)->update([
                 'status' => 'terminated',
@@ -275,6 +287,12 @@ class FederationPartnershipService
         }
         if ($partnership['status'] !== 'active') {
             return ['success' => false, 'error' => 'Can only suspend active partnerships'];
+        }
+
+        // Either party can suspend
+        $tenantId = TenantContext::getId();
+        if ((int) $partnership['tenant_id'] !== $tenantId && (int) $partnership['partner_tenant_id'] !== $tenantId) {
+            return ['success' => false, 'error' => 'Only a partner tenant can suspend this partnership'];
         }
 
         try {

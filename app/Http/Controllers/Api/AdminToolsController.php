@@ -122,7 +122,7 @@ class AdminToolsController extends BaseApiController
     /** GET /api/v2/admin/tools/404-errors */
     public function get404Errors(): JsonResponse
     {
-        $this->requireAdmin();
+        $this->requireSuperAdmin();
 
         $page = $this->queryInt('page', 1, 1);
         $perPage = $this->queryInt('per_page', 50, 1, 100);
@@ -157,7 +157,7 @@ class AdminToolsController extends BaseApiController
     /** DELETE /api/v2/admin/tools/404-errors/{id} */
     public function delete404Error(int $id): JsonResponse
     {
-        $this->requireAdmin();
+        $this->requireSuperAdmin();
 
         try {
             $error = DB::selectOne("SELECT id FROM error_404_log WHERE id = ?", [$id]);

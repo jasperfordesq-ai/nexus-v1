@@ -86,8 +86,7 @@ export function FederationEventsPage() {
   tRef.current = t;
   const toastRef = useRef(toast);
   toastRef.current = toast;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const loadEventsRef = useRef<(append?: boolean) => Promise<void>>(null as any);
+  const loadEventsRef = useRef<(append?: boolean) => Promise<void>>(null!);
 
   // ── Debounce search ──────────────────────────────────────────────────────
   useEffect(() => {

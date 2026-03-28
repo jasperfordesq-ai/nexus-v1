@@ -182,7 +182,7 @@ export function GoalCheckinModal({
         <ModalHeader className="flex flex-col gap-1">
           <div className="flex items-center gap-2 text-theme-primary">
             <ClipboardCheck className="w-5 h-5 text-emerald-400" aria-hidden="true" />
-            Check In
+            {t('checkin.title')}
           </div>
           <p className="text-sm text-theme-muted font-normal">{goalTitle}</p>
         </ModalHeader>
@@ -198,7 +198,7 @@ export function GoalCheckinModal({
               onPress={() => setShowHistory(false)}
               startContent={<ClipboardCheck className="w-4 h-4" aria-hidden="true" />}
             >
-              New Check-in
+              {t('checkin.new_checkin')}
             </Button>
             <Button
               size="sm"
@@ -209,7 +209,7 @@ export function GoalCheckinModal({
               onPress={() => setShowHistory(true)}
               startContent={<Clock className="w-4 h-4" aria-hidden="true" />}
             >
-              History
+              {t('checkin.history')}
             </Button>
           </div>
 
@@ -223,7 +223,7 @@ export function GoalCheckinModal({
               ) : checkins.length === 0 ? (
                 <div className="text-center py-8">
                   <ClipboardCheck className="w-10 h-10 text-theme-subtle mx-auto mb-2" aria-hidden="true" />
-                  <p className="text-sm text-theme-muted">No check-ins yet. Record your first one!</p>
+                  <p className="text-sm text-theme-muted">{t('checkin.no_checkins')}</p>
                 </div>
               ) : (
                 <div className="space-y-3 max-h-80 overflow-y-auto pr-1">
@@ -249,7 +249,7 @@ export function GoalCheckinModal({
                                   className="text-[10px] bg-theme-elevated"
                                   startContent={getMoodIcon(checkin.mood)}
                                 >
-                                  {getMoodLabel(checkin.mood)}
+                                  {t(getMoodLabel(checkin.mood))}
                                 </Chip>
                               )}
                             </div>
@@ -275,7 +275,7 @@ export function GoalCheckinModal({
               {/* Progress Slider */}
               <div>
                 <label className="text-sm font-medium text-theme-primary mb-2 block">
-                  Progress
+                  {t('checkin.progress_label')}
                 </label>
                 <Slider
                   step={5}
@@ -303,7 +303,7 @@ export function GoalCheckinModal({
               {/* Mood Selector */}
               <div>
                 <label className="text-sm font-medium text-theme-primary mb-2 block">
-                  How are you feeling?
+                  {t('checkin.mood_label')}
                 </label>
                 <div className="flex gap-2 flex-wrap">
                   {MOODS.map((mood) => {
@@ -332,8 +332,8 @@ export function GoalCheckinModal({
               {/* Note */}
               <div>
                 <Textarea
-                  label="Note (optional)"
-                  placeholder="How's it going? Any wins or challenges?"
+                  label={t('checkin.note_label')}
+                  placeholder={t('checkin.note_placeholder')}
                   value={note}
                   onChange={(e) => setNote(e.target.value)}
                   minRows={2}
@@ -350,7 +350,7 @@ export function GoalCheckinModal({
         </ModalBody>
         <ModalFooter>
           <Button variant="flat" onPress={onClose} className="text-theme-muted">
-            Cancel
+            {t('checkin.cancel')}
           </Button>
           {!showHistory && (
             <Button
@@ -358,7 +358,7 @@ export function GoalCheckinModal({
               onPress={handleSubmit}
               isLoading={isSubmitting}
             >
-              Record Check-in
+              {t('checkin.submit')}
             </Button>
           )}
         </ModalFooter>

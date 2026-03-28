@@ -80,7 +80,7 @@ export function SafeguardingStep({ onNext, onBack, onSkip, isRequired, introText
       }
     } catch (error) {
       logError('Failed to load safeguarding options', error);
-      toast.error('Failed to load options', 'Please try again');
+      toast.error(t('safeguarding.load_error'), t('safeguarding.try_again'));
     } finally {
       setLoading(false);
     }
@@ -102,8 +102,8 @@ export function SafeguardingStep({ onNext, onBack, onSkip, isRequired, introText
     const unmetRequired = requiredOptions.filter(o => !selections[o.id]);
     if (unmetRequired.length > 0) {
       toast.error(
-        'Required options',
-        `Please respond to: ${unmetRequired.map(o => o.label).join(', ')}`
+        t('safeguarding.required'),
+        t('safeguarding.required_respond', { items: unmetRequired.map(o => o.label).join(', ') })
       );
       return;
     }
@@ -130,12 +130,12 @@ export function SafeguardingStep({ onNext, onBack, onSkip, isRequired, introText
         });
 
         if (!res.success) {
-          toast.error('Save failed', res.error || 'Please try again');
+          toast.error(t('safeguarding.save_failed'), res.error || t('safeguarding.try_again'));
           return;
         }
       } catch (error) {
         logError('Failed to save safeguarding preferences', error);
-        toast.error('Save failed', 'Please try again');
+        toast.error(t('safeguarding.save_failed'), t('safeguarding.try_again'));
         return;
       } finally {
         setSaving(false);
@@ -161,20 +161,20 @@ export function SafeguardingStep({ onNext, onBack, onSkip, isRequired, introText
       <div className="space-y-6">
         <GlassCard className="p-6 text-center">
           <Shield className="w-10 h-10 mx-auto mb-3 text-theme-muted opacity-40" />
-          <p className="text-theme-muted">No safeguarding options have been configured for this community.</p>
+          <p className="text-theme-muted">{t('safeguarding.empty')}</p>
         </GlassCard>
         <div className="flex items-center justify-between gap-3">
           <Button variant="light" className="text-theme-muted" onPress={onBack}
             startContent={<ArrowLeft className="w-4 h-4" />}
           >
-            Back
+            {t('back')}
           </Button>
           <Button
             className="bg-gradient-to-r from-emerald-500 to-teal-600 text-white font-semibold"
             onPress={onNext}
             endContent={<ArrowRight className="w-4 h-4" />}
           >
-            Continue
+            {t('next')}
           </Button>
         </div>
       </div>
@@ -277,7 +277,7 @@ export function SafeguardingStep({ onNext, onBack, onSkip, isRequired, introText
         {/* Required field notice */}
         {options.some(o => o.is_required) && (
           <p className="text-xs text-theme-muted mt-3">
-            <span className="text-danger-500">*</span> Required fields
+            <span className="text-danger-500">*</span> {t('safeguarding.required_fields')}
           </p>
         )}
       </GlassCard>
@@ -290,7 +290,7 @@ export function SafeguardingStep({ onNext, onBack, onSkip, isRequired, introText
           onPress={onBack}
           startContent={<ArrowLeft className="w-4 h-4" />}
         >
-          Back
+          {t('back')}
         </Button>
 
         <div className="flex items-center gap-3">
@@ -301,7 +301,7 @@ export function SafeguardingStep({ onNext, onBack, onSkip, isRequired, introText
               onPress={onSkip}
               endContent={<SkipForward className="w-4 h-4" />}
             >
-              Skip for now
+              {t('skip_for_now')}
             </Button>
           )}
           <Button
@@ -310,7 +310,7 @@ export function SafeguardingStep({ onNext, onBack, onSkip, isRequired, introText
             isLoading={saving}
             endContent={!saving ? <ArrowRight className="w-4 h-4" /> : undefined}
           >
-            {anySelected ? 'Save & Continue' : 'Continue'}
+            {anySelected ? t('safeguarding.save_continue') : t('next')}
           </Button>
         </div>
       </div>

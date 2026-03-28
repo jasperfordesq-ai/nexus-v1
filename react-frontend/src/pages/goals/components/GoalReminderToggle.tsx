@@ -46,10 +46,10 @@ interface GoalReminderToggleProps {
 /* ───────────────────────── Frequency Options ───────────────────────── */
 
 const FREQUENCIES = [
-  { value: 'daily', label: 'Daily' },
-  { value: 'weekly', label: 'Weekly' },
-  { value: 'biweekly', label: 'Every 2 weeks' },
-  { value: 'monthly', label: 'Monthly' },
+  { value: 'daily', labelKey: 'frequency.daily' },
+  { value: 'weekly', labelKey: 'frequency.weekly' },
+  { value: 'biweekly', labelKey: 'frequency.biweekly' },
+  { value: 'monthly', labelKey: 'frequency.monthly' },
 ] as const;
 
 /* ───────────────────────── Component ───────────────────────── */
@@ -88,7 +88,7 @@ export function GoalReminderToggle({ goalId, className = '' }: GoalReminderToggl
       setIsSaving(true);
       const response = await api.put(`/v2/goals/${goalId}/reminder`, { frequency });
       if (response.success) {
-        toast.success(`Reminder set: ${frequency}`);
+        toast.success(t('reminder.reminder_set_success', { frequency }));
         await loadReminder();
         setIsPopoverOpen(false);
       } else {
@@ -136,7 +136,7 @@ export function GoalReminderToggle({ goalId, className = '' }: GoalReminderToggl
           variant="flat"
           className={`${hasReminder ? 'bg-indigo-500/10 text-indigo-400' : 'bg-theme-elevated text-theme-muted'} ${className}`}
           isLoading={isLoading}
-          aria-label={hasReminder ? 'Reminder active' : 'Set reminder'}
+          aria-label={hasReminder ? t('reminder.aria_active') : t('reminder.aria_set')}
         >
           {hasReminder ? (
             <BellRing className="w-4 h-4" />
@@ -148,12 +148,12 @@ export function GoalReminderToggle({ goalId, className = '' }: GoalReminderToggl
       <PopoverContent className="bg-content1 border border-theme-default p-3 w-52">
         <div className="space-y-2">
           <p className="text-sm font-semibold text-theme-primary">
-            {hasReminder ? 'Reminder Active' : 'Set Reminder'}
+            {hasReminder ? t('reminder.active') : t('reminder.set')}
           </p>
 
           {hasReminder && reminder && (
             <p className="text-xs text-theme-subtle">
-              Currently: {FREQUENCIES.find((f) => f.value === reminder.frequency)?.label || reminder.frequency}
+              {t('reminder.currently', { frequency: FREQUENCIES.find((f) => f.value === reminder.frequency) ? t(FREQUENCIES.find((f) => f.value === reminder.frequency)!.labelKey) : reminder.frequency })}
             </p>
           )}
 
@@ -174,7 +174,7 @@ export function GoalReminderToggle({ goalId, className = '' }: GoalReminderToggl
                 isDisabled={isSaving}
                 endContent={reminder?.frequency === freq.value ? <Check className="w-3.5 h-3.5" /> : undefined}
               >
-                {freq.label}
+                {t(freq.labelKey)}
               </Button>
             ))}
           </div>
@@ -190,7 +190,7 @@ export function GoalReminderToggle({ goalId, className = '' }: GoalReminderToggl
                 onPress={handleDeleteReminder}
                 isDisabled={isSaving}
               >
-                Remove Reminder
+                {t('reminder.remove')}
               </Button>
             </>
           )}

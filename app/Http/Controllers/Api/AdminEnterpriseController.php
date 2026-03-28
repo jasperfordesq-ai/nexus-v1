@@ -301,10 +301,16 @@ class AdminEnterpriseController extends BaseApiController
     {
         $this->requireAdmin();
         $tenantId = $this->getTenantId();
+
+        $page = max(1, (int) request()->query('page', 1));
+        $perPage = min(100, max(1, (int) request()->query('per_page', 25)));
+        $offset = ($page - 1) * $perPage;
+
         try {
-            $consents = array_map(fn($r) => (array)$r, DB::select("SELECT uc.*, uc.consent_given as consented, uc.given_at as consented_at, u.name as user_name FROM user_consents uc LEFT JOIN users u ON u.id = uc.user_id WHERE uc.tenant_id = ? ORDER BY uc.created_at DESC LIMIT 100", [$tenantId]));
-            return $this->respondWithData($consents);
-        } catch (\Exception $e) { return $this->respondWithData([]); }
+            $total = (int) (DB::selectOne("SELECT COUNT(*) as cnt FROM user_consents WHERE tenant_id = ?", [$tenantId])->cnt ?? 0);
+            $consents = array_map(fn($r) => (array)$r, DB::select("SELECT uc.*, uc.consent_given as consented, uc.given_at as consented_at, u.name as user_name FROM user_consents uc LEFT JOIN users u ON u.id = uc.user_id WHERE uc.tenant_id = ? ORDER BY uc.created_at DESC LIMIT ? OFFSET ?", [$tenantId, $perPage, $offset]));
+            return $this->respondWithData(['data' => $consents, 'total' => $total, 'page' => $page, 'per_page' => $perPage]);
+        } catch (\Exception $e) { return $this->respondWithData(['data' => [], 'total' => 0, 'page' => $page, 'per_page' => $perPage]); }
     }
 
     /** GET /api/v2/admin/enterprise/gdpr/breaches */
@@ -312,10 +318,16 @@ class AdminEnterpriseController extends BaseApiController
     {
         $this->requireAdmin();
         $tenantId = $this->getTenantId();
+
+        $page = max(1, (int) request()->query('page', 1));
+        $perPage = min(100, max(1, (int) request()->query('per_page', 25)));
+        $offset = ($page - 1) * $perPage;
+
         try {
-            $breaches = array_map(fn($r) => (array)$r, DB::select("SELECT *, breach_type as title, detected_at as reported_at FROM data_breach_log WHERE tenant_id = ? ORDER BY detected_at DESC LIMIT 100", [$tenantId]));
-            return $this->respondWithData($breaches);
-        } catch (\Exception $e) { return $this->respondWithData([]); }
+            $total = (int) (DB::selectOne("SELECT COUNT(*) as cnt FROM data_breach_log WHERE tenant_id = ?", [$tenantId])->cnt ?? 0);
+            $breaches = array_map(fn($r) => (array)$r, DB::select("SELECT *, breach_type as title, detected_at as reported_at FROM data_breach_log WHERE tenant_id = ? ORDER BY detected_at DESC LIMIT ? OFFSET ?", [$tenantId, $perPage, $offset]));
+            return $this->respondWithData(['data' => $breaches, 'total' => $total, 'page' => $page, 'per_page' => $perPage]);
+        } catch (\Exception $e) { return $this->respondWithData(['data' => [], 'total' => 0, 'page' => $page, 'per_page' => $perPage]); }
     }
 
     /** POST /api/v2/admin/enterprise/gdpr/breaches */
@@ -343,13 +355,19 @@ class AdminEnterpriseController extends BaseApiController
     {
         $this->requireAdmin();
         $tenantId = $this->getTenantId();
+
+        $page = max(1, (int) request()->query('page', 1));
+        $perPage = min(100, max(1, (int) request()->query('per_page', 25)));
+        $offset = ($page - 1) * $perPage;
+
         try {
+            $total = (int) (DB::selectOne("SELECT COUNT(*) as cnt FROM gdpr_audit_log WHERE tenant_id = ?", [$tenantId])->cnt ?? 0);
             $entries = array_map(fn($r) => (array)$r, DB::select(
-                "SELECT gal.id, gal.tenant_id, gal.admin_id, gal.action, gal.entity_type, gal.entity_id, gal.old_value, gal.new_value, gal.ip_address, gal.created_at, u.name as user_name FROM gdpr_audit_log gal LEFT JOIN users u ON u.id = gal.admin_id WHERE gal.tenant_id = ? ORDER BY gal.created_at DESC LIMIT 100",
-                [$tenantId]
+                "SELECT gal.id, gal.tenant_id, gal.admin_id, gal.action, gal.entity_type, gal.entity_id, gal.old_value, gal.new_value, gal.ip_address, gal.created_at, u.name as user_name FROM gdpr_audit_log gal LEFT JOIN users u ON u.id = gal.admin_id WHERE gal.tenant_id = ? ORDER BY gal.created_at DESC LIMIT ? OFFSET ?",
+                [$tenantId, $perPage, $offset]
             ));
-            return $this->respondWithData($entries);
-        } catch (\Exception $e) { return $this->respondWithData([]); }
+            return $this->respondWithData(['data' => $entries, 'total' => $total, 'page' => $page, 'per_page' => $perPage]);
+        } catch (\Exception $e) { return $this->respondWithData(['data' => [], 'total' => 0, 'page' => $page, 'per_page' => $perPage]); }
     }
 
     /** GET /api/v2/admin/enterprise/monitoring */

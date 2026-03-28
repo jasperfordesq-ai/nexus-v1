@@ -47,7 +47,7 @@ class RegistrationService
             ->where('tenant_id', $tenantId)
             ->exists();
         if ($exists) {
-            return ['error' => 'This email is already registered.'];
+            return ['error' => 'Registration could not be completed. Please try again or contact support.'];
         }
 
         $user = DB::transaction(function () use ($data, $tenantId) {

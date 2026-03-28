@@ -172,7 +172,7 @@ function DailyRewardWidget() {
       const res = await api.get<DailyRewardStatus>('/v2/gamification/daily-reward');
       if (controller.signal.aborted) return;
       if (res.success && res.data) {
-        setStatus(res.data as unknown as DailyRewardStatus);
+        setStatus(res.data);
       }
     } catch (err) {
       if (controller.signal.aborted) return;
@@ -192,7 +192,7 @@ function DailyRewardWidget() {
       const res = await api.post<{ claimed: boolean; reward: { xp_earned: number; streak_day: number } }>('/v2/gamification/daily-reward');
       if (res.success) {
         setJustClaimed(true);
-        const reward = (res.data as { claimed: boolean; reward: { xp_earned: number; streak_day: number } } | undefined)?.reward;
+        const reward = res.data?.reward;
         toastRef.current.success(tRef.current('achievements.daily_reward.claimed_title'), tRef.current('achievements.daily_reward.claimed_message', { xp: reward?.xp_earned ?? status?.reward_xp ?? 0 }));
         // Update status
         setStatus((prev) =>

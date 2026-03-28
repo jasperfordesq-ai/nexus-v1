@@ -70,7 +70,8 @@ class AdminCronController extends BaseApiController
         )->total;
 
         $logs = DB::select(
-            "SELECT * FROM cron_logs WHERE {$whereClause} ORDER BY executed_at DESC LIMIT ? OFFSET ?",
+            "SELECT id, job_id, status, executed_at, duration_seconds, output AS error_message, tenant_id
+             FROM cron_logs WHERE {$whereClause} ORDER BY executed_at DESC LIMIT ? OFFSET ?",
             array_merge($values, [$limit, $offset])
         );
 
@@ -92,7 +93,9 @@ class AdminCronController extends BaseApiController
         $tenantId = $this->getTenantId();
 
         $log = DB::selectOne(
-            "SELECT * FROM cron_logs WHERE id = ? AND (tenant_id = ? OR tenant_id IS NULL)",
+            "SELECT id, job_id, status, executed_at, duration_seconds,
+                    LEFT(output, 10000) AS output, tenant_id
+             FROM cron_logs WHERE id = ? AND (tenant_id = ? OR tenant_id IS NULL)",
             [$logId, $tenantId]
         );
 

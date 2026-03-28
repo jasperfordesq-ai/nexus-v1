@@ -9,6 +9,7 @@ namespace App\Http\Controllers\Api;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
 use App\Core\TenantContext;
+use App\Models\ActivityLog;
 use App\Services\RedisCache;
 
 /**
@@ -261,7 +262,7 @@ class AdminContentController extends BaseApiController
 
     public function deletePage($id): JsonResponse
     {
-        $this->requireAdmin();
+        $adminId = $this->requireAdmin();
         $tenantId = TenantContext::getId();
         $id = (int) $id;
 
@@ -269,13 +270,15 @@ class AdminContentController extends BaseApiController
             return $this->respondWithError('VALIDATION_ERROR', 'Invalid page ID', 'id', 400);
         }
 
-        $existing = DB::selectOne("SELECT id FROM pages WHERE id = ? AND tenant_id = ?", [$id, $tenantId]);
+        $existing = DB::selectOne("SELECT id, title FROM pages WHERE id = ? AND tenant_id = ?", [$id, $tenantId]);
         if (!$existing) {
             return $this->respondWithError('NOT_FOUND', 'Page not found', 'id', 404);
         }
 
         DB::delete("DELETE FROM menu_items WHERE page_id = ? AND page_id IN (SELECT id FROM pages WHERE tenant_id = ?)", [$id, $tenantId]);
         DB::delete("DELETE FROM pages WHERE id = ? AND tenant_id = ?", [$id, $tenantId]);
+
+        ActivityLog::log($adminId, 'admin_delete_page', "Deleted page #{$id}: " . ($existing->title ?? ''));
 
         try { $this->redisCache->delete('tenant_bootstrap', $tenantId); } catch (\Exception $e) {}
 
@@ -399,17 +402,19 @@ class AdminContentController extends BaseApiController
 
     public function deleteMenu($id): JsonResponse
     {
-        $this->requireAdmin();
+        $adminId = $this->requireAdmin();
         $tenantId = TenantContext::getId();
         $id = (int) $id;
 
         if ($id < 1) { return $this->respondWithError('VALIDATION_ERROR', 'Invalid menu ID', 'id', 400); }
 
-        $existing = DB::selectOne("SELECT id FROM menus WHERE id = ? AND tenant_id = ?", [$id, $tenantId]);
+        $existing = DB::selectOne("SELECT id, name FROM menus WHERE id = ? AND tenant_id = ?", [$id, $tenantId]);
         if (!$existing) { return $this->respondWithError('NOT_FOUND', 'Menu not found', 'id', 404); }
 
         DB::delete("DELETE FROM menu_items WHERE menu_id = ? AND menu_id IN (SELECT id FROM menus WHERE tenant_id = ?)", [$id, $tenantId]);
         DB::delete("DELETE FROM menus WHERE id = ? AND tenant_id = ?", [$id, $tenantId]);
+
+        ActivityLog::log($adminId, 'admin_delete_menu', "Deleted menu #{$id}: " . ($existing->name ?? ''));
 
         return $this->respondWithData(['deleted' => true]);
     }

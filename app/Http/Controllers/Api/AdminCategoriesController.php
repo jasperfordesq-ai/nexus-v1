@@ -48,7 +48,8 @@ class AdminCategoriesController extends BaseApiController
                     (SELECT COUNT(*) FROM listings l WHERE l.category_id = c.id) as listing_count
              FROM categories c
              WHERE {$where}
-             ORDER BY c.type ASC, c.name ASC",
+             ORDER BY c.type ASC, c.name ASC
+             LIMIT 500",
             $params
         );
 
@@ -278,7 +279,8 @@ class AdminCategoriesController extends BaseApiController
              FROM attributes a
              LEFT JOIN categories c ON a.category_id = c.id
              WHERE a.tenant_id = ?
-             ORDER BY a.category_id ASC, a.name ASC",
+             ORDER BY a.category_id ASC, a.name ASC
+             LIMIT 500",
             [$tenantId]
         );
 

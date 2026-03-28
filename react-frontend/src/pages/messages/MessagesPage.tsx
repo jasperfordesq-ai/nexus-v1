@@ -124,8 +124,7 @@ export function MessagesPage() {
    */
   const handleNewMessage = useCallback((event: NewMessageEvent) => {
     // Backend sends from_user_id on user channel; normalize to sender_id
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const raw = event as any;
+    const raw = event as NewMessageEvent & { from_user_id?: number; preview?: string };
     const senderId: number | undefined = event.sender_id || raw.from_user_id;
     if (!senderId) {
       // Can't identify sender — full reload to be safe

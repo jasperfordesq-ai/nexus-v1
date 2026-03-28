@@ -33,7 +33,7 @@ class AiChatService
             $response = Http::withToken($apiKey)
                 ->timeout(30)
                 ->post('https://api.openai.com/v1/chat/completions', [
-                    'model'    => $context['model'] ?? 'gpt-4o-mini',
+                    'model'    => in_array($context['model'] ?? 'gpt-4o-mini', ['gpt-4o-mini', 'gpt-4o'], true) ? ($context['model'] ?? 'gpt-4o-mini') : 'gpt-4o-mini',
                     'messages' => array_merge(
                         [['role' => 'system', 'content' => $context['system_prompt'] ?? 'You are a helpful community assistant.']],
                         $context['history'] ?? [],

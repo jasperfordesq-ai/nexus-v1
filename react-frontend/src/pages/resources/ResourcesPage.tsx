@@ -54,7 +54,7 @@ import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
 import { EmptyState } from '@/components/feedback';
 import { useAuth, useToast, useTenant } from '@/contexts';
-import { api, API_BASE } from '@/lib/api';
+import { api, API_BASE, tokenManager } from '@/lib/api';
 import { logError } from '@/lib/logger';
 import { formatRelativeTime } from '@/lib/helpers';
 import { usePageTitle } from '@/hooks';
@@ -483,12 +483,27 @@ export function ResourcesPage() {
     }
   };
 
-  // Authenticated download handler - opens download in new window with proper URL
-  async function handleDownload(resourceId: number, _title: string) {
+  // Authenticated download handler - fetches with auth headers then triggers browser download
+  async function handleDownload(resourceId: number, title: string) {
     try {
-      // Use window.open with the API URL - cookies handle auth, no token needed
       const downloadUrl = `${API_BASE}/v2/resources/${resourceId}/download`;
-      window.open(downloadUrl, '_blank');
+      const response = await fetch(downloadUrl, {
+        headers: {
+          'Authorization': `Bearer ${tokenManager.getAccessToken()}`,
+          'X-Tenant-ID': tokenManager.getTenantId() || '',
+        },
+        credentials: 'include',
+      });
+      if (!response.ok) throw new Error('Download failed');
+      const blob = await response.blob();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = title || 'download';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
       // Optimistically increment local download count
       setResources((prev) =>
         prev.map((r) => r.id === resourceId ? { ...r, downloads: r.downloads + 1 } : r)

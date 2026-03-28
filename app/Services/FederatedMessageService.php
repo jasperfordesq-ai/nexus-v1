@@ -245,6 +245,13 @@ class FederatedMessageService
         ?string $externalMessageId = null
     ): array {
         try {
+            // Sanitize and limit external input
+            $senderName = htmlspecialchars(substr($senderName, 0, 255), ENT_QUOTES, 'UTF-8');
+            $partnerName = htmlspecialchars(substr($partnerName, 0, 255), ENT_QUOTES, 'UTF-8');
+            $subject = htmlspecialchars(substr($subject ?? '', 0, 500), ENT_QUOTES, 'UTF-8');
+            $body = htmlspecialchars(substr($body, 0, 10000), ENT_QUOTES, 'UTF-8');
+            $externalMessageId = $externalMessageId ? htmlspecialchars(substr($externalMessageId, 0, 255), ENT_QUOTES, 'UTF-8') : null;
+
             $receiver = DB::table('users')->where('id', $receiverUserId)->first();
             if (!$receiver) {
                 return ['success' => false, 'error' => 'Receiver not found'];

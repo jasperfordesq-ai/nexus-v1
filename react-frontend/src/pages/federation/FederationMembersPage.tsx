@@ -115,8 +115,7 @@ export function FederationMembersPage() {
   tRef.current = t;
   const toastRef = useRef(toast);
   toastRef.current = toast;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const loadMembersRef = useRef<(append?: boolean) => Promise<void>>(null as any);
+  const loadMembersRef = useRef<(append?: boolean) => Promise<void>>(null!);
 
   // Debounce search input
   useEffect(() => {

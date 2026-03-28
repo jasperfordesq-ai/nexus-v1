@@ -321,7 +321,7 @@ class ResourcesController extends BaseApiController
         // Check ownership or admin role
         $isOwner = (int) $resource->user_id === $userId;
         $user = \Illuminate\Support\Facades\Auth::user();
-        $role = $user->role ?? ($_SESSION['user_role'] ?? 'member');
+        $role = $user->role ?? 'member';
         $isAdmin = in_array($role, ['admin', 'super_admin', 'tenant_admin'], true);
 
         if (! $isOwner && ! $isAdmin) {

@@ -9,6 +9,7 @@ namespace App\Http\Controllers\Api;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
 use App\Core\TenantContext;
+use App\Models\ActivityLog;
 
 /**
  * AdminDeliverabilityController -- Admin deliverability dashboard, analytics, and CRUD.
@@ -499,7 +500,7 @@ class AdminDeliverabilityController extends BaseApiController
     /** DELETE /api/v2/admin/deliverability/{id} */
     public function deleteDeliverable(int $id): JsonResponse
     {
-        $this->requireAdmin();
+        $adminId = $this->requireAdmin();
         $tenantId = $this->getTenantId();
 
         $deliverable = DB::selectOne("SELECT id, title FROM deliverables WHERE id = ? AND tenant_id = ?", [$id, $tenantId]);
@@ -511,6 +512,8 @@ class AdminDeliverabilityController extends BaseApiController
         DB::delete("DELETE FROM deliverable_milestones WHERE deliverable_id = ? AND tenant_id = ?", [$id, $tenantId]);
         DB::delete("DELETE FROM deliverable_history WHERE deliverable_id = ? AND tenant_id = ?", [$id, $tenantId]);
         DB::delete("DELETE FROM deliverables WHERE id = ? AND tenant_id = ?", [$id, $tenantId]);
+
+        ActivityLog::log($adminId, 'admin_delete_deliverable', "Deleted deliverable #{$id}: " . ($deliverable->title ?? ''));
 
         return $this->respondWithData(['deleted' => true, 'id' => $id]);
     }

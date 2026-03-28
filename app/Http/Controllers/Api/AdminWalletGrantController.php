@@ -8,6 +8,7 @@ namespace App\Http\Controllers\Api;
 
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
+use App\Models\ActivityLog;
 
 /**
  * AdminWalletGrantController -- Admin time credit grants.
@@ -153,11 +154,14 @@ class AdminWalletGrantController extends BaseApiController
             return $id;
         });
 
+        $userName = trim(($user->first_name ?? '') . ' ' . ($user->last_name ?? ''));
+        ActivityLog::log($adminId, 'admin_grant_credits', "Granted {$amount} credits to user #{$userId} ({$userName}). Reason: " . ($reason ?? 'Admin credit grant'));
+
         return $this->respondWithData([
             'grant' => [
                 'id' => $grantId,
                 'user_id' => $userId,
-                'user_name' => trim(($user->first_name ?? '') . ' ' . ($user->last_name ?? '')),
+                'user_name' => $userName,
                 'amount' => round($amount, 2),
                 'reason' => $reason ?? 'Admin credit grant',
                 'admin_id' => $adminId,

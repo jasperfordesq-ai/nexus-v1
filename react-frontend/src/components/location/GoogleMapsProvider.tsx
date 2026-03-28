@@ -19,6 +19,12 @@
 import { type ReactNode, useEffect } from 'react';
 import { APIProvider } from '@vis.gl/react-google-maps';
 
+declare global {
+  interface Window {
+    gm_authFailure?: () => void;
+  }
+}
+
 const GOOGLE_MAPS_API_KEY = import.meta.env.VITE_GOOGLE_MAPS_API_KEY || '';
 
 interface GoogleMapsProviderProps {
@@ -31,8 +37,7 @@ export function GoogleMapsProvider({ children }: GoogleMapsProviderProps) {
   // By defining it, we prevent the default alert dialog from appearing.
   // Individual map components detect AUTH_FAILURE via useApiLoadingStatus() and return null.
   useEffect(() => {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    (window as any).gm_authFailure = () => {
+    window.gm_authFailure = () => {
       if (import.meta.env.DEV) {
         console.warn(
           '[GoogleMaps] Auth failure — check billing is enabled and API key restrictions in Google Cloud Console.'

@@ -8,6 +8,7 @@ namespace App\Http\Controllers\Api;
 
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
+use App\Models\ActivityLog;
 use App\Services\EventService;
 
 /**
@@ -40,16 +41,16 @@ class AdminEventsController extends BaseApiController
         $status = $this->query('status');
         $search = $this->query('search');
 
-        $conditions = ['tenant_id = ?'];
+        $conditions = ['e.tenant_id = ?'];
         $params = [$tenantId];
 
         if ($status) {
-            $conditions[] = 'status = ?';
+            $conditions[] = 'e.status = ?';
             $params[] = $status;
         }
 
         if ($search) {
-            $conditions[] = '(title LIKE ? OR description LIKE ?)';
+            $conditions[] = '(e.title LIKE ? OR e.description LIKE ?)';
             $searchPattern = '%' . $search . '%';
             $params[] = $searchPattern;
             $params[] = $searchPattern;
@@ -58,12 +59,17 @@ class AdminEventsController extends BaseApiController
         $where = implode(' AND ', $conditions);
 
         $total = (int) DB::selectOne(
-            "SELECT COUNT(*) as cnt FROM events WHERE {$where}",
+            "SELECT COUNT(*) as cnt FROM events e WHERE {$where}",
             $params
         )->cnt;
 
         $items = DB::select(
-            "SELECT * FROM events WHERE {$where} ORDER BY created_at DESC LIMIT ? OFFSET ?",
+            "SELECT e.id, e.title, e.description, e.start_date, e.end_date, e.location, e.status,
+                    e.created_by, e.created_at, e.max_attendees, e.category_id,
+                    u.name as creator_name
+             FROM events e
+             LEFT JOIN users u ON e.created_by = u.id
+             WHERE {$where} ORDER BY e.created_at DESC LIMIT ? OFFSET ?",
             array_merge($params, [$limit, $offset])
         );
 
@@ -79,7 +85,12 @@ class AdminEventsController extends BaseApiController
         $tenantId = $this->getTenantId();
 
         $event = DB::selectOne(
-            'SELECT * FROM events WHERE id = ? AND tenant_id = ?',
+            "SELECT e.id, e.title, e.description, e.start_date, e.end_date, e.location, e.status,
+                    e.created_by, e.created_at, e.max_attendees, e.category_id,
+                    u.name as creator_name
+             FROM events e
+             LEFT JOIN users u ON e.created_by = u.id
+             WHERE e.id = ? AND e.tenant_id = ?",
             [$id, $tenantId]
         );
 
@@ -143,6 +154,7 @@ class AdminEventsController extends BaseApiController
         $cancelled = $this->eventService->cancelEvent($id, $adminId, $reason);
 
         if ($cancelled) {
+            ActivityLog::log($adminId, 'admin_cancel_event', "Cancelled event #{$id}: {$reason}");
             return $this->respondWithData(['cancelled' => true, 'id' => $id]);
         }
 

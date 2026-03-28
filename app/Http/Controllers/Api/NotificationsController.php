@@ -6,6 +6,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Core\TenantContext;
 use App\Services\NotificationService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
@@ -231,6 +232,7 @@ class NotificationsController extends BaseApiController
         }
 
         $unreadCount = (int) DB::table('notifications')
+            ->where('tenant_id', TenantContext::getId())
             ->where('user_id', $userId)
             ->where('is_read', 0)
             ->whereNull('deleted_at')
@@ -256,10 +258,12 @@ class NotificationsController extends BaseApiController
         if ($id) {
             DB::table('notifications')
                 ->where('id', (int) $id)
+                ->where('tenant_id', TenantContext::getId())
                 ->where('user_id', $userId)
                 ->delete();
         } elseif ($all === true || $all === 'true') {
             DB::table('notifications')
+                ->where('tenant_id', TenantContext::getId())
                 ->where('user_id', $userId)
                 ->delete();
         } else {

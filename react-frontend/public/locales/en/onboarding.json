@@ -90,5 +90,16 @@
   "toast_listings_created": "{{count}} listing(s) created for you.",
   "toast_profile_all_set": "Your profile is all set.",
   "toast_complete_profile_first": "Complete your profile first",
-  "toast_photo_bio_required": "Photo and bio are required."
+  "toast_photo_bio_required": "Photo and bio are required.",
+
+  "safeguarding": {
+    "load_error": "Failed to load options",
+    "try_again": "Please try again.",
+    "required": "Required options",
+    "required_respond": "Please respond to: {{items}}",
+    "empty": "No safeguarding options have been configured for this community.",
+    "save_failed": "Save failed",
+    "save_continue": "Save & Continue",
+    "required_fields": "Required fields"
+  }
 }

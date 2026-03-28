@@ -6,6 +6,9 @@
 
 use Illuminate\Support\Facades\Route;
 
+// Global route pattern: {id} parameters must be numeric
+Route::pattern('id', '[0-9]+');
+
 /*
 |--------------------------------------------------------------------------
 | Laravel API Routes
@@ -347,7 +350,8 @@ Route::get('/v2/feed/polls/{id}', [\App\Http\Controllers\Api\SocialController::c
 Route::post('/v2/feed/polls/{id}/vote', [\App\Http\Controllers\Api\SocialController::class, 'votePollV2']);
 Route::post('/v2/feed/posts/{id}/hide', [\App\Http\Controllers\Api\SocialController::class, 'hidePostV2']);
 Route::post('/v2/feed/posts/{id}/report', [\App\Http\Controllers\Api\SocialController::class, 'reportPostV2']);
-Route::post('/v2/feed/posts/{id}/delete', [\App\Http\Controllers\Api\SocialController::class, 'deletePostV2']);
+Route::delete('/v2/feed/posts/{id}', [\App\Http\Controllers\Api\SocialController::class, 'deletePostV2']);
+Route::post('/v2/feed/posts/{id}/delete', [\App\Http\Controllers\Api\SocialController::class, 'deletePostV2']); // deprecated: use DELETE /v2/feed/posts/{id}
 Route::post('/v2/feed/users/{id}/mute', [\App\Http\Controllers\Api\SocialController::class, 'muteUserV2']);
 Route::post('/v2/feed/posts/{id}/impression', [\App\Http\Controllers\Api\SocialController::class, 'recordImpression']);
 Route::post('/v2/feed/posts/{id}/click', [\App\Http\Controllers\Api\SocialController::class, 'recordClick']);
@@ -597,10 +601,10 @@ Route::delete('/v2/comments/{id}', [\App\Http\Controllers\Api\CommentsController
 // Note: POST /v2/comments/{id}/reactions is handled by ReactionController (line ~354)
 Route::get('/v2/mentions/search', [\App\Http\Controllers\Api\MentionController::class, 'search']);
 Route::get('/v2/mentions/me', [\App\Http\Controllers\Api\MentionController::class, 'myMentions']);
-Route::get('/v2/blog', [\App\Http\Controllers\Api\BlogPublicController::class, 'index']);
-Route::get('/v2/blog/categories', [\App\Http\Controllers\Api\BlogPublicController::class, 'categories']);
-Route::get('/v2/blog/{slug}', [\App\Http\Controllers\Api\BlogPublicController::class, 'show']);
-Route::get('/v2/help/faqs', [\App\Http\Controllers\Api\HelpController::class, 'getFaqs']);
+Route::get('/v2/blog', [\App\Http\Controllers\Api\BlogPublicController::class, 'index'])->withoutMiddleware('auth:sanctum');
+Route::get('/v2/blog/categories', [\App\Http\Controllers\Api\BlogPublicController::class, 'categories'])->withoutMiddleware('auth:sanctum');
+Route::get('/v2/blog/{slug}', [\App\Http\Controllers\Api\BlogPublicController::class, 'show'])->withoutMiddleware('auth:sanctum');
+Route::get('/v2/help/faqs', [\App\Http\Controllers\Api\HelpController::class, 'getFaqs'])->withoutMiddleware('auth:sanctum');
 Route::get('/v2/pages/{slug}', [\App\Http\Controllers\Api\PagesPublicController::class, 'show'])->withoutMiddleware('auth:sanctum');
 Route::get('/v2/resources', [\App\Http\Controllers\Api\ResourcePublicController::class, 'index']);
 Route::get('/v2/resources/categories', [\App\Http\Controllers\Api\ResourcePublicController::class, 'categories']);
@@ -612,11 +616,11 @@ Route::put('/v2/resources/reorder', [\App\Http\Controllers\Api\ResourceCategoryC
 Route::post('/v2/resources', [\App\Http\Controllers\Api\ResourcePublicController::class, 'store']);
 Route::get('/v2/resources/{id}/download', [\App\Http\Controllers\Api\ResourcePublicController::class, 'download']);
 Route::delete('/v2/resources/{id}', [\App\Http\Controllers\Api\ResourcePublicController::class, 'destroy']);
-Route::get('/v2/kb', [\App\Http\Controllers\Api\KnowledgeBaseController::class, 'index']);
-Route::get('/v2/kb/search', [\App\Http\Controllers\Api\KnowledgeBaseController::class, 'search']);
+Route::get('/v2/kb', [\App\Http\Controllers\Api\KnowledgeBaseController::class, 'index'])->withoutMiddleware('auth:sanctum');
+Route::get('/v2/kb/search', [\App\Http\Controllers\Api\KnowledgeBaseController::class, 'search'])->withoutMiddleware('auth:sanctum');
 Route::post('/v2/kb', [\App\Http\Controllers\Api\KnowledgeBaseController::class, 'store']);
-Route::get('/v2/kb/slug/{slug}', [\App\Http\Controllers\Api\KnowledgeBaseController::class, 'showBySlug']);
-Route::get('/v2/kb/{id}', [\App\Http\Controllers\Api\KnowledgeBaseController::class, 'show']);
+Route::get('/v2/kb/slug/{slug}', [\App\Http\Controllers\Api\KnowledgeBaseController::class, 'showBySlug'])->withoutMiddleware('auth:sanctum');
+Route::get('/v2/kb/{id}', [\App\Http\Controllers\Api\KnowledgeBaseController::class, 'show'])->withoutMiddleware('auth:sanctum');
 Route::put('/v2/kb/{id}', [\App\Http\Controllers\Api\KnowledgeBaseController::class, 'update']);
 Route::delete('/v2/kb/{id}', [\App\Http\Controllers\Api\KnowledgeBaseController::class, 'destroy']);
 Route::post('/v2/kb/{id}/feedback', [\App\Http\Controllers\Api\KnowledgeBaseController::class, 'feedback']);
@@ -1258,7 +1262,7 @@ Route::get('/menus', [\App\Http\Controllers\Api\MenuController::class, 'index'])
 Route::get('/menus/config', [\App\Http\Controllers\Api\MenuController::class, 'config']);
 Route::get('/menus/mobile', [\App\Http\Controllers\Api\MenuController::class, 'mobile']);
 Route::get('/menus/{slug}', [\App\Http\Controllers\Api\MenuController::class, 'show']);
-Route::post('/v2/contact', [\App\Http\Controllers\Api\CoreController::class, 'apiSubmit']);
+Route::post('/v2/contact', [\App\Http\Controllers\Api\CoreController::class, 'apiSubmit'])->middleware('throttle:5,1');
 
 // API documentation
 Route::get('/docs', [\App\Http\Controllers\Api\OpenApiDocController::class, 'ui']);
@@ -1274,18 +1278,19 @@ Route::middleware('auth:sanctum')->group(function () {
 // MIGRATED ROUTES — Misc API (Social, Auth, Push, AI, Menus, Wallet Features, Events, Volunteering, Ideation, Matching)
 // Source: httpdocs/routes/misc-api.php
 // ============================================
+// Legacy social routes (deprecated — use V2 GET/POST equivalents above)
 Route::get('/social/test', [\App\Http\Controllers\Api\SocialController::class, 'test']);
 Route::post('/social/like', [\App\Http\Controllers\Api\SocialController::class, 'like']);
-Route::post('/social/likers', [\App\Http\Controllers\Api\SocialController::class, 'likers']);
-Route::post('/social/comments', [\App\Http\Controllers\Api\SocialController::class, 'comments']);
+Route::post('/social/likers', [\App\Http\Controllers\Api\SocialController::class, 'likers']); // deprecated: use V2 GET equivalent
+Route::post('/social/comments', [\App\Http\Controllers\Api\SocialController::class, 'comments']); // deprecated: use V2 GET equivalent
 Route::post('/social/share', [\App\Http\Controllers\Api\SocialController::class, 'share']);
 Route::post('/social/delete', [\App\Http\Controllers\Api\SocialController::class, 'delete']);
 Route::post('/social/reaction', [\App\Http\Controllers\Api\SocialController::class, 'reaction']);
 Route::post('/social/reply', [\App\Http\Controllers\Api\SocialController::class, 'reply']);
 Route::post('/social/edit-comment', [\App\Http\Controllers\Api\SocialController::class, 'editComment']);
 Route::post('/social/delete-comment', [\App\Http\Controllers\Api\SocialController::class, 'deleteComment']);
-Route::post('/social/mention-search', [\App\Http\Controllers\Api\SocialController::class, 'mentionSearch']);
-Route::post('/social/feed', [\App\Http\Controllers\Api\SocialController::class, 'feed']);
+Route::post('/social/mention-search', [\App\Http\Controllers\Api\SocialController::class, 'mentionSearch']); // deprecated: use V2 GET equivalent
+Route::post('/social/feed', [\App\Http\Controllers\Api\SocialController::class, 'feed']); // deprecated: use GET /v2/feed
 Route::post('/social/create-post', [\App\Http\Controllers\Api\SocialController::class, 'createPost']);
 Route::post('/upload', [\App\Http\Controllers\Api\UploadController::class, 'store']);
 Route::post('/push/subscribe', [\App\Http\Controllers\Api\PushController::class, 'subscribe']);
@@ -1509,9 +1514,9 @@ Route::post('/v2/volunteering/donations', [\App\Http\Controllers\Api\VolunteerCo
 Route::get('/v2/volunteering/giving-days', [\App\Http\Controllers\Api\VolunteerCommunityController::class, 'getGivingDays']);
 Route::get('/v2/volunteering/giving-days/{id}/stats', [\App\Http\Controllers\Api\VolunteerCommunityController::class, 'getGivingDayStats']);
 Route::get('/v2/ideation-categories', [\App\Http\Controllers\Api\IdeationChallengesController::class, 'listCategories']);
-Route::post('/v2/ideation-categories', [\App\Http\Controllers\Api\IdeationChallengesController::class, 'createCategory']);
-Route::put('/v2/ideation-categories/{id}', [\App\Http\Controllers\Api\IdeationChallengesController::class, 'updateCategory']);
-Route::delete('/v2/ideation-categories/{id}', [\App\Http\Controllers\Api\IdeationChallengesController::class, 'deleteCategory']);
+Route::post('/v2/ideation-categories', [\App\Http\Controllers\Api\IdeationChallengesController::class, 'createCategory'])->middleware('admin');
+Route::put('/v2/ideation-categories/{id}', [\App\Http\Controllers\Api\IdeationChallengesController::class, 'updateCategory'])->middleware('admin');
+Route::delete('/v2/ideation-categories/{id}', [\App\Http\Controllers\Api\IdeationChallengesController::class, 'deleteCategory'])->middleware('admin');
 Route::get('/v2/ideation-tags/popular', [\App\Http\Controllers\Api\IdeationChallengesController::class, 'popularTags']);
 Route::get('/v2/ideation-tags', [\App\Http\Controllers\Api\IdeationChallengesController::class, 'listTags']);
 Route::post('/v2/ideation-tags', [\App\Http\Controllers\Api\IdeationChallengesController::class, 'createTag']);

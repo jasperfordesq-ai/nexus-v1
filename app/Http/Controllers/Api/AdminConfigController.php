@@ -433,36 +433,53 @@ class AdminConfigController extends BaseApiController
         $output = '';
         $status = 'success';
 
+        // Build allowlist of permitted script paths from hardcoded job definitions
+        $allowedScripts = [];
+        foreach ($this->getCronJobDefinitions() as $def) {
+            if (isset($def['command']) && strpos($def['command'], 'scripts/') === 0) {
+                $scriptParts = explode(' ', $def['command']);
+                $allowedScripts[] = $scriptParts[0];
+            }
+        }
+
         try {
             if (isset($job['command']) && strpos($job['command'], 'scripts/') === 0) {
                 $parts = explode(' ', $job['command']);
-                $script = dirname(__DIR__, 4) . '/' . $parts[0];
+                $scriptRelative = $parts[0];
                 $args = $parts[1] ?? '';
 
-                if (file_exists($script)) {
-                    if (!defined('CRON_INTERNAL_RUN')) {
-                        define('CRON_INTERNAL_RUN', true);
-                    }
-                    $oldArgv = $GLOBALS['argv'] ?? [];
-                    $oldArgc = $GLOBALS['argc'] ?? 0;
-                    $GLOBALS['argv'] = [basename($script), $args];
-                    $GLOBALS['argc'] = count($GLOBALS['argv']);
+                // Validate script is in the allowlist and contains no path traversal
+                if (!in_array($scriptRelative, $allowedScripts, true) || str_contains($scriptRelative, '..')) {
+                    $output = "Script not permitted: {$scriptRelative}";
+                    $status = 'error';
+                } else {
+                    $script = dirname(__DIR__, 4) . '/' . $scriptRelative;
 
-                    // Legacy script inclusion — retained for backward compatibility with admin-triggered scripts
-                    ob_start();
-                    try {
-                        include $script;
-                        $output = ob_get_clean() ?: 'Completed (no output)';
-                    } catch (\Throwable $e) {
-                        $output = ob_get_clean() . "\nError: " . $e->getMessage();
+                    if (file_exists($script)) {
+                        if (!defined('CRON_INTERNAL_RUN')) {
+                            define('CRON_INTERNAL_RUN', true);
+                        }
+                        $oldArgv = $GLOBALS['argv'] ?? [];
+                        $oldArgc = $GLOBALS['argc'] ?? 0;
+                        $GLOBALS['argv'] = [basename($script), $args];
+                        $GLOBALS['argc'] = count($GLOBALS['argv']);
+
+                        // Legacy script inclusion — retained for backward compatibility with admin-triggered scripts
+                        ob_start();
+                        try {
+                            include $script;
+                            $output = ob_get_clean() ?: 'Completed (no output)';
+                        } catch (\Throwable $e) {
+                            $output = ob_get_clean() . "\nError: " . $e->getMessage();
+                            $status = 'error';
+                        }
+
+                        $GLOBALS['argv'] = $oldArgv;
+                        $GLOBALS['argc'] = $oldArgc;
+                    } else {
+                        $output = "Script not found: {$script}";
                         $status = 'error';
                     }
-
-                    $GLOBALS['argv'] = $oldArgv;
-                    $GLOBALS['argc'] = $oldArgc;
-                } else {
-                    $output = "Script not found: {$script}";
-                    $status = 'error';
                 }
             } else {
                 if (!defined('CRON_INTERNAL_RUN')) {

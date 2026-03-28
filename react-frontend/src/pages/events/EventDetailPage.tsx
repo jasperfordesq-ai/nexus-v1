@@ -357,10 +357,10 @@ export function EventDetailPage() {
 
     try {
       setIsSubmitting(true);
-      const response = await api.post(`/v2/events/${event.id}/waitlist`);
+      const response = await api.post<{ position?: number }>(`/v2/events/${event.id}/waitlist`);
       if (response.success && response.data) {
         setIsWaitlisted(true);
-        setWaitlistPosition((response.data as { position?: number }).position ?? null);
+        setWaitlistPosition(response.data.position ?? null);
         toastRef.current.success(tRef.current('toast.added_to_waitlist'));
       } else {
         toastRef.current.error(tRef.current('toast.waitlist_join_failed'));

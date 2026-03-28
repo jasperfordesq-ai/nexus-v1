@@ -55,8 +55,7 @@ export function ExchangesPage() {
   tRef.current = t;
   const toastRef = useRef(toast);
   toastRef.current = toast;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const loadExchangesRef = useRef<(append?: boolean) => Promise<void>>(null as any);
+  const loadExchangesRef = useRef<(append?: boolean) => Promise<void>>(null!);
 
   // Load config once on mount
   const loadConfig = useCallback(async () => {

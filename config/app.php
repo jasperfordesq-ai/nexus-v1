@@ -13,6 +13,7 @@ return [
     'locale' => 'en',
     'fallback_locale' => 'en',
     'key' => env('APP_KEY'),
+    'jwt_secret' => env('JWT_SECRET'),
     'cipher' => 'AES-256-CBC',
     'maintenance' => [
         'driver' => 'file',
