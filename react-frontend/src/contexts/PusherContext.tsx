@@ -54,6 +54,10 @@ export interface NewMessageEvent {
   body: string;
   created_at: string;
   timestamp: number;
+  /** Backend may send from_user_id instead of sender_id in some event payloads */
+  from_user_id?: number;
+  /** Some event payloads include a preview field instead of body */
+  preview?: string;
 }
 
 export interface TypingEvent {

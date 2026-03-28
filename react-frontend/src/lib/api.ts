@@ -440,9 +440,14 @@ class ApiClient {
 
       // Handle successful response
       if (response.ok) {
+        // Handle null/empty body (e.g. 204 No Content)
+        if (data === null || data === undefined) {
+          return { success: true, data: undefined as T };
+        }
+
         const result: ApiResponse<T> = {
           success: true,
-          data: 'data' in data ? data.data : data,
+          data: typeof data === 'object' && data !== null && 'data' in data ? data.data : data,
           message: data.message,
           meta: data.meta,
         };
@@ -631,7 +636,10 @@ class ApiClient {
       const data = await response.json();
 
       if (response.ok) {
-        return { success: true, data: 'data' in data ? data.data : data, meta: data.meta };
+        if (data === null || data === undefined) {
+          return { success: true, data: undefined as T };
+        }
+        return { success: true, data: typeof data === 'object' && 'data' in data ? data.data : data, meta: data.meta };
       }
 
       // Handle error response (v2 API uses {errors: [{code, message}]}, v1 uses {error, code})

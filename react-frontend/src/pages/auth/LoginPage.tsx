@@ -24,6 +24,7 @@ import { GlassCard } from '@/components/ui';
 import { PageMeta } from '@/components/seo';
 import { usePageTitle } from '@/hooks';
 import { api, tokenManager } from '@/lib/api';
+import { logError } from '@/lib/logger';
 import {
   isBiometricAvailable,
   isConditionalMediationAvailable,
@@ -149,11 +150,13 @@ export function LoginPage() {
     if (tenantLoading) return; // Wait for context to settle first
     if (tenantResolvedFromUrl) return; // Already have a tenant — no list needed
 
+    let cancelled = false;
     const fetchTenants = async () => {
       setTenantsLoading(true);
       try {
         // Fetch ALL tenants including tenant 1 for super admin access
         const response = await api.get<Tenant[]>('/v2/tenants?include_master=1', { skipAuth: true, skipTenant: true });
+        if (cancelled) return;
         if (response.success && response.data) {
           setTenants(response.data);
 
@@ -172,19 +175,19 @@ export function LoginPage() {
           }
         }
       } catch (err) {
-        console.error('[LoginPage] Failed to fetch tenants:', err);
+        if (!cancelled) logError('[LoginPage] Failed to fetch tenants', err);
       } finally {
-        setTenantsLoading(false);
+        if (!cancelled) setTenantsLoading(false);
       }
     };
     fetchTenants();
+    return () => { cancelled = true; };
   }, [tenantLoading, tenantResolvedFromUrl, tenantSlug, searchParams]);
 
   // Handle tenant selection from dropdown
   const handleTenantChange = (keys: unknown) => {
-    if (!(keys instanceof Set)) return;
-    const selectedKeys = keys as Set<string>;
-    const tenantId = Array.from(selectedKeys)[0] || '';
+    if (keys === 'all' || !keys || !(keys instanceof Set)) return;
+    const tenantId = Array.from(keys as Set<string>)[0] || '';
     setSelectedTenantId(tenantId);
     if (tenantId) {
       tokenManager.setTenantId(tenantId);

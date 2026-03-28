@@ -293,7 +293,10 @@ abstract class BaseApiController extends Controller
      */
     protected function noContent(): JsonResponse
     {
-        return $this->buildJsonResponse(null, 204);
+        // Send empty JSON object {} instead of null for 204 responses.
+        // The frontend API client's unwrap logic ('data' in data) throws
+        // TypeError when data is null, so we avoid that by sending {}.
+        return $this->buildJsonResponse(new \stdClass(), 204);
     }
 
     // ============================================

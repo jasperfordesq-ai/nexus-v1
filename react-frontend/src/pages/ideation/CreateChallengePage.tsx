@@ -159,27 +159,32 @@ export function CreateChallengePage() {
 
   // Fetch categories
   useEffect(() => {
+    let cancelled = false;
     const fetchCategories = async () => {
       try {
         const response = await api.get<Category[]>('/v2/ideation-categories');
+        if (cancelled) return;
         if (response.success && response.data) {
           setCategories(Array.isArray(response.data) ? response.data : []);
         }
       } catch (err) {
-        logError('Failed to fetch categories', err);
+        if (!cancelled) logError('Failed to fetch categories', err);
       }
     };
     fetchCategories();
+    return () => { cancelled = true; };
   }, []);
 
   // Load existing challenge for editing
   useEffect(() => {
     if (!isEdit || !id) return;
 
+    let cancelled = false;
     const fetchChallenge = async () => {
       try {
         setIsLoading(true);
         const response = await api.get<ChallengeData>(`/v2/ideation-challenges/${id}`);
+        if (cancelled) return;
 
         if (response.success && response.data) {
           const challenge = response.data;
@@ -203,15 +208,17 @@ export function CreateChallengePage() {
           });
         }
       } catch (err) {
+        if (cancelled) return;
         logError('Failed to fetch challenge for editing', err);
         toast.error(t('toast.error_generic'));
         navigate(tenantPath('/ideation'));
       } finally {
-        setIsLoading(false);
+        if (!cancelled) setIsLoading(false);
       }
     };
 
     fetchChallenge();
+    return () => { cancelled = true; };
   }, [id, isEdit, navigate, tenantPath, toast, t]);
 
   const updateField = (field: keyof ChallengeForm, value: string) => {

@@ -71,7 +71,7 @@ export function ReviewModal({
         handleClose();
         onSuccess?.();
       } else {
-        toast.error(response.error || 'Failed to submit review');
+        toast.error(response.error || t('review_modal.submit_failed_fallback'));
       }
     } catch {
       toast.error(t('toast.review_submit_failed'));
@@ -91,9 +91,9 @@ export function ReviewModal({
     <Modal isOpen={isOpen} onClose={handleClose} size="lg">
       <ModalContent>
         <ModalHeader className="flex flex-col gap-1">
-          <h2 className="text-xl font-bold text-theme-primary">Write a Review</h2>
+          <h2 className="text-xl font-bold text-theme-primary">{t('review_modal.title')}</h2>
           <p className="text-sm text-theme-subtle font-normal">
-            Share your experience with {receiverName}
+            {t('review_modal.subtitle', { name: receiverName })}
           </p>
         </ModalHeader>
 
@@ -109,7 +109,7 @@ export function ReviewModal({
             <div>
               <p className="font-medium text-theme-primary">{receiverName}</p>
               <p className="text-xs text-theme-subtle">
-                {transactionId ? 'Transaction Review' : 'General Review'}
+                {transactionId ? t('review_modal.transaction_review') : t('review_modal.general_review')}
               </p>
             </div>
           </div>
@@ -117,7 +117,7 @@ export function ReviewModal({
           {/* Rating Stars */}
           <div className="space-y-2">
             <label className="text-sm font-medium text-theme-primary">
-              Rating <span className="text-red-500">*</span>
+              {t('review_modal.rating_label')} <span className="text-red-500">{t('review_modal.rating_required')}</span>
             </label>
             <div className="flex items-center gap-1">
               {[1, 2, 3, 4, 5].map((star) => (
@@ -130,7 +130,7 @@ export function ReviewModal({
                   onMouseEnter={() => setHoverRating(star)}
                   onMouseLeave={() => setHoverRating(0)}
                   className="focus:outline-none focus:ring-2 focus:ring-indigo-500 rounded min-w-0 h-auto p-0"
-                  aria-label={`Rate ${star} out of 5 stars`}
+                  aria-label={t('review_modal.rate_star', { star })}
                 >
                   <Star
                     className={`w-8 h-8 transition-colors ${
@@ -143,11 +143,11 @@ export function ReviewModal({
               ))}
               {rating > 0 && (
                 <span className="ml-2 text-sm text-theme-muted">
-                  {rating === 1 && 'Poor'}
-                  {rating === 2 && 'Fair'}
-                  {rating === 3 && 'Good'}
-                  {rating === 4 && 'Very Good'}
-                  {rating === 5 && 'Excellent'}
+                  {rating === 1 && t('review_modal.rating_poor')}
+                  {rating === 2 && t('review_modal.rating_fair')}
+                  {rating === 3 && t('review_modal.rating_good')}
+                  {rating === 4 && t('review_modal.rating_very_good')}
+                  {rating === 5 && t('review_modal.rating_excellent')}
                 </span>
               )}
             </div>
@@ -156,11 +156,11 @@ export function ReviewModal({
           {/* Comment */}
           <div className="space-y-2">
             <label htmlFor="review-comment" className="text-sm font-medium text-theme-primary">
-              Comment (Optional)
+              {t('review_modal.comment_label')}
             </label>
             <Textarea
               id="review-comment"
-              placeholder="Share details about your experience..."
+              placeholder={t('review_modal.comment_placeholder')}
               value={comment}
               onChange={(e) => setComment(e.target.value)}
               minRows={4}
@@ -172,7 +172,7 @@ export function ReviewModal({
               }}
             />
             <p className="text-xs text-theme-subtle text-right">
-              {comment.length}/2000 characters
+              {t('review_modal.characters_count', { count: comment.length, max: 2000 })}
             </p>
           </div>
         </ModalBody>
@@ -183,7 +183,7 @@ export function ReviewModal({
             onPress={handleClose}
             className="bg-theme-elevated text-theme-muted"
           >
-            Cancel
+            {t('review_modal.cancel')}
           </Button>
           <Button
             onPress={handleSubmit}
@@ -191,7 +191,7 @@ export function ReviewModal({
             isDisabled={rating === 0}
             className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
           >
-            Submit Review
+            {t('review_modal.submit')}
           </Button>
         </ModalFooter>
       </ModalContent>

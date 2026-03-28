@@ -98,5 +98,25 @@
   },
   "load_error": "Failed to load profile. Please try again.",
   "listing_image_alt": "Listing image",
-  "credits_sent_success": "Credits sent to {{name}}"
+  "credits_sent_success": "Credits sent to {{name}}",
+  "review_modal": {
+    "title": "Write a Review",
+    "subtitle": "Share your experience with {{name}}",
+    "transaction_review": "Transaction Review",
+    "general_review": "General Review",
+    "rating_label": "Rating",
+    "rating_required": "*",
+    "rate_star": "Rate {{star}} out of 5 stars",
+    "rating_poor": "Poor",
+    "rating_fair": "Fair",
+    "rating_good": "Good",
+    "rating_very_good": "Very Good",
+    "rating_excellent": "Excellent",
+    "comment_label": "Comment (Optional)",
+    "comment_placeholder": "Share details about your experience...",
+    "characters_count": "{{count}}/{{max}} characters",
+    "cancel": "Cancel",
+    "submit": "Submit Review",
+    "submit_failed_fallback": "Failed to submit review"
+  }
 }

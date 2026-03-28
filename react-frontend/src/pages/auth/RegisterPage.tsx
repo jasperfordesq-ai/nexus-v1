@@ -46,6 +46,7 @@ import { usePageTitle } from '@/hooks';
 import { GlassCard } from '@/components/ui';
 import { PlaceAutocompleteInput } from '@/components/location';
 import { api, tokenManager } from '@/lib/api';
+import { logError } from '@/lib/logger';
 import { PASSWORD_REQUIREMENTS, isPasswordValid, getPasswordStrength } from '@/lib/validation';
 
 interface Tenant {
@@ -135,9 +136,11 @@ export function RegisterPage() {
 
   // Fetch available tenants on mount, with ?tenant= hint support (TRS-001 Phase 0)
   useEffect(() => {
+    let cancelled = false;
     const fetchTenants = async () => {
       try {
         const response = await api.get<Tenant[]>('/v2/tenants', { skipAuth: true, skipTenant: true });
+        if (cancelled) return;
         if (response.success && response.data) {
           setTenants(response.data);
 
@@ -160,12 +163,14 @@ export function RegisterPage() {
           }
         }
       } catch (err) {
-        console.error('[RegisterPage] Failed to fetch tenants:', err);
+        if (cancelled) return;
+        logError('[RegisterPage] Failed to fetch tenants', err);
       } finally {
-        setTenantsLoading(false);
+        if (!cancelled) setTenantsLoading(false);
       }
     };
     fetchTenants();
+    return () => { cancelled = true; };
   }, [tenantSlug, searchParams, tenant?.id]);
 
   // Fetch registration info when tenant is resolved (to know if invite code is required)
@@ -173,9 +178,11 @@ export function RegisterPage() {
     const effectiveTenantId = selectedTenantId || (tenant?.id ? String(tenant.id) : '');
     if (!effectiveTenantId) return;
 
+    let cancelled = false;
     const fetchRegInfo = async () => {
       try {
         const res = await api.get<{ registration_mode: string; requires_invite_code: boolean }>('/v2/auth/registration-info', { skipAuth: true });
+        if (cancelled) return;
         if (res.success && res.data) {
           setRequiresInviteCode(res.data.requires_invite_code);
         }
@@ -184,11 +191,14 @@ export function RegisterPage() {
       }
     };
     fetchRegInfo();
+    return () => { cancelled = true; };
   }, [selectedTenantId, tenant?.id]);
 
   // Handle tenant selection
   const handleTenantChange = useCallback((keys: unknown) => {
-    const selectedKeys = keys as Set<string>;
+    // HeroUI Select passes SharedSelection which is Set-like or 'all'
+    if (keys === 'all' || !keys) return;
+    const selectedKeys = keys as Iterable<string>;
     const tenantId = Array.from(selectedKeys)[0] || '';
     setSelectedTenantId(tenantId);
     if (tenantId) {

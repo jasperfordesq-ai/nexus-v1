@@ -222,42 +222,46 @@ export function JobsPage() {
 
   // J1: Load saved jobs
   useEffect(() => {
-    if (activeTab === 'saved' && isAuthenticated) {
-      const loadSaved = async () => {
-        setIsLoadingSaved(true);
-        try {
-          const response = await api.get<JobVacancy[]>('/v2/jobs/saved');
-          if (response.success && response.data) {
-            setSavedJobs(response.data);
-          }
-        } catch (err) {
-          logError('Failed to load saved jobs', err);
-        } finally {
-          setIsLoadingSaved(false);
+    if (activeTab !== 'saved' || !isAuthenticated) return;
+    let cancelled = false;
+    const loadSaved = async () => {
+      setIsLoadingSaved(true);
+      try {
+        const response = await api.get<JobVacancy[]>('/v2/jobs/saved');
+        if (cancelled) return;
+        if (response.success && response.data) {
+          setSavedJobs(response.data);
         }
-      };
-      loadSaved();
-    }
+      } catch (err) {
+        if (!cancelled) logError('Failed to load saved jobs', err);
+      } finally {
+        if (!cancelled) setIsLoadingSaved(false);
+      }
+    };
+    loadSaved();
+    return () => { cancelled = true; };
   }, [activeTab, isAuthenticated]);
 
   // Load my postings (also on browse tab to check if user has posted before — for onboarding banner)
   useEffect(() => {
-    if ((activeTab === 'my-postings' || activeTab === 'browse') && isAuthenticated) {
-      const loadMyPostings = async () => {
-        setIsLoadingMyPostings(true);
-        try {
-          const response = await api.get<JobVacancy[]>('/v2/jobs/my-postings');
-          if (response.success && response.data) {
-            setMyPostings(response.data);
-          }
-        } catch (err) {
-          logError('Failed to load my postings', err);
-        } finally {
-          setIsLoadingMyPostings(false);
+    if (!((activeTab === 'my-postings' || activeTab === 'browse') && isAuthenticated)) return;
+    let cancelled = false;
+    const loadMyPostings = async () => {
+      setIsLoadingMyPostings(true);
+      try {
+        const response = await api.get<JobVacancy[]>('/v2/jobs/my-postings');
+        if (cancelled) return;
+        if (response.success && response.data) {
+          setMyPostings(response.data);
         }
-      };
-      loadMyPostings();
-    }
+      } catch (err) {
+        if (!cancelled) logError('Failed to load my postings', err);
+      } finally {
+        if (!cancelled) setIsLoadingMyPostings(false);
+      }
+    };
+    loadMyPostings();
+    return () => { cancelled = true; };
   }, [activeTab, isAuthenticated]);
 
 

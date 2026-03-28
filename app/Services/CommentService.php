@@ -41,7 +41,10 @@ class CommentService
         $userReactions = [];
 
         if (!empty($commentIds)) {
+            $tenantId = TenantContext::getId();
+
             $reactionRows = DB::table('reactions')
+                ->where('tenant_id', $tenantId)
                 ->where('target_type', 'comment')
                 ->whereIn('target_id', $commentIds)
                 ->selectRaw('target_id, emoji, COUNT(*) as count')
@@ -54,6 +57,7 @@ class CommentService
 
             if ($currentUserId > 0) {
                 $userReactionRows = DB::table('reactions')
+                    ->where('tenant_id', $tenantId)
                     ->where('target_type', 'comment')
                     ->whereIn('target_id', $commentIds)
                     ->where('user_id', $currentUserId)
@@ -209,8 +213,9 @@ class CommentService
         $userReactionsByComment = [];
 
         if (!empty($commentIds)) {
-            // Get reaction counts grouped by emoji
+            // Get reaction counts grouped by emoji (tenant-scoped)
             $reactionRows = DB::table('reactions')
+                ->where('tenant_id', $tenantId)
                 ->where('target_type', 'comment')
                 ->whereIn('target_id', $commentIds)
                 ->selectRaw('target_id, emoji, COUNT(*) as count')
@@ -221,9 +226,10 @@ class CommentService
                 $reactionsByComment[$row->target_id][$row->emoji] = (int) $row->count;
             }
 
-            // Get current user's reactions
+            // Get current user's reactions (tenant-scoped)
             if ($currentUserId) {
                 $userReactionRows = DB::table('reactions')
+                    ->where('tenant_id', $tenantId)
                     ->where('target_type', 'comment')
                     ->whereIn('target_id', $commentIds)
                     ->where('user_id', $currentUserId)

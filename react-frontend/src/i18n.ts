@@ -23,7 +23,7 @@ i18n
       'exchanges', 'group_exchanges', 'feed', 'notifications',
       'search_page', 'onboarding', 'gamification', 'blog',
       'community', 'utility', 'public', 'legal', 'about',
-      'federation', 'connections', 'chat', 'activity', 'admin',
+      'federation', 'connections', 'chat', 'activity', 'admin', 'stories',
       'admin_dashboard', 'admin_nav', 'auth', 'dashboard',
       'emails', 'errors', 'goals', 'ideation', 'jobs', 'kb',
       'listings', 'matches', 'messages', 'polls', 'settings',

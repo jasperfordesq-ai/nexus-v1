@@ -57,7 +57,7 @@ export function EndorseButton({
           // Revert
           setLocalIsEndorsed(true);
           setLocalCount((prev) => prev + 1);
-          toast.error(response.error || 'Failed to remove endorsement');
+          toast.error(response.error || t('endorse.remove_failed'));
           return;
         }
       } else {
@@ -68,7 +68,7 @@ export function EndorseButton({
           // Revert
           setLocalIsEndorsed(false);
           setLocalCount((prev) => prev - 1);
-          toast.error(response.error || 'Failed to endorse');
+          toast.error(response.error || t('endorse.endorse_failed'));
           return;
         }
       }

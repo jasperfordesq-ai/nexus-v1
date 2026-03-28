@@ -186,9 +186,7 @@ export function ConversationPage() {
     // Listen for new messages
     const unsubMessage = pusher.onNewMessage((event: NewMessageEvent) => {
       // Backend may send from_user_id instead of sender_id; normalize
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const raw = event as any;
-      const senderId: number | undefined = event.sender_id || raw.from_user_id;
+      const senderId: number | undefined = event.sender_id || event.from_user_id;
 
       // Only handle messages from the other user in this conversation
       if (senderId === otherUserId) {
@@ -206,7 +204,7 @@ export function ConversationPage() {
 
           const newMsg: Message = {
             id: event.id,
-            body: event.body || raw.preview || '',
+            body: event.body || event.preview || '',
             sender_id: senderId,
             is_own: false,
             created_at: event.created_at || new Date().toISOString(),

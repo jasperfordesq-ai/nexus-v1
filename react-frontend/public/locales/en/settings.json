@@ -342,5 +342,32 @@
     "skill_removed": "Skill removed",
     "skill_add_failed": "Failed to add skill",
     "skill_remove_failed": "Failed to remove skill"
+  },
+  "sub_accounts": {
+    "title": "Linked Accounts",
+    "add_button": "Add Account",
+    "description": "Link accounts for family members or dependents. You can control what they can do on the platform.",
+    "retry": "Retry",
+    "empty_title": "No linked accounts",
+    "empty_description": "Add a linked account for a family member or dependent.",
+    "status_active": "Active",
+    "status_pending": "Pending",
+    "status_rejected": "Rejected",
+    "permissions_label": "Permissions",
+    "approve": "Approve",
+    "decline": "Decline",
+    "remove_aria": "Remove {{name}}",
+    "modal_title": "Add Linked Account",
+    "modal_description": "Enter the email address of the person you want to link. They will receive a notification to approve the request.",
+    "email_label": "Email Address",
+    "email_placeholder": "child@example.com",
+    "name_label": "Name (optional)",
+    "name_placeholder": "Their display name",
+    "cancel": "Cancel",
+    "send_request": "Send Request",
+    "load_failed": "Failed to load linked accounts",
+    "add_failed": "Failed to add linked account",
+    "remove_failed": "Failed to remove",
+    "approve_failed": "Failed to approve"
   }
 }

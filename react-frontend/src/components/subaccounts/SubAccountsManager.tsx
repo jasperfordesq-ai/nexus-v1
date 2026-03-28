@@ -108,12 +108,12 @@ export function SubAccountsManager() {
       if (response.success && response.data) {
         setSubAccounts(response.data);
       } else {
-        setError('Failed to load linked accounts');
+        setError(tRef.current('sub_accounts.load_failed'));
       }
     } catch (err) {
       if (controller.signal.aborted) return;
       logError('Failed to load sub-accounts', err);
-      setError('Failed to load linked accounts');
+      setError(tRef.current('sub_accounts.load_failed'));
     } finally {
       if (!controller.signal.aborted) {
         setIsLoading(false);
@@ -146,7 +146,7 @@ export function SubAccountsManager() {
         onClose();
         loadSubAccounts();
       } else {
-        toastRef.current.error(response.error || 'Failed to add linked account');
+        toastRef.current.error(response.error || tRef.current('sub_accounts.add_failed'));
       }
     } catch (err) {
       logError('Failed to add sub-account', err);
@@ -188,7 +188,7 @@ export function SubAccountsManager() {
         toastRef.current.success(tRef.current('toasts.subaccount_removed'));
         setSubAccounts((prev) => prev.filter((sa) => sa.id !== accountId));
       } else {
-        toastRef.current.error(response.error || 'Failed to remove');
+        toastRef.current.error(response.error || tRef.current('sub_accounts.remove_failed'));
       }
     } catch (err) {
       logError('Failed to remove sub-account', err);
@@ -204,7 +204,7 @@ export function SubAccountsManager() {
         toastRef.current.success(tRef.current('toasts.subaccount_approved'));
         loadSubAccounts();
       } else {
-        toastRef.current.error(response.error || 'Failed to approve');
+        toastRef.current.error(response.error || tRef.current('sub_accounts.approve_failed'));
       }
     } catch (err) {
       logError('Failed to approve sub-account', err);
@@ -213,9 +213,9 @@ export function SubAccountsManager() {
   };
 
   const statusConfig: Record<string, { label: string; color: 'success' | 'warning' | 'danger'; icon: React.ReactNode }> = {
-    approved: { label: 'Active', color: 'success', icon: <CheckCircle className="w-3 h-3" /> },
-    pending: { label: 'Pending', color: 'warning', icon: <Clock className="w-3 h-3" /> },
-    rejected: { label: 'Rejected', color: 'danger', icon: <AlertTriangle className="w-3 h-3" /> },
+    approved: { label: t('sub_accounts.status_active'), color: 'success', icon: <CheckCircle className="w-3 h-3" /> },
+    pending: { label: t('sub_accounts.status_pending'), color: 'warning', icon: <Clock className="w-3 h-3" /> },
+    rejected: { label: t('sub_accounts.status_rejected'), color: 'danger', icon: <AlertTriangle className="w-3 h-3" /> },
   };
 
   return (
@@ -223,7 +223,7 @@ export function SubAccountsManager() {
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <Users className="w-5 h-5 text-indigo-500" aria-hidden="true" />
-          <h3 className="font-semibold text-theme-primary">Linked Accounts</h3>
+          <h3 className="font-semibold text-theme-primary">{t('sub_accounts.title')}</h3>
         </div>
         <Button
           size="sm"
@@ -232,12 +232,12 @@ export function SubAccountsManager() {
           startContent={<Plus className="w-4 h-4" aria-hidden="true" />}
           onPress={onOpen}
         >
-          Add Account
+          {t('sub_accounts.add_button')}
         </Button>
       </div>
 
       <p className="text-sm text-theme-subtle">
-        Link accounts for family members or dependents. You can control what they can do on the platform.
+        {t('sub_accounts.description')}
       </p>
 
       {/* Loading */}
@@ -258,7 +258,7 @@ export function SubAccountsManager() {
             startContent={<RefreshCw className="w-3 h-3" aria-hidden="true" />}
             onPress={loadSubAccounts}
           >
-            Retry
+            {t('sub_accounts.retry')}
           </Button>
         </GlassCard>
       )}
@@ -269,8 +269,8 @@ export function SubAccountsManager() {
           {subAccounts.length === 0 ? (
             <EmptyState
               icon={<UserPlus className="w-10 h-10" aria-hidden="true" />}
-              title="No linked accounts"
-              description="Add a linked account for a family member or dependent."
+              title={t('sub_accounts.empty_title')}
+              description={t('sub_accounts.empty_description')}
               action={
                 <Button
                   variant="flat"
@@ -278,7 +278,7 @@ export function SubAccountsManager() {
                   startContent={<Plus className="w-4 h-4" aria-hidden="true" />}
                   onPress={onOpen}
                 >
-                  Add Account
+                  {t('sub_accounts.add_button')}
                 </Button>
               }
             />
@@ -315,7 +315,7 @@ export function SubAccountsManager() {
                           <div className="mt-3 space-y-2">
                             <p className="text-xs font-medium text-theme-muted flex items-center gap-1">
                               <Shield className="w-3 h-3" aria-hidden="true" />
-                              Permissions
+                              {t('sub_accounts.permissions_label')}
                             </p>
                             <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
                               {Object.entries(account.permissions).map(([key, value]) => (
@@ -344,7 +344,7 @@ export function SubAccountsManager() {
                               variant="flat"
                               onPress={() => handleApprove(account.id)}
                             >
-                              Approve
+                              {t('sub_accounts.approve')}
                             </Button>
                             <Button
                               size="sm"
@@ -352,7 +352,7 @@ export function SubAccountsManager() {
                               variant="flat"
                               onPress={() => handleRemove(account.id)}
                             >
-                              Decline
+                              {t('sub_accounts.decline')}
                             </Button>
                           </div>
                         )}
@@ -365,7 +365,7 @@ export function SubAccountsManager() {
                         variant="light"
                         color="danger"
                         onPress={() => handleRemove(account.id)}
-                        aria-label={`Remove ${account.child_name}`}
+                        aria-label={t('sub_accounts.remove_aria', { name: account.child_name })}
                       >
                         <Trash2 className="w-4 h-4" />
                       </Button>
@@ -393,16 +393,16 @@ export function SubAccountsManager() {
               <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-indigo-500/20 to-purple-500/20 flex items-center justify-center">
                 <UserPlus className="w-4 h-4 text-indigo-500" aria-hidden="true" />
               </div>
-              Add Linked Account
+              {t('sub_accounts.modal_title')}
             </div>
           </ModalHeader>
           <ModalBody>
             <p className="text-sm text-theme-muted mb-3">
-              Enter the email address of the person you want to link. They will receive a notification to approve the request.
+              {t('sub_accounts.modal_description')}
             </p>
             <Input
-              label="Email Address"
-              placeholder="child@example.com"
+              label={t('sub_accounts.email_label')}
+              placeholder={t('sub_accounts.email_placeholder')}
               value={addEmail}
               onChange={(e) => setAddEmail(e.target.value)}
               type="email"
@@ -414,8 +414,8 @@ export function SubAccountsManager() {
               autoFocus
             />
             <Input
-              label="Name (optional)"
-              placeholder="Their display name"
+              label={t('sub_accounts.name_label')}
+              placeholder={t('sub_accounts.name_placeholder')}
               value={addName}
               onChange={(e) => setAddName(e.target.value)}
               classNames={{
@@ -426,7 +426,7 @@ export function SubAccountsManager() {
           </ModalBody>
           <ModalFooter>
             <Button variant="flat" onPress={onClose} className="text-theme-muted">
-              Cancel
+              {t('sub_accounts.cancel')}
             </Button>
             <Button
               className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
@@ -434,7 +434,7 @@ export function SubAccountsManager() {
               isLoading={isAdding}
               isDisabled={!addEmail.trim()}
             >
-              Send Request
+              {t('sub_accounts.send_request')}
             </Button>
           </ModalFooter>
         </ModalContent>

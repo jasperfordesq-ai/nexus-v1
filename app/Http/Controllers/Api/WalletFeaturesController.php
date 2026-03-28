@@ -306,14 +306,14 @@ class WalletFeaturesController extends BaseApiController
         $data = $this->getAllInput();
 
         if (empty($data['amount']) || (float) $data['amount'] <= 0) {
-            return $this->error('Amount must be greater than 0', 400);
+            return $this->respondWithError('VALIDATION_ERROR', 'Amount must be greater than 0', 'amount', 400);
         }
 
         $recipientType = $data['recipient_type'] ?? 'community_fund';
 
         if ($recipientType === 'user') {
             if (empty($data['recipient_id'])) {
-                return $this->error('recipient_id is required when donating to a user', 400);
+                return $this->respondWithError('VALIDATION_ERROR', 'recipient_id is required when donating to a user', 'recipient_id', 400);
             }
 
             $result = $this->creditDonationService->donateToMember(
@@ -331,7 +331,7 @@ class WalletFeaturesController extends BaseApiController
         }
 
         if (!$result['success']) {
-            return $this->error($result['error'], 400);
+            return $this->respondWithError('DONATION_FAILED', $result['error'], null, 400);
         }
 
         return $this->respondWithData(['message' => 'Donation successful. Thank you!'], null, 201);

@@ -160,7 +160,7 @@ class ExchangesController extends BaseApiController
         );
 
         if (!$exchangeId) {
-            return $this->error('Failed to create exchange request', 400);
+            return $this->respondWithError('EXCHANGE_ERROR', 'Failed to create exchange request', null, 400);
         }
 
         $exchange = $this->exchangeWorkflowService->getExchange($exchangeId);
@@ -189,7 +189,7 @@ class ExchangesController extends BaseApiController
 
         $success = $this->exchangeWorkflowService->acceptRequest($id, $userId);
         if (!$success) {
-            return $this->error('Unable to accept this exchange request', 400);
+            return $this->respondWithError('EXCHANGE_ERROR', 'Unable to accept this exchange request', null, 400);
         }
 
         $exchange = $this->exchangeWorkflowService->getExchange($id);
@@ -215,7 +215,7 @@ class ExchangesController extends BaseApiController
 
         $success = $this->exchangeWorkflowService->declineRequest($id, $userId, $reason);
         if (!$success) {
-            return $this->error('Unable to decline this exchange request', 400);
+            return $this->respondWithError('EXCHANGE_ERROR', 'Unable to decline this exchange request', null, 400);
         }
 
         return $this->respondWithData(['message' => 'Exchange request declined']);
@@ -238,7 +238,7 @@ class ExchangesController extends BaseApiController
 
         $success = $this->exchangeWorkflowService->startProgress($id, $userId);
         if (!$success) {
-            return $this->error('Unable to start this exchange', 400);
+            return $this->respondWithError('EXCHANGE_ERROR', 'Unable to start this exchange', null, 400);
         }
 
         $exchange = $this->exchangeWorkflowService->getExchange($id);
@@ -263,7 +263,7 @@ class ExchangesController extends BaseApiController
 
         $success = $this->exchangeWorkflowService->markReadyForConfirmation($id, $userId);
         if (!$success) {
-            return $this->error('Unable to complete this exchange', 400);
+            return $this->respondWithError('EXCHANGE_ERROR', 'Unable to complete this exchange', null, 400);
         }
 
         $exchange = $this->exchangeWorkflowService->getExchange($id);
@@ -293,7 +293,7 @@ class ExchangesController extends BaseApiController
 
         $success = $this->exchangeWorkflowService->confirmCompletion($id, $userId, $hours);
         if (!$success) {
-            return $this->error('Unable to confirm this exchange', 400);
+            return $this->respondWithError('EXCHANGE_ERROR', 'Unable to confirm this exchange', null, 400);
         }
 
         $exchange = $this->exchangeWorkflowService->getExchange($id);
@@ -327,7 +327,7 @@ class ExchangesController extends BaseApiController
 
         $success = $this->exchangeWorkflowService->cancelExchange($id, $userId, $reason);
         if (!$success) {
-            return $this->error('Unable to cancel this exchange', 400);
+            return $this->respondWithError('EXCHANGE_ERROR', 'Unable to cancel this exchange', null, 400);
         }
 
         return $this->respondWithData(['message' => 'Exchange cancelled']);

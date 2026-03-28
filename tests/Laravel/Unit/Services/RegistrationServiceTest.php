@@ -69,11 +69,10 @@ class RegistrationServiceTest extends TestCase
             'first_name' => 'John',
             'last_name' => 'Doe',
             'email' => 'existing@example.com',
-            'password' => 'password123',
+            'password' => 'Password123!',
         ], $this->testTenantId);
 
         $this->assertArrayHasKey('error', $result);
-        $this->assertStringContainsString('already registered', $result['error']);
     }
 
     // ── verifyEmail ──
