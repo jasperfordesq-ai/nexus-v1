@@ -94,7 +94,7 @@ services:
         VITE_SENTRY_DSN: ${SENTRY_DSN_REACT:-}
         VITE_SENTRY_ENVIRONMENT: production
         VITE_SENTRY_TRACES_SAMPLE_RATE: ${SENTRY_TRACES_SAMPLE_RATE:-0.1}
-        VITE_TENOR_API_KEY: ${TENOR_API_KEY:-}
+        VITE_GIPHY_API_KEY: ${GIPHY_API_KEY:-}
         BUILD_COMMIT: ${BUILD_COMMIT:-unknown}
     image: nexus-react-prod:latest
     container_name: nexus-react-prod

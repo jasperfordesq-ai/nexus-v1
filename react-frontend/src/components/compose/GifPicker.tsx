@@ -4,7 +4,7 @@
 // See NOTICE file for attribution and acknowledgements.
 
 /**
- * GifPicker — popover-based GIF picker using the Tenor API.
+ * GifPicker — popover-based GIF picker using the GIPHY API.
  * Shows trending GIFs on open, with debounced search.
  */
 
