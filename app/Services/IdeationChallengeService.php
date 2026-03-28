@@ -94,6 +94,7 @@ class IdeationChallengeService
         }
 
         $data = (array) $challenge;
+        $data['tags'] = isset($data['tags']) ? (json_decode($data['tags'], true) ?? []) : [];
         $data['ideas_count'] = (int) DB::table('challenge_ideas')->where('challenge_id', $id)->count();
 
         return $data;
@@ -123,6 +124,7 @@ class IdeationChallengeService
         }
 
         $data = (array) $challenge;
+        $data['tags'] = isset($data['tags']) ? (json_decode($data['tags'], true) ?? []) : [];
         $data['ideas_count'] = (int) DB::table('challenge_ideas')
             ->where('challenge_id', $id)
             ->whereNotIn('status', ['draft', 'withdrawn'])

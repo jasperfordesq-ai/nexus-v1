@@ -932,7 +932,7 @@ export function ChallengeDetailPage() {
         </p>
 
         {/* Tags */}
-        {challenge.tags && challenge.tags.length > 0 && (
+        {Array.isArray(challenge.tags) && challenge.tags.length > 0 && (
           <div className="flex flex-wrap gap-1.5 mb-4">
             {challenge.tags.map((tag) => (
               <Chip key={tag} size="sm" variant="bordered" className="text-xs">
