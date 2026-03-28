@@ -497,7 +497,8 @@ export function DonationsTab() {
                 <Input
                   label={t('donations.form.amount', 'Amount')}
                   type="number"
-                  min="1"
+                  min="0.01"
+                  max="1000000"
                   step="0.01"
                   variant="bordered"
                   value={form.amount}

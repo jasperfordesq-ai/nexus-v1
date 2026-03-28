@@ -248,6 +248,10 @@ class GroupService
             ->first();
 
         if ($existing) {
+            // Prevent banned users from rejoining
+            if (($existing->status ?? '') === 'banned') {
+                return ['success' => false, 'error' => 'You have been banned from this group'];
+            }
             return ['success' => false, 'error' => 'Already a member or request pending'];
         }
 
@@ -410,6 +414,24 @@ class GroupService
                 GroupDiscussion::withoutGlobalScopes()
                     ->where('group_id', $id)
                     ->delete();
+            }
+
+            // Disassociate events from this group (preserve events, clear group_id)
+            DB::table('events')
+                ->where('group_id', $id)
+                ->update(['group_id' => null]);
+
+            // Delete chatroom messages and chatrooms
+            $chatroomIds = DB::table('group_chatrooms')
+                ->where('group_id', $id)
+                ->pluck('id')
+                ->all();
+
+            if (! empty($chatroomIds)) {
+                $placeholders = implode(',', array_fill(0, count($chatroomIds), '?'));
+                DB::delete("DELETE FROM group_chatroom_messages WHERE chatroom_id IN ({$placeholders})", $chatroomIds);
+                DB::delete("DELETE FROM group_chatroom_pinned_messages WHERE chatroom_id IN ({$placeholders})", $chatroomIds);
+                DB::table('group_chatrooms')->where('group_id', $id)->delete();
             }
 
             // Delete the group itself
@@ -748,6 +770,10 @@ class GroupService
             return null;
         }
 
+        // Sanitize to prevent XSS — strip HTML tags from title, allow basic formatting in content
+        $title = strip_tags($title);
+        $content = strip_tags($content, '<p><br><b><i><strong><em><ul><ol><li><a><blockquote>');
+
         return DB::transaction(function () use ($groupId, $userId, $title, $content) {
             $discussion = GroupDiscussion::create([
                 'group_id' => $groupId,
@@ -919,6 +945,9 @@ class GroupService
             self::$errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'Content is required', 'field' => 'content'];
             return null;
         }
+
+        // Sanitize to prevent XSS — allow basic formatting tags
+        $content = strip_tags($content, '<p><br><b><i><strong><em><ul><ol><li><a><blockquote>');
 
         $post = GroupPost::create([
             'discussion_id' => $discussionId,

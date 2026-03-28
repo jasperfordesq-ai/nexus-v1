@@ -104,6 +104,21 @@ class VolunteerCommunityController extends BaseApiController
         $this->rateLimit('volunteering_waitlist_promote', 10, 60);
 
         $tenantId = TenantContext::getId();
+
+        // Authorization: only the waitlisted user themselves can claim a promoted spot
+        $entry = DB::table('vol_shift_waitlist')
+            ->where('id', (int) $id)
+            ->where('tenant_id', $tenantId)
+            ->first();
+
+        if (!$entry) {
+            return $this->respondWithError('NOT_FOUND', 'Waitlist entry not found', null, 404);
+        }
+
+        if ((int) $entry->user_id !== $userId) {
+            return $this->respondWithError('FORBIDDEN', 'You can only claim your own waitlist spot', null, 403);
+        }
+
         $success = $this->shiftWaitlistService->promoteUser((int) $id, $tenantId);
         if (!$success) {
             $errors = $this->shiftWaitlistService->getErrors();

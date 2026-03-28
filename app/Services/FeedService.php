@@ -159,25 +159,40 @@ class FeedService
 
         // Hide private group posts from non-members (unless viewing a specific group feed)
         $tenantId = TenantContext::getId();
-        if (!isset($filters['group_id']) && $currentUserId) {
-            $query->where(function ($q) use ($currentUserId, $tenantId) {
-                $q->whereNull('feed_activity.group_id')
-                  ->orWhereExists(function ($sub) use ($currentUserId, $tenantId) {
-                      $sub->select(DB::raw(1))
-                          ->from('group_members')
-                          ->whereColumn('group_members.group_id', 'feed_activity.group_id')
-                          ->where('group_members.user_id', $currentUserId)
-                          ->where('group_members.tenant_id', $tenantId)
-                          ->where('group_members.status', 'active');
-                  })
-                  ->orWhereExists(function ($sub) use ($tenantId) {
-                      $sub->select(DB::raw(1))
-                          ->from('groups')
-                          ->whereColumn('groups.id', 'feed_activity.group_id')
-                          ->where('groups.tenant_id', $tenantId)
-                          ->where('groups.privacy', 'public');
-                  });
-            });
+        if (!isset($filters['group_id'])) {
+            if ($currentUserId) {
+                // Authenticated: show public group posts + groups user is a member of
+                $query->where(function ($q) use ($currentUserId, $tenantId) {
+                    $q->whereNull('feed_activity.group_id')
+                      ->orWhereExists(function ($sub) use ($currentUserId, $tenantId) {
+                          $sub->select(DB::raw(1))
+                              ->from('group_members')
+                              ->whereColumn('group_members.group_id', 'feed_activity.group_id')
+                              ->where('group_members.user_id', $currentUserId)
+                              ->where('group_members.tenant_id', $tenantId)
+                              ->where('group_members.status', 'active');
+                      })
+                      ->orWhereExists(function ($sub) use ($tenantId) {
+                          $sub->select(DB::raw(1))
+                              ->from('groups')
+                              ->whereColumn('groups.id', 'feed_activity.group_id')
+                              ->where('groups.tenant_id', $tenantId)
+                              ->where('groups.privacy', 'public');
+                      });
+                });
+            } else {
+                // Unauthenticated: only show non-group posts and public group posts
+                $query->where(function ($q) use ($tenantId) {
+                    $q->whereNull('feed_activity.group_id')
+                      ->orWhereExists(function ($sub) use ($tenantId) {
+                          $sub->select(DB::raw(1))
+                              ->from('groups')
+                              ->whereColumn('groups.id', 'feed_activity.group_id')
+                              ->where('groups.tenant_id', $tenantId)
+                              ->where('groups.privacy', 'public');
+                      });
+                });
+            }
         }
 
         // Cursor pagination by (created_at, id) tuple
@@ -677,7 +692,7 @@ class FeedService
                            (SELECT COUNT(*) FROM comments WHERE target_type = 'post' AND target_id = p.id) as comments_count
                     FROM feed_posts p
                     JOIN users u ON p.user_id = u.id
-                    WHERE p.id = ? AND p.tenant_id = ? AND (p.publish_status = 'published' OR p.publish_status IS NULL)",
+                    WHERE p.id = ? AND p.tenant_id = ? AND (p.publish_status = 'published' OR p.publish_status IS NULL) AND (p.is_hidden = 0 OR p.is_hidden IS NULL)",
                     [$id, $tenantId]
                 );
                 $items = array_map(fn($r) => (array) $r, $rows);

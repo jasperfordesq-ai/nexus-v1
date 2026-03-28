@@ -608,7 +608,7 @@ class SmartMatchingEngine
             "SELECT u.*,
                     COALESCE(u.latitude, 0) as latitude,
                     COALESCE(u.longitude, 0) as longitude,
-                    (SELECT AVG(rating) FROM reviews WHERE receiver_id = u.id) as avg_rating,
+                    (SELECT AVG(rating) FROM reviews WHERE receiver_id = u.id AND tenant_id = u.tenant_id) as avg_rating,
                     (SELECT COUNT(*) FROM transactions WHERE (sender_id = u.id OR receiver_id = u.id) AND tenant_id = u.tenant_id AND status = 'completed') as transaction_count
              FROM users u
              WHERE u.id = ? AND u.tenant_id = ?",
@@ -691,7 +691,7 @@ class SmartMatchingEngine
                        u.latitude as author_latitude, u.longitude as author_longitude,
                        u.is_verified as author_verified,
                        TRIM(CONCAT(COALESCE(u.first_name, ''), ' ', COALESCE(u.last_name, ''))) as user_name,
-                       (SELECT AVG(rating) FROM reviews WHERE receiver_id = u.id) as author_rating,
+                       (SELECT AVG(rating) FROM reviews WHERE receiver_id = u.id AND tenant_id = u.tenant_id) as author_rating,
                        c.name as category_name, c.color as category_color";
 
         if ($userLat && $userLon) {
@@ -707,7 +707,8 @@ class SmartMatchingEngine
         $sql .= " FROM listings l
                   JOIN users u ON l.user_id = u.id
                   LEFT JOIN categories c ON l.category_id = c.id
-                  WHERE l.tenant_id = ? AND l.type = ? AND l.status = 'active' AND l.user_id != ?";
+                  WHERE l.tenant_id = ? AND l.type = ? AND l.status = 'active' AND l.user_id != ?
+                  AND u.status NOT IN ('banned', 'suspended')";
 
         if ($this->userBlocksTableExists()) {
             $sql .= "
@@ -763,7 +764,8 @@ class SmartMatchingEngine
         $sql .= " FROM listings l
                   JOIN users u ON l.user_id = u.id
                   LEFT JOIN categories c ON l.category_id = c.id
-                  WHERE l.tenant_id = ? AND l.status = 'active' AND l.user_id != ?";
+                  WHERE l.tenant_id = ? AND l.status = 'active' AND l.user_id != ?
+                  AND u.status NOT IN ('banned', 'suspended')";
 
         if ($this->userBlocksTableExists()) {
             $sql .= "

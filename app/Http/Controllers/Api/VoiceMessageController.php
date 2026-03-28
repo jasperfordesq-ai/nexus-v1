@@ -69,16 +69,23 @@ class VoiceMessageController extends BaseApiController
                 return $this->respondWithError('VALIDATION_ERROR', 'No audio data provided', 'audio', 400);
             }
 
-            // Create voice message in database
+            // Create voice message via MessageService::send() (consistent with MessagesController)
             $tenant = TenantContext::get();
             $tenantId = $tenant['id'];
-            $messageId = Message::createVoice(
-                $tenantId,
-                $senderId,
-                $receiverId,
-                $audioResult['url'],
-                $audioResult['duration']
-            );
+            $messageData = \App\Services\MessageService::send($senderId, [
+                'recipient_id'   => $receiverId,
+                'body'           => '',
+                'is_voice'       => true,
+                'audio_url'      => $audioResult['url'],
+                'audio_duration' => $audioResult['duration'],
+            ]);
+
+            if (empty($messageData)) {
+                $errors = \App\Services\MessageService::getErrors();
+                return $this->respondWithErrors($errors, 422);
+            }
+
+            $messageId = $messageData['id'] ?? null;
 
             // Transcribe the audio file (non-blocking — failures are logged, not thrown)
             $transcript = null;

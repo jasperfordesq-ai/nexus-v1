@@ -252,10 +252,13 @@ class GroupChatroomService
     {
         $limit = min((int) ($filters['limit'] ?? 50), 100);
         $cursor = $filters['cursor'] ?? null;
+        $tenantId = TenantContext::getId();
 
         $query = DB::table('group_chatroom_messages as m')
             ->join('users as u', 'm.user_id', '=', 'u.id')
+            ->join('group_chatrooms as c', 'm.chatroom_id', '=', 'c.id')
             ->where('m.chatroom_id', $chatroomId)
+            ->where('c.tenant_id', $tenantId)
             ->select([
                 'm.id',
                 'm.chatroom_id',

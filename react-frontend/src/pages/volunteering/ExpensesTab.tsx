@@ -370,7 +370,7 @@ export function ExpensesTab() {
                   <Input
                     label={t('expenses.form.amount', 'Amount')}
                     type="number"
-                    min="0"
+                    min="0.01"
                     step="0.01"
                     value={formAmount}
                     onValueChange={setFormAmount}

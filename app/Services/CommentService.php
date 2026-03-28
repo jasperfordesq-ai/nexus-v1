@@ -160,7 +160,8 @@ class CommentService
             return false;
         }
 
-        $trimmedContent = trim($content);
+        // Server-side XSS prevention: sanitize HTML content before storage
+        $trimmedContent = \App\Helpers\HtmlSanitizer::sanitize(trim($content));
         $comment->content = $trimmedContent;
         $comment->save();
 
@@ -362,7 +363,8 @@ class CommentService
     public static function editComment(int $commentId, int $userId, string $newContent): array
     {
         $tenantId = TenantContext::getId();
-        $newContent = trim($newContent);
+        // Server-side XSS prevention: sanitize HTML content before storage
+        $newContent = \App\Helpers\HtmlSanitizer::sanitize(trim($newContent));
 
         if (empty($newContent)) {
             return ['success' => false, 'error' => 'Comment cannot be empty'];

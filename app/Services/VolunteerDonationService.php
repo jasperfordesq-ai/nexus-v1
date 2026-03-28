@@ -121,6 +121,9 @@ class VolunteerDonationService
         if ($amount <= 0) {
             throw new \InvalidArgumentException('Donation amount must be greater than zero.');
         }
+        if ($amount > 1000000) {
+            throw new \InvalidArgumentException('Donation amount exceeds the maximum allowed (1,000,000).');
+        }
         if (strlen($currency) !== 3) {
             throw new \InvalidArgumentException('Currency must be a 3-letter ISO code.');
         }

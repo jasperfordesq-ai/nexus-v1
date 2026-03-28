@@ -23,17 +23,31 @@ Broadcast::channel('tenant.{tenantId}.user.{userId}', function (User $user, int 
 });
 
 // Private conversation channel — both participants can listen
+// The conversationId is a CRC32 hash of the sorted user ID pair (e.g., crc32("3-7"))
+// generated in MessageService::send(). Auth verifies the user is one of those participants.
 Broadcast::channel('tenant.{tenantId}.conversation.{conversationId}', function (User $user, int $tenantId, int $conversationId) {
     if ($user->tenant_id !== $tenantId) {
         return false;
     }
-    return \Illuminate\Support\Facades\DB::table('messages')
+    // Look up all distinct conversation partners for this user and check if any
+    // produces a matching CRC32 hash. This ensures only actual participants can subscribe.
+    $partnerIds = \Illuminate\Support\Facades\DB::table('messages')
         ->where('tenant_id', $tenantId)
-        ->where('id', $conversationId)
         ->where(function ($q) use ($user) {
             $q->where('sender_id', $user->id)->orWhere('receiver_id', $user->id);
         })
-        ->exists();
+        ->selectRaw('DISTINCT CASE WHEN sender_id = ? THEN receiver_id ELSE sender_id END as partner_id', [$user->id])
+        ->pluck('partner_id');
+
+    foreach ($partnerIds as $partnerId) {
+        $ids = [(int) $user->id, (int) $partnerId];
+        sort($ids);
+        if (crc32(implode('-', $ids)) === $conversationId) {
+            return true;
+        }
+    }
+
+    return false;
 });
 
 // Private group channel — group members only

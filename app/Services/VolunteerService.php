@@ -902,6 +902,24 @@ class VolunteerService
             }
         }
 
+        // Prevent duplicate hour logging for the same org + date + opportunity
+        $oppId = !empty($data['opportunity_id']) ? (int) $data['opportunity_id'] : null;
+        if ($oppId !== null) {
+            $duplicateCheck = DB::selectOne(
+                "SELECT id FROM vol_logs WHERE user_id = ? AND tenant_id = ? AND organization_id = ? AND date_logged = ? AND opportunity_id = ? AND status NOT IN ('declined', 'rejected')",
+                [$userId, $tenantId, (int) $data['organization_id'], $data['date'], $oppId]
+            );
+        } else {
+            $duplicateCheck = DB::selectOne(
+                "SELECT id FROM vol_logs WHERE user_id = ? AND tenant_id = ? AND organization_id = ? AND date_logged = ? AND opportunity_id IS NULL AND status NOT IN ('declined', 'rejected')",
+                [$userId, $tenantId, (int) $data['organization_id'], $data['date']]
+            );
+        }
+        if ($duplicateCheck) {
+            self::$errors[] = ['code' => 'ALREADY_EXISTS', 'message' => 'You have already logged hours for this organization and date'];
+            return null;
+        }
+
         try {
             DB::insert(
                 "INSERT INTO vol_logs (tenant_id, user_id, organization_id, opportunity_id, date_logged, hours, description, status, created_at)

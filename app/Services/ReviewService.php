@@ -199,6 +199,19 @@ class ReviewService
             if ($exists) {
                 throw new \RuntimeException('You have already reviewed this exchange');
             }
+        } else {
+            // Without a transaction_id, prevent multiple reviews for the same receiver
+            // within a 24-hour window to avoid spam
+            $recentExists = $this->review->newQuery()
+                ->where('reviewer_id', $reviewerId)
+                ->where('receiver_id', $receiverId)
+                ->whereNull('transaction_id')
+                ->where('created_at', '>=', now()->subDay())
+                ->exists();
+
+            if ($recentExists) {
+                throw new \RuntimeException('You have already reviewed this member recently');
+            }
         }
 
         $review = $this->review->newInstance([

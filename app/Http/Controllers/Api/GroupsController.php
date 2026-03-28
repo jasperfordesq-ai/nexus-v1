@@ -305,6 +305,22 @@ class GroupsController extends BaseApiController
             return $this->respondWithError('NOT_FOUND', 'Group not found', null, 404);
         }
 
+        // For private groups, only members can view the member list
+        if (($group['visibility'] ?? 'public') === 'private') {
+            $userId = $this->getOptionalUserId();
+            if (!$userId) {
+                return $this->respondWithError('FORBIDDEN', 'You must be a member to view members of a private group', null, 403);
+            }
+            $isMember = \Illuminate\Support\Facades\DB::table('group_members')
+                ->where('group_id', $id)
+                ->where('user_id', $userId)
+                ->where('status', 'active')
+                ->exists();
+            if (!$isMember) {
+                return $this->respondWithError('FORBIDDEN', 'You must be a member to view members of a private group', null, 403);
+            }
+        }
+
         $filters = [
             'limit' => $this->queryInt('per_page', 20, 1, 100),
         ];

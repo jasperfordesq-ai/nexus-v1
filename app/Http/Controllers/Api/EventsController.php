@@ -442,6 +442,18 @@ class EventsController extends BaseApiController
             return $this->respondWithError('NOT_FOUND', 'Event not found', null, 404);
         }
 
+        // Block check-in if event hasn't started yet (allow up to 30 min early)
+        $startTime = isset($event['start_time']) ? strtotime($event['start_time']) : null;
+        if ($startTime && $startTime > time() + 1800) {
+            return $this->respondWithError('TOO_EARLY', 'Check-in is not available until 30 minutes before the event starts', null, 422);
+        }
+
+        // Block check-in if event ended more than 24 hours ago
+        $endTime = isset($event['end_time']) ? strtotime($event['end_time']) : $startTime;
+        if ($endTime && $endTime < time() - 86400) {
+            return $this->respondWithError('EVENT_ENDED', 'Check-in is no longer available — event ended more than 24 hours ago', null, 422);
+        }
+
         // Only the organizer or an admin can check in attendees
         $isOrganizer = (int) $event['user_id'] === $userId;
         $isAdmin = false;

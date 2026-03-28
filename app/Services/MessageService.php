@@ -152,8 +152,11 @@ class MessageService
      */
     public static function getMessages(int $partnerId, int $userId, array $filters = []): ?array
     {
-        // Verify the partner user exists (skip tenant scope — users may be cross-tenant visible)
-        $partner = User::withoutGlobalScopes()->find($partnerId);
+        // Verify the partner user exists within the same tenant
+        $partner = User::withoutGlobalScopes()
+            ->where('id', $partnerId)
+            ->where('tenant_id', app('tenant.id'))
+            ->first();
         if ($partner === null) {
             return null;
         }
@@ -236,6 +239,55 @@ class MessageService
 
         if ($senderId === $receiverId) {
             self::$errors = [['code' => 'VALIDATION_ERROR', 'message' => 'You cannot send a message to yourself']];
+            return [];
+        }
+
+        $tenantId = app('tenant.id');
+
+        // Check if sender is suspended/banned
+        $sender = User::withoutGlobalScopes()
+            ->where('id', $senderId)
+            ->where('tenant_id', $tenantId)
+            ->first();
+        if (!$sender || in_array($sender->status ?? 'active', ['suspended', 'banned', 'deactivated'])) {
+            self::$errors = [['code' => 'FORBIDDEN', 'message' => 'Your account is not allowed to send messages']];
+            return [];
+        }
+
+        // Check if receiver exists in the same tenant
+        $receiver = User::withoutGlobalScopes()
+            ->where('id', $receiverId)
+            ->where('tenant_id', $tenantId)
+            ->first();
+        if (!$receiver) {
+            self::$errors = [['code' => 'NOT_FOUND', 'message' => 'Recipient not found']];
+            return [];
+        }
+
+        // Check if messaging is disabled for sender (broker restriction)
+        $isDisabled = DB::table('user_messaging_restrictions')
+            ->where('user_id', $senderId)
+            ->where('tenant_id', $tenantId)
+            ->where('messaging_disabled', true)
+            ->exists();
+        if ($isDisabled) {
+            self::$errors = [['code' => 'MESSAGING_DISABLED', 'message' => 'Your messaging has been restricted by an administrator']];
+            return [];
+        }
+
+        // Check if either user has blocked the other
+        // user_blocks uses user_id (blocker) and blocked_user_id columns, no tenant_id
+        $blocked = DB::table('user_blocks')
+            ->where(function ($q) use ($senderId, $receiverId) {
+                $q->where(function ($inner) use ($senderId, $receiverId) {
+                    $inner->where('user_id', $senderId)->where('blocked_user_id', $receiverId);
+                })->orWhere(function ($inner) use ($senderId, $receiverId) {
+                    $inner->where('user_id', $receiverId)->where('blocked_user_id', $senderId);
+                });
+            })
+            ->exists();
+        if ($blocked) {
+            self::$errors = [['code' => 'BLOCKED', 'message' => 'You cannot send messages to this user']];
             return [];
         }
 
@@ -344,13 +396,17 @@ class MessageService
     {
         self::$errors = [];
 
-        $otherUser = User::withoutGlobalScopes()->find($otherUserId);
+        $tenantId = app('tenant.id');
+
+        // Verify user exists within the same tenant (not cross-tenant)
+        $otherUser = User::withoutGlobalScopes()
+            ->where('id', $otherUserId)
+            ->where('tenant_id', $tenantId)
+            ->first();
         if (! $otherUser) {
             self::$errors[] = ['code' => 'NOT_FOUND', 'message' => 'User not found'];
             return null;
         }
-
-        $tenantId = app('tenant.id');
 
         $unreadCount = Message::query()
             ->where('sender_id', $otherUserId)
@@ -545,6 +601,15 @@ class MessageService
             self::$errors[] = ['code' => 'FORBIDDEN', 'message' => 'You can only edit your own messages'];
             return null;
         }
+
+        // Enforce 24-hour edit window
+        if ($message->created_at && $message->created_at->lt(now()->subHours(24))) {
+            self::$errors[] = ['code' => 'EDIT_EXPIRED', 'message' => 'Messages can only be edited within 24 hours of sending'];
+            return null;
+        }
+
+        // Server-side XSS prevention: strip all HTML (consistent with send())
+        $newBody = \App\Helpers\HtmlSanitizer::stripAll($newBody);
 
         $message->body = $newBody;
 

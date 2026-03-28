@@ -23,7 +23,7 @@ class SubmitExpenseRequest extends FormRequest
         return [
             'organization_id' => ['required', 'integer'],
             'expense_type' => ['required', 'in:travel,meals,supplies,equipment,parking,other'],
-            'amount' => ['required', 'numeric', 'min:0.01'],
+            'amount' => ['required', 'numeric', 'min:0.01', 'max:100000'],
             'currency' => ['nullable', 'string', 'max:10'],
             'description' => ['required', 'string', 'max:1000'],
         ];

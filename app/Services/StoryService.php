@@ -300,17 +300,18 @@ class StoryService
             return;
         }
 
-        // Insert view (ignore duplicate)
-        DB::statement(
+        // Insert view (ignore duplicate) — only increment view_count if a new row was actually inserted
+        $affected = DB::affectingStatement(
             'INSERT IGNORE INTO story_views (story_id, viewer_id, viewed_at) VALUES (?, ?, NOW())',
             [$storyId, $viewerId]
         );
 
-        // Increment view count
-        DB::update(
-            'UPDATE stories SET view_count = view_count + 1 WHERE id = ? AND tenant_id = ?',
-            [$storyId, $tenantId]
-        );
+        if ($affected > 0) {
+            DB::update(
+                'UPDATE stories SET view_count = view_count + 1 WHERE id = ? AND tenant_id = ?',
+                [$storyId, $tenantId]
+            );
+        }
     }
 
     /**
@@ -382,13 +383,32 @@ class StoryService
             throw new \RuntimeException('Invalid reaction type');
         }
 
-        DB::insert(
-            'INSERT INTO story_reactions (story_id, user_id, reaction_type, created_at) VALUES (?, ?, ?, NOW())',
-            [$storyId, $userId, $reactionType]
+        // Toggle reaction: remove if same type exists, otherwise upsert
+        $existing = DB::selectOne(
+            'SELECT id, reaction_type FROM story_reactions WHERE story_id = ? AND user_id = ?',
+            [$storyId, $userId]
         );
 
-        // Notify story owner about the reaction (skip self-reactions)
-        if ($story->user_id !== $userId) {
+        if ($existing) {
+            if ($existing->reaction_type === $reactionType) {
+                // Same reaction — remove it (toggle off)
+                DB::delete('DELETE FROM story_reactions WHERE id = ?', [$existing->id]);
+                return;
+            }
+            // Different reaction — update in place
+            DB::update(
+                'UPDATE story_reactions SET reaction_type = ?, created_at = NOW() WHERE id = ?',
+                [$reactionType, $existing->id]
+            );
+        } else {
+            DB::insert(
+                'INSERT INTO story_reactions (story_id, user_id, reaction_type, created_at) VALUES (?, ?, ?, NOW())',
+                [$storyId, $userId, $reactionType]
+            );
+        }
+
+        // Notify story owner about the reaction (skip self-reactions, skip updates)
+        if (!$existing && (int) $story->user_id !== $userId) {
             try {
                 $emojiMap = [
                     'heart' => "\u{2764}\u{FE0F}",

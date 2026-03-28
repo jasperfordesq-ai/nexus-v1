@@ -219,11 +219,37 @@ class EventService
 
     /**
      * Update an existing event.
+     *
+     * @param int   $id     Event ID
+     * @param int   $userId Authenticated user requesting the update
+     * @param array $data   Fields to update
+     * @return bool True on success, false on error (check getErrors())
      */
-    public static function update(int $id, array $data): Event
+    public static function update(int $id, int $userId, array $data): bool
     {
-        /** @var Event $event */
-        $event = Event::query()->findOrFail($id);
+        self::$errors = [];
+        $tenantId = \App\Core\TenantContext::getId();
+
+        /** @var Event|null $event */
+        $event = Event::query()->find($id);
+
+        if (! $event) {
+            self::$errors[] = ['code' => 'NOT_FOUND', 'message' => 'Event not found'];
+            return false;
+        }
+
+        // Authorization: only organizer or platform admin
+        if ((int) $event->user_id !== $userId) {
+            $user = DB::selectOne("SELECT role, is_super_admin, is_tenant_super_admin FROM users WHERE id = ? AND tenant_id = ?", [$userId, $tenantId]);
+            if (!$user || !(
+                in_array($user->role ?? '', ['admin', 'super_admin', 'god']) ||
+                !empty($user->is_super_admin) ||
+                !empty($user->is_tenant_super_admin)
+            )) {
+                self::$errors[] = ['code' => 'FORBIDDEN', 'message' => 'You do not have permission to edit this event'];
+                return false;
+            }
+        }
 
         // Resolve category_name slug to category_id if provided
         if (!empty($data['category_name']) && empty($data['category_id'])) {
@@ -239,7 +265,7 @@ class EventService
         $event->fill(collect($data)->only($allowed)->all());
         $event->save();
 
-        return $event->fresh(['user', 'category']);
+        return true;
     }
 
     /**
@@ -264,14 +290,35 @@ class EventService
 
     /**
      * Delete an event.
+     *
+     * @param int $id     Event ID
+     * @param int $userId Authenticated user requesting the deletion
+     * @return bool True on success, false on error (check getErrors())
      */
-    public static function delete(int $id): bool
+    public static function delete(int $id, int $userId): bool
     {
+        self::$errors = [];
+        $tenantId = \App\Core\TenantContext::getId();
+
         /** @var Event|null $event */
         $event = Event::query()->find($id);
 
         if (! $event) {
+            self::$errors[] = ['code' => 'NOT_FOUND', 'message' => 'Event not found'];
             return false;
+        }
+
+        // Authorization: only organizer or platform admin
+        if ((int) $event->user_id !== $userId) {
+            $user = DB::selectOne("SELECT role, is_super_admin, is_tenant_super_admin FROM users WHERE id = ? AND tenant_id = ?", [$userId, $tenantId]);
+            if (!$user || !(
+                in_array($user->role ?? '', ['admin', 'super_admin', 'god']) ||
+                !empty($user->is_super_admin) ||
+                !empty($user->is_tenant_super_admin)
+            )) {
+                self::$errors[] = ['code' => 'FORBIDDEN', 'message' => 'Only the event organizer can delete this event'];
+                return false;
+            }
         }
 
         $event->delete();
@@ -397,37 +444,61 @@ class EventService
             return false;
         }
 
-        // Capacity enforcement for 'going' status
-        if ($status === 'going' && !empty($event->max_attendees)) {
-            $maxAttendees = (int) $event->max_attendees;
-            $currentGoing = (int) DB::selectOne("SELECT COUNT(*) as cnt FROM event_rsvps WHERE event_id = ? AND tenant_id = ? AND status = 'going'", [$eventId, $tenantId])->cnt;
-            $currentUserStatus = self::getUserRsvp($eventId, $userId);
-            $isAlreadyGoing = ($currentUserStatus === 'going');
-
-            if (!$isAlreadyGoing && $currentGoing >= $maxAttendees) {
-                self::addToWaitlist($eventId, $userId);
-                self::$errors[] = [
-                    'code' => 'EVENT_FULL',
-                    'message' => 'This event is full. You have been added to the waitlist.',
-                    'waitlisted' => true,
-                ];
+        // Block RSVP to past events (event has already ended, or started with no end time)
+        if ($status === 'going' || $status === 'interested') {
+            $eventEnd = $event->end_time ?? $event->start_time ?? null;
+            if ($eventEnd && strtotime($eventEnd) < time()) {
+                self::$errors[] = ['code' => 'EVENT_ENDED', 'message' => 'This event has already ended'];
                 return false;
             }
         }
 
+        // Capacity enforcement for 'going' status — use SELECT ... FOR UPDATE to prevent race conditions
+        if ($status === 'going' && !empty($event->max_attendees)) {
+            $maxAttendees = (int) $event->max_attendees;
+
+            return DB::transaction(function () use ($eventId, $userId, $tenantId, $status, $maxAttendees) {
+                // Lock the RSVP rows for this event to prevent concurrent over-booking
+                $currentGoing = (int) DB::selectOne(
+                    "SELECT COUNT(*) as cnt FROM event_rsvps WHERE event_id = ? AND tenant_id = ? AND status = 'going' FOR UPDATE",
+                    [$eventId, $tenantId]
+                )->cnt;
+
+                $currentUserStatus = self::getUserRsvp($eventId, $userId);
+                $isAlreadyGoing = ($currentUserStatus === 'going');
+
+                if (!$isAlreadyGoing && $currentGoing >= $maxAttendees) {
+                    self::addToWaitlist($eventId, $userId);
+                    self::$errors[] = [
+                        'code' => 'EVENT_FULL',
+                        'message' => 'This event is full. You have been added to the waitlist.',
+                        'waitlisted' => true,
+                    ];
+                    return false;
+                }
+
+                // Upsert RSVP inside the transaction
+                DB::statement(
+                    "INSERT INTO event_rsvps (event_id, user_id, tenant_id, status, created_at)
+                     VALUES (?, ?, ?, ?, NOW())
+                     ON DUPLICATE KEY UPDATE status = VALUES(status), updated_at = NOW()",
+                    [$eventId, $userId, $tenantId, $status]
+                );
+
+                self::removeFromWaitlist($eventId, $userId);
+
+                return true;
+            });
+        }
+
         try {
-            // Upsert RSVP
+            // Upsert RSVP (no capacity limit)
             DB::statement(
                 "INSERT INTO event_rsvps (event_id, user_id, tenant_id, status, created_at)
                  VALUES (?, ?, ?, ?, NOW())
                  ON DUPLICATE KEY UPDATE status = VALUES(status), updated_at = NOW()",
                 [$eventId, $userId, $tenantId, $status]
             );
-
-            // If going, remove from waitlist
-            if ($status === 'going') {
-                self::removeFromWaitlist($eventId, $userId);
-            }
 
             return true;
         } catch (\Exception $e) {
@@ -746,14 +817,22 @@ class EventService
                 [$eventId, $tenantId]
             );
 
-            // Notify all RSVPs (going + interested) and waitlisted users
+            // Collect RSVP'd users BEFORE updating statuses (for notifications)
             $rsvpUserIds = DB::select(
-                "SELECT DISTINCT user_id FROM event_rsvps WHERE event_id = ? AND status IN ('going', 'interested', 'invited')",
-                [$eventId]
+                "SELECT DISTINCT user_id FROM event_rsvps WHERE event_id = ? AND tenant_id = ? AND status IN ('going', 'interested', 'invited')",
+                [$eventId, $tenantId]
             );
+
+            // Mark all active RSVPs as cancelled
+            DB::update(
+                "UPDATE event_rsvps SET status = 'cancelled' WHERE event_id = ? AND tenant_id = ? AND status IN ('going', 'interested', 'invited')",
+                [$eventId, $tenantId]
+            );
+
+            // Notify all RSVPs (going + interested) and waitlisted users
             $waitlistUserIds = DB::select(
-                "SELECT DISTINCT user_id FROM event_waitlist WHERE event_id = ? AND status = 'waiting'",
-                [$eventId]
+                "SELECT DISTINCT user_id FROM event_waitlist WHERE event_id = ? AND tenant_id = ? AND status = 'waiting'",
+                [$eventId, $tenantId]
             );
 
             $allUserIds = collect($rsvpUserIds)->pluck('user_id')
@@ -1426,7 +1505,7 @@ class EventService
         if ($scope === 'single') {
             // Detach from parent (make independent) and update
             DB::update("UPDATE events SET parent_event_id = NULL WHERE id = ? AND tenant_id = ?", [$eventId, $tenantId]);
-            return self::update($eventId, $data) instanceof Event;
+            return self::update($eventId, $userId, $data);
         }
 
         // scope === 'all': update all future occurrences
@@ -1446,7 +1525,7 @@ class EventService
         $updated = 0;
         foreach ($ids as $row) {
             try {
-                self::update((int) $row->id, $data);
+                self::update((int) $row->id, $userId, $data);
                 $updated++;
             } catch (\Exception $e) {
                 Log::error("EventService::updateRecurring failed for event {$row->id}: " . $e->getMessage());

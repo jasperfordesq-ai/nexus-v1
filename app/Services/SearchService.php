@@ -258,7 +258,7 @@ class SearchService
 
         if ($type === null || $type === 'users') {
             $hits = $client->index('users')->search($term, [
-                'filter'               => "tenant_id = {$tenantId} AND status != 'banned'",
+                'filter'               => "tenant_id = {$tenantId} AND status != 'banned' AND status != 'suspended'",
                 'limit'                => $limit,
                 'attributesToRetrieve' => ['id', 'first_name', 'last_name', 'avatar_url', 'organization_name', 'profile_type', 'bio'],
             ])->getHits();
@@ -333,7 +333,7 @@ class SearchService
                       ->orWhere('organization_name', 'LIKE', $like)
                       ->orWhereRaw("CONCAT(first_name, ' ', last_name) LIKE ?", [$like]);
                 })
-                ->where('status', '!=', 'banned')
+                ->whereNotIn('status', ['banned', 'suspended'])
                 ->select('id', 'first_name', 'last_name', 'avatar_url', 'organization_name', 'profile_type', 'bio')
                 ->limit($limit)
                 ->get()
@@ -455,7 +455,7 @@ class SearchService
 
         if ($type === 'all' || $type === 'users') {
             $hits = $client->index('users')->search($term, [
-                'filter'               => "tenant_id = {$tenantId} AND status != 'banned'",
+                'filter'               => "tenant_id = {$tenantId} AND status != 'banned' AND status != 'suspended'",
                 'limit'                => $limit,
                 'attributesToRetrieve' => ['id', 'first_name', 'last_name', 'avatar_url', 'organization_name', 'profile_type', 'bio', 'created_at'],
             ])->getHits();
@@ -557,7 +557,7 @@ class SearchService
                       ->orWhere('organization_name', 'LIKE', $like)
                       ->orWhereRaw("CONCAT(first_name, ' ', last_name) LIKE ?", [$like]);
                 })
-                ->where('status', '!=', 'banned')
+                ->whereNotIn('status', ['banned', 'suspended'])
                 ->select('id', 'first_name', 'last_name', 'avatar_url', 'organization_name', 'profile_type', 'bio', 'created_at');
 
             $this->applySortOrder($uq, $sort);
@@ -655,7 +655,7 @@ class SearchService
         ])->getHits();
 
         $userHits = $client->index('users')->search($term, [
-            'filter'               => "tenant_id = {$tenantId} AND status != 'banned'",
+            'filter'               => "tenant_id = {$tenantId} AND status != 'banned' AND status != 'suspended'",
             'limit'                => $limit,
             'attributesToRetrieve' => ['id', 'first_name', 'last_name', 'avatar_url', 'organization_name', 'profile_type'],
         ])->getHits();
@@ -709,7 +709,7 @@ class SearchService
                   ->orWhere('last_name', 'LIKE', $like)
                   ->orWhere('organization_name', 'LIKE', $like);
             })
-            ->where('status', '!=', 'banned')
+            ->whereNotIn('status', ['banned', 'suspended'])
             ->select('id', 'first_name', 'last_name', 'avatar_url', 'organization_name', 'profile_type')
             ->limit($limit)
             ->get()
@@ -784,7 +784,7 @@ class SearchService
                   ->orWhere('organization_name', 'LIKE', $like)
                   ->orWhereRaw("CONCAT(first_name, ' ', last_name) LIKE ?", [$like]);
             })
-            ->where('status', '!=', 'banned')
+            ->whereNotIn('status', ['banned', 'suspended'])
             ->limit($limit)
             ->pluck('id')
             ->all();

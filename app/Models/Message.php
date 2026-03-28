@@ -104,17 +104,22 @@ class Message extends Model
             return [];
         }
 
+        $tenantId = TenantContext::getId();
+
+        // message_reactions has no tenant_id column — scope via JOIN to messages table
         $results = DB::table('message_reactions')
+            ->join('messages', 'message_reactions.message_id', '=', 'messages.id')
             ->select([
-                'message_id',
-                'emoji',
+                'message_reactions.message_id',
+                'message_reactions.emoji',
                 DB::raw('COUNT(*) as count'),
-                DB::raw('GROUP_CONCAT(user_id) as user_ids'),
+                DB::raw('GROUP_CONCAT(message_reactions.user_id) as user_ids'),
             ])
-            ->whereIn('message_id', $messageIds)
-            ->groupBy('message_id', 'emoji')
-            ->orderBy('message_id')
-            ->orderByRaw('MIN(created_at)')
+            ->where('messages.tenant_id', $tenantId)
+            ->whereIn('message_reactions.message_id', $messageIds)
+            ->groupBy('message_reactions.message_id', 'message_reactions.emoji')
+            ->orderBy('message_reactions.message_id')
+            ->orderByRaw('MIN(message_reactions.created_at)')
             ->get();
 
         $grouped = [];
@@ -140,7 +145,21 @@ class Message extends Model
     public static function sendEmailNotification(int $recipientId, string $senderName, string $preview, int $senderId): void
     {
         try {
+            $tenantId = TenantContext::getId();
+
+            // Verify recipient belongs to the current tenant first
+            $receiver = DB::table('users')
+                ->where('id', $recipientId)
+                ->where('tenant_id', $tenantId)
+                ->select('email', 'first_name')
+                ->first();
+
+            if (!$receiver || empty($receiver->email)) {
+                return;
+            }
+
             // Get receiver's email notification preferences
+            // notification_settings has no tenant_id — scoped indirectly via tenant-verified user_id
             $pref = DB::table('notification_settings')
                 ->where('user_id', $recipientId)
                 ->where('context_type', 'global')
@@ -153,20 +172,14 @@ class Message extends Model
                 return;
             }
 
-            $receiver = DB::table('users')
-                ->where('id', $recipientId)
-                ->select('email', 'first_name')
-                ->first();
+            // Escape user-provided content to prevent XSS in email HTML
+            $safeSenderName = htmlspecialchars($senderName, ENT_QUOTES, 'UTF-8');
+            $safePreview = htmlspecialchars($preview, ENT_QUOTES, 'UTF-8');
+            $content = "{$safeSenderName} sent you a message: {$safePreview}";
 
-            if (!$receiver || empty($receiver->email)) {
-                return;
-            }
-
-            $content = "{$senderName} sent you a message: {$preview}";
-
-            $receiverName = $receiver->first_name ?? 'there';
+            $receiverName = htmlspecialchars($receiver->first_name ?? 'there', ENT_QUOTES, 'UTF-8');
             $tenant = TenantContext::get();
-            $tenantName = $tenant['name'] ?? 'Project NEXUS';
+            $tenantName = htmlspecialchars($tenant['name'] ?? 'Project NEXUS', ENT_QUOTES, 'UTF-8');
             $baseUrl = TenantContext::getFrontendUrl();
             $slugPrefix = TenantContext::getSlugPrefix();
             $link = "{$slugPrefix}/messages/{$senderId}";
@@ -175,12 +188,12 @@ class Message extends Model
 <div style="font-family: system-ui, -apple-system, sans-serif; max-width: 600px; margin: 0 auto;">
     <div style="background: linear-gradient(135deg, #6366f1, #8b5cf6); padding: 24px; border-radius: 16px 16px 0 0; text-align: center;">
         <h1 style="color: white; margin: 0; font-size: 24px;">New Message</h1>
-        <p style="color: rgba(255,255,255,0.9); margin: 8px 0 0;">You have a new message from {$senderName}</p>
+        <p style="color: rgba(255,255,255,0.9); margin: 8px 0 0;">You have a new message from {$safeSenderName}</p>
     </div>
     <div style="background: #f8fafc; padding: 24px; border-radius: 0 0 16px 16px; border: 1px solid #e2e8f0; border-top: none;">
         <p style="color: #64748b; margin: 0 0 8px;">Hi {$receiverName},</p>
         <div style="background: white; border: 1px solid #e2e8f0; border-radius: 12px; padding: 16px; margin: 16px 0;">
-            <p style="color: #1e293b; margin: 0; font-style: italic;">"{$preview}"</p>
+            <p style="color: #1e293b; margin: 0; font-style: italic;">"{$safePreview}"</p>
         </div>
         <div style="text-align: center; margin-top: 24px;">
             <a href="{$baseUrl}{$link}" style="display: inline-block; background: linear-gradient(135deg, #6366f1, #8b5cf6); color: white; padding: 12px 32px; border-radius: 8px; text-decoration: none; font-weight: 600;">
@@ -197,7 +210,7 @@ HTML;
 
             if ($frequency === 'instant') {
                 $mailer = new \App\Core\Mailer();
-                $mailer->send($receiver->email, "New Message from {$senderName}", $htmlBody);
+                $mailer->send($receiver->email, "New Message from {$safeSenderName}", $htmlBody);
             } else {
                 // Queue for daily digest
                 DB::table('notification_queue')->insert([
