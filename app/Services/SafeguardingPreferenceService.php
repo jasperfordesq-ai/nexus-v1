@@ -112,8 +112,8 @@ class SafeguardingPreferenceService
 
         $option->update($updates);
 
-        // Invalidate trigger cache for affected users when option activation changes
-        if (array_key_exists('is_active', $updates)) {
+        // Re-evaluate triggers for affected users when option activation or triggers change
+        if (array_key_exists('is_active', $updates) || array_key_exists('triggers', $updates)) {
             $affectedUserIds = \App\Models\UserSafeguardingPreference::where('option_id', $optionId)
                 ->whereNull('revoked_at')
                 ->distinct()
@@ -121,7 +121,9 @@ class SafeguardingPreferenceService
 
             $tenantId = TenantContext::getId();
             foreach ($affectedUserIds as $userId) {
-                \Illuminate\Support\Facades\Cache::forget("safeguarding_triggers:{$tenantId}:{$userId}");
+                // Full re-evaluation: invalidates cache, re-merges triggers, updates
+                // user_messaging_restrictions, and re-dispatches notifications if needed
+                SafeguardingTriggerService::activateTriggersForUser((int) $userId, $tenantId);
             }
         }
 
@@ -147,7 +149,8 @@ class SafeguardingPreferenceService
 
         $option->update(['is_active' => false]);
 
-        // Invalidate trigger cache for affected users
+        // Re-evaluate triggers for affected users — deactivating an option may
+        // remove monitoring/broker-approval requirements if it was the only trigger
         $affectedUserIds = \App\Models\UserSafeguardingPreference::where('option_id', $optionId)
             ->whereNull('revoked_at')
             ->distinct()
@@ -155,7 +158,7 @@ class SafeguardingPreferenceService
 
         $tenantId = TenantContext::getId();
         foreach ($affectedUserIds as $userId) {
-            \Illuminate\Support\Facades\Cache::forget("safeguarding_triggers:{$tenantId}:{$userId}");
+            SafeguardingTriggerService::activateTriggersForUser((int) $userId, $tenantId);
         }
 
         self::logActivity(null, 'safeguarding_option_deleted', 'safeguarding_option', $optionId, [

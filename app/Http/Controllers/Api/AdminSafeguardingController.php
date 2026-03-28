@@ -286,14 +286,20 @@ class AdminSafeguardingController extends BaseApiController
         $notes = $request->input('notes', '');
 
         try {
+            $updateData = [
+                'reviewed_by' => $adminId,
+                'reviewed_at' => now(),
+            ];
+            if (!empty($notes)) {
+                $updateData['action_notes'] = $notes;
+                $updateData['action_taken'] = 'reviewed';
+            }
+
             $affected = DB::table('broker_message_copies')
                 ->where('id', $id)
                 ->where('tenant_id', $tenantId)
                 ->whereNull('reviewed_at')
-                ->update([
-                    'reviewed_by' => $adminId,
-                    'reviewed_at' => now(),
-                ]);
+                ->update($updateData);
 
             if ($affected === 0) {
                 return $this->respondWithError(
