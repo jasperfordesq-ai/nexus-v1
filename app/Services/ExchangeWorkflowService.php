@@ -141,7 +141,12 @@ class ExchangeWorkflowService
             return false;
         }
 
-        $needsBroker = self::needsBrokerApproval($exchange->listing_id, (float) $exchange->proposed_hours);
+        $needsBroker = self::needsBrokerApproval(
+            $exchange->listing_id,
+            (float) $exchange->proposed_hours,
+            (int) $exchange->requester_id,
+            (int) $exchange->provider_id
+        );
         $newStatus = $needsBroker ? self::STATUS_PENDING_BROKER : self::STATUS_ACCEPTED;
 
         return self::updateStatus($exchangeId, $newStatus, $providerId, 'provider', 'Provider accepted request');
@@ -778,9 +783,38 @@ class ExchangeWorkflowService
 
     /**
      * Check if an exchange needs broker approval (static).
+     *
+     * Checks TWO layers:
+     * 1. User-level safeguarding: either party has requires_broker_approval in user_messaging_restrictions
+     *    (set when a vulnerable person ticks safeguarding checkboxes during onboarding)
+     * 2. Listing-level risk: listing risk tags, hours threshold, or global broker approval config
      */
-    private static function needsBrokerApproval(int $listingId, float $proposedHours): bool
+    private static function needsBrokerApproval(int $listingId, float $proposedHours, ?int $requesterId = null, ?int $providerId = null): bool
     {
+        $tenantId = TenantContext::getId();
+
+        // LAYER 1: User-level safeguarding flags (always checked, even if exchange workflow is "off")
+        // A vulnerable person's exchanges MUST go through broker regardless of tenant config
+        try {
+            $userIds = array_filter([$requesterId, $providerId]);
+            if (!empty($userIds)) {
+                $placeholders = implode(',', array_fill(0, count($userIds), '?'));
+                $hasSafeguardingFlag = DB::selectOne(
+                    "SELECT COUNT(*) as cnt FROM user_messaging_restrictions
+                     WHERE tenant_id = ? AND user_id IN ({$placeholders})
+                     AND requires_broker_approval = 1
+                     AND (monitoring_expires_at IS NULL OR monitoring_expires_at > NOW())",
+                    array_merge([$tenantId], $userIds)
+                );
+                if ($hasSafeguardingFlag && (int) $hasSafeguardingFlag->cnt > 0) {
+                    return true;
+                }
+            }
+        } catch (\Exception $e) {
+            // Table may not exist — fail open for this check only
+        }
+
+        // LAYER 2: Listing-level and tenant-level config checks
         try {
             $configService = app(BrokerControlConfigService::class);
             if (!$configService->isExchangeWorkflowEnabled()) {
@@ -794,8 +828,6 @@ class ExchangeWorkflowService
             }
 
             if (!empty($config['auto_approve_low_risk'])) {
-                $tenantId = TenantContext::getId();
-
                 $isHighRisk = DB::table('listing_risk_tags')
                     ->where('listing_id', $listingId)
                     ->where('tenant_id', $tenantId)

@@ -427,6 +427,7 @@ class SafeguardingPreferenceService
     ): void {
         try {
             DB::table('activity_log')->insert([
+                'tenant_id' => TenantContext::getId(),
                 'user_id' => $userId,
                 'action' => $action,
                 'action_type' => 'safeguarding',

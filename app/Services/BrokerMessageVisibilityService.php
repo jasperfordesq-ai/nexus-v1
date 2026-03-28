@@ -51,7 +51,8 @@ class BrokerMessageVisibilityService
             return null;
         }
 
-        if ($this->isUserUnderMonitoring($senderId)) {
+        // Check BOTH sender and receiver — messages to/from vulnerable users must be monitored
+        if ($this->isUserUnderMonitoring($senderId) || $this->isUserUnderMonitoring($receiverId)) {
             return self::REASON_FLAGGED_USER;
         }
 

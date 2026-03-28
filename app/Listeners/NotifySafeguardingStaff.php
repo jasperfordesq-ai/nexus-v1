@@ -34,6 +34,10 @@ class NotifySafeguardingStaff implements ShouldQueue
             $tenantId = $event->tenantId;
             $flaggedUserId = $event->userId;
 
+            // Set tenant context for queued job — required for HasTenantScope
+            // and any service that reads TenantContext::getId()
+            \App\Core\TenantContext::setById($tenantId);
+
             // Load the flagged member's name
             $flaggedUser = User::find($flaggedUserId);
             $memberName = $flaggedUser
@@ -52,10 +56,10 @@ class NotifySafeguardingStaff implements ShouldQueue
                 ? implode(', ', $optionLabels)
                 : 'safeguarding support options';
 
-            // Find all admin and broker users for this tenant
+            // Find all admin, tenant_admin, broker, and super_admin users for this tenant
             $staffUsers = DB::select(
                 "SELECT id, email, first_name, name, role FROM users
-                 WHERE tenant_id = ? AND role IN ('admin', 'broker', 'super_admin') AND status = 'active'",
+                 WHERE tenant_id = ? AND role IN ('admin', 'tenant_admin', 'broker', 'super_admin') AND status = 'active'",
                 [$tenantId]
             );
 

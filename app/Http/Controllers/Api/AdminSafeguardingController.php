@@ -6,6 +6,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Core\TenantContext;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -13,8 +14,10 @@ use Illuminate\Support\Facades\DB;
 /**
  * AdminSafeguardingController -- Admin safeguarding module endpoints.
  *
- * Provides dashboard stats, flagged message management, and safeguarding
- * assignment CRUD for the admin safeguarding module.
+ * Provides dashboard stats, flagged message management, guardian assignment
+ * CRUD, and member safeguarding preference review for the admin panel.
+ *
+ * Frontend contract: react-frontend/src/admin/modules/safeguarding/SafeguardingDashboard.tsx
  */
 class AdminSafeguardingController extends BaseApiController
 {
@@ -23,56 +26,108 @@ class AdminSafeguardingController extends BaseApiController
     /**
      * GET /v2/admin/safeguarding/dashboard
      *
-     * Returns aggregate stats for the safeguarding dashboard.
+     * Returns aggregate stats matching the SafeguardingDashboard frontend:
+     * { active_assignments, unreviewed_flags, consented_wards, total_flags_this_month, critical_flags }
      */
     public function dashboard(): JsonResponse
     {
         $this->requireAdmin();
         $tenantId = $this->getTenantId();
 
+        $activeAssignments = 0;
+        $unreviewedFlags = 0;
+        $consentedWards = 0;
+        $totalFlagsThisMonth = 0;
+        $criticalFlags = 0;
+
+        // Active safeguarding assignments (not revoked, consent given)
         try {
-            $totalFlagged = DB::table('flagged_messages')
+            $activeAssignments = (int) DB::table('safeguarding_assignments')
                 ->where('tenant_id', $tenantId)
-                ->count();
-
-            $pendingReview = DB::table('flagged_messages')
-                ->where('tenant_id', $tenantId)
-                ->where('status', 'pending')
-                ->count();
-
-            $activeAssignments = DB::table('safeguarding_assignments')
-                ->where('tenant_id', $tenantId)
-                ->where('status', 'active')
-                ->count();
-
-            $resolved = DB::table('flagged_messages')
-                ->where('tenant_id', $tenantId)
-                ->where('status', 'resolved')
+                ->whereNull('revoked_at')
                 ->count();
         } catch (\Illuminate\Database\QueryException $e) {
-            if ($this->isTableNotFound($e)) {
-                return $this->respondWithData([
-                    'total_flagged' => 0,
-                    'pending_review' => 0,
-                    'active_assignments' => 0,
-                    'resolved' => 0,
-                ]);
+            if (!$this->isTableNotFound($e)) {
+                throw $e;
             }
-            throw $e;
+        }
+
+        // Unreviewed broker message copies (pending review)
+        try {
+            $unreviewedFlags = (int) DB::table('broker_message_copies')
+                ->where('tenant_id', $tenantId)
+                ->whereNull('reviewed_at')
+                ->count();
+        } catch (\Illuminate\Database\QueryException $e) {
+            if (!$this->isTableNotFound($e)) {
+                throw $e;
+            }
+        }
+
+        // Consented wards (assignments where the ward has given consent)
+        try {
+            $consentedWards = (int) DB::table('safeguarding_assignments')
+                ->where('tenant_id', $tenantId)
+                ->whereNull('revoked_at')
+                ->whereNotNull('consent_given_at')
+                ->count();
+        } catch (\Illuminate\Database\QueryException $e) {
+            if (!$this->isTableNotFound($e)) {
+                throw $e;
+            }
+        }
+
+        // Total flags this month (broker message copies created this month)
+        try {
+            $totalFlagsThisMonth = (int) DB::table('broker_message_copies')
+                ->where('tenant_id', $tenantId)
+                ->where('created_at', '>=', now()->startOfMonth())
+                ->count();
+        } catch (\Illuminate\Database\QueryException $e) {
+            if (!$this->isTableNotFound($e)) {
+                throw $e;
+            }
+        }
+
+        // Critical: flagged copies + unreviewed safeguarding incidents
+        try {
+            $criticalFlags = (int) DB::table('broker_message_copies')
+                ->where('tenant_id', $tenantId)
+                ->where('flagged', true)
+                ->whereNull('reviewed_at')
+                ->count();
+        } catch (\Illuminate\Database\QueryException $e) {
+            if (!$this->isTableNotFound($e)) {
+                throw $e;
+            }
+        }
+
+        // Also count unreviewed safeguarding incidents as critical
+        try {
+            $criticalFlags += (int) DB::table('vol_safeguarding_incidents')
+                ->where('tenant_id', $tenantId)
+                ->whereIn('severity', ['high', 'critical'])
+                ->where('status', 'open')
+                ->count();
+        } catch (\Illuminate\Database\QueryException $e) {
+            // Table may not exist yet
         }
 
         return $this->respondWithData([
-            'total_flagged' => $totalFlagged,
-            'pending_review' => $pendingReview,
             'active_assignments' => $activeAssignments,
-            'resolved' => $resolved,
+            'unreviewed_flags' => $unreviewedFlags,
+            'consented_wards' => $consentedWards,
+            'total_flags_this_month' => $totalFlagsThisMonth,
+            'critical_flags' => $criticalFlags,
         ]);
     }
 
     /**
      * GET /v2/admin/safeguarding/flagged-messages
      *
-     * Returns list of flagged messages with user info.
+     * Returns broker message copies as flagged messages in the shape the frontend expects:
+     * { id, message_content, sender: { id, name, avatar_url }, recipient: { id, name, avatar_url },
+     *   severity, flag_reason, is_reviewed, reviewed_by, review_notes, reviewed_at, created_at }
      */
     public function flaggedMessages(): JsonResponse
     {
@@ -80,42 +135,80 @@ class AdminSafeguardingController extends BaseApiController
         $tenantId = $this->getTenantId();
 
         try {
-            $messages = DB::table('flagged_messages as fm')
-                ->join('users as u', 'fm.user_id', '=', 'u.id')
-                ->where('fm.tenant_id', $tenantId)
+            $copies = DB::table('broker_message_copies as bmc')
+                ->leftJoin('users as sender', 'bmc.sender_id', '=', 'sender.id')
+                ->leftJoin('users as receiver', 'bmc.receiver_id', '=', 'receiver.id')
+                ->leftJoin('users as reviewer', 'bmc.reviewed_by', '=', 'reviewer.id')
+                ->where('bmc.tenant_id', $tenantId)
                 ->select([
-                    'fm.id',
-                    'fm.user_id',
-                    'u.first_name',
-                    'u.last_name',
-                    'u.email',
-                    'fm.message_id',
-                    'fm.reason',
-                    'fm.status',
-                    'fm.review_notes',
-                    'fm.reviewed_by',
-                    'fm.reviewed_at',
-                    'fm.created_at',
-                    'fm.updated_at',
+                    'bmc.id',
+                    'bmc.original_message_id as message_id',
+                    'bmc.message_body as message_content',
+                    'bmc.sender_id',
+                    DB::raw("COALESCE(sender.name, CONCAT(COALESCE(sender.first_name, ''), ' ', COALESCE(sender.last_name, ''))) as sender_name"),
+                    'sender.avatar_url as sender_avatar',
+                    'bmc.receiver_id',
+                    DB::raw("COALESCE(receiver.name, CONCAT(COALESCE(receiver.first_name, ''), ' ', COALESCE(receiver.last_name, ''))) as receiver_name"),
+                    'receiver.avatar_url as receiver_avatar',
+                    'bmc.copy_reason',
+                    'bmc.flagged',
+                    'bmc.reviewed_by as reviewed_by_id',
+                    DB::raw("COALESCE(reviewer.name, CONCAT(COALESCE(reviewer.first_name, ''), ' ', COALESCE(reviewer.last_name, ''))) as reviewed_by_name"),
+                    'bmc.reviewed_at',
+                    'bmc.created_at',
                 ])
-                ->orderByDesc('fm.created_at')
+                ->orderByDesc('bmc.flagged')
+                ->orderByDesc('bmc.created_at')
+                ->limit(200)
                 ->get()
-                ->map(fn ($row) => (array) $row)
+                ->map(function ($row) {
+                    $severity = 'low';
+                    if ($row->flagged) {
+                        $severity = 'high';
+                    } elseif ($row->copy_reason === 'flagged_user') {
+                        $severity = 'medium';
+                    }
+
+                    return [
+                        'id' => (int) $row->id,
+                        'message_id' => (int) $row->message_id,
+                        'message_content' => $row->message_content ?? '',
+                        'sender' => [
+                            'id' => (int) $row->sender_id,
+                            'name' => trim($row->sender_name ?? ''),
+                            'avatar_url' => $row->sender_avatar,
+                        ],
+                        'recipient' => [
+                            'id' => (int) $row->receiver_id,
+                            'name' => trim($row->receiver_name ?? ''),
+                            'avatar_url' => $row->receiver_avatar,
+                        ],
+                        'severity' => $severity,
+                        'flag_reason' => $row->copy_reason ?? 'unknown',
+                        'is_reviewed' => $row->reviewed_at !== null,
+                        'reviewed_by' => $row->reviewed_by_name ? trim($row->reviewed_by_name) : null,
+                        'review_notes' => null,
+                        'reviewed_at' => $row->reviewed_at,
+                        'created_at' => $row->created_at,
+                    ];
+                })
                 ->toArray();
+
+            return $this->respondWithData($copies);
         } catch (\Illuminate\Database\QueryException $e) {
             if ($this->isTableNotFound($e)) {
-                return $this->respondWithCollection([]);
+                return $this->respondWithData([]);
             }
             throw $e;
         }
-
-        return $this->respondWithCollection($messages);
     }
 
     /**
      * GET /v2/admin/safeguarding/assignments
      *
-     * Returns list of safeguarding assignments with user info.
+     * Returns guardian assignments in the shape the frontend expects:
+     * { id, ward: { id, name, avatar_url }, guardian: { id, name, avatar_url },
+     *   status, consent_given, created_at, expires_at }
      */
     public function assignments(): JsonResponse
     {
@@ -124,77 +217,107 @@ class AdminSafeguardingController extends BaseApiController
 
         try {
             $assignments = DB::table('safeguarding_assignments as sa')
-                ->join('users as u', 'sa.ward_user_id', '=', 'u.id')
+                ->join('users as ward', 'sa.ward_user_id', '=', 'ward.id')
+                ->join('users as guardian', 'sa.guardian_user_id', '=', 'guardian.id')
                 ->where('sa.tenant_id', $tenantId)
                 ->select([
                     'sa.id',
-                    'sa.ward_user_id as user_id',
-                    'u.first_name',
-                    'u.last_name',
-                    'u.email',
-                    'sa.guardian_user_id as assignee_id',
-                    DB::raw("'safeguarding' as type"),
-                    DB::raw("CASE WHEN sa.revoked_at IS NOT NULL THEN 'revoked' WHEN sa.consent_given_at IS NOT NULL THEN 'active' ELSE 'pending' END as status"),
+                    'sa.ward_user_id',
+                    DB::raw("COALESCE(ward.name, CONCAT(COALESCE(ward.first_name, ''), ' ', COALESCE(ward.last_name, ''))) as ward_name"),
+                    'ward.avatar_url as ward_avatar',
+                    'sa.guardian_user_id',
+                    DB::raw("COALESCE(guardian.name, CONCAT(COALESCE(guardian.first_name, ''), ' ', COALESCE(guardian.last_name, ''))) as guardian_name"),
+                    'guardian.avatar_url as guardian_avatar',
+                    'sa.consent_given_at',
+                    'sa.revoked_at',
+                    'sa.assigned_at',
                     'sa.notes',
-                    'sa.assigned_at as created_at',
-                    'sa.assigned_at as updated_at',
                 ])
                 ->orderByDesc('sa.assigned_at')
                 ->get()
-                ->map(fn ($row) => (array) $row)
+                ->map(function ($row) {
+                    $status = 'pending';
+                    if ($row->revoked_at !== null) {
+                        $status = 'revoked';
+                    } elseif ($row->consent_given_at !== null) {
+                        $status = 'active';
+                    }
+
+                    return [
+                        'id' => (int) $row->id,
+                        'ward' => [
+                            'id' => (int) $row->ward_user_id,
+                            'name' => trim($row->ward_name ?? ''),
+                            'avatar_url' => $row->ward_avatar,
+                        ],
+                        'guardian' => [
+                            'id' => (int) $row->guardian_user_id,
+                            'name' => trim($row->guardian_name ?? ''),
+                            'avatar_url' => $row->guardian_avatar,
+                        ],
+                        'status' => $status,
+                        'consent_given' => $row->consent_given_at !== null,
+                        'created_at' => $row->assigned_at,
+                        'expires_at' => null,
+                    ];
+                })
                 ->toArray();
+
+            return $this->respondWithData($assignments);
         } catch (\Illuminate\Database\QueryException $e) {
             if ($this->isTableNotFound($e) || str_contains($e->getMessage(), 'Column not found')) {
-                return $this->respondWithCollection([]);
+                return $this->respondWithData([]);
             }
             throw $e;
         }
-
-        return $this->respondWithCollection($assignments);
     }
 
     /**
      * POST /v2/admin/safeguarding/flagged-messages/{id}/review
      *
-     * Reviews a flagged message by updating its status and adding review notes.
+     * Reviews a flagged message (broker_message_copies). Frontend sends { notes }.
+     * Marks the copy as reviewed by the current admin.
      */
     public function reviewMessage(Request $request, int $id): JsonResponse
     {
         $adminId = $this->requireAdmin();
         $tenantId = $this->getTenantId();
 
-        $validated = $request->validate([
-            'action' => 'required|in:pending,approved,rejected,resolved',
-            'notes' => 'nullable|string|max:2000',
-        ]);
+        $notes = $request->input('notes', '');
 
         try {
-            $affected = DB::table('flagged_messages')
+            $affected = DB::table('broker_message_copies')
                 ->where('id', $id)
                 ->where('tenant_id', $tenantId)
+                ->whereNull('reviewed_at')
                 ->update([
-                    'status' => $validated['action'],
                     'reviewed_by' => $adminId,
-                    'review_notes' => $validated['notes'] ?? null,
                     'reviewed_at' => now(),
-                    'updated_at' => now(),
                 ]);
 
             if ($affected === 0) {
                 return $this->respondWithError(
                     'NOT_FOUND',
-                    'Flagged message not found.',
+                    'Message not found or already reviewed.',
                     null,
                     404
                 );
             }
 
-            $message = DB::table('flagged_messages')
-                ->where('id', $id)
-                ->where('tenant_id', $tenantId)
-                ->first();
+            // Audit log the review
+            DB::table('activity_log')->insert([
+                'tenant_id' => $tenantId,
+                'user_id' => $adminId,
+                'action' => 'safeguarding_message_reviewed',
+                'action_type' => 'safeguarding',
+                'entity_type' => 'broker_message_copy',
+                'entity_id' => $id,
+                'details' => json_encode(['notes' => $notes]),
+                'ip_address' => request()?->ip(),
+                'created_at' => now(),
+            ]);
 
-            return $this->respondWithData((array) $message);
+            return $this->respondWithData(['reviewed' => true]);
         } catch (\Illuminate\Database\QueryException $e) {
             if ($this->isTableNotFound($e)) {
                 return $this->respondWithError(
@@ -211,50 +334,113 @@ class AdminSafeguardingController extends BaseApiController
     /**
      * POST /v2/admin/safeguarding/assignments
      *
-     * Creates a new safeguarding assignment.
+     * Creates a new safeguarding (guardian/ward) assignment.
+     * Accepts either user IDs or email addresses:
+     *   { user_id, assignee_id } OR { ward_email, guardian_email }
      */
     public function createAssignment(Request $request): JsonResponse
     {
-        $this->requireAdmin();
+        $adminId = $this->requireAdmin();
         $tenantId = $this->getTenantId();
 
-        $validated = $request->validate([
-            'user_id' => 'required|integer',
-            'assignee_id' => 'required|integer',
-            'type' => 'required|string|max:100',
-            'notes' => 'nullable|string|max:2000',
-        ]);
+        $wardId = null;
+        $guardianId = null;
 
-        // Validate both users belong to current tenant
-        $userExists = \App\Models\User::where('id', $validated['user_id'])
-            ->where('tenant_id', $tenantId)
-            ->exists();
-        $assigneeExists = \App\Models\User::where('id', $validated['assignee_id'])
-            ->where('tenant_id', $tenantId)
-            ->exists();
+        // Support both ID-based and email-based input from the frontend
+        if ($request->has('ward_email') || $request->has('guardian_email')) {
+            $wardEmail = trim($request->input('ward_email', ''));
+            $guardianEmail = trim($request->input('guardian_email', ''));
 
-        if (!$userExists) {
-            return $this->respondWithError('INVALID_USER', 'User not found in this tenant', 'user_id', 404);
+            if (empty($wardEmail) || empty($guardianEmail)) {
+                return $this->respondWithError('VALIDATION_ERROR', 'Both ward and guardian emails are required', null, 422);
+            }
+
+            $ward = \App\Models\User::where('email', $wardEmail)
+                ->where('tenant_id', $tenantId)
+                ->where('status', 'active')
+                ->first();
+            $guardian = \App\Models\User::where('email', $guardianEmail)
+                ->where('tenant_id', $tenantId)
+                ->where('status', 'active')
+                ->first();
+
+            if (!$ward) {
+                return $this->respondWithError('INVALID_USER', "No active member found with email: {$wardEmail}", 'ward_email', 404);
+            }
+            if (!$guardian) {
+                return $this->respondWithError('INVALID_USER', "No active member found with email: {$guardianEmail}", 'guardian_email', 404);
+            }
+
+            $wardId = $ward->id;
+            $guardianId = $guardian->id;
+        } else {
+            $validated = $request->validate([
+                'user_id' => 'required|integer',
+                'assignee_id' => 'required|integer',
+            ]);
+
+            $wardId = $validated['user_id'];
+            $guardianId = $validated['assignee_id'];
+
+            // Validate both users belong to current tenant
+            if (!\App\Models\User::where('id', $wardId)->where('tenant_id', $tenantId)->exists()) {
+                return $this->respondWithError('INVALID_USER', 'Ward user not found in this tenant', 'user_id', 404);
+            }
+            if (!\App\Models\User::where('id', $guardianId)->where('tenant_id', $tenantId)->exists()) {
+                return $this->respondWithError('INVALID_USER', 'Guardian user not found in this tenant', 'assignee_id', 404);
+            }
         }
-        if (!$assigneeExists) {
-            return $this->respondWithError('INVALID_USER', 'Assignee not found in this tenant', 'assignee_id', 404);
+
+        if ($wardId === $guardianId) {
+            return $this->respondWithError('VALIDATION_ERROR', 'Ward and guardian cannot be the same person', null, 422);
         }
+
+        $notes = $request->input('notes', '');
 
         try {
             $id = DB::table('safeguarding_assignments')->insertGetId([
                 'tenant_id' => $tenantId,
-                'ward_user_id' => $validated['user_id'],
-                'guardian_user_id' => $validated['assignee_id'],
-                'assigned_by' => $this->requireAdmin(),
+                'ward_user_id' => $wardId,
+                'guardian_user_id' => $guardianId,
+                'assigned_by' => $adminId,
                 'assigned_at' => now(),
-                'notes' => $validated['notes'] ?? null,
+                'notes' => $notes ?: null,
             ]);
 
-            $assignment = DB::table('safeguarding_assignments')
-                ->where('id', $id)
-                ->first();
+            // Audit log
+            DB::table('activity_log')->insert([
+                'tenant_id' => $tenantId,
+                'user_id' => $adminId,
+                'action' => 'safeguarding_assignment_created',
+                'action_type' => 'safeguarding',
+                'entity_type' => 'safeguarding_assignment',
+                'entity_id' => $id,
+                'details' => json_encode([
+                    'ward_user_id' => $wardId,
+                    'guardian_user_id' => $guardianId,
+                ]),
+                'ip_address' => request()?->ip(),
+                'created_at' => now(),
+            ]);
 
-            return $this->respondWithData((array) $assignment);
+            // Notify the ward and guardian
+            try {
+                $wardUser = \App\Models\User::find($wardId);
+                $guardianUser = \App\Models\User::find($guardianId);
+
+                \App\Models\Notification::create([
+                    'tenant_id' => $tenantId,
+                    'user_id' => $guardianId,
+                    'type' => 'safeguarding_assignment',
+                    'message' => 'You have been assigned as a safeguarding guardian for ' . ($wardUser->name ?? 'a member'),
+                    'link' => '/admin/safeguarding',
+                    'is_read' => false,
+                ]);
+            } catch (\Throwable $e) {
+                \Illuminate\Support\Facades\Log::warning('Failed to notify guardian of assignment', ['error' => $e->getMessage()]);
+            }
+
+            return $this->respondWithData(['id' => $id, 'created' => true]);
         } catch (\Illuminate\Database\QueryException $e) {
             if ($this->isTableNotFound($e)) {
                 return $this->respondWithError(
@@ -271,29 +457,45 @@ class AdminSafeguardingController extends BaseApiController
     /**
      * DELETE /v2/admin/safeguarding/assignments/{id}
      *
-     * Deletes a safeguarding assignment.
+     * Soft-deletes (revokes) a safeguarding assignment to preserve the audit trail.
      */
     public function deleteAssignment(int $id): JsonResponse
     {
-        $this->requireAdmin();
+        $adminId = $this->requireAdmin();
         $tenantId = $this->getTenantId();
 
         try {
             $affected = DB::table('safeguarding_assignments')
                 ->where('id', $id)
                 ->where('tenant_id', $tenantId)
-                ->delete();
+                ->whereNull('revoked_at')
+                ->update([
+                    'revoked_at' => now(),
+                ]);
 
             if ($affected === 0) {
                 return $this->respondWithError(
                     'NOT_FOUND',
-                    'Assignment not found.',
+                    'Assignment not found or already revoked.',
                     null,
                     404
                 );
             }
 
-            return $this->respondWithData(['deleted' => true]);
+            // Audit log the revocation
+            DB::table('activity_log')->insert([
+                'tenant_id' => $tenantId,
+                'user_id' => $adminId,
+                'action' => 'safeguarding_assignment_revoked',
+                'action_type' => 'safeguarding',
+                'entity_type' => 'safeguarding_assignment',
+                'entity_id' => $id,
+                'details' => json_encode(['revoked_by_admin' => $adminId]),
+                'ip_address' => request()?->ip(),
+                'created_at' => now(),
+            ]);
+
+            return $this->respondWithData(['revoked' => true]);
         } catch (\Illuminate\Database\QueryException $e) {
             if ($this->isTableNotFound($e)) {
                 return $this->respondWithError(
@@ -321,7 +523,7 @@ class AdminSafeguardingController extends BaseApiController
     public function memberPreferences(): JsonResponse
     {
         $adminId = $this->requireAdmin();
-        $tenantId = \App\Core\TenantContext::getId();
+        $tenantId = TenantContext::getId();
 
         try {
             $rows = DB::select(
@@ -368,6 +570,7 @@ class AdminSafeguardingController extends BaseApiController
 
             // Audit log this access
             DB::table('activity_log')->insert([
+                'tenant_id' => $tenantId,
                 'user_id' => $adminId,
                 'action' => 'safeguarding_preferences_list_viewed',
                 'action_type' => 'safeguarding',

@@ -13,6 +13,7 @@ use App\Events\MessageSent;
 use App\Events\SafeguardingFlaggedEvent;
 use App\Events\TransactionCompleted;
 use App\Events\UserRegistered;
+use App\Listeners\CopyMessageForBrokerReview;
 use App\Listeners\NotifyConnectionRequest;
 use App\Listeners\NotifyJobAlertSubscribers;
 use App\Listeners\NotifyMessageReceived;
@@ -55,6 +56,7 @@ class EventServiceProvider extends ServiceProvider
 
         MessageSent::class => [
             NotifyMessageReceived::class,
+            CopyMessageForBrokerReview::class,
         ],
 
         JobVacancyCreated::class => [

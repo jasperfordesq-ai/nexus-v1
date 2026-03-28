@@ -24,6 +24,9 @@ import {
   CheckCheck,
   Trash2,
   Settings,
+  ShieldAlert,
+  Shield,
+  Eye,
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
@@ -296,6 +299,9 @@ function NotificationCard({ notification, onMarkRead, onDelete }: NotificationCa
     event: { icon: <Calendar className="w-5 h-5" />, color: 'rose' },
     group: { icon: <Users className="w-5 h-5" />, color: 'teal' },
     achievement: { icon: <Award className="w-5 h-5" />, color: 'orange' },
+    safeguarding_flag: { icon: <ShieldAlert className="w-5 h-5" />, color: 'red' },
+    safeguarding_assignment: { icon: <Shield className="w-5 h-5" />, color: 'blue' },
+    broker_review: { icon: <Eye className="w-5 h-5" />, color: 'amber' },
   };
 
   const { icon, color } = iconMap[notification.type] || { icon: <Bell className="w-5 h-5" />, color: 'gray' };
@@ -308,6 +314,8 @@ function NotificationCard({ notification, onMarkRead, onDelete }: NotificationCa
     rose: 'bg-rose-500/20 text-rose-600 dark:text-rose-400',
     teal: 'bg-teal-500/20 text-teal-600 dark:text-teal-400',
     orange: 'bg-orange-500/20 text-orange-600 dark:text-orange-400',
+    red: 'bg-red-500/20 text-red-600 dark:text-red-400',
+    blue: 'bg-blue-500/20 text-blue-600 dark:text-blue-400',
     gray: 'bg-theme-elevated text-theme-muted',
   };
 

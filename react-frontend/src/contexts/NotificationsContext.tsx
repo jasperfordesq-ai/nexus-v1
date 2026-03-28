@@ -434,6 +434,8 @@ function getToastConfig(type: string): { title: string } {
     group: { title: t('group', 'Group Notification') },
     achievement: { title: t('achievement', 'Achievement Unlocked!') },
     broker_review: { title: t('broker_review', 'Message for Review') },
+    safeguarding_flag: { title: t('safeguarding_flag', 'Safeguarding Alert') },
+    safeguarding_assignment: { title: t('safeguarding_assignment', 'Safeguarding Assignment') },
     system: { title: t('system', 'System Notification') },
     vol_application_received: { title: t('vol_application_received', 'New Application') },
     vol_application_approved: { title: t('vol_application_approved', 'Application Approved') },
