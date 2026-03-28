@@ -162,7 +162,7 @@ BODY
         <CardBody className="space-y-3">
           <p className="text-sm text-default-600">
             Exchange your API key for a short-lived JWT via the token endpoint. Include it as a Bearer token.
-            JWTs expire after <strong>24 hours</strong>.
+            JWTs expire after <strong>1 hour</strong>.
           </p>
           <CodeBlock>{`
 POST /api/v1/federation/oauth/token HTTP/1.1
@@ -178,7 +178,7 @@ grant_type=client_credentials&scope=members:read listings:read
 // Response:
 {
   "access_token": "eyJhbGciOiJIUzI1NiIs...",
-  "expires_in": 86400,
+  "expires_in": 3600,
   "token_type": "Bearer"
 }
           `}</CodeBlock>
@@ -249,7 +249,7 @@ const ENDPOINTS: EndpointDef[] = [
     ],
     response: `{
   "access_token": "eyJhbGciOiJIUzI1NiIs...",
-  "expires_in": 86400,
+  "expires_in": 3600,
   "token_type": "Bearer"
 }`,
   },
@@ -260,15 +260,14 @@ const ENDPOINTS: EndpointDef[] = [
     description: 'Returns API version info and a list of available endpoints. Useful as a health check.',
     response: `{
   "success": true,
-  "data": {
-    "api": "Federation API",
-    "version": "1.0",
-    "documentation": "/docs/api/federation",
-    "endpoints": {
-      "GET /api/v1/federation/timebanks": "List partner timebanks",
-      "GET /api/v1/federation/members": "Search federated members",
-      ...
-    }
+  "timestamp": "2026-03-28T12:00:00+00:00",
+  "api": "Federation API",
+  "version": "1.0",
+  "documentation": "/docs/api/federation",
+  "endpoints": {
+    "GET /api/v1/federation/timebanks": "List partner timebanks",
+    "GET /api/v1/federation/members": "Search federated members",
+    ...
   }
 }`,
   },
@@ -279,20 +278,19 @@ const ENDPOINTS: EndpointDef[] = [
     description: 'List all partner timebanks with active partnerships. Returns name, location, member count, and partnership status.',
     response: `{
   "success": true,
-  "data": {
-    "data": [
-      {
-        "id": 3,
-        "name": "Dublin Time Exchange",
-        "tagline": "Sharing time, building community",
-        "location": { "city": "Dublin", "country": "IE" },
-        "member_count": 142,
-        "partnership_status": "active",
-        "partnership_since": "2025-06-15 10:30:00"
-      }
-    ],
-    "count": 1
-  }
+  "timestamp": "2026-03-28T12:00:00+00:00",
+  "data": [
+    {
+      "id": 3,
+      "name": "Dublin Time Exchange",
+      "tagline": "Sharing time, building community",
+      "location": { "city": "Dublin", "country": "IE" },
+      "member_count": 142,
+      "partnership_status": "active",
+      "partnership_since": "2025-06-15 10:30:00"
+    }
+  ],
+  "count": 1
 }`,
   },
   {
@@ -337,22 +335,19 @@ const ENDPOINTS: EndpointDef[] = [
     ],
     response: `{
   "success": true,
-  "data": {
-    "data": {
-      "id": 45,
-      "username": "jane_doe",
-      "name": "Jane Doe",
-      "avatar": "https://...",
-      "bio": "Community organiser",
-      "skills": ["gardening", "tutoring"],
-      "location": "Cork",
-      "timebank": { "id": 3, "name": "Dublin Time Exchange" },
-      "service_reach": "regional",
-      "accepts_messages": true,
-      "accepts_transactions": true,
-      "joined": "2024-03-10 09:00:00"
-    }
-  }
+  "timestamp": "2026-03-28T12:00:00+00:00",
+  "id": 45,
+  "username": "jane_doe",
+  "name": "Jane Doe",
+  "avatar": "https://...",
+  "bio": "Community organiser",
+  "skills": ["gardening", "tutoring"],
+  "location": "Cork",
+  "timebank": { "id": 3, "name": "Dublin Time Exchange" },
+  "service_reach": "regional",
+  "accepts_messages": true,
+  "accepts_transactions": true,
+  "joined": "2024-03-10 09:00:00"
 }`,
   },
   {
@@ -364,7 +359,7 @@ const ENDPOINTS: EndpointDef[] = [
       { name: 'q', type: 'string', required: false, description: 'Search query (title, description)' },
       { name: 'type', type: 'string', required: false, description: '"offer" or "request"' },
       { name: 'timebank_id', type: 'integer', required: false, description: 'Filter by specific timebank ID' },
-      { name: 'category', type: 'string', required: false, description: 'Category filter (exact match)' },
+      { name: 'category', type: 'integer', required: false, description: 'Category ID (integer)' },
       { name: 'page', type: 'integer', required: false, description: 'Page number (default: 1)' },
       { name: 'per_page', type: 'integer', required: false, description: 'Results per page (default: 20, max: 100)' },
     ],
@@ -396,25 +391,22 @@ const ENDPOINTS: EndpointDef[] = [
     ],
     response: `{
   "success": true,
-  "data": {
-    "data": {
-      "id": 201,
-      "title": "Guitar Lessons",
-      "description": "30-minute beginner guitar sessions",
-      "type": "offer",
-      "category": "Music",
-      "rate": "1.0",
-      "owner": {
-        "id": 45,
-        "name": "Jane Doe",
-        "avatar": "https://...",
-        "location": "Cork"
-      },
-      "timebank": { "id": 3, "name": "Dublin Time Exchange" },
-      "created_at": "2025-08-20 14:30:00",
-      "updated_at": "2025-09-01 10:00:00"
-    }
-  }
+  "timestamp": "2026-03-28T12:00:00+00:00",
+  "id": 201,
+  "title": "Guitar Lessons",
+  "description": "30-minute beginner guitar sessions",
+  "type": "offer",
+  "category": "Music",
+  "rate": "1.0",
+  "owner": {
+    "id": 45,
+    "name": "Jane Doe",
+    "avatar": "https://...",
+    "location": "Cork"
+  },
+  "timebank": { "id": 3, "name": "Dublin Time Exchange" },
+  "created_at": "2025-08-20 14:30:00",
+  "updated_at": "2025-09-01 10:00:00"
 }`,
   },
   {
@@ -430,10 +422,9 @@ const ENDPOINTS: EndpointDef[] = [
     ],
     response: `{
   "success": true,
-  "data": {
-    "message_id": 1234,
-    "status": "sent"
-  }
+  "timestamp": "2026-03-28T12:00:00+00:00",
+  "message_id": 1234,
+  "status": "sent"
 }`,
   },
   {
@@ -449,12 +440,11 @@ const ENDPOINTS: EndpointDef[] = [
     ],
     response: `{
   "success": true,
-  "data": {
-    "transaction_id": 567,
-    "status": "completed",
-    "amount": 2,
-    "note": "Transaction completed successfully"
-  }
+  "timestamp": "2026-03-28T12:00:00+00:00",
+  "transaction_id": 567,
+  "status": "completed",
+  "amount": 2,
+  "note": "Transaction completed successfully"
 }`,
   },
   {
@@ -562,38 +552,41 @@ const ENDPOINTS: EndpointDef[] = [
     ],
     response: `{
   "success": true,
-  "data": {
-    "id": 567,
-    "amount": 1.5,
-    "status": "completed",
-    "description": "Guitar lesson - 1.5 hours",
-    "sender": {
-      "id": 12,
-      "name": "John Smith",
-      "tenant_id": 2,
-      "tenant_name": "Hour Timebank"
-    },
-    "receiver": {
-      "id": 45,
-      "name": "Jane Doe",
-      "tenant_id": 3,
-      "tenant_name": "Dublin Time Exchange"
-    },
-    "created_at": "2025-09-15 14:30:00"
-  }
+  "timestamp": "2026-03-28T12:00:00+00:00",
+  "id": 567,
+  "amount": 1.5,
+  "status": "completed",
+  "description": "Guitar lesson - 1.5 hours",
+  "sender": {
+    "id": 12,
+    "name": "John Smith",
+    "tenant_id": 2,
+    "tenant_name": "Hour Timebank"
+  },
+  "receiver": {
+    "id": 45,
+    "name": "Jane Doe",
+    "tenant_id": 3,
+    "tenant_name": "Dublin Time Exchange"
+  },
+  "created_at": "2025-09-15 14:30:00"
 }`,
   },
   {
     method: 'POST',
     path: '/api/v1/federation/webhooks/test',
-    permission: 'webhooks:write',
-    description: 'Send a test webhook delivery to verify your endpoint configuration. Returns the response code and time.',
+    permission: 'none',
+    description: 'Verify HMAC signature correctness for webhook payloads. Tests that your signing implementation produces valid signatures.',
     response: `{
   "success": true,
-  "data": {
-    "response_code": 200,
-    "response_time_ms": 145
-  }
+  "timestamp": "2026-03-28T12:00:00+00:00",
+  "valid": true,
+  "message": "Signature verified successfully",
+  "platform": {
+    "id": 1,
+    "name": "Partner Platform"
+  },
+  "timestamp_age_seconds": 2
 }`,
   },
 ];
@@ -802,7 +795,7 @@ const response = await fetch(
 );
 
 const data = await response.json();
-console.log(data.data.message_id); // 1234`,
+console.log(data.message_id); // 1234`,
     python: `# Send a federated message
 import requests
 
@@ -821,7 +814,7 @@ response = requests.post(
 )
 
 data = response.json()
-print(data['data']['message_id'])  # 1234`,
+print(data['message_id'])  # 1234`,
   },
 };
 

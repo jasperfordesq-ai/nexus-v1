@@ -31,7 +31,6 @@ const AVAILABLE_SCOPES = [
   { key: 'transactions:write', description: 'Create time credit transfers' },
   { key: 'reviews:read', description: 'Read cross-community reviews' },
   { key: 'reviews:write', description: 'Write cross-community reviews' },
-  { key: 'webhooks:write', description: 'Test webhook connectivity' },
 ];
 
 export function CreateApiKey() {

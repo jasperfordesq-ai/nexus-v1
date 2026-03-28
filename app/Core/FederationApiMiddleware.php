@@ -85,7 +85,7 @@ class FederationApiMiddleware
 
         // Verify partner is still active in DB (may have been revoked since token issuance)
         $dbPartner = DB::selectOne("
-            SELECT id, name, tenant_id, status, permissions FROM federation_api_keys
+            SELECT id, name, tenant_id, status, permissions, platform_id FROM federation_api_keys
             WHERE id = ? AND status = 'active'
             AND (expires_at IS NULL OR expires_at > NOW())
         ", [$partnerId]);
@@ -102,6 +102,7 @@ class FederationApiMiddleware
             'name' => $payload['aud'] ?? ($dbPartner->name ?? 'JWT Partner'),
             'permissions' => json_encode($payload['scopes'] ?? []),
             'status' => 'active',
+            'platform_id' => $dbPartner->platform_id ?? null,
             'auth_method' => 'jwt',
             'jwt_subject' => $payload['sub'],
             'jwt_issuer' => $payload['iss'] ?? null,
