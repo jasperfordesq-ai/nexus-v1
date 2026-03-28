@@ -274,7 +274,7 @@ class AdminMatchingController extends BaseApiController
             $this->smartMatchingEngine->clearCache();
             return $this->respondWithData(['message' => 'Match cache cleared successfully', 'entries_cleared' => $deleted]);
         } catch (\Exception $e) {
-            return $this->respondWithError('SERVER_ERROR', 'Failed to clear cache: ' . $e->getMessage(), null, 500);
+            return $this->respondWithError('SERVER_ERROR', 'Failed to clear cache', null, 500);
         }
     }
 
@@ -312,7 +312,7 @@ class AdminMatchingController extends BaseApiController
                 'rejected_count' => $rejectedCount, 'approval_rate' => $approvalRate,
             ]);
         } catch (\Throwable $e) {
-            return $this->respondWithError('SERVER_ERROR', 'Failed to load matching stats: ' . $e->getMessage(), null, 500);
+            return $this->respondWithError('SERVER_ERROR', 'Failed to load matching stats', null, 500);
         }
     }
 

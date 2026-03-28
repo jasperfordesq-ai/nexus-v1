@@ -8,6 +8,7 @@ namespace App\Http\Controllers\Api;
 
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use App\Services\UserService;
 use App\Services\Enterprise\GdprService;
 use App\Services\ListingService;
@@ -593,7 +594,8 @@ class UsersController extends BaseApiController
 
             return $this->respondWithData($result);
         } catch (\Exception $e) {
-            return $this->respondWithError('CONSENT_UPDATE_FAILED', $e->getMessage(), null, 400);
+            Log::error('Consent update failed', ['user' => $userId, 'slug' => $slug, 'error' => $e->getMessage()]);
+            return $this->respondWithError('CONSENT_UPDATE_FAILED', 'Failed to update consent preferences', null, 500);
         }
     }
 
@@ -637,9 +639,10 @@ class UsersController extends BaseApiController
                 'message'    => 'Your request has been submitted and will be processed within 30 days.',
             ], null, 201);
         } catch (\RuntimeException $e) {
-            return $this->respondWithError('DUPLICATE_REQUEST', $e->getMessage(), null, 409);
+            return $this->respondWithError('DUPLICATE_REQUEST', 'A similar request is already pending', null, 409);
         } catch (\Exception $e) {
-            return $this->respondWithError('REQUEST_FAILED', $e->getMessage(), null, 500);
+            Log::error('GDPR request creation failed', ['user' => $userId, 'type' => $type, 'error' => $e->getMessage()]);
+            return $this->respondWithError('REQUEST_FAILED', 'Failed to submit request. Please try again.', null, 500);
         }
     }
 
@@ -765,7 +768,8 @@ class UsersController extends BaseApiController
 
                 return $this->success(['push_enabled' => $pushEnabled]);
             } catch (\Exception $e) {
-                return $this->error($e->getMessage(), 500);
+                Log::error('Failed to update push notification setting', ['user' => $userId, 'error' => $e->getMessage()]);
+                return $this->error('Failed to update notification settings', 500);
             }
         }
 
@@ -823,7 +827,8 @@ class UsersController extends BaseApiController
 
             return $this->success(true);
         } catch (\Exception $e) {
-            return $this->error($e->getMessage(), 500);
+            Log::error('Failed to update notification settings', ['user' => $userId, 'error' => $e->getMessage()]);
+            return $this->error('Failed to update notification settings', 500);
         }
     }
 

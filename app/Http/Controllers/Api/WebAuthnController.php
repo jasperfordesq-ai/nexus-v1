@@ -155,7 +155,7 @@ class WebAuthnController extends BaseApiController
             );
         } catch (WebAuthnException $e) {
             error_log('[WebAuthn] Registration verification failed: ' . $e->getMessage());
-            return $this->respondWithError(ApiErrorCodes::AUTH_WEBAUTHN_FAILED, 'Passkey registration failed: ' . $e->getMessage(), null, 400);
+            return $this->respondWithError(ApiErrorCodes::AUTH_WEBAUTHN_FAILED, 'Passkey registration failed. Please try again.', null, 400);
         }
 
         // Store the credential
@@ -341,7 +341,7 @@ class WebAuthnController extends BaseApiController
             );
         } catch (WebAuthnException $e) {
             error_log('[WebAuthn] Authentication verification failed: ' . $e->getMessage());
-            return $this->respondWithError(ApiErrorCodes::AUTH_WEBAUTHN_FAILED, 'Passkey authentication failed: ' . $e->getMessage(), null, 401);
+            return $this->respondWithError(ApiErrorCodes::AUTH_WEBAUTHN_FAILED, 'Passkey authentication failed. Please try again.', null, 401);
         }
 
         // Update sign count

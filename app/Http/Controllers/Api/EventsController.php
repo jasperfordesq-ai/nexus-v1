@@ -553,7 +553,8 @@ class EventsController extends BaseApiController
         } catch (\RuntimeException $e) {
             return $this->respondWithError('INSUFFICIENT_BALANCE', $e->getMessage(), null, 422);
         } catch (\Exception $e) {
-            return $this->respondWithError('CHECKIN_ERROR', 'Failed to check in attendee: ' . $e->getMessage(), null, 500);
+            \Log::error('Event check-in failed', ['event' => $id, 'error' => $e->getMessage()]);
+            return $this->respondWithError('CHECKIN_ERROR', 'Failed to check in attendee', null, 500);
         }
     }
 
@@ -1025,7 +1026,8 @@ class EventsController extends BaseApiController
 
             return $this->respondWithData(['image_url' => $imageUrl]);
         } catch (\Exception $e) {
-            return $this->respondWithError('UPLOAD_FAILED', 'Failed to upload image: ' . $e->getMessage(), 'image', 400);
+            \Log::error('Event image upload failed', ['error' => $e->getMessage()]);
+            return $this->respondWithError('UPLOAD_FAILED', 'Failed to upload image', 'image', 500);
         }
     }
 }

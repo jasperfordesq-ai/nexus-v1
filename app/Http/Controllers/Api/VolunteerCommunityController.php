@@ -219,6 +219,36 @@ class VolunteerCommunityController extends BaseApiController
         return $this->noContent();
     }
 
+    public function adminPendingSwaps(): JsonResponse
+    {
+        $this->ensureFeature();
+        $this->requireAdmin();
+        $this->rateLimit('volunteering_admin_swaps', 60, 60);
+
+        $requests = $this->shiftSwapService->getAdminPendingSwaps();
+        return $this->respondWithData($requests);
+    }
+
+    public function adminDecideSwap($id): JsonResponse
+    {
+        $this->ensureFeature();
+        $adminId = $this->requireAdmin();
+        $this->rateLimit('volunteering_admin_swap_decide', 20, 60);
+
+        $action = $this->input('action');
+        if (!$action || !in_array($action, ['approve', 'reject'])) {
+            return $this->respondWithError('VALIDATION_ERROR', 'Action must be approve or reject', 'action', 400);
+        }
+
+        $success = $this->shiftSwapService->adminDecision((int) $id, $adminId, $action);
+        if (!$success) {
+            $errors = $this->shiftSwapService->getErrors();
+            return $this->respondWithErrors($errors, $this->getErrorStatus($errors));
+        }
+
+        return $this->respondWithData(['id' => (int) $id, 'status' => $action === 'approve' ? 'admin_approved' : 'admin_rejected']);
+    }
+
     // ========================================
     // GROUP RESERVATIONS
     // ========================================

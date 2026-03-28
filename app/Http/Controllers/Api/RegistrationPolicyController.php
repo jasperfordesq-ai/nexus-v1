@@ -305,7 +305,8 @@ class RegistrationPolicyController extends BaseApiController
             $result = $this->registrationOrchestrationService->initiateVerification($userId, $tenantId);
             return $this->respondWithData($result);
         } catch (\RuntimeException $e) {
-            return $this->respondWithError('SERVER_INTERNAL_ERROR', $e->getMessage(), null, 503);
+            \Illuminate\Support\Facades\Log::error('Verification initiation failed', ['user' => $userId, 'error' => $e->getMessage()]);
+            return $this->respondWithError('SERVER_INTERNAL_ERROR', 'Verification service is temporarily unavailable', null, 503);
         }
     }
 

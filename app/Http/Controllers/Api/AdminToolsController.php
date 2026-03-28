@@ -92,7 +92,7 @@ class AdminToolsController extends BaseApiController
                 'status_code' => $statusCode,
             ], null, 201);
         } catch (\Throwable $e) {
-            return $this->respondWithError('SERVER_ERROR', 'Failed to create redirect: ' . $e->getMessage(), null, 500);
+            return $this->respondWithError('SERVER_ERROR', 'Failed to create redirect', null, 500);
         }
     }
 
@@ -190,7 +190,7 @@ class AdminToolsController extends BaseApiController
             DB::selectOne("SELECT 1");
             $tests[] = ['name' => 'Database Connection', 'status' => 'pass', 'duration_ms' => round((microtime(true) - $start) * 1000)];
         } catch (\Throwable $e) {
-            $tests[] = ['name' => 'Database Connection', 'status' => 'fail', 'duration_ms' => round((microtime(true) - $start) * 1000), 'error' => $e->getMessage()];
+            $tests[] = ['name' => 'Database Connection', 'status' => 'fail', 'duration_ms' => round((microtime(true) - $start) * 1000), 'error' => 'Connection failed'];
         }
 
         // Redis
@@ -199,7 +199,7 @@ class AdminToolsController extends BaseApiController
             $stats = $this->redisCache->getStats();
             $tests[] = ['name' => 'Redis Connection', 'status' => ($stats['enabled'] ?? false) ? 'pass' : 'fail', 'duration_ms' => round((microtime(true) - $start) * 1000)];
         } catch (\Throwable $e) {
-            $tests[] = ['name' => 'Redis Connection', 'status' => 'fail', 'duration_ms' => round((microtime(true) - $start) * 1000), 'error' => $e->getMessage()];
+            $tests[] = ['name' => 'Redis Connection', 'status' => 'fail', 'duration_ms' => round((microtime(true) - $start) * 1000), 'error' => 'Connection failed'];
         }
 
         // Token Service
@@ -208,7 +208,7 @@ class AdminToolsController extends BaseApiController
             $testToken = $this->tokenService->generateToken(0, $tenantId);
             $tests[] = ['name' => 'API Auth (Token Service)', 'status' => !empty($testToken) ? 'pass' : 'fail', 'duration_ms' => round((microtime(true) - $start) * 1000)];
         } catch (\Throwable $e) {
-            $tests[] = ['name' => 'API Auth (Token Service)', 'status' => 'fail', 'duration_ms' => round((microtime(true) - $start) * 1000), 'error' => $e->getMessage()];
+            $tests[] = ['name' => 'API Auth (Token Service)', 'status' => 'fail', 'duration_ms' => round((microtime(true) - $start) * 1000), 'error' => 'Connection failed'];
         }
 
         // Tenant
@@ -217,7 +217,7 @@ class AdminToolsController extends BaseApiController
             $tenant = DB::selectOne("SELECT id, name FROM tenants WHERE id = ?", [$tenantId]);
             $tests[] = ['name' => 'Tenant Bootstrap', 'status' => $tenant ? 'pass' : 'fail', 'duration_ms' => round((microtime(true) - $start) * 1000)];
         } catch (\Throwable $e) {
-            $tests[] = ['name' => 'Tenant Bootstrap', 'status' => 'fail', 'duration_ms' => round((microtime(true) - $start) * 1000), 'error' => $e->getMessage()];
+            $tests[] = ['name' => 'Tenant Bootstrap', 'status' => 'fail', 'duration_ms' => round((microtime(true) - $start) * 1000), 'error' => 'Connection failed'];
         }
 
         $passCount = count(array_filter($tests, fn($t) => $t['status'] === 'pass'));

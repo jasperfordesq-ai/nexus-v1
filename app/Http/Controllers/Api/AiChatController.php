@@ -227,9 +227,10 @@ class AiChatController extends BaseApiController
                 'latency_ms' => $result['latency_ms'],
             ]);
         } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::warning('AI provider test failed', ['provider' => $providerId, 'error' => $e->getMessage()]);
             return $this->respondWithData([
                 'success' => false,
-                'message' => $e->getMessage(),
+                'message' => 'Connection test failed',
             ]);
         }
     }

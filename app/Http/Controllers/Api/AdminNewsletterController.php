@@ -172,7 +172,7 @@ class AdminNewsletterController extends BaseApiController
             $id = DB::getPdo()->lastInsertId();
             return $this->respondWithData(['id' => $id, 'name' => $name, 'status' => $status], null, 201);
         } catch (\Exception $e) {
-            return $this->respondWithError('CREATE_FAILED', 'Failed to create newsletter: ' . $e->getMessage());
+            return $this->respondWithError('CREATE_FAILED', 'Failed to create newsletter');
         }
     }
 
@@ -410,7 +410,7 @@ class AdminNewsletterController extends BaseApiController
                 'status' => 'active',
             ], null, 201);
         } catch (\Exception $e) {
-            return $this->respondWithError('CREATE_FAILED', 'Failed to add subscriber: ' . $e->getMessage());
+            return $this->respondWithError('CREATE_FAILED', 'Failed to add subscriber');
         }
     }
 
@@ -456,7 +456,7 @@ class AdminNewsletterController extends BaseApiController
                 'total_rows' => count($rows),
             ]);
         } catch (\Exception $e) {
-            return $this->respondWithError('IMPORT_FAILED', 'Failed to import subscribers: ' . $e->getMessage());
+            return $this->respondWithError('IMPORT_FAILED', 'Failed to import subscribers');
         }
     }
 
@@ -494,7 +494,7 @@ class AdminNewsletterController extends BaseApiController
                 'pending_approval' => $result['pending_approval'] ?? 0,
             ]);
         } catch (\Exception $e) {
-            return $this->respondWithError('SYNC_FAILED', 'Failed to sync members: ' . $e->getMessage());
+            return $this->respondWithError('SYNC_FAILED', 'Failed to sync members');
         }
     }
 
@@ -738,7 +738,7 @@ class AdminNewsletterController extends BaseApiController
                 'subscriber_count' => $subscriberCount,
             ], null, 201);
         } catch (\Exception $e) {
-            return $this->respondWithError('CREATE_FAILED', 'Failed to create segment: ' . $e->getMessage());
+            return $this->respondWithError('CREATE_FAILED', 'Failed to create segment');
         }
     }
 
@@ -823,7 +823,7 @@ class AdminNewsletterController extends BaseApiController
 
             return $this->respondWithData(['id' => $id, 'updated' => true]);
         } catch (\Exception $e) {
-            return $this->respondWithError('UPDATE_FAILED', 'Failed to update segment: ' . $e->getMessage());
+            return $this->respondWithError('UPDATE_FAILED', 'Failed to update segment');
         }
     }
 
@@ -1251,7 +1251,7 @@ class AdminNewsletterController extends BaseApiController
             $id = DB::getPdo()->lastInsertId();
             return $this->respondWithData(['id' => $id, 'name' => $name], null, 201);
         } catch (\Exception $e) {
-            return $this->respondWithError('CREATE_FAILED', 'Failed to create template: ' . $e->getMessage());
+            return $this->respondWithError('CREATE_FAILED', 'Failed to create template');
         }
     }
 
@@ -1364,7 +1364,7 @@ class AdminNewsletterController extends BaseApiController
             $newId = DB::getPdo()->lastInsertId();
             return $this->respondWithData(['id' => $newId, 'name' => $newName], null, 201);
         } catch (\Exception $e) {
-            return $this->respondWithError('DUPLICATE_FAILED', 'Failed to duplicate template: ' . $e->getMessage());
+            return $this->respondWithError('DUPLICATE_FAILED', 'Failed to duplicate template');
         }
     }
 
@@ -2219,7 +2219,7 @@ class AdminNewsletterController extends BaseApiController
                 'subject' => $subject,
             ]);
         } catch (\Exception $e) {
-            return $this->respondWithError('RESEND_FAILED', 'Failed to queue resend: ' . $e->getMessage());
+            return $this->respondWithError('RESEND_FAILED', 'Failed to queue resend');
         }
     }
 
@@ -2371,7 +2371,7 @@ class AdminNewsletterController extends BaseApiController
                 'message' => "Newsletter queued for {$queued} recipients",
             ]);
         } catch (\Exception $e) {
-            return $this->respondWithError('SEND_FAILED', $e->getMessage());
+            return $this->respondWithError('SEND_FAILED', 'Failed to send newsletter');
         }
     }
 
@@ -2435,7 +2435,7 @@ class AdminNewsletterController extends BaseApiController
                 return $this->respondWithError('SEND_FAILED', 'Failed to send test email. Check email configuration.');
             }
         } catch (\Exception $e) {
-            return $this->respondWithError('SEND_FAILED', 'Failed to send test email: ' . $e->getMessage());
+            return $this->respondWithError('SEND_FAILED', 'Failed to send test email');
         }
     }
 
@@ -2523,7 +2523,7 @@ class AdminNewsletterController extends BaseApiController
                 'message' => 'Newsletter duplicated successfully',
             ]);
         } catch (\Exception $e) {
-            return $this->respondWithError('DUPLICATE_FAILED', 'Failed to duplicate newsletter: ' . $e->getMessage());
+            return $this->respondWithError('DUPLICATE_FAILED', 'Failed to duplicate newsletter');
         }
     }
 

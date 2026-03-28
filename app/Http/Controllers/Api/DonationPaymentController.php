@@ -77,7 +77,7 @@ class DonationPaymentController extends BaseApiController
                 'tenant_id' => $tenantId,
                 'error' => $e->getMessage(),
             ]);
-            return $this->respondWithError('PAYMENT_ERROR', $e->getMessage(), null, 500);
+            return $this->respondWithError('PAYMENT_ERROR', 'Payment processing failed. Please try again.', null, 500);
         }
     }
 
@@ -126,7 +126,7 @@ class DonationPaymentController extends BaseApiController
                 'tenant_id' => $tenantId,
                 'error' => $e->getMessage(),
             ]);
-            return $this->respondWithError('REFUND_ERROR', $e->getMessage(), null, 400);
+            return $this->respondWithError('REFUND_ERROR', 'Refund processing failed. Please try again.', null, 500);
         }
     }
 }

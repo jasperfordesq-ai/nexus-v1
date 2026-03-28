@@ -231,9 +231,14 @@ export function usePaginatedApi<T>(
   });
 
   const mountedRef = useRef(true);
+  // Guard against concurrent loadMore calls (stale closure protection)
+  const loadingRef = useRef(false);
+  const currentPageRef = useRef(0);
+  const totalPagesRef = useRef(1);
 
   const fetchPage = useCallback(
     async (page: number, reset = false) => {
+      loadingRef.current = true;
       setState((prev) => ({ ...prev, isLoading: true, error: null }));
 
       const separator = endpoint.includes('?') ? '&' : '?';
@@ -247,10 +252,14 @@ export function usePaginatedApi<T>(
           // Pagination meta is in response.meta (preserved by api.ts)
           const items = Array.isArray(response.data) ? response.data : [];
           const meta = response.meta;
+          const newCurrentPage = meta?.current_page ?? meta?.total_pages ?? page;
+          const newTotalPages = meta?.total_pages ?? 1;
+          currentPageRef.current = newCurrentPage;
+          totalPagesRef.current = newTotalPages;
           setState((prev) => ({
             items: reset ? items : [...prev.items, ...items],
-            currentPage: meta?.current_page ?? meta?.total_pages ?? page,
-            totalPages: meta?.total_pages ?? 1,
+            currentPage: newCurrentPage,
+            totalPages: newTotalPages,
             total: meta?.total ?? items.length,
             isLoading: false,
             error: null,
@@ -263,21 +272,26 @@ export function usePaginatedApi<T>(
           }));
         }
       }
+      loadingRef.current = false;
     },
     [endpoint, pageSize]
   );
 
   const loadMore = useCallback(async () => {
-    if (state.currentPage < state.totalPages && !state.isLoading) {
-      await fetchPage(state.currentPage + 1);
+    // Use refs instead of state to avoid stale closures from rapid calls
+    if (currentPageRef.current < totalPagesRef.current && !loadingRef.current) {
+      await fetchPage(currentPageRef.current + 1);
     }
-  }, [state.currentPage, state.totalPages, state.isLoading, fetchPage]);
+  }, [fetchPage]);
 
   const refresh = useCallback(async () => {
     await fetchPage(1, true);
   }, [fetchPage]);
 
   const reset = useCallback(() => {
+    currentPageRef.current = 0;
+    totalPagesRef.current = 1;
+    loadingRef.current = false;
     setState({
       items: [],
       currentPage: 0,

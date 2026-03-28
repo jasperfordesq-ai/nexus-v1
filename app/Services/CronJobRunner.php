@@ -275,6 +275,11 @@ class CronJobRunner
                 continue;
             }
 
+            // Set tenant context so email links point to the correct frontend URL
+            if (!empty($user['tenant_id'])) {
+                TenantContext::setById($user['tenant_id']);
+            }
+
             echo "Processing User: {$user['name']} ($count items)...\n";
 
             // Partition into batches? (Maybe later. For now, fetch all pending for this user/freq)
@@ -323,7 +328,7 @@ class CronJobRunner
             $mailer = new Mailer();
 
             // Limit to 50 to prevent timeout
-            $sql = "SELECT q.*, u.email, u.name
+            $sql = "SELECT q.*, u.email, u.name, u.tenant_id as user_tenant_id
                     FROM notification_queue q
                     JOIN users u ON q.user_id = u.id
                     WHERE q.frequency = 'instant' AND q.status = 'pending'
@@ -336,6 +341,11 @@ class CronJobRunner
                 echo "No pending instant notifications.\n";
             } else {
                 foreach ($items as $item) {
+                    // Set tenant context so URLs point to the correct frontend
+                    if (!empty($item['user_tenant_id'])) {
+                        TenantContext::setById($item['user_tenant_id']);
+                    }
+
                     echo "Sending Instant ID {$item['id']} to {$item['email']}... ";
 
                     // Reconstruct subject
@@ -610,14 +620,23 @@ class CronJobRunner
 
         $tasks = [];
 
-        // 1. Clean expired password reset tokens (check column exists first)
+        // 1. Clean expired password reset tokens (using reset_token_expiry column)
         try {
-            $sql = "UPDATE users SET reset_token = NULL WHERE reset_token IS NOT NULL AND created_at < DATE_SUB(NOW(), INTERVAL 24 HOUR)";
+            $sql = "UPDATE users SET reset_token = NULL WHERE reset_token IS NOT NULL AND (reset_token_expiry IS NOT NULL AND reset_token_expiry < NOW())";
             DB::update($sql);
             $tasks[] = "Cleaned expired password reset tokens";
         } catch (\Exception $e) {
             // Column may not exist in this schema version
             $tasks[] = "Password reset tokens: skipped (column not found)";
+        }
+
+        // 1b. Clean expired password_resets table entries (Laravel password resets older than 1 hour)
+        try {
+            $sql = "DELETE FROM password_resets WHERE created_at < DATE_SUB(NOW(), INTERVAL 1 HOUR)";
+            DB::delete($sql);
+            $tasks[] = "Cleaned expired password_resets entries";
+        } catch (\Exception $e) {
+            $tasks[] = "password_resets table: skipped (" . $e->getMessage() . ")";
         }
 
         // 2. Clean old notification queue items (older than 30 days, already sent)
@@ -662,6 +681,33 @@ class CronJobRunner
             // Table may not exist
         }
         */
+
+        // 6. Clean expired API tokens
+        try {
+            DB::delete("DELETE FROM api_tokens WHERE expires_at IS NOT NULL AND expires_at < NOW()");
+            $tasks[] = "Cleaned expired API tokens";
+        } catch (\Exception $e) {
+            $tasks[] = "API tokens: skipped (" . $e->getMessage() . ")";
+        }
+
+        // 7. Clean expired password_resets entries (older than 1 hour)
+        try {
+            DB::delete("DELETE FROM password_resets WHERE created_at < DATE_SUB(NOW(), INTERVAL 1 HOUR)");
+            $tasks[] = "Cleaned expired password_resets entries";
+        } catch (\Exception $e) {
+            $tasks[] = "password_resets: skipped (" . $e->getMessage() . ")";
+        }
+
+        // 8. Expire stale exchange requests (pending_provider > 14 days)
+        try {
+            $expired = DB::update(
+                "UPDATE exchange_requests SET status = 'expired', updated_at = NOW()
+                 WHERE status = 'pending_provider' AND created_at < DATE_SUB(NOW(), INTERVAL 14 DAY)"
+            );
+            $tasks[] = "Expired $expired stale exchange requests";
+        } catch (\Exception $e) {
+            $tasks[] = "Exchange expiry: skipped (" . $e->getMessage() . ")";
+        }
 
         foreach ($tasks as $task) {
             echo " - $task\n";
@@ -1067,7 +1113,7 @@ class CronJobRunner
     private function cleanupInternal()
     {
         try {
-            DB::update("UPDATE users SET reset_token = NULL WHERE reset_token IS NOT NULL AND created_at < DATE_SUB(NOW(), INTERVAL 24 HOUR)");
+            DB::update("UPDATE users SET reset_token = NULL WHERE reset_token IS NOT NULL AND (reset_token_expiry IS NOT NULL AND reset_token_expiry < NOW())");
             echo "   Cleaned expired reset tokens.\n";
         } catch (\Exception $e) {
         }
@@ -1084,10 +1130,44 @@ class CronJobRunner
         } catch (\Exception $e) {
         }
 
+        // Clean expired password_resets table entries (older than 1 hour)
+        try {
+            DB::delete("DELETE FROM password_resets WHERE created_at < DATE_SUB(NOW(), INTERVAL 1 HOUR)");
+            echo "   Cleaned expired password_resets.\n";
+        } catch (\Exception $e) {
+        }
+
+        // Clean expired API tokens
+        try {
+            DB::delete("DELETE FROM api_tokens WHERE expires_at IS NOT NULL AND expires_at < NOW()");
+            echo "   Cleaned expired API tokens.\n";
+        } catch (\Exception $e) {
+        }
+
         // Clean old match cache entries (older than 24 hours)
         try {
             DB::delete("DELETE FROM match_cache WHERE expires_at < NOW()");
             echo "   Cleaned expired match cache.\n";
+        } catch (\Exception $e) {
+        }
+
+        // Clean old cron_logs entries (older than 30 days)
+        try {
+            DB::delete("DELETE FROM cron_logs WHERE executed_at < DATE_SUB(NOW(), INTERVAL 30 DAY)");
+            echo "   Cleaned old cron logs.\n";
+        } catch (\Exception $e) {
+        }
+
+        // Expire stale exchange requests stuck in pending_provider for 14+ days
+        try {
+            $expired = DB::update(
+                "UPDATE exchange_requests SET status = 'expired', updated_at = NOW()
+                 WHERE status = 'pending_provider'
+                 AND created_at < DATE_SUB(NOW(), INTERVAL 14 DAY)"
+            );
+            if ($expired > 0) {
+                echo "   Expired $expired stale exchange requests (pending_provider > 14 days).\n";
+            }
         } catch (\Exception $e) {
         }
     }
@@ -1536,7 +1616,7 @@ class CronJobRunner
         }
 
         try {
-            DB::update("UPDATE users SET reset_token = NULL WHERE reset_token IS NOT NULL AND created_at < DATE_SUB(NOW(), INTERVAL 24 HOUR)");
+            DB::update("UPDATE users SET reset_token = NULL WHERE reset_token IS NOT NULL AND (reset_token_expiry IS NOT NULL AND reset_token_expiry < NOW())");
             echo "   Cleaned expired reset tokens.\n";
         } catch (\Exception $e) {
             echo "   Reset tokens: skipped.\n";
@@ -2092,19 +2172,25 @@ class CronJobRunner
     {
         try {
             $totalSent = 0;
-            $totalErrors = 0;
-            $this->forEachTenant(function ($tenantId, $slug) use (&$totalSent, &$totalErrors) {
+            $service = app(EventReminderService::class);
+            $this->forEachTenant(function ($tenantId, $slug) use (&$totalSent, $service) {
                 if (!TenantContext::hasFeature('events')) return;
 
-                $result = EventReminderService::sendDueReminders();
-                $totalSent += $result['sent'];
-                $totalErrors += $result['errors'];
-                if ($result['sent'] > 0) {
-                    echo "   [$slug] Sent {$result['sent']} event reminders.\n";
+                $sent = $service->sendDueReminders($tenantId);
+                $totalSent += $sent;
+                if ($sent > 0) {
+                    echo "   [$slug] Sent {$sent} event reminders.\n";
                 }
             });
-            EventReminderService::cleanupOldRecords();
-            echo "   Event reminders complete ($totalSent sent, $totalErrors errors).\n";
+
+            // Cleanup old reminder tracking records (older than 90 days)
+            try {
+                DB::delete("DELETE FROM event_reminder_sent WHERE sent_at < DATE_SUB(NOW(), INTERVAL 90 DAY)");
+            } catch (\Exception $e) {
+                // Table may not exist yet
+            }
+
+            echo "   Event reminders complete ($totalSent sent).\n";
         } catch (\Throwable $e) {
             echo "   Error: " . $e->getMessage() . "\n";
         }

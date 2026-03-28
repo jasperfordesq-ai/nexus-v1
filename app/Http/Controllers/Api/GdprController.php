@@ -8,6 +8,7 @@ namespace App\Http\Controllers\Api;
 
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use App\Services\Enterprise\GdprService;
 
 /**
@@ -71,7 +72,8 @@ class GdprController extends BaseApiController
                 'granted' => $granted,
             ]);
         } catch (\Exception $e) {
-            return $this->respondWithError('CONSENT_UPDATE_FAILED', $e->getMessage(), null, 500);
+            Log::error('GDPR consent update failed', ['user' => $userId, 'error' => $e->getMessage()]);
+            return $this->respondWithError('CONSENT_UPDATE_FAILED', 'Failed to update consent preferences', null, 500);
         }
     }
 
@@ -123,7 +125,8 @@ class GdprController extends BaseApiController
                 'message' => 'Your request has been submitted and will be processed within 30 days.',
             ], null, 201);
         } catch (\Exception $e) {
-            return $this->respondWithError('REQUEST_FAILED', $e->getMessage(), null, 500);
+            Log::error('GDPR request creation failed', ['user' => $userId, 'type' => $type, 'error' => $e->getMessage()]);
+            return $this->respondWithError('REQUEST_FAILED', 'Failed to submit GDPR request. Please try again.', null, 500);
         }
     }
 
@@ -178,7 +181,8 @@ class GdprController extends BaseApiController
                 'logout_required' => true,
             ]);
         } catch (\Exception $e) {
-            return $this->respondWithError('DELETE_FAILED', $e->getMessage(), null, 500);
+            Log::error('Account deletion request failed', ['user' => $userId, 'error' => $e->getMessage()]);
+            return $this->respondWithError('DELETE_FAILED', 'Failed to submit account deletion request. Please try again.', null, 500);
         }
     }
 }

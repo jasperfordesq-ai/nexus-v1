@@ -1516,6 +1516,8 @@ Route::get('/v2/volunteering/swaps', [\App\Http\Controllers\Api\VolunteerCommuni
 Route::post('/v2/volunteering/swaps', [\App\Http\Controllers\Api\VolunteerCommunityController::class, 'requestSwap']);
 Route::put('/v2/volunteering/swaps/{id}', [\App\Http\Controllers\Api\VolunteerCommunityController::class, 'respondToSwap']);
 Route::delete('/v2/volunteering/swaps/{id}', [\App\Http\Controllers\Api\VolunteerCommunityController::class, 'cancelSwap']);
+Route::get('/v2/volunteering/admin/swaps', [\App\Http\Controllers\Api\VolunteerCommunityController::class, 'adminPendingSwaps']);
+Route::put('/v2/volunteering/admin/swaps/{id}', [\App\Http\Controllers\Api\VolunteerCommunityController::class, 'adminDecideSwap']);
 Route::get('/v2/volunteering/my-waitlists', [\App\Http\Controllers\Api\VolunteerCommunityController::class, 'myWaitlists']);
 Route::post('/v2/volunteering/shifts/{id}/waitlist', [\App\Http\Controllers\Api\VolunteerCommunityController::class, 'joinWaitlist']);
 Route::delete('/v2/volunteering/shifts/{id}/waitlist', [\App\Http\Controllers\Api\VolunteerCommunityController::class, 'leaveWaitlist']);

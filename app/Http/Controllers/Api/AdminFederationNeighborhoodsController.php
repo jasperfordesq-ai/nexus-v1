@@ -62,7 +62,7 @@ class AdminFederationNeighborhoodsController extends BaseApiController
                 $neighborhood = \App\Services\FederationNeighborhoodService::createStatic($name, $description, null, $adminId);
                 return $this->respondWithData($neighborhood, null, 201);
             } catch (\Exception $e) {
-                return $this->respondWithError('CREATE_FAILED', 'Failed to create neighborhood: ' . $e->getMessage());
+                return $this->respondWithError('CREATE_FAILED', 'Failed to create neighborhood');
             }
         }
 
@@ -116,7 +116,7 @@ class AdminFederationNeighborhoodsController extends BaseApiController
 
             return $this->respondWithData(['success' => true]);
         } catch (\Exception $e) {
-            return $this->respondWithError('ADD_FAILED', 'Failed to add tenant to neighborhood: ' . $e->getMessage(), null, 500);
+            return $this->respondWithError('ADD_FAILED', 'Failed to add tenant to neighborhood', null, 500);
         }
     }
 

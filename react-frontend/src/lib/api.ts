@@ -384,13 +384,32 @@ class ApiClient {
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), timeout);
 
+    // Combine timeout signal with caller-provided signal (if any) so that
+    // either aborting the timeout OR the caller's AbortController cancels the fetch.
+    const callerSignal = options.signal as AbortSignal | undefined;
+    let combinedSignal: AbortSignal = controller.signal;
+    if (callerSignal) {
+      // AbortSignal.any() is supported in Chrome 116+, Safari 17.4+, Firefox 124+.
+      // Fall back to linking signals manually for older browsers.
+      if ('any' in AbortSignal) {
+        combinedSignal = AbortSignal.any([controller.signal, callerSignal]);
+      } else {
+        // Legacy fallback: when the caller aborts, abort our controller too
+        if (callerSignal.aborted) {
+          controller.abort(callerSignal.reason);
+        } else {
+          callerSignal.addEventListener('abort', () => controller.abort(callerSignal.reason), { once: true });
+        }
+      }
+    }
+
     try {
       const response = await fetch(url, {
         ...options,
         headers,
         body,
         credentials: 'include',
-        signal: controller.signal,
+        signal: combinedSignal,
       });
       clearTimeout(timeoutId);
 

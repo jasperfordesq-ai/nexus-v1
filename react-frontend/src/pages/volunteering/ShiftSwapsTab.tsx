@@ -49,7 +49,7 @@ interface SwapShift {
 
 interface ShiftSwap {
   id: number;
-  status: 'pending' | 'accepted' | 'rejected';
+  status: 'pending' | 'accepted' | 'rejected' | 'admin_pending' | 'admin_approved' | 'admin_rejected' | 'cancelled' | 'expired';
   direction: 'sent' | 'received';
   requester: {
     id: number;
@@ -188,9 +188,18 @@ export function ShiftSwapsTab() {
 
   const statusColor = (status: string) => {
     switch (status) {
-      case 'accepted': return 'success';
-      case 'rejected': return 'danger';
-      default: return 'warning';
+      case 'accepted':
+      case 'admin_approved':
+        return 'success';
+      case 'rejected':
+      case 'admin_rejected':
+      case 'cancelled':
+        return 'danger';
+      case 'expired':
+        return 'default';
+      case 'admin_pending':
+      default:
+        return 'warning';
     }
   };
 

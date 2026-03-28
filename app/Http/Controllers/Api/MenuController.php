@@ -63,7 +63,7 @@ class MenuController extends BaseApiController
                 'location'  => $location,
             ]);
         } catch (\Throwable $e) {
-            return $this->respondWithError('MENU_LOAD_FAILED', 'Failed to load menus: ' . $e->getMessage(), null, 500);
+            return $this->respondWithError('MENU_LOAD_FAILED', 'Failed to load menus', null, 500);
         }
     }
 
@@ -93,7 +93,7 @@ class MenuController extends BaseApiController
                 'tenant_id' => $tenantId,
             ]);
         } catch (\Throwable $e) {
-            return $this->respondWithError('MENU_LOAD_FAILED', 'Failed to load menu: ' . $e->getMessage(), null, 500);
+            return $this->respondWithError('MENU_LOAD_FAILED', 'Failed to load menu', null, 500);
         }
     }
 
@@ -131,7 +131,7 @@ class MenuController extends BaseApiController
                 ],
             ]);
         } catch (\Throwable $e) {
-            return $this->respondWithError('CONFIG_LOAD_FAILED', 'Failed to load config: ' . $e->getMessage(), null, 500);
+            return $this->respondWithError('CONFIG_LOAD_FAILED', 'Failed to load config', null, 500);
         }
     }
 
@@ -176,7 +176,7 @@ class MenuController extends BaseApiController
                 'cache_key' => md5(json_encode($simplified)),
             ]);
         } catch (\Throwable $e) {
-            return $this->respondWithError('MOBILE_MENU_LOAD_FAILED', 'Failed to load mobile menu: ' . $e->getMessage(), null, 500);
+            return $this->respondWithError('MOBILE_MENU_LOAD_FAILED', 'Failed to load mobile menu', null, 500);
         }
     }
 
@@ -195,7 +195,7 @@ class MenuController extends BaseApiController
 
             return $this->respondWithData(['message' => 'Menu cache cleared successfully']);
         } catch (\Throwable $e) {
-            return $this->respondWithError('CACHE_CLEAR_FAILED', 'Failed to clear cache: ' . $e->getMessage(), null, 500);
+            return $this->respondWithError('CACHE_CLEAR_FAILED', 'Failed to clear cache', null, 500);
         }
     }
 

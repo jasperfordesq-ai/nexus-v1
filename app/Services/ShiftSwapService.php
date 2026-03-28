@@ -7,9 +7,9 @@
 namespace App\Services;
 
 use App\Core\TenantContext;
-use App\Models\User;
 use App\Models\VolApplication;
 use App\Models\VolShift;
+use App\Services\NotificationDispatcher;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
@@ -129,6 +129,9 @@ class ShiftSwapService
                 'created_at'              => now(),
             ]);
 
+            // Notify the target user about the incoming swap request
+            self::notifySwap($toUserId, 'vol_swap_requested', 'You have a new shift swap request', '/volunteering?tab=swaps');
+
             return (int) $swapId;
         } catch (\Exception $e) {
             Log::error('ShiftSwapService::requestSwap error: ' . $e->getMessage());
@@ -172,6 +175,10 @@ class ShiftSwapService
                     ->where('id', $swapId)
                     ->where('tenant_id', $tenantId)
                     ->update(['status' => 'rejected']);
+
+                // Notify requester their swap was declined
+                self::notifySwap((int) $swap->from_user_id, 'vol_swap_declined', 'Your shift swap request was declined', '/volunteering?tab=swaps');
+
                 return true;
             }
 
@@ -185,7 +192,14 @@ class ShiftSwapService
             }
 
             // Execute swap directly
-            return self::executeSwap($swap, $tenantId);
+            $result = self::executeSwap($swap, $tenantId);
+
+            if ($result) {
+                // Notify requester their swap was approved
+                self::notifySwap((int) $swap->from_user_id, 'vol_swap_approved', 'Your shift swap request was accepted', '/volunteering?tab=swaps');
+            }
+
+            return $result;
         } catch (\Exception $e) {
             Log::error('ShiftSwapService::respond error: ' . $e->getMessage());
             self::$errors[] = ['code' => 'SERVER_ERROR', 'message' => 'Failed to process swap response'];
@@ -223,17 +237,26 @@ class ShiftSwapService
                     ->where('id', $swapId)
                     ->where('tenant_id', $tenantId)
                     ->update(['status' => 'admin_rejected', 'admin_id' => $adminId]);
+
+                // Notify both parties
+                self::notifySwap((int) $swap->from_user_id, 'vol_swap_declined', 'Your shift swap request was declined by an admin', '/volunteering?tab=swaps');
+                self::notifySwap((int) $swap->to_user_id, 'vol_swap_declined', 'A shift swap you accepted was declined by an admin', '/volunteering?tab=swaps');
+
                 return true;
             }
 
-            // Execute the swap
-            $result = self::executeSwap($swap, $tenantId);
+            // Execute the swap — use admin_approved status
+            $result = self::executeSwap($swap, $tenantId, 'admin_approved');
 
             if ($result) {
                 DB::table('vol_shift_swap_requests')
                     ->where('id', $swapId)
                     ->where('tenant_id', $tenantId)
                     ->update(['admin_id' => $adminId]);
+
+                // Notify both parties
+                self::notifySwap((int) $swap->from_user_id, 'vol_swap_approved', 'Your shift swap was approved by an admin', '/volunteering?tab=swaps');
+                self::notifySwap((int) $swap->to_user_id, 'vol_swap_approved', 'A shift swap you accepted was approved by an admin', '/volunteering?tab=swaps');
             }
 
             return $result;
@@ -354,11 +377,15 @@ class ShiftSwapService
 
     /**
      * Execute the actual swap (move shift assignments) within a transaction.
+     *
+     * @param object $swap     The swap request row
+     * @param int    $tenantId Current tenant
+     * @param string $finalStatus Status to set on completion ('accepted' or 'admin_approved')
      */
-    private static function executeSwap(object $swap, int $tenantId): bool
+    private static function executeSwap(object $swap, int $tenantId, string $finalStatus = 'accepted'): bool
     {
         try {
-            return DB::transaction(function () use ($swap, $tenantId) {
+            return DB::transaction(function () use ($swap, $tenantId, $finalStatus) {
                 // Lock both assignments
                 $fromApp = DB::table('vol_applications')
                     ->where('user_id', $swap->from_user_id)
@@ -378,6 +405,17 @@ class ShiftSwapService
 
                 if (! $fromApp || ! $toApp) {
                     self::$errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'One or both volunteers are no longer assigned to the requested shifts'];
+                    return false;
+                }
+
+                // Double-booking check: ensure neither user already has an overlapping
+                // approved shift assignment for the shift they are moving INTO.
+                if (self::hasOverlappingShift((int) $swap->from_user_id, (int) $swap->to_shift_id, (int) $swap->from_shift_id, $tenantId)) {
+                    self::$errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'Swap would double-book the requester with an overlapping shift'];
+                    return false;
+                }
+                if (self::hasOverlappingShift((int) $swap->to_user_id, (int) $swap->from_shift_id, (int) $swap->to_shift_id, $tenantId)) {
+                    self::$errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'Swap would double-book the recipient with an overlapping shift'];
                     return false;
                 }
 
@@ -402,7 +440,7 @@ class ShiftSwapService
                 DB::table('vol_shift_swap_requests')
                     ->where('id', $swap->id)
                     ->where('tenant_id', $tenantId)
-                    ->update(['status' => 'accepted']);
+                    ->update(['status' => $finalStatus]);
 
                 return true;
             });
@@ -413,6 +451,84 @@ class ShiftSwapService
             self::$errors[] = ['code' => 'SERVER_ERROR', 'message' => 'Failed to execute shift swap'];
             return false;
         }
+    }
+
+    /**
+     * Check if a user has any approved shift assignment that overlaps with
+     * the target shift's time window, excluding a specific shift being vacated.
+     */
+    private static function hasOverlappingShift(int $userId, int $targetShiftId, int $excludeShiftId, int $tenantId): bool
+    {
+        $targetShift = DB::table('vol_shifts')
+            ->where('id', $targetShiftId)
+            ->where('tenant_id', $tenantId)
+            ->first();
+
+        if (! $targetShift) {
+            return false;
+        }
+
+        return DB::table('vol_applications as va')
+            ->join('vol_shifts as vs', 'va.shift_id', '=', 'vs.id')
+            ->where('va.user_id', $userId)
+            ->where('va.status', 'approved')
+            ->where('va.tenant_id', $tenantId)
+            ->where('va.shift_id', '!=', $excludeShiftId) // exclude shift being vacated
+            ->where('va.shift_id', '!=', $targetShiftId)  // exclude target itself
+            ->where('vs.start_time', '<', $targetShift->end_time)
+            ->where('vs.end_time', '>', $targetShift->start_time)
+            ->exists();
+    }
+
+    /**
+     * Get swap requests pending admin approval (for admin panel).
+     */
+    public static function getAdminPendingSwaps(): array
+    {
+        $tenantId = TenantContext::getId();
+
+        $requests = DB::table('vol_shift_swap_requests as sr')
+            ->join('users as fu', 'sr.from_user_id', '=', 'fu.id')
+            ->join('users as tu', 'sr.to_user_id', '=', 'tu.id')
+            ->join('vol_shifts as fs', 'sr.from_shift_id', '=', 'fs.id')
+            ->join('vol_shifts as ts', 'sr.to_shift_id', '=', 'ts.id')
+            ->leftJoin('vol_opportunities as fo', 'fs.opportunity_id', '=', 'fo.id')
+            ->leftJoin('vol_opportunities as to_opp', 'ts.opportunity_id', '=', 'to_opp.id')
+            ->where('sr.tenant_id', $tenantId)
+            ->where('sr.status', 'admin_pending')
+            ->select(
+                'sr.*',
+                'fu.name as from_user_name',
+                'tu.name as to_user_name',
+                'fs.start_time as from_shift_start', 'fs.end_time as from_shift_end',
+                'ts.start_time as to_shift_start', 'ts.end_time as to_shift_end',
+                'fo.title as from_opp_title',
+                'to_opp.title as to_opp_title'
+            )
+            ->orderByDesc('sr.created_at')
+            ->limit(100)
+            ->get();
+
+        return $requests->map(fn ($r) => [
+            'id' => (int) $r->id,
+            'status' => $r->status,
+            'message' => $r->message,
+            'requester' => ['id' => (int) $r->from_user_id, 'name' => $r->from_user_name],
+            'recipient' => ['id' => (int) $r->to_user_id, 'name' => $r->to_user_name],
+            'original_shift' => [
+                'id' => (int) $r->from_shift_id,
+                'start_time' => $r->from_shift_start,
+                'end_time' => $r->from_shift_end,
+                'opportunity_title' => $r->from_opp_title ?? null,
+            ],
+            'proposed_shift' => [
+                'id' => (int) $r->to_shift_id,
+                'start_time' => $r->to_shift_start,
+                'end_time' => $r->to_shift_end,
+                'opportunity_title' => $r->to_opp_title ?? null,
+            ],
+            'created_at' => $r->created_at,
+        ])->all();
     }
 
     /**
@@ -429,6 +545,28 @@ class ShiftSwapService
             return $result === '1';
         } catch (\Throwable $e) {
             return false;
+        }
+    }
+
+    /**
+     * Dispatch an in-app notification for a shift swap event.
+     */
+    private static function notifySwap(int $userId, string $activityType, string $content, string $link): void
+    {
+        try {
+            NotificationDispatcher::dispatch(
+                $userId,
+                'global',
+                null,
+                $activityType,
+                $content,
+                $link,
+                null,
+                false
+            );
+        } catch (\Throwable $e) {
+            // Notification failure should never block the swap operation
+            Log::warning('ShiftSwapService: notification dispatch failed: ' . $e->getMessage());
         }
     }
 }

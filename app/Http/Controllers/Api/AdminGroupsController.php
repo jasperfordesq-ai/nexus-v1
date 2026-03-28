@@ -12,6 +12,7 @@ use App\Services\GroupService;
 use App\Services\SmartGroupRankingService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use App\Core\TenantContext;
 use App\Models\ActivityLog;
 
@@ -98,7 +99,8 @@ class AdminGroupsController extends BaseApiController
 
             return $this->respondWithPaginatedCollection($formatted, $total, $page, $limit);
         } catch (\Exception $e) {
-            return $this->respondWithError('GROUPS_QUERY_ERROR', 'Failed to load groups: ' . $e->getMessage(), null, 500);
+            Log::error('Failed to load groups', ['error' => $e->getMessage()]);
+            return $this->respondWithError('GROUPS_QUERY_ERROR', 'Failed to load groups', null, 500);
         }
     }
 
@@ -133,7 +135,8 @@ class AdminGroupsController extends BaseApiController
 
             return $this->respondWithData($group);
         } catch (\Exception $e) {
-            return $this->respondWithError('GROUP_DETAIL_ERROR', 'Failed to load group: ' . $e->getMessage(), null, 500);
+            Log::error('Failed to load group', ['error' => $e->getMessage()]);
+            return $this->respondWithError('GROUP_DETAIL_ERROR', 'Failed to load group', null, 500);
         }
     }
 
@@ -184,7 +187,7 @@ class AdminGroupsController extends BaseApiController
                 ], $mostActive),
             ]);
         } catch (\Exception $e) {
-            return $this->respondWithError('GROUPS_ANALYTICS_ERROR', 'Failed to load group analytics: ' . $e->getMessage(), null, 500);
+            return $this->respondWithError('GROUPS_ANALYTICS_ERROR', 'Failed to load group analytics', null, 500);
         }
     }
 
@@ -225,7 +228,7 @@ class AdminGroupsController extends BaseApiController
 
             return $this->respondWithData($formatted);
         } catch (\Exception $e) {
-            return $this->respondWithError('GROUPS_APPROVALS_ERROR', 'Failed to load group approvals: ' . $e->getMessage(), null, 500);
+            return $this->respondWithError('GROUPS_APPROVALS_ERROR', 'Failed to load group approvals', null, 500);
         }
     }
 
@@ -255,7 +258,7 @@ class AdminGroupsController extends BaseApiController
 
             return $this->respondWithData(['id' => (int) $id, 'status' => 'approved']);
         } catch (\Exception $e) {
-            return $this->respondWithError('GROUPS_APPROVE_ERROR', 'Failed to approve membership: ' . $e->getMessage(), null, 500);
+            return $this->respondWithError('GROUPS_APPROVE_ERROR', 'Failed to approve membership', null, 500);
         }
     }
 
@@ -285,7 +288,7 @@ class AdminGroupsController extends BaseApiController
 
             return $this->respondWithData(['id' => (int) $id, 'status' => 'rejected']);
         } catch (\Exception $e) {
-            return $this->respondWithError('GROUPS_REJECT_ERROR', 'Failed to reject membership: ' . $e->getMessage(), null, 500);
+            return $this->respondWithError('GROUPS_REJECT_ERROR', 'Failed to reject membership', null, 500);
         }
     }
 
@@ -348,7 +351,7 @@ class AdminGroupsController extends BaseApiController
 
             return $this->respondWithData($formatted);
         } catch (\Exception $e) {
-            return $this->respondWithError('GROUPS_MODERATION_ERROR', 'Failed to load moderation data: ' . $e->getMessage(), null, 500);
+            return $this->respondWithError('GROUPS_MODERATION_ERROR', 'Failed to load moderation data', null, 500);
         }
     }
 
@@ -481,7 +484,7 @@ class AdminGroupsController extends BaseApiController
 
             return $this->respondWithData($formatted);
         } catch (\Throwable $e) {
-            return $this->respondWithError('GROUP_TYPES_ERROR', 'Failed to load group types: ' . $e->getMessage(), null, 500);
+            return $this->respondWithError('GROUP_TYPES_ERROR', 'Failed to load group types', null, 500);
         }
     }
 
@@ -506,7 +509,7 @@ class AdminGroupsController extends BaseApiController
             ActivityLog::log($adminId, 'admin_create_group_type', "Created group type: {$name}");
             return $this->respondWithData(['id' => $id, 'name' => $name]);
         } catch (\Throwable $e) {
-            return $this->respondWithError('GROUP_TYPE_CREATE_ERROR', 'Failed to create group type: ' . $e->getMessage(), null, 500);
+            return $this->respondWithError('GROUP_TYPE_CREATE_ERROR', 'Failed to create group type', null, 500);
         }
     }
 
@@ -531,7 +534,7 @@ class AdminGroupsController extends BaseApiController
             ActivityLog::log($adminId, 'admin_update_group_type', "Updated group type #{$id}: {$name}");
             return $this->respondWithData(['id' => $id, 'name' => $name]);
         } catch (\Throwable $e) {
-            return $this->respondWithError('GROUP_TYPE_UPDATE_ERROR', 'Failed to update group type: ' . $e->getMessage(), null, 500);
+            return $this->respondWithError('GROUP_TYPE_UPDATE_ERROR', 'Failed to update group type', null, 500);
         }
     }
 
@@ -557,7 +560,7 @@ class AdminGroupsController extends BaseApiController
             ActivityLog::log($adminId, 'admin_delete_group_type', "Deleted group type #{$id}: {$type->name}");
             return $this->respondWithData(['deleted' => true, 'id' => $id]);
         } catch (\Throwable $e) {
-            return $this->respondWithError('GROUP_TYPE_DELETE_ERROR', 'Failed to delete group type: ' . $e->getMessage(), null, 500);
+            return $this->respondWithError('GROUP_TYPE_DELETE_ERROR', 'Failed to delete group type', null, 500);
         }
     }
 
@@ -588,7 +591,7 @@ class AdminGroupsController extends BaseApiController
             }
             return $this->respondWithData($formatted);
         } catch (\Throwable $e) {
-            return $this->respondWithError('POLICIES_ERROR', 'Failed to load policies: ' . $e->getMessage(), null, 500);
+            return $this->respondWithError('POLICIES_ERROR', 'Failed to load policies', null, 500);
         }
     }
 
@@ -612,7 +615,7 @@ class AdminGroupsController extends BaseApiController
             ActivityLog::log($adminId, 'admin_set_group_policy', "Set policy {$key} = " . json_encode($value));
             return $this->respondWithData(['key' => $key, 'value' => $value]);
         } catch (\Throwable $e) {
-            return $this->respondWithError('POLICY_SET_ERROR', 'Failed to set policy: ' . $e->getMessage(), null, 500);
+            return $this->respondWithError('POLICY_SET_ERROR', 'Failed to set policy', null, 500);
         }
     }
 
@@ -664,7 +667,7 @@ class AdminGroupsController extends BaseApiController
 
             return $this->respondWithData($formatted);
         } catch (\Exception $e) {
-            return $this->respondWithError('GROUP_MEMBERS_ERROR', 'Failed to load members: ' . $e->getMessage(), null, 500);
+            return $this->respondWithError('GROUP_MEMBERS_ERROR', 'Failed to load members', null, 500);
         }
     }
 
@@ -695,7 +698,7 @@ class AdminGroupsController extends BaseApiController
 
             return $this->respondWithData(['role' => $newRole]);
         } catch (\Exception $e) {
-            return $this->respondWithError('PROMOTE_ERROR', 'Failed to promote member: ' . $e->getMessage(), null, 500);
+            return $this->respondWithError('PROMOTE_ERROR', 'Failed to promote member', null, 500);
         }
     }
 
@@ -726,7 +729,7 @@ class AdminGroupsController extends BaseApiController
 
             return $this->respondWithData(['role' => $newRole]);
         } catch (\Exception $e) {
-            return $this->respondWithError('DEMOTE_ERROR', 'Failed to demote member: ' . $e->getMessage(), null, 500);
+            return $this->respondWithError('DEMOTE_ERROR', 'Failed to demote member', null, 500);
         }
     }
 
@@ -756,7 +759,7 @@ class AdminGroupsController extends BaseApiController
 
             return $this->respondWithData(['kicked' => true]);
         } catch (\Exception $e) {
-            return $this->respondWithError('KICK_ERROR', 'Failed to kick member: ' . $e->getMessage(), null, 500);
+            return $this->respondWithError('KICK_ERROR', 'Failed to kick member', null, 500);
         }
     }
 
@@ -789,7 +792,7 @@ class AdminGroupsController extends BaseApiController
             ActivityLog::log($adminId, 'admin_geocode_group', "Geocoded group #{$id}: {$group->name}");
             return $this->respondWithData(['latitude' => $coords['latitude'], 'longitude' => $coords['longitude']]);
         } catch (\Throwable $e) {
-            return $this->respondWithError('GEOCODE_ERROR', 'Failed to geocode group: ' . $e->getMessage(), null, 500);
+            return $this->respondWithError('GEOCODE_ERROR', 'Failed to geocode group', null, 500);
         }
     }
 
@@ -822,7 +825,7 @@ class AdminGroupsController extends BaseApiController
             ActivityLog::log($adminId, 'admin_batch_geocode_groups', "Batch geocoded {$success} groups, {$failed} failed");
             return $this->respondWithData(['processed' => count($groups), 'success' => $success, 'failed' => $failed]);
         } catch (\Throwable $e) {
-            return $this->respondWithError('BATCH_GEOCODE_ERROR', 'Failed to batch geocode: ' . $e->getMessage(), null, 500);
+            return $this->respondWithError('BATCH_GEOCODE_ERROR', 'Failed to batch geocode', null, 500);
         }
     }
 
@@ -882,7 +885,7 @@ class AdminGroupsController extends BaseApiController
                 'stats' => ['total' => (int) $stats['total'], 'avg_score' => round((float) ($stats['avg_score'] ?? 0), 2), 'join_rate' => $joinRate],
             ]);
         } catch (\Throwable $e) {
-            return $this->respondWithError('RECOMMENDATIONS_ERROR', 'Failed to load recommendations: ' . $e->getMessage(), null, 500);
+            return $this->respondWithError('RECOMMENDATIONS_ERROR', 'Failed to load recommendations', null, 500);
         }
     }
 
@@ -896,7 +899,7 @@ class AdminGroupsController extends BaseApiController
             $groups = $this->smartGroupRankingService->getFeaturedGroupsWithScores('local_hubs', $tenantId);
             return $this->respondWithData($groups);
         } catch (\Throwable $e) {
-            return $this->respondWithError('FEATURED_GROUPS_ERROR', 'Failed to load featured groups: ' . $e->getMessage(), null, 500);
+            return $this->respondWithError('FEATURED_GROUPS_ERROR', 'Failed to load featured groups', null, 500);
         }
     }
 
@@ -911,7 +914,7 @@ class AdminGroupsController extends BaseApiController
             ActivityLog::log($adminId, 'admin_update_featured_groups', "Updated featured groups: {$result['featured']} groups featured, {$result['cleared']} cleared");
             return $this->respondWithData($result);
         } catch (\Throwable $e) {
-            return $this->respondWithError('UPDATE_FEATURED_ERROR', 'Failed to update featured groups: ' . $e->getMessage(), null, 500);
+            return $this->respondWithError('UPDATE_FEATURED_ERROR', 'Failed to update featured groups', null, 500);
         }
     }
 
@@ -933,7 +936,7 @@ class AdminGroupsController extends BaseApiController
 
             return $this->respondWithData(['is_featured' => (bool) $newStatus]);
         } catch (\Exception $e) {
-            return $this->respondWithError('TOGGLE_FEATURED_ERROR', 'Failed to toggle featured status: ' . $e->getMessage(), null, 500);
+            return $this->respondWithError('TOGGLE_FEATURED_ERROR', 'Failed to toggle featured status', null, 500);
         }
     }
 
@@ -968,7 +971,7 @@ class AdminGroupsController extends BaseApiController
                 'events_count' => $eventsCount,
             ]);
         } catch (\Throwable $e) {
-            return $this->respondWithError('ANALYTICS_ERROR', 'Failed to load group analytics: ' . $e->getMessage(), null, 500);
+            return $this->respondWithError('ANALYTICS_ERROR', 'Failed to load group analytics', null, 500);
         }
     }
 }

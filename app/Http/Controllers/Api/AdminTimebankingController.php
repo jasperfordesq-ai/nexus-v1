@@ -212,7 +212,8 @@ class AdminTimebankingController extends BaseApiController
         } catch (\DomainException $e) {
             return $this->respondWithError('INSUFFICIENT_BALANCE', $e->getMessage(), null, 400);
         } catch (\Throwable $e) {
-            return $this->respondWithError('SERVER_ERROR', 'Failed to adjust balance: ' . $e->getMessage(), null, 500);
+            \Illuminate\Support\Facades\Log::error('Balance adjustment failed', ['user' => $userId, 'error' => $e->getMessage()]);
+            return $this->respondWithError('SERVER_ERROR', 'Failed to adjust balance', null, 500);
         }
 
         return $this->respondWithData([

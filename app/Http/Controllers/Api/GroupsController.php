@@ -810,7 +810,8 @@ class GroupsController extends BaseApiController
 
             return $this->respondWithData(['image_url' => $imageUrl]);
         } catch (\Exception $e) {
-            return $this->respondWithError('UPLOAD_FAILED', 'Failed to upload image: ' . $e->getMessage(), 'image', 400);
+            \Log::error('Group image upload failed', ['error' => $e->getMessage()]);
+            return $this->respondWithError('UPLOAD_FAILED', 'Failed to upload image', 'image', 500);
         }
     }
 
