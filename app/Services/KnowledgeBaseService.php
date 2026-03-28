@@ -410,10 +410,16 @@ class KnowledgeBaseService
 
         $html = strip_tags($html, $allowedTags);
 
-        // Remove dangerous attributes
-        $html = preg_replace('/\s+on\w+\s*=\s*(["\']).*?\1/i', '', $html);
-        $html = preg_replace('/\s+on\w+\s*=\s*[^\s>]*/i', '', $html);
-        $html = preg_replace('/href\s*=\s*(["\'])\s*javascript\s*:.*?\1/i', 'href="$1#$1"', $html);
+        // Remove dangerous attributes: event handlers (on*)
+        $html = preg_replace('/\s+on\w+\s*=\s*(["\']).*?\1/si', '', $html);
+        $html = preg_replace('/\s+on\w+\s*=\s*[^\s>]*/si', '', $html);
+
+        // Remove dangerous URI schemes in href/src/action attributes
+        $html = preg_replace('/\b(href|src|action)\s*=\s*(["\'])\s*(javascript|data|vbscript)\s*:.*?\2/si', '$1=$2#$2', $html);
+
+        // Remove style attributes (prevents CSS expression() attacks)
+        $html = preg_replace('/\s+style\s*=\s*(["\']).*?\1/si', '', $html);
+        $html = preg_replace('/\s+style\s*=\s*[^\s>]*/si', '', $html);
 
         return $html;
     }

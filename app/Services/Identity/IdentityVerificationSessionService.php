@@ -66,14 +66,20 @@ class IdentityVerificationSessionService
     /**
      * Find a session by provider session ID and provider slug.
      */
-    public static function findByProviderSession(string $providerSlug, string $providerSessionId): ?array
+    public static function findByProviderSession(string $providerSlug, string $providerSessionId, ?int $tenantId = null): ?array
     {
-        $row = DB::statement(
-            "SELECT * FROM identity_verification_sessions
-             WHERE provider_slug = ? AND provider_session_id = ?
-             ORDER BY created_at DESC LIMIT 1",
-            [$providerSlug, $providerSessionId]
-        )->fetch();
+        $query = "SELECT * FROM identity_verification_sessions
+             WHERE provider_slug = ? AND provider_session_id = ?";
+        $params = [$providerSlug, $providerSessionId];
+
+        if ($tenantId !== null) {
+            $query .= " AND tenant_id = ?";
+            $params[] = $tenantId;
+        }
+
+        $query .= " ORDER BY created_at DESC LIMIT 1";
+
+        $row = DB::statement($query, $params)->fetch();
 
         return $row ?: null;
     }

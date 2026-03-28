@@ -175,12 +175,19 @@ class InsuranceCertificateService
     {
         $tenantId = TenantContext::getId();
 
-        $data['updated_at'] = now();
+        $allowedFields = [
+            'insurance_type', 'provider_name', 'policy_number',
+            'coverage_amount', 'start_date', 'expiry_date',
+            'certificate_file_path', 'notes',
+        ];
+
+        $updates = collect($data)->only($allowedFields)->all();
+        $updates['updated_at'] = now();
 
         $affected = DB::table('insurance_certificates')
             ->where('id', $id)
             ->where('tenant_id', $tenantId)
-            ->update($data);
+            ->update($updates);
 
         return $affected > 0;
     }

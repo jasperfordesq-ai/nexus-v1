@@ -69,6 +69,7 @@ class OnboardingService
         // For explicit step tracking, we use the onboarding_completed flag
         if ($step === 'complete') {
             return User::where('id', $userId)
+                ->where('tenant_id', $tenantId)
                 ->update(['onboarding_completed' => true]) > 0;
         }
 
@@ -94,9 +95,12 @@ class OnboardingService
     public static function resetProgress(int $tenantId, int $userId): bool
     {
         User::where('id', $userId)
+            ->where('tenant_id', $tenantId)
             ->update(['onboarding_completed' => false]);
 
-        UserInterest::where('user_id', $userId)->delete();
+        UserInterest::where('user_id', $userId)
+            ->where('tenant_id', $tenantId)
+            ->delete();
 
         return true;
     }
@@ -277,6 +281,7 @@ class OnboardingService
     public static function completeOnboarding(int $userId): void
     {
         User::where('id', $userId)
+            ->where('tenant_id', TenantContext::getId())
             ->update(['onboarding_completed' => true]);
     }
 

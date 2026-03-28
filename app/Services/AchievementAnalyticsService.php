@@ -172,9 +172,10 @@ class AchievementAnalyticsService
 
         return DB::table('users as u')
             ->where('u.tenant_id', $tenantId)
+            ->leftJoin(DB::raw('(SELECT user_id, COUNT(*) as badge_count FROM user_badges WHERE tenant_id = ' . ((int) $tenantId) . ' GROUP BY user_id) as bc'), 'bc.user_id', '=', 'u.id')
             ->select([
                 'u.id', 'u.first_name', 'u.last_name', 'u.avatar_url', 'u.xp', 'u.level',
-                DB::raw('(SELECT COUNT(*) FROM user_badges WHERE user_id = u.id AND tenant_id = ' . ((int) $tenantId) . ') as badge_count'),
+                DB::raw('COALESCE(bc.badge_count, 0) as badge_count'),
             ])
             ->orderByDesc('u.xp')
             ->limit($limit)

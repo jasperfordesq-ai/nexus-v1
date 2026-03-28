@@ -257,6 +257,8 @@ class AdminConfigController extends BaseApiController
 
         try {
             if ($type === 'all') {
+                // Cross-tenant cache clear requires super admin privileges
+                $this->requireSuperAdmin();
                 foreach ([1, 2, 3, 4, 5] as $tid) {
                     $this->redisCache->clearTenant($tid);
                 }
@@ -1111,7 +1113,7 @@ class AdminConfigController extends BaseApiController
     // Algorithm Info (public endpoint)
     // =========================================================================
 
-    /** GET /api/v2/admin/config/algorithm-info */
+    /** GET /api/v2/config/algorithms — public, returns which algorithms are active */
     public function getAlgorithmInfo(): JsonResponse
     {
         $feedEnabled = $this->feedRankingService->isEnabled();

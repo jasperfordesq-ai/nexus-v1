@@ -119,6 +119,12 @@ class AdminSettingsController extends BaseApiController
                 continue;
             }
 
+            // Regular admins can only modify keys in the explicit allowlist
+            if (!$isSuperAdmin && !in_array($key, self::ADMIN_ALLOWED_KEYS, true)) {
+                $rejected[] = $key;
+                continue;
+            }
+
             // Validate specific setting values
             $validationError = $this->validateSettingValue($key, $value);
             if ($validationError !== null) {

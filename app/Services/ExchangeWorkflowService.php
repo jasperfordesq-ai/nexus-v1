@@ -647,6 +647,24 @@ class ExchangeWorkflowService
 
             self::updateStatus($exchangeId, self::STATUS_COMPLETED, null, 'system', "Completed with $finalHours hours");
 
+            // Notify both parties of completion (outside the lock but inside the DB transaction)
+            try {
+                $notificationData = [
+                    'exchange_id' => $exchangeId,
+                    'hours' => $finalHours,
+                    'listing_title' => $exchange->listing->title ?? '',
+                ];
+                $requesterId = (int) $exchange->requester_id;
+                $providerId = (int) $exchange->provider_id;
+
+                NotificationDispatcher::send($requesterId, 'exchange_completed', $notificationData);
+                NotificationDispatcher::send($providerId, 'exchange_completed', $notificationData);
+            } catch (\Throwable $e) {
+                Log::warning("Exchange #{$exchangeId}: notification failed after completion", [
+                    'error' => $e->getMessage(),
+                ]);
+            }
+
             return true;
         });
     }

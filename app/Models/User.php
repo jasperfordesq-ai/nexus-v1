@@ -43,7 +43,7 @@ class User extends Authenticatable
     protected $casts = [
         'latitude' => 'float',
         'longitude' => 'float',
-        'balance' => 'integer',
+        'balance' => 'decimal:2',
         'is_verified' => 'boolean',
         'is_admin' => 'boolean',
         'is_super_admin' => 'boolean',

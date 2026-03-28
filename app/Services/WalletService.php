@@ -188,15 +188,19 @@ class WalletService
         }
 
         $txn = DB::transaction(function () use ($senderId, $receiver, $amount, $description) {
+            // Lock both user rows in consistent ID order to prevent deadlocks
+            // when two users transfer to each other simultaneously
+            $minId = min($senderId, $receiver->id);
+            $maxId = max($senderId, $receiver->id);
+            $this->user->newQuery()->lockForUpdate()->findOrFail($minId);
+            $this->user->newQuery()->lockForUpdate()->findOrFail($maxId);
+
             /** @var User $sender */
-            $sender = $this->user->newQuery()->lockForUpdate()->findOrFail($senderId);
+            $sender = $this->user->newQuery()->find($senderId);
 
             if ((float) $sender->balance < $amount) {
                 throw new \RuntimeException('Insufficient balance');
             }
-
-            // Lock receiver row too
-            $this->user->newQuery()->lockForUpdate()->findOrFail($receiver->id);
 
             $txn = $this->transaction->newInstance([
                 'sender_id'   => $senderId,

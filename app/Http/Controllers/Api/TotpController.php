@@ -142,11 +142,13 @@ class TotpController extends BaseApiController
         }
 
         // Fetch user data for response
+        // Allow super admins to complete 2FA even when their tenant_id differs
+        // from the current tenant context (cross-tenant login)
         $tenantId = TenantContext::getId();
         $userRow = DB::selectOne("
             SELECT id, first_name, last_name, email, avatar_url, role, tenant_id,
                    is_super_admin, is_tenant_super_admin, email_verified_at, is_approved, status
-            FROM users WHERE id = ? AND tenant_id = ?
+            FROM users WHERE id = ? AND (tenant_id = ? OR is_super_admin = 1 OR is_tenant_super_admin = 1)
         ", [$userId, $tenantId]);
         $user = $userRow ? (array)$userRow : null;
 

@@ -11,11 +11,13 @@ SET FOREIGN_KEY_CHECKS=0;
 
 -- ============================================================================
 -- CRITICAL-01: transactions.amount is INT, but Model casts to decimal:2
--- The users.balance and transactions.amount columns use INT (whole time credits),
--- which is the CORRECT design for a timebanking platform (integer hour credits).
--- The Model cast 'decimal:2' is the mismatch — it should be 'integer'.
--- NO SCHEMA CHANGE NEEDED — fix the Model cast instead.
+-- The application uses fractional hours (0.25, 0.5, etc.) throughout
+-- ExchangeWorkflowService, EventService, and WalletService.
+-- The DB column must be DECIMAL to match the Model cast and application logic.
+-- FIX: Alter the column to DECIMAL(10,2). Also fix users.balance.
 -- ============================================================================
+ALTER TABLE `transactions` MODIFY COLUMN `amount` DECIMAL(10,2) NOT NULL DEFAULT 0;
+ALTER TABLE `users` MODIFY COLUMN `balance` DECIMAL(10,2) NOT NULL DEFAULT 0;
 
 -- ============================================================================
 -- CRITICAL-02: users.tenant_id is NULLable — allows orphaned users

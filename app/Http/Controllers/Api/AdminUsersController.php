@@ -391,25 +391,30 @@ class AdminUsersController extends BaseApiController
             return $this->respondWithError('VALIDATION_ERROR', 'A user with this email already exists', 'email', 422);
         }
 
-        // Create user
-        User::create($firstName, $lastName, $email, $password, $location ?: null);
-        $newUser = User::findByEmail($email);
+        // Create user via createWithTenant (direct DB insert, not Eloquent::create)
+        $newUserId = User::createWithTenant([
+            'first_name' => $firstName,
+            'last_name' => $lastName,
+            'email' => $email,
+            'password' => $password,
+            'location' => $location ?: null,
+            'role' => $role,
+            'is_approved' => 1,
+        ], $tenantId);
 
-        if (!$newUser) {
-            return $this->respondWithError('SERVER_ERROR', 'Failed to create user', null, 500);
+        if (!$newUserId) {
+            return $this->respondWithError('SERVER_ERROR', 'Failed to create user — email may already exist', null, 500);
         }
 
-        User::updateAdminFields($newUser['id'], $role, 1);
-
         ActivityLog::log($adminId, 'admin_create_user', "Created user: {$email}");
-        AuditLogService::logUserCreated($adminId, (int) $newUser['id'], $email);
+        AuditLogService::logUserCreated($adminId, $newUserId, $email);
 
         // Record GDPR consents (admin-created accounts)
         try {
             $consentText = "Account created by administrator. User agrees to Terms of Service and Privacy Policy upon first login.";
             $consentVersion = '1.0';
-            $this->gdprService->recordConsent((int) $newUser['id'], 'terms_of_service', true, $consentText, $consentVersion);
-            $this->gdprService->recordConsent((int) $newUser['id'], 'privacy_policy', true, $consentText, $consentVersion);
+            $this->gdprService->recordConsent($newUserId, 'terms_of_service', true, $consentText, $consentVersion);
+            $this->gdprService->recordConsent($newUserId, 'privacy_policy', true, $consentText, $consentVersion);
         } catch (\Throwable $e) {
             error_log("GDPR Consent Recording Failed for admin-created user: " . $e->getMessage());
         }
@@ -446,7 +451,7 @@ class AdminUsersController extends BaseApiController
         }
 
         return $this->respondWithData([
-            'id' => (int) $newUser['id'],
+            'id' => $newUserId,
             'name' => trim($firstName . ' ' . $lastName),
             'email' => $email,
             'role' => $role,
@@ -474,7 +479,11 @@ class AdminUsersController extends BaseApiController
             return $this->respondWithData(['approved' => true, 'id' => $id, 'already_approved' => true]);
         }
 
-        User::updateAdminFields($id, $user['role'] ?? 'member', 1, null, (int) $user['tenant_id']);
+        User::updateAdminFields($id, [
+            'role' => $user['role'] ?? 'member',
+            'is_approved' => 1,
+            'tenant_id' => (int) $user['tenant_id'],
+        ]);
 
         ActivityLog::log($adminId, 'admin_approve_user', "Approved user #{$id} ({$user['email']})");
         AuditLogService::logUserApproved($adminId, $id, $user['email']);
@@ -1187,7 +1196,19 @@ class AdminUsersController extends BaseApiController
                 // Seed federation settings for the new user
                 $newUserId = (int) DB::getPdo()->lastInsertId();
                 if ($newUserId > 0) {
-                    User::seedFederationSettings($newUserId);
+                    try {
+                        DB::statement(
+                            "INSERT IGNORE INTO federation_user_settings (
+                                user_id, federation_optin, profile_visible_federated,
+                                messaging_enabled_federated, transactions_enabled_federated,
+                                appear_in_federated_search, show_skills_federated,
+                                show_location_federated, service_reach, opted_in_at, created_at
+                            ) VALUES (?, 1, 1, 1, 1, 1, 1, 0, 'local_only', NOW(), NOW())",
+                            [$newUserId]
+                        );
+                    } catch (\Exception $e) {
+                        // Non-critical — federation settings can be seeded later
+                    }
                 }
 
                 $results['imported']++;

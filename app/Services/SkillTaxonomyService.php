@@ -265,7 +265,10 @@ class SkillTaxonomyService
      */
     public function search(string $term, int $limit = 20): array
     {
+        $tenantId = TenantContext::getId();
+
         return DB::table('skill_categories')
+            ->where('tenant_id', $tenantId)
             ->where('is_active', true)
             ->where('name', 'LIKE', '%' . $term . '%')
             ->orderBy('name')
@@ -280,9 +283,12 @@ class SkillTaxonomyService
      */
     public function getMySkills(int $userId): array
     {
+        $tenantId = TenantContext::getId();
+
         return DB::table('user_skills as us')
             ->leftJoin('skill_categories as sc', 'us.skill_id', '=', 'sc.id')
             ->where('us.user_id', $userId)
+            ->where('us.tenant_id', $tenantId)
             ->select('us.*', 'sc.name as category_name', 'sc.icon')
             ->orderByDesc('us.created_at')
             ->get()

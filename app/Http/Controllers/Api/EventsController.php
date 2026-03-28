@@ -499,17 +499,50 @@ class EventsController extends BaseApiController
             }
         }
 
-        try {
-            // Create time credit transaction (organizer -> attendee)
-            \App\Models\Transaction::create(
-                $userId,
-                $attendeeId,
-                $duration,
-                "Event Attendance: " . ($event['title'] ?? 'Event #' . $id)
-            );
+        // Cap duration to prevent unreasonable credit awards (max 24 hours)
+        if ($duration > 24) {
+            $duration = 24;
+        }
 
-            // Update RSVP status to 'attended'
-            EventRsvp::rsvp($id, $attendeeId, 'attended');
+        try {
+            DB::transaction(function () use ($userId, $attendeeId, $id, $event, $duration, $tenantId) {
+                // Lock organizer row and check balance before decrementing
+                $organizer = DB::table('users')
+                    ->where('id', $userId)
+                    ->where('tenant_id', $tenantId)
+                    ->lockForUpdate()
+                    ->first();
+
+                if (!$organizer || (float) $organizer->balance < $duration) {
+                    throw new \RuntimeException('Organizer has insufficient time credit balance to award ' . $duration . ' hours');
+                }
+
+                // Lock attendee row for consistency
+                DB::table('users')
+                    ->where('id', $attendeeId)
+                    ->where('tenant_id', $tenantId)
+                    ->lockForUpdate()
+                    ->first();
+
+                // Create time credit transaction (organizer -> attendee)
+                \App\Models\Transaction::create([
+                    'sender_id'        => $userId,
+                    'receiver_id'      => $attendeeId,
+                    'amount'           => $duration,
+                    'description'      => "Event Attendance: " . ($event['title'] ?? 'Event #' . $id),
+                    'transaction_type' => 'event_checkin',
+                    'status'           => 'completed',
+                ]);
+
+                // Update balances atomically
+                DB::table('users')->where('id', $userId)->where('tenant_id', $tenantId)
+                    ->decrement('balance', $duration);
+                DB::table('users')->where('id', $attendeeId)->where('tenant_id', $tenantId)
+                    ->increment('balance', $duration);
+
+                // Update RSVP status to 'attended' inside the same transaction
+                EventRsvp::rsvp($id, $attendeeId, 'attended');
+            });
 
             return $this->respondWithData([
                 'checked_in'     => true,
@@ -517,6 +550,8 @@ class EventsController extends BaseApiController
                 'event_id'       => $id,
                 'hours_credited' => $duration,
             ]);
+        } catch (\RuntimeException $e) {
+            return $this->respondWithError('INSUFFICIENT_BALANCE', $e->getMessage(), null, 422);
         } catch (\Exception $e) {
             return $this->respondWithError('CHECKIN_ERROR', 'Failed to check in attendee: ' . $e->getMessage(), null, 500);
         }

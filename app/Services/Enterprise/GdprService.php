@@ -299,6 +299,7 @@ class GdprService
             'messaging_restrictions' => $this->getMessagingRestrictionsData($userId),
             'ai_chat_history' => $this->getAiChatData($userId),
             'reviews' => $this->getReviewsData($userId),
+            'exchanges' => $this->getExchangeData($userId),
         ];
     }
 
@@ -731,11 +732,12 @@ class GdprService
 
     private function getConnectionsData(int $userId): array
     {
+        // Connection table uses requester_id/receiver_id columns
         return $this->query(
             "SELECT u.id, u.first_name, u.last_name, c.created_at
              FROM connections c
-             JOIN users u ON (c.user_id = u.id OR c.connected_user_id = u.id) AND u.id != ?
-             WHERE (c.user_id = ? OR c.connected_user_id = ?) AND c.tenant_id = ? AND c.status = 'accepted'",
+             JOIN users u ON (c.requester_id = u.id OR c.receiver_id = u.id) AND u.id != ?
+             WHERE (c.requester_id = ? OR c.receiver_id = ?) AND c.tenant_id = ? AND c.status = 'accepted'",
             [$userId, $userId, $userId, $this->tenantId]
         )->fetchAll();
     }
@@ -796,6 +798,27 @@ class GdprService
         }
     }
 
+    private function getExchangeData(int $userId): array
+    {
+        try {
+            return $this->query(
+                "SELECT er.id, er.listing_id, er.requester_id, er.provider_id,
+                        er.proposed_hours, er.final_hours, er.status,
+                        er.requester_notes, er.requester_confirmed_hours,
+                        er.provider_confirmed_hours, er.created_at, er.updated_at,
+                        l.title as listing_title,
+                        CASE WHEN er.requester_id = ? THEN 'requester' ELSE 'provider' END as role
+                 FROM exchange_requests er
+                 LEFT JOIN listings l ON er.listing_id = l.id
+                 WHERE (er.requester_id = ? OR er.provider_id = ?) AND er.tenant_id = ?
+                 ORDER BY er.created_at DESC",
+                [$userId, $userId, $userId, $this->tenantId]
+            )->fetchAll();
+        } catch (\Throwable $e) {
+            return [];
+        }
+    }
+
     // =========================================================================
     // ACCOUNT DELETION (Article 17 - Right to Erasure)
     // =========================================================================
@@ -831,6 +854,7 @@ class GdprService
                     cover_image = NULL,
                     website = NULL,
                     social_links = NULL,
+                    password_hash = '',
                     password = '',
                     remember_token = NULL,
                     deleted_at = NOW(),
@@ -896,8 +920,9 @@ class GdprService
             }
 
             // 3e. Remove connections (personal relationship data)
+            // Connection table uses requester_id/receiver_id columns (not user_id/connected_user_id)
             $this->query(
-                "DELETE FROM connections WHERE (user_id = ? OR connected_user_id = ?) AND tenant_id = ?",
+                "DELETE FROM connections WHERE (requester_id = ? OR receiver_id = ?) AND tenant_id = ?",
                 [$userId, $userId, $this->tenantId]
             );
 
@@ -944,6 +969,44 @@ class GdprService
                 $this->query(
                     "DELETE FROM user_notification_preferences WHERE user_id = ?",
                     [$userId]
+                );
+            } catch (\Throwable $e) { /* ignore */ }
+
+            // 3k. Anonymize exchange requests (preserve transaction history, remove personal notes)
+            try {
+                $this->query(
+                    "UPDATE exchange_requests SET requester_notes = NULL, provider_notes = NULL, broker_notes = NULL
+                     WHERE (requester_id = ? OR provider_id = ?) AND tenant_id = ?",
+                    [$userId, $userId, $this->tenantId]
+                );
+            } catch (\Throwable $e) { /* ignore */ }
+
+            // 3l. Delete feed activity entries (user's posts/shares in the feed)
+            try {
+                $this->query(
+                    "DELETE FROM feed_activity WHERE user_id = ? AND tenant_id = ?",
+                    [$userId, $this->tenantId]
+                );
+            } catch (\Throwable $e) { /* ignore */ }
+
+            // 3m. Delete user blocks (in both directions)
+            try {
+                $this->query(
+                    "DELETE FROM user_blocks WHERE user_id = ? OR blocked_user_id = ?",
+                    [$userId, $userId]
+                );
+            } catch (\Throwable $e) { /* ignore */ }
+
+            // 3n. Anonymize transactions (preserve amounts for audit, remove personal link text)
+            // Note: transactions are financial records — we keep them but with anonymized sender/receiver names
+            try {
+                $this->query(
+                    "UPDATE transactions SET deleted_for_sender = 1 WHERE sender_id = ? AND tenant_id = ?",
+                    [$userId, $this->tenantId]
+                );
+                $this->query(
+                    "UPDATE transactions SET deleted_for_receiver = 1 WHERE receiver_id = ? AND tenant_id = ?",
+                    [$userId, $this->tenantId]
                 );
             } catch (\Throwable $e) { /* ignore */ }
 

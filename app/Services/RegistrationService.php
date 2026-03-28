@@ -6,6 +6,7 @@
 
 namespace App\Services;
 
+use App\Events\UserRegistered;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
@@ -62,7 +63,21 @@ class RegistrationService
             $user->password_hash = Hash::make($data['password']);
             $user->status = 'pending';
             $user->verification_token = Str::random(64);
-            $user->balance = 0;
+
+            // Apply tenant's welcome credits (configurable in admin settings)
+            $welcomeCredits = 0;
+            try {
+                $welcomeSetting = DB::table('tenant_settings')
+                    ->where('tenant_id', $tenantId)
+                    ->where('setting_key', 'welcome_credits')
+                    ->value('setting_value');
+                if ($welcomeSetting !== null) {
+                    $welcomeCredits = max(0, min(100, (float) $welcomeSetting));
+                }
+            } catch (\Throwable $e) {
+                // Fail gracefully — default to 0
+            }
+            $user->balance = $welcomeCredits;
 
             // Optional fields from frontend
             if (!empty($data['phone'])) {
@@ -86,11 +101,36 @@ class RegistrationService
 
             $user->save();
 
+            // Record the starting balance transaction if welcome credits > 0
+            if ($welcomeCredits > 0) {
+                DB::table('transactions')->insert([
+                    'tenant_id'        => $tenantId,
+                    'sender_id'        => null,
+                    'receiver_id'      => $user->id,
+                    'amount'           => $welcomeCredits,
+                    'description'      => 'Welcome credits — starting balance',
+                    'transaction_type' => 'starting_balance',
+                    'status'           => 'completed',
+                    'created_at'       => now(),
+                    'updated_at'       => now(),
+                ]);
+            }
+
             return $user;
         });
 
         if ($user === null) {
             return ['error' => 'Registration could not be completed. Please try again or contact support.'];
+        }
+
+        // Dispatch UserRegistered event (triggers welcome notification, etc.)
+        try {
+            event(new UserRegistered($user, $tenantId));
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::warning('UserRegistered event dispatch failed', [
+                'user_id' => $user->id,
+                'error' => $e->getMessage(),
+            ]);
         }
 
         return [
