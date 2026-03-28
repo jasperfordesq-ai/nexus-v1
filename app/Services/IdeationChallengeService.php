@@ -387,7 +387,16 @@ class IdeationChallengeService
         }
 
         return [
-            'items'    => $items->map(fn ($i) => (array) $i)->values()->all(),
+            'items'    => $items->map(function ($i) {
+                $item = (array) $i;
+                $item['creator'] = [
+                    'id'         => (int) ($item['user_id'] ?? 0),
+                    'name'       => trim(($item['first_name'] ?? '') . ' ' . ($item['last_name'] ?? '')),
+                    'avatar_url' => $item['avatar_url'] ?? null,
+                ];
+                unset($item['first_name'], $item['last_name'], $item['avatar_url']);
+                return $item;
+            })->values()->all(),
             'cursor'   => $hasMore && $items->isNotEmpty() ? base64_encode((string) $items->last()->id) : null,
             'has_more' => $hasMore,
         ];

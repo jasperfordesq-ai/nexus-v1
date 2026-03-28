@@ -58,8 +58,11 @@ class Category extends Model
         return $query->where('type', $type);
     }
 
+    /**
+     * Active scope — categories table has no status column, so all rows are active.
+     */
     public function scopeActive(Builder $query): Builder
     {
-        return $query->where('status', 'active');
+        return $query;
     }
 }
