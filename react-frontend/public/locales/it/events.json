@@ -99,7 +99,9 @@
     "leave_waitlist": "Lascia la lista d'attesa",
     "other_series_events": "Altri eventi in questa serie",
     "view_all_series": "Visualizza tutti i {{count}} eventi della serie",
-    "no_other_series_events": "Nessun altro evento trovato in questa serie."
+    "no_other_series_events": "Nessun altro evento trovato in questa serie.",
+    "remote_attendance_available": "Partecipazione da remoto disponibile",
+    "join_meeting": "Partecipa alla riunione"
   },
   "card": {
     "cancelled": "Annullato",
@@ -145,6 +147,11 @@
     "error_not_found": "Evento non trovato",
     "error_load_failed": "Impossibile caricare l'evento. Riprova.",
     "cancel": "Annulla",
+    "remote_attendance_toggle": "Consenti partecipazione da remoto",
+    "remote_attendance_desc": "Permetti ai partecipanti di unirsi tramite videoconferenza",
+    "remote_attendance_toggle_aria": "Attiva/disattiva partecipazione da remoto",
+    "video_url_label": "Link della riunione",
+    "video_url_placeholder": "https://zoom.us/j/... o https://meet.google.com/...",
     "recurring_toggle": "Rendi questo un evento ricorrente",
     "recurring_desc": "Crea automaticamente più occorrenze",
     "recurring_toggle_aria": "Attiva/disattiva evento ricorrente",
@@ -189,7 +196,10 @@
       "updated": "Evento aggiornato",
       "image_failed": "Evento creato ma il caricamento dell'immagine non è riuscito",
       "error": "Qualcosa è andato storto"
-    }
+    },
+    "attach_polls_label": "Allega sondaggi (opzionale)",
+    "attach_polls_placeholder": "Seleziona sondaggi da allegare...",
+    "attach_polls_hint": "Allega sondaggi della comunità esistenti a questo evento."
   },
   "toast": {
     "rsvp_removed": "RSVP rimosso",
@@ -215,5 +225,14 @@
   "reminder": {
     "title": "Promemoria Evento",
     "coming_soon_desc": "Le preferenze globali per i promemoria saranno disponibili a breve. Nel frattempo, puoi impostare promemoria sui singoli eventi dalla loro pagina di dettaglio."
+  },
+  "polls": {
+    "title": "Sondaggi dell'evento",
+    "status_open": "Aperto",
+    "status_closed": "Chiuso",
+    "total_votes": "{{count}} voti",
+    "vote_success": "Voto registrato!",
+    "vote_failed": "Impossibile registrare il voto",
+    "view_full": "Visualizza sondaggio completo"
   }
 }

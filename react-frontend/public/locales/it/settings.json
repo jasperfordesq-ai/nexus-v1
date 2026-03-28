@@ -342,5 +342,23 @@
     "skill_removed": "Competenza rimossa",
     "skill_add_failed": "Impossibile aggiungere la competenza",
     "skill_remove_failed": "Impossibile rimuovere la competenza"
+  },
+  "appearance_prefs": {
+    "title": "Preferenze aspetto",
+    "accent_color": "Colore di accentuazione",
+    "accent_color_desc": "Scegli il colore di accentuazione utilizzato in tutta l'interfaccia",
+    "select_color": "Seleziona {{color}} come colore di accentuazione",
+    "font_size": "Dimensione del carattere",
+    "font_size_desc": "Regola la dimensione del testo di base nell'interfaccia",
+    "font_small": "P",
+    "font_medium": "M",
+    "font_large": "G",
+    "density": "Densità del layout",
+    "density_desc": "Controlla la spaziatura e il padding degli elementi dell'interfaccia",
+    "density_compact": "Compatto",
+    "density_comfortable": "Confortevole",
+    "density_spacious": "Spazioso",
+    "high_contrast": "Alto contrasto",
+    "high_contrast_desc": "Aumenta bordi, contrasto del testo e indicatori di messa a fuoco per una migliore accessibilità"
   }
 }

@@ -99,7 +99,9 @@
     "leave_waitlist": "Sair da Lista de Espera",
     "other_series_events": "Outros eventos nesta série",
     "view_all_series": "Ver todos os {{count}} eventos da série",
-    "no_other_series_events": "Nenhum outro evento encontrado nesta série."
+    "no_other_series_events": "Nenhum outro evento encontrado nesta série.",
+    "remote_attendance_available": "Participação remota disponível",
+    "join_meeting": "Entrar na reunião"
   },
   "card": {
     "cancelled": "Cancelado",
@@ -145,6 +147,11 @@
     "error_not_found": "Evento não encontrado",
     "error_load_failed": "Falha ao carregar evento. Por favor, tente novamente.",
     "cancel": "Cancelar",
+    "remote_attendance_toggle": "Permitir participação remota",
+    "remote_attendance_desc": "Permitir que os participantes participem por videoconferência",
+    "remote_attendance_toggle_aria": "Alternar participação remota",
+    "video_url_label": "Link da reunião",
+    "video_url_placeholder": "https://zoom.us/j/... ou https://meet.google.com/...",
     "recurring_toggle": "Tornar este um evento recorrente",
     "recurring_desc": "Criar automaticamente múltiplas ocorrências",
     "recurring_toggle_aria": "Alternar evento recorrente",
@@ -189,7 +196,10 @@
       "updated": "Evento atualizado",
       "image_failed": "Evento criado mas o carregamento da imagem falhou",
       "error": "Algo correu mal"
-    }
+    },
+    "attach_polls_label": "Anexar sondagens (opcional)",
+    "attach_polls_placeholder": "Selecionar sondagens para anexar...",
+    "attach_polls_hint": "Anexe sondagens comunitárias existentes a este evento."
   },
   "toast": {
     "rsvp_removed": "Confirmação removida",
@@ -215,5 +225,14 @@
   "reminder": {
     "title": "Lembretes de Evento",
     "coming_soon_desc": "As preferências globais de lembrete estarão disponíveis em breve. Entretanto, pode definir lembretes em eventos individuais a partir da página de detalhes."
+  },
+  "polls": {
+    "title": "Sondagens do evento",
+    "status_open": "Aberta",
+    "status_closed": "Fechada",
+    "total_votes": "{{count}} votos",
+    "vote_success": "Voto registado!",
+    "vote_failed": "Falha ao registar voto",
+    "view_full": "Ver sondagem completa"
   }
 }

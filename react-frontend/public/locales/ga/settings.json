@@ -342,5 +342,23 @@
     "skill_removed": "Scil bainte",
     "skill_add_failed": "Theip ar scil a chur leis",
     "skill_remove_failed": "Theip ar an scil a bhaint"
+  },
+  "appearance_prefs": {
+    "title": "Roghanna Cuma",
+    "accent_color": "Dath Béime",
+    "accent_color_desc": "Roghnaigh an dath béime a úsáidtear ar fud an chomhéadain",
+    "select_color": "Roghnaigh {{color}} mar dhath béime",
+    "font_size": "Méid Clófhoirne",
+    "font_size_desc": "Coigeartaigh méid bunúsach an téacs ar fud an chomhéadain",
+    "font_small": "B",
+    "font_medium": "M",
+    "font_large": "M",
+    "density": "Dlús Leagan Amach",
+    "density_desc": "Rialaigh an spásáil agus an stuáil ar ghnéithe an chomhéadain",
+    "density_compact": "Dlúth",
+    "density_comfortable": "Compordach",
+    "density_spacious": "Fairsing",
+    "high_contrast": "Codarsnacht Ard",
+    "high_contrast_desc": "Méadaigh imeallíní, codarsnacht téacs, agus táscairí fócais le haghaidh inrochtaineachta níos fearr"
   }
 }

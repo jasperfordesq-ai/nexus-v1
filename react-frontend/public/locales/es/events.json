@@ -99,7 +99,9 @@
     "leave_waitlist": "Salir de Lista de Espera",
     "other_series_events": "Otros eventos en esta serie",
     "view_all_series": "Ver los {{count}} eventos de la serie",
-    "no_other_series_events": "No se encontraron otros eventos en esta serie."
+    "no_other_series_events": "No se encontraron otros eventos en esta serie.",
+    "remote_attendance_available": "Asistencia remota disponible",
+    "join_meeting": "Unirse a la reunión"
   },
   "card": {
     "cancelled": "Cancelado",
@@ -145,6 +147,11 @@
     "error_not_found": "Evento no encontrado",
     "error_load_failed": "No se pudo cargar el evento. Por favor, inténtelo de nuevo.",
     "cancel": "Cancelar",
+    "remote_attendance_toggle": "Permitir asistencia remota",
+    "remote_attendance_desc": "Permite a los asistentes unirse por videoconferencia",
+    "remote_attendance_toggle_aria": "Alternar asistencia remota",
+    "video_url_label": "Enlace de la reunión",
+    "video_url_placeholder": "https://zoom.us/j/... o https://meet.google.com/...",
     "recurring_toggle": "Hacer evento recurrente",
     "recurring_desc": "Crear automáticamente múltiples repeticiones",
     "recurring_toggle_aria": "Alternar evento recurrente",
@@ -189,7 +196,10 @@
       "updated": "Evento actualizado",
       "image_failed": "Evento creado pero la subida de imagen falló",
       "error": "Algo salió mal"
-    }
+    },
+    "attach_polls_label": "Adjuntar encuestas (opcional)",
+    "attach_polls_placeholder": "Seleccionar encuestas para adjuntar...",
+    "attach_polls_hint": "Adjunte encuestas comunitarias existentes a este evento."
   },
   "toast": {
     "rsvp_removed": "Confirmación eliminada",
@@ -215,5 +225,14 @@
   "reminder": {
     "title": "Recordatorios de Eventos",
     "coming_soon_desc": "Las preferencias globales de recordatorios estarán disponibles pronto. Mientras tanto, puede configurar recordatorios en eventos individuales."
+  },
+  "polls": {
+    "title": "Encuestas del evento",
+    "status_open": "Abierta",
+    "status_closed": "Cerrada",
+    "total_votes": "{{count}} votos",
+    "vote_success": "Voto registrado!",
+    "vote_failed": "No se pudo registrar el voto",
+    "view_full": "Ver encuesta completa"
   }
 }

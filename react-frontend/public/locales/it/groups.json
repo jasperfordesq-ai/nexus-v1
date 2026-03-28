@@ -278,5 +278,19 @@
   },
   "loading_aria": "Caricamento gruppi",
   "load_error": "Impossibile caricare i gruppi.",
-  "load_more_error": "Impossibile caricare altri gruppi"
+  "load_more_error": "Impossibile caricare altri gruppi",
+  "chatrooms": {
+    "private_label": "Privato",
+    "show_pinned": "Mostra messaggi fissati",
+    "pinned_messages": "Messaggi fissati",
+    "pin": "Fissa messaggio",
+    "unpin": "Sblocca messaggio",
+    "pinned_success": "Messaggio fissato",
+    "unpinned_success": "Messaggio sbloccato",
+    "pin_failed": "Impossibile fissare il messaggio",
+    "unpin_failed": "Impossibile sbloccare il messaggio",
+    "category_general": "Generale",
+    "category_announcements": "Annunci",
+    "category_off_topic": "Fuori tema"
+  }
 }

@@ -278,5 +278,19 @@
   },
   "loading_aria": "Grúpaí á lódáil",
   "load_error": "Theip ar lodail na ngrupai.",
-  "load_more_error": "Theip ar thuilleadh grupai"
+  "load_more_error": "Theip ar thuilleadh grupai",
+  "chatrooms": {
+    "private_label": "Príobháideach",
+    "show_pinned": "Taispeáin teachtaireachtaí pionnáilte",
+    "pinned_messages": "Teachtaireachtaí Pionnáilte",
+    "pin": "Pionnáil teachtaireacht",
+    "unpin": "Díphionnáil teachtaireacht",
+    "pinned_success": "Teachtaireacht pionnáilte",
+    "unpinned_success": "Teachtaireacht díphionnáilte",
+    "pin_failed": "Theip ar phionnáil teachtaireachta",
+    "unpin_failed": "Theip ar dhíphionnáil teachtaireachta",
+    "category_general": "Ginearálta",
+    "category_announcements": "Fógraí",
+    "category_off_topic": "As ábhar"
+  }
 }

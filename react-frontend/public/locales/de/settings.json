@@ -342,5 +342,23 @@
     "skill_removed": "Fähigkeit entfernt",
     "skill_add_failed": "Fähigkeit konnte nicht hinzugefügt werden",
     "skill_remove_failed": "Fähigkeit konnte nicht entfernt werden"
+  },
+  "appearance_prefs": {
+    "title": "Darstellungseinstellungen",
+    "accent_color": "Akzentfarbe",
+    "accent_color_desc": "Wählen Sie die Akzentfarbe, die in der gesamten Oberfläche verwendet wird",
+    "select_color": "{{color}} als Akzentfarbe auswählen",
+    "font_size": "Schriftgröße",
+    "font_size_desc": "Passen Sie die Basis-Textgröße der Oberfläche an",
+    "font_small": "K",
+    "font_medium": "M",
+    "font_large": "G",
+    "density": "Layout-Dichte",
+    "density_desc": "Steuern Sie den Abstand und die Polsterung der Oberflächenelemente",
+    "density_compact": "Kompakt",
+    "density_comfortable": "Komfortabel",
+    "density_spacious": "Großzügig",
+    "high_contrast": "Hoher Kontrast",
+    "high_contrast_desc": "Erhöht Rahmen, Textkontrast und Fokusanzeiger für bessere Barrierefreiheit"
   }
 }

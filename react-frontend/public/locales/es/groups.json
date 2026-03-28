@@ -278,5 +278,19 @@
   },
   "loading_aria": "Cargando grupos",
   "load_error": "Error al cargar los grupos.",
-  "load_more_error": "Error al cargar mas grupos"
+  "load_more_error": "Error al cargar mas grupos",
+  "chatrooms": {
+    "private_label": "Privado",
+    "show_pinned": "Mostrar mensajes fijados",
+    "pinned_messages": "Mensajes fijados",
+    "pin": "Fijar mensaje",
+    "unpin": "Desfijar mensaje",
+    "pinned_success": "Mensaje fijado",
+    "unpinned_success": "Mensaje desfijado",
+    "pin_failed": "No se pudo fijar el mensaje",
+    "unpin_failed": "No se pudo desfijar el mensaje",
+    "category_general": "General",
+    "category_announcements": "Anuncios",
+    "category_off_topic": "Fuera de tema"
+  }
 }

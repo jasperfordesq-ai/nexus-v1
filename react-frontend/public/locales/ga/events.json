@@ -99,7 +99,9 @@
     "leave_waitlist": "Fág an Liosta Feithimh",
     "other_series_events": "Imeachtaí eile sa tsraith seo",
     "view_all_series": "Féach ar gach {{count}} imeacht sa tsraith",
-    "no_other_series_events": "Níor aimsíodh aon imeachtaí eile sa tsraith seo."
+    "no_other_series_events": "Níor aimsíodh aon imeachtaí eile sa tsraith seo.",
+    "remote_attendance_available": "Freastal cianda ar fáil",
+    "join_meeting": "Bí páirteach sa chruinniú"
   },
   "card": {
     "cancelled": "Cealaithe",
@@ -145,6 +147,11 @@
     "error_not_found": "Imeacht gan aimsiú",
     "error_load_failed": "Theip ar imeacht a lódáil. Bain triail eile as le do thoil.",
     "cancel": "Cealaigh",
+    "remote_attendance_toggle": "Ceadaigh freastal cianda",
+    "remote_attendance_desc": "Lig do fhreastalaitheoirí páirt a ghlacadh trí fhíschomhdháil",
+    "remote_attendance_toggle_aria": "Scoránaigh freastal cianda",
+    "video_url_label": "Nasc cruinnithe",
+    "video_url_placeholder": "https://zoom.us/j/... nó https://meet.google.com/...",
     "recurring_toggle": "Déan imeacht athfhillteach de seo",
     "recurring_desc": "Cruthaigh tarluithe iolracha go huathoibríoch",
     "recurring_toggle_aria": "Scoránaigh imeacht athfhillteach",
@@ -189,7 +196,10 @@
       "updated": "Imeacht nuashonraithe",
       "image_failed": "Imeacht cruthaithe ach theip ar uaslódáil íomhá",
       "error": "Chuaigh rud éigin mícheart"
-    }
+    },
+    "attach_polls_label": "Ceangail pobalbhreitheanna (roghnach)",
+    "attach_polls_placeholder": "Roghnaigh pobalbhreitheanna le ceangal...",
+    "attach_polls_hint": "Ceangail pobalbhreitheanna pobail reatha leis an imeacht seo."
   },
   "toast": {
     "rsvp_removed": "RSVP bainte",
@@ -215,5 +225,14 @@
   "reminder": {
     "title": "Meabhrúcháin Imeachtaí",
     "coming_soon_desc": "Tá roghanna meabhrúcháin domhanda ag teacht go luath. Idir an dá linn, is féidir leat meabhrúcháin a shocrú ar imeachtaí aonair ón leathanach sonraí."
+  },
+  "polls": {
+    "title": "Pobalbhreitheanna Imeachta",
+    "status_open": "Oscailte",
+    "status_closed": "Dúnta",
+    "total_votes": "{{count}} vóta",
+    "vote_success": "Vóta taifeadta!",
+    "vote_failed": "Theip ar vóta a thaifeadadh",
+    "view_full": "Féach ar an bpobalbhreith iomlán"
   }
 }

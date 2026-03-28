@@ -278,5 +278,19 @@
   },
   "loading_aria": "Gruppen werden geladen",
   "load_error": "Gruppen konnten nicht geladen werden.",
-  "load_more_error": "Weitere Gruppen konnten nicht geladen werden"
+  "load_more_error": "Weitere Gruppen konnten nicht geladen werden",
+  "chatrooms": {
+    "private_label": "Privat",
+    "show_pinned": "Angeheftete Nachrichten anzeigen",
+    "pinned_messages": "Angeheftete Nachrichten",
+    "pin": "Nachricht anheften",
+    "unpin": "Nachricht lösen",
+    "pinned_success": "Nachricht angeheftet",
+    "unpinned_success": "Nachricht gelöst",
+    "pin_failed": "Nachricht konnte nicht angeheftet werden",
+    "unpin_failed": "Nachricht konnte nicht gelöst werden",
+    "category_general": "Allgemein",
+    "category_announcements": "Ankündigungen",
+    "category_off_topic": "Off-Topic"
+  }
 }

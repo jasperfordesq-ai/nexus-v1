@@ -599,10 +599,9 @@ jobs:
           echo "Total violations across all pages: $VIOLATIONS"
 
           if [ "$VIOLATIONS" -gt 0 ]; then
-            echo "::warning::Accessibility: Found $VIOLATIONS WCAG 2.1 AA violations. Review and fix."
+            echo "::error::Accessibility: Found $VIOLATIONS WCAG 2.1 AA violations. Fix before merging."
+            exit 1
           else
             echo "PASS: No WCAG 2.1 AA violations detected."
+            exit 0
           fi
-
-          # Warning-only: always exit 0
-          exit 0

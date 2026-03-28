@@ -278,5 +278,19 @@
   },
   "loading_aria": "A carregar grupos",
   "load_error": "Falha ao carregar grupos.",
-  "load_more_error": "Falha ao carregar mais grupos"
+  "load_more_error": "Falha ao carregar mais grupos",
+  "chatrooms": {
+    "private_label": "Privado",
+    "show_pinned": "Mostrar mensagens fixadas",
+    "pinned_messages": "Mensagens fixadas",
+    "pin": "Fixar mensagem",
+    "unpin": "Desafixar mensagem",
+    "pinned_success": "Mensagem fixada",
+    "unpinned_success": "Mensagem desafixada",
+    "pin_failed": "Falha ao fixar mensagem",
+    "unpin_failed": "Falha ao desafixar mensagem",
+    "category_general": "Geral",
+    "category_announcements": "Anúncios",
+    "category_off_topic": "Fora do tema"
+  }
 }

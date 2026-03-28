@@ -99,7 +99,9 @@
     "leave_waitlist": "Quitter la liste d'attente",
     "other_series_events": "Autres événements de cette série",
     "view_all_series": "Voir les {{count}} événements de la série",
-    "no_other_series_events": "Aucun autre événement trouvé dans cette série."
+    "no_other_series_events": "Aucun autre événement trouvé dans cette série.",
+    "remote_attendance_available": "Participation à distance disponible",
+    "join_meeting": "Rejoindre la réunion"
   },
   "card": {
     "cancelled": "Annulé",
@@ -145,7 +147,12 @@
     "error_not_found": "Event not found",
     "error_load_failed": "Failed to load event. Please try again.",
     "cancel": "Annuler",
-    "recurring_toggle": "Make this a recurring event",
+    "remote_attendance_toggle": "Autoriser la participation à distance",
+    "remote_attendance_desc": "Permettre aux participants de rejoindre par visioconférence",
+    "remote_attendance_toggle_aria": "Activer/désactiver la participation à distance",
+    "video_url_label": "Lien de la réunion",
+    "video_url_placeholder": "https://zoom.us/j/... ou https://meet.google.com/...",
+    "recurring_toggle": "Rendre cet événement récurrent",
     "recurring_desc": "Automatically create multiple occurrences",
     "recurring_toggle_aria": "Toggle recurring event",
     "recurrence_frequency": "Frequency",
@@ -189,7 +196,10 @@
       "updated": "Événement mis à jour",
       "image_failed": "Événement créé mais le téléchargement de l'image a échoué",
       "error": "Une erreur s'est produite"
-    }
+    },
+    "attach_polls_label": "Joindre des sondages (optionnel)",
+    "attach_polls_placeholder": "Sélectionner des sondages à joindre...",
+    "attach_polls_hint": "Joignez des sondages communautaires existants à cet événement."
   },
   "toast": {
     "rsvp_removed": "RSVP annulé",
@@ -211,9 +221,18 @@
     "waitlist_join_failed": "Impossible de rejoindre la liste d'attente.",
     "removed_from_waitlist": "Vous avez été retiré(e) de la liste d'attente."
   },
-  "reminder_settings": "Event Reminder Settings",
+  "reminder_settings": "Paramètres de rappel d'événement",
   "reminder": {
-    "title": "Event Reminders",
-    "coming_soon_desc": "Global reminder preferences are coming soon. In the meantime, you can set reminders on individual events from their detail page."
+    "title": "Rappels d'événement",
+    "coming_soon_desc": "Les préférences de rappel globales seront bientôt disponibles. En attendant, vous pouvez configurer des rappels pour chaque événement depuis sa page de détails."
+  },
+  "polls": {
+    "title": "Sondages de l'événement",
+    "status_open": "Ouvert",
+    "status_closed": "Fermé",
+    "total_votes": "{{count}} votes",
+    "vote_success": "Vote enregistré !",
+    "vote_failed": "Impossible d'enregistrer le vote",
+    "view_full": "Voir le sondage complet"
   }
 }

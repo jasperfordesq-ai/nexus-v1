@@ -342,5 +342,23 @@
     "skill_removed": "Habilidad eliminada",
     "skill_add_failed": "Error al añadir la habilidad",
     "skill_remove_failed": "Error al eliminar la habilidad"
+  },
+  "appearance_prefs": {
+    "title": "Preferencias de apariencia",
+    "accent_color": "Color de acento",
+    "accent_color_desc": "Elige el color de acento usado en toda la interfaz",
+    "select_color": "Seleccionar {{color}} como color de acento",
+    "font_size": "Tamaño de fuente",
+    "font_size_desc": "Ajusta el tamaño base del texto en la interfaz",
+    "font_small": "P",
+    "font_medium": "M",
+    "font_large": "G",
+    "density": "Densidad del diseño",
+    "density_desc": "Controla el espaciado y el relleno de los elementos de la interfaz",
+    "density_compact": "Compacto",
+    "density_comfortable": "Cómodo",
+    "density_spacious": "Espacioso",
+    "high_contrast": "Alto contraste",
+    "high_contrast_desc": "Aumenta bordes, contraste de texto e indicadores de enfoque para una mejor accesibilidad"
   }
 }

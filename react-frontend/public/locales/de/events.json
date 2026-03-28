@@ -99,7 +99,9 @@
     "leave_waitlist": "Von Warteliste entfernen",
     "other_series_events": "Weitere Veranstaltungen in dieser Reihe",
     "view_all_series": "Alle {{count}} Veranstaltungen der Reihe anzeigen",
-    "no_other_series_events": "Keine weiteren Veranstaltungen in dieser Reihe gefunden."
+    "no_other_series_events": "Keine weiteren Veranstaltungen in dieser Reihe gefunden.",
+    "remote_attendance_available": "Fernteilnahme verfügbar",
+    "join_meeting": "Meeting beitreten"
   },
   "card": {
     "cancelled": "Abgesagt",
@@ -145,6 +147,11 @@
     "error_not_found": "Veranstaltung nicht gefunden",
     "error_load_failed": "Failed to load event. Please try again.",
     "cancel": "Abbrechen",
+    "remote_attendance_toggle": "Fernteilnahme erlauben",
+    "remote_attendance_desc": "Teilnehmer können per Videokonferenz teilnehmen",
+    "remote_attendance_toggle_aria": "Fernteilnahme umschalten",
+    "video_url_label": "Meeting-Link",
+    "video_url_placeholder": "https://zoom.us/j/... oder https://meet.google.com/...",
     "recurring_toggle": "Als wiederkehrende Veranstaltung anlegen",
     "recurring_desc": "Automatisch mehrere Termine erstellen",
     "recurring_toggle_aria": "Wiederkehrende Veranstaltung umschalten",
@@ -189,7 +196,10 @@
       "updated": "Veranstaltung aktualisiert",
       "image_failed": "Veranstaltung erstellt, aber Bild-Upload fehlgeschlagen",
       "error": "Etwas ist schiefgelaufen"
-    }
+    },
+    "attach_polls_label": "Umfragen anhängen (optional)",
+    "attach_polls_placeholder": "Umfragen zum Anhängen auswählen...",
+    "attach_polls_hint": "Hängen Sie bestehende Gemeinschaftsumfragen an diese Veranstaltung an."
   },
   "toast": {
     "rsvp_removed": "RSVP entfernt",
@@ -215,5 +225,14 @@
   "reminder": {
     "title": "Veranstaltungserinnerungen",
     "coming_soon_desc": "Globale Erinnerungseinstellungen kommen bald. In der Zwischenzeit können Sie Erinnerungen für einzelne Veranstaltungen auf deren Detailseite festlegen."
+  },
+  "polls": {
+    "title": "Veranstaltungsumfragen",
+    "status_open": "Offen",
+    "status_closed": "Geschlossen",
+    "total_votes": "{{count}} Stimmen",
+    "vote_success": "Stimme erfasst!",
+    "vote_failed": "Stimme konnte nicht erfasst werden",
+    "view_full": "Vollständige Umfrage anzeigen"
   }
 }

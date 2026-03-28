@@ -276,7 +276,21 @@
     "report_failed": "Failed to report post",
     "vote_failed": "Failed to vote"
   },
-  "loading_aria": "Loading groups",
+  "loading_aria": "Chargement des groupes",
   "load_error": "Impossible de charger les groupes.",
-  "load_more_error": "Impossible de charger plus de groupes"
+  "load_more_error": "Impossible de charger plus de groupes",
+  "chatrooms": {
+    "private_label": "Privé",
+    "show_pinned": "Afficher les messages épinglés",
+    "pinned_messages": "Messages épinglés",
+    "pin": "Épingler le message",
+    "unpin": "Détacher le message",
+    "pinned_success": "Message épinglé",
+    "unpinned_success": "Message détaché",
+    "pin_failed": "Impossible d'épingler le message",
+    "unpin_failed": "Impossible de détacher le message",
+    "category_general": "Général",
+    "category_announcements": "Annonces",
+    "category_off_topic": "Hors-sujet"
+  }
 }

@@ -150,8 +150,18 @@ class StripeSubscriptionService
             ? $plan->stripe_price_id_yearly
             : $plan->stripe_price_id_monthly;
 
+        // Auto-sync to Stripe if price IDs are missing (e.g., pre-existing plans)
         if (empty($priceId)) {
-            throw new \RuntimeException("No Stripe price configured for plan {$planId} ({$billingInterval})");
+            Log::info("Auto-syncing plan {$planId} to Stripe (no price ID for {$billingInterval})");
+            static::syncPlanToStripe($planId);
+            $plan->refresh();
+            $priceId = $billingInterval === 'yearly'
+                ? $plan->stripe_price_id_yearly
+                : $plan->stripe_price_id_monthly;
+
+            if (empty($priceId)) {
+                throw new \RuntimeException("Failed to sync plan {$planId} to Stripe — no price created for {$billingInterval}");
+            }
         }
 
         // Build success/cancel URLs — point to the React admin billing page

@@ -342,5 +342,23 @@
     "skill_removed": "Compétence supprimée",
     "skill_add_failed": "Échec de l'ajout de la compétence",
     "skill_remove_failed": "Échec de la suppression de la compétence"
+  },
+  "appearance_prefs": {
+    "title": "Préférences d'apparence",
+    "accent_color": "Couleur d'accentuation",
+    "accent_color_desc": "Choisissez la couleur d'accentuation utilisée dans toute l'interface",
+    "select_color": "Sélectionner {{color}} comme couleur d'accentuation",
+    "font_size": "Taille de police",
+    "font_size_desc": "Ajustez la taille du texte de base dans l'interface",
+    "font_small": "P",
+    "font_medium": "M",
+    "font_large": "G",
+    "density": "Densité de mise en page",
+    "density_desc": "Contrôlez l'espacement et le rembourrage des éléments de l'interface",
+    "density_compact": "Compact",
+    "density_comfortable": "Confortable",
+    "density_spacious": "Spacieux",
+    "high_contrast": "Contraste élevé",
+    "high_contrast_desc": "Augmente les bordures, le contraste du texte et les indicateurs de focus pour une meilleure accessibilité"
   }
 }
