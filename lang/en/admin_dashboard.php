@@ -10,6 +10,7 @@ return [
     'tour_btn' => 'Tour',
     'refresh' => 'Refresh',
     'view_all_activity' => 'View All Activity',
+    'load_error' => 'Failed to load dashboard data',
     'tour' => [
         'welcome_title' => 'Welcome to Mission Control!',
         'welcome_description' => 'This is your command center for managing your community platform. Let\'s take a quick tour of the key features.',
@@ -24,8 +25,19 @@ return [
         'transactions' => 'Transactions',
         'hours_exchanged' => 'Hours Exchanged',
         'hours' => 'Hours',
+        'new_users_this_month' => 'New Users This Month',
+        'active_users' => 'Active Users',
+        'total_listings' => 'Total Listings',
+        'new_listings_this_month' => 'New Listings This Month',
+    ],
+    'trends' => [
+        'card_title' => 'Transaction Trends',
+        'hours_suffix' => 'hrs',
+        'no_data' => 'No trend data available',
     ],
     'alerts' => [
+        'pending_approvals' => 'Members awaiting approval',
+        'pending_listings' => 'Listings awaiting moderation',
         'users_pending_one' => ':count User Pending',
         'users_pending_other' => ':count Users Pending',
         'users_pending_text' => 'New member registrations require your review',
@@ -90,6 +102,8 @@ return [
         'new_blog_post' => 'New Blog Post',
         'gamification' => 'Gamification',
         'settings' => 'Settings',
+        'enterprise' => 'Enterprise',
+        'advanced_controls' => 'Advanced Controls',
     ],
     'enterprise' => [
         'card_title' => 'Enterprise Suite',
