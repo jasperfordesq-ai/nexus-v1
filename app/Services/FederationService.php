@@ -20,11 +20,14 @@ class FederationService
      */
     public function getTimebanks(int $tenantId): array
     {
-        return DB::table('federation_tenant_whitelist as fw')
-            ->join('tenants as t', 'fw.partner_tenant_id', '=', 't.id')
-            ->where('fw.tenant_id', $tenantId)
-            ->where('fw.status', 'active')
-            ->select('t.id', 't.name', 't.slug', 't.city', 't.country', 'fw.approved_at')
+        return DB::table('federation_partnerships as fp')
+            ->join('tenants as t', DB::raw('CASE WHEN fp.tenant_id = ' . (int) $tenantId . ' THEN fp.partner_tenant_id ELSE fp.tenant_id END'), '=', 't.id')
+            ->where(function ($q) use ($tenantId) {
+                $q->where('fp.tenant_id', $tenantId)
+                  ->orWhere('fp.partner_tenant_id', $tenantId);
+            })
+            ->where('fp.status', 'active')
+            ->select('t.id', 't.name', 't.slug', 't.city', 't.country', 'fp.approved_at')
             ->get()
             ->map(fn ($r) => (array) $r)
             ->all();
@@ -35,13 +38,18 @@ class FederationService
      */
     public function getMembers(int $tenantId, int $partnerTenantId, int $limit = 20): array
     {
-        $whitelisted = DB::table('federation_tenant_whitelist')
-            ->where('tenant_id', $tenantId)
-            ->where('partner_tenant_id', $partnerTenantId)
+        $partnershipActive = DB::table('federation_partnerships')
+            ->where(function ($q) use ($tenantId, $partnerTenantId) {
+                $q->where(function ($q2) use ($tenantId, $partnerTenantId) {
+                    $q2->where('tenant_id', $tenantId)->where('partner_tenant_id', $partnerTenantId);
+                })->orWhere(function ($q2) use ($tenantId, $partnerTenantId) {
+                    $q2->where('tenant_id', $partnerTenantId)->where('partner_tenant_id', $tenantId);
+                });
+            })
             ->where('status', 'active')
             ->exists();
 
-        if (! $whitelisted) {
+        if (! $partnershipActive) {
             return [];
         }
 
@@ -63,20 +71,25 @@ class FederationService
      */
     public function getListings(int $tenantId, int $partnerTenantId, int $limit = 20): array
     {
-        $whitelisted = DB::table('federation_tenant_whitelist')
-            ->where('tenant_id', $tenantId)
-            ->where('partner_tenant_id', $partnerTenantId)
+        $partnershipActive = DB::table('federation_partnerships')
+            ->where(function ($q) use ($tenantId, $partnerTenantId) {
+                $q->where(function ($q2) use ($tenantId, $partnerTenantId) {
+                    $q2->where('tenant_id', $tenantId)->where('partner_tenant_id', $partnerTenantId);
+                })->orWhere(function ($q2) use ($tenantId, $partnerTenantId) {
+                    $q2->where('tenant_id', $partnerTenantId)->where('partner_tenant_id', $tenantId);
+                });
+            })
             ->where('status', 'active')
             ->exists();
 
-        if (! $whitelisted) {
+        if (! $partnershipActive) {
             return [];
         }
 
         return DB::table('listings')
             ->where('tenant_id', $partnerTenantId)
             ->where('status', 'active')
-            ->where('federation_visible', true)
+            ->whereIn('federated_visibility', ['listed', 'bookable'])
             ->select('id', 'title', 'description', 'type', 'category_id', 'created_at')
             ->orderByDesc('created_at')
             ->limit(min($limit, 100))

@@ -45,8 +45,8 @@ function mapApiToLocal(sc: FederationSystemControlsType): { controls: SystemCont
       federation_enabled: sc.federation_enabled,
       whitelist_mode: sc.whitelist_mode_enabled,
       max_level: sc.max_federation_level,
-      lockdown_active: sc.is_locked_down,
-      lockdown_reason: sc.lockdown_reason,
+      lockdown_active: sc.emergency_lockdown_active,
+      lockdown_reason: sc.emergency_lockdown_reason,
     },
     features: {
       profiles: sc.cross_tenant_profiles_enabled,

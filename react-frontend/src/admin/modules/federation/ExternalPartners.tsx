@@ -9,7 +9,7 @@
  * Includes health check, API call logs, and feature toggles.
  */
 
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
 import {
   Button,
   Chip,
@@ -130,9 +130,9 @@ const STATUS_COLORS: Record<string, 'success' | 'default' | 'warning' | 'danger'
 };
 
 const AUTH_METHODS = [
-  { key: 'api_key', label: 'API Key' },
-  { key: 'hmac', label: 'HMAC Signature' },
-  { key: 'oauth2', label: 'OAuth 2.0' },
+  { key: 'api_key', i18nKey: 'federation.auth_method_api_key', fallback: 'API Key' },
+  { key: 'hmac', i18nKey: 'federation.auth_method_hmac', fallback: 'HMAC Signature' },
+  { key: 'oauth2', i18nKey: 'federation.auth_method_oauth2', fallback: 'OAuth 2.0' },
 ];
 
 const EMPTY_FORM: PartnerFormData = {
@@ -185,11 +185,18 @@ export function ExternalPartners() {
   const [logsLoading, setLogsLoading] = useState(false);
   const [logsPartnerName, setLogsPartnerName] = useState('');
 
+  // AbortController for cancelling in-flight requests
+  const abortControllerRef = useRef<AbortController | null>(null);
+
   // ─── Load data ───
   const loadData = useCallback(async () => {
+    if (abortControllerRef.current) abortControllerRef.current.abort();
+    const controller = new AbortController();
+    abortControllerRef.current = controller;
+
     setLoading(true);
     try {
-      const res = await api.get('/v2/admin/federation/external-partners');
+      const res = await api.get('/v2/admin/federation/external-partners', { signal: controller.signal });
       if (res.success) {
         const payload = res.data;
         setPartners(Array.isArray(payload) ? payload : (payload as { data?: ExternalPartner[] })?.data ?? []);
@@ -201,7 +208,10 @@ export function ExternalPartners() {
     setLoading(false);
   }, [toast, t]);
 
-  useEffect(() => { loadData(); }, [loadData]);
+  useEffect(() => {
+    loadData();
+    return () => { if (abortControllerRef.current) abortControllerRef.current.abort(); };
+  }, [loadData]);
 
   // ─── Open create modal ───
   const openCreate = useCallback(() => {
@@ -420,7 +430,9 @@ export function ExternalPartners() {
                 <code className="text-xs bg-default-100 px-1.5 py-0.5 rounded">{partner.base_url}</code>
               </TableCell>
               <TableCell>
-                <Chip size="sm" variant="flat">{partner.auth_method}</Chip>
+                <Chip size="sm" variant="flat">
+                  {t(`federation.auth_method_${partner.auth_method}`, partner.auth_method)}
+                </Chip>
               </TableCell>
               <TableCell>
                 <Chip
@@ -529,7 +541,7 @@ export function ExternalPartners() {
                   }}
                 >
                   {AUTH_METHODS.map((m) => (
-                    <SelectItem key={m.key}>{m.label}</SelectItem>
+                    <SelectItem key={m.key}>{t(m.i18nKey, m.fallback)}</SelectItem>
                   ))}
                 </Select>
 

@@ -43,7 +43,6 @@ class FederatedMessageService
             // Check sender has opted into federation
             $senderSettings = DB::table('federation_user_settings')
                 ->where('user_id', $senderId)
-                ->where('tenant_id', $sender->tenant_id)
                 ->first();
 
             if (!$senderSettings || !$senderSettings->federation_optin || !$senderSettings->messaging_enabled_federated) {
@@ -53,7 +52,6 @@ class FederatedMessageService
             // Check receiver has opted into federated messaging
             $receiverOptIn = DB::table('federation_user_settings')
                 ->where('user_id', $receiverId)
-                ->where('tenant_id', $receiverTenantId)
                 ->where('messaging_enabled_federated', true)
                 ->exists();
             if (!$receiverOptIn) {
@@ -82,9 +80,9 @@ class FederatedMessageService
                 'receiver_tenant_id' => $receiverTenantId,
                 'subject'           => $subject,
                 'body'              => $body,
-                'is_read'           => false,
+                'direction'         => 'outbound',
+                'status'            => 'pending',
                 'created_at'        => now(),
-                'updated_at'        => now(),
             ]);
 
             return ['success' => true, 'message_id' => $messageId];
@@ -146,8 +144,8 @@ class FederatedMessageService
             $affected = DB::table('federation_messages')
                 ->where('id', $messageId)
                 ->where('receiver_user_id', $userId)
-                ->where('is_read', false)
-                ->update(['is_read' => true, 'read_at' => now(), 'updated_at' => now()]);
+                ->whereIn('status', ['pending', 'delivered', 'unread'])
+                ->update(['status' => 'read', 'read_at' => now()]);
 
             return $affected > 0;
         } catch (\Throwable $e) {
@@ -167,8 +165,8 @@ class FederatedMessageService
                 ->where('receiver_user_id', $userId)
                 ->where('sender_user_id', $otherUserId)
                 ->where('sender_tenant_id', $otherTenantId)
-                ->where('is_read', false)
-                ->update(['is_read' => true, 'read_at' => now(), 'updated_at' => now()]);
+                ->whereIn('status', ['pending', 'delivered', 'unread'])
+                ->update(['status' => 'read', 'read_at' => now()]);
         } catch (\Throwable $e) {
             return 0;
         }
@@ -182,7 +180,7 @@ class FederatedMessageService
         try {
             return (int) DB::table('federation_messages')
                 ->where('receiver_user_id', $userId)
-                ->where('is_read', false)
+                ->whereIn('status', ['pending', 'delivered', 'unread'])
                 ->count();
         } catch (\Throwable $e) {
             return 0;
@@ -261,19 +259,18 @@ class FederatedMessageService
             }
 
             $messageId = DB::table('federation_messages')->insertGetId([
-                'sender_user_id'      => $externalSenderId,
-                'sender_tenant_id'    => $externalPartnerId,
-                'receiver_user_id'    => $receiverUserId,
-                'receiver_tenant_id'  => $receiver->tenant_id,
-                'subject'             => $subject,
-                'body'                => $body,
-                'sender_name'         => $senderName,
-                'partner_name'        => $partnerName,
-                'external_message_id' => $externalMessageId,
-                'is_read'             => false,
-                'is_external'         => true,
-                'created_at'          => now(),
-                'updated_at'          => now(),
+                'sender_user_id'         => $externalSenderId,
+                'sender_tenant_id'       => $externalPartnerId,
+                'receiver_user_id'       => $receiverUserId,
+                'receiver_tenant_id'     => $receiver->tenant_id,
+                'subject'                => $subject,
+                'body'                   => $body,
+                'external_partner_id'    => $externalPartnerId,
+                'external_receiver_name' => $senderName,
+                'external_message_id'    => $externalMessageId,
+                'direction'              => 'inbound',
+                'status'                 => 'pending',
+                'created_at'             => now(),
             ]);
 
             return ['success' => true, 'message_id' => $messageId];

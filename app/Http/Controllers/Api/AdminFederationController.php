@@ -66,21 +66,46 @@ class AdminFederationController extends BaseApiController
     public function controls(): JsonResponse
     {
         $this->requireAdmin();
-        $controls = DB::select('SELECT * FROM federation_system_control ORDER BY control_key');
-        $result = [];
-        foreach ($controls as $c) { $result[$c->control_key] = $c->control_value; }
+        $row = DB::selectOne('SELECT * FROM federation_system_control WHERE id = 1');
+        if (!$row) {
+            return $this->respondWithData([]);
+        }
+        $result = (array) $row;
+        unset($result['id'], $result['created_at'], $result['updated_at'], $result['updated_by']);
         return $this->respondWithData($result);
     }
 
     /** PUT /api/v2/admin/federation/controls */
     public function updateControls(): JsonResponse
     {
-        $this->requireSuperAdmin();
+        $adminId = $this->requireSuperAdmin();
         $data = $this->getAllInput();
-        $updated = 0;
+
+        $allowedColumns = [
+            'federation_enabled', 'whitelist_mode_enabled', 'max_federation_level',
+            'cross_tenant_profiles_enabled', 'cross_tenant_messaging_enabled',
+            'cross_tenant_transactions_enabled', 'cross_tenant_listings_enabled',
+            'cross_tenant_events_enabled', 'cross_tenant_groups_enabled',
+            'emergency_lockdown_active', 'emergency_lockdown_reason',
+        ];
+
+        $updates = [];
+        $bindings = [];
         foreach ($data as $key => $value) {
-            $updated += DB::update('UPDATE federation_system_control SET control_value = ? WHERE control_key = ?', [$value, $key]);
+            if (in_array($key, $allowedColumns, true)) {
+                $updates[] = "`{$key}` = ?";
+                $bindings[] = $value;
+            }
         }
+
+        if (empty($updates)) {
+            return $this->respondWithData(['updated' => 0]);
+        }
+
+        $bindings[] = $adminId;
+        $sql = 'UPDATE federation_system_control SET ' . implode(', ', $updates) . ', updated_by = ? WHERE id = 1';
+        $updated = DB::update($sql, $bindings);
+
         return $this->respondWithData(['updated' => $updated]);
     }
 

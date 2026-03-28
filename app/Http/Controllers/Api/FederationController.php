@@ -680,7 +680,7 @@ class FederationController extends BaseApiController
         // Fix 5: Enforce credit agreements between tenants
         $creditAgreement = DB::selectOne(
             "SELECT id FROM federation_credit_agreements
-             WHERE ((tenant_a_id = ? AND tenant_b_id = ?) OR (tenant_a_id = ? AND tenant_b_id = ?))
+             WHERE ((from_tenant_id = ? AND to_tenant_id = ?) OR (from_tenant_id = ? AND to_tenant_id = ?))
              AND status = 'active'",
             [$partnerTenantId, $recipient['tenant_id'], $recipient['tenant_id'], $partnerTenantId]
         );

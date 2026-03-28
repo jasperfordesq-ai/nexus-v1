@@ -9,6 +9,7 @@ namespace App\Http\Controllers\Api;
 use App\Services\FederationAuditService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 /**
  * AdminFederationCreditAgreementsController -- Federation credit agreement management.
@@ -94,7 +95,8 @@ class AdminFederationCreditAgreementsController extends BaseApiController
 
                 return $this->respondWithData($agreement, null, 201);
             } catch (\Exception $e) {
-                return $this->respondWithError('CREATE_FAILED', 'Failed to create credit agreement: ' . $e->getMessage());
+                Log::warning('Failed to create credit agreement', ['error' => $e->getMessage()]);
+                return $this->respondWithError('CREATE_FAILED', 'Failed to create credit agreement', null, 500);
             }
         }
 
@@ -118,7 +120,7 @@ class AdminFederationCreditAgreementsController extends BaseApiController
 
         $statusMap = [
             'approve'    => 'active',
-            'reject'     => 'rejected',
+            'reject'     => 'terminated',
             'suspend'    => 'suspended',
             'activate'   => 'active',
             'reactivate' => 'active',

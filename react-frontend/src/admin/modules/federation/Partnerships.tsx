@@ -10,7 +10,7 @@
  * incoming requests tab, partnership statistics.
  */
 
-import { useState, useCallback, useEffect, useMemo } from 'react';
+import { useState, useCallback, useEffect, useMemo, useRef } from 'react';
 import {
   Button, Dropdown, DropdownTrigger, DropdownMenu, DropdownItem,
   Tabs, Tab, Chip, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter,
@@ -154,11 +154,21 @@ export function Partnerships() {
   const [counterMessage, setCounterMessage] = useState('');
   const [counterLoading, setCounterLoading] = useState(false);
 
+  // AbortController for cancelling in-flight requests
+  const abortControllerRef = useRef<AbortController | null>(null);
+
   // ─── Load data ───
   const loadData = useCallback(async () => {
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort();
+    }
+    const controller = new AbortController();
+    abortControllerRef.current = controller;
+
     setLoading(true);
     try {
       const res = await adminFederation.getPartnerships();
+      if (controller.signal.aborted) return;
       if (res.success && res.data) {
         const payload = res.data as unknown;
         if (Array.isArray(payload)) {
@@ -168,12 +178,19 @@ export function Partnerships() {
         }
       }
     } catch {
-      setItems([]);
+      if (!controller.signal.aborted) {
+        setItems([]);
+      }
     }
-    setLoading(false);
+    if (!controller.signal.aborted) {
+      setLoading(false);
+    }
   }, []);
 
-  useEffect(() => { loadData(); }, [loadData]);
+  useEffect(() => {
+    loadData();
+    return () => { abortControllerRef.current?.abort(); };
+  }, [loadData]);
 
   // ─── Filtered items ───
   const incomingRequests = useMemo(() =>

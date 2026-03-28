@@ -10,7 +10,7 @@
  * settlement view, transaction history, agreement detail modal.
  */
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import {
   Card,
   CardBody,
@@ -61,7 +61,7 @@ import { api } from '@/lib/api';
 import { adminFederation } from '../../api/adminApi';
 import { logError } from '@/lib/logger';
 import { formatRelativeTime } from '@/lib/helpers';
-import { PageHeader, StatCard } from '../../components';
+import { PageHeader, StatCard, ConfirmModal } from '../../components';
 
 import { useTranslation } from 'react-i18next';
 
@@ -175,6 +175,16 @@ export function CreditAgreements() {
   const [netTotal, setNetTotal] = useState(0);
   const [balancesLoading, setBalancesLoading] = useState(false);
 
+  // Confirm modal for destructive actions
+  const [pendingAction, setPendingAction] = useState<{
+    agreementId: number;
+    action: 'suspend' | 'terminate';
+    partnerName: string;
+  } | null>(null);
+
+  // AbortController for cancelling in-flight requests
+  const abortControllerRef = useRef<AbortController | null>(null);
+
   // Detail modal state
   const [selectedAgreement, setSelectedAgreement] = useState<CreditAgreement | null>(null);
   const [detailTransactions, setDetailTransactions] = useState<AgreementTransaction[]>([]);
@@ -184,11 +194,15 @@ export function CreditAgreements() {
 
   // ─── Load data ───
   const loadData = useCallback(async () => {
+    if (abortControllerRef.current) abortControllerRef.current.abort();
+    const controller = new AbortController();
+    abortControllerRef.current = controller;
+
     setLoading(true);
     try {
       const [agreementsRes, partnersRes] = await Promise.all([
-        api.get('/v2/admin/federation/credit-agreements'),
-        api.get('/v2/admin/federation/partners'),
+        api.get('/v2/admin/federation/credit-agreements', { signal: controller.signal }),
+        api.get('/v2/admin/federation/partners', { signal: controller.signal }),
       ]);
 
       if (agreementsRes.success) {
@@ -226,7 +240,10 @@ export function CreditAgreements() {
     setBalancesLoading(false);
   }, []);
 
-  useEffect(() => { loadData(); }, [loadData]);
+  useEffect(() => {
+    loadData();
+    return () => { if (abortControllerRef.current) abortControllerRef.current.abort(); };
+  }, [loadData]);
 
   useEffect(() => {
     if (activeTab === 'balances' && balances.length === 0) {
@@ -421,7 +438,7 @@ export function CreditAgreements() {
                     </TableCell>
                     <TableCell>
                       <Chip size="sm" color={STATUS_COLORS[agreement.status]} variant="flat">
-                        {agreement.status}
+                        {t(`federation.status_${agreement.status}`, agreement.status.charAt(0).toUpperCase() + agreement.status.slice(1))}
                       </Chip>
                     </TableCell>
                     <TableCell>
@@ -457,7 +474,7 @@ export function CreditAgreements() {
                             color="warning"
                             isIconOnly
                             aria-label={t('federation.label_suspend')}
-                            onPress={() => handleStatusChange(agreement.id, 'suspend')}
+                            onPress={() => setPendingAction({ agreementId: agreement.id, action: 'suspend', partnerName: getPartnerName(agreement) })}
                           >
                             <Pause size={14} />
                           </Button>
@@ -481,7 +498,7 @@ export function CreditAgreements() {
                             color="danger"
                             isIconOnly
                             aria-label={t('federation.label_terminate')}
-                            onPress={() => handleStatusChange(agreement.id, 'terminate')}
+                            onPress={() => setPendingAction({ agreementId: agreement.id, action: 'terminate', partnerName: getPartnerName(agreement) })}
                           >
                             <XCircle size={14} />
                           </Button>
@@ -659,7 +676,7 @@ export function CreditAgreements() {
                           <div>
                             <p className="text-default-400">{t('federation.col_status')}</p>
                             <Chip size="sm" color={STATUS_COLORS[selectedAgreement.status]} variant="flat">
-                              {selectedAgreement.status}
+                              {t(`federation.status_${selectedAgreement.status}`, selectedAgreement.status.charAt(0).toUpperCase() + selectedAgreement.status.slice(1))}
                             </Chip>
                           </div>
                           <div>
@@ -768,7 +785,7 @@ export function CreditAgreements() {
                                   </TableCell>
                                   <TableCell>
                                     <Chip size="sm" variant="flat" color={tx.status === 'completed' ? 'success' : 'warning'}>
-                                      {tx.status}
+                                      {t(`federation.status_${tx.status}`, tx.status.charAt(0).toUpperCase() + tx.status.slice(1))}
                                     </Chip>
                                   </TableCell>
                                 </TableRow>
@@ -788,6 +805,38 @@ export function CreditAgreements() {
           )}
         </ModalContent>
       </Modal>
+
+      {/* Confirm destructive action modal */}
+      <ConfirmModal
+        isOpen={!!pendingAction}
+        onClose={() => setPendingAction(null)}
+        onConfirm={async () => {
+          if (pendingAction) {
+            await handleStatusChange(pendingAction.agreementId, pendingAction.action);
+            setPendingAction(null);
+          }
+        }}
+        title={
+          pendingAction?.action === 'terminate'
+            ? t('federation.terminate_agreement', 'Terminate Agreement')
+            : t('federation.suspend_agreement', 'Suspend Agreement')
+        }
+        message={
+          pendingAction?.action === 'terminate'
+            ? t('federation.terminate_agreement_confirm', {
+                name: pendingAction?.partnerName,
+              }) || `Are you sure you want to terminate the agreement with "${pendingAction?.partnerName}"? This action cannot be undone.`
+            : t('federation.suspend_agreement_confirm', {
+                name: pendingAction?.partnerName,
+              }) || `Are you sure you want to suspend the agreement with "${pendingAction?.partnerName}"? Credit exchanges will be paused.`
+        }
+        confirmLabel={
+          pendingAction?.action === 'terminate'
+            ? t('federation.terminate', 'Terminate')
+            : t('federation.suspend', 'Suspend')
+        }
+        confirmColor="danger"
+      />
     </div>
   );
 }

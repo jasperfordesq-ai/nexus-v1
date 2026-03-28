@@ -327,14 +327,14 @@ export function FederationMessagesPage() {
         )
       );
 
-      // Fire off mark-read calls
-      for (const id of unreadIds) {
-        try {
-          await api.post(`/v2/federation/messages/${id}/mark-read`);
-        } catch (err) {
-          logError(`Failed to mark federated message ${id} as read`, err);
-        }
-      }
+      // Fire off mark-read calls in parallel
+      await Promise.all(
+        unreadIds.map((id) =>
+          api.post(`/v2/federation/messages/${id}/mark-read`).catch((err) => {
+            logError(`Failed to mark federated message ${id} as read`, err);
+          })
+        )
+      );
     },
     []
   );

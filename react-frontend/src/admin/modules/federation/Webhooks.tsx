@@ -9,7 +9,7 @@
  * Includes test delivery, delivery logs with retry, and expandable log rows.
  */
 
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
 import {
   Button,
   Chip,
@@ -165,11 +165,18 @@ export function Webhooks() {
   const [expandedLogId, setExpandedLogId] = useState<number | null>(null);
   const [retryingLogId, setRetryingLogId] = useState<number | null>(null);
 
+  // AbortController for cancelling in-flight requests
+  const abortControllerRef = useRef<AbortController | null>(null);
+
   // ─── Load data ───
   const loadData = useCallback(async () => {
+    if (abortControllerRef.current) abortControllerRef.current.abort();
+    const controller = new AbortController();
+    abortControllerRef.current = controller;
+
     setLoading(true);
     try {
-      const res = await api.get('/v2/admin/federation/webhooks');
+      const res = await api.get('/v2/admin/federation/webhooks', { signal: controller.signal });
       if (res.success) {
         const payload = res.data;
         setWebhooks(Array.isArray(payload) ? payload : (payload as { data?: WebhookItem[] })?.data ?? []);
@@ -181,7 +188,10 @@ export function Webhooks() {
     setLoading(false);
   }, [toast, t]);
 
-  useEffect(() => { loadData(); }, [loadData]);
+  useEffect(() => {
+    loadData();
+    return () => { if (abortControllerRef.current) abortControllerRef.current.abort(); };
+  }, [loadData]);
 
   // ─── Open create modal ───
   const openCreate = useCallback(() => {
@@ -617,113 +627,96 @@ export function Webhooks() {
                     {t('federation.webhooks_no_logs', 'No delivery logs found')}
                   </div>
                 ) : (
-                  <div className="space-y-1">
-                    <Table aria-label={t('federation.webhooks_logs_title', 'Delivery Logs')} removeWrapper>
-                      <TableHeader>
-                        <TableColumn width={30}>{''}</TableColumn>
-                        <TableColumn>{t('federation.webhooks_col_event_type', 'Event')}</TableColumn>
-                        <TableColumn>{t('federation.col_success', 'Status')}</TableColumn>
-                        <TableColumn>{t('federation.col_status_code', 'Code')}</TableColumn>
-                        <TableColumn>{t('federation.col_response_time', 'Time')}</TableColumn>
-                        <TableColumn>{t('federation.webhooks_col_attempt', 'Attempt')}</TableColumn>
-                        <TableColumn>{t('federation.col_timestamp', 'Timestamp')}</TableColumn>
-                        <TableColumn>{t('federation.col_actions', 'Actions')}</TableColumn>
-                      </TableHeader>
-                      <TableBody>
-                        {logs.map((log) => (
-                          <TableRow key={log.id}>
-                            <TableCell>
-                              <Button
-                                isIconOnly
-                                size="sm"
-                                variant="light"
-                                onPress={() => setExpandedLogId(expandedLogId === log.id ? null : log.id)}
-                                aria-label={t('federation.webhooks_expand', 'Toggle details')}
-                              >
-                                {expandedLogId === log.id
-                                  ? <ChevronDown size={14} className="text-default-400" />
-                                  : <ChevronRight size={14} className="text-default-400" />
-                                }
-                              </Button>
-                            </TableCell>
-                            <TableCell>
-                              <Chip size="sm" variant="flat">{log.event_type}</Chip>
-                            </TableCell>
-                            <TableCell>
-                              {log.success ? (
-                                <Check size={16} className="text-success" />
-                              ) : (
-                                <X size={16} className="text-danger" />
-                              )}
-                            </TableCell>
-                            <TableCell>
-                              <span className={`text-sm ${log.response_code && log.response_code >= 200 && log.response_code < 300 ? 'text-success' : log.response_code ? 'text-danger' : 'text-default-400'}`}>
-                                {log.response_code ?? '--'}
-                              </span>
-                            </TableCell>
-                            <TableCell>
-                              <span className="text-sm text-default-500">
-                                {log.response_time_ms != null ? `${log.response_time_ms}ms` : '--'}
-                              </span>
-                            </TableCell>
-                            <TableCell>
-                              <span className="text-sm text-default-500">#{log.attempt_number}</span>
-                            </TableCell>
-                            <TableCell>
-                              <span className="text-sm text-default-400">
-                                {log.created_at ? formatRelativeTime(log.created_at) : '--'}
-                              </span>
-                            </TableCell>
-                            <TableCell>
-                              {!log.success && (
-                                <Tooltip content={t('federation.webhooks_retry', 'Retry delivery')}>
-                                  <Button
-                                    isIconOnly
-                                    size="sm"
-                                    variant="light"
-                                    isLoading={retryingLogId === log.id}
-                                    onPress={() => handleRetry(log)}
-                                    aria-label={t('federation.webhooks_retry', 'Retry delivery')}
-                                  >
-                                    <RotateCcw size={14} />
-                                  </Button>
-                                </Tooltip>
-                              )}
-                            </TableCell>
-                          </TableRow>
-                        ))}
-                      </TableBody>
-                    </Table>
-
-                    {/* Expanded log detail */}
-                    {expandedLogId && (() => {
-                      const log = logs.find(l => l.id === expandedLogId);
-                      if (!log) return null;
-                      return (
-                        <div className="rounded-lg border border-default-200 p-4 space-y-3 bg-default-50">
-                          {log.error_message && (
-                            <div>
-                              <p className="text-xs font-semibold text-danger mb-1">{t('federation.webhooks_error', 'Error')}</p>
-                              <p className="text-sm text-danger">{log.error_message}</p>
-                            </div>
-                          )}
+                  <div className="space-y-0">
+                    {logs.map((log) => (
+                      <div key={log.id}>
+                        {/* Log row */}
+                        <div className="grid grid-cols-[30px_1fr_60px_60px_80px_70px_120px_50px] items-center gap-2 py-2 border-b border-default-100 text-sm">
+                          <Button
+                            isIconOnly
+                            size="sm"
+                            variant="light"
+                            onPress={() => setExpandedLogId(expandedLogId === log.id ? null : log.id)}
+                            aria-label={t('federation.webhooks_expand', 'Toggle details')}
+                          >
+                            {expandedLogId === log.id
+                              ? <ChevronDown size={14} className="text-default-400" />
+                              : <ChevronRight size={14} className="text-default-400" />
+                            }
+                          </Button>
                           <div>
-                            <p className="text-xs font-semibold text-default-500 mb-1">{t('federation.webhooks_payload', 'Payload')}</p>
-                            <pre className="text-xs bg-default-100 rounded p-2 overflow-x-auto max-h-48">
-                              {JSON.stringify(log.payload, null, 2)}
-                            </pre>
+                            <Chip size="sm" variant="flat">{log.event_type}</Chip>
                           </div>
-                          {log.response_body && (
+                          <div>
+                            {log.success ? (
+                              <Check size={16} className="text-success" />
+                            ) : (
+                              <X size={16} className="text-danger" />
+                            )}
+                          </div>
+                          <div>
+                            <span className={`text-sm ${log.response_code && log.response_code >= 200 && log.response_code < 300 ? 'text-success' : log.response_code ? 'text-danger' : 'text-default-400'}`}>
+                              {log.response_code ?? '--'}
+                            </span>
+                          </div>
+                          <div>
+                            <span className="text-sm text-default-500">
+                              {log.response_time_ms != null ? `${log.response_time_ms}ms` : '--'}
+                            </span>
+                          </div>
+                          <div>
+                            <span className="text-sm text-default-500">#{log.attempt_number}</span>
+                          </div>
+                          <div>
+                            <span className="text-sm text-default-400">
+                              {log.created_at ? formatRelativeTime(log.created_at) : '--'}
+                            </span>
+                          </div>
+                          <div>
+                            {!log.success && (
+                              <Tooltip content={t('federation.webhooks_retry', 'Retry delivery')}>
+                                <Button
+                                  isIconOnly
+                                  size="sm"
+                                  variant="light"
+                                  isLoading={retryingLogId === log.id}
+                                  onPress={() => handleRetry(log)}
+                                  aria-label={t('federation.webhooks_retry', 'Retry delivery')}
+                                >
+                                  <RotateCcw size={14} />
+                                </Button>
+                              </Tooltip>
+                            )}
+                          </div>
+                        </div>
+
+                        {/* Inline expanded detail */}
+                        {expandedLogId === log.id && (
+                          <div className="rounded-lg border border-default-200 p-4 space-y-3 bg-default-50 my-2">
+                            {log.error_message && (
+                              <div>
+                                <p className="text-xs font-semibold text-danger mb-1">{t('federation.webhooks_error', 'Error')}</p>
+                                <p className="text-sm text-danger">{log.error_message}</p>
+                              </div>
+                            )}
                             <div>
-                              <p className="text-xs font-semibold text-default-500 mb-1">{t('federation.webhooks_response', 'Response Body')}</p>
+                              <p className="text-xs font-semibold text-default-500 mb-1">{t('federation.webhooks_payload', 'Payload')}</p>
                               <pre className="text-xs bg-default-100 rounded p-2 overflow-x-auto max-h-48">
-                                {log.response_body}
+                                {JSON.stringify(log.payload, null, 2)}
                               </pre>
                             </div>
-                          )}
-                        </div>
-                      );
-                    })()}
+                            {log.response_body && (
+                              <div>
+                                <p className="text-xs font-semibold text-default-500 mb-1">{t('federation.webhooks_response', 'Response Body')}</p>
+                                <pre className="text-xs bg-default-100 rounded p-2 overflow-x-auto max-h-48">
+                                  {log.response_body}
+                                </pre>
+                              </div>
+                            )}
+                          </div>
+                        )}
+                      </div>
+                    ))}
                   </div>
                 )}
               </ModalBody>

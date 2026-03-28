@@ -1331,8 +1331,8 @@ export interface FederationSystemControls {
   cross_tenant_listings_enabled: boolean;
   cross_tenant_events_enabled: boolean;
   cross_tenant_groups_enabled: boolean;
-  is_locked_down: boolean;
-  lockdown_reason?: string;
+  emergency_lockdown_active: boolean;
+  emergency_lockdown_reason?: string;
   updated_at?: string;
 }
 
@@ -1774,7 +1774,7 @@ export interface FederationStats {
   events_enabled: boolean;
   groups_enabled: boolean;
   emergency_lockdown_active: boolean;
-  lockdown_reason?: string | null;
+  emergency_lockdown_reason?: string | null;
 }
 
 export interface WhitelistedTenant {

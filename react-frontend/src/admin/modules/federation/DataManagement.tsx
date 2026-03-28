@@ -8,7 +8,7 @@
  * Import and export federation data (users, partnerships, transactions, audit).
  */
 
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
 import { Card, CardBody, CardHeader, Button } from '@heroui/react';
 import { Database, Download, Upload, RefreshCw } from 'lucide-react';
 import { usePageTitle } from '@/hooks';
@@ -33,6 +33,7 @@ export function DataManagement() {
   const [config, setConfig] = useState<DataConfig | null>(null);
   const [loading, setLoading] = useState(true);
   const [exportingType, setExportingType] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const loadData = useCallback(async () => {
     setLoading(true);
@@ -79,10 +80,44 @@ export function DataManagement() {
       toast.error(t('federation.export_failed', 'Export failed'));
     }
     setExportingType(null);
-  }, []);
+  }, [toast, t]);
+
+  const handleFileUpload = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+    if (!file.name.endsWith('.csv')) {
+      toast.error(t('federation.import_csv_only', 'Only CSV files are supported'));
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = () => {
+      const content = reader.result as string;
+      const lines = content.split('\n').filter(Boolean);
+      toast.success(
+        t('federation.import_file_read', 'Read {{count}} rows from {{name}}', {
+          count: Math.max(0, lines.length - 1),
+          name: file.name,
+        })
+      );
+      // Reset the input so the same file can be selected again
+      if (fileInputRef.current) fileInputRef.current.value = '';
+    };
+    reader.onerror = () => {
+      toast.error(t('federation.import_read_failed', 'Failed to read file'));
+    };
+    reader.readAsText(file);
+  }, [toast, t]);
 
   return (
     <div>
+      {/* Hidden file input for CSV upload */}
+      <input
+        ref={fileInputRef}
+        type="file"
+        accept=".csv"
+        className="hidden"
+        onChange={handleFileUpload}
+      />
       <PageHeader
         title={t('federation.data_management_title')}
         description={t('federation.data_management_desc')}
@@ -127,7 +162,13 @@ export function DataManagement() {
               <Upload size={40} className="mb-3" />
               <p className="text-sm font-medium">{t('federation.import_users')}</p>
               <p className="text-xs text-center max-w-xs mt-1">{t('federation.import_users_desc')}</p>
-              <Button size="sm" variant="flat" className="mt-4" isDisabled={!config?.import_supported}>
+              <Button
+                size="sm"
+                variant="flat"
+                className="mt-4"
+                isDisabled={!config?.import_supported}
+                onPress={() => fileInputRef.current?.click()}
+              >
                 {t('federation.upload_csv')}
               </Button>
               {config?.last_import_at && (

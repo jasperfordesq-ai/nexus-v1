@@ -10,7 +10,7 @@
  * Uses cursor-based pagination with "Load more" and CSV export.
  */
 
-import { useState, useCallback, useEffect, useMemo } from 'react';
+import { useState, useCallback, useEffect, useMemo, useRef } from 'react';
 import {
   Card,
   CardBody,
@@ -40,6 +40,7 @@ import {
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { usePageTitle } from '@/hooks';
+import { formatRelativeTime } from '@/lib/helpers';
 import { adminFederation } from '../../api/adminApi';
 import { PageHeader, StatCard } from '../../components';
 
@@ -75,140 +76,71 @@ interface EventTypeConfig {
   bgClass: string;
 }
 
-const EVENT_TYPE_MAP: Record<string, EventTypeConfig> = {
-  cross_tenant_message: {
-    label: 'Message Sent',
-    icon: Mail,
-    color: 'primary',
-    bgClass: 'bg-primary-100 text-primary-600 dark:bg-primary-900/30 dark:text-primary-400',
-  },
-  api_message_sent: {
-    label: 'Message Sent',
-    icon: Mail,
-    color: 'primary',
-    bgClass: 'bg-primary-100 text-primary-600 dark:bg-primary-900/30 dark:text-primary-400',
-  },
-  cross_tenant_transaction: {
-    label: 'Transaction',
-    icon: CreditCard,
-    color: 'success',
-    bgClass: 'bg-success-100 text-success-600 dark:bg-success-900/30 dark:text-success-400',
-  },
-  api_transaction_initiated: {
-    label: 'Transaction',
-    icon: CreditCard,
-    color: 'success',
-    bgClass: 'bg-success-100 text-success-600 dark:bg-success-900/30 dark:text-success-400',
-  },
-  connection_request: {
-    label: 'Connection',
-    icon: UserPlus,
-    color: 'secondary',
-    bgClass: 'bg-secondary-100 text-secondary-600 dark:bg-secondary-900/30 dark:text-secondary-400',
-  },
-  listing_federated: {
-    label: 'Listing Shared',
-    icon: Package,
-    color: 'warning',
-    bgClass: 'bg-warning-100 text-warning-600 dark:bg-warning-900/30 dark:text-warning-400',
-  },
-  listing_unfederated: {
-    label: 'Listing Unshared',
-    icon: Package,
-    color: 'warning',
-    bgClass: 'bg-warning-100 text-warning-600 dark:bg-warning-900/30 dark:text-warning-400',
-  },
-  listing_viewed: {
-    label: 'Listing Viewed',
-    icon: Package,
-    color: 'warning',
-    bgClass: 'bg-warning-100 text-warning-600 dark:bg-warning-900/30 dark:text-warning-400',
-  },
-  partnership_requested: {
-    label: 'Partnership Requested',
-    icon: Handshake,
-    color: 'primary',
-    bgClass: 'bg-primary-100 text-primary-600 dark:bg-primary-900/30 dark:text-primary-400',
-  },
-  partnership_approved: {
-    label: 'Partnership Approved',
-    icon: Handshake,
-    color: 'success',
-    bgClass: 'bg-success-100 text-success-600 dark:bg-success-900/30 dark:text-success-400',
-  },
-  partnership_rejected: {
-    label: 'Partnership Rejected',
-    icon: Handshake,
-    color: 'danger',
-    bgClass: 'bg-danger-100 text-danger-600 dark:bg-danger-900/30 dark:text-danger-400',
-  },
-  partnership_status_changed: {
-    label: 'Partnership Changed',
-    icon: Handshake,
-    color: 'warning',
-    bgClass: 'bg-warning-100 text-warning-600 dark:bg-warning-900/30 dark:text-warning-400',
-  },
-  partnership_revoked: {
-    label: 'Partnership Terminated',
-    icon: Handshake,
-    color: 'danger',
-    bgClass: 'bg-danger-100 text-danger-600 dark:bg-danger-900/30 dark:text-danger-400',
-  },
-  cross_tenant_profile_view: {
-    label: 'Profile Viewed',
-    icon: Eye,
-    color: 'default',
-    bgClass: 'bg-default-100 text-default-600 dark:bg-default-800 dark:text-default-400',
-  },
-  federated_search: {
-    label: 'Federated Search',
-    icon: Search,
-    color: 'default',
-    bgClass: 'bg-default-100 text-default-600 dark:bg-default-800 dark:text-default-400',
-  },
+// Event type i18n keys — labels resolved at render time via t()
+const EVENT_TYPE_I18N_KEYS: Record<string, string> = {
+  cross_tenant_message: 'federation.event_type_message_sent',
+  api_message_sent: 'federation.event_type_message_sent',
+  cross_tenant_transaction: 'federation.event_type_transaction',
+  api_transaction_initiated: 'federation.event_type_transaction',
+  connection_request: 'federation.event_type_connection',
+  listing_federated: 'federation.event_type_listing_shared',
+  listing_unfederated: 'federation.event_type_listing_unshared',
+  listing_viewed: 'federation.event_type_listing_viewed',
+  partnership_requested: 'federation.event_type_partnership_requested',
+  partnership_approved: 'federation.event_type_partnership_approved',
+  partnership_rejected: 'federation.event_type_partnership_rejected',
+  partnership_status_changed: 'federation.event_type_partnership_changed',
+  partnership_revoked: 'federation.event_type_partnership_terminated',
+  cross_tenant_profile_view: 'federation.event_type_profile_viewed',
+  federated_search: 'federation.event_type_federated_search',
 };
 
-const EVENT_TYPE_OPTIONS = [
-  { key: 'cross_tenant_message', label: 'Messages' },
-  { key: 'cross_tenant_transaction', label: 'Transactions' },
-  { key: 'connection_request', label: 'Connections' },
-  { key: 'listing_federated', label: 'Listings' },
-  { key: 'partnership_requested', label: 'Partnership Requests' },
-  { key: 'partnership_approved', label: 'Partnership Approved' },
-  { key: 'partnership_status_changed', label: 'Partnership Changes' },
-  { key: 'cross_tenant_profile_view', label: 'Profile Views' },
-  { key: 'federated_search', label: 'Searches' },
+const EVENT_TYPE_STYLES: Record<string, Omit<EventTypeConfig, 'label'>> = {
+  cross_tenant_message: { icon: Mail, color: 'primary', bgClass: 'bg-primary-100 text-primary-600 dark:bg-primary-900/30 dark:text-primary-400' },
+  api_message_sent: { icon: Mail, color: 'primary', bgClass: 'bg-primary-100 text-primary-600 dark:bg-primary-900/30 dark:text-primary-400' },
+  cross_tenant_transaction: { icon: CreditCard, color: 'success', bgClass: 'bg-success-100 text-success-600 dark:bg-success-900/30 dark:text-success-400' },
+  api_transaction_initiated: { icon: CreditCard, color: 'success', bgClass: 'bg-success-100 text-success-600 dark:bg-success-900/30 dark:text-success-400' },
+  connection_request: { icon: UserPlus, color: 'secondary', bgClass: 'bg-secondary-100 text-secondary-600 dark:bg-secondary-900/30 dark:text-secondary-400' },
+  listing_federated: { icon: Package, color: 'warning', bgClass: 'bg-warning-100 text-warning-600 dark:bg-warning-900/30 dark:text-warning-400' },
+  listing_unfederated: { icon: Package, color: 'warning', bgClass: 'bg-warning-100 text-warning-600 dark:bg-warning-900/30 dark:text-warning-400' },
+  listing_viewed: { icon: Package, color: 'warning', bgClass: 'bg-warning-100 text-warning-600 dark:bg-warning-900/30 dark:text-warning-400' },
+  partnership_requested: { icon: Handshake, color: 'primary', bgClass: 'bg-primary-100 text-primary-600 dark:bg-primary-900/30 dark:text-primary-400' },
+  partnership_approved: { icon: Handshake, color: 'success', bgClass: 'bg-success-100 text-success-600 dark:bg-success-900/30 dark:text-success-400' },
+  partnership_rejected: { icon: Handshake, color: 'danger', bgClass: 'bg-danger-100 text-danger-600 dark:bg-danger-900/30 dark:text-danger-400' },
+  partnership_status_changed: { icon: Handshake, color: 'warning', bgClass: 'bg-warning-100 text-warning-600 dark:bg-warning-900/30 dark:text-warning-400' },
+  partnership_revoked: { icon: Handshake, color: 'danger', bgClass: 'bg-danger-100 text-danger-600 dark:bg-danger-900/30 dark:text-danger-400' },
+  cross_tenant_profile_view: { icon: Eye, color: 'default', bgClass: 'bg-default-100 text-default-600 dark:bg-default-800 dark:text-default-400' },
+  federated_search: { icon: Search, color: 'default', bgClass: 'bg-default-100 text-default-600 dark:bg-default-800 dark:text-default-400' },
+};
+
+// Filter option i18n keys — resolved at render time via t()
+const EVENT_TYPE_OPTION_KEYS = [
+  { key: 'cross_tenant_message', i18nKey: 'federation.filter_messages' },
+  { key: 'cross_tenant_transaction', i18nKey: 'federation.filter_transactions' },
+  { key: 'connection_request', i18nKey: 'federation.filter_connections' },
+  { key: 'listing_federated', i18nKey: 'federation.filter_listings' },
+  { key: 'partnership_requested', i18nKey: 'federation.filter_partnership_requests' },
+  { key: 'partnership_approved', i18nKey: 'federation.filter_partnership_approved' },
+  { key: 'partnership_status_changed', i18nKey: 'federation.filter_partnership_changes' },
+  { key: 'cross_tenant_profile_view', i18nKey: 'federation.filter_profile_views' },
+  { key: 'federated_search', i18nKey: 'federation.filter_searches' },
 ];
 
-function getEventConfig(type: string): EventTypeConfig {
-  return (
-    EVENT_TYPE_MAP[type] ?? {
-      label: type.replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase()),
-      icon: Activity,
-      color: 'default' as const,
-      bgClass: 'bg-default-100 text-default-600 dark:bg-default-800 dark:text-default-400',
-    }
-  );
-}
-
-// ─────────────────────────────────────────────────────────────────────────────
-// Relative time helper
-// ─────────────────────────────────────────────────────────────────────────────
-
-function relativeTime(dateStr: string): string {
-  const now = Date.now();
-  const then = new Date(dateStr).getTime();
-  const diffMs = now - then;
-  const diffSec = Math.floor(diffMs / 1000);
-  const diffMin = Math.floor(diffSec / 60);
-  const diffHour = Math.floor(diffMin / 60);
-  const diffDay = Math.floor(diffHour / 24);
-
-  if (diffSec < 60) return 'just now';
-  if (diffMin < 60) return `${diffMin}m ago`;
-  if (diffHour < 24) return `${diffHour}h ago`;
-  if (diffDay < 7) return `${diffDay}d ago`;
-  return new Date(dateStr).toLocaleDateString();
+function getEventConfig(type: string, t: (key: string, defaultValue?: string) => string): EventTypeConfig {
+  const i18nKey = EVENT_TYPE_I18N_KEYS[type];
+  const style = EVENT_TYPE_STYLES[type];
+  if (style && i18nKey) {
+    return {
+      label: t(i18nKey),
+      ...style,
+    };
+  }
+  return {
+    label: type.replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase()),
+    icon: Activity,
+    color: 'default' as const,
+    bgClass: 'bg-default-100 text-default-600 dark:bg-default-800 dark:text-default-400',
+  };
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -216,7 +148,8 @@ function relativeTime(dateStr: string): string {
 // ─────────────────────────────────────────────────────────────────────────────
 
 function TimelineItem({ item }: { item: ActivityItem }) {
-  const config = getEventConfig(item.type);
+  const { t } = useTranslation('admin');
+  const config = getEventConfig(item.type, ((key: string) => t(key)) as (key: string, defaultValue?: string) => string);
   const Icon = config.icon;
 
   const absoluteTime = new Date(item.timestamp).toLocaleString();
@@ -226,9 +159,9 @@ function TimelineItem({ item }: { item: ActivityItem }) {
   if (item.actor_name && item.partner_tenant_name) {
     desc = `${item.actor_name} - ${item.description}`;
     if (item.direction === 'inbound') {
-      desc += ` (from ${item.partner_tenant_name})`;
+      desc += ` (${t('federation.direction_from', { name: item.partner_tenant_name })})`;
     } else {
-      desc += ` (to ${item.partner_tenant_name})`;
+      desc += ` (${t('federation.direction_to', { name: item.partner_tenant_name })})`;
     }
   } else if (item.actor_name) {
     desc = `${item.actor_name} - ${item.description}`;
@@ -257,16 +190,16 @@ function TimelineItem({ item }: { item: ActivityItem }) {
             variant="flat"
             color={item.direction === 'inbound' ? 'primary' : 'secondary'}
           >
-            {item.direction === 'inbound' ? 'Inbound' : 'Outbound'}
+            {item.direction === 'inbound' ? t('federation.inbound') : t('federation.outbound')}
           </Chip>
           {item.level === 'critical' && (
             <Chip size="sm" variant="flat" color="danger">
-              Critical
+              {t('federation.level_critical')}
             </Chip>
           )}
           {item.level === 'warning' && (
             <Chip size="sm" variant="flat" color="warning">
-              Warning
+              {t('federation.level_warning')}
             </Chip>
           )}
         </div>
@@ -290,7 +223,7 @@ function TimelineItem({ item }: { item: ActivityItem }) {
 
         <Tooltip content={absoluteTime}>
           <span className="text-xs text-default-400 mt-1 inline-block cursor-default">
-            {relativeTime(item.timestamp)}
+            {formatRelativeTime(item.timestamp)}
           </span>
         </Tooltip>
       </div>
@@ -316,15 +249,28 @@ export function ActivityFeed() {
 
   // Filters
   const [search, setSearch] = useState('');
+  const [debouncedSearch, setDebouncedSearch] = useState('');
   const [dateFrom, setDateFrom] = useState('');
   const [dateTo, setDateTo] = useState('');
   const [selectedTypes, setSelectedTypes] = useState<Set<string>>(new Set());
   const [partnerFilter, setPartnerFilter] = useState('');
 
-  // Partner tenant list (derived from results)
+  // Partner tenant list (derived from results) — use ref to avoid infinite loop
+  const knownPartnersRef = useRef(new Map<number, { id: number; name: string }>());
   const [knownPartners, setKnownPartners] = useState<
     Array<{ id: number; name: string }>
   >([]);
+
+  // AbortController for cancelling in-flight requests
+  const abortControllerRef = useRef<AbortController | null>(null);
+
+  // Debounce search input
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearch(search);
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [search]);
 
   const eventTypeParam = useMemo(() => {
     if (selectedTypes.size === 0) return undefined;
@@ -333,6 +279,13 @@ export function ActivityFeed() {
 
   const loadItems = useCallback(
     async (append = false, cursor?: string | null) => {
+      // Abort any in-flight request
+      if (abortControllerRef.current) {
+        abortControllerRef.current.abort();
+      }
+      const controller = new AbortController();
+      abortControllerRef.current = controller;
+
       if (append) {
         setLoadingMore(true);
       } else {
@@ -347,8 +300,11 @@ export function ActivityFeed() {
           partner_tenant_id: partnerFilter ? Number(partnerFilter) : undefined,
           date_from: dateFrom || undefined,
           date_to: dateTo || undefined,
-          search: search || undefined,
+          search: debouncedSearch || undefined,
         });
+
+        // If a newer request was started, discard this result
+        if (abortControllerRef.current !== controller) return;
 
         if (res.success && res.data) {
           const payload = res.data as unknown;
@@ -377,19 +333,19 @@ export function ActivityFeed() {
           setHasMore(feedData.has_more ?? false);
           setNextCursor(feedData.next_cursor ?? null);
 
-          // Track known partner communities for filter dropdown
-          const newPartners = new Map(knownPartners.map((p) => [p.id, p]));
+          // Track known partner communities for filter dropdown (using ref)
           for (const item of newItems) {
             if (item.partner_tenant_id && item.partner_tenant_name) {
-              newPartners.set(item.partner_tenant_id, {
+              knownPartnersRef.current.set(item.partner_tenant_id, {
                 id: item.partner_tenant_id,
                 name: item.partner_tenant_name,
               });
             }
           }
-          setKnownPartners(Array.from(newPartners.values()));
+          setKnownPartners(Array.from(knownPartnersRef.current.values()));
         }
-      } catch {
+      } catch (err) {
+        if (err instanceof DOMException && err.name === 'AbortError') return;
         if (!append) {
           setItems([]);
           setTotal(0);
@@ -400,14 +356,19 @@ export function ActivityFeed() {
       setLoading(false);
       setLoadingMore(false);
     },
-    [eventTypeParam, partnerFilter, dateFrom, dateTo, search, knownPartners],
+    [eventTypeParam, partnerFilter, dateFrom, dateTo, debouncedSearch],
   );
 
   // Initial load and filter changes
   useEffect(() => {
     loadItems(false);
+    return () => {
+      if (abortControllerRef.current) {
+        abortControllerRef.current.abort();
+      }
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [eventTypeParam, partnerFilter, dateFrom, dateTo, search]);
+  }, [eventTypeParam, partnerFilter, dateFrom, dateTo, debouncedSearch]);
 
   const handleLoadMore = () => {
     if (hasMore && nextCursor) {
@@ -457,16 +418,23 @@ export function ActivityFeed() {
       'Actor',
       'Partner Community',
     ];
+    const csvEscape = (val: string | number | null | undefined): string => {
+      const s = String(val ?? '');
+      if (s.includes(',') || s.includes('"') || s.includes('\n')) {
+        return `"${s.replace(/"/g, '""')}"`;
+      }
+      return s;
+    };
     const rows = items.map((item) => [
       item.id,
-      item.timestamp,
-      item.type,
-      item.category,
-      item.level,
-      item.direction,
-      `"${(item.description || '').replace(/"/g, '""')}"`,
-      item.actor_name ?? '',
-      item.partner_tenant_name ?? '',
+      csvEscape(item.timestamp),
+      csvEscape(item.type),
+      csvEscape(item.category),
+      csvEscape(item.level),
+      csvEscape(item.direction),
+      csvEscape(item.description),
+      csvEscape(item.actor_name),
+      csvEscape(item.partner_tenant_name),
     ]);
     const csv = [headers.join(','), ...rows.map((r) => r.join(','))].join('\n');
     const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
@@ -516,7 +484,7 @@ export function ActivityFeed() {
               onPress={exportCsv}
               isDisabled={items.length === 0}
             >
-              Export CSV
+              {t('federation.export_csv', 'Export CSV')}
             </Button>
           </div>
         }
@@ -532,21 +500,21 @@ export function ActivityFeed() {
           loading={loading && total === 0}
         />
         <StatCard
-          label={t('federation.label_messages', 'Messages')}
+          label={t('federation.label_messages_in_view', 'Messages (in view)')}
           value={statsMessages}
           icon={Mail}
           color="primary"
           loading={loading && total === 0}
         />
         <StatCard
-          label={t('federation.label_transactions', 'Transactions')}
+          label={t('federation.label_transactions_in_view', 'Transactions (in view)')}
           value={statsTransactions}
           icon={CreditCard}
           color="success"
           loading={loading && total === 0}
         />
         <StatCard
-          label={t('federation.label_partnership_events', 'Partnership Events')}
+          label={t('federation.label_partnership_events_in_view', 'Partnership Events (in view)')}
           value={statsPartnerships}
           icon={Handshake}
           color="secondary"
@@ -560,7 +528,7 @@ export function ActivityFeed() {
           <div className="flex flex-wrap gap-3 items-end">
             <Input
               label={t('federation.label_search', 'Search')}
-              placeholder="User name, description..."
+              placeholder={t('federation.search_placeholder', 'User name, description...')}
               size="sm"
               className="max-w-[220px]"
               value={search}
@@ -612,22 +580,22 @@ export function ActivityFeed() {
                 startContent={<X size={14} />}
                 onPress={clearFilters}
               >
-                Clear
+                {t('federation.clear', 'Clear')}
               </Button>
             )}
           </div>
 
           {/* Event type checkboxes */}
           <div className="flex flex-wrap gap-3 mt-3">
-            <span className="text-xs text-default-500 self-center">Event types:</span>
-            {EVENT_TYPE_OPTIONS.map((opt) => (
+            <span className="text-xs text-default-500 self-center">{t('federation.event_types_label', 'Event types:')}</span>
+            {EVENT_TYPE_OPTION_KEYS.map((opt) => (
               <Checkbox
                 key={opt.key}
                 size="sm"
                 isSelected={selectedTypes.has(opt.key)}
                 onValueChange={() => toggleEventType(opt.key)}
               >
-                {opt.label}
+                {t(opt.i18nKey)}
               </Checkbox>
             ))}
           </div>
