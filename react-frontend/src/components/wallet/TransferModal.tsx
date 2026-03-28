@@ -189,21 +189,21 @@ export function TransferModal({
   // Validate form
   const validateForm = (): string | null => {
     if (!formData.recipient) {
-      return 'Please select a recipient';
+      return t('validation.select_recipient', 'Please select a recipient');
     }
 
     const amount = parseFloat(formData.amount);
     if (isNaN(amount) || amount <= 0) {
-      return 'Please enter a valid amount';
+      return t('validation.valid_amount', 'Please enter a valid amount');
     }
 
     if (amount > currentBalance) {
-      return 'Insufficient balance';
+      return t('validation.insufficient_balance', 'Insufficient balance');
     }
 
     // Check for reasonable max (prevent typos)
     if (amount > 1000) {
-      return 'Maximum transfer is 1000 hours';
+      return t('validation.max_transfer', 'Maximum transfer is 1000 hours');
     }
 
     return null;
@@ -232,11 +232,11 @@ export function TransferModal({
         onTransferComplete(response.data);
         onClose();
       } else {
-        setError(response.error || 'Transfer failed. Please try again.');
+        setError(response.error || t('error.transfer_failed', 'Transfer failed. Please try again.'));
       }
     } catch (err) {
       logError('Transfer failed', err);
-      setError('An unexpected error occurred. Please try again.');
+      setError(t('error.unexpected', 'An unexpected error occurred. Please try again.'));
     } finally {
       setIsSubmitting(false);
     }
@@ -467,11 +467,12 @@ export function TransferModal({
               {formData.recipient && parsedAmount > 0 && !isOverBalance && (
                 <div className="bg-indigo-500/10 border border-indigo-500/30 rounded-lg p-4">
                   <p className="text-theme-muted text-sm">
-                    You are about to send{' '}
-                    <span className="font-semibold text-theme-primary">{parsedAmount} {t('hours').toLowerCase()}</span> to{' '}
-                    <span className="font-semibold text-theme-primary">
-                      {formData.recipient.first_name} {formData.recipient.last_name}
-                    </span>
+                    {t('transfer_summary', {
+                      amount: parsedAmount,
+                      unit: t('hours').toLowerCase(),
+                      name: `${formData.recipient.first_name} ${formData.recipient.last_name}`,
+                      defaultValue: 'You are about to send {{amount}} {{unit}} to {{name}}',
+                    })}
                   </p>
                   <p className="text-theme-subtle text-xs mt-1">
                     {t('new_balance_after', { balance: (currentBalance - parsedAmount).toFixed(2) })}

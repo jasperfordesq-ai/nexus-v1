@@ -254,7 +254,7 @@ export function WalletPage() {
       {error && (
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3 }}>
           <GlassCard className="p-8 text-center">
-            <AlertTriangle className="w-12 h-12 text-amber-500 mx-auto mb-4" />
+            <AlertTriangle className="w-12 h-12 text-amber-500 mx-auto mb-4" aria-hidden="true" />
             <h3 className="text-lg font-semibold text-theme-primary mb-2">{t('unable_to_load')}</h3>
             <p className="text-theme-muted mb-4">{error}</p>
             <Button
@@ -306,7 +306,7 @@ export function WalletPage() {
                 className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white font-medium px-8"
                 size="lg"
                 startContent={<Send className="w-5 h-5" />}
-                onClick={() => setIsTransferModalOpen(true)}
+                onPress={() => setIsTransferModalOpen(true)}
                 isDisabled={isLoading || !balance || balance.balance <= 0}
               >
                 {t('send_credits')}
@@ -316,7 +316,7 @@ export function WalletPage() {
                 size="lg"
                 className="bg-rose-500/10 text-rose-400 font-medium px-6"
                 startContent={<ArrowDownLeft className="w-5 h-5" />}
-                onClick={() => setIsDonateModalOpen(true)}
+                onPress={() => setIsDonateModalOpen(true)}
                 isDisabled={isLoading || !balance || balance.balance <= 0}
               >
                 {t('donate')}
@@ -379,7 +379,7 @@ export function WalletPage() {
               size="sm"
               className="bg-theme-elevated text-theme-muted"
               startContent={<Download className="w-4 h-4" aria-hidden="true" />}
-              onClick={handleExport}
+              onPress={handleExport}
               isDisabled={transactions.length === 0}
               aria-label="Export transactions to CSV"
             >
@@ -436,7 +436,7 @@ export function WalletPage() {
                     <Button
                       variant="flat"
                       className="bg-theme-elevated text-theme-muted"
-                      onClick={loadMoreTransactions}
+                      onPress={loadMoreTransactions}
                       isLoading={isLoadingMore}
                     >
                       {t('load_more')}

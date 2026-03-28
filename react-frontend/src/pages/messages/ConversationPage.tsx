@@ -1170,7 +1170,7 @@ export function ConversationPage() {
     return (
       <div className="max-w-3xl mx-auto">
         <GlassCard className="p-8 text-center">
-          <AlertTriangle className="w-12 h-12 text-amber-500 mx-auto mb-4" />
+          <AlertTriangle className="w-12 h-12 text-amber-500 mx-auto mb-4" aria-hidden="true" />
           <h3 className="text-lg font-semibold text-theme-primary mb-2">{t('load_error_title')}</h3>
           <p className="text-theme-muted mb-4">{t('conversation_load_failed')}</p>
           <div className="flex gap-3 justify-center">

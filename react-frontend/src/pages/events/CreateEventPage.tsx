@@ -627,6 +627,7 @@ export function CreateEventPage() {
                 setFormData((prev) => ({ ...prev, title: e.target.value }));
                 if (errors.title) setErrors((prev) => ({ ...prev, title: '' }));
               }}
+              isRequired
               isInvalid={!!errors.title}
               errorMessage={errors.title}
               startContent={<FileText className="w-4 h-4 text-theme-subtle" aria-hidden="true" />}
@@ -670,6 +671,7 @@ export function CreateEventPage() {
                 if (errors.description) setErrors((prev) => ({ ...prev, description: '' }));
               }}
               minRows={4}
+              isRequired
               isInvalid={!!errors.description}
               errorMessage={errors.description}
               classNames={{

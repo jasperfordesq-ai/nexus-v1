@@ -64,20 +64,9 @@ class RegistrationService
             $user->status = 'pending';
             $user->verification_token = Str::random(64);
 
-            // Apply tenant's welcome credits (configurable in admin settings)
-            $welcomeCredits = 0;
-            try {
-                $welcomeSetting = DB::table('tenant_settings')
-                    ->where('tenant_id', $tenantId)
-                    ->where('setting_key', 'welcome_credits')
-                    ->value('setting_value');
-                if ($welcomeSetting !== null) {
-                    $welcomeCredits = max(0, min(100, (float) $welcomeSetting));
-                }
-            } catch (\Throwable $e) {
-                // Fail gracefully — default to 0
-            }
-            $user->balance = $welcomeCredits;
+            // Welcome credits are granted during admin approval (AdminUsersController::grantWelcomeCredits)
+            // NOT at registration time — to avoid double-crediting on tenants with admin_approval enabled
+            $user->balance = 0;
 
             // Optional fields from frontend
             if (!empty($data['phone'])) {
@@ -100,21 +89,6 @@ class RegistrationService
             }
 
             $user->save();
-
-            // Record the starting balance transaction if welcome credits > 0
-            if ($welcomeCredits > 0) {
-                DB::table('transactions')->insert([
-                    'tenant_id'        => $tenantId,
-                    'sender_id'        => null,
-                    'receiver_id'      => $user->id,
-                    'amount'           => $welcomeCredits,
-                    'description'      => 'Welcome credits — starting balance',
-                    'transaction_type' => 'starting_balance',
-                    'status'           => 'completed',
-                    'created_at'       => now(),
-                    'updated_at'       => now(),
-                ]);
-            }
 
             return $user;
         });

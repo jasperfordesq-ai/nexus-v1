@@ -282,6 +282,7 @@ export function CreateListingPage() {
               placeholder={t('form.title_placeholder')}
               value={formData.title}
               onChange={(e) => updateField('title', e.target.value)}
+              isRequired
               isInvalid={!!errors.title}
               errorMessage={errors.title}
               startContent={<FileText className="w-4 h-4 text-theme-subtle" />}
@@ -301,6 +302,7 @@ export function CreateListingPage() {
               value={formData.description}
               onChange={(e) => updateField('description', e.target.value)}
               minRows={4}
+              isRequired
               isInvalid={!!errors.description}
               errorMessage={errors.description}
               classNames={{
@@ -318,6 +320,7 @@ export function CreateListingPage() {
               placeholder={t('form.category_placeholder')}
               selectedKeys={formData.category_id ? [formData.category_id] : []}
               onChange={(e) => updateField('category_id', e.target.value)}
+              isRequired
               isInvalid={!!errors.category_id}
               errorMessage={errors.category_id}
               startContent={<Tag className="w-4 h-4 text-theme-subtle" />}

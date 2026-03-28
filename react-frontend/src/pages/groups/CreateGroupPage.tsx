@@ -373,6 +373,7 @@ export function CreateGroupPage() {
               placeholder={t('form.name_placeholder')}
               value={formData.name}
               onChange={(e) => updateField('name', e.target.value)}
+              isRequired
               isInvalid={!!errors.name}
               errorMessage={errors.name}
               startContent={<FileText className="w-4 h-4 text-theme-subtle" aria-hidden="true" />}
@@ -392,6 +393,7 @@ export function CreateGroupPage() {
               value={formData.description}
               onChange={(e) => updateField('description', e.target.value)}
               minRows={4}
+              isRequired
               isInvalid={!!errors.description}
               errorMessage={errors.description}
               classNames={{

@@ -91,7 +91,7 @@ export function CustomPage() {
       <div className="max-w-3xl mx-auto px-4 py-16 text-center">
         <PageMeta title={t('not_found.page_title')} />
         <GlassCard className="p-8">
-          <AlertTriangle className="w-12 h-12 text-warning mx-auto mb-4" />
+          <AlertTriangle className="w-12 h-12 text-warning mx-auto mb-4" aria-hidden="true" />
           <h1 className="text-2xl font-bold text-theme-primary mb-2">{t('not_found.heading')}</h1>
           <p className="text-theme-secondary mb-6">
             {t('custom_page.not_found_description', "The page you're looking for doesn't exist or is no longer available.")}
