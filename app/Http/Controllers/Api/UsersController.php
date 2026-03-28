@@ -135,9 +135,8 @@ class UsersController extends BaseApiController
     public function stats(): JsonResponse
     {
         $userId = $this->requireAuth();
-        $tenantId = TenantContext::getId();
 
-        $stats = $this->userService->getProfileStats($userId, $tenantId);
+        $stats = $this->userService->getProfileStats($userId);
 
         return $this->respondWithData($stats);
     }
@@ -334,7 +333,7 @@ class UsersController extends BaseApiController
     // ================================================================
 
     /**
-     * PUT /api/v2/users/me/password
+     * POST /api/v2/users/me/password
      */
     public function updatePassword(): JsonResponse
     {
@@ -613,9 +612,18 @@ class UsersController extends BaseApiController
             return $this->respondWithError('VALIDATION_ERROR', 'Longitude must be between -180 and 180', 'lon', 400);
         }
 
+        // Accept both 'limit' (frontend sends this) and 'per_page' for backwards compat
+        $limit = $this->queryInt('limit', 0, 1, 100);
+        if ($limit === 0) {
+            $limit = $this->queryInt('per_page', 20, 1, 100);
+        }
+
+        $offset = max((int) request()->query('offset', 0), 0);
+
         $filters = [
             'radius_km' => (float) $this->query('radius_km', '25'),
-            'limit'     => $this->queryInt('per_page', 20, 1, 100),
+            'limit'     => $limit,
+            'offset'    => $offset,
         ];
 
         $result = $this->userService->getNearby($lat, $lon, $filters, $currentUserId);
@@ -627,8 +635,9 @@ class UsersController extends BaseApiController
                 'lon'       => $lon,
                 'radius_km' => $filters['radius_km'],
             ],
-            'per_page' => $filters['limit'],
-            'has_more' => $result['has_more'],
+            'per_page'    => $filters['limit'],
+            'total_items' => $result['total'] ?? null,
+            'has_more'    => $result['has_more'],
         ]);
     }
 
@@ -913,11 +922,17 @@ class UsersController extends BaseApiController
 
         $totalCount = (int) DB::selectOne("SELECT COUNT(*) as total FROM users u WHERE $whereClause", $params)->total;
 
-        $sql = "SELECT u.id, u.name, u.first_name, u.last_name,
-                       u.avatar_url as avatar, u.bio as tagline,
+        $sql = "SELECT u.id,
+                       CASE
+                           WHEN u.profile_type = 'organisation' AND u.organization_name IS NOT NULL AND u.organization_name != '' THEN u.organization_name
+                           ELSE CONCAT(COALESCE(u.first_name, ''), ' ', COALESCE(u.last_name, ''))
+                       END as name,
+                       u.first_name, u.last_name,
+                       u.avatar_url as avatar,
+                       COALESCE(u.tagline, LEFT(u.bio, 120)) as tagline,
                        u.location, u.latitude, u.longitude,
                        u.created_at, u.last_login_at, u.is_verified,
-                       COALESCE(u.xp, 0) as xp, COALESCE(u.level, 1) as level,
+                       COALESCE(u.xp, 0) as xp, COALESCE(u.level, 0) as level,
                        (SELECT AVG(rating) FROM reviews WHERE receiver_id = u.id AND tenant_id = u.tenant_id) as rating,
                        (SELECT COALESCE(SUM(amount), 0) FROM transactions WHERE sender_id = u.id AND status = 'completed' AND tenant_id = u.tenant_id) as total_hours_given,
                        (SELECT COALESCE(SUM(amount), 0) FROM transactions WHERE receiver_id = u.id AND status = 'completed' AND tenant_id = u.tenant_id) as total_hours_received,
@@ -994,14 +1009,11 @@ class UsersController extends BaseApiController
             return $u;
         }, $users);
 
-        return response()->json([
-            'data' => $users,
-            'meta' => [
-                'total_items' => $totalCount,
-                'per_page' => $limit,
-                'offset' => $offset,
-                'has_more' => ($offset + $limit) < $totalCount,
-            ],
+        return $this->respondWithData($users, [
+            'total_items' => $totalCount,
+            'per_page'    => $limit,
+            'offset'      => $offset,
+            'has_more'    => ($offset + $limit) < $totalCount,
         ]);
     }
 

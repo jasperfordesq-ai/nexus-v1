@@ -516,6 +516,16 @@ class ListingService
         $radiusKm = (float) ($filters['radius_km'] ?? 25);
         $limit = min((int) ($filters['limit'] ?? 20), 100);
 
+        // Decode offset cursor (format: "nearby:<offset>")
+        $offset = 0;
+        $cursor = $filters['cursor'] ?? null;
+        if ($cursor !== null) {
+            $decoded = base64_decode($cursor, true);
+            if ($decoded !== false && str_starts_with($decoded, 'nearby:')) {
+                $offset = (int) substr($decoded, 7);
+            }
+        }
+
         $haversine = '(6371 * acos(LEAST(1.0, GREATEST(-1.0, '
             . 'cos(radians(?)) * cos(radians(latitude)) * cos(radians(longitude) - radians(?)) + '
             . 'sin(radians(?)) * sin(radians(latitude))'
@@ -546,7 +556,7 @@ class ListingService
             $query->where('category_id', (int) $filters['category_id']);
         }
 
-        $items = $query->limit($limit + 1)->get();
+        $items = $query->offset($offset)->limit($limit + 1)->get();
         $hasMore = $items->count() > $limit;
         if ($hasMore) {
             $items->pop();
@@ -565,8 +575,11 @@ class ListingService
             return $data;
         })->all();
 
+        $nextCursor = $hasMore ? base64_encode('nearby:' . ($offset + $limit)) : null;
+
         return [
             'items'    => array_values($result),
+            'cursor'   => $nextCursor,
             'has_more' => $hasMore,
         ];
     }

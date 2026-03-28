@@ -361,7 +361,7 @@ export function FeedPage() {
 
   const handleHidePost = useCallback(async (item: FeedItem) => {
     try {
-      await api.post(`/v2/feed/posts/${item.id}/hide`);
+      await api.post(`/v2/feed/posts/${item.id}/hide`, { type: item.type });
       setItems((prev) => prev.filter((fi) => !(fi.id === item.id && fi.type === item.type)));
       toastRef.current.success(tRef.current('toast.post_hidden'));
     } catch (err) {

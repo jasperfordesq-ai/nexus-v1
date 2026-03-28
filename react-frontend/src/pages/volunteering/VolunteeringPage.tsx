@@ -134,8 +134,8 @@ interface HoursSummary {
   total_verified: number;
   total_pending: number;
   total_declined: number;
-  by_organization: { name: string; total: number }[];
-  by_month: { month: string; total: number }[];
+  by_organization: { name: string; hours: number }[];
+  by_month: { month: string; hours: number }[];
 }
 
 type VolunteerTab = 'opportunities' | 'applications' | 'hours' | 'recommended' | 'certificates' | 'alerts' | 'wellbeing' | 'credentials' | 'waitlist' | 'swaps' | 'group-signups' | 'hours-review' | 'expenses' | 'safeguarding' | 'community-projects' | 'donations' | 'accessibility';
@@ -147,9 +147,22 @@ export function VolunteeringPage() {
   usePageTitle(t('page_title'));
   const { isAuthenticated } = useAuth();
   const { tenantPath, hasFeature } = useTenant();
-  const [searchParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams();
   const initialTab = (searchParams.get('tab') as VolunteerTab) ?? 'opportunities';
-  const [tab, setTab] = useState<VolunteerTab>(initialTab);
+  const [tab, setTabState] = useState<VolunteerTab>(initialTab);
+
+  const setTab = useCallback((newTab: VolunteerTab) => {
+    setTabState(newTab);
+    setSearchParams((prev) => {
+      const next = new URLSearchParams(prev);
+      if (newTab === 'opportunities') {
+        next.delete('tab');
+      } else {
+        next.set('tab', newTab);
+      }
+      return next;
+    }, { replace: true });
+  }, [setSearchParams]);
   const [hasApprovedOrg, setHasApprovedOrg] = useState(false);
 
   useEffect(() => {
@@ -1051,7 +1064,18 @@ function HoursTab() {
   });
   const [isLogging, setIsLogging] = useState(false);
 
+  // AbortController ref to cancel stale requests
+  const abortRef = useRef<AbortController | null>(null);
+
+  // Stable refs for t — avoids re-creating callbacks when i18n namespace loads
+  const tRef = useRef(t);
+  tRef.current = t;
+
   const loadSummary = useCallback(async () => {
+    abortRef.current?.abort();
+    const controller = new AbortController();
+    abortRef.current = controller;
+
     try {
       setIsLoading(true);
       setError(null);
@@ -1061,26 +1085,35 @@ function HoursTab() {
         api.get<Organization[]>('/v2/volunteering/organisations?per_page=50'),
       ]);
 
+      if (controller.signal.aborted) return;
+
       if (summaryRes.success && summaryRes.data) {
         setSummary(summaryRes.data);
       } else {
-        setError(t('error_load_hours'));
+        setError(tRef.current('error_load_hours'));
       }
 
       if (orgsRes.success && orgsRes.data) {
         setOrganisations(Array.isArray(orgsRes.data) ? orgsRes.data : []);
       }
     } catch (err) {
+      if (controller.signal.aborted) return;
       logError('Failed to load hours summary', err);
-      setError(t('error_load_hours_retry'));
+      setError(tRef.current('error_load_hours_retry'));
     } finally {
-      setIsLoading(false);
+      if (!controller.signal.aborted) {
+        setIsLoading(false);
+      }
     }
-  }, [t]);
+  }, []);
+
+  const loadSummaryRef = useRef(loadSummary);
+  loadSummaryRef.current = loadSummary;
 
   useEffect(() => {
-    loadSummary();
-  }, [loadSummary]);
+    loadSummaryRef.current();
+    return () => { abortRef.current?.abort(); };
+  }, []);
 
   const handleLogHours = async () => {
     if (!logForm.hours || !logForm.date || !logForm.organization_id) return;
@@ -1223,7 +1256,7 @@ function HoursTab() {
                     {(summary.by_organization ?? []).map((org, i) => (
                       <div key={i} className="flex items-center justify-between">
                         <span className="text-sm text-theme-muted">{org.name}</span>
-                        <span className="text-sm font-medium text-theme-primary">{org.total}h</span>
+                        <span className="text-sm font-medium text-theme-primary">{org.hours}h</span>
                       </div>
                     ))}
                   </div>
@@ -1243,7 +1276,7 @@ function HoursTab() {
                         <span className="text-sm text-theme-muted">
                           {new Date(month.month + '-01').toLocaleDateString(undefined, { year: 'numeric', month: 'long' })}
                         </span>
-                        <span className="text-sm font-medium text-theme-primary">{month.total}h</span>
+                        <span className="text-sm font-medium text-theme-primary">{month.hours}h</span>
                       </div>
                     ))}
                   </div>

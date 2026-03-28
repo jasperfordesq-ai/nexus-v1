@@ -59,7 +59,7 @@ class ContextualMessageService
             'tenant_id' => $tenantId,
             'sender_id' => $senderId,
             'receiver_id' => $receiverId,
-            'content' => $body,
+            'body' => $body,
             'created_at' => now(),
         ]);
 

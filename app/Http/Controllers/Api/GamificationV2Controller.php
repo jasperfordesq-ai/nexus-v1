@@ -67,7 +67,9 @@ class GamificationV2Controller extends BaseApiController
         $xp = (int) ($user['xp'] ?? 0);
         $level = (int) ($user['level'] ?? 1);
 
-        $levelProgress = $this->gamificationServiceLegacy->getLevelProgress($xp, $level);
+        $progressPercent = $this->gamificationServiceLegacy->getLevelProgress($xp, $level);
+        $currentThreshold = GamificationService::LEVEL_THRESHOLDS[$level] ?? 0;
+        $nextThreshold = GamificationService::LEVEL_THRESHOLDS[$level + 1] ?? null;
 
         $badges = UserBadge::getForUser($targetUserId);
         $showcasedBadges = UserBadge::getShowcased($targetUserId);
@@ -87,7 +89,12 @@ class GamificationV2Controller extends BaseApiController
             ],
             'xp' => $xp,
             'level' => $level,
-            'level_progress' => $levelProgress,
+            'level_progress' => [
+                'current_xp' => $xp,
+                'xp_for_current_level' => $currentThreshold,
+                'xp_for_next_level' => $nextThreshold ?? $currentThreshold,
+                'progress_percentage' => $progressPercent,
+            ],
             'badges_count' => count($badges),
             'showcased_badges' => $showcasedBadges,
             'is_own_profile' => ($targetUserId === $currentUserId),
@@ -214,11 +221,9 @@ class GamificationV2Controller extends BaseApiController
             }
 
             $rowResults = DB::select(
-                "SELECT n.user_id, n.total_score, n.percentile, u.name, u.avatar_url, u.xp, u.level,
-                        @rownum := @rownum + 1 AS rank_pos
+                "SELECT n.user_id, n.total_score, n.percentile, u.name, u.avatar_url, u.xp, u.level
                  FROM nexus_score_cache n
                  JOIN users u ON u.id = n.user_id
-                 JOIN (SELECT @rownum := 0) r
                  WHERE n.tenant_id = ? AND u.tenant_id = ? AND u.is_approved = 1
                  ORDER BY n.total_score DESC
                  LIMIT ?",
@@ -516,8 +521,8 @@ class GamificationV2Controller extends BaseApiController
             return $this->respondWithError('VALIDATION_INVALID_FORMAT', 'badge_keys must be an array', 'badge_keys', 400);
         }
 
-        if (count($badgeKeys) > 3) {
-            return $this->respondWithError('VALIDATION_ERROR', 'Maximum 3 badges can be showcased', 'badge_keys', 400);
+        if (count($badgeKeys) > 5) {
+            return $this->respondWithError('VALIDATION_ERROR', 'Maximum 5 badges can be showcased', 'badge_keys', 400);
         }
 
         $userBadges = UserBadge::getForUser($userId);
@@ -583,6 +588,7 @@ class GamificationV2Controller extends BaseApiController
                     'rewards' => null,
                     'days_remaining' => 0,
                     'is_ending_soon' => false,
+                    'total_participants' => 0,
                 ]);
             }
 

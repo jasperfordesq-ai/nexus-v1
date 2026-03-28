@@ -638,7 +638,9 @@ class ExchangeWorkflowService
                 'amount' => $hours,
                 'description' => "Exchange #$exchangeId for listing: " . ($exchangeData['listing_title'] ?? ''),
                 'transaction_type' => 'exchange',
+                'status' => 'completed',
                 'created_at' => now(),
+                'updated_at' => now(),
             ]);
 
             return $transactionId;

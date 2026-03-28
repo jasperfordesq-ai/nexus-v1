@@ -225,6 +225,12 @@ class DailyRewardService
             }
         }
 
+        // Calculate reward_xp (XP available for today's unclaimed reward)
+        $nextStreak = $todayReward !== null ? $currentStreak + 1 : max(1, $currentStreak + 1);
+        $rewardXp = self::BASE_XP + (self::STREAK_BONUSES[$todayReward === null ? max(1, $currentStreak + 1) : $currentStreak] ?? 0);
+        // next_reward_xp = what tomorrow's reward would be
+        $nextRewardXp = self::BASE_XP + (self::STREAK_BONUSES[$todayReward !== null ? $currentStreak + 1 : max(1, $currentStreak + 1) + 1] ?? 0);
+
         return [
             'claimed_today'   => $todayReward !== null,
             'claimed_at'      => $todayReward->claimed_at ?? null,
@@ -234,6 +240,9 @@ class DailyRewardService
             'total_xp'        => (int) ($user->xp ?? 0),
             'next_milestone'  => $nextMilestone,
             'can_claim'       => $todayReward === null,
+            'reward_xp'       => $todayReward === null ? $rewardXp : ($todayReward ? (int) $todayReward->xp_earned : self::BASE_XP),
+            'next_reward_xp'  => $nextRewardXp,
+            'next_claim_at'   => $todayReward !== null ? now()->addDay()->startOfDay()->toIso8601String() : null,
         ];
     }
 

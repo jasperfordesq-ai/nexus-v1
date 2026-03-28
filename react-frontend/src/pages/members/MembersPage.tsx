@@ -205,8 +205,9 @@ export function MembersPage() {
   // Load on mount and when filters change
   useEffect(() => {
     loadMembers();
-    // Reset hasMore when filters change
+    // Reset pagination state when filters change
     setHasMore(true);
+    setTotalCount(null);
   }, [debouncedQuery, sortBy, nearMeEnabled, user?.latitude, user?.longitude, radiusKm]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Fetch presence for visible members
@@ -489,20 +490,20 @@ export function MembersPage() {
                   }
                   getMarkerConfig={(m) => ({
                     id: m.id,
-                    title: `${m.first_name || ''} ${m.last_name || ''}`.trim() || m.name || 'Member',
+                    title: m.name?.trim() || `${m.first_name || ''} ${m.last_name || ''}`.trim() || 'Member',
                   })}
                   renderInfoContent={(m) => (
                     <div className="p-2 max-w-[200px]">
                       <div className="flex items-center gap-2">
-                        {m.avatar_url && (
-                          <img src={resolveAvatarUrl(m.avatar_url) || undefined} alt={`${m.first_name || ''} ${m.last_name || ''}`.trim() || 'Member avatar'} className="w-8 h-8 rounded-full" width={32} height={32} loading="lazy" />
+                        {(m.avatar || m.avatar_url) && (
+                          <img src={resolveAvatarUrl(m.avatar ?? m.avatar_url) || undefined} alt={`${m.first_name || ''} ${m.last_name || ''}`.trim() || 'Member avatar'} className="w-8 h-8 rounded-full" width={32} height={32} loading="lazy" />
                         )}
                         <div>
-                          <h4 className="font-semibold text-sm text-gray-900">
-                            {m.first_name} {m.last_name}
+                          <h4 className="font-semibold text-sm text-gray-900 dark:text-gray-100">
+                            {m.name || `${m.first_name || ''} ${m.last_name || ''}`.trim()}
                           </h4>
                           {m.tagline && (
-                            <p className="text-xs text-gray-600">{m.tagline}</p>
+                            <p className="text-xs text-gray-600 dark:text-gray-400">{m.tagline}</p>
                           )}
                         </div>
                       </div>
@@ -520,7 +521,7 @@ export function MembersPage() {
                 >
                   {members.map((member) => (
                     <motion.div key={member.id} variants={itemVariants}>
-                      <MemberCard member={member} viewMode={viewMode} />
+                      <MemberCard member={member} viewMode={viewMode} sortBy={sortBy} />
                     </motion.div>
                   ))}
                 </motion.div>
@@ -550,9 +551,10 @@ export function MembersPage() {
 interface MemberCardProps {
   member: User;
   viewMode: ViewMode;
+  sortBy?: SortOption;
 }
 
-const MemberCard = memo(function MemberCard({ member, viewMode }: MemberCardProps) {
+const MemberCard = memo(function MemberCard({ member, viewMode, sortBy }: MemberCardProps) {
   const { t } = useTranslation('common');
   const { tenantPath } = useTenant();
   const hasGamification = useFeature('gamification');
@@ -562,8 +564,24 @@ const MemberCard = memo(function MemberCard({ member, viewMode }: MemberCardProp
     || `${member.first_name || ''} ${member.last_name || ''}`.trim()
     || t('members.fallback_name');
 
+  // Resolve avatar from either field (index returns 'avatar', nearby may return 'avatar_url')
+  const avatarSrc = resolveAvatarUrl(member.avatar ?? member.avatar_url);
+
   const level = member.level ?? 0;
   const showcasedBadges = member.showcased_badges ?? [];
+
+  // Format join date for "New members" sort
+  const joinedLabel = sortBy === 'joined' && member.created_at
+    ? t('members.joined_date', {
+        date: new Date(member.created_at).toLocaleDateString(undefined, { month: 'short', year: 'numeric' }),
+        defaultValue: 'Joined {{date}}',
+      })
+    : null;
+
+  // Distance label for nearby mode
+  const distanceLabel = member.distance != null
+    ? `${member.distance} km`
+    : null;
 
   if (viewMode === 'list') {
     return (
@@ -573,7 +591,7 @@ const MemberCard = memo(function MemberCard({ member, viewMode }: MemberCardProp
             <div className="flex items-center gap-4">
               <div className="relative inline-block">
                 <Avatar
-                  src={resolveAvatarUrl(member.avatar)}
+                  src={avatarSrc}
                   name={displayName}
                   size="lg"
                   className="ring-2 ring-theme-muted/20"
@@ -619,6 +637,18 @@ const MemberCard = memo(function MemberCard({ member, viewMode }: MemberCardProp
                   <Clock className="w-4 h-4" aria-hidden="true" />
                   <span>{(member.total_hours_given ?? 0) + (member.total_hours_received ?? 0)}h</span>
                 </span>
+                {joinedLabel && (
+                  <span className="flex items-center gap-1 shrink-0 whitespace-nowrap text-indigo-500 dark:text-indigo-400">
+                    <Sparkles className="w-3.5 h-3.5" aria-hidden="true" />
+                    <span>{joinedLabel}</span>
+                  </span>
+                )}
+                {distanceLabel && (
+                  <span className="flex items-center gap-1 shrink-0 whitespace-nowrap text-emerald-600 dark:text-emerald-400">
+                    <MapPin className="w-3.5 h-3.5" aria-hidden="true" />
+                    <span>{distanceLabel}</span>
+                  </span>
+                )}
               </div>
             </div>
           </GlassCard>
@@ -633,7 +663,7 @@ const MemberCard = memo(function MemberCard({ member, viewMode }: MemberCardProp
         <GlassCard className="p-5 hover:scale-[1.02] transition-transform text-center">
           <div className="relative inline-block mx-auto mb-3">
             <Avatar
-              src={resolveAvatarUrl(member.avatar)}
+              src={avatarSrc}
               name={displayName}
               className="w-16 h-16 ring-2 ring-theme-muted/20"
             />
@@ -673,10 +703,17 @@ const MemberCard = memo(function MemberCard({ member, viewMode }: MemberCardProp
             </span>
           </div>
 
-          {member.location && (
+          {(member.location || distanceLabel) && (
             <p className="text-xs text-theme-subtle mt-2 flex items-center justify-center gap-1">
               <MapPin className="w-3 h-3" aria-hidden="true" />
-              <span>{member.location}</span>
+              <span>{distanceLabel ? `${member.location ? member.location + ' · ' : ''}${distanceLabel}` : member.location}</span>
+            </p>
+          )}
+
+          {joinedLabel && (
+            <p className="text-xs text-indigo-500 dark:text-indigo-400 mt-1 flex items-center justify-center gap-1">
+              <Sparkles className="w-3 h-3" aria-hidden="true" />
+              <span>{joinedLabel}</span>
             </p>
           )}
         </GlassCard>

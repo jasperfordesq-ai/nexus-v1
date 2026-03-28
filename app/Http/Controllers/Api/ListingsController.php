@@ -306,18 +306,26 @@ class ListingsController extends BaseApiController
             $filters['category_id'] = $this->queryInt('category_id');
         }
 
+        if ($this->query('cursor')) {
+            $filters['cursor'] = $this->query('cursor');
+        }
+
         $result = $this->listingService->getNearby($lat, $lon, $filters);
 
-        return $this->respondWithData($result['items'], [
-            'search' => [
-                'type'      => 'nearby',
-                'lat'       => $lat,
-                'lon'       => $lon,
-                'radius_km' => $filters['radius_km'],
-            ],
-            'per_page' => $filters['limit'],
-            'has_more' => $result['has_more'],
-        ]);
+        return $this->respondWithCollection(
+            $result['items'],
+            $result['cursor'] ?? null,
+            $filters['limit'],
+            $result['has_more'] ?? false,
+            [
+                'search' => [
+                    'type'      => 'nearby',
+                    'lat'       => $lat,
+                    'lon'       => $lon,
+                    'radius_km' => $filters['radius_km'],
+                ],
+            ]
+        );
     }
 
     // -----------------------------------------------------------------

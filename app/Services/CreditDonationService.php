@@ -72,7 +72,9 @@ class CreditDonationService
                 'amount' => $amount,
                 'description' => 'Donation' . ($message ? ": $message" : ''),
                 'transaction_type' => 'donation',
+                'status' => 'completed',
                 'created_at' => now(),
+                'updated_at' => now(),
             ]);
 
             CreditDonation::create([

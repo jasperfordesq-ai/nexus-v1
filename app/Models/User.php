@@ -65,11 +65,19 @@ class User extends Authenticatable
     }
 
     /**
-     * Accessor: React frontend expects 'tagline' (alias for bio).
+     * Accessor: React frontend expects 'tagline'.
+     * Returns the real tagline column if set, otherwise falls back to a
+     * truncated bio so every member has something displayed.
      */
     public function getTaglineAttribute(): ?string
     {
-        return $this->bio;
+        $raw = $this->getRawOriginal('tagline');
+        if (!empty($raw)) {
+            return $raw;
+        }
+        // Fallback: first 120 chars of bio
+        $bio = $this->getRawOriginal('bio') ?? $this->bio;
+        return $bio ? mb_substr($bio, 0, 120) : null;
     }
 
     public function getAuthPassword(): string

@@ -150,10 +150,10 @@ export function HashtagPage() {
     }
   };
 
-  const handleHidePost = async (postId: number) => {
+  const handleHidePost = async (item: FeedItem) => {
     try {
-      await api.post(`/v2/feed/posts/${postId}/hide`);
-      setItems((prev) => prev.filter((fi) => fi.id !== postId));
+      await api.post(`/v2/feed/posts/${item.id}/hide`, { type: item.type });
+      setItems((prev) => prev.filter((fi) => !(fi.id === item.id && fi.type === item.type)));
     } catch { /* ignore */ }
   };
 
@@ -283,7 +283,7 @@ export function HashtagPage() {
                     <FeedCard
                       item={item}
                       onToggleLike={() => handleToggleLike(item)}
-                      onHidePost={() => handleHidePost(item.id)}
+                      onHidePost={() => handleHidePost(item)}
                       onMuteUser={() => handleMuteUser(getAuthor(item).id)}
                       onReportPost={openReportModal}
                       onDeletePost={() => handleDeletePost(item)}

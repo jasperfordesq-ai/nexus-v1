@@ -164,7 +164,7 @@ export function SettingsPage() {
   const { t } = useTranslation('settings');
   const toast = useToast();
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const validTabs = ['profile', 'notifications', 'privacy', 'security'];
+  const validTabs = ['profile', 'notifications', 'privacy', 'security', 'skills', 'availability', 'linked-accounts'];
   const initialTab = validTabs.includes(searchParams.get('tab') || '') ? searchParams.get('tab')! : 'profile';
   const [activeTab, setActiveTab] = useState(initialTab);
   const [isSaving, setIsSaving] = useState(false);
@@ -390,7 +390,7 @@ export function SettingsPage() {
         location: user.location || '',
         latitude: user.latitude ?? undefined,
         longitude: user.longitude ?? undefined,
-        avatar: user.avatar || null,
+        avatar: user.avatar_url || user.avatar || null,
         profile_type: user.profile_type || 'individual',
         organization_name: user.organization_name || '',
       });

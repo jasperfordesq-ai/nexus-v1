@@ -504,7 +504,7 @@ export function JobDetailPage() {
   useEffect(() => {
     if (!vacancy?.category || !vacancy?.id) return;
     const controller = new AbortController();
-    api.get<{ data: JobVacancy[] } | JobVacancy[]>(`/v2/jobs?category=${encodeURIComponent(vacancy.category)}&limit=4&exclude=${vacancy.id}`)
+    api.get<{ data: JobVacancy[] } | JobVacancy[]>(`/v2/jobs?category=${encodeURIComponent(vacancy.category)}&per_page=5&exclude=${vacancy.id}&status=open`)
       .then((res) => {
         if (controller.signal.aborted || !res.success || !res.data) return;
         const items = parseArrayResponse<JobVacancy>(res.data);

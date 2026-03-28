@@ -85,12 +85,12 @@ function getTierConfig(name: string) {
 // ─────────────────────────────────────────────────────────────────────────────
 
 const CATEGORY_ICONS: Record<string, React.ReactNode> = {
-  engagement: <Users className="w-5 h-5" />,
-  quality:    <Star className="w-5 h-5" />,
-  volunteer:  <Clock className="w-5 h-5" />,
-  activity:   <TrendingUp className="w-5 h-5" />,
-  badges:     <Medal className="w-5 h-5" />,
-  impact:     <Heart className="w-5 h-5" />,
+  engagement: <Users className="w-5 h-5" aria-hidden="true" />,
+  quality:    <Star className="w-5 h-5" aria-hidden="true" />,
+  volunteer:  <Clock className="w-5 h-5" aria-hidden="true" />,
+  activity:   <TrendingUp className="w-5 h-5" aria-hidden="true" />,
+  badges:     <Medal className="w-5 h-5" aria-hidden="true" />,
+  impact:     <Heart className="w-5 h-5" aria-hidden="true" />,
 };
 
 const CATEGORY_COLORS: Record<string, string> = {
@@ -223,7 +223,7 @@ export default function NexusScorePage() {
   if (error || !data) {
     return (
       <div className="max-w-lg mx-auto px-4 py-16 text-center">
-        <AlertTriangle className="w-12 h-12 text-warning mx-auto mb-4" />
+        <AlertTriangle className="w-12 h-12 text-warning mx-auto mb-4" aria-hidden="true" />
         <p className="text-theme-subtle mb-6">{error}</p>
         <Button color="primary" onPress={() => load()}>
           {t('common.try_again', 'Try again')}

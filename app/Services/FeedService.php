@@ -447,6 +447,13 @@ class FeedService
             $userVotes = $votes->all();
         }
 
+        // Load poll rows for is_active and question
+        $polls = DB::table('polls')
+            ->whereIn('id', $pollIds)
+            ->where('tenant_id', $tenantId)
+            ->get()
+            ->keyBy('id');
+
         foreach ($pollIds as $pollId) {
             $opts = $optionsByPoll[$pollId] ?? collect();
             $totalVotes = 0;
@@ -457,14 +464,27 @@ class FeedService
                 $formattedOptions[] = [
                     'id' => (int) $opt->id,
                     'text' => $opt->option_text ?? $opt->text ?? '',
-                    'votes' => $count,
+                    'vote_count' => $count,
                 ];
             }
 
+            // Compute percentages after we know the total
+            foreach ($formattedOptions as &$fopt) {
+                $fopt['percentage'] = $totalVotes > 0
+                    ? round(($fopt['vote_count'] / $totalVotes) * 100, 1)
+                    : 0;
+            }
+            unset($fopt);
+
+            $poll = $polls[$pollId] ?? null;
+
             $pollDataMap[$pollId] = [
+                'id' => $pollId,
+                'question' => $poll->question ?? '',
                 'options' => $formattedOptions,
                 'total_votes' => $totalVotes,
-                'user_vote' => $userVotes[$pollId] ?? null,
+                'user_vote_option_id' => $userVotes[$pollId] ?? null,
+                'is_active' => (bool) ($poll->is_active ?? true),
             ];
         }
 

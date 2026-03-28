@@ -178,16 +178,11 @@ export function WalletPage() {
   }, [transactions, filter]);
 
   const stats = useMemo(() => ({
-    earned: transactions
-      .filter((tx) => tx.type === 'credit' && tx.status === 'completed')
-      .reduce((sum, tx) => sum + tx.amount, 0),
-    spent: transactions
-      .filter((tx) => tx.type === 'debit' && tx.status === 'completed')
-      .reduce((sum, tx) => sum + tx.amount, 0),
-    pending: transactions
-      .filter((tx) => tx.status === 'pending')
-      .reduce((sum, tx) => sum + tx.amount, 0),
-  }), [transactions]);
+    earned: balance?.total_earned ?? 0,
+    spent: balance?.total_spent ?? 0,
+    pending: (balance?.pending_in ?? balance?.pending_incoming ?? 0)
+           + (balance?.pending_out ?? balance?.pending_outgoing ?? 0),
+  }), [balance]);
 
   /**
    * Sanitize cell value to prevent CSV injection
@@ -302,7 +297,7 @@ export function WalletPage() {
             )}
 
             <p className="text-theme-subtle text-sm mb-4">
-              {balance?.pending_in ? t('pending_in', { count: balance.pending_in }) : t('no_pending')}
+              {(balance?.pending_in || balance?.pending_incoming) ? t('pending_in', { count: balance?.pending_in ?? balance?.pending_incoming ?? 0 }) : t('no_pending')}
             </p>
 
             {/* Action Buttons */}

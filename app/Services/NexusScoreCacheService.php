@@ -58,7 +58,7 @@ class NexusScoreCacheService
             }
 
             $this->cache->newQuery()->updateOrCreate(
-                ['user_id' => $userId],
+                ['user_id' => $userId, 'tenant_id' => $tenantId],
                 [
                     'total_score'   => $score,
                     'calculated_at' => now(),
@@ -125,7 +125,7 @@ class NexusScoreCacheService
         $scoreData = $this->scoreService->calculateNexusScore($userId, $tenantId);
 
         // Cache it
-        $this->cacheScore($userId, $scoreData);
+        $this->cacheScore($userId, $tenantId, $scoreData);
 
         return $scoreData;
     }
@@ -276,7 +276,7 @@ class NexusScoreCacheService
     /**
      * Cache the calculated score.
      */
-    private function cacheScore(int $userId, array $scoreData): void
+    private function cacheScore(int $userId, int $tenantId, array $scoreData): void
     {
         try {
             if (! $this->cacheTableExists()) {
@@ -286,7 +286,7 @@ class NexusScoreCacheService
             $breakdown = $scoreData['breakdown'];
 
             $this->cache->newQuery()->updateOrCreate(
-                ['user_id' => $userId],
+                ['user_id' => $userId, 'tenant_id' => $tenantId],
                 [
                     'total_score'      => $scoreData['total_score'],
                     'engagement_score' => $breakdown['engagement']['score'],

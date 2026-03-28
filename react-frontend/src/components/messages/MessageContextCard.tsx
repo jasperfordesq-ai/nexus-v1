@@ -95,7 +95,8 @@ export function MessageContextCard({ contextType, contextId }: MessageContextCar
     }
 
     loadContext();
-  }, [contextType, contextId]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- t is stable after initial load
+  }, [contextType, contextId, t]);
 
   const config = CONTEXT_CONFIG[contextType];
   if (!config) return null;

@@ -331,10 +331,10 @@ export function GroupDetailPage() {
     }
   };
 
-  const handleFeedHidePost = async (postId: number) => {
+  const handleFeedHidePost = async (item: FeedItem) => {
     try {
-      await api.post(`/v2/feed/posts/${postId}/hide`);
-      setFeedItems((prev) => prev.filter((fi) => !(fi.id === postId && fi.type === 'post')));
+      await api.post(`/v2/feed/posts/${item.id}/hide`, { type: item.type });
+      setFeedItems((prev) => prev.filter((fi) => !(fi.id === item.id && fi.type === item.type)));
       toastRef.current.success(tRef.current('toast.post_hidden', 'Post hidden'));
     } catch (err) {
       logError('Failed to hide post', err);

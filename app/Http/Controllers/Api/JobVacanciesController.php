@@ -112,6 +112,20 @@ class JobVacanciesController extends BaseApiController
         if ($this->query('radius_km') !== null) {
             $filters['radius_km'] = (float) $this->query('radius_km');
         }
+        if ($this->query('is_remote')) {
+            $filters['is_remote'] = true;
+        }
+        if ($this->query('organization_id')) {
+            $filters['organization_id'] = $this->queryInt('organization_id');
+        }
+        if ($this->query('exclude')) {
+            $filters['exclude'] = $this->queryInt('exclude');
+        }
+
+        $validSorts = ['newest', 'deadline', 'salary_desc'];
+        if ($this->query('sort') && in_array($this->query('sort'), $validSorts, true)) {
+            $filters['sort'] = $this->query('sort');
+        }
 
         $result = $this->jobService->getAll($filters, $userId);
 

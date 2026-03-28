@@ -53,17 +53,22 @@ class WalletService
             ->where('status', 'pending')
             ->sum('amount');
 
+        $txCount = $this->transaction->newQuery()
+            ->where(fn (Builder $q) => $q->where('sender_id', $userId)->orWhere('receiver_id', $userId))
+            ->completed()
+            ->count();
+
         return [
             'balance'           => (float) ($user->balance ?? 0),
             'total_earned'      => $totalEarned,
             'total_spent'       => $totalSpent,
-            'transaction_count' => $this->transaction->newQuery()
-                ->where(fn (Builder $q) => $q->where('sender_id', $userId)->orWhere('receiver_id', $userId))
-                ->completed()
-                ->count(),
+            'transaction_count' => $txCount,
             'currency'          => 'hours',
             'pending_incoming'  => $pendingIncoming,
             'pending_outgoing'  => $pendingOutgoing,
+            // Aliases for frontend compatibility
+            'pending_in'        => $pendingIncoming,
+            'pending_out'       => $pendingOutgoing,
         ];
     }
 
@@ -86,12 +91,21 @@ class WalletService
             ])
             ->completed();
 
+        // Filter by type and respect soft-delete flags
         if ($type === 'sent') {
-            $query->where('sender_id', $userId);
+            $query->where('sender_id', $userId)
+                  ->where('deleted_for_sender', false);
         } elseif ($type === 'received') {
-            $query->where('receiver_id', $userId);
+            $query->where('receiver_id', $userId)
+                  ->where('deleted_for_receiver', false);
         } else {
-            $query->where(fn (Builder $q) => $q->where('sender_id', $userId)->orWhere('receiver_id', $userId));
+            $query->where(function (Builder $q) use ($userId) {
+                $q->where(function (Builder $q2) use ($userId) {
+                    $q2->where('sender_id', $userId)->where('deleted_for_sender', false);
+                })->orWhere(function (Builder $q2) use ($userId) {
+                    $q2->where('receiver_id', $userId)->where('deleted_for_receiver', false);
+                });
+            });
         }
 
         if ($cursor !== null) {
@@ -109,8 +123,11 @@ class WalletService
             $items->pop();
         }
 
+        // Format each transaction into the standard API shape expected by the frontend
+        $formatted = $items->map(fn (Transaction $txn) => $this->formatTransaction($txn, $userId))->all();
+
         return [
-            'items'    => $items->toArray(),
+            'items'    => $formatted,
             'cursor'   => $hasMore && $items->isNotEmpty() ? base64_encode((string) $items->last()->id) : null,
             'has_more' => $hasMore,
         ];
@@ -298,12 +315,26 @@ class WalletService
     private function formatTransaction(Transaction $txn, int $userId): array
     {
         $isSender = $txn->sender_id === $userId;
+        // If sender_id is null (community fund grant), the user is always the receiver
+        if ($txn->sender_id === null) {
+            $isSender = false;
+        }
         $sender = $txn->sender;
         $receiver = $txn->receiver;
 
-        $formatUser = function (?User $u): array {
+        $txnType = $txn->transaction_type ?? 'transfer';
+
+        $formatUser = function (?User $u) use ($txnType): array {
             if (! $u) {
-                return ['id' => 0, 'name' => 'Unknown', 'avatar' => null];
+                // Use a meaningful label for system transactions
+                $label = match ($txnType) {
+                    'donation'         => 'Community Fund',
+                    'community_fund'   => 'Community Fund',
+                    'starting_balance' => 'System',
+                    'admin_grant'      => 'Admin',
+                    default            => 'Unknown',
+                };
+                return ['id' => 0, 'name' => $label, 'avatar' => null];
             }
             $name = ($u->profile_type === 'organisation' && $u->organization_name)
                 ? $u->organization_name

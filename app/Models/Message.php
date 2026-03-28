@@ -26,6 +26,7 @@ class Message extends Model
         'tenant_id', 'sender_id', 'receiver_id', 'listing_id',
         'body', 'is_read', 'is_edited', 'edited_at',
         'is_deleted_sender', 'is_deleted_receiver',
+        'is_deleted', 'is_voice', 'audio_url', 'audio_duration',
         'read_at', 'created_at',
         'context_type', 'context_id',
     ];
@@ -33,8 +34,11 @@ class Message extends Model
     protected $casts = [
         'is_read' => 'boolean',
         'is_edited' => 'boolean',
+        'is_deleted' => 'boolean',
         'is_deleted_sender' => 'boolean',
         'is_deleted_receiver' => 'boolean',
+        'is_voice' => 'boolean',
+        'audio_duration' => 'integer',
         'created_at' => 'datetime',
         'edited_at' => 'datetime',
         'read_at' => 'datetime',

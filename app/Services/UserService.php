@@ -83,6 +83,9 @@ class UserService
         // Add badges
         $profile['badges'] = self::getUserBadges($userId);
 
+        // Add NexusScore summary
+        $profile['nexus_score'] = self::getNexusScoreSummary($userId);
+
         return $profile;
     }
 
@@ -144,6 +147,9 @@ class UserService
 
         // Add badges
         $profile['badges'] = self::getUserBadges($userId);
+
+        // Add NexusScore summary
+        $profile['nexus_score'] = self::getNexusScoreSummary($userId);
 
         return $profile;
     }
@@ -487,6 +493,7 @@ class UserService
         $radiusKm = (float) ($filters['radius_km'] ?? 50);
         $limit    = (int) ($filters['limit'] ?? 20);
         $limit    = min($limit, 100);
+        $offset   = max((int) ($filters['offset'] ?? 0), 0);
 
         // Haversine formula (result in km) — tenant scoping via HasTenantScope on User model
         $haversine = "(
@@ -497,12 +504,13 @@ class UserService
             )
         )";
 
+        $tenantId = TenantContext::getId();
+
         $query = User::query()
             ->selectRaw("*, $haversine AS distance", [$lat, $lon, $lat])
             ->whereNotNull('latitude')
             ->whereNotNull('longitude')
-            ->where('status', '!=', 'banned')
-            ->where('status', '!=', 'deleted')
+            ->where('status', 'active')
             ->havingRaw('distance <= ?', [$radiusKm])
             ->orderBy('distance');
 
@@ -513,28 +521,77 @@ class UserService
         // Apply onboarding visibility gating
         OnboardingConfigService::applyVisibilityScope($query);
 
-        $items = $query->limit($limit + 1)->get();
+        $items = $query->offset($offset)->limit($limit + 1)->get();
 
         $hasMore = $items->count() > $limit;
         if ($hasMore) {
             $items->pop();
         }
 
-        $result = $items->map(function (User $user) {
+        // Collect user IDs for batch badge lookup
+        $userIds = $items->pluck('id')->all();
+        $badgesByUser = [];
+        if (!empty($userIds) && TenantContext::hasFeature('gamification')) {
+            $placeholders = implode(',', array_fill(0, count($userIds), '?'));
+            $badgeRows = DB::select(
+                "SELECT user_id, badge_key, name, icon
+                 FROM user_badges
+                 WHERE user_id IN ($placeholders) AND tenant_id = ? AND is_showcased = 1
+                 ORDER BY showcase_order ASC",
+                array_merge(array_map('intval', $userIds), [$tenantId])
+            );
+            foreach ($badgeRows as $row) {
+                $uid = (int) $row->user_id;
+                if (!isset($badgesByUser[$uid])) {
+                    $badgesByUser[$uid] = [];
+                }
+                if (count($badgesByUser[$uid]) < 3) {
+                    $def = \App\Services\GamificationService::getBadgeByKey($row->badge_key);
+                    $badgesByUser[$uid][] = [
+                        'badge_key' => $row->badge_key,
+                        'name'      => $def['name'] ?? $row->name ?? $row->badge_key,
+                        'icon'      => $def['icon'] ?? $row->icon ?? '',
+                    ];
+                }
+            }
+        }
+
+        $result = $items->map(function (User $user) use ($badgesByUser, $tenantId) {
+            // Compute rating and hours via subqueries for consistency with index()
+            $rating = DB::selectOne(
+                "SELECT AVG(rating) as avg_rating FROM reviews WHERE receiver_id = ? AND tenant_id = ?",
+                [$user->id, $tenantId]
+            );
+            $hoursGiven = DB::selectOne(
+                "SELECT COALESCE(SUM(amount), 0) as total FROM transactions WHERE sender_id = ? AND status = 'completed' AND tenant_id = ?",
+                [$user->id, $tenantId]
+            );
+            $hoursReceived = DB::selectOne(
+                "SELECT COALESCE(SUM(amount), 0) as total FROM transactions WHERE receiver_id = ? AND status = 'completed' AND tenant_id = ?",
+                [$user->id, $tenantId]
+            );
+
             return [
-                'id'         => $user->id,
-                'name'       => ($user->profile_type === 'organisation' && $user->organization_name)
-                                    ? $user->organization_name
-                                    : trim($user->first_name . ' ' . $user->last_name),
-                'first_name' => $user->first_name,
-                'last_name'  => $user->last_name,
-                'avatar_url' => $user->avatar_url,
-                'bio'        => $user->bio,
-                'tagline'    => $user->tagline,
-                'location'   => $user->location,
-                'latitude'   => $user->latitude,
-                'longitude'  => $user->longitude,
-                'distance'   => round((float) $user->distance, 1),
+                'id'                   => $user->id,
+                'name'                 => ($user->profile_type === 'organisation' && $user->organization_name)
+                                              ? $user->organization_name
+                                              : trim($user->first_name . ' ' . $user->last_name),
+                'first_name'           => $user->first_name,
+                'last_name'            => $user->last_name,
+                'avatar'               => $user->avatar_url,
+                'tagline'              => $user->getRawOriginal('tagline') ?: ($user->bio ? mb_substr($user->bio, 0, 120) : null),
+                'location'             => $user->location,
+                'latitude'             => $user->latitude,
+                'longitude'            => $user->longitude,
+                'created_at'           => $user->created_at?->toISOString(),
+                'is_verified'          => (bool) $user->is_verified,
+                'xp'                   => (int) ($user->xp ?? 0),
+                'level'                => (int) ($user->level ?? 0),
+                'rating'               => $rating->avg_rating ? (float) $rating->avg_rating : null,
+                'total_hours_given'    => (int) $hoursGiven->total,
+                'total_hours_received' => (int) $hoursReceived->total,
+                'showcased_badges'     => $badgesByUser[$user->id] ?? [],
+                'distance'             => round((float) $user->distance, 1),
             ];
         })->all();
 
@@ -621,6 +678,8 @@ class UserService
             $profile['privacy_contact']         = (bool) ($user->privacy_contact ?? true);
             $profile['onboarding_completed']    = (bool) ($user->onboarding_completed ?? false);
             $profile['preferred_language']       = $user->preferred_language ?? 'en';
+            $profile['has_2fa_enabled']          = (bool) ($user->totp_enabled ?? false);
+            $profile['preferred_theme']          = $user->preferred_theme ?? 'system';
         }
 
         return $profile;
@@ -796,6 +855,54 @@ class UserService
         }
 
         return $connection->status;
+    }
+
+    /**
+     * Get NexusScore summary for a user (cached, returns null if unavailable).
+     *
+     * @return array{total_score: float, tier: string, percentile: int}|null
+     */
+    private static function getNexusScoreSummary(int $userId): ?array
+    {
+        try {
+            $tenantId = TenantContext::getId();
+
+            if (! \Illuminate\Support\Facades\Schema::hasTable('nexus_score_cache')) {
+                return null;
+            }
+
+            $cached = DB::table('nexus_score_cache')
+                ->where('user_id', $userId)
+                ->where('tenant_id', $tenantId)
+                ->first();
+
+            if (! $cached || empty($cached->total_score)) {
+                return null;
+            }
+
+            // Determine tier from score (matches NexusScoreService::calculateTier thresholds)
+            $score = (float) $cached->total_score;
+            $tier = match (true) {
+                $score >= 900 => 'Legendary',
+                $score >= 800 => 'Elite',
+                $score >= 700 => 'Expert',
+                $score >= 600 => 'Advanced',
+                $score >= 500 => 'Proficient',
+                $score >= 400 => 'Intermediate',
+                $score >= 300 => 'Developing',
+                $score >= 200 => 'Beginner',
+                default       => 'Novice',
+            };
+
+            return [
+                'total_score' => round($score, 1),
+                'tier'        => $cached->tier ?? $tier,
+                'percentile'  => (int) ($cached->percentile ?? 0),
+            ];
+        } catch (\Throwable $e) {
+            Log::warning('Failed to load NexusScore summary', ['user_id' => $userId, 'error' => $e->getMessage()]);
+            return null;
+        }
     }
 
     /**

@@ -561,7 +561,7 @@ export function ProfilePage() {
               <div className="flex flex-wrap justify-center sm:justify-start gap-3 mt-6">
                 {isOwnProfile ? (
                   <>
-                    <Link to={tenantPath('/settings')}>
+                    <Link to={tenantPath('/settings?tab=profile')}>
                       <Button
                         className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
                         startContent={<Edit className="w-4 h-4" aria-hidden="true" />}

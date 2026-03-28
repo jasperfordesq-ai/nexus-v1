@@ -43,6 +43,7 @@ import { GlassCard } from '@/components/ui';
 import { EmptyState } from '@/components/feedback';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
+import { useToast } from '@/contexts';
 
 /* ───────────────────────── Types ───────────────────────── */
 
@@ -121,28 +122,46 @@ export function CredentialVerificationTab() {
   const [isUploading, setIsUploading] = useState(false);
   const [uploadError, setUploadError] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const toast = useToast();
+
+  // AbortController ref to cancel stale requests
+  const abortRef = useRef<AbortController | null>(null);
+
+  // Stable refs for t/toast — avoids re-creating callbacks when i18n namespace loads
+  const tRef = useRef(t);
+  tRef.current = t;
+  const toastRef = useRef(toast);
+  toastRef.current = toast;
 
   const load = useCallback(async () => {
+    abortRef.current?.abort();
+    const controller = new AbortController();
+    abortRef.current = controller;
+
     try {
       setIsLoading(true);
       setError(null);
 
       const response = await api.get<{ credentials?: Credential[] }>('/v2/volunteering/credentials');
 
+      if (controller.signal.aborted) return;
       if (response.success && response.data) {
         const payload = response.data as { credentials?: Credential[] } | Credential[];
         const items = Array.isArray(payload) ? payload : (payload.credentials ?? []);
         setCredentials(items);
       } else {
-        setError(t('credentials.load_failed', 'Failed to load credentials.'));
+        setError(tRef.current('credentials.load_failed', 'Failed to load credentials.'));
       }
     } catch (err) {
+      if (controller.signal.aborted) return;
       logError('Failed to load credentials', err);
-      setError(t('credentials.load_error', 'Unable to load credentials. Please try again.'));
+      setError(tRef.current('credentials.load_error', 'Unable to load credentials. Please try again.'));
     } finally {
-      setIsLoading(false);
+      if (!controller.signal.aborted) {
+        setIsLoading(false);
+      }
     }
-  }, [t]);
+  }, []);
 
   useEffect(() => {
     load();
@@ -186,15 +205,16 @@ export function CredentialVerificationTab() {
       const response = await api.upload('/v2/volunteering/credentials', formData);
 
       if (response.success) {
+        toastRef.current.success(tRef.current('credentials.upload_success', 'Credential uploaded successfully!'));
         onClose();
         resetUploadForm();
         load();
       } else {
-        setUploadError(t('credentials.upload_failed', 'Failed to upload credential. Please try again.'));
+        setUploadError(tRef.current('credentials.upload_failed', 'Failed to upload credential. Please try again.'));
       }
     } catch (err) {
       logError('Failed to upload credential', err);
-      setUploadError(t('credentials.upload_error', 'An error occurred while uploading. Please try again.'));
+      setUploadError(tRef.current('credentials.upload_error', 'An error occurred while uploading. Please try again.'));
     } finally {
       setIsUploading(false);
     }

@@ -52,11 +52,14 @@ export interface User {
   has_2fa_enabled?: boolean;
   preferred_layout?: 'modern';
   preferred_language?: string;
+  preferred_theme?: 'light' | 'dark' | 'system';
   onboarding_completed?: boolean;
   email_verified_at?: string | null;
   created_at?: string;
   updated_at?: string;
   last_login_at?: string;
+  distance?: number;
+  is_verified?: boolean;
 }
 
 export interface UserProfile extends User {
@@ -465,10 +468,11 @@ export interface WalletBalance {
   balance: number;
   pending_incoming: number;
   pending_outgoing: number;
-  pending_in?: number;   // Alias for pending_incoming (frontend compatibility)
-  pending_out?: number;  // Alias for pending_outgoing (frontend compatibility)
+  pending_in?: number;   // Alias for pending_incoming (API returns both)
+  pending_out?: number;  // Alias for pending_outgoing (API returns both)
   total_earned: number;
   total_spent: number;
+  transaction_count: number;
   currency: 'hours';
   last_transaction_at?: string;
 }
@@ -530,7 +534,8 @@ export interface WalletUserSearchResult {
   id: number;
   first_name: string;
   last_name: string;
-  username?: string;
+  name?: string;      // Computed display name from API
+  username?: string | null;
   avatar?: string | null;
 }
 

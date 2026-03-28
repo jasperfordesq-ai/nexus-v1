@@ -109,7 +109,7 @@ export function PostDetailPage() {
 
   const handleHidePost = async (feedItem: FeedItem) => {
     try {
-      await api.post(`/v2/feed/posts/${feedItem.id}/hide`);
+      await api.post(`/v2/feed/posts/${feedItem.id}/hide`, { type: feedItem.type });
       navigate(tenantPath('/feed'));
     } catch (err) {
       logError('Failed to hide post', err);

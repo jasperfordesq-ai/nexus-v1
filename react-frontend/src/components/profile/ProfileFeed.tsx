@@ -157,10 +157,10 @@ export function ProfileFeed({ userId, isOwnProfile = false }: ProfileFeedProps) 
     }
   };
 
-  const handleHidePost = async (postId: number) => {
+  const handleHidePost = async (item: FeedItem) => {
     try {
-      await api.post(`/v2/feed/posts/${postId}/hide`);
-      setItems((prev) => prev.filter((fi) => !(fi.id === postId && fi.type === 'post')));
+      await api.post(`/v2/feed/posts/${item.id}/hide`, { type: item.type });
+      setItems((prev) => prev.filter((fi) => !(fi.id === item.id && fi.type === item.type)));
     } catch (err) {
       logError('Failed to hide post', err);
     }
@@ -248,7 +248,7 @@ export function ProfileFeed({ userId, isOwnProfile = false }: ProfileFeedProps) 
             <FeedCard
               item={item}
               onToggleLike={() => void handleToggleLike(item)}
-              onHidePost={() => void handleHidePost(item.id)}
+              onHidePost={() => void handleHidePost(item)}
               onMuteUser={() => {/* no-op on profile */}}
               onReportPost={() => {/* no-op on profile */}}
               onDeletePost={() => void handleDeletePost(item)}

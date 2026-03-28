@@ -70,7 +70,7 @@ export function EmployerBrandPage() {
       setIsLoading(true);
       setError(null);
 
-      const jobsRes = await api.get<{ data: EmployerJob[] }>(`/v2/jobs?user_id=${userId}&status=open&limit=50`);
+      const jobsRes = await api.get<{ data: EmployerJob[] }>(`/v2/jobs?user_id=${userId}&status=open&per_page=50`);
 
       if (controller.signal.aborted) return;
 

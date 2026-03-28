@@ -10,7 +10,6 @@ use Illuminate\Http\JsonResponse;
 use App\Services\MessageService;
 use App\Services\BrokerMessageVisibilityService;
 use App\Core\AudioUploader;
-use App\Core\TenantContext;
 use App\Models\Message;
 use Illuminate\Support\Facades\Log;
 
@@ -373,10 +372,8 @@ class MessagesController extends BaseApiController
             return $this->respondWithError('VALIDATION_ERROR', 'Other user ID required', 'other_user_id', 400);
         }
 
-        $tenantId = TenantContext::getId();
-
         try {
-            $deleted = Message::deleteConversation($tenantId, $userId, $otherUserId);
+            $deleted = Message::deleteConversation($userId, $otherUserId);
             return $this->success(['deleted' => $deleted]);
         } catch (\Throwable $e) {
             Log::error('Failed to delete conversation', ['error' => $e->getMessage(), 'user' => $userId, 'other_user' => $otherUserId]);

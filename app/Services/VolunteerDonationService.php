@@ -57,6 +57,10 @@ class VolunteerDonationService
                 'message', 'is_anonymous', 'status', 'created_at',
             ]);
 
+        if (!empty($filters['user_id'])) {
+            $query->where('user_id', (int) $filters['user_id']);
+        }
+
         if (!empty($filters['opportunity_id'])) {
             $query->where('opportunity_id', (int) $filters['opportunity_id']);
         }

@@ -595,9 +595,11 @@ class VolunteerCommunityController extends BaseApiController
     public function getDonations(): JsonResponse
     {
         $this->ensureFeature();
+        $userId = $this->getUserId();
         $this->rateLimit('vol_public_read', 60, 30);
 
         $filters = [
+            'user_id' => $userId,
             'opportunity_id' => $this->query('opportunity_id') ? (int) $this->query('opportunity_id') : null,
             'community_project_id' => $this->query('community_project_id') ? (int) $this->query('community_project_id') : null,
             'cursor' => $this->query('cursor'),

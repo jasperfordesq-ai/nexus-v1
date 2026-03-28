@@ -31,7 +31,7 @@ interface GroupFeedTabProps {
   onComposeOpen: () => void;
   onLoadMore: () => void;
   onToggleLike: (item: FeedItem) => void;
-  onHidePost: (postId: number) => void;
+  onHidePost: (item: FeedItem) => void;
   onMuteUser: (userId: number) => void;
   onReportPost: (postId: number) => void;
   onDeletePost: (item: FeedItem) => void;
@@ -148,7 +148,7 @@ export function GroupFeedTab({
                 <FeedCard
                   item={item}
                   onToggleLike={() => onToggleLike(item)}
-                  onHidePost={() => onHidePost(item.id)}
+                  onHidePost={() => onHidePost(item)}
                   onMuteUser={() => onMuteUser(getAuthor(item).id)}
                   onReportPost={() => onReportPost(item.id)}
                   onDeletePost={() => onDeletePost(item)}

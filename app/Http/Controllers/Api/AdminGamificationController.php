@@ -73,8 +73,9 @@ class AdminGamificationController extends BaseApiController
 
         try {
             $definitions = $this->gamificationService->getBadgeDefinitions();
-            foreach ($definitions as $key => $def) {
-                $badges[] = ['id' => null, 'key' => $key, 'name' => $def['name'] ?? $key, 'description' => $def['description'] ?? '', 'icon' => $def['icon'] ?? 'award', 'type' => 'built_in', 'awarded_count' => 0];
+            foreach ($definitions as $def) {
+                $badgeKey = $def['key'] ?? '';
+                $badges[] = ['id' => null, 'key' => $badgeKey, 'name' => $def['name'] ?? $badgeKey, 'description' => $def['msg'] ?? $def['description'] ?? '', 'icon' => $def['icon'] ?? 'award', 'type' => 'built_in', 'awarded_count' => 0];
             }
         } catch (\Throwable $e) {}
 

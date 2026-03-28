@@ -150,7 +150,7 @@ export function OrganisationDetailPage() {
         api.get<OrganisationDetail>(`/v2/volunteering/organisations/${id}`),
         api.get<{ data: Opportunity[] }>(`/v2/volunteering/opportunities?organization_id=${id}&per_page=50`),
         api.get<{ reviews: Review[] }>(`/v2/volunteering/reviews/organization/${id}`),
-        api.get<{ data: MinimalJob[] } | MinimalJob[]>(`/v2/jobs?organization_id=${id}&status=open&limit=10`),
+        api.get<{ data: MinimalJob[] } | MinimalJob[]>(`/v2/jobs?organization_id=${id}&status=open&per_page=10`),
       ]);
 
       if (controller.signal.aborted) return;

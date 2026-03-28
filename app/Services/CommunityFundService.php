@@ -164,14 +164,15 @@ class CommunityFundService
                 'updated_at' => now(),
             ]);
 
-            // Log wallet transaction for the recipient
+            // Log wallet transaction for the recipient (sender_id is NULL — credits come from the fund, not a user)
             DB::table('transactions')->insert([
                 'tenant_id' => $tenantId,
-                'sender_id' => $recipientId,
+                'sender_id' => null,
                 'receiver_id' => $recipientId,
                 'amount' => $amount,
                 'description' => $description ?: 'Community fund grant',
                 'transaction_type' => 'community_fund',
+                'status' => 'completed',
                 'created_at' => now(),
                 'updated_at' => now(),
             ]);
@@ -317,14 +318,15 @@ class CommunityFundService
                 'updated_at' => now(),
             ]);
 
-            // Log wallet transaction for the donor
+            // Log wallet transaction for the donor (receiver_id is NULL — credits go to the fund, not a user)
             DB::table('transactions')->insert([
                 'tenant_id' => $tenantId,
                 'sender_id' => $donorId,
-                'receiver_id' => $donorId,
+                'receiver_id' => null,
                 'amount' => $amount,
                 'description' => 'Donation to community fund' . ($message ? ": $message" : ''),
                 'transaction_type' => 'donation',
+                'status' => 'completed',
                 'created_at' => now(),
                 'updated_at' => now(),
             ]);

@@ -121,6 +121,15 @@ class JobVacancyService
                       ->orWhere('job_vacancies.featured_until', '>', now());
                 });
         }
+        if (!empty($filters['is_remote'])) {
+            $query->where('job_vacancies.is_remote', true);
+        }
+        if (!empty($filters['exclude'])) {
+            $query->where('job_vacancies.id', '!=', (int) $filters['exclude']);
+        }
+        if (!empty($filters['organization_id'])) {
+            $query->where('job_vacancies.organization_id', (int) $filters['organization_id']);
+        }
 
         // Haversine geolocation radius filter
         $lat = isset($filters['latitude']) ? (float) $filters['latitude'] : null;
@@ -136,9 +145,26 @@ class JobVacancyService
                 );
         }
 
-        $query->orderByRaw('(CASE WHEN job_vacancies.is_featured = 1 AND (job_vacancies.featured_until IS NULL OR job_vacancies.featured_until > NOW()) THEN 0 ELSE 1 END) ASC')
-            ->orderByDesc('job_vacancies.created_at')
-            ->orderByDesc('job_vacancies.id');
+        // Featured jobs always first, then apply requested sort
+        $query->orderByRaw('(CASE WHEN job_vacancies.is_featured = 1 AND (job_vacancies.featured_until IS NULL OR job_vacancies.featured_until > NOW()) THEN 0 ELSE 1 END) ASC');
+
+        $sort = $filters['sort'] ?? 'newest';
+        switch ($sort) {
+            case 'deadline':
+                // Soonest deadlines first, nulls last
+                $query->orderByRaw('CASE WHEN job_vacancies.deadline IS NULL THEN 1 ELSE 0 END ASC')
+                      ->orderBy('job_vacancies.deadline', 'asc');
+                break;
+            case 'salary_desc':
+                // Highest salary first, nulls last
+                $query->orderByRaw('CASE WHEN job_vacancies.salary_max IS NULL AND job_vacancies.salary_min IS NULL THEN 1 ELSE 0 END ASC')
+                      ->orderByRaw('COALESCE(job_vacancies.salary_max, job_vacancies.salary_min, 0) DESC');
+                break;
+            default: // 'newest'
+                $query->orderByDesc('job_vacancies.created_at')
+                      ->orderByDesc('job_vacancies.id');
+                break;
+        }
 
         // Offset-based pagination (used by admin panel, supports total count)
         if (array_key_exists('offset', $filters)) {

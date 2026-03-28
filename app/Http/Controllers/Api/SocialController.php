@@ -410,10 +410,19 @@ class SocialController extends BaseApiController
         $userId = $this->requireAuth();
         $tenantId = $this->getTenantId();
 
+        // Accept optional type parameter so non-post feed items (listings, events, etc.)
+        // can be hidden correctly. Falls back to 'post' for backward compatibility.
+        $targetType = $this->input('type', 'post');
+        $validTypes = ['post', 'listing', 'event', 'poll', 'goal', 'review', 'job',
+                       'challenge', 'volunteer', 'blog', 'discussion', 'badge_earned', 'level_up'];
+        if (!in_array($targetType, $validTypes, true)) {
+            $targetType = 'post';
+        }
+
         DB::table('feed_hidden')->insertOrIgnore([
             'user_id'     => $userId,
             'tenant_id'   => $tenantId,
-            'target_type' => 'post',
+            'target_type' => $targetType,
             'target_id'   => $id,
             'created_at'  => now(),
         ]);

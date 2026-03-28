@@ -84,7 +84,8 @@ class PollService
             ->get()
             ->map(fn ($o) => [
                 'id'         => $o->id,
-                'label'      => $o->label,
+                'text'       => $o->label ?? $o->option_text ?? '',
+                'label'      => $o->label ?? $o->option_text ?? '',
                 'vote_count' => (int) DB::table('poll_votes')->where('option_id', $o->id)->count(),
             ])->all();
 
@@ -112,6 +113,7 @@ class PollService
             $votedOptionId = $vote ? (int) $vote->option_id : null;
         }
         $data['voted_option_id'] = $votedOptionId;
+        $data['user_vote_option_id'] = $votedOptionId;
 
         $data['poll_type'] = $data['poll_type'] ?? 'standard';
 

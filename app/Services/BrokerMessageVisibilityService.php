@@ -125,7 +125,7 @@ class BrokerMessageVisibilityService
             'conversation_key' => $conversationKey,
             'sender_id' => $message->sender_id,
             'receiver_id' => $message->receiver_id,
-            'message_body' => $message->content ?? $message->body ?? '',
+            'message_body' => $message->body ?? '',
             'sent_at' => $message->created_at,
             'copy_reason' => $reason,
             'related_listing_id' => $message->listing_id ?? null,

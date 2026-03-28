@@ -260,8 +260,9 @@ class VolunteerService
             ->where('status', 'pending')
             ->sum('hours');
 
+        $declineStatus = self::getDeclineStatusValue();
         $declined = VolLog::where('user_id', $userId)
-            ->where('status', 'rejected')
+            ->where('status', $declineStatus)
             ->sum('hours');
 
         $totalLogs = VolLog::where('user_id', $userId)->count();

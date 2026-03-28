@@ -7,10 +7,12 @@
 namespace App\Services;
 
 use App\Core\TenantContext;
+use App\Events\MessageSent;
 use App\Models\Message;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 /**
  * MessageService — Laravel DI-based service for messaging operations.
@@ -123,7 +125,8 @@ class MessageService
             ] : null;
             $data['last_message'] = [
                 'id'         => $msg->id,
-                'content'    => $msg->body,
+                'body'       => $msg->body,
+                'content'    => $msg->body, // Deprecated alias — kept for backward compat
                 'sender_id'  => $msg->sender_id,
                 'created_at' => $msg->created_at?->toISOString(),
                 'is_read'    => $msg->is_read,
@@ -191,10 +194,7 @@ class MessageService
             $messages->pop();
         }
 
-        // Mark messages as read when viewing (older direction or no cursor)
-        if ($direction !== 'newer' || $cursor === null) {
-            self::markAsRead($partnerId, $userId);
-        }
+        // Note: markAsRead is called by the controller, not here, to avoid double-calling.
 
         $items = $messages->map(fn (Message $msg) => $msg->toArray())->all();
 
@@ -230,13 +230,22 @@ class MessageService
         }
 
         if ($receiverId <= 0) {
-            return ['error' => 'recipient_id is required'];
+            self::$errors = [['code' => 'VALIDATION_ERROR', 'message' => 'recipient_id is required']];
+            return [];
+        }
+
+        if ($senderId === $receiverId) {
+            self::$errors = [['code' => 'VALIDATION_ERROR', 'message' => 'You cannot send a message to yourself']];
+            return [];
         }
 
         $content = trim($data['body'] ?? ($data['content'] ?? ''));
+        $voiceUrl = $data['voice_url'] ?? ($data['audio_url'] ?? null);
+        $isVoice = !empty($data['is_voice']) || !empty($voiceUrl);
 
-        if (empty($content)) {
-            return ['error' => 'Message body is required'];
+        if (empty($content) && !$isVoice) {
+            self::$errors = [['code' => 'VALIDATION_ERROR', 'message' => 'Message body is required']];
+            return [];
         }
 
         $attributes = [
@@ -246,6 +255,15 @@ class MessageService
             'is_read'        => false,
             'created_at'     => now(),
         ];
+
+        // Voice message fields
+        if ($isVoice && $voiceUrl) {
+            $attributes['is_voice'] = true;
+            $attributes['audio_url'] = $voiceUrl;
+            if (!empty($data['audio_duration'])) {
+                $attributes['audio_duration'] = (int) $data['audio_duration'];
+            }
+        }
 
         // Pass through contextual messaging fields if provided
         if (!empty($data['context_type'])) {
@@ -259,6 +277,20 @@ class MessageService
 
         $message->save();
 
+        // Broadcast the new message event for real-time delivery
+        try {
+            $sender = User::withoutGlobalScopes()->find($senderId);
+            if ($sender) {
+                $ids = [$senderId, $receiverId];
+                sort($ids);
+                $conversationId = crc32(implode('-', $ids));
+
+                MessageSent::dispatch($message, $sender, $conversationId, $message->tenant_id ?? app('tenant.id'));
+            }
+        } catch (\Throwable $e) {
+            Log::warning('MessageSent broadcast failed', ['error' => $e->getMessage(), 'message_id' => $message->id]);
+        }
+
         return $message->fresh(['sender', 'receiver'])->toArray();
     }
 
@@ -271,7 +303,7 @@ class MessageService
             ->where('sender_id', $partnerId)
             ->where('receiver_id', $userId)
             ->where('is_read', false)
-            ->update(['is_read' => true]);
+            ->update(['is_read' => true, 'read_at' => now()]);
     }
 
     /**
@@ -632,15 +664,31 @@ class MessageService
     /**
      * Set typing indicator for a conversation.
      *
-     * This is a no-op in Eloquent mode — real-time typing indicators
-     * are handled by the frontend via Pusher directly.
+     * Broadcasts a typing event to the recipient's private Pusher channel.
+     * No DB persistence needed — purely real-time.
      */
     public static function setTypingIndicator(int $recipientId, int $userId, bool $isTyping): bool
     {
-        // Typing indicators are broadcast-only (Pusher) — no DB persistence needed.
-        // The legacy implementation called RealtimeService::broadcastTyping() which
-        // is a Pusher broadcast. In the Laravel app, this should be handled by
-        // a dedicated broadcasting event rather than a service method.
+        try {
+            $tenantId = app('tenant.id');
+            $channelName = "private-tenant.{$tenantId}.user.{$recipientId}";
+
+            // Broadcast typing event via the configured broadcast driver (Pusher).
+            // Uses the broadcast manager to resolve the underlying Pusher connection.
+            $broadcaster = app('Illuminate\Broadcasting\BroadcastManager');
+            $driver = $broadcaster->connection('pusher');
+
+            // The Pusher broadcaster wraps the Pusher SDK; access it to trigger directly.
+            if (method_exists($driver, 'getPusher')) {
+                $driver->getPusher()->trigger($channelName, 'typing', [
+                    'user_id'   => $userId,
+                    'is_typing' => $isTyping,
+                ]);
+            }
+        } catch (\Throwable $e) {
+            Log::debug('Typing indicator broadcast failed', ['error' => $e->getMessage()]);
+        }
+
         return true;
     }
 }

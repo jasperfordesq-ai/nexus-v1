@@ -50,4 +50,22 @@ class MessageSent implements ShouldBroadcast
     {
         return 'message.sent';
     }
+
+    /**
+     * Data to broadcast — only include fields the frontend needs.
+     * Avoids leaking full User model (email, phone, etc.).
+     *
+     * @return array<string, mixed>
+     */
+    public function broadcastWith(): array
+    {
+        return [
+            'id'         => $this->message->id,
+            'body'       => $this->message->body,
+            'sender_id'  => $this->message->sender_id,
+            'created_at' => $this->message->created_at?->toISOString(),
+            'is_voice'   => (bool) $this->message->is_voice,
+            'audio_url'  => $this->message->audio_url,
+        ];
+    }
 }
