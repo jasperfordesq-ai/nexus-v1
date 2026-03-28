@@ -183,6 +183,27 @@ class GroupExchangeService
             return false;
         }
 
+        // Safeguarding: block adding participants who require broker approval
+        // (set when a vulnerable person ticks safeguarding checkboxes during onboarding)
+        $tenantId = \App\Core\TenantContext::getId();
+        $hasSafeguardingRestriction = DB::table('user_messaging_restrictions')
+            ->where('tenant_id', $tenantId)
+            ->where('user_id', $userId)
+            ->where('requires_broker_approval', 1)
+            ->where(function ($q) {
+                $q->whereNull('monitoring_expires_at')
+                  ->orWhere('monitoring_expires_at', '>', now());
+            })
+            ->exists();
+
+        if ($hasSafeguardingRestriction) {
+            \Illuminate\Support\Facades\Log::info('[GroupExchange] Blocked: participant has safeguarding restrictions', [
+                'exchange_id' => $exchangeId,
+                'user_id' => $userId,
+            ]);
+            return false;
+        }
+
         DB::table('group_exchange_participants')->insert([
             'group_exchange_id' => $exchangeId,
             'user_id'           => $userId,

@@ -57,6 +57,30 @@ class MatchApprovalWorkflowService
                 return null;
             }
 
+            // Safeguarding: check if either party has matching restrictions
+            // (set when a vulnerable person ticks safeguarding checkboxes)
+            $hasMatchingRestriction = DB::table('user_messaging_restrictions')
+                ->where('tenant_id', $tenantId)
+                ->whereIn('user_id', [$userId, $listingOwnerId])
+                ->where(function ($q) {
+                    $q->where('under_monitoring', 1)
+                      ->orWhere('requires_broker_approval', 1);
+                })
+                ->where(function ($q) {
+                    $q->whereNull('monitoring_expires_at')
+                      ->orWhere('monitoring_expires_at', '>', now());
+                })
+                ->exists();
+
+            if ($hasMatchingRestriction) {
+                Log::info('[MatchApprovalWorkflow] Blocked: user has safeguarding restrictions', [
+                    'user_id' => $userId,
+                    'listing_owner_id' => $listingOwnerId,
+                    'listing_id' => $listingId,
+                ]);
+                return null;
+            }
+
             $id = DB::table('match_approvals')->insertGetId([
                 'tenant_id' => $tenantId,
                 'user_id' => $userId,

@@ -999,10 +999,31 @@ class AdminBrokerController extends BaseApiController
                 return $this->respondWithData(['user_id' => $userId, 'under_monitoring' => true]);
             } else {
                 if ($existing) {
-                    DB::update(
-                        "UPDATE user_messaging_restrictions SET under_monitoring = 0, messaging_disabled = 0, monitoring_reason = NULL, restriction_reason = NULL, monitoring_started_at = NULL, monitoring_expires_at = NULL WHERE user_id = ? AND tenant_id = ?",
+                    // Check if monitoring was set by safeguarding triggers — warn admin
+                    $existingRow = DB::selectOne(
+                        "SELECT monitoring_reason, requires_broker_approval FROM user_messaging_restrictions WHERE user_id = ? AND tenant_id = ?",
                         [$userId, $userTenantId]
                     );
+                    $isSafeguardingSet = $existingRow && str_starts_with($existingRow->monitoring_reason ?? '', 'Safeguarding:');
+
+                    // Preserve audit trail: don't null out monitoring_reason or monitoring_started_at
+                    // They record WHY monitoring was originally set, which is legally required
+                    DB::update(
+                        "UPDATE user_messaging_restrictions
+                         SET under_monitoring = 0, messaging_disabled = 0, monitoring_expires_at = NULL,
+                             restriction_reason = CONCAT(COALESCE(restriction_reason, ''), ' [Removed by admin {$adminId}]')
+                         WHERE user_id = ? AND tenant_id = ?",
+                        [$userId, $userTenantId]
+                    );
+
+                    // If safeguarding-set, also clear requires_broker_approval
+                    // (admin explicitly chose to remove protections)
+                    if ($isSafeguardingSet) {
+                        DB::update(
+                            "UPDATE user_messaging_restrictions SET requires_broker_approval = 0 WHERE user_id = ? AND tenant_id = ?",
+                            [$userId, $userTenantId]
+                        );
+                    }
                 }
 
                 AuditLogService::log('user_monitoring_removed', null, $adminId, ['user_id' => $userId, 'user_name' => $userName]);
