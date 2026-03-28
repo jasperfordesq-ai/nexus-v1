@@ -528,7 +528,7 @@ class NotificationDispatcher
         Notification::createNotification($userId, $content, $link, 'verification_reminder');
 
         $tenant = TenantContext::get();
-        $tenantName = $tenant['name'] ?? 'Community';
+        $tenantName = htmlspecialchars($tenant['name'] ?? 'Community', ENT_QUOTES, 'UTF-8');
         $basePath = TenantContext::getSlugPrefix();
         $frontendUrl = TenantContext::getFrontendUrl();
 
@@ -896,9 +896,11 @@ HTML;
     private static function buildMatchApprovalRequestEmail($userName, $listingTitle, $requestId): string
     {
         $tenant = TenantContext::get();
-        $tenantName = $tenant['name'] ?? 'Community';
+        $tenantName = htmlspecialchars($tenant['name'] ?? 'Community', ENT_QUOTES, 'UTF-8');
         $basePath = TenantContext::getSlugPrefix();
         $frontendUrl = TenantContext::getFrontendUrl();
+        $userName = htmlspecialchars($userName, ENT_QUOTES, 'UTF-8');
+        $listingTitle = htmlspecialchars($listingTitle, ENT_QUOTES, 'UTF-8');
 
         return <<<HTML
 <div style="font-family: system-ui, -apple-system, sans-serif; max-width: 600px; margin: 0 auto;">
@@ -928,9 +930,10 @@ HTML;
     private static function buildMatchApprovedEmail($listingTitle, $listingId, $matchScore): string
     {
         $tenant = TenantContext::get();
-        $tenantName = $tenant['name'] ?? 'Community';
+        $tenantName = htmlspecialchars($tenant['name'] ?? 'Community', ENT_QUOTES, 'UTF-8');
         $basePath = TenantContext::getSlugPrefix();
         $frontendUrl = TenantContext::getFrontendUrl();
+        $listingTitle = htmlspecialchars($listingTitle, ENT_QUOTES, 'UTF-8');
         $scoreText = $matchScore > 0 ? " ({$matchScore}% match)" : "";
 
         return <<<HTML
@@ -959,9 +962,11 @@ HTML;
     private static function buildMatchRejectedEmail($listingTitle, $reason): string
     {
         $tenant = TenantContext::get();
-        $tenantName = $tenant['name'] ?? 'Community';
+        $tenantName = htmlspecialchars($tenant['name'] ?? 'Community', ENT_QUOTES, 'UTF-8');
         $basePath = TenantContext::getSlugPrefix();
         $frontendUrl = TenantContext::getFrontendUrl();
+        $listingTitle = htmlspecialchars($listingTitle, ENT_QUOTES, 'UTF-8');
+        $reason = htmlspecialchars($reason, ENT_QUOTES, 'UTF-8');
 
         $reasonHtml = '';
         if (!empty($reason)) {
@@ -1126,14 +1131,14 @@ HTML;
     private static function buildRichExchangeEmail(string $type, array $data, array $user, array $details, string $actionUrl): string
     {
         $tenant = TenantContext::get();
-        $tenantName = $tenant['name'] ?? 'Community';
+        $tenantName = htmlspecialchars($tenant['name'] ?? 'Community', ENT_QUOTES, 'UTF-8');
 
-        $userName = $user['first_name'] ?? $user['name'] ?? 'there';
-        $listingTitle = $details['listing_title'] ?? 'Service Exchange';
+        $userName = htmlspecialchars($user['first_name'] ?? $user['name'] ?? 'there', ENT_QUOTES, 'UTF-8');
+        $listingTitle = htmlspecialchars($details['listing_title'] ?? 'Service Exchange', ENT_QUOTES, 'UTF-8');
         $listingType = $details['listing_type'] ?? 'offer';
         $proposedHours = $details['proposed_hours'] ?? $data['hours'] ?? 0;
-        $requesterName = $details['requester_first_name'] ?? $details['requester_name'] ?? 'A member';
-        $providerName = $details['provider_first_name'] ?? $details['provider_name'] ?? 'Provider';
+        $requesterName = htmlspecialchars($details['requester_first_name'] ?? $details['requester_name'] ?? 'A member', ENT_QUOTES, 'UTF-8');
+        $providerName = htmlspecialchars($details['provider_first_name'] ?? $details['provider_name'] ?? 'Provider', ENT_QUOTES, 'UTF-8');
 
         $emailConfig = self::getExchangeEmailConfig($type, $data, $details);
 
@@ -1600,7 +1605,7 @@ HTML;
     private static function buildVerificationPassedEmail(): string
     {
         $tenant = TenantContext::get();
-        $tenantName = $tenant['name'] ?? 'Community';
+        $tenantName = htmlspecialchars($tenant['name'] ?? 'Community', ENT_QUOTES, 'UTF-8');
         $basePath = TenantContext::getSlugPrefix();
         $frontendUrl = TenantContext::getFrontendUrl();
 
@@ -1623,7 +1628,7 @@ HTML;
     private static function buildVerificationFailedEmail(string $reason): string
     {
         $tenant = TenantContext::get();
-        $tenantName = $tenant['name'] ?? 'Community';
+        $tenantName = htmlspecialchars($tenant['name'] ?? 'Community', ENT_QUOTES, 'UTF-8');
         $basePath = TenantContext::getSlugPrefix();
         $frontendUrl = TenantContext::getFrontendUrl();
         $reasonHtml = !empty($reason) ? "<p style=\"color: #dc2626; font-weight: 500; margin: 16px 0;\">Reason: " . htmlspecialchars($reason) . "</p>" : '';

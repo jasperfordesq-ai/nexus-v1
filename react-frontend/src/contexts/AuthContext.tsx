@@ -575,6 +575,32 @@ export function AuthProvider({ children }: AuthProviderProps) {
   }, []);
 
   // ─────────────────────────────────────────────────────────────────────────
+  // Cross-Tab Logout — sync auth state when tokens are cleared in another tab
+  // ─────────────────────────────────────────────────────────────────────────
+
+  useEffect(() => {
+    const handleStorageChange = (event: StorageEvent) => {
+      // localStorage 'storage' event only fires in OTHER tabs (not the one that made the change).
+      // When access token is removed (logout in another tab), clear state here too.
+      if (event.key === 'nexus_access_token' && event.newValue === null && state.status === 'authenticated') {
+        tokenManager.clearAll();
+        setState({
+          user: null,
+          status: 'idle',
+          error: null,
+          twoFactorToken: null,
+          twoFactorMethods: [],
+        });
+      }
+    };
+
+    window.addEventListener('storage', handleStorageChange);
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+    };
+  }, [state.status]);
+
+  // ─────────────────────────────────────────────────────────────────────────
   // Initial Auth Check
   // ─────────────────────────────────────────────────────────────────────────
 

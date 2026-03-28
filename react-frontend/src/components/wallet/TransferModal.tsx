@@ -211,6 +211,8 @@ export function TransferModal({
 
   // Submit transfer
   const handleSubmit = async () => {
+    if (isSubmitting) return;
+
     const validationError = validateForm();
     if (validationError) {
       setError(validationError);

@@ -87,7 +87,7 @@ class ListingsGridRenderer implements BlockRendererInterface
         $html .= '</h3>';
 
         if ($description) {
-            $shortDesc = strlen($description) > 100 ? substr($description, 0, 100) . '...' : $description;
+            $shortDesc = mb_strlen($description) > 100 ? mb_substr($description, 0, 100) . '...' : $description;
             $html .= '<p class="pb-listing-description">' . $shortDesc . '</p>';
         }
 

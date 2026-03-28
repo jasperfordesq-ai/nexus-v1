@@ -448,7 +448,7 @@ class CronJobRunner
         <body style='font-family: sans-serif; line-height: 1.5; color: #333;'>
             <div style='max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #ddd; border-radius: 8px;'>
                 <h2 style='color: #4f46e5;'>Your $freqLabel Digest</h2>
-                <p>Hello {$user['name']},</p>
+                <p>Hello " . htmlspecialchars($user['name'] ?? 'there', ENT_QUOTES, 'UTF-8') . ",</p>
                 <p>Here is a summary of what you missed on Project NEXUS:</p>
 
                 <div style='margin-top: 20px; border-top: 2px solid #eee; padding-top: 20px;'>

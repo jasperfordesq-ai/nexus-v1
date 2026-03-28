@@ -381,7 +381,7 @@ class AdminSuperController extends BaseApiController
     /** DELETE /api/v2/super-admin/tenants/{id} */
     public function tenantDelete(int $id): JsonResponse
     {
-        $this->requireSuperAdmin();
+        $userId = $this->requireSuperAdmin();
 
         if (!SuperPanelAccess::canAccessTenant($id)) {
             return $this->respondWithError(ApiErrorCodes::SUPER_PANEL_ACCESS_DENIED, 'You do not have access to this tenant', null, 403);
@@ -389,6 +389,11 @@ class AdminSuperController extends BaseApiController
 
         $input = $this->getAllInput();
         $hardDelete = !empty($input['hard_delete']);
+
+        // Hard delete is destructive and can orphan data — restrict to god-level only
+        if ($hardDelete) {
+            $this->requireGod($userId);
+        }
 
         $result = $this->tenantHierarchyService->deleteTenant($id, $hardDelete);
 

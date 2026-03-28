@@ -282,18 +282,18 @@ class UserService
     {
         self::$errors = [];
 
-        // first_name: optional, max 100 chars
-        if (isset($data['first_name']) && strlen($data['first_name']) > 100) {
+        // first_name: optional, max 100 chars (mb_strlen for multibyte/emoji support)
+        if (isset($data['first_name']) && mb_strlen($data['first_name']) > 100) {
             self::$errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'First name must not exceed 100 characters', 'field' => 'first_name'];
         }
 
-        // last_name: optional, max 100 chars
-        if (isset($data['last_name']) && strlen($data['last_name']) > 100) {
+        // last_name: optional, max 100 chars (mb_strlen for multibyte/emoji support)
+        if (isset($data['last_name']) && mb_strlen($data['last_name']) > 100) {
             self::$errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'Last name must not exceed 100 characters', 'field' => 'last_name'];
         }
 
-        // bio: optional, max 5000 chars
-        if (isset($data['bio']) && strlen($data['bio']) > 5000) {
+        // bio: optional, max 5000 chars (mb_strlen for multibyte/emoji support)
+        if (isset($data['bio']) && mb_strlen($data['bio']) > 5000) {
             self::$errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'Bio must not exceed 5000 characters', 'field' => 'bio'];
         }
 

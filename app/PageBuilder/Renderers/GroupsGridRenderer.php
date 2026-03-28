@@ -93,7 +93,7 @@ class GroupsGridRenderer implements BlockRendererInterface
         $html .= '</h3>';
 
         if ($showDescription && $description) {
-            $shortDesc = strlen($description) > 120 ? substr($description, 0, 120) . '...' : $description;
+            $shortDesc = mb_strlen($description) > 120 ? mb_substr($description, 0, 120) . '...' : $description;
             $html .= '<p class="pb-group-description">' . $shortDesc . '</p>';
         }
 

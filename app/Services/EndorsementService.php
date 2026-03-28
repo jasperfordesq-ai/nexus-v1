@@ -43,7 +43,7 @@ class EndorsementService
 
         // Validate skill name
         $skillName = trim($skillName);
-        if (empty($skillName) || strlen($skillName) > 100) {
+        if (empty($skillName) || mb_strlen($skillName) > 100) {
             self::$errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'Skill name is required (max 100 chars)', 'field' => 'skill_name'];
             return null;
         }
@@ -70,8 +70,8 @@ class EndorsementService
         // Validate comment length
         if ($comment !== null) {
             $comment = trim($comment);
-            if (strlen($comment) > 500) {
-                $comment = substr($comment, 0, 500);
+            if (mb_strlen($comment) > 500) {
+                $comment = mb_substr($comment, 0, 500);
             }
         }
 

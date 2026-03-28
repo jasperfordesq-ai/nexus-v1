@@ -176,6 +176,7 @@ export function ExpensesTab() {
   };
 
   const handleSubmit = async (onClose: () => void) => {
+    if (isSubmitting) return;
     if (!formOrgId || !formAmount || !formDescription) {
       toast.error(t('expenses.fill_required', 'Please fill in all required fields.'));
       return;

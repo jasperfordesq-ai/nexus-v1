@@ -685,7 +685,7 @@ class AiChatController extends BaseApiController
                     $context .= "- Location: {$user->location}\n";
                 }
                 if (!empty($user->bio)) {
-                    $bio = strlen($user->bio) > 200 ? substr($user->bio, 0, 200) . '...' : $user->bio;
+                    $bio = mb_strlen($user->bio) > 200 ? mb_substr($user->bio, 0, 200) . '...' : $user->bio;
                     $context .= "- Bio: {$bio}\n";
                 }
             }

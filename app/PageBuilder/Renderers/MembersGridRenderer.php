@@ -90,7 +90,7 @@ class MembersGridRenderer implements BlockRendererInterface
 
         if ($showBio && $bio) {
             // Truncate bio to 100 characters
-            $shortBio = strlen($bio) > 100 ? substr($bio, 0, 100) . '...' : $bio;
+            $shortBio = mb_strlen($bio) > 100 ? mb_substr($bio, 0, 100) . '...' : $bio;
             $html .= '<p class="pb-member-bio">' . $shortBio . '</p>';
         }
 

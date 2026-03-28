@@ -933,8 +933,8 @@ class FederationV2Controller extends BaseApiController
 
             // 3. In-app notification + push notification
             try {
-                $notifMessage = "New federated message from {$senderName} ({$senderTenantName}): " . substr($subject ?: '(no subject)', 0, 50);
-                if (strlen($subject) > 50) {
+                $notifMessage = "New federated message from {$senderName} ({$senderTenantName}): " . mb_substr($subject ?: '(no subject)', 0, 50);
+                if (mb_strlen($subject) > 50) {
                     $notifMessage .= '...';
                 }
 

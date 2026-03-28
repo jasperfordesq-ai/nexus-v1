@@ -6,10 +6,14 @@
 
 namespace App\Services;
 
+use App\Core\EmailTemplate;
+use App\Core\Mailer;
+use App\Core\TenantContext;
 use App\Events\UserRegistered;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rules\Password;
 /**
@@ -162,6 +166,40 @@ class RegistrationService
 
         $token = Str::random(64);
         $user->update(['verification_token' => $token]);
+
+        // Send the verification email
+        try {
+            $appUrl = TenantContext::getFrontendUrl();
+            $basePath = TenantContext::getSlugPrefix();
+            $verifyUrl = $appUrl . $basePath . '/verify-email?token=' . $token;
+
+            $tenantName = 'Project NEXUS';
+            try {
+                $tenant = TenantContext::get();
+                $tenantName = $tenant['name'] ?? 'Project NEXUS';
+            } catch (\Throwable $e) {
+                // Use default
+            }
+
+            $firstName = $user->first_name ?? 'there';
+
+            $html = EmailTemplate::render(
+                'Verify Your Email Address',
+                "Hi {$firstName}, welcome to {$tenantName}!",
+                'Please verify your email address by clicking the button below.<br><br>If you did not create an account, please ignore this email.',
+                'Verify Email Address',
+                $verifyUrl,
+                $tenantName
+            );
+
+            $mailer = Mailer::forCurrentTenant();
+            $mailer->send($user->email, "Verify Your Email - {$tenantName}", $html);
+        } catch (\Throwable $e) {
+            Log::warning('RegistrationService: Failed to send verification email', [
+                'user_id' => $user->id,
+                'error' => $e->getMessage(),
+            ]);
+        }
 
         return $token;
     }

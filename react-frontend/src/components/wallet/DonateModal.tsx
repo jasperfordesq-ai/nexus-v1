@@ -7,7 +7,7 @@
  * DonateModal - Modal for donating credits to community fund or another member
  */
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
   Modal,
   ModalContent,
@@ -42,7 +42,19 @@ export function DonateModal({ isOpen, onClose, currentBalance, onDonationComplet
   const [message, setMessage] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  // Reset form state when modal opens
+  useEffect(() => {
+    if (isOpen) {
+      setRecipientType('community_fund');
+      setRecipientId('');
+      setAmount('');
+      setMessage('');
+    }
+  }, [isOpen]);
+
   async function handleDonate() {
+    if (isSubmitting) return;
+
     const parsedAmount = parseFloat(amount);
     if (isNaN(parsedAmount) || parsedAmount <= 0) {
       toast.error(t('donate_invalid_amount'), t('donate_invalid_amount_desc'));
@@ -176,6 +188,7 @@ export function DonateModal({ isOpen, onClose, currentBalance, onDonationComplet
             variant="flat"
             onPress={onClose}
             className="bg-theme-elevated text-theme-primary"
+            isDisabled={isSubmitting}
           >
             {t('cancel')}
           </Button>
@@ -183,7 +196,8 @@ export function DonateModal({ isOpen, onClose, currentBalance, onDonationComplet
             color="danger"
             onPress={handleDonate}
             isLoading={isSubmitting}
-            startContent={<Heart className="w-4 h-4" />}
+            isDisabled={isSubmitting}
+            startContent={!isSubmitting ? <Heart className="w-4 h-4" /> : undefined}
           >
             {t('donate_confirm')}
           </Button>

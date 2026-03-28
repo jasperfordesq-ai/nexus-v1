@@ -73,11 +73,35 @@ class TenantHierarchyService
             }
 
             // Handle features — store as JSON
+            // If no features provided, use sensible defaults (conservative — most optional features off)
             $features = null;
             if (isset($data['features'])) {
                 $features = is_string($data['features'])
                     ? $data['features']
                     : json_encode($data['features']);
+            } else {
+                // Default: core features on, advanced features off for new tenants
+                $features = json_encode([
+                    'events' => true,
+                    'groups' => true,
+                    'gamification' => false,
+                    'goals' => false,
+                    'blog' => true,
+                    'resources' => false,
+                    'volunteering' => false,
+                    'exchange_workflow' => false,
+                    'organisations' => false,
+                    'federation' => false,
+                    'connections' => true,
+                    'reviews' => true,
+                    'polls' => false,
+                    'job_vacancies' => false,
+                    'ideation_challenges' => false,
+                    'direct_messaging' => true,
+                    'group_exchanges' => false,
+                    'search' => true,
+                    'ai_chat' => false,
+                ]);
             }
 
             // Handle configuration — store as JSON
@@ -88,51 +112,61 @@ class TenantHierarchyService
                     : json_encode($data['configuration']);
             }
 
-            $tenantId = DB::table('tenants')->insertGetId([
-                'name'               => $name,
-                'slug'               => $slug,
-                'domain'             => $domain ?: null,
-                'tagline'            => $data['tagline'] ?? null,
-                'description'        => $data['description'] ?? null,
-                'parent_id'          => $parentId,
-                'depth'              => $newDepth,
-                'allows_subtenants'  => !empty($data['allows_subtenants']) ? 1 : 0,
-                'max_depth'          => (int) ($data['max_depth'] ?? 2),
-                'is_active'          => isset($data['is_active']) ? (int) $data['is_active'] : 1,
-                'features'           => $features,
-                'configuration'      => $configuration,
-                'contact_email'      => $data['contact_email'] ?? null,
-                'contact_phone'      => $data['contact_phone'] ?? null,
-                'address'            => $data['address'] ?? null,
-                // SEO fields
-                'meta_title'         => $data['meta_title'] ?? null,
-                'meta_description'   => $data['meta_description'] ?? null,
-                'h1_headline'        => $data['h1_headline'] ?? null,
-                'hero_intro'         => $data['hero_intro'] ?? null,
-                'og_image_url'       => $data['og_image_url'] ?? null,
-                'robots_directive'   => $data['robots_directive'] ?? 'index, follow',
-                // Location fields
-                'location_name'      => $data['location_name'] ?? null,
-                'country_code'       => $data['country_code'] ?? null,
-                'service_area'       => $data['service_area'] ?? 'national',
-                'latitude'           => $data['latitude'] ?: null,
-                'longitude'          => $data['longitude'] ?: null,
-                // Social media
-                'social_facebook'    => $data['social_facebook'] ?? null,
-                'social_twitter'     => $data['social_twitter'] ?? null,
-                'social_instagram'   => $data['social_instagram'] ?? null,
-                'social_linkedin'    => $data['social_linkedin'] ?? null,
-                'social_youtube'     => $data['social_youtube'] ?? null,
-                'created_at'         => now(),
-                'updated_at'         => now(),
-            ]);
+            // Wrap entire creation in a transaction to prevent half-initialized tenants
+            $tenantId = DB::transaction(function () use (
+                $name, $slug, $domain, $data, $parentId, $newDepth, $features, $configuration, $parent
+            ) {
+                $tenantId = DB::table('tenants')->insertGetId([
+                    'name'               => $name,
+                    'slug'               => $slug,
+                    'domain'             => $domain ?: null,
+                    'tagline'            => $data['tagline'] ?? null,
+                    'description'        => $data['description'] ?? null,
+                    'parent_id'          => $parentId,
+                    'depth'              => $newDepth,
+                    'allows_subtenants'  => !empty($data['allows_subtenants']) ? 1 : 0,
+                    'max_depth'          => (int) ($data['max_depth'] ?? 2),
+                    'is_active'          => isset($data['is_active']) ? (int) $data['is_active'] : 1,
+                    'features'           => $features,
+                    'configuration'      => $configuration,
+                    'contact_email'      => $data['contact_email'] ?? null,
+                    'contact_phone'      => $data['contact_phone'] ?? null,
+                    'address'            => $data['address'] ?? null,
+                    // SEO fields
+                    'meta_title'         => $data['meta_title'] ?? null,
+                    'meta_description'   => $data['meta_description'] ?? null,
+                    'h1_headline'        => $data['h1_headline'] ?? null,
+                    'hero_intro'         => $data['hero_intro'] ?? null,
+                    'og_image_url'       => $data['og_image_url'] ?? null,
+                    'robots_directive'   => $data['robots_directive'] ?? 'index, follow',
+                    // Location fields
+                    'location_name'      => $data['location_name'] ?? null,
+                    'country_code'       => $data['country_code'] ?? null,
+                    'service_area'       => $data['service_area'] ?? 'national',
+                    'latitude'           => $data['latitude'] ?: null,
+                    'longitude'          => $data['longitude'] ?: null,
+                    // Social media
+                    'social_facebook'    => $data['social_facebook'] ?? null,
+                    'social_twitter'     => $data['social_twitter'] ?? null,
+                    'social_instagram'   => $data['social_instagram'] ?? null,
+                    'social_linkedin'    => $data['social_linkedin'] ?? null,
+                    'social_youtube'     => $data['social_youtube'] ?? null,
+                    'created_at'         => now(),
+                    'updated_at'         => now(),
+                ]);
 
-            // Set materialized path: parent path + own ID
-            $parentPath = $parent->path ?? ('/' . $parentId . '/');
-            $path = $parentPath . $tenantId . '/';
-            DB::table('tenants')->where('id', $tenantId)->update(['path' => $path]);
+                // Set materialized path: parent path + own ID
+                $parentPath = $parent->path ?? ('/' . $parentId . '/');
+                $path = $parentPath . $tenantId . '/';
+                DB::table('tenants')->where('id', $tenantId)->update(['path' => $path]);
 
-            // Audit
+                // Seed required default data for the new tenant
+                self::seedTenantDefaults($tenantId);
+
+                return $tenantId;
+            });
+
+            // Audit (outside transaction — non-critical, should not block creation)
             SuperAdminAuditService::log(
                 'tenant_created',
                 'tenant',
@@ -280,16 +314,28 @@ class TenantHierarchyService
             }
 
             if ($hardDelete) {
-                // Move users to parent tenant before deleting
-                $parentId = $tenant->parent_id ?? 1;
-                DB::table('users')->where('tenant_id', $tenantId)->update(['tenant_id' => $parentId]);
+                // Hard delete is wrapped in a transaction to prevent partial cleanup.
+                // WARNING: This only moves users and child tenants. Other tenant-scoped
+                // data (listings, transactions, messages, events, groups, etc.) will be
+                // orphaned. Hard delete should only be used for empty/test tenants.
+                DB::transaction(function () use ($tenantId, $tenant) {
+                    $parentId = $tenant->parent_id ?? 1;
 
-                // Reassign orphaned child tenants to parent
-                DB::table('tenants')->where('parent_id', $tenantId)->update([
-                    'parent_id' => $parentId,
-                ]);
+                    // Move users to parent tenant before deleting
+                    DB::table('users')->where('tenant_id', $tenantId)->update(['tenant_id' => $parentId]);
 
-                DB::table('tenants')->where('id', $tenantId)->delete();
+                    // Reassign orphaned child tenants to parent
+                    DB::table('tenants')->where('parent_id', $tenantId)->update([
+                        'parent_id' => $parentId,
+                    ]);
+
+                    // Clean up tenant-specific seed data
+                    DB::table('tenant_settings')->where('tenant_id', $tenantId)->delete();
+                    DB::table('categories')->where('tenant_id', $tenantId)->delete();
+                    DB::table('federation_tenant_features')->where('tenant_id', $tenantId)->delete();
+
+                    DB::table('tenants')->where('id', $tenantId)->delete();
+                });
             } else {
                 DB::table('tenants')->where('id', $tenantId)->update([
                     'is_active' => 0,
@@ -520,6 +566,75 @@ class TenantHierarchyService
         } catch (\Throwable $e) {
             Log::error('TenantHierarchyService::revokeTenantSuperAdmin failed', ['error' => $e->getMessage()]);
             return ['success' => false, 'error' => 'Failed to revoke super admin: ' . $e->getMessage()];
+        }
+    }
+
+    /**
+     * Seed required default data for a newly created tenant.
+     *
+     * Seeds: tenant_settings (security defaults), default categories,
+     * and federation tables. This ensures a new tenant is fully functional
+     * from the moment it is created.
+     */
+    private static function seedTenantDefaults(int $tenantId): void
+    {
+        // 1. Seed secure default tenant_settings
+        //    admin_approval=true and email_verification=true ensure new signups
+        //    require admin review and verified email — secure by default.
+        $defaultSettings = [
+            ['tenant_id' => $tenantId, 'setting_key' => 'general.registration_mode', 'setting_value' => 'open', 'setting_type' => 'string'],
+            ['tenant_id' => $tenantId, 'setting_key' => 'general.admin_approval', 'setting_value' => 'true', 'setting_type' => 'boolean'],
+            ['tenant_id' => $tenantId, 'setting_key' => 'general.email_verification', 'setting_value' => 'true', 'setting_type' => 'boolean'],
+            ['tenant_id' => $tenantId, 'setting_key' => 'general.maintenance_mode', 'setting_value' => 'false', 'setting_type' => 'boolean'],
+        ];
+
+        foreach ($defaultSettings as $setting) {
+            DB::table('tenant_settings')->insertOrIgnore($setting);
+        }
+
+        // 2. Seed default categories (universal set for any timebank)
+        $categories = [
+            'Home & Garden',
+            'Technology',
+            'Education & Tutoring',
+            'Health & Wellness',
+            'Transport',
+            'Creative & Arts',
+            'Professional Services',
+            'Community',
+        ];
+
+        foreach ($categories as $sort => $categoryName) {
+            DB::table('categories')->insertOrIgnore([
+                'tenant_id'  => $tenantId,
+                'name'       => $categoryName,
+                'slug'       => strtolower(preg_replace('/[^a-z0-9]+/', '-', strtolower(trim($categoryName)))),
+                'sort_order' => $sort,
+                'is_active'  => 1,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+        }
+
+        // 3. Seed federation tenant features (required for federation feature gating)
+        $federationFeatures = [
+            'tenant_federation_enabled',
+            'tenant_appear_in_directory',
+            'tenant_profiles_enabled',
+            'tenant_messaging_enabled',
+            'tenant_transactions_enabled',
+            'tenant_listings_enabled',
+            'tenant_events_enabled',
+            'tenant_groups_enabled',
+        ];
+
+        foreach ($federationFeatures as $featureKey) {
+            DB::table('federation_tenant_features')->insertOrIgnore([
+                'tenant_id'   => $tenantId,
+                'feature_key' => $featureKey,
+                'is_enabled'  => 1,
+                'updated_at'  => now(),
+            ]);
         }
     }
 

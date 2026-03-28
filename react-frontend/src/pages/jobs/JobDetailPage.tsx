@@ -649,7 +649,7 @@ export function JobDetailPage() {
   }, [showApplications, isOwner, loadApplications]);
 
   const handleApply = async () => {
-    if (!id) return;
+    if (!id || isSubmitting) return;
     setIsSubmitting(true);
     try {
       let response;

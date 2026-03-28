@@ -316,7 +316,7 @@ class GroupService
         // name is required and max 255
         if ($name === null || $name === '') {
             self::$errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'Name is required', 'field' => 'name'];
-        } elseif (strlen($name) > 255) {
+        } elseif (mb_strlen($name) > 255) {
             self::$errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'Name must not exceed 255 characters', 'field' => 'name'];
         }
 

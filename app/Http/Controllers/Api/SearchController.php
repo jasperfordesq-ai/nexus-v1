@@ -206,7 +206,7 @@ class SearchController extends BaseApiController
             return $this->respondWithError('VALIDATION_ERROR', 'Name is required', 'name', 400);
         }
 
-        if (strlen($name) > 255) {
+        if (mb_strlen($name) > 255) {
             return $this->respondWithError('VALIDATION_ERROR', 'Name must be 255 characters or less', 'name', 400);
         }
 

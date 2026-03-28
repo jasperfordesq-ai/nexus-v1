@@ -143,7 +143,7 @@ class GroupAnnouncementService
             $this->errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'Title is required', 'field' => 'title'];
             return null;
         }
-        if (strlen($title) > 255) {
+        if (mb_strlen($title) > 255) {
             $this->errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'Title must be 255 characters or less', 'field' => 'title'];
             return null;
         }

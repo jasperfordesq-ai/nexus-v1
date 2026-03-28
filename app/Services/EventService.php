@@ -345,7 +345,7 @@ class EventService
         // title is required and max 255
         if ($title === null || $title === '') {
             self::$errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'Title is required', 'field' => 'title'];
-        } elseif (strlen($title) > 255) {
+        } elseif (mb_strlen($title) > 255) {
             self::$errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'Title must not exceed 255 characters', 'field' => 'title'];
         }
 

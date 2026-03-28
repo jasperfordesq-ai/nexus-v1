@@ -146,21 +146,21 @@ class ExploreService
                     COALESCE(u.first_name, '') AS author_first_name,
                     COALESCE(u.last_name, '') AS author_last_name,
                     u.avatar_url AS author_avatar,
-                    (SELECT COUNT(*) FROM post_likes pl WHERE pl.post_id = fp.id) AS likes_count,
+                    (SELECT COUNT(*) FROM post_likes pl WHERE pl.post_id = fp.id AND pl.tenant_id = ?) AS likes_count,
                     (SELECT COUNT(*) FROM comments c WHERE c.target_type = 'post' AND c.target_id = fp.id AND c.tenant_id = ?) AS comments_count,
-                    (SELECT COUNT(*) FROM post_likes pl WHERE pl.post_id = fp.id)
+                    (SELECT COUNT(*) FROM post_likes pl WHERE pl.post_id = fp.id AND pl.tenant_id = ?)
                         + (SELECT COUNT(*) FROM comments c WHERE c.target_type = 'post' AND c.target_id = fp.id AND c.tenant_id = ?) AS engagement,
-                    (SELECT COUNT(*) FROM post_likes pl2 WHERE pl2.post_id = fp.id AND pl2.created_at >= DATE_SUB(NOW(), INTERVAL 6 HOUR))
+                    (SELECT COUNT(*) FROM post_likes pl2 WHERE pl2.post_id = fp.id AND pl2.tenant_id = ? AND pl2.created_at >= DATE_SUB(NOW(), INTERVAL 6 HOUR))
                         + (SELECT COUNT(*) FROM comments c2 WHERE c2.target_type = 'post' AND c2.target_id = fp.id AND c2.tenant_id = ? AND c2.created_at >= DATE_SUB(NOW(), INTERVAL 6 HOUR)) AS recent_engagement,
                     GREATEST(1, TIMESTAMPDIFF(HOUR, fp.created_at, NOW())) AS age_hours
                 FROM feed_posts fp
-                JOIN users u ON u.id = fp.user_id AND u.tenant_id = ?
+                JOIN users u ON u.id = fp.user_id AND u.tenant_id = ? AND u.status = 'active'
                 WHERE fp.tenant_id = ?
                     AND fp.created_at >= DATE_SUB(NOW(), INTERVAL 90 DAY)
                     AND fp.is_hidden = 0
                 ORDER BY engagement DESC
                 LIMIT 30
-            ", [$tenantId, $tenantId, $tenantId, $tenantId, $tenantId]);
+            ", [$tenantId, $tenantId, $tenantId, $tenantId, $tenantId, $tenantId, $tenantId, $tenantId]);
 
             // Compute velocity-weighted trending score
             $scored = [];
@@ -236,7 +236,7 @@ class ExploreService
                     u.avatar_url AS author_avatar
                 FROM listings l
                 LEFT JOIN categories cat ON cat.id = l.category_id
-                JOIN users u ON u.id = l.user_id AND u.tenant_id = ?
+                JOIN users u ON u.id = l.user_id AND u.tenant_id = ? AND u.status = 'active'
                 WHERE l.tenant_id = ?
                     AND l.status = 'active'
                     AND l.created_at >= DATE_SUB(NOW(), INTERVAL 30 DAY)
@@ -691,7 +691,7 @@ class ExploreService
                     u.avatar_url AS author_avatar
                 FROM listings l
                 LEFT JOIN categories cat ON cat.id = l.category_id
-                JOIN users u ON u.id = l.user_id AND u.tenant_id = ?
+                JOIN users u ON u.id = l.user_id AND u.tenant_id = ? AND u.status = 'active'
                 WHERE l.tenant_id = ? AND l.status = 'active' AND l.id IN ({$placeholders})
             ", $params);
 
@@ -793,7 +793,7 @@ class ExploreService
                     u.avatar_url AS author_avatar
                 FROM listings l
                 LEFT JOIN categories cat ON cat.id = l.category_id
-                JOIN users u ON u.id = l.user_id AND u.tenant_id = ?
+                JOIN users u ON u.id = l.user_id AND u.tenant_id = ? AND u.status = 'active'
                 WHERE l.tenant_id = ?
                     AND l.status = 'active'
                     AND l.user_id != ?
@@ -929,7 +929,7 @@ class ExploreService
                     )) AS distance_km
                 FROM listings l
                 LEFT JOIN categories cat ON cat.id = l.category_id
-                JOIN users u ON u.id = l.user_id AND u.tenant_id = ?
+                JOIN users u ON u.id = l.user_id AND u.tenant_id = ? AND u.status = 'active'
                 WHERE l.tenant_id = ?
                     AND l.status = 'active'
                     AND l.user_id != ?
@@ -1117,7 +1117,7 @@ class ExploreService
                     COALESCE(u.last_name, '') AS author_last_name,
                     u.avatar_url AS author_avatar
                 FROM blog_posts bp
-                JOIN users u ON u.id = bp.author_id AND u.tenant_id = ?
+                JOIN users u ON u.id = bp.author_id AND u.tenant_id = ? AND u.status = 'active'
                 WHERE bp.tenant_id = ?
                     AND bp.status = 'published'
                     AND bp.published_at IS NOT NULL
@@ -1242,7 +1242,7 @@ class ExploreService
                     (SELECT COUNT(*) FROM poll_options po WHERE po.poll_id = p.id) AS option_count,
                     (SELECT COUNT(DISTINCT pr.user_id) FROM poll_responses pr WHERE pr.poll_id = p.id) AS vote_count
                 FROM polls p
-                JOIN users u ON u.id = p.creator_id AND u.tenant_id = ?
+                JOIN users u ON u.id = p.creator_id AND u.tenant_id = ? AND u.status = 'active'
                 WHERE p.tenant_id = ?
                     AND p.status = 'active'
                     AND (p.closes_at IS NULL OR p.closes_at > NOW())
@@ -1896,10 +1896,11 @@ class ExploreService
             $total = DB::selectOne("
                 SELECT COUNT(*) AS cnt
                 FROM feed_posts fp
+                JOIN users u ON u.id = fp.user_id AND u.tenant_id = ? AND u.status = 'active'
                 WHERE fp.tenant_id = ?
                     AND fp.created_at >= DATE_SUB(NOW(), INTERVAL 90 DAY)
                     AND fp.is_hidden = 0
-            ", [$tenantId]);
+            ", [$tenantId, $tenantId]);
 
             $rows = DB::select("
                 SELECT
@@ -1911,19 +1912,19 @@ class ExploreService
                     COALESCE(u.first_name, '') AS author_first_name,
                     COALESCE(u.last_name, '') AS author_last_name,
                     u.avatar_url AS author_avatar,
-                    (SELECT COUNT(*) FROM post_likes pl WHERE pl.post_id = fp.id) AS likes_count,
+                    (SELECT COUNT(*) FROM post_likes pl WHERE pl.post_id = fp.id AND pl.tenant_id = ?) AS likes_count,
                     (SELECT COUNT(*) FROM comments c WHERE c.target_type = 'post' AND c.target_id = fp.id AND c.tenant_id = ?) AS comments_count
                 FROM feed_posts fp
-                JOIN users u ON u.id = fp.user_id AND u.tenant_id = ?
+                JOIN users u ON u.id = fp.user_id AND u.tenant_id = ? AND u.status = 'active'
                 WHERE fp.tenant_id = ?
                     AND fp.created_at >= DATE_SUB(NOW(), INTERVAL 90 DAY)
                     AND fp.is_hidden = 0
                 ORDER BY (
-                    (SELECT COUNT(*) FROM post_likes pl WHERE pl.post_id = fp.id)
+                    (SELECT COUNT(*) FROM post_likes pl WHERE pl.post_id = fp.id AND pl.tenant_id = ?)
                     + (SELECT COUNT(*) FROM comments c WHERE c.target_type = 'post' AND c.target_id = fp.id AND c.tenant_id = ?)
                 ) DESC, fp.created_at DESC
                 LIMIT ? OFFSET ?
-            ", [$tenantId, $tenantId, $tenantId, $tenantId, $perPage, $offset]);
+            ", [$tenantId, $tenantId, $tenantId, $tenantId, $tenantId, $tenantId, $perPage, $offset]);
 
             return [
                 'items' => array_map(fn($row) => [
@@ -1980,7 +1981,7 @@ class ExploreService
                     u.avatar_url AS author_avatar
                 FROM listings l
                 LEFT JOIN categories cat ON cat.id = l.category_id
-                JOIN users u ON u.id = l.user_id AND u.tenant_id = ?
+                JOIN users u ON u.id = l.user_id AND u.tenant_id = ? AND u.status = 'active'
                 WHERE l.tenant_id = ?
                     AND l.status = 'active'
                 ORDER BY (COALESCE(l.view_count, 0) + COALESCE(l.save_count, 0)) DESC
@@ -2052,7 +2053,7 @@ class ExploreService
                     COALESCE(u.last_name, '') AS author_last_name,
                     u.avatar_url AS author_avatar
                 FROM listings l
-                JOIN users u ON u.id = l.user_id AND u.tenant_id = ?
+                JOIN users u ON u.id = l.user_id AND u.tenant_id = ? AND u.status = 'active'
                 WHERE l.tenant_id = ?
                     AND l.category_id = ?
                     AND l.status = 'active'

@@ -40,6 +40,8 @@ export function RatingModal({ isOpen, onClose, exchangeId, otherPartyName, onRat
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   async function handleSubmit() {
+    if (isSubmitting) return;
+
     if (rating === 0) {
       toast.error(t('toast.rating_required'), t('toast.rating_required_desc'));
       return;

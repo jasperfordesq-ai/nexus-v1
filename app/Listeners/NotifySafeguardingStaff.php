@@ -123,8 +123,7 @@ class NotifySafeguardingStaff implements ShouldQueue
                 . "Please review this in the admin panel and take appropriate action.\n"
                 . "This may include assigning a guardian, adjusting messaging permissions, or contacting the member directly.\n\n"
                 . "This is an automated notification from the platform safeguarding system.\n"
-                . "All access to safeguarding data is audit-logged.\n",
-                $tenantId
+                . "All access to safeguarding data is audit-logged.\n"
             );
         } catch (\Throwable $e) {
             Log::error('NotifySafeguardingStaff: failed to send email', [

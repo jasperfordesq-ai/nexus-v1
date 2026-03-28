@@ -123,7 +123,7 @@ class MessagesController extends BaseApiController
             return $this->respondWithError('VALIDATION_ERROR', 'Message body or voice message is required', 'body', 422);
         }
 
-        if (strlen($body) > 10000) {
+        if (mb_strlen($body) > 10000) {
             return $this->respondWithError('VALIDATION_ERROR', 'Message is too long (max 10000 characters)', 'body', 400);
         }
 
@@ -274,7 +274,7 @@ class MessagesController extends BaseApiController
             return $this->respondWithError('VALIDATION_ERROR', 'Message body is required', 'body', 400);
         }
 
-        if (strlen($body) > 10000) {
+        if (mb_strlen($body) > 10000) {
             return $this->respondWithError('VALIDATION_ERROR', 'Message is too long (max 10000 characters)', 'body', 400);
         }
 

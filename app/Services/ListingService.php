@@ -935,11 +935,11 @@ class ListingService
 
         if (! $isUpdate) {
             $rules['title']       = 'required|string|max:255';
-            $rules['description'] = 'required|string';
+            $rules['description'] = 'required|string|max:10000';
             $rules['type']        = 'required|in:offer,request';
         } else {
             $rules['title']       = 'sometimes|string|max:255';
-            $rules['description'] = 'sometimes|string';
+            $rules['description'] = 'sometimes|string|max:10000';
             $rules['type']        = 'sometimes|in:offer,request';
         }
 

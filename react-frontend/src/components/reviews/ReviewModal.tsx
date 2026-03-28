@@ -51,6 +51,8 @@ export function ReviewModal({
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleSubmit = async () => {
+    if (isSubmitting) return;
+
     if (rating === 0) {
       toast.error(t('toast.select_rating'));
       return;
