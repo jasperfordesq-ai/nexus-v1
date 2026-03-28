@@ -116,11 +116,11 @@ Content-Type: application/json
 METHOD\n
 URL\n
 TIMESTAMP\n
-SHA256(body)
+BODY
           `}</CodeBlock>
           <p className="text-sm text-default-600">
-            Concatenate the HTTP method, full URL path, Unix timestamp, and SHA-256 hex digest of the request body
-            (use empty string for GET requests), each separated by a newline character.
+            Concatenate the HTTP method, full URL path, Unix timestamp, and the raw request body
+            (use empty string for GET requests with no body), each separated by a newline character.
           </p>
           <p className="text-sm font-semibold text-default-700">Required headers:</p>
           <Table aria-label="HMAC headers" removeWrapper>
@@ -140,6 +140,10 @@ SHA256(body)
               <TableRow key="nonce">
                 <TableCell><code className="text-xs bg-default-100 px-1.5 py-0.5 rounded">X-Federation-Nonce</code></TableCell>
                 <TableCell>Unique random string per request. Prevents replay attacks.</TableCell>
+              </TableRow>
+              <TableRow key="platform-id">
+                <TableCell><code className="text-xs bg-default-100 px-1.5 py-0.5 rounded">X-Federation-Platform-Id</code></TableCell>
+                <TableCell>Your platform identifier (the key_prefix from your API key)</TableCell>
               </TableRow>
             </TableBody>
           </Table>
@@ -161,18 +165,19 @@ SHA256(body)
             JWTs expire after <strong>24 hours</strong>.
           </p>
           <CodeBlock>{`
-POST /api/v1/federation/token HTTP/1.1
+POST /api/v1/federation/oauth/token HTTP/1.1
 Host: api.project-nexus.ie
-Content-Type: application/json
+Content-Type: application/x-www-form-urlencoded
+Authorization: Basic base64(client_id:client_secret)
 
-{
-  "api_key": "fed_live_abc123...",
-  "api_secret": "your_secret_here"
-}
+grant_type=client_credentials&scope=members:read listings:read
+
+// client_id = API key prefix (e.g. "fed_live_abc123")
+// client_secret = full API key
 
 // Response:
 {
-  "token": "eyJhbGciOiJIUzI1NiIs...",
+  "access_token": "eyJhbGciOiJIUzI1NiIs...",
   "expires_in": 86400,
   "token_type": "Bearer"
 }
@@ -233,6 +238,21 @@ interface EndpointDef {
 }
 
 const ENDPOINTS: EndpointDef[] = [
+  {
+    method: 'POST',
+    path: '/api/v1/federation/oauth/token',
+    permission: 'none',
+    description: 'Exchange API credentials for a JWT bearer token. Uses OAuth2 client_credentials grant. Authenticate with HTTP Basic auth where client_id is the API key prefix and client_secret is the full API key.',
+    params: [
+      { name: 'grant_type', type: 'string', required: true, description: 'Must be "client_credentials"' },
+      { name: 'scope', type: 'string', required: false, description: 'Space-separated list of requested scopes (e.g. "members:read listings:read")' },
+    ],
+    response: `{
+  "access_token": "eyJhbGciOiJIUzI1NiIs...",
+  "expires_in": 86400,
+  "token_type": "Bearer"
+}`,
+  },
   {
     method: 'GET',
     path: '/api/v1/federation',
@@ -304,7 +324,7 @@ const ENDPOINTS: EndpointDef[] = [
       "joined": "2024-03-10 09:00:00"
     }
   ],
-  "meta": { "total": 142, "page": 1, "per_page": 20, "total_pages": 8 }
+  "pagination": { "total": 142, "page": 1, "per_page": 20, "total_pages": 8, "has_more": true }
 }`,
   },
   {
@@ -363,7 +383,7 @@ const ENDPOINTS: EndpointDef[] = [
       "created_at": "2025-08-20 14:30:00"
     }
   ],
-  "meta": { "total": 89, "page": 1, "per_page": 20, "total_pages": 5 }
+  "pagination": { "total": 89, "page": 1, "per_page": 20, "total_pages": 5, "has_more": true }
 }`,
   },
   {
@@ -424,7 +444,7 @@ const ENDPOINTS: EndpointDef[] = [
     params: [
       { name: 'sender_id', type: 'integer', required: true, description: 'Sender user ID (must belong to your tenant)' },
       { name: 'recipient_id', type: 'integer', required: true, description: 'Recipient user ID' },
-      { name: 'amount', type: 'number', required: true, description: 'Amount in hours (0-100)' },
+      { name: 'amount', type: 'integer', required: true, description: 'Amount in whole hours (1-100)' },
       { name: 'description', type: 'string', required: true, description: 'Transaction description' },
     ],
     response: `{
@@ -432,9 +452,8 @@ const ENDPOINTS: EndpointDef[] = [
   "data": {
     "transaction_id": 567,
     "status": "completed",
-    "amount": 1.5,
-    "sender_new_balance": 8.5,
-    "recipient_new_balance": 11.5
+    "amount": 2,
+    "note": "Transaction completed successfully"
   }
 }`,
   },
@@ -681,9 +700,8 @@ print(data['data'])  # List of members`,
     curl: `# HMAC-signed request
 TIMESTAMP=$(date +%s)
 NONCE=$(uuidgen)
-BODY=''
-BODY_HASH=$(echo -n "$BODY" | sha256sum | cut -d' ' -f1)
-STRING_TO_SIGN="GET\\n/api/v1/federation/timebanks\\n$TIMESTAMP\\n$BODY_HASH"
+BODY=''  # Empty string for GET requests
+STRING_TO_SIGN="GET\\n/api/v1/federation/timebanks\\n$TIMESTAMP\\n$BODY"
 SIGNATURE=$(echo -n "$STRING_TO_SIGN" | openssl dgst -sha256 -hmac "your_api_secret" | cut -d' ' -f2)
 
 curl -X GET "https://api.project-nexus.ie/api/v1/federation/timebanks" \\
@@ -691,18 +709,19 @@ curl -X GET "https://api.project-nexus.ie/api/v1/federation/timebanks" \\
   -H "X-Federation-Signature: $SIGNATURE" \\
   -H "X-Federation-Timestamp: $TIMESTAMP" \\
   -H "X-Federation-Nonce: $NONCE" \\
+  -H "X-Federation-Platform-Id: fed_live_abc123" \\
   -H "Content-Type: application/json"`,
     js: `// HMAC-signed request
 import crypto from 'crypto';
 
 const apiKey = 'fed_live_abc123...';
 const apiSecret = 'your_api_secret';
+const platformId = 'fed_live_abc123';  // API key prefix
 const timestamp = Math.floor(Date.now() / 1000).toString();
 const nonce = crypto.randomUUID();
-const body = '';
-const bodyHash = crypto.createHash('sha256').update(body).digest('hex');
+const body = '';  // Empty string for GET requests
 
-const stringToSign = \`GET\\n/api/v1/federation/timebanks\\n\${timestamp}\\n\${bodyHash}\`;
+const stringToSign = \`GET\\n/api/v1/federation/timebanks\\n\${timestamp}\\n\${body}\`;
 const signature = crypto
   .createHmac('sha256', apiSecret)
   .update(stringToSign)
@@ -717,25 +736,26 @@ const response = await fetch(
       'X-Federation-Signature': signature,
       'X-Federation-Timestamp': timestamp,
       'X-Federation-Nonce': nonce,
+      'X-Federation-Platform-Id': platformId,
       'Content-Type': 'application/json',
     },
   }
 );`,
     python: `# HMAC-signed request
-import hashlib
 import hmac
+import hashlib
 import time
 import uuid
 import requests
 
 api_key = 'fed_live_abc123...'
 api_secret = 'your_api_secret'
+platform_id = 'fed_live_abc123'  # API key prefix
 timestamp = str(int(time.time()))
 nonce = str(uuid.uuid4())
-body = ''
-body_hash = hashlib.sha256(body.encode()).hexdigest()
+body = ''  # Empty string for GET requests
 
-string_to_sign = f"GET\\n/api/v1/federation/timebanks\\n{timestamp}\\n{body_hash}"
+string_to_sign = f"GET\\n/api/v1/federation/timebanks\\n{timestamp}\\n{body}"
 signature = hmac.new(
     api_secret.encode(), string_to_sign.encode(), hashlib.sha256
 ).hexdigest()
@@ -747,6 +767,7 @@ response = requests.get(
         'X-Federation-Signature': signature,
         'X-Federation-Timestamp': timestamp,
         'X-Federation-Nonce': nonce,
+        'X-Federation-Platform-Id': platform_id,
         'Content-Type': 'application/json',
     },
 )`,

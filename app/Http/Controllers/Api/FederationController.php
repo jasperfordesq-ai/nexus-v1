@@ -650,9 +650,12 @@ class FederationController extends BaseApiController
             }
         }
 
-        $amount = (float) $input['amount'];
+        $amount = (int) $input['amount'];
         if ($amount <= 0 || $amount > 100) {
-            return $this->fedError(400, 'Amount must be between 0 and 100 hours', 'INVALID_AMOUNT');
+            return $this->fedError(400, 'Amount must be between 1 and 100 whole hours', 'INVALID_AMOUNT');
+        }
+        if ((float) $input['amount'] != $amount) {
+            return $this->fedError(400, 'Amount must be between 1 and 100 whole hours', 'INVALID_AMOUNT');
         }
 
         if ($isExternal) {

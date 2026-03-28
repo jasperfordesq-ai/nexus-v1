@@ -94,6 +94,7 @@ interface PartnerFormData {
   signing_secret: string;
   oauth_client_id: string;
   oauth_client_secret: string;
+  oauth_token_url: string;
   allow_member_search: boolean;
   allow_listing_search: boolean;
   allow_messaging: boolean;
@@ -143,6 +144,7 @@ const EMPTY_FORM: PartnerFormData = {
   signing_secret: '',
   oauth_client_id: '',
   oauth_client_secret: '',
+  oauth_token_url: '',
   allow_member_search: true,
   allow_listing_search: true,
   allow_messaging: false,
@@ -229,6 +231,7 @@ export function ExternalPartners() {
       signing_secret: '',
       oauth_client_id: '',
       oauth_client_secret: '',
+      oauth_token_url: (partner as unknown as Record<string, string>).oauth_token_url || '',
       allow_member_search: partner.allow_member_search,
       allow_listing_search: partner.allow_listing_search,
       allow_messaging: partner.allow_messaging,
@@ -267,6 +270,7 @@ export function ExternalPartners() {
       if (form.signing_secret) payload.signing_secret = form.signing_secret;
       if (form.oauth_client_id) payload.oauth_client_id = form.oauth_client_id;
       if (form.oauth_client_secret) payload.oauth_client_secret = form.oauth_client_secret;
+      if (form.oauth_token_url) payload.oauth_token_url = form.oauth_token_url;
       let res;
       if (editingId) {
         res = await api.put(`/v2/admin/federation/external-partners/${editingId}`, payload);
@@ -568,6 +572,12 @@ export function ExternalPartners() {
                       value={form.oauth_client_secret}
                       onValueChange={(v) => updateForm('oauth_client_secret', v)}
                       type="password"
+                    />
+                    <Input
+                      label={t('federation.label_oauth_token_url', 'OAuth Token URL')}
+                      placeholder="https://api.partner-timebank.org/oauth/token"
+                      value={form.oauth_token_url}
+                      onValueChange={(v) => updateForm('oauth_token_url', v)}
                     />
                   </>
                 )}
