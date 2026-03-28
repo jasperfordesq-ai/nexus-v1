@@ -234,7 +234,8 @@ function syncEvents(int $tenantId, bool $dryRun): array
 {
     $rows = array_map(fn($r) => (array) $r, DB::select(
         "SELECT e.id, e.tenant_id, e.title, e.description, e.location,
-                e.status, e.is_online,
+                COALESCE(e.status, 'active') as status,
+                e.allow_remote_attendance as is_online,
                 UNIX_TIMESTAMP(COALESCE(e.start_time, e.start_date)) as start_time,
                 UNIX_TIMESTAMP(e.created_at) as created_at,
                 CONCAT(u.first_name, ' ', u.last_name) as organizer_name
@@ -242,6 +243,7 @@ function syncEvents(int $tenantId, bool $dryRun): array
          LEFT JOIN users u ON e.user_id = u.id
          WHERE e.tenant_id = ?
            AND COALESCE(e.start_time, e.start_date) >= NOW()
+           AND COALESCE(e.status, 'active') != 'cancelled'
          ORDER BY e.id",
         [$tenantId]
     ));
@@ -259,12 +261,12 @@ function syncGroups(int $tenantId, bool $dryRun): array
 {
     $rows = array_map(fn($r) => (array) $r, DB::select(
         "SELECT g.id, g.tenant_id, g.name, g.description,
-                g.status, g.privacy,
-                (SELECT COUNT(*) FROM group_members gm
-                 WHERE gm.group_id = g.id AND gm.status = 'active') as members_count,
+                IF(g.is_active, 'active', 'inactive') as status,
+                g.visibility as privacy,
+                COALESCE(g.cached_member_count, 0) as members_count,
                 UNIX_TIMESTAMP(g.created_at) as created_at
          FROM `groups` g
-         WHERE g.tenant_id = ?
+         WHERE g.tenant_id = ? AND g.is_active = 1
          ORDER BY g.id",
         [$tenantId]
     ));

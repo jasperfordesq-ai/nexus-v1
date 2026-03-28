@@ -309,8 +309,8 @@ class SearchService
             'title'          => $event->title ?? '',
             'description'    => $event->description ?? '',
             'location'       => $event->location ?? '',
-            'status'         => $event->status ?? 'published',
-            'is_online'      => (bool) ($event->is_online ?? false),
+            'status'         => $event->status ?? 'active',
+            'is_online'      => (bool) ($event->allow_remote_attendance ?? false),
             'organizer_name' => $event->user
                 ? trim($event->user->first_name . ' ' . $event->user->last_name)
                 : '',
@@ -337,9 +337,9 @@ class SearchService
             'tenant_id'     => $group->tenant_id,
             'name'          => $group->name ?? '',
             'description'   => $group->description ?? '',
-            'status'        => $group->status ?? 'active',
-            'privacy'       => $group->privacy ?? 'public',
-            'members_count' => $group->active_members_count ?? $group->members_count ?? 0,
+            'status'        => $group->is_active ? 'active' : 'inactive',
+            'privacy'       => $group->visibility ?? 'public',
+            'members_count' => $group->cached_member_count ?? $group->active_members_count ?? 0,
             'created_at'    => $group->created_at?->timestamp ?? 0,
         ] : $group;
 

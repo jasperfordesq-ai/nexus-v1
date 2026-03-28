@@ -33,7 +33,7 @@ class EventObserver
 
     public function updated(Event $event): void
     {
-        $searchableFields = ['title', 'description', 'location', 'status', 'start_time', 'is_online'];
+        $searchableFields = ['title', 'description', 'location', 'status', 'start_time', 'allow_remote_attendance'];
         $dirty = array_keys($event->getDirty());
 
         if (empty(array_intersect($dirty, $searchableFields))) {

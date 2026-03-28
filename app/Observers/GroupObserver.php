@@ -33,7 +33,7 @@ class GroupObserver
 
     public function updated(Group $group): void
     {
-        $searchableFields = ['name', 'description', 'status', 'privacy'];
+        $searchableFields = ['name', 'description', 'is_active', 'visibility'];
         $dirty = array_keys($group->getDirty());
 
         if (empty(array_intersect($dirty, $searchableFields))) {
