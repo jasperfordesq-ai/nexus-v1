@@ -211,17 +211,19 @@ export function BillingPage() {
                 {t('billing.change_plan', 'Change Plan')}
               </Button>
 
-              <Button
-                variant="flat"
-                className="justify-start"
-                startContent={<Settings className="w-4 h-4" />}
-                endContent={<ArrowRight className="w-4 h-4 ml-auto" />}
-                isLoading={portalLoading}
-                onPress={handleManagePayment}
-                fullWidth
-              >
-                {t('billing.manage_payment', 'Manage Payment Methods')}
-              </Button>
+              {hasActiveSubscription && (
+                <Button
+                  variant="flat"
+                  className="justify-start"
+                  startContent={<Settings className="w-4 h-4" />}
+                  endContent={<ArrowRight className="w-4 h-4 ml-auto" />}
+                  isLoading={portalLoading}
+                  onPress={handleManagePayment}
+                  fullWidth
+                >
+                  {t('billing.manage_payment', 'Manage Payment Methods')}
+                </Button>
+              )}
 
               <Button
                 as={Link}

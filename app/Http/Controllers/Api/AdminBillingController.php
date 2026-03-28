@@ -90,6 +90,17 @@ class AdminBillingController extends BaseApiController
         $this->requireAdmin();
         $tenantId = TenantContext::getId();
 
+        // Check if tenant has a Stripe customer before attempting portal
+        $tenant = DB::selectOne("SELECT stripe_customer_id FROM tenants WHERE id = ?", [$tenantId]);
+        if (!$tenant || empty($tenant->stripe_customer_id)) {
+            return $this->respondWithError(
+                'NO_SUBSCRIPTION',
+                'No active subscription. Subscribe to a plan first to manage payment methods.',
+                null,
+                400
+            );
+        }
+
         try {
             $result = StripeSubscriptionService::createPortalSession($tenantId);
             return $this->respondWithData($result);
