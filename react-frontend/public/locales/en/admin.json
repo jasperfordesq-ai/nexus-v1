@@ -233,7 +233,13 @@
     "warnings_count": "Warnings",
     "webhook_u_r_l_copied": "Webhook URL Copied",
     "webhook_url_hint": "Webhook URL",
-    "webhook_url_label": "Webhook URL Label"
+    "webhook_url_label": "Webhook URL Label",
+    "score_category": "Category Match",
+    "score_freshness": "Freshness",
+    "score_proximity": "Proximity",
+    "score_quality": "Quality",
+    "score_reciprocity": "Reciprocity",
+    "score_skill": "Skill Match"
   },
   "alerts": {
     "pending_approvals": "Pending Approvals",
@@ -951,7 +957,28 @@
     "title_is_required": "Title is Required",
     "update_note": "Update Note",
     "update_task": "Update Task",
-    "valid_user_i_d_is_required": "Valid User I D is Required"
+    "valid_user_i_d_is_required": "Valid User I D is Required",
+    "category_concern": "Concern",
+    "category_follow_up": "Follow Up",
+    "category_general": "General",
+    "category_onboarding": "Onboarding",
+    "category_outreach": "Outreach",
+    "category_support": "Support",
+    "date_range_7": "Last 7 Days",
+    "date_range_30": "Last 30 Days",
+    "date_range_90": "Last 90 Days",
+    "date_range_all": "All Time",
+    "priority_all": "All Priorities",
+    "qa_activity_timeline": "Activity Timeline",
+    "qa_all_members": "All Members",
+    "qa_crm_tasks": "CRM Tasks",
+    "qa_member_notes": "Member Notes",
+    "qa_member_tags": "Member Tags",
+    "qa_onboarding_funnel": "Onboarding Funnel",
+    "status_all": "All",
+    "status_completed": "Completed",
+    "status_in_progress": "In Progress",
+    "status_pending": "Pending"
   },
   "data_table": {
     "admin_data_table": "Admin Data Table",
@@ -1721,7 +1748,25 @@
     "webhooks_url_hint": "Webhooks URL",
     "webhooks_url_required": "Webhooks URL Required",
     "website_description": "Website",
-    "your_new_api_key": "Your New API Key"
+    "your_new_api_key": "Your New API Key",
+    "auth_method_api_key": "API Key",
+    "auth_method_hmac": "HMAC Signature",
+    "auth_method_oauth2": "OAuth 2.0",
+    "filter_connections": "Connections",
+    "filter_listings": "Listings",
+    "filter_messages": "Messages",
+    "filter_partnership_approved": "Partnership Approved",
+    "filter_partnership_changes": "Partnership Changes",
+    "filter_partnership_requests": "Partnership Requests",
+    "filter_profile_views": "Profile Views",
+    "filter_searches": "Searches",
+    "filter_transactions": "Transactions",
+    "event_type_message_sent": "Message Sent",
+    "status_partner": "Partner",
+    "status_pending": "Pending",
+    "status_rejected": "Rejected",
+    "status_suspended": "Suspended",
+    "status_terminated": "Terminated"
   },
   "gamification": {
     "activate": "Activate",
@@ -2373,7 +2418,13 @@
     "this_week": "This Week",
     "total": "Total",
     "view_analytics": "View Analytics",
-    "weights_must_sum_to_100": "Weights Must Sum to 100"
+    "weights_must_sum_to_100": "Weights Must Sum to 100",
+    "weight_category": "Category",
+    "weight_freshness": "Freshness",
+    "weight_proximity": "Proximity",
+    "weight_quality": "Quality",
+    "weight_reciprocity": "Reciprocity",
+    "weight_skill": "Skill"
   },
   "moderation": {
     "action_failed": "Failed",
@@ -2536,7 +2587,11 @@
     "status_resolved": "Status Resolved",
     "total_reports": "Total Reports",
     "untitled": "Untitled",
-    "visible": "Visible"
+    "visible": "Visible",
+    "all_status": "All Status",
+    "all_types": "All Types",
+    "pending": "Pending",
+    "posts": "Posts"
   },
   "new": "NEW",
   "newsletters": {
