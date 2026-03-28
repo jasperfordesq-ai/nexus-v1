@@ -116,6 +116,21 @@ class SafeguardingService
     public function revokeAssignment(int $assignmentId, int $revokedBy): bool
     {
         try {
+            $assignment = $this->assignment->newQuery()
+                ->where('id', $assignmentId)
+                ->first();
+
+            if (!$assignment) {
+                throw new \Exception('Assignment not found');
+            }
+
+            if ((int) $assignment->guardian_user_id !== $revokedBy && (int) $assignment->ward_user_id !== $revokedBy) {
+                $user = User::find($revokedBy);
+                if (!$user || !in_array($user->role, ['admin', 'super_admin'])) {
+                    throw new \Exception('Unauthorized to revoke this assignment');
+                }
+            }
+
             $this->assignment->newQuery()
                 ->where('id', $assignmentId)
                 ->update(['revoked_at' => now()]);

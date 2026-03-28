@@ -81,11 +81,11 @@ export function CrmDashboard() {
     try {
       const url = `${API_BASE}/v2/admin/crm/export/${type}`;
       const token = tokenManager.getAccessToken();
-      const tenantId = localStorage.getItem('nexus_tenant_id');
+      const tenantId = tokenManager.getTenantId();
       const headers: Record<string, string> = {};
       if (token) headers['Authorization'] = `Bearer ${token}`;
       if (tenantId) headers['X-Tenant-ID'] = tenantId;
-      const res = await fetch(url, { headers });
+      const res = await fetch(url, { headers, credentials: 'include' });
       if (!res.ok) throw new Error('Export failed');
       const blob = await res.blob();
       const a = document.createElement('a');

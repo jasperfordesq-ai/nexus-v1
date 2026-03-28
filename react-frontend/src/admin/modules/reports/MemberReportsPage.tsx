@@ -60,7 +60,7 @@ import {
   BarChart3,
 } from 'lucide-react';
 import { usePageTitle } from '@/hooks';
-import { api } from '@/lib/api';
+import { api, tokenManager } from '@/lib/api';
 import { resolveAvatarUrl } from '@/lib/helpers';
 import { CHART_COLOR_MAP } from '@/lib/chartColors';
 import { StatCard, PageHeader } from '../../components';
@@ -151,14 +151,14 @@ const tooltipStyle = {
 // ---------------------------------------------------------------------------
 
 async function exportCsv(reportType: string) {
-  const token = localStorage.getItem('nexus_access_token');
-  const tenantId = localStorage.getItem('nexus_tenant_id');
+  const token = tokenManager.getAccessToken();
+  const tenantId = tokenManager.getTenantId();
   const headers: Record<string, string> = {};
   if (token) headers['Authorization'] = `Bearer ${token}`;
   if (tenantId) headers['X-Tenant-ID'] = tenantId;
 
   const apiBase = import.meta.env.VITE_API_BASE || '/api';
-  const res = await fetch(`${apiBase}/v2/admin/reports/members/export?format=csv`, { headers });
+  const res = await fetch(`${apiBase}/v2/admin/reports/members/export?format=csv`, { headers, credentials: 'include' });
   const blob = await res.blob();
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');

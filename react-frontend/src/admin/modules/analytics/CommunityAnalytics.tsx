@@ -41,7 +41,7 @@ import {
   Globe,
 } from 'lucide-react';
 import { usePageTitle } from '@/hooks';
-import { api } from '@/lib/api';
+import { api, tokenManager } from '@/lib/api';
 import { LocationMap } from '@/components/location';
 import { MAPS_ENABLED } from '@/lib/map-config';
 import { StatCard, PageHeader } from '../../components';
@@ -153,8 +153,8 @@ export function CommunityAnalytics() {
 
   const handleExport = async () => {
     try {
-      const token = localStorage.getItem('nexus_access_token');
-      const tenantId = localStorage.getItem('nexus_tenant_id');
+      const token = tokenManager.getAccessToken();
+      const tenantId = tokenManager.getTenantId();
       const headers: Record<string, string> = {};
       if (token) headers['Authorization'] = `Bearer ${token}`;
       if (tenantId) headers['X-Tenant-ID'] = tenantId;
@@ -162,6 +162,7 @@ export function CommunityAnalytics() {
       const apiBase = import.meta.env.VITE_API_BASE || '/api';
       const res = await fetch(`${apiBase}/v2/admin/community-analytics/export`, {
         headers,
+        credentials: 'include',
       });
       const blob = await res.blob();
       const url = URL.createObjectURL(blob);

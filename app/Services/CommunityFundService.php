@@ -83,13 +83,10 @@ class CommunityFundService
         try {
             $newBalance = (float) $fund['balance'] + $amount;
 
-            DB::table('community_fund_accounts')
-                ->where('id', $fund['id'])
-                ->where('tenant_id', $tenantId)
-                ->update([
-                    'balance' => DB::raw("balance + {$amount}"),
-                    'total_deposited' => DB::raw("total_deposited + {$amount}"),
-                ]);
+            DB::statement(
+                'UPDATE community_fund_accounts SET balance = balance + ?, total_deposited = total_deposited + ? WHERE id = ? AND tenant_id = ?',
+                [$amount, $amount, $fund['id'], $tenantId]
+            );
 
             DB::table('community_fund_transactions')->insert([
                 'tenant_id' => $tenantId,
@@ -135,20 +132,16 @@ class CommunityFundService
             $newBalance = (float) $fund['balance'] - $amount;
 
             // Deduct from fund
-            DB::table('community_fund_accounts')
-                ->where('id', $fund['id'])
-                ->where('tenant_id', $tenantId)
-                ->where('balance', '>=', $amount)
-                ->update([
-                    'balance' => DB::raw("balance - {$amount}"),
-                    'total_withdrawn' => DB::raw("total_withdrawn + {$amount}"),
-                ]);
+            DB::statement(
+                'UPDATE community_fund_accounts SET balance = balance - ?, total_withdrawn = total_withdrawn + ? WHERE id = ? AND tenant_id = ? AND balance >= ?',
+                [$amount, $amount, $fund['id'], $tenantId, $amount]
+            );
 
             // Credit the recipient user
             DB::table('users')
                 ->where('id', $recipientId)
                 ->where('tenant_id', $tenantId)
-                ->update(['balance' => DB::raw("balance + {$amount}")]);
+                ->increment('balance', $amount);
 
             // Log fund transaction
             DB::table('community_fund_transactions')->insert([
@@ -274,11 +267,10 @@ class CommunityFundService
             $newBalance = (float) $fund['balance'] + $amount;
 
             // Deduct from donor
-            $affected = DB::table('users')
-                ->where('id', $donorId)
-                ->where('tenant_id', $tenantId)
-                ->where('balance', '>=', $amount)
-                ->update(['balance' => DB::raw("balance - {$amount}")]);
+            $affected = DB::update(
+                'UPDATE users SET balance = balance - ? WHERE id = ? AND tenant_id = ? AND balance >= ?',
+                [$amount, $donorId, $tenantId, $amount]
+            );
 
             if ($affected === 0) {
                 DB::rollBack();
@@ -286,13 +278,10 @@ class CommunityFundService
             }
 
             // Credit community fund
-            DB::table('community_fund_accounts')
-                ->where('id', $fund['id'])
-                ->where('tenant_id', $tenantId)
-                ->update([
-                    'balance' => DB::raw("balance + {$amount}"),
-                    'total_donated' => DB::raw("total_donated + {$amount}"),
-                ]);
+            DB::statement(
+                'UPDATE community_fund_accounts SET balance = balance + ?, total_donated = total_donated + ? WHERE id = ? AND tenant_id = ?',
+                [$amount, $amount, $fund['id'], $tenantId]
+            );
 
             // Log fund transaction
             DB::table('community_fund_transactions')->insert([

@@ -60,7 +60,7 @@ import {
 } from 'lucide-react';
 import { usePageTitle } from '@/hooks';
 import { useToast } from '@/contexts';
-import { api } from '@/lib/api';
+import { api, tokenManager } from '@/lib/api';
 import { CHART_COLOR_MAP } from '@/lib/chartColors';
 import { StatCard, PageHeader } from '../../components';
 
@@ -173,8 +173,8 @@ function formatMonth(monthStr: string): string {
 // ---------------------------------------------------------------------------
 
 async function exportCsv(dateFrom?: string, dateTo?: string) {
-  const token = localStorage.getItem('nexus_access_token');
-  const tenantId = localStorage.getItem('nexus_tenant_id');
+  const token = tokenManager.getAccessToken();
+  const tenantId = tokenManager.getTenantId();
   const headers: Record<string, string> = {};
   if (token) headers['Authorization'] = `Bearer ${token}`;
   if (tenantId) headers['X-Tenant-ID'] = tenantId;
@@ -184,7 +184,7 @@ async function exportCsv(dateFrom?: string, dateTo?: string) {
   if (dateTo) params.append('date_to', dateTo);
 
   const apiBase = import.meta.env.VITE_API_BASE || '/api';
-  const res = await fetch(`${apiBase}/v2/admin/reports/social_value/export?${params}`, { headers });
+  const res = await fetch(`${apiBase}/v2/admin/reports/social_value/export?${params}`, { headers, credentials: 'include' });
   const blob = await res.blob();
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');

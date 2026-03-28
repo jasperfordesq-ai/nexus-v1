@@ -49,7 +49,7 @@ import {
 } from 'lucide-react';
 import { usePageTitle } from '@/hooks';
 import { useToast } from '@/contexts/ToastContext';
-import { api } from '@/lib/api';
+import { api, tokenManager } from '@/lib/api';
 import { resolveAvatarUrl } from '@/lib/helpers';
 import { StatCard, PageHeader } from '../../components';
 
@@ -119,8 +119,8 @@ const FLAG_COLORS: Record<string, 'warning' | 'danger' | 'secondary'> = {
 // ---------------------------------------------------------------------------
 
 async function exportCsv(days: string) {
-  const token = localStorage.getItem('nexus_access_token');
-  const tenantId = localStorage.getItem('nexus_tenant_id');
+  const token = tokenManager.getAccessToken();
+  const tenantId = tokenManager.getTenantId();
   const headers: Record<string, string> = {};
   if (token) headers['Authorization'] = `Bearer ${token}`;
   if (tenantId) headers['X-Tenant-ID'] = tenantId;
@@ -128,7 +128,7 @@ async function exportCsv(days: string) {
   const params = new URLSearchParams({ format: 'csv', days });
 
   const apiBase = import.meta.env.VITE_API_BASE || '/api';
-  const res = await fetch(`${apiBase}/v2/admin/reports/inactive_members/export?${params}`, { headers });
+  const res = await fetch(`${apiBase}/v2/admin/reports/inactive_members/export?${params}`, { headers, credentials: 'include' });
   const blob = await res.blob();
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');

@@ -9,6 +9,7 @@ namespace App\Services;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Str;
 use App\Core\TenantContext;
 
@@ -33,6 +34,13 @@ class AuthService
      */
     public function login(string $email, string $password, ?string $deviceType = null): ?array
     {
+        $key = 'login:' . request()->ip() . ':' . $email;
+        if (RateLimiter::tooManyAttempts($key, 5)) {
+            $seconds = RateLimiter::availableIn($key);
+            return ['success' => false, 'error' => "Too many login attempts. Try again in {$seconds} seconds."];
+        }
+        RateLimiter::hit($key, 300); // 5 minute decay
+
         /** @var User|null $user */
         $user = $this->user->newQuery()
             ->where('email', $email)

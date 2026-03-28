@@ -86,9 +86,10 @@ class FederatedConnectionService
      */
     public function acceptRequest(int $connectionId, int $userId): array
     {
+        $tenantId = TenantContext::getId();
         $connection = DB::selectOne(
-            "SELECT * FROM federation_connections WHERE id = ? AND receiver_user_id = ? AND status = 'pending'",
-            [$connectionId, $userId]
+            "SELECT * FROM federation_connections WHERE id = ? AND receiver_user_id = ? AND receiver_tenant_id = ? AND status = 'pending'",
+            [$connectionId, $userId, $tenantId]
         );
 
         if (!$connection) {
@@ -118,9 +119,10 @@ class FederatedConnectionService
      */
     public function rejectRequest(int $connectionId, int $userId): array
     {
+        $tenantId = TenantContext::getId();
         $connection = DB::selectOne(
-            "SELECT * FROM federation_connections WHERE id = ? AND receiver_user_id = ? AND status = 'pending'",
-            [$connectionId, $userId]
+            "SELECT * FROM federation_connections WHERE id = ? AND receiver_user_id = ? AND receiver_tenant_id = ? AND status = 'pending'",
+            [$connectionId, $userId, $tenantId]
         );
 
         if (!$connection) {

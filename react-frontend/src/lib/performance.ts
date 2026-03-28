@@ -15,6 +15,8 @@
  * Logs to localStorage in dev, sends to /api/v2/metrics in production
  */
 
+import { api } from '@/lib/api';
+
 // ─────────────────────────────────────────────────────────────────────────────
 // Types
 // ─────────────────────────────────────────────────────────────────────────────
@@ -228,20 +230,14 @@ async function sendQueuedMetrics(): Promise<void> {
   metricQueue = [];
 
   try {
-    const response = await fetch('/api/v2/metrics', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        metrics: metricsToSend,
-        user_agent: navigator.userAgent,
-        page_url: window.location.href,
-      }),
+    const response = await api.post('/v2/metrics', {
+      metrics: metricsToSend,
+      user_agent: navigator.userAgent,
+      page_url: window.location.href,
     });
 
-    if (!response.ok) {
-      console.warn('Failed to send performance metrics:', response.statusText);
+    if (!response.success) {
+      console.warn('Failed to send performance metrics:', response.error);
     }
   } catch (error) {
     console.warn('Failed to send performance metrics:', error);

@@ -6,6 +6,7 @@
 
 namespace App\Services;
 
+use App\Core\TenantContext;
 use Illuminate\Support\Facades\DB;
 
 /**
@@ -99,6 +100,8 @@ class OrgWalletService
             return ['success' => false, 'message' => 'Amount must be greater than zero'];
         }
 
+        $tenantId = TenantContext::getId();
+
         // Check membership
         $member = DB::table('org_members')
             ->where('organization_id', $orgId)
@@ -110,19 +113,20 @@ class OrgWalletService
             return ['success' => false, 'message' => 'User is not an active member of this organization'];
         }
 
-        return DB::transaction(function () use ($userId, $orgId, $amount, $note) {
+        return DB::transaction(function () use ($userId, $orgId, $amount, $note, $tenantId) {
             // Check user balance
-            $user = DB::table('users')->where('id', $userId)->lockForUpdate()->first();
+            $user = DB::table('users')->where('id', $userId)->where('tenant_id', $tenantId)->lockForUpdate()->first();
             if (! $user || (float) $user->balance < $amount) {
                 return ['success' => false, 'message' => 'Insufficient balance'];
             }
 
             // Deduct from user
-            DB::table('users')->where('id', $userId)->decrement('balance', $amount);
+            DB::table('users')->where('id', $userId)->where('tenant_id', $tenantId)->decrement('balance', $amount);
 
             // Credit to org wallet
             DB::table('org_wallets')
                 ->where('organization_id', $orgId)
+                ->where('tenant_id', $tenantId)
                 ->increment('balance', $amount);
 
             // Record transaction
@@ -150,6 +154,8 @@ class OrgWalletService
             return ['success' => false, 'message' => 'Amount must be greater than zero'];
         }
 
+        $tenantId = TenantContext::getId();
+
         // Check requester is a member
         $member = DB::table('org_members')
             ->where('organization_id', $orgId)
@@ -164,6 +170,7 @@ class OrgWalletService
         // Check org wallet balance
         $wallet = DB::table('org_wallets')
             ->where('organization_id', $orgId)
+            ->where('tenant_id', $tenantId)
             ->first();
 
         if (! $wallet || (float) $wallet->balance < $amount) {
@@ -190,7 +197,8 @@ class OrgWalletService
      */
     public static function approveRequest(int $requestId, int $approverId): array
     {
-        $request = DB::table('org_transfer_requests')->where('id', $requestId)->first();
+        $tenantId = TenantContext::getId();
+        $request = DB::table('org_transfer_requests')->where('id', $requestId)->where('tenant_id', $tenantId)->first();
         if (! $request || $request->status !== 'pending') {
             return ['success' => false, 'message' => 'Transfer request not found or not pending'];
         }
@@ -207,10 +215,11 @@ class OrgWalletService
             return ['success' => false, 'message' => 'Only admin or owner can approve requests'];
         }
 
-        return DB::transaction(function () use ($request, $requestId, $approverId) {
+        return DB::transaction(function () use ($request, $requestId, $approverId, $tenantId) {
             // Check wallet balance
             $wallet = DB::table('org_wallets')
                 ->where('organization_id', $request->organization_id)
+                ->where('tenant_id', $tenantId)
                 ->lockForUpdate()
                 ->first();
 
@@ -221,11 +230,13 @@ class OrgWalletService
             // Deduct from org wallet
             DB::table('org_wallets')
                 ->where('organization_id', $request->organization_id)
+                ->where('tenant_id', $tenantId)
                 ->decrement('balance', $request->amount);
 
             // Credit to recipient
             DB::table('users')
                 ->where('id', $request->recipient_id)
+                ->where('tenant_id', $tenantId)
                 ->increment('balance', $request->amount);
 
             // Update request status
@@ -260,7 +271,8 @@ class OrgWalletService
      */
     public static function rejectRequest(int $requestId, int $adminId, ?string $reason = null): array
     {
-        $request = DB::table('org_transfer_requests')->where('id', $requestId)->first();
+        $tenantId = TenantContext::getId();
+        $request = DB::table('org_transfer_requests')->where('id', $requestId)->where('tenant_id', $tenantId)->first();
         if (! $request || $request->status !== 'pending') {
             return ['success' => false, 'message' => 'Transfer request not found or not pending'];
         }
@@ -294,7 +306,8 @@ class OrgWalletService
      */
     public static function cancelRequest(int $requestId, int $userId): array
     {
-        $request = DB::table('org_transfer_requests')->where('id', $requestId)->first();
+        $tenantId = TenantContext::getId();
+        $request = DB::table('org_transfer_requests')->where('id', $requestId)->where('tenant_id', $tenantId)->first();
         if (! $request || $request->status !== 'pending') {
             return ['success' => false, 'message' => 'Transfer request not found or not pending'];
         }
@@ -336,10 +349,13 @@ class OrgWalletService
             }
         }
 
-        return DB::transaction(function () use ($orgId, $recipientId, $amount, $note, $adminId) {
+        $tenantId = TenantContext::getId();
+
+        return DB::transaction(function () use ($orgId, $recipientId, $amount, $note, $adminId, $tenantId) {
             // Check wallet balance
             $wallet = DB::table('org_wallets')
                 ->where('organization_id', $orgId)
+                ->where('tenant_id', $tenantId)
                 ->lockForUpdate()
                 ->first();
 
@@ -350,11 +366,13 @@ class OrgWalletService
             // Deduct from org wallet
             DB::table('org_wallets')
                 ->where('organization_id', $orgId)
+                ->where('tenant_id', $tenantId)
                 ->decrement('balance', $amount);
 
             // Credit to recipient
             DB::table('users')
                 ->where('id', $recipientId)
+                ->where('tenant_id', $tenantId)
                 ->increment('balance', $amount);
 
             // Record transaction
@@ -378,28 +396,35 @@ class OrgWalletService
      */
     public static function getWalletSummary(int $orgId): array
     {
+        $tenantId = TenantContext::getId();
+
         $wallet = DB::table('org_wallets')
             ->where('organization_id', $orgId)
+            ->where('tenant_id', $tenantId)
             ->first();
 
         $balance = $wallet ? (float) $wallet->balance : 0.0;
 
         $totalReceived = (float) DB::table('org_transactions')
             ->where('organization_id', $orgId)
+            ->where('tenant_id', $tenantId)
             ->where('amount', '>', 0)
             ->sum('amount');
 
         $totalPaidOut = (float) abs(DB::table('org_transactions')
             ->where('organization_id', $orgId)
+            ->where('tenant_id', $tenantId)
             ->where('amount', '<', 0)
             ->sum('amount'));
 
         $transactionCount = (int) DB::table('org_transactions')
             ->where('organization_id', $orgId)
+            ->where('tenant_id', $tenantId)
             ->count();
 
         $pendingRequests = (int) DB::table('org_transfer_requests')
             ->where('organization_id', $orgId)
+            ->where('tenant_id', $tenantId)
             ->where('status', 'pending')
             ->count();
 

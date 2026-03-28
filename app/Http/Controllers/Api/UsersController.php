@@ -373,6 +373,22 @@ class UsersController extends BaseApiController
         $userId = $this->requireAuth();
         $this->rateLimit('delete_account', 1, 60);
 
+        // Require password re-authentication before account deletion
+        $password = $this->input('password', '');
+        if (empty($password)) {
+            return $this->respondWithError('VALIDATION_ERROR', 'Password is required', 'password', 400);
+        }
+
+        $user = \Illuminate\Support\Facades\DB::table('users')
+            ->where('id', $userId)
+            ->where('tenant_id', $this->getTenantId())
+            ->select('password_hash')
+            ->first();
+
+        if (!$user || !password_verify($password, $user->password_hash)) {
+            return $this->respondWithError('INVALID_PASSWORD', 'Invalid password', 'password', 403);
+        }
+
         $success = $this->userService->deleteAccount($userId);
 
         if (!$success) {

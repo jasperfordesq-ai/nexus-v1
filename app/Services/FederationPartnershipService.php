@@ -457,12 +457,10 @@ class FederationPartnershipService
             $query = DB::table('federation_partnerships as p')
                 ->leftJoin('tenants as t1', 'p.tenant_id', '=', 't1.id')
                 ->leftJoin('tenants as t2', 'p.partner_tenant_id', '=', 't2.id')
-                ->select(
-                    'p.*',
-                    DB::raw("CASE WHEN p.tenant_id = {$tenantId} THEN t2.name ELSE t1.name END as partner_name"),
-                    DB::raw("CASE WHEN p.tenant_id = {$tenantId} THEN t2.domain ELSE t1.domain END as partner_domain"),
-                    DB::raw("CASE WHEN p.tenant_id = {$tenantId} THEN p.partner_tenant_id ELSE p.tenant_id END as partner_id")
-                )
+                ->select('p.*')
+                ->selectRaw('CASE WHEN p.tenant_id = ? THEN t2.name ELSE t1.name END as partner_name', [$tenantId])
+                ->selectRaw('CASE WHEN p.tenant_id = ? THEN t2.domain ELSE t1.domain END as partner_domain', [$tenantId])
+                ->selectRaw('CASE WHEN p.tenant_id = ? THEN p.partner_tenant_id ELSE p.tenant_id END as partner_id', [$tenantId])
                 ->where(function ($q) use ($tenantId) {
                     $q->where('p.tenant_id', $tenantId)
                       ->orWhere('p.partner_tenant_id', $tenantId);

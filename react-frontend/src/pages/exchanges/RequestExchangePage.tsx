@@ -306,7 +306,7 @@ export function RequestExchangePage() {
             />
           </div>
 
-          {config.require_broker_approval && (
+          {config?.require_broker_approval && (
             <div className="bg-amber-500/10 rounded-lg p-4 text-sm">
               <p className="text-amber-400 font-medium">{t('request.broker_approval_title')}</p>
               <p className="text-theme-muted mt-1">

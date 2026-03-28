@@ -48,6 +48,30 @@ class FederatedMessageService
                 return ['success' => false, 'error' => 'Sender has not enabled federated messaging'];
             }
 
+            // Check receiver has opted into federated messaging
+            $receiverOptIn = DB::table('federation_user_settings')
+                ->where('user_id', $receiverId)
+                ->where('tenant_id', $receiverTenantId)
+                ->where('messaging_enabled_federated', true)
+                ->exists();
+            if (!$receiverOptIn) {
+                return ['success' => false, 'error' => 'Receiver has not opted into federated messaging'];
+            }
+
+            // Check active federation partnership between tenants
+            $senderTenantId = $sender->tenant_id;
+            $partnershipActive = DB::table('federation_partnerships')
+                ->where(function ($q) use ($senderTenantId, $receiverTenantId) {
+                    $q->where('tenant_id', $senderTenantId)->where('partner_tenant_id', $receiverTenantId);
+                })->orWhere(function ($q) use ($senderTenantId, $receiverTenantId) {
+                    $q->where('tenant_id', $receiverTenantId)->where('partner_tenant_id', $senderTenantId);
+                })
+                ->where('status', 'active')
+                ->exists();
+            if (!$partnershipActive) {
+                return ['success' => false, 'error' => 'No active federation partnership between tenants'];
+            }
+
             $messageId = DB::table('federation_messages')->insertGetId([
                 'sender_user_id'    => $senderId,
                 'sender_tenant_id'  => $sender->tenant_id,
@@ -99,10 +123,10 @@ class FederatedMessageService
                 DB::select(
                     "SELECT * FROM federation_messages
                      WHERE (sender_user_id = ? AND receiver_user_id = ? AND receiver_tenant_id = ?)
-                        OR (sender_user_id = ? AND receiver_user_id = ?)
+                        OR (sender_user_id = ? AND receiver_user_id = ? AND sender_tenant_id = ?)
                      ORDER BY created_at ASC
                      LIMIT ?",
-                    [$userId, $otherUserId, $otherTenantId, $otherUserId, $userId, $limit]
+                    [$userId, $otherUserId, $otherTenantId, $otherUserId, $userId, $otherTenantId, $limit]
                 )
             );
         } catch (\Throwable $e) {

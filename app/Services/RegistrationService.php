@@ -10,6 +10,7 @@ use App\Models\User;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
+use Illuminate\Validation\Rules\Password;
 /**
  * RegistrationService — Laravel DI-based service for user registration.
  *
@@ -33,7 +34,7 @@ class RegistrationService
             'first_name' => 'required|string|max:100',
             'last_name'  => 'required|string|max:100',
             'email'      => 'required|email|max:255',
-            'password'   => 'required|string|min:8',
+            'password'   => ['required', 'string', Password::min(8)->mixedCase()->numbers()],
         ]);
 
         if ($validator->fails()) {

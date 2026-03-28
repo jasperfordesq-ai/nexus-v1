@@ -99,10 +99,11 @@ class GroupService
         if (empty($groupIds)) {
             return [];
         }
+        $tenantId = TenantContext::getId();
         $placeholders = implode(',', array_fill(0, count($groupIds), '?'));
-        $params = array_merge($groupIds, [$userId]);
+        $params = array_merge($groupIds, [$tenantId, $userId]);
         $rows = DB::select(
-            "SELECT group_id, status, role FROM group_members WHERE group_id IN ({$placeholders}) AND user_id = ?",
+            "SELECT group_id, status, role FROM group_members WHERE group_id IN ({$placeholders}) AND group_id IN (SELECT id FROM groups WHERE tenant_id = ?) AND user_id = ?",
             $params
         );
         $map = [];
@@ -421,6 +422,9 @@ class GroupService
         $query = DB::table('group_members')
             ->join('users', 'group_members.user_id', '=', 'users.id')
             ->where('group_members.group_id', $groupId)
+            ->whereIn('group_members.group_id', function ($q) {
+                $q->select('id')->from('groups')->where('tenant_id', TenantContext::getId());
+            })
             ->where('group_members.status', 'active')
             ->select([
                 'group_members.id as membership_id',

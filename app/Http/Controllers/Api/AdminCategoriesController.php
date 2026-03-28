@@ -350,17 +350,17 @@ class AdminCategoriesController extends BaseApiController
         $tenantId = $this->getTenantId();
         $data = $this->getAllInput();
 
-        $attribute = \App\Models\Attribute::find($id);
+        $attribute = \App\Models\Attribute::where('id', $id)->where('tenant_id', $tenantId)->first();
         if (!$attribute) {
             return $this->respondWithError('RESOURCE_NOT_FOUND', 'Attribute not found', null, 404);
         }
 
-        $name = isset($data['name']) && trim($data['name']) !== '' ? trim($data['name']) : $attribute['name'];
-        $categoryId = array_key_exists('category_id', $data) ? ($data['category_id'] ?: null) : ($attribute['category_id'] ?: null);
-        $inputType = isset($data['type']) ? trim($data['type']) : (isset($data['input_type']) ? trim($data['input_type']) : $attribute['input_type']);
-        $isActive = isset($data['is_active']) ? ($data['is_active'] ? 1 : 0) : ($attribute['is_active'] ?? 1);
+        $name = isset($data['name']) && trim($data['name']) !== '' ? trim($data['name']) : $attribute->name;
+        $categoryId = array_key_exists('category_id', $data) ? ($data['category_id'] ?: null) : ($attribute->category_id ?: null);
+        $inputType = isset($data['type']) ? trim($data['type']) : (isset($data['input_type']) ? trim($data['input_type']) : $attribute->input_type);
+        $isActive = isset($data['is_active']) ? ($data['is_active'] ? 1 : 0) : ($attribute->is_active ?? 1);
 
-        \App\Models\Attribute::update($id, [
+        $attribute->update([
             'name' => $name,
             'category_id' => $categoryId,
             'input_type' => $inputType,
@@ -386,15 +386,16 @@ class AdminCategoriesController extends BaseApiController
     public function destroyAttribute(int $id): JsonResponse
     {
         $adminId = $this->requireAdmin();
+        $tenantId = $this->getTenantId();
 
-        $attribute = \App\Models\Attribute::find($id);
+        $attribute = \App\Models\Attribute::where('id', $id)->where('tenant_id', $tenantId)->first();
         if (!$attribute) {
             return $this->respondWithError('RESOURCE_NOT_FOUND', 'Attribute not found', null, 404);
         }
 
-        \App\Models\Attribute::delete($id);
+        $attribute->delete();
 
-        ActivityLog::log($adminId, 'admin_delete_attribute', "Deleted attribute #{$id}: {$attribute['name']}");
+        ActivityLog::log($adminId, 'admin_delete_attribute', "Deleted attribute #{$id}: {$attribute->name}");
 
         return $this->respondWithData(['deleted' => true, 'id' => $id]);
     }

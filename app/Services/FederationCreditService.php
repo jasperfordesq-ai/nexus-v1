@@ -6,6 +6,7 @@
 
 namespace App\Services;
 
+use App\Core\TenantContext;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
@@ -151,6 +152,13 @@ class FederationCreditService
                 return ['success' => false, 'error' => 'Agreement not found or not pending'];
             }
 
+            // Verify current tenant is a party to this agreement
+            $tenantId = TenantContext::getId();
+            if ((int) $agreement->from_tenant_id !== $tenantId && (int) $agreement->to_tenant_id !== $tenantId) {
+                $this->errors[] = 'Unauthorized: tenant is not party to this agreement';
+                return ['success' => false, 'error' => 'Unauthorized: tenant is not party to this agreement'];
+            }
+
             DB::update(
                 "UPDATE federation_credit_agreements SET status = 'active', approved_by_to = ?, updated_at = NOW() WHERE id = ?",
                 [$approvedBy, $agreementId]
@@ -180,6 +188,23 @@ class FederationCreditService
         }
 
         try {
+            // Verify current tenant is a party to this agreement
+            $agreement = DB::selectOne(
+                "SELECT * FROM federation_credit_agreements WHERE id = ?",
+                [$agreementId]
+            );
+
+            if (!$agreement) {
+                $this->errors[] = 'Agreement not found';
+                return ['success' => false, 'error' => 'Agreement not found'];
+            }
+
+            $tenantId = TenantContext::getId();
+            if ((int) $agreement->from_tenant_id !== $tenantId && (int) $agreement->to_tenant_id !== $tenantId) {
+                $this->errors[] = 'Unauthorized: tenant is not party to this agreement';
+                return ['success' => false, 'error' => 'Unauthorized: tenant is not party to this agreement'];
+            }
+
             $updated = DB::update(
                 "UPDATE federation_credit_agreements SET status = ?, updated_at = NOW() WHERE id = ?",
                 [$status, $agreementId]

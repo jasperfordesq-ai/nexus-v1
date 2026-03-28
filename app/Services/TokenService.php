@@ -153,6 +153,20 @@ class TokenService
             return null;
         }
 
+        // Check global revocation (e.g. "log out everywhere")
+        $userId = $payload['user_id'] ?? null;
+        $iat = $payload['iat'] ?? 0;
+        if ($userId && $iat) {
+            $globalJti = 'global_revoke_' . $userId;
+            $globalRevoke = DB::selectOne(
+                "SELECT revoked_at FROM revoked_tokens WHERE jti = ? AND revoked_at > FROM_UNIXTIME(?)",
+                [$globalJti, $iat]
+            );
+            if ($globalRevoke) {
+                return null;
+            }
+        }
+
         return $payload;
     }
 

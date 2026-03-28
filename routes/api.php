@@ -261,9 +261,9 @@ Route::get('/v2/skills/categories', [\App\Http\Controllers\Api\SkillTaxonomyCont
 Route::get('/v2/skills/search', [\App\Http\Controllers\Api\SkillTaxonomyController::class, 'search'])->withoutMiddleware('auth:sanctum');
 Route::get('/v2/skills/members', [\App\Http\Controllers\Api\SkillTaxonomyController::class, 'getMembersWithSkill']);
 Route::get('/v2/skills/categories/{id}', [\App\Http\Controllers\Api\SkillTaxonomyController::class, 'getCategoryById']);
-Route::post('/v2/skills/categories', [\App\Http\Controllers\Api\SkillTaxonomyController::class, 'createCategory']);
-Route::put('/v2/skills/categories/{id}', [\App\Http\Controllers\Api\SkillTaxonomyController::class, 'updateCategory']);
-Route::delete('/v2/skills/categories/{id}', [\App\Http\Controllers\Api\SkillTaxonomyController::class, 'deleteCategory']);
+Route::post('/v2/skills/categories', [\App\Http\Controllers\Api\SkillTaxonomyController::class, 'createCategory'])->middleware('admin');
+Route::put('/v2/skills/categories/{id}', [\App\Http\Controllers\Api\SkillTaxonomyController::class, 'updateCategory'])->middleware('admin');
+Route::delete('/v2/skills/categories/{id}', [\App\Http\Controllers\Api\SkillTaxonomyController::class, 'deleteCategory'])->middleware('admin');
 Route::get('/v2/users/me/skills', [\App\Http\Controllers\Api\SkillTaxonomyController::class, 'getMySkills']);
 Route::post('/v2/users/me/skills', [\App\Http\Controllers\Api\SkillTaxonomyController::class, 'addSkill']);
 Route::put('/v2/users/me/skills/{id}', [\App\Http\Controllers\Api\SkillTaxonomyController::class, 'updateSkill']);
@@ -605,10 +605,10 @@ Route::get('/v2/pages/{slug}', [\App\Http\Controllers\Api\PagesPublicController:
 Route::get('/v2/resources', [\App\Http\Controllers\Api\ResourcePublicController::class, 'index']);
 Route::get('/v2/resources/categories', [\App\Http\Controllers\Api\ResourcePublicController::class, 'categories']);
 Route::get('/v2/resources/categories/tree', [\App\Http\Controllers\Api\ResourceCategoryController::class, 'tree']);
-Route::post('/v2/resources/categories', [\App\Http\Controllers\Api\ResourceCategoryController::class, 'store']);
-Route::put('/v2/resources/categories/{id}', [\App\Http\Controllers\Api\ResourceCategoryController::class, 'update']);
-Route::delete('/v2/resources/categories/{id}', [\App\Http\Controllers\Api\ResourceCategoryController::class, 'destroy']);
-Route::put('/v2/resources/reorder', [\App\Http\Controllers\Api\ResourceCategoryController::class, 'reorder']);
+Route::post('/v2/resources/categories', [\App\Http\Controllers\Api\ResourceCategoryController::class, 'store'])->middleware('admin');
+Route::put('/v2/resources/categories/{id}', [\App\Http\Controllers\Api\ResourceCategoryController::class, 'update'])->middleware('admin');
+Route::delete('/v2/resources/categories/{id}', [\App\Http\Controllers\Api\ResourceCategoryController::class, 'destroy'])->middleware('admin');
+Route::put('/v2/resources/reorder', [\App\Http\Controllers\Api\ResourceCategoryController::class, 'reorder'])->middleware('admin');
 Route::post('/v2/resources', [\App\Http\Controllers\Api\ResourcePublicController::class, 'store']);
 Route::get('/v2/resources/{id}/download', [\App\Http\Controllers\Api\ResourcePublicController::class, 'download']);
 Route::delete('/v2/resources/{id}', [\App\Http\Controllers\Api\ResourcePublicController::class, 'destroy']);
@@ -685,9 +685,7 @@ Route::post('/v2/admin/users/{id}/reset-2fa', [\App\Http\Controllers\Api\AdminUs
 Route::post('/v2/admin/users/badges/recheck-all', [\App\Http\Controllers\Api\AdminGamificationController::class, 'recheckAll']);
 Route::post('/v2/admin/users/{id}/badges', [\App\Http\Controllers\Api\AdminUsersController::class, 'addBadge']);
 Route::delete('/v2/admin/users/{id}/badges/{badgeId}', [\App\Http\Controllers\Api\AdminUsersController::class, 'removeBadge']);
-Route::post('/v2/admin/users/{id}/impersonate', [\App\Http\Controllers\Api\AdminUsersController::class, 'impersonate']);
-Route::put('/v2/admin/users/{id}/super-admin', [\App\Http\Controllers\Api\AdminUsersController::class, 'setSuperAdmin']);
-Route::put('/v2/admin/users/{id}/global-super-admin', [\App\Http\Controllers\Api\AdminUsersController::class, 'setGlobalSuperAdmin']);
+// impersonate, super-admin promotion — moved to super-admin middleware group (see below)
 Route::post('/v2/admin/users/{id}/badges/recheck', [\App\Http\Controllers\Api\AdminUsersController::class, 'recheckBadges']);
 Route::get('/v2/admin/users/{id}/consents', [\App\Http\Controllers\Api\AdminUsersController::class, 'getConsents']);
 Route::post('/v2/admin/users/{id}/password', [\App\Http\Controllers\Api\AdminUsersController::class, 'setPassword']);
@@ -1177,6 +1175,11 @@ Route::post('/v2/admin/super/federation/partnerships/{id}/terminate', [\App\Http
 Route::get('/v2/admin/super/federation/tenant/{id}/features', [\App\Http\Controllers\Api\AdminSuperController::class, 'federationGetTenantFeatures']);
 Route::put('/v2/admin/super/federation/tenant/{id}/features', [\App\Http\Controllers\Api\AdminSuperController::class, 'federationUpdateTenantFeature']);
 
+// Impersonate and super-admin promotion — requires super-admin (moved from admin group)
+Route::post('/v2/admin/users/{id}/impersonate', [\App\Http\Controllers\Api\AdminUsersController::class, 'impersonate']);
+Route::put('/v2/admin/users/{id}/super-admin', [\App\Http\Controllers\Api\AdminUsersController::class, 'setSuperAdmin']);
+Route::put('/v2/admin/users/{id}/global-super-admin', [\App\Http\Controllers\Api\AdminUsersController::class, 'setGlobalSuperAdmin']);
+
 }); // End Route::middleware(['auth:sanctum', 'super-admin'])
 
 // ============================================
@@ -1242,6 +1245,10 @@ Route::get('/auth/csrf-token', [\App\Http\Controllers\Api\AuthController::class,
 Route::get('/v2/csrf-token', [\App\Http\Controllers\Api\AuthController::class, 'getCsrfToken']);
 Route::get('/csrf-token', [\App\Http\Controllers\Api\AuthController::class, 'getCsrfToken']);
 
+// Newsletter unsubscribe/tracking — public (recipients may not be logged in)
+Route::post('/v2/newsletter/unsubscribe', [\App\Http\Controllers\Api\NewsletterController::class, 'unsubscribe'])->middleware('throttle:30,1');
+Route::get('/v2/newsletter/pixel/{token}', [\App\Http\Controllers\Api\NewsletterController::class, 'trackOpen']);
+
 // ============================================
 // Public routes — No auth required
 // These were incorrectly inside auth:sanctum but must be accessible
@@ -1306,7 +1313,7 @@ Route::post('/v2/auth/2fa/verify', [\App\Http\Controllers\Api\TwoFactorControlle
 Route::post('/v2/auth/2fa/disable', [\App\Http\Controllers\Api\TwoFactorController::class, 'disable']);
 Route::post('/app/check-version', [\App\Http\Controllers\Api\AppController::class, 'checkVersion'])->withoutMiddleware('auth:sanctum');
 Route::get('/app/version', [\App\Http\Controllers\Api\AppController::class, 'version'])->withoutMiddleware('auth:sanctum');
-Route::post('/app/log', [\App\Http\Controllers\Api\AppController::class, 'log'])->withoutMiddleware('auth:sanctum');
+Route::post('/app/log', [\App\Http\Controllers\Api\AppController::class, 'log'])->withoutMiddleware('auth:sanctum')->middleware('throttle:10,1');
 Route::post('/pusher/auth', [\App\Http\Controllers\Api\PusherController::class, 'auth']);
 Route::get('/pusher/auth', [\App\Http\Controllers\Api\PusherController::class, 'auth']);
 Route::get('/pusher/config', [\App\Http\Controllers\Api\PusherController::class, 'config']);
@@ -1379,8 +1386,8 @@ Route::post('/messages/delete-conversation', [\App\Http\Controllers\Api\Messages
 Route::post('/messages/reaction', [\App\Http\Controllers\Api\MessagesController::class, 'toggleReaction']);
 Route::get('/messages/reactions-batch', [\App\Http\Controllers\Api\MessagesController::class, 'getReactionsBatch']);
 Route::get('/admin/users/search', [\App\Http\Controllers\Api\AdminTimebankingController::class, 'userSearchApi'])->middleware(['auth:sanctum', 'admin']);
-Route::post('/v2/newsletter/unsubscribe', [\App\Http\Controllers\Api\NewsletterController::class, 'unsubscribe']);
-Route::get('/v2/newsletter/pixel/{token}', [\App\Http\Controllers\Api\NewsletterController::class, 'trackOpen']);
+// Newsletter unsubscribe/tracking — moved to public routes (no auth required)
+// See public section below line 1244
 Route::post('/gdpr/consent', [\App\Http\Controllers\Api\GdprController::class, 'updateConsent']);
 Route::post('/gdpr/request', [\App\Http\Controllers\Api\GdprController::class, 'createRequest']);
 Route::post('/gdpr/delete-account', [\App\Http\Controllers\Api\GdprController::class, 'deleteAccount']);

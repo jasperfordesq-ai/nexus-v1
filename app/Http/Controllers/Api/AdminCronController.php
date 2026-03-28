@@ -138,7 +138,7 @@ class AdminCronController extends BaseApiController
     /** GET /api/v2/admin/cron/jobs/{jobId}/settings */
     public function getJobSettings(int $jobId): JsonResponse
     {
-        $this->requireAdmin();
+        $this->requireSuperAdmin();
 
         $settings = DB::selectOne("SELECT * FROM cron_job_settings WHERE job_id = ?", [$jobId]);
 
@@ -162,7 +162,7 @@ class AdminCronController extends BaseApiController
     /** PUT /api/v2/admin/cron/jobs/{jobId}/settings */
     public function updateJobSettings(int $jobId): JsonResponse
     {
-        $this->requireAdmin();
+        $this->requireSuperAdmin();
         $data = $this->getAllInput();
 
         $existing = DB::selectOne("SELECT id FROM cron_job_settings WHERE job_id = ?", [$jobId]);
@@ -216,7 +216,7 @@ class AdminCronController extends BaseApiController
     /** GET /api/v2/admin/cron/settings */
     public function getGlobalSettings(): JsonResponse
     {
-        $this->requireAdmin();
+        $this->requireSuperAdmin();
 
         $rows = DB::select("SELECT setting_key, setting_value FROM cron_settings");
         $map = [];
@@ -234,7 +234,7 @@ class AdminCronController extends BaseApiController
     /** PUT /api/v2/admin/cron/settings */
     public function updateGlobalSettings(): JsonResponse
     {
-        $this->requireAdmin();
+        $this->requireSuperAdmin();
         $data = $this->getAllInput();
 
         $allowedKeys = ['default_notify_email', 'log_retention_days', 'max_concurrent_jobs'];

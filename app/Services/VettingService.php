@@ -293,12 +293,14 @@ class VettingService
     {
         $tenantId = TenantContext::getId();
 
-        $data['updated_at'] = now();
+        $allowed = ['reference_number', 'issue_date', 'expiry_date', 'notes', 'document_url'];
+        $updates = collect($data)->only($allowed)->all();
+        $updates['updated_at'] = now();
 
         $affected = DB::table('vetting_records')
             ->where('id', $id)
             ->where('tenant_id', $tenantId)
-            ->update($data);
+            ->update($updates);
 
         // If status changed, sync the user's vetting_status
         if (isset($data['status'])) {

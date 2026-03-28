@@ -31,6 +31,10 @@ class UploadController extends BaseApiController
         $userId = $this->requireAuth();
         $this->rateLimit('upload', 20, 60);
 
+        request()->validate([
+            'file' => 'required|file|max:10240|mimes:jpg,jpeg,png,gif,webp,pdf,doc,docx,xls,xlsx,csv,txt,mp3,mp4,wav',
+        ]);
+
         $file = request()->file('file');
 
         if (!$file || !$file->isValid()) {

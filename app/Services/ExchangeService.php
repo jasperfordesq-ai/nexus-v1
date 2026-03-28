@@ -45,10 +45,8 @@ class ExchangeService
                 'l.title as listing_title',
                 'l.type as listing_type',
                 'req.name as requester_name',
-                'req.email as requester_email',
                 'req.avatar_url as requester_avatar',
                 'prov.name as provider_name',
-                'prov.email as provider_email',
                 'prov.avatar_url as provider_avatar'
             );
 
