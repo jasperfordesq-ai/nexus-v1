@@ -112,6 +112,9 @@ export function FederationPartnerDetailPage() {
     try {
       setIsLoading(true);
       setError(null);
+      // TODO: Backend does not support single-partner fetch yet. Fetches all partners
+      // and filters client-side. When a GET /v2/federation/partners/:id endpoint is added,
+      // replace this with a direct single-partner request.
       const response = await api.get<FederationPartner[]>('/v2/federation/partners');
       if (controller.signal.aborted) return;
       if (response.success && response.data) {

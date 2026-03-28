@@ -12,6 +12,7 @@ import { useState, useCallback, useEffect } from 'react';
 import { Card, CardBody, CardHeader, Button } from '@heroui/react';
 import { Database, Download, Upload, RefreshCw } from 'lucide-react';
 import { usePageTitle } from '@/hooks';
+import { useToast } from '@/contexts';
 import { adminFederation } from '../../api/adminApi';
 import { PageHeader } from '../../components';
 import { API_BASE } from '@/lib/api';
@@ -28,6 +29,7 @@ interface DataConfig {
 export function DataManagement() {
   const { t } = useTranslation('admin');
   usePageTitle(t('federation.page_title'));
+  const toast = useToast();
   const [config, setConfig] = useState<DataConfig | null>(null);
   const [loading, setLoading] = useState(true);
   const [exportingType, setExportingType] = useState<string | null>(null);
@@ -74,7 +76,7 @@ export function DataManagement() {
       a.remove();
       window.URL.revokeObjectURL(url);
     } catch {
-      // Silently handle — could add toast here
+      toast.error(t('federation.export_failed', 'Export failed'));
     }
     setExportingType(null);
   }, []);

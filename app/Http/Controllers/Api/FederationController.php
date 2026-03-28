@@ -523,14 +523,14 @@ class FederationController extends BaseApiController
 
         if ($isExternal) {
             $stmt = $db->prepare("
-                SELECT l.*, u.first_name, u.last_name, u.avatar_url as avatar, u.location, t.name as timebank_name
+                SELECT l.id, l.title, l.description, l.type, l.status, l.category, l.price, l.user_id, l.tenant_id, l.created_at, l.updated_at, u.first_name, u.last_name, u.avatar_url as avatar, u.location, t.name as timebank_name
                 FROM listings l JOIN users u ON u.id = l.user_id JOIN tenants t ON t.id = l.tenant_id JOIN federation_user_settings fus ON fus.user_id = l.user_id
                 WHERE l.id = ? AND l.tenant_id = ? AND l.status = 'active' AND fus.federation_optin = 1
             ");
             $stmt->execute([$id, $partnerTenantId]);
         } else {
             $stmt = $db->prepare("
-                SELECT l.*, u.first_name, u.last_name, u.avatar_url as avatar, u.location, t.name as timebank_name
+                SELECT l.id, l.title, l.description, l.type, l.status, l.category, l.price, l.user_id, l.tenant_id, l.created_at, l.updated_at, u.first_name, u.last_name, u.avatar_url as avatar, u.location, t.name as timebank_name
                 FROM listings l JOIN users u ON u.id = l.user_id JOIN tenants t ON t.id = l.tenant_id JOIN federation_user_settings fus ON fus.user_id = l.user_id
                 JOIN federation_partnerships fp ON ((fp.tenant_id = ? AND fp.partner_tenant_id = l.tenant_id) OR (fp.partner_tenant_id = ? AND fp.tenant_id = l.tenant_id))
                 WHERE l.id = ? AND l.status = 'active' AND fus.federation_optin = 1 AND fp.status = 'active'
@@ -567,6 +567,15 @@ class FederationController extends BaseApiController
             if (empty($input[$field])) {
                 return $this->fedError(400, "Missing required field: {$field}", 'VALIDATION_ERROR');
             }
+        }
+
+        // Fix 6: Validate sender belongs to partner's tenant
+        $senderCheck = DB::selectOne(
+            "SELECT id FROM users WHERE id = ? AND tenant_id = ?",
+            [(int) $input['sender_id'], $partnerTenantId]
+        );
+        if (!$senderCheck) {
+            return $this->fedError(403, 'Sender does not belong to your tenant', 'SENDER_TENANT_MISMATCH');
         }
 
         if ($isExternal) {
@@ -645,15 +654,69 @@ class FederationController extends BaseApiController
         if (!$recipient) return $this->fedError(404, 'Recipient not found or not accessible', 'RECIPIENT_NOT_FOUND');
         if (!$recipient['transactions_enabled_federated']) return $this->fedError(403, 'Recipient does not accept federated transactions', 'TRANSACTIONS_DISABLED');
 
-        $stmt = $db->prepare("INSERT INTO transactions (tenant_id, sender_id, receiver_id, amount, description, status, is_federated, sender_tenant_id, receiver_tenant_id, created_at) VALUES (?, ?, ?, ?, ?, 'pending', 1, ?, ?, NOW())");
-        $stmt->execute([$recipient['tenant_id'], $input['sender_id'], $input['recipient_id'], $amount, $input['description'], $partnerTenantId, $recipient['tenant_id']]);
-        $transactionId = $db->lastInsertId();
+        // Fix 3: Validate sender belongs to partner's tenant
+        $senderId = (int) $input['sender_id'];
+        $senderCheck = DB::selectOne(
+            "SELECT id FROM users WHERE id = ? AND tenant_id = ?",
+            [$senderId, $partnerTenantId]
+        );
+        if (!$senderCheck) {
+            return $this->fedError(403, 'Sender does not belong to your tenant', 'SENDER_TENANT_MISMATCH');
+        }
 
-        $status = 'pending';
-        if ($isExternal) {
-            $db->prepare("UPDATE users SET balance = balance + ? WHERE id = ? AND tenant_id = ?")->execute([$amount, $input['recipient_id'], $partnerTenantId]);
-            $db->prepare("UPDATE transactions SET status = 'completed' WHERE id = ?")->execute([$transactionId]);
-            $status = 'completed';
+        // Fix 4: Check partnership level allows transactions
+        if (!$isExternal) {
+            $partnershipCheck = DB::selectOne(
+                "SELECT id FROM federation_partnerships
+                 WHERE ((tenant_id = ? AND partner_tenant_id = ?) OR (partner_tenant_id = ? AND tenant_id = ?))
+                 AND status = 'active' AND (transactions_enabled = 1 OR federation_level >= 3)",
+                [$partnerTenantId, $recipient['tenant_id'], $partnerTenantId, $recipient['tenant_id']]
+            );
+            if (!$partnershipCheck) {
+                return $this->fedError(403, 'Partnership does not allow transactions', 'TRANSACTIONS_NOT_ALLOWED');
+            }
+        }
+
+        // Fix 5: Enforce credit agreements between tenants
+        $creditAgreement = DB::selectOne(
+            "SELECT id FROM federation_credit_agreements
+             WHERE ((tenant_a_id = ? AND tenant_b_id = ?) OR (tenant_a_id = ? AND tenant_b_id = ?))
+             AND status = 'active'",
+            [$partnerTenantId, $recipient['tenant_id'], $recipient['tenant_id'], $partnerTenantId]
+        );
+        if (!$creditAgreement) {
+            return $this->fedError(403, 'No active credit agreement between tenants', 'NO_CREDIT_AGREEMENT');
+        }
+
+        // Fix 1: Wrap transaction creation in DB transaction for atomicity
+        DB::beginTransaction();
+        try {
+            // Fix 2: Deduct sender balance (atomic double-spend prevention)
+            $deducted = DB::update(
+                "UPDATE users SET balance = balance - ? WHERE id = ? AND balance >= ?",
+                [$amount, $senderId, $amount]
+            );
+            if ($deducted === 0) {
+                DB::rollBack();
+                return $this->fedError(400, 'Insufficient balance', 'INSUFFICIENT_BALANCE');
+            }
+
+            $stmt = $db->prepare("INSERT INTO transactions (tenant_id, sender_id, receiver_id, amount, description, status, is_federated, sender_tenant_id, receiver_tenant_id, created_at) VALUES (?, ?, ?, ?, ?, 'pending', 1, ?, ?, NOW())");
+            $stmt->execute([$recipient['tenant_id'], $senderId, $input['recipient_id'], $amount, $input['description'], $partnerTenantId, $recipient['tenant_id']]);
+            $transactionId = $db->lastInsertId();
+
+            $status = 'pending';
+            if ($isExternal) {
+                $db->prepare("UPDATE users SET balance = balance + ? WHERE id = ? AND tenant_id = ?")->execute([$amount, $input['recipient_id'], $partnerTenantId]);
+                $db->prepare("UPDATE transactions SET status = 'completed' WHERE id = ?")->execute([$transactionId]);
+                $status = 'completed';
+            }
+
+            DB::commit();
+        } catch (\Exception $e) {
+            DB::rollBack();
+            error_log("FederationV1: transaction creation failed: " . $e->getMessage());
+            return $this->fedError(500, 'Transaction creation failed', 'TRANSACTION_ERROR');
         }
 
         $this->federationAuditService->log('api_transaction_initiated', $partnerTenantId, $recipient['tenant_id'], null, ['transaction_id' => $transactionId, 'amount' => $amount, 'recipient_id' => $input['recipient_id'], 'external_partner' => $isExternal]);
@@ -715,12 +778,7 @@ class FederationController extends BaseApiController
         $signatureValid = hash_equals($expectedSignature, $signature);
 
         if (!$signatureValid) {
-            return $this->fedSuccess([
-                'valid' => false, 'message' => 'Signature verification failed',
-                'debug' => ['platform_id' => $platformId, 'timestamp_age_seconds' => $timeDiff, 'method' => $method, 'path' => $path, 'body_length' => strlen($body),
-                    'expected_signature_preview' => substr($expectedSignature, 0, 16) . '...', 'received_signature_preview' => substr($signature, 0, 16) . '...',
-                    'hint' => 'Ensure you are signing: METHOD\\nPATH\\nTIMESTAMP\\nBODY'],
-            ]);
+            return $this->fedError(401, 'Signature verification failed', 'SIGNATURE_INVALID');
         }
 
         return $this->fedSuccess([

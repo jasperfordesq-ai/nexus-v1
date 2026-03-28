@@ -6,6 +6,8 @@
 
 namespace App\Services;
 
+use App\Services\FederationExternalApiClient;
+use App\Services\FederationExternalPartnerService;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -32,7 +34,7 @@ class FederationSearchService
 
         $cacheKey = 'fed_search_' . md5(json_encode([
             'tenants' => $partnerTenantIds,
-            'filters' => array_diff_key($filters, ['offset' => 1]),
+            'filters' => $filters,
         ]));
 
         try {
@@ -336,16 +338,67 @@ class FederationSearchService
     /**
      * Search external members via federation partners' APIs.
      *
+     * Queries each active external partner's API in sequence, merging results.
+     * One failing partner does not break the entire search — errors are collected.
+     *
      * @return array{members: array, total: int, partners_queried: int, errors: array}
      */
     public function searchExternalMembers(int $tenantId, array $filters): array
     {
-        // Stub: external API search would query partner APIs
+        $allMembers = [];
+        $errors = [];
+        $partnersQueried = 0;
+
+        try {
+            $partners = FederationExternalPartnerService::getActivePartners($tenantId);
+        } catch (\Throwable $e) {
+            Log::error('FederationSearchService::searchExternalMembers failed to get partners', [
+                'tenant_id' => $tenantId,
+                'error' => $e->getMessage(),
+            ]);
+            return [
+                'members'          => [],
+                'total'            => 0,
+                'partners_queried' => 0,
+                'errors'           => ['Failed to retrieve external partners: ' . $e->getMessage()],
+            ];
+        }
+
+        foreach ($partners as $partner) {
+            $partnerId = $partner['id'] ?? null;
+            $partnerName = $partner['name'] ?? ('Partner #' . $partnerId);
+
+            if ($partnerId === null) {
+                continue;
+            }
+
+            try {
+                $partnersQueried++;
+                $results = FederationExternalApiClient::fetchMembers($partnerId, $filters);
+
+                if (is_array($results)) {
+                    foreach ($results as $member) {
+                        $member['partner_id'] = $partnerId;
+                        $member['partner_name'] = $partnerName;
+                        $allMembers[] = $member;
+                    }
+                }
+            } catch (\Throwable $e) {
+                Log::warning('FederationSearchService::searchExternalMembers partner query failed', [
+                    'tenant_id' => $tenantId,
+                    'partner_id' => $partnerId,
+                    'partner_name' => $partnerName,
+                    'error' => $e->getMessage(),
+                ]);
+                $errors[] = "Partner '{$partnerName}' (#{$partnerId}): " . $e->getMessage();
+            }
+        }
+
         return [
-            'members'          => [],
-            'total'            => 0,
-            'partners_queried' => 0,
-            'errors'           => [],
+            'members'          => $allMembers,
+            'total'            => count($allMembers),
+            'partners_queried' => $partnersQueried,
+            'errors'           => $errors,
         ];
     }
 
@@ -373,16 +426,67 @@ class FederationSearchService
     /**
      * Search external listings via federation partners' APIs.
      *
+     * Queries each active external partner's API for listings, merging results.
+     * One failing partner does not break the entire search — errors are collected.
+     *
      * @return array{listings: array, total: int, partners_queried: int, errors: array}
      */
     public function searchExternalListings(int $tenantId, array $filters): array
     {
-        // Stub: external API search would query partner APIs
+        $allListings = [];
+        $errors = [];
+        $partnersQueried = 0;
+
+        try {
+            $partners = FederationExternalPartnerService::getActivePartnersForListings($tenantId);
+        } catch (\Throwable $e) {
+            Log::error('FederationSearchService::searchExternalListings failed to get partners', [
+                'tenant_id' => $tenantId,
+                'error' => $e->getMessage(),
+            ]);
+            return [
+                'listings'         => [],
+                'total'            => 0,
+                'partners_queried' => 0,
+                'errors'           => ['Failed to retrieve external partners: ' . $e->getMessage()],
+            ];
+        }
+
+        foreach ($partners as $partner) {
+            $partnerId = $partner['id'] ?? null;
+            $partnerName = $partner['name'] ?? ('Partner #' . $partnerId);
+
+            if ($partnerId === null) {
+                continue;
+            }
+
+            try {
+                $partnersQueried++;
+                $results = FederationExternalApiClient::fetchListings($partnerId, $filters);
+
+                if (is_array($results)) {
+                    foreach ($results as $listing) {
+                        $listing['partner_id'] = $partnerId;
+                        $listing['partner_name'] = $partnerName;
+                        $allListings[] = $listing;
+                    }
+                }
+            } catch (\Throwable $e) {
+                Log::warning('FederationSearchService::searchExternalListings partner query failed', [
+                    'tenant_id' => $tenantId,
+                    'partner_id' => $partnerId,
+                    'partner_name' => $partnerName,
+                    'error' => $e->getMessage(),
+                ]);
+                $errors[] = "Partner '{$partnerName}' (#{$partnerId}): " . $e->getMessage();
+            }
+        }
+
         return [
-            'listings'         => [],
-            'total'            => 0,
-            'partners_queried' => 0,
-            'errors'           => [],
+            'listings'         => $allListings,
+            'total'            => count($allListings),
+            'partners_queried' => $partnersQueried,
+            'errors'           => $errors,
         ];
     }
 

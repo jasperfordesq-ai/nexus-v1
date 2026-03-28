@@ -27,6 +27,7 @@ class FederationUserService
         'appear_in_federated_search'     => false,
         'show_skills_federated'          => false,
         'show_location_federated'        => false,
+        'show_reviews_federated'         => false,
         'service_reach'                  => 'local_only',
         'travel_radius_km'              => null,
     ];
@@ -58,6 +59,7 @@ class FederationUserService
                 'appear_in_federated_search'     => (bool) $row->appear_in_federated_search,
                 'show_skills_federated'          => (bool) $row->show_skills_federated,
                 'show_location_federated'        => (bool) $row->show_location_federated,
+                'show_reviews_federated'         => (bool) ($row->show_reviews_federated ?? false),
                 'service_reach'                  => $row->service_reach ?? 'local_only',
                 'travel_radius_km'              => $row->travel_radius_km ?? null,
             ];
@@ -94,6 +96,9 @@ class FederationUserService
             }
             if (isset($settings['show_location_federated'])) {
                 $data['show_location_federated'] = $settings['show_location_federated'] ? 1 : 0;
+            }
+            if (isset($settings['show_reviews_federated'])) {
+                $data['show_reviews_federated'] = $settings['show_reviews_federated'] ? 1 : 0;
             }
             if (isset($settings['service_reach'])) {
                 $data['service_reach'] = in_array($settings['service_reach'], self::VALID_SERVICE_REACH, true)
@@ -209,7 +214,7 @@ class FederationUserService
      *
      * @return array{score: int|float, level: string, components: array, details: array}
      */
-    public static function getTrustScore(int $userId): array
+    public static function getTrustScore(int $userId, ?int $tenantId = null): array
     {
         $empty = [
             'score'      => 0,
@@ -225,7 +230,7 @@ class FederationUserService
         ];
 
         try {
-            $tenantId = \App\Core\TenantContext::getId();
+            $tenantId = $tenantId ?? \App\Core\TenantContext::getId();
 
             // Review component (up to 40 points)
             $reviewCount = (int) DB::table('reviews')

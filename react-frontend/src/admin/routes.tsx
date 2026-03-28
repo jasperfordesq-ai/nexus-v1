@@ -139,6 +139,7 @@ const CreateApiKey = lazy(() => import('./modules/federation/CreateApiKey'));
 const DataManagement = lazy(() => import('./modules/federation/DataManagement'));
 const CreditAgreements = lazy(() => import('./modules/federation/CreditAgreements'));
 const Neighborhoods = lazy(() => import('./modules/federation/Neighborhoods'));
+const ExternalPartners = lazy(() => import('./modules/federation/ExternalPartners'));
 
 // Safeguarding module
 const SafeguardingDashboard = lazy(() => import('./modules/safeguarding/SafeguardingDashboard'));
@@ -396,6 +397,7 @@ export function AdminRoutes() {
       <Route path="federation/data" element={<Lazy><DataManagement /></Lazy>} />
       <Route path="federation/credit-agreements" element={<Lazy><CreditAgreements /></Lazy>} />
       <Route path="federation/neighborhoods" element={<Lazy><Neighborhoods /></Lazy>} />
+      <Route path="federation/external-partners" element={<Lazy><ExternalPartners /></Lazy>} />
 
       {/* ─── SAFEGUARDING ─── */}
       <Route path="safeguarding" element={<Lazy><SafeguardingDashboard /></Lazy>} />

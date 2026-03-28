@@ -159,6 +159,30 @@ class FederationJwtService
             return null;
         }
 
+        // Verify audience (aud) claim matches this platform
+        $expectedAudience = config('app.url', '');
+        if (!empty($expectedAudience) && !empty($payload['aud'])) {
+            if ($payload['aud'] !== $expectedAudience) {
+                Log::warning('[FederationJwt] Token audience mismatch', [
+                    'expected' => $expectedAudience,
+                    'got' => $payload['aud'],
+                ]);
+                return null;
+            }
+        }
+
+        // Verify issuer (iss) claim matches expected issuer
+        $expectedIssuer = config('federation.jwt_issuer', config('app.url', ''));
+        if (!empty($expectedIssuer) && !empty($payload['iss'])) {
+            if ($payload['iss'] !== $expectedIssuer) {
+                Log::warning('[FederationJwt] Token issuer mismatch', [
+                    'expected' => $expectedIssuer,
+                    'got' => $payload['iss'],
+                ]);
+                return null;
+            }
+        }
+
         return $payload;
     }
 
@@ -294,12 +318,12 @@ class FederationJwtService
      */
     private static function getSigningSecret(): ?string
     {
-        // Use a dedicated federation secret, falling back to APP_KEY
-        $secret = config('federation.jwt_secret', config('app.key'));
+        $secret = config('federation.jwt_secret');
         if (empty($secret)) {
+            Log::error('[FederationJwt] federation.jwt_secret is not configured — refusing to fall back to APP_KEY');
             return null;
         }
-        // Laravel APP_KEY is prefixed with "base64:" — decode it
+        // Support base64-encoded secrets
         if (str_starts_with($secret, 'base64:')) {
             $secret = base64_decode(substr($secret, 7));
         }

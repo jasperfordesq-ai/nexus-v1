@@ -6,6 +6,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Services\FederationAuditService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
 
@@ -78,6 +79,19 @@ class AdminFederationCreditAgreementsController extends BaseApiController
                     $monthlyLimit,
                     $adminId
                 );
+
+                try {
+                    FederationAuditService::log(
+                        'credit_agreement_created',
+                        $tenantId,
+                        $partnerTenantId,
+                        $adminId,
+                        ['exchange_rate' => $exchangeRate, 'monthly_limit' => $monthlyLimit]
+                    );
+                } catch (\Exception $e) {
+                    // Audit logging failure should not block the operation
+                }
+
                 return $this->respondWithData($agreement, null, 201);
             } catch (\Exception $e) {
                 return $this->respondWithError('CREATE_FAILED', 'Failed to create credit agreement: ' . $e->getMessage());
@@ -94,29 +108,43 @@ class AdminFederationCreditAgreementsController extends BaseApiController
      */
     public function action(int $id, string $action): JsonResponse
     {
-        $this->requireAdmin();
+        $adminId = $this->requireAdmin();
         $tenantId = $this->getTenantId();
 
-        $validActions = ['approve', 'reject', 'suspend', 'activate'];
+        $validActions = ['approve', 'reject', 'suspend', 'activate', 'reactivate', 'terminate'];
         if (!in_array($action, $validActions, true)) {
             return $this->respondWithError('VALIDATION_ERROR', 'Invalid action. Must be one of: ' . implode(', ', $validActions), 'action');
         }
 
         $statusMap = [
-            'approve'  => 'active',
-            'reject'   => 'rejected',
-            'suspend'  => 'suspended',
-            'activate' => 'active',
+            'approve'    => 'active',
+            'reject'     => 'rejected',
+            'suspend'    => 'suspended',
+            'activate'   => 'active',
+            'reactivate' => 'active',
+            'terminate'  => 'terminated',
         ];
 
         try {
             $updated = DB::update(
-                "UPDATE federation_credit_agreements SET status = ?, updated_at = NOW() WHERE id = ? AND (tenant_a_id = ? OR tenant_b_id = ?)",
+                "UPDATE federation_credit_agreements SET status = ?, updated_at = NOW() WHERE id = ? AND (from_tenant_id = ? OR to_tenant_id = ?)",
                 [$statusMap[$action], $id, $tenantId, $tenantId]
             );
 
             if ($updated === 0) {
                 return $this->respondWithError('NOT_FOUND', 'Credit agreement not found', null, 404);
+            }
+
+            try {
+                FederationAuditService::log(
+                    'credit_agreement_' . $action,
+                    $tenantId,
+                    null,
+                    $adminId,
+                    ['agreement_id' => $id, 'new_status' => $statusMap[$action]]
+                );
+            } catch (\Exception $e) {
+                // Audit logging failure should not block the operation
             }
 
             return $this->respondWithData(['success' => true]);
@@ -139,8 +167,8 @@ class AdminFederationCreditAgreementsController extends BaseApiController
             $partners = DB::select(
                 "SELECT fp.*, t.name as partner_name, t.slug as partner_slug
                  FROM federation_partnerships fp
-                 JOIN tenants t ON (CASE WHEN fp.tenant_a_id = ? THEN fp.tenant_b_id ELSE fp.tenant_a_id END) = t.id
-                 WHERE (fp.tenant_a_id = ? OR fp.tenant_b_id = ?) AND fp.status = 'active'",
+                 JOIN tenants t ON (CASE WHEN fp.tenant_id = ? THEN fp.partner_tenant_id ELSE fp.tenant_id END) = t.id
+                 WHERE (fp.tenant_id = ? OR fp.partner_tenant_id = ?) AND fp.status = 'active'",
                 [$tenantId, $tenantId, $tenantId]
             );
 

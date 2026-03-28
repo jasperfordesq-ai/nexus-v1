@@ -45,11 +45,13 @@ class FederationService
             return [];
         }
 
-        return DB::table('users')
-            ->where('tenant_id', $partnerTenantId)
-            ->where('status', 'active')
-            ->where('federation_visible', true)
-            ->select('id', 'name', 'city', 'bio', 'avatar')
+        return DB::table('users as u')
+            ->join('federation_user_settings as fus', 'u.id', '=', 'fus.user_id')
+            ->where('u.tenant_id', $partnerTenantId)
+            ->where('u.status', 'active')
+            ->where('fus.federation_optin', 1)
+            ->where('fus.appear_in_federated_search', 1)
+            ->select('u.id', 'u.name', 'u.city', 'u.bio', 'u.avatar_url as avatar')
             ->limit(min($limit, 100))
             ->get()
             ->map(fn ($r) => (array) $r)

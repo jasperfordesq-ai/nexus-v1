@@ -9,9 +9,9 @@ declare(strict_types=1);
 namespace Tests\Laravel\Unit\Services;
 
 use Tests\Laravel\TestCase;
-use App\Core\Database;
 use App\Core\TenantContext;
 use App\Services\FederationExternalPartnerService;
+use Illuminate\Support\Facades\DB;
 
 /**
  * FederationExternalPartnerService Tests
@@ -28,17 +28,22 @@ class FederationExternalPartnerServiceTest extends \Tests\Laravel\TestCase
     {
         parent::setUpBeforeClass();
 
+        // Boot the Laravel application so facades (DB, Crypt, etc.) are available
+        // before any test instance is created. setUpBeforeClass runs before setUp().
+        $app = require dirname(__DIR__, 4) . '/bootstrap/app.php';
+        $app->make(\Illuminate\Contracts\Console\Kernel::class)->bootstrap();
+
         self::$staticTenantId = 2;
         TenantContext::setById(self::$staticTenantId);
 
         // Create test user for createdBy field
         $timestamp = time();
-        Database::query(
+        DB::insert(
             "INSERT INTO users (tenant_id, email, username, first_name, last_name, name, balance, is_approved, created_at)
              VALUES (?, ?, ?, ?, ?, ?, ?, 1, NOW())",
             [self::$staticTenantId, "ext_partner_test_{$timestamp}@test.com", "ext_partner_test_{$timestamp}", 'Ext', 'Partner', 'Ext Partner', 100]
         );
-        self::$testUserId = (int)Database::getInstance()->lastInsertId();
+        self::$testUserId = (int) DB::getPdo()->lastInsertId();
     }
 
     public static function tearDownAfterClass(): void
@@ -46,15 +51,15 @@ class FederationExternalPartnerServiceTest extends \Tests\Laravel\TestCase
         // Clean up created partner if any
         if (self::$createdPartnerId) {
             try {
-                Database::query("DELETE FROM federation_external_partner_logs WHERE partner_id = ?", [self::$createdPartnerId]);
-                Database::query("DELETE FROM federation_external_partners WHERE id = ?", [self::$createdPartnerId]);
+                DB::delete("DELETE FROM federation_external_partner_logs WHERE partner_id = ?", [self::$createdPartnerId]);
+                DB::delete("DELETE FROM federation_external_partners WHERE id = ?", [self::$createdPartnerId]);
             } catch (\Exception $e) {}
         }
 
         if (self::$testUserId) {
             try {
-                Database::query("DELETE FROM federation_audit_log WHERE actor_user_id = ?", [self::$testUserId]);
-                Database::query("DELETE FROM users WHERE id = ?", [self::$testUserId]);
+                DB::delete("DELETE FROM federation_audit_log WHERE actor_user_id = ?", [self::$testUserId]);
+                DB::delete("DELETE FROM users WHERE id = ?", [self::$testUserId]);
             } catch (\Exception $e) {}
         }
 

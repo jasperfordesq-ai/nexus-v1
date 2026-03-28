@@ -152,7 +152,7 @@ export function FederationMembersPage() {
   }, [federationEnabled]);
 
   // Load members
-  const loadMembers = useCallback(async (append = false) => {
+  const loadMembers = useCallback(async (append = false, cursorParam?: string) => {
     if (!federationEnabled) return;
 
     abortRef.current?.abort();
@@ -174,8 +174,8 @@ export function FederationMembersPage() {
       if (skillsFilter.trim()) params.set('skills', skillsFilter.trim());
       params.set('per_page', ITEMS_PER_PAGE.toString());
 
-      if (append && cursor) {
-        params.set('cursor', cursor);
+      if (append && cursorParam) {
+        params.set('cursor', cursorParam);
       }
 
       const response = await api.get<FederatedMember[]>(
@@ -217,7 +217,7 @@ export function FederationMembersPage() {
         setIsLoadingMore(false);
       }
     }
-  }, [federationEnabled, debouncedQuery, selectedPartner, serviceReach, skillsFilter, cursor]);
+  }, [federationEnabled, debouncedQuery, selectedPartner, serviceReach, skillsFilter]);
   loadMembersRef.current = loadMembers;
 
   // Load on mount and when filters change
@@ -234,8 +234,8 @@ export function FederationMembersPage() {
   // Load more handler
   const handleLoadMore = useCallback(() => {
     if (isLoadingMore || !hasMore) return;
-    loadMembers(true);
-  }, [isLoadingMore, hasMore, loadMembers]);
+    loadMembers(true, cursor);
+  }, [isLoadingMore, hasMore, loadMembers, cursor]);
 
   // Navigation handlers
   const handleViewProfile = useCallback((member: FederatedMember) => {

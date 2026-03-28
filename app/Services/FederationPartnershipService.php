@@ -59,6 +59,9 @@ class FederationPartnershipService
             if ($existing['status'] === 'pending') {
                 return ['success' => false, 'error' => 'Partnership request already pending'];
             }
+            if ($existing['status'] === 'terminated') {
+                return ['success' => false, 'error' => 'Terminated partnerships cannot be re-requested'];
+            }
         }
 
         try {
@@ -155,6 +158,12 @@ class FederationPartnershipService
         if (!$partnership) {
             return ['success' => false, 'error' => 'Partnership not found'];
         }
+
+        $tenantId = TenantContext::getId();
+        if ((int) $partnership['tenant_id'] !== $tenantId && (int) $partnership['partner_tenant_id'] !== $tenantId) {
+            return ['success' => false, 'error' => 'Not authorized to counter-propose on this partnership'];
+        }
+
         if ($partnership['status'] !== 'pending') {
             return ['success' => false, 'error' => 'Partnership is not pending'];
         }
@@ -197,6 +206,12 @@ class FederationPartnershipService
         if (!$partnership) {
             return ['success' => false, 'error' => 'Partnership not found'];
         }
+
+        $tenantId = TenantContext::getId();
+        if ((int) $partnership['tenant_id'] !== $tenantId) {
+            return ['success' => false, 'error' => 'Only the original requester can accept a counter-proposal'];
+        }
+
         if ($partnership['status'] !== 'pending') {
             return ['success' => false, 'error' => 'Partnership is not pending'];
         }
@@ -246,6 +261,9 @@ class FederationPartnershipService
         $partnership = self::getPartnershipById($partnershipId);
         if (!$partnership) {
             return ['success' => false, 'error' => 'Partnership not found'];
+        }
+        if ($partnership['status'] !== 'pending') {
+            return ['success' => false, 'error' => 'Partnership is not pending approval'];
         }
 
         // Only the receiving tenant can reject
@@ -329,6 +347,11 @@ class FederationPartnershipService
             return ['success' => false, 'error' => 'Can only reactivate suspended partnerships'];
         }
 
+        $tenantId = TenantContext::getId();
+        if ((int) $partnership['tenant_id'] !== $tenantId && (int) $partnership['partner_tenant_id'] !== $tenantId) {
+            return ['success' => false, 'error' => 'Only a partner tenant can reactivate this partnership'];
+        }
+
         try {
             DB::table('federation_partnerships')->where('id', $partnershipId)->update([
                 'status' => 'active',
@@ -357,6 +380,11 @@ class FederationPartnershipService
         $partnership = self::getPartnershipById($partnershipId);
         if (!$partnership) {
             return ['success' => false, 'error' => 'Partnership not found'];
+        }
+
+        $tenantId = TenantContext::getId();
+        if ((int) $partnership['tenant_id'] !== $tenantId && (int) $partnership['partner_tenant_id'] !== $tenantId) {
+            return ['success' => false, 'error' => 'Only a partner tenant can terminate this partnership'];
         }
 
         try {
@@ -392,6 +420,11 @@ class FederationPartnershipService
             return ['success' => false, 'error' => 'Partnership not found'];
         }
 
+        $tenantId = TenantContext::getId();
+        if ((int) $partnership['tenant_id'] !== $tenantId && (int) $partnership['partner_tenant_id'] !== $tenantId) {
+            return ['success' => false, 'error' => 'Only a partner tenant can update permissions on this partnership'];
+        }
+
         try {
             DB::table('federation_partnerships')->where('id', $partnershipId)->update([
                 'profiles_enabled' => isset($permissions['profiles']) ? ($permissions['profiles'] ? 1 : 0) : $partnership['profiles_enabled'],
@@ -423,10 +456,10 @@ class FederationPartnershipService
     /**
      * Get partnership by ID.
      */
-    public static function getPartnershipById(int $id): ?array
+    public static function getPartnershipById(int $id, ?int $tenantId = null): ?array
     {
         try {
-            $result = DB::table('federation_partnerships as p')
+            $query = DB::table('federation_partnerships as p')
                 ->leftJoin('tenants as t1', 'p.tenant_id', '=', 't1.id')
                 ->leftJoin('tenants as t2', 'p.partner_tenant_id', '=', 't2.id')
                 ->select(
@@ -434,8 +467,16 @@ class FederationPartnershipService
                     't1.name as tenant_name', 't1.domain as tenant_domain',
                     't2.name as partner_name', 't2.domain as partner_domain'
                 )
-                ->where('p.id', $id)
-                ->first();
+                ->where('p.id', $id);
+
+            if ($tenantId !== null) {
+                $query->where(function ($q) use ($tenantId) {
+                    $q->where('p.tenant_id', $tenantId)
+                      ->orWhere('p.partner_tenant_id', $tenantId);
+                });
+            }
+
+            $result = $query->first();
 
             return $result ? (array) $result : null;
         } catch (\Exception $e) {

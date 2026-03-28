@@ -79,7 +79,11 @@ export function FederationControls() {
       if (res?.success) { toastRef.current.success('Lockdown lifted'); loadData(); }
       else toastRef.current.error('Failed to lift lockdown');
     } else {
-      const res = await adminSuper.emergencyLockdown(lockdownReason || 'Emergency lockdown');
+      if (!lockdownReason.trim()) {
+        toastRef.current.error(t('super.please_provide_a_reason_for_the_lockdown', 'Please provide a reason for the lockdown'));
+        return;
+      }
+      const res = await adminSuper.emergencyLockdown(lockdownReason);
       if (res?.success) { toastRef.current.success('Lockdown activated'); loadData(); }
       else toastRef.current.error('Failed to activate lockdown');
     }

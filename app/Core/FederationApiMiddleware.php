@@ -7,6 +7,8 @@
 namespace App\Core;
 
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Log;
 use App\Services\FederationJwtService;
 
 /**
@@ -78,6 +80,19 @@ class FederationApiMiddleware
 
         if (!$partnerId) {
             self::sendError(401, 'Token missing partner information', 'INVALID_TOKEN');
+            return false;
+        }
+
+        // Verify partner is still active in DB (may have been revoked since token issuance)
+        $dbPartner = DB::selectOne("
+            SELECT id, status FROM federation_api_keys
+            WHERE id = ? AND status = 'active'
+            AND (expires_at IS NULL OR expires_at > NOW())
+        ", [$partnerId]);
+
+        if (!$dbPartner) {
+            Log::warning('[FederationApiMiddleware] JWT partner no longer active in DB', ['partner_id' => $partnerId]);
+            self::sendError(401, 'Partner account has been revoked or suspended', 'PARTNER_REVOKED');
             return false;
         }
 
@@ -231,9 +246,19 @@ class FederationApiMiddleware
      */
     private static function verifyHmacSignature(string $signature, string $secret, string $timestamp): bool
     {
-        $method = $_SERVER['REQUEST_METHOD'];
+        $method = strtoupper($_SERVER['REQUEST_METHOD']);
         $path = $_SERVER['REQUEST_URI'];
         $body = file_get_contents('php://input') ?: '';
+
+        // Check for replay via optional nonce header
+        $nonce = $_SERVER['HTTP_X_FEDERATION_NONCE'] ?? null;
+        if ($nonce) {
+            $cacheKey = "federation_nonce:{$nonce}";
+            if (Cache::has($cacheKey)) {
+                return false; // Replay detected
+            }
+            Cache::put($cacheKey, true, self::TIMESTAMP_TOLERANCE); // TTL matches timestamp tolerance
+        }
 
         $stringToSign = implode("\n", [$method, $path, $timestamp, $body]);
         $expectedSignature = hash_hmac('sha256', $stringToSign, $secret);
@@ -426,41 +451,59 @@ class FederationApiMiddleware
         $currentHour = date('Y-m-d H:00:00');
 
         try {
+            // First, handle hourly reset if needed (separate atomic operation)
+            DB::update("
+                UPDATE federation_api_keys
+                SET hourly_request_count = 0,
+                    rate_limit_hour = ?
+                WHERE id = ? AND (rate_limit_hour IS NULL OR rate_limit_hour != ?)
+            ", [$currentHour, $keyId, $currentHour]);
+
+            // Atomic increment-and-check: only increments if under the rate limit
+            $updated = DB::update("
+                UPDATE federation_api_keys
+                SET hourly_request_count = hourly_request_count + 1
+                WHERE id = ? AND hourly_request_count < rate_limit_per_hour
+            ", [$keyId]);
+
+            if ($updated === 0) {
+                // Either key not found or rate limit exceeded — check which
+                $results = DB::select("
+                    SELECT rate_limit_per_hour, hourly_request_count
+                    FROM federation_api_keys
+                    WHERE id = ?
+                ", [$keyId]);
+
+                $config = $results[0] ?? null;
+                if (!$config) {
+                    return false;
+                }
+
+                $rateLimit = (int) ($config->rate_limit_per_hour ?? 1000);
+                $requestCount = (int) $config->hourly_request_count;
+
+                $resetTime = strtotime($currentHour) + 3600;
+                $remaining = 0;
+
+                header("X-RateLimit-Limit: {$rateLimit}");
+                header("X-RateLimit-Remaining: {$remaining}");
+                header("X-RateLimit-Reset: {$resetTime}");
+
+                $retryAfter = max(1, $resetTime - time());
+                header("Retry-After: {$retryAfter}");
+                return false;
+            }
+
+            // Success — fetch current counts for headers
             $results = DB::select("
-                SELECT
-                    rate_limit,
-                    COALESCE(hourly_request_count, 0) as hourly_request_count,
-                    rate_limit_hour
+                SELECT rate_limit_per_hour, hourly_request_count
                 FROM federation_api_keys
                 WHERE id = ?
             ", [$keyId]);
 
             $config = $results[0] ?? null;
-
-            if (!$config) {
-                return false;
-            }
-
-            $rateLimit = (int) ($config->rate_limit ?? 1000);
-            $storedHour = $config->rate_limit_hour;
-            $requestCount = (int) $config->hourly_request_count;
-
-            if ($storedHour !== $currentHour) {
-                DB::update("
-                    UPDATE federation_api_keys
-                    SET hourly_request_count = 1,
-                        rate_limit_hour = ?
-                    WHERE id = ?
-                ", [$currentHour, $keyId]);
-                $requestCount = 1;
-            } else {
-                DB::update("
-                    UPDATE federation_api_keys
-                    SET hourly_request_count = hourly_request_count + 1
-                    WHERE id = ?
-                ", [$keyId]);
-                $requestCount++;
-            }
+            $rateLimit = (int) ($config->rate_limit_per_hour ?? 1000);
+            $requestCount = (int) ($config->hourly_request_count ?? 1);
         } catch (\PDOException $e) {
             // Fallback for pre-migration schemas
             $results = DB::select("
@@ -487,12 +530,6 @@ class FederationApiMiddleware
         header("X-RateLimit-Limit: {$rateLimit}");
         header("X-RateLimit-Remaining: {$remaining}");
         header("X-RateLimit-Reset: {$resetTime}");
-
-        if ($requestCount > $rateLimit) {
-            $retryAfter = max(1, $resetTime - time());
-            header("Retry-After: {$retryAfter}");
-            return false;
-        }
 
         return true;
     }

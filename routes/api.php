@@ -1083,6 +1083,13 @@ Route::get('/v2/admin/federation/credit-agreements', [\App\Http\Controllers\Api\
 Route::post('/v2/admin/federation/credit-agreements', [\App\Http\Controllers\Api\AdminFederationCreditAgreementsController::class, 'store']);
 Route::post('/v2/admin/federation/credit-agreements/{id}/{action}', [\App\Http\Controllers\Api\AdminFederationCreditAgreementsController::class, 'action']);
 Route::get('/v2/admin/federation/partners', [\App\Http\Controllers\Api\AdminFederationCreditAgreementsController::class, 'partners']);
+// External federation partners
+Route::get('/v2/admin/federation/external-partners', [\App\Http\Controllers\Api\AdminFederationExternalPartnersController::class, 'index']);
+Route::post('/v2/admin/federation/external-partners', [\App\Http\Controllers\Api\AdminFederationExternalPartnersController::class, 'store']);
+Route::put('/v2/admin/federation/external-partners/{id}', [\App\Http\Controllers\Api\AdminFederationExternalPartnersController::class, 'update']);
+Route::delete('/v2/admin/federation/external-partners/{id}', [\App\Http\Controllers\Api\AdminFederationExternalPartnersController::class, 'destroy']);
+Route::post('/v2/admin/federation/external-partners/{id}/health-check', [\App\Http\Controllers\Api\AdminFederationExternalPartnersController::class, 'healthCheck']);
+Route::get('/v2/admin/federation/external-partners/{id}/logs', [\App\Http\Controllers\Api\AdminFederationExternalPartnersController::class, 'logs']);
 // NOTE: Federation user routes moved to auth-only group (not admin-only)
 Route::get('/v2/admin/pages', [\App\Http\Controllers\Api\AdminContentController::class, 'getPages']);
 Route::post('/v2/admin/pages', [\App\Http\Controllers\Api\AdminContentController::class, 'createPage']);
@@ -1623,9 +1630,13 @@ Route::post('/notifications/read', [\App\Http\Controllers\Api\NotificationsContr
 Route::post('/notifications/delete', [\App\Http\Controllers\Api\NotificationsController::class, 'delete']);
 Route::post('/listings/delete', [\App\Http\Controllers\Api\ListingsController::class, 'delete']);
 
+}); // End Route::middleware('auth:sanctum') — Misc/legacy routes
+
 // ============================================
 // MIGRATED ROUTES — Federation API V1
 // Source: httpdocs/routes/federation-api-v1.php
+// These routes use their own fedAuth() method (FederationApiMiddleware)
+// for authentication — they must NOT be inside auth:sanctum.
 // ============================================
 Route::get('/v1/federation', [\App\Http\Controllers\Api\FederationController::class, 'index']);
 Route::get('/v1/federation/timebanks', [\App\Http\Controllers\Api\FederationController::class, 'timebanks']);
@@ -1637,8 +1648,6 @@ Route::post('/v1/federation/messages', [\App\Http\Controllers\Api\FederationCont
 Route::post('/v1/federation/transactions', [\App\Http\Controllers\Api\FederationController::class, 'createTransaction']);
 Route::post('/v1/federation/oauth/token', [\App\Http\Controllers\Api\FederationController::class, 'oauthToken']);
 Route::post('/v1/federation/webhooks/test', [\App\Http\Controllers\Api\FederationController::class, 'testWebhook']);
-
-}); // End Route::middleware('auth:sanctum') — Misc/legacy routes
 
 // ============================================
 // PUBLIC LEGAL DOCUMENT ROUTES — No auth required

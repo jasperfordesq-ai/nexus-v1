@@ -41,7 +41,7 @@ class FederationDirectoryService
             $params = [$currentTenantId];
 
             // Check if tenant has opted into federation directory
-            $query .= " AND (fdp.tenant_id IS NOT NULL OR 1=1)";
+            $query .= " AND fdp.tenant_id IS NOT NULL";
 
             if (!empty($filters['search'])) {
                 $search = '%' . $filters['search'] . '%';
@@ -136,6 +136,7 @@ class FederationDirectoryService
                 "SELECT DISTINCT c.name, c.id, COUNT(DISTINCT l.tenant_id) as tenant_count
                  FROM categories c
                  JOIN listings l ON l.category_id = c.id AND l.status = 'active'
+                 JOIN federation_directory_profiles fdp ON fdp.tenant_id = l.tenant_id
                  GROUP BY c.id, c.name
                  HAVING tenant_count > 1
                  ORDER BY c.name ASC
@@ -177,6 +178,10 @@ class FederationDirectoryService
                 return null;
             }
 
+            $showMembers = (bool) ($row->show_member_count ?? true);
+            $showActivity = (bool) ($row->show_activity_stats ?? false);
+            $showLocation = (bool) ($row->show_location ?? true);
+
             return [
                 'id' => (int) $row->id,
                 'name' => $row->display_name ?: $row->name,
@@ -186,17 +191,17 @@ class FederationDirectoryService
                 'logo_url' => $row->logo_url ?? null,
                 'cover_image_url' => $row->cover_image_url ?? null,
                 'website_url' => $row->website_url ?? null,
-                'country_code' => $row->country_code ?? null,
-                'region' => $row->region ?? null,
-                'city' => $row->city ?? null,
-                'latitude' => $row->latitude ? (float) $row->latitude : null,
-                'longitude' => $row->longitude ? (float) $row->longitude : null,
-                'member_count' => (int) ($row->member_count ?: $row->live_member_count),
-                'active_listings_count' => (int) ($row->active_listings_count ?? 0),
-                'total_hours_exchanged' => (float) ($row->total_hours_exchanged ?? 0),
-                'show_member_count' => (bool) ($row->show_member_count ?? true),
-                'show_activity_stats' => (bool) ($row->show_activity_stats ?? false),
-                'show_location' => (bool) ($row->show_location ?? true),
+                'country_code' => $showLocation ? ($row->country_code ?? null) : null,
+                'region' => $showLocation ? ($row->region ?? null) : null,
+                'city' => $showLocation ? ($row->city ?? null) : null,
+                'latitude' => $showLocation && $row->latitude ? (float) $row->latitude : null,
+                'longitude' => $showLocation && $row->longitude ? (float) $row->longitude : null,
+                'member_count' => $showMembers ? (int) ($row->member_count ?: $row->live_member_count) : null,
+                'active_listings_count' => $showActivity ? (int) ($row->active_listings_count ?? 0) : null,
+                'total_hours_exchanged' => $showActivity ? (float) ($row->total_hours_exchanged ?? 0) : null,
+                'show_member_count' => $showMembers,
+                'show_activity_stats' => $showActivity,
+                'show_location' => $showLocation,
                 'is_active' => (bool) $row->is_active,
                 'created_at' => $row->created_at,
             ];

@@ -322,6 +322,7 @@ function useAdminNav(): NavSection[] {
           { label: t('federation_directory'), href: '/admin/federation/directory', icon: Globe },
           { label: t('federation_analytics'), href: '/admin/federation/analytics', icon: BarChart3 },
           { label: t('federation_api_keys'), href: '/admin/federation/api-keys', icon: Key },
+          { label: t('federation_external_partners'), href: '/admin/federation/external-partners', icon: Globe },
         ],
       });
     }

@@ -104,9 +104,6 @@ class FederationV2Controller extends BaseApiController
             'federation_optin' => true,
             'profile_visible_federated' => true,
             'appear_in_federated_search' => true,
-            'show_skills_federated' => true,
-            'messaging_enabled_federated' => true,
-            'transactions_enabled_federated' => true,
         ]);
 
         $success = $this->federationUserService->updateSettings($userId, $settings);
@@ -526,7 +523,7 @@ class FederationV2Controller extends BaseApiController
             $filterParams = [':tid1' => $tenantId, ':tid2' => $tenantId, ':tid3' => $tenantId];
 
             if (!empty($q)) {
-                $fromWhere .= " AND (u.first_name LIKE :q1 OR u.last_name LIKE :q2 OR u.skills LIKE :q3 OR u.bio LIKE :q4)";
+                $fromWhere .= " AND (u.first_name LIKE :q1 OR u.last_name LIKE :q2 OR (fus.show_skills_federated = 1 AND u.skills LIKE :q3) OR u.bio LIKE :q4)";
                 $searchTerm = "%{$q}%";
                 $filterParams[':q1'] = $searchTerm;
                 $filterParams[':q2'] = $searchTerm;
@@ -546,6 +543,7 @@ class FederationV2Controller extends BaseApiController
                 }
             }
             if (!empty($skills)) {
+                $fromWhere .= " AND fus.show_skills_federated = 1";
                 $skillList = array_map('trim', explode(',', $skills));
                 $skillIdx = 0;
                 foreach ($skillList as $skill) {
@@ -570,7 +568,8 @@ class FederationV2Controller extends BaseApiController
             $params = $filterParams;
             $sql = "SELECT u.id, u.first_name, u.last_name, u.avatar_url, u.bio, u.skills,
                     u.location, u.tenant_id, t.name as tenant_name,
-                    fus.service_reach, fus.messaging_enabled_federated " . $fromWhere;
+                    fus.service_reach, fus.messaging_enabled_federated,
+                    fus.show_skills_federated, fus.show_location_federated " . $fromWhere;
             if ($cursorId) {
                 $sql .= " AND u.id < :cursor_id";
                 $params[':cursor_id'] = (int) $cursorId;
@@ -598,8 +597,8 @@ class FederationV2Controller extends BaseApiController
                     'last_name' => $m['last_name'] ?? '',
                     'avatar' => $m['avatar_url'] ?: null,
                     'bio' => $m['bio'] ?? '',
-                    'skills' => !empty($m['skills']) ? array_map('trim', explode(',', $m['skills'])) : [],
-                    'location' => $m['location'] ?? null,
+                    'skills' => ($m['show_skills_federated'] && !empty($m['skills'])) ? array_map('trim', explode(',', $m['skills'])) : [],
+                    'location' => $m['show_location_federated'] ? ($m['location'] ?? null) : null,
                     'service_reach' => $m['service_reach'] ?? 'local_only',
                     'messaging_enabled' => (bool) ($m['messaging_enabled_federated'] ?? false),
                     'tenant_id' => (int) $m['tenant_id'],
@@ -783,6 +782,15 @@ class FederationV2Controller extends BaseApiController
         $body = $input['body'] ?? '';
         $referenceMessageId = $input['reference_message_id'] ?? null;
 
+        // Verify sender is opted in and has messaging enabled
+        $senderSettings = $this->federationUserService->getUserSettings($userId);
+        if (!($senderSettings['federation_optin'] ?? false)) {
+            return $this->respondWithError('SENDER_NOT_OPTED_IN', 'You must opt in to federation before sending messages.', null, 403);
+        }
+        if (!($senderSettings['messaging_enabled_federated'] ?? false)) {
+            return $this->respondWithError('SENDER_MESSAGING_DISABLED', 'You must enable federated messaging in your settings before sending messages.', null, 403);
+        }
+
         // Validate required fields
         $errors = [];
         if (empty($receiverId)) {
@@ -794,9 +802,19 @@ class FederationV2Controller extends BaseApiController
         if (empty($body)) {
             $errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'Message body is required.', 'field' => 'body'];
         }
+        if (mb_strlen($subject) > 255) {
+            $errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'Subject must not exceed 255 characters.', 'field' => 'subject'];
+        }
+        if (mb_strlen($body) > 10000) {
+            $errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'Message body must not exceed 10,000 characters.', 'field' => 'body'];
+        }
         if (!empty($errors)) {
             return $this->respondWithErrors($errors);
         }
+
+        // Sanitize subject and body to prevent stored XSS
+        $subject = htmlspecialchars($subject, ENT_QUOTES, 'UTF-8');
+        $body = htmlspecialchars($body, ENT_QUOTES, 'UTF-8');
 
         try {
             // Verify the receiver exists and accepts federated messages

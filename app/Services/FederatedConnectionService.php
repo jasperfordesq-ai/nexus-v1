@@ -155,9 +155,10 @@ class FederatedConnectionService
      */
     public function removeConnection(int $connectionId, int $userId): array
     {
+        $tenantId = TenantContext::getId();
         $connection = DB::selectOne(
-            "SELECT * FROM federation_connections WHERE id = ? AND (requester_user_id = ? OR receiver_user_id = ?)",
-            [$connectionId, $userId, $userId]
+            "SELECT * FROM federation_connections WHERE id = ? AND ((requester_user_id = ? AND requester_tenant_id = ?) OR (receiver_user_id = ? AND receiver_tenant_id = ?))",
+            [$connectionId, $userId, $tenantId, $userId, $tenantId]
         );
 
         if (!$connection) {

@@ -6,6 +6,7 @@
 
 namespace App\Services;
 
+use App\Core\TenantContext;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
@@ -26,7 +27,7 @@ class FederatedMessageService
     public static function sendMessage(int $senderId, int $receiverId, int $receiverTenantId, string $subject, string $body): array
     {
         try {
-            $sender = DB::table('users')->where('id', $senderId)->first();
+            $sender = DB::table('users')->where('id', $senderId)->where('tenant_id', TenantContext::getId())->first();
             if (!$sender) {
                 return ['success' => false, 'error' => 'Sender not found'];
             }
@@ -42,6 +43,7 @@ class FederatedMessageService
             // Check sender has opted into federation
             $senderSettings = DB::table('federation_user_settings')
                 ->where('user_id', $senderId)
+                ->where('tenant_id', $sender->tenant_id)
                 ->first();
 
             if (!$senderSettings || !$senderSettings->federation_optin || !$senderSettings->messaging_enabled_federated) {
@@ -67,6 +69,7 @@ class FederatedMessageService
                     $q->where('tenant_id', $receiverTenantId)->where('partner_tenant_id', $senderTenantId);
                 })
                 ->where('status', 'active')
+                ->where('messaging_enabled', 1)
                 ->exists();
             if (!$partnershipActive) {
                 return ['success' => false, 'error' => 'No active federation partnership between tenants'];
@@ -101,10 +104,10 @@ class FederatedMessageService
                 fn ($row) => (array) $row,
                 DB::select(
                     "SELECT * FROM federation_messages
-                     WHERE receiver_user_id = ?
+                     WHERE receiver_user_id = ? AND receiver_tenant_id = ?
                      ORDER BY created_at DESC
                      LIMIT ? OFFSET ?",
-                    [$userId, $limit, $offset]
+                    [$userId, TenantContext::getId(), $limit, $offset]
                 )
             );
         } catch (\Throwable $e) {

@@ -53,6 +53,11 @@ class Kernel extends ConsoleKernel
             ->weekly()
             ->withoutOverlapping()
             ->name('safeguarding-purge-message-copies');
+
+        $schedule->command('federation:purge-external-logs')
+            ->daily()
+            ->withoutOverlapping()
+            ->name('federation-purge-external-logs');
     }
 
     /**
