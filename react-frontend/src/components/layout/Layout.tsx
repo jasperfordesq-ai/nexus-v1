@@ -151,8 +151,17 @@ export function Layout({
  * Auth Layout - simplified layout for auth pages (no navbar/footer)
  */
 export function AuthLayout() {
+  const { t } = useTranslation('common');
   return (
     <div className="min-h-screen max-w-[100vw] flex flex-col overflow-x-clip">
+      {/* Skip navigation — visible on focus only */}
+      <a
+        href="#main-content"
+        className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-[9999] focus:px-4 focus:py-2 focus:bg-primary focus:text-primary-foreground focus:rounded-lg focus:shadow-lg"
+      >
+        {t('accessibility.skip_to_content', 'Skip to main content')}
+      </a>
+
       {/* Background blobs */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none z-0">
         <div className="blob blob-indigo" />
@@ -172,7 +181,7 @@ export function AuthLayout() {
       </div>
 
       {/* Main Content */}
-      <main className="relative z-10 flex-1">
+      <main id="main-content" className="relative z-10 flex-1">
         <Outlet />
       </main>
 

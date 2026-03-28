@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\DB;
  * CookieConsentService — Laravel DI-based service for cookie consent management.
  *
  * Manages GDPR cookie consent recording and validation.
+ * All queries are tenant-scoped to prevent cross-tenant data leakage.
  */
 class CookieConsentService
 {
@@ -19,18 +20,26 @@ class CookieConsentService
     private const DEFAULT_VALIDITY_DAYS = 365;
 
     /**
-     * Get the current consent status for a user or session.
+     * Get the current consent status for a user or IP session.
+     *
+     * Called by CookieConsentController::show().
+     * Tenant-scoped: only returns consent for the given tenant.
      */
-    public function getConsent(?int $userId = null, ?string $sessionId = null): ?array
+    public function getConsent(?int $userId, int $tenantId, ?string $ipAddress = null): ?array
     {
         $query = DB::table('cookie_consents')
-            ->where('expires_at', '>', now())
+            ->where('tenant_id', $tenantId)
+            ->whereNull('withdrawal_date')
+            ->where(function ($q) {
+                $q->whereNull('expires_at')
+                  ->orWhere('expires_at', '>', now());
+            })
             ->orderByDesc('created_at');
 
         if ($userId) {
             $query->where('user_id', $userId);
-        } elseif ($sessionId) {
-            $query->where('session_id', $sessionId);
+        } elseif ($ipAddress) {
+            $query->where('ip_address', $ipAddress);
         } else {
             return null;
         }
@@ -41,17 +50,72 @@ class CookieConsentService
     }
 
     /**
-     * Save cookie consent preferences.
+     * Store cookie consent preferences.
+     *
+     * Called by CookieConsentController::store().
+     * Always records tenant_id, IP address, and user agent for GDPR audit trail.
+     *
+     * @param array{functional?: bool, analytics?: bool, marketing?: bool} $preferences
+     */
+    public function storeConsent(?int $userId, int $tenantId, ?string $ipAddress, array $preferences): array
+    {
+        $expiresAt = now()->addDays(self::DEFAULT_VALIDITY_DAYS);
+
+        $record = [
+            'user_id'         => $userId,
+            'tenant_id'       => $tenantId,
+            'session_id'      => session_id() ?: null,
+            'essential'       => true,
+            'functional'      => $preferences['functional'] ?? false,
+            'analytics'       => $preferences['analytics'] ?? false,
+            'marketing'       => $preferences['marketing'] ?? false,
+            'consent_version' => self::CONSENT_VERSION,
+            'consent_string'  => json_encode($preferences),
+            'ip_address'      => $ipAddress,
+            'user_agent'      => request()->userAgent(),
+            'expires_at'      => $expiresAt,
+            'created_at'      => now(),
+            'updated_at'      => now(),
+        ];
+
+        $id = DB::table('cookie_consents')->insertGetId($record);
+
+        return [
+            'id' => $id,
+            'consent' => [
+                'essential'  => true,
+                'functional' => $record['functional'],
+                'analytics'  => $record['analytics'],
+                'marketing'  => $record['marketing'],
+                'created_at' => (string) $record['created_at'],
+            ],
+        ];
+    }
+
+    /**
+     * Check if a user/IP has any valid (non-expired, non-withdrawn) consent.
+     *
+     * Called by CookieConsentController::check().
+     */
+    public function hasConsent(?int $userId, int $tenantId, ?string $ipAddress = null): bool
+    {
+        $consent = $this->getConsent($userId, $tenantId, $ipAddress);
+        return $consent !== null;
+    }
+
+    /**
+     * Save cookie consent preferences (legacy static-compatible method).
      *
      * @param array{functional?: bool, analytics?: bool, marketing?: bool} $categories
      */
-    public function saveConsent(array $categories, ?int $userId = null, ?string $sessionId = null): bool
+    public function saveConsent(array $categories, ?int $userId = null, ?int $tenantId = null): bool
     {
         $expiresAt = now()->addDays(self::DEFAULT_VALIDITY_DAYS);
 
         DB::table('cookie_consents')->insert([
             'user_id'         => $userId,
-            'session_id'      => $sessionId ?? session_id(),
+            'tenant_id'       => $tenantId,
+            'session_id'      => session_id() ?: null,
             'essential'       => true,
             'functional'      => $categories['functional'] ?? false,
             'analytics'       => $categories['analytics'] ?? false,
@@ -71,9 +135,13 @@ class CookieConsentService
     /**
      * Check if a specific consent category is granted.
      */
-    public function checkCategory(string $category, ?int $userId = null, ?string $sessionId = null): bool
+    public function checkCategory(string $category, ?int $userId = null, ?int $tenantId = null): bool
     {
-        $consent = $this->getConsent($userId, $sessionId);
+        if (!$tenantId) {
+            return $category === 'essential';
+        }
+
+        $consent = $this->getConsent($userId, $tenantId);
 
         if (! $consent) {
             return $category === 'essential';
@@ -114,48 +182,36 @@ class CookieConsentService
     /**
      * Record cookie consent for a user/session.
      */
-    public static function recordConsent(array $categories, ?int $userId = null, ?string $sessionId = null): bool
+    public static function recordConsent(array $categories, ?int $userId = null, ?int $tenantId = null): bool
     {
-        return (new self())->saveConsent($categories, $userId, $sessionId);
+        return (new self())->saveConsent($categories, $userId, $tenantId);
     }
 
     /**
-     * Get the current valid consent for a user/session.
+     * Get the current valid consent for a user within a tenant.
      */
-    public static function getCurrentConsent(?int $userId = null, ?string $sessionId = null): ?array
+    public static function getCurrentConsent(?int $userId = null, ?int $tenantId = null): ?array
     {
-        return (new self())->getConsent($userId, $sessionId);
-    }
-
-    /**
-     * Check if a user/session has any valid consent on record.
-     */
-    public static function hasConsent(?int $userId = null, ?string $sessionId = null): bool
-    {
-        $consent = (new self())->getConsent($userId, $sessionId);
-        return $consent !== null;
-    }
-
-    /**
-     * Update existing consent with new categories.
-     */
-    public static function updateConsent(array $categories, ?int $userId = null, ?string $sessionId = null): bool
-    {
-        return (new self())->saveConsent($categories, $userId, $sessionId);
+        if (!$tenantId) {
+            return null;
+        }
+        return (new self())->getConsent($userId, $tenantId);
     }
 
     /**
      * Withdraw consent by setting withdrawal_date.
      */
-    public static function withdrawConsent(?int $userId = null, ?string $sessionId = null): bool
+    public static function withdrawConsent(?int $userId = null, ?int $tenantId = null): bool
     {
         try {
             $query = DB::table('cookie_consents');
 
+            if ($tenantId) {
+                $query->where('tenant_id', $tenantId);
+            }
+
             if ($userId) {
                 $query->where('user_id', $userId);
-            } elseif ($sessionId) {
-                $query->where('session_id', $sessionId);
             } else {
                 return false;
             }
@@ -213,11 +269,17 @@ class CookieConsentService
 
     /**
      * Get consent statistics for a tenant.
+     *
+     * Tenant-scoped: only counts consent records for the specified tenant.
      */
     public static function getStatistics(?int $tenantId = null): array
     {
         try {
             $query = DB::table('cookie_consents');
+
+            if ($tenantId) {
+                $query->where('tenant_id', $tenantId);
+            }
 
             $total = $query->count();
             $functional = (clone $query)->where('functional', true)->count();
@@ -236,11 +298,15 @@ class CookieConsentService
     }
 
     /**
-     * Get a summary of consent for a user/session.
+     * Get a summary of consent for a user within a tenant.
      */
-    public static function getConsentSummary(?int $userId = null, ?string $sessionId = null): array
+    public static function getConsentSummary(?int $userId = null, ?int $tenantId = null): array
     {
-        $consent = (new self())->getConsent($userId, $sessionId);
+        if (!$tenantId) {
+            return ['has_consent' => false, 'categories' => []];
+        }
+
+        $consent = (new self())->getConsent($userId, $tenantId);
 
         if (!$consent) {
             return ['has_consent' => false, 'categories' => []];

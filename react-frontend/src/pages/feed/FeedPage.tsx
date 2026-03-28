@@ -13,7 +13,7 @@
  * Uses V2 API: POST /api/v2/feed/polls, POST /api/v2/feed/polls/{id}/vote
  */
 
-import { useState, useEffect, useCallback, useRef, Component, type ReactNode, type ErrorInfo } from 'react';
+import { useState, useEffect, useCallback, useRef, Component, type ReactNode, type ErrorInfo, type KeyboardEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
@@ -536,8 +536,15 @@ export function FeedPage() {
 
       {/* Quick Post Box */}
       {isAuthenticated && (
-        <GlassCard className="p-4 hover:border-[var(--color-primary)]/20 transition-colors cursor-pointer" onClick={() => { setComposeDefaultTab("listing"); onCreateOpen(); }}>
-          <div className="flex items-center gap-3">
+        <GlassCard className="p-4 hover:border-[var(--color-primary)]/20 transition-colors">
+          <div
+            className="flex items-center gap-3 cursor-pointer"
+            role="button"
+            tabIndex={0}
+            aria-label={t('whats_on_your_mind')}
+            onClick={() => { setComposeDefaultTab("listing"); onCreateOpen(); }}
+            onKeyDown={(e: KeyboardEvent<HTMLDivElement>) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setComposeDefaultTab("listing"); onCreateOpen(); } }}
+          >
             <Avatar
               name={user?.first_name || 'You'}
               src={resolveAvatarUrl(user?.avatar)}
@@ -607,6 +614,8 @@ export function FeedPage() {
             exit={{ opacity: 0, y: -12 }}
             transition={{ duration: 0.2 }}
             className="sticky top-4 z-20 flex justify-center"
+            role="status"
+            aria-live="polite"
           >
             <Button
               onPress={handleScrollToNewPosts}

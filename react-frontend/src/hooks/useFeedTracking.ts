@@ -15,6 +15,7 @@
 
 import { useRef, useEffect, useCallback } from 'react';
 import { api } from '@/lib/api';
+import { readStoredConsent } from '@/contexts/CookieConsentContext';
 
 /** Set of post IDs already tracked this session (prevents duplicates) */
 const impressedIds = new Set<number>();
@@ -24,6 +25,10 @@ export function useFeedTracking(postId: number, isAuthenticated: boolean) {
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
+    // GDPR: feed tracking is analytics — only fire if user has granted analytics consent
+    const consent = readStoredConsent();
+    if (!consent?.analytics) return;
+
     if (!isAuthenticated || !postId || impressedIds.has(postId)) return;
 
     const el = ref.current;
@@ -62,6 +67,10 @@ export function useFeedTracking(postId: number, isAuthenticated: boolean) {
   }, [postId, isAuthenticated]);
 
   const recordClick = useCallback(() => {
+    // GDPR: click tracking is analytics — only fire if user has granted analytics consent
+    const consent = readStoredConsent();
+    if (!consent?.analytics) return;
+
     if (!isAuthenticated || !postId) return;
     api.post(`/v2/feed/posts/${postId}/click`, {}).catch(() => {});
   }, [postId, isAuthenticated]);

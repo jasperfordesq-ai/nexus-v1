@@ -12,10 +12,11 @@ use Illuminate\Support\Facades\DB;
 
 class CookieConsentServiceTest extends TestCase
 {
-    public function test_getConsent_returns_null_without_user_or_session(): void
+    public function test_getConsent_returns_null_without_user_or_ip(): void
     {
         $service = new CookieConsentService();
-        $result = $service->getConsent(null, null);
+        // No userId and no IP → returns null
+        $result = $service->getConsent(null, 1, null);
         $this->assertNull($result);
     }
 
@@ -23,35 +24,34 @@ class CookieConsentServiceTest extends TestCase
     {
         DB::shouldReceive('table')->with('cookie_consents')->andReturnSelf();
         DB::shouldReceive('where')->andReturnSelf();
+        DB::shouldReceive('whereNull')->andReturnSelf();
+        DB::shouldReceive('orWhere')->andReturnSelf();
         DB::shouldReceive('orderByDesc')->andReturnSelf();
         DB::shouldReceive('first')->andReturnNull();
 
         $service = new CookieConsentService();
-        $result = $service->getConsent(1);
+        $result = $service->getConsent(1, 1);
         $this->assertNull($result);
     }
 
-    public function test_checkCategory_returns_true_for_essential_without_consent(): void
+    public function test_checkCategory_returns_true_for_essential_without_tenant(): void
     {
         $service = new CookieConsentService();
-        // No consent record
-        DB::shouldReceive('table')->with('cookie_consents')->andReturnSelf();
-        DB::shouldReceive('where')->andReturnSelf();
-        DB::shouldReceive('orderByDesc')->andReturnSelf();
-        DB::shouldReceive('first')->andReturnNull();
-
-        $this->assertTrue($service->checkCategory('essential', 1));
+        // No tenantId → always returns true for essential
+        $this->assertTrue($service->checkCategory('essential', 1, null));
     }
 
     public function test_checkCategory_returns_false_for_analytics_without_consent(): void
     {
         DB::shouldReceive('table')->with('cookie_consents')->andReturnSelf();
         DB::shouldReceive('where')->andReturnSelf();
+        DB::shouldReceive('whereNull')->andReturnSelf();
+        DB::shouldReceive('orWhere')->andReturnSelf();
         DB::shouldReceive('orderByDesc')->andReturnSelf();
         DB::shouldReceive('first')->andReturnNull();
 
         $service = new CookieConsentService();
-        $this->assertFalse($service->checkCategory('analytics', 1));
+        $this->assertFalse($service->checkCategory('analytics', 1, 1));
     }
 
     public function test_isConsentValid_returns_false_when_withdrawn(): void
@@ -87,20 +87,20 @@ class CookieConsentServiceTest extends TestCase
     {
         DB::shouldReceive('table')->with('cookie_consents')->andReturnSelf();
         DB::shouldReceive('where')->andReturnSelf();
+        DB::shouldReceive('whereNull')->andReturnSelf();
+        DB::shouldReceive('orWhere')->andReturnSelf();
         DB::shouldReceive('orderByDesc')->andReturnSelf();
         DB::shouldReceive('first')->andReturnNull();
 
-        $this->assertFalse(CookieConsentService::hasConsent(1));
+        // hasConsent requires tenantId as 2nd arg, called via instance
+        $service = new CookieConsentService();
+        $this->assertFalse($service->hasConsent(1, 1));
     }
 
-    public function test_getConsentSummary_returns_no_consent_when_none_exists(): void
+    public function test_getConsentSummary_returns_no_consent_without_tenant(): void
     {
-        DB::shouldReceive('table')->with('cookie_consents')->andReturnSelf();
-        DB::shouldReceive('where')->andReturnSelf();
-        DB::shouldReceive('orderByDesc')->andReturnSelf();
-        DB::shouldReceive('first')->andReturnNull();
-
-        $result = CookieConsentService::getConsentSummary(1);
+        // Without tenantId, returns no consent
+        $result = CookieConsentService::getConsentSummary(1, null);
         $this->assertFalse($result['has_consent']);
     }
 

@@ -341,6 +341,7 @@ export function LoginPage() {
                       initial={{ opacity: 0, y: -10 }}
                       animate={{ opacity: 1, y: 0 }}
                       className="mb-6 p-4 rounded-xl bg-red-500/10 border border-red-500/20 text-sm"
+                      role="alert"
                     >
                       <p className="text-red-600 dark:text-red-400">{error}</p>
                       {/* Resend verification email button */}
@@ -628,6 +629,7 @@ export function LoginPage() {
                       initial={{ opacity: 0, y: -10 }}
                       animate={{ opacity: 1, y: 0 }}
                       className="mb-6 p-4 rounded-xl bg-red-500/10 border border-red-500/20 text-red-600 dark:text-red-400 text-sm"
+                      role="alert"
                     >
                       {error}
                     </motion.div>

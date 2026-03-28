@@ -174,6 +174,7 @@ class CookieConsentController extends BaseApiController
     public function update($id): JsonResponse
     {
         $tenantId = $this->getTenantId();
+        $userId = $this->getOptionalUserId();
         $input = $this->getAllInput();
 
         $categories = [
@@ -183,10 +184,19 @@ class CookieConsentController extends BaseApiController
         ];
 
         try {
-            $updated = DB::table('cookie_consents')
+            // Build query with tenant scope AND user ownership check
+            // Users can only update their own consent records (prevents IDOR)
+            $query = DB::table('cookie_consents')
                 ->where('id', $id)
-                ->where('tenant_id', $tenantId)
-                ->update(array_merge($categories, ['updated_at' => now()]));
+                ->where('tenant_id', $tenantId);
+
+            if ($userId) {
+                $query->where('user_id', $userId);
+            } else {
+                $query->where('ip_address', request()->ip());
+            }
+
+            $updated = $query->update(array_merge($categories, ['updated_at' => now()]));
 
             if ($updated) {
                 $userId = $this->getOptionalUserId();
@@ -224,12 +234,22 @@ class CookieConsentController extends BaseApiController
     public function withdraw($id): JsonResponse
     {
         $tenantId = $this->getTenantId();
+        $userId = $this->getOptionalUserId();
 
         try {
-            $updated = DB::table('cookie_consents')
+            // Build query with tenant scope AND user ownership check
+            // Users can only withdraw their own consent records (prevents IDOR)
+            $query = DB::table('cookie_consents')
                 ->where('id', $id)
-                ->where('tenant_id', $tenantId)
-                ->update(['withdrawal_date' => now()]);
+                ->where('tenant_id', $tenantId);
+
+            if ($userId) {
+                $query->where('user_id', $userId);
+            } else {
+                $query->where('ip_address', request()->ip());
+            }
+
+            $updated = $query->update(['withdrawal_date' => now()]);
 
             if ($updated) {
                 $userId = $this->getOptionalUserId();

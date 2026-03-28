@@ -1479,18 +1479,20 @@ export function ConversationPage() {
         </div>
 
         {/* Typing Indicator */}
-        {isOtherUserTyping && (
-          <div className="px-4 py-2 border-t border-theme-default">
-            <div className="flex items-center gap-2 text-theme-subtle text-sm">
-              <div className="flex gap-1">
-                <span className="w-1.5 h-1.5 bg-indigo-500/60 rounded-full animate-bounce" />
-                <span className="w-1.5 h-1.5 bg-indigo-500/60 rounded-full animate-bounce [animation-delay:150ms]" />
-                <span className="w-1.5 h-1.5 bg-indigo-500/60 rounded-full animate-bounce [animation-delay:300ms]" />
+        <div aria-live="polite" aria-atomic="true">
+          {isOtherUserTyping && (
+            <div className="px-4 py-2 border-t border-theme-default">
+              <div className="flex items-center gap-2 text-theme-subtle text-sm">
+                <div className="flex gap-1" aria-hidden="true">
+                  <span className="w-1.5 h-1.5 bg-indigo-500/60 rounded-full animate-bounce" />
+                  <span className="w-1.5 h-1.5 bg-indigo-500/60 rounded-full animate-bounce [animation-delay:150ms]" />
+                  <span className="w-1.5 h-1.5 bg-indigo-500/60 rounded-full animate-bounce [animation-delay:300ms]" />
+                </div>
+                <span>{t('typing_indicator', { name: other_user.name })}</span>
               </div>
-              <span>{t('typing_indicator', { name: other_user.name })}</span>
             </div>
-          </div>
-        )}
+          )}
+        </div>
 
         {/* Message Input Area */}
         <MessageInputArea
