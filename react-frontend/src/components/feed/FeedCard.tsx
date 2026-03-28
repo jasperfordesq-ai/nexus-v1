@@ -53,7 +53,7 @@ import {
   Zap,
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { GlassCard, ImagePlaceholder } from '@/components/ui';
+import { GlassCard } from '@/components/ui';
 import { useTenant, useToast } from '@/contexts';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
@@ -176,19 +176,6 @@ const typeConfig = {
 
 /* ────────────── Placeholder icon per feed type ────────────── */
 
-import type { LucideIcon } from 'lucide-react';
-
-const feedPlaceholderIcons: Record<string, LucideIcon> = {
-  listing: ShoppingBag,
-  event: Calendar,
-  job: TrendingUp,
-  blog: BookOpen,
-  challenge: Target,
-  volunteer: Heart,
-  goal: Target,
-  review: Star,
-  discussion: Users,
-};
 
 /* ───────────────────────── Comment Item ───────────────────────── */
 
@@ -628,11 +615,7 @@ const FeedCard = React.memo(function FeedCard({
               />
             )}
           </div>
-        ) : item.type !== 'post' && item.type !== 'poll' && (
-          <div className="mb-4 -mx-5 overflow-hidden">
-            <ImagePlaceholder size="md" icon={feedPlaceholderIcons[item.type]} />
-          </div>
-        )}
+        ) : null}
 
         {/* Poll Display */}
         {item.type === 'poll' && (
