@@ -783,7 +783,7 @@ class AdminUsersController extends BaseApiController
             return $this->respondWithError('VALIDATION_ERROR', 'Password must be at least 8 characters', 'password', 422);
         }
 
-        $hashed = password_hash($password, PASSWORD_DEFAULT);
+        $hashed = password_hash($password, PASSWORD_ARGON2ID);
         DB::update("UPDATE users SET password_hash = ? WHERE id = ? AND tenant_id = ?", [$hashed, $id, $tenantId]);
 
         ActivityLog::log($adminId, 'admin_set_password', "Admin set password for user #{$id} ({$user['email']})");
@@ -1166,7 +1166,7 @@ class AdminUsersController extends BaseApiController
 
                 // Create user with random temp password
                 $password = bin2hex(random_bytes(16));
-                $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
+                $hashedPassword = password_hash($password, PASSWORD_ARGON2ID);
 
                 DB::insert(
                     "INSERT INTO users (tenant_id, name, first_name, last_name, email, password_hash, phone, role, status, is_approved, created_at)

@@ -297,6 +297,8 @@ class GdprService
             'connections' => self::getConnectionsData($userId),
             'login_history' => self::getLoginHistoryData($userId),
             'messaging_restrictions' => $this->getMessagingRestrictionsData($userId),
+            'ai_chat_history' => $this->getAiChatData($userId),
+            'reviews' => $this->getReviewsData($userId),
         ];
     }
 
@@ -677,8 +679,8 @@ class GdprService
             "SELECT b.name, b.description, ub.awarded_at
              FROM user_badges ub
              JOIN badges b ON ub.badge_key = b.badge_key AND ub.tenant_id = b.tenant_id
-             WHERE ub.user_id = ?",
-            [$userId]
+             WHERE ub.user_id = ? AND ub.tenant_id = ?",
+            [$userId, $this->tenantId]
         )->fetchAll();
 
         $stats = $this->query(
@@ -733,8 +735,8 @@ class GdprService
             "SELECT u.id, u.first_name, u.last_name, c.created_at
              FROM connections c
              JOIN users u ON (c.user_id = u.id OR c.connected_user_id = u.id) AND u.id != ?
-             WHERE (c.user_id = ? OR c.connected_user_id = ?) AND c.status = 'accepted'",
-            [$userId, $userId, $userId]
+             WHERE (c.user_id = ? OR c.connected_user_id = ?) AND c.tenant_id = ? AND c.status = 'accepted'",
+            [$userId, $userId, $userId, $this->tenantId]
         )->fetchAll();
     }
 
@@ -743,10 +745,10 @@ class GdprService
         return $this->query(
             "SELECT ip_address, user_agent, created_at
              FROM activity_log
-             WHERE user_id = ? AND action = 'login'
+             WHERE user_id = ? AND tenant_id = ? AND action = 'login'
              ORDER BY created_at DESC
              LIMIT 100",
-            [$userId]
+            [$userId, $this->tenantId]
         )->fetchAll();
     }
 
@@ -761,6 +763,37 @@ class GdprService
         )->fetch();
 
         return $row ?: null;
+    }
+
+    private function getAiChatData(int $userId): array
+    {
+        try {
+            return $this->query(
+                "SELECT id, user_message, ai_response, model, created_at
+                 FROM ai_chat_messages
+                 WHERE user_id = ? AND tenant_id = ?
+                 ORDER BY created_at DESC",
+                [$userId, $this->tenantId]
+            )->fetchAll();
+        } catch (\Throwable $e) {
+            return []; // Table may not exist
+        }
+    }
+
+    private function getReviewsData(int $userId): array
+    {
+        try {
+            return $this->query(
+                "SELECT id, reviewer_id, receiver_id, listing_id, rating, comment, created_at,
+                        CASE WHEN reviewer_id = ? THEN 'given' ELSE 'received' END as direction
+                 FROM reviews
+                 WHERE (reviewer_id = ? OR receiver_id = ?) AND tenant_id = ?
+                 ORDER BY created_at DESC",
+                [$userId, $userId, $userId, $this->tenantId]
+            )->fetchAll();
+        } catch (\Throwable $e) {
+            return [];
+        }
     }
 
     // =========================================================================
@@ -822,6 +855,98 @@ class GdprService
             $this->query("DELETE FROM push_subscriptions WHERE user_id = ?", [$userId]);
             $this->query("DELETE FROM fcm_device_tokens WHERE user_id = ?", [$userId]);
 
+            // 3a. Delete AI chat history (GDPR: user content sent to third-party AI)
+            try {
+                $this->query(
+                    "DELETE FROM ai_chat_messages WHERE user_id = ? AND tenant_id = ?",
+                    [$userId, $this->tenantId]
+                );
+            } catch (\Throwable $e) {
+                // Table may not exist on all deployments
+            }
+
+            // 3b. Delete WebAuthn credentials / passkeys
+            try {
+                $this->query(
+                    "DELETE FROM webauthn_credentials WHERE user_id = ?",
+                    [$userId]
+                );
+            } catch (\Throwable $e) {
+                // Table may not exist
+            }
+
+            // 3c. Revoke API tokens (Sanctum personal_access_tokens)
+            try {
+                $this->query(
+                    "DELETE FROM personal_access_tokens WHERE tokenable_type = 'App\\\\Models\\\\User' AND tokenable_id = ?",
+                    [$userId]
+                );
+            } catch (\Throwable $e) {
+                // Table may not exist
+            }
+
+            // 3d. Delete cookie consent records
+            try {
+                $this->query(
+                    "DELETE FROM cookie_consents WHERE user_id = ? AND tenant_id = ?",
+                    [$userId, $this->tenantId]
+                );
+            } catch (\Throwable $e) {
+                // Table may not exist
+            }
+
+            // 3e. Remove connections (personal relationship data)
+            $this->query(
+                "DELETE FROM connections WHERE (user_id = ? OR connected_user_id = ?) AND tenant_id = ?",
+                [$userId, $userId, $this->tenantId]
+            );
+
+            // 3f. Remove group memberships
+            try {
+                $this->query(
+                    "DELETE FROM group_members WHERE user_id = ? AND tenant_id = ?",
+                    [$userId, $this->tenantId]
+                );
+            } catch (\Throwable $e) {
+                // Fallback: group_members may not have tenant_id
+                try {
+                    $this->query("DELETE FROM group_members WHERE user_id = ?", [$userId]);
+                } catch (\Throwable $e2) { /* ignore */ }
+            }
+
+            // 3g. Remove event RSVPs
+            try {
+                $this->query(
+                    "DELETE FROM event_rsvps WHERE user_id = ?",
+                    [$userId]
+                );
+            } catch (\Throwable $e) { /* ignore */ }
+
+            // 3h. Anonymize reviews (preserve review content but remove personal link)
+            try {
+                $this->query(
+                    "UPDATE reviews SET reviewer_id = NULL WHERE reviewer_id = ? AND tenant_id = ?",
+                    [$userId, $this->tenantId]
+                );
+            } catch (\Throwable $e) { /* ignore */ }
+
+            // 3i. Delete TOTP/2FA secrets
+            try {
+                $this->query(
+                    "UPDATE users SET totp_secret = NULL, totp_enabled = 0, totp_backup_codes = NULL
+                     WHERE id = ? AND tenant_id = ?",
+                    [$userId, $this->tenantId]
+                );
+            } catch (\Throwable $e) { /* ignore */ }
+
+            // 3j. Delete user notification preferences
+            try {
+                $this->query(
+                    "DELETE FROM user_notification_preferences WHERE user_id = ?",
+                    [$userId]
+                );
+            } catch (\Throwable $e) { /* ignore */ }
+
             // 4. Soft delete listings
             $this->query(
                 "UPDATE listings SET status = 'deleted', description = '[DELETED]', deleted_at = NOW()
@@ -854,6 +979,44 @@ class GdprService
 
             $this->db->commit();
 
+            // 9. Remove from Meilisearch index (outside transaction — external service)
+            try {
+                $meiliClient = new \Meilisearch\Client(
+                    env('MEILISEARCH_HOST', 'http://meilisearch:7700'),
+                    env('MEILISEARCH_KEY') ?: null,
+                );
+                $meiliClient->index('users')->deleteDocument($userId);
+
+                // Also remove user's listings from the search index
+                $listingIds = $this->query(
+                    "SELECT id FROM listings WHERE user_id = ? AND tenant_id = ?",
+                    [$userId, $this->tenantId]
+                )->fetchAll(\PDO::FETCH_COLUMN);
+
+                foreach ($listingIds as $listingId) {
+                    try {
+                        $meiliClient->index('listings')->deleteDocument($listingId);
+                    } catch (\Throwable $e) { /* ignore individual listing failures */ }
+                }
+            } catch (\Throwable $e) {
+                $this->logger->warning("Meilisearch cleanup failed during account deletion", [
+                    'user_id' => $userId,
+                    'error' => $e->getMessage(),
+                ]);
+            }
+
+            // 10. Purge Redis cache for this user
+            try {
+                $redis = \Illuminate\Support\Facades\Cache::getStore();
+                if (method_exists($redis, 'forget')) {
+                    \Illuminate\Support\Facades\Cache::forget("user:{$userId}");
+                    \Illuminate\Support\Facades\Cache::forget("user_profile:{$userId}");
+                    \Illuminate\Support\Facades\Cache::forget("user_presence:{$userId}");
+                }
+            } catch (\Throwable $e) {
+                // Cache purge is best-effort
+            }
+
             // Log action
             $this->logAction($userId, 'account_deleted', null, null, $adminId, null, [
                 'export_path' => $exportPath,
@@ -870,6 +1033,51 @@ class GdprService
             ]);
             throw $e;
         }
+    }
+
+    // =========================================================================
+    // EXPIRED EXPORT CLEANUP (Data Minimization)
+    // =========================================================================
+
+    /**
+     * Delete expired GDPR export files from disk.
+     *
+     * Exports are set to expire after 7 days (see generateDataExport).
+     * This method should be called periodically (e.g. daily cron) to enforce
+     * data minimization — GDPR Article 5(1)(e) storage limitation.
+     *
+     * @return int Number of expired exports cleaned up
+     */
+    public function cleanupExpiredExports(): int
+    {
+        $expired = $this->query(
+            "SELECT id, export_file_path FROM gdpr_requests
+             WHERE export_file_path IS NOT NULL
+             AND export_expires_at IS NOT NULL
+             AND export_expires_at < NOW()
+             AND status = 'completed'"
+        )->fetchAll();
+
+        $cleaned = 0;
+        foreach ($expired as $row) {
+            $path = $row['export_file_path'];
+            if ($path && file_exists($path)) {
+                @unlink($path);
+                $cleaned++;
+            }
+
+            // Clear the file path in the DB so we don't re-process
+            $this->query(
+                "UPDATE gdpr_requests SET export_file_path = NULL WHERE id = ?",
+                [$row['id']]
+            );
+        }
+
+        if ($cleaned > 0) {
+            $this->logger->info("Cleaned up {$cleaned} expired GDPR export files");
+        }
+
+        return $cleaned;
     }
 
     // =========================================================================

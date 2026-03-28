@@ -10,10 +10,11 @@
 
 import { useState, useCallback, useEffect } from 'react';
 import { Button, Chip } from '@heroui/react';
-import { Key, Plus, RefreshCw } from 'lucide-react';
+import { Key, Plus, RefreshCw, Ban } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { usePageTitle } from '@/hooks';
-import { useTenant } from '@/contexts';
+import { useTenant, useToast } from '@/contexts';
+import { logError } from '@/lib/logger';
 import { adminFederation } from '../../api/adminApi';
 import { DataTable, PageHeader, EmptyState, type Column } from '../../components';
 
@@ -34,8 +35,26 @@ export function ApiKeys() {
   usePageTitle(t('federation.page_title'));
   const navigate = useNavigate();
   const { tenantPath } = useTenant();
+  const toast = useToast();
   const [items, setItems] = useState<ApiKey[]>([]);
   const [loading, setLoading] = useState(true);
+  const [revokingId, setRevokingId] = useState<number | null>(null);
+
+  const handleRevoke = useCallback(async (id: number) => {
+    if (!confirm(t('federation.confirm_revoke', 'Are you sure you want to revoke this API key? This cannot be undone.'))) return;
+    setRevokingId(id);
+    try {
+      const res = await adminFederation.revokeApiKey(id);
+      if (res.success) {
+        toast.success(t('federation.key_revoked', 'API key revoked successfully'));
+        setItems(prev => prev.map(k => k.id === id ? { ...k, status: 'revoked' } : k));
+      }
+    } catch (err) {
+      logError('ApiKeys: failed to revoke key', err);
+      toast.error(t('federation.revoke_failed', 'Failed to revoke API key'));
+    }
+    setRevokingId(null);
+  }, [t, toast]);
 
   const loadData = useCallback(async () => {
     setLoading(true);
@@ -57,6 +76,18 @@ export function ApiKeys() {
 
   useEffect(() => { loadData(); }, [loadData]);
 
+  const getStatusColor = (item: ApiKey): 'success' | 'danger' | 'warning' => {
+    if (item.status === 'revoked') return 'danger';
+    if (item.expires_at && new Date(item.expires_at) < new Date()) return 'warning';
+    return 'success';
+  };
+
+  const getStatusLabel = (item: ApiKey): string => {
+    if (item.status === 'revoked') return t('federation.status_revoked', 'Revoked');
+    if (item.expires_at && new Date(item.expires_at) < new Date()) return t('federation.status_expired', 'Expired');
+    return t('federation.status_active', 'Active');
+  };
+
   const columns: Column<ApiKey>[] = [
     { key: 'name', label: t('federation.col_key_name'), sortable: true },
     {
@@ -66,12 +97,20 @@ export function ApiKeys() {
     {
       key: 'status', label: t('federation.col_status'),
       render: (item) => (
-        <Chip size="sm" variant="flat" color={item.status === 'active' ? 'success' : 'danger'} className="capitalize">{item.status}</Chip>
+        <Chip size="sm" variant="flat" color={getStatusColor(item)} className="capitalize">{getStatusLabel(item)}</Chip>
       ),
     },
     {
       key: 'scopes', label: t('federation.col_scopes'),
       render: (item) => <span className="text-sm text-default-500">{Array.isArray(item.scopes) ? item.scopes.join(', ') : '--'}</span>,
+    },
+    {
+      key: 'expires_at', label: t('federation.col_expires', 'Expires'),
+      render: (item) => {
+        if (!item.expires_at) return <span className="text-sm text-default-400">{t('federation.never_expires', 'Never')}</span>;
+        const isExpired = new Date(item.expires_at) < new Date();
+        return <span className={`text-sm ${isExpired ? 'text-warning' : 'text-default-500'}`}>{new Date(item.expires_at).toLocaleDateString()}</span>;
+      },
     },
     {
       key: 'last_used_at', label: t('federation.col_last_used'),
@@ -80,6 +119,21 @@ export function ApiKeys() {
     {
       key: 'created_at', label: t('federation.col_created'), sortable: true,
       render: (item) => <span className="text-sm text-default-500">{item.created_at ? new Date(item.created_at).toLocaleDateString() : '--'}</span>,
+    },
+    {
+      key: 'actions' as keyof ApiKey, label: '',
+      render: (item) => item.status === 'active' ? (
+        <Button
+          size="sm"
+          variant="flat"
+          color="danger"
+          startContent={<Ban size={14} />}
+          isLoading={revokingId === item.id}
+          onPress={() => handleRevoke(item.id)}
+        >
+          {t('federation.revoke', 'Revoke')}
+        </Button>
+      ) : null,
     },
   ];
 

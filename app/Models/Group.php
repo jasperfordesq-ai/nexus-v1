@@ -30,6 +30,11 @@ class Group extends Model
 
     protected $appends = ['members_count', 'member_count'];
 
+    /**
+     * Attributes hidden from JSON serialization to prevent data leakage.
+     */
+    protected $hidden = ['tenant_id'];
+
     protected $casts = [
         'latitude' => 'float',
         'longitude' => 'float',

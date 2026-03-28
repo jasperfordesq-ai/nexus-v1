@@ -129,7 +129,7 @@ class VolunteerExpenseService
             }
         }
 
-        $query = VolExpense::with(['user', 'organization']);
+        $query = VolExpense::with(['user:id,first_name,last_name,avatar_url', 'organization']);
 
         if (!empty($filters['user_id'])) {
             $query->where('user_id', (int) $filters['user_id']);
@@ -183,7 +183,7 @@ class VolunteerExpenseService
      */
     public static function getExpense(int $id): ?array
     {
-        $expense = VolExpense::with(['user', 'organization'])->find($id);
+        $expense = VolExpense::with(['user:id,first_name,last_name,avatar_url', 'organization'])->find($id);
 
         if (!$expense) {
             return null;

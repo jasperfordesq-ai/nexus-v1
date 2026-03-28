@@ -184,10 +184,12 @@ class UserService
         $like = '%' . $term . '%';
 
         $query = User::query()
+            ->select('id', 'first_name', 'last_name', 'avatar_url', 'organization_name',
+                     'profile_type', 'bio', 'tagline', 'location', 'created_at', 'is_verified',
+                     'xp', 'level', 'status', 'onboarding_completed')
             ->where(function (Builder $q) use ($like) {
                 $q->where('first_name', 'LIKE', $like)
                   ->orWhere('last_name', 'LIKE', $like)
-                  ->orWhere('email', 'LIKE', $like)
                   ->orWhere('organization_name', 'LIKE', $like)
                   ->orWhereRaw("CONCAT(first_name, ' ', last_name) LIKE ?", [$like]);
             })

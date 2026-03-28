@@ -819,6 +819,13 @@ class CronJobRunner
                 });
 
                 $taskNum++;
+                echo "\n[{$taskNum}] GDPR export cleanup (expired files)...\n";
+                echo $this->runSubTask('gdpr-export-cleanup', function () {
+                    $cleaned = (new \App\Services\Enterprise\GdprService())->cleanupExpiredExports();
+                    echo "   GDPR export cleanup complete: {$cleaned} expired files removed.\n";
+                });
+
+                $taskNum++;
                 echo "\n[{$taskNum}] Leaderboard snapshot...\n";
                 echo $this->runSubTask('gamification-leaderboard', fn() => $this->gamificationLeaderboardSnapshotInternal());
             }

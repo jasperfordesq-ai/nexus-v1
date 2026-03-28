@@ -159,19 +159,30 @@ class EmailSettings
     }
 
     /**
-     * Encrypt a value.
+     * Encrypt a value using AES-256-GCM (authenticated encryption).
+     *
+     * Wire format: base64(iv[12] + tag[16] + ciphertext)
+     * Replaces legacy AES-256-CBC (no HMAC) — decrypt() handles both formats.
      */
     private static function encrypt(string $value): string
     {
         $key = self::getEncryptionKey();
-        $iv = random_bytes(16);
-        $encrypted = openssl_encrypt($value, 'AES-256-CBC', $key, OPENSSL_RAW_DATA, $iv);
+        $iv = random_bytes(12);
+        $tag = '';
+        $encrypted = openssl_encrypt($value, 'aes-256-gcm', $key, OPENSSL_RAW_DATA, $iv, $tag);
 
-        return base64_encode($iv . $encrypted);
+        if ($encrypted === false) {
+            throw new \RuntimeException('EmailSettings: encryption failed: ' . openssl_error_string());
+        }
+
+        return base64_encode($iv . $tag . $encrypted);
     }
 
     /**
-     * Decrypt a value.
+     * Decrypt a value. Accepts both GCM (new) and CBC (legacy) wire formats.
+     *
+     * GCM format: base64(iv[12] + tag[16] + ciphertext) — total raw >= 29 bytes
+     * CBC format: base64(iv[16] + ciphertext) — total raw >= 17 bytes, (len-16) % 16 == 0
      */
     private static function decrypt(string $value): ?string
     {
@@ -182,6 +193,24 @@ class EmailSettings
             return $value;
         }
 
+        // Detect format: CBC has iv[16] + ciphertext where ciphertext is a multiple of 16.
+        // GCM has iv[12] + tag[16] + ciphertext. We distinguish by checking if
+        // (length - 16) is a multiple of 16 (CBC) vs trying GCM first.
+        $rawLen = strlen($data);
+
+        // Try GCM first (new format): iv[12] + tag[16] + ciphertext
+        if ($rawLen >= 29) {
+            $gcmIv = substr($data, 0, 12);
+            $gcmTag = substr($data, 12, 16);
+            $gcmCiphertext = substr($data, 28);
+
+            $decrypted = openssl_decrypt($gcmCiphertext, 'aes-256-gcm', $key, OPENSSL_RAW_DATA, $gcmIv, $gcmTag);
+            if ($decrypted !== false) {
+                return $decrypted;
+            }
+        }
+
+        // Fall back to legacy CBC format: iv[16] + ciphertext
         $iv = substr($data, 0, 16);
         $encrypted = substr($data, 16);
 

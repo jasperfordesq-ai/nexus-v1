@@ -76,12 +76,27 @@ class PollService
      */
     public static function getById(int $id, ?int $currentUserId = null): ?array
     {
-        $poll = Poll::query()->with(['user'])->find($id);
+        $poll = Poll::query()
+            ->with(['user:id,first_name,last_name,organization_name,profile_type,avatar_url'])
+            ->find($id);
         if (! $poll) {
             return null;
         }
 
         $data = $poll->toArray();
+
+        // Replace eager-loaded user relation with safe public fields only
+        $pollUser = $poll->user;
+        if ($pollUser) {
+            $data['user'] = [
+                'id'         => $pollUser->id,
+                'name'       => ($pollUser->profile_type === 'organisation' && $pollUser->organization_name)
+                                    ? $pollUser->organization_name
+                                    : trim($pollUser->first_name . ' ' . $pollUser->last_name),
+                'avatar'     => $pollUser->avatar_url,
+                'avatar_url' => $pollUser->avatar_url,
+            ];
+        }
 
         $optionRows = DB::table('poll_options')
             ->where('poll_id', $id)

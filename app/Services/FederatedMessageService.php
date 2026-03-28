@@ -146,6 +146,7 @@ class FederatedMessageService
             $affected = DB::table('federation_messages')
                 ->where('id', $messageId)
                 ->where('receiver_user_id', $userId)
+                ->where('receiver_tenant_id', TenantContext::getId())
                 ->whereIn('status', ['pending', 'delivered', 'unread'])
                 ->update(['status' => 'read', 'read_at' => now()]);
 
@@ -182,6 +183,7 @@ class FederatedMessageService
         try {
             return (int) DB::table('federation_messages')
                 ->where('receiver_user_id', $userId)
+                ->where('receiver_tenant_id', TenantContext::getId())
                 ->whereIn('status', ['pending', 'delivered', 'unread'])
                 ->count();
         } catch (\Throwable $e) {
@@ -255,9 +257,19 @@ class FederatedMessageService
             $body = htmlspecialchars(substr($body, 0, 10000), ENT_QUOTES, 'UTF-8');
             $externalMessageId = $externalMessageId ? htmlspecialchars(substr($externalMessageId, 0, 255), ENT_QUOTES, 'UTF-8') : null;
 
-            $receiver = DB::table('users')->where('id', $receiverUserId)->first();
+            $receiver = DB::table('users')->where('id', $receiverUserId)->where('status', 'active')->first();
             if (!$receiver) {
                 return ['success' => false, 'error' => 'Receiver not found'];
+            }
+
+            // FED-001: Verify receiver has opted into federated messaging
+            $receiverOptIn = DB::table('federation_user_settings')
+                ->where('user_id', $receiverUserId)
+                ->where('federation_optin', 1)
+                ->where('messaging_enabled_federated', 1)
+                ->exists();
+            if (!$receiverOptIn) {
+                return ['success' => false, 'error' => 'Receiver has not opted into federated messaging'];
             }
 
             $messageId = DB::table('federation_messages')->insertGetId([

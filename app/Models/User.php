@@ -34,6 +34,8 @@ class User extends Authenticatable
     protected $hidden = [
         'password_hash', 'totp_secret', 'totp_backup_codes',
         'remember_token', 'api_token', 'verification_token', 'two_factor_secret',
+        'tenant_id', 'is_god', 'is_super_admin', 'is_tenant_super_admin',
+        'balance', 'notification_preferences',
     ];
 
     protected $appends = ['avatar', 'tagline'];
@@ -242,7 +244,7 @@ class User extends Authenticatable
         $firstName = $data['first_name'] ?? '';
         $lastName = $data['last_name'] ?? '';
         $password = $data['password'] ?? '';
-        $hash = password_hash($password, PASSWORD_DEFAULT);
+        $hash = password_hash($password, PASSWORD_ARGON2ID);
 
         $userId = DB::table('users')->insertGetId([
             'tenant_id' => $tenantId,

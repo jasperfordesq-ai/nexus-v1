@@ -49,6 +49,11 @@ class Listing extends Model
         'featured_until',
     ];
 
+    /**
+     * Attributes hidden from JSON serialization to prevent data leakage.
+     */
+    protected $hidden = ['tenant_id'];
+
     protected $casts = [
         'sdg_goals' => 'array',
         'latitude' => 'float',

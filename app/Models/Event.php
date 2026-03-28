@@ -28,6 +28,11 @@ class Event extends Model
         'allow_remote_attendance',
     ];
 
+    /**
+     * Attributes hidden from JSON serialization to prevent data leakage.
+     */
+    protected $hidden = ['tenant_id'];
+
     protected $casts = [
         'latitude' => 'float',
         'longitude' => 'float',

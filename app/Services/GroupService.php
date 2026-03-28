@@ -124,7 +124,7 @@ class GroupService
     {
         /** @var Group|null $group */
         $group = Group::query()
-            ->with(['creator'])
+            ->with(['creator:id,first_name,last_name,organization_name,profile_type,avatar_url'])
             ->withCount('activeMembers')
             ->find($id);
 
@@ -134,6 +134,19 @@ class GroupService
 
         $data = $group->toArray();
         $data = self::enrichGroupData($data, $group);
+
+        // Replace eager-loaded creator relation with safe public fields only
+        $creator = $group->creator;
+        if ($creator) {
+            $data['creator'] = [
+                'id'         => $creator->id,
+                'name'       => ($creator->profile_type === 'organisation' && $creator->organization_name)
+                                    ? $creator->organization_name
+                                    : trim($creator->first_name . ' ' . $creator->last_name),
+                'avatar'     => $creator->avatar_url,
+                'avatar_url' => $creator->avatar_url,
+            ];
+        }
 
         if ($currentUserId) {
             $membership = DB::table('group_members')

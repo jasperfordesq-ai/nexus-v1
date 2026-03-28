@@ -415,7 +415,11 @@ class ListingService
     public static function getById(int $id, bool $includeDeleted = false, ?int $currentUserId = null): ?array
     {
         $query = Listing::query()
-            ->with(['user', 'category', 'skillTags']);
+            ->with([
+                'user:id,first_name,last_name,organization_name,profile_type,avatar_url,tagline',
+                'category',
+                'skillTags',
+            ]);
 
         if (! $includeDeleted) {
             $query->where(function (Builder $q) {
@@ -430,18 +434,32 @@ class ListingService
             return null;
         }
 
+        // Draft/pending/suspended listings are only visible to their owner
+        $listingStatus = $listing->status ?? 'active';
+        if (!in_array($listingStatus, ['active', null], true) && $listing->user_id !== $currentUserId) {
+            return null;
+        }
+
         $data = $listing->toArray();
 
-        // Author info
+        // Author info — replace the eager-loaded user relation with safe public fields only
         $user = $listing->user;
         if ($user) {
             $data['author_name'] = ($user->profile_type === 'organisation' && $user->organization_name)
                 ? $user->organization_name
                 : trim($user->first_name . ' ' . $user->last_name);
             $data['author_avatar'] = $user->avatar_url ?? null;
+            $data['user'] = [
+                'id'         => $user->id,
+                'name'       => $data['author_name'],
+                'avatar'     => $user->avatar_url,
+                'avatar_url' => $user->avatar_url,
+                'tagline'    => $user->tagline,
+            ];
         } else {
             $data['author_name'] = 'Unknown User';
             $data['author_avatar'] = null;
+            $data['user'] = null;
         }
 
         // Category

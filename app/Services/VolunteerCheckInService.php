@@ -339,7 +339,7 @@ class VolunteerCheckInService
     {
         $this->clearErrors();
 
-        $checkin = VolShiftCheckin::with(['shift', 'user'])
+        $checkin = VolShiftCheckin::with(['shift', 'user:id,first_name,last_name,avatar_url'])
             ->where('qr_token', $token)
             ->where('tenant_id', TenantContext::getId())
             ->first();

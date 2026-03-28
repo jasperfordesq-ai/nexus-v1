@@ -38,6 +38,7 @@ class FederationService
      */
     public function getMembers(int $tenantId, int $partnerTenantId, int $limit = 20): array
     {
+        // FED-009: Check profiles_enabled on partnership to enforce permission boundaries
         $partnershipActive = DB::table('federation_partnerships')
             ->where(function ($q) use ($tenantId, $partnerTenantId) {
                 $q->where(function ($q2) use ($tenantId, $partnerTenantId) {
@@ -47,6 +48,7 @@ class FederationService
                 });
             })
             ->where('status', 'active')
+            ->where('profiles_enabled', 1)
             ->exists();
 
         if (! $partnershipActive) {
@@ -71,6 +73,7 @@ class FederationService
      */
     public function getListings(int $tenantId, int $partnerTenantId, int $limit = 20): array
     {
+        // Check listings_enabled on partnership
         $partnershipActive = DB::table('federation_partnerships')
             ->where(function ($q) use ($tenantId, $partnerTenantId) {
                 $q->where(function ($q2) use ($tenantId, $partnerTenantId) {
@@ -80,6 +83,7 @@ class FederationService
                 });
             })
             ->where('status', 'active')
+            ->where('listings_enabled', 1)
             ->exists();
 
         if (! $partnershipActive) {

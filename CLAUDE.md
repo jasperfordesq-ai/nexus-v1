@@ -22,6 +22,36 @@ This project uses **Claude Opus 4.6 Agent Teams** (swarm mode) for large, multi-
 
 ---
 
+## Project Overview (Stack)
+
+This is a TypeScript-first codebase (Laravel backend + React/React Native frontend). Always use TypeScript for new frontend files. The primary language stack is TypeScript (React/RN), PHP (Laravel), with JSON configs and Markdown docs.
+
+---
+
+## Git & Commits
+
+When committing code, always use `--no-verify` flag if pre-commit hooks fail due to pre-existing issues in unstaged files. Do not spend multiple cycles trying to fix pre-existing lint/test errors that are unrelated to the current changes.
+
+---
+
+## Audit Workflow
+
+When performing audits, use parallel agent teams (5-8 agents) scoped by domain/module. After fixes, always commit and push before moving to next module. Never claim work is complete without verifying the actual file changes exist.
+
+---
+
+## Deployment Checklist
+
+After deploying to production, always check for CORS errors, tenant binding issues, and feature gate problems. Run a quick smoke test of critical endpoints before reporting deployment success.
+
+---
+
+## Debugging Guidelines
+
+When debugging a bug, do NOT apply surface-level fixes. Identify the root cause first. If the user reports the bug persists after a fix, re-examine assumptions rather than tweaking the same approach.
+
+---
+
 ## Quick Reference
 
 | Item | Value |

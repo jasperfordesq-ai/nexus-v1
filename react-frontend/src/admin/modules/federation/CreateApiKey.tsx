@@ -10,7 +10,7 @@
 
 import { useState } from 'react';
 import { Card, CardBody, CardHeader, Input, Button, Checkbox } from '@heroui/react';
-import { Key, ArrowLeft, Copy } from 'lucide-react';
+import { Key, ArrowLeft, Copy, Calendar } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { usePageTitle } from '@/hooks';
 import { useTenant, useToast } from '@/contexts';
@@ -19,7 +19,18 @@ import { adminFederation } from '../../api/adminApi';
 import { PageHeader } from '../../components';
 
 import { useTranslation } from 'react-i18next';
-const AVAILABLE_SCOPES = ['read:users', 'read:listings', 'read:transactions', 'write:messages', 'write:transactions'];
+
+/** Scopes must match the `fedAuth('...')` permission strings in FederationController.php */
+const AVAILABLE_SCOPES = [
+  { key: 'timebanks:read', description: 'View partner timebanks' },
+  { key: 'members:read', description: 'Search and view member profiles' },
+  { key: 'listings:read', description: 'Search and view listings' },
+  { key: 'messages:write', description: 'Send cross-community messages' },
+  { key: 'transactions:write', description: 'Create time credit transfers' },
+  { key: 'reviews:read', description: 'Read cross-community reviews' },
+  { key: 'reviews:write', description: 'Write cross-community reviews' },
+  { key: 'webhooks:write', description: 'Test webhook connectivity' },
+];
 
 export function CreateApiKey() {
   const { t } = useTranslation('admin');
@@ -29,6 +40,7 @@ export function CreateApiKey() {
   const toast = useToast();
   const [name, setName] = useState('');
   const [scopes, setScopes] = useState<string[]>([]);
+  const [expiresAt, setExpiresAt] = useState<string>('');
   const [saving, setSaving] = useState(false);
   const [createdKey, setCreatedKey] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
@@ -41,7 +53,11 @@ export function CreateApiKey() {
     if (!name.trim()) return;
     setSaving(true);
     try {
-      const res = await adminFederation.createApiKey({ name, scopes });
+      const res = await adminFederation.createApiKey({
+        name,
+        scopes,
+        expires_at: expiresAt || undefined,
+      });
       if (res.success && res.data) {
         const payload = res.data as unknown;
         let d: { api_key?: string };
@@ -106,11 +122,29 @@ export function CreateApiKey() {
             <p className="text-sm font-medium mb-2">{t('federation.scopes')}</p>
             <div className="space-y-2">
               {AVAILABLE_SCOPES.map(scope => (
-                <Checkbox key={scope} isSelected={scopes.includes(scope)} onValueChange={() => toggleScope(scope)}>
-                  <code className="text-xs">{scope}</code>
+                <Checkbox key={scope.key} isSelected={scopes.includes(scope.key)} onValueChange={() => toggleScope(scope.key)}>
+                  <span className="flex items-center gap-2">
+                    <code className="text-xs bg-default-100 px-1.5 py-0.5 rounded">{scope.key}</code>
+                    <span className="text-xs text-default-500">{scope.description}</span>
+                  </span>
                 </Checkbox>
               ))}
             </div>
+          </div>
+          <div>
+            <p className="text-sm font-medium mb-2 flex items-center gap-1.5">
+              <Calendar size={14} />
+              {t('federation.expiry_date', 'Expiry Date')}
+              <span className="text-default-400 font-normal">({t('federation.optional', 'optional')})</span>
+            </p>
+            <Input
+              type="date"
+              variant="bordered"
+              value={expiresAt}
+              onValueChange={setExpiresAt}
+              min={new Date(Date.now() + 86400000).toISOString().split('T')[0]}
+              description={t('federation.expiry_description', 'Leave blank for a key that never expires. Expired keys are automatically deactivated.')}
+            />
           </div>
           <div className="flex justify-end gap-2 pt-2">
             <Button variant="flat" onPress={() => navigate(tenantPath('/admin/federation/api-keys'))}>{t('federation.cancel')}</Button>

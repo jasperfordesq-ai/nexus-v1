@@ -130,7 +130,12 @@ class EventService
     {
         /** @var Event|null $event */
         $event = Event::query()
-            ->with(['user', 'category', 'group', 'rsvps.user:id,first_name,last_name,avatar_url'])
+            ->with([
+                'user:id,first_name,last_name,organization_name,profile_type,avatar_url',
+                'category',
+                'group',
+                'rsvps.user:id,first_name,last_name,avatar_url',
+            ])
             ->find($id);
 
         if (! $event) {
@@ -138,6 +143,19 @@ class EventService
         }
 
         $data = $event->toArray();
+
+        // Replace eager-loaded user relation with safe public fields only
+        $eventUser = $event->user;
+        if ($eventUser) {
+            $data['user'] = [
+                'id'         => $eventUser->id,
+                'name'       => ($eventUser->profile_type === 'organisation' && $eventUser->organization_name)
+                                    ? $eventUser->organization_name
+                                    : trim($eventUser->first_name . ' ' . $eventUser->last_name),
+                'avatar'     => $eventUser->avatar_url,
+                'avatar_url' => $eventUser->avatar_url,
+            ];
+        }
         $goingCount = $event->rsvps->where('status', 'going')->count();
         $interestedCount = $event->rsvps->where('status', 'interested')->count();
         $maxAttendees = $event->max_attendees;

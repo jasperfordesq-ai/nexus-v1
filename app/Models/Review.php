@@ -24,6 +24,11 @@ class Review extends Model
         'group_id', 'rating', 'comment', 'status',
     ];
 
+    /**
+     * Attributes hidden from JSON serialization to prevent data leakage.
+     */
+    protected $hidden = ['tenant_id'];
+
     protected $casts = [
         'rating' => 'integer',
     ];

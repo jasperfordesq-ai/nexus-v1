@@ -1038,8 +1038,11 @@ export const adminFederation = {
 
   getApiKeys: () => api.get<Array<{ id: number; name: string; key_prefix: string; scopes: string[]; created_at: string; last_used_at?: string }>>('/v2/admin/federation/api-keys'),
 
-  createApiKey: (data: { name: string; scopes?: string[] }) =>
+  createApiKey: (data: { name: string; scopes?: string[]; expires_at?: string }) =>
     api.post<{ id: number; key: string; name: string }>('/v2/admin/federation/api-keys', data),
+
+  revokeApiKey: (id: number) =>
+    api.post<{ success: boolean }>(`/v2/admin/federation/api-keys/${id}/revoke`, {}),
 
   getDataManagement: () => api.get<{ export_formats: string[]; available_exports: Record<string, string>; import_supported: boolean; last_export_at: string | null; last_import_at: string | null }>('/v2/admin/federation/data'),
 

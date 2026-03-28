@@ -241,7 +241,7 @@ class RegistrationPolicyService
      */
     public static function encryptConfig(array $config): string
     {
-        $key = \App\Core\Env::get('APP_KEY');
+        $key = self::deriveEncryptionKey();
         if (!$key) {
             // Fallback: store as JSON (not ideal but prevents data loss)
             error_log('[RegistrationPolicyService] APP_KEY not set — storing provider_config as plaintext JSON');
@@ -264,8 +264,8 @@ class RegistrationPolicyService
      */
     public static function decryptConfig(string $encrypted): array
     {
-        $key = \App\Core\Env::get('APP_KEY');
-        if (!$key) {
+        $derivedKey = self::deriveEncryptionKey();
+        if (!$derivedKey) {
             // Try JSON decode as fallback
             $decoded = json_decode($encrypted, true);
             return is_array($decoded) ? $decoded : [];
@@ -280,7 +280,17 @@ class RegistrationPolicyService
         $tag = substr($raw, 12, 16);
         $ciphertext = substr($raw, 28);
 
-        $plaintext = openssl_decrypt($ciphertext, 'aes-256-gcm', $key, OPENSSL_RAW_DATA, $iv, $tag);
+        // Try derived key first (new format)
+        $plaintext = openssl_decrypt($ciphertext, 'aes-256-gcm', $derivedKey, OPENSSL_RAW_DATA, $iv, $tag);
+
+        // Backward compatibility: try raw APP_KEY for data encrypted before the fix
+        if ($plaintext === false) {
+            $rawKey = \App\Core\Env::get('APP_KEY');
+            if ($rawKey) {
+                $plaintext = openssl_decrypt($ciphertext, 'aes-256-gcm', $rawKey, OPENSSL_RAW_DATA, $iv, $tag);
+            }
+        }
+
         if ($plaintext === false) {
             error_log('[RegistrationPolicyService] Failed to decrypt provider_config');
             return [];
@@ -288,5 +298,23 @@ class RegistrationPolicyService
 
         $decoded = json_decode($plaintext, true);
         return is_array($decoded) ? $decoded : [];
+    }
+
+    /**
+     * Derive a consistent 32-byte encryption key from APP_KEY.
+     *
+     * AES-256-GCM requires exactly 32 bytes. APP_KEY may be a "base64:..." string
+     * of variable length, so we hash it to get a consistent 32-byte key.
+     *
+     * @return string|null 32-byte binary key, or null if APP_KEY is not set
+     */
+    private static function deriveEncryptionKey(): ?string
+    {
+        $appKey = \App\Core\Env::get('APP_KEY');
+        if (!$appKey) {
+            return null;
+        }
+
+        return hash('sha256', $appKey, true);
     }
 }

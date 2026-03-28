@@ -296,7 +296,11 @@ class FederationController extends BaseApiController
                 'GET /api/v1/federation/members/{id}' => 'Get member profile',
                 'GET /api/v1/federation/listings' => 'Search federated listings',
                 'GET /api/v1/federation/listings/{id}' => 'Get listing details',
+                'GET /api/v1/federation/messages' => 'Retrieve federated messages',
                 'POST /api/v1/federation/messages' => 'Send federated message',
+                'GET /api/v1/federation/reviews' => 'Get federated reviews for a user',
+                'POST /api/v1/federation/reviews' => 'Create federated review',
+                'GET /api/v1/federation/transactions/{id}' => 'Get transaction status',
                 'POST /api/v1/federation/transactions' => 'Initiate time credit transfer',
             ],
         ]);
@@ -370,10 +374,11 @@ class FederationController extends BaseApiController
                     WHERE u.tenant_id = ? AND fus.federation_optin = 1 AND fus.appear_in_federated_search = 1 AND u.status = 'active'";
             $params = [$partnerTenantId];
         } else {
+            // FED-005: Check profiles_enabled on partnership to enforce permission boundaries
             $sql = "SELECT SQL_CALC_FOUND_ROWS u.id, u.username, u.first_name, u.last_name, u.avatar_url as avatar, u.location, u.bio, u.skills, u.created_at, u.tenant_id, fus.service_reach, t.name as timebank_name
                     FROM users u JOIN federation_user_settings fus ON fus.user_id = u.id JOIN tenants t ON t.id = u.tenant_id
                     JOIN federation_partnerships fp ON ((fp.tenant_id = ? AND fp.partner_tenant_id = u.tenant_id) OR (fp.partner_tenant_id = ? AND fp.tenant_id = u.tenant_id))
-                    WHERE fus.federation_optin = 1 AND fus.appear_in_federated_search = 1 AND fp.status = 'active' AND u.tenant_id != ?";
+                    WHERE fus.federation_optin = 1 AND fus.appear_in_federated_search = 1 AND fp.status = 'active' AND fp.profiles_enabled = 1 AND u.tenant_id != ?";
             $params = [$partnerTenantId, $partnerTenantId, $partnerTenantId];
         }
 
@@ -427,12 +432,13 @@ class FederationController extends BaseApiController
             ");
             $stmt->execute([$id, $partnerTenantId]);
         } else {
+            // FED-005: Also check profiles_enabled on partnership
             $stmt = $db->prepare("
                 SELECT u.id, u.username, u.first_name, u.last_name, u.avatar_url as avatar, u.location, u.bio, u.skills, u.created_at, u.tenant_id,
                        fus.service_reach, fus.messaging_enabled_federated, fus.transactions_enabled_federated, t.name as timebank_name
                 FROM users u JOIN federation_user_settings fus ON fus.user_id = u.id JOIN tenants t ON t.id = u.tenant_id
                 JOIN federation_partnerships fp ON ((fp.tenant_id = ? AND fp.partner_tenant_id = u.tenant_id) OR (fp.partner_tenant_id = ? AND fp.tenant_id = u.tenant_id))
-                WHERE u.id = ? AND fus.federation_optin = 1 AND fus.profile_visible_federated = 1 AND fp.status = 'active'
+                WHERE u.id = ? AND fus.federation_optin = 1 AND fus.profile_visible_federated = 1 AND fp.status = 'active' AND fp.profiles_enabled = 1
             ");
             $stmt->execute([$partnerTenantId, $partnerTenantId, $id]);
         }
@@ -479,10 +485,11 @@ class FederationController extends BaseApiController
                     WHERE l.status = 'active' AND l.tenant_id = ? AND fus.federation_optin = 1";
             $params = [$partnerTenantId];
         } else {
+            // FED-006: Check listings_enabled on partnership to enforce permission boundaries
             $sql = "SELECT SQL_CALC_FOUND_ROWS l.id, l.title, l.description, l.type, l.category_id, c.name as category_name, l.price as rate, l.created_at, l.user_id, u.first_name, u.last_name, u.avatar_url as avatar, l.tenant_id, t.name as timebank_name
                     FROM listings l JOIN users u ON u.id = l.user_id JOIN tenants t ON t.id = l.tenant_id JOIN federation_user_settings fus ON fus.user_id = l.user_id LEFT JOIN categories c ON c.id = l.category_id
                     JOIN federation_partnerships fp ON ((fp.tenant_id = ? AND fp.partner_tenant_id = l.tenant_id) OR (fp.partner_tenant_id = ? AND fp.tenant_id = l.tenant_id))
-                    WHERE l.status = 'active' AND fus.federation_optin = 1 AND fp.status = 'active' AND l.tenant_id != ?";
+                    WHERE l.status = 'active' AND fus.federation_optin = 1 AND fp.status = 'active' AND fp.listings_enabled = 1 AND l.tenant_id != ?";
             $params = [$partnerTenantId, $partnerTenantId, $partnerTenantId];
         }
 
@@ -529,11 +536,12 @@ class FederationController extends BaseApiController
             ");
             $stmt->execute([$id, $partnerTenantId]);
         } else {
+            // FED-006: Also check listings_enabled on partnership
             $stmt = $db->prepare("
                 SELECT l.id, l.title, l.description, l.type, l.status, l.category_id, c.name as category_name, l.price, l.user_id, l.tenant_id, l.created_at, l.updated_at, u.first_name, u.last_name, u.avatar_url as avatar, u.location, t.name as timebank_name
                 FROM listings l JOIN users u ON u.id = l.user_id JOIN tenants t ON t.id = l.tenant_id JOIN federation_user_settings fus ON fus.user_id = l.user_id LEFT JOIN categories c ON c.id = l.category_id
                 JOIN federation_partnerships fp ON ((fp.tenant_id = ? AND fp.partner_tenant_id = l.tenant_id) OR (fp.partner_tenant_id = ? AND fp.tenant_id = l.tenant_id))
-                WHERE l.id = ? AND l.status = 'active' AND fus.federation_optin = 1 AND fp.status = 'active'
+                WHERE l.id = ? AND l.status = 'active' AND fus.federation_optin = 1 AND fp.status = 'active' AND fp.listings_enabled = 1
             ");
             $stmt->execute([$partnerTenantId, $partnerTenantId, $id]);
         }
@@ -582,7 +590,8 @@ class FederationController extends BaseApiController
             $stmt = $db->prepare("SELECT u.id, u.first_name, u.tenant_id, fus.messaging_enabled_federated FROM users u JOIN federation_user_settings fus ON fus.user_id = u.id WHERE u.id = ? AND u.tenant_id = ? AND fus.federation_optin = 1 AND u.status = 'active'");
             $stmt->execute([$input['recipient_id'], $partnerTenantId]);
         } else {
-            $stmt = $db->prepare("SELECT u.id, u.first_name, u.tenant_id, fus.messaging_enabled_federated FROM users u JOIN federation_user_settings fus ON fus.user_id = u.id JOIN federation_partnerships fp ON ((fp.tenant_id = ? AND fp.partner_tenant_id = u.tenant_id) OR (fp.partner_tenant_id = ? AND fp.tenant_id = u.tenant_id)) WHERE u.id = ? AND fus.federation_optin = 1 AND fp.status = 'active'");
+            // FED-004: Check messaging_enabled on partnership to prevent bypass
+            $stmt = $db->prepare("SELECT u.id, u.first_name, u.tenant_id, fus.messaging_enabled_federated FROM users u JOIN federation_user_settings fus ON fus.user_id = u.id JOIN federation_partnerships fp ON ((fp.tenant_id = ? AND fp.partner_tenant_id = u.tenant_id) OR (fp.partner_tenant_id = ? AND fp.tenant_id = u.tenant_id)) WHERE u.id = ? AND fus.federation_optin = 1 AND fp.status = 'active' AND fp.messaging_enabled = 1");
             $stmt->execute([$partnerTenantId, $partnerTenantId, $input['recipient_id']]);
         }
 
@@ -597,8 +606,12 @@ class FederationController extends BaseApiController
             return $this->fedError(403, 'Recipient is not currently accepting messages', 'RECIPIENT_UNAVAILABLE');
         }
 
+        // FED-007: Sanitize external input to prevent stored XSS
+        $sanitizedSubject = htmlspecialchars(substr($input['subject'], 0, 500), ENT_QUOTES, 'UTF-8');
+        $sanitizedBody = htmlspecialchars(substr($input['body'], 0, 10000), ENT_QUOTES, 'UTF-8');
+
         $stmt = $db->prepare("INSERT INTO messages (tenant_id, sender_id, receiver_id, subject, body, is_federated, created_at) VALUES (?, ?, ?, ?, ?, 1, NOW())");
-        $stmt->execute([$recipient['tenant_id'], $input['sender_id'], $input['recipient_id'], $input['subject'], $input['body']]);
+        $stmt->execute([$recipient['tenant_id'], $input['sender_id'], $input['recipient_id'], $sanitizedSubject, $sanitizedBody]);
         $messageId = $db->lastInsertId();
 
         $this->federationAuditService->log('api_message_sent', $partnerTenantId, $recipient['tenant_id'], null, ['message_id' => $messageId, 'recipient_id' => $input['recipient_id'], 'external_partner' => $isExternal]);
@@ -722,6 +735,310 @@ class FederationController extends BaseApiController
         $this->federationAuditService->log('api_transaction_initiated', $partnerTenantId, $recipient['tenant_id'], null, ['transaction_id' => $transactionId, 'amount' => $amount, 'recipient_id' => $input['recipient_id'], 'external_partner' => $isExternal]);
 
         return $this->fedSuccess(['transaction_id' => (int) $transactionId, 'status' => $status, 'amount' => $amount, 'note' => $status === 'completed' ? 'Transaction completed successfully' : 'Transaction requires recipient confirmation'], 201);
+    }
+
+    /** POST /api/v1/federation/reviews */
+    public function createReview(): JsonResponse
+    {
+        $auth = $this->fedAuth('reviews:write');
+        if ($auth instanceof JsonResponse) return $auth;
+
+        $partnerTenantId = $auth['tenant_id'];
+        $isExternal = !empty($auth['platform_id']);
+        $input = request()->json()->all();
+        $db = DB::getPdo();
+
+        foreach (['reviewer_id', 'reviewee_id', 'rating'] as $field) {
+            if (!isset($input[$field]) || $input[$field] === '') {
+                return $this->fedError(400, "Missing required field: {$field}", 'VALIDATION_ERROR');
+            }
+        }
+
+        $rating = (int) $input['rating'];
+        if ($rating < 1 || $rating > 5) {
+            return $this->fedError(400, 'Rating must be between 1 and 5', 'INVALID_RATING');
+        }
+
+        // Validate reviewer belongs to partner's tenant
+        $reviewerCheck = DB::selectOne(
+            "SELECT id FROM users WHERE id = ? AND tenant_id = ?",
+            [(int) $input['reviewer_id'], $partnerTenantId]
+        );
+        if (!$reviewerCheck) {
+            return $this->fedError(403, 'Reviewer does not belong to your tenant', 'REVIEWER_TENANT_MISMATCH');
+        }
+
+        // Validate reviewee exists and has show_reviews_federated enabled
+        if ($isExternal) {
+            $stmt = $db->prepare("
+                SELECT u.id, u.tenant_id, u.first_name, u.last_name, fus.show_reviews_federated
+                FROM users u JOIN federation_user_settings fus ON fus.user_id = u.id
+                WHERE u.id = ? AND u.tenant_id = ? AND fus.federation_optin = 1 AND u.status = 'active'
+            ");
+            $stmt->execute([(int) $input['reviewee_id'], $partnerTenantId]);
+        } else {
+            $stmt = $db->prepare("
+                SELECT u.id, u.tenant_id, u.first_name, u.last_name, fus.show_reviews_federated
+                FROM users u JOIN federation_user_settings fus ON fus.user_id = u.id
+                JOIN federation_partnerships fp ON ((fp.tenant_id = ? AND fp.partner_tenant_id = u.tenant_id) OR (fp.partner_tenant_id = ? AND fp.tenant_id = u.tenant_id))
+                WHERE u.id = ? AND fus.federation_optin = 1 AND fp.status = 'active' AND u.status = 'active'
+            ");
+            $stmt->execute([$partnerTenantId, $partnerTenantId, (int) $input['reviewee_id']]);
+        }
+
+        $reviewee = $stmt->fetch(\PDO::FETCH_ASSOC);
+        if (!$reviewee) {
+            return $this->fedError(404, 'Reviewee not found or not accessible', 'REVIEWEE_NOT_FOUND');
+        }
+        if (!$reviewee['show_reviews_federated']) {
+            return $this->fedError(403, 'Reviewee does not accept federated reviews', 'REVIEWS_DISABLED');
+        }
+
+        // Validate active partnership between the two tenants (non-external only)
+        if (!$isExternal) {
+            $partnershipCheck = DB::selectOne(
+                "SELECT id FROM federation_partnerships
+                 WHERE ((tenant_id = ? AND partner_tenant_id = ?) OR (partner_tenant_id = ? AND tenant_id = ?))
+                 AND status = 'active'",
+                [$partnerTenantId, $reviewee['tenant_id'], $partnerTenantId, $reviewee['tenant_id']]
+            );
+            if (!$partnershipCheck) {
+                return $this->fedError(403, 'No active partnership between tenants', 'NO_PARTNERSHIP');
+            }
+        }
+
+        // Sanitize comment
+        $comment = isset($input['comment']) ? htmlspecialchars(substr($input['comment'], 0, 5000), ENT_QUOTES, 'UTF-8') : null;
+        $transactionId = isset($input['transaction_id']) ? (int) $input['transaction_id'] : null;
+
+        $stmt = $db->prepare("
+            INSERT INTO reviews (tenant_id, reviewer_id, reviewer_tenant_id, receiver_id, receiver_tenant_id, rating, comment, review_type, status, show_cross_tenant, transaction_id, created_at)
+            VALUES (?, ?, ?, ?, ?, ?, ?, 'federated', 'approved', 1, ?, NOW())
+        ");
+        $stmt->execute([
+            $reviewee['tenant_id'],
+            (int) $input['reviewer_id'],
+            $partnerTenantId,
+            (int) $input['reviewee_id'],
+            (int) $reviewee['tenant_id'],
+            $rating,
+            $comment,
+            $transactionId,
+        ]);
+        $reviewId = $db->lastInsertId();
+
+        $this->federationAuditService->log('api_review_created', $partnerTenantId, (int) $reviewee['tenant_id'], null, [
+            'review_id' => $reviewId,
+            'reviewer_id' => (int) $input['reviewer_id'],
+            'reviewee_id' => (int) $input['reviewee_id'],
+            'rating' => $rating,
+            'external_partner' => $isExternal,
+        ]);
+
+        return $this->fedSuccess([
+            'data' => [
+                'id' => (int) $reviewId,
+                'reviewer_id' => (int) $input['reviewer_id'],
+                'reviewee_id' => (int) $input['reviewee_id'],
+                'rating' => $rating,
+                'comment' => $comment,
+                'transaction_id' => $transactionId,
+                'review_type' => 'federated',
+                'status' => 'approved',
+                'created_at' => date('Y-m-d H:i:s'),
+            ],
+        ], 201);
+    }
+
+    /** GET /api/v1/federation/reviews */
+    public function getReviews(): JsonResponse
+    {
+        $auth = $this->fedAuth('reviews:read');
+        if ($auth instanceof JsonResponse) return $auth;
+
+        $partnerTenantId = $auth['tenant_id'];
+        $isExternal = !empty($auth['platform_id']);
+        $db = DB::getPdo();
+
+        $userId = request()->query('user_id');
+        if (empty($userId)) {
+            return $this->fedError(400, 'Missing required parameter: user_id', 'VALIDATION_ERROR');
+        }
+        $userId = (int) $userId;
+
+        $page = max(1, (int) request()->query('page', 1));
+        $perPage = min(100, max(1, (int) request()->query('per_page', 20)));
+
+        // Validate the user has show_reviews_federated enabled
+        $userCheck = DB::selectOne(
+            "SELECT u.id, fus.show_reviews_federated FROM users u JOIN federation_user_settings fus ON fus.user_id = u.id WHERE u.id = ? AND fus.federation_optin = 1 AND u.status = 'active'",
+            [$userId]
+        );
+        if (!$userCheck || !$userCheck->show_reviews_federated) {
+            return $this->fedError(404, 'User not found or federated reviews are disabled', 'USER_NOT_FOUND');
+        }
+
+        $sql = "SELECT SQL_CALC_FOUND_ROWS r.id, r.reviewer_id, r.reviewer_tenant_id, r.receiver_id, r.receiver_tenant_id, r.rating, r.comment, r.review_type, r.status, r.transaction_id, r.created_at,
+                       u.first_name as reviewer_first_name, u.last_name as reviewer_last_name, u.avatar_url as reviewer_avatar,
+                       t.name as reviewer_tenant_name
+                FROM reviews r
+                JOIN users u ON u.id = r.reviewer_id
+                LEFT JOIN tenants t ON t.id = r.reviewer_tenant_id
+                WHERE r.receiver_id = ? AND r.review_type = 'federated' AND r.show_cross_tenant = 1 AND r.status = 'approved'";
+        $params = [$userId];
+
+        $sql .= " ORDER BY r.created_at DESC LIMIT ?, ?";
+        $params[] = (int) (($page - 1) * $perPage);
+        $params[] = (int) $perPage;
+
+        $stmt = $db->prepare($sql);
+        $stmt->execute($params);
+        $rows = $stmt->fetchAll(\PDO::FETCH_ASSOC);
+        $total = (int) $db->query("SELECT FOUND_ROWS()")->fetchColumn();
+
+        $formatted = array_map(fn($r) => [
+            'id' => (int) $r['id'],
+            'rating' => (int) $r['rating'],
+            'comment' => $r['comment'],
+            'review_type' => $r['review_type'],
+            'transaction_id' => $r['transaction_id'] ? (int) $r['transaction_id'] : null,
+            'reviewer' => [
+                'id' => (int) $r['reviewer_id'],
+                'name' => trim($r['reviewer_first_name'] . ' ' . $r['reviewer_last_name']),
+                'avatar' => $r['reviewer_avatar'] ?: null,
+                'tenant_name' => $r['reviewer_tenant_name'] ?? null,
+            ],
+            'created_at' => $r['created_at'],
+        ], $rows);
+
+        return $this->fedPaginated($formatted, $total, $page, $perPage);
+    }
+
+    /** GET /api/v1/federation/messages */
+    public function getMessages(): JsonResponse
+    {
+        $auth = $this->fedAuth('messages:read');
+        if ($auth instanceof JsonResponse) return $auth;
+
+        $partnerTenantId = $auth['tenant_id'];
+        $db = DB::getPdo();
+
+        $since = request()->query('since');
+        $direction = request()->query('direction', 'all');
+        $page = max(1, (int) request()->query('page', 1));
+        $perPage = min(100, max(1, (int) request()->query('per_page', 20)));
+
+        $sql = "SELECT SQL_CALC_FOUND_ROWS m.id, m.sender_id, m.receiver_id, m.subject, m.body, m.created_at, m.is_read,
+                       su.first_name as sender_first_name, su.last_name as sender_last_name, su.tenant_id as sender_tenant_id,
+                       ru.first_name as receiver_first_name, ru.last_name as receiver_last_name, ru.tenant_id as receiver_tenant_id,
+                       st.name as sender_tenant_name, rt.name as receiver_tenant_name
+                FROM messages m
+                JOIN users su ON su.id = m.sender_id
+                JOIN users ru ON ru.id = m.receiver_id
+                LEFT JOIN tenants st ON st.id = su.tenant_id
+                LEFT JOIN tenants rt ON rt.id = ru.tenant_id
+                WHERE m.is_federated = 1";
+        $params = [];
+
+        // Filter to messages involving the partner's tenant
+        if ($direction === 'inbound') {
+            $sql .= " AND ru.tenant_id = ?";
+            $params[] = $partnerTenantId;
+        } elseif ($direction === 'outbound') {
+            $sql .= " AND su.tenant_id = ?";
+            $params[] = $partnerTenantId;
+        } else {
+            $sql .= " AND (su.tenant_id = ? OR ru.tenant_id = ?)";
+            $params[] = $partnerTenantId;
+            $params[] = $partnerTenantId;
+        }
+
+        if (!empty($since)) {
+            $sql .= " AND m.created_at >= ?";
+            $params[] = $since;
+        }
+
+        $sql .= " ORDER BY m.created_at DESC LIMIT ?, ?";
+        $params[] = (int) (($page - 1) * $perPage);
+        $params[] = (int) $perPage;
+
+        $stmt = $db->prepare($sql);
+        $stmt->execute($params);
+        $rows = $stmt->fetchAll(\PDO::FETCH_ASSOC);
+        $total = (int) $db->query("SELECT FOUND_ROWS()")->fetchColumn();
+
+        $formatted = array_map(fn($m) => [
+            'id' => (int) $m['id'],
+            'subject' => $m['subject'],
+            'body' => $m['body'],
+            'sender' => [
+                'id' => (int) $m['sender_id'],
+                'name' => trim($m['sender_first_name'] . ' ' . $m['sender_last_name']),
+                'tenant_id' => (int) $m['sender_tenant_id'],
+                'tenant_name' => $m['sender_tenant_name'] ?? null,
+            ],
+            'receiver' => [
+                'id' => (int) $m['receiver_id'],
+                'name' => trim($m['receiver_first_name'] . ' ' . $m['receiver_last_name']),
+                'tenant_id' => (int) $m['receiver_tenant_id'],
+                'tenant_name' => $m['receiver_tenant_name'] ?? null,
+            ],
+            'is_read' => (bool) $m['is_read'],
+            'created_at' => $m['created_at'],
+        ], $rows);
+
+        return $this->fedPaginated($formatted, $total, $page, $perPage);
+    }
+
+    /** GET /api/v1/federation/transactions/{id} */
+    public function getTransaction($id): JsonResponse
+    {
+        $auth = $this->fedAuth('transactions:read');
+        if ($auth instanceof JsonResponse) return $auth;
+
+        $partnerTenantId = $auth['tenant_id'];
+        $db = DB::getPdo();
+
+        $stmt = $db->prepare("
+            SELECT t.id, t.amount, t.status, t.description, t.created_at, t.is_federated,
+                   t.sender_id, t.receiver_id, t.sender_tenant_id, t.receiver_tenant_id,
+                   su.first_name as sender_first_name, su.last_name as sender_last_name,
+                   ru.first_name as receiver_first_name, ru.last_name as receiver_last_name,
+                   st.name as sender_tenant_name, rt.name as receiver_tenant_name
+            FROM transactions t
+            JOIN users su ON su.id = t.sender_id
+            JOIN users ru ON ru.id = t.receiver_id
+            LEFT JOIN tenants st ON st.id = t.sender_tenant_id
+            LEFT JOIN tenants rt ON rt.id = t.receiver_tenant_id
+            WHERE t.id = ? AND t.is_federated = 1
+            AND (t.sender_tenant_id = ? OR t.receiver_tenant_id = ?)
+        ");
+        $stmt->execute([(int) $id, $partnerTenantId, $partnerTenantId]);
+
+        $transaction = $stmt->fetch(\PDO::FETCH_ASSOC);
+        if (!$transaction) {
+            return $this->fedError(404, 'Transaction not found or not accessible', 'TRANSACTION_NOT_FOUND');
+        }
+
+        return $this->fedSuccess(['data' => [
+            'id' => (int) $transaction['id'],
+            'amount' => (float) $transaction['amount'],
+            'status' => $transaction['status'],
+            'description' => $transaction['description'],
+            'sender' => [
+                'id' => (int) $transaction['sender_id'],
+                'name' => trim($transaction['sender_first_name'] . ' ' . $transaction['sender_last_name']),
+                'tenant_id' => $transaction['sender_tenant_id'] ? (int) $transaction['sender_tenant_id'] : null,
+                'tenant_name' => $transaction['sender_tenant_name'] ?? null,
+            ],
+            'receiver' => [
+                'id' => (int) $transaction['receiver_id'],
+                'name' => trim($transaction['receiver_first_name'] . ' ' . $transaction['receiver_last_name']),
+                'tenant_id' => $transaction['receiver_tenant_id'] ? (int) $transaction['receiver_tenant_id'] : null,
+                'tenant_name' => $transaction['receiver_tenant_name'] ?? null,
+            ],
+            'created_at' => $transaction['created_at'],
+        ]]);
     }
 
     /** POST /api/v1/federation/oauth/token */

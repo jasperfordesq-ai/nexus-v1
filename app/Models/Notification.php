@@ -29,6 +29,11 @@ class Notification extends Model
         'link', 'is_read', 'created_at',
     ];
 
+    /**
+     * Attributes hidden from JSON serialization to prevent data leakage.
+     */
+    protected $hidden = ['tenant_id'];
+
     protected $casts = [
         'is_read' => 'boolean',
         'created_at' => 'datetime',

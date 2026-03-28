@@ -314,6 +314,16 @@ class TenantBootstrapController extends BaseApiController
         return $data;
     }
 
+    /**
+     * Public-safe setting keys that may be exposed in the bootstrap payload.
+     * Admin-only settings (maintenance_mode, admin_approval, registration_mode,
+     * email_verification, max_upload_size_mb, etc.) are deliberately excluded.
+     */
+    private const PUBLIC_GENERAL_SETTINGS = [
+        'timezone', 'default_currency', 'date_format', 'time_format',
+        'items_per_page', 'welcome_credits', 'footer_text', 'welcome_message',
+    ];
+
     private function buildGeneralSettings(int $tenantId): array
     {
         $settings = [];
@@ -327,6 +337,12 @@ class TenantBootstrapController extends BaseApiController
 
             foreach ($rows as $row) {
                 $key = str_replace('general.', '', $row->setting_key);
+
+                // Only expose whitelisted public settings — never admin-only keys
+                if (!in_array($key, self::PUBLIC_GENERAL_SETTINGS, true)) {
+                    continue;
+                }
+
                 $value = $row->setting_value;
 
                 if ($value === 'true' || $value === '1') {

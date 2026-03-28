@@ -23,6 +23,11 @@ class Poll extends Model
         'end_date', 'is_active', 'category', 'poll_type',
     ];
 
+    /**
+     * Attributes hidden from JSON serialization to prevent data leakage.
+     */
+    protected $hidden = ['tenant_id'];
+
     protected $casts = [
         'user_id'   => 'integer',
         'event_id'  => 'integer',

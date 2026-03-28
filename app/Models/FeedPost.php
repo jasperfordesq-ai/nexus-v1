@@ -23,6 +23,11 @@ class FeedPost extends Model
         'scheduled_at', 'publish_status',
     ];
 
+    /**
+     * Attributes hidden from JSON serialization to prevent data leakage.
+     */
+    protected $hidden = ['tenant_id'];
+
     protected $casts = [
         'user_id' => 'integer',
         'parent_id' => 'integer',

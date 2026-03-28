@@ -1085,6 +1085,7 @@ Route::get('/v2/admin/federation/analytics', [\App\Http\Controllers\Api\AdminFed
 Route::get('/v2/admin/federation/activity', [\App\Http\Controllers\Api\AdminFederationController::class, 'activityFeed']);
 Route::get('/v2/admin/federation/api-keys', [\App\Http\Controllers\Api\AdminFederationController::class, 'apiKeys']);
 Route::post('/v2/admin/federation/api-keys', [\App\Http\Controllers\Api\AdminFederationController::class, 'createApiKey']);
+Route::post('/v2/admin/federation/api-keys/{id}/revoke', [\App\Http\Controllers\Api\AdminFederationController::class, 'revokeApiKey']);
 Route::get('/v2/admin/federation/data', [\App\Http\Controllers\Api\AdminFederationController::class, 'dataManagement']);
 Route::get('/v2/admin/federation/export/{type}', [\App\Http\Controllers\Api\AdminFederationController::class, 'exportData']);
 Route::get('/v2/admin/federation/neighborhoods', [\App\Http\Controllers\Api\AdminFederationNeighborhoodsController::class, 'index']);
@@ -1684,10 +1685,14 @@ Route::get('/v1/federation/members', [\App\Http\Controllers\Api\FederationContro
 Route::get('/v1/federation/members/{id}', [\App\Http\Controllers\Api\FederationController::class, 'member']);
 Route::get('/v1/federation/listings', [\App\Http\Controllers\Api\FederationController::class, 'listings']);
 Route::get('/v1/federation/listings/{id}', [\App\Http\Controllers\Api\FederationController::class, 'listing']);
+Route::get('/v1/federation/messages', [\App\Http\Controllers\Api\FederationController::class, 'getMessages']);
+Route::get('/v1/federation/reviews', [\App\Http\Controllers\Api\FederationController::class, 'getReviews']);
+Route::get('/v1/federation/transactions/{id}', [\App\Http\Controllers\Api\FederationController::class, 'getTransaction']);
 // Write operations rate-limited to prevent abuse (20 req/min per IP)
 Route::middleware('throttle:20,1')->group(function () {
     Route::post('/v1/federation/messages', [\App\Http\Controllers\Api\FederationController::class, 'sendMessage']);
     Route::post('/v1/federation/transactions', [\App\Http\Controllers\Api\FederationController::class, 'createTransaction']);
+    Route::post('/v1/federation/reviews', [\App\Http\Controllers\Api\FederationController::class, 'createReview']);
 });
 Route::post('/v1/federation/oauth/token', [\App\Http\Controllers\Api\FederationController::class, 'oauthToken'])->middleware('throttle:10,1');
 Route::post('/v1/federation/webhooks/test', [\App\Http\Controllers\Api\FederationController::class, 'testWebhook']);

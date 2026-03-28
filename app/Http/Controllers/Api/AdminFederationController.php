@@ -690,13 +690,46 @@ class AdminFederationController extends BaseApiController
         if (!$name) { return $this->respondWithError('VALIDATION_ERROR', 'Name is required', 'name'); }
         if (!$this->tableExists('federation_api_keys')) { return $this->respondWithError('TABLE_MISSING', 'Federation API keys table not configured', null, 503); }
 
+        $expiresAt = $this->input('expires_at');
+
         try {
             $keyValue = bin2hex(random_bytes(32));
             $prefix = substr($keyValue, 0, 8);
-            DB::insert("INSERT INTO federation_api_keys (tenant_id, name, key_hash, key_prefix, permissions, status, created_by, created_at) VALUES (?, ?, ?, ?, ?, 'active', ?, NOW())", [$tenantId, $name, hash('sha256', $keyValue), $prefix, json_encode($scopes), $this->getUserId()]);
+            DB::insert(
+                "INSERT INTO federation_api_keys (tenant_id, name, key_hash, key_prefix, permissions, status, expires_at, created_by, created_at) VALUES (?, ?, ?, ?, ?, 'active', ?, ?, NOW())",
+                [$tenantId, $name, hash('sha256', $keyValue), $prefix, json_encode($scopes), $expiresAt ?: null, $this->getUserId()]
+            );
             \Illuminate\Support\Facades\Log::info('[Federation] API key created', ['tenant_id' => $tenantId, 'key_prefix' => $prefix, 'created_by' => $this->getUserId()]);
             return $this->respondWithData(['id' => DB::getPdo()->lastInsertId(), 'name' => $name, 'api_key' => $keyValue, 'key_prefix' => $prefix, 'warning' => 'This key is shown ONCE. Store it securely — it cannot be retrieved again.'], null, 201);
         } catch (\Exception $e) { return $this->respondWithError('CREATE_FAILED', 'Failed to create API key'); }
+    }
+
+    /** POST /api/v2/admin/federation/api-keys/{id}/revoke */
+    public function revokeApiKey($id): JsonResponse
+    {
+        $this->requireAdmin();
+        $tenantId = TenantContext::getId();
+        $id = (int) $id;
+
+        if (!$this->tableExists('federation_api_keys')) {
+            return $this->respondWithError('TABLE_MISSING', 'Federation API keys table not configured', null, 503);
+        }
+
+        try {
+            $key = DB::selectOne("SELECT id, status FROM federation_api_keys WHERE id = ? AND tenant_id = ?", [$id, $tenantId]);
+            if (!$key) {
+                return $this->respondWithError('NOT_FOUND', 'API key not found', null, 404);
+            }
+            if ($key->status === 'revoked') {
+                return $this->respondWithError('ALREADY_REVOKED', 'API key is already revoked', null, 409);
+            }
+
+            DB::update("UPDATE federation_api_keys SET status = 'revoked', updated_at = NOW() WHERE id = ? AND tenant_id = ?", [$id, $tenantId]);
+            \Illuminate\Support\Facades\Log::info('[Federation] API key revoked', ['tenant_id' => $tenantId, 'key_id' => $id, 'revoked_by' => $this->getUserId()]);
+            return $this->respondWithData(['id' => $id, 'status' => 'revoked']);
+        } catch (\Exception $e) {
+            return $this->respondWithError('REVOKE_FAILED', 'Failed to revoke API key');
+        }
     }
 
     public function dataManagement(): JsonResponse

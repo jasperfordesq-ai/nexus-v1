@@ -439,6 +439,132 @@ const ENDPOINTS: EndpointDef[] = [
 }`,
   },
   {
+    method: 'GET',
+    path: '/api/v1/federation/messages',
+    permission: 'messages:read',
+    description: 'Retrieve federated messages involving your tenant. Supports filtering by direction (inbound/outbound) and a since timestamp for incremental syncing.',
+    params: [
+      { name: 'since', type: 'string', required: false, description: 'ISO 8601 timestamp -- only return messages after this time' },
+      { name: 'direction', type: 'string', required: false, description: '"inbound", "outbound", or "all" (default: "all")' },
+      { name: 'page', type: 'integer', required: false, description: 'Page number (default: 1)' },
+      { name: 'per_page', type: 'integer', required: false, description: 'Results per page (default: 20, max: 100)' },
+    ],
+    response: `{
+  "success": true,
+  "data": [
+    {
+      "id": 1234,
+      "subject": "Time exchange request",
+      "body": "Hi Jane, I saw your guitar lessons listing...",
+      "sender": {
+        "id": 12,
+        "name": "John Smith",
+        "tenant_id": 2,
+        "tenant_name": "Hour Timebank"
+      },
+      "receiver": {
+        "id": 45,
+        "name": "Jane Doe",
+        "tenant_id": 3,
+        "tenant_name": "Dublin Time Exchange"
+      },
+      "is_read": false,
+      "created_at": "2025-09-15 14:30:00"
+    }
+  ],
+  "pagination": { "total": 24, "page": 1, "per_page": 20, "total_pages": 2, "has_more": true }
+}`,
+  },
+  {
+    method: 'POST',
+    path: '/api/v1/federation/reviews',
+    permission: 'reviews:write',
+    description: 'Create a federated review for a member in a partner timebank. The reviewer must belong to your tenant and the reviewee must have federated reviews enabled.',
+    params: [
+      { name: 'reviewer_id', type: 'integer', required: true, description: 'Reviewer user ID (must belong to your tenant)' },
+      { name: 'reviewee_id', type: 'integer', required: true, description: 'Reviewee user ID (must have federated reviews enabled)' },
+      { name: 'rating', type: 'integer', required: true, description: 'Rating from 1 to 5' },
+      { name: 'comment', type: 'string', required: false, description: 'Review text (max 5000 characters)' },
+      { name: 'transaction_id', type: 'integer', required: false, description: 'Associated transaction ID (optional)' },
+    ],
+    response: `{
+  "success": true,
+  "data": {
+    "id": 789,
+    "reviewer_id": 12,
+    "reviewee_id": 45,
+    "rating": 5,
+    "comment": "Excellent guitar lesson, very patient teacher!",
+    "transaction_id": 567,
+    "review_type": "federated",
+    "status": "approved",
+    "created_at": "2025-09-20 16:00:00"
+  }
+}`,
+  },
+  {
+    method: 'GET',
+    path: '/api/v1/federation/reviews',
+    permission: 'reviews:read',
+    description: 'Get federated reviews for a specific user. Only returns approved reviews where the user has federated reviews enabled.',
+    params: [
+      { name: 'user_id', type: 'integer', required: true, description: 'User ID to get reviews for' },
+      { name: 'page', type: 'integer', required: false, description: 'Page number (default: 1)' },
+      { name: 'per_page', type: 'integer', required: false, description: 'Results per page (default: 20, max: 100)' },
+    ],
+    response: `{
+  "success": true,
+  "data": [
+    {
+      "id": 789,
+      "rating": 5,
+      "comment": "Excellent guitar lesson, very patient teacher!",
+      "review_type": "federated",
+      "transaction_id": 567,
+      "reviewer": {
+        "id": 12,
+        "name": "John Smith",
+        "avatar": "https://...",
+        "tenant_name": "Hour Timebank"
+      },
+      "created_at": "2025-09-20 16:00:00"
+    }
+  ],
+  "pagination": { "total": 5, "page": 1, "per_page": 20, "total_pages": 1, "has_more": false }
+}`,
+  },
+  {
+    method: 'GET',
+    path: '/api/v1/federation/transactions/{id}',
+    permission: 'transactions:read',
+    description: 'Get the status and details of a specific federated transaction. Your tenant must be either the sender or receiver tenant.',
+    params: [
+      { name: 'id', type: 'integer', required: true, description: 'Transaction ID (URL parameter)' },
+    ],
+    response: `{
+  "success": true,
+  "data": {
+    "id": 567,
+    "amount": 1.5,
+    "status": "completed",
+    "description": "Guitar lesson - 1.5 hours",
+    "sender": {
+      "id": 12,
+      "name": "John Smith",
+      "tenant_id": 2,
+      "tenant_name": "Hour Timebank"
+    },
+    "receiver": {
+      "id": 45,
+      "name": "Jane Doe",
+      "tenant_id": 3,
+      "tenant_name": "Dublin Time Exchange"
+    },
+    "created_at": "2025-09-15 14:30:00"
+  }
+}`,
+  },
+  {
     method: 'POST',
     path: '/api/v1/federation/webhooks/test',
     permission: 'webhooks:write',

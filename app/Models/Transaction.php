@@ -24,6 +24,11 @@ class Transaction extends Model
         'transaction_type', 'status', 'source_match_id', 'deleted_for_sender', 'deleted_for_receiver',
     ];
 
+    /**
+     * Attributes hidden from JSON serialization to prevent data leakage.
+     */
+    protected $hidden = ['tenant_id'];
+
     protected $casts = [
         'amount' => 'integer',
         'deleted_for_sender' => 'boolean',
