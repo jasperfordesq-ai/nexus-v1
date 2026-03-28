@@ -81,7 +81,7 @@ Here's the full breakdown:
 - 📋 **CRM** — Admin contact management with notes, tasks, tags, activity timelines, and export
 
 **AI & Recommendation Engine:**
-- 🔍 **Semantic Search** — Meilisearch-powered full-text search with synonym support and tenant isolation
+- 🔍 **Semantic Search** — Meilisearch-powered full-text search across listings, members, events, and groups with typo tolerance, domain-specific synonyms, custom ranking rules, and per-tenant isolation
 - 🤖 **Collaborative Filtering** — Item-based recommendations from real community interaction data
 - 🧠 **Semantic Embeddings** — OpenAI-powered content matching for listings, members, and requests
 - 📈 **EdgeRank Feed** — Time-decay, affinity, and engagement-weighted feed ranking

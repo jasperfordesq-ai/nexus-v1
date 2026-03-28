@@ -7,7 +7,7 @@
 /**
  * Meilisearch Sync Script
  *
- * Backfills all active listings and users into Meilisearch indexes.
+ * Backfills all active listings, users, events, and groups into Meilisearch indexes.
  * Safe to re-run at any time — Meilisearch upserts are idempotent.
  *
  * Usage:
@@ -18,11 +18,11 @@
  *   php scripts/sync_search_index.php --help
  *
  * Options:
- *   --tenant=<id>       Process a single tenant by ID
- *   --all-tenants       Process all active tenants
- *   --type=listing|user Process only one content type (default: both)
- *   --dry-run           Count rows without sending to Meilisearch
- *   --help              Show this message
+ *   --tenant=<id>                    Process a single tenant by ID
+ *   --all-tenants                    Process all active tenants
+ *   --type=listing|user|event|group  Process only one content type (default: all)
+ *   --dry-run                        Count rows without sending to Meilisearch
+ *   --help                           Show this message
  */
 
 if (php_sapi_name() !== 'cli') {
@@ -48,16 +48,17 @@ if (isset($opts['help'])) {
 sync_search_index.php — Backfill Meilisearch indexes from the database
 
 Options:
-  --tenant=<id>       Process a single tenant by ID
-  --all-tenants       Process all active tenants
-  --type=listing|user Process only one content type (default: both)
-  --dry-run           Count items without indexing
-  --help              Show this message
+  --tenant=<id>                    Process a single tenant by ID
+  --all-tenants                    Process all active tenants
+  --type=listing|user|event|group  Process only one content type (default: all four)
+  --dry-run                        Count items without indexing
+  --help                           Show this message
 
 Examples:
   php scripts/sync_search_index.php --tenant=2
   php scripts/sync_search_index.php --all-tenants
   php scripts/sync_search_index.php --all-tenants --type=listing
+  php scripts/sync_search_index.php --all-tenants --type=event
   php scripts/sync_search_index.php --tenant=2 --dry-run
 
 HELP;
@@ -65,10 +66,11 @@ HELP;
 }
 
 $dryRun     = isset($opts['dry-run']);
-$typeFilter = $opts['type'] ?? null; // null = both
+$typeFilter = $opts['type'] ?? null; // null = all four types
 
-if ($typeFilter !== null && !in_array($typeFilter, ['listing', 'user'], true)) {
-    fwrite(STDERR, "Error: --type must be 'listing' or 'user'\n");
+$validTypes = ['listing', 'user', 'event', 'group'];
+if ($typeFilter !== null && !in_array($typeFilter, $validTypes, true)) {
+    fwrite(STDERR, "Error: --type must be one of: " . implode(', ', $validTypes) . "\n");
     exit(1);
 }
 
@@ -97,22 +99,23 @@ if (empty($tenantIds)) {
 // Ensure indexes exist (creates them if missing, sets attributes)
 // ============================================================
 if (!$dryRun) {
-    echo "Configuring Meilisearch indexes...\n";
+    echo "Configuring Meilisearch indexes (listings, users, events, groups)...\n";
     SearchService::ensureIndexes();
 
     if (!SearchService::isAvailable()) {
         fwrite(STDERR, "Error: Meilisearch is not available. Check MEILISEARCH_HOST env var and ensure the service is running.\n");
         exit(1);
     }
-    echo "Meilisearch is online.\n\n";
+    echo "Meilisearch is online. Indexes configured with synonyms and ranking rules.\n\n";
 }
 
 // ============================================================
 // Process tenants
 // ============================================================
+$typesLabel = $typeFilter ?? 'listing + user + event + group';
 echo "Sync search index" . ($dryRun ? " [DRY RUN]" : "") . "\n";
 echo "Tenants  : " . implode(', ', $tenantIds) . "\n";
-echo "Type     : " . ($typeFilter ?? 'listing + user') . "\n\n";
+echo "Types    : {$typesLabel}\n\n";
 
 $totalProcessed = 0;
 $totalSkipped   = 0;
@@ -133,6 +136,20 @@ foreach ($tenantIds as $tenantId) {
 
     if (!$typeFilter || $typeFilter === 'user') {
         [$proc, $skip, $err] = syncUsers($tenantId, $dryRun);
+        $totalProcessed += $proc;
+        $totalSkipped   += $skip;
+        $totalErrors    += $err;
+    }
+
+    if (!$typeFilter || $typeFilter === 'event') {
+        [$proc, $skip, $err] = syncEvents($tenantId, $dryRun);
+        $totalProcessed += $proc;
+        $totalSkipped   += $skip;
+        $totalErrors    += $err;
+    }
+
+    if (!$typeFilter || $typeFilter === 'group') {
+        [$proc, $skip, $err] = syncGroups($tenantId, $dryRun);
         $totalProcessed += $proc;
         $totalSkipped   += $skip;
         $totalErrors    += $err;
@@ -183,40 +200,7 @@ function syncListings(int $tenantId, bool $dryRun): array
         return $row;
     }, $rows);
 
-    $total = count($rows);
-
-    if ($total === 0) {
-        echo "  listings: 0 active rows — skipping\n";
-        return [0, 0, 0];
-    }
-
-    echo "  listings: {$total} items\n";
-
-    if ($dryRun) {
-        return [0, $total, 0];
-    }
-
-    $processed = 0;
-    $errors    = 0;
-    $batches   = array_chunk($rows, 100);
-
-    foreach ($batches as $batchIndex => $batch) {
-        foreach ($batch as $row) {
-            try {
-                SearchService::indexListing($row);
-                $processed++;
-            } catch (\Throwable $e) {
-                fwrite(STDERR, "    Error listing#{$row['id']}: " . $e->getMessage() . "\n");
-                $errors++;
-            }
-        }
-
-        $done = min(($batchIndex + 1) * 100, $total);
-        echo "  listings: {$done}/{$total}\r";
-    }
-
-    echo "  listings: {$total}/{$total} processed\n";
-    return [$processed, 0, $errors];
+    return batchIndex($rows, 'listings', 'listing', $dryRun, fn($row) => SearchService::indexListing($row));
 }
 
 /**
@@ -228,21 +212,81 @@ function syncListings(int $tenantId, bool $dryRun): array
 function syncUsers(int $tenantId, bool $dryRun): array
 {
     $rows = array_map(fn($r) => (array) $r, DB::select(
-        "SELECT id, tenant_id, first_name, last_name, bio, skills, location, status
+        "SELECT id, tenant_id, first_name, last_name, organization_name,
+                profile_type, bio, skills, location, avatar_url, status,
+                UNIX_TIMESTAMP(created_at) as created_at
          FROM users
          WHERE tenant_id = ? AND status = 'active'
          ORDER BY id",
         [$tenantId]
     ));
 
+    return batchIndex($rows, 'users', 'user', $dryRun, fn($row) => SearchService::indexUser($row));
+}
+
+/**
+ * Load and index all upcoming events for a tenant.
+ * Returns [processed, skipped, errors].
+ *
+ * @return array{int, int, int}
+ */
+function syncEvents(int $tenantId, bool $dryRun): array
+{
+    $rows = array_map(fn($r) => (array) $r, DB::select(
+        "SELECT e.id, e.tenant_id, e.title, e.description, e.location,
+                e.status, e.is_online,
+                UNIX_TIMESTAMP(COALESCE(e.start_time, e.start_date)) as start_time,
+                UNIX_TIMESTAMP(e.created_at) as created_at,
+                CONCAT(u.first_name, ' ', u.last_name) as organizer_name
+         FROM events e
+         LEFT JOIN users u ON e.user_id = u.id
+         WHERE e.tenant_id = ?
+           AND COALESCE(e.start_time, e.start_date) >= NOW()
+         ORDER BY e.id",
+        [$tenantId]
+    ));
+
+    return batchIndex($rows, 'events', 'event', $dryRun, fn($row) => SearchService::indexEvent($row));
+}
+
+/**
+ * Load and index all active groups for a tenant.
+ * Returns [processed, skipped, errors].
+ *
+ * @return array{int, int, int}
+ */
+function syncGroups(int $tenantId, bool $dryRun): array
+{
+    $rows = array_map(fn($r) => (array) $r, DB::select(
+        "SELECT g.id, g.tenant_id, g.name, g.description,
+                g.status, g.privacy,
+                (SELECT COUNT(*) FROM group_members gm
+                 WHERE gm.group_id = g.id AND gm.status = 'active') as members_count,
+                UNIX_TIMESTAMP(g.created_at) as created_at
+         FROM `groups` g
+         WHERE g.tenant_id = ?
+         ORDER BY g.id",
+        [$tenantId]
+    ));
+
+    return batchIndex($rows, 'groups', 'group', $dryRun, fn($row) => SearchService::indexGroup($row));
+}
+
+/**
+ * Generic batch indexer. Processes rows in batches of 100 with progress output.
+ *
+ * @return array{int, int, int}  [processed, skipped, errors]
+ */
+function batchIndex(array $rows, string $label, string $type, bool $dryRun, callable $indexFn): array
+{
     $total = count($rows);
 
     if ($total === 0) {
-        echo "  users: 0 active rows — skipping\n";
+        echo "  {$label}: 0 rows — skipping\n";
         return [0, 0, 0];
     }
 
-    echo "  users: {$total} items\n";
+    echo "  {$label}: {$total} items\n";
 
     if ($dryRun) {
         return [0, $total, 0];
@@ -255,18 +299,18 @@ function syncUsers(int $tenantId, bool $dryRun): array
     foreach ($batches as $batchIndex => $batch) {
         foreach ($batch as $row) {
             try {
-                SearchService::indexUser($row);
+                $indexFn($row);
                 $processed++;
             } catch (\Throwable $e) {
-                fwrite(STDERR, "    Error user#{$row['id']}: " . $e->getMessage() . "\n");
+                fwrite(STDERR, "    Error {$type}#{$row['id']}: " . $e->getMessage() . "\n");
                 $errors++;
             }
         }
 
         $done = min(($batchIndex + 1) * 100, $total);
-        echo "  users: {$done}/{$total}\r";
+        echo "  {$label}: {$done}/{$total}\r";
     }
 
-    echo "  users: {$total}/{$total} processed\n";
+    echo "  {$label}: {$total}/{$total} processed\n";
     return [$processed, 0, $errors];
 }

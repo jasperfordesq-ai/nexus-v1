@@ -10,6 +10,7 @@ use App\Core\TenantContext;
 use App\Events\UserRegistered;
 use App\Models\Notification;
 use App\Services\EmailService;
+use App\Services\SearchService;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Support\Facades\Log;
 
@@ -29,6 +30,10 @@ class SendWelcomeNotification implements ShouldQueue
     public function handle(UserRegistered $event): void
     {
         try {
+            // Index new user in Meilisearch so they appear in search immediately
+            TenantContext::setById($event->tenantId);
+            SearchService::indexUser($event->user);
+
             // Create in-app welcome notification
             Notification::create([
                 'tenant_id'  => $event->tenantId,

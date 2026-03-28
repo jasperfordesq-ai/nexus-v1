@@ -37,4 +37,16 @@ class UserObserver
             ]);
         }
     }
+
+    public function deleted(User $user): void
+    {
+        try {
+            SearchService::removeUser($user->id);
+        } catch (\Throwable $e) {
+            Log::error('UserObserver: failed to remove deleted user from index', [
+                'user_id' => $user->id,
+                'error'   => $e->getMessage(),
+            ]);
+        }
+    }
 }

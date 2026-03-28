@@ -21,8 +21,8 @@ use Meilisearch\Client as MeilisearchClient;
  * Uses Meilisearch when available (fast, typo-tolerant, ranked results),
  * with automatic SQL LIKE fallback when Meilisearch is unreachable.
  *
- * Meilisearch indexes: `listings`, `users` (events/groups use SQL fallback until
- * indexEvent/indexGroup methods and a sync pass are added).
+ * Meilisearch indexes: `listings`, `users`, `events`, `groups` — all four
+ * content types are fully indexed with custom ranking rules and synonyms.
  *
  * Availability is cached per PHP process/request via a static property, so the
  * health-check ping only happens once per request.
@@ -74,8 +74,11 @@ class SearchService
     // =========================================================================
 
     /**
-     * Create and configure the `listings` and `users` Meilisearch indexes.
+     * Create and configure all four Meilisearch indexes (listings, users, events, groups).
      * Idempotent — safe to call repeatedly. Called by sync_search_index.php.
+     *
+     * Configures searchable/filterable/sortable attributes, custom ranking rules,
+     * and synonyms for each index.
      */
     public static function ensureIndexes(): void
     {
@@ -84,15 +87,31 @@ class SearchService
         $configs = [
             'listings' => [
                 'pk'         => 'id',
-                'searchable' => ['title', 'description', 'location', 'author_name', 'category_name'],
+                'searchable' => ['title', 'description', 'location', 'author_name', 'category_name', 'skill_tags'],
                 'filterable' => ['tenant_id', 'status', 'category_id', 'type', 'user_id', 'skill_tags'],
-                'sortable'   => ['created_at'],
+                'sortable'   => ['created_at', 'updated_at'],
+                'ranking'    => ['words', 'typo', 'proximity', 'attribute', 'sort', 'exactness'],
             ],
             'users' => [
                 'pk'         => 'id',
-                'searchable' => ['first_name', 'last_name', 'organization_name', 'bio'],
+                'searchable' => ['first_name', 'last_name', 'organization_name', 'bio', 'skills', 'location'],
                 'filterable' => ['tenant_id', 'status', 'profile_type'],
                 'sortable'   => ['created_at'],
+                'ranking'    => ['words', 'typo', 'proximity', 'attribute', 'sort', 'exactness'],
+            ],
+            'events' => [
+                'pk'         => 'id',
+                'searchable' => ['title', 'description', 'location', 'organizer_name'],
+                'filterable' => ['tenant_id', 'status', 'start_time', 'is_online'],
+                'sortable'   => ['start_time', 'created_at'],
+                'ranking'    => ['words', 'typo', 'proximity', 'attribute', 'sort', 'exactness'],
+            ],
+            'groups' => [
+                'pk'         => 'id',
+                'searchable' => ['name', 'description'],
+                'filterable' => ['tenant_id', 'status', 'privacy'],
+                'sortable'   => ['created_at', 'members_count'],
+                'ranking'    => ['words', 'typo', 'proximity', 'attribute', 'sort', 'exactness'],
             ],
         ];
 
@@ -106,6 +125,68 @@ class SearchService
             $idx->updateSearchableAttributes($cfg['searchable']);
             $idx->updateFilterableAttributes($cfg['filterable']);
             $idx->updateSortableAttributes($cfg['sortable']);
+
+            if (!empty($cfg['ranking'])) {
+                $idx->updateRankingRules($cfg['ranking']);
+            }
+        }
+
+        // ── Synonyms ──────────────────────────────────────────────────────
+        // Applied globally across all indexes — covers timebanking domain
+        // terminology, common abbreviations, and community platform concepts.
+        $synonyms = [
+            // Timebanking terminology
+            'timebank'      => ['time bank', 'time banking', 'timebanking'],
+            'time bank'     => ['timebank', 'timebanking'],
+            'timebanking'   => ['timebank', 'time bank', 'time banking'],
+            'time credit'   => ['time credits', 'hour', 'hours', 'credit', 'credits'],
+            'time credits'  => ['time credit', 'hours', 'credits'],
+            // Listing types
+            'offer'         => ['offering', 'service', 'provide', 'give', 'teach'],
+            'request'       => ['requesting', 'need', 'want', 'looking for', 'seek'],
+            'service'       => ['offer', 'skill', 'help', 'assistance'],
+            'listing'       => ['service', 'offer', 'request', 'ad', 'post'],
+            // Community concepts
+            'volunteer'     => ['volunteering', 'helper', 'helping'],
+            'volunteering'  => ['volunteer', 'helping', 'community service'],
+            'member'        => ['user', 'person', 'participant', 'neighbour', 'neighbor'],
+            'group'         => ['team', 'club', 'circle', 'community'],
+            'event'         => ['meeting', 'gathering', 'workshop', 'session', 'activity'],
+            'exchange'      => ['swap', 'trade', 'transaction', 'transfer'],
+            // Skill-related
+            'tutor'         => ['teacher', 'instructor', 'mentor', 'coach'],
+            'teacher'       => ['tutor', 'instructor', 'mentor'],
+            'repair'        => ['fix', 'mend', 'restore'],
+            'fix'           => ['repair', 'mend', 'restore'],
+            'gardening'     => ['garden', 'landscaping', 'horticulture', 'planting'],
+            'cooking'       => ['baking', 'meal prep', 'culinary', 'food'],
+            'transport'     => ['ride', 'lift', 'driving', 'travel'],
+            'childcare'     => ['babysitting', 'child minding', 'kids'],
+            'tech support'  => ['IT help', 'computer help', 'technology', 'IT support'],
+            'computer'      => ['IT', 'technology', 'tech', 'digital'],
+        ];
+
+        foreach ($configs as $name => $_) {
+            try {
+                $client->index($name)->updateSynonyms($synonyms);
+            } catch (\Throwable) {
+                // Synonym update is non-critical — continue silently
+            }
+        }
+
+        // Configure typo tolerance — be generous with shorter words
+        foreach ($configs as $name => $_) {
+            try {
+                $client->index($name)->updateTypoTolerance([
+                    'enabled'             => true,
+                    'minWordSizeForTypos' => [
+                        'oneTypo'  => 4,
+                        'twoTypos' => 7,
+                    ],
+                ]);
+            } catch (\Throwable) {
+                // Typo tolerance config is non-critical
+            }
         }
 
         // Mark as available since we just communicated with Meilisearch successfully
@@ -212,6 +293,60 @@ class SearchService
     }
 
     /**
+     * Index an event into Meilisearch.
+     * Silently skips if Meilisearch is unavailable.
+     * Accepts an Eloquent Event model or a plain array (from sync script).
+     */
+    public static function indexEvent(array|Event $event): void
+    {
+        if (!static::isAvailable()) {
+            return;
+        }
+
+        $doc = $event instanceof Event ? [
+            'id'             => $event->id,
+            'tenant_id'      => $event->tenant_id,
+            'title'          => $event->title ?? '',
+            'description'    => $event->description ?? '',
+            'location'       => $event->location ?? '',
+            'status'         => $event->status ?? 'published',
+            'is_online'      => (bool) ($event->is_online ?? false),
+            'organizer_name' => $event->user
+                ? trim($event->user->first_name . ' ' . $event->user->last_name)
+                : '',
+            'start_time'     => $event->start_time?->timestamp ?? $event->start_date?->timestamp ?? 0,
+            'created_at'     => $event->created_at?->timestamp ?? 0,
+        ] : $event;
+
+        static::client()->index('events')->addDocuments([$doc]);
+    }
+
+    /**
+     * Index a group into Meilisearch.
+     * Silently skips if Meilisearch is unavailable.
+     * Accepts an Eloquent Group model or a plain array (from sync script).
+     */
+    public static function indexGroup(array|Group $group): void
+    {
+        if (!static::isAvailable()) {
+            return;
+        }
+
+        $doc = $group instanceof Group ? [
+            'id'            => $group->id,
+            'tenant_id'     => $group->tenant_id,
+            'name'          => $group->name ?? '',
+            'description'   => $group->description ?? '',
+            'status'        => $group->status ?? 'active',
+            'privacy'       => $group->privacy ?? 'public',
+            'members_count' => $group->active_members_count ?? $group->members_count ?? 0,
+            'created_at'    => $group->created_at?->timestamp ?? 0,
+        ] : $group;
+
+        static::client()->index('groups')->addDocuments([$doc]);
+    }
+
+    /**
      * Remove a listing from the Meilisearch index.
      * Silently skips if Meilisearch is unavailable.
      */
@@ -224,6 +359,152 @@ class SearchService
             static::client()->index('listings')->deleteDocument($listingId);
         } catch (\Throwable) {
             // Non-critical — document may already be absent
+        }
+    }
+
+    /**
+     * Remove a user from the Meilisearch index.
+     * Silently skips if Meilisearch is unavailable.
+     */
+    public static function removeUser(int $userId): void
+    {
+        if (!static::isAvailable()) {
+            return;
+        }
+        try {
+            static::client()->index('users')->deleteDocument($userId);
+        } catch (\Throwable) {
+            // Non-critical — document may already be absent
+        }
+    }
+
+    /**
+     * Remove an event from the Meilisearch index.
+     * Silently skips if Meilisearch is unavailable.
+     */
+    public static function removeEvent(int $eventId): void
+    {
+        if (!static::isAvailable()) {
+            return;
+        }
+        try {
+            static::client()->index('events')->deleteDocument($eventId);
+        } catch (\Throwable) {
+            // Non-critical — document may already be absent
+        }
+    }
+
+    /**
+     * Remove a group from the Meilisearch index.
+     * Silently skips if Meilisearch is unavailable.
+     */
+    public static function removeGroup(int $groupId): void
+    {
+        if (!static::isAvailable()) {
+            return;
+        }
+        try {
+            static::client()->index('groups')->deleteDocument($groupId);
+        } catch (\Throwable) {
+            // Non-critical — document may already be absent
+        }
+    }
+
+    /**
+     * Search users in Meilisearch and return matching IDs.
+     *
+     * Returns null when Meilisearch is unavailable — callers should fall back to SQL.
+     *
+     * @return array{ids: int[], total: int}|null
+     */
+    public static function searchUserIds(
+        string $term,
+        int $tenantId,
+        int $limit = 200,
+        int $offset = 0,
+    ): ?array {
+        if (!static::isAvailable()) {
+            return null;
+        }
+        try {
+            $result = static::client()->index('users')->search($term, [
+                'filter'               => "tenant_id = {$tenantId} AND status != 'banned' AND status != 'suspended'",
+                'limit'                => max(0, $limit),
+                'offset'               => $offset,
+                'attributesToRetrieve' => ['id'],
+            ]);
+            return [
+                'ids'   => array_column($result->getHits(), 'id'),
+                'total' => $result->getEstimatedTotalHits() ?? count($result->getHits()),
+            ];
+        } catch (\Throwable) {
+            return null;
+        }
+    }
+
+    /**
+     * Search events in Meilisearch and return matching IDs.
+     *
+     * Returns null when Meilisearch is unavailable — callers should fall back to SQL.
+     *
+     * @return array{ids: int[], total: int}|null
+     */
+    public static function searchEventIds(
+        string $term,
+        int $tenantId,
+        int $limit = 20,
+        int $offset = 0,
+    ): ?array {
+        if (!static::isAvailable()) {
+            return null;
+        }
+        try {
+            $now = now()->timestamp;
+            $result = static::client()->index('events')->search($term, [
+                'filter'               => "tenant_id = {$tenantId} AND start_time >= {$now}",
+                'limit'                => max(0, $limit),
+                'offset'               => $offset,
+                'sort'                 => ['start_time:asc'],
+                'attributesToRetrieve' => ['id'],
+            ]);
+            return [
+                'ids'   => array_column($result->getHits(), 'id'),
+                'total' => $result->getEstimatedTotalHits() ?? count($result->getHits()),
+            ];
+        } catch (\Throwable) {
+            return null;
+        }
+    }
+
+    /**
+     * Search groups in Meilisearch and return matching IDs.
+     *
+     * Returns null when Meilisearch is unavailable — callers should fall back to SQL.
+     *
+     * @return array{ids: int[], total: int}|null
+     */
+    public static function searchGroupIds(
+        string $term,
+        int $tenantId,
+        int $limit = 20,
+        int $offset = 0,
+    ): ?array {
+        if (!static::isAvailable()) {
+            return null;
+        }
+        try {
+            $result = static::client()->index('groups')->search($term, [
+                'filter'               => "tenant_id = {$tenantId}",
+                'limit'                => max(0, $limit),
+                'offset'               => $offset,
+                'attributesToRetrieve' => ['id'],
+            ]);
+            return [
+                'ids'   => array_column($result->getHits(), 'id'),
+                'total' => $result->getEstimatedTotalHits() ?? count($result->getHits()),
+            ];
+        } catch (\Throwable) {
+            return null;
         }
     }
 
@@ -280,41 +561,61 @@ class SearchService
             $results['listings'] = array_map(fn(array $h) => [...$h, 'result_type' => 'listing'], $hits);
         }
 
-        // Events and groups fall back to SQL — not yet indexed in Meilisearch
         if ($type === null || $type === 'events') {
-            $like = '%' . $term . '%';
-            $results['events'] = $this->event->newQuery()
-                ->with(['user:id,first_name,last_name,avatar_url'])
-                ->where(function (Builder $q) use ($like) {
-                    $q->where('title', 'LIKE', $like)
-                      ->orWhere('description', 'LIKE', $like)
-                      ->orWhere('location', 'LIKE', $like);
-                })
-                ->where('start_time', '>=', now())
-                ->orderBy('start_time')
-                ->limit($limit)
-                ->get()
-                ->map(fn (Event $e) => [...$e->toArray(), 'result_type' => 'event'])
-                ->all();
+            $now = now()->timestamp;
+            $hits = $client->index('events')->search($term, [
+                'filter'               => "tenant_id = {$tenantId} AND start_time >= {$now}",
+                'limit'                => $limit,
+                'sort'                 => ['start_time:asc'],
+            ])->getHits();
+
+            if (!empty($hits)) {
+                // Hydrate from DB to get relations
+                $eventIds = array_column($hits, 'id');
+                $events = $this->event->newQuery()
+                    ->with(['user:id,first_name,last_name,avatar_url'])
+                    ->whereIn('id', $eventIds)
+                    ->get()
+                    ->keyBy('id');
+
+                $results['events'] = [];
+                foreach ($eventIds as $eid) {
+                    if ($events->has($eid)) {
+                        $results['events'][] = [...$events[$eid]->toArray(), 'result_type' => 'event'];
+                    }
+                }
+            } else {
+                $results['events'] = [];
+            }
         }
 
         if ($type === null || $type === 'groups') {
-            $like = '%' . $term . '%';
-            $results['groups'] = $this->group->newQuery()
-                ->withCount('activeMembers')
-                ->where(function (Builder $q) use ($like) {
-                    $q->where('name', 'LIKE', $like)
-                      ->orWhere('description', 'LIKE', $like);
-                })
-                ->orderByDesc('id')
-                ->limit($limit)
-                ->get()
-                ->map(fn (Group $g) => [
-                    ...$g->toArray(),
-                    'result_type'   => 'group',
-                    'members_count' => $g->active_members_count,
-                ])
-                ->all();
+            $hits = $client->index('groups')->search($term, [
+                'filter' => "tenant_id = {$tenantId}",
+                'limit'  => $limit,
+            ])->getHits();
+
+            if (!empty($hits)) {
+                $groupIds = array_column($hits, 'id');
+                $groups = $this->group->newQuery()
+                    ->withCount('activeMembers')
+                    ->whereIn('id', $groupIds)
+                    ->get()
+                    ->keyBy('id');
+
+                $results['groups'] = [];
+                foreach ($groupIds as $gid) {
+                    if ($groups->has($gid)) {
+                        $results['groups'][] = [
+                            ...$groups[$gid]->toArray(),
+                            'result_type'   => 'group',
+                            'members_count' => $groups[$gid]->active_members_count,
+                        ];
+                    }
+                }
+            } else {
+                $results['groups'] = [];
+            }
         }
 
         return $results;
@@ -467,34 +768,48 @@ class SearchService
             }
         }
 
-        // Events and groups use SQL fallback until Meilisearch indexing is extended to them
         if ($type === 'all' || $type === 'events') {
-            $eq = $this->event->newQuery()
-                ->with(['user:id,first_name,last_name,avatar_url'])
-                ->where(function (Builder $q) use ($like) {
-                    $q->where('title', 'LIKE', $like)
-                      ->orWhere('description', 'LIKE', $like)
-                      ->orWhere('location', 'LIKE', $like);
-                })
-                ->where('start_time', '>=', now());
+            $now = now()->timestamp;
+            $eventSort = $sort === 'newest' ? ['start_time:desc'] : ['start_time:asc'];
+            $hits = $client->index('events')->search($term, [
+                'filter' => "tenant_id = {$tenantId} AND start_time >= {$now}",
+                'limit'  => $limit,
+                'sort'   => $eventSort,
+            ])->getHits();
 
-            $this->applySortOrder($eq, $sort, 'start_time');
-            foreach ($eq->limit($limit)->get() as $e) {
-                $allItems[] = [...$e->toArray(), 'type' => 'event'];
+            if (!empty($hits)) {
+                $eventIds = array_column($hits, 'id');
+                $events = $this->event->newQuery()
+                    ->with(['user:id,first_name,last_name,avatar_url'])
+                    ->whereIn('id', $eventIds)
+                    ->get()
+                    ->keyBy('id');
+                foreach ($eventIds as $eid) {
+                    if ($events->has($eid)) {
+                        $allItems[] = [...$events[$eid]->toArray(), 'type' => 'event'];
+                    }
+                }
             }
         }
 
         if ($type === 'all' || $type === 'groups') {
-            $gq = $this->group->newQuery()
-                ->withCount('activeMembers')
-                ->where(function (Builder $q) use ($like) {
-                    $q->where('name', 'LIKE', $like)
-                      ->orWhere('description', 'LIKE', $like);
-                });
+            $hits = $client->index('groups')->search($term, [
+                'filter' => "tenant_id = {$tenantId}",
+                'limit'  => $limit,
+            ])->getHits();
 
-            $this->applySortOrder($gq, $sort);
-            foreach ($gq->limit($limit)->get() as $g) {
-                $allItems[] = [...$g->toArray(), 'type' => 'group', 'members_count' => $g->active_members_count];
+            if (!empty($hits)) {
+                $groupIds = array_column($hits, 'id');
+                $groups = $this->group->newQuery()
+                    ->withCount('activeMembers')
+                    ->whereIn('id', $groupIds)
+                    ->get()
+                    ->keyBy('id');
+                foreach ($groupIds as $gid) {
+                    if ($groups->has($gid)) {
+                        $allItems[] = [...$groups[$gid]->toArray(), 'type' => 'group', 'members_count' => $groups[$gid]->active_members_count];
+                    }
+                }
             }
         }
 
@@ -666,24 +981,19 @@ class SearchService
             return [...$h, 'name' => $name];
         }, $userHits);
 
-        // Events and groups via SQL — not yet indexed in Meilisearch
-        $like   = '%' . $term . '%';
-        $events = $this->event->newQuery()
-            ->where('title', 'LIKE', $like)
-            ->where('start_time', '>=', now())
-            ->select('id', 'title', 'start_time')
-            ->orderBy('start_time')
-            ->limit($limit)
-            ->get()
-            ->toArray();
+        $now = now()->timestamp;
+        $events = $client->index('events')->search($term, [
+            'filter'               => "tenant_id = {$tenantId} AND start_time >= {$now}",
+            'limit'                => $limit,
+            'sort'                 => ['start_time:asc'],
+            'attributesToRetrieve' => ['id', 'title', 'start_time'],
+        ])->getHits();
 
-        $groups = $this->group->newQuery()
-            ->where('name', 'LIKE', $like)
-            ->select('id', 'name')
-            ->orderByDesc('id')
-            ->limit($limit)
-            ->get()
-            ->toArray();
+        $groups = $client->index('groups')->search($term, [
+            'filter'               => "tenant_id = {$tenantId}",
+            'limit'                => $limit,
+            'attributesToRetrieve' => ['id', 'name'],
+        ])->getHits();
 
         return compact('listings', 'users', 'events', 'groups');
     }
@@ -773,9 +1083,23 @@ class SearchService
     // Static user search (used by UsersController member list)
     // =========================================================================
 
+    /**
+     * Static user search — used by UsersController member directory.
+     *
+     * Tries Meilisearch first for typo-tolerant, synonym-aware results.
+     * Falls back to SQL LIKE if Meilisearch is unavailable.
+     */
     public static function searchUsersStatic(string $query, int $tenantId, int $limit = 200, array $extraFilters = []): array|false
     {
         $limit = min($limit, 200);
+
+        // Try Meilisearch first for typo-tolerant, ranked results
+        $meiliResult = static::searchUserIds($query, $tenantId, $limit);
+        if ($meiliResult !== null) {
+            return $meiliResult['ids'];
+        }
+
+        // Fall back to SQL LIKE
         $like = '%' . $query . '%';
         return User::where('tenant_id', $tenantId)
             ->where(function ($q) use ($like) {
