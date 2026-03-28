@@ -177,7 +177,7 @@ class FeedService
                               ->from('groups')
                               ->whereColumn('groups.id', 'feed_activity.group_id')
                               ->where('groups.tenant_id', $tenantId)
-                              ->where('groups.privacy', 'public');
+                              ->where('groups.visibility', 'public');
                       });
                 });
             } else {
@@ -189,7 +189,7 @@ class FeedService
                               ->from('groups')
                               ->whereColumn('groups.id', 'feed_activity.group_id')
                               ->where('groups.tenant_id', $tenantId)
-                              ->where('groups.privacy', 'public');
+                              ->where('groups.visibility', 'public');
                       });
                 });
             }
