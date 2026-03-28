@@ -903,8 +903,20 @@ class JobVacanciesController extends BaseApiController
     public function getInterviews(Request $request, int $vacancyId): JsonResponse
     {
         $this->ensureFeature();
-        $this->getUserId(); // auth required
+        $userId = $this->getUserId();
         $this->rateLimit('jobs_interviews_list', 30, 60);
+
+        // Verify caller owns the vacancy or is admin
+        $vacancy = \App\Models\JobVacancy::find($vacancyId);
+        if (!$vacancy) {
+            return $this->respondWithError('RESOURCE_NOT_FOUND', 'Vacancy not found', null, 404);
+        }
+        if ((int) $vacancy->user_id !== $userId) {
+            $user = \App\Models\User::where('id', $userId)->first(['id', 'role']);
+            if (!$user || !in_array($user->role, ['admin', 'super_admin'])) {
+                return $this->respondWithError('RESOURCE_FORBIDDEN', 'Only the vacancy owner can view interviews', null, 403);
+            }
+        }
 
         $interviews = JobInterviewService::getForVacancy($vacancyId);
 
@@ -1082,6 +1094,18 @@ class JobVacanciesController extends BaseApiController
     {
         $userId = $this->getUserId();
 
+        // Verify caller owns the vacancy or is admin
+        $vacancy = \App\Models\JobVacancy::find($id);
+        if (!$vacancy) {
+            return $this->respondWithError('RESOURCE_NOT_FOUND', 'Vacancy not found', null, 404);
+        }
+        if ((int) $vacancy->user_id !== $userId) {
+            $user = \App\Models\User::where('id', $userId)->first(['id', 'role']);
+            if (!$user || !in_array($user->role, ['admin', 'super_admin'])) {
+                return $this->respondWithError('RESOURCE_FORBIDDEN', 'Only the vacancy owner can view referral stats', null, 403);
+            }
+        }
+
         $stats = JobReferralService::getStats($id);
         return $this->respondWithData(['stats' => $stats]);
     }
@@ -1095,6 +1119,19 @@ class JobVacanciesController extends BaseApiController
     public function upsertScorecard(int $id): JsonResponse
     {
         $userId = $this->getUserId();
+
+        // Verify caller owns the vacancy or is admin (only employer/team should score)
+        $application = JobApplication::with(['vacancy'])->find($id);
+        if (!$application || !$application->vacancy || (int) $application->vacancy->tenant_id !== TenantContext::getId()) {
+            return $this->respondWithError('RESOURCE_NOT_FOUND', 'Application not found', null, 404);
+        }
+        if ((int) $application->vacancy->user_id !== $userId) {
+            $user = \App\Models\User::where('id', $userId)->first(['id', 'role']);
+            if (!$user || !in_array($user->role, ['admin', 'super_admin'])) {
+                return $this->respondWithError('RESOURCE_FORBIDDEN', 'Only the vacancy owner can score applications', null, 403);
+            }
+        }
+
         $data   = $this->getAllInput();
         $result = JobScorecardService::upsert($id, $userId, $data);
 
@@ -1110,7 +1147,21 @@ class JobVacanciesController extends BaseApiController
      */
     public function getScorecards(int $id): JsonResponse
     {
-        $this->getUserId(); // auth required
+        $userId = $this->getUserId();
+
+        // Verify caller owns the vacancy, is the applicant, or is admin
+        $application = JobApplication::with(['vacancy'])->find($id);
+        if (!$application || !$application->vacancy || (int) $application->vacancy->tenant_id !== TenantContext::getId()) {
+            return $this->respondWithError('RESOURCE_NOT_FOUND', 'Application not found', null, 404);
+        }
+        $isApplicant = (int) $application->user_id === $userId;
+        $isPoster = (int) $application->vacancy->user_id === $userId;
+        if (!$isApplicant && !$isPoster) {
+            $user = \App\Models\User::where('id', $userId)->first(['id', 'role']);
+            if (!$user || !in_array($user->role, ['admin', 'super_admin'])) {
+                return $this->respondWithError('RESOURCE_FORBIDDEN', 'Access denied', null, 403);
+            }
+        }
 
         $cards = JobScorecardService::getForApplication($id);
         return $this->respondWithData(['data' => $cards]);
@@ -1160,7 +1211,19 @@ class JobVacanciesController extends BaseApiController
      */
     public function getTeam(int $id): JsonResponse
     {
-        $this->getUserId(); // auth required
+        $userId = $this->getUserId();
+
+        // Verify caller owns the vacancy or is admin
+        $vacancy = \App\Models\JobVacancy::find($id);
+        if (!$vacancy) {
+            return $this->respondWithError('RESOURCE_NOT_FOUND', 'Vacancy not found', null, 404);
+        }
+        if ((int) $vacancy->user_id !== $userId) {
+            $user = \App\Models\User::where('id', $userId)->first(['id', 'role']);
+            if (!$user || !in_array($user->role, ['admin', 'super_admin'])) {
+                return $this->respondWithError('RESOURCE_FORBIDDEN', 'Only the vacancy owner can view team members', null, 403);
+            }
+        }
 
         $members = JobTeamService::getMembers($id);
         return $this->respondWithData(['data' => $members]);

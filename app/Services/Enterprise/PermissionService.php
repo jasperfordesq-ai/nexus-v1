@@ -569,15 +569,15 @@ class PermissionService
     }
 
     /**
-     * Create a new role
+     * Create a new role (tenant-scoped)
      */
     public function createRole(string $name, string $displayName, string $description, int $level = 0, bool $isSystem = false): ?int
     {
         try {
             DB::statement(
-                "INSERT INTO roles (name, display_name, description, level, is_system)
-                 VALUES (?, ?, ?, ?, ?)",
-                [$name, $displayName, $description, $level, $isSystem]
+                "INSERT INTO roles (name, display_name, description, level, is_system, tenant_id)
+                 VALUES (?, ?, ?, ?, ?, ?)",
+                [$name, $displayName, $description, $level, $isSystem, $this->tenantId]
             );
 
             return (int) DB::getPdo()->lastInsertId();
@@ -588,16 +588,16 @@ class PermissionService
     }
 
     /**
-     * Attach permissions to a role
+     * Attach permissions to a role (tenant-scoped)
      */
     public function attachPermissionsToRole(int $roleId, array $permissionIds, int $grantedBy): bool
     {
         try {
             foreach ($permissionIds as $permissionId) {
                 DB::statement(
-                    "INSERT IGNORE INTO role_permissions (role_id, permission_id, granted_by)
-                     VALUES (?, ?, ?)",
-                    [$roleId, $permissionId, $grantedBy]
+                    "INSERT IGNORE INTO role_permissions (role_id, permission_id, granted_by, tenant_id)
+                     VALUES (?, ?, ?, ?)",
+                    [$roleId, $permissionId, $grantedBy, $this->tenantId]
                 );
             }
             return true;

@@ -318,7 +318,7 @@ class GamificationController extends BaseApiController
         }
 
         try {
-            $result = $this->xpShopService->purchase($userId, $itemId);
+            $result = $this->xpShopService->purchaseItem($userId, $itemId);
 
             if ($result['success'] ?? false) {
                 return $this->success($result);

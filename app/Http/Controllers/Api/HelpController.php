@@ -113,6 +113,9 @@ class HelpController extends BaseApiController
             );
         }
 
+        // Sanitize HTML in answer to prevent stored XSS
+        $answer = \App\Helpers\HtmlSanitizer::sanitize($answer);
+
         $newId = DB::table('help_faqs')->insertGetId([
             'tenant_id'    => $tenantId,
             'category'     => trim($data['category'] ?? 'General'),
@@ -154,6 +157,11 @@ class HelpController extends BaseApiController
             if (array_key_exists($field, $data)) {
                 $updates[$field] = $data[$field];
             }
+        }
+
+        // Sanitize HTML in answer to prevent stored XSS
+        if (isset($updates['answer'])) {
+            $updates['answer'] = \App\Helpers\HtmlSanitizer::sanitize($updates['answer']);
         }
 
         if (empty($updates)) {

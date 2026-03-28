@@ -188,6 +188,7 @@ class SafeguardingTriggerService
         // Audit log trigger activation
         try {
             DB::table('activity_log')->insert([
+                'tenant_id' => $tenantId,
                 'user_id' => $userId,
                 'action' => 'safeguarding_triggers_activated',
                 'action_type' => 'safeguarding',

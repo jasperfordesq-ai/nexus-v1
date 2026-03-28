@@ -81,20 +81,28 @@ class ImpactReportingService
         $new30d = (int) $userStats->new_30d;
 
         // Engagement: users who traded in last 30 days
-        $activeTraders = (int) DB::table(DB::raw(
-            "(SELECT sender_id as user_id FROM transactions WHERE tenant_id = {$tenantId} AND created_at >= DATE_SUB(NOW(), INTERVAL 30 DAY)
-              UNION
-              SELECT receiver_id as user_id FROM transactions WHERE tenant_id = {$tenantId} AND created_at >= DATE_SUB(NOW(), INTERVAL 30 DAY)) t"
-        ))->distinct()->count('user_id');
+        // Use parameterized query to avoid SQL injection via raw interpolation
+        $activeTraderRows = DB::select(
+            "SELECT COUNT(DISTINCT user_id) as cnt FROM (
+                SELECT sender_id as user_id FROM transactions WHERE tenant_id = ? AND created_at >= DATE_SUB(NOW(), INTERVAL 30 DAY)
+                UNION
+                SELECT receiver_id as user_id FROM transactions WHERE tenant_id = ? AND created_at >= DATE_SUB(NOW(), INTERVAL 30 DAY)
+            ) t",
+            [$tenantId, $tenantId]
+        );
+        $activeTraders = (int) ($activeTraderRows[0]->cnt ?? 0);
 
-        // Reciprocity score
-        $balanceStats = DB::table(DB::raw(
-            "(SELECT u.id,
-                COALESCE((SELECT SUM(amount) FROM transactions WHERE sender_id = u.id AND tenant_id = {$tenantId}), 0) as given,
-                COALESCE((SELECT SUM(amount) FROM transactions WHERE receiver_id = u.id AND tenant_id = {$tenantId}), 0) as received
-              FROM users u WHERE u.tenant_id = {$tenantId} AND u.status = 'active'
-              HAVING given > 0 OR received > 0) user_balance"
-        ))->select(DB::raw('AVG(ABS(given - received) / GREATEST(given + received, 1)) as imbalance_ratio'))->first();
+        // Reciprocity score — use parameterized query to avoid SQL injection
+        $balanceStats = DB::selectOne(
+            "SELECT AVG(ABS(given_amt - received_amt) / GREATEST(given_amt + received_amt, 1)) as imbalance_ratio FROM (
+                SELECT u.id,
+                    COALESCE((SELECT SUM(amount) FROM transactions WHERE sender_id = u.id AND tenant_id = ?), 0) as given_amt,
+                    COALESCE((SELECT SUM(amount) FROM transactions WHERE receiver_id = u.id AND tenant_id = ?), 0) as received_amt
+                FROM users u WHERE u.tenant_id = ? AND u.status = 'active'
+                HAVING given_amt > 0 OR received_amt > 0
+            ) user_balance",
+            [$tenantId, $tenantId, $tenantId]
+        );
 
         $imbalanceRatio = (float) ($balanceStats->imbalance_ratio ?? 0);
         $reciprocityScore = round(1 - $imbalanceRatio, 2);

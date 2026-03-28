@@ -169,8 +169,8 @@ class AdminBlogController extends BaseApiController
             $slug = $slug . '-' . time();
         }
 
-        $content = $this->input('content', '');
-        $excerpt = $this->input('excerpt', '');
+        $content = \App\Helpers\HtmlSanitizer::sanitizeCms($this->input('content', ''));
+        $excerpt = trim($this->input('excerpt', ''));
         $status = in_array($this->input('status', ''), ['draft', 'published'], true) ? $this->input('status') : 'draft';
         $featuredImage = $this->input('featured_image');
         $categoryId = $this->input('category_id') ? (int) $this->input('category_id') : null;
@@ -287,7 +287,7 @@ class AdminBlogController extends BaseApiController
         }
 
         if (array_key_exists('content', $data)) {
-            $updates['content'] = $data['content'] ?? '';
+            $updates['content'] = \App\Helpers\HtmlSanitizer::sanitizeCms($data['content'] ?? '');
         }
 
         if (array_key_exists('excerpt', $data)) {

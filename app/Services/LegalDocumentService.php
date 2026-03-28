@@ -95,12 +95,16 @@ class LegalDocumentService
 
     /**
      * Get all versions of a legal document.
+     * Verifies the document belongs to the current tenant before returning versions.
      */
     public static function getVersions(int $documentId): array
     {
-        return DB::table('legal_document_versions')
-            ->where('document_id', $documentId)
-            ->orderByDesc('version_number')
+        return DB::table('legal_document_versions as ldv')
+            ->join('legal_documents as ld', 'ldv.document_id', '=', 'ld.id')
+            ->where('ldv.document_id', $documentId)
+            ->where('ld.tenant_id', TenantContext::getId())
+            ->orderByDesc('ldv.version_number')
+            ->select('ldv.*')
             ->get()
             ->map(fn ($v) => (array) $v)
             ->all();
@@ -189,9 +193,20 @@ class LegalDocumentService
 
     /**
      * Create a new version for a document.
+     * Verifies the document belongs to the current tenant before creating.
      */
     public static function createVersion(int $docId, array $data): int
     {
+        // Verify document belongs to current tenant
+        $doc = DB::table('legal_documents')
+            ->where('id', $docId)
+            ->where('tenant_id', TenantContext::getId())
+            ->first();
+
+        if (! $doc) {
+            throw new \InvalidArgumentException('Document not found for this tenant');
+        }
+
         $plainText = ! empty($data['content']) ? strip_tags($data['content']) : null;
 
         return DB::table('legal_document_versions')->insertGetId([
@@ -509,12 +524,16 @@ class LegalDocumentService
 
     /**
      * Get acceptances for a document version.
+     * Verifies the version belongs to the current tenant.
      */
     public static function getVersionAcceptances(int $vid, int $limit = 50, int $offset = 0): array
     {
         return DB::table('user_legal_acceptances as ula')
             ->join('users as u', 'ula.user_id', '=', 'u.id')
+            ->join('legal_document_versions as ldv', 'ula.version_id', '=', 'ldv.id')
+            ->join('legal_documents as ld', 'ldv.document_id', '=', 'ld.id')
             ->where('ula.version_id', $vid)
+            ->where('ld.tenant_id', TenantContext::getId())
             ->orderByDesc('ula.accepted_at')
             ->limit($limit)
             ->offset($offset)
@@ -526,13 +545,16 @@ class LegalDocumentService
 
     /**
      * Export acceptance records for compliance audit.
+     * Verifies the document belongs to the current tenant.
      */
     public static function exportAcceptanceRecords(int $docId, ?string $startDate = null, ?string $endDate = null): array
     {
         $query = DB::table('user_legal_acceptances as ula')
             ->join('users as u', 'ula.user_id', '=', 'u.id')
             ->join('legal_document_versions as ldv', 'ula.version_id', '=', 'ldv.id')
+            ->join('legal_documents as ld', 'ula.document_id', '=', 'ld.id')
             ->where('ula.document_id', $docId)
+            ->where('ld.tenant_id', TenantContext::getId())
             ->orderByDesc('ula.accepted_at')
             ->select(
                 'ula.id as acceptance_id', 'u.id as user_id', 'u.name as user_name', 'u.email as user_email',

@@ -208,6 +208,9 @@ class GuardianConsentService
     /**
      * Withdraw an active consent.
      *
+     * Authorization: only the minor themselves, or an admin, may withdraw consent.
+     * The guardian email holder uses a separate revocation flow (not user-id-based).
+     *
      * @param int $consentId Consent record ID
      * @param int $userId User ID performing the withdrawal
      * @return bool
@@ -227,8 +230,28 @@ class GuardianConsentService
                 return false;
             }
 
+            // Authorization check: only the minor or an admin can withdraw
+            $isMinor = (int) $consent->minor_user_id === $userId;
+            if (!$isMinor) {
+                $user = DB::table('users')
+                    ->where('id', $userId)
+                    ->where('tenant_id', $tenantId)
+                    ->select('role')
+                    ->first();
+                $isAdmin = $user && in_array($user->role, ['admin', 'tenant_admin', 'super_admin', 'god'], true);
+                if (!$isAdmin) {
+                    Log::warning('GuardianConsentService::withdrawConsent unauthorized attempt', [
+                        'consent_id' => $consentId,
+                        'user_id' => $userId,
+                        'minor_user_id' => $consent->minor_user_id,
+                    ]);
+                    return false;
+                }
+            }
+
             DB::table('vol_guardian_consents')
                 ->where('id', $consentId)
+                ->where('tenant_id', $tenantId)
                 ->update([
                     'status' => 'withdrawn',
                     'withdrawn_at' => now(),

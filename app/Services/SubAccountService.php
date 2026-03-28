@@ -29,6 +29,9 @@ class SubAccountService
         'can_view_messages'   => false,
     ];
 
+    /** Maximum number of child accounts a parent can have */
+    public const MAX_CHILDREN = 20;
+
     private array $errors = [];
 
     public function __construct(
@@ -180,7 +183,7 @@ class SubAccountService
             return $existing->id;
         }
 
-        // Prevent circular: child cannot also be parent
+        // Prevent circular: child cannot also be parent of the requester
         $circular = $this->relationship->newQuery()
             ->where('parent_user_id', $childUserId)
             ->where('child_user_id', $parentUserId)
@@ -189,6 +192,39 @@ class SubAccountService
 
         if ($circular) {
             $this->errors[] = ['code' => 'CIRCULAR', 'message' => 'This user already manages your account'];
+            return null;
+        }
+
+        // Prevent infinite nesting: a child account cannot also be a parent of other accounts
+        $childIsParent = $this->relationship->newQuery()
+            ->where('parent_user_id', $childUserId)
+            ->whereIn('status', ['active', 'pending'])
+            ->exists();
+
+        if ($childIsParent) {
+            $this->errors[] = ['code' => 'NESTING_NOT_ALLOWED', 'message' => 'This user already manages other accounts and cannot be added as a child'];
+            return null;
+        }
+
+        // Prevent a user who is already a child from becoming a parent
+        $parentIsChild = $this->relationship->newQuery()
+            ->where('child_user_id', $parentUserId)
+            ->whereIn('status', ['active', 'pending'])
+            ->exists();
+
+        if ($parentIsChild) {
+            $this->errors[] = ['code' => 'NESTING_NOT_ALLOWED', 'message' => 'You are a managed account and cannot manage other accounts'];
+            return null;
+        }
+
+        // Enforce maximum children limit
+        $currentChildCount = $this->relationship->newQuery()
+            ->where('parent_user_id', $parentUserId)
+            ->whereIn('status', ['active', 'pending'])
+            ->count();
+
+        if ($currentChildCount >= self::MAX_CHILDREN) {
+            $this->errors[] = ['code' => 'LIMIT_REACHED', 'message' => 'Maximum number of sub-accounts (' . self::MAX_CHILDREN . ') reached'];
             return null;
         }
 

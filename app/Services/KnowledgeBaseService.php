@@ -8,7 +8,6 @@ namespace App\Services;
 
 use App\Core\TenantContext;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
 
 /**
  * KnowledgeBaseService — Laravel DI-based service for knowledge base articles.
@@ -400,27 +399,10 @@ class KnowledgeBaseService
     }
 
     /**
-     * Basic HTML sanitization.
+     * HTML sanitization — delegates to the centralized HtmlSanitizer helper.
      */
     private function sanitizeHtml(string $html): string
     {
-        $allowedTags = '<h1><h2><h3><h4><h5><h6><p><br><strong><em><b><i><u><s>'
-            . '<ul><ol><li><a><img><blockquote><pre><code><hr><table><thead><tbody>'
-            . '<tr><th><td><div><span><sub><sup>';
-
-        $html = strip_tags($html, $allowedTags);
-
-        // Remove dangerous attributes: event handlers (on*)
-        $html = preg_replace('/\s+on\w+\s*=\s*(["\']).*?\1/si', '', $html);
-        $html = preg_replace('/\s+on\w+\s*=\s*[^\s>]*/si', '', $html);
-
-        // Remove dangerous URI schemes in href/src/action attributes
-        $html = preg_replace('/\b(href|src|action)\s*=\s*(["\'])\s*(javascript|data|vbscript)\s*:.*?\2/si', '$1=$2#$2', $html);
-
-        // Remove style attributes (prevents CSS expression() attacks)
-        $html = preg_replace('/\s+style\s*=\s*(["\']).*?\1/si', '', $html);
-        $html = preg_replace('/\s+style\s*=\s*[^\s>]*/si', '', $html);
-
-        return $html;
+        return \App\Helpers\HtmlSanitizer::sanitizeCms($html);
     }
 }

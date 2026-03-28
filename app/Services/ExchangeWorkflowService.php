@@ -547,12 +547,12 @@ class ExchangeWorkflowService
             }
 
             if (!empty($riskTag->dbs_required)) {
-                $hasVetting = DB::table('user_vetting_records')
+                $hasVetting = DB::table('vetting_records')
                     ->where('user_id', $providerId)
                     ->where('tenant_id', $tenantId)
-                    ->where('status', 'valid')
+                    ->where('status', 'verified')
                     ->where(function ($q) {
-                        $q->whereNull('expires_at')->orWhere('expires_at', '>', now());
+                        $q->whereNull('expiry_date')->orWhere('expiry_date', '>', now());
                     })
                     ->exists();
 
@@ -565,9 +565,9 @@ class ExchangeWorkflowService
                 $hasInsurance = DB::table('insurance_certificates')
                     ->where('user_id', $providerId)
                     ->where('tenant_id', $tenantId)
-                    ->where('status', 'valid')
+                    ->where('status', 'verified')
                     ->where(function ($q) {
-                        $q->whereNull('expires_at')->orWhere('expires_at', '>', now());
+                        $q->whereNull('expiry_date')->orWhere('expiry_date', '>', now());
                     })
                     ->exists();
 

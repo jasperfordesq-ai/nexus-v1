@@ -424,18 +424,24 @@ class VettingService
     private function syncUserVettingStatus(int $userId): void
     {
         try {
-            // Find the best active vetting record for this user
+            $tenantId = TenantContext::getId();
+
+            // Find the best active vetting record for this user (tenant-scoped)
             $bestRecord = DB::table('vetting_records')
                 ->where('user_id', $userId)
+                ->where('tenant_id', $tenantId)
                 ->orderByRaw("FIELD(status, 'verified', 'pending', 'submitted', 'expired', 'rejected', 'revoked')")
                 ->orderByDesc('created_at')
                 ->first();
 
             if (!$bestRecord) {
-                DB::table('users')->where('id', $userId)->update([
-                    'vetting_status' => 'none',
-                    'vetting_expires_at' => null,
-                ]);
+                DB::table('users')
+                    ->where('id', $userId)
+                    ->where('tenant_id', $tenantId)
+                    ->update([
+                        'vetting_status' => 'none',
+                        'vetting_expires_at' => null,
+                    ]);
                 return;
             }
 
@@ -455,10 +461,13 @@ class VettingService
                 $vettingStatus = 'expired';
             }
 
-            DB::table('users')->where('id', $userId)->update([
-                'vetting_status' => $vettingStatus,
-                'vetting_expires_at' => $bestRecord->expiry_date,
-            ]);
+            DB::table('users')
+                ->where('id', $userId)
+                ->where('tenant_id', $tenantId)
+                ->update([
+                    'vetting_status' => $vettingStatus,
+                    'vetting_expires_at' => $bestRecord->expiry_date,
+                ]);
         } catch (\Throwable $e) {
             Log::error('VettingService::syncUserVettingStatus failed', [
                 'error' => $e->getMessage(),

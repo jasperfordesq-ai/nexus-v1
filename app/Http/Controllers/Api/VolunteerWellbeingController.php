@@ -480,8 +480,13 @@ class VolunteerWellbeingController extends BaseApiController
         $this->ensureFeature();
         $adminId = $this->requireAdmin();
 
+        $reason = trim($this->input('reason', ''));
+        if (empty($reason)) {
+            return $this->respondWithError('VALIDATION_ERROR', 'A reason is required to reject a training record', 'reason', 422);
+        }
+
         $tenantId = TenantContext::getId();
-        $result = $this->safeguardingService->rejectTraining((int) $id, $adminId, '', $tenantId);
+        $result = $this->safeguardingService->rejectTraining((int) $id, $adminId, $reason, $tenantId);
         if (!$result) {
             return $this->respondWithError('NOT_FOUND', 'Training record not found', null, 404);
         }

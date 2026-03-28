@@ -161,11 +161,19 @@ class AdminLegalDocController extends BaseApiController
 
             return new \Symfony\Component\HttpFoundation\StreamedResponse(function () use ($records) {
                 $output = fopen('php://output', 'w');
+                // Write BOM for UTF-8 Excel compatibility
+                fwrite($output, "\xEF\xBB\xBF");
                 fputcsv($output, ['Acceptance ID', 'User ID', 'User Name', 'User Email', 'Version Number', 'Accepted At', 'Acceptance Method', 'IP Address']);
                 foreach ($records as $record) {
                     fputcsv($output, [
-                        $record['acceptance_id'], $record['user_id'], $record['user_name'], $record['user_email'],
-                        $record['version_number'], $record['accepted_at'], $record['acceptance_method'], $record['ip_address'] ?? 'N/A',
+                        $record['acceptance_id'],
+                        $record['user_id'],
+                        $this->sanitizeCsvValue($record['user_name']),
+                        $this->sanitizeCsvValue($record['user_email']),
+                        $this->sanitizeCsvValue($record['version_number']),
+                        $record['accepted_at'],
+                        $this->sanitizeCsvValue($record['acceptance_method']),
+                        $record['ip_address'] ?? 'N/A',
                     ]);
                 }
                 fclose($output);
@@ -275,4 +283,17 @@ class AdminLegalDocController extends BaseApiController
         }
     }
 
+    /**
+     * Sanitize a value for CSV export to prevent formula injection.
+     * Prefixes cells starting with =, +, -, @, \t, \r with a single quote
+     * to prevent spreadsheet applications from interpreting them as formulas.
+     */
+    private function sanitizeCsvValue(mixed $value): string
+    {
+        $str = (string) ($value ?? '');
+        if ($str !== '' && in_array($str[0], ['=', '+', '-', '@', "\t", "\r"], true)) {
+            return "'" . $str;
+        }
+        return $str;
+    }
 }

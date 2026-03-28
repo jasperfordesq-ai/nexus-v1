@@ -223,6 +223,7 @@ class ChallengeService
                     $prog = UserChallengeProgress::query()
                         ->where('user_id', $userId)
                         ->where('challenge_id', $challenge->id)
+                        ->lockForUpdate()
                         ->first();
 
                     if (! $prog) {

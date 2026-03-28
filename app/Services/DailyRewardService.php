@@ -47,6 +47,7 @@ class DailyRewardService
     {
         $today = now()->toDateString();
 
+        // Quick pre-check outside transaction (avoids transaction overhead for common case)
         $alreadyClaimed = DB::table('daily_rewards')
             ->where('tenant_id', $tenantId)
             ->where('user_id', $userId)
@@ -85,48 +86,54 @@ class DailyRewardService
 
         $longestStreak = max((int) ($user->longest_streak ?? 0), $currentStreak);
 
-        return DB::transaction(function () use ($tenantId, $userId, $today, $currentStreak, $baseXp, $milestoneBonus, $totalXp, $longestStreak) {
-            // Insert daily reward record
-            DB::table('daily_rewards')->insert([
-                'tenant_id'      => $tenantId,
-                'user_id'        => $userId,
-                'reward_date'    => $today,
-                'xp_earned'      => $totalXp,
-                'streak_day'     => $currentStreak,
-                'milestone_bonus' => $milestoneBonus,
-                'created_at'     => now(),
-                'claimed_at'     => now(),
-            ]);
-
-            // Update user streak info and XP
-            DB::table('users')
-                ->where('id', $userId)
-                ->where('tenant_id', $tenantId)
-                ->update([
-                    'login_streak'      => $currentStreak,
-                    'last_daily_reward' => $today,
-                    'longest_streak'    => $longestStreak,
-                    'xp'                => DB::raw('xp + ' . (int) $totalXp),
+        try {
+            return DB::transaction(function () use ($tenantId, $userId, $today, $currentStreak, $baseXp, $milestoneBonus, $totalXp, $longestStreak) {
+                // Insert daily reward record — UNIQUE KEY (tenant_id, user_id, reward_date)
+                // prevents double-claim even under concurrent requests (TOCTOU protection)
+                DB::table('daily_rewards')->insert([
+                    'tenant_id'      => $tenantId,
+                    'user_id'        => $userId,
+                    'reward_date'    => $today,
+                    'xp_earned'      => $totalXp,
+                    'streak_day'     => $currentStreak,
+                    'milestone_bonus' => $milestoneBonus,
+                    'created_at'     => now(),
+                    'claimed_at'     => now(),
                 ]);
 
-            // Log XP award
-            DB::table('user_xp_log')->insert([
-                'tenant_id'   => $tenantId,
-                'user_id'     => $userId,
-                'xp_amount'   => $totalXp,
-                'action'      => 'daily_login',
-                'description' => "Daily login reward (day {$currentStreak})" . ($milestoneBonus > 0 ? " + streak bonus" : ''),
-                'created_at'  => now(),
-            ]);
+                // Update user streak info and XP
+                DB::table('users')
+                    ->where('id', $userId)
+                    ->where('tenant_id', $tenantId)
+                    ->update([
+                        'login_streak'      => $currentStreak,
+                        'last_daily_reward' => $today,
+                        'longest_streak'    => $longestStreak,
+                        'xp'                => DB::raw('xp + ' . (int) $totalXp),
+                    ]);
 
-            return [
-                'xp_earned'       => $totalXp,
-                'base_xp'         => $baseXp,
-                'milestone_bonus' => $milestoneBonus,
-                'streak_day'      => $currentStreak,
-                'longest_streak'  => $longestStreak,
-            ];
-        });
+                // Log XP award
+                DB::table('user_xp_log')->insert([
+                    'tenant_id'   => $tenantId,
+                    'user_id'     => $userId,
+                    'xp_amount'   => $totalXp,
+                    'action'      => 'daily_login',
+                    'description' => "Daily login reward (day {$currentStreak})" . ($milestoneBonus > 0 ? " + streak bonus" : ''),
+                    'created_at'  => now(),
+                ]);
+
+                return [
+                    'xp_earned'       => $totalXp,
+                    'base_xp'         => $baseXp,
+                    'milestone_bonus' => $milestoneBonus,
+                    'streak_day'      => $currentStreak,
+                    'longest_streak'  => $longestStreak,
+                ];
+            });
+        } catch (\Illuminate\Database\UniqueConstraintViolationException $e) {
+            // Concurrent request already claimed — return null (already claimed)
+            return null;
+        }
     }
 
     /**

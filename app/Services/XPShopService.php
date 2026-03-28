@@ -135,6 +135,7 @@ class XPShopService
 
         $itemArr = (array) $item;
 
+        // Pre-check outside transaction (fast path for common rejection cases)
         if (!self::canPurchaseItem($userId, $itemArr)) {
             $reason = self::getPurchaseBlockReason($userId, $itemArr, null);
             return ['success' => false, 'error' => $reason ?? 'Cannot purchase'];
@@ -142,7 +143,34 @@ class XPShopService
 
         DB::beginTransaction();
         try {
-            // Deduct XP
+            // Re-check stock and per-user limits inside transaction to prevent
+            // TOCTOU race conditions on concurrent purchases
+            if ($item->stock_limit !== null) {
+                $totalPurchases = DB::table('user_xp_purchases')
+                    ->where('item_id', $item->id)
+                    ->where('tenant_id', $tenantId)
+                    ->lockForUpdate()
+                    ->count();
+                if ($totalPurchases >= $item->stock_limit) {
+                    DB::rollBack();
+                    return ['success' => false, 'error' => 'Out of stock'];
+                }
+            }
+
+            if ($item->per_user_limit !== null) {
+                $userPurchases = DB::table('user_xp_purchases')
+                    ->where('user_id', $userId)
+                    ->where('item_id', $item->id)
+                    ->where('tenant_id', $tenantId)
+                    ->lockForUpdate()
+                    ->count();
+                if ($userPurchases >= $item->per_user_limit) {
+                    DB::rollBack();
+                    return ['success' => false, 'error' => 'Already owned'];
+                }
+            }
+
+            // Deduct XP (atomic — WHERE xp >= cost prevents negative balance)
             $affected = DB::table('users')
                 ->where('id', $userId)
                 ->where('tenant_id', $tenantId)

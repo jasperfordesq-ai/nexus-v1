@@ -771,6 +771,13 @@ class JobVacancyService
 
         $previousStatus = $application->stage ?? $application->status ?? 'applied';
 
+        // Prevent backwards transitions from terminal states (accepted/rejected/withdrawn)
+        $terminalStatuses = ['accepted', 'rejected', 'withdrawn'];
+        if (in_array($previousStatus, $terminalStatuses, true) && $previousStatus !== $status) {
+            $this->errors[] = ['code' => 'INVALID_TRANSITION', 'message' => "Cannot change status from '{$previousStatus}' — it is a terminal state"];
+            return false;
+        }
+
         try {
             $application->update([
                 'status' => $status,
@@ -1799,8 +1806,11 @@ class JobVacancyService
         }
         $tenantId = TenantContext::getId();
         if ((int) $vacancy['user_id'] !== $userId) {
-            $this->errors[] = ['code' => 'RESOURCE_FORBIDDEN', 'message' => 'Access denied'];
-            return null;
+            $user = User::where('id', $userId)->first(['id', 'role']);
+            if (!$user || !in_array($user->role, ['admin', 'super_admin'])) {
+                $this->errors[] = ['code' => 'RESOURCE_FORBIDDEN', 'message' => 'Access denied'];
+                return null;
+            }
         }
 
         $apps = JobApplication::with(['applicant:id,first_name,last_name,email'])

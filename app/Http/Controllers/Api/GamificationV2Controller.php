@@ -382,10 +382,16 @@ class GamificationV2Controller extends BaseApiController
                 return $this->respondWithError('CHALLENGE_NOT_COMPLETED', 'You have not completed this challenge yet', null, 400);
             }
 
-            DB::update(
-                "UPDATE user_challenge_progress SET reward_claimed = 1 WHERE challenge_id = ? AND user_id = ? AND tenant_id = ?",
+            // Atomic claim: UPDATE only if reward_claimed is still 0 to prevent
+            // double-award under concurrent requests (TOCTOU race condition)
+            $affected = DB::update(
+                "UPDATE user_challenge_progress SET reward_claimed = 1 WHERE challenge_id = ? AND user_id = ? AND tenant_id = ? AND reward_claimed = 0",
                 [$id, $userId, $this->getTenantId()]
             );
+
+            if ($affected === 0) {
+                return $this->respondWithError('CHALLENGE_ALREADY_CLAIMED', 'You have already claimed this reward', null, 400);
+            }
 
             $xpReward = (int) ($challenge['xp_reward'] ?? 0);
             if ($xpReward > 0) {

@@ -76,9 +76,9 @@ class UserBadge extends Model
         if ($tenantId) { $query->where('tenant_id', $tenantId); }
         $query->update(['is_showcased' => 0, 'showcase_order' => 0]);
 
-        // Set new showcased (max 3)
+        // Set new showcased (max 5)
         $order = 0;
-        foreach (array_slice($badgeKeys, 0, 3) as $key) {
+        foreach (array_slice($badgeKeys, 0, 5) as $key) {
             $q = DB::table('user_badges')
                 ->where('user_id', $userId)
                 ->where('badge_key', $key);
@@ -104,7 +104,7 @@ class UserBadge extends Model
         }
 
         return $query->orderBy('showcase_order')
-            ->limit(3)
+            ->limit(5)
             ->get()
             ->map(fn ($r) => (array) $r)
             ->all();

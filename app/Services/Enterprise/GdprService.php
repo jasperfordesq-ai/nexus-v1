@@ -300,6 +300,10 @@ class GdprService
             'ai_chat_history' => $this->getAiChatData($userId),
             'reviews' => $this->getReviewsData($userId),
             'exchanges' => $this->getExchangeData($userId),
+            'vetting_records' => $this->getVettingRecordsData($userId),
+            'insurance_certificates' => $this->getInsuranceCertificatesData($userId),
+            'identity_verification' => $this->getIdentityVerificationData($userId),
+            'safeguarding_preferences' => $this->getSafeguardingPreferencesData($userId),
         ];
     }
 
@@ -1860,6 +1864,89 @@ This export will expire in 7 days.
                     copy($item, $dest);
                 }
             }
+        }
+    }
+
+    // =========================================================================
+    // PII data export methods for identity, vetting, insurance, safeguarding
+    // =========================================================================
+
+    /**
+     * Get vetting/background check records for a user (GDPR Article 15).
+     */
+    private function getVettingRecordsData(int $userId): array
+    {
+        try {
+            return $this->query(
+                "SELECT id, vetting_type, status, reference_number, issue_date, expiry_date,
+                        works_with_children, works_with_vulnerable_adults, requires_enhanced_check,
+                        notes, rejection_reason, created_at, updated_at
+                 FROM vetting_records
+                 WHERE user_id = ? AND tenant_id = ?
+                 ORDER BY created_at DESC",
+                [$userId, $this->tenantId]
+            )->fetchAll();
+        } catch (\Throwable $e) {
+            return [];
+        }
+    }
+
+    /**
+     * Get insurance certificate records for a user (GDPR Article 15).
+     */
+    private function getInsuranceCertificatesData(int $userId): array
+    {
+        try {
+            return $this->query(
+                "SELECT id, insurance_type, provider_name, policy_number, coverage_amount,
+                        start_date, expiry_date, status, notes, created_at, updated_at
+                 FROM insurance_certificates
+                 WHERE user_id = ? AND tenant_id = ?
+                 ORDER BY created_at DESC",
+                [$userId, $this->tenantId]
+            )->fetchAll();
+        } catch (\Throwable $e) {
+            return [];
+        }
+    }
+
+    /**
+     * Get identity verification session records for a user (GDPR Article 15).
+     * Excludes raw provider data/tokens — only includes status and metadata.
+     */
+    private function getIdentityVerificationData(int $userId): array
+    {
+        try {
+            return $this->query(
+                "SELECT id, provider_slug, verification_level, status,
+                        failure_reason, created_at, completed_at
+                 FROM identity_verification_sessions
+                 WHERE user_id = ? AND tenant_id = ?
+                 ORDER BY created_at DESC",
+                [$userId, $this->tenantId]
+            )->fetchAll();
+        } catch (\Throwable $e) {
+            return [];
+        }
+    }
+
+    /**
+     * Get safeguarding preference selections for a user (GDPR Article 15).
+     */
+    private function getSafeguardingPreferencesData(int $userId): array
+    {
+        try {
+            return $this->query(
+                "SELECT usp.id, tso.option_key, tso.label as option_label,
+                        usp.selected_value, usp.notes, usp.consent_given_at, usp.revoked_at, usp.created_at
+                 FROM user_safeguarding_preferences usp
+                 LEFT JOIN tenant_safeguarding_options tso ON tso.id = usp.option_id
+                 WHERE usp.user_id = ? AND usp.tenant_id = ?
+                 ORDER BY usp.created_at DESC",
+                [$userId, $this->tenantId]
+            )->fetchAll();
+        } catch (\Throwable $e) {
+            return [];
         }
     }
 

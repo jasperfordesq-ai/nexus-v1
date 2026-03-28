@@ -210,7 +210,12 @@ class KnowledgeBaseController extends BaseApiController
         $updateData = [];
         if (isset($data['title'])) $updateData['title'] = trim($data['title']);
         if (isset($data['slug'])) $updateData['slug'] = $data['slug'];
-        if (isset($data['content'])) $updateData['content'] = $data['content'];
+        if (isset($data['content'])) {
+            $contentType = $data['content_type'] ?? ($existing->content_type ?? 'html');
+            $updateData['content'] = ($contentType === 'html')
+                ? \App\Helpers\HtmlSanitizer::sanitizeCms($data['content'])
+                : $data['content'];
+        }
         if (isset($data['content_type'])) $updateData['content_type'] = $data['content_type'];
         if (array_key_exists('category_id', $data)) $updateData['category_id'] = $data['category_id'];
         if (array_key_exists('parent_article_id', $data)) $updateData['parent_article_id'] = $data['parent_article_id'];
