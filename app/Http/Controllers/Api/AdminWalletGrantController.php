@@ -126,6 +126,10 @@ class AdminWalletGrantController extends BaseApiController
             return $this->respondWithError('VALIDATION_ERROR', 'amount is required and must be greater than zero', 'amount', 422);
         }
 
+        if ($amount > 10000) {
+            return $this->respondWithError('VALIDATION_ERROR', 'Grant amount cannot exceed 10,000 hours', 'amount', 422);
+        }
+
         // Validate user exists and belongs to current tenant
         $user = DB::selectOne(
             "SELECT id, first_name, last_name FROM users WHERE id = ? AND tenant_id = ?",

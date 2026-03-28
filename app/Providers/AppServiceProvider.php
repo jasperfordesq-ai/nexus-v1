@@ -1016,6 +1016,7 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         Listing::observe(ListingObserver::class);
+        \App\Models\User::observe(\App\Observers\UserObserver::class);
 
         // Dynamically merge CorsHelper's full origin list (including tenant custom
         // domains from DB) into Laravel's HandleCors config. This ensures custom

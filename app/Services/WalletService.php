@@ -154,6 +154,16 @@ class WalletService
             throw new \InvalidArgumentException('Amount must be greater than 0');
         }
 
+        // Cap maximum transfer amount to prevent accidental or malicious large transfers
+        if ($amount > 1000) {
+            throw new \InvalidArgumentException('Transfer amount cannot exceed 1000 hours');
+        }
+
+        // Enforce reasonable decimal precision (max 2 decimal places)
+        if (round($amount, 2) != $amount) {
+            throw new \InvalidArgumentException('Amount must have at most 2 decimal places');
+        }
+
         // Resolve recipient: ID, email, or username
         $receiver = null;
         if (is_numeric($recipient)) {

@@ -463,13 +463,13 @@ class FederationApiMiddleware
             $updated = DB::update("
                 UPDATE federation_api_keys
                 SET hourly_request_count = hourly_request_count + 1
-                WHERE id = ? AND hourly_request_count < rate_limit_per_hour
+                WHERE id = ? AND hourly_request_count < rate_limit
             ", [$keyId]);
 
             if ($updated === 0) {
                 // Either key not found or rate limit exceeded — check which
                 $results = DB::select("
-                    SELECT rate_limit_per_hour, hourly_request_count
+                    SELECT rate_limit, hourly_request_count
                     FROM federation_api_keys
                     WHERE id = ?
                 ", [$keyId]);
@@ -479,7 +479,7 @@ class FederationApiMiddleware
                     return false;
                 }
 
-                $rateLimit = (int) ($config->rate_limit_per_hour ?? 1000);
+                $rateLimit = (int) ($config->rate_limit ?? 1000);
                 $requestCount = (int) $config->hourly_request_count;
 
                 $resetTime = strtotime($currentHour) + 3600;
@@ -496,13 +496,13 @@ class FederationApiMiddleware
 
             // Success — fetch current counts for headers
             $results = DB::select("
-                SELECT rate_limit_per_hour, hourly_request_count
+                SELECT rate_limit, hourly_request_count
                 FROM federation_api_keys
                 WHERE id = ?
             ", [$keyId]);
 
             $config = $results[0] ?? null;
-            $rateLimit = (int) ($config->rate_limit_per_hour ?? 1000);
+            $rateLimit = (int) ($config->rate_limit ?? 1000);
             $requestCount = (int) ($config->hourly_request_count ?? 1);
         } catch (\PDOException $e) {
             // Fallback for pre-migration schemas

@@ -26,10 +26,10 @@ return new class extends Migration
 
         if (!Schema::hasTable('group_chatroom_pinned_messages')) {
             Schema::create('group_chatroom_pinned_messages', function (Blueprint $table) {
-                $table->bigIncrements('id');
-                $table->unsignedBigInteger('chatroom_id');
-                $table->unsignedBigInteger('message_id');
-                $table->unsignedBigInteger('pinned_by');
+                $table->id();
+                $table->unsignedInteger('chatroom_id');
+                $table->unsignedInteger('message_id');
+                $table->integer('pinned_by');
                 $table->unsignedInteger('tenant_id');
                 $table->timestamp('created_at')->useCurrent();
 
@@ -47,7 +47,8 @@ return new class extends Migration
 
                 $table->foreign('pinned_by')
                     ->references('id')
-                    ->on('users');
+                    ->on('users')
+                    ->onDelete('cascade');
             });
         }
     }

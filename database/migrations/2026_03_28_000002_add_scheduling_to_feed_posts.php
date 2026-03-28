@@ -24,9 +24,12 @@ return new class extends Migration
         });
 
         // Add composite index for the cron query that finds scheduled posts ready to publish
-        Schema::table('feed_posts', function (Blueprint $table) {
-            $table->index(['publish_status', 'scheduled_at'], 'idx_feed_posts_publish_schedule');
-        });
+        $existing = collect(Schema::getIndexes('feed_posts'))->pluck('name')->all();
+        if (!in_array('idx_feed_posts_publish_schedule', $existing, true)) {
+            Schema::table('feed_posts', function (Blueprint $table) {
+                $table->index(['publish_status', 'scheduled_at'], 'idx_feed_posts_publish_schedule');
+            });
+        }
     }
 
     public function down(): void

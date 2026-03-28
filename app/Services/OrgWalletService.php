@@ -74,7 +74,7 @@ class OrgWalletService
                 return false;
             }
 
-            DB::table('organizations')->where('id', $fromOrgId)->decrement('balance', $amount);
+            DB::table('organizations')->where('id', $fromOrgId)->where('tenant_id', $tenantId)->decrement('balance', $amount);
             DB::table('organizations')->where('id', $toOrgId)->where('tenant_id', $tenantId)->increment('balance', $amount);
 
             $now = now();
@@ -132,6 +132,7 @@ class OrgWalletService
             // Record transaction
             $now = now();
             DB::table('org_transactions')->insert([
+                'tenant_id' => $tenantId,
                 'organization_id' => $orgId,
                 'user_id' => $userId,
                 'type' => 'deposit',

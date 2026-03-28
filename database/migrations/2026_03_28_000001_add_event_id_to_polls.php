@@ -14,7 +14,7 @@ return new class extends Migration
     {
         Schema::table('polls', function (Blueprint $table) {
             if (!Schema::hasColumn('polls', 'event_id')) {
-                $table->unsignedInteger('event_id')->nullable()->after('user_id');
+                $table->integer('event_id')->nullable()->after('user_id');
                 $table->index('event_id', 'polls_event_id_index');
                 $table->foreign('event_id')
                     ->references('id')

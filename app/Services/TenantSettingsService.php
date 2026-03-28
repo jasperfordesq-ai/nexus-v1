@@ -80,16 +80,26 @@ class TenantSettingsService
 
     /**
      * Clear all cached settings.
+     *
+     * Cache::forget() does NOT support wildcards — 'tenant_settings:*' is treated
+     * as a literal key that never exists, so the old code was a silent no-op.
+     * Instead, scan Redis for all matching keys and delete them individually.
      */
     public static function clearCache(): void
     {
-        // Flush all tenant settings from cache
-        // Since we can't enumerate all keys easily, use a tagged approach
-        // or just clear specific known tenants. For now, flush the cache store.
         try {
-            Cache::forget(self::CACHE_PREFIX . '*');
+            $redis = \Illuminate\Support\Facades\Redis::connection();
+            $prefix = config('cache.prefix', '') . ':' . self::CACHE_PREFIX;
+            $cursor = '0';
+
+            do {
+                [$cursor, $keys] = $redis->scan($cursor, ['match' => $prefix . '*', 'count' => 200]);
+                if (!empty($keys)) {
+                    $redis->del(...$keys);
+                }
+            } while ($cursor !== '0' && $cursor !== 0);
         } catch (\Throwable $e) {
-            // Ignore cache errors
+            // Ignore cache errors — Redis may be unavailable
         }
     }
 

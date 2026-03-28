@@ -25,7 +25,7 @@ class Transaction extends Model
     ];
 
     protected $casts = [
-        'amount' => 'decimal:2',
+        'amount' => 'integer',
         'deleted_for_sender' => 'boolean',
         'deleted_for_receiver' => 'boolean',
     ];

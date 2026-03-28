@@ -129,7 +129,19 @@ class CommunityFundService
 
         DB::beginTransaction();
         try {
-            $newBalance = (float) $fund['balance'] - $amount;
+            // Re-read balance under lock to prevent TOCTOU race condition
+            $lockedFund = DB::table('community_fund_accounts')
+                ->where('id', $fund['id'])
+                ->where('tenant_id', $tenantId)
+                ->lockForUpdate()
+                ->first();
+
+            if (!$lockedFund || (float) $lockedFund->balance < $amount) {
+                DB::rollBack();
+                return ['success' => false, 'error' => 'Insufficient community fund balance'];
+            }
+
+            $newBalance = (float) $lockedFund->balance - $amount;
 
             // Deduct from fund
             DB::statement(

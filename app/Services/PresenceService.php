@@ -85,7 +85,7 @@ class PresenceService
         }
 
         // Throttle DB writes — only write once per minute
-        $throttleKey = "nexus:presence:throttle:{$userId}";
+        $throttleKey = "nexus:presence:throttle:{$tenantId}:{$userId}";
         try {
             $wasSet = Redis::set($throttleKey, '1', 'EX', self::DB_WRITE_THROTTLE, 'NX');
             if (!$wasSet) {

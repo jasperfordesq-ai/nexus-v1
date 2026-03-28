@@ -598,13 +598,34 @@ class ExchangeWorkflowService
             return false;
         }
 
+        // Guard: only pending_confirmation or disputed exchanges can be completed
+        $allowedStatuses = [self::STATUS_PENDING_CONFIRMATION, self::STATUS_DISPUTED];
+        if (!in_array($exchange->status, $allowedStatuses, true)) {
+            Log::warning("Exchange #$exchangeId: cannot complete from status '{$exchange->status}'");
+            return false;
+        }
+
         return DB::transaction(function () use ($exchangeId, $exchange, $finalHours) {
+            // Re-read with lock to prevent double-completion race condition
+            $lockedExchange = DB::table('exchange_requests')
+                ->where('id', $exchangeId)
+                ->lockForUpdate()
+                ->first();
+
+            if (!$lockedExchange || $lockedExchange->status === self::STATUS_COMPLETED) {
+                Log::warning("Exchange #$exchangeId: already completed (race condition prevented)");
+                return false;
+            }
+
             $exchange->update(['final_hours' => $finalHours]);
 
-            // Create transaction via DB
+            // Create transaction via DB (includes balance check + row locking)
             $transactionId = self::createTransaction($exchangeId, $finalHours);
             if ($transactionId) {
                 $exchange->update(['transaction_id' => $transactionId]);
+            } else {
+                // Transaction creation failed (e.g., insufficient balance) — abort
+                throw new \RuntimeException("Exchange #$exchangeId: failed to create financial transaction");
             }
 
             self::updateStatus($exchangeId, self::STATUS_COMPLETED, null, 'system', "Completed with $finalHours hours");
@@ -625,6 +646,25 @@ class ExchangeWorkflowService
         try {
             $requesterId = (int) $exchangeData['requester_id'];
             $providerId = (int) $exchangeData['provider_id'];
+
+            // Lock sender row and check balance to prevent negative balances
+            $sender = DB::table('users')
+                ->where('id', $requesterId)
+                ->where('tenant_id', $tenantId)
+                ->lockForUpdate()
+                ->first();
+
+            if (!$sender || (float) $sender->balance < $hours) {
+                Log::warning("Exchange #$exchangeId: requester #$requesterId has insufficient balance ({$sender->balance ?? 0} < $hours)");
+                return null;
+            }
+
+            // Lock receiver row too for consistency
+            DB::table('users')
+                ->where('id', $providerId)
+                ->where('tenant_id', $tenantId)
+                ->lockForUpdate()
+                ->first();
 
             DB::table('users')->where('id', $requesterId)->where('tenant_id', $tenantId)
                 ->decrement('balance', $hours);
