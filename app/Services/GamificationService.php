@@ -460,9 +460,12 @@ class GamificationService
 
         try {
             DB::transaction(function () use ($userId, $amount, $action, $description) {
-                // Prevent duplicate one-time XP awards
+                // Prevent duplicate one-time XP awards — lock user row to serialize
                 $oneTimeActions = ['complete_profile'];
                 if (in_array($action, $oneTimeActions)) {
+                    // Lock user row to prevent concurrent duplicate one-time awards
+                    DB::table('users')->where('id', $userId)->lockForUpdate()->first();
+
                     $existing = UserXpLog::where('user_id', $userId)
                         ->where('action', $action)
                         ->exists();
@@ -479,7 +482,7 @@ class GamificationService
                     'description' => $description,
                 ]);
 
-                // Update user XP
+                // Update user XP (atomic increment)
                 User::query()->where('id', $userId)->increment('xp', $amount);
             });
 

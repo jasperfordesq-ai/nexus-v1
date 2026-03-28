@@ -7,16 +7,20 @@
 namespace App\Core;
 
 /**
- * TOTP secret encryption/decryption using AES-256-CBC via OpenSSL.
+ * TOTP secret encryption/decryption using AES-256-CBC + HMAC-SHA256 via OpenSSL.
+ *
+ * Wire format v2: base64(IV + ciphertext + HMAC)
+ * Wire format v1 (legacy): base64(IV + ciphertext) — no HMAC, accepted on decrypt only
  *
  * NOTE: This uses a custom key derivation (SHA-256 of APP_KEY) and wire format
- * (IV prepended to ciphertext, base64-encoded) that is NOT compatible with
- * Laravel's Crypt facade. Existing TOTP secrets in the database depend on this
- * exact format — do NOT switch to Crypt::encrypt/decrypt without migrating data.
+ * that is NOT compatible with Laravel's Crypt facade. Existing TOTP secrets in
+ * the database depend on this exact format — do NOT switch to Crypt::encrypt/decrypt
+ * without migrating data.
  */
 class TotpEncryption
 {
     private const CIPHER = 'aes-256-cbc';
+    private const HMAC_LENGTH = 32; // SHA-256 produces 32 bytes
 
     /**
      * Derive the encryption key from APP_KEY.
@@ -41,10 +45,19 @@ class TotpEncryption
     }
 
     /**
+     * Derive a separate HMAC key from the encryption key.
+     * Uses a different derivation to avoid key reuse between encryption and authentication.
+     */
+    private static function getHmacKey(): string
+    {
+        return hash_hmac('sha256', 'totp-hmac-key', self::getKey(), true);
+    }
+
+    /**
      * Encrypt a TOTP secret.
      *
      * @param string $data Plaintext TOTP secret
-     * @return string Base64-encoded ciphertext (IV prepended)
+     * @return string Base64-encoded ciphertext (IV + ciphertext + HMAC)
      */
     public static function encrypt(string $data): string
     {
@@ -54,14 +67,21 @@ class TotpEncryption
         if ($encrypted === false) {
             throw new \RuntimeException('TOTP encryption failed: ' . openssl_error_string());
         }
-        // Prepend IV to ciphertext, then base64-encode
-        return base64_encode($iv . $encrypted);
+        // Compute HMAC over IV + ciphertext for authenticated encryption
+        $payload = $iv . $encrypted;
+        $hmac = hash_hmac('sha256', $payload, self::getHmacKey(), true);
+        // Wire format: base64(IV + ciphertext + HMAC)
+        return base64_encode($payload . $hmac);
     }
 
     /**
      * Decrypt a TOTP secret.
      *
-     * @param string $data Base64-encoded ciphertext (IV prepended)
+     * Accepts both v2 (with HMAC) and v1 (legacy, without HMAC) wire formats.
+     * v1 secrets will be decrypted but should be re-encrypted on next write to
+     * upgrade them to v2 format.
+     *
+     * @param string $data Base64-encoded ciphertext
      * @return string Plaintext TOTP secret
      */
     public static function decrypt(string $data): string
@@ -75,8 +95,34 @@ class TotpEncryption
         if (strlen($raw) < $ivLength) {
             throw new \RuntimeException('TOTP decryption failed: data too short.');
         }
-        $iv = substr($raw, 0, $ivLength);
-        $ciphertext = substr($raw, $ivLength);
+
+        // Determine if this is v2 (with HMAC) or v1 (legacy without HMAC).
+        // AES-CBC block size is 16 bytes. Valid v1 payload: IV (16) + ciphertext (multiple of 16).
+        // Valid v2 payload: IV (16) + ciphertext (multiple of 16) + HMAC (32).
+        // If (len - IV) % 16 == 0, it's v1. If ((len - IV - 32) % 16 == 0 && len > IV + 32), it's v2.
+        $payloadWithoutIv = strlen($raw) - $ivLength;
+        $isV2 = ($payloadWithoutIv > self::HMAC_LENGTH)
+            && (($payloadWithoutIv - self::HMAC_LENGTH) % 16 === 0);
+
+        if ($isV2) {
+            // Extract HMAC from the end
+            $hmac = substr($raw, -self::HMAC_LENGTH);
+            $payload = substr($raw, 0, -self::HMAC_LENGTH);
+
+            // Verify HMAC before decrypting (Encrypt-then-MAC)
+            $expectedHmac = hash_hmac('sha256', $payload, self::getHmacKey(), true);
+            if (!hash_equals($expectedHmac, $hmac)) {
+                throw new \RuntimeException('TOTP decryption failed: HMAC verification failed (data tampered).');
+            }
+
+            $iv = substr($payload, 0, $ivLength);
+            $ciphertext = substr($payload, $ivLength);
+        } else {
+            // Legacy v1 format: no HMAC
+            $iv = substr($raw, 0, $ivLength);
+            $ciphertext = substr($raw, $ivLength);
+        }
+
         $decrypted = openssl_decrypt($ciphertext, self::CIPHER, $key, OPENSSL_RAW_DATA, $iv);
         if ($decrypted === false) {
             throw new \RuntimeException('TOTP decryption failed: ' . openssl_error_string());

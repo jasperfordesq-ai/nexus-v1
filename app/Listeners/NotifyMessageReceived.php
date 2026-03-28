@@ -6,6 +6,7 @@
 
 namespace App\Listeners;
 
+use App\Core\TenantContext;
 use App\Events\MessageSent;
 use App\Services\NotificationDispatcher;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -30,6 +31,8 @@ class NotifyMessageReceived implements ShouldQueue
     public function handle(MessageSent $event): void
     {
         try {
+            // Ensure tenant context is set (required when running via async queue)
+            TenantContext::setById($event->tenantId);
             $message = $event->message;
             $senderId = $event->sender->id;
             $recipientId = (int) $message->receiver_id;

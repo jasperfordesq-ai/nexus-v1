@@ -251,7 +251,8 @@ class PasswordResetController extends BaseApiController
 
             $mailer->send($email, "Password Reset Request - " . $tenantName, $html);
         } catch (\Throwable $e) {
-            error_log("Password reset email failed for {$email}: " . $e->getMessage());
+            $maskedEmail = substr($email, 0, 2) . '***@' . (explode('@', $email)[1] ?? '***');
+            error_log("Password reset email failed for {$maskedEmail}: " . $e->getMessage());
         }
     }
 

@@ -213,23 +213,15 @@ class PollService
      */
     public static function vote(int $pollId, int $optionId, int $userId): bool
     {
-        $alreadyVoted = DB::table('poll_votes')
-            ->where('poll_id', $pollId)
-            ->where('user_id', $userId)
-            ->exists();
+        // Use INSERT IGNORE to atomically prevent double-votes.
+        // The idx_vote_unique (poll_id, user_id) constraint enforces uniqueness;
+        // INSERT IGNORE silently skips if the row already exists.
+        $affected = DB::affectingStatement(
+            'INSERT IGNORE INTO poll_votes (poll_id, option_id, user_id, created_at) VALUES (?, ?, ?, NOW())',
+            [$pollId, $optionId, $userId]
+        );
 
-        if ($alreadyVoted) {
-            return false;
-        }
-
-        DB::table('poll_votes')->insert([
-            'poll_id'    => $pollId,
-            'option_id'  => $optionId,
-            'user_id'    => $userId,
-            'created_at' => now(),
-        ]);
-
-        return true;
+        return $affected > 0;
     }
 
     /**

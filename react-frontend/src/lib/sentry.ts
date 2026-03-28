@@ -90,7 +90,7 @@ export function initSentry(): void {
       // Strip sensitive fields from request data
       if (event.request?.data && typeof event.request.data === 'object') {
         const data = event.request.data as Record<string, unknown>;
-        const sensitiveFields = ['password', 'password_confirmation', 'token', 'api_key', 'secret', 'csrf_token'];
+        const sensitiveFields = ['password', 'password_confirmation', 'current_password', 'token', 'api_key', 'secret', 'csrf_token', 'email', 'phone', 'credit_card', 'card_number', 'cvv', 'refresh_token', 'access_token'];
         for (const field of sensitiveFields) {
           if (field in data) {
             data[field] = '[FILTERED]';
@@ -126,10 +126,9 @@ export function setSentryUser(user: User | null): void {
   if (!IS_ENABLED) return;
 
   if (user) {
+    // Only send user ID and role — no PII (email, name) to Sentry
     Sentry.setUser({
       id: String(user.id),
-      email: user.email,
-      username: user.name || user.first_name,
     });
   } else {
     Sentry.setUser(null);

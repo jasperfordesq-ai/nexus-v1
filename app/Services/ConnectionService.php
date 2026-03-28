@@ -9,6 +9,7 @@ namespace App\Services;
 use App\Models\Connection;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Facades\DB;
 
 /**
  * ConnectionService — Laravel DI-based service for user connections.
@@ -92,30 +93,39 @@ class ConnectionService
             throw new \RuntimeException('Cannot connect with yourself');
         }
 
-        // Check for existing connection in either direction
-        $existing = Connection::query()
-            ->where(function (Builder $q) use ($requesterId, $receiverId) {
-                $q->where(function (Builder $q2) use ($requesterId, $receiverId) {
-                    $q2->where('requester_id', $requesterId)->where('receiver_id', $receiverId);
-                })->orWhere(function (Builder $q2) use ($requesterId, $receiverId) {
-                    $q2->where('requester_id', $receiverId)->where('receiver_id', $requesterId);
-                });
-            })
-            ->first();
+        return DB::transaction(function () use ($requesterId, $receiverId) {
+            // Lock both user rows (in consistent order to prevent deadlocks) to serialize
+            // concurrent connection requests between the same pair of users
+            $minId = min($requesterId, $receiverId);
+            $maxId = max($requesterId, $receiverId);
+            DB::table('users')->where('id', $minId)->lockForUpdate()->first();
+            DB::table('users')->where('id', $maxId)->lockForUpdate()->first();
 
-        if ($existing) {
-            throw new \RuntimeException('Connection already exists (status: ' . $existing->status . ')');
-        }
+            // Check for existing connection in either direction
+            $existing = Connection::query()
+                ->where(function (Builder $q) use ($requesterId, $receiverId) {
+                    $q->where(function (Builder $q2) use ($requesterId, $receiverId) {
+                        $q2->where('requester_id', $requesterId)->where('receiver_id', $receiverId);
+                    })->orWhere(function (Builder $q2) use ($requesterId, $receiverId) {
+                        $q2->where('requester_id', $receiverId)->where('receiver_id', $requesterId);
+                    });
+                })
+                ->first();
 
-        $connection = new Connection([
-            'requester_id' => $requesterId,
-            'receiver_id'  => $receiverId,
-            'status'       => 'pending',
-        ]);
+            if ($existing) {
+                throw new \RuntimeException('Connection already exists (status: ' . $existing->status . ')');
+            }
 
-        $connection->save();
+            $connection = new Connection([
+                'requester_id' => $requesterId,
+                'receiver_id'  => $receiverId,
+                'status'       => 'pending',
+            ]);
 
-        return $connection->fresh(['requester', 'receiver']);
+            $connection->save();
+
+            return $connection->fresh(['requester', 'receiver']);
+        });
     }
 
     /**
@@ -125,21 +135,23 @@ class ConnectionService
      */
     public static function accept(int $connectionId, int $userId): Connection
     {
-        /** @var Connection $connection */
-        $connection = Connection::query()->findOrFail($connectionId);
+        return DB::transaction(function () use ($connectionId, $userId) {
+            /** @var Connection $connection */
+            $connection = Connection::query()->lockForUpdate()->findOrFail($connectionId);
 
-        if ($connection->receiver_id !== $userId) {
-            throw new \RuntimeException('Only the receiver can accept a connection request');
-        }
+            if ($connection->receiver_id !== $userId) {
+                throw new \RuntimeException('Only the receiver can accept a connection request');
+            }
 
-        if ($connection->status !== 'pending') {
-            throw new \RuntimeException('Connection is not pending');
-        }
+            if ($connection->status !== 'pending') {
+                throw new \RuntimeException('Connection is not pending');
+            }
 
-        $connection->status = 'accepted';
-        $connection->save();
+            $connection->status = 'accepted';
+            $connection->save();
 
-        return $connection->fresh(['requester', 'receiver']);
+            return $connection->fresh(['requester', 'receiver']);
+        });
     }
 
     /**

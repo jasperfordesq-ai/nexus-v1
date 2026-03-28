@@ -43,8 +43,60 @@ class Handler extends ExceptionHandler
     {
         $this->reportable(function (Throwable $e) {
             // Sentry integration — report to Sentry in production
-            if (app()->bound('sentry') && $this->shouldReport($e)) {
-                app('sentry')->captureException($e);
+            // Uses raw sentry/sentry SDK (not sentry-laravel) since the Laravel
+            // integration package is not installed. Falls back to app('sentry')
+            // binding if sentry-laravel is ever added.
+            $sentryClient = null;
+
+            if (app()->bound('sentry')) {
+                $sentryClient = app('sentry');
+            } elseif (class_exists(\Sentry\SentrySdk::class)) {
+                $hub = \Sentry\SentrySdk::getCurrentHub();
+                if ($hub->getClient() !== null) {
+                    $sentryClient = $hub;
+                }
+            }
+
+            if ($sentryClient && $this->shouldReport($e)) {
+                // Enrich with tenant context
+                \Sentry\configureScope(function (\Sentry\State\Scope $scope): void {
+                    try {
+                        $tenantId = \App\Core\TenantContext::getId();
+                        if ($tenantId) {
+                            $scope->setTag('tenant_id', (string) $tenantId);
+                            $tenant = \App\Core\TenantContext::get();
+                            if ($tenant) {
+                                $scope->setTag('tenant_slug', $tenant['slug'] ?? '');
+                                $scope->setContext('tenant', [
+                                    'id' => $tenantId,
+                                    'name' => $tenant['name'] ?? '',
+                                    'slug' => $tenant['slug'] ?? '',
+                                ]);
+                            }
+                        }
+                    } catch (\Throwable) {
+                        // Tenant context may not be available — skip silently
+                    }
+
+                    // Enrich with user context (ID only — no PII)
+                    try {
+                        $user = auth()->user();
+                        if ($user) {
+                            $scope->setUser([
+                                'id' => (string) $user->id,
+                                'role' => $user->role ?? 'unknown',
+                            ]);
+                        }
+                    } catch (\Throwable) {
+                        // Auth may not be available — skip silently
+                    }
+                });
+
+                if ($sentryClient instanceof \Sentry\State\HubInterface) {
+                    $sentryClient->captureException($e);
+                } else {
+                    $sentryClient->captureException($e);
+                }
             }
         });
     }

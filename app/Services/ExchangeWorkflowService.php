@@ -226,52 +226,69 @@ class ExchangeWorkflowService
      */
     public static function confirmCompletion(int $exchangeId, int $userId, float $hours): bool
     {
-        $exchange = ExchangeRequest::find($exchangeId);
-        if (!$exchange) {
-            return false;
-        }
+        return DB::transaction(function () use ($exchangeId, $userId, $hours) {
+            // Lock the exchange row to prevent concurrent confirmation races
+            $exchange = ExchangeRequest::query()
+                ->lockForUpdate()
+                ->find($exchangeId);
 
-        if (!in_array($exchange->status, [self::STATUS_IN_PROGRESS, self::STATUS_PENDING_CONFIRMATION], true)) {
-            return false;
-        }
+            if (!$exchange) {
+                return false;
+            }
 
-        $isRequester = (int) $exchange->requester_id === $userId;
-        $isProvider = (int) $exchange->provider_id === $userId;
+            if (!in_array($exchange->status, [self::STATUS_IN_PROGRESS, self::STATUS_PENDING_CONFIRMATION], true)) {
+                return false;
+            }
 
-        if (!$isRequester && !$isProvider) {
-            return false;
-        }
+            $isRequester = (int) $exchange->requester_id === $userId;
+            $isProvider = (int) $exchange->provider_id === $userId;
 
-        // Adjust hours — use simple variance check without config service
-        $minHours = (float) $exchange->proposed_hours * 0.75;
-        $maxHours = (float) $exchange->proposed_hours * 1.25;
-        $hours = max($minHours, min($maxHours, $hours));
+            if (!$isRequester && !$isProvider) {
+                return false;
+            }
 
-        if ($isRequester) {
-            $exchange->update([
-                'requester_confirmed_at' => now(),
-                'requester_confirmed_hours' => $hours,
-            ]);
-            self::logHistory($exchangeId, 'requester_confirmed', $userId, 'requester', null, null, "Confirmed $hours hours");
-        } else {
-            $exchange->update([
-                'provider_confirmed_at' => now(),
-                'provider_confirmed_hours' => $hours,
-            ]);
-            self::logHistory($exchangeId, 'provider_confirmed', $userId, 'provider', null, null, "Confirmed $hours hours");
-        }
+            // Adjust hours — use simple variance check without config service
+            $minHours = (float) $exchange->proposed_hours * 0.75;
+            $maxHours = (float) $exchange->proposed_hours * 1.25;
+            $hours = max($minHours, min($maxHours, $hours));
 
-        if ($exchange->status === self::STATUS_IN_PROGRESS) {
-            self::updateStatus($exchangeId, self::STATUS_PENDING_CONFIRMATION, $userId, $isRequester ? 'requester' : 'provider');
-        }
+            if ($isRequester) {
+                $exchange->update([
+                    'requester_confirmed_at' => now(),
+                    'requester_confirmed_hours' => $hours,
+                ]);
+                self::logHistory($exchangeId, 'requester_confirmed', $userId, 'requester', null, null, "Confirmed $hours hours");
+            } else {
+                $exchange->update([
+                    'provider_confirmed_at' => now(),
+                    'provider_confirmed_hours' => $hours,
+                ]);
+                self::logHistory($exchangeId, 'provider_confirmed', $userId, 'provider', null, null, "Confirmed $hours hours");
+            }
 
-        // Refresh and check if both confirmed
-        $exchange->refresh();
-        if ($exchange->requester_confirmed_at && $exchange->provider_confirmed_at) {
-            return self::processConfirmations($exchangeId, $exchange);
-        }
+            if ($exchange->status === self::STATUS_IN_PROGRESS) {
+                // Use direct update since updateStatus() now acquires its own lock
+                // and we already hold the lock — avoid nested lock
+                $oldStatus = $exchange->status;
+                $newStatus = self::STATUS_PENDING_CONFIRMATION;
+                $allowedTransitions = self::TRANSITIONS[$oldStatus] ?? [];
+                if (in_array($newStatus, $allowedTransitions, true)) {
+                    DB::table('exchange_requests')
+                        ->where('id', $exchangeId)
+                        ->update(['status' => $newStatus]);
+                    self::logHistory($exchangeId, 'status_changed', $userId, $isRequester ? 'requester' : 'provider', $oldStatus, $newStatus);
+                    $exchange->status = $newStatus;
+                }
+            }
 
-        return true;
+            // Refresh to get latest confirmation data (we already hold the lock)
+            $exchange->refresh();
+            if ($exchange->requester_confirmed_at && $exchange->provider_confirmed_at) {
+                return self::processConfirmations($exchangeId, $exchange);
+            }
+
+            return true;
+        });
     }
 
     /**
@@ -655,7 +672,7 @@ class ExchangeWorkflowService
                 ->first();
 
             if (!$sender || (float) $sender->balance < $hours) {
-                Log::warning("Exchange #$exchangeId: requester #$requesterId has insufficient balance ({$sender->balance ?? 0} < $hours)");
+                Log::warning("Exchange #{$exchangeId}: requester #{$requesterId} has insufficient balance (" . ($sender->balance ?? 0) . " < {$hours})");
                 return null;
             }
 
@@ -692,23 +709,32 @@ class ExchangeWorkflowService
 
     private static function updateStatus(int $exchangeId, string $newStatus, ?int $actorId, string $actorRole, ?string $notes = null): bool
     {
-        $exchange = ExchangeRequest::find($exchangeId);
-        if (!$exchange) {
-            return false;
-        }
+        return DB::transaction(function () use ($exchangeId, $newStatus, $actorId, $actorRole, $notes) {
+            // Lock the row to prevent concurrent status transitions
+            $exchange = DB::table('exchange_requests')
+                ->where('id', $exchangeId)
+                ->lockForUpdate()
+                ->first();
 
-        $oldStatus = $exchange->status;
+            if (!$exchange) {
+                return false;
+            }
 
-        $allowedTransitions = self::TRANSITIONS[$oldStatus] ?? [];
-        if (!in_array($newStatus, $allowedTransitions, true)) {
-            return false;
-        }
+            $oldStatus = $exchange->status;
 
-        $exchange->update(['status' => $newStatus]);
+            $allowedTransitions = self::TRANSITIONS[$oldStatus] ?? [];
+            if (!in_array($newStatus, $allowedTransitions, true)) {
+                return false;
+            }
 
-        self::logHistory($exchangeId, 'status_changed', $actorId, $actorRole, $oldStatus, $newStatus, $notes);
+            DB::table('exchange_requests')
+                ->where('id', $exchangeId)
+                ->update(['status' => $newStatus]);
 
-        return true;
+            self::logHistory($exchangeId, 'status_changed', $actorId, $actorRole, $oldStatus, $newStatus, $notes);
+
+            return true;
+        });
     }
 
     private static function logHistory(

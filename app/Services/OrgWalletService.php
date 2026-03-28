@@ -168,7 +168,9 @@ class OrgWalletService
             return ['success' => false, 'message' => 'Requester is not an active member of this organization'];
         }
 
-        // Check org wallet balance
+        // Check org wallet balance — note: this is a non-binding pre-check.
+        // The actual balance enforcement happens in approveRequest() with lockForUpdate().
+        // Pending requests do not reserve funds, so this is just a UX hint.
         $wallet = DB::table('org_wallets')
             ->where('organization_id', $orgId)
             ->where('tenant_id', $tenantId)
@@ -199,6 +201,8 @@ class OrgWalletService
     public static function approveRequest(int $requestId, int $approverId): array
     {
         $tenantId = TenantContext::getId();
+
+        // Pre-check (non-authoritative — real check is inside transaction)
         $request = DB::table('org_transfer_requests')->where('id', $requestId)->where('tenant_id', $tenantId)->first();
         if (! $request || $request->status !== 'pending') {
             return ['success' => false, 'message' => 'Transfer request not found or not pending'];
@@ -216,7 +220,18 @@ class OrgWalletService
             return ['success' => false, 'message' => 'Only admin or owner can approve requests'];
         }
 
-        return DB::transaction(function () use ($request, $requestId, $approverId, $tenantId) {
+        return DB::transaction(function () use ($requestId, $approverId, $tenantId) {
+            // Re-read request with lock to prevent double-approval race
+            $request = DB::table('org_transfer_requests')
+                ->where('id', $requestId)
+                ->where('tenant_id', $tenantId)
+                ->lockForUpdate()
+                ->first();
+
+            if (! $request || $request->status !== 'pending') {
+                return ['success' => false, 'message' => 'Transfer request not found or already processed'];
+            }
+
             // Check wallet balance
             $wallet = DB::table('org_wallets')
                 ->where('organization_id', $request->organization_id)
@@ -273,6 +288,8 @@ class OrgWalletService
     public static function rejectRequest(int $requestId, int $adminId, ?string $reason = null): array
     {
         $tenantId = TenantContext::getId();
+
+        // Pre-check
         $request = DB::table('org_transfer_requests')->where('id', $requestId)->where('tenant_id', $tenantId)->first();
         if (! $request || $request->status !== 'pending') {
             return ['success' => false, 'message' => 'Transfer request not found or not pending'];
@@ -290,14 +307,20 @@ class OrgWalletService
             return ['success' => false, 'message' => 'Only admin or owner can reject requests'];
         }
 
-        DB::table('org_transfer_requests')
+        // Atomic status update — only update if still pending to prevent race with approve
+        $affected = DB::table('org_transfer_requests')
             ->where('id', $requestId)
+            ->where('status', 'pending')
             ->update([
                 'status' => 'rejected',
                 'rejection_reason' => $reason,
                 'approved_by' => $adminId,
                 'updated_at' => now(),
             ]);
+
+        if ($affected === 0) {
+            return ['success' => false, 'message' => 'Transfer request already processed'];
+        }
 
         return ['success' => true];
     }

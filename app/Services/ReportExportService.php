@@ -483,7 +483,9 @@ class ReportExportService
         fputcsv($output, $headers);
 
         foreach ($rows as $row) {
-            fputcsv($output, $row);
+            // CSV injection prevention: sanitize each cell value
+            $sanitized = array_map([$this, 'sanitizeCsvCell'], $row);
+            fputcsv($output, $sanitized);
         }
 
         rewind($output);
@@ -491,6 +493,21 @@ class ReportExportService
         fclose($output);
 
         return $csv;
+    }
+
+    /**
+     * Sanitize a CSV cell value to prevent formula injection.
+     * Prefixes formula-trigger characters (=, +, -, @, tab, CR) with a single quote.
+     */
+    private function sanitizeCsvCell(mixed $value): mixed
+    {
+        if (!is_string($value)) {
+            return $value;
+        }
+        if (preg_match('/^[=+\-@\t\r]/', $value)) {
+            return "'" . $value;
+        }
+        return $value;
     }
 
     /**

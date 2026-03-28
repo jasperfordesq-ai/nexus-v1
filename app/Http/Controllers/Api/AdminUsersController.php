@@ -823,10 +823,8 @@ class AdminUsersController extends BaseApiController
         $gateBlock = $this->tenantSettingsService->checkLoginGatesForUser($user);
 
         try {
-            // Generate an access token for the target user with impersonation claim
-            $token = $this->tokenService->generateToken($id, $userTenantId, [
-                'impersonated_by' => $adminId,
-            ]);
+            // Generate a short-lived, single-use impersonation token (5 min TTL)
+            $token = $this->tokenService->generateImpersonationToken($id, $userTenantId, $adminId);
 
             ActivityLog::log($adminId, 'admin_impersonate', "Impersonated user #{$id} ({$user['email']})");
             AuditLogService::logUserImpersonated($adminId, $id, $user['email']);
@@ -1412,14 +1410,14 @@ class AdminUsersController extends BaseApiController
             $result = (new \App\Core\Mailer())->send($user['email'], $subject, $html);
 
             if ($result) {
-                error_log("[AdminUsers] Welcome email sent to {$user['email']} (user #{$user['id']}, credits: {$creditsAwarded})");
+                error_log("[AdminUsers] Welcome email sent to user #{$user['id']} (credits: {$creditsAwarded})");
             } else {
-                error_log("[AdminUsers] Mailer returned false for welcome email to {$user['email']} (user #{$user['id']}) — check SMTP/Gmail config");
+                error_log("[AdminUsers] Mailer returned false for welcome email to user #{$user['id']} — check SMTP/Gmail config");
             }
 
             return (bool) $result;
         } catch (\Throwable $e) {
-            error_log("[AdminUsers] Failed to send welcome email to user #{$user['id']} ({$user['email']}): " . $e->getMessage());
+            error_log("[AdminUsers] Failed to send welcome email to user #{$user['id']}: " . $e->getMessage());
             return false;
         }
     }
@@ -1484,14 +1482,14 @@ class AdminUsersController extends BaseApiController
             );
 
             if ($result) {
-                error_log("[AdminUsers] Reactivation email sent to {$user['email']} (user #{$user['id']})");
+                error_log("[AdminUsers] Reactivation email sent to user #{$user['id']}");
             } else {
-                error_log("[AdminUsers] Mailer returned false for reactivation email to {$user['email']} (user #{$user['id']}) — check SMTP/Gmail config");
+                error_log("[AdminUsers] Mailer returned false for reactivation email to user #{$user['id']} — check SMTP/Gmail config");
             }
 
             return (bool) $result;
         } catch (\Throwable $e) {
-            error_log("[AdminUsers] Failed to send reactivation email to user #{$user['id']} ({$user['email']}): " . $e->getMessage());
+            error_log("[AdminUsers] Failed to send reactivation email to user #{$user['id']}: " . $e->getMessage());
             return false;
         }
     }

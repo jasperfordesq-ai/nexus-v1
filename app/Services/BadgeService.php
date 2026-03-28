@@ -38,26 +38,19 @@ class BadgeService
      */
     public function award(int $userId, int $badgeId, int $tenantId, ?int $awardedBy = null): bool
     {
-        $exists = $this->userBadge->newQuery()
-            ->where('user_id', $userId)
-            ->where('badge_id', $badgeId)
-            ->where('tenant_id', $tenantId)
-            ->exists();
+        // Use INSERT IGNORE to atomically prevent duplicate badge awards.
+        // The user_badge_unique (user_id, badge_key) constraint enforces uniqueness.
+        try {
+            $affected = DB::affectingStatement(
+                'INSERT IGNORE INTO user_badges (user_id, badge_id, tenant_id, awarded_by, awarded_at, created_at) VALUES (?, ?, ?, ?, NOW(), NOW())',
+                [$userId, $badgeId, $tenantId, $awardedBy]
+            );
 
-        if ($exists) {
+            return $affected > 0;
+        } catch (\Throwable $e) {
+            // Duplicate key — badge already awarded
             return false;
         }
-
-        $this->userBadge->newQuery()->insert([
-            'user_id'    => $userId,
-            'badge_id'   => $badgeId,
-            'tenant_id'  => $tenantId,
-            'awarded_by' => $awardedBy,
-            'awarded_at' => now(),
-            'created_at' => now(),
-        ]);
-
-        return true;
     }
 
     /**

@@ -285,6 +285,16 @@ class AuthController extends BaseApiController
         }
         \App\Core\RateLimiter::recordAttempt($ip, 'ip', false);
 
+        // Log failed login to application logs for security monitoring
+        // Email is masked to prevent PII leakage in logs
+        $maskedEmail = !empty($email) ? substr($email, 0, 2) . '***@' . (explode('@', $email)[1] ?? '***') : 'empty';
+        \Illuminate\Support\Facades\Log::warning('Failed login attempt', [
+            'email_masked' => $maskedEmail,
+            'ip' => $ip,
+            'tenant_id' => $tenantId,
+            'user_agent' => request()->userAgent(),
+        ]);
+
         return $this->authError(
             'Invalid credentials',
             ApiErrorCodes::AUTH_INVALID_CREDENTIALS,

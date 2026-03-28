@@ -18,8 +18,59 @@ use Illuminate\Support\Facades\Log;
  */
 class WebhookDispatchService
 {
+    /** Private/reserved IP ranges for SSRF protection */
+    private const PRIVATE_IP_PREFIXES = ['127.', '10.', '0.', '169.254.', '::1', 'fc00:', 'fe80:'];
+
     public function __construct()
     {
+    }
+
+    /**
+     * Check if a URL target resolves to a private/internal IP (SSRF protection).
+     */
+    public static function isPrivateUrl(string $url): bool
+    {
+        $parsed = parse_url($url);
+        $host = $parsed['host'] ?? '';
+        if (empty($host)) {
+            return true;
+        }
+
+        // Check if hostname is literally an IP
+        if (filter_var($host, FILTER_VALIDATE_IP)) {
+            return self::isPrivateIp($host);
+        }
+
+        // Resolve hostname to IP and check
+        $ip = gethostbyname($host);
+        if ($ip === $host) {
+            // Resolution failed — block to be safe
+            return true;
+        }
+
+        return self::isPrivateIp($ip);
+    }
+
+    private static function isPrivateIp(string $ip): bool
+    {
+        foreach (self::PRIVATE_IP_PREFIXES as $prefix) {
+            if (str_starts_with($ip, $prefix)) {
+                return true;
+            }
+        }
+
+        // Check 172.16.0.0/12 and 192.168.0.0/16
+        $long = ip2long($ip);
+        if ($long !== false) {
+            if ($long >= ip2long('172.16.0.0') && $long <= ip2long('172.31.255.255')) {
+                return true;
+            }
+            if ($long >= ip2long('192.168.0.0') && $long <= ip2long('192.168.255.255')) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**
@@ -42,6 +93,12 @@ class WebhookDispatchService
                 }
 
                 try {
+                    // SSRF protection: block webhooks targeting private/internal IPs
+                    if (self::isPrivateUrl($webhook->url)) {
+                        Log::warning('WebhookDispatchService: SSRF blocked — private URL', ['url' => $webhook->url]);
+                        continue;
+                    }
+
                     $body = json_encode([
                         'event' => $eventType,
                         'timestamp' => now()->toIso8601String(),
@@ -137,6 +194,10 @@ class WebhookDispatchService
         }
         if (empty($data['url']) || !filter_var($data['url'], FILTER_VALIDATE_URL)) {
             throw new \InvalidArgumentException('A valid webhook URL is required.');
+        }
+        // SSRF protection: reject URLs targeting private/internal IPs at creation time
+        if (self::isPrivateUrl($data['url'])) {
+            throw new \InvalidArgumentException('Webhook URL must not target private or internal IP addresses.');
         }
         if (empty($data['secret'])) {
             throw new \InvalidArgumentException('Webhook secret is required.');
@@ -249,6 +310,15 @@ class WebhookDispatchService
 
         if (!$webhook) {
             throw new \RuntimeException("Webhook not found (id={$id}).");
+        }
+
+        // SSRF protection: block webhooks targeting private/internal IPs
+        if (self::isPrivateUrl($webhook->url)) {
+            return [
+                'success' => false,
+                'http_code' => 0,
+                'response' => 'Blocked: webhook URL resolves to a private/internal IP address',
+            ];
         }
 
         $body = json_encode([

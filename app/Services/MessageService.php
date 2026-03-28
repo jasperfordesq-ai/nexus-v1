@@ -239,7 +239,8 @@ class MessageService
             return [];
         }
 
-        $content = trim($data['body'] ?? ($data['content'] ?? ''));
+        // Server-side XSS prevention: strip all HTML from messages (plain text only)
+        $content = \App\Helpers\HtmlSanitizer::stripAll(trim($data['body'] ?? ($data['content'] ?? '')));
         $voiceUrl = $data['voice_url'] ?? ($data['audio_url'] ?? null);
         $isVoice = !empty($data['is_voice']) || !empty($voiceUrl);
 

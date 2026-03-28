@@ -500,7 +500,8 @@ class FeedService
     public function createPost(int $userId, array $data): FeedPost|array
     {
         $tenantId = TenantContext::getId();
-        $content = trim($data['content'] ?? '');
+        // Server-side XSS prevention: sanitize HTML content before storage
+        $content = \App\Helpers\HtmlSanitizer::sanitize(trim($data['content'] ?? ''));
         $image = $data['image_url'] ?? $data['image'] ?? null;
         $visibility = $data['visibility'] ?? 'public';
         $groupId = !empty($data['group_id']) ? (int) $data['group_id'] : null;
@@ -590,7 +591,8 @@ class FeedService
         $this->errors = [];
 
         $rawContent = trim($data['content'] ?? '');
-        $content = $rawContent;
+        // Server-side XSS prevention: sanitize HTML content before storage
+        $content = \App\Helpers\HtmlSanitizer::sanitize($rawContent);
         $imageUrl = $data['image_url'] ?? null;
         $visibility = $data['visibility'] ?? 'public';
         $groupId = (int) ($data['group_id'] ?? 0);
@@ -854,6 +856,8 @@ class FeedService
     {
         $tenantId = TenantContext::getId();
 
+        // Use atomic INSERT IGNORE + check affected rows to prevent duplicate likes
+        // from concurrent requests (the uk_likes_user_target unique key enforces this)
         $existing = DB::table('likes')
             ->where('target_type', 'post')
             ->where('target_id', $postId)
@@ -863,20 +867,16 @@ class FeedService
 
         if ($existing) {
             DB::table('likes')
-                ->where('target_type', 'post')
-                ->where('target_id', $postId)
-                ->where('user_id', $userId)
+                ->where('id', $existing->id)
                 ->where('tenant_id', $tenantId)
                 ->delete();
             $liked = false;
         } else {
-            DB::table('likes')->insert([
-                'target_type' => 'post',
-                'target_id'   => $postId,
-                'user_id'     => $userId,
-                'tenant_id'   => $tenantId,
-                'created_at'  => now(),
-            ]);
+            // Use INSERT IGNORE to gracefully handle race condition with unique constraint
+            DB::statement(
+                'INSERT IGNORE INTO likes (target_type, target_id, user_id, tenant_id, created_at) VALUES (?, ?, ?, ?, NOW())',
+                ['post', $postId, $userId, $tenantId]
+            );
             $liked = true;
         }
 

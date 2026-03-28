@@ -640,6 +640,11 @@ class WebAuthnController extends BaseApiController
             if ($challengeData['type'] !== $expectedType) {
                 return $this->respondWithError(ApiErrorCodes::AUTH_WEBAUTHN_CHALLENGE_INVALID, 'Invalid challenge type', null, 401);
             }
+            // SECURITY: Verify challenge belongs to current tenant to prevent cross-tenant replay
+            $currentTenantId = TenantContext::getId();
+            if (!empty($challengeData['tenant_id']) && (int)$challengeData['tenant_id'] !== (int)$currentTenantId) {
+                return $this->respondWithError(ApiErrorCodes::AUTH_WEBAUTHN_CHALLENGE_INVALID, 'Challenge tenant mismatch', null, 401);
+            }
             return $challengeData['challenge'];
         }
 
@@ -672,6 +677,11 @@ class WebAuthnController extends BaseApiController
             }
             if ($challengeData['type'] !== 'authenticate') {
                 return $this->respondWithError(ApiErrorCodes::AUTH_WEBAUTHN_CHALLENGE_INVALID, 'Invalid challenge type', null, 401);
+            }
+            // SECURITY: Verify challenge belongs to current tenant to prevent cross-tenant replay
+            $currentTenantId = TenantContext::getId();
+            if (!empty($challengeData['tenant_id']) && (int)$challengeData['tenant_id'] !== (int)$currentTenantId) {
+                return $this->respondWithError(ApiErrorCodes::AUTH_WEBAUTHN_CHALLENGE_INVALID, 'Challenge tenant mismatch', null, 401);
             }
             return $challengeData['challenge'];
         }

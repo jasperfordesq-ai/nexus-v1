@@ -197,16 +197,14 @@ class SocialController extends BaseApiController
 
             $action = 'unliked';
         } else {
-            // Like
-            DB::table('likes')->insert([
-                'user_id'     => $userId,
-                'target_type' => $targetType,
-                'target_id'   => $targetId,
-                'tenant_id'   => $tenantId,
-                'created_at'  => now(),
-            ]);
+            // Like — use INSERT IGNORE to prevent duplicates from concurrent requests
+            // (protected by uk_likes_user_target unique constraint)
+            $affected = DB::affectingStatement(
+                'INSERT IGNORE INTO likes (user_id, target_type, target_id, tenant_id, created_at) VALUES (?, ?, ?, ?, NOW())',
+                [$userId, $targetType, $targetId, $tenantId]
+            );
 
-            if ($targetType === 'post') {
+            if ($affected > 0 && $targetType === 'post') {
                 DB::table('feed_posts')
                     ->where('id', $targetId)
                     ->where('tenant_id', $tenantId)

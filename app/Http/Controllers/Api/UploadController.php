@@ -31,6 +31,8 @@ class UploadController extends BaseApiController
         $userId = $this->requireAuth();
         $this->rateLimit('upload', 20, 60);
 
+        // Validate file upload. SVG is intentionally excluded (XSS vector).
+        // Non-image types are allowed for document uploads (CV, resources).
         request()->validate([
             'file' => 'required|file|max:10240|mimes:jpg,jpeg,png,gif,webp,pdf,doc,docx,xls,xlsx,csv,txt,mp3,mp4,wav',
         ]);
@@ -39,6 +41,14 @@ class UploadController extends BaseApiController
 
         if (!$file || !$file->isValid()) {
             return $this->respondWithError('UPLOAD_INVALID', 'No valid file provided', 'file', 422);
+        }
+
+        // Double-check MIME type via file content inspection (not just extension)
+        // Blocks HTML/SVG/PHP disguised as allowed extensions
+        $detectedMime = $file->getMimeType();
+        $blockedMimes = ['text/html', 'application/xhtml+xml', 'image/svg+xml', 'application/x-httpd-php'];
+        if ($detectedMime && in_array($detectedMime, $blockedMimes, true)) {
+            return $this->respondWithError('UPLOAD_BLOCKED', 'This file type is not allowed (HTML/SVG/PHP)', 'file', 422);
         }
 
         $type = $this->input('type', 'general');

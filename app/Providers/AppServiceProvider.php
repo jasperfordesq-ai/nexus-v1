@@ -1015,6 +1015,10 @@ class AppServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
+        // Initialize Sentry SDK for error tracking (raw sentry/sentry package).
+        // sentry-laravel is not installed, so we init manually with PII scrubbing.
+        $this->initializeSentry();
+
         Listing::observe(ListingObserver::class);
         \App\Models\User::observe(\App\Observers\UserObserver::class);
 
@@ -1042,6 +1046,61 @@ class AppServiceProvider extends ServiceProvider
                 fwrite(STDERR, "  Use DB_DATABASE=nexus_test or run against the test database.\n\n");
                 exit(1);
             }
+        }
+    }
+
+    /**
+     * Initialize the Sentry SDK for PHP error tracking.
+     *
+     * Since sentry/sentry-laravel is not installed, we initialize the raw
+     * sentry/sentry SDK manually. This sets up:
+     * - DSN from config/services.php
+     * - Environment and release tags
+     * - PII scrubbing via before_send callback
+     * - Send default PII disabled
+     */
+    private function initializeSentry(): void
+    {
+        if (!class_exists(\Sentry\SentrySdk::class)) {
+            return;
+        }
+
+        $dsn = config('services.sentry.dsn');
+        if (empty($dsn)) {
+            return;
+        }
+
+        try {
+            \Sentry\init([
+                'dsn' => $dsn,
+                'environment' => config('services.sentry.environment', 'production'),
+                'release' => 'nexus-php@' . (config('app.version', 'unknown')),
+                'sample_rate' => 1.0,
+                'traces_sample_rate' => config('services.sentry.traces_sample_rate', 0.1),
+                'send_default_pii' => false,
+                'before_send' => function (\Sentry\Event $event): ?\Sentry\Event {
+                    // Scrub sensitive data from request body
+                    $request = $event->getRequest();
+                    if (!empty($request['data']) && is_array($request['data'])) {
+                        $sensitiveFields = [
+                            'password', 'password_confirmation', 'current_password',
+                            'token', 'api_key', 'secret', 'csrf_token',
+                            'credit_card', 'card_number', 'cvv', 'ssn',
+                            'refresh_token', 'access_token',
+                        ];
+                        foreach ($sensitiveFields as $field) {
+                            if (isset($request['data'][$field])) {
+                                $request['data'][$field] = '[FILTERED]';
+                            }
+                        }
+                        $event->setRequest($request);
+                    }
+                    return $event;
+                },
+            ]);
+        } catch (\Throwable $e) {
+            // Sentry init failure is non-fatal — log and continue
+            error_log('Sentry initialization failed: ' . $e->getMessage());
         }
     }
 }

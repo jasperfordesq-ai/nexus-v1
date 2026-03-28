@@ -45,8 +45,13 @@ class PollExportService
             $votes = DB::table('poll_votes')
                 ->where('option_id', $option->id)
                 ->count();
+            // CSV injection prevention: prefix formula-trigger characters
+            $text = $option->option_text;
+            if (is_string($text) && preg_match('/^[=+\-@\t\r]/', $text)) {
+                $text = "'" . $text;
+            }
             $lines[] = implode(',', [
-                '"' . str_replace('"', '""', $option->option_text) . '"',
+                '"' . str_replace('"', '""', $text) . '"',
                 $votes,
             ]);
         }

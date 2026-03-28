@@ -532,7 +532,10 @@ class AuditLogService
                 $detailsStr = implode('; ', $parts);
             }
 
-            fputcsv($output, [
+            // CSV injection prevention: sanitize user-controlled values
+            $row = array_map(function ($v) {
+                return is_string($v) && preg_match('/^[=+\-@\t\r]/', $v) ? "'" . $v : $v;
+            }, [
                 $log['created_at'],
                 self::getActionLabel($log['action']),
                 $log['user_name'] ?? 'System',
@@ -540,6 +543,7 @@ class AuditLogService
                 $detailsStr,
                 $log['ip_address'] ?? '-',
             ]);
+            fputcsv($output, $row);
         }
 
         rewind($output);

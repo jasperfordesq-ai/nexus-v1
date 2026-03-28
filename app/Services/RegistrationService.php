@@ -42,15 +42,18 @@ class RegistrationService
             return ['error' => $errors];
         }
 
-        $exists = $this->user->newQuery()
-            ->where('email', strtolower(trim($data['email'])))
-            ->where('tenant_id', $tenantId)
-            ->exists();
-        if ($exists) {
-            return ['error' => 'Registration could not be completed. Please try again or contact support.'];
-        }
-
         $user = DB::transaction(function () use ($data, $tenantId) {
+            // Check uniqueness inside the transaction to prevent race conditions
+            // where two concurrent registrations with the same email both pass the check
+            $exists = $this->user->newQuery()
+                ->where('email', strtolower(trim($data['email'])))
+                ->where('tenant_id', $tenantId)
+                ->lockForUpdate()
+                ->exists();
+            if ($exists) {
+                return null; // Duplicate — handled below
+            }
+
             $user = $this->user->newInstance();
             $user->tenant_id = $tenantId;
             $user->first_name = trim($data['first_name']);
@@ -85,6 +88,10 @@ class RegistrationService
 
             return $user;
         });
+
+        if ($user === null) {
+            return ['error' => 'Registration could not be completed. Please try again or contact support.'];
+        }
 
         return [
             'user' => [

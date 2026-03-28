@@ -125,7 +125,8 @@ class CommentService
      */
     public static function create(string $targetType, int $targetId, int $userId, int $tenantId, array $data): Comment
     {
-        $content = trim($data['content']);
+        // Server-side XSS prevention: sanitize HTML content before storage
+        $content = \App\Helpers\HtmlSanitizer::sanitize(trim($data['content']));
 
         $comment = Comment::create([
             'target_type' => $targetType,
@@ -271,7 +272,8 @@ class CommentService
      */
     public static function addComment(int $userId, int $tenantId, string $targetType, int $targetId, string $content, ?int $parentId = null): array
     {
-        $content = trim($content);
+        // Server-side XSS prevention: sanitize HTML content before storage
+        $content = \App\Helpers\HtmlSanitizer::sanitize(trim($content));
         if (empty($content)) {
             return ['success' => false, 'error' => 'Comment cannot be empty'];
         }

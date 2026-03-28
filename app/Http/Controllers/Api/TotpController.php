@@ -14,6 +14,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
 use App\Core\ApiErrorCodes;
 use App\Core\Csrf;
+use App\Core\TenantContext;
 
 /**
  * TotpController -- TOTP two-factor authentication verify + status.
@@ -141,15 +142,21 @@ class TotpController extends BaseApiController
         }
 
         // Fetch user data for response
+        $tenantId = TenantContext::getId();
         $userRow = DB::selectOne("
             SELECT id, first_name, last_name, email, avatar_url, role, tenant_id,
-                   is_super_admin, is_tenant_super_admin, email_verified_at, is_approved
-            FROM users WHERE id = ?
-        ", [$userId]);
+                   is_super_admin, is_tenant_super_admin, email_verified_at, is_approved, status
+            FROM users WHERE id = ? AND tenant_id = ?
+        ", [$userId, $tenantId]);
         $user = $userRow ? (array)$userRow : null;
 
         if (!$user) {
             return $this->respondWithError(ApiErrorCodes::RESOURCE_NOT_FOUND, 'User not found', null, 401);
+        }
+
+        // SECURITY: Block suspended/banned users from completing 2FA login
+        if (($user['status'] ?? 'active') !== 'active') {
+            return $this->respondWithError(ApiErrorCodes::AUTH_ACCOUNT_SUSPENDED, 'Account suspended', null, 403);
         }
 
         // SECURITY: Enforce registration policy gates after 2FA completion

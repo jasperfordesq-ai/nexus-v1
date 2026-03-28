@@ -6,6 +6,7 @@
 
 namespace App\Listeners;
 
+use App\Core\TenantContext;
 use App\Events\TransactionCompleted;
 use App\Services\GamificationService;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -31,6 +32,8 @@ class UpdateWalletBalance implements ShouldQueue
     public function handle(TransactionCompleted $event): void
     {
         try {
+            // Ensure tenant context is set (required when running via async queue)
+            TenantContext::setById($event->tenantId);
             /** @var GamificationService $gamification */
             $gamification = app(GamificationService::class);
 

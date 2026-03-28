@@ -14,6 +14,7 @@ import { AlertTriangle, RefreshCw, Home } from 'lucide-react';
 import { Button } from '@heroui/react';
 import { GlassCard } from '@/components/ui';
 import { logError } from '@/lib/logger';
+import { captureSentryException } from '@/lib/sentry';
 import i18n from 'i18next';
 
 interface ErrorBoundaryProps {
@@ -48,6 +49,12 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
 
     // Log to console in development
     logError('Error Boundary caught an error', { error, errorInfo });
+
+    // Report to Sentry in production
+    captureSentryException(error, {
+      componentStack: errorInfo.componentStack ?? undefined,
+      source: 'ErrorBoundary',
+    });
   }
 
   handleReload = () => {

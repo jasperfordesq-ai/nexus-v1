@@ -6,6 +6,7 @@
 
 namespace App\Listeners;
 
+use App\Core\TenantContext;
 use App\Events\ConnectionRequested;
 use App\Services\NotificationDispatcher;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -27,6 +28,9 @@ class NotifyConnectionRequest implements ShouldQueue
     public function handle(ConnectionRequested $event): void
     {
         try {
+            // Ensure tenant context is set (required when running via async queue)
+            TenantContext::setById($event->tenantId);
+
             $requesterName = $event->requester->first_name ?? $event->requester->name ?? 'Someone';
             $targetUserId = $event->target->id;
 

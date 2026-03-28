@@ -6,9 +6,11 @@
 
 namespace App\Services;
 
+use App\Core\TenantContext;
 use App\Models\JobVacancy;
 use App\Models\Notification;
 use App\Models\User;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 
@@ -23,41 +25,52 @@ class JobExpiryNotificationService
     /**
      * Send notifications for all vacancies expiring in the next 7 days
      * that haven't been notified yet. Run once daily via scheduler.
+     *
+     * Iterates over all active tenants to ensure TenantContext is set
+     * correctly for each batch of notifications (required for tenant-scoped
+     * Notification::createNotification).
      */
     public static function notifyExpiringSoon(): int
     {
         $notified = 0;
 
         try {
-            $vacancies = JobVacancy::with(['creator:id,first_name,last_name,email'])
-                ->where('status', 'open')
-                ->whereNotNull('deadline')
-                ->whereBetween('deadline', [now(), now()->addDays(7)])
-                ->whereNull('expired_at') // not yet expired
-                ->get();
+            // Iterate tenants so TenantContext is set for notifications
+            $tenants = DB::select("SELECT id FROM tenants WHERE is_active = 1");
 
-            foreach ($vacancies as $vacancy) {
-                try {
-                    $daysLeft = (int) now()->diffInDays($vacancy->deadline);
+            foreach ($tenants as $tenant) {
+                TenantContext::setById($tenant->id);
 
-                    // In-app notification
-                    if ($vacancy->user_id) {
-                        Notification::createNotification(
-                            (int) $vacancy->user_id,
-                            "Your job \"{$vacancy->title}\" expires in {$daysLeft} day(s). Renew it to keep it visible.",
-                            "/jobs/{$vacancy->id}",
-                            'job_application'
-                        );
+                $vacancies = JobVacancy::with(['creator:id,first_name,last_name,email'])
+                    ->where('status', 'open')
+                    ->whereNotNull('deadline')
+                    ->whereBetween('deadline', [now(), now()->addDays(7)])
+                    ->whereNull('expired_at') // not yet expired
+                    ->get();
+
+                foreach ($vacancies as $vacancy) {
+                    try {
+                        $daysLeft = (int) now()->diffInDays($vacancy->deadline);
+
+                        // In-app notification
+                        if ($vacancy->user_id) {
+                            Notification::createNotification(
+                                (int) $vacancy->user_id,
+                                "Your job \"{$vacancy->title}\" expires in {$daysLeft} day(s). Renew it to keep it visible.",
+                                "/jobs/{$vacancy->id}",
+                                'job_application'
+                            );
+                        }
+
+                        // Email notification
+                        if ($vacancy->creator && $vacancy->creator->email) {
+                            self::sendExpiryEmail($vacancy->creator, $vacancy, $daysLeft);
+                        }
+
+                        $notified++;
+                    } catch (\Throwable $e) {
+                        Log::warning('JobExpiryNotificationService: vacancy failed', ['vacancy_id' => $vacancy->id, 'error' => $e->getMessage()]);
                     }
-
-                    // Email notification
-                    if ($vacancy->creator && $vacancy->creator->email) {
-                        self::sendExpiryEmail($vacancy->creator, $vacancy, $daysLeft);
-                    }
-
-                    $notified++;
-                } catch (\Throwable $e) {
-                    Log::warning('JobExpiryNotificationService: vacancy failed', ['vacancy_id' => $vacancy->id, 'error' => $e->getMessage()]);
                 }
             }
         } catch (\Throwable $e) {

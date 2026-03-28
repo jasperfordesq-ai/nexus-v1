@@ -81,7 +81,19 @@ class CommunityFundService
 
         DB::beginTransaction();
         try {
-            $newBalance = (float) $fund['balance'] + $amount;
+            // Lock fund row to get accurate balance_after value
+            $lockedFund = DB::table('community_fund_accounts')
+                ->where('id', $fund['id'])
+                ->where('tenant_id', $tenantId)
+                ->lockForUpdate()
+                ->first();
+
+            if (!$lockedFund) {
+                DB::rollBack();
+                return ['success' => false, 'error' => 'Community fund not found'];
+            }
+
+            $newBalance = (float) $lockedFund->balance + $amount;
 
             DB::statement(
                 'UPDATE community_fund_accounts SET balance = balance + ?, total_deposited = total_deposited + ? WHERE id = ? AND tenant_id = ?',
@@ -261,24 +273,25 @@ class CommunityFundService
         }
 
         $tenantId = TenantContext::getId();
-
-        // Check donor balance
-        $donor = DB::table('users')
-            ->where('id', $donorId)
-            ->where('tenant_id', $tenantId)
-            ->first(['balance']);
-
-        if (!$donor || (float) $donor->balance < $amount) {
-            return ['success' => false, 'error' => 'Insufficient balance'];
-        }
-
         $fund = self::getOrCreateFund();
 
         DB::beginTransaction();
         try {
-            $newBalance = (float) $fund['balance'] + $amount;
+            // Lock fund row to get accurate balance_after
+            $lockedFund = DB::table('community_fund_accounts')
+                ->where('id', $fund['id'])
+                ->where('tenant_id', $tenantId)
+                ->lockForUpdate()
+                ->first();
 
-            // Deduct from donor
+            if (!$lockedFund) {
+                DB::rollBack();
+                return ['success' => false, 'error' => 'Community fund not found'];
+            }
+
+            $newBalance = (float) $lockedFund->balance + $amount;
+
+            // Atomic deduct from donor (WHERE balance >= amount prevents negative balance)
             $affected = DB::update(
                 'UPDATE users SET balance = balance - ? WHERE id = ? AND tenant_id = ? AND balance >= ?',
                 [$amount, $donorId, $tenantId, $amount]

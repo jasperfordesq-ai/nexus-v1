@@ -39,5 +39,22 @@ try {
     $health['status'] = 'degraded';
 }
 
+// Check Redis connection (optional)
+$redisHost = getenv('REDIS_HOST') ?: '127.0.0.1';
+$redisPort = getenv('REDIS_PORT') ?: '6379';
+
+try {
+    $redis = new Redis();
+    $redis->connect($redisHost, (int) $redisPort, 3);
+    $redis->ping();
+    $health['redis'] = 'connected';
+    $redis->close();
+} catch (Throwable $e) {
+    $health['redis'] = 'disconnected';
+    if ($health['status'] === 'healthy') {
+        $health['status'] = 'degraded';
+    }
+}
+
 http_response_code($health['status'] === 'healthy' ? 200 : 503);
 echo json_encode($health, JSON_PRETTY_PRINT);

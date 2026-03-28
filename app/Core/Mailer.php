@@ -201,6 +201,21 @@ class Mailer
     }
 
     /**
+     * Mask an email address for safe logging (e.g., "j***@example.com").
+     */
+    private static function maskEmail(string $email): string
+    {
+        $parts = explode('@', $email, 2);
+        if (count($parts) !== 2) {
+            return '***';
+        }
+        $local = $parts[0];
+        $domain = $parts[1];
+        $masked = strlen($local) > 1 ? $local[0] . str_repeat('*', min(strlen($local) - 1, 5)) : '*';
+        return $masked . '@' . $domain;
+    }
+
+    /**
      * Send an email.
      *
      * @param string      $to      Recipient email address
@@ -226,11 +241,11 @@ class Mailer
             }
 
             if (!empty($this->host) && !empty($this->username)) {
-                error_log("Mailer: SendGrid failed, falling back to SMTP for: $to");
+                error_log("Mailer: SendGrid failed, falling back to SMTP for: " . self::maskEmail($to));
                 return $this->sendViaSmtp($to, $subject, $body, $cc, $replyTo, $unsubscribeUrl);
             }
 
-            error_log("Mailer: SendGrid failed and no SMTP fallback configured. Email not sent to: $to");
+            error_log("Mailer: SendGrid failed and no SMTP fallback configured. Email not sent to: " . self::maskEmail($to));
             return false;
         }
 
@@ -241,11 +256,11 @@ class Mailer
             }
 
             if (!empty($this->host) && !empty($this->username)) {
-                error_log("Mailer: Gmail API failed, falling back to SMTP for: $to");
+                error_log("Mailer: Gmail API failed, falling back to SMTP for: " . self::maskEmail($to));
                 return $this->sendViaSmtp($to, $subject, $body, $cc, $replyTo, $unsubscribeUrl);
             }
 
-            error_log("Mailer: Gmail API failed and no SMTP fallback configured. Email not sent to: $to");
+            error_log("Mailer: Gmail API failed and no SMTP fallback configured. Email not sent to: " . self::maskEmail($to));
             return false;
         }
 

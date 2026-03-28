@@ -1991,7 +1991,7 @@ class CronJobRunner
                 if (!TenantContext::hasFeature('gamification')) return;
 
                 DB::delete("DELETE FROM xp_notifications WHERE tenant_id = ? AND created_at < DATE_SUB(NOW(), INTERVAL 7 DAY)", [$tenantId]);
-                DB::delete("DELETE FROM campaign_awards WHERE awarded_at < DATE_SUB(NOW(), INTERVAL 1 YEAR)");
+                DB::delete("DELETE FROM campaign_awards WHERE tenant_id = ? AND awarded_at < DATE_SUB(NOW(), INTERVAL 1 YEAR)", [$tenantId]);
                 DB::delete("DELETE FROM achievement_analytics WHERE tenant_id = ? AND date < DATE_SUB(CURDATE(), INTERVAL 2 YEAR)", [$tenantId]);
             });
             echo "   Gamification cleanup complete.\n";

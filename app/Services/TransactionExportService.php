@@ -166,9 +166,15 @@ class TransactionExportService
 
     /**
      * Escape a value for CSV (double-quote if it contains commas, quotes, or newlines).
+     * Also prevents CSV injection by prefixing formula-trigger characters with a single quote.
      */
     private function escapeCSV(string $value): string
     {
+        // CSV injection prevention: prefix formula-trigger characters
+        if (preg_match('/^[=+\-@\t\r]/', $value)) {
+            $value = "'" . $value;
+        }
+
         if (str_contains($value, ',') || str_contains($value, '"') || str_contains($value, "\n")) {
             return '"' . str_replace('"', '""', $value) . '"';
         }

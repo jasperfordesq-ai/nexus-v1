@@ -1809,9 +1809,14 @@ class JobVacancyService
             ->orderBy('created_at')
             ->get();
 
+        // CSV injection prevention helper
+        $sanitize = function (mixed $v): mixed {
+            return is_string($v) && preg_match('/^[=+\-@\t\r]/', $v) ? "'" . $v : $v;
+        };
+
         $rows = [['ID', 'Name', 'Email', 'Status', 'Stage', 'Applied At', 'Updated At']];
         foreach ($apps as $app) {
-            $rows[] = [
+            $rows[] = array_map($sanitize, [
                 $app->id,
                 ($app->applicant->first_name ?? '') . ' ' . ($app->applicant->last_name ?? ''),
                 $app->applicant->email ?? '',
@@ -1819,7 +1824,7 @@ class JobVacancyService
                 $app->stage ?? $app->status,
                 $app->created_at?->toDateTimeString() ?? '',
                 $app->updated_at?->toDateTimeString() ?? '',
-            ];
+            ]);
         }
 
         $out = fopen('php://temp', 'r+');
