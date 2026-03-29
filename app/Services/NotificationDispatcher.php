@@ -133,7 +133,7 @@ class NotificationDispatcher
         if ($contextType === 'global') {
             $tenant = TenantContext::get();
             $config = json_decode($tenant['configuration'] ?? '{}', true);
-            return $config['notifications']['default_frequency'] ?? 'daily';
+            return $config['notifications']['default_frequency'] ?? 'instant';
         }
 
         return null;
