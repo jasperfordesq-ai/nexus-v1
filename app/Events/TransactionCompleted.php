@@ -11,6 +11,7 @@ use App\Models\User;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Broadcasting\PrivateChannel;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
+use Illuminate\Contracts\Broadcasting\ShouldRescue;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 
@@ -20,7 +21,7 @@ use Illuminate\Queue\SerializesModels;
  * Broadcasts privately to both the sender and receiver so their wallets
  * can update in real time.
  */
-class TransactionCompleted implements ShouldBroadcast
+class TransactionCompleted implements ShouldBroadcast, ShouldRescue
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 

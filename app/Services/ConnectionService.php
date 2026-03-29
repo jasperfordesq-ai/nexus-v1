@@ -156,7 +156,7 @@ class ConnectionService
         try {
             if ($connection->requester && $connection->receiver) {
                 event(new ConnectionRequested(
-                    connection: $connection,
+                    connectionModel: $connection,
                     requester: $connection->requester,
                     target: $connection->receiver,
                     tenantId: (int) $connection->requester->tenant_id,

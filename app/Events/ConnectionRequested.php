@@ -11,6 +11,7 @@ use App\Models\User;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Broadcasting\PrivateChannel;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
+use Illuminate\Contracts\Broadcasting\ShouldRescue;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 
@@ -19,12 +20,12 @@ use Illuminate\Queue\SerializesModels;
  *
  * Broadcasts privately to the target user for real-time notification.
  */
-class ConnectionRequested implements ShouldBroadcast
+class ConnectionRequested implements ShouldBroadcast, ShouldRescue
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
     public function __construct(
-        public readonly Connection $connection,
+        public readonly Connection $connectionModel,
         public readonly User $requester,
         public readonly User $target,
         public readonly int $tenantId,
@@ -60,12 +61,12 @@ class ConnectionRequested implements ShouldBroadcast
     public function broadcastWith(): array
     {
         return [
-            'id'           => $this->connection->id,
+            'id'           => $this->connectionModel->id,
             'requester_id' => $this->requester->id,
             'requester_name' => trim(
                 ($this->requester->first_name ?? '') . ' ' . ($this->requester->last_name ?? '')
             ) ?: ($this->requester->name ?? 'Someone'),
-            'created_at'   => $this->connection->created_at?->toISOString(),
+            'created_at'   => $this->connectionModel->created_at?->toISOString(),
         ];
     }
 }
