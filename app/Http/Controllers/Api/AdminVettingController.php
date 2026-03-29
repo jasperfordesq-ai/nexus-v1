@@ -8,8 +8,11 @@ namespace App\Http\Controllers\Api;
 
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+use App\Core\Mailer;
 use App\Core\TenantContext;
 use App\Models\ActivityLog;
+use App\Models\Notification;
 use App\Services\VettingService;
 
 /**
@@ -236,6 +239,19 @@ class AdminVettingController extends BaseApiController
             $this->vettingService->verify($id, $adminId);
             ActivityLog::log($adminId, 'vetting_record_verified', "Verified vetting record #{$id} for {$existing['first_name']} {$existing['last_name']}", false, null, 'admin', 'vetting_record', $id);
 
+            // Notify the user: bell + email
+            $this->sendVettingNotification(
+                (int) $existing['user_id'],
+                'Your verification has been approved!',
+                '/dashboard',
+                'Verification Approved',
+                'Your background check verification has been approved. Your verified status is now active on your profile.',
+                '#22c55e',
+                '#16a34a',
+                'Go to Dashboard',
+                '/dashboard'
+            );
+
             $record = $this->vettingService->getById($id);
             return $this->respondWithData($record);
         } catch (\Exception $e) {
@@ -262,6 +278,19 @@ class AdminVettingController extends BaseApiController
             $this->vettingService->reject($id, $adminId, $reason);
             ActivityLog::log($adminId, 'vetting_record_rejected', "Rejected vetting record #{$id}: {$reason}", false, null, 'admin', 'vetting_record', $id);
 
+            // Notify the user: bell + email
+            $this->sendVettingNotification(
+                (int) $existing['user_id'],
+                'Your verification could not be completed. Please contact support.',
+                '/help',
+                'Verification Not Completed',
+                'Your background check verification could not be completed at this time. Please contact your community coordinator for more information or to resubmit.',
+                '#ef4444',
+                '#dc2626',
+                'Contact Support',
+                '/help'
+            );
+
             $record = $this->vettingService->getById($id);
             return $this->respondWithData($record);
         } catch (\Exception $e) {
@@ -282,6 +311,22 @@ class AdminVettingController extends BaseApiController
 
             $this->vettingService->delete($id);
             ActivityLog::log($adminId, 'vetting_record_deleted', "Deleted vetting record #{$id} ({$existing['vetting_type']})", false, null, 'admin', 'vetting_record', $id);
+
+            // Notify the user: bell only (no email for deletion)
+            try {
+                $userId = (int) $existing['user_id'];
+                if ($userId) {
+                    Notification::createNotification(
+                        $userId,
+                        'Your verification record has been removed.',
+                        null,
+                        'moderation',
+                        false
+                    );
+                }
+            } catch (\Throwable $e) {
+                Log::warning("AdminVettingController::destroy notification failed: " . $e->getMessage());
+            }
 
             return $this->respondWithData(['deleted' => true]);
         } catch (\Exception $e) {
@@ -314,6 +359,11 @@ class AdminVettingController extends BaseApiController
         $processed = 0;
         $failed = 0;
 
+        // Collect user IDs for deferred notification sending (avoid blocking the loop)
+        $notifyVerified = [];
+        $notifyRejected = [];
+        $notifyDeleted = [];
+
         foreach ($ids as $id) {
             $id = (int) $id;
             try {
@@ -324,6 +374,7 @@ class AdminVettingController extends BaseApiController
                     case 'verify':
                         if (in_array($existing['status'], ['pending', 'submitted'])) {
                             $this->vettingService->verify($id, $adminId);
+                            $notifyVerified[] = (int) $existing['user_id'];
                             $processed++;
                         } else {
                             $failed++;
@@ -331,16 +382,51 @@ class AdminVettingController extends BaseApiController
                         break;
                     case 'reject':
                         $this->vettingService->reject($id, $adminId, $reason);
+                        $notifyRejected[] = (int) $existing['user_id'];
                         $processed++;
                         break;
                     case 'delete':
                         $this->vettingService->delete($id);
+                        $notifyDeleted[] = (int) $existing['user_id'];
                         $processed++;
                         break;
                 }
             } catch (\Exception $e) {
                 $failed++;
             }
+        }
+
+        // Send notifications after processing (bell only for bulk — emails would be too heavy)
+        try {
+            foreach ($notifyVerified as $userId) {
+                Notification::createNotification(
+                    $userId,
+                    'Your verification has been approved!',
+                    '/dashboard',
+                    'moderation',
+                    true
+                );
+            }
+            foreach ($notifyRejected as $userId) {
+                Notification::createNotification(
+                    $userId,
+                    'Your verification could not be completed. Please contact support.',
+                    '/help',
+                    'moderation',
+                    true
+                );
+            }
+            foreach ($notifyDeleted as $userId) {
+                Notification::createNotification(
+                    $userId,
+                    'Your verification record has been removed.',
+                    null,
+                    'moderation',
+                    false
+                );
+            }
+        } catch (\Throwable $e) {
+            Log::warning("AdminVettingController::bulk notifications failed: " . $e->getMessage());
         }
 
         ActivityLog::log($adminId, "vetting_bulk_{$action}", "Bulk {$action}: {$processed} records processed, {$failed} failed", false, null, 'admin', 'vetting_record', null);
@@ -417,6 +503,73 @@ class AdminVettingController extends BaseApiController
             return $this->respondWithData($record);
         } catch (\Exception $e) {
             return $this->respondWithError('SERVER_ERROR', 'Failed to upload document', null, 500);
+        }
+    }
+
+    /**
+     * Send a vetting-related bell notification + email to a user.
+     *
+     * Wrapped in try/catch so notification failures never break the admin action.
+     */
+    private function sendVettingNotification(
+        int $userId,
+        string $bellMessage,
+        ?string $bellLink,
+        string $emailHeading,
+        string $emailBody,
+        string $gradientFrom,
+        string $gradientTo,
+        string $ctaLabel,
+        string $ctaPath
+    ): void {
+        try {
+            // Bell notification
+            Notification::createNotification(
+                $userId,
+                $bellMessage,
+                $bellLink,
+                'moderation',
+                true
+            );
+
+            // Email notification
+            $tenantId = TenantContext::getId();
+            $user = DB::table('users')
+                ->where('id', $userId)
+                ->where('tenant_id', $tenantId)
+                ->select(['email', 'name', 'first_name'])
+                ->first();
+
+            if ($user && !empty($user->email)) {
+                $recipientName = htmlspecialchars($user->first_name ?? $user->name ?? 'there', ENT_QUOTES, 'UTF-8');
+                $tenantName = htmlspecialchars(TenantContext::getSetting('site_name', 'Project NEXUS'), ENT_QUOTES, 'UTF-8');
+                $baseUrl = TenantContext::getFrontendUrl();
+                $basePath = TenantContext::getSlugPrefix();
+                $fullCtaUrl = $baseUrl . $basePath . $ctaPath;
+                $safeEmailBody = htmlspecialchars($emailBody, ENT_QUOTES, 'UTF-8');
+
+                $html = <<<HTML
+<div style="font-family: system-ui, -apple-system, sans-serif; max-width: 600px; margin: 0 auto;">
+    <div style="background: linear-gradient(135deg, {$gradientFrom}, {$gradientTo}); padding: 24px; border-radius: 16px 16px 0 0; text-align: center;">
+        <h1 style="color: white; margin: 0; font-size: 24px;">{$emailHeading}</h1>
+        <p style="color: rgba(255,255,255,0.9); margin: 8px 0 0;">{$tenantName}</p>
+    </div>
+    <div style="background: #f8fafc; padding: 24px; border-radius: 0 0 16px 16px; border: 1px solid #e2e8f0; border-top: none;">
+        <p style="color: #1e293b; font-size: 16px; line-height: 1.6;">Hi {$recipientName},</p>
+        <p style="color: #1e293b; font-size: 16px; line-height: 1.6;">{$safeEmailBody}</p>
+        <div style="text-align: center; margin-top: 24px;">
+            <a href="{$fullCtaUrl}" style="display: inline-block; background: linear-gradient(135deg, {$gradientFrom}, {$gradientTo}); color: white; text-decoration: none; padding: 14px 32px; border-radius: 10px; font-weight: 600;">{$ctaLabel}</a>
+        </div>
+    </div>
+</div>
+HTML;
+
+                $subject = "{$emailHeading} - {$tenantName}";
+                $mailer = Mailer::forCurrentTenant();
+                $mailer->send($user->email, $subject, $html);
+            }
+        } catch (\Throwable $e) {
+            Log::warning("AdminVettingController::sendVettingNotification failed for user {$userId}: " . $e->getMessage());
         }
     }
 }

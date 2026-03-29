@@ -8,7 +8,9 @@ namespace App\Http\Controllers\Api;
 
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use App\Models\ActivityLog;
+use App\Models\Notification;
 
 /**
  * AdminCommentsController -- Admin comment moderation.
@@ -190,7 +192,7 @@ class AdminCommentsController extends BaseApiController
         $tenantParams = $effectiveTenantId !== null ? [$effectiveTenantId] : [];
 
         $comment = DB::selectOne(
-            "SELECT id, target_type, target_id, tenant_id FROM comments WHERE id = ? {$tenantWhere}",
+            "SELECT id, user_id, target_type, target_id, tenant_id FROM comments WHERE id = ? {$tenantWhere}",
             array_merge([$id], $tenantParams)
         );
 
@@ -211,6 +213,27 @@ class AdminCommentsController extends BaseApiController
             'hide_comment',
             "Hidden comment #{$id} on {$comment->target_type} #{$comment->target_id}" . ($superAdmin ? " (tenant {$commentTenantId})" : '')
         );
+
+        // Notify the comment author
+        try {
+            $commentAuthorId = (int) $comment->user_id;
+
+            if ($commentAuthorId && $commentAuthorId !== $adminId) {
+                $link = $comment->target_type && $comment->target_id
+                    ? "/{$comment->target_type}s/{$comment->target_id}"
+                    : null;
+
+                Notification::createNotification(
+                    $commentAuthorId,
+                    'Your comment has been hidden by a moderator.',
+                    $link,
+                    'moderation',
+                    true
+                );
+            }
+        } catch (\Throwable $e) {
+            Log::warning("AdminCommentsController::hide notification failed: " . $e->getMessage());
+        }
 
         return $this->respondWithData(['success' => true, 'message' => 'Comment hidden']);
     }
@@ -247,6 +270,23 @@ class AdminCommentsController extends BaseApiController
             'delete_comment',
             "Deleted comment #{$id} on {$comment->target_type} #{$comment->target_id}" . ($superAdmin ? " (tenant {$commentTenantId})" : '')
         );
+
+        // Notify the comment author (comment already deleted, use cached data)
+        try {
+            $commentAuthorId = (int) $comment->user_id;
+
+            if ($commentAuthorId && $commentAuthorId !== $adminId) {
+                Notification::createNotification(
+                    $commentAuthorId,
+                    'Your comment has been removed by a moderator.',
+                    null,
+                    'moderation',
+                    true
+                );
+            }
+        } catch (\Throwable $e) {
+            Log::warning("AdminCommentsController::destroy notification failed: " . $e->getMessage());
+        }
 
         return $this->respondWithData(['success' => true, 'message' => 'Comment deleted']);
     }

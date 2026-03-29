@@ -174,8 +174,16 @@ class NotificationDispatcher
     {
         $snippet = substr($content, 0, 250);
 
+        // Resolve tenant_id: use current context, or fall back to user's tenant
+        $tenantId = TenantContext::getId();
+        if (!$tenantId) {
+            $user = \App\Models\User::findById($userId);
+            $tenantId = $user['tenant_id'] ?? null;
+        }
+
         DB::table('notification_queue')->insert([
             'user_id'        => $userId,
+            'tenant_id'      => $tenantId,
             'activity_type'  => $activityType,
             'content_snippet' => $snippet,
             'link'           => $link,

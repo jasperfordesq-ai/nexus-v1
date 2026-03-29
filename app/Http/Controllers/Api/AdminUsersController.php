@@ -18,6 +18,7 @@ use App\Services\Enterprise\GdprService;
 use App\Services\GamificationService;
 use App\Services\TenantSettingsService;
 use App\Services\TokenService;
+use Illuminate\Support\Facades\Log;
 
 /**
  * AdminUsersController — Admin user management (list, view, create, update, approve, suspend, ban, etc.).
@@ -532,6 +533,43 @@ class AdminUsersController extends BaseApiController
         ActivityLog::log($adminId, 'admin_suspend_user', "Suspended user #{$id}: {$reason}");
         AuditLogService::logUserSuspended($adminId, $id, $reason);
 
+        // Notify the suspended user (bell + email — they may not be able to log in)
+        try {
+            Notification::createNotification(
+                $id,
+                'Your account has been suspended. Contact support if you believe this is an error.',
+                null,
+                'system',
+                true
+            );
+        } catch (\Throwable $e) {
+            Log::warning("[AdminUsers] Failed to create suspension bell notification for user #{$id}: " . $e->getMessage());
+        }
+
+        try {
+            $tenant = $this->resolveUserTenant($user);
+            $firstName = htmlspecialchars($user['first_name'] ?? 'there', ENT_QUOTES, 'UTF-8');
+            $tenantNameSafe = htmlspecialchars($tenant['name'], ENT_QUOTES, 'UTF-8');
+
+            $html = \App\Core\EmailTemplate::render(
+                'Account Suspended',
+                "Important notice, {$firstName}",
+                '<p>Your account on <strong>' . $tenantNameSafe . '</strong> has been suspended.</p>
+                 <p>If you believe this is an error, please contact your community administrator for assistance.</p>',
+                null,
+                null,
+                $tenant['name']
+            );
+
+            (new \App\Core\Mailer())->send(
+                $user['email'],
+                "Your account has been suspended - {$tenantNameSafe}",
+                $html
+            );
+        } catch (\Throwable $e) {
+            Log::warning("[AdminUsers] Failed to send suspension email to user #{$id}: " . $e->getMessage());
+        }
+
         return $this->respondWithData(['suspended' => true, 'id' => $id]);
     }
 
@@ -561,6 +599,31 @@ class AdminUsersController extends BaseApiController
 
         ActivityLog::log($adminId, 'admin_ban_user', "Banned user #{$id}: {$reason}");
         AuditLogService::logUserBanned($adminId, $id, $reason);
+
+        // Notify the banned user (email only — they can't log in at all)
+        try {
+            $tenant = $this->resolveUserTenant($user);
+            $firstName = htmlspecialchars($user['first_name'] ?? 'there', ENT_QUOTES, 'UTF-8');
+            $tenantNameSafe = htmlspecialchars($tenant['name'], ENT_QUOTES, 'UTF-8');
+
+            $html = \App\Core\EmailTemplate::render(
+                'Account Banned',
+                "Important notice, {$firstName}",
+                '<p>Your account on <strong>' . $tenantNameSafe . '</strong> has been permanently banned.</p>
+                 <p>If you believe this is an error, please contact your community administrator.</p>',
+                null,
+                null,
+                $tenant['name']
+            );
+
+            (new \App\Core\Mailer())->send(
+                $user['email'],
+                "Your account has been banned - {$tenantNameSafe}",
+                $html
+            );
+        } catch (\Throwable $e) {
+            Log::warning("[AdminUsers] Failed to send ban email to user #{$id}: " . $e->getMessage());
+        }
 
         return $this->respondWithData(['banned' => true, 'id' => $id]);
     }
@@ -613,6 +676,31 @@ class AdminUsersController extends BaseApiController
             return $this->respondWithError('AUTH_INSUFFICIENT_PERMISSIONS', 'Cannot delete a super admin', null, 403);
         }
 
+        // Send deletion email BEFORE the actual deletion (user record must still exist)
+        try {
+            $tenant = $this->resolveUserTenant($user);
+            $firstName = htmlspecialchars($user['first_name'] ?? 'there', ENT_QUOTES, 'UTF-8');
+            $tenantNameSafe = htmlspecialchars($tenant['name'], ENT_QUOTES, 'UTF-8');
+
+            $html = \App\Core\EmailTemplate::render(
+                'Account Deleted',
+                "Important notice, {$firstName}",
+                '<p>Your account on <strong>' . $tenantNameSafe . '</strong> has been scheduled for deletion.</p>
+                 <p>If you believe this is an error, please contact your community administrator as soon as possible.</p>',
+                null,
+                null,
+                $tenant['name']
+            );
+
+            (new \App\Core\Mailer())->send(
+                $user['email'],
+                "Your account has been scheduled for deletion - {$tenantNameSafe}",
+                $html
+            );
+        } catch (\Throwable $e) {
+            Log::warning("[AdminUsers] Failed to send deletion email to user #{$id}: " . $e->getMessage());
+        }
+
         DB::delete("DELETE FROM users WHERE id = ? AND tenant_id = ?", [$id, $tenantId]);
 
         ActivityLog::log($adminId, 'admin_delete_user', "Deleted user #{$id} ({$user['email']})");
@@ -651,6 +739,45 @@ class AdminUsersController extends BaseApiController
         ActivityLog::log($adminId, 'admin_reset_2fa', "Reset 2FA for user #{$id}: {$reason}");
         AuditLogService::log2faReset($adminId, $id, $reason);
 
+        // Notify the user (bell + email — security-critical action)
+        try {
+            Notification::createNotification(
+                $id,
+                'Your two-factor authentication has been reset by an administrator. If you did not request this, please contact support immediately.',
+                '/settings/security',
+                'security',
+                true
+            );
+        } catch (\Throwable $e) {
+            Log::warning("[AdminUsers] Failed to create 2FA reset bell notification for user #{$id}: " . $e->getMessage());
+        }
+
+        try {
+            $tenant = $this->resolveUserTenant($user);
+            $firstName = htmlspecialchars($user['first_name'] ?? 'there', ENT_QUOTES, 'UTF-8');
+            $tenantNameSafe = htmlspecialchars($tenant['name'], ENT_QUOTES, 'UTF-8');
+            $loginUrl = TenantContext::getFrontendUrl() . $tenant['slug_prefix'] . '/login';
+
+            $html = \App\Core\EmailTemplate::render(
+                'Two-Factor Authentication Reset',
+                "Security notice, {$firstName}",
+                '<p>Your two-factor authentication on <strong>' . $tenantNameSafe . '</strong> has been reset by an administrator.</p>
+                 <p>Your account is no longer protected by two-factor authentication. We strongly recommend re-enabling it in your security settings after logging in.</p>
+                 <p>If you did not request this change, please contact your community administrator immediately.</p>',
+                'Log In & Secure Your Account',
+                $loginUrl,
+                $tenant['name']
+            );
+
+            (new \App\Core\Mailer())->send(
+                $user['email'],
+                "Your two-factor authentication has been reset - {$tenantNameSafe}",
+                $html
+            );
+        } catch (\Throwable $e) {
+            Log::warning("[AdminUsers] Failed to send 2FA reset email to user #{$id}: " . $e->getMessage());
+        }
+
         return $this->respondWithData(['reset' => true, 'id' => $id]);
     }
 
@@ -674,6 +801,21 @@ class AdminUsersController extends BaseApiController
         try {
             $this->gamificationService->awardBadgeByKey($id, $badgeSlug);
             ActivityLog::log($adminId, 'admin_award_badge', "Awarded badge '{$badgeSlug}' to user #{$id}");
+
+            // Notify the user (bell notification only)
+            try {
+                $badgeDisplayName = ucwords(str_replace(['-', '_'], ' ', $badgeSlug));
+                Notification::createNotification(
+                    $id,
+                    "You've been awarded the {$badgeDisplayName} badge!",
+                    '/achievements',
+                    'achievement',
+                    false
+                );
+            } catch (\Throwable $e) {
+                Log::warning("[AdminUsers] Failed to create badge award bell notification for user #{$id}: " . $e->getMessage());
+            }
+
             return $this->respondWithData(['awarded' => true, 'user_id' => $id, 'badge_slug' => $badgeSlug], null, 201);
         } catch (\Throwable $e) {
             error_log("[AdminUsers] Failed to award badge to user #{$id}: " . $e->getMessage());
@@ -700,6 +842,20 @@ class AdminUsersController extends BaseApiController
 
         DB::delete("DELETE FROM user_badges WHERE id = ? AND user_id = ? AND tenant_id = ?", [$badgeId, $id, $tenantId]);
         ActivityLog::log($adminId, 'admin_remove_badge', "Removed badge #{$badgeId} from user #{$id}");
+
+        // Notify the user (bell notification only)
+        try {
+            $badgeDisplayName = $badge->badge_name ?? ucwords(str_replace(['-', '_'], ' ', $badge->badge_key ?? 'Unknown'));
+            Notification::createNotification(
+                $id,
+                "The {$badgeDisplayName} badge has been removed from your profile.",
+                '/achievements',
+                'system',
+                false
+            );
+        } catch (\Throwable $e) {
+            Log::warning("[AdminUsers] Failed to create badge removal bell notification for user #{$id}: " . $e->getMessage());
+        }
 
         return $this->respondWithData(['removed' => true, 'user_id' => $id, 'badge_id' => $badgeId]);
     }
@@ -797,6 +953,34 @@ class AdminUsersController extends BaseApiController
 
         ActivityLog::log($adminId, 'admin_set_password', "Admin set password for user #{$id} ({$user['email']})");
         AuditLogService::logAdminAction('admin_set_password', $adminId, $id, ['email' => $user['email']]);
+
+        // Notify the user (email only — they need to know their old password no longer works)
+        // CRITICAL: Do NOT include the new password in the email
+        try {
+            $tenant = $this->resolveUserTenant($user);
+            $firstName = htmlspecialchars($user['first_name'] ?? 'there', ENT_QUOTES, 'UTF-8');
+            $tenantNameSafe = htmlspecialchars($tenant['name'], ENT_QUOTES, 'UTF-8');
+            $loginUrl = TenantContext::getFrontendUrl() . $tenant['slug_prefix'] . '/login';
+
+            $html = \App\Core\EmailTemplate::render(
+                'Password Changed',
+                "Security notice, {$firstName}",
+                '<p>Your password on <strong>' . $tenantNameSafe . '</strong> has been reset by an administrator.</p>
+                 <p>Your previous password will no longer work. Please use the new password provided to you by your administrator to log in.</p>
+                 <p>If you did not expect this change, please contact your community administrator immediately.</p>',
+                'Log In Now',
+                $loginUrl,
+                $tenant['name']
+            );
+
+            (new \App\Core\Mailer())->send(
+                $user['email'],
+                "Your password has been reset - {$tenantNameSafe}",
+                $html
+            );
+        } catch (\Throwable $e) {
+            Log::warning("[AdminUsers] Failed to send password reset email to user #{$id}: " . $e->getMessage());
+        }
 
         return $this->respondWithData(['password_set' => true, 'id' => $id]);
     }
@@ -901,6 +1085,22 @@ class AdminUsersController extends BaseApiController
             ActivityLog::log($adminId, $action, ($grant ? 'Granted' : 'Revoked') . " tenant super admin for user #{$id}: {$user->email} (tenant {$user->tenant_id})");
             AuditLogService::logAdminAction($action, $adminId, $id, ['email' => $user->email]);
 
+            // Notify the user of role change (bell notification)
+            try {
+                $message = $grant
+                    ? 'You have been granted Tenant Super Admin privileges.'
+                    : 'Your Tenant Super Admin privileges have been removed.';
+                Notification::createNotification(
+                    $id,
+                    $message,
+                    null,
+                    'system',
+                    true
+                );
+            } catch (\Throwable $e) {
+                Log::warning("[AdminUsers] Failed to create super admin role change notification for user #{$id}: " . $e->getMessage());
+            }
+
             return $this->respondWithData(['id' => $id, 'is_tenant_super_admin' => $grant]);
         } catch (\Exception $e) {
             return $this->respondWithError('SERVER_ERROR', 'Failed to update super admin status', null, 500);
@@ -946,6 +1146,22 @@ class AdminUsersController extends BaseApiController
             $action = $grant ? 'grant_global_super_admin' : 'revoke_global_super_admin';
             ActivityLog::log($adminId, $action, ($grant ? 'Granted' : 'Revoked') . " global super admin for user #{$id}: {$user->email} (tenant {$user->tenant_id})");
             AuditLogService::logAdminAction($action, $adminId, $id, ['email' => $user->email]);
+
+            // Notify the user of role change (bell notification)
+            try {
+                $message = $grant
+                    ? 'You have been granted Global Super Admin privileges.'
+                    : 'Your Global Super Admin privileges have been removed.';
+                Notification::createNotification(
+                    $id,
+                    $message,
+                    null,
+                    'system',
+                    true
+                );
+            } catch (\Throwable $e) {
+                Log::warning("[AdminUsers] Failed to create global super admin role change notification for user #{$id}: " . $e->getMessage());
+            }
 
             return $this->respondWithData(['id' => $id, 'is_super_admin' => $grant]);
         } catch (\Exception $e) {

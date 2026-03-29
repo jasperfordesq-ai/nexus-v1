@@ -131,30 +131,35 @@ class NotifySafeguardingStaff implements ShouldQueue
 
     private function sendEmail(object $staff, string $memberName, array $optionLabels, int $flaggedUserId, int $tenantId): void
     {
-        try {
-            $staffName = $staff->first_name ?? $staff->name ?? 'Team member';
-            $optionList = implode("\n  - ", $optionLabels);
+        $staffName = $staff->first_name ?? $staff->name ?? 'Team member';
+        $optionList = implode("\n  - ", $optionLabels);
 
-            /** @var EmailService $emailService */
-            $emailService = app(EmailService::class);
+        /** @var EmailService $emailService */
+        $emailService = app(EmailService::class);
 
-            $emailService->send(
-                $staff->email,
-                "[NEXUS] Safeguarding flag — {$memberName}",
-                "Hi {$staffName},\n\n"
-                . "A member has indicated safeguarding support needs during onboarding.\n\n"
-                . "Member: {$memberName}\n"
-                . "Selected options:\n  - {$optionList}\n\n"
-                . "Please review this in the admin panel and take appropriate action.\n"
-                . "This may include assigning a guardian, adjusting messaging permissions, or contacting the member directly.\n\n"
-                . "This is an automated notification from the platform safeguarding system.\n"
-                . "All access to safeguarding data is audit-logged.\n"
-            );
-        } catch (\Throwable $e) {
-            Log::error('NotifySafeguardingStaff: failed to send email', [
+        $sent = $emailService->send(
+            $staff->email,
+            "[NEXUS] Safeguarding flag — {$memberName}",
+            "Hi {$staffName},\n\n"
+            . "A member has indicated safeguarding support needs during onboarding.\n\n"
+            . "Member: {$memberName}\n"
+            . "Selected options:\n  - {$optionList}\n\n"
+            . "Please review this in the admin panel and take appropriate action.\n"
+            . "This may include assigning a guardian, adjusting messaging permissions, or contacting the member directly.\n\n"
+            . "This is an automated notification from the platform safeguarding system.\n"
+            . "All access to safeguarding data is audit-logged.\n"
+        );
+
+        if (!$sent) {
+            Log::critical('NotifySafeguardingStaff: email send returned false — safeguarding notification not delivered', [
                 'staff_id' => $staff->id,
-                'error' => $e->getMessage(),
+                'staff_email' => $staff->email,
+                'flagged_user_id' => $flaggedUserId,
+                'tenant_id' => $tenantId,
             ]);
+            throw new \RuntimeException(
+                "Safeguarding email failed to send to staff {$staff->id} ({$staff->email}) — queue will retry"
+            );
         }
     }
 }

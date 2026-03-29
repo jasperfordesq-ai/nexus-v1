@@ -8,7 +8,9 @@ namespace App\Http\Controllers\Api;
 
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use App\Models\ActivityLog;
+use App\Models\Notification;
 
 /**
  * AdminReportsController -- Admin user and content report handling.
@@ -196,9 +198,9 @@ class AdminReportsController extends BaseApiController
         $tenantId = $this->getTenantId();
 
         if ($superAdmin) {
-            $report = DB::selectOne("SELECT id, status, tenant_id FROM reports WHERE id = ?", [$id]);
+            $report = DB::selectOne("SELECT id, status, tenant_id, reporter_id, target_type, target_id FROM reports WHERE id = ?", [$id]);
         } else {
-            $report = DB::selectOne("SELECT id, status, tenant_id FROM reports WHERE id = ? AND tenant_id = ?", [$id, $tenantId]);
+            $report = DB::selectOne("SELECT id, status, tenant_id, reporter_id, target_type, target_id FROM reports WHERE id = ? AND tenant_id = ?", [$id, $tenantId]);
         }
 
         if (!$report) {
@@ -222,6 +224,27 @@ class AdminReportsController extends BaseApiController
             "Resolved report ID {$id}" . ($superAdmin ? " (tenant {$reportTenantId})" : '')
         );
 
+        // Notify the report creator
+        try {
+            $reporterId = (int) $report->reporter_id;
+
+            if ($reporterId) {
+                $link = $report->target_type && $report->target_id
+                    ? "/{$report->target_type}s/{$report->target_id}"
+                    : null;
+
+                Notification::createNotification(
+                    $reporterId,
+                    'Your report has been reviewed and resolved.',
+                    $link,
+                    'moderation',
+                    false
+                );
+            }
+        } catch (\Throwable $e) {
+            Log::warning("AdminReportsController::resolve notification failed: " . $e->getMessage());
+        }
+
         return $this->respondWithData(['success' => true, 'message' => 'Report resolved']);
     }
 
@@ -235,9 +258,9 @@ class AdminReportsController extends BaseApiController
         $tenantId = $this->getTenantId();
 
         if ($superAdmin) {
-            $report = DB::selectOne("SELECT id, status, tenant_id FROM reports WHERE id = ?", [$id]);
+            $report = DB::selectOne("SELECT id, status, tenant_id, reporter_id FROM reports WHERE id = ?", [$id]);
         } else {
-            $report = DB::selectOne("SELECT id, status, tenant_id FROM reports WHERE id = ? AND tenant_id = ?", [$id, $tenantId]);
+            $report = DB::selectOne("SELECT id, status, tenant_id, reporter_id FROM reports WHERE id = ? AND tenant_id = ?", [$id, $tenantId]);
         }
 
         if (!$report) {
@@ -260,6 +283,23 @@ class AdminReportsController extends BaseApiController
             'dismiss_report',
             "Dismissed report ID {$id}" . ($superAdmin ? " (tenant {$reportTenantId})" : '')
         );
+
+        // Notify the report creator (neutral wording — "reviewed" not "dismissed")
+        try {
+            $reporterId = (int) $report->reporter_id;
+
+            if ($reporterId) {
+                Notification::createNotification(
+                    $reporterId,
+                    'Your report has been reviewed.',
+                    null,
+                    'moderation',
+                    false
+                );
+            }
+        } catch (\Throwable $e) {
+            Log::warning("AdminReportsController::dismiss notification failed: " . $e->getMessage());
+        }
 
         return $this->respondWithData(['success' => true, 'message' => 'Report dismissed']);
     }

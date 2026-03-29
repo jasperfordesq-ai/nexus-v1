@@ -263,8 +263,6 @@ class CronJobRunner
 
         echo "Found " . count($users) . " users to process.\n";
 
-        $mailer = new Mailer();
-
         foreach ($users as $uRow) {
             $userId = $uRow['user_id'];
             $count = $uRow['count'];
@@ -275,16 +273,27 @@ class CronJobRunner
                 continue;
             }
 
-            // Set tenant context so email links point to the correct frontend URL
+            // Set tenant context so email links and SMTP credentials are correct
             if (!empty($user['tenant_id'])) {
                 TenantContext::setById($user['tenant_id']);
             }
 
             echo "Processing User: {$user['name']} ($count items)...\n";
 
-            // Partition into batches? (Maybe later. For now, fetch all pending for this user/freq)
+            // Race condition fix: atomically claim items by setting status='processing'
+            $claimSql = "UPDATE notification_queue
+                         SET status = 'processing'
+                         WHERE user_id = ? AND frequency = ? AND status = 'pending'";
+            $claimed = DB::update($claimSql, [$userId, $frequency]);
+
+            if ($claimed === 0) {
+                echo " - Items already claimed by another runner, skipping.\n";
+                continue;
+            }
+
+            // Fetch the items we just claimed
             $itemsSql = "SELECT * FROM notification_queue
-                         WHERE user_id = ? AND frequency = ? AND status = 'pending'
+                         WHERE user_id = ? AND frequency = ? AND status = 'processing'
                          ORDER BY created_at ASC";
             $items = array_map(fn($r) => (array) $r, DB::select($itemsSql, [$userId, $frequency]));
 
@@ -292,12 +301,14 @@ class CronJobRunner
             $subject = "Your $frequency Digest from Project NEXUS";
             $body = $this->generateEmailHtml($user, $items, $frequency);
 
+            // Create mailer with tenant context for correct SMTP credentials
+            $mailer = Mailer::forCurrentTenant();
+
             // Send Email
             if ($mailer->send($user['email'], $subject, $body)) {
                 echo " - Email Sent.\n";
 
                 // Mark as Sent
-                // Collect IDs
                 $ids = array_column($items, 'id');
                 if (!empty($ids)) {
                     $inQuery = implode(',', array_fill(0, count($ids), '?'));
@@ -307,6 +318,14 @@ class CronJobRunner
                 }
             } else {
                 echo " - FAILED to send email.\n";
+
+                // Revert processing items back to pending so they can be retried
+                $ids = array_column($items, 'id');
+                if (!empty($ids)) {
+                    $inQuery = implode(',', array_fill(0, count($ids), '?'));
+                    $revertSql = "UPDATE notification_queue SET status = 'failed' WHERE id IN ($inQuery)";
+                    DB::update($revertSql, $ids);
+                }
             }
         }
 
@@ -325,23 +344,28 @@ class CronJobRunner
         try {
             echo "Processing Instant Queue...\n";
 
-            $mailer = new Mailer();
+            // Race condition fix: atomically claim up to 50 pending items
+            $claimSql = "UPDATE notification_queue
+                         SET status = 'processing'
+                         WHERE frequency = 'instant' AND status = 'pending'
+                         ORDER BY created_at ASC
+                         LIMIT 50";
+            $claimed = DB::update($claimSql);
 
-            // Limit to 50 to prevent timeout
-            $sql = "SELECT q.*, u.email, u.name, u.tenant_id as user_tenant_id
-                    FROM notification_queue q
-                    JOIN users u ON q.user_id = u.id
-                    WHERE q.frequency = 'instant' AND q.status = 'pending'
-                    ORDER BY q.created_at ASC
-                    LIMIT 50";
-
-            $items = array_map(fn($r) => (array) $r, DB::select($sql));
-
-            if (empty($items)) {
+            if ($claimed === 0) {
                 echo "No pending instant notifications.\n";
             } else {
+                // Fetch the items we just claimed
+                $sql = "SELECT q.*, u.email, u.name, u.tenant_id as user_tenant_id
+                        FROM notification_queue q
+                        JOIN users u ON q.user_id = u.id
+                        WHERE q.frequency = 'instant' AND q.status = 'processing'
+                        ORDER BY q.created_at ASC";
+
+                $items = array_map(fn($r) => (array) $r, DB::select($sql));
+
                 foreach ($items as $item) {
-                    // Set tenant context so URLs point to the correct frontend
+                    // Set tenant context so URLs and SMTP credentials are correct
                     if (!empty($item['user_tenant_id'])) {
                         TenantContext::setById($item['user_tenant_id']);
                     }
@@ -404,10 +428,14 @@ class CronJobRunner
                         $body = str_replace('{{EXCHANGE_URL}}', $baseUrl . $basePath . $item['link'], $body);
                     }
 
+                    // Create mailer with tenant context for correct SMTP credentials
+                    $mailer = Mailer::forCurrentTenant();
+
                     if ($mailer->send($item['email'], $subject, $body)) {
                         DB::update("UPDATE notification_queue SET status = 'sent', sent_at = NOW() WHERE id = ?", [$item['id']]);
                         echo "OK.\n";
                     } else {
+                        DB::update("UPDATE notification_queue SET status = 'failed' WHERE id = ?", [$item['id']]);
                         echo "FAILED.\n";
                     }
                 }
@@ -416,6 +444,9 @@ class CronJobRunner
         } catch (\Throwable $e) {
             echo "\nError: " . $e->getMessage() . "\n";
             $status = 'error';
+
+            // On exception, revert any 'processing' items back to 'pending' for retry
+            DB::update("UPDATE notification_queue SET status = 'pending' WHERE frequency = 'instant' AND status = 'processing'");
         }
 
         $output = ob_get_clean();
@@ -1019,24 +1050,35 @@ class CronJobRunner
      */
     private function runInstantQueueInternal()
     {
-        $mailer = new Mailer();
+        // Race condition fix: atomically claim up to 50 pending items
+        $claimSql = "UPDATE notification_queue
+                     SET status = 'processing'
+                     WHERE frequency = 'instant' AND status = 'pending'
+                     ORDER BY created_at ASC
+                     LIMIT 50";
+        $claimed = DB::update($claimSql);
 
-        $sql = "SELECT q.*, u.email, u.name
-                FROM notification_queue q
-                JOIN users u ON q.user_id = u.id
-                WHERE q.frequency = 'instant' AND q.status = 'pending'
-                ORDER BY q.created_at ASC
-                LIMIT 50";
-
-        $items = array_map(fn($r) => (array) $r, DB::select($sql));
-
-        if (empty($items)) {
+        if ($claimed === 0) {
             echo "   No pending instant notifications.\n";
             return;
         }
 
+        // Fetch the items we just claimed, including tenant_id for context
+        $sql = "SELECT q.*, u.email, u.name, u.tenant_id as user_tenant_id
+                FROM notification_queue q
+                JOIN users u ON q.user_id = u.id
+                WHERE q.frequency = 'instant' AND q.status = 'processing'
+                ORDER BY q.created_at ASC";
+
+        $items = array_map(fn($r) => (array) $r, DB::select($sql));
+
         $sent = 0;
         foreach ($items as $item) {
+            // Set tenant context so SMTP credentials are correct
+            if (!empty($item['user_tenant_id'])) {
+                TenantContext::setById($item['user_tenant_id']);
+            }
+
             $subject = "Notification from Nexus";
             if ($item['activity_type'] === 'new_topic') {
                 $subject = "New Discussion: " . substr(strip_tags($item['content_snippet']), 0, 50) . "...";
@@ -1054,9 +1096,14 @@ class CronJobRunner
 
             $body = $item['email_body'] ?? nl2br($item['content_snippet']);
 
+            // Create mailer with tenant context for correct SMTP credentials
+            $mailer = Mailer::forCurrentTenant();
+
             if ($mailer->send($item['email'], $subject, $body)) {
                 DB::update("UPDATE notification_queue SET status = 'sent', sent_at = NOW() WHERE id = ?", [$item['id']]);
                 $sent++;
+            } else {
+                DB::update("UPDATE notification_queue SET status = 'failed' WHERE id = ?", [$item['id']]);
             }
         }
         echo "   Sent $sent instant notifications.\n";

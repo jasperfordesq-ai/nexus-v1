@@ -403,7 +403,7 @@ class SafeguardingService
                 'title' => $data['title'] ?? '',
             ]);
 
-            // Notify all admins/brokers of new incident (legally required for high/critical)
+            // Notify all admins/brokers of new incident (legally required for ALL severities)
             $this->notifyAdminsOfIncident($tenantId, $reporterId, $id, $data['title'] ?? '', $severity, $incidentType);
 
             return $record ? (array) $record : [];
@@ -629,7 +629,7 @@ class SafeguardingService
                 'dlp_user_id' => $dlpUserId,
             ]);
 
-            // Notify the assigned DLP
+            // Notify the assigned DLP (bell notification)
             try {
                 \App\Models\Notification::create([
                     'tenant_id' => $tenantId,
@@ -640,7 +640,47 @@ class SafeguardingService
                     'is_read' => false,
                 ]);
             } catch (\Throwable $notifError) {
-                Log::warning('SafeguardingService::assignDlp: failed to notify DLP', ['error' => $notifError->getMessage()]);
+                Log::critical('SafeguardingService::assignDlp: failed to create DLP bell notification', [
+                    'dlp_user_id' => $dlpUserId,
+                    'incident_id' => $incidentId,
+                    'error' => $notifError->getMessage(),
+                ]);
+            }
+
+            // Email the assigned DLP — DLP assignment is critical and time-sensitive
+            // Safeguarding emails bypass user preferences — always send
+            if (!empty($dlpUser->email)) {
+                try {
+                    $severityLabel = strtoupper($incident->severity ?? 'UNKNOWN');
+                    $dlpName = trim(($dlpUser->first_name ?? '') . ' ' . ($dlpUser->last_name ?? '')) ?: ($dlpUser->name ?? 'Team member');
+
+                    $emailService = app(\App\Services\EmailService::class);
+                    $sent = $emailService->send(
+                        $dlpUser->email,
+                        "[NEXUS] [{$severityLabel}] DLP Assignment — Safeguarding Incident #{$incidentId}",
+                        "Hi {$dlpName},\n\n"
+                        . "You have been assigned as the Designated Liaison Person (DLP) for safeguarding incident #{$incidentId}.\n\n"
+                        . "Severity: {$severityLabel}\n"
+                        . "Title: " . ($incident->title ?? 'N/A') . "\n\n"
+                        . "Please review this immediately in the admin panel and take appropriate action.\n"
+                        . "As DLP, you are responsible for coordinating the safeguarding response for this incident.\n\n"
+                        . "This is an automated notification from the platform safeguarding system.\n"
+                        . "All access to safeguarding data is audit-logged.\n"
+                    );
+                    if (!$sent) {
+                        Log::critical('SafeguardingService::assignDlp: DLP assignment email failed to send', [
+                            'dlp_user_id' => $dlpUserId,
+                            'dlp_email' => $dlpUser->email,
+                            'incident_id' => $incidentId,
+                        ]);
+                    }
+                } catch (\Throwable $emailError) {
+                    Log::critical('SafeguardingService::assignDlp: DLP assignment email exception', [
+                        'dlp_user_id' => $dlpUserId,
+                        'incident_id' => $incidentId,
+                        'error' => $emailError->getMessage(),
+                    ]);
+                }
             }
 
             return true;
@@ -681,22 +721,33 @@ class SafeguardingService
                     'is_read' => false,
                 ]);
 
-                // Send email for high/critical incidents
-                if (in_array($severity, ['high', 'critical']) && !empty($staff->email)) {
+                // Send email for ALL safeguarding incidents (legal requirement)
+                // Severity label is included in subject for prioritization
+                if (!empty($staff->email)) {
                     try {
                         $emailService = app(\App\Services\EmailService::class);
-                        $emailService->send(
+                        $sent = $emailService->send(
                             $staff->email,
-                            "[NEXUS] {$severityLabel} Safeguarding Incident — {$title}",
+                            "[NEXUS] [{$severityLabel}] Safeguarding Incident — {$title}",
                             "A {$severity} safeguarding incident ({$type}) has been reported by {$reporterName}.\n\n"
                             . "Title: {$title}\n"
                             . "Severity: {$severityLabel}\n\n"
-                            . "Please review this immediately in the admin panel.\n"
+                            . "Please review this in the admin panel and take appropriate action.\n"
                             . "This is an automated notification from the platform safeguarding system.\n"
                         );
+                        if (!$sent) {
+                            Log::critical('SafeguardingService: safeguarding incident email failed to send', [
+                                'staff_id' => $staff->id,
+                                'incident_id' => $incidentId,
+                                'severity' => $severity,
+                            ]);
+                        }
                     } catch (\Throwable $emailError) {
-                        Log::error('SafeguardingService: failed to email admin about incident', [
-                            'staff_id' => $staff->id, 'error' => $emailError->getMessage(),
+                        Log::critical('SafeguardingService: safeguarding incident email exception', [
+                            'staff_id' => $staff->id,
+                            'incident_id' => $incidentId,
+                            'severity' => $severity,
+                            'error' => $emailError->getMessage(),
                         ]);
                     }
                 }
@@ -721,7 +772,7 @@ class SafeguardingService
             $label = $statusLabels[$newStatus] ?? $newStatus;
             $message = "Your safeguarding incident #{$incidentId} has been marked as {$label}";
 
-            // Notify reporter
+            // Notify reporter (bell)
             \App\Models\Notification::create([
                 'tenant_id' => $tenantId,
                 'user_id' => $reporterId,
@@ -731,7 +782,7 @@ class SafeguardingService
                 'is_read' => false,
             ]);
 
-            // Notify assigned DLP if different from reporter
+            // Notify assigned DLP if different from reporter (bell)
             if ($dlpUserId && $dlpUserId !== $reporterId) {
                 \App\Models\Notification::create([
                     'tenant_id' => $tenantId,
@@ -741,6 +792,68 @@ class SafeguardingService
                     'link' => '/admin/safeguarding',
                     'is_read' => false,
                 ]);
+            }
+
+            // Send email for status changes on high/critical incidents
+            // Safeguarding emails bypass user preferences — always send
+            $incident = DB::table('vol_safeguarding_incidents')
+                ->where('id', $incidentId)
+                ->where('tenant_id', $tenantId)
+                ->first();
+
+            if ($incident && in_array($incident->severity, ['high', 'critical'])) {
+                $severityLabel = strtoupper($incident->severity);
+                $emailSubject = "[NEXUS] [{$severityLabel}] Safeguarding Incident #{$incidentId} — {$label}";
+
+                $emailBody = "Safeguarding incident #{$incidentId} has been updated.\n\n"
+                    . "New status: {$label}\n"
+                    . "Severity: {$severityLabel}\n\n"
+                    . "Please review this in the admin panel.\n"
+                    . "This is an automated notification from the platform safeguarding system.\n";
+
+                $emailService = app(\App\Services\EmailService::class);
+
+                // Email the reporter
+                $reporter = User::find($reporterId);
+                if ($reporter && !empty($reporter->email)) {
+                    try {
+                        $sent = $emailService->send($reporter->email, $emailSubject, $emailBody);
+                        if (!$sent) {
+                            Log::critical('SafeguardingService: status change email failed for reporter', [
+                                'reporter_id' => $reporterId,
+                                'incident_id' => $incidentId,
+                            ]);
+                        }
+                    } catch (\Throwable $emailError) {
+                        Log::critical('SafeguardingService: status change email exception for reporter', [
+                            'reporter_id' => $reporterId,
+                            'incident_id' => $incidentId,
+                            'error' => $emailError->getMessage(),
+                        ]);
+                    }
+                }
+
+                // Email the assigned DLP if different from reporter
+                if ($dlpUserId && $dlpUserId !== $reporterId) {
+                    $dlpUser = User::find($dlpUserId);
+                    if ($dlpUser && !empty($dlpUser->email)) {
+                        try {
+                            $sent = $emailService->send($dlpUser->email, $emailSubject, $emailBody);
+                            if (!$sent) {
+                                Log::critical('SafeguardingService: status change email failed for DLP', [
+                                    'dlp_user_id' => $dlpUserId,
+                                    'incident_id' => $incidentId,
+                                ]);
+                            }
+                        } catch (\Throwable $emailError) {
+                            Log::critical('SafeguardingService: status change email exception for DLP', [
+                                'dlp_user_id' => $dlpUserId,
+                                'incident_id' => $incidentId,
+                                'error' => $emailError->getMessage(),
+                            ]);
+                        }
+                    }
+                }
             }
         } catch (\Throwable $e) {
             Log::error('SafeguardingService::notifyIncidentStatusChange error: ' . $e->getMessage());
