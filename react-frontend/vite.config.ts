@@ -116,6 +116,7 @@ export default defineConfig(({ command }) => ({
         target: process.env.VITE_API_URL || 'http://localhost:8090',
         changeOrigin: true,
         secure: false,
+        timeout: 120000, // 2 min — some dashboard queries are slow on Docker dev
         headers: {
           // Ensure headers are forwarded
           'X-Forwarded-Proto': 'http',

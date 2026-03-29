@@ -6,6 +6,9 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Models\Comment;
+use App\Models\Notification;
+use App\Models\User;
 use App\Services\CommentService;
 use Illuminate\Http\JsonResponse;
 
@@ -165,6 +168,24 @@ class CommentsController extends BaseApiController
         $actualEmoji = $emojiMap[$emoji] ?? $emoji;
 
         $result = $this->commentService->toggleReaction($userId, $tenantId, $id, $actualEmoji);
+
+        // Notify comment author on reaction add (not on remove/update)
+        if ($result['action'] === 'added') {
+            try {
+                $comment = Comment::find($id);
+                if ($comment && (int) $comment->user_id !== $userId) {
+                    $reactor = User::find($userId);
+                    $reactorName = $reactor ? trim(($reactor->first_name ?? '') . ' ' . ($reactor->last_name ?? '')) : 'Someone';
+                    $link = $comment->target_type && $comment->target_id
+                        ? "/{$comment->target_type}s/{$comment->target_id}"
+                        : null;
+                    $message = "{$reactorName} reacted to your comment";
+                    Notification::createNotification((int) $comment->user_id, $message, $link, 'reaction');
+                }
+            } catch (\Throwable $e) {
+                \Log::warning('Comment reaction notification failed', ['comment' => $id, 'reactor' => $userId, 'error' => $e->getMessage()]);
+            }
+        }
 
         return $this->respondWithData([
             'action'    => $result['action'],

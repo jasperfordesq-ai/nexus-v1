@@ -6,7 +6,9 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Models\User;
 use App\Services\ConnectionService;
+use App\Services\NotificationDispatcher;
 use Illuminate\Http\JsonResponse;
 
 /**
@@ -168,6 +170,29 @@ class ConnectionsController extends BaseApiController
             \App\Services\GamificationService::runAllBadgeChecks($otherUserId);
         } catch (\Throwable $e) {
             \Log::warning('Gamification XP award failed', ['action' => 'make_connection', 'user' => $userId, 'error' => $e->getMessage()]);
+        }
+
+        // Notify the original requester that their connection request was accepted
+        try {
+            $requesterId = $connection->requester_id;
+            $accepter = User::find($userId);
+            $accepterName = $accepter->first_name ?? $accepter->name ?? 'Someone';
+
+            NotificationDispatcher::dispatch(
+                $requesterId,
+                'global',
+                null,
+                'connection_accepted',
+                "{$accepterName} accepted your connection request",
+                '/members/' . $userId,
+                null
+            );
+        } catch (\Throwable $e) {
+            \Log::warning('Connection accepted notification failed', [
+                'accepter' => $userId,
+                'requester' => $connection->requester_id ?? null,
+                'error' => $e->getMessage(),
+            ]);
         }
 
         return $this->respondWithData([

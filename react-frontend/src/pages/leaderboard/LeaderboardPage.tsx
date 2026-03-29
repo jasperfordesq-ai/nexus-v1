@@ -4,13 +4,19 @@
 // See NOTICE file for attribution and acknowledgements.
 
 /**
- * Leaderboard Page - Community rankings with type selector and seasons
+ * Leaderboard Page — Community dashboard with 4 tabs.
+ *
+ * Redesigned to lead with community impact rather than competitive rankings:
+ *   1. Community Impact (default) — aggregate stats, trends
+ *   2. My Journey — personal growth timeline
+ *   3. Member Spotlight — daily rotating featured members
+ *   4. Most Active — traditional competitive leaderboard (optional)
  */
 
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Button, Avatar, Select, SelectItem, Chip, Skeleton } from '@heroui/react';
+import { Button, Avatar, Select, SelectItem, Chip, Skeleton, Tabs, Tab } from '@heroui/react';
 import {
   Trophy,
   Medal,
@@ -25,6 +31,10 @@ import {
   Calendar,
   ChevronRight,
   Flame,
+  Users,
+  Route,
+  Sparkles,
+  BarChart3,
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
@@ -34,6 +44,9 @@ import { useToast, useTenant } from '@/contexts';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
 import { resolveAvatarUrl } from '@/lib/helpers';
+import CommunityImpactTab from './CommunityImpactTab';
+import PersonalJourneyTab from './PersonalJourneyTab';
+import MemberSpotlightTab from './MemberSpotlightTab';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Types
@@ -496,16 +509,131 @@ export function LeaderboardPage() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-bold text-theme-primary flex items-center gap-3">
-            <Trophy className="w-7 h-7 text-amber-400" aria-hidden="true" />
-            {t('leaderboard.title')}
-          </h1>
-          <p className="text-theme-muted mt-1">{t('leaderboard.subtitle')}</p>
-        </div>
+      <div>
+        <h1 className="text-2xl font-bold text-theme-primary flex items-center gap-3">
+          <Users className="w-7 h-7 text-amber-400" aria-hidden="true" />
+          {t('leaderboard.title', 'Community')}
+        </h1>
+        <p className="text-theme-muted mt-1">
+          {t('leaderboard.subtitle_redesign', 'See how our community is growing together')}
+        </p>
+      </div>
 
-        <div className="flex items-center gap-3">
+      {/* Tab navigation */}
+      <Tabs
+        aria-label={t('leaderboard.tabs_aria', 'Community views')}
+        color="primary"
+        variant="underlined"
+        classNames={{ tabList: 'gap-4' }}
+        defaultSelectedKey="competitive"
+      >
+        <Tab
+          key="competitive"
+          title={
+            <div className="flex items-center gap-2">
+              <Trophy className="w-4 h-4" />
+              <span>{t('leaderboard.tab.competitive', 'Most Active')}</span>
+            </div>
+          }
+        >
+          <div className="pt-4">
+            <CompetitiveLeaderboard
+              entries={entries}
+              meta={meta}
+              isLoading={isLoading}
+              error={error}
+              period={period}
+              type={type}
+              setPeriod={setPeriod}
+              setType={setType}
+              tenantPath={tenantPath}
+              t={t}
+              getRankIcon={getRankIcon}
+              formatScore={formatScore}
+              typeLabels={typeLabels}
+              typeIcons={typeIcons}
+              periodLabels={periodLabels}
+              containerVariants={containerVariants}
+              itemVariants={itemVariants}
+              loadLeaderboard={loadLeaderboard}
+            />
+          </div>
+        </Tab>
+
+        <Tab
+          key="community"
+          title={
+            <div className="flex items-center gap-2">
+              <BarChart3 className="w-4 h-4" />
+              <span>{t('leaderboard.tab.community', 'Community Impact')}</span>
+            </div>
+          }
+        >
+          <div className="pt-4">
+            <CommunityImpactTab />
+          </div>
+        </Tab>
+
+        <Tab
+          key="journey"
+          title={
+            <div className="flex items-center gap-2">
+              <Route className="w-4 h-4" />
+              <span>{t('leaderboard.tab.journey', 'My Journey')}</span>
+            </div>
+          }
+        >
+          <div className="pt-4">
+            <PersonalJourneyTab />
+          </div>
+        </Tab>
+
+        <Tab
+          key="spotlight"
+          title={
+            <div className="flex items-center gap-2">
+              <Sparkles className="w-4 h-4" />
+              <span>{t('leaderboard.tab.spotlight', 'Spotlight')}</span>
+            </div>
+          }
+        >
+          <div className="pt-4">
+            <MemberSpotlightTab />
+          </div>
+        </Tab>
+      </Tabs>
+    </div>
+  );
+}
+
+/**
+ * CompetitiveLeaderboard — the original ranking view, now wrapped as a tab.
+ */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function CompetitiveLeaderboard(props: any) {
+  const {
+    entries,
+    meta,
+    isLoading,
+    error,
+    period,
+    type,
+    setPeriod,
+    setType,
+    tenantPath,
+    t,
+    getRankIcon,
+    formatScore,
+    typeLabels,
+    typeIcons,
+    periodLabels,
+    containerVariants,
+    itemVariants,
+    loadLeaderboard,
+  } = props;
+  return (
+    <div className="space-y-6">
+      <div className="flex items-center gap-3">
           {/* Type Selector */}
           <Select
             placeholder={t('leaderboard.type_placeholder')}
@@ -544,7 +672,6 @@ export function LeaderboardPage() {
             <SelectItem key="week">{t('leaderboard.period.week')}</SelectItem>
           </Select>
         </div>
-      </div>
 
       {/* Season Section */}
       <SeasonCard />
@@ -553,7 +680,7 @@ export function LeaderboardPage() {
           list over the meta fallback, which can disagree if the backend's fallback
           rank query uses different filters. */}
       {(() => {
-        const myEntry = entries.find((e) => e.is_current_user);
+        const myEntry = entries.find((e: LeaderboardEntry) => e.is_current_user);
         const displayPosition = myEntry?.position ?? meta?.your_position;
         const displayTotal = meta?.total_entries ?? entries.length;
         if (!displayPosition) return null;
@@ -630,7 +757,7 @@ export function LeaderboardPage() {
                 animate="visible"
                 className="divide-y divide-white/5"
               >
-                {entries.map((entry) => (
+                {entries.map((entry: LeaderboardEntry) => (
                   <motion.div key={entry.position} variants={itemVariants}>
                     <Link
                       to={tenantPath(`/profile/${entry.user.id}`)}

@@ -12,7 +12,8 @@ use Illuminate\Support\Facades\DB;
 /**
  * MemberVerificationBadgeService — Verification badge system.
  *
- * Badge types: email_verified, phone_verified, id_verified, address_verified, admin_verified.
+ * Badge types: email_verified, phone_verified, id_verified, address_verified, admin_verified,
+ *              background_check, organization_vouched, peer_endorsed.
  * Provides grant/revoke badges, get badges for users, batch get badges, and admin badge list.
  */
 class MemberVerificationBadgeService
@@ -23,6 +24,9 @@ class MemberVerificationBadgeService
         'id_verified',
         'address_verified',
         'admin_verified',
+        'background_check',
+        'organization_vouched',
+        'peer_endorsed',
     ];
 
     public const BADGE_LABELS = [
@@ -31,6 +35,9 @@ class MemberVerificationBadgeService
         'id_verified' => 'ID Verified',
         'address_verified' => 'Address Verified',
         'admin_verified' => 'Admin Verified',
+        'background_check' => 'Background Check Verified',
+        'organization_vouched' => 'Organization Vouched',
+        'peer_endorsed' => 'Peer Endorsed',
     ];
 
     public const BADGE_ICONS = [
@@ -39,6 +46,9 @@ class MemberVerificationBadgeService
         'id_verified' => 'shield-check',
         'address_verified' => 'badge-check',
         'admin_verified' => 'user-check',
+        'background_check' => 'shield-check',
+        'organization_vouched' => 'building-2',
+        'peer_endorsed' => 'users-round',
     ];
 
     private array $errors = [];

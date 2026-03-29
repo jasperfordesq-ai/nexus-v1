@@ -286,6 +286,8 @@ Route::post('/v2/members/{id}/endorse', [\App\Http\Controllers\Api\EndorsementCo
 Route::delete('/v2/members/{id}/endorse', [\App\Http\Controllers\Api\EndorsementController::class, 'removeEndorsement']);
 Route::get('/v2/members/{id}/endorsements', [\App\Http\Controllers\Api\EndorsementController::class, 'getEndorsements']);
 Route::get('/v2/members/top-endorsed', [\App\Http\Controllers\Api\EndorsementController::class, 'getTopEndorsed']);
+// Peer Endorsements (verification badge system)
+Route::post('/v2/members/{id}/peer-endorse', [\App\Http\Controllers\Api\PeerEndorsementController::class, 'endorse']);
 // Activity Dashboard
 Route::get('/v2/users/me/activity/dashboard', [\App\Http\Controllers\Api\MemberActivityController::class, 'getDashboard']);
 Route::get('/v2/users/me/activity/timeline', [\App\Http\Controllers\Api\MemberActivityController::class, 'getTimeline']);
@@ -570,6 +572,9 @@ Route::get('/v2/gamification/seasons', [\App\Http\Controllers\Api\GamificationV2
 Route::get('/v2/gamification/seasons/current', [\App\Http\Controllers\Api\GamificationV2Controller::class, 'currentSeason']);
 Route::post('/v2/gamification/challenges/{id}/claim', [\App\Http\Controllers\Api\GamificationV2Controller::class, 'claimChallenge']);
 Route::get('/v2/gamification/nexus-score', [\App\Http\Controllers\Api\GamificationV2Controller::class, 'nexusScore']);
+Route::get('/v2/gamification/community-dashboard', [\App\Http\Controllers\Api\GamificationV2Controller::class, 'communityDashboard']);
+Route::get('/v2/gamification/personal-journey', [\App\Http\Controllers\Api\GamificationV2Controller::class, 'personalJourney']);
+Route::get('/v2/gamification/member-spotlight', [\App\Http\Controllers\Api\GamificationV2Controller::class, 'memberSpotlight']);
 Route::get('/v2/volunteering/opportunities', [\App\Http\Controllers\Api\VolunteerController::class, 'opportunities']);
 Route::post('/v2/volunteering/opportunities', [\App\Http\Controllers\Api\VolunteerController::class, 'createOpportunity']);
 Route::get('/v2/volunteering/opportunities/{id}', [\App\Http\Controllers\Api\VolunteerController::class, 'showOpportunity']);
@@ -837,6 +842,9 @@ Route::put('/v2/admin/gamification/campaigns/{id}', [\App\Http\Controllers\Api\A
 Route::delete('/v2/admin/gamification/campaigns/{id}', [\App\Http\Controllers\Api\AdminGamificationController::class, 'deleteCampaign']);
 Route::post('/v2/admin/gamification/recheck-all', [\App\Http\Controllers\Api\AdminGamificationController::class, 'recheckAll']);
 Route::post('/v2/admin/gamification/bulk-award', [\App\Http\Controllers\Api\AdminGamificationController::class, 'bulkAward']);
+Route::get('/v2/admin/gamification/badge-config', [\App\Http\Controllers\Api\AdminGamificationController::class, 'getBadgeConfig']);
+Route::put('/v2/admin/gamification/badge-config/{badgeKey}', [\App\Http\Controllers\Api\AdminGamificationController::class, 'updateBadgeConfig']);
+Route::post('/v2/admin/gamification/badge-config/{badgeKey}/reset', [\App\Http\Controllers\Api\AdminGamificationController::class, 'resetBadgeConfig']);
 Route::get('/v2/admin/groups', [\App\Http\Controllers\Api\AdminGroupsController::class, 'index']);
 Route::get('/v2/admin/groups/analytics', [\App\Http\Controllers\Api\AdminGroupsController::class, 'analytics']);
 Route::get('/v2/admin/groups/approvals', [\App\Http\Controllers\Api\AdminGroupsController::class, 'approvals']);

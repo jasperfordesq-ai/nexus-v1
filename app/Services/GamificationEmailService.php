@@ -87,6 +87,21 @@ class GamificationEmailService
 
                 foreach ($users as $user) {
                     try {
+                        // Check email_gamification_digest preference — default to sending (opt-out model)
+                        try {
+                            $prefs = User::getNotificationPreferences($user->id);
+                            if (!((bool) ($prefs['email_gamification_digest'] ?? true))) {
+                                $skipped++;
+                                continue;
+                            }
+                        } catch (\Throwable $prefError) {
+                            Log::debug('GamificationEmailService: could not read email_gamification_digest pref', [
+                                'user_id' => $user->id,
+                                'error' => $prefError->getMessage(),
+                            ]);
+                            // Default to sending on error
+                        }
+
                         $digest = $this->generateUserDigest($user->id);
 
                         if (empty($digest) || ($digest['xp_earned'] ?? 0) === 0) {
@@ -206,6 +221,20 @@ class GamificationEmailService
     public function sendMilestoneEmail(int $userId, string $type, array $data): bool
     {
         try {
+            // Check email_gamification_milestones preference — default to sending (opt-out model)
+            try {
+                $prefs = User::getNotificationPreferences($userId);
+                if (!((bool) ($prefs['email_gamification_milestones'] ?? true))) {
+                    return false;
+                }
+            } catch (\Throwable $prefError) {
+                Log::debug('GamificationEmailService: could not read email_gamification_milestones pref', [
+                    'user_id' => $userId,
+                    'error' => $prefError->getMessage(),
+                ]);
+                // Default to sending on error
+            }
+
             $user = User::find($userId, ['id', 'email', 'first_name', 'last_name']);
 
             if (!$user || empty($user->email)) {

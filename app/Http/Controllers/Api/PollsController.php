@@ -6,6 +6,9 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Models\Notification;
+use App\Models\Poll;
+use App\Models\User;
 use App\Services\PollService;
 use App\Services\PollRankingService;
 use App\Services\PollExportService;
@@ -194,6 +197,20 @@ class PollsController extends BaseApiController
             \Log::warning('Gamification XP award failed', ['action' => 'vote_poll', 'user' => $userId, 'error' => $e->getMessage()]);
         }
 
+        // Notify poll creator of the vote
+        try {
+            $pollModel = Poll::find($id);
+            if ($pollModel && (int) $pollModel->user_id !== $userId) {
+                $voter = User::find($userId);
+                $voterName = $voter ? trim(($voter->first_name ?? '') . ' ' . ($voter->last_name ?? '')) : 'Someone';
+                $pollTitle = $pollModel->question ?? 'your poll';
+                $message = "{$voterName} voted on your poll: \"{$pollTitle}\"";
+                Notification::createNotification((int) $pollModel->user_id, $message, "/polls/{$id}", 'poll_vote');
+            }
+        } catch (\Throwable $e) {
+            \Log::warning('Poll vote notification failed', ['poll' => $id, 'voter' => $userId, 'error' => $e->getMessage()]);
+        }
+
         $poll = $this->pollService->getById($id, $userId);
 
         return $this->respondWithData($poll);
@@ -218,6 +235,20 @@ class PollsController extends BaseApiController
 
         if (! $success) {
             return $this->respondWithError('RESOURCE_CONFLICT', 'Already submitted rankings', null, 409);
+        }
+
+        // Notify poll creator of ranking submission
+        try {
+            $pollModel = Poll::find($id);
+            if ($pollModel && (int) $pollModel->user_id !== $userId) {
+                $ranker = User::find($userId);
+                $rankerName = $ranker ? trim(($ranker->first_name ?? '') . ' ' . ($ranker->last_name ?? '')) : 'Someone';
+                $pollTitle = $pollModel->question ?? 'your poll';
+                $message = "{$rankerName} submitted a ranking on your poll: \"{$pollTitle}\"";
+                Notification::createNotification((int) $pollModel->user_id, $message, "/polls/{$id}", 'poll_vote');
+            }
+        } catch (\Throwable $e) {
+            \Log::warning('Poll ranking notification failed', ['poll' => $id, 'ranker' => $userId, 'error' => $e->getMessage()]);
         }
 
         $results = $this->rankingService->calculateResults($id);

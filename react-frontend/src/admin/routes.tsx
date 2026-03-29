@@ -56,6 +56,7 @@ const CampaignList = lazy(() => import('./modules/gamification/CampaignList'));
 const CampaignForm = lazy(() => import('./modules/gamification/CampaignForm'));
 const GamificationAnalytics = lazy(() => import('./modules/gamification/GamificationAnalytics'));
 const CustomBadges = lazy(() => import('./modules/gamification/CustomBadges'));
+const BadgeConfiguration = lazy(() => import('./modules/gamification/BadgeConfiguration'));
 const CreateBadge = lazy(() => import('./modules/gamification/CreateBadge'));
 const GroupList = lazy(() => import('./modules/groups/GroupList'));
 const GroupAnalytics = lazy(() => import('./modules/groups/GroupAnalytics'));
@@ -298,6 +299,7 @@ export function AdminRoutes() {
       <Route path="gamification/campaigns/create" element={<Lazy><CampaignForm /></Lazy>} />
       <Route path="gamification/campaigns/edit/:id" element={<Lazy><CampaignForm /></Lazy>} />
       <Route path="gamification/analytics" element={<Lazy><GamificationAnalytics /></Lazy>} />
+      <Route path="gamification/badge-config" element={<Lazy><BadgeConfiguration /></Lazy>} />
       <Route path="custom-badges" element={<Lazy><CustomBadges /></Lazy>} />
       <Route path="custom-badges/create" element={<Lazy><CreateBadge /></Lazy>} />
 

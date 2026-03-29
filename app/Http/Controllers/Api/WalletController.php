@@ -9,7 +9,6 @@ namespace App\Http\Controllers\Api;
 use App\Events\TransactionCompleted;
 use App\Models\Transaction;
 use App\Models\User;
-use App\Services\GamificationService;
 use App\Services\WalletService;
 use Illuminate\Http\JsonResponse;
 
@@ -142,23 +141,7 @@ class WalletController extends BaseApiController
             return $this->respondWithError($code, $msg, null, $status);
         }
 
-        // Award XP to both sender and receiver
-        try {
-            $senderId = $userId;
-            $receiverId = (int) ($result['receiver']['id'] ?? 0);
-            GamificationService::awardXP($senderId, GamificationService::XP_VALUES['send_credits'], 'send_credits', 'Sent time credits');
-            if ($receiverId > 0) {
-                GamificationService::awardXP($receiverId, GamificationService::XP_VALUES['receive_credits'], 'receive_credits', 'Received time credits');
-            }
-            GamificationService::runAllBadgeChecks($senderId);
-            if ($receiverId > 0) {
-                GamificationService::runAllBadgeChecks($receiverId);
-            }
-        } catch (\Throwable $e) {
-            \Log::warning('Gamification XP award failed', ['action' => 'send_credits/receive_credits', 'user' => $userId, 'error' => $e->getMessage()]);
-        }
-
-        // Dispatch TransactionCompleted event
+        // Dispatch TransactionCompleted event (handles XP awards via UpdateWalletBalance listener)
         try {
             $transactionId = (int) ($result['id'] ?? 0);
             $receiverId = (int) ($result['receiver']['id'] ?? 0);

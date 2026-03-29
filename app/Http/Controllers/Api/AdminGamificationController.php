@@ -13,6 +13,7 @@ use App\Core\TenantContext;
 use App\Models\User;
 use App\Services\GamificationService;
 use App\Services\AchievementCampaignService;
+use App\Services\BadgeDefinitionService;
 
 /**
  * AdminGamificationController -- Admin gamification: stats, badges, campaigns, bulk awards.
@@ -280,5 +281,41 @@ class AdminGamificationController extends BaseApiController
         }
 
         return $this->respondWithData(['awarded' => $awarded, 'total_requested' => count($validUserIds), 'errors' => $errors]);
+    }
+
+    /** GET /api/v2/admin/gamification/badge-config */
+    public function getBadgeConfig(): JsonResponse
+    {
+        $this->requireAdmin();
+        $tenantId = $this->getTenantId();
+        $badges = BadgeDefinitionService::getAllBadgesForAdmin($tenantId);
+
+        return $this->respondWithData($badges);
+    }
+
+    /** PUT /api/v2/admin/gamification/badge-config/{badgeKey} */
+    public function updateBadgeConfig(string $badgeKey): JsonResponse
+    {
+        $this->requireAdmin();
+        $tenantId = $this->getTenantId();
+        $data = request()->only(['is_enabled', 'custom_threshold', 'custom_name', 'custom_description', 'custom_icon']);
+
+        $success = BadgeDefinitionService::updateTenantOverride($tenantId, $badgeKey, $data);
+
+        if (!$success) {
+            return $this->respondWithError('BADGE_UPDATE_FAILED', 'Failed to update badge configuration', null, 422);
+        }
+
+        return $this->respondWithData(['success' => true]);
+    }
+
+    /** POST /api/v2/admin/gamification/badge-config/{badgeKey}/reset */
+    public function resetBadgeConfig(string $badgeKey): JsonResponse
+    {
+        $this->requireAdmin();
+        $tenantId = $this->getTenantId();
+        $success = BadgeDefinitionService::resetTenantOverride($tenantId, $badgeKey);
+
+        return $this->respondWithData(['success' => $success]);
     }
 }

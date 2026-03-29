@@ -22,11 +22,13 @@ class BadgeCollection extends Model
     protected $fillable = [
         'tenant_id', 'collection_key', 'name', 'description',
         'icon', 'bonus_xp', 'bonus_badge_key', 'display_order',
+        'collection_type', 'is_ordered', 'estimated_duration',
     ];
 
     protected $casts = [
         'bonus_xp' => 'integer',
         'display_order' => 'integer',
+        'is_ordered' => 'boolean',
     ];
 
     public function items(): HasMany

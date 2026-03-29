@@ -14,8 +14,11 @@ use App\Http\Requests\Volunteering\CreateReviewRequest;
 use App\Services\VolunteerService;
 use App\Services\VolunteerMatchingService;
 use App\Core\TenantContext;
+use App\Models\Notification;
+use App\Models\User;
 use App\Models\VolApplication;
 use App\Models\VolOpportunity;
+use App\Models\VolShift;
 
 /**
  * VolunteerController -- Core volunteering: opportunities, applications, shifts, hours,
@@ -166,6 +169,24 @@ class VolunteerController extends BaseApiController
         } catch (\RuntimeException $e) {
             return $this->respondWithError('NOT_FOUND', $e->getMessage(), null, 404);
         }
+
+        // Notify the opportunity organizer about the new application
+        try {
+            $opportunity = VolOpportunity::find($id);
+            if ($opportunity && $opportunity->created_by && $opportunity->created_by !== $userId) {
+                $volunteer = User::find($userId);
+                $volunteerName = $volunteer->name ?? 'Someone';
+                Notification::createNotification(
+                    (int) $opportunity->created_by,
+                    "{$volunteerName} applied for your volunteer opportunity",
+                    "/volunteering/opportunities/{$id}/applications",
+                    'volunteering'
+                );
+            }
+        } catch (\Throwable $e) {
+            // Notification failure must not break the main flow
+        }
+
         return $this->respondWithData($application, null, 201);
     }
 
@@ -213,6 +234,28 @@ class VolunteerController extends BaseApiController
             $errors = $this->volunteerService->getErrors();
             return $this->respondWithErrors($errors, $this->getErrorStatus($errors));
         }
+
+        // Notify the volunteer about the application decision
+        try {
+            $application = VolApplication::find($id);
+            if ($application && $application->user_id) {
+                $opportunityId = $application->opportunity_id;
+                if ($action === 'approve') {
+                    $message = 'Your volunteer application was accepted!';
+                } else {
+                    $message = 'Your volunteer application was not accepted';
+                }
+                Notification::createNotification(
+                    (int) $application->user_id,
+                    $message,
+                    "/volunteering/opportunities/{$opportunityId}",
+                    'volunteering'
+                );
+            }
+        } catch (\Throwable $e) {
+            // Notification failure must not break the main flow
+        }
+
         return $this->respondWithData(['id' => (int) $id, 'status' => $action === 'approve' ? 'approved' : 'declined']);
     }
 
@@ -262,6 +305,24 @@ class VolunteerController extends BaseApiController
             $errors = $this->volunteerService->getErrors();
             return $this->respondWithErrors($errors, $this->getErrorStatus($errors));
         }
+
+        // Notify the opportunity organizer about the shift sign-up
+        try {
+            $shift = VolShift::with('opportunity')->find($id);
+            if ($shift && $shift->opportunity && $shift->opportunity->created_by && $shift->opportunity->created_by !== $userId) {
+                $volunteer = User::find($userId);
+                $volunteerName = $volunteer->name ?? 'Someone';
+                Notification::createNotification(
+                    (int) $shift->opportunity->created_by,
+                    "{$volunteerName} signed up for a shift",
+                    "/volunteering/opportunities/{$shift->opportunity_id}",
+                    'volunteering'
+                );
+            }
+        } catch (\Throwable $e) {
+            // Notification failure must not break the main flow
+        }
+
         return $this->respondWithData(['shift_id' => (int) $id, 'message' => 'Successfully signed up for shift']);
     }
 

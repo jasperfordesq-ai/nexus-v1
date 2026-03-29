@@ -12,7 +12,7 @@
 import { useState, useCallback, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Card, CardBody, CardHeader, Button, Spinner } from '@heroui/react';
-import { Award, Users, Zap, Target, RefreshCw, ArrowRight, Megaphone, BarChart3 } from 'lucide-react';
+import { Award, Users, Zap, Target, RefreshCw, ArrowRight, Megaphone, BarChart3, Settings2 } from 'lucide-react';
 import { usePageTitle } from '@/hooks';
 import { useToast } from '@/contexts';
 import { adminGamification } from '../../api/adminApi';
@@ -185,6 +185,21 @@ export function GamificationHub() {
                   <div className="flex-1 min-w-0">
                     <p className="font-medium text-foreground">{t('gamification.custom_badges')}</p>
                     <p className="text-xs text-default-500">{t('gamification.create_and_manage_badges')}</p>
+                  </div>
+                  <ArrowRight size={16} className="text-default-400" />
+                </CardBody>
+              </Card>
+            </Link>
+
+            <Link to="../gamification/badge-config" className="block">
+              <Card shadow="none" className="bg-default-50 hover:bg-default-100 transition-colors cursor-pointer">
+                <CardBody className="flex flex-row items-center gap-3 p-3">
+                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-secondary/10 text-secondary">
+                    <Settings2 size={20} />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="font-medium text-foreground">{t('gamification.badge_configuration', 'Badge Configuration')}</p>
+                    <p className="text-xs text-default-500">{t('gamification.configure_badge_availability', 'Enable, disable & customize badges')}</p>
                   </div>
                   <ArrowRight size={16} className="text-default-400" />
                 </CardBody>

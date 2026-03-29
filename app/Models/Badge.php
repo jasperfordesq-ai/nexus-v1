@@ -32,6 +32,13 @@ class Badge extends Model
         'points_required',
         'is_hidden',
         'is_active',
+        'badge_tier',
+        'badge_class',
+        'threshold',
+        'threshold_type',
+        'evaluation_method',
+        'is_enabled',
+        'config_json',
     ];
 
     protected $casts = [
@@ -40,6 +47,8 @@ class Badge extends Model
         'points_required' => 'integer',
         'is_hidden' => 'boolean',
         'is_active' => 'boolean',
+        'is_enabled' => 'boolean',
+        'threshold' => 'integer',
     ];
 
     public function userBadges(): HasMany

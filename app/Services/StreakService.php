@@ -13,7 +13,7 @@ use Illuminate\Support\Facades\Log;
 /**
  * StreakService — Eloquent-based service for user streaks.
  *
- * Manages login, activity, giving, and volunteer streaks with freeze support.
+ * Manages login, activity, giving, and volunteer streaks.
  * All queries are tenant-scoped via HasTenantScope trait on models.
  */
 class StreakService
@@ -140,29 +140,24 @@ class StreakService
 
             if (! $streak) {
                 return [
-                    'current'           => 0,
-                    'longest'           => 0,
-                    'last_activity'     => null,
-                    'is_active'         => false,
-                    'freezes_remaining' => 1,
+                    'current'       => 0,
+                    'longest'       => 0,
+                    'last_activity' => null,
+                    'is_active'     => false,
                 ];
             }
 
             $lastDate = $streak->last_activity_date?->toDateString();
             $today = now()->toDateString();
             $yesterday = now()->subDay()->toDateString();
-            $twoDaysAgo = now()->subDays(2)->toDateString();
 
             $isActive = ($lastDate === $today || $lastDate === $yesterday);
-            $canFreeze = ($lastDate === $twoDaysAgo && $streak->streak_freezes_remaining > 0);
 
             return [
-                'current'            => $streak->current_streak,
-                'longest'            => $streak->longest_streak,
-                'last_activity'      => $lastDate,
-                'is_active'          => $isActive,
-                'can_use_freeze'     => $canFreeze,
-                'freezes_remaining'  => $streak->streak_freezes_remaining,
+                'current'       => $streak->current_streak,
+                'longest'       => $streak->longest_streak,
+                'last_activity' => $lastDate,
+                'is_active'     => $isActive,
             ];
         } catch (\Throwable $e) {
             Log::error('Get Streak Error: ' . $e->getMessage());
@@ -216,7 +211,6 @@ class StreakService
             $lastDate = $streak->last_activity_date?->toDateString();
             $currentStreak = $streak->current_streak;
             $longestStreak = $streak->longest_streak;
-            $freezesRemaining = $streak->streak_freezes_remaining;
 
             // Already recorded today
             if ($lastDate === $today) {
@@ -229,26 +223,19 @@ class StreakService
             }
 
             $yesterday = now()->subDay()->toDateString();
-            $twoDaysAgo = now()->subDays(2)->toDateString();
 
             if ($lastDate === $yesterday) {
                 // Consecutive day
                 $currentStreak++;
                 $longestStreak = max($longestStreak, $currentStreak);
-            } elseif ($lastDate === $twoDaysAgo && $freezesRemaining > 0) {
-                // Missed one day but have a freeze
-                $currentStreak++;
-                $freezesRemaining--;
-                $longestStreak = max($longestStreak, $currentStreak);
             } else {
-                // Streak broken
+                // Streak broken — reset to 1
                 $currentStreak = 1;
             }
 
             $streak->current_streak = $currentStreak;
             $streak->longest_streak = $longestStreak;
             $streak->last_activity_date = $today;
-            $streak->streak_freezes_remaining = $freezesRemaining;
             $streak->save();
 
             // Check for streak badges
@@ -265,10 +252,9 @@ class StreakService
             }
 
             return [
-                'current'            => $currentStreak,
-                'longest'            => $longestStreak,
-                'is_new'             => true,
-                'freezes_remaining'  => $freezesRemaining,
+                'current' => $currentStreak,
+                'longest' => $longestStreak,
+                'is_new'  => true,
             ];
         } catch (\Throwable $e) {
             Log::error('Streak Error: ' . $e->getMessage());

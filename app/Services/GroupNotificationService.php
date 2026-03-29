@@ -7,15 +7,16 @@
 namespace App\Services;
 
 use App\Core\TenantContext;
-use App\Models\Notification;
+use App\Services\NotificationDispatcher;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
 /**
- * GroupNotificationService — sends in-app notifications for group events.
+ * GroupNotificationService — sends in-app + email + push notifications for group events.
  *
  * Native Laravel implementation (replaces legacy wrapper).
- * Creates notifications in the `notifications` table for relevant users.
+ * Uses NotificationDispatcher::dispatch() to create in-app bell notifications
+ * AND trigger email/push delivery based on user frequency settings.
  */
 class GroupNotificationService
 {
@@ -45,17 +46,30 @@ class GroupNotificationService
 
         $message = "{$userName} has requested to join \"{$group->name}\"";
         $link = "/groups/{$groupId}/members?tab=requests";
+        $htmlContent = "<p><strong>{$userName}</strong> has requested to join <strong>{$group->name}</strong>.</p>"
+            . "<p><a href=\"{$link}\">Review request</a></p>";
 
         foreach ($admins as $admin) {
             if ((int) $admin->user_id === $userId) {
                 continue; // Don't notify the requester if they're somehow an admin
             }
-            Notification::createNotification(
-                (int) $admin->user_id,
-                $message,
-                $link,
-                'group_join_request'
-            );
+            try {
+                NotificationDispatcher::dispatch(
+                    (int) $admin->user_id,
+                    'group',
+                    $groupId,
+                    'group_join_request',
+                    $message,
+                    $link,
+                    $htmlContent
+                );
+            } catch (\Throwable $e) {
+                Log::error('GroupNotification: failed to dispatch join request notification', [
+                    'group_id' => $groupId,
+                    'admin_user_id' => $admin->user_id,
+                    'error' => $e->getMessage(),
+                ]);
+            }
         }
     }
 
@@ -73,13 +87,26 @@ class GroupNotificationService
 
         $message = "You have been accepted into \"{$group->name}\"";
         $link = "/groups/{$groupId}";
+        $htmlContent = "<p>You have been accepted into <strong>{$group->name}</strong>.</p>"
+            . "<p><a href=\"{$link}\">Visit group</a></p>";
 
-        Notification::createNotification(
-            $userId,
-            $message,
-            $link,
-            'group_joined'
-        );
+        try {
+            NotificationDispatcher::dispatch(
+                $userId,
+                'group',
+                $groupId,
+                'group_join',
+                $message,
+                $link,
+                $htmlContent
+            );
+        } catch (\Throwable $e) {
+            Log::error('GroupNotification: failed to dispatch joined notification', [
+                'group_id' => $groupId,
+                'user_id' => $userId,
+                'error' => $e->getMessage(),
+            ]);
+        }
     }
 
     /**
@@ -96,13 +123,26 @@ class GroupNotificationService
 
         $message = "Your request to join \"{$group->name}\" was not approved";
         $link = "/groups";
+        $htmlContent = "<p>Your request to join <strong>{$group->name}</strong> was not approved.</p>"
+            . "<p><a href=\"{$link}\">Browse other groups</a></p>";
 
-        Notification::createNotification(
-            $userId,
-            $message,
-            $link,
-            'group_join_rejected'
-        );
+        try {
+            NotificationDispatcher::dispatch(
+                $userId,
+                'group',
+                $groupId,
+                'group_join_rejected',
+                $message,
+                $link,
+                $htmlContent
+            );
+        } catch (\Throwable $e) {
+            Log::error('GroupNotification: failed to dispatch join rejected notification', [
+                'group_id' => $groupId,
+                'user_id' => $userId,
+                'error' => $e->getMessage(),
+            ]);
+        }
     }
 
     /**
@@ -119,8 +159,12 @@ class GroupNotificationService
             return;
         }
 
+        $safeTitle = htmlspecialchars($title, ENT_QUOTES, 'UTF-8');
         $message = "{$authorName} started a new discussion \"{$title}\" in \"{$group->name}\"";
         $link = "/groups/{$groupId}/discussions/{$discussionId}";
+        $htmlContent = "<p><strong>{$authorName}</strong> started a new discussion "
+            . "<strong>\"{$safeTitle}\"</strong> in <strong>{$group->name}</strong>.</p>"
+            . "<p><a href=\"{$link}\">View discussion</a></p>";
 
         $members = $this->getActiveMembers($groupId, $tenantId);
 
@@ -128,12 +172,24 @@ class GroupNotificationService
             if ((int) $member->user_id === $authorId) {
                 continue; // Don't notify the author
             }
-            Notification::createNotification(
-                (int) $member->user_id,
-                $message,
-                $link,
-                'group_new_discussion'
-            );
+            try {
+                NotificationDispatcher::dispatch(
+                    (int) $member->user_id,
+                    'group',
+                    $groupId,
+                    'new_topic',
+                    $message,
+                    $link,
+                    $htmlContent
+                );
+            } catch (\Throwable $e) {
+                Log::error('GroupNotification: failed to dispatch new discussion notification', [
+                    'group_id' => $groupId,
+                    'discussion_id' => $discussionId,
+                    'member_user_id' => $member->user_id,
+                    'error' => $e->getMessage(),
+                ]);
+            }
         }
     }
 
@@ -151,8 +207,12 @@ class GroupNotificationService
             return;
         }
 
+        $safeTitle = htmlspecialchars($title, ENT_QUOTES, 'UTF-8');
         $message = "{$authorName} posted an announcement \"{$title}\" in \"{$group->name}\"";
         $link = "/groups/{$groupId}/announcements";
+        $htmlContent = "<p><strong>{$authorName}</strong> posted an announcement "
+            . "<strong>\"{$safeTitle}\"</strong> in <strong>{$group->name}</strong>.</p>"
+            . "<p><a href=\"{$link}\">View announcement</a></p>";
 
         $members = $this->getActiveMembers($groupId, $tenantId);
 
@@ -160,12 +220,24 @@ class GroupNotificationService
             if ((int) $member->user_id === $authorId) {
                 continue; // Don't notify the author
             }
-            Notification::createNotification(
-                (int) $member->user_id,
-                $message,
-                $link,
-                'group_new_announcement'
-            );
+            try {
+                NotificationDispatcher::dispatch(
+                    (int) $member->user_id,
+                    'group',
+                    $groupId,
+                    'new_topic',
+                    $message,
+                    $link,
+                    $htmlContent,
+                    true // isOrganizer: announcements are admin-only, treat as organizer priority
+                );
+            } catch (\Throwable $e) {
+                Log::error('GroupNotification: failed to dispatch announcement notification', [
+                    'group_id' => $groupId,
+                    'member_user_id' => $member->user_id,
+                    'error' => $e->getMessage(),
+                ]);
+            }
         }
     }
 

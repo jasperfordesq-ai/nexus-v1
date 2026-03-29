@@ -125,6 +125,19 @@ class ExchangeWorkflowService
 
         self::logHistory($exchange->id, 'request_created', $requesterId, 'requester', null, $initialStatus);
 
+        // Notify the listing owner (provider) about the new request
+        try {
+            NotificationDispatcher::send($providerId, 'exchange_request_received', [
+                'exchange_id' => $exchange->id,
+                'listing_title' => $listing->title ?? '',
+                'proposed_hours' => $proposedHours,
+            ]);
+        } catch (\Throwable $e) {
+            Log::warning("Exchange #{$exchange->id}: notification failed after createRequest", [
+                'error' => $e->getMessage(),
+            ]);
+        }
+
         return $exchange->id;
     }
 
@@ -149,7 +162,34 @@ class ExchangeWorkflowService
         );
         $newStatus = $needsBroker ? self::STATUS_PENDING_BROKER : self::STATUS_ACCEPTED;
 
-        return self::updateStatus($exchangeId, $newStatus, $providerId, 'provider', 'Provider accepted request');
+        $result = self::updateStatus($exchangeId, $newStatus, $providerId, 'provider', 'Provider accepted request');
+
+        if ($result) {
+            try {
+                $requesterId = (int) $exchange->requester_id;
+                $notificationData = [
+                    'exchange_id' => $exchangeId,
+                    'listing_title' => $exchange->listing->title ?? '',
+                    'proposed_hours' => (float) $exchange->proposed_hours,
+                ];
+
+                if ($needsBroker) {
+                    // Notify requester that exchange is pending broker approval
+                    NotificationDispatcher::send($requesterId, 'exchange_pending_broker', $notificationData);
+                    // Also notify admins/brokers
+                    NotificationDispatcher::notifyAdmins('exchange_pending_broker', $notificationData);
+                } else {
+                    // Notify requester that exchange was accepted
+                    NotificationDispatcher::send($requesterId, 'exchange_accepted', $notificationData);
+                }
+            } catch (\Throwable $e) {
+                Log::warning("Exchange #{$exchangeId}: notification failed after acceptRequest", [
+                    'error' => $e->getMessage(),
+                ]);
+            }
+        }
+
+        return $result;
     }
 
     /**
@@ -165,7 +205,23 @@ class ExchangeWorkflowService
             return false;
         }
 
-        return self::updateStatus($exchangeId, self::STATUS_CANCELLED, $providerId, 'provider', $reason ?: 'Provider declined');
+        $result = self::updateStatus($exchangeId, self::STATUS_CANCELLED, $providerId, 'provider', $reason ?: 'Provider declined');
+
+        if ($result) {
+            try {
+                NotificationDispatcher::send((int) $exchange->requester_id, 'exchange_request_declined', [
+                    'exchange_id' => $exchangeId,
+                    'listing_title' => $exchange->listing->title ?? '',
+                    'reason' => $reason,
+                ]);
+            } catch (\Throwable $e) {
+                Log::warning("Exchange #{$exchangeId}: notification failed after declineRequest", [
+                    'error' => $e->getMessage(),
+                ]);
+            }
+        }
+
+        return $result;
     }
 
     /**
@@ -180,7 +236,25 @@ class ExchangeWorkflowService
 
         $exchange->update(['broker_id' => $brokerId, 'broker_notes' => $notes]);
 
-        return self::updateStatus($exchangeId, self::STATUS_ACCEPTED, $brokerId, 'broker', $notes ?: 'Broker approved');
+        $result = self::updateStatus($exchangeId, self::STATUS_ACCEPTED, $brokerId, 'broker', $notes ?: 'Broker approved');
+
+        if ($result) {
+            try {
+                $notificationData = [
+                    'exchange_id' => $exchangeId,
+                    'listing_title' => $exchange->listing->title ?? '',
+                    'proposed_hours' => (float) $exchange->proposed_hours,
+                ];
+                NotificationDispatcher::send((int) $exchange->requester_id, 'exchange_approved', $notificationData);
+                NotificationDispatcher::send((int) $exchange->provider_id, 'exchange_approved', $notificationData);
+            } catch (\Throwable $e) {
+                Log::warning("Exchange #{$exchangeId}: notification failed after approveExchange", [
+                    'error' => $e->getMessage(),
+                ]);
+            }
+        }
+
+        return $result;
     }
 
     /**
@@ -195,7 +269,25 @@ class ExchangeWorkflowService
 
         $exchange->update(['broker_id' => $brokerId, 'broker_notes' => $reason]);
 
-        return self::updateStatus($exchangeId, self::STATUS_CANCELLED, $brokerId, 'broker', $reason);
+        $result = self::updateStatus($exchangeId, self::STATUS_CANCELLED, $brokerId, 'broker', $reason);
+
+        if ($result) {
+            try {
+                $notificationData = [
+                    'exchange_id' => $exchangeId,
+                    'listing_title' => $exchange->listing->title ?? '',
+                    'reason' => $reason,
+                ];
+                NotificationDispatcher::send((int) $exchange->requester_id, 'exchange_rejected', $notificationData);
+                NotificationDispatcher::send((int) $exchange->provider_id, 'exchange_rejected', $notificationData);
+            } catch (\Throwable $e) {
+                Log::warning("Exchange #{$exchangeId}: notification failed after rejectExchange", [
+                    'error' => $e->getMessage(),
+                ]);
+            }
+        }
+
+        return $result;
     }
 
     /**
@@ -209,7 +301,28 @@ class ExchangeWorkflowService
         }
 
         $role = ((int) $exchange->requester_id === $userId) ? 'requester' : 'provider';
-        return self::updateStatus($exchangeId, self::STATUS_IN_PROGRESS, $userId, $role, 'Work started');
+        $result = self::updateStatus($exchangeId, self::STATUS_IN_PROGRESS, $userId, $role, 'Work started');
+
+        if ($result) {
+            try {
+                $notificationData = [
+                    'exchange_id' => $exchangeId,
+                    'listing_title' => $exchange->listing->title ?? '',
+                    'proposed_hours' => (float) $exchange->proposed_hours,
+                ];
+                // Notify the other party (not the one who started)
+                $otherPartyId = ((int) $exchange->requester_id === $userId)
+                    ? (int) $exchange->provider_id
+                    : (int) $exchange->requester_id;
+                NotificationDispatcher::send($otherPartyId, 'exchange_started', $notificationData);
+            } catch (\Throwable $e) {
+                Log::warning("Exchange #{$exchangeId}: notification failed after startProgress", [
+                    'error' => $e->getMessage(),
+                ]);
+            }
+        }
+
+        return $result;
     }
 
     /**
@@ -223,7 +336,28 @@ class ExchangeWorkflowService
         }
 
         $role = ((int) $exchange->requester_id === $userId) ? 'requester' : 'provider';
-        return self::updateStatus($exchangeId, self::STATUS_PENDING_CONFIRMATION, $userId, $role, 'Work completed, pending confirmation');
+        $result = self::updateStatus($exchangeId, self::STATUS_PENDING_CONFIRMATION, $userId, $role, 'Work completed, pending confirmation');
+
+        if ($result) {
+            try {
+                $notificationData = [
+                    'exchange_id' => $exchangeId,
+                    'listing_title' => $exchange->listing->title ?? '',
+                    'proposed_hours' => (float) $exchange->proposed_hours,
+                ];
+                // Notify the other party to confirm hours
+                $otherPartyId = ((int) $exchange->requester_id === $userId)
+                    ? (int) $exchange->provider_id
+                    : (int) $exchange->requester_id;
+                NotificationDispatcher::send($otherPartyId, 'exchange_ready_confirmation', $notificationData);
+            } catch (\Throwable $e) {
+                Log::warning("Exchange #{$exchangeId}: notification failed after markReadyForConfirmation", [
+                    'error' => $e->getMessage(),
+                ]);
+            }
+        }
+
+        return $result;
     }
 
     /**
@@ -315,7 +449,28 @@ class ExchangeWorkflowService
         $isProvider = (int) $exchange->provider_id === $userId;
         $role = $isRequester ? 'requester' : ($isProvider ? 'provider' : 'broker');
 
-        return self::updateStatus($exchangeId, self::STATUS_CANCELLED, $userId, $role, $reason ?: 'Cancelled');
+        $result = self::updateStatus($exchangeId, self::STATUS_CANCELLED, $userId, $role, $reason ?: 'Cancelled');
+
+        if ($result) {
+            try {
+                $notificationData = [
+                    'exchange_id' => $exchangeId,
+                    'listing_title' => $exchange->listing->title ?? '',
+                    'reason' => $reason,
+                ];
+                // Notify the other party (not the one who cancelled)
+                $otherPartyId = $isRequester
+                    ? (int) $exchange->provider_id
+                    : (int) $exchange->requester_id;
+                NotificationDispatcher::send($otherPartyId, 'exchange_cancelled', $notificationData);
+            } catch (\Throwable $e) {
+                Log::warning("Exchange #{$exchangeId}: notification failed after cancelExchange", [
+                    'error' => $e->getMessage(),
+                ]);
+            }
+        }
+
+        return $result;
     }
 
     /**

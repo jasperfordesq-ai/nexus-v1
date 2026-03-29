@@ -81,13 +81,15 @@ class MatchApprovalWorkflowService
                 return null;
             }
 
+            $matchType = $matchData['match_type'] ?? $matchData['type'] ?? 'one_way';
+
             $id = DB::table('match_approvals')->insertGetId([
                 'tenant_id' => $tenantId,
                 'user_id' => $userId,
                 'listing_id' => $listingId,
                 'listing_owner_id' => $listingOwnerId,
                 'match_score' => (float) ($matchData['match_score'] ?? $matchData['score'] ?? 0),
-                'match_type' => $matchData['match_type'] ?? $matchData['type'] ?? 'one_way',
+                'match_type' => $matchType,
                 'match_reasons' => json_encode($matchData['match_reasons'] ?? $matchData['reasons'] ?? []),
                 'distance_km' => $matchData['distance_km'] ?? $matchData['distance'] ?? null,
                 'status' => 'pending',
@@ -95,6 +97,93 @@ class MatchApprovalWorkflowService
                 'created_at' => now(),
                 'updated_at' => now(),
             ]);
+
+            // Look up names for notifications (used by both broker and mutual match notifications)
+            $userName = null;
+            $listingTitle = null;
+            try {
+                $userName = DB::table('users')
+                    ->where('id', $userId)
+                    ->where('tenant_id', $tenantId)
+                    ->value(DB::raw("CONCAT(COALESCE(first_name, ''), ' ', COALESCE(last_name, ''))"));
+                $listingTitle = DB::table('listings')
+                    ->where('id', $listingId)
+                    ->where('tenant_id', $tenantId)
+                    ->value('title');
+            } catch (\Throwable $e) {
+                Log::warning('[MatchApprovalWorkflow] Failed to look up names for notifications', [
+                    'error' => $e->getMessage(),
+                ]);
+            }
+
+            // Notify brokers/admins that a match needs approval
+            try {
+                $brokerIds = DB::table('users')
+                    ->where('tenant_id', $tenantId)
+                    ->whereIn('role', ['admin', 'broker', 'coordinator'])
+                    ->where('status', 'active')
+                    ->pluck('id');
+
+                foreach ($brokerIds as $brokerId) {
+                    NotificationDispatcher::dispatchMatchApprovalRequest(
+                        (int) $brokerId,
+                        trim($userName ?? 'A member'),
+                        $listingTitle ?? 'a listing',
+                        (int) $id
+                    );
+                }
+            } catch (\Throwable $e) {
+                Log::warning('[MatchApprovalWorkflow] Failed to notify brokers', [
+                    'request_id' => $id,
+                    'error' => $e->getMessage(),
+                ]);
+            }
+
+            // If this is a mutual match, notify both users
+            if ($matchType === 'mutual') {
+                try {
+                    $matchInfo = [
+                        'id' => $listingId,
+                        'user_name' => trim($userName ?? 'Someone'),
+                    ];
+                    $reciprocalInfo = [
+                        'they_offer' => $matchData['matched_listing'] ?? 'a skill you need',
+                        'you_offer' => $listingTitle ?? 'something they need',
+                    ];
+
+                    NotificationDispatcher::dispatchMutualMatch(
+                        $listingOwnerId,
+                        $matchInfo,
+                        $reciprocalInfo
+                    );
+
+                    // Also notify the requesting user about the mutual match
+                    $ownerName = DB::table('users')
+                        ->where('id', $listingOwnerId)
+                        ->where('tenant_id', $tenantId)
+                        ->value(DB::raw("CONCAT(COALESCE(first_name, ''), ' ', COALESCE(last_name, ''))"));
+
+                    $reverseMatchInfo = [
+                        'id' => $listingId,
+                        'user_name' => trim($ownerName ?? 'Someone'),
+                    ];
+                    $reverseReciprocalInfo = [
+                        'they_offer' => $listingTitle ?? 'a skill you need',
+                        'you_offer' => $matchData['matched_listing'] ?? 'something they need',
+                    ];
+
+                    NotificationDispatcher::dispatchMutualMatch(
+                        $userId,
+                        $reverseMatchInfo,
+                        $reverseReciprocalInfo
+                    );
+                } catch (\Throwable $e) {
+                    Log::warning('[MatchApprovalWorkflow] Failed to dispatch mutual match notification', [
+                        'request_id' => $id,
+                        'error' => $e->getMessage(),
+                    ]);
+                }
+            }
 
             return (int) $id;
         } catch (\Throwable $e) {
@@ -127,6 +216,17 @@ class MatchApprovalWorkflowService
         $tenantId = TenantContext::getId();
 
         try {
+            // Fetch the approval row before updating so we have data for notifications
+            $approval = DB::table('match_approvals')
+                ->where('id', $requestId)
+                ->where('tenant_id', $tenantId)
+                ->where('status', 'pending')
+                ->first();
+
+            if (!$approval) {
+                return false;
+            }
+
             $affected = DB::table('match_approvals')
                 ->where('id', $requestId)
                 ->where('tenant_id', $tenantId)
@@ -144,6 +244,27 @@ class MatchApprovalWorkflowService
                     'request_id' => $requestId,
                     'approved_by' => $approvedBy,
                 ]);
+
+                // Notify the matched user that their match was approved
+                try {
+                    $listingTitle = DB::table('listings')
+                        ->where('id', (int) $approval->listing_id)
+                        ->where('tenant_id', $tenantId)
+                        ->value('title') ?? 'a listing';
+
+                    NotificationDispatcher::dispatchMatchApproved(
+                        (int) $approval->user_id,
+                        $listingTitle,
+                        (int) $approval->listing_id,
+                        (int) ($approval->match_score ?? 0)
+                    );
+                } catch (\Throwable $e) {
+                    Log::warning('[MatchApprovalWorkflow] Failed to dispatch match approved notification', [
+                        'request_id' => $requestId,
+                        'error' => $e->getMessage(),
+                    ]);
+                }
+
                 return true;
             }
 
@@ -168,6 +289,17 @@ class MatchApprovalWorkflowService
         $tenantId = TenantContext::getId();
 
         try {
+            // Fetch the approval row before updating so we have data for notifications
+            $approval = DB::table('match_approvals')
+                ->where('id', $requestId)
+                ->where('tenant_id', $tenantId)
+                ->where('status', 'pending')
+                ->first();
+
+            if (!$approval) {
+                return false;
+            }
+
             $affected = DB::table('match_approvals')
                 ->where('id', $requestId)
                 ->where('tenant_id', $tenantId)
@@ -186,6 +318,26 @@ class MatchApprovalWorkflowService
                     'rejected_by' => $rejectedBy,
                     'reason' => $reason,
                 ]);
+
+                // Notify the matched user that their match was rejected
+                try {
+                    $listingTitle = DB::table('listings')
+                        ->where('id', (int) $approval->listing_id)
+                        ->where('tenant_id', $tenantId)
+                        ->value('title') ?? 'a listing';
+
+                    NotificationDispatcher::dispatchMatchRejected(
+                        (int) $approval->user_id,
+                        $listingTitle,
+                        $reason
+                    );
+                } catch (\Throwable $e) {
+                    Log::warning('[MatchApprovalWorkflow] Failed to dispatch match rejected notification', [
+                        'request_id' => $requestId,
+                        'error' => $e->getMessage(),
+                    ]);
+                }
+
                 return true;
             }
 
@@ -216,6 +368,20 @@ class MatchApprovalWorkflowService
         try {
             $placeholders = implode(',', array_fill(0, count($requestIds), '?'));
 
+            // Fetch pending rows before updating so we can notify users
+            $pendingRows = DB::select(
+                "SELECT ma.id, ma.user_id, ma.listing_id, ma.match_score, l.title as listing_title
+                 FROM match_approvals ma
+                 LEFT JOIN listings l ON ma.listing_id = l.id
+                 WHERE ma.id IN ({$placeholders})
+                   AND ma.tenant_id = ?
+                   AND ma.status = 'pending'",
+                array_merge(
+                    array_map('intval', $requestIds),
+                    [$tenantId]
+                )
+            );
+
             $affected = DB::update(
                 "UPDATE match_approvals
                  SET status = 'approved',
@@ -238,6 +404,22 @@ class MatchApprovalWorkflowService
                     'count' => $affected,
                     'approved_by' => $approvedBy,
                 ]);
+
+                // Notify each affected user
+                try {
+                    foreach ($pendingRows as $row) {
+                        NotificationDispatcher::dispatchMatchApproved(
+                            (int) $row->user_id,
+                            $row->listing_title ?? 'a listing',
+                            (int) $row->listing_id,
+                            (int) ($row->match_score ?? 0)
+                        );
+                    }
+                } catch (\Throwable $e) {
+                    Log::warning('[MatchApprovalWorkflow] Failed to dispatch bulk approve notifications', [
+                        'error' => $e->getMessage(),
+                    ]);
+                }
             }
 
             return $affected;
@@ -267,6 +449,20 @@ class MatchApprovalWorkflowService
         try {
             $placeholders = implode(',', array_fill(0, count($requestIds), '?'));
 
+            // Fetch pending rows before updating so we can notify users
+            $pendingRows = DB::select(
+                "SELECT ma.id, ma.user_id, ma.listing_id, l.title as listing_title
+                 FROM match_approvals ma
+                 LEFT JOIN listings l ON ma.listing_id = l.id
+                 WHERE ma.id IN ({$placeholders})
+                   AND ma.tenant_id = ?
+                   AND ma.status = 'pending'",
+                array_merge(
+                    array_map('intval', $requestIds),
+                    [$tenantId]
+                )
+            );
+
             $affected = DB::update(
                 "UPDATE match_approvals
                  SET status = 'rejected',
@@ -289,6 +485,21 @@ class MatchApprovalWorkflowService
                     'count' => $affected,
                     'rejected_by' => $rejectedBy,
                 ]);
+
+                // Notify each affected user
+                try {
+                    foreach ($pendingRows as $row) {
+                        NotificationDispatcher::dispatchMatchRejected(
+                            (int) $row->user_id,
+                            $row->listing_title ?? 'a listing',
+                            $reason
+                        );
+                    }
+                } catch (\Throwable $e) {
+                    Log::warning('[MatchApprovalWorkflow] Failed to dispatch bulk reject notifications', [
+                        'error' => $e->getMessage(),
+                    ]);
+                }
             }
 
             return $affected;

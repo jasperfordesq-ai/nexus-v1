@@ -6,6 +6,8 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Models\Notification;
+use App\Models\User;
 use App\Services\GoalService;
 use App\Services\GoalCheckinService;
 use App\Services\GoalProgressService;
@@ -195,6 +197,49 @@ class GoalsController extends BaseApiController
             return $this->respondWithError('RESOURCE_NOT_FOUND', 'Goal not found or not owned', null, 404);
         }
 
+        // Notify the buddy/mentor of progress updates
+        try {
+            $mentorId = $goal->mentor_id ? (int) $goal->mentor_id : null;
+            if ($mentorId && $mentorId !== $userId) {
+                $owner = User::find($userId);
+                $ownerName = $owner->name ?? 'Someone';
+                $goalTitle = $goal->title ?? 'their goal';
+
+                // If progress caused auto-completion, send completion message
+                if ($goal->status === 'completed') {
+                    Notification::createNotification(
+                        $mentorId,
+                        "{$ownerName} completed their goal: {$goalTitle}",
+                        "/goals/{$id}",
+                        'goal_completed'
+                    );
+                } else {
+                    Notification::createNotification(
+                        $mentorId,
+                        "{$ownerName} made progress on their goal: {$goalTitle}",
+                        "/goals/{$id}",
+                        'goal_progress'
+                    );
+                }
+            }
+        } catch (\Throwable $e) {
+            \Log::warning('Goal progress notification failed', ['goal' => $id, 'error' => $e->getMessage()]);
+        }
+
+        // If auto-completed via progress, also notify the owner (achievement)
+        try {
+            if ($goal->status === 'completed') {
+                Notification::createNotification(
+                    $userId,
+                    "Congratulations! You completed your goal: {$goal->title}",
+                    "/goals/{$id}",
+                    'goal_completed'
+                );
+            }
+        } catch (\Throwable $e) {
+            \Log::warning('Goal auto-completion notification failed', ['goal' => $id, 'error' => $e->getMessage()]);
+        }
+
         $data = $goal->toArray();
         $data['is_owner'] = true;
 
@@ -221,6 +266,36 @@ class GoalsController extends BaseApiController
             \App\Services\GamificationService::awardXP($userId, \App\Services\GamificationService::XP_VALUES['complete_goal'], 'complete_goal', 'Completed a goal');
         } catch (\Throwable $e) {
             \Log::warning('Gamification XP award failed', ['action' => 'complete_goal', 'user' => $userId, 'error' => $e->getMessage()]);
+        }
+
+        // Notify the goal owner (achievement notification)
+        try {
+            $goalTitle = $goal->title ?? 'your goal';
+            Notification::createNotification(
+                $userId,
+                "Congratulations! You completed your goal: {$goalTitle}",
+                "/goals/{$id}",
+                'goal_completed'
+            );
+        } catch (\Throwable $e) {
+            \Log::warning('Goal completion notification failed', ['goal' => $id, 'error' => $e->getMessage()]);
+        }
+
+        // Notify the buddy/mentor if one exists
+        try {
+            $mentorId = $goal->mentor_id ? (int) $goal->mentor_id : null;
+            if ($mentorId && $mentorId !== $userId) {
+                $owner = User::find($userId);
+                $ownerName = $owner->name ?? 'Someone';
+                Notification::createNotification(
+                    $mentorId,
+                    "{$ownerName} completed their goal: {$goal->title}",
+                    "/goals/{$id}",
+                    'goal_completed'
+                );
+            }
+        } catch (\Throwable $e) {
+            \Log::warning('Goal buddy completion notification failed', ['goal' => $id, 'error' => $e->getMessage()]);
         }
 
         $data = $goal->toArray();
@@ -298,6 +373,23 @@ class GoalsController extends BaseApiController
             return $this->respondWithError('RESOURCE_CONFLICT', 'Cannot become buddy for this goal', null, 409);
         }
 
+        // Notify the goal owner that someone became their buddy
+        try {
+            $goalOwnerId = (int) $goal->user_id;
+            if ($goalOwnerId !== $userId) {
+                $buddy = User::find($userId);
+                $buddyName = $buddy->name ?? 'Someone';
+                Notification::createNotification(
+                    $goalOwnerId,
+                    "{$buddyName} has become a buddy for your goal: {$goal->title}",
+                    "/goals/{$id}",
+                    'goal_buddy'
+                );
+            }
+        } catch (\Throwable $e) {
+            \Log::warning('Goal buddy notification failed', ['goal' => $id, 'error' => $e->getMessage()]);
+        }
+
         return $this->respondWithData([
             'message' => 'You are now a buddy for this goal',
             'goal'    => $goal->toArray(),
@@ -319,6 +411,23 @@ class GoalsController extends BaseApiController
         }
 
         $checkin = $this->checkinService->create($id, $userId, $this->getAllInput());
+
+        // Notify the buddy/mentor about the check-in
+        try {
+            $mentorId = $goal->mentor_id ? (int) $goal->mentor_id : null;
+            if ($mentorId && $mentorId !== $userId) {
+                $owner = User::find($userId);
+                $ownerName = $owner->name ?? 'Someone';
+                Notification::createNotification(
+                    $mentorId,
+                    "{$ownerName} checked in on their goal: {$goal->title}",
+                    "/goals/{$id}",
+                    'goal_checkin'
+                );
+            }
+        } catch (\Throwable $e) {
+            \Log::warning('Goal check-in notification failed', ['goal' => $id, 'error' => $e->getMessage()]);
+        }
 
         return $this->respondWithData($checkin->toArray(), null, 201);
     }

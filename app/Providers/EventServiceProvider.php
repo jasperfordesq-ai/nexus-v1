@@ -18,6 +18,7 @@ use App\Listeners\NotifyConnectionRequest;
 use App\Listeners\NotifyJobAlertSubscribers;
 use App\Listeners\NotifyMessageReceived;
 use App\Listeners\NotifySafeguardingStaff;
+use App\Listeners\NotifyTransactionCompleted;
 use App\Listeners\SendWelcomeNotification;
 use App\Listeners\UpdateFeedOnListingCreated;
 use App\Listeners\UpdateWalletBalance;
@@ -48,6 +49,7 @@ class EventServiceProvider extends ServiceProvider
 
         TransactionCompleted::class => [
             UpdateWalletBalance::class,
+            NotifyTransactionCompleted::class,
         ],
 
         ConnectionRequested::class => [

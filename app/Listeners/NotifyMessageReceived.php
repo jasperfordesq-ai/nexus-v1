@@ -8,6 +8,8 @@ namespace App\Listeners;
 
 use App\Core\TenantContext;
 use App\Events\MessageSent;
+use App\Models\Notification;
+use App\Models\User;
 use App\Services\NotificationDispatcher;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Support\Facades\Log;
@@ -51,15 +53,33 @@ class NotifyMessageReceived implements ShouldQueue
             $link = '/messages/' . $senderId;
             $content = "{$senderName} sent you a message";
 
-            NotificationDispatcher::dispatch(
-                $recipientId,
-                'global',
-                null,
-                'new_message',
-                $content,
-                $link,
-                null
-            );
+            // Check email_messages preference — default to sending (opt-out model)
+            $emailEnabled = true;
+            try {
+                $prefs = User::getNotificationPreferences($recipientId);
+                $emailEnabled = (bool) ($prefs['email_messages'] ?? true);
+            } catch (\Throwable $prefError) {
+                Log::debug('NotifyMessageReceived: could not read email_messages pref', [
+                    'user_id' => $recipientId,
+                    'error' => $prefError->getMessage(),
+                ]);
+            }
+
+            if ($emailEnabled) {
+                // Bell + email (via dispatcher)
+                NotificationDispatcher::dispatch(
+                    $recipientId,
+                    'global',
+                    null,
+                    'new_message',
+                    $content,
+                    $link,
+                    null
+                );
+            } else {
+                // Bell only — user opted out of message emails
+                Notification::createNotification($recipientId, $content, $link, 'new_message');
+            }
         } catch (\Throwable $e) {
             Log::error('NotifyMessageReceived listener failed', [
                 'message_id' => $event->message->id ?? null,

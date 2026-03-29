@@ -183,9 +183,17 @@
     }
   },
   "leaderboard": {
-    "page_title": "Leaderboard",
-    "title": "Leaderboard",
+    "page_title": "Community",
+    "title": "Community",
     "subtitle": "See who's leading the community",
+    "subtitle_redesign": "See how our community is growing together",
+    "tabs_aria": "Community views",
+    "tab": {
+      "community": "Community Impact",
+      "journey": "My Journey",
+      "spotlight": "Spotlight",
+      "competitive": "Most Active"
+    },
     "unable_to_load": "Unable to Load Leaderboard",
     "try_again": "Try Again",
     "loading": "Loading leaderboard",
@@ -201,7 +209,8 @@
     "type": {
       "xp": "XP",
       "volunteer_hours": "Volunteer Hours",
-      "credits_earned": "Credits Earned"
+      "credits_earned": "Credits Earned",
+      "nexus_score": "NexusScore"
     },
     "period": {
       "all": "All Time",
@@ -229,5 +238,34 @@
     "session_expired": "Your session has expired. Please log in again.",
     "load_error": "Failed to load leaderboard. Please try again.",
     "type_nexus_score": "NexusScore"
+  },
+  "community": {
+    "total_hours": "Total Hours Exchanged",
+    "total_members": "Community Members",
+    "total_exchanges": "Exchanges Completed",
+    "skills_offered": "Skill Categories",
+    "this_month": "This Month",
+    "hours_this_month": "Hours Exchanged",
+    "active_members": "Active Members",
+    "new_connections": "New Connections",
+    "new_exchanges": "New Exchanges",
+    "new_members": "New Members"
+  },
+  "journey": {
+    "hours_earned": "Hours Earned",
+    "hours_given": "Hours Given",
+    "exchanges": "Exchanges",
+    "badges": "Badges",
+    "connections": "Connections",
+    "member_since": "Member Since",
+    "monthly_activity": "Monthly Activity",
+    "badge_timeline": "Badge Timeline",
+    "milestones": "Milestones"
+  },
+  "spotlight": {
+    "description": "Today's featured active community members",
+    "member_since": "Member since",
+    "empty_title": "No Spotlight Yet",
+    "empty_description": "Active members will be featured here once the community starts exchanging."
   }
 }

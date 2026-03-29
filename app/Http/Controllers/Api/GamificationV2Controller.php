@@ -7,6 +7,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Services\BadgeCollectionService;
+use App\Services\CommunityDashboardService;
 use App\Services\LeaderboardService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
@@ -674,5 +675,38 @@ class GamificationV2Controller extends BaseApiController
             error_log("NexusScore error for user {$userId}: " . $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine());
             return $this->respondWithError('SERVER_INTERNAL_ERROR', 'Failed to load NexusScore', null, 500);
         }
+    }
+
+    // =====================================================================
+    // COMMUNITY DASHBOARD (Gamification Redesign)
+    // =====================================================================
+
+    /** GET /api/v2/gamification/community-dashboard */
+    public function communityDashboard(): JsonResponse
+    {
+        $tenantId = TenantContext::getId();
+        $data = CommunityDashboardService::getCommunityImpact($tenantId);
+
+        return $this->respondWithData($data);
+    }
+
+    /** GET /api/v2/gamification/personal-journey */
+    public function personalJourney(): JsonResponse
+    {
+        $userId = $this->getUserId();
+        $tenantId = TenantContext::getId();
+        $data = CommunityDashboardService::getPersonalJourney($tenantId, $userId);
+
+        return $this->respondWithData($data);
+    }
+
+    /** GET /api/v2/gamification/member-spotlight */
+    public function memberSpotlight(): JsonResponse
+    {
+        $tenantId = TenantContext::getId();
+        $limit = (int) (request()->query('limit', 3));
+        $data = CommunityDashboardService::getMemberSpotlight($tenantId, min($limit, 10));
+
+        return $this->respondWithData($data);
     }
 }

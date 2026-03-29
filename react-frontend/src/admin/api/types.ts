@@ -323,6 +323,33 @@ export interface BadgeDefinition {
   awarded_count: number;
 }
 
+export interface BadgeConfigEntry {
+  key: string;
+  name: string;
+  description: string;
+  icon: string;
+  type: string;
+  threshold: number;
+  msg: string;
+  badge_tier: 'core' | 'template' | 'custom';
+  badge_class: 'quantity' | 'quality' | 'special' | 'verification';
+  threshold_type: string;
+  evaluation_method: string;
+  config_json: Record<string, unknown> | null;
+  rarity: string;
+  xp_value: number;
+  is_enabled: boolean;
+  has_override: boolean;
+}
+
+export interface BadgeConfigUpdate {
+  is_enabled: boolean;
+  custom_threshold: number;
+  custom_name: string;
+  custom_description: string;
+  custom_icon: string;
+}
+
 // ─────────────────────────────────────────────────────────────────────────────
 // Matching & Broker
 // ─────────────────────────────────────────────────────────────────────────────

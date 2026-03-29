@@ -6,6 +6,7 @@
 
 namespace App\Services;
 
+use App\Models\User;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Minishlink\WebPush\Subscription;
@@ -29,6 +30,20 @@ class WebPushService
     public function sendToUser($userId, $title, $body, $link = null, $type = 'general', $options = []): bool
     {
         try {
+            // Check push_enabled preference — default to sending (opt-out model)
+            try {
+                $prefs = User::getNotificationPreferences((int) $userId);
+                if (!((bool) ($prefs['push_enabled'] ?? true))) {
+                    return false;
+                }
+            } catch (\Throwable $prefError) {
+                Log::debug('WebPushService: could not read push_enabled pref', [
+                    'user_id' => $userId,
+                    'error' => $prefError->getMessage(),
+                ]);
+                // Default to sending on error
+            }
+
             $tenantId = \App\Core\TenantContext::getId();
             $subscriptions = DB::table('push_subscriptions')
                 ->where('user_id', $userId)

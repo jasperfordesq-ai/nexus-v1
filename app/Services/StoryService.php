@@ -407,9 +407,16 @@ class StoryService
             );
         }
 
-        // Notify story owner about the reaction (skip self-reactions, skip updates)
+        // Note: Notification is dispatched by StoryController after this method returns.
+        // Realtime broadcast for reaction events.
         if (!$existing && (int) $story->user_id !== $userId) {
             try {
+                $reactor = DB::selectOne(
+                    'SELECT first_name, last_name FROM users WHERE id = ? AND tenant_id = ?',
+                    [$userId, $tenantId]
+                );
+                $reactorName = $reactor ? trim($reactor->first_name . ' ' . $reactor->last_name) : 'Someone';
+
                 $emojiMap = [
                     'heart' => "\u{2764}\u{FE0F}",
                     'laugh' => "\u{1F602}",
@@ -420,32 +427,13 @@ class StoryService
                 ];
                 $emoji = $emojiMap[$reactionType] ?? $reactionType;
 
-                $reactor = DB::selectOne(
-                    'SELECT first_name, last_name FROM users WHERE id = ? AND tenant_id = ?',
-                    [$userId, $tenantId]
-                );
-                $reactorName = $reactor ? trim($reactor->first_name . ' ' . $reactor->last_name) : 'Someone';
-
-                $content = "{$reactorName} reacted {$emoji} to your story";
-
-                NotificationDispatcher::dispatch(
-                    $story->user_id,
-                    'global',
-                    null,
-                    'story_reaction',
-                    $content,
-                    '/feed',
-                    null
-                );
-
                 RealtimeService::broadcastNotification($story->user_id, [
                     'type'    => 'story_reaction',
-                    'message' => $content,
+                    'message' => "{$reactorName} reacted {$emoji} to your story",
                     'link'    => '/feed',
                 ]);
             } catch (\Throwable $e) {
-                // Notification failure should not break the reaction
-                \Log::warning('Failed to send story reaction notification', [
+                \Log::warning('Failed to broadcast story reaction', [
                     'story_id' => $storyId,
                     'reactor'  => $userId,
                     'error'    => $e->getMessage(),

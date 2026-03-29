@@ -11,6 +11,7 @@ use App\Models\BadgeCollectionItem;
 use App\Models\Notification;
 use App\Models\UserBadge;
 use App\Models\UserCollectionCompletion;
+use App\Core\TenantContext;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
@@ -102,6 +103,58 @@ class BadgeCollectionService
         }
 
         return $result;
+    }
+
+    /**
+     * Get journey-type collections with ordered step-by-step progress.
+     */
+    public static function getJourneys(int $userId, ?int $tenantId = null): array
+    {
+        $tenantId = $tenantId ?? TenantContext::getId();
+
+        $journeys = BadgeCollection::where('tenant_id', $tenantId)
+            ->where('collection_type', 'journey')
+            ->orderBy('display_order')
+            ->with(['items' => function ($q) {
+                $q->orderBy('display_order');
+            }])
+            ->get();
+
+        if ($journeys->isEmpty()) {
+            return [];
+        }
+
+        // Get user's earned badge keys
+        $earnedKeys = UserBadge::where('user_id', $userId)
+            ->pluck('badge_key')
+            ->flip()
+            ->all();
+
+        return $journeys->map(function ($journey) use ($earnedKeys) {
+            $steps = $journey->items->map(function ($item) use ($earnedKeys) {
+                return [
+                    'badge_key' => $item->badge_key,
+                    'display_order' => $item->display_order,
+                    'earned' => isset($earnedKeys[$item->badge_key]),
+                ];
+            })->values()->toArray();
+
+            $earnedCount = count(array_filter($steps, fn ($s) => $s['earned']));
+
+            return [
+                'id' => $journey->id,
+                'name' => $journey->name,
+                'description' => $journey->description,
+                'icon' => $journey->icon,
+                'estimated_duration' => $journey->estimated_duration,
+                'is_ordered' => $journey->is_ordered,
+                'steps' => $steps,
+                'earned_count' => $earnedCount,
+                'total_steps' => count($steps),
+                'completed' => $earnedCount === count($steps) && count($steps) > 0,
+                'bonus_xp' => $journey->bonus_xp,
+            ];
+        })->values()->toArray();
     }
 
     /**

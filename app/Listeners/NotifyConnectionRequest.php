@@ -8,6 +8,8 @@ namespace App\Listeners;
 
 use App\Core\TenantContext;
 use App\Events\ConnectionRequested;
+use App\Models\Notification;
+use App\Models\User;
 use App\Services\NotificationDispatcher;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Support\Facades\Log;
@@ -33,16 +35,36 @@ class NotifyConnectionRequest implements ShouldQueue
 
             $requesterName = $event->requester->first_name ?? $event->requester->name ?? 'Someone';
             $targetUserId = $event->target->id;
+            $content = "{$requesterName} sent you a connection request";
+            $link = '/connections';
 
-            NotificationDispatcher::dispatch(
-                $targetUserId,
-                'global',
-                null,
-                'connection_request',
-                "{$requesterName} sent you a connection request",
-                '/connections',
-                null
-            );
+            // Check email_connections preference — default to sending (opt-out model)
+            $emailEnabled = true;
+            try {
+                $prefs = User::getNotificationPreferences($targetUserId);
+                $emailEnabled = (bool) ($prefs['email_connections'] ?? true);
+            } catch (\Throwable $prefError) {
+                Log::debug('NotifyConnectionRequest: could not read email_connections pref', [
+                    'user_id' => $targetUserId,
+                    'error' => $prefError->getMessage(),
+                ]);
+            }
+
+            if ($emailEnabled) {
+                // Bell + email (via dispatcher)
+                NotificationDispatcher::dispatch(
+                    $targetUserId,
+                    'global',
+                    null,
+                    'connection_request',
+                    $content,
+                    $link,
+                    null
+                );
+            } else {
+                // Bell only — user opted out of connection emails
+                Notification::createNotification($targetUserId, $content, $link, 'connection_request');
+            }
         } catch (\Throwable $e) {
             Log::error('NotifyConnectionRequest listener failed', [
                 'requester_id' => $event->requester->id ?? null,

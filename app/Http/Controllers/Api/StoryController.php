@@ -8,6 +8,8 @@ namespace App\Http\Controllers\Api;
 
 use Illuminate\Http\JsonResponse;
 use App\Services\StoryService;
+use App\Models\Notification;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
 /**
@@ -223,6 +225,39 @@ class StoryController extends BaseApiController
 
         try {
             $this->storyService->reactToStory($id, $userId, $reactionType);
+
+            // Notify story creator about the reaction (skip self-reactions)
+            try {
+                $tenantId = $this->getTenantId();
+                $story = DB::selectOne(
+                    'SELECT user_id FROM stories WHERE id = ? AND tenant_id = ?',
+                    [$id, $tenantId]
+                );
+
+                if ($story && (int) $story->user_id !== $userId) {
+                    $reactor = DB::selectOne(
+                        'SELECT first_name, last_name FROM users WHERE id = ? AND tenant_id = ?',
+                        [$userId, $tenantId]
+                    );
+                    $reactorName = $reactor
+                        ? trim($reactor->first_name . ' ' . $reactor->last_name)
+                        : 'Someone';
+
+                    Notification::createNotification(
+                        (int) $story->user_id,
+                        "{$reactorName} reacted to your story",
+                        '/feed',
+                        'story_reaction'
+                    );
+                }
+            } catch (\Throwable $e) {
+                Log::warning('Story reaction notification failed', [
+                    'story_id' => $id,
+                    'reactor' => $userId,
+                    'error' => $e->getMessage(),
+                ]);
+            }
+
             return $this->respondWithData(['reacted' => true]);
         } catch (\RuntimeException $e) {
             return $this->respondWithError('REACT_FAILED', $e->getMessage());
@@ -371,6 +406,39 @@ class StoryController extends BaseApiController
 
         try {
             $result = $this->storyService->replyToStory($id, $userId, $body);
+
+            // Notify story creator about the reply (skip self-replies)
+            try {
+                $tenantId = $this->getTenantId();
+                $story = DB::selectOne(
+                    'SELECT user_id FROM stories WHERE id = ? AND tenant_id = ?',
+                    [$id, $tenantId]
+                );
+
+                if ($story && (int) $story->user_id !== $userId) {
+                    $replier = DB::selectOne(
+                        'SELECT first_name, last_name FROM users WHERE id = ? AND tenant_id = ?',
+                        [$userId, $tenantId]
+                    );
+                    $replierName = $replier
+                        ? trim($replier->first_name . ' ' . $replier->last_name)
+                        : 'Someone';
+
+                    Notification::createNotification(
+                        (int) $story->user_id,
+                        "{$replierName} replied to your story",
+                        '/feed',
+                        'story_reply'
+                    );
+                }
+            } catch (\Throwable $e) {
+                Log::warning('Story reply notification failed', [
+                    'story_id' => $id,
+                    'replier' => $userId,
+                    'error' => $e->getMessage(),
+                ]);
+            }
+
             return $this->respondWithData($result, null, 201);
         } catch (\RuntimeException $e) {
             return $this->respondWithError('REPLY_FAILED', $e->getMessage());

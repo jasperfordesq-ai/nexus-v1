@@ -170,9 +170,12 @@ class MessageService
                 'sender:id,first_name,last_name,avatar_url',
                 'receiver:id,first_name,last_name,avatar_url',
             ])
-            ->betweenUsers($userId, $partnerId)
-            ->whereRaw('NOT (sender_id = ? AND is_deleted_sender = 1)', [$userId])
-            ->whereRaw('NOT (receiver_id = ? AND is_deleted_receiver = 1)', [$userId]);
+            ->betweenUsers($userId, $partnerId);
+
+        if (self::hasPerUserDeleteColumns()) {
+            $query->whereRaw('NOT (sender_id = ? AND is_deleted_sender = 1)', [$userId])
+                  ->whereRaw('NOT (receiver_id = ? AND is_deleted_receiver = 1)', [$userId]);
+        }
 
         if ($cursor !== null) {
             $cursorId = base64_decode($cursor, true);
@@ -446,6 +449,9 @@ class MessageService
     /** @var bool|null Cached result of schema introspection for reactions column */
     private static ?bool $hasReactionsColumn = null;
 
+    /** @var bool|null Cached result of schema introspection for per-user delete columns */
+    private static ?bool $hasPerUserDeleteColumns = null;
+
     /**
      * Check if messages table has archived columns (cached per-request).
      */
@@ -477,6 +483,17 @@ class MessageService
             self::$hasReactionsColumn = DB::getSchemaBuilder()->hasColumn('messages', 'reactions');
         }
         return self::$hasReactionsColumn;
+    }
+
+    /**
+     * Check if messages table has per-user delete columns (cached per-request).
+     */
+    private static function hasPerUserDeleteColumns(): bool
+    {
+        if (self::$hasPerUserDeleteColumns === null) {
+            self::$hasPerUserDeleteColumns = DB::getSchemaBuilder()->hasColumn('messages', 'is_deleted_sender');
+        }
+        return self::$hasPerUserDeleteColumns;
     }
 
     // -----------------------------------------------------------------

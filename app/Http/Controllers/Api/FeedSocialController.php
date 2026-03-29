@@ -6,6 +6,8 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Models\Notification;
+use App\Models\User;
 use App\Services\FeedSocialService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
@@ -78,6 +80,27 @@ class FeedSocialController extends BaseApiController
 
         // Increment share count on the original post
         DB::table('feed_posts')->where('id', $id)->where('tenant_id', $tenantId)->increment('share_count');
+
+        // Notify the original post author (sharer !== author already guaranteed above)
+        try {
+            $sharer = DB::table('users')
+                ->where('id', $userId)
+                ->where('tenant_id', $tenantId)
+                ->select('first_name', 'last_name')
+                ->first();
+
+            if ($sharer) {
+                $sharerName = trim($sharer->first_name . ' ' . $sharer->last_name);
+                Notification::createNotification(
+                    (int) $original->user_id,
+                    "{$sharerName} shared your post",
+                    "/feed/post/{$id}",
+                    'post_shared'
+                );
+            }
+        } catch (\Throwable $e) {
+            // Non-critical — don't fail the share if notification fails
+        }
 
         return $this->respondWithData([
             'id'               => $shareId,

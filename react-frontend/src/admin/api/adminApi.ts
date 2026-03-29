@@ -43,6 +43,8 @@ import type {
   CreateBlogPostPayload,
   UpdateBlogPostPayload,
   BadgeDefinition,
+  BadgeConfigEntry,
+  BadgeConfigUpdate,
   BrokerDashboardStats,
   ExchangeRequest,
   ExchangeDetail,
@@ -381,6 +383,15 @@ export const adminGamification = {
 
   deleteBadge: (id: number) =>
     api.delete<{ success: boolean }>(`/v2/admin/gamification/badges/${id}`),
+
+  getBadgeConfig: () =>
+    api.get<BadgeConfigEntry[]>('/v2/admin/gamification/badge-config'),
+
+  updateBadgeConfig: (badgeKey: string, data: Partial<BadgeConfigUpdate>) =>
+    api.put<{ success: boolean }>(`/v2/admin/gamification/badge-config/${badgeKey}`, data),
+
+  resetBadgeConfig: (badgeKey: string) =>
+    api.post<{ success: boolean }>(`/v2/admin/gamification/badge-config/${badgeKey}/reset`),
 };
 
 // ─────────────────────────────────────────────────────────────────────────────

@@ -154,6 +154,41 @@ class ReviewsController extends BaseApiController
             \Log::warning('Gamification XP award failed', ['action' => 'leave_review', 'user' => $userId, 'error' => $e->getMessage()]);
         }
 
+        // Notify review receiver (in-app + email)
+        try {
+            $receiverId = (int) ($review['receiver_id'] ?? 0);
+            if ($receiverId > 0 && $receiverId !== $userId) {
+                $reviewer = \App\Models\User::find($userId);
+                $reviewerName = $reviewer->first_name ?? $reviewer->name ?? 'Someone';
+                $rating = (int) ($review['rating'] ?? 5);
+
+                // In-app notification
+                \App\Models\Notification::createNotification(
+                    $receiverId,
+                    "{$reviewerName} left you a {$rating}-star review",
+                    '/reviews',
+                    'review'
+                );
+
+                // Email notification (respects user preference)
+                $emailPref = \Illuminate\Support\Facades\DB::table('users')
+                    ->where('id', $receiverId)
+                    ->where('tenant_id', \App\Core\TenantContext::getId())
+                    ->value('email_reviews');
+
+                if ($emailPref === null || (int) $emailPref === 1) {
+                    \App\Services\NotificationDispatcher::sendReviewEmail(
+                        $receiverId,
+                        $reviewerName,
+                        $rating,
+                        $review['comment'] ?? null
+                    );
+                }
+            }
+        } catch (\Throwable $e) {
+            \Log::warning('Review notification failed', ['review_id' => $review['id'] ?? 0, 'error' => $e->getMessage()]);
+        }
+
         // Record feed activity
         try {
             app(\App\Services\FeedActivityService::class)->recordActivity(

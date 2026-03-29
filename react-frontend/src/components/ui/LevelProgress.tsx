@@ -14,11 +14,13 @@ export interface LevelProgressProps {
   currentXP: number;
   requiredXP: number;
   level: number;
+  /** Optional: V2 level name (e.g. "Builder", "Champion") */
+  levelName?: string;
   /** Optional: show compact variant without level text */
   compact?: boolean;
 }
 
-export function LevelProgress({ currentXP, requiredXP, level, compact = false }: LevelProgressProps) {
+export function LevelProgress({ currentXP, requiredXP, level, levelName, compact = false }: LevelProgressProps) {
   // Guard against negative or NaN values from malformed backend data
   const safeCurrentXP = Math.max(0, currentXP ?? 0);
   const safeRequiredXP = Math.max(0, requiredXP ?? 0);
@@ -28,7 +30,9 @@ export function LevelProgress({ currentXP, requiredXP, level, compact = false }:
     <div className="space-y-2">
       {!compact && (
         <div className="flex justify-between items-center">
-          <span className="text-theme-primary font-medium">Level {level}</span>
+          <span className="text-theme-primary font-medium">
+            Level {level}{levelName ? ` \u2014 ${levelName}` : ''}
+          </span>
           <span className="text-theme-subtle text-sm">
             {safeCurrentXP.toLocaleString()} / {safeRequiredXP.toLocaleString()} XP
           </span>
