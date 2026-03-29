@@ -782,7 +782,9 @@ class ExchangeWorkflowService
             return false;
         }
 
-        return DB::transaction(function () use ($exchangeId, $exchange, $finalHours) {
+        // Run the financial transaction first — notifications must NEVER be inside this block.
+        // If notifications threw inside the transaction, the credit transfer would roll back.
+        $transactionSucceeded = DB::transaction(function () use ($exchangeId, $exchange, $finalHours) {
             // Re-read with lock to prevent double-completion race condition
             $lockedExchange = DB::table('exchange_requests')
                 ->where('id', $exchangeId)
@@ -807,7 +809,12 @@ class ExchangeWorkflowService
 
             self::updateStatus($exchangeId, self::STATUS_COMPLETED, null, 'system', "Completed with $finalHours hours");
 
-            // Notify both parties of completion (outside the lock but inside the DB transaction)
+            return true;
+        });
+
+        // Send notifications AFTER the transaction has committed — notification failures
+        // must never affect the financial transaction or roll back credit transfers.
+        if ($transactionSucceeded) {
             try {
                 $notificationData = [
                     'exchange_id' => $exchangeId,
@@ -824,9 +831,9 @@ class ExchangeWorkflowService
                     'error' => $e->getMessage(),
                 ]);
             }
+        }
 
-            return true;
-        });
+        return $transactionSucceeded;
     }
 
     private static function createTransaction(int $exchangeId, float $hours): ?int

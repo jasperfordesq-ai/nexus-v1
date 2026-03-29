@@ -61,6 +61,23 @@ class GoalReminderService
         return (array) DB::table('goal_reminders')->where('id', $id)->where('tenant_id', TenantContext::getId())->first();
     }
 
+    // ─── Cron-callable stub ────────────────────────────────────────────
+
+    /**
+     * Send due goal reminders for the current tenant.
+     * Stub — not yet implemented; logs a warning and returns 0.
+     * Called statically by CronJobRunner.
+     *
+     * @return int Number of reminders sent
+     */
+    public static function sendDueReminders(): int
+    {
+        \Illuminate\Support\Facades\Log::warning(
+            '[GoalReminderService] sendDueReminders() is not yet implemented — returning 0.'
+        );
+        return 0;
+    }
+
     /**
      * Delete a reminder.
      */

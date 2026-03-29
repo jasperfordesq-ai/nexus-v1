@@ -6,8 +6,14 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Core\EmailTemplate;
+use App\Core\Mailer;
+use App\Core\TenantContext;
+use App\Models\Notification;
+use App\Models\User;
 use App\Services\TotpService;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\DB;
 
 /**
  * TwoFactorController -- Two-factor authentication setup.
@@ -99,6 +105,18 @@ class TwoFactorController extends BaseApiController
             );
         }
 
+        // Security notification: bell for 2FA enabled
+        try {
+            Notification::createNotification(
+                $userId,
+                'Two-factor authentication has been enabled on your account.',
+                null,
+                '2fa_enabled'
+            );
+        } catch (\Throwable $e) {
+            error_log("Failed to create 2FA enabled notification: " . $e->getMessage());
+        }
+
         return $this->respondWithData([
             'backup_codes' => $result['backup_codes'] ?? [],
         ]);
@@ -131,6 +149,39 @@ class TwoFactorController extends BaseApiController
                 'password',
                 403
             );
+        }
+
+        // Security notification: bell + email for 2FA disabled
+        try {
+            Notification::createNotification(
+                $userId,
+                'Two-factor authentication has been disabled on your account. If you did not do this, secure your account immediately.',
+                null,
+                '2fa_disabled'
+            );
+        } catch (\Throwable $e) {
+            error_log("Failed to create 2FA disabled notification: " . $e->getMessage());
+        }
+
+        try {
+            $user = User::query()->find($userId);
+            if ($user && $user->email) {
+                $mailer = Mailer::forCurrentTenant();
+                $tenantName = TenantContext::get()['name'] ?? 'Project NEXUS';
+
+                $html = EmailTemplate::render(
+                    "Two-Factor Authentication Disabled",
+                    "2FA has been disabled on your account.",
+                    "Two-factor authentication has been disabled on your account. If you did not make this change, please secure your account immediately by changing your password and re-enabling 2FA.",
+                    null,
+                    null,
+                    $tenantName
+                );
+
+                $mailer->send($user->email, "Security Alert: 2FA Disabled - " . $tenantName, $html);
+            }
+        } catch (\Throwable $e) {
+            error_log("Failed to send 2FA disabled email: " . $e->getMessage());
         }
 
         return $this->respondWithData([

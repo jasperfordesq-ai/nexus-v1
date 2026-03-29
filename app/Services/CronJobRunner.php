@@ -2263,14 +2263,15 @@ class CronJobRunner
     {
         try {
             $totalSent = 0;
-            $this->forEachTenant(function ($tenantId, $slug) use (&$totalSent) {
-                $result = ListingExpiryReminderService::sendDueReminders();
+            $service = app(ListingExpiryReminderService::class);
+            $this->forEachTenant(function ($tenantId, $slug) use (&$totalSent, $service) {
+                $result = $service->sendDueReminders();
                 $totalSent += $result['sent'];
                 if ($result['sent'] > 0) {
                     echo "   [$slug] Sent {$result['sent']} listing expiry reminders.\n";
                 }
             });
-            ListingExpiryReminderService::cleanupOldRecords();
+            $service->cleanupOldRecords();
             echo "   Listing expiry reminders complete ($totalSent total).\n";
         } catch (\Throwable $e) {
             echo "   Error: " . $e->getMessage() . "\n";

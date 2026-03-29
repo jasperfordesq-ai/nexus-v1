@@ -7,6 +7,7 @@
 namespace App\Services;
 
 use App\Core\TenantContext;
+use App\Models\Notification;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
@@ -77,6 +78,33 @@ class FederatedConnectionService
                 'receiver_tenant' => $receiverTenantId,
             ]);
 
+            // Notify the recipient (cross-tenant bell notification)
+            try {
+                $sender = DB::selectOne(
+                    "SELECT first_name, last_name FROM users WHERE id = ?",
+                    [$requesterId]
+                );
+                $community = DB::selectOne(
+                    "SELECT name FROM tenants WHERE id = ?",
+                    [$requesterTenantId]
+                );
+                $senderName = $sender ? trim(($sender->first_name ?? '') . ' ' . ($sender->last_name ?? '')) : 'Someone';
+                $communityName = $community->name ?? 'a partner community';
+
+                Notification::createNotification(
+                    $receiverId,
+                    "{$senderName} from {$communityName} wants to connect with you",
+                    '/connections',
+                    'federation_connection',
+                    true,
+                    $receiverTenantId
+                );
+            } catch (\Exception $notifEx) {
+                Log::warning('[FederatedConnection] sendRequest notification failed', [
+                    'error' => $notifEx->getMessage(),
+                ]);
+            }
+
             return ['success' => true, 'connection_id' => $connectionId];
         } catch (\Exception $e) {
             Log::error('[FederatedConnection] sendRequest failed', ['error' => $e->getMessage()]);
@@ -110,6 +138,28 @@ class FederatedConnectionService
                 'accepted_by' => $userId,
             ]);
 
+            // Notify the original requester (cross-tenant bell notification)
+            try {
+                $accepter = DB::selectOne(
+                    "SELECT first_name, last_name FROM users WHERE id = ?",
+                    [$userId]
+                );
+                $accepterName = $accepter ? trim(($accepter->first_name ?? '') . ' ' . ($accepter->last_name ?? '')) : 'Someone';
+
+                Notification::createNotification(
+                    (int) $connection->requester_user_id,
+                    "{$accepterName} accepted your connection request",
+                    '/connections',
+                    'federation_connection',
+                    false,
+                    (int) $connection->requester_tenant_id
+                );
+            } catch (\Exception $notifEx) {
+                Log::warning('[FederatedConnection] acceptRequest notification failed', [
+                    'error' => $notifEx->getMessage(),
+                ]);
+            }
+
             return ['success' => true, 'connection_id' => $connectionId];
         } catch (\Exception $e) {
             Log::error('[FederatedConnection] acceptRequest failed', ['error' => $e->getMessage()]);
@@ -142,6 +192,22 @@ class FederatedConnectionService
                 'connection_id' => $connectionId,
                 'rejected_by' => $userId,
             ]);
+
+            // Notify the original requester (cross-tenant bell notification)
+            try {
+                Notification::createNotification(
+                    (int) $connection->requester_user_id,
+                    'Your connection request was declined',
+                    '/connections',
+                    'federation_connection',
+                    false,
+                    (int) $connection->requester_tenant_id
+                );
+            } catch (\Exception $notifEx) {
+                Log::warning('[FederatedConnection] rejectRequest notification failed', [
+                    'error' => $notifEx->getMessage(),
+                ]);
+            }
 
             return ['success' => true, 'connection_id' => $connectionId];
         } catch (\Exception $e) {

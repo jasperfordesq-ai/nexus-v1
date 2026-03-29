@@ -31,6 +31,7 @@ class NotificationService
         'jobs'         => ['job_application', 'job_application_status'],
         'safeguarding' => ['safeguarding_flag', 'safeguarding_assignment', 'broker_review', 'safeguarding_incident'],
         'system'       => ['system', 'announcement', 'welcome', 'badge', 'achievement', 'level_up'],
+        'security'     => ['password_changed', 'email_changed', '2fa_enabled', '2fa_disabled', 'passkey_registered', 'passkey_removed', 'security'],
     ];
 
     public function __construct(
@@ -106,6 +107,7 @@ class NotificationService
             'groups' => 0,
             'listings' => 0,
             'system' => 0,
+            'security' => 0,
             'other' => 0,
         ];
 

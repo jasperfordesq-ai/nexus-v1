@@ -6,6 +6,9 @@
 
 namespace App\Services;
 
+use App\Core\EmailTemplate;
+use App\Core\Mailer;
+use App\Models\Notification;
 use App\Models\User;
 use App\Services\OnboardingConfigService;
 use Illuminate\Database\Eloquent\Builder;
@@ -163,7 +166,7 @@ class UserService
         $user = User::query()->findOrFail($id);
 
         $allowed = [
-            'first_name', 'last_name', 'bio', 'tagline', 'location', 'latitude', 'longitude',
+            'first_name', 'last_name', 'email', 'bio', 'tagline', 'location', 'latitude', 'longitude',
             'phone', 'avatar_url', 'organization_name', 'profile_type',
         ];
 
@@ -317,6 +320,7 @@ class UserService
      * Update a user profile (alias for update()).
      *
      * Validates data first via validateProfileUpdate(), then applies changes.
+     * If the email address is changed, sends a security notification to the OLD email.
      *
      * @return bool True on success, false on failure (check getErrors()).
      */
@@ -326,14 +330,60 @@ class UserService
             return false;
         }
 
+        // Capture old email BEFORE the update for security notification
+        $oldEmail = null;
+        if (isset($data['email']) && $data['email'] !== '') {
+            try {
+                $currentUser = User::query()->find($userId);
+                if ($currentUser) {
+                    $oldEmail = $currentUser->email;
+                }
+            } catch (\Throwable $e) {
+                Log::warning('Failed to fetch old email for change notification', ['user_id' => $userId, 'error' => $e->getMessage()]);
+            }
+        }
+
         try {
             self::update($userId, $data);
-            return true;
         } catch (\Throwable $e) {
             Log::warning('Profile update failed', ['user_id' => $userId, 'error' => $e->getMessage()]);
             self::setError('UPDATE_FAILED', $e->getMessage());
             return false;
         }
+
+        // Security notification: bell + email to OLD address when email is changed
+        if ($oldEmail && isset($data['email']) && $oldEmail !== $data['email']) {
+            try {
+                Notification::createNotification(
+                    $userId,
+                    'Your email address has been changed. If you did not do this, contact support immediately.',
+                    null,
+                    'email_changed'
+                );
+            } catch (\Throwable $e) {
+                Log::warning('Failed to create email change notification', ['user_id' => $userId, 'error' => $e->getMessage()]);
+            }
+
+            try {
+                $mailer = Mailer::forCurrentTenant();
+                $tenantName = TenantContext::get()['name'] ?? 'Project NEXUS';
+
+                $html = EmailTemplate::render(
+                    "Email Address Changed",
+                    "Your email address has been changed.",
+                    "The email address on your account has been changed to a new address. If you did not make this change, please contact support immediately to secure your account.",
+                    null,
+                    null,
+                    $tenantName
+                );
+
+                $mailer->send($oldEmail, "Security Alert: Email Address Changed - " . $tenantName, $html);
+            } catch (\Throwable $e) {
+                Log::warning('Failed to send email change notification to old address', ['user_id' => $userId, 'error' => $e->getMessage()]);
+            }
+        }
+
+        return true;
     }
 
     /**

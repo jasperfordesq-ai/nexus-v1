@@ -88,6 +88,27 @@ class FederationPartnershipService
                 ['federation_level' => $federationLevel, 'notes' => $notes]
             );
 
+            // Email the target tenant's admins about the incoming partnership request
+            try {
+                $requestingTenant = DB::selectOne(
+                    "SELECT name FROM tenants WHERE id = ?",
+                    [$requestingTenantId]
+                );
+                $requestingTenantName = $requestingTenant->name ?? 'A partner community';
+
+                FederationEmailService::sendPartnershipRequestNotification(
+                    $targetTenantId,
+                    $requestingTenantId,
+                    $requestingTenantName,
+                    $federationLevel,
+                    $notes
+                );
+            } catch (\Exception $emailEx) {
+                Log::warning('FederationPartnershipService::requestPartnership email notification failed', [
+                    'error' => $emailEx->getMessage(),
+                ]);
+            }
+
             return ['success' => true, 'message' => 'Partnership request sent'];
         } catch (\Exception $e) {
             Log::error('FederationPartnershipService::requestPartnership error: ' . $e->getMessage());

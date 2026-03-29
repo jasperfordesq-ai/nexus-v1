@@ -278,6 +278,81 @@ class VolunteerReminderService
         return $settings;
     }
 
+    // ─── Cron-callable stubs ───────────────────────────────────────────
+    // These methods are called by CronJobRunner but the actual sending logic
+    // is not yet implemented. They log a warning and return 0 so the cron
+    // runner doesn't crash.
+
+    /**
+     * Send pre-shift reminders to volunteers with upcoming shifts.
+     * Stub — not yet implemented; logs a warning and returns 0.
+     *
+     * @return int Number of reminders sent
+     */
+    public static function sendPreShiftReminders(): int
+    {
+        \Illuminate\Support\Facades\Log::warning(
+            '[VolunteerReminderService] sendPreShiftReminders() is not yet implemented — returning 0.'
+        );
+        return 0;
+    }
+
+    /**
+     * Send post-shift feedback requests to volunteers after their shift ends.
+     * Stub — not yet implemented; logs a warning and returns 0.
+     *
+     * @return int Number of feedback requests sent
+     */
+    public static function sendPostShiftFeedback(): int
+    {
+        \Illuminate\Support\Facades\Log::warning(
+            '[VolunteerReminderService] sendPostShiftFeedback() is not yet implemented — returning 0.'
+        );
+        return 0;
+    }
+
+    /**
+     * Nudge volunteers who have been inactive/lapsed.
+     * Stub — not yet implemented; logs a warning and returns 0.
+     *
+     * @return int Number of nudges sent
+     */
+    public static function nudgeLapsedVolunteers(): int
+    {
+        \Illuminate\Support\Facades\Log::warning(
+            '[VolunteerReminderService] nudgeLapsedVolunteers() is not yet implemented — returning 0.'
+        );
+        return 0;
+    }
+
+    /**
+     * Send warnings to volunteers whose credentials are about to expire.
+     * Stub — not yet implemented; logs a warning and returns 0.
+     *
+     * @return int Number of warnings sent
+     */
+    public static function sendCredentialExpiryWarnings(): int
+    {
+        \Illuminate\Support\Facades\Log::warning(
+            '[VolunteerReminderService] sendCredentialExpiryWarnings() is not yet implemented — returning 0.'
+        );
+        return 0;
+    }
+
+    /**
+     * Send warnings to volunteers whose training certifications are about to expire.
+     * Stub — not yet implemented; logs a warning and returns 0.
+     *
+     * @return int Number of warnings sent
+     */
+    public static function sendTrainingExpiryWarnings(): int
+    {
+        \Illuminate\Support\Facades\Log::warning(
+            '[VolunteerReminderService] sendTrainingExpiryWarnings() is not yet implemented — returning 0.'
+        );
+        return 0;
+    }
+
     /**
      * Create or update a reminder setting for the current tenant.
      *

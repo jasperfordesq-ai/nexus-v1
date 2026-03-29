@@ -9,8 +9,10 @@ namespace App\Http\Controllers\Api;
 use App\Services\SearchLogService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use App\Core\TenantContext;
 use App\Models\ActivityLog;
+use App\Models\Notification;
 use App\Services\ListingFeaturedService;
 use App\Services\ListingModerationService;
 
@@ -191,7 +193,7 @@ class AdminListingsController extends BaseApiController
         $tenantId = $this->getTenantId();
 
         $item = DB::selectOne(
-            "SELECT id, title, status, tenant_id FROM listings WHERE id = ? AND tenant_id = ?",
+            "SELECT id, title, status, user_id, tenant_id FROM listings WHERE id = ? AND tenant_id = ?",
             [$id, $tenantId]
         );
 
@@ -205,6 +207,20 @@ class AdminListingsController extends BaseApiController
         );
 
         ActivityLog::log($adminId, 'admin_approve_listing', "Approved listing #{$id}: {$item->title}");
+
+        // Notify listing owner
+        try {
+            $title = htmlspecialchars($item->title ?? '', ENT_QUOTES, 'UTF-8');
+            Notification::create([
+                'user_id' => (int) $item->user_id,
+                'message' => "Your listing \"{$title}\" has been approved!",
+                'link' => "/listings/{$id}",
+                'type' => 'listing_approved',
+                'created_at' => now(),
+            ]);
+        } catch (\Exception $e) {
+            Log::warning("[AdminListingsController] approve notification failed for listing #{$id}: " . $e->getMessage());
+        }
 
         return $this->respondWithData(['approved' => true, 'id' => $id]);
     }
@@ -232,12 +248,26 @@ class AdminListingsController extends BaseApiController
         $tenantId = $this->getTenantId();
 
         $item = DB::selectOne(
-            "SELECT id, title, tenant_id FROM listings WHERE id = ? AND tenant_id = ?",
+            "SELECT id, title, user_id, tenant_id FROM listings WHERE id = ? AND tenant_id = ?",
             [$id, $tenantId]
         );
 
         if (!$item) {
             return $this->respondWithError('NOT_FOUND', 'Listing not found', null, 404);
+        }
+
+        // Notify listing owner BEFORE delete so the data still exists
+        try {
+            $title = htmlspecialchars($item->title ?? '', ENT_QUOTES, 'UTF-8');
+            Notification::create([
+                'user_id' => (int) $item->user_id,
+                'message' => "Your listing \"{$title}\" has been removed by a moderator.",
+                'link' => '/listings',
+                'type' => 'listing_removed',
+                'created_at' => now(),
+            ]);
+        } catch (\Exception $e) {
+            Log::warning("[AdminListingsController] destroy notification failed for listing #{$id}: " . $e->getMessage());
         }
 
         DB::delete("DELETE FROM listings WHERE id = ? AND tenant_id = ?", [$id, $tenantId]);

@@ -6,6 +6,8 @@
 
 namespace App\Services;
 
+use App\Core\EmailTemplate;
+use App\Core\Mailer;
 use App\Core\TenantContext;
 use App\Models\Listing;
 use App\Models\Notification;
@@ -110,6 +112,35 @@ class ListingExpiryReminderService
             'type' => 'listing_expiry',
             'created_at' => now(),
         ]);
+
+        // Send email notification to listing owner
+        try {
+            $email = $listing->email ?? null;
+            if (!empty($email) && filter_var($email, FILTER_VALIDATE_EMAIL)) {
+                $tenantName = TenantContext::get()['name'] ?? 'Project NEXUS';
+                $frontendUrl = TenantContext::getFrontendUrl();
+                $basePath = TenantContext::getSlugPrefix();
+                $listingUrl = $frontendUrl . $basePath . $link;
+
+                $body = "<p>Hi " . htmlspecialchars($listing->first_name ?? $listing->name ?? 'there', ENT_QUOTES, 'UTF-8') . ",</p>"
+                    . "<p>Your listing <strong>\"{$title}\"</strong> expires in {$daysText} (on {$expiryFormatted}).</p>"
+                    . "<p>Renew it now to keep it visible to the community.</p>";
+
+                $html = EmailTemplate::render(
+                    'Your listing expires in ' . $daysText,
+                    'Don\'t miss out — renew your listing to keep it active.',
+                    $body,
+                    'View Listing',
+                    $listingUrl,
+                    $tenantName
+                );
+
+                $mailer = Mailer::forCurrentTenant();
+                $mailer->send($email, "Your listing expires in {$daysText}", $html);
+            }
+        } catch (\Exception $e) {
+            Log::warning("[ListingExpiryReminderService] Email send failed for user={$userId}, listing={$listingId}: " . $e->getMessage());
+        }
     }
 
     /**

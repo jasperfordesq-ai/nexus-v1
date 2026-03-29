@@ -6,6 +6,8 @@
 
 namespace App\Services;
 
+use App\Core\EmailTemplate;
+use App\Core\Mailer;
 use App\Core\TenantContext;
 use App\Models\ActivityLog;
 use App\Models\Listing;
@@ -151,7 +153,7 @@ class ListingModerationService
             'rejection_reason' => $reason,
         ]);
 
-        // Notify owner
+        // Notify owner (bell)
         $title = htmlspecialchars($listing->title, ENT_QUOTES, 'UTF-8');
         $safeReason = htmlspecialchars($reason, ENT_QUOTES, 'UTF-8');
         Notification::create([
@@ -161,6 +163,47 @@ class ListingModerationService
             'type' => 'listing_rejected',
             'created_at' => now(),
         ]);
+
+        // Send email notification to listing owner
+        try {
+            $ownerEmail = DB::table('users')
+                ->where('id', $listing->user_id)
+                ->where('tenant_id', $tenantId)
+                ->value('email');
+
+            if (!empty($ownerEmail) && filter_var($ownerEmail, FILTER_VALIDATE_EMAIL)) {
+                $ownerRow = DB::table('users')
+                    ->where('id', $listing->user_id)
+                    ->where('tenant_id', $tenantId)
+                    ->select(['first_name', 'name'])
+                    ->first();
+
+                $ownerName = htmlspecialchars($ownerRow->first_name ?? $ownerRow->name ?? 'there', ENT_QUOTES, 'UTF-8');
+                $tenantName = TenantContext::get()['name'] ?? 'Project NEXUS';
+                $frontendUrl = TenantContext::getFrontendUrl();
+                $basePath = TenantContext::getSlugPrefix();
+                $listingUrl = $frontendUrl . $basePath . "/listings/{$listingId}";
+
+                $body = "<p>Hi {$ownerName},</p>"
+                    . "<p>Your listing <strong>\"{$title}\"</strong> was not approved.</p>"
+                    . "<p><strong>Reason:</strong> {$safeReason}</p>"
+                    . "<p>Please review and update your listing, then resubmit for approval.</p>";
+
+                $html = EmailTemplate::render(
+                    'Your listing needs changes',
+                    'Your listing was not approved — here\'s what to do next.',
+                    $body,
+                    'Edit Listing',
+                    $listingUrl,
+                    $tenantName
+                );
+
+                $mailer = Mailer::forCurrentTenant();
+                $mailer->send($ownerEmail, 'Your listing needs changes', $html);
+            }
+        } catch (\Exception $e) {
+            Log::warning("[ListingModerationService] reject email failed for user={$listing->user_id}, listing={$listingId}: " . $e->getMessage());
+        }
 
         ActivityLog::log($adminId, 'listing_moderation_reject', "Rejected listing #{$listingId}: {$listing->title}. Reason: {$reason}");
 

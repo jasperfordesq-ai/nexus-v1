@@ -1191,25 +1191,34 @@ class StoryService
         foreach ($connections as $connection) {
             $friendId = (int) $connection->friend_id;
 
-            // In-app notification + email routing
-            NotificationDispatcher::dispatch(
-                $friendId,
-                'global',
-                null,
-                'new_story',
-                $content,
-                $link,
-                null
-            );
+            try {
+                // In-app notification + email routing
+                NotificationDispatcher::dispatch(
+                    $friendId,
+                    'global',
+                    null,
+                    'new_story',
+                    $content,
+                    $link,
+                    null
+                );
 
-            // Real-time push via Pusher
-            RealtimeService::broadcastNotification($friendId, [
-                'type' => 'new_story',
-                'message' => $content,
-                'link' => $link,
-                'story_id' => $storyId,
-                'user_id' => $userId,
-            ]);
+                // Real-time push via Pusher
+                RealtimeService::broadcastNotification($friendId, [
+                    'type' => 'new_story',
+                    'message' => $content,
+                    'link' => $link,
+                    'story_id' => $storyId,
+                    'user_id' => $userId,
+                ]);
+            } catch (\Throwable $e) {
+                Log::warning('StoryService: Failed to notify connection of new story', [
+                    'story_id' => $storyId,
+                    'friend_id' => $friendId,
+                    'error' => $e->getMessage(),
+                ]);
+                // Continue notifying remaining connections
+            }
         }
     }
 

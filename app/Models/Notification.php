@@ -109,15 +109,24 @@ class Notification extends Model
     /**
      * Create a notification record.
      * Named createNotification to avoid conflict with Eloquent's create().
+     *
+     * @param int      $userId      Target user to notify
+     * @param string   $message     Notification body text
+     * @param string|null $link     Optional link for the notification
+     * @param string   $type        Notification type (e.g. 'info', 'connection_request', 'federation_connection')
+     * @param bool     $isImportant Whether this is a high-priority notification
+     * @param int|null $tenantId    Explicit tenant ID for cross-tenant notifications (e.g. federation).
+     *                              When null, uses TenantContext::getId().
      */
     public static function createNotification(
         int $userId,
         string $message,
         ?string $link = null,
         string $type = 'info',
-        bool $isImportant = false
+        bool $isImportant = false,
+        ?int $tenantId = null
     ): int {
-        $tenantId = TenantContext::getId();
+        $tenantId = $tenantId ?? TenantContext::getId();
 
         $id = DB::table('notifications')->insertGetId([
             'user_id' => $userId,

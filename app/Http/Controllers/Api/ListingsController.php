@@ -7,6 +7,10 @@
 namespace App\Http\Controllers\Api;
 
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+use App\Core\TenantContext;
+use App\Models\Notification;
 use App\Services\ListingService;
 use App\Services\ListingAnalyticsService;
 use App\Services\ListingExpiryService;
@@ -376,6 +380,45 @@ class ListingsController extends BaseApiController
             $this->listingAnalyticsService->updateSaveCount($id, true);
         } catch (\Exception $e) {
             // Non-critical
+        }
+
+        // Notify listing owner that someone saved their listing (bell only, skip if saver === owner)
+        try {
+            $tenantId = TenantContext::getId();
+            $listing = DB::table('listings')
+                ->where('id', $id)
+                ->where('tenant_id', $tenantId)
+                ->select(['user_id', 'title'])
+                ->first();
+
+            if ($listing && (int) $listing->user_id !== $userId) {
+                $saver = DB::table('users')
+                    ->where('id', $userId)
+                    ->where('tenant_id', $tenantId)
+                    ->select(['first_name', 'last_name', 'name'])
+                    ->first();
+
+                $saverName = 'Someone';
+                if ($saver) {
+                    $saverName = trim(($saver->first_name ?? '') . ' ' . ($saver->last_name ?? ''));
+                    if (empty($saverName)) {
+                        $saverName = $saver->name ?? 'Someone';
+                    }
+                }
+
+                $saverName = htmlspecialchars($saverName, ENT_QUOTES, 'UTF-8');
+                $title = htmlspecialchars($listing->title ?? '', ENT_QUOTES, 'UTF-8');
+
+                Notification::create([
+                    'user_id' => (int) $listing->user_id,
+                    'message' => "{$saverName} saved your listing \"{$title}\"",
+                    'link' => "/listings/{$id}",
+                    'type' => 'listing_saved',
+                    'created_at' => now(),
+                ]);
+            }
+        } catch (\Exception $e) {
+            Log::warning("[ListingsController] saveListing notification failed for listing #{$id}: " . $e->getMessage());
         }
 
         return $this->respondWithData(['saved' => true, 'listing_id' => $id]);

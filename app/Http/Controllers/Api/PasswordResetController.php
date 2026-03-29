@@ -15,6 +15,7 @@ use App\Core\TenantContext;
 use App\Core\RateLimiter;
 use App\Core\Mailer;
 use App\Core\EmailTemplate;
+use App\Models\Notification;
 use App\Models\User;
 
 /**
@@ -183,6 +184,36 @@ class PasswordResetController extends BaseApiController
             );
         } catch (\Throwable $e) {
             error_log("Failed to log password reset: " . $e->getMessage());
+        }
+
+        // Security notification: bell + email for password change
+        try {
+            Notification::createNotification(
+                (int) $user['id'],
+                'Your password was changed. If you did not do this, contact support immediately.',
+                null,
+                'password_changed'
+            );
+        } catch (\Throwable $e) {
+            error_log("Failed to create password change notification: " . $e->getMessage());
+        }
+
+        try {
+            $mailer = Mailer::forCurrentTenant();
+            $tenantName = TenantContext::get()['name'] ?? 'Project NEXUS';
+
+            $html = EmailTemplate::render(
+                "Password Changed",
+                "Your password was recently changed.",
+                "Your account password was changed. If you did not make this change, please contact support immediately to secure your account.",
+                null,
+                null,
+                $tenantName
+            );
+
+            $mailer->send($email, "Security Alert: Password Changed - " . $tenantName, $html);
+        } catch (\Throwable $e) {
+            error_log("Failed to send password change email: " . $e->getMessage());
         }
 
         return $this->respondWithData([

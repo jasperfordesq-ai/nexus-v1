@@ -6,6 +6,10 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Core\EmailTemplate;
+use App\Core\Mailer;
+use App\Models\Notification;
+use App\Models\User;
 use App\Services\TenantSettingsService;
 use App\Services\TokenService;
 use App\Services\WebAuthnChallengeStore;
@@ -199,6 +203,19 @@ class WebAuthnController extends BaseApiController
 
         // Consume the challenge (single-use)
         $this->consumeChallenge($input);
+
+        // Security notification: bell for passkey registered
+        try {
+            $passkeyLabel = $deviceName ? "\"$deviceName\"" : 'A new passkey';
+            Notification::createNotification(
+                $userId,
+                "$passkeyLabel has been registered on your account.",
+                null,
+                'passkey_registered'
+            );
+        } catch (\Throwable $e) {
+            error_log("Failed to create passkey registered notification: " . $e->getMessage());
+        }
 
         return $this->respondWithData(['message' => 'Passkey registered successfully']);
     }
@@ -451,6 +468,39 @@ class WebAuthnController extends BaseApiController
             );
         }
 
+        // Security notification: bell + email for passkey removed
+        try {
+            Notification::createNotification(
+                $userId,
+                'A passkey was removed from your account. If you did not do this, secure your account immediately.',
+                null,
+                'passkey_removed'
+            );
+        } catch (\Throwable $e) {
+            error_log("Failed to create passkey removed notification: " . $e->getMessage());
+        }
+
+        try {
+            $user = User::query()->find($userId);
+            if ($user && $user->email) {
+                $mailer = Mailer::forCurrentTenant();
+                $tenantName = TenantContext::get()['name'] ?? 'Project NEXUS';
+
+                $html = EmailTemplate::render(
+                    "Passkey Removed",
+                    "A passkey was removed from your account.",
+                    "A passkey has been removed from your account. If you did not make this change, please secure your account immediately by changing your password.",
+                    null,
+                    null,
+                    $tenantName
+                );
+
+                $mailer->send($user->email, "Security Alert: Passkey Removed - " . $tenantName, $html);
+            }
+        } catch (\Throwable $e) {
+            error_log("Failed to send passkey removed email: " . $e->getMessage());
+        }
+
         return $this->respondWithData(['message' => 'Credential(s) removed']);
     }
 
@@ -500,6 +550,41 @@ class WebAuthnController extends BaseApiController
             "DELETE FROM webauthn_credentials WHERE user_id = ? AND tenant_id = ?",
             [$userId, $tenantId]
         );
+
+        // Security notification: bell + email for all passkeys removed
+        if ($count > 0) {
+            try {
+                Notification::createNotification(
+                    $userId,
+                    "All passkeys ({$count}) were removed from your account. If you did not do this, secure your account immediately.",
+                    null,
+                    'passkey_removed'
+                );
+            } catch (\Throwable $e) {
+                error_log("Failed to create passkeys removed notification: " . $e->getMessage());
+            }
+
+            try {
+                $user = User::query()->find($userId);
+                if ($user && $user->email) {
+                    $mailer = Mailer::forCurrentTenant();
+                    $tenantName = TenantContext::get()['name'] ?? 'Project NEXUS';
+
+                    $html = EmailTemplate::render(
+                        "All Passkeys Removed",
+                        "All passkeys were removed from your account.",
+                        "All {$count} passkey(s) have been removed from your account. If you did not make this change, please secure your account immediately by changing your password.",
+                        null,
+                        null,
+                        $tenantName
+                    );
+
+                    $mailer->send($user->email, "Security Alert: All Passkeys Removed - " . $tenantName, $html);
+                }
+            } catch (\Throwable $e) {
+                error_log("Failed to send passkeys removed email: " . $e->getMessage());
+            }
+        }
 
         return $this->respondWithData([
             'message' => "Removed {$count} passkey(s). You can now re-register on any device.",
