@@ -25,14 +25,14 @@ return [
             'key' => env('PUSHER_KEY', env('PUSHER_APP_KEY')),
             'secret' => env('PUSHER_SECRET', env('PUSHER_APP_SECRET')),
             'app_id' => env('PUSHER_APP_ID'),
-            'options' => [
+            'options' => array_filter([
                 'cluster' => env('PUSHER_CLUSTER', env('PUSHER_APP_CLUSTER', 'eu')),
                 'host' => env('PUSHER_HOST'),
-                'port' => env('PUSHER_PORT', 443),
-                'scheme' => env('PUSHER_SCHEME', 'https'),
+                'port' => env('PUSHER_HOST') ? (int) env('PUSHER_PORT', 443) : null,
+                'scheme' => env('PUSHER_HOST') ? env('PUSHER_SCHEME', 'https') : null,
                 'encrypted' => true,
                 'useTLS' => env('PUSHER_SCHEME', 'https') === 'https',
-            ],
+            ], fn ($v) => $v !== null),
             'client_options' => [
                 // Guzzle client options: https://docs.guzzlephp.org/en/stable/request-options.html
             ],
