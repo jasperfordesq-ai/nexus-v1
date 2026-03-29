@@ -421,6 +421,21 @@ export function Navbar({ onMobileMenuOpen, externalSearchOpen, onSearchOpenChang
                   <Moon className="w-3.5 h-3.5 text-indigo-500" aria-hidden="true" />
                 )}
               </Button>
+              <span className="text-[var(--border-default)] text-xs select-none shrink-0">|</span>
+              {/* Search — in utility bar on desktop */}
+              <Button
+                variant="light"
+                size="sm"
+                onPress={() => setIsSearchOpen(true)}
+                aria-label="Search (Ctrl+K)"
+                className="flex items-center gap-1 px-2 h-7 min-w-0 text-theme-muted hover:text-theme-primary text-xs shrink-0"
+              >
+                <Search className="w-3.5 h-3.5 shrink-0" aria-hidden="true" />
+                <span className="hidden md:inline">Search</span>
+                <kbd className="hidden lg:inline-flex items-center gap-0.5 ml-0.5 px-1 py-0 rounded bg-theme-hover/60 text-[10px] font-medium text-theme-subtle">
+                  <span className="text-xs">⌘</span>K
+                </kbd>
+              </Button>
             </div>
           </div>
         </div>
@@ -622,18 +637,16 @@ export function Navbar({ onMobileMenuOpen, externalSearchOpen, onSearchOpenChang
 
             {/* User Actions */}
             <div className="flex items-center gap-1 sm:gap-2">
-              {/* Command Palette Trigger — single unified button */}
+              {/* Search — visible on mobile/tablet where utility bar is hidden */}
               <Button
+                isIconOnly
                 variant="light"
+                size="sm"
                 onPress={() => setIsSearchOpen(true)}
                 aria-label="Search (Ctrl+K)"
-                className="flex items-center gap-1.5 px-2.5 py-1.5 min-w-[44px] min-h-[44px] h-auto rounded-lg text-theme-muted hover:text-theme-primary hover:bg-theme-hover border border-transparent lg:border-theme-default transition-colors"
+                className="sm:hidden text-theme-muted hover:text-theme-primary min-w-[44px] min-h-[44px]"
               >
-                <Search className="w-4 h-4" aria-hidden="true" />
-                <span className="hidden lg:inline text-xs text-theme-subtle">Search</span>
-                <kbd className="hidden lg:inline-flex items-center gap-0.5 ml-1 px-1.5 py-0.5 rounded bg-theme-hover/60 text-[10px] font-medium text-theme-subtle">
-                  <span className="text-xs">⌘</span>K
-                </kbd>
+                <Search className="w-5 h-5" aria-hidden="true" />
               </Button>
 
               {isAuthenticated ? (
