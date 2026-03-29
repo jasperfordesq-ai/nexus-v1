@@ -824,7 +824,7 @@ function EngagementTab() {
             {t('achievements.engagement.title', 'Monthly Engagement')}
           </h4>
           <Chip size="sm" color={activeCount >= 6 ? 'success' : 'default'} variant="flat">
-            {t('achievements.engagement.months_active', { count: activeCount }, `${activeCount} of 12 months`)}
+            {t('achievements.engagement.months_active', { count: activeCount, defaultValue: `${activeCount} of 12 months` })}
           </Chip>
         </div>
 
