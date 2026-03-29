@@ -8,6 +8,7 @@ namespace App\Services;
 
 use App\Core\TenantContext;
 use App\Models\JobVacancy;
+use App\Models\Notification;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
@@ -106,6 +107,22 @@ class JobModerationService
                 'job_id' => $jobId,
             ]);
 
+            // Notify the job poster
+            try {
+                Notification::createNotification(
+                    (int) $job->user_id,
+                    'Your job posting has been approved!',
+                    "/jobs/{$jobId}",
+                    'job_moderation'
+                );
+            } catch (\Throwable $e) {
+                Log::warning('JobModerationService::approveJob notification failed', [
+                    'job_id' => $jobId,
+                    'user_id' => $job->user_id,
+                    'error' => $e->getMessage(),
+                ]);
+            }
+
             return true;
         } catch (\Throwable $e) {
             Log::error('JobModerationService::approveJob failed: ' . $e->getMessage());
@@ -141,6 +158,22 @@ class JobModerationService
                 'tenant_id' => $tenantId,
                 'job_id' => $jobId,
             ]);
+
+            // Notify the job poster
+            try {
+                Notification::createNotification(
+                    (int) $job->user_id,
+                    'Your job posting was not approved',
+                    "/jobs/{$jobId}",
+                    'job_moderation'
+                );
+            } catch (\Throwable $e) {
+                Log::warning('JobModerationService::rejectJob notification failed', [
+                    'job_id' => $jobId,
+                    'user_id' => $job->user_id,
+                    'error' => $e->getMessage(),
+                ]);
+            }
 
             return true;
         } catch (\Throwable $e) {

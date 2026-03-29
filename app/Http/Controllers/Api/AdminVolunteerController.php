@@ -10,8 +10,10 @@ use App\Services\VolunteerService;
 use App\Services\VolunteerReminderService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Schema;
 use App\Core\TenantContext;
+use App\Models\Notification;
 
 /**
  * AdminVolunteerController -- Admin volunteer management.
@@ -430,6 +432,25 @@ class AdminVolunteerController extends BaseApiController
 
             DB::update("UPDATE vol_applications SET status = 'approved', updated_at = NOW() WHERE id = ? AND tenant_id = ?", [$id, $tenantId]);
 
+            // Notify the applicant
+            try {
+                $applicantId = (int) $app->user_id;
+
+                if ($applicantId) {
+                    $opportunityTitle = $app->opportunity_title ?? 'a volunteer opportunity';
+                    Notification::createNotification(
+                        $applicantId,
+                        'Your volunteer application has been approved!',
+                        '/volunteering',
+                        'moderation',
+                        true,
+                        $tenantId
+                    );
+                }
+            } catch (\Throwable $e) {
+                Log::warning("AdminVolunteerController::approveApplication notification failed: " . $e->getMessage());
+            }
+
             return $this->respondWithData(['message' => 'Application approved']);
         } catch (\Exception $e) {
             return $this->respondWithError('SERVER_ERROR', 'Failed to approve application', null, 500);
@@ -452,7 +473,7 @@ class AdminVolunteerController extends BaseApiController
 
         try {
             $app = DB::selectOne(
-                "SELECT va.id, va.status FROM vol_applications va INNER JOIN vol_opportunities vo ON va.opportunity_id = vo.id
+                "SELECT va.id, va.status, va.user_id FROM vol_applications va INNER JOIN vol_opportunities vo ON va.opportunity_id = vo.id
                  WHERE va.id = ? AND va.tenant_id = ? AND vo.tenant_id = ?",
                 [$id, $tenantId, $tenantId]
             );
@@ -466,6 +487,24 @@ class AdminVolunteerController extends BaseApiController
             }
 
             DB::update("UPDATE vol_applications SET status = 'declined', updated_at = NOW() WHERE id = ? AND tenant_id = ?", [$id, $tenantId]);
+
+            // Notify the applicant
+            try {
+                $applicantId = (int) $app->user_id;
+
+                if ($applicantId) {
+                    Notification::createNotification(
+                        $applicantId,
+                        'Your volunteer application was not accepted.',
+                        null,
+                        'moderation',
+                        true,
+                        $tenantId
+                    );
+                }
+            } catch (\Throwable $e) {
+                Log::warning("AdminVolunteerController::declineApplication notification failed: " . $e->getMessage());
+            }
 
             return $this->respondWithData(['message' => 'Application declined']);
         } catch (\Exception $e) {

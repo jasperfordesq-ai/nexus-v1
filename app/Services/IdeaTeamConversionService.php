@@ -8,6 +8,7 @@ namespace App\Services;
 
 use App\Core\TenantContext;
 use App\Models\IdeaTeamLink;
+use App\Models\Notification;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
@@ -153,6 +154,22 @@ class IdeaTeamConversionService
                     DB::table('groups')
                         ->where('id', $groupId)
                         ->update(['cached_member_count' => 2]);
+
+                    // Notify the idea author that they've been added to the new group
+                    try {
+                        Notification::createNotification(
+                            (int) $idea->user_id,
+                            "You've been added to {$groupName}",
+                            "/groups/{$groupId}",
+                            'group_added'
+                        );
+                    } catch (\Throwable $e) {
+                        Log::warning('IdeaTeamConversionService: failed to notify added user', [
+                            'user_id' => $idea->user_id,
+                            'group_id' => $groupId,
+                            'error' => $e->getMessage(),
+                        ]);
+                    }
                 }
 
                 return [

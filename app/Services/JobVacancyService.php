@@ -13,6 +13,7 @@ use App\Models\JobApplicationHistory;
 use App\Models\JobVacancy;
 use App\Models\SavedJob;
 use App\Models\User;
+use App\Models\Notification;
 use App\Services\JobModerationService;
 use App\Services\JobSpamDetectionService;
 use Illuminate\Database\Eloquent\Builder;
@@ -801,6 +802,32 @@ class JobVacancyService
                 ]);
             } catch (\Throwable $e) {
                 Log::warning('JobVacancyService::updateApplicationStatus webhook dispatch failed: ' . $e->getMessage());
+            }
+
+            // Notify the applicant about their status change
+            try {
+                $jobTitle = $application->vacancy->title ?? 'a job';
+                $applicantId = (int) $application->user_id;
+
+                $message = match ($status) {
+                    'shortlisted' => "Your application for {$jobTitle} has been shortlisted!",
+                    'rejected'    => "Your application for {$jobTitle} was not successful",
+                    'hired', 'accepted' => "Congratulations! You've been hired for {$jobTitle}",
+                    default       => "Your application for {$jobTitle} status updated to {$status}",
+                };
+
+                Notification::createNotification(
+                    $applicantId,
+                    $message,
+                    "/jobs/{$application->vacancy_id}",
+                    'job_application'
+                );
+            } catch (\Throwable $e) {
+                Log::warning('JobVacancyService::updateApplicationStatus notification failed', [
+                    'application_id' => $applicationId,
+                    'status' => $status,
+                    'error' => $e->getMessage(),
+                ]);
             }
 
             return true;

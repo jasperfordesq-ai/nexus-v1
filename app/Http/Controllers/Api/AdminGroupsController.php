@@ -15,6 +15,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use App\Core\TenantContext;
 use App\Models\ActivityLog;
+use App\Models\Notification;
 
 /**
  * AdminGroupsController -- Admin group management (list, analytics, approvals, moderation,
@@ -256,6 +257,26 @@ class AdminGroupsController extends BaseApiController
             );
             ActivityLog::log($adminId, 'admin_approve_group_member', "Approved membership #{$id} for group \"{$membership->group_name}\"");
 
+            // Notify the member they've been approved (unless admin is the member)
+            try {
+                if ((int) $membership->user_id !== $adminId) {
+                    Notification::createNotification(
+                        (int) $membership->user_id,
+                        "You've been approved to join {$membership->group_name}",
+                        "/groups/{$membership->group_id}",
+                        'info',
+                        false,
+                        $tenantId
+                    );
+                }
+            } catch (\Throwable $e) {
+                Log::warning('Failed to send group member approval notification', [
+                    'membership_id' => $id,
+                    'user_id' => $membership->user_id,
+                    'error' => $e->getMessage(),
+                ]);
+            }
+
             return $this->respondWithData(['id' => (int) $id, 'status' => 'approved']);
         } catch (\Exception $e) {
             return $this->respondWithError('GROUPS_APPROVE_ERROR', 'Failed to approve membership', null, 500);
@@ -286,6 +307,26 @@ class AdminGroupsController extends BaseApiController
             );
             ActivityLog::log($adminId, 'admin_reject_group_member', "Rejected membership #{$id} for group \"{$membership->group_name}\"");
 
+            // Notify the member their request was declined (unless admin is the member)
+            try {
+                if ((int) $membership->user_id !== $adminId) {
+                    Notification::createNotification(
+                        (int) $membership->user_id,
+                        "Your request to join {$membership->group_name} was declined",
+                        null,
+                        'info',
+                        false,
+                        $tenantId
+                    );
+                }
+            } catch (\Throwable $e) {
+                Log::warning('Failed to send group member rejection notification', [
+                    'membership_id' => $id,
+                    'user_id' => $membership->user_id,
+                    'error' => $e->getMessage(),
+                ]);
+            }
+
             return $this->respondWithData(['id' => (int) $id, 'status' => 'rejected']);
         } catch (\Exception $e) {
             return $this->respondWithError('GROUPS_REJECT_ERROR', 'Failed to reject membership', null, 500);
@@ -295,12 +336,38 @@ class AdminGroupsController extends BaseApiController
     /** POST /api/v2/admin/groups/{id}/approve */
     public function approve(int $id): JsonResponse
     {
-        $this->requireAdmin();
+        $adminId = $this->requireAdmin();
         $tenantId = $this->getTenantId();
 
-        $affected = DB::update("UPDATE `groups` SET is_active = 1 WHERE id = ? AND tenant_id = ?", [$id, $tenantId]);
-        if ($affected === 0) {
+        $group = DB::selectOne(
+            "SELECT id, name, owner_id FROM `groups` WHERE id = ? AND tenant_id = ?",
+            [$id, $tenantId]
+        );
+
+        if (!$group) {
             return $this->respondWithError('NOT_FOUND', 'Group not found', null, 404);
+        }
+
+        DB::update("UPDATE `groups` SET is_active = 1 WHERE id = ? AND tenant_id = ?", [$id, $tenantId]);
+
+        // Notify the group owner (unless the admin is the owner)
+        try {
+            if ($group->owner_id && (int) $group->owner_id !== $adminId) {
+                Notification::createNotification(
+                    (int) $group->owner_id,
+                    'Your group has been approved!',
+                    "/groups/{$id}",
+                    'info',
+                    false,
+                    $tenantId
+                );
+            }
+        } catch (\Throwable $e) {
+            Log::warning('Failed to send group approval notification', [
+                'group_id' => $id,
+                'owner_id' => $group->owner_id,
+                'error' => $e->getMessage(),
+            ]);
         }
 
         return $this->respondWithData(['id' => $id, 'status' => 'active']);
@@ -741,7 +808,7 @@ class AdminGroupsController extends BaseApiController
 
         try {
             $member = DB::selectOne(
-                "SELECT gm.role, g.tenant_id FROM group_members gm
+                "SELECT gm.role, g.tenant_id, g.name as group_name FROM group_members gm
                  JOIN `groups` g ON gm.group_id = g.id
                  WHERE gm.group_id = ? AND gm.user_id = ? AND g.tenant_id = ?",
                 [(int) $groupId, (int) $userId, $tenantId]
@@ -756,6 +823,26 @@ class AdminGroupsController extends BaseApiController
                 [(int) $groupId, (int) $userId, $tenantId]
             );
             ActivityLog::log($adminId, 'admin_kick_group_member', "Kicked user #{$userId} from group #{$groupId}");
+
+            // Notify the kicked member (unless the admin kicked themselves)
+            try {
+                if ((int) $userId !== $adminId) {
+                    Notification::createNotification(
+                        (int) $userId,
+                        "You have been removed from {$member->group_name}",
+                        null,
+                        'info',
+                        false,
+                        $tenantId
+                    );
+                }
+            } catch (\Throwable $e) {
+                Log::warning('Failed to send group kick notification', [
+                    'group_id' => $groupId,
+                    'user_id' => $userId,
+                    'error' => $e->getMessage(),
+                ]);
+            }
 
             return $this->respondWithData(['kicked' => true]);
         } catch (\Exception $e) {

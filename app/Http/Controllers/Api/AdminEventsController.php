@@ -8,7 +8,9 @@ namespace App\Http\Controllers\Api;
 
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use App\Models\ActivityLog;
+use App\Models\Notification;
 use App\Services\EventService;
 
 /**
@@ -106,16 +108,41 @@ class AdminEventsController extends BaseApiController
      */
     public function approve(int $id): JsonResponse
     {
-        $this->requireAdmin();
+        $adminId = $this->requireAdmin();
         $tenantId = $this->getTenantId();
 
-        $affected = DB::update(
+        $event = DB::selectOne(
+            'SELECT id, title, created_by FROM events WHERE id = ? AND tenant_id = ?',
+            [$id, $tenantId]
+        );
+
+        if (!$event) {
+            return $this->respondWithError('NOT_FOUND', 'Event not found', null, 404);
+        }
+
+        DB::update(
             'UPDATE events SET status = ? WHERE id = ? AND tenant_id = ?',
             ['active', $id, $tenantId]
         );
 
-        if ($affected === 0) {
-            return $this->respondWithError('NOT_FOUND', 'Event not found', null, 404);
+        // Notify the event organizer (unless the admin is the organizer)
+        try {
+            if ((int) $event->created_by !== $adminId) {
+                Notification::createNotification(
+                    (int) $event->created_by,
+                    'Your event has been approved!',
+                    "/events/{$id}",
+                    'info',
+                    false,
+                    $tenantId
+                );
+            }
+        } catch (\Throwable $e) {
+            Log::warning('Failed to send event approval notification', [
+                'event_id' => $id,
+                'user_id' => $event->created_by,
+                'error' => $e->getMessage(),
+            ]);
         }
 
         return $this->respondWithData(['id' => $id, 'status' => 'active']);

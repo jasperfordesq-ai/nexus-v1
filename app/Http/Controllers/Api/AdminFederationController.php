@@ -10,8 +10,10 @@ use App\Services\FederationActivityService;
 use App\Services\FederationAuditService;
 use App\Services\FederationDirectoryService;
 use App\Services\FederationPartnershipService;
+use App\Models\Notification;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use App\Core\TenantContext;
 
 /**
@@ -38,6 +40,49 @@ class AdminFederationController extends BaseApiController
     {
         if (!in_array($table, self::ALLOWED_TABLES, true)) { return false; }
         try { DB::select("SELECT 1 FROM `{$table}` LIMIT 1"); return true; } catch (\Exception $e) { return false; }
+    }
+
+    /**
+     * Notify admin users in a partner tenant about a federation event.
+     *
+     * Uses explicit tenantId parameter on createNotification() for cross-tenant writes.
+     */
+    private function notifyPartnerAdmins(int $partnerTenantId, string $message, string $type = 'federation', ?string $link = '/admin/federation'): void
+    {
+        try {
+            $admins = DB::select(
+                "SELECT id FROM users WHERE tenant_id = ? AND role IN ('admin', 'tenant_admin') AND status = 'active'",
+                [$partnerTenantId]
+            );
+            foreach ($admins as $admin) {
+                Notification::createNotification(
+                    (int) $admin->id,
+                    $message,
+                    $link,
+                    $type,
+                    true,
+                    $partnerTenantId
+                );
+            }
+        } catch (\Exception $e) {
+            Log::warning('[Federation] Failed to notify partner admins', [
+                'partner_tenant_id' => $partnerTenantId,
+                'error' => $e->getMessage(),
+            ]);
+        }
+    }
+
+    /**
+     * Get the current tenant's display name.
+     */
+    private function getTenantName(int $tenantId): string
+    {
+        try {
+            $tenant = DB::selectOne("SELECT name FROM tenants WHERE id = ?", [$tenantId]);
+            return $tenant->name ?? 'A partner community';
+        } catch (\Exception $e) {
+            return 'A partner community';
+        }
     }
 
     // ─────────────────────────────────────────────────────────────────────────
@@ -206,6 +251,16 @@ class AdminFederationController extends BaseApiController
                 return $this->respondWithError('INVALID_STATE', 'Only pending partnerships can be approved (current: ' . $partner->status . ')', null, 409);
             }
             DB::update("UPDATE federation_partnerships SET status = 'active', updated_at = NOW() WHERE id = ? AND partner_tenant_id = ?", [$id, $tenantId]);
+
+            // Notify the initiating tenant's admins that partnership was approved
+            $initiatorTenantId = (int) $partner->tenant_id;
+            $tenantName = $this->getTenantName($tenantId);
+            $this->notifyPartnerAdmins(
+                $initiatorTenantId,
+                "{$tenantName} has approved your federation partnership request.",
+                'federation_partnership_approved'
+            );
+
             return $this->respondWithData(['message' => 'Partnership approved']);
         } catch (\Exception $e) { return $this->respondWithError('UPDATE_FAILED', 'Failed to approve partnership'); }
     }
@@ -225,6 +280,18 @@ class AdminFederationController extends BaseApiController
                 return $this->respondWithError('INVALID_STATE', 'Only pending partnerships can be rejected (current: ' . $partner->status . ')', null, 409);
             }
             DB::update("UPDATE federation_partnerships SET status = 'terminated', updated_at = NOW() WHERE id = ? AND (tenant_id = ? OR partner_tenant_id = ?)", [$id, $tenantId, $tenantId]);
+
+            // Notify the other tenant's admins that partnership was rejected
+            $otherTenantId = ((int) $partner->tenant_id === $tenantId)
+                ? (int) $partner->partner_tenant_id
+                : (int) $partner->tenant_id;
+            $tenantName = $this->getTenantName($tenantId);
+            $this->notifyPartnerAdmins(
+                $otherTenantId,
+                "{$tenantName} has rejected the federation partnership request.",
+                'federation_partnership_rejected'
+            );
+
             return $this->respondWithData(['message' => 'Partnership rejected']);
         } catch (\Exception $e) { return $this->respondWithError('UPDATE_FAILED', 'Failed to reject partnership'); }
     }
@@ -244,6 +311,18 @@ class AdminFederationController extends BaseApiController
                 return $this->respondWithError('INVALID_STATE', 'Only active or suspended partnerships can be terminated (current: ' . $partner->status . ')', null, 409);
             }
             DB::update("UPDATE federation_partnerships SET status = 'terminated', updated_at = NOW() WHERE id = ? AND (tenant_id = ? OR partner_tenant_id = ?)", [$id, $tenantId, $tenantId]);
+
+            // Notify the other tenant's admins that partnership was terminated
+            $otherTenantId = ((int) $partner->tenant_id === $tenantId)
+                ? (int) $partner->partner_tenant_id
+                : (int) $partner->tenant_id;
+            $tenantName = $this->getTenantName($tenantId);
+            $this->notifyPartnerAdmins(
+                $otherTenantId,
+                "{$tenantName} has terminated the federation partnership.",
+                'federation_partnership_terminated'
+            );
+
             return $this->respondWithData(['message' => 'Partnership terminated']);
         } catch (\Exception $e) { return $this->respondWithError('UPDATE_FAILED', 'Failed to terminate partnership'); }
     }

@@ -8,7 +8,9 @@ namespace App\Http\Controllers\Api;
 
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use App\Models\ActivityLog;
+use App\Models\Notification;
 
 /**
  * AdminReviewsController -- Admin review moderation.
@@ -254,9 +256,9 @@ class AdminReviewsController extends BaseApiController
         $tenantId = $this->getTenantId();
 
         if ($superAdmin) {
-            $review = DB::selectOne("SELECT id, status, tenant_id FROM reviews WHERE id = ?", [$id]);
+            $review = DB::selectOne("SELECT id, status, tenant_id, reviewer_id FROM reviews WHERE id = ?", [$id]);
         } else {
-            $review = DB::selectOne("SELECT id, status, tenant_id FROM reviews WHERE id = ? AND tenant_id = ?", [$id, $tenantId]);
+            $review = DB::selectOne("SELECT id, status, tenant_id, reviewer_id FROM reviews WHERE id = ? AND tenant_id = ?", [$id, $tenantId]);
         }
 
         if (!$review) {
@@ -273,6 +275,24 @@ class AdminReviewsController extends BaseApiController
             "Hidden review #{$id} (set status to rejected)" . ($superAdmin ? " (tenant {$reviewTenantId})" : '')
         );
 
+        // Notify the reviewer
+        try {
+            $reviewerId = (int) $review->reviewer_id;
+
+            if ($reviewerId && $reviewerId !== $adminId) {
+                Notification::createNotification(
+                    $reviewerId,
+                    'Your review has been hidden by a moderator.',
+                    null,
+                    'moderation',
+                    true,
+                    $reviewTenantId
+                );
+            }
+        } catch (\Throwable $e) {
+            Log::warning("AdminReviewsController::hide notification failed: " . $e->getMessage());
+        }
+
         return $this->respondWithData(['success' => true, 'message' => 'Review hidden']);
     }
 
@@ -286,9 +306,9 @@ class AdminReviewsController extends BaseApiController
         $tenantId = $this->getTenantId();
 
         if ($superAdmin) {
-            $review = DB::selectOne("SELECT id, tenant_id FROM reviews WHERE id = ?", [$id]);
+            $review = DB::selectOne("SELECT id, tenant_id, reviewer_id FROM reviews WHERE id = ?", [$id]);
         } else {
-            $review = DB::selectOne("SELECT id, tenant_id FROM reviews WHERE id = ? AND tenant_id = ?", [$id, $tenantId]);
+            $review = DB::selectOne("SELECT id, tenant_id, reviewer_id FROM reviews WHERE id = ? AND tenant_id = ?", [$id, $tenantId]);
         }
 
         if (!$review) {
@@ -296,6 +316,7 @@ class AdminReviewsController extends BaseApiController
         }
 
         $reviewTenantId = (int) $review->tenant_id;
+        $reviewerId = (int) $review->reviewer_id;
 
         DB::delete("DELETE FROM reviews WHERE id = ? AND tenant_id = ?", [$id, $reviewTenantId]);
 
@@ -304,6 +325,22 @@ class AdminReviewsController extends BaseApiController
             'delete_review',
             "Deleted review #{$id}" . ($superAdmin ? " (tenant {$reviewTenantId})" : '')
         );
+
+        // Notify the reviewer (review already deleted, use cached reviewer_id)
+        try {
+            if ($reviewerId && $reviewerId !== $adminId) {
+                Notification::createNotification(
+                    $reviewerId,
+                    'Your review has been removed by a moderator.',
+                    null,
+                    'moderation',
+                    true,
+                    $reviewTenantId
+                );
+            }
+        } catch (\Throwable $e) {
+            Log::warning("AdminReviewsController::destroy notification failed: " . $e->getMessage());
+        }
 
         return $this->respondWithData(['success' => true, 'message' => 'Review deleted']);
     }

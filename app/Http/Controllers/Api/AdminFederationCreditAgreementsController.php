@@ -6,6 +6,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Models\Notification;
 use App\Services\FederationAuditService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
@@ -128,13 +129,23 @@ class AdminFederationCreditAgreementsController extends BaseApiController
         ];
 
         try {
+            // Fetch agreement first so we can determine the partner tenant for notifications
+            $agreement = DB::selectOne(
+                "SELECT * FROM federation_credit_agreements WHERE id = ? AND (from_tenant_id = ? OR to_tenant_id = ?)",
+                [$id, $tenantId, $tenantId]
+            );
+
+            if (!$agreement) {
+                return $this->respondWithError('NOT_FOUND', 'Credit agreement not found', null, 404);
+            }
+
             $updated = DB::update(
                 "UPDATE federation_credit_agreements SET status = ?, updated_at = NOW() WHERE id = ? AND (from_tenant_id = ? OR to_tenant_id = ?)",
                 [$statusMap[$action], $id, $tenantId, $tenantId]
             );
 
             if ($updated === 0) {
-                return $this->respondWithError('NOT_FOUND', 'Credit agreement not found', null, 404);
+                return $this->respondWithError('UPDATE_FAILED', 'Failed to update credit agreement', null, 500);
             }
 
             try {
@@ -147,6 +158,54 @@ class AdminFederationCreditAgreementsController extends BaseApiController
                 );
             } catch (\Exception $e) {
                 // Audit logging failure should not block the operation
+            }
+
+            // Notify partner tenant admins about the status change
+            try {
+                $partnerTenantId = ((int) $agreement->from_tenant_id === $tenantId)
+                    ? (int) $agreement->to_tenant_id
+                    : (int) $agreement->from_tenant_id;
+
+                $tenantName = 'A partner community';
+                try {
+                    $tenant = DB::selectOne("SELECT name FROM tenants WHERE id = ?", [$tenantId]);
+                    if ($tenant) {
+                        $tenantName = $tenant->name;
+                    }
+                } catch (\Exception $e) {
+                    // Use fallback name
+                }
+
+                $actionLabels = [
+                    'approve'    => 'approved',
+                    'reject'     => 'rejected',
+                    'suspend'    => 'suspended',
+                    'activate'   => 'activated',
+                    'reactivate' => 'reactivated',
+                    'terminate'  => 'terminated',
+                ];
+                $label = $actionLabels[$action] ?? $action;
+
+                $admins = DB::select(
+                    "SELECT id FROM users WHERE tenant_id = ? AND role IN ('admin', 'tenant_admin') AND status = 'active'",
+                    [$partnerTenantId]
+                );
+                foreach ($admins as $admin) {
+                    Notification::createNotification(
+                        (int) $admin->id,
+                        "{$tenantName} has {$label} your federation credit agreement.",
+                        '/admin/federation',
+                        'federation_credit_agreement_' . $action,
+                        true,
+                        $partnerTenantId
+                    );
+                }
+            } catch (\Exception $e) {
+                Log::warning('[FederationCreditAgreement] Failed to notify partner admins', [
+                    'agreement_id' => $id,
+                    'action' => $action,
+                    'error' => $e->getMessage(),
+                ]);
             }
 
             return $this->respondWithData(['success' => true]);
