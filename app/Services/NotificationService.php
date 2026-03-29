@@ -106,6 +106,8 @@ class NotificationService
             'events' => 0,
             'groups' => 0,
             'listings' => 0,
+            'jobs' => 0,
+            'safeguarding' => 0,
             'system' => 0,
             'security' => 0,
             'other' => 0,
