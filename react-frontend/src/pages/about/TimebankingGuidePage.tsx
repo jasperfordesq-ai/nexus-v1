@@ -272,9 +272,9 @@ export function TimebankingGuidePage() {
                 viewport={{ once: true }}
                 transition={{ delay: index * 0.15 }}
               >
-                <GlassCard className="p-8 h-full text-center relative group hover:scale-[1.02] transition-transform">
+                <GlassCard className="p-8 h-full text-center relative group hover:scale-[1.02] transition-transform overflow-hidden">
                   {/* Step number badge */}
-                  <div className="absolute -top-3 -right-3 w-9 h-9 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white text-sm font-bold shadow-lg">
+                  <div className="absolute top-2 right-2 w-9 h-9 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white text-sm font-bold shadow-lg">
                     {index + 1}
                   </div>
 
