@@ -994,7 +994,7 @@ class AdminBrokerController extends BaseApiController
                         ? 'Your messaging has been temporarily restricted by your timebank coordinator.'
                         : 'Your account has been placed under review by your timebank coordinator.';
                     Notification::createNotification($userId, $msg, '/messages', 'system', true);
-                } catch (\Throwable $e) {}
+                } catch (\Throwable $e) { \Log::warning('[AdminBroker] monitoring notification failed', ['user_id' => $userId, 'error' => $e->getMessage()]); }
 
                 return $this->respondWithData(['user_id' => $userId, 'under_monitoring' => true]);
             } else {
@@ -1030,7 +1030,7 @@ class AdminBrokerController extends BaseApiController
 
                 try {
                     Notification::createNotification($userId, 'Your messaging restrictions have been lifted.', '/messages', 'system', true);
-                } catch (\Throwable $e) {}
+                } catch (\Throwable $e) { \Log::warning('[AdminBroker] restrictions-lifted notification failed', ['user_id' => $userId, 'error' => $e->getMessage()]); }
 
                 return $this->respondWithData(['user_id' => $userId, 'under_monitoring' => false]);
             }
