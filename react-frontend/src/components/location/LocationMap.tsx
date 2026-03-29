@@ -258,7 +258,7 @@ function LocationMapInner({
         streetViewControl={false}
         fullscreenControl={true}
         zoomControl={true}
-        styles={resolvedTheme === 'dark' ? DARK_MAP_STYLES : undefined}
+        styles={import.meta.env.VITE_GOOGLE_MAPS_MAP_ID ? undefined : (resolvedTheme === 'dark' ? DARK_MAP_STYLES : undefined)}
         clickableIcons={false}
         mapId={import.meta.env.VITE_GOOGLE_MAPS_MAP_ID || undefined}
       >
