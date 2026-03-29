@@ -225,7 +225,7 @@ class CoreController extends BaseApiController
 
         $sent = false;
         try {
-            $mailer = new Mailer();
+            $mailer = Mailer::forCurrentTenant();
             $replyTo = "{$name} <{$email}>";
             $sent = $mailer->send($tenantEmail, $emailSubject, $emailBody, null, $replyTo);
         } catch (\Exception $e) {

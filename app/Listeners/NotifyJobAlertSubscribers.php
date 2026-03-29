@@ -6,6 +6,7 @@
 
 namespace App\Listeners;
 
+use App\Core\TenantContext;
 use App\Events\JobVacancyCreated;
 use App\Models\JobAlert;
 use App\Models\Notification;
@@ -31,6 +32,9 @@ class NotifyJobAlertSubscribers implements ShouldQueue
     public function handle(JobVacancyCreated $event): void
     {
         try {
+            // Ensure tenant context is set (required when running via async queue)
+            TenantContext::setById($event->tenantId);
+
             $vacancy = $event->vacancy;
             $tenantId = $event->tenantId;
 

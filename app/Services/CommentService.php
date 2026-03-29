@@ -8,6 +8,8 @@ namespace App\Services;
 
 use App\Core\TenantContext;
 use App\Models\Comment;
+use App\Models\Notification;
+use App\Models\User;
 use App\Services\MentionService;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -142,6 +144,31 @@ class CommentService
             MentionService::processText($content, $comment->id, 'comment', $userId);
         } catch (\Exception $e) {
             Log::warning("CommentService::create mention processing failed: " . $e->getMessage());
+        }
+
+        // Notify the content owner that someone commented on their content
+        try {
+            $ownerId = self::resolveContentOwnerId($targetType, $targetId, $tenantId);
+
+            if ($ownerId && $ownerId !== $userId) {
+                $commenter = User::find($userId);
+                $commenterName = $commenter
+                    ? trim(($commenter->first_name ?? '') . ' ' . ($commenter->last_name ?? ''))
+                    : 'Someone';
+
+                $label = self::contentTypeLabel($targetType);
+                $message = "{$commenterName} commented on your {$label}";
+                $link = "/{$targetType}s/{$targetId}";
+
+                Notification::createNotification($ownerId, $message, $link, 'comment', false, $tenantId);
+            }
+        } catch (\Throwable $e) {
+            Log::warning('CommentService::create content owner notification failed', [
+                'target_type' => $targetType,
+                'target_id' => $targetId,
+                'user_id' => $userId,
+                'error' => $e->getMessage(),
+            ]);
         }
 
         return $comment;
@@ -512,6 +539,54 @@ class CommentService
     {
         preg_match_all('/@(\w+)/', $content, $matches);
         return array_unique($matches[1] ?? []);
+    }
+
+    /**
+     * Resolve the owner (user_id / author_id) of the content being commented on.
+     *
+     * Maps target_type to its database table and owner column, then queries for
+     * the owner. Returns null when the target type is unknown or the row is missing.
+     */
+    private static function resolveContentOwnerId(string $targetType, int $targetId, int $tenantId): ?int
+    {
+        // Map target_type → [table, owner_column]
+        $map = [
+            'blog_post'  => ['blog_posts',    'author_id'],
+            'blog'       => ['blog_posts',    'author_id'],
+            'listing'    => ['listings',       'user_id'],
+            'feed_post'  => ['feed_activity',  'user_id'],
+            'post'       => ['feed_activity',  'user_id'],
+            'event'      => ['events',         'user_id'],
+        ];
+
+        $entry = $map[$targetType] ?? null;
+        if (! $entry) {
+            return null;
+        }
+
+        [$table, $ownerColumn] = $entry;
+
+        $row = DB::table($table)
+            ->where('id', $targetId)
+            ->where('tenant_id', $tenantId)
+            ->select([$ownerColumn])
+            ->first();
+
+        return $row ? (int) $row->{$ownerColumn} : null;
+    }
+
+    /**
+     * Return a human-readable label for a comment target type.
+     */
+    private static function contentTypeLabel(string $targetType): string
+    {
+        return match ($targetType) {
+            'blog_post', 'blog' => 'post',
+            'listing'           => 'listing',
+            'feed_post', 'post' => 'post',
+            'event'             => 'event',
+            default             => 'content',
+        };
     }
 
     /**

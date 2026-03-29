@@ -444,7 +444,7 @@ class AdminUsersController extends BaseApiController
                     "Project NEXUS"
                 );
 
-                $mailer = new \App\Core\Mailer();
+                $mailer = \App\Core\Mailer::forCurrentTenant();
                 $mailer->send($email, "Your account on {$tenantName}", $html);
             } catch (\Throwable $e) {
                 error_log("Welcome email failed for admin-created user: " . $e->getMessage());
@@ -561,7 +561,7 @@ class AdminUsersController extends BaseApiController
                 $tenant['name']
             );
 
-            (new \App\Core\Mailer())->send(
+            (\App\Core\Mailer::forCurrentTenant())->send(
                 $user['email'],
                 "Your account has been suspended - {$tenantNameSafe}",
                 $html
@@ -616,7 +616,7 @@ class AdminUsersController extends BaseApiController
                 $tenant['name']
             );
 
-            (new \App\Core\Mailer())->send(
+            (\App\Core\Mailer::forCurrentTenant())->send(
                 $user['email'],
                 "Your account has been banned - {$tenantNameSafe}",
                 $html
@@ -692,7 +692,7 @@ class AdminUsersController extends BaseApiController
                 $tenant['name']
             );
 
-            (new \App\Core\Mailer())->send(
+            (\App\Core\Mailer::forCurrentTenant())->send(
                 $user['email'],
                 "Your account has been scheduled for deletion - {$tenantNameSafe}",
                 $html
@@ -769,7 +769,7 @@ class AdminUsersController extends BaseApiController
                 $tenant['name']
             );
 
-            (new \App\Core\Mailer())->send(
+            (\App\Core\Mailer::forCurrentTenant())->send(
                 $user['email'],
                 "Your two-factor authentication has been reset - {$tenantNameSafe}",
                 $html
@@ -973,7 +973,7 @@ class AdminUsersController extends BaseApiController
                 $tenant['name']
             );
 
-            (new \App\Core\Mailer())->send(
+            (\App\Core\Mailer::forCurrentTenant())->send(
                 $user['email'],
                 "Your password has been reset - {$tenantNameSafe}",
                 $html
@@ -1220,7 +1220,7 @@ class AdminUsersController extends BaseApiController
                 $tenant['name']
             );
 
-            $mailer = new \App\Core\Mailer();
+            $mailer = \App\Core\Mailer::forCurrentTenant();
             $mailer->send($user['email'], "Password Reset - {$tenantNameSafe}", $html);
 
             ActivityLog::log($adminId, 'admin_send_password_reset', "Sent password reset email to user #{$id} ({$user['email']})");
@@ -1283,7 +1283,7 @@ class AdminUsersController extends BaseApiController
                 );
             }
 
-            $mailer = new \App\Core\Mailer();
+            $mailer = \App\Core\Mailer::forCurrentTenant();
             $mailer->send($user['email'], $subject, $html);
 
             ActivityLog::log($adminId, 'admin_resend_welcome', "Resent welcome email to user #{$id} ({$user['email']})");
@@ -1644,7 +1644,7 @@ class AdminUsersController extends BaseApiController
                 ? "Welcome to {$tenantNameSafe} — {$creditsAwarded} time credits are waiting for you!"
                 : "Welcome to {$tenantNameSafe} — your account is approved!";
 
-            $result = (new \App\Core\Mailer())->send($user['email'], $subject, $html);
+            $result = (\App\Core\Mailer::forCurrentTenant())->send($user['email'], $subject, $html);
 
             if ($result) {
                 error_log("[AdminUsers] Welcome email sent to user #{$user['id']} (credits: {$creditsAwarded})");
@@ -1712,7 +1712,7 @@ class AdminUsersController extends BaseApiController
                 $tenant['name']
             );
 
-            $result = (new \App\Core\Mailer())->send(
+            $result = (\App\Core\Mailer::forCurrentTenant())->send(
                 $user['email'],
                 "Your account has been reactivated - {$tenantNameSafe}",
                 $html

@@ -436,6 +436,32 @@ class RegistrationOrchestrationService
     private static function handleOpenWithApproval(int $userId, int $tenantId, array $policy): array
     {
         // User stays is_approved=0, admin must approve
+
+        // Notify all tenant admins that a new user requires approval
+        try {
+            $user = \Illuminate\Support\Facades\DB::table('users')
+                ->where('id', $userId)
+                ->where('tenant_id', $tenantId)
+                ->select(['first_name', 'last_name', 'name', 'email'])
+                ->first();
+
+            if ($user) {
+                $userName = trim(($user->first_name ?? '') . ' ' . ($user->last_name ?? ''));
+                if (empty($userName)) {
+                    $userName = $user->name ?? 'Unknown';
+                }
+                $email = $user->email ?? '';
+
+                \App\Services\NotificationDispatcher::notifyAdmins(
+                    'pending_approval',
+                    ['user_id' => $userId, 'user_name' => $userName, 'email' => $email],
+                    "New user {$userName} ({$email}) requires approval"
+                );
+            }
+        } catch (\Throwable $e) {
+            error_log("[RegistrationOrchestrationService] Failed to notify admins of pending approval for user #{$userId}: " . $e->getMessage());
+        }
+
         return [
             'action' => 'pending_approval',
             'requires_verification' => false,

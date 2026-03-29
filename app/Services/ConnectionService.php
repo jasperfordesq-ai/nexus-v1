@@ -6,10 +6,12 @@
 
 namespace App\Services;
 
+use App\Events\ConnectionRequested;
 use App\Models\Connection;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 /**
  * ConnectionService — Laravel DI-based service for user connections.
@@ -114,7 +116,7 @@ class ConnectionService
             throw new \RuntimeException('User not found');
         }
 
-        return DB::transaction(function () use ($requesterId, $receiverId) {
+        $connection = DB::transaction(function () use ($requesterId, $receiverId) {
             // Lock both user rows (in consistent order to prevent deadlocks) to serialize
             // concurrent connection requests between the same pair of users
             $minId = min($requesterId, $receiverId);
@@ -147,6 +149,29 @@ class ConnectionService
 
             return $connection->fresh(['requester', 'receiver']);
         });
+
+        // Dispatch ConnectionRequested event AFTER the transaction has committed.
+        // Wrapped in try/catch so a notification/broadcast failure never breaks
+        // the connection creation itself.
+        try {
+            if ($connection->requester && $connection->receiver) {
+                event(new ConnectionRequested(
+                    connection: $connection,
+                    requester: $connection->requester,
+                    target: $connection->receiver,
+                    tenantId: (int) $connection->requester->tenant_id,
+                ));
+            }
+        } catch (\Throwable $e) {
+            Log::error('Failed to dispatch ConnectionRequested event', [
+                'connection_id' => $connection->id,
+                'requester_id'  => $requesterId,
+                'receiver_id'   => $receiverId,
+                'error'         => $e->getMessage(),
+            ]);
+        }
+
+        return $connection;
     }
 
     /**

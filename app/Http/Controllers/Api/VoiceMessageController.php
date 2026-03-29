@@ -142,7 +142,7 @@ class VoiceMessageController extends BaseApiController
                 );
 
                 try {
-                    $mailer = new Mailer();
+                    $mailer = Mailer::forCurrentTenant();
                     $mailer->send($receiver->email, "Voice Message from " . ($sender->name ?? 'Someone'), $emailHtml);
                 } catch (\Throwable $e) {
                     error_log("Voice Message Email Notification Failed: " . $e->getMessage());
