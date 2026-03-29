@@ -24,7 +24,9 @@ This project uses **Claude Opus 4.6 Agent Teams** (swarm mode) for large, multi-
 
 ## Project Overview (Stack)
 
-This is a TypeScript-first codebase (Laravel backend + React/React Native frontend). Always use TypeScript for new frontend files. The primary language stack is TypeScript (React/RN), PHP (Laravel), with JSON configs and Markdown docs.
+This is a **multi-tenant Laravel + React/TypeScript application**. The backend uses Laravel with tenant scoping. The frontend is TypeScript React. Always check tenant context when debugging issues. Always use TypeScript for new frontend files. The primary language stack is TypeScript (React/RN), PHP (Laravel), with JSON configs and Markdown docs.
+
+**Infrastructure:** The web server is **Apache** (not nginx) running on Plesk/Azure. Do not assume nginx for any server configuration tasks.
 
 ---
 
@@ -32,11 +34,17 @@ This is a TypeScript-first codebase (Laravel backend + React/React Native fronte
 
 When committing code, always use `--no-verify` flag if pre-commit hooks fail due to pre-existing issues in unstaged files. Do not spend multiple cycles trying to fix pre-existing lint/test errors that are unrelated to the current changes.
 
+Pre-commit hooks (husky/eslint) have known pre-existing failures. When commits are blocked by pre-existing lint or test errors unrelated to current changes, use `--no-verify` to bypass rather than attempting to fix all pre-existing issues.
+
 ---
 
 ## Audit Workflow
 
 When performing audits, use parallel agent teams (5-8 agents) scoped by domain/module. After fixes, always commit and push before moving to next module. Never claim work is complete without verifying the actual file changes exist.
+
+## Agent Guidelines
+
+When running audits, limit parallel background agents to **5 maximum**. Do NOT spawn excessive background tasks. Report progress concisely without flooding the session with notifications.
 
 ---
 
@@ -44,11 +52,15 @@ When performing audits, use parallel agent teams (5-8 agents) scoped by domain/m
 
 After deploying to production, always check for CORS errors, tenant binding issues, and feature gate problems. Run a quick smoke test of critical endpoints before reporting deployment success.
 
+When deploying to production, always verify the deployment is working by checking key endpoints before reporting success. Never skip migration dry-runs on production.
+
 ---
 
 ## Debugging Guidelines
 
 When debugging a bug, do NOT apply surface-level fixes. Identify the root cause first. If the user reports the bug persists after a fix, re-examine assumptions rather than tweaking the same approach.
+
+When debugging, do NOT go in circles. If an approach fails twice, stop and reassess the root cause before trying again. Never claim something is fixed without verifying it actually works end-to-end.
 
 ---
 
