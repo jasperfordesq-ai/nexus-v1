@@ -216,6 +216,23 @@ class AdminTimebankingController extends BaseApiController
             return $this->respondWithError('SERVER_ERROR', 'Failed to adjust balance', null, 500);
         }
 
+        // Notify user of balance adjustment
+        try {
+            $absAmount = abs($amount);
+            $hourLabel = $absAmount == 1 ? 'hour' : 'hours';
+            $msg = $amount > 0
+                ? "Your balance was adjusted: +{$absAmount} {$hourLabel} added by coordinator"
+                : "Your balance was adjusted: -{$absAmount} {$hourLabel} removed by coordinator";
+            \App\Models\Notification::createNotification(
+                $userId,
+                $msg,
+                '/wallet',
+                'transaction'
+            );
+        } catch (\Throwable $e) {
+            \Log::warning('Balance adjustment notification failed', ['user_id' => $userId, 'error' => $e->getMessage()]);
+        }
+
         return $this->respondWithData([
             'user_id' => $userId,
             'user_name' => $result['user_name'],

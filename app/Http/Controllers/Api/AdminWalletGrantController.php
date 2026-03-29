@@ -161,6 +161,19 @@ class AdminWalletGrantController extends BaseApiController
         $userName = trim(($user->first_name ?? '') . ' ' . ($user->last_name ?? ''));
         ActivityLog::log($adminId, 'admin_grant_credits', "Granted {$amount} credits to user #{$userId} ({$userName}). Reason: " . ($reason ?? 'Admin credit grant'));
 
+        // Notify user of credit grant
+        try {
+            $hourLabel = $amount == 1 ? 'hour' : 'hours';
+            \App\Models\Notification::createNotification(
+                $userId,
+                "You received {$amount} {$hourLabel} from your timebank coordinator",
+                '/wallet',
+                'transaction'
+            );
+        } catch (\Throwable $e) {
+            \Log::warning('Admin grant notification failed', ['user_id' => $userId, 'error' => $e->getMessage()]);
+        }
+
         return $this->respondWithData([
             'grant' => [
                 'id' => $grantId,

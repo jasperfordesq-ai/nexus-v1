@@ -838,6 +838,20 @@ class FederationController extends BaseApiController
             'external_partner' => $isExternal,
         ]);
 
+        // Notify reviewee of federated review
+        try {
+            $reviewerName = 'A member from another community';
+            \App\Models\Notification::createNotification(
+                (int) $input['reviewee_id'],
+                "{$reviewerName} left you a {$rating}-star review",
+                '/reviews',
+                'review',
+                (int) $reviewee['tenant_id']
+            );
+        } catch (\Throwable $e) {
+            \Log::warning('[Federation] review notification failed', ['reviewee' => $input['reviewee_id'] ?? null, 'error' => $e->getMessage()]);
+        }
+
         return $this->fedSuccess([
             'data' => [
                 'id' => (int) $reviewId,
