@@ -171,12 +171,10 @@ class ReviewsController extends BaseApiController
                 );
 
                 // Email notification (respects user preference)
-                $emailPref = \Illuminate\Support\Facades\DB::table('users')
-                    ->where('id', $receiverId)
-                    ->where('tenant_id', \App\Core\TenantContext::getId())
-                    ->value('email_reviews');
+                $prefs = \App\Models\User::getNotificationPreferences($receiverId);
+                $emailPref = $prefs['email_reviews'] ?? 1;
 
-                if ($emailPref === null || (int) $emailPref === 1) {
+                if ((int) $emailPref === 1) {
                     \App\Services\NotificationDispatcher::sendReviewEmail(
                         $receiverId,
                         $reviewerName,

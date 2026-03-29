@@ -141,6 +141,26 @@ class DeliverableController extends BaseApiController
 
         $commentId = (int) DB::getPdo()->lastInsertId();
 
+        // Notify deliverable owner of new comment
+        try {
+            $owner = DB::selectOne(
+                'SELECT user_id, title FROM deliverables WHERE id = ? AND tenant_id = ?',
+                [$id, $tenantId]
+            );
+            if ($owner && (int) $owner->user_id !== $userId) {
+                $commenter = \App\Models\User::find($userId);
+                $commenterName = $commenter->first_name ?? $commenter->name ?? 'Someone';
+                \App\Models\Notification::createNotification(
+                    (int) $owner->user_id,
+                    "{$commenterName} commented on your deliverable \"{$owner->title}\"",
+                    "/deliverables/{$id}",
+                    'comment'
+                );
+            }
+        } catch (\Throwable $e) {
+            \Log::warning('Deliverable comment notification failed', ['deliverable_id' => $id, 'error' => $e->getMessage()]);
+        }
+
         return $this->respondWithData(['id' => $commentId, 'deliverable_id' => $id], null, 201);
     }
 }

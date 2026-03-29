@@ -209,7 +209,7 @@ class Message extends Model
 HTML;
 
             if ($frequency === 'instant') {
-                $mailer = new \App\Core\Mailer();
+                $mailer = \App\Core\Mailer::forCurrentTenant();
                 $mailer->send($receiver->email, "New Message from {$safeSenderName}", $htmlBody);
             } else {
                 // Queue for daily digest
