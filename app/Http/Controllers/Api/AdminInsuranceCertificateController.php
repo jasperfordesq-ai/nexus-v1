@@ -7,6 +7,8 @@
 namespace App\Http\Controllers\Api;
 
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Log;
+use App\Models\Notification;
 use App\Services\InsuranceCertificateService;
 
 /**
@@ -186,6 +188,22 @@ class AdminInsuranceCertificateController extends BaseApiController
             }
 
             $this->insuranceCertificateService->verify($id, $adminId);
+
+            // Notify the user that their insurance certificate was verified
+            try {
+                if (!empty($existing['user_id'])) {
+                    Notification::createNotification(
+                        (int) $existing['user_id'],
+                        'Your insurance certificate has been verified!',
+                        '/dashboard',
+                        'moderation',
+                        true
+                    );
+                }
+            } catch (\Throwable $e) {
+                Log::warning("AdminInsuranceCertificateController::verify notification failed for cert #{$id}: " . $e->getMessage());
+            }
+
             $record = $this->insuranceCertificateService->getById($id);
 
             return $this->respondWithData($record);
@@ -211,6 +229,22 @@ class AdminInsuranceCertificateController extends BaseApiController
             }
 
             $this->insuranceCertificateService->reject($id, $adminId, $reason);
+
+            // Notify the user that their insurance certificate was not approved
+            try {
+                if (!empty($existing['user_id'])) {
+                    Notification::createNotification(
+                        (int) $existing['user_id'],
+                        'Your insurance certificate was not approved. Please contact support for details.',
+                        '/help',
+                        'moderation',
+                        true
+                    );
+                }
+            } catch (\Throwable $e) {
+                Log::warning("AdminInsuranceCertificateController::reject notification failed for cert #{$id}: " . $e->getMessage());
+            }
+
             $record = $this->insuranceCertificateService->getById($id);
 
             return $this->respondWithData($record);

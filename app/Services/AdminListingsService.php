@@ -7,6 +7,7 @@
 namespace App\Services;
 
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 /**
  * AdminListingsService — Laravel DI-based service for admin listing management.
@@ -42,7 +43,18 @@ class AdminListingsService
      */
     public function approve(int $listingId, int $tenantId, int $adminId): bool
     {
-        return DB::table('listings')
+        // Fetch listing data before update for notification
+        $listing = DB::table('listings')
+            ->where('id', $listingId)
+            ->where('tenant_id', $tenantId)
+            ->where('status', 'pending')
+            ->first();
+
+        if (!$listing) {
+            return false;
+        }
+
+        $affected = DB::table('listings')
             ->where('id', $listingId)
             ->where('tenant_id', $tenantId)
             ->where('status', 'pending')
@@ -51,7 +63,26 @@ class AdminListingsService
                 'approved_by' => $adminId,
                 'approved_at' => now(),
                 'updated_at'  => now(),
-            ]) > 0;
+            ]);
+
+        if ($affected > 0) {
+            // Notify listing owner
+            try {
+                $title = htmlspecialchars($listing->title ?? '', ENT_QUOTES, 'UTF-8');
+                \App\Models\Notification::createNotification(
+                    (int) $listing->user_id,
+                    "Your listing \"{$title}\" has been approved!",
+                    "/listings/{$listingId}",
+                    'listing_approved',
+                    true,
+                    $tenantId
+                );
+            } catch (\Throwable $e) {
+                Log::warning("AdminListingsService::approve notification failed for listing #{$listingId}: " . $e->getMessage());
+            }
+        }
+
+        return $affected > 0;
     }
 
     /**
@@ -59,7 +90,18 @@ class AdminListingsService
      */
     public function reject(int $listingId, int $tenantId, int $adminId, ?string $reason = null): bool
     {
-        return DB::table('listings')
+        // Fetch listing data before update for notification
+        $listing = DB::table('listings')
+            ->where('id', $listingId)
+            ->where('tenant_id', $tenantId)
+            ->where('status', 'pending')
+            ->first();
+
+        if (!$listing) {
+            return false;
+        }
+
+        $affected = DB::table('listings')
             ->where('id', $listingId)
             ->where('tenant_id', $tenantId)
             ->where('status', 'pending')
@@ -68,7 +110,31 @@ class AdminListingsService
                 'rejection_reason' => $reason,
                 'approved_by'     => $adminId,
                 'updated_at'      => now(),
-            ]) > 0;
+            ]);
+
+        if ($affected > 0) {
+            // Notify listing owner
+            try {
+                $title = htmlspecialchars($listing->title ?? '', ENT_QUOTES, 'UTF-8');
+                $message = "Your listing \"{$title}\" was not approved.";
+                if (!empty($reason)) {
+                    $safeReason = htmlspecialchars($reason, ENT_QUOTES, 'UTF-8');
+                    $message .= " Reason: {$safeReason}";
+                }
+                \App\Models\Notification::createNotification(
+                    (int) $listing->user_id,
+                    $message,
+                    "/listings/{$listingId}",
+                    'listing_rejected',
+                    true,
+                    $tenantId
+                );
+            } catch (\Throwable $e) {
+                Log::warning("AdminListingsService::reject notification failed for listing #{$listingId}: " . $e->getMessage());
+            }
+        }
+
+        return $affected > 0;
     }
 
     /**

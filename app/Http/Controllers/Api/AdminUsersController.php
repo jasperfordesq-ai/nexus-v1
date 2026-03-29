@@ -322,6 +322,9 @@ class AdminUsersController extends BaseApiController
             return $this->respondWithError('VALIDATION_ERROR', 'No fields to update', null, 422);
         }
 
+        // Capture old status before the update for change detection
+        $oldStatus = $user['status'] ?? 'active';
+
         $params[] = $id;
         $params[] = $tenantId;
 
@@ -332,6 +335,32 @@ class AdminUsersController extends BaseApiController
 
         if (isset($input['role']) && ($user['role'] ?? 'member') !== $input['role']) {
             AuditLogService::logAdminRoleChanged($adminId, $id, $user['role'] ?? 'member', $input['role']);
+        }
+
+        // Notify user when status changes to suspended/banned via the generic update path
+        // (The dedicated suspend()/ban() endpoints have their own richer notifications)
+        if (isset($input['status']) && $input['status'] !== $oldStatus) {
+            try {
+                if ($input['status'] === 'suspended') {
+                    Notification::createNotification(
+                        $id,
+                        'Your account has been suspended. Contact support if you believe this is an error.',
+                        null,
+                        'system',
+                        true
+                    );
+                } elseif ($input['status'] === 'banned') {
+                    Notification::createNotification(
+                        $id,
+                        'Your account has been banned. Contact support if you believe this is an error.',
+                        null,
+                        'system',
+                        true
+                    );
+                }
+            } catch (\Throwable $e) {
+                Log::warning("AdminUsersController::update status notification failed for user #{$id}: " . $e->getMessage());
+            }
         }
 
         return $this->show($id);

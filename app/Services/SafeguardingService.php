@@ -304,6 +304,16 @@ class SafeguardingService
     public function verifyTraining(int $recordId, int $adminId, int $tenantId): bool
     {
         try {
+            // Fetch the record to get the user_id for notification
+            $record = DB::table('vol_safeguarding_training')
+                ->where('id', $recordId)
+                ->where('tenant_id', $tenantId)
+                ->first();
+
+            if (!$record) {
+                return false;
+            }
+
             DB::table('vol_safeguarding_training')
                 ->where('id', $recordId)
                 ->where('tenant_id', $tenantId)
@@ -315,6 +325,21 @@ class SafeguardingService
                 ]);
 
             $this->logActivity($adminId, 'safeguarding_training_verified', 'safeguarding_training', $recordId);
+
+            // Notify the user whose training was verified
+            try {
+                $trainingName = $record->training_name ?? 'safeguarding training';
+                \App\Models\Notification::createNotification(
+                    (int) $record->user_id,
+                    "Your {$trainingName} record has been verified!",
+                    '/dashboard',
+                    'moderation',
+                    true,
+                    $tenantId
+                );
+            } catch (\Throwable $notifError) {
+                Log::warning("SafeguardingService::verifyTraining notification failed for record #{$recordId}: " . $notifError->getMessage());
+            }
 
             return true;
         } catch (\Throwable $e) {
@@ -329,6 +354,16 @@ class SafeguardingService
     public function rejectTraining(int $recordId, int $adminId, string $reason, int $tenantId): bool
     {
         try {
+            // Fetch the record to get the user_id for notification
+            $record = DB::table('vol_safeguarding_training')
+                ->where('id', $recordId)
+                ->where('tenant_id', $tenantId)
+                ->first();
+
+            if (!$record) {
+                return false;
+            }
+
             DB::table('vol_safeguarding_training')
                 ->where('id', $recordId)
                 ->where('tenant_id', $tenantId)
@@ -343,6 +378,21 @@ class SafeguardingService
             $this->logActivity($adminId, 'safeguarding_training_rejected', 'safeguarding_training', $recordId, [
                 'reason' => $reason,
             ]);
+
+            // Notify the user whose training was rejected
+            try {
+                $trainingName = $record->training_name ?? 'safeguarding training';
+                \App\Models\Notification::createNotification(
+                    (int) $record->user_id,
+                    "Your {$trainingName} record was not approved. Please contact support for details.",
+                    '/help',
+                    'moderation',
+                    true,
+                    $tenantId
+                );
+            } catch (\Throwable $notifError) {
+                Log::warning("SafeguardingService::rejectTraining notification failed for record #{$recordId}: " . $notifError->getMessage());
+            }
 
             return true;
         } catch (\Throwable $e) {

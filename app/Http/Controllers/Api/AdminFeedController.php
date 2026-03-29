@@ -8,7 +8,9 @@ namespace App\Http\Controllers\Api;
 
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use App\Models\ActivityLog;
+use App\Models\Notification;
 
 /**
  * AdminFeedController -- Admin feed post moderation.
@@ -273,6 +275,26 @@ class AdminFeedController extends BaseApiController
             "Hidden feed {$sourceType} #{$id}" . ($superAdmin ? " (tenant {$itemTenantId})" : '')
         );
 
+        // Notify the content creator that their post was hidden
+        try {
+            $feedItem = DB::selectOne(
+                "SELECT user_id FROM feed_activity WHERE source_type = ? AND source_id = ? AND tenant_id = ? LIMIT 1",
+                [$sourceType, $id, $itemTenantId]
+            );
+            if ($feedItem && $feedItem->user_id) {
+                Notification::createNotification(
+                    (int) $feedItem->user_id,
+                    'Your post has been hidden by a moderator.',
+                    null,
+                    'moderation',
+                    false,
+                    $itemTenantId
+                );
+            }
+        } catch (\Throwable $e) {
+            Log::warning("AdminFeedController::hide notification failed for {$sourceType} #{$id}: " . $e->getMessage());
+        }
+
         return $this->respondWithData(['success' => true, 'message' => 'Item hidden']);
     }
 
@@ -304,6 +326,18 @@ class AdminFeedController extends BaseApiController
 
         $itemTenantId = (int) $row->tenant_id;
 
+        // Capture creator user_id BEFORE deleting so we can notify them
+        $creatorUserId = null;
+        try {
+            $feedItem = DB::selectOne(
+                "SELECT user_id FROM feed_activity WHERE source_type = ? AND source_id = ? AND tenant_id = ? LIMIT 1",
+                [$sourceType, $id, $itemTenantId]
+            );
+            $creatorUserId = $feedItem ? (int) $feedItem->user_id : null;
+        } catch (\Throwable $e) {
+            Log::warning("AdminFeedController::destroy failed to capture creator user_id for {$sourceType} #{$id}: " . $e->getMessage());
+        }
+
         // Remove from feed_activity
         DB::delete("DELETE FROM feed_activity WHERE source_type = ? AND source_id = ? AND tenant_id = ?", [$sourceType, $id, $itemTenantId]);
         // Remove related engagement data
@@ -321,6 +355,22 @@ class AdminFeedController extends BaseApiController
             'delete_feed_item',
             "Deleted feed {$sourceType} #{$id}" . ($superAdmin ? " (tenant {$itemTenantId})" : '')
         );
+
+        // Notify the content creator that their post was removed
+        if ($creatorUserId) {
+            try {
+                Notification::createNotification(
+                    $creatorUserId,
+                    'Your post has been removed by a moderator.',
+                    null,
+                    'moderation',
+                    false,
+                    $itemTenantId
+                );
+            } catch (\Throwable $e) {
+                Log::warning("AdminFeedController::destroy notification failed for {$sourceType} #{$id}: " . $e->getMessage());
+            }
+        }
 
         return $this->respondWithData(['success' => true, 'message' => 'Item deleted']);
     }
