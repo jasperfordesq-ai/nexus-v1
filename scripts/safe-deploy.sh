@@ -50,6 +50,33 @@ log_step() { echo -e "\n${BOLD}$1${NC}" | tee -a "$LOG_FILE"; }
 MAINTENANCE_FILE="/var/www/html/.maintenance"
 PHP_CONTAINER="nexus-php-app"
 
+# --- SSH Keepalive for Docker Builds ---
+# Azure NAT gateway kills idle TCP connections after ~4 minutes.
+# During --no-cache builds, C compilation of PHP extensions produces no stdout
+# for minutes at a time, causing SSH disconnects. This wrapper prints a dot
+# every 30s to keep the connection alive.
+KEEPALIVE_PID=""
+start_keepalive() {
+    ( while true; do echo -n "." | tee -a "$LOG_FILE"; sleep 30; done ) &
+    KEEPALIVE_PID=$!
+}
+stop_keepalive() {
+    if [ -n "$KEEPALIVE_PID" ] && kill -0 "$KEEPALIVE_PID" 2>/dev/null; then
+        kill "$KEEPALIVE_PID" 2>/dev/null
+        wait "$KEEPALIVE_PID" 2>/dev/null || true
+        KEEPALIVE_PID=""
+        echo ""  # newline after dots
+    fi
+}
+# Run a docker build with SSH keepalive active
+build_with_keepalive() {
+    start_keepalive
+    local rc=0
+    "$@" || rc=$?
+    stop_keepalive
+    return $rc
+}
+
 enable_maintenance_mode() {
     log_step "=== Enabling Maintenance Mode (both layers) ==="
 
@@ -182,6 +209,7 @@ re_enable_maintenance_after_rebuild() {
 
 # --- Helper functions ---
 cleanup() {
+    stop_keepalive  # Kill any lingering keepalive background process
     if [ -f "$LOCK_FILE" ]; then
         rm -f "$LOCK_FILE"
         log_info "Deployment lock released"
@@ -693,7 +721,7 @@ deploy_quick() {
 
     # Rebuild React frontend with --no-cache (CRITICAL: without this, old image keeps running)
     log_info "Rebuilding React frontend with --no-cache..."
-    docker compose build --no-cache frontend
+    build_with_keepalive docker compose build --no-cache frontend
     log_ok "React frontend rebuilt"
 
     # Run pending database migrations (before container rebuild)
@@ -704,7 +732,7 @@ deploy_quick() {
 
     # Rebuild sales site
     log_info "Rebuilding sales site..."
-    docker compose build --no-cache sales
+    build_with_keepalive docker compose build --no-cache sales
     log_ok "Sales site rebuilt"
 
     # Recreate frontend + sales containers with new images, restart PHP for OPCache
@@ -760,7 +788,7 @@ deploy_full() {
 
     # Rebuild containers
     log_info "Building containers with --no-cache..."
-    docker compose build --no-cache
+    build_with_keepalive docker compose build --no-cache
 
     log_info "Starting containers (--force-recreate)..."
     docker compose up -d --force-recreate
@@ -812,7 +840,7 @@ rollback_deployment() {
 
     # Full rebuild all containers (rollback must guarantee correct images)
     log_info "Rebuilding ALL containers with --no-cache..."
-    docker compose build --no-cache
+    build_with_keepalive docker compose build --no-cache
 
     log_info "Starting containers (--force-recreate)..."
     docker compose up -d --force-recreate
