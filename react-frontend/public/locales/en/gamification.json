@@ -14,7 +14,14 @@
     "tab_badges": "Badges",
     "tab_challenges": "Challenges",
     "tab_collections": "Collections",
+    "tab_journeys": "Journeys",
+    "tab_engagement": "Engagement",
     "tab_shop": "XP Shop",
+    "engagement": {
+      "title": "Monthly Engagement",
+      "months_active": "{{count}} of 12 months",
+      "description": "Months where you completed at least one meaningful activity (exchange, listing, review, or volunteer hours)."
+    },
     "filter_by_type": "Filter by type",
     "filter_badges_aria": "Filter badges by type",
     "all_types": "All Types",

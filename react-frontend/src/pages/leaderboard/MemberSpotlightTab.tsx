@@ -46,7 +46,6 @@ export default function MemberSpotlightTab() {
       try {
         setIsLoading(true);
         const res = await api.get<SpotlightMember[]>('/v2/gamification/member-spotlight?limit=6');
-        if (controller.signal.aborted) return;
         if (res.success && res.data) {
           setMembers(Array.isArray(res.data) ? res.data : []);
         } else if (!res.success) {

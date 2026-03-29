@@ -45,6 +45,8 @@ import {
   Layers,
   Zap,
   Package,
+  Route,
+  Calendar,
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
@@ -581,10 +583,10 @@ function ChallengesTab() {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Collections Tab Content
+// Journeys Tab Content (formerly Collections)
 // ─────────────────────────────────────────────────────────────────────────────
 
-function CollectionsTab() {
+function JourneysTab() {
   const { t } = useTranslation('gamification');
   const toast = useToast();
   const [collections, setCollections] = useState<BadgeCollection[]>([]);
@@ -742,6 +744,116 @@ function CollectionsTab() {
         );
       })}
     </motion.div>
+  );
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Engagement Tab Content
+// ─────────────────────────────────────────────────────────────────────────────
+
+interface EngagementMonth {
+  year_month: string;
+  was_active: boolean;
+  activity_count: number;
+}
+
+function EngagementTab() {
+  const { t } = useTranslation('gamification');
+  const [history, setHistory] = useState<EngagementMonth[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const load = async () => {
+      try {
+        setIsLoading(true);
+        // Try the engagement endpoint; fall back to empty if not available
+        const res = await api.get<EngagementMonth[]>('/v2/gamification/engagement-history');
+        if (res.success && res.data && Array.isArray(res.data)) {
+          setHistory(res.data);
+        }
+      } catch {
+        // Endpoint may not exist yet — show empty state gracefully
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    load();
+  }, []);
+
+  if (isLoading) {
+    return (
+      <div className="mt-4 space-y-4">
+        <GlassCard className="p-5">
+          <Skeleton className="rounded-lg"><div className="h-4 w-48 bg-default-300" /></Skeleton>
+          <div className="grid grid-cols-6 gap-2 mt-4">
+            {Array.from({ length: 12 }).map((_, i) => (
+              <Skeleton key={i} className="rounded-lg"><div className="h-10 bg-default-200" /></Skeleton>
+            ))}
+          </div>
+        </GlassCard>
+      </div>
+    );
+  }
+
+  // Generate last 12 months for the grid
+  const months: Array<{ label: string; ym: string; active: boolean; count: number }> = [];
+  const historyMap = new Map(history.map((h) => [h.year_month, h]));
+
+  for (let i = 11; i >= 0; i--) {
+    const d = new Date();
+    d.setMonth(d.getMonth() - i);
+    const ym = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+    const label = d.toLocaleDateString('en', { month: 'short', year: '2-digit' });
+    const entry = historyMap.get(ym);
+    months.push({
+      label,
+      ym,
+      active: entry?.was_active ?? false,
+      count: entry?.activity_count ?? 0,
+    });
+  }
+
+  const activeCount = months.filter((m) => m.active).length;
+
+  return (
+    <div className="mt-4 space-y-4">
+      <GlassCard className="p-5">
+        <div className="flex items-center justify-between mb-4">
+          <h4 className="font-semibold text-theme-primary flex items-center gap-2">
+            <Calendar className="w-4 h-4 text-indigo-400" />
+            {t('achievements.engagement.title', 'Monthly Engagement')}
+          </h4>
+          <Chip size="sm" color={activeCount >= 6 ? 'success' : 'default'} variant="flat">
+            {t('achievements.engagement.months_active', { count: activeCount }, `${activeCount} of 12 months`)}
+          </Chip>
+        </div>
+
+        <div className="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-12 gap-2">
+          {months.map((month) => (
+            <div
+              key={month.ym}
+              className={`flex flex-col items-center p-2 rounded-lg transition-colors ${
+                month.active
+                  ? 'bg-emerald-500/20 border border-emerald-500/30'
+                  : 'bg-default-100/50 border border-transparent'
+              }`}
+              title={month.active ? `Active: ${month.count} activities` : 'Inactive'}
+            >
+              <span className="text-[10px] text-default-400">{month.label}</span>
+              {month.active ? (
+                <CheckCircle className="w-5 h-5 text-emerald-500 mt-1" />
+              ) : (
+                <div className="w-5 h-5 rounded-full bg-default-200 mt-1" />
+              )}
+            </div>
+          ))}
+        </div>
+
+        <p className="text-xs text-theme-muted mt-3">
+          {t('achievements.engagement.description', 'Months where you completed at least one meaningful activity (exchange, listing, review, or volunteer hours).')}
+        </p>
+      </GlassCard>
+    </div>
   );
 }
 
@@ -1362,11 +1474,20 @@ export function AchievementsPage() {
                   }
                 />
                 <Tab
-                  key="collections"
+                  key="journeys"
                   title={
                     <div className="flex items-center gap-2">
-                      <Layers className="w-4 h-4" aria-hidden="true" />
-                      <span>{t('achievements.tab_collections')}</span>
+                      <Route className="w-4 h-4" aria-hidden="true" />
+                      <span>{t('achievements.tab_journeys', 'Journeys')}</span>
+                    </div>
+                  }
+                />
+                <Tab
+                  key="engagement"
+                  title={
+                    <div className="flex items-center gap-2">
+                      <Calendar className="w-4 h-4" aria-hidden="true" />
+                      <span>{t('achievements.tab_engagement', 'Engagement')}</span>
                     </div>
                   }
                 />
@@ -1483,7 +1604,8 @@ export function AchievementsPage() {
               )}
 
               {activeTab === 'challenges' && <ChallengesTab />}
-              {activeTab === 'collections' && <CollectionsTab />}
+              {activeTab === 'journeys' && <JourneysTab />}
+              {activeTab === 'engagement' && <EngagementTab />}
               {activeTab === 'shop' && <XpShopTab userXp={profile?.xp ?? 0} />}
             </>
           )}

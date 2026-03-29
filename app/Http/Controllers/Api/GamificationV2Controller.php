@@ -8,6 +8,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Services\BadgeCollectionService;
 use App\Services\CommunityDashboardService;
+use App\Services\EngagementRecognitionService;
 use App\Services\LeaderboardService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
@@ -706,6 +707,16 @@ class GamificationV2Controller extends BaseApiController
         $tenantId = TenantContext::getId();
         $limit = (int) (request()->query('limit', 3));
         $data = CommunityDashboardService::getMemberSpotlight($tenantId, min($limit, 10));
+
+        return $this->respondWithData($data);
+    }
+
+    /** GET /api/v2/gamification/engagement-history */
+    public function engagementHistory(): JsonResponse
+    {
+        $userId = $this->getUserId();
+        $tenantId = TenantContext::getId();
+        $data = EngagementRecognitionService::getEngagementHistory($tenantId, $userId);
 
         return $this->respondWithData($data);
     }

@@ -575,6 +575,7 @@ Route::get('/v2/gamification/nexus-score', [\App\Http\Controllers\Api\Gamificati
 Route::get('/v2/gamification/community-dashboard', [\App\Http\Controllers\Api\GamificationV2Controller::class, 'communityDashboard']);
 Route::get('/v2/gamification/personal-journey', [\App\Http\Controllers\Api\GamificationV2Controller::class, 'personalJourney']);
 Route::get('/v2/gamification/member-spotlight', [\App\Http\Controllers\Api\GamificationV2Controller::class, 'memberSpotlight']);
+Route::get('/v2/gamification/engagement-history', [\App\Http\Controllers\Api\GamificationV2Controller::class, 'engagementHistory']);
 Route::get('/v2/volunteering/opportunities', [\App\Http\Controllers\Api\VolunteerController::class, 'opportunities']);
 Route::post('/v2/volunteering/opportunities', [\App\Http\Controllers\Api\VolunteerController::class, 'createOpportunity']);
 Route::get('/v2/volunteering/opportunities/{id}', [\App\Http\Controllers\Api\VolunteerController::class, 'showOpportunity']);
