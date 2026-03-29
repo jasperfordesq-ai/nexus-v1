@@ -103,9 +103,26 @@ class GamificationService
     /**
      * Get level name for a given level number (V2 system).
      */
+    /**
+     * Get level name for a given level number.
+     * Maps V1 levels (1-25) to V2 named levels (1-10) by finding the closest match.
+     */
     public static function getLevelName(int $level): string
     {
-        return self::LEVEL_THRESHOLDS_V2[$level]['name'] ?? 'Unknown';
+        // Direct V2 match
+        if (isset(self::LEVEL_THRESHOLDS_V2[$level])) {
+            return self::LEVEL_THRESHOLDS_V2[$level]['name'];
+        }
+
+        // V1 level > 10: map to closest V2 level by XP threshold
+        $xp = self::LEVEL_THRESHOLDS[$level] ?? 0;
+        $v2Level = 1;
+        foreach (self::LEVEL_THRESHOLDS_V2 as $lvl => $data) {
+            if ($xp >= $data['xp']) {
+                $v2Level = $lvl;
+            }
+        }
+        return self::LEVEL_THRESHOLDS_V2[$v2Level]['name'];
     }
 
     /**
