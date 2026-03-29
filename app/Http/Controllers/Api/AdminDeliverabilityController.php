@@ -373,6 +373,21 @@ class AdminDeliverabilityController extends BaseApiController
 
         $this->logHistory($tenantId, (int) $newId, 'created', $adminId, null, null, null, "Created deliverable: {$title}");
 
+        // Notify assigned user
+        try {
+            $assignedTo = isset($data['assigned_to']) ? (int) $data['assigned_to'] : null;
+            if ($assignedTo && $assignedTo !== $adminId) {
+                \App\Models\Notification::createNotification(
+                    $assignedTo,
+                    "You've been assigned a deliverable: \"{$title}\"",
+                    "/deliverables/{$newId}",
+                    'deliverable_assigned'
+                );
+            }
+        } catch (\Throwable $e) {
+            \Log::warning('Deliverable assignment notification failed', ['deliverable_id' => $newId, 'error' => $e->getMessage()]);
+        }
+
         return $this->respondWithData([
             'id' => (int) $newId, 'title' => $title, 'status' => $status, 'priority' => $priority,
         ]);
@@ -457,6 +472,21 @@ class AdminDeliverabilityController extends BaseApiController
             $newAssigneeStr = $newAssignee !== null ? (string) $newAssignee : 'unassigned';
             if ($oldAssignee !== $newAssigneeStr) {
                 $this->logHistory($tenantId, $id, 'assignment_changed', $adminId, 'assigned_to', $oldAssignee, $newAssigneeStr, "Assignment changed");
+
+                // Notify new assignee
+                if ($newAssignee && $newAssignee !== $adminId) {
+                    try {
+                        $deliverableTitle = $existing['title'] ?? 'a deliverable';
+                        \App\Models\Notification::createNotification(
+                            $newAssignee,
+                            "You've been assigned to deliverable: \"{$deliverableTitle}\"",
+                            "/deliverables/{$id}",
+                            'deliverable_assigned'
+                        );
+                    } catch (\Throwable $e) {
+                        \Log::warning('Deliverable reassignment notification failed', ['deliverable_id' => $id, 'error' => $e->getMessage()]);
+                    }
+                }
             }
         }
 
