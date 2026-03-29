@@ -330,6 +330,26 @@ class JobVacanciesController extends BaseApiController
 
         $vacancy = $this->jobService->legacyGetById($id, $userId);
 
+        // Notify vacancy owner of new application
+        try {
+            $job = DB::selectOne(
+                'SELECT user_id, title FROM job_vacancies WHERE id = ? AND tenant_id = ?',
+                [$id, $tenantId]
+            );
+            if ($job && (int) $job->user_id !== $userId) {
+                $applicant = \App\Models\User::find($userId);
+                $applicantName = $applicant->first_name ?? $applicant->name ?? 'Someone';
+                \App\Models\Notification::createNotification(
+                    (int) $job->user_id,
+                    "{$applicantName} applied for your job: \"{$job->title}\"",
+                    "/jobs/{$id}/applications",
+                    'job_application'
+                );
+            }
+        } catch (\Throwable $e) {
+            \Log::warning('Job application notification failed', ['vacancy_id' => $id, 'error' => $e->getMessage()]);
+        }
+
         return $this->respondWithData($vacancy, null, 201);
     }
 
