@@ -10,7 +10,7 @@
  * Uses date-seeded rotation so the same members show all day.
  */
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Avatar, Skeleton } from '@heroui/react';
@@ -30,6 +30,8 @@ interface SpotlightMember {
   avatar_url: string | null;
   bio: string | null;
   member_since: string | null;
+  level: number;
+  xp: number;
   recent_activity: string;
 }
 
@@ -38,19 +40,12 @@ export default function MemberSpotlightTab() {
   const { tenantPath } = useTenant();
   const [members, setMembers] = useState<SpotlightMember[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const abortRef = useRef<AbortController | null>(null);
 
   useEffect(() => {
-    const controller = new AbortController();
-    abortRef.current = controller;
-
     const load = async () => {
       try {
         setIsLoading(true);
-        const res = await api.get<SpotlightMember[]>('/v2/gamification/member-spotlight?limit=6', {
-          signal: controller.signal,
-          timeout: 60000,
-        });
+        const res = await api.get<SpotlightMember[]>('/v2/gamification/member-spotlight?limit=6');
         if (controller.signal.aborted) return;
         if (res.success && res.data) {
           setMembers(Array.isArray(res.data) ? res.data : []);
@@ -67,7 +62,6 @@ export default function MemberSpotlightTab() {
     };
 
     load();
-    return () => controller.abort();
   }, []);
 
   if (isLoading) {
@@ -141,9 +135,12 @@ export default function MemberSpotlightTab() {
                   <ChevronRight className="w-4 h-4 text-default-300 flex-shrink-0" />
                 </div>
 
-                <p className="text-sm text-primary-500 font-medium">
-                  {member.recent_activity}
-                </p>
+                <div className="flex items-center gap-2 text-sm">
+                  <span className="text-primary-500 font-medium">{member.recent_activity}</span>
+                  {member.xp > 0 && (
+                    <span className="text-default-400 text-xs">{member.xp.toLocaleString()} XP</span>
+                  )}
+                </div>
 
                 {member.bio && (
                   <p className="text-xs text-default-400 mt-2 line-clamp-2">

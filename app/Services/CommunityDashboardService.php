@@ -8,26 +8,26 @@ namespace App\Services;
 
 use App\Core\TenantContext;
 use App\Models\Connection;
+use App\Models\FeedPost;
 use App\Models\Listing;
+use App\Models\Review;
 use App\Models\Transaction;
 use App\Models\User;
 use App\Models\UserBadge;
+use App\Models\VolLog;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
 /**
- * CommunityDashboardService — replaces competitive leaderboard as the default view.
+ * CommunityDashboardService — community impact stats, personal journey, member spotlight.
  *
- * Provides aggregate community impact stats, personal journey tracking,
- * and member spotlight rotation. All data is tenant-scoped.
+ * Uses ALL available data sources: users.xp, user_badges, vol_logs, listings,
+ * connections, reviews, feed_posts, AND transactions (when available).
  */
 class CommunityDashboardService
 {
     /**
      * Get aggregate community impact stats for the current tenant.
-     *
-     * Returns collective metrics (not individual rankings) to reflect
-     * timebanking's cooperative philosophy.
      */
     public static function getCommunityImpact(?int $tenantId = null): array
     {
@@ -38,34 +38,40 @@ class CommunityDashboardService
         $lastMonthEnd = now()->subMonth()->endOfMonth();
 
         try {
-            // Current month stats
             $currentMonth = self::getMonthStats($tenantId, $thisMonthStart, now());
             $lastMonth = self::getMonthStats($tenantId, $lastMonthStart, $lastMonthEnd);
 
-            // All-time stats
-            $totalHoursExchanged = (float) Transaction::where('tenant_id', $tenantId)
-                ->where('status', 'completed')
-                ->sum('amount');
-
+            // All-time aggregate stats from all data sources
             $totalMembers = (int) User::where('tenant_id', $tenantId)
-                ->where('is_approved', true)
-                ->count();
+                ->where('is_approved', true)->count();
 
-            $totalSkillsOffered = (int) Listing::where('tenant_id', $tenantId)
-                ->where('type', 'offer')
-                ->where('status', 'active')
-                ->distinct()
-                ->count('category_id');
+            $totalXP = (int) User::where('tenant_id', $tenantId)->sum('xp');
 
+            $totalBadges = (int) UserBadge::where('tenant_id', $tenantId)->count();
+
+            $totalVolunteerHours = (float) VolLog::where('tenant_id', $tenantId)
+                ->where('status', 'verified')->sum('hours');
+
+            $totalListings = (int) Listing::where('tenant_id', $tenantId)->count();
+
+            $totalConnections = (int) Connection::where('tenant_id', $tenantId)
+                ->where('status', 'accepted')->count();
+
+            // Transactions may be sparse — include but don't rely on them
             $totalExchanges = (int) Transaction::where('tenant_id', $tenantId)
-                ->where('status', 'completed')
-                ->count();
+                ->where('status', 'completed')->count();
+
+            $totalReviews = (int) Review::where('tenant_id', $tenantId)->count();
 
             return [
-                'total_hours_exchanged' => round($totalHoursExchanged, 1),
                 'total_members' => $totalMembers,
+                'total_xp' => $totalXP,
+                'total_badges_awarded' => $totalBadges,
+                'total_volunteer_hours' => round($totalVolunteerHours, 1),
+                'total_listings' => $totalListings,
+                'total_connections' => $totalConnections,
                 'total_exchanges' => $totalExchanges,
-                'total_skills_offered' => $totalSkillsOffered,
+                'total_reviews' => $totalReviews,
                 'this_month' => $currentMonth,
                 'last_month' => $lastMonth,
                 'trends' => self::calculateTrends($currentMonth, $lastMonth),
@@ -73,22 +79,16 @@ class CommunityDashboardService
         } catch (\Throwable $e) {
             Log::error('CommunityDashboardService::getCommunityImpact failed: ' . $e->getMessage());
             return [
-                'total_hours_exchanged' => 0,
-                'total_members' => 0,
-                'total_exchanges' => 0,
-                'total_skills_offered' => 0,
-                'this_month' => [],
-                'last_month' => [],
-                'trends' => [],
+                'total_members' => 0, 'total_xp' => 0, 'total_badges_awarded' => 0,
+                'total_volunteer_hours' => 0, 'total_listings' => 0,
+                'total_connections' => 0, 'total_exchanges' => 0, 'total_reviews' => 0,
+                'this_month' => [], 'last_month' => [], 'trends' => [],
             ];
         }
     }
 
     /**
-     * Get personal journey data for a specific user — their own growth over time.
-     *
-     * Shows monthly activity timeline (12 months), badge progression,
-     * skills growth, and personal milestones.
+     * Get personal journey data for a specific user.
      */
     public static function getPersonalJourney(?int $tenantId = null, ?int $userId = null): array
     {
@@ -102,71 +102,62 @@ class CommunityDashboardService
             return [
                 'monthly_activity' => self::getMonthlyActivityTimeline($tenantId, $userId),
                 'badge_progression' => self::getBadgeProgression($userId),
-                'skills_growth' => self::getSkillsGrowth($tenantId, $userId),
                 'milestones' => self::getPersonalMilestones($tenantId, $userId),
                 'summary' => self::getPersonalSummary($tenantId, $userId),
             ];
         } catch (\Throwable $e) {
             Log::error('CommunityDashboardService::getPersonalJourney failed: ' . $e->getMessage());
             return [
-                'monthly_activity' => [],
-                'badge_progression' => [],
-                'skills_growth' => [],
-                'milestones' => [],
-                'summary' => [],
+                'monthly_activity' => [], 'badge_progression' => [],
+                'milestones' => [], 'summary' => [],
             ];
         }
     }
 
     /**
      * Get randomly spotlighted active members — daily rotation.
-     *
-     * Uses a date-based seed so the same members are shown all day,
-     * then different ones tomorrow. Avoids always surfacing "top earners".
+     * Uses XP, badges, and activity to find active members (not just transactions).
      */
     public static function getMemberSpotlight(?int $tenantId = null, int $limit = 3): array
     {
         $tenantId = $tenantId ?? TenantContext::getId();
 
         try {
-            // Find members active in the last 30 days (SQL-level distinct)
-            $activeUserIds = collect(DB::select("
-                SELECT DISTINCT user_id FROM (
-                    SELECT sender_id AS user_id FROM transactions
-                    WHERE tenant_id = ? AND status = 'completed' AND created_at >= ?
-                    UNION
-                    SELECT receiver_id AS user_id FROM transactions
-                    WHERE tenant_id = ? AND status = 'completed' AND created_at >= ?
-                ) AS active_users
-            ", [$tenantId, now()->subDays(30), $tenantId, now()->subDays(30)]))->pluck('user_id')->toArray();
+            // Find members with real activity: XP > 0 OR badges earned recently OR vol hours
+            $activeUsers = User::where('tenant_id', $tenantId)
+                ->where('is_approved', true)
+                ->where(function ($q) {
+                    $q->where('xp', '>', 0)
+                      ->orWhereExists(function ($sub) {
+                          $sub->select(DB::raw(1))
+                              ->from('user_badges')
+                              ->whereColumn('user_badges.user_id', 'users.id');
+                      });
+                })
+                ->orderByRaw('RAND(' . ((int) now()->format('Ymd')) . ')')
+                ->limit($limit)
+                ->get(['id', 'first_name', 'last_name', 'avatar_url', 'bio', 'xp', 'level', 'created_at']);
 
-            if (empty($activeUserIds)) {
+            if ($activeUsers->isEmpty()) {
                 return [];
             }
 
-            // Use date-based seed for consistent daily rotation
-            $dateSeed = (int) now()->format('Ymd');
-            srand($dateSeed);
-            shuffle($activeUserIds);
-            srand(); // Reset to random seed
-
-            $spotlightIds = array_slice($activeUserIds, 0, $limit);
-
-            $users = User::whereIn('id', $spotlightIds)
-                ->where('is_approved', true)
-                ->get(['id', 'first_name', 'last_name', 'avatar_url', 'bio', 'created_at']);
-
-            return $users->map(function ($user) use ($tenantId) {
-                $recentActivity = self::getRecentActivitySummary($tenantId, $user->id);
+            return $activeUsers->map(function ($user) {
+                $badgeCount = (int) UserBadge::where('user_id', $user->id)->count();
+                $activity = $badgeCount > 0
+                    ? "Earned {$badgeCount} " . ($badgeCount === 1 ? 'badge' : 'badges')
+                    : 'Active community member';
 
                 return [
                     'id' => $user->id,
                     'first_name' => $user->first_name,
                     'last_name' => $user->last_name,
                     'avatar_url' => $user->avatar_url,
-                    'bio' => $user->bio ? mb_substr($user->bio, 0, 120) . '...' : null,
+                    'bio' => $user->bio ? mb_substr($user->bio, 0, 120) : null,
                     'member_since' => $user->created_at?->format('M Y'),
-                    'recent_activity' => $recentActivity,
+                    'level' => (int) ($user->level ?? 1),
+                    'xp' => (int) ($user->xp ?? 0),
+                    'recent_activity' => $activity,
                 ];
             })->values()->toArray();
         } catch (\Throwable $e) {
@@ -180,56 +171,44 @@ class CommunityDashboardService
     // =========================================================================
 
     /**
-     * Get stats for a specific date range within a tenant.
+     * Get stats for a specific date range — uses ALL data sources.
      */
     private static function getMonthStats(int $tenantId, $start, $end): array
     {
-        $hoursExchanged = (float) Transaction::where('tenant_id', $tenantId)
-            ->where('status', 'completed')
-            ->whereBetween('created_at', [$start, $end])
-            ->sum('amount');
+        $newMembers = (int) User::where('tenant_id', $tenantId)
+            ->where('is_approved', true)
+            ->whereBetween('created_at', [$start, $end])->count();
 
-        $activeMembers = (int) DB::selectOne("
-            SELECT COUNT(DISTINCT user_id) AS cnt FROM (
-                SELECT sender_id AS user_id FROM transactions
-                WHERE tenant_id = ? AND status = 'completed' AND created_at BETWEEN ? AND ?
-                UNION
-                SELECT receiver_id AS user_id FROM transactions
-                WHERE tenant_id = ? AND status = 'completed' AND created_at BETWEEN ? AND ?
-            ) AS active_users
-        ", [$tenantId, $start, $end, $tenantId, $start, $end])->cnt ?? 0;
+        $badgesAwarded = (int) UserBadge::where('tenant_id', $tenantId)
+            ->whereBetween('awarded_at', [$start, $end])->count();
+
+        $newListings = (int) Listing::where('tenant_id', $tenantId)
+            ->whereBetween('created_at', [$start, $end])->count();
 
         $newConnections = (int) Connection::where('tenant_id', $tenantId)
             ->where('status', 'accepted')
-            ->whereBetween('created_at', [$start, $end])
-            ->count();
+            ->whereBetween('created_at', [$start, $end])->count();
 
-        $newExchanges = (int) Transaction::where('tenant_id', $tenantId)
-            ->where('status', 'completed')
-            ->whereBetween('created_at', [$start, $end])
-            ->count();
+        $volHours = round((float) VolLog::where('tenant_id', $tenantId)
+            ->where('status', 'verified')
+            ->whereBetween('created_at', [$start, $end])->sum('hours'), 1);
 
-        $newMembers = (int) User::where('tenant_id', $tenantId)
-            ->where('is_approved', true)
-            ->whereBetween('created_at', [$start, $end])
-            ->count();
+        $newPosts = (int) FeedPost::where('tenant_id', $tenantId)
+            ->whereBetween('created_at', [$start, $end])->count();
 
         return [
-            'hours_exchanged' => round($hoursExchanged, 1),
-            'active_members' => $activeMembers,
-            'new_connections' => $newConnections,
-            'new_exchanges' => $newExchanges,
             'new_members' => $newMembers,
+            'badges_awarded' => $badgesAwarded,
+            'new_listings' => $newListings,
+            'new_connections' => $newConnections,
+            'volunteer_hours' => $volHours,
+            'new_posts' => $newPosts,
         ];
     }
 
-    /**
-     * Calculate percentage trends between two months.
-     */
     private static function calculateTrends(array $current, array $last): array
     {
         $trends = [];
-
         foreach ($current as $key => $value) {
             $prev = $last[$key] ?? 0;
             if ($prev > 0) {
@@ -238,62 +217,45 @@ class CommunityDashboardService
                 $trends[$key] = $value > 0 ? 100.0 : 0.0;
             }
         }
-
         return $trends;
     }
 
     /**
-     * Get monthly activity timeline for the last 12 months (single query).
+     * Monthly activity timeline — badges, listings, vol hours, posts per month.
      */
     private static function getMonthlyActivityTimeline(int $tenantId, int $userId): array
     {
         $startDate = now()->subMonths(11)->startOfMonth();
 
-        // Single query for exchanges + hours per month
-        $txData = collect(DB::select("
-            SELECT DATE_FORMAT(created_at, '%Y-%m') AS ym,
-                   COUNT(*) AS exchanges,
-                   COALESCE(SUM(CASE WHEN receiver_id = ? THEN amount ELSE 0 END), 0) AS hours_earned
-            FROM transactions
-            WHERE tenant_id = ? AND status = 'completed'
-              AND (sender_id = ? OR receiver_id = ?)
-              AND created_at >= ?
-            GROUP BY ym ORDER BY ym
-        ", [$userId, $tenantId, $userId, $userId, $startDate]))->keyBy('ym');
+        // Badges earned per month
+        $badgeData = collect(DB::select("
+            SELECT DATE_FORMAT(awarded_at, '%Y-%m') AS ym, COUNT(*) AS cnt
+            FROM user_badges WHERE tenant_id = ? AND user_id = ? AND awarded_at >= ?
+            GROUP BY ym
+        ", [$tenantId, $userId, $startDate]))->keyBy('ym');
 
-        // Single query for connections per month
-        $connData = collect(DB::select("
-            SELECT DATE_FORMAT(created_at, '%Y-%m') AS ym, COUNT(*) AS connections
-            FROM connections
-            WHERE tenant_id = ? AND status = 'accepted'
-              AND (requester_id = ? OR receiver_id = ?)
-              AND created_at >= ?
-            GROUP BY ym ORDER BY ym
-        ", [$tenantId, $userId, $userId, $startDate]))->keyBy('ym');
+        // XP log per month
+        $xpData = collect(DB::select("
+            SELECT DATE_FORMAT(created_at, '%Y-%m') AS ym, SUM(xp_amount) AS xp
+            FROM user_xp_log WHERE tenant_id = ? AND user_id = ? AND created_at >= ?
+            GROUP BY ym
+        ", [$tenantId, $userId, $startDate]))->keyBy('ym');
 
         $timeline = [];
         for ($i = 11; $i >= 0; $i--) {
             $date = now()->subMonths($i)->startOfMonth();
             $ym = $date->format('Y-m');
-            $label = $date->format('M Y');
-
-            $tx = $txData->get($ym);
-            $conn = $connData->get($ym);
 
             $timeline[] = [
-                'month' => $label,
-                'exchanges' => (int) ($tx->exchanges ?? 0),
-                'hours_earned' => round((float) ($tx->hours_earned ?? 0), 1),
-                'connections' => (int) ($conn->connections ?? 0),
+                'month' => $date->format('M Y'),
+                'badges' => (int) ($badgeData->get($ym)?->cnt ?? 0),
+                'xp_earned' => (int) ($xpData->get($ym)?->xp ?? 0),
             ];
         }
 
         return $timeline;
     }
 
-    /**
-     * Get badge progression — when each badge was earned.
-     */
     private static function getBadgeProgression(int $userId): array
     {
         return UserBadge::where('user_id', $userId)
@@ -304,68 +266,16 @@ class CommunityDashboardService
                 'name' => $b->name,
                 'icon' => $b->icon,
                 'earned_at' => $b->awarded_at?->format('Y-m-d'),
-            ])
-            ->toArray();
-    }
-
-    /**
-     * Get skill category growth over time — how many categories they've been active in.
-     */
-    private static function getSkillsGrowth(int $tenantId, int $userId): array
-    {
-        try {
-            $results = DB::table('transactions')
-                ->join('listings', 'transactions.listing_id', '=', 'listings.id')
-                ->where('transactions.tenant_id', $tenantId)
-                ->where(function ($q) use ($userId) {
-                    $q->where('transactions.sender_id', $userId)
-                      ->orWhere('transactions.receiver_id', $userId);
-                })
-                ->where('transactions.status', 'completed')
-                ->selectRaw('DATE_FORMAT(transactions.created_at, "%Y-%m") as month')
-                ->selectRaw('COUNT(DISTINCT listings.category_id) as categories')
-                ->groupBy('month')
-                ->orderBy('month')
-                ->get();
-
-            return $results->map(fn ($r) => [
-                'month' => $r->month,
-                'categories' => (int) $r->categories,
             ])->toArray();
-        } catch (\Throwable $e) {
-            return [];
-        }
     }
 
-    /**
-     * Get personal milestones — key moments in the user's journey.
-     */
     private static function getPersonalMilestones(int $tenantId, int $userId): array
     {
         $milestones = [];
 
-        // First transaction
-        $firstTx = Transaction::where('tenant_id', $tenantId)
-            ->where(function ($q) use ($userId) {
-                $q->where('sender_id', $userId)->orWhere('receiver_id', $userId);
-            })
-            ->where('status', 'completed')
-            ->orderBy('created_at')
-            ->first(['created_at']);
-
-        if ($firstTx) {
-            $milestones[] = [
-                'type' => 'first_exchange',
-                'label' => 'First exchange',
-                'date' => $firstTx->created_at->format('M d, Y'),
-            ];
-        }
-
         // First badge
         $firstBadge = UserBadge::where('user_id', $userId)
-            ->orderBy('awarded_at')
-            ->first(['name', 'icon', 'awarded_at']);
-
+            ->orderBy('awarded_at')->first(['name', 'icon', 'awarded_at']);
         if ($firstBadge) {
             $milestones[] = [
                 'type' => 'first_badge',
@@ -374,82 +284,68 @@ class CommunityDashboardService
             ];
         }
 
-        // Total exchanges milestone
-        $totalTx = (int) Transaction::where('tenant_id', $tenantId)
-            ->where(function ($q) use ($userId) {
-                $q->where('sender_id', $userId)->orWhere('receiver_id', $userId);
-            })
-            ->where('status', 'completed')
-            ->count();
-
-        $txMilestones = [10, 25, 50, 100, 250, 500];
-        foreach ($txMilestones as $milestone) {
-            if ($totalTx >= $milestone) {
-                $milestones[] = [
-                    'type' => 'exchange_milestone',
-                    'label' => "{$milestone} exchanges completed",
-                    'date' => null,
-                ];
+        // Badge count milestones
+        $badgeCount = (int) UserBadge::where('user_id', $userId)->count();
+        foreach ([5, 10, 25, 50, 100] as $m) {
+            if ($badgeCount >= $m) {
+                $milestones[] = ['type' => 'badge_milestone', 'label' => "{$m} badges earned", 'date' => null];
             }
+        }
+
+        // XP milestones
+        $xp = (int) (User::where('id', $userId)->value('xp') ?? 0);
+        foreach ([100, 500, 1000, 5000, 10000, 50000] as $m) {
+            if ($xp >= $m) {
+                $milestones[] = ['type' => 'xp_milestone', 'label' => number_format($m) . ' XP reached', 'date' => null];
+            }
+        }
+
+        // First listing
+        $firstListing = Listing::where('tenant_id', $tenantId)
+            ->where('user_id', $userId)->orderBy('created_at')->first(['created_at']);
+        if ($firstListing) {
+            $milestones[] = [
+                'type' => 'first_listing',
+                'label' => 'First listing posted',
+                'date' => $firstListing->created_at?->format('M d, Y'),
+            ];
+        }
+
+        // Volunteer hours
+        $volHours = (float) VolLog::where('tenant_id', $tenantId)
+            ->where('user_id', $userId)->where('status', 'verified')->sum('hours');
+        if ($volHours > 0) {
+            $milestones[] = [
+                'type' => 'volunteer',
+                'label' => round($volHours, 1) . ' volunteer hours logged',
+                'date' => null,
+            ];
         }
 
         return $milestones;
     }
 
-    /**
-     * Get a quick personal summary (total hours, exchanges, badges, connections).
-     */
     private static function getPersonalSummary(int $tenantId, int $userId): array
     {
+        $user = User::find($userId, ['xp', 'level', 'created_at']);
+
         return [
-            'total_hours_earned' => round((float) Transaction::where('tenant_id', $tenantId)
-                ->where('receiver_id', $userId)->where('status', 'completed')->sum('amount'), 1),
-            'total_hours_given' => round((float) Transaction::where('tenant_id', $tenantId)
-                ->where('sender_id', $userId)->where('status', 'completed')->sum('amount'), 1),
-            'total_exchanges' => (int) Transaction::where('tenant_id', $tenantId)
-                ->where(function ($q) use ($userId) {
-                    $q->where('sender_id', $userId)->orWhere('receiver_id', $userId);
-                })->where('status', 'completed')->count(),
+            'xp' => (int) ($user->xp ?? 0),
+            'level' => (int) ($user->level ?? 1),
+            'level_name' => GamificationService::getLevelName((int) ($user->level ?? 1)),
             'total_badges' => (int) UserBadge::where('user_id', $userId)->count(),
+            'total_listings' => (int) Listing::where('tenant_id', $tenantId)
+                ->where('user_id', $userId)->count(),
+            'volunteer_hours' => round((float) VolLog::where('tenant_id', $tenantId)
+                ->where('user_id', $userId)->where('status', 'verified')->sum('hours'), 1),
             'total_connections' => (int) Connection::where('tenant_id', $tenantId)
                 ->where('status', 'accepted')
                 ->where(function ($q) use ($userId) {
                     $q->where('requester_id', $userId)->orWhere('receiver_id', $userId);
                 })->count(),
-            'member_since' => User::find($userId)?->created_at?->format('M Y'),
+            'total_reviews' => (int) Review::where('tenant_id', $tenantId)
+                ->where('reviewer_id', $userId)->count(),
+            'member_since' => $user?->created_at?->format('M Y'),
         ];
-    }
-
-    /**
-     * Get recent activity summary for a spotlight member.
-     */
-    private static function getRecentActivitySummary(int $tenantId, int $userId): string
-    {
-        $exchanges = (int) Transaction::where('tenant_id', $tenantId)
-            ->where(function ($q) use ($userId) {
-                $q->where('sender_id', $userId)->orWhere('receiver_id', $userId);
-            })
-            ->where('status', 'completed')
-            ->where('created_at', '>=', now()->subDays(30))
-            ->count();
-
-        $people = (int) Transaction::where('tenant_id', $tenantId)
-            ->where(function ($q) use ($userId) {
-                $q->where('sender_id', $userId)->orWhere('receiver_id', $userId);
-            })
-            ->where('status', 'completed')
-            ->where('created_at', '>=', now()->subDays(30))
-            ->selectRaw('COUNT(DISTINCT CASE WHEN sender_id = ? THEN receiver_id ELSE sender_id END) as cnt', [$userId])
-            ->value('cnt');
-
-        if ($exchanges > 0 && $people > 0) {
-            return "Helped {$people} " . ($people === 1 ? 'person' : 'people') . " this month";
-        }
-
-        if ($exchanges > 0) {
-            return "{$exchanges} " . ($exchanges === 1 ? 'exchange' : 'exchanges') . " this month";
-        }
-
-        return 'Active community member';
     }
 }

@@ -10,7 +10,7 @@
  * monthly activity timeline, badge progression, skills growth, milestones.
  */
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Skeleton } from '@heroui/react';
 import {
@@ -23,9 +23,8 @@ import { logError } from '@/lib/logger';
 
 interface MonthlyActivity {
   month: string;
-  exchanges: number;
-  hours_earned: number;
-  connections: number;
+  badges: number;
+  xp_earned: number;
 }
 
 interface BadgeEntry {
@@ -42,18 +41,20 @@ interface PersonalMilestone {
 }
 
 interface PersonalSummary {
-  total_hours_earned: number;
-  total_hours_given: number;
-  total_exchanges: number;
+  xp: number;
+  level: number;
+  level_name: string;
   total_badges: number;
+  total_listings: number;
+  volunteer_hours: number;
   total_connections: number;
+  total_reviews: number;
   member_since: string | null;
 }
 
 interface JourneyData {
   monthly_activity: MonthlyActivity[];
   badge_progression: BadgeEntry[];
-  skills_growth: Array<{ month: string; categories: number }>;
   milestones: PersonalMilestone[];
   summary: PersonalSummary;
 }
@@ -63,37 +64,26 @@ export default function PersonalJourneyTab() {
   const [data, setData] = useState<JourneyData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const abortRef = useRef<AbortController | null>(null);
 
   useEffect(() => {
-    const controller = new AbortController();
-    abortRef.current = controller;
-
     const load = async () => {
       try {
         setIsLoading(true);
-        const res = await api.get<JourneyData>('/v2/gamification/personal-journey', {
-          signal: controller.signal,
-          timeout: 60000,
-        });
-        if (controller.signal.aborted) return;
+        const res = await api.get<JourneyData>('/v2/gamification/personal-journey');
         if (res.success && res.data) {
           setData(res.data);
         } else {
           setError(res.error || 'Failed to load journey data');
         }
       } catch (err: unknown) {
-        if (err instanceof Error && err.name !== 'AbortError') {
-          logError('PersonalJourneyTab', err);
-          setError('Failed to load journey data');
-        }
+        logError('PersonalJourneyTab', err);
+        setError('Failed to load journey data');
       } finally {
         setIsLoading(false);
       }
     };
 
     load();
-    return () => controller.abort();
   }, []);
 
   if (isLoading) {
@@ -128,24 +118,25 @@ export default function PersonalJourneyTab() {
       {/* Summary cards */}
       <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
         <SummaryCard
-          label={t('journey.hours_earned', 'Hours Earned')}
-          value={summary.total_hours_earned}
-          icon={<TrendingUp className="w-4 h-4 text-emerald-500" />}
-        />
-        <SummaryCard
-          label={t('journey.hours_given', 'Hours Given')}
-          value={summary.total_hours_given}
-          icon={<TrendingUp className="w-4 h-4 text-blue-500" />}
-        />
-        <SummaryCard
-          label={t('journey.exchanges', 'Exchanges')}
-          value={summary.total_exchanges}
-          icon={<Target className="w-4 h-4 text-purple-500" />}
+          label={summary.level_name || `Level ${summary.level}`}
+          value={`${summary.xp.toLocaleString()} XP`}
+          icon={<TrendingUp className="w-4 h-4 text-purple-500" />}
+          isText
         />
         <SummaryCard
           label={t('journey.badges', 'Badges')}
           value={summary.total_badges}
           icon={<Award className="w-4 h-4 text-amber-500" />}
+        />
+        <SummaryCard
+          label={t('journey.listings', 'Listings')}
+          value={summary.total_listings}
+          icon={<Target className="w-4 h-4 text-blue-500" />}
+        />
+        <SummaryCard
+          label={t('journey.volunteer_hours', 'Volunteer Hours')}
+          value={summary.volunteer_hours}
+          icon={<Target className="w-4 h-4 text-emerald-500" />}
         />
         <SummaryCard
           label={t('journey.connections', 'Connections')}
@@ -170,12 +161,12 @@ export default function PersonalJourneyTab() {
           </h3>
           <div className="flex items-end gap-1 h-32">
             {monthly_activity.map((month, i) => {
-              const maxExchanges = Math.max(
-                ...monthly_activity.map((m) => m.exchanges),
+              const maxXP = Math.max(
+                ...monthly_activity.map((m) => m.xp_earned),
                 1
               );
               const height = Math.max(
-                (month.exchanges / maxExchanges) * 100,
+                (month.xp_earned / maxXP) * 100,
                 4
               );
 
@@ -189,12 +180,12 @@ export default function PersonalJourneyTab() {
                   style={{ transformOrigin: 'bottom' }}
                 >
                   <span className="text-[10px] text-default-400 font-medium">
-                    {month.exchanges || ''}
+                    {month.xp_earned || ''}
                   </span>
                   <div
                     className="w-full rounded-t bg-gradient-to-t from-primary-500 to-primary-300 min-h-1"
                     style={{ height: `${height}%` }}
-                    title={`${month.month}: ${month.exchanges} exchanges, ${month.hours_earned}h earned`}
+                    title={`${month.month}: ${month.xp_earned} XP, ${month.badges} badges`}
                   />
                   <span className="text-[9px] text-default-400 truncate w-full text-center">
                     {month.month.split(' ')[0]?.slice(0, 3)}
