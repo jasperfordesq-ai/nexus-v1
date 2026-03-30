@@ -7,6 +7,7 @@
 # ─── Dependencies ─────────────────────────────────────────────────────────────
 /node_modules
 /vendor
+composer.phar
 
 # ─── Environment & Credentials (NEVER commit) ────────────────────────────────
 .env
@@ -103,6 +104,7 @@ _deprecated/
 .snapshots
 
 /coverage/
+**/coverage/
 /bootstrap/cache/
 # ─── Logs ─────────────────────────────────────────────────────────────────────
 /logs
