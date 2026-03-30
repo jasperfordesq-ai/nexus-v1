@@ -191,7 +191,6 @@ httpdocs/assets/css/admin-legacy-compat.css
 # ─── Stray CLI Artifacts ────────────────────────────────────────────────────
 --help
 0
-test
 tests/Services/test_*.txt
 Ctemp*
 
