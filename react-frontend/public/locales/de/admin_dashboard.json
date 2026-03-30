@@ -10,6 +10,7 @@
     "back": "Zurück",
     "next": "Weiter"
   },
+  "load_error": "Dashboard-Daten konnten nicht geladen werden",
   "stats": {
     "users_online": "Benutzer online",
     "active_sessions": "Aktive Sitzungen",
@@ -18,6 +19,11 @@
     "transactions": "Transaktionen",
     "hours_exchanged": "Getauschte Stunden",
     "hours": "Stunden"
+  },
+  "trends": {
+    "card_title": "Transaktionstrends",
+    "hours_suffix": "Std",
+    "no_data": "Keine Trenddaten verfügbar"
   },
   "alerts": {
     "users_pending_one": "{{count}} Benutzer ausstehend",

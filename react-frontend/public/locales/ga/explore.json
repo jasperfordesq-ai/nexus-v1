@@ -136,5 +136,16 @@
     "not_relevant": "Níl sé ábhartha",
     "already_seen": "Feicthe cheana",
     "not_interested": "Níl spéis agam sa mhéid seo"
-  }
+  },
+  "loading": "Ábhar Aimsigh á lódáil...",
+  "sections_loaded": "Ábhar Aimsigh lódáilte",
+  "for_you_empty": "Idirghníomhaigh le liostuithe, postálacha, agus imeachtaí chun moltaí pearsantaithe a fháil.",
+  "end_of_feed": "Tá tú suas chun dáta!",
+  "empty_listings": "Níl aon liostuithe le taispeáint fós. Bí ar an gcéad duine ceann a chruthú!",
+  "empty_people": "Níl aon bhaill le taispeáint fós. Tabhair cuireadh do dhuine éigin!",
+  "empty_events": "Níl aon imeachtaí le teacht. Cruthaigh ceann chun do phobal a thabhairt le chéile!",
+  "empty_groups": "Níl aon ghrúpaí gníomhacha fós. Tosaigh grúpa bunaithe ar do spéiseanna!",
+  "create_listing": "Cruthaigh Liostú",
+  "create_event": "Cruthaigh Imeacht",
+  "create_group": "Cruthaigh Grúpa"
 }

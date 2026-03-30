@@ -121,5 +121,10 @@
     "translate": "Übersetzen",
     "translating": "Wird übersetzt...",
     "translation_failed": "Übersetzung fehlgeschlagen"
-  }
+  },
+  "voice.show_transcript": "Transkript anzeigen",
+  "voice.hide_transcript": "Transkript ausblenden",
+  "voice.translate": "Übersetzen",
+  "voice.translating": "Wird übersetzt...",
+  "voice.translation_failed": "Übersetzung fehlgeschlagen. Bitte versuchen Sie es erneut."
 }

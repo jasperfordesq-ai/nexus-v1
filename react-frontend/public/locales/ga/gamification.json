@@ -229,5 +229,34 @@
     "load_error": "Theip ar lódáil an chláir ceannais. Bain triail eile as le do thoil.",
     "type_nexus_score": "NexusScore",
     "loading": "Clár ceannairí á lódáil"
+  },
+  "community": {
+    "total_hours": "Uaireanta Iomlána Malartaithe",
+    "total_members": "Baill an Phobail",
+    "total_exchanges": "Malartuithe Comhlánaithe",
+    "skills_offered": "Catagóirí Scileanna",
+    "this_month": "An Mhí Seo",
+    "hours_this_month": "Uaireanta Malartaithe",
+    "active_members": "Baill Ghníomhacha",
+    "new_connections": "Ceangail Nua",
+    "new_exchanges": "Malartuithe Nua",
+    "new_members": "Baill Nua"
+  },
+  "journey": {
+    "hours_earned": "Uaireanta Tuillte",
+    "hours_given": "Uaireanta Tugtha",
+    "exchanges": "Malartuithe",
+    "badges": "Suaitheantais",
+    "connections": "Ceangail",
+    "member_since": "Ball Ó",
+    "monthly_activity": "Gníomhaíocht Mhíosúil",
+    "badge_timeline": "Amlíne Suaitheantas",
+    "milestones": "Clocha Míle"
+  },
+  "spotlight": {
+    "description": "Baill ghníomhacha molta an phobail inniu",
+    "member_since": "Ball ó",
+    "empty_title": "Gan Spotsholas fós",
+    "empty_description": "Cuirfear baill ghníomhacha i láthair anseo nuair a thosóidh an pobal ag malartú."
   }
 }

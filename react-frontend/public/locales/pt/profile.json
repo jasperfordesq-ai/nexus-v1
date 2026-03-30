@@ -96,5 +96,27 @@
   },
   "load_error": "Falha ao carregar perfil.",
   "listing_image_alt": "Imagem do anúncio",
-  "credits_sent_success": "Créditos enviados para {{name}}"
+  "credits_sent_success": "Créditos enviados para {{name}}",
+  "profile_incomplete": "Perfil ainda não completo",
+  "profile_incomplete_desc": "Este membro ainda não terminou de configurar o seu perfil. Volte mais tarde!",
+  "review_modal": {
+    "title": "Escrever uma avaliação",
+    "subtitle": "Partilhe a sua experiência com {{name}}",
+    "transaction_review": "Avaliação da transação",
+    "general_review": "Avaliação geral",
+    "rating_label": "Classificação",
+    "rating_required": "*",
+    "rate_star": "Avaliar {{star}} de 5 estrelas",
+    "rating_poor": "Fraco",
+    "rating_fair": "Razoável",
+    "rating_good": "Bom",
+    "rating_very_good": "Muito bom",
+    "rating_excellent": "Excelente",
+    "comment_label": "Comentário (Opcional)",
+    "comment_placeholder": "Partilhe detalhes sobre a sua experiência...",
+    "characters_count": "{{count}}/{{max}} caracteres",
+    "cancel": "Cancelar",
+    "submit": "Submeter avaliação",
+    "submit_failed_fallback": "Falha ao submeter avaliação"
+  }
 }

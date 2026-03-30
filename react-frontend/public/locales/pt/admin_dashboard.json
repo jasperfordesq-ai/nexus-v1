@@ -10,6 +10,7 @@
     "back": "Voltar",
     "next": "Seguinte"
   },
+  "load_error": "Falha ao carregar os dados do painel",
   "stats": {
     "users_online": "Utilizadores Online",
     "active_sessions": "Sessões Ativas",
@@ -18,6 +19,11 @@
     "transactions": "Transações",
     "hours_exchanged": "Horas Trocadas",
     "hours": "Horas"
+  },
+  "trends": {
+    "card_title": "Tendências de Transações",
+    "hours_suffix": "h",
+    "no_data": "Sem dados de tendência disponíveis"
   },
   "alerts": {
     "users_pending_one": "{{count}} Utilizador Pendente",

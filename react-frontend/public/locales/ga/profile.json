@@ -96,5 +96,27 @@
   },
   "load_error": "Theip ar lodail an proifile.",
   "listing_image_alt": "Íomhá liostaithe",
-  "credits_sent_success": "Creidmheasanna seolta chuig {{name}}"
+  "credits_sent_success": "Creidmheasanna seolta chuig {{name}}",
+  "profile_incomplete": "Próifíl nach bhfuil críochnaithe fós",
+  "profile_incomplete_desc": "Níl an ball seo tar éis a phróifíl a shocrú fós. Seiceáil arís níos déanaí!",
+  "review_modal": {
+    "title": "Scríobh Léirmheas",
+    "subtitle": "Roinn do thaithí le {{name}}",
+    "transaction_review": "Léirmheas Idirbhirt",
+    "general_review": "Léirmheas Ginearálta",
+    "rating_label": "Rátáil",
+    "rating_required": "*",
+    "rate_star": "Rátáil {{star}} as 5 réalta",
+    "rating_poor": "Go dona",
+    "rating_fair": "Cothrom",
+    "rating_good": "Maith",
+    "rating_very_good": "An-mhaith",
+    "rating_excellent": "Ar fheabhas",
+    "comment_label": "Trácht (Roghnach)",
+    "comment_placeholder": "Roinn sonraí faoi do thaithí...",
+    "characters_count": "{{count}}/{{max}} carachtar",
+    "cancel": "Cealaigh",
+    "submit": "Seol Léirmheas",
+    "submit_failed_fallback": "Theip ar léirmheas a sheoladh"
+  }
 }

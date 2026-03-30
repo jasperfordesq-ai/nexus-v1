@@ -10,6 +10,7 @@
     "back": "Ar ais",
     "next": "Ar aghaidh"
   },
+  "load_error": "Theip ar shonraí an phainéil a lódáil",
   "stats": {
     "users_online": "Úsáideoirí ar Líne",
     "active_sessions": "Seisiúin Ghníomhacha",
@@ -18,6 +19,11 @@
     "transactions": "Idirbhearta",
     "hours_exchanged": "Uaireanta Malartaithe",
     "hours": "Uaireanta"
+  },
+  "trends": {
+    "card_title": "Treochtaí Idirbheart",
+    "hours_suffix": "uair",
+    "no_data": "Níl aon sonraí treochtaí ar fáil"
   },
   "alerts": {
     "users_pending_one": "{{count}} Úsáideoir ar Feitheamh",

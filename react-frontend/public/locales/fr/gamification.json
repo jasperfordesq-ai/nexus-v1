@@ -228,6 +228,35 @@
     "session_expired": "Votre session a expiré. Veuillez vous reconnecter.",
     "load_error": "Échec du chargement du classement. Veuillez réessayer.",
     "type_nexus_score": "NexusScore",
-    "loading": "Loading leaderboard"
+    "loading": "Chargement du classement"
+  },
+  "community": {
+    "total_hours": "Total d'heures échangées",
+    "total_members": "Membres de la communauté",
+    "total_exchanges": "Échanges réalisés",
+    "skills_offered": "Catégories de compétences",
+    "this_month": "Ce mois-ci",
+    "hours_this_month": "Heures échangées",
+    "active_members": "Membres actifs",
+    "new_connections": "Nouvelles connexions",
+    "new_exchanges": "Nouveaux échanges",
+    "new_members": "Nouveaux membres"
+  },
+  "journey": {
+    "hours_earned": "Heures gagnées",
+    "hours_given": "Heures données",
+    "exchanges": "Échanges",
+    "badges": "Badges",
+    "connections": "Connexions",
+    "member_since": "Membre depuis",
+    "monthly_activity": "Activité mensuelle",
+    "badge_timeline": "Chronologie des badges",
+    "milestones": "Jalons"
+  },
+  "spotlight": {
+    "description": "Les membres actifs mis en lumière aujourd'hui",
+    "member_since": "Membre depuis",
+    "empty_title": "Pas encore de coup de projecteur",
+    "empty_description": "Les membres actifs seront mis en avant ici dès que la communauté commencera à échanger."
   }
 }

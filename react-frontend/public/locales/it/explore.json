@@ -136,5 +136,16 @@
     "not_relevant": "Non pertinente",
     "already_seen": "Già visto",
     "not_interested": "Non mi interessa"
-  }
+  },
+  "loading": "Caricamento contenuti Scopri...",
+  "sections_loaded": "Contenuti Scopri caricati",
+  "for_you_empty": "Interagisci con annunci, post ed eventi per ricevere raccomandazioni personalizzate.",
+  "end_of_feed": "Sei aggiornato/a!",
+  "empty_listings": "Nessun annuncio da mostrare. Sii il primo a crearne uno!",
+  "empty_people": "Nessun membro da mostrare. Invita qualcuno a unirsi!",
+  "empty_events": "Nessun evento in programma. Creane uno per riunire la tua comunità!",
+  "empty_groups": "Nessun gruppo attivo. Avvia un gruppo sui tuoi interessi!",
+  "create_listing": "Crea Annuncio",
+  "create_event": "Crea Evento",
+  "create_group": "Crea Gruppo"
 }

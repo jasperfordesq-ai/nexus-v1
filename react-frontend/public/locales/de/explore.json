@@ -136,5 +136,16 @@
     "not_relevant": "Nicht relevant",
     "already_seen": "Bereits gesehen",
     "not_interested": "Kein Interesse daran"
-  }
+  },
+  "loading": "Entdecken-Inhalte werden geladen...",
+  "sections_loaded": "Entdecken-Inhalte geladen",
+  "for_you_empty": "Interagieren Sie mit Inseraten, Beiträgen und Veranstaltungen, um personalisierte Empfehlungen zu erhalten.",
+  "end_of_feed": "Sie sind auf dem neuesten Stand!",
+  "empty_listings": "Noch keine Inserate vorhanden. Erstellen Sie das erste!",
+  "empty_people": "Noch keine Mitglieder anzuzeigen. Laden Sie jemanden ein!",
+  "empty_events": "Keine bevorstehenden Veranstaltungen. Erstellen Sie eine, um Ihre Gemeinschaft zusammenzubringen!",
+  "empty_groups": "Noch keine aktiven Gruppen. Gründen Sie eine Gruppe zu Ihren Interessen!",
+  "create_listing": "Inserat erstellen",
+  "create_event": "Veranstaltung erstellen",
+  "create_group": "Gruppe erstellen"
 }

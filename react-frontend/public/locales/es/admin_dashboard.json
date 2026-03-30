@@ -10,6 +10,7 @@
     "back": "Atrás",
     "next": "Siguiente"
   },
+  "load_error": "No se pudieron cargar los datos del panel",
   "stats": {
     "users_online": "Usuarios en Línea",
     "active_sessions": "Sesiones Activas",
@@ -18,6 +19,11 @@
     "transactions": "Transacciones",
     "hours_exchanged": "Horas Intercambiadas",
     "hours": "Horas"
+  },
+  "trends": {
+    "card_title": "Tendencias de Transacciones",
+    "hours_suffix": "h",
+    "no_data": "No hay datos de tendencias disponibles"
   },
   "alerts": {
     "users_pending_one": "{{count}} Usuario Pendiente",

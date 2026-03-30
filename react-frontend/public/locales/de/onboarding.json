@@ -90,5 +90,16 @@
   "toast_listings_created": "{{count}} Eintrag/Einträge für Sie erstellt.",
   "toast_profile_all_set": "Ihr Profil ist eingerichtet.",
   "toast_complete_profile_first": "Vervollständigen Sie zuerst Ihr Profil",
-  "toast_photo_bio_required": "Foto und Biografie sind erforderlich."
+  "toast_photo_bio_required": "Foto und Biografie sind erforderlich.",
+
+  "safeguarding": {
+    "load_error": "Optionen konnten nicht geladen werden",
+    "try_again": "Bitte versuchen Sie es erneut.",
+    "required": "Erforderliche Optionen",
+    "required_respond": "Bitte antworten Sie auf: {{items}}",
+    "empty": "Für diese Gemeinschaft wurden keine Schutzoptionen konfiguriert.",
+    "save_failed": "Speichern fehlgeschlagen",
+    "save_continue": "Speichern & Weiter",
+    "required_fields": "Pflichtfelder"
+  }
 }

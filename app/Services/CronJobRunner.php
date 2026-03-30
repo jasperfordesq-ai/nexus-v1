@@ -34,6 +34,7 @@ use App\Services\ListingExpiryReminderService;
 use App\Services\JobVacancyService;
 use App\Services\RecurringShiftService;
 use App\Services\StoryService;
+use Illuminate\Support\Facades\RateLimiter;
 
 /**
  * Executes scheduled cron jobs (digests, newsletters, cleanup, matching, etc.).
@@ -50,7 +51,23 @@ class CronJobRunner
             return;
         }
 
-        // 2. HTTP Access requires a Key
+        // 2. IP-based rate limiting — 120 requests per hour (cron runs every minute = 60/hr, 2x headroom)
+        $ip = $_SERVER['REMOTE_ADDR'] ?? 'unknown';
+        $rateLimitKey = 'cron-access:' . $ip;
+
+        if (RateLimiter::tooManyAttempts($rateLimitKey, 120)) {
+            $retryAfter = RateLimiter::availableIn($rateLimitKey);
+            if (($_ENV['APP_ENV'] ?? getenv('APP_ENV')) === 'testing' || (function_exists('app') && app()->environment('testing'))) {
+                throw new \Symfony\Component\HttpKernel\Exception\HttpException(429, 'Too Many Requests: Rate limit exceeded. Retry after ' . $retryAfter . ' seconds.');
+            }
+            http_response_code(429);
+            header('Retry-After: ' . $retryAfter);
+            die('Too Many Requests: Rate limit exceeded. Retry after ' . $retryAfter . ' seconds.');
+        }
+
+        RateLimiter::hit($rateLimitKey, 3600);
+
+        // 3. HTTP Access requires a Key
         // Try to get key from request query param or Header
         $key = request()->query('key');
         if (!$key) {

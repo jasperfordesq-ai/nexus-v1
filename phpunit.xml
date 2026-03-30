@@ -5,6 +5,9 @@
       <directory suffix="Test.php">tests/Laravel</directory>
       <exclude>tests/Laravel/Migrated</exclude>
     </testsuite>
+    <testsuite name="Integration">
+      <directory suffix="Test.php">tests/Laravel/Integration</directory>
+    </testsuite>
     <testsuite name="LaravelMigrated">
       <directory suffix="Test.php">tests/Laravel/Migrated</directory>
     </testsuite>

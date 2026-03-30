@@ -90,5 +90,16 @@
   "toast_listings_created": "{{count}} anuncio(s) creados por ti.",
   "toast_profile_all_set": "Tu perfil está todo listo.",
   "toast_complete_profile_first": "Completa tu perfil primero",
-  "toast_photo_bio_required": "Se requieren foto y biografía."
+  "toast_photo_bio_required": "Se requieren foto y biografía.",
+
+  "safeguarding": {
+    "load_error": "Error al cargar las opciones",
+    "try_again": "Inténtalo de nuevo.",
+    "required": "Opciones obligatorias",
+    "required_respond": "Por favor responde a: {{items}}",
+    "empty": "No se han configurado opciones de protección para esta comunidad.",
+    "save_failed": "Error al guardar",
+    "save_continue": "Guardar y continuar",
+    "required_fields": "Campos obligatorios"
+  }
 }

@@ -10,6 +10,7 @@
     "back": "Retour",
     "next": "Suivant"
   },
+  "load_error": "Impossible de charger les données du tableau de bord",
   "stats": {
     "users_online": "Utilisateurs en ligne",
     "active_sessions": "Sessions actives",
@@ -18,6 +19,11 @@
     "transactions": "Transactions",
     "hours_exchanged": "Heures échangées",
     "hours": "Heures"
+  },
+  "trends": {
+    "card_title": "Tendances des transactions",
+    "hours_suffix": "h",
+    "no_data": "Aucune donnée de tendance disponible"
   },
   "alerts": {
     "users_pending_one": "{{count}} utilisateur en attente",

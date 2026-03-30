@@ -121,5 +121,10 @@
     "translate": "Aistrigh",
     "translating": "Ag aistriú...",
     "translation_failed": "Theip ar an aistriúchán"
-  }
+  },
+  "voice.show_transcript": "Taispeáin an trascríbhinn",
+  "voice.hide_transcript": "Folaigh an trascríbhinn",
+  "voice.translate": "Aistrigh",
+  "voice.translating": "Ag aistriú...",
+  "voice.translation_failed": "Theip ar an aistriúchán. Bain triail eile as."
 }

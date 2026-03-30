@@ -96,5 +96,27 @@
   },
   "load_error": "Profil konnte nicht geladen werden.",
   "listing_image_alt": "Anzeigenbild",
-  "credits_sent_success": "Kredite an {{name}} gesendet"
+  "credits_sent_success": "Kredite an {{name}} gesendet",
+  "profile_incomplete": "Profil noch nicht vollständig",
+  "profile_incomplete_desc": "Dieses Mitglied hat sein Profil noch nicht fertig eingerichtet. Schauen Sie später noch einmal vorbei!",
+  "review_modal": {
+    "title": "Bewertung schreiben",
+    "subtitle": "Teilen Sie Ihre Erfahrung mit {{name}}",
+    "transaction_review": "Transaktionsbewertung",
+    "general_review": "Allgemeine Bewertung",
+    "rating_label": "Bewertung",
+    "rating_required": "*",
+    "rate_star": "{{star}} von 5 Sternen bewerten",
+    "rating_poor": "Schlecht",
+    "rating_fair": "Ausreichend",
+    "rating_good": "Gut",
+    "rating_very_good": "Sehr gut",
+    "rating_excellent": "Ausgezeichnet",
+    "comment_label": "Kommentar (Optional)",
+    "comment_placeholder": "Teilen Sie Details über Ihre Erfahrung...",
+    "characters_count": "{{count}}/{{max}} Zeichen",
+    "cancel": "Abbrechen",
+    "submit": "Bewertung absenden",
+    "submit_failed_fallback": "Bewertung konnte nicht abgesendet werden"
+  }
 }

@@ -229,5 +229,34 @@
     "load_error": "Falha ao carregar a classificação. Tente novamente.",
     "type_nexus_score": "NexusScore",
     "loading": "A carregar tabela de classificação"
+  },
+  "community": {
+    "total_hours": "Total de horas trocadas",
+    "total_members": "Membros da comunidade",
+    "total_exchanges": "Trocas concluídas",
+    "skills_offered": "Categorias de competências",
+    "this_month": "Este mês",
+    "hours_this_month": "Horas trocadas",
+    "active_members": "Membros ativos",
+    "new_connections": "Novas ligações",
+    "new_exchanges": "Novas trocas",
+    "new_members": "Novos membros"
+  },
+  "journey": {
+    "hours_earned": "Horas ganhas",
+    "hours_given": "Horas dadas",
+    "exchanges": "Trocas",
+    "badges": "Emblemas",
+    "connections": "Ligações",
+    "member_since": "Membro desde",
+    "monthly_activity": "Atividade mensal",
+    "badge_timeline": "Cronologia de emblemas",
+    "milestones": "Marcos"
+  },
+  "spotlight": {
+    "description": "Membros ativos da comunidade em destaque hoje",
+    "member_since": "Membro desde",
+    "empty_title": "Sem destaque ainda",
+    "empty_description": "Os membros ativos serão apresentados aqui assim que a comunidade começar a trocar."
   }
 }

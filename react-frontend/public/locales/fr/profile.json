@@ -96,5 +96,27 @@
   },
   "load_error": "Impossible de charger le profil.",
   "listing_image_alt": "Listing image",
-  "credits_sent_success": "Credits sent to {{name}}"
+  "credits_sent_success": "Crédits envoyés à {{name}}",
+  "profile_incomplete": "Profil pas encore complété",
+  "profile_incomplete_desc": "Ce membre n'a pas encore terminé la configuration de son profil. Revenez plus tard !",
+  "review_modal": {
+    "title": "Écrire un avis",
+    "subtitle": "Partagez votre expérience avec {{name}}",
+    "transaction_review": "Avis sur la transaction",
+    "general_review": "Avis général",
+    "rating_label": "Note",
+    "rating_required": "*",
+    "rate_star": "Noter {{star}} sur 5 étoiles",
+    "rating_poor": "Mauvais",
+    "rating_fair": "Passable",
+    "rating_good": "Bon",
+    "rating_very_good": "Très bon",
+    "rating_excellent": "Excellent",
+    "comment_label": "Commentaire (Optionnel)",
+    "comment_placeholder": "Partagez les détails de votre expérience...",
+    "characters_count": "{{count}}/{{max}} caractères",
+    "cancel": "Annuler",
+    "submit": "Soumettre l'avis",
+    "submit_failed_fallback": "Impossible de soumettre l'avis"
+  }
 }

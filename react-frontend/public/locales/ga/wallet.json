@@ -111,5 +111,19 @@
   "exceeds_balance": "Thar an iarmhéid ar fáil",
   "optional": "roghnach",
   "description_placeholder": "Cad is aidhm leis an aistriú seo?",
-  "new_balance_after": "Beidh d'iarmhéid nua {{balance}} uair"
+  "new_balance_after": "Beidh d'iarmhéid nua {{balance}} uair",
+  "rating": {
+    "title": "Rátáil do Mhalartú",
+    "prompt": "Conas a bhí do mhalartú?",
+    "prompt_with_name": "Conas a bhí do mhalartú le {{name}}?",
+    "poor": "Go dona",
+    "fair": "Cothrom",
+    "good": "Maith",
+    "very_good": "An-mhaith",
+    "excellent": "Ar fheabhas",
+    "comment_label": "Trácht (roghnach)",
+    "comment_placeholder": "Roinn do thaithí...",
+    "skip": "Scipeáil",
+    "submit": "Seol Rátáil"
+  }
 }

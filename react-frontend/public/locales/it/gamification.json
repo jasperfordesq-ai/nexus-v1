@@ -229,5 +229,34 @@
     "load_error": "Impossibile caricare la classifica. Riprova.",
     "type_nexus_score": "NexusScore",
     "loading": "Caricamento classifica"
+  },
+  "community": {
+    "total_hours": "Ore totali scambiate",
+    "total_members": "Membri della comunità",
+    "total_exchanges": "Scambi completati",
+    "skills_offered": "Categorie di competenze",
+    "this_month": "Questo mese",
+    "hours_this_month": "Ore scambiate",
+    "active_members": "Membri attivi",
+    "new_connections": "Nuove connessioni",
+    "new_exchanges": "Nuovi scambi",
+    "new_members": "Nuovi membri"
+  },
+  "journey": {
+    "hours_earned": "Ore guadagnate",
+    "hours_given": "Ore donate",
+    "exchanges": "Scambi",
+    "badges": "Badge",
+    "connections": "Connessioni",
+    "member_since": "Membro dal",
+    "monthly_activity": "Attività mensile",
+    "badge_timeline": "Cronologia badge",
+    "milestones": "Traguardi"
+  },
+  "spotlight": {
+    "description": "Membri attivi della comunità in evidenza oggi",
+    "member_since": "Membro dal",
+    "empty_title": "Nessun riflettore ancora",
+    "empty_description": "I membri attivi saranno messi in evidenza qui una volta che la comunità inizierà a scambiare."
   }
 }

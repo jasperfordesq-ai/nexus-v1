@@ -111,5 +111,19 @@
   "exceeds_balance": "Dépasse le solde disponible",
   "optional": "optionnel",
   "description_placeholder": "À quoi sert ce transfert ?",
-  "new_balance_after": "Votre nouveau solde sera de {{balance}} heures"
+  "new_balance_after": "Votre nouveau solde sera de {{balance}} heures",
+  "rating": {
+    "title": "Évaluez votre échange",
+    "prompt": "Comment s'est passé votre échange ?",
+    "prompt_with_name": "Comment s'est passé votre échange avec {{name}} ?",
+    "poor": "Mauvais",
+    "fair": "Passable",
+    "good": "Bon",
+    "very_good": "Très bon",
+    "excellent": "Excellent",
+    "comment_label": "Commentaire (optionnel)",
+    "comment_placeholder": "Partagez votre expérience...",
+    "skip": "Passer",
+    "submit": "Soumettre l'évaluation"
+  }
 }

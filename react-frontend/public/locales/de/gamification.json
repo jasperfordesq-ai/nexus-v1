@@ -229,5 +229,34 @@
     "load_error": "Rangliste konnte nicht geladen werden. Bitte versuchen Sie es erneut.",
     "type_nexus_score": "NexusScore",
     "loading": "Rangliste wird geladen"
+  },
+  "community": {
+    "total_hours": "Insgesamt getauschte Stunden",
+    "total_members": "Gemeinschaftsmitglieder",
+    "total_exchanges": "Abgeschlossene Tauschvorgänge",
+    "skills_offered": "Fähigkeitskategorien",
+    "this_month": "Diesen Monat",
+    "hours_this_month": "Getauschte Stunden",
+    "active_members": "Aktive Mitglieder",
+    "new_connections": "Neue Verbindungen",
+    "new_exchanges": "Neue Tauschvorgänge",
+    "new_members": "Neue Mitglieder"
+  },
+  "journey": {
+    "hours_earned": "Verdiente Stunden",
+    "hours_given": "Gegebene Stunden",
+    "exchanges": "Tauschvorgänge",
+    "badges": "Abzeichen",
+    "connections": "Verbindungen",
+    "member_since": "Mitglied seit",
+    "monthly_activity": "Monatliche Aktivität",
+    "badge_timeline": "Abzeichen-Zeitachse",
+    "milestones": "Meilensteine"
+  },
+  "spotlight": {
+    "description": "Heutige hervorgehobene aktive Gemeinschaftsmitglieder",
+    "member_since": "Mitglied seit",
+    "empty_title": "Noch kein Spotlight",
+    "empty_description": "Aktive Mitglieder werden hier vorgestellt, sobald die Gemeinschaft mit dem Tauschen beginnt."
   }
 }

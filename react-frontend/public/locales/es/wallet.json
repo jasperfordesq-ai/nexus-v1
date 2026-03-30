@@ -111,5 +111,19 @@
   "exceeds_balance": "Supera el saldo disponible",
   "optional": "opcional",
   "description_placeholder": "¿Para qué es esta transferencia?",
-  "new_balance_after": "Tu nuevo saldo será de {{balance}} horas"
+  "new_balance_after": "Tu nuevo saldo será de {{balance}} horas",
+  "rating": {
+    "title": "Califica tu intercambio",
+    "prompt": "¿Cómo fue tu intercambio?",
+    "prompt_with_name": "¿Cómo fue tu intercambio con {{name}}?",
+    "poor": "Malo",
+    "fair": "Regular",
+    "good": "Bueno",
+    "very_good": "Muy bueno",
+    "excellent": "Excelente",
+    "comment_label": "Comentario (opcional)",
+    "comment_placeholder": "Comparte tu experiencia...",
+    "skip": "Omitir",
+    "submit": "Enviar calificación"
+  }
 }

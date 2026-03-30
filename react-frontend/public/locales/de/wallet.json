@@ -111,5 +111,19 @@
   "exceeds_balance": "Übersteigt das verfügbare Guthaben",
   "optional": "optional",
   "description_placeholder": "Wofür ist diese Überweisung?",
-  "new_balance_after": "Ihr neues Guthaben beträgt {{balance}} Stunden"
+  "new_balance_after": "Ihr neues Guthaben beträgt {{balance}} Stunden",
+  "rating": {
+    "title": "Bewerten Sie Ihren Tausch",
+    "prompt": "Wie war Ihr Tausch?",
+    "prompt_with_name": "Wie war Ihr Tausch mit {{name}}?",
+    "poor": "Schlecht",
+    "fair": "Ausreichend",
+    "good": "Gut",
+    "very_good": "Sehr gut",
+    "excellent": "Ausgezeichnet",
+    "comment_label": "Kommentar (optional)",
+    "comment_placeholder": "Teilen Sie Ihre Erfahrung...",
+    "skip": "Überspringen",
+    "submit": "Bewertung abgeben"
+  }
 }

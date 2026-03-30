@@ -121,5 +121,10 @@
     "translate": "Traducir",
     "translating": "Traduciendo...",
     "translation_failed": "Error en la traducción"
-  }
+  },
+  "voice.show_transcript": "Mostrar transcripción",
+  "voice.hide_transcript": "Ocultar transcripción",
+  "voice.translate": "Traducir",
+  "voice.translating": "Traduciendo...",
+  "voice.translation_failed": "Error en la traducción. Inténtalo de nuevo."
 }

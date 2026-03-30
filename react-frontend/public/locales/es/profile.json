@@ -96,5 +96,27 @@
   },
   "load_error": "Error al cargar el perfil.",
   "listing_image_alt": "Imagen del anuncio",
-  "credits_sent_success": "Créditos enviados a {{name}}"
+  "credits_sent_success": "Créditos enviados a {{name}}",
+  "profile_incomplete": "Perfil aún no completado",
+  "profile_incomplete_desc": "Este miembro aún no ha terminado de configurar su perfil. ¡Vuelve más tarde!",
+  "review_modal": {
+    "title": "Escribir una reseña",
+    "subtitle": "Comparte tu experiencia con {{name}}",
+    "transaction_review": "Reseña de transacción",
+    "general_review": "Reseña general",
+    "rating_label": "Calificación",
+    "rating_required": "*",
+    "rate_star": "Calificar {{star}} de 5 estrellas",
+    "rating_poor": "Malo",
+    "rating_fair": "Regular",
+    "rating_good": "Bueno",
+    "rating_very_good": "Muy bueno",
+    "rating_excellent": "Excelente",
+    "comment_label": "Comentario (Opcional)",
+    "comment_placeholder": "Comparte detalles sobre tu experiencia...",
+    "characters_count": "{{count}}/{{max}} caracteres",
+    "cancel": "Cancelar",
+    "submit": "Enviar reseña",
+    "submit_failed_fallback": "No se pudo enviar la reseña"
+  }
 }
