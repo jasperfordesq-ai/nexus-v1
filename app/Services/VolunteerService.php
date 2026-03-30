@@ -272,8 +272,8 @@ class VolunteerService
             ->where('date_logged', '>=', now()->startOfMonth())
             ->sum('hours');
 
-        $byOrg = VolLog::where('user_id', $userId)
-            ->where('status', 'approved')
+        $byOrg = VolLog::where('vol_logs.user_id', $userId)
+            ->where('vol_logs.status', 'approved')
             ->join('vol_organizations', 'vol_logs.organization_id', '=', 'vol_organizations.id')
             ->selectRaw('vol_organizations.name, SUM(vol_logs.hours) as hours')
             ->groupBy('vol_organizations.id', 'vol_organizations.name')

@@ -344,8 +344,8 @@ export function DashboardPage() {
                   </div>
                 ) : stats.recentActivity.length > 0 ? (
                   <div className="divide-y divide-[var(--glass-border)]">
-                    {stats.recentActivity.map((item) => (
-                      <Link key={item.id} to={tenantPath('/feed')} className="flex items-center gap-3 py-3 first:pt-0 last:pb-0 group">
+                    {stats.recentActivity.map((item, idx) => (
+                      <Link key={`${item.type}-${item.id}-${idx}`} to={tenantPath('/feed')} className="flex items-center gap-3 py-3 first:pt-0 last:pb-0 group">
                         <Avatar src={resolveAvatarUrl(item.author_avatar)} name={item.author_name} size="sm" className="shrink-0" />
                         <div className="flex-1 min-w-0">
                           <p className="text-sm text-theme-primary"><span className="font-medium">{item.author_name}</span>{' '}<span className="text-theme-muted">{formatActivityAction(item, t)}</span></p>

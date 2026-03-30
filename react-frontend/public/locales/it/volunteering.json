@@ -406,5 +406,55 @@
       "language": "Linguistica",
       "other": "Altro"
     }
+  },
+  "common": {
+    "refresh": "Aggiorna",
+    "try_again": "Riprova"
+  },
+  "recommendations": {
+    "title": "Consigliato per te",
+    "empty_title": "Nessuna raccomandazione ancora",
+    "empty_description": "Aggiungi competenze al tuo profilo per ottenere raccomandazioni personalizzate sui turni.",
+    "error_load": "Impossibile caricare le raccomandazioni",
+    "error_load_generic": "Impossibile caricare le raccomandazioni. Riprova.",
+    "match_score": "{{score}}% di corrispondenza",
+    "view_opportunity": "Vedi"
+  },
+  "certificates": {
+    "title": "Certificati di impatto",
+    "generate": "Genera certificato",
+    "description": "I certificati includono tutte le ore di volontariato approvate in tutte le organizzazioni.",
+    "empty_title": "Nessun certificato ancora",
+    "empty_description": "Genera un certificato per mostrare le tue ore di volontariato.",
+    "error_load": "Impossibile caricare i certificati",
+    "error_load_generic": "Impossibile caricare i certificati.",
+    "generated_success": "Certificato generato!",
+    "no_verified_hours": "Nessuna ora di volontariato verificata trovata. Le ore devono essere approvate prima di generare un certificato.",
+    "generated_error": "Impossibile generare il certificato. Riprova.",
+    "verified_hours": "{{count}} ore verificate",
+    "generated_on": "Generato",
+    "download": "Scarica",
+    "verify": "Verifica"
+  },
+  "emergency": {
+    "title": "Avvisi di emergenza",
+    "priority_critical": "CRITICO",
+    "priority_urgent": "URGENTE",
+    "priority_normal": "NORMALE",
+    "error_load": "Impossibile caricare gli avvisi",
+    "error_load_generic": "Impossibile caricare gli avvisi.",
+    "empty_title": "Nessun avviso di emergenza",
+    "empty_description": "Non hai richieste di turni di emergenza al momento.",
+    "pending_count": "{{count}} in attesa",
+    "accept": "Accetta",
+    "decline": "Rifiuta",
+    "accepted": "Accettato",
+    "declined": "Rifiutato",
+    "alert_accepted": "Avviso accettato.",
+    "alert_declined": "Avviso rifiutato.",
+    "respond_error": "Impossibile rispondere all'avviso.",
+    "respond_error_generic": "Impossibile rispondere all'avviso. Riprova.",
+    "from": "Da",
+    "expires": "Scade"
   }
 }

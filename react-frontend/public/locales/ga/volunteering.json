@@ -406,5 +406,55 @@
       "language": "Teanga",
       "other": "Eile"
     }
+  },
+  "common": {
+    "refresh": "Athnuaigh",
+    "try_again": "Bain Triail Eile As"
+  },
+  "recommendations": {
+    "title": "Molta Duit",
+    "empty_title": "Níl moltaí ann fós",
+    "empty_description": "Cuir scileanna le do phróifíl chun moltaí pearsantaithe sealanna a fháil.",
+    "error_load": "Theip ar mholtaí a lódáil",
+    "error_load_generic": "Ní féidir moltaí a lódáil. Bain triail eile as le do thoil.",
+    "match_score": "{{score}}% meaitseáil",
+    "view_opportunity": "Féach"
+  },
+  "certificates": {
+    "title": "Teastais Tionchair",
+    "generate": "Gin Teastas",
+    "description": "Áirítear ar theastais do chuid uaireanta oibre deonaí ceadaithe ar fad ar fud gach eagrais.",
+    "empty_title": "Níl teastais ann fós",
+    "empty_description": "Gin teastas chun do chuid uaireanta oibre deonaí a thaispeáint.",
+    "error_load": "Theip ar theastais a lódáil",
+    "error_load_generic": "Ní féidir teastais a lódáil.",
+    "generated_success": "Teastas ginte!",
+    "no_verified_hours": "Níor aimsíodh uaireanta oibre deonaí deimhnithe. Caithfidh uaireanta a bheith ceadaithe sula ngintear teastas.",
+    "generated_error": "Theip ar theastas a ghiniúint. Bain triail eile as le do thoil.",
+    "verified_hours": "{{count}} Uair Dheimhnithe",
+    "generated_on": "Ginte",
+    "download": "Íoslódáil",
+    "verify": "Fíoraigh"
+  },
+  "emergency": {
+    "title": "Foláirimh Éigeandála",
+    "priority_critical": "CRITICIÚIL",
+    "priority_urgent": "PRÁINNEACH",
+    "priority_normal": "GNÁTH",
+    "error_load": "Theip ar fholáirimh a lódáil",
+    "error_load_generic": "Ní féidir foláirimh a lódáil.",
+    "empty_title": "Gan foláirimh éigeandála",
+    "empty_description": "Níl aon iarratais seal éigeandála agat faoi láthair.",
+    "pending_count": "{{count}} ar feitheamh",
+    "accept": "Glac",
+    "decline": "Diúltaigh",
+    "accepted": "Glactha",
+    "declined": "Diúltaithe",
+    "alert_accepted": "Foláireamh glactha.",
+    "alert_declined": "Foláireamh diúltaithe.",
+    "respond_error": "Theip ar fhreagra a thabhairt ar fholáireamh.",
+    "respond_error_generic": "Theip ar fhreagra a thabhairt ar fholáireamh. Bain triail eile as le do thoil.",
+    "from": "Ó",
+    "expires": "Ag Dul in Éag"
   }
 }

@@ -406,5 +406,55 @@
       "language": "Sprache",
       "other": "Sonstige"
     }
+  },
+  "common": {
+    "refresh": "Aktualisieren",
+    "try_again": "Erneut versuchen"
+  },
+  "recommendations": {
+    "title": "Für Sie empfohlen",
+    "empty_title": "Noch keine Empfehlungen",
+    "empty_description": "Fügen Sie Ihrem Profil Fähigkeiten hinzu, um personalisierte Schichtempfehlungen zu erhalten.",
+    "error_load": "Empfehlungen konnten nicht geladen werden",
+    "error_load_generic": "Empfehlungen konnten nicht geladen werden. Bitte versuchen Sie es erneut.",
+    "match_score": "{{score}}% Übereinstimmung",
+    "view_opportunity": "Ansehen"
+  },
+  "certificates": {
+    "title": "Wirkungszertifikate",
+    "generate": "Zertifikat erstellen",
+    "description": "Zertifikate beinhalten alle Ihre genehmigten Freiwilligenstunden aller Organisationen.",
+    "empty_title": "Noch keine Zertifikate",
+    "empty_description": "Erstellen Sie ein Zertifikat, um Ihre Freiwilligenstunden zu präsentieren.",
+    "error_load": "Zertifikate konnten nicht geladen werden",
+    "error_load_generic": "Zertifikate konnten nicht geladen werden.",
+    "generated_success": "Zertifikat erstellt!",
+    "no_verified_hours": "Keine bestätigten Freiwilligenstunden gefunden. Stunden müssen genehmigt werden, bevor ein Zertifikat erstellt werden kann.",
+    "generated_error": "Zertifikat konnte nicht erstellt werden. Bitte versuchen Sie es erneut.",
+    "verified_hours": "{{count}} bestätigte Stunden",
+    "generated_on": "Erstellt",
+    "download": "Herunterladen",
+    "verify": "Überprüfen"
+  },
+  "emergency": {
+    "title": "Notfall-Benachrichtigungen",
+    "priority_critical": "KRITISCH",
+    "priority_urgent": "DRINGEND",
+    "priority_normal": "NORMAL",
+    "error_load": "Benachrichtigungen konnten nicht geladen werden",
+    "error_load_generic": "Benachrichtigungen konnten nicht geladen werden.",
+    "empty_title": "Keine Notfall-Benachrichtigungen",
+    "empty_description": "Sie haben derzeit keine Notfall-Schichtanfragen.",
+    "pending_count": "{{count}} ausstehend",
+    "accept": "Annehmen",
+    "decline": "Ablehnen",
+    "accepted": "Angenommen",
+    "declined": "Abgelehnt",
+    "alert_accepted": "Benachrichtigung angenommen.",
+    "alert_declined": "Benachrichtigung abgelehnt.",
+    "respond_error": "Antwort auf Benachrichtigung fehlgeschlagen.",
+    "respond_error_generic": "Antwort auf Benachrichtigung fehlgeschlagen. Bitte versuchen Sie es erneut.",
+    "from": "Von",
+    "expires": "Läuft ab"
   }
 }

@@ -73,8 +73,9 @@ export function MediaGrid({ media, className = '' }: MediaGridProps) {
           draggable={false}
           onError={(e) => {
             const img = e.target as HTMLImageElement;
-            const fullUrl = resolveAssetUrl(item.file_url);
-            if (img.src !== fullUrl) img.src = fullUrl;
+            if (img.dataset.retried) return;
+            img.dataset.retried = '1';
+            img.src = resolveAssetUrl(item.file_url);
           }}
         />
       )}

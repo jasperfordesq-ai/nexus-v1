@@ -406,5 +406,55 @@
       "language": "Idioma",
       "other": "Otro"
     }
+  },
+  "common": {
+    "refresh": "Actualizar",
+    "try_again": "Reintentar"
+  },
+  "recommendations": {
+    "title": "Recomendado para ti",
+    "empty_title": "Sin recomendaciones aún",
+    "empty_description": "Añade habilidades a tu perfil para obtener recomendaciones de turnos personalizadas.",
+    "error_load": "Error al cargar las recomendaciones",
+    "error_load_generic": "No se pudieron cargar las recomendaciones. Por favor, inténtelo de nuevo.",
+    "match_score": "{{score}}% de coincidencia",
+    "view_opportunity": "Ver"
+  },
+  "certificates": {
+    "title": "Certificados de Impacto",
+    "generate": "Generar Certificado",
+    "description": "Los certificados incluyen todas tus horas de voluntariado aprobadas en todas las organizaciones.",
+    "empty_title": "Sin certificados aún",
+    "empty_description": "Genera un certificado para mostrar tus horas de voluntariado.",
+    "error_load": "Error al cargar los certificados",
+    "error_load_generic": "No se pudieron cargar los certificados.",
+    "generated_success": "¡Certificado generado!",
+    "no_verified_hours": "No se encontraron horas de voluntariado verificadas. Las horas deben ser aprobadas antes de generar un certificado.",
+    "generated_error": "Error al generar el certificado. Por favor, inténtelo de nuevo.",
+    "verified_hours": "{{count}} Horas Verificadas",
+    "generated_on": "Generado",
+    "download": "Descargar",
+    "verify": "Verificar"
+  },
+  "emergency": {
+    "title": "Alertas de Emergencia",
+    "priority_critical": "CRÍTICO",
+    "priority_urgent": "URGENTE",
+    "priority_normal": "NORMAL",
+    "error_load": "Error al cargar las alertas",
+    "error_load_generic": "No se pudieron cargar las alertas.",
+    "empty_title": "Sin alertas de emergencia",
+    "empty_description": "No tienes solicitudes de turnos de emergencia en este momento.",
+    "pending_count": "{{count}} pendientes",
+    "accept": "Aceptar",
+    "decline": "Rechazar",
+    "accepted": "Aceptado",
+    "declined": "Rechazado",
+    "alert_accepted": "Alerta aceptada.",
+    "alert_declined": "Alerta rechazada.",
+    "respond_error": "Error al responder a la alerta.",
+    "respond_error_generic": "Error al responder a la alerta. Por favor, inténtelo de nuevo.",
+    "from": "De",
+    "expires": "Expira"
   }
 }

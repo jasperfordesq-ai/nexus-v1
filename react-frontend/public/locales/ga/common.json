@@ -288,6 +288,7 @@
   },
   "dev_banner": {
     "aria_label": "Stádas forbartha",
+    "dev_notice": "Fógra Forbartha",
     "status": "{{stage}}",
     "summary": "Is ardán nua é seo agus tá tú á fheiceáil i mód réamhamhairc.",
     "read_more": "Léigh tuilleadh"

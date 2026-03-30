@@ -90,7 +90,7 @@ export function EmergencyAlertsTab() {
       if (controller.signal.aborted) return;
       if (response.success && response.data) {
         const payload = response.data as { alerts?: EmergencyAlert[] } | EmergencyAlert[];
-        setAlerts(Array.isArray(payload) ? payload : (payload.alerts ?? []));
+        setAlerts(Array.isArray(payload) ? payload : Array.isArray(payload.alerts) ? payload.alerts : []);
       } else {
         setError(tRef.current('emergency.error_load', 'Failed to load alerts'));
       }

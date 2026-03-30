@@ -406,5 +406,55 @@
       "language": "Language",
       "other": "Other"
     }
+  },
+  "common": {
+    "refresh": "Refresh",
+    "try_again": "Try Again"
+  },
+  "recommendations": {
+    "title": "Recommended for You",
+    "empty_title": "No recommendations yet",
+    "empty_description": "Add skills to your profile to get personalized shift recommendations.",
+    "error_load": "Failed to load recommendations",
+    "error_load_generic": "Unable to load recommendations. Please try again.",
+    "match_score": "{{score}}% match",
+    "view_opportunity": "View"
+  },
+  "certificates": {
+    "title": "Impact Certificates",
+    "generate": "Generate Certificate",
+    "description": "Certificates include all of your approved volunteer hours across every organization.",
+    "empty_title": "No certificates yet",
+    "empty_description": "Generate a certificate to showcase your volunteer hours.",
+    "error_load": "Failed to load certificates",
+    "error_load_generic": "Unable to load certificates.",
+    "generated_success": "Certificate generated!",
+    "no_verified_hours": "No verified volunteer hours found. Hours must be approved before generating a certificate.",
+    "generated_error": "Failed to generate certificate. Please try again.",
+    "verified_hours": "{{count}} Verified Hours",
+    "generated_on": "Generated",
+    "download": "Download",
+    "verify": "Verify"
+  },
+  "emergency": {
+    "title": "Emergency Alerts",
+    "priority_critical": "CRITICAL",
+    "priority_urgent": "URGENT",
+    "priority_normal": "NORMAL",
+    "error_load": "Failed to load alerts",
+    "error_load_generic": "Unable to load alerts.",
+    "empty_title": "No emergency alerts",
+    "empty_description": "You don't have any emergency shift requests at the moment.",
+    "pending_count": "{{count}} pending",
+    "accept": "Accept",
+    "decline": "Decline",
+    "accepted": "Accepted",
+    "declined": "Declined",
+    "alert_accepted": "Alert accepted.",
+    "alert_declined": "Alert declined.",
+    "respond_error": "Failed to respond to alert.",
+    "respond_error_generic": "Failed to respond to alert. Please try again.",
+    "from": "From",
+    "expires": "Expires"
   }
 }
