@@ -198,62 +198,69 @@ class NewsletterService
 
         $mailer = new \App\Core\Mailer($tenantId);
 
-        $pending = DB::table('newsletter_queue')
-            ->where('newsletter_id', $newsletterId)
-            ->where('status', 'pending')
-            ->limit($batchSize)
-            ->get();
-
         $sent = 0;
         $failed = 0;
 
-        foreach ($pending as $item) {
-            try {
-                $recipientData = [
-                    'email' => $item->email,
-                    'first_name' => $item->first_name ?? '',
-                    'last_name' => $item->last_name ?? '',
-                    'name' => $item->name ?? '',
-                ];
+        // Process all pending items in batches
+        do {
+            $pending = DB::table('newsletter_queue')
+                ->where('newsletter_id', $newsletterId)
+                ->where('status', 'pending')
+                ->limit($batchSize)
+                ->get();
 
-                $unsubscribeToken = $item->unsubscribe_token ?? null;
-                $emailHtml = self::renderEmail(
-                    (array) $newsletter->getAttributes(),
-                    $tenantName,
-                    $unsubscribeToken,
-                    $recipientData
-                );
-
-                $subject = $newsletter->subject;
-
-                $apiUrl = rtrim(config('app.url', ''), '/');
-                $unsubscribeUrl = $unsubscribeToken
-                    ? $apiUrl . '/newsletter/unsubscribe?token=' . $unsubscribeToken
-                    : null;
-
-                $success = $mailer->send($item->email, $subject, $emailHtml, null, null, $unsubscribeUrl);
-
-                if ($success) {
-                    DB::table('newsletter_queue')
-                        ->where('id', $item->id)
-                        ->update(['status' => 'sent', 'sent_at' => now()]);
-                    $sent++;
-                } else {
-                    DB::table('newsletter_queue')
-                        ->where('id', $item->id)
-                        ->update(['status' => 'failed', 'error_message' => 'Email send failed']);
-                    $failed++;
-                }
-
-                usleep(self::EMAIL_DELAY_MICROSECONDS);
-            } catch (\Exception $e) {
-                DB::table('newsletter_queue')
-                    ->where('id', $item->id)
-                    ->update(['status' => 'failed', 'error_message' => $e->getMessage()]);
-                $failed++;
-                Log::error("Newsletter send error for {$item->email}: " . $e->getMessage());
+            if ($pending->isEmpty()) {
+                break;
             }
-        }
+
+            foreach ($pending as $item) {
+                try {
+                    $recipientData = [
+                        'email' => $item->email,
+                        'first_name' => $item->first_name ?? '',
+                        'last_name' => $item->last_name ?? '',
+                        'name' => $item->name ?? '',
+                    ];
+
+                    $unsubscribeToken = $item->unsubscribe_token ?? null;
+                    $emailHtml = self::renderEmail(
+                        (array) $newsletter->getAttributes(),
+                        $tenantName,
+                        $unsubscribeToken,
+                        $recipientData
+                    );
+
+                    $subject = $newsletter->subject;
+
+                    $apiUrl = rtrim(config('app.url', ''), '/');
+                    $unsubscribeUrl = $unsubscribeToken
+                        ? $apiUrl . '/newsletter/unsubscribe?token=' . $unsubscribeToken
+                        : null;
+
+                    $success = $mailer->send($item->email, $subject, $emailHtml, null, null, $unsubscribeUrl);
+
+                    if ($success) {
+                        DB::table('newsletter_queue')
+                            ->where('id', $item->id)
+                            ->update(['status' => 'sent', 'sent_at' => now()]);
+                        $sent++;
+                    } else {
+                        DB::table('newsletter_queue')
+                            ->where('id', $item->id)
+                            ->update(['status' => 'failed', 'error_message' => 'Email send failed']);
+                        $failed++;
+                    }
+
+                    usleep(self::EMAIL_DELAY_MICROSECONDS);
+                } catch (\Exception $e) {
+                    DB::table('newsletter_queue')
+                        ->where('id', $item->id)
+                        ->update(['status' => 'failed', 'error_message' => $e->getMessage()]);
+                    $failed++;
+                    Log::error("Newsletter send error for {$item->email}: " . $e->getMessage());
+                }
+            }
+        } while (true);
 
         // Update newsletter stats
         $stats = DB::table('newsletter_queue')
