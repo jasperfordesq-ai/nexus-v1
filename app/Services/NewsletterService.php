@@ -241,7 +241,7 @@ class NewsletterService
                 } else {
                     DB::table('newsletter_queue')
                         ->where('id', $item->id)
-                        ->update(['status' => 'failed', 'error' => 'Email send failed']);
+                        ->update(['status' => 'failed', 'error_message' => 'Email send failed']);
                     $failed++;
                 }
 
@@ -249,7 +249,7 @@ class NewsletterService
             } catch (\Exception $e) {
                 DB::table('newsletter_queue')
                     ->where('id', $item->id)
-                    ->update(['status' => 'failed', 'error' => $e->getMessage()]);
+                    ->update(['status' => 'failed', 'error_message' => $e->getMessage()]);
                 $failed++;
                 Log::error("Newsletter send error for {$item->email}: " . $e->getMessage());
             }

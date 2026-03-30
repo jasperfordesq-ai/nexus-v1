@@ -10,6 +10,7 @@ use App\Services\NewsletterService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
 use App\Core\TenantContext;
+use Illuminate\Support\Facades\Log;
 
 /**
  * Admin Newsletter API Controller
@@ -2371,7 +2372,8 @@ class AdminNewsletterController extends BaseApiController
                 'message' => "Newsletter queued for {$queued} recipients",
             ]);
         } catch (\Exception $e) {
-            return $this->respondWithError('SEND_FAILED', 'Failed to send newsletter');
+            Log::error('Newsletter send failed', ['id' => $id, 'error' => $e->getMessage()]);
+            return $this->respondWithError('SEND_FAILED', $e->getMessage());
         }
     }
 
