@@ -11,6 +11,7 @@ use App\Services\NewsletterService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 /**
  * NewsletterController — Newsletter management and distribution.
@@ -152,21 +153,30 @@ class NewsletterController extends BaseApiController
         $gif = base64_decode('R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7');
 
         try {
+            // Try tracking_token first (new per-send unique tokens), fall back
+            // to unsubscribe_token (legacy shared tokens) for older emails.
             $queue = DB::table('newsletter_queue')
-                ->where('unsubscribe_token', $token)
+                ->where('tracking_token', $token)
                 ->first(['newsletter_id', 'email']);
+
+            if (!$queue) {
+                $queue = DB::table('newsletter_queue')
+                    ->where('unsubscribe_token', $token)
+                    ->orderByDesc('id')
+                    ->first(['newsletter_id', 'email']);
+            }
 
             if ($queue instanceof \stdClass) {
                 NewsletterAnalytics::recordOpen(
                     (int) $queue->newsletter_id,
-                    null,
+                    $token,
                     (string) $queue->email,
                     request()->header('User-Agent'),
                     request()->ip()
                 );
             }
-        } catch (\Throwable) {
-            // Never break email rendering over a tracking failure
+        } catch (\Throwable $e) {
+            Log::warning('Newsletter pixel tracking failed', ['token' => $token, 'error' => $e->getMessage()]);
         }
 
         return response($gif, 200, [

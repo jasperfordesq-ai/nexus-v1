@@ -223,11 +223,13 @@ class NewsletterService
                     ];
 
                     $unsubscribeToken = $item->unsubscribe_token ?? null;
+                    $trackingToken = $item->tracking_token ?? null;
                     $emailHtml = self::renderEmail(
                         (array) $newsletter->getAttributes(),
                         $tenantName,
                         $unsubscribeToken,
-                        $recipientData
+                        $recipientData,
+                        $trackingToken
                     );
 
                     $subject = $newsletter->subject;
@@ -311,6 +313,7 @@ class NewsletterService
                 'first_name' => $recipient['first_name'] ?? '',
                 'last_name' => $recipient['last_name'] ?? '',
                 'unsubscribe_token' => $token,
+                'tracking_token' => bin2hex(random_bytes(32)),
                 'status' => 'pending',
                 'created_at' => now(),
             ]);
@@ -334,9 +337,10 @@ class NewsletterService
      * @param string $tenantName Tenant/community name for branding
      * @param string|null $unsubscribeToken Token for one-click unsubscribe
      * @param array|null $recipient Recipient data for personalization
+     * @param string|null $trackingToken Unique per-queue-entry token for open tracking pixel
      * @return string Full HTML email
      */
-    public static function renderEmail(array $newsletter, string $tenantName, ?string $unsubscribeToken = null, ?array $recipient = null): string
+    public static function renderEmail(array $newsletter, string $tenantName, ?string $unsubscribeToken = null, ?array $recipient = null, ?string $trackingToken = null): string
     {
         $content = $newsletter['content'] ?? '';
         $subject = $newsletter['subject'] ?? '';
@@ -377,10 +381,11 @@ class NewsletterService
             $unsubscribeLinks = '<a href="' . $unsubscribeUrl . '" style="color: #6b7280; text-decoration: underline;">Manage Email Preferences</a>';
         }
 
-        // Tracking pixel (1×1 transparent GIF) — only when we have a token
+        // Tracking pixel (1×1 transparent GIF) — uses unique tracking_token per queue entry
         $pixelHtml = '';
-        if ($unsubscribeToken) {
-            $pixelUrl = $apiUrl . '/v2/newsletter/pixel/' . rawurlencode($unsubscribeToken);
+        $pixelToken = $trackingToken ?? $unsubscribeToken;
+        if ($pixelToken) {
+            $pixelUrl = $apiUrl . '/v2/newsletter/pixel/' . rawurlencode($pixelToken);
             $pixelHtml = '<img src="' . $pixelUrl . '" width="1" height="1" border="0" alt=""'
                 . ' style="height:1px!important;width:1px!important;border-width:0!important;'
                 . 'margin-top:0!important;margin-bottom:0!important;'
