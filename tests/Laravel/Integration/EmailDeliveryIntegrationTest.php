@@ -149,7 +149,8 @@ class EmailDeliveryIntegrationTest extends TestCase
                 'user_id'    => $user->id,
                 'tenant_id'  => $tenantId,
                 'xp_amount'  => 25 + ($i * 10),
-                'reason'     => 'test_activity',
+                'action'      => 'test_activity',
+                'description' => 'Test XP activity for integration test',
                 'created_at' => now()->subDays(rand(1, 6)),
             ]);
 
