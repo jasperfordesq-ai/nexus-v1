@@ -26,7 +26,7 @@ import {
 } from '@heroui/react';
 import { Bot, Send, RefreshCw, Sparkles, AlertCircle, Zap } from 'lucide-react';
 import { useAuth, useTenant, useToast } from '@/contexts';
-import { API_BASE, tokenManager } from '@/lib/api';
+import api from '@/lib/api';
 import { usePageTitle } from '@/hooks';
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -312,31 +312,18 @@ export default function AiChatPage() {
     setIsLoading(true);
 
     try {
-      const token = tokenManager.getAccessToken();
-      const tenantId = tokenManager.getTenantId();
-      const csrfToken = tokenManager.getCsrfToken();
-
-      const headers: Record<string, string> = {
-        'Content-Type': 'application/json',
-        'Accept': 'application/json',
-      };
-      if (token) headers['Authorization'] = `Bearer ${token}`;
-      if (tenantId) headers['X-Tenant-ID'] = tenantId;
-      if (csrfToken) headers['X-CSRF-Token'] = csrfToken;
-
       const body: Record<string, unknown> = { message: trimmed };
       if (conversationId) body['conversation_id'] = conversationId;
 
-      const response = await fetch(`${API_BASE}/ai/chat`, {
-        method: 'POST',
-        headers,
-        credentials: 'include',
-        body: JSON.stringify(body),
-      });
+      const res = await api.post<AiChatResponse>('/ai/chat', body);
 
-      const data = (await response.json()) as AiChatResponse;
+      // The API client unwraps `data` from the envelope, so res.data is the payload.
+      // However the AI chat endpoint returns a non-standard envelope where `message`
+      // and `conversation_id` live at the top level alongside `success`.
+      // api.post unwraps `response.data.data` if present, otherwise the full body.
+      const data = res.data as unknown as AiChatResponse | undefined;
 
-      if (response.ok && data.success && data.message) {
+      if (res.success && data?.message) {
         const assistantMsg: ChatMessage = {
           id: `assistant-${Date.now()}`,
           role: 'assistant',
@@ -352,8 +339,8 @@ export default function AiChatPage() {
           setLimits(data.limits);
         }
       } else {
-        const errorText = data.error ?? t('error_generic');
-        const isLimit = response.status === 429;
+        const errorText = data?.error ?? res.error ?? t('error_generic');
+        const isLimit = res.code === 'HTTP_429';
 
         const errorMsg: ChatMessage = {
           id: `error-${Date.now()}`,

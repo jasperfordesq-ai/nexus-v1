@@ -282,7 +282,7 @@ const ENDPOINTS: EndpointDef[] = [
   "data": [
     {
       "id": 3,
-      "name": "Dublin Time Exchange",
+      "name": "Greenville Community Exchange",
       "tagline": "Sharing time, building community",
       "location": { "city": "Dublin", "country": "IE" },
       "member_count": 142,
@@ -317,7 +317,7 @@ const ENDPOINTS: EndpointDef[] = [
       "bio": "Community organiser",
       "skills": ["gardening", "tutoring"],
       "location": "Cork",
-      "timebank": { "id": 3, "name": "Dublin Time Exchange" },
+      "timebank": { "id": 3, "name": "Greenville Community Exchange" },
       "service_reach": "regional",
       "joined": "2024-03-10 09:00:00"
     }
@@ -344,7 +344,7 @@ const ENDPOINTS: EndpointDef[] = [
     "bio": "Community organiser",
     "skills": ["gardening", "tutoring"],
     "location": "Cork",
-    "timebank": { "id": 3, "name": "Dublin Time Exchange" },
+    "timebank": { "id": 3, "name": "Greenville Community Exchange" },
     "service_reach": "regional",
     "accepts_messages": true,
     "accepts_transactions": true,
@@ -376,7 +376,7 @@ const ENDPOINTS: EndpointDef[] = [
       "category": "Music",
       "rate": "1.0",
       "owner": { "id": 45, "name": "Jane Doe", "avatar": "https://..." },
-      "timebank": { "id": 3, "name": "Dublin Time Exchange" },
+      "timebank": { "id": 3, "name": "Greenville Community Exchange" },
       "created_at": "2025-08-20 14:30:00"
     }
   ],
@@ -407,7 +407,7 @@ const ENDPOINTS: EndpointDef[] = [
       "avatar": "https://...",
       "location": "Cork"
     },
-    "timebank": { "id": 3, "name": "Dublin Time Exchange" },
+    "timebank": { "id": 3, "name": "Greenville Community Exchange" },
     "created_at": "2025-08-20 14:30:00",
     "updated_at": "2025-09-01 10:00:00"
   }
@@ -479,7 +479,7 @@ const ENDPOINTS: EndpointDef[] = [
         "id": 45,
         "name": "Jane Doe",
         "tenant_id": 3,
-        "tenant_name": "Dublin Time Exchange"
+        "tenant_name": "Greenville Community Exchange"
       },
       "is_read": false,
       "created_at": "2025-09-15 14:30:00"
@@ -572,7 +572,7 @@ const ENDPOINTS: EndpointDef[] = [
       "id": 45,
       "name": "Jane Doe",
       "tenant_id": 3,
-      "tenant_name": "Dublin Time Exchange"
+      "tenant_name": "Greenville Community Exchange"
     },
     "created_at": "2025-09-15 14:30:00"
   }
@@ -1009,7 +1009,7 @@ function WebhooksTab() {
     "sender": {
       "id": 45,
       "name": "Jane Doe",
-      "timebank": { "id": 3, "name": "Dublin Time Exchange" }
+      "timebank": { "id": 3, "name": "Greenville Community Exchange" }
     },
     "recipient": {
       "id": 12,

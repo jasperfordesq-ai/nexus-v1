@@ -471,34 +471,15 @@ export const adminTimebanking = {
     }>(`/v2/admin/timebanking/user-statement${buildQuery(params)}`),
 
   downloadStatementCsv: async (userId: number, startDate?: string, endDate?: string) => {
-    const { tokenManager } = await import('@/lib/api');
-    const apiBase = import.meta.env.VITE_API_BASE || '/api';
     const params = buildQuery({
       user_id: userId,
       format: 'csv',
       start_date: startDate,
       end_date: endDate,
     });
-    const headers: Record<string, string> = { Accept: 'text/csv' };
-    const token = tokenManager.getAccessToken();
-    if (token) headers['Authorization'] = `Bearer ${token}`;
-    const tenantId = tokenManager.getTenantId();
-    if (tenantId) headers['X-Tenant-ID'] = tenantId;
-
-    const response = await fetch(`${apiBase}/v2/admin/timebanking/user-statement${params}`, {
-      headers,
-      credentials: 'include',
+    await api.download(`/v2/admin/timebanking/user-statement${params}`, {
+      filename: `statement_${userId}_${new Date().toISOString().slice(0, 10)}.csv`,
     });
-    if (!response.ok) throw new Error('Failed to download statement');
-    const blob = await response.blob();
-    const url = window.URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `statement_${userId}_${new Date().toISOString().slice(0, 10)}.csv`;
-    document.body.appendChild(a);
-    a.click();
-    a.remove();
-    window.URL.revokeObjectURL(url);
   },
 
   // Starting balance grants

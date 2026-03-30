@@ -587,6 +587,68 @@ class ApiClient {
   }
 
   /**
+   * Download a file (blob response) with full auth/tenant handling.
+   * Returns the Blob on success, throws on failure.
+   * Handles 401 with automatic token refresh + retry.
+   */
+  async download(
+    endpoint: string,
+    options: RequestOptions & { filename?: string } = {}
+  ): Promise<Blob> {
+    const url = `${this.baseUrl}${endpoint}`;
+    const headers = this.buildHeaders(options);
+    // Override Accept to allow any content type from the server
+    headers.delete('Accept');
+
+    const response = await fetch(url, {
+      ...options,
+      method: options.method?.toUpperCase() || 'GET',
+      headers,
+      body: options.body ? JSON.stringify(options.body) : undefined,
+      credentials: 'include',
+    });
+
+    // Handle 401 with token refresh
+    if (response.status === 401 && !options.skipAuth) {
+      const refreshed = await this.handleTokenRefresh();
+      if (refreshed) {
+        return this.download(endpoint, options);
+      }
+      this.dispatchSessionExpired();
+      throw new Error('Session expired. Please log in again.');
+    }
+
+    if (!response.ok) {
+      throw new Error(`Download failed (HTTP ${response.status})`);
+    }
+
+    const blob = await response.blob();
+
+    // Auto-trigger download if filename is provided
+    if (options.filename) {
+      // Try to get filename from Content-Disposition header first
+      const disposition = response.headers.get('Content-Disposition');
+      let resolvedFilename = options.filename;
+      if (disposition) {
+        const match = disposition.match(/filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/);
+        if (match?.[1]) {
+          resolvedFilename = match[1].replace(/['"]/g, '');
+        }
+      }
+      const blobUrl = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = blobUrl;
+      a.download = resolvedFilename;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(blobUrl);
+    }
+
+    return blob;
+  }
+
+  /**
    * Upload file(s) - multipart form data
    */
   async upload<T>(

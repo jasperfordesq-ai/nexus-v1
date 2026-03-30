@@ -448,14 +448,14 @@ export function SafeguardingOptionsAdmin() {
                   className="mt-3"
                   description={t('safeguarding.desc_required_vetting_type')}
                 >
-                  <SelectItem key="garda_vetting">Garda Vetting (Ireland)</SelectItem>
-                  <SelectItem key="dbs_basic">DBS Basic</SelectItem>
-                  <SelectItem key="dbs_standard">DBS Standard</SelectItem>
-                  <SelectItem key="dbs_enhanced">DBS Enhanced</SelectItem>
-                  <SelectItem key="pvg_scotland">PVG Scotland</SelectItem>
-                  <SelectItem key="access_ni">AccessNI</SelectItem>
-                  <SelectItem key="international">International</SelectItem>
-                  <SelectItem key="other">Other</SelectItem>
+                  <SelectItem key="garda_vetting">{t('safeguarding.vetting_garda')}</SelectItem>
+                  <SelectItem key="dbs_basic">{t('safeguarding.vetting_dbs_basic')}</SelectItem>
+                  <SelectItem key="dbs_standard">{t('safeguarding.vetting_dbs_standard')}</SelectItem>
+                  <SelectItem key="dbs_enhanced">{t('safeguarding.vetting_dbs_enhanced')}</SelectItem>
+                  <SelectItem key="pvg_scotland">{t('safeguarding.vetting_pvg_scotland')}</SelectItem>
+                  <SelectItem key="access_ni">{t('safeguarding.vetting_access_ni')}</SelectItem>
+                  <SelectItem key="international">{t('safeguarding.vetting_international')}</SelectItem>
+                  <SelectItem key="other">{t('safeguarding.vetting_other')}</SelectItem>
                 </Select>
               )}
             </div>

@@ -1278,8 +1278,6 @@ Route::middleware('throttle:10,1')->group(function () {
     Route::post('/totp/verify', [\App\Http\Controllers\Api\TotpController::class, 'verify']);
     Route::post('/webauthn/auth-challenge', [\App\Http\Controllers\Api\WebAuthnController::class, 'authChallenge']);
     Route::post('/webauthn/auth-verify', [\App\Http\Controllers\Api\WebAuthnController::class, 'authVerify']);
-    Route::post('/webauthn/login/options', [\App\Http\Controllers\Api\WebAuthnController::class, 'authChallenge']);
-    Route::post('/webauthn/login/verify', [\App\Http\Controllers\Api\WebAuthnController::class, 'authVerify']);
     Route::post('/auth/forgot-password', [\App\Http\Controllers\Api\PasswordResetController::class, 'forgotPassword']);
     Route::post('/auth/reset-password', [\App\Http\Controllers\Api\PasswordResetController::class, 'resetPassword']);
     Route::post('/auth/verify-email', [\App\Http\Controllers\Api\EmailVerificationController::class, 'verifyEmail']);

@@ -28,7 +28,7 @@ import {
 } from 'lucide-react';
 import { usePageTitle } from '@/hooks';
 import { useTenant, useToast } from '@/contexts';
-import { API_BASE, tokenManager } from '@/lib/api';
+import api from '@/lib/api';
 import { adminCrm } from '../../api/adminApi';
 import { StatCard, PageHeader } from '../../components';
 
@@ -79,25 +79,14 @@ export function CrmDashboard() {
 
   const handleExport = useCallback(async (type: 'dashboard' | 'notes' | 'tasks') => {
     try {
-      const url = `${API_BASE}/v2/admin/crm/export/${type}`;
-      const token = tokenManager.getAccessToken();
-      const tenantId = tokenManager.getTenantId();
-      const headers: Record<string, string> = {};
-      if (token) headers['Authorization'] = `Bearer ${token}`;
-      if (tenantId) headers['X-Tenant-ID'] = tenantId;
-      const res = await fetch(url, { headers, credentials: 'include' });
-      if (!res.ok) throw new Error('Export failed');
-      const blob = await res.blob();
-      const a = document.createElement('a');
-      a.href = URL.createObjectURL(blob);
-      a.download = `crm-${type}-${new Date().toISOString().slice(0, 10)}.csv`;
-      a.click();
-      URL.revokeObjectURL(a.href);
+      await api.download(`/v2/admin/crm/export/${type}`, {
+        filename: `crm-${type}-${new Date().toISOString().slice(0, 10)}.csv`,
+      });
       toast.success(t('crm.export_success', { type }));
     } catch {
       toast.error(t('crm.export_failed', { type }));
     }
-  }, [toast]);
+  }, [toast, t]);
 
   useEffect(() => {
     loadDashboard();

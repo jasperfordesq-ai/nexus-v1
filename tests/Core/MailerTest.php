@@ -26,10 +26,7 @@ class MailerTest extends TestCase
     {
         $methods = ['send', 'sendTemplate'];
         foreach ($methods as $method) {
-            if (method_exists(Mailer::class, $method)) {
-                $this->assertTrue(true);
-            }
+            $this->assertTrue(method_exists(Mailer::class, $method), "Method {$method} should exist");
         }
-        $this->assertTrue(true);
     }
 }

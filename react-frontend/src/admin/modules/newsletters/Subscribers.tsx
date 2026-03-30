@@ -191,12 +191,12 @@ export function Subscribers() {
         last_name: addForm.last_name || undefined,
       });
       if (res.success) {
-        toast.success(`Subscriber ${addForm.email} added successfully`);
+        toast.success(t('newsletters.subscriber_added', { email: addForm.email }));
         setAddModalOpen(false);
         setAddForm({ email: '', first_name: '', last_name: '' });
         loadData(1, statusFilter, searchQuery);
       } else {
-        toast.error(res.message || 'Failed to add subscriber');
+        toast.error(res.message || t('newsletters.failed_to_add_subscriber'));
       }
     } catch {
       toast.error(t('newsletters.failed_to_add_subscriber'));
@@ -214,7 +214,7 @@ export function Subscribers() {
     try {
       const res = await adminNewsletters.removeSubscriber(removeTarget.id);
       if (res.success) {
-        toast.success(`Subscriber ${removeTarget.email} removed`);
+        toast.success(t('newsletters.subscriber_removed', { email: removeTarget.email }));
         setRemoveTarget(null);
         loadData();
       } else {
@@ -279,13 +279,13 @@ export function Subscribers() {
       const res = await adminNewsletters.importSubscribers(importRows);
       if (res.success) {
         const data = res.data as { imported?: number; skipped?: number };
-        toast.success(`${data.imported || 0} imported, ${data.skipped || 0} skipped`);
+        toast.success(t('newsletters.import_result', { imported: data.imported || 0, skipped: data.skipped || 0 }));
         setImportModalOpen(false);
         setImportRows([]);
         setImportFileName('');
         loadData(1, statusFilter, searchQuery);
       } else {
-        toast.error(res.message || 'Failed to import');
+        toast.error(res.message || t('newsletters.failed_to_import_subscribers'));
       }
     } catch {
       toast.error(t('newsletters.failed_to_import_subscribers'));
@@ -320,7 +320,7 @@ export function Subscribers() {
         a.download = `subscribers-${new Date().toISOString().slice(0, 10)}.csv`;
         a.click();
         URL.revokeObjectURL(url);
-        toast.success(`${rows.length} subscribers exported`);
+        toast.success(t('newsletters.subscribers_exported', { count: rows.length }));
       }
     } catch {
       toast.error(t('newsletters.failed_to_export_subscribers'));
@@ -338,10 +338,10 @@ export function Subscribers() {
       const res = await adminNewsletters.syncMembers();
       if (res.success) {
         const data = res.data as { synced?: number; already_subscribed?: number };
-        toast.success(`${data.synced || 0} new subscribers added. ${data.already_subscribed || 0} already subscribed.`);
+        toast.success(t('newsletters.sync_result', { synced: data.synced || 0, already: data.already_subscribed || 0 }));
         loadData(1, statusFilter, searchQuery);
       } else {
-        toast.error(res.message || 'Failed to sync');
+        toast.error(res.message || t('newsletters.failed_to_sync_members'));
       }
     } catch {
       toast.error(t('newsletters.failed_to_sync_members'));
@@ -402,7 +402,7 @@ export function Subscribers() {
               onPress={() => loadData()}
               isLoading={loading}
             >
-              Refresh
+              {t('common.refresh')}
             </Button>
             <Button
               variant="flat"
@@ -411,7 +411,7 @@ export function Subscribers() {
               onPress={handleExport}
               isLoading={exportLoading}
             >
-              Export CSV
+              {t('newsletters.export_csv')}
             </Button>
             <Button
               variant="flat"
@@ -419,7 +419,7 @@ export function Subscribers() {
               startContent={<Upload size={14} />}
               onPress={() => setImportModalOpen(true)}
             >
-              Import CSV
+              {t('newsletters.import_csv')}
             </Button>
             <Button
               color="primary"
@@ -427,7 +427,7 @@ export function Subscribers() {
               startContent={<UserPlus size={14} />}
               onPress={() => setAddModalOpen(true)}
             >
-              Add Subscriber
+              {t('newsletters.add_subscriber')}
             </Button>
           </div>
         }
@@ -440,9 +440,9 @@ export function Subscribers() {
             <Users size={20} />
           </div>
           <div className="min-w-0 flex-1">
-            <p className="font-medium text-foreground">Sync Platform Members</p>
+            <p className="font-medium text-foreground">{t('newsletters.sync_platform_members')}</p>
             <p className="text-sm text-default-500">
-              Add all existing platform members to your subscriber list. Already-subscribed members will be skipped.
+              {t('newsletters.sync_platform_members_desc')}
             </p>
           </div>
           <Button
@@ -453,7 +453,7 @@ export function Subscribers() {
             onPress={handleSync}
             isLoading={syncLoading}
           >
-            Sync Now
+            {t('newsletters.sync_now')}
           </Button>
         </CardBody>
       </Card>
@@ -526,18 +526,18 @@ export function Subscribers() {
         }
       >
         <TableHeader>
-          <TableColumn>Subscriber</TableColumn>
-          <TableColumn>Status</TableColumn>
-          <TableColumn>Source</TableColumn>
-          <TableColumn>Date</TableColumn>
-          <TableColumn className="text-right">Actions</TableColumn>
+          <TableColumn>{t('newsletters.col_subscriber')}</TableColumn>
+          <TableColumn>{t('newsletters.col_status')}</TableColumn>
+          <TableColumn>{t('newsletters.col_source')}</TableColumn>
+          <TableColumn>{t('newsletters.col_date')}</TableColumn>
+          <TableColumn className="text-right">{t('newsletters.label_actions')}</TableColumn>
         </TableHeader>
         <TableBody
           emptyContent={
             <div className="flex flex-col items-center gap-2 py-8 text-default-400">
               <Users size={40} />
-              <p className="text-lg font-medium">No subscribers found</p>
-              <p className="text-sm">Add subscribers manually, import from CSV, or sync your platform members.</p>
+              <p className="text-lg font-medium">{t('newsletters.no_subscribers_found')}</p>
+              <p className="text-sm">{t('newsletters.no_subscribers_hint')}</p>
             </div>
           }
           isLoading={loading && items.length === 0}
@@ -574,7 +574,7 @@ export function Subscribers() {
                 {sub.created_at ? new Date(sub.created_at).toLocaleDateString() : '--'}
               </TableCell>
               <TableCell className="text-right">
-                <Tooltip content="Remove subscriber">
+                <Tooltip content={t('newsletters.remove_subscriber')}>
                   <Button
                     isIconOnly
                     variant="light"
@@ -598,12 +598,12 @@ export function Subscribers() {
         <Card shadow="sm">
           <CardBody className="flex flex-col gap-2 p-4 sm:flex-row sm:items-center">
             <div className="min-w-0 flex-1">
-              <p className="text-sm font-medium text-foreground">Public Subscribe Link</p>
+              <p className="text-sm font-medium text-foreground">{t('newsletters.public_subscribe_link')}</p>
               <p className="truncate text-xs text-default-400">{subscribeUrl}</p>
             </div>
             <div className="flex items-center gap-2">
               <Button variant="flat" size="sm" startContent={<Copy size={14} />} onPress={copySubscribeLink}>
-                Copy
+                {t('newsletters.copy')}
               </Button>
               <Button
                 variant="flat"
@@ -614,7 +614,7 @@ export function Subscribers() {
                 target="_blank"
                 rel="noopener noreferrer"
               >
-                Preview
+                {t('newsletters.preview')}
               </Button>
             </div>
           </CardBody>
@@ -624,7 +624,7 @@ export function Subscribers() {
       {/* ─── Add Subscriber Modal ────────────────────────────────────────────── */}
       <Modal isOpen={addModalOpen} onClose={() => setAddModalOpen(false)} size="md">
         <ModalContent>
-          <ModalHeader>Add Subscriber</ModalHeader>
+          <ModalHeader>{t('newsletters.add_subscriber')}</ModalHeader>
           <ModalBody>
             <div className="space-y-4">
               <Input
@@ -652,7 +652,7 @@ export function Subscribers() {
           </ModalBody>
           <ModalFooter>
             <Button variant="flat" onPress={() => setAddModalOpen(false)} isDisabled={addLoading}>
-              Cancel
+              {t('common.cancel')}
             </Button>
             <Button
               color="primary"
@@ -660,7 +660,7 @@ export function Subscribers() {
               isLoading={addLoading}
               isDisabled={!addForm.email}
             >
-              Add Subscriber
+              {t('newsletters.add_subscriber')}
             </Button>
           </ModalFooter>
         </ModalContent>
@@ -669,7 +669,7 @@ export function Subscribers() {
       {/* ─── Import CSV Modal ────────────────────────────────────────────────── */}
       <Modal isOpen={importModalOpen} onClose={() => { setImportModalOpen(false); setImportRows([]); setImportFileName(''); }} size="lg">
         <ModalContent>
-          <ModalHeader>Import Subscribers from CSV</ModalHeader>
+          <ModalHeader>{t('newsletters.import_subscribers_from_csv')}</ModalHeader>
           <ModalBody>
             <div className="space-y-4">
               <div
@@ -689,10 +689,10 @@ export function Subscribers() {
               >
                 <Upload size={32} className="text-default-400" />
                 <p className="font-medium text-foreground">
-                  {importFileName || 'Click or drag a CSV file here'}
+                  {importFileName || t('newsletters.click_or_drag_csv')}
                 </p>
                 <p className="text-xs text-default-400">
-                  Accepted format: .csv
+                  {t('newsletters.accepted_format_csv')}
                 </p>
               </div>
               <input
@@ -713,12 +713,12 @@ export function Subscribers() {
 
               <Card shadow="none" className="bg-default-50">
                 <CardBody className="p-3">
-                  <p className="text-xs font-medium text-default-600">Required CSV format:</p>
+                  <p className="text-xs font-medium text-default-600">{t('newsletters.required_csv_format')}</p>
                   <code className="mt-1 block text-xs text-default-500">
                     email,first_name,last_name
                   </code>
                   <p className="mt-1 text-xs text-default-400">
-                    The <strong>email</strong> column is required. first_name and last_name are optional.
+                    {t('newsletters.csv_email_required_hint')}
                   </p>
                 </CardBody>
               </Card>
@@ -726,7 +726,7 @@ export function Subscribers() {
           </ModalBody>
           <ModalFooter>
             <Button variant="flat" onPress={() => { setImportModalOpen(false); setImportRows([]); setImportFileName(''); }} isDisabled={importLoading}>
-              Cancel
+              {t('common.cancel')}
             </Button>
             <Button
               color="primary"
@@ -734,7 +734,7 @@ export function Subscribers() {
               isLoading={importLoading}
               isDisabled={importRows.length === 0}
             >
-              Import {importRows.length > 0 ? `(${importRows.length})` : ''}
+              {t('newsletters.import')} {importRows.length > 0 ? `(${importRows.length})` : ''}
             </Button>
           </ModalFooter>
         </ModalContent>
@@ -745,9 +745,9 @@ export function Subscribers() {
         isOpen={!!removeTarget}
         onClose={() => setRemoveTarget(null)}
         onConfirm={handleRemoveSubscriber}
-        title="Remove Subscriber"
-        message={`Are you sure you want to remove ${removeTarget?.email || 'this subscriber'}? This action cannot be undone.`}
-        confirmLabel="Remove"
+        title={t('newsletters.remove_subscriber')}
+        message={t('newsletters.confirm_remove_subscriber', { email: removeTarget?.email || t('newsletters.this_subscriber') })}
+        confirmLabel={t('newsletters.remove')}
         confirmColor="danger"
         isLoading={removeLoading}
       />

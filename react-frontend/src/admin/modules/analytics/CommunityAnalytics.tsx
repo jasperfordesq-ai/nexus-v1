@@ -41,7 +41,7 @@ import {
   Globe,
 } from 'lucide-react';
 import { usePageTitle } from '@/hooks';
-import { api, tokenManager } from '@/lib/api';
+import api from '@/lib/api';
 import { LocationMap } from '@/components/location';
 import { MAPS_ENABLED } from '@/lib/map-config';
 import { StatCard, PageHeader } from '../../components';
@@ -153,24 +153,9 @@ export function CommunityAnalytics() {
 
   const handleExport = async () => {
     try {
-      const token = tokenManager.getAccessToken();
-      const tenantId = tokenManager.getTenantId();
-      const headers: Record<string, string> = {};
-      if (token) headers['Authorization'] = `Bearer ${token}`;
-      if (tenantId) headers['X-Tenant-ID'] = tenantId;
-
-      const apiBase = import.meta.env.VITE_API_BASE || '/api';
-      const res = await fetch(`${apiBase}/v2/admin/community-analytics/export`, {
-        headers,
-        credentials: 'include',
+      await api.download('/v2/admin/community-analytics/export', {
+        filename: 'community-analytics.csv',
       });
-      const blob = await res.blob();
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = 'community-analytics.csv';
-      a.click();
-      URL.revokeObjectURL(url);
     } catch {
       // Export failed silently
     }

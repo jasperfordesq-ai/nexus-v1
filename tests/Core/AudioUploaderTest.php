@@ -26,10 +26,7 @@ class AudioUploaderTest extends TestCase
     {
         $methods = ['upload', 'validate'];
         foreach ($methods as $method) {
-            if (method_exists(AudioUploader::class, $method)) {
-                $this->assertTrue(true);
-            }
+            $this->assertTrue(method_exists(AudioUploader::class, $method), "Method {$method} should exist");
         }
-        $this->assertTrue(true);
     }
 }

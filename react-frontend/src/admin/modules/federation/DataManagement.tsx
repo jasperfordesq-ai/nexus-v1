@@ -15,7 +15,7 @@ import { usePageTitle } from '@/hooks';
 import { useToast } from '@/contexts';
 import { adminFederation } from '../../api/adminApi';
 import { PageHeader } from '../../components';
-import { API_BASE } from '@/lib/api';
+import api from '@/lib/api';
 
 import { useTranslation } from 'react-i18next';
 interface DataConfig {
@@ -58,24 +58,9 @@ export function DataManagement() {
   const handleExport = useCallback(async (type: string) => {
     setExportingType(type);
     try {
-      const token = localStorage.getItem('nexus_access_token');
-      const tenantId = localStorage.getItem('nexus_tenant_id');
-      const headers: Record<string, string> = {};
-      if (token) headers['Authorization'] = `Bearer ${token}`;
-      if (tenantId) headers['X-Tenant-ID'] = tenantId;
-      const response = await fetch(`${API_BASE}/v2/admin/federation/export/${type}`, {
-        headers,
+      await api.download(`/v2/admin/federation/export/${type}`, {
+        filename: `federation_${type}_${new Date().toISOString().slice(0, 10)}.csv`,
       });
-      if (!response.ok) throw new Error('Export failed');
-      const blob = await response.blob();
-      const url = window.URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `federation_${type}_${new Date().toISOString().slice(0, 10)}.csv`;
-      document.body.appendChild(a);
-      a.click();
-      a.remove();
-      window.URL.revokeObjectURL(url);
     } catch {
       toast.error(t('federation.export_failed', 'Export failed'));
     }

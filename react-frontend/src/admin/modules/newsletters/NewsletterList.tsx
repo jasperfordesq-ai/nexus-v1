@@ -82,7 +82,7 @@ export function NewsletterList() {
     try {
       const res = await adminNewsletters.delete(deleteTarget.id);
       if (res.success) {
-        toast.success(`Newsletter "${deleteTarget.subject || deleteTarget.name}" deleted`);
+        toast.success(t('newsletters.newsletter_deleted', { name: deleteTarget.subject || deleteTarget.name }));
         setDeleteTarget(null);
         loadData();
       } else {
@@ -114,11 +114,11 @@ export function NewsletterList() {
     try {
       const res = await adminNewsletters.sendNewsletter(sendTarget.id);
       if (res.success) {
-        toast.success(res.data?.message || 'Newsletter queued for sending');
+        toast.success(res.data?.message || t('newsletters.newsletter_queued_for_sending'));
         setSendTarget(null);
         loadData();
       } else {
-        toast.error((res as { error?: string }).error || 'Failed to send newsletter');
+        toast.error((res as { error?: string }).error || t('newsletters.failed_to_send_newsletter'));
       }
     } catch {
       toast.error(t('newsletters.failed_to_send_newsletter'));
@@ -128,7 +128,7 @@ export function NewsletterList() {
 
   const columns: Column<NewsletterItem>[] = [
     {
-      key: 'subject', label: 'Subject', sortable: true,
+      key: 'subject', label: t('newsletters.col_subject'), sortable: true,
       render: (item) => (
         <div className="min-w-0">
           <p className="font-medium truncate">{item.subject || item.name}</p>
@@ -140,23 +140,23 @@ export function NewsletterList() {
       ),
     },
     {
-      key: 'status', label: 'Status', sortable: true,
+      key: 'status', label: t('newsletters.col_status'), sortable: true,
       render: (item) => <StatusBadge status={item.status} />,
     },
     {
-      key: 'recipients_count', label: 'Recipients',
+      key: 'recipients_count', label: t('newsletters.col_recipients'),
       render: (item) => <span>{((item.total_recipients || item.recipients_count) || 0).toLocaleString()}</span>,
     },
     {
-      key: 'open_rate', label: 'Open Rate',
+      key: 'open_rate', label: t('newsletters.label_open_rate'),
       render: (item) => <span>{item.open_rate ? `${item.open_rate}%` : '--'}</span>,
     },
     {
-      key: 'click_rate', label: 'Click Rate',
+      key: 'click_rate', label: t('newsletters.label_click_rate'),
       render: (item) => <span>{item.click_rate ? `${item.click_rate}%` : '--'}</span>,
     },
     {
-      key: 'created_at', label: 'Date', sortable: true,
+      key: 'created_at', label: t('newsletters.col_date'), sortable: true,
       render: (item) => (
         <span className="text-sm text-default-500">
           {item.sent_at
@@ -168,7 +168,7 @@ export function NewsletterList() {
       ),
     },
     {
-      key: 'actions' as keyof NewsletterItem, label: 'Actions',
+      key: 'actions' as keyof NewsletterItem, label: t('newsletters.label_actions'),
       render: (item) => (
         <Dropdown>
           <DropdownTrigger>
@@ -183,37 +183,37 @@ export function NewsletterList() {
             else if (key === 'resend') setResendTarget(item.id);
             else if (key === 'delete') setDeleteTarget(item);
           }}>
-            <DropdownItem key="edit" startContent={<Edit size={14} />}>Edit</DropdownItem>
+            <DropdownItem key="edit" startContent={<Edit size={14} />}>{t('newsletters.edit')}</DropdownItem>
             <DropdownItem
               key="send"
               startContent={<Send size={14} />}
               className={item.status === 'draft' || item.status === 'scheduled' ? '' : 'hidden'}
             >
-              Send Now
+              {t('newsletters.send_now')}
             </DropdownItem>
             <DropdownItem
               key="stats"
               startContent={<BarChart3 size={14} />}
               className={item.status === 'sent' || item.status === 'sending' ? '' : 'hidden'}
             >
-              Stats
+              {t('newsletters.stats')}
             </DropdownItem>
             <DropdownItem
               key="activity"
               startContent={<Activity size={14} />}
               className={item.status === 'sent' ? '' : 'hidden'}
             >
-              Activity Log
+              {t('newsletters.activity_log')}
             </DropdownItem>
-            <DropdownItem key="duplicate" startContent={<Copy size={14} />}>Duplicate</DropdownItem>
+            <DropdownItem key="duplicate" startContent={<Copy size={14} />}>{t('newsletters.duplicate')}</DropdownItem>
             <DropdownItem
               key="resend"
               startContent={<Send size={14} />}
               className={item.status === 'sent' ? '' : 'hidden'}
             >
-              Resend to Non-Openers
+              {t('newsletters.resend_to_non_openers')}
             </DropdownItem>
-            <DropdownItem key="delete" startContent={<Trash2 size={14} />} className="text-danger" color="danger">Delete</DropdownItem>
+            <DropdownItem key="delete" startContent={<Trash2 size={14} />} className="text-danger" color="danger">{t('newsletters.delete')}</DropdownItem>
           </DropdownMenu>
         </Dropdown>
       ),
@@ -227,8 +227,8 @@ export function NewsletterList() {
         description={t('newsletters.newsletter_list_desc')}
         actions={
           <div className="flex gap-2">
-            <Button variant="flat" startContent={<RefreshCw size={16} />} onPress={loadData} isLoading={loading}>Refresh</Button>
-            <Button color="primary" startContent={<Plus size={16} />} onPress={() => navigate(tenantPath('/admin/newsletters/create'))}>Create Newsletter</Button>
+            <Button variant="flat" startContent={<RefreshCw size={16} />} onPress={loadData} isLoading={loading}>{t('common.refresh')}</Button>
+            <Button color="primary" startContent={<Plus size={16} />} onPress={() => navigate(tenantPath('/admin/newsletters/create'))}>{t('newsletters.create_newsletter')}</Button>
           </div>
         }
       />
@@ -236,7 +236,7 @@ export function NewsletterList() {
         columns={columns}
         data={items}
         isLoading={loading}
-        searchPlaceholder="Search newsletters..."
+        searchPlaceholder={t('newsletters.search_newsletters_placeholder')}
         totalItems={total}
         page={page}
         pageSize={20}
@@ -245,8 +245,8 @@ export function NewsletterList() {
         emptyContent={
           <div className="flex flex-col items-center gap-2 py-8 text-default-400">
             <Mail size={40} />
-            <p>No newsletters found</p>
-            <p className="text-xs">Create your first newsletter to get started</p>
+            <p>{t('newsletters.no_newsletters_found')}</p>
+            <p className="text-xs">{t('newsletters.create_first_newsletter')}</p>
           </div>
         }
       />
@@ -256,9 +256,9 @@ export function NewsletterList() {
           isOpen={!!deleteTarget}
           onClose={() => setDeleteTarget(null)}
           onConfirm={handleDelete}
-          title="Delete Newsletter"
-          message={`Are you sure you want to delete "${deleteTarget.subject || deleteTarget.name}"? This cannot be undone.`}
-          confirmLabel="Delete"
+          title={t('newsletters.delete_newsletter')}
+          message={t('newsletters.confirm_delete_newsletter', { name: deleteTarget.subject || deleteTarget.name })}
+          confirmLabel={t('newsletters.delete')}
           confirmColor="danger"
           isLoading={deleting}
         />
@@ -269,9 +269,9 @@ export function NewsletterList() {
           isOpen={!!sendTarget}
           onClose={() => setSendTarget(null)}
           onConfirm={handleSendNow}
-          title="Send Newsletter Now"
-          message={`Are you sure you want to send "${sendTarget.subject || sendTarget.name}" to all targeted recipients? This action cannot be undone.`}
-          confirmLabel="Send Now"
+          title={t('newsletters.send_newsletter_now')}
+          message={t('newsletters.confirm_send_newsletter', { name: sendTarget.subject || sendTarget.name })}
+          confirmLabel={t('newsletters.send_now')}
           confirmColor="primary"
           isLoading={sendingId === sendTarget.id}
         />

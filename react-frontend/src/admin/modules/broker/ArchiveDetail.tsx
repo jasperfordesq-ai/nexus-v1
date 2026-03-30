@@ -51,10 +51,10 @@ export function ArchiveDetail() {
       if (res.success && res.data) {
         setData(res.data);
       } else {
-        setError('Archive record not found');
+        setError(t('broker.archive_record_not_found'));
       }
     } catch {
-      setError('Failed to load archive record');
+      setError(t('broker.failed_to_load_archive_record'));
     } finally {
       setLoading(false);
     }
@@ -71,7 +71,7 @@ export function ArchiveDetail() {
   if (error || !data) {
     return (
       <div className="text-center py-12">
-        <p className="text-danger">{error || 'Archive record not found'}</p>
+        <p className="text-danger">{error || t('broker.archive_record_not_found')}</p>
         <Button
           as={Link}
           to={tenantPath('/admin/broker-controls/archives')}
@@ -79,7 +79,7 @@ export function ArchiveDetail() {
           className="mt-4"
           startContent={<ArrowLeft size={16} />}
         >
-          Back to Archives
+          {t('broker.back_to_archives')}
         </Button>
       </div>
     );
@@ -99,7 +99,7 @@ export function ArchiveDetail() {
             startContent={<ArrowLeft size={16} />}
             size="sm"
           >
-            Back
+            {t('common.back')}
           </Button>
         }
       />
@@ -111,7 +111,7 @@ export function ArchiveDetail() {
         size="lg"
         startContent={<Lock size={14} />}
       >
-        Read-only compliance record
+        {t('broker.read_only_compliance_record')}
       </Chip>
 
       {/* Decision Card */}
@@ -122,13 +122,13 @@ export function ArchiveDetail() {
           ) : (
             <Flag size={18} className="text-danger" />
           )}
-          <span className="font-semibold">Decision</span>
+          <span className="font-semibold">{t('broker.decision')}</span>
         </CardHeader>
         <Divider />
         <CardBody className="space-y-3">
           <div className="flex flex-wrap items-center gap-4">
             <div>
-              <p className="text-xs text-default-400">Decision</p>
+              <p className="text-xs text-default-400">{t('broker.decision')}</p>
               <Chip
                 size="sm"
                 variant="flat"
@@ -139,11 +139,11 @@ export function ArchiveDetail() {
               </Chip>
             </div>
             <div>
-              <p className="text-xs text-default-400">Decided By</p>
+              <p className="text-xs text-default-400">{t('broker.decided_by')}</p>
               <p className="text-sm font-medium mt-1">{data.decided_by_name}</p>
             </div>
             <div>
-              <p className="text-xs text-default-400">Date</p>
+              <p className="text-xs text-default-400">{t('broker.date')}</p>
               <p className="text-sm mt-1">
                 {new Date(data.decided_at).toLocaleString()}
               </p>
@@ -152,14 +152,14 @@ export function ArchiveDetail() {
 
           {data.decision_notes && (
             <div>
-              <p className="text-xs text-default-400">Decision Notes</p>
+              <p className="text-xs text-default-400">{t('broker.decision_notes')}</p>
               <p className="text-sm mt-1">{data.decision_notes}</p>
             </div>
           )}
 
           {data.flag_reason && (
             <div className="rounded-lg bg-danger-50 p-3">
-              <p className="text-xs text-danger font-medium">Flag Reason</p>
+              <p className="text-xs text-danger font-medium">{t('broker.flag_reason')}</p>
               <p className="text-sm mt-1">{data.flag_reason}</p>
               {data.flag_severity && (
                 <Chip
@@ -168,7 +168,7 @@ export function ArchiveDetail() {
                   color="danger"
                   className="capitalize mt-2"
                 >
-                  Severity: {data.flag_severity}
+                  {t('broker.severity_label', { severity: data.flag_severity })}
                 </Chip>
               )}
             </div>
@@ -180,7 +180,7 @@ export function ArchiveDetail() {
       <Card shadow="sm">
         <CardHeader className="flex items-center gap-2">
           <Mail size={18} />
-          <span className="font-semibold">Target Message</span>
+          <span className="font-semibold">{t('broker.target_message')}</span>
         </CardHeader>
         <Divider />
         <CardBody className="space-y-3">
@@ -188,14 +188,14 @@ export function ArchiveDetail() {
             <div className="flex items-center gap-2">
               <User size={14} className="text-default-400" />
               <div>
-                <p className="text-xs text-default-400">Sender</p>
+                <p className="text-xs text-default-400">{t('broker.sender')}</p>
                 <p className="text-sm font-medium">{data.sender_name}</p>
               </div>
             </div>
             <div className="flex items-center gap-2">
               <User size={14} className="text-default-400" />
               <div>
-                <p className="text-xs text-default-400">Receiver</p>
+                <p className="text-xs text-default-400">{t('broker.receiver')}</p>
                 <p className="text-sm font-medium">{data.receiver_name}</p>
               </div>
             </div>
@@ -204,26 +204,26 @@ export function ArchiveDetail() {
           <Divider />
 
           <div>
-            <p className="text-xs text-default-400">Message Body</p>
+            <p className="text-xs text-default-400">{t('broker.message_body')}</p>
             <p className="text-sm mt-1 whitespace-pre-wrap">{data.target_message_body}</p>
           </div>
 
           <div className="flex flex-wrap gap-4">
             <div>
-              <p className="text-xs text-default-400">Copy Reason</p>
+              <p className="text-xs text-default-400">{t('broker.copy_reason')}</p>
               <Chip size="sm" variant="flat" color="default" className="capitalize mt-1">
                 {data.copy_reason.replace(/_/g, ' ')}
               </Chip>
             </div>
             <div>
-              <p className="text-xs text-default-400">Sent At</p>
+              <p className="text-xs text-default-400">{t('broker.sent_at')}</p>
               <p className="text-sm mt-1">
                 {new Date(data.target_message_sent_at).toLocaleString()}
               </p>
             </div>
             {data.listing_title && (
               <div>
-                <p className="text-xs text-default-400">Listing</p>
+                <p className="text-xs text-default-400">{t('broker.listing')}</p>
                 <p className="text-sm mt-1">{data.listing_title}</p>
               </div>
             )}
@@ -235,15 +235,15 @@ export function ArchiveDetail() {
       <Card shadow="sm">
         <CardHeader className="flex items-center gap-2">
           <MessageSquare size={18} />
-          <span className="font-semibold">Conversation Snapshot</span>
+          <span className="font-semibold">{t('broker.conversation_snapshot')}</span>
           <Chip size="sm" variant="flat" color="default" className="ml-auto">
-            {data.conversation_snapshot.length} messages
+            {t('broker.messages_count', { count: data.conversation_snapshot.length })}
           </Chip>
         </CardHeader>
         <Divider />
         <CardBody>
           {data.conversation_snapshot.length === 0 ? (
-            <p className="text-sm text-default-500">No conversation snapshot available</p>
+            <p className="text-sm text-default-500">{t('broker.no_conversation_snapshot')}</p>
           ) : (
             <ScrollShadow className="max-h-[500px]">
               <div className="space-y-0">
@@ -261,13 +261,13 @@ export function ArchiveDetail() {
                       </div>
                       <p className="text-sm text-default-600 whitespace-pre-wrap">
                         {msg.is_deleted ? (
-                          <span className="italic text-default-400">[Message deleted]</span>
+                          <span className="italic text-default-400">{t('broker.message_deleted')}</span>
                         ) : (
                           msg.body
                         )}
                       </p>
                       {msg.is_edited && (
-                        <span className="text-xs text-default-400 italic">(edited)</span>
+                        <span className="text-xs text-default-400 italic">{t('broker.edited')}</span>
                       )}
                     </div>
                   </div>

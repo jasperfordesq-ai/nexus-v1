@@ -84,10 +84,10 @@ export function MessageDetail() {
       if (res.success && res.data) {
         setDetail(res.data);
       } else {
-        setError('Message not found');
+        setError(t('broker.message_not_found'));
       }
     } catch {
-      setError('Failed to load message details');
+      setError(t('broker.failed_to_load_message_details'));
     } finally {
       setLoading(false);
     }
@@ -108,7 +108,7 @@ export function MessageDetail() {
         toast.success(t('broker.message_marked_as_reviewed'));
         loadDetail();
       } else {
-        toast.error(res?.error || 'Failed to mark message as reviewed');
+        toast.error(res?.error || t('broker.failed_to_mark_message_as_reviewed'));
       }
     } catch {
       toast.error(t('broker.failed_to_mark_message_as_reviewed'));
@@ -133,7 +133,7 @@ export function MessageDetail() {
         setFlagSeverity('concern');
         loadDetail();
       } else {
-        toast.error(res?.error || 'Failed to flag message');
+        toast.error(res?.error || t('broker.failed_to_flag_message'));
       }
     } catch {
       toast.error(t('broker.failed_to_flag_message'));
@@ -152,7 +152,7 @@ export function MessageDetail() {
         setApproveModalOpen(false);
         navigate(tenantPath('/admin/broker-controls/messages'));
       } else {
-        toast.error(res?.error || 'Failed to approve message');
+        toast.error(res?.error || t('broker.failed_to_approve_message'));
       }
     } catch {
       toast.error(t('broker.failed_to_approve_message'));
@@ -176,7 +176,7 @@ export function MessageDetail() {
   if (error || !detail) {
     return (
       <div className="text-center py-12">
-        <p className="text-danger">{error || 'Message not found'}</p>
+        <p className="text-danger">{error || t('broker.message_not_found')}</p>
         <Button
           as={Link}
           to={tenantPath('/admin/broker-controls/messages')}
@@ -184,7 +184,7 @@ export function MessageDetail() {
           className="mt-4"
           startContent={<ArrowLeft className="w-4 h-4" />}
         >
-          Back to Messages
+          {t('broker.back_to_messages')}
         </Button>
       </div>
     );
@@ -209,7 +209,7 @@ export function MessageDetail() {
             startContent={<ArrowLeft className="w-4 h-4" />}
             size="sm"
           >
-            Back
+            {t('common.back')}
           </Button>
         }
       />
@@ -218,7 +218,7 @@ export function MessageDetail() {
       <Card shadow="sm">
         <CardHeader className="flex items-center gap-2">
           <Shield className="w-4 h-4" />
-          <span className="font-semibold">Message Metadata</span>
+          <span className="font-semibold">{t('broker.message_metadata')}</span>
         </CardHeader>
         <Divider />
         <CardBody>
@@ -226,7 +226,7 @@ export function MessageDetail() {
             {/* Sender */}
             <div className="space-y-1">
               <p className="text-sm text-default-500 flex items-center gap-1">
-                <User className="w-3 h-3" /> Sender
+                <User className="w-3 h-3" /> {t('broker.sender')}
               </p>
               <p className="text-sm font-medium text-foreground">{copy.sender_name}</p>
             </div>
@@ -234,22 +234,22 @@ export function MessageDetail() {
             {/* Receiver */}
             <div className="space-y-1">
               <p className="text-sm text-default-500 flex items-center gap-1">
-                <User className="w-3 h-3" /> Receiver
+                <User className="w-3 h-3" /> {t('broker.receiver')}
               </p>
               <p className="text-sm font-medium text-foreground">{copy.receiver_name}</p>
             </div>
 
             {/* Listing */}
             <div className="space-y-1">
-              <p className="text-sm text-default-500">Listing</p>
+              <p className="text-sm text-default-500">{t('broker.listing')}</p>
               <p className="text-sm text-foreground">
-                {copy.listing_title || <span className="text-default-400">None</span>}
+                {copy.listing_title || <span className="text-default-400">{t('broker.none')}</span>}
               </p>
             </div>
 
             {/* Copy Reason */}
             <div className="space-y-1">
-              <p className="text-sm text-default-500">Copy Reason</p>
+              <p className="text-sm text-default-500">{t('broker.copy_reason')}</p>
               <Chip
                 size="sm"
                 variant="flat"
@@ -262,7 +262,7 @@ export function MessageDetail() {
             {/* Sent At */}
             <div className="space-y-1">
               <p className="text-sm text-default-500 flex items-center gap-1">
-                <Calendar className="w-3 h-3" /> Sent
+                <Calendar className="w-3 h-3" /> {t('broker.sent')}
               </p>
               <p className="text-sm text-foreground">
                 {new Date(copy.sent_at).toLocaleString()}
@@ -271,7 +271,7 @@ export function MessageDetail() {
 
             {/* Status Chips */}
             <div className="space-y-1">
-              <p className="text-sm text-default-500">Status</p>
+              <p className="text-sm text-default-500">{t('broker.status')}</p>
               <div className="flex flex-wrap gap-1">
                 {isFlagged && (
                   <Chip
@@ -280,7 +280,7 @@ export function MessageDetail() {
                     color="danger"
                     startContent={<Flag className="w-3 h-3" />}
                   >
-                    Flagged{copy.flag_severity ? ` (${copy.flag_severity})` : ''}
+                    {t('broker.flagged')}{copy.flag_severity ? ` (${copy.flag_severity})` : ''}
                   </Chip>
                 )}
                 {isReviewed && (
@@ -290,7 +290,7 @@ export function MessageDetail() {
                     color="success"
                     startContent={<CheckCircle className="w-3 h-3" />}
                   >
-                    Reviewed
+                    {t('broker.reviewed')}
                   </Chip>
                 )}
                 {isArchived && (
@@ -300,12 +300,12 @@ export function MessageDetail() {
                     color="secondary"
                     startContent={<Archive className="w-3 h-3" />}
                   >
-                    Archived
+                    {t('broker.archived')}
                   </Chip>
                 )}
                 {!isFlagged && !isReviewed && !isArchived && (
                   <Chip size="sm" variant="flat" color="warning">
-                    Unreviewed
+                    {t('broker.unreviewed')}
                   </Chip>
                 )}
               </div>
@@ -317,7 +317,7 @@ export function MessageDetail() {
             <>
               <Divider className="my-3" />
               <div className="space-y-1">
-                <p className="text-sm text-default-500">Flag Reason</p>
+                <p className="text-sm text-default-500">{t('broker.flag_reason')}</p>
                 <p className="text-sm text-foreground">{copy.flag_reason}</p>
               </div>
             </>
@@ -329,7 +329,7 @@ export function MessageDetail() {
       <Card shadow="sm">
         <CardHeader className="flex items-center gap-2">
           <MessageCircle className="w-4 h-4" />
-          <span className="font-semibold">Conversation Thread</span>
+          <span className="font-semibold">{t('broker.conversation_thread')}</span>
           <Chip size="sm" variant="flat" className="ml-auto">
             {thread.length} message{thread.length !== 1 ? 's' : ''}
           </Chip>
@@ -338,7 +338,7 @@ export function MessageDetail() {
         <CardBody className="p-0">
           {thread.length === 0 ? (
             <div className="p-6 text-center">
-              <p className="text-sm text-default-500">No messages in thread</p>
+              <p className="text-sm text-default-500">{t('broker.no_messages_in_thread')}</p>
             </div>
           ) : (
             <ScrollShadow className="max-h-[500px]">
@@ -363,11 +363,11 @@ export function MessageDetail() {
                           {isTarget && (
                             <Chip size="sm" variant="flat" color="warning">
                               <AlertTriangle className="w-3 h-3 mr-1 inline" />
-                              Copied Message
+                              {t('broker.copied_message')}
                             </Chip>
                           )}
                           {msg.is_edited && (
-                            <span className="text-xs text-default-400">(edited)</span>
+                            <span className="text-xs text-default-400">{t('broker.edited')}</span>
                           )}
                         </div>
                         <span className="text-xs text-default-500">
@@ -378,14 +378,14 @@ export function MessageDetail() {
                       {/* Subject line */}
                       {msg.subject && (
                         <p className="text-xs text-default-500 mb-1">
-                          Subject: {msg.subject}
+                          {t('broker.subject')}: {msg.subject}
                         </p>
                       )}
 
                       {/* Message body */}
                       {msg.is_deleted ? (
                         <p className="text-sm italic text-default-400">
-                          This message has been deleted
+                          {t('broker.this_message_has_been_deleted')}
                         </p>
                       ) : (
                         <p className="text-sm text-foreground whitespace-pre-wrap">
@@ -406,13 +406,13 @@ export function MessageDetail() {
         <Card shadow="sm">
           <CardHeader className="flex items-center gap-2">
             <Archive className="w-4 h-4 text-secondary" />
-            <span className="font-semibold">Archive Record</span>
+            <span className="font-semibold">{t('broker.archive_record')}</span>
           </CardHeader>
           <Divider />
           <CardBody>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
               <div className="space-y-1">
-                <p className="text-sm text-default-500">Decision</p>
+                <p className="text-sm text-default-500">{t('broker.decision')}</p>
                 <Chip
                   size="sm"
                   variant="flat"
@@ -423,11 +423,11 @@ export function MessageDetail() {
                 </Chip>
               </div>
               <div className="space-y-1">
-                <p className="text-sm text-default-500">Decided By</p>
+                <p className="text-sm text-default-500">{t('broker.decided_by')}</p>
                 <p className="text-sm font-medium text-foreground">{archive.decided_by_name}</p>
               </div>
               <div className="space-y-1">
-                <p className="text-sm text-default-500">Date</p>
+                <p className="text-sm text-default-500">{t('broker.date')}</p>
                 <p className="text-sm text-foreground">
                   {new Date(archive.decided_at).toLocaleString()}
                 </p>
@@ -437,7 +437,7 @@ export function MessageDetail() {
               <>
                 <Divider className="my-3" />
                 <div className="space-y-1">
-                  <p className="text-sm text-default-500">Notes</p>
+                  <p className="text-sm text-default-500">{t('broker.notes')}</p>
                   <p className="text-sm text-foreground">{archive.decision_notes}</p>
                 </div>
               </>
@@ -450,13 +450,13 @@ export function MessageDetail() {
       <Card shadow="sm">
         <CardHeader className="flex items-center gap-2">
           <Shield className="w-4 h-4" />
-          <span className="font-semibold">Actions</span>
+          <span className="font-semibold">{t('broker.actions')}</span>
         </CardHeader>
         <Divider />
         <CardBody>
           {isArchived ? (
             <p className="text-sm text-default-500">
-              This message has been archived. No further actions are available.
+              {t('broker.message_archived_no_actions')}
             </p>
           ) : (
             <div className="flex flex-wrap gap-3">
@@ -469,7 +469,7 @@ export function MessageDetail() {
                   onPress={handleReview}
                   isLoading={reviewLoading}
                 >
-                  Mark Reviewed
+                  {t('broker.mark_reviewed')}
                 </Button>
               )}
 
@@ -485,7 +485,7 @@ export function MessageDetail() {
                     setFlagModalOpen(true);
                   }}
                 >
-                  Flag
+                  {t('broker.flag')}
                 </Button>
               )}
 
@@ -498,7 +498,7 @@ export function MessageDetail() {
                   setApproveModalOpen(true);
                 }}
               >
-                Approve &amp; Archive
+                {t('broker.approve_and_archive')}
               </Button>
             </div>
           )}
@@ -514,11 +514,11 @@ export function MessageDetail() {
         <ModalContent>
           <ModalHeader className="flex items-center gap-2">
             <Flag className="w-5 h-5 text-warning" />
-            Flag Message
+            {t('broker.flag_message')}
           </ModalHeader>
           <ModalBody>
             <Textarea
-              label="Reason (required)"
+              label={t('broker.reason_required')}
               placeholder={t('broker.placeholder_describe_why_this_message_is_being_flagged')}
               value={flagReason}
               onValueChange={setFlagReason}
@@ -535,10 +535,10 @@ export function MessageDetail() {
               }}
               variant="bordered"
             >
-              <SelectItem key="info">Info</SelectItem>
-              <SelectItem key="warning">Warning</SelectItem>
-              <SelectItem key="concern">Concern</SelectItem>
-              <SelectItem key="urgent">Urgent</SelectItem>
+              <SelectItem key="info">{t('broker.severity_info')}</SelectItem>
+              <SelectItem key="warning">{t('broker.severity_warning')}</SelectItem>
+              <SelectItem key="concern">{t('broker.severity_concern')}</SelectItem>
+              <SelectItem key="urgent">{t('broker.severity_urgent')}</SelectItem>
             </Select>
           </ModalBody>
           <ModalFooter>
@@ -547,7 +547,7 @@ export function MessageDetail() {
               onPress={() => setFlagModalOpen(false)}
               isDisabled={flagLoading}
             >
-              Cancel
+              {t('common.cancel')}
             </Button>
             <Button
               color="warning"
@@ -555,7 +555,7 @@ export function MessageDetail() {
               isLoading={flagLoading}
               startContent={!flagLoading && <Flag className="w-4 h-4" />}
             >
-              Flag Message
+              {t('broker.flag_message')}
             </Button>
           </ModalFooter>
         </ModalContent>
@@ -570,15 +570,14 @@ export function MessageDetail() {
         <ModalContent>
           <ModalHeader className="flex items-center gap-2">
             <Archive className="w-5 h-5 text-primary" />
-            Approve &amp; Archive
+            {t('broker.approve_and_archive')}
           </ModalHeader>
           <ModalBody>
             <p className="text-sm text-default-600">
-              Approving this message will create an immutable compliance record.
-              This action cannot be undone.
+              {t('broker.approve_archive_warning')}
             </p>
             <Textarea
-              label="Decision Notes (optional)"
+              label={t('broker.decision_notes_optional')}
               placeholder={t('broker.placeholder_add_any_notes_about_this_review_decision')}
               value={approveNotes}
               onValueChange={setApproveNotes}
@@ -592,7 +591,7 @@ export function MessageDetail() {
               onPress={() => setApproveModalOpen(false)}
               isDisabled={approveLoading}
             >
-              Cancel
+              {t('common.cancel')}
             </Button>
             <Button
               color="primary"
@@ -600,7 +599,7 @@ export function MessageDetail() {
               isLoading={approveLoading}
               startContent={!approveLoading && <Archive className="w-4 h-4" />}
             >
-              Confirm Approve
+              {t('broker.confirm_approve')}
             </Button>
           </ModalFooter>
         </ModalContent>

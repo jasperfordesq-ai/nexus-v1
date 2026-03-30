@@ -120,9 +120,8 @@ class AdminSecurityAuditTest extends TestCase
                 "SELECT setting_value FROM tenant_settings WHERE tenant_id = ? AND setting_key = 'maintenance_mode'",
                 [$this->testTenantId]
             );
-            // This assertion will fail if dangerous keys are accepted,
-            // which is the vulnerability we're testing for
-            $this->markTestIncomplete(
+            // Security vulnerability: dangerous keys are accepted without restriction
+            $this->fail(
                 'SEC-003: Settings endpoint accepted maintenance_mode key without restriction. ' .
                 'An allowlist should be implemented.'
             );
@@ -182,7 +181,7 @@ class AdminSecurityAuditTest extends TestCase
         // This test documents whether the endpoint properly restricts access.
         // Currently requireAdmin() allows any admin role, which may be too permissive.
         if ($response->getStatusCode() === 200) {
-            $this->markTestIncomplete(
+            $this->fail(
                 'SEC-005: Regular admin can impersonate users. ' .
                 'Consider restricting to super-admin only.'
             );

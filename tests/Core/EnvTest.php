@@ -26,10 +26,7 @@ class EnvTest extends TestCase
     {
         $methods = ['get', 'load'];
         foreach ($methods as $method) {
-            if (method_exists(Env::class, $method)) {
-                $this->assertTrue(true);
-            }
+            $this->assertTrue(method_exists(Env::class, $method), "Method {$method} should exist");
         }
-        $this->assertTrue(true);
     }
 }

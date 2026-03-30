@@ -50,10 +50,10 @@ export default function ExchangeDetail() {
       if (res.success && res.data) {
         setData(res.data);
       } else {
-        setError('Exchange not found');
+        setError(t('broker.exchange_not_found'));
       }
     } catch {
-      setError('Failed to load exchange');
+      setError(t('broker.failed_to_load_exchange'));
     } finally {
       setLoading(false);
     }
@@ -70,7 +70,7 @@ export default function ExchangeDetail() {
   if (error || !data) {
     return (
       <div className="text-center py-12">
-        <p className="text-danger">{error || 'Exchange not found'}</p>
+        <p className="text-danger">{error || t('broker.exchange_not_found')}</p>
         <Button
           as={Link}
           to={tenantPath('/admin/broker-controls/exchanges')}
@@ -78,7 +78,7 @@ export default function ExchangeDetail() {
           className="mt-4"
           startContent={<ArrowLeft className="w-4 h-4" />}
         >
-          Back to Exchanges
+          {t('broker.back_to_exchanges')}
         </Button>
       </div>
     );
@@ -91,7 +91,7 @@ export default function ExchangeDetail() {
     <div className="space-y-6">
       <PageHeader
         title={`Exchange #${exchange.id}`}
-        description={exchange.listing_title ?? 'Exchange Request'}
+        description={exchange.listing_title ?? t('broker.exchange_request')}
         actions={
           <Button
             as={Link}
@@ -100,7 +100,7 @@ export default function ExchangeDetail() {
             startContent={<ArrowLeft className="w-4 h-4" />}
             size="sm"
           >
-            Back
+            {t('common.back')}
           </Button>
         }
       />
@@ -109,19 +109,19 @@ export default function ExchangeDetail() {
       <Card shadow="sm">
         <CardBody className="flex flex-row items-center justify-between">
           <div className="space-y-1">
-            <p className="text-sm text-default-500">Status</p>
+            <p className="text-sm text-default-500">{t('broker.status')}</p>
             <Chip color={statusColor} variant="flat" size="sm" className="capitalize">
               {exchange.status.replace(/_/g, ' ')}
             </Chip>
           </div>
           {exchange.final_hours !== undefined && exchange.final_hours !== null && (
             <div className="space-y-1 text-center">
-              <p className="text-sm text-default-500">Hours</p>
+              <p className="text-sm text-default-500">{t('broker.hours')}</p>
               <p className="text-sm font-semibold">{exchange.final_hours}h</p>
             </div>
           )}
           <div className="space-y-1 text-right">
-            <p className="text-sm text-default-500">Created</p>
+            <p className="text-sm text-default-500">{t('broker.created')}</p>
             <p className="text-sm">{new Date(exchange.created_at).toLocaleString()}</p>
           </div>
         </CardBody>
@@ -132,7 +132,7 @@ export default function ExchangeDetail() {
         <Card shadow="sm">
           <CardHeader className="flex items-center gap-2">
             <User className="w-4 h-4" />
-            <span className="font-semibold">Requester</span>
+            <span className="font-semibold">{t('broker.requester')}</span>
           </CardHeader>
           <Divider />
           <CardBody>
@@ -145,7 +145,7 @@ export default function ExchangeDetail() {
         <Card shadow="sm">
           <CardHeader className="flex items-center gap-2">
             <User className="w-4 h-4" />
-            <span className="font-semibold">Provider</span>
+            <span className="font-semibold">{t('broker.provider')}</span>
           </CardHeader>
           <Divider />
           <CardBody>
@@ -162,7 +162,7 @@ export default function ExchangeDetail() {
         <Card shadow="sm">
           <CardHeader className="flex items-center gap-2">
             <Shield className="w-4 h-4 text-warning" />
-            <span className="font-semibold">Risk Tag</span>
+            <span className="font-semibold">{t('broker.risk_tag')}</span>
           </CardHeader>
           <Divider />
           <CardBody>
@@ -182,13 +182,13 @@ export default function ExchangeDetail() {
             )}
             <div className="flex gap-3 mt-3">
               {risk_tag.requires_approval && (
-                <Chip size="sm" variant="dot" color="warning">Approval Required</Chip>
+                <Chip size="sm" variant="dot" color="warning">{t('broker.approval_required')}</Chip>
               )}
               {risk_tag.insurance_required && (
-                <Chip size="sm" variant="dot" color="warning">Insurance Required</Chip>
+                <Chip size="sm" variant="dot" color="warning">{t('broker.insurance_required')}</Chip>
               )}
               {risk_tag.dbs_required && (
-                <Chip size="sm" variant="dot" color="warning">DBS Required</Chip>
+                <Chip size="sm" variant="dot" color="warning">{t('broker.dbs_required')}</Chip>
               )}
             </div>
           </CardBody>
@@ -198,7 +198,7 @@ export default function ExchangeDetail() {
       {/* Broker Notes */}
       {exchange.broker_notes && (
         <Card shadow="sm">
-          <CardHeader><span className="font-semibold">Broker Notes</span></CardHeader>
+          <CardHeader><span className="font-semibold">{t('broker.broker_notes')}</span></CardHeader>
           <Divider />
           <CardBody>
             <p className="text-sm">{exchange.broker_notes}</p>
@@ -209,7 +209,7 @@ export default function ExchangeDetail() {
       {/* Broker Conditions */}
       {exchange.broker_conditions && (
         <Card shadow="sm">
-          <CardHeader><span className="font-semibold">Broker Conditions</span></CardHeader>
+          <CardHeader><span className="font-semibold">{t('broker.broker_conditions')}</span></CardHeader>
           <Divider />
           <CardBody>
             <p className="text-sm">{exchange.broker_conditions}</p>
@@ -221,12 +221,12 @@ export default function ExchangeDetail() {
       <Card shadow="sm">
         <CardHeader className="flex items-center gap-2">
           <Clock className="w-4 h-4" />
-          <span className="font-semibold">History</span>
+          <span className="font-semibold">{t('broker.history')}</span>
         </CardHeader>
         <Divider />
         <CardBody>
           {history.length === 0 ? (
-            <p className="text-sm text-default-500">No history recorded</p>
+            <p className="text-sm text-default-500">{t('broker.no_history_recorded')}</p>
           ) : (
             <div className="space-y-3">
               {history.map((entry) => (
