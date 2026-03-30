@@ -2136,16 +2136,16 @@ class CronJobRunner
 
     /**
      * Gamification weekly digest emails (Monday 4am)
+     *
+     * NOTE: sendWeeklyDigests() iterates all tenants internally,
+     * so we must NOT wrap it in forEachTenant() — that caused a nested
+     * loop where every user received one copy per tenant (11× duplicates).
      */
     private function gamificationWeeklyDigestInternal(): void
     {
         try {
-            $this->forEachTenant(function ($tenantId, $slug) {
-                if (!TenantContext::hasFeature('gamification')) return;
-
-                $result = app(GamificationEmailService::class)->sendWeeklyDigests();
-                echo "   [$slug] Sent {$result['sent']}, skipped {$result['skipped']}, errors {$result['errors']}.\n";
-            });
+            $result = app(GamificationEmailService::class)->sendWeeklyDigests();
+            echo "   Sent {$result['sent']}, skipped {$result['skipped']}, errors {$result['errors']}.\n";
             echo "   Gamification weekly digest complete.\n";
         } catch (\Throwable $e) {
             echo "   Error: " . $e->getMessage() . "\n";

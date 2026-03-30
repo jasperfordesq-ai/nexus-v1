@@ -6,33 +6,27 @@
 
 namespace App\Services;
 
+use App\Core\Mailer;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Log;
 
 /**
  * EmailService — Laravel DI-based service for email operations.
  *
  * Manages email sending, template configuration, and delivery settings.
+ * Uses the custom Mailer class which supports SendGrid, Gmail API, and SMTP
+ * with per-tenant configuration.
  */
 class EmailService
 {
     /**
-     * Send an email using the configured mail driver.
+     * Send an email using the tenant-aware Mailer (SendGrid/Gmail API/SMTP).
      */
     public function send(string $to, string $subject, string $body, array $options = []): bool
     {
         try {
-            Mail::raw($body, function ($message) use ($to, $subject, $options) {
-                $message->to($to)->subject($subject);
-                if (! empty($options['from'])) {
-                    $message->from($options['from']);
-                }
-                if (! empty($options['reply_to'])) {
-                    $message->replyTo($options['reply_to']);
-                }
-            });
-            return true;
+            $mailer = Mailer::forCurrentTenant();
+            return $mailer->send($to, $subject, $body);
         } catch (\Throwable $e) {
             Log::error('EmailService::send failed', ['to' => self::maskEmail($to), 'error' => $e->getMessage()]);
             return false;
