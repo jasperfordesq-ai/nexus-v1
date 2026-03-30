@@ -97,7 +97,7 @@ class AdminNewsletterController extends BaseApiController
         $tenantId = TenantContext::getId();
 
         if (!$this->tableExists('newsletters')) {
-            return $this->respondWithError('NOT_FOUND', 'Newsletter not found', null, 404);
+            return $this->respondWithError('NOT_FOUND', __('api.newsletter_not_found'), null, 404);
         }
 
         try {
@@ -106,11 +106,11 @@ class AdminNewsletterController extends BaseApiController
                 [$id, $tenantId]
             );
             if (!$item) {
-                return $this->respondWithError('NOT_FOUND', 'Newsletter not found', null, 404);
+                return $this->respondWithError('NOT_FOUND', __('api.newsletter_not_found'), null, 404);
             }
             return $this->respondWithData((array)$item);
         } catch (\Exception $e) {
-            return $this->respondWithError('NOT_FOUND', 'Newsletter not found', null, 404);
+            return $this->respondWithError('NOT_FOUND', __('api.newsletter_not_found'), null, 404);
         }
     }
 
@@ -145,11 +145,11 @@ class AdminNewsletterController extends BaseApiController
         $recurringEndDate = $this->input('recurring_end_date') ?: null;
 
         if (!$name && !$subject) {
-            return $this->respondWithError('VALIDATION_ERROR', 'Subject is required', 'subject');
+            return $this->respondWithError('VALIDATION_ERROR', __('api.subject_required'), 'subject');
         }
 
         if (!$this->tableExists('newsletters')) {
-            return $this->respondWithError('TABLE_MISSING', 'Newsletter functionality is not yet configured', null, 503);
+            return $this->respondWithError('TABLE_MISSING', __('api.newsletter_not_configured'), null, 503);
         }
 
         try {
@@ -173,7 +173,7 @@ class AdminNewsletterController extends BaseApiController
             $id = DB::getPdo()->lastInsertId();
             return $this->respondWithData(['id' => $id, 'name' => $name, 'status' => $status], null, 201);
         } catch (\Exception $e) {
-            return $this->respondWithError('CREATE_FAILED', 'Failed to create newsletter');
+            return $this->respondWithError('CREATE_FAILED', __('api.create_failed', ['resource' => 'newsletter']));
         }
     }
 
@@ -183,7 +183,7 @@ class AdminNewsletterController extends BaseApiController
         $tenantId = TenantContext::getId();
 
         if (!$this->tableExists('newsletters')) {
-            return $this->respondWithError('TABLE_MISSING', 'Newsletter functionality is not yet configured', null, 503);
+            return $this->respondWithError('TABLE_MISSING', __('api.newsletter_not_configured'), null, 503);
         }
 
         try {
@@ -225,7 +225,7 @@ class AdminNewsletterController extends BaseApiController
             }
 
             if (empty($fields)) {
-                return $this->respondWithError('VALIDATION_ERROR', 'No fields to update');
+                return $this->respondWithError('VALIDATION_ERROR', __('api.no_fields_to_update'));
             }
             $params[] = $id;
             $params[] = $tenantId;
@@ -235,7 +235,7 @@ class AdminNewsletterController extends BaseApiController
             );
             return $this->respondWithData(['id' => $id, 'updated' => true]);
         } catch (\Exception $e) {
-            return $this->respondWithError('UPDATE_FAILED', 'Failed to update newsletter');
+            return $this->respondWithError('UPDATE_FAILED', __('api.update_failed', ['resource' => 'newsletter']));
         }
     }
 
@@ -245,14 +245,14 @@ class AdminNewsletterController extends BaseApiController
         $tenantId = TenantContext::getId();
 
         if (!$this->tableExists('newsletters')) {
-            return $this->respondWithError('TABLE_MISSING', 'Newsletter functionality is not yet configured', null, 503);
+            return $this->respondWithError('TABLE_MISSING', __('api.newsletter_not_configured'), null, 503);
         }
 
         try {
             DB::delete("DELETE FROM newsletters WHERE id = ? AND tenant_id = ?", [$id, $tenantId]);
             return $this->noContent();
         } catch (\Exception $e) {
-            return $this->respondWithError('DELETE_FAILED', 'Failed to delete newsletter');
+            return $this->respondWithError('DELETE_FAILED', __('api.delete_failed', ['resource' => 'newsletter']));
         }
     }
 
@@ -389,17 +389,17 @@ class AdminNewsletterController extends BaseApiController
         $lastName = $this->input('last_name');
 
         if (!$email || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
-            return $this->respondWithError('VALIDATION_ERROR', 'A valid email address is required', 'email');
+            return $this->respondWithError('VALIDATION_ERROR', __('api.valid_email_address_required'), 'email');
         }
 
         if (!$this->tableExists('newsletter_subscribers')) {
-            return $this->respondWithError('TABLE_MISSING', 'Newsletter subscriber functionality is not yet configured', null, 503);
+            return $this->respondWithError('TABLE_MISSING', __('api.subscriber_not_configured'), null, 503);
         }
 
         try {
             $existing = \App\Models\NewsletterSubscriber::where('email', strtolower(trim($email)))->first();
             if ($existing) {
-                return $this->respondWithError('DUPLICATE', 'A subscriber with this email already exists', 'email', 409);
+                return $this->respondWithError('DUPLICATE', __('api.subscriber_already_exists'), 'email', 409);
             }
 
             $id = \App\Models\NewsletterSubscriber::createConfirmed($email, $firstName, $lastName, 'manual');
@@ -411,7 +411,7 @@ class AdminNewsletterController extends BaseApiController
                 'status' => 'active',
             ], null, 201);
         } catch (\Exception $e) {
-            return $this->respondWithError('CREATE_FAILED', 'Failed to add subscriber');
+            return $this->respondWithError('CREATE_FAILED', __('api.create_failed', ['resource' => 'subscriber']));
         }
     }
 
@@ -420,19 +420,19 @@ class AdminNewsletterController extends BaseApiController
         $this->requireAdmin();
 
         if (!$this->tableExists('newsletter_subscribers')) {
-            return $this->respondWithError('TABLE_MISSING', 'Newsletter subscriber functionality is not yet configured', null, 503);
+            return $this->respondWithError('TABLE_MISSING', __('api.subscriber_not_configured'), null, 503);
         }
 
         try {
             $subscriber = \App\Models\NewsletterSubscriber::find($id);
             if (!$subscriber) {
-                return $this->respondWithError('NOT_FOUND', 'Subscriber not found', null, 404);
+                return $this->respondWithError('NOT_FOUND', __('api.subscriber_not_found'), null, 404);
             }
 
             $subscriber->delete();
             return $this->noContent();
         } catch (\Exception $e) {
-            return $this->respondWithError('DELETE_FAILED', 'Failed to remove subscriber');
+            return $this->respondWithError('DELETE_FAILED', __('api.delete_failed', ['resource' => 'subscriber']));
         }
     }
 
@@ -442,11 +442,11 @@ class AdminNewsletterController extends BaseApiController
 
         $rows = $this->input('rows');
         if (!is_array($rows) || empty($rows)) {
-            return $this->respondWithError('VALIDATION_ERROR', 'An array of subscriber rows is required', 'rows');
+            return $this->respondWithError('VALIDATION_ERROR', __('api.rows_array_required'), 'rows');
         }
 
         if (!$this->tableExists('newsletter_subscribers')) {
-            return $this->respondWithError('TABLE_MISSING', 'Newsletter subscriber functionality is not yet configured', null, 503);
+            return $this->respondWithError('TABLE_MISSING', __('api.subscriber_not_configured'), null, 503);
         }
 
         try {
@@ -457,7 +457,7 @@ class AdminNewsletterController extends BaseApiController
                 'total_rows' => count($rows),
             ]);
         } catch (\Exception $e) {
-            return $this->respondWithError('IMPORT_FAILED', 'Failed to import subscribers');
+            return $this->respondWithError('IMPORT_FAILED', __('api.create_failed', ['resource' => 'subscriber import']));
         }
     }
 
@@ -482,7 +482,7 @@ class AdminNewsletterController extends BaseApiController
         $this->requireAdmin();
 
         if (!$this->tableExists('newsletter_subscribers')) {
-            return $this->respondWithError('TABLE_MISSING', 'Newsletter subscriber functionality is not yet configured', null, 503);
+            return $this->respondWithError('TABLE_MISSING', __('api.subscriber_not_configured'), null, 503);
         }
 
         try {
@@ -495,7 +495,7 @@ class AdminNewsletterController extends BaseApiController
                 'pending_approval' => $result['pending_approval'] ?? 0,
             ]);
         } catch (\Exception $e) {
-            return $this->respondWithError('SYNC_FAILED', 'Failed to sync members');
+            return $this->respondWithError('SYNC_FAILED', __('api.update_failed', ['resource' => 'member sync']));
         }
     }
 
@@ -671,7 +671,7 @@ class AdminNewsletterController extends BaseApiController
         $tenantId = TenantContext::getId();
 
         if (!$this->tableExists('newsletter_segments')) {
-            return $this->respondWithError('NOT_FOUND', 'Segment not found', null, 404);
+            return $this->respondWithError('NOT_FOUND', __('api.segment_not_found'), null, 404);
         }
 
         try {
@@ -681,7 +681,7 @@ class AdminNewsletterController extends BaseApiController
             );
 
             if (!$segment) {
-                return $this->respondWithError('NOT_FOUND', 'Segment not found', null, 404);
+                return $this->respondWithError('NOT_FOUND', __('api.segment_not_found'), null, 404);
             }
 
             // Decode rules JSON if stored as string
@@ -692,7 +692,7 @@ class AdminNewsletterController extends BaseApiController
 
             return $this->respondWithData($segmentArr);
         } catch (\Exception $e) {
-            return $this->respondWithError('FETCH_FAILED', 'Failed to fetch segment');
+            return $this->respondWithError('FETCH_FAILED', __('api.fetch_failed', ['resource' => 'segment']));
         }
     }
 
@@ -708,15 +708,15 @@ class AdminNewsletterController extends BaseApiController
         $rules = $this->input('rules');
 
         if (!$name) {
-            return $this->respondWithError('VALIDATION_ERROR', 'Name is required', 'name');
+            return $this->respondWithError('VALIDATION_ERROR', __('api.name_required'), 'name');
         }
 
         if (!in_array($matchType, ['all', 'any'], true)) {
-            return $this->respondWithError('VALIDATION_ERROR', 'match_type must be "all" or "any"', 'match_type');
+            return $this->respondWithError('VALIDATION_ERROR', __('api.match_type_must_be_all_or_any'), 'match_type');
         }
 
         if (!$this->tableExists('newsletter_segments')) {
-            return $this->respondWithError('TABLE_MISSING', 'Segment functionality is not yet configured', null, 503);
+            return $this->respondWithError('TABLE_MISSING', __('api.segment_not_configured'), null, 503);
         }
 
         try {
@@ -739,7 +739,7 @@ class AdminNewsletterController extends BaseApiController
                 'subscriber_count' => $subscriberCount,
             ], null, 201);
         } catch (\Exception $e) {
-            return $this->respondWithError('CREATE_FAILED', 'Failed to create segment');
+            return $this->respondWithError('CREATE_FAILED', __('api.create_failed', ['resource' => 'segment']));
         }
     }
 
@@ -749,7 +749,7 @@ class AdminNewsletterController extends BaseApiController
         $tenantId = TenantContext::getId();
 
         if (!$this->tableExists('newsletter_segments')) {
-            return $this->respondWithError('TABLE_MISSING', 'Segment functionality is not yet configured', null, 503);
+            return $this->respondWithError('TABLE_MISSING', __('api.segment_not_configured'), null, 503);
         }
 
         try {
@@ -760,7 +760,7 @@ class AdminNewsletterController extends BaseApiController
             );
 
             if (!$existing) {
-                return $this->respondWithError('NOT_FOUND', 'Segment not found', null, 404);
+                return $this->respondWithError('NOT_FOUND', __('api.segment_not_found'), null, 404);
             }
 
             $fields = [];
@@ -787,7 +787,7 @@ class AdminNewsletterController extends BaseApiController
             $matchType = $this->input('match_type');
             if ($matchType !== null) {
                 if (!in_array($matchType, ['all', 'any'], true)) {
-                    return $this->respondWithError('VALIDATION_ERROR', 'match_type must be "all" or "any"', 'match_type');
+                    return $this->respondWithError('VALIDATION_ERROR', __('api.match_type_must_be_all_or_any'), 'match_type');
                 }
                 $fields[] = "match_type = ?";
                 $params[] = $matchType;
@@ -801,7 +801,7 @@ class AdminNewsletterController extends BaseApiController
             }
 
             if (empty($fields)) {
-                return $this->respondWithError('VALIDATION_ERROR', 'No fields to update');
+                return $this->respondWithError('VALIDATION_ERROR', __('api.no_fields_to_update'));
             }
 
             // Recalculate subscriber count if rules or match_type changed
@@ -824,7 +824,7 @@ class AdminNewsletterController extends BaseApiController
 
             return $this->respondWithData(['id' => $id, 'updated' => true]);
         } catch (\Exception $e) {
-            return $this->respondWithError('UPDATE_FAILED', 'Failed to update segment');
+            return $this->respondWithError('UPDATE_FAILED', __('api.update_failed', ['resource' => 'segment']));
         }
     }
 
@@ -834,7 +834,7 @@ class AdminNewsletterController extends BaseApiController
         $tenantId = TenantContext::getId();
 
         if (!$this->tableExists('newsletter_segments')) {
-            return $this->respondWithError('TABLE_MISSING', 'Segment functionality is not yet configured', null, 503);
+            return $this->respondWithError('TABLE_MISSING', __('api.segment_not_configured'), null, 503);
         }
 
         try {
@@ -844,7 +844,7 @@ class AdminNewsletterController extends BaseApiController
             );
 
             if (!$existing) {
-                return $this->respondWithError('NOT_FOUND', 'Segment not found', null, 404);
+                return $this->respondWithError('NOT_FOUND', __('api.segment_not_found'), null, 404);
             }
 
             DB::delete(
@@ -853,7 +853,7 @@ class AdminNewsletterController extends BaseApiController
             );
             return $this->noContent();
         } catch (\Exception $e) {
-            return $this->respondWithError('DELETE_FAILED', 'Failed to delete segment');
+            return $this->respondWithError('DELETE_FAILED', __('api.delete_failed', ['resource' => 'segment']));
         }
     }
 
@@ -866,7 +866,7 @@ class AdminNewsletterController extends BaseApiController
         $rules = $this->input('rules');
 
         if (!in_array($matchType, ['all', 'any'], true)) {
-            return $this->respondWithError('VALIDATION_ERROR', 'match_type must be "all" or "any"', 'match_type');
+            return $this->respondWithError('VALIDATION_ERROR', __('api.match_type_must_be_all_or_any'), 'match_type');
         }
 
         $rulesArray = is_array($rules) ? $rules : (json_decode($rules ?? '[]', true) ?: []);
@@ -1200,7 +1200,7 @@ class AdminNewsletterController extends BaseApiController
         $tenantId = TenantContext::getId();
 
         if (!$this->tableExists('newsletter_templates')) {
-            return $this->respondWithError('NOT_FOUND', 'Template not found', null, 404);
+            return $this->respondWithError('NOT_FOUND', __('api.template_not_found'), null, 404);
         }
 
         try {
@@ -1213,11 +1213,11 @@ class AdminNewsletterController extends BaseApiController
             );
 
             if (!$item) {
-                return $this->respondWithError('NOT_FOUND', 'Template not found', null, 404);
+                return $this->respondWithError('NOT_FOUND', __('api.template_not_found'), null, 404);
             }
             return $this->respondWithData((array)$item);
         } catch (\Exception $e) {
-            return $this->respondWithError('NOT_FOUND', 'Template not found', null, 404);
+            return $this->respondWithError('NOT_FOUND', __('api.template_not_found'), null, 404);
         }
     }
 
@@ -1228,11 +1228,11 @@ class AdminNewsletterController extends BaseApiController
 
         $name = $this->input('name');
         if (!$name) {
-            return $this->respondWithError('VALIDATION_ERROR', 'Name is required', 'name');
+            return $this->respondWithError('VALIDATION_ERROR', __('api.name_required'), 'name');
         }
 
         if (!$this->tableExists('newsletter_templates')) {
-            return $this->respondWithError('TABLE_MISSING', 'Template functionality is not yet configured', null, 503);
+            return $this->respondWithError('TABLE_MISSING', __('api.template_not_configured'), null, 503);
         }
 
         $description = $this->input('description', '');
@@ -1252,7 +1252,7 @@ class AdminNewsletterController extends BaseApiController
             $id = DB::getPdo()->lastInsertId();
             return $this->respondWithData(['id' => $id, 'name' => $name], null, 201);
         } catch (\Exception $e) {
-            return $this->respondWithError('CREATE_FAILED', 'Failed to create template');
+            return $this->respondWithError('CREATE_FAILED', __('api.create_failed', ['resource' => 'template']));
         }
     }
 
@@ -1262,7 +1262,7 @@ class AdminNewsletterController extends BaseApiController
         $tenantId = TenantContext::getId();
 
         if (!$this->tableExists('newsletter_templates')) {
-            return $this->respondWithError('TABLE_MISSING', 'Template functionality is not yet configured', null, 503);
+            return $this->respondWithError('TABLE_MISSING', __('api.template_not_configured'), null, 503);
         }
 
         try {
@@ -1287,7 +1287,7 @@ class AdminNewsletterController extends BaseApiController
             }
 
             if (empty($fields)) {
-                return $this->respondWithError('VALIDATION_ERROR', 'No fields to update');
+                return $this->respondWithError('VALIDATION_ERROR', __('api.no_fields_to_update'));
             }
 
             $fields[] = "updated_at = NOW()";
@@ -1300,7 +1300,7 @@ class AdminNewsletterController extends BaseApiController
             );
             return $this->respondWithData(['id' => $id, 'updated' => true]);
         } catch (\Exception $e) {
-            return $this->respondWithError('UPDATE_FAILED', 'Failed to update template');
+            return $this->respondWithError('UPDATE_FAILED', __('api.update_failed', ['resource' => 'template']));
         }
     }
 
@@ -1310,7 +1310,7 @@ class AdminNewsletterController extends BaseApiController
         $tenantId = TenantContext::getId();
 
         if (!$this->tableExists('newsletter_templates')) {
-            return $this->respondWithError('TABLE_MISSING', 'Template functionality is not yet configured', null, 503);
+            return $this->respondWithError('TABLE_MISSING', __('api.template_not_configured'), null, 503);
         }
 
         try {
@@ -1320,7 +1320,7 @@ class AdminNewsletterController extends BaseApiController
             );
             return $this->noContent();
         } catch (\Exception $e) {
-            return $this->respondWithError('DELETE_FAILED', 'Failed to delete template');
+            return $this->respondWithError('DELETE_FAILED', __('api.delete_failed', ['resource' => 'template']));
         }
     }
 
@@ -1330,7 +1330,7 @@ class AdminNewsletterController extends BaseApiController
         $tenantId = TenantContext::getId();
 
         if (!$this->tableExists('newsletter_templates')) {
-            return $this->respondWithError('TABLE_MISSING', 'Template functionality is not yet configured', null, 503);
+            return $this->respondWithError('TABLE_MISSING', __('api.template_not_configured'), null, 503);
         }
 
         try {
@@ -1340,7 +1340,7 @@ class AdminNewsletterController extends BaseApiController
             );
 
             if (!$original) {
-                return $this->respondWithError('NOT_FOUND', 'Template not found', null, 404);
+                return $this->respondWithError('NOT_FOUND', __('api.template_not_found'), null, 404);
             }
 
             $newName = $original->name . ' (Copy)';
@@ -1365,7 +1365,7 @@ class AdminNewsletterController extends BaseApiController
             $newId = DB::getPdo()->lastInsertId();
             return $this->respondWithData(['id' => $newId, 'name' => $newName], null, 201);
         } catch (\Exception $e) {
-            return $this->respondWithError('DUPLICATE_FAILED', 'Failed to duplicate template');
+            return $this->respondWithError('DUPLICATE_FAILED', __('api.create_failed', ['resource' => 'template duplicate']));
         }
     }
 
@@ -1375,7 +1375,7 @@ class AdminNewsletterController extends BaseApiController
         $tenantId = TenantContext::getId();
 
         if (!$this->tableExists('newsletter_templates')) {
-            return $this->respondWithError('NOT_FOUND', 'Template not found', null, 404);
+            return $this->respondWithError('NOT_FOUND', __('api.template_not_found'), null, 404);
         }
 
         try {
@@ -1385,7 +1385,7 @@ class AdminNewsletterController extends BaseApiController
             );
 
             if (!$item) {
-                return $this->respondWithError('NOT_FOUND', 'Template not found', null, 404);
+                return $this->respondWithError('NOT_FOUND', __('api.template_not_found'), null, 404);
             }
             return $this->respondWithData([
                 'html' => $item->content ?? '',
@@ -1393,7 +1393,7 @@ class AdminNewsletterController extends BaseApiController
                 'name' => $item->name ?? '',
             ]);
         } catch (\Exception $e) {
-            return $this->respondWithError('NOT_FOUND', 'Template not found', null, 404);
+            return $this->respondWithError('NOT_FOUND', __('api.template_not_found'), null, 404);
         }
     }
 
@@ -1407,7 +1407,7 @@ class AdminNewsletterController extends BaseApiController
         $tenantId = TenantContext::getId();
 
         if (!$this->tableExists('newsletters')) {
-            return $this->respondWithError('NOT_FOUND', 'Newsletter not found', null, 404);
+            return $this->respondWithError('NOT_FOUND', __('api.newsletter_not_found'), null, 404);
         }
 
         try {
@@ -1421,7 +1421,7 @@ class AdminNewsletterController extends BaseApiController
             );
 
             if (!$newsletter) {
-                return $this->respondWithError('NOT_FOUND', 'Newsletter not found', null, 404);
+                return $this->respondWithError('NOT_FOUND', __('api.newsletter_not_found'), null, 404);
             }
 
             $authorName = trim(($newsletter->author_first_name ?? '') . ' ' . ($newsletter->author_last_name ?? ''));
@@ -1840,7 +1840,7 @@ class AdminNewsletterController extends BaseApiController
                 ],
             ]);
         } catch (\Exception $e) {
-            return $this->respondWithError('FETCH_FAILED', 'Failed to fetch newsletter stats');
+            return $this->respondWithError('FETCH_FAILED', __('api.fetch_failed', ['resource' => 'newsletter stats']));
         }
     }
 
@@ -1851,11 +1851,11 @@ class AdminNewsletterController extends BaseApiController
 
         $winner = $this->input('winner');
         if (!in_array($winner, ['a', 'b'], true)) {
-            return $this->respondWithError('VALIDATION_ERROR', 'Winner must be "a" or "b"', 'winner');
+            return $this->respondWithError('VALIDATION_ERROR', __('api.ab_winner_must_be_a_or_b'), 'winner');
         }
 
         if (!$this->tableExists('newsletters')) {
-            return $this->respondWithError('TABLE_MISSING', 'Newsletter functionality is not yet configured', null, 503);
+            return $this->respondWithError('TABLE_MISSING', __('api.newsletter_not_configured'), null, 503);
         }
 
         try {
@@ -1865,11 +1865,11 @@ class AdminNewsletterController extends BaseApiController
             );
 
             if (!$newsletter) {
-                return $this->respondWithError('NOT_FOUND', 'Newsletter not found', null, 404);
+                return $this->respondWithError('NOT_FOUND', __('api.newsletter_not_found'), null, 404);
             }
 
             if (empty($newsletter->ab_test_enabled)) {
-                return $this->respondWithError('VALIDATION_ERROR', 'Newsletter does not have A/B testing enabled');
+                return $this->respondWithError('VALIDATION_ERROR', __('api.no_ab_testing'));
             }
 
             DB::update(
@@ -1879,7 +1879,7 @@ class AdminNewsletterController extends BaseApiController
 
             return $this->respondWithData(['success' => true, 'winner' => $winner]);
         } catch (\Exception $e) {
-            return $this->respondWithError('UPDATE_FAILED', 'Failed to select A/B test winner');
+            return $this->respondWithError('UPDATE_FAILED', __('api.update_failed', ['resource' => 'A/B test winner']));
         }
     }
 
@@ -1966,7 +1966,7 @@ class AdminNewsletterController extends BaseApiController
         $tenantId = TenantContext::getId();
 
         if (!$this->tableExists('newsletter_suppression_list')) {
-            return $this->respondWithError('TABLE_MISSING', 'Suppression list not available', null, 503);
+            return $this->respondWithError('TABLE_MISSING', __('api.suppression_list_not_available'), null, 503);
         }
 
         try {
@@ -1976,7 +1976,7 @@ class AdminNewsletterController extends BaseApiController
             );
             return $this->respondWithData(['success' => true, 'email' => $email]);
         } catch (\Exception $e) {
-            return $this->respondWithError('UNSUPPRESS_FAILED', 'Failed to remove email from suppression list');
+            return $this->respondWithError('UNSUPPRESS_FAILED', __('api.delete_failed', ['resource' => 'suppression entry']));
         }
     }
 
@@ -1986,7 +1986,7 @@ class AdminNewsletterController extends BaseApiController
         $tenantId = TenantContext::getId();
 
         if (!$this->tableExists('newsletter_suppression_list')) {
-            return $this->respondWithError('TABLE_MISSING', 'Suppression list not available', null, 503);
+            return $this->respondWithError('TABLE_MISSING', __('api.suppression_list_not_available'), null, 503);
         }
 
         try {
@@ -1998,7 +1998,7 @@ class AdminNewsletterController extends BaseApiController
             );
             return $this->respondWithData(['success' => true, 'email' => $email]);
         } catch (\Exception $e) {
-            return $this->respondWithError('SUPPRESS_FAILED', 'Failed to add email to suppression list');
+            return $this->respondWithError('SUPPRESS_FAILED', __('api.create_failed', ['resource' => 'suppression entry']));
         }
     }
 
@@ -2012,7 +2012,7 @@ class AdminNewsletterController extends BaseApiController
         $tenantId = TenantContext::getId();
 
         if (!$this->tableExists('newsletters') || !$this->tableExists('newsletter_queue')) {
-            return $this->respondWithError('TABLE_MISSING', 'Newsletter functionality not available', null, 503);
+            return $this->respondWithError('TABLE_MISSING', __('api.newsletter_tables_not_available'), null, 503);
         }
 
         try {
@@ -2023,7 +2023,7 @@ class AdminNewsletterController extends BaseApiController
             );
 
             if (!$newsletter) {
-                return $this->respondWithError('NOT_FOUND', 'Newsletter not found', null, 404);
+                return $this->respondWithError('NOT_FOUND', __('api.newsletter_not_found'), null, 404);
             }
 
             // Count non-openers
@@ -2062,7 +2062,7 @@ class AdminNewsletterController extends BaseApiController
                 'non_clickers_count' => (int)$nonClickers,
             ]);
         } catch (\Exception $e) {
-            return $this->respondWithError('FETCH_FAILED', 'Failed to fetch resend info');
+            return $this->respondWithError('FETCH_FAILED', __('api.fetch_failed', ['resource' => 'resend info']));
         }
     }
 
@@ -2075,11 +2075,11 @@ class AdminNewsletterController extends BaseApiController
         $subjectOverride = $this->input('subject_override');
 
         if (!in_array($target, ['non_openers', 'non_clickers', 'segment'])) {
-            return $this->respondWithError('VALIDATION_ERROR', 'Invalid target', 'target');
+            return $this->respondWithError('VALIDATION_ERROR', __('api.invalid_target'), 'target');
         }
 
         if (!$this->tableExists('newsletters') || !$this->tableExists('newsletter_queue')) {
-            return $this->respondWithError('TABLE_MISSING', 'Newsletter functionality not available', null, 503);
+            return $this->respondWithError('TABLE_MISSING', __('api.newsletter_tables_not_available'), null, 503);
         }
 
         try {
@@ -2090,7 +2090,7 @@ class AdminNewsletterController extends BaseApiController
             );
 
             if (!$newsletter) {
-                return $this->respondWithError('NOT_FOUND', 'Newsletter not found', null, 404);
+                return $this->respondWithError('NOT_FOUND', __('api.newsletter_not_found'), null, 404);
             }
 
             // Get recipient list based on target
@@ -2197,7 +2197,7 @@ class AdminNewsletterController extends BaseApiController
             }
 
             if (empty($recipients)) {
-                return $this->respondWithError('NO_RECIPIENTS', 'No recipients found for resend target');
+                return $this->respondWithError('NO_RECIPIENTS', __('api.no_recipients_for_resend'));
             }
 
             // Queue the resend
@@ -2220,7 +2220,7 @@ class AdminNewsletterController extends BaseApiController
                 'subject' => $subject,
             ]);
         } catch (\Exception $e) {
-            return $this->respondWithError('RESEND_FAILED', 'Failed to queue resend');
+            return $this->respondWithError('RESEND_FAILED', __('api.create_failed', ['resource' => 'resend queue']));
         }
     }
 
@@ -2340,7 +2340,7 @@ class AdminNewsletterController extends BaseApiController
         $tenantId = TenantContext::getId();
 
         if (!$this->tableExists('newsletters')) {
-            return $this->respondWithError('TABLE_MISSING', 'Newsletter tables not available', null, 503);
+            return $this->respondWithError('TABLE_MISSING', __('api.newsletter_tables_not_available'), null, 503);
         }
 
         try {
@@ -2350,15 +2350,15 @@ class AdminNewsletterController extends BaseApiController
             );
 
             if (!$newsletter) {
-                return $this->respondWithError('NOT_FOUND', 'Newsletter not found', null, 404);
+                return $this->respondWithError('NOT_FOUND', __('api.newsletter_not_found'), null, 404);
             }
 
             if ($newsletter->status === 'sent') {
-                return $this->respondWithError('ALREADY_SENT', 'Newsletter has already been sent');
+                return $this->respondWithError('ALREADY_SENT', __('api.newsletter_already_sent'));
             }
 
             if ($newsletter->status === 'sending') {
-                return $this->respondWithError('ALREADY_SENDING', 'Newsletter is currently being sent');
+                return $this->respondWithError('ALREADY_SENDING', __('api.newsletter_currently_sending'));
             }
 
             $targetAudience = $newsletter->target_audience ?? 'all_members';
@@ -2386,7 +2386,7 @@ class AdminNewsletterController extends BaseApiController
         $tenantId = TenantContext::getId();
 
         if (!$this->tableExists('newsletters')) {
-            return $this->respondWithError('TABLE_MISSING', 'Newsletter tables not available', null, 503);
+            return $this->respondWithError('TABLE_MISSING', __('api.newsletter_tables_not_available'), null, 503);
         }
 
         try {
@@ -2396,7 +2396,7 @@ class AdminNewsletterController extends BaseApiController
             );
 
             if (!$newsletter) {
-                return $this->respondWithError('NOT_FOUND', 'Newsletter not found', null, 404);
+                return $this->respondWithError('NOT_FOUND', __('api.newsletter_not_found'), null, 404);
             }
 
             $admin = DB::selectOne(
@@ -2405,7 +2405,7 @@ class AdminNewsletterController extends BaseApiController
             );
 
             if (!$admin || empty($admin->email)) {
-                return $this->respondWithError('NO_EMAIL', 'Admin user has no email address');
+                return $this->respondWithError('NO_EMAIL', __('api.admin_no_email'));
             }
 
             $tenantName = TenantContext::get()['name'] ?? 'Community';
@@ -2434,10 +2434,10 @@ class AdminNewsletterController extends BaseApiController
                     'message' => "Test email sent to {$admin->email}",
                 ]);
             } else {
-                return $this->respondWithError('SEND_FAILED', 'Failed to send test email. Check email configuration.');
+                return $this->respondWithError('SEND_FAILED', __('api.failed_send_test_email'));
             }
         } catch (\Exception $e) {
-            return $this->respondWithError('SEND_FAILED', 'Failed to send test email');
+            return $this->respondWithError('SEND_FAILED', __('api.failed_send_test_email'));
         }
     }
 
@@ -2473,7 +2473,7 @@ class AdminNewsletterController extends BaseApiController
         $tenantId = TenantContext::getId();
 
         if (!$this->tableExists('newsletters')) {
-            return $this->respondWithError('TABLE_MISSING', 'Newsletter tables not available', null, 503);
+            return $this->respondWithError('TABLE_MISSING', __('api.newsletter_tables_not_available'), null, 503);
         }
 
         try {
@@ -2489,7 +2489,7 @@ class AdminNewsletterController extends BaseApiController
             );
 
             if (!$newsletter) {
-                return $this->respondWithError('NOT_FOUND', 'Newsletter not found', null, 404);
+                return $this->respondWithError('NOT_FOUND', __('api.newsletter_not_found'), null, 404);
             }
 
             $newSubject = ($newsletter->subject ?? 'Newsletter') . ' (Copy)';
@@ -2522,10 +2522,10 @@ class AdminNewsletterController extends BaseApiController
 
             return $this->respondWithData([
                 'id' => (int) $newId,
-                'message' => 'Newsletter duplicated successfully',
+                'message' => __('api.newsletter_duplicated'),
             ]);
         } catch (\Exception $e) {
-            return $this->respondWithError('DUPLICATE_FAILED', 'Failed to duplicate newsletter');
+            return $this->respondWithError('DUPLICATE_FAILED', __('api.create_failed', ['resource' => 'newsletter duplicate']));
         }
     }
 
@@ -2549,7 +2549,7 @@ class AdminNewsletterController extends BaseApiController
             );
 
             if (!$newsletter) {
-                return $this->respondWithError('NOT_FOUND', 'Newsletter not found', null, 404);
+                return $this->respondWithError('NOT_FOUND', __('api.newsletter_not_found'), null, 404);
             }
         }
 

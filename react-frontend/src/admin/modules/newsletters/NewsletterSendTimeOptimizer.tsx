@@ -95,10 +95,10 @@ export function NewsletterSendTimeOptimizer() {
               className="w-32"
               size="sm"
             >
-              <SelectItem key="7">7 days</SelectItem>
-              <SelectItem key="30">30 days</SelectItem>
-              <SelectItem key="60">60 days</SelectItem>
-              <SelectItem key="90">90 days</SelectItem>
+              <SelectItem key="7">{t('newsletters.days_7')}</SelectItem>
+              <SelectItem key="30">{t('newsletters.days_30')}</SelectItem>
+              <SelectItem key="60">{t('newsletters.days_60')}</SelectItem>
+              <SelectItem key="90">{t('newsletters.days_90')}</SelectItem>
             </Select>
             <Button
               variant="flat"

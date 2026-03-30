@@ -634,7 +634,7 @@ export function InsuranceCertificates() {
       {/* Search — #6: now debounced */}
       <div className="mb-4">
         <Input
-          placeholder="Search by name, email, provider, or policy number..."
+          placeholder={t('broker.placeholder_search_by_name_email_provider_or_policy_number')}
           aria-label={t('broker.label_search_insurance_certificates')}
           value={searchQuery}
           onValueChange={setSearchQuery}
@@ -655,13 +655,13 @@ export function InsuranceCertificates() {
           variant="underlined"
           size="sm"
         >
-          <Tab key="all" title="All" />
-          <Tab key="pending" title="Pending" />
-          <Tab key="submitted" title="Submitted" />
-          <Tab key="verified" title="Verified" />
-          <Tab key="expired" title="Expired" />
-          <Tab key="expiring_soon" title="Expiring Soon" />
-          <Tab key="rejected" title="Rejected" />
+          <Tab key="all" title={t('broker.tab_all')} />
+          <Tab key="pending" title={t('broker.tab_pending')} />
+          <Tab key="submitted" title={t('broker.tab_submitted')} />
+          <Tab key="verified" title={t('broker.tab_verified')} />
+          <Tab key="expired" title={t('broker.tab_expired')} />
+          <Tab key="expiring_soon" title={t('broker.tab_expiring_soon')} />
+          <Tab key="rejected" title={t('broker.tab_rejected')} />
         </Tabs>
       </div>
 
@@ -967,7 +967,7 @@ export function InsuranceCertificates() {
                 <strong>{rejectModal.first_name} {rejectModal.last_name}</strong>?
               </p>
               <Textarea
-                label="Reason (required)"
+                label={t('broker.label_reason_required')}
                 placeholder={t('broker.placeholder_provide_a_reason_for_rejection')}
                 value={rejectReason}
                 onValueChange={setRejectReason}

@@ -25,6 +25,7 @@ import {
   useDisclosure,
 } from '@heroui/react';
 import { Plus, X, Pencil, Trash2 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { useAuth, useToast } from '@/contexts';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
@@ -81,6 +82,7 @@ interface StoryHighlightsProps {
 
 export function StoryHighlights({ userId, userName, userAvatar }: StoryHighlightsProps) {
   const { user: currentUser } = useAuth();
+  const { t } = useTranslation('stories');
   const toast = useToast();
   const [highlights, setHighlights] = useState<Highlight[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -298,12 +300,12 @@ export function StoryHighlights({ userId, userName, userAvatar }: StoryHighlight
             <button
               onClick={onCreateOpen}
               className="flex flex-col items-center gap-1.5 flex-shrink-0 w-18 group"
-              aria-label="Create new highlight"
+              aria-label={t('highlights.aria_create', 'Create new highlight')}
             >
               <div className="w-16 h-16 rounded-full border-2 border-dashed border-[var(--border-default)] flex items-center justify-center group-hover:border-[var(--color-primary)] transition-colors">
                 <Plus className="w-6 h-6 text-[var(--text-muted)] group-hover:text-[var(--color-primary)] transition-colors" />
               </div>
-              <span className="text-xs text-[var(--text-muted)] text-center">New</span>
+              <span className="text-xs text-[var(--text-muted)] text-center">{t('highlights.new', 'New')}</span>
             </button>
           )}
 
@@ -366,24 +368,24 @@ export function StoryHighlights({ userId, userName, userAvatar }: StoryHighlight
       {/* Create Highlight Modal */}
       <Modal isOpen={isCreateOpen} onClose={onCreateClose} size="sm">
         <ModalContent>
-          <ModalHeader>Create Highlight</ModalHeader>
+          <ModalHeader>{t('highlights.create_title', 'Create Highlight')}</ModalHeader>
           <ModalBody>
             <Input
               value={newTitle}
               onValueChange={setNewTitle}
-              label="Highlight Title"
-              placeholder="e.g., Travel, Food, Events..."
+              label={t('highlights.title_label', 'Highlight Title')}
+              placeholder={t('highlights.title_placeholder', 'e.g., Travel, Food, Events...')}
               variant="bordered"
               maxLength={100}
               autoFocus
             />
             <p className="text-xs text-[var(--text-muted)]">
-              You can add stories to this highlight later from the story viewer.
+              {t('highlights.create_hint', 'You can add stories to this highlight later from the story viewer.')}
             </p>
           </ModalBody>
           <ModalFooter>
             <Button variant="light" onPress={onCreateClose}>
-              Cancel
+              {t('highlights.cancel', 'Cancel')}
             </Button>
             <Button
               color="primary"
@@ -391,7 +393,7 @@ export function StoryHighlights({ userId, userName, userAvatar }: StoryHighlight
               isLoading={isCreating}
               isDisabled={!newTitle.trim()}
             >
-              Create
+              {t('highlights.create', 'Create')}
             </Button>
           </ModalFooter>
         </ModalContent>
@@ -400,14 +402,14 @@ export function StoryHighlights({ userId, userName, userAvatar }: StoryHighlight
       {/* Edit Highlight Modal */}
       <Modal isOpen={isEditOpen} onClose={handleEditClose} size="md">
         <ModalContent>
-          <ModalHeader>Edit Highlight</ModalHeader>
+          <ModalHeader>{t('highlights.edit_title', 'Edit Highlight')}</ModalHeader>
           <ModalBody className="gap-4">
             {/* Title editing */}
             <div className="flex gap-2 items-end">
               <Input
                 value={editTitle}
                 onValueChange={setEditTitle}
-                label="Highlight Title"
+                label={t('highlights.title_label', 'Highlight Title')}
                 variant="bordered"
                 maxLength={100}
                 className="flex-1"
@@ -487,7 +489,7 @@ export function StoryHighlights({ userId, userName, userAvatar }: StoryHighlight
                         isIconOnly
                         isLoading={removingStoryId === story.id}
                         onPress={() => handleRemoveStory(story.id)}
-                        aria-label="Remove story from highlight"
+                        aria-label={t('highlights.aria_remove_story', 'Remove story from highlight')}
                       >
                         <Trash2 className="w-4 h-4" />
                       </Button>

@@ -14,6 +14,7 @@ import {
   Button, RadioGroup, Radio, Input, Card, CardBody,
 } from '@heroui/react';
 import { Mail, Users, AlertCircle } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { useToast } from '@/contexts';
 import { adminNewsletters } from '../../api/adminApi';
 import type { ResendInfo } from '../../api/types';
@@ -26,6 +27,7 @@ interface NewsletterResendProps {
 }
 
 export function NewsletterResend({ isOpen, onClose, newsletterId, onSuccess }: NewsletterResendProps) {
+  const { t } = useTranslation('admin');
   const toast = useToast();
   const [loading, setLoading] = useState(true);
   const [sending, setSending] = useState(false);
@@ -157,7 +159,7 @@ export function NewsletterResend({ isOpen, onClose, newsletterId, onSuccess }: N
 
                   <Input
                     label="Subject Override (Optional)"
-                    placeholder="Leave blank to use original subject"
+                    placeholder={t('newsletters.placeholder_leave_blank_to_use_original_subject')}
                     value={subjectOverride}
                     onValueChange={setSubjectOverride}
                     description="Override the original subject line for this resend"

@@ -552,7 +552,7 @@ export function RiskTagsPage() {
             </Select>
 
             <Textarea
-              label="Risk Notes (internal)"
+              label={t('broker.label_risk_notes_internal')}
               value={form.risk_notes}
               onValueChange={v => setForm(f => ({ ...f, risk_notes: v }))}
               placeholder={t('broker.placeholder_internal_notes_visible_only_to_brokers')}

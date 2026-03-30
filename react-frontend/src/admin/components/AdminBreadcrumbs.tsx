@@ -249,7 +249,7 @@ export function AdminBreadcrumbs({ items }: AdminBreadcrumbsProps) {
   if (breadcrumbs.length <= 1) return null;
 
   return (
-    <nav aria-label="Breadcrumbs" className="mb-4">
+    <nav aria-label={t('aria.breadcrumbs')} className="mb-4">
       <ol className="flex items-center gap-1.5 text-sm text-default-500">
         {breadcrumbs.map((crumb, index) => (
           <li key={crumb.label} className="flex items-center gap-1.5">

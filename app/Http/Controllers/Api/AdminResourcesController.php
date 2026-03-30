@@ -64,7 +64,7 @@ class AdminResourcesController extends BaseApiController
         $article = $this->knowledgeBaseService->getById($id);
 
         if (!$article) {
-            return $this->respondWithError('NOT_FOUND', 'Article not found', null, 404);
+            return $this->respondWithError('NOT_FOUND', __('api.article_not_found'), null, 404);
         }
 
         return $this->respondWithData($article);
@@ -79,7 +79,7 @@ class AdminResourcesController extends BaseApiController
 
         $article = $this->knowledgeBaseService->getById($id);
         if (!$article) {
-            return $this->respondWithError('NOT_FOUND', 'Article not found', null, 404);
+            return $this->respondWithError('NOT_FOUND', __('api.article_not_found'), null, 404);
         }
 
         $deleted = $this->knowledgeBaseService->delete($id);
@@ -88,6 +88,6 @@ class AdminResourcesController extends BaseApiController
             return $this->respondWithData(['deleted' => true, 'id' => $id]);
         }
 
-        return $this->respondWithError('DELETE_FAILED', 'Failed to delete article', null, 400);
+        return $this->respondWithError('DELETE_FAILED', __('api.delete_failed', ['resource' => 'article']), null, 400);
     }
 }

@@ -627,4 +627,23 @@ return [
     'match_cache_cleared'                  => 'Match cache cleared successfully',
     'password_reset_email_sent'            => 'Password reset email sent',
     'welcome_email_sent'                   => 'Welcome email sent',
+
+    // ============================================
+    // ADMIN — ANALYTICS / REPORTS (additional)
+    // ============================================
+    'unknown_report_type'                  => 'Unknown report type: :type. Valid types: active, registrations, retention, engagement, top_contributors, least_active',
+    'unknown_group_by'                     => 'Unknown group_by: :value. Valid values: category, member, period, summary',
+    'supported_formats_csv_pdf'            => 'Supported formats: csv, pdf',
+    'unknown_export_type'                  => 'Unknown report type: :type. Valid types: :valid',
+    'no_data_for_export'                   => 'No data found for export',
+
+    // ============================================
+    // ADMIN — CATEGORIES (additional)
+    // ============================================
+    'invalid_category_type'                => 'Invalid category type. Allowed: :types',
+
+    // ============================================
+    // ADMIN — VOLUNTEER (additional)
+    // ============================================
+    'only_pending_can_be_verified'         => 'Only pending hours can be verified',
 ];

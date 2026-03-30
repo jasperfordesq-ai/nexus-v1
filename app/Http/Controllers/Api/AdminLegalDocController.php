@@ -34,7 +34,7 @@ class AdminLegalDocController extends BaseApiController
             return $this->respondWithData($versions);
         } catch (\Exception $e) {
             error_log("[AdminLegalDocController] getVersions error: " . $e->getMessage());
-            return $this->respondWithError('SERVER_ERROR', 'Failed to fetch versions', null, 500);
+            return $this->respondWithError('SERVER_ERROR', __('api.fetch_failed', ['resource' => 'versions']), null, 500);
         }
     }
 
@@ -46,24 +46,24 @@ class AdminLegalDocController extends BaseApiController
         $v2 = $this->query('v2');
 
         if (!$v1 || !$v2) {
-            return $this->respondWithError('VALIDATION_ERROR', 'Both v1 and v2 parameters are required', null, 400);
+            return $this->respondWithError('VALIDATION_ERROR', __('api.both_versions_required'), null, 400);
         }
 
         try {
             $comparison = $this->legalDocumentService->compareVersions((int) $v1, (int) $v2);
 
             if (!$comparison) {
-                return $this->respondWithError('NOT_FOUND', 'One or both versions not found', null, 404);
+                return $this->respondWithError('NOT_FOUND', __('api.versions_not_found'), null, 404);
             }
 
             if ((int) $comparison['version1']['document_id'] !== $docId || (int) $comparison['version2']['document_id'] !== $docId) {
-                return $this->respondWithError('VALIDATION_ERROR', 'Versions do not belong to this document', null, 400);
+                return $this->respondWithError('VALIDATION_ERROR', __('api.version_does_not_belong'), null, 400);
             }
 
             return $this->respondWithData($comparison);
         } catch (\Exception $e) {
             error_log("[AdminLegalDocController] compareVersions error: " . $e->getMessage());
-            return $this->respondWithError('SERVER_ERROR', 'Failed to compare versions', null, 500);
+            return $this->respondWithError('SERVER_ERROR', __('api.fetch_failed', ['resource' => 'version comparison']), null, 500);
         }
     }
 
@@ -74,13 +74,13 @@ class AdminLegalDocController extends BaseApiController
         $input = $this->getAllInput();
 
         if (empty($input['version_number'])) {
-            return $this->respondWithError('VALIDATION_ERROR', 'Version number is required', 'version_number', 400);
+            return $this->respondWithError('VALIDATION_ERROR', __('api.version_number_required'), 'version_number', 400);
         }
         if (empty($input['content'])) {
-            return $this->respondWithError('VALIDATION_ERROR', 'Content is required', 'content', 400);
+            return $this->respondWithError('VALIDATION_ERROR', __('api.content_required'), 'content', 400);
         }
         if (empty($input['effective_date'])) {
-            return $this->respondWithError('VALIDATION_ERROR', 'Effective date is required', 'effective_date', 400);
+            return $this->respondWithError('VALIDATION_ERROR', __('api.effective_date_required'), 'effective_date', 400);
         }
 
         try {
@@ -96,7 +96,7 @@ class AdminLegalDocController extends BaseApiController
             return $this->respondWithData(['id' => $versionId], null, 201);
         } catch (\Exception $e) {
             error_log("[AdminLegalDocController] createVersion error: " . $e->getMessage());
-            return $this->respondWithError('SERVER_ERROR', 'Failed to create version', null, 500);
+            return $this->respondWithError('SERVER_ERROR', __('api.create_failed', ['resource' => 'version']), null, 500);
         }
     }
 
@@ -110,10 +110,10 @@ class AdminLegalDocController extends BaseApiController
             if ($success) {
                 return $this->respondWithData(['published' => true]);
             }
-            return $this->respondWithError('SERVER_ERROR', 'Failed to publish version', null, 500);
+            return $this->respondWithError('SERVER_ERROR', __('api.update_failed', ['resource' => 'version publish']), null, 500);
         } catch (\Exception $e) {
             error_log("[AdminLegalDocController] publishVersion error: " . $e->getMessage());
-            return $this->respondWithError('SERVER_ERROR', 'Failed to publish version', null, 500);
+            return $this->respondWithError('SERVER_ERROR', __('api.update_failed', ['resource' => 'version publish']), null, 500);
         }
     }
 
@@ -127,7 +127,7 @@ class AdminLegalDocController extends BaseApiController
             return $this->respondWithData($stats);
         } catch (\Exception $e) {
             error_log("[AdminLegalDocController] getComplianceStats error: " . $e->getMessage());
-            return $this->respondWithError('SERVER_ERROR', 'Failed to fetch compliance stats', null, 500);
+            return $this->respondWithError('SERVER_ERROR', __('api.fetch_failed', ['resource' => 'compliance stats']), null, 500);
         }
     }
 
@@ -143,7 +143,7 @@ class AdminLegalDocController extends BaseApiController
             return $this->respondWithData($acceptances);
         } catch (\Exception $e) {
             error_log("[AdminLegalDocController] getAcceptances error: " . $e->getMessage());
-            return $this->respondWithError('SERVER_ERROR', 'Failed to fetch acceptances', null, 500);
+            return $this->respondWithError('SERVER_ERROR', __('api.fetch_failed', ['resource' => 'acceptances']), null, 500);
         }
     }
 
@@ -183,7 +183,7 @@ class AdminLegalDocController extends BaseApiController
                 'Cache-Control' => 'no-cache, no-store, must-revalidate',
             ]);
         } catch (\Throwable $e) {
-            return $this->respondWithError('SERVER_ERROR', 'Failed to export acceptances', null, 500);
+            return $this->respondWithError('SERVER_ERROR', __('api.fetch_failed', ['resource' => 'acceptance export']), null, 500);
         }
     }
 
@@ -199,7 +199,7 @@ class AdminLegalDocController extends BaseApiController
             return $this->respondWithData(['notified' => true, 'count' => $count]);
         } catch (\Exception $e) {
             error_log("[AdminLegalDocController] notifyUsers error: " . $e->getMessage());
-            return $this->respondWithError('SERVER_ERROR', 'Failed to send notifications', null, 500);
+            return $this->respondWithError('SERVER_ERROR', __('api.update_failed', ['resource' => 'notifications']), null, 500);
         }
     }
 
@@ -212,7 +212,7 @@ class AdminLegalDocController extends BaseApiController
             return $this->respondWithData(['count' => $count]);
         } catch (\Exception $e) {
             error_log("[AdminLegalDocController] getUsersPendingCount error: " . $e->getMessage());
-            return $this->respondWithError('SERVER_ERROR', 'Failed to fetch count', null, 500);
+            return $this->respondWithError('SERVER_ERROR', __('api.fetch_failed', ['resource' => 'pending count']), null, 500);
         }
     }
 
@@ -226,13 +226,13 @@ class AdminLegalDocController extends BaseApiController
             $version = $this->legalDocumentService->getVersion($vid);
 
             if (!$version) {
-                return $this->respondWithError('NOT_FOUND', 'Version not found', null, 404);
+                return $this->respondWithError('NOT_FOUND', __('api.version_not_found'), null, 404);
             }
             if ((int) $version['document_id'] !== $docId) {
-                return $this->respondWithError('VALIDATION_ERROR', 'Version does not belong to this document', null, 400);
+                return $this->respondWithError('VALIDATION_ERROR', __('api.version_does_not_belong'), null, 400);
             }
             if (!$version['is_draft']) {
-                return $this->respondWithError('VALIDATION_ERROR', 'Only draft versions can be edited', null, 400);
+                return $this->respondWithError('VALIDATION_ERROR', __('api.only_draft_can_be_edited'), null, 400);
             }
 
             $success = $this->legalDocumentService->updateVersion($vid, [
@@ -246,10 +246,10 @@ class AdminLegalDocController extends BaseApiController
             if ($success) {
                 return $this->respondWithData(['updated' => true]);
             }
-            return $this->respondWithError('SERVER_ERROR', 'Failed to update version', null, 500);
+            return $this->respondWithError('SERVER_ERROR', __('api.update_failed', ['resource' => 'version']), null, 500);
         } catch (\Exception $e) {
             error_log("[AdminLegalDocController] updateVersion error: " . $e->getMessage());
-            return $this->respondWithError('SERVER_ERROR', 'Failed to update version', null, 500);
+            return $this->respondWithError('SERVER_ERROR', __('api.update_failed', ['resource' => 'version']), null, 500);
         }
     }
 
@@ -262,13 +262,13 @@ class AdminLegalDocController extends BaseApiController
             $version = $this->legalDocumentService->getVersion($vid);
 
             if (!$version) {
-                return $this->respondWithError('NOT_FOUND', 'Version not found', null, 404);
+                return $this->respondWithError('NOT_FOUND', __('api.version_not_found'), null, 404);
             }
             if ((int) $version['document_id'] !== $docId) {
-                return $this->respondWithError('VALIDATION_ERROR', 'Version does not belong to this document', null, 400);
+                return $this->respondWithError('VALIDATION_ERROR', __('api.version_does_not_belong'), null, 400);
             }
             if (!$version['is_draft']) {
-                return $this->respondWithError('VALIDATION_ERROR', 'Only draft versions can be deleted', null, 400);
+                return $this->respondWithError('VALIDATION_ERROR', __('api.only_draft_can_be_deleted'), null, 400);
             }
 
             $success = $this->legalDocumentService->deleteVersion($vid);
@@ -276,10 +276,10 @@ class AdminLegalDocController extends BaseApiController
             if ($success) {
                 return $this->respondWithData(['deleted' => true]);
             }
-            return $this->respondWithError('SERVER_ERROR', 'Failed to delete version', null, 500);
+            return $this->respondWithError('SERVER_ERROR', __('api.delete_failed', ['resource' => 'version']), null, 500);
         } catch (\Exception $e) {
             error_log("[AdminLegalDocController] deleteVersion error: " . $e->getMessage());
-            return $this->respondWithError('SERVER_ERROR', 'Failed to delete version', null, 500);
+            return $this->respondWithError('SERVER_ERROR', __('api.delete_failed', ['resource' => 'version']), null, 500);
         }
     }
 

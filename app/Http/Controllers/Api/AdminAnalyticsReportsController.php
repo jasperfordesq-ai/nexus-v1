@@ -64,24 +64,24 @@ class AdminAnalyticsReportsController extends BaseApiController
         ];
 
         if ($config['hour_value_amount'] <= 0 || $config['hour_value_amount'] > 10000) {
-            return $this->respondWithError('VALIDATION_ERROR', 'Hour value must be between 0 and 10,000', 'hour_value_amount', 400);
+            return $this->respondWithError('VALIDATION_ERROR', __('api.hour_value_range'), 'hour_value_amount', 400);
         }
 
         if ($config['social_multiplier'] <= 0 || $config['social_multiplier'] > 100) {
-            return $this->respondWithError('VALIDATION_ERROR', 'Social multiplier must be between 0 and 100', 'social_multiplier', 400);
+            return $this->respondWithError('VALIDATION_ERROR', __('api.social_multiplier_range'), 'social_multiplier', 400);
         }
 
         if (!in_array($config['reporting_period'], ['monthly', 'quarterly', 'annually'], true)) {
-            return $this->respondWithError('VALIDATION_ERROR', 'Invalid reporting period', 'reporting_period', 400);
+            return $this->respondWithError('VALIDATION_ERROR', __('api.invalid_reporting_period'), 'reporting_period', 400);
         }
 
         $success = $this->socialValueService->saveConfig($tenantId, $config);
 
         if ($success) {
-            return $this->respondWithData(['message' => 'Social value configuration updated', 'config' => $config]);
+            return $this->respondWithData(['message' => __('api.social_value_config_updated'), 'config' => $config]);
         }
 
-        return $this->respondWithError('SERVER_ERROR', 'Failed to save configuration', null, 500);
+        return $this->respondWithError('SERVER_ERROR', __('api.failed_to_save_config'), null, 500);
     }
 
     // ============================================
@@ -112,7 +112,7 @@ class AdminAnalyticsReportsController extends BaseApiController
         };
 
         if ($data === null) {
-            return $this->respondWithError('VALIDATION_ERROR', "Unknown report type: {$type}. Valid types: active, registrations, retention, engagement, top_contributors, least_active", 'type', 400);
+            return $this->respondWithError('VALIDATION_ERROR', __('api.unknown_report_type', ['type' => $type]), 'type', 400);
         }
 
         return $this->respondWithData($data);
@@ -143,7 +143,7 @@ class AdminAnalyticsReportsController extends BaseApiController
         };
 
         if ($data === null) {
-            return $this->respondWithError('VALIDATION_ERROR', "Unknown group_by: {$groupBy}. Valid values: category, member, period, summary", 'group_by', 400);
+            return $this->respondWithError('VALIDATION_ERROR', __('api.unknown_group_by', ['value' => $groupBy]), 'group_by', 400);
         }
 
         return $this->respondWithData($data);
@@ -203,7 +203,7 @@ class AdminAnalyticsReportsController extends BaseApiController
         $userIds = $this->input('user_ids', []);
 
         if (empty($userIds) || !is_array($userIds)) {
-            return $this->respondWithError('VALIDATION_ERROR', 'user_ids must be a non-empty array', 'user_ids', 400);
+            return $this->respondWithError('VALIDATION_ERROR', __('api.user_ids_required'), 'user_ids', 400);
         }
 
         $userIds = array_map('intval', $userIds);
@@ -229,13 +229,13 @@ class AdminAnalyticsReportsController extends BaseApiController
         $format = $this->query('format', 'csv');
 
         if (!in_array($format, ['csv', 'pdf'], true)) {
-            return $this->respondWithError('VALIDATION_ERROR', 'Supported formats: csv, pdf', 'format', 400);
+            return $this->respondWithError('VALIDATION_ERROR', __('api.supported_formats_csv_pdf'), 'format', 400);
         }
 
         $supportedTypes = $this->reportExportService->getSupportedTypes();
         if (!isset($supportedTypes[$type])) {
             $validTypes = implode(', ', array_keys($supportedTypes));
-            return $this->respondWithError('VALIDATION_ERROR', "Unknown report type: {$type}. Valid types: {$validTypes}", 'type', 400);
+            return $this->respondWithError('VALIDATION_ERROR', __('api.unknown_export_type', ['type' => $type, 'valid' => $validTypes]), 'type', 400);
         }
 
         $filters = [
@@ -248,7 +248,7 @@ class AdminAnalyticsReportsController extends BaseApiController
         if ($format === 'pdf') {
             $result = $this->reportExportService->exportPdf($type, $tenantId, $filters);
             if (!$result['success']) {
-                return $this->respondWithError('NO_DATA', $result['message'] ?? 'No data found for export', null, 404);
+                return $this->respondWithError('NO_DATA', $result['message'] ?? __('api.no_data_for_export'), null, 404);
             }
             return response($result['pdf'], 200, [
                 'Content-Type' => 'application/pdf',
@@ -263,7 +263,7 @@ class AdminAnalyticsReportsController extends BaseApiController
         $result = $this->reportExportService->export($type, $tenantId, $filters);
 
         if (!$result['success']) {
-            return $this->respondWithError('NO_DATA', $result['message'] ?? 'No data found for export', null, 404);
+            return $this->respondWithError('NO_DATA', $result['message'] ?? __('api.no_data_for_export'), null, 404);
         }
 
         return response($result['csv'], 200, [
@@ -326,7 +326,7 @@ class AdminAnalyticsReportsController extends BaseApiController
         $rejectionReason = $this->input('rejection_reason');
 
         if (!$decision) {
-            return $this->respondWithError('VALIDATION_ERROR', 'Decision is required (approved or rejected)', 'decision', 400);
+            return $this->respondWithError('VALIDATION_ERROR', __('api.decision_required'), 'decision', 400);
         }
 
         $result = $this->contentModerationService->review($id, $tenantId, $adminId, $decision, $rejectionReason);
@@ -373,12 +373,12 @@ class AdminAnalyticsReportsController extends BaseApiController
         if ($success) {
             $updatedSettings = $this->contentModerationService->getModerationSettings($tenantId);
             return $this->respondWithData([
-                'message' => 'Moderation settings updated',
+                'message' => __('api.moderation_settings_updated'),
                 'settings' => $updatedSettings,
             ]);
         }
 
-        return $this->respondWithError('SERVER_ERROR', 'Failed to update moderation settings', null, 500);
+        return $this->respondWithError('SERVER_ERROR', __('api.failed_update_moderation'), null, 500);
     }
 
     // ============================================

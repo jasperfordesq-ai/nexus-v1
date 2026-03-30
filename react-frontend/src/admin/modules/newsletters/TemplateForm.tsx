@@ -366,7 +366,7 @@ export function TemplateForm() {
                 <Suspense fallback={<Spinner size="sm" className="m-4" />}>
                   <RichTextEditor
                     label="Template Content"
-                    placeholder="Design your email template content..."
+                    placeholder={t('newsletters.placeholder_design_your_email_template_content')}
                     value={content}
                     onChange={setContent}
                     isDisabled={submitting}

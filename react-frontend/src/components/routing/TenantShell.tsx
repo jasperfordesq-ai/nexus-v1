@@ -26,6 +26,7 @@
  * @see docs/TRS-001-TENANT-RESOLUTION-SPEC.md
  */
 
+import { useTranslation } from 'react-i18next';
 import { Outlet, Routes, useLocation } from 'react-router-dom';
 import { TenantProvider, useTenant, useAuth } from '@/contexts';
 import { AuthProvider, NotificationsProvider, PusherProvider, MenuProvider } from '@/contexts';
@@ -91,6 +92,7 @@ function TenantGuard({
   slugPrefix?: string;
   appRoutes?: () => React.ReactNode;
 }) {
+  const { t } = useTranslation('common');
   const { isLoading, notFoundSlug, tenant } = useTenant();
   const { user } = useAuth();
   const location = useLocation();
@@ -101,7 +103,7 @@ function TenantGuard({
   // the tenant ID is known, causing the API to return master tenant (ID 1) results.
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center" aria-label="Loading community">
+      <div className="min-h-screen flex items-center justify-center" aria-label={t('aria.loading_community')}>
         <Spinner size="lg" color="primary" />
       </div>
     );

@@ -422,9 +422,12 @@
     "aria_reply": "Responder à mensagem",
     "aria_send_reply": "Enviar resposta"
   },
-  "onboarding": {},
+  "onboarding": {
+    "reach_label_remote_ok": "Remote OK"
+  },
   "listings": {},
   "members": {
+    "reach_remote_ok": "Remote OK",
     "aria_search": "Pesquisar membros federados",
     "aria_filter_community": "Filtrar por comunidade parceira",
     "aria_filter_skills": "Filtrar por competências"

@@ -475,7 +475,7 @@ export function NewsletterForm() {
               <Suspense fallback={<Spinner size="sm" className="m-4" />}>
                 <RichTextEditor
                   label="Content"
-                  placeholder="Write your newsletter content..."
+                  placeholder={t('newsletters.placeholder_write_your_newsletter_content')}
                   value={content}
                   onChange={setContent}
                   isDisabled={saving || isSent}
@@ -718,7 +718,7 @@ export function NewsletterForm() {
                     variant="bordered"
                     size="sm"
                     isDisabled={isSent}
-                    placeholder="Select groups..."
+                    placeholder={t('newsletters.placeholder_select_groups')}
                   >
                     {groups.map((g) => (
                       <SelectItem key={String(g.id)}>{g.name}</SelectItem>
@@ -748,7 +748,7 @@ export function NewsletterForm() {
                   onSelectionChange={(keys) => { const v = Array.from(keys)[0]; if (v) setTemplateId(String(v)); }}
                   variant="bordered"
                   size="sm"
-                  placeholder="Choose a template..."
+                  placeholder={t('newsletters.placeholder_choose_a_template')}
                   isDisabled={isSent}
                 >
                   {templates.map((t) => (

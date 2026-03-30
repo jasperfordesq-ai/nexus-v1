@@ -1,6 +1,4 @@
 {
-  "feedback_thanks": "¡Gracias por tu opinión!",
-  "feedback_failed": "Error al enviar la opinión.",
   "title": "Base de Conocimientos",
   "description": "Encuentra respuestas, guías y recursos útiles",
   "search_placeholder": "Buscar en la base de conocimientos...",
@@ -28,7 +26,21 @@
   "feedback.question": "¿Fue útil este artículo?",
   "feedback.yes": "Sí ({{count}})",
   "feedback.no": "No ({{count}})",
-  "error": {},
-  "empty": {},
-  "feedback": {}
+  "feedback_thanks": "¡Gracias por tu opinión!",
+  "feedback_failed": "Error al enviar la opinión.",
+  "error": {
+    "title": "Unable to load",
+    "article_not_found": "Article not found.",
+    "article_title": "Unable to load article"
+  },
+  "empty": {
+    "title": "No articles found",
+    "search_description": "Try a different search term.",
+    "no_articles": "No knowledge base articles have been published yet."
+  },
+  "feedback": {
+    "question": "Was this article helpful?",
+    "yes": "Yes ({{count}})",
+    "no": "No ({{count}})"
+  }
 }

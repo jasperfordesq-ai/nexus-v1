@@ -81,7 +81,7 @@ class AdminCategoriesController extends BaseApiController
 
         $name = trim($this->input('name', ''));
         if ($name === '') {
-            return $this->respondWithError('VALIDATION_ERROR', 'Category name is required', 'name', 422);
+            return $this->respondWithError('VALIDATION_ERROR', __('api.category_name_required'), 'name', 422);
         }
 
         $slug = strtolower(preg_replace('/[^a-z0-9]+/i', '-', trim($name)));
@@ -94,7 +94,7 @@ class AdminCategoriesController extends BaseApiController
         if (!in_array($type, $allowedTypes)) {
             return $this->respondWithError(
                 'VALIDATION_INVALID_VALUE',
-                'Invalid category type. Allowed: ' . implode(', ', $allowedTypes),
+                __('api.invalid_category_type', ['types' => implode(', ', $allowedTypes)]),
                 'type',
                 422
             );
@@ -107,7 +107,7 @@ class AdminCategoriesController extends BaseApiController
         );
 
         if ($existing) {
-            return $this->respondWithError('VALIDATION_DUPLICATE', 'A category with this name already exists', 'name', 409);
+            return $this->respondWithError('VALIDATION_DUPLICATE', __('api.category_duplicate'), 'name', 409);
         }
 
         $newId = DB::table('categories')->insertGetId([
@@ -148,7 +148,7 @@ class AdminCategoriesController extends BaseApiController
         );
 
         if (!$category) {
-            return $this->respondWithError('RESOURCE_NOT_FOUND', 'Category not found', null, 404);
+            return $this->respondWithError('RESOURCE_NOT_FOUND', __('api.category_not_found'), null, 404);
         }
 
         $data = $this->getAllInput();
@@ -161,7 +161,7 @@ class AdminCategoriesController extends BaseApiController
         if (!in_array($type, $allowedTypes)) {
             return $this->respondWithError(
                 'VALIDATION_INVALID_VALUE',
-                'Invalid category type. Allowed: ' . implode(', ', $allowedTypes),
+                __('api.invalid_category_type', ['types' => implode(', ', $allowedTypes)]),
                 'type',
                 422
             );
@@ -175,7 +175,7 @@ class AdminCategoriesController extends BaseApiController
             );
 
             if ($existing) {
-                return $this->respondWithError('VALIDATION_DUPLICATE', 'A category with this name already exists', 'name', 409);
+                return $this->respondWithError('VALIDATION_DUPLICATE', __('api.category_duplicate'), 'name', 409);
             }
         }
 
@@ -232,7 +232,7 @@ class AdminCategoriesController extends BaseApiController
         );
 
         if (!$category) {
-            return $this->respondWithError('RESOURCE_NOT_FOUND', 'Category not found', null, 404);
+            return $this->respondWithError('RESOURCE_NOT_FOUND', __('api.category_not_found'), null, 404);
         }
 
         $listingCount = (int) ($category->listing_count ?? 0);
@@ -313,7 +313,7 @@ class AdminCategoriesController extends BaseApiController
 
         $name = trim($this->input('name', ''));
         if ($name === '') {
-            return $this->respondWithError('VALIDATION_ERROR', 'Attribute name is required', 'name', 422);
+            return $this->respondWithError('VALIDATION_ERROR', __('api.attribute_name_required'), 'name', 422);
         }
 
         $categoryId = $this->input('category_id') ? (int) $this->input('category_id') : null;
@@ -354,7 +354,7 @@ class AdminCategoriesController extends BaseApiController
 
         $attribute = \App\Models\Attribute::where('id', $id)->where('tenant_id', $tenantId)->first();
         if (!$attribute) {
-            return $this->respondWithError('RESOURCE_NOT_FOUND', 'Attribute not found', null, 404);
+            return $this->respondWithError('RESOURCE_NOT_FOUND', __('api.attribute_not_found'), null, 404);
         }
 
         $name = isset($data['name']) && trim($data['name']) !== '' ? trim($data['name']) : $attribute->name;
@@ -392,7 +392,7 @@ class AdminCategoriesController extends BaseApiController
 
         $attribute = \App\Models\Attribute::where('id', $id)->where('tenant_id', $tenantId)->first();
         if (!$attribute) {
-            return $this->respondWithError('RESOURCE_NOT_FOUND', 'Attribute not found', null, 404);
+            return $this->respondWithError('RESOURCE_NOT_FOUND', __('api.attribute_not_found'), null, 404);
         }
 
         $attribute->delete();

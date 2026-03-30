@@ -305,7 +305,7 @@ export function MessageReview() {
           </ModalHeader>
           <ModalBody>
             <Textarea
-              label="Reason (required)"
+              label={t('broker.label_reason_required')}
               placeholder={t('broker.placeholder_describe_why_this_message_is_being_flagged')}
               value={flagReason}
               onValueChange={setFlagReason}

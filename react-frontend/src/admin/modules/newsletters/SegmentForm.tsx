@@ -405,7 +405,7 @@ export function SegmentForm() {
           />
           <Input
             label="Description"
-            placeholder="Describe what this segment targets..."
+            placeholder={t('newsletters.placeholder_describe_what_this_segment_targets')}
             value={description}
             onValueChange={setDescription}
           />

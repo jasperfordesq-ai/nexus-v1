@@ -87,7 +87,7 @@ export function MobileTabBar({ onMenuOpen }: MobileTabBarProps) {
 
       <nav
         className="fixed bottom-0 left-0 right-0 z-300 md:hidden"
-        aria-label="Mobile navigation"
+        aria-label={t('aria.mobile_navigation')}
         style={{ paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}
       >
         {/* Glass surface */}

@@ -72,7 +72,7 @@ class AdminVolunteerController extends BaseApiController
     {
         $this->requireAdmin();
         if (!TenantContext::hasFeature('volunteering')) {
-            return $this->respondWithError('FEATURE_DISABLED', 'Feature not available', null, 403);
+            return $this->respondWithError('FEATURE_DISABLED', __('api.service_unavailable'), null, 403);
         }
         $tenantId = $this->getTenantId();
 
@@ -143,7 +143,7 @@ class AdminVolunteerController extends BaseApiController
     {
         $this->requireAdmin();
         if (!TenantContext::hasFeature('volunteering')) {
-            return $this->respondWithError('FEATURE_DISABLED', 'Feature not available', null, 403);
+            return $this->respondWithError('FEATURE_DISABLED', __('api.service_unavailable'), null, 403);
         }
         $tenantId = $this->getTenantId();
 
@@ -205,17 +205,17 @@ class AdminVolunteerController extends BaseApiController
     {
         $this->requireAdmin();
         if (!TenantContext::hasFeature('volunteering')) {
-            return $this->respondWithError('FEATURE_DISABLED', 'Feature not available', null, 403);
+            return $this->respondWithError('FEATURE_DISABLED', __('api.service_unavailable'), null, 403);
         }
         $tenantId = $this->getTenantId();
 
         $action = $this->input('action');
         if (!$action || !in_array($action, ['approve', 'decline'], true)) {
-            return $this->respondWithError('VALIDATION_ERROR', 'Action is required (approve or decline)', 'action', 400);
+            return $this->respondWithError('VALIDATION_ERROR', __('api.decision_required'), 'action', 400);
         }
 
         if (!$this->tableExists('vol_logs')) {
-            return $this->respondWithError('NOT_FOUND', 'Hours log not found', null, 404);
+            return $this->respondWithError('NOT_FOUND', __('api.log_not_found'), null, 404);
         }
 
         try {
@@ -225,11 +225,11 @@ class AdminVolunteerController extends BaseApiController
             );
 
             if (!$log) {
-                return $this->respondWithError('NOT_FOUND', 'Hours log not found', null, 404);
+                return $this->respondWithError('NOT_FOUND', __('api.log_not_found'), null, 404);
             }
 
             if ($log->status !== 'pending') {
-                return $this->respondWithError('VALIDATION_ERROR', 'Only pending hours can be verified', null, 422);
+                return $this->respondWithError('VALIDATION_ERROR', __('api.only_pending_can_be_verified'), null, 422);
             }
 
             $newStatus = $action === 'approve' ? 'approved' : 'declined';
@@ -243,7 +243,7 @@ class AdminVolunteerController extends BaseApiController
                 'status' => $newStatus,
             ]);
         } catch (\Exception $e) {
-            return $this->respondWithError('SERVER_ERROR', 'Failed to verify hours', null, 500);
+            return $this->respondWithError('SERVER_ERROR', __('api.update_failed', ['resource' => 'hours verification']), null, 500);
         }
     }
 
@@ -252,7 +252,7 @@ class AdminVolunteerController extends BaseApiController
     {
         $this->requireAdmin();
         if (!TenantContext::hasFeature('volunteering')) {
-            return $this->respondWithError('FEATURE_DISABLED', 'Feature not available', null, 403);
+            return $this->respondWithError('FEATURE_DISABLED', __('api.service_unavailable'), null, 403);
         }
         $tenantId = TenantContext::getId();
 
@@ -340,7 +340,7 @@ class AdminVolunteerController extends BaseApiController
     {
         $this->requireAdmin();
         if (!TenantContext::hasFeature('volunteering')) {
-            return $this->respondWithError('FEATURE_DISABLED', 'Feature not available', null, 403);
+            return $this->respondWithError('FEATURE_DISABLED', __('api.service_unavailable'), null, 403);
         }
         $tenantId = TenantContext::getId();
 
@@ -369,7 +369,7 @@ class AdminVolunteerController extends BaseApiController
     {
         $this->requireAdmin();
         if (!TenantContext::hasFeature('volunteering')) {
-            return $this->respondWithError('FEATURE_DISABLED', 'Feature not available', null, 403);
+            return $this->respondWithError('FEATURE_DISABLED', __('api.service_unavailable'), null, 403);
         }
         $tenantId = TenantContext::getId();
 
@@ -405,13 +405,13 @@ class AdminVolunteerController extends BaseApiController
     {
         $this->requireAdmin();
         if (!TenantContext::hasFeature('volunteering')) {
-            return $this->respondWithError('FEATURE_DISABLED', 'Feature not available', null, 403);
+            return $this->respondWithError('FEATURE_DISABLED', __('api.service_unavailable'), null, 403);
         }
         $tenantId = TenantContext::getId();
         $id = (int) $id;
 
         if (!$id || !$this->tableExists('vol_applications')) {
-            return $this->respondWithError('NOT_FOUND', 'Application not found', null, 404);
+            return $this->respondWithError('NOT_FOUND', __('api.not_found', ['model' => 'Application']), null, 404);
         }
 
         try {
@@ -423,11 +423,11 @@ class AdminVolunteerController extends BaseApiController
             );
 
             if (!$app) {
-                return $this->respondWithError('NOT_FOUND', 'Application not found', null, 404);
+                return $this->respondWithError('NOT_FOUND', __('api.not_found', ['model' => 'Application']), null, 404);
             }
 
             if ($app->status !== 'pending') {
-                return $this->respondWithError('VALIDATION_ERROR', 'Only pending applications can be approved', null, 422);
+                return $this->respondWithError('VALIDATION_ERROR', __('api.only_pending_can_be_approved', ['status' => 'pending']), null, 422);
             }
 
             DB::update("UPDATE vol_applications SET status = 'approved', updated_at = NOW() WHERE id = ? AND tenant_id = ?", [$id, $tenantId]);
@@ -453,7 +453,7 @@ class AdminVolunteerController extends BaseApiController
 
             return $this->respondWithData(['message' => 'Application approved']);
         } catch (\Exception $e) {
-            return $this->respondWithError('SERVER_ERROR', 'Failed to approve application', null, 500);
+            return $this->respondWithError('SERVER_ERROR', __('api.approve_failed', ['resource' => 'application']), null, 500);
         }
     }
 
@@ -462,13 +462,13 @@ class AdminVolunteerController extends BaseApiController
     {
         $this->requireAdmin();
         if (!TenantContext::hasFeature('volunteering')) {
-            return $this->respondWithError('FEATURE_DISABLED', 'Feature not available', null, 403);
+            return $this->respondWithError('FEATURE_DISABLED', __('api.service_unavailable'), null, 403);
         }
         $tenantId = TenantContext::getId();
         $id = (int) $id;
 
         if (!$id || !$this->tableExists('vol_applications')) {
-            return $this->respondWithError('NOT_FOUND', 'Application not found', null, 404);
+            return $this->respondWithError('NOT_FOUND', __('api.not_found', ['model' => 'Application']), null, 404);
         }
 
         try {
@@ -479,11 +479,11 @@ class AdminVolunteerController extends BaseApiController
             );
 
             if (!$app) {
-                return $this->respondWithError('NOT_FOUND', 'Application not found', null, 404);
+                return $this->respondWithError('NOT_FOUND', __('api.not_found', ['model' => 'Application']), null, 404);
             }
 
             if ($app->status !== 'pending') {
-                return $this->respondWithError('VALIDATION_ERROR', 'Only pending applications can be declined', null, 422);
+                return $this->respondWithError('VALIDATION_ERROR', __('api.only_pending_can_be_rejected', ['status' => 'pending']), null, 422);
             }
 
             DB::update("UPDATE vol_applications SET status = 'declined', updated_at = NOW() WHERE id = ? AND tenant_id = ?", [$id, $tenantId]);
@@ -508,7 +508,7 @@ class AdminVolunteerController extends BaseApiController
 
             return $this->respondWithData(['message' => 'Application declined']);
         } catch (\Exception $e) {
-            return $this->respondWithError('SERVER_ERROR', 'Failed to decline application', null, 500);
+            return $this->respondWithError('SERVER_ERROR', __('api.reject_failed', ['resource' => 'application']), null, 500);
         }
     }
 

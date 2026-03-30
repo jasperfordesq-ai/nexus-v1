@@ -170,13 +170,13 @@ class AdminConfigController extends BaseApiController
         $enabled = $this->input('enabled');
 
         if (!$featureName || !is_string($featureName)) {
-            return $this->respondWithError('VALIDATION_ERROR', 'Feature name is required', 'feature', 422);
+            return $this->respondWithError('VALIDATION_ERROR', __('api.feature_name_required'), 'feature', 422);
         }
         if (!array_key_exists($featureName, TenantFeatureConfig::FEATURE_DEFAULTS)) {
-            return $this->respondWithError('VALIDATION_ERROR', 'Unknown feature: ' . $featureName, 'feature', 422);
+            return $this->respondWithError('VALIDATION_ERROR', __('api.unknown_feature', ['feature' => $featureName]), 'feature', 422);
         }
         if ($enabled === null) {
-            return $this->respondWithError('VALIDATION_ERROR', 'Enabled value is required', 'enabled', 422);
+            return $this->respondWithError('VALIDATION_ERROR', __('api.enabled_required'), 'enabled', 422);
         }
 
         $tenant = DB::selectOne("SELECT features FROM tenants WHERE id = ?", [$tenantId]);
@@ -208,13 +208,13 @@ class AdminConfigController extends BaseApiController
         $enabled = $this->input('enabled');
 
         if (!$moduleName || !is_string($moduleName)) {
-            return $this->respondWithError('VALIDATION_ERROR', 'Module name is required', 'module', 422);
+            return $this->respondWithError('VALIDATION_ERROR', __('api.module_name_required'), 'module', 422);
         }
         if (!array_key_exists($moduleName, TenantFeatureConfig::MODULE_DEFAULTS)) {
-            return $this->respondWithError('VALIDATION_ERROR', 'Unknown module: ' . $moduleName, 'module', 422);
+            return $this->respondWithError('VALIDATION_ERROR', __('api.unknown_module', ['module' => $moduleName]), 'module', 422);
         }
         if ($enabled === null) {
-            return $this->respondWithError('VALIDATION_ERROR', 'Enabled value is required', 'enabled', 422);
+            return $this->respondWithError('VALIDATION_ERROR', __('api.enabled_required'), 'enabled', 422);
         }
 
         $tenant = DB::selectOne("SELECT configuration FROM tenants WHERE id = ?", [$tenantId]);
@@ -266,7 +266,7 @@ class AdminConfigController extends BaseApiController
                 $this->redisCache->clearTenant($tenantId);
             }
         } catch (\Throwable $e) {
-            return $this->respondWithError('SERVER_ERROR', 'Failed to clear cache', null, 500);
+            return $this->respondWithError('SERVER_ERROR', __('api.failed_to_clear_cache'), null, 500);
         }
 
         return $this->respondWithData(['cleared' => true, 'type' => $type]);
@@ -377,14 +377,14 @@ class AdminConfigController extends BaseApiController
         $numericId = (int) ($matches[1] ?? 0);
 
         if ($numericId < 1) {
-            return $this->respondWithError('VALIDATION_ERROR', 'Invalid job ID', 'id', 400);
+            return $this->respondWithError('VALIDATION_ERROR', __('api.invalid_id', ['resource' => 'job']), 'id', 400);
         }
 
         $jobs = $this->getCronJobDefinitions();
         $jobIndex = $numericId - 1;
 
         if (!isset($jobs[$jobIndex])) {
-            return $this->respondWithError('NOT_FOUND', 'Cron job not found', 'id', 404);
+            return $this->respondWithError('NOT_FOUND', __('api.cron_job_not_found'), 'id', 404);
         }
 
         $job = $jobs[$jobIndex];
@@ -393,7 +393,7 @@ class AdminConfigController extends BaseApiController
         try {
             $setting = DB::selectOne("SELECT is_enabled FROM cron_job_settings WHERE job_id = ?", [$jobSlug]);
             if ($setting && !$setting->is_enabled) {
-                return $this->respondWithError('VALIDATION_ERROR', 'Cannot run disabled job. Enable it first.', 'status', 422);
+                return $this->respondWithError('VALIDATION_ERROR', __('api.cannot_run_disabled_job'), 'status', 422);
             }
         } catch (\Throwable $e) {
             // Table may not exist
@@ -577,7 +577,7 @@ class AdminConfigController extends BaseApiController
 
         $tenantRow = DB::selectOne("SELECT * FROM tenants WHERE id = ?", [$tenantId]);
         if (!$tenantRow) {
-            return $this->respondWithError('NOT_FOUND', 'Tenant not found', null, 404);
+            return $this->respondWithError('NOT_FOUND', __('api.tenant_not_found'), null, 404);
         }
         $tenant = (array)$tenantRow;
 
@@ -607,7 +607,7 @@ class AdminConfigController extends BaseApiController
         $input = $this->getAllInput();
 
         if (empty($input)) {
-            return $this->respondWithError('VALIDATION_ERROR', 'Request body is empty', null, 422);
+            return $this->respondWithError('VALIDATION_ERROR', __('api.request_body_empty'), null, 422);
         }
 
         $this->ensureTenantSettingsTable();
@@ -627,7 +627,7 @@ class AdminConfigController extends BaseApiController
         }
 
         if (empty($directUpdates) && empty($kvUpdates)) {
-            return $this->respondWithError('VALIDATION_ERROR', 'No recognized settings provided. Unknown keys: ' . implode(', ', $unknownKeys), null, 422);
+            return $this->respondWithError('VALIDATION_ERROR', __('api.no_recognized_settings', ['keys' => implode(', ', $unknownKeys)]), null, 422);
         }
 
         if (!empty($directUpdates)) {
@@ -644,7 +644,7 @@ class AdminConfigController extends BaseApiController
         if (isset($kvUpdates['welcome_credits'])) {
             $wc = (int) $kvUpdates['welcome_credits'];
             if ($wc < 0 || $wc > 100) {
-                return $this->respondWithError('VALIDATION_ERROR', 'welcome_credits must be between 0 and 100', 'welcome_credits', 422);
+                return $this->respondWithError('VALIDATION_ERROR', __('api.welcome_credits_range'), 'welcome_credits', 422);
             }
             $kvUpdates['welcome_credits'] = (string) $wc;
         }
@@ -653,7 +653,7 @@ class AdminConfigController extends BaseApiController
         if (isset($kvUpdates['max_upload_size_mb'])) {
             $maxMb = (int) $kvUpdates['max_upload_size_mb'];
             if ($maxMb < 1 || $maxMb > 50) {
-                return $this->respondWithError('VALIDATION_ERROR', 'max_upload_size_mb must be between 1 and 50', 'max_upload_size_mb', 422);
+                return $this->respondWithError('VALIDATION_ERROR', __('api.max_upload_size_range'), 'max_upload_size_mb', 422);
             }
             $kvUpdates['max_upload_size_mb'] = (string) $maxMb;
         }
@@ -662,7 +662,7 @@ class AdminConfigController extends BaseApiController
         if (isset($kvUpdates['items_per_page'])) {
             $ipp = (int) $kvUpdates['items_per_page'];
             if ($ipp < 5 || $ipp > 100) {
-                return $this->respondWithError('VALIDATION_ERROR', 'items_per_page must be between 5 and 100', 'items_per_page', 422);
+                return $this->respondWithError('VALIDATION_ERROR', __('api.items_per_page_range'), 'items_per_page', 422);
             }
             $kvUpdates['items_per_page'] = (string) $ipp;
         }
@@ -670,14 +670,14 @@ class AdminConfigController extends BaseApiController
         // Validate maintenance_mode — must be a boolean
         if (isset($kvUpdates['maintenance_mode'])) {
             if (!in_array((string) $kvUpdates['maintenance_mode'], ['true', 'false', '1', '0'], true)) {
-                return $this->respondWithError('VALIDATION_ERROR', 'maintenance_mode must be a boolean value', 'maintenance_mode', 422);
+                return $this->respondWithError('VALIDATION_ERROR', __('api.maintenance_mode_boolean'), 'maintenance_mode', 422);
             }
         }
 
         // Validate registration_mode — restricted values
         if (isset($kvUpdates['registration_mode'])) {
             if (!in_array($kvUpdates['registration_mode'], ['open', 'closed', 'invite_only'], true)) {
-                return $this->respondWithError('VALIDATION_ERROR', 'registration_mode must be one of: open, closed, invite_only', 'registration_mode', 422);
+                return $this->respondWithError('VALIDATION_ERROR', __('api.registration_mode_invalid'), 'registration_mode', 422);
             }
         }
 
@@ -758,7 +758,7 @@ class AdminConfigController extends BaseApiController
         $input = $this->getAllInput();
 
         if (empty($input)) {
-            return $this->respondWithError('VALIDATION_ERROR', 'Request body is empty', null, 422);
+            return $this->respondWithError('VALIDATION_ERROR', __('api.request_body_empty'), null, 422);
         }
 
         $allowedKeys = [
@@ -780,13 +780,13 @@ class AdminConfigController extends BaseApiController
         }
 
         if (empty($toSave)) {
-            return $this->respondWithError('VALIDATION_ERROR', 'No recognized AI settings provided', null, 422);
+            return $this->respondWithError('VALIDATION_ERROR', __('api.no_recognized_ai_settings'), null, 422);
         }
 
         if (isset($toSave['ai_provider'])) {
             $validProviders = ['gemini', 'openai', 'anthropic', 'ollama'];
             if (!in_array($toSave['ai_provider'], $validProviders, true)) {
-                return $this->respondWithError('VALIDATION_ERROR', 'Invalid AI provider. Must be one of: ' . implode(', ', $validProviders), 'ai_provider', 422);
+                return $this->respondWithError('VALIDATION_ERROR', __('api.invalid_ai_provider', ['providers' => implode(', ', $validProviders)]), 'ai_provider', 422);
             }
         }
 
@@ -831,7 +831,7 @@ class AdminConfigController extends BaseApiController
         $input = $this->getAllInput();
 
         if (empty($input)) {
-            return $this->respondWithError('VALIDATION_ERROR', 'Request body is empty', null, 422);
+            return $this->respondWithError('VALIDATION_ERROR', __('api.request_body_empty'), null, 422);
         }
 
         $this->ensureTenantSettingsTable();
@@ -843,7 +843,7 @@ class AdminConfigController extends BaseApiController
             if (strpos($key, '_weight') !== false) {
                 $floatVal = (float) $value;
                 if ($floatVal < 0.0 || $floatVal > 1.0) {
-                    return $this->respondWithError('VALIDATION_ERROR', "Weight {$key} must be between 0 and 1", $key, 422);
+                    return $this->respondWithError('VALIDATION_ERROR', __('api.weight_range', ['key' => $key]), $key, 422);
                 }
             }
 
@@ -854,7 +854,7 @@ class AdminConfigController extends BaseApiController
         }
 
         if (empty($updated)) {
-            return $this->respondWithError('VALIDATION_ERROR', 'No recognized feed algorithm settings provided', null, 422);
+            return $this->respondWithError('VALIDATION_ERROR', __('api.no_recognized_feed_settings'), null, 422);
         }
 
         $this->redisCache->delete('tenant_bootstrap', $tenantId);
@@ -906,7 +906,7 @@ class AdminConfigController extends BaseApiController
         $input = $this->getAllInput();
 
         if (empty($input)) {
-            return $this->respondWithError('VALIDATION_ERROR', 'Request body is empty', null, 422);
+            return $this->respondWithError('VALIDATION_ERROR', __('api.request_body_empty'), null, 422);
         }
 
         $this->ensureTenantSettingsTable();
@@ -916,13 +916,13 @@ class AdminConfigController extends BaseApiController
             if (!array_key_exists($key, self::IMAGE_DEFAULTS)) continue;
 
             if ($key === 'image_max_size_mb' && ((int) $value < 1 || (int) $value > 50)) {
-                return $this->respondWithError('VALIDATION_ERROR', 'Max file size must be between 1 and 50 MB', $key, 422);
+                return $this->respondWithError('VALIDATION_ERROR', __('api.max_file_size_range'), $key, 422);
             }
             if ($key === 'image_webp_quality' && ((int) $value < 50 || (int) $value > 100)) {
-                return $this->respondWithError('VALIDATION_ERROR', 'WebP quality must be between 50 and 100', $key, 422);
+                return $this->respondWithError('VALIDATION_ERROR', __('api.webp_quality_range'), $key, 422);
             }
             if (in_array($key, ['image_max_width', 'image_max_height', 'image_thumbnail_width', 'image_thumbnail_height'], true) && ((int) $value < 50 || (int) $value > 10000)) {
-                return $this->respondWithError('VALIDATION_ERROR', "Dimension {$key} must be between 50 and 10000", $key, 422);
+                return $this->respondWithError('VALIDATION_ERROR', __('api.dimension_range', ['key' => $key]), $key, 422);
             }
 
             $storeValue = is_bool($value) ? ($value ? '1' : '0') : (string) $value;
@@ -931,7 +931,7 @@ class AdminConfigController extends BaseApiController
         }
 
         if (empty($updated)) {
-            return $this->respondWithError('VALIDATION_ERROR', 'No recognized image settings provided', null, 422);
+            return $this->respondWithError('VALIDATION_ERROR', __('api.no_recognized_image_settings'), null, 422);
         }
 
         $this->redisCache->delete('tenant_bootstrap', $tenantId);
@@ -979,7 +979,7 @@ class AdminConfigController extends BaseApiController
         $input = $this->getAllInput();
 
         if (empty($input)) {
-            return $this->respondWithError('VALIDATION_ERROR', 'Request body is empty', null, 422);
+            return $this->respondWithError('VALIDATION_ERROR', __('api.request_body_empty'), null, 422);
         }
 
         $this->ensureTenantSettingsTable();
@@ -1021,7 +1021,7 @@ class AdminConfigController extends BaseApiController
         }
 
         if (empty($updated)) {
-            return $this->respondWithError('VALIDATION_ERROR', 'No recognized SEO settings provided', null, 422);
+            return $this->respondWithError('VALIDATION_ERROR', __('api.no_recognized_seo_settings'), null, 422);
         }
 
         $this->redisCache->delete('tenant_bootstrap', $tenantId);
@@ -1072,7 +1072,7 @@ class AdminConfigController extends BaseApiController
         $input = $this->getAllInput();
 
         if (empty($input)) {
-            return $this->respondWithError('VALIDATION_ERROR', 'Request body is empty', null, 422);
+            return $this->respondWithError('VALIDATION_ERROR', __('api.request_body_empty'), null, 422);
         }
 
         $this->ensureTenantSettingsTable();
@@ -1084,14 +1084,14 @@ class AdminConfigController extends BaseApiController
             if ($key === 'native_app_display') {
                 $valid = ['standalone', 'fullscreen', 'minimal-ui', 'browser'];
                 if (!in_array($value, $valid, true)) {
-                    return $this->respondWithError('VALIDATION_ERROR', 'Invalid display mode. Must be one of: ' . implode(', ', $valid), $key, 422);
+                    return $this->respondWithError('VALIDATION_ERROR', __('api.invalid_display_mode', ['modes' => implode(', ', $valid)]), $key, 422);
                 }
             }
 
             if ($key === 'native_app_orientation') {
                 $valid = ['portrait', 'landscape', 'any'];
                 if (!in_array($value, $valid, true)) {
-                    return $this->respondWithError('VALIDATION_ERROR', 'Invalid orientation. Must be one of: ' . implode(', ', $valid), $key, 422);
+                    return $this->respondWithError('VALIDATION_ERROR', __('api.invalid_orientation', ['orientations' => implode(', ', $valid)]), $key, 422);
                 }
             }
 
@@ -1101,7 +1101,7 @@ class AdminConfigController extends BaseApiController
         }
 
         if (empty($updated)) {
-            return $this->respondWithError('VALIDATION_ERROR', 'No recognized native app settings provided', null, 422);
+            return $this->respondWithError('VALIDATION_ERROR', __('api.no_recognized_native_app_settings'), null, 422);
         }
 
         $this->redisCache->delete('tenant_bootstrap', $tenantId);
@@ -1182,12 +1182,12 @@ class AdminConfigController extends BaseApiController
 
         $validAreas = ['feed', 'listings', 'members'];
         if (!in_array($area, $validAreas, true)) {
-            return $this->respondWithError('VALIDATION_ERROR', 'Area must be: feed, listings, or members', 'area', 422);
+            return $this->respondWithError('VALIDATION_ERROR', __('api.algorithm_area_invalid'), 'area', 422);
         }
 
         $input = $this->getAllInput();
         if (empty($input)) {
-            return $this->respondWithError('VALIDATION_ERROR', 'Request body is empty', null, 422);
+            return $this->respondWithError('VALIDATION_ERROR', __('api.request_body_empty'), null, 422);
         }
 
         $currentConfig = match ($area) {
@@ -1203,7 +1203,7 @@ class AdminConfigController extends BaseApiController
             if (str_ends_with($key, '_weight') || str_ends_with($key, '_boost') || str_ends_with($key, '_minimum')) {
                 $val = (float) $value;
                 if ($val < 0.0 || $val > 10.0) {
-                    return $this->respondWithError('VALIDATION_ERROR', "{$key} must be between 0 and 10", $key, 422);
+                    return $this->respondWithError('VALIDATION_ERROR', __('api.algorithm_value_range', ['key' => $key]), $key, 422);
                 }
             }
 
@@ -1211,7 +1211,7 @@ class AdminConfigController extends BaseApiController
         }
 
         if (empty($updated)) {
-            return $this->respondWithError('VALIDATION_ERROR', 'No recognized algorithm settings provided', null, 422);
+            return $this->respondWithError('VALIDATION_ERROR', __('api.no_recognized_algorithm_settings'), null, 422);
         }
 
         $tenantRow = DB::selectOne("SELECT configuration FROM tenants WHERE id = ?", [$tenantId]);
@@ -1356,20 +1356,20 @@ class AdminConfigController extends BaseApiController
 
         if (isset($input['default_language'])) {
             if (!in_array($input['default_language'], self::VALID_LANGUAGES, true)) {
-                return $this->respondWithError('VALIDATION_ERROR', 'Invalid default language', 'default_language', 400);
+                return $this->respondWithError('VALIDATION_ERROR', __('api.invalid_default_language'), 'default_language', 400);
             }
         }
 
         if (isset($input['supported_languages'])) {
             if (!is_array($input['supported_languages'])) {
-                return $this->respondWithError('VALIDATION_ERROR', 'supported_languages must be an array', 'supported_languages', 400);
+                return $this->respondWithError('VALIDATION_ERROR', __('api.supported_languages_must_be_array'), 'supported_languages', 400);
             }
             if (!in_array('en', $input['supported_languages'], true)) {
                 $input['supported_languages'][] = 'en';
             }
             foreach ($input['supported_languages'] as $lang) {
                 if (!in_array($lang, self::VALID_LANGUAGES, true)) {
-                    return $this->respondWithError('VALIDATION_ERROR', "Invalid language: $lang", 'supported_languages', 400);
+                    return $this->respondWithError('VALIDATION_ERROR', __('api.invalid_language', ['lang' => $lang]), 'supported_languages', 400);
                 }
             }
         }

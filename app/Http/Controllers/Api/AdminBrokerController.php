@@ -319,7 +319,7 @@ class AdminBrokerController extends BaseApiController
             }
 
             if (!$exchange) {
-                return $this->respondWithError('NOT_FOUND', 'Exchange request not found', null, 404);
+                return $this->respondWithError('NOT_FOUND', __('api.exchange_not_found'), null, 404);
             }
 
             $exchange = (array) $exchange;
@@ -356,7 +356,7 @@ class AdminBrokerController extends BaseApiController
                 'risk_tag' => $riskTag,
             ]);
         } catch (\Exception $e) {
-            return $this->respondWithError('SERVER_ERROR', 'Failed to load exchange', null, 500);
+            return $this->respondWithError('SERVER_ERROR', __('api.fetch_failed', ['resource' => 'exchange']), null, 500);
         }
     }
 
@@ -380,20 +380,20 @@ class AdminBrokerController extends BaseApiController
             }
 
             if (!$exchange) {
-                return $this->respondWithError('NOT_FOUND', 'Exchange request not found', null, 404);
+                return $this->respondWithError('NOT_FOUND', __('api.exchange_not_found'), null, 404);
             }
             if ($exchange->status !== 'pending_broker') {
-                return $this->respondWithError('INVALID_STATUS', 'Exchange is not pending broker approval');
+                return $this->respondWithError('INVALID_STATUS', __('api.exchange_not_pending'));
             }
 
             $success = $this->exchangeWorkflowService->approveExchange($id, $adminId, $notes);
             if (!$success) {
-                return $this->respondWithError('SERVER_ERROR', 'Failed to approve exchange', null, 500);
+                return $this->respondWithError('SERVER_ERROR', __('api.approve_failed', ['resource' => 'exchange']), null, 500);
             }
 
             return $this->respondWithData(['id' => $id, 'status' => 'accepted']);
         } catch (\Exception $e) {
-            return $this->respondWithError('SERVER_ERROR', 'Failed to approve exchange', null, 500);
+            return $this->respondWithError('SERVER_ERROR', __('api.approve_failed', ['resource' => 'exchange']), null, 500);
         }
     }
 
@@ -406,7 +406,7 @@ class AdminBrokerController extends BaseApiController
         $reason = $this->input('reason', '');
 
         if (empty($reason)) {
-            return $this->respondWithError('VALIDATION_ERROR', 'A reason is required to reject an exchange', 'reason');
+            return $this->respondWithError('VALIDATION_ERROR', __('api.reason_required_reject_exchange'), 'reason');
         }
 
         try {
@@ -421,20 +421,20 @@ class AdminBrokerController extends BaseApiController
             }
 
             if (!$exchange) {
-                return $this->respondWithError('NOT_FOUND', 'Exchange request not found', null, 404);
+                return $this->respondWithError('NOT_FOUND', __('api.exchange_not_found'), null, 404);
             }
             if ($exchange->status !== 'pending_broker') {
-                return $this->respondWithError('INVALID_STATUS', 'Exchange is not pending broker approval');
+                return $this->respondWithError('INVALID_STATUS', __('api.exchange_not_pending'));
             }
 
             $success = $this->exchangeWorkflowService->rejectExchange($id, $adminId, $reason);
             if (!$success) {
-                return $this->respondWithError('SERVER_ERROR', 'Failed to reject exchange', null, 500);
+                return $this->respondWithError('SERVER_ERROR', __('api.reject_failed', ['resource' => 'exchange']), null, 500);
             }
 
             return $this->respondWithData(['id' => $id, 'status' => 'cancelled']);
         } catch (\Exception $e) {
-            return $this->respondWithError('SERVER_ERROR', 'Failed to reject exchange', null, 500);
+            return $this->respondWithError('SERVER_ERROR', __('api.reject_failed', ['resource' => 'exchange']), null, 500);
         }
     }
 
@@ -509,10 +509,10 @@ class AdminBrokerController extends BaseApiController
 
         $allowedLevels = ['low', 'medium', 'high', 'critical'];
         if (!in_array($riskLevel, $allowedLevels)) {
-            return $this->respondWithError('VALIDATION_ERROR', 'Invalid risk level', 'risk_level');
+            return $this->respondWithError('VALIDATION_ERROR', __('api.invalid_risk_level'), 'risk_level');
         }
         if (empty($riskCategory)) {
-            return $this->respondWithError('VALIDATION_ERROR', 'Risk category is required', 'risk_category');
+            return $this->respondWithError('VALIDATION_ERROR', __('api.risk_category_required'), 'risk_category');
         }
 
         try {
@@ -523,7 +523,7 @@ class AdminBrokerController extends BaseApiController
             }
 
             if (!$listing) {
-                return $this->respondWithError('NOT_FOUND', 'Listing not found', null, 404);
+                return $this->respondWithError('NOT_FOUND', __('api.listing_not_found'), null, 404);
             }
 
             $listingTenantId = (int) $listing->tenant_id;
@@ -561,7 +561,7 @@ class AdminBrokerController extends BaseApiController
 
             return $this->respondWithData(['id' => $tagId, 'listing_id' => $listingId, 'risk_level' => $riskLevel]);
         } catch (\Exception $e) {
-            return $this->respondWithError('SERVER_ERROR', 'Failed to save risk tag', null, 500);
+            return $this->respondWithError('SERVER_ERROR', __('api.create_failed', ['resource' => 'risk tag']), null, 500);
         }
     }
 
@@ -580,7 +580,7 @@ class AdminBrokerController extends BaseApiController
             }
 
             if (!$existing) {
-                return $this->respondWithError('NOT_FOUND', 'Risk tag not found', null, 404);
+                return $this->respondWithError('NOT_FOUND', __('api.not_found', ['model' => 'Risk tag']), null, 404);
             }
 
             $recordTenantId = (int) $existing->tenant_id;
@@ -590,7 +590,7 @@ class AdminBrokerController extends BaseApiController
 
             return $this->respondWithData(['listing_id' => $listingId, 'removed' => true]);
         } catch (\Exception $e) {
-            return $this->respondWithError('SERVER_ERROR', 'Failed to remove risk tag', null, 500);
+            return $this->respondWithError('SERVER_ERROR', __('api.delete_failed', ['resource' => 'risk tag']), null, 500);
         }
     }
 
@@ -685,7 +685,7 @@ class AdminBrokerController extends BaseApiController
             }
 
             if (!$copy) {
-                return $this->respondWithError('NOT_FOUND', 'Broker message copy not found', null, 404);
+                return $this->respondWithError('NOT_FOUND', __('api.broker_message_not_found'), null, 404);
             }
 
             $copy = (array) $copy;
@@ -723,7 +723,7 @@ class AdminBrokerController extends BaseApiController
 
             return $this->respondWithData(['copy' => $copy, 'thread' => $thread, 'archive' => $archive]);
         } catch (\Exception $e) {
-            return $this->respondWithError('SERVER_ERROR', 'Failed to load message detail', null, 500);
+            return $this->respondWithError('SERVER_ERROR', __('api.fetch_failed', ['resource' => 'message detail']), null, 500);
         }
     }
 
@@ -742,7 +742,7 @@ class AdminBrokerController extends BaseApiController
             }
 
             if (!$message) {
-                return $this->respondWithError('NOT_FOUND', 'Message not found', null, 404);
+                return $this->respondWithError('NOT_FOUND', __('api.not_found', ['model' => 'Message']), null, 404);
             }
 
             $recordTenantId = (int) $message->tenant_id;
@@ -753,7 +753,7 @@ class AdminBrokerController extends BaseApiController
 
             return $this->respondWithData(['id' => $id, 'reviewed' => true]);
         } catch (\Exception $e) {
-            return $this->respondWithError('SERVER_ERROR', 'Failed to mark message as reviewed', null, 500);
+            return $this->respondWithError('SERVER_ERROR', __('api.update_failed', ['resource' => 'message review']), null, 500);
         }
     }
 
@@ -780,14 +780,14 @@ class AdminBrokerController extends BaseApiController
             }
 
             if (!$copy) {
-                return $this->respondWithError('NOT_FOUND', 'Broker message copy not found', null, 404);
+                return $this->respondWithError('NOT_FOUND', __('api.broker_message_not_found'), null, 404);
             }
 
             $copy = (array) $copy;
             $copyTenantId = (int) $copy['tenant_id'];
 
             if (!empty($copy['archive_id'])) {
-                return $this->respondWithError('ALREADY_ARCHIVED', 'This message copy has already been archived', null, 409);
+                return $this->respondWithError('ALREADY_ARCHIVED', __('api.already_archived'), null, 409);
             }
 
             $adminRow = DB::selectOne("SELECT CONCAT(first_name, ' ', last_name) as name FROM users WHERE id = ? AND tenant_id = ?", [$adminId, $this->getTenantId()]);
@@ -842,7 +842,7 @@ class AdminBrokerController extends BaseApiController
 
             return $this->respondWithData(['id' => $id, 'archive_id' => $archiveId, 'decision' => $decision, 'decided_by' => $adminName]);
         } catch (\Exception $e) {
-            return $this->respondWithError('SERVER_ERROR', 'Failed to archive message', null, 500);
+            return $this->respondWithError('SERVER_ERROR', __('api.update_failed', ['resource' => 'message archive']), null, 500);
         }
     }
 
@@ -856,7 +856,7 @@ class AdminBrokerController extends BaseApiController
         $severity = $this->input('severity', 'concern');
 
         if (empty($reason)) {
-            return $this->respondWithError('VALIDATION_ERROR', 'A reason is required to flag a message', 'reason');
+            return $this->respondWithError('VALIDATION_ERROR', __('api.reason_required_flag_message'), 'reason');
         }
 
         $allowedSeverities = ['info', 'warning', 'concern', 'urgent'];
@@ -872,7 +872,7 @@ class AdminBrokerController extends BaseApiController
             }
 
             if (!$message) {
-                return $this->respondWithError('NOT_FOUND', 'Message not found', null, 404);
+                return $this->respondWithError('NOT_FOUND', __('api.not_found', ['model' => 'Message']), null, 404);
             }
 
             $recordTenantId = (int) $message->tenant_id;
@@ -883,7 +883,7 @@ class AdminBrokerController extends BaseApiController
 
             return $this->respondWithData(['id' => $id, 'flagged' => true, 'flag_reason' => $reason, 'flag_severity' => $severity]);
         } catch (\Exception $e) {
-            return $this->respondWithError('SERVER_ERROR', 'Failed to flag message', null, 500);
+            return $this->respondWithError('SERVER_ERROR', __('api.update_failed', ['resource' => 'message flag']), null, 500);
         }
     }
 
@@ -953,7 +953,7 @@ class AdminBrokerController extends BaseApiController
             }
 
             if (!$user) {
-                return $this->respondWithError('NOT_FOUND', 'User not found', null, 404);
+                return $this->respondWithError('NOT_FOUND', __('api.user_not_found'), null, 404);
             }
 
             $userTenantId = (int) $user->tenant_id;
@@ -963,7 +963,7 @@ class AdminBrokerController extends BaseApiController
 
             if ($underMonitoring) {
                 if (empty($reason)) {
-                    return $this->respondWithError('VALIDATION_ERROR', 'A reason is required to set monitoring', 'reason');
+                    return $this->respondWithError('VALIDATION_ERROR', __('api.reason_required_monitoring'), 'reason');
                 }
 
                 $expiresAt = null;
@@ -1035,7 +1035,7 @@ class AdminBrokerController extends BaseApiController
                 return $this->respondWithData(['user_id' => $userId, 'under_monitoring' => false]);
             }
         } catch (\Exception $e) {
-            return $this->respondWithError('SERVER_ERROR', 'Failed to update monitoring', null, 500);
+            return $this->respondWithError('SERVER_ERROR', __('api.update_failed', ['resource' => 'monitoring']), null, 500);
         }
     }
 
@@ -1137,7 +1137,7 @@ class AdminBrokerController extends BaseApiController
             }
 
             if (!$archive) {
-                return $this->respondWithError('NOT_FOUND', 'Archive not found', null, 404);
+                return $this->respondWithError('NOT_FOUND', __('api.not_found', ['model' => 'Archive']), null, 404);
             }
 
             $archive = (array) $archive;
@@ -1151,7 +1151,7 @@ class AdminBrokerController extends BaseApiController
 
             return $this->respondWithData($archive);
         } catch (\Exception $e) {
-            return $this->respondWithError('SERVER_ERROR', 'Failed to load archive', null, 500);
+            return $this->respondWithError('SERVER_ERROR', __('api.fetch_failed', ['resource' => 'archive']), null, 500);
         }
     }
 
@@ -1297,7 +1297,7 @@ class AdminBrokerController extends BaseApiController
 
             return $this->respondWithData($config);
         } catch (\Exception $e) {
-            return $this->respondWithError('SERVER_ERROR', 'Failed to save configuration', null, 500);
+            return $this->respondWithError('SERVER_ERROR', __('api.failed_to_save_config'), null, 500);
         }
     }
 

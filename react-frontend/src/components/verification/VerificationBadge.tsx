@@ -23,6 +23,7 @@ import {
   UserCheck,
   Shield,
 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
 
@@ -145,6 +146,7 @@ export function VerificationBadgeRow({
   badges?: VerificationBadgeData[];
   size?: 'sm' | 'md' | 'lg';
 }) {
+  const { t } = useTranslation('common');
   const [badges, setBadges] = useState<VerificationBadgeData[]>(propBadges || []);
   const [isLoaded, setIsLoaded] = useState(!!propBadges);
 
@@ -175,7 +177,7 @@ export function VerificationBadgeRow({
   if (!isLoaded || badges.length === 0) return null;
 
   return (
-    <div className="flex items-center gap-1" aria-label="Verification badges">
+    <div className="flex items-center gap-1" aria-label={t('aria.verification_badges')}>
       {badges.map((badge) => (
         <VerificationBadgeIcon key={badge.type} badge={badge} size={size} />
       ))}

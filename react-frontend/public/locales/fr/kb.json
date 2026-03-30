@@ -1,6 +1,4 @@
 {
-  "feedback_thanks": "Merci pour votre retour !",
-  "feedback_failed": "Échec de l'envoi du commentaire.",
   "title": "Knowledge Base",
   "description": "Find answers, guides, and helpful resources",
   "search_placeholder": "Search the knowledge base...",
@@ -28,7 +26,21 @@
   "feedback.question": "Was this article helpful?",
   "feedback.yes": "Yes ({{count}})",
   "feedback.no": "No ({{count}})",
-  "error": {},
-  "empty": {},
-  "feedback": {}
+  "feedback_thanks": "Merci pour votre retour !",
+  "feedback_failed": "Échec de l'envoi du commentaire.",
+  "error": {
+    "title": "Unable to load",
+    "article_not_found": "Article not found.",
+    "article_title": "Unable to load article"
+  },
+  "empty": {
+    "title": "No articles found",
+    "search_description": "Try a different search term.",
+    "no_articles": "No knowledge base articles have been published yet."
+  },
+  "feedback": {
+    "question": "Was this article helpful?",
+    "yes": "Yes ({{count}})",
+    "no": "No ({{count}})"
+  }
 }

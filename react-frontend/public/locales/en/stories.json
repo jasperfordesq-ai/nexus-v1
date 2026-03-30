@@ -71,7 +71,15 @@
     "capture": "Capture",
     "start_recording": "Start recording",
     "stop_recording": "Stop recording",
-    "recording": "Recording..."
+    "recording": "Recording...",
+    "close_camera": "Close camera",
+    "open_camera": "Open camera",
+    "select_image": "Select image from device",
+    "choose_image_file": "Choose image file",
+    "record_video": "Record video",
+    "select_video": "Select video from device",
+    "choose_video_file": "Choose video file",
+    "aria_poll_question": "Poll question"
   },
   "viewer": {
     "story_from": "Story from {{name}}",
@@ -96,6 +104,12 @@
     "viewed_at": "Viewed {{time}}",
     "poll_vote": "Vote",
     "poll_votes": "{{count}} votes",
-    "paused": "Paused"
+    "paused": "Paused",
+    "previous_story": "Previous story",
+    "double_tap_react": "Double-tap to react",
+    "next_story": "Next story",
+    "resume_story": "Resume story",
+    "story_options": "Story options",
+    "reply_placeholder_generic": "Reply to story..."
   }
 }

@@ -829,7 +829,7 @@ export function StoryViewer({ storyUsers, initialUserIndex, onClose }: StoryView
                   if (holdTimerRef.current) clearTimeout(holdTimerRef.current);
                   setIsPaused(false);
                 }}
-                aria-label="Previous story"
+                aria-label={t('viewer.previous_story')}
               />
               <button
                 className="w-1/3 h-full cursor-pointer"
@@ -842,7 +842,7 @@ export function StoryViewer({ storyUsers, initialUserIndex, onClose }: StoryView
                     lastTapRef.current = now;
                   }
                 }}
-                aria-label="Double-tap to react"
+                aria-label={t('viewer.double_tap_react')}
               />
               <button
                 className="w-1/3 h-full cursor-pointer"
@@ -853,7 +853,7 @@ export function StoryViewer({ storyUsers, initialUserIndex, onClose }: StoryView
                   if (holdTimerRef.current) clearTimeout(holdTimerRef.current);
                   setIsPaused(false);
                 }}
-                aria-label="Next story"
+                aria-label={t('viewer.next_story')}
               />
             </div>
 
@@ -910,7 +910,7 @@ export function StoryViewer({ storyUsers, initialUserIndex, onClose }: StoryView
                 <button
                   onClick={() => setIsPaused(false)}
                   className="p-1.5 rounded-full hover:bg-white/10 transition-colors"
-                  aria-label="Resume story"
+                  aria-label={t('viewer.resume_story')}
                 >
                   <Play className="w-4 h-4 text-white" />
                 </button>
@@ -922,7 +922,7 @@ export function StoryViewer({ storyUsers, initialUserIndex, onClose }: StoryView
                   <button
                     onClick={() => { setShowMenu(!showMenu); setIsPaused(true); }}
                     className="p-1.5 rounded-full hover:bg-white/10 transition-colors"
-                    aria-label="Story options"
+                    aria-label={t('viewer.story_options')}
                   >
                     <MoreHorizontal className="w-4 h-4 text-white" />
                   </button>
@@ -971,7 +971,7 @@ export function StoryViewer({ storyUsers, initialUserIndex, onClose }: StoryView
                     type="text"
                     value={replyText}
                     onChange={(e) => setReplyText(e.target.value)}
-                    placeholder="Reply to story..."
+                    placeholder={t('viewer.reply_placeholder_generic')}
                     className="flex-1 bg-white/10 border border-white/20 rounded-full px-4 py-2 text-white text-sm placeholder:text-white/40 outline-none focus:border-white/40"
                     onKeyDown={(e) => { if (e.key === 'Enter' && replyText.trim()) handleReply(); }}
                     onFocus={() => setIsPaused(true)}
@@ -983,7 +983,7 @@ export function StoryViewer({ storyUsers, initialUserIndex, onClose }: StoryView
                       onClick={handleReply}
                       disabled={isSendingReply}
                       className="p-2 rounded-full bg-white/10 hover:bg-white/20 transition-colors"
-                      aria-label="Send reply"
+                      aria-label={t('viewer.send_reply')}
                     >
                       <Send className="w-4 h-4 text-white" />
                     </button>

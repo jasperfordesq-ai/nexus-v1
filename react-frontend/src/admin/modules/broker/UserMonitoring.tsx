@@ -466,7 +466,7 @@ export function UserMonitoring() {
             )}
 
             <Textarea
-              label="Reason (required)"
+              label={t('broker.label_reason_required')}
               placeholder={t('broker.placeholder_reason_for_placing_this_user_under_monitoring')}
               value={monitoringReason}
               onValueChange={setMonitoringReason}
@@ -492,11 +492,11 @@ export function UserMonitoring() {
                 setExpiresDays(val ?? '');
               }}
             >
-              <SelectItem key="7">7 days</SelectItem>
-              <SelectItem key="14">14 days</SelectItem>
-              <SelectItem key="30">30 days</SelectItem>
-              <SelectItem key="60">60 days</SelectItem>
-              <SelectItem key="90">90 days</SelectItem>
+              <SelectItem key="7">{t('broker.days_7')}</SelectItem>
+              <SelectItem key="14">{t('broker.days_14')}</SelectItem>
+              <SelectItem key="30">{t('broker.days_30')}</SelectItem>
+              <SelectItem key="60">{t('broker.days_60')}</SelectItem>
+              <SelectItem key="90">{t('broker.days_90')}</SelectItem>
             </Select>
           </ModalBody>
           <ModalFooter>

@@ -97,7 +97,7 @@ class AdminEventsController extends BaseApiController
         );
 
         if ($event === null) {
-            return $this->respondWithError('NOT_FOUND', 'Event not found', null, 404);
+            return $this->respondWithError('NOT_FOUND', __('api.event_not_found'), null, 404);
         }
 
         return $this->respondWithData($event);
@@ -117,7 +117,7 @@ class AdminEventsController extends BaseApiController
         );
 
         if (!$event) {
-            return $this->respondWithError('NOT_FOUND', 'Event not found', null, 404);
+            return $this->respondWithError('NOT_FOUND', __('api.event_not_found'), null, 404);
         }
 
         DB::update(
@@ -158,7 +158,7 @@ class AdminEventsController extends BaseApiController
 
         $event = $this->eventService->getById($id);
         if (!$event) {
-            return $this->respondWithError('NOT_FOUND', 'Event not found', null, 404);
+            return $this->respondWithError('NOT_FOUND', __('api.event_not_found'), null, 404);
         }
 
         $deleted = $this->eventService->delete($id, $adminId);
@@ -167,7 +167,7 @@ class AdminEventsController extends BaseApiController
             return $this->respondWithData(['id' => $id, 'deleted' => true]);
         }
 
-        return $this->respondWithError('DELETE_FAILED', 'Failed to delete event', null, 400);
+        return $this->respondWithError('DELETE_FAILED', __('api.delete_failed', ['resource' => 'event']), null, 400);
     }
 
     /**
@@ -185,6 +185,6 @@ class AdminEventsController extends BaseApiController
             return $this->respondWithData(['cancelled' => true, 'id' => $id]);
         }
 
-        return $this->respondWithError('CANCEL_FAILED', 'Failed to cancel event', null, 400);
+        return $this->respondWithError('CANCEL_FAILED', __('api.update_failed', ['resource' => 'event cancellation']), null, 400);
     }
 }

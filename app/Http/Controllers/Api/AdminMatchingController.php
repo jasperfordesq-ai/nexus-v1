@@ -132,7 +132,7 @@ class AdminMatchingController extends BaseApiController
         $row = $rowObj ? (array)$rowObj : null;
 
         if (!$row) {
-            return $this->respondWithError('NOT_FOUND', 'Match approval not found', null, 404);
+            return $this->respondWithError('NOT_FOUND', __('api.not_found', ['model' => 'Match approval']), null, 404);
         }
 
         $reasons = $row['match_reasons'] ?? null;
@@ -166,7 +166,7 @@ class AdminMatchingController extends BaseApiController
         $adminId = $this->requireAdmin();
         $notes = trim($this->input('notes', ''));
         $success = $this->matchApprovalWorkflowService->approveMatch($id, $adminId, $notes);
-        if (!$success) return $this->respondWithError('NOT_FOUND', 'Match approval not found or already reviewed', null, 404);
+        if (!$success) return $this->respondWithError('NOT_FOUND', __('api.not_found', ['model' => 'Match approval or already reviewed']), null, 404);
         return $this->respondWithData(['approved' => true, 'id' => $id]);
     }
 
@@ -175,10 +175,10 @@ class AdminMatchingController extends BaseApiController
     {
         $adminId = $this->requireAdmin();
         $reason = trim($this->input('reason', ''));
-        if (empty($reason)) return $this->respondWithError('VALIDATION_ERROR', 'Rejection reason is required', 'reason', 422);
+        if (empty($reason)) return $this->respondWithError('VALIDATION_ERROR', __('api.reason_required'), 'reason', 422);
 
         $success = $this->matchApprovalWorkflowService->rejectMatch($id, $adminId, $reason);
-        if (!$success) return $this->respondWithError('NOT_FOUND', 'Match approval not found or already reviewed', null, 404);
+        if (!$success) return $this->respondWithError('NOT_FOUND', __('api.not_found', ['model' => 'Match approval or already reviewed']), null, 404);
         return $this->respondWithData(['rejected' => true, 'id' => $id]);
     }
 
@@ -259,7 +259,7 @@ class AdminMatchingController extends BaseApiController
         DB::update("UPDATE tenants SET configuration = ? WHERE id = ?", [json_encode($config), $tenantId]);
         $this->smartMatchingEngine->clearCache();
 
-        return $this->respondWithData(['message' => 'Matching configuration updated successfully']);
+        return $this->respondWithData(['message' => __('api.matching_config_updated')]);
     }
 
     /** POST /api/v2/admin/matching/clear-cache */
@@ -272,9 +272,9 @@ class AdminMatchingController extends BaseApiController
             $deleted = (int) DB::selectOne("SELECT COUNT(*) as cnt FROM match_cache WHERE tenant_id = ?", [$tenantId])->cnt;
             DB::delete("DELETE FROM match_cache WHERE tenant_id = ?", [$tenantId]);
             $this->smartMatchingEngine->clearCache();
-            return $this->respondWithData(['message' => 'Match cache cleared successfully', 'entries_cleared' => $deleted]);
+            return $this->respondWithData(['message' => __('api.match_cache_cleared'), 'entries_cleared' => $deleted]);
         } catch (\Exception $e) {
-            return $this->respondWithError('SERVER_ERROR', 'Failed to clear cache', null, 500);
+            return $this->respondWithError('SERVER_ERROR', __('api.failed_to_clear_cache'), null, 500);
         }
     }
 
@@ -312,7 +312,7 @@ class AdminMatchingController extends BaseApiController
                 'rejected_count' => $rejectedCount, 'approval_rate' => $approvalRate,
             ]);
         } catch (\Throwable $e) {
-            return $this->respondWithError('SERVER_ERROR', 'Failed to load matching stats', null, 500);
+            return $this->respondWithError('SERVER_ERROR', __('api.fetch_failed', ['resource' => 'matching stats']), null, 500);
         }
     }
 

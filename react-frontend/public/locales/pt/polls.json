@@ -73,5 +73,8 @@
   "category_label": "Category (optional)",
   "category_placeholder": "e.g. Community, Events, Feedback",
   "anonymous_voting": "Anonymous Voting",
-  "anonymous_voting_desc": "Hide voter identities in results"
+  "anonymous_voting_desc": "Hide voter identities in results",
+  "aria": {
+    "export_csv": "Export results as CSV"
+  }
 }

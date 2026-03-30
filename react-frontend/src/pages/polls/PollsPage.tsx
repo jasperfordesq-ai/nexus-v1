@@ -241,7 +241,7 @@ const PollCard = memo(function PollCard({ poll, currentUserId, onVote, onDelete,
                 variant="light"
                 className="text-[var(--text-subtle)] hover:text-[var(--color-primary)] min-w-0"
                 onPress={() => onExport(poll.id)}
-                aria-label="Export results as CSV"
+                aria-label={t('aria.export_csv')}
               >
                 <Download className="w-4 h-4" />
               </Button>

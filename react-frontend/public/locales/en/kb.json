@@ -27,5 +27,20 @@
   "feedback.yes": "Yes ({{count}})",
   "feedback.no": "No ({{count}})",
   "feedback_thanks": "Thank you for your feedback!",
-  "feedback_failed": "Failed to submit feedback."
+  "feedback_failed": "Failed to submit feedback.",
+  "error": {
+    "title": "Unable to load",
+    "article_not_found": "Article not found.",
+    "article_title": "Unable to load article"
+  },
+  "empty": {
+    "title": "No articles found",
+    "search_description": "Try a different search term.",
+    "no_articles": "No knowledge base articles have been published yet."
+  },
+  "feedback": {
+    "question": "Was this article helpful?",
+    "yes": "Yes ({{count}})",
+    "no": "No ({{count}})"
+  }
 }

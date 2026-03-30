@@ -317,8 +317,8 @@ export function SkillSelector({
           <ModalBody>
             {/* Search */}
             <Input
-              placeholder="Search for a skill..."
-              aria-label="Search skills"
+              placeholder={tc('skills.search_placeholder')}
+              aria-label={tc('aria.search_skills')}
               value={searchQuery}
               onChange={(e) => handleSearch(e.target.value)}
               startContent={<Search className="w-4 h-4 text-theme-subtle" aria-hidden="true" />}
@@ -372,7 +372,7 @@ export function SkillSelector({
             {/* Category selector */}
             {!isLoadingCategories && categories.length > 0 && (
               <Select
-                label="Category (optional)"
+                label={tc('skills.category_optional')}
                 placeholder={tc('aria.select_category')}
                 selectedKeys={selectedCategory ? [selectedCategory] : []}
                 onChange={(e) => setSelectedCategory(e.target.value)}
@@ -391,7 +391,7 @@ export function SkillSelector({
 
             {/* Proficiency selector */}
             <Select
-              label="Proficiency Level"
+              label={tc('skills.proficiency_level')}
               selectedKeys={[proficiency]}
               onChange={(e) => setProficiency(e.target.value)}
               classNames={{

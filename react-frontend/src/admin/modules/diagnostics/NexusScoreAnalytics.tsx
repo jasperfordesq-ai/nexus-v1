@@ -72,7 +72,7 @@ export function NexusScoreAnalytics() {
           color="primary"
         />
         <StatCard
-          label="Top 10% Threshold"
+          label={t('diagnostics.label_top_10_percent_threshold')}
           value={stats.top_10_threshold !== undefined ? String(stats.top_10_threshold) : String(stats.total_badges_awarded)}
           icon={TrendingUp}
           color="success"
@@ -84,7 +84,7 @@ export function NexusScoreAnalytics() {
           color="warning"
         />
         <StatCard
-          label="Score Trend (30d)"
+          label={t('diagnostics.label_score_trend_30d')}
           value={stats.score_trend_30d !== undefined ? `${stats.score_trend_30d > 0 ? '+' : ''}${stats.score_trend_30d}%` : String(stats.active_campaigns)}
           icon={TrendingUp}
           color="secondary"

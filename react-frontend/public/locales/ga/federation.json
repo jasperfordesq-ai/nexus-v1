@@ -422,9 +422,12 @@
     "aria_reply": "Freagair teachtaireacht",
     "aria_send_reply": "Seol freagra"
   },
-  "onboarding": {},
+  "onboarding": {
+    "reach_label_remote_ok": "Remote OK"
+  },
   "listings": {},
   "members": {
+    "reach_remote_ok": "Remote OK",
     "aria_search": "Cuardaigh baill chónaidhme",
     "aria_filter_community": "Scag de réir pobail chomhpháirtíochta",
     "aria_filter_skills": "Scag de réir scileanna"

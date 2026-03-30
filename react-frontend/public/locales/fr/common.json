@@ -311,6 +311,7 @@
     "underline": "Underline",
     "bullet_list": "Bullet List",
     "numbered_list": "Numbered List",
+    "loading_community": "Loading community",
     "link_url": "Link URL",
     "confirm_link": "Confirm link",
     "cancel_link": "Cancel link",
@@ -338,7 +339,9 @@
     "scroll_right": "Scroll right",
     "select_language": "Select language",
     "clear_location": "Clear location",
-    "select_category": "Select a category"
+    "select_category": "Select a category",
+    "verification_badges": "Verification badges",
+    "search_skills": "Search skills"
   },
   "skills": {
     "browse_title": "Répertoire des compétences communautaires",
@@ -373,7 +376,9 @@
       "expert": "Expert"
     },
     "aria_clear_search": "Clear search",
-    "aria_close_members_list": "Close members list"
+    "aria_close_members_list": "Close members list",
+    "category_optional": "Category (optional)",
+    "proficiency_level": "Proficiency Level"
   },
   "hours_display_one": "{{count}} hour",
   "hours_display_other": "{{count}} hours"

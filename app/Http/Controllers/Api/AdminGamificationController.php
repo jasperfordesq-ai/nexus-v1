@@ -106,7 +106,7 @@ class AdminGamificationController extends BaseApiController
 
         $name = trim($this->input('name', ''));
         if (empty($name)) {
-            return $this->respondWithError('VALIDATION_ERROR', 'Badge name is required', 'name', 422);
+            return $this->respondWithError('VALIDATION_ERROR', __('api.badge_name_required'), 'name', 422);
         }
 
         $description = trim($this->input('description', ''));
@@ -122,7 +122,7 @@ class AdminGamificationController extends BaseApiController
 
             return $this->respondWithData(['id' => $id, 'key' => $badgeKey, 'name' => $name, 'description' => $description, 'icon' => $icon, 'type' => 'custom'], null, 201);
         } catch (\Throwable $e) {
-            return $this->respondWithError('SERVER_ERROR', 'Failed to create badge', null, 500);
+            return $this->respondWithError('SERVER_ERROR', __('api.create_failed', ['resource' => 'badge']), null, 500);
         }
     }
 
@@ -135,7 +135,7 @@ class AdminGamificationController extends BaseApiController
         try {
             $badge = DB::selectOne("SELECT * FROM custom_badges WHERE id = ? AND tenant_id = ?", [$id, $tenantId]);
             if (!$badge) {
-                return $this->respondWithError('NOT_FOUND', 'Badge not found', null, 404);
+                return $this->respondWithError('NOT_FOUND', __('api.badge_not_found'), null, 404);
             }
 
             $actualKey = $badge->badge_key ?? ('custom_' . $id);
@@ -144,7 +144,7 @@ class AdminGamificationController extends BaseApiController
 
             return $this->respondWithData(['deleted' => true]);
         } catch (\Throwable $e) {
-            return $this->respondWithError('SERVER_ERROR', 'Failed to delete badge', null, 500);
+            return $this->respondWithError('SERVER_ERROR', __('api.delete_failed', ['resource' => 'badge']), null, 500);
         }
     }
 
@@ -170,7 +170,7 @@ class AdminGamificationController extends BaseApiController
     {
         $this->requireAdmin();
         $name = trim($this->input('name', ''));
-        if (empty($name)) return $this->respondWithError('VALIDATION_ERROR', 'Campaign name is required', 'name');
+        if (empty($name)) return $this->respondWithError('VALIDATION_ERROR', __('api.campaign_name_required'), 'name');
 
         try {
             $id = $this->achievementCampaignService->createCampaign([
@@ -182,7 +182,7 @@ class AdminGamificationController extends BaseApiController
             return $this->respondWithData(['id' => (int) $id, 'name' => $name, 'status' => 'draft'], null, 201);
         } catch (\Throwable $e) {
             Log::error('Failed to create campaign: ' . $e->getMessage());
-            return $this->respondWithError('SERVER_ERROR', 'Failed to create campaign', null, 500);
+            return $this->respondWithError('SERVER_ERROR', __('api.create_failed', ['resource' => 'campaign']), null, 500);
         }
     }
 
@@ -191,7 +191,7 @@ class AdminGamificationController extends BaseApiController
     {
         $this->requireAdmin();
         $campaign = $this->achievementCampaignService->getCampaign($id);
-        if (!$campaign) return $this->respondWithError('NOT_FOUND', 'Campaign not found', null, 404);
+        if (!$campaign) return $this->respondWithError('NOT_FOUND', __('api.campaign_not_found'), null, 404);
 
         $newStatus = $this->input('status');
         if ($newStatus && $newStatus !== $campaign['status']) {
@@ -211,7 +211,7 @@ class AdminGamificationController extends BaseApiController
             return $this->respondWithData(['id' => $id, 'updated' => true]);
         } catch (\Throwable $e) {
             Log::error('Failed to update campaign: ' . $e->getMessage());
-            return $this->respondWithError('SERVER_ERROR', 'Failed to update campaign', null, 500);
+            return $this->respondWithError('SERVER_ERROR', __('api.update_failed', ['resource' => 'campaign']), null, 500);
         }
     }
 
@@ -220,9 +220,9 @@ class AdminGamificationController extends BaseApiController
     {
         $this->requireAdmin();
         $campaign = $this->achievementCampaignService->getCampaign($id);
-        if (!$campaign) return $this->respondWithError('NOT_FOUND', 'Campaign not found', null, 404);
+        if (!$campaign) return $this->respondWithError('NOT_FOUND', __('api.campaign_not_found'), null, 404);
         try { $this->achievementCampaignService->deleteCampaign($id); return $this->respondWithData(['deleted' => true]); }
-        catch (\Throwable $e) { return $this->respondWithError('SERVER_ERROR', 'Failed to delete campaign', null, 500); }
+        catch (\Throwable $e) { return $this->respondWithError('SERVER_ERROR', __('api.delete_failed', ['resource' => 'campaign']), null, 500); }
     }
 
     /** POST /api/v2/admin/gamification/recheck-all */
@@ -253,7 +253,7 @@ class AdminGamificationController extends BaseApiController
             return $this->respondWithData(['users_checked' => $checked, 'message' => "Badge recheck completed for {$checked} users"]);
         } catch (\Throwable $e) {
             Log::error('Badge recheck failed: ' . $e->getMessage());
-            return $this->respondWithError('SERVER_ERROR', 'Badge recheck failed', null, 500);
+            return $this->respondWithError('SERVER_ERROR', __('api.badge_recheck_failed'), null, 500);
         }
     }
 
@@ -264,8 +264,8 @@ class AdminGamificationController extends BaseApiController
         $badgeSlug = trim($this->input('badge_slug', ''));
         $userIds = $this->input('user_ids', []);
 
-        if (empty($badgeSlug)) return $this->respondWithError('VALIDATION_ERROR', 'Badge slug is required', 'badge_slug', 422);
-        if (empty($userIds) || !is_array($userIds)) return $this->respondWithError('VALIDATION_ERROR', 'User IDs array is required', 'user_ids', 422);
+        if (empty($badgeSlug)) return $this->respondWithError('VALIDATION_ERROR', __('api.badge_slug_required'), 'badge_slug', 422);
+        if (empty($userIds) || !is_array($userIds)) return $this->respondWithError('VALIDATION_ERROR', __('api.user_ids_required'), 'user_ids', 422);
 
         // Filter user_ids to only include users belonging to the current tenant
         $tenantId = TenantContext::getId();
@@ -303,7 +303,7 @@ class AdminGamificationController extends BaseApiController
         $success = BadgeDefinitionService::updateTenantOverride($tenantId, $badgeKey, $data);
 
         if (!$success) {
-            return $this->respondWithError('BADGE_UPDATE_FAILED', 'Failed to update badge configuration', null, 422);
+            return $this->respondWithError('BADGE_UPDATE_FAILED', __('api.update_failed', ['resource' => 'badge configuration']), null, 422);
         }
 
         return $this->respondWithData(['success' => true]);

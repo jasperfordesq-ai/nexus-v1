@@ -598,7 +598,7 @@ export function StoryCreator({ onClose, onCreated }: StoryCreatorProps) {
                       className={`p-2 rounded-full backdrop-blur transition-colors ${
                         drawingActive ? 'bg-white text-black' : 'bg-black/40 text-white hover:bg-black/60'
                       }`}
-                      aria-label="Toggle drawing mode"
+                      aria-label={t('creator.draw_toggle')}
                     >
                       <Pencil className="w-4 h-4" />
                     </button>
@@ -607,7 +607,7 @@ export function StoryCreator({ onClose, onCreated }: StoryCreatorProps) {
                         <button
                           onClick={clearDrawing}
                           className="p-2 rounded-full bg-black/40 backdrop-blur text-white hover:bg-black/60 transition-colors"
-                          aria-label="Clear drawing"
+                          aria-label={t('creator.draw_clear')}
                         >
                           <Eraser className="w-4 h-4" />
                         </button>
@@ -646,7 +646,7 @@ export function StoryCreator({ onClose, onCreated }: StoryCreatorProps) {
                     <Input
                       value={photoText}
                       onValueChange={setPhotoText}
-                      placeholder="Add text overlay..."
+                      placeholder={t('creator.text_overlay')}
                       variant="bordered"
                       size="sm"
                       classNames={{
@@ -706,19 +706,19 @@ export function StoryCreator({ onClose, onCreated }: StoryCreatorProps) {
                   <button
                     onClick={flipCamera}
                     className="p-3 rounded-full bg-white/20 backdrop-blur hover:bg-white/30 transition-colors"
-                    aria-label="Flip camera"
+                    aria-label={t('creator.flip_camera')}
                   >
                     <SwitchCamera className="w-5 h-5 text-white" />
                   </button>
                   <button
                     onClick={capturePhoto}
                     className="w-16 h-16 rounded-full border-4 border-white bg-white/20 hover:bg-white/40 transition-colors active:scale-90"
-                    aria-label="Take photo"
+                    aria-label={t('creator.capture')}
                   />
                   <button
                     onClick={stopCamera}
                     className="p-3 rounded-full bg-white/20 backdrop-blur hover:bg-white/30 transition-colors"
-                    aria-label="Close camera"
+                    aria-label={t('creator.close_camera')}
                   >
                     <X className="w-5 h-5 text-white" />
                   </button>
@@ -729,7 +729,7 @@ export function StoryCreator({ onClose, onCreated }: StoryCreatorProps) {
                 <button
                   onClick={startCamera}
                   className="flex flex-col items-center gap-4 p-10 w-full rounded-2xl border-2 border-dashed border-white/20 hover:border-white/40 transition-colors cursor-pointer"
-                  aria-label="Open camera"
+                  aria-label={t('creator.open_camera')}
                 >
                   <div className="w-16 h-16 rounded-full bg-white/10 flex items-center justify-center">
                     <Camera className="w-8 h-8 text-white/70" />
@@ -743,7 +743,7 @@ export function StoryCreator({ onClose, onCreated }: StoryCreatorProps) {
                 <button
                   onClick={() => fileInputRef.current?.click()}
                   className="flex flex-col items-center gap-3 p-8 w-full rounded-2xl border-2 border-dashed border-white/20 hover:border-white/40 transition-colors cursor-pointer"
-                  aria-label="Select image from device"
+                  aria-label={t('creator.select_image')}
                 >
                   <div className="w-12 h-12 rounded-full bg-white/10 flex items-center justify-center">
                     <ImagePlus className="w-6 h-6 text-white/70" />
@@ -758,7 +758,7 @@ export function StoryCreator({ onClose, onCreated }: StoryCreatorProps) {
               accept="image/*"
               onChange={handleImageSelect}
               className="hidden"
-              aria-label="Choose image file"
+              aria-label={t('creator.choose_image_file')}
             />
           </div>
         )}
@@ -807,7 +807,7 @@ export function StoryCreator({ onClose, onCreated }: StoryCreatorProps) {
                   <button
                     onClick={flipCamera}
                     className="p-3 rounded-full bg-white/20 backdrop-blur hover:bg-white/30 transition-colors"
-                    aria-label="Flip camera"
+                    aria-label={t('creator.flip_camera')}
                   >
                     <SwitchCamera className="w-5 h-5 text-white" />
                   </button>
@@ -815,7 +815,7 @@ export function StoryCreator({ onClose, onCreated }: StoryCreatorProps) {
                     <button
                       onClick={stopRecording}
                       className="w-16 h-16 rounded-full border-4 border-red-500 bg-red-500/30 flex items-center justify-center hover:bg-red-500/50 transition-colors"
-                      aria-label="Stop recording"
+                      aria-label={t('creator.stop_recording')}
                     >
                       <Square className="w-6 h-6 text-white fill-white" />
                     </button>
@@ -823,7 +823,7 @@ export function StoryCreator({ onClose, onCreated }: StoryCreatorProps) {
                     <button
                       onClick={startRecording}
                       className="w-16 h-16 rounded-full border-4 border-red-500 bg-red-500/20 flex items-center justify-center hover:bg-red-500/40 transition-colors"
-                      aria-label="Start recording"
+                      aria-label={t('creator.start_recording')}
                     >
                       <Circle className="w-6 h-6 text-red-500 fill-red-500" />
                     </button>
@@ -831,7 +831,7 @@ export function StoryCreator({ onClose, onCreated }: StoryCreatorProps) {
                   <button
                     onClick={stopCamera}
                     className="p-3 rounded-full bg-white/20 backdrop-blur hover:bg-white/30 transition-colors"
-                    aria-label="Close camera"
+                    aria-label={t('creator.close_camera')}
                   >
                     <X className="w-5 h-5 text-white" />
                   </button>
@@ -842,7 +842,7 @@ export function StoryCreator({ onClose, onCreated }: StoryCreatorProps) {
                 <button
                   onClick={startCamera}
                   className="flex flex-col items-center gap-4 p-10 w-full rounded-2xl border-2 border-dashed border-white/20 hover:border-white/40 transition-colors cursor-pointer"
-                  aria-label="Record video"
+                  aria-label={t('creator.record_video')}
                 >
                   <div className="w-16 h-16 rounded-full bg-white/10 flex items-center justify-center">
                     <Video className="w-8 h-8 text-white/70" />
@@ -856,7 +856,7 @@ export function StoryCreator({ onClose, onCreated }: StoryCreatorProps) {
                 <button
                   onClick={() => videoInputRef.current?.click()}
                   className="flex flex-col items-center gap-3 p-8 w-full rounded-2xl border-2 border-dashed border-white/20 hover:border-white/40 transition-colors cursor-pointer"
-                  aria-label="Select video from device"
+                  aria-label={t('creator.select_video')}
                 >
                   <div className="w-12 h-12 rounded-full bg-white/10 flex items-center justify-center">
                     <ImagePlus className="w-6 h-6 text-white/70" />
@@ -871,7 +871,7 @@ export function StoryCreator({ onClose, onCreated }: StoryCreatorProps) {
               accept="video/mp4,video/webm,video/ogg,video/quicktime"
               onChange={handleVideoSelect}
               className="hidden"
-              aria-label="Choose video file"
+              aria-label={t('creator.choose_video_file')}
             />
           </div>
         )}
@@ -1015,14 +1015,14 @@ export function StoryCreator({ onClose, onCreated }: StoryCreatorProps) {
               <Input
                 value={pollQuestion}
                 onValueChange={setPollQuestion}
-                placeholder="Ask a question..."
+                placeholder={t('creator.poll_question_placeholder')}
                 variant="bordered"
                 maxLength={255}
                 classNames={{
                   input: 'text-white',
                   inputWrapper: 'border-white/20 bg-white/5',
                 }}
-                aria-label="Poll question"
+                aria-label={t('creator.aria_poll_question')}
               />
 
               <div className="space-y-2">

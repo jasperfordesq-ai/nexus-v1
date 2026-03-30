@@ -119,5 +119,12 @@
   "voice.hide_transcript": "Hide transcript",
   "voice.translate": "Translate",
   "voice.translating": "Translating...",
-  "voice.translation_failed": "Translation failed. Please try again."
+  "voice.translation_failed": "Translation failed. Please try again.",
+  "voice": {
+    "show_transcript": "Show transcript",
+    "hide_transcript": "Hide transcript",
+    "translate": "Translate",
+    "translating": "Translating...",
+    "translation_failed": "Translation failed. Please try again."
+  }
 }

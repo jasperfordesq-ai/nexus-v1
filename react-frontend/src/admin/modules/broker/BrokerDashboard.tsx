@@ -192,7 +192,7 @@ export function BrokerDashboard() {
           loading={loading}
         />
         <StatCard
-          label="Onboarding Flags"
+          label={t('broker.label_onboarding_flags')}
           value={stats?.onboarding_safeguarding_flags ?? '—'}
           icon={ShieldAlert}
           color="warning"

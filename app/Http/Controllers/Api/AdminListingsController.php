@@ -162,7 +162,7 @@ class AdminListingsController extends BaseApiController
         );
 
         if (!$item) {
-            return $this->respondWithError('NOT_FOUND', 'Listing not found', null, 404);
+            return $this->respondWithError('NOT_FOUND', __('api.listing_not_found'), null, 404);
         }
 
         return $this->respondWithData([
@@ -198,7 +198,7 @@ class AdminListingsController extends BaseApiController
         );
 
         if (!$item) {
-            return $this->respondWithError('NOT_FOUND', 'Listing not found', null, 404);
+            return $this->respondWithError('NOT_FOUND', __('api.listing_not_found'), null, 404);
         }
 
         DB::update(
@@ -234,7 +234,7 @@ class AdminListingsController extends BaseApiController
         $result = $this->listingModerationService->reject($id, $adminId, $reason);
 
         if (!$result['success']) {
-            $status = $result['error'] === 'Listing not found' ? 404 : 422;
+            $status = $result['error'] === __('api.listing_not_found') ? 404 : 422;
             return $this->respondWithError('REJECT_FAILED', $result['error'], null, $status);
         }
 
@@ -253,7 +253,7 @@ class AdminListingsController extends BaseApiController
         );
 
         if (!$item) {
-            return $this->respondWithError('NOT_FOUND', 'Listing not found', null, 404);
+            return $this->respondWithError('NOT_FOUND', __('api.listing_not_found'), null, 404);
         }
 
         // Notify listing owner BEFORE delete so the data still exists

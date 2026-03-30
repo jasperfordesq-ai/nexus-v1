@@ -693,7 +693,7 @@ export function VettingRecords() {
       {/* Search */}
       <div className="mb-4">
         <Input
-          placeholder="Search by name, email, or reference number..."
+          placeholder={t('broker.placeholder_search_by_name_email_or_reference_number')}
           aria-label={t('broker.label_search_vetting_records')}
           value={searchQuery}
           onValueChange={(val) => { setSearchQuery(val); setPage(1); }}
@@ -1095,7 +1095,7 @@ export function VettingRecords() {
                 <strong>{rejectModal.first_name} {rejectModal.last_name}</strong>?
               </p>
               <Textarea
-                label="Reason (required)"
+                label={t('broker.label_reason_required')}
                 placeholder={t('broker.placeholder_provide_a_reason_for_rejection')}
                 value={rejectReason}
                 onValueChange={setRejectReason}
@@ -1337,7 +1337,7 @@ export function VettingRecords() {
                 Reject <strong>{selectedIds.size}</strong> selected vetting record(s)?
               </p>
               <Textarea
-                label="Reason (required)"
+                label={t('broker.label_reason_required')}
                 placeholder={t('broker.placeholder_provide_a_reason_for_rejection')}
                 value={bulkRejectReason}
                 onValueChange={setBulkRejectReason}

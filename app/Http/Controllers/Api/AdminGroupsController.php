@@ -100,8 +100,8 @@ class AdminGroupsController extends BaseApiController
 
             return $this->respondWithPaginatedCollection($formatted, $total, $page, $limit);
         } catch (\Exception $e) {
-            Log::error('Failed to load groups', ['error' => $e->getMessage()]);
-            return $this->respondWithError('GROUPS_QUERY_ERROR', 'Failed to load groups', null, 500);
+            Log::error(__('api.fetch_failed', ['resource' => 'groups']), ['error' => $e->getMessage()]);
+            return $this->respondWithError('GROUPS_QUERY_ERROR', __('api.fetch_failed', ['resource' => 'groups']), null, 500);
         }
     }
 
@@ -115,7 +115,7 @@ class AdminGroupsController extends BaseApiController
             $group = $this->groupService->getById((int) $id);
 
             if (!$group || ($group['tenant_id'] ?? null) != $tenantId) {
-                return $this->respondWithError('NOT_FOUND', 'Group not found', null, 404);
+                return $this->respondWithError('NOT_FOUND', __('api.group_not_found'), null, 404);
             }
 
             $stats = DB::selectOne(
@@ -136,8 +136,8 @@ class AdminGroupsController extends BaseApiController
 
             return $this->respondWithData($group);
         } catch (\Exception $e) {
-            Log::error('Failed to load group', ['error' => $e->getMessage()]);
-            return $this->respondWithError('GROUP_DETAIL_ERROR', 'Failed to load group', null, 500);
+            Log::error(__('api.fetch_failed', ['resource' => 'group']), ['error' => $e->getMessage()]);
+            return $this->respondWithError('GROUP_DETAIL_ERROR', __('api.fetch_failed', ['resource' => 'group']), null, 500);
         }
     }
 
@@ -188,7 +188,7 @@ class AdminGroupsController extends BaseApiController
                 ], $mostActive),
             ]);
         } catch (\Exception $e) {
-            return $this->respondWithError('GROUPS_ANALYTICS_ERROR', 'Failed to load group analytics', null, 500);
+            return $this->respondWithError('GROUPS_ANALYTICS_ERROR', __('api.fetch_failed', ['resource' => 'group analytics']), null, 500);
         }
     }
 
@@ -229,7 +229,7 @@ class AdminGroupsController extends BaseApiController
 
             return $this->respondWithData($formatted);
         } catch (\Exception $e) {
-            return $this->respondWithError('GROUPS_APPROVALS_ERROR', 'Failed to load group approvals', null, 500);
+            return $this->respondWithError('GROUPS_APPROVALS_ERROR', __('api.fetch_failed', ['resource' => 'group approvals']), null, 500);
         }
     }
 
@@ -248,7 +248,7 @@ class AdminGroupsController extends BaseApiController
             );
 
             if (!$membership) {
-                return $this->respondWithError('NOT_FOUND', 'Pending membership request not found', null, 404);
+                return $this->respondWithError('NOT_FOUND', __('api.pending_request_not_found'), null, 404);
             }
 
             DB::update(
@@ -279,7 +279,7 @@ class AdminGroupsController extends BaseApiController
 
             return $this->respondWithData(['id' => (int) $id, 'status' => 'approved']);
         } catch (\Exception $e) {
-            return $this->respondWithError('GROUPS_APPROVE_ERROR', 'Failed to approve membership', null, 500);
+            return $this->respondWithError('GROUPS_APPROVE_ERROR', __('api.approve_failed', ['resource' => 'membership']), null, 500);
         }
     }
 
@@ -298,7 +298,7 @@ class AdminGroupsController extends BaseApiController
             );
 
             if (!$membership) {
-                return $this->respondWithError('NOT_FOUND', 'Pending membership request not found', null, 404);
+                return $this->respondWithError('NOT_FOUND', __('api.pending_request_not_found'), null, 404);
             }
 
             DB::update(
@@ -329,7 +329,7 @@ class AdminGroupsController extends BaseApiController
 
             return $this->respondWithData(['id' => (int) $id, 'status' => 'rejected']);
         } catch (\Exception $e) {
-            return $this->respondWithError('GROUPS_REJECT_ERROR', 'Failed to reject membership', null, 500);
+            return $this->respondWithError('GROUPS_REJECT_ERROR', __('api.reject_failed', ['resource' => 'membership']), null, 500);
         }
     }
 
@@ -345,7 +345,7 @@ class AdminGroupsController extends BaseApiController
         );
 
         if (!$group) {
-            return $this->respondWithError('NOT_FOUND', 'Group not found', null, 404);
+            return $this->respondWithError('NOT_FOUND', __('api.group_not_found'), null, 404);
         }
 
         DB::update("UPDATE `groups` SET is_active = 1 WHERE id = ? AND tenant_id = ?", [$id, $tenantId]);
@@ -418,7 +418,7 @@ class AdminGroupsController extends BaseApiController
 
             return $this->respondWithData($formatted);
         } catch (\Exception $e) {
-            return $this->respondWithError('GROUPS_MODERATION_ERROR', 'Failed to load moderation data', null, 500);
+            return $this->respondWithError('GROUPS_MODERATION_ERROR', __('api.fetch_failed', ['resource' => 'moderation data']), null, 500);
         }
     }
 
@@ -434,12 +434,12 @@ class AdminGroupsController extends BaseApiController
         $newStatus = $this->input('status');
 
         if (!in_array($newStatus, ['active', 'inactive'])) {
-            return $this->respondWithError('VALIDATION_ERROR', 'Status must be "active" or "inactive"', 'status', 422);
+            return $this->respondWithError('VALIDATION_ERROR', __('api.status_must_be_active_or_inactive'), 'status', 422);
         }
 
         $group = DB::selectOne("SELECT id, name, tenant_id FROM `groups` WHERE id = ? AND tenant_id = ?", [(int) $id, $tenantId]);
         if (!$group) {
-            return $this->respondWithError('NOT_FOUND', 'Group not found', null, 404);
+            return $this->respondWithError('NOT_FOUND', __('api.group_not_found'), null, 404);
         }
 
         $isActive = $newStatus === 'active' ? 1 : 0;
@@ -458,7 +458,7 @@ class AdminGroupsController extends BaseApiController
 
         $group = DB::selectOne("SELECT id, name, tenant_id FROM `groups` WHERE id = ? AND tenant_id = ?", [(int) $id, $tenantId]);
         if (!$group) {
-            return $this->respondWithError('NOT_FOUND', 'Group not found', null, 404);
+            return $this->respondWithError('NOT_FOUND', __('api.group_not_found'), null, 404);
         }
 
         $updates = [];
@@ -471,7 +471,7 @@ class AdminGroupsController extends BaseApiController
         }
 
         if (empty($updates)) {
-            return $this->respondWithError('VALIDATION_ERROR', 'No fields to update', null, 422);
+            return $this->respondWithError('VALIDATION_ERROR', __('api.no_fields_to_update'), null, 422);
         }
 
         $updates[] = 'updated_at = NOW()';
@@ -498,7 +498,7 @@ class AdminGroupsController extends BaseApiController
 
         $group = DB::selectOne("SELECT id, name, tenant_id FROM `groups` WHERE id = ? AND tenant_id = ?", [(int) $id, $tenantId]);
         if (!$group) {
-            return $this->respondWithError('NOT_FOUND', 'Group not found', null, 404);
+            return $this->respondWithError('NOT_FOUND', __('api.group_not_found'), null, 404);
         }
 
         DB::delete("DELETE FROM group_members WHERE group_id = ? AND tenant_id = ?", [(int) $id, $tenantId]);
@@ -551,7 +551,7 @@ class AdminGroupsController extends BaseApiController
 
             return $this->respondWithData($formatted);
         } catch (\Throwable $e) {
-            return $this->respondWithError('GROUP_TYPES_ERROR', 'Failed to load group types', null, 500);
+            return $this->respondWithError('GROUP_TYPES_ERROR', __('api.fetch_failed', ['resource' => 'group types']), null, 500);
         }
     }
 
@@ -563,7 +563,7 @@ class AdminGroupsController extends BaseApiController
         $name = trim($this->input('name', ''));
 
         if (empty($name)) {
-            return $this->respondWithError('VALIDATION_ERROR', 'Name is required', 'name', 422);
+            return $this->respondWithError('VALIDATION_ERROR', __('api.name_required'), 'name', 422);
         }
 
         try {
@@ -576,7 +576,7 @@ class AdminGroupsController extends BaseApiController
             ActivityLog::log($adminId, 'admin_create_group_type', "Created group type: {$name}");
             return $this->respondWithData(['id' => $id, 'name' => $name]);
         } catch (\Throwable $e) {
-            return $this->respondWithError('GROUP_TYPE_CREATE_ERROR', 'Failed to create group type', null, 500);
+            return $this->respondWithError('GROUP_TYPE_CREATE_ERROR', __('api.create_failed', ['resource' => 'group type']), null, 500);
         }
     }
 
@@ -590,7 +590,7 @@ class AdminGroupsController extends BaseApiController
         try {
             $existing = DB::selectOne("SELECT id, name, tenant_id FROM group_types WHERE id = ? AND tenant_id = ?", [$id, $tenantId]);
             if (!$existing) {
-                return $this->respondWithError('NOT_FOUND', 'Group type not found', null, 404);
+                return $this->respondWithError('NOT_FOUND', __('api.not_found', ['model' => 'Group type']), null, 404);
             }
 
             $name = trim($this->input('name', $existing->name));
@@ -601,7 +601,7 @@ class AdminGroupsController extends BaseApiController
             ActivityLog::log($adminId, 'admin_update_group_type', "Updated group type #{$id}: {$name}");
             return $this->respondWithData(['id' => $id, 'name' => $name]);
         } catch (\Throwable $e) {
-            return $this->respondWithError('GROUP_TYPE_UPDATE_ERROR', 'Failed to update group type', null, 500);
+            return $this->respondWithError('GROUP_TYPE_UPDATE_ERROR', __('api.update_failed', ['resource' => 'group type']), null, 500);
         }
     }
 
@@ -615,19 +615,19 @@ class AdminGroupsController extends BaseApiController
         try {
             $type = DB::selectOne("SELECT id, name FROM group_types WHERE id = ? AND tenant_id = ?", [$id, $tenantId]);
             if (!$type) {
-                return $this->respondWithError('NOT_FOUND', 'Group type not found', null, 404);
+                return $this->respondWithError('NOT_FOUND', __('api.not_found', ['model' => 'Group type']), null, 404);
             }
 
             $count = (int) (DB::selectOne("SELECT COUNT(*) as cnt FROM `groups` WHERE type_id = ? AND tenant_id = ?", [$id, $tenantId])->cnt ?? 0);
             if ($count > 0) {
-                return $this->respondWithError('GROUP_TYPE_IN_USE', "Cannot delete group type: {$count} groups are using it", null, 422);
+                return $this->respondWithError('GROUP_TYPE_IN_USE', __('api.group_type_in_use', ['count' => $count]), null, 422);
             }
 
             DB::delete("DELETE FROM group_types WHERE id = ? AND tenant_id = ?", [$id, $tenantId]);
             ActivityLog::log($adminId, 'admin_delete_group_type', "Deleted group type #{$id}: {$type->name}");
             return $this->respondWithData(['deleted' => true, 'id' => $id]);
         } catch (\Throwable $e) {
-            return $this->respondWithError('GROUP_TYPE_DELETE_ERROR', 'Failed to delete group type', null, 500);
+            return $this->respondWithError('GROUP_TYPE_DELETE_ERROR', __('api.delete_failed', ['resource' => 'group type']), null, 500);
         }
     }
 
@@ -658,7 +658,7 @@ class AdminGroupsController extends BaseApiController
             }
             return $this->respondWithData($formatted);
         } catch (\Throwable $e) {
-            return $this->respondWithError('POLICIES_ERROR', 'Failed to load policies', null, 500);
+            return $this->respondWithError('POLICIES_ERROR', __('api.fetch_failed', ['resource' => 'policies']), null, 500);
         }
     }
 
@@ -672,7 +672,7 @@ class AdminGroupsController extends BaseApiController
         $value = $this->input('value');
 
         if (empty($key)) {
-            return $this->respondWithError('VALIDATION_ERROR', 'Policy key is required', 'key', 422);
+            return $this->respondWithError('VALIDATION_ERROR', __('api.policy_key_required'), 'key', 422);
         }
 
         try {
@@ -682,7 +682,7 @@ class AdminGroupsController extends BaseApiController
             ActivityLog::log($adminId, 'admin_set_group_policy', "Set policy {$key} = " . json_encode($value));
             return $this->respondWithData(['key' => $key, 'value' => $value]);
         } catch (\Throwable $e) {
-            return $this->respondWithError('POLICY_SET_ERROR', 'Failed to set policy', null, 500);
+            return $this->respondWithError('POLICY_SET_ERROR', __('api.update_failed', ['resource' => 'policy']), null, 500);
         }
     }
 
@@ -734,7 +734,7 @@ class AdminGroupsController extends BaseApiController
 
             return $this->respondWithData($formatted);
         } catch (\Exception $e) {
-            return $this->respondWithError('GROUP_MEMBERS_ERROR', 'Failed to load members', null, 500);
+            return $this->respondWithError('GROUP_MEMBERS_ERROR', __('api.fetch_failed', ['resource' => 'members']), null, 500);
         }
     }
 
@@ -753,7 +753,7 @@ class AdminGroupsController extends BaseApiController
             );
 
             if (!$member) {
-                return $this->respondWithError('NOT_FOUND', 'Member not found', null, 404);
+                return $this->respondWithError('NOT_FOUND', __('api.member_not_found'), null, 404);
             }
 
             $newRole = $member->role === 'member' ? 'admin' : 'owner';
@@ -765,7 +765,7 @@ class AdminGroupsController extends BaseApiController
 
             return $this->respondWithData(['role' => $newRole]);
         } catch (\Exception $e) {
-            return $this->respondWithError('PROMOTE_ERROR', 'Failed to promote member', null, 500);
+            return $this->respondWithError('PROMOTE_ERROR', __('api.update_failed', ['resource' => 'member promotion']), null, 500);
         }
     }
 
@@ -784,7 +784,7 @@ class AdminGroupsController extends BaseApiController
             );
 
             if (!$member) {
-                return $this->respondWithError('NOT_FOUND', 'Member not found', null, 404);
+                return $this->respondWithError('NOT_FOUND', __('api.member_not_found'), null, 404);
             }
 
             $newRole = $member->role === 'owner' ? 'admin' : 'member';
@@ -796,7 +796,7 @@ class AdminGroupsController extends BaseApiController
 
             return $this->respondWithData(['role' => $newRole]);
         } catch (\Exception $e) {
-            return $this->respondWithError('DEMOTE_ERROR', 'Failed to demote member', null, 500);
+            return $this->respondWithError('DEMOTE_ERROR', __('api.update_failed', ['resource' => 'member demotion']), null, 500);
         }
     }
 
@@ -815,7 +815,7 @@ class AdminGroupsController extends BaseApiController
             );
 
             if (!$member) {
-                return $this->respondWithError('NOT_FOUND', 'Member not found', null, 404);
+                return $this->respondWithError('NOT_FOUND', __('api.member_not_found'), null, 404);
             }
 
             DB::delete(
@@ -846,7 +846,7 @@ class AdminGroupsController extends BaseApiController
 
             return $this->respondWithData(['kicked' => true]);
         } catch (\Exception $e) {
-            return $this->respondWithError('KICK_ERROR', 'Failed to kick member', null, 500);
+            return $this->respondWithError('KICK_ERROR', __('api.delete_failed', ['resource' => 'member']), null, 500);
         }
     }
 
@@ -864,22 +864,22 @@ class AdminGroupsController extends BaseApiController
         try {
             $group = DB::selectOne("SELECT id, name, location, tenant_id FROM `groups` WHERE id = ? AND tenant_id = ?", [$id, $tenantId]);
             if (!$group) {
-                return $this->respondWithError('NOT_FOUND', 'Group not found', null, 404);
+                return $this->respondWithError('NOT_FOUND', __('api.group_not_found'), null, 404);
             }
             if (empty($group->location)) {
-                return $this->respondWithError('VALIDATION_ERROR', 'Group has no location to geocode', null, 422);
+                return $this->respondWithError('VALIDATION_ERROR', __('api.group_no_location'), null, 422);
             }
 
             $coords = $this->geocodingService->geocode($group->location);
             if (!$coords) {
-                return $this->respondWithError('GEOCODING_FAILED', 'Failed to geocode location', null, 500);
+                return $this->respondWithError('GEOCODING_FAILED', __('api.geocoding_failed'), null, 500);
             }
 
             DB::update("UPDATE `groups` SET latitude = ?, longitude = ? WHERE id = ? AND tenant_id = ?", [$coords['latitude'], $coords['longitude'], $id, $tenantId]);
             ActivityLog::log($adminId, 'admin_geocode_group', "Geocoded group #{$id}: {$group->name}");
             return $this->respondWithData(['latitude' => $coords['latitude'], 'longitude' => $coords['longitude']]);
         } catch (\Throwable $e) {
-            return $this->respondWithError('GEOCODE_ERROR', 'Failed to geocode group', null, 500);
+            return $this->respondWithError('GEOCODE_ERROR', __('api.update_failed', ['resource' => 'group geocode']), null, 500);
         }
     }
 
@@ -912,7 +912,7 @@ class AdminGroupsController extends BaseApiController
             ActivityLog::log($adminId, 'admin_batch_geocode_groups', "Batch geocoded {$success} groups, {$failed} failed");
             return $this->respondWithData(['processed' => count($groups), 'success' => $success, 'failed' => $failed]);
         } catch (\Throwable $e) {
-            return $this->respondWithError('BATCH_GEOCODE_ERROR', 'Failed to batch geocode', null, 500);
+            return $this->respondWithError('BATCH_GEOCODE_ERROR', __('api.update_failed', ['resource' => 'batch geocode']), null, 500);
         }
     }
 
@@ -972,7 +972,7 @@ class AdminGroupsController extends BaseApiController
                 'stats' => ['total' => (int) $stats['total'], 'avg_score' => round((float) ($stats['avg_score'] ?? 0), 2), 'join_rate' => $joinRate],
             ]);
         } catch (\Throwable $e) {
-            return $this->respondWithError('RECOMMENDATIONS_ERROR', 'Failed to load recommendations', null, 500);
+            return $this->respondWithError('RECOMMENDATIONS_ERROR', __('api.fetch_failed', ['resource' => 'recommendations']), null, 500);
         }
     }
 
@@ -986,7 +986,7 @@ class AdminGroupsController extends BaseApiController
             $groups = $this->smartGroupRankingService->getFeaturedGroupsWithScores('local_hubs', $tenantId);
             return $this->respondWithData($groups);
         } catch (\Throwable $e) {
-            return $this->respondWithError('FEATURED_GROUPS_ERROR', 'Failed to load featured groups', null, 500);
+            return $this->respondWithError('FEATURED_GROUPS_ERROR', __('api.fetch_failed', ['resource' => 'featured groups']), null, 500);
         }
     }
 
@@ -1001,7 +1001,7 @@ class AdminGroupsController extends BaseApiController
             ActivityLog::log($adminId, 'admin_update_featured_groups', "Updated featured groups: {$result['featured']} groups featured, {$result['cleared']} cleared");
             return $this->respondWithData($result);
         } catch (\Throwable $e) {
-            return $this->respondWithError('UPDATE_FEATURED_ERROR', 'Failed to update featured groups', null, 500);
+            return $this->respondWithError('UPDATE_FEATURED_ERROR', __('api.update_failed', ['resource' => 'featured groups']), null, 500);
         }
     }
 
@@ -1014,7 +1014,7 @@ class AdminGroupsController extends BaseApiController
         try {
             $group = DB::selectOne("SELECT id, name, is_featured, tenant_id FROM `groups` WHERE id = ? AND tenant_id = ?", [(int) $id, $tenantId]);
             if (!$group) {
-                return $this->respondWithError('NOT_FOUND', 'Group not found', null, 404);
+                return $this->respondWithError('NOT_FOUND', __('api.group_not_found'), null, 404);
             }
 
             $newStatus = $group->is_featured ? 0 : 1;
@@ -1023,7 +1023,7 @@ class AdminGroupsController extends BaseApiController
 
             return $this->respondWithData(['is_featured' => (bool) $newStatus]);
         } catch (\Exception $e) {
-            return $this->respondWithError('TOGGLE_FEATURED_ERROR', 'Failed to toggle featured status', null, 500);
+            return $this->respondWithError('TOGGLE_FEATURED_ERROR', __('api.update_failed', ['resource' => 'featured status']), null, 500);
         }
     }
 
@@ -1041,7 +1041,7 @@ class AdminGroupsController extends BaseApiController
         try {
             $group = DB::selectOne("SELECT id, name FROM `groups` WHERE id = ? AND tenant_id = ?", [$id, $tenantId]);
             if (!$group) {
-                return $this->respondWithError('NOT_FOUND', 'Group not found', null, 404);
+                return $this->respondWithError('NOT_FOUND', __('api.group_not_found'), null, 404);
             }
 
             $memberCount = (int) (DB::selectOne("SELECT COUNT(*) as cnt FROM group_members WHERE group_id = ? AND tenant_id = ?", [$id, $tenantId])->cnt ?? 0);
@@ -1058,7 +1058,7 @@ class AdminGroupsController extends BaseApiController
                 'events_count' => $eventsCount,
             ]);
         } catch (\Throwable $e) {
-            return $this->respondWithError('ANALYTICS_ERROR', 'Failed to load group analytics', null, 500);
+            return $this->respondWithError('ANALYTICS_ERROR', __('api.fetch_failed', ['resource' => 'group analytics']), null, 500);
         }
     }
 }

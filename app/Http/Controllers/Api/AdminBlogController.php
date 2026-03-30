@@ -112,7 +112,7 @@ class AdminBlogController extends BaseApiController
         );
 
         if (!$post) {
-            return $this->respondWithError('RESOURCE_NOT_FOUND', 'Blog post not found', null, 404);
+            return $this->respondWithError('RESOURCE_NOT_FOUND', __('api.blog_post_not_found'), null, 404);
         }
 
         // Fetch SEO metadata
@@ -152,7 +152,7 @@ class AdminBlogController extends BaseApiController
         $title = trim($this->input('title', ''));
 
         if (empty($title)) {
-            return $this->respondWithError('VALIDATION_REQUIRED_FIELD', 'Title is required', 'title', 400);
+            return $this->respondWithError('VALIDATION_REQUIRED_FIELD', __('api.title_required'), 'title', 400);
         }
 
         // Auto-generate slug from title
@@ -241,7 +241,7 @@ class AdminBlogController extends BaseApiController
         );
 
         if (!$post) {
-            return $this->respondWithError('RESOURCE_NOT_FOUND', 'Blog post not found', null, 404);
+            return $this->respondWithError('RESOURCE_NOT_FOUND', __('api.blog_post_not_found'), null, 404);
         }
 
         $data = $this->getAllInput();
@@ -307,7 +307,7 @@ class AdminBlogController extends BaseApiController
         }
 
         if (empty($updates)) {
-            return $this->respondWithError('VALIDATION_NO_FIELDS', 'No fields provided to update', null, 400);
+            return $this->respondWithError('VALIDATION_NO_FIELDS', __('api.no_fields_provided'), null, 400);
         }
 
         $updates['updated_at'] = now();
@@ -351,7 +351,7 @@ class AdminBlogController extends BaseApiController
         );
 
         if (!$post) {
-            return $this->respondWithError('RESOURCE_NOT_FOUND', 'Blog post not found', null, 404);
+            return $this->respondWithError('RESOURCE_NOT_FOUND', __('api.blog_post_not_found'), null, 404);
         }
 
         DB::delete("DELETE FROM posts WHERE id = ? AND tenant_id = ?", [$id, $tenantId]);
@@ -375,7 +375,7 @@ class AdminBlogController extends BaseApiController
         );
 
         if (!$post) {
-            return $this->respondWithError('RESOURCE_NOT_FOUND', 'Blog post not found', null, 404);
+            return $this->respondWithError('RESOURCE_NOT_FOUND', __('api.blog_post_not_found'), null, 404);
         }
 
         $newStatus = $post->status === 'published' ? 'draft' : 'published';

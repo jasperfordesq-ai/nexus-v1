@@ -21,6 +21,7 @@ import {
   Spinner,
 } from '@heroui/react';
 import { Save, ArrowLeft } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { usePageTitle } from '@/hooks';
 import { useTenant, useToast } from '@/contexts';
 import { adminLegalDocs } from '../../api/adminApi';
@@ -42,6 +43,7 @@ const STATUS_OPTIONS = [
 ];
 
 export function LegalDocForm() {
+  const { t } = useTranslation('admin');
   const { id } = useParams();
   const isEdit = !!id;
   usePageTitle(`Admin - ${isEdit ? 'Edit' : 'Create'} Legal Document`);
@@ -156,16 +158,16 @@ export function LegalDocForm() {
           <CardBody className="p-4 space-y-4">
             <h3 className="text-lg font-semibold">Document Details</h3>
             <Input
-              label="Title"
+              label={t('enterprise.label_title')}
               value={title}
               onValueChange={setTitle}
               variant="bordered"
               isRequired
-              placeholder="e.g. Terms of Service"
+              placeholder={t('enterprise.placeholder_title')}
             />
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
               <Select
-                label="Type"
+                label={t('enterprise.label_type')}
                 selectedKeys={new Set([type])}
                 onSelectionChange={(keys) => {
                   const selected = Array.from(keys)[0] as string;
@@ -173,19 +175,19 @@ export function LegalDocForm() {
                 }}
                 variant="bordered"
               >
-                {DOC_TYPES.map((t) => (
-                  <SelectItem key={t.value}>{t.label}</SelectItem>
+                {DOC_TYPES.map((dt) => (
+                  <SelectItem key={dt.value}>{dt.label}</SelectItem>
                 ))}
               </Select>
               <Input
-                label="Version"
+                label={t('enterprise.label_version')}
                 value={version}
                 onValueChange={setVersion}
                 variant="bordered"
                 placeholder="1.0"
               />
               <Select
-                label="Status"
+                label={t('enterprise.label_status')}
                 selectedKeys={new Set([status])}
                 onSelectionChange={(keys) => {
                   const selected = Array.from(keys)[0] as string;
@@ -206,12 +208,12 @@ export function LegalDocForm() {
           <CardBody className="p-4">
             <h3 className="text-lg font-semibold mb-3">Content</h3>
             <Textarea
-              label="Document Content"
+              label={t('enterprise.label_document_content')}
               value={content}
               onValueChange={setContent}
               variant="bordered"
               minRows={12}
-              placeholder="Enter the legal document content here..."
+              placeholder={t('enterprise.placeholder_document_content')}
             />
           </CardBody>
         </Card>

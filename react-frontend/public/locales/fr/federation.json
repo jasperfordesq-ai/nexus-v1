@@ -415,14 +415,56 @@
   "messages.aria_send_reply": "Send reply",
   "partner_detail.federation_partner_badge": "Federation Partner",
   "hub": {},
-  "messages": {},
-  "onboarding": {},
+  "messages": {
+    "aria_back_to_list": "Back to message list",
+    "aria_read": "Read",
+    "aria_delivered": "Delivered",
+    "aria_reply": "Reply message",
+    "aria_send_reply": "Send reply"
+  },
+  "onboarding": {
+    "reach_label_remote_ok": "Remote OK"
+  },
   "listings": {},
-  "members": {},
+  "members": {
+    "reach_remote_ok": "Remote OK",
+    "aria_search": "Search federated members",
+    "aria_filter_community": "Filter by partner community",
+    "aria_filter_skills": "Filter by skills"
+  },
   "events": {},
   "partners": {},
-  "partner_detail": {},
+  "partner_detail": {
+    "federation_partner_badge": "Federation Partner"
+  },
   "member_profile": {},
   "settings": {},
-  "connections": {}
+  "connections": {
+    "page_title": "Connections",
+    "breadcrumb_federation": "Federation",
+    "breadcrumb_connections": "Connections",
+    "title": "Federation Connections",
+    "subtitle": "Manage your cross-community connections",
+    "tab_connected": "Connected",
+    "tab_received": "Received",
+    "tab_sent": "Sent",
+    "loading": "Loading connections...",
+    "empty_connected": "No connections yet",
+    "empty_received": "No pending requests",
+    "empty_sent": "No sent requests",
+    "empty_connected_desc": "Connect with members from partner communities to grow your network.",
+    "empty_received_desc": "When someone sends you a connection request, it will appear here.",
+    "empty_sent_desc": "Connection requests you send will appear here.",
+    "browse_members": "Browse Federation Members",
+    "unknown_member": "Federation Member",
+    "message": "Message",
+    "remove": "Remove connection",
+    "accept": "Accept",
+    "decline": "Decline",
+    "pending": "Pending",
+    "accepted_success": "Connection accepted!",
+    "rejected_success": "Connection request declined",
+    "removed_success": "Connection removed",
+    "action_failed": "Action failed"
+  }
 }
