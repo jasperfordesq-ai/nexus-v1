@@ -27,7 +27,7 @@ class VolunteerExpenseController extends BaseApiController
     {
         if (!TenantContext::hasFeature('volunteering')) {
             throw new \Illuminate\Http\Exceptions\HttpResponseException(
-                $this->respondWithError('FEATURE_DISABLED', 'Volunteering module is not enabled for this community', null, 403)
+                $this->respondWithError('FEATURE_DISABLED', __('api.volunteering_feature_disabled'), null, 403)
             );
         }
     }
@@ -92,7 +92,7 @@ class VolunteerExpenseController extends BaseApiController
 
         $expense = $this->volunteerExpenseService->getExpense((int) $id);
         if (!$expense || (int) $expense['user_id'] !== $userId) {
-            return $this->respondWithError('NOT_FOUND', 'Expense not found', null, 404);
+            return $this->respondWithError('NOT_FOUND', __('api.expense_not_found'), null, 404);
         }
 
         return $this->respondWithData($expense);
@@ -143,7 +143,7 @@ class VolunteerExpenseController extends BaseApiController
         }
 
         if (!$result) {
-            return $this->respondWithError('NOT_FOUND', 'Expense not found or invalid status', null, 404);
+            return $this->respondWithError('NOT_FOUND', __('api.expense_not_found_or_invalid'), null, 404);
         }
 
         return $this->respondWithData(['success' => true]);
@@ -193,7 +193,7 @@ class VolunteerExpenseController extends BaseApiController
         $data = $this->getAllInput();
 
         if (empty($data['expense_type'])) {
-            return $this->respondWithError('VALIDATION_ERROR', 'expense_type is required', 'expense_type', 422);
+            return $this->respondWithError('VALIDATION_ERROR', __('api.missing_required_field', ['field' => 'expense_type']), 'expense_type', 422);
         }
 
         $policyFields = ['max_amount', 'requires_receipt', 'auto_approve_below', 'description', 'enabled'];
@@ -205,7 +205,7 @@ class VolunteerExpenseController extends BaseApiController
             }
         }
         if (!$hasPolicyField) {
-            return $this->respondWithError('VALIDATION_ERROR', 'At least one policy field is required (e.g., max_amount, requires_receipt, auto_approve_below, description, enabled)', null, 422);
+            return $this->respondWithError('VALIDATION_ERROR', __('api.at_least_one_policy_field_required'), null, 422);
         }
 
         $result = $this->volunteerExpenseService->updatePolicy((int)($data['id'] ?? 0), $data, TenantContext::getId());

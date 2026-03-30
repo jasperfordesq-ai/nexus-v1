@@ -46,7 +46,7 @@ class MemberVerificationBadgeController extends BaseApiController
             ->exists();
 
         if (!$userExists) {
-            return $this->respondWithError('RESOURCE_NOT_FOUND', 'User not found', null, 404);
+            return $this->respondWithError('RESOURCE_NOT_FOUND', __('api.user_not_found'), null, 404);
         }
 
         $badges = $this->memberVerificationBadgeService->getUserBadges($id);
@@ -77,7 +77,7 @@ class MemberVerificationBadgeController extends BaseApiController
         $expiresAt = $data['expires_at'] ?? null;
 
         if (empty($badgeType)) {
-            return $this->respondWithError('VALIDATION_ERROR', 'badge_type is required', 'badge_type', 400);
+            return $this->respondWithError('VALIDATION_ERROR', __('api.missing_required_field', ['field' => 'badge_type']), 'badge_type', 400);
         }
 
         $badgeId = $this->memberVerificationBadgeService->grantBadge($id, $badgeType, $adminId, $note, $expiresAt);

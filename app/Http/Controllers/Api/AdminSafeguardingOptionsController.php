@@ -48,11 +48,11 @@ class AdminSafeguardingOptionsController extends BaseApiController
         $label = trim($this->input('label', ''));
 
         if (empty($optionKey)) {
-            return $this->respondWithError('VALIDATION_ERROR', 'option_key is required', 'option_key', 422);
+            return $this->respondWithError('VALIDATION_ERROR', __('api.option_key_required'), 'option_key', 422);
         }
 
         if (empty($label)) {
-            return $this->respondWithError('VALIDATION_ERROR', 'label is required', 'label', 422);
+            return $this->respondWithError('VALIDATION_ERROR', __('api.label_is_required'), 'label', 422);
         }
 
         // Sanitize option_key: lowercase, alphanumeric + underscores only
@@ -74,30 +74,30 @@ class AdminSafeguardingOptionsController extends BaseApiController
         // Validate option_type
         $allowedTypes = ['checkbox', 'info', 'select'];
         if (!in_array($data['option_type'], $allowedTypes, true)) {
-            return $this->respondWithError('VALIDATION_ERROR', 'option_type must be one of: checkbox, info, select', 'option_type', 422);
+            return $this->respondWithError('VALIDATION_ERROR', __('api.safeguarding_invalid_option_type'), 'option_type', 422);
         }
 
         // Validate triggers
         if (!empty($data['triggers']) && !is_array($data['triggers'])) {
-            return $this->respondWithError('VALIDATION_ERROR', 'triggers must be a JSON object', 'triggers', 422);
+            return $this->respondWithError('VALIDATION_ERROR', __('api.safeguarding_triggers_json_required'), 'triggers', 422);
         }
 
         // Validate select_options structure when option_type is 'select'
         if ($data['option_type'] === 'select') {
             $selectOptions = $data['select_options'];
             if (!is_array($selectOptions) || empty($selectOptions)) {
-                return $this->respondWithError('VALIDATION_ERROR', 'select_options must be a non-empty array for select type', 'select_options', 422);
+                return $this->respondWithError('VALIDATION_ERROR', __('api.safeguarding_select_options_required'), 'select_options', 422);
             }
             foreach ($selectOptions as $idx => $opt) {
                 if (!is_array($opt) || !isset($opt['value']) || !isset($opt['label'])) {
-                    return $this->respondWithError('VALIDATION_ERROR', "select_options[{$idx}] must have 'value' and 'label' keys", 'select_options', 422);
+                    return $this->respondWithError('VALIDATION_ERROR', __('api.safeguarding_select_option_invalid', ['idx' => $idx]), 'select_options', 422);
                 }
             }
         }
 
         $existingCount = \App\Models\TenantSafeguardingOption::where('tenant_id', $tenantId)->count();
         if ($existingCount >= 50) {
-            return $this->respondWithError('LIMIT_EXCEEDED', 'Maximum 50 safeguarding options per tenant', null, 422);
+            return $this->respondWithError('LIMIT_EXCEEDED', __('api.safeguarding_max_50_options'), null, 422);
         }
 
         try {
@@ -105,7 +105,7 @@ class AdminSafeguardingOptionsController extends BaseApiController
             return $this->respondWithData($option->toArray(), 201);
         } catch (\Illuminate\Database\QueryException $e) {
             if (str_contains($e->getMessage(), 'Duplicate entry')) {
-                return $this->respondWithError('DUPLICATE', "An option with key '{$optionKey}' already exists", 'option_key', 409);
+                return $this->respondWithError('DUPLICATE', __('api.safeguarding_duplicate_option_key', ['key' => $optionKey]), 'option_key', 409);
             }
             throw $e;
         }
@@ -120,13 +120,13 @@ class AdminSafeguardingOptionsController extends BaseApiController
         unset($data['id'], $data['tenant_id'], $data['option_key']); // Immutable fields
 
         if (empty($data)) {
-            return $this->respondWithError('VALIDATION_ERROR', 'No updateable fields provided', null, 422);
+            return $this->respondWithError('VALIDATION_ERROR', __('api.no_updateable_fields'), null, 422);
         }
 
         $success = SafeguardingPreferenceService::updateOption($id, $data);
 
         if (!$success) {
-            return $this->respondWithError('NOT_FOUND', 'Option not found', null, 404);
+            return $this->respondWithError('NOT_FOUND', __('api.safeguarding_option_not_found'), null, 404);
         }
 
         return $this->respondWithData(['message' => 'Option updated']);
@@ -140,7 +140,7 @@ class AdminSafeguardingOptionsController extends BaseApiController
         $success = SafeguardingPreferenceService::deleteOption($id);
 
         if (!$success) {
-            return $this->respondWithError('NOT_FOUND', 'Option not found', null, 404);
+            return $this->respondWithError('NOT_FOUND', __('api.safeguarding_option_not_found'), null, 404);
         }
 
         return $this->respondWithData(['message' => 'Option deactivated']);
@@ -154,7 +154,7 @@ class AdminSafeguardingOptionsController extends BaseApiController
 
         $order = $this->input('order', []);
         if (empty($order) || !is_array($order)) {
-            return $this->respondWithError('VALIDATION_ERROR', 'order must be a non-empty object of {id: sort_order}', 'order', 422);
+            return $this->respondWithError('VALIDATION_ERROR', __('api.safeguarding_order_required'), 'order', 422);
         }
 
         // Validate all option IDs belong to current tenant
@@ -164,7 +164,7 @@ class AdminSafeguardingOptionsController extends BaseApiController
             ->count();
 
         if ($validCount !== count($submittedIds)) {
-            return $this->respondWithError('VALIDATION_ERROR', 'One or more option IDs are invalid', 'order', 422);
+            return $this->respondWithError('VALIDATION_ERROR', __('api.safeguarding_invalid_option_ids'), 'order', 422);
         }
 
         SafeguardingPreferenceService::reorderOptions($tenantId, $order);

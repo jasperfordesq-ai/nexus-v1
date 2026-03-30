@@ -12,6 +12,7 @@ import { createContext, useContext, useState, useCallback, useMemo, useRef, forw
 import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from '@heroui/react';
 import { X, CheckCircle, AlertCircle, AlertTriangle, Info } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Types
@@ -139,11 +140,12 @@ interface ToastContainerProps {
 }
 
 function ToastContainer({ toasts, onRemove }: ToastContainerProps) {
+  const { t } = useTranslation('common');
   return (
     <div
       className="fixed bottom-4 right-4 z-[9999] flex flex-col gap-2 max-w-sm w-full pointer-events-none"
       role="region"
-      aria-label="Notifications"
+      aria-label={t('toast.aria_notifications')}
       aria-live="polite"
       aria-atomic="false"
     >
@@ -166,6 +168,7 @@ interface ToastItemProps {
 }
 
 const ToastItem = forwardRef<HTMLDivElement, ToastItemProps>(function ToastItem({ toast, onRemove }, ref) {
+  const { t } = useTranslation('common');
   const config = {
     success: {
       icon: CheckCircle,
@@ -222,7 +225,7 @@ const ToastItem = forwardRef<HTMLDivElement, ToastItemProps>(function ToastItem(
           isIconOnly
           onPress={() => onRemove(toast.id)}
           className="text-white/40 hover:text-white transition-colors flex-shrink-0 min-w-0 h-auto p-0"
-          aria-label="Dismiss notification"
+          aria-label={t('toast.aria_dismiss_notification')}
         >
           <X className="w-4 h-4" />
         </Button>

@@ -101,7 +101,7 @@ class ReviewsController extends BaseApiController
         $review = $this->reviewService->getById($id);
 
         if ($review === null) {
-            return $this->respondWithError('NOT_FOUND', 'Review not found', null, 404);
+            return $this->respondWithError('NOT_FOUND', __('api.review_not_found'), null, 404);
         }
 
         return $this->respondWithData($review);
@@ -224,11 +224,11 @@ class ReviewsController extends BaseApiController
         $existing = $this->reviewService->getById($id);
 
         if ($existing === null) {
-            return $this->respondWithError('NOT_FOUND', 'Review not found', null, 404);
+            return $this->respondWithError('NOT_FOUND', __('api.review_not_found'), null, 404);
         }
 
         if ((int) ($existing['reviewer_id'] ?? 0) !== $userId) {
-            return $this->respondWithError('FORBIDDEN', 'You did not author this review', null, 403);
+            return $this->respondWithError('FORBIDDEN', __('api.not_review_author'), null, 403);
         }
 
         $this->reviewService->delete($id);

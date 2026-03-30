@@ -64,7 +64,7 @@ class AdminContentController extends BaseApiController
         );
 
         if ($affected === 0) {
-            return $this->respondWithError('NOT_FOUND', 'Report not found', null, 404);
+            return $this->respondWithError('NOT_FOUND', __('api.report_not_found'), null, 404);
         }
 
         return $this->respondWithData(['id' => $id, 'status' => 'approved']);
@@ -83,7 +83,7 @@ class AdminContentController extends BaseApiController
         );
 
         if ($affected === 0) {
-            return $this->respondWithError('NOT_FOUND', 'Report not found', null, 404);
+            return $this->respondWithError('NOT_FOUND', __('api.report_not_found'), null, 404);
         }
 
         return $this->respondWithData(['id' => $id, 'status' => 'rejected']);
@@ -120,7 +120,7 @@ class AdminContentController extends BaseApiController
         $id = (int) $id;
 
         if ($id < 1) {
-            return $this->respondWithError('VALIDATION_ERROR', 'Invalid page ID', 'id', 400);
+            return $this->respondWithError('VALIDATION_ERROR', __('api.invalid_page_id'), 'id', 400);
         }
 
         $result = DB::selectOne(
@@ -130,7 +130,7 @@ class AdminContentController extends BaseApiController
         );
 
         if (!$result) {
-            return $this->respondWithError('NOT_FOUND', 'Page not found', 'id', 404);
+            return $this->respondWithError('NOT_FOUND', __('api.page_not_found'), 'id', 404);
         }
 
         $row = (array)$result;
@@ -149,7 +149,7 @@ class AdminContentController extends BaseApiController
         $title = trim($input['title'] ?? '');
 
         if (empty($title)) {
-            return $this->respondWithError('VALIDATION_ERROR', 'Title is required', 'title', 422);
+            return $this->respondWithError('VALIDATION_ERROR', __('api.title_required'), 'title', 422);
         }
 
         $slug = $this->generateSlug($title);
@@ -162,11 +162,11 @@ class AdminContentController extends BaseApiController
         $menuOrder = (int)($input['menu_order'] ?? 0);
 
         if (!in_array($status, ['draft', 'published'], true)) {
-            return $this->respondWithError('VALIDATION_ERROR', 'Status must be draft or published', 'status', 422);
+            return $this->respondWithError('VALIDATION_ERROR', __('api.status_must_be_draft_or_published'), 'status', 422);
         }
 
         if ($this->isReservedPageSlug($slug)) {
-            return $this->respondWithError('VALIDATION_ERROR', "The slug \"{$slug}\" is reserved and cannot be used for a page.", 'slug', 422);
+            return $this->respondWithError('VALIDATION_ERROR', __('api.slug_reserved', ['slug' => $slug]), 'slug', 422);
         }
 
         $isPublished = ($status === 'published') ? 1 : 0;
@@ -201,12 +201,12 @@ class AdminContentController extends BaseApiController
         $id = (int) $id;
 
         if ($id < 1) {
-            return $this->respondWithError('VALIDATION_ERROR', 'Invalid page ID', 'id', 400);
+            return $this->respondWithError('VALIDATION_ERROR', __('api.invalid_page_id'), 'id', 400);
         }
 
         $existing = DB::selectOne("SELECT id FROM pages WHERE id = ? AND tenant_id = ?", [$id, $tenantId]);
         if (!$existing) {
-            return $this->respondWithError('NOT_FOUND', 'Page not found', 'id', 404);
+            return $this->respondWithError('NOT_FOUND', __('api.page_not_found'), 'id', 404);
         }
 
         $input = $this->getAllInput();
@@ -217,18 +217,18 @@ class AdminContentController extends BaseApiController
         if (isset($input['slug'])) {
             $slug = $this->generateSlug($input['slug']);
             if ($this->isReservedPageSlug($slug)) {
-                return $this->respondWithError('VALIDATION_ERROR', "The slug \"{$slug}\" is reserved.", 'slug', 422);
+                return $this->respondWithError('VALIDATION_ERROR', __('api.slug_reserved_short', ['slug' => $slug]), 'slug', 422);
             }
             $conflict = DB::selectOne("SELECT id FROM pages WHERE slug = ? AND tenant_id = ? AND id != ?", [$slug, $tenantId, $id]);
             if ($conflict) {
-                return $this->respondWithError('VALIDATION_ERROR', 'Slug already in use', 'slug', 422);
+                return $this->respondWithError('VALIDATION_ERROR', __('api.slug_already_in_use'), 'slug', 422);
             }
             $updates[] = 'slug = ?'; $params[] = $slug;
         }
         if (array_key_exists('content', $input)) { $updates[] = 'content = ?'; $params[] = $input['content']; }
         if (isset($input['status'])) {
             if (!in_array($input['status'], ['draft', 'published'], true)) {
-                return $this->respondWithError('VALIDATION_ERROR', 'Status must be draft or published', 'status', 422);
+                return $this->respondWithError('VALIDATION_ERROR', __('api.status_must_be_draft_or_published'), 'status', 422);
             }
             $updates[] = 'is_published = ?'; $params[] = ($input['status'] === 'published') ? 1 : 0;
         }
@@ -239,7 +239,7 @@ class AdminContentController extends BaseApiController
         if (isset($input['menu_order'])) { $updates[] = 'menu_order = ?'; $params[] = (int)$input['menu_order']; }
 
         if (empty($updates)) {
-            return $this->respondWithError('VALIDATION_ERROR', 'No fields to update', null, 422);
+            return $this->respondWithError('VALIDATION_ERROR', __('api.no_fields_to_update'), null, 422);
         }
 
         $updates[] = 'updated_at = NOW()';
@@ -269,12 +269,12 @@ class AdminContentController extends BaseApiController
         $id = (int) $id;
 
         if ($id < 1) {
-            return $this->respondWithError('VALIDATION_ERROR', 'Invalid page ID', 'id', 400);
+            return $this->respondWithError('VALIDATION_ERROR', __('api.invalid_page_id'), 'id', 400);
         }
 
         $existing = DB::selectOne("SELECT id, title FROM pages WHERE id = ? AND tenant_id = ?", [$id, $tenantId]);
         if (!$existing) {
-            return $this->respondWithError('NOT_FOUND', 'Page not found', 'id', 404);
+            return $this->respondWithError('NOT_FOUND', __('api.page_not_found'), 'id', 404);
         }
 
         DB::delete("DELETE FROM menu_items WHERE page_id = ? AND page_id IN (SELECT id FROM pages WHERE tenant_id = ?)", [$id, $tenantId]);
@@ -314,7 +314,7 @@ class AdminContentController extends BaseApiController
         $id = (int) $id;
 
         if ($id < 1) {
-            return $this->respondWithError('VALIDATION_ERROR', 'Invalid menu ID', 'id', 400);
+            return $this->respondWithError('VALIDATION_ERROR', __('api.invalid_menu_id'), 'id', 400);
         }
 
         $result = DB::selectOne(
@@ -324,7 +324,7 @@ class AdminContentController extends BaseApiController
         );
 
         if (!$result) {
-            return $this->respondWithError('NOT_FOUND', 'Menu not found', 'id', 404);
+            return $this->respondWithError('NOT_FOUND', __('api.menu_not_found'), 'id', 404);
         }
 
         $menu = (array)$result;
@@ -342,8 +342,8 @@ class AdminContentController extends BaseApiController
         $name = trim($input['name'] ?? '');
         $location = trim($input['location'] ?? '');
 
-        if (empty($name)) { return $this->respondWithError('VALIDATION_ERROR', 'Name is required', 'name', 422); }
-        if (empty($location)) { return $this->respondWithError('VALIDATION_ERROR', 'Location is required', 'location', 422); }
+        if (empty($name)) { return $this->respondWithError('VALIDATION_ERROR', __('api.name_required'), 'name', 422); }
+        if (empty($location)) { return $this->respondWithError('VALIDATION_ERROR', __('api.location_required'), 'location', 422); }
 
         $slug = $this->generateSlug($name);
         $slug = $this->ensureUniqueSlug('menus', $slug, $tenantId);
@@ -366,10 +366,10 @@ class AdminContentController extends BaseApiController
         $tenantId = TenantContext::getId();
         $id = (int) $id;
 
-        if ($id < 1) { return $this->respondWithError('VALIDATION_ERROR', 'Invalid menu ID', 'id', 400); }
+        if ($id < 1) { return $this->respondWithError('VALIDATION_ERROR', __('api.invalid_menu_id'), 'id', 400); }
 
         $existing = DB::selectOne("SELECT id FROM menus WHERE id = ? AND tenant_id = ?", [$id, $tenantId]);
-        if (!$existing) { return $this->respondWithError('NOT_FOUND', 'Menu not found', 'id', 404); }
+        if (!$existing) { return $this->respondWithError('NOT_FOUND', __('api.menu_not_found'), 'id', 404); }
 
         $input = $this->getAllInput();
         $updates = [];
@@ -379,7 +379,7 @@ class AdminContentController extends BaseApiController
         if (isset($input['slug'])) {
             $slug = $this->generateSlug($input['slug']);
             $conflict = DB::selectOne("SELECT id FROM menus WHERE slug = ? AND tenant_id = ? AND id != ?", [$slug, $tenantId, $id]);
-            if ($conflict) { return $this->respondWithError('VALIDATION_ERROR', 'Slug already in use', 'slug', 422); }
+            if ($conflict) { return $this->respondWithError('VALIDATION_ERROR', __('api.slug_already_in_use'), 'slug', 422); }
             $updates[] = 'slug = ?'; $params[] = $slug;
         }
         if (array_key_exists('description', $input)) { $updates[] = 'description = ?'; $params[] = $input['description']; }
@@ -388,7 +388,7 @@ class AdminContentController extends BaseApiController
         if (isset($input['min_plan_tier'])) { $updates[] = 'min_plan_tier = ?'; $params[] = (int)$input['min_plan_tier']; }
         if (isset($input['is_active'])) { $updates[] = 'is_active = ?'; $params[] = (int)$input['is_active']; }
 
-        if (empty($updates)) { return $this->respondWithError('VALIDATION_ERROR', 'No fields to update', null, 422); }
+        if (empty($updates)) { return $this->respondWithError('VALIDATION_ERROR', __('api.no_fields_to_update'), null, 422); }
 
         $updates[] = 'updated_at = NOW()';
         $params[] = $id;
@@ -408,10 +408,10 @@ class AdminContentController extends BaseApiController
         $tenantId = TenantContext::getId();
         $id = (int) $id;
 
-        if ($id < 1) { return $this->respondWithError('VALIDATION_ERROR', 'Invalid menu ID', 'id', 400); }
+        if ($id < 1) { return $this->respondWithError('VALIDATION_ERROR', __('api.invalid_menu_id'), 'id', 400); }
 
         $existing = DB::selectOne("SELECT id, name FROM menus WHERE id = ? AND tenant_id = ?", [$id, $tenantId]);
-        if (!$existing) { return $this->respondWithError('NOT_FOUND', 'Menu not found', 'id', 404); }
+        if (!$existing) { return $this->respondWithError('NOT_FOUND', __('api.menu_not_found'), 'id', 404); }
 
         DB::delete("DELETE FROM menu_items WHERE menu_id = ? AND menu_id IN (SELECT id FROM menus WHERE tenant_id = ?)", [$id, $tenantId]);
         DB::delete("DELETE FROM menus WHERE id = ? AND tenant_id = ?", [$id, $tenantId]);
@@ -431,10 +431,10 @@ class AdminContentController extends BaseApiController
         $tenantId = TenantContext::getId();
         $menuId = (int) $menuId;
 
-        if ($menuId < 1) { return $this->respondWithError('VALIDATION_ERROR', 'Invalid menu ID', 'id', 400); }
+        if ($menuId < 1) { return $this->respondWithError('VALIDATION_ERROR', __('api.invalid_menu_id'), 'id', 400); }
 
         $menu = DB::selectOne("SELECT id FROM menus WHERE id = ? AND tenant_id = ?", [$menuId, $tenantId]);
-        if (!$menu) { return $this->respondWithError('NOT_FOUND', 'Menu not found', 'id', 404); }
+        if (!$menu) { return $this->respondWithError('NOT_FOUND', __('api.menu_not_found'), 'id', 404); }
 
         return $this->respondWithData($this->buildMenuItemTree($menuId));
     }
@@ -445,14 +445,14 @@ class AdminContentController extends BaseApiController
         $tenantId = TenantContext::getId();
         $menuId = (int) $menuId;
 
-        if ($menuId < 1) { return $this->respondWithError('VALIDATION_ERROR', 'Invalid menu ID', 'id', 400); }
+        if ($menuId < 1) { return $this->respondWithError('VALIDATION_ERROR', __('api.invalid_menu_id'), 'id', 400); }
 
         $menu = DB::selectOne("SELECT id FROM menus WHERE id = ? AND tenant_id = ?", [$menuId, $tenantId]);
-        if (!$menu) { return $this->respondWithError('NOT_FOUND', 'Menu not found', 'id', 404); }
+        if (!$menu) { return $this->respondWithError('NOT_FOUND', __('api.menu_not_found'), 'id', 404); }
 
         $input = $this->getAllInput();
         $label = trim($input['label'] ?? '');
-        if (empty($label)) { return $this->respondWithError('VALIDATION_ERROR', 'Label is required', 'label', 422); }
+        if (empty($label)) { return $this->respondWithError('VALIDATION_ERROR', __('api.label_required'), 'label', 422); }
 
         $parentId = isset($input['parent_id']) ? (int)$input['parent_id'] : null;
         $pageId = isset($input['page_id']) ? (int)$input['page_id'] : null;
@@ -461,13 +461,13 @@ class AdminContentController extends BaseApiController
         // Validate parent_id belongs to the same menu (and therefore same tenant)
         if ($parentId !== null) {
             $parentExists = DB::selectOne("SELECT id FROM menu_items WHERE id = ? AND menu_id = ?", [$parentId, $menuId]);
-            if (!$parentExists) { return $this->respondWithError('VALIDATION_ERROR', 'Parent menu item not found in this menu', 'parent_id', 422); }
+            if (!$parentExists) { return $this->respondWithError('VALIDATION_ERROR', __('api.parent_menu_item_not_found'), 'parent_id', 422); }
         }
 
         // Validate page_id belongs to the same tenant
         if ($pageId !== null) {
             $pageExists = DB::selectOne("SELECT id FROM pages WHERE id = ? AND tenant_id = ?", [$pageId, $tenantId]);
-            if (!$pageExists) { return $this->respondWithError('VALIDATION_ERROR', 'Page not found', 'page_id', 422); }
+            if (!$pageExists) { return $this->respondWithError('VALIDATION_ERROR', __('api.page_not_found'), 'page_id', 422); }
         }
 
         DB::insert(
@@ -497,15 +497,15 @@ class AdminContentController extends BaseApiController
         $tenantId = TenantContext::getId();
         $menuId = (int) $menuId;
 
-        if ($menuId < 1) { return $this->respondWithError('VALIDATION_ERROR', 'Invalid menu ID', 'id', 400); }
+        if ($menuId < 1) { return $this->respondWithError('VALIDATION_ERROR', __('api.invalid_menu_id'), 'id', 400); }
 
         $menu = DB::selectOne("SELECT id FROM menus WHERE id = ? AND tenant_id = ?", [$menuId, $tenantId]);
-        if (!$menu) { return $this->respondWithError('NOT_FOUND', 'Menu not found', 'id', 404); }
+        if (!$menu) { return $this->respondWithError('NOT_FOUND', __('api.menu_not_found'), 'id', 404); }
 
         $input = $this->getAllInput();
         $items = $input['items'] ?? [];
         if (!is_array($items) || empty($items)) {
-            return $this->respondWithError('VALIDATION_ERROR', 'Items array is required', 'items', 422);
+            return $this->respondWithError('VALIDATION_ERROR', __('api.items_array_required'), 'items', 422);
         }
 
         // Collect valid item IDs in this menu for parent_id validation
@@ -524,7 +524,7 @@ class AdminContentController extends BaseApiController
                 // Validate parent_id belongs to the same menu
                 if ($parentId !== null && !in_array($parentId, $validItemIds, true)) {
                     DB::rollBack();
-                    return $this->respondWithError('VALIDATION_ERROR', 'Parent menu item not found in this menu', 'parent_id', 422);
+                    return $this->respondWithError('VALIDATION_ERROR', __('api.parent_menu_item_not_found'), 'parent_id', 422);
                 }
 
                 DB::update("UPDATE menu_items SET sort_order = ?, parent_id = ?, updated_at = NOW() WHERE id = ? AND menu_id = ?",
@@ -545,13 +545,13 @@ class AdminContentController extends BaseApiController
         $tenantId = TenantContext::getId();
         $id = (int) $id;
 
-        if ($id < 1) { return $this->respondWithError('VALIDATION_ERROR', 'Invalid menu item ID', 'id', 400); }
+        if ($id < 1) { return $this->respondWithError('VALIDATION_ERROR', __('api.invalid_menu_item_id'), 'id', 400); }
 
         $existing = DB::selectOne(
             "SELECT mi.id, mi.menu_id FROM menu_items mi JOIN menus m ON m.id = mi.menu_id WHERE mi.id = ? AND m.tenant_id = ?",
             [$id, $tenantId]
         );
-        if (!$existing) { return $this->respondWithError('NOT_FOUND', 'Menu item not found', 'id', 404); }
+        if (!$existing) { return $this->respondWithError('NOT_FOUND', __('api.menu_item_not_found'), 'id', 404); }
 
         $input = $this->getAllInput();
         $updates = [];
@@ -565,7 +565,7 @@ class AdminContentController extends BaseApiController
             $pageId = isset($input['page_id']) ? (int)$input['page_id'] : null;
             if ($pageId !== null) {
                 $pageExists = DB::selectOne("SELECT id FROM pages WHERE id = ? AND tenant_id = ?", [$pageId, $tenantId]);
-                if (!$pageExists) { return $this->respondWithError('VALIDATION_ERROR', 'Page not found', 'page_id', 422); }
+                if (!$pageExists) { return $this->respondWithError('VALIDATION_ERROR', __('api.page_not_found'), 'page_id', 422); }
             }
             $updates[] = 'page_id = ?'; $params[] = $pageId;
         }
@@ -573,7 +573,7 @@ class AdminContentController extends BaseApiController
             $parentId = isset($input['parent_id']) ? (int)$input['parent_id'] : null;
             if ($parentId !== null) {
                 $parentExists = DB::selectOne("SELECT id FROM menu_items WHERE id = ? AND menu_id = ?", [$parentId, $existing->menu_id]);
-                if (!$parentExists) { return $this->respondWithError('VALIDATION_ERROR', 'Parent menu item not found in this menu', 'parent_id', 422); }
+                if (!$parentExists) { return $this->respondWithError('VALIDATION_ERROR', __('api.parent_menu_item_not_found'), 'parent_id', 422); }
             }
             $updates[] = 'parent_id = ?'; $params[] = $parentId;
         }
@@ -587,7 +587,7 @@ class AdminContentController extends BaseApiController
         }
         if (isset($input['is_active'])) { $updates[] = 'is_active = ?'; $params[] = (int)$input['is_active']; }
 
-        if (empty($updates)) { return $this->respondWithError('VALIDATION_ERROR', 'No fields to update', null, 422); }
+        if (empty($updates)) { return $this->respondWithError('VALIDATION_ERROR', __('api.no_fields_to_update'), null, 422); }
 
         $updates[] = 'updated_at = NOW()';
         $params[] = $id;
@@ -614,13 +614,13 @@ class AdminContentController extends BaseApiController
         $tenantId = TenantContext::getId();
         $id = (int) $id;
 
-        if ($id < 1) { return $this->respondWithError('VALIDATION_ERROR', 'Invalid menu item ID', 'id', 400); }
+        if ($id < 1) { return $this->respondWithError('VALIDATION_ERROR', __('api.invalid_menu_item_id'), 'id', 400); }
 
         $existing = DB::selectOne(
             "SELECT mi.id FROM menu_items mi JOIN menus m ON m.id = mi.menu_id WHERE mi.id = ? AND m.tenant_id = ?",
             [$id, $tenantId]
         );
-        if (!$existing) { return $this->respondWithError('NOT_FOUND', 'Menu item not found', 'id', 404); }
+        if (!$existing) { return $this->respondWithError('NOT_FOUND', __('api.menu_item_not_found'), 'id', 404); }
 
         DB::delete("DELETE FROM menu_items WHERE parent_id = ? AND menu_id IN (SELECT id FROM menus WHERE tenant_id = ?)", [$id, $tenantId]);
         DB::delete("DELETE FROM menu_items WHERE id = ? AND menu_id IN (SELECT id FROM menus WHERE tenant_id = ?)", [$id, $tenantId]);
@@ -656,7 +656,7 @@ class AdminContentController extends BaseApiController
         $this->requireAdmin();
         $id = (int) $id;
 
-        if ($id < 1) { return $this->respondWithError('VALIDATION_ERROR', 'Invalid plan ID', 'id', 400); }
+        if ($id < 1) { return $this->respondWithError('VALIDATION_ERROR', __('api.invalid_plan_id'), 'id', 400); }
 
         $result = DB::selectOne(
             "SELECT id, name, slug, description, tier_level, features, allowed_layouts,
@@ -664,7 +664,7 @@ class AdminContentController extends BaseApiController
              FROM pay_plans WHERE id = ?", [$id]
         );
 
-        if (!$result) { return $this->respondWithError('NOT_FOUND', 'Plan not found', 'id', 404); }
+        if (!$result) { return $this->respondWithError('NOT_FOUND', __('api.plan_not_found'), 'id', 404); }
 
         $plan = (array)$result;
         if (isset($plan['features'])) { $plan['features'] = json_decode($plan['features'], true) ?: []; }
@@ -679,7 +679,7 @@ class AdminContentController extends BaseApiController
 
         $input = $this->getAllInput();
         $name = trim($input['name'] ?? '');
-        if (empty($name)) { return $this->respondWithError('VALIDATION_ERROR', 'Name is required', 'name', 422); }
+        if (empty($name)) { return $this->respondWithError('VALIDATION_ERROR', __('api.name_required'), 'name', 422); }
 
         $slug = $this->generateSlug($name);
         $counter = 0;
@@ -733,10 +733,10 @@ class AdminContentController extends BaseApiController
         $this->requireSuperAdmin();
         $id = (int) $id;
 
-        if ($id < 1) { return $this->respondWithError('VALIDATION_ERROR', 'Invalid plan ID', 'id', 400); }
+        if ($id < 1) { return $this->respondWithError('VALIDATION_ERROR', __('api.invalid_plan_id'), 'id', 400); }
 
         $existing = DB::selectOne("SELECT id FROM pay_plans WHERE id = ?", [$id]);
-        if (!$existing) { return $this->respondWithError('NOT_FOUND', 'Plan not found', 'id', 404); }
+        if (!$existing) { return $this->respondWithError('NOT_FOUND', __('api.plan_not_found'), 'id', 404); }
 
         $input = $this->getAllInput();
         $updates = [];
@@ -746,7 +746,7 @@ class AdminContentController extends BaseApiController
         if (isset($input['slug'])) {
             $slug = $this->generateSlug($input['slug']);
             $conflict = DB::selectOne("SELECT id FROM pay_plans WHERE slug = ? AND id != ?", [$slug, $id]);
-            if ($conflict) { return $this->respondWithError('VALIDATION_ERROR', 'Slug already in use', 'slug', 422); }
+            if ($conflict) { return $this->respondWithError('VALIDATION_ERROR', __('api.slug_already_in_use'), 'slug', 422); }
             $updates[] = 'slug = ?'; $params[] = $slug;
         }
         if (array_key_exists('description', $input)) { $updates[] = 'description = ?'; $params[] = $input['description']; }
@@ -759,7 +759,7 @@ class AdminContentController extends BaseApiController
         if (array_key_exists('price_yearly', $input)) { $updates[] = 'price_yearly = ?'; $params[] = isset($input['price_yearly']) ? (float)$input['price_yearly'] : null; }
         if (isset($input['is_active'])) { $updates[] = 'is_active = ?'; $params[] = (int)$input['is_active']; }
 
-        if (empty($updates)) { return $this->respondWithError('VALIDATION_ERROR', 'No fields to update', null, 422); }
+        if (empty($updates)) { return $this->respondWithError('VALIDATION_ERROR', __('api.no_fields_to_update'), null, 422); }
 
         $updates[] = 'updated_at = NOW()';
         $params[] = $id;
@@ -795,14 +795,14 @@ class AdminContentController extends BaseApiController
         $this->requireSuperAdmin();
         $id = (int) $id;
 
-        if ($id < 1) { return $this->respondWithError('VALIDATION_ERROR', 'Invalid plan ID', 'id', 400); }
+        if ($id < 1) { return $this->respondWithError('VALIDATION_ERROR', __('api.invalid_plan_id'), 'id', 400); }
 
         $existing = DB::selectOne("SELECT id FROM pay_plans WHERE id = ?", [$id]);
-        if (!$existing) { return $this->respondWithError('NOT_FOUND', 'Plan not found', 'id', 404); }
+        if (!$existing) { return $this->respondWithError('NOT_FOUND', __('api.plan_not_found'), 'id', 404); }
 
         $activeAssignments = DB::selectOne("SELECT COUNT(*) AS cnt FROM tenant_plan_assignments WHERE pay_plan_id = ? AND status = 'active'", [$id]);
         if ($activeAssignments && (int)$activeAssignments->cnt > 0) {
-            return $this->respondWithError('VALIDATION_ERROR', 'Cannot delete plan with active tenant assignments (' . $activeAssignments->cnt . ' active)', 'id', 422);
+            return $this->respondWithError('VALIDATION_ERROR', __('api.plan_has_active_assignments', ['count' => $activeAssignments->cnt]), 'id', 422);
         }
 
         DB::delete("DELETE FROM pay_plans WHERE id = ?", [$id]);

@@ -73,7 +73,7 @@ class EndorsementController extends BaseApiController
         $skillName = $this->input('skill_name') ?? $this->query('skill_name', '');
 
         if (empty($skillName)) {
-            return $this->respondWithError('VALIDATION_ERROR', 'skill_name is required', 'skill_name', 400);
+            return $this->respondWithError('VALIDATION_ERROR', __('api.skill_name_required'), 'skill_name', 400);
         }
 
         $this->endorsementService->removeEndorsement($userId, $id, $skillName);

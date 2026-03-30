@@ -72,9 +72,7 @@ class AdminSuperController extends BaseApiController
 
         if (!$access['granted']) {
             throw new \Illuminate\Http\Exceptions\HttpResponseException(
-                $this->respondWithError(
-                    ApiErrorCodes::SUPER_PANEL_ACCESS_DENIED,
-                    'Super Panel access denied: ' . ($access['reason'] ?? 'Unknown reason'),
+                $this->respondWithError(ApiErrorCodes::SUPER_PANEL_ACCESS_DENIED, __('api.super_panel_access_denied', ['reason' => $access['reason'] ?? __('api.unknown_reason')]),
                     null,
                     403
                 )
@@ -105,7 +103,7 @@ class AdminSuperController extends BaseApiController
             throw new \Illuminate\Http\Exceptions\HttpResponseException(
                 $this->respondWithError(
                     ApiErrorCodes::AUTH_INSUFFICIENT_PERMISSIONS,
-                    'God-level access required for this action',
+                    __('api.god_level_access_required'),
                     null,
                     403
                 )
@@ -164,7 +162,7 @@ class AdminSuperController extends BaseApiController
 
         $tenant = $this->tenantVisibilityService->getTenant($id);
         if (!$tenant) {
-            return $this->respondWithError(ApiErrorCodes::RESOURCE_NOT_FOUND, 'Tenant not found', null, 404);
+            return $this->respondWithError(ApiErrorCodes::RESOURCE_NOT_FOUND, __('api.tenant_not_found'), null, 404);
         }
 
         $children = Tenant::getChildren($id);
@@ -216,52 +214,52 @@ class AdminSuperController extends BaseApiController
                 $parentId = $access['tenant_id'] ?? 0;
             }
             if (!$parentId) {
-                return $this->respondWithError(ApiErrorCodes::VALIDATION_ERROR, 'parent_id is required', 'parent_id', 422);
+                return $this->respondWithError(ApiErrorCodes::VALIDATION_ERROR, __('api.parent_id_required'), 'parent_id', 422);
             }
         }
 
         // Verify access to parent tenant regardless of source
         if (!SuperPanelAccess::canAccessTenant($parentId)) {
-            return $this->respondWithError(ApiErrorCodes::SUPER_PANEL_ACCESS_DENIED, 'You do not have access to the parent tenant', null, 403);
+            return $this->respondWithError(ApiErrorCodes::SUPER_PANEL_ACCESS_DENIED, __('api.super_no_access_parent_tenant'), null, 403);
         }
 
         $name = trim($input['name'] ?? '');
         if (empty($name)) {
-            return $this->respondWithError(ApiErrorCodes::VALIDATION_ERROR, 'name is required', 'name', 422);
+            return $this->respondWithError(ApiErrorCodes::VALIDATION_ERROR, __('api.name_is_required'), 'name', 422);
         }
 
         // Validate slug format (alphanumeric + hyphens only, no leading/trailing hyphens)
         $slug = trim($input['slug'] ?? '');
         if ($slug !== '' && !preg_match('/^[a-z0-9][a-z0-9-]*[a-z0-9]$|^[a-z0-9]$/', $slug)) {
-            return $this->respondWithError(ApiErrorCodes::VALIDATION_ERROR, 'Slug must contain only lowercase letters, numbers, and hyphens', 'slug', 422);
+            return $this->respondWithError(ApiErrorCodes::VALIDATION_ERROR, __('api.slug_format_invalid'), 'slug', 422);
         }
 
         // Validate domain format if provided
         $domain = trim($input['domain'] ?? '');
         if ($domain !== '' && !preg_match('/^[a-z0-9]([a-z0-9-]*[a-z0-9])?(\.[a-z0-9]([a-z0-9-]*[a-z0-9])?)+$/i', $domain)) {
-            return $this->respondWithError(ApiErrorCodes::VALIDATION_ERROR, 'Domain must be a valid domain name', 'domain', 422);
+            return $this->respondWithError(ApiErrorCodes::VALIDATION_ERROR, __('api.domain_format_invalid'), 'domain', 422);
         }
 
         // Validate contact email if provided
         $contactEmail = trim($input['contact_email'] ?? '');
         if ($contactEmail !== '' && !filter_var($contactEmail, FILTER_VALIDATE_EMAIL)) {
-            return $this->respondWithError(ApiErrorCodes::VALIDATION_ERROR, 'contact_email must be a valid email address', 'contact_email', 422);
+            return $this->respondWithError(ApiErrorCodes::VALIDATION_ERROR, __('api.contact_email_invalid'), 'contact_email', 422);
         }
 
         // Validate contact phone if provided (international E.164 format)
         $contactPhone = trim($input['contact_phone'] ?? '');
         if ($contactPhone !== '' && !Validator::isPhone($contactPhone)) {
-            return $this->respondWithError(ApiErrorCodes::VALIDATION_ERROR, 'contact_phone must be a valid international phone number', 'contact_phone', 422);
+            return $this->respondWithError(ApiErrorCodes::VALIDATION_ERROR, __('api.contact_phone_invalid'), 'contact_phone', 422);
         }
 
         // Validate latitude/longitude if provided
         $latitude = $input['latitude'] ?? '';
         $longitude = $input['longitude'] ?? '';
         if ($latitude !== '' && (float)$latitude !== 0.0 && ((float)$latitude < -90 || (float)$latitude > 90)) {
-            return $this->respondWithError(ApiErrorCodes::VALIDATION_ERROR, 'Latitude must be between -90 and 90', 'latitude', 422);
+            return $this->respondWithError(ApiErrorCodes::VALIDATION_ERROR, __('api.latitude_range'), 'latitude', 422);
         }
         if ($longitude !== '' && (float)$longitude !== 0.0 && ((float)$longitude < -180 || (float)$longitude > 180)) {
-            return $this->respondWithError(ApiErrorCodes::VALIDATION_ERROR, 'Longitude must be between -180 and 180', 'longitude', 422);
+            return $this->respondWithError(ApiErrorCodes::VALIDATION_ERROR, __('api.longitude_range'), 'longitude', 422);
         }
 
         $data = [
@@ -318,20 +316,20 @@ class AdminSuperController extends BaseApiController
         $this->requireSuperAdmin();
 
         if (!SuperPanelAccess::canAccessTenant($id)) {
-            return $this->respondWithError(ApiErrorCodes::SUPER_PANEL_ACCESS_DENIED, 'You do not have access to this tenant', null, 403);
+            return $this->respondWithError(ApiErrorCodes::SUPER_PANEL_ACCESS_DENIED, __('api.super_no_access_tenant'), null, 403);
         }
 
         $input = $this->getAllInput();
 
         if (empty($input)) {
-            return $this->respondWithError(ApiErrorCodes::VALIDATION_ERROR, 'Request body is empty', null, 422);
+            return $this->respondWithError(ApiErrorCodes::VALIDATION_ERROR, __('api.request_body_empty'), null, 422);
         }
 
         // Validate slug format if being updated
         if (isset($input['slug']) && trim($input['slug']) !== '') {
             $slug = trim($input['slug']);
             if (!preg_match('/^[a-z0-9][a-z0-9-]*[a-z0-9]$|^[a-z0-9]$/', $slug)) {
-                return $this->respondWithError(ApiErrorCodes::VALIDATION_ERROR, 'Slug must contain only lowercase letters, numbers, and hyphens', 'slug', 422);
+                return $this->respondWithError(ApiErrorCodes::VALIDATION_ERROR, __('api.slug_format_invalid'), 'slug', 422);
             }
         }
 
@@ -339,33 +337,33 @@ class AdminSuperController extends BaseApiController
         if (isset($input['domain']) && trim($input['domain']) !== '') {
             $domain = trim($input['domain']);
             if (!preg_match('/^[a-z0-9]([a-z0-9-]*[a-z0-9])?(\.[a-z0-9]([a-z0-9-]*[a-z0-9])?)+$/i', $domain)) {
-                return $this->respondWithError(ApiErrorCodes::VALIDATION_ERROR, 'Domain must be a valid domain name', 'domain', 422);
+                return $this->respondWithError(ApiErrorCodes::VALIDATION_ERROR, __('api.domain_format_invalid'), 'domain', 422);
             }
         }
 
         // Validate contact email if being updated
         if (isset($input['contact_email']) && trim($input['contact_email']) !== '') {
             if (!filter_var(trim($input['contact_email']), FILTER_VALIDATE_EMAIL)) {
-                return $this->respondWithError(ApiErrorCodes::VALIDATION_ERROR, 'contact_email must be a valid email address', 'contact_email', 422);
+                return $this->respondWithError(ApiErrorCodes::VALIDATION_ERROR, __('api.contact_email_invalid'), 'contact_email', 422);
             }
         }
 
         // Validate contact phone if being updated (international E.164 format)
         if (isset($input['contact_phone']) && trim($input['contact_phone']) !== '') {
             if (!Validator::isPhone(trim($input['contact_phone']))) {
-                return $this->respondWithError(ApiErrorCodes::VALIDATION_ERROR, 'contact_phone must be a valid international phone number', 'contact_phone', 422);
+                return $this->respondWithError(ApiErrorCodes::VALIDATION_ERROR, __('api.contact_phone_invalid'), 'contact_phone', 422);
             }
         }
 
         // Validate latitude/longitude if being updated
         if (isset($input['latitude']) && $input['latitude'] !== '' && (float)$input['latitude'] !== 0.0) {
             if ((float)$input['latitude'] < -90 || (float)$input['latitude'] > 90) {
-                return $this->respondWithError(ApiErrorCodes::VALIDATION_ERROR, 'Latitude must be between -90 and 90', 'latitude', 422);
+                return $this->respondWithError(ApiErrorCodes::VALIDATION_ERROR, __('api.latitude_range'), 'latitude', 422);
             }
         }
         if (isset($input['longitude']) && $input['longitude'] !== '' && (float)$input['longitude'] !== 0.0) {
             if ((float)$input['longitude'] < -180 || (float)$input['longitude'] > 180) {
-                return $this->respondWithError(ApiErrorCodes::VALIDATION_ERROR, 'Longitude must be between -180 and 180', 'longitude', 422);
+                return $this->respondWithError(ApiErrorCodes::VALIDATION_ERROR, __('api.longitude_range'), 'longitude', 422);
             }
         }
 
@@ -384,7 +382,7 @@ class AdminSuperController extends BaseApiController
         $userId = $this->requireSuperAdmin();
 
         if (!SuperPanelAccess::canAccessTenant($id)) {
-            return $this->respondWithError(ApiErrorCodes::SUPER_PANEL_ACCESS_DENIED, 'You do not have access to this tenant', null, 403);
+            return $this->respondWithError(ApiErrorCodes::SUPER_PANEL_ACCESS_DENIED, __('api.super_no_access_tenant'), null, 403);
         }
 
         $input = $this->getAllInput();
@@ -410,7 +408,7 @@ class AdminSuperController extends BaseApiController
         $this->requireSuperAdmin();
 
         if (!SuperPanelAccess::canAccessTenant($id)) {
-            return $this->respondWithError(ApiErrorCodes::SUPER_PANEL_ACCESS_DENIED, 'You do not have access to this tenant', null, 403);
+            return $this->respondWithError(ApiErrorCodes::SUPER_PANEL_ACCESS_DENIED, __('api.super_no_access_tenant'), null, 403);
         }
 
         $result = $this->tenantHierarchyService->updateTenant($id, ['is_active' => 1]);
@@ -428,7 +426,7 @@ class AdminSuperController extends BaseApiController
         $this->requireSuperAdmin();
 
         if (!SuperPanelAccess::canAccessTenant($id)) {
-            return $this->respondWithError(ApiErrorCodes::SUPER_PANEL_ACCESS_DENIED, 'You do not have access to this tenant', null, 403);
+            return $this->respondWithError(ApiErrorCodes::SUPER_PANEL_ACCESS_DENIED, __('api.super_no_access_tenant'), null, 403);
         }
 
         $input = $this->getAllInput();
@@ -452,18 +450,18 @@ class AdminSuperController extends BaseApiController
         $this->requireSuperAdmin();
 
         if (!SuperPanelAccess::canAccessTenant($id)) {
-            return $this->respondWithError(ApiErrorCodes::SUPER_PANEL_ACCESS_DENIED, 'You do not have access to this tenant', null, 403);
+            return $this->respondWithError(ApiErrorCodes::SUPER_PANEL_ACCESS_DENIED, __('api.super_no_access_tenant'), null, 403);
         }
 
         $input = $this->getAllInput();
         $newParentId = (int) ($input['new_parent_id'] ?? 0);
 
         if (!$newParentId) {
-            return $this->respondWithError(ApiErrorCodes::VALIDATION_ERROR, 'new_parent_id is required', 'new_parent_id', 422);
+            return $this->respondWithError(ApiErrorCodes::VALIDATION_ERROR, __('api.new_parent_id_required'), 'new_parent_id', 422);
         }
 
         if (!SuperPanelAccess::canAccessTenant($newParentId)) {
-            return $this->respondWithError(ApiErrorCodes::SUPER_PANEL_ACCESS_DENIED, 'You do not have access to the destination tenant', null, 403);
+            return $this->respondWithError(ApiErrorCodes::SUPER_PANEL_ACCESS_DENIED, __('api.super_no_access_destination'), null, 403);
         }
 
         $result = $this->tenantHierarchyService->moveTenant($id, $newParentId);
@@ -513,11 +511,11 @@ class AdminSuperController extends BaseApiController
         $user = User::findById($id, false);
 
         if (!$user) {
-            return $this->respondWithError(ApiErrorCodes::RESOURCE_NOT_FOUND, 'User not found', null, 404);
+            return $this->respondWithError(ApiErrorCodes::RESOURCE_NOT_FOUND, __('api.user_not_found'), null, 404);
         }
 
         if (!SuperPanelAccess::canAccessTenant((int) $user['tenant_id'])) {
-            return $this->respondWithError(ApiErrorCodes::SUPER_PANEL_ACCESS_DENIED, 'You do not have access to this user\'s tenant', null, 403);
+            return $this->respondWithError(ApiErrorCodes::SUPER_PANEL_ACCESS_DENIED, __('api.super_no_access_user_tenant'), null, 403);
         }
 
         $tenant = Tenant::find($user['tenant_id']);
@@ -537,11 +535,11 @@ class AdminSuperController extends BaseApiController
 
         $tenantId = (int) ($input['tenant_id'] ?? 0);
         if (!$tenantId) {
-            return $this->respondWithError(ApiErrorCodes::VALIDATION_ERROR, 'tenant_id is required', 'tenant_id', 422);
+            return $this->respondWithError(ApiErrorCodes::VALIDATION_ERROR, __('api.tenant_id_is_required'), 'tenant_id', 422);
         }
 
         if (!SuperPanelAccess::canAccessTenant($tenantId)) {
-            return $this->respondWithError(ApiErrorCodes::SUPER_PANEL_ACCESS_DENIED, 'You do not have access to this tenant', null, 403);
+            return $this->respondWithError(ApiErrorCodes::SUPER_PANEL_ACCESS_DENIED, __('api.super_no_access_tenant'), null, 403);
         }
 
         $firstName = trim($input['first_name'] ?? '');
@@ -551,18 +549,18 @@ class AdminSuperController extends BaseApiController
         $role = $input['role'] ?? 'member';
 
         if (empty($firstName) || empty($email) || empty($password)) {
-            return $this->respondWithError(ApiErrorCodes::VALIDATION_ERROR, 'first_name, email, and password are required', null, 422);
+            return $this->respondWithError(ApiErrorCodes::VALIDATION_ERROR, __('api.super_user_create_required_fields'), null, 422);
         }
 
         $allowedRoles = ['member', 'admin', 'tenant_admin', 'broker', 'super_admin'];
         if (!in_array($role, $allowedRoles, true)) {
-            return $this->respondWithError(ApiErrorCodes::VALIDATION_ERROR, 'Invalid role. Allowed: ' . implode(', ', $allowedRoles), 'role', 422);
+            return $this->respondWithError(ApiErrorCodes::VALIDATION_ERROR, __('api.invalid_role_allowed', ['roles' => implode(', ', $allowedRoles)]), 'role', 422);
         }
 
         // Check email uniqueness
         $existing = User::findGlobalByEmail($email);
         if ($existing) {
-            return $this->respondWithError(ApiErrorCodes::VALIDATION_ERROR, 'Email already exists in the system', 'email', 422);
+            return $this->respondWithError(ApiErrorCodes::VALIDATION_ERROR, __('api.email_already_exists_system'), 'email', 422);
         }
 
         $options = [
@@ -588,7 +586,7 @@ class AdminSuperController extends BaseApiController
             return $this->respondWithData(['user_id' => $newUserId], null, 201);
         }
 
-        return $this->respondWithError(ApiErrorCodes::SERVER_INTERNAL_ERROR, 'Failed to create user', null, 500);
+        return $this->respondWithError(ApiErrorCodes::SERVER_INTERNAL_ERROR, __('api.user_created_failed'), null, 500);
     }
 
     /** PUT /api/v2/super-admin/users/{id} */
@@ -599,11 +597,11 @@ class AdminSuperController extends BaseApiController
         $user = User::findById($id, false);
 
         if (!$user) {
-            return $this->respondWithError(ApiErrorCodes::RESOURCE_NOT_FOUND, 'User not found', null, 404);
+            return $this->respondWithError(ApiErrorCodes::RESOURCE_NOT_FOUND, __('api.user_not_found'), null, 404);
         }
 
         if (!SuperPanelAccess::canAccessTenant((int) $user['tenant_id'])) {
-            return $this->respondWithError(ApiErrorCodes::SUPER_PANEL_ACCESS_DENIED, 'You do not have access to this user\'s tenant', null, 403);
+            return $this->respondWithError(ApiErrorCodes::SUPER_PANEL_ACCESS_DENIED, __('api.super_no_access_user_tenant'), null, 403);
         }
 
         $input = $this->getAllInput();
@@ -616,19 +614,19 @@ class AdminSuperController extends BaseApiController
         $phone = isset($input['phone']) ? trim($input['phone']) : ($user['phone'] ?? null);
 
         if (empty($firstName) || empty($email)) {
-            return $this->respondWithError(ApiErrorCodes::VALIDATION_ERROR, 'first_name and email are required', null, 422);
+            return $this->respondWithError(ApiErrorCodes::VALIDATION_ERROR, __('api.super_user_edit_required_fields'), null, 422);
         }
 
         $allowedRoles = ['member', 'admin', 'tenant_admin', 'broker', 'super_admin'];
         if (!in_array($role, $allowedRoles, true)) {
-            return $this->respondWithError(ApiErrorCodes::VALIDATION_ERROR, 'Invalid role. Allowed: ' . implode(', ', $allowedRoles), 'role', 422);
+            return $this->respondWithError(ApiErrorCodes::VALIDATION_ERROR, __('api.invalid_role_allowed', ['roles' => implode(', ', $allowedRoles)]), 'role', 422);
         }
 
         // Check email uniqueness if changed
         if ($email !== $user['email']) {
             $existing = User::findGlobalByEmail($email);
             if ($existing && (int) $existing['id'] !== $id) {
-                return $this->respondWithError(ApiErrorCodes::VALIDATION_ERROR, 'Email already exists', 'email', 422);
+                return $this->respondWithError(ApiErrorCodes::VALIDATION_ERROR, __('api.email_already_exists'), 'email', 422);
             }
         }
 
@@ -648,11 +646,11 @@ class AdminSuperController extends BaseApiController
         $user = User::findById($id, false);
 
         if (!$user) {
-            return $this->respondWithError(ApiErrorCodes::RESOURCE_NOT_FOUND, 'User not found', null, 404);
+            return $this->respondWithError(ApiErrorCodes::RESOURCE_NOT_FOUND, __('api.user_not_found'), null, 404);
         }
 
         if (!SuperPanelAccess::canAccessTenant((int) $user['tenant_id'])) {
-            return $this->respondWithError(ApiErrorCodes::SUPER_PANEL_ACCESS_DENIED, 'You do not have access to this user\'s tenant', null, 403);
+            return $this->respondWithError(ApiErrorCodes::SUPER_PANEL_ACCESS_DENIED, __('api.super_no_access_user_tenant'), null, 403);
         }
 
         // Tenant must allow sub-tenants
@@ -660,7 +658,7 @@ class AdminSuperController extends BaseApiController
         if (!$tenant || !$tenant['allows_subtenants']) {
             return $this->respondWithError(
                 ApiErrorCodes::VALIDATION_ERROR,
-                'Cannot grant super admin: tenant does not allow sub-tenants',
+                __('api.super_grant_denied_not_hub'),
                 null,
                 422
             );
@@ -683,18 +681,18 @@ class AdminSuperController extends BaseApiController
         $user = User::findById($id, false);
 
         if (!$user) {
-            return $this->respondWithError(ApiErrorCodes::RESOURCE_NOT_FOUND, 'User not found', null, 404);
+            return $this->respondWithError(ApiErrorCodes::RESOURCE_NOT_FOUND, __('api.user_not_found'), null, 404);
         }
 
         if (!SuperPanelAccess::canAccessTenant((int) $user['tenant_id'])) {
-            return $this->respondWithError(ApiErrorCodes::SUPER_PANEL_ACCESS_DENIED, 'You do not have access to this user\'s tenant', null, 403);
+            return $this->respondWithError(ApiErrorCodes::SUPER_PANEL_ACCESS_DENIED, __('api.super_no_access_user_tenant'), null, 403);
         }
 
         // Cannot revoke from a global super admin unless caller is god
         if (!empty($user['is_super_admin']) && !User::isGod($userId)) {
             return $this->respondWithError(
                 ApiErrorCodes::AUTH_INSUFFICIENT_PERMISSIONS,
-                'Cannot revoke privileges from a global super admin',
+                __('api.super_revoke_denied_global'),
                 null,
                 403
             );
@@ -718,7 +716,7 @@ class AdminSuperController extends BaseApiController
         $user = User::findById($id, false);
 
         if (!$user) {
-            return $this->respondWithError(ApiErrorCodes::RESOURCE_NOT_FOUND, 'User not found', null, 404);
+            return $this->respondWithError(ApiErrorCodes::RESOURCE_NOT_FOUND, __('api.user_not_found'), null, 404);
         }
 
         DB::update(
@@ -748,14 +746,14 @@ class AdminSuperController extends BaseApiController
         $user = User::findById($id, false);
 
         if (!$user) {
-            return $this->respondWithError(ApiErrorCodes::RESOURCE_NOT_FOUND, 'User not found', null, 404);
+            return $this->respondWithError(ApiErrorCodes::RESOURCE_NOT_FOUND, __('api.user_not_found'), null, 404);
         }
 
         // Cannot revoke from yourself
         if ($id === $userId) {
             return $this->respondWithError(
                 ApiErrorCodes::VALIDATION_ERROR,
-                'Cannot revoke your own global super admin status',
+                __('api.super_cannot_revoke_self'),
                 null,
                 422
             );
@@ -784,29 +782,29 @@ class AdminSuperController extends BaseApiController
         $user = User::findById($id, false);
 
         if (!$user) {
-            return $this->respondWithError(ApiErrorCodes::RESOURCE_NOT_FOUND, 'User not found', null, 404);
+            return $this->respondWithError(ApiErrorCodes::RESOURCE_NOT_FOUND, __('api.user_not_found'), null, 404);
         }
 
         if (!SuperPanelAccess::canAccessTenant((int) $user['tenant_id'])) {
-            return $this->respondWithError(ApiErrorCodes::SUPER_PANEL_ACCESS_DENIED, 'You do not have access to this user\'s source tenant', null, 403);
+            return $this->respondWithError(ApiErrorCodes::SUPER_PANEL_ACCESS_DENIED, __('api.super_no_access_user_source_tenant'), null, 403);
         }
 
         $input = $this->getAllInput();
         $newTenantId = (int) ($input['new_tenant_id'] ?? 0);
 
         if (!$newTenantId) {
-            return $this->respondWithError(ApiErrorCodes::VALIDATION_ERROR, 'new_tenant_id is required', 'new_tenant_id', 422);
+            return $this->respondWithError(ApiErrorCodes::VALIDATION_ERROR, __('api.new_tenant_id_required'), 'new_tenant_id', 422);
         }
 
         if (!SuperPanelAccess::canAccessTenant($newTenantId)) {
-            return $this->respondWithError(ApiErrorCodes::SUPER_PANEL_ACCESS_DENIED, 'You do not have access to the destination tenant', null, 403);
+            return $this->respondWithError(ApiErrorCodes::SUPER_PANEL_ACCESS_DENIED, __('api.super_no_access_destination'), null, 403);
         }
 
         $oldTenantId = $user['tenant_id'];
 
         $moveResult = User::moveTenant($id, $newTenantId);
         if (!$moveResult['success']) {
-            return $this->respondWithError(ApiErrorCodes::SERVER_INTERNAL_ERROR, 'Failed to move user', null, 500);
+            return $this->respondWithError(ApiErrorCodes::SERVER_INTERNAL_ERROR, __('api.super_move_user_failed'), null, 500);
         }
 
         // Revoke super admin if moving to a tenant without sub-tenant capability
@@ -845,30 +843,28 @@ class AdminSuperController extends BaseApiController
         $user = User::findById($id, false);
 
         if (!$user) {
-            return $this->respondWithError(ApiErrorCodes::RESOURCE_NOT_FOUND, 'User not found', null, 404);
+            return $this->respondWithError(ApiErrorCodes::RESOURCE_NOT_FOUND, __('api.user_not_found'), null, 404);
         }
 
         if (!SuperPanelAccess::canAccessTenant((int) $user['tenant_id'])) {
-            return $this->respondWithError(ApiErrorCodes::SUPER_PANEL_ACCESS_DENIED, 'You do not have access to this user\'s source tenant', null, 403);
+            return $this->respondWithError(ApiErrorCodes::SUPER_PANEL_ACCESS_DENIED, __('api.super_no_access_user_source_tenant'), null, 403);
         }
 
         $input = $this->getAllInput();
         $targetTenantId = (int) ($input['target_tenant_id'] ?? 0);
 
         if (!$targetTenantId) {
-            return $this->respondWithError(ApiErrorCodes::VALIDATION_ERROR, 'target_tenant_id is required', 'target_tenant_id', 422);
+            return $this->respondWithError(ApiErrorCodes::VALIDATION_ERROR, __('api.target_tenant_id_required'), 'target_tenant_id', 422);
         }
 
         if (!SuperPanelAccess::canAccessTenant($targetTenantId)) {
-            return $this->respondWithError(ApiErrorCodes::SUPER_PANEL_ACCESS_DENIED, 'You do not have access to the target tenant', null, 403);
+            return $this->respondWithError(ApiErrorCodes::SUPER_PANEL_ACCESS_DENIED, __('api.super_no_access_target'), null, 403);
         }
 
         // Target must be a hub tenant
         $targetTenant = Tenant::find($targetTenantId);
         if (!$targetTenant || !$targetTenant['allows_subtenants']) {
-            return $this->respondWithError(
-                ApiErrorCodes::VALIDATION_ERROR,
-                'Target tenant must be a Hub tenant (allows sub-tenants)',
+            return $this->respondWithError(ApiErrorCodes::VALIDATION_ERROR, __('api.target_must_be_hub'),
                 'target_tenant_id',
                 422
             );
@@ -879,7 +875,7 @@ class AdminSuperController extends BaseApiController
         // Step 1: Move user
         $moveResult = User::moveTenant($id, $targetTenantId);
         if (!$moveResult['success']) {
-            return $this->respondWithError(ApiErrorCodes::SERVER_INTERNAL_ERROR, 'Failed to move user', null, 500);
+            return $this->respondWithError(ApiErrorCodes::SERVER_INTERNAL_ERROR, __('api.super_move_user_failed'), null, 500);
         }
 
         // Step 2: Grant super admin
@@ -925,26 +921,24 @@ class AdminSuperController extends BaseApiController
         $grantSuperAdmin = !empty($input['grant_super_admin']);
 
         if (empty($userIds) || !is_array($userIds)) {
-            return $this->respondWithError(ApiErrorCodes::VALIDATION_ERROR, 'user_ids array is required', 'user_ids', 422);
+            return $this->respondWithError(ApiErrorCodes::VALIDATION_ERROR, __('api.user_ids_required'), 'user_ids', 422);
         }
 
         if (!$targetTenantId) {
-            return $this->respondWithError(ApiErrorCodes::VALIDATION_ERROR, 'target_tenant_id is required', 'target_tenant_id', 422);
+            return $this->respondWithError(ApiErrorCodes::VALIDATION_ERROR, __('api.target_tenant_id_required'), 'target_tenant_id', 422);
         }
 
         $targetTenant = Tenant::find($targetTenantId);
         if (!$targetTenant) {
-            return $this->respondWithError(ApiErrorCodes::RESOURCE_NOT_FOUND, 'Target tenant not found', null, 404);
+            return $this->respondWithError(ApiErrorCodes::RESOURCE_NOT_FOUND, __('api.target_tenant_not_found'), null, 404);
         }
 
         if (!SuperPanelAccess::canAccessTenant($targetTenantId)) {
-            return $this->respondWithError(ApiErrorCodes::SUPER_PANEL_ACCESS_DENIED, 'You do not have access to the target tenant', null, 403);
+            return $this->respondWithError(ApiErrorCodes::SUPER_PANEL_ACCESS_DENIED, __('api.super_no_access_target'), null, 403);
         }
 
         if ($grantSuperAdmin && !$targetTenant['allows_subtenants']) {
-            return $this->respondWithError(
-                ApiErrorCodes::VALIDATION_ERROR,
-                'Cannot grant Super Admin: target tenant is not a Hub',
+            return $this->respondWithError(ApiErrorCodes::VALIDATION_ERROR, __('api.super_grant_denied_not_hub_target'),
                 null,
                 422
             );
@@ -1038,11 +1032,11 @@ class AdminSuperController extends BaseApiController
         $action = $input['action'] ?? '';
 
         if (empty($tenantIds) || !is_array($tenantIds)) {
-            return $this->respondWithError(ApiErrorCodes::VALIDATION_ERROR, 'tenant_ids array is required', 'tenant_ids', 422);
+            return $this->respondWithError(ApiErrorCodes::VALIDATION_ERROR, __('api.tenant_ids_array_required'), 'tenant_ids', 422);
         }
 
         if (!in_array($action, ['activate', 'deactivate', 'enable_hub', 'disable_hub'], true)) {
-            return $this->respondWithError(ApiErrorCodes::VALIDATION_ERROR, 'action must be one of: activate, deactivate, enable_hub, disable_hub', 'action', 422);
+            return $this->respondWithError(ApiErrorCodes::VALIDATION_ERROR, __('api.super_bulk_invalid_action'), 'action', 422);
         }
 
         $updatedCount = 0;
@@ -1224,7 +1218,7 @@ class AdminSuperController extends BaseApiController
         }
 
         if (empty($updates)) {
-            return $this->respondWithError(ApiErrorCodes::VALIDATION_ERROR, 'No valid fields to update', null, 422);
+            return $this->respondWithError(ApiErrorCodes::VALIDATION_ERROR, __('api.no_valid_fields'), null, 422);
         }
 
         $updates[] = "updated_at = NOW()";
@@ -1264,7 +1258,7 @@ class AdminSuperController extends BaseApiController
             return $this->respondWithData(['lockdown' => true, 'message' => 'Emergency lockdown activated']);
         }
 
-        return $this->respondWithError(ApiErrorCodes::SERVER_INTERNAL_ERROR, 'Failed to activate lockdown', null, 500);
+        return $this->respondWithError(ApiErrorCodes::SERVER_INTERNAL_ERROR, __('api.federation_lockdown_activate_failed'), null, 500);
     }
 
     /** POST /api/v2/super-admin/federation/lift-lockdown */
@@ -1278,7 +1272,7 @@ class AdminSuperController extends BaseApiController
             return $this->respondWithData(['lockdown' => false, 'message' => 'Emergency lockdown lifted']);
         }
 
-        return $this->respondWithError(ApiErrorCodes::SERVER_INTERNAL_ERROR, 'Failed to lift lockdown', null, 500);
+        return $this->respondWithError(ApiErrorCodes::SERVER_INTERNAL_ERROR, __('api.federation_lockdown_lift_failed'), null, 500);
     }
 
     /** GET /api/v2/super-admin/federation/whitelist */
@@ -1301,7 +1295,7 @@ class AdminSuperController extends BaseApiController
         $notes = $input['notes'] ?? null;
 
         if ($tenantId <= 0) {
-            return $this->respondWithError(ApiErrorCodes::VALIDATION_ERROR, 'tenant_id is required', 'tenant_id', 422);
+            return $this->respondWithError(ApiErrorCodes::VALIDATION_ERROR, __('api.tenant_id_is_required'), 'tenant_id', 422);
         }
 
         $result = $this->federationFeatureService->addToWhitelist($tenantId, $userId, $notes);
@@ -1310,7 +1304,7 @@ class AdminSuperController extends BaseApiController
             return $this->respondWithData(['added' => true, 'tenant_id' => $tenantId]);
         }
 
-        return $this->respondWithError(ApiErrorCodes::SERVER_INTERNAL_ERROR, 'Failed to add tenant to whitelist', null, 500);
+        return $this->respondWithError(ApiErrorCodes::SERVER_INTERNAL_ERROR, __('api.federation_whitelist_add_failed'), null, 500);
     }
 
     /** DELETE /api/v2/super-admin/federation/whitelist/{tenantId} */
@@ -1321,7 +1315,7 @@ class AdminSuperController extends BaseApiController
         $tenantId = (int) $tenantId;
 
         if ($tenantId <= 0) {
-            return $this->respondWithError(ApiErrorCodes::VALIDATION_ERROR, 'Invalid tenant ID', 'tenantId', 400);
+            return $this->respondWithError(ApiErrorCodes::VALIDATION_ERROR, __('api.invalid_tenant_id'), 'tenantId', 400);
         }
 
         $result = $this->federationFeatureService->removeFromWhitelist($tenantId, $userId);
@@ -1330,7 +1324,7 @@ class AdminSuperController extends BaseApiController
             return $this->respondWithData(['removed' => true, 'tenant_id' => $tenantId]);
         }
 
-        return $this->respondWithError(ApiErrorCodes::SERVER_INTERNAL_ERROR, 'Failed to remove tenant from whitelist', null, 500);
+        return $this->respondWithError(ApiErrorCodes::SERVER_INTERNAL_ERROR, __('api.federation_whitelist_remove_failed'), null, 500);
     }
 
     /** GET /api/v2/super-admin/federation/partnerships */
@@ -1355,7 +1349,7 @@ class AdminSuperController extends BaseApiController
         $partnershipId = (int) $id;
 
         if ($partnershipId <= 0) {
-            return $this->respondWithError(ApiErrorCodes::VALIDATION_ERROR, 'Invalid partnership ID', 'id', 400);
+            return $this->respondWithError(ApiErrorCodes::VALIDATION_ERROR, __('api.invalid_partnership_id'), 'id', 400);
         }
 
         $input = $this->getAllInput();
@@ -1379,7 +1373,7 @@ class AdminSuperController extends BaseApiController
         $partnershipId = (int) $id;
 
         if ($partnershipId <= 0) {
-            return $this->respondWithError(ApiErrorCodes::VALIDATION_ERROR, 'Invalid partnership ID', 'id', 400);
+            return $this->respondWithError(ApiErrorCodes::VALIDATION_ERROR, __('api.invalid_partnership_id'), 'id', 400);
         }
 
         $input = $this->getAllInput();
@@ -1403,16 +1397,16 @@ class AdminSuperController extends BaseApiController
         $tenantId = (int) $id;
 
         if ($tenantId <= 0) {
-            return $this->respondWithError(ApiErrorCodes::VALIDATION_ERROR, 'Invalid tenant ID', 'id', 400);
+            return $this->respondWithError(ApiErrorCodes::VALIDATION_ERROR, __('api.invalid_tenant_id'), 'id', 400);
         }
 
         $tenant = Tenant::find($tenantId);
         if (!$tenant) {
-            return $this->respondWithError(ApiErrorCodes::RESOURCE_NOT_FOUND, 'Tenant not found', null, 404);
+            return $this->respondWithError(ApiErrorCodes::RESOURCE_NOT_FOUND, __('api.tenant_not_found'), null, 404);
         }
 
         if (!SuperPanelAccess::canAccessTenant($tenantId)) {
-            return $this->respondWithError(ApiErrorCodes::SUPER_PANEL_ACCESS_DENIED, 'You do not have access to this tenant', null, 403);
+            return $this->respondWithError(ApiErrorCodes::SUPER_PANEL_ACCESS_DENIED, __('api.super_no_access_tenant'), null, 403);
         }
 
         $features = $this->federationFeatureService->getAllTenantFeatures($tenantId);
@@ -1435,11 +1429,11 @@ class AdminSuperController extends BaseApiController
         $tenantId = (int) $id;
 
         if ($tenantId <= 0) {
-            return $this->respondWithError(ApiErrorCodes::VALIDATION_ERROR, 'Invalid tenant ID', 'id', 400);
+            return $this->respondWithError(ApiErrorCodes::VALIDATION_ERROR, __('api.invalid_tenant_id'), 'id', 400);
         }
 
         if (!SuperPanelAccess::canAccessTenant($tenantId)) {
-            return $this->respondWithError(ApiErrorCodes::SUPER_PANEL_ACCESS_DENIED, 'You do not have access to this tenant', null, 403);
+            return $this->respondWithError(ApiErrorCodes::SUPER_PANEL_ACCESS_DENIED, __('api.super_no_access_tenant'), null, 403);
         }
 
         $input = $this->getAllInput();
@@ -1447,7 +1441,7 @@ class AdminSuperController extends BaseApiController
         $enabled = (bool) ($input['enabled'] ?? false);
 
         if (empty($feature)) {
-            return $this->respondWithError(ApiErrorCodes::VALIDATION_ERROR, 'feature is required', 'feature', 422);
+            return $this->respondWithError(ApiErrorCodes::VALIDATION_ERROR, __('api.feature_name_required'), 'feature', 422);
         }
 
         if ($enabled) {
@@ -1465,6 +1459,6 @@ class AdminSuperController extends BaseApiController
             ]);
         }
 
-        return $this->respondWithError(ApiErrorCodes::SERVER_INTERNAL_ERROR, 'Failed to update feature', null, 500);
+        return $this->respondWithError(ApiErrorCodes::SERVER_INTERNAL_ERROR, __('api.feature_update_failed'), null, 500);
     }
 }

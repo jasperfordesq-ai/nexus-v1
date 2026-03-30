@@ -381,5 +381,9 @@
     "proficiency_level": "Proficiency Level"
   },
   "hours_display_one": "{{count}} hour",
-  "hours_display_other": "{{count}} hours"
+  "hours_display_other": "{{count}} hours",
+  "toast": {
+    "aria_notifications": "Notifications",
+    "aria_dismiss_notification": "Dismiss notification"
+  }
 }

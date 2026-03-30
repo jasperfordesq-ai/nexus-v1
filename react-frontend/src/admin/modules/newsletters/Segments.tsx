@@ -194,7 +194,7 @@ export function Segments() {
         />
         <EmptyState
           icon={Filter}
-          title="No Segments Created"
+          title={t('newsletters.no_segments_created')}
           description={t('newsletters.desc_create_audience_segments_to_target_speci')}
           actionLabel="Create Your First Segment"
           onAction={() => navigate('/admin/newsletters/segments/create')}
@@ -237,7 +237,7 @@ export function Segments() {
           setDeleteTarget(null);
         }}
         onConfirm={handleDelete}
-        title="Delete Segment"
+        title={t('newsletters.delete_segment')}
         message={`Are you sure you want to delete "${deleteTarget?.name}"? This action cannot be undone. Newsletters using this segment will no longer have a target audience.`}
         confirmLabel="Delete Segment"
         confirmColor="danger"

@@ -196,9 +196,9 @@ export default function LegalDocVersionList() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold">Legal Document Versions</h1>
+          <h1 className="text-3xl font-bold">{t('legal_versions.title')}</h1>
           <p className="text-[var(--color-text-secondary)] mt-1">
-            Manage version history and compliance tracking
+            {t('legal_versions.subtitle')}
           </p>
         </div>
         <div className="flex gap-2">
@@ -207,13 +207,13 @@ export default function LegalDocVersionList() {
             startContent={<Plus size={18} />}
             onPress={() => setShowFormModal(true)}
           >
-            Create New Version
+            {t('legal_versions.create_new_version')}
           </Button>
           <Button
             variant="bordered"
             onPress={() => navigate(tenantPath('/admin/legal-documents/compliance'))}
           >
-            Compliance Dashboard
+            {t('legal_versions.compliance_dashboard')}
           </Button>
         </div>
       </div>
@@ -458,18 +458,18 @@ export default function LegalDocVersionList() {
         <ModalContent>
           {(onClose) => (
             <>
-              <ModalHeader>Publish Version</ModalHeader>
+              <ModalHeader>{t('legal_versions.publish_version')}</ModalHeader>
               <ModalBody>
                 <div className="space-y-4">
                   <div className="flex items-start gap-3 p-3 bg-warning-50 dark:bg-warning-900/20 rounded-lg">
                     <AlertCircle size={20} className="text-warning flex-shrink-0 mt-0.5" />
                     <div className="text-sm">
-                      <p className="font-medium mb-1">This will:</p>
+                      <p className="font-medium mb-1">{t('legal_versions.this_will')}:</p>
                       <ul className="list-disc list-inside space-y-1 text-[var(--color-text-secondary)]">
-                        <li>Set this version as the current version</li>
-                        <li>Mark all other versions as non-current</li>
-                        <li>Users who accepted old versions will need to re-accept</li>
-                        <li>Sync with the GDPR consent system</li>
+                        <li>{t('legal_versions.publish_step_1')}</li>
+                        <li>{t('legal_versions.publish_step_2')}</li>
+                        <li>{t('legal_versions.publish_step_3')}</li>
+                        <li>{t('legal_versions.publish_step_4')}</li>
                       </ul>
                     </div>
                   </div>
@@ -485,7 +485,7 @@ export default function LegalDocVersionList() {
                   onPress={handlePublish}
                   isLoading={submitting}
                 >
-                  Publish Version
+                  {t('legal_versions.publish_version')}
                 </Button>
               </ModalFooter>
             </>
@@ -555,7 +555,7 @@ export default function LegalDocVersionList() {
         <ModalContent>
           {(onClose) => (
             <>
-              <ModalHeader>Send Notification</ModalHeader>
+              <ModalHeader>{t('legal_versions.send_notification')}</ModalHeader>
               <ModalBody>
                 <div className="space-y-4">
                   <p className="text-sm text-[var(--color-text-secondary)]">
@@ -602,7 +602,7 @@ export default function LegalDocVersionList() {
                   isLoading={submitting}
                   startContent={<Send size={16} />}
                 >
-                  Send Notification
+                  {t('legal_versions.send_notification')}
                 </Button>
               </ModalFooter>
             </>
@@ -615,7 +615,7 @@ export default function LegalDocVersionList() {
         <ModalContent>
           {(onClose) => (
             <>
-              <ModalHeader>Delete Draft Version</ModalHeader>
+              <ModalHeader>{t('legal_versions.delete_draft_version')}</ModalHeader>
               <ModalBody>
                 <div className="space-y-4">
                   <div className="flex items-start gap-3 p-3 bg-danger-50 dark:bg-danger-900/20 rounded-lg">
@@ -639,7 +639,7 @@ export default function LegalDocVersionList() {
                   isLoading={submitting}
                   startContent={<Trash2 size={16} />}
                 >
-                  Delete Draft
+                  {t('legal_versions.delete_draft')}
                 </Button>
               </ModalFooter>
             </>

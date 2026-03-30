@@ -167,7 +167,7 @@ class AdminEmailController extends BaseApiController
         if (isset($input['email_provider'])) {
             $validProviders = ['platform_default', 'sendgrid', 'gmail_api', 'smtp'];
             if (!in_array($input['email_provider'], $validProviders, true)) {
-                return $this->respondWithError('VALIDATION_ERROR', 'Invalid email provider', null, 422);
+                return $this->respondWithError('VALIDATION_ERROR', __('api.invalid_email_provider'), null, 422);
             }
         }
 
@@ -185,7 +185,7 @@ class AdminEmailController extends BaseApiController
         }
 
         if (empty($toSave)) {
-            return $this->respondWithError('VALIDATION_ERROR', 'No valid settings provided', null, 422);
+            return $this->respondWithError('VALIDATION_ERROR', __('api.no_valid_settings'), null, 422);
         }
 
         EmailSettings::setMultiple($tenantId, $toSave);
@@ -204,7 +204,7 @@ class AdminEmailController extends BaseApiController
         $to = $this->input('to', '');
 
         if (empty($to) || !filter_var($to, FILTER_VALIDATE_EMAIL)) {
-            return $this->respondWithError('VALIDATION_ERROR', 'Valid email address required', 'to', 400);
+            return $this->respondWithError('VALIDATION_ERROR', __('api.valid_email_address_required'), 'to', 400);
         }
 
         $mailer = new Mailer();
@@ -222,7 +222,7 @@ class AdminEmailController extends BaseApiController
             return $this->respondWithData(['success' => true, 'provider' => $provider, 'to' => $to]);
         }
 
-        return $this->respondWithError('SERVER_ERROR', 'Failed to send test email. Check server logs.', null, 500);
+        return $this->respondWithError('SERVER_ERROR', __('api.failed_send_test_email'), null, 500);
     }
 
     /** POST /api/v2/admin/email/test (v1 wrapper) */
@@ -246,7 +246,7 @@ class AdminEmailController extends BaseApiController
         $to = $this->input('to', '');
 
         if (empty($to) || !filter_var($to, FILTER_VALIDATE_EMAIL)) {
-            return $this->respondWithError('VALIDATION_ERROR', 'Valid email address required', 'to', 400);
+            return $this->respondWithError('VALIDATION_ERROR', __('api.valid_email_address_required'), 'to', 400);
         }
 
         $mailer = Mailer::forCurrentTenant();
@@ -264,6 +264,6 @@ class AdminEmailController extends BaseApiController
             return $this->respondWithData(['success' => true, 'provider' => $provider, 'to' => $to]);
         }
 
-        return $this->respondWithError('SERVER_ERROR', 'Failed to send test email via ' . $provider . '. Check server logs.', null, 500);
+        return $this->respondWithError('SERVER_ERROR', __('api.failed_send_test_via', ['provider' => $provider]), null, 500);
     }
 }

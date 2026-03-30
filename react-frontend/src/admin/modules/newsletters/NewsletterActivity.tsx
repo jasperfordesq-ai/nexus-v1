@@ -467,7 +467,7 @@ export function NewsletterActivity() {
           {/* ── Non-Openers Table ── */}
           {activeTab === 'non-openers' && !loading && (
             <Table
-              aria-label="Newsletter non-openers"
+              aria-label={t('newsletters.label_newsletter_non_openers')}
               isStriped
               classNames={{ th: 'text-default-500 text-xs uppercase' }}
             >
@@ -494,7 +494,7 @@ export function NewsletterActivity() {
           {/* ── Opened No Click Table ── */}
           {activeTab === 'opened-no-click' && !loading && (
             <Table
-              aria-label="Opened but didn't click"
+              aria-label={t('newsletters.label_opened_no_click')}
               isStriped
               classNames={{ th: 'text-default-500 text-xs uppercase' }}
             >

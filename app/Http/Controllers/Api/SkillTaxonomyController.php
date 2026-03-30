@@ -52,7 +52,7 @@ class SkillTaxonomyController extends BaseApiController
         $category = $this->skillTaxonomyService->getCategoryById((int) $id);
 
         if (!$category) {
-            return $this->respondWithError('NOT_FOUND', 'Category not found', null, 404);
+            return $this->respondWithError('NOT_FOUND', __('api.category_not_found'), null, 404);
         }
 
         $category['skills'] = $this->skillTaxonomyService->getCategorySkills((int) $id);

@@ -16,6 +16,7 @@ import {
   Activity, CheckCircle, XCircle, Clock, AlertTriangle, Shield, Wifi, WifiOff,
 } from 'lucide-react';
 import { useToast } from '@/contexts';
+import { useTranslation } from 'react-i18next';
 import { api } from '@/lib/api';
 
 interface ProviderHealthStats {
@@ -167,6 +168,7 @@ export function ProviderHealthDashboard() {
 }
 
 function ProviderCard({ provider }: { provider: ProviderHealth }) {
+  const { t } = useTranslation('admin');
   const { stats, recent_24h, last_webhook } = provider;
   const successColor = stats.success_rate === null
     ? 'default'
@@ -240,7 +242,7 @@ function ProviderCard({ provider }: { provider: ProviderHealth }) {
             value={stats.success_rate ?? 0}
             maxValue={100}
             color={successColor}
-            aria-label="Success rate"
+            aria-label={t('provider_health.aria_success_rate')}
           />
         </div>
 

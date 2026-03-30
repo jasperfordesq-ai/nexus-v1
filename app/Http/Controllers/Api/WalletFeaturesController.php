@@ -82,7 +82,7 @@ class WalletFeaturesController extends BaseApiController
         $data = $this->getAllInput();
 
         if (empty($data['amount']) || (float) $data['amount'] <= 0) {
-            return $this->error('Amount must be greater than 0', 400);
+            return $this->error(__('api.amount_gt_zero'), 400);
         }
 
         $result = $this->communityFundService->adminDeposit(
@@ -119,7 +119,7 @@ class WalletFeaturesController extends BaseApiController
         }
 
         if (empty($data['amount']) || (float) $data['amount'] <= 0) {
-            return $this->error('Amount must be greater than 0', 400);
+            return $this->error(__('api.amount_gt_zero'), 400);
         }
 
         $result = $this->communityFundService->adminWithdraw(
@@ -148,7 +148,7 @@ class WalletFeaturesController extends BaseApiController
         $data = $this->getAllInput();
 
         if (empty($data['amount']) || (float) $data['amount'] <= 0) {
-            return $this->error('Amount must be greater than 0', 400);
+            return $this->error(__('api.amount_gt_zero'), 400);
         }
 
         $result = $this->creditDonationService->donateToCommunityFund(
@@ -306,14 +306,14 @@ class WalletFeaturesController extends BaseApiController
         $data = $this->getAllInput();
 
         if (empty($data['amount']) || (float) $data['amount'] <= 0) {
-            return $this->respondWithError('VALIDATION_ERROR', 'Amount must be greater than 0', 'amount', 400);
+            return $this->respondWithError('VALIDATION_ERROR', __('api.amount_gt_zero'), 'amount', 400);
         }
 
         $recipientType = $data['recipient_type'] ?? 'community_fund';
 
         if ($recipientType === 'user') {
             if (empty($data['recipient_id'])) {
-                return $this->respondWithError('VALIDATION_ERROR', 'recipient_id is required when donating to a user', 'recipient_id', 400);
+                return $this->respondWithError('VALIDATION_ERROR', __('api.recipient_id_required_for_user'), 'recipient_id', 400);
             }
 
             $result = $this->creditDonationService->donateToMember(

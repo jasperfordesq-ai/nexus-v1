@@ -65,7 +65,7 @@ class TenantBootstrapController extends BaseApiController
                 // TRS-001 fail-closed: unknown slug MUST 404, never fall back to master tenant
                 return $this->respondWithError(
                     'TENANT_NOT_FOUND',
-                    'The requested community was not found or is inactive.',
+                    __('api.community_not_found_or_inactive'),
                     null,
                     404
                 );
@@ -132,7 +132,7 @@ class TenantBootstrapController extends BaseApiController
         if (!empty($tenant['id']) && $tenant['id'] > 1 && empty($tenant['is_active'])) {
             return $this->respondWithError(
                 \App\Core\ApiErrorCodes::INVALID_TENANT,
-                'Tenant is inactive',
+                __('api.tenant_inactive'),
                 null,
                 503
             );

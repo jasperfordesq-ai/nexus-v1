@@ -542,7 +542,7 @@ export function ImpactReport() {
           loading={loading}
         />
         <StatCard
-          label="Retention Rate (90d)"
+          label={t('impact.label_retention_rate')}
           value={data ? formatPercent(data.health.retention_rate) : '\u2014'}
           icon={Heart}
           color="danger"
@@ -736,7 +736,7 @@ export function ImpactReport() {
 
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 max-w-xl">
             <Input
-              label="Hourly Value (GBP)"
+              label={t('impact.label_hourly_value')}
               type="number"
               min={0.01}
               max={1000}

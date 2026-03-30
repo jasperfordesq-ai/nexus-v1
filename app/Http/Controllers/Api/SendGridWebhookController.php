@@ -50,7 +50,7 @@ class SendGridWebhookController extends BaseApiController
             $timestamp = request()->header('X-Twilio-Email-Event-Webhook-Timestamp');
 
             if (empty($signature) || empty($timestamp)) {
-                return $this->respondWithError('UNAUTHORIZED', 'Missing signature headers', null, 401);
+                return $this->respondWithError('UNAUTHORIZED', __('api.missing_signature_headers'), null, 401);
             }
 
             $payload = request()->getContent();
@@ -64,7 +64,7 @@ class SendGridWebhookController extends BaseApiController
             } else {
                 $valid = openssl_verify($timestampedPayload, $decodedSignature, $publicKey, OPENSSL_ALGO_SHA256);
                 if ($valid !== 1) {
-                    return $this->respondWithError('UNAUTHORIZED', 'Invalid webhook signature', null, 401);
+                    return $this->respondWithError('UNAUTHORIZED', __('api.invalid_webhook_signature'), null, 401);
                 }
                 // Signature verified — skip shared secret check
                 $ecdsaVerified = true;
@@ -79,26 +79,26 @@ class SendGridWebhookController extends BaseApiController
                 $providedSecret = request()->header('X-Webhook-Secret')
                     ?? request()->query('secret');
                 if (!hash_equals($expectedSecret, (string) $providedSecret)) {
-                    return $this->respondWithError('UNAUTHORIZED', 'Invalid webhook secret', null, 401);
+                    return $this->respondWithError('UNAUTHORIZED', __('api.invalid_webhook_secret'), null, 401);
                 }
             } else {
                 // SECURITY: If neither ECDSA key nor shared secret is configured,
                 // reject all requests. Never accept unauthenticated webhooks.
                 Log::error('SendGrid webhook: No authentication configured (set SENDGRID_WEBHOOK_VERIFICATION_KEY or SENDGRID_WEBHOOK_SECRET)');
-                return $this->respondWithError('UNAUTHORIZED', 'Webhook authentication not configured', null, 401);
+                return $this->respondWithError('UNAUTHORIZED', __('api.webhook_auth_not_configured'), null, 401);
             }
         }
 
         $payload = request()->getContent();
 
         if (empty($payload)) {
-            return $this->respondWithError('INVALID_PAYLOAD', 'Empty payload', null, 400);
+            return $this->respondWithError('INVALID_PAYLOAD', __('api.empty_payload'), null, 400);
         }
 
         $events = json_decode($payload, true);
 
         if (!is_array($events)) {
-            return $this->respondWithError('INVALID_PAYLOAD', 'Invalid JSON payload', null, 400);
+            return $this->respondWithError('INVALID_PAYLOAD', __('api.invalid_json_payload'), null, 400);
         }
 
         $processed = 0;

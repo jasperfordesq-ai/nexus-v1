@@ -51,7 +51,7 @@ class UsersController extends BaseApiController
         $profile = $this->userService->getOwnProfile($userId);
 
         if (!$profile) {
-            return $this->respondWithError('NOT_FOUND', 'User not found', null, 404);
+            return $this->respondWithError('NOT_FOUND', __('api.user_not_found'), null, 404);
         }
 
         return $this->respondWithData($profile);
@@ -108,10 +108,10 @@ class UsersController extends BaseApiController
                     return $this->respondWithErrors($errors, 403);
                 }
                 if ($errorCode === 'PROFILE_INCOMPLETE') {
-                    return $this->respondWithError('PROFILE_INCOMPLETE', 'This member\'s profile is not yet complete', null, 404);
+                    return $this->respondWithError('PROFILE_INCOMPLETE', __('api.user_profile_incomplete'), null, 404);
                 }
             }
-            return $this->respondWithError('NOT_FOUND', 'User not found', null, 404);
+            return $this->respondWithError('NOT_FOUND', __('api.user_not_found'), null, 404);
         }
 
         return $this->respondWithData($profile);
@@ -280,7 +280,7 @@ class UsersController extends BaseApiController
             ->update(['preferred_theme' => $theme]);
 
         if ($success === false) {
-            return $this->respondWithError('UPDATE_FAILED', 'Failed to update theme preference', null, 500);
+            return $this->respondWithError('UPDATE_FAILED', __('api.user_theme_update_failed'), null, 500);
         }
 
         return $this->respondWithData([
@@ -363,7 +363,7 @@ class UsersController extends BaseApiController
             ->update(['theme_preferences' => json_encode($preferences)]);
 
         if ($success === false) {
-            return $this->respondWithError('UPDATE_FAILED', 'Failed to update theme preferences', null, 500);
+            return $this->respondWithError('UPDATE_FAILED', __('api.user_theme_prefs_update_failed'), null, 500);
         }
 
         return $this->respondWithData([
@@ -399,7 +399,7 @@ class UsersController extends BaseApiController
             ->update(['preferred_language' => $language]);
 
         if ($success === false) {
-            return $this->respondWithError('UPDATE_FAILED', 'Failed to update language preference', null, 500);
+            return $this->respondWithError('UPDATE_FAILED', __('api.user_lang_update_failed'), null, 500);
         }
 
         // Update session so PHP admin views pick it up immediately
@@ -429,11 +429,11 @@ class UsersController extends BaseApiController
         $newPassword = $this->input('new_password');
 
         if (empty($currentPassword)) {
-            return $this->respondWithError('VALIDATION_ERROR', 'Current password is required', 'current_password', 400);
+            return $this->respondWithError('VALIDATION_ERROR', __('api.user_current_password_required'), 'current_password', 400);
         }
 
         if (empty($newPassword)) {
-            return $this->respondWithError('VALIDATION_ERROR', 'New password is required', 'new_password', 400);
+            return $this->respondWithError('VALIDATION_ERROR', __('api.user_new_password_required'), 'new_password', 400);
         }
 
         $success = $this->userService->updatePassword($userId, $currentPassword, $newPassword);
@@ -461,7 +461,7 @@ class UsersController extends BaseApiController
         // Require password re-authentication before account deletion
         $password = $this->input('password', '');
         if (empty($password)) {
-            return $this->respondWithError('VALIDATION_ERROR', 'Password is required', 'password', 400);
+            return $this->respondWithError('VALIDATION_ERROR', __('api.user_password_required'), 'password', 400);
         }
 
         $user = \Illuminate\Support\Facades\DB::table('users')
@@ -471,7 +471,7 @@ class UsersController extends BaseApiController
             ->first();
 
         if (!$user || !password_verify($password, $user->password_hash)) {
-            return $this->respondWithError('INVALID_PASSWORD', 'Invalid password', 'password', 403);
+            return $this->respondWithError('INVALID_PASSWORD', __('api.user_invalid_password'), 'password', 403);
         }
 
         $success = $this->userService->deleteAccount($userId);
@@ -540,13 +540,13 @@ class UsersController extends BaseApiController
         }
 
         if (empty($prefs)) {
-            return $this->respondWithError('VALIDATION_ERROR', 'No valid preferences provided', null, 400);
+            return $this->respondWithError('VALIDATION_ERROR', __('api.user_no_valid_prefs'), null, 400);
         }
 
         $success = User::updateNotificationPreferences($userId, $prefs);
 
         if (!$success) {
-            return $this->respondWithError('UPDATE_FAILED', 'Failed to update preferences', null, 500);
+            return $this->respondWithError('UPDATE_FAILED', __('api.user_prefs_update_failed'), null, 500);
         }
 
         return $this->respondWithData(['message' => 'Notification preferences updated']);
@@ -581,7 +581,7 @@ class UsersController extends BaseApiController
         $given = (bool) ($data['given'] ?? false);
 
         if (empty($slug)) {
-            return $this->respondWithError('VALIDATION_ERROR', 'Missing consent slug', 'slug', 400);
+            return $this->respondWithError('VALIDATION_ERROR', __('api.user_consent_slug_required'), 'slug', 400);
         }
 
         try {
@@ -595,7 +595,7 @@ class UsersController extends BaseApiController
             return $this->respondWithData($result);
         } catch (\Exception $e) {
             Log::error('Consent update failed', ['user' => $userId, 'slug' => $slug, 'error' => $e->getMessage()]);
-            return $this->respondWithError('CONSENT_UPDATE_FAILED', 'Failed to update consent preferences', null, 500);
+            return $this->respondWithError('CONSENT_UPDATE_FAILED', __('api.user_consent_update_failed'), null, 500);
         }
     }
 
@@ -639,10 +639,10 @@ class UsersController extends BaseApiController
                 'message'    => 'Your request has been submitted and will be processed within 30 days.',
             ], null, 201);
         } catch (\RuntimeException $e) {
-            return $this->respondWithError('DUPLICATE_REQUEST', 'A similar request is already pending', null, 409);
+            return $this->respondWithError('DUPLICATE_REQUEST', __('api.user_duplicate_request'), null, 409);
         } catch (\Exception $e) {
             Log::error('GDPR request creation failed', ['user' => $userId, 'type' => $type, 'error' => $e->getMessage()]);
-            return $this->respondWithError('REQUEST_FAILED', 'Failed to submit request. Please try again.', null, 500);
+            return $this->respondWithError('REQUEST_FAILED', __('api.user_request_failed'), null, 500);
         }
     }
 
@@ -702,17 +702,17 @@ class UsersController extends BaseApiController
         $lon = $this->query('lon');
 
         if ($lat === null || $lon === null) {
-            return $this->respondWithError('VALIDATION_ERROR', 'Latitude and longitude are required', null, 400);
+            return $this->respondWithError('VALIDATION_ERROR', __('api.event_lat_lon_required'), null, 400);
         }
 
         $lat = (float) $lat;
         $lon = (float) $lon;
 
         if ($lat < -90 || $lat > 90) {
-            return $this->respondWithError('VALIDATION_ERROR', 'Latitude must be between -90 and 90', 'lat', 400);
+            return $this->respondWithError('VALIDATION_ERROR', __('api.event_lat_range'), 'lat', 400);
         }
         if ($lon < -180 || $lon > 180) {
-            return $this->respondWithError('VALIDATION_ERROR', 'Longitude must be between -180 and 180', 'lon', 400);
+            return $this->respondWithError('VALIDATION_ERROR', __('api.event_lon_range'), 'lon', 400);
         }
 
         // Accept both 'limit' (frontend sends this) and 'per_page' for backwards compat
@@ -849,7 +849,7 @@ class UsersController extends BaseApiController
 
         $file = request()->file('avatar');
         if (!$file || !$file->isValid()) {
-            return $this->respondWithError('VALIDATION_ERROR', 'No avatar file uploaded or upload error', 'avatar', 400);
+            return $this->respondWithError('VALIDATION_ERROR', __('api.user_no_avatar_uploaded'), 'avatar', 400);
         }
 
         // Build a $_FILES-compatible array for $this->userService->updateAvatar()

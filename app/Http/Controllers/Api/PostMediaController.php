@@ -39,7 +39,7 @@ class PostMediaController extends BaseApiController
 
         // Verify post ownership
         if (!$this->postMediaService->isPostOwnedByUser($id, $userId)) {
-            return $this->respondWithError('FORBIDDEN', 'You can only add media to your own posts', null, 403);
+            return $this->respondWithError('FORBIDDEN', __('api.own_posts_media_only'), null, 403);
         }
 
         $request = request();
@@ -70,14 +70,14 @@ class PostMediaController extends BaseApiController
         }
 
         if (empty($files)) {
-            return $this->respondWithError('VALIDATION_ERROR', 'No media files provided', 'media', 422);
+            return $this->respondWithError('VALIDATION_ERROR', __('api.no_media_files_provided'), 'media', 422);
         }
 
         $altTexts = $this->input('alt_texts') ?? [];
         $media = $this->postMediaService->attachMedia($id, $files, is_array($altTexts) ? $altTexts : []);
 
         if (empty($media)) {
-            return $this->respondWithError('UPLOAD_FAILED', 'No files were uploaded successfully. Maximum 10 images per post.', null, 422);
+            return $this->respondWithError('UPLOAD_FAILED', __('api.media_upload_failed'), null, 422);
         }
 
         return $this->respondWithData($media, null, 201);
@@ -94,13 +94,13 @@ class PostMediaController extends BaseApiController
         $userId = $this->requireAuth();
 
         if (!$this->postMediaService->isPostOwnedByUser($id, $userId)) {
-            return $this->respondWithError('FORBIDDEN', 'You can only reorder media on your own posts', null, 403);
+            return $this->respondWithError('FORBIDDEN', __('api.own_posts_media_only'), null, 403);
         }
 
         $mediaIds = $this->input('media_ids');
 
         if (!is_array($mediaIds) || empty($mediaIds)) {
-            return $this->respondWithError('VALIDATION_ERROR', 'media_ids must be a non-empty array', 'media_ids', 422);
+            return $this->respondWithError('VALIDATION_ERROR', __('api.media_ids_required'), 'media_ids', 422);
         }
 
         $this->postMediaService->reorderMedia($id, $mediaIds);
@@ -118,7 +118,7 @@ class PostMediaController extends BaseApiController
         $userId = $this->requireAuth();
 
         if (!$this->postMediaService->isMediaOwnedByUser($mediaId, $userId)) {
-            return $this->respondWithError('FORBIDDEN', 'You can only remove your own media', null, 403);
+            return $this->respondWithError('FORBIDDEN', __('api.own_media_only'), null, 403);
         }
 
         $this->postMediaService->removeMedia($mediaId);
@@ -137,7 +137,7 @@ class PostMediaController extends BaseApiController
         $userId = $this->requireAuth();
 
         if (!$this->postMediaService->isMediaOwnedByUser($mediaId, $userId)) {
-            return $this->respondWithError('FORBIDDEN', 'You can only update your own media', null, 403);
+            return $this->respondWithError('FORBIDDEN', __('api.own_media_only'), null, 403);
         }
 
         $altText = $this->input('alt_text');
@@ -149,7 +149,7 @@ class PostMediaController extends BaseApiController
         }
 
         if (!is_string($altText)) {
-            return $this->respondWithError('VALIDATION_ERROR', 'alt_text must be a string', 'alt_text', 422);
+            return $this->respondWithError('VALIDATION_ERROR', __('api.alt_text_must_be_string'), 'alt_text', 422);
         }
 
         $this->postMediaService->updateAltText($mediaId, $altText);

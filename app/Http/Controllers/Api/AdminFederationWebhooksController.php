@@ -64,7 +64,7 @@ class AdminFederationWebhooksController extends BaseApiController
 
             return $this->respondWithData($webhooks);
         } catch (\Exception $e) {
-            return $this->respondWithError('FETCH_FAILED', 'Failed to load webhooks', null, 500);
+            return $this->respondWithError('FETCH_FAILED', __('api.webhooks_fetch_failed'), null, 500);
         }
     }
 
@@ -82,25 +82,25 @@ class AdminFederationWebhooksController extends BaseApiController
         // Validate URL
         $url = trim($input['url'] ?? '');
         if (!$url || !filter_var($url, FILTER_VALIDATE_URL)) {
-            return $this->respondWithError('VALIDATION_ERROR', 'A valid URL is required', 'url', 422);
+            return $this->respondWithError('VALIDATION_ERROR', __('api.valid_url_required'), 'url', 422);
         }
         if (!str_starts_with($url, 'https://')) {
-            return $this->respondWithError('VALIDATION_ERROR', 'URL must use HTTPS', 'url', 422);
+            return $this->respondWithError('VALIDATION_ERROR', __('api.url_must_use_https'), 'url', 422);
         }
 
         // SSRF protection: reject URLs targeting private/internal IPs
         if (\App\Services\WebhookDispatchService::isPrivateUrl($url)) {
-            return $this->respondWithError('VALIDATION_ERROR', 'URL must not target private or internal IP addresses', 'url', 422);
+            return $this->respondWithError('VALIDATION_ERROR', __('api.url_no_private_ip'), 'url', 422);
         }
 
         // Validate events
         $events = $input['events'] ?? [];
         if (!is_array($events) || empty($events)) {
-            return $this->respondWithError('VALIDATION_ERROR', 'At least one event type is required', 'events', 422);
+            return $this->respondWithError('VALIDATION_ERROR', __('api.at_least_one_event_type'), 'events', 422);
         }
         $invalidEvents = array_diff($events, self::VALID_EVENTS);
         if (!empty($invalidEvents)) {
-            return $this->respondWithError('VALIDATION_ERROR', 'Invalid event types: ' . implode(', ', $invalidEvents), 'events', 422);
+            return $this->respondWithError('VALIDATION_ERROR', __('api.invalid_event_types', ['types' => implode(', ', $invalidEvents)]), 'events', 422);
         }
 
         // Generate signing secret
@@ -125,7 +125,7 @@ class AdminFederationWebhooksController extends BaseApiController
                 'secret' => $secret,
             ], null, 201);
         } catch (\Exception $e) {
-            return $this->respondWithError('CREATE_FAILED', 'Failed to create webhook', null, 500);
+            return $this->respondWithError('CREATE_FAILED', __('api.webhook_create_failed'), null, 500);
         }
     }
 
@@ -147,7 +147,7 @@ class AdminFederationWebhooksController extends BaseApiController
             ->first();
 
         if (!$webhook) {
-            return $this->respondWithError('NOT_FOUND', 'Webhook not found', null, 404);
+            return $this->respondWithError('NOT_FOUND', __('api.webhook_not_found'), null, 404);
         }
 
         $updates = [];
@@ -156,14 +156,14 @@ class AdminFederationWebhooksController extends BaseApiController
         if (isset($input['url'])) {
             $url = trim($input['url']);
             if (!$url || !filter_var($url, FILTER_VALIDATE_URL)) {
-                return $this->respondWithError('VALIDATION_ERROR', 'A valid URL is required', 'url', 422);
+                return $this->respondWithError('VALIDATION_ERROR', __('api.valid_url_required'), 'url', 422);
             }
             if (!str_starts_with($url, 'https://')) {
-                return $this->respondWithError('VALIDATION_ERROR', 'URL must use HTTPS', 'url', 422);
+                return $this->respondWithError('VALIDATION_ERROR', __('api.url_must_use_https'), 'url', 422);
             }
             // SSRF protection: reject URLs targeting private/internal IPs
             if (\App\Services\WebhookDispatchService::isPrivateUrl($url)) {
-                return $this->respondWithError('VALIDATION_ERROR', 'URL must not target private or internal IP addresses', 'url', 422);
+                return $this->respondWithError('VALIDATION_ERROR', __('api.url_no_private_ip'), 'url', 422);
             }
             $updates['url'] = $url;
         }
@@ -172,11 +172,11 @@ class AdminFederationWebhooksController extends BaseApiController
         if (isset($input['events'])) {
             $events = $input['events'];
             if (!is_array($events) || empty($events)) {
-                return $this->respondWithError('VALIDATION_ERROR', 'At least one event type is required', 'events', 422);
+                return $this->respondWithError('VALIDATION_ERROR', __('api.at_least_one_event_type'), 'events', 422);
             }
             $invalidEvents = array_diff($events, self::VALID_EVENTS);
             if (!empty($invalidEvents)) {
-                return $this->respondWithError('VALIDATION_ERROR', 'Invalid event types: ' . implode(', ', $invalidEvents), 'events', 422);
+                return $this->respondWithError('VALIDATION_ERROR', __('api.invalid_event_types', ['types' => implode(', ', $invalidEvents)]), 'events', 422);
             }
             $updates['events'] = json_encode(array_values($events));
         }
@@ -197,7 +197,7 @@ class AdminFederationWebhooksController extends BaseApiController
         }
 
         if (empty($updates)) {
-            return $this->respondWithError('VALIDATION_ERROR', 'No valid fields to update', null, 422);
+            return $this->respondWithError('VALIDATION_ERROR', __('api.no_valid_fields'), null, 422);
         }
 
         $updates['updated_at'] = now();
@@ -210,7 +210,7 @@ class AdminFederationWebhooksController extends BaseApiController
 
             return $this->respondWithData(['id' => $id]);
         } catch (\Exception $e) {
-            return $this->respondWithError('UPDATE_FAILED', 'Failed to update webhook', null, 500);
+            return $this->respondWithError('UPDATE_FAILED', __('api.webhook_update_failed'), null, 500);
         }
     }
 
@@ -230,7 +230,7 @@ class AdminFederationWebhooksController extends BaseApiController
             ->first();
 
         if (!$webhook) {
-            return $this->respondWithError('NOT_FOUND', 'Webhook not found', null, 404);
+            return $this->respondWithError('NOT_FOUND', __('api.webhook_not_found'), null, 404);
         }
 
         try {
@@ -247,7 +247,7 @@ class AdminFederationWebhooksController extends BaseApiController
 
             return $this->respondWithData(['deleted' => true]);
         } catch (\Exception $e) {
-            return $this->respondWithError('DELETE_FAILED', 'Failed to delete webhook', null, 500);
+            return $this->respondWithError('DELETE_FAILED', __('api.webhook_delete_failed'), null, 500);
         }
     }
 
@@ -267,12 +267,12 @@ class AdminFederationWebhooksController extends BaseApiController
             ->first();
 
         if (!$webhook) {
-            return $this->respondWithError('NOT_FOUND', 'Webhook not found', null, 404);
+            return $this->respondWithError('NOT_FOUND', __('api.webhook_not_found'), null, 404);
         }
 
         // SSRF protection: re-check at dispatch time (DNS rebinding defense)
         if (\App\Services\WebhookDispatchService::isPrivateUrl($webhook->url)) {
-            return $this->respondWithError('VALIDATION_ERROR', 'Webhook URL resolves to a private or internal IP address', 'url', 422);
+            return $this->respondWithError('VALIDATION_ERROR', __('api.webhook_private_ip'), 'url', 422);
         }
 
         $payload = [
@@ -361,9 +361,7 @@ class AdminFederationWebhooksController extends BaseApiController
             ]);
         }
 
-        return $this->respondWithError(
-            'TEST_FAILED',
-            $errorMessage ?? 'Webhook test failed',
+        return $this->respondWithError('TEST_FAILED', $errorMessage ?? __('api.webhook_test_failed'),
             null,
             502
         );
@@ -386,7 +384,7 @@ class AdminFederationWebhooksController extends BaseApiController
             ->first();
 
         if (!$webhook) {
-            return $this->respondWithError('NOT_FOUND', 'Webhook not found', null, 404);
+            return $this->respondWithError('NOT_FOUND', __('api.webhook_not_found'), null, 404);
         }
 
         try {
@@ -408,7 +406,7 @@ class AdminFederationWebhooksController extends BaseApiController
 
             return $this->respondWithData($logs);
         } catch (\Exception $e) {
-            return $this->respondWithError('FETCH_FAILED', 'Failed to load webhook logs', null, 500);
+            return $this->respondWithError('FETCH_FAILED', __('api.webhook_logs_fetch_failed'), null, 500);
         }
     }
 
@@ -429,11 +427,11 @@ class AdminFederationWebhooksController extends BaseApiController
             ->first();
 
         if (!$log) {
-            return $this->respondWithError('NOT_FOUND', 'Log entry not found', null, 404);
+            return $this->respondWithError('NOT_FOUND', __('api.log_not_found'), null, 404);
         }
 
         if ($log->success) {
-            return $this->respondWithError('ALREADY_SUCCEEDED', 'This delivery already succeeded', null, 422);
+            return $this->respondWithError('ALREADY_SUCCEEDED', __('api.delivery_already_succeeded'), null, 422);
         }
 
         // Get the parent webhook
@@ -443,12 +441,12 @@ class AdminFederationWebhooksController extends BaseApiController
             ->first();
 
         if (!$webhook) {
-            return $this->respondWithError('NOT_FOUND', 'Parent webhook not found', null, 404);
+            return $this->respondWithError('NOT_FOUND', __('api.parent_webhook_not_found'), null, 404);
         }
 
         // SSRF protection: re-check at dispatch time (DNS rebinding defense)
         if (\App\Services\WebhookDispatchService::isPrivateUrl($webhook->url)) {
-            return $this->respondWithError('VALIDATION_ERROR', 'Webhook URL resolves to a private or internal IP address', 'url', 422);
+            return $this->respondWithError('VALIDATION_ERROR', __('api.webhook_private_ip'), 'url', 422);
         }
 
         // Re-send the original payload

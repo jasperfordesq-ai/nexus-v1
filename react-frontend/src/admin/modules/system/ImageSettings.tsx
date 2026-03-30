@@ -76,24 +76,24 @@ export function ImageSettings() {
 
       <div className="space-y-4">
         <Card shadow="sm">
-          <CardHeader><h3 className="text-lg font-semibold flex items-center gap-2"><Image size={20} /> Upload Limits</h3></CardHeader>
+          <CardHeader><h3 className="text-lg font-semibold flex items-center gap-2"><Image size={20} /> {t('system.upload_limits')}</h3></CardHeader>
           <CardBody className="gap-4">
             <Input
-              label="Max File Size (MB)"
+              label={t('system.label_max_file_size')}
               type="number"
               variant="bordered"
               value={String(formData.max_file_size || '')}
               onValueChange={(v) => updateField('max_file_size', v)}
             />
             <Input
-              label="Max Width (px)"
+              label={t('system.label_max_width')}
               type="number"
               variant="bordered"
               value={String(formData.max_width || '')}
               onValueChange={(v) => updateField('max_width', v)}
             />
             <Input
-              label="Max Height (px)"
+              label={t('system.label_max_height')}
               type="number"
               variant="bordered"
               value={String(formData.max_height || '')}

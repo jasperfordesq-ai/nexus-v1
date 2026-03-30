@@ -132,20 +132,20 @@ class AdminTimebankingController extends BaseApiController
         $status = $this->input('status', '');
         $validStatuses = ['new', 'reviewing', 'resolved', 'dismissed'];
         if (!in_array($status, $validStatuses)) {
-            return $this->respondWithError('INVALID_STATUS', 'Status must be one of: ' . implode(', ', $validStatuses), 'status', 400);
+            return $this->respondWithError('INVALID_STATUS', __('api.status_must_be_one_of', ['statuses' => implode(', ', $validStatuses)]), 'status', 400);
         }
 
         try {
             $alert = DB::selectOne("SELECT id FROM abuse_alerts WHERE id = ? AND tenant_id = ?", [$id, $tenantId]);
             if (!$alert) {
-                return $this->respondWithError('NOT_FOUND', 'Alert not found', null, 404);
+                return $this->respondWithError('NOT_FOUND', __('api.alert_not_found'), null, 404);
             }
 
             $resolvedBy = in_array($status, ['resolved', 'dismissed']) ? $this->getUserId() : null;
             $notes = $this->input('notes', '');
             $this->abuseDetectionService->updateAlertStatus($id, $status, $resolvedBy, $notes);
         } catch (\Throwable $e) {
-            return $this->respondWithError('UPDATE_FAILED', 'Failed to update alert status', null, 500);
+            return $this->respondWithError('UPDATE_FAILED', __('api.alert_update_failed'), null, 500);
         }
 
         return $this->respondWithData(['id' => $id, 'status' => $status]);
@@ -161,13 +161,13 @@ class AdminTimebankingController extends BaseApiController
         $amount = (float) $this->input('amount', 0);
         $reason = trim($this->input('reason', ''));
 
-        if (!$userId) return $this->respondWithError('VALIDATION_ERROR', 'user_id is required', 'user_id', 400);
-        if ($amount == 0) return $this->respondWithError('VALIDATION_ERROR', 'amount must be non-zero', 'amount', 400);
-        if (empty($reason)) return $this->respondWithError('VALIDATION_ERROR', 'reason is required', 'reason', 400);
+        if (!$userId) return $this->respondWithError('VALIDATION_ERROR', __('api.user_id_required'), 'user_id', 400);
+        if ($amount == 0) return $this->respondWithError('VALIDATION_ERROR', __('api.amount_must_be_nonzero'), 'amount', 400);
+        if (empty($reason)) return $this->respondWithError('VALIDATION_ERROR', __('api.reason_required'), 'reason', 400);
 
         // Verify user exists (non-locking read for early 404)
         $user = DB::selectOne("SELECT id, first_name, last_name, balance FROM users WHERE id = ? AND tenant_id = ?", [$userId, $tenantId]);
-        if (!$user) return $this->respondWithError('NOT_FOUND', 'User not found', null, 404);
+        if (!$user) return $this->respondWithError('NOT_FOUND', __('api.user_not_found'), null, 404);
 
         try {
             $result = DB::transaction(function () use ($userId, $tenantId, $adminId, $amount, $reason) {
@@ -178,7 +178,7 @@ class AdminTimebankingController extends BaseApiController
                 );
 
                 if (!$lockedUser) {
-                    throw new \RuntimeException('User not found');
+                    throw new \RuntimeException(__('api.user_not_found'));
                 }
 
                 $currentBalance = (float) ($lockedUser->balance ?? 0);
@@ -213,7 +213,7 @@ class AdminTimebankingController extends BaseApiController
             return $this->respondWithError('INSUFFICIENT_BALANCE', $e->getMessage(), null, 400);
         } catch (\Throwable $e) {
             \Illuminate\Support\Facades\Log::error('Balance adjustment failed', ['user' => $userId, 'error' => $e->getMessage()]);
-            return $this->respondWithError('SERVER_ERROR', 'Failed to adjust balance', null, 500);
+            return $this->respondWithError('SERVER_ERROR', __('api.balance_adjust_failed'), null, 500);
         }
 
         // Notify user of balance adjustment
@@ -367,7 +367,7 @@ class AdminTimebankingController extends BaseApiController
 
         $userId = $this->queryInt('user_id');
         if (!$userId) {
-            return $this->respondWithError('VALIDATION_ERROR', 'user_id is required', 'user_id', 400);
+            return $this->respondWithError('VALIDATION_ERROR', __('api.user_id_required'), 'user_id', 400);
         }
 
         $startDate = $this->query('start_date', date('Y-m-01', strtotime('-12 months')));
@@ -381,7 +381,7 @@ class AdminTimebankingController extends BaseApiController
         $user = $userRow ? (array)$userRow : null;
 
         if (!$user) {
-            return $this->respondWithError('NOT_FOUND', 'User not found', null, 404);
+            return $this->respondWithError('NOT_FOUND', __('api.user_not_found'), null, 404);
         }
 
         $txResults = DB::select(

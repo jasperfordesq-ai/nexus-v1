@@ -51,7 +51,7 @@ class ExchangesController extends BaseApiController
 
         $listingId = $this->queryInt('listing_id');
         if (!$listingId || $listingId <= 0) {
-            return $this->respondWithError('VALIDATION_REQUIRED_FIELD', 'listing_id is required', 'listing_id', 400);
+            return $this->respondWithError('VALIDATION_REQUIRED_FIELD', __('api.missing_required_field', ['field' => 'listing_id']), 'listing_id', 400);
         }
 
         $exchange = $this->exchangeWorkflowService->getActiveExchangeForListing($userId, $listingId);
@@ -71,7 +71,7 @@ class ExchangesController extends BaseApiController
         $userId = $this->requireAuth();
 
         if (!$this->brokerControlConfigService->isExchangeWorkflowEnabled()) {
-            return $this->respondWithError('FEATURE_DISABLED', 'Exchange workflow is not enabled for this community', null, 400);
+            return $this->respondWithError('FEATURE_DISABLED', __('api.exchange_feature_disabled'), null, 400);
         }
 
         $filters = [
@@ -104,11 +104,11 @@ class ExchangesController extends BaseApiController
         $exchange = $this->exchangeWorkflowService->getExchange($id);
 
         if (!$exchange) {
-            return $this->respondWithError('NOT_FOUND', 'Exchange not found', null, 404);
+            return $this->respondWithError('NOT_FOUND', __('api.exchange_not_found'), null, 404);
         }
 
         if ((int) $exchange['requester_id'] !== $userId && (int) $exchange['provider_id'] !== $userId) {
-            return $this->respondWithError('NOT_FOUND', 'Exchange not found', null, 404);
+            return $this->respondWithError('NOT_FOUND', __('api.exchange_not_found'), null, 404);
         }
 
         $history = $this->exchangeWorkflowService->getExchangeHistory($id);
@@ -134,13 +134,13 @@ class ExchangesController extends BaseApiController
         $this->rateLimit('exchange_create', 10, 60);
 
         if (!$this->brokerControlConfigService->isExchangeWorkflowEnabled()) {
-            return $this->respondWithError('FEATURE_DISABLED', 'Exchange workflow is not enabled for this community', null, 400);
+            return $this->respondWithError('FEATURE_DISABLED', __('api.exchange_feature_disabled'), null, 400);
         }
 
         $data = $this->getAllInput();
 
         if (empty($data['listing_id'])) {
-            return $this->respondWithError('VALIDATION_REQUIRED_FIELD', 'listing_id is required', 'listing_id', 400);
+            return $this->respondWithError('VALIDATION_REQUIRED_FIELD', __('api.missing_required_field', ['field' => 'listing_id']), 'listing_id', 400);
         }
 
         // Check compliance requirements
@@ -160,7 +160,7 @@ class ExchangesController extends BaseApiController
         );
 
         if (!$exchangeId) {
-            return $this->respondWithError('EXCHANGE_ERROR', 'Failed to create exchange request', null, 400);
+            return $this->respondWithError('EXCHANGE_ERROR', __('api.exchange_create_failed'), null, 400);
         }
 
         $exchange = $this->exchangeWorkflowService->getExchange($exchangeId);
@@ -175,11 +175,11 @@ class ExchangesController extends BaseApiController
 
         $exchange = $this->exchangeWorkflowService->getExchange($id);
         if (!$exchange) {
-            return $this->respondWithError('NOT_FOUND', 'Exchange not found', null, 404);
+            return $this->respondWithError('NOT_FOUND', __('api.exchange_not_found'), null, 404);
         }
 
         if ((int) $exchange['provider_id'] !== $userId) {
-            return $this->respondWithError('FORBIDDEN', 'Only the provider can accept this request', null, 403);
+            return $this->respondWithError('FORBIDDEN', __('api.exchange_provider_only_accept'), null, 403);
         }
 
         $violations = $this->exchangeWorkflowService->checkComplianceRequirements((int) $exchange['listing_id'], $userId);
@@ -189,7 +189,7 @@ class ExchangesController extends BaseApiController
 
         $success = $this->exchangeWorkflowService->acceptRequest($id, $userId);
         if (!$success) {
-            return $this->respondWithError('EXCHANGE_ERROR', 'Unable to accept this exchange request', null, 400);
+            return $this->respondWithError('EXCHANGE_ERROR', __('api.exchange_accept_failed'), null, 400);
         }
 
         $exchange = $this->exchangeWorkflowService->getExchange($id);
@@ -204,21 +204,21 @@ class ExchangesController extends BaseApiController
 
         $exchange = $this->exchangeWorkflowService->getExchange($id);
         if (!$exchange) {
-            return $this->respondWithError('NOT_FOUND', 'Exchange not found', null, 404);
+            return $this->respondWithError('NOT_FOUND', __('api.exchange_not_found'), null, 404);
         }
 
         if ((int) $exchange['provider_id'] !== $userId) {
-            return $this->respondWithError('FORBIDDEN', 'Only the provider can decline this request', null, 403);
+            return $this->respondWithError('FORBIDDEN', __('api.exchange_provider_only_decline'), null, 403);
         }
 
         $reason = $this->input('reason', '');
 
         $success = $this->exchangeWorkflowService->declineRequest($id, $userId, $reason);
         if (!$success) {
-            return $this->respondWithError('EXCHANGE_ERROR', 'Unable to decline this exchange request', null, 400);
+            return $this->respondWithError('EXCHANGE_ERROR', __('api.exchange_decline_failed'), null, 400);
         }
 
-        return $this->respondWithData(['message' => 'Exchange request declined']);
+        return $this->respondWithData(['message' => __('api.exchange_declined')]);
     }
 
     /** POST /api/v2/exchanges/{id}/start — mark as in progress */
@@ -229,16 +229,16 @@ class ExchangesController extends BaseApiController
 
         $exchange = $this->exchangeWorkflowService->getExchange($id);
         if (!$exchange) {
-            return $this->respondWithError('NOT_FOUND', 'Exchange not found', null, 404);
+            return $this->respondWithError('NOT_FOUND', __('api.exchange_not_found'), null, 404);
         }
 
         if ((int) $exchange['requester_id'] !== $userId && (int) $exchange['provider_id'] !== $userId) {
-            return $this->respondWithError('NOT_FOUND', 'Exchange not found', null, 404);
+            return $this->respondWithError('NOT_FOUND', __('api.exchange_not_found'), null, 404);
         }
 
         $success = $this->exchangeWorkflowService->startProgress($id, $userId);
         if (!$success) {
-            return $this->respondWithError('EXCHANGE_ERROR', 'Unable to start this exchange', null, 400);
+            return $this->respondWithError('EXCHANGE_ERROR', __('api.exchange_start_failed'), null, 400);
         }
 
         $exchange = $this->exchangeWorkflowService->getExchange($id);
@@ -254,16 +254,16 @@ class ExchangesController extends BaseApiController
 
         $exchange = $this->exchangeWorkflowService->getExchange($id);
         if (!$exchange) {
-            return $this->respondWithError('NOT_FOUND', 'Exchange not found', null, 404);
+            return $this->respondWithError('NOT_FOUND', __('api.exchange_not_found'), null, 404);
         }
 
         if ((int) $exchange['requester_id'] !== $userId && (int) $exchange['provider_id'] !== $userId) {
-            return $this->respondWithError('NOT_FOUND', 'Exchange not found', null, 404);
+            return $this->respondWithError('NOT_FOUND', __('api.exchange_not_found'), null, 404);
         }
 
         $success = $this->exchangeWorkflowService->markReadyForConfirmation($id, $userId);
         if (!$success) {
-            return $this->respondWithError('EXCHANGE_ERROR', 'Unable to complete this exchange', null, 400);
+            return $this->respondWithError('EXCHANGE_ERROR', __('api.exchange_complete_failed'), null, 400);
         }
 
         $exchange = $this->exchangeWorkflowService->getExchange($id);
@@ -279,30 +279,30 @@ class ExchangesController extends BaseApiController
 
         $exchange = $this->exchangeWorkflowService->getExchange($id);
         if (!$exchange) {
-            return $this->respondWithError('NOT_FOUND', 'Exchange not found', null, 404);
+            return $this->respondWithError('NOT_FOUND', __('api.exchange_not_found'), null, 404);
         }
 
         if ((int) $exchange['requester_id'] !== $userId && (int) $exchange['provider_id'] !== $userId) {
-            return $this->respondWithError('NOT_FOUND', 'Exchange not found', null, 404);
+            return $this->respondWithError('NOT_FOUND', __('api.exchange_not_found'), null, 404);
         }
 
         $hours = (float) $this->input('hours', 0);
         if ($hours <= 0) {
-            return $this->respondWithError('VALIDATION_REQUIRED_FIELD', 'hours must be greater than 0', 'hours', 400);
+            return $this->respondWithError('VALIDATION_REQUIRED_FIELD', __('api.exchange_hours_gt_zero'), 'hours', 400);
         }
 
         $success = $this->exchangeWorkflowService->confirmCompletion($id, $userId, $hours);
         if (!$success) {
-            return $this->respondWithError('EXCHANGE_ERROR', 'Unable to confirm this exchange', null, 400);
+            return $this->respondWithError('EXCHANGE_ERROR', __('api.exchange_confirm_failed'), null, 400);
         }
 
         $exchange = $this->exchangeWorkflowService->getExchange($id);
 
-        $message = 'Hours confirmed';
+        $message = __('api.exchange_hours_confirmed');
         if ($exchange['status'] === 'completed') {
-            $message = 'Exchange completed! Credits have been transferred.';
+            $message = __('api.exchange_completed_credits');
         } elseif ($exchange['status'] === 'disputed') {
-            $message = 'Hours recorded. There is a discrepancy - a broker will review.';
+            $message = __('api.exchange_disputed_broker');
         }
 
         return $this->respondWithData(array_merge($this->formatExchange($exchange), ['message' => $message]));
@@ -316,21 +316,21 @@ class ExchangesController extends BaseApiController
 
         $exchange = $this->exchangeWorkflowService->getExchange($id);
         if (!$exchange) {
-            return $this->respondWithError('NOT_FOUND', 'Exchange not found', null, 404);
+            return $this->respondWithError('NOT_FOUND', __('api.exchange_not_found'), null, 404);
         }
 
         if ((int) $exchange['requester_id'] !== $userId && (int) $exchange['provider_id'] !== $userId) {
-            return $this->respondWithError('NOT_FOUND', 'Exchange not found', null, 404);
+            return $this->respondWithError('NOT_FOUND', __('api.exchange_not_found'), null, 404);
         }
 
         $reason = $this->input('reason', '');
 
         $success = $this->exchangeWorkflowService->cancelExchange($id, $userId, $reason);
         if (!$success) {
-            return $this->respondWithError('EXCHANGE_ERROR', 'Unable to cancel this exchange', null, 400);
+            return $this->respondWithError('EXCHANGE_ERROR', __('api.exchange_cancel_failed'), null, 400);
         }
 
-        return $this->respondWithData(['message' => 'Exchange cancelled']);
+        return $this->respondWithData(['message' => __('api.exchange_cancelled')]);
     }
 
     /**

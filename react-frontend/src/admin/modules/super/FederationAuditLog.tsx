@@ -262,7 +262,7 @@ export function FederationAuditLog() {
             onPress={exportCsv}
             isDisabled={logs.length === 0}
           >
-            Export CSV
+            {t('federation_audit.export_csv')}
           </Button>
         }
       />
@@ -270,7 +270,7 @@ export function FederationAuditLog() {
       {/* Stats Row */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
         <StatCard
-          label="Total Actions (30 days)"
+          label={t('federation_audit.total_actions_30d')}
           value={stats.total}
           icon={Activity}
           color="primary"
@@ -367,7 +367,7 @@ export function FederationAuditLog() {
             startContent={<X size={14} />}
             onPress={clearFilters}
           >
-            Clear
+            {t('federation_audit.clear')}
           </Button>
         )}
       </div>

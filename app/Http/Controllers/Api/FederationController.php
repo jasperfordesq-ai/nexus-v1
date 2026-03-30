@@ -95,7 +95,7 @@ class FederationController extends BaseApiController
             && $this->federationFeatureService->isTenantFederationEnabled($tenantId);
 
         if (!$tenantEnabled) {
-            return $this->respondWithError('FEDERATION_NOT_AVAILABLE', 'Federation is not enabled for your community.', null, 403);
+            return $this->respondWithError('FEDERATION_NOT_AVAILABLE', __('api.federation_not_available'), null, 403);
         }
 
         $current = $this->federationUserService->getUserSettings($userId);
@@ -119,7 +119,7 @@ class FederationController extends BaseApiController
             $this->federationAuditService->log('user_federation_optin', $tenantId, null, $userId, [], FederationAuditService::LEVEL_INFO);
             return $this->respondWithData(['success' => true, 'message' => 'Federation enabled successfully.']);
         } else {
-            return $this->respondWithError('OPT_IN_FAILED', 'Failed to enable federation. Please try again.', null, 500);
+            return $this->respondWithError('OPT_IN_FAILED', __('api.federation_opt_in_failed'), null, 500);
         }
     }
 
@@ -133,7 +133,7 @@ class FederationController extends BaseApiController
             && $this->federationFeatureService->isTenantFederationEnabled($tenantId);
 
         if (!$tenantEnabled) {
-            return $this->respondWithError('FEDERATION_NOT_AVAILABLE', 'Federation is not enabled for your community.', null, 403);
+            return $this->respondWithError('FEDERATION_NOT_AVAILABLE', __('api.federation_not_available'), null, 403);
         }
 
         $data = $this->getAllInput();
@@ -158,7 +158,7 @@ class FederationController extends BaseApiController
             $this->federationAuditService->log('user_federation_optin', $tenantId, null, $userId, [], FederationAuditService::LEVEL_INFO);
             return $this->respondWithData(['success' => true, 'message' => 'Federation enabled successfully.']);
         } else {
-            return $this->respondWithError('SETUP_FAILED', 'Failed to enable federation. Please try again.', null, 500);
+            return $this->respondWithError('SETUP_FAILED', __('api.federation_opt_in_failed'), null, 500);
         }
     }
 
@@ -174,7 +174,7 @@ class FederationController extends BaseApiController
             $this->federationAuditService->log('user_federation_optout', $tenantId, null, $userId, [], FederationAuditService::LEVEL_INFO);
             return $this->respondWithData(['success' => true, 'message' => 'Federation disabled successfully.']);
         } else {
-            return $this->respondWithError('OPT_OUT_FAILED', 'Failed to disable federation. Please try again.', null, 500);
+            return $this->respondWithError('OPT_OUT_FAILED', __('api.federation_opt_out_failed'), null, 500);
         }
     }
 

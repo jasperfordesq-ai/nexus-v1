@@ -123,7 +123,7 @@ class ExploreController extends BaseApiController
         $result = $this->exploreService->getListingsByCategory($tenantId, $slug, $page, $perPage);
 
         if ($result['category'] === null) {
-            return $this->respondWithError('CATEGORY_NOT_FOUND', 'Category not found', null, 404);
+            return $this->respondWithError('CATEGORY_NOT_FOUND', __('api.category_not_found'), null, 404);
         }
 
         return $this->respondWithPaginatedCollection(
@@ -148,13 +148,13 @@ class ExploreController extends BaseApiController
         $action = $input['action'] ?? 'view'; // impression, click, save, dwell
 
         if (!$itemId || !$itemType) {
-            return $this->respondWithError('INVALID_INPUT', 'item_type and item_id are required', null, 422);
+            return $this->respondWithError('INVALID_INPUT', __('api.item_type_and_id_required'), null, 422);
         }
 
         // Validate item_type against allowlist to prevent cache poisoning / log injection
         $validItemTypes = ['listing', 'post', 'event', 'group', 'member', 'job', 'vol_opportunity', 'blog'];
         if (!in_array($itemType, $validItemTypes, true)) {
-            return $this->respondWithError('INVALID_INPUT', 'Invalid item_type', 'item_type', 422);
+            return $this->respondWithError('INVALID_INPUT', __('api.invalid_item_type'), 'item_type', 422);
         }
 
         // Map explore actions to match_history actions
@@ -192,7 +192,7 @@ class ExploreController extends BaseApiController
         $reason = $input['reason'] ?? null; // not_relevant, already_seen, not_interested
 
         if (!$itemId) {
-            return $this->respondWithError('INVALID_INPUT', 'item_id is required', null, 422);
+            return $this->respondWithError('INVALID_INPUT', __('api.item_id_required'), null, 422);
         }
 
         try {
@@ -219,7 +219,7 @@ class ExploreController extends BaseApiController
 
             return $this->respondWithData(['dismissed' => true]);
         } catch (\Throwable $e) {
-            return $this->respondWithError('DISMISS_FAILED', 'Failed to dismiss item', null, 500);
+            return $this->respondWithError('DISMISS_FAILED', __('api.failed_dismiss_item'), null, 500);
         }
     }
 

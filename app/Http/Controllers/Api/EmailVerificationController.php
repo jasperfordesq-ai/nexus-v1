@@ -47,7 +47,7 @@ class EmailVerificationController extends BaseApiController
         if (empty($token)) {
             return $this->respondWithError(
                 ApiErrorCodes::VALIDATION_REQUIRED_FIELD,
-                'Verification token is required',
+                __('api.verification_token_required'),
                 'token',
                 400
             );
@@ -59,7 +59,7 @@ class EmailVerificationController extends BaseApiController
         if (!$verificationRecord) {
             return $this->respondWithError(
                 ApiErrorCodes::AUTH_TOKEN_INVALID,
-                'Invalid or expired verification token. Please request a new verification email.',
+                __('api.invalid_verification_token'),
                 'token',
                 400
             );
@@ -77,7 +77,7 @@ class EmailVerificationController extends BaseApiController
         if (!$user) {
             return $this->respondWithError(
                 ApiErrorCodes::RESOURCE_NOT_FOUND,
-                'User not found',
+                __('api.user_not_found'),
                 null,
                 404
             );
@@ -138,7 +138,7 @@ class EmailVerificationController extends BaseApiController
         if (!RateLimiter::attempt($userKey, 1, self::RESEND_COOLDOWN_SECONDS)) {
             return $this->respondWithError(
                 ApiErrorCodes::RATE_LIMIT_EXCEEDED,
-                'Please wait at least 1 minute before requesting another verification email',
+                __('api.verification_resend_cooldown'),
                 null,
                 429
             );
@@ -155,7 +155,7 @@ class EmailVerificationController extends BaseApiController
         if (!$user) {
             return $this->respondWithError(
                 ApiErrorCodes::RESOURCE_NOT_FOUND,
-                'User not found',
+                __('api.user_not_found'),
                 null,
                 404
             );
@@ -185,7 +185,7 @@ class EmailVerificationController extends BaseApiController
         if ($this->rateLimitService->check("resend_verify:$ip", 3, 300)) {
             return $this->respondWithError(
                 ApiErrorCodes::RATE_LIMIT_EXCEEDED,
-                'Too many requests. Please try again later.',
+                __('api.rate_limit_exceeded'),
                 null,
                 429
             );

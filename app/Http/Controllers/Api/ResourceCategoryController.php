@@ -98,7 +98,7 @@ class ResourceCategoryController extends BaseApiController
 
         $name = trim($data['name'] ?? '');
         if (empty($name)) {
-            return $this->respondWithError('VALIDATION_REQUIRED_FIELD', 'Category name is required', 'name', 422);
+            return $this->respondWithError('VALIDATION_REQUIRED_FIELD', __('api.category_name_required'), 'name', 422);
         }
 
         $slug = trim($data['slug'] ?? '');
@@ -129,7 +129,7 @@ class ResourceCategoryController extends BaseApiController
                 ->first();
 
             if (!$parent) {
-                return $this->respondWithError('VALIDATION_INVALID_VALUE', 'Parent category not found', 'parent_id', 422);
+                return $this->respondWithError('VALIDATION_INVALID_VALUE', __('api.parent_category_not_found'), 'parent_id', 422);
             }
         }
 
@@ -165,7 +165,7 @@ class ResourceCategoryController extends BaseApiController
         $category = $this->getCategoryById($id, $tenantId);
 
         if (!$category) {
-            return $this->respondWithError('RESOURCE_NOT_FOUND', 'Category not found', null, 404);
+            return $this->respondWithError('RESOURCE_NOT_FOUND', __('api.category_not_found'), null, 404);
         }
 
         $data = $this->getAllInput();
@@ -174,7 +174,7 @@ class ResourceCategoryController extends BaseApiController
         if (isset($data['name'])) {
             $name = trim($data['name']);
             if (empty($name)) {
-                return $this->respondWithError('VALIDATION_REQUIRED_FIELD', 'Name cannot be empty', 'name', 422);
+                return $this->respondWithError('VALIDATION_REQUIRED_FIELD', __('api.name_required'), 'name', 422);
             }
             $updates['name'] = $name;
         }
@@ -231,7 +231,7 @@ class ResourceCategoryController extends BaseApiController
             ->exists();
 
         if (!$exists) {
-            return $this->respondWithError('RESOURCE_NOT_FOUND', 'Category not found', null, 404);
+            return $this->respondWithError('RESOURCE_NOT_FOUND', __('api.category_not_found'), null, 404);
         }
 
         // Block deletion if children exist
@@ -241,7 +241,7 @@ class ResourceCategoryController extends BaseApiController
             ->count();
 
         if ($childCount > 0) {
-            return $this->respondWithError('RESOURCE_CONFLICT', 'Cannot delete category with child categories', null, 409);
+            return $this->respondWithError('RESOURCE_CONFLICT', __('api.cannot_delete_category_with_children'), null, 409);
         }
 
         // Unset category on associated resources (set to null)
@@ -317,7 +317,7 @@ class ResourceCategoryController extends BaseApiController
             DB::commit();
         } catch (\Throwable $e) {
             DB::rollBack();
-            return $this->respondWithError('SERVER_INTERNAL_ERROR', 'Failed to reorder resources', null, 500);
+            return $this->respondWithError('SERVER_INTERNAL_ERROR', __('api.failed_reorder_resources'), null, 500);
         }
 
         return $this->respondWithData(['message' => 'Resources reordered successfully']);

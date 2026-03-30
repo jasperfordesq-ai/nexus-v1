@@ -369,16 +369,16 @@ export default function PerformanceDashboard() {
           onSelectionChange={(key) => setSelectedTab(key as string)}
           aria-label={t('performance.label_performance_metrics')}
         >
-          <Tab key="requests" title="Slow Requests">
+          <Tab key="requests" title={t('performance.tab_slow_requests')}>
             <div className="py-4">{renderSlowRequests()}</div>
           </Tab>
-          <Tab key="queries" title="Slow Queries">
+          <Tab key="queries" title={t('performance.tab_slow_queries')}>
             <div className="py-4">{renderSlowQueries()}</div>
           </Tab>
-          <Tab key="memory" title="Memory Spikes">
+          <Tab key="memory" title={t('performance.tab_memory_spikes')}>
             <div className="py-4">{renderMemorySpikes()}</div>
           </Tab>
-          <Tab key="volume" title="Request Volume">
+          <Tab key="volume" title={t('performance.tab_request_volume')}>
             <div className="py-4">{renderVolumeChart()}</div>
           </Tab>
         </Tabs>

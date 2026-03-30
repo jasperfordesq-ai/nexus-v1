@@ -41,7 +41,7 @@ class EndorsementsController extends BaseApiController
         $result = $this->endorsementService->endorse($userId, $id, $skillId, $tenantId, $comment);
 
         if ($result === null) {
-            return $this->respondWithError('ENDORSEMENT_FAILED', 'Cannot endorse this member', null, 422);
+            return $this->respondWithError('ENDORSEMENT_FAILED', __('api.cannot_endorse_member'), null, 422);
         }
 
         // Notify the endorsed user (skip if endorsing yourself, which the service already blocks)
@@ -110,7 +110,7 @@ class EndorsementsController extends BaseApiController
         $removed = $this->endorsementService->removeEndorsement($userId, $id, $skillId, $tenantId);
 
         if (!$removed) {
-            return $this->respondWithError('NOT_FOUND', 'Endorsement not found', null, 404);
+            return $this->respondWithError('NOT_FOUND', __('api.endorsement_not_found'), null, 404);
         }
 
         // Notify the endorsed user about the withdrawn endorsement

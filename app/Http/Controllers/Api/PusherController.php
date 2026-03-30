@@ -46,7 +46,7 @@ class PusherController extends BaseApiController
             $channelName = $this->input('channel_name') ?? request()->request->get('channel_name');
 
             if (empty($socketId) || empty($channelName)) {
-                return $this->respondWithError('VALIDATION_ERROR', 'Missing socket_id or channel_name', null, 400);
+                return $this->respondWithError('VALIDATION_ERROR', __('api.missing_socket_or_channel'), null, 400);
             }
 
             // Handle presence channels
@@ -65,14 +65,14 @@ class PusherController extends BaseApiController
             }
 
             // Public channels don't need auth
-            return $this->respondWithError('INVALID_INPUT', 'Invalid channel type', null, 400);
+            return $this->respondWithError('INVALID_INPUT', __('api.invalid_channel_type'), null, 400);
         } catch (\Throwable $e) {
             Log::error('[PusherAuth] Exception', [
                 'message' => $e->getMessage(),
                 'file' => $e->getFile(),
                 'line' => $e->getLine(),
             ]);
-            return $this->respondWithError('SERVER_ERROR', 'Server error', null, 500);
+            return $this->respondWithError('SERVER_ERROR', __('api.server_error'), null, 500);
         }
     }
 
@@ -108,14 +108,14 @@ class PusherController extends BaseApiController
             $auth = $this->pusherService->authPrivateChannel($channelName, $socketId, $userId);
 
             if ($auth === null) {
-                return $this->respondWithError('FORBIDDEN', 'Forbidden', null, 403);
+                return $this->respondWithError('FORBIDDEN', __('api.forbidden'), null, 403);
             }
 
             // Return raw JSON string from Pusher SDK
             return response()->json(json_decode($auth, true));
         } catch (\Throwable $e) {
             Log::error('[PusherAuth] authPrivate error', ['message' => $e->getMessage()]);
-            return $this->respondWithError('SERVER_ERROR', 'Auth error', null, 500);
+            return $this->respondWithError('SERVER_ERROR', __('api.auth_error'), null, 500);
         }
     }
 
@@ -131,14 +131,14 @@ class PusherController extends BaseApiController
             $auth = $this->pusherService->authPresenceChannel($channelName, $socketId, $userId, $userInfo);
 
             if ($auth === null) {
-                return $this->respondWithError('FORBIDDEN', 'Forbidden', null, 403);
+                return $this->respondWithError('FORBIDDEN', __('api.forbidden'), null, 403);
             }
 
             // Return raw JSON string from Pusher SDK
             return response()->json(json_decode($auth, true));
         } catch (\Throwable $e) {
             Log::error('[PusherAuth] authPresence error', ['message' => $e->getMessage()]);
-            return $this->respondWithError('SERVER_ERROR', 'Auth error', null, 500);
+            return $this->respondWithError('SERVER_ERROR', __('api.auth_error'), null, 500);
         }
     }
 
@@ -153,14 +153,14 @@ class PusherController extends BaseApiController
             $auth = $this->federationRealtimeService->authFederationChannel($channelName, $socketId, $userId, $tenantId);
 
             if ($auth === null) {
-                return $this->respondWithError('FORBIDDEN', 'Forbidden', null, 403);
+                return $this->respondWithError('FORBIDDEN', __('api.forbidden'), null, 403);
             }
 
             // Return raw JSON string from Pusher SDK
             return response()->json(json_decode($auth, true));
         } catch (\Throwable $e) {
             Log::error('[PusherAuth] authFederation error', ['message' => $e->getMessage()]);
-            return $this->respondWithError('SERVER_ERROR', 'Auth error', null, 500);
+            return $this->respondWithError('SERVER_ERROR', __('api.auth_error'), null, 500);
         }
     }
 

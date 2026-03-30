@@ -217,7 +217,7 @@ class AdminDeliverabilityController extends BaseApiController
         $deliverable = $deliverableRow ? (array)$deliverableRow : null;
 
         if (!$deliverable) {
-            return $this->respondWithError('NOT_FOUND', 'Deliverable not found', null, 404);
+            return $this->respondWithError('NOT_FOUND', __('api.deliverable_not_found'), null, 404);
         }
 
         $milestoneResults = DB::select(
@@ -323,7 +323,7 @@ class AdminDeliverabilityController extends BaseApiController
         $title = trim($data['title'] ?? '');
 
         if (empty($title)) {
-            return $this->respondWithError('VALIDATION_ERROR', 'Title is required', 'title', 400);
+            return $this->respondWithError('VALIDATION_ERROR', __('api.title_required'), 'title', 400);
         }
 
         $status = 'draft';
@@ -406,7 +406,7 @@ class AdminDeliverabilityController extends BaseApiController
         $existing = $existingRow ? (array)$existingRow : null;
 
         if (!$existing) {
-            return $this->respondWithError('NOT_FOUND', 'Deliverable not found', null, 404);
+            return $this->respondWithError('NOT_FOUND', __('api.deliverable_not_found'), null, 404);
         }
 
         $data = $this->getAllInput();
@@ -425,13 +425,13 @@ class AdminDeliverabilityController extends BaseApiController
         }
 
         if (isset($data['title']) && trim($data['title']) === '') {
-            return $this->respondWithError('VALIDATION_ERROR', 'Title cannot be empty', 'title', 400);
+            return $this->respondWithError('VALIDATION_ERROR', __('api.title_cannot_be_empty'), 'title', 400);
         }
 
         // Status
         if (isset($data['status'])) {
             if (!in_array($data['status'], self::VALID_STATUSES, true)) {
-                return $this->respondWithError('VALIDATION_ERROR', 'Invalid status value', 'status', 400);
+                return $this->respondWithError('VALIDATION_ERROR', __('api.invalid_status_value'), 'status', 400);
             }
             $fields[] = 'status = ?';
             $params[] = $data['status'];
@@ -451,7 +451,7 @@ class AdminDeliverabilityController extends BaseApiController
         // Priority
         if (isset($data['priority'])) {
             if (!in_array($data['priority'], self::VALID_PRIORITIES, true)) {
-                return $this->respondWithError('VALIDATION_ERROR', 'Invalid priority value', 'priority', 400);
+                return $this->respondWithError('VALIDATION_ERROR', __('api.invalid_priority_value'), 'priority', 400);
             }
             $fields[] = 'priority = ?';
             $params[] = $data['priority'];
@@ -515,7 +515,7 @@ class AdminDeliverabilityController extends BaseApiController
         }
 
         if (empty($fields)) {
-            return $this->respondWithError('VALIDATION_ERROR', 'No fields provided to update', null, 400);
+            return $this->respondWithError('VALIDATION_ERROR', __('api.no_fields_provided'), null, 400);
         }
 
         $fields[] = 'updated_at = NOW()';
@@ -535,7 +535,7 @@ class AdminDeliverabilityController extends BaseApiController
 
         $deliverable = DB::selectOne("SELECT id, title FROM deliverables WHERE id = ? AND tenant_id = ?", [$id, $tenantId]);
         if (!$deliverable) {
-            return $this->respondWithError('NOT_FOUND', 'Deliverable not found', null, 404);
+            return $this->respondWithError('NOT_FOUND', __('api.deliverable_not_found'), null, 404);
         }
 
         DB::delete("DELETE FROM deliverable_comments WHERE deliverable_id = ? AND tenant_id = ?", [$id, $tenantId]);
@@ -556,12 +556,12 @@ class AdminDeliverabilityController extends BaseApiController
 
         $deliverable = DB::selectOne("SELECT id FROM deliverables WHERE id = ? AND tenant_id = ?", [$id, $tenantId]);
         if (!$deliverable) {
-            return $this->respondWithError('NOT_FOUND', 'Deliverable not found', null, 404);
+            return $this->respondWithError('NOT_FOUND', __('api.deliverable_not_found'), null, 404);
         }
 
         $commentText = trim($this->input('comment_text', ''));
         if (empty($commentText)) {
-            return $this->respondWithError('VALIDATION_ERROR', 'Comment text is required', 'comment_text', 400);
+            return $this->respondWithError('VALIDATION_ERROR', __('api.comment_text_required'), 'comment_text', 400);
         }
 
         $commentType = $this->input('comment_type', 'comment');

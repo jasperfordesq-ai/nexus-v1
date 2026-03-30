@@ -135,7 +135,7 @@ export function NewsletterResend({ isOpen, onClose, newsletterId, onSuccess }: N
                   </Card>
 
                   <RadioGroup
-                    label="Resend to"
+                    label={t('newsletter_form.label_resend_to')}
                     value={target}
                     onValueChange={(v) => setTarget(v as typeof target)}
                   >
@@ -158,7 +158,7 @@ export function NewsletterResend({ isOpen, onClose, newsletterId, onSuccess }: N
                   </RadioGroup>
 
                   <Input
-                    label="Subject Override (Optional)"
+                    label={t('newsletter_form.label_subject_override')}
                     placeholder={t('newsletters.placeholder_leave_blank_to_use_original_subject')}
                     value={subjectOverride}
                     onValueChange={setSubjectOverride}

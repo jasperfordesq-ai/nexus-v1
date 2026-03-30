@@ -86,13 +86,13 @@ export function NativeApp() {
               onValueChange={(v) => updateField('app_name', v)}
             />
             <Input
-              label="Bundle ID (iOS)"
+              label={t('system.label_bundle_id')}
               variant="bordered"
               value={String(formData.bundle_id || '')}
               onValueChange={(v) => updateField('bundle_id', v)}
             />
             <Input
-              label="Package Name (Android)"
+              label={t('system.label_package_name')}
               variant="bordered"
               value={String(formData.package_name || '')}
               onValueChange={(v) => updateField('package_name', v)}

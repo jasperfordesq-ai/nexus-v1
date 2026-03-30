@@ -91,7 +91,7 @@ class FederationV2Controller extends BaseApiController
             && $this->federationFeatureService->isTenantFederationEnabled($tenantId);
 
         if (!$tenantEnabled) {
-            return $this->respondWithError('FEDERATION_NOT_AVAILABLE', 'Federation is not enabled for your community.', null, 403);
+            return $this->respondWithError('FEDERATION_NOT_AVAILABLE', __('api.fed_not_available'), null, 403);
         }
 
         $current = $this->federationUserService->getUserSettings($userId);
@@ -113,7 +113,7 @@ class FederationV2Controller extends BaseApiController
             return $this->respondWithData(['success' => true, 'message' => 'Federation enabled successfully.']);
         }
 
-        return $this->respondWithError('OPT_IN_FAILED', 'Failed to enable federation. Please try again.', null, 500);
+        return $this->respondWithError('OPT_IN_FAILED', __('api.fed_opt_in_failed'), null, 500);
     }
 
     /** POST /api/v2/federation/setup */
@@ -126,7 +126,7 @@ class FederationV2Controller extends BaseApiController
             && $this->federationFeatureService->isTenantFederationEnabled($tenantId);
 
         if (!$tenantEnabled) {
-            return $this->respondWithError('FEDERATION_NOT_AVAILABLE', 'Federation is not enabled for your community.', null, 403);
+            return $this->respondWithError('FEDERATION_NOT_AVAILABLE', __('api.fed_not_available'), null, 403);
         }
 
         $data = $this->getAllInput();
@@ -152,7 +152,7 @@ class FederationV2Controller extends BaseApiController
             return $this->respondWithData(['success' => true, 'message' => 'Federation enabled successfully.']);
         }
 
-        return $this->respondWithError('SETUP_FAILED', 'Failed to enable federation. Please try again.', null, 500);
+        return $this->respondWithError('SETUP_FAILED', __('api.fed_setup_failed'), null, 500);
     }
 
     /** POST /api/v2/federation/opt-out */
@@ -168,7 +168,7 @@ class FederationV2Controller extends BaseApiController
             return $this->respondWithData(['success' => true, 'message' => 'Federation disabled successfully.']);
         }
 
-        return $this->respondWithError('OPT_OUT_FAILED', 'Failed to disable federation. Please try again.', null, 500);
+        return $this->respondWithError('OPT_OUT_FAILED', __('api.fed_opt_out_failed'), null, 500);
     }
 
     // =====================================================================
@@ -665,7 +665,7 @@ class FederationV2Controller extends BaseApiController
             $m = $stmt->fetch(\PDO::FETCH_ASSOC);
 
             if (!$m) {
-                return $this->respondWithError('MEMBER_NOT_FOUND', 'Federated member not found or not accessible.', null, 404);
+                return $this->respondWithError('MEMBER_NOT_FOUND', __('api.fed_member_not_found'), null, 404);
             }
 
             $member = [
@@ -692,7 +692,7 @@ class FederationV2Controller extends BaseApiController
             return $this->respondWithData($member);
         } catch (\Exception $e) {
             error_log("FederationV2Api::member error: " . $e->getMessage());
-            return $this->respondWithError('INTERNAL_ERROR', 'Failed to load member profile.', null, 500);
+            return $this->respondWithError('INTERNAL_ERROR', __('api.fed_member_profile_failed'), null, 500);
         }
     }
 
@@ -785,10 +785,10 @@ class FederationV2Controller extends BaseApiController
         // Verify sender is opted in and has messaging enabled
         $senderSettings = $this->federationUserService->getUserSettings($userId);
         if (!($senderSettings['federation_optin'] ?? false)) {
-            return $this->respondWithError('SENDER_NOT_OPTED_IN', 'You must opt in to federation before sending messages.', null, 403);
+            return $this->respondWithError('SENDER_NOT_OPTED_IN', __('api.fed_sender_not_opted_in'), null, 403);
         }
         if (!($senderSettings['messaging_enabled_federated'] ?? false)) {
-            return $this->respondWithError('SENDER_MESSAGING_DISABLED', 'You must enable federated messaging in your settings before sending messages.', null, 403);
+            return $this->respondWithError('SENDER_MESSAGING_DISABLED', __('api.fed_sender_messaging_disabled'), null, 403);
         }
 
         // Validate required fields
@@ -830,21 +830,21 @@ class FederationV2Controller extends BaseApiController
             $receiver = $receiverRow ? (array)$receiverRow : null;
 
             if (!$receiver) {
-                return $this->respondWithError('RECIPIENT_NOT_FOUND', 'Recipient not found.', null, 404);
+                return $this->respondWithError('RECIPIENT_NOT_FOUND', __('api.fed_recipient_not_found'), null, 404);
             }
 
             if (!$receiver['federation_optin'] || !$receiver['messaging_enabled_federated']) {
-                return $this->respondWithError('MESSAGING_DISABLED', 'This member does not accept federated messages.', null, 403);
+                return $this->respondWithError('MESSAGING_DISABLED', __('api.fed_messaging_disabled'), null, 403);
             }
 
             // Verify an active partnership exists between the two tenants
             $partnership = $this->federationPartnershipService->getPartnership($tenantId, (int)$receiverTenantId);
             if (!$partnership || $partnership['status'] !== 'active') {
-                return $this->respondWithError('NO_PARTNERSHIP', 'No active partnership with the recipient\'s community.', null, 403);
+                return $this->respondWithError('NO_PARTNERSHIP', __('api.fed_no_partnership'), null, 403);
             }
 
             if (!($partnership['messaging_enabled'] ?? false)) {
-                return $this->respondWithError('MESSAGING_NOT_ALLOWED', 'Messaging is not enabled for this partnership.', null, 403);
+                return $this->respondWithError('MESSAGING_NOT_ALLOWED', __('api.fed_messaging_not_allowed'), null, 403);
             }
 
             // Get sender info
@@ -977,7 +977,7 @@ class FederationV2Controller extends BaseApiController
             ], null, 201);
         } catch (\Exception $e) {
             error_log("FederationV2Api::sendMessage error: " . $e->getMessage());
-            return $this->respondWithError('SEND_FAILED', 'Failed to send message. Please try again.', null, 500);
+            return $this->respondWithError('SEND_FAILED', __('api.fed_send_failed'), null, 500);
         }
     }
 
@@ -996,7 +996,7 @@ class FederationV2Controller extends BaseApiController
             $message = $messageRow ? (array)$messageRow : null;
 
             if (!$message) {
-                return $this->respondWithError('MESSAGE_NOT_FOUND', 'Message not found.', null, 404);
+                return $this->respondWithError('MESSAGE_NOT_FOUND', __('api.fed_message_not_found'), null, 404);
             }
 
             if ($message['status'] !== 'read') {
@@ -1009,7 +1009,7 @@ class FederationV2Controller extends BaseApiController
             return $this->respondWithData(['success' => true]);
         } catch (\Exception $e) {
             error_log("FederationV2Api::markMessageRead error: " . $e->getMessage());
-            return $this->respondWithError('INTERNAL_ERROR', 'Failed to mark message as read.', null, 500);
+            return $this->respondWithError('INTERNAL_ERROR', __('api.fed_mark_read_failed'), null, 500);
         }
     }
 
@@ -1070,7 +1070,7 @@ class FederationV2Controller extends BaseApiController
             return $this->respondWithData(['success' => true, 'message' => 'Settings updated successfully.']);
         }
 
-        return $this->respondWithError('UPDATE_FAILED', 'Failed to update settings. Please try again.', null, 500);
+        return $this->respondWithError('UPDATE_FAILED', __('api.fed_settings_update_failed'), null, 500);
     }
 
     // =====================================================================
@@ -1103,7 +1103,7 @@ class FederationV2Controller extends BaseApiController
         $message = $this->input('message');
 
         if (!$receiverId || !$receiverTenantId) {
-            return $this->respondWithError('VALIDATION_ERROR', 'receiver_id and receiver_tenant_id are required.', null, 400);
+            return $this->respondWithError('VALIDATION_ERROR', __('api.fed_receiver_ids_required'), null, 400);
         }
 
         $result = $this->federatedConnectionService->sendRequest($userId, $receiverId, $receiverTenantId, $message);

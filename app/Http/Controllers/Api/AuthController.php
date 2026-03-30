@@ -71,7 +71,7 @@ class AuthController extends BaseApiController
 
         if (empty($email) || empty($password)) {
             return $this->authError(
-                'Email and password required',
+                __('api.email_and_password_required'),
                 ApiErrorCodes::VALIDATION_REQUIRED_FIELD,
                 400
             );
@@ -81,7 +81,7 @@ class AuthController extends BaseApiController
         $ip = \App\Core\ClientIp::get();
         if (!$this->rateLimitService->increment("auth:login:$ip", 10, 60)) {
             return $this->authError(
-                'Too many login attempts. Please try again later.',
+                __('api.too_many_login_attempts'),
                 ApiErrorCodes::RATE_LIMIT_EXCEEDED,
                 429,
                 ['retry_after' => 60]
@@ -296,7 +296,7 @@ class AuthController extends BaseApiController
         ]);
 
         return $this->authError(
-            'Invalid credentials',
+            __('api.invalid_credentials'),
             ApiErrorCodes::AUTH_INVALID_CREDENTIALS,
             401
         );
@@ -385,7 +385,7 @@ class AuthController extends BaseApiController
         $ip = \App\Core\ClientIp::get();
         if (!$this->rateLimitService->increment("auth:refresh:$ip", 10, 60)) {
             return $this->authError(
-                'Too many attempts. Please try again later.',
+                __('api.too_many_attempts'),
                 ApiErrorCodes::RATE_LIMIT_EXCEEDED,
                 429,
                 ['retry_after' => 60]
@@ -405,7 +405,7 @@ class AuthController extends BaseApiController
 
         if (empty($refreshToken)) {
             return $this->authError(
-                'Refresh token required',
+                __('api.refresh_token_required'),
                 ApiErrorCodes::AUTH_TOKEN_MISSING,
                 400
             );
@@ -416,7 +416,7 @@ class AuthController extends BaseApiController
 
         if (!$payload) {
             return $this->authError(
-                'Invalid or expired refresh token',
+                __('api.invalid_or_expired_refresh_token'),
                 ApiErrorCodes::AUTH_TOKEN_EXPIRED,
                 401
             );
@@ -425,7 +425,7 @@ class AuthController extends BaseApiController
         // Check it's actually a refresh token
         if (($payload['type'] ?? '') !== 'refresh') {
             return $this->authError(
-                'Invalid token type',
+                __('api.invalid_token_type'),
                 ApiErrorCodes::AUTH_TOKEN_INVALID,
                 401
             );
@@ -436,7 +436,7 @@ class AuthController extends BaseApiController
 
         if (!$userId || !$tenantId) {
             return $this->authError(
-                'Invalid token payload',
+                __('api.invalid_token_payload'),
                 ApiErrorCodes::AUTH_TOKEN_INVALID,
                 401
             );
@@ -448,7 +448,7 @@ class AuthController extends BaseApiController
 
         if (!$user) {
             return $this->authError(
-                'User not found',
+                __('api.user_not_found'),
                 ApiErrorCodes::RESOURCE_NOT_FOUND,
                 401
             );
@@ -456,7 +456,7 @@ class AuthController extends BaseApiController
 
         if (($user['status'] ?? 'active') === 'suspended') {
             return $this->authError(
-                'Account suspended',
+                __('api.account_suspended'),
                 ApiErrorCodes::AUTH_ACCOUNT_SUSPENDED,
                 403
             );
@@ -553,7 +553,7 @@ class AuthController extends BaseApiController
 
         if (!$isAuthenticated) {
             return $this->authError(
-                'Unauthorized',
+                __('api.unauthorized'),
                 ApiErrorCodes::AUTH_TOKEN_MISSING,
                 401,
                 ['authenticated' => false, 'token' => $tokenInfo]
@@ -569,7 +569,7 @@ class AuthController extends BaseApiController
                 $bearerUser = \App\Models\User::findById((int)$bearerUserId, false);
                 if (!$bearerUser || ($bearerUser['status'] ?? 'active') === 'suspended') {
                     return $this->authError(
-                        'User not found',
+                        __('api.user_not_found'),
                         ApiErrorCodes::AUTH_ACCOUNT_DELETED,
                         401,
                         ['authenticated' => false, 'should_reauth' => true]
@@ -598,7 +598,7 @@ class AuthController extends BaseApiController
                     if (!$user) {
                         error_log("[Heartbeat] User ID {$_SESSION['user_id']} not found after retries - possible deleted user");
                         return $this->authError(
-                            'User not found',
+                            __('api.user_not_found'),
                             ApiErrorCodes::AUTH_ACCOUNT_DELETED,
                             401,
                             ['authenticated' => false, 'should_reauth' => true]
@@ -690,7 +690,7 @@ class AuthController extends BaseApiController
         }
 
         return $this->authError(
-            'Not authenticated',
+            __('api.not_authenticated'),
             ApiErrorCodes::AUTH_TOKEN_MISSING,
             401,
             ['authenticated' => false]
@@ -708,7 +708,7 @@ class AuthController extends BaseApiController
 
         if (empty($_SESSION['user_id'])) {
             return $this->authError(
-                'Unauthorized',
+                __('api.unauthorized'),
                 ApiErrorCodes::AUTH_TOKEN_MISSING,
                 401
             );
@@ -742,7 +742,7 @@ class AuthController extends BaseApiController
         $authHeader = $_SERVER['HTTP_AUTHORIZATION'] ?? $_SERVER['REDIRECT_HTTP_AUTHORIZATION'] ?? '';
         if (empty($authHeader) || !preg_match('/Bearer\s+(.+)$/i', $authHeader, $matches)) {
             return $this->authError(
-                'Bearer token required',
+                __('api.bearer_token_required'),
                 ApiErrorCodes::AUTH_TOKEN_MISSING,
                 400
             );
@@ -753,7 +753,7 @@ class AuthController extends BaseApiController
 
         if (!$payload || ($payload['type'] ?? 'access') !== 'access') {
             return $this->authError(
-                'Invalid or expired token',
+                __('api.invalid_or_expired_token'),
                 ApiErrorCodes::AUTH_TOKEN_INVALID,
                 401
             );
@@ -763,7 +763,7 @@ class AuthController extends BaseApiController
 
         if (!$userId) {
             return $this->authError(
-                'Invalid token payload',
+                __('api.invalid_token_payload'),
                 ApiErrorCodes::AUTH_TOKEN_INVALID,
                 401
             );
@@ -779,7 +779,7 @@ class AuthController extends BaseApiController
 
         if (!$user) {
             return $this->authError(
-                'User not found',
+                __('api.user_not_found'),
                 ApiErrorCodes::RESOURCE_NOT_FOUND,
                 401
             );
@@ -848,7 +848,7 @@ class AuthController extends BaseApiController
 
         if (empty($token)) {
             return $this->authError(
-                'Token required',
+                __('api.token_required'),
                 ApiErrorCodes::AUTH_TOKEN_MISSING,
                 400
             );
@@ -858,7 +858,7 @@ class AuthController extends BaseApiController
 
         if (!$payload) {
             return $this->authError(
-                'Invalid or expired token',
+                __('api.invalid_or_expired_token'),
                 ApiErrorCodes::AUTH_TOKEN_INVALID,
                 401,
                 ['valid' => false]
@@ -884,7 +884,7 @@ class AuthController extends BaseApiController
         $userId = $this->getOptionalUserId();
         if (!$userId) {
             return $this->authError(
-                'Authentication required',
+                __('api.auth_required'),
                 ApiErrorCodes::AUTH_TOKEN_MISSING,
                 401
             );
@@ -895,7 +895,7 @@ class AuthController extends BaseApiController
 
         if (empty($refreshToken)) {
             return $this->authError(
-                'Refresh token required',
+                __('api.refresh_token_required'),
                 ApiErrorCodes::VALIDATION_REQUIRED_FIELD,
                 400
             );
@@ -905,7 +905,7 @@ class AuthController extends BaseApiController
 
         if (!$revoked) {
             return $this->authError(
-                'Invalid refresh token or already revoked',
+                __('api.invalid_refresh_token_or_revoked'),
                 ApiErrorCodes::AUTH_TOKEN_INVALID,
                 400
             );
@@ -924,7 +924,7 @@ class AuthController extends BaseApiController
         $userId = $this->getOptionalUserId();
         if (!$userId) {
             return $this->authError(
-                'Authentication required',
+                __('api.auth_required'),
                 ApiErrorCodes::AUTH_TOKEN_MISSING,
                 401
             );
@@ -955,18 +955,18 @@ class AuthController extends BaseApiController
         }
 
         if (empty($token)) {
-            return $this->authError('Missing token', ApiErrorCodes::AUTH_TOKEN_MISSING, 400);
+            return $this->authError(__('api.missing_token'), ApiErrorCodes::AUTH_TOKEN_MISSING, 400);
         }
 
         // Validate the JWT
         $payload = $this->tokenService->validateToken($token);
         if (!$payload) {
-            return $this->authError('Invalid or expired token', ApiErrorCodes::AUTH_TOKEN_INVALID, 401);
+            return $this->authError(__('api.invalid_or_expired_token'), ApiErrorCodes::AUTH_TOKEN_INVALID, 401);
         }
 
         $userId = $payload['user_id'] ?? $payload['sub'] ?? null;
         if (!$userId) {
-            return $this->authError('Invalid token payload', ApiErrorCodes::AUTH_TOKEN_INVALID, 401);
+            return $this->authError(__('api.invalid_token_payload'), ApiErrorCodes::AUTH_TOKEN_INVALID, 401);
         }
 
         // Load user from DB — tenant-scoped, with super-admin bypass
@@ -993,14 +993,14 @@ class AuthController extends BaseApiController
         }
 
         if (!$user) {
-            return $this->authError('User not found', ApiErrorCodes::RESOURCE_NOT_FOUND, 404);
+            return $this->authError(__('api.user_not_found'), ApiErrorCodes::RESOURCE_NOT_FOUND, 404);
         }
 
         // Check admin privileges
         $adminRoles = ['admin', 'super_admin', 'tenant_admin'];
         $isAdmin = in_array($user['role'], $adminRoles) || !empty($user['is_super_admin']) || !empty($user['is_tenant_super_admin']) || !empty($user['is_god']);
         if (!$isAdmin) {
-            return $this->authError('Admin access required', ApiErrorCodes::AUTH_INSUFFICIENT_PERMISSIONS, 403);
+            return $this->authError(__('api.admin_access_required'), ApiErrorCodes::AUTH_INSUFFICIENT_PERMISSIONS, 403);
         }
 
         // Create PHP session
@@ -1036,7 +1036,7 @@ class AuthController extends BaseApiController
 
         if ($rateLimitResult['limited']) {
             return $this->authError(
-                'Too many requests. Please try again later.',
+                __('api.rate_limit_exceeded'),
                 ApiErrorCodes::RATE_LIMIT_EXCEEDED,
                 429
             );

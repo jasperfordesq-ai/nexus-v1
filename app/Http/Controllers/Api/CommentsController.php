@@ -37,7 +37,7 @@ class CommentsController extends BaseApiController
         if (! $targetType || ! $targetId) {
             return $this->respondWithError(
                 'VALIDATION_REQUIRED_FIELD',
-                'target_type and target_id are required',
+                __('api.target_type_and_id_required'),
                 null,
                 400
             );
@@ -68,11 +68,11 @@ class CommentsController extends BaseApiController
         $content = trim($data['content'] ?? '');
 
         if (! $targetType || ! $targetId) {
-            return $this->respondWithError('VALIDATION_REQUIRED_FIELD', 'target_type and target_id are required', null, 400);
+            return $this->respondWithError('VALIDATION_REQUIRED_FIELD', __('api.target_type_and_id_required'), null, 400);
         }
 
         if (empty($content)) {
-            return $this->respondWithError('VALIDATION_REQUIRED_FIELD', 'Comment content is required', 'content', 400);
+            return $this->respondWithError('VALIDATION_REQUIRED_FIELD', __('api.comment_text_required'), 'content', 400);
         }
 
         $comment = $this->commentService->create($targetType, $targetId, $userId, $tenantId, $data);
@@ -108,13 +108,13 @@ class CommentsController extends BaseApiController
         $content = trim($this->input('content', ''));
 
         if (empty($content)) {
-            return $this->respondWithError('VALIDATION_REQUIRED_FIELD', 'Comment content is required', 'content', 400);
+            return $this->respondWithError('VALIDATION_REQUIRED_FIELD', __('api.comment_text_required'), 'content', 400);
         }
 
         $updated = $this->commentService->update($id, $userId, $content);
 
         if (! $updated) {
-            return $this->respondWithError('RESOURCE_FORBIDDEN', 'Cannot edit this comment', null, 403);
+            return $this->respondWithError('RESOURCE_FORBIDDEN', __('api.cannot_edit_comment'), null, 403);
         }
 
         return $this->respondWithData([
@@ -135,7 +135,7 @@ class CommentsController extends BaseApiController
         $deleted = $this->commentService->delete($id, $userId);
 
         if (! $deleted) {
-            return $this->respondWithError('RESOURCE_FORBIDDEN', 'Cannot delete this comment', null, 403);
+            return $this->respondWithError('RESOURCE_FORBIDDEN', __('api.cannot_delete_comment'), null, 403);
         }
 
         return $this->respondWithData(['deleted' => true, 'id' => $id]);
@@ -153,7 +153,7 @@ class CommentsController extends BaseApiController
         $emoji = $this->input('emoji');
 
         if (! $emoji) {
-            return $this->respondWithError('VALIDATION_REQUIRED_FIELD', 'Emoji is required', 'emoji', 400);
+            return $this->respondWithError('VALIDATION_REQUIRED_FIELD', __('api.emoji_required'), 'emoji', 400);
         }
 
         // Map frontend emoji names to actual emojis

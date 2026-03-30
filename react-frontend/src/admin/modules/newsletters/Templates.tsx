@@ -290,7 +290,7 @@ export function Templates() {
         />
         <EmptyState
           icon={FileText}
-          title="No Templates Created"
+          title={t('newsletters.no_templates_created')}
           description={t('newsletters.desc_create_reusable_email_templates_to_speed')}
           actionLabel="Create Template"
           onAction={() => navigate(tenantPath('/admin/newsletters/templates/create'))}
@@ -352,7 +352,7 @@ export function Templates() {
         isOpen={!!deleteTarget}
         onClose={() => setDeleteTarget(null)}
         onConfirm={handleDelete}
-        title="Delete Template"
+        title={t('newsletters.delete_template')}
         message={`Are you sure you want to delete "${deleteTarget?.name}"? This action cannot be undone.`}
         confirmLabel="Delete"
         confirmColor="danger"

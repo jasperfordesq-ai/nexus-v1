@@ -109,12 +109,12 @@ class AdminEnterpriseController extends BaseApiController
                 [$id, $tenantId]
             );
 
-            if (!$result) { return $this->respondWithError('NOT_FOUND', 'Role not found', null, 404); }
+            if (!$result) { return $this->respondWithError('NOT_FOUND', __('api.role_not_found'), null, 404); }
             $role = (array)$result;
             $role['permissions'] = json_decode($role['permissions'] ?? '[]', true) ?: [];
             return $this->respondWithData($role);
         } catch (\Exception $e) {
-            return $this->respondWithError('NOT_FOUND', 'Role not found or roles table not available', null, 404);
+            return $this->respondWithError('NOT_FOUND', __('api.role_not_found_or_unavailable'), null, 404);
         }
     }
 
@@ -125,7 +125,7 @@ class AdminEnterpriseController extends BaseApiController
         $data = $this->getAllInput();
         $tenantId = TenantContext::getId();
 
-        if (empty($data['name'])) { return $this->respondWithError('VALIDATION_ERROR', 'Role name is required', 'name', 422); }
+        if (empty($data['name'])) { return $this->respondWithError('VALIDATION_ERROR', __('api.role_name_required'), 'name', 422); }
 
         $name = trim($data['name']);
         $displayName = $data['display_name'] ?? $name;
@@ -159,7 +159,7 @@ class AdminEnterpriseController extends BaseApiController
             return $this->respondWithData($resultArr, null, 201);
         } catch (\Exception $e) {
             DB::rollBack();
-            return $this->respondWithError('CREATE_FAILED', 'Failed to create role', null, 500);
+            return $this->respondWithError('CREATE_FAILED', __('api.role_create_failed'), null, 500);
         }
     }
 
@@ -185,7 +185,7 @@ class AdminEnterpriseController extends BaseApiController
 
             if (isset($data['permissions']) && is_array($data['permissions'])) {
                 $roleCheck = DB::selectOne("SELECT id FROM roles WHERE id = ? AND tenant_id = ?", [$id, $tenantId]);
-                if (!$roleCheck) { DB::rollBack(); return $this->respondWithError('NOT_FOUND', 'Role not found for this tenant', null, 404); }
+                if (!$roleCheck) { DB::rollBack(); return $this->respondWithError('NOT_FOUND', __('api.role_not_found_in_tenant'), null, 404); }
                 DB::delete("DELETE FROM role_permissions WHERE role_id = ? AND tenant_id = ?", [$id, $tenantId]);
                 foreach ($data['permissions'] as $permName) {
                     $perm = DB::selectOne("SELECT id FROM permissions WHERE name = ? LIMIT 1", [$permName]);
@@ -201,14 +201,14 @@ class AdminEnterpriseController extends BaseApiController
                 [$id, $tenantId]
             );
 
-            if (empty($result)) { return $this->respondWithError('NOT_FOUND', 'Role not found', null, 404); }
+            if (empty($result)) { return $this->respondWithError('NOT_FOUND', __('api.role_not_found'), null, 404); }
             $resultArr = (array)$result;
             $resultArr['permissions'] = !empty($resultArr['permission_names']) ? explode(',', $resultArr['permission_names']) : [];
             unset($resultArr['permission_names']);
             return $this->respondWithData($resultArr);
         } catch (\Exception $e) {
             DB::rollBack();
-            return $this->respondWithError('UPDATE_FAILED', 'Failed to update role', null, 500);
+            return $this->respondWithError('UPDATE_FAILED', __('api.role_update_failed'), null, 500);
         }
     }
 
@@ -221,7 +221,7 @@ class AdminEnterpriseController extends BaseApiController
             DB::delete("DELETE FROM roles WHERE id = ? AND tenant_id = ?", [$id, $tenantId]);
             return $this->respondWithData(['deleted' => true]);
         } catch (\Exception $e) {
-            return $this->respondWithError('DELETE_FAILED', 'Failed to delete role', null, 500);
+            return $this->respondWithError('DELETE_FAILED', __('api.role_delete_failed'), null, 500);
         }
     }
 
@@ -282,7 +282,7 @@ class AdminEnterpriseController extends BaseApiController
         $this->requireAdmin();
         $tenantId = $this->getTenantId();
         $status = $this->input('status'); $notes = $this->input('notes');
-        if (empty($status)) { return $this->respondWithError('VALIDATION_ERROR', 'Status is required', 'status', 422); }
+        if (empty($status)) { return $this->respondWithError('VALIDATION_ERROR', __('api.status_required'), 'status', 422); }
 
         try {
             $updates = ["status = ?", "updated_at = NOW()"]; $params = [$status];
@@ -292,7 +292,7 @@ class AdminEnterpriseController extends BaseApiController
             DB::update("UPDATE gdpr_requests SET " . implode(', ', $updates) . " WHERE id = ? AND tenant_id = ?", $params);
             return $this->respondWithData(['id' => $id, 'status' => $status, 'updated' => true]);
         } catch (\Exception $e) {
-            return $this->respondWithError('UPDATE_FAILED', 'Failed to update GDPR request', null, 500);
+            return $this->respondWithError('UPDATE_FAILED', __('api.gdpr_request_update_failed'), null, 500);
         }
     }
 
@@ -337,7 +337,7 @@ class AdminEnterpriseController extends BaseApiController
         $tenantId = $this->getTenantId();
         $input = $this->getAllInput();
         $breachType = trim($input['breach_type'] ?? $input['title'] ?? '');
-        if (!$breachType) { return $this->respondWithError('VALIDATION_ERROR', 'Breach type is required', 'breach_type', 422); }
+        if (!$breachType) { return $this->respondWithError('VALIDATION_ERROR', __('api.breach_type_required'), 'breach_type', 422); }
 
         try {
             DB::insert(
@@ -346,7 +346,7 @@ class AdminEnterpriseController extends BaseApiController
             );
             return $this->respondWithData(['id' => DB::getPdo()->lastInsertId(), 'message' => 'Breach reported successfully'], null, 201);
         } catch (\Exception $e) {
-            return $this->respondWithError('CREATE_FAILED', 'Failed to report breach', null, 500);
+            return $this->respondWithError('CREATE_FAILED', __('api.breach_report_failed'), null, 500);
         }
     }
 
@@ -454,7 +454,7 @@ class AdminEnterpriseController extends BaseApiController
         $this->requireAdmin();
         $tenantId = $this->getTenantId();
         $newConfig = $this->getAllInput();
-        if (empty($newConfig)) { return $this->respondWithError('VALIDATION_ERROR', 'No configuration data provided', null, 422); }
+        if (empty($newConfig)) { return $this->respondWithError('VALIDATION_ERROR', __('api.no_configuration_data'), null, 422); }
 
         try {
             $row = DB::selectOne("SELECT configuration FROM tenants WHERE id = ?", [$tenantId]);
@@ -464,7 +464,7 @@ class AdminEnterpriseController extends BaseApiController
             try { app(\App\Services\RedisCache::class)->delete('tenant_bootstrap', $tenantId); } catch (\Throwable $e) { \Illuminate\Support\Facades\Log::warning('[AdminEnterprise] Cache invalidation failed: ' . $e->getMessage()); }
             return $this->respondWithData($merged);
         } catch (\Exception $e) {
-            return $this->respondWithError('UPDATE_FAILED', 'Failed to update configuration', null, 500);
+            return $this->respondWithError('UPDATE_FAILED', __('api.config_update_failed'), null, 500);
         }
     }
 
@@ -496,7 +496,7 @@ class AdminEnterpriseController extends BaseApiController
     {
         $this->requireAdmin();
         $data = $this->getAllInput();
-        if (empty($data['title'])) { return $this->respondWithError('VALIDATION_ERROR', 'Title is required', 'title', 422); }
+        if (empty($data['title'])) { return $this->respondWithError('VALIDATION_ERROR', __('api.title_required'), 'title', 422); }
 
         try {
             $doc = $this->legalDocumentService->createDocument([
@@ -508,7 +508,7 @@ class AdminEnterpriseController extends BaseApiController
             ]);
             return $this->respondWithData($doc, null, 201);
         } catch (\Exception $e) {
-            return $this->respondWithError('CREATE_FAILED', 'Failed to create legal document', null, 500);
+            return $this->respondWithError('CREATE_FAILED', __('api.legal_doc_create_failed'), null, 500);
         }
     }
 
@@ -520,11 +520,11 @@ class AdminEnterpriseController extends BaseApiController
         $tenantId = $this->getTenantId();
         try {
             $result = DB::selectOne("SELECT *, document_type as type FROM legal_documents WHERE id = ? AND tenant_id = ?", [$id, $tenantId]);
-            if (!$result) { return $this->respondWithError('NOT_FOUND', 'Legal document not found', null, 404); }
+            if (!$result) { return $this->respondWithError('NOT_FOUND', __('api.legal_doc_not_found'), null, 404); }
             $doc = (array)$result;
             return $this->respondWithData($doc);
         } catch (\Exception $e) {
-            return $this->respondWithError('NOT_FOUND', 'Legal document not found', null, 404);
+            return $this->respondWithError('NOT_FOUND', __('api.legal_doc_not_found'), null, 404);
         }
     }
 
@@ -547,10 +547,10 @@ class AdminEnterpriseController extends BaseApiController
             if (isset($data['notify_on_update'])) $updateData['notify_on_update'] = $data['notify_on_update'];
 
             $doc = $this->legalDocumentService->updateDocument($id, $updateData);
-            if (!$doc) { return $this->respondWithError('NOT_FOUND', 'Document not found', null, 404); }
+            if (!$doc) { return $this->respondWithError('NOT_FOUND', __('api.document_not_found'), null, 404); }
             return $this->respondWithData($doc);
         } catch (\Exception $e) {
-            return $this->respondWithError('UPDATE_FAILED', 'Failed to update legal document', null, 500);
+            return $this->respondWithError('UPDATE_FAILED', __('api.legal_doc_update_failed'), null, 500);
         }
     }
 
@@ -564,7 +564,7 @@ class AdminEnterpriseController extends BaseApiController
             DB::delete("DELETE FROM legal_documents WHERE id = ? AND tenant_id = ?", [$id, $tenantId]);
             return $this->respondWithData(['deleted' => true]);
         } catch (\Exception $e) {
-            return $this->respondWithError('DELETE_FAILED', 'Failed to delete legal document', null, 500);
+            return $this->respondWithError('DELETE_FAILED', __('api.legal_doc_delete_failed'), null, 500);
         }
     }
 

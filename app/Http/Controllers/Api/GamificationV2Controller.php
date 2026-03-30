@@ -63,7 +63,7 @@ class GamificationV2Controller extends BaseApiController
         $user = $userRow ? (array)$userRow : null;
 
         if (!$user) {
-            return $this->respondWithError('RESOURCE_NOT_FOUND', 'User not found', null, 404);
+            return $this->respondWithError('RESOURCE_NOT_FOUND', __('api.user_not_found'), null, 404);
         }
 
         $xp = (int) ($user['xp'] ?? 0);
@@ -164,7 +164,7 @@ class GamificationV2Controller extends BaseApiController
         $definition = $this->gamificationServiceLegacy->getBadgeByKey($key);
 
         if (!$definition) {
-            return $this->respondWithError('RESOURCE_NOT_FOUND', 'Badge not found', null, 404);
+            return $this->respondWithError('RESOURCE_NOT_FOUND', __('api.badge_not_found'), null, 404);
         }
 
         $userBadgeRow = DB::selectOne(
@@ -349,7 +349,7 @@ class GamificationV2Controller extends BaseApiController
             $challenges = $this->challengeService->getChallengesWithProgress($userId);
             return $this->respondWithData($challenges);
         } catch (\Throwable $e) {
-            return $this->respondWithError('SERVER_INTERNAL_ERROR', 'Failed to load challenges', null, 500);
+            return $this->respondWithError('SERVER_INTERNAL_ERROR', __('api.gamification_challenges_failed'), null, 500);
         }
     }
 
@@ -363,7 +363,7 @@ class GamificationV2Controller extends BaseApiController
             $challenge = $this->challengeService->getById($id, $this->getTenantId());
 
             if (!$challenge) {
-                return $this->respondWithError('RESOURCE_NOT_FOUND', 'Challenge not found', null, 404);
+                return $this->respondWithError('RESOURCE_NOT_FOUND', __('api.challenge_not_found'), null, 404);
             }
 
             $progressRow = DB::selectOne(
@@ -373,15 +373,15 @@ class GamificationV2Controller extends BaseApiController
             $progress = $progressRow ? (array)$progressRow : null;
 
             if (!$progress) {
-                return $this->respondWithError('CHALLENGE_NOT_STARTED', 'You have not started this challenge', null, 400);
+                return $this->respondWithError('CHALLENGE_NOT_STARTED', __('api.gamification_challenge_not_started'), null, 400);
             }
 
             if (!empty($progress['reward_claimed'])) {
-                return $this->respondWithError('CHALLENGE_ALREADY_CLAIMED', 'You have already claimed this reward', null, 400);
+                return $this->respondWithError('CHALLENGE_ALREADY_CLAIMED', __('api.gamification_challenge_already_claimed'), null, 400);
             }
 
             if (empty($progress['completed_at'])) {
-                return $this->respondWithError('CHALLENGE_NOT_COMPLETED', 'You have not completed this challenge yet', null, 400);
+                return $this->respondWithError('CHALLENGE_NOT_COMPLETED', __('api.gamification_challenge_not_completed'), null, 400);
             }
 
             // Atomic claim: UPDATE only if reward_claimed is still 0 to prevent
@@ -392,7 +392,7 @@ class GamificationV2Controller extends BaseApiController
             );
 
             if ($affected === 0) {
-                return $this->respondWithError('CHALLENGE_ALREADY_CLAIMED', 'You have already claimed this reward', null, 400);
+                return $this->respondWithError('CHALLENGE_ALREADY_CLAIMED', __('api.gamification_challenge_already_claimed'), null, 400);
             }
 
             $xpReward = (int) ($challenge['xp_reward'] ?? 0);
@@ -408,7 +408,7 @@ class GamificationV2Controller extends BaseApiController
                 ],
             ]);
         } catch (\Throwable $e) {
-            return $this->respondWithError('SERVER_INTERNAL_ERROR', 'Failed to claim challenge reward', null, 500);
+            return $this->respondWithError('SERVER_INTERNAL_ERROR', __('api.gamification_claim_failed'), null, 500);
         }
     }
 
@@ -426,7 +426,7 @@ class GamificationV2Controller extends BaseApiController
             $collections = $this->badgeCollectionService->getCollectionsWithProgress($userId);
             return $this->respondWithData($collections);
         } catch (\Throwable $e) {
-            return $this->respondWithError('SERVER_INTERNAL_ERROR', 'Failed to load collections', null, 500);
+            return $this->respondWithError('SERVER_INTERNAL_ERROR', __('api.gamification_collections_failed'), null, 500);
         }
     }
 
@@ -444,7 +444,7 @@ class GamificationV2Controller extends BaseApiController
             $status = $this->dailyRewardService->getTodayStatus($userId);
             return $this->respondWithData($status);
         } catch (\Throwable $e) {
-            return $this->respondWithError('SERVER_INTERNAL_ERROR', 'Daily rewards not available', null, 500);
+            return $this->respondWithError('SERVER_INTERNAL_ERROR', __('api.gamification_daily_unavailable'), null, 500);
         }
     }
 
@@ -458,7 +458,7 @@ class GamificationV2Controller extends BaseApiController
             $reward = $this->dailyRewardService->checkAndAwardDailyReward($userId);
 
             if ($reward === null) {
-                return $this->respondWithError('RESOURCE_CONFLICT', 'Daily reward already claimed today', null, 409);
+                return $this->respondWithError('RESOURCE_CONFLICT', __('api.gamification_daily_already_claimed'), null, 409);
             }
 
             return $this->respondWithData([
@@ -466,7 +466,7 @@ class GamificationV2Controller extends BaseApiController
                 'reward' => $reward,
             ]);
         } catch (\Throwable $e) {
-            return $this->respondWithError('SERVER_INTERNAL_ERROR', 'Failed to claim daily reward', null, 500);
+            return $this->respondWithError('SERVER_INTERNAL_ERROR', __('api.gamification_daily_claim_failed'), null, 500);
         }
     }
 
@@ -484,7 +484,7 @@ class GamificationV2Controller extends BaseApiController
             $data = $this->xpShopService->getItemsWithUserStatus($userId);
             return $this->respondWithData($data['items'] ?? $data, ['user_xp' => $data['user_xp'] ?? null]);
         } catch (\Throwable $e) {
-            return $this->respondWithError('SERVER_INTERNAL_ERROR', 'Failed to load shop', null, 500);
+            return $this->respondWithError('SERVER_INTERNAL_ERROR', __('api.gamification_shop_failed'), null, 500);
         }
     }
 
@@ -497,7 +497,7 @@ class GamificationV2Controller extends BaseApiController
         $itemId = $this->input('item_id');
 
         if (empty($itemId)) {
-            return $this->respondWithError('VALIDATION_REQUIRED_FIELD', 'Item ID is required', 'item_id', 400);
+            return $this->respondWithError('VALIDATION_REQUIRED_FIELD', __('api.gamification_item_id_required'), 'item_id', 400);
         }
 
         try {
@@ -506,10 +506,10 @@ class GamificationV2Controller extends BaseApiController
             if ($result['success'] ?? false) {
                 return $this->respondWithData($result);
             } else {
-                return $this->respondWithError('RESOURCE_CONFLICT', $result['error'] ?? 'Purchase failed', null, 400);
+                return $this->respondWithError('RESOURCE_CONFLICT', $result['error'] ?? __('api.purchase_failed'), null, 400);
             }
         } catch (\Throwable $e) {
-            return $this->respondWithError('SERVER_INTERNAL_ERROR', 'Purchase failed', null, 500);
+            return $this->respondWithError('SERVER_INTERNAL_ERROR', __('api.gamification_purchase_failed'), null, 500);
         }
     }
 
@@ -526,11 +526,11 @@ class GamificationV2Controller extends BaseApiController
         $badgeKeys = $this->input('badge_keys', []);
 
         if (!is_array($badgeKeys)) {
-            return $this->respondWithError('VALIDATION_INVALID_FORMAT', 'badge_keys must be an array', 'badge_keys', 400);
+            return $this->respondWithError('VALIDATION_INVALID_FORMAT', __('api.gamification_badge_keys_array'), 'badge_keys', 400);
         }
 
         if (count($badgeKeys) > 5) {
-            return $this->respondWithError('VALIDATION_ERROR', 'Maximum 5 badges can be showcased', 'badge_keys', 400);
+            return $this->respondWithError('VALIDATION_ERROR', __('api.gamification_max_5_showcase'), 'badge_keys', 400);
         }
 
         $userBadges = UserBadge::getForUser($userId);
@@ -538,7 +538,7 @@ class GamificationV2Controller extends BaseApiController
 
         $invalidKeys = array_diff($badgeKeys, $userBadgeKeys);
         if (!empty($invalidKeys)) {
-            return $this->respondWithError('VALIDATION_INVALID_VALUE', 'You do not own some of the specified badges', 'badge_keys', 400);
+            return $this->respondWithError('VALIDATION_INVALID_VALUE', __('api.gamification_badges_not_owned'), 'badge_keys', 400);
         }
 
         try {
@@ -553,11 +553,11 @@ class GamificationV2Controller extends BaseApiController
             }
 
             return $this->respondWithData([
-                'message' => 'Showcase updated',
+                'message' => __('api.showcase_updated'),
                 'showcased_badges' => $showcased,
             ]);
         } catch (\Throwable $e) {
-            return $this->respondWithError('SERVER_INTERNAL_ERROR', 'Failed to update showcase', null, 500);
+            return $this->respondWithError('SERVER_INTERNAL_ERROR', __('api.gamification_showcase_update_failed'), null, 500);
         }
     }
 
@@ -574,7 +574,7 @@ class GamificationV2Controller extends BaseApiController
             $seasons = $this->leaderboardSeasonService->getAllSeasons();
             return $this->respondWithData($seasons);
         } catch (\Throwable $e) {
-            return $this->respondWithError('SERVER_INTERNAL_ERROR', 'Failed to load seasons', null, 500);
+            return $this->respondWithError('SERVER_INTERNAL_ERROR', __('api.gamification_seasons_failed'), null, 500);
         }
     }
 
@@ -603,7 +603,7 @@ class GamificationV2Controller extends BaseApiController
             return $this->respondWithData($data);
         } catch (\Throwable $e) {
             error_log('[GamificationV2] currentSeason error: ' . $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine());
-            return $this->respondWithError('SERVER_INTERNAL_ERROR', 'Failed to load current season', null, 500);
+            return $this->respondWithError('SERVER_INTERNAL_ERROR', __('api.gamification_season_current_failed'), null, 500);
         }
     }
 
@@ -674,7 +674,7 @@ class GamificationV2Controller extends BaseApiController
             ]);
         } catch (\Throwable $e) {
             error_log("NexusScore error for user {$userId}: " . $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine());
-            return $this->respondWithError('SERVER_INTERNAL_ERROR', 'Failed to load NexusScore', null, 500);
+            return $this->respondWithError('SERVER_INTERNAL_ERROR', __('api.gamification_nexus_score_failed'), null, 500);
         }
     }
 

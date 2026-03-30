@@ -83,11 +83,11 @@ class GoalsController extends BaseApiController
         $goal = $this->goalService->getById($id);
 
         if (! $goal) {
-            return $this->respondWithError('RESOURCE_NOT_FOUND', 'Goal not found', null, 404);
+            return $this->respondWithError('RESOURCE_NOT_FOUND', __('api.goal_not_found'), null, 404);
         }
 
         if (! $goal->is_public && (int) $goal->user_id !== $userId) {
-            return $this->respondWithError('RESOURCE_FORBIDDEN', 'This goal is private', null, 403);
+            return $this->respondWithError('RESOURCE_FORBIDDEN', __('api.goal_is_private'), null, 403);
         }
 
         $data = $goal->toArray();
@@ -109,7 +109,7 @@ class GoalsController extends BaseApiController
         $data = $this->getAllInput();
 
         if (empty(trim($data['title'] ?? ''))) {
-            return $this->respondWithError('VALIDATION_REQUIRED_FIELD', 'Title is required', 'title', 400);
+            return $this->respondWithError('VALIDATION_REQUIRED_FIELD', __('api.title_required'), 'title', 400);
         }
 
         $goal = $this->goalService->create($userId, $data);
@@ -149,7 +149,7 @@ class GoalsController extends BaseApiController
         $goal = $this->goalService->update($id, $userId, $this->getAllInput());
 
         if (! $goal) {
-            return $this->respondWithError('RESOURCE_NOT_FOUND', 'Goal not found or not owned', null, 404);
+            return $this->respondWithError('RESOURCE_NOT_FOUND', __('api.goal_not_found_or_not_owned'), null, 404);
         }
 
         $data = $goal->toArray();
@@ -170,7 +170,7 @@ class GoalsController extends BaseApiController
         $deleted = $this->goalService->delete($id, $userId);
 
         if (! $deleted) {
-            return $this->respondWithError('RESOURCE_NOT_FOUND', 'Goal not found or not owned', null, 404);
+            return $this->respondWithError('RESOURCE_NOT_FOUND', __('api.goal_not_found_or_not_owned'), null, 404);
         }
 
         return $this->noContent();
@@ -188,13 +188,13 @@ class GoalsController extends BaseApiController
         $increment = $this->input('increment');
 
         if ($increment === null) {
-            return $this->respondWithError('VALIDATION_REQUIRED_FIELD', 'Increment value is required', 'increment', 400);
+            return $this->respondWithError('VALIDATION_REQUIRED_FIELD', __('api.increment_required'), 'increment', 400);
         }
 
         $goal = $this->goalService->incrementProgress($id, $userId, (float) $increment);
 
         if (! $goal) {
-            return $this->respondWithError('RESOURCE_NOT_FOUND', 'Goal not found or not owned', null, 404);
+            return $this->respondWithError('RESOURCE_NOT_FOUND', __('api.goal_not_found_or_not_owned'), null, 404);
         }
 
         // Notify the buddy/mentor of progress updates
@@ -258,7 +258,7 @@ class GoalsController extends BaseApiController
         $goal = $this->goalService->complete($id, $userId);
 
         if (! $goal) {
-            return $this->respondWithError('RESOURCE_NOT_FOUND', 'Goal not found or not owned', null, 404);
+            return $this->respondWithError('RESOURCE_NOT_FOUND', __('api.goal_not_found_or_not_owned'), null, 404);
         }
 
         // Award XP for completing a goal
@@ -370,7 +370,7 @@ class GoalsController extends BaseApiController
         $goal = $this->goalService->offerBuddy($id, $userId);
 
         if (! $goal) {
-            return $this->respondWithError('RESOURCE_CONFLICT', 'Cannot become buddy for this goal', null, 409);
+            return $this->respondWithError('RESOURCE_CONFLICT', __('api.cannot_become_buddy'), null, 409);
         }
 
         // Notify the goal owner that someone became their buddy
@@ -391,7 +391,7 @@ class GoalsController extends BaseApiController
         }
 
         return $this->respondWithData([
-            'message' => 'You are now a buddy for this goal',
+            'message' => __('api.buddy_added'),
             'goal'    => $goal->toArray(),
         ]);
     }
@@ -407,7 +407,7 @@ class GoalsController extends BaseApiController
 
         $goal = $this->goalService->getById($id);
         if (! $goal || (int) $goal->user_id !== $userId) {
-            return $this->respondWithError('RESOURCE_NOT_FOUND', 'Goal not found or not owned', null, 404);
+            return $this->respondWithError('RESOURCE_NOT_FOUND', __('api.goal_not_found_or_not_owned'), null, 404);
         }
 
         $checkin = $this->checkinService->create($id, $userId, $this->getAllInput());
@@ -459,7 +459,7 @@ class GoalsController extends BaseApiController
 
         $goal = $this->goalService->getById($id);
         if (! $goal) {
-            return $this->respondWithError('RESOURCE_NOT_FOUND', 'Goal not found', null, 404);
+            return $this->respondWithError('RESOURCE_NOT_FOUND', __('api.goal_not_found'), null, 404);
         }
 
         $filters = [
@@ -485,7 +485,7 @@ class GoalsController extends BaseApiController
 
         $goal = $this->goalService->getById($id);
         if (! $goal) {
-            return $this->respondWithError('RESOURCE_NOT_FOUND', 'Goal not found', null, 404);
+            return $this->respondWithError('RESOURCE_NOT_FOUND', __('api.goal_not_found'), null, 404);
         }
 
         $summary = $this->progressService->getSummary($id);
@@ -535,7 +535,7 @@ class GoalsController extends BaseApiController
         $data = $this->getAllInput();
 
         if (empty(trim($data['title'] ?? ''))) {
-            return $this->respondWithError('VALIDATION_REQUIRED_FIELD', 'Title is required', 'title', 400);
+            return $this->respondWithError('VALIDATION_REQUIRED_FIELD', __('api.title_required'), 'title', 400);
         }
 
         $template = $this->templateService->create($userId, $data);
@@ -551,7 +551,7 @@ class GoalsController extends BaseApiController
         $goal = $this->templateService->createGoalFromTemplate($templateId, $userId, $this->getAllInput());
 
         if (! $goal) {
-            return $this->respondWithError('RESOURCE_NOT_FOUND', 'Template not found', null, 404);
+            return $this->respondWithError('RESOURCE_NOT_FOUND', __('api.template_not_found'), null, 404);
         }
 
         $data = $goal->toArray();

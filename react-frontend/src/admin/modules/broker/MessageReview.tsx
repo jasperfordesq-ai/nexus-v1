@@ -126,7 +126,7 @@ export function MessageReview() {
   const columns: Column<BrokerMessage>[] = [
     {
       key: 'sender_name',
-      label: 'Sender',
+      label: t('broker.col_sender'),
       sortable: true,
       render: (item) => (
         <Link
@@ -139,7 +139,7 @@ export function MessageReview() {
     },
     {
       key: 'receiver_name',
-      label: 'Receiver',
+      label: t('broker.col_receiver'),
       sortable: true,
       render: (item) => (
         <span className="font-medium text-foreground">{item.receiver_name}</span>
@@ -147,7 +147,7 @@ export function MessageReview() {
     },
     {
       key: 'message_body',
-      label: 'Preview',
+      label: t('broker.col_preview'),
       render: (item) => (
         <span className="text-sm text-default-500 line-clamp-1 max-w-[200px]">
           {item.message_body ? item.message_body.substring(0, 80) + (item.message_body.length > 80 ? '…' : '') : '—'}
@@ -156,7 +156,7 @@ export function MessageReview() {
     },
     {
       key: 'copy_reason',
-      label: 'Reason',
+      label: t('broker.col_reason'),
       render: (item) => (
         item.copy_reason ? (
           <Chip size="sm" variant="flat" color="default">
@@ -167,7 +167,7 @@ export function MessageReview() {
     },
     {
       key: 'flagged',
-      label: 'Flagged',
+      label: t('broker.col_flagged'),
       render: (item) => {
         if (!item.flagged) return <span className="text-sm text-default-400">No</span>;
         const severityColor = {
@@ -190,22 +190,22 @@ export function MessageReview() {
     },
     {
       key: 'reviewed_at',
-      label: 'Status',
+      label: t('broker.col_status'),
       render: (item) => (
         item.reviewed_at ? (
           <Chip size="sm" variant="flat" color="success">
-            Reviewed
+            {t('broker.tab_reviewed')}
           </Chip>
         ) : (
           <Chip size="sm" variant="flat" color="warning">
-            Unreviewed
+            {t('broker.tab_unreviewed')}
           </Chip>
         )
       ),
     },
     {
       key: 'created_at',
-      label: 'Date',
+      label: t('broker.col_date'),
       sortable: true,
       render: (item) => (
         <span className="text-sm text-default-500">
@@ -215,7 +215,7 @@ export function MessageReview() {
     },
     {
       key: 'actions',
-      label: 'Actions',
+      label: t('broker.col_actions'),
       render: (item) => (
         <div className="flex gap-1">
           {!item.reviewed_at && (
@@ -228,7 +228,7 @@ export function MessageReview() {
               isLoading={reviewingId === item.id}
               aria-label={t('broker.label_mark_as_reviewed')}
             >
-              Review
+              {t('broker.review')}
             </Button>
           )}
           {!item.flagged && (
@@ -240,7 +240,7 @@ export function MessageReview() {
               onPress={() => openFlagModal(item.id)}
               aria-label={t('broker.label_flag_message')}
             >
-              Flag
+              {t('broker.flag')}
             </Button>
           )}
         </div>
@@ -261,7 +261,7 @@ export function MessageReview() {
             startContent={<ArrowLeft size={16} />}
             size="sm"
           >
-            Back
+            {t('common.back')}
           </Button>
         }
       />
@@ -273,10 +273,10 @@ export function MessageReview() {
           variant="underlined"
           size="sm"
         >
-          <Tab key="unreviewed" title="Unreviewed" />
-          <Tab key="flagged" title="Flagged" />
-          <Tab key="reviewed" title="Reviewed" />
-          <Tab key="all" title="All" />
+          <Tab key="unreviewed" title={t('broker.tab_unreviewed')} />
+          <Tab key="flagged" title={t('broker.tab_flagged')} />
+          <Tab key="reviewed" title={t('broker.tab_reviewed')} />
+          <Tab key="all" title={t('broker.tab_all')} />
         </Tabs>
       </div>
 
@@ -301,7 +301,7 @@ export function MessageReview() {
         <ModalContent>
           <ModalHeader className="flex items-center gap-2">
             <Flag size={20} className="text-warning" />
-            Flag Message
+            {t('broker.flag_message')}
           </ModalHeader>
           <ModalBody>
             <Textarea
@@ -334,7 +334,7 @@ export function MessageReview() {
               onPress={() => setFlagModalOpen(false)}
               isDisabled={flagLoading}
             >
-              Cancel
+              {t('common.cancel')}
             </Button>
             <Button
               color="warning"
@@ -342,7 +342,7 @@ export function MessageReview() {
               isLoading={flagLoading}
               startContent={!flagLoading && <Flag size={14} />}
             >
-              Flag Message
+              {t('broker.flag_message')}
             </Button>
           </ModalFooter>
         </ModalContent>

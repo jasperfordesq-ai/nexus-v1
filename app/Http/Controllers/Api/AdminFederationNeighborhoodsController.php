@@ -33,11 +33,11 @@ class AdminFederationNeighborhoodsController extends BaseApiController
                 $neighborhoods = \App\Services\FederationNeighborhoodService::listAllStatic();
                 return $this->respondWithData($neighborhoods);
             } catch (\Exception $e) {
-                return $this->respondWithError('FETCH_FAILED', 'Failed to load neighborhoods', null, 500);
+                return $this->respondWithError('FETCH_FAILED', __('api.neighborhoods_fetch_failed'), null, 500);
             }
         }
 
-        return $this->respondWithError('SERVICE_UNAVAILABLE', 'FederationNeighborhoodService not available', null, 503);
+        return $this->respondWithError('SERVICE_UNAVAILABLE', __('api.federation_neighborhood_unavailable'), null, 503);
     }
 
     /**
@@ -52,7 +52,7 @@ class AdminFederationNeighborhoodsController extends BaseApiController
 
         $name = trim($input['name'] ?? '');
         if ($name === '') {
-            return $this->respondWithError('VALIDATION_ERROR', 'Name is required', 'name');
+            return $this->respondWithError('VALIDATION_ERROR', __('api.name_required'), 'name');
         }
 
         $description = isset($input['description']) ? trim($input['description']) : null;
@@ -62,11 +62,11 @@ class AdminFederationNeighborhoodsController extends BaseApiController
                 $neighborhood = \App\Services\FederationNeighborhoodService::createStatic($name, $description, null, $adminId);
                 return $this->respondWithData($neighborhood, null, 201);
             } catch (\Exception $e) {
-                return $this->respondWithError('CREATE_FAILED', 'Failed to create neighborhood');
+                return $this->respondWithError('CREATE_FAILED', __('api.neighborhood_create_failed'));
             }
         }
 
-        return $this->respondWithError('SERVICE_UNAVAILABLE', 'FederationNeighborhoodService not available', null, 503);
+        return $this->respondWithError('SERVICE_UNAVAILABLE', __('api.federation_neighborhood_unavailable'), null, 503);
     }
 
     /**
@@ -81,7 +81,7 @@ class AdminFederationNeighborhoodsController extends BaseApiController
         try {
             $existing = DB::selectOne("SELECT id FROM federation_neighborhoods WHERE id = ?", [$id]);
             if (!$existing) {
-                return $this->respondWithError('NOT_FOUND', 'Neighborhood not found', null, 404);
+                return $this->respondWithError('NOT_FOUND', __('api.neighborhood_not_found'), null, 404);
             }
 
             DB::delete("DELETE FROM federation_neighborhood_tenants WHERE neighborhood_id = ?", [$id]);
@@ -89,7 +89,7 @@ class AdminFederationNeighborhoodsController extends BaseApiController
 
             return $this->respondWithData(['success' => true]);
         } catch (\Exception $e) {
-            return $this->respondWithError('DELETE_FAILED', 'Failed to delete neighborhood', null, 500);
+            return $this->respondWithError('DELETE_FAILED', __('api.neighborhood_delete_failed'), null, 500);
         }
     }
 
@@ -105,7 +105,7 @@ class AdminFederationNeighborhoodsController extends BaseApiController
 
         $tenantId = (int) ($input['tenant_id'] ?? 0);
         if ($tenantId <= 0) {
-            return $this->respondWithError('VALIDATION_ERROR', 'Tenant ID is required', 'tenant_id');
+            return $this->respondWithError('VALIDATION_ERROR', __('api.tenant_id_required'), 'tenant_id');
         }
 
         try {
@@ -116,7 +116,7 @@ class AdminFederationNeighborhoodsController extends BaseApiController
 
             return $this->respondWithData(['success' => true]);
         } catch (\Exception $e) {
-            return $this->respondWithError('ADD_FAILED', 'Failed to add tenant to neighborhood', null, 500);
+            return $this->respondWithError('ADD_FAILED', __('api.neighborhood_add_tenant_failed'), null, 500);
         }
     }
 
@@ -136,12 +136,12 @@ class AdminFederationNeighborhoodsController extends BaseApiController
             );
 
             if ($deleted === 0) {
-                return $this->respondWithError('NOT_FOUND', 'Tenant not found in neighborhood', null, 404);
+                return $this->respondWithError('NOT_FOUND', __('api.tenant_not_in_neighborhood'), null, 404);
             }
 
             return $this->respondWithData(['success' => true]);
         } catch (\Exception $e) {
-            return $this->respondWithError('DELETE_FAILED', 'Failed to remove tenant from neighborhood', null, 500);
+            return $this->respondWithError('DELETE_FAILED', __('api.neighborhood_remove_tenant_failed'), null, 500);
         }
     }
 
@@ -163,7 +163,7 @@ class AdminFederationNeighborhoodsController extends BaseApiController
 
             return $this->respondWithData(array_map(fn($r) => (array) $r, $tenants));
         } catch (\Exception $e) {
-            return $this->respondWithError('FETCH_FAILED', 'Failed to load available tenants', null, 500);
+            return $this->respondWithError('FETCH_FAILED', __('api.available_tenants_fetch_failed'), null, 500);
         }
     }
 }

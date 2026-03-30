@@ -40,7 +40,7 @@ class UploadController extends BaseApiController
         $file = request()->file('file');
 
         if (!$file || !$file->isValid()) {
-            return $this->respondWithError('UPLOAD_INVALID', 'No valid file provided', 'file', 422);
+            return $this->respondWithError('UPLOAD_INVALID', __('api.no_valid_file_provided'), 'file', 422);
         }
 
         // Double-check MIME type via file content inspection (not just extension)
@@ -48,7 +48,7 @@ class UploadController extends BaseApiController
         $detectedMime = $file->getMimeType();
         $blockedMimes = ['text/html', 'application/xhtml+xml', 'image/svg+xml', 'application/x-httpd-php'];
         if ($detectedMime && in_array($detectedMime, $blockedMimes, true)) {
-            return $this->respondWithError('UPLOAD_BLOCKED', 'This file type is not allowed (HTML/SVG/PHP)', 'file', 422);
+            return $this->respondWithError('UPLOAD_BLOCKED', __('api.file_type_blocked'), 'file', 422);
         }
 
         $type = $this->input('type', 'general');

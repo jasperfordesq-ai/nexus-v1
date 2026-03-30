@@ -30,7 +30,7 @@ class MenuController extends BaseApiController
     {
         $tenantId = $this->getTenantId();
         if (!$tenantId) {
-            return $this->respondWithError('TENANT_NOT_FOUND', 'Tenant not found', null, 404);
+            return $this->respondWithError('TENANT_NOT_FOUND', __('api.tenant_not_found'), null, 404);
         }
 
         $layout = $this->query('layout');
@@ -63,7 +63,7 @@ class MenuController extends BaseApiController
                 'location'  => $location,
             ]);
         } catch (\Throwable $e) {
-            return $this->respondWithError('MENU_LOAD_FAILED', 'Failed to load menus', null, 500);
+            return $this->respondWithError('MENU_LOAD_FAILED', __('api.fetch_failed', ['resource' => 'menus']), null, 500);
         }
     }
 
@@ -77,7 +77,7 @@ class MenuController extends BaseApiController
     {
         $tenantId = $this->getTenantId();
         if (!$tenantId) {
-            return $this->respondWithError('TENANT_NOT_FOUND', 'Tenant not found', null, 404);
+            return $this->respondWithError('TENANT_NOT_FOUND', __('api.tenant_not_found'), null, 404);
         }
 
         $layout = $this->query('layout');
@@ -86,14 +86,14 @@ class MenuController extends BaseApiController
             $menu = MenuManager::getMenuBySlug($slug, $layout, true);
 
             if (!$menu) {
-                return $this->respondWithError('MENU_NOT_FOUND', 'Menu not found', null, 404);
+                return $this->respondWithError('MENU_NOT_FOUND', __('api.menu_not_found'), null, 404);
             }
 
             return $this->respondWithData($menu, [
                 'tenant_id' => $tenantId,
             ]);
         } catch (\Throwable $e) {
-            return $this->respondWithError('MENU_LOAD_FAILED', 'Failed to load menu', null, 500);
+            return $this->respondWithError('MENU_LOAD_FAILED', __('api.fetch_failed', ['resource' => 'menu']), null, 500);
         }
     }
 
@@ -107,7 +107,7 @@ class MenuController extends BaseApiController
     {
         $tenantId = $this->getTenantId();
         if (!$tenantId) {
-            return $this->respondWithError('TENANT_NOT_FOUND', 'Tenant not found', null, 404);
+            return $this->respondWithError('TENANT_NOT_FOUND', __('api.tenant_not_found'), null, 404);
         }
 
         try {
@@ -131,7 +131,7 @@ class MenuController extends BaseApiController
                 ],
             ]);
         } catch (\Throwable $e) {
-            return $this->respondWithError('CONFIG_LOAD_FAILED', 'Failed to load config', null, 500);
+            return $this->respondWithError('CONFIG_LOAD_FAILED', __('api.fetch_failed', ['resource' => 'config']), null, 500);
         }
     }
 
@@ -145,7 +145,7 @@ class MenuController extends BaseApiController
     {
         $tenantId = $this->getTenantId();
         if (!$tenantId) {
-            return $this->respondWithError('TENANT_NOT_FOUND', 'Tenant not found', null, 404);
+            return $this->respondWithError('TENANT_NOT_FOUND', __('api.tenant_not_found'), null, 404);
         }
 
         try {
@@ -176,7 +176,7 @@ class MenuController extends BaseApiController
                 'cache_key' => md5(json_encode($simplified)),
             ]);
         } catch (\Throwable $e) {
-            return $this->respondWithError('MOBILE_MENU_LOAD_FAILED', 'Failed to load mobile menu', null, 500);
+            return $this->respondWithError('MOBILE_MENU_LOAD_FAILED', __('api.fetch_failed', ['resource' => 'mobile menu']), null, 500);
         }
     }
 
@@ -195,7 +195,7 @@ class MenuController extends BaseApiController
 
             return $this->respondWithData(['message' => 'Menu cache cleared successfully']);
         } catch (\Throwable $e) {
-            return $this->respondWithError('CACHE_CLEAR_FAILED', 'Failed to clear cache', null, 500);
+            return $this->respondWithError('CACHE_CLEAR_FAILED', __('api.failed_to_clear_cache'), null, 500);
         }
     }
 

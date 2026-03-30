@@ -119,15 +119,15 @@ class AdminWalletGrantController extends BaseApiController
 
         // Validate required fields
         if ($userId <= 0) {
-            return $this->respondWithError('VALIDATION_ERROR', 'user_id is required and must be a positive integer', 'user_id', 422);
+            return $this->respondWithError('VALIDATION_ERROR', __('api.user_id_positive_integer_required'), 'user_id', 422);
         }
 
         if ($amount <= 0) {
-            return $this->respondWithError('VALIDATION_ERROR', 'amount is required and must be greater than zero', 'amount', 422);
+            return $this->respondWithError('VALIDATION_ERROR', __('api.amount_gt_zero_required'), 'amount', 422);
         }
 
         if ($amount > 10000) {
-            return $this->respondWithError('VALIDATION_ERROR', 'Grant amount cannot exceed 10,000 hours', 'amount', 422);
+            return $this->respondWithError('VALIDATION_ERROR', __('api.grant_amount_max_10000'), 'amount', 422);
         }
 
         // Validate user exists and belongs to current tenant
@@ -137,7 +137,7 @@ class AdminWalletGrantController extends BaseApiController
         );
 
         if (!$user) {
-            return $this->respondWithError('USER_NOT_FOUND', 'User not found in this tenant', 'user_id', 404);
+            return $this->respondWithError('USER_NOT_FOUND', __('api.user_not_found_in_tenant'), 'user_id', 404);
         }
 
         // Atomic: insert transaction + update balance

@@ -33,14 +33,14 @@ class OpenApiDocController extends BaseApiController
         $specPath = base_path(self::SPEC_PATH);
 
         if (!file_exists($specPath)) {
-            return $this->respondWithError('RESOURCE_NOT_FOUND', 'OpenAPI specification not found', null, 404);
+            return $this->respondWithError('RESOURCE_NOT_FOUND', __('api.openapi_spec_not_found'), null, 404);
         }
 
         $yaml = file_get_contents($specPath);
         $spec = $this->parseYaml($yaml);
 
         if ($spec === null) {
-            return $this->respondWithError('SERVER_INTERNAL_ERROR', 'Failed to parse OpenAPI specification', null, 500);
+            return $this->respondWithError('SERVER_INTERNAL_ERROR', __('api.openapi_parse_failed'), null, 500);
         }
 
         return response()->json($spec, 200, [
@@ -88,7 +88,7 @@ class OpenApiDocController extends BaseApiController
         $showDocsInProd = config('app.show_api_docs', false);
 
         if ($appEnv === 'production' && !$showDocsInProd) {
-            return $this->respondWithError('FORBIDDEN', 'API documentation is disabled in production', null, 403);
+            return $this->respondWithError('FORBIDDEN', __('api.api_docs_disabled_production'), null, 403);
         }
 
         $specUrl = url('/api/docs/openapi.json');

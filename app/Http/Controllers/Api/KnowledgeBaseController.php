@@ -75,19 +75,19 @@ class KnowledgeBaseController extends BaseApiController
         $article = $this->kbService->getById($id);
 
         if (! $article) {
-            return $this->respondWithError('NOT_FOUND', 'Article not found', null, 404);
+            return $this->respondWithError('NOT_FOUND', __('api.kb_article_not_found'), null, 404);
         }
 
         // Check if unpublished — only admins can see
         if (! ($article['is_published'] ?? true)) {
             $userId = $this->getOptionalUserId();
             if (! $userId) {
-                return $this->respondWithError('NOT_FOUND', 'Article not found', null, 404);
+                return $this->respondWithError('NOT_FOUND', __('api.kb_article_not_found'), null, 404);
             }
             $user = \Illuminate\Support\Facades\Auth::user();
             $role = $user->role ?? 'member';
             if (! in_array($role, ['admin', 'tenant_admin', 'super_admin', 'god'])) {
-                return $this->respondWithError('NOT_FOUND', 'Article not found', null, 404);
+                return $this->respondWithError('NOT_FOUND', __('api.kb_article_not_found'), null, 404);
             }
         }
 
@@ -120,7 +120,7 @@ class KnowledgeBaseController extends BaseApiController
             ->first();
 
         if (! $article) {
-            return $this->respondWithError('NOT_FOUND', 'Article not found', null, 404);
+            return $this->respondWithError('NOT_FOUND', __('api.kb_article_not_found'), null, 404);
         }
 
         $articleArr = (array) $article;
@@ -129,12 +129,12 @@ class KnowledgeBaseController extends BaseApiController
         if (! ($articleArr['is_published'] ?? true)) {
             $userId = $this->getOptionalUserId();
             if (! $userId) {
-                return $this->respondWithError('NOT_FOUND', 'Article not found', null, 404);
+                return $this->respondWithError('NOT_FOUND', __('api.kb_article_not_found'), null, 404);
             }
             $user = \Illuminate\Support\Facades\Auth::user();
             $role = $user->role ?? 'member';
             if (! in_array($role, ['admin', 'tenant_admin', 'super_admin', 'god'])) {
-                return $this->respondWithError('NOT_FOUND', 'Article not found', null, 404);
+                return $this->respondWithError('NOT_FOUND', __('api.kb_article_not_found'), null, 404);
             }
         }
 
@@ -154,7 +154,7 @@ class KnowledgeBaseController extends BaseApiController
     {
         $query = $this->query('q', '');
         if (empty(trim($query))) {
-            return $this->respondWithError('VALIDATION_REQUIRED_FIELD', 'Search query is required', 'q', 400);
+            return $this->respondWithError('VALIDATION_REQUIRED_FIELD', __('api.kb_search_query_required'), 'q', 400);
         }
 
         $limit = $this->queryInt('limit', 20, 1, 50);
@@ -176,7 +176,7 @@ class KnowledgeBaseController extends BaseApiController
         $data = $this->getAllInput();
 
         if (empty(trim($data['title'] ?? ''))) {
-            return $this->respondWithError('VALIDATION_REQUIRED_FIELD', 'Title is required', 'title', 400);
+            return $this->respondWithError('VALIDATION_REQUIRED_FIELD', __('api.title_required'), 'title', 400);
         }
 
         $articleId = $this->kbService->create($userId, $data);
@@ -204,7 +204,7 @@ class KnowledgeBaseController extends BaseApiController
             ->first();
 
         if (! $existing) {
-            return $this->respondWithError('NOT_FOUND', 'Article not found', null, 404);
+            return $this->respondWithError('NOT_FOUND', __('api.kb_article_not_found'), null, 404);
         }
 
         $updateData = [];
@@ -251,7 +251,7 @@ class KnowledgeBaseController extends BaseApiController
             ->count();
 
         if ($childCount > 0) {
-            return $this->respondWithError('RESOURCE_CONFLICT', 'Cannot delete article with child articles', null, 409);
+            return $this->respondWithError('RESOURCE_CONFLICT', __('api.kb_cannot_delete_with_children'), null, 409);
         }
 
         $deleted = DB::table('knowledge_base_articles')
@@ -260,7 +260,7 @@ class KnowledgeBaseController extends BaseApiController
             ->delete();
 
         if (! $deleted) {
-            return $this->respondWithError('NOT_FOUND', 'Article not found', null, 404);
+            return $this->respondWithError('NOT_FOUND', __('api.kb_article_not_found'), null, 404);
         }
 
         // Clean up feedback
@@ -285,7 +285,7 @@ class KnowledgeBaseController extends BaseApiController
 
         $isHelpful = $this->input('is_helpful');
         if ($isHelpful === null) {
-            return $this->respondWithError('VALIDATION_REQUIRED_FIELD', 'is_helpful field is required', 'is_helpful', 400);
+            return $this->respondWithError('VALIDATION_REQUIRED_FIELD', __('api.kb_is_helpful_required'), 'is_helpful', 400);
         }
 
         $comment = $this->input('comment');
@@ -297,7 +297,7 @@ class KnowledgeBaseController extends BaseApiController
             ->exists();
 
         if (! $exists) {
-            return $this->respondWithError('NOT_FOUND', 'Article not found', null, 404);
+            return $this->respondWithError('NOT_FOUND', __('api.kb_article_not_found'), null, 404);
         }
 
         // Upsert feedback

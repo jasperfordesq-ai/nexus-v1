@@ -49,7 +49,7 @@ class PresenceController extends BaseApiController
 
         $userIdsParam = $request->query('user_ids', '');
         if (empty($userIdsParam)) {
-            return $this->respondWithError('VALIDATION_REQUIRED_FIELD', 'user_ids query parameter is required', 'user_ids');
+            return $this->respondWithError('VALIDATION_REQUIRED_FIELD', __('api.missing_required_field', ['field' => 'user_ids']), 'user_ids');
         }
 
         $userIds = array_filter(
@@ -85,7 +85,7 @@ class PresenceController extends BaseApiController
 
         $validStatuses = ['online', 'away', 'dnd', 'offline'];
         if (!in_array($status, $validStatuses, true)) {
-            return $this->respondWithError('VALIDATION_INVALID', 'Invalid status. Must be one of: online, away, dnd, offline', 'status');
+            return $this->respondWithError('VALIDATION_INVALID', __('api.invalid_presence_status'), 'status');
         }
 
         PresenceService::setStatus($userId, $status, $customStatus, $emoji);

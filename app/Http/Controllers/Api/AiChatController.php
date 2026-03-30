@@ -83,7 +83,7 @@ class AiChatController extends BaseApiController
 
         return $this->respondWithError(
             'NOT_IMPLEMENTED',
-            'Streaming chat is not yet available. Use the standard chat endpoint.',
+            __('api.ai_streaming_not_available'),
             null,
             501
         );
@@ -142,7 +142,7 @@ class AiChatController extends BaseApiController
         $id = (int) $id;
 
         if (!AiConversation::belongsToUser($id, $userId)) {
-            return $this->respondWithError('RESOURCE_NOT_FOUND', 'Conversation not found', null, 404);
+            return $this->respondWithError('RESOURCE_NOT_FOUND', __('api.ai_conversation_not_found'), null, 404);
         }
 
         $conversation = AiConversation::getWithMessages($id);
@@ -174,7 +174,7 @@ class AiChatController extends BaseApiController
         $id = (int) $id;
 
         if (!AiConversation::belongsToUser($id, $userId)) {
-            return $this->respondWithError('RESOURCE_NOT_FOUND', 'Conversation not found', null, 404);
+            return $this->respondWithError('RESOURCE_NOT_FOUND', __('api.ai_conversation_not_found'), null, 404);
         }
 
         AiConversation::delete($id);
@@ -245,12 +245,12 @@ class AiChatController extends BaseApiController
         $userId = $this->requireAuth();
 
         if (!$this->aiServiceFactory->isFeatureEnabled('content_generation')) {
-            return $this->respondWithError('FEATURE_DISABLED', 'Content generation is not enabled', null, 403);
+            return $this->respondWithError('FEATURE_DISABLED', __('api.ai_feature_disabled'), null, 403);
         }
 
         $limitCheck = AiUserLimit::canMakeRequest($userId);
         if (!$limitCheck['allowed']) {
-            return $this->respondWithError('RATE_LIMIT', 'Usage limit reached', null, 429);
+            return $this->respondWithError('RATE_LIMIT', __('api.ai_rate_limit'), null, 429);
         }
 
         $title = trim($this->input('title', ''));
@@ -258,7 +258,7 @@ class AiChatController extends BaseApiController
         $context = $this->input('context', []);
 
         if (empty($title)) {
-            return $this->respondWithError('VALIDATION_REQUIRED_FIELD', 'Title is required', 'title', 400);
+            return $this->respondWithError('VALIDATION_REQUIRED_FIELD', __('api.title_required'), 'title', 400);
         }
 
         try {
@@ -294,19 +294,19 @@ class AiChatController extends BaseApiController
         $userId = $this->requireAuth();
 
         if (!$this->aiServiceFactory->isFeatureEnabled('content_generation')) {
-            return $this->respondWithError('FEATURE_DISABLED', 'Content generation is not enabled', null, 403);
+            return $this->respondWithError('FEATURE_DISABLED', __('api.ai_feature_disabled'), null, 403);
         }
 
         $limitCheck = AiUserLimit::canMakeRequest($userId);
         if (!$limitCheck['allowed']) {
-            return $this->respondWithError('RATE_LIMIT', 'Usage limit reached', null, 429);
+            return $this->respondWithError('RATE_LIMIT', __('api.ai_rate_limit'), null, 429);
         }
 
         $title = trim($this->input('title', ''));
         $context = $this->input('context', []);
 
         if (empty($title)) {
-            return $this->respondWithError('VALIDATION_REQUIRED_FIELD', 'Title is required', 'title', 400);
+            return $this->respondWithError('VALIDATION_REQUIRED_FIELD', __('api.title_required'), 'title', 400);
         }
 
         try {
@@ -342,12 +342,12 @@ class AiChatController extends BaseApiController
         $userId = $this->requireAuth();
 
         if (!$this->aiServiceFactory->isFeatureEnabled('content_generation')) {
-            return $this->respondWithError('FEATURE_DISABLED', 'Content generation is not enabled', null, 403);
+            return $this->respondWithError('FEATURE_DISABLED', __('api.ai_feature_disabled'), null, 403);
         }
 
         $limitCheck = AiUserLimit::canMakeRequest($userId);
         if (!$limitCheck['allowed']) {
-            return $this->respondWithError('RATE_LIMIT', 'Usage limit reached', null, 429);
+            return $this->respondWithError('RATE_LIMIT', __('api.ai_rate_limit'), null, 429);
         }
 
         $originalMessage = trim($this->input('original_message', ''));
@@ -355,7 +355,7 @@ class AiChatController extends BaseApiController
         $tone = $this->input('tone', 'friendly');
 
         if (empty($originalMessage)) {
-            return $this->respondWithError('VALIDATION_REQUIRED_FIELD', 'Original message is required', 'original_message', 400);
+            return $this->respondWithError('VALIDATION_REQUIRED_FIELD', __('api.ai_original_message_required'), 'original_message', 400);
         }
 
         try {
@@ -404,12 +404,12 @@ class AiChatController extends BaseApiController
         $userId = $this->requireAuth();
 
         if (!$this->aiServiceFactory->isFeatureEnabled('content_generation')) {
-            return $this->respondWithError('FEATURE_DISABLED', 'Content generation is not enabled', null, 403);
+            return $this->respondWithError('FEATURE_DISABLED', __('api.ai_feature_disabled'), null, 403);
         }
 
         $limitCheck = AiUserLimit::canMakeRequest($userId);
         if (!$limitCheck['allowed']) {
-            return $this->respondWithError('RATE_LIMIT', 'Usage limit reached', null, 429);
+            return $this->respondWithError('RATE_LIMIT', __('api.ai_rate_limit'), null, 429);
         }
 
         $existingBio = trim($this->input('existing_bio', ''));
@@ -487,12 +487,12 @@ class AiChatController extends BaseApiController
         $userId = $this->requireAdmin();
 
         if (!$this->aiServiceFactory->isFeatureEnabled('content_generation')) {
-            return $this->respondWithError('FEATURE_DISABLED', 'Content generation is not enabled', null, 403);
+            return $this->respondWithError('FEATURE_DISABLED', __('api.ai_feature_disabled'), null, 403);
         }
 
         $limitCheck = AiUserLimit::canMakeRequest($userId);
         if (!$limitCheck['allowed']) {
-            return $this->respondWithError('RATE_LIMIT', 'Usage limit reached', null, 429);
+            return $this->respondWithError('RATE_LIMIT', __('api.ai_rate_limit'), null, 429);
         }
 
         $type = $this->input('type', 'subject');
@@ -539,12 +539,12 @@ class AiChatController extends BaseApiController
         $userId = $this->requireAdmin();
 
         if (!$this->aiServiceFactory->isFeatureEnabled('content_generation')) {
-            return $this->respondWithError('FEATURE_DISABLED', 'Content generation is not enabled', null, 403);
+            return $this->respondWithError('FEATURE_DISABLED', __('api.ai_feature_disabled'), null, 403);
         }
 
         $limitCheck = AiUserLimit::canMakeRequest($userId);
         if (!$limitCheck['allowed']) {
-            return $this->respondWithError('RATE_LIMIT', 'Usage limit reached', null, 429);
+            return $this->respondWithError('RATE_LIMIT', __('api.ai_rate_limit'), null, 429);
         }
 
         $type = $this->input('type', 'content');
@@ -587,12 +587,12 @@ class AiChatController extends BaseApiController
         $userId = $this->requireAdmin();
 
         if (!$this->aiServiceFactory->isFeatureEnabled('content_generation')) {
-            return $this->respondWithError('FEATURE_DISABLED', 'Content generation is not enabled', null, 403);
+            return $this->respondWithError('FEATURE_DISABLED', __('api.ai_feature_disabled'), null, 403);
         }
 
         $limitCheck = AiUserLimit::canMakeRequest($userId);
         if (!$limitCheck['allowed']) {
-            return $this->respondWithError('RATE_LIMIT', 'Usage limit reached', null, 429);
+            return $this->respondWithError('RATE_LIMIT', __('api.ai_rate_limit'), null, 429);
         }
 
         $type = $this->input('type', 'section');

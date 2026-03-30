@@ -535,10 +535,10 @@ function OptionCard({
         )}
       </div>
       <div className="flex items-center gap-1 ml-3 flex-shrink-0">
-        <Button isIconOnly size="sm" variant="light" onPress={onEdit} aria-label="Edit option">
+        <Button isIconOnly size="sm" variant="light" onPress={onEdit} aria-label={t('safeguarding.aria_edit_option')}>
           <Edit3 className="w-4 h-4" />
         </Button>
-        <Button isIconOnly size="sm" variant="light" color="danger" onPress={onDelete} aria-label="Deactivate option">
+        <Button isIconOnly size="sm" variant="light" color="danger" onPress={onDelete} aria-label={t('safeguarding.aria_deactivate_option')}>
           <Trash2 className="w-4 h-4" />
         </Button>
       </div>

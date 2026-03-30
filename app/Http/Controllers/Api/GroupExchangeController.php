@@ -49,17 +49,17 @@ class GroupExchangeController extends BaseApiController
         $data = $this->getAllInput();
 
         if (empty($data['title'])) {
-            return $this->respondWithError('VALIDATION_ERROR', 'Title is required', 'title', 400);
+            return $this->respondWithError('VALIDATION_ERROR', __('api.title_required'), 'title', 400);
         }
 
         if (empty($data['total_hours']) || (float) $data['total_hours'] <= 0) {
-            return $this->respondWithError('VALIDATION_ERROR', 'Total hours must be greater than 0', 'total_hours', 400);
+            return $this->respondWithError('VALIDATION_ERROR', __('api.total_hours_gt_zero'), 'total_hours', 400);
         }
 
         $id = $this->groupExchangeService->create($userId, $data);
 
         if (!$id) {
-            return $this->respondWithError('INTERNAL_ERROR', 'Failed to create exchange', null, 500);
+            return $this->respondWithError('INTERNAL_ERROR', __('api.create_failed', ['resource' => 'exchange']), null, 500);
         }
 
         // Add participants if provided inline
@@ -89,7 +89,7 @@ class GroupExchangeController extends BaseApiController
         $exchange = $this->groupExchangeService->get($id);
 
         if (!$exchange) {
-            return $this->respondWithError('NOT_FOUND', 'Not found', null, 404);
+            return $this->respondWithError('NOT_FOUND', __('api.not_found', ['model' => 'Exchange']), null, 404);
         }
 
         $exchange['calculated_split'] = $this->groupExchangeService->calculateSplit($id);
@@ -105,15 +105,15 @@ class GroupExchangeController extends BaseApiController
         $exchange = $this->groupExchangeService->get($id);
 
         if (!$exchange) {
-            return $this->respondWithError('NOT_FOUND', 'Not found', null, 404);
+            return $this->respondWithError('NOT_FOUND', __('api.not_found', ['model' => 'Exchange']), null, 404);
         }
 
         if ((int) $exchange['organizer_id'] !== $userId) {
-            return $this->respondWithError('FORBIDDEN', 'Only the organizer can update', null, 403);
+            return $this->respondWithError('FORBIDDEN', __('api.organizer_only_update'), null, 403);
         }
 
         if (in_array($exchange['status'], ['completed', 'cancelled'], true)) {
-            return $this->respondWithError('VALIDATION_ERROR', 'Cannot update a completed or cancelled exchange', null, 400);
+            return $this->respondWithError('VALIDATION_ERROR', __('api.cannot_update_completed_exchange'), null, 400);
         }
 
         $data = $this->getAllInput();
@@ -132,11 +132,11 @@ class GroupExchangeController extends BaseApiController
         $exchange = $this->groupExchangeService->get($id);
 
         if (!$exchange) {
-            return $this->respondWithError('NOT_FOUND', 'Not found', null, 404);
+            return $this->respondWithError('NOT_FOUND', __('api.not_found', ['model' => 'Exchange']), null, 404);
         }
 
         if ((int) $exchange['organizer_id'] !== $userId) {
-            return $this->respondWithError('FORBIDDEN', 'Only the organizer can cancel', null, 403);
+            return $this->respondWithError('FORBIDDEN', __('api.organizer_only_cancel'), null, 403);
         }
 
         $this->groupExchangeService->updateStatus($id, 'cancelled');
@@ -152,13 +152,13 @@ class GroupExchangeController extends BaseApiController
         $exchange = $this->groupExchangeService->get((int) $id);
 
         if (!$exchange) {
-            return $this->respondWithError('NOT_FOUND', 'Not found', null, 404);
+            return $this->respondWithError('NOT_FOUND', __('api.not_found', ['model' => 'Exchange']), null, 404);
         }
 
         $data = $this->getAllInput();
 
         if (empty($data['user_id']) || empty($data['role'])) {
-            return $this->respondWithError('VALIDATION_ERROR', 'user_id and role are required', null, 400);
+            return $this->respondWithError('VALIDATION_ERROR', __('api.user_id_and_role_required'), null, 400);
         }
 
         $ok = $this->groupExchangeService->addParticipant(
@@ -170,7 +170,7 @@ class GroupExchangeController extends BaseApiController
         );
 
         if (!$ok) {
-            return $this->respondWithError('VALIDATION_ERROR', 'Failed to add participant (may already exist)', null, 400);
+            return $this->respondWithError('VALIDATION_ERROR', __('api.failed_add_participant'), null, 400);
         }
 
         $updated = $this->groupExchangeService->get((int) $id);
@@ -198,7 +198,7 @@ class GroupExchangeController extends BaseApiController
         $exchange = $this->groupExchangeService->get($id);
 
         if (!$exchange) {
-            return $this->respondWithError('NOT_FOUND', 'Not found', null, 404);
+            return $this->respondWithError('NOT_FOUND', __('api.not_found', ['model' => 'Exchange']), null, 404);
         }
 
         $this->groupExchangeService->confirmParticipation($id, $userId);
@@ -216,11 +216,11 @@ class GroupExchangeController extends BaseApiController
         $exchange = $this->groupExchangeService->get($id);
 
         if (!$exchange) {
-            return $this->respondWithError('NOT_FOUND', 'Not found', null, 404);
+            return $this->respondWithError('NOT_FOUND', __('api.not_found', ['model' => 'Exchange']), null, 404);
         }
 
         if ((int) $exchange['organizer_id'] !== $userId) {
-            return $this->respondWithError('FORBIDDEN', 'Only the organizer can complete', null, 403);
+            return $this->respondWithError('FORBIDDEN', __('api.organizer_only_complete'), null, 403);
         }
 
         $result = $this->groupExchangeService->complete($id);

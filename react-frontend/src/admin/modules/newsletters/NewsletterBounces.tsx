@@ -302,8 +302,8 @@ export function NewsletterBounces() {
             onSelectionChange={(key) => setActiveTab(key as string)}
             aria-label={t('newsletters.label_bounce_tabs')}
           >
-            <Tab key="bounces" title="Recent Bounces" />
-            <Tab key="suppression" title="Suppression List" />
+            <Tab key="bounces" title={t('newsletters.tab_recent_bounces')} />
+            <Tab key="suppression" title={t('newsletters.tab_suppression_list')} />
           </Tabs>
 
           <div className="flex gap-2 w-full">
@@ -421,7 +421,7 @@ export function NewsletterBounces() {
           isOpen={!!unsuppressTarget}
           onClose={() => setUnsuppressTarget(null)}
           onConfirm={handleUnsuppress}
-          title="Unsuppress Email"
+          title={t('newsletters.unsuppress_email')}
           message={`Remove "${unsuppressTarget}" from the suppression list? They will be able to receive newsletters again.`}
           confirmLabel="Unsuppress"
           confirmColor="primary"

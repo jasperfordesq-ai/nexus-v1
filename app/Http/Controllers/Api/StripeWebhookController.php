@@ -42,7 +42,7 @@ class StripeWebhookController extends BaseApiController
             ]);
             return $this->respondWithError(
                 'INVALID_SIGNATURE',
-                'Webhook signature verification failed.',
+                __('api.webhook_signature_failed'),
                 null,
                 400
             );
@@ -52,7 +52,7 @@ class StripeWebhookController extends BaseApiController
             ]);
             return $this->respondWithError(
                 'WEBHOOK_ERROR',
-                'Internal error processing webhook.',
+                __('api.webhook_internal_error'),
                 null,
                 500
             );
@@ -108,7 +108,7 @@ class StripeWebhookController extends BaseApiController
             ]);
             return $this->respondWithError(
                 'HANDLER_ERROR',
-                'Error processing webhook event.',
+                __('api.webhook_handler_error'),
                 null,
                 500
             );

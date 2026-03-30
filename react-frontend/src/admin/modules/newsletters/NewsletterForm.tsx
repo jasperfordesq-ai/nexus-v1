@@ -385,7 +385,7 @@ export function NewsletterForm() {
             <CardHeader><h3 className="text-lg font-semibold">Newsletter Details</h3></CardHeader>
             <CardBody className="gap-4">
               <Input
-                label="Subject Line"
+                label={t('newsletter_form.label_subject_line')}
                 placeholder="e.g., Your February Update"
                 value={subject}
                 onValueChange={setSubject}
@@ -394,7 +394,7 @@ export function NewsletterForm() {
                 isDisabled={isSent}
               />
               <Input
-                label="Preview Text"
+                label={t('newsletter_form.label_preview_text')}
                 placeholder={t('newsletter_form.preview_text_placeholder')}
                 value={previewText}
                 onValueChange={setPreviewText}
@@ -414,7 +414,7 @@ export function NewsletterForm() {
               {abTestEnabled && (
                 <div className="space-y-3 pl-4 border-l-2 border-warning-200">
                   <Input
-                    label="Subject B (Variant)"
+                    label={t('newsletter_form.label_subject_b')}
                     placeholder={t('newsletter_form.subject_b_placeholder')}
                     value={subjectB}
                     onValueChange={setSubjectB}
@@ -424,7 +424,7 @@ export function NewsletterForm() {
                   <div className="grid grid-cols-2 gap-3">
                     <Input
                       type="number"
-                      label="Split % (Variant A)"
+                      label={t('newsletter_form.label_split_percent')}
                       value={String(abSplitPercentage)}
                       onValueChange={(v) => setAbSplitPercentage(Math.max(10, Math.min(90, Number(v) || 50)))}
                       variant="bordered"
@@ -433,7 +433,7 @@ export function NewsletterForm() {
                       isDisabled={isSent}
                     />
                     <Select
-                      label="Winning Metric"
+                      label={t('newsletter_form.label_winning_metric')}
                       selectedKeys={[abWinnerMetric]}
                       onSelectionChange={(keys) => { const v = Array.from(keys)[0]; if (v) setAbWinnerMetric(String(v)); }}
                       variant="bordered"
@@ -460,7 +460,7 @@ export function NewsletterForm() {
                   {abAutoSelectWinner && (
                     <Input
                       type="number"
-                      label="Auto-select after (hours)"
+                      label={t('newsletter_form.label_auto_select_after')}
                       value={String(abAutoSelectAfterHours)}
                       onValueChange={(v) => setAbAutoSelectAfterHours(Math.max(1, Number(v) || 24))}
                       variant="bordered"
@@ -474,7 +474,7 @@ export function NewsletterForm() {
               <Divider />
               <Suspense fallback={<Spinner size="sm" className="m-4" />}>
                 <RichTextEditor
-                  label="Content"
+                  label={t('newsletter_form.label_content')}
                   placeholder={t('newsletters.placeholder_write_your_newsletter_content')}
                   value={content}
                   onChange={setContent}
@@ -519,7 +519,7 @@ export function NewsletterForm() {
             <CardHeader><h3 className="text-sm font-semibold">Status & Scheduling</h3></CardHeader>
             <CardBody className="gap-4">
               <Select
-                label="Status"
+                label={t('newsletter_form.label_status')}
                 selectedKeys={[status]}
                 onSelectionChange={(keys) => { const v = Array.from(keys)[0]; if (v) setStatus(String(v)); }}
                 variant="bordered"
@@ -532,7 +532,7 @@ export function NewsletterForm() {
 
               {status === 'scheduled' && (
                 <Input
-                  label="Scheduled Date & Time"
+                  label={t('newsletter_form.label_scheduled_date')}
                   type="datetime-local"
                   value={scheduledAt}
                   onValueChange={setScheduledAt}
@@ -561,7 +561,7 @@ export function NewsletterForm() {
               {isRecurring && (
                 <div className="space-y-3">
                   <Select
-                    label="Frequency"
+                    label={t('newsletter_form.label_frequency')}
                     selectedKeys={[recurringFrequency]}
                     onSelectionChange={(keys) => { const v = Array.from(keys)[0]; if (v) setRecurringFrequency(String(v)); }}
                     variant="bordered"
@@ -575,7 +575,7 @@ export function NewsletterForm() {
 
                   {recurringFrequency === 'weekly' && (
                     <Select
-                      label="Day of Week"
+                      label={t('newsletter_form.label_day_of_week')}
                       selectedKeys={[recurringDay]}
                       onSelectionChange={(keys) => { const v = Array.from(keys)[0]; if (v) setRecurringDay(String(v)); }}
                       variant="bordered"
@@ -590,7 +590,7 @@ export function NewsletterForm() {
 
                   {recurringFrequency === 'monthly' && (
                     <Select
-                      label="Day of Month"
+                      label={t('newsletter_form.label_day_of_month')}
                       selectedKeys={[recurringDayOfMonth]}
                       onSelectionChange={(keys) => { const v = Array.from(keys)[0]; if (v) setRecurringDayOfMonth(String(v)); }}
                       variant="bordered"
@@ -604,7 +604,7 @@ export function NewsletterForm() {
                   )}
 
                   <Input
-                    label="Send Time"
+                    label={t('newsletter_form.label_send_time')}
                     type="time"
                     value={recurringTime}
                     onValueChange={setRecurringTime}
@@ -614,7 +614,7 @@ export function NewsletterForm() {
                   />
 
                   <Input
-                    label="End Date (Optional)"
+                    label={t('newsletter_form.label_end_date')}
                     type="date"
                     value={recurringEndDate}
                     onValueChange={setRecurringEndDate}
@@ -638,7 +638,7 @@ export function NewsletterForm() {
             </CardHeader>
             <CardBody className="gap-4">
               <Select
-                label="Recipients"
+                label={t('newsletter_form.label_recipients')}
                 selectedKeys={[targetAudience]}
                 onSelectionChange={(keys) => { const v = Array.from(keys)[0]; if (v) setTargetAudience(String(v)); }}
                 variant="bordered"
@@ -653,7 +653,7 @@ export function NewsletterForm() {
 
               {targetAudience === 'segment' && segments.length > 0 && (
                 <Select
-                  label="Segment"
+                  label={t('newsletter_form.label_segment')}
                   selectedKeys={segmentId ? [segmentId] : []}
                   onSelectionChange={(keys) => { const v = Array.from(keys)[0]; if (v) setSegmentId(String(v)); }}
                   variant="bordered"
@@ -682,7 +682,7 @@ export function NewsletterForm() {
                   <p className="text-xs font-medium text-default-600">Geographic Targeting (Optional)</p>
                 </div>
                 <Input
-                  label="Counties"
+                  label={t('newsletter_form.label_counties')}
                   placeholder="e.g., Somerset, Devon"
                   value={targetCounties}
                   onValueChange={setTargetCounties}
@@ -692,7 +692,7 @@ export function NewsletterForm() {
                   isDisabled={isSent}
                 />
                 <Input
-                  label="Towns/Cities"
+                  label={t('newsletter_form.label_towns_cities')}
                   placeholder="e.g., Bristol, Bath"
                   value={targetTowns}
                   onValueChange={setTargetTowns}
@@ -711,7 +711,7 @@ export function NewsletterForm() {
                     <p className="text-xs font-medium text-default-600">Group Targeting (Optional)</p>
                   </div>
                   <Select
-                    label="Target Groups"
+                    label={t('newsletter_form.label_target_groups')}
                     selectionMode="multiple"
                     selectedKeys={new Set(targetGroups)}
                     onSelectionChange={(keys) => setTargetGroups(Array.from(keys) as string[])}
@@ -743,7 +743,7 @@ export function NewsletterForm() {
               </CardHeader>
               <CardBody className="gap-4">
                 <Select
-                  label="Load Template"
+                  label={t('newsletter_form.label_load_template')}
                   selectedKeys={templateId ? [templateId] : []}
                   onSelectionChange={(keys) => { const v = Array.from(keys)[0]; if (v) setTemplateId(String(v)); }}
                   variant="bordered"

@@ -53,7 +53,7 @@ class DeliverableController extends BaseApiController
         );
 
         if ($deliverable === null) {
-            return $this->respondWithError('NOT_FOUND', 'Deliverable not found', null, 404);
+            return $this->respondWithError('NOT_FOUND', __('api.deliverable_not_found'), null, 404);
         }
 
         return $this->respondWithData($deliverable);
@@ -99,7 +99,7 @@ class DeliverableController extends BaseApiController
         }
 
         if (empty($sets)) {
-            return $this->respondWithError('VALIDATION_ERROR', 'No valid fields to update');
+            return $this->respondWithError('VALIDATION_ERROR', __('api.no_valid_fields'));
         }
 
         $params[] = $id;
@@ -111,7 +111,7 @@ class DeliverableController extends BaseApiController
         );
 
         if ($affected === 0) {
-            return $this->respondWithError('NOT_FOUND', 'Deliverable not found', null, 404);
+            return $this->respondWithError('NOT_FOUND', __('api.deliverable_not_found'), null, 404);
         }
 
         return $this->respondWithData(['id' => $id, 'updated' => true]);
@@ -129,7 +129,7 @@ class DeliverableController extends BaseApiController
         );
 
         if ($deliverable === null) {
-            return $this->respondWithError('NOT_FOUND', 'Deliverable not found', null, 404);
+            return $this->respondWithError('NOT_FOUND', __('api.deliverable_not_found'), null, 404);
         }
 
         $content = $this->requireInput('content');

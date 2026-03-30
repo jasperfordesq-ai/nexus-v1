@@ -20,6 +20,7 @@ import {
 } from 'lucide-react';
 import { usePageTitle } from '@/hooks';
 import { useToast } from '@/contexts';
+import { useTranslation } from 'react-i18next';
 import { adminSuper } from '../../api/adminApi';
 import { PageHeader, StatusBadge, ConfirmModal } from '../../components';
 import type { FederationWhitelistEntry, FederationPartnership } from '../../api/types';
@@ -55,6 +56,7 @@ const FEATURE_TOGGLES: Array<{
 ];
 
 export function FederationTenantFeatures() {
+  const { t } = useTranslation('admin');
   const { tenantId } = useParams<{ tenantId: string }>();
   const numericTenantId = Number(tenantId);
   const toast = useToast();
@@ -197,7 +199,7 @@ export function FederationTenantFeatures() {
     <div>
       <PageHeader
         title={`Federation Features: ${tenant.name}`}
-        description="Manage federation capabilities for this tenant"
+        description={t('federation_tenant_features.description')}
       />
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">

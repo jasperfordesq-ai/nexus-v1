@@ -42,7 +42,7 @@ class MemberAvailabilityController extends BaseApiController
         $schedule = $data['schedule'] ?? $data['slots'] ?? [];
 
         if (empty($schedule) || !is_array($schedule)) {
-            return $this->respondWithError('VALIDATION_ERROR', 'schedule is required and must be an array', 'schedule', 422);
+            return $this->respondWithError('VALIDATION_ERROR', __('api.schedule_required_array'), 'schedule', 422);
         }
 
         $success = $this->memberAvailabilityService->setBulkAvailability($userId, $schedule);
@@ -122,7 +122,7 @@ class MemberAvailabilityController extends BaseApiController
 
         $otherUserId = $this->queryInt('user_id');
         if (!$otherUserId) {
-            return $this->respondWithError('VALIDATION_ERROR', 'user_id query parameter is required', 'user_id', 400);
+            return $this->respondWithError('VALIDATION_ERROR', __('api.missing_required_field', ['field' => 'user_id']), 'user_id', 400);
         }
 
         $compatible = $this->memberAvailabilityService->findCompatibleTimes($userId, $otherUserId);
@@ -141,7 +141,7 @@ class MemberAvailabilityController extends BaseApiController
             $day = (int) date('w');
         }
         if ($day < 0 || $day > 6) {
-            return $this->respondWithError('VALIDATION_ERROR', 'day must be between 0-6', 'day', 422);
+            return $this->respondWithError('VALIDATION_ERROR', __('api.day_range_0_6'), 'day', 422);
         }
 
         $time = $this->query('time');

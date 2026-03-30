@@ -72,7 +72,7 @@ class AdminImpactReportController extends BaseApiController
         if ($hourlyValue <= 0 || $hourlyValue > 1000) {
             return $this->respondWithError(
                 'VALIDATION_ERROR',
-                'Hourly value must be between 0 and 1000',
+                __('api.hour_value_range'),
                 'hourly_value',
                 400
             );
@@ -81,7 +81,7 @@ class AdminImpactReportController extends BaseApiController
         if ($socialMultiplier <= 0 || $socialMultiplier > 100) {
             return $this->respondWithError(
                 'VALIDATION_ERROR',
-                'Social multiplier must be between 0 and 100',
+                __('api.social_multiplier_range'),
                 'social_multiplier',
                 400
             );

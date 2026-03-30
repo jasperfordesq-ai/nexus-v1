@@ -44,7 +44,7 @@ class GdprController extends BaseApiController
         $granted = $this->inputBool('granted', false);
 
         if (!$consentId && !$this->input('consent_type')) {
-            return $this->respondWithError('VALIDATION_ERROR', 'Missing consent_id', 'consent_id', 400);
+            return $this->respondWithError('VALIDATION_ERROR', __('api.missing_required_field', ['field' => 'consent_id']), 'consent_id', 400);
         }
 
         // Resolve consent_id (int) to consent type slug, or use consent_type directly
@@ -59,7 +59,7 @@ class GdprController extends BaseApiController
         }
 
         if (!$consentType) {
-            return $this->respondWithError('VALIDATION_ERROR', 'consent_id or consent_type is required', 'consent_id', 422);
+            return $this->respondWithError('VALIDATION_ERROR', __('api.consent_id_or_type_required'), 'consent_id', 422);
         }
 
         try {
@@ -73,7 +73,7 @@ class GdprController extends BaseApiController
             ]);
         } catch (\Exception $e) {
             Log::error('GDPR consent update failed', ['user' => $userId, 'error' => $e->getMessage()]);
-            return $this->respondWithError('CONSENT_UPDATE_FAILED', 'Failed to update consent preferences', null, 500);
+            return $this->respondWithError('CONSENT_UPDATE_FAILED', __('api.failed_update_consent'), null, 500);
         }
     }
 
@@ -105,7 +105,7 @@ class GdprController extends BaseApiController
         if (!$type || !isset($typeMap[$type])) {
             return $this->respondWithError(
                 'VALIDATION_ERROR',
-                'Invalid request type. Valid types: data_export, data_portability, data_rectification, data_access',
+                __('api.invalid_gdpr_request_type'),
                 'type',
                 400
             );
@@ -126,7 +126,7 @@ class GdprController extends BaseApiController
             ], null, 201);
         } catch (\Exception $e) {
             Log::error('GDPR request creation failed', ['user' => $userId, 'type' => $type, 'error' => $e->getMessage()]);
-            return $this->respondWithError('REQUEST_FAILED', 'Failed to submit GDPR request. Please try again.', null, 500);
+            return $this->respondWithError('REQUEST_FAILED', __('api.gdpr_request_failed'), null, 500);
         }
     }
 
@@ -151,7 +151,7 @@ class GdprController extends BaseApiController
         $feedback = $this->input('feedback');
 
         if (empty($password)) {
-            return $this->respondWithError('VALIDATION_ERROR', 'Password is required', 'password', 400);
+            return $this->respondWithError('VALIDATION_ERROR', __('api.password_required'), 'password', 400);
         }
 
         // Verify password
@@ -162,7 +162,7 @@ class GdprController extends BaseApiController
             ->first();
 
         if (!$user || !password_verify($password, $user->password_hash)) {
-            return $this->respondWithError('INVALID_PASSWORD', 'Invalid password', 'password', 403);
+            return $this->respondWithError('INVALID_PASSWORD', __('api.invalid_password'), 'password', 403);
         }
 
         try {
@@ -182,7 +182,7 @@ class GdprController extends BaseApiController
             ]);
         } catch (\Exception $e) {
             Log::error('Account deletion request failed', ['user' => $userId, 'error' => $e->getMessage()]);
-            return $this->respondWithError('DELETE_FAILED', 'Failed to submit account deletion request. Please try again.', null, 500);
+            return $this->respondWithError('DELETE_FAILED', __('api.account_deletion_failed'), null, 500);
         }
     }
 }

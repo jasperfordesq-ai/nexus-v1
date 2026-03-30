@@ -136,10 +136,10 @@ export function BulkOperations() {
         <Card>
           <CardHeader className="flex flex-col items-start gap-1">
             <div className="flex gap-2 items-center">
-              <Users size={20} /> <h3 className="text-lg font-semibold">Bulk Move Users</h3>
+              <Users size={20} /> <h3 className="text-lg font-semibold">{t('bulk_operations.bulk_move_users')}</h3>
             </div>
             <p className="text-xs text-default-400">
-              Select users from one tenant and move them to another.{' '}
+              {t('bulk_operations.bulk_move_desc')}{' '}
               <Link to={tenantPath('/admin/super/users')} className="text-primary hover:underline">Manage individual users</Link>
             </p>
           </CardHeader>
@@ -182,8 +182,8 @@ export function BulkOperations() {
                 }}
               >
                 <div>
-                  <p className="text-sm font-medium">Grant Super Admin on arrival</p>
-                  <p className="text-xs text-default-500 mt-0.5">Users will become Tenant Super Admins in the new tenant</p>
+                  <p className="text-sm font-medium">{t('bulk_operations.grant_sa_on_arrival')}</p>
+                  <p className="text-xs text-default-500 mt-0.5">{t('bulk_operations.grant_sa_on_arrival_desc')}</p>
                 </div>
               </Switch>
             </div>
@@ -191,7 +191,7 @@ export function BulkOperations() {
             <Button color="primary" startContent={<ArrowRight size={16} />}
               isDisabled={selectedUserIds.size === 0 || !targetTenant}
               onPress={() => setMoveConfirm(true)}>
-              Move {selectedUserIds.size} User(s)
+              {t('bulk_operations.move_n_users', { count: selectedUserIds.size })}
             </Button>
           </CardBody>
         </Card>
@@ -200,16 +200,16 @@ export function BulkOperations() {
         <Card>
           <CardHeader className="flex flex-col items-start gap-1">
             <div className="flex gap-2 items-center">
-              <Building2 size={20} /> <h3 className="text-lg font-semibold">Bulk Update Tenants</h3>
+              <Building2 size={20} /> <h3 className="text-lg font-semibold">{t('bulk_operations.bulk_update_tenants')}</h3>
             </div>
             <p className="text-xs text-default-400">
-              Activate, deactivate, or toggle hub status for multiple tenants at once.{' '}
+              {t('bulk_operations.bulk_update_desc')}{' '}
               <Link to={tenantPath('/admin/super/tenants')} className="text-primary hover:underline">Manage individual tenants</Link>
             </p>
           </CardHeader>
           <CardBody className="flex flex-col gap-4">
             <div className="flex items-center justify-between mb-1">
-              <p className="text-sm font-medium">Select Tenants</p>
+              <p className="text-sm font-medium">{t('bulk_operations.select_tenants')}</p>
               <div className="flex gap-2">
                 <Button
                   size="sm"
@@ -218,7 +218,7 @@ export function BulkOperations() {
                   startContent={<CheckCheck size={14} />}
                   onPress={selectAllTenants}
                 >
-                  Select All
+                  {t('bulk_operations.select_all')}
                 </Button>
                 <Button
                   size="sm"
@@ -227,7 +227,7 @@ export function BulkOperations() {
                   startContent={<XCircle size={14} />}
                   onPress={deselectAllTenants}
                 >
-                  Deselect All
+                  {t('bulk_operations.deselect_all')}
                 </Button>
               </div>
             </div>
@@ -243,7 +243,7 @@ export function BulkOperations() {
             </div>
             <Divider />
             <div>
-              <p className="text-sm font-medium mb-3">Select Action</p>
+              <p className="text-sm font-medium mb-3">{t('bulk_operations.select_action')}</p>
               <RadioGroup value={bulkAction} onValueChange={setBulkAction}>
                 <div className="grid grid-cols-2 gap-3">
                   <div
@@ -320,7 +320,7 @@ export function BulkOperations() {
               isDisabled={selectedTenantIds.size === 0 || !bulkAction}
               onPress={() => setTenantConfirm(true)}
             >
-              Apply to {selectedTenantIds.size} Tenant(s)
+              {t('bulk_operations.apply_to_n_tenants', { count: selectedTenantIds.size })}
             </Button>
           </CardBody>
         </Card>
@@ -328,13 +328,13 @@ export function BulkOperations() {
 
       <ConfirmModal isOpen={moveConfirm} onClose={() => setMoveConfirm(false)}
         onConfirm={handleBulkMoveUsers}
-        title="Confirm Bulk Move" message={`Move ${selectedUserIds.size} user(s) to the selected tenant?${grantSA ? ' They will be granted Tenant Super Admin privileges.' : ''}`}
-        confirmLabel="Move Users" confirmColor="primary" isLoading={moveLoading} />
+        title={t('bulk_operations.confirm_bulk_move')} message={`${t('bulk_operations.move_count', { count: selectedUserIds.size })}${grantSA ? ` ${t('bulk_operations.grant_sa_note')}` : ''}`}
+        confirmLabel={t('bulk_operations.move_users')} confirmColor="primary" isLoading={moveLoading} />
 
       <ConfirmModal isOpen={tenantConfirm} onClose={() => setTenantConfirm(false)}
         onConfirm={handleBulkUpdateTenants}
-        title="Confirm Bulk Update" message={`Apply '${bulkAction.replace('_', ' ')}' to ${selectedTenantIds.size} tenant(s)?`}
-        confirmLabel="Apply" confirmColor={
+        title={t('bulk_operations.confirm_bulk_update')} message={t('bulk_operations.apply_action', { action: bulkAction.replace('_', ' '), count: selectedTenantIds.size })}
+        confirmLabel={t('bulk_operations.apply')} confirmColor={
           bulkAction === 'activate' ? 'primary' :
           bulkAction === 'deactivate' ? 'danger' :
           'warning'

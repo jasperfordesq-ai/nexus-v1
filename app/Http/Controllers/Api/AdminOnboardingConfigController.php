@@ -80,7 +80,7 @@ class AdminOnboardingConfigController extends BaseApiController
         $input = $this->getAllInput();
 
         if (empty($input)) {
-            return $this->respondWithError('VALIDATION_ERROR', 'Request body is empty', null, 422);
+            return $this->respondWithError('VALIDATION_ERROR', __('api.request_body_empty'), null, 422);
         }
 
         $updated = [];
@@ -186,12 +186,12 @@ class AdminOnboardingConfigController extends BaseApiController
         $presetKey = $this->input('preset');
 
         if (empty($presetKey)) {
-            return $this->respondWithError('VALIDATION_ERROR', 'preset is required', 'preset', 422);
+            return $this->respondWithError('VALIDATION_ERROR', __('api.preset_required'), 'preset', 422);
         }
 
         $allowed = ['ireland', 'england_wales', 'scotland', 'northern_ireland', 'custom'];
         if (!in_array($presetKey, $allowed, true)) {
-            return $this->respondWithError('VALIDATION_ERROR', "Invalid preset: {$presetKey}", 'preset', 422);
+            return $this->respondWithError('VALIDATION_ERROR', __('api.invalid_preset', ['preset' => $presetKey]), 'preset', 422);
         }
 
         $created = SafeguardingPreferenceService::applyCountryPreset($tenantId, $presetKey);

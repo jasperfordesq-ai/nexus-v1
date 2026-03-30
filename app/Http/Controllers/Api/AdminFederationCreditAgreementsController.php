@@ -37,11 +37,11 @@ class AdminFederationCreditAgreementsController extends BaseApiController
                 $agreements = \App\Services\FederationCreditService::listAgreementsStatic($tenantId);
                 return $this->respondWithData($agreements);
             } catch (\Exception $e) {
-                return $this->respondWithError('FETCH_FAILED', 'Failed to load credit agreements', null, 500);
+                return $this->respondWithError('FETCH_FAILED', __('api.credit_agreements_fetch_failed'), null, 500);
             }
         }
 
-        return $this->respondWithError('SERVICE_UNAVAILABLE', 'FederationCreditService not available', null, 503);
+        return $this->respondWithError('SERVICE_UNAVAILABLE', __('api.federation_credit_unavailable'), null, 503);
     }
 
     /**
@@ -60,16 +60,16 @@ class AdminFederationCreditAgreementsController extends BaseApiController
         $monthlyLimit = (float) ($input['monthly_limit'] ?? 0);
 
         if ($partnerTenantId <= 0) {
-            return $this->respondWithError('VALIDATION_ERROR', 'Partner tenant ID is required', 'partner_tenant_id');
+            return $this->respondWithError('VALIDATION_ERROR', __('api.partner_tenant_required'), 'partner_tenant_id');
         }
         if ($partnerTenantId === $tenantId) {
-            return $this->respondWithError('VALIDATION_ERROR', 'Cannot create agreement with your own community', 'partner_tenant_id');
+            return $this->respondWithError('VALIDATION_ERROR', __('api.cannot_agree_with_self'), 'partner_tenant_id');
         }
         if ($exchangeRate <= 0) {
-            return $this->respondWithError('VALIDATION_ERROR', 'Exchange rate must be greater than zero', 'exchange_rate');
+            return $this->respondWithError('VALIDATION_ERROR', __('api.exchange_rate_gt_zero'), 'exchange_rate');
         }
         if ($monthlyLimit <= 0) {
-            return $this->respondWithError('VALIDATION_ERROR', 'Monthly limit must be greater than zero', 'monthly_limit');
+            return $this->respondWithError('VALIDATION_ERROR', __('api.monthly_limit_gt_zero'), 'monthly_limit');
         }
 
         if (class_exists(\App\Services\FederationCreditService::class)) {
@@ -96,12 +96,12 @@ class AdminFederationCreditAgreementsController extends BaseApiController
 
                 return $this->respondWithData($agreement, null, 201);
             } catch (\Exception $e) {
-                Log::warning('Failed to create credit agreement', ['error' => $e->getMessage()]);
-                return $this->respondWithError('CREATE_FAILED', 'Failed to create credit agreement', null, 500);
+                Log::warning(__('api.credit_agreement_create_failed'), ['error' => $e->getMessage()]);
+                return $this->respondWithError('CREATE_FAILED', __('api.credit_agreement_create_failed'), null, 500);
             }
         }
 
-        return $this->respondWithError('SERVICE_UNAVAILABLE', 'FederationCreditService not available', null, 503);
+        return $this->respondWithError('SERVICE_UNAVAILABLE', __('api.federation_credit_unavailable'), null, 503);
     }
 
     /**
@@ -116,7 +116,7 @@ class AdminFederationCreditAgreementsController extends BaseApiController
 
         $validActions = ['approve', 'reject', 'suspend', 'activate', 'reactivate', 'terminate'];
         if (!in_array($action, $validActions, true)) {
-            return $this->respondWithError('VALIDATION_ERROR', 'Invalid action. Must be one of: ' . implode(', ', $validActions), 'action');
+            return $this->respondWithError('VALIDATION_ERROR', __('api.invalid_action', ['actions' => implode(', ', $validActions)]), 'action');
         }
 
         $statusMap = [
@@ -136,7 +136,7 @@ class AdminFederationCreditAgreementsController extends BaseApiController
             );
 
             if (!$agreement) {
-                return $this->respondWithError('NOT_FOUND', 'Credit agreement not found', null, 404);
+                return $this->respondWithError('NOT_FOUND', __('api.credit_agreement_not_found'), null, 404);
             }
 
             $updated = DB::update(
@@ -145,7 +145,7 @@ class AdminFederationCreditAgreementsController extends BaseApiController
             );
 
             if ($updated === 0) {
-                return $this->respondWithError('UPDATE_FAILED', 'Failed to update credit agreement', null, 500);
+                return $this->respondWithError('UPDATE_FAILED', __('api.credit_agreement_update_failed'), null, 500);
             }
 
             try {
@@ -210,7 +210,7 @@ class AdminFederationCreditAgreementsController extends BaseApiController
 
             return $this->respondWithData(['success' => true]);
         } catch (\Exception $e) {
-            return $this->respondWithError('UPDATE_FAILED', 'Failed to update credit agreement', null, 500);
+            return $this->respondWithError('UPDATE_FAILED', __('api.credit_agreement_update_failed'), null, 500);
         }
     }
 
@@ -232,7 +232,7 @@ class AdminFederationCreditAgreementsController extends BaseApiController
             );
 
             if (!$agreement) {
-                return $this->respondWithError('NOT_FOUND', 'Credit agreement not found', null, 404);
+                return $this->respondWithError('NOT_FOUND', __('api.credit_agreement_not_found'), null, 404);
             }
 
             $fromId = (int) $agreement->from_tenant_id;
@@ -281,7 +281,7 @@ class AdminFederationCreditAgreementsController extends BaseApiController
                 ]);
             }
         } catch (\Exception $e) {
-            return $this->respondWithError('FETCH_FAILED', 'Failed to load transactions', null, 500);
+            return $this->respondWithError('FETCH_FAILED', __('api.transactions_fetch_failed'), null, 500);
         }
     }
 

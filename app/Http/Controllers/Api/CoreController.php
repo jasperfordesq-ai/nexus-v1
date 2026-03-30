@@ -48,7 +48,7 @@ class CoreController extends BaseApiController
         $tenantEmail = $tenant['contact_email'] ?? '';
 
         if (empty($tenantEmail)) {
-            return $this->respondWithError('SERVER_ERROR', 'No contact email configured for this community.', null, 500);
+            return $this->respondWithError('SERVER_ERROR', __('api.no_contact_email_configured'), null, 500);
         }
 
         $emailSubject = "[{$tenantName}] Contact Form: {$subject}";

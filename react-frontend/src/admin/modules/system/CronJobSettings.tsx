@@ -281,7 +281,7 @@ export function CronJobSettingsPage() {
                         />
 
                         <Input
-                          label="Timeout (seconds)"
+                          label={t('system.label_timeout')}
                           type="number"
                           placeholder="300"
                           description={t('system.desc_maximum_execution_time')}
@@ -349,7 +349,7 @@ export function CronJobSettingsPage() {
                 />
 
                 <Input
-                  label="Log Retention (days)"
+                  label={t('system.label_log_retention')}
                   type="number"
                   placeholder="30"
                   description={t('system.desc_how_long_to_keep_job_execution_logs')}

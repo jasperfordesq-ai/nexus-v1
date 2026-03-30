@@ -69,11 +69,11 @@ class AdminInsuranceCertificateController extends BaseApiController
         try {
             $record = $this->insuranceCertificateService->getById($id);
             if (!$record) {
-                return $this->respondWithError('NOT_FOUND', 'Insurance certificate not found', null, 404);
+                return $this->respondWithError('NOT_FOUND', __('api.insurance_cert_not_found'), null, 404);
             }
             return $this->respondWithData($record);
         } catch (\Exception $e) {
-            return $this->respondWithError('SERVER_ERROR', 'Failed to fetch insurance certificate', null, 500);
+            return $this->respondWithError('SERVER_ERROR', __('api.insurance_cert_fetch_failed'), null, 500);
         }
     }
 
@@ -86,19 +86,19 @@ class AdminInsuranceCertificateController extends BaseApiController
         $insuranceType = $this->input('insurance_type');
 
         if (!$userId) {
-            return $this->respondWithError('VALIDATION_ERROR', 'user_id is required', 'user_id', 422);
+            return $this->respondWithError('VALIDATION_ERROR', __('api.user_id_required'), 'user_id', 422);
         }
 
         $validTypes = ['public_liability', 'professional_indemnity', 'employers_liability',
                         'product_liability', 'personal_accident', 'other'];
         if ($insuranceType && !in_array($insuranceType, $validTypes, true)) {
-            return $this->respondWithError('VALIDATION_ERROR', 'Invalid insurance type', 'insurance_type');
+            return $this->respondWithError('VALIDATION_ERROR', __('api.invalid_insurance_type'), 'insurance_type');
         }
 
         $validStatuses = ['pending', 'submitted', 'verified', 'expired', 'rejected', 'revoked'];
         $status = $this->input('status', 'pending');
         if (!in_array($status, $validStatuses, true)) {
-            return $this->respondWithError('VALIDATION_ERROR', 'Invalid status', 'status');
+            return $this->respondWithError('VALIDATION_ERROR', __('api.invalid_status'), 'status');
         }
 
         try {
@@ -119,7 +119,7 @@ class AdminInsuranceCertificateController extends BaseApiController
 
             return $this->respondWithData($record, null, 201);
         } catch (\Exception $e) {
-            return $this->respondWithError('SERVER_ERROR', 'Failed to create insurance certificate', null, 500);
+            return $this->respondWithError('SERVER_ERROR', __('api.insurance_cert_create_failed'), null, 500);
         }
     }
 
@@ -131,7 +131,7 @@ class AdminInsuranceCertificateController extends BaseApiController
         try {
             $existing = $this->insuranceCertificateService->getById($id);
             if (!$existing) {
-                return $this->respondWithError('NOT_FOUND', 'Insurance certificate not found', null, 404);
+                return $this->respondWithError('NOT_FOUND', __('api.insurance_cert_not_found'), null, 404);
             }
 
             $allInput = $this->getAllInput();
@@ -140,14 +140,14 @@ class AdminInsuranceCertificateController extends BaseApiController
                 $validTypes = ['public_liability', 'professional_indemnity', 'employers_liability',
                                 'product_liability', 'personal_accident', 'other'];
                 if (!in_array($allInput['insurance_type'], $validTypes, true)) {
-                    return $this->respondWithError('VALIDATION_ERROR', 'Invalid insurance type', 'insurance_type');
+                    return $this->respondWithError('VALIDATION_ERROR', __('api.invalid_insurance_type'), 'insurance_type');
                 }
             }
 
             if (array_key_exists('status', $allInput) && $allInput['status'] !== null) {
                 $validStatuses = ['pending', 'submitted', 'verified', 'expired', 'rejected', 'revoked'];
                 if (!in_array($allInput['status'], $validStatuses, true)) {
-                    return $this->respondWithError('VALIDATION_ERROR', 'Invalid status', 'status');
+                    return $this->respondWithError('VALIDATION_ERROR', __('api.invalid_status'), 'status');
                 }
             }
 
@@ -161,7 +161,7 @@ class AdminInsuranceCertificateController extends BaseApiController
             }
 
             if (empty($data)) {
-                return $this->respondWithError('VALIDATION_ERROR', 'No valid fields to update');
+                return $this->respondWithError('VALIDATION_ERROR', __('api.no_valid_fields'));
             }
 
             $this->insuranceCertificateService->update($id, $data);
@@ -169,7 +169,7 @@ class AdminInsuranceCertificateController extends BaseApiController
 
             return $this->respondWithData($record);
         } catch (\Exception $e) {
-            return $this->respondWithError('SERVER_ERROR', 'Failed to update insurance certificate', null, 500);
+            return $this->respondWithError('SERVER_ERROR', __('api.insurance_cert_update_failed'), null, 500);
         }
     }
 
@@ -181,10 +181,10 @@ class AdminInsuranceCertificateController extends BaseApiController
         try {
             $existing = $this->insuranceCertificateService->getById($id);
             if (!$existing) {
-                return $this->respondWithError('NOT_FOUND', 'Insurance certificate not found', null, 404);
+                return $this->respondWithError('NOT_FOUND', __('api.insurance_cert_not_found'), null, 404);
             }
             if ($existing['status'] === 'verified') {
-                return $this->respondWithError('INVALID_STATUS', 'Certificate is already verified');
+                return $this->respondWithError('INVALID_STATUS', __('api.certificate_already_verified'));
             }
 
             $this->insuranceCertificateService->verify($id, $adminId);
@@ -208,7 +208,7 @@ class AdminInsuranceCertificateController extends BaseApiController
 
             return $this->respondWithData($record);
         } catch (\Exception $e) {
-            return $this->respondWithError('SERVER_ERROR', 'Failed to verify insurance certificate', null, 500);
+            return $this->respondWithError('SERVER_ERROR', __('api.insurance_cert_verify_failed'), null, 500);
         }
     }
 
@@ -219,13 +219,13 @@ class AdminInsuranceCertificateController extends BaseApiController
         $reason = $this->input('reason', '');
 
         if (empty($reason)) {
-            return $this->respondWithError('VALIDATION_ERROR', 'A reason is required to reject an insurance certificate', 'reason', 422);
+            return $this->respondWithError('VALIDATION_ERROR', __('api.reason_required_reject_cert'), 'reason', 422);
         }
 
         try {
             $existing = $this->insuranceCertificateService->getById($id);
             if (!$existing) {
-                return $this->respondWithError('NOT_FOUND', 'Insurance certificate not found', null, 404);
+                return $this->respondWithError('NOT_FOUND', __('api.insurance_cert_not_found'), null, 404);
             }
 
             $this->insuranceCertificateService->reject($id, $adminId, $reason);
@@ -249,7 +249,7 @@ class AdminInsuranceCertificateController extends BaseApiController
 
             return $this->respondWithData($record);
         } catch (\Exception $e) {
-            return $this->respondWithError('SERVER_ERROR', 'Failed to reject insurance certificate', null, 500);
+            return $this->respondWithError('SERVER_ERROR', __('api.insurance_cert_reject_failed'), null, 500);
         }
     }
 
@@ -261,13 +261,13 @@ class AdminInsuranceCertificateController extends BaseApiController
         try {
             $existing = $this->insuranceCertificateService->getById($id);
             if (!$existing) {
-                return $this->respondWithError('NOT_FOUND', 'Insurance certificate not found', null, 404);
+                return $this->respondWithError('NOT_FOUND', __('api.insurance_cert_not_found'), null, 404);
             }
 
             $this->insuranceCertificateService->delete($id);
             return $this->respondWithData(['deleted' => true]);
         } catch (\Exception $e) {
-            return $this->respondWithError('SERVER_ERROR', 'Failed to delete insurance certificate', null, 500);
+            return $this->respondWithError('SERVER_ERROR', __('api.insurance_cert_delete_failed'), null, 500);
         }
     }
 

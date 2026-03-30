@@ -38,7 +38,7 @@ class StoryController extends BaseApiController
             return $this->respondWithData($stories);
         } catch (\Throwable $e) {
             Log::error('StoryController::index failed', ['error' => $e->getMessage()]);
-            return $this->respondWithError('STORIES_FETCH_FAILED', 'Failed to load stories', null, 500);
+            return $this->respondWithError('STORIES_FETCH_FAILED', __('api.stories_fetch_failed'), null, 500);
         }
     }
 
@@ -54,7 +54,7 @@ class StoryController extends BaseApiController
             return $this->respondWithData($stories);
         } catch (\Throwable $e) {
             Log::error('StoryController::userStories failed', ['error' => $e->getMessage()]);
-            return $this->respondWithError('STORIES_FETCH_FAILED', 'Failed to load user stories', null, 500);
+            return $this->respondWithError('STORIES_FETCH_FAILED', __('api.user_stories_fetch_failed'), null, 500);
         }
     }
 
@@ -116,12 +116,12 @@ class StoryController extends BaseApiController
             // Validate file
             $maxSize = 10 * 1024 * 1024; // 10MB
             if ($file->getSize() > $maxSize) {
-                return $this->respondWithError('FILE_TOO_LARGE', 'Image must be less than 10MB', 'media');
+                return $this->respondWithError('FILE_TOO_LARGE', __('api.story_image_too_large'), 'media');
             }
 
             $allowedMimes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
             if (!in_array($file->getMimeType(), $allowedMimes)) {
-                return $this->respondWithError('INVALID_FILE_TYPE', 'Only JPEG, PNG, GIF, and WebP images are allowed', 'media');
+                return $this->respondWithError('INVALID_FILE_TYPE', __('api.story_invalid_image_type'), 'media');
             }
 
             try {
@@ -129,7 +129,7 @@ class StoryController extends BaseApiController
                 $data['media_url'] = $this->storyService->uploadMedia($file, $tenantId, $userId);
             } catch (\Throwable $e) {
                 Log::error('Story image upload failed', ['error' => $e->getMessage()]);
-                return $this->respondWithError('UPLOAD_FAILED', 'Failed to upload image', 'media', 500);
+                return $this->respondWithError('UPLOAD_FAILED', __('api.story_upload_failed'), 'media', 500);
             }
         }
 
@@ -139,12 +139,12 @@ class StoryController extends BaseApiController
 
             $maxSize = 50 * 1024 * 1024; // 50MB
             if ($file->getSize() > $maxSize) {
-                return $this->respondWithError('FILE_TOO_LARGE', 'Video must be less than 50MB', 'media');
+                return $this->respondWithError('FILE_TOO_LARGE', __('api.story_video_too_large'), 'media');
             }
 
             $allowedMimes = ['video/mp4', 'video/webm', 'video/ogg', 'video/quicktime'];
             if (!in_array($file->getMimeType(), $allowedMimes)) {
-                return $this->respondWithError('INVALID_FILE_TYPE', 'Only MP4, WebM, OGG, and MOV videos are allowed', 'media');
+                return $this->respondWithError('INVALID_FILE_TYPE', __('api.story_invalid_video_type'), 'media');
             }
 
             try {
@@ -153,16 +153,16 @@ class StoryController extends BaseApiController
                 $data['video_duration'] = $request->input('video_duration');
             } catch (\Throwable $e) {
                 Log::error('Story video upload failed', ['error' => $e->getMessage()]);
-                return $this->respondWithError('UPLOAD_FAILED', 'Failed to upload video', 'media', 500);
+                return $this->respondWithError('UPLOAD_FAILED', __('api.story_video_upload_failed'), 'media', 500);
             }
         }
 
         // Validate: image/video stories must have a media file, text stories must have content
         if (in_array($mediaType, ['image', 'video']) && empty($data['media_url'])) {
-            return $this->respondWithError('MISSING_MEDIA', ucfirst($mediaType) . ' stories require a media file', 'media');
+            return $this->respondWithError('MISSING_MEDIA', __('api.story_media_required', ['type' => ucfirst($mediaType)]), 'media');
         }
         if ($mediaType === 'text' && empty($data['text_content'])) {
-            return $this->respondWithError('MISSING_CONTENT', 'Text stories require content', 'text_content');
+            return $this->respondWithError('MISSING_CONTENT', __('api.story_text_required'), 'text_content');
         }
 
         try {
@@ -172,7 +172,7 @@ class StoryController extends BaseApiController
             return $this->respondWithError('STORY_CREATE_FAILED', $e->getMessage());
         } catch (\Throwable $e) {
             Log::error('StoryController::store failed', ['error' => $e->getMessage()]);
-            return $this->respondWithError('STORY_CREATE_FAILED', 'Failed to create story', null, 500);
+            return $this->respondWithError('STORY_CREATE_FAILED', __('api.story_create_failed'), null, 500);
         }
     }
 
@@ -188,7 +188,7 @@ class StoryController extends BaseApiController
             return $this->respondWithData(['viewed' => true]);
         } catch (\Throwable $e) {
             Log::error('StoryController::view failed', ['error' => $e->getMessage()]);
-            return $this->respondWithError('VIEW_FAILED', 'Failed to record view', null, 500);
+            return $this->respondWithError('VIEW_FAILED', __('api.story_view_failed'), null, 500);
         }
     }
 
@@ -206,7 +206,7 @@ class StoryController extends BaseApiController
             return $this->respondWithError('VIEWERS_FETCH_FAILED', $e->getMessage(), null, 403);
         } catch (\Throwable $e) {
             Log::error('StoryController::viewers failed', ['error' => $e->getMessage()]);
-            return $this->respondWithError('VIEWERS_FETCH_FAILED', 'Failed to load viewers', null, 500);
+            return $this->respondWithError('VIEWERS_FETCH_FAILED', __('api.story_viewers_failed'), null, 500);
         }
     }
 
@@ -220,7 +220,7 @@ class StoryController extends BaseApiController
 
         $reactionType = request()->input('reaction_type');
         if (empty($reactionType)) {
-            return $this->respondWithError('MISSING_REACTION', 'Reaction type is required', 'reaction_type');
+            return $this->respondWithError('MISSING_REACTION', __('api.story_reaction_required'), 'reaction_type');
         }
 
         try {
@@ -263,7 +263,7 @@ class StoryController extends BaseApiController
             return $this->respondWithError('REACT_FAILED', $e->getMessage());
         } catch (\Throwable $e) {
             Log::error('StoryController::react failed', ['error' => $e->getMessage()]);
-            return $this->respondWithError('REACT_FAILED', 'Failed to add reaction', null, 500);
+            return $this->respondWithError('REACT_FAILED', __('api.story_react_failed'), null, 500);
         }
     }
 
@@ -281,7 +281,7 @@ class StoryController extends BaseApiController
             return $this->respondWithError('DELETE_FAILED', $e->getMessage(), null, 403);
         } catch (\Throwable $e) {
             Log::error('StoryController::destroy failed', ['error' => $e->getMessage()]);
-            return $this->respondWithError('DELETE_FAILED', 'Failed to delete story', null, 500);
+            return $this->respondWithError('DELETE_FAILED', __('api.story_delete_failed'), null, 500);
         }
     }
 
@@ -295,7 +295,7 @@ class StoryController extends BaseApiController
 
         $optionIndex = request()->input('option_index');
         if ($optionIndex === null) {
-            return $this->respondWithError('MISSING_OPTION', 'Option index is required', 'option_index');
+            return $this->respondWithError('MISSING_OPTION', __('api.story_poll_option_required'), 'option_index');
         }
 
         try {
@@ -305,7 +305,7 @@ class StoryController extends BaseApiController
             return $this->respondWithError('VOTE_FAILED', $e->getMessage());
         } catch (\Throwable $e) {
             Log::error('StoryController::pollVote failed', ['error' => $e->getMessage()]);
-            return $this->respondWithError('VOTE_FAILED', 'Failed to submit vote', null, 500);
+            return $this->respondWithError('VOTE_FAILED', __('api.story_vote_failed'), null, 500);
         }
     }
 
@@ -321,7 +321,7 @@ class StoryController extends BaseApiController
             return $this->respondWithData($highlights);
         } catch (\Throwable $e) {
             Log::error('StoryController::highlights failed', ['error' => $e->getMessage()]);
-            return $this->respondWithError('HIGHLIGHTS_FETCH_FAILED', 'Failed to load highlights', null, 500);
+            return $this->respondWithError('HIGHLIGHTS_FETCH_FAILED', __('api.story_highlights_fetch_failed'), null, 500);
         }
     }
 
@@ -337,7 +337,7 @@ class StoryController extends BaseApiController
             return $this->respondWithData($stories);
         } catch (\Throwable $e) {
             Log::error('StoryController::highlightStories failed', ['error' => $e->getMessage()]);
-            return $this->respondWithError('HIGHLIGHT_STORIES_FAILED', 'Failed to load highlight stories', null, 500);
+            return $this->respondWithError('HIGHLIGHT_STORIES_FAILED', __('api.story_highlight_stories_failed'), null, 500);
         }
     }
 
@@ -351,7 +351,7 @@ class StoryController extends BaseApiController
 
         $title = request()->input('title');
         if (empty($title)) {
-            return $this->respondWithError('MISSING_TITLE', 'Highlight title is required', 'title');
+            return $this->respondWithError('MISSING_TITLE', __('api.story_highlight_title_required'), 'title');
         }
 
         $storyIds = request()->input('story_ids', []);
@@ -364,7 +364,7 @@ class StoryController extends BaseApiController
             return $this->respondWithData($highlight, null, 201);
         } catch (\Throwable $e) {
             Log::error('StoryController::createHighlight failed', ['error' => $e->getMessage()]);
-            return $this->respondWithError('HIGHLIGHT_CREATE_FAILED', 'Failed to create highlight', null, 500);
+            return $this->respondWithError('HIGHLIGHT_CREATE_FAILED', __('api.story_highlight_create_failed'), null, 500);
         }
     }
 
@@ -377,7 +377,7 @@ class StoryController extends BaseApiController
 
         $storyId = request()->input('story_id');
         if (empty($storyId)) {
-            return $this->respondWithError('MISSING_STORY_ID', 'Story ID is required', 'story_id');
+            return $this->respondWithError('MISSING_STORY_ID', __('api.story_id_required'), 'story_id');
         }
 
         try {
@@ -387,7 +387,7 @@ class StoryController extends BaseApiController
             return $this->respondWithError('ADD_ITEM_FAILED', $e->getMessage(), null, 403);
         } catch (\Throwable $e) {
             Log::error('StoryController::addHighlightItem failed', ['error' => $e->getMessage()]);
-            return $this->respondWithError('ADD_ITEM_FAILED', 'Failed to add story to highlight', null, 500);
+            return $this->respondWithError('ADD_ITEM_FAILED', __('api.story_highlight_add_failed'), null, 500);
         }
     }
 
@@ -401,7 +401,7 @@ class StoryController extends BaseApiController
 
         $body = trim(request()->input('body', ''));
         if (empty($body)) {
-            return $this->respondWithError('MISSING_BODY', 'Reply message is required', 'body');
+            return $this->respondWithError('MISSING_BODY', __('api.story_reply_required'), 'body');
         }
 
         try {
@@ -444,7 +444,7 @@ class StoryController extends BaseApiController
             return $this->respondWithError('REPLY_FAILED', $e->getMessage());
         } catch (\Throwable $e) {
             Log::error('StoryController::reply failed', ['error' => $e->getMessage()]);
-            return $this->respondWithError('REPLY_FAILED', 'Failed to send reply', null, 500);
+            return $this->respondWithError('REPLY_FAILED', __('api.story_reply_failed'), null, 500);
         }
     }
 
@@ -462,7 +462,7 @@ class StoryController extends BaseApiController
             return $this->respondWithError('DELETE_FAILED', $e->getMessage(), null, 403);
         } catch (\Throwable $e) {
             Log::error('StoryController::deleteHighlight failed', ['error' => $e->getMessage()]);
-            return $this->respondWithError('DELETE_FAILED', 'Failed to delete highlight', null, 500);
+            return $this->respondWithError('DELETE_FAILED', __('api.story_highlight_delete_failed'), null, 500);
         }
     }
 
@@ -480,7 +480,7 @@ class StoryController extends BaseApiController
             return $this->respondWithData($stories);
         } catch (\Throwable $e) {
             Log::error('StoryController::archive failed', ['error' => $e->getMessage()]);
-            return $this->respondWithError('ARCHIVE_FETCH_FAILED', 'Failed to load archived stories', null, 500);
+            return $this->respondWithError('ARCHIVE_FETCH_FAILED', __('api.story_archive_fetch_failed'), null, 500);
         }
     }
 
@@ -496,7 +496,7 @@ class StoryController extends BaseApiController
             return $this->respondWithData($friends);
         } catch (\Throwable $e) {
             Log::error('StoryController::closeFriends failed', ['error' => $e->getMessage()]);
-            return $this->respondWithError('CLOSE_FRIENDS_FAILED', 'Failed to load close friends', null, 500);
+            return $this->respondWithError('CLOSE_FRIENDS_FAILED', __('api.story_close_friends_failed'), null, 500);
         }
     }
 
@@ -509,7 +509,7 @@ class StoryController extends BaseApiController
 
         $friendId = request()->input('friend_id');
         if (empty($friendId)) {
-            return $this->respondWithError('MISSING_FRIEND_ID', 'Friend ID is required', 'friend_id');
+            return $this->respondWithError('MISSING_FRIEND_ID', __('api.story_friend_id_required'), 'friend_id');
         }
 
         try {
@@ -517,7 +517,7 @@ class StoryController extends BaseApiController
             return $this->respondWithData(['added' => true]);
         } catch (\Throwable $e) {
             Log::error('StoryController::addCloseFriend failed', ['error' => $e->getMessage()]);
-            return $this->respondWithError('ADD_FRIEND_FAILED', 'Failed to add close friend', null, 500);
+            return $this->respondWithError('ADD_FRIEND_FAILED', __('api.story_add_friend_failed'), null, 500);
         }
     }
 
@@ -533,7 +533,7 @@ class StoryController extends BaseApiController
             return $this->respondWithData(['removed' => true]);
         } catch (\Throwable $e) {
             Log::error('StoryController::removeCloseFriend failed', ['error' => $e->getMessage()]);
-            return $this->respondWithError('REMOVE_FRIEND_FAILED', 'Failed to remove close friend', null, 500);
+            return $this->respondWithError('REMOVE_FRIEND_FAILED', __('api.story_remove_friend_failed'), null, 500);
         }
     }
 
@@ -546,7 +546,7 @@ class StoryController extends BaseApiController
 
         $eventType = request()->input('event_type');
         if (empty($eventType)) {
-            return $this->respondWithError('MISSING_EVENT', 'Event type is required', 'event_type');
+            return $this->respondWithError('MISSING_EVENT', __('api.story_event_type_required'), 'event_type');
         }
 
         $watchDuration = request()->input('watch_duration_ms');
@@ -574,7 +574,7 @@ class StoryController extends BaseApiController
             return $this->respondWithError('ANALYTICS_FAILED', $e->getMessage(), null, 403);
         } catch (\Throwable $e) {
             Log::error('StoryController::getAnalytics failed', ['error' => $e->getMessage()]);
-            return $this->respondWithError('ANALYTICS_FAILED', 'Failed to load analytics', null, 500);
+            return $this->respondWithError('ANALYTICS_FAILED', __('api.story_analytics_failed'), null, 500);
         }
     }
 
@@ -587,7 +587,7 @@ class StoryController extends BaseApiController
 
         $title = request()->input('title');
         if (empty($title)) {
-            return $this->respondWithError('MISSING_TITLE', 'Highlight title is required', 'title');
+            return $this->respondWithError('MISSING_TITLE', __('api.story_highlight_title_required'), 'title');
         }
 
         try {
@@ -597,7 +597,7 @@ class StoryController extends BaseApiController
             return $this->respondWithError('UPDATE_FAILED', $e->getMessage(), null, 403);
         } catch (\Throwable $e) {
             Log::error('StoryController::updateHighlight failed', ['error' => $e->getMessage()]);
-            return $this->respondWithError('UPDATE_FAILED', 'Failed to update highlight', null, 500);
+            return $this->respondWithError('UPDATE_FAILED', __('api.story_highlight_update_failed'), null, 500);
         }
     }
 
@@ -615,7 +615,7 @@ class StoryController extends BaseApiController
             return $this->respondWithError('REMOVE_FAILED', $e->getMessage(), null, 403);
         } catch (\Throwable $e) {
             Log::error('StoryController::removeHighlightItem failed', ['error' => $e->getMessage()]);
-            return $this->respondWithError('REMOVE_FAILED', 'Failed to remove story from highlight', null, 500);
+            return $this->respondWithError('REMOVE_FAILED', __('api.story_highlight_remove_failed'), null, 500);
         }
     }
 
@@ -628,7 +628,7 @@ class StoryController extends BaseApiController
 
         $stickers = request()->input('stickers', []);
         if (!is_array($stickers)) {
-            return $this->respondWithError('INVALID_STICKERS', 'Stickers must be an array', 'stickers');
+            return $this->respondWithError('INVALID_STICKERS', __('api.story_stickers_must_be_array'), 'stickers');
         }
 
         try {
@@ -638,7 +638,7 @@ class StoryController extends BaseApiController
             return $this->respondWithError('SAVE_FAILED', $e->getMessage(), null, 403);
         } catch (\Throwable $e) {
             Log::error('StoryController::saveStickers failed', ['error' => $e->getMessage()]);
-            return $this->respondWithError('SAVE_FAILED', 'Failed to save stickers', null, 500);
+            return $this->respondWithError('SAVE_FAILED', __('api.story_save_stickers_failed'), null, 500);
         }
     }
 
@@ -651,7 +651,7 @@ class StoryController extends BaseApiController
 
         $order = request()->input('order', []);
         if (empty($order) || !is_array($order)) {
-            return $this->respondWithError('MISSING_ORDER', 'Order array is required', 'order');
+            return $this->respondWithError('MISSING_ORDER', __('api.story_order_required'), 'order');
         }
 
         try {
@@ -659,7 +659,7 @@ class StoryController extends BaseApiController
             return $this->respondWithData(['reordered' => true]);
         } catch (\Throwable $e) {
             Log::error('StoryController::reorderHighlights failed', ['error' => $e->getMessage()]);
-            return $this->respondWithError('REORDER_FAILED', 'Failed to reorder highlights', null, 500);
+            return $this->respondWithError('REORDER_FAILED', __('api.story_reorder_failed'), null, 500);
         }
     }
 }

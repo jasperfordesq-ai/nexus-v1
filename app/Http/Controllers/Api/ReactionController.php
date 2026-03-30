@@ -65,7 +65,7 @@ class ReactionController extends BaseApiController
 
             return $this->respondWithData($result);
         } catch (\Exception $e) {
-            return $this->respondWithError('REACTION_ERROR', 'Failed to toggle reaction', null, 500);
+            return $this->respondWithError('REACTION_ERROR', __('api.reaction_toggle_failed'), null, 500);
         }
     }
 
@@ -82,7 +82,7 @@ class ReactionController extends BaseApiController
             $reactions = $this->reactionService->getReactions($id, 'post', $userId);
             return $this->respondWithData($reactions);
         } catch (\Exception $e) {
-            return $this->respondWithError('REACTION_ERROR', 'Failed to get reactions', null, 500);
+            return $this->respondWithError('REACTION_ERROR', __('api.failed_fetch_reactions'), null, 500);
         }
     }
 
@@ -94,7 +94,7 @@ class ReactionController extends BaseApiController
     public function getPostReactors(int $id, string $type): JsonResponse
     {
         if (!in_array($type, ReactionService::VALID_TYPES, true)) {
-            return $this->respondWithError('VALIDATION_ERROR', 'Invalid reaction type', 'type', 400);
+            return $this->respondWithError('VALIDATION_ERROR', __('api.invalid_reaction_type'), 'type', 400);
         }
 
         $page = $this->queryInt('page', 1, 1);
@@ -109,7 +109,7 @@ class ReactionController extends BaseApiController
                 $perPage
             );
         } catch (\Exception $e) {
-            return $this->respondWithError('REACTION_ERROR', 'Failed to get reactors', null, 500);
+            return $this->respondWithError('REACTION_ERROR', __('api.failed_get_reactors'), null, 500);
         }
     }
 
@@ -148,7 +148,7 @@ class ReactionController extends BaseApiController
 
             return $this->respondWithData($result);
         } catch (\Exception $e) {
-            return $this->respondWithError('REACTION_ERROR', 'Failed to toggle reaction', null, 500);
+            return $this->respondWithError('REACTION_ERROR', __('api.reaction_toggle_failed'), null, 500);
         }
     }
 
@@ -165,7 +165,7 @@ class ReactionController extends BaseApiController
             $reactions = $this->reactionService->getReactions($id, 'comment', $userId);
             return $this->respondWithData($reactions);
         } catch (\Exception $e) {
-            return $this->respondWithError('REACTION_ERROR', 'Failed to get reactions', null, 500);
+            return $this->respondWithError('REACTION_ERROR', __('api.failed_fetch_reactions'), null, 500);
         }
     }
 

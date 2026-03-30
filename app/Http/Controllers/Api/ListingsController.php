@@ -122,7 +122,7 @@ class ListingsController extends BaseApiController
         $listing = $this->listingService->getById($id, false, $userId);
 
         if (!$listing) {
-            return $this->respondWithError('NOT_FOUND', 'Listing not found', null, 404);
+            return $this->respondWithError('NOT_FOUND', __('api.listing_not_found'), null, 404);
         }
 
         // Track view (skip if viewer is the listing owner)
@@ -214,10 +214,10 @@ class ListingsController extends BaseApiController
         // Verify ownership or admin
         $existing = $this->listingService->getById($id, false, $userId);
         if (!$existing) {
-            return $this->respondWithError('NOT_FOUND', 'Listing not found', null, 404);
+            return $this->respondWithError('NOT_FOUND', __('api.listing_not_found'), null, 404);
         }
         if (!$this->listingService->canModify($existing, $userId)) {
-            return $this->respondWithError('FORBIDDEN', 'You can only edit your own listings', null, 403);
+            return $this->respondWithError('FORBIDDEN', __('api.listing_edit_own_only'), null, 403);
         }
 
         $data = $this->getAllInput();
@@ -227,7 +227,7 @@ class ListingsController extends BaseApiController
         try {
             $this->listingService->update($id, $data);
         } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
-            return $this->respondWithError('NOT_FOUND', 'Listing not found', null, 404);
+            return $this->respondWithError('NOT_FOUND', __('api.listing_not_found'), null, 404);
         } catch (\Illuminate\Validation\ValidationException $e) {
             $errors = [];
             foreach ($e->errors() as $field => $messages) {
@@ -255,16 +255,16 @@ class ListingsController extends BaseApiController
         // Verify ownership or admin
         $existing = $this->listingService->getById($id, false, $userId);
         if (!$existing) {
-            return $this->respondWithError('NOT_FOUND', 'Listing not found', null, 404);
+            return $this->respondWithError('NOT_FOUND', __('api.listing_not_found'), null, 404);
         }
         if (!$this->listingService->canModify($existing, $userId)) {
-            return $this->respondWithError('FORBIDDEN', 'You can only delete your own listings', null, 403);
+            return $this->respondWithError('FORBIDDEN', __('api.listing_delete_own_only'), null, 403);
         }
 
         $success = $this->listingService->delete($id);
 
         if (!$success) {
-            return $this->respondWithError('DELETE_FAILED', 'Failed to delete listing', null, 400);
+            return $this->respondWithError('DELETE_FAILED', __('api.listing_delete_failed'), null, 400);
         }
 
         // Clean up feed entry for deleted listing
@@ -287,17 +287,17 @@ class ListingsController extends BaseApiController
         $lon = $this->query('lon');
 
         if ($lat === null || $lon === null) {
-            return $this->respondWithError('VALIDATION_ERROR', 'Latitude and longitude are required', null, 400);
+            return $this->respondWithError('VALIDATION_ERROR', __('api.event_lat_lon_required'), null, 400);
         }
 
         $lat = (float) $lat;
         $lon = (float) $lon;
 
         if ($lat < -90 || $lat > 90) {
-            return $this->respondWithError('VALIDATION_ERROR', 'Latitude must be between -90 and 90', 'lat', 400);
+            return $this->respondWithError('VALIDATION_ERROR', __('api.event_lat_range'), 'lat', 400);
         }
         if ($lon < -180 || $lon > 180) {
-            return $this->respondWithError('VALIDATION_ERROR', 'Longitude must be between -180 and 180', 'lon', 400);
+            return $this->respondWithError('VALIDATION_ERROR', __('api.event_lon_range'), 'lon', 400);
         }
 
         $filters = [
@@ -373,7 +373,7 @@ class ListingsController extends BaseApiController
         $result = $this->listingService->saveListing($userId, $id);
 
         if (!$result) {
-            return $this->respondWithError('NOT_FOUND', 'Listing not found', null, 404);
+            return $this->respondWithError('NOT_FOUND', __('api.listing_not_found'), null, 404);
         }
 
         try {
@@ -485,11 +485,11 @@ class ListingsController extends BaseApiController
         $listing = $this->listingService->getById($id);
 
         if (!$listing) {
-            return $this->respondWithError('NOT_FOUND', 'Listing not found', null, 404);
+            return $this->respondWithError('NOT_FOUND', __('api.listing_not_found'), null, 404);
         }
 
         if (!$this->listingService->canModify($listing, $userId)) {
-            return $this->respondWithError('FORBIDDEN', 'You do not have permission to modify this listing', null, 403);
+            return $this->respondWithError('FORBIDDEN', __('api.listing_modify_forbidden'), null, 403);
         }
 
         $this->listingService->update($id, ['image_url' => null]);
@@ -534,11 +534,11 @@ class ListingsController extends BaseApiController
 
         $listing = $this->listingService->getById($id);
         if (!$listing) {
-            return $this->respondWithError('NOT_FOUND', 'Listing not found', null, 404);
+            return $this->respondWithError('NOT_FOUND', __('api.listing_not_found'), null, 404);
         }
 
         if (!$this->listingService->canModify($listing, $userId)) {
-            return $this->respondWithError('FORBIDDEN', 'You do not have permission to view analytics', null, 403);
+            return $this->respondWithError('FORBIDDEN', __('api.listing_analytics_forbidden'), null, 403);
         }
 
         $days = $this->queryInt('days', 30, 1, 90);
@@ -559,24 +559,24 @@ class ListingsController extends BaseApiController
 
         $listing = $this->listingService->getById($id);
         if (!$listing) {
-            return $this->respondWithError('NOT_FOUND', 'Listing not found', null, 404);
+            return $this->respondWithError('NOT_FOUND', __('api.listing_not_found'), null, 404);
         }
 
         if (!$this->listingService->canModify($listing, $userId)) {
-            return $this->respondWithError('FORBIDDEN', 'You do not have permission to modify this listing', null, 403);
+            return $this->respondWithError('FORBIDDEN', __('api.listing_modify_forbidden'), null, 403);
         }
 
         $data = $this->getAllInput();
         $tags = $data['tags'] ?? [];
 
         if (!is_array($tags)) {
-            return $this->respondWithError('VALIDATION_ERROR', 'Tags must be an array of strings', 'tags', 400);
+            return $this->respondWithError('VALIDATION_ERROR', __('api.listing_tags_must_be_array'), 'tags', 400);
         }
 
         $success = $this->listingSkillTagService->setTags($id, $tags);
 
         if (!$success) {
-            return $this->respondWithError('NOT_FOUND', 'Listing not found', null, 404);
+            return $this->respondWithError('NOT_FOUND', __('api.listing_not_found'), null, 404);
         }
 
         $updatedTags = $this->listingSkillTagService->getTags($id);
@@ -603,16 +603,16 @@ class ListingsController extends BaseApiController
         // Verify listing exists and user can modify it
         $listing = $this->listingService->getById($id);
         if (!$listing) {
-            return $this->respondWithError('NOT_FOUND', 'Listing not found', null, 404);
+            return $this->respondWithError('NOT_FOUND', __('api.listing_not_found'), null, 404);
         }
 
         if (!$this->listingService->canModify($listing, $userId)) {
-            return $this->respondWithError('FORBIDDEN', 'You do not have permission to modify this listing', null, 403);
+            return $this->respondWithError('FORBIDDEN', __('api.listing_modify_forbidden'), null, 403);
         }
 
         $file = request()->file('image');
         if (!$file || !$file->isValid()) {
-            return $this->respondWithError('VALIDATION_ERROR', 'No image file uploaded or upload error', 'image', 400);
+            return $this->respondWithError('VALIDATION_ERROR', __('api.listing_no_image_uploaded'), 'image', 400);
         }
 
         try {
@@ -633,7 +633,7 @@ class ListingsController extends BaseApiController
             return $this->respondWithData(['image_url' => $imageUrl]);
         } catch (\Exception $e) {
             \Log::error('Listing image upload failed', ['error' => $e->getMessage()]);
-            return $this->respondWithError('UPLOAD_FAILED', 'Failed to upload image', 'image', 500);
+            return $this->respondWithError('UPLOAD_FAILED', __('api.listing_image_upload_failed'), 'image', 500);
         }
     }
 }

@@ -87,7 +87,7 @@ class AdminSettingsController extends BaseApiController
         $data = $this->getAllInput();
 
         if (empty($data)) {
-            return $this->respondWithError('VALIDATION_ERROR', 'No settings provided', null, 422);
+            return $this->respondWithError('VALIDATION_ERROR', __('api.no_settings_provided'), null, 422);
         }
 
         $isSuperAdmin = $this->isSuperAdmin();
@@ -189,9 +189,7 @@ class AdminSettingsController extends BaseApiController
 
         // Validate feature key against known features
         if (!array_key_exists($feature, TenantFeatureConfig::FEATURE_DEFAULTS)) {
-            return $this->respondWithError(
-                'VALIDATION_ERROR',
-                'Unknown feature: ' . $feature . '. Valid features: ' . implode(', ', array_keys(TenantFeatureConfig::FEATURE_DEFAULTS)),
+            return $this->respondWithError('VALIDATION_ERROR', __('api.unknown_feature_with_valid', ['feature' => $feature, 'valid' => implode(', ', array_keys(TenantFeatureConfig::FEATURE_DEFAULTS))]),
                 'feature',
                 422
             );
@@ -224,33 +222,33 @@ class AdminSettingsController extends BaseApiController
             'general.max_upload_size_mb' => (function () use ($value) {
                 $mb = (int) $value;
                 if ($mb < 1 || $mb > 50) {
-                    return 'max_upload_size_mb must be between 1 and 50';
+                    return __('api.max_upload_size_range');
                 }
                 return null;
             })(),
             'general.items_per_page' => (function () use ($value) {
                 $ipp = (int) $value;
                 if ($ipp < 5 || $ipp > 100) {
-                    return 'items_per_page must be between 5 and 100';
+                    return __('api.items_per_page_range');
                 }
                 return null;
             })(),
             'general.welcome_credits' => (function () use ($value) {
                 $wc = (int) $value;
                 if ($wc < 0 || $wc > 100) {
-                    return 'welcome_credits must be between 0 and 100';
+                    return __('api.welcome_credits_range');
                 }
                 return null;
             })(),
             'general.maintenance_mode' => (function () use ($value) {
                 if (!in_array((string) $value, ['true', 'false', '1', '0'], true)) {
-                    return 'maintenance_mode must be a boolean value';
+                    return __('api.maintenance_mode_boolean');
                 }
                 return null;
             })(),
             'general.registration_mode' => (function () use ($value) {
                 if (!in_array($value, ['open', 'closed', 'invite_only'], true)) {
-                    return 'registration_mode must be one of: open, closed, invite_only';
+                    return __('api.registration_mode_invalid');
                 }
                 return null;
             })(),

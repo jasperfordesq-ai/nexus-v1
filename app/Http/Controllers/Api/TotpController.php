@@ -91,18 +91,18 @@ class TotpController extends BaseApiController
 
             // Validate CSRF for session-based requests
             if (!Csrf::verify($csrfToken)) {
-                return $this->respondWithError(ApiErrorCodes::AUTH_CSRF_INVALID, 'Invalid CSRF token', null, 403);
+                return $this->respondWithError(ApiErrorCodes::AUTH_CSRF_INVALID, __('api.invalid_csrf_token'), null, 403);
             }
 
             // Check for pending 2FA session
             if (empty($_SESSION['pending_2fa_user_id'])) {
-                return $this->respondWithError(ApiErrorCodes::AUTH_2FA_EXPIRED, 'No pending 2FA session', null, 401);
+                return $this->respondWithError(ApiErrorCodes::AUTH_2FA_EXPIRED, __('api.no_pending_2fa_session'), null, 401);
             }
 
             // Check session expiry
             if (($_SESSION['pending_2fa_expires'] ?? 0) < time()) {
                 unset($_SESSION['pending_2fa_user_id'], $_SESSION['pending_2fa_expires']);
-                return $this->respondWithError(ApiErrorCodes::AUTH_2FA_EXPIRED, 'Session expired', null, 401);
+                return $this->respondWithError(ApiErrorCodes::AUTH_2FA_EXPIRED, __('api.session_expired'), null, 401);
             }
 
             $userId = (int)$_SESSION['pending_2fa_user_id'];
@@ -110,7 +110,7 @@ class TotpController extends BaseApiController
 
         // Validate code is provided
         if (empty($code)) {
-            return $this->respondWithError(ApiErrorCodes::VALIDATION_REQUIRED_FIELD, 'Code is required', 'code', 400);
+            return $this->respondWithError(ApiErrorCodes::VALIDATION_REQUIRED_FIELD, __('api.code_required'), 'code', 400);
         }
 
         // Verify the code
@@ -153,12 +153,12 @@ class TotpController extends BaseApiController
         $user = $userRow ? (array)$userRow : null;
 
         if (!$user) {
-            return $this->respondWithError(ApiErrorCodes::RESOURCE_NOT_FOUND, 'User not found', null, 401);
+            return $this->respondWithError(ApiErrorCodes::RESOURCE_NOT_FOUND, __('api.user_not_found'), null, 401);
         }
 
         // SECURITY: Block suspended/banned users from completing 2FA login
         if (($user['status'] ?? 'active') !== 'active') {
-            return $this->respondWithError(ApiErrorCodes::AUTH_ACCOUNT_SUSPENDED, 'Account suspended', null, 403);
+            return $this->respondWithError(ApiErrorCodes::AUTH_ACCOUNT_SUSPENDED, __('api.account_suspended'), null, 403);
         }
 
         // SECURITY: Enforce registration policy gates after 2FA completion

@@ -34,7 +34,7 @@ class AdminFederationExternalPartnersController extends BaseApiController
             $partners = FederationExternalPartnerService::getAll($tenantId);
             return $this->respondWithData($partners);
         } catch (\Exception $e) {
-            return $this->respondWithError('FETCH_FAILED', 'Failed to load external partners', null, 500);
+            return $this->respondWithError('FETCH_FAILED', __('api.external_partners_fetch_failed'), null, 500);
         }
     }
 
@@ -52,9 +52,7 @@ class AdminFederationExternalPartnersController extends BaseApiController
         $result = FederationExternalPartnerService::create($input, $tenantId, $adminId);
 
         if (!$result['success']) {
-            return $this->respondWithError(
-                'CREATE_FAILED',
-                $result['error'] ?? 'Failed to create external partner',
+            return $this->respondWithError('CREATE_FAILED', $result['error'] ?? __('api.external_partner_create_failed'),
                 null,
                 422
             );
@@ -77,9 +75,7 @@ class AdminFederationExternalPartnersController extends BaseApiController
         $result = FederationExternalPartnerService::update($id, $input, $tenantId, $adminId);
 
         if (!$result['success']) {
-            return $this->respondWithError(
-                'UPDATE_FAILED',
-                $result['error'] ?? 'Failed to update external partner',
+            return $this->respondWithError('UPDATE_FAILED', $result['error'] ?? __('api.external_partner_update_failed'),
                 null,
                 422
             );
@@ -101,9 +97,7 @@ class AdminFederationExternalPartnersController extends BaseApiController
         $result = FederationExternalPartnerService::delete($id, $tenantId, $adminId);
 
         if (!$result['success']) {
-            return $this->respondWithError(
-                'DELETE_FAILED',
-                $result['error'] ?? 'Failed to delete external partner',
+            return $this->respondWithError('DELETE_FAILED', $result['error'] ?? __('api.external_partner_delete_failed'),
                 null,
                 422
             );
@@ -125,7 +119,7 @@ class AdminFederationExternalPartnersController extends BaseApiController
         // Verify partner exists and belongs to tenant
         $partner = FederationExternalPartnerService::getById($id, $tenantId);
         if (!$partner) {
-            return $this->respondWithError('NOT_FOUND', 'Partner not found', null, 404);
+            return $this->respondWithError('NOT_FOUND', __('api.partnership_not_found'), null, 404);
         }
 
         $startTime = microtime(true);
@@ -140,9 +134,7 @@ class AdminFederationExternalPartnersController extends BaseApiController
             ]);
         }
 
-        return $this->respondWithError(
-            'HEALTH_CHECK_FAILED',
-            $result['error'] ?? 'Health check failed',
+        return $this->respondWithError('HEALTH_CHECK_FAILED', $result['error'] ?? __('api.health_check_failed'),
             null,
             502
         );
@@ -161,14 +153,14 @@ class AdminFederationExternalPartnersController extends BaseApiController
         // Verify partner exists and belongs to tenant
         $partner = FederationExternalPartnerService::getById($id, $tenantId);
         if (!$partner) {
-            return $this->respondWithError('NOT_FOUND', 'Partner not found', null, 404);
+            return $this->respondWithError('NOT_FOUND', __('api.partnership_not_found'), null, 404);
         }
 
         try {
             $logs = FederationExternalPartnerService::getLogs($id, 100);
             return $this->respondWithData($logs);
         } catch (\Exception $e) {
-            return $this->respondWithError('FETCH_FAILED', 'Failed to load partner logs', null, 500);
+            return $this->respondWithError('FETCH_FAILED', __('api.partner_logs_fetch_failed'), null, 500);
         }
     }
 }

@@ -66,7 +66,7 @@ class SubAccountController extends BaseApiController
         $permissions = $data['permissions'] ?? [];
 
         if ($childUserId <= 0) {
-            return $this->respondWithError('VALIDATION_ERROR', 'child_user_id is required', 'child_user_id', 400);
+            return $this->respondWithError('VALIDATION_ERROR', __('api.missing_required_field', ['field' => 'child_user_id']), 'child_user_id', 400);
         }
 
         $relationshipId = $this->subAccountService->requestRelationship($userId, $childUserId, $relationshipType, $permissions);
@@ -105,7 +105,7 @@ class SubAccountController extends BaseApiController
         $permissions = $data['permissions'] ?? [];
 
         if (empty($permissions)) {
-            return $this->respondWithError('VALIDATION_ERROR', 'permissions object is required', 'permissions', 400);
+            return $this->respondWithError('VALIDATION_ERROR', __('api.missing_required_field', ['field' => 'permissions']), 'permissions', 400);
         }
 
         $success = $this->subAccountService->updatePermissions($userId, (int) $id, $permissions);

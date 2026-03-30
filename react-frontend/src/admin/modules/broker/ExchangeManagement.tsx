@@ -91,13 +91,13 @@ export function ExchangeManagement() {
         : await adminBroker.rejectExchange(item.id, actionText);
 
       if (res?.success) {
-        toast.success(`Exchange ${type}d successfully`);
+        toast.success(t('broker.exchange_action_success', { type }));
         loadItems();
       } else {
-        toast.error(res?.error || `Failed to ${type} exchange`);
+        toast.error(res?.error || t('broker.exchange_action_failed', { type }));
       }
     } catch {
-      toast.error(`Failed to ${type} exchange`);
+      toast.error(t('broker.exchange_action_failed', { type }));
     } finally {
       setActionLoading(false);
       setActionModal(null);
@@ -113,7 +113,7 @@ export function ExchangeManagement() {
   const columns: Column<ExchangeRequest>[] = [
     {
       key: 'requester_name',
-      label: 'Requester',
+      label: t('broker.col_requester'),
       sortable: true,
       render: (item) => (
         <span className="font-medium text-foreground">{item.requester_name}</span>
@@ -121,7 +121,7 @@ export function ExchangeManagement() {
     },
     {
       key: 'provider_name',
-      label: 'Provider',
+      label: t('broker.col_provider'),
       sortable: true,
       render: (item) => (
         <span className="font-medium text-foreground">{item.provider_name}</span>
@@ -129,7 +129,7 @@ export function ExchangeManagement() {
     },
     {
       key: 'listing_title',
-      label: 'Listing',
+      label: t('broker.col_listing'),
       sortable: true,
       render: (item) => (
         <span className="text-sm text-default-600">
@@ -139,13 +139,13 @@ export function ExchangeManagement() {
     },
     {
       key: 'status',
-      label: 'Status',
+      label: t('broker.col_status'),
       sortable: true,
       render: (item) => <StatusBadge status={item.status} />,
     },
     {
       key: 'final_hours',
-      label: 'Hours',
+      label: t('broker.col_hours'),
       sortable: true,
       render: (item) => (
         <span className="text-sm">
@@ -155,7 +155,7 @@ export function ExchangeManagement() {
     },
     {
       key: 'created_at',
-      label: 'Date',
+      label: t('broker.col_date'),
       sortable: true,
       render: (item) => (
         <span className="text-sm text-default-500">
@@ -165,7 +165,7 @@ export function ExchangeManagement() {
     },
     {
       key: 'actions',
-      label: 'Actions',
+      label: t('broker.col_actions'),
       render: (item) => (
         <div className="flex gap-1">
           <Button
@@ -221,7 +221,7 @@ export function ExchangeManagement() {
             startContent={<ArrowLeft size={16} />}
             size="sm"
           >
-            Back
+            {t('common.back')}
           </Button>
         }
       />
@@ -233,13 +233,13 @@ export function ExchangeManagement() {
           variant="underlined"
           size="sm"
         >
-          <Tab key="all" title="All" />
-          <Tab key="pending_broker" title="Pending" />
-          <Tab key="accepted" title="Approved" />
-          <Tab key="in_progress" title="In Progress" />
-          <Tab key="completed" title="Completed" />
-          <Tab key="cancelled" title="Cancelled" />
-          <Tab key="disputed" title="Disputed" />
+          <Tab key="all" title={t('broker.tab_all')} />
+          <Tab key="pending_broker" title={t('broker.tab_pending')} />
+          <Tab key="accepted" title={t('broker.tab_approved')} />
+          <Tab key="in_progress" title={t('broker.tab_in_progress')} />
+          <Tab key="completed" title={t('broker.tab_completed')} />
+          <Tab key="cancelled" title={t('broker.tab_cancelled')} />
+          <Tab key="disputed" title={t('broker.tab_disputed')} />
         </Tabs>
       </div>
 
@@ -263,27 +263,27 @@ export function ExchangeManagement() {
               {actionModal.type === 'approve' ? (
                 <>
                   <CheckCircle size={20} className="text-success" />
-                  Approve Exchange
+                  {t('broker.approve_exchange')}
                 </>
               ) : (
                 <>
                   <XCircle size={20} className="text-danger" />
-                  Reject Exchange
+                  {t('broker.reject_exchange')}
                 </>
               )}
             </ModalHeader>
             <ModalBody>
               <p className="text-default-600 mb-3">
                 {actionModal.type === 'approve'
-                  ? `Approve the exchange request from ${actionModal.item.requester_name} to ${actionModal.item.provider_name}?`
-                  : `Reject the exchange request from ${actionModal.item.requester_name} to ${actionModal.item.provider_name}?`
+                  ? t('broker.confirm_approve_exchange', { requester: actionModal.item.requester_name, provider: actionModal.item.provider_name })
+                  : t('broker.confirm_reject_exchange', { requester: actionModal.item.requester_name, provider: actionModal.item.provider_name })
                 }
               </p>
               <Textarea
-                label={actionModal.type === 'approve' ? 'Notes (optional)' : 'Reason (required)'}
+                label={actionModal.type === 'approve' ? t('broker.label_notes_optional') : t('broker.label_reason_required')}
                 placeholder={actionModal.type === 'approve'
-                  ? 'Add optional notes for this approval...'
-                  : 'Provide a reason for rejection...'
+                  ? t('broker.placeholder_approval_notes')
+                  : t('broker.placeholder_rejection_reason')
                 }
                 value={actionText}
                 onValueChange={setActionText}
@@ -298,14 +298,14 @@ export function ExchangeManagement() {
                 onPress={() => { setActionModal(null); setActionText(''); }}
                 isDisabled={actionLoading}
               >
-                Cancel
+                {t('common.cancel')}
               </Button>
               <Button
                 color={actionModal.type === 'approve' ? 'success' : 'danger'}
                 onPress={handleAction}
                 isLoading={actionLoading}
               >
-                {actionModal.type === 'approve' ? 'Approve' : 'Reject'}
+                {actionModal.type === 'approve' ? t('broker.approve') : t('broker.reject')}
               </Button>
             </ModalFooter>
           </ModalContent>

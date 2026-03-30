@@ -44,7 +44,7 @@ class VoiceMessageController extends BaseApiController
         $duration = (int) request()->input('duration', 0);
 
         if (!$receiverId) {
-            return $this->respondWithError('VALIDATION_ERROR', 'Receiver ID is required', 'receiver_id', 400);
+            return $this->respondWithError('VALIDATION_ERROR', __('api.missing_required_field', ['field' => 'receiver_id']), 'receiver_id', 400);
         }
 
         try {
@@ -66,7 +66,7 @@ class VoiceMessageController extends BaseApiController
                 $mimeType = request()->input('mime_type', 'audio/webm');
                 $audioResult = AudioUploader::uploadFromBase64(request()->input('audio_data'), $mimeType, $duration);
             } else {
-                return $this->respondWithError('VALIDATION_ERROR', 'No audio data provided', 'audio', 400);
+                return $this->respondWithError('VALIDATION_ERROR', __('api.no_audio_data_provided'), 'audio', 400);
             }
 
             // Create voice message via MessageService::send() (consistent with MessagesController)
@@ -159,7 +159,7 @@ class VoiceMessageController extends BaseApiController
             ], null, 201);
         } catch (\Exception $e) {
             Log::error('Voice message store failed', ['error' => $e->getMessage(), 'trace' => $e->getTraceAsString()]);
-            return $this->respondWithError('UPLOAD_FAILED', 'Failed to upload audio file', 'audio', 400);
+            return $this->respondWithError('UPLOAD_FAILED', __('api.audio_upload_failed'), 'audio', 400);
         }
     }
 }

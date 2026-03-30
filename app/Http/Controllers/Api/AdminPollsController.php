@@ -63,7 +63,7 @@ class AdminPollsController extends BaseApiController
         $poll = $this->pollService->getById($id);
 
         if (!$poll) {
-            return $this->respondWithError('NOT_FOUND', 'Poll not found', null, 404);
+            return $this->respondWithError('NOT_FOUND', __('api.poll_not_found'), null, 404);
         }
 
         return $this->respondWithData($poll);
@@ -78,7 +78,7 @@ class AdminPollsController extends BaseApiController
 
         $poll = $this->pollService->getById($id);
         if (!$poll) {
-            return $this->respondWithError('NOT_FOUND', 'Poll not found', null, 404);
+            return $this->respondWithError('NOT_FOUND', __('api.poll_not_found'), null, 404);
         }
 
         $deleted = $this->pollService->delete($id, $adminId);
@@ -87,6 +87,6 @@ class AdminPollsController extends BaseApiController
             return $this->respondWithData(['deleted' => true, 'id' => $id]);
         }
 
-        return $this->respondWithError('DELETE_FAILED', 'Failed to delete poll', null, 400);
+        return $this->respondWithError('DELETE_FAILED', __('api.poll_delete_failed'), null, 400);
     }
 }

@@ -27,7 +27,7 @@ class VolunteerCertificateController extends BaseApiController
     {
         if (!TenantContext::hasFeature('volunteering')) {
             throw new \Illuminate\Http\Exceptions\HttpResponseException(
-                $this->respondWithError('FEATURE_DISABLED', 'Volunteering module is not enabled for this community', null, 403)
+                $this->respondWithError('FEATURE_DISABLED', __('api.volunteering_feature_disabled'), null, 403)
             );
         }
     }
@@ -86,7 +86,7 @@ class VolunteerCertificateController extends BaseApiController
         $cert = $this->volunteerCertificateService->verify($code);
 
         if ($cert === null) {
-            return $this->respondWithError('NOT_FOUND', 'Certificate not found or invalid', null, 404);
+            return $this->respondWithError('NOT_FOUND', __('api.certificate_not_found'), null, 404);
         }
 
         return $this->respondWithData($cert);
@@ -100,7 +100,7 @@ class VolunteerCertificateController extends BaseApiController
         $html = $this->volunteerCertificateService->generateHtml($code);
 
         if ($html === null) {
-            return $this->respondWithError('NOT_FOUND', 'Certificate not found', null, 404);
+            return $this->respondWithError('NOT_FOUND', __('api.certificate_not_found'), null, 404);
         }
 
         $this->volunteerCertificateService->markDownloaded($code);
@@ -164,7 +164,7 @@ class VolunteerCertificateController extends BaseApiController
         $expiresAt = $this->input('expires_at') ?? $this->input('expiry_date');
 
         if (empty($type)) {
-            return $this->respondWithError('VALIDATION_ERROR', 'Credential type is required', 'credential_type');
+            return $this->respondWithError('VALIDATION_ERROR', __('api.missing_required_field', ['field' => 'credential_type']), 'credential_type');
         }
 
         // Support both Laravel UploadedFile and raw $_FILES
@@ -175,10 +175,10 @@ class VolunteerCertificateController extends BaseApiController
             // Laravel UploadedFile path
             $allowedMimes = ['application/pdf', 'image/jpeg', 'image/png', 'image/webp'];
             if (!in_array($file->getMimeType(), $allowedMimes, true)) {
-                return $this->respondWithError('VALIDATION_ERROR', 'Only PDF, JPEG, PNG, and WebP files are allowed', 'file');
+                return $this->respondWithError('VALIDATION_ERROR', __('api.credential_file_types'), 'file');
             }
             if ($file->getSize() > 10 * 1024 * 1024) {
-                return $this->respondWithError('VALIDATION_ERROR', 'File size must be under 10 MB', 'file');
+                return $this->respondWithError('VALIDATION_ERROR', __('api.file_exceeds_limit'), 'file');
             }
             // Build $_FILES-compatible array for ImageUploader
             $uploadedFile = [
@@ -192,16 +192,16 @@ class VolunteerCertificateController extends BaseApiController
             // Fallback to raw $_FILES
             $uploadedFile = $_FILES['file'] ?? $_FILES['document'] ?? null;
             if (empty($uploadedFile) || !isset($uploadedFile['error']) || $uploadedFile['error'] !== UPLOAD_ERR_OK) {
-                return $this->respondWithError('VALIDATION_ERROR', 'A credential file is required', 'file');
+                return $this->respondWithError('VALIDATION_ERROR', __('api.credential_file_required'), 'file');
             }
             $allowedMimes = ['application/pdf', 'image/jpeg', 'image/png', 'image/webp'];
             $finfo = new \finfo(FILEINFO_MIME_TYPE);
             $mimeType = $finfo->file($uploadedFile['tmp_name']);
             if (!in_array($mimeType, $allowedMimes, true)) {
-                return $this->respondWithError('VALIDATION_ERROR', 'Only PDF, JPEG, PNG, and WebP files are allowed', 'file');
+                return $this->respondWithError('VALIDATION_ERROR', __('api.credential_file_types'), 'file');
             }
             if (($uploadedFile['size'] ?? 0) > 10 * 1024 * 1024) {
-                return $this->respondWithError('VALIDATION_ERROR', 'File size must be under 10 MB', 'file');
+                return $this->respondWithError('VALIDATION_ERROR', __('api.file_exceeds_limit'), 'file');
             }
         }
 
@@ -233,7 +233,7 @@ class VolunteerCertificateController extends BaseApiController
         );
 
         if ($affected === 0) {
-            return $this->respondWithError('NOT_FOUND', 'Credential not found', null, 404);
+            return $this->respondWithError('NOT_FOUND', __('api.credential_not_found'), null, 404);
         }
 
         return $this->respondWithData(['success' => true]);

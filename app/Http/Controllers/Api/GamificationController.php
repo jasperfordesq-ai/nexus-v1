@@ -55,7 +55,7 @@ class GamificationController extends BaseApiController
         $profile = $this->gamificationService->getProfile($targetUserId, $this->getTenantId());
 
         if (empty($profile)) {
-            return $this->respondWithError('RESOURCE_NOT_FOUND', 'User not found', null, 404);
+            return $this->respondWithError('RESOURCE_NOT_FOUND', __('api.user_not_found'), null, 404);
         }
 
         $profile['is_own_profile'] = ($targetUserId === $userId);
@@ -127,7 +127,7 @@ class GamificationController extends BaseApiController
         $result = $this->gamificationService->claimDailyReward($userId, $this->getTenantId());
 
         if ($result === null) {
-            return $this->respondWithError('ALREADY_CLAIMED', 'Daily reward already claimed today', null, 409);
+            return $this->respondWithError('ALREADY_CLAIMED', __('api.daily_reward_already_claimed'), null, 409);
         }
 
         return $this->respondWithData($result);

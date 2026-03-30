@@ -52,7 +52,7 @@ class NewsletterController extends BaseApiController
         $newsletter = $this->newsletterService->getById($id, $tenantId);
 
         if ($newsletter === null) {
-            return $this->respondWithError('NOT_FOUND', 'Newsletter not found', null, 404);
+            return $this->respondWithError('NOT_FOUND', __('api.newsletter_not_found'), null, 404);
         }
 
         return $this->respondWithData($newsletter);
@@ -86,7 +86,7 @@ class NewsletterController extends BaseApiController
         $result = $this->newsletterService->send($id, $tenantId);
 
         if ($result === null) {
-            return $this->respondWithError('NOT_FOUND', 'Newsletter not found', null, 404);
+            return $this->respondWithError('NOT_FOUND', __('api.newsletter_not_found'), null, 404);
         }
 
         return $this->respondWithData($result);
@@ -107,7 +107,7 @@ class NewsletterController extends BaseApiController
         $token = trim($input['token'] ?? $this->query('token', ''));
 
         if (empty($token)) {
-            return $this->respondWithError('VALIDATION_ERROR', 'Unsubscribe token is required.', 'token', 400);
+            return $this->respondWithError('VALIDATION_ERROR', __('api.unsubscribe_token_required'), 'token', 400);
         }
 
         $subscriber = DB::table('newsletter_subscribers')
@@ -115,7 +115,7 @@ class NewsletterController extends BaseApiController
             ->first();
 
         if (! $subscriber) {
-            return $this->respondWithError('NOT_FOUND', 'This unsubscribe link is invalid or has already been used.', null, 404);
+            return $this->respondWithError('NOT_FOUND', __('api.invalid_unsubscribe_link'), null, 404);
         }
 
         if ($subscriber->status === 'unsubscribed') {
@@ -137,7 +137,7 @@ class NewsletterController extends BaseApiController
             return $this->respondWithData(['unsubscribed' => true]);
         }
 
-        return $this->respondWithError('SERVER_ERROR', 'Unable to process your request. Please try again.', null, 500);
+        return $this->respondWithError('SERVER_ERROR', __('api.unable_to_process_request'), null, 500);
     }
 
     /**

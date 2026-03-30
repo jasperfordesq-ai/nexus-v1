@@ -195,7 +195,7 @@ class AdminFeedController extends BaseApiController
         );
 
         if (!$row) {
-            return $this->respondWithError('NOT_FOUND', 'Post not found', null, 404);
+            return $this->respondWithError('NOT_FOUND', __('api.post_not_found'), null, 404);
         }
 
         $rowTenantId = (int) $row->tenant_id;
@@ -250,7 +250,7 @@ class AdminFeedController extends BaseApiController
         );
 
         if (!$row) {
-            return $this->respondWithError('NOT_FOUND', 'Feed item not found', null, 404);
+            return $this->respondWithError('NOT_FOUND', __('api.feed_item_not_found'), null, 404);
         }
 
         $itemTenantId = (int) $row->tenant_id;
@@ -321,7 +321,7 @@ class AdminFeedController extends BaseApiController
         );
 
         if (!$row) {
-            return $this->respondWithError('NOT_FOUND', 'Feed item not found', null, 404);
+            return $this->respondWithError('NOT_FOUND', __('api.feed_item_not_found'), null, 404);
         }
 
         $itemTenantId = (int) $row->tenant_id;

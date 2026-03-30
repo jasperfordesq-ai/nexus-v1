@@ -173,18 +173,18 @@ class ResourcesController extends BaseApiController
 
         $title = trim(request()->input('title', ''));
         if (empty($title)) {
-            return $this->respondWithError('VALIDATION_REQUIRED_FIELD', 'Title is required', 'title', 400);
+            return $this->respondWithError('VALIDATION_REQUIRED_FIELD', __('api.title_required'), 'title', 400);
         }
 
         $file = request()->file('file');
         if (!$file || !$file->isValid()) {
-            return $this->respondWithError('VALIDATION_REQUIRED_FIELD', 'File is required', 'file', 400);
+            return $this->respondWithError('VALIDATION_REQUIRED_FIELD', __('api.file_required'), 'file', 400);
         }
 
         // Verify temp file exists on disk (Docker overlay FS can lose temp files)
         $tmpPath = $file->getPathname();
         if (!file_exists($tmpPath)) {
-            return $this->respondWithError('FILE_UPLOAD_FAILED', 'Upload failed: temporary file not found. Please try again.', 'file', 500);
+            return $this->respondWithError('FILE_UPLOAD_FAILED', __('api.upload_temp_file_not_found'), 'file', 500);
         }
 
         $maxSize = 10 * 1024 * 1024; // 10MB
@@ -194,12 +194,12 @@ class ResourcesController extends BaseApiController
         // Use filesize() for reliable stat — SplFileInfo::getSize() throws ErrorException in Laravel
         $fileSize = (int) filesize($tmpPath);
         if ($fileSize > $maxSize) {
-            return $this->respondWithError('FILE_TOO_LARGE', 'File exceeds 10MB limit', 'file', 400);
+            return $this->respondWithError('FILE_TOO_LARGE', __('api.file_exceeds_limit'), 'file', 400);
         }
 
         $ext = strtolower($file->getClientOriginalExtension());
         if (!in_array($ext, $allowedExts, true)) {
-            return $this->respondWithError('FILE_TYPE_NOT_ALLOWED', 'File type not allowed', 'file', 400);
+            return $this->respondWithError('FILE_TYPE_NOT_ALLOWED', __('api.file_type_not_allowed'), 'file', 400);
         }
 
         // Double-check MIME type via file content inspection (not just extension)
@@ -207,7 +207,7 @@ class ResourcesController extends BaseApiController
         $detectedMime = $file->getMimeType();
         $blockedMimes = ['text/html', 'application/xhtml+xml', 'image/svg+xml', 'application/x-httpd-php'];
         if ($detectedMime && in_array($detectedMime, $blockedMimes, true)) {
-            return $this->respondWithError('FILE_TYPE_NOT_ALLOWED', 'This file type is not allowed (HTML/SVG/PHP)', 'file', 400);
+            return $this->respondWithError('FILE_TYPE_NOT_ALLOWED', __('api.file_type_blocked'), 'file', 400);
         }
 
         // Capture MIME type BEFORE move() invalidates the temp file
@@ -273,12 +273,12 @@ class ResourcesController extends BaseApiController
             ->first();
 
         if (!$resource) {
-            return $this->respondWithError('NOT_FOUND', 'Resource not found', null, 404);
+            return $this->respondWithError('NOT_FOUND', __('api.resource_not_found'), null, 404);
         }
 
         $filePath = $resource->file_path ?? '';
         if (empty($filePath)) {
-            return $this->respondWithError('NOT_FOUND', 'No file associated with this resource', null, 404);
+            return $this->respondWithError('NOT_FOUND', __('api.no_file_for_resource'), null, 404);
         }
 
         // Resolve full filesystem path
@@ -290,7 +290,7 @@ class ResourcesController extends BaseApiController
 
         $uploadsDir = realpath(base_path('httpdocs/uploads'));
         if (!$fullPath || !$uploadsDir || !str_starts_with($fullPath, $uploadsDir) || !file_exists($fullPath)) {
-            return $this->respondWithError('NOT_FOUND', 'File not found', null, 404);
+            return $this->respondWithError('NOT_FOUND', __('api.file_not_found'), null, 404);
         }
 
         // Increment download counter
@@ -333,7 +333,7 @@ class ResourcesController extends BaseApiController
             ->first();
 
         if (! $resource) {
-            return $this->respondWithError('NOT_FOUND', 'Resource not found', null, 404);
+            return $this->respondWithError('NOT_FOUND', __('api.resource_not_found'), null, 404);
         }
 
         // Check ownership or admin role
@@ -343,7 +343,7 @@ class ResourcesController extends BaseApiController
         $isAdmin = in_array($role, ['admin', 'super_admin', 'tenant_admin'], true);
 
         if (! $isOwner && ! $isAdmin) {
-            return $this->respondWithError('FORBIDDEN', 'You do not have permission to delete this resource', null, 403);
+            return $this->respondWithError('FORBIDDEN', __('api.no_permission_delete_resource'), null, 403);
         }
 
         // Delete file from disk

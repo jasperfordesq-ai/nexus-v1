@@ -47,7 +47,7 @@ class PeerEndorsementController extends BaseApiController
 
         // Prevent self-endorsement
         if ($endorserId === $id) {
-            return $this->respondWithError('SELF_ENDORSEMENT', 'You cannot endorse yourself', null, 422);
+            return $this->respondWithError('SELF_ENDORSEMENT', __('api.cannot_endorse_yourself'), null, 422);
         }
 
         // Verify the target user exists in the current tenant
@@ -58,7 +58,7 @@ class PeerEndorsementController extends BaseApiController
             ->first();
 
         if (!$targetUser) {
-            return $this->respondWithError('RESOURCE_NOT_FOUND', 'User not found', null, 404);
+            return $this->respondWithError('RESOURCE_NOT_FOUND', __('api.user_not_found'), null, 404);
         }
 
         // Insert with INSERT IGNORE for idempotency (duplicate endorsements are silently ignored)

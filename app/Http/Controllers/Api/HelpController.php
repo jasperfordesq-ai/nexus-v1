@@ -98,7 +98,7 @@ class HelpController extends BaseApiController
         if ($question === '') {
             return $this->respondWithError(
                 'VALIDATION_REQUIRED_FIELD',
-                'Question is required',
+                __('api.question_required'),
                 'question',
                 400
             );
@@ -107,7 +107,7 @@ class HelpController extends BaseApiController
         if ($answer === '') {
             return $this->respondWithError(
                 'VALIDATION_REQUIRED_FIELD',
-                'Answer is required',
+                __('api.answer_required'),
                 'answer',
                 400
             );
@@ -144,7 +144,7 @@ class HelpController extends BaseApiController
         if (empty($data)) {
             return $this->respondWithError(
                 'VALIDATION_NO_FIELDS',
-                'No fields provided to update',
+                __('api.no_fields_provided'),
                 null,
                 400
             );
@@ -167,7 +167,7 @@ class HelpController extends BaseApiController
         if (empty($updates)) {
             return $this->respondWithError(
                 'VALIDATION_NO_FIELDS',
-                'No valid fields provided to update',
+                __('api.no_fields_provided'),
                 null,
                 400
             );
@@ -243,7 +243,7 @@ class HelpController extends BaseApiController
             }
 
             if ($exists) {
-                return $this->respondWithError('DUPLICATE_ERROR', 'Feedback already submitted');
+                return $this->respondWithError('DUPLICATE_ERROR', __('api.feedback_already_submitted'));
             }
 
             DB::table('help_article_feedback')->insert([

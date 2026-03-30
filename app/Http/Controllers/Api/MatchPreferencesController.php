@@ -81,7 +81,7 @@ class MatchPreferencesController extends BaseApiController
         $success = $this->matchingService->savePreferences($userId, $updated);
 
         if (!$success) {
-            return $this->respondWithError('SERVER_ERROR', 'Failed to save match preferences');
+            return $this->respondWithError('SERVER_ERROR', __('api.failed_save_match_preferences'));
         }
 
         return $this->respondWithData($this->matchingService->getPreferences($userId));

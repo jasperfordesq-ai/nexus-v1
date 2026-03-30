@@ -12,6 +12,7 @@ import { Card, CardBody, Switch, Chip, Button, Spinner, Tabs, Tab } from '@herou
 import { Award, RotateCcw, Shield, Star, Gem, Zap } from 'lucide-react';
 import { usePageTitle } from '@/hooks';
 import { useToast } from '@/contexts';
+import { useTranslation } from 'react-i18next';
 import { adminGamification } from '../../api/adminApi';
 import { PageHeader } from '../../components';
 import type { BadgeConfigEntry } from '../../api/types';
@@ -46,7 +47,8 @@ const CLASS_ICONS: Record<string, typeof Award> = {
 type FilterTab = 'all' | 'core' | 'template' | 'custom' | 'quality';
 
 export function BadgeConfiguration() {
-  usePageTitle('Badge Configuration');
+  const { t } = useTranslation('admin');
+  usePageTitle(t('badge_configuration.page_title'));
   const toast = useToast();
 
   const [badges, setBadges] = useState<BadgeConfigEntry[]>([]);
@@ -114,7 +116,7 @@ export function BadgeConfiguration() {
   if (loading) {
     return (
       <div>
-        <PageHeader title="Badge Configuration" description="Configure which badges are available for your community" />
+        <PageHeader title={t('badge_configuration.page_title')} description={t('badge_configuration.description')} />
         <div className="flex items-center justify-center py-24">
           <Spinner size="lg" />
         </div>
@@ -125,12 +127,12 @@ export function BadgeConfiguration() {
   return (
     <div>
       <PageHeader
-        title="Badge Configuration"
-        description="Configure which badges are available for your community"
+        title={t('badge_configuration.page_title')}
+        description={t('badge_configuration.description')}
       />
 
       <Tabs
-        aria-label="Badge filter"
+        aria-label={t('badge_configuration.aria_badge_filter')}
         selectedKey={filter}
         onSelectionChange={(key) => setFilter(key as FilterTab)}
         className="mb-6"

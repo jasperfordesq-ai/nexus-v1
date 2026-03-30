@@ -47,7 +47,7 @@ class VolunteerCommunityController extends BaseApiController
     {
         if (!TenantContext::hasFeature('volunteering')) {
             throw new \Illuminate\Http\Exceptions\HttpResponseException(
-                $this->respondWithError('FEATURE_DISABLED', 'Volunteering module is not enabled for this community', null, 403)
+                $this->respondWithError('FEATURE_DISABLED', __('api.vol_feature_disabled'), null, 403)
             );
         }
     }
@@ -112,11 +112,11 @@ class VolunteerCommunityController extends BaseApiController
             ->first();
 
         if (!$entry) {
-            return $this->respondWithError('NOT_FOUND', 'Waitlist entry not found', null, 404);
+            return $this->respondWithError('NOT_FOUND', __('api.vol_waitlist_not_found'), null, 404);
         }
 
         if ((int) $entry->user_id !== $userId) {
-            return $this->respondWithError('FORBIDDEN', 'You can only claim your own waitlist spot', null, 403);
+            return $this->respondWithError('FORBIDDEN', __('api.vol_waitlist_own_only'), null, 403);
         }
 
         $success = $this->shiftWaitlistService->promoteUser((int) $id, $tenantId);
@@ -180,7 +180,7 @@ class VolunteerCommunityController extends BaseApiController
 
         $action = $this->input('action');
         if (!$action || !in_array($action, ['accept', 'reject'])) {
-            return $this->respondWithError('VALIDATION_ERROR', 'Action must be accept or reject', 'action', 400);
+            return $this->respondWithError('VALIDATION_ERROR', __('api.vol_action_accept_reject'), 'action', 400);
         }
 
         $success = $this->shiftSwapService->respond((int) $id, $userId, $action);
@@ -237,7 +237,7 @@ class VolunteerCommunityController extends BaseApiController
 
         $action = $this->input('action');
         if (!$action || !in_array($action, ['approve', 'reject'])) {
-            return $this->respondWithError('VALIDATION_ERROR', 'Action must be approve or reject', 'action', 400);
+            return $this->respondWithError('VALIDATION_ERROR', __('api.vol_action_approve_reject'), 'action', 400);
         }
 
         $success = $this->shiftSwapService->adminDecision((int) $id, $adminId, $action);
@@ -262,7 +262,7 @@ class VolunteerCommunityController extends BaseApiController
         $groupId = $this->inputInt('group_id');
         $slots = $this->inputInt('reserved_slots', 1);
         $notes = trim($this->input('notes', ''));
-        if (!$groupId) return $this->respondWithError('VALIDATION_ERROR', 'Group ID is required', 'group_id', 400);
+        if (!$groupId) return $this->respondWithError('VALIDATION_ERROR', __('api.vol_group_id_required'), 'group_id', 400);
 
         $reservationId = $this->shiftGroupReservationService->reserve((int) $id, $groupId, $userId, $slots, $notes ?: null);
         if ($reservationId === null) {
@@ -279,7 +279,7 @@ class VolunteerCommunityController extends BaseApiController
         $this->rateLimit('volunteering_group_member', 20, 60);
 
         $memberUserId = $this->inputInt('user_id');
-        if (!$memberUserId) return $this->respondWithError('VALIDATION_ERROR', 'User ID is required', 'user_id', 400);
+        if (!$memberUserId) return $this->respondWithError('VALIDATION_ERROR', __('api.vol_user_id_required'), 'user_id', 400);
 
         $success = $this->shiftGroupReservationService->addMember((int) $id, $memberUserId, $leaderId);
         if (!$success) {
@@ -454,7 +454,7 @@ class VolunteerCommunityController extends BaseApiController
         $data = $this->getAllInput();
 
         if (empty($data['field_label'])) {
-            return $this->respondWithError('VALIDATION_ERROR', 'field_label is required', 'field_label', 422);
+            return $this->respondWithError('VALIDATION_ERROR', __('api.vol_field_label_required'), 'field_label', 422);
         }
 
         try {
@@ -464,7 +464,7 @@ class VolunteerCommunityController extends BaseApiController
             return $this->respondWithError('VALIDATION_ERROR', $e->getMessage(), null, 422);
         } catch (\Exception $e) {
             error_log("VolunteerCommunityController::createCustomField error: " . $e->getMessage());
-            return $this->respondWithError('INTERNAL_ERROR', 'Failed to create custom field', null, 500);
+            return $this->respondWithError('INTERNAL_ERROR', __('api.vol_custom_field_create_failed'), null, 500);
         }
     }
 
@@ -477,7 +477,7 @@ class VolunteerCommunityController extends BaseApiController
         $result = $this->volunteerFormService->updateField((int) $id, $data);
 
         if (!$result) {
-            return $this->respondWithError('NOT_FOUND', 'Custom field not found', null, 404);
+            return $this->respondWithError('NOT_FOUND', __('api.vol_custom_field_not_found'), null, 404);
         }
 
         return $this->respondWithData(['success' => true]);
@@ -491,7 +491,7 @@ class VolunteerCommunityController extends BaseApiController
         $result = $this->volunteerFormService->deleteField((int) $id);
 
         if (!$result) {
-            return $this->respondWithError('NOT_FOUND', 'Custom field not found', null, 404);
+            return $this->respondWithError('NOT_FOUND', __('api.vol_custom_field_not_found'), null, 404);
         }
 
         return $this->respondWithData(['success' => true]);
@@ -569,7 +569,7 @@ class VolunteerCommunityController extends BaseApiController
 
         $project = $this->communityProjectService->getProposal((int) $id);
         if (!$project) {
-            return $this->respondWithError('NOT_FOUND', 'Project not found', null, 404);
+            return $this->respondWithError('NOT_FOUND', __('api.vol_project_not_found'), null, 404);
         }
         return $this->respondWithData($project);
     }
@@ -583,7 +583,7 @@ class VolunteerCommunityController extends BaseApiController
         $result = $this->communityProjectService->updateProposal((int) $id, $userId, $data);
 
         if (!$result) {
-            return $this->respondWithError('FORBIDDEN', 'Cannot update this project', null, 403);
+            return $this->respondWithError('FORBIDDEN', __('api.vol_project_update_forbidden'), null, 403);
         }
         return $this->respondWithData(['success' => true]);
     }
@@ -713,7 +713,7 @@ class VolunteerCommunityController extends BaseApiController
 
         $stats = $this->volunteerDonationService->getGivingDayStats((int) $id);
         if (!$stats) {
-            return $this->respondWithError('NOT_FOUND', 'Giving day not found', null, 404);
+            return $this->respondWithError('NOT_FOUND', __('api.vol_giving_day_not_found'), null, 404);
         }
         return $this->respondWithData($stats);
     }
@@ -849,7 +849,7 @@ class VolunteerCommunityController extends BaseApiController
 
         $allowedTypes = ['pre_shift', 'post_shift_feedback', 'lapsed_volunteer', 'credential_expiry', 'training_expiry'];
         if (!in_array($type, $allowedTypes, true)) {
-            return $this->respondWithError('VALIDATION_ERROR', 'Invalid reminder_type. Must be one of: ' . implode(', ', $allowedTypes), 'reminder_type', 422);
+            return $this->respondWithError('VALIDATION_ERROR', __('api.vol_invalid_reminder_type', ['types' => implode(', ', $allowedTypes)]), 'reminder_type', 422);
         }
 
         $result = $this->volunteerReminderService->updateSetting($type, $data);
@@ -896,7 +896,7 @@ class VolunteerCommunityController extends BaseApiController
         $result = $this->guardianConsentService->grantConsent($token, $ip);
 
         if (!$result) {
-            return $this->respondWithError('INVALID_TOKEN', 'Consent token is invalid or expired', null, 400);
+            return $this->respondWithError('INVALID_TOKEN', __('api.vol_consent_invalid_token'), null, 400);
         }
 
         return $this->respondWithData(['success' => true, 'message' => 'Guardian consent has been granted successfully.']);
@@ -910,7 +910,7 @@ class VolunteerCommunityController extends BaseApiController
 
         $result = $this->guardianConsentService->withdrawConsent((int) $id, $userId);
         if (!$result) {
-            return $this->respondWithError('NOT_FOUND', 'Consent not found', null, 404);
+            return $this->respondWithError('NOT_FOUND', __('api.vol_consent_not_found'), null, 404);
         }
 
         return $this->respondWithData(['success' => true]);

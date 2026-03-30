@@ -137,7 +137,7 @@ export default function FederationWhitelist() {
         <CardHeader>
           <h3 className="text-lg font-semibold flex items-center gap-2">
             <Plus className="w-5 h-5" />
-            Add Tenant to Whitelist
+            {t('federation_whitelist.add_tenant_to_whitelist')}
           </h3>
         </CardHeader>
         <CardBody className="space-y-4">
@@ -159,7 +159,7 @@ export default function FederationWhitelist() {
           </Select>
 
           <Textarea
-            label="Notes (Optional)"
+            label={t('federation_whitelist.label_notes_optional')}
             placeholder={t('super.placeholder_add_notes_about_why_this_tenant_is_being_whitelist')}
             value={notes}
             onValueChange={setNotes}
@@ -172,7 +172,7 @@ export default function FederationWhitelist() {
             onPress={handleAdd}
             startContent={<Plus className="w-4 h-4" />}
           >
-            Add to Whitelist
+            {t('federation_whitelist.add_to_whitelist')}
           </Button>
         </CardBody>
       </Card>
@@ -180,7 +180,7 @@ export default function FederationWhitelist() {
       {/* Whitelist Table */}
       <Card>
         <CardHeader>
-          <h3 className="text-lg font-semibold">Whitelisted Tenants ({entries.length})</h3>
+          <h3 className="text-lg font-semibold">{t('federation_whitelist.whitelisted_tenants_count', { count: entries.length })}</h3>
         </CardHeader>
         <CardBody>
           <Table aria-label={t('super.label_whitelisted_tenants')} shadow="sm" isStriped>
@@ -246,9 +246,9 @@ export default function FederationWhitelist() {
           isOpen={true}
           onClose={() => setRemoving(null)}
           onConfirm={() => handleRemove(removing)}
-          title="Remove from Whitelist"
-          message="Are you sure you want to remove this tenant from the whitelist? They will lose access to all federation features."
-          confirmLabel="Remove"
+          title={t('federation_whitelist.remove_from_whitelist')}
+          message={t('federation_whitelist.remove_confirm_message')}
+          confirmLabel={t('federation_whitelist.remove')}
           confirmColor="danger"
         />
       )}

@@ -32,7 +32,7 @@ class OrgWalletController extends BaseApiController
         );
 
         if ($org === null) {
-            return $this->respondWithError('NOT_FOUND', 'Organization not found', null, 404);
+            return $this->respondWithError('NOT_FOUND', __('api.organization_not_found'), null, 404);
         }
 
         $wallet = DB::selectOne(
@@ -58,7 +58,7 @@ class OrgWalletController extends BaseApiController
         );
 
         if ($org === null) {
-            return $this->respondWithError('NOT_FOUND', 'Organization not found', null, 404);
+            return $this->respondWithError('NOT_FOUND', __('api.organization_not_found'), null, 404);
         }
 
         $items = DB::select(
@@ -86,7 +86,7 @@ class OrgWalletController extends BaseApiController
         $note = $this->input('note', '');
 
         if ($amount <= 0) {
-            return $this->respondWithError('VALIDATION_ERROR', 'Amount must be positive', 'amount');
+            return $this->respondWithError('VALIDATION_ERROR', __('api.amount_gt_zero'), 'amount');
         }
 
         // Verify requesting user is an owner/admin of the source organization (or site admin)
@@ -103,7 +103,7 @@ class OrgWalletController extends BaseApiController
             );
 
             if (!$orgRole || !in_array($orgRole->role, ['owner', 'admin'])) {
-                return $this->respondWithError('FORBIDDEN', 'You do not have permission to transfer from this organization', null, 403);
+                return $this->respondWithError('FORBIDDEN', __('api.no_permission_org_transfer'), null, 403);
             }
         }
 
@@ -117,7 +117,7 @@ class OrgWalletController extends BaseApiController
 
             if ($fromWallet === null || (float) $fromWallet->balance < $amount) {
                 DB::rollBack();
-                return $this->respondWithError('INSUFFICIENT_BALANCE', 'Insufficient balance for transfer');
+                return $this->respondWithError('INSUFFICIENT_BALANCE', __('api.insufficient_balance'));
             }
 
             DB::update('UPDATE org_wallets SET balance = balance - ? WHERE org_id = ? AND tenant_id = ?', [$amount, $fromOrgId, $tenantId]);
@@ -137,7 +137,7 @@ class OrgWalletController extends BaseApiController
             DB::commit();
         } catch (\Throwable $e) {
             DB::rollBack();
-            return $this->respondWithError('TRANSFER_FAILED', 'Transfer failed', null, 500);
+            return $this->respondWithError('TRANSFER_FAILED', __('api.transfer_failed'), null, 500);
         }
 
         return $this->respondWithData(['from_org_id' => $fromOrgId, 'to_org_id' => $toOrgId, 'amount' => $amount]);
@@ -209,7 +209,7 @@ class OrgWalletController extends BaseApiController
                 ->exists();
 
             if (! $isMember) {
-                return $this->respondWithError('FORBIDDEN', 'Access denied', null, 403);
+                return $this->respondWithError('FORBIDDEN', __('api.forbidden'), null, 403);
             }
         }
 

@@ -357,7 +357,7 @@ export function TenantForm() {
       />
 
       <Tabs variant="underlined" className="mb-4">
-        <Tab key="details" title="Details">
+        <Tab key="details" title={t('tenant_form.tab_details')}>
           <Card shadow="sm">
             <CardBody className="space-y-4 p-6">
               <Input
@@ -377,7 +377,7 @@ export function TenantForm() {
                   updateField('slug', v.toLowerCase().replace(/[^a-z0-9-]/g, ''));
                 }}
                 isRequired
-                description={slugAutoGen ? 'Auto-generated from name. Edit to customize.' : 'URL-safe identifier. Changing this updates the tenant URL path.'}
+                description={slugAutoGen ? t('tenant_form.slug_auto_desc') : t('tenant_form.slug_manual_desc')}
               />
               <Input
                 label={t('tenant_form.domain_label')}
@@ -407,7 +407,7 @@ export function TenantForm() {
                   updateField('parent_id', arr.length > 0 ? String(arr[0]) : '');
                 }}
                 isDisabled={isEdit}
-                description={isEdit ? 'Use "Move Tenant" on the detail page to change parent' : undefined}
+                description={isEdit ? t('tenant_form.parent_edit_desc') : undefined}
               >
                 {parentTenants
                   .filter((t) => String(t.id) !== id)
@@ -420,13 +420,13 @@ export function TenantForm() {
                   isSelected={form.is_active}
                   onValueChange={(v) => updateField('is_active', v)}
                 >
-                  Active
+                  {t('tenant_form.active')}
                 </Switch>
                 <Switch
                   isSelected={form.allows_subtenants}
                   onValueChange={(v) => updateField('allows_subtenants', v)}
                 >
-                  Allows Sub-tenants (Hub)
+                  {t('tenant_form.allows_subtenants')}
                 </Switch>
               </div>
               {form.allows_subtenants && (
@@ -442,7 +442,7 @@ export function TenantForm() {
           </Card>
         </Tab>
 
-        <Tab key="contact" title="Contact">
+        <Tab key="contact" title={t('tenant_form.tab_contact')}>
           <Card shadow="sm">
             <CardBody className="space-y-4 p-6">
               <Input
@@ -469,13 +469,13 @@ export function TenantForm() {
           </Card>
         </Tab>
 
-        <Tab key="seo" title="SEO">
+        <Tab key="seo" title={t('tenant_form.tab_seo')}>
           <Card shadow="sm">
             <CardBody className="space-y-4 p-6">
               {/* Live SERP Preview */}
               <div className="rounded-lg border border-default-200 p-4 bg-white dark:bg-default-50">
                 <p className="text-xs font-medium uppercase text-default-400 mb-2 flex items-center gap-1">
-                  <Eye size={12} /> Google Search Preview
+                  <Eye size={12} /> {t('tenant_form.google_search_preview')}
                 </p>
                 <p className="text-lg text-blue-700 dark:text-primary truncate">
                   {form.meta_title || form.name || 'Page Title'}
@@ -534,7 +534,7 @@ export function TenantForm() {
                   updateField('robots_directive', arr.length > 0 ? String(arr[0]) : '');
                 }}
                 className="max-w-xs"
-                description="Search engine indexing instructions"
+                description={t('tenant_form.robots_description')}
               >
                 <SelectItem key="index, follow">index, follow (default)</SelectItem>
                 <SelectItem key="noindex, follow">noindex, follow</SelectItem>
@@ -545,7 +545,7 @@ export function TenantForm() {
           </Card>
         </Tab>
 
-        <Tab key="location" title="Location">
+        <Tab key="location" title={t('tenant_form.tab_location')}>
           <Card shadow="sm">
             <CardBody className="space-y-4 p-6">
               <Input
@@ -600,7 +600,7 @@ export function TenantForm() {
           </Card>
         </Tab>
 
-        <Tab key="social" title="Social">
+        <Tab key="social" title={t('tenant_form.tab_social')}>
           <Card shadow="sm">
             <CardBody className="space-y-4 p-6">
               <Input
@@ -637,7 +637,7 @@ export function TenantForm() {
           </Card>
         </Tab>
 
-        <Tab key="languages" title="Languages">
+        <Tab key="languages" title={t('tenant_form.tab_languages')}>
           <Card shadow="sm">
             <CardBody className="space-y-4 p-6">
               <Select
@@ -659,9 +659,9 @@ export function TenantForm() {
                 ))}
               </Select>
               <div>
-                <p className="text-sm font-medium mb-1">Available Languages</p>
+                <p className="text-sm font-medium mb-1">{t('tenant_form.available_languages')}</p>
                 <p className="text-xs text-default-400 mb-3">
-                  Languages shown in the language switcher
+                  {t('tenant_form.available_languages_desc')}
                 </p>
                 <div className="space-y-2">
                   {PLATFORM_LANGUAGES.map((lang) => (
@@ -683,7 +683,7 @@ export function TenantForm() {
                       <span className="text-sm">
                         {lang.label} ({lang.short})
                         {lang.code === 'en' && (
-                          <span className="ml-2 text-xs text-default-400">always enabled</span>
+                          <span className="ml-2 text-xs text-default-400">{t('tenant_form.always_enabled')}</span>
                         )}
                       </span>
                     </Checkbox>
@@ -694,11 +694,11 @@ export function TenantForm() {
           </Card>
         </Tab>
 
-        <Tab key="features" title="Features">
+        <Tab key="features" title={t('tenant_form.tab_features')}>
           <Card shadow="sm">
             <CardBody className="p-6">
               <p className="text-sm text-default-500 mb-4">
-                Toggle platform features for this tenant. Changes take effect immediately after save.
+                {t('tenant_form.features_desc')}
               </p>
               <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                 {FEATURE_META.map(({ key, label, description, icon: Icon }) => {
@@ -730,12 +730,11 @@ export function TenantForm() {
             </CardBody>
           </Card>
         </Tab>
-        <Tab key="legal" title="Legal">
+        <Tab key="legal" title={t('tenant_form.tab_legal')}>
           <Card shadow="sm">
             <CardBody className="space-y-4 p-6">
               <p className="text-sm text-default-500 mb-2">
-                Override the default privacy and terms pages with custom HTML content.
-                Leave empty to use the default tenant-specific documents.
+                {t('tenant_form.legal_desc')}
               </p>
               <Textarea
                 label={t('tenant_form.privacy_override_label')}
@@ -763,7 +762,7 @@ export function TenantForm() {
                     updateField('terms_text', '');
                   }}
                 >
-                  Clear All & Use Defaults
+                  {t('tenant_form.clear_all_use_defaults')}
                 </Button>
               )}
             </CardBody>

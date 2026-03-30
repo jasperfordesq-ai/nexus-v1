@@ -93,7 +93,7 @@ export function NexusScoreAnalytics() {
 
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
         <Card shadow="sm">
-          <CardHeader><h3 className="text-lg font-semibold">Score Distribution</h3></CardHeader>
+          <CardHeader><h3 className="text-lg font-semibold">{t('diagnostics.score_distribution')}</h3></CardHeader>
           <CardBody>
             {stats.badge_distribution && stats.badge_distribution.length > 0 ? (
               <div className="space-y-3">
@@ -107,16 +107,16 @@ export function NexusScoreAnalytics() {
             ) : (
               <div className="flex flex-col items-center py-8 text-default-400">
                 <BarChart3 size={40} className="mb-3" />
-                <p>Score distribution chart will appear here once Nexus Scores are calculated for active users.</p>
+                <p>{t('diagnostics.score_distribution_empty')}</p>
               </div>
             )}
           </CardBody>
         </Card>
 
         <Card shadow="sm">
-          <CardHeader><h3 className="text-lg font-semibold">Score Factors</h3></CardHeader>
+          <CardHeader><h3 className="text-lg font-semibold">{t('diagnostics.score_factors')}</h3></CardHeader>
           <CardBody>
-            <p className="text-xs text-default-400 mb-3">These weights are configurable from the matching configuration page.</p>
+            <p className="text-xs text-default-400 mb-3">{t('diagnostics.score_factors_desc')}</p>
             <div className="space-y-3">
               {[
                 { factor: 'Transaction Activity', weight: '25%' },

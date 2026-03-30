@@ -90,7 +90,7 @@ class GroupsController extends BaseApiController
         $group = $this->groupService->getById($id, $userId);
 
         if (!$group) {
-            return $this->respondWithError('NOT_FOUND', 'Group not found', null, 404);
+            return $this->respondWithError('NOT_FOUND', __('api.group_not_found'), null, 404);
         }
 
         return $this->respondWithData($group);
@@ -302,14 +302,14 @@ class GroupsController extends BaseApiController
 
         $group = $this->groupService->getById($id);
         if (!$group) {
-            return $this->respondWithError('NOT_FOUND', 'Group not found', null, 404);
+            return $this->respondWithError('NOT_FOUND', __('api.group_not_found'), null, 404);
         }
 
         // For private groups, only members can view the member list
         if (($group['visibility'] ?? 'public') === 'private') {
             $userId = $this->getOptionalUserId();
             if (!$userId) {
-                return $this->respondWithError('FORBIDDEN', 'You must be a member to view members of a private group', null, 403);
+                return $this->respondWithError('FORBIDDEN', __('api.private_group_members_only'), null, 403);
             }
             $isMember = \Illuminate\Support\Facades\DB::table('group_members')
                 ->where('group_id', $id)
@@ -317,7 +317,7 @@ class GroupsController extends BaseApiController
                 ->where('status', 'active')
                 ->exists();
             if (!$isMember) {
-                return $this->respondWithError('FORBIDDEN', 'You must be a member to view members of a private group', null, 403);
+                return $this->respondWithError('FORBIDDEN', __('api.private_group_members_only'), null, 403);
             }
         }
 
@@ -355,7 +355,7 @@ class GroupsController extends BaseApiController
         $role = $this->input('role');
 
         if (empty($role)) {
-            return $this->respondWithError('VALIDATION_ERROR', 'Role is required', 'role', 400);
+            return $this->respondWithError('VALIDATION_ERROR', __('api.role_required'), 'role', 400);
         }
 
         $success = $this->groupService->updateMemberRole($id, $targetUserId, $userId, $role);
@@ -451,7 +451,7 @@ class GroupsController extends BaseApiController
         $action = $this->input('action');
 
         if (empty($action)) {
-            return $this->respondWithError('VALIDATION_ERROR', 'Action is required', 'action', 400);
+            return $this->respondWithError('VALIDATION_ERROR', __('api.action_required'), 'action', 400);
         }
 
         $success = $this->groupService->handleJoinRequest($id, $requesterId, $userId, $action);
@@ -770,7 +770,7 @@ class GroupsController extends BaseApiController
 
         $file = request()->file('image');
         if (!$file || !$file->isValid()) {
-            return $this->respondWithError('VALIDATION_ERROR', 'No image file uploaded or upload error', 'image', 400);
+            return $this->respondWithError('VALIDATION_ERROR', __('api.no_image_uploaded'), 'image', 400);
         }
 
         $imageType = $this->query('type', 'avatar');
@@ -811,7 +811,7 @@ class GroupsController extends BaseApiController
             return $this->respondWithData(['image_url' => $imageUrl]);
         } catch (\Exception $e) {
             \Log::error('Group image upload failed', ['error' => $e->getMessage()]);
-            return $this->respondWithError('UPLOAD_FAILED', 'Failed to upload image', 'image', 500);
+            return $this->respondWithError('UPLOAD_FAILED', __('api.failed_upload_image'), 'image', 500);
         }
     }
 

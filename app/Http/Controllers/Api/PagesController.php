@@ -48,7 +48,7 @@ class PagesController extends BaseApiController
             ->first();
 
         if (! $page) {
-            return $this->respondWithError('NOT_FOUND', 'Page not found', null, 404);
+            return $this->respondWithError('NOT_FOUND', __('api.page_not_found'), null, 404);
         }
 
         return $this->respondWithData([

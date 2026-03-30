@@ -86,7 +86,7 @@ class PushController extends BaseApiController
         $body = $this->input('body');
 
         if (empty($title) || empty($body)) {
-            return $this->respondWithError('VALIDATION_ERROR', 'Title and body are required', null, 400);
+            return $this->respondWithError('VALIDATION_ERROR', __('api.title_and_body_required'), null, 400);
         }
 
         $targetUserIds = $this->input('user_ids');
@@ -196,7 +196,7 @@ class PushController extends BaseApiController
         $platform = $this->input('platform', 'android');
 
         if (empty($token)) {
-            return $this->respondWithError('VALIDATION_ERROR', 'Token is required', 'token', 400);
+            return $this->respondWithError('VALIDATION_ERROR', __('api.missing_required_field', ['field' => 'token']), 'token', 400);
         }
 
         $userId = $this->getOptionalUserId();
@@ -225,10 +225,10 @@ class PushController extends BaseApiController
                 ]);
             }
 
-            return $this->respondWithError('REGISTRATION_FAILED', 'Failed to register device', null, 500);
+            return $this->respondWithError('REGISTRATION_FAILED', __('api.device_registration_failed'), null, 500);
         } catch (\Exception $e) {
             error_log('[PushApi] Register device error: ' . $e->getMessage());
-            return $this->respondWithError('SERVER_ERROR', 'Server error', null, 500);
+            return $this->respondWithError('SERVER_ERROR', __('api.server_error'), null, 500);
         }
     }
 
@@ -245,7 +245,7 @@ class PushController extends BaseApiController
         $token = $this->input('token');
 
         if (empty($token)) {
-            return $this->respondWithError('VALIDATION_ERROR', 'Token is required', 'token', 400);
+            return $this->respondWithError('VALIDATION_ERROR', __('api.missing_required_field', ['field' => 'token']), 'token', 400);
         }
 
         $userId = $this->getOptionalUserId();
@@ -259,7 +259,7 @@ class PushController extends BaseApiController
             ]);
         } catch (\Exception $e) {
             error_log('[PushApi] Unregister device error: ' . $e->getMessage());
-            return $this->respondWithError('SERVER_ERROR', 'Server error', null, 500);
+            return $this->respondWithError('SERVER_ERROR', __('api.server_error'), null, 500);
         }
     }
 

@@ -70,10 +70,10 @@ class AdminToolsController extends BaseApiController
         $statusCode = (int) ($this->input('status_code', 301));
 
         if (empty($fromUrl)) {
-            return $this->respondWithError('VALIDATION_ERROR', 'from_url is required', 'from_url', 422);
+            return $this->respondWithError('VALIDATION_ERROR', __('api.from_url_required'), 'from_url', 422);
         }
         if (empty($toUrl)) {
-            return $this->respondWithError('VALIDATION_ERROR', 'to_url is required', 'to_url', 422);
+            return $this->respondWithError('VALIDATION_ERROR', __('api.to_url_required'), 'to_url', 422);
         }
         if (!in_array($statusCode, [301, 302, 307, 308], true)) {
             $statusCode = 301;
@@ -92,7 +92,7 @@ class AdminToolsController extends BaseApiController
                 'status_code' => $statusCode,
             ], null, 201);
         } catch (\Throwable $e) {
-            return $this->respondWithError('SERVER_ERROR', 'Failed to create redirect', null, 500);
+            return $this->respondWithError('SERVER_ERROR', __('api.redirect_create_failed'), null, 500);
         }
     }
 
@@ -105,13 +105,13 @@ class AdminToolsController extends BaseApiController
         try {
             $redirect = DB::selectOne("SELECT id FROM seo_redirects WHERE id = ? AND tenant_id = ?", [$id, $tenantId]);
             if (!$redirect) {
-                return $this->respondWithError('NOT_FOUND', 'Redirect not found', 'id', 404);
+                return $this->respondWithError('NOT_FOUND', __('api.redirect_not_found'), 'id', 404);
             }
 
             DB::delete("DELETE FROM seo_redirects WHERE id = ? AND tenant_id = ?", [$id, $tenantId]);
             return $this->respondWithData(['deleted' => true, 'id' => $id]);
         } catch (\Throwable $e) {
-            return $this->respondWithError('NOT_FOUND', 'Redirect not found or table does not exist', 'id', 404);
+            return $this->respondWithError('NOT_FOUND', __('api.redirect_not_found_or_missing_table'), 'id', 404);
         }
     }
 
@@ -162,13 +162,13 @@ class AdminToolsController extends BaseApiController
         try {
             $error = DB::selectOne("SELECT id FROM error_404_log WHERE id = ?", [$id]);
             if (!$error) {
-                return $this->respondWithError('NOT_FOUND', '404 error entry not found', 'id', 404);
+                return $this->respondWithError('NOT_FOUND', __('api.error_404_not_found'), 'id', 404);
             }
 
             DB::delete("DELETE FROM error_404_log WHERE id = ?", [$id]);
             return $this->respondWithData(['deleted' => true, 'id' => $id]);
         } catch (\Throwable $e) {
-            return $this->respondWithError('NOT_FOUND', '404 error entry not found or table does not exist', 'id', 404);
+            return $this->respondWithError('NOT_FOUND', __('api.error_404_not_found_or_missing_table'), 'id', 404);
         }
     }
 
@@ -294,16 +294,14 @@ class AdminToolsController extends BaseApiController
         $counts = $input['counts'] ?? [];
 
         if (empty($types)) {
-            return $this->respondWithError('VALIDATION_ERROR', 'At least one seed type is required', 'types', 422);
+            return $this->respondWithError('VALIDATION_ERROR', __('api.seed_type_required'), 'types', 422);
         }
 
         $validTypes = ['users', 'listings', 'transactions', 'events', 'groups', 'feed_posts', 'messages', 'reviews'];
         $invalidTypes = array_diff($types, $validTypes);
 
         if (!empty($invalidTypes)) {
-            return $this->respondWithError(
-                'VALIDATION_ERROR',
-                'Invalid seed types: ' . implode(', ', $invalidTypes) . '. Valid types: ' . implode(', ', $validTypes),
+            return $this->respondWithError('VALIDATION_ERROR', __('api.invalid_seed_types', ['invalid' => implode(', ', $invalidTypes), 'valid' => implode(', ', $validTypes)]),
                 'types',
                 422
             );
@@ -362,7 +360,7 @@ class AdminToolsController extends BaseApiController
         }
 
         if ($id < 1) {
-            return $this->respondWithError('VALIDATION_ERROR', 'Invalid backup ID', 'id', 400);
+            return $this->respondWithError('VALIDATION_ERROR', __('api.invalid_backup_id'), 'id', 400);
         }
 
         return $this->respondWithData([

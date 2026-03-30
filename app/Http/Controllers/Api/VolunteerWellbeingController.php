@@ -32,7 +32,7 @@ class VolunteerWellbeingController extends BaseApiController
     {
         if (!TenantContext::hasFeature('volunteering')) {
             throw new \Illuminate\Http\Exceptions\HttpResponseException(
-                $this->respondWithError('FEATURE_DISABLED', 'Volunteering module is not enabled for this community', null, 403)
+                $this->respondWithError('FEATURE_DISABLED', __('api.vol_feature_disabled'), null, 403)
             );
         }
     }
@@ -182,7 +182,7 @@ class VolunteerWellbeingController extends BaseApiController
 
         $mood = (int) $this->input('mood');
         if ($mood < 1 || $mood > 5) {
-            return $this->respondWithError('VALIDATION_ERROR', 'Mood must be between 1 and 5', 'mood', 400);
+            return $this->respondWithError('VALIDATION_ERROR', __('api.vol_mood_range'), 'mood', 400);
         }
 
         $note = $this->input('note');
@@ -205,7 +205,7 @@ class VolunteerWellbeingController extends BaseApiController
             ]);
         } catch (\Throwable $e) {
             error_log("Wellbeing checkin failed: " . $e->getMessage());
-            return $this->respondWithError('SERVER_ERROR', 'Failed to save check-in', null, 500);
+            return $this->respondWithError('SERVER_ERROR', __('api.vol_checkin_save_failed'), null, 500);
         }
     }
 
@@ -265,7 +265,7 @@ class VolunteerWellbeingController extends BaseApiController
 
         $response = $this->input('response');
         if (!$response || !in_array($response, ['accepted', 'declined'])) {
-            return $this->respondWithError('VALIDATION_ERROR', 'Response must be accepted or declined', 'response', 400);
+            return $this->respondWithError('VALIDATION_ERROR', __('api.vol_response_accept_decline'), 'response', 400);
         }
 
         $success = $this->volunteerEmergencyAlertService->respond((int) $id, $userId, $response);
@@ -351,7 +351,7 @@ class VolunteerWellbeingController extends BaseApiController
         $tenantId = TenantContext::getId();
         $incident = $this->safeguardingService->getIncident((int) $id, $tenantId);
         if (!$incident) {
-            return $this->respondWithError('NOT_FOUND', 'Incident not found', null, 404);
+            return $this->respondWithError('NOT_FOUND', __('api.vol_incident_not_found'), null, 404);
         }
 
         // Ownership check: only the reporter or an admin can view
@@ -359,7 +359,7 @@ class VolunteerWellbeingController extends BaseApiController
         $role = $user->role ?? 'member';
         $isAdmin = in_array($role, ['admin', 'tenant_admin', 'super_admin', 'god'], true);
         if ((int) ($incident['reported_by'] ?? 0) !== $userId && !$isAdmin) {
-            return $this->respondWithError('FORBIDDEN', 'You do not have permission to view this incident', null, 403);
+            return $this->respondWithError('FORBIDDEN', __('api.vol_incident_view_forbidden'), null, 403);
         }
 
         return $this->respondWithData($incident);
@@ -389,7 +389,7 @@ class VolunteerWellbeingController extends BaseApiController
         $result = $this->safeguardingService->updateIncident((int) $id, $data, $adminId, $tenantId);
 
         if (!$result) {
-            return $this->respondWithError('NOT_FOUND', 'Incident not found', null, 404);
+            return $this->respondWithError('NOT_FOUND', __('api.vol_incident_not_found'), null, 404);
         }
         return $this->respondWithData(['success' => true]);
     }
@@ -403,7 +403,7 @@ class VolunteerWellbeingController extends BaseApiController
 
         $dlpUserId = (int) ($data['dlp_user_id'] ?? 0);
         if ($dlpUserId <= 0) {
-            return $this->respondWithError('VALIDATION_ERROR', 'dlp_user_id is required and must be a positive integer', 'dlp_user_id', 422);
+            return $this->respondWithError('VALIDATION_ERROR', __('api.vol_dlp_user_required'), 'dlp_user_id', 422);
         }
 
         $tenantId = TenantContext::getId();
@@ -470,7 +470,7 @@ class VolunteerWellbeingController extends BaseApiController
         $tenantId = TenantContext::getId();
         $result = $this->safeguardingService->verifyTraining((int) $id, $adminId, $tenantId);
         if (!$result) {
-            return $this->respondWithError('NOT_FOUND', 'Training record not found', null, 404);
+            return $this->respondWithError('NOT_FOUND', __('api.vol_training_not_found'), null, 404);
         }
         return $this->respondWithData(['success' => true]);
     }
@@ -482,13 +482,13 @@ class VolunteerWellbeingController extends BaseApiController
 
         $reason = trim($this->input('reason', ''));
         if (empty($reason)) {
-            return $this->respondWithError('VALIDATION_ERROR', 'A reason is required to reject a training record', 'reason', 422);
+            return $this->respondWithError('VALIDATION_ERROR', __('api.vol_training_reject_reason'), 'reason', 422);
         }
 
         $tenantId = TenantContext::getId();
         $result = $this->safeguardingService->rejectTraining((int) $id, $adminId, $reason, $tenantId);
         if (!$result) {
-            return $this->respondWithError('NOT_FOUND', 'Training record not found', null, 404);
+            return $this->respondWithError('NOT_FOUND', __('api.vol_training_not_found'), null, 404);
         }
         return $this->respondWithData(['success' => true]);
     }

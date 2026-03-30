@@ -297,7 +297,7 @@ export function SegmentForm() {
       return (
         <Select
           size="sm"
-          label="Value"
+          label={t('segment_form.label_value')}
           selectedKeys={rule.value ? [rule.value] : []}
           onSelectionChange={(keys) => {
             const val = Array.from(keys)[0] as string;
@@ -315,7 +315,7 @@ export function SegmentForm() {
       return (
         <Select
           size="sm"
-          label="Value"
+          label={t('segment_form.label_value')}
           selectedKeys={rule.value ? [rule.value] : []}
           onSelectionChange={(keys) => {
             const val = Array.from(keys)[0] as string;
@@ -335,7 +335,7 @@ export function SegmentForm() {
         <Input
           size="sm"
           type="date"
-          label="Value"
+          label={t('segment_form.label_value')}
           value={rule.value}
           onValueChange={(val) => updateRule(rule.id, 'value', val)}
           className="min-w-[160px]"
@@ -347,7 +347,7 @@ export function SegmentForm() {
       <Input
         size="sm"
         type={fieldConfig.type === 'number' ? 'number' : 'text'}
-        label="Value"
+        label={t('segment_form.label_value')}
         placeholder={fieldConfig.type === 'number' ? '0' : 'Enter value...'}
         value={rule.value}
         onValueChange={(val) => updateRule(rule.id, 'value', val)}
@@ -359,7 +359,7 @@ export function SegmentForm() {
   if (loading) {
     return (
       <div className="flex items-center justify-center py-20">
-        <Spinner size="lg" label="Loading segment..." />
+        <Spinner size="lg" label={t('segment_form.loading_segment')} />
       </div>
     );
   }
@@ -395,7 +395,7 @@ export function SegmentForm() {
         </CardHeader>
         <CardBody className="space-y-4">
           <Input
-            label="Segment Name"
+            label={t('segment_form.label_segment_name')}
             placeholder="e.g., Active Members, New Joiners"
             value={name}
             onValueChange={setName}
@@ -404,7 +404,7 @@ export function SegmentForm() {
             errorMessage={errors.name}
           />
           <Input
-            label="Description"
+            label={t('segment_form.label_description')}
             placeholder={t('newsletters.placeholder_describe_what_this_segment_targets')}
             value={description}
             onValueChange={setDescription}
@@ -428,7 +428,7 @@ export function SegmentForm() {
           <h3 className="text-lg font-semibold">Targeting Rules</h3>
           <Select
             size="sm"
-            label="Match Logic"
+            label={t('segment_form.label_match_logic')}
             selectedKeys={[matchType]}
             onSelectionChange={(keys) => {
               const val = Array.from(keys)[0] as string;
@@ -459,7 +459,7 @@ export function SegmentForm() {
 
               <Select
                 size="sm"
-                label="Field"
+                label={t('segment_form.label_field')}
                 selectedKeys={rule.field ? [rule.field] : []}
                 onSelectionChange={(keys) => {
                   const val = Array.from(keys)[0] as string;
@@ -475,7 +475,7 @@ export function SegmentForm() {
               {rule.field && (
                 <Select
                   size="sm"
-                  label="Operator"
+                  label={t('segment_form.label_operator')}
                   selectedKeys={rule.operator ? [rule.operator] : []}
                   onSelectionChange={(keys) => {
                     const val = Array.from(keys)[0] as string;

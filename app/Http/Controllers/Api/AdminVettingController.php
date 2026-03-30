@@ -73,11 +73,11 @@ class AdminVettingController extends BaseApiController
         try {
             $record = $this->vettingService->getById($id);
             if (!$record) {
-                return $this->respondWithError('NOT_FOUND', 'Vetting record not found', null, 404);
+                return $this->respondWithError('NOT_FOUND', __('api.vetting_record_not_found'), null, 404);
             }
             return $this->respondWithData($record);
         } catch (\Exception $e) {
-            return $this->respondWithError('SERVER_ERROR', 'Failed to fetch vetting record', null, 500);
+            return $this->respondWithError('SERVER_ERROR', __('api.vetting_fetch_failed'), null, 500);
         }
     }
 
@@ -90,35 +90,35 @@ class AdminVettingController extends BaseApiController
         $vettingType = $this->input('vetting_type');
 
         if (!$userId) {
-            return $this->respondWithError('VALIDATION_ERROR', 'user_id is required', 'user_id');
+            return $this->respondWithError('VALIDATION_ERROR', __('api.user_id_required'), 'user_id');
         }
 
         $validTypes = ['dbs_basic', 'dbs_standard', 'dbs_enhanced', 'garda_vetting',
                         'access_ni', 'pvg_scotland', 'international', 'other'];
         if ($vettingType && !in_array($vettingType, $validTypes, true)) {
-            return $this->respondWithError('VALIDATION_ERROR', 'Invalid vetting type', 'vetting_type');
+            return $this->respondWithError('VALIDATION_ERROR', __('api.invalid_vetting_type'), 'vetting_type');
         }
 
         $validStatuses = ['pending', 'submitted', 'verified', 'expired', 'rejected', 'revoked'];
         $status = $this->input('status', 'pending');
         if (!in_array($status, $validStatuses, true)) {
-            return $this->respondWithError('VALIDATION_ERROR', 'Invalid status', 'status');
+            return $this->respondWithError('VALIDATION_ERROR', __('api.invalid_status'), 'status');
         }
 
         // Verify user exists in current tenant
         $tenantId = $this->getTenantId();
         $userExists = DB::selectOne("SELECT id FROM users WHERE id = ? AND tenant_id = ?", [$userId, $tenantId]);
         if (!$userExists) {
-            return $this->respondWithError('VALIDATION_ERROR', 'User not found in this tenant', 'user_id');
+            return $this->respondWithError('VALIDATION_ERROR', __('api.user_not_found_in_tenant'), 'user_id');
         }
 
         // Validate dates
         $issueDate = $this->input('issue_date');
         $expiryDate = $this->input('expiry_date');
-        if ($issueDate && !strtotime($issueDate)) return $this->respondWithError('VALIDATION_ERROR', 'Invalid issue date format', 'issue_date');
-        if ($expiryDate && !strtotime($expiryDate)) return $this->respondWithError('VALIDATION_ERROR', 'Invalid expiry date format', 'expiry_date');
+        if ($issueDate && !strtotime($issueDate)) return $this->respondWithError('VALIDATION_ERROR', __('api.invalid_issue_date_format'), 'issue_date');
+        if ($expiryDate && !strtotime($expiryDate)) return $this->respondWithError('VALIDATION_ERROR', __('api.invalid_expiry_date_format'), 'expiry_date');
         if ($issueDate && $expiryDate && strtotime($expiryDate) < strtotime($issueDate)) {
-            return $this->respondWithError('VALIDATION_ERROR', 'Expiry date must be after issue date', 'expiry_date');
+            return $this->respondWithError('VALIDATION_ERROR', __('api.expiry_after_issue_date'), 'expiry_date');
         }
 
         try {
@@ -141,7 +141,7 @@ class AdminVettingController extends BaseApiController
             $record = $this->vettingService->getById($id);
             return $this->respondWithData($record, null, 201);
         } catch (\Exception $e) {
-            return $this->respondWithError('SERVER_ERROR', 'Failed to create vetting record', null, 500);
+            return $this->respondWithError('SERVER_ERROR', __('api.vetting_create_failed'), null, 500);
         }
     }
 
@@ -153,7 +153,7 @@ class AdminVettingController extends BaseApiController
         try {
             $existing = $this->vettingService->getById($id);
             if (!$existing) {
-                return $this->respondWithError('NOT_FOUND', 'Vetting record not found', null, 404);
+                return $this->respondWithError('NOT_FOUND', __('api.vetting_record_not_found'), null, 404);
             }
 
             $allInput = $this->getAllInput();
@@ -164,24 +164,24 @@ class AdminVettingController extends BaseApiController
 
             if (array_key_exists('vetting_type', $allInput) && $allInput['vetting_type'] !== null
                 && !in_array($allInput['vetting_type'], $validTypes, true)) {
-                return $this->respondWithError('VALIDATION_ERROR', 'Invalid vetting type', 'vetting_type');
+                return $this->respondWithError('VALIDATION_ERROR', __('api.invalid_vetting_type'), 'vetting_type');
             }
             if (array_key_exists('status', $allInput) && $allInput['status'] !== null
                 && !in_array($allInput['status'], $validStatuses, true)) {
-                return $this->respondWithError('VALIDATION_ERROR', 'Invalid status', 'status');
+                return $this->respondWithError('VALIDATION_ERROR', __('api.invalid_status'), 'status');
             }
 
             // Validate dates
             if (array_key_exists('issue_date', $allInput) && $allInput['issue_date'] !== null && !strtotime($allInput['issue_date'])) {
-                return $this->respondWithError('VALIDATION_ERROR', 'Invalid issue date format', 'issue_date');
+                return $this->respondWithError('VALIDATION_ERROR', __('api.invalid_issue_date_format'), 'issue_date');
             }
             if (array_key_exists('expiry_date', $allInput) && $allInput['expiry_date'] !== null && !strtotime($allInput['expiry_date'])) {
-                return $this->respondWithError('VALIDATION_ERROR', 'Invalid expiry date format', 'expiry_date');
+                return $this->respondWithError('VALIDATION_ERROR', __('api.invalid_expiry_date_format'), 'expiry_date');
             }
             $effectiveIssue = $allInput['issue_date'] ?? $existing['issue_date'] ?? null;
             $effectiveExpiry = $allInput['expiry_date'] ?? $existing['expiry_date'] ?? null;
             if ($effectiveIssue && $effectiveExpiry && strtotime($effectiveExpiry) < strtotime($effectiveIssue)) {
-                return $this->respondWithError('VALIDATION_ERROR', 'Expiry date must be after issue date', 'expiry_date');
+                return $this->respondWithError('VALIDATION_ERROR', __('api.expiry_after_issue_date'), 'expiry_date');
             }
 
             $data = [];
@@ -198,7 +198,7 @@ class AdminVettingController extends BaseApiController
             }
 
             if (empty($data)) {
-                return $this->respondWithError('VALIDATION_ERROR', 'No valid fields to update');
+                return $this->respondWithError('VALIDATION_ERROR', __('api.no_valid_fields'));
             }
 
             $this->vettingService->update($id, $data);
@@ -208,7 +208,7 @@ class AdminVettingController extends BaseApiController
             $record = $this->vettingService->getById($id);
             return $this->respondWithData($record);
         } catch (\Exception $e) {
-            return $this->respondWithError('SERVER_ERROR', 'Failed to update vetting record', null, 500);
+            return $this->respondWithError('SERVER_ERROR', __('api.vetting_update_failed'), null, 500);
         }
     }
 
@@ -220,17 +220,17 @@ class AdminVettingController extends BaseApiController
         try {
             $existing = $this->vettingService->getById($id);
             if (!$existing) {
-                return $this->respondWithError('NOT_FOUND', 'Vetting record not found', null, 404);
+                return $this->respondWithError('NOT_FOUND', __('api.vetting_record_not_found'), null, 404);
             }
             if ($existing['status'] === 'verified') {
-                return $this->respondWithError('INVALID_STATUS', 'Record is already verified');
+                return $this->respondWithError('INVALID_STATUS', __('api.vetting_already_verified'));
             }
 
             // Require reference number for verification (legal compliance)
             if (empty($existing['reference_number'])) {
                 return $this->respondWithError(
                     'VALIDATION_ERROR',
-                    'A reference number is required before a vetting record can be verified',
+                    __('api.vetting_reference_required'),
                     'reference_number',
                     422
                 );
@@ -255,7 +255,7 @@ class AdminVettingController extends BaseApiController
             $record = $this->vettingService->getById($id);
             return $this->respondWithData($record);
         } catch (\Exception $e) {
-            return $this->respondWithError('SERVER_ERROR', 'Failed to verify vetting record', null, 500);
+            return $this->respondWithError('SERVER_ERROR', __('api.vetting_verify_failed'), null, 500);
         }
     }
 
@@ -266,13 +266,13 @@ class AdminVettingController extends BaseApiController
         $reason = $this->input('reason', '');
 
         if (empty($reason)) {
-            return $this->respondWithError('VALIDATION_ERROR', 'A reason is required to reject a vetting record', 'reason');
+            return $this->respondWithError('VALIDATION_ERROR', __('api.vetting_reject_reason_required'), 'reason');
         }
 
         try {
             $existing = $this->vettingService->getById($id);
             if (!$existing) {
-                return $this->respondWithError('NOT_FOUND', 'Vetting record not found', null, 404);
+                return $this->respondWithError('NOT_FOUND', __('api.vetting_record_not_found'), null, 404);
             }
 
             $this->vettingService->reject($id, $adminId, $reason);
@@ -294,7 +294,7 @@ class AdminVettingController extends BaseApiController
             $record = $this->vettingService->getById($id);
             return $this->respondWithData($record);
         } catch (\Exception $e) {
-            return $this->respondWithError('SERVER_ERROR', 'Failed to reject vetting record', null, 500);
+            return $this->respondWithError('SERVER_ERROR', __('api.vetting_reject_failed'), null, 500);
         }
     }
 
@@ -306,7 +306,7 @@ class AdminVettingController extends BaseApiController
         try {
             $existing = $this->vettingService->getById($id);
             if (!$existing) {
-                return $this->respondWithError('NOT_FOUND', 'Vetting record not found', null, 404);
+                return $this->respondWithError('NOT_FOUND', __('api.vetting_record_not_found'), null, 404);
             }
 
             $this->vettingService->delete($id);
@@ -330,7 +330,7 @@ class AdminVettingController extends BaseApiController
 
             return $this->respondWithData(['deleted' => true]);
         } catch (\Exception $e) {
-            return $this->respondWithError('SERVER_ERROR', 'Failed to delete vetting record', null, 500);
+            return $this->respondWithError('SERVER_ERROR', __('api.vetting_delete_failed'), null, 500);
         }
     }
 
@@ -344,16 +344,16 @@ class AdminVettingController extends BaseApiController
         $reason = $this->input('reason', '');
 
         if (!is_array($ids) || empty($ids)) {
-            return $this->respondWithError('VALIDATION_ERROR', 'ids must be a non-empty array', 'ids');
+            return $this->respondWithError('VALIDATION_ERROR', __('api.ids_non_empty_array_required'), 'ids');
         }
         if (count($ids) > 100) {
-            return $this->respondWithError('VALIDATION_ERROR', 'Maximum 100 records per bulk action', 'ids');
+            return $this->respondWithError('VALIDATION_ERROR', __('api.bulk_max_100'), 'ids');
         }
         if (!in_array($action, ['verify', 'reject', 'delete'], true)) {
-            return $this->respondWithError('VALIDATION_ERROR', 'Invalid action. Must be: verify, reject, or delete', 'action');
+            return $this->respondWithError('VALIDATION_ERROR', __('api.vetting_bulk_invalid_action'), 'action');
         }
         if ($action === 'reject' && empty($reason)) {
-            return $this->respondWithError('VALIDATION_ERROR', 'A reason is required for bulk rejection', 'reason');
+            return $this->respondWithError('VALIDATION_ERROR', __('api.vetting_bulk_reject_reason_required'), 'reason');
         }
 
         $processed = 0;
@@ -464,12 +464,12 @@ class AdminVettingController extends BaseApiController
         try {
             $existing = $this->vettingService->getById($id);
             if (!$existing) {
-                return $this->respondWithError('NOT_FOUND', 'Vetting record not found', null, 404);
+                return $this->respondWithError('NOT_FOUND', __('api.vetting_record_not_found'), null, 404);
             }
 
             $file = request()->file('file');
             if (!$file || !$file->isValid()) {
-                return $this->respondWithError('VALIDATION_ERROR', 'No file was uploaded or upload failed', 'file');
+                return $this->respondWithError('VALIDATION_ERROR', __('api.file_upload_failed'), 'file');
             }
 
             // Validate file type using file content
@@ -477,12 +477,12 @@ class AdminVettingController extends BaseApiController
             $finfo = new \finfo(FILEINFO_MIME_TYPE);
             $mimeType = $finfo->file($file->getRealPath());
             if (!in_array($mimeType, $allowedMimes, true)) {
-                return $this->respondWithError('VALIDATION_ERROR', 'Only PDF, JPEG, PNG, and WebP files are allowed', 'file');
+                return $this->respondWithError('VALIDATION_ERROR', __('api.file_type_pdf_jpeg_png_webp'), 'file');
             }
 
             // 10 MB limit
             if ($file->getSize() > 10 * 1024 * 1024) {
-                return $this->respondWithError('VALIDATION_ERROR', 'File size must be under 10 MB', 'file');
+                return $this->respondWithError('VALIDATION_ERROR', __('api.file_size_limit_10mb'), 'file');
             }
 
             // Build a $_FILES-compatible array for ImageUploader::upload()
@@ -502,7 +502,7 @@ class AdminVettingController extends BaseApiController
             $record = $this->vettingService->getById($id);
             return $this->respondWithData($record);
         } catch (\Exception $e) {
-            return $this->respondWithError('SERVER_ERROR', 'Failed to upload document', null, 500);
+            return $this->respondWithError('SERVER_ERROR', __('api.document_upload_failed'), null, 500);
         }
     }
 

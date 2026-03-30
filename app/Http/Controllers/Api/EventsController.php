@@ -91,7 +91,7 @@ class EventsController extends BaseApiController
         $event = $this->eventService->getById($id, $userId);
 
         if (!$event) {
-            return $this->respondWithError('NOT_FOUND', 'Event not found', null, 404);
+            return $this->respondWithError('NOT_FOUND', __('api.event_not_found'), null, 404);
         }
 
         return $this->respondWithData($event);
@@ -106,17 +106,17 @@ class EventsController extends BaseApiController
         $lon = $this->query('lon');
 
         if ($lat === null || $lon === null) {
-            return $this->respondWithError('VALIDATION_ERROR', 'Latitude and longitude are required', null, 400);
+            return $this->respondWithError('VALIDATION_ERROR', __('api.event_lat_lon_required'), null, 400);
         }
 
         $lat = (float) $lat;
         $lon = (float) $lon;
 
         if ($lat < -90 || $lat > 90) {
-            return $this->respondWithError('VALIDATION_ERROR', 'Latitude must be between -90 and 90', 'lat', 400);
+            return $this->respondWithError('VALIDATION_ERROR', __('api.event_lat_range'), 'lat', 400);
         }
         if ($lon < -180 || $lon > 180) {
-            return $this->respondWithError('VALIDATION_ERROR', 'Longitude must be between -180 and 180', 'lon', 400);
+            return $this->respondWithError('VALIDATION_ERROR', __('api.event_lon_range'), 'lon', 400);
         }
 
         $filters = [
@@ -306,7 +306,7 @@ class EventsController extends BaseApiController
         $status = $this->input('status');
 
         if (empty($status)) {
-            return $this->respondWithError('VALIDATION_ERROR', 'RSVP status is required', 'status', 400);
+            return $this->respondWithError('VALIDATION_ERROR', __('api.event_rsvp_status_required'), 'status', 400);
         }
 
         $success = $this->eventService->rsvp($id, $userId, $status);
@@ -339,7 +339,7 @@ class EventsController extends BaseApiController
                     'status'             => 'waitlisted',
                     'waitlist_position'  => $position,
                     'rsvp_counts'        => $event['rsvp_counts'] ?? ['going' => 0, 'interested' => 0],
-                    'message'            => 'Event is full. You have been added to the waitlist.',
+                    'message'            => __('api.event_full_waitlisted_msg'),
                 ]);
             }
 
@@ -402,7 +402,7 @@ class EventsController extends BaseApiController
 
         $event = $this->eventService->getById($id);
         if (!$event) {
-            return $this->respondWithError('NOT_FOUND', 'Event not found', null, 404);
+            return $this->respondWithError('NOT_FOUND', __('api.event_not_found'), null, 404);
         }
 
         $filters = [
@@ -439,19 +439,19 @@ class EventsController extends BaseApiController
         // Verify event exists
         $event = $this->eventService->getById($id);
         if (!$event) {
-            return $this->respondWithError('NOT_FOUND', 'Event not found', null, 404);
+            return $this->respondWithError('NOT_FOUND', __('api.event_not_found'), null, 404);
         }
 
         // Block check-in if event hasn't started yet (allow up to 30 min early)
         $startTime = isset($event['start_time']) ? strtotime($event['start_time']) : null;
         if ($startTime && $startTime > time() + 1800) {
-            return $this->respondWithError('TOO_EARLY', 'Check-in is not available until 30 minutes before the event starts', null, 422);
+            return $this->respondWithError('TOO_EARLY', __('api.event_too_early_checkin'), null, 422);
         }
 
         // Block check-in if event ended more than 24 hours ago
         $endTime = isset($event['end_time']) ? strtotime($event['end_time']) : $startTime;
         if ($endTime && $endTime < time() - 86400) {
-            return $this->respondWithError('EVENT_ENDED', 'Check-in is no longer available — event ended more than 24 hours ago', null, 422);
+            return $this->respondWithError('EVENT_ENDED', __('api.event_ended_checkin'), null, 422);
         }
 
         // Only the organizer or an admin can check in attendees
@@ -475,16 +475,16 @@ class EventsController extends BaseApiController
         }
 
         if (!$isOrganizer && !$isAdmin) {
-            return $this->respondWithError('FORBIDDEN', 'Only the event organizer can check in attendees', null, 403);
+            return $this->respondWithError('FORBIDDEN', __('api.event_organizer_only_checkin'), null, 403);
         }
 
         // Verify the attendee has an RSVP for this event
         $currentStatus = EventRsvp::getUserStatus($id, $attendeeId);
         if (!$currentStatus) {
-            return $this->respondWithError('VALIDATION_ERROR', 'This user has not RSVPed to this event', null, 422);
+            return $this->respondWithError('VALIDATION_ERROR', __('api.event_not_rsvped'), null, 422);
         }
         if ($currentStatus === 'attended') {
-            return $this->respondWithError('VALIDATION_ERROR', 'This attendee has already been checked in', null, 422);
+            return $this->respondWithError('VALIDATION_ERROR', __('api.event_already_checked_in'), null, 422);
         }
 
         // Calculate event duration (default 1 hour)
@@ -554,7 +554,7 @@ class EventsController extends BaseApiController
             return $this->respondWithError('INSUFFICIENT_BALANCE', $e->getMessage(), null, 422);
         } catch (\Exception $e) {
             \Log::error('Event check-in failed', ['event' => $id, 'error' => $e->getMessage()]);
-            return $this->respondWithError('CHECKIN_ERROR', 'Failed to check in attendee', null, 500);
+            return $this->respondWithError('CHECKIN_ERROR', __('api.event_checkin_failed'), null, 500);
         }
     }
 
@@ -624,7 +624,7 @@ class EventsController extends BaseApiController
 
         $event = $this->eventService->getById($id);
         if (!$event) {
-            return $this->respondWithError('NOT_FOUND', 'Event not found', null, 404);
+            return $this->respondWithError('NOT_FOUND', __('api.event_not_found'), null, 404);
         }
 
         $result = $this->eventService->getWaitlist($id, [
@@ -650,13 +650,13 @@ class EventsController extends BaseApiController
 
         $event = $this->eventService->getById($id);
         if (!$event) {
-            return $this->respondWithError('NOT_FOUND', 'Event not found', null, 404);
+            return $this->respondWithError('NOT_FOUND', __('api.event_not_found'), null, 404);
         }
 
         $success = $this->eventService->addToWaitlist($id, $userId);
 
         if (!$success) {
-            return $this->respondWithError('WAITLIST_FAILED', 'Failed to join waitlist', null, 400);
+            return $this->respondWithError('WAITLIST_FAILED', __('api.event_waitlist_failed'), null, 400);
         }
 
         $position = $this->eventService->getUserWaitlistPosition($id, $userId);
@@ -709,13 +709,13 @@ class EventsController extends BaseApiController
 
         $reminders = $this->input('reminders');
         if (!is_array($reminders)) {
-            return $this->respondWithError('VALIDATION_ERROR', 'reminders must be an array', 'reminders', 400);
+            return $this->respondWithError('VALIDATION_ERROR', __('api.event_reminders_must_be_array'), 'reminders', 400);
         }
 
         $success = $this->eventService->updateReminders($id, $userId, $reminders);
 
         if (!$success) {
-            return $this->respondWithError('UPDATE_FAILED', 'Failed to update reminders', null, 400);
+            return $this->respondWithError('UPDATE_FAILED', __('api.event_reminders_update_failed'), null, 400);
         }
 
         $updated = $this->eventService->getUserReminders($id, $userId);
@@ -737,7 +737,7 @@ class EventsController extends BaseApiController
 
         $event = $this->eventService->getById($id);
         if (!$event) {
-            return $this->respondWithError('NOT_FOUND', 'Event not found', null, 404);
+            return $this->respondWithError('NOT_FOUND', __('api.event_not_found'), null, 404);
         }
 
         $records = $this->eventService->getAttendanceRecords($id);
@@ -756,7 +756,7 @@ class EventsController extends BaseApiController
 
         $attendeeId = $this->inputInt('user_id');
         if (!$attendeeId) {
-            return $this->respondWithError('VALIDATION_ERROR', 'user_id is required', 'user_id', 400);
+            return $this->respondWithError('VALIDATION_ERROR', __('api.event_user_id_required'), 'user_id', 400);
         }
 
         $hours = $this->input('hours') !== null ? (float) $this->input('hours') : null;
@@ -798,7 +798,7 @@ class EventsController extends BaseApiController
 
         $userIds = $this->input('user_ids');
         if (!is_array($userIds) || empty($userIds)) {
-            return $this->respondWithError('VALIDATION_ERROR', 'user_ids must be a non-empty array', 'user_ids', 400);
+            return $this->respondWithError('VALIDATION_ERROR', __('api.event_user_ids_array_required'), 'user_ids', 400);
         }
 
         $result = $this->eventService->bulkMarkAttended($id, $userIds, $userId);
@@ -836,7 +836,7 @@ class EventsController extends BaseApiController
         $description = $this->input('description');
 
         if (empty($title)) {
-            return $this->respondWithError('VALIDATION_ERROR', 'Series title is required', 'title', 400);
+            return $this->respondWithError('VALIDATION_ERROR', __('api.event_series_title_required'), 'title', 400);
         }
 
         $seriesId = $this->eventService->createSeries($userId, $title, $description);
@@ -860,7 +860,7 @@ class EventsController extends BaseApiController
 
         $series = $this->eventService->getSeriesInfo($seriesId);
         if (!$series) {
-            return $this->respondWithError('NOT_FOUND', 'Series not found', null, 404);
+            return $this->respondWithError('NOT_FOUND', __('api.event_series_not_found'), null, 404);
         }
 
         $events = $this->eventService->getSeriesEvents($seriesId);
@@ -882,7 +882,7 @@ class EventsController extends BaseApiController
 
         $seriesId = $this->inputInt('series_id');
         if (!$seriesId) {
-            return $this->respondWithError('VALIDATION_ERROR', 'series_id is required', 'series_id', 400);
+            return $this->respondWithError('VALIDATION_ERROR', __('api.event_series_id_required'), 'series_id', 400);
         }
 
         $success = $this->eventService->linkToSeries($id, $seriesId, $userId);
@@ -955,7 +955,7 @@ class EventsController extends BaseApiController
         $scope = $data['scope'] ?? 'single';
 
         if (!in_array($scope, ['single', 'all'])) {
-            return $this->respondWithError('VALIDATION_ERROR', 'scope must be "single" or "all"', 'scope', 400);
+            return $this->respondWithError('VALIDATION_ERROR', __('api.event_scope_must_be_single_or_all'), 'scope', 400);
         }
 
         $success = $this->eventService->updateRecurring($id, $userId, $data, $scope);
@@ -999,7 +999,7 @@ class EventsController extends BaseApiController
 
         $file = request()->file('image');
         if (!$file || !$file->isValid()) {
-            return $this->respondWithError('VALIDATION_ERROR', 'No image file uploaded or upload error', 'image', 400);
+            return $this->respondWithError('VALIDATION_ERROR', __('api.event_no_image_uploaded'), 'image', 400);
         }
 
         try {
@@ -1035,7 +1035,7 @@ class EventsController extends BaseApiController
             return $this->respondWithData(['image_url' => $imageUrl]);
         } catch (\Exception $e) {
             \Log::error('Event image upload failed', ['error' => $e->getMessage()]);
-            return $this->respondWithError('UPLOAD_FAILED', 'Failed to upload image', 'image', 500);
+            return $this->respondWithError('UPLOAD_FAILED', __('api.event_image_upload_failed'), 'image', 500);
         }
     }
 }

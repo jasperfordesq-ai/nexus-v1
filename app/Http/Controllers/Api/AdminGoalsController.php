@@ -63,7 +63,7 @@ class AdminGoalsController extends BaseApiController
         $goal = $this->goalService->getById($id);
 
         if (!$goal) {
-            return $this->respondWithError('NOT_FOUND', 'Goal not found', null, 404);
+            return $this->respondWithError('NOT_FOUND', __('api.goal_not_found'), null, 404);
         }
 
         return $this->respondWithData($goal);
@@ -78,7 +78,7 @@ class AdminGoalsController extends BaseApiController
 
         $goal = $this->goalService->getById($id);
         if (!$goal) {
-            return $this->respondWithError('NOT_FOUND', 'Goal not found', null, 404);
+            return $this->respondWithError('NOT_FOUND', __('api.goal_not_found'), null, 404);
         }
 
         $deleted = $this->goalService->delete($id, $adminId);
@@ -87,6 +87,6 @@ class AdminGoalsController extends BaseApiController
             return $this->respondWithData(['deleted' => true, 'id' => $id]);
         }
 
-        return $this->respondWithError('DELETE_FAILED', 'Failed to delete goal', null, 400);
+        return $this->respondWithError('DELETE_FAILED', __('api.goal_delete_failed'), null, 400);
     }
 }

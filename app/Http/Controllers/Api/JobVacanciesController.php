@@ -54,7 +54,7 @@ class JobVacanciesController extends BaseApiController
     {
         if (!TenantContext::hasFeature('job_vacancies')) {
             throw new \Illuminate\Http\Exceptions\HttpResponseException(
-                $this->respondWithError('FEATURE_DISABLED', 'Job Vacancies module is not enabled for this community', null, 403)
+                $this->respondWithError('FEATURE_DISABLED', __('api.job_feature_disabled'), null, 403)
             );
         }
     }
@@ -148,7 +148,7 @@ class JobVacanciesController extends BaseApiController
         $job = $this->jobService->legacyGetById($id, $userId);
 
         if (!$job) {
-            return $this->respondWithError('RESOURCE_NOT_FOUND', 'Job vacancy not found', null, 404);
+            return $this->respondWithError('RESOURCE_NOT_FOUND', __('api.job_vacancy_not_found'), null, 404);
         }
 
         // Increment views
@@ -169,18 +169,18 @@ class JobVacanciesController extends BaseApiController
         // Validate required fields before calling service
         $title = trim($data['title'] ?? '');
         if (empty($title)) {
-            return $this->respondWithError('VALIDATION_ERROR', 'Title is required', 'title', 422);
+            return $this->respondWithError('VALIDATION_ERROR', __('api.title_required'), 'title', 422);
         }
 
         try {
             $jobId = $this->jobService->create($userId, $data);
         } catch (\Throwable $e) {
-            return $this->respondWithErrors([['code' => 'SERVER_INTERNAL_ERROR', 'message' => 'Failed to create job vacancy']], 500);
+            return $this->respondWithErrors([['code' => 'SERVER_INTERNAL_ERROR', 'message' => __('api.job_create_failed')]], 500);
         }
 
         if (!$jobId) {
             $errors = $this->jobService->getErrors();
-            return $this->respondWithErrors($errors ?: [['code' => 'SERVER_INTERNAL_ERROR', 'message' => 'Failed to create job vacancy']], 422);
+            return $this->respondWithErrors($errors ?: [['code' => 'SERVER_INTERNAL_ERROR', 'message' => __('api.job_create_failed')]], 422);
         }
 
         $job = $this->jobService->getById($jobId);
@@ -280,16 +280,16 @@ class JobVacanciesController extends BaseApiController
             $allowed = ['pdf', 'doc', 'docx'];
             $ext = strtolower($file->getClientOriginalExtension());
             if (!in_array($ext, $allowed)) {
-                return $this->respondWithError('VALIDATION_INVALID_VALUE', 'Invalid file type. Allowed: PDF, DOC, DOCX', 'cv', 422);
+                return $this->respondWithError('VALIDATION_INVALID_VALUE', __('api.job_cv_invalid_type'), 'cv', 422);
             }
             if ($file->getSize() > 5 * 1024 * 1024) {
-                return $this->respondWithError('VALIDATION_FILE_TOO_LARGE', 'File too large. Maximum 5MB', 'cv', 422);
+                return $this->respondWithError('VALIDATION_FILE_TOO_LARGE', __('api.job_cv_too_large'), 'cv', 422);
             }
             // MIME content inspection — block HTML/SVG/PHP disguised as document extensions
             $detectedMime = $file->getMimeType();
             $blockedMimes = ['text/html', 'application/xhtml+xml', 'image/svg+xml', 'application/x-httpd-php'];
             if ($detectedMime && in_array($detectedMime, $blockedMimes, true)) {
-                return $this->respondWithError('VALIDATION_INVALID_VALUE', 'This file type is not allowed', 'cv', 422);
+                return $this->respondWithError('VALIDATION_INVALID_VALUE', __('api.job_cv_type_not_allowed'), 'cv', 422);
             }
             $cvPath = $file->store("job-applications/{$tenantId}", 'local');
             $cvFilename = $file->getClientOriginalName();
@@ -311,7 +311,7 @@ class JobVacanciesController extends BaseApiController
 
             if (empty($errors)) {
                 // apply() returns null when already applied (idempotency)
-                return $this->respondWithError('RESOURCE_CONFLICT', 'You have already applied to this vacancy', null, 409);
+                return $this->respondWithError('RESOURCE_CONFLICT', __('api.job_already_applied'), null, 409);
             }
 
             foreach ($errors as $error) {
@@ -365,7 +365,7 @@ class JobVacanciesController extends BaseApiController
         $application = JobApplication::with(['vacancy'])->find($applicationId);
 
         if (!$application || !$application->vacancy || (int) $application->vacancy->tenant_id !== $tenantId) {
-            return $this->respondWithError('RESOURCE_NOT_FOUND', 'Application not found', null, 404);
+            return $this->respondWithError('RESOURCE_NOT_FOUND', __('api.job_application_not_found'), null, 404);
         }
 
         // Only allow: the applicant themselves, the job poster, or an admin
@@ -376,16 +376,16 @@ class JobVacanciesController extends BaseApiController
             $user = \App\Models\User::where('id', $userId)->first(['id', 'role']);
             $isAdmin = $user && in_array($user->role, ['admin', 'super_admin', 'tenant_admin']);
             if (!$isAdmin) {
-                return $this->respondWithError('RESOURCE_FORBIDDEN', 'Access denied', null, 403);
+                return $this->respondWithError('RESOURCE_FORBIDDEN', __('api.job_access_denied'), null, 403);
             }
         }
 
         if (empty($application->cv_path)) {
-            return $this->respondWithError('RESOURCE_NOT_FOUND', 'No CV attached to this application', null, 404);
+            return $this->respondWithError('RESOURCE_NOT_FOUND', __('api.job_no_cv_attached'), null, 404);
         }
 
         if (!Storage::disk('local')->exists($application->cv_path)) {
-            return $this->respondWithError('RESOURCE_NOT_FOUND', 'CV file not found', null, 404);
+            return $this->respondWithError('RESOURCE_NOT_FOUND', __('api.job_cv_file_not_found'), null, 404);
         }
 
         $filename = preg_replace('/[^a-zA-Z0-9._\- ]/', '_', $application->cv_filename ?? basename($application->cv_path));
@@ -451,7 +451,7 @@ class JobVacanciesController extends BaseApiController
             return $this->respondWithErrors($errors, 400);
         }
 
-        return $this->respondWithData(['message' => 'Job saved successfully', 'is_saved' => true], null, 201);
+        return $this->respondWithData(['message' => __('api.job_saved'), 'is_saved' => true], null, 201);
     }
 
     /** DELETE /api/v2/jobs/{id}/save */
@@ -463,7 +463,7 @@ class JobVacanciesController extends BaseApiController
 
         $this->jobService->unsaveJob((int) $id, $userId);
 
-        return $this->respondWithData(['message' => 'Job removed from saved', 'is_saved' => false]);
+        return $this->respondWithData(['message' => __('api.job_removed_from_saved'), 'is_saved' => false]);
     }
 
     // =====================================================================
@@ -558,7 +558,7 @@ class JobVacanciesController extends BaseApiController
 
         return $this->respondWithData([
             'id' => $alertId,
-            'message' => 'Job alert created successfully',
+            'message' => __('api.job_alert_created'),
         ], null, 201);
     }
 
@@ -583,7 +583,7 @@ class JobVacanciesController extends BaseApiController
 
         $this->jobService->unsubscribeAlert((int) $id, $userId);
 
-        return $this->respondWithData(['message' => 'Alert unsubscribed successfully']);
+        return $this->respondWithData(['message' => __('api.alert_unsubscribed')]);
     }
 
     /** PUT /api/v2/jobs/alerts/{id}/resubscribe */
@@ -595,7 +595,7 @@ class JobVacanciesController extends BaseApiController
 
         $this->jobService->resubscribeAlert((int) $id, $userId);
 
-        return $this->respondWithData(['message' => 'Alert resubscribed successfully']);
+        return $this->respondWithData(['message' => __('api.alert_resubscribed')]);
     }
 
     // =====================================================================
@@ -676,7 +676,7 @@ class JobVacanciesController extends BaseApiController
         $notes = $this->input('notes');
 
         if (empty($status)) {
-            return $this->respondWithError('VALIDATION_REQUIRED_FIELD', 'Status is required', 'status', 400);
+            return $this->respondWithError('VALIDATION_REQUIRED_FIELD', __('api.job_status_required'), 'status', 400);
         }
 
         $success = $this->jobService->updateApplicationStatus((int) $id, $userId, $status, $notes);
@@ -699,7 +699,7 @@ class JobVacanciesController extends BaseApiController
             return $this->respondWithErrors($errors, $httpStatus);
         }
 
-        return $this->respondWithData(['message' => 'Application updated successfully']);
+        return $this->respondWithData(['message' => __('api.application_updated')]);
     }
 
     /** GET /api/v2/jobs/applications/{id}/history */
@@ -861,13 +861,13 @@ class JobVacanciesController extends BaseApiController
         $data = $this->getAllInput();
 
         if (empty($data['scheduled_at'])) {
-            return $this->respondWithError('VALIDATION_REQUIRED_FIELD', 'scheduled_at is required', 'scheduled_at', 422);
+            return $this->respondWithError('VALIDATION_REQUIRED_FIELD', __('api.job_scheduled_at_required'), 'scheduled_at', 422);
         }
 
         $interview = JobInterviewService::propose($applicationId, $userId, $data);
 
         if ($interview === false) {
-            return $this->respondWithError('RESOURCE_FORBIDDEN', 'Unable to propose interview. Check application ownership and data.', null, 422);
+            return $this->respondWithError('RESOURCE_FORBIDDEN', __('api.job_interview_propose_failed'), null, 422);
         }
 
         return $this->respondWithData($interview, null, 201);
@@ -885,10 +885,10 @@ class JobVacanciesController extends BaseApiController
         $success = JobInterviewService::accept($interviewId, $userId, $notes);
 
         if (!$success) {
-            return $this->respondWithError('RESOURCE_FORBIDDEN', 'Unable to accept interview. It may not exist or already been actioned.', null, 422);
+            return $this->respondWithError('RESOURCE_FORBIDDEN', __('api.job_interview_accept_failed'), null, 422);
         }
 
-        return $this->respondWithData(['message' => 'Interview accepted successfully']);
+        return $this->respondWithData(['message' => __('api.interview_accepted')]);
     }
 
     /** PUT /api/v2/jobs/interviews/{id}/decline — candidate declines an interview */
@@ -903,10 +903,10 @@ class JobVacanciesController extends BaseApiController
         $success = JobInterviewService::decline($interviewId, $userId, $notes);
 
         if (!$success) {
-            return $this->respondWithError('RESOURCE_FORBIDDEN', 'Unable to decline interview. It may not exist or already been actioned.', null, 422);
+            return $this->respondWithError('RESOURCE_FORBIDDEN', __('api.job_interview_decline_failed'), null, 422);
         }
 
-        return $this->respondWithData(['message' => 'Interview declined successfully']);
+        return $this->respondWithData(['message' => __('api.interview_declined')]);
     }
 
     /** DELETE /api/v2/jobs/interviews/{id} — employer cancels an interview */
@@ -919,7 +919,7 @@ class JobVacanciesController extends BaseApiController
         $success = JobInterviewService::cancel($interviewId, $userId);
 
         if (!$success) {
-            return $this->respondWithError('RESOURCE_FORBIDDEN', 'Unable to cancel interview. It may not exist or already been completed.', null, 422);
+            return $this->respondWithError('RESOURCE_FORBIDDEN', __('api.job_interview_cancel_failed'), null, 422);
         }
 
         return $this->noContent();
@@ -935,12 +935,12 @@ class JobVacanciesController extends BaseApiController
         // Verify caller owns the vacancy or is admin
         $vacancy = \App\Models\JobVacancy::find($vacancyId);
         if (!$vacancy) {
-            return $this->respondWithError('RESOURCE_NOT_FOUND', 'Vacancy not found', null, 404);
+            return $this->respondWithError('RESOURCE_NOT_FOUND', __('api.job_vacancy_not_found'), null, 404);
         }
         if ((int) $vacancy->user_id !== $userId) {
             $user = \App\Models\User::where('id', $userId)->first(['id', 'role']);
             if (!$user || !in_array($user->role, ['admin', 'super_admin'])) {
-                return $this->respondWithError('RESOURCE_FORBIDDEN', 'Only the vacancy owner can view interviews', null, 403);
+                return $this->respondWithError('RESOURCE_FORBIDDEN', __('api.job_vacancy_owner_only_interviews'), null, 403);
             }
         }
 
@@ -977,7 +977,7 @@ class JobVacanciesController extends BaseApiController
         $offer = JobOfferService::create($applicationId, $userId, $data);
 
         if ($offer === false) {
-            return $this->respondWithError('RESOURCE_FORBIDDEN', 'Unable to create offer. Check application ownership or an offer may already exist.', null, 422);
+            return $this->respondWithError('RESOURCE_FORBIDDEN', __('api.job_offer_create_failed'), null, 422);
         }
 
         return $this->respondWithData($offer, null, 201);
@@ -993,10 +993,10 @@ class JobVacanciesController extends BaseApiController
         $success = JobOfferService::accept($offerId, $userId);
 
         if (!$success) {
-            return $this->respondWithError('RESOURCE_FORBIDDEN', 'Unable to accept offer. It may not exist or already been actioned.', null, 422);
+            return $this->respondWithError('RESOURCE_FORBIDDEN', __('api.job_offer_accept_failed'), null, 422);
         }
 
-        return $this->respondWithData(['message' => 'Offer accepted successfully']);
+        return $this->respondWithData(['message' => __('api.offer_accepted')]);
     }
 
     /** PUT /api/v2/jobs/offers/{id}/reject — candidate rejects a job offer */
@@ -1009,10 +1009,10 @@ class JobVacanciesController extends BaseApiController
         $success = JobOfferService::reject($offerId, $userId);
 
         if (!$success) {
-            return $this->respondWithError('RESOURCE_FORBIDDEN', 'Unable to reject offer. It may not exist or already been actioned.', null, 422);
+            return $this->respondWithError('RESOURCE_FORBIDDEN', __('api.job_offer_reject_failed'), null, 422);
         }
 
-        return $this->respondWithData(['message' => 'Offer rejected successfully']);
+        return $this->respondWithData(['message' => __('api.offer_rejected')]);
     }
 
     /** DELETE /api/v2/jobs/offers/{id} — employer withdraws a job offer */
@@ -1025,7 +1025,7 @@ class JobVacanciesController extends BaseApiController
         $success = JobOfferService::withdraw($offerId, $userId);
 
         if (!$success) {
-            return $this->respondWithError('RESOURCE_FORBIDDEN', 'Unable to withdraw offer. It may not exist or already been actioned.', null, 422);
+            return $this->respondWithError('RESOURCE_FORBIDDEN', __('api.job_offer_withdraw_failed'), null, 422);
         }
 
         return $this->noContent();
@@ -1041,7 +1041,7 @@ class JobVacanciesController extends BaseApiController
         $offer = JobOfferService::getForApplication($applicationId, $userId);
 
         if ($offer === null) {
-            return $this->respondWithError('RESOURCE_NOT_FOUND', 'Offer not found', null, 404);
+            return $this->respondWithError('RESOURCE_NOT_FOUND', __('api.job_offer_not_found'), null, 404);
         }
 
         return $this->respondWithData($offer);
@@ -1075,7 +1075,7 @@ class JobVacanciesController extends BaseApiController
         $application = JobApplication::with(['vacancy'])->find($id);
 
         if (!$application || !$application->vacancy || (int) $application->vacancy->tenant_id !== $tenantId) {
-            return $this->respondWithError('RESOURCE_NOT_FOUND', 'Application not found', null, 404);
+            return $this->respondWithError('RESOURCE_NOT_FOUND', __('api.job_application_not_found'), null, 404);
         }
 
         // Only allow: the applicant themselves or the job poster
@@ -1083,11 +1083,11 @@ class JobVacanciesController extends BaseApiController
         $isPoster = $application->vacancy && (int) $application->vacancy->user_id === $userId;
 
         if (!$isApplicant && !$isPoster) {
-            return $this->respondWithError('RESOURCE_FORBIDDEN', 'Access denied', null, 403);
+            return $this->respondWithError('RESOURCE_FORBIDDEN', __('api.job_access_denied'), null, 403);
         }
 
         if (empty($application->cv_path)) {
-            return $this->respondWithError('RESOURCE_NOT_FOUND', 'No CV attached to this application', null, 404);
+            return $this->respondWithError('RESOURCE_NOT_FOUND', __('api.job_no_cv_attached'), null, 404);
         }
 
         $parsed = AiChatService::parseResume($application->cv_path);
@@ -1107,7 +1107,7 @@ class JobVacanciesController extends BaseApiController
         $referral = JobReferralService::getOrCreate($id, $userId);
 
         if (empty($referral)) {
-            return $this->respondWithError('SERVER_INTERNAL_ERROR', 'Unable to create referral token', null, 422);
+            return $this->respondWithError('SERVER_INTERNAL_ERROR', __('api.job_referral_failed'), null, 422);
         }
         return $this->respondWithData(['referral' => $referral], null, 201);
     }
@@ -1123,12 +1123,12 @@ class JobVacanciesController extends BaseApiController
         // Verify caller owns the vacancy or is admin
         $vacancy = \App\Models\JobVacancy::find($id);
         if (!$vacancy) {
-            return $this->respondWithError('RESOURCE_NOT_FOUND', 'Vacancy not found', null, 404);
+            return $this->respondWithError('RESOURCE_NOT_FOUND', __('api.job_vacancy_not_found'), null, 404);
         }
         if ((int) $vacancy->user_id !== $userId) {
             $user = \App\Models\User::where('id', $userId)->first(['id', 'role']);
             if (!$user || !in_array($user->role, ['admin', 'super_admin'])) {
-                return $this->respondWithError('RESOURCE_FORBIDDEN', 'Only the vacancy owner can view referral stats', null, 403);
+                return $this->respondWithError('RESOURCE_FORBIDDEN', __('api.job_vacancy_owner_only_referrals'), null, 403);
             }
         }
 
@@ -1149,12 +1149,12 @@ class JobVacanciesController extends BaseApiController
         // Verify caller owns the vacancy or is admin (only employer/team should score)
         $application = JobApplication::with(['vacancy'])->find($id);
         if (!$application || !$application->vacancy || (int) $application->vacancy->tenant_id !== TenantContext::getId()) {
-            return $this->respondWithError('RESOURCE_NOT_FOUND', 'Application not found', null, 404);
+            return $this->respondWithError('RESOURCE_NOT_FOUND', __('api.job_application_not_found'), null, 404);
         }
         if ((int) $application->vacancy->user_id !== $userId) {
             $user = \App\Models\User::where('id', $userId)->first(['id', 'role']);
             if (!$user || !in_array($user->role, ['admin', 'super_admin'])) {
-                return $this->respondWithError('RESOURCE_FORBIDDEN', 'Only the vacancy owner can score applications', null, 403);
+                return $this->respondWithError('RESOURCE_FORBIDDEN', __('api.job_vacancy_owner_only_scoring'), null, 403);
             }
         }
 
@@ -1162,7 +1162,7 @@ class JobVacanciesController extends BaseApiController
         $result = JobScorecardService::upsert($id, $userId, $data);
 
         if ($result === false) {
-            return $this->respondWithError('SERVER_INTERNAL_ERROR', 'Unable to save scorecard', null, 422);
+            return $this->respondWithError('SERVER_INTERNAL_ERROR', __('api.job_scorecard_save_failed'), null, 422);
         }
         return $this->respondWithData(['scorecard' => $result]);
     }
@@ -1178,14 +1178,14 @@ class JobVacanciesController extends BaseApiController
         // Verify caller owns the vacancy, is the applicant, or is admin
         $application = JobApplication::with(['vacancy'])->find($id);
         if (!$application || !$application->vacancy || (int) $application->vacancy->tenant_id !== TenantContext::getId()) {
-            return $this->respondWithError('RESOURCE_NOT_FOUND', 'Application not found', null, 404);
+            return $this->respondWithError('RESOURCE_NOT_FOUND', __('api.job_application_not_found'), null, 404);
         }
         $isApplicant = (int) $application->user_id === $userId;
         $isPoster = (int) $application->vacancy->user_id === $userId;
         if (!$isApplicant && !$isPoster) {
             $user = \App\Models\User::where('id', $userId)->first(['id', 'role']);
             if (!$user || !in_array($user->role, ['admin', 'super_admin'])) {
-                return $this->respondWithError('RESOURCE_FORBIDDEN', 'Access denied', null, 403);
+                return $this->respondWithError('RESOURCE_FORBIDDEN', __('api.job_access_denied'), null, 403);
             }
         }
 
@@ -1211,7 +1211,7 @@ class JobVacanciesController extends BaseApiController
         );
 
         if ($result === false) {
-            return $this->respondWithError('RESOURCE_FORBIDDEN', 'Unable to add team member', null, 422);
+            return $this->respondWithError('RESOURCE_FORBIDDEN', __('api.job_team_add_failed'), null, 422);
         }
         return $this->respondWithData(['member' => $result], null, 201);
     }
@@ -1226,7 +1226,7 @@ class JobVacanciesController extends BaseApiController
 
         $ok = JobTeamService::removeMember($id, $currentUserId, $userId);
         if (!$ok) {
-            return $this->respondWithError('RESOURCE_FORBIDDEN', 'Unable to remove team member', null, 422);
+            return $this->respondWithError('RESOURCE_FORBIDDEN', __('api.job_team_remove_failed'), null, 422);
         }
         return $this->respondWithData(['success' => true]);
     }
@@ -1242,12 +1242,12 @@ class JobVacanciesController extends BaseApiController
         // Verify caller owns the vacancy or is admin
         $vacancy = \App\Models\JobVacancy::find($id);
         if (!$vacancy) {
-            return $this->respondWithError('RESOURCE_NOT_FOUND', 'Vacancy not found', null, 404);
+            return $this->respondWithError('RESOURCE_NOT_FOUND', __('api.job_vacancy_not_found'), null, 404);
         }
         if ((int) $vacancy->user_id !== $userId) {
             $user = \App\Models\User::where('id', $userId)->first(['id', 'role']);
             if (!$user || !in_array($user->role, ['admin', 'super_admin'])) {
-                return $this->respondWithError('RESOURCE_FORBIDDEN', 'Only the vacancy owner can view team members', null, 403);
+                return $this->respondWithError('RESOURCE_FORBIDDEN', __('api.job_vacancy_owner_only_team'), null, 403);
             }
         }
 
@@ -1280,7 +1280,7 @@ class JobVacanciesController extends BaseApiController
         $result = JobSavedProfileService::save($userId, $data);
 
         if ($result === false) {
-            return $this->respondWithError('SERVER_INTERNAL_ERROR', 'Unable to save profile', null, 422);
+            return $this->respondWithError('SERVER_INTERNAL_ERROR', __('api.job_profile_save_failed'), null, 422);
         }
         return $this->respondWithData(['profile' => $result]);
     }
@@ -1306,7 +1306,7 @@ class JobVacanciesController extends BaseApiController
         $result = JobTemplateService::create($userId, $data);
         return $result !== false
             ? $this->respondWithData(['template' => $result], null, 201)
-            : $this->respondWithError('SERVER_INTERNAL_ERROR', 'Unable to create template', null, 422);
+            : $this->respondWithError('SERVER_INTERNAL_ERROR', __('api.job_template_create_failed'), null, 422);
     }
 
     /**
@@ -1318,7 +1318,7 @@ class JobVacanciesController extends BaseApiController
         $template = JobTemplateService::get($id, $userId);
         return $template
             ? $this->respondWithData(['template' => $template])
-            : $this->respondWithError('RESOURCE_NOT_FOUND', 'Not found', null, 404);
+            : $this->respondWithError('RESOURCE_NOT_FOUND', __('api.not_found', ['model' => '']), null, 404);
     }
 
     /**
@@ -1330,7 +1330,7 @@ class JobVacanciesController extends BaseApiController
         $ok     = JobTemplateService::delete($id, $userId);
         return $ok
             ? $this->respondWithData(['success' => true])
-            : $this->respondWithError('RESOURCE_NOT_FOUND', 'Not found', null, 404);
+            : $this->respondWithError('RESOURCE_NOT_FOUND', __('api.not_found', ['model' => '']), null, 404);
     }
 
     // ── Salary Benchmarks ─────────────────────────────────────────────────
@@ -1362,8 +1362,8 @@ class JobVacanciesController extends BaseApiController
         $userId = $this->getUserId();
         $ok = JobGdprService::eraseUserData($userId);
         return $ok
-            ? $this->respondWithData(['success' => true, 'message' => 'Your job application data has been anonymised.'])
-            : $this->respondWithError('SERVER_INTERNAL_ERROR', 'Erasure failed', null, 500);
+            ? $this->respondWithData(['success' => true, 'message' => __('api.application_data_anonymised')])
+            : $this->respondWithError('SERVER_INTERNAL_ERROR', __('api.job_erasure_failed'), null, 500);
     }
 
     /** GET /v2/jobs/{id}/applications/export-csv */
@@ -1402,7 +1402,7 @@ class JobVacanciesController extends BaseApiController
         $result = JobPipelineRuleService::create($id, $userId, $data);
         return $result !== false
             ? $this->respondWithData(['rule' => $result], null, 201)
-            : $this->respondWithError('VALIDATION_ERROR', 'Unable to create rule', null, 422);
+            : $this->respondWithError('VALIDATION_ERROR', __('api.job_rule_create_failed'), null, 422);
     }
 
     /** DELETE /v2/jobs/pipeline-rules/{id} */
@@ -1412,7 +1412,7 @@ class JobVacanciesController extends BaseApiController
         $ok     = JobPipelineRuleService::delete($id, $userId);
         return $ok
             ? $this->respondWithData(['success' => true])
-            : $this->respondWithError('RESOURCE_NOT_FOUND', 'Not found', null, 404);
+            : $this->respondWithError('RESOURCE_NOT_FOUND', __('api.not_found', ['model' => '']), null, 404);
     }
 
     /** POST /v2/jobs/{id}/pipeline-rules/run */
@@ -1434,11 +1434,11 @@ class JobVacanciesController extends BaseApiController
         $status = $data['status'] ?? '';
 
         if (empty($ids) || !$status) {
-            return $this->respondWithError('VALIDATION_ERROR', 'application_ids and status are required', null, 422);
+            return $this->respondWithError('VALIDATION_ERROR', __('api.job_bulk_ids_status_required'), null, 422);
         }
 
         if (count($ids) > 1000) {
-            return $this->respondWithError('VALIDATION_ERROR', 'Maximum 1000 application IDs per request', null, 422);
+            return $this->respondWithError('VALIDATION_ERROR', __('api.job_bulk_max_1000'), null, 422);
         }
 
         $count  = $this->jobService->bulkUpdateApplicationStatus($id, $userId, $ids, $status);
@@ -1466,7 +1466,7 @@ class JobVacanciesController extends BaseApiController
         $commitment = $this->input('commitment', 'flexible');
 
         if (empty($title)) {
-            return $this->respondWithError('VALIDATION_REQUIRED_FIELD', 'Job title is required', 'title', 400);
+            return $this->respondWithError('VALIDATION_REQUIRED_FIELD', __('api.title_required'), 'title', 400);
         }
 
         $skillsList = is_array($skills) ? implode(', ', $skills) : (string) $skills;
@@ -1501,7 +1501,7 @@ class JobVacanciesController extends BaseApiController
         ]);
 
         if (!empty($result['error'])) {
-            return $this->respondWithError('AI_SERVICE_ERROR', $result['reply'] ?? 'Failed to generate description', null, 503);
+            return $this->respondWithError('AI_SERVICE_ERROR', $result['reply'] ?? __('api.job_ai_generate_failed'), null, 503);
         }
 
         return $this->respondWithData(['description' => $result['reply']]);
@@ -1522,7 +1522,7 @@ class JobVacanciesController extends BaseApiController
         $organizationId = $this->input('organization_id');
 
         if (empty($title)) {
-            return $this->respondWithError('VALIDATION_REQUIRED_FIELD', 'Job title is required', 'title', 400);
+            return $this->respondWithError('VALIDATION_REQUIRED_FIELD', __('api.title_required'), 'title', 400);
         }
 
         $tenantId = TenantContext::getId();
@@ -1581,7 +1581,7 @@ class JobVacanciesController extends BaseApiController
         $profile = $this->candidateService->getCandidateProfile($id, $tenantId);
 
         if (!$profile) {
-            return $this->respondWithError('RESOURCE_NOT_FOUND', 'Candidate profile not found or not searchable', null, 404);
+            return $this->respondWithError('RESOURCE_NOT_FOUND', __('api.job_candidate_not_found'), null, 404);
         }
 
         return $this->respondWithData($profile);
@@ -1599,7 +1599,7 @@ class JobVacanciesController extends BaseApiController
         $success = $this->candidateService->updateResumeVisibility($userId, $tenantId, $searchable);
 
         if (!$success) {
-            return $this->respondWithError('SERVER_INTERNAL_ERROR', 'Failed to update resume visibility', null, 500);
+            return $this->respondWithError('SERVER_INTERNAL_ERROR', __('api.job_resume_visibility_failed'), null, 500);
         }
 
         return $this->respondWithData([
@@ -1638,7 +1638,7 @@ class JobVacanciesController extends BaseApiController
         $slots = $data['slots'] ?? [];
 
         if (empty($slots) || !is_array($slots)) {
-            return $this->respondWithError('VALIDATION_REQUIRED_FIELD', 'At least one slot is required', 'slots', 400);
+            return $this->respondWithError('VALIDATION_REQUIRED_FIELD', __('api.job_slots_required'), 'slots', 400);
         }
 
         $created = $this->schedulingService->createSlots($id, $userId, $slots, $tenantId);
@@ -1678,11 +1678,11 @@ class JobVacanciesController extends BaseApiController
         $dayConfig = $data['day_config'] ?? [];
 
         if (empty($dateFrom) || empty($dateTo)) {
-            return $this->respondWithError('VALIDATION_REQUIRED_FIELD', 'date_from and date_to are required', 'date_from', 400);
+            return $this->respondWithError('VALIDATION_REQUIRED_FIELD', __('api.job_date_range_required'), 'date_from', 400);
         }
 
         if (empty($dayConfig)) {
-            return $this->respondWithError('VALIDATION_REQUIRED_FIELD', 'day_config is required', 'day_config', 400);
+            return $this->respondWithError('VALIDATION_REQUIRED_FIELD', __('api.job_day_config_required'), 'day_config', 400);
         }
 
         $created = $this->schedulingService->bulkCreateSlots(
@@ -1762,7 +1762,7 @@ class JobVacanciesController extends BaseApiController
             return $this->respondWithErrors($errors, 400);
         }
 
-        return $this->respondWithData(['message' => 'Booking cancelled']);
+        return $this->respondWithData(['message' => __('api.booking_cancelled')]);
     }
 
     /** DELETE /api/v2/jobs/interview-slots/{slotId} — employer deletes a slot */

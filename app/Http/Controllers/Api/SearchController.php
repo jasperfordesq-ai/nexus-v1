@@ -45,7 +45,7 @@ class SearchController extends BaseApiController
         $query = trim($this->query('q', ''));
 
         if (strlen($query) < 2) {
-            return $this->respondWithError('VALIDATION_ERROR', 'Search query must be at least 2 characters', 'q', 400);
+            return $this->respondWithError('VALIDATION_ERROR', __('api.search_query_min_length'), 'q', 400);
         }
 
         // Validate type param
@@ -55,7 +55,7 @@ class SearchController extends BaseApiController
             if (! in_array($type, $validTypes, true)) {
                 return $this->respondWithError(
                     'VALIDATION_ERROR',
-                    'Invalid type. Must be one of: ' . implode(', ', $validTypes),
+                    __('api.invalid_search_type', ['types' => implode(', ', $validTypes)]),
                     'type',
                     400
                 );
@@ -203,16 +203,16 @@ class SearchController extends BaseApiController
         $name = trim($input['name'] ?? '');
 
         if ($name === '') {
-            return $this->respondWithError('VALIDATION_ERROR', 'Name is required', 'name', 400);
+            return $this->respondWithError('VALIDATION_ERROR', __('api.name_required'), 'name', 400);
         }
 
         if (mb_strlen($name) > 255) {
-            return $this->respondWithError('VALIDATION_ERROR', 'Name must be 255 characters or less', 'name', 400);
+            return $this->respondWithError('VALIDATION_ERROR', __('api.name_max_length'), 'name', 400);
         }
 
         $queryParams = $input['query_params'] ?? [];
         if (! is_array($queryParams)) {
-            return $this->respondWithError('VALIDATION_ERROR', 'query_params must be an object', 'query_params', 400);
+            return $this->respondWithError('VALIDATION_ERROR', __('api.query_params_must_be_object'), 'query_params', 400);
         }
 
         $notifyOnNew = ! empty($input['notify_on_new']);
@@ -257,7 +257,7 @@ class SearchController extends BaseApiController
             ->delete();
 
         if (! $deleted) {
-            return $this->respondWithError('NOT_FOUND', 'Saved search not found', null, 404);
+            return $this->respondWithError('NOT_FOUND', __('api.saved_search_not_found'), null, 404);
         }
 
         return $this->respondWithData(['deleted' => true]);
@@ -284,7 +284,7 @@ class SearchController extends BaseApiController
             ->first();
 
         if (! $row) {
-            return $this->respondWithError('NOT_FOUND', 'Saved search not found', null, 404);
+            return $this->respondWithError('NOT_FOUND', __('api.saved_search_not_found'), null, 404);
         }
 
         $input = $this->getJsonInput();

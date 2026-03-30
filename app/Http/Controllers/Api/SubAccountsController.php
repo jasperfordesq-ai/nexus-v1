@@ -71,7 +71,7 @@ class SubAccountsController extends BaseApiController
         $result = $this->subAccountService->approve($id, $tenantId);
 
         if ($result === null) {
-            return $this->respondWithError('NOT_FOUND', 'Sub-account request not found', null, 404);
+            return $this->respondWithError('NOT_FOUND', __('api.sub_account_request_not_found'), null, 404);
         }
 
         return $this->respondWithData($result);

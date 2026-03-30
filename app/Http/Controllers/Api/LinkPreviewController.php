@@ -37,7 +37,7 @@ class LinkPreviewController extends BaseApiController
         $url = $this->query('url');
 
         if (empty($url)) {
-            return $this->respondWithError('VALIDATION_ERROR', 'URL parameter is required', null, 400);
+            return $this->respondWithError('VALIDATION_ERROR', __('api.url_required'), null, 400);
         }
 
         // Decode in case it was double-encoded
@@ -45,13 +45,13 @@ class LinkPreviewController extends BaseApiController
 
         // Basic URL validation
         if (! filter_var($url, FILTER_VALIDATE_URL)) {
-            return $this->respondWithError('VALIDATION_ERROR', 'Invalid URL', null, 400);
+            return $this->respondWithError('VALIDATION_ERROR', __('api.invalid_url'), null, 400);
         }
 
         $preview = $this->linkPreviewService->fetchPreview($url);
 
         if ($preview === null) {
-            return $this->respondWithError('NOT_FOUND', 'Could not fetch preview for this URL', null, 404);
+            return $this->respondWithError('NOT_FOUND', __('api.link_preview_failed'), null, 404);
         }
 
         return $this->respondWithData($preview);
@@ -71,24 +71,24 @@ class LinkPreviewController extends BaseApiController
         $url = $this->input('url');
 
         if (empty($url)) {
-            return $this->respondWithError('VALIDATION_ERROR', 'URL is required', null, 400);
+            return $this->respondWithError('VALIDATION_ERROR', __('api.url_required'), null, 400);
         }
 
         // Basic URL validation
         if (! filter_var($url, FILTER_VALIDATE_URL)) {
-            return $this->respondWithError('VALIDATION_ERROR', 'Invalid URL', null, 400);
+            return $this->respondWithError('VALIDATION_ERROR', __('api.invalid_url'), null, 400);
         }
 
         // Only allow HTTP and HTTPS schemes
         $scheme = strtolower(parse_url($url, PHP_URL_SCHEME) ?? '');
         if (! in_array($scheme, ['http', 'https'], true)) {
-            return $this->respondWithError('VALIDATION_ERROR', 'Only http and https URLs are supported', null, 400);
+            return $this->respondWithError('VALIDATION_ERROR', __('api.url_http_https_only'), null, 400);
         }
 
         $preview = $this->linkPreviewService->fetchPreview($url);
 
         if ($preview === null) {
-            return $this->respondWithError('NOT_FOUND', 'Could not fetch preview for this URL', null, 404);
+            return $this->respondWithError('NOT_FOUND', __('api.link_preview_failed'), null, 404);
         }
 
         return $this->respondWithData($preview);

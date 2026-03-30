@@ -64,7 +64,7 @@ class AdminIdeationController extends BaseApiController
         $challenge = $this->ideationChallengeService->getChallengeById($id);
 
         if (!$challenge) {
-            return $this->respondWithError('NOT_FOUND', 'Challenge not found', null, 404);
+            return $this->respondWithError('NOT_FOUND', __('api.challenge_not_found'), null, 404);
         }
 
         return $this->respondWithData($challenge);
@@ -79,7 +79,7 @@ class AdminIdeationController extends BaseApiController
 
         $challenge = $this->ideationChallengeService->getChallengeById($id);
         if (!$challenge) {
-            return $this->respondWithError('NOT_FOUND', 'Challenge not found', null, 404);
+            return $this->respondWithError('NOT_FOUND', __('api.challenge_not_found'), null, 404);
         }
 
         $deleted = $this->ideationChallengeService->deleteChallenge($id, $adminId);
@@ -88,7 +88,7 @@ class AdminIdeationController extends BaseApiController
             return $this->respondWithData(['deleted' => true, 'id' => $id]);
         }
 
-        return $this->respondWithError('DELETE_FAILED', 'Failed to delete challenge', null, 400);
+        return $this->respondWithError('DELETE_FAILED', __('api.challenge_delete_failed'), null, 400);
     }
 
     /**
@@ -100,7 +100,7 @@ class AdminIdeationController extends BaseApiController
 
         $status = $this->input('status');
         if (!$status || !in_array($status, ['open', 'closed', 'reviewing', 'archived'], true)) {
-            return $this->respondWithError('VALIDATION_ERROR', 'Invalid status. Valid: open, closed, reviewing, archived', 'status', 400);
+            return $this->respondWithError('VALIDATION_ERROR', __('api.invalid_challenge_status'), 'status', 400);
         }
 
         $updated = $this->ideationChallengeService->updateChallengeStatus($id, $adminId, $status);
@@ -109,6 +109,6 @@ class AdminIdeationController extends BaseApiController
             return $this->respondWithData(['id' => $id, 'status' => $status]);
         }
 
-        return $this->respondWithError('UPDATE_FAILED', 'Failed to update challenge status', null, 400);
+        return $this->respondWithError('UPDATE_FAILED', __('api.challenge_status_update_failed'), null, 400);
     }
 }

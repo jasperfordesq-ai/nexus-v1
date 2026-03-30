@@ -77,7 +77,7 @@ class DonationPaymentController extends BaseApiController
                 'tenant_id' => $tenantId,
                 'error' => $e->getMessage(),
             ]);
-            return $this->respondWithError('PAYMENT_ERROR', 'Payment processing failed. Please try again.', null, 500);
+            return $this->respondWithError('PAYMENT_ERROR', __('api.payment_processing_failed'), null, 500);
         }
     }
 
@@ -97,7 +97,7 @@ class DonationPaymentController extends BaseApiController
         $receipt = StripeDonationService::getDonationReceipt($id, $userId, $tenantId);
 
         if ($receipt === null) {
-            return $this->respondWithError('NOT_FOUND', 'Donation not found.', null, 404);
+            return $this->respondWithError('NOT_FOUND', __('api.donation_not_found'), null, 404);
         }
 
         return $this->respondWithData($receipt);
@@ -126,7 +126,7 @@ class DonationPaymentController extends BaseApiController
                 'tenant_id' => $tenantId,
                 'error' => $e->getMessage(),
             ]);
-            return $this->respondWithError('REFUND_ERROR', 'Refund processing failed. Please try again.', null, 500);
+            return $this->respondWithError('REFUND_ERROR', __('api.refund_processing_failed'), null, 500);
         }
     }
 }

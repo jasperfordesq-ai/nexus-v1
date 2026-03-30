@@ -67,6 +67,7 @@ function MethodChip({ method }: { method: 'GET' | 'POST' }) {
 // ─────────────────────────────────────────────────────────────────────────────
 
 function AuthenticationTab() {
+  const { t } = useTranslation('admin');
   return (
     <div className="space-y-6">
       {/* API Key Auth */}
@@ -123,7 +124,7 @@ BODY
             (use empty string for GET requests with no body), each separated by a newline character.
           </p>
           <p className="text-sm font-semibold text-default-700">Required headers:</p>
-          <Table aria-label="HMAC headers" removeWrapper>
+          <Table aria-label={t('api_docs.aria_hmac_headers')} removeWrapper>
             <TableHeader>
               <TableColumn>Header</TableColumn>
               <TableColumn>Description</TableColumn>
@@ -198,7 +199,7 @@ grant_type=client_credentials&scope=members:read listings:read
           <p className="text-sm text-default-600">
             All API responses include rate-limit headers. When the limit is exceeded, responses return <code className="text-xs bg-default-100 px-1.5 py-0.5 rounded">429 Too Many Requests</code>.
           </p>
-          <Table aria-label="Rate limit headers" removeWrapper>
+          <Table aria-label={t('api_docs.aria_rate_limit_headers')} removeWrapper>
             <TableHeader>
               <TableColumn>Header</TableColumn>
               <TableColumn>Description</TableColumn>
@@ -598,6 +599,7 @@ const ENDPOINTS: EndpointDef[] = [
 ];
 
 function EndpointsTab() {
+  const { t } = useTranslation('admin');
   return (
     <Accordion variant="bordered" selectionMode="multiple">
       {ENDPOINTS.map((ep, idx) => (
@@ -622,7 +624,7 @@ function EndpointsTab() {
             {ep.params && ep.params.length > 0 && (
               <>
                 <p className="text-sm font-semibold text-default-700">Parameters</p>
-                <Table aria-label="Parameters" removeWrapper>
+                <Table aria-label={t('api_docs.aria_parameters')} removeWrapper>
                   <TableHeader>
                     <TableColumn>Name</TableColumn>
                     <TableColumn>Type</TableColumn>
@@ -1119,7 +1121,7 @@ export function ApiDocumentation() {
       />
 
       <Tabs
-        aria-label="API Documentation sections"
+        aria-label={t('api_docs.aria_api_documentation_sections')}
         variant="underlined"
         classNames={{
           tabList: 'gap-6',

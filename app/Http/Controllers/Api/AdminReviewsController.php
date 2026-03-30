@@ -187,7 +187,7 @@ class AdminReviewsController extends BaseApiController
         }
 
         if (!$review) {
-            return $this->respondWithError('NOT_FOUND', 'Review not found', null, 404);
+            return $this->respondWithError('NOT_FOUND', __('api.review_not_found'), null, 404);
         }
 
         return $this->respondWithData([
@@ -230,7 +230,7 @@ class AdminReviewsController extends BaseApiController
         }
 
         if (!$review) {
-            return $this->respondWithError('NOT_FOUND', 'Review not found', null, 404);
+            return $this->respondWithError('NOT_FOUND', __('api.review_not_found'), null, 404);
         }
 
         $reviewTenantId = (int) $review->tenant_id;
@@ -262,7 +262,7 @@ class AdminReviewsController extends BaseApiController
         }
 
         if (!$review) {
-            return $this->respondWithError('NOT_FOUND', 'Review not found', null, 404);
+            return $this->respondWithError('NOT_FOUND', __('api.review_not_found'), null, 404);
         }
 
         $reviewTenantId = (int) $review->tenant_id;
@@ -312,7 +312,7 @@ class AdminReviewsController extends BaseApiController
         }
 
         if (!$review) {
-            return $this->respondWithError('NOT_FOUND', 'Review not found', null, 404);
+            return $this->respondWithError('NOT_FOUND', __('api.review_not_found'), null, 404);
         }
 
         $reviewTenantId = (int) $review->tenant_id;

@@ -228,7 +228,7 @@ export function UserMonitoring() {
   const columns: Column<MonitoredUser>[] = [
     {
       key: 'user_name',
-      label: 'User',
+      label: t('broker.col_user'),
       sortable: true,
       render: (item) => (
         <span className="font-medium text-foreground">{item.user_name}</span>
@@ -236,7 +236,7 @@ export function UserMonitoring() {
     },
     {
       key: 'under_monitoring',
-      label: 'Status',
+      label: t('broker.col_status'),
       render: (item) => (
         <div className="flex flex-wrap gap-1">
           <Chip
@@ -245,7 +245,7 @@ export function UserMonitoring() {
             color={item.under_monitoring ? 'warning' : 'default'}
             startContent={<Eye size={12} />}
           >
-            Monitored
+            {t('broker.monitored')}
           </Chip>
           {item.messaging_disabled && (
             <Chip
@@ -254,7 +254,7 @@ export function UserMonitoring() {
               color="danger"
               startContent={<MessageCircleOff size={12} />}
             >
-              Messaging Off
+              {t('broker.messaging_off')}
             </Chip>
           )}
         </div>
@@ -262,7 +262,7 @@ export function UserMonitoring() {
     },
     {
       key: 'monitoring_reason',
-      label: 'Reason',
+      label: t('broker.col_reason'),
       render: (item) => (
         <span className="text-sm text-default-600">
           {item.monitoring_reason || '—'}
@@ -271,7 +271,7 @@ export function UserMonitoring() {
     },
     {
       key: 'monitoring_started_at',
-      label: 'Started',
+      label: t('broker.col_started'),
       sortable: true,
       render: (item) => (
         <span className="text-sm text-default-500">
@@ -284,11 +284,11 @@ export function UserMonitoring() {
     },
     {
       key: 'monitoring_expires_at',
-      label: 'Expires',
+      label: t('broker.col_expires'),
       sortable: true,
       render: (item) => {
         if (!item.monitoring_expires_at) {
-          return <span className="text-sm text-default-400">No expiry</span>;
+          return <span className="text-sm text-default-400">{t('broker.no_expiry')}</span>;
         }
         const expiresAt = new Date(item.monitoring_expires_at);
         const isExpired = expiresAt <= new Date();
@@ -305,7 +305,7 @@ export function UserMonitoring() {
     },
     {
       key: 'actions',
-      label: 'Actions',
+      label: t('broker.col_actions'),
       render: (item) => (
         <Button
           isIconOnly
@@ -335,7 +335,7 @@ export function UserMonitoring() {
               size="sm"
               onPress={() => setMonitoringModalOpen(true)}
             >
-              Add to Monitoring
+              {t('broker.add_to_monitoring')}
             </Button>
             <Button
               as={Link}
@@ -344,7 +344,7 @@ export function UserMonitoring() {
               startContent={<ArrowLeft size={16} />}
               size="sm"
             >
-              Back
+              {t('common.back')}
             </Button>
           </div>
         }
@@ -353,7 +353,7 @@ export function UserMonitoring() {
       {!loading && items.length === 0 ? (
         <EmptyState
           icon={Eye}
-          title="No Monitored Users"
+          title={t('broker.no_monitored_users')}
           description={t('broker.desc_no_users_are_currently_under_monitoring_')}
         />
       ) : (
@@ -375,7 +375,7 @@ export function UserMonitoring() {
         <ModalContent>
           <ModalHeader className="flex items-center gap-2">
             <UserPlus size={20} className="text-primary" />
-            Add User to Monitoring
+            {t('broker.add_user_to_monitoring')}
           </ModalHeader>
           <ModalBody>
             {/* User search / selection */}
@@ -460,7 +460,7 @@ export function UserMonitoring() {
                   </ul>
                 )}
                 {userSearchQuery.length >= 2 && !isSearching && userSearchResults.length === 0 && (
-                  <p className="mt-1 text-xs text-default-400">No users found</p>
+                  <p className="mt-1 text-xs text-default-400">{t('broker.no_users_found')}</p>
                 )}
               </div>
             )}
@@ -475,7 +475,7 @@ export function UserMonitoring() {
               isRequired
             />
             <div className="flex items-center justify-between py-1">
-              <span className="text-sm text-default-600">Disable messaging</span>
+              <span className="text-sm text-default-600">{t('broker.disable_messaging')}</span>
               <Switch
                 isSelected={messagingDisabled}
                 onValueChange={setMessagingDisabled}
@@ -484,7 +484,7 @@ export function UserMonitoring() {
             </div>
             <Select
               label={t('broker.label_monitoring_duration')}
-              placeholder="No expiry (indefinite)"
+              placeholder={t('broker.placeholder_no_expiry')}
               variant="bordered"
               selectedKeys={expiresDays ? [expiresDays] : []}
               onSelectionChange={(keys) => {
@@ -505,7 +505,7 @@ export function UserMonitoring() {
               onPress={resetModalState}
               isDisabled={monitoringLoading}
             >
-              Cancel
+              {t('common.cancel')}
             </Button>
             <Button
               color="primary"
@@ -514,7 +514,7 @@ export function UserMonitoring() {
               isDisabled={!selectedUser}
               startContent={!monitoringLoading && <UserPlus size={14} />}
             >
-              Add to Monitoring
+              {t('broker.add_to_monitoring')}
             </Button>
           </ModalFooter>
         </ModalContent>

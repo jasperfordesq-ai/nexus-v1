@@ -53,7 +53,7 @@ class AdminCrmController extends BaseApiController
         $this->requireAdmin();
         $tenantId = $this->getTenantId();
         $contact = DB::selectOne('SELECT * FROM crm_contacts WHERE id = ? AND tenant_id = ?', [$id, $tenantId]);
-        if ($contact === null) { return $this->respondWithError('NOT_FOUND', 'Contact not found', null, 404); }
+        if ($contact === null) { return $this->respondWithError('NOT_FOUND', __('api.contact_not_found'), null, 404); }
         return $this->respondWithData($contact);
     }
 
@@ -68,10 +68,10 @@ class AdminCrmController extends BaseApiController
         foreach ($data as $key => $value) {
             if (in_array($key, $allowed, true)) { $sets[] = "{$key} = ?"; $params[] = $value; }
         }
-        if (empty($sets)) { return $this->respondWithError('VALIDATION_ERROR', 'No valid fields to update'); }
+        if (empty($sets)) { return $this->respondWithError('VALIDATION_ERROR', __('api.no_valid_fields')); }
         $params[] = $id; $params[] = $tenantId;
         $affected = DB::update('UPDATE crm_contacts SET ' . implode(', ', $sets) . ' WHERE id = ? AND tenant_id = ?', $params);
-        if ($affected === 0) { return $this->respondWithError('NOT_FOUND', 'Contact not found', null, 404); }
+        if ($affected === 0) { return $this->respondWithError('NOT_FOUND', __('api.contact_not_found'), null, 404); }
         return $this->respondWithData(['id' => $id, 'updated' => true]);
     }
 
@@ -81,7 +81,7 @@ class AdminCrmController extends BaseApiController
         $this->requireAdmin();
         $tenantId = $this->getTenantId();
         $contact = DB::selectOne('SELECT id FROM crm_contacts WHERE id = ? AND tenant_id = ?', [$id, $tenantId]);
-        if ($contact === null) { return $this->respondWithError('NOT_FOUND', 'Contact not found', null, 404); }
+        if ($contact === null) { return $this->respondWithError('NOT_FOUND', __('api.contact_not_found'), null, 404); }
         $notes = DB::select('SELECT * FROM crm_notes WHERE contact_id = ? AND tenant_id = ? ORDER BY created_at DESC', [$id, $tenantId]);
         return $this->respondWithData($notes);
     }
@@ -261,12 +261,12 @@ class AdminCrmController extends BaseApiController
         $category = $this->input('category', 'general');
 
         if (!$userId || !$content) {
-            return $this->respondWithError('VALIDATION_ERROR', 'user_id and content are required', null, 400);
+            return $this->respondWithError('VALIDATION_ERROR', __('api.user_id_content_required'), null, 400);
         }
 
         $user = DB::selectOne("SELECT id FROM users WHERE id = ? AND tenant_id = ?", [$userId, $tenantId]);
         if (!$user) {
-            return $this->respondWithError('NOT_FOUND', 'User not found', null, 404);
+            return $this->respondWithError('NOT_FOUND', __('api.user_not_found'), null, 404);
         }
 
         $validCategories = ['general', 'outreach', 'support', 'onboarding', 'concern', 'follow_up'];
@@ -300,7 +300,7 @@ class AdminCrmController extends BaseApiController
 
         $note = DB::selectOne("SELECT id FROM member_notes WHERE id = ? AND tenant_id = ?", [$id, $tenantId]);
         if (!$note) {
-            return $this->respondWithError('NOT_FOUND', 'Note not found', null, 404);
+            return $this->respondWithError('NOT_FOUND', __('api.note_not_found'), null, 404);
         }
 
         $updates = [];
@@ -326,7 +326,7 @@ class AdminCrmController extends BaseApiController
         }
 
         if (empty($updates)) {
-            return $this->respondWithError('VALIDATION_ERROR', 'No fields to update', null, 400);
+            return $this->respondWithError('VALIDATION_ERROR', __('api.no_fields_to_update'), null, 400);
         }
 
         $params[] = $id;
@@ -352,7 +352,7 @@ class AdminCrmController extends BaseApiController
 
         $note = DB::selectOne("SELECT id FROM member_notes WHERE id = ? AND tenant_id = ?", [$id, $tenantId]);
         if (!$note) {
-            return $this->respondWithError('NOT_FOUND', 'Note not found', null, 404);
+            return $this->respondWithError('NOT_FOUND', __('api.note_not_found'), null, 404);
         }
 
         DB::delete("DELETE FROM member_notes WHERE id = ? AND tenant_id = ?", [$id, $tenantId]);
@@ -438,7 +438,7 @@ class AdminCrmController extends BaseApiController
         $assignedTo = (int) $this->input('assigned_to', $adminId);
 
         if (!$title) {
-            return $this->respondWithError('VALIDATION_ERROR', 'title is required', null, 400);
+            return $this->respondWithError('VALIDATION_ERROR', __('api.title_is_required'), null, 400);
         }
 
         $validPriorities = ['low', 'medium', 'high', 'urgent'];
@@ -483,7 +483,7 @@ class AdminCrmController extends BaseApiController
 
         $task = DB::selectOne("SELECT id, status FROM coordinator_tasks WHERE id = ? AND tenant_id = ?", [$id, $tenantId]);
         if (!$task) {
-            return $this->respondWithError('NOT_FOUND', 'Task not found', null, 404);
+            return $this->respondWithError('NOT_FOUND', __('api.task_not_found'), null, 404);
         }
 
         $updates = [];
@@ -526,7 +526,7 @@ class AdminCrmController extends BaseApiController
         }
 
         if (empty($updates)) {
-            return $this->respondWithError('VALIDATION_ERROR', 'No fields to update', null, 400);
+            return $this->respondWithError('VALIDATION_ERROR', __('api.no_fields_to_update'), null, 400);
         }
 
         $params[] = $id;
@@ -556,7 +556,7 @@ class AdminCrmController extends BaseApiController
 
         $task = DB::selectOne("SELECT id FROM coordinator_tasks WHERE id = ? AND tenant_id = ?", [$id, $tenantId]);
         if (!$task) {
-            return $this->respondWithError('NOT_FOUND', 'Task not found', null, 404);
+            return $this->respondWithError('NOT_FOUND', __('api.task_not_found'), null, 404);
         }
 
         DB::delete("DELETE FROM coordinator_tasks WHERE id = ? AND tenant_id = ?", [$id, $tenantId]);
@@ -612,16 +612,16 @@ class AdminCrmController extends BaseApiController
         $tag = trim($this->input('tag', ''));
 
         if (!$userId || !$tag) {
-            return $this->respondWithError('VALIDATION_ERROR', 'user_id and tag are required', null, 400);
+            return $this->respondWithError('VALIDATION_ERROR', __('api.user_id_tag_required'), null, 400);
         }
 
         if (mb_strlen($tag) > 50) {
-            return $this->respondWithError('VALIDATION_ERROR', 'Tag must be 50 characters or less', null, 400);
+            return $this->respondWithError('VALIDATION_ERROR', __('api.tag_max_length'), null, 400);
         }
 
         $user = DB::selectOne("SELECT id FROM users WHERE id = ? AND tenant_id = ?", [$userId, $tenantId]);
         if (!$user) {
-            return $this->respondWithError('NOT_FOUND', 'User not found', null, 404);
+            return $this->respondWithError('NOT_FOUND', __('api.user_not_found'), null, 404);
         }
 
         try {
@@ -631,7 +631,7 @@ class AdminCrmController extends BaseApiController
             );
         } catch (\Throwable $e) {
             if (strpos($e->getMessage(), 'Duplicate') !== false) {
-                return $this->respondWithError('RESOURCE_ALREADY_EXISTS', 'Tag already assigned', null, 409);
+                return $this->respondWithError('RESOURCE_ALREADY_EXISTS', __('api.tag_already_assigned'), null, 409);
             }
             throw $e;
         }
@@ -652,12 +652,12 @@ class AdminCrmController extends BaseApiController
 
         $tag = trim($this->query('tag', ''));
         if (!$tag) {
-            return $this->respondWithError('VALIDATION_ERROR', 'tag parameter is required', null, 400);
+            return $this->respondWithError('VALIDATION_ERROR', __('api.tag_param_required'), null, 400);
         }
 
         $count = (int) DB::selectOne("SELECT COUNT(*) as cnt FROM member_tags WHERE tenant_id = ? AND tag = ?", [$tenantId, $tag])->cnt;
         if ($count === 0) {
-            return $this->respondWithError('NOT_FOUND', 'Tag not found', null, 404);
+            return $this->respondWithError('NOT_FOUND', __('api.tag_not_found'), null, 404);
         }
 
         DB::delete("DELETE FROM member_tags WHERE tenant_id = ? AND tag = ?", [$tenantId, $tag]);
@@ -674,7 +674,7 @@ class AdminCrmController extends BaseApiController
 
         $tag = DB::selectOne("SELECT id FROM member_tags WHERE id = ? AND tenant_id = ?", [$id, $tenantId]);
         if (!$tag) {
-            return $this->respondWithError('NOT_FOUND', 'Tag not found', null, 404);
+            return $this->respondWithError('NOT_FOUND', __('api.tag_not_found'), null, 404);
         }
 
         DB::delete("DELETE FROM member_tags WHERE id = ? AND tenant_id = ?", [$id, $tenantId]);

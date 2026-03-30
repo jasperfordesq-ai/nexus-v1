@@ -45,7 +45,7 @@ class PagesPublicController extends BaseApiController
             ->first();
 
         if (!$page) {
-            return $this->respondWithError('RESOURCE_NOT_FOUND', 'Page not found', null, 404);
+            return $this->respondWithError('RESOURCE_NOT_FOUND', __('api.page_not_found'), null, 404);
         }
 
         return $this->respondWithData([

@@ -113,7 +113,7 @@ class OnboardingController extends BaseApiController
                 DB::rollback();
                 return $this->respondWithError(
                     'VALIDATION_REQUIRED_FIELD',
-                    'Profile photo is required to complete onboarding',
+                    __('api.profile_photo_required'),
                     'avatar_url',
                     422
                 );
@@ -122,7 +122,7 @@ class OnboardingController extends BaseApiController
                 DB::rollback();
                 return $this->respondWithError(
                     'VALIDATION_REQUIRED_FIELD',
-                    'Bio is required to complete onboarding',
+                    __('api.bio_required'),
                     'bio',
                     422
                 );
@@ -142,7 +142,7 @@ class OnboardingController extends BaseApiController
                     DB::rollback();
                     return $this->respondWithError(
                         'VALIDATION_REQUIRED_STEP',
-                        'The safeguarding step must be completed before finishing onboarding',
+                        __('api.safeguarding_step_required'),
                         'safeguarding',
                         422
                     );
@@ -214,7 +214,7 @@ class OnboardingController extends BaseApiController
         if (!is_array($preferences) || empty($preferences)) {
             return $this->respondWithError(
                 'VALIDATION_ERROR',
-                'preferences must be a non-empty array of {option_id, value}',
+                __('api.preferences_array_required'),
                 'preferences',
                 422
             );
@@ -225,7 +225,7 @@ class OnboardingController extends BaseApiController
             if (empty($pref['option_id'])) {
                 return $this->respondWithError(
                     'VALIDATION_ERROR',
-                    "preferences[{$idx}].option_id is required",
+                    __('api.preference_option_id_required', ['index' => $idx]),
                     'preferences',
                     422
                 );

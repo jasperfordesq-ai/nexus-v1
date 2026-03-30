@@ -45,7 +45,7 @@ class VolunteerController extends BaseApiController
     {
         if (!TenantContext::hasFeature('volunteering')) {
             throw new \Illuminate\Http\Exceptions\HttpResponseException(
-                $this->respondWithError('FEATURE_DISABLED', 'Volunteering module is not enabled for this community', null, 403)
+                $this->respondWithError('FEATURE_DISABLED', __('api.volunteering_feature_disabled'), null, 403)
             );
         }
     }
@@ -87,7 +87,7 @@ class VolunteerController extends BaseApiController
         $this->ensureFeature();
         $this->rateLimit('volunteering_show', 120, 60);
         $opportunity = $this->volunteerService->getOpportunityById((int) $id, Auth::id());
-        if (!$opportunity) return $this->respondWithError('NOT_FOUND', 'Opportunity not found', null, 404);
+        if (!$opportunity) return $this->respondWithError('NOT_FOUND', __('api.opportunity_not_found'), null, 404);
         return $this->respondWithData($opportunity);
     }
 
@@ -161,7 +161,7 @@ class VolunteerController extends BaseApiController
             ->whereIn('status', ['pending', 'approved'])
             ->exists();
         if ($existing) {
-            return $this->respondWithError('ALREADY_EXISTS', 'You have already applied to this opportunity', null, 409);
+            return $this->respondWithError('ALREADY_EXISTS', __('api.already_applied'), null, 409);
         }
 
         try {
@@ -226,7 +226,7 @@ class VolunteerController extends BaseApiController
         $action = $this->input('action');
         $orgNote = trim((string) ($this->input('org_note') ?? ''));
         if (!$action || !in_array($action, ['approve', 'decline'], true)) {
-            return $this->respondWithError('VALIDATION_ERROR', 'Action must be approve or decline', 'action', 400);
+            return $this->respondWithError('VALIDATION_ERROR', __('api.action_must_be_approve_or_decline'), 'action', 400);
         }
 
         $success = $this->volunteerService->handleApplication((int) $id, $userId, $action, $orgNote);
@@ -405,7 +405,7 @@ class VolunteerController extends BaseApiController
 
         $action = $this->input('action');
         if (!$action || !in_array($action, ['approve', 'decline'], true)) {
-            return $this->respondWithError('VALIDATION_ERROR', 'Action must be approve or decline', 'action', 400);
+            return $this->respondWithError('VALIDATION_ERROR', __('api.action_must_be_approve_or_decline'), 'action', 400);
         }
 
         $success = $this->volunteerService->verifyHours((int) $id, $userId, $action);
@@ -436,7 +436,7 @@ class VolunteerController extends BaseApiController
         $this->ensureFeature();
         $this->rateLimit('volunteering_org_show', 120, 60);
         $org = $this->volunteerService->getOrganisationById((int) $id);
-        if (!$org) return $this->respondWithError('NOT_FOUND', 'Organisation not found', null, 404);
+        if (!$org) return $this->respondWithError('NOT_FOUND', __('api.organization_not_found'), null, 404);
         return $this->respondWithData($org);
     }
 
@@ -498,7 +498,7 @@ class VolunteerController extends BaseApiController
     {
         $this->ensureFeature();
         $this->rateLimit('volunteering_reviews', 60, 60);
-        if (!in_array($type, ['organization', 'user'])) return $this->respondWithError('VALIDATION_ERROR', 'Type must be organization or user', 'type', 400);
+        if (!in_array($type, ['organization', 'user'])) return $this->respondWithError('VALIDATION_ERROR', __('api.type_must_be_org_or_user'), 'type', 400);
         $reviews = $this->volunteerService->getReviews($type, (int) $id);
         return $this->respondWithData(['reviews' => $reviews]);
     }

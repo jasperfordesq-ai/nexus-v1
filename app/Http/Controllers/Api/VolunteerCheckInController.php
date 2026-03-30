@@ -29,7 +29,7 @@ class VolunteerCheckInController extends BaseApiController
     {
         if (!TenantContext::hasFeature('volunteering')) {
             throw new \Illuminate\Http\Exceptions\HttpResponseException(
-                $this->respondWithError('FEATURE_DISABLED', 'Volunteering module is not enabled for this community', null, 403)
+                $this->respondWithError('FEATURE_DISABLED', __('api.volunteering_feature_disabled'), null, 403)
             );
         }
     }
@@ -101,7 +101,7 @@ class VolunteerCheckInController extends BaseApiController
         }
 
         if (!$checkin) {
-            return $this->respondWithError('NOT_FOUND', 'No check-in available for this shift', null, 404);
+            return $this->respondWithError('NOT_FOUND', __('api.no_checkin_available'), null, 404);
         }
 
         return $this->respondWithData($checkin);
@@ -116,17 +116,17 @@ class VolunteerCheckInController extends BaseApiController
         $tenantId = TenantContext::getId();
         $shiftId = $this->volunteerCheckInService->getShiftIdByToken($token, $tenantId);
         if ($shiftId === null) {
-            return $this->respondWithError('NOT_FOUND', 'Invalid check-in code', null, 404);
+            return $this->respondWithError('NOT_FOUND', __('api.invalid_checkin_code'), null, 404);
         }
 
         if (!$this->canManageShift($shiftId, $userId)) {
-            return $this->respondWithError('FORBIDDEN', 'You do not have permission to verify check-ins for this shift', null, 403);
+            return $this->respondWithError('FORBIDDEN', __('api.no_permission_verify_checkin'), null, 403);
         }
 
         $result = $this->volunteerCheckInService->verifyCheckIn($token);
 
         if ($result === null) {
-            return $this->respondWithError('NOT_FOUND', 'Check-in not found or already completed', null, 404);
+            return $this->respondWithError('NOT_FOUND', __('api.checkin_not_found_or_completed'), null, 404);
         }
 
         return $this->respondWithData($result);
@@ -141,11 +141,11 @@ class VolunteerCheckInController extends BaseApiController
         $tenantId = TenantContext::getId();
         $shiftId = $this->volunteerCheckInService->getShiftIdByToken($token, $tenantId);
         if ($shiftId === null) {
-            return $this->respondWithError('NOT_FOUND', 'Invalid check-in code', null, 404);
+            return $this->respondWithError('NOT_FOUND', __('api.invalid_checkin_code'), null, 404);
         }
 
         if (!$this->canManageShift($shiftId, $userId)) {
-            return $this->respondWithError('FORBIDDEN', 'You do not have permission to check out volunteers for this shift', null, 403);
+            return $this->respondWithError('FORBIDDEN', __('api.no_permission_checkout'), null, 403);
         }
 
         $checkinUserId = $this->volunteerCheckInService->getUserIdByToken($token);
@@ -178,7 +178,7 @@ class VolunteerCheckInController extends BaseApiController
         $shiftId = (int) $id;
 
         if (!$this->canManageShift($shiftId, $userId)) {
-            return $this->respondWithError('FORBIDDEN', 'You do not have permission to view check-ins for this shift', null, 403);
+            return $this->respondWithError('FORBIDDEN', __('api.no_permission_view_checkins'), null, 403);
         }
 
         $checkins = $this->volunteerCheckInService->getShiftCheckIns($shiftId);

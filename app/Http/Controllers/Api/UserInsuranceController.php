@@ -61,7 +61,7 @@ class UserInsuranceController extends BaseApiController
 
         $insuranceType = request()->input('insurance_type', 'public_liability');
         if (!in_array($insuranceType, $validTypes, true)) {
-            return $this->respondWithError('VALIDATION_ERROR', 'Invalid insurance type', 'insurance_type');
+            return $this->respondWithError('VALIDATION_ERROR', __('api.invalid_insurance_type'), 'insurance_type');
         }
 
         // Handle file upload
@@ -75,12 +75,12 @@ class UserInsuranceController extends BaseApiController
             finfo_close($finfo);
 
             if (!in_array($mimeType, $allowedMimes, true)) {
-                return $this->respondWithError('VALIDATION_ERROR', 'Only PDF, JPG, and PNG files are accepted', 'certificate_file');
+                return $this->respondWithError('VALIDATION_ERROR', __('api.insurance_file_types'), 'certificate_file');
             }
 
             // Validate file size (10MB max)
             if ($file->getSize() > 10 * 1024 * 1024) {
-                return $this->respondWithError('VALIDATION_ERROR', 'File must be under 10MB', 'certificate_file');
+                return $this->respondWithError('VALIDATION_ERROR', __('api.file_exceeds_limit'), 'certificate_file');
             }
 
             // Store file — derive extension from validated MIME type (not user filename)
@@ -117,7 +117,7 @@ class UserInsuranceController extends BaseApiController
 
             return $this->respondWithData($record, null, 201);
         } catch (\Exception $e) {
-            return $this->respondWithError('SERVER_ERROR', 'Failed to upload insurance certificate', null, 500);
+            return $this->respondWithError('SERVER_ERROR', __('api.insurance_upload_failed'), null, 500);
         }
     }
 }

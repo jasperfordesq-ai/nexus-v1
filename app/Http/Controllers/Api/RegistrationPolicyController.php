@@ -123,7 +123,7 @@ class RegistrationPolicyController extends BaseApiController
 
         $sessionId = (int) $id;
         if (!$sessionId) {
-            return $this->respondWithError('VALIDATION_REQUIRED_FIELD', 'Session ID required', null, 400);
+            return $this->respondWithError('VALIDATION_REQUIRED_FIELD', __('api.reg_session_id_required'), null, 400);
         }
 
         try {
@@ -141,7 +141,7 @@ class RegistrationPolicyController extends BaseApiController
 
         $sessionId = (int) $id;
         if (!$sessionId) {
-            return $this->respondWithError('VALIDATION_REQUIRED_FIELD', 'Session ID required', null, 400);
+            return $this->respondWithError('VALIDATION_REQUIRED_FIELD', __('api.reg_session_id_required'), null, 400);
         }
 
         try {
@@ -186,7 +186,7 @@ class RegistrationPolicyController extends BaseApiController
         $tenantId = $this->getTenantId();
 
         if (!$slug || !$this->identityProviderRegistry->has($slug)) {
-            return $this->respondWithError('RESOURCE_NOT_FOUND', 'Unknown provider', null, 404);
+            return $this->respondWithError('RESOURCE_NOT_FOUND', __('api.reg_unknown_provider'), null, 404);
         }
 
         $input = $this->getAllInput();
@@ -200,7 +200,7 @@ class RegistrationPolicyController extends BaseApiController
         }
 
         if (empty($credentials)) {
-            return $this->respondWithError('VALIDATION_REQUIRED_FIELD', 'At least one credential field is required', null, 422);
+            return $this->respondWithError('VALIDATION_REQUIRED_FIELD', __('api.reg_credential_required'), null, 422);
         }
 
         $saved = $this->tenantProviderCredentialService->save($tenantId, $slug, $credentials);
@@ -215,7 +215,7 @@ class RegistrationPolicyController extends BaseApiController
         $tenantId = $this->getTenantId();
 
         if (!$slug || !$this->identityProviderRegistry->has($slug)) {
-            return $this->respondWithError('RESOURCE_NOT_FOUND', 'Unknown provider', null, 404);
+            return $this->respondWithError('RESOURCE_NOT_FOUND', __('api.reg_unknown_provider'), null, 404);
         }
 
         $deleted = $this->tenantProviderCredentialService->delete($tenantId, $slug);
@@ -252,7 +252,7 @@ class RegistrationPolicyController extends BaseApiController
         $note = isset($input['note']) ? substr(trim($input['note']), 0, 255) : null;
 
         if ($expiresAt && !strtotime($expiresAt)) {
-            return $this->respondWithError('VALIDATION_INVALID_FORMAT', 'Invalid expires_at date', null, 422);
+            return $this->respondWithError('VALIDATION_INVALID_FORMAT', __('api.reg_invalid_expires_at'), null, 422);
         }
 
         $codes = $this->inviteCodeService->generate($tenantId, $adminId, $count, $maxUses, $expiresAt, $note);
@@ -268,12 +268,12 @@ class RegistrationPolicyController extends BaseApiController
 
         $codeId = (int) $id;
         if (!$codeId) {
-            return $this->respondWithError('VALIDATION_REQUIRED_FIELD', 'Code ID required', null, 400);
+            return $this->respondWithError('VALIDATION_REQUIRED_FIELD', __('api.reg_code_id_required'), null, 400);
         }
 
         $success = $this->inviteCodeService->deactivate($tenantId, $codeId);
         if (!$success) {
-            return $this->respondWithError('RESOURCE_NOT_FOUND', 'Invite code not found', null, 404);
+            return $this->respondWithError('RESOURCE_NOT_FOUND', __('api.reg_invite_code_not_found'), null, 404);
         }
 
         return $this->respondWithData(['deactivated' => true]);
@@ -306,7 +306,7 @@ class RegistrationPolicyController extends BaseApiController
             return $this->respondWithData($result);
         } catch (\RuntimeException $e) {
             \Illuminate\Support\Facades\Log::error('Verification initiation failed', ['user' => $userId, 'error' => $e->getMessage()]);
-            return $this->respondWithError('SERVER_INTERNAL_ERROR', 'Verification service is temporarily unavailable', null, 503);
+            return $this->respondWithError('SERVER_INTERNAL_ERROR', __('api.reg_verification_unavailable'), null, 503);
         }
     }
 
@@ -320,7 +320,7 @@ class RegistrationPolicyController extends BaseApiController
         $code = $input['code'] ?? '';
 
         if (!$code || strlen($code) < 4) {
-            return $this->respondWithError('VALIDATION_REQUIRED_FIELD', 'Invite code required', null, 400);
+            return $this->respondWithError('VALIDATION_REQUIRED_FIELD', __('api.reg_invite_code_required'), null, 400);
         }
 
         $tenantId = $this->getTenantId();

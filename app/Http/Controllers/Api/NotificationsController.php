@@ -122,7 +122,7 @@ class NotificationsController extends BaseApiController
 
         $notification = $this->notificationService->getById($id, $userId);
         if ($notification === null) {
-            return $this->respondWithError('NOT_FOUND', 'Notification not found', null, 404);
+            return $this->respondWithError('NOT_FOUND', __('api.notification_not_found'), null, 404);
         }
 
         // Mark as read via direct update
@@ -149,7 +149,7 @@ class NotificationsController extends BaseApiController
         $notification = $this->notificationService->getById($id, $userId);
 
         if ($notification === null) {
-            return $this->respondWithError('NOT_FOUND', 'Notification not found', null, 404);
+            return $this->respondWithError('NOT_FOUND', __('api.notification_not_found'), null, 404);
         }
 
         return $this->respondWithData($notification);
@@ -169,7 +169,7 @@ class NotificationsController extends BaseApiController
         $deleted = $this->notificationService->delete($id, $userId);
 
         if (!$deleted) {
-            return $this->respondWithError('NOT_FOUND', 'Notification not found', null, 404);
+            return $this->respondWithError('NOT_FOUND', __('api.notification_not_found'), null, 404);
         }
 
         return $this->noContent();
@@ -267,7 +267,7 @@ class NotificationsController extends BaseApiController
                 ->where('user_id', $userId)
                 ->delete();
         } else {
-            return $this->respondWithError('VALIDATION_ERROR', 'Missing ID or Action', null, 400);
+            return $this->respondWithError('VALIDATION_ERROR', __('api.missing_id_or_action'), null, 400);
         }
 
         return $this->respondWithData(['message' => 'Notification deleted']);

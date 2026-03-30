@@ -168,7 +168,7 @@ class AdminReportsController extends BaseApiController
         }
 
         if (!$report) {
-            return $this->respondWithError('NOT_FOUND', 'Report not found', null, 404);
+            return $this->respondWithError('NOT_FOUND', __('api.report_not_found'), null, 404);
         }
 
         return $this->respondWithData([
@@ -204,11 +204,11 @@ class AdminReportsController extends BaseApiController
         }
 
         if (!$report) {
-            return $this->respondWithError('NOT_FOUND', 'Report not found', null, 404);
+            return $this->respondWithError('NOT_FOUND', __('api.report_not_found'), null, 404);
         }
 
         if ($report->status !== 'open') {
-            return $this->respondWithError('ALREADY_PROCESSED', 'Report is already ' . $report->status, null, 400);
+            return $this->respondWithError('ALREADY_PROCESSED', __('api.report_already_status', ['status' => $report->status]), null, 400);
         }
 
         $reportTenantId = (int) $report->tenant_id;
@@ -264,11 +264,11 @@ class AdminReportsController extends BaseApiController
         }
 
         if (!$report) {
-            return $this->respondWithError('NOT_FOUND', 'Report not found', null, 404);
+            return $this->respondWithError('NOT_FOUND', __('api.report_not_found'), null, 404);
         }
 
         if ($report->status !== 'open') {
-            return $this->respondWithError('ALREADY_PROCESSED', 'Report is already ' . $report->status, null, 400);
+            return $this->respondWithError('ALREADY_PROCESSED', __('api.report_already_status', ['status' => $report->status]), null, 400);
         }
 
         $reportTenantId = (int) $report->tenant_id;

@@ -58,7 +58,7 @@ class JobFeedController extends BaseApiController
         $tenantId = TenantContext::getId();
 
         if (!TenantContext::hasFeature('job_vacancies')) {
-            return $this->respondWithError('FEATURE_DISABLED', 'Job Vacancies module is not enabled for this community', null, 403);
+            return $this->respondWithError('FEATURE_DISABLED', __('api.job_vacancies_feature_disabled'), null, 403);
         }
 
         $data = $this->feedService->generateJsonFeed($tenantId);

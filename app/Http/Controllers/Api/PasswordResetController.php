@@ -50,7 +50,7 @@ class PasswordResetController extends BaseApiController
         if (empty($email) || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
             return $this->respondWithError(
                 ApiErrorCodes::VALIDATION_INVALID_FORMAT,
-                'Please provide a valid email address',
+                __('api.valid_email_required'),
                 'email',
                 400
             );
@@ -90,7 +90,7 @@ class PasswordResetController extends BaseApiController
         if (empty($token)) {
             $errors[] = [
                 'code' => ApiErrorCodes::VALIDATION_REQUIRED_FIELD,
-                'message' => 'Reset token is required',
+                'message' => __('api.reset_token_required'),
                 'field' => 'token'
             ];
         }
@@ -98,7 +98,7 @@ class PasswordResetController extends BaseApiController
         if (empty($password)) {
             $errors[] = [
                 'code' => ApiErrorCodes::VALIDATION_REQUIRED_FIELD,
-                'message' => 'Password is required',
+                'message' => __('api.password_required'),
                 'field' => 'password'
             ];
         }
@@ -106,7 +106,7 @@ class PasswordResetController extends BaseApiController
         if (empty($passwordConfirmation)) {
             $errors[] = [
                 'code' => ApiErrorCodes::VALIDATION_REQUIRED_FIELD,
-                'message' => 'Password confirmation is required',
+                'message' => __('api.password_confirmation_required'),
                 'field' => 'password_confirmation'
             ];
         }
@@ -119,7 +119,7 @@ class PasswordResetController extends BaseApiController
         if ($password !== $passwordConfirmation) {
             return $this->respondWithError(
                 ApiErrorCodes::VALIDATION_ERROR,
-                'Passwords do not match',
+                __('api.passwords_do_not_match'),
                 'password_confirmation',
                 400
             );
@@ -137,7 +137,7 @@ class PasswordResetController extends BaseApiController
         if (!$resetRecord) {
             return $this->respondWithError(
                 ApiErrorCodes::AUTH_TOKEN_INVALID,
-                'Invalid or expired reset token. Please request a new password reset.',
+                __('api.invalid_reset_token'),
                 'token',
                 400
             );
@@ -154,7 +154,7 @@ class PasswordResetController extends BaseApiController
         if (!$user) {
             return $this->respondWithError(
                 ApiErrorCodes::AUTH_TOKEN_INVALID,
-                'Unable to reset password. Please request a new password reset.',
+                __('api.unable_to_reset_password'),
                 'token',
                 400
             );
@@ -325,7 +325,7 @@ class PasswordResetController extends BaseApiController
         if (strlen($password) < self::MIN_PASSWORD_LENGTH) {
             $errors[] = [
                 'code' => ApiErrorCodes::VALIDATION_TOO_SHORT,
-                'message' => 'Password must be at least ' . self::MIN_PASSWORD_LENGTH . ' characters long',
+                'message' => __('api.password_min_length_generic', ['length' => self::MIN_PASSWORD_LENGTH]),
                 'field' => 'password'
             ];
         }
@@ -333,7 +333,7 @@ class PasswordResetController extends BaseApiController
         if (!preg_match('/[A-Z]/', $password)) {
             $errors[] = [
                 'code' => ApiErrorCodes::VALIDATION_INVALID_FORMAT,
-                'message' => 'Password must contain at least one uppercase letter',
+                'message' => __('api.password_uppercase'),
                 'field' => 'password'
             ];
         }
@@ -341,7 +341,7 @@ class PasswordResetController extends BaseApiController
         if (!preg_match('/[a-z]/', $password)) {
             $errors[] = [
                 'code' => ApiErrorCodes::VALIDATION_INVALID_FORMAT,
-                'message' => 'Password must contain at least one lowercase letter',
+                'message' => __('api.password_lowercase'),
                 'field' => 'password'
             ];
         }
@@ -349,7 +349,7 @@ class PasswordResetController extends BaseApiController
         if (!preg_match('/[0-9]/', $password)) {
             $errors[] = [
                 'code' => ApiErrorCodes::VALIDATION_INVALID_FORMAT,
-                'message' => 'Password must contain at least one number',
+                'message' => __('api.password_number'),
                 'field' => 'password'
             ];
         }
@@ -357,7 +357,7 @@ class PasswordResetController extends BaseApiController
         if (!preg_match('/[\W_]/', $password)) {
             $errors[] = [
                 'code' => ApiErrorCodes::VALIDATION_INVALID_FORMAT,
-                'message' => 'Password must contain at least one special character',
+                'message' => __('api.password_special_char'),
                 'field' => 'password'
             ];
         }

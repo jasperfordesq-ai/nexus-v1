@@ -158,7 +158,7 @@ class ConnectionsController extends BaseApiController
 
             return $this->respondWithError('INVALID_STATE', $msg, null, $status);
         } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
-            return $this->respondWithError('NOT_FOUND', 'Connection request not found', null, 404);
+            return $this->respondWithError('NOT_FOUND', __('api.connection_request_not_found'), null, 404);
         }
 
         // Award XP to both users for making a connection
@@ -216,7 +216,7 @@ class ConnectionsController extends BaseApiController
         $existing = $this->connectionService->getById($id, $userId);
 
         if ($existing === null) {
-            return $this->respondWithError('NOT_FOUND', 'Connection not found', null, 404);
+            return $this->respondWithError('NOT_FOUND', __('api.connection_not_found'), null, 404);
         }
 
         $this->connectionService->delete($id, $userId);

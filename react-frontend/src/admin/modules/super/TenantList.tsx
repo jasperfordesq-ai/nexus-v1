@@ -163,25 +163,25 @@ export function TenantList() {
         </DropdownTrigger>
         <DropdownMenu aria-label={t('super.label_tenant_actions')} onAction={handleMenuAction}>
           <DropdownItem key="view" startContent={<Eye size={14} />}>
-            View
+            {t('tenant_list.action_view')}
           </DropdownItem>
           <DropdownItem key="edit" startContent={<Edit size={14} />}>
-            Edit
+            {t('tenant_list.action_edit')}
           </DropdownItem>
           <DropdownItem key="toggle-hub" startContent={tenant.allows_subtenants ? <ToggleLeft size={14} /> : <ToggleRight size={14} />}>
-            {tenant.allows_subtenants ? 'Disable Hub' : 'Enable Hub'}
+            {tenant.allows_subtenants ? t('tenant_list.disable_hub') : t('tenant_list.enable_hub')}
           </DropdownItem>
           {tenant.is_active ? (
             <DropdownItem key="deactivate" startContent={<Shield size={14} />} className="text-warning" color="warning">
-              Deactivate
+              {t('tenant_list.deactivate')}
             </DropdownItem>
           ) : (
             <DropdownItem key="reactivate" startContent={<Shield size={14} />} className="text-success" color="success">
-              Reactivate
+              {t('tenant_list.reactivate')}
             </DropdownItem>
           )}
           <DropdownItem key="delete" startContent={<Trash2 size={14} />} className="text-danger" color="danger">
-            Delete
+            {t('tenant_list.action_delete')}
           </DropdownItem>
         </DropdownMenu>
       </Dropdown>
@@ -191,7 +191,7 @@ export function TenantList() {
   const columns: Column<SuperAdminTenant>[] = [
     {
       key: 'name',
-      label: 'Tenant',
+      label: t('tenant_list.col_tenant'),
       sortable: true,
       render: (tenant) => (
         <div>
@@ -207,14 +207,14 @@ export function TenantList() {
     },
     {
       key: 'domain',
-      label: 'Domain',
+      label: t('tenant_list.col_domain'),
       render: (tenant) => (
         <span className="text-sm text-default-500">{tenant.domain || '---'}</span>
       ),
     },
     {
       key: 'is_active',
-      label: 'Status',
+      label: t('tenant_list.col_status'),
       sortable: true,
       render: (tenant) => (
         <Chip size="sm" variant="flat" color={tenant.is_active ? 'success' : 'default'}>
@@ -224,13 +224,13 @@ export function TenantList() {
     },
     {
       key: 'user_count',
-      label: 'Users',
+      label: t('tenant_list.col_users'),
       sortable: true,
       render: (tenant) => <span>{tenant.user_count ?? 0}</span>,
     },
     {
       key: 'allows_subtenants',
-      label: 'Hub',
+      label: t('tenant_list.col_hub'),
       render: (tenant) =>
         tenant.allows_subtenants ? (
           <Chip size="sm" variant="flat" color="secondary">Hub</Chip>
@@ -240,7 +240,7 @@ export function TenantList() {
     },
     {
       key: 'parent_name',
-      label: 'Parent',
+      label: t('tenant_list.col_parent'),
       render: (tenant) => (
         <span className="text-sm text-default-500">
           {tenant.parent_name || '---'}
@@ -249,7 +249,7 @@ export function TenantList() {
     },
     {
       key: 'created_at',
-      label: 'Created',
+      label: t('tenant_list.col_created'),
       sortable: true,
       render: (tenant) => (
         <span className="text-sm text-default-500">
@@ -259,7 +259,7 @@ export function TenantList() {
     },
     {
       key: 'actions',
-      label: 'Actions',
+      label: t('tenant_list.col_actions'),
       render: (tenant) => <TenantActionsMenu tenant={tenant} />,
     },
   ];
@@ -288,14 +288,14 @@ export function TenantList() {
               startContent={<Network size={16} />}
               size="sm"
             >
-              View Hierarchy
+              {t('tenant_list.view_hierarchy')}
             </Button>
             <Button
               color="primary"
               startContent={<Plus size={16} />}
               onPress={() => navigate(tenantPath('/admin/super/tenants/create'))}
             >
-              Create Tenant
+              {t('tenant_list.create_tenant')}
             </Button>
           </div>
         }
@@ -308,10 +308,10 @@ export function TenantList() {
           variant="underlined"
           size="sm"
         >
-          <Tab key="all" title="All Tenants" />
-          <Tab key="active" title="Active" />
-          <Tab key="inactive" title="Inactive" />
-          <Tab key="hub" title="Hub Tenants" />
+          <Tab key="all" title={t('tenant_list.tab_all')} />
+          <Tab key="active" title={t('tenant_list.tab_active')} />
+          <Tab key="inactive" title={t('tenant_list.tab_inactive')} />
+          <Tab key="hub" title={t('tenant_list.tab_hub')} />
         </Tabs>
       </div>
 

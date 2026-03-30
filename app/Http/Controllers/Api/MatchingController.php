@@ -90,7 +90,7 @@ class MatchingController extends BaseApiController
         $this->rateLimit('match_dismiss', 200, 60);
 
         if ($listingId <= 0) {
-            return $this->respondWithError('VALIDATION_ERROR', 'Invalid listing ID', 'id', 400);
+            return $this->respondWithError('VALIDATION_ERROR', __('api.invalid_id', ['resource' => 'listing']), 'id', 400);
         }
 
         $reason = $this->input('reason');

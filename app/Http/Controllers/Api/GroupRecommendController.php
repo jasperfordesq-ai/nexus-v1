@@ -73,18 +73,18 @@ class GroupRecommendController extends BaseApiController
         $action = $this->input('action');
 
         if (!$groupId) {
-            return $this->respondWithError('VALIDATION_ERROR', 'group_id is required', 'group_id', 400);
+            return $this->respondWithError('VALIDATION_ERROR', __('api.missing_required_field', ['field' => 'group_id']), 'group_id', 400);
         }
 
         if (!$action) {
-            return $this->respondWithError('VALIDATION_ERROR', 'action is required', 'action', 400);
+            return $this->respondWithError('VALIDATION_ERROR', __('api.missing_required_field', ['field' => 'action']), 'action', 400);
         }
 
         $validActions = ['viewed', 'clicked', 'joined', 'dismissed'];
         if (!in_array($action, $validActions)) {
             return $this->respondWithError(
                 'VALIDATION_ERROR',
-                'Invalid action. Valid actions: ' . implode(', ', $validActions),
+                __('api.invalid_action', ['actions' => implode(', ', $validActions)]),
                 'action',
                 400
             );

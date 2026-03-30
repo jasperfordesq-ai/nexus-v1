@@ -84,7 +84,7 @@ class PollsController extends BaseApiController
         $poll = $this->pollService->getById($id, $userId);
 
         if (! $poll) {
-            return $this->respondWithError('RESOURCE_NOT_FOUND', 'Poll not found', null, 404);
+            return $this->respondWithError('RESOURCE_NOT_FOUND', __('api.poll_not_found'), null, 404);
         }
 
         return $this->respondWithData($poll);
@@ -102,11 +102,11 @@ class PollsController extends BaseApiController
         $data = $this->getAllInput();
 
         if (empty(trim($data['question'] ?? ''))) {
-            return $this->respondWithError('VALIDATION_REQUIRED_FIELD', 'Question is required', 'question', 400);
+            return $this->respondWithError('VALIDATION_REQUIRED_FIELD', __('api.social_question_required'), 'question', 400);
         }
 
         if (empty($data['options']) || ! is_array($data['options']) || count($data['options']) < 2) {
-            return $this->respondWithError('VALIDATION_REQUIRED_FIELD', 'At least 2 options are required', 'options', 400);
+            return $this->respondWithError('VALIDATION_REQUIRED_FIELD', __('api.social_min_2_options'), 'options', 400);
         }
 
         $poll = $this->pollService->create($userId, $data);
@@ -143,7 +143,7 @@ class PollsController extends BaseApiController
         $poll = $this->pollService->update($id, $userId, $this->getAllInput());
 
         if (! $poll) {
-            return $this->respondWithError('RESOURCE_NOT_FOUND', 'Poll not found or not owned', null, 404);
+            return $this->respondWithError('RESOURCE_NOT_FOUND', __('api.poll_not_found_or_not_owned'), null, 404);
         }
 
         $result = $this->pollService->getById($id, $userId);
@@ -163,7 +163,7 @@ class PollsController extends BaseApiController
         $deleted = $this->pollService->delete($id, $userId);
 
         if (! $deleted) {
-            return $this->respondWithError('RESOURCE_NOT_FOUND', 'Poll not found or not owned', null, 404);
+            return $this->respondWithError('RESOURCE_NOT_FOUND', __('api.poll_not_found_or_not_owned'), null, 404);
         }
 
         return $this->noContent();
@@ -181,13 +181,13 @@ class PollsController extends BaseApiController
         $optionId = $this->input('option_id');
 
         if (empty($optionId)) {
-            return $this->respondWithError('VALIDATION_REQUIRED_FIELD', 'Option ID is required', 'option_id', 400);
+            return $this->respondWithError('VALIDATION_REQUIRED_FIELD', __('api.social_option_id_required'), 'option_id', 400);
         }
 
         $success = $this->pollService->vote($id, (int) $optionId, $userId);
 
         if (! $success) {
-            return $this->respondWithError('RESOURCE_CONFLICT', 'Already voted on this poll', null, 409);
+            return $this->respondWithError('RESOURCE_CONFLICT', __('api.poll_already_voted'), null, 409);
         }
 
         // Award XP for voting on a poll
@@ -228,13 +228,13 @@ class PollsController extends BaseApiController
         $rankings = $this->input('rankings');
 
         if (empty($rankings) || ! is_array($rankings)) {
-            return $this->respondWithError('VALIDATION_REQUIRED_FIELD', 'Rankings array is required', 'rankings', 400);
+            return $this->respondWithError('VALIDATION_REQUIRED_FIELD', __('api.poll_rankings_required'), 'rankings', 400);
         }
 
         $success = $this->rankingService->submitRanking($id, $userId, $rankings);
 
         if (! $success) {
-            return $this->respondWithError('RESOURCE_CONFLICT', 'Already submitted rankings', null, 409);
+            return $this->respondWithError('RESOURCE_CONFLICT', __('api.poll_already_ranked'), null, 409);
         }
 
         // Notify poll creator of ranking submission
@@ -270,11 +270,11 @@ class PollsController extends BaseApiController
 
         $poll = $this->pollService->getById($id, $userId);
         if (! $poll) {
-            return $this->respondWithError('RESOURCE_NOT_FOUND', 'Poll not found', null, 404);
+            return $this->respondWithError('RESOURCE_NOT_FOUND', __('api.poll_not_found'), null, 404);
         }
 
         if (($poll['poll_type'] ?? 'standard') !== 'ranked') {
-            return $this->respondWithError('VALIDATION_INVALID_VALUE', 'This is not a ranked-choice poll', null, 400);
+            return $this->respondWithError('VALIDATION_INVALID_VALUE', __('api.poll_not_ranked_choice'), null, 400);
         }
 
         $results = $this->rankingService->calculateResults($id);
@@ -299,7 +299,7 @@ class PollsController extends BaseApiController
         $csv = $this->exportService->exportToCsv($id, $userId);
 
         if ($csv === null) {
-            return $this->respondWithError('RESOURCE_NOT_FOUND', 'Poll not found or not authorized', null, 404);
+            return $this->respondWithError('RESOURCE_NOT_FOUND', __('api.poll_not_found_or_unauthorized'), null, 404);
         }
 
         return response($csv, 200, [

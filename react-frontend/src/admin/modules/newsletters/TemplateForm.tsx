@@ -220,7 +220,7 @@ export function TemplateForm() {
   if (loading) {
     return (
       <div className="flex items-center justify-center py-20">
-        <Spinner size="lg" label="Loading template..." />
+        <Spinner size="lg" label={t('template_form.loading_template')} />
       </div>
     );
   }
@@ -230,7 +230,7 @@ export function TemplateForm() {
     return (
       <div>
         <PageHeader
-          title="Edit Template"
+          title={t('template_form.edit_template')}
           actions={
             <Button
               variant="flat"
@@ -263,7 +263,7 @@ export function TemplateForm() {
   return (
     <div>
       <PageHeader
-        title={isEdit ? `Edit Template: ${template?.name}` : 'Create Template'}
+        title={isEdit ? t('template_form.edit_template_name', { name: template?.name }) : t('template_form.create_template')}
         actions={
           <Button
             variant="flat"
@@ -286,7 +286,7 @@ export function TemplateForm() {
               </CardHeader>
               <CardBody className="gap-4">
                 <Input
-                  label="Name"
+                  label={t('template_form.label_name')}
                   placeholder="e.g. Monthly Newsletter"
                   value={name}
                   onValueChange={setName}
@@ -296,7 +296,7 @@ export function TemplateForm() {
                   isDisabled={submitting}
                 />
                 <Textarea
-                  label="Description"
+                  label={t('template_form.label_description')}
                   placeholder={t('template_form.description_placeholder')}
                   value={description}
                   onValueChange={setDescription}
@@ -306,7 +306,7 @@ export function TemplateForm() {
                 />
                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                   <Select
-                    label="Category"
+                    label={t('template_form.label_category')}
                     placeholder={t('template_form.category_placeholder')}
                     selectedKeys={category ? [category] : []}
                     onSelectionChange={(keys) => {
@@ -340,14 +340,14 @@ export function TemplateForm() {
               </CardHeader>
               <CardBody className="gap-4">
                 <Input
-                  label="Default Subject Line"
+                  label={t('template_form.label_default_subject_line')}
                   placeholder="e.g. Your Monthly Community Update"
                   value={subject}
                   onValueChange={setSubject}
                   isDisabled={submitting}
                 />
                 <Input
-                  label="Preview Text"
+                  label={t('template_form.label_preview_text')}
                   placeholder={t('template_form.preview_text_placeholder')}
                   value={previewText}
                   onValueChange={setPreviewText}
@@ -365,7 +365,7 @@ export function TemplateForm() {
               <CardBody className="gap-4">
                 <Suspense fallback={<Spinner size="sm" className="m-4" />}>
                   <RichTextEditor
-                    label="Template Content"
+                    label={t('template_form.label_template_content')}
                     placeholder={t('newsletters.placeholder_design_your_email_template_content')}
                     value={content}
                     onChange={setContent}

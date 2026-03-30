@@ -215,7 +215,7 @@ export function RiskTagsPage() {
         dbs_required: form.dbs_required,
       });
       if (res.success) {
-        toast.success(editingTag ? 'Risk tag updated' : 'Risk tag created');
+        toast.success(editingTag ? t('broker.risk_tag_updated') : t('broker.risk_tag_created'));
         closeModal();
         loadItems();
       } else {
@@ -261,7 +261,7 @@ export function RiskTagsPage() {
   const columns: Column<RiskTag>[] = [
     {
       key: 'listing_title',
-      label: 'Listing',
+      label: t('broker.col_listing'),
       sortable: true,
       render: (item) => (
         <span className="font-medium text-foreground">
@@ -271,7 +271,7 @@ export function RiskTagsPage() {
     },
     {
       key: 'owner_name',
-      label: 'Owner',
+      label: t('broker.col_owner'),
       sortable: true,
       render: (item) => (
         <span className="text-sm text-default-600">
@@ -281,7 +281,7 @@ export function RiskTagsPage() {
     },
     {
       key: 'risk_level',
-      label: 'Risk Level',
+      label: t('broker.col_risk_level'),
       sortable: true,
       render: (item) => (
         <Chip
@@ -300,7 +300,7 @@ export function RiskTagsPage() {
     },
     {
       key: 'risk_category',
-      label: 'Category',
+      label: t('broker.col_category'),
       sortable: true,
       render: (item) => {
         const label = RISK_CATEGORIES.find(c => c.key === item.risk_category)?.label;
@@ -309,7 +309,7 @@ export function RiskTagsPage() {
     },
     {
       key: 'requires_approval',
-      label: 'Approval Req.',
+      label: t('broker.col_approval_req'),
       render: (item) => (
         <Chip size="sm" variant="dot" color={item.requires_approval ? 'warning' : 'default'}>
           {item.requires_approval ? 'Yes' : 'No'}
@@ -318,7 +318,7 @@ export function RiskTagsPage() {
     },
     {
       key: 'insurance_required',
-      label: 'Insurance',
+      label: t('broker.col_insurance'),
       render: (item) => (
         <Chip size="sm" variant="dot" color={item.insurance_required ? 'warning' : 'default'}>
           {item.insurance_required ? 'Yes' : 'No'}
@@ -327,7 +327,7 @@ export function RiskTagsPage() {
     },
     {
       key: 'dbs_required',
-      label: 'DBS',
+      label: t('broker.col_dbs'),
       render: (item) => (
         <Chip size="sm" variant="dot" color={item.dbs_required ? 'warning' : 'default'}>
           {item.dbs_required ? 'Yes' : 'No'}
@@ -336,7 +336,7 @@ export function RiskTagsPage() {
     },
     {
       key: 'tagged_by_name',
-      label: 'Tagged By',
+      label: t('broker.col_tagged_by'),
       sortable: true,
       render: (item) => (
         <span className="text-sm text-default-500">
@@ -346,7 +346,7 @@ export function RiskTagsPage() {
     },
     {
       key: 'created_at',
-      label: 'Date',
+      label: t('broker.col_date'),
       sortable: true,
       render: (item) => (
         <span className="text-sm text-default-500">
@@ -356,7 +356,7 @@ export function RiskTagsPage() {
     },
     {
       key: 'id',
-      label: 'Actions',
+      label: t('broker.col_actions'),
       render: (item) => (
         <div className="flex gap-2">
           <Button
@@ -398,7 +398,7 @@ export function RiskTagsPage() {
               onPress={openCreateModal}
               size="sm"
             >
-              Tag Listing
+              {t('broker.tag_listing')}
             </Button>
             <Button
               as={Link}
@@ -407,7 +407,7 @@ export function RiskTagsPage() {
               startContent={<ArrowLeft size={16} />}
               size="sm"
             >
-              Back
+              {t('common.back')}
             </Button>
           </div>
         }
@@ -420,11 +420,11 @@ export function RiskTagsPage() {
           variant="underlined"
           size="sm"
         >
-          <Tab key="all" title="All" />
-          <Tab key="critical" title="Critical" />
-          <Tab key="high" title="High" />
-          <Tab key="medium" title="Medium" />
-          <Tab key="low" title="Low" />
+          <Tab key="all" title={t('broker.tab_all')} />
+          <Tab key="critical" title={t('broker.tab_critical')} />
+          <Tab key="high" title={t('broker.tab_high')} />
+          <Tab key="medium" title={t('broker.tab_medium')} />
+          <Tab key="low" title={t('broker.tab_low')} />
         </Tabs>
       </div>
 
@@ -441,7 +441,7 @@ export function RiskTagsPage() {
       <Modal isOpen={modalOpen} onClose={closeModal} size="lg">
         <ModalContent>
           <ModalHeader>
-            {editingTag ? 'Edit Risk Tag' : 'Tag Listing'}
+            {editingTag ? t('broker.edit_risk_tag') : t('broker.tag_listing')}
           </ModalHeader>
           <ModalBody className="space-y-4">
             {/* Listing search — only shown when creating */}
@@ -464,7 +464,7 @@ export function RiskTagsPage() {
                         setForm(f => ({ ...f, listing_id: '' }));
                       }}
                     >
-                      Change
+                      {t('broker.change')}
                     </Button>
                   </div>
                 ) : (
@@ -514,7 +514,7 @@ export function RiskTagsPage() {
             )}
             {editingTag && (
               <div>
-                <p className="text-sm text-default-500">Listing</p>
+                <p className="text-sm text-default-500">{t('broker.col_listing')}</p>
                 <p className="font-medium">{editingTag.listing_title ?? `Listing #${editingTag.listing_id}`}</p>
               </div>
             )}
@@ -569,8 +569,8 @@ export function RiskTagsPage() {
 
             <div className="flex items-center justify-between">
               <div>
-                <p className="font-medium text-sm">Requires Approval</p>
-                <p className="text-xs text-default-500">Broker must approve exchanges involving this listing</p>
+                <p className="font-medium text-sm">{t('broker.requires_approval')}</p>
+                <p className="text-xs text-default-500">{t('broker.requires_approval_desc')}</p>
               </div>
               <Switch
                 isSelected={form.requires_approval}
@@ -581,8 +581,8 @@ export function RiskTagsPage() {
 
             <div className="flex items-center justify-between">
               <div>
-                <p className="font-medium text-sm">Insurance Required</p>
-                <p className="text-xs text-default-500">Provider must have insurance for this listing</p>
+                <p className="font-medium text-sm">{t('broker.insurance_required')}</p>
+                <p className="text-xs text-default-500">{t('broker.insurance_required_desc')}</p>
               </div>
               <Switch
                 isSelected={form.insurance_required}
@@ -593,8 +593,8 @@ export function RiskTagsPage() {
 
             <div className="flex items-center justify-between">
               <div>
-                <p className="font-medium text-sm">DBS Check Required</p>
-                <p className="text-xs text-default-500">Provider must have a valid DBS check</p>
+                <p className="font-medium text-sm">{t('broker.dbs_check_required')}</p>
+                <p className="text-xs text-default-500">{t('broker.dbs_check_required_desc')}</p>
               </div>
               <Switch
                 isSelected={form.dbs_required}
@@ -605,10 +605,10 @@ export function RiskTagsPage() {
           </ModalBody>
           <ModalFooter>
             <Button variant="flat" onPress={closeModal}>
-              Cancel
+              {t('common.cancel')}
             </Button>
             <Button color="primary" onPress={handleSave} isLoading={saving} isDisabled={saving}>
-              {editingTag ? 'Update Tag' : 'Create Tag'}
+              {editingTag ? t('broker.update_tag') : t('broker.create_tag')}
             </Button>
           </ModalFooter>
         </ModalContent>

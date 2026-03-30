@@ -99,7 +99,7 @@ class FeedController extends BaseApiController
         $postId = (int) ($input['post_id'] ?? $input['target_id'] ?? 0);
 
         if ($postId <= 0) {
-            return $this->respondWithError('INVALID_INPUT', 'Invalid post ID');
+            return $this->respondWithError('INVALID_INPUT', __('api.invalid_post_id'));
         }
 
         $result = $this->feedService->like($postId, $userId);
@@ -122,7 +122,7 @@ class FeedController extends BaseApiController
         $postId = (int) ($this->input('post_id', 0));
 
         if ($postId <= 0) {
-            return $this->respondWithError('INVALID_INPUT', 'Invalid post ID');
+            return $this->respondWithError('INVALID_INPUT', __('api.invalid_post_id'));
         }
 
         try {
@@ -135,7 +135,7 @@ class FeedController extends BaseApiController
 
             return $this->respondWithData(['success' => true]);
         } catch (\Exception $e) {
-            return $this->respondWithError('DATABASE_ERROR', 'Database error', null, 500);
+            return $this->respondWithError('DATABASE_ERROR', __('api.database_error'), null, 500);
         }
     }
 
@@ -154,7 +154,7 @@ class FeedController extends BaseApiController
         $mutedUserId = (int) ($this->input('user_id', 0));
 
         if ($mutedUserId <= 0 || $mutedUserId === $userId) {
-            return $this->respondWithError('INVALID_INPUT', 'Invalid user');
+            return $this->respondWithError('INVALID_INPUT', __('api.invalid_user'));
         }
 
         try {
@@ -167,7 +167,7 @@ class FeedController extends BaseApiController
 
             return $this->respondWithData(['success' => true]);
         } catch (\Exception $e) {
-            return $this->respondWithError('DATABASE_ERROR', 'Database error', null, 500);
+            return $this->respondWithError('DATABASE_ERROR', __('api.database_error'), null, 500);
         }
     }
 
@@ -187,7 +187,7 @@ class FeedController extends BaseApiController
         $targetType = $this->input('target_type', 'post');
 
         if ($postId <= 0) {
-            return $this->respondWithError('INVALID_INPUT', 'Invalid post ID');
+            return $this->respondWithError('INVALID_INPUT', __('api.invalid_post_id'));
         }
 
         // Prevent duplicate reports from the same user
@@ -197,7 +197,7 @@ class FeedController extends BaseApiController
             ->where('tenant_id', $this->getTenantId())
             ->exists();
         if ($existing) {
-            return $this->respondWithError('DUPLICATE', 'Already reported', null, 409);
+            return $this->respondWithError('DUPLICATE', __('api.already_reported'), null, 409);
         }
 
         try {
@@ -212,7 +212,7 @@ class FeedController extends BaseApiController
 
             return $this->respondWithData(['success' => true]);
         } catch (\Exception $e) {
-            return $this->respondWithError('DATABASE_ERROR', 'Database error', null, 500);
+            return $this->respondWithError('DATABASE_ERROR', __('api.database_error'), null, 500);
         }
     }
 }

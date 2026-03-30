@@ -61,7 +61,7 @@ class BlogController extends BaseApiController
         $post = $this->blogService->getBySlug($slug, $this->getTenantId());
 
         if ($post === null) {
-            return $this->respondWithError('NOT_FOUND', 'Blog post not found', null, 404);
+            return $this->respondWithError('NOT_FOUND', __('api.blog_post_not_found'), null, 404);
         }
 
         return $this->respondWithData($post);

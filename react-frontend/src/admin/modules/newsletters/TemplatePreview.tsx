@@ -19,6 +19,7 @@ import {
   Spinner,
 } from '@heroui/react';
 import { X } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { adminNewsletters } from '../../api/adminApi';
 
 interface TemplatePreviewProps {
@@ -28,6 +29,7 @@ interface TemplatePreviewProps {
 }
 
 export function TemplatePreview({ templateId, isOpen, onClose }: TemplatePreviewProps) {
+  const { t } = useTranslation('admin');
   const [html, setHtml] = useState('');
   const [name, setName] = useState('');
   const [subject, setSubject] = useState('');
@@ -75,11 +77,11 @@ export function TemplatePreview({ templateId, isOpen, onClose }: TemplatePreview
         <ModalBody className="p-0">
           {loading ? (
             <div className="flex items-center justify-center py-20">
-              <Spinner size="lg" label="Loading preview..." />
+              <Spinner size="lg" label={t('template_form.loading_preview')} />
             </div>
           ) : (
             <iframe
-              title="Template Preview"
+              title={t('template_form.template_preview')}
               sandbox="allow-same-origin"
               srcDoc={html}
               className="w-full border-0"

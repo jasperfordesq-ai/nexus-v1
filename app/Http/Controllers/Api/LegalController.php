@@ -39,7 +39,7 @@ class LegalController extends BaseApiController
         $document = $this->legalService->getCurrentDocument($slug, $tenantId);
 
         if ($document === null) {
-            return $this->respondWithError('NOT_FOUND', 'Document not found', null, 404);
+            return $this->respondWithError('NOT_FOUND', __('api.legal_doc_not_found'), null, 404);
         }
 
         return $this->respondWithData($document);
@@ -91,7 +91,7 @@ class LegalController extends BaseApiController
     public function apiGetDocument($type): JsonResponse
     {
         if (!in_array($type, self::VALID_TYPES, true)) {
-            return $this->respondWithError('NOT_FOUND', 'Document type not found', null, 404);
+            return $this->respondWithError('NOT_FOUND', __('api.legal_doc_type_not_found'), null, 404);
         }
 
         $document = $this->legalService->getByType($type);
@@ -120,7 +120,7 @@ class LegalController extends BaseApiController
     public function apiGetVersions($type): JsonResponse
     {
         if (!in_array($type, self::VALID_TYPES, true)) {
-            return $this->respondWithError('NOT_FOUND', 'Document type not found', null, 404);
+            return $this->respondWithError('NOT_FOUND', __('api.legal_doc_type_not_found'), null, 404);
         }
 
         $document = $this->legalService->getByType($type);
@@ -160,15 +160,15 @@ class LegalController extends BaseApiController
         $version = $this->legalService->getVersion((int) $versionId);
 
         if (!$version) {
-            return $this->respondWithError('NOT_FOUND', 'Version not found', null, 404);
+            return $this->respondWithError('NOT_FOUND', __('api.legal_version_not_found'), null, 404);
         }
 
         if ((int) $version['tenant_id'] !== TenantContext::getId()) {
-            return $this->respondWithError('NOT_FOUND', 'Version not found', null, 404);
+            return $this->respondWithError('NOT_FOUND', __('api.legal_version_not_found'), null, 404);
         }
 
         if ($version['is_draft']) {
-            return $this->respondWithError('NOT_FOUND', 'Version not found', null, 404);
+            return $this->respondWithError('NOT_FOUND', __('api.legal_version_not_found'), null, 404);
         }
 
         return $this->respondWithData([
@@ -194,27 +194,27 @@ class LegalController extends BaseApiController
         $v2 = $this->query('v2');
 
         if (!$v1 || !$v2) {
-            return $this->respondWithError('VALIDATION_ERROR', 'Both v1 and v2 parameters are required', null, 400);
+            return $this->respondWithError('VALIDATION_ERROR', __('api.both_versions_required'), null, 400);
         }
 
         $version1 = $this->legalService->getVersion((int) $v1);
         $version2 = $this->legalService->getVersion((int) $v2);
 
         if (!$version1 || !$version2) {
-            return $this->respondWithError('NOT_FOUND', 'One or both versions not found', null, 404);
+            return $this->respondWithError('NOT_FOUND', __('api.versions_not_found'), null, 404);
         }
 
         $tenantId = TenantContext::getId();
         if ((int) $version1['tenant_id'] !== $tenantId || (int) $version2['tenant_id'] !== $tenantId) {
-            return $this->respondWithError('NOT_FOUND', 'Version not found', null, 404);
+            return $this->respondWithError('NOT_FOUND', __('api.legal_version_not_found'), null, 404);
         }
 
         if ($version1['is_draft'] || $version2['is_draft']) {
-            return $this->respondWithError('NOT_FOUND', 'Version not found', null, 404);
+            return $this->respondWithError('NOT_FOUND', __('api.legal_version_not_found'), null, 404);
         }
 
         if ((int) $version1['document_id'] !== (int) $version2['document_id']) {
-            return $this->respondWithError('VALIDATION_ERROR', 'Versions must belong to the same document', null, 400);
+            return $this->respondWithError('VALIDATION_ERROR', __('api.legal_versions_same_doc_required'), null, 400);
         }
 
         // Check cache
@@ -227,7 +227,7 @@ class LegalController extends BaseApiController
         $comparison = $this->legalService->compareVersions((int) $v1, (int) $v2);
 
         if (!$comparison) {
-            return $this->respondWithError('INTERNAL_ERROR', 'Comparison failed', null, 500);
+            return $this->respondWithError('INTERNAL_ERROR', __('api.legal_comparison_failed'), null, 500);
         }
 
         $publicVersion = static function (array $v): array {
@@ -264,17 +264,17 @@ class LegalController extends BaseApiController
         $versionId = (int) ($this->input('version_id', 0));
 
         if (!$documentId || !$versionId) {
-            return $this->respondWithError('VALIDATION_ERROR', 'Missing document_id or version_id', null, 400);
+            return $this->respondWithError('VALIDATION_ERROR', __('api.legal_missing_doc_or_version'), null, 400);
         }
 
         $version = $this->legalService->getVersion($versionId);
         if (!$version || (int) $version['tenant_id'] !== TenantContext::getId()) {
-            return $this->respondWithError('NOT_FOUND', 'Document version not found', null, 404);
+            return $this->respondWithError('NOT_FOUND', __('api.legal_version_not_found'), null, 404);
         }
 
         $document = $this->legalService->legacyGetById($documentId);
         if (!$document || ($document['current_version_id'] ?? null) !== $versionId) {
-            return $this->respondWithError('VALIDATION_ERROR', 'This is not the current version', null, 400);
+            return $this->respondWithError('VALIDATION_ERROR', __('api.legal_not_current_version'), null, 400);
         }
 
         try {
@@ -291,7 +291,7 @@ class LegalController extends BaseApiController
                 'accepted_at' => date('c'),
             ]);
         } catch (\Exception $e) {
-            return $this->respondWithError('INTERNAL_ERROR', 'Failed to record acceptance', null, 500);
+            return $this->respondWithError('INTERNAL_ERROR', __('api.legal_acceptance_failed'), null, 500);
         }
     }
 

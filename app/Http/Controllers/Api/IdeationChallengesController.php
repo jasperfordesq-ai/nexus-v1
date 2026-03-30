@@ -53,7 +53,7 @@ class IdeationChallengesController extends BaseApiController
     {
         if (!TenantContext::hasFeature('ideation_challenges')) {
             throw new \Illuminate\Http\Exceptions\HttpResponseException(
-                $this->respondWithError('FEATURE_DISABLED', 'Ideation Challenges module is not enabled for this community', null, 403)
+                $this->respondWithError('FEATURE_DISABLED', __('api.ideation_feature_disabled'), null, 403)
             );
         }
     }
@@ -127,7 +127,7 @@ class IdeationChallengesController extends BaseApiController
         $challenge = $this->challengeService->getById($id);
 
         if (!$challenge) {
-            return $this->respondWithError('RESOURCE_NOT_FOUND', 'Challenge not found', null, 404);
+            return $this->respondWithError('RESOURCE_NOT_FOUND', __('api.challenge_not_found'), null, 404);
         }
 
         return $this->respondWithData($challenge);
@@ -252,7 +252,7 @@ class IdeationChallengesController extends BaseApiController
         $newStatus = $this->input('status');
 
         if (empty($newStatus)) {
-            return $this->respondWithError('VALIDATION_REQUIRED_FIELD', 'Status is required', 'status', 400);
+            return $this->respondWithError('VALIDATION_REQUIRED_FIELD', __('api.status_required'), 'status', 400);
         }
 
         $success = $this->challengeService->updateChallengeStatus((int) $id, $userId, $newStatus);
@@ -314,7 +314,7 @@ class IdeationChallengesController extends BaseApiController
         $idea = $this->challengeService->getIdeaById((int) $id, $userId);
 
         if (!$idea) {
-            return $this->respondWithError('RESOURCE_NOT_FOUND', 'Idea not found', null, 404);
+            return $this->respondWithError('RESOURCE_NOT_FOUND', __('api.idea_not_found'), null, 404);
         }
 
         return $this->respondWithData($idea);
@@ -401,7 +401,7 @@ class IdeationChallengesController extends BaseApiController
         $newStatus = $this->input('status');
 
         if (empty($newStatus)) {
-            return $this->respondWithError('VALIDATION_REQUIRED_FIELD', 'Status is required', 'status', 400);
+            return $this->respondWithError('VALIDATION_REQUIRED_FIELD', __('api.status_required'), 'status', 400);
         }
 
         $success = $this->challengeService->updateIdeaStatus((int) $id, $userId, $newStatus);
@@ -718,7 +718,7 @@ class IdeationChallengesController extends BaseApiController
         $campaign = $this->campaignService->getById((int) $id);
 
         if (!$campaign) {
-            return $this->respondWithError('RESOURCE_NOT_FOUND', 'Campaign not found', null, 404);
+            return $this->respondWithError('RESOURCE_NOT_FOUND', __('api.campaign_not_found'), null, 404);
         }
 
         return $this->respondWithData($campaign);
@@ -794,7 +794,7 @@ class IdeationChallengesController extends BaseApiController
         $sortOrder = $this->inputInt('sort_order', 0);
 
         if (!$challengeId || $challengeId <= 0) {
-            return $this->respondWithError('VALIDATION_REQUIRED_FIELD', 'challenge_id is required', 'challenge_id', 400);
+            return $this->respondWithError('VALIDATION_REQUIRED_FIELD', __('api.missing_required_field', ['field' => 'challenge_id']), 'challenge_id', 400);
         }
 
         $success = $this->campaignService->linkChallenge((int) $id, $challengeId, $userId, $sortOrder);
@@ -844,7 +844,7 @@ class IdeationChallengesController extends BaseApiController
         $template = $this->challengeTemplateService->getById((int) $id);
 
         if (!$template) {
-            return $this->respondWithError('RESOURCE_NOT_FOUND', 'Template not found', null, 404);
+            return $this->respondWithError('RESOURCE_NOT_FOUND', __('api.template_not_found'), null, 404);
         }
 
         return $this->respondWithData($template);
@@ -915,7 +915,7 @@ class IdeationChallengesController extends BaseApiController
         $data = $this->challengeTemplateService->getTemplateData((int) $id);
 
         if ($data === null) {
-            return $this->respondWithError('RESOURCE_NOT_FOUND', 'Template not found', null, 404);
+            return $this->respondWithError('RESOURCE_NOT_FOUND', __('api.template_not_found'), null, 404);
         }
 
         return $this->respondWithData($data);
@@ -1163,7 +1163,7 @@ class IdeationChallengesController extends BaseApiController
         $task = $this->teamTaskService->getById((int) $id);
 
         if (!$task) {
-            return $this->respondWithError('RESOURCE_NOT_FOUND', 'Task not found', null, 404);
+            return $this->respondWithError('RESOURCE_NOT_FOUND', __('api.task_not_found'), null, 404);
         }
 
         return $this->respondWithData($task);

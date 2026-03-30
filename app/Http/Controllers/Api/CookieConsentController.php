@@ -160,7 +160,7 @@ class CookieConsentController extends BaseApiController
             ]);
         } catch (\Exception $e) {
             report($e);
-            return $this->respondWithError('SERVER_ERROR', 'Failed to retrieve cookie inventory', null, 500);
+            return $this->respondWithError('SERVER_ERROR', __('api.failed_retrieve_cookie_inventory'), null, 500);
         }
     }
 
@@ -218,10 +218,10 @@ class CookieConsentController extends BaseApiController
                 ]);
             }
 
-            return $this->respondWithError('NOT_FOUND', 'Consent record not found', null, 404);
+            return $this->respondWithError('NOT_FOUND', __('api.consent_record_not_found'), null, 404);
         } catch (\Exception $e) {
             report($e);
-            return $this->respondWithError('SERVER_ERROR', 'Failed to update consent preferences', null, 500);
+            return $this->respondWithError('SERVER_ERROR', __('api.failed_update_consent'), null, 500);
         }
     }
 
@@ -270,10 +270,10 @@ class CookieConsentController extends BaseApiController
                 ]);
             }
 
-            return $this->respondWithError('NOT_FOUND', 'Consent record not found', null, 404);
+            return $this->respondWithError('NOT_FOUND', __('api.consent_record_not_found'), null, 404);
         } catch (\Exception $e) {
             report($e);
-            return $this->respondWithError('SERVER_ERROR', 'Failed to withdraw consent', null, 500);
+            return $this->respondWithError('SERVER_ERROR', __('api.failed_withdraw_consent'), null, 500);
         }
     }
 }

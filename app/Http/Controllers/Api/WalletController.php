@@ -98,7 +98,7 @@ class WalletController extends BaseApiController
         $transaction = $this->walletService->getTransaction($id, $userId);
 
         if ($transaction === null) {
-            return $this->respondWithError('NOT_FOUND', 'Transaction not found', null, 404);
+            return $this->respondWithError('NOT_FOUND', __('api.transaction_not_found'), null, 404);
         }
 
         return $this->respondWithData($transaction);
@@ -175,7 +175,7 @@ class WalletController extends BaseApiController
         $success = $this->walletService->deleteTransaction($id, $userId);
 
         if (! $success) {
-            return $this->respondWithError('NOT_FOUND', 'Transaction not found', null, 404);
+            return $this->respondWithError('NOT_FOUND', __('api.transaction_not_found'), null, 404);
         }
 
         return $this->noContent();

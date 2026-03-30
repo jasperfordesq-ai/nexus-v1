@@ -307,7 +307,7 @@ class AdminSafeguardingController extends BaseApiController
             if ($affected === 0) {
                 return $this->respondWithError(
                     'NOT_FOUND',
-                    'Message not found or already reviewed.',
+                    __('api.safeguarding_message_not_found_or_reviewed'),
                     null,
                     404
                 );
@@ -331,7 +331,7 @@ class AdminSafeguardingController extends BaseApiController
             if ($this->isTableNotFound($e)) {
                 return $this->respondWithError(
                     'TABLE_NOT_FOUND',
-                    'Safeguarding tables have not been created yet.',
+                    __('api.safeguarding_tables_not_created'),
                     null,
                     404
                 );
@@ -361,7 +361,7 @@ class AdminSafeguardingController extends BaseApiController
             $guardianEmail = trim($request->input('guardian_email', ''));
 
             if (empty($wardEmail) || empty($guardianEmail)) {
-                return $this->respondWithError('VALIDATION_ERROR', 'Both ward and guardian emails are required', null, 422);
+                return $this->respondWithError('VALIDATION_ERROR', __('api.ward_guardian_emails_required'), null, 422);
             }
 
             $ward = \App\Models\User::where('email', $wardEmail)
@@ -374,10 +374,10 @@ class AdminSafeguardingController extends BaseApiController
                 ->first();
 
             if (!$ward) {
-                return $this->respondWithError('INVALID_USER', "No active member found with email: {$wardEmail}", 'ward_email', 404);
+                return $this->respondWithError('INVALID_USER', __('api.no_active_member_found', ['email' => $wardEmail]), 'ward_email', 404);
             }
             if (!$guardian) {
-                return $this->respondWithError('INVALID_USER', "No active member found with email: {$guardianEmail}", 'guardian_email', 404);
+                return $this->respondWithError('INVALID_USER', __('api.no_active_member_found', ['email' => $guardianEmail]), 'guardian_email', 404);
             }
 
             $wardId = $ward->id;
@@ -393,15 +393,15 @@ class AdminSafeguardingController extends BaseApiController
 
             // Validate both users belong to current tenant
             if (!\App\Models\User::where('id', $wardId)->where('tenant_id', $tenantId)->exists()) {
-                return $this->respondWithError('INVALID_USER', 'Ward user not found in this tenant', 'user_id', 404);
+                return $this->respondWithError('INVALID_USER', __('api.ward_not_found_in_tenant'), 'user_id', 404);
             }
             if (!\App\Models\User::where('id', $guardianId)->where('tenant_id', $tenantId)->exists()) {
-                return $this->respondWithError('INVALID_USER', 'Guardian user not found in this tenant', 'assignee_id', 404);
+                return $this->respondWithError('INVALID_USER', __('api.guardian_not_found_in_tenant'), 'assignee_id', 404);
             }
         }
 
         if ($wardId === $guardianId) {
-            return $this->respondWithError('VALIDATION_ERROR', 'Ward and guardian cannot be the same person', null, 422);
+            return $this->respondWithError('VALIDATION_ERROR', __('api.ward_guardian_same_person'), null, 422);
         }
 
         $notes = $request->input('notes', '');
@@ -465,7 +465,7 @@ class AdminSafeguardingController extends BaseApiController
             if ($this->isTableNotFound($e)) {
                 return $this->respondWithError(
                     'TABLE_NOT_FOUND',
-                    'Safeguarding tables have not been created yet.',
+                    __('api.safeguarding_tables_not_created'),
                     null,
                     404
                 );
@@ -496,7 +496,7 @@ class AdminSafeguardingController extends BaseApiController
             if ($affected === 0) {
                 return $this->respondWithError(
                     'NOT_FOUND',
-                    'Assignment not found or already revoked.',
+                    __('api.safeguarding_assignment_not_found_or_revoked'),
                     null,
                     404
                 );
@@ -520,7 +520,7 @@ class AdminSafeguardingController extends BaseApiController
             if ($this->isTableNotFound($e)) {
                 return $this->respondWithError(
                     'TABLE_NOT_FOUND',
-                    'Safeguarding tables have not been created yet.',
+                    __('api.safeguarding_tables_not_created'),
                     null,
                     404
                 );

@@ -60,7 +60,7 @@ class FeedSidebarController extends BaseApiController
             return $this->respondWithData($stats);
         } catch (\Throwable $e) {
             report($e);
-            return $this->respondWithError('INTERNAL_ERROR', 'Failed to load community stats', null, 500);
+            return $this->respondWithError('INTERNAL_ERROR', __('api.failed_load_community_stats'), null, 500);
         }
     }
 
@@ -120,7 +120,7 @@ class FeedSidebarController extends BaseApiController
             return $this->respondWithData($filtered);
         } catch (\Throwable $e) {
             report($e);
-            return $this->respondWithError('INTERNAL_ERROR', 'Failed to load suggestions', null, 500);
+            return $this->respondWithError('INTERNAL_ERROR', __('api.failed_load_suggestions'), null, 500);
         }
     }
 

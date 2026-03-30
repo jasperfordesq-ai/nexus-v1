@@ -382,7 +382,7 @@ export function NewsletterStats() {
           description={`${engagement.unique_clicks.toLocaleString()} unique clicks`}
         />
         <StatCard
-          label="Click-to-Open Rate"
+          label={t('newsletters.label_click_to_open_rate')}
           value={`${engagement.click_to_open_rate}%`}
           icon={BarChart3}
           color="secondary"

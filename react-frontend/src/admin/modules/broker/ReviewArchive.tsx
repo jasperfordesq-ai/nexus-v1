@@ -71,7 +71,7 @@ export function ReviewArchive() {
   const columns: Column<BrokerArchive>[] = [
     {
       key: 'sender_name',
-      label: 'Sender',
+      label: t('broker.col_sender'),
       sortable: true,
       render: (item) => (
         <Link
@@ -84,7 +84,7 @@ export function ReviewArchive() {
     },
     {
       key: 'receiver_name',
-      label: 'Receiver',
+      label: t('broker.col_receiver'),
       sortable: true,
       render: (item) => (
         <span className="font-medium text-foreground">{item.receiver_name}</span>
@@ -92,7 +92,7 @@ export function ReviewArchive() {
     },
     {
       key: 'listing_title',
-      label: 'Listing',
+      label: t('broker.col_listing'),
       sortable: true,
       render: (item) => (
         <span className="text-sm text-default-600">
@@ -102,7 +102,7 @@ export function ReviewArchive() {
     },
     {
       key: 'copy_reason',
-      label: 'Copy Reason',
+      label: t('broker.col_copy_reason'),
       render: (item) => (
         <Chip size="sm" variant="flat" color="default" className="capitalize">
           {item.copy_reason.replace(/_/g, ' ')}
@@ -111,7 +111,7 @@ export function ReviewArchive() {
     },
     {
       key: 'decision',
-      label: 'Decision',
+      label: t('broker.col_decision'),
       render: (item) => {
         const isApproved = item.decision === 'approved';
         return (
@@ -129,7 +129,7 @@ export function ReviewArchive() {
     },
     {
       key: 'decided_by_name',
-      label: 'Decided By',
+      label: t('broker.col_decided_by'),
       sortable: true,
       render: (item) => (
         <span className="text-sm text-foreground">{item.decided_by_name}</span>
@@ -137,7 +137,7 @@ export function ReviewArchive() {
     },
     {
       key: 'decided_at',
-      label: 'Date',
+      label: t('broker.col_date'),
       sortable: true,
       render: (item) => (
         <span className="text-sm text-default-500">
@@ -160,7 +160,7 @@ export function ReviewArchive() {
             startContent={<ArrowLeft size={16} />}
             size="sm"
           >
-            Back
+            {t('common.back')}
           </Button>
         }
       />
@@ -172,9 +172,9 @@ export function ReviewArchive() {
           variant="underlined"
           size="sm"
         >
-          <Tab key="all" title="All" />
-          <Tab key="approved" title="Approved" />
-          <Tab key="flagged" title="Flagged" />
+          <Tab key="all" title={t('broker.tab_all')} />
+          <Tab key="approved" title={t('broker.tab_approved')} />
+          <Tab key="flagged" title={t('broker.tab_flagged')} />
         </Tabs>
 
         <Input
@@ -201,7 +201,7 @@ export function ReviewArchive() {
         page={page}
         pageSize={20}
         onPageChange={setPage}
-        emptyContent="No archive records found"
+        emptyContent={t('broker.no_archive_records_found')}
       />
     </div>
   );

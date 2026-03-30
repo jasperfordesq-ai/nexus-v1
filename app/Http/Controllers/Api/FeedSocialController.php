@@ -50,12 +50,12 @@ class FeedSocialController extends BaseApiController
             ->first();
 
         if (! $original) {
-            return $this->respondWithError('NOT_FOUND', 'Post not found', null, 404);
+            return $this->respondWithError('NOT_FOUND', __('api.post_not_found'), null, 404);
         }
 
         // Cannot share own post
         if ((int) $original->user_id === $userId) {
-            return $this->respondWithError('SELF_SHARE', 'You cannot share your own post', null, 422);
+            return $this->respondWithError('SELF_SHARE', __('api.cannot_share_own_post'), null, 422);
         }
 
         // Check if already shared
@@ -66,7 +66,7 @@ class FeedSocialController extends BaseApiController
             ->exists();
 
         if ($existing) {
-            return $this->respondWithError('ALREADY_SHARED', 'You have already shared this post', null, 409);
+            return $this->respondWithError('ALREADY_SHARED', __('api.already_shared_post'), null, 409);
         }
 
         // Create share record
@@ -127,7 +127,7 @@ class FeedSocialController extends BaseApiController
             ->delete();
 
         if (! $deleted) {
-            return $this->respondWithError('NOT_FOUND', 'Share not found', null, 404);
+            return $this->respondWithError('NOT_FOUND', __('api.share_not_found'), null, 404);
         }
 
         // Decrement share count

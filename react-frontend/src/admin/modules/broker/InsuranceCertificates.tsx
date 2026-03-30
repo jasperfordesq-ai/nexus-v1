@@ -679,8 +679,8 @@ export function InsuranceCertificates() {
         emptyContent={
           <EmptyState
             icon={Users}
-            title="No insurance certificates found"
-            description={statusFilter !== 'all' ? 'Try changing the filter or search query.' : 'Add a certificate to get started.'}
+            title={t('broker.no_insurance_certificates_found')}
+            description={statusFilter !== 'all' ? t('broker.try_changing_filter') : t('broker.add_certificate_to_start')}
           />
         }
       />
@@ -1106,7 +1106,7 @@ export function InsuranceCertificates() {
         isOpen={!!deleteItem}
         onClose={() => setDeleteItem(null)}
         onConfirm={handleDelete}
-        title="Delete Insurance Certificate"
+        title={t('broker.delete_insurance_certificate')}
         message={deleteItem
           ? `Are you sure you want to delete the insurance certificate for ${deleteItem.first_name} ${deleteItem.last_name}? This action cannot be undone.`
           : ''}

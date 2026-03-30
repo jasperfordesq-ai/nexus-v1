@@ -55,7 +55,7 @@ class RegistrationController extends BaseApiController
         $result = $this->registrationService->verifyEmail($token);
 
         if (!$result) {
-            return $this->respondWithError('VERIFICATION_FAILED', 'Invalid or expired verification token', null, 400);
+            return $this->respondWithError('VERIFICATION_FAILED', __('api.invalid_verification_token'), null, 400);
         }
 
         return $this->respondWithData(['message' => 'Email verified successfully']);
