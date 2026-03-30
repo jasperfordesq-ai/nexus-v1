@@ -62,7 +62,12 @@ class NotificationDispatcher
             $frequency = 'daily';
         }
 
-        // 5. TRAFFIC LIGHT LOGIC
+        // 5. Direct messages override: always instant unless user explicitly opted out
+        if ($activityType === 'new_message' && $frequency !== 'off') {
+            $frequency = 'instant';
+        }
+
+        // 6. TRAFFIC LIGHT LOGIC
         switch ($frequency) {
             case 'instant':
                 self::queueNotification($userId, $activityType, $content, $link, 'instant', $htmlContent);
