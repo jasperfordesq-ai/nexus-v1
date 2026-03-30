@@ -263,10 +263,10 @@ export default function FederationSystemControls() {
                 variant="bordered"
                 description={t('super.desc_highest_level_allowed_for_new_partnershi')}
               >
-                <SelectItem key="1">Level 1 - Profiles Only</SelectItem>
-                <SelectItem key="2">Level 2 - Profiles + Messaging</SelectItem>
-                <SelectItem key="3">Level 3 - Profiles + Messaging + Transactions</SelectItem>
-                <SelectItem key="4">Level 4 - Full Integration</SelectItem>
+                <SelectItem key="1">{t('super.federation_level_1')}</SelectItem>
+                <SelectItem key="2">{t('super.federation_level_2')}</SelectItem>
+                <SelectItem key="3">{t('super.federation_level_3')}</SelectItem>
+                <SelectItem key="4">{t('super.federation_level_4')}</SelectItem>
               </Select>
             </div>
           )}

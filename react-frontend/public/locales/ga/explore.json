@@ -117,6 +117,9 @@
     "applications": "{{count}} iarratas",
     "deadline": "Spriocdháta: {{date}}"
   },
+  "aria": {
+    "content_tabs": "Explore content tabs"
+  },
   "tabs": {
     "all": "Gach rud",
     "for_you": "Duit Féin",

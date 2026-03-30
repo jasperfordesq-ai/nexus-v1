@@ -7,6 +7,7 @@
   "template_created": "Obiettivo creato dal modello!",
   "template_create_failed": "Impossibile creare l'obiettivo dal modello.",
   "checkin": {
+    "aria_progress_percentage": "Progress percentage",
     "title": "Check-in",
     "new_checkin": "Nuovo Check-in",
     "history": "Cronologia",

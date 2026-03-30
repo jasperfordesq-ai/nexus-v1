@@ -885,9 +885,9 @@ export function JobKanbanPage() {
                 setOfferForm((f) => ({ ...f, salary_currency: key }));
               }}
             >
-              <SelectItem key="EUR">EUR</SelectItem>
-              <SelectItem key="GBP">GBP</SelectItem>
-              <SelectItem key="USD">USD</SelectItem>
+              <SelectItem key="EUR">{t('salary.currency_eur', 'EUR')}</SelectItem>
+              <SelectItem key="GBP">{t('salary.currency_gbp', 'GBP')}</SelectItem>
+              <SelectItem key="USD">{t('salary.currency_usd', 'USD')}</SelectItem>
             </Select>
             <Select
               label={t('salary.form_type_label', 'Pay Type')}

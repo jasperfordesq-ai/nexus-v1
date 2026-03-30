@@ -60,6 +60,7 @@ import {
   Check,
   X,
 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 /* ───────────────────────── Types ───────────────────────── */
 
@@ -110,6 +111,7 @@ const EDITOR_NODES = [ListNode, ListItemNode, LinkNode, AutoLinkNode];
 
 function ComposeToolbar({ isDisabled }: { isDisabled?: boolean }) {
   const [editor] = useLexicalComposerContext();
+  const { t } = useTranslation('common');
   const [isBold, setIsBold] = useState(false);
   const [isItalic, setIsItalic] = useState(false);
   const [isUnderline, setIsUnderline] = useState(false);
@@ -213,7 +215,7 @@ function ComposeToolbar({ isDisabled }: { isDisabled?: boolean }) {
           color={isBold ? 'primary' : 'default'}
           isDisabled={isDisabled}
           onPress={() => editor.dispatchCommand(FORMAT_TEXT_COMMAND, 'bold')}
-          aria-label="Bold"
+          aria-label={t('aria.bold')}
           aria-pressed={isBold}
           className="min-w-9 w-9 h-9"
         >
@@ -228,7 +230,7 @@ function ComposeToolbar({ isDisabled }: { isDisabled?: boolean }) {
           color={isItalic ? 'primary' : 'default'}
           isDisabled={isDisabled}
           onPress={() => editor.dispatchCommand(FORMAT_TEXT_COMMAND, 'italic')}
-          aria-label="Italic"
+          aria-label={t('aria.italic')}
           aria-pressed={isItalic}
           className="min-w-9 w-9 h-9"
         >
@@ -243,7 +245,7 @@ function ComposeToolbar({ isDisabled }: { isDisabled?: boolean }) {
           color={isUnderline ? 'primary' : 'default'}
           isDisabled={isDisabled}
           onPress={() => editor.dispatchCommand(FORMAT_TEXT_COMMAND, 'underline')}
-          aria-label="Underline"
+          aria-label={t('aria.underline')}
           aria-pressed={isUnderline}
           className="min-w-9 w-9 h-9"
         >
@@ -258,7 +260,7 @@ function ComposeToolbar({ isDisabled }: { isDisabled?: boolean }) {
           color={blockType === 'bullet' ? 'primary' : 'default'}
           isDisabled={isDisabled}
           onPress={() => formatList('bullet')}
-          aria-label="Bullet List"
+          aria-label={t('aria.bullet_list')}
           aria-pressed={blockType === 'bullet'}
           className="min-w-9 w-9 h-9"
         >
@@ -273,7 +275,7 @@ function ComposeToolbar({ isDisabled }: { isDisabled?: boolean }) {
           color={blockType === 'number' ? 'primary' : 'default'}
           isDisabled={isDisabled}
           onPress={() => formatList('number')}
-          aria-label="Numbered List"
+          aria-label={t('aria.numbered_list')}
           aria-pressed={blockType === 'number'}
           className="min-w-9 w-9 h-9"
         >
@@ -306,7 +308,7 @@ function ComposeToolbar({ isDisabled }: { isDisabled?: boolean }) {
             value={linkUrl}
             onValueChange={setLinkUrl}
             onKeyDown={handleLinkKeyDown}
-            aria-label="Link URL"
+            aria-label={t('aria.link_url')}
             classNames={{
               input: 'bg-transparent text-[var(--text-primary)] text-xs',
               inputWrapper: 'bg-[var(--surface-default)] border-[var(--border-default)] h-8',
@@ -318,7 +320,7 @@ function ComposeToolbar({ isDisabled }: { isDisabled?: boolean }) {
             variant="flat"
             color="success"
             onPress={confirmLink}
-            aria-label="Confirm link"
+            aria-label={t('aria.confirm_link')}
             className="min-w-8 w-8 h-8"
           >
             <Check size={14} />
@@ -329,7 +331,7 @@ function ComposeToolbar({ isDisabled }: { isDisabled?: boolean }) {
             variant="flat"
             color="danger"
             onPress={cancelLink}
-            aria-label="Cancel link"
+            aria-label={t('aria.cancel_link')}
             className="min-w-8 w-8 h-8"
           >
             <X size={14} />
@@ -421,6 +423,7 @@ export const ComposeEditor = forwardRef<ComposeEditorHandle, ComposeEditorProps>
     },
     ref,
   ) {
+    const { t } = useTranslation('common');
     const editorRef = useRef<LexicalEditor | null>(null);
 
     const initialConfig = useMemo(
@@ -503,7 +506,7 @@ export const ComposeEditor = forwardRef<ComposeEditorHandle, ComposeEditorProps>
               contentEditable={
                 <ContentEditable
                   className="min-h-[120px] max-h-[300px] overflow-y-auto px-3 py-2 outline-none text-sm text-[var(--text-primary)]"
-                  aria-label="Post content editor"
+                  aria-label={t('aria.post_content_editor')}
                 />
               }
               placeholder={

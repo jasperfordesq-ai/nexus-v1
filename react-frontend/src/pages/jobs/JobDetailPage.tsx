@@ -1644,9 +1644,9 @@ export function JobDetailPage() {
                           setNewRule((r) => ({ ...r, action: Array.from(keys)[0] as string }))
                         }
                       >
-                        <SelectItem key="move_stage">Move stage</SelectItem>
-                        <SelectItem key="reject">Auto-reject</SelectItem>
-                        <SelectItem key="notify_reviewer">Notify me</SelectItem>
+                        <SelectItem key="move_stage">{t('pipeline.action_move_stage', 'Move stage')}</SelectItem>
+                        <SelectItem key="reject">{t('pipeline.action_auto_reject', 'Auto-reject')}</SelectItem>
+                        <SelectItem key="notify_reviewer">{t('pipeline.action_notify_me', 'Notify me')}</SelectItem>
                       </Select>
                       {newRule.action === 'move_stage' && (
                         <Select
@@ -2004,7 +2004,7 @@ export function JobDetailPage() {
                         qualification.percentage >= 40 ? 'warning' : 'danger'
                       }
                       className="max-w-full"
-                      aria-label="Qualification percentage"
+                      aria-label={t('aria.qualification_percentage', 'Qualification percentage')}
                     />
 
                     {/* Breakdown */}

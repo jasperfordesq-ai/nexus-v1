@@ -141,8 +141,6 @@
     "try_different_search": "Versuchen Sie einen anderen Suchbegriff",
     "no_organisations_available": "Noch keine Freiwilligenorganisationen verfügbar",
     "load_more": "Mehr laden",
-    "opportunity_count": "{{count}} Einsatz",
-    "opportunity_count_plural": "{{count}} Einsätze",
     "volunteer_count": "{{count}} Freiwillige",
     "hours_logged": "{{hours}} Std. erfasst",
     "website": "Webseite",
@@ -178,7 +176,9 @@
     "terms_item_4": "Ich verpflichte mich, die Plattform verantwortungsvoll zu nutzen und sicherzustellen, dass alle veröffentlichten Freiwilligeneinsätze echt und rechtmässig sind.",
     "terms_item_5": "Ich verstehe, dass die Plattform-Administratoren die Organisation oder ihre Einträge entfernen können, wenn sie gegen die Gemeinschaftsrichtlinien verstossen.",
     "terms_agreement": "Ich habe die oben genannten Registrierungsbedingungen für Organisationen gelesen und stimme ihnen zu.",
-    "terms_required": "Sie müssen den Bedingungen zustimmen, um Ihre Organisation zu registrieren."
+    "terms_required": "Sie müssen den Bedingungen zustimmen, um Ihre Organisation zu registrieren.",
+    "opportunity_count_one": "{{count}} Einsatz",
+    "opportunity_count_other": "{{count}} Einsätze"
   },
   "organisation_detail": {
     "page_title": "Organisation",

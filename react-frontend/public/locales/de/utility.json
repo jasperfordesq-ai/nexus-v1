@@ -106,7 +106,10 @@
     "reorder": "Neu anordnen",
     "delete_confirm_title": "Ressource löschen",
     "delete_confirm_message": "Sind Sie sicher, dass Sie \"{{title}}\" löschen möchten? Diese Aktion kann nicht rückgängig gemacht werden.",
-    "delete_confirm": "Löschen"
+    "delete_confirm": "Löschen",
+    "aria_move_up": "Move up",
+    "aria_move_down": "Move down",
+    "aria_upload_progress": "Upload progress"
   },
   "not_found": {
     "page_title": "Seite nicht gefunden",

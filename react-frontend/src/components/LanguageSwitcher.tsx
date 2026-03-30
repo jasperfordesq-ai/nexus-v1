@@ -50,7 +50,7 @@ interface LanguageSwitcherProps {
 }
 
 export function LanguageSwitcher({ compact = true }: LanguageSwitcherProps) {
-  const { i18n } = useTranslation();
+  const { i18n, t } = useTranslation('common');
   const tenantLanguages = useTenantLanguages();
 
   // Only show languages this tenant supports
@@ -93,7 +93,7 @@ export function LanguageSwitcher({ compact = true }: LanguageSwitcherProps) {
         </Button>
       </DropdownTrigger>
       <DropdownMenu
-        aria-label="Select language"
+        aria-label={t('aria.select_language')}
         classNames={{
           base: 'bg-[var(--surface-overlay)] border border-[var(--border-default)] shadow-xl min-w-[140px]',
         }}

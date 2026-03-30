@@ -261,7 +261,7 @@ export function MobileDrawer({ isOpen, onClose, onSearchOpen }: MobileDrawerProp
             variant="light"
             className="text-theme-muted hover:text-theme-primary"
             onPress={onClose}
-            aria-label="Close menu"
+            aria-label={t('accessibility.close_menu')}
           >
             <X className="w-6 h-6" aria-hidden="true" />
           </Button>
@@ -276,7 +276,7 @@ export function MobileDrawer({ isOpen, onClose, onSearchOpen }: MobileDrawerProp
                 fullWidth
                 className="flex items-center justify-start gap-3 px-4 py-2.5 rounded-xl bg-theme-elevated hover:bg-theme-hover border border-theme-default text-sm text-theme-subtle h-auto"
                 onPress={() => { onClose(); onSearchOpen(); }}
-                aria-label="Open search"
+                aria-label={t('aria.open_search')}
               >
                 <Search className="w-4 h-4" aria-hidden="true" />
                 <span>{t('search.placeholder')}</span>
@@ -345,7 +345,7 @@ export function MobileDrawer({ isOpen, onClose, onSearchOpen }: MobileDrawerProp
           )}
 
           {/* Navigation — Collapsible Sections */}
-          <nav className="flex-1 overflow-y-auto" aria-label="Mobile navigation">
+          <nav className="flex-1 overflow-y-auto" aria-label={t('aria.mobile_navigation')}>
             {hasCustomMenus ? (
               <div className="p-4 space-y-1">
                 <MobileMenuItems menus={apiMenus} />
@@ -365,7 +365,7 @@ export function MobileDrawer({ isOpen, onClose, onSearchOpen }: MobileDrawerProp
               }}
             >
               {/* Main Navigation */}
-              <AccordionItem key="main" title={t('sections.main', 'Main')} aria-label="Main navigation">
+              <AccordionItem key="main" title={t('sections.main', 'Main')} aria-label={t('aria.main_navigation')}>
                 <div className="space-y-0.5">
                   {mainNavItems.map(renderNavLink)}
                 </div>
@@ -373,7 +373,7 @@ export function MobileDrawer({ isOpen, onClose, onSearchOpen }: MobileDrawerProp
 
               {/* Timebanking */}
               {visibleTimebanking.length > 0 ? (
-                <AccordionItem key="timebanking" title={t('nav.timebanking', 'Timebanking')} aria-label="Timebanking navigation">
+                <AccordionItem key="timebanking" title={t('nav.timebanking', 'Timebanking')} aria-label={t('aria.timebanking_navigation')}>
                   <div className="space-y-0.5">
                     {timebankingNavItems.map(renderNavLink)}
                   </div>
@@ -382,7 +382,7 @@ export function MobileDrawer({ isOpen, onClose, onSearchOpen }: MobileDrawerProp
 
               {/* Community */}
               {visibleCommunity.length > 0 ? (
-                <AccordionItem key="community" title={t('sections.community')} aria-label="Community navigation">
+                <AccordionItem key="community" title={t('sections.community')} aria-label={t('aria.community_navigation')}>
                   <div className="space-y-0.5">
                     {communityNavItems.map(renderNavLink)}
                   </div>
@@ -391,7 +391,7 @@ export function MobileDrawer({ isOpen, onClose, onSearchOpen }: MobileDrawerProp
 
               {/* Engage */}
               {visibleEngage.length > 0 ? (
-                <AccordionItem key="engage" title={t('sections.engage', 'Engage')} aria-label="Engage navigation">
+                <AccordionItem key="engage" title={t('sections.engage', 'Engage')} aria-label={t('aria.engage_navigation')}>
                   <div className="space-y-0.5">
                     {engageNavItems.map(renderNavLink)}
                   </div>
@@ -400,7 +400,7 @@ export function MobileDrawer({ isOpen, onClose, onSearchOpen }: MobileDrawerProp
 
               {/* Explore / Activity */}
               {visibleExplore.length > 0 ? (
-                <AccordionItem key="explore" title={t('sections.explore')} aria-label="Explore navigation">
+                <AccordionItem key="explore" title={t('sections.explore')} aria-label={t('aria.explore_navigation')}>
                   <div className="space-y-0.5">
                     {exploreNavItems.map(renderNavLink)}
                   </div>
@@ -417,7 +417,7 @@ export function MobileDrawer({ isOpen, onClose, onSearchOpen }: MobileDrawerProp
                       {t('sections.federation')}
                     </span>
                   }
-                  aria-label="Federation navigation"
+                  aria-label={t('aria.federation_navigation')}
                 >
                   <div className="space-y-0.5">
                     {federationNavItems.map(renderNavLink)}
@@ -426,7 +426,7 @@ export function MobileDrawer({ isOpen, onClose, onSearchOpen }: MobileDrawerProp
               ) : null}
 
               {/* About */}
-              <AccordionItem key="about" title={t('sections.about')} aria-label="About navigation">
+              <AccordionItem key="about" title={t('sections.about')} aria-label={t('aria.about_navigation')}>
                 <div className="space-y-0.5">
                   {aboutNavItems.map(renderNavLink)}
                   {tenant?.slug === 'hour-timebank' && hourTimebankAboutItems.map(renderNavLink)}
@@ -439,7 +439,7 @@ export function MobileDrawer({ isOpen, onClose, onSearchOpen }: MobileDrawerProp
               </AccordionItem>
 
               {/* Legal */}
-              <AccordionItem key="legal" title={t('sections.legal')} aria-label="Legal navigation">
+              <AccordionItem key="legal" title={t('sections.legal')} aria-label={t('aria.legal_navigation')}>
                 <div className="space-y-0.5">
                   {legalNavItems.map(renderNavLink)}
                   <Button

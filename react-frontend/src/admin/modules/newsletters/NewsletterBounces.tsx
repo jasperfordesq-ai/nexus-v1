@@ -322,10 +322,10 @@ export function NewsletterBounces() {
                 onSelectionChange={(keys) => setTypeFilter(Array.from(keys)[0] as string)}
                 className="w-40"
               >
-                <SelectItem key="all">All Types</SelectItem>
-                <SelectItem key="hard">Hard</SelectItem>
-                <SelectItem key="soft">Soft</SelectItem>
-                <SelectItem key="complaint">Complaint</SelectItem>
+                <SelectItem key="all">{t('newsletters.bounce_type_all')}</SelectItem>
+                <SelectItem key="hard">{t('newsletters.bounce_type_hard')}</SelectItem>
+                <SelectItem key="soft">{t('newsletters.bounce_type_soft')}</SelectItem>
+                <SelectItem key="complaint">{t('newsletters.bounce_type_complaint')}</SelectItem>
               </Select>
             )}
           </div>

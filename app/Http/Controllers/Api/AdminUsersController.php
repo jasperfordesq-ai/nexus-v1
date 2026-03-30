@@ -193,7 +193,7 @@ class AdminUsersController extends BaseApiController
         );
 
         if (!$user) {
-            return $this->respondWithError('NOT_FOUND', 'User not found', null, 404);
+            return $this->respondWithError('NOT_FOUND', __('api.user_not_found'), null, 404);
         }
 
         $status = 'active';
@@ -267,7 +267,7 @@ class AdminUsersController extends BaseApiController
 
         $user = User::findById($id, true);
         if (!$user || $user['tenant_id'] != $tenantId) {
-            return $this->respondWithError('NOT_FOUND', 'User not found', null, 404);
+            return $this->respondWithError('NOT_FOUND', __('api.user_not_found'), null, 404);
         }
 
         $input = $this->getAllInput();
@@ -279,13 +279,13 @@ class AdminUsersController extends BaseApiController
         // Only super admins can assign elevated roles
         if (isset($input['role']) && in_array($input['role'], ['tenant_admin', 'super_admin', 'god'], true)) {
             if (!$this->isCallerSuperAdmin($adminId)) {
-                return $this->respondWithError('AUTH_INSUFFICIENT_PERMISSIONS', 'Only super admins can assign elevated roles', null, 403);
+                return $this->respondWithError('AUTH_INSUFFICIENT_PERMISSIONS', __('api.only_super_admins_assign_roles'), null, 403);
             }
             // Super admins can also assign tenant_admin
             $allowedRoles = array_merge($allowedRoles, ['tenant_admin']);
             // super_admin and god roles should only be managed via dedicated endpoints
             if (in_array($input['role'], ['super_admin', 'god'], true)) {
-                return $this->respondWithError('VALIDATION_ERROR', 'Use the dedicated super-admin endpoints to manage super admin privileges', null, 422);
+                return $this->respondWithError('VALIDATION_ERROR', __('api.use_super_admin_endpoints'), null, 422);
             }
         }
 
@@ -294,11 +294,11 @@ class AdminUsersController extends BaseApiController
             if (isset($input[$field])) {
                 $value = is_string($input[$field]) ? trim($input[$field]) : $input[$field];
                 if ($field === 'email' && !filter_var($value, FILTER_VALIDATE_EMAIL)) {
-                    return $this->respondWithError('VALIDATION_ERROR', 'Invalid email', 'email', 422);
+                    return $this->respondWithError('VALIDATION_ERROR', __('api.invalid_email'), 'email', 422);
                 }
                 // SECURITY: Validate role against allowed values
                 if ($field === 'role' && !in_array($value, $allowedRoles, true)) {
-                    return $this->respondWithError('VALIDATION_ERROR', 'Invalid role value', 'role', 422);
+                    return $this->respondWithError('VALIDATION_ERROR', __('api.invalid_role'), 'role', 422);
                 }
                 $updates[] = "{$field} = ?";
                 $params[] = $value;
@@ -319,7 +319,7 @@ class AdminUsersController extends BaseApiController
         }
 
         if (empty($updates)) {
-            return $this->respondWithError('VALIDATION_ERROR', 'No fields to update', null, 422);
+            return $this->respondWithError('VALIDATION_ERROR', __('api.no_fields_to_update'), null, 422);
         }
 
         // Capture old status before the update for change detection
@@ -388,7 +388,7 @@ class AdminUsersController extends BaseApiController
         // SECURITY: Restrict role to prevent privilege escalation via user creation (SEC-009)
         $allowedRoles = ['member', 'admin', 'broker'];
         if (!in_array($role, $allowedRoles, true)) {
-            return $this->respondWithError('VALIDATION_ERROR', 'Invalid role. Allowed: ' . implode(', ', $allowedRoles), 'role', 422);
+            return $this->respondWithError('VALIDATION_ERROR', __('api.invalid_role_allowed', ['roles' => implode(', ', $allowedRoles)]), 'role', 422);
         }
 
         // Auto-generate password if not provided
@@ -399,16 +399,16 @@ class AdminUsersController extends BaseApiController
         // Validation
         $errors = [];
         if (empty($firstName)) {
-            $errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'First name is required', 'field' => 'first_name'];
+            $errors[] = ['code' => 'VALIDATION_ERROR', 'message' => __('api.first_name_required'), 'field' => 'first_name'];
         }
         if (empty($lastName)) {
-            $errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'Last name is required', 'field' => 'last_name'];
+            $errors[] = ['code' => 'VALIDATION_ERROR', 'message' => __('api.last_name_required'), 'field' => 'last_name'];
         }
         if (empty($email) || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
-            $errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'Valid email is required', 'field' => 'email'];
+            $errors[] = ['code' => 'VALIDATION_ERROR', 'message' => __('api.valid_email_required'), 'field' => 'email'];
         }
         if (strlen($password) < 8) {
-            $errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'Password must be at least 8 characters', 'field' => 'password'];
+            $errors[] = ['code' => 'VALIDATION_ERROR', 'message' => __('api.password_min_length'), 'field' => 'password'];
         }
 
         if (!empty($errors)) {
@@ -418,7 +418,7 @@ class AdminUsersController extends BaseApiController
         // Check duplicate email
         $existing = User::findByEmail($email);
         if ($existing) {
-            return $this->respondWithError('VALIDATION_ERROR', 'A user with this email already exists', 'email', 422);
+            return $this->respondWithError('VALIDATION_ERROR', __('api.email_already_exists'), 'email', 422);
         }
 
         // Create user via createWithTenant (direct DB insert, not Eloquent::create)
@@ -433,7 +433,7 @@ class AdminUsersController extends BaseApiController
         ], $tenantId);
 
         if (!$newUserId) {
-            return $this->respondWithError('SERVER_ERROR', 'Failed to create user — email may already exist', null, 500);
+            return $this->respondWithError('SERVER_ERROR', __('api.user_created_failed'), null, 500);
         }
 
         ActivityLog::log($adminId, 'admin_create_user', "Created user: {$email}");
@@ -501,7 +501,7 @@ class AdminUsersController extends BaseApiController
 
         $user = User::findById($id, true);
         if (!$user || $user['tenant_id'] != $tenantId) {
-            return $this->respondWithError('NOT_FOUND', 'User not found', null, 404);
+            return $this->respondWithError('NOT_FOUND', __('api.user_not_found'), null, 404);
         }
 
         // Idempotency: prevent double-approval (and double welcome credits)
@@ -543,16 +543,16 @@ class AdminUsersController extends BaseApiController
         $id = (int) $id;
 
         if ($id === $adminId) {
-            return $this->respondWithError('AUTH_INSUFFICIENT_PERMISSIONS', 'Cannot suspend your own account', null, 403);
+            return $this->respondWithError('AUTH_INSUFFICIENT_PERMISSIONS', __('api.cannot_suspend_own_account'), null, 403);
         }
 
         $user = User::findById($id, true);
         if (!$user || $user['tenant_id'] != $tenantId) {
-            return $this->respondWithError('NOT_FOUND', 'User not found', null, 404);
+            return $this->respondWithError('NOT_FOUND', __('api.user_not_found'), null, 404);
         }
 
         if (!empty($user['is_super_admin']) || !empty($user['is_tenant_super_admin'])) {
-            return $this->respondWithError('AUTH_INSUFFICIENT_PERMISSIONS', 'Cannot suspend a super admin', null, 403);
+            return $this->respondWithError('AUTH_INSUFFICIENT_PERMISSIONS', __('api.cannot_suspend_super_admin'), null, 403);
         }
 
         $reason = $this->input('reason', 'Suspended by admin');
@@ -610,16 +610,16 @@ class AdminUsersController extends BaseApiController
         $id = (int) $id;
 
         if ($id === $adminId) {
-            return $this->respondWithError('AUTH_INSUFFICIENT_PERMISSIONS', 'Cannot ban your own account', null, 403);
+            return $this->respondWithError('AUTH_INSUFFICIENT_PERMISSIONS', __('api.cannot_ban_own_account'), null, 403);
         }
 
         $user = User::findById($id, true);
         if (!$user || $user['tenant_id'] != $tenantId) {
-            return $this->respondWithError('NOT_FOUND', 'User not found', null, 404);
+            return $this->respondWithError('NOT_FOUND', __('api.user_not_found'), null, 404);
         }
 
         if (!empty($user['is_super_admin']) || !empty($user['is_tenant_super_admin'])) {
-            return $this->respondWithError('AUTH_INSUFFICIENT_PERMISSIONS', 'Cannot ban a super admin', null, 403);
+            return $this->respondWithError('AUTH_INSUFFICIENT_PERMISSIONS', __('api.cannot_ban_super_admin'), null, 403);
         }
 
         $reason = $this->input('reason', 'Banned by admin');
@@ -666,7 +666,7 @@ class AdminUsersController extends BaseApiController
 
         $user = User::findById($id, true);
         if (!$user || $user['tenant_id'] != $tenantId) {
-            return $this->respondWithError('NOT_FOUND', 'User not found', null, 404);
+            return $this->respondWithError('NOT_FOUND', __('api.user_not_found'), null, 404);
         }
 
         DB::update("UPDATE users SET status = 'active', is_approved = 1 WHERE id = ? AND tenant_id = ?", [$id, $tenantId]);
@@ -693,16 +693,16 @@ class AdminUsersController extends BaseApiController
         $id = (int) $id;
 
         if ($id === $adminId) {
-            return $this->respondWithError('AUTH_INSUFFICIENT_PERMISSIONS', 'Cannot delete your own account', null, 403);
+            return $this->respondWithError('AUTH_INSUFFICIENT_PERMISSIONS', __('api.cannot_delete_own_account'), null, 403);
         }
 
         $user = User::findById($id, true);
         if (!$user || $user['tenant_id'] != $tenantId) {
-            return $this->respondWithError('NOT_FOUND', 'User not found', null, 404);
+            return $this->respondWithError('NOT_FOUND', __('api.user_not_found'), null, 404);
         }
 
         if (!empty($user['is_super_admin']) || !empty($user['is_tenant_super_admin'])) {
-            return $this->respondWithError('AUTH_INSUFFICIENT_PERMISSIONS', 'Cannot delete a super admin', null, 403);
+            return $this->respondWithError('AUTH_INSUFFICIENT_PERMISSIONS', __('api.cannot_delete_super_admin'), null, 403);
         }
 
         // Send deletion email BEFORE the actual deletion (user record must still exist)
@@ -751,7 +751,7 @@ class AdminUsersController extends BaseApiController
 
         $user = User::findById($id, true);
         if (!$user || $user['tenant_id'] != $tenantId) {
-            return $this->respondWithError('NOT_FOUND', 'User not found', null, 404);
+            return $this->respondWithError('NOT_FOUND', __('api.user_not_found'), null, 404);
         }
 
         $reason = $this->input('reason', 'Reset by admin');
@@ -762,7 +762,7 @@ class AdminUsersController extends BaseApiController
             DB::update("UPDATE users SET totp_enabled = 0 WHERE id = ? AND tenant_id = ?", [$id, $tenantId]);
             DB::update("UPDATE user_trusted_devices SET is_revoked = 1, revoked_at = NOW(), revoked_reason = 'admin_reset' WHERE user_id = ? AND tenant_id = ?", [$id, $tenantId]);
         } catch (\Throwable $e) {
-            return $this->respondWithError('SERVER_ERROR', 'Failed to reset 2FA', null, 500);
+            return $this->respondWithError('SERVER_ERROR', __('api.update_failed', ['resource' => '2FA']), null, 500);
         }
 
         ActivityLog::log($adminId, 'admin_reset_2fa', "Reset 2FA for user #{$id}: {$reason}");
@@ -819,12 +819,12 @@ class AdminUsersController extends BaseApiController
 
         $user = User::findById($id, true);
         if (!$user || $user['tenant_id'] != $tenantId) {
-            return $this->respondWithError('NOT_FOUND', 'User not found', null, 404);
+            return $this->respondWithError('NOT_FOUND', __('api.user_not_found'), null, 404);
         }
 
         $badgeSlug = trim($this->input('badge_slug', ''));
         if (empty($badgeSlug)) {
-            return $this->respondWithError('VALIDATION_ERROR', 'Badge slug is required', 'badge_slug', 422);
+            return $this->respondWithError('VALIDATION_ERROR', __('api.badge_slug_required'), 'badge_slug', 422);
         }
 
         try {
@@ -848,7 +848,7 @@ class AdminUsersController extends BaseApiController
             return $this->respondWithData(['awarded' => true, 'user_id' => $id, 'badge_slug' => $badgeSlug], null, 201);
         } catch (\Throwable $e) {
             error_log("[AdminUsers] Failed to award badge to user #{$id}: " . $e->getMessage());
-            return $this->respondWithError('SERVER_ERROR', 'Failed to award badge', null, 500);
+            return $this->respondWithError('SERVER_ERROR', __('api.create_failed', ['resource' => 'badge award']), null, 500);
         }
     }
 
@@ -866,7 +866,7 @@ class AdminUsersController extends BaseApiController
         );
 
         if (!$badge) {
-            return $this->respondWithError('NOT_FOUND', 'Badge not found for this user', null, 404);
+            return $this->respondWithError('NOT_FOUND', __('api.badge_not_found'), null, 404);
         }
 
         DB::delete("DELETE FROM user_badges WHERE id = ? AND user_id = ? AND tenant_id = ?", [$badgeId, $id, $tenantId]);
@@ -898,7 +898,7 @@ class AdminUsersController extends BaseApiController
 
         $user = User::findById($id, true);
         if (!$user || $user['tenant_id'] != $tenantId) {
-            return $this->respondWithError('NOT_FOUND', 'User not found', null, 404);
+            return $this->respondWithError('NOT_FOUND', __('api.user_not_found'), null, 404);
         }
 
         try {
@@ -923,7 +923,7 @@ class AdminUsersController extends BaseApiController
             return $this->respondWithData(['rechecked' => true, 'user_id' => $id, 'badges' => $badges]);
         } catch (\Throwable $e) {
             error_log("[AdminUsers] Badge recheck failed for user #{$id}: " . $e->getMessage());
-            return $this->respondWithError('SERVER_ERROR', 'Badge recheck failed', null, 500);
+            return $this->respondWithError('SERVER_ERROR', __('api.badge_recheck_failed'), null, 500);
         }
     }
 
@@ -936,7 +936,7 @@ class AdminUsersController extends BaseApiController
 
         $user = User::findById($id, true);
         if (!$user || $user['tenant_id'] != $tenantId) {
-            return $this->respondWithError('NOT_FOUND', 'User not found', null, 404);
+            return $this->respondWithError('NOT_FOUND', __('api.user_not_found'), null, 404);
         }
 
         try {
@@ -969,12 +969,12 @@ class AdminUsersController extends BaseApiController
 
         $user = User::findById($id, true);
         if (!$user || $user['tenant_id'] != $tenantId) {
-            return $this->respondWithError('NOT_FOUND', 'User not found', null, 404);
+            return $this->respondWithError('NOT_FOUND', __('api.user_not_found'), null, 404);
         }
 
         $password = $this->input('password', '');
         if (strlen($password) < 8) {
-            return $this->respondWithError('VALIDATION_ERROR', 'Password must be at least 8 characters', 'password', 422);
+            return $this->respondWithError('VALIDATION_ERROR', __('api.password_min_length'), 'password', 422);
         }
 
         $hashed = password_hash($password, PASSWORD_ARGON2ID);
@@ -1027,17 +1027,17 @@ class AdminUsersController extends BaseApiController
 
         $user = User::findById($id, true);
         if (!$user || $user['tenant_id'] != $tenantId) {
-            return $this->respondWithError('NOT_FOUND', 'User not found', null, 404);
+            return $this->respondWithError('NOT_FOUND', __('api.user_not_found'), null, 404);
         }
 
         // Prevent impersonating super admins (security measure)
         if (!empty($user['is_super_admin']) || !empty($user['is_tenant_super_admin'])) {
-            return $this->respondWithError('AUTH_INSUFFICIENT_PERMISSIONS', 'Cannot impersonate a super admin', null, 403);
+            return $this->respondWithError('AUTH_INSUFFICIENT_PERMISSIONS', __('api.cannot_impersonate_super_admin'), null, 403);
         }
 
         // Prevent self-impersonation
         if ($id === $adminId) {
-            return $this->respondWithError('VALIDATION_ERROR', 'Cannot impersonate yourself', null, 422);
+            return $this->respondWithError('VALIDATION_ERROR', __('api.cannot_impersonate_self'), null, 422);
         }
 
         // Check if target user is blocked by registration policy gates
@@ -1063,7 +1063,7 @@ class AdminUsersController extends BaseApiController
 
             return $this->respondWithData($responseData);
         } catch (\Throwable $e) {
-            return $this->respondWithError('SERVER_ERROR', 'Failed to generate impersonation token', null, 500);
+            return $this->respondWithError('SERVER_ERROR', __('api.create_failed', ['resource' => 'impersonation token']), null, 500);
         }
     }
 
@@ -1076,12 +1076,12 @@ class AdminUsersController extends BaseApiController
 
         // Only super admins can grant/revoke tenant super admin status
         if (!$this->isCallerSuperAdmin($adminId)) {
-            return $this->respondWithError('AUTH_INSUFFICIENT_PERMISSIONS', 'Only super admins can manage super admin status', null, 403);
+            return $this->respondWithError('AUTH_INSUFFICIENT_PERMISSIONS', __('api.only_super_admins_manage_status'), null, 403);
         }
 
         // Prevent self-modification
         if ($id === $adminId) {
-            return $this->respondWithError('VALIDATION_ERROR', 'You cannot modify your own super admin status', null, 422);
+            return $this->respondWithError('VALIDATION_ERROR', __('api.cannot_modify_own_super_admin'), null, 422);
         }
 
         $grant = (bool) ($this->input('grant', false));
@@ -1094,7 +1094,7 @@ class AdminUsersController extends BaseApiController
             );
 
             if (!$user) {
-                return $this->respondWithError('NOT_FOUND', 'User not found', null, 404);
+                return $this->respondWithError('NOT_FOUND', __('api.user_not_found'), null, 404);
             }
 
             // SECURITY: Scope UPDATE by tenant_id to prevent cross-tenant modification
@@ -1132,7 +1132,7 @@ class AdminUsersController extends BaseApiController
 
             return $this->respondWithData(['id' => $id, 'is_tenant_super_admin' => $grant]);
         } catch (\Exception $e) {
-            return $this->respondWithError('SERVER_ERROR', 'Failed to update super admin status', null, 500);
+            return $this->respondWithError('SERVER_ERROR', __('api.update_failed', ['resource' => 'super admin status']), null, 500);
         }
     }
 
@@ -1145,12 +1145,12 @@ class AdminUsersController extends BaseApiController
 
         // Only god users can set global super admin
         if (!User::isGod($adminId)) {
-            return $this->respondWithError('AUTH_INSUFFICIENT_PERMISSIONS', 'Only god users can manage global super admin status', null, 403);
+            return $this->respondWithError('AUTH_INSUFFICIENT_PERMISSIONS', __('api.only_god_manage_global_super_admin'), null, 403);
         }
 
         // Prevent self-modification
         if ($id === $adminId) {
-            return $this->respondWithError('VALIDATION_ERROR', 'You cannot modify your own super admin status', null, 422);
+            return $this->respondWithError('VALIDATION_ERROR', __('api.cannot_modify_own_super_admin'), null, 422);
         }
 
         $grant = (bool) ($this->input('grant', false));
@@ -1163,7 +1163,7 @@ class AdminUsersController extends BaseApiController
             );
 
             if (!$user) {
-                return $this->respondWithError('NOT_FOUND', 'User not found', null, 404);
+                return $this->respondWithError('NOT_FOUND', __('api.user_not_found'), null, 404);
             }
 
             // SECURITY: Scope UPDATE by tenant_id to prevent cross-tenant modification
@@ -1194,7 +1194,7 @@ class AdminUsersController extends BaseApiController
 
             return $this->respondWithData(['id' => $id, 'is_super_admin' => $grant]);
         } catch (\Exception $e) {
-            return $this->respondWithError('SERVER_ERROR', 'Failed to update global super admin status', null, 500);
+            return $this->respondWithError('SERVER_ERROR', __('api.update_failed', ['resource' => 'global super admin status']), null, 500);
         }
     }
 
@@ -1211,7 +1211,7 @@ class AdminUsersController extends BaseApiController
 
         $user = User::findById($id, true);
         if (!$user || $user['tenant_id'] != $tenantId) {
-            return $this->respondWithError('NOT_FOUND', 'User not found', null, 404);
+            return $this->respondWithError('NOT_FOUND', __('api.user_not_found'), null, 404);
         }
 
         try {
@@ -1257,7 +1257,7 @@ class AdminUsersController extends BaseApiController
             return $this->respondWithData(['sent' => true, 'id' => $id]);
         } catch (\Throwable $e) {
             error_log("[AdminUsers] Failed to send password reset email for user #{$id}: " . $e->getMessage());
-            return $this->respondWithError('SERVER_ERROR', 'Failed to send password reset email', null, 500);
+            return $this->respondWithError('SERVER_ERROR', __('api.create_failed', ['resource' => 'password reset email']), null, 500);
         }
     }
 
@@ -1270,7 +1270,7 @@ class AdminUsersController extends BaseApiController
 
         $user = User::findById($id, true);
         if (!$user || $user['tenant_id'] != $tenantId) {
-            return $this->respondWithError('NOT_FOUND', 'User not found', null, 404);
+            return $this->respondWithError('NOT_FOUND', __('api.user_not_found'), null, 404);
         }
 
         try {
@@ -1320,7 +1320,7 @@ class AdminUsersController extends BaseApiController
             return $this->respondWithData(['sent' => true, 'id' => $id]);
         } catch (\Throwable $e) {
             error_log("[AdminUsers] Failed to send welcome email for user #{$id}: " . $e->getMessage());
-            return $this->respondWithError('SERVER_ERROR', 'Failed to send welcome email', null, 500);
+            return $this->respondWithError('SERVER_ERROR', __('api.create_failed', ['resource' => 'welcome email']), null, 500);
         }
     }
 
@@ -1335,25 +1335,25 @@ class AdminUsersController extends BaseApiController
         $tenantId = $this->getTenantId();
 
         if (!isset($_FILES['csv_file']) || $_FILES['csv_file']['error'] !== UPLOAD_ERR_OK) {
-            return $this->respondWithError('VALIDATION_ERROR', 'No CSV file uploaded or upload error', null, 400);
+            return $this->respondWithError('VALIDATION_ERROR', __('api.csv_no_file'), null, 400);
         }
 
         $file = $_FILES['csv_file'];
         $allowedTypes = ['text/csv', 'text/plain', 'application/csv', 'application/vnd.ms-excel'];
         if (!in_array($file['type'], $allowedTypes)) {
-            return $this->respondWithError('VALIDATION_ERROR', 'Invalid file type. Please upload a CSV file.', null, 400);
+            return $this->respondWithError('VALIDATION_ERROR', __('api.csv_invalid_type'), null, 400);
         }
 
         $handle = fopen($file['tmp_name'], 'r');
         if (!$handle) {
-            return $this->respondWithError('SERVER_ERROR', 'Could not read file', null, 500);
+            return $this->respondWithError('SERVER_ERROR', __('api.csv_could_not_read'), null, 500);
         }
 
         // Read header row
         $header = fgetcsv($handle);
         if (!$header) {
             fclose($handle);
-            return $this->respondWithError('VALIDATION_ERROR', 'Empty CSV file', null, 400);
+            return $this->respondWithError('VALIDATION_ERROR', __('api.csv_empty'), null, 400);
         }
 
         // Normalize headers (lowercase, trim, underscores)
@@ -1366,7 +1366,7 @@ class AdminUsersController extends BaseApiController
         $missing = array_diff($requiredColumns, $header);
         if (!empty($missing)) {
             fclose($handle);
-            return $this->respondWithError('VALIDATION_ERROR', 'Missing required columns: ' . implode(', ', $missing), null, 400);
+            return $this->respondWithError('VALIDATION_ERROR', __('api.csv_missing_columns', ['columns' => implode(', ', $missing)]), null, 400);
         }
 
         $results = ['imported' => 0, 'skipped' => 0, 'errors' => []];

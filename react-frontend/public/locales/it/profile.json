@@ -19,6 +19,8 @@
   "try_again": "Riprova",
   "not_found": "Profilo non trovato",
   "not_found_desc": "Questo profilo utente non esiste o è stato rimosso",
+  "profile_incomplete": "Profilo non ancora completo",
+  "profile_incomplete_desc": "Questo membro non ha ancora completato il proprio profilo. Torna più tardi!",
   "settings": "Impostazioni",
   "pending": "In attesa",
   "accept": "Accetta",
@@ -97,8 +99,16 @@
   "load_error": "Impossibile caricare il profilo.",
   "listing_image_alt": "Immagine annuncio",
   "credits_sent_success": "Crediti inviati a {{name}}",
-  "profile_incomplete": "Profilo non ancora completo",
-  "profile_incomplete_desc": "Questo membro non ha ancora completato il proprio profilo. Torna più tardi!",
+  "aria": {
+    "profile_sections": "Profile sections",
+    "about_this_user": "About this user",
+    "user_listings": "User listings",
+    "user_activity_feed": "User activity feed",
+    "user_availability": "User availability",
+    "user_reviews": "User reviews",
+    "user_achievements": "User achievements",
+    "loading_reviews": "Loading reviews"
+  },
   "review_modal": {
     "title": "Scrivi una recensione",
     "subtitle": "Condividi la tua esperienza con {{name}}",

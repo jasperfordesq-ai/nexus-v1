@@ -54,7 +54,8 @@
     "save_error_subtitle": "Bitte überprüfen Sie Ihre Angaben und versuchen Sie es erneut.",
     "load_error": "Inserat konnte nicht geladen werden",
     "update_success": "Inserat erfolgreich aktualisiert",
-    "create_success": "Inserat erfolgreich erstellt"
+    "create_success": "Inserat erfolgreich erstellt",
+    "aria_remove_image": "Remove image"
   },
   "page_subtitle": "Dienstleistungen und Gesuche der Gemeinschaft durchsuchen",
   "search_placeholder": "Nach Titel, Beschreibung, Standort oder Name suchen...",
@@ -81,6 +82,16 @@
   "share_copied_subtitle": "Teilen Sie dieses Inserat mit anderen",
   "share_error_title": "Link konnte nicht kopiert werden",
   "not_found_title": "Inserat nicht gefunden",
+  "near_me": "In meiner Nähe",
+  "near_me_no_location": "Standort aktivieren, um diese Funktion zu nutzen",
+  "radius_label": "Suchradius",
+  "like": "Gefällt mir",
+  "likes": "Gefällt mir",
+  "comment": "Kommentar",
+  "comments": "Kommentare",
+  "detail_like": "Gefällt mir",
+  "detail_liked": "Gefällt mir",
+  "detail_comments": "Kommentare",
   "detail_edit": "Bearbeiten",
   "detail_delete": "Löschen",
   "detail_duration": "Dauer",
@@ -135,6 +146,10 @@
     "placeholder": "Eine Fähigkeit eingeben und Enter drücken...",
     "aria_add": "Fähigkeits-Tag hinzufügen"
   },
+  "aria": {
+    "view_mode": "View mode",
+    "loading_listings": "Loading listings"
+  },
   "analytics": {
     "title": "Anzeigenanalyse",
     "total_views": "Gesamtaufrufe",
@@ -146,15 +161,5 @@
     "trend_7day": "7-Tage-Trend",
     "vs_previous_week": "ggü. Vorwoche",
     "views_last_days": "Aufrufe (letzte {{days}} Tage)"
-  },
-  "near_me": "In meiner Nähe",
-  "near_me_no_location": "Standort aktivieren, um diese Funktion zu nutzen",
-  "radius_label": "Suchradius",
-  "like": "Gefällt mir",
-  "likes": "Gefällt mir",
-  "comment": "Kommentar",
-  "comments": "Kommentare",
-  "detail_like": "Gefällt mir",
-  "detail_liked": "Gefällt mir",
-  "detail_comments": "Kommentare"
+  }
 }

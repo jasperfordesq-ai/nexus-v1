@@ -21,6 +21,7 @@ import { PageHeader, ConfirmModal } from '../../components';
 import type { SuperAdminUserDetail, SuperAdminTenant } from '../../api/types';
 
 import { useTranslation } from 'react-i18next';
+import i18n from '@/i18n';
 type ConfirmActionType =
   | 'grant-sa'
   | 'revoke-sa'
@@ -36,7 +37,7 @@ function getPrivilegeLevel(user: SuperAdminUserDetail) {
 
 function formatDate(dateStr: string | null | undefined): string {
   if (!dateStr) return 'Never';
-  return new Date(dateStr).toLocaleDateString('en-IE', {
+  return new Date(dateStr).toLocaleDateString(i18n.language, {
     year: 'numeric', month: 'long', day: 'numeric',
   });
 }

@@ -157,7 +157,7 @@ class AdminCommentsController extends BaseApiController
         );
 
         if (!$comment) {
-            return $this->respondWithError('NOT_FOUND', 'Comment not found', null, 404);
+            return $this->respondWithError('NOT_FOUND', __('api.comment_not_found'), null, 404);
         }
 
         return $this->respondWithData([
@@ -197,7 +197,7 @@ class AdminCommentsController extends BaseApiController
         );
 
         if (!$comment) {
-            return $this->respondWithError('NOT_FOUND', 'Comment not found', null, 404);
+            return $this->respondWithError('NOT_FOUND', __('api.comment_not_found'), null, 404);
         }
 
         $commentTenantId = (int) $comment->tenant_id;
@@ -235,7 +235,7 @@ class AdminCommentsController extends BaseApiController
             Log::warning("AdminCommentsController::hide notification failed: " . $e->getMessage());
         }
 
-        return $this->respondWithData(['success' => true, 'message' => 'Comment hidden']);
+        return $this->respondWithData(['success' => true, 'message' => __('api.comment_hidden')]);
     }
 
     /**
@@ -257,7 +257,7 @@ class AdminCommentsController extends BaseApiController
         );
 
         if (!$comment) {
-            return $this->respondWithError('NOT_FOUND', 'Comment not found', null, 404);
+            return $this->respondWithError('NOT_FOUND', __('api.comment_not_found'), null, 404);
         }
 
         $commentTenantId = (int) $comment->tenant_id;
@@ -288,6 +288,6 @@ class AdminCommentsController extends BaseApiController
             Log::warning("AdminCommentsController::destroy notification failed: " . $e->getMessage());
         }
 
-        return $this->respondWithData(['success' => true, 'message' => 'Comment deleted']);
+        return $this->respondWithData(['success' => true, 'message' => __('api.comment_deleted')]);
     }
 }

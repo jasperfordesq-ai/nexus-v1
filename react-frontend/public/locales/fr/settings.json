@@ -262,6 +262,7 @@
     "warning": "Avertissement : cette action est irréversible",
     "warning_desc": "Toutes vos données, y compris les annonces, les messages et l'historique des transactions, seront définitivement supprimées.",
     "type_confirm": "Tapez DELETE pour confirmer :",
+    "placeholder": "DELETE",
     "submit": "Supprimer mon compte",
     "aria_label": "Tapez DELETE pour confirmer"
   },

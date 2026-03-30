@@ -113,7 +113,10 @@
     "action": "Aktion",
     "target": "Verschieben nach",
     "add": "Regel hinzufügen",
-    "delete": "Löschen"
+    "delete": "Löschen",
+    "action_move_stage": "Move stage",
+    "action_auto_reject": "Auto-reject",
+    "action_notify_me": "Notify me"
   },
   "employer": {
     "page_title": "Arbeitgeberprofil",
@@ -219,7 +222,10 @@
     "form_type_label": "Vergütungsart",
     "form_currency_label": "Währung",
     "form_currency_placeholder": "z.B. USD, EUR, GBP",
-    "form_negotiable_label": "Gehalt ist verhandelbar"
+    "form_negotiable_label": "Gehalt ist verhandelbar",
+    "currency_eur": "EUR",
+    "currency_gbp": "GBP",
+    "currency_usd": "USD"
   },
   "my_applications": {
     "title": "Meine Bewerbungen",
@@ -816,7 +822,8 @@
     "go_to_jobs": "Zu Stellen gehen",
     "first_time_banner": "Erstes Mal posten?",
     "first_time_desc": "Unser Onboarding-Assistent führt Sie durch das Erstellen Ihrer ersten Stellenanzeige.",
-    "start_wizard": "Assistent starten"
+    "start_wizard": "Assistent starten",
+    "aria_progress": "Onboarding progress"
   },
   "preview": {
     "title": "Stellen-Vorschau",
@@ -868,8 +875,6 @@
   },
   "salary_display": "{{min}} – {{max}}",
   "salary_negotiable": "Verhandelbar",
-  "deadline_countdown": "Schließt in {{count}} Tag",
-  "deadline_countdown_plural": "Schließt in {{count}} Tagen",
   "deadline_closed": "Geschlossen",
   "remote_only": "Nur Remote",
   "match_badge": "{{count}}% Übereinstimmung",
@@ -878,5 +883,10 @@
   "unknown": "Unbekannt",
   "nav": {
     "jobs": "Stellen"
-  }
+  },
+  "aria": {
+    "qualification_percentage": "Qualification percentage"
+  },
+  "deadline_countdown_one": "Schließt in {{count}} Tag",
+  "deadline_countdown_other": "Schließt in {{count}} Tagen"
 }

@@ -195,14 +195,14 @@ export default function SuperAuditLog() {
             resetAndFilter();
           }}
         >
-          <SelectItem key="user_created">User Created</SelectItem>
-          <SelectItem key="user_moved">User Moved</SelectItem>
-          <SelectItem key="tenant_created">Tenant Created</SelectItem>
-          <SelectItem key="tenant_updated">Tenant Updated</SelectItem>
-          <SelectItem key="bulk_users_moved">Bulk Users Moved</SelectItem>
-          <SelectItem key="bulk_tenants_updated">Bulk Tenants Updated</SelectItem>
-          <SelectItem key="federation_lockdown">Federation Lockdown</SelectItem>
-          <SelectItem key="federation_updated">Federation Updated</SelectItem>
+          <SelectItem key="user_created">{t('super.event_user_created')}</SelectItem>
+          <SelectItem key="user_moved">{t('super.event_user_moved')}</SelectItem>
+          <SelectItem key="tenant_created">{t('super.event_tenant_created')}</SelectItem>
+          <SelectItem key="tenant_updated">{t('super.event_tenant_updated')}</SelectItem>
+          <SelectItem key="bulk_users_moved">{t('super.event_bulk_users_moved')}</SelectItem>
+          <SelectItem key="bulk_tenants_updated">{t('super.event_bulk_tenants_updated')}</SelectItem>
+          <SelectItem key="federation_lockdown">{t('super.event_federation_lockdown')}</SelectItem>
+          <SelectItem key="federation_updated">{t('super.event_federation_updated')}</SelectItem>
         </Select>
 
         <Select
@@ -215,10 +215,10 @@ export default function SuperAuditLog() {
             resetAndFilter();
           }}
         >
-          <SelectItem key="user">User</SelectItem>
-          <SelectItem key="tenant">Tenant</SelectItem>
-          <SelectItem key="bulk">Bulk</SelectItem>
-          <SelectItem key="federation">Federation</SelectItem>
+          <SelectItem key="user">{t('super.target_type_user')}</SelectItem>
+          <SelectItem key="tenant">{t('super.target_type_tenant')}</SelectItem>
+          <SelectItem key="bulk">{t('super.target_type_bulk')}</SelectItem>
+          <SelectItem key="federation">{t('super.target_type_federation')}</SelectItem>
         </Select>
 
         <Input

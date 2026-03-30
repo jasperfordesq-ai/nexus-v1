@@ -166,8 +166,8 @@ class EventNotificationService
                         try {
                             $eventTitle = htmlspecialchars($event->title, ENT_QUOTES, 'UTF-8');
                             $subject = $type === '24h'
-                                ? "Reminder: \"{$eventTitle}\" is tomorrow"
-                                : "Starting soon: \"{$eventTitle}\" begins in 1 hour";
+                                ? __('notifications.event_reminder_subject_24h', ['title' => $eventTitle])
+                                : __('notifications.event_reminder_subject_1h', ['title' => $eventTitle]);
 
                             $this->sendEventEmail(
                                 $attendee,
@@ -249,9 +249,9 @@ class EventNotificationService
             }
 
             $eventTitle = htmlspecialchars($event->title, ENT_QUOTES, 'UTF-8');
-            $message = "The event \"{$event->title}\" has been cancelled.";
+            $message = __('notifications.event_cancelled', ['title' => $event->title]);
             if (!empty($reason)) {
-                $message .= " Reason: {$reason}";
+                $message .= ' ' . __('notifications.event_cancelled_reason', ['reason' => $reason]);
             }
 
             $path = '/events/' . $eventId;
@@ -346,16 +346,16 @@ class EventNotificationService
             // Build change summary
             $changeParts = [];
             if (isset($meaningfulChanges['start_time'])) {
-                $changeParts[] = 'date/time';
+                $changeParts[] = __('notifications.event_change_date_time');
             }
             if (isset($meaningfulChanges['location'])) {
-                $changeParts[] = 'location';
+                $changeParts[] = __('notifications.event_change_location');
             }
             if (isset($meaningfulChanges['title'])) {
-                $changeParts[] = 'title';
+                $changeParts[] = __('notifications.event_change_title');
             }
             $changeLabel = implode(' and ', $changeParts);
-            $message = "The event \"{$eventTitle}\" has been updated ({$changeLabel})";
+            $message = __('notifications.event_updated', ['title' => $eventTitle, 'changes' => $changeLabel]);
 
             $safeTitle = htmlspecialchars($eventTitle, ENT_QUOTES, 'UTF-8');
 
@@ -428,10 +428,13 @@ class EventNotificationService
             $userName = $user->name ?? trim(($user->first_name ?? '') . ' ' . ($user->last_name ?? ''));
             $eventTitle = $event->title;
             $organizerId = (int) $event->user_id;
+
             $statusLabel = $status === 'going' ? 'is going to' : 'is interested in';
 
             $path = '/events/' . $eventId;
-            $message = "{$userName} {$statusLabel} your event: {$eventTitle}";
+            $message = $status === 'going'
+                ? __('notifications.event_rsvp_going', ['name' => $userName, 'title' => $eventTitle])
+                : __('notifications.event_rsvp_interested', ['name' => $userName, 'title' => $eventTitle]);
 
             Notification::create([
                 'user_id' => $organizerId,
@@ -604,9 +607,9 @@ class EventNotificationService
         }
 
         if ($reminderType === '24h') {
-            $message = "Reminder: \"{$title}\" is tomorrow — {$when}{$locationText}";
+            $message = __('notifications.event_reminder_24h', ['title' => $title, 'when' => $when, 'location' => $locationText]);
         } else {
-            $message = "Starting soon: \"{$title}\" begins in 1 hour — {$when}{$locationText}";
+            $message = __('notifications.event_reminder_1h', ['title' => $title, 'when' => $when, 'location' => $locationText]);
         }
 
         $link = "/events/{$event->id}";

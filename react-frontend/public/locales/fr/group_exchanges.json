@@ -12,10 +12,6 @@
   "empty_description_all": "Vous n'avez pas encore créé ou rejoint d'échanges de groupe.",
   "empty_description_filtered": "Aucun échange de groupe ne correspond à ce filtre.",
   "card_aria": "Échange de groupe : {{title}} – {{status}}",
-  "participants_count": "{{count}} participant",
-  "participants_count_plural": "{{count}} participants",
-  "hours_count": "{{count}} heure",
-  "hours_count_plural": "{{count}} heures",
   "role_organizer": "Organisé par vous",
   "role_participant": "Participant",
   "tabs_aria": "Filtre de statut des échanges de groupe",
@@ -90,7 +86,9 @@
     "search_members_aria": "Rechercher des membres",
     "add_as_role": "Ajouter comme {{role}}",
     "no_members_found": "Aucun membre trouvé correspondant à votre recherche.",
-    "done": "Terminé"
+    "done": "Terminé",
+    "aria_exchange_participants": "Exchange participants",
+    "aria_hour_split": "Hour split"
   },
   "create": {
     "page_title": "Créer un échange de groupe",
@@ -143,7 +141,8 @@
     "hours_placeholder": "Heures",
     "weight_placeholder": "Pondération",
     "hours_for": "Heures pour {{name}}",
-    "weight_for": "Pondération pour {{name}}"
+    "weight_for": "Pondération pour {{name}}",
+    "aria_hour_split_preview": "Hour split preview"
   },
   "toast": {
     "load_more_failed": "Impossible de charger plus d'échanges",
@@ -165,5 +164,9 @@
     "created_desc": "Votre échange a été créé avec succès.",
     "create_failed": "Impossible de créer l'échange",
     "something_wrong": "Une erreur est survenue. Veuillez réessayer."
-  }
+  },
+  "participants_count_one": "{{count}} participant",
+  "participants_count_other": "{{count}} participants",
+  "hours_count_one": "{{count}} heure",
+  "hours_count_other": "{{count}} heures"
 }

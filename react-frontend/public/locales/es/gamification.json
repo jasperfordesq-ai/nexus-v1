@@ -14,7 +14,14 @@
     "tab_badges": "Insignias",
     "tab_challenges": "Retos",
     "tab_collections": "Colecciones",
+    "tab_journeys": "Journeys",
+    "tab_engagement": "Engagement",
     "tab_shop": "Tienda XP",
+    "engagement": {
+      "title": "Monthly Engagement",
+      "months_active": "{{count}} of 12 months",
+      "description": "Months where you completed at least one meaningful activity (exchange, listing, review, or volunteer hours)."
+    },
     "filter_by_type": "Filtrar por tipo",
     "filter_badges_aria": "Filtrar insignias por tipo",
     "all_types": "Todos los Tipos",
@@ -26,6 +33,7 @@
     "locked": "Bloqueada",
     "daily_reward": {
       "title": "Recompensa Diaria",
+      "loading": "Cargando recompensa diaria",
       "come_back_tomorrow": "¡Vuelve mañana por {{xp}} XP!",
       "day_streak": "Racha de {{count}} días",
       "claim_today": "¡Reclama {{xp}} XP hoy!",
@@ -36,8 +44,7 @@
       "claimed_message": "¡Ganaste {{xp}} XP!",
       "claim_failed": "Error al Reclamar",
       "claim_failed_desc": "No se pudo reclamar la recompensa diaria.",
-      "claim_error": "Algo salió mal. Por favor intenta de nuevo.",
-      "loading": "Cargando recompensa diaria"
+      "claim_error": "Algo salió mal. Por favor intenta de nuevo."
     },
     "challenges": {
       "active_challenges": "Retos Activos",
@@ -81,6 +88,7 @@
       "load_failed": "Error al Cargar",
       "load_failed_desc": "No se pudo cargar la tienda XP."
     },
+    "loading": "Cargando logros",
     "showcase": {
       "manage_title": "Gestionar Vitrina de Insignias",
       "select_badges": "Selecciona hasta 5 insignias para mostrar en tu perfil. ({{count}}/5 seleccionadas)",
@@ -95,12 +103,12 @@
       "save_failed_desc": "No se pudo actualizar la vitrina.",
       "save_error": "Algo salió mal."
     },
-    "loading": "Cargando logros",
     "load_error": "Error al cargar los logros. Inténtalo de nuevo."
   },
   "goals": {
     "page_title": "Metas",
     "title": "Metas",
+    "loading": "Cargando objetivos",
     "subtitle": "Establece metas y sigue tu progreso",
     "new_goal": "Nueva Meta",
     "from_template": "Desde Plantilla",
@@ -179,15 +187,23 @@
       "progress_failed": "Error al actualizar el progreso",
       "buddy_joined": "¡Ahora eres compañero!",
       "buddy_failed": "Error al unirse como compañero"
-    },
-    "loading": "Cargando objetivos"
+    }
   },
   "leaderboard": {
     "page_title": "Clasificación",
     "title": "Clasificación",
     "subtitle": "Mira quién lidera la comunidad",
+    "subtitle_redesign": "See how our community is growing together",
+    "tabs_aria": "Community views",
+    "tab": {
+      "community": "Community Impact",
+      "journey": "My Journey",
+      "spotlight": "Spotlight",
+      "competitive": "Most Active"
+    },
     "unable_to_load": "No se Pudo Cargar la Clasificación",
     "try_again": "Intentar de Nuevo",
+    "loading": "Cargando clasificación",
     "empty_title": "Aún no hay clasificaciones",
     "empty_description": "¡Empieza a ganar {{type}} para aparecer en la clasificación!",
     "your_rank": "Tu posición: #{{position}} de {{total}} miembros",
@@ -200,7 +216,8 @@
     "type": {
       "xp": "XP",
       "volunteer_hours": "Horas de Voluntariado",
-      "credits_earned": "Créditos Ganados"
+      "credits_earned": "Créditos Ganados",
+      "nexus_score": "NexusScore"
     },
     "period": {
       "all": "Todo el Tiempo",
@@ -219,16 +236,15 @@
       "hide_history": "Ocultar Historial de Temporadas",
       "history": "Historial de Temporadas",
       "active": "Activa",
+      "loading": "Cargando temporada",
       "load_failed": "Error al Cargar",
-      "load_failed_desc": "No se pudo cargar el historial de temporadas.",
-      "loading": "Cargando temporada"
+      "load_failed_desc": "No se pudo cargar el historial de temporadas."
     },
     "season_unavailable": "Datos de temporada no disponibles",
     "season_unavailable_desc": "No se pudieron cargar los datos de la temporada. Las clasificaciones a continuación siguen disponibles.",
     "session_expired": "Tu sesión ha expirado. Inicia sesión de nuevo.",
     "load_error": "Error al cargar la clasificación. Inténtalo de nuevo.",
-    "type_nexus_score": "NexusScore",
-    "loading": "Cargando clasificación"
+    "type_nexus_score": "NexusScore"
   },
   "community": {
     "total_hours": "Total de horas intercambiadas",

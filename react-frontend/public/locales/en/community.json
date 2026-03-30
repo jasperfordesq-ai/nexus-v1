@@ -141,8 +141,6 @@
     "try_different_search": "Try a different search term",
     "no_organisations_available": "No volunteer organisations available yet",
     "load_more": "Load More",
-    "opportunity_count": "{{count}} opportunity",
-    "opportunity_count_plural": "{{count}} opportunities",
     "volunteer_count": "{{count}} volunteers",
     "hours_logged": "{{hours}}h logged",
     "website": "Website",
@@ -178,7 +176,9 @@
     "terms_item_4": "I agree to use the platform responsibly and ensure all volunteer opportunities posted are genuine and lawful.",
     "terms_item_5": "I understand that the platform administrators may remove the organisation or its listings if they violate community guidelines.",
     "terms_agreement": "I have read and agree to the organisation registration terms above.",
-    "terms_required": "You must agree to the terms to register your organisation."
+    "terms_required": "You must agree to the terms to register your organisation.",
+    "opportunity_count_one": "{{count}} opportunity",
+    "opportunity_count_other": "{{count}} opportunities"
   },
   "organisation_detail": {
     "page_title": "Organisation",

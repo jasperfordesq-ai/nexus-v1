@@ -66,5 +66,12 @@
   "load_more": "Load More",
   "try_again": "Try Again",
   "collapse": "Collapse",
-  "expand": "Create a poll"
+  "expand": "Create a poll",
+  "poll_type": "Poll Type",
+  "poll_type_standard": "Standard (pick one)",
+  "poll_type_ranked": "Ranked Choice (order preferences)",
+  "category_label": "Category (optional)",
+  "category_placeholder": "e.g. Community, Events, Feedback",
+  "anonymous_voting": "Anonymous Voting",
+  "anonymous_voting_desc": "Hide voter identities in results"
 }

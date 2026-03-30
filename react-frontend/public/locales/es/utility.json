@@ -106,7 +106,10 @@
     "reorder": "Reordenar",
     "delete_confirm_title": "Eliminar Recurso",
     "delete_confirm_message": "¿Estás seguro de que deseas eliminar \"{{title}}\"? Esta acción no se puede deshacer.",
-    "delete_confirm": "Eliminar"
+    "delete_confirm": "Eliminar",
+    "aria_move_up": "Move up",
+    "aria_move_down": "Move down",
+    "aria_upload_progress": "Upload progress"
   },
   "not_found": {
     "page_title": "Página No Encontrada",

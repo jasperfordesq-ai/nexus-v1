@@ -86,7 +86,7 @@ export function TrendingHashtags({ limit = 10 }: { limit?: number }) {
                   #{hashtag.tag}
                 </span>
                 <p className="text-xs text-theme-subtle">
-                  {hashtag.post_count === 1 ? t('trending.post_count', { count: hashtag.post_count }) : t('trending.post_count_plural', { count: hashtag.post_count })}
+                  {t('trending.post_count', { count: hashtag.post_count })}
                 </p>
               </div>
             </div>

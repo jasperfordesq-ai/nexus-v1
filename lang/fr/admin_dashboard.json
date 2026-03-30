@@ -10,6 +10,7 @@
     "back": "Retour",
     "next": "Suivant"
   },
+  "load_error": "Failed to load dashboard data",
   "stats": {
     "users_online": "Utilisateurs en ligne",
     "active_sessions": "Sessions actives",
@@ -17,9 +18,20 @@
     "active_listings": "Annonces actives",
     "transactions": "Transactions",
     "hours_exchanged": "Heures échangées",
-    "hours": "Heures"
+    "hours": "Heures",
+    "new_users_this_month": "New Users This Month",
+    "active_users": "Active Users",
+    "total_listings": "Total Listings",
+    "new_listings_this_month": "New Listings This Month"
+  },
+  "trends": {
+    "card_title": "Transaction Trends",
+    "hours_suffix": "hrs",
+    "no_data": "No trend data available"
   },
   "alerts": {
+    "pending_approvals": "Members awaiting approval",
+    "pending_listings": "Listings awaiting moderation",
     "users_pending_one": "{{count}} utilisateur en attente",
     "users_pending_other": "{{count}} utilisateurs en attente",
     "users_pending_text": "De nouvelles inscriptions de membres nécessitent votre examen",
@@ -83,7 +95,9 @@
     "send_newsletter": "Envoyer une newsletter",
     "new_blog_post": "Nouvel article de Blog",
     "gamification": "Gamification",
-    "settings": "Paramètres"
+    "settings": "Paramètres",
+    "enterprise": "Enterprise",
+    "advanced_controls": "Advanced Controls"
   },
   "enterprise": {
     "card_title": "Suite Enterprise",

@@ -42,6 +42,7 @@
     "template_unpopular": "Unpopular Opinion",
     "template_weekend": "Weekend Plans",
     "text_placeholder": "Type your story...",
+    "compose_placeholder": "What's on your mind?",
     "text_overlay": "Add text to your photo...",
     "poll_question_placeholder": "Ask a question...",
     "poll_option_placeholder": "Option {{number}}",

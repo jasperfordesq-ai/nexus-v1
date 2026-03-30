@@ -43,7 +43,7 @@ $platformUrl = $appUrl . $basePath . '/dashboard';
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="x-apple-disable-message-reformatting">
     <meta name="format-detection" content="telephone=no,address=no,email=no,date=no,url=no">
-    <title>Community Pulse - Weekly Digest</title>
+    <title><?= __('emails.weekly_digest.title') ?></title>
     <!--[if mso]>
     <noscript>
         <xml>
@@ -94,7 +94,7 @@ $platformUrl = $appUrl . $basePath . '/dashboard';
 
     <!-- Preview text -->
     <div style="display: none; max-height: 0; overflow: hidden; mso-hide: all;">
-        Your weekly community highlights - new offers, requests, and upcoming events
+        <?= __('emails.weekly_digest.preview_text') ?>
         &#847; &#847; &#847; &#847; &#847; &#847; &#847; &#847; &#847; &#847; &#847; &#847; &#847; &#847; &#847; &#847; &#847; &#847;
     </div>
 
@@ -109,8 +109,8 @@ $platformUrl = $appUrl . $basePath . '/dashboard';
                     <!-- Header with gradient -->
                     <tr>
                         <td style="padding: 30px 40px; text-align: center; background: linear-gradient(135deg, <?= $brandColor ?> 0%, <?= $brandColorDark ?> 100%); border-radius: 16px 16px 0 0;">
-                            <h1 style="margin: 0; font-size: 28px; font-weight: 700; color: #ffffff; letter-spacing: -0.5px;">Community Pulse</h1>
-                            <p style="margin: 10px 0 0; font-size: 16px; color: rgba(255,255,255,0.9);">Your Weekly Digest</p>
+                            <h1 style="margin: 0; font-size: 28px; font-weight: 700; color: #ffffff; letter-spacing: -0.5px;"><?= __('emails.weekly_digest.heading') ?></h1>
+                            <p style="margin: 10px 0 0; font-size: 16px; color: rgba(255,255,255,0.9);"><?= __('emails.weekly_digest.subheading') ?></p>
                         </td>
                     </tr>
 
@@ -122,8 +122,8 @@ $platformUrl = $appUrl . $basePath . '/dashboard';
                             <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%">
                                 <tr>
                                     <td style="padding: 40px 40px 20px;" class="mobile-padding">
-                                        <p style="margin: 0 0 15px; font-size: 18px; line-height: 1.6; color: <?= $textColor ?>;" class="text-dark">Hi <?= htmlspecialchars($userName) ?>,</p>
-                                        <p style="margin: 0; font-size: 16px; line-height: 1.8; color: <?= $textColor ?>;" class="text-dark">Here's what's happening in your community this week.</p>
+                                        <p style="margin: 0 0 15px; font-size: 18px; line-height: 1.6; color: <?= $textColor ?>;" class="text-dark"><?= __('emails.weekly_digest.greeting', ['name' => htmlspecialchars($userName)]) ?></p>
+                                        <p style="margin: 0; font-size: 16px; line-height: 1.8; color: <?= $textColor ?>;" class="text-dark"><?= __('emails.weekly_digest.intro') ?></p>
                                     </td>
                                 </tr>
                             </table>
@@ -134,7 +134,7 @@ $platformUrl = $appUrl . $basePath . '/dashboard';
                                 <tr>
                                     <td style="padding: 20px 40px;" class="mobile-padding">
                                         <h2 style="margin: 0 0 20px; font-size: 20px; font-weight: 700; color: <?= $textColor ?>; display: flex; align-items: center;" class="text-dark">
-                                            <span style="margin-right: 10px;">New Offers</span>
+                                            <span style="margin-right: 10px;"><?= __('emails.weekly_digest.new_offers') ?></span>
                                         </h2>
                                         <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%">
                                             <?php foreach ($offers as $item): ?>
@@ -146,7 +146,7 @@ $platformUrl = $appUrl . $basePath . '/dashboard';
                                                                 <p style="margin: 0 0 4px; font-size: 16px; font-weight: 600; color: <?= $textColor ?>;" class="text-dark">
                                                                     <a href="<?= $appUrl . $basePath ?>/listings/<?= $item['id'] ?>" style="color: <?= $brandColor ?>; text-decoration: none;"><?= htmlspecialchars($item['title']) ?></a>
                                                                 </p>
-                                                                <p style="margin: 0; font-size: 14px; color: <?= $mutedColor ?>;" class="text-muted">by <?= htmlspecialchars($item['user_name']) ?></p>
+                                                                <p style="margin: 0; font-size: 14px; color: <?= $mutedColor ?>;" class="text-muted"><?= __('emails.weekly_digest.by_author', ['name' => htmlspecialchars($item['user_name'])]) ?></p>
                                                             </td>
                                                         </tr>
                                                     </table>
@@ -165,7 +165,7 @@ $platformUrl = $appUrl . $basePath . '/dashboard';
                                 <tr>
                                     <td style="padding: 20px 40px;" class="mobile-padding">
                                         <h2 style="margin: 0 0 20px; font-size: 20px; font-weight: 700; color: <?= $textColor ?>; display: flex; align-items: center;" class="text-dark">
-                                            <span style="margin-right: 10px;">New Requests</span>
+                                            <span style="margin-right: 10px;"><?= __('emails.weekly_digest.new_requests') ?></span>
                                         </h2>
                                         <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%">
                                             <?php foreach ($requests as $item): ?>
@@ -177,7 +177,7 @@ $platformUrl = $appUrl . $basePath . '/dashboard';
                                                                 <p style="margin: 0 0 4px; font-size: 16px; font-weight: 600; color: <?= $textColor ?>;" class="text-dark">
                                                                     <a href="<?= $appUrl . $basePath ?>/listings/<?= $item['id'] ?>" style="color: <?= $brandColor ?>; text-decoration: none;"><?= htmlspecialchars($item['title']) ?></a>
                                                                 </p>
-                                                                <p style="margin: 0; font-size: 14px; color: <?= $mutedColor ?>;" class="text-muted">by <?= htmlspecialchars($item['user_name']) ?></p>
+                                                                <p style="margin: 0; font-size: 14px; color: <?= $mutedColor ?>;" class="text-muted"><?= __('emails.weekly_digest.by_author', ['name' => htmlspecialchars($item['user_name'])]) ?></p>
                                                             </td>
                                                         </tr>
                                                     </table>
@@ -196,7 +196,7 @@ $platformUrl = $appUrl . $basePath . '/dashboard';
                                 <tr>
                                     <td style="padding: 20px 40px;" class="mobile-padding">
                                         <h2 style="margin: 0 0 20px; font-size: 20px; font-weight: 700; color: <?= $textColor ?>; display: flex; align-items: center;" class="text-dark">
-                                            <span style="margin-right: 10px;">Upcoming Events</span>
+                                            <span style="margin-right: 10px;"><?= __('emails.weekly_digest.upcoming_events') ?></span>
                                         </h2>
                                         <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%">
                                             <?php foreach ($events as $item): ?>
@@ -236,7 +236,7 @@ $platformUrl = $appUrl . $basePath . '/dashboard';
                                         <table role="presentation" cellspacing="0" cellpadding="0" border="0" style="margin: 0 auto;">
                                             <tr>
                                                 <td style="border-radius: 10px; background: linear-gradient(135deg, <?= $brandColor ?> 0%, <?= $brandColorDark ?> 100%);" class="button-primary">
-                                                    <a href="<?= $platformUrl ?>" style="display: inline-block; padding: 16px 32px; font-size: 16px; font-weight: 600; color: #ffffff; text-decoration: none; border-radius: 10px;">Visit Platform</a>
+                                                    <a href="<?= $platformUrl ?>" style="display: inline-block; padding: 16px 32px; font-size: 16px; font-weight: 600; color: #ffffff; text-decoration: none; border-radius: 10px;"><?= __('emails.weekly_digest.visit_platform') ?></a>
                                                 </td>
                                             </tr>
                                         </table>
@@ -254,22 +254,22 @@ $platformUrl = $appUrl . $basePath . '/dashboard';
                                 <tr>
                                     <td style="text-align: center; padding-bottom: 15px;">
                                         <p style="margin: 0; font-size: 14px; color: #6b7280;">
-                                            &copy; <?= $year ?> <?= htmlspecialchars($tenantName) ?>. All rights reserved.
+                                            &copy; <?= $year ?> <?= htmlspecialchars($tenantName) ?>. <?= __('emails.footer.all_rights_reserved') ?>
                                         </p>
                                     </td>
                                 </tr>
                                 <tr>
                                     <td style="text-align: center; padding-bottom: 15px;">
                                         <p style="margin: 0; font-size: 13px; color: #9ca3af; line-height: 1.6;">
-                                            You received this email because you opted into weekly digests.
+                                            <?= __('emails.weekly_digest.opted_in_notice') ?>
                                         </p>
                                     </td>
                                 </tr>
                                 <tr>
                                     <td style="text-align: center;">
-                                        <a href="<?= $unsubscribeUrl ?>" style="color: #6b7280; text-decoration: underline; font-size: 13px;">Unsubscribe</a>
+                                        <a href="<?= $unsubscribeUrl ?>" style="color: #6b7280; text-decoration: underline; font-size: 13px;"><?= __('emails.weekly_digest.unsubscribe') ?></a>
                                         <span style="color: #d1d5db; margin: 0 8px;">|</span>
-                                        <a href="<?= $settingsUrl ?>" style="color: #6b7280; text-decoration: underline; font-size: 13px;">Manage Preferences</a>
+                                        <a href="<?= $settingsUrl ?>" style="color: #6b7280; text-decoration: underline; font-size: 13px;"><?= __('emails.footer.manage_preferences') ?></a>
                                     </td>
                                 </tr>
                             </table>

@@ -425,7 +425,7 @@ export function CreateListingPage() {
                   variant="flat"
                   onPress={() => { setImageFile(null); setImagePreview(null); if (existingImageUrl) setRemoveExistingImage(true); setExistingImageUrl(null); }}
                   className="absolute top-2 right-2 p-1.5 rounded-full bg-black/60 text-white hover:bg-black/80 transition-colors min-w-0 w-auto h-auto"
-                  aria-label="Remove image"
+                  aria-label={t('form.aria_remove_image', 'Remove image')}
                 >
                   <X className="w-4 h-4" />
                 </Button>

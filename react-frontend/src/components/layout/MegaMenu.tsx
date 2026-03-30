@@ -243,7 +243,7 @@ export function MegaMenu({
         <nav
           ref={menuRef}
           className="grid grid-cols-2 gap-0 p-2 min-w-[500px]"
-          aria-label="More navigation"
+          aria-label={t('aria.more_navigation')}
           onKeyDown={handleKeyDown}
         >
           {renderColumn(leftSections, false)}

@@ -262,6 +262,7 @@
     "warning": "Attenzione: Questa azione non può essere annullata",
     "warning_desc": "Tutti i tuoi dati, inclusi annunci, messaggi e cronologia transazioni saranno eliminati in modo permanente.",
     "type_confirm": "Digita DELETE per confermare:",
+    "placeholder": "DELETE",
     "submit": "Elimina il Mio Account",
     "aria_label": "Digita DELETE per confermare"
   },

@@ -64,5 +64,8 @@
   "filter_apply": "Cuir scagairí i bhfeidhm",
   "run_search": "Rith cuardach",
   "delete": "Scrios",
-  "delete_saved_search": "Scrios cuardach sábháilte"
+  "delete_saved_search": "Scrios cuardach sábháilte",
+  "aria": {
+    "loading_search_results": "Loading search results"
+  }
 }

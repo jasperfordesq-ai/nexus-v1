@@ -54,7 +54,8 @@
     "save_error_subtitle": "Veuillez vérifier vos informations et réessayer.",
     "load_error": "Échec du chargement de l'annonce",
     "update_success": "Annonce mise à jour avec succès",
-    "create_success": "Annonce créée avec succès"
+    "create_success": "Annonce créée avec succès",
+    "aria_remove_image": "Remove image"
   },
   "page_subtitle": "Parcourez les services et demandes de la communauté",
   "search_placeholder": "Rechercher par titre, description, localisation ou nom...",
@@ -81,6 +82,16 @@
   "share_copied_subtitle": "Partagez cette annonce avec n'importe qui",
   "share_error_title": "Impossible de copier le lien",
   "not_found_title": "Annonce introuvable",
+  "near_me": "Près de moi",
+  "near_me_no_location": "Activez la localisation pour utiliser cette fonctionnalité",
+  "radius_label": "Rayon de recherche",
+  "like": "j'aime",
+  "likes": "j'aime",
+  "comment": "commentaire",
+  "comments": "commentaires",
+  "detail_like": "J'aime",
+  "detail_liked": "Aimé",
+  "detail_comments": "Commentaires",
   "detail_edit": "Modifier",
   "detail_delete": "Supprimer",
   "detail_duration": "Durée",
@@ -135,6 +146,10 @@
     "placeholder": "Saisissez une compétence et appuyez sur Entrée...",
     "aria_add": "Ajouter une étiquette de compétence"
   },
+  "aria": {
+    "view_mode": "View mode",
+    "loading_listings": "Loading listings"
+  },
   "analytics": {
     "title": "Statistiques de l'annonce",
     "total_views": "Vues totales",
@@ -146,15 +161,5 @@
     "trend_7day": "Tendance sur 7 jours",
     "vs_previous_week": "vs. semaine précédente",
     "views_last_days": "Vues ({{days}} derniers jours)"
-  },
-  "near_me": "Près de moi",
-  "near_me_no_location": "Activez la localisation pour utiliser cette fonctionnalité",
-  "radius_label": "Rayon de recherche",
-  "like": "j'aime",
-  "likes": "j'aime",
-  "comment": "commentaire",
-  "comments": "commentaires",
-  "detail_like": "J'aime",
-  "detail_liked": "Aimé",
-  "detail_comments": "Commentaires"
+  }
 }

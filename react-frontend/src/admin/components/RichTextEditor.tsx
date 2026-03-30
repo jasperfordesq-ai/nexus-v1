@@ -60,6 +60,7 @@ import {
   Redo2,
   Code,
 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 /* ───────────────────────── Types ───────────────────────── */
 
@@ -108,6 +109,7 @@ const editorTheme = {
 
 function ToolbarPlugin({ isDisabled }: { isDisabled?: boolean }) {
   const [editor] = useLexicalComposerContext();
+  const { t } = useTranslation('admin');
   const [isBold, setIsBold] = useState(false);
   const [isItalic, setIsItalic] = useState(false);
   const [isUnderline, setIsUnderline] = useState(false);
@@ -205,27 +207,27 @@ function ToolbarPlugin({ isDisabled }: { isDisabled?: boolean }) {
   return (
     <div className="flex flex-wrap items-center gap-0.5 border-b border-default-200 dark:border-default-100 px-2 py-1.5 bg-default-50 dark:bg-default-100 rounded-t-lg">
       {/* Undo / Redo */}
-      <Tooltip content="Undo" size="sm" delay={500}>
+      <Tooltip content={t('rte.undo', 'Undo')} size="sm" delay={500}>
         <Button
           isIconOnly
           size="sm"
           variant="light"
           isDisabled={isDisabled}
           onPress={() => editor.dispatchCommand(UNDO_COMMAND, undefined)}
-          aria-label="Undo"
+          aria-label={t('rte.undo', 'Undo')}
           className="min-w-8 w-8 h-8"
         >
           <Undo2 size={15} />
         </Button>
       </Tooltip>
-      <Tooltip content="Redo" size="sm" delay={500}>
+      <Tooltip content={t('rte.redo', 'Redo')} size="sm" delay={500}>
         <Button
           isIconOnly
           size="sm"
           variant="light"
           isDisabled={isDisabled}
           onPress={() => editor.dispatchCommand(REDO_COMMAND, undefined)}
-          aria-label="Redo"
+          aria-label={t('rte.redo', 'Redo')}
           className="min-w-8 w-8 h-8"
         >
           <Redo2 size={15} />
@@ -235,7 +237,7 @@ function ToolbarPlugin({ isDisabled }: { isDisabled?: boolean }) {
       <Divider orientation="vertical" className="h-5 mx-1" />
 
       {/* Headings */}
-      <Tooltip content="Heading 2" size="sm" delay={500}>
+      <Tooltip content={t('rte.heading_2', 'Heading 2')} size="sm" delay={500}>
         <Button
           isIconOnly
           size="sm"
@@ -243,13 +245,13 @@ function ToolbarPlugin({ isDisabled }: { isDisabled?: boolean }) {
           color={blockType === 'h2' ? 'primary' : 'default'}
           isDisabled={isDisabled}
           onPress={() => formatHeading('h2')}
-          aria-label="Heading 2"
+          aria-label={t('rte.heading_2', 'Heading 2')}
           className="min-w-8 w-8 h-8"
         >
           <Heading2 size={15} />
         </Button>
       </Tooltip>
-      <Tooltip content="Heading 3" size="sm" delay={500}>
+      <Tooltip content={t('rte.heading_3', 'Heading 3')} size="sm" delay={500}>
         <Button
           isIconOnly
           size="sm"
@@ -257,7 +259,7 @@ function ToolbarPlugin({ isDisabled }: { isDisabled?: boolean }) {
           color={blockType === 'h3' ? 'primary' : 'default'}
           isDisabled={isDisabled}
           onPress={() => formatHeading('h3')}
-          aria-label="Heading 3"
+          aria-label={t('rte.heading_3', 'Heading 3')}
           className="min-w-8 w-8 h-8"
         >
           <Heading3 size={15} />
@@ -267,7 +269,7 @@ function ToolbarPlugin({ isDisabled }: { isDisabled?: boolean }) {
       <Divider orientation="vertical" className="h-5 mx-1" />
 
       {/* Inline formatting */}
-      <Tooltip content="Bold" size="sm" delay={500}>
+      <Tooltip content={t('rte.bold', 'Bold')} size="sm" delay={500}>
         <Button
           isIconOnly
           size="sm"
@@ -275,13 +277,13 @@ function ToolbarPlugin({ isDisabled }: { isDisabled?: boolean }) {
           color={isBold ? 'primary' : 'default'}
           isDisabled={isDisabled}
           onPress={() => editor.dispatchCommand(FORMAT_TEXT_COMMAND, 'bold')}
-          aria-label="Bold"
+          aria-label={t('rte.bold', 'Bold')}
           className="min-w-8 w-8 h-8"
         >
           <Bold size={15} />
         </Button>
       </Tooltip>
-      <Tooltip content="Italic" size="sm" delay={500}>
+      <Tooltip content={t('rte.italic', 'Italic')} size="sm" delay={500}>
         <Button
           isIconOnly
           size="sm"
@@ -289,13 +291,13 @@ function ToolbarPlugin({ isDisabled }: { isDisabled?: boolean }) {
           color={isItalic ? 'primary' : 'default'}
           isDisabled={isDisabled}
           onPress={() => editor.dispatchCommand(FORMAT_TEXT_COMMAND, 'italic')}
-          aria-label="Italic"
+          aria-label={t('rte.italic', 'Italic')}
           className="min-w-8 w-8 h-8"
         >
           <Italic size={15} />
         </Button>
       </Tooltip>
-      <Tooltip content="Underline" size="sm" delay={500}>
+      <Tooltip content={t('rte.underline', 'Underline')} size="sm" delay={500}>
         <Button
           isIconOnly
           size="sm"
@@ -303,13 +305,13 @@ function ToolbarPlugin({ isDisabled }: { isDisabled?: boolean }) {
           color={isUnderline ? 'primary' : 'default'}
           isDisabled={isDisabled}
           onPress={() => editor.dispatchCommand(FORMAT_TEXT_COMMAND, 'underline')}
-          aria-label="Underline"
+          aria-label={t('rte.underline', 'Underline')}
           className="min-w-8 w-8 h-8"
         >
           <Underline size={15} />
         </Button>
       </Tooltip>
-      <Tooltip content="Strikethrough" size="sm" delay={500}>
+      <Tooltip content={t('rte.strikethrough', 'Strikethrough')} size="sm" delay={500}>
         <Button
           isIconOnly
           size="sm"
@@ -317,13 +319,13 @@ function ToolbarPlugin({ isDisabled }: { isDisabled?: boolean }) {
           color={isStrikethrough ? 'primary' : 'default'}
           isDisabled={isDisabled}
           onPress={() => editor.dispatchCommand(FORMAT_TEXT_COMMAND, 'strikethrough')}
-          aria-label="Strikethrough"
+          aria-label={t('rte.strikethrough', 'Strikethrough')}
           className="min-w-8 w-8 h-8"
         >
           <Strikethrough size={15} />
         </Button>
       </Tooltip>
-      <Tooltip content="Inline Code" size="sm" delay={500}>
+      <Tooltip content={t('rte.inline_code', 'Inline Code')} size="sm" delay={500}>
         <Button
           isIconOnly
           size="sm"
@@ -331,7 +333,7 @@ function ToolbarPlugin({ isDisabled }: { isDisabled?: boolean }) {
           color={isCode ? 'primary' : 'default'}
           isDisabled={isDisabled}
           onPress={() => editor.dispatchCommand(FORMAT_TEXT_COMMAND, 'code')}
-          aria-label="Inline Code"
+          aria-label={t('rte.inline_code', 'Inline Code')}
           className="min-w-8 w-8 h-8"
         >
           <Code size={15} />
@@ -341,7 +343,7 @@ function ToolbarPlugin({ isDisabled }: { isDisabled?: boolean }) {
       <Divider orientation="vertical" className="h-5 mx-1" />
 
       {/* Block formatting */}
-      <Tooltip content="Bullet List" size="sm" delay={500}>
+      <Tooltip content={t('rte.bullet_list', 'Bullet List')} size="sm" delay={500}>
         <Button
           isIconOnly
           size="sm"
@@ -349,13 +351,13 @@ function ToolbarPlugin({ isDisabled }: { isDisabled?: boolean }) {
           color={blockType === 'bullet' ? 'primary' : 'default'}
           isDisabled={isDisabled}
           onPress={() => formatList('bullet')}
-          aria-label="Bullet List"
+          aria-label={t('rte.bullet_list', 'Bullet List')}
           className="min-w-8 w-8 h-8"
         >
           <List size={15} />
         </Button>
       </Tooltip>
-      <Tooltip content="Numbered List" size="sm" delay={500}>
+      <Tooltip content={t('rte.numbered_list', 'Numbered List')} size="sm" delay={500}>
         <Button
           isIconOnly
           size="sm"
@@ -363,13 +365,13 @@ function ToolbarPlugin({ isDisabled }: { isDisabled?: boolean }) {
           color={blockType === 'number' ? 'primary' : 'default'}
           isDisabled={isDisabled}
           onPress={() => formatList('number')}
-          aria-label="Numbered List"
+          aria-label={t('rte.numbered_list', 'Numbered List')}
           className="min-w-8 w-8 h-8"
         >
           <ListOrdered size={15} />
         </Button>
       </Tooltip>
-      <Tooltip content="Block Quote" size="sm" delay={500}>
+      <Tooltip content={t('rte.block_quote', 'Block Quote')} size="sm" delay={500}>
         <Button
           isIconOnly
           size="sm"
@@ -377,7 +379,7 @@ function ToolbarPlugin({ isDisabled }: { isDisabled?: boolean }) {
           color={blockType === 'quote' ? 'primary' : 'default'}
           isDisabled={isDisabled}
           onPress={formatQuote}
-          aria-label="Block Quote"
+          aria-label={t('rte.block_quote', 'Block Quote')}
           className="min-w-8 w-8 h-8"
         >
           <Quote size={15} />
@@ -387,7 +389,7 @@ function ToolbarPlugin({ isDisabled }: { isDisabled?: boolean }) {
       <Divider orientation="vertical" className="h-5 mx-1" />
 
       {/* Link */}
-      <Tooltip content={isLink ? 'Remove Link' : 'Insert Link'} size="sm" delay={500}>
+      <Tooltip content={isLink ? t('rte.remove_link', 'Remove Link') : t('rte.insert_link', 'Insert Link')} size="sm" delay={500}>
         <Button
           isIconOnly
           size="sm"
@@ -395,7 +397,7 @@ function ToolbarPlugin({ isDisabled }: { isDisabled?: boolean }) {
           color={isLink ? 'primary' : 'default'}
           isDisabled={isDisabled}
           onPress={insertLink}
-          aria-label={isLink ? 'Remove Link' : 'Insert Link'}
+          aria-label={isLink ? t('rte.remove_link', 'Remove Link') : t('rte.insert_link', 'Insert Link')}
           className="min-w-8 w-8 h-8"
         >
           <Link2 size={15} />

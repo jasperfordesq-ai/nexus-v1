@@ -106,7 +106,10 @@
     "reorder": "Réorganiser",
     "delete_confirm_title": "Supprimer la ressource",
     "delete_confirm_message": "Êtes-vous sûr de vouloir supprimer « {{title}} » ? Cette action est irréversible.",
-    "delete_confirm": "Supprimer"
+    "delete_confirm": "Supprimer",
+    "aria_move_up": "Move up",
+    "aria_move_down": "Move down",
+    "aria_upload_progress": "Upload progress"
   },
   "not_found": {
     "page_title": "Page non trouvée",

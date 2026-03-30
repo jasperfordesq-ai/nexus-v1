@@ -106,7 +106,10 @@
     "reorder": "Reorder",
     "delete_confirm_title": "Delete Resource",
     "delete_confirm_message": "Are you sure you want to delete \"{{title}}\"? This action cannot be undone.",
-    "delete_confirm": "Delete"
+    "delete_confirm": "Delete",
+    "aria_move_up": "Move up",
+    "aria_move_down": "Move down",
+    "aria_upload_progress": "Upload progress"
   },
   "not_found": {
     "page_title": "Page Not Found",

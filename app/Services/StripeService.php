@@ -44,7 +44,7 @@ class StripeService
      */
     public static function constructWebhookEvent(string $payload, string $sigHeader): Event
     {
-        $webhookSecret = env('STRIPE_WEBHOOK_SECRET');
+        $webhookSecret = config('services.stripe.webhook_secret') ?: env('STRIPE_WEBHOOK_SECRET');
 
         if (empty($webhookSecret)) {
             throw new \RuntimeException('Stripe webhook secret is not configured. Set STRIPE_WEBHOOK_SECRET in .env.');

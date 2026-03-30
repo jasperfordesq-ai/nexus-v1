@@ -908,7 +908,7 @@ export function PollsPage() {
 
                 {/* Poll Type (P1) */}
                 <Select
-                  label="Poll Type"
+                  label={t('poll_type')}
                   selectedKeys={[newPollType]}
                   onSelectionChange={(keys) => {
                     const val = Array.from(keys)[0] as string;
@@ -921,14 +921,14 @@ export function PollsPage() {
                     value: 'text-[var(--text-primary)]',
                   }}
                 >
-                  <SelectItem key="standard">Standard (pick one)</SelectItem>
-                  <SelectItem key="ranked">Ranked Choice (order preferences)</SelectItem>
+                  <SelectItem key="standard">{t('poll_type_standard')}</SelectItem>
+                  <SelectItem key="ranked">{t('poll_type_ranked')}</SelectItem>
                 </Select>
 
                 {/* Category (P2) */}
                 <Input
-                  label="Category (optional)"
-                  placeholder="e.g. Community, Events, Feedback"
+                  label={t('category_label')}
+                  placeholder={t('category_placeholder')}
                   value={newCategory}
                   onChange={(e) => setNewCategory(e.target.value)}
                   classNames={{
@@ -940,8 +940,8 @@ export function PollsPage() {
                 {/* Anonymous (P3) */}
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-sm font-medium text-[var(--text-primary)]">Anonymous Voting</p>
-                    <p className="text-xs text-[var(--text-muted)]">Hide voter identities in results</p>
+                    <p className="text-sm font-medium text-[var(--text-primary)]">{t('anonymous_voting')}</p>
+                    <p className="text-xs text-[var(--text-muted)]">{t('anonymous_voting_desc')}</p>
                   </div>
                   <Switch
                     isSelected={newIsAnonymous}

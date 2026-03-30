@@ -40,8 +40,6 @@
   "likes_given_30d": "J'aime donnés (30j)",
   "hours_suffix": "h",
   "skill_request": "Demande",
-  "endorsements_count": "{{count}} approbation",
-  "endorsements_count_plural": "{{count}} approbations",
   "activity_types": {
     "exchange": "Échange",
     "listing": "Annonce",
@@ -51,5 +49,7 @@
     "review": "Avis",
     "post": "Publication",
     "default": "Activité"
-  }
+  },
+  "endorsements_count_one": "{{count}} approbation",
+  "endorsements_count_other": "{{count}} approbations"
 }

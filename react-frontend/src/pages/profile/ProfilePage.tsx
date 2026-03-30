@@ -723,7 +723,7 @@ export function ProfilePage() {
         <Tabs
           selectedKey={activeTab}
           onSelectionChange={(key) => setActiveTab(key as string)}
-          aria-label="Profile sections"
+          aria-label={t('aria.profile_sections', 'Profile sections')}
           classNames={{
             tabList: 'bg-theme-elevated p-1 rounded-lg',
             cursor: 'bg-theme-hover',
@@ -732,7 +732,7 @@ export function ProfilePage() {
         >
           <Tab
             key="about"
-            aria-label="About this user"
+            aria-label={t('aria.about_this_user', 'About this user')}
             title={
               <span className="flex items-center gap-2">
                 <User className="w-4 h-4" aria-hidden="true" />
@@ -742,7 +742,7 @@ export function ProfilePage() {
           />
           <Tab
             key="listings"
-            aria-label="User listings"
+            aria-label={t('aria.user_listings', 'User listings')}
             title={
               <span className="flex items-center gap-2">
                 <ListTodo className="w-4 h-4" aria-hidden="true" />
@@ -752,7 +752,7 @@ export function ProfilePage() {
           />
           <Tab
             key="activity"
-            aria-label="User activity feed"
+            aria-label={t('aria.user_activity_feed', 'User activity feed')}
             title={
               <span className="flex items-center gap-2">
                 <Rss className="w-4 h-4" aria-hidden="true" />
@@ -762,7 +762,7 @@ export function ProfilePage() {
           />
           <Tab
             key="availability"
-            aria-label="User availability"
+            aria-label={t('aria.user_availability', 'User availability')}
             title={
               <span className="flex items-center gap-2">
                 <Calendar className="w-4 h-4" aria-hidden="true" />
@@ -773,7 +773,7 @@ export function ProfilePage() {
           {hasReviews && reviewsAvailable && (
             <Tab
               key="reviews"
-              aria-label="User reviews"
+              aria-label={t('aria.user_reviews', 'User reviews')}
               title={
                 <span className="flex items-center gap-2">
                   <Star className="w-4 h-4" aria-hidden="true" />
@@ -785,7 +785,7 @@ export function ProfilePage() {
           {hasGamification && (
             <Tab
               key="achievements"
-              aria-label="User achievements"
+              aria-label={t('aria.user_achievements', 'User achievements')}
               title={
                 <span className="flex items-center gap-2">
                   <Award className="w-4 h-4" aria-hidden="true" />
@@ -852,7 +852,7 @@ export function ProfilePage() {
           )}
 
           {activeTab === 'listings' && (
-            <div className="grid sm:grid-cols-2 gap-4" role="list" aria-label="User listings">
+            <div className="grid sm:grid-cols-2 gap-4" role="list" aria-label={t('aria.user_listings', 'User listings')}>
               {listings.length > 0 ? (
                 listings.map((listing) => (
                   <Link
@@ -931,7 +931,7 @@ export function ProfilePage() {
             <div className="space-y-4">
               {isLoadingReviews ? (
                 // Loading skeleton for reviews
-                <div aria-label="Loading reviews" aria-busy="true" className="space-y-3">
+                <div aria-label={t('aria.loading_reviews', 'Loading reviews')} aria-busy="true" className="space-y-3">
                   {Array.from({ length: 3 }).map((_, i) => (
                     <GlassCard key={i} className="p-5">
                       <div className="flex items-start gap-4">

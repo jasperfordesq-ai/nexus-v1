@@ -457,7 +457,7 @@ export function SecurityTab({
                 <Input
                   value={deleteConfirmation}
                   onChange={(e) => onDeleteConfirmationChange(e.target.value)}
-                  placeholder="DELETE"
+                  placeholder={t('delete_modal.placeholder')}
                   aria-label={t('delete_modal.aria_label')}
                   classNames={{
                     input: 'bg-transparent text-theme-primary font-mono',

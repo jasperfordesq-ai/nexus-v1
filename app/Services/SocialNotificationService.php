@@ -58,7 +58,7 @@ class SocialNotificationService
             $ownerEmail = $owner->email ?? null;
 
             $contentLabel = self::getContentLabel($contentType);
-            $message = "$likerName liked your $contentLabel";
+            $message = __('notifications.liked_your_content', ['name' => $likerName, 'content_type' => $contentLabel]);
             $link = self::getContentLink($contentType, $contentId);
 
             // 1. Create platform notification (bell)
@@ -106,7 +106,7 @@ class SocialNotificationService
 
             $contentLabel = self::getContentLabel($contentType);
             $shortComment = strlen($commentText) > 50 ? substr($commentText, 0, 50) . '...' : $commentText;
-            $message = "$commenterName commented on your $contentLabel: \"$shortComment\"";
+            $message = __('notifications.commented_on_your_content', ['name' => $commenterName, 'content_type' => $contentLabel, 'comment' => $shortComment]);
             $link = self::getContentLink($contentType, $contentId);
 
             // 1. Create platform notification (bell)
@@ -153,7 +153,7 @@ class SocialNotificationService
             $ownerEmail = $owner->email ?? null;
 
             $contentLabel = self::getContentLabel($contentType);
-            $message = "$sharerName shared your $contentLabel";
+            $message = __('notifications.shared_your_content', ['name' => $sharerName, 'content_type' => $contentLabel]);
             $link = self::getContentLink($contentType, $contentId);
 
             // 1. Create platform notification (bell)
@@ -174,17 +174,10 @@ class SocialNotificationService
      */
     private static function getContentLabel($contentType): string
     {
-        $labels = [
-            'post' => 'post',
-            'listing' => 'listing',
-            'event' => 'event',
-            'goal' => 'goal',
-            'poll' => 'poll',
-            'resource' => 'resource',
-            'volunteering' => 'volunteering opportunity',
-            'review' => 'review',
-        ];
-        return $labels[$contentType] ?? 'content';
+        $key = 'notifications.content_type_' . $contentType;
+        $translated = __($key);
+        // If the translation key doesn't exist, fall back to the default
+        return $translated !== $key ? $translated : __('notifications.content_type_default');
     }
 
     /**
@@ -245,15 +238,15 @@ class SocialNotificationService
             $likerName = $liker->name ?? 'Someone';
             $contentLabel = self::getContentLabel($contentType);
 
-            $title = "New Like on Your " . ucfirst($contentLabel);
-            $subtitle = "$likerName liked your $contentLabel";
-            $body = $contentPreview ? "\"" . htmlspecialchars($contentPreview) . "\"" : "Your $contentLabel is getting attention!";
+            $title = __('notifications.email_new_like_title', ['content_type' => ucfirst($contentLabel)]);
+            $subtitle = __('notifications.email_liked_subtitle', ['name' => $likerName, 'content_type' => $contentLabel]);
+            $body = $contentPreview ? "\"" . htmlspecialchars($contentPreview) . "\"" : __('notifications.content_getting_attention', ['content_type' => $contentLabel]);
 
             $html = EmailTemplate::render(
                 $title,
                 $subtitle,
                 $body,
-                "View " . ucfirst($contentLabel),
+                __('notifications.email_view_content', ['content_type' => ucfirst($contentLabel)]),
                 $fullLink,
                 $tenantName
             );
@@ -278,15 +271,15 @@ class SocialNotificationService
             $commenterName = $commenter->name ?? 'Someone';
             $contentLabel = self::getContentLabel($contentType);
 
-            $title = "New Comment on Your " . ucfirst($contentLabel);
-            $subtitle = "$commenterName commented on your $contentLabel";
+            $title = __('notifications.email_new_comment_title', ['content_type' => ucfirst($contentLabel)]);
+            $subtitle = __('notifications.email_commented_subtitle', ['name' => $commenterName, 'content_type' => $contentLabel]);
             $body = "\"" . htmlspecialchars($commentText) . "\"";
 
             $html = EmailTemplate::render(
                 $title,
                 $subtitle,
                 $body,
-                "View Comment",
+                __('notifications.email_view_comment'),
                 $fullLink,
                 $tenantName
             );
@@ -311,15 +304,15 @@ class SocialNotificationService
             $sharerName = $sharer->name ?? 'Someone';
             $contentLabel = self::getContentLabel($contentType);
 
-            $title = "Your " . ucfirst($contentLabel) . " Was Shared";
-            $subtitle = "$sharerName shared your $contentLabel with their network";
-            $body = "Your content is reaching more people!";
+            $title = __('notifications.email_shared_title', ['content_type' => ucfirst($contentLabel)]);
+            $subtitle = __('notifications.email_shared_subtitle', ['name' => $sharerName, 'content_type' => $contentLabel]);
+            $body = __('notifications.content_reaching_more');
 
             $html = EmailTemplate::render(
                 $title,
                 $subtitle,
                 $body,
-                "View " . ucfirst($contentLabel),
+                __('notifications.email_view_content', ['content_type' => ucfirst($contentLabel)]),
                 $fullLink,
                 $tenantName
             );

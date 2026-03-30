@@ -64,5 +64,8 @@
   "filter_apply": "Appliquer les filtres",
   "run_search": "Lancer la recherche",
   "delete": "Supprimer",
-  "delete_saved_search": "Supprimer la recherche enregistrée"
+  "delete_saved_search": "Supprimer la recherche enregistrée",
+  "aria": {
+    "loading_search_results": "Loading search results"
+  }
 }

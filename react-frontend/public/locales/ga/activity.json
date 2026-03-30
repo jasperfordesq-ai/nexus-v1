@@ -40,8 +40,6 @@
   "likes_given_30d": "Maith Liom Tugtha (30l)",
   "hours_suffix": "u",
   "skill_request": "Iarratas",
-  "endorsements_count": "{{count}} tacaíocht",
-  "endorsements_count_plural": "{{count}} tacaíocht",
   "activity_types": {
     "exchange": "Malartú",
     "listing": "Liostú",
@@ -51,5 +49,7 @@
     "review": "Athbhreithniú",
     "post": "Postáil",
     "default": "Gníomhaíocht"
-  }
+  },
+  "endorsements_count_one": "{{count}} tacaíocht",
+  "endorsements_count_other": "{{count}} tacaíocht"
 }

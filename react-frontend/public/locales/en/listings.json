@@ -54,7 +54,8 @@
     "save_error_subtitle": "Please check your information and try again.",
     "load_error": "Failed to load listing",
     "update_success": "Listing updated successfully",
-    "create_success": "Listing created successfully"
+    "create_success": "Listing created successfully",
+    "aria_remove_image": "Remove image"
   },
   "page_subtitle": "Browse services and requests from the community",
   "search_placeholder": "Search by title, description, location or name...",
@@ -144,6 +145,10 @@
     "label": "Skill Tags",
     "placeholder": "Type a skill and press Enter...",
     "aria_add": "Add skill tag"
+  },
+  "aria": {
+    "view_mode": "View mode",
+    "loading_listings": "Loading listings"
   },
   "analytics": {
     "title": "Listing Analytics",

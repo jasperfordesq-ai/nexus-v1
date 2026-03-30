@@ -752,7 +752,7 @@ export function CreateGroupExchangePage() {
 
                 {/* Split Table */}
                 <Table
-                  aria-label="Hour split preview"
+                  aria-label={t('create.aria_hour_split_preview', 'Hour split preview')}
                   shadow="none"
                   isStriped
                   classNames={{

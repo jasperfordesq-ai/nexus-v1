@@ -239,6 +239,11 @@
     "discussion_factor_2_description": "Il modello dare-ricevere supera lo stigma del \"bisogno di aiuto\" e favorisce una partecipazione sostenuta rispetto al volontariato tradizionale.",
     "discussion_factor_3_title": "Efficienza della piattaforma digitale",
     "discussion_factor_3_description": "La piattaforma di abbinamento online riduce i costi di coordinamento e consente ai membri di organizzare gli scambi in modo autonomo, aumentando la scalabilità.",
+    "aria": {
+      "activity_statistics": "TBI activity statistics",
+      "sroi_breakdown": "SROI breakdown",
+      "recommendations": "Recommendations"
+    },
     "rec_header": "Raccomandazione",
     "rec_priority_header": "Priorità",
     "rec_0": "Garantire un finanziamento base pluriennale per assicurare la continuità del programma e ridurre la dipendenza dalle sovvenzioni annuali.",
@@ -364,6 +369,12 @@
     "badge_launch": "Lanciare",
     "badge_ongoing": "In corso",
     "badge_pitch": "Presentare",
+    "aria": {
+      "pillar_1_initiatives": "Strategic pillar 1 initiatives",
+      "pillar_2_initiatives": "Strategic pillar 2 initiatives",
+      "year_1_roadmap": "Year 1 roadmap",
+      "risk_and_mitigation": "Risk and mitigation"
+    },
     "risk_header": "Rischio",
     "likelihood_header": "Probabilità",
     "impact_header": "Impatto",

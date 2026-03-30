@@ -732,7 +732,7 @@ export function ResourcesPage() {
                             variant="light"
                             className="text-theme-subtle min-w-0 w-6 h-6"
                             onPress={() => handleMoveResource(resource.id, 'up')}
-                            aria-label="Move up"
+                            aria-label={t('resources.aria_move_up', 'Move up')}
                           >
                             <ArrowUp className="w-3.5 h-3.5" />
                           </Button>
@@ -742,7 +742,7 @@ export function ResourcesPage() {
                             variant="light"
                             className="text-theme-subtle min-w-0 w-6 h-6"
                             onPress={() => handleMoveResource(resource.id, 'down')}
-                            aria-label="Move down"
+                            aria-label={t('resources.aria_move_down', 'Move down')}
                           >
                             <ArrowDown className="w-3.5 h-3.5" />
                           </Button>
@@ -1053,7 +1053,7 @@ export function ResourcesPage() {
                       indicator: 'bg-gradient-to-r from-amber-500 to-orange-600',
                       track: 'bg-theme-elevated',
                     }}
-                    aria-label="Upload progress"
+                    aria-label={t('resources.aria_upload_progress', 'Upload progress')}
                   />
                   <p className="text-xs text-theme-subtle text-center">
                     {t('resources.uploading_progress', { progress: uploadProgress })}

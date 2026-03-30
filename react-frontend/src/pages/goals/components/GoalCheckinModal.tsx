@@ -289,7 +289,7 @@ export function GoalCheckinModal({
                     filler: 'bg-gradient-to-r from-indigo-500 to-purple-600',
                     thumb: 'bg-white shadow-md border-2 border-indigo-500',
                   }}
-                  aria-label="Progress percentage"
+                  aria-label={t('checkin.aria_progress_percentage', 'Progress percentage')}
                 />
                 <div className="flex justify-between text-xs text-theme-subtle mt-1">
                   <span>0%</span>

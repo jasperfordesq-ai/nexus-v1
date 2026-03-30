@@ -40,8 +40,6 @@
   "likes_given_30d": "Gostos Dados (30d)",
   "hours_suffix": "h",
   "skill_request": "Pedido",
-  "endorsements_count": "{{count}} recomendação",
-  "endorsements_count_plural": "{{count}} recomendações",
   "activity_types": {
     "exchange": "Troca",
     "listing": "Anúncio",
@@ -51,5 +49,7 @@
     "review": "Avaliação",
     "post": "Publicação",
     "default": "Atividade"
-  }
+  },
+  "endorsements_count_one": "{{count}} recomendação",
+  "endorsements_count_other": "{{count}} recomendações"
 }

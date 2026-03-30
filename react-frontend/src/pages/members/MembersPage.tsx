@@ -399,13 +399,13 @@ export function MembersPage() {
               </Select>
             )}
 
-            <div className="flex rounded-lg overflow-hidden border border-theme-default" role="group" aria-label="View mode">
+            <div className="flex rounded-lg overflow-hidden border border-theme-default" role="group" aria-label={t('aria.view_mode', 'View mode')}>
               <Button
                 isIconOnly
                 size="sm"
                 variant="light"
                 className={`rounded-none ${viewMode === 'grid' ? 'bg-theme-hover' : 'bg-theme-elevated'}`}
-                aria-label="Grid view"
+                aria-label={t('aria.grid_view', 'Grid view')}
                 aria-pressed={viewMode === 'grid'}
                 onPress={() => setViewMode('grid')}
               >
@@ -416,7 +416,7 @@ export function MembersPage() {
                 size="sm"
                 variant="light"
                 className={`rounded-none ${viewMode === 'list' ? 'bg-theme-hover' : 'bg-theme-elevated'}`}
-                aria-label="List view"
+                aria-label={t('aria.list_view', 'List view')}
                 aria-pressed={viewMode === 'list'}
                 onPress={() => setViewMode('list')}
               >
@@ -428,7 +428,7 @@ export function MembersPage() {
                   size="sm"
                   variant="light"
                   className={`rounded-none rounded-r-lg ${viewMode === 'map' ? 'bg-primary/10 text-primary' : 'bg-theme-elevated'}`}
-                  aria-label="Map view"
+                  aria-label={t('aria.map_view', 'Map view')}
                   aria-pressed={viewMode === 'map'}
                   onPress={() => setViewMode('map')}
                 >
@@ -460,7 +460,7 @@ export function MembersPage() {
       {!error && (
         <>
           {isLoading ? (
-            <div className={viewMode === 'grid' ? 'grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4' : 'space-y-3'} aria-label="Loading members" aria-busy="true">
+            <div className={viewMode === 'grid' ? 'grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4' : 'space-y-3'} aria-label={t('aria.loading_members', 'Loading members')} aria-busy="true">
               {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
                 <MemberCardSkeleton key={i} />
               ))}

@@ -12,10 +12,6 @@
   "empty_description_all": "You haven't created or joined any group exchanges yet.",
   "empty_description_filtered": "No group exchanges match this filter.",
   "card_aria": "Group exchange: {{title}} - {{status}}",
-  "participants_count": "{{count}} participant",
-  "participants_count_plural": "{{count}} participants",
-  "hours_count": "{{count}} hour",
-  "hours_count_plural": "{{count}} hours",
   "role_organizer": "You organized",
   "role_participant": "Participant",
   "tabs_aria": "Group exchange status filter",
@@ -90,7 +86,9 @@
     "search_members_aria": "Search members",
     "add_as_role": "Add as {{role}}",
     "no_members_found": "No members found matching your search.",
-    "done": "Done"
+    "done": "Done",
+    "aria_exchange_participants": "Exchange participants",
+    "aria_hour_split": "Hour split"
   },
   "create": {
     "page_title": "Create Group Exchange",
@@ -143,7 +141,8 @@
     "hours_placeholder": "Hours",
     "weight_placeholder": "Weight",
     "hours_for": "Hours for {{name}}",
-    "weight_for": "Weight for {{name}}"
+    "weight_for": "Weight for {{name}}",
+    "aria_hour_split_preview": "Hour split preview"
   },
   "toast": {
     "load_more_failed": "Failed to load more exchanges",
@@ -165,5 +164,9 @@
     "created_desc": "Your exchange has been created successfully.",
     "create_failed": "Failed to create exchange",
     "something_wrong": "Something went wrong. Please try again."
-  }
+  },
+  "participants_count_one": "{{count}} participant",
+  "participants_count_other": "{{count}} participants",
+  "hours_count_one": "{{count}} hour",
+  "hours_count_other": "{{count}} hours"
 }

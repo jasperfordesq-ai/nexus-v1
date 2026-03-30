@@ -53,8 +53,8 @@
     "share_failed": "Beitrag konnte nicht geteilt werden"
   },
   "realtime": {
-    "new_post_singular": "1 neuer Beitrag",
-    "new_posts_plural": "{{count}} neue Beiträge"
+    "new_posts_one": "1 neuer Beitrag",
+    "new_posts_other": "{{count}} neue Beiträge"
   },
   "compose": {
     "create_title": "{{type}} erstellen",
@@ -132,8 +132,6 @@
     "ai_tooltip": "Beschreibung mit KI generieren",
     "ai_button": "KI-Assistent",
     "sdg_label": "UN-Nachhaltigkeitsziele (optional)",
-    "sdg_selected": "{{count}} Ziel ausgewählt",
-    "sdg_selected_plural": "{{count}} Ziele ausgewählt",
     "draft_restored": "Entwurf wiederhergestellt",
     "draft_cleared": "Entwurf gelöscht",
     "char_count": "{{current}}/{{max}}",
@@ -194,7 +192,9 @@
     "media_upload_error": "Bilder konnten nicht verarbeitet werden",
     "template_button": "Vorlage",
     "media_drag_drop": "Klicken oder Fotos hierher ziehen",
-    "media_formats": "JPEG, PNG, GIF, WebP bis zu 10 MB jeweils"
+    "media_formats": "JPEG, PNG, GIF, WebP bis zu 10 MB jeweils",
+    "sdg_selected_one": "{{count}} Ziel ausgewählt",
+    "sdg_selected_other": "{{count}} Ziele ausgewählt"
   },
   "card": {
     "edited": "bearbeitet",
@@ -295,8 +295,8 @@
   "trending": {
     "title": "Im Trend",
     "view_all": "Alle Hashtags anzeigen",
-    "post_count": "{{count}} Beitrag",
-    "post_count_plural": "{{count}} Beiträge"
+    "post_count_one": "{{count}} Beitrag",
+    "post_count_other": "{{count}} Beiträge"
   },
   "sidebar": {
     "profile": {

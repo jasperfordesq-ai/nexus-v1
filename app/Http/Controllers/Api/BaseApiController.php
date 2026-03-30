@@ -339,7 +339,7 @@ abstract class BaseApiController extends Controller
         $value = $this->input($key);
 
         if ($value === null || $value === '') {
-            $message = $errorMessage ?? "Missing required field: {$key}";
+            $message = $errorMessage ?? __('api.missing_required_field', ['field' => $key]);
             throw new \Illuminate\Http\Exceptions\HttpResponseException(
                 $this->error($message, 400, 'VALIDATION_REQUIRED_FIELD', ['field' => $key])
             );
@@ -478,7 +478,7 @@ abstract class BaseApiController extends Controller
 
         if ($userId === null) {
             throw new \Illuminate\Http\Exceptions\HttpResponseException(
-                $this->error('Authentication required', 401, 'AUTH_REQUIRED')
+                $this->error(__('api.auth_required'), 401, 'AUTH_REQUIRED')
             );
         }
 
@@ -526,7 +526,7 @@ abstract class BaseApiController extends Controller
         if (!in_array($role, ['admin', 'tenant_admin', 'super_admin', 'god'])) {
             if (!($user->is_super_admin ?? false) && !($user->is_tenant_super_admin ?? false)) {
                 throw new \Illuminate\Http\Exceptions\HttpResponseException(
-                    $this->error('Admin access required', 403, 'AUTH_INSUFFICIENT_PERMISSIONS')
+                    $this->error(__('api.admin_access_required'), 403, 'AUTH_INSUFFICIENT_PERMISSIONS')
                 );
             }
         }
@@ -563,7 +563,7 @@ abstract class BaseApiController extends Controller
         }
 
         throw new \Illuminate\Http\Exceptions\HttpResponseException(
-            $this->error('Super admin access required', 403, 'AUTH_INSUFFICIENT_PERMISSIONS')
+            $this->error(__('api.super_admin_required'), 403, 'AUTH_INSUFFICIENT_PERMISSIONS')
         );
     }
 
@@ -613,7 +613,7 @@ abstract class BaseApiController extends Controller
 
             throw new \Illuminate\Http\Exceptions\HttpResponseException(
                 $this->error(
-                    'Rate limit exceeded. Please try again later.',
+                    __('api.rate_limit_exceeded'),
                     429,
                     'RATE_LIMIT_EXCEEDED'
                 )->header('Retry-After', (string) max(1, $retryAfter))
@@ -827,7 +827,7 @@ abstract class BaseApiController extends Controller
         }
 
         throw new \Illuminate\Http\Exceptions\HttpResponseException(
-            $this->error('Authentication required', 401, 'AUTH_REQUIRED')
+            $this->error(__('api.auth_required'), 401, 'AUTH_REQUIRED')
         );
     }
 }

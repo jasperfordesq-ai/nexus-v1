@@ -64,7 +64,9 @@
   },
   "error": {
     "load_balance": "Falha ao carregar saldo da carteira",
-    "load_wallet": "Falha ao carregar dados da carteira. Tente novamente."
+    "load_wallet": "Falha ao carregar dados da carteira. Tente novamente.",
+    "session_expired": "Your session has expired. Please log in again.",
+    "load_community_fund": "Could not load community fund"
   },
   "no_members_found": "Nenhum membro encontrado",
   "donate": "Doar",
@@ -100,18 +102,6 @@
   "community_fund_hours": "horas disponíveis",
   "community_fund_deposited": "Depositado",
   "community_fund_withdrawn": "Levantado",
-  "available_balance": "Saldo disponível",
-  "recipient": "Destinatário",
-  "remove_recipient": "Remover destinatário",
-  "search_placeholder": "Pesquisar por nome ou nome de utilizador...",
-  "search_recipient": "Pesquisar destinatário",
-  "search_results": "Resultados da pesquisa",
-  "amount_hours": "Valor (horas)",
-  "amount_in_hours": "Valor em horas",
-  "exceeds_balance": "Excede o saldo disponível",
-  "optional": "opcional",
-  "description_placeholder": "Para que é esta transferência?",
-  "new_balance_after": "O seu novo saldo será de {{balance}} horas",
   "rating": {
     "title": "Avalie a sua troca",
     "prompt": "Como foi a sua troca?",
@@ -125,5 +115,22 @@
     "comment_placeholder": "Partilhe a sua experiência...",
     "skip": "Saltar",
     "submit": "Submeter avaliação"
-  }
+  },
+  "aria": {
+    "export_csv": "Export transactions to CSV",
+    "loading_transactions": "Loading transactions",
+    "transaction_detail": "{{direction}} {{amount}} hours {{name}}"
+  },
+  "available_balance": "Saldo disponível",
+  "recipient": "Destinatário",
+  "remove_recipient": "Remover destinatário",
+  "search_placeholder": "Pesquisar por nome ou nome de utilizador...",
+  "search_recipient": "Pesquisar destinatário",
+  "search_results": "Resultados da pesquisa",
+  "amount_hours": "Valor (horas)",
+  "amount_in_hours": "Valor em horas",
+  "exceeds_balance": "Excede o saldo disponível",
+  "optional": "opcional",
+  "description_placeholder": "Para que é esta transferência?",
+  "new_balance_after": "O seu novo saldo será de {{balance}} horas"
 }

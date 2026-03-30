@@ -407,6 +407,17 @@
       "other": "Other"
     }
   },
+  "aria": {
+    "volunteering_sections": "Volunteering sections"
+  },
+  "credentials": {
+    "aria_remove_file": "Remove selected file",
+    "aria_upload_document": "Upload credential document"
+  },
+  "applications": {
+    "aria_select_all": "Select all visible pending applications",
+    "aria_search_volunteers": "Search volunteers by name"
+  },
   "common": {
     "refresh": "Refresh",
     "try_again": "Try Again"

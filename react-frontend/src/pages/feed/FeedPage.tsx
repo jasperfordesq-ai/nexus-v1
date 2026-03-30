@@ -622,9 +622,7 @@ export function FeedPage() {
               className="flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r from-indigo-500 to-purple-600 text-white text-sm font-medium shadow-lg shadow-indigo-500/30 hover:shadow-indigo-500/50 transition-shadow"
               startContent={<ArrowUp className="w-3.5 h-3.5" aria-hidden="true" />}
             >
-              {pendingPostCount === 1
-                ? t('realtime.new_post_singular')
-                : t('realtime.new_posts_plural', { count: pendingPostCount })}
+              {t('realtime.new_posts', { count: pendingPostCount })}
             </Button>
           </motion.div>
         )}

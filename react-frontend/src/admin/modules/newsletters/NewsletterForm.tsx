@@ -20,6 +20,7 @@ import {
   MapPin, UsersRound, AlertCircle, CheckCircle,
 } from 'lucide-react';
 import { useNavigate, useParams } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { usePageTitle } from '@/hooks';
 import { useTenant, useToast } from '@/contexts';
 import { logError } from '@/lib/logger';
@@ -50,6 +51,7 @@ interface GroupOption {
 }
 
 export function NewsletterForm() {
+  const { t } = useTranslation('admin');
   const { id } = useParams<{ id: string }>();
   const isEdit = Boolean(id);
   usePageTitle(`Admin - ${isEdit ? 'Edit' : 'Create'} Newsletter`);
@@ -393,7 +395,7 @@ export function NewsletterForm() {
               />
               <Input
                 label="Preview Text"
-                placeholder="Brief text shown in inbox preview"
+                placeholder={t('newsletter_form.preview_text_placeholder')}
                 value={previewText}
                 onValueChange={setPreviewText}
                 variant="bordered"
@@ -413,7 +415,7 @@ export function NewsletterForm() {
                 <div className="space-y-3 pl-4 border-l-2 border-warning-200">
                   <Input
                     label="Subject B (Variant)"
-                    placeholder="Alternative subject line"
+                    placeholder={t('newsletter_form.subject_b_placeholder')}
                     value={subjectB}
                     onValueChange={setSubjectB}
                     variant="bordered"
@@ -438,9 +440,9 @@ export function NewsletterForm() {
                       size="sm"
                       isDisabled={isSent}
                     >
-                      <SelectItem key="opens">Open Rate</SelectItem>
-                      <SelectItem key="clicks">Click Rate</SelectItem>
-                      <SelectItem key="conversions">Conversion Rate</SelectItem>
+                      <SelectItem key="opens">{t('newsletter_form.metric_open_rate')}</SelectItem>
+                      <SelectItem key="clicks">{t('newsletter_form.metric_click_rate')}</SelectItem>
+                      <SelectItem key="conversions">{t('newsletter_form.metric_conversion_rate')}</SelectItem>
                     </Select>
                   </div>
                   <div className="flex items-center justify-between p-2 rounded-lg bg-default-50">
@@ -524,8 +526,8 @@ export function NewsletterForm() {
                 size="sm"
                 isDisabled={isSent}
               >
-                <SelectItem key="draft">Draft</SelectItem>
-                <SelectItem key="scheduled">Scheduled</SelectItem>
+                <SelectItem key="draft">{t('newsletter_form.status_draft')}</SelectItem>
+                <SelectItem key="scheduled">{t('newsletter_form.status_scheduled')}</SelectItem>
               </Select>
 
               {status === 'scheduled' && (
@@ -566,9 +568,9 @@ export function NewsletterForm() {
                     size="sm"
                     isDisabled={isSent}
                   >
-                    <SelectItem key="daily">Daily</SelectItem>
-                    <SelectItem key="weekly">Weekly</SelectItem>
-                    <SelectItem key="monthly">Monthly</SelectItem>
+                    <SelectItem key="daily">{t('newsletter_form.frequency_daily')}</SelectItem>
+                    <SelectItem key="weekly">{t('newsletter_form.frequency_weekly')}</SelectItem>
+                    <SelectItem key="monthly">{t('newsletter_form.frequency_monthly')}</SelectItem>
                   </Select>
 
                   {recurringFrequency === 'weekly' && (
@@ -643,10 +645,10 @@ export function NewsletterForm() {
                 size="sm"
                 isDisabled={isSent}
               >
-                <SelectItem key="all_members">All Members</SelectItem>
-                <SelectItem key="subscribers_only">Subscribers Only</SelectItem>
-                <SelectItem key="both">Members + Subscribers</SelectItem>
-                <SelectItem key="segment">Specific Segment</SelectItem>
+                <SelectItem key="all_members">{t('newsletter_form.audience_all_members')}</SelectItem>
+                <SelectItem key="subscribers_only">{t('newsletter_form.audience_subscribers_only')}</SelectItem>
+                <SelectItem key="both">{t('newsletter_form.audience_members_subscribers')}</SelectItem>
+                <SelectItem key="segment">{t('newsletter_form.audience_specific_segment')}</SelectItem>
               </Select>
 
               {targetAudience === 'segment' && segments.length > 0 && (

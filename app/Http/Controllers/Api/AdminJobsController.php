@@ -53,7 +53,7 @@ class AdminJobsController extends BaseApiController
     {
         $this->requireAdmin();
         $job = $this->jobVacancyService->getById($id);
-        if (!$job) return $this->respondWithError('NOT_FOUND', 'Job not found', null, 404);
+        if (!$job) return $this->respondWithError('NOT_FOUND', __('api.job_not_found'), null, 404);
         return $this->respondWithData($job);
     }
 
@@ -62,11 +62,11 @@ class AdminJobsController extends BaseApiController
     {
         $adminId = $this->requireAdmin();
         $job = $this->jobVacancyService->getById($id);
-        if (!$job) return $this->respondWithError('NOT_FOUND', 'Job not found', null, 404);
+        if (!$job) return $this->respondWithError('NOT_FOUND', __('api.job_not_found'), null, 404);
 
         $deleted = $this->jobVacancyService->delete($id, $adminId);
         if ($deleted) return $this->respondWithData(['deleted' => true, 'id' => $id]);
-        return $this->respondWithError('DELETE_FAILED', 'Failed to delete job', null, 400);
+        return $this->respondWithError('DELETE_FAILED', __('api.delete_failed', ['resource' => 'job']), null, 400);
     }
 
     /** POST /api/v2/admin/jobs/{id}/feature */
@@ -77,7 +77,7 @@ class AdminJobsController extends BaseApiController
 
         $featured = $this->jobVacancyService->featureJob($id, $adminId, $days);
         if ($featured) return $this->respondWithData(['featured' => true, 'id' => $id, 'duration_days' => $days]);
-        return $this->respondWithError('FEATURE_FAILED', 'Failed to feature job', null, 400);
+        return $this->respondWithError('FEATURE_FAILED', __('api.update_failed', ['resource' => 'job feature']), null, 400);
     }
 
     /** POST /api/v2/admin/jobs/{id}/unfeature */
@@ -86,7 +86,7 @@ class AdminJobsController extends BaseApiController
         $adminId = $this->requireAdmin();
         $unfeatured = $this->jobVacancyService->unfeatureJob($id, $adminId);
         if ($unfeatured) return $this->respondWithData(['featured' => false, 'id' => $id]);
-        return $this->respondWithError('UNFEATURE_FAILED', 'Failed to unfeature job', null, 400);
+        return $this->respondWithError('UNFEATURE_FAILED', __('api.update_failed', ['resource' => 'job feature']), null, 400);
     }
 
     /** GET /api/v2/admin/jobs/{id}/applications */
@@ -94,10 +94,10 @@ class AdminJobsController extends BaseApiController
     {
         $adminId = $this->requireAdmin();
         $job = $this->jobVacancyService->getById($id);
-        if (!$job) return $this->respondWithError('NOT_FOUND', 'Job not found', null, 404);
+        if (!$job) return $this->respondWithError('NOT_FOUND', __('api.job_not_found'), null, 404);
 
         $applications = $this->jobVacancyService->getApplications($id, $adminId);
-        if ($applications === null) return $this->respondWithError('FETCH_FAILED', 'Failed to load applications', null, 400);
+        if ($applications === null) return $this->respondWithError('FETCH_FAILED', __('api.fetch_failed', ['resource' => 'applications']), null, 400);
         return $this->respondWithData($applications);
     }
 
@@ -108,7 +108,7 @@ class AdminJobsController extends BaseApiController
         $status = $this->input('status');
         $notes = $this->input('notes');
 
-        if (!$status) return $this->respondWithError('VALIDATION_REQUIRED', 'Status is required', 'status', 422);
+        if (!$status) return $this->respondWithError('VALIDATION_REQUIRED', __('api.status_required'), 'status', 422);
 
         $updated = $this->jobVacancyService->updateApplicationStatus($id, $adminId, $status, $notes);
         if ($updated) return $this->respondWithData(['updated' => true, 'id' => $id, 'status' => $status]);
@@ -148,11 +148,11 @@ class AdminJobsController extends BaseApiController
             return $this->respondWithData([
                 'approved' => true,
                 'id' => $id,
-                'message' => 'Job approved and published successfully',
+                'message' => __('api.job_approved'),
             ]);
         }
 
-        return $this->respondWithError('APPROVE_FAILED', 'Failed to approve job — job not found or already processed', null, 400);
+        return $this->respondWithError('APPROVE_FAILED', __('api.approve_failed', ['resource' => 'job']), null, 400);
     }
 
     /** POST /api/v2/admin/jobs/{id}/reject */
@@ -162,7 +162,7 @@ class AdminJobsController extends BaseApiController
         $reason = $this->input('reason');
 
         if (empty($reason)) {
-            return $this->respondWithError('VALIDATION_REQUIRED', 'A reason is required when rejecting a job', 'reason', 422);
+            return $this->respondWithError('VALIDATION_REQUIRED', __('api.reason_required_reject_job'), 'reason', 422);
         }
 
         $rejected = JobModerationService::rejectJob($id, $adminId, $reason);
@@ -171,11 +171,11 @@ class AdminJobsController extends BaseApiController
             return $this->respondWithData([
                 'rejected' => true,
                 'id' => $id,
-                'message' => 'Job rejected successfully',
+                'message' => __('api.job_rejected'),
             ]);
         }
 
-        return $this->respondWithError('REJECT_FAILED', 'Failed to reject job — job not found or already processed', null, 400);
+        return $this->respondWithError('REJECT_FAILED', __('api.reject_failed', ['resource' => 'job']), null, 400);
     }
 
     /** POST /api/v2/admin/jobs/{id}/flag */
@@ -185,7 +185,7 @@ class AdminJobsController extends BaseApiController
         $reason = $this->input('reason');
 
         if (empty($reason)) {
-            return $this->respondWithError('VALIDATION_REQUIRED', 'A reason is required when flagging a job', 'reason', 422);
+            return $this->respondWithError('VALIDATION_REQUIRED', __('api.reason_required_flag_job'), 'reason', 422);
         }
 
         $flagged = JobModerationService::flagJob($id, $adminId, $reason);
@@ -194,11 +194,11 @@ class AdminJobsController extends BaseApiController
             return $this->respondWithData([
                 'flagged' => true,
                 'id' => $id,
-                'message' => 'Job flagged for further review',
+                'message' => __('api.job_flagged'),
             ]);
         }
 
-        return $this->respondWithError('FLAG_FAILED', 'Failed to flag job — job not found', null, 400);
+        return $this->respondWithError('FLAG_FAILED', __('api.update_failed', ['resource' => 'job flag']), null, 400);
     }
 
     /** GET /api/v2/admin/jobs/moderation-stats */

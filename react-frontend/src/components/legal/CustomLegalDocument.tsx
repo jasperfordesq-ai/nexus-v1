@@ -17,6 +17,7 @@
 import { useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import i18n from '@/i18n';
 import { motion } from 'framer-motion';
 import { Button, Chip } from '@heroui/react';
 import DOMPurify from 'dompurify';
@@ -232,7 +233,7 @@ export function CustomLegalDocument({ document: doc, accentColor = 'blue' }: Pro
               <>
                 <CalendarDays className="w-4 h-4" aria-hidden="true" />
                 <span>
-                  {t('custom.effective_label', { date: new Date(doc.effective_date).toLocaleDateString('en-IE', {
+                  {t('custom.effective_label', { date: new Date(doc.effective_date).toLocaleDateString(i18n.language, {
                     year: 'numeric',
                     month: 'long',
                     day: 'numeric',

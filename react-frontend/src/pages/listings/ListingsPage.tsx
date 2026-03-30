@@ -354,7 +354,7 @@ export function ListingsPage() {
               </Select>
             )}
 
-            <div className="flex rounded-lg overflow-hidden border border-theme-default" role="group" aria-label="View mode">
+            <div className="flex rounded-lg overflow-hidden border border-theme-default" role="group" aria-label={t('aria.view_mode', 'View mode')}>
               <Button
                 isIconOnly
                 variant="light"
@@ -396,7 +396,7 @@ export function ListingsPage() {
       {isLoading && listings.length === 0 ? (
         <div
           className={viewMode === 'grid' ? 'grid sm:grid-cols-2 lg:grid-cols-3 gap-4' : 'space-y-4'}
-          aria-label="Loading listings"
+          aria-label={t('aria.loading_listings', 'Loading listings')}
           aria-busy="true"
         >
           {[1, 2, 3, 4, 5, 6].map((i) => (

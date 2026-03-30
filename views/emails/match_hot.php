@@ -47,13 +47,13 @@ $listingType = ucfirst($match['type'] ?? 'offer');
 $distanceLabel = '';
 if ($distance !== null) {
     if ($distance <= 2) {
-        $distanceLabel = 'Walking distance';
+        $distanceLabel = __('emails.match_hot.walking_distance');
     } elseif ($distance <= 10) {
-        $distanceLabel = 'Nearby';
+        $distanceLabel = __('emails.match_hot.nearby');
     } elseif ($distance <= 25) {
-        $distanceLabel = 'In your area';
+        $distanceLabel = __('emails.match_hot.in_your_area');
     } else {
-        $distanceLabel = 'Regional';
+        $distanceLabel = __('emails.match_hot.regional');
     }
 }
 ?>
@@ -65,7 +65,7 @@ if ($distance !== null) {
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="x-apple-disable-message-reformatting">
     <meta name="format-detection" content="telephone=no,address=no,email=no,date=no,url=no">
-    <title>Hot Match Found!</title>
+    <title><?= __('emails.match_hot.title') ?></title>
     <!--[if mso]>
     <noscript>
         <xml>
@@ -136,9 +136,9 @@ if ($distance !== null) {
                             <div style="width: 80px; height: 80px; margin: 0 auto 20px; background: rgba(255,255,255,0.2); border-radius: 50%; display: flex; align-items: center; justify-content: center;">
                                 <span style="font-size: 42px; line-height: 1;">&#128293;</span>
                             </div>
-                            <h1 style="margin: 0; font-size: 32px; font-weight: 800; color: #ffffff; letter-spacing: -0.5px;">Hot Match Found!</h1>
+                            <h1 style="margin: 0; font-size: 32px; font-weight: 800; color: #ffffff; letter-spacing: -0.5px;"><?= __('emails.match_hot.heading') ?></h1>
                             <p style="margin: 12px 0 0; font-size: 18px; color: rgba(255,255,255,0.95); font-weight: 500;">
-                                <strong style="font-size: 24px;"><?= $matchScore ?>%</strong> Compatibility Score
+                                <strong style="font-size: 24px;"><?= $matchScore ?>%</strong> <?= __('emails.match_hot.compatibility_score') ?>
                             </p>
                         </td>
                     </tr>
@@ -152,10 +152,10 @@ if ($distance !== null) {
                                 <tr>
                                     <td style="padding: 35px 40px 20px;" class="mobile-padding">
                                         <p style="margin: 0; font-size: 18px; line-height: 1.6; color: <?= $textColor ?>;" class="text-primary">
-                                            Hi <?= htmlspecialchars($userName) ?>,
+                                            <?= __('emails.match_hot.greeting', ['name' => htmlspecialchars($userName)]) ?>
                                         </p>
                                         <p style="margin: 15px 0 0; font-size: 16px; line-height: 1.7; color: <?= $textMuted ?>;" class="text-secondary">
-                                            Great news! We found a highly compatible listing that matches your preferences. This is a <strong style="color: <?= $accentColor ?>;">hot match</strong> - don't miss out!
+                                            <?= __('emails.match_hot.intro', ['color' => $accentColor]) ?>
                                         </p>
                                     </td>
                                 </tr>
@@ -188,7 +188,7 @@ if ($distance !== null) {
 
                                                 <!-- Posted by -->
                                                 <p style="margin: 0 0 20px; font-size: 15px; color: <?= $primaryColor ?>; font-weight: 600;">
-                                                    Posted by <?= htmlspecialchars($posterName) ?>
+                                                    <?= __('emails.match_hot.posted_by', ['name' => htmlspecialchars($posterName)]) ?>
                                                 </p>
 
                                                 <!-- Meta info row -->
@@ -214,7 +214,7 @@ if ($distance !== null) {
                                                 <?php if (!empty($reasons)): ?>
                                                 <!-- Match reasons -->
                                                 <div style="margin-top: 20px; padding-top: 20px; border-top: 1px solid <?= $borderColor ?>;">
-                                                    <p style="margin: 0 0 10px; font-size: 13px; color: <?= $textMuted ?>; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">Why this matches you</p>
+                                                    <p style="margin: 0 0 10px; font-size: 13px; color: <?= $textMuted ?>; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;"><?= __('emails.match_hot.why_matches') ?></p>
                                                     <p style="margin: 0; font-size: 15px; color: <?= $textColor ?>; line-height: 1.6;">
                                                         <?= htmlspecialchars(implode(' &bull; ', array_slice($reasons, 0, 3))) ?>
                                                     </p>
@@ -233,7 +233,7 @@ if ($distance !== null) {
                                         <table role="presentation" cellspacing="0" cellpadding="0" border="0" style="margin: 0 auto;">
                                             <tr>
                                                 <td class="button-td" style="border-radius: 12px; background: linear-gradient(135deg, <?= $primaryColor ?> 0%, <?= $accentColor ?> 100%); box-shadow: 0 4px 14px rgba(249, 115, 22, 0.4);">
-                                                    <a href="<?= $listingUrl ?>" style="display: inline-block; padding: 18px 44px; font-size: 17px; font-weight: 700; color: #ffffff; text-decoration: none; border-radius: 12px;">View This Match &#8594;</a>
+                                                    <a href="<?= $listingUrl ?>" style="display: inline-block; padding: 18px 44px; font-size: 17px; font-weight: 700; color: #ffffff; text-decoration: none; border-radius: 12px;"><?= __('emails.match_hot.view_match') ?> &#8594;</a>
                                                 </td>
                                             </tr>
                                         </table>
@@ -246,7 +246,7 @@ if ($distance !== null) {
                                 <tr>
                                     <td style="padding: 0 40px 35px; text-align: center;" class="mobile-padding">
                                         <p style="margin: 0; font-size: 14px; color: <?= $textMuted ?>;" class="text-secondary">
-                                            or <a href="<?= $matchesUrl ?>" style="color: <?= $primaryColor ?>; font-weight: 600;">view all your matches</a>
+                                            or <a href="<?= $matchesUrl ?>" style="color: <?= $primaryColor ?>; font-weight: 600;"><?= __('emails.match_hot.view_all_matches') ?></a>
                                         </p>
                                     </td>
                                 </tr>
@@ -269,13 +269,13 @@ if ($distance !== null) {
                                 <tr>
                                     <td style="text-align: center; padding-bottom: 15px;">
                                         <p style="margin: 0; font-size: 13px; color: <?= $textMuted ?>; line-height: 1.6;">
-                                            You're receiving this because you enabled hot match notifications.
+                                            <?= __('emails.match_hot.receiving_notice') ?>
                                         </p>
                                     </td>
                                 </tr>
                                 <tr>
                                     <td style="text-align: center;">
-                                        <a href="<?= $settingsUrl ?>" style="color: <?= $textMuted ?>; text-decoration: underline; font-size: 13px;">Manage notification preferences</a>
+                                        <a href="<?= $settingsUrl ?>" style="color: <?= $textMuted ?>; text-decoration: underline; font-size: 13px;"><?= __('emails.match_hot.manage_preferences') ?></a>
                                     </td>
                                 </tr>
                             </table>
@@ -289,7 +289,7 @@ if ($distance !== null) {
                     <tr>
                         <td style="padding: 20px; text-align: center;">
                             <p style="margin: 0; font-size: 12px; color: <?= $textMuted ?>;">
-                                &copy; <?= $year ?> <?= htmlspecialchars($tenantName) ?>. All rights reserved.
+                                &copy; <?= $year ?> <?= htmlspecialchars($tenantName) ?>. <?= __('emails.footer.all_rights_reserved') ?>
                             </p>
                         </td>
                     </tr>

@@ -53,8 +53,8 @@
     "share_failed": "Échec du partage de la publication"
   },
   "realtime": {
-    "new_post_singular": "1 nouvelle publication",
-    "new_posts_plural": "{{count}} nouvelles publications"
+    "new_posts_one": "1 nouvelle publication",
+    "new_posts_other": "{{count}} nouvelles publications"
   },
   "compose": {
     "create_title": "Créer {{type}}",
@@ -132,8 +132,6 @@
     "ai_tooltip": "Générer une description avec l'IA",
     "ai_button": "Assistance IA",
     "sdg_label": "Objectifs de développement durable de l'ONU (facultatif)",
-    "sdg_selected": "{{count}} objectif sélectionné",
-    "sdg_selected_plural": "{{count}} objectifs sélectionnés",
     "draft_restored": "Brouillon restauré",
     "draft_cleared": "Brouillon effacé",
     "char_count": "{{current}}/{{max}}",
@@ -194,7 +192,9 @@
     "alt_text_label": "Texte alternatif pour l'image",
     "media_rejected": "{{count}} fichier(s) ignoré(s) (type incorrect ou trop volumineux)",
     "media_compression_failed": "{{count}} image(s) n'ont pas pu être traitée(s)",
-    "media_upload_error": "Échec du traitement des images"
+    "media_upload_error": "Échec du traitement des images",
+    "sdg_selected_one": "{{count}} objectif sélectionné",
+    "sdg_selected_other": "{{count}} objectifs sélectionnés"
   },
   "card": {
     "edited": "modifié",
@@ -295,8 +295,8 @@
   "trending": {
     "title": "Tendances",
     "view_all": "Voir tous les hashtags",
-    "post_count": "{{count}} publication",
-    "post_count_plural": "{{count}} publications"
+    "post_count_one": "{{count}} publication",
+    "post_count_other": "{{count}} publications"
   },
   "sidebar": {
     "profile": {

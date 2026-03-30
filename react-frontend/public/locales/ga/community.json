@@ -141,8 +141,6 @@
     "try_different_search": "Bain triail as téarma cuardaigh eile",
     "no_organisations_available": "Nil aon eagrais dheonacha ar fáil fós",
     "load_more": "Luchtaigh Tuilleadh",
-    "opportunity_count": "{{count}} deis",
-    "opportunity_count_plural": "{{count}} deiseanna",
     "volunteer_count": "{{count}} oibrí deonach",
     "hours_logged": "{{hours}}u cláraithe",
     "website": "Suíomh Gréasáin",
@@ -178,7 +176,9 @@
     "terms_item_4": "Aontaím an t-ardán a úsáid go freagrach agus a chinntiú go bhfuil gach deis oibre deonaí a fhoilsítear fíor agus dleathach.",
     "terms_item_5": "Tuigim go bhféadfadh riarthóirí an ardáin an t-eagras nó a liostaí a bhaint más rud é go sáraíonn siad treoirlínte an phobail.",
     "terms_agreement": "Léigh mé agus aontaím leis na téarmaí cláraithe eagrais thuas.",
-    "terms_required": "Ní mór duit aontú leis na téarmaí chun d'eagras a chlárú."
+    "terms_required": "Ní mór duit aontú leis na téarmaí chun d'eagras a chlárú.",
+    "opportunity_count_one": "{{count}} deis",
+    "opportunity_count_other": "{{count}} deiseanna"
   },
   "organisation_detail": {
     "page_title": "Eagras",

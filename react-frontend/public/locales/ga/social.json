@@ -67,6 +67,8 @@
     "aria_remove": "Bain formhuiniú {{skillName}}",
     "aria_endorse": "Formhuinigh {{skillName}}",
     "endorsed": "Formhuinithe",
-    "endorse": "Formhuinigh"
+    "endorse": "Formhuinigh",
+    "endorse_failed": "Failed to endorse",
+    "remove_failed": "Failed to remove endorsement"
   }
 }

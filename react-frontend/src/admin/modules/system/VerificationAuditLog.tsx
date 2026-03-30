@@ -13,6 +13,7 @@ import {
   Table, TableHeader, TableColumn, TableBody, TableRow, TableCell,
 } from '@heroui/react';
 import { ScrollText, ChevronLeft, ChevronRight, RefreshCw } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { api } from '@/lib/api';
 
 interface AuditEvent {
@@ -51,6 +52,7 @@ const EVENT_TYPES = Object.keys(EVENT_TYPE_LABELS);
 const PAGE_SIZE = 25;
 
 export function VerificationAuditLog() {
+  const { t } = useTranslation('admin');
   const [events, setEvents] = useState<AuditEvent[]>([]);
   const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(true);
@@ -97,7 +99,7 @@ export function VerificationAuditLog() {
         <div className="flex items-center gap-2">
           <Select
             size="sm"
-            placeholder="All events"
+            placeholder={t('verification.filter_all_events')}
             className="w-48"
             selectedKeys={filterType ? [filterType] : []}
             onSelectionChange={(keys) => {
@@ -112,7 +114,7 @@ export function VerificationAuditLog() {
               </SelectItem>
             ))}
           </Select>
-          <Button isIconOnly size="sm" variant="flat" onPress={fetchEvents} aria-label="Refresh">
+          <Button isIconOnly size="sm" variant="flat" onPress={fetchEvents} aria-label={t('verification.refresh_aria')}>
             <RefreshCw className="w-4 h-4" />
           </Button>
         </div>
@@ -126,7 +128,7 @@ export function VerificationAuditLog() {
           <p className="text-center py-8 text-theme-muted">No verification events yet.</p>
         ) : (
           <>
-            <Table aria-label="Verification audit log" removeWrapper>
+            <Table aria-label={t('verification.audit_log_aria')} removeWrapper>
               <TableHeader>
                 <TableColumn>TIME</TableColumn>
                 <TableColumn>USER</TableColumn>

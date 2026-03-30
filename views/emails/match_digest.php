@@ -57,7 +57,7 @@ $remainingCount = max(0, $totalCount - 5);
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="x-apple-disable-message-reformatting">
     <meta name="format-detection" content="telephone=no,address=no,email=no,date=no,url=no">
-    <title>Your <?= $periodTitle ?> Match Digest</title>
+    <title><?= __('emails.match_digest.title', ['period' => $periodTitle]) ?></title>
     <!--[if mso]>
     <noscript>
         <xml>
@@ -133,9 +133,9 @@ $remainingCount = max(0, $totalCount - 5);
                             <div style="width: 80px; height: 80px; margin: 0 auto 20px; background: rgba(255,255,255,0.2); border-radius: 50%; display: flex; align-items: center; justify-content: center;">
                                 <span style="font-size: 42px; line-height: 1;">&#128202;</span>
                             </div>
-                            <h1 style="margin: 0; font-size: 32px; font-weight: 800; color: #ffffff; letter-spacing: -0.5px;">Your <?= $periodTitle ?> Digest</h1>
+                            <h1 style="margin: 0; font-size: 32px; font-weight: 800; color: #ffffff; letter-spacing: -0.5px;"><?= __('emails.match_digest.heading', ['period' => $periodTitle]) ?></h1>
                             <p style="margin: 12px 0 0; font-size: 18px; color: rgba(255,255,255,0.95); font-weight: 500;">
-                                <strong style="font-size: 24px;"><?= $totalCount ?></strong> new match<?= $totalCount !== 1 ? 'es' : '' ?> waiting for you
+                                <?= __('emails.match_digest.new_matches_waiting', ['count' => $totalCount]) ?>
                             </p>
                         </td>
                     </tr>
@@ -149,10 +149,10 @@ $remainingCount = max(0, $totalCount - 5);
                                 <tr>
                                     <td style="padding: 35px 40px 20px;" class="mobile-padding">
                                         <p style="margin: 0; font-size: 18px; line-height: 1.6; color: <?= $textColor ?>;" class="text-primary">
-                                            Hi <?= htmlspecialchars($userName) ?>,
+                                            <?= __('emails.match_digest.greeting', ['name' => htmlspecialchars($userName)]) ?>
                                         </p>
                                         <p style="margin: 15px 0 0; font-size: 16px; line-height: 1.7; color: <?= $textMuted ?>;" class="text-secondary">
-                                            Here's a summary of your new matches from the past <?= $periodLabel ?>. Don't miss out on these opportunities!
+                                            <?= __('emails.match_digest.intro', ['period' => $periodLabel]) ?>
                                         </p>
                                     </td>
                                 </tr>
@@ -171,8 +171,8 @@ $remainingCount = max(0, $totalCount - 5);
                                                         <div style="font-size: 36px; font-weight: 800; color: <?= $hotColor ?>; line-height: 1;">
                                                             &#128293; <?= $hotCount ?>
                                                         </div>
-                                                        <div style="font-size: 14px; color: #c2410c; margin-top: 8px; font-weight: 600;">Hot Match<?= $hotCount !== 1 ? 'es' : '' ?></div>
-                                                        <div style="font-size: 12px; color: <?= $textMuted ?>; margin-top: 4px;">85%+ compatibility</div>
+                                                        <div style="font-size: 14px; color: #c2410c; margin-top: 8px; font-weight: 600;"><?= __('emails.match_digest.hot_matches') ?></div>
+                                                        <div style="font-size: 12px; color: <?= $textMuted ?>; margin-top: 4px;"><?= __('emails.match_digest.hot_compatibility') ?></div>
                                                     </div>
                                                 </td>
                                                 <?php endif; ?>
@@ -182,8 +182,8 @@ $remainingCount = max(0, $totalCount - 5);
                                                         <div style="font-size: 36px; font-weight: 800; color: <?= $mutualColor ?>; line-height: 1;">
                                                             &#129309; <?= $mutualCount ?>
                                                         </div>
-                                                        <div style="font-size: 14px; color: #059669; margin-top: 8px; font-weight: 600;">Mutual Match<?= $mutualCount !== 1 ? 'es' : '' ?></div>
-                                                        <div style="font-size: 12px; color: <?= $textMuted ?>; margin-top: 4px;">Win-win opportunities</div>
+                                                        <div style="font-size: 14px; color: #059669; margin-top: 8px; font-weight: 600;"><?= __('emails.match_digest.mutual_matches') ?></div>
+                                                        <div style="font-size: 12px; color: <?= $textMuted ?>; margin-top: 4px;"><?= __('emails.match_digest.win_win') ?></div>
                                                     </div>
                                                 </td>
                                                 <?php endif; ?>
@@ -199,7 +199,7 @@ $remainingCount = max(0, $totalCount - 5);
                                 <tr>
                                     <td style="padding: 0 40px 30px;" class="mobile-padding">
                                         <h3 style="margin: 0 0 18px; font-size: 14px; font-weight: 700; color: <?= $textMuted ?>; text-transform: uppercase; letter-spacing: 1px;">
-                                            &#11088; Top Matches
+                                            &#11088; <?= __('emails.match_digest.top_matches') ?>
                                         </h3>
 
                                         <?php foreach ($displayMatches as $index => $match):
@@ -220,7 +220,7 @@ $remainingCount = max(0, $totalCount - 5);
                                                             <a href="<?= $listingUrl ?>" style="color: <?= $textColor ?>; text-decoration: none;"><?= htmlspecialchars($match['title'] ?? 'Listing') ?></a>
                                                         </p>
                                                         <p style="margin: 0; font-size: 14px; color: <?= $textMuted ?>; line-height: 1.4;">
-                                                            by <span style="color: <?= $primaryColor ?>; font-weight: 600;"><?= htmlspecialchars(!empty($match['user_name']) ? $match['user_name'] : 'A member') ?></span>
+                                                            <?= __('emails.match_digest.by_author', ['name' => '<span style="color: ' . $primaryColor . '; font-weight: 600;">' . htmlspecialchars(!empty($match['user_name']) ? $match['user_name'] : __('emails.match_digest.a_member')) . '</span>']) ?>
                                                             <?php if ($distance !== null): ?>
                                                                 <span style="color: #d1d5db;">&bull;</span> <?= number_format($distance, 1) ?> km
                                                             <?php endif; ?>
@@ -240,7 +240,7 @@ $remainingCount = max(0, $totalCount - 5);
                                         <?php if ($remainingCount > 0): ?>
                                         <div style="text-align: center; margin-top: 18px;">
                                             <span style="display: inline-block; background: #e0e7ff; color: <?= $primaryDark ?>; padding: 10px 20px; border-radius: 20px; font-size: 14px; font-weight: 600;">
-                                                + <?= $remainingCount ?> more match<?= $remainingCount !== 1 ? 'es' : '' ?> to explore
+                                                <?= __('emails.match_digest.more_matches', ['count' => $remainingCount]) ?>
                                             </span>
                                         </div>
                                         <?php endif; ?>
@@ -255,7 +255,7 @@ $remainingCount = max(0, $totalCount - 5);
                                         <table role="presentation" cellspacing="0" cellpadding="0" border="0" style="margin: 0 auto;">
                                             <tr>
                                                 <td class="button-td" style="border-radius: 12px; background: linear-gradient(135deg, <?= $primaryColor ?> 0%, <?= $accentColor ?> 100%); box-shadow: 0 4px 14px rgba(99, 102, 241, 0.4);">
-                                                    <a href="<?= $matchesUrl ?>" style="display: inline-block; padding: 18px 44px; font-size: 17px; font-weight: 700; color: #ffffff; text-decoration: none; border-radius: 12px;">View All Matches &#8594;</a>
+                                                    <a href="<?= $matchesUrl ?>" style="display: inline-block; padding: 18px 44px; font-size: 17px; font-weight: 700; color: #ffffff; text-decoration: none; border-radius: 12px;"><?= __('emails.match_digest.view_all_matches') ?> &#8594;</a>
                                                 </td>
                                             </tr>
                                         </table>
@@ -269,14 +269,14 @@ $remainingCount = max(0, $totalCount - 5);
                                     <td style="padding: 0 40px 35px; text-align: center;" class="mobile-padding">
                                         <p style="margin: 0; font-size: 14px; color: <?= $textMuted ?>;" class="text-secondary">
                                             <?php if ($hotCount > 0): ?>
-                                                <a href="<?= $matchesUrl ?>?type=hot" style="color: <?= $hotColor ?>; font-weight: 600;">Hot matches</a>
+                                                <a href="<?= $matchesUrl ?>?type=hot" style="color: <?= $hotColor ?>; font-weight: 600;"><?= __('emails.match_digest.hot_matches_link') ?></a>
                                                 <span style="color: #d1d5db; margin: 0 8px;">&bull;</span>
                                             <?php endif; ?>
                                             <?php if ($mutualCount > 0): ?>
-                                                <a href="<?= $matchesUrl ?>?type=mutual" style="color: <?= $mutualColor ?>; font-weight: 600;">Mutual matches</a>
+                                                <a href="<?= $matchesUrl ?>?type=mutual" style="color: <?= $mutualColor ?>; font-weight: 600;"><?= __('emails.match_digest.mutual_matches_link') ?></a>
                                                 <span style="color: #d1d5db; margin: 0 8px;">&bull;</span>
                                             <?php endif; ?>
-                                            <a href="<?= $matchesUrl ?>" style="color: <?= $primaryColor ?>; font-weight: 600;">All matches</a>
+                                            <a href="<?= $matchesUrl ?>" style="color: <?= $primaryColor ?>; font-weight: 600;"><?= __('emails.match_digest.all_matches_link') ?></a>
                                         </p>
                                     </td>
                                 </tr>
@@ -299,13 +299,13 @@ $remainingCount = max(0, $totalCount - 5);
                                 <tr>
                                     <td style="text-align: center; padding-bottom: 15px;">
                                         <p style="margin: 0; font-size: 13px; color: <?= $textMuted ?>; line-height: 1.6;">
-                                            You're receiving this <?= $periodTitle ?> digest because you have matches enabled.
+                                            <?= __('emails.match_digest.receiving_digest', ['period' => $periodTitle]) ?>
                                         </p>
                                     </td>
                                 </tr>
                                 <tr>
                                     <td style="text-align: center;">
-                                        <a href="<?= $settingsUrl ?>" style="color: <?= $textMuted ?>; text-decoration: underline; font-size: 13px;">Manage digest frequency</a>
+                                        <a href="<?= $settingsUrl ?>" style="color: <?= $textMuted ?>; text-decoration: underline; font-size: 13px;"><?= __('emails.match_digest.manage_frequency') ?></a>
                                     </td>
                                 </tr>
                             </table>
@@ -319,7 +319,7 @@ $remainingCount = max(0, $totalCount - 5);
                     <tr>
                         <td style="padding: 20px; text-align: center;">
                             <p style="margin: 0; font-size: 12px; color: <?= $textMuted ?>;">
-                                &copy; <?= $year ?> <?= htmlspecialchars($tenantName) ?>. All rights reserved.
+                                &copy; <?= $year ?> <?= htmlspecialchars($tenantName) ?>. <?= __('emails.footer.all_rights_reserved') ?>
                             </p>
                         </td>
                     </tr>

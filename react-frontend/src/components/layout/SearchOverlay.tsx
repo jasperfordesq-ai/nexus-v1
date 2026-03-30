@@ -294,7 +294,7 @@ export function SearchOverlay({ isOpen, onClose }: SearchOverlayProps) {
                 type="button"
                 onClick={() => setQuery('')}
                 className="p-1 rounded hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-300"
-                aria-label="Clear"
+                aria-label={t('aria.clear')}
               >
                 <X className="w-4 h-4" />
               </button>
@@ -303,7 +303,7 @@ export function SearchOverlay({ isOpen, onClose }: SearchOverlayProps) {
               type="button"
               onClick={handleClose}
               className="flex items-center gap-1.5 px-2 py-1 rounded-md bg-zinc-100 dark:bg-zinc-800 text-zinc-500 dark:text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200 text-xs border border-zinc-200 dark:border-zinc-600"
-              aria-label="Close"
+              aria-label={t('accessibility.close')}
             >
               <X className="w-3.5 h-3.5" />
               <kbd className="text-[10px]">ESC</kbd>

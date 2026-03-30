@@ -29,6 +29,7 @@ import {
   Heart, ArrowRightLeft, Network, Building, ShoppingBag, Wallet, MessageCircle,
   LayoutDashboard, Rss, Eye,
 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { usePageTitle } from '@/hooks';
 import { useTenant, useToast } from '@/contexts';
 import { adminSuper } from '../../api/adminApi';
@@ -94,6 +95,7 @@ const PLATFORM_LANGUAGES = [
 ];
 
 export function TenantForm() {
+  const { t } = useTranslation('admin');
   const { id } = useParams<{ id: string }>();
   const [searchParams] = useSearchParams();
   const isEdit = !!id;
@@ -359,16 +361,16 @@ export function TenantForm() {
           <Card shadow="sm">
             <CardBody className="space-y-4 p-6">
               <Input
-                label="Tenant Name"
-                placeholder="My Community"
+                label={t('tenant_form.name_label')}
+                placeholder={t('tenant_form.name_placeholder')}
                 value={form.name}
                 onValueChange={(v) => updateField('name', v)}
                 isRequired
                 startContent={<Building2 size={16} className="text-default-400" />}
               />
               <Input
-                label="Slug"
-                placeholder="my-community"
+                label={t('tenant_form.slug_label')}
+                placeholder={t('tenant_form.slug_placeholder')}
                 value={form.slug}
                 onValueChange={(v) => {
                   setSlugAutoGen(false);
@@ -378,27 +380,27 @@ export function TenantForm() {
                 description={slugAutoGen ? 'Auto-generated from name. Edit to customize.' : 'URL-safe identifier. Changing this updates the tenant URL path.'}
               />
               <Input
-                label="Domain"
-                placeholder="community.example.com"
+                label={t('tenant_form.domain_label')}
+                placeholder={t('tenant_form.domain_placeholder')}
                 value={form.domain}
                 onValueChange={(v) => updateField('domain', v)}
               />
               <Input
-                label="Tagline"
-                placeholder="A short tagline"
+                label={t('tenant_form.tagline_label')}
+                placeholder={t('tenant_form.tagline_placeholder')}
                 value={form.tagline}
                 onValueChange={(v) => updateField('tagline', v)}
               />
               <Textarea
-                label="Description"
-                placeholder="Describe this community..."
+                label={t('tenant_form.description_label')}
+                placeholder={t('tenant_form.description_placeholder')}
                 value={form.description}
                 onValueChange={(v) => updateField('description', v)}
                 minRows={3}
               />
               <Select
-                label="Parent Tenant"
-                placeholder="None (top-level)"
+                label={t('tenant_form.parent_tenant_label')}
+                placeholder={t('tenant_form.parent_tenant_placeholder')}
                 selectedKeys={form.parent_id ? [form.parent_id] : []}
                 onSelectionChange={(keys) => {
                   const arr = Array.from(keys);
@@ -430,7 +432,7 @@ export function TenantForm() {
               {form.allows_subtenants && (
                 <Input
                   type="number"
-                  label="Max Depth"
+                  label={t('tenant_form.max_depth_label')}
                   value={String(form.max_depth)}
                   onValueChange={(v) => updateField('max_depth', Number(v) || 3)}
                   className="max-w-xs"
@@ -444,21 +446,21 @@ export function TenantForm() {
           <Card shadow="sm">
             <CardBody className="space-y-4 p-6">
               <Input
-                label="Contact Email"
+                label={t('tenant_form.contact_email_label')}
                 type="email"
                 placeholder="admin@example.com"
                 value={form.contact_email}
                 onValueChange={(v) => updateField('contact_email', v)}
               />
               <Input
-                label="Contact Phone"
+                label={t('tenant_form.contact_phone_label')}
                 placeholder="+1 555 123 4567"
                 value={form.contact_phone}
                 onValueChange={(v) => updateField('contact_phone', v)}
               />
               <Textarea
-                label="Address"
-                placeholder="Full address..."
+                label={t('tenant_form.address_label')}
+                placeholder={t('tenant_form.address_placeholder')}
                 value={form.address}
                 onValueChange={(v) => updateField('address', v)}
                 minRows={2}
@@ -486,16 +488,16 @@ export function TenantForm() {
                 </p>
               </div>
               <Input
-                label="Meta Title"
-                placeholder="Page title for search engines"
+                label={t('tenant_form.meta_title_label')}
+                placeholder={t('tenant_form.meta_title_placeholder')}
                 value={form.meta_title}
                 onValueChange={(v) => updateField('meta_title', v)}
                 description={`${form.meta_title.length}/70 characters`}
                 maxLength={70}
               />
               <Textarea
-                label="Meta Description"
-                placeholder="Description for search engines..."
+                label={t('tenant_form.meta_description_label')}
+                placeholder={t('tenant_form.meta_description_placeholder')}
                 value={form.meta_description}
                 onValueChange={(v) => updateField('meta_description', v)}
                 description={`${form.meta_description.length}/180 characters`}
@@ -503,29 +505,29 @@ export function TenantForm() {
                 minRows={2}
               />
               <Input
-                label="H1 Headline"
-                placeholder="Main page heading"
+                label={t('tenant_form.h1_headline_label')}
+                placeholder={t('tenant_form.h1_headline_placeholder')}
                 value={form.h1_headline}
                 onValueChange={(v) => updateField('h1_headline', v)}
                 maxLength={100}
               />
               <Textarea
-                label="Hero Introduction"
-                placeholder="Introduction text for the hero section..."
+                label={t('tenant_form.hero_intro_label')}
+                placeholder={t('tenant_form.hero_intro_placeholder')}
                 value={form.hero_intro}
                 onValueChange={(v) => updateField('hero_intro', v)}
                 minRows={2}
               />
               <Input
-                label="OG Image URL"
+                label={t('tenant_form.og_image_url_label')}
                 placeholder="https://example.com/image.jpg"
                 value={form.og_image_url}
                 onValueChange={(v) => updateField('og_image_url', v)}
-                description="Image for social shares (1200x630 recommended)"
+                description={t('tenant_form.og_image_url_description')}
               />
               <Select
-                label="Robots Directive"
-                placeholder="Select robots directive"
+                label={t('tenant_form.robots_directive_label')}
+                placeholder={t('tenant_form.robots_directive_placeholder')}
                 selectedKeys={form.robots_directive ? [form.robots_directive] : []}
                 onSelectionChange={(keys) => {
                   const arr = Array.from(keys);
@@ -547,14 +549,14 @@ export function TenantForm() {
           <Card shadow="sm">
             <CardBody className="space-y-4 p-6">
               <Input
-                label="Location Name"
-                placeholder="City, Region"
+                label={t('tenant_form.location_name_label')}
+                placeholder={t('tenant_form.location_name_placeholder')}
                 value={form.location_name}
                 onValueChange={(v) => updateField('location_name', v)}
               />
               <Select
-                label="Country"
-                placeholder="Select country"
+                label={t('tenant_form.country_label')}
+                placeholder={t('tenant_form.country_placeholder')}
                 selectedKeys={form.country_code ? [form.country_code] : []}
                 onSelectionChange={(keys) => {
                   const arr = Array.from(keys);
@@ -567,8 +569,8 @@ export function TenantForm() {
                 ))}
               </Select>
               <Select
-                label="Service Area"
-                placeholder="Select service area"
+                label={t('tenant_form.service_area_label')}
+                placeholder={t('tenant_form.service_area_placeholder')}
                 selectedKeys={form.service_area ? [form.service_area] : []}
                 onSelectionChange={(keys) => {
                   const arr = Array.from(keys);
@@ -582,13 +584,13 @@ export function TenantForm() {
               </Select>
               <div className="grid grid-cols-2 gap-4">
                 <Input
-                  label="Latitude"
+                  label={t('tenant_form.latitude_label')}
                   placeholder="53.3498"
                   value={form.latitude}
                   onValueChange={(v) => updateField('latitude', v)}
                 />
                 <Input
-                  label="Longitude"
+                  label={t('tenant_form.longitude_label')}
                   placeholder="-6.2603"
                   value={form.longitude}
                   onValueChange={(v) => updateField('longitude', v)}
@@ -602,31 +604,31 @@ export function TenantForm() {
           <Card shadow="sm">
             <CardBody className="space-y-4 p-6">
               <Input
-                label="Facebook"
+                label={t('tenant_form.facebook_label')}
                 placeholder="https://facebook.com/..."
                 value={form.social_facebook}
                 onValueChange={(v) => updateField('social_facebook', v)}
               />
               <Input
-                label="Twitter / X"
+                label={t('tenant_form.twitter_label')}
                 placeholder="https://twitter.com/..."
                 value={form.social_twitter}
                 onValueChange={(v) => updateField('social_twitter', v)}
               />
               <Input
-                label="Instagram"
+                label={t('tenant_form.instagram_label')}
                 placeholder="https://instagram.com/..."
                 value={form.social_instagram}
                 onValueChange={(v) => updateField('social_instagram', v)}
               />
               <Input
-                label="LinkedIn"
+                label={t('tenant_form.linkedin_label')}
                 placeholder="https://linkedin.com/..."
                 value={form.social_linkedin}
                 onValueChange={(v) => updateField('social_linkedin', v)}
               />
               <Input
-                label="YouTube"
+                label={t('tenant_form.youtube_label')}
                 placeholder="https://youtube.com/..."
                 value={form.social_youtube}
                 onValueChange={(v) => updateField('social_youtube', v)}
@@ -639,8 +641,8 @@ export function TenantForm() {
           <Card shadow="sm">
             <CardBody className="space-y-4 p-6">
               <Select
-                label="Default Language"
-                description="Shown to new visitors without a preference"
+                label={t('tenant_form.default_language_label')}
+                description={t('tenant_form.default_language_description')}
                 selectedKeys={[form.default_language]}
                 onSelectionChange={(keys) => {
                   const val = Array.from(keys)[0] as string;
@@ -736,20 +738,20 @@ export function TenantForm() {
                 Leave empty to use the default tenant-specific documents.
               </p>
               <Textarea
-                label="Privacy Policy Override"
-                placeholder="Custom privacy policy HTML content..."
+                label={t('tenant_form.privacy_override_label')}
+                placeholder={t('tenant_form.privacy_override_placeholder')}
                 value={form.privacy_text}
                 onValueChange={(v) => updateField('privacy_text', v)}
                 minRows={4}
-                description="HTML allowed. Leave empty to use the default privacy page."
+                description={t('tenant_form.privacy_override_description')}
               />
               <Textarea
-                label="Terms of Service Override"
-                placeholder="Custom terms of service HTML content..."
+                label={t('tenant_form.terms_override_label')}
+                placeholder={t('tenant_form.terms_override_placeholder')}
                 value={form.terms_text}
                 onValueChange={(v) => updateField('terms_text', v)}
                 minRows={4}
-                description="HTML allowed. Leave empty to use the default terms page."
+                description={t('tenant_form.terms_override_description')}
               />
               {(form.privacy_text.trim() || form.terms_text.trim()) && (
                 <Button

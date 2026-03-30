@@ -8,6 +8,7 @@
   "template_create_failed": "Failed to create goal from template.",
 
   "checkin": {
+    "aria_progress_percentage": "Progress percentage",
     "title": "Check In",
     "new_checkin": "New Check-in",
     "history": "History",

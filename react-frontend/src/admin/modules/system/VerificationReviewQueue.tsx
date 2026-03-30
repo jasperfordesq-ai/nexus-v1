@@ -15,6 +15,7 @@ import {
   Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, useDisclosure,
 } from '@heroui/react';
 import { ClipboardCheck, RefreshCw, CheckCircle, XCircle } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { api } from '@/lib/api';
 import { useToast } from '@/contexts';
 
@@ -46,6 +47,7 @@ const STATUS_COLORS: Record<string, 'default' | 'primary' | 'warning' | 'success
 };
 
 export function VerificationReviewQueue() {
+  const { t } = useTranslation('admin');
   const toast = useToast();
   const [sessions, setSessions] = useState<PendingSession[]>([]);
   const [loading, setLoading] = useState(true);
@@ -146,7 +148,7 @@ export function VerificationReviewQueue() {
             size="sm"
             variant="flat"
             onPress={fetchSessions}
-            aria-label="Refresh pending reviews"
+            aria-label={t('verification.refresh_pending_reviews_aria')}
           >
             <RefreshCw className="w-4 h-4" />
           </Button>
@@ -161,7 +163,7 @@ export function VerificationReviewQueue() {
               No pending verification reviews. All users are up to date.
             </p>
           ) : (
-            <Table aria-label="Pending verification reviews" removeWrapper>
+            <Table aria-label={t('verification.pending_reviews_aria')} removeWrapper>
               <TableHeader>
                 <TableColumn>USER</TableColumn>
                 <TableColumn>PROVIDER</TableColumn>

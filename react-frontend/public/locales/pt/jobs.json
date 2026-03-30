@@ -113,7 +113,10 @@
     "action": "Ação",
     "target": "Mover para",
     "add": "Adicionar Regra",
-    "delete": "Eliminar"
+    "delete": "Eliminar",
+    "action_move_stage": "Move stage",
+    "action_auto_reject": "Auto-reject",
+    "action_notify_me": "Notify me"
   },
   "employer": {
     "page_title": "Perfil do Empregador",
@@ -219,7 +222,10 @@
     "form_type_label": "Tipo de Pagamento",
     "form_currency_label": "Moeda",
     "form_currency_placeholder": "ex.: USD, EUR, GBP",
-    "form_negotiable_label": "Salário é negociável"
+    "form_negotiable_label": "Salário é negociável",
+    "currency_eur": "EUR",
+    "currency_gbp": "GBP",
+    "currency_usd": "USD"
   },
   "my_applications": {
     "title": "As Minhas Candidaturas",
@@ -816,7 +822,8 @@
     "go_to_jobs": "Ir para Empregos",
     "first_time_banner": "Primeira vez a publicar?",
     "first_time_desc": "O nosso assistente de integração guiá-lo-á na publicação da sua primeira vaga.",
-    "start_wizard": "Iniciar Assistente"
+    "start_wizard": "Iniciar Assistente",
+    "aria_progress": "Onboarding progress"
   },
   "preview": {
     "title": "Pré-visualização da Vaga",
@@ -868,8 +875,6 @@
   },
   "salary_display": "{{min}} – {{max}}",
   "salary_negotiable": "Negociável",
-  "deadline_countdown": "Fecha em {{count}} dia",
-  "deadline_countdown_plural": "Fecha em {{count}} dias",
   "deadline_closed": "Encerrado",
   "remote_only": "Apenas Remoto",
   "match_badge": "{{count}}% de compatibilidade",
@@ -878,5 +883,10 @@
   "unknown": "Desconhecido",
   "nav": {
     "jobs": "Empregos"
-  }
+  },
+  "aria": {
+    "qualification_percentage": "Qualification percentage"
+  },
+  "deadline_countdown_one": "Fecha em {{count}} dia",
+  "deadline_countdown_other": "Fecha em {{count}} dias"
 }

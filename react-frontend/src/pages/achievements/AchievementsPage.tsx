@@ -49,6 +49,7 @@ import {
   Calendar,
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import i18n from '@/i18n';
 import { GlassCard } from '@/components/ui';
 import { EmptyState } from '@/components/feedback';
 import { usePageTitle } from '@/hooks';
@@ -803,7 +804,7 @@ function EngagementTab() {
     const d = new Date();
     d.setMonth(d.getMonth() - i);
     const ym = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
-    const label = d.toLocaleDateString('en', { month: 'short', year: '2-digit' });
+    const label = d.toLocaleDateString(i18n.language, { month: 'short', year: '2-digit' });
     const entry = historyMap.get(ym);
     months.push({
       label,

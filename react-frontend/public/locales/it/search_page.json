@@ -64,5 +64,8 @@
   "filter_apply": "Applica filtri",
   "run_search": "Avvia ricerca",
   "delete": "Elimina",
-  "delete_saved_search": "Elimina ricerca salvata"
+  "delete_saved_search": "Elimina ricerca salvata",
+  "aria": {
+    "loading_search_results": "Loading search results"
+  }
 }

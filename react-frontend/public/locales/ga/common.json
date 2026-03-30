@@ -282,6 +282,13 @@
     "new_goal": "Sprioc Nua",
     "new_goal_desc": "Socraigh sprioc phearsanta"
   },
+  "gif": {
+    "search_placeholder": "Cuardaigh GIFanna...",
+    "trending": "Ag Treáil",
+    "no_results": "Níor aimsíodh GIFanna",
+    "powered_by": "Cumhachtaithe ag GIPHY",
+    "button_label": "Cuir GIF leis"
+  },
   "loading": "Á Lódáil...",
   "feature_error": {
     "load_failed": "Ní rabhamar in ann {{feature}} a lódáil. D'fhéadfadh an chuid seo a bheith neamh-infhaighte go sealadach."
@@ -292,6 +299,46 @@
     "status": "{{stage}}",
     "summary": "Is ardán nua é seo agus tá tú á fheiceáil i mód réamhamhairc.",
     "read_more": "Léigh tuilleadh"
+  },
+  "aria": {
+    "view_mode": "View mode",
+    "grid_view": "Grid view",
+    "list_view": "List view",
+    "map_view": "Map view",
+    "loading_members": "Loading members",
+    "bold": "Bold",
+    "italic": "Italic",
+    "underline": "Underline",
+    "bullet_list": "Bullet List",
+    "numbered_list": "Numbered List",
+    "link_url": "Link URL",
+    "confirm_link": "Confirm link",
+    "cancel_link": "Cancel link",
+    "post_content_editor": "Post content editor",
+    "drag_to_reorder": "Drag to reorder",
+    "click_or_drag_to_upload": "Click or drag to upload images",
+    "add_more_photos": "Add more photos",
+    "main_navigation": "Main navigation",
+    "timebanking_navigation": "Timebanking navigation",
+    "community_navigation": "Community navigation",
+    "create_actions": "Create actions",
+    "user_actions": "User actions",
+    "close_menu": "Close menu",
+    "open_search": "Open search",
+    "mobile_navigation": "Mobile navigation",
+    "engage_navigation": "Engage navigation",
+    "explore_navigation": "Explore navigation",
+    "federation_navigation": "Federation navigation",
+    "about_navigation": "About navigation",
+    "legal_navigation": "Legal navigation",
+    "more_navigation": "More navigation",
+    "cookie_settings": "Cookie settings",
+    "clear": "Clear",
+    "scroll_left": "Scroll left",
+    "scroll_right": "Scroll right",
+    "select_language": "Select language",
+    "clear_location": "Clear location",
+    "select_category": "Select a category"
   },
   "skills": {
     "browse_title": "Eolaire Scileanna Pobail",
@@ -324,13 +371,10 @@
       "intermediate": "Meánach",
       "advanced": "Ardleibhéal",
       "expert": "Saineolaí"
-    }
+    },
+    "aria_clear_search": "Clear search",
+    "aria_close_members_list": "Close members list"
   },
-  "gif": {
-    "search_placeholder": "Cuardaigh GIFanna...",
-    "trending": "Ag Treáil",
-    "no_results": "Níor aimsíodh GIFanna",
-    "powered_by": "Cumhachtaithe ag GIPHY",
-    "button_label": "Cuir GIF leis"
-  }
+  "hours_display_one": "{{count}} hour",
+  "hours_display_other": "{{count}} hours"
 }

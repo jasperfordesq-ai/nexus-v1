@@ -152,7 +152,7 @@ export function Footer({ children, copyright }: FooterProps) {
                 size="sm"
                 onPress={resetConsent}
                 className="inline-flex items-center gap-1 text-xs text-theme-subtle hover:text-theme-primary transition-colors h-auto p-0 min-w-0"
-                aria-label="Cookie settings"
+                aria-label={t('aria.cookie_settings')}
                 startContent={<Cookie className="w-3 h-3" aria-hidden="true" />}
               >
                 {t('footer.cookie_settings')}

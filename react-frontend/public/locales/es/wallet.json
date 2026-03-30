@@ -64,7 +64,9 @@
   },
   "error": {
     "load_balance": "Error al cargar el saldo de la billetera",
-    "load_wallet": "Error al cargar los datos de la billetera. Por favor intenta de nuevo."
+    "load_wallet": "Error al cargar los datos de la billetera. Por favor intenta de nuevo.",
+    "session_expired": "Your session has expired. Please log in again.",
+    "load_community_fund": "Could not load community fund"
   },
   "no_members_found": "No se encontraron miembros",
   "donate": "Donar",
@@ -100,18 +102,6 @@
   "community_fund_hours": "horas disponibles",
   "community_fund_deposited": "Depositado",
   "community_fund_withdrawn": "Retirado",
-  "available_balance": "Saldo disponible",
-  "recipient": "Destinatario",
-  "remove_recipient": "Eliminar destinatario",
-  "search_placeholder": "Buscar por nombre o nombre de usuario...",
-  "search_recipient": "Buscar destinatario",
-  "search_results": "Resultados de búsqueda",
-  "amount_hours": "Importe (horas)",
-  "amount_in_hours": "Importe en horas",
-  "exceeds_balance": "Supera el saldo disponible",
-  "optional": "opcional",
-  "description_placeholder": "¿Para qué es esta transferencia?",
-  "new_balance_after": "Tu nuevo saldo será de {{balance}} horas",
   "rating": {
     "title": "Califica tu intercambio",
     "prompt": "¿Cómo fue tu intercambio?",
@@ -125,5 +115,22 @@
     "comment_placeholder": "Comparte tu experiencia...",
     "skip": "Omitir",
     "submit": "Enviar calificación"
-  }
+  },
+  "aria": {
+    "export_csv": "Export transactions to CSV",
+    "loading_transactions": "Loading transactions",
+    "transaction_detail": "{{direction}} {{amount}} hours {{name}}"
+  },
+  "available_balance": "Saldo disponible",
+  "recipient": "Destinatario",
+  "remove_recipient": "Eliminar destinatario",
+  "search_placeholder": "Buscar por nombre o nombre de usuario...",
+  "search_recipient": "Buscar destinatario",
+  "search_results": "Resultados de búsqueda",
+  "amount_hours": "Importe (horas)",
+  "amount_in_hours": "Importe en horas",
+  "exceeds_balance": "Supera el saldo disponible",
+  "optional": "opcional",
+  "description_placeholder": "¿Para qué es esta transferencia?",
+  "new_balance_after": "Tu nuevo saldo será de {{balance}} horas"
 }

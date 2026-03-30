@@ -82,6 +82,16 @@
     "streak_days_one": "{{count}} la",
     "streak_days_other": "{{count}} la"
   },
+  "aria": {
+    "loading_listings": "Loading listings",
+    "loading_activity": "Loading activity",
+    "loading_events": "Loading events",
+    "loading_groups": "Loading groups",
+    "loading_progress": "Loading progress",
+    "loading_suggestions": "Loading suggestions",
+    "loading_endorsements": "Loading endorsements",
+    "loading_pending_reviews": "Loading pending reviews"
+  },
   "reviews": {
     "sent": "Seolta {{amount}}u",
     "received": "Faighte {{amount}}u",

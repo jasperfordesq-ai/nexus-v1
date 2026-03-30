@@ -59,7 +59,7 @@ class AdminBillingController extends BaseApiController
         }
 
         if ($planId < 1) {
-            return $this->respondWithError('VALIDATION_ERROR', 'Invalid plan_id', 'plan_id', 422);
+            return $this->respondWithError('VALIDATION_ERROR', __('api.invalid_plan_id'), 'plan_id', 422);
         }
 
         try {

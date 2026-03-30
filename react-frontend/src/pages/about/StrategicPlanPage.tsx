@@ -345,7 +345,7 @@ export function StrategicPlanPage() {
                     </div>
                   </div>
                 </div>
-                <Table aria-label="Strategic pillar 1 initiatives" shadow="none" isStriped>
+                <Table aria-label={t('strategic_plan.aria.pillar_1_initiatives')} shadow="none" isStriped>
                   <TableHeader>
                     <TableColumn>{t('strategic_plan.pillar_initiative_header')}</TableColumn>
                     <TableColumn>{t('strategic_plan.pillar_priority_header')}</TableColumn>
@@ -380,7 +380,7 @@ export function StrategicPlanPage() {
                     </div>
                   </div>
                 </div>
-                <Table aria-label="Strategic pillar 2 initiatives" shadow="none" isStriped>
+                <Table aria-label={t('strategic_plan.aria.pillar_2_initiatives')} shadow="none" isStriped>
                   <TableHeader>
                     <TableColumn>{t('strategic_plan.pillar_initiative_header')}</TableColumn>
                     <TableColumn>{t('strategic_plan.pillar_priority_header')}</TableColumn>
@@ -418,7 +418,7 @@ export function StrategicPlanPage() {
 
             <div className="mt-6">
               <GlassCard className="overflow-hidden">
-                <Table aria-label="Year 1 roadmap" shadow="none" isStriped>
+                <Table aria-label={t('strategic_plan.aria.year_1_roadmap')} shadow="none" isStriped>
                   <TableHeader>
                     <TableColumn className="min-w-[160px]">{t('strategic_plan.roadmap_activity_header')}</TableColumn>
                     <TableColumn className="text-center min-w-[90px]">{t('strategic_plan.roadmap_q1')}</TableColumn>
@@ -524,7 +524,7 @@ export function StrategicPlanPage() {
 
             <div className="mt-6">
               <GlassCard className="overflow-hidden">
-                <Table aria-label="Risk and mitigation" shadow="none" isStriped>
+                <Table aria-label={t('strategic_plan.aria.risk_and_mitigation')} shadow="none" isStriped>
                   <TableHeader>
                     <TableColumn>{t('strategic_plan.risk_header')}</TableColumn>
                     <TableColumn className="text-center w-24">{t('strategic_plan.likelihood_header')}</TableColumn>

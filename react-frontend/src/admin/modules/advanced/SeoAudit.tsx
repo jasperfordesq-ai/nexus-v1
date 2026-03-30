@@ -93,7 +93,7 @@ export function SeoAudit() {
         if (warnCount > 0) parts.push(t('advanced.warnings_count', { count: warnCount }));
         if (failCount > 0) parts.push(t('advanced.failed_count', { count: failCount }));
 
-        toast.success(t('advanced.seo_audit_complete'), parts.join(', ') + '.');
+        toast.success(t('advanced.seo_audit_complete'), t('advanced.seo_audit_summary', { summary: parts.join(', '), defaultValue: '{{summary}}.' }));
       } else {
         toast.error(t('advanced.seo_audit_failed'), t('advanced.seo_audit_no_results'));
       }

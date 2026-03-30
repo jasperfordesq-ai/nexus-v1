@@ -6,6 +6,7 @@
 import { useRef, useState, useCallback, useEffect, type ReactNode } from 'react';
 import { Button } from '@heroui/react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 interface HorizontalScrollProps {
   children: ReactNode;
@@ -18,6 +19,7 @@ interface HorizontalScrollProps {
  * Fades edges to indicate more content.
  */
 export function HorizontalScroll({ children, className = '' }: HorizontalScrollProps) {
+  const { t } = useTranslation('common');
   const scrollRef = useRef<HTMLDivElement>(null);
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(false);
@@ -68,7 +70,7 @@ export function HorizontalScroll({ children, className = '' }: HorizontalScrollP
             size="sm"
             className="absolute left-1 top-1/2 -translate-y-1/2 z-20 hidden sm:flex bg-[var(--surface-elevated)] border border-[var(--border-default)] shadow-md opacity-0 group-hover:opacity-100 transition-opacity min-w-8 w-8 h-8"
             onPress={() => scroll('left')}
-            aria-label="Scroll left"
+            aria-label={t('aria.scroll_left')}
           >
             <ChevronLeft className="w-4 h-4" />
           </Button>
@@ -94,7 +96,7 @@ export function HorizontalScroll({ children, className = '' }: HorizontalScrollP
             size="sm"
             className="absolute right-1 top-1/2 -translate-y-1/2 z-20 hidden sm:flex bg-[var(--surface-elevated)] border border-[var(--border-default)] shadow-md opacity-0 group-hover:opacity-100 transition-opacity min-w-8 w-8 h-8"
             onPress={() => scroll('right')}
-            aria-label="Scroll right"
+            aria-label={t('aria.scroll_right')}
           >
             <ChevronRight className="w-4 h-4" />
           </Button>

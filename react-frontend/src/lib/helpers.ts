@@ -9,6 +9,7 @@
 
 import type { User } from '@/types/api';
 import { logError } from './logger';
+import i18n from '../i18n';
 
 /**
  * API Base URL for resolving relative image/asset URLs
@@ -83,24 +84,28 @@ export function formatRelativeTime(dateString: string): string {
   const date = new Date(dateString);
   const now = new Date();
   const diffMs = now.getTime() - date.getTime();
-  const diffMins = Math.floor(diffMs / 60000);
+  const diffSecs = Math.floor(diffMs / 1000);
+  const diffMins = Math.floor(diffSecs / 60);
   const diffHours = Math.floor(diffMins / 60);
   const diffDays = Math.floor(diffHours / 24);
+  const diffWeeks = Math.floor(diffDays / 7);
 
-  if (diffMins < 1) return 'just now';
-  if (diffMins < 60) return `${diffMins}m ago`;
-  if (diffHours < 24) return `${diffHours}h ago`;
-  if (diffDays < 7) return `${diffDays}d ago`;
-  if (diffDays < 30) return `${Math.floor(diffDays / 7)}w ago`;
+  const rtf = new Intl.RelativeTimeFormat(i18n.language, { numeric: 'auto', style: 'narrow' });
 
-  return date.toLocaleDateString();
+  if (diffSecs < 60) return rtf.format(-diffSecs, 'second');
+  if (diffMins < 60) return rtf.format(-diffMins, 'minute');
+  if (diffHours < 24) return rtf.format(-diffHours, 'hour');
+  if (diffDays < 7) return rtf.format(-diffDays, 'day');
+  if (diffDays < 30) return rtf.format(-diffWeeks, 'week');
+
+  return date.toLocaleDateString(i18n.language);
 }
 
 /**
  * Format a date for display
  */
 export function formatDate(dateString: string, options?: Intl.DateTimeFormatOptions): string {
-  return new Date(dateString).toLocaleDateString('en-US', options ?? {
+  return new Date(dateString).toLocaleDateString(i18n.language, options ?? {
     year: 'numeric',
     month: 'long',
     day: 'numeric',
@@ -111,7 +116,7 @@ export function formatDate(dateString: string, options?: Intl.DateTimeFormatOpti
  * Format a time for display
  */
 export function formatTime(dateString: string): string {
-  return new Date(dateString).toLocaleTimeString('en-US', {
+  return new Date(dateString).toLocaleTimeString(i18n.language, {
     hour: '2-digit',
     minute: '2-digit',
   });
@@ -129,8 +134,7 @@ export function truncate(text: string, maxLength: number): string {
  * Format hours for display
  */
 export function formatHours(hours: number): string {
-  if (hours === 1) return '1 hour';
-  return `${hours} hours`;
+  return i18n.t('common:hours_display', { count: hours, defaultValue: `${hours} hours` });
 }
 
 /**

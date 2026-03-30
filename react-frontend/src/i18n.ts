@@ -47,4 +47,9 @@ i18n
     },
   });
 
+// Keep <html lang="..."> in sync with the active language for accessibility & SEO
+i18n.on('languageChanged', (lng: string) => {
+  document.documentElement.lang = lng;
+});
+
 export default i18n;

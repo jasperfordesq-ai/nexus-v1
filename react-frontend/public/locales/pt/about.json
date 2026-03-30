@@ -14,7 +14,6 @@
     "link_strategic-plan_label": "Plano Estratégico",
     "link_strategic-plan_description": "Roteiro 2026–2030"
   },
-
   "timebanking_guide": {
     "page_title": "Guia de Timebanking",
     "meta_description": "Saiba como funciona o timebanking — dê uma hora, ganhe um crédito, receba ajuda. Junte-se a uma comunidade construída com base na reciprocidade e confiança.",
@@ -52,7 +51,6 @@
     "cta_join_free": "Junte-se Gratuitamente Hoje",
     "cta_partner": "Parceria Connosco"
   },
-
   "impact_summary": {
     "page_title": "O Nosso Impacto",
     "meta_description": "Descubra como o hOUR Timebank cria €16 de valor social por cada €1 investido. Explore os resultados de bem-estar, o potencial de saúde pública e a nossa visão estratégica.",
@@ -85,7 +83,6 @@
     "cta_subtitle": "Faça parceria com o hOUR Timebank para criar bem-estar comunitário mensurável. Cada contribuição gera 16x de retorno social.",
     "cta_contact": "Contacte-nos"
   },
-
   "partner": {
     "page_title": "Parceria Connosco",
     "meta_description": "Faça parceria com o hOUR Timebank para criar €16 de valor social por cada €1 investido. Parcerias corporativas, patrocínios e oportunidades de investigação.",
@@ -127,7 +124,6 @@
     "cta_contact": "Iniciar uma Conversa",
     "cta_view_plan": "Ver Plano Estratégico"
   },
-
   "social_prescribing": {
     "page_title": "Prescrição Social",
     "meta_description": "Uma via de prescrição social estruturada e baseada em evidências. 100% de melhoria no bem-estar, 95% de aumento na conexão social, SROI de 16:1.",
@@ -167,7 +163,6 @@
     "cta_contact": "Discutir uma Parceria",
     "cta_partnership": "Ver Todas as Parcerias"
   },
-
   "impact_report": {
     "page_title": "Relatório de Impacto Social",
     "meta_description": "O Estudo de Impacto Social completo de 2023 do hOUR Timebank — análise SROI independente que mostra €16 de retorno social por cada €1 investido.",
@@ -244,6 +239,11 @@
     "discussion_factor_2_description": "O modelo de dar e receber supera o estigma de \"precisar de ajuda\" e impulsiona a participação sustentada em comparação com o voluntariado tradicional.",
     "discussion_factor_3_title": "Eficiência da Plataforma Digital",
     "discussion_factor_3_description": "A plataforma de correspondência online reduz a sobrecarga de coordenação e permite que os membros organizem trocas de forma independente, aumentando a escalabilidade.",
+    "aria": {
+      "activity_statistics": "TBI activity statistics",
+      "sroi_breakdown": "SROI breakdown",
+      "recommendations": "Recommendations"
+    },
     "rec_header": "Recomendação",
     "rec_priority_header": "Prioridade",
     "rec_0": "Assegurar financiamento base plurianual para garantir a continuidade do programa e reduzir a dependência de subsídios anuais.",
@@ -259,7 +259,6 @@
     "cta_questions": "Questões sobre a investigação?",
     "cta_contact": "Contacte-nos"
   },
-
   "strategic_plan": {
     "page_title": "Plano Estratégico 2026–2030",
     "meta_description": "O plano estratégico de cinco anos do hOUR Timebank, abrangendo crescimento, federação, resiliência financeira e objetivos de impacto comunitário para 2026–2030.",
@@ -370,6 +369,12 @@
     "badge_launch": "Lançar",
     "badge_ongoing": "Contínuo",
     "badge_pitch": "Apresentar",
+    "aria": {
+      "pillar_1_initiatives": "Strategic pillar 1 initiatives",
+      "pillar_2_initiatives": "Strategic pillar 2 initiatives",
+      "year_1_roadmap": "Year 1 roadmap",
+      "risk_and_mitigation": "Risk and mitigation"
+    },
     "risk_header": "Risco",
     "likelihood_header": "Probabilidade",
     "impact_header": "Impacto",

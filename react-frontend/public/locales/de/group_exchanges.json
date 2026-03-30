@@ -12,10 +12,6 @@
   "empty_description_all": "Sie haben noch keinen Gruppentausch erstellt oder daran teilgenommen.",
   "empty_description_filtered": "Kein Gruppentausch entspricht diesem Filter.",
   "card_aria": "Gruppentausch: {{title}} – {{status}}",
-  "participants_count": "{{count}} Teilnehmer",
-  "participants_count_plural": "{{count}} Teilnehmende",
-  "hours_count": "{{count}} Stunde",
-  "hours_count_plural": "{{count}} Stunden",
   "role_organizer": "Von Ihnen organisiert",
   "role_participant": "Teilnehmend",
   "tabs_aria": "Statusfilter für Gruppentausch",
@@ -90,7 +86,9 @@
     "search_members_aria": "Mitglieder suchen",
     "add_as_role": "Als {{role}} hinzufügen",
     "no_members_found": "Keine Mitglieder gefunden, die Ihrer Suche entsprechen.",
-    "done": "Fertig"
+    "done": "Fertig",
+    "aria_exchange_participants": "Exchange participants",
+    "aria_hour_split": "Hour split"
   },
   "create": {
     "page_title": "Gruppentausch erstellen",
@@ -143,7 +141,8 @@
     "hours_placeholder": "Stunden",
     "weight_placeholder": "Gewichtung",
     "hours_for": "Stunden für {{name}}",
-    "weight_for": "Gewichtung für {{name}}"
+    "weight_for": "Gewichtung für {{name}}",
+    "aria_hour_split_preview": "Hour split preview"
   },
   "toast": {
     "load_more_failed": "Weitere Tauschvorgänge konnten nicht geladen werden",
@@ -165,5 +164,9 @@
     "created_desc": "Ihr Tausch wurde erfolgreich erstellt.",
     "create_failed": "Tausch konnte nicht erstellt werden",
     "something_wrong": "Etwas ist schiefgelaufen. Bitte versuchen Sie es erneut."
-  }
+  },
+  "participants_count_one": "{{count}} Teilnehmer",
+  "participants_count_other": "{{count}} Teilnehmende",
+  "hours_count_one": "{{count}} Stunde",
+  "hours_count_other": "{{count}} Stunden"
 }

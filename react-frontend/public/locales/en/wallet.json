@@ -116,6 +116,11 @@
     "skip": "Skip",
     "submit": "Submit Rating"
   },
+  "aria": {
+    "export_csv": "Export transactions to CSV",
+    "loading_transactions": "Loading transactions",
+    "transaction_detail": "{{direction}} {{amount}} hours {{name}}"
+  },
   "available_balance": "Available Balance",
   "recipient": "Recipient",
   "remove_recipient": "Remove recipient",

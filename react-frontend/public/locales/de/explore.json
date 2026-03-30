@@ -117,6 +117,9 @@
     "applications": "{{count}} beworben",
     "deadline": "Frist: {{date}}"
   },
+  "aria": {
+    "content_tabs": "Explore content tabs"
+  },
   "tabs": {
     "all": "Alle",
     "for_you": "Für Sie",

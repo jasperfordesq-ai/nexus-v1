@@ -64,7 +64,9 @@
   },
   "error": {
     "load_balance": "Impossible de charger le solde du portefeuille",
-    "load_wallet": "Impossible de charger les données du portefeuille. Veuillez réessayer."
+    "load_wallet": "Impossible de charger les données du portefeuille. Veuillez réessayer.",
+    "session_expired": "Your session has expired. Please log in again.",
+    "load_community_fund": "Could not load community fund"
   },
   "no_members_found": "Aucun membre trouvé",
   "donate": "Faire un don",
@@ -100,18 +102,6 @@
   "community_fund_hours": "heures disponibles",
   "community_fund_deposited": "Déposé",
   "community_fund_withdrawn": "Retiré",
-  "available_balance": "Solde disponible",
-  "recipient": "Destinataire",
-  "remove_recipient": "Supprimer le destinataire",
-  "search_placeholder": "Rechercher par nom ou nom d'utilisateur...",
-  "search_recipient": "Rechercher un destinataire",
-  "search_results": "Résultats de recherche",
-  "amount_hours": "Montant (heures)",
-  "amount_in_hours": "Montant en heures",
-  "exceeds_balance": "Dépasse le solde disponible",
-  "optional": "optionnel",
-  "description_placeholder": "À quoi sert ce transfert ?",
-  "new_balance_after": "Votre nouveau solde sera de {{balance}} heures",
   "rating": {
     "title": "Évaluez votre échange",
     "prompt": "Comment s'est passé votre échange ?",
@@ -125,5 +115,22 @@
     "comment_placeholder": "Partagez votre expérience...",
     "skip": "Passer",
     "submit": "Soumettre l'évaluation"
-  }
+  },
+  "aria": {
+    "export_csv": "Export transactions to CSV",
+    "loading_transactions": "Loading transactions",
+    "transaction_detail": "{{direction}} {{amount}} hours {{name}}"
+  },
+  "available_balance": "Solde disponible",
+  "recipient": "Destinataire",
+  "remove_recipient": "Supprimer le destinataire",
+  "search_placeholder": "Rechercher par nom ou nom d'utilisateur...",
+  "search_recipient": "Rechercher un destinataire",
+  "search_results": "Résultats de recherche",
+  "amount_hours": "Montant (heures)",
+  "amount_in_hours": "Montant en heures",
+  "exceeds_balance": "Dépasse le solde disponible",
+  "optional": "optionnel",
+  "description_placeholder": "À quoi sert ce transfert ?",
+  "new_balance_after": "Votre nouveau solde sera de {{balance}} heures"
 }

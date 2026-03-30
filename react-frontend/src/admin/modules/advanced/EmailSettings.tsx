@@ -410,9 +410,9 @@ export function EmailSettings() {
                 }}
                 variant="bordered"
               >
-                <SelectItem key="tls">TLS</SelectItem>
-                <SelectItem key="ssl">SSL</SelectItem>
-                <SelectItem key="none">None</SelectItem>
+                <SelectItem key="tls">{t('advanced.encryption_tls')}</SelectItem>
+                <SelectItem key="ssl">{t('advanced.encryption_ssl')}</SelectItem>
+                <SelectItem key="none">{t('advanced.encryption_none')}</SelectItem>
               </Select>
               <Input
                 label={t('advanced.label_from_email')}

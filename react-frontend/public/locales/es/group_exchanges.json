@@ -12,10 +12,6 @@
   "empty_description_all": "Aún no has creado ni participado en ningún intercambio grupal.",
   "empty_description_filtered": "Ningún intercambio grupal coincide con este filtro.",
   "card_aria": "Intercambio grupal: {{title}} - {{status}}",
-  "participants_count": "{{count}} participante",
-  "participants_count_plural": "{{count}} participantes",
-  "hours_count": "{{count}} hora",
-  "hours_count_plural": "{{count}} horas",
   "role_organizer": "Tú organizaste",
   "role_participant": "Participante",
   "tabs_aria": "Filtro de estado de intercambio grupal",
@@ -90,7 +86,9 @@
     "search_members_aria": "Buscar miembros",
     "add_as_role": "Agregar como {{role}}",
     "no_members_found": "No se encontraron miembros que coincidan con tu búsqueda.",
-    "done": "Listo"
+    "done": "Listo",
+    "aria_exchange_participants": "Exchange participants",
+    "aria_hour_split": "Hour split"
   },
   "create": {
     "page_title": "Crear Intercambio Grupal",
@@ -143,7 +141,8 @@
     "hours_placeholder": "Horas",
     "weight_placeholder": "Peso",
     "hours_for": "Horas para {{name}}",
-    "weight_for": "Peso para {{name}}"
+    "weight_for": "Peso para {{name}}",
+    "aria_hour_split_preview": "Hour split preview"
   },
   "toast": {
     "load_more_failed": "Error al cargar más intercambios",
@@ -165,5 +164,9 @@
     "created_desc": "Tu intercambio ha sido creado exitosamente.",
     "create_failed": "Error al crear el intercambio",
     "something_wrong": "Algo salió mal. Por favor intenta de nuevo."
-  }
+  },
+  "participants_count_one": "{{count}} participante",
+  "participants_count_other": "{{count}} participantes",
+  "hours_count_one": "{{count}} hora",
+  "hours_count_other": "{{count}} horas"
 }

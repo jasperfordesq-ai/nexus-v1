@@ -64,7 +64,9 @@
   },
   "error": {
     "load_balance": "Theip ar luchtú iarmhéid an sparáin",
-    "load_wallet": "Theip ar luchtú sonraí an sparáin. Bain triail eile as le do thoil."
+    "load_wallet": "Theip ar luchtú sonraí an sparáin. Bain triail eile as le do thoil.",
+    "session_expired": "Your session has expired. Please log in again.",
+    "load_community_fund": "Could not load community fund"
   },
   "no_members_found": "Níor aimsíodh comhaltaí",
   "donate": "Tabhair",
@@ -100,18 +102,6 @@
   "community_fund_hours": "uaireanta ar fáil",
   "community_fund_deposited": "Taiscthe",
   "community_fund_withdrawn": "Tarraingthe Siar",
-  "available_balance": "Iarmhéid ar Fáil",
-  "recipient": "Faighteoir",
-  "remove_recipient": "Bain an faighteoir",
-  "search_placeholder": "Cuardaigh de réir ainm nó ainm úsáideora...",
-  "search_recipient": "Cuardaigh faighteoir",
-  "search_results": "Torthaí cuardaigh",
-  "amount_hours": "Méid (uaireanta)",
-  "amount_in_hours": "Méid in uaireanta",
-  "exceeds_balance": "Thar an iarmhéid ar fáil",
-  "optional": "roghnach",
-  "description_placeholder": "Cad is aidhm leis an aistriú seo?",
-  "new_balance_after": "Beidh d'iarmhéid nua {{balance}} uair",
   "rating": {
     "title": "Rátáil do Mhalartú",
     "prompt": "Conas a bhí do mhalartú?",
@@ -125,5 +115,22 @@
     "comment_placeholder": "Roinn do thaithí...",
     "skip": "Scipeáil",
     "submit": "Seol Rátáil"
-  }
+  },
+  "aria": {
+    "export_csv": "Export transactions to CSV",
+    "loading_transactions": "Loading transactions",
+    "transaction_detail": "{{direction}} {{amount}} hours {{name}}"
+  },
+  "available_balance": "Iarmhéid ar Fáil",
+  "recipient": "Faighteoir",
+  "remove_recipient": "Bain an faighteoir",
+  "search_placeholder": "Cuardaigh de réir ainm nó ainm úsáideora...",
+  "search_recipient": "Cuardaigh faighteoir",
+  "search_results": "Torthaí cuardaigh",
+  "amount_hours": "Méid (uaireanta)",
+  "amount_in_hours": "Méid in uaireanta",
+  "exceeds_balance": "Thar an iarmhéid ar fáil",
+  "optional": "roghnach",
+  "description_placeholder": "Cad is aidhm leis an aistriú seo?",
+  "new_balance_after": "Beidh d'iarmhéid nua {{balance}} uair"
 }

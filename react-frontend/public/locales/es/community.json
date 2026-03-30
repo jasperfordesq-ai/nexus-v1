@@ -141,8 +141,6 @@
     "try_different_search": "Prueba con un término de búsqueda diferente",
     "no_organisations_available": "Aún no hay organizaciones de voluntariado disponibles",
     "load_more": "Cargar Más",
-    "opportunity_count": "{{count}} oportunidad",
-    "opportunity_count_plural": "{{count}} oportunidades",
     "volunteer_count": "{{count}} voluntarios",
     "hours_logged": "{{hours}}h registradas",
     "website": "Sitio Web",
@@ -178,7 +176,9 @@
     "terms_item_4": "Acepto usar la plataforma de manera responsable y asegurar que todas las oportunidades de voluntariado publicadas sean genuinas y legales.",
     "terms_item_5": "Entiendo que los administradores de la plataforma pueden eliminar la organización o sus anuncios si violan las directrices de la comunidad.",
     "terms_agreement": "He leído y acepto los términos de registro de organización anteriores.",
-    "terms_required": "Debes aceptar los términos para registrar tu organización."
+    "terms_required": "Debes aceptar los términos para registrar tu organización.",
+    "opportunity_count_one": "{{count}} oportunidad",
+    "opportunity_count_other": "{{count}} oportunidades"
   },
   "organisation_detail": {
     "page_title": "Organización",

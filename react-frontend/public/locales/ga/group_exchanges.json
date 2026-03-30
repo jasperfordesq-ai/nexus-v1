@@ -12,10 +12,6 @@
   "empty_description_all": "Níor chruthaigh tú nó níor ghlac tú páirt in aon mhalartuithe grúpa fós.",
   "empty_description_filtered": "Níl aon mhalartuithe grúpa ag teacht leis an scagaire seo.",
   "card_aria": "Malartú grúpa: {{title}} - {{status}}",
-  "participants_count": "{{count}} rannpháirtí",
-  "participants_count_plural": "{{count}} rannpháirtithe",
-  "hours_count": "{{count}} uair",
-  "hours_count_plural": "{{count}} uair",
   "role_organizer": "Eagraithe agat",
   "role_participant": "Rannpháirtí",
   "tabs_aria": "Scagaire stádais malartuithe grúpa",
@@ -90,7 +86,9 @@
     "search_members_aria": "Cuardaigh baill",
     "add_as_role": "Cuir leis mar {{role}}",
     "no_members_found": "Níor aimsíodh aon bhaill a mheaitseálann do chuardach.",
-    "done": "Déanta"
+    "done": "Déanta",
+    "aria_exchange_participants": "Exchange participants",
+    "aria_hour_split": "Hour split"
   },
   "create": {
     "page_title": "Cruthaigh Malartú Grúpa",
@@ -143,7 +141,8 @@
     "hours_placeholder": "Uaireanta",
     "weight_placeholder": "Ualú",
     "hours_for": "Uaireanta do {{name}}",
-    "weight_for": "Ualú do {{name}}"
+    "weight_for": "Ualú do {{name}}",
+    "aria_hour_split_preview": "Hour split preview"
   },
   "toast": {
     "load_more_failed": "Theip ar thuilleadh malartuithe a lódáil",
@@ -165,5 +164,9 @@
     "created_desc": "Cruthaíodh do mhalartú go rathúil.",
     "create_failed": "Theip ar mhalartú a chruthú",
     "something_wrong": "Chuaigh rud éigin mícheart. Bain triail eile as."
-  }
+  },
+  "participants_count_one": "{{count}} rannpháirtí",
+  "participants_count_other": "{{count}} rannpháirtithe",
+  "hours_count_one": "{{count}} uair",
+  "hours_count_other": "{{count}} uair"
 }

@@ -12,10 +12,6 @@
   "empty_description_all": "Ainda não criou nem participou em trocas de grupo.",
   "empty_description_filtered": "Nenhuma troca de grupo corresponde a este filtro.",
   "card_aria": "Troca de grupo: {{title}} - {{status}}",
-  "participants_count": "{{count}} participante",
-  "participants_count_plural": "{{count}} participantes",
-  "hours_count": "{{count}} hora",
-  "hours_count_plural": "{{count}} horas",
   "role_organizer": "Organizou",
   "role_participant": "Participante",
   "tabs_aria": "Filtro de estado de troca de grupo",
@@ -90,7 +86,9 @@
     "search_members_aria": "Pesquisar membros",
     "add_as_role": "Adicionar como {{role}}",
     "no_members_found": "Nenhum membro encontrado correspondente à sua pesquisa.",
-    "done": "Concluído"
+    "done": "Concluído",
+    "aria_exchange_participants": "Exchange participants",
+    "aria_hour_split": "Hour split"
   },
   "create": {
     "page_title": "Criar Troca de Grupo",
@@ -143,7 +141,8 @@
     "hours_placeholder": "Horas",
     "weight_placeholder": "Peso",
     "hours_for": "Horas para {{name}}",
-    "weight_for": "Peso para {{name}}"
+    "weight_for": "Peso para {{name}}",
+    "aria_hour_split_preview": "Hour split preview"
   },
   "toast": {
     "load_more_failed": "Falha ao carregar mais trocas",
@@ -165,5 +164,9 @@
     "created_desc": "A sua troca foi criada com sucesso.",
     "create_failed": "Falha ao criar troca",
     "something_wrong": "Algo correu mal. Tente novamente."
-  }
+  },
+  "participants_count_one": "{{count}} participante",
+  "participants_count_other": "{{count}} participantes",
+  "hours_count_one": "{{count}} hora",
+  "hours_count_other": "{{count}} horas"
 }

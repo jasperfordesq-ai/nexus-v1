@@ -117,6 +117,9 @@
     "applications": "{{count}} postulados",
     "deadline": "Fecha límite: {{date}}"
   },
+  "aria": {
+    "content_tabs": "Explore content tabs"
+  },
   "tabs": {
     "all": "Todo",
     "for_you": "Para Ti",

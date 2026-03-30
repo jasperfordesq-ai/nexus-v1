@@ -101,9 +101,9 @@ export function AiSettings() {
               onSelectionChange={(keys) => { const v = Array.from(keys)[0]; if (v) updateField('provider', String(v)); }}
               variant="bordered"
             >
-              <SelectItem key="openai">OpenAI (GPT-4)</SelectItem>
-              <SelectItem key="anthropic">Anthropic (Claude)</SelectItem>
-              <SelectItem key="local">Local Model</SelectItem>
+              <SelectItem key="openai">{t('advanced.provider_openai')}</SelectItem>
+              <SelectItem key="anthropic">{t('advanced.provider_anthropic')}</SelectItem>
+              <SelectItem key="local">{t('advanced.provider_local')}</SelectItem>
             </Select>
             <Input
               label={t('advanced.label_a_p_i_key')}

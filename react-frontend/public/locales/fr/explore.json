@@ -117,6 +117,9 @@
     "applications": "{{count}} candidatures",
     "deadline": "Date limite : {{date}}"
   },
+  "aria": {
+    "content_tabs": "Explore content tabs"
+  },
   "tabs": {
     "all": "Tout",
     "for_you": "Pour Vous",

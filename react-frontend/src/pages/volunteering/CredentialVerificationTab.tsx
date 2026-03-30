@@ -523,7 +523,7 @@ export function CredentialVerificationTab() {
                         setSelectedFile(null);
                         if (fileInputRef.current) fileInputRef.current.value = '';
                       }}
-                      aria-label="Remove selected file"
+                      aria-label={t('credentials.aria_remove_file', 'Remove selected file')}
                     >
                       <Trash2 className="w-4 h-4" />
                     </Button>
@@ -541,7 +541,7 @@ export function CredentialVerificationTab() {
                   accept=".pdf,.jpg,.jpeg,.png,.webp"
                   onChange={handleFileChange}
                   className={selectedFile ? 'hidden' : 'absolute inset-0 w-full h-full opacity-0 cursor-pointer'}
-                  aria-label="Upload credential document"
+                  aria-label={t('credentials.aria_upload_document', 'Upload credential document')}
                 />
               </div>
             </div>

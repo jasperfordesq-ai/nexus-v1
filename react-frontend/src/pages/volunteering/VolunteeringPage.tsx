@@ -232,7 +232,7 @@ export function VolunteeringPage() {
       </div>
 
       {/* Tabs */}
-      <div className="flex gap-2 flex-wrap" role="tablist" aria-label="Volunteering sections">
+      <div className="flex gap-2 flex-wrap" role="tablist" aria-label={t('aria.volunteering_sections', 'Volunteering sections')}>
         <Button
           role="tab"
           id="vol-tab-opportunities"

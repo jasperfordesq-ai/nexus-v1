@@ -14,7 +14,14 @@
     "tab_badges": "Badge",
     "tab_challenges": "Sfide",
     "tab_collections": "Collezioni",
+    "tab_journeys": "Journeys",
+    "tab_engagement": "Engagement",
     "tab_shop": "Negozio XP",
+    "engagement": {
+      "title": "Monthly Engagement",
+      "months_active": "{{count}} of 12 months",
+      "description": "Months where you completed at least one meaningful activity (exchange, listing, review, or volunteer hours)."
+    },
     "filter_by_type": "Filtra per tipo",
     "filter_badges_aria": "Filtra badge per tipo",
     "all_types": "Tutti i tipi",
@@ -26,6 +33,7 @@
     "locked": "Bloccato",
     "daily_reward": {
       "title": "Ricompensa giornaliera",
+      "loading": "Caricamento ricompensa giornaliera",
       "come_back_tomorrow": "Torni domani per {{xp}} XP!",
       "day_streak": "Serie di {{count}} giorni",
       "claim_today": "Reclami {{xp}} XP oggi!",
@@ -36,8 +44,7 @@
       "claimed_message": "Ha guadagnato {{xp}} XP!",
       "claim_failed": "Reclamo fallito",
       "claim_failed_desc": "Impossibile reclamare la ricompensa giornaliera.",
-      "claim_error": "Si è verificato un errore. La preghiamo di riprovare.",
-      "loading": "Caricamento ricompensa giornaliera"
+      "claim_error": "Si è verificato un errore. La preghiamo di riprovare."
     },
     "challenges": {
       "active_challenges": "Sfide attive",
@@ -81,6 +88,7 @@
       "load_failed": "Caricamento fallito",
       "load_failed_desc": "Impossibile caricare il negozio XP."
     },
+    "loading": "Caricamento traguardi",
     "showcase": {
       "manage_title": "Gestisca la vetrina badge",
       "select_badges": "Selezioni fino a 5 badge da mostrare sul Suo profilo. ({{count}}/5 selezionati)",
@@ -95,12 +103,12 @@
       "save_failed_desc": "Impossibile aggiornare la vetrina.",
       "save_error": "Si è verificato un errore."
     },
-    "loading": "Caricamento traguardi",
     "load_error": "Impossibile caricare i risultati. Riprova."
   },
   "goals": {
     "page_title": "Obiettivi",
     "title": "Obiettivi",
+    "loading": "Caricamento obiettivi",
     "subtitle": "Definisca obiettivi e segua i Suoi progressi",
     "new_goal": "Nuovo obiettivo",
     "from_template": "Da modello",
@@ -179,15 +187,23 @@
       "progress_failed": "Impossibile aggiornare i progressi",
       "buddy_joined": "Ora Lei è un compagno!",
       "buddy_failed": "Impossibile diventare compagno"
-    },
-    "loading": "Caricamento obiettivi"
+    }
   },
   "leaderboard": {
     "page_title": "Classifica",
     "title": "Classifica",
     "subtitle": "Scopra chi guida la comunità",
+    "subtitle_redesign": "See how our community is growing together",
+    "tabs_aria": "Community views",
+    "tab": {
+      "community": "Community Impact",
+      "journey": "My Journey",
+      "spotlight": "Spotlight",
+      "competitive": "Most Active"
+    },
     "unable_to_load": "Impossibile caricare la classifica",
     "try_again": "Riprovi",
+    "loading": "Caricamento classifica",
     "empty_title": "Nessuna classifica ancora",
     "empty_description": "Inizi a guadagnare {{type}} per apparire nella classifica!",
     "your_rank": "La Sua posizione: #{{position}} su {{total}} membri",
@@ -200,7 +216,8 @@
     "type": {
       "xp": "XP",
       "volunteer_hours": "Ore di volontariato",
-      "credits_earned": "Crediti guadagnati"
+      "credits_earned": "Crediti guadagnati",
+      "nexus_score": "NexusScore"
     },
     "period": {
       "all": "Da sempre",
@@ -219,16 +236,15 @@
       "hide_history": "Nascondi cronologia stagioni",
       "history": "Cronologia stagioni",
       "active": "Attiva",
+      "loading": "Caricamento stagione",
       "load_failed": "Caricamento fallito",
-      "load_failed_desc": "Impossibile caricare la cronologia delle stagioni.",
-      "loading": "Caricamento stagione"
+      "load_failed_desc": "Impossibile caricare la cronologia delle stagioni."
     },
     "season_unavailable": "Dati della stagione non disponibili",
     "season_unavailable_desc": "Impossibile caricare le informazioni sulla stagione. Le classifiche qui sotto sono ancora disponibili.",
     "session_expired": "La sessione è scaduta. Effettua nuovamente l'accesso.",
     "load_error": "Impossibile caricare la classifica. Riprova.",
-    "type_nexus_score": "NexusScore",
-    "loading": "Caricamento classifica"
+    "type_nexus_score": "NexusScore"
   },
   "community": {
     "total_hours": "Ore totali scambiate",

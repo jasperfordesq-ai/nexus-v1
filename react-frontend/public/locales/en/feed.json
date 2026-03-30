@@ -53,8 +53,8 @@
     "share_failed": "Failed to share post"
   },
   "realtime": {
-    "new_post_singular": "1 new post",
-    "new_posts_plural": "{{count}} new posts"
+    "new_posts_one": "1 new post",
+    "new_posts_other": "{{count}} new posts"
   },
   "compose": {
     "create_title": "Create {{type}}",
@@ -132,8 +132,6 @@
     "ai_tooltip": "Generate description with AI",
     "ai_button": "AI Assist",
     "sdg_label": "UN Sustainable Development Goals (optional)",
-    "sdg_selected": "{{count}} goal selected",
-    "sdg_selected_plural": "{{count}} goals selected",
     "draft_restored": "Draft restored",
     "draft_cleared": "Draft cleared",
     "char_count": "{{current}}/{{max}}",
@@ -194,7 +192,9 @@
     "alt_text_label": "Alt text for image",
     "media_rejected": "{{count}} file(s) skipped (wrong type or too large)",
     "media_compression_failed": "{{count}} image(s) failed to process",
-    "media_upload_error": "Failed to process images"
+    "media_upload_error": "Failed to process images",
+    "sdg_selected_one": "{{count}} goal selected",
+    "sdg_selected_other": "{{count}} goals selected"
   },
   "card": {
     "edited": "edited",
@@ -295,8 +295,8 @@
   "trending": {
     "title": "Trending",
     "view_all": "View all hashtags",
-    "post_count": "{{count}} post",
-    "post_count_plural": "{{count}} posts"
+    "post_count_one": "{{count}} post",
+    "post_count_other": "{{count}} posts"
   },
   "sidebar": {
     "profile": {

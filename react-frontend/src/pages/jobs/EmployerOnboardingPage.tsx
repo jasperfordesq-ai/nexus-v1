@@ -223,7 +223,7 @@ export function EmployerOnboardingPage() {
           value={progressPercentage}
           color="primary"
           className="max-w-full"
-          aria-label="Onboarding progress"
+          aria-label={t('onboarding.aria_progress', 'Onboarding progress')}
         />
       </GlassCard>
 

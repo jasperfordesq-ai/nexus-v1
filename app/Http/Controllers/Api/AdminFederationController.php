@@ -212,7 +212,7 @@ class AdminFederationController extends BaseApiController
                 'settings' => array_diff_key($federationSettings, ['federation_enabled' => '']),
             ]);
         } catch (\Exception $e) {
-            return $this->respondWithError('UPDATE_FAILED', 'Failed to update federation settings', null, 500);
+            return $this->respondWithError('UPDATE_FAILED', __('api.update_failed', ['resource' => 'federation settings']), null, 500);
         }
     }
 
@@ -242,13 +242,13 @@ class AdminFederationController extends BaseApiController
         $tenantId = TenantContext::getId();
         $id = (int) $id;
 
-        if (!$id || !$this->tableExists('federation_partnerships')) { return $this->respondWithError('NOT_FOUND', 'Partnership not found', null, 404); }
+        if (!$id || !$this->tableExists('federation_partnerships')) { return $this->respondWithError('NOT_FOUND', __('api.partnership_not_found'), null, 404); }
 
         try {
             $partner = DB::selectOne("SELECT * FROM federation_partnerships WHERE id = ? AND partner_tenant_id = ?", [$id, $tenantId]);
-            if (!$partner) { return $this->respondWithError('NOT_FOUND', 'Partnership not found', null, 404); }
+            if (!$partner) { return $this->respondWithError('NOT_FOUND', __('api.partnership_not_found'), null, 404); }
             if ($partner->status !== 'pending') {
-                return $this->respondWithError('INVALID_STATE', 'Only pending partnerships can be approved (current: ' . $partner->status . ')', null, 409);
+                return $this->respondWithError('INVALID_STATE', __('api.only_pending_can_be_approved', ['status' => $partner->status]), null, 409);
             }
             DB::update("UPDATE federation_partnerships SET status = 'active', updated_at = NOW() WHERE id = ? AND partner_tenant_id = ?", [$id, $tenantId]);
 
@@ -261,8 +261,8 @@ class AdminFederationController extends BaseApiController
                 'federation_partnership_approved'
             );
 
-            return $this->respondWithData(['message' => 'Partnership approved']);
-        } catch (\Exception $e) { return $this->respondWithError('UPDATE_FAILED', 'Failed to approve partnership'); }
+            return $this->respondWithData(['message' => __('api.partnership_approved')]);
+        } catch (\Exception $e) { return $this->respondWithError('UPDATE_FAILED', __('api.approve_failed', ['resource' => 'partnership'])); }
     }
 
     public function rejectPartnership($id): JsonResponse
@@ -271,13 +271,13 @@ class AdminFederationController extends BaseApiController
         $tenantId = TenantContext::getId();
         $id = (int) $id;
 
-        if (!$id || !$this->tableExists('federation_partnerships')) { return $this->respondWithError('NOT_FOUND', 'Partnership not found', null, 404); }
+        if (!$id || !$this->tableExists('federation_partnerships')) { return $this->respondWithError('NOT_FOUND', __('api.partnership_not_found'), null, 404); }
 
         try {
             $partner = DB::selectOne("SELECT * FROM federation_partnerships WHERE id = ? AND (tenant_id = ? OR partner_tenant_id = ?)", [$id, $tenantId, $tenantId]);
-            if (!$partner) { return $this->respondWithError('NOT_FOUND', 'Partnership not found', null, 404); }
+            if (!$partner) { return $this->respondWithError('NOT_FOUND', __('api.partnership_not_found'), null, 404); }
             if ($partner->status !== 'pending') {
-                return $this->respondWithError('INVALID_STATE', 'Only pending partnerships can be rejected (current: ' . $partner->status . ')', null, 409);
+                return $this->respondWithError('INVALID_STATE', __('api.only_pending_can_be_rejected', ['status' => $partner->status]), null, 409);
             }
             DB::update("UPDATE federation_partnerships SET status = 'terminated', updated_at = NOW() WHERE id = ? AND (tenant_id = ? OR partner_tenant_id = ?)", [$id, $tenantId, $tenantId]);
 
@@ -292,8 +292,8 @@ class AdminFederationController extends BaseApiController
                 'federation_partnership_rejected'
             );
 
-            return $this->respondWithData(['message' => 'Partnership rejected']);
-        } catch (\Exception $e) { return $this->respondWithError('UPDATE_FAILED', 'Failed to reject partnership'); }
+            return $this->respondWithData(['message' => __('api.partnership_rejected')]);
+        } catch (\Exception $e) { return $this->respondWithError('UPDATE_FAILED', __('api.reject_failed', ['resource' => 'partnership'])); }
     }
 
     public function terminatePartnership($id): JsonResponse
@@ -302,13 +302,13 @@ class AdminFederationController extends BaseApiController
         $tenantId = TenantContext::getId();
         $id = (int) $id;
 
-        if (!$id || !$this->tableExists('federation_partnerships')) { return $this->respondWithError('NOT_FOUND', 'Partnership not found', null, 404); }
+        if (!$id || !$this->tableExists('federation_partnerships')) { return $this->respondWithError('NOT_FOUND', __('api.partnership_not_found'), null, 404); }
 
         try {
             $partner = DB::selectOne("SELECT * FROM federation_partnerships WHERE id = ? AND (tenant_id = ? OR partner_tenant_id = ?)", [$id, $tenantId, $tenantId]);
-            if (!$partner) { return $this->respondWithError('NOT_FOUND', 'Partnership not found', null, 404); }
+            if (!$partner) { return $this->respondWithError('NOT_FOUND', __('api.partnership_not_found'), null, 404); }
             if (!in_array($partner->status, ['active', 'suspended'], true)) {
-                return $this->respondWithError('INVALID_STATE', 'Only active or suspended partnerships can be terminated (current: ' . $partner->status . ')', null, 409);
+                return $this->respondWithError('INVALID_STATE', __('api.only_active_can_be_terminated', ['status' => $partner->status]), null, 409);
             }
             DB::update("UPDATE federation_partnerships SET status = 'terminated', updated_at = NOW() WHERE id = ? AND (tenant_id = ? OR partner_tenant_id = ?)", [$id, $tenantId, $tenantId]);
 
@@ -323,8 +323,8 @@ class AdminFederationController extends BaseApiController
                 'federation_partnership_terminated'
             );
 
-            return $this->respondWithData(['message' => 'Partnership terminated']);
-        } catch (\Exception $e) { return $this->respondWithError('UPDATE_FAILED', 'Failed to terminate partnership'); }
+            return $this->respondWithData(['message' => __('api.partnership_terminated')]);
+        } catch (\Exception $e) { return $this->respondWithError('UPDATE_FAILED', __('api.update_failed', ['resource' => 'partnership'])); }
     }
 
     public function requestPartnership(): JsonResponse
@@ -336,8 +336,8 @@ class AdminFederationController extends BaseApiController
         $targetTenantId = (int)($input['target_tenant_id'] ?? 0);
         $notes = isset($input['notes']) ? substr(trim($input['notes']), 0, 1000) : null;
 
-        if ($targetTenantId <= 0) { return $this->respondWithError('VALIDATION_ERROR', 'Target community ID is required', 'target_tenant_id'); }
-        if ($targetTenantId === $tenantId) { return $this->respondWithError('VALIDATION_ERROR', 'Cannot partner with your own community'); }
+        if ($targetTenantId <= 0) { return $this->respondWithError('VALIDATION_ERROR', __('api.target_community_required'), 'target_tenant_id'); }
+        if ($targetTenantId === $tenantId) { return $this->respondWithError('VALIDATION_ERROR', __('api.cannot_partner_with_self')); }
 
         try {
             $result = $this->federationPartnershipService->requestPartnership($tenantId, $targetTenantId, $userId, FederationPartnershipService::LEVEL_DISCOVERY, $notes);
@@ -354,13 +354,13 @@ class AdminFederationController extends BaseApiController
         $id = (int) $id;
 
         if (!$id || !$this->tableExists('federation_partnerships')) {
-            return $this->respondWithError('NOT_FOUND', 'Partnership not found', null, 404);
+            return $this->respondWithError('NOT_FOUND', __('api.partnership_not_found'), null, 404);
         }
 
         try {
             $partnership = $this->federationPartnershipService->getPartnershipById($id, $tenantId);
             if (!$partnership) {
-                return $this->respondWithError('NOT_FOUND', 'Partnership not found', null, 404);
+                return $this->respondWithError('NOT_FOUND', __('api.partnership_not_found'), null, 404);
             }
 
             $isInitiator = (int) $partnership['tenant_id'] === $tenantId;
@@ -389,7 +389,7 @@ class AdminFederationController extends BaseApiController
         $message = isset($input['message']) ? substr(trim($input['message']), 0, 1000) : null;
 
         if ($level < 1 || $level > 4) {
-            return $this->respondWithError('VALIDATION_ERROR', 'Level must be between 1 and 4', 'level');
+            return $this->respondWithError('VALIDATION_ERROR', __('api.level_must_be_1_to_4'), 'level');
         }
 
         try {
@@ -439,7 +439,7 @@ class AdminFederationController extends BaseApiController
                 [$id, $tenantId, $tenantId]
             );
             if (!$partnership) {
-                return $this->respondWithError('NOT_FOUND', 'Partnership not found', null, 404);
+                return $this->respondWithError('NOT_FOUND', __('api.partnership_not_found'), null, 404);
             }
 
             $t1 = (int) $partnership->tenant_id;
@@ -478,7 +478,7 @@ class AdminFederationController extends BaseApiController
                 [$id, $tenantId, $tenantId]
             );
             if (!$partnership) {
-                return $this->respondWithError('NOT_FOUND', 'Partnership not found', null, 404);
+                return $this->respondWithError('NOT_FOUND', __('api.partnership_not_found'), null, 404);
             }
 
             $t1 = (int) $partnership->tenant_id;
@@ -574,7 +574,7 @@ class AdminFederationController extends BaseApiController
             try { app(\App\Services\RedisCache::class)->delete('tenant_bootstrap', $tenantId); } catch (\Exception $e) {}
             return $this->respondWithData($config['federation_profile']);
         } catch (\Exception $e) {
-            return $this->respondWithError('UPDATE_FAILED', 'Failed to update federation profile', null, 500);
+            return $this->respondWithError('UPDATE_FAILED', __('api.update_failed', ['resource' => 'federation profile']), null, 500);
         }
     }
 

@@ -50,7 +50,7 @@ $matchScore = (int)($match['match_score'] ?? 75);
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="x-apple-disable-message-reformatting">
     <meta name="format-detection" content="telephone=no,address=no,email=no,date=no,url=no">
-    <title>Mutual Match Found!</title>
+    <title><?= __('emails.match_mutual.title') ?></title>
     <!--[if mso]>
     <noscript>
         <xml>
@@ -123,9 +123,9 @@ $matchScore = (int)($match['match_score'] ?? 75);
                             <div style="width: 80px; height: 80px; margin: 0 auto 20px; background: rgba(255,255,255,0.2); border-radius: 50%; display: flex; align-items: center; justify-content: center;">
                                 <span style="font-size: 42px; line-height: 1;">&#129309;</span>
                             </div>
-                            <h1 style="margin: 0; font-size: 32px; font-weight: 800; color: #ffffff; letter-spacing: -0.5px;">Mutual Match!</h1>
+                            <h1 style="margin: 0; font-size: 32px; font-weight: 800; color: #ffffff; letter-spacing: -0.5px;"><?= __('emails.match_mutual.heading') ?></h1>
                             <p style="margin: 12px 0 0; font-size: 18px; color: rgba(255,255,255,0.95); font-weight: 500;">
-                                A Perfect Exchange Opportunity
+                                <?= __('emails.match_mutual.subheading') ?>
                             </p>
                         </td>
                     </tr>
@@ -139,10 +139,10 @@ $matchScore = (int)($match['match_score'] ?? 75);
                                 <tr>
                                     <td style="padding: 35px 40px 20px;" class="mobile-padding">
                                         <p style="margin: 0; font-size: 18px; line-height: 1.6; color: <?= $textColor ?>;" class="text-primary">
-                                            Hi <?= htmlspecialchars($userName) ?>,
+                                            <?= __('emails.match_mutual.greeting', ['name' => htmlspecialchars($userName)]) ?>
                                         </p>
                                         <p style="margin: 15px 0 0; font-size: 16px; line-height: 1.7; color: <?= $textMuted ?>;" class="text-secondary">
-                                            We found a <strong style="color: <?= $primaryColor ?>;">mutual exchange opportunity</strong> with <strong><?= htmlspecialchars($posterName) ?></strong>. You can both help each other - this is a win-win!
+                                            <?= __('emails.match_mutual.intro', ['color' => $primaryColor, 'partner' => htmlspecialchars($posterName)]) ?>
                                         </p>
                                     </td>
                                 </tr>
@@ -153,7 +153,7 @@ $matchScore = (int)($match['match_score'] ?? 75);
                                 <tr>
                                     <td style="padding: 0 40px 25px; text-align: center;" class="mobile-padding">
                                         <div style="display: inline-block; background: linear-gradient(135deg, <?= $primaryColor ?>, <?= $accentColor ?>); color: white; padding: 12px 28px; border-radius: 30px; font-weight: 800; font-size: 18px; box-shadow: 0 4px 14px rgba(16, 185, 129, 0.4);">
-                                            &#129309; <?= $matchScore ?>% Match
+                                            &#129309; <?= $matchScore ?>% <?= __('emails.match_mutual.match_label') ?>
                                         </div>
                                     </td>
                                 </tr>
@@ -168,7 +168,7 @@ $matchScore = (int)($match['match_score'] ?? 75);
                                         <div class="exchange-card" style="background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%); border: 2px solid <?= $primaryColor ?>; border-radius: 16px; padding: 24px; margin-bottom: 12px; position: relative;">
                                             <!-- Arrow badge -->
                                             <div style="position: absolute; top: -12px; left: 24px; background: <?= $primaryColor ?>; color: white; padding: 4px 12px; border-radius: 12px; font-size: 12px; font-weight: 700;">
-                                                THEY OFFER
+                                                <?= __('emails.match_mutual.they_offer') ?>
                                             </div>
                                             <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%">
                                                 <tr>
@@ -179,7 +179,7 @@ $matchScore = (int)($match['match_score'] ?? 75);
                                                     </td>
                                                     <td style="padding-left: 16px; vertical-align: middle;">
                                                         <p style="margin: 0 0 6px; font-size: 13px; color: <?= $textMuted ?>; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">
-                                                            <?= htmlspecialchars($posterName) ?> can help you with
+                                                            <?= __('emails.match_mutual.can_help_you', ['name' => htmlspecialchars($posterName)]) ?>
                                                         </p>
                                                         <p style="margin: 0; font-size: 20px; color: <?= $primaryDark ?>; font-weight: 700; line-height: 1.3;">
                                                             <?= htmlspecialchars($theyOffer) ?>
@@ -200,7 +200,7 @@ $matchScore = (int)($match['match_score'] ?? 75);
                                         <div class="exchange-card" style="background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%); border: 2px solid <?= $blueColor ?>; border-radius: 16px; padding: 24px; position: relative;">
                                             <!-- Arrow badge -->
                                             <div style="position: absolute; top: -12px; left: 24px; background: <?= $blueColor ?>; color: white; padding: 4px 12px; border-radius: 12px; font-size: 12px; font-weight: 700;">
-                                                YOU OFFER
+                                                <?= __('emails.match_mutual.you_offer') ?>
                                             </div>
                                             <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%">
                                                 <tr>
@@ -211,7 +211,7 @@ $matchScore = (int)($match['match_score'] ?? 75);
                                                     </td>
                                                     <td style="padding-left: 16px; vertical-align: middle;">
                                                         <p style="margin: 0 0 6px; font-size: 13px; color: <?= $textMuted ?>; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">
-                                                            You can help <?= htmlspecialchars($posterName) ?> with
+                                                            <?= __('emails.match_mutual.you_can_help', ['name' => htmlspecialchars($posterName)]) ?>
                                                         </p>
                                                         <p style="margin: 0; font-size: 20px; color: #1d4ed8; font-weight: 700; line-height: 1.3;">
                                                             <?= htmlspecialchars($youOffer) ?>
@@ -231,7 +231,7 @@ $matchScore = (int)($match['match_score'] ?? 75);
                                     <td style="padding: 0 40px 30px;" class="mobile-padding">
                                         <div class="info-box" style="background: linear-gradient(135deg, #fefce8 0%, #fef9c3 100%); border: 1px solid #fde047; border-radius: 12px; padding: 18px 20px; text-align: center;">
                                             <p style="margin: 0; font-size: 15px; color: <?= $textColor ?>; line-height: 1.6;">
-                                                &#128161; <strong style="color: #ca8a04;">Mutual matches are rare!</strong> This is a win-win opportunity where both parties benefit from the exchange.
+                                                &#128161; <strong style="color: #ca8a04;"><?= __('emails.match_mutual.rare_notice') ?></strong>
                                             </p>
                                         </div>
                                     </td>
@@ -245,7 +245,7 @@ $matchScore = (int)($match['match_score'] ?? 75);
                                         <table role="presentation" cellspacing="0" cellpadding="0" border="0" style="margin: 0 auto;">
                                             <tr>
                                                 <td class="button-td" style="border-radius: 12px; background: linear-gradient(135deg, <?= $primaryColor ?> 0%, <?= $accentColor ?> 100%); box-shadow: 0 4px 14px rgba(16, 185, 129, 0.4);">
-                                                    <a href="<?= $listingUrl ?>" style="display: inline-block; padding: 18px 44px; font-size: 17px; font-weight: 700; color: #ffffff; text-decoration: none; border-radius: 12px;">Connect with <?= htmlspecialchars($posterName) ?> &#8594;</a>
+                                                    <a href="<?= $listingUrl ?>" style="display: inline-block; padding: 18px 44px; font-size: 17px; font-weight: 700; color: #ffffff; text-decoration: none; border-radius: 12px;"><?= __('emails.match_mutual.connect_with', ['name' => htmlspecialchars($posterName)]) ?> &#8594;</a>
                                                 </td>
                                             </tr>
                                         </table>
@@ -258,7 +258,7 @@ $matchScore = (int)($match['match_score'] ?? 75);
                                 <tr>
                                     <td style="padding: 0 40px 35px; text-align: center;" class="mobile-padding">
                                         <p style="margin: 0; font-size: 14px; color: <?= $textMuted ?>;" class="text-secondary">
-                                            or <a href="<?= $matchesUrl ?>" style="color: <?= $primaryColor ?>; font-weight: 600;">view all mutual matches</a>
+                                            or <a href="<?= $matchesUrl ?>" style="color: <?= $primaryColor ?>; font-weight: 600;"><?= __('emails.match_mutual.view_all_mutual') ?></a>
                                         </p>
                                     </td>
                                 </tr>
@@ -281,13 +281,13 @@ $matchScore = (int)($match['match_score'] ?? 75);
                                 <tr>
                                     <td style="text-align: center; padding-bottom: 15px;">
                                         <p style="margin: 0; font-size: 13px; color: <?= $textMuted ?>; line-height: 1.6;">
-                                            You're receiving this because you enabled mutual match notifications.
+                                            <?= __('emails.match_mutual.receiving_notice') ?>
                                         </p>
                                     </td>
                                 </tr>
                                 <tr>
                                     <td style="text-align: center;">
-                                        <a href="<?= $settingsUrl ?>" style="color: <?= $textMuted ?>; text-decoration: underline; font-size: 13px;">Manage notification preferences</a>
+                                        <a href="<?= $settingsUrl ?>" style="color: <?= $textMuted ?>; text-decoration: underline; font-size: 13px;"><?= __('emails.match_mutual.manage_preferences') ?></a>
                                     </td>
                                 </tr>
                             </table>
@@ -301,7 +301,7 @@ $matchScore = (int)($match['match_score'] ?? 75);
                     <tr>
                         <td style="padding: 20px; text-align: center;">
                             <p style="margin: 0; font-size: 12px; color: <?= $textMuted ?>;">
-                                &copy; <?= $year ?> <?= htmlspecialchars($tenantName) ?>. All rights reserved.
+                                &copy; <?= $year ?> <?= htmlspecialchars($tenantName) ?>. <?= __('emails.footer.all_rights_reserved') ?>
                             </p>
                         </td>
                     </tr>

@@ -927,7 +927,7 @@ export function StoryCreator({ onClose, onCreated }: StoryCreatorProps) {
               <Textarea
                 value={textContent}
                 onValueChange={setTextContent}
-                placeholder="What's on your mind?"
+                placeholder={t('creator.compose_placeholder', "What's on your mind?")}
                 variant="bordered"
                 maxLength={500}
                 minRows={2}

@@ -9,6 +9,7 @@ import {
   Card, CardBody, CardHeader, Button, Input, Select, SelectItem, Switch, Divider,
 } from '@heroui/react';
 import { Save, ArrowLeft, ArrowRightLeft, Crown } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { usePageTitle } from '@/hooks';
 import { useTenant, useToast } from '@/contexts';
 import { adminSuper } from '../../api/adminApi';
@@ -16,6 +17,7 @@ import { PageHeader } from '../../components';
 import type { SuperAdminUserDetail, SuperAdminTenant } from '../../api/types';
 
 export function SuperUserForm() {
+  const { t } = useTranslation('admin');
   const { id } = useParams();
   const isEditing = !!id;
   usePageTitle(isEditing ? 'Super Admin - Edit User' : 'Super Admin - Create User');
@@ -173,9 +175,9 @@ export function SuperUserForm() {
                 onValueChange={(v) => update('password', v)} />
               <Select label="Role" selectedKeys={[form.role]}
                 onSelectionChange={(keys) => update('role', Array.from(keys)[0])}>
-                <SelectItem key="member">Member</SelectItem>
-                <SelectItem key="admin">Admin</SelectItem>
-                <SelectItem key="tenant_admin">Tenant Admin</SelectItem>
+                <SelectItem key="member">{t('super_user_form.role_member')}</SelectItem>
+                <SelectItem key="admin">{t('super_user_form.role_admin')}</SelectItem>
+                <SelectItem key="tenant_admin">{t('super_user_form.role_tenant_admin')}</SelectItem>
               </Select>
               <div className="grid grid-cols-2 gap-4">
                 <Input label="Location" value={form.location} onValueChange={(v) => update('location', v)} />
@@ -226,9 +228,9 @@ export function SuperUserForm() {
                     onValueChange={(v) => update('email', v)} />
                   <Select label="Role" selectedKeys={[form.role]}
                     onSelectionChange={(keys) => update('role', Array.from(keys)[0])}>
-                    <SelectItem key="member">Member</SelectItem>
-                    <SelectItem key="admin">Admin</SelectItem>
-                    <SelectItem key="tenant_admin">Tenant Admin</SelectItem>
+                    <SelectItem key="member">{t('super_user_form.role_member')}</SelectItem>
+                    <SelectItem key="admin">{t('super_user_form.role_admin')}</SelectItem>
+                    <SelectItem key="tenant_admin">{t('super_user_form.role_tenant_admin')}</SelectItem>
                   </Select>
                   <div className="grid grid-cols-2 gap-4">
                     <Input label="Location" value={form.location} onValueChange={(v) => update('location', v)} />
@@ -261,7 +263,7 @@ export function SuperUserForm() {
                 </div>
                 <Select
                   label="Target Tenant"
-                  placeholder="Select a tenant"
+                  placeholder={t('super_user_form.select_tenant_placeholder')}
                   selectedKeys={moveTargetTenant ? [moveTargetTenant] : []}
                   onSelectionChange={(keys) => setMoveTargetTenant(String(Array.from(keys)[0] || ''))}
                 >
@@ -304,7 +306,7 @@ export function SuperUserForm() {
                 </div>
                 <Select
                   label="Target Hub Tenant"
-                  placeholder="Select a hub tenant"
+                  placeholder={t('super_user_form.select_hub_tenant_placeholder')}
                   selectedKeys={promoteTargetTenant ? [promoteTargetTenant] : []}
                   onSelectionChange={(keys) => setPromoteTargetTenant(String(Array.from(keys)[0] || ''))}
                 >

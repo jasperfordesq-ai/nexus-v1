@@ -244,6 +244,11 @@
     "discussion_factor_2_description": "The give-and-receive model overcomes the stigma of \"needing help\" and drives sustained participation compared to traditional volunteering.",
     "discussion_factor_3_title": "Digital Platform Efficiency",
     "discussion_factor_3_description": "The online matching platform reduces coordination overhead and enables members to arrange exchanges independently, increasing scalability.",
+    "aria": {
+      "activity_statistics": "TBI activity statistics",
+      "sroi_breakdown": "SROI breakdown",
+      "recommendations": "Recommendations"
+    },
     "rec_header": "Recommendation",
     "rec_priority_header": "Priority",
     "rec_0": "Secure multi-year core funding to ensure programme continuity and reduce annual grant dependency.",
@@ -370,6 +375,12 @@
     "badge_launch": "Launch",
     "badge_ongoing": "Ongoing",
     "badge_pitch": "Pitch",
+    "aria": {
+      "pillar_1_initiatives": "Strategic pillar 1 initiatives",
+      "pillar_2_initiatives": "Strategic pillar 2 initiatives",
+      "year_1_roadmap": "Year 1 roadmap",
+      "risk_and_mitigation": "Risk and mitigation"
+    },
     "risk_header": "Risk",
     "likelihood_header": "Likelihood",
     "impact_header": "Impact",

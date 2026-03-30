@@ -151,6 +151,7 @@ export function SkillSelector({
 }) {
   const toast = useToast();
   const { t } = useTranslation('settings');
+  const { t: tc } = useTranslation('common');
   const { isOpen, onOpen, onClose } = useDisclosure();
 
   const [categories, setCategories] = useState<SkillCategory[]>([]);
@@ -372,7 +373,7 @@ export function SkillSelector({
             {!isLoadingCategories && categories.length > 0 && (
               <Select
                 label="Category (optional)"
-                placeholder="Select a category"
+                placeholder={tc('aria.select_category')}
                 selectedKeys={selectedCategory ? [selectedCategory] : []}
                 onChange={(e) => setSelectedCategory(e.target.value)}
                 classNames={{
@@ -398,10 +399,10 @@ export function SkillSelector({
                 value: 'text-theme-primary',
               }}
             >
-              <SelectItem key="beginner">Beginner</SelectItem>
-              <SelectItem key="intermediate">Intermediate</SelectItem>
-              <SelectItem key="advanced">Advanced</SelectItem>
-              <SelectItem key="expert">Expert</SelectItem>
+              <SelectItem key="beginner">{tc('skills.proficiency.beginner')}</SelectItem>
+              <SelectItem key="intermediate">{tc('skills.proficiency.intermediate')}</SelectItem>
+              <SelectItem key="advanced">{tc('skills.proficiency.advanced')}</SelectItem>
+              <SelectItem key="expert">{tc('skills.proficiency.expert')}</SelectItem>
             </Select>
 
             {/* Selected skill preview */}

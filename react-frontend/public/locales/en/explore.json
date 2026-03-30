@@ -117,6 +117,9 @@
     "applications": "{{count}} applied",
     "deadline": "Deadline: {{date}}"
   },
+  "aria": {
+    "content_tabs": "Explore content tabs"
+  },
   "tabs": {
     "all": "All",
     "for_you": "For You",

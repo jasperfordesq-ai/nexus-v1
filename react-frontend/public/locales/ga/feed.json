@@ -53,8 +53,8 @@
     "share_failed": "Theip ar an bpostáil a roinnt"
   },
   "realtime": {
-    "new_post_singular": "1 postáil nua",
-    "new_posts_plural": "{{count}} postáil nua"
+    "new_posts_one": "1 postáil nua",
+    "new_posts_other": "{{count}} postáil nua"
   },
   "compose": {
     "create_title": "Cruthaigh {{type}}",
@@ -132,8 +132,6 @@
     "ai_tooltip": "Gin cur síos le AI",
     "ai_button": "Cúnamh AI",
     "sdg_label": "Spriocanna Forbartha Inbhuanaithe na NA (roghnach)",
-    "sdg_selected": "{{count}} sprioc roghnaithe",
-    "sdg_selected_plural": "{{count}} sprioc roghnaithe",
     "draft_restored": "Dréacht athchóirithe",
     "draft_cleared": "Dréacht glanta",
     "char_count": "{{current}}/{{max}}",
@@ -194,7 +192,9 @@
     "media_upload_error": "Theip ar íomhánna a phróiseáil",
     "template_button": "Teimpléad",
     "media_drag_drop": "Cliceáil nó tarraing grianghraif anseo",
-    "media_formats": "JPEG, PNG, GIF, WebP suas le 10MB an ceann"
+    "media_formats": "JPEG, PNG, GIF, WebP suas le 10MB an ceann",
+    "sdg_selected_one": "{{count}} sprioc roghnaithe",
+    "sdg_selected_other": "{{count}} sprioc roghnaithe"
   },
   "card": {
     "edited": "curtha in eagar",
@@ -295,8 +295,8 @@
   "trending": {
     "title": "Ag Treocht",
     "view_all": "Féach ar gach haischlib",
-    "post_count": "{{count}} postáil",
-    "post_count_plural": "{{count}} postálacha"
+    "post_count_one": "{{count}} postáil",
+    "post_count_other": "{{count}} postálacha"
   },
   "sidebar": {
     "profile": {

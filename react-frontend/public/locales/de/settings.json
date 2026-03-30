@@ -262,6 +262,7 @@
     "warning": "Warnung: Diese Aktion kann nicht rückgängig gemacht werden",
     "warning_desc": "Alle Ihre Daten, einschließlich Anzeigen, Nachrichten und Transaktionsverlauf, werden dauerhaft gelöscht.",
     "type_confirm": "Geben Sie DELETE ein, um zu bestätigen:",
+    "placeholder": "DELETE",
     "submit": "Mein Konto löschen",
     "aria_label": "Geben Sie DELETE ein"
   },

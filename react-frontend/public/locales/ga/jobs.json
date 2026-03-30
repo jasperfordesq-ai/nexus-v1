@@ -113,7 +113,10 @@
     "action": "Gníomh",
     "target": "Bog go",
     "add": "Cuir Riail Leis",
-    "delete": "Scrios"
+    "delete": "Scrios",
+    "action_move_stage": "Move stage",
+    "action_auto_reject": "Auto-reject",
+    "action_notify_me": "Notify me"
   },
   "employer": {
     "page_title": "Próifíl Fostóra",
@@ -219,7 +222,10 @@
     "form_type_label": "Cineál Íocaíochta",
     "form_currency_label": "Airgeadra",
     "form_currency_placeholder": "m.sh. USD, EUR, GBP",
-    "form_negotiable_label": "Tá an tuarastal inshocraithe"
+    "form_negotiable_label": "Tá an tuarastal inshocraithe",
+    "currency_eur": "EUR",
+    "currency_gbp": "GBP",
+    "currency_usd": "USD"
   },
   "my_applications": {
     "title": "Mo Chuid Iarratas",
@@ -816,7 +822,8 @@
     "go_to_jobs": "Téigh chuig Poist",
     "first_time_banner": "An chéad uair ag postáil?",
     "first_time_desc": "Treorófar tú ag ár ndraoi iontráil tríd an gcéad phost a phostáil.",
-    "start_wizard": "Tosaigh Draoi"
+    "start_wizard": "Tosaigh Draoi",
+    "aria_progress": "Onboarding progress"
   },
   "preview": {
     "title": "Réamhamharc Poist",
@@ -868,8 +875,6 @@
   },
   "salary_display": "{{min}} – {{max}}",
   "salary_negotiable": "Insocraithe",
-  "deadline_countdown": "Ag dúnadh i gceann {{count}} lá",
-  "deadline_countdown_plural": "Ag dúnadh i gceann {{count}} lá",
   "deadline_closed": "Dúnta",
   "remote_only": "Cianda Amháin",
   "match_badge": "{{count}}% meaitseáil",
@@ -878,5 +883,10 @@
   "unknown": "Anaithnid",
   "nav": {
     "jobs": "Poist"
-  }
+  },
+  "aria": {
+    "qualification_percentage": "Qualification percentage"
+  },
+  "deadline_countdown_one": "Ag dúnadh i gceann {{count}} lá",
+  "deadline_countdown_other": "Ag dúnadh i gceann {{count}} lá"
 }

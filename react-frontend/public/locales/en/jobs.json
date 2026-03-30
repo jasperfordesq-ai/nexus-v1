@@ -113,7 +113,10 @@
     "action": "Action",
     "target": "Move to",
     "add": "Add Rule",
-    "delete": "Delete"
+    "delete": "Delete",
+    "action_move_stage": "Move stage",
+    "action_auto_reject": "Auto-reject",
+    "action_notify_me": "Notify me"
   },
   "employer": {
     "page_title": "Employer Profile",
@@ -219,7 +222,10 @@
     "form_type_label": "Pay Type",
     "form_currency_label": "Currency",
     "form_currency_placeholder": "e.g. USD, EUR, GBP",
-    "form_negotiable_label": "Salary is negotiable"
+    "form_negotiable_label": "Salary is negotiable",
+    "currency_eur": "EUR",
+    "currency_gbp": "GBP",
+    "currency_usd": "USD"
   },
   "my_applications": {
     "title": "My Applications",
@@ -816,7 +822,8 @@
     "go_to_jobs": "Go to Jobs",
     "first_time_banner": "First time posting?",
     "first_time_desc": "Our onboarding wizard will guide you through posting your first job.",
-    "start_wizard": "Start Wizard"
+    "start_wizard": "Start Wizard",
+    "aria_progress": "Onboarding progress"
   },
   "preview": {
     "title": "Job Preview",
@@ -868,8 +875,6 @@
   },
   "salary_display": "{{min}} – {{max}}",
   "salary_negotiable": "Negotiable",
-  "deadline_countdown": "Closes in {{count}} day",
-  "deadline_countdown_plural": "Closes in {{count}} days",
   "deadline_closed": "Closed",
   "remote_only": "Remote Only",
   "match_badge": "{{count}}% match",
@@ -878,5 +883,10 @@
   "unknown": "Unknown",
   "nav": {
     "jobs": "Jobs"
-  }
+  },
+  "aria": {
+    "qualification_percentage": "Qualification percentage"
+  },
+  "deadline_countdown_one": "Closes in {{count}} day",
+  "deadline_countdown_other": "Closes in {{count}} days"
 }

@@ -12,10 +12,6 @@
   "empty_description_all": "Non ha ancora creato o partecipato ad alcuno scambio di gruppo.",
   "empty_description_filtered": "Nessuno scambio di gruppo corrisponde a questo filtro.",
   "card_aria": "Scambio di gruppo: {{title}} – {{status}}",
-  "participants_count": "{{count}} partecipante",
-  "participants_count_plural": "{{count}} partecipanti",
-  "hours_count": "{{count}} ora",
-  "hours_count_plural": "{{count}} ore",
   "role_organizer": "Organizzato da Lei",
   "role_participant": "Partecipante",
   "tabs_aria": "Filtro di stato degli scambi di gruppo",
@@ -90,7 +86,9 @@
     "search_members_aria": "Cerca membri",
     "add_as_role": "Aggiungi come {{role}}",
     "no_members_found": "Nessun membro trovato corrispondente alla Sua ricerca.",
-    "done": "Fatto"
+    "done": "Fatto",
+    "aria_exchange_participants": "Exchange participants",
+    "aria_hour_split": "Hour split"
   },
   "create": {
     "page_title": "Crea scambio di gruppo",
@@ -143,7 +141,8 @@
     "hours_placeholder": "Ore",
     "weight_placeholder": "Peso",
     "hours_for": "Ore per {{name}}",
-    "weight_for": "Peso per {{name}}"
+    "weight_for": "Peso per {{name}}",
+    "aria_hour_split_preview": "Hour split preview"
   },
   "toast": {
     "load_more_failed": "Impossibile caricare altri scambi",
@@ -165,5 +164,9 @@
     "created_desc": "Il Suo scambio è stato creato con successo.",
     "create_failed": "Impossibile creare lo scambio",
     "something_wrong": "Qualcosa è andato storto. La preghiamo di riprovare."
-  }
+  },
+  "participants_count_one": "{{count}} partecipante",
+  "participants_count_other": "{{count}} partecipanti",
+  "hours_count_one": "{{count}} ora",
+  "hours_count_other": "{{count}} ore"
 }

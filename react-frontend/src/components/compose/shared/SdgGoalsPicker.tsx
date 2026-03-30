@@ -56,9 +56,7 @@ export function SdgGoalsPicker({ selected, onChange }: SdgGoalsPickerProps) {
       </div>
       {selected.length > 0 && (
         <p className="text-xs text-[var(--text-subtle)]">
-          {selected.length === 1
-            ? t('compose.sdg_selected', { count: selected.length })
-            : t('compose.sdg_selected_plural', { count: selected.length })}
+          {t('compose.sdg_selected', { count: selected.length })}
         </p>
       )}
     </div>

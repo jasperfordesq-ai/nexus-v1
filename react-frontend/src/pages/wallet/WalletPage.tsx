@@ -381,7 +381,7 @@ export function WalletPage() {
               startContent={<Download className="w-4 h-4" aria-hidden="true" />}
               onPress={handleExport}
               isDisabled={transactions.length === 0}
-              aria-label="Export transactions to CSV"
+              aria-label={t('aria.export_csv')}
             >
               {t('export')}
             </Button>
@@ -406,7 +406,7 @@ export function WalletPage() {
           {/* Transactions List */}
           <div className="mt-6 space-y-3">
             {isLoading ? (
-              <div aria-label="Loading transactions" aria-busy="true" className="space-y-3">
+              <div aria-label={t('aria.loading_transactions')} aria-busy="true" className="space-y-3">
                 {Array.from({ length: 5 }).map((_, i) => (
                 <div key={i} className="p-4 rounded-lg bg-theme-elevated">
                   <div className="flex items-center gap-4">
@@ -513,7 +513,7 @@ function TransactionCard({ transaction }: TransactionCardProps) {
   return (
     <article
       className="p-4 rounded-lg bg-theme-elevated hover:bg-theme-hover transition-colors"
-      aria-label={`${isCredit ? t('csv.received') : t('csv.sent')} ${transaction.amount} hours ${otherPartyName ? (isCredit ? 'from' : 'to') + ' ' + otherPartyName : ''}`}
+      aria-label={t('aria.transaction_detail', { direction: isCredit ? t('csv.received') : t('csv.sent'), amount: transaction.amount, name: otherPartyName || '' })}
     >
       <div className="flex items-center gap-4">
         <div className={`

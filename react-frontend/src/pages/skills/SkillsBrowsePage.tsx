@@ -332,7 +332,7 @@ export function SkillsBrowsePage() {
                 variant="light"
                 onPress={() => setSearchQuery('')}
                 className="p-0.5 rounded-full hover:bg-theme-hover transition-colors min-w-0 w-auto h-auto"
-                aria-label="Clear search"
+                aria-label={t('skills.aria_clear_search', 'Clear search')}
               >
                 <X className="w-3.5 h-3.5 text-theme-subtle" />
               </Button>
@@ -579,7 +579,7 @@ export function SkillsBrowsePage() {
                                             setSkillMembers([]);
                                           }}
                                           className="p-1 rounded-lg hover:bg-theme-hover transition-colors min-w-0 w-auto h-auto"
-                                          aria-label="Close members list"
+                                          aria-label={t('skills.aria_close_members_list', 'Close members list')}
                                         >
                                           <X className="w-4 h-4 text-theme-subtle" />
                                         </Button>

@@ -262,6 +262,7 @@
     "warning": "Advertencia: Esta acción no se puede deshacer",
     "warning_desc": "Todos tus datos, incluyendo anuncios, mensajes e historial de transacciones serán eliminados permanentemente.",
     "type_confirm": "Escribe ELIMINAR para confirmar:",
+    "placeholder": "DELETE",
     "submit": "Eliminar Mi Cuenta",
     "aria_label": "Escribe DELETE para confirmar"
   },

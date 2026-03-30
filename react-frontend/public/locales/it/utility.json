@@ -106,7 +106,10 @@
     "reorder": "Riordina",
     "delete_confirm_title": "Elimina risorsa",
     "delete_confirm_message": "Sei sicuro di voler eliminare \"{{title}}\"? Questa azione non può essere annullata.",
-    "delete_confirm": "Elimina"
+    "delete_confirm": "Elimina",
+    "aria_move_up": "Move up",
+    "aria_move_down": "Move down",
+    "aria_upload_progress": "Upload progress"
   },
   "not_found": {
     "page_title": "Pagina non trovata",

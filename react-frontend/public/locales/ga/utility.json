@@ -106,7 +106,10 @@
     "reorder": "Athordaigh",
     "delete_confirm_title": "Scrios Acmhainn",
     "delete_confirm_message": "An bhfuil tú cinnte gur mian leat \"{{title}}\" a scriosadh? Ní féidir an gníomh seo a chealú.",
-    "delete_confirm": "Scrios"
+    "delete_confirm": "Scrios",
+    "aria_move_up": "Move up",
+    "aria_move_down": "Move down",
+    "aria_upload_progress": "Upload progress"
   },
   "not_found": {
     "page_title": "Leathanach Gan Aimsiú",

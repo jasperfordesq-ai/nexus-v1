@@ -716,7 +716,7 @@ export function RegisterPage() {
                           : 'success'
                     }
                     size="sm"
-                    aria-label="Password strength"
+                    aria-label={t('register.aria.password_strength')}
                   />
                   <ul className="space-y-1 text-xs">
                     {PASSWORD_REQUIREMENTS.map((req) => {

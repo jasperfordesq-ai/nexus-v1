@@ -322,10 +322,10 @@ export function MessageReview() {
               }}
               variant="bordered"
             >
-              <SelectItem key="info">Info</SelectItem>
-              <SelectItem key="warning">Warning</SelectItem>
-              <SelectItem key="concern">Concern</SelectItem>
-              <SelectItem key="urgent">Urgent</SelectItem>
+              <SelectItem key="info">{t('broker.severity_info')}</SelectItem>
+              <SelectItem key="warning">{t('broker.severity_warning')}</SelectItem>
+              <SelectItem key="concern">{t('broker.severity_concern')}</SelectItem>
+              <SelectItem key="urgent">{t('broker.severity_urgent')}</SelectItem>
             </Select>
           </ModalBody>
           <ModalFooter>

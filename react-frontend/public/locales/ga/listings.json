@@ -54,7 +54,8 @@
     "save_error_subtitle": "Seiceáil do chuid eolais agus bain triail eile as.",
     "load_error": "Theip ar an liosta a luchtú",
     "update_success": "Liosta nuashonraithe go rathúil",
-    "create_success": "Liosta cruthaithe go rathúil"
+    "create_success": "Liosta cruthaithe go rathúil",
+    "aria_remove_image": "Remove image"
   },
   "page_subtitle": "Brabhsáil seirbhísí agus iarratais ón bpobal",
   "search_placeholder": "Cuardaigh de réir teideal, cur síos, suíomh nó ainm...",
@@ -81,6 +82,16 @@
   "share_copied_subtitle": "Roinn an liosta seo le duine ar bith",
   "share_error_title": "Níorbh fhéidir an nasc a chóipeáil",
   "not_found_title": "Liosta Gan Aimsiú",
+  "near_me": "In aice liom",
+  "near_me_no_location": "Cumasaigh suíomh chun an ghné seo a úsáid",
+  "radius_label": "Raon cuardaigh",
+  "like": "maith liom",
+  "likes": "is maith leo",
+  "comment": "nóta tráchta",
+  "comments": "nótaí tráchta",
+  "detail_like": "Is Maith Liom",
+  "detail_liked": "Is Maith Liom É",
+  "detail_comments": "Nótaí Tráchta",
   "detail_edit": "Cuir in Eagar",
   "detail_delete": "Scrios",
   "detail_duration": "Fad",
@@ -135,6 +146,10 @@
     "placeholder": "Clóscríobh scil agus brúigh Iontráil...",
     "aria_add": "Cuir clib scile leis"
   },
+  "aria": {
+    "view_mode": "View mode",
+    "loading_listings": "Loading listings"
+  },
   "analytics": {
     "title": "Anailísíocht Liostaithe",
     "total_views": "Amhairc Iomlána",
@@ -146,15 +161,5 @@
     "trend_7day": "Treocht 7 Lá",
     "vs_previous_week": "vs. an tseachtain roimhe",
     "views_last_days": "Amhairc ({{days}} Lá Deiridh)"
-  },
-  "near_me": "In aice liom",
-  "near_me_no_location": "Cumasaigh suíomh chun an ghné seo a úsáid",
-  "radius_label": "Raon cuardaigh",
-  "like": "maith liom",
-  "likes": "is maith leo",
-  "comment": "nóta tráchta",
-  "comments": "nótaí tráchta",
-  "detail_like": "Is Maith Liom",
-  "detail_liked": "Is Maith Liom É",
-  "detail_comments": "Nótaí Tráchta"
+  }
 }

@@ -19,6 +19,8 @@
   "try_again": "Triail Arís",
   "not_found": "Próifíl gan aimsiú",
   "not_found_desc": "Níl an phróifíl seo ann nó baineadh í",
+  "profile_incomplete": "Próifíl nach bhfuil críochnaithe fós",
+  "profile_incomplete_desc": "Níl an ball seo tar éis a phróifíl a shocrú fós. Seiceáil arís níos déanaí!",
   "settings": "Socruithe",
   "pending": "Ar Feitheamh",
   "accept": "Glac",
@@ -97,8 +99,16 @@
   "load_error": "Theip ar lodail an proifile.",
   "listing_image_alt": "Íomhá liostaithe",
   "credits_sent_success": "Creidmheasanna seolta chuig {{name}}",
-  "profile_incomplete": "Próifíl nach bhfuil críochnaithe fós",
-  "profile_incomplete_desc": "Níl an ball seo tar éis a phróifíl a shocrú fós. Seiceáil arís níos déanaí!",
+  "aria": {
+    "profile_sections": "Profile sections",
+    "about_this_user": "About this user",
+    "user_listings": "User listings",
+    "user_activity_feed": "User activity feed",
+    "user_availability": "User availability",
+    "user_reviews": "User reviews",
+    "user_achievements": "User achievements",
+    "loading_reviews": "Loading reviews"
+  },
   "review_modal": {
     "title": "Scríobh Léirmheas",
     "subtitle": "Roinn do thaithí le {{name}}",

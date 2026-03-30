@@ -262,6 +262,7 @@
     "warning": "Warning: This action cannot be undone",
     "warning_desc": "All your data, including listings, messages, and transaction history will be permanently deleted.",
     "type_confirm": "Type DELETE to confirm:",
+    "placeholder": "DELETE",
     "submit": "Delete My Account",
     "aria_label": "Type DELETE to confirm account deletion"
   },

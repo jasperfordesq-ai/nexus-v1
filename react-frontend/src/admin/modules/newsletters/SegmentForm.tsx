@@ -34,6 +34,7 @@ import {
   Sparkles,
   Lightbulb,
 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { usePageTitle } from '@/hooks';
 import { adminNewsletters } from '../../api/adminApi';
 import { PageHeader } from '../../components';
@@ -108,6 +109,7 @@ function generateId(): string {
 // ─────────────────────────────────────────────────────────────────────────────
 
 export function SegmentForm() {
+  const { t } = useTranslation('admin');
   const { id } = useParams<{ id: string }>();
   const isEdit = Boolean(id);
   const navigate = useNavigate();
@@ -303,8 +305,8 @@ export function SegmentForm() {
           }}
           className="min-w-[120px]"
         >
-          <SelectItem key="1">Yes</SelectItem>
-          <SelectItem key="0">No</SelectItem>
+          <SelectItem key="1">{t('segment_form.value_yes')}</SelectItem>
+          <SelectItem key="0">{t('segment_form.value_no')}</SelectItem>
         </Select>
       );
     }
@@ -434,8 +436,8 @@ export function SegmentForm() {
             }}
             className="max-w-[200px]"
           >
-            <SelectItem key="all">ALL rules (AND)</SelectItem>
-            <SelectItem key="any">ANY rule (OR)</SelectItem>
+            <SelectItem key="all">{t('segment_form.match_all_and')}</SelectItem>
+            <SelectItem key="any">{t('segment_form.match_any_or')}</SelectItem>
           </Select>
         </CardHeader>
         <CardBody className="space-y-3">
@@ -497,7 +499,7 @@ export function SegmentForm() {
                   color="danger"
                   onPress={() => removeRule(rule.id)}
                   isDisabled={rules.length === 1}
-                  aria-label="Remove rule"
+                  aria-label={t('segment_form.remove_rule_aria')}
                 >
                   <Trash2 size={14} />
                 </Button>

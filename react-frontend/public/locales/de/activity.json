@@ -40,8 +40,6 @@
   "likes_given_30d": "Gegebene Likes (30T)",
   "hours_suffix": "Std",
   "skill_request": "Anfrage",
-  "endorsements_count": "{{count}} Empfehlung",
-  "endorsements_count_plural": "{{count}} Empfehlungen",
   "activity_types": {
     "exchange": "Tausch",
     "listing": "Anzeige",
@@ -51,5 +49,7 @@
     "review": "Überprüfung",
     "post": "Beitrag",
     "default": "Aktivität"
-  }
+  },
+  "endorsements_count_one": "{{count}} Empfehlung",
+  "endorsements_count_other": "{{count}} Empfehlungen"
 }

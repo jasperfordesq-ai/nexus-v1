@@ -54,7 +54,8 @@
     "save_error_subtitle": "Verifique as suas informações e tente novamente.",
     "load_error": "Falha ao carregar anúncio",
     "update_success": "Anúncio atualizado com sucesso",
-    "create_success": "Anúncio criado com sucesso"
+    "create_success": "Anúncio criado com sucesso",
+    "aria_remove_image": "Remove image"
   },
   "page_subtitle": "Explore serviços e pedidos da comunidade",
   "search_placeholder": "Pesquisar por título, descrição, localização ou nome...",
@@ -81,6 +82,16 @@
   "share_copied_subtitle": "Partilhe este anúncio com qualquer pessoa",
   "share_error_title": "Não foi possível copiar o link",
   "not_found_title": "Anúncio Não Encontrado",
+  "near_me": "Perto de mim",
+  "near_me_no_location": "Ative a localização para utilizar esta funcionalidade",
+  "radius_label": "Raio de pesquisa",
+  "like": "gosto",
+  "likes": "gostos",
+  "comment": "comentário",
+  "comments": "comentários",
+  "detail_like": "Gosto",
+  "detail_liked": "Gostei",
+  "detail_comments": "Comentários",
   "detail_edit": "Editar",
   "detail_delete": "Eliminar",
   "detail_duration": "Duração",
@@ -135,6 +146,10 @@
     "placeholder": "Escreva uma competência e prima Enter...",
     "aria_add": "Adicionar etiqueta de competência"
   },
+  "aria": {
+    "view_mode": "View mode",
+    "loading_listings": "Loading listings"
+  },
   "analytics": {
     "title": "Análise do Anúncio",
     "total_views": "Visualizações Totais",
@@ -146,15 +161,5 @@
     "trend_7day": "Tendência de 7 Dias",
     "vs_previous_week": "vs. semana anterior",
     "views_last_days": "Visualizações (Últimos {{days}} Dias)"
-  },
-  "near_me": "Perto de mim",
-  "near_me_no_location": "Ative a localização para utilizar esta funcionalidade",
-  "radius_label": "Raio de pesquisa",
-  "like": "gosto",
-  "likes": "gostos",
-  "comment": "comentário",
-  "comments": "comentários",
-  "detail_like": "Gosto",
-  "detail_liked": "Gostei",
-  "detail_comments": "Comentários"
+  }
 }

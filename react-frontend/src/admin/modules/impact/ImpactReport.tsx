@@ -54,6 +54,7 @@ import { CHART_COLOR_MAP } from '@/lib/chartColors';
 import { StatCard, PageHeader } from '../../components';
 
 import { useTranslation } from 'react-i18next';
+import i18n from '@/i18n';
 // ---------------------------------------------------------------------------
 // Types
 // ---------------------------------------------------------------------------
@@ -134,7 +135,7 @@ const PERIOD_OPTIONS = [
 // ---------------------------------------------------------------------------
 
 function formatCurrency(value: number): string {
-  return `\u00A3${value.toLocaleString('en-GB', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+  return new Intl.NumberFormat(undefined, { style: 'currency', currency: 'GBP', minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(value);
 }
 
 function formatPercent(rate: number): string {
@@ -231,7 +232,7 @@ export function ImpactReport() {
     doc.setFontSize(11);
     doc.setTextColor(100, 100, 100);
     doc.text(
-      `Period: Last ${data.sroi.period_months} months | Generated: ${new Date().toLocaleDateString('en-GB')}`,
+      `Period: Last ${data.sroi.period_months} months | Generated: ${new Date().toLocaleDateString(i18n.language)}`,
       20,
       33,
     );
@@ -251,11 +252,11 @@ export function ImpactReport() {
         ['Unique Receivers', String(data.sroi.unique_receivers)],
         [
           'Monetary Value',
-          `\u00A3${data.sroi.monetary_value.toLocaleString('en-GB', { minimumFractionDigits: 2 })}`,
+          `${new Intl.NumberFormat(i18n.language, { style: 'currency', currency: 'GBP', minimumFractionDigits: 2 }).format(data.sroi.monetary_value)}`,
         ],
         [
           'Social Value',
-          `\u00A3${data.sroi.social_value.toLocaleString('en-GB', { minimumFractionDigits: 2 })}`,
+          `${new Intl.NumberFormat(i18n.language, { style: 'currency', currency: 'GBP', minimumFractionDigits: 2 }).format(data.sroi.social_value)}`,
         ],
         ['SROI Ratio', `${data.sroi.sroi_ratio}:1`],
       ],

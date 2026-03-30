@@ -44,10 +44,10 @@ class GroupNotificationService
 
         $admins = $this->getGroupAdmins($groupId, $tenantId);
 
-        $message = "{$userName} has requested to join \"{$group->name}\"";
+        $message = __('notifications.group_join_request', ['name' => $userName, 'group' => $group->name]);
         $link = "/groups/{$groupId}/members?tab=requests";
         $htmlContent = "<p><strong>{$userName}</strong> has requested to join <strong>{$group->name}</strong>.</p>"
-            . "<p><a href=\"{$link}\">Review request</a></p>";
+            . "<p><a href=\"{$link}\">" . __('notifications.group_join_request_review') . "</a></p>";
 
         foreach ($admins as $admin) {
             if ((int) $admin->user_id === $userId) {
@@ -85,10 +85,10 @@ class GroupNotificationService
             return;
         }
 
-        $message = "You have been accepted into \"{$group->name}\"";
+        $message = __('notifications.group_joined', ['group' => $group->name]);
         $link = "/groups/{$groupId}";
-        $htmlContent = "<p>You have been accepted into <strong>{$group->name}</strong>.</p>"
-            . "<p><a href=\"{$link}\">Visit group</a></p>";
+        $htmlContent = "<p>" . __('notifications.group_joined', ['group' => "<strong>{$group->name}</strong>"]) . "</p>"
+            . "<p><a href=\"{$link}\">" . __('notifications.group_joined_visit') . "</a></p>";
 
         try {
             NotificationDispatcher::dispatch(
@@ -121,10 +121,10 @@ class GroupNotificationService
             return;
         }
 
-        $message = "Your request to join \"{$group->name}\" was not approved";
+        $message = __('notifications.group_join_rejected', ['group' => $group->name]);
         $link = "/groups";
-        $htmlContent = "<p>Your request to join <strong>{$group->name}</strong> was not approved.</p>"
-            . "<p><a href=\"{$link}\">Browse other groups</a></p>";
+        $htmlContent = "<p>" . __('notifications.group_join_rejected', ['group' => "<strong>{$group->name}</strong>"]) . "</p>"
+            . "<p><a href=\"{$link}\">" . __('notifications.group_browse_others') . "</a></p>";
 
         try {
             NotificationDispatcher::dispatch(
@@ -160,11 +160,10 @@ class GroupNotificationService
         }
 
         $safeTitle = htmlspecialchars($title, ENT_QUOTES, 'UTF-8');
-        $message = "{$authorName} started a new discussion \"{$title}\" in \"{$group->name}\"";
+        $message = __('notifications.group_new_discussion', ['author' => $authorName, 'title' => $title, 'group' => $group->name]);
         $link = "/groups/{$groupId}/discussions/{$discussionId}";
-        $htmlContent = "<p><strong>{$authorName}</strong> started a new discussion "
-            . "<strong>\"{$safeTitle}\"</strong> in <strong>{$group->name}</strong>.</p>"
-            . "<p><a href=\"{$link}\">View discussion</a></p>";
+        $htmlContent = "<p>" . __('notifications.group_new_discussion', ['author' => "<strong>{$authorName}</strong>", 'title' => "<strong>\"{$safeTitle}\"</strong>", 'group' => "<strong>{$group->name}</strong>"]) . "</p>"
+            . "<p><a href=\"{$link}\">" . __('notifications.group_view_discussion') . "</a></p>";
 
         $members = $this->getActiveMembers($groupId, $tenantId);
 
@@ -208,11 +207,10 @@ class GroupNotificationService
         }
 
         $safeTitle = htmlspecialchars($title, ENT_QUOTES, 'UTF-8');
-        $message = "{$authorName} posted an announcement \"{$title}\" in \"{$group->name}\"";
+        $message = __('notifications.group_new_announcement', ['author' => $authorName, 'title' => $title, 'group' => $group->name]);
         $link = "/groups/{$groupId}/announcements";
-        $htmlContent = "<p><strong>{$authorName}</strong> posted an announcement "
-            . "<strong>\"{$safeTitle}\"</strong> in <strong>{$group->name}</strong>.</p>"
-            . "<p><a href=\"{$link}\">View announcement</a></p>";
+        $htmlContent = "<p>" . __('notifications.group_new_announcement', ['author' => "<strong>{$authorName}</strong>", 'title' => "<strong>\"{$safeTitle}\"</strong>", 'group' => "<strong>{$group->name}</strong>"]) . "</p>"
+            . "<p><a href=\"{$link}\">" . __('notifications.group_view_announcement') . "</a></p>";
 
         $members = $this->getActiveMembers($groupId, $tenantId);
 

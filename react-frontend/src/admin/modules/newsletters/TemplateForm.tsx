@@ -33,6 +33,7 @@ import {
   Lightbulb,
   BarChart3,
 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { usePageTitle } from '@/hooks';
 import { useTenant, useToast } from '@/contexts';
 import { adminNewsletters } from '../../api/adminApi';
@@ -72,6 +73,7 @@ interface TemplateData {
 }
 
 export function TemplateForm() {
+  const { t } = useTranslation('admin');
   const { id } = useParams<{ id: string }>();
   const isEdit = !!id;
   const { tenantPath } = useTenant();
@@ -295,7 +297,7 @@ export function TemplateForm() {
                 />
                 <Textarea
                   label="Description"
-                  placeholder="Brief description of this template"
+                  placeholder={t('template_form.description_placeholder')}
                   value={description}
                   onValueChange={setDescription}
                   minRows={2}
@@ -305,7 +307,7 @@ export function TemplateForm() {
                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                   <Select
                     label="Category"
-                    placeholder="Select category"
+                    placeholder={t('template_form.category_placeholder')}
                     selectedKeys={category ? [category] : []}
                     onSelectionChange={(keys) => {
                       const selected = Array.from(keys)[0] as string;
@@ -346,7 +348,7 @@ export function TemplateForm() {
                 />
                 <Input
                   label="Preview Text"
-                  placeholder="Short text shown in inbox preview"
+                  placeholder={t('template_form.preview_text_placeholder')}
                   value={previewText}
                   onValueChange={setPreviewText}
                   isDisabled={submitting}

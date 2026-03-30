@@ -113,7 +113,10 @@
     "action": "Azione",
     "target": "Sposta a",
     "add": "Aggiungi Regola",
-    "delete": "Elimina"
+    "delete": "Elimina",
+    "action_move_stage": "Move stage",
+    "action_auto_reject": "Auto-reject",
+    "action_notify_me": "Notify me"
   },
   "employer": {
     "page_title": "Profilo Datore di Lavoro",
@@ -219,7 +222,10 @@
     "form_type_label": "Tipo di Retribuzione",
     "form_currency_label": "Valuta",
     "form_currency_placeholder": "es. USD, EUR, GBP",
-    "form_negotiable_label": "Lo stipendio e negoziabile"
+    "form_negotiable_label": "Lo stipendio e negoziabile",
+    "currency_eur": "EUR",
+    "currency_gbp": "GBP",
+    "currency_usd": "USD"
   },
   "my_applications": {
     "title": "Le Mie Candidature",
@@ -816,7 +822,8 @@
     "go_to_jobs": "Vai ai Lavori",
     "first_time_banner": "Prima pubblicazione?",
     "first_time_desc": "La nostra procedura guidata ti aiuterà a pubblicare il tuo primo lavoro.",
-    "start_wizard": "Avvia Procedura Guidata"
+    "start_wizard": "Avvia Procedura Guidata",
+    "aria_progress": "Onboarding progress"
   },
   "preview": {
     "title": "Anteprima Lavoro",
@@ -868,8 +875,6 @@
   },
   "salary_display": "{{min}} – {{max}}",
   "salary_negotiable": "Negoziabile",
-  "deadline_countdown": "Chiude tra {{count}} giorno",
-  "deadline_countdown_plural": "Chiude tra {{count}} giorni",
   "deadline_closed": "Chiuso",
   "remote_only": "Solo Da Remoto",
   "match_badge": "{{count}}% compatibilità",
@@ -878,5 +883,10 @@
   "unknown": "Sconosciuto",
   "nav": {
     "jobs": "Lavori"
-  }
+  },
+  "aria": {
+    "qualification_percentage": "Qualification percentage"
+  },
+  "deadline_countdown_one": "Chiude tra {{count}} giorno",
+  "deadline_countdown_other": "Chiude tra {{count}} giorni"
 }

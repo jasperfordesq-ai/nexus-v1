@@ -72,7 +72,7 @@ export function FederationControls() {
         toastRef.current.error(t('super.failed_to_update_setting', 'Failed to update setting'));
       }
     } catch (err) {
-      toastRef.current.error(t('super.failed_to_update_setting', 'Failed to update setting') + `: ${err instanceof Error ? err.message : ''}`);
+      toastRef.current.error(t('super.failed_to_update_setting_detail', { detail: err instanceof Error ? err.message : '', defaultValue: 'Failed to update setting: {{detail}}' }));
     } finally {
       setSaving(null);
     }
@@ -94,7 +94,7 @@ export function FederationControls() {
         else toastRef.current.error(t('super.failed_to_activate_lockdown', 'Failed to activate lockdown'));
       }
     } catch (err) {
-      toastRef.current.error(t('super.lockdown_action_failed', 'Lockdown action failed') + `: ${err instanceof Error ? err.message : ''}`);
+      toastRef.current.error(t('super.lockdown_action_failed_detail', { detail: err instanceof Error ? err.message : '', defaultValue: 'Lockdown action failed: {{detail}}' }));
     } finally {
       setLockdownConfirm(false);
     }

@@ -616,7 +616,7 @@ export function GroupExchangeDetailPage() {
         </h2>
 
         <Table
-          aria-label="Exchange participants"
+          aria-label={t('detail.aria_exchange_participants', 'Exchange participants')}
           shadow="sm"
           isStriped
         >
@@ -709,7 +709,7 @@ export function GroupExchangeDetailPage() {
             {t('detail.hour_split')}
           </h2>
 
-          <Table aria-label="Hour split" shadow="sm" isStriped>
+          <Table aria-label={t('detail.aria_hour_split', 'Hour split')} shadow="sm" isStriped>
             <TableHeader>
               <TableColumn>{t('detail.col_provider')}</TableColumn>
               <TableColumn className="text-center" aria-hidden="true">{' '}</TableColumn>

@@ -427,7 +427,7 @@ export function Navbar({ onMobileMenuOpen, externalSearchOpen, onSearchOpenChang
                 variant="light"
                 size="sm"
                 onPress={() => setIsSearchOpen(true)}
-                aria-label="Search (Ctrl+K)"
+                aria-label={t('accessibility.search_ctrl_k')}
                 className="flex items-center gap-1 px-2 h-7 min-w-0 text-theme-muted hover:text-theme-primary text-xs shrink-0"
               >
                 <Search className="w-3.5 h-3.5 shrink-0" aria-hidden="true" />
@@ -452,7 +452,7 @@ export function Navbar({ onMobileMenuOpen, externalSearchOpen, onSearchOpenChang
                 size="sm"
                 className="lg:hidden text-theme-muted hover:text-theme-primary min-w-[44px] min-h-[44px]"
                 onPress={onMobileMenuOpen}
-                aria-label="Open menu"
+                aria-label={t('accessibility.open_menu')}
               >
                 <Menu className="w-5 h-5" aria-hidden="true" />
               </Button>
@@ -462,7 +462,7 @@ export function Navbar({ onMobileMenuOpen, externalSearchOpen, onSearchOpenChang
             </div>
 
             {/* Desktop Navigation — uses ResizeObserver for smart collapsing */}
-            <nav ref={navRef} className="hidden lg:flex items-center gap-1 flex-1 justify-center min-w-0" aria-label="Main navigation">
+            <nav ref={navRef} className="hidden lg:flex items-center gap-1 flex-1 justify-center min-w-0" aria-label={t('aria.main_navigation')}>
               {hasCustomMenus ? (
                 <DesktopMenuItems menus={headerMenus} />
               ) : (
@@ -536,7 +536,7 @@ export function Navbar({ onMobileMenuOpen, externalSearchOpen, onSearchOpenChang
                     </Button>
                   </DropdownTrigger>
                   <DropdownMenu
-                    aria-label="Timebanking navigation"
+                    aria-label={t('aria.timebanking_navigation')}
                     className="min-w-[220px]"
                     classNames={{
                       base: 'bg-[var(--surface-dropdown)] border border-[var(--border-default)] shadow-xl max-h-[70vh] overflow-y-auto',
@@ -599,7 +599,7 @@ export function Navbar({ onMobileMenuOpen, externalSearchOpen, onSearchOpenChang
                     </Button>
                   </DropdownTrigger>
                   <DropdownMenu
-                    aria-label="Community navigation"
+                    aria-label={t('aria.community_navigation')}
                     className="min-w-[220px]"
                     classNames={{
                       base: 'bg-[var(--surface-dropdown)] border border-[var(--border-default)] shadow-xl max-h-[70vh] overflow-y-auto',
@@ -643,7 +643,7 @@ export function Navbar({ onMobileMenuOpen, externalSearchOpen, onSearchOpenChang
                 variant="light"
                 size="sm"
                 onPress={() => setIsSearchOpen(true)}
-                aria-label="Search (Ctrl+K)"
+                aria-label={t('accessibility.search_ctrl_k')}
                 className="sm:hidden text-theme-muted hover:text-theme-primary min-w-[44px] min-h-[44px]"
               >
                 <Search className="w-5 h-5" aria-hidden="true" />
@@ -658,13 +658,13 @@ export function Navbar({ onMobileMenuOpen, externalSearchOpen, onSearchOpenChang
                         isIconOnly
                         size="sm"
                         className="hidden sm:flex bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
-                        aria-label="Create new"
+                        aria-label={t('accessibility.create_new')}
                       >
                         <Plus className="w-4 h-4" aria-hidden="true" />
                       </Button>
                     </DropdownTrigger>
                     <DropdownMenu
-                      aria-label="Create actions"
+                      aria-label={t('aria.create_actions')}
                       classNames={{
                         base: 'bg-[var(--surface-dropdown)] border border-[var(--border-default)] shadow-xl max-h-[70vh] overflow-y-auto',
                       }}
@@ -716,7 +716,7 @@ export function Navbar({ onMobileMenuOpen, externalSearchOpen, onSearchOpenChang
                       </div>
                     </DropdownTrigger>
                     <DropdownMenu
-                      aria-label="User actions"
+                      aria-label={t('aria.user_actions')}
                       classNames={{
                         base: 'bg-[var(--surface-dropdown)] border border-[var(--border-default)] shadow-xl min-w-[220px] max-h-[70vh] overflow-y-auto',
                       }}

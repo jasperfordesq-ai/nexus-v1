@@ -262,6 +262,7 @@
     "warning": "Rabhadh: Ní féidir an gníomh seo a chealú",
     "warning_desc": "Scriosfar do shonraí go léir go buan, lena n-áirítear liostuithe, teachtaireachtaí, agus stair idirbheart.",
     "type_confirm": "Clóscríobh DELETE chun deimhniú:",
+    "placeholder": "DELETE",
     "submit": "Scrios Mo Chuntas",
     "aria_label": "Closcriobh DELETE chun dearbhu"
   },

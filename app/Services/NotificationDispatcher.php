@@ -148,26 +148,9 @@ class NotificationDispatcher
      */
     private static function getPushTitle(string $activityType): string
     {
-        $titles = [
-            'vol_application_received'  => 'New Application',
-            'vol_application_approved'  => 'Application Approved',
-            'vol_application_declined'  => 'Application Declined',
-            'vol_hours_approved'        => 'Hours Approved',
-            'vol_hours_declined'        => 'Hours Declined',
-            'vol_hours_pending_review'  => 'Hours Pending Review',
-            'vol_shift_reminder'        => 'Shift Reminder',
-            'vol_shift_cancelled'       => 'Shift Cancelled',
-            'vol_waitlist_promoted'     => 'Waitlist Update',
-            'vol_swap_requested'        => 'Shift Swap Request',
-            'vol_swap_approved'         => 'Shift Swap Approved',
-            'vol_swap_declined'         => 'Shift Swap Declined',
-            'new_topic'                 => 'New Post',
-            'new_reply'                 => 'New Reply',
-            'mention'                   => 'You Were Mentioned',
-            'hot_match'                 => 'Hot Match Found',
-            'mutual_match'              => 'Mutual Match Found',
-        ];
-        return $titles[$activityType] ?? 'New Notification';
+        $key = 'notifications.push_' . $activityType;
+        $translated = __($key);
+        return $translated !== $key ? $translated : __('notifications.push_default');
     }
 
     private static function queueNotification($userId, $activityType, $content, $link, $frequency = 'daily', $emailBody = null): void
@@ -210,7 +193,7 @@ class NotificationDispatcher
         $listingId = $match['id'] ?? 0;
 
         $distanceText = $distance !== null ? " ({$distance}km away)" : '';
-        $content = "Hot Match! {$userName} posted \"{$listingTitle}\" - {$matchScore}% match{$distanceText}";
+        $content = __('notifications.hot_match_content', ['name' => $userName, 'title' => $listingTitle, 'score' => $matchScore, 'distance' => $distanceText]);
         $link = "/listings/{$listingId}";
 
         // Check user's match notification preferences
@@ -242,7 +225,7 @@ class NotificationDispatcher
         $youOffer = $reciprocalInfo['you_offer'] ?? 'something they need';
         $listingId = $match['id'] ?? 0;
 
-        $content = "Mutual Match! {$userName} can help you with {$theyOffer}, and you can help them with {$youOffer}";
+        $content = __('notifications.mutual_match_content', ['name' => $userName, 'they_offer' => $theyOffer, 'you_offer' => $youOffer]);
         $link = "/listings/{$listingId}";
 
         $prefs = \App\Services\MatchingService::getPreferencesStatic($userId);
@@ -276,12 +259,12 @@ class NotificationDispatcher
         $hotCount = count(array_filter($matches, fn($m) => ($m['match_score'] ?? 0) >= 85));
         $mutualCount = count(array_filter($matches, fn($m) => ($m['match_type'] ?? '') === 'mutual'));
 
-        $content = "Your {$period} match digest: {$count} new matches";
+        $content = __('notifications.match_digest_content', ['period' => $period, 'count' => $count]);
         if ($hotCount > 0) {
-            $content .= ", {$hotCount} hot";
+            $content .= __('notifications.match_digest_hot', ['count' => $hotCount]);
         }
         if ($mutualCount > 0) {
-            $content .= ", {$mutualCount} mutual";
+            $content .= __('notifications.match_digest_mutual', ['count' => $mutualCount]);
         }
 
         $link = "/matches";
@@ -301,7 +284,7 @@ class NotificationDispatcher
      */
     public static function dispatchMatchApprovalRequest($brokerId, $userName, $listingTitle, $requestId): void
     {
-        $content = "Match needs approval: {$userName} matched with \"{$listingTitle}\"";
+        $content = __('notifications.match_approval_request', ['name' => $userName, 'title' => $listingTitle]);
         $link = "/admin/match-approvals";
 
         Notification::createNotification((int) $brokerId, $content, $link, 'match_approval_request');
@@ -315,7 +298,7 @@ class NotificationDispatcher
      */
     public static function dispatchMatchApproved($userId, $listingTitle, $listingId, $matchScore = 0): void
     {
-        $content = "Great news! You've been matched with \"{$listingTitle}\"";
+        $content = __('notifications.match_approved', ['title' => $listingTitle]);
         $link = "/listings/{$listingId}";
 
         Notification::createNotification((int) $userId, $content, $link, 'match_approved');
@@ -329,9 +312,9 @@ class NotificationDispatcher
      */
     public static function dispatchMatchRejected($userId, $listingTitle, $reason = ''): void
     {
-        $content = "Match update: \"{$listingTitle}\" wasn't suitable at this time";
+        $content = __('notifications.match_rejected', ['title' => $listingTitle]);
         if (!empty($reason)) {
-            $content .= ". Reason: {$reason}";
+            $content .= __('notifications.match_rejected_reason', ['reason' => $reason]);
         }
         $link = "/matches";
 
@@ -473,7 +456,7 @@ class NotificationDispatcher
 
     public static function dispatchVerificationPassed(int $userId): void
     {
-        $content = "Your identity has been verified successfully.";
+        $content = __('notifications.verification_passed');
         $link = "/dashboard";
 
         Notification::createNotification($userId, $content, $link, 'verification_passed');
@@ -483,10 +466,9 @@ class NotificationDispatcher
 
     public static function dispatchVerificationFailed(int $userId, string $reason = ''): void
     {
-        $content = "Your identity verification was unsuccessful.";
-        if (!empty($reason)) {
-            $content .= " Reason: {$reason}";
-        }
+        $content = !empty($reason)
+            ? __('notifications.verification_failed_reason', ['reason' => $reason])
+            : __('notifications.verification_failed');
         $link = "/verify-identity";
 
         Notification::createNotification($userId, $content, $link, 'verification_failed');
@@ -513,8 +495,8 @@ class NotificationDispatcher
         $isPassed = $status === 'passed';
 
         $content = $isPassed
-            ? "Identity verification passed for {$userName} ({$email})"
-            : "Identity verification failed for {$userName} ({$email})";
+            ? __('notifications.verification_passed_admin', ['name' => $userName, 'email' => $email])
+            : __('notifications.verification_failed_admin', ['name' => $userName, 'email' => $email]);
         $link = "/admin/members";
 
         $admins = DB::table('users')
@@ -530,7 +512,7 @@ class NotificationDispatcher
 
     public static function dispatchVerificationReminder(int $userId): void
     {
-        $content = "You haven't completed identity verification yet. Please verify your identity to activate your account.";
+        $content = __('notifications.verification_reminder');
         $link = "/verify-identity";
 
         Notification::createNotification($userId, $content, $link, 'verification_reminder');
@@ -540,16 +522,20 @@ class NotificationDispatcher
         $basePath = TenantContext::getSlugPrefix();
         $frontendUrl = TenantContext::getFrontendUrl();
 
+        $reminderHeading = __('notifications.verification_reminder_heading');
+        $reminderBody = __('notifications.verification_reminder_body');
+        $reminderCta = __('notifications.verification_reminder_cta');
+
         $htmlContent = <<<HTML
 <div style="font-family: system-ui, -apple-system, sans-serif; max-width: 600px; margin: 0 auto;">
     <div style="background: linear-gradient(135deg, #f59e0b, #d97706); padding: 24px; border-radius: 16px 16px 0 0; text-align: center;">
-        <h1 style="color: white; margin: 0; font-size: 24px;">Verification Reminder</h1>
+        <h1 style="color: white; margin: 0; font-size: 24px;">{$reminderHeading}</h1>
         <p style="color: rgba(255,255,255,0.9); margin: 8px 0 0;">{$tenantName}</p>
     </div>
     <div style="background: #f8fafc; padding: 24px; border-radius: 0 0 16px 16px; border: 1px solid #e2e8f0; border-top: none;">
-        <p style="color: #1e293b; font-size: 16px; line-height: 1.6;">You started registering but haven't completed identity verification yet. Please verify your identity to activate your account.</p>
+        <p style="color: #1e293b; font-size: 16px; line-height: 1.6;">{$reminderBody}</p>
         <div style="text-align: center; margin-top: 24px;">
-            <a href="{$frontendUrl}{$basePath}/verify-identity" style="display: inline-block; background: linear-gradient(135deg, #f59e0b, #d97706); color: white; text-decoration: none; padding: 14px 32px; border-radius: 10px; font-weight: 600;">Complete Verification</a>
+            <a href="{$frontendUrl}{$basePath}/verify-identity" style="display: inline-block; background: linear-gradient(135deg, #f59e0b, #d97706); color: white; text-decoration: none; padding: 14px 32px; border-radius: 10px; font-weight: 600;">{$reminderCta}</a>
         </div>
     </div>
 </div>
@@ -566,39 +552,43 @@ HTML;
     {
         switch ($type) {
             case 'exchange_request_received':
-                return "New exchange request for your listing";
+                return __('notifications.exchange_request_received');
             case 'exchange_request_declined':
-                $reason = !empty($data['reason']) ? ": {$data['reason']}" : '';
-                return "Your exchange request was declined{$reason}";
+                if (!empty($data['reason'])) {
+                    return __('notifications.exchange_request_declined_reason', ['reason' => $data['reason']]);
+                }
+                return __('notifications.exchange_request_declined');
             case 'exchange_approved':
-                return "Your exchange has been approved! You can now begin.";
+                return __('notifications.exchange_approved');
             case 'exchange_rejected':
-                $reason = !empty($data['reason']) ? ": {$data['reason']}" : '';
-                return "Exchange was not approved{$reason}";
+                if (!empty($data['reason'])) {
+                    return __('notifications.exchange_rejected_reason', ['reason' => $data['reason']]);
+                }
+                return __('notifications.exchange_rejected');
             case 'exchange_completed':
                 $hours = $data['hours'] ?? 0;
-                return "Exchange completed! {$hours} hours transferred.";
+                return __('notifications.exchange_completed', ['hours' => $hours]);
             case 'exchange_cancelled':
-                return "Exchange was cancelled";
+                return __('notifications.exchange_cancelled');
             case 'exchange_disputed':
-                return "Exchange has conflicting hour confirmations - broker review needed";
+                return __('notifications.exchange_disputed');
             case 'exchange_accepted':
-                return "Your exchange request was accepted! You can now coordinate the service.";
+                return __('notifications.exchange_accepted');
             case 'exchange_pending_broker':
-                return "Exchange accepted - awaiting coordinator approval";
+                return __('notifications.exchange_pending_broker');
             case 'exchange_started':
-                return "Exchange has started! Service is now in progress.";
+                return __('notifications.exchange_started');
             case 'exchange_ready_confirmation':
                 $hours = $data['proposed_hours'] ?? 0;
-                return "Exchange complete - please confirm {$hours} hours worked";
+                return __('notifications.exchange_ready_confirmation', ['hours' => $hours]);
             case 'listing_risk_tagged':
                 $level = $data['risk_level'] ?? 'unknown';
                 $title = $data['listing_title'] ?? 'Listing';
-                return "Listing '{$title}' tagged as {$level} risk";
+                return __('notifications.listing_risk_tagged', ['title' => $title, 'level' => $level]);
             case 'credit_received':
                 $senderName = $data['sender_name'] ?? 'Someone';
                 $amount = $data['amount'] ?? 0;
-                return "{$senderName} sent you {$amount} hour" . ($amount != 1 ? 's' : '');
+                return __('notifications.credit_received', ['name' => $senderName, 'amount' => $amount]);
             default:
                 return "Notification: {$type}";
         }
@@ -721,21 +711,12 @@ HTML;
         $listingTitle = $details['listing_title'] ?? 'your listing';
         $shortTitle = strlen($listingTitle) > 30 ? substr($listingTitle, 0, 30) . '...' : $listingTitle;
 
-        $subjects = [
-            'exchange_request_received' => "New exchange request for \"{$shortTitle}\"",
-            'exchange_request_declined' => "Exchange request declined",
-            'exchange_approved' => "Exchange approved by coordinator - Ready to begin!",
-            'exchange_rejected' => "Exchange not approved",
-            'exchange_completed' => "Exchange completed - Hours transferred!",
-            'exchange_cancelled' => "Exchange cancelled",
-            'exchange_disputed' => "Exchange needs broker review",
-            'exchange_accepted' => "Your exchange request was accepted!",
-            'exchange_pending_broker' => "Exchange accepted - Awaiting coordinator approval",
-            'exchange_started' => "Exchange started - Service in progress",
-            'exchange_ready_confirmation' => "Action needed: Confirm your exchange hours",
-        ];
-
-        return $subjects[$type] ?? "Exchange update";
+        $key = 'notifications.exchange_email_' . str_replace('exchange_', '', $type);
+        if ($type === 'exchange_request_received') {
+            return __('notifications.exchange_email_request_received', ['title' => $shortTitle]);
+        }
+        $translated = __($key);
+        return $translated !== $key ? $translated : __('notifications.exchange_email_default');
     }
 
     // =========================================================================
@@ -1617,16 +1598,20 @@ HTML;
         $basePath = TenantContext::getSlugPrefix();
         $frontendUrl = TenantContext::getFrontendUrl();
 
+        $heading = __('notifications.verification_passed_heading');
+        $body = __('notifications.verification_passed_body');
+        $cta = __('notifications.verification_passed_cta');
+
         return <<<HTML
 <div style="font-family: system-ui, -apple-system, sans-serif; max-width: 600px; margin: 0 auto;">
     <div style="background: linear-gradient(135deg, #22c55e, #16a34a); padding: 24px; border-radius: 16px 16px 0 0; text-align: center;">
-        <h1 style="color: white; margin: 0; font-size: 24px;">Identity Verified</h1>
+        <h1 style="color: white; margin: 0; font-size: 24px;">{$heading}</h1>
         <p style="color: rgba(255,255,255,0.9); margin: 8px 0 0;">{$tenantName}</p>
     </div>
     <div style="background: #f8fafc; padding: 24px; border-radius: 0 0 16px 16px; border: 1px solid #e2e8f0; border-top: none;">
-        <p style="color: #1e293b; font-size: 16px; line-height: 1.6;">Your identity has been successfully verified. Your account is now active and ready to use.</p>
+        <p style="color: #1e293b; font-size: 16px; line-height: 1.6;">{$body}</p>
         <div style="text-align: center; margin-top: 24px;">
-            <a href="{$frontendUrl}{$basePath}/dashboard" style="display: inline-block; background: linear-gradient(135deg, #22c55e, #16a34a); color: white; text-decoration: none; padding: 14px 32px; border-radius: 10px; font-weight: 600;">Go to Dashboard</a>
+            <a href="{$frontendUrl}{$basePath}/dashboard" style="display: inline-block; background: linear-gradient(135deg, #22c55e, #16a34a); color: white; text-decoration: none; padding: 14px 32px; border-radius: 10px; font-weight: 600;">{$cta}</a>
         </div>
     </div>
 </div>
@@ -1639,19 +1624,23 @@ HTML;
         $tenantName = htmlspecialchars($tenant['name'] ?? 'Community', ENT_QUOTES, 'UTF-8');
         $basePath = TenantContext::getSlugPrefix();
         $frontendUrl = TenantContext::getFrontendUrl();
-        $reasonHtml = !empty($reason) ? "<p style=\"color: #dc2626; font-weight: 500; margin: 16px 0;\">Reason: " . htmlspecialchars($reason) . "</p>" : '';
+        $reasonHtml = !empty($reason) ? "<p style=\"color: #dc2626; font-weight: 500; margin: 16px 0;\">" . __('notifications.label_reason') . " " . htmlspecialchars($reason) . "</p>" : '';
+
+        $heading = __('notifications.verification_failed_heading');
+        $body = __('notifications.verification_failed_body');
+        $cta = __('notifications.verification_failed_cta');
 
         return <<<HTML
 <div style="font-family: system-ui, -apple-system, sans-serif; max-width: 600px; margin: 0 auto;">
     <div style="background: linear-gradient(135deg, #dc2626, #991b1b); padding: 24px; border-radius: 16px 16px 0 0; text-align: center;">
-        <h1 style="color: white; margin: 0; font-size: 24px;">Verification Unsuccessful</h1>
+        <h1 style="color: white; margin: 0; font-size: 24px;">{$heading}</h1>
         <p style="color: rgba(255,255,255,0.9); margin: 8px 0 0;">{$tenantName}</p>
     </div>
     <div style="background: #f8fafc; padding: 24px; border-radius: 0 0 16px 16px; border: 1px solid #e2e8f0; border-top: none;">
-        <p style="color: #1e293b; font-size: 16px; line-height: 1.6;">We were unable to verify your identity. You may retry the verification process or contact support for assistance.</p>
+        <p style="color: #1e293b; font-size: 16px; line-height: 1.6;">{$body}</p>
         {$reasonHtml}
         <div style="text-align: center; margin-top: 24px;">
-            <a href="{$frontendUrl}{$basePath}/verify-identity" style="display: inline-block; background: linear-gradient(135deg, #6366f1, #8b5cf6); color: white; text-decoration: none; padding: 14px 32px; border-radius: 10px; font-weight: 600;">Retry Verification</a>
+            <a href="{$frontendUrl}{$basePath}/verify-identity" style="display: inline-block; background: linear-gradient(135deg, #6366f1, #8b5cf6); color: white; text-decoration: none; padding: 14px 32px; border-radius: 10px; font-weight: 600;">{$cta}</a>
         </div>
     </div>
 </div>

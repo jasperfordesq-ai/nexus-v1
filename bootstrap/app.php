@@ -45,6 +45,7 @@ $app = Application::configure(basePath: dirname(__DIR__))
             \App\Http\Middleware\SecurityHeaders::class,
             \App\Http\Middleware\ResolveTenant::class,
             \App\Http\Middleware\CheckMaintenanceMode::class,
+            \App\Http\Middleware\SetLocale::class,
         ]);
 
         $middleware->alias([
@@ -58,7 +59,7 @@ $app = Application::configure(basePath: dirname(__DIR__))
         $exceptions->renderable(function (\Illuminate\Validation\ValidationException $e) {
             return response()->json([
                 'errors' => [
-                    ['code' => 'validation_failed', 'message' => 'Validation failed', 'details' => $e->errors()],
+                    ['code' => 'validation_failed', 'message' => __('api.validation_failed'), 'details' => $e->errors()],
                 ],
                 'success' => false,
             ], 422, ['API-Version' => '2.0']);
@@ -67,7 +68,7 @@ $app = Application::configure(basePath: dirname(__DIR__))
         $exceptions->renderable(function (\Illuminate\Auth\AuthenticationException $e) {
             return response()->json([
                 'errors' => [
-                    ['code' => 'auth_required', 'message' => 'You must be logged in to access this resource.'],
+                    ['code' => 'auth_required', 'message' => __('api.auth_required_detail')],
                 ],
                 'success' => false,
             ], 401, ['API-Version' => '2.0']);
@@ -77,7 +78,7 @@ $app = Application::configure(basePath: dirname(__DIR__))
             $model = class_basename($e->getModel());
             return response()->json([
                 'errors' => [
-                    ['code' => 'not_found', 'message' => "{$model} not found."],
+                    ['code' => 'not_found', 'message' => __('api.not_found', ['model' => $model])],
                 ],
                 'success' => false,
             ], 404, ['API-Version' => '2.0']);
@@ -86,7 +87,7 @@ $app = Application::configure(basePath: dirname(__DIR__))
         $exceptions->renderable(function (\Symfony\Component\HttpKernel\Exception\TooManyRequestsHttpException $e) {
             return response()->json([
                 'errors' => [
-                    ['code' => 'rate_limited', 'message' => 'Rate limit exceeded. Please try again later.'],
+                    ['code' => 'rate_limited', 'message' => __('api.rate_limit_exceeded')],
                 ],
                 'success' => false,
                 'retry_after' => $e->getHeaders()['Retry-After'] ?? null,

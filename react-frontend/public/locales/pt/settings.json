@@ -262,6 +262,7 @@
     "warning": "Aviso: Esta ação não pode ser desfeita",
     "warning_desc": "Todos os seus dados, incluindo anúncios, mensagens e histórico de transações, serão permanentemente eliminados.",
     "type_confirm": "Escreva DELETE para confirmar:",
+    "placeholder": "DELETE",
     "submit": "Eliminar a Minha Conta",
     "aria_label": "Digite DELETE para confirmar"
   },

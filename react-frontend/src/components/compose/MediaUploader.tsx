@@ -71,6 +71,7 @@ function SortableMediaItem({
   onAltTextChange,
 }: SortableMediaItemProps) {
   const { t } = useTranslation('feed');
+  const { t: tc } = useTranslation('common');
   const [showAltInput, setShowAltInput] = useState(false);
   const {
     attributes,
@@ -100,7 +101,7 @@ function SortableMediaItem({
         size="sm"
         variant="flat"
         className="absolute top-1.5 left-1.5 z-10 bg-black/60 text-white rounded-lg p-1.5 opacity-0 group-hover/item:opacity-100 focus:opacity-100 transition-opacity cursor-grab active:cursor-grabbing backdrop-blur-sm min-w-0 w-auto h-auto"
-        aria-label="Drag to reorder"
+        aria-label={tc('aria.drag_to_reorder')}
         {...attributes}
         {...listeners}
       >
@@ -188,6 +189,7 @@ export function MediaUploader({
   onError,
 }: MediaUploaderProps) {
   const { t } = useTranslation('feed');
+  const { t: tc } = useTranslation('common');
   const inputRef = useRef<HTMLInputElement>(null);
   const [compressing, setCompressing] = useState(false);
   const [isDragOver, setIsDragOver] = useState(false);
@@ -362,7 +364,7 @@ export function MediaUploader({
           onDrop={handleDrop}
           role="button"
           tabIndex={0}
-          aria-label="Click or drag to upload images"
+          aria-label={tc('aria.click_or_drag_to_upload')}
           onKeyDown={(e) => {
             if (e.key === 'Enter' || e.key === ' ') {
               e.preventDefault();
@@ -412,7 +414,7 @@ export function MediaUploader({
                     }`}
                     onClick={() => inputRef.current?.click()}
                     disabled={compressing}
-                    aria-label="Add more photos"
+                    aria-label={tc('aria.add_more_photos')}
                   >
                     <ImagePlus className="w-6 h-6 text-[var(--text-subtle)]" aria-hidden="true" />
                     <span className="text-[10px] text-[var(--text-subtle)]">

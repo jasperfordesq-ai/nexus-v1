@@ -611,7 +611,7 @@ export default function ExplorePage() {
             cursor: 'bg-primary',
             tabContent: 'group-data-[selected=true]:text-primary',
           }}
-          aria-label="Explore content tabs"
+          aria-label={t('aria.content_tabs')}
         >
           <Tab key="all" title={t('tabs.all')} />
           <Tab key="for_you" title={t('tabs.for_you')} />

@@ -328,9 +328,9 @@ export function CampaignForm() {
               variant="bordered"
               placeholder={t('gamification.placeholder_select_frequency')}
             >
-              <SelectItem key="daily">Daily</SelectItem>
-              <SelectItem key="weekly">Weekly</SelectItem>
-              <SelectItem key="monthly">Monthly</SelectItem>
+              <SelectItem key="daily">{t('gamification.schedule_daily')}</SelectItem>
+              <SelectItem key="weekly">{t('gamification.schedule_weekly')}</SelectItem>
+              <SelectItem key="monthly">{t('gamification.schedule_monthly')}</SelectItem>
             </Select>
           )}
 

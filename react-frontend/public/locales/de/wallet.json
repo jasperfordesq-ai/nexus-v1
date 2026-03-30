@@ -64,7 +64,9 @@
   },
   "error": {
     "load_balance": "Kontostand konnte nicht geladen werden",
-    "load_wallet": "Zeitkonto-Daten konnten nicht geladen werden. Bitte versuchen Sie es erneut."
+    "load_wallet": "Zeitkonto-Daten konnten nicht geladen werden. Bitte versuchen Sie es erneut.",
+    "session_expired": "Your session has expired. Please log in again.",
+    "load_community_fund": "Could not load community fund"
   },
   "no_members_found": "Keine Mitglieder gefunden",
   "donate": "Spenden",
@@ -100,18 +102,6 @@
   "community_fund_hours": "Stunden verfügbar",
   "community_fund_deposited": "Eingezahlt",
   "community_fund_withdrawn": "Zurückgezogen",
-  "available_balance": "Verfügbares Guthaben",
-  "recipient": "Empfänger",
-  "remove_recipient": "Empfänger entfernen",
-  "search_placeholder": "Nach Name oder Benutzername suchen...",
-  "search_recipient": "Empfänger suchen",
-  "search_results": "Suchergebnisse",
-  "amount_hours": "Betrag (Stunden)",
-  "amount_in_hours": "Betrag in Stunden",
-  "exceeds_balance": "Übersteigt das verfügbare Guthaben",
-  "optional": "optional",
-  "description_placeholder": "Wofür ist diese Überweisung?",
-  "new_balance_after": "Ihr neues Guthaben beträgt {{balance}} Stunden",
   "rating": {
     "title": "Bewerten Sie Ihren Tausch",
     "prompt": "Wie war Ihr Tausch?",
@@ -125,5 +115,22 @@
     "comment_placeholder": "Teilen Sie Ihre Erfahrung...",
     "skip": "Überspringen",
     "submit": "Bewertung abgeben"
-  }
+  },
+  "aria": {
+    "export_csv": "Export transactions to CSV",
+    "loading_transactions": "Loading transactions",
+    "transaction_detail": "{{direction}} {{amount}} hours {{name}}"
+  },
+  "available_balance": "Verfügbares Guthaben",
+  "recipient": "Empfänger",
+  "remove_recipient": "Empfänger entfernen",
+  "search_placeholder": "Nach Name oder Benutzername suchen...",
+  "search_recipient": "Empfänger suchen",
+  "search_results": "Suchergebnisse",
+  "amount_hours": "Betrag (Stunden)",
+  "amount_in_hours": "Betrag in Stunden",
+  "exceeds_balance": "Übersteigt das verfügbare Guthaben",
+  "optional": "optional",
+  "description_placeholder": "Wofür ist diese Überweisung?",
+  "new_balance_after": "Ihr neues Guthaben beträgt {{balance}} Stunden"
 }

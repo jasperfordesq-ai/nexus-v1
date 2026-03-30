@@ -53,8 +53,8 @@
     "share_failed": "Impossibile condividere il post"
   },
   "realtime": {
-    "new_post_singular": "1 nuovo post",
-    "new_posts_plural": "{{count}} nuovi post"
+    "new_posts_one": "1 nuovo post",
+    "new_posts_other": "{{count}} nuovi post"
   },
   "compose": {
     "create_title": "Crea {{type}}",
@@ -132,8 +132,6 @@
     "ai_tooltip": "Genera descrizione con IA",
     "ai_button": "Assistente IA",
     "sdg_label": "Obiettivi di Sviluppo Sostenibile ONU (facoltativo)",
-    "sdg_selected": "{{count}} obiettivo selezionato",
-    "sdg_selected_plural": "{{count}} obiettivi selezionati",
     "draft_restored": "Bozza ripristinata",
     "draft_cleared": "Bozza cancellata",
     "char_count": "{{current}}/{{max}}",
@@ -194,7 +192,9 @@
     "media_upload_error": "Impossibile elaborare le immagini",
     "template_button": "Modello",
     "media_drag_drop": "Clicca o trascina le foto qui",
-    "media_formats": "JPEG, PNG, GIF, WebP fino a 10MB ciascuno"
+    "media_formats": "JPEG, PNG, GIF, WebP fino a 10MB ciascuno",
+    "sdg_selected_one": "{{count}} obiettivo selezionato",
+    "sdg_selected_other": "{{count}} obiettivi selezionati"
   },
   "card": {
     "edited": "modificato",
@@ -295,8 +295,8 @@
   "trending": {
     "title": "Di tendenza",
     "view_all": "Vedi tutti gli hashtag",
-    "post_count": "{{count}} post",
-    "post_count_plural": "{{count}} post"
+    "post_count_one": "{{count}} post",
+    "post_count_other": "{{count}} post"
   },
   "sidebar": {
     "profile": {
