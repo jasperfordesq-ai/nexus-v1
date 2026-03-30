@@ -324,7 +324,7 @@ export function SearchPage() {
               </Button>
             </GlassCard>
           ) : isLoading ? (
-            <div aria-label="Loading search results" aria-busy="true" className="space-y-4">
+            <div aria-label={t('aria.loading_search_results', 'Loading search results')} aria-busy="true" className="space-y-4">
               {Array.from({ length: 6 }).map((_, i) => (
                 <GlassCard key={i} className="p-4">
                   <div className="flex items-center gap-3">
@@ -431,12 +431,12 @@ export function SearchPage() {
                                 src={resolveAvatarUrl(user.avatar)}
                                 name={user.name}
                                 size="lg"
-                                className="ring-2 ring-theme-default"
+                                className="shrink-0 ring-2 ring-theme-default"
                               />
-                              <div>
-                                <h3 className="font-semibold text-theme-primary">{user.name}</h3>
+                              <div className="min-w-0 flex-1">
+                                <h3 className="font-semibold text-theme-primary truncate">{user.name}</h3>
                                 {user.tagline && (
-                                  <p className="text-sm text-theme-subtle">{user.tagline}</p>
+                                  <p className="text-sm text-theme-subtle line-clamp-2">{user.tagline}</p>
                                 )}
                                 {user.location && (
                                   <p className="text-xs text-theme-subtle flex items-center gap-1 mt-1">
