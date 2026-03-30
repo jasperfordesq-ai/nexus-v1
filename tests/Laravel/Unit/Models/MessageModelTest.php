@@ -20,7 +20,7 @@ use ReflectionMethod;
  *
  * Tests the Message Eloquent model structure, traits, relationships,
  * scopes, and available static methods:
- * deleteConversation(), getReactionsBatch(), sendEmailNotification().
+ * deleteConversation(), getReactionsBatch().
  */
 class MessageModelTest extends \Tests\Laravel\TestCase
 {
@@ -153,18 +153,4 @@ class MessageModelTest extends \Tests\Laravel\TestCase
         $this->assertEmpty($result);
     }
 
-    public function testSendEmailNotificationMethodExists(): void
-    {
-        $this->assertTrue(
-            method_exists(Message::class, 'sendEmailNotification'),
-            'Message::sendEmailNotification() should exist'
-        );
-    }
-
-    public function testSendEmailNotificationIsPublicStatic(): void
-    {
-        $method = new ReflectionMethod(Message::class, 'sendEmailNotification');
-        $this->assertTrue($method->isPublic());
-        $this->assertTrue($method->isStatic());
-    }
 }

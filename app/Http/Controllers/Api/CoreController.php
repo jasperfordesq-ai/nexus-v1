@@ -10,184 +10,15 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
 use App\Core\Mailer;
 use App\Core\TenantContext;
-use App\Services\BrokerMessageVisibilityService;
-use App\Services\RealtimeService;
 
 /**
- * CoreController -- Core platform endpoints (members, listings, groups,
- * messages, notifications).
+ * CoreController -- Contact form, members, listings, groups, notifications.
  *
- * Converted from legacy delegation to DB facade / static services.
+ * Legacy messaging endpoints removed — all clients use /v2/messages (MessagesController).
  */
 class CoreController extends BaseApiController
 {
     protected bool $isV2Api = true;
-
-    public function __construct(
-        private readonly BrokerMessageVisibilityService $brokerMessageVisibilityService,
-        private readonly RealtimeService $realtimeService,
-    ) {}
-
-    // ──────────────────────────────────────────────
-    // Messaging endpoints
-    // ──────────────────────────────────────────────
-
-    /** POST /api/messages/send */
-    public function sendMessage(): JsonResponse
-    {
-        $userId = $this->requireAuth();
-        $this->rateLimit('send_message', 30, 60);
-
-        $receiverId = $this->inputInt('receiver_id', 0, 1);
-        $body = trim($this->input('body', ''));
-
-        if (!$receiverId) {
-            return $this->respondWithError('VALIDATION_ERROR', 'Missing receiver_id', 'receiver_id', 400);
-        }
-        if (empty($body)) {
-            return $this->respondWithError('VALIDATION_ERROR', 'Message body is required', 'body', 400);
-        }
-        if ($receiverId === $userId) {
-            return $this->respondWithError('VALIDATION_ERROR', 'Cannot send message to yourself', 'receiver_id', 400);
-        }
-
-        if ($this->brokerMessageVisibilityService->isMessagingDisabledForUser($userId)) {
-            return $this->respondWithError('SENDER_RESTRICTED', 'Your messaging privileges have been restricted. Please contact support.', null, 403);
-        }
-        if ($this->brokerMessageVisibilityService->isMessagingDisabledForUser($receiverId)) {
-            return $this->respondWithError('RECIPIENT_UNAVAILABLE', 'This user is not currently accepting messages.', null, 403);
-        }
-
-        $tenantId = $this->getTenantId();
-
-        try {
-            DB::insert(
-                "INSERT INTO messages (tenant_id, sender_id, receiver_id, body, created_at) VALUES (?, ?, ?, ?, NOW())",
-                [$tenantId, $userId, $receiverId, $body]
-            );
-            $messageId = (int) DB::getPdo()->lastInsertId();
-
-            $message = (array) DB::selectOne(
-                "SELECT id, sender_id, receiver_id, body, created_at FROM messages WHERE id = ?",
-                [$messageId]
-            );
-
-            // Pusher broadcast (non-blocking)
-            if (class_exists(RealtimeService::class)) {
-                try {
-                    $this->realtimeService->broadcastMessage($userId, $receiverId, $message);
-                } catch (\Exception $e) {
-                    error_log("Pusher notification failed: " . $e->getMessage());
-                }
-            }
-
-            // In-app notification + email (non-blocking)
-            try {
-                $sender = DB::selectOne("SELECT name FROM users WHERE id = ?", [$userId]);
-                $senderName = $sender->name ?? 'Someone';
-
-                if ($sender && class_exists('App\Models\Notification')) {
-                    \App\Models\Notification::createNotification(
-                        $receiverId,
-                        "New message from " . $senderName,
-                        "/messages/" . $userId,
-                        'message'
-                    );
-                }
-
-                $preview = mb_strlen($body) > 50 ? mb_substr($body, 0, 47) . '...' : $body;
-                \App\Models\Message::sendEmailNotification($receiverId, $senderName, $preview, $userId);
-            } catch (\Exception $e) {
-                error_log("Message notification failed: " . $e->getMessage());
-            }
-
-            return $this->respondWithData($message, null, 201);
-        } catch (\Exception $e) {
-            error_log("Send message error: " . $e->getMessage());
-            return $this->respondWithError('SERVER_ERROR', 'Failed to send message', null, 500);
-        }
-    }
-
-    /** POST /api/messages/typing */
-    public function typing(): JsonResponse
-    {
-        $userId = $this->requireAuth();
-        $this->rateLimit('typing', 60, 60);
-
-        $receiverId = $this->inputInt('receiver_id', 0, 1);
-
-        if (!$receiverId) {
-            return $this->respondWithError('VALIDATION_ERROR', 'Missing receiver_id', 'receiver_id', 400);
-        }
-
-        if (class_exists(RealtimeService::class)) {
-            try {
-                $this->realtimeService->broadcastTyping($userId, $receiverId, true);
-                return $this->respondWithData(['note' => 'Typing broadcast']);
-            } catch (\Exception $e) {
-                error_log("Pusher typing notification failed: " . $e->getMessage());
-                return $this->respondWithData(['note' => 'Realtime disabled']);
-            }
-        }
-
-        return $this->respondWithData(['note' => 'Realtime not configured']);
-    }
-
-    /** GET /api/messages/poll */
-    public function pollMessages(): JsonResponse
-    {
-        $userId = $this->requireAuth();
-        $this->rateLimit('poll_messages', 120, 60);
-
-        $otherUserId = $this->queryInt('other_user_id', 0, 1);
-        $afterId = $this->queryInt('after', 0, 0);
-
-        if (!$otherUserId) {
-            return $this->respondWithError('VALIDATION_ERROR', 'Missing other_user_id', 'other_user_id', 400);
-        }
-
-        $query = DB::table('messages')
-            ->select('id', 'sender_id', 'body', 'audio_url', 'audio_duration', 'created_at')
-            ->where('tenant_id', $this->getTenantId())
-            ->where(function ($q) use ($userId, $otherUserId) {
-                $q->where(function ($inner) use ($userId, $otherUserId) {
-                    $inner->where('sender_id', $userId)->where('receiver_id', $otherUserId);
-                })->orWhere(function ($inner) use ($userId, $otherUserId) {
-                    $inner->where('sender_id', $otherUserId)->where('receiver_id', $userId);
-                });
-            });
-
-        if ($afterId > 0) {
-            $query->where('id', '>', $afterId);
-        }
-
-        $messages = $query->orderBy('id', 'asc')->limit(50)->get()->map(fn ($m) => (array) $m)->all();
-
-        return $this->respondWithData($messages);
-    }
-
-    /** GET /api/messages/unread-count */
-    public function unreadMessagesCount(): JsonResponse
-    {
-        $userId = $this->requireAuth();
-        $this->rateLimit('unread_messages', 120, 60);
-
-        $count = 0;
-        try {
-            if (class_exists('App\Models\MessageThread')) {
-                $threads = \App\Models\MessageThread::getForUser($userId);
-                foreach ($threads as $thread) {
-                    if (!empty($thread['unread_count'])) {
-                        $count += (int) $thread['unread_count'];
-                    }
-                }
-            }
-        } catch (\Exception) {
-            $count = 0;
-        }
-
-        return $this->respondWithData(['count' => $count]);
-    }
 
     // ──────────────────────────────────────────────
     // Contact form
@@ -333,26 +164,6 @@ class CoreController extends BaseApiController
         }
 
         return $this->respondWithData($groups);
-    }
-
-    /** GET /api/messages */
-    public function messages(): JsonResponse
-    {
-        $userId = $this->requireAuth();
-        $this->rateLimit('messages', 60, 60);
-
-        $messages = DB::table('messages as m')
-            ->join('users as u', 'm.sender_id', '=', 'u.id')
-            ->select('m.*', 'u.name as sender_name', 'u.avatar_url as sender_avatar')
-            ->where('m.tenant_id', $this->getTenantId())
-            ->where('m.recipient_id', $userId)
-            ->groupBy('m.sender_id')
-            ->orderByDesc('m.created_at')
-            ->get()
-            ->map(fn ($m) => (array) $m)
-            ->all();
-
-        return $this->respondWithData($messages);
     }
 
     /** GET /api/notifications */

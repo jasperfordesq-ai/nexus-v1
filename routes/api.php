@@ -1432,10 +1432,7 @@ Route::post('/feed/hide', [\App\Http\Controllers\Api\FeedController::class, 'hid
 Route::post('/feed/mute', [\App\Http\Controllers\Api\FeedController::class, 'muteUser']);
 Route::post('/feed/report', [\App\Http\Controllers\Api\FeedController::class, 'reportPost']);
 Route::post('/messages/voice', [\App\Http\Controllers\Api\VoiceMessageController::class, 'store']);
-Route::post('/messages/send', [\App\Http\Controllers\Api\CoreController::class, 'sendMessage']);
-Route::post('/messages/typing', [\App\Http\Controllers\Api\CoreController::class, 'typing']);
-Route::get('/messages/poll', [\App\Http\Controllers\Api\CoreController::class, 'pollMessages']);
-Route::get('/messages/unread-count', [\App\Http\Controllers\Api\CoreController::class, 'unreadMessagesCount']);
+// Legacy message routes removed — all clients use /v2/messages (MessagesController)
 Route::post('/messages/delete', [\App\Http\Controllers\Api\MessagesController::class, 'deleteMessage']);
 Route::post('/messages/delete-conversation', [\App\Http\Controllers\Api\MessagesController::class, 'deleteConversation']);
 Route::post('/messages/reaction', [\App\Http\Controllers\Api\MessagesController::class, 'toggleReaction']);
@@ -1669,7 +1666,7 @@ Route::post('/wallet/user-search', [\App\Http\Controllers\Api\WalletController::
 Route::get('/members', [\App\Http\Controllers\Api\CoreController::class, 'members']);
 Route::get('/listings', [\App\Http\Controllers\Api\CoreController::class, 'listings']);
 Route::get('/groups', [\App\Http\Controllers\Api\CoreController::class, 'groups']);
-Route::get('/messages', [\App\Http\Controllers\Api\CoreController::class, 'messages']);
+// Legacy GET /messages removed — all clients use /v2/messages (MessagesController)
 Route::get('/notifications', [\App\Http\Controllers\Api\CoreController::class, 'notifications']);
 Route::get('/notifications/check', [\App\Http\Controllers\Api\CoreController::class, 'checkNotifications']);
 Route::get('/notifications/unread-count', [\App\Http\Controllers\Api\CoreController::class, 'unreadCount']);
