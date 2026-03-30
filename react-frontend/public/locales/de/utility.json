@@ -102,7 +102,11 @@
     "uploading_progress": "Wird hochgeladen... {{progress}}%",
     "cancel": "Abbrechen",
     "upload": "Hochladen",
-    "save_order_failed": "Neue Reihenfolge konnte nicht gespeichert werden."
+    "save_order_failed": "Neue Reihenfolge konnte nicht gespeichert werden.",
+    "reorder": "Neu anordnen",
+    "delete_confirm_title": "Ressource löschen",
+    "delete_confirm_message": "Sind Sie sicher, dass Sie \"{{title}}\" löschen möchten? Diese Aktion kann nicht rückgängig gemacht werden.",
+    "delete_confirm": "Löschen"
   },
   "not_found": {
     "page_title": "Seite nicht gefunden",

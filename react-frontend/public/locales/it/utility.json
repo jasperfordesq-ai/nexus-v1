@@ -102,7 +102,11 @@
     "uploading_progress": "Caricamento in corso... {{progress}}%",
     "cancel": "Annulla",
     "upload": "Carica",
-    "save_order_failed": "Impossibile salvare il nuovo ordine."
+    "save_order_failed": "Impossibile salvare il nuovo ordine.",
+    "reorder": "Riordina",
+    "delete_confirm_title": "Elimina risorsa",
+    "delete_confirm_message": "Sei sicuro di voler eliminare \"{{title}}\"? Questa azione non può essere annullata.",
+    "delete_confirm": "Elimina"
   },
   "not_found": {
     "page_title": "Pagina non trovata",

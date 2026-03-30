@@ -102,7 +102,11 @@
     "uploading_progress": "Ag uaslódáil... {{progress}}%",
     "cancel": "Cealaigh",
     "upload": "Uaslódáil",
-    "save_order_failed": "Theip ar an ord nua a shábháil."
+    "save_order_failed": "Theip ar an ord nua a shábháil.",
+    "reorder": "Athordaigh",
+    "delete_confirm_title": "Scrios Acmhainn",
+    "delete_confirm_message": "An bhfuil tú cinnte gur mian leat \"{{title}}\" a scriosadh? Ní féidir an gníomh seo a chealú.",
+    "delete_confirm": "Scrios"
   },
   "not_found": {
     "page_title": "Leathanach Gan Aimsiú",

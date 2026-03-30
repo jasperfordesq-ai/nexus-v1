@@ -102,7 +102,11 @@
     "uploading_progress": "Téléversement... {{progress}} %",
     "cancel": "Annuler",
     "upload": "Téléverser",
-    "save_order_failed": "Échec de l'enregistrement du nouvel ordre."
+    "save_order_failed": "Échec de l'enregistrement du nouvel ordre.",
+    "reorder": "Réorganiser",
+    "delete_confirm_title": "Supprimer la ressource",
+    "delete_confirm_message": "Êtes-vous sûr de vouloir supprimer « {{title}} » ? Cette action est irréversible.",
+    "delete_confirm": "Supprimer"
   },
   "not_found": {
     "page_title": "Page non trouvée",

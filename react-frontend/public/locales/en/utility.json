@@ -102,7 +102,11 @@
     "uploading_progress": "Uploading... {{progress}}%",
     "cancel": "Cancel",
     "upload": "Upload",
-    "save_order_failed": "Failed to save new order."
+    "save_order_failed": "Failed to save new order.",
+    "reorder": "Reorder",
+    "delete_confirm_title": "Delete Resource",
+    "delete_confirm_message": "Are you sure you want to delete \"{{title}}\"? This action cannot be undone.",
+    "delete_confirm": "Delete"
   },
   "not_found": {
     "page_title": "Page Not Found",

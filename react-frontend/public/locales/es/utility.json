@@ -102,7 +102,11 @@
     "uploading_progress": "Subiendo... {{progress}}%",
     "cancel": "Cancelar",
     "upload": "Subir",
-    "save_order_failed": "Error al guardar el nuevo orden."
+    "save_order_failed": "Error al guardar el nuevo orden.",
+    "reorder": "Reordenar",
+    "delete_confirm_title": "Eliminar Recurso",
+    "delete_confirm_message": "¿Estás seguro de que deseas eliminar \"{{title}}\"? Esta acción no se puede deshacer.",
+    "delete_confirm": "Eliminar"
   },
   "not_found": {
     "page_title": "Página No Encontrada",

@@ -202,6 +202,10 @@ class ResourcePublicController extends BaseApiController
             return $this->respondWithError('FILE_TYPE_NOT_ALLOWED', 'This file type is not allowed (HTML/SVG/PHP)', 'file', 400);
         }
 
+        // Capture file metadata BEFORE move() invalidates the temp file
+        $fileType = $file->getClientMimeType();
+        $fileSize = (int) $file->getSize();
+
         // Generate secure unique filename (cryptographic randomness)
         $filename = bin2hex(random_bytes(16)) . '.' . $ext;
 
@@ -217,8 +221,6 @@ class ResourcePublicController extends BaseApiController
         $description = trim(request()->input('description', ''));
         $categoryId = request()->input('category_id');
         $categoryId = ($categoryId !== null && $categoryId !== '') ? (int) $categoryId : null;
-        $fileType = $file->getClientMimeType() ?? mime_content_type($uploadDir . '/' . $filename) ?? null;
-        $fileSize = (int) $file->getSize();
 
         DB::table('resources')->insert([
             'tenant_id'   => $tenantId,
