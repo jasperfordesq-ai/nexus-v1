@@ -330,7 +330,7 @@ export function GoalsPage() {
       title: goal.title,
       description: goal.description || '',
       target_value: goal.target_value,
-      deadline: goal.deadline ? goal.deadline.split('T')[0] : '',
+      deadline: goal.deadline ? (goal.deadline.split('T')[0] ?? '') : '',
       is_public: goal.is_public,
     });
     onEditOpen();

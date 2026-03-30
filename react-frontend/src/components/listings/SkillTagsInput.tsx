@@ -81,7 +81,8 @@ export function SkillTagsInput({ tags, onChange, maxTags = 10 }: SkillTagsInputP
       }
     }
     if (e.key === 'Backspace' && !inputValue && tags.length > 0) {
-      removeTag(tags[tags.length - 1]);
+      const lastTag = tags[tags.length - 1];
+      if (lastTag) removeTag(lastTag);
     }
   };
 

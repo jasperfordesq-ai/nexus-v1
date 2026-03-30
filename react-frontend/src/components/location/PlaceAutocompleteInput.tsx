@@ -229,7 +229,8 @@ function PlaceAutocompleteWithGoogle(props: PlaceAutocompleteInputProps) {
         case 'Enter':
           e.preventDefault();
           if (activeIndex >= 0 && activeIndex < suggestions.length) {
-            handleSelect(suggestions[activeIndex]);
+            const selected = suggestions[activeIndex];
+            if (selected) handleSelect(selected);
           }
           break;
         case 'Escape':

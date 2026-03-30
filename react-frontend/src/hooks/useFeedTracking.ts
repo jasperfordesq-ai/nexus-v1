@@ -36,7 +36,7 @@ export function useFeedTracking(postId: number, isAuthenticated: boolean) {
 
     const observer = new IntersectionObserver(
       ([entry]) => {
-        if (entry.isIntersecting) {
+        if (entry?.isIntersecting) {
           // Start 1-second timer
           timerRef.current = setTimeout(() => {
             if (!impressedIds.has(postId)) {

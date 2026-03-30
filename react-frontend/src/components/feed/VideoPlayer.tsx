@@ -39,7 +39,7 @@ export function VideoPlayer({ media, className = '' }: VideoPlayerProps) {
 
     const observer = new IntersectionObserver(
       ([entry]) => {
-        if (entry.isIntersecting) {
+        if (entry?.isIntersecting) {
           video.play().catch(() => {
             // Autoplay blocked — user must interact
           });

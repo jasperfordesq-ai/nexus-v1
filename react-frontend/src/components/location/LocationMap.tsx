@@ -216,7 +216,9 @@ function LocationMapInner({
     if (!map || !fitBounds || markers.length === 0) return;
 
     if (markers.length === 1) {
-      map.setCenter({ lat: markers[0].lat, lng: markers[0].lng });
+      const first = markers[0];
+      if (!first) return;
+      map.setCenter({ lat: first.lat, lng: first.lng });
       map.setZoom(zoom);
       return;
     }
@@ -241,7 +243,7 @@ function LocationMapInner({
 
   const mapCenter =
     center ??
-    (markers.length === 1
+    (markers.length === 1 && markers[0]
       ? { lat: markers[0].lat, lng: markers[0].lng }
       : DEFAULT_CENTER);
 

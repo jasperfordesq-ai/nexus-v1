@@ -170,8 +170,11 @@ export function LoginPage() {
             setSelectedTenantId(String(hintMatch.id));
             tokenManager.setTenantId(hintMatch.id);
           } else if (response.data.length === 1) {
-            setSelectedTenantId(String(response.data[0].id));
-            tokenManager.setTenantId(response.data[0].id);
+            const firstTenant = response.data[0];
+            if (firstTenant) {
+              setSelectedTenantId(String(firstTenant.id));
+              tokenManager.setTenantId(firstTenant.id);
+            }
           }
         }
       } catch (err) {
@@ -205,7 +208,7 @@ export function LoginPage() {
     if (error) {
       clearError();
     }
-  }, [email, password, twoFactorCode, selectedTenantId]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [email, password, twoFactorCode, selectedTenantId]); // eslint-disable-line react-hooks/exhaustive-deps -- clear validation error on input change; error/clearError excluded to avoid loop
 
   const handleLogin = async (e: FormEvent) => {
     e.preventDefault();
@@ -470,9 +473,9 @@ export function LoginPage() {
                         <div className="flex items-center gap-3">
                           <Building2 className="w-5 h-5 text-indigo-500 dark:text-indigo-400" />
                           <div>
-                            <p className="text-gray-900 dark:text-white font-medium">{tenants[0].name}</p>
-                            {tenants[0].tagline && (
-                              <p className="text-gray-500 dark:text-gray-400 text-xs">{tenants[0].tagline}</p>
+                            <p className="text-gray-900 dark:text-white font-medium">{tenants[0]?.name}</p>
+                            {tenants[0]?.tagline && (
+                              <p className="text-gray-500 dark:text-gray-400 text-xs">{tenants[0]?.tagline}</p>
                             )}
                           </div>
                         </div>

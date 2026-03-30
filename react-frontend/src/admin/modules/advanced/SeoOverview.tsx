@@ -64,7 +64,7 @@ export function SeoOverview() {
       })
       .catch(() => toast.error(t('advanced.failed_to_load_s_e_o_settings')))
       .finally(() => setLoading(false));
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps -- load once on mount
 
   const handleSave = async () => {
     setSaving(true);

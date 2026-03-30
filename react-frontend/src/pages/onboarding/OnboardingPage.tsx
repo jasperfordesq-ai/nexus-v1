@@ -205,7 +205,7 @@ export function OnboardingPage() {
     if (currentStep >= 3 && categories.length === 0 && !categoriesLoading) {
       loadCategories();
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- lazy load categories at step 3; loadCategories excluded to avoid loop
   }, [currentStep]);
 
   const loadCategories = useCallback(async () => {
@@ -1262,7 +1262,7 @@ function StepIndicator({ currentStep, totalSteps, visitedSteps, completedSteps, 
             <Button
               variant="light"
               onPress={() => isClickable && onStepClick(step)}
-              aria-label={t('aria_step', { step, label: t(stepLabelKeys[i]), status: isCompleted ? t('aria_completed') : isCurrent ? t('aria_current') : '' })}
+              aria-label={t('aria_step', { step, label: t(stepLabelKeys[i] ?? ''), status: isCompleted ? t('aria_completed') : isCurrent ? t('aria_current') : '' })}
               aria-current={isCurrent ? 'step' : undefined}
               isDisabled={!isClickable}
               className={`
@@ -1293,7 +1293,7 @@ function StepIndicator({ currentStep, totalSteps, visitedSteps, completedSteps, 
                   ${isCurrent ? 'text-emerald-600 dark:text-emerald-400' : 'text-theme-subtle'}
                 `}
               >
-                {t(stepLabelKeys[i])}
+                {t(stepLabelKeys[i] ?? '')}
               </span>
             </Button>
 

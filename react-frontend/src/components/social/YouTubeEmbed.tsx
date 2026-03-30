@@ -38,7 +38,7 @@ function extractVideoId(embedUrl: string): string | null {
   const match = embedUrl.match(
     /(?:youtube(?:-nocookie)?\.com\/embed\/|youtu\.be\/)([a-zA-Z0-9_-]{11})/
   );
-  return match ? match[1] : null;
+  return match?.[1] ?? null;
 }
 
 /**

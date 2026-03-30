@@ -240,7 +240,8 @@ export function SearchOverlay({ isOpen, onClose }: SearchOverlayProps) {
           filteredActions[selectedIndex]?.action();
           handleClose();
         } else {
-          goToSuggestion(suggestions[selectedIndex]);
+          const suggestion = suggestions[selectedIndex];
+          if (suggestion) goToSuggestion(suggestion);
         }
       } else {
         goToSearch();

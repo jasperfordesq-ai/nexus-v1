@@ -107,8 +107,8 @@ export function VerificationAuditLog() {
             }}
           >
             {EVENT_TYPES.map((type) => (
-              <SelectItem key={type} textValue={EVENT_TYPE_LABELS[type].label}>
-                {EVENT_TYPE_LABELS[type].label}
+              <SelectItem key={type} textValue={EVENT_TYPE_LABELS[type]?.label ?? type}>
+                {EVENT_TYPE_LABELS[type]?.label ?? type}
               </SelectItem>
             ))}
           </Select>

@@ -112,7 +112,7 @@ export function HoursReviewTab() {
 
   useEffect(() => {
     loadEntries();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- load once on mount
   }, []);
 
   const handleAction = async (entryId: number, action: 'approve' | 'decline') => {

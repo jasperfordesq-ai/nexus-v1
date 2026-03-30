@@ -272,7 +272,7 @@ export function MatchesPage() {
         <AnimatePresence mode="popLayout">
           <div className="space-y-3">
             {filteredMatches.map((match, index) => {
-              const config = SOURCE_CONFIG[match.source_type] || SOURCE_CONFIG.listing;
+              const config = SOURCE_CONFIG[match.source_type] ?? SOURCE_CONFIG['listing'] ?? { icon: ListChecks, labelKey: 'source_listing', color: 'text-blue-400 bg-blue-400/10', path: '/listings' };
               const Icon = config.icon;
               const detailPath = `${config.path}/${match.source_id}`;
 

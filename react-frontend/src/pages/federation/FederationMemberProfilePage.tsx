@@ -149,7 +149,7 @@ export function FederationMemberProfilePage() {
     : 'Member';
 
   const reachKey = member?.service_reach ?? 'local_only';
-  const reachMeta = SERVICE_REACH_META[reachKey] ?? SERVICE_REACH_META.local_only;
+  const reachMeta = SERVICE_REACH_META[reachKey] ?? SERVICE_REACH_META.local_only ?? { label: 'Local Only', icon: Home };
   const ReachIcon = reachMeta.icon;
 
   // Loading

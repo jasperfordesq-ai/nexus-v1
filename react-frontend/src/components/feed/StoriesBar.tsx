@@ -88,7 +88,7 @@ export function StoriesBar({ friends: _friends }: StoriesBarProps) {
       el.removeEventListener('scroll', updateArrows);
       window.removeEventListener('resize', updateArrows);
     };
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- scroll listener setup; updateArrows is stable via useCallback
   }, [updateArrows]);
 
   const scroll = (direction: 'left' | 'right') => {
@@ -236,7 +236,7 @@ export function StoriesBar({ friends: _friends }: StoriesBarProps) {
                     </div>
                   </div>
                   <span className="text-xs truncate w-full text-center text-[var(--text-primary)]">
-                    {truncateName((storyUser.first_name || storyUser.name || '').split(' ')[0])}
+                    {truncateName((storyUser.first_name || storyUser.name || '').split(' ')[0] ?? '')}
                   </span>
                 </button>
               );

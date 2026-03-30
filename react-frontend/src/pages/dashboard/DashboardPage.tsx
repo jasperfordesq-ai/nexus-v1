@@ -169,9 +169,9 @@ export function DashboardPage() {
 
       if (controller.signal.aborted) return;
 
-      const walletRes = results[0].status === 'fulfilled' ? results[0].value : null;
-      const listingsRes = results[1].status === 'fulfilled' ? results[1].value : null;
-      const pendingRes = results[2].status === 'fulfilled' ? results[2].value : null;
+      const walletRes = results[0]?.status === 'fulfilled' ? results[0].value : null;
+      const listingsRes = results[1]?.status === 'fulfilled' ? results[1].value : null;
+      const pendingRes = results[2]?.status === 'fulfilled' ? results[2].value : null;
       const walletData = walletRes as { success?: boolean; data?: WalletBalance } | null;
       const listingsData = listingsRes as { success?: boolean; data?: Listing[]; meta?: { total_items?: number } } | null;
       const pendingData = pendingRes as { success?: boolean; data?: { count: number } } | null;
@@ -179,7 +179,7 @@ export function DashboardPage() {
       const optionalResults: Record<string, unknown> = {};
       optionalRequests.forEach((req, index) => {
         const result = results[coreRequests.length + index];
-        optionalResults[req.key] = result.status === 'fulfilled' ? result.value : null;
+        optionalResults[req.key] = result?.status === 'fulfilled' ? result.value : null;
       });
 
       let gamificationData: GamificationProfile | null = null;

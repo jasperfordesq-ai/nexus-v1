@@ -304,7 +304,8 @@ export function ConversationPage() {
         const newMessages = response.data;
 
         // Update the last message ID
-        lastMessageIdRef.current = newMessages[newMessages.length - 1].id;
+        const lastNewMsg = newMessages[newMessages.length - 1];
+        if (lastNewMsg) lastMessageIdRef.current = lastNewMsg.id;
 
         // Append new messages to the conversation
         setConversation((prev) => {
@@ -361,7 +362,8 @@ export function ConversationPage() {
 
         // Track the newest message ID for polling
         if (messages.length > 0) {
-          lastMessageIdRef.current = messages[messages.length - 1].id;
+          const lastMsg = messages[messages.length - 1];
+          if (lastMsg) lastMessageIdRef.current = lastMsg.id;
         }
 
         // Scroll to bottom on initial load
@@ -374,7 +376,8 @@ export function ConversationPage() {
           messages,
         });
         if (messages.length > 0) {
-          lastMessageIdRef.current = messages[messages.length - 1].id;
+          const lastMsg = messages[messages.length - 1];
+          if (lastMsg) lastMessageIdRef.current = lastMsg.id;
         }
         setTimeout(() => scrollToBottom(), 100);
       } else {
@@ -822,7 +825,8 @@ export function ConversationPage() {
 
     // Scroll to first result if found
     if (matchingIds.length > 0) {
-      scrollToMessage(matchingIds[0]);
+      const firstId = matchingIds[0];
+      if (firstId !== undefined) scrollToMessage(firstId);
     }
   }
 
@@ -840,7 +844,8 @@ export function ConversationPage() {
     }
 
     setCurrentSearchIndex(newIndex);
-    scrollToMessage(searchResults[newIndex]);
+    const resultId = searchResults[newIndex];
+    if (resultId !== undefined) scrollToMessage(resultId);
   }
 
   /**

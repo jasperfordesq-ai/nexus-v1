@@ -109,7 +109,8 @@ export function AvailabilityGrid({
           const endIdx = TIME_SLOTS.indexOf(slot.end_time);
           if (startIdx >= 0 && endIdx >= 0) {
             for (let i = startIdx; i < endIdx; i++) {
-              newSlots.set(slotKey(slot.day_of_week, TIME_SLOTS[i]), slot.is_available);
+              const ts = TIME_SLOTS[i];
+              if (ts) newSlots.set(slotKey(slot.day_of_week, ts), slot.is_available);
             }
           }
         });
@@ -155,15 +156,17 @@ export function AvailabilityGrid({
         let rangeStart: string | null = null;
 
         for (let i = 0; i < TIME_SLOTS.length; i++) {
-          const isAvail = slots.get(slotKey(day, TIME_SLOTS[i])) || false;
+          const ts = TIME_SLOTS[i];
+          if (!ts) continue;
+          const isAvail = slots.get(slotKey(day, ts)) || false;
 
           if (isAvail && !rangeStart) {
-            rangeStart = TIME_SLOTS[i];
+            rangeStart = ts;
           } else if (!isAvail && rangeStart) {
             availabilitySlots.push({
               day_of_week: day,
               start_time: rangeStart,
-              end_time: TIME_SLOTS[i],
+              end_time: ts,
               is_available: true,
             });
             rangeStart = null;
@@ -295,7 +298,7 @@ export function AvailabilityGrid({
                   return (
                     <Tooltip
                       key={key}
-                      content={`${FULL_DAYS[dayIdx]} ${time} - ${isAvail ? 'Available' : 'Unavailable'}`}
+                      content={`${FULL_DAYS[dayIdx] ?? ''} ${time} - ${isAvail ? 'Available' : 'Unavailable'}`}
                       delay={300}
                       closeDelay={0}
                       size="sm"
@@ -312,7 +315,7 @@ export function AvailabilityGrid({
                           ${editable ? 'cursor-pointer' : 'cursor-default'}
                         `}
                         variant="flat"
-                        aria-label={`${FULL_DAYS[dayIdx]} ${time}: ${isAvail ? 'Available' : 'Unavailable'}`}
+                        aria-label={`${FULL_DAYS[dayIdx] ?? ''} ${time}: ${isAvail ? 'Available' : 'Unavailable'}`}
                       />
                     </Tooltip>
                   );

@@ -3,7 +3,7 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import { useState, useEffect, useRef, type ReactNode } from 'react';
+import { useState, useEffect, useRef, memo, type ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
 import { Button, Avatar, Input } from '@heroui/react';
@@ -42,7 +42,7 @@ export interface MessageBubbleProps {
   onCancelEdit?: () => void;
 }
 
-export function MessageBubble({
+export const MessageBubble = memo(function MessageBubble({
   id,
   message,
   isOwn,
@@ -403,4 +403,4 @@ export function MessageBubble({
       </div>
     </motion.div>
   );
-}
+});

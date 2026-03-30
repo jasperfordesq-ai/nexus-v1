@@ -73,7 +73,7 @@ const categoryColors: Record<string, string> = {
 };
 
 function getCategoryGradient(category: string): string {
-  return categoryColors[category.toLowerCase()] || categoryColors.default;
+  return categoryColors[category.toLowerCase()] ?? categoryColors.default ?? 'from-gray-500 to-gray-600';
 }
 
 /* ───────────────────────── Component ───────────────────────── */

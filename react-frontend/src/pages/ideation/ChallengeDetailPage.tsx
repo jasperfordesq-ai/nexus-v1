@@ -340,7 +340,7 @@ export function ChallengeDetailPage() {
     } finally {
       setIsLoadingOutcome(false);
     }
-  }, [id, challenge?.status]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [id, challenge?.status]); // eslint-disable-line react-hooks/exhaustive-deps -- load outcome when challenge closes; loadOutcome excluded to avoid loop
 
   /* ───── Fetch user's draft ideas ───── */
   const fetchDrafts = useCallback(async () => {
@@ -367,14 +367,14 @@ export function ChallengeDetailPage() {
       setCursor(undefined);
       fetchIdeas(sortMode);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- reset on sort change; fetchIdeas excluded to avoid loop
   }, [id, sortMode]);
 
   useEffect(() => {
     if (challenge && ['closed', 'archived'].includes(challenge.status)) {
       fetchOutcome();
     }
-  }, [challenge?.status, fetchOutcome]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [challenge?.status, fetchOutcome]); // eslint-disable-line react-hooks/exhaustive-deps -- only trigger on status change
 
   // Fetch drafts when submit modal opens
   useEffect(() => {
@@ -1136,7 +1136,7 @@ export function ChallengeDetailPage() {
         <div className="space-y-3">
           {ideas.map((idea) => {
             const MediaIconComponent = idea.media && idea.media.length > 0
-              ? MEDIA_ICON_MAP[idea.media[0].type] ?? LinkIcon
+              ? MEDIA_ICON_MAP[idea.media[0]?.type ?? ''] ?? LinkIcon
               : null;
 
             return (

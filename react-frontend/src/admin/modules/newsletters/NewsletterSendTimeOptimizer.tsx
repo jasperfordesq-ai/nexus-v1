@@ -49,14 +49,16 @@ export function NewsletterSendTimeOptimizer() {
   for (let d = 1; d <= 7; d++) {
     heatmapMatrix[d] = {};
     for (let h = 0; h < 24; h++) {
-      heatmapMatrix[d][h] = 0;
+      const row = heatmapMatrix[d];
+      if (row) row[h] = 0;
     }
   }
 
   if (data?.heatmap) {
     data.heatmap.forEach(cell => {
       heatmapMatrix[cell.day_of_week] = heatmapMatrix[cell.day_of_week] || {};
-      heatmapMatrix[cell.day_of_week][cell.hour] = cell.engagement_score;
+      const row = heatmapMatrix[cell.day_of_week];
+      if (row) row[cell.hour] = cell.engagement_score;
     });
   }
 

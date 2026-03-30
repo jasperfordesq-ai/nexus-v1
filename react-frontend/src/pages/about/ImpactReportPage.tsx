@@ -83,11 +83,11 @@ export function ImpactReportPage() {
       el: document.getElementById(s.id),
     }));
     for (let i = sections.length - 1; i >= 0; i--) {
-      const el = sections[i].el;
-      if (el) {
-        const rect = el.getBoundingClientRect();
+      const section = sections[i];
+      if (section?.el) {
+        const rect = section.el.getBoundingClientRect();
         if (rect.top <= 120) {
-          setActiveSection(sections[i].id);
+          setActiveSection(section.id);
           break;
         }
       }

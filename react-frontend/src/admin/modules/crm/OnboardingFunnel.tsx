@@ -114,11 +114,11 @@ export default function OnboardingFunnel() {
   }
 
   const { stages, monthly_registrations } = data;
-  const maxCount = stages.length > 0 ? stages[0].count : 1;
+  const maxCount = stages.length > 0 ? (stages[0]?.count ?? 1) : 1;
 
   // Build conversion rates between consecutive stages
   const conversions = stages.slice(1).map((stage, i) => {
-    const prev = stages[i];
+    const prev = stages[i] ?? { name: '', count: 0 };
     const rate = prev.count > 0 ? (stage.count / prev.count) * 100 : 0;
     return {
       from: prev.name,
@@ -144,7 +144,7 @@ export default function OnboardingFunnel() {
             <h3 className="text-lg font-semibold">{t('crm.member_funnel_title')}</h3>
             <p className="text-sm text-default-500">
               {stages.length > 0
-                ? t('crm.registered_members', { count: stages[0].count })
+                ? t('crm.registered_members', { count: stages[0]?.count ?? 0 })
                 : t('crm.no_stages_available')}
             </p>
           </div>
@@ -158,9 +158,10 @@ export default function OnboardingFunnel() {
                 maxCount > 0
                   ? Math.round((stage.count / maxCount) * 1000) / 10
                   : 0;
+              const prevStage = index > 0 ? stages[index - 1] : undefined;
               const dropOff =
-                index > 0 && stages[index - 1].count > 0
-                  ? stages[index - 1].count - stage.count
+                prevStage && prevStage.count > 0
+                  ? prevStage.count - stage.count
                   : 0;
 
               return (
@@ -210,23 +211,28 @@ export default function OnboardingFunnel() {
           </div>
 
           {/* Overall conversion */}
-          {stages.length >= 2 && (
-            <div className="mt-6 pt-4 border-t border-divider text-center">
-              <p className="text-sm text-default-500">
-                {t('crm.overall_conversion')} (
-                {stages[0].name} to {stages[stages.length - 1].name})
-              </p>
-              <p className="text-2xl font-bold mt-1">
-                {stages[0].count > 0
-                  ? (
-                      (stages[stages.length - 1].count / stages[0].count) *
-                      100
-                    ).toFixed(1)
-                  : '0'}
-                %
-              </p>
-            </div>
-          )}
+          {stages.length >= 2 && (() => {
+            const firstStage = stages[0];
+            const lastStage = stages[stages.length - 1];
+            if (!firstStage || !lastStage) return null;
+            return (
+              <div className="mt-6 pt-4 border-t border-divider text-center">
+                <p className="text-sm text-default-500">
+                  {t('crm.overall_conversion')} (
+                  {firstStage.name} to {lastStage.name})
+                </p>
+                <p className="text-2xl font-bold mt-1">
+                  {firstStage.count > 0
+                    ? (
+                        (lastStage.count / firstStage.count) *
+                        100
+                      ).toFixed(1)
+                    : '0'}
+                  %
+                </p>
+              </div>
+            );
+          })()}
         </CardBody>
       </Card>
 

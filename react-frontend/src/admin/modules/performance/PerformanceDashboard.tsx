@@ -280,7 +280,7 @@ export default function PerformanceDashboard() {
     return (
       <div className="space-y-2">
         {hours.map((hour) => {
-          const volume = summary.request_volume[hour];
+          const volume = summary.request_volume[hour] ?? 0;
           const percentage = (volume / maxVolume) * 100;
 
           return (

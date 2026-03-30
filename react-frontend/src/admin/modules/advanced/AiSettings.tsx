@@ -137,12 +137,12 @@ export function AiSettings() {
           <CardBody className="space-y-3">
             {FEATURE_KEYS.map((featureKey, index) => (
               <div key={featureKey} className="flex items-center justify-between py-1">
-                <p className="text-sm">{t(FEATURE_I18N_KEYS[index])}</p>
+                <p className="text-sm">{t(FEATURE_I18N_KEYS[index] ?? '')}</p>
                 <Switch
                   size="sm"
                   isSelected={!!formData[featureKey]}
                   onValueChange={(v) => updateField(featureKey, v)}
-                  aria-label={t(FEATURE_I18N_KEYS[index])}
+                  aria-label={t(FEATURE_I18N_KEYS[index] ?? '')}
                 />
               </div>
             ))}

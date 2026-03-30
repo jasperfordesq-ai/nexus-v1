@@ -101,7 +101,7 @@ export function LegalDocList() {
       sortable: true,
       render: (doc) => (
         <Chip size="sm" variant="flat" color="primary">
-          {DOC_TYPE_KEYS[doc.type] ? t(DOC_TYPE_KEYS[doc.type]) : doc.type}
+          {DOC_TYPE_KEYS[doc.type] ? t(DOC_TYPE_KEYS[doc.type] ?? '') : doc.type}
         </Chip>
       ),
     },

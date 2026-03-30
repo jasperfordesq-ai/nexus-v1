@@ -227,6 +227,7 @@ export function AdminBreadcrumbs({ items }: AdminBreadcrumbsProps) {
 
     for (let i = 0; i < segments.length; i++) {
       const segment = segments[i];
+      if (!segment) continue;
       currentPath += `/${segment}`;
 
       // Skip numeric IDs

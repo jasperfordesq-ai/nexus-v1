@@ -470,7 +470,10 @@ export function ResourcesPage() {
 
     const newResources = [...resources];
     const swapIndex = direction === 'up' ? currentIndex - 1 : currentIndex + 1;
-    [newResources[currentIndex], newResources[swapIndex]] = [newResources[swapIndex], newResources[currentIndex]];
+    const current = newResources[currentIndex];
+    const swap = newResources[swapIndex];
+    if (!current || !swap) return;
+    [newResources[currentIndex], newResources[swapIndex]] = [swap, current];
     setResources(newResources);
 
     try {

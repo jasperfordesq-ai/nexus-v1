@@ -39,7 +39,7 @@ export function HashtagRenderer({
       parts.push({ type: 'text', value: content.slice(lastIndex, match.index) });
     }
     // Add hashtag
-    parts.push({ type: 'hashtag', value: match[1] });
+    parts.push({ type: 'hashtag', value: match[1] ?? '' });
     lastIndex = match.index + match[0].length;
   }
 
@@ -49,7 +49,7 @@ export function HashtagRenderer({
   }
 
   // If no hashtags found, return original content
-  if (parts.length === 0 || (parts.length === 1 && parts[0].type === 'text')) {
+  if (parts.length === 0 || (parts.length === 1 && parts[0]?.type === 'text')) {
     return <span className={className}>{content}</span>;
   }
 

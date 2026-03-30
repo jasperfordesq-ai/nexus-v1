@@ -23,7 +23,7 @@ export function EmojiPicker({ onSelect }: EmojiPickerProps) {
   const { t } = useTranslation('feed');
   const [isOpen, setIsOpen] = useState(false);
   const [search, setSearch] = useState('');
-  const [activeCategory, setActiveCategory] = useState(EMOJI_CATEGORIES[0].key);
+  const [activeCategory, setActiveCategory] = useState(EMOJI_CATEGORIES[0]?.key ?? '');
   const triggerRef = useRef<HTMLButtonElement>(null);
   const gridRef = useRef<HTMLDivElement>(null);
   const categoryRefs = useRef<Record<string, HTMLDivElement | null>>({});

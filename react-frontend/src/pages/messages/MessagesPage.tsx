@@ -142,7 +142,9 @@ export function MessagesPage() {
       if (existingIndex >= 0) {
         // Update existing conversation optimistically
         const updated = [...prev];
-        const conv = { ...updated[existingIndex] };
+        const existing = updated[existingIndex];
+        if (!existing) return prev;
+        const conv = { ...existing };
 
         // Update last message (body may come as preview from legacy events)
         conv.last_message = {
@@ -208,7 +210,7 @@ export function MessagesPage() {
         presence.fetchPresence(userIds);
       }
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- fetch presence when conversations load; presence excluded (stable ref)
   }, [conversations]);
 
   // Fetch messaging restriction status (broker monitoring)

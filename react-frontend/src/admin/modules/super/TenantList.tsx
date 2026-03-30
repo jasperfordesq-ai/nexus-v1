@@ -329,9 +329,9 @@ export function TenantList() {
           isOpen={!!confirmAction}
           onClose={() => setConfirmAction(null)}
           onConfirm={handleAction}
-          title={confirmMessages[confirmAction.type].title}
-          message={`${confirmMessages[confirmAction.type].message}\n\nTenant: ${confirmAction.tenant.name}`}
-          confirmLabel={confirmMessages[confirmAction.type].label}
+          title={confirmMessages[confirmAction.type]?.title ?? ''}
+          message={`${confirmMessages[confirmAction.type]?.message ?? ''}\n\nTenant: ${confirmAction.tenant.name}`}
+          confirmLabel={confirmMessages[confirmAction.type]?.label ?? ''}
           confirmColor={confirmAction.type === 'reactivate' ? 'primary' : 'danger'}
           isLoading={actionLoading}
         />

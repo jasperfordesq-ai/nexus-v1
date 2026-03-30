@@ -488,6 +488,7 @@ export function MenuBuilder() {
     // Reorder locally
     const updated = [...menuItems];
     const [moved] = updated.splice(oldIndex, 1);
+    if (!moved) return;
     updated.splice(newIndex, 0, moved);
 
     // Update sort_order

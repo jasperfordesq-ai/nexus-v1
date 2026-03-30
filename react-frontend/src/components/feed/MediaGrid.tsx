@@ -87,37 +87,43 @@ export function MediaGrid({ media, className = '' }: MediaGridProps) {
   );
 
   const gridContent = () => {
-    if (total === 2) {
+    const m0 = displayMedia[0];
+    const m1 = displayMedia[1];
+    const m2 = displayMedia[2];
+    const m3 = displayMedia[3];
+
+    if (total === 2 && m0 && m1) {
       // Side-by-side 50/50
       return (
         <div className={`grid grid-cols-2 gap-1 rounded-xl overflow-hidden ${className}`}>
-          <div className="aspect-square">{renderMedia(displayMedia[0], 0)}</div>
-          <div className="aspect-square">{renderMedia(displayMedia[1], 1)}</div>
+          <div className="aspect-square">{renderMedia(m0, 0)}</div>
+          <div className="aspect-square">{renderMedia(m1, 1)}</div>
         </div>
       );
     }
 
-    if (total === 3) {
+    if (total === 3 && m0 && m1 && m2) {
       // One large left (60%) + two stacked right (40%)
       return (
         <div className={`grid grid-cols-5 gap-1 rounded-xl overflow-hidden h-96 ${className}`}>
-          <div className="col-span-3 h-full">{renderMedia(displayMedia[0], 0)}</div>
+          <div className="col-span-3 h-full">{renderMedia(m0, 0)}</div>
           <div className="col-span-2 grid grid-rows-2 gap-1 h-full">
-            <div>{renderMedia(displayMedia[1], 1)}</div>
-            <div>{renderMedia(displayMedia[2], 2)}</div>
+            <div>{renderMedia(m1, 1)}</div>
+            <div>{renderMedia(m2, 2)}</div>
           </div>
         </div>
       );
     }
 
     // 4+ images: 2x2 grid, with +N overlay on 4th if 5+
+    if (!m0 || !m1 || !m2 || !m3) return null;
     return (
       <div className={`grid grid-cols-2 gap-1 rounded-xl overflow-hidden ${className}`}>
-        <div className="aspect-square">{renderMedia(displayMedia[0], 0)}</div>
-        <div className="aspect-square">{renderMedia(displayMedia[1], 1)}</div>
-        <div className="aspect-square">{renderMedia(displayMedia[2], 2)}</div>
+        <div className="aspect-square">{renderMedia(m0, 0)}</div>
+        <div className="aspect-square">{renderMedia(m1, 1)}</div>
+        <div className="aspect-square">{renderMedia(m2, 2)}</div>
         <div className="aspect-square">
-          {renderMedia(displayMedia[3], 3, total > 4)}
+          {renderMedia(m3, 3, total > 4)}
         </div>
       </div>
     );

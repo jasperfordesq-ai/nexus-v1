@@ -303,7 +303,7 @@ export function GroupDetailPage() {
     if (activeTab === 'feed' && !feedLoaded && group && isMember(group)) {
       loadGroupFeed();
     }
-  }, [activeTab, feedLoaded, group]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [activeTab, feedLoaded, group]); // eslint-disable-line react-hooks/exhaustive-deps -- lazy load feed tab; loadGroupFeed excluded to avoid loop
 
   // ─────────────────────────────────────────────────────────────────────────
   // Feed Actions (like, hide, mute, report, delete, poll vote)
@@ -455,7 +455,7 @@ export function GroupDetailPage() {
     if (activeTab === 'discussion' && !discussionsLoaded && group && isMember(group)) {
       loadDiscussions();
     }
-  }, [activeTab, discussionsLoaded, group]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [activeTab, discussionsLoaded, group]); // eslint-disable-line react-hooks/exhaustive-deps -- lazy load discussion tab; loadDiscussions excluded to avoid loop
 
   // ─────────────────────────────────────────────────────────────────────────
   // Load Members

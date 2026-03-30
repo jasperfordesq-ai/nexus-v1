@@ -249,7 +249,7 @@ export function ThemeProvider({
     })();
 
     return () => { cancelled = true; };
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps -- load theme once on mount
 
   // Listen for system preference changes (only relevant when theme is 'system')
   useEffect(() => {

@@ -285,7 +285,7 @@ export function SafeguardingStep({ onNext, onBack, onSkip, isRequired, introText
                         size="sm"
                         variant="bordered"
                         className="mt-2 max-w-xs"
-                        selectedKeys={selectValues[option.id] ? [selectValues[option.id]] : []}
+                        selectedKeys={selectValues[option.id] != null ? [selectValues[option.id] ?? ''] : []}
                         onSelectionChange={(keys) => {
                           const value = Array.from(keys)[0] as string || '';
                           setSelectValues(prev => ({ ...prev, [option.id]: value }));

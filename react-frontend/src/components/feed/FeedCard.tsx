@@ -366,7 +366,7 @@ const FeedCard = React.memo(function FeedCard({
     if (defaultShowComments) {
       loadComments();
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- load once on mount; defaultShowComments is initial prop
   }, []);
 
   const toggleComments = () => {
@@ -581,7 +581,7 @@ const FeedCard = React.memo(function FeedCard({
               <ImageCarousel media={item.media} className="mx-5" />
             )}
           </div>
-        ) : item.media && item.media.length === 1 ? (
+        ) : item.media && item.media.length === 1 && item.media[0] ? (
           /* Single media item — use VideoPlayer for video, ImageCarousel for image */
           <div className="mb-4 -mx-5 overflow-hidden">
             {item.media[0].media_type === 'video' ? (

@@ -367,7 +367,7 @@ export function ActivityFeed() {
         abortControllerRef.current.abort();
       }
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- reload on filter change; loadActivities excluded to avoid loop
   }, [eventTypeParam, partnerFilter, dateFrom, dateTo, debouncedSearch]);
 
   const handleLoadMore = () => {

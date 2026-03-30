@@ -104,7 +104,7 @@ export function LegalVersionHistoryPage() {
   // Extract document slug from URL path: /terms/versions → "terms"
   const pathSegments = location.pathname.split('/').filter(Boolean);
   const versionsIdx = pathSegments.indexOf('versions');
-  const slug = versionsIdx > 0 ? pathSegments[versionsIdx - 1] : '';
+  const slug = versionsIdx > 0 ? (pathSegments[versionsIdx - 1] ?? '') : '';
   const docType = SLUG_TO_TYPE[slug];
 
   const [title, setTitle] = useState('');

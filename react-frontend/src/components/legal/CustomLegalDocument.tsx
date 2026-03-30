@@ -67,7 +67,7 @@ interface Section {
  */
 function parseNumberedTitle(title: string): [string | null, string] {
   const match = title.match(/^(\d+)[.)]\s+(.+)$/);
-  if (match) return [match[1], match[2]];
+  if (match) return [match[1] ?? null, match[2] ?? title];
   return [null, title];
 }
 
@@ -92,7 +92,7 @@ function parseSections(html: string): Section[] {
         const [numericPrefix, displayTitle] = parseNumberedTitle(currentTitle);
         sections.push({ id: currentId, title: currentTitle, displayTitle, numericPrefix, html: currentHtml.trim() });
       }
-      const rawTitle = h2Match[2].replace(/<[^>]+>/g, '').trim();
+      const rawTitle = (h2Match[2] ?? '').replace(/<[^>]+>/g, '').trim();
       currentTitle = rawTitle;
       currentId = h2Match[1] || slugify(rawTitle);
       currentHtml = '';

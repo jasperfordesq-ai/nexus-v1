@@ -286,9 +286,9 @@ export function SuperUserList() {
           isOpen={!!confirmAction}
           onClose={() => setConfirmAction(null)}
           onConfirm={handleAction}
-          title={confirmMessages[confirmAction.type].title}
-          message={`${confirmMessages[confirmAction.type].message}\n\nUser: ${confirmAction.user.name} (${confirmAction.user.email})`}
-          confirmLabel={confirmMessages[confirmAction.type].label}
+          title={confirmMessages[confirmAction.type]?.title ?? ''}
+          message={`${confirmMessages[confirmAction.type]?.message ?? ''}\n\nUser: ${confirmAction.user.name} (${confirmAction.user.email})`}
+          confirmLabel={confirmMessages[confirmAction.type]?.label ?? ''}
           confirmColor={confirmAction.type.includes('revoke') ? 'danger' : 'primary'}
           isLoading={actionLoading}
         />

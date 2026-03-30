@@ -43,7 +43,7 @@ export function ImageSettings() {
       })
       .catch(() => toast.error(t('system.failed_to_load_image_settings')))
       .finally(() => setLoading(false));
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- load once on mount
   }, []);
 
   const handleSave = async () => {

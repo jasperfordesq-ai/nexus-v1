@@ -7,7 +7,7 @@
  * Notifications Page - User notifications center
  */
 
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useCallback, useRef, memo } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Button, Skeleton } from '@heroui/react';
@@ -276,7 +276,7 @@ interface NotificationCardProps {
   onDelete: () => void;
 }
 
-function NotificationCard({ notification, onMarkRead, onDelete }: NotificationCardProps) {
+const NotificationCard = memo(function NotificationCard({ notification, onMarkRead, onDelete }: NotificationCardProps) {
   const { t } = useTranslation('notifications');
   const navigate = useNavigate();
   const { tenantPath } = useTenant();
@@ -370,6 +370,6 @@ function NotificationCard({ notification, onMarkRead, onDelete }: NotificationCa
       </div>
     </GlassCard>
   );
-}
+});
 
 export default NotificationsPage;

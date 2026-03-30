@@ -128,7 +128,7 @@ export function useLinkPreview(text: string): UseLinkPreviewReturn {
 
         const newPreviews: LinkPreview[] = [];
         results.forEach((result, i) => {
-          const url = urlsToFetch[i];
+          const url = urlsToFetch[i] ?? '';
           fetchedUrls.current.add(url);
 
           if (

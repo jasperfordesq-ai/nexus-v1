@@ -123,7 +123,7 @@ export function FederationConnectionsPage() {
           reject: tRef.current('connections.rejected_success', 'Connection request declined'),
           remove: tRef.current('connections.removed_success', 'Connection removed'),
         };
-        toastRef.current.success(msgs[action]);
+        toastRef.current.success(msgs[action] ?? '');
         loadConnections(activeTab);
       } else {
         toastRef.current.error(response.error || tRef.current('connections.action_failed', 'Action failed'));

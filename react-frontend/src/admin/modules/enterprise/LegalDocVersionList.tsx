@@ -358,7 +358,7 @@ export default function LegalDocVersionList() {
                         size="sm"
                         variant="bordered"
                         startContent={<GitCompare size={16} />}
-                        onPress={() => openCompareModal(version, versions[index + 1])}
+                        onPress={() => { const prev = versions[index + 1]; if (prev) openCompareModal(version, prev); }}
                       >
                         Compare
                       </Button>

@@ -58,7 +58,8 @@ export function LanguageSwitcher({ compact = true }: LanguageSwitcherProps) {
 
   // If current language isn't in the tenant's list, fall back to the first supported one
   const currentLang = supportedLanguages.find((l) => l.code === i18n.language)
-    ?? supportedLanguages[0];
+    ?? supportedLanguages[0]
+    ?? { code: 'en', label: 'English', short: 'EN' };
 
   const handleLanguageChange = (code: string) => {
     i18n.changeLanguage(code);

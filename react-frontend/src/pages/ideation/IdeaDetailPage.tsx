@@ -219,7 +219,7 @@ export function IdeaDetailPage() {
   useEffect(() => {
     fetchIdea();
     fetchComments();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- reload on id change; fetchIdea/fetchComments excluded to avoid loop
   }, [id]);
 
   // Pre-populate group form when idea loads
@@ -231,7 +231,7 @@ export function IdeaDetailPage() {
         description: idea.description,
       }));
     }
-  }, [idea?.id]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [idea?.id]); // eslint-disable-line react-hooks/exhaustive-deps -- sync edit form when idea loads; editForm excluded to avoid loop
 
   /* ───── Actions ───── */
 

@@ -112,7 +112,7 @@ export const PresenceIndicator = memo(function PresenceIndicator({
   const sizeClass = sizeClasses[size];
   const ringClass = ringClasses[size];
 
-  const statusLabel = t(STATUS_LABEL_KEYS[status] ?? STATUS_LABEL_KEYS.offline);
+  const statusLabel = t(STATUS_LABEL_KEYS[status] ?? STATUS_LABEL_KEYS.offline ?? 'presence.offline');
 
   // Format last seen
   const formatLastSeen = (lastSeen: string | null): string => {

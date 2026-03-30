@@ -148,7 +148,7 @@ export function ExpensesTab() {
         const orgs = Array.isArray(res.data) ? res.data : [];
         setOrganisations(orgs);
         if (orgs.length === 1) {
-          setFormOrgId(orgs[0].id.toString());
+          setFormOrgId((orgs[0]?.id ?? '').toString());
         }
       }
     }).catch((err) => logError('Failed to load organisations', err));

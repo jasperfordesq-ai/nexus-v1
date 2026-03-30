@@ -461,7 +461,7 @@ export default function ExplorePage() {
     if (activeTab === 'for_you' && forYouItems.length === 0 && !forYouLoading) {
       loadForYouPage(1, true);
     }
-  }, [activeTab]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [activeTab]); // eslint-disable-line react-hooks/exhaustive-deps -- reset when tab changes; loadForYouPage excluded to avoid loop
 
   // Infinite scroll via IntersectionObserver
   useEffect(() => {

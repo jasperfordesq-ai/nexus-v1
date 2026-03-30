@@ -458,7 +458,7 @@ export default function ConnectionsPage() {
         }
       }
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- load once on mount
   }, []);
   fetchConnectionsRef.current = fetchConnections;
 

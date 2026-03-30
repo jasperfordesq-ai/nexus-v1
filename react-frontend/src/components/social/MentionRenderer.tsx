@@ -154,7 +154,7 @@ export function MentionRenderer({
       parts.push({ type: 'text', value: text.slice(lastIndex, match.index) });
     }
 
-    const username = match[1];
+    const username = match[1] ?? '';
     const user = findMentionUser(username, mentions);
     parts.push({ type: 'mention', value: username, user });
 

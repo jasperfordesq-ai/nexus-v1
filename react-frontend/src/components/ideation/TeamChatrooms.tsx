@@ -140,7 +140,7 @@ export function TeamChatrooms({ groupId, isGroupAdmin }: TeamChatroomsProps) {
         const rooms = Array.isArray(response.data) ? response.data : [];
         setChatrooms(rooms);
         if (rooms.length > 0 && !activeChatroomId) {
-          setActiveChatroomId(rooms[0].id);
+          setActiveChatroomId(rooms[0]?.id ?? null);
         }
       }
     } catch (err) {

@@ -392,8 +392,8 @@ export function MediaUploader({
               <div className="grid grid-cols-3 gap-2 sm:grid-cols-4">
                 {mediaFiles.map((item, index) => (
                   <SortableMediaItem
-                    key={itemIds[index]}
-                    id={itemIds[index]}
+                    key={itemIds[index] ?? index}
+                    id={itemIds[index] ?? ''}
                     item={item}
                     index={index}
                     onRemove={handleRemove}

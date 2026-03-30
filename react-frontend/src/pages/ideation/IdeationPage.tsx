@@ -253,7 +253,7 @@ export function IdeationPage() {
   useEffect(() => {
     setCursor(undefined);
     fetchChallenges(activeTab, false, selectedCategory, debouncedSearch, selectedTags);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- reset on filter change; fetchChallenges excluded to avoid loop
   }, [activeTab, selectedCategory, debouncedSearch, selectedTags]);
 
   const handleTabChange = (key: React.Key) => {

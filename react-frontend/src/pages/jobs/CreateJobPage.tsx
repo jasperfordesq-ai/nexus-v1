@@ -244,7 +244,7 @@ export function CreateJobPage() {
             time_credits: v.time_credits != null ? String(v.time_credits) : '',
             contact_email: str(v.contact_email),
             contact_phone: str(v.contact_phone),
-            deadline: v.deadline ? String(v.deadline).split('T')[0] : '',
+            deadline: v.deadline ? (String(v.deadline).split('T')[0] ?? '') : '',
             salary_min: v.salary_min != null ? String(v.salary_min) : '',
             salary_max: v.salary_max != null ? String(v.salary_max) : '',
             salary_type: str(v.salary_type),
@@ -441,7 +441,7 @@ export function CreateJobPage() {
       }
     }, 800);
     return () => clearTimeout(timer);
-  }, [form.title, form.organization_id, isEditing]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [form.title, form.organization_id, isEditing]); // eslint-disable-line react-hooks/exhaustive-deps -- debounced duplicate check on title/org change
 
   const handleSubmit = async () => {
     if (!validate()) return;

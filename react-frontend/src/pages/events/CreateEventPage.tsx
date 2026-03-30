@@ -187,9 +187,9 @@ export function CreateEventPage() {
         setFormData({
           title: event.title,
           description: event.description || '',
-          startDate: parseDate(startDate.toISOString().split('T')[0]),
+          startDate: parseDate(startDate.toISOString().split('T')[0] ?? ''),
           startTime: parseTime(startDate.toTimeString().slice(0, 5)),
-          endDate: endDate ? parseDate(endDate.toISOString().split('T')[0]) : null,
+          endDate: endDate ? parseDate(endDate.toISOString().split('T')[0] ?? '') : null,
           endTime: endDate ? parseTime(endDate.toTimeString().slice(0, 5)) : null,
           location: event.location || '',
           latitude: event.coordinates?.lat,

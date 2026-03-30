@@ -110,7 +110,7 @@ export function MentionInput({
       // Detect @mention pattern at cursor position or end of text
       const match = newValue.match(/@([a-zA-Z0-9_.-]{2,})$/);
       if (match) {
-        const query = match[1];
+        const query = match[1] ?? '';
         setMentionQuery(query);
         setSelectedIndex(0);
 
@@ -183,7 +183,8 @@ export function MentionInput({
         }
         if (e.key === 'Enter') {
           e.preventDefault();
-          selectMention(suggestions[selectedIndex]);
+          const selected = suggestions[selectedIndex];
+          if (selected) selectMention(selected);
           return;
         }
         if (e.key === 'Escape') {

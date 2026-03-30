@@ -28,7 +28,7 @@ export function ExploreStatCard({ icon: Icon, label, value, suffix = '' }: Explo
 
     const observer = new IntersectionObserver(
       ([entry]) => {
-        if (entry.isIntersecting && !hasAnimated) {
+        if (entry?.isIntersecting && !hasAnimated) {
           setHasAnimated(true);
           animateCount(value);
         }

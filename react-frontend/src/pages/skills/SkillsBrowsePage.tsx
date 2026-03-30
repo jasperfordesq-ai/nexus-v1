@@ -75,7 +75,7 @@ const proficiencyConfig: Record<string, { labelKey: string; fallback: string; co
 
 function ProficiencyBadge({ level }: { level: string }) {
   const { t } = useTranslation('common');
-  const config = proficiencyConfig[level] ?? proficiencyConfig.beginner;
+  const config = proficiencyConfig[level] ?? proficiencyConfig['beginner'] ?? { labelKey: 'skills.proficiency.beginner', fallback: 'Beginner', color: 'text-emerald-500', bg: 'bg-emerald-500', dots: 1 };
   return (
     <span className={`inline-flex items-center gap-1 text-xs font-medium ${config.color}`}>
       {[1, 2, 3, 4].map((d) => (

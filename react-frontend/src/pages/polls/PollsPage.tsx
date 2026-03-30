@@ -483,7 +483,7 @@ export function PollsPage() {
   useEffect(() => {
     setCursor(undefined);
     loadPolls();
-  }, [tab, selectedCategory]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [tab, selectedCategory]); // eslint-disable-line react-hooks/exhaustive-deps -- reset on tab/category change; loadPolls excluded to avoid loop
 
   const loadMore = useCallback(() => {
     if (isLoadingMore || !hasMore) return;
@@ -704,7 +704,12 @@ export function PollsPage() {
     if (index === 0) return;
     setRankOrder((prev) => {
       const next = [...prev];
-      [next[index - 1], next[index]] = [next[index], next[index - 1]];
+      const a = next[index - 1];
+      const b = next[index];
+      if (a !== undefined && b !== undefined) {
+        next[index - 1] = b;
+        next[index] = a;
+      }
       return next;
     });
   };
@@ -713,7 +718,12 @@ export function PollsPage() {
     setRankOrder((prev) => {
       if (index >= prev.length - 1) return prev;
       const next = [...prev];
-      [next[index], next[index + 1]] = [next[index + 1], next[index]];
+      const a = next[index];
+      const b = next[index + 1];
+      if (a !== undefined && b !== undefined) {
+        next[index] = b;
+        next[index + 1] = a;
+      }
       return next;
     });
   };

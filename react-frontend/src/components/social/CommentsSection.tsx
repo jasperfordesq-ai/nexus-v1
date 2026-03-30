@@ -349,7 +349,7 @@ function MentionInput({
     // Detect @mention pattern: @ followed by 2+ word characters at end of input or before space
     const match = newValue.match(/@(\w{2,})$/);
     if (match) {
-      const query = match[1];
+      const query = match[1] ?? '';
       setMentionQuery(query);
       setSelectedIndex(0);
       if (debounceRef.current) clearTimeout(debounceRef.current);
@@ -387,7 +387,8 @@ function MentionInput({
       }
       if (e.key === 'Enter') {
         e.preventDefault();
-        selectMention(mentionResults[selectedIndex]);
+        const selected = mentionResults[selectedIndex];
+        if (selected) selectMention(selected);
         return;
       }
       if (e.key === 'Escape') {

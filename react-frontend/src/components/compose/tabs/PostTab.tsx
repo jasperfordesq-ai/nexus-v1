@@ -148,7 +148,7 @@ export function PostTab({ onSuccess, onClose, groupId, templateData }: TabSubmit
         if (groupId) formData.append('group_id', String(groupId));
         if (schedulePayload.publish_status) {
           formData.append('publish_status', schedulePayload.publish_status);
-          formData.append('scheduled_at', schedulePayload.scheduled_at);
+          formData.append('scheduled_at', schedulePayload.scheduled_at ?? '');
         }
 
         // Append media files and alt texts for PostMediaService

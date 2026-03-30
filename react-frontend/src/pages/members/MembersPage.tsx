@@ -208,7 +208,7 @@ export function MembersPage() {
     // Reset pagination state when filters change
     setHasMore(true);
     setTotalCount(null);
-  }, [debouncedQuery, sortBy, nearMeEnabled, user?.latitude, user?.longitude, radiusKm]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [debouncedQuery, sortBy, nearMeEnabled, user?.latitude, user?.longitude, radiusKm]); // eslint-disable-line react-hooks/exhaustive-deps -- reset pagination on filter change
 
   // Fetch presence for visible members
   useEffect(() => {
@@ -216,7 +216,7 @@ export function MembersPage() {
       const userIds = members.map((m) => m.id);
       presence.fetchPresence(userIds);
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- fetch presence when member list updates; presence excluded (stable ref)
   }, [members]);
 
   // Update URL params

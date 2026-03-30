@@ -360,7 +360,7 @@ export function ActivityDashboardPage() {
             {timeline.length > 0 ? (
               <div className="space-y-4">
                 {timeline.map((item, idx) => {
-                  const config = activityIcons[item.activity_type] || activityIcons.default;
+                  const config = activityIcons[item.activity_type] ?? activityIcons.default ?? { icon: null, color: '' };
                   return (
                     <div key={`${item.id}-${idx}`} className="flex items-start gap-3">
                       <div className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${config.color}`}>

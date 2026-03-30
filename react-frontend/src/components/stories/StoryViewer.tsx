@@ -228,7 +228,7 @@ export function StoryViewer({ storyUsers, initialUserIndex, onClose }: StoryView
     if (currentUserIdx < storyUsers.length - 1) {
       const nextUser = storyUsers[currentUserIdx + 1];
       // Preload avatar
-      if (nextUser.avatar_url) {
+      if (nextUser?.avatar_url) {
         const img = new Image();
         img.src = resolveAvatarUrl(nextUser.avatar_url);
       }
@@ -278,7 +278,7 @@ export function StoryViewer({ storyUsers, initialUserIndex, onClose }: StoryView
         cancelAnimationFrame(progressTimerRef.current);
       }
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- timer depends on story state; callback refs excluded
   }, [currentStory, isPaused, isLoadingStories, hasVoted]);
 
   // Track analytics helper (fire-and-forget)
@@ -414,12 +414,14 @@ export function StoryViewer({ storyUsers, initialUserIndex, onClose }: StoryView
   // Swipe down to close
   const handleTouchStart = useCallback((e: React.TouchEvent) => {
     const touch = e.touches[0];
+    if (!touch) return;
     touchStartRef.current = { x: touch.clientX, y: touch.clientY, time: Date.now() };
   }, []);
 
   const handleTouchEnd = useCallback((e: React.TouchEvent) => {
     if (!touchStartRef.current) return;
     const touch = e.changedTouches[0];
+    if (!touch) return;
     const dx = touch.clientX - touchStartRef.current.x;
     const dy = touch.clientY - touchStartRef.current.y;
     const dt = Date.now() - touchStartRef.current.time;

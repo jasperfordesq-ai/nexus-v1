@@ -247,7 +247,7 @@ export function Subscribers() {
       }
 
       // Parse header
-      const header = lines[0].split(',').map((h) => h.trim().toLowerCase().replace(/"/g, ''));
+      const header = (lines[0] ?? '').split(',').map((h) => h.trim().toLowerCase().replace(/"/g, ''));
       const emailIdx = header.indexOf('email');
       if (emailIdx === -1) {
         toast.warning(t('newsletters.c_s_v_must_have_an_email_column'));
@@ -258,7 +258,7 @@ export function Subscribers() {
 
       const rows: Array<{ email: string; first_name?: string; last_name?: string }> = [];
       for (let i = 1; i < lines.length; i++) {
-        const cols = lines[i].split(',').map((c) => c.trim().replace(/^"|"$/g, ''));
+        const cols = (lines[i] ?? '').split(',').map((c) => c.trim().replace(/^"|"$/g, ''));
         const email = cols[emailIdx];
         if (!email) continue;
         rows.push({

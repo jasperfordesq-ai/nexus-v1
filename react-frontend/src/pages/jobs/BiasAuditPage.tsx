@@ -130,13 +130,13 @@ export function BiasAuditPage() {
     if (dateFrom && dateTo && dateFrom > dateTo) {
       setDateTo(dateFrom);
     }
-  }, [dateFrom]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [dateFrom]); // eslint-disable-line react-hooks/exhaustive-deps -- sync dateTo when dateFrom changes; dateTo excluded to avoid loop
 
   useEffect(() => {
     if (dateFrom && dateTo && dateTo < dateFrom) {
       setDateFrom(dateTo);
     }
-  }, [dateTo]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [dateTo]); // eslint-disable-line react-hooks/exhaustive-deps -- sync dateFrom when dateTo changes; dateFrom excluded to avoid loop
 
   // Load available jobs for the filter dropdown
   useEffect(() => {

@@ -218,7 +218,7 @@ export function JobsPage() {
       setHasMore(true);
       loadVacancies();
     }
-  }, [debouncedQuery, selectedType, selectedCommitment, selectedSort, remoteOnly, activeTab]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [debouncedQuery, selectedType, selectedCommitment, selectedSort, remoteOnly, activeTab]); // eslint-disable-line react-hooks/exhaustive-deps -- reset on filter change; loadVacancies excluded to avoid loop
 
   // J1: Load saved jobs
   useEffect(() => {

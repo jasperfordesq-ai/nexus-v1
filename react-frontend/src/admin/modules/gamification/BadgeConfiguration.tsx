@@ -159,11 +159,11 @@ export function BadgeConfiguration() {
                   {TIER_LABELS[tier] ?? tier}
                 </Chip>
                 <span className="text-default-400 text-sm font-normal">
-                  {grouped[tier].length} badge{grouped[tier].length !== 1 ? 's' : ''}
+                  {(grouped[tier] ?? []).length} badge{(grouped[tier] ?? []).length !== 1 ? 's' : ''}
                 </span>
               </h2>
               <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
-                {grouped[tier].map((badge) => {
+                {(grouped[tier] ?? []).map((badge) => {
                   const IconComp = CLASS_ICONS[badge.badge_class] ?? Award;
                   const isUpdating = updating === badge.key;
                   return (

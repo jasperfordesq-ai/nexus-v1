@@ -178,7 +178,7 @@ export function SearchPage() {
       setQuery(urlQuery);
       performSearch(urlQuery);
     }
-  }, [searchParams]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [searchParams]); // eslint-disable-line react-hooks/exhaustive-deps -- sync from URL params; performSearch excluded to avoid loop
 
   function handleSearch(e: React.FormEvent) {
     e.preventDefault();

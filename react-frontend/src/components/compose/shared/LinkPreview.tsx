@@ -162,7 +162,7 @@ export function LinkPreview({ content, onPreviewData }: LinkPreviewProps) {
         clearTimeout(debounceTimer.current);
       }
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- debounced link extraction on content change
   }, [content]);
 
   // Cleanup abort controller on unmount

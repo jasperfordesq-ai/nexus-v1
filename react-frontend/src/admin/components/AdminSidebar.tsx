@@ -389,7 +389,7 @@ export function AdminSidebar({ collapsed, onToggle }: AdminSidebarProps) {
         }
         if (section.items) {
           for (const item of section.items) {
-            if (location.pathname.startsWith(tenantPath(item.href.split('?')[0]))) {
+            if (location.pathname.startsWith(tenantPath(item.href.split('?')[0] ?? ''))) {
               active.add(section.key);
             }
           }
@@ -432,7 +432,7 @@ export function AdminSidebar({ collapsed, onToggle }: AdminSidebarProps) {
   };
 
   const isActive = (href: string) => {
-    const cleanHref = href.split('?')[0];
+    const cleanHref = href.split('?')[0] ?? '';
     const fullPath = tenantPath(cleanHref);
     if (cleanHref === '/admin') {
       return location.pathname === fullPath;

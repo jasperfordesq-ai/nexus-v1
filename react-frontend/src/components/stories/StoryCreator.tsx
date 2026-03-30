@@ -236,7 +236,7 @@ export function StoryCreator({ onClose, onCreated }: StoryCreatorProps) {
     if (cameraActive && !cameraStream) {
       startCamera();
     }
-  }, [cameraFacing]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [cameraFacing]); // eslint-disable-line react-hooks/exhaustive-deps -- restart camera on facing change; startCamera excluded to avoid loop
 
   // Cleanup camera on unmount
   useEffect(() => {
@@ -455,8 +455,9 @@ export function StoryCreator({ onClose, onCreated }: StoryCreatorProps) {
           throw new Error(response.error || 'Failed to create story');
         }
       } else if (mode === 'text') {
-        const gradient = GRADIENT_PRESETS[selectedGradient];
-        const font = FONT_STYLES[selectedFont];
+        const gradient = GRADIENT_PRESETS[selectedGradient] ?? GRADIENT_PRESETS[0];
+        const font = FONT_STYLES[selectedFont] ?? FONT_STYLES[0];
+        if (!gradient || !font) return;
 
         const response = await api.post('/v2/stories', {
           media_type: 'text',
@@ -470,7 +471,7 @@ export function StoryCreator({ onClose, onCreated }: StoryCreatorProps) {
           throw new Error(response.error || 'Failed to create story');
         }
       } else if (mode === 'poll') {
-        const gradient = GRADIENT_PRESETS[pollGradient];
+        const gradient = GRADIENT_PRESETS[pollGradient] ?? GRADIENT_PRESETS[0] ?? { label: '', class: '', css: '' };
         const filledOptions = pollOptions.filter((o) => o.trim());
 
         const response = await api.post('/v2/stories', {
@@ -881,14 +882,14 @@ export function StoryCreator({ onClose, onCreated }: StoryCreatorProps) {
             {/* Preview */}
             <div
               className="flex-1 flex items-center justify-center px-8 py-12 mx-4 rounded-2xl min-h-[300px]"
-              style={{ background: GRADIENT_PRESETS[selectedGradient].css }}
+              style={{ background: (GRADIENT_PRESETS[selectedGradient] ?? GRADIENT_PRESETS[0])?.css }}
             >
               {textContent ? (
                 <p
                   className="text-white text-center max-w-sm drop-shadow-lg"
                   style={{
                     fontSize: '1.5rem',
-                    fontFamily: FONT_STYLES[selectedFont].family,
+                    fontFamily: (FONT_STYLES[selectedFont] ?? FONT_STYLES[0])?.family,
                     lineHeight: 1.4,
                   }}
                 >
@@ -990,7 +991,7 @@ export function StoryCreator({ onClose, onCreated }: StoryCreatorProps) {
             {/* Preview */}
             <div
               className="flex flex-col items-center justify-center px-8 py-12 mx-4 rounded-2xl min-h-[250px] gap-4"
-              style={{ background: GRADIENT_PRESETS[pollGradient].css }}
+              style={{ background: (GRADIENT_PRESETS[pollGradient] ?? GRADIENT_PRESETS[0])?.css }}
             >
               {pollQuestion ? (
                 <h3 className="text-white text-xl font-bold text-center">{pollQuestion}</h3>

@@ -137,7 +137,7 @@ export function GroupsPage() {
     setCursor(null);
     loadGroups();
     setHasMore(true);
-  }, [debouncedQuery, filter]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [debouncedQuery, filter]); // eslint-disable-line react-hooks/exhaustive-deps -- reset on filter change; loadGroups excluded to avoid loop
 
   // Update URL params
   useEffect(() => {

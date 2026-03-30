@@ -91,7 +91,7 @@ function formatFileSize(bytes: number): string {
 
 function getFileExtension(filename: string): string {
   const parts = filename.split('.');
-  return parts.length > 1 ? parts[parts.length - 1].toUpperCase() : '';
+  return parts.length > 1 ? (parts[parts.length - 1] ?? '').toUpperCase() : '';
 }
 
 /* ───────────────────────── Main Component ───────────────────────── */

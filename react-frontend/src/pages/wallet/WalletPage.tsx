@@ -122,7 +122,7 @@ export function WalletPage() {
       newParams.delete('to');
       setSearchParams(newParams, { replace: true });
     }
-  }, [savedRecipientId, isLoading, balance]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [savedRecipientId, isLoading, balance]); // eslint-disable-line react-hooks/exhaustive-deps -- sync from URL params; searchParams/setSearchParams excluded to avoid loop
 
   // Load more transactions (cursor-based pagination)
   const loadMoreTransactions = useCallback(async () => {

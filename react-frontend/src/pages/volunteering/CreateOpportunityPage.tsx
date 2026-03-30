@@ -84,7 +84,7 @@ export default function CreateOpportunityPage() {
 
         // Auto-select if only one approved org
         if (approved.length === 1) {
-          setFormData((prev) => ({ ...prev, organization_id: approved[0].id.toString() }));
+          setFormData((prev) => ({ ...prev, organization_id: (approved[0]?.id ?? '').toString() }));
         }
       }
     } catch (error) {

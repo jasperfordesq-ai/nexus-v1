@@ -229,7 +229,7 @@ export function NewsletterForm() {
         if (tpl.preview_text && !previewText) setPreviewText(tpl.preview_text);
       }
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- apply template defaults on selection change
   }, [templateId]);
 
   const buildPayload = (): Record<string, unknown> => ({

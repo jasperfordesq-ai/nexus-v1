@@ -736,14 +736,14 @@ export function MyApplicationsPage() {
     setHasMore(false);
     setApplications([]);
     loadApplications();
-  }, [activeTab]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [activeTab]); // eslint-disable-line react-hooks/exhaustive-deps -- reset state when tab changes; loadApplications excluded to avoid loop
 
   // After loadApplications completes, also fetch interviews + offers
   useEffect(() => {
     if (!isLoading && applications.length > 0) {
       mergeInterviewsAndOffers(applications);
     }
-  }, [isLoading]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [isLoading]); // eslint-disable-line react-hooks/exhaustive-deps -- merge interviews after load completes; applications excluded to avoid loop
 
   // Feature 3: Interview accept/decline handlers
   const handleAcceptInterview = useCallback(async (interviewId: number) => {

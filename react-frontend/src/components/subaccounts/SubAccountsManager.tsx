@@ -285,7 +285,7 @@ export function SubAccountsManager() {
           ) : (
             <div className="space-y-3">
               {subAccounts.map((account) => {
-                const status = statusConfig[account.status] || statusConfig.pending;
+                const status = statusConfig[account.status] ?? statusConfig['pending'] ?? { label: account.status, color: 'warning' as const, icon: null };
                 return (
                   <GlassCard key={account.id} className="p-4">
                     <div className="flex items-start gap-4">

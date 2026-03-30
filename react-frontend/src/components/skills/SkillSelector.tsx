@@ -77,7 +77,7 @@ const proficiencyConfig: Record<string, { label: string; color: string; dots: nu
 // ─────────────────────────────────────────────────────────────────────────────
 
 export function ProficiencyDots({ level }: { level: string }) {
-  const config = proficiencyConfig[level] ?? proficiencyConfig.beginner;
+  const config = proficiencyConfig[level] ?? proficiencyConfig['beginner'] ?? { label: 'Beginner', color: 'text-emerald-500', dots: 1 };
   return (
     <div className="flex items-center gap-1" aria-label={`Proficiency: ${config.label}`}>
       {[1, 2, 3, 4].map((dot) => (

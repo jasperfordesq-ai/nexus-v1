@@ -320,7 +320,7 @@ export function RegistrationPolicySettings() {
                 return (
                   <SelectItem key={mode.key} textValue={mode.label}>
                     <div className="flex items-center gap-2">
-                      <Icon size={16} />
+                      {Icon && <Icon size={16} />}
                       <span>{mode.label}</span>
                     </div>
                   </SelectItem>

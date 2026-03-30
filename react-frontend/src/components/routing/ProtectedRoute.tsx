@@ -51,7 +51,7 @@ export function ProtectedRoute({ children }: ProtectedRouteProps) {
   // onboarding.enabled=false or onboarding.mandatory=false, we skip the
   // redirect entirely so members can use the platform without onboarding.
   const pathSegments = location.pathname.replace(/\/+$/, '').split('/');
-  const lastSegment = pathSegments[pathSegments.length - 1];
+  const lastSegment = pathSegments[pathSegments.length - 1] ?? '';
   const onboardingSettings = tenant?.settings as Record<string, unknown> | undefined;
   const onboardingEnabled = onboardingSettings?.onboarding_enabled !== false;
   const onboardingMandatory = onboardingSettings?.onboarding_mandatory !== false;

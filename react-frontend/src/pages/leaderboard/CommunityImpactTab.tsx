@@ -104,12 +104,12 @@ export default function CommunityImpactTab() {
   ];
 
   const monthMetrics = [
-    { label: t('community.new_members', 'New Members'), value: data.this_month.new_members, trend: data.trends.new_members, icon: <UserPlus className="w-4 h-4" /> },
-    { label: t('community.badges_awarded', 'Badges Awarded'), value: data.this_month.badges_awarded, trend: data.trends.badges_awarded, icon: <Award className="w-4 h-4" /> },
-    { label: t('community.new_listings', 'New Listings'), value: data.this_month.new_listings, trend: data.trends.new_listings, icon: <FileText className="w-4 h-4" /> },
-    { label: t('community.new_connections', 'New Connections'), value: data.this_month.new_connections, trend: data.trends.new_connections, icon: <Handshake className="w-4 h-4" /> },
-    { label: t('community.volunteer_hours', 'Volunteer Hours'), value: data.this_month.volunteer_hours, trend: data.trends.volunteer_hours, icon: <Clock className="w-4 h-4" /> },
-    { label: t('community.new_posts', 'New Posts'), value: data.this_month.new_posts, trend: data.trends.new_posts, icon: <FileText className="w-4 h-4" /> },
+    { label: t('community.new_members', 'New Members'), value: data.this_month.new_members, trend: data.trends.new_members ?? 0, icon: <UserPlus className="w-4 h-4" /> },
+    { label: t('community.badges_awarded', 'Badges Awarded'), value: data.this_month.badges_awarded, trend: data.trends.badges_awarded ?? 0, icon: <Award className="w-4 h-4" /> },
+    { label: t('community.new_listings', 'New Listings'), value: data.this_month.new_listings, trend: data.trends.new_listings ?? 0, icon: <FileText className="w-4 h-4" /> },
+    { label: t('community.new_connections', 'New Connections'), value: data.this_month.new_connections, trend: data.trends.new_connections ?? 0, icon: <Handshake className="w-4 h-4" /> },
+    { label: t('community.volunteer_hours', 'Volunteer Hours'), value: data.this_month.volunteer_hours, trend: data.trends.volunteer_hours ?? 0, icon: <Clock className="w-4 h-4" /> },
+    { label: t('community.new_posts', 'New Posts'), value: data.this_month.new_posts, trend: data.trends.new_posts ?? 0, icon: <FileText className="w-4 h-4" /> },
   ];
 
   return (

@@ -129,7 +129,7 @@ export function OrganisationsPage() {
   useEffect(() => {
     setCursor(undefined);
     loadOrganisations();
-  }, [debouncedQuery]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [debouncedQuery]); // eslint-disable-line react-hooks/exhaustive-deps -- reset on search change; loadOrganisations excluded to avoid loop
 
   const containerVariants = {
     hidden: { opacity: 0 },

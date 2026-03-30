@@ -11,8 +11,10 @@ import { useTenant } from '@/contexts';
 /** Extract 1–2 initials from a tenant name. */
 function getInitials(name: string): string {
   const words = name.trim().split(/\s+/);
-  if (words.length === 1) return words[0].substring(0, 2).toUpperCase();
-  return (words[0][0] + words[words.length - 1][0]).toUpperCase();
+  const firstWord = words[0] ?? '';
+  const lastWord = words[words.length - 1] ?? '';
+  if (words.length === 1) return firstWord.substring(0, 2).toUpperCase();
+  return ((firstWord[0] ?? '') + (lastWord[0] ?? '')).toUpperCase();
 }
 
 /** Returns true when the background is light enough to need dark text. */

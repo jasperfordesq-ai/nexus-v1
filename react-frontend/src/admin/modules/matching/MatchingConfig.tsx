@@ -109,7 +109,7 @@ export function MatchingConfig() {
     (index: number, field: 'distance_km' | 'score', value: number) => {
       setConfig((prev) => {
         const bands = [...(prev.proximity_bands || [])];
-        bands[index] = { ...bands[index], [field]: value };
+        bands[index] = { distance_km: 0, score: 0, ...bands[index], [field]: value };
         return { ...prev, proximity_bands: bands };
       });
       setDirty(true);

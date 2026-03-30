@@ -353,7 +353,7 @@ export function Partnerships() {
     if (detailTab === 'stats' && !stats) {
       loadStats(detailPartnership.id);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- lazy load stats tab; loadStats excluded to avoid loop
   }, [detailTab, detailPartnership]);
 
   // ─── Update permissions ───
@@ -568,7 +568,7 @@ export function Partnerships() {
                 <div className="space-y-3">
                   <p className="text-sm font-medium">{t('federation.label_feature_permissions')}</p>
                   {PERMISSION_KEYS.map((key) => {
-                    const Icon = PERMISSION_ICONS[key];
+                    const Icon = PERMISSION_ICONS[key] ?? Users;
                     return (
                       <div key={key} className="flex items-center justify-between">
                         <div className="flex items-center gap-2">
@@ -577,7 +577,7 @@ export function Partnerships() {
                         </div>
                         <Switch
                           size="sm"
-                          isSelected={counterPermissions[key]}
+                          isSelected={counterPermissions[key] ?? false}
                           onValueChange={(val) => setCounterPermissions(prev => ({ ...prev, [key]: val }))}
                         />
                       </div>
@@ -722,7 +722,7 @@ export function Partnerships() {
                         </CardHeader>
                         <CardBody className="gap-4">
                           {PERMISSION_KEYS.map((key) => {
-                            const Icon = PERMISSION_ICONS[key];
+                            const Icon = PERMISSION_ICONS[key] ?? Users;
                             const isEnabled = detailPartnership[`${key}_enabled` as keyof PartnershipDetail] === 1;
                             const canEdit = detailPartnership.status === 'active';
                             return (
