@@ -181,11 +181,19 @@ class ResourcesController extends BaseApiController
             return $this->respondWithError('VALIDATION_REQUIRED_FIELD', 'File is required', 'file', 400);
         }
 
+        // Verify temp file exists on disk (Docker overlay FS can lose temp files)
+        $tmpPath = $file->getPathname();
+        if (!file_exists($tmpPath)) {
+            return $this->respondWithError('FILE_UPLOAD_FAILED', 'Upload failed: temporary file not found. Please try again.', 'file', 500);
+        }
+
         $maxSize = 10 * 1024 * 1024; // 10MB
         // SVG intentionally excluded — XSS vector (can contain inline JS)
         $allowedExts = ['pdf', 'doc', 'docx', 'xls', 'xlsx', 'txt', 'csv', 'jpg', 'png', 'gif', 'webp'];
 
-        if ($file->getSize() > $maxSize) {
+        // Use filesize() for reliable stat — SplFileInfo::getSize() throws ErrorException in Laravel
+        $fileSize = (int) filesize($tmpPath);
+        if ($fileSize > $maxSize) {
             return $this->respondWithError('FILE_TOO_LARGE', 'File exceeds 10MB limit', 'file', 400);
         }
 
@@ -202,6 +210,9 @@ class ResourcesController extends BaseApiController
             return $this->respondWithError('FILE_TYPE_NOT_ALLOWED', 'This file type is not allowed (HTML/SVG/PHP)', 'file', 400);
         }
 
+        // Capture MIME type BEFORE move() invalidates the temp file
+        $fileType = $file->getClientMimeType();
+
         // Generate secure unique filename (cryptographic randomness)
         $filename = bin2hex(random_bytes(16)) . '.' . $ext;
 
@@ -217,8 +228,6 @@ class ResourcesController extends BaseApiController
         $description = trim(request()->input('description', ''));
         $categoryId = request()->input('category_id');
         $categoryId = ($categoryId !== null && $categoryId !== '') ? (int) $categoryId : null;
-        $fileType = $file->getClientMimeType() ?? mime_content_type($uploadDir . '/' . $filename) ?? null;
-        $fileSize = (int) $file->getSize();
 
         DB::table('resources')->insert([
             'tenant_id'   => $tenantId,

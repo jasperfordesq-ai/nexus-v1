@@ -29,7 +29,14 @@ class ImageUploadService
      */
     public function upload(UploadedFile $file, string $directory = 'uploads'): array
     {
-        if ($file->getSize() > self::MAX_FILE_SIZE) {
+        // Use filesize() on the temp path — SplFileInfo::getSize() can throw
+        // ErrorException in Laravel if the Docker overlay FS loses the temp file
+        $tmpPath = $file->getPathname();
+        if (!file_exists($tmpPath)) {
+            throw new \InvalidArgumentException('Upload failed: temporary file not found. Please try again.');
+        }
+
+        if (filesize($tmpPath) > self::MAX_FILE_SIZE) {
             throw new \InvalidArgumentException('File exceeds maximum size of 10 MB.');
         }
 
