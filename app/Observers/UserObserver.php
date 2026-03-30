@@ -18,6 +18,18 @@ use Illuminate\Support\Facades\Log;
  */
 class UserObserver
 {
+    public function created(User $user): void
+    {
+        try {
+            SearchService::indexUser($user);
+        } catch (\Throwable $e) {
+            Log::error('UserObserver: failed to index new user', [
+                'user_id' => $user->id,
+                'error'   => $e->getMessage(),
+            ]);
+        }
+    }
+
     public function updated(User $user): void
     {
         // Only re-index if searchable fields changed

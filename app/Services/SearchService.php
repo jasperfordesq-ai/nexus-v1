@@ -174,14 +174,16 @@ class SearchService
             }
         }
 
-        // Configure typo tolerance — be generous with shorter words
+        // Configure typo tolerance — require 5+ chars for 1 typo, 8+ for 2.
+        // Previous thresholds (4/7) caused short names like "Mary" to match
+        // "Marc", "Many", etc., producing irrelevant search results.
         foreach ($configs as $name => $_) {
             try {
                 $client->index($name)->updateTypoTolerance([
                     'enabled'             => true,
                     'minWordSizeForTypos' => [
-                        'oneTypo'  => 4,
-                        'twoTypos' => 7,
+                        'oneTypo'  => 5,
+                        'twoTypos' => 8,
                     ],
                 ]);
             } catch (\Throwable) {
@@ -813,14 +815,15 @@ class SearchService
             }
         }
 
-        $total   = count($allItems);
-        $hasMore = $total > $limit;
-
+        // When searching all types, each type already has its own $limit cap.
+        // Do NOT globally slice — that biases toward whichever type is first
+        // (listings) and silently drops users/events/groups from the response.
+        // The frontend handles per-tab display limits (4 per category on "All" tab).
         return [
-            'items'    => $hasMore ? array_slice($allItems, 0, $limit) : $allItems,
+            'items'    => $allItems,
             'cursor'   => null,
-            'has_more' => $hasMore,
-            'total'    => $total,
+            'has_more' => false,
+            'total'    => count($allItems),
             'query'    => $term,
         ];
     }
@@ -924,14 +927,13 @@ class SearchService
             }
         }
 
-        $total   = count($allItems);
-        $hasMore = $total > $limit;
-
+        // Same as Meilisearch path — do NOT globally slice. Each type has its
+        // own $limit cap, and the frontend handles per-tab display limits.
         return [
-            'items'    => $hasMore ? array_slice($allItems, 0, $limit) : $allItems,
+            'items'    => $allItems,
             'cursor'   => null,
-            'has_more' => $hasMore,
-            'total'    => $total,
+            'has_more' => false,
+            'total'    => count($allItems),
             'query'    => $term,
         ];
     }

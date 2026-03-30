@@ -398,6 +398,17 @@ export function SearchPage() {
                       </motion.div>
                     ))}
                   </div>
+                  {activeTab === 'all' && results.listings.length > 4 && (
+                    <Button
+                      variant="light"
+                      color="primary"
+                      size="sm"
+                      className="mt-2"
+                      onPress={() => setActiveTab('listings')}
+                    >
+                      {t('view_all_listings', { count: results.listings.length })}
+                    </Button>
+                  )}
                 </section>
               )}
 
@@ -440,6 +451,17 @@ export function SearchPage() {
                       </motion.div>
                     ))}
                   </div>
+                  {activeTab === 'all' && results.users.length > 4 && (
+                    <Button
+                      variant="light"
+                      color="primary"
+                      size="sm"
+                      className="mt-2"
+                      onPress={() => setActiveTab('users')}
+                    >
+                      {t('view_all_members', { count: results.users.length })}
+                    </Button>
+                  )}
                 </section>
               )}
 
@@ -476,6 +498,17 @@ export function SearchPage() {
                       </motion.div>
                     ))}
                   </div>
+                  {activeTab === 'all' && results.events.length > 4 && (
+                    <Button
+                      variant="light"
+                      color="primary"
+                      size="sm"
+                      className="mt-2"
+                      onPress={() => setActiveTab('events')}
+                    >
+                      {t('view_all_events', { count: results.events.length })}
+                    </Button>
+                  )}
                 </section>
               )}
 
@@ -504,6 +537,17 @@ export function SearchPage() {
                       </motion.div>
                     ))}
                   </div>
+                  {activeTab === 'all' && results.groups.length > 4 && (
+                    <Button
+                      variant="light"
+                      color="primary"
+                      size="sm"
+                      className="mt-2"
+                      onPress={() => setActiveTab('groups')}
+                    >
+                      {t('view_all_groups', { count: results.groups.length })}
+                    </Button>
+                  )}
                 </section>
               )}
             </motion.div>
