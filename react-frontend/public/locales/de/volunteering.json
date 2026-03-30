@@ -456,5 +456,30 @@
     "respond_error_generic": "Antwort auf Benachrichtigung fehlgeschlagen. Bitte versuchen Sie es erneut.",
     "from": "Von",
     "expires": "Läuft ab"
+  },
+  "wellbeing": {
+    "heading": "Wohlbefinden der Freiwilligen",
+    "log_feeling": "Stimmung festhalten",
+    "how_feeling": "Wie fühlen Sie sich?",
+    "checkin_desc": "Nehmen Sie sich einen Moment Zeit, um bei sich selbst einzuchecken. Ihre Antworten helfen uns, Ihnen einen passenden Zeitpunkt für eine Pause vorzuschlagen.",
+    "select_mood": "Wählen Sie Ihre Stimmung",
+    "note_label": "Notiz hinzufügen (optional)",
+    "note_placeholder": "Wie ist Ihr Energielevel? Gibt es etwas, das Sie beschäftigt?",
+    "cancel": "Abbrechen",
+    "submit_checkin": "Check-in absenden",
+    "mood_struggling": "Kämpfend",
+    "mood_low": "Niedrig",
+    "mood_okay": "In Ordnung",
+    "mood_good": "Gut",
+    "mood_great": "Großartig",
+    "score_label": "Wohlbefindenswert",
+    "score_excellent": "Ausgezeichnet",
+    "risk_low": "Geringes Risiko",
+    "this_week": "Diese Woche",
+    "this_month": "Diesen Monat",
+    "day_streak": "Tage-Serie",
+    "suggested_rest_days": "Empfohlene Ruhetage",
+    "rest_days_desc": "Basierend auf Ihrer letzten Aktivität empfehlen wir, an diesen Tagen eine Pause einzulegen:",
+    "recent_checkins": "Letzte Stimmungs-Check-ins"
   }
 }

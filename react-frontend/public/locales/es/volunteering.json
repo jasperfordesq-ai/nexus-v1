@@ -456,5 +456,30 @@
     "respond_error_generic": "Error al responder a la alerta. Por favor, inténtelo de nuevo.",
     "from": "De",
     "expires": "Expira"
+  },
+  "wellbeing": {
+    "heading": "Bienestar del Voluntario",
+    "log_feeling": "Registrar Cómo Me Siento",
+    "how_feeling": "¿Cómo Te Sientes?",
+    "checkin_desc": "Tómate un momento para hacer un balance contigo mismo. Tus respuestas nos ayudan a sugerirte cuándo podrías necesitar un descanso.",
+    "select_mood": "Selecciona tu estado de ánimo",
+    "note_label": "Añadir una nota (opcional)",
+    "note_placeholder": "¿Cómo está tu nivel de energía? ¿Algo en mente?",
+    "cancel": "Cancelar",
+    "submit_checkin": "Enviar Check-in",
+    "mood_struggling": "Con Dificultades",
+    "mood_low": "Bajo",
+    "mood_okay": "Regular",
+    "mood_good": "Bien",
+    "mood_great": "Genial",
+    "score_label": "Puntuación de Bienestar",
+    "score_excellent": "Excelente",
+    "risk_low": "Riesgo Bajo",
+    "this_week": "Esta Semana",
+    "this_month": "Este Mes",
+    "day_streak": "Racha de Días",
+    "suggested_rest_days": "Días de Descanso Sugeridos",
+    "rest_days_desc": "Según tu actividad reciente, te recomendamos tomarte un descanso estos días:",
+    "recent_checkins": "Check-ins de Ánimo Recientes"
   }
 }

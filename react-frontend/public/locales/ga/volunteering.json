@@ -456,5 +456,30 @@
     "respond_error_generic": "Theip ar fhreagra a thabhairt ar fholáireamh. Bain triail eile as le do thoil.",
     "from": "Ó",
     "expires": "Ag Dul in Éag"
+  },
+  "wellbeing": {
+    "heading": "Folláine an Oibrí Dheonaigh",
+    "log_feeling": "Cláraigh Conas Atá Mé ag Mothú",
+    "how_feeling": "Conas Atá Tú ag Mothú?",
+    "checkin_desc": "Tóg nóiméad le seiceáil isteach leat féin. Cuidíonn do fhreagraí linn a mholadh nuair a d'fhéadfadh sos a bheith ag teastáil uait.",
+    "select_mood": "Roghnaigh do ghiúmar",
+    "note_label": "Cuir nóta leis (roghnach)",
+    "note_placeholder": "Conas atá do leibhéal fuinnimh? Aon rud ar d'aigne?",
+    "cancel": "Cealaigh",
+    "submit_checkin": "Cuir Seiceáil Isteach",
+    "mood_struggling": "Ag Streachailt",
+    "mood_low": "Íseal",
+    "mood_okay": "Ceart go leor",
+    "mood_good": "Maith",
+    "mood_great": "Ar fheabhas",
+    "score_label": "Scór Folláine",
+    "score_excellent": "Ar fheabhas",
+    "risk_low": "Riosca Íseal",
+    "this_week": "An tSeachtain Seo",
+    "this_month": "An Mhí Seo",
+    "day_streak": "Sraith Laethanta",
+    "suggested_rest_days": "Laethanta Scíthe Molta",
+    "rest_days_desc": "Bunaithe ar do ghníomhaíocht le déanaí, molaimid sos a ghlacadh na laethanta seo:",
+    "recent_checkins": "Seiceálacha Giúmair Le Déanaí"
   }
 }

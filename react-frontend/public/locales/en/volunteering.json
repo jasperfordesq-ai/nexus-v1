@@ -456,5 +456,30 @@
     "respond_error_generic": "Failed to respond to alert. Please try again.",
     "from": "From",
     "expires": "Expires"
+  },
+  "wellbeing": {
+    "heading": "Volunteer Wellbeing",
+    "log_feeling": "Log How I'm Feeling",
+    "how_feeling": "How Are You Feeling?",
+    "checkin_desc": "Take a moment to check in with yourself. Your responses help us suggest when you might need a break.",
+    "select_mood": "Select your mood",
+    "note_label": "Add a note (optional)",
+    "note_placeholder": "How's your energy level? Anything on your mind?",
+    "cancel": "Cancel",
+    "submit_checkin": "Submit Check-in",
+    "mood_struggling": "Struggling",
+    "mood_low": "Low",
+    "mood_okay": "Okay",
+    "mood_good": "Good",
+    "mood_great": "Great",
+    "score_label": "Wellbeing Score",
+    "score_excellent": "Excellent",
+    "risk_low": "Low Risk",
+    "this_week": "This Week",
+    "this_month": "This Month",
+    "day_streak": "Day Streak",
+    "suggested_rest_days": "Suggested Rest Days",
+    "rest_days_desc": "Based on your recent activity, we recommend taking a break on these days:",
+    "recent_checkins": "Recent Mood Check-ins"
   }
 }

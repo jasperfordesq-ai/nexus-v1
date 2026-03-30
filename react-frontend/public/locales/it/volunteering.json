@@ -456,5 +456,30 @@
     "respond_error_generic": "Impossibile rispondere all'avviso. Riprova.",
     "from": "Da",
     "expires": "Scade"
+  },
+  "wellbeing": {
+    "heading": "Benessere del volontario",
+    "log_feeling": "Registra come mi sento",
+    "how_feeling": "Come ti senti?",
+    "checkin_desc": "Prenditi un momento per fare il punto su come stai. Le tue risposte ci aiutano a suggerirti quando potresti aver bisogno di una pausa.",
+    "select_mood": "Seleziona il tuo umore",
+    "note_label": "Aggiungi una nota (opzionale)",
+    "note_placeholder": "Com'è il tuo livello di energia? Qualcosa per la testa?",
+    "cancel": "Annulla",
+    "submit_checkin": "Invia check-in",
+    "mood_struggling": "In difficoltà",
+    "mood_low": "Basso",
+    "mood_okay": "Così così",
+    "mood_good": "Bene",
+    "mood_great": "Ottimo",
+    "score_label": "Punteggio di benessere",
+    "score_excellent": "Eccellente",
+    "risk_low": "Rischio basso",
+    "this_week": "Questa settimana",
+    "this_month": "Questo mese",
+    "day_streak": "Serie di giorni",
+    "suggested_rest_days": "Giorni di riposo suggeriti",
+    "rest_days_desc": "In base alla tua attività recente, ti consigliamo di prenderti una pausa in questi giorni:",
+    "recent_checkins": "Check-in dell'umore recenti"
   }
 }

@@ -456,5 +456,30 @@
     "respond_error_generic": "Falha ao responder ao alerta. Tente novamente.",
     "from": "De",
     "expires": "Expira"
+  },
+  "wellbeing": {
+    "heading": "Bem-estar do Voluntário",
+    "log_feeling": "Registar Como Me Sinto",
+    "how_feeling": "Como Se Sente?",
+    "checkin_desc": "Reserve um momento para fazer um balanço consigo mesmo. As suas respostas ajudam-nos a sugerir quando poderá precisar de uma pausa.",
+    "select_mood": "Selecione o seu humor",
+    "note_label": "Adicionar uma nota (opcional)",
+    "note_placeholder": "Como está o seu nível de energia? Algo em mente?",
+    "cancel": "Cancelar",
+    "submit_checkin": "Submeter Check-in",
+    "mood_struggling": "Em Dificuldade",
+    "mood_low": "Baixo",
+    "mood_okay": "Razoável",
+    "mood_good": "Bom",
+    "mood_great": "Ótimo",
+    "score_label": "Pontuação de Bem-estar",
+    "score_excellent": "Excelente",
+    "risk_low": "Risco Baixo",
+    "this_week": "Esta Semana",
+    "this_month": "Este Mês",
+    "day_streak": "Série de Dias",
+    "suggested_rest_days": "Dias de Descanso Sugeridos",
+    "rest_days_desc": "Com base na sua atividade recente, recomendamos que descanse nestes dias:",
+    "recent_checkins": "Check-ins de Humor Recentes"
   }
 }

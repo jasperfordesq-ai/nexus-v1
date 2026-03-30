@@ -456,5 +456,30 @@
     "respond_error_generic": "Échec de la réponse à l'alerte. Veuillez réessayer.",
     "from": "De",
     "expires": "Expire"
+  },
+  "wellbeing": {
+    "heading": "Bien-être des bénévoles",
+    "log_feeling": "Noter comment je me sens",
+    "how_feeling": "Comment vous sentez-vous ?",
+    "checkin_desc": "Prenez un moment pour faire le point avec vous-même. Vos réponses nous aident à vous suggérer quand vous pourriez avoir besoin d'une pause.",
+    "select_mood": "Sélectionnez votre humeur",
+    "note_label": "Ajouter une note (facultatif)",
+    "note_placeholder": "Comment est votre niveau d'énergie ? Quelque chose en tête ?",
+    "cancel": "Annuler",
+    "submit_checkin": "Envoyer le bilan",
+    "mood_struggling": "En difficulté",
+    "mood_low": "Bas",
+    "mood_okay": "Correct",
+    "mood_good": "Bien",
+    "mood_great": "Très bien",
+    "score_label": "Score de bien-être",
+    "score_excellent": "Excellent",
+    "risk_low": "Risque faible",
+    "this_week": "Cette semaine",
+    "this_month": "Ce mois-ci",
+    "day_streak": "Jours consécutifs",
+    "suggested_rest_days": "Jours de repos suggérés",
+    "rest_days_desc": "D'après votre activité récente, nous vous recommandons de prendre une pause ces jours-ci :",
+    "recent_checkins": "Bilans d'humeur récents"
   }
 }
