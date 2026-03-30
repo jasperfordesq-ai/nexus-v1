@@ -2154,16 +2154,22 @@ class CronJobRunner
 
     /**
      * Group weekly digest emails to group owners (Monday 9am)
+     *
+     * NOTE: GroupReportingService does not exist yet — this is a stub.
+     * When implemented, do NOT wrap in forEachTenant() if the service
+     * iterates tenants internally (same bug that caused 11× duplicate
+     * gamification emails — see gamificationWeeklyDigestInternal).
      */
     private function groupWeeklyDigestsInternal(): void
     {
         try {
-            $this->forEachTenant(function ($tenantId, $slug) {
-                if (!TenantContext::hasFeature('groups')) return;
+            if (!class_exists(\App\Services\GroupReportingService::class)) {
+                echo "   GroupReportingService not implemented — skipping.\n";
+                return;
+            }
 
-                $stats = GroupReportingService::sendAllWeeklyDigests();
-                echo "   [$slug] Sent {$stats['sent']}/{$stats['total_groups']} group digests.\n";
-            });
+            $stats = GroupReportingService::sendAllWeeklyDigests();
+            echo "   Sent {$stats['sent']}/{$stats['total_groups']} group digests.\n";
             echo "   Group weekly digests complete.\n";
         } catch (\Throwable $e) {
             echo "   Error: " . $e->getMessage() . "\n";

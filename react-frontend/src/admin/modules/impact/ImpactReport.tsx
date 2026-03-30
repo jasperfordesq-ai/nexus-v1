@@ -144,7 +144,7 @@ function formatPercent(rate: number): string {
 function formatMonth(monthStr: string): string {
   const [year, month] = monthStr.split('-');
   const date = new Date(Number(year), Number(month) - 1);
-  return date.toLocaleDateString('en-GB', { month: 'short', year: '2-digit' });
+  return date.toLocaleDateString(undefined, { month: 'short', year: '2-digit' });
 }
 
 // ---------------------------------------------------------------------------

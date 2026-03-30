@@ -171,11 +171,10 @@ class XPShopService
             }
 
             // Deduct XP (atomic — WHERE xp >= cost prevents negative balance)
-            $affected = DB::table('users')
-                ->where('id', $userId)
-                ->where('tenant_id', $tenantId)
-                ->where('xp', '>=', $item->xp_cost)
-                ->update(['xp' => DB::raw('xp - ' . (int) $item->xp_cost)]);
+            $affected = DB::update(
+                'UPDATE users SET xp = xp - ? WHERE id = ? AND tenant_id = ? AND xp >= ?',
+                [(int) $item->xp_cost, $userId, $tenantId, (int) $item->xp_cost]
+            );
 
             if ($affected === 0) {
                 DB::rollBack();

@@ -170,9 +170,14 @@ class AchievementAnalyticsService
     {
         $tenantId = TenantContext::getId();
 
+        $badgeCounts = DB::table('user_badges')
+            ->where('tenant_id', $tenantId)
+            ->selectRaw('user_id, COUNT(*) as badge_count')
+            ->groupBy('user_id');
+
         return DB::table('users as u')
             ->where('u.tenant_id', $tenantId)
-            ->leftJoin(DB::raw('(SELECT user_id, COUNT(*) as badge_count FROM user_badges WHERE tenant_id = ' . ((int) $tenantId) . ' GROUP BY user_id) as bc'), 'bc.user_id', '=', 'u.id')
+            ->leftJoinSub($badgeCounts, 'bc', 'bc.user_id', '=', 'u.id')
             ->select([
                 'u.id', 'u.first_name', 'u.last_name', 'u.avatar_url', 'u.xp', 'u.level',
                 DB::raw('COALESCE(bc.badge_count, 0) as badge_count'),

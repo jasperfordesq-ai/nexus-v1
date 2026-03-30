@@ -113,7 +113,7 @@ export function VerificationBadgeIcon({
       )}
       {badge.verified_at && (
         <p className="text-[10px] text-default-400 mt-0.5">
-          Since {new Date(badge.verified_at).toLocaleDateString('en-US', { month: 'short', year: 'numeric' })}
+          Since {new Date(badge.verified_at).toLocaleDateString(undefined, { month: 'short', year: 'numeric' })}
         </p>
       )}
     </div>

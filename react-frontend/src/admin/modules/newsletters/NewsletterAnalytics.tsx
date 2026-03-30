@@ -108,13 +108,13 @@ const BENCHMARK_CLICK_RATE = 2.6;
 function formatMonth(ym: string): string {
   const [year, month] = ym.split('-');
   const date = new Date(Number(year), Number(month) - 1);
-  return date.toLocaleDateString('en-US', { month: 'short', year: '2-digit' });
+  return date.toLocaleDateString(undefined, { month: 'short', year: '2-digit' });
 }
 
 function formatDate(dateStr: string): string {
   if (!dateStr) return '-';
   const d = new Date(dateStr);
-  return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+  return d.toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' });
 }
 
 function truncate(str: string, max: number): string {
