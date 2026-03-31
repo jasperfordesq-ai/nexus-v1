@@ -59,7 +59,9 @@ import {
   Undo2,
   Redo2,
   Code,
+  FileDown,
 } from 'lucide-react';
+import { marked } from 'marked';
 import { useTranslation } from 'react-i18next';
 
 /* ───────────────────────── Types ───────────────────────── */
@@ -75,6 +77,8 @@ interface RichTextEditorProps {
   isDisabled?: boolean;
   /** Label shown above the editor */
   label?: string;
+  /** Show "Import Markdown" button in toolbar */
+  showMarkdownImport?: boolean;
 }
 
 /* ───────────────────────── Theme ───────────────────────── */
@@ -107,7 +111,7 @@ const editorTheme = {
 
 /* ───────────────────────── Toolbar ───────────────────────── */
 
-function ToolbarPlugin({ isDisabled }: { isDisabled?: boolean }) {
+function ToolbarPlugin({ isDisabled, showMarkdownImport }: { isDisabled?: boolean; showMarkdownImport?: boolean }) {
   const [editor] = useLexicalComposerContext();
   const { t } = useTranslation('admin');
   const [isBold, setIsBold] = useState(false);
@@ -403,6 +407,45 @@ function ToolbarPlugin({ isDisabled }: { isDisabled?: boolean }) {
           <Link2 size={15} />
         </Button>
       </Tooltip>
+
+      {/* Import Markdown */}
+      {showMarkdownImport && (
+        <>
+          <Divider orientation="vertical" className="h-5 mx-1" />
+          <Tooltip content={t('rte.import_markdown', 'Import Markdown')} size="sm" delay={500}>
+            <Button
+              size="sm"
+              variant="light"
+              isDisabled={isDisabled}
+              onPress={() => {
+                const input = document.createElement('input');
+                input.type = 'file';
+                input.accept = '.md,.txt';
+                input.onchange = async (e) => {
+                  const file = (e.target as HTMLInputElement).files?.[0];
+                  if (!file) return;
+                  const text = await file.text();
+                  const html = await marked.parse(text);
+                  editor.update(() => {
+                    const parser = new DOMParser();
+                    const dom = parser.parseFromString(html, 'text/html');
+                    const nodes = $generateNodesFromDOM(editor, dom);
+                    const root = $getRoot();
+                    root.clear();
+                    nodes.forEach((node) => root.append(node));
+                  });
+                };
+                input.click();
+              }}
+              aria-label={t('rte.import_markdown', 'Import Markdown')}
+              className="h-8 gap-1 text-xs px-2"
+              startContent={<FileDown size={14} />}
+            >
+              {t('rte.import_md', 'Import .md')}
+            </Button>
+          </Tooltip>
+        </>
+      )}
     </div>
   );
 }
@@ -461,6 +504,7 @@ export function RichTextEditor({
   placeholder = 'Start writing...',
   isDisabled = false,
   label,
+  showMarkdownImport = false,
 }: RichTextEditorProps) {
   const initialConfig = {
     namespace: 'NexusBlogEditor',
@@ -503,7 +547,7 @@ export function RichTextEditor({
         `}
       >
         <LexicalComposer initialConfig={initialConfig}>
-          <ToolbarPlugin isDisabled={isDisabled} />
+          <ToolbarPlugin isDisabled={isDisabled} showMarkdownImport={showMarkdownImport} />
           <div className="relative">
             <RichTextPlugin
               contentEditable={

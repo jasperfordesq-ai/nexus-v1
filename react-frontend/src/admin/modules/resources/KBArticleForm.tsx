@@ -494,6 +494,7 @@ export function KBArticleForm() {
                   value={content}
                   onChange={setContent}
                   isDisabled={submitting}
+                  showMarkdownImport
                 />
               </Suspense>
             )}
