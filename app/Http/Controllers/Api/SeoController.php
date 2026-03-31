@@ -25,9 +25,16 @@ class SeoController extends BaseApiController
     {
         $tenantId = $this->getTenantId();
 
+        // entity_type='page' with the slug path as an entity_id lookup
         $meta = DB::selectOne(
-            'SELECT title, description, og_image, canonical_url, robots FROM seo_metadata WHERE tenant_id = ? AND slug = ?',
-            [$tenantId, $slug]
+            "SELECT meta_title AS title, meta_description AS description,
+                    og_image_url AS og_image, canonical_url,
+                    CASE WHEN noindex = 1 THEN 'noindex, nofollow' ELSE 'index, follow' END AS robots
+             FROM seo_metadata
+             WHERE tenant_id = ? AND entity_type = 'page' AND entity_id = (
+                 SELECT id FROM pages WHERE tenant_id = ? AND slug = ? LIMIT 1
+             )",
+            [$tenantId, $tenantId, $slug]
         );
 
         if ($meta === null) {
@@ -53,7 +60,8 @@ class SeoController extends BaseApiController
         $offset = ($page - 1) * $perPage;
 
         $items = DB::select(
-            'SELECT * FROM seo_redirects WHERE tenant_id = ? ORDER BY created_at DESC LIMIT ? OFFSET ?',
+            'SELECT id, tenant_id, source_url, destination_url, hits, created_at
+             FROM seo_redirects WHERE tenant_id = ? ORDER BY created_at DESC LIMIT ? OFFSET ?',
             [$tenantId, $perPage, $offset]
         );
         $total = DB::selectOne(

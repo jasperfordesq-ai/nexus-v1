@@ -67,6 +67,11 @@ class RouteServiceProvider extends ServiceProvider
                 return '';
             });
 
+            // Sitemap endpoints — no /api prefix (crawlers access these directly)
+            Route::get('/sitemap.xml', [\App\Http\Controllers\SitemapController::class, 'index']);
+            Route::get('/sitemap-{slug}.xml', [\App\Http\Controllers\SitemapController::class, 'tenant'])
+                ->where('slug', '[a-zA-Z0-9_-]+');
+
             // Channel authorization routes for broadcasting
             if (file_exists(base_path('routes/channels.php'))) {
                 require base_path('routes/channels.php');

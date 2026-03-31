@@ -392,7 +392,12 @@ class AdminToolsController extends BaseApiController
     public function runSeoAudit(): JsonResponse
     {
         $this->requireAdmin();
-        return $this->respondWithData(['started' => true, 'message' => 'SEO audit queued']);
+        $tenantId = $this->getTenantId();
+
+        $auditService = app(\App\Services\SeoAuditService::class);
+        $results = $auditService->runAudit($tenantId);
+
+        return $this->respondWithData($results);
     }
 
     /** GET /api/v2/admin/tools/ip-debug */

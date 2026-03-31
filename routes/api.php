@@ -56,6 +56,14 @@ Route::get('/v2/jobs/feed.xml', [\App\Http\Controllers\Api\JobFeedController::cl
 Route::get('/v2/jobs/feed.json', [\App\Http\Controllers\Api\JobFeedController::class, 'jsonFeed']);
 
 // ============================================
+// PUBLIC ROUTES — SEO metadata (no auth required)
+// React frontend fetches per-page metadata for <head> tags
+// ============================================
+Route::get('/v2/seo/metadata/{slug}', [\App\Http\Controllers\Api\SeoController::class, 'metadata'])
+    ->where('slug', '.*');
+Route::get('/v2/seo/redirects', [\App\Http\Controllers\Api\SeoController::class, 'redirects']);
+
+// ============================================
 // PUBLIC ROUTES — Explore / Discover
 // Supports both authenticated (personalized) and anonymous (global) access
 // ============================================

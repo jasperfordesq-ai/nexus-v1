@@ -936,6 +936,12 @@ class CronJobRunner
                 echo $this->runSubTask('gamification-daily', fn() => $this->gamificationDailyInternal());
             }
 
+            if ($hour === 4 && $minute === 0) {
+                $taskNum++;
+                echo "\n[{$taskNum}] Regenerating XML sitemaps...\n";
+                echo $this->runSubTask('sitemap-generate', fn() => $this->sitemapGenerateInternal());
+            }
+
             if ($hour === 5 && $minute === 0) {
                 $taskNum++;
                 echo "\n[{$taskNum}] Volunteer lapsed nudge...\n";
@@ -2603,5 +2609,33 @@ class CronJobRunner
                 echo "   [{$slug}] Webhook retry error: {$e->getMessage()}\n";
             }
         });
+    }
+
+    /**
+     * Regenerate XML sitemaps for all active tenants.
+     * Clears cache and warms fresh sitemaps so crawlers get up-to-date URLs.
+     */
+    private function sitemapGenerateInternal(): void
+    {
+        try {
+            $service = app(SitemapService::class);
+            $service->clearCache();
+
+            $tenants = DB::select("SELECT id, name, slug FROM tenants WHERE is_active = 1 ORDER BY id");
+            $totalUrls = 0;
+
+            foreach ($tenants as $tenant) {
+                $xml = $service->generateForTenant((int) $tenant->id);
+                $urlCount = substr_count($xml, '<url>');
+                $totalUrls += $urlCount;
+                $slug = $tenant->slug ?: 'main';
+                echo "   [{$slug}] {$urlCount} URLs\n";
+            }
+
+            $service->generateIndex();
+            echo "   Sitemap index + " . count($tenants) . " tenant sitemaps generated ({$totalUrls} total URLs).\n";
+        } catch (\Throwable $e) {
+            echo "   Sitemap generation error: {$e->getMessage()}\n";
+        }
     }
 }

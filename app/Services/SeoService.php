@@ -16,34 +16,41 @@ use Illuminate\Support\Facades\DB;
 class SeoService
 {
     /**
-     * Get SEO metadata for a specific route/path.
+     * Get SEO metadata for a specific entity.
      */
-    public function getMetadata(int $tenantId, string $path): array
+    public function getMetadata(int $tenantId, string $entityType, ?int $entityId = null): array
     {
-        $meta = DB::table('seo_metadata')
+        $query = DB::table('seo_metadata')
             ->where('tenant_id', $tenantId)
-            ->where('path', $path)
-            ->first();
+            ->where('entity_type', $entityType);
+
+        if ($entityId !== null) {
+            $query->where('entity_id', $entityId);
+        } else {
+            $query->whereNull('entity_id');
+        }
+
+        $meta = $query->first();
 
         if (! $meta) {
-            return ['title' => null, 'description' => null, 'og_image' => null, 'canonical' => null];
+            return ['meta_title' => null, 'meta_description' => null, 'og_image_url' => null, 'canonical_url' => null];
         }
 
         return (array) $meta;
     }
 
     /**
-     * Update SEO metadata for a specific route/path.
+     * Update SEO metadata for a specific entity.
      */
-    public function updateMetadata(int $tenantId, string $path, array $data): bool
+    public function updateMetadata(int $tenantId, string $entityType, ?int $entityId, array $data): bool
     {
-        $allowed = ['title', 'description', 'og_image', 'canonical', 'robots', 'schema_json'];
+        $allowed = ['meta_title', 'meta_description', 'meta_keywords', 'og_image_url', 'canonical_url', 'noindex'];
         $update = array_intersect_key($data, array_flip($allowed));
         $update['updated_at'] = now();
 
         return DB::table('seo_metadata')
             ->updateOrInsert(
-                ['tenant_id' => $tenantId, 'path' => $path],
+                ['tenant_id' => $tenantId, 'entity_type' => $entityType, 'entity_id' => $entityId],
                 $update
             );
     }
@@ -55,7 +62,7 @@ class SeoService
     {
         return DB::table('seo_redirects')
             ->where('tenant_id', $tenantId)
-            ->orderBy('from_path')
+            ->orderBy('source_url')
             ->get()
             ->map(fn ($r) => (array) $r)
             ->all();
@@ -71,11 +78,10 @@ class SeoService
         }
 
         return DB::table('seo_redirects')->insertGetId([
-            'tenant_id'   => $tenantId,
-            'from_path'   => $from,
-            'to_path'     => $to,
-            'status_code' => $statusCode,
-            'created_at'  => now(),
+            'tenant_id'       => $tenantId,
+            'source_url'      => $from,
+            'destination_url' => $to,
+            'created_at'      => now(),
         ]);
     }
 }

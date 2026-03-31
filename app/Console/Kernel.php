@@ -60,6 +60,11 @@ class Kernel extends ConsoleKernel
             ->withoutOverlapping()
             ->name('federation-purge-external-logs');
 
+        $schedule->command('sitemap:generate')
+            ->dailyAt('04:00')
+            ->withoutOverlapping()
+            ->name('sitemap-generate');
+
         $schedule->call(function () {
             app(FeedService::class)->publishScheduledPosts();
         })

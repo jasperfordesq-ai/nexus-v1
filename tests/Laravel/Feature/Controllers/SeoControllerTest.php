@@ -88,23 +88,32 @@ class SeoControllerTest extends TestCase
     public function test_metadata_returns_data_for_known_slug(): void
     {
         $slug = 'home-' . uniqid();
+
+        // Create a CMS page first, then attach SEO metadata via entity_type/entity_id
+        $pageId = DB::table('pages')->insertGetId([
+            'tenant_id'    => $this->testTenantId,
+            'title'        => 'Home Page',
+            'slug'         => $slug,
+            'content'      => '<p>Home</p>',
+            'is_published' => 1,
+            'created_at'   => now(),
+            'updated_at'   => now(),
+        ]);
+
         DB::table('seo_metadata')->insert([
-            'tenant_id'     => $this->testTenantId,
-            'slug'          => $slug,
-            'title'         => 'Home | My Timebank',
-            'description'   => 'Welcome to the timebank.',
-            'og_image'      => null,
-            'canonical_url' => null,
-            'robots'        => 'index, follow',
-            'created_at'    => now(),
-            'updated_at'    => now(),
+            'tenant_id'        => $this->testTenantId,
+            'entity_type'      => 'page',
+            'entity_id'        => $pageId,
+            'meta_title'       => 'Home | My Timebank',
+            'meta_description' => 'Welcome to the timebank.',
+            'og_image_url'     => null,
+            'canonical_url'    => null,
+            'noindex'          => 0,
+            'created_at'       => now(),
+            'updated_at'       => now(),
         ]);
 
         $response = $this->apiGet("/v2/seo/metadata/{$slug}");
-
-        if ($response->getStatusCode() === 404) {
-            $this->markTestSkipped('SeoController routes are not yet registered in routes/api.php');
-        }
 
         $response->assertStatus(200);
         $response->assertJsonPath('data.title', 'Home | My Timebank');
@@ -155,12 +164,10 @@ class SeoControllerTest extends TestCase
 
         // Seed a redirect for the test tenant
         DB::table('seo_redirects')->insert([
-            'tenant_id'   => $this->testTenantId,
-            'from_path'   => '/old-path',
-            'to_path'     => '/new-path',
-            'status_code' => 301,
-            'created_at'  => now(),
-            'updated_at'  => now(),
+            'tenant_id'       => $this->testTenantId,
+            'source_url'      => '/old-path-' . uniqid(),
+            'destination_url' => '/new-path',
+            'created_at'      => now(),
         ]);
 
         $response = $this->apiGet('/v2/seo/redirects');

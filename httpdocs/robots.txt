@@ -53,4 +53,5 @@ Disallow: /
 User-agent: Applebot-Extended
 Disallow: /
 
-# Sitemap — API backend has no sitemap; the frontend app and sales site have their own robots.txt
+# Sitemap — dynamically generated, covers all active tenants
+Sitemap: https://api.project-nexus.ie/sitemap.xml

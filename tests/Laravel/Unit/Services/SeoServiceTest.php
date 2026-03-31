@@ -24,22 +24,30 @@ class SeoServiceTest extends TestCase
 
     public function test_getMetadata_returns_defaults_when_not_found(): void
     {
-        DB::shouldReceive('table->where->where->first')->andReturnNull();
+        // Build a mock query builder that returns null
+        $builder = \Mockery::mock(\Illuminate\Database\Query\Builder::class);
+        $builder->shouldReceive('where')->andReturnSelf();
+        $builder->shouldReceive('whereNull')->andReturnSelf();
+        $builder->shouldReceive('first')->andReturnNull();
+        DB::shouldReceive('table')->with('seo_metadata')->andReturn($builder);
 
-        $result = $this->service->getMetadata($this->testTenantId, '/about');
-        $this->assertNull($result['title']);
-        $this->assertNull($result['description']);
-        $this->assertNull($result['og_image']);
-        $this->assertNull($result['canonical']);
+        $result = $this->service->getMetadata($this->testTenantId, 'global');
+        $this->assertNull($result['meta_title']);
+        $this->assertNull($result['meta_description']);
+        $this->assertNull($result['og_image_url']);
+        $this->assertNull($result['canonical_url']);
     }
 
     public function test_getMetadata_returns_data_when_found(): void
     {
-        $meta = (object) ['title' => 'About Us', 'description' => 'Our story', 'og_image' => null, 'canonical' => null];
-        DB::shouldReceive('table->where->where->first')->andReturn($meta);
+        $meta = (object) ['meta_title' => 'About Us', 'meta_description' => 'Our story', 'og_image_url' => null, 'canonical_url' => null];
+        $builder = \Mockery::mock(\Illuminate\Database\Query\Builder::class);
+        $builder->shouldReceive('where')->andReturnSelf();
+        $builder->shouldReceive('first')->andReturn($meta);
+        DB::shouldReceive('table')->with('seo_metadata')->andReturn($builder);
 
-        $result = $this->service->getMetadata($this->testTenantId, '/about');
-        $this->assertEquals('About Us', $result['title']);
+        $result = $this->service->getMetadata($this->testTenantId, 'page', 1);
+        $this->assertEquals('About Us', $result['meta_title']);
     }
 
     // ── updateMetadata ──
@@ -48,8 +56,8 @@ class SeoServiceTest extends TestCase
     {
         DB::shouldReceive('table->updateOrInsert')->once()->andReturn(true);
 
-        $result = $this->service->updateMetadata($this->testTenantId, '/about', [
-            'title' => 'New Title',
+        $result = $this->service->updateMetadata($this->testTenantId, 'page', 1, [
+            'meta_title' => 'New Title',
             'malicious_field' => 'should be ignored',
         ]);
         $this->assertTrue($result);
