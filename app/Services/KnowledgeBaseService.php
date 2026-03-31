@@ -295,7 +295,7 @@ class KnowledgeBaseService
             'sort_order'        => (int) ($data['sort_order'] ?? 0),
             'is_published'      => $data['is_published'] ?? false,
             'created_by'        => $userId,
-            'view_count'        => 0,
+            'views_count'       => 0,
             'created_at'        => now(),
             'updated_at'        => now(),
         ]);
