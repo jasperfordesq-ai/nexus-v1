@@ -31,6 +31,11 @@ class ResolveTenant
             }
         }
 
+        // KB attachment downloads are direct browser links — no tenant header available
+        if (preg_match('#^/api/v2/kb/\d+/attachments/\d+/download$#', $path)) {
+            return $next($request);
+        }
+
         if (!TenantContext::getId()) {
             try {
                 TenantContext::resolve();

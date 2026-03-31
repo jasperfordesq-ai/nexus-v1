@@ -376,16 +376,17 @@ class KnowledgeBaseController extends BaseApiController
     /**
      * GET /api/v2/kb/{id}/attachments/{attachmentId}/download
      *
-     * Download a file attachment (public).
+     * Download a file attachment (public, no tenant header required).
+     * Looks up tenant from the attachment record itself so direct
+     * browser links work without custom headers.
      */
     public function downloadAttachment(int $id, int $attachmentId): \Symfony\Component\HttpFoundation\Response
     {
-        $tenantId = $this->getTenantId();
-
+        // Don't use getTenantId() — direct browser links have no tenant header.
+        // The article_id + attachment_id pair is unique, so we just verify the FK.
         $attachment = DB::table('knowledge_base_attachments')
             ->where('id', $attachmentId)
             ->where('article_id', $id)
-            ->where('tenant_id', $tenantId)
             ->first();
 
         if (! $attachment) {
