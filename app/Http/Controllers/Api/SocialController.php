@@ -567,12 +567,12 @@ class SocialController extends BaseApiController
         }
 
         DB::table('reports')->insert([
-            'user_id'     => $userId,
+            'reporter_id' => $userId,
             'tenant_id'   => $tenantId,
             'target_type' => 'feed_post',
             'target_id'   => (int) $id,
             'reason'      => $reason,
-            'status'      => 'pending',
+            'status'      => 'open',
             'created_at'  => now(),
         ]);
 

@@ -179,13 +179,13 @@ class FCMPushService
     private static function isConfiguredStatic(): bool
     {
         // Check for HTTP v1 API (service account file)
-        $saPath = env('FIREBASE_SERVICE_ACCOUNT_PATH', base_path('firebase-service-account.json'));
+        $saPath = config('services.fcm.service_account_path', base_path('firebase-service-account.json'));
         if (file_exists($saPath)) {
             return true;
         }
 
         // Check for legacy server key
-        if (!empty(env('FCM_SERVER_KEY'))) {
+        if (!empty(config('services.fcm.server_key'))) {
             return true;
         }
 
@@ -256,7 +256,7 @@ class FCMPushService
         }
 
         // Fallback: legacy FCM HTTP API with server key
-        $serverKey = env('FCM_SERVER_KEY');
+        $serverKey = config('services.fcm.server_key');
         if (empty($serverKey)) {
             return ['sent' => 0, 'failed' => count($tokens), 'errors' => ['No valid FCM credentials']];
         }
@@ -311,12 +311,12 @@ class FCMPushService
      */
     private static function getProjectId(): ?string
     {
-        $projectId = env('FIREBASE_PROJECT_ID');
+        $projectId = config('services.fcm.project_id');
         if (!empty($projectId)) {
             return $projectId;
         }
 
-        $saPath = env('FIREBASE_SERVICE_ACCOUNT_PATH', base_path('firebase-service-account.json'));
+        $saPath = config('services.fcm.service_account_path', base_path('firebase-service-account.json'));
         if (file_exists($saPath)) {
             $sa = json_decode(file_get_contents($saPath), true);
             return $sa['project_id'] ?? null;
@@ -339,7 +339,7 @@ class FCMPushService
         }
 
         try {
-            $saPath = env('FIREBASE_SERVICE_ACCOUNT_PATH', base_path('firebase-service-account.json'));
+            $saPath = config('services.fcm.service_account_path', base_path('firebase-service-account.json'));
             if (!file_exists($saPath)) {
                 return null;
             }

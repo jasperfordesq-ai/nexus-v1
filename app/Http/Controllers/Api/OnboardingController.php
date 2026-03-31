@@ -95,8 +95,8 @@ class OnboardingController extends BaseApiController
         try {
             // Lock user row to prevent concurrent completion (TOCTOU race condition)
             $user = DB::selectOne(
-                "SELECT id, avatar_url, bio, onboarding_completed FROM users WHERE id = ? FOR UPDATE",
-                [$userId]
+                "SELECT id, avatar_url, bio, onboarding_completed FROM users WHERE id = ? AND tenant_id = ? FOR UPDATE",
+                [$userId, $tenantId]
             );
 
             if (!empty($user->onboarding_completed)) {
@@ -130,8 +130,8 @@ class OnboardingController extends BaseApiController
 
             // Validate safeguarding step completion if required
             $steps = OnboardingConfigService::getActiveSteps($tenantId);
-            $safeguardingStep = collect($steps)->firstWhere('key', 'safeguarding');
-            if ($safeguardingStep && ($safeguardingStep['is_required'] ?? false)) {
+            $safeguardingStep = collect($steps)->firstWhere('slug', 'safeguarding');
+            if ($safeguardingStep && ($safeguardingStep['required'] ?? false)) {
                 $hasPreferences = DB::table('user_safeguarding_preferences')
                     ->where('tenant_id', $tenantId)
                     ->where('user_id', $userId)

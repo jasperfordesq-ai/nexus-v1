@@ -134,12 +134,20 @@ class AdminSafeguardingController extends BaseApiController
         $this->requireAdmin();
         $tenantId = $this->getTenantId();
 
+        $page = $this->queryInt('page', 1, 1);
+        $limit = $this->queryInt('limit', 50, 1, 200);
+        $offset = ($page - 1) * $limit;
+
         try {
-            $copies = DB::table('broker_message_copies as bmc')
+            $baseQuery = DB::table('broker_message_copies as bmc')
+                ->where('bmc.tenant_id', $tenantId);
+
+            $total = (int) (clone $baseQuery)->count();
+
+            $copies = $baseQuery
                 ->leftJoin('users as sender', 'bmc.sender_id', '=', 'sender.id')
                 ->leftJoin('users as receiver', 'bmc.receiver_id', '=', 'receiver.id')
                 ->leftJoin('users as reviewer', 'bmc.reviewed_by', '=', 'reviewer.id')
-                ->where('bmc.tenant_id', $tenantId)
                 ->select([
                     'bmc.id',
                     'bmc.original_message_id as message_id',
@@ -160,7 +168,8 @@ class AdminSafeguardingController extends BaseApiController
                 ])
                 ->orderByDesc('bmc.flagged')
                 ->orderByDesc('bmc.created_at')
-                ->limit(200)
+                ->limit($limit)
+                ->offset($offset)
                 ->get()
                 ->map(function ($row) {
                     $severity = 'low';
@@ -195,10 +204,10 @@ class AdminSafeguardingController extends BaseApiController
                 })
                 ->toArray();
 
-            return $this->respondWithData($copies);
+            return $this->respondWithPaginatedCollection($copies, $total, $page, $limit);
         } catch (\Illuminate\Database\QueryException $e) {
             if ($this->isTableNotFound($e)) {
-                return $this->respondWithData([]);
+                return $this->respondWithPaginatedCollection([], 0, 1, $limit);
             }
             throw $e;
         }

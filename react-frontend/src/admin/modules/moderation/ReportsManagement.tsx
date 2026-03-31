@@ -293,7 +293,7 @@ export default function ReportsManagement() {
                 <Flag className="w-6 h-6 text-primary" />
               </div>
               <div>
-                <p className="text-2xl font-bold">{(stats.reports_pending ?? 0) + (stats.reports_resolved ?? 0) + (stats.reports_dismissed ?? 0)}</p>
+                <p className="text-2xl font-bold">{stats.total ?? ((stats.reports_pending ?? 0) + (stats.reports_resolved ?? 0) + (stats.reports_dismissed ?? 0))}</p>
                 <p className="text-sm text-default-500">{t('moderation.total_reports')}</p>
               </div>
             </CardBody>
@@ -304,7 +304,7 @@ export default function ReportsManagement() {
                 <AlertCircle className="w-6 h-6 text-warning" />
               </div>
               <div>
-                <p className="text-2xl font-bold">{stats.reports_pending ?? 0}</p>
+                <p className="text-2xl font-bold">{stats.pending ?? stats.reports_pending ?? 0}</p>
                 <p className="text-sm text-default-500">{t('moderation.status_pending')}</p>
               </div>
             </CardBody>
@@ -315,7 +315,7 @@ export default function ReportsManagement() {
                 <CheckCircle2 className="w-6 h-6 text-success" />
               </div>
               <div>
-                <p className="text-2xl font-bold">{stats.reports_resolved ?? 0}</p>
+                <p className="text-2xl font-bold">{stats.resolved ?? stats.reports_resolved ?? 0}</p>
                 <p className="text-sm text-default-500">{t('moderation.status_resolved')}</p>
               </div>
             </CardBody>
@@ -326,7 +326,7 @@ export default function ReportsManagement() {
                 <XCircle className="w-6 h-6 text-default-500" />
               </div>
               <div>
-                <p className="text-2xl font-bold">{stats.reports_dismissed ?? 0}</p>
+                <p className="text-2xl font-bold">{stats.dismissed ?? stats.reports_dismissed ?? 0}</p>
                 <p className="text-sm text-default-500">{t('moderation.status_dismissed')}</p>
               </div>
             </CardBody>

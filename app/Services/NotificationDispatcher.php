@@ -212,12 +212,13 @@ class NotificationDispatcher
             return;
         }
 
+        // Normalize frequency: map 'fortnightly' to 'weekly' for queue ENUM compatibility
+        $queueFrequency = $frequency === 'fortnightly' ? 'weekly' : $frequency;
+
         Notification::createNotification((int) $userId, $content, $link, 'hot_match');
 
-        if ($frequency !== 'never') {
-            $htmlContent = self::buildHotMatchEmail($match, $matchScore);
-            self::queueNotification($userId, 'hot_match', $content, $link, $frequency, $htmlContent);
-        }
+        $htmlContent = self::buildHotMatchEmail($match, $matchScore);
+        self::queueNotification($userId, 'hot_match', $content, $link, $queueFrequency, $htmlContent);
     }
 
     /**
@@ -243,12 +244,13 @@ class NotificationDispatcher
             return;
         }
 
+        // Normalize frequency: map 'fortnightly' to 'weekly' for queue ENUM compatibility
+        $queueFrequency = $frequency === 'fortnightly' ? 'weekly' : $frequency;
+
         Notification::createNotification((int) $userId, $content, $link, 'mutual_match');
 
-        if ($frequency !== 'never') {
-            $htmlContent = self::buildMutualMatchEmail($match, $reciprocalInfo);
-            self::queueNotification($userId, 'mutual_match', $content, $link, $frequency, $htmlContent);
-        }
+        $htmlContent = self::buildMutualMatchEmail($match, $reciprocalInfo);
+        self::queueNotification($userId, 'mutual_match', $content, $link, $queueFrequency, $htmlContent);
     }
 
     /**

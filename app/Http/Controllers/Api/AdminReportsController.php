@@ -87,9 +87,14 @@ class AdminReportsController extends BaseApiController
             $params[] = $type;
         }
 
-        if ($status && in_array($status, ['open', 'resolved', 'dismissed'], true)) {
-            $conditions[] = 'r.status = ?';
-            $params[] = $status;
+        if ($status && in_array($status, ['open', 'pending', 'resolved', 'dismissed'], true)) {
+            // Treat 'pending' and 'open' as equivalent (legacy compat)
+            if ($status === 'pending') {
+                $conditions[] = "r.status IN ('open', 'pending')";
+            } else {
+                $conditions[] = 'r.status = ?';
+                $params[] = $status;
+            }
         }
 
         if ($search) {
@@ -207,7 +212,7 @@ class AdminReportsController extends BaseApiController
             return $this->respondWithError('NOT_FOUND', __('api.report_not_found'), null, 404);
         }
 
-        if ($report->status !== 'open') {
+        if (!in_array($report->status, ['open', 'pending'], true)) {
             return $this->respondWithError('ALREADY_PROCESSED', __('api.report_already_status', ['status' => $report->status]), null, 400);
         }
 
@@ -267,7 +272,7 @@ class AdminReportsController extends BaseApiController
             return $this->respondWithError('NOT_FOUND', __('api.report_not_found'), null, 404);
         }
 
-        if ($report->status !== 'open') {
+        if (!in_array($report->status, ['open', 'pending'], true)) {
             return $this->respondWithError('ALREADY_PROCESSED', __('api.report_already_status', ['status' => $report->status]), null, 400);
         }
 
@@ -320,7 +325,7 @@ class AdminReportsController extends BaseApiController
         $stats = DB::selectOne(
             "SELECT
                 COUNT(*) as total,
-                SUM(CASE WHEN status = 'open' THEN 1 ELSE 0 END) as pending,
+                SUM(CASE WHEN status IN ('open', 'pending') THEN 1 ELSE 0 END) as pending,
                 SUM(CASE WHEN status = 'resolved' THEN 1 ELSE 0 END) as resolved,
                 SUM(CASE WHEN status = 'dismissed' THEN 1 ELSE 0 END) as dismissed
              FROM reports

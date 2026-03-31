@@ -96,14 +96,19 @@ class SafeguardingService
     /**
      * Record consent from the ward.
      */
-    public function recordConsent(int $wardUserId): bool
+    public function recordConsent(int $wardUserId, ?int $assignmentId = null): bool
     {
         try {
-            $this->assignment->newQuery()
+            $query = $this->assignment->newQuery()
                 ->where('ward_user_id', $wardUserId)
                 ->whereNull('revoked_at')
-                ->whereNull('consent_given_at')
-                ->update(['consent_given_at' => now()]);
+                ->whereNull('consent_given_at');
+
+            if ($assignmentId !== null) {
+                $query->where('id', $assignmentId);
+            }
+
+            $query->update(['consent_given_at' => now()]);
             return true;
         } catch (\Throwable $e) {
             Log::error('SafeguardingService::recordConsent error: ' . $e->getMessage());

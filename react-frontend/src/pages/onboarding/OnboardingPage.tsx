@@ -567,6 +567,7 @@ export function OnboardingPage() {
             selectedInterests,
             skillOffers,
             skillNeeds,
+            stepSlugToIndex,
           })}
           onStepClick={(step) => {
             // Verify step still exists in config
@@ -1137,7 +1138,7 @@ export function OnboardingPage() {
                     getCategoryName={getCategoryName}
                     chipColor="primary"
                     emptyText={t('none_selected')}
-                    onEdit={() => goToStep(3)}
+                    onEdit={() => goToStep(stepSlugToIndex.get('interests') ?? 3)}
                   />
 
                   <Divider />
@@ -1149,7 +1150,7 @@ export function OnboardingPage() {
                     getCategoryName={getCategoryName}
                     chipColor="success"
                     emptyText={t('none_selected')}
-                    onEdit={() => goToStep(4)}
+                    onEdit={() => goToStep(stepSlugToIndex.get('skills') ?? 4)}
                   />
 
                   <Divider />
@@ -1161,7 +1162,7 @@ export function OnboardingPage() {
                     getCategoryName={getCategoryName}
                     chipColor="warning"
                     emptyText={t('none_selected')}
-                    onEdit={() => goToStep(4)}
+                    onEdit={() => goToStep(stepSlugToIndex.get('skills') ?? 4)}
                   />
                 </div>
               </GlassCard>
@@ -1222,12 +1223,19 @@ function getCompletedSteps(state: {
   selectedInterests: number[];
   skillOffers: number[];
   skillNeeds: number[];
+  stepSlugToIndex: Map<string, number>;
 }): Set<number> {
   const completed = new Set<number>();
-  completed.add(1); // Welcome is always "done" once visited
-  if (state.hasAvatar && state.hasBio) completed.add(2);
-  if (state.selectedInterests.length > 0) completed.add(3);
-  if (state.skillOffers.length > 0 || state.skillNeeds.length > 0) completed.add(4);
+  const idx = state.stepSlugToIndex;
+  const welcomeIdx = idx.get('welcome') ?? 1;
+  const profileIdx = idx.get('profile') ?? 2;
+  const interestsIdx = idx.get('interests') ?? 3;
+  const skillsIdx = idx.get('skills') ?? 4;
+
+  completed.add(welcomeIdx); // Welcome is always "done" once visited
+  if (state.hasAvatar && state.hasBio) completed.add(profileIdx);
+  if (state.selectedInterests.length > 0) completed.add(interestsIdx);
+  if (state.skillOffers.length > 0 || state.skillNeeds.length > 0) completed.add(skillsIdx);
   return completed;
 }
 

@@ -44,7 +44,7 @@ class PushNotificationService
                 ->update([
                     'tenant_id'  => $tenantId,
                     'p256dh_key' => $subscription['keys']['p256dh'] ?? null,
-                    'auth_token' => $subscription['keys']['auth'] ?? null,
+                    'auth_key'   => $subscription['keys']['auth'] ?? null,
                     'updated_at' => now(),
                 ]);
             return true;
@@ -55,7 +55,7 @@ class PushNotificationService
             'tenant_id'  => $tenantId,
             'endpoint'   => $endpoint,
             'p256dh_key' => $subscription['keys']['p256dh'] ?? null,
-            'auth_token' => $subscription['keys']['auth'] ?? null,
+            'auth_key'   => $subscription['keys']['auth'] ?? null,
             'created_at' => now(),
             'updated_at' => now(),
         ]);

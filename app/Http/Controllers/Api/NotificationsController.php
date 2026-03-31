@@ -260,12 +260,14 @@ class NotificationsController extends BaseApiController
                 ->where('id', (int) $id)
                 ->where('tenant_id', TenantContext::getId())
                 ->where('user_id', $userId)
-                ->delete();
+                ->whereNull('deleted_at')
+                ->update(['deleted_at' => now()]);
         } elseif ($all === true || $all === 'true') {
             DB::table('notifications')
                 ->where('tenant_id', TenantContext::getId())
                 ->where('user_id', $userId)
-                ->delete();
+                ->whereNull('deleted_at')
+                ->update(['deleted_at' => now()]);
         } else {
             return $this->respondWithError('VALIDATION_ERROR', __('api.missing_id_or_action'), null, 400);
         }

@@ -50,6 +50,16 @@ class Authenticate
                     }
                 }
 
+                // Check user is active (not suspended/banned)
+                if ($user && $user->status !== 'active') {
+                    return response()->json([
+                        'errors' => [
+                            ['code' => 'account_suspended', 'message' => 'Your account has been suspended or deactivated'],
+                        ],
+                        'success' => false,
+                    ], 403, ['API-Version' => '2.0']);
+                }
+
                 auth()->shouldUse($guard);
                 return $next($request);
             }

@@ -386,9 +386,12 @@ class ExchangeWorkflowService
                 return false;
             }
 
-            // Adjust hours — use simple variance check without config service
-            $minHours = (float) $exchange->proposed_hours * 0.75;
-            $maxHours = (float) $exchange->proposed_hours * 1.25;
+            // Adjust hours — read configured variance percentage from broker config
+            $config = app(BrokerControlConfigService::class)->getConfig();
+            $variancePercent = (int) ($config['max_hour_variance_percent'] ?? 25);
+            $varianceFactor = $variancePercent / 100;
+            $minHours = (float) $exchange->proposed_hours * (1 - $varianceFactor);
+            $maxHours = (float) $exchange->proposed_hours * (1 + $varianceFactor);
             $hours = max($minHours, min($maxHours, $hours));
 
             if ($isRequester) {

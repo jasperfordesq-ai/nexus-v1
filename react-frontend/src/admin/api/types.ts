@@ -1693,6 +1693,11 @@ export interface ModerationStats {
   reports_pending: number;
   reports_resolved: number;
   reports_dismissed: number;
+  // Direct keys from /v2/admin/reports/stats
+  pending?: number;
+  resolved?: number;
+  dismissed?: number;
+  total?: number;
 }
 
 // ─────────────────────────────────────────────────────────────────────────────

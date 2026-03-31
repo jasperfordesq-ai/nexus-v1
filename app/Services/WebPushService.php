@@ -72,7 +72,7 @@ class WebPushService
                     Subscription::create([
                         'endpoint'        => $sub->endpoint,
                         'publicKey'       => $sub->p256dh_key,
-                        'authToken'       => $sub->auth_token,
+                        'authToken'       => $sub->auth_key,
                         'contentEncoding' => 'aesgcm',
                     ]),
                     $payload

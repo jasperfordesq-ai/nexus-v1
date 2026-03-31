@@ -373,6 +373,10 @@ class AdminVettingController extends BaseApiController
                 switch ($action) {
                     case 'verify':
                         if (in_array($existing['status'], ['pending', 'submitted'])) {
+                            if (empty($existing['reference_number'])) {
+                                $failed++;
+                                break;
+                            }
                             $this->vettingService->verify($id, $adminId);
                             $notifyVerified[] = (int) $existing['user_id'];
                             $processed++;
