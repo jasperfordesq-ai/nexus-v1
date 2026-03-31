@@ -10,8 +10,9 @@
  */
 
 import { useState, useCallback, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Tabs, Tab, Chip, Button } from '@heroui/react';
-import { BookOpen, Eye, Trash2, ThumbsUp } from 'lucide-react';
+import { BookOpen, Eye, Trash2, ThumbsUp, Plus, Pencil } from 'lucide-react';
 import { usePageTitle } from '@/hooks';
 import { useToast, useTenant } from '@/contexts';
 import { api } from '@/lib/api';
@@ -56,6 +57,7 @@ export function ResourcesAdmin() {
   usePageTitle(t('resources.page_title'));
   const toast = useToast();
   const { tenantPath } = useTenant();
+  const navigate = useNavigate();
 
   const [items, setItems] = useState<Resource[]>([]);
   const [total, setTotal] = useState(0);
@@ -201,8 +203,18 @@ export function ResourcesAdmin() {
             size="sm"
             variant="flat"
             color="primary"
+            onPress={() => navigate(tenantPath(`/admin/resources/edit/${item.id}`))}
+            aria-label={t('resources.label_edit_resource', 'Edit article')}
+          >
+            <Pencil size={14} />
+          </Button>
+          <Button
+            isIconOnly
+            size="sm"
+            variant="flat"
+            color="default"
             as="a"
-            href={tenantPath(`/resources/${item.id}`)}
+            href={tenantPath(`/kb/${item.id}`)}
             target="_blank"
             rel="noopener noreferrer"
             aria-label={t('resources.label_view_resource')}
@@ -231,6 +243,15 @@ export function ResourcesAdmin() {
       <PageHeader
         title={t('resources.resources_admin_title')}
         description={t('resources.resources_admin_desc')}
+        actions={
+          <Button
+            color="primary"
+            startContent={<Plus size={16} />}
+            onPress={() => navigate(tenantPath('/admin/resources/create'))}
+          >
+            {t('resources.new_article', 'New Article')}
+          </Button>
+        }
       />
 
       <div className="mb-4">

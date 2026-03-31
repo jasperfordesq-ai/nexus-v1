@@ -121,6 +121,7 @@ const GoalsAdmin = lazy(() => import('./modules/goals/GoalsAdmin'));
 
 // Resources / Knowledge Base module
 const ResourcesAdmin = lazy(() => import('./modules/resources/ResourcesAdmin'));
+const KBArticleForm = lazy(() => import('./modules/resources/KBArticleForm'));
 
 // Jobs module
 const JobsAdmin = lazy(() => import('./modules/jobs/JobsAdmin'));
@@ -470,6 +471,8 @@ export function AdminRoutes() {
 
       {/* ─── RESOURCES / KNOWLEDGE BASE ─── */}
       <Route path="resources" element={<Lazy><ResourcesAdmin /></Lazy>} />
+      <Route path="resources/create" element={<Lazy><KBArticleForm /></Lazy>} />
+      <Route path="resources/edit/:id" element={<Lazy><KBArticleForm /></Lazy>} />
 
       {/* ─── JOBS ─── */}
       <Route path="jobs" element={<Lazy><JobsAdmin /></Lazy>} />

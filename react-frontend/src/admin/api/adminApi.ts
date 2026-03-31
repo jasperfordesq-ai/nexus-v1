@@ -1628,6 +1628,42 @@ export const adminCrm = {
 };
 
 // ─────────────────────────────────────────────────────────────────────────────
+// Knowledge Base
+// ─────────────────────────────────────────────────────────────────────────────
+
+export const adminKb = {
+  get: (id: number) =>
+    api.get(`/v2/kb/${id}`),
+
+  create: (data: {
+    title: string;
+    slug?: string;
+    content?: string;
+    content_type?: 'html' | 'plain' | 'markdown';
+    category_id?: number | null;
+    parent_article_id?: number | null;
+    sort_order?: number;
+    is_published?: boolean;
+  }) =>
+    api.post('/v2/kb', data),
+
+  update: (id: number, data: {
+    title?: string;
+    slug?: string;
+    content?: string;
+    content_type?: 'html' | 'plain' | 'markdown';
+    category_id?: number | null;
+    parent_article_id?: number | null;
+    sort_order?: number;
+    is_published?: boolean;
+  }) =>
+    api.put(`/v2/kb/${id}`, data),
+
+  delete: (id: number) =>
+    api.delete(`/v2/kb/${id}`),
+};
+
+// ─────────────────────────────────────────────────────────────────────────────
 // Re-export for convenience
 // ─────────────────────────────────────────────────────────────────────────────
 
