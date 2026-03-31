@@ -217,8 +217,8 @@ export function ConversationPage() {
         });
 
         // Mark incoming message as read immediately (user is viewing this conversation)
-        if (id) {
-          api.put(`/v2/messages/${id}/read`).catch(() => {
+        if (targetId) {
+          api.put(`/v2/messages/${targetId}/read`).catch(() => {
             // non-critical — will sync on next load
           });
         }
@@ -292,13 +292,13 @@ export function ConversationPage() {
    * Only fetches messages newer than the last known message
    */
   const pollForNewMessages = useCallback(async () => {
-    // Only poll for existing conversations (not new ones started via user ID)
-    if (!id || isNewConversationRoute || !lastMessageIdRef.current) return;
+    // Only poll when we have a target user ID and a known last message
+    if (!targetId || !lastMessageIdRef.current) return;
 
     try {
       // Use the last message ID as cursor to get only newer messages
       const cursor = btoa(String(lastMessageIdRef.current));
-      const response = await api.get<Message[]>(`/v2/messages/${id}?direction=newer&cursor=${cursor}`);
+      const response = await api.get<Message[]>(`/v2/messages/${targetId}?direction=newer&cursor=${cursor}`);
 
       if (response.success && response.data && response.data.length > 0) {
         const newMessages = response.data;
@@ -326,7 +326,7 @@ export function ConversationPage() {
     } catch {
       // Silent fail for polling - don't spam console
     }
-  }, [id, isNewConversationRoute]);
+  }, [targetId]);
 
   // Memoize loadConversation
   const loadConversation = useCallback(async () => {
@@ -336,20 +336,22 @@ export function ConversationPage() {
       setIsLoading(true);
       setIsNewConversation(false);
 
-      // If this is a new conversation route, load user profile directly
-      if (isNewConversationRoute) {
-        await loadUserForNewConversation(parseInt(targetId, 10));
-        return;
-      }
-
-      // API returns messages as data with conversation info in meta
+      // ALWAYS try to load existing messages from the API first, regardless
+      // of whether this is the /messages/new/:userId or /messages/:id route.
+      // This prevents the recurring regression where refreshing a "new" conversation
+      // URL wiped all chat history because it skipped the API call entirely.
       const response = await api.get<Message[]>(`/v2/messages/${targetId}`);
       const meta = response.meta;
       if (response.success && response.data && meta?.conversation) {
         const messages = response.data as Message[];
+
+        // API returns messages in descending order (newest first).
+        // Reverse to chronological order (oldest first) for chat display.
+        const chronologicalMessages = [...messages].reverse();
+
         setConversation({
           meta: meta.conversation as ConversationMeta,
-          messages,
+          messages: chronologicalMessages,
         });
 
         // Track pagination state from response
@@ -360,39 +362,48 @@ export function ConversationPage() {
           hasNewerMessages: false,
         });
 
-        // Track the newest message ID for polling
-        if (messages.length > 0) {
-          const lastMsg = messages[messages.length - 1];
-          if (lastMsg) lastMessageIdRef.current = lastMsg.id;
+        // Track the newest message ID for polling (last in chronological = newest)
+        if (chronologicalMessages.length > 0) {
+          const newestMsg = chronologicalMessages[chronologicalMessages.length - 1];
+          if (newestMsg) lastMessageIdRef.current = newestMsg.id;
+        }
+
+        // If we're on the /messages/new/ route but messages exist, redirect to
+        // the canonical /messages/:id URL so refreshes continue to work correctly.
+        if (isNewConversationRoute && chronologicalMessages.length > 0) {
+          navigate(tenantPath(`/messages/${targetId}`), { replace: true });
         }
 
         // Scroll to bottom on initial load
         setTimeout(() => scrollToBottom(), 100);
       } else if (response.success && response.data && response.data.length > 0) {
         // Fallback: messages loaded but meta.conversation missing — recover gracefully
-        const messages = response.data as Message[];
+        const messages = [...(response.data as Message[])].reverse();
         setConversation({
           meta: { id: parseInt(targetId, 10), other_user: { id: parseInt(targetId, 10), name: '' } },
           messages,
         });
         if (messages.length > 0) {
-          const lastMsg = messages[messages.length - 1];
-          if (lastMsg) lastMessageIdRef.current = lastMsg.id;
+          const newestMsg = messages[messages.length - 1];
+          if (newestMsg) lastMessageIdRef.current = newestMsg.id;
+        }
+        if (isNewConversationRoute) {
+          navigate(tenantPath(`/messages/${targetId}`), { replace: true });
         }
         setTimeout(() => scrollToBottom(), 100);
       } else {
-        // No existing conversation - this might be a new conversation
-        // Try to fetch the user's profile to show their info
+        // No existing messages — this is genuinely a new conversation.
+        // Load user profile to show their info in the empty chat view.
         await loadUserForNewConversation(parseInt(targetId, 10));
       }
     } catch (error) {
-      // API returned error (e.g., 404) - try to start a new conversation
+      // API returned error (e.g., 404 for unknown user) — try new conversation fallback
       logError('Failed to load conversation, trying new conversation', error);
       await loadUserForNewConversation(parseInt(targetId, 10));
     } finally {
       setIsLoading(false);
     }
-  }, [targetId, isNewConversationRoute, loadUserForNewConversation]);
+  }, [targetId, isNewConversationRoute, loadUserForNewConversation, navigate, tenantPath]);
 
   // Cleanup ref for unmount guard
   useEffect(() => {
@@ -407,7 +418,7 @@ export function ConversationPage() {
 
   // Mark conversation as read when it loads and when new messages arrive
   useEffect(() => {
-    if (!conversation?.messages?.length || !id || isNewConversationRoute) return;
+    if (!conversation?.messages?.length || !targetId) return;
 
     // Find unread messages from the other user
     const unreadMessages = conversation.messages.filter(
@@ -417,7 +428,7 @@ export function ConversationPage() {
     if (unreadMessages.length === 0) return;
 
     // Mark the conversation as read via the API
-    api.put(`/v2/messages/${id}/read`).catch((err) => {
+    api.put(`/v2/messages/${targetId}/read`).catch((err) => {
       logError('Failed to mark conversation as read', err);
     });
 
@@ -434,7 +445,7 @@ export function ConversationPage() {
       };
     });
   // eslint-disable-next-line react-hooks/exhaustive-deps -- messages.length is sufficient; including messages ref causes double-fire
-  }, [conversation?.messages?.length, id, isNewConversationRoute, user?.id]);
+  }, [conversation?.messages?.length, targetId, user?.id]);
 
   // Fetch messaging restriction status (broker monitoring)
   const refreshRestrictionStatus = useCallback(() => {
@@ -518,17 +529,18 @@ export function ConversationPage() {
    * Load older messages when user scrolls to top
    */
   const loadOlderMessages = useCallback(async () => {
-    if (!id || !pagination.hasOlderMessages || isLoadingOlder || !pagination.olderCursor) return;
+    if (!targetId || !pagination.hasOlderMessages || isLoadingOlder || !pagination.olderCursor) return;
 
     try {
       setIsLoadingOlder(true);
 
       const response = await api.get<Message[]>(
-        `/v2/messages/${id}?direction=older&cursor=${pagination.olderCursor}`
+        `/v2/messages/${targetId}?direction=older&cursor=${pagination.olderCursor}`
       );
 
       if (response.success && response.data) {
-        const olderMessages = response.data;
+        // API returns older messages in descending order — reverse to chronological
+        const olderMessages = [...response.data].reverse();
 
         // Update pagination state
         setPagination((prev) => ({
@@ -537,7 +549,7 @@ export function ConversationPage() {
           hasOlderMessages: response.meta?.has_more || false,
         }));
 
-        // Prepend older messages
+        // Prepend older messages (now in ascending order) before existing messages
         setConversation((prev) => {
           if (!prev) return null;
 
@@ -568,7 +580,7 @@ export function ConversationPage() {
     } finally {
       setIsLoadingOlder(false);
     }
-  }, [id, pagination.hasOlderMessages, pagination.olderCursor, isLoadingOlder]);
+  }, [targetId, pagination.hasOlderMessages, pagination.olderCursor, isLoadingOlder]);
 
   // Handle scroll to detect when user wants to load older messages
   const handleScroll = useCallback(() => {
@@ -589,11 +601,11 @@ export function ConversationPage() {
    * Delete the conversation — 'self' hides from current user only; 'everyone' hides from both.
    */
   async function deleteConversation(scope: 'self' | 'everyone') {
-    if (!id || isArchiving) return;
+    if (!targetId || isArchiving) return;
 
     try {
       setIsArchiving(true);
-      const response = await api.delete(`/v2/messages/conversations/${id}?scope=${scope}`);
+      const response = await api.delete(`/v2/messages/conversations/${targetId}?scope=${scope}`);
 
       if (response.success) {
         if (scope === 'everyone') {
@@ -746,6 +758,7 @@ export function ConversationPage() {
 
         if (isNewConversation) {
           setIsNewConversation(false);
+          navigate(tenantPath(`/messages/${targetId}`), { replace: true });
         }
 
         setTimeout(() => scrollToBottom(), 50);
@@ -947,6 +960,7 @@ export function ConversationPage() {
 
           if (isNewConversation) {
             setIsNewConversation(false);
+            navigate(tenantPath(`/messages/${targetId}`), { replace: true });
           }
 
           setTimeout(() => scrollToBottom(), 50);
@@ -989,6 +1003,9 @@ export function ConversationPage() {
 
           if (isNewConversation) {
             setIsNewConversation(false);
+            // Redirect to the canonical conversation URL so refreshes load
+            // message history from the API instead of showing empty state.
+            navigate(tenantPath(`/messages/${targetId}`), { replace: true });
           }
 
           setTimeout(() => scrollToBottom(), 50);
@@ -1047,6 +1064,7 @@ export function ConversationPage() {
 
         if (isNewConversation) {
           setIsNewConversation(false);
+          navigate(tenantPath(`/messages/${targetId}`), { replace: true });
         }
 
         setTimeout(() => scrollToBottom(), 50);

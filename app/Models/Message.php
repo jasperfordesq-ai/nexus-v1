@@ -67,10 +67,16 @@ class Message extends Model
 
     public function scopeBetweenUsers(Builder $query, int $userId1, int $userId2): Builder
     {
+        // Wrap both directions in a single where() so that other global scopes
+        // (e.g., TenantScope) remain safely AND-ed outside this group.
+        // Previously used ->where()->orWhere() which could break SQL precedence
+        // when composed with other top-level conditions.
         return $query->where(function ($q) use ($userId1, $userId2) {
-            $q->where('sender_id', $userId1)->where('receiver_id', $userId2);
-        })->orWhere(function ($q) use ($userId1, $userId2) {
-            $q->where('sender_id', $userId2)->where('receiver_id', $userId1);
+            $q->where(function ($inner) use ($userId1, $userId2) {
+                $inner->where('sender_id', $userId1)->where('receiver_id', $userId2);
+            })->orWhere(function ($inner) use ($userId1, $userId2) {
+                $inner->where('sender_id', $userId2)->where('receiver_id', $userId1);
+            });
         });
     }
 
