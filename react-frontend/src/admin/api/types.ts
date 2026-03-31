@@ -1674,7 +1674,7 @@ export interface AdminReport {
   content_preview?: string;
   reason: string;
   description?: string;
-  status: 'pending' | 'resolved' | 'dismissed';
+  status: 'open' | 'pending' | 'resolved' | 'dismissed';
   created_at: string;
   resolved_at?: string | null;
   resolved_by?: string | null;

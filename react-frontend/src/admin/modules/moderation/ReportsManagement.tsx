@@ -209,7 +209,7 @@ export default function ReportsManagement() {
         <p className="text-sm line-clamp-2 max-w-md">{report.description}</p>
       </TableCell>,
       <TableCell key="status">
-        {report.status === 'pending' && (
+        {(report.status === 'open' || report.status === 'pending') && (
           <Chip size="sm" color="warning" variant="flat">{t('moderation.status_pending')}</Chip>
         )}
         {report.status === 'resolved' && (
@@ -225,7 +225,7 @@ export default function ReportsManagement() {
         </span>
       </TableCell>,
       <TableCell key="actions">
-        {report.status === 'pending' && (
+        {(report.status === 'open' || report.status === 'pending') && (
           <div className="flex items-center gap-2">
             <Button
               size="sm"
@@ -247,7 +247,7 @@ export default function ReportsManagement() {
             </Button>
           </div>
         )}
-        {report.status !== 'pending' && (
+        {report.status !== 'open' && report.status !== 'pending' && (
           <div className="text-sm text-default-400">
             {report.resolved_by && t('moderation.resolved_by', { name: report.resolved_by })}
           </div>

@@ -79,8 +79,7 @@ class PushNotificationService
      */
     public function getVapidKey(): ?string
     {
-        return config('services.webpush.vapid_public_key')
-            ?: env('VAPID_PUBLIC_KEY');
+        return config('services.vapid.public_key');
     }
 
     /**
