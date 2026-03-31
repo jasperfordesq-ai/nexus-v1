@@ -1661,6 +1661,12 @@ export const adminKb = {
 
   delete: (id: number) =>
     api.delete(`/v2/kb/${id}`),
+
+  uploadAttachment: (articleId: number, file: File) =>
+    api.upload(`/v2/kb/${articleId}/attachments`, file),
+
+  deleteAttachment: (articleId: number, attachmentId: number) =>
+    api.delete(`/v2/kb/${articleId}/attachments/${attachmentId}`),
 };
 
 // ─────────────────────────────────────────────────────────────────────────────

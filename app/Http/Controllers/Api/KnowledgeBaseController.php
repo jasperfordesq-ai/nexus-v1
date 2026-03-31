@@ -7,6 +7,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Services\KnowledgeBaseService;
+use App\Services\KnowledgeBaseAttachmentService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
 use App\Core\TenantContext;
@@ -22,6 +23,7 @@ class KnowledgeBaseController extends BaseApiController
 
     public function __construct(
         private readonly KnowledgeBaseService $kbService,
+        private readonly KnowledgeBaseAttachmentService $attachmentService,
     ) {}
 
     /**
@@ -254,6 +256,9 @@ class KnowledgeBaseController extends BaseApiController
             return $this->respondWithError('RESOURCE_CONFLICT', __('api.kb_cannot_delete_with_children'), null, 409);
         }
 
+        // Delete attachment files from disk (DB rows cascade via FK)
+        $this->attachmentService->deleteAllForArticle($id);
+
         $deleted = DB::table('knowledge_base_articles')
             ->where('id', $id)
             ->where('tenant_id', $tenantId)
@@ -330,5 +335,60 @@ class KnowledgeBaseController extends BaseApiController
             ->update(['helpful_count' => $helpful, 'not_helpful_count' => $notHelpful]);
 
         return $this->respondWithData(['message' => 'Feedback submitted successfully']);
+    }
+
+    /**
+     * POST /api/v2/kb/{id}/attachments
+     *
+     * Upload a file attachment to a KB article (admin only).
+     */
+    public function uploadAttachment(int $id): JsonResponse
+    {
+        $this->requireAdmin();
+        $this->rateLimit('kb_attachment_upload', 20, 60);
+
+        $tenantId = $this->getTenantId();
+
+        // Verify article exists
+        $exists = DB::table('knowledge_base_articles')
+            ->where('id', $id)
+            ->where('tenant_id', $tenantId)
+            ->exists();
+
+        if (! $exists) {
+            return $this->respondWithError('NOT_FOUND', __('api.kb_article_not_found'), null, 404);
+        }
+
+        $file = request()->file('file');
+        if (! $file || ! $file->isValid()) {
+            return $this->respondWithError('UPLOAD_INVALID', __('api.no_valid_file_provided'), 'file', 422);
+        }
+
+        $result = $this->attachmentService->upload($id, $file, $tenantId);
+
+        if (isset($result['error'])) {
+            return $this->respondWithError('UPLOAD_FAILED', $result['error'], null, 422);
+        }
+
+        return $this->respondWithData($result, null, 201);
+    }
+
+    /**
+     * DELETE /api/v2/kb/{id}/attachments/{attachmentId}
+     *
+     * Delete a file attachment from a KB article (admin only).
+     */
+    public function deleteAttachment(int $id, int $attachmentId): JsonResponse
+    {
+        $this->requireAdmin();
+        $this->rateLimit('kb_attachment_delete', 20, 60);
+
+        $deleted = $this->attachmentService->delete($attachmentId, $id);
+
+        if (! $deleted) {
+            return $this->respondWithError('NOT_FOUND', 'Attachment not found', null, 404);
+        }
+
+        return $this->noContent();
     }
 }

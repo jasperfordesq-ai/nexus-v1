@@ -5,11 +5,16 @@
 
 /**
  * Admin Knowledge Base Article Form (Create / Edit)
- * Shared form for creating and editing KB articles.
+ *
+ * Two creation modes:
+ * - "Write" — rich text editor (HTML content)
+ * - "Upload" — drag-and-drop a file (.md, .pdf, .docx, .txt)
+ *
+ * Supports file attachments on existing articles.
  * Detects edit mode via URL param `:id`.
  */
 
-import { useState, useEffect, useCallback, lazy, Suspense } from 'react';
+import { useState, useEffect, useCallback, useRef, lazy, Suspense } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import {
   Card,
@@ -21,17 +26,29 @@ import {
   Switch,
   Textarea,
   Spinner,
+  Tabs,
+  Tab,
+  Chip,
+  Divider,
 } from '@heroui/react';
 const RichTextEditor = lazy(() =>
   import('../../components/RichTextEditor').then((m) => ({ default: m.RichTextEditor })),
 );
-import { ArrowLeft, Save } from 'lucide-react';
+import { ArrowLeft, Save, Upload, FileText, Trash2, Download, X } from 'lucide-react';
 import { usePageTitle } from '@/hooks';
 import { useTenant, useToast } from '@/contexts';
 import { adminKb } from '../../api/adminApi';
 import { api } from '@/lib/api';
 import { PageHeader } from '../../components';
 import { useTranslation } from 'react-i18next';
+
+interface KBAttachment {
+  id: number;
+  file_name: string;
+  file_url: string;
+  mime_type: string;
+  file_size: number;
+}
 
 interface KBArticle {
   id: number;
@@ -40,18 +57,11 @@ interface KBArticle {
   content: string;
   content_type: string;
   category_id: number | null;
-  category: string | null;
   parent_article_id: number | null;
-  parent_title: string | null;
   sort_order: number;
   is_published: boolean;
-  view_count: number;
-  helpful_count: number;
-  not_helpful_count: number;
-  author_name: string;
-  children: KBArticle[];
-  created_at: string;
-  updated_at: string;
+  attachments: KBAttachment[];
+  [key: string]: unknown;
 }
 
 interface ResourceCategory {
@@ -66,6 +76,14 @@ interface ParentArticleOption {
   title: string;
 }
 
+function formatFileSize(bytes: number): string {
+  if (bytes < 1024) return `${bytes} B`;
+  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(0)} KB`;
+  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+}
+
+const ACCEPTED_FILE_TYPES = '.md,.pdf,.doc,.docx,.txt,.csv,.xls,.xlsx';
+
 export function KBArticleForm() {
   const { t } = useTranslation('admin');
   const { id } = useParams<{ id: string }>();
@@ -73,24 +91,37 @@ export function KBArticleForm() {
   const { tenantPath } = useTenant();
   const toast = useToast();
   const navigate = useNavigate();
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Loading states
   const [loading, setLoading] = useState(isEdit);
   const [submitting, setSubmitting] = useState(false);
   const [loadError, setLoadError] = useState<string | null>(null);
 
-  // Original article data (for edit mode page title)
+  // Original article data
   const [article, setArticle] = useState<KBArticle | null>(null);
+
+  // Mode: "write" (rich text) or "upload" (file)
+  const [mode, setMode] = useState<'write' | 'upload'>('write');
 
   // Form state
   const [title, setTitle] = useState('');
   const [slug, setSlug] = useState('');
   const [content, setContent] = useState('');
+  const [contentType, setContentType] = useState<'html' | 'markdown' | 'plain'>('html');
   const [excerpt, setExcerpt] = useState('');
   const [isPublished, setIsPublished] = useState(false);
   const [categoryId, setCategoryId] = useState('');
   const [parentArticleId, setParentArticleId] = useState('');
   const [sortOrder, setSortOrder] = useState('0');
+
+  // File upload state
+  const [pendingFile, setPendingFile] = useState<File | null>(null);
+  const [isDragging, setIsDragging] = useState(false);
+
+  // Attachments (edit mode)
+  const [attachments, setAttachments] = useState<KBAttachment[]>([]);
+  const [uploadingAttachment, setUploadingAttachment] = useState(false);
 
   // Dropdowns data
   const [categories, setCategories] = useState<ResourceCategory[]>([]);
@@ -99,7 +130,6 @@ export function KBArticleForm() {
   // Validation
   const [errors, setErrors] = useState<Record<string, string>>({});
 
-  // Dynamic page title
   usePageTitle(
     isEdit && article
       ? `Admin - ${t('breadcrumbs.edit')}: ${article.title}`
@@ -111,11 +141,8 @@ export function KBArticleForm() {
     async function loadCategories() {
       try {
         const res = await api.get('/v2/resources/categories/tree?flat=1');
-        if (res.success && res.data) {
-          const data = res.data;
-          if (Array.isArray(data)) {
-            setCategories(data);
-          }
+        if (res.success && res.data && Array.isArray(res.data)) {
+          setCategories(res.data);
         }
       } catch {
         // Categories are optional
@@ -124,7 +151,7 @@ export function KBArticleForm() {
     loadCategories();
   }, []);
 
-  // Load parent articles (all articles for this tenant, for nesting)
+  // Load parent articles
   useEffect(() => {
     async function loadParentArticles() {
       try {
@@ -133,7 +160,6 @@ export function KBArticleForm() {
           const items = Array.isArray(res.data)
             ? res.data
             : (res.data as { items?: ParentArticleOption[] }).items || [];
-          // Filter out current article in edit mode
           const filtered = id
             ? items.filter((a: ParentArticleOption) => a.id !== Number(id))
             : items;
@@ -149,26 +175,25 @@ export function KBArticleForm() {
   // Load article for edit mode
   const loadArticle = useCallback(async () => {
     if (!id) return;
-
     setLoading(true);
     setLoadError(null);
 
     try {
       const res = await adminKb.get(Number(id));
-
       if (res.success && res.data) {
         const data = res.data as KBArticle;
         setArticle(data);
-
-        // Populate form fields
         setTitle(data.title || '');
         setSlug(data.slug || '');
         setContent(data.content || '');
-        setExcerpt('');
+        setContentType((data.content_type as 'html' | 'markdown' | 'plain') || 'html');
         setIsPublished(!!data.is_published);
         setCategoryId(data.category_id ? String(data.category_id) : '');
         setParentArticleId(data.parent_article_id ? String(data.parent_article_id) : '');
         setSortOrder(String(data.sort_order ?? 0));
+        setAttachments(data.attachments || []);
+        // Set mode based on content_type
+        setMode(data.content_type === 'markdown' ? 'upload' : 'write');
       } else {
         setLoadError(t('resources.failed_to_load_resources'));
       }
@@ -180,9 +205,7 @@ export function KBArticleForm() {
   }, [id, t]);
 
   useEffect(() => {
-    if (isEdit) {
-      loadArticle();
-    }
+    if (isEdit) loadArticle();
   }, [isEdit, loadArticle]);
 
   // Auto-generate slug from title (only in create mode)
@@ -196,22 +219,112 @@ export function KBArticleForm() {
     }
   }, [title, isEdit]);
 
+  // ── File handling ───────────────────────────────────────────
+
+  function processFile(file: File) {
+    const ext = file.name.split('.').pop()?.toLowerCase();
+
+    if (ext === 'md') {
+      // Read markdown content
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const text = e.target?.result as string;
+        setContent(text);
+        setContentType('markdown');
+
+        // Extract title from first # heading
+        const headingMatch = text.match(/^#\s+(.+)$/m);
+        if (headingMatch?.[1] && !title) {
+          setTitle(headingMatch[1].trim());
+        } else if (!title) {
+          // Fallback: use filename
+          setTitle(file.name.replace(/\.md$/, '').replace(/[_-]+/g, ' '));
+        }
+
+        // Extract excerpt from first non-heading paragraph
+        const lines = text.split('\n').filter((l) => l.trim() && !l.startsWith('#'));
+        const firstLine = lines[0];
+        if (firstLine) {
+          setExcerpt(firstLine.trim().substring(0, 200));
+        }
+      };
+      reader.readAsText(file);
+      setPendingFile(file);
+    } else if (ext === 'pdf') {
+      // PDF — store as attachment, user writes excerpt
+      setPendingFile(file);
+      setContentType('html');
+      if (!title) {
+        setTitle(file.name.replace(/\.pdf$/, '').replace(/[_-]+/g, ' '));
+      }
+    } else {
+      // Other file types — store as attachment
+      setPendingFile(file);
+      if (!title) {
+        setTitle(file.name.replace(/\.[^.]+$/, '').replace(/[_-]+/g, ' '));
+      }
+    }
+  }
+
+  function handleDrop(e: React.DragEvent) {
+    e.preventDefault();
+    setIsDragging(false);
+    const file = e.dataTransfer.files[0];
+    if (file) processFile(file);
+  }
+
+  function handleFileSelect(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (file) processFile(file);
+  }
+
+  // ── Attachment management (edit mode) ──────────────────────
+
+  async function uploadAttachment(file: File) {
+    if (!id) return;
+    setUploadingAttachment(true);
+    try {
+      const res = await api.upload(`/v2/kb/${id}/attachments`, file);
+      if (res.success && res.data) {
+        setAttachments((prev) => [...prev, res.data as KBAttachment]);
+        toast.success(t('resources.attachment_uploaded', 'File attached successfully'));
+      } else {
+        toast.error(res.error || 'Failed to upload attachment');
+      }
+    } catch {
+      toast.error('Failed to upload attachment');
+    } finally {
+      setUploadingAttachment(false);
+    }
+  }
+
+  async function deleteAttachment(attachmentId: number) {
+    if (!id) return;
+    try {
+      const res = await api.delete(`/v2/kb/${id}/attachments/${attachmentId}`);
+      if (res.success !== false) {
+        setAttachments((prev) => prev.filter((a) => a.id !== attachmentId));
+        toast.success(t('resources.attachment_deleted', 'Attachment removed'));
+      }
+    } catch {
+      toast.error('Failed to delete attachment');
+    }
+  }
+
+  // ── Form submission ────────────────────────────────────────
+
   function validate(): boolean {
     const newErrors: Record<string, string> = {};
-
     if (!title.trim()) {
       newErrors.title = t('blog.title_required', 'Title is required');
     }
-
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   }
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-
     if (!validate()) return;
-
     setSubmitting(true);
 
     try {
@@ -219,7 +332,7 @@ export function KBArticleForm() {
         title: title.trim(),
         slug: slug.trim() || undefined,
         content,
-        content_type: 'html' as const,
+        content_type: contentType,
         is_published: isPublished,
         category_id: categoryId ? Number(categoryId) : null,
         parent_article_id: parentArticleId ? Number(parentArticleId) : null,
@@ -231,6 +344,12 @@ export function KBArticleForm() {
         : await adminKb.create(payload);
 
       if (res.success) {
+        // If we have a pending file and the article was just created, upload it as attachment
+        const articleId = isEdit ? Number(id) : (res.data as KBArticle)?.id;
+        if (pendingFile && articleId) {
+          await api.upload(`/v2/kb/${articleId}/attachments`, pendingFile);
+        }
+
         toast.success(
           isEdit
             ? t('resources.article_updated', 'Article updated successfully')
@@ -247,7 +366,8 @@ export function KBArticleForm() {
     }
   }
 
-  // Loading state (edit mode)
+  // ── Render ─────────────────────────────────────────────────
+
   if (loading) {
     return (
       <div className="flex items-center justify-center py-20">
@@ -256,18 +376,14 @@ export function KBArticleForm() {
     );
   }
 
-  // Error state (edit mode)
   if (isEdit && (loadError || !article)) {
     return (
       <div>
         <PageHeader
           title={`${t('breadcrumbs.edit')} ${t('resources.page_title')}`}
           actions={
-            <Button
-              variant="flat"
-              startContent={<ArrowLeft size={16} />}
-              onPress={() => navigate(tenantPath('/admin/resources'))}
-            >
+            <Button variant="flat" startContent={<ArrowLeft size={16} />}
+              onPress={() => navigate(tenantPath('/admin/resources'))}>
               {t('common.back')}
             </Button>
           }
@@ -297,11 +413,8 @@ export function KBArticleForm() {
             : `${t('breadcrumbs.create')} ${t('resources.page_title')}`
         }
         actions={
-          <Button
-            variant="flat"
-            startContent={<ArrowLeft size={16} />}
-            onPress={() => navigate(tenantPath('/admin/resources'))}
-          >
+          <Button variant="flat" startContent={<ArrowLeft size={16} />}
+            onPress={() => navigate(tenantPath('/admin/resources'))}>
             {t('common.back')}
           </Button>
         }
@@ -310,6 +423,34 @@ export function KBArticleForm() {
       <form onSubmit={handleSubmit}>
         <Card className="max-w-3xl">
           <CardBody className="gap-5 p-6">
+            {/* Mode tabs (create only — in edit mode, mode is inferred from content_type) */}
+            {!isEdit && (
+              <Tabs
+                selectedKey={mode}
+                onSelectionChange={(key) => {
+                  setMode(key as 'write' | 'upload');
+                  if (key === 'write') {
+                    setContentType('html');
+                    setPendingFile(null);
+                  }
+                }}
+                variant="underlined"
+                size="sm"
+                classNames={{ tabList: 'mb-2' }}
+              >
+                <Tab key="write" title={
+                  <span className="flex items-center gap-1.5">
+                    <FileText size={14} /> {t('resources.mode_write', 'Write')}
+                  </span>
+                } />
+                <Tab key="upload" title={
+                  <span className="flex items-center gap-1.5">
+                    <Upload size={14} /> {t('resources.mode_upload', 'Upload File')}
+                  </span>
+                } />
+              </Tabs>
+            )}
+
             {/* Title */}
             <Input
               label={t('content.label_name')}
@@ -336,18 +477,95 @@ export function KBArticleForm() {
               }
             />
 
-            {/* Content */}
-            <Suspense fallback={<Spinner size="sm" className="m-4" />}>
-              <RichTextEditor
-                label={t('content.page_title')}
-                placeholder={t('resources.placeholder_content', 'Write the article content...')}
-                value={content}
-                onChange={setContent}
-                isDisabled={submitting}
-              />
-            </Suspense>
+            {/* Content — Write mode */}
+            {mode === 'write' && contentType !== 'markdown' && (
+              <Suspense fallback={<Spinner size="sm" className="m-4" />}>
+                <RichTextEditor
+                  label={t('content.page_title')}
+                  placeholder={t('resources.placeholder_content', 'Write the article content...')}
+                  value={content}
+                  onChange={setContent}
+                  isDisabled={submitting}
+                />
+              </Suspense>
+            )}
 
-            {/* Excerpt (optional) */}
+            {/* Content — Markdown edit (when editing a markdown article) */}
+            {(mode === 'write' || mode === 'upload') && contentType === 'markdown' && content && (
+              <Textarea
+                label={t('resources.markdown_content', 'Markdown Content')}
+                value={content}
+                onValueChange={setContent}
+                minRows={12}
+                maxRows={30}
+                isDisabled={submitting}
+                classNames={{ input: 'font-mono text-sm' }}
+                description={t('resources.markdown_desc', 'Raw markdown — will be rendered on the public page.')}
+              />
+            )}
+
+            {/* Content — Upload mode drop zone */}
+            {mode === 'upload' && !content && (
+              <div
+                onDragOver={(e) => { e.preventDefault(); setIsDragging(true); }}
+                onDragLeave={() => setIsDragging(false)}
+                onDrop={handleDrop}
+                onClick={() => fileInputRef.current?.click()}
+                className={`
+                  flex flex-col items-center justify-center gap-3 rounded-lg border-2 border-dashed p-10 cursor-pointer transition-colors
+                  ${isDragging
+                    ? 'border-primary bg-primary/5'
+                    : 'border-default-300 hover:border-primary hover:bg-default-50'
+                  }
+                `}
+              >
+                <Upload size={32} className="text-default-400" />
+                <div className="text-center">
+                  <p className="text-sm font-medium text-foreground">
+                    {t('resources.drop_file', 'Drop a file here or click to browse')}
+                  </p>
+                  <p className="text-xs text-default-400 mt-1">
+                    {t('resources.supported_formats', 'Supported: Markdown (.md), PDF, Word (.doc, .docx), Text (.txt)')}
+                  </p>
+                </div>
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept={ACCEPTED_FILE_TYPES}
+                  onChange={handleFileSelect}
+                  className="hidden"
+                />
+              </div>
+            )}
+
+            {/* Pending file indicator */}
+            {pendingFile && (
+              <div className="flex items-center gap-3 rounded-lg border border-default-200 px-4 py-3">
+                <FileText size={18} className="text-primary flex-shrink-0" />
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-medium text-foreground truncate">{pendingFile.name}</p>
+                  <p className="text-xs text-default-400">{formatFileSize(pendingFile.size)}</p>
+                </div>
+                <Chip size="sm" variant="flat" color="primary">
+                  {pendingFile.name.split('.').pop()?.toUpperCase()}
+                </Chip>
+                <Button
+                  isIconOnly size="sm" variant="light" color="danger"
+                  onPress={() => {
+                    setPendingFile(null);
+                    if (contentType === 'markdown') {
+                      setContent('');
+                      setContentType('html');
+                    }
+                  }}
+                  aria-label="Remove file"
+                >
+                  <X size={14} />
+                </Button>
+              </div>
+            )}
+
+            {/* Excerpt */}
             <Textarea
               label={t('blog.excerpt', 'Excerpt')}
               placeholder={t('resources.placeholder_excerpt', 'A short summary of the article (optional)')}
@@ -362,9 +580,8 @@ export function KBArticleForm() {
               )}
             />
 
-            {/* Published toggle + Category row */}
+            {/* Category + Parent */}
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-              {/* Category */}
               <Select
                 label={t('breadcrumbs.categories')}
                 placeholder={t('resources.placeholder_category', 'Select a category (optional)')}
@@ -380,7 +597,6 @@ export function KBArticleForm() {
                 ))}
               </Select>
 
-              {/* Parent Article */}
               <Select
                 label={t('resources.parent_article', 'Parent Article')}
                 placeholder={t('resources.placeholder_parent', 'None (top-level)')}
@@ -406,22 +622,14 @@ export function KBArticleForm() {
                 value={sortOrder}
                 onValueChange={setSortOrder}
                 isDisabled={submitting}
-                description={t(
-                  'resources.sort_order_desc',
-                  'Lower numbers appear first. Default is 0.',
-                )}
+                description={t('resources.sort_order_desc', 'Lower numbers appear first. Default is 0.')}
               />
 
               <div className="flex items-center justify-between rounded-lg border border-default-200 px-4 py-3">
                 <div>
-                  <p className="text-sm font-medium">
-                    {t('content.published', 'Published')}
-                  </p>
+                  <p className="text-sm font-medium">{t('content.published', 'Published')}</p>
                   <p className="text-xs text-default-400">
-                    {t(
-                      'resources.publish_desc',
-                      'Published articles are visible to all users',
-                    )}
+                    {t('resources.publish_desc', 'Published articles are visible to all users')}
                   </p>
                 </div>
                 <Switch
@@ -432,6 +640,77 @@ export function KBArticleForm() {
                 />
               </div>
             </div>
+
+            {/* Attachments section (edit mode) */}
+            {isEdit && (
+              <>
+                <Divider />
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between">
+                    <h3 className="text-sm font-semibold text-foreground">
+                      {t('resources.attachments', 'Attachments')}
+                      {attachments.length > 0 && (
+                        <Chip size="sm" variant="flat" className="ml-2">{attachments.length}</Chip>
+                      )}
+                    </h3>
+                    <Button
+                      size="sm"
+                      variant="flat"
+                      color="primary"
+                      startContent={<Upload size={14} />}
+                      isLoading={uploadingAttachment}
+                      onPress={() => {
+                        const input = document.createElement('input');
+                        input.type = 'file';
+                        input.accept = ACCEPTED_FILE_TYPES;
+                        input.onchange = (e) => {
+                          const file = (e.target as HTMLInputElement).files?.[0];
+                          if (file) uploadAttachment(file);
+                        };
+                        input.click();
+                      }}
+                    >
+                      {t('resources.add_attachment', 'Add File')}
+                    </Button>
+                  </div>
+
+                  {attachments.length === 0 && (
+                    <p className="text-xs text-default-400">
+                      {t('resources.no_attachments', 'No files attached yet.')}
+                    </p>
+                  )}
+
+                  {attachments.map((att) => (
+                    <div key={att.id} className="flex items-center gap-3 rounded-lg border border-default-200 px-4 py-2.5">
+                      <FileText size={16} className="text-primary flex-shrink-0" />
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-medium text-foreground truncate">{att.file_name}</p>
+                        <p className="text-xs text-default-400">
+                          {att.mime_type} — {formatFileSize(att.file_size)}
+                        </p>
+                      </div>
+                      <div className="flex gap-1">
+                        <Button
+                          isIconOnly size="sm" variant="flat" color="default"
+                          as="a" href={att.file_url} download={att.file_name}
+                          target="_blank" rel="noopener noreferrer"
+                          aria-label="Download"
+                        >
+                          <Download size={14} />
+                        </Button>
+                        <Button
+                          isIconOnly size="sm" variant="flat" color="danger"
+                          onPress={() => deleteAttachment(att.id)}
+                          aria-label="Delete attachment"
+                        >
+                          <Trash2 size={14} />
+                        </Button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </>
+            )}
 
             {/* Submit */}
             <div className="flex justify-end gap-3 pt-2">

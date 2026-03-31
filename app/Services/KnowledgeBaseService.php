@@ -160,6 +160,24 @@ class KnowledgeBaseService
             ->select('id', 'title', 'slug', 'sort_order')
             ->get();
 
+        // Get attachments
+        $attachments = DB::table('knowledge_base_attachments')
+            ->where('article_id', $id)
+            ->where('tenant_id', $tenantId)
+            ->orderBy('sort_order')
+            ->orderBy('created_at')
+            ->get()
+            ->map(fn ($a) => [
+                'id'         => (int) $a->id,
+                'file_name'  => $a->file_name,
+                'file_url'   => $a->file_url,
+                'mime_type'  => $a->mime_type,
+                'file_size'  => (int) $a->file_size,
+                'sort_order' => (int) $a->sort_order,
+                'created_at' => $a->created_at,
+            ])
+            ->all();
+
         return [
             'id'                => (int) $article->id,
             'title'             => $article->title,
@@ -189,6 +207,7 @@ class KnowledgeBaseService
                     'sort_order' => (int) $c->sort_order,
                 ];
             })->all(),
+            'attachments' => $attachments,
         ];
     }
 

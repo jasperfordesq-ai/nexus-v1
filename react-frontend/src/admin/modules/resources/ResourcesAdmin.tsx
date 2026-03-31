@@ -12,7 +12,7 @@
 import { useState, useCallback, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Tabs, Tab, Chip, Button } from '@heroui/react';
-import { BookOpen, Eye, Trash2, ThumbsUp, Plus, Pencil } from 'lucide-react';
+import { BookOpen, Eye, Trash2, ThumbsUp, Plus, Pencil, FolderTree } from 'lucide-react';
 import { usePageTitle } from '@/hooks';
 import { useToast, useTenant } from '@/contexts';
 import { api } from '@/lib/api';
@@ -244,13 +244,22 @@ export function ResourcesAdmin() {
         title={t('resources.resources_admin_title')}
         description={t('resources.resources_admin_desc')}
         actions={
-          <Button
-            color="primary"
-            startContent={<Plus size={16} />}
-            onPress={() => navigate(tenantPath('/admin/resources/create'))}
-          >
-            {t('resources.new_article', 'New Article')}
-          </Button>
+          <div className="flex items-center gap-2">
+            <Button
+              variant="flat"
+              startContent={<FolderTree size={16} />}
+              onPress={() => navigate(tenantPath('/admin/resources/categories'))}
+            >
+              {t('resources.manage_categories', 'Manage Categories')}
+            </Button>
+            <Button
+              color="primary"
+              startContent={<Plus size={16} />}
+              onPress={() => navigate(tenantPath('/admin/resources/create'))}
+            >
+              {t('resources.new_article', 'New Article')}
+            </Button>
+          </div>
         }
       />
 

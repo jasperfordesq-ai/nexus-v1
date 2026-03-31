@@ -38,8 +38,15 @@ import {
   RefreshCw,
   AlertTriangle,
   CheckCircle,
+  Download,
+  File,
 } from 'lucide-react';
 import DOMPurify from 'dompurify';
+import { lazy, Suspense } from 'react';
+
+const MarkdownRenderer = lazy(() =>
+  import('@/components/content/MarkdownRenderer').then((m) => ({ default: m.MarkdownRenderer })),
+);
 import { GlassCard } from '@/components/ui';
 import { useTenant, useToast } from '@/contexts';
 import { usePageTitle } from '@/hooks';
@@ -50,22 +57,37 @@ import { formatRelativeTime } from '@/lib/helpers';
 import { useTranslation } from 'react-i18next';
 /* ───────────────────────── Types ───────────────────────── */
 
+interface KBAttachment {
+  id: number;
+  file_name: string;
+  file_url: string;
+  mime_type: string;
+  file_size: number;
+}
+
 interface KBArticleFull {
   id: number;
   title: string;
   slug: string;
   content: string;
+  content_type: 'html' | 'markdown' | 'plain';
   excerpt: string | null;
   category: string | null;
+  category_name: string | null;
   parent_id: number | null;
+  parent_article_id: number | null;
   parent_title: string | null;
   is_published: boolean;
   view_count: number;
+  views_count: number;
   helpful_count: number;
+  helpful_yes: number;
+  helpful_no: number;
   not_helpful_count: number;
   created_at: string;
   updated_at: string;
   children: KBChild[];
+  attachments: KBAttachment[];
 }
 
 interface KBChild {
@@ -73,6 +95,14 @@ interface KBChild {
   title: string;
   slug: string;
   excerpt: string | null;
+}
+
+/* ───────────────────────── Helpers ───────────────────────── */
+
+function formatFileSize(bytes: number): string {
+  if (bytes < 1024) return `${bytes} B`;
+  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(0)} KB`;
+  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
 }
 
 /* ───────────────────────── Component ───────────────────────── */
@@ -261,16 +291,56 @@ export function KBArticlePage() {
           <Divider className="my-4" />
 
           {/* Article Content */}
-          <div
-            className="prose prose-sm dark:prose-invert max-w-none text-theme-primary
-              prose-headings:text-theme-primary prose-p:text-theme-secondary
-              prose-a:text-blue-400 prose-a:no-underline hover:prose-a:underline
-              prose-strong:text-theme-primary prose-code:text-blue-400
-              prose-pre:bg-theme-elevated prose-pre:border prose-pre:border-theme-default
-              prose-img:rounded-lg prose-blockquote:border-blue-400
-              prose-li:text-theme-secondary"
-            dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(article.content) }}
-          />
+          {article.content_type === 'markdown' ? (
+            <Suspense fallback={<Spinner size="sm" />}>
+              <MarkdownRenderer content={article.content} />
+            </Suspense>
+          ) : (
+            <div
+              className="prose prose-sm dark:prose-invert max-w-none text-theme-primary
+                prose-headings:text-theme-primary prose-p:text-theme-secondary
+                prose-a:text-blue-400 prose-a:no-underline hover:prose-a:underline
+                prose-strong:text-theme-primary prose-code:text-blue-400
+                prose-pre:bg-theme-elevated prose-pre:border prose-pre:border-theme-default
+                prose-img:rounded-lg prose-blockquote:border-blue-400
+                prose-li:text-theme-secondary"
+              dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(article.content || '') }}
+            />
+          )}
+
+          {/* Attachments */}
+          {article.attachments && article.attachments.length > 0 && (
+            <>
+              <Divider className="my-4" />
+              <div className="space-y-2">
+                <h3 className="text-sm font-semibold text-theme-primary flex items-center gap-2">
+                  <File className="w-4 h-4 text-blue-400" aria-hidden="true" />
+                  {t('attachments', 'Attachments')}
+                </h3>
+                <div className="flex flex-wrap gap-2">
+                  {article.attachments.map((att) => (
+                    <Button
+                      key={att.id}
+                      as="a"
+                      href={att.file_url}
+                      download={att.file_name}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      variant="flat"
+                      size="sm"
+                      className="bg-theme-elevated text-theme-primary"
+                      startContent={<Download className="w-3.5 h-3.5" aria-hidden="true" />}
+                    >
+                      {att.file_name}
+                      <span className="text-theme-subtle text-xs ml-1">
+                        ({formatFileSize(att.file_size)})
+                      </span>
+                    </Button>
+                  ))}
+                </div>
+              </div>
+            </>
+          )}
         </GlassCard>
       </motion.div>
 

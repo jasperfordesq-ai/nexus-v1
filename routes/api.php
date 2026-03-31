@@ -631,6 +631,8 @@ Route::get('/v2/kb/{id}', [\App\Http\Controllers\Api\KnowledgeBaseController::cl
 Route::put('/v2/kb/{id}', [\App\Http\Controllers\Api\KnowledgeBaseController::class, 'update']);
 Route::delete('/v2/kb/{id}', [\App\Http\Controllers\Api\KnowledgeBaseController::class, 'destroy']);
 Route::post('/v2/kb/{id}/feedback', [\App\Http\Controllers\Api\KnowledgeBaseController::class, 'feedback']);
+Route::post('/v2/kb/{id}/attachments', [\App\Http\Controllers\Api\KnowledgeBaseController::class, 'uploadAttachment']);
+Route::delete('/v2/kb/{id}/attachments/{attachmentId}', [\App\Http\Controllers\Api\KnowledgeBaseController::class, 'deleteAttachment']);
 
 // ============================================
 // STORIES — 24-hour disappearing content
