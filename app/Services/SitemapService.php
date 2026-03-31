@@ -193,39 +193,23 @@ class SitemapService
     {
         $methods = [];
 
+        // ── PUBLIC routes (no auth required — crawlers CAN access these) ──
+        // Blog: FeatureGate only, no ProtectedRoute wrapper
         if ($this->hasFeature($tenant, 'blog')) {
             $methods['blog_posts'] = fn (int $tid, string $base) => $this->getBlogUrls($tid, $base);
         }
+        // Listings: module-gated only, no ProtectedRoute wrapper
         if ($this->hasModule($tenant, 'listings')) {
             $methods['listings'] = fn (int $tid, string $base) => $this->getListingUrls($tid, $base);
         }
-        if ($this->hasFeature($tenant, 'events')) {
-            $methods['events'] = fn (int $tid, string $base) => $this->getEventUrls($tid, $base);
-        }
-        if ($this->hasFeature($tenant, 'groups')) {
-            $methods['groups'] = fn (int $tid, string $base) => $this->getGroupUrls($tid, $base);
-        }
-        if ($this->hasFeature($tenant, 'job_vacancies')) {
-            $methods['job_vacancies'] = fn (int $tid, string $base) => $this->getJobUrls($tid, $base);
-        }
-        if ($this->hasFeature($tenant, 'volunteering')) {
-            $methods['volunteering'] = fn (int $tid, string $base) => $this->getVolunteeringUrls($tid, $base);
-        }
-        if ($this->hasFeature($tenant, 'ideation_challenges')) {
-            $methods['ideation'] = fn (int $tid, string $base) => $this->getIdeationUrls($tid, $base);
-        }
-        if ($this->hasFeature($tenant, 'resources')) {
-            $methods['resources'] = fn (int $tid, string $base) => $this->getResourceUrls($tid, $base);
-        }
-        if ($this->hasFeature($tenant, 'organisations')) {
-            $methods['organisations'] = fn (int $tid, string $base) => $this->getOrganizationUrls($tid, $base);
-        }
-
-        // Always include — not feature-gated
+        // CMS pages: public
         $methods['cms_pages'] = fn (int $tid, string $base) => $this->getCmsPageUrls($tid, $base);
-        $methods['kb_articles'] = fn (int $tid, string $base) => $this->getKbArticleUrls($tid, $base);
-        $methods['help_articles'] = fn (int $tid, string $base) => $this->getHelpArticleUrls($tid, $base);
-        $methods['profiles'] = fn (int $tid, string $base) => $this->getProfileUrls($tid, $base);
+
+        // ── EXCLUDED: Routes behind ProtectedRoute (redirect to /login) ──
+        // events, groups, jobs, volunteering, ideation, resources,
+        // organisations, kb, profiles — all require authentication.
+        // Search engines cannot access them, so including them causes
+        // soft 404s and hurts SEO ranking.
 
         return $methods;
     }
@@ -251,34 +235,16 @@ class SitemapService
             $urls[] = $this->url($baseUrl, "/{$page}", $now, 'yearly', '0.2');
         }
 
-        // Feature-gated listing pages
+        // Public listing pages (no auth required)
         if ($this->hasModule($tenant, 'listings')) {
             $urls[] = $this->url($baseUrl, '/listings', $now, 'daily', '0.8');
         }
         if ($this->hasFeature($tenant, 'blog')) {
             $urls[] = $this->url($baseUrl, '/blog', $now, 'daily', '0.8');
         }
-        if ($this->hasFeature($tenant, 'events')) {
-            $urls[] = $this->url($baseUrl, '/events', $now, 'daily', '0.8');
-        }
-        if ($this->hasFeature($tenant, 'groups')) {
-            $urls[] = $this->url($baseUrl, '/groups', $now, 'weekly', '0.7');
-        }
-        if ($this->hasFeature($tenant, 'job_vacancies')) {
-            $urls[] = $this->url($baseUrl, '/jobs', $now, 'daily', '0.8');
-        }
-        if ($this->hasFeature($tenant, 'volunteering')) {
-            $urls[] = $this->url($baseUrl, '/volunteering', $now, 'daily', '0.7');
-        }
-        if ($this->hasFeature($tenant, 'ideation_challenges')) {
-            $urls[] = $this->url($baseUrl, '/ideation', $now, 'weekly', '0.6');
-        }
-        if ($this->hasFeature($tenant, 'resources')) {
-            $urls[] = $this->url($baseUrl, '/resources', $now, 'weekly', '0.6');
-        }
-        if ($this->hasFeature($tenant, 'organisations')) {
-            $urls[] = $this->url($baseUrl, '/organisations', $now, 'weekly', '0.6');
-        }
+
+        // EXCLUDED: /events, /groups, /jobs, /volunteering, /ideation,
+        // /resources, /organisations — all behind ProtectedRoute (login required)
 
         return $urls;
     }

@@ -209,98 +209,36 @@ class SitemapServiceTest extends TestCase
         $this->assertStringNotContainsString("/listings/{$id}", $xml);
     }
 
-    public function test_generateForTenant_includes_public_groups(): void
-    {
-        $id = DB::table('groups')->insertGetId([
-            'tenant_id' => $this->testTenantId,
-            'owner_id' => $this->userId,
-            'name' => 'Public Sitemap Group',
-            'visibility' => 'public',
-            'is_active' => 1,
-            'created_at' => now(),
-        ]);
+    // Groups, jobs, events, profiles, KB, resources, organisations, volunteering,
+    // ideation are all behind ProtectedRoute (login required) — correctly EXCLUDED
+    // from sitemap since crawlers cannot access them.
 
+    public function test_generateForTenant_excludes_protected_groups(): void
+    {
         Cache::flush();
         $xml = $this->service->generateForTenant($this->testTenantId);
-        $this->assertStringContainsString("/groups/{$id}", $xml);
+        $this->assertStringNotContainsString('/groups/', $xml);
     }
 
-    public function test_generateForTenant_excludes_private_groups(): void
+    public function test_generateForTenant_excludes_protected_jobs(): void
     {
-        $id = DB::table('groups')->insertGetId([
-            'tenant_id' => $this->testTenantId,
-            'owner_id' => $this->userId,
-            'name' => 'Private Group',
-            'visibility' => 'private',
-            'is_active' => 1,
-            'created_at' => now(),
-        ]);
-
         Cache::flush();
         $xml = $this->service->generateForTenant($this->testTenantId);
-        $this->assertStringNotContainsString("/groups/{$id}", $xml);
+        $this->assertStringNotContainsString('/jobs/', $xml);
     }
 
-    public function test_generateForTenant_includes_open_jobs(): void
+    public function test_generateForTenant_excludes_protected_kb_articles(): void
     {
-        DB::table('job_vacancies')->insertOrIgnore([
-            'id' => 90001,
-            'tenant_id' => $this->testTenantId,
-            'user_id' => $this->userId,
-            'title' => 'Sitemap Test Job',
-            'status' => 'open',
-            'type' => 'paid',
-            'created_at' => now(),
-            'updated_at' => now(),
-        ]);
-
         Cache::flush();
         $xml = $this->service->generateForTenant($this->testTenantId);
-        $this->assertStringContainsString('/jobs/90001', $xml);
+        $this->assertStringNotContainsString('/kb/', $xml);
     }
 
-    public function test_generateForTenant_excludes_draft_jobs(): void
+    public function test_generateForTenant_excludes_protected_profiles(): void
     {
-        DB::table('job_vacancies')->insertOrIgnore([
-            'id' => 90002,
-            'tenant_id' => $this->testTenantId,
-            'user_id' => $this->userId,
-            'title' => 'Draft Job',
-            'status' => 'draft',
-            'type' => 'paid',
-            'created_at' => now(),
-            'updated_at' => now(),
-        ]);
-
         Cache::flush();
         $xml = $this->service->generateForTenant($this->testTenantId);
-        $this->assertStringNotContainsString('/jobs/90002', $xml);
-    }
-
-    public function test_generateForTenant_includes_published_kb_articles(): void
-    {
-        DB::table('knowledge_base_articles')->insertOrIgnore([
-            'id' => 90001,
-            'tenant_id' => $this->testTenantId,
-            'title' => 'Sitemap KB Article',
-            'slug' => 'sitemap-kb-article',
-            'content' => 'Test KB content',
-            'is_published' => 1,
-            'created_at' => now(),
-            'updated_at' => now(),
-        ]);
-
-        Cache::flush();
-        $xml = $this->service->generateForTenant($this->testTenantId);
-        $this->assertStringContainsString('/kb/90001', $xml);
-    }
-
-    public function test_generateForTenant_includes_approved_profiles(): void
-    {
-        $xml = $this->service->generateForTenant($this->testTenantId);
-
-        // Tenant 2 should have approved users
-        $this->assertStringContainsString('/profile/', $xml);
+        $this->assertStringNotContainsString('/profile/', $xml);
     }
 
     public function test_generateForTenant_is_cached(): void
