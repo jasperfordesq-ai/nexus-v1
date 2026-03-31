@@ -144,13 +144,14 @@ export function KBArticleForm() {
       : `Admin - ${t('breadcrumbs.create')} ${t('resources.page_title')}`,
   );
 
-  // Load categories
+  // Load categories (from main categories table, type=resource)
   useEffect(() => {
     async function loadCategories() {
       try {
-        const res = await api.get('/v2/resources/categories/tree?flat=1');
-        if (res.success && res.data && Array.isArray(res.data)) {
-          setCategories(res.data);
+        const res = await api.get('/v2/admin/categories?type=resource');
+        if (res.success && res.data) {
+          const data = Array.isArray(res.data) ? res.data : (res.data as { items?: ResourceCategory[] }).items || [];
+          setCategories(data);
         }
       } catch {
         // Categories are optional

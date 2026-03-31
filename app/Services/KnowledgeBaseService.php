@@ -37,7 +37,7 @@ class KnowledgeBaseService
 
         $query = DB::table('knowledge_base_articles as a')
             ->leftJoin('users as u', 'a.created_by', '=', 'u.id')
-            ->leftJoin('resource_categories as rc', 'a.category_id', '=', 'rc.id')
+            ->leftJoin('categories as rc', 'a.category_id', '=', 'rc.id')
             ->where('a.tenant_id', $tenantId);
 
         if ($filters['published_only'] ?? true) {
@@ -126,7 +126,7 @@ class KnowledgeBaseService
 
         $article = DB::table('knowledge_base_articles as a')
             ->leftJoin('users as u', 'a.created_by', '=', 'u.id')
-            ->leftJoin('resource_categories as rc', 'a.category_id', '=', 'rc.id')
+            ->leftJoin('categories as rc', 'a.category_id', '=', 'rc.id')
             ->where('a.id', $id)
             ->where('a.tenant_id', $tenantId)
             ->select(
@@ -220,7 +220,7 @@ class KnowledgeBaseService
         $tenantId = TenantContext::getId();
 
         return DB::table('knowledge_base_articles as a')
-            ->leftJoin('resource_categories as rc', 'a.category_id', '=', 'rc.id')
+            ->leftJoin('categories as rc', 'a.category_id', '=', 'rc.id')
             ->where('a.tenant_id', $tenantId)
             ->where('a.is_published', true)
             ->where(function ($q) use ($like) {

@@ -51,6 +51,7 @@ const CATEGORY_TYPES = [
   { key: 'listing', label: 'Listing' },
   { key: 'event', label: 'Event' },
   { key: 'blog', label: 'Blog' },
+  { key: 'resource', label: 'Resource / KB' },
   { key: 'vol_opportunity', label: 'Volunteering' },
 ] as const;
 
@@ -58,6 +59,7 @@ const TYPE_COLORS: Record<string, 'primary' | 'success' | 'warning' | 'secondary
   listing: 'primary',
   event: 'success',
   blog: 'warning',
+  resource: 'primary',
   vol_opportunity: 'secondary',
 };
 
@@ -65,6 +67,7 @@ const TYPE_LABELS: Record<string, string> = {
   listing: 'Listing',
   event: 'Event',
   blog: 'Blog',
+  resource: 'Resource / KB',
   vol_opportunity: 'Volunteering',
 };
 
