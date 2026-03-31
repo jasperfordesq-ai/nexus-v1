@@ -90,7 +90,7 @@ class AdminCategoriesController extends BaseApiController
         $color = trim($this->input('color', 'blue'));
         $type = trim($this->input('type', 'listing'));
 
-        $allowedTypes = ['listing', 'event', 'blog', 'vol_opportunity'];
+        $allowedTypes = ['listing', 'event', 'blog', 'resource', 'vol_opportunity'];
         if (!in_array($type, $allowedTypes)) {
             return $this->respondWithError(
                 'VALIDATION_INVALID_VALUE',
@@ -157,7 +157,7 @@ class AdminCategoriesController extends BaseApiController
         $color = isset($data['color']) && trim($data['color']) !== '' ? trim($data['color']) : $category->color;
         $type = isset($data['type']) && trim($data['type']) !== '' ? trim($data['type']) : $category->type;
 
-        $allowedTypes = ['listing', 'event', 'blog', 'vol_opportunity'];
+        $allowedTypes = ['listing', 'event', 'blog', 'resource', 'vol_opportunity'];
         if (!in_array($type, $allowedTypes)) {
             return $this->respondWithError(
                 'VALIDATION_INVALID_VALUE',
