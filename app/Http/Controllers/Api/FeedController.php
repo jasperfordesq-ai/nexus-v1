@@ -207,6 +207,7 @@ class FeedController extends BaseApiController
                 'target_type' => $targetType,
                 'target_id'   => $postId,
                 'reason'      => 'Reported via feed',
+                'status'      => 'open',
                 'created_at'  => now(),
             ]);
 
