@@ -310,7 +310,7 @@ class KnowledgeBaseController extends BaseApiController
             DB::table('knowledge_base_feedback')
                 ->updateOrInsert(
                     ['article_id' => $id, 'user_id' => $userId, 'tenant_id' => $tenantId],
-                    ['is_helpful' => (bool) $isHelpful, 'comment' => $comment, 'updated_at' => now()]
+                    ['is_helpful' => (bool) $isHelpful, 'comment' => $comment, 'created_at' => now()]
                 );
         } else {
             DB::table('knowledge_base_feedback')->insert([
@@ -332,7 +332,7 @@ class KnowledgeBaseController extends BaseApiController
         DB::table('knowledge_base_articles')
             ->where('id', $id)
             ->where('tenant_id', $tenantId)
-            ->update(['helpful_count' => $helpful, 'not_helpful_count' => $notHelpful]);
+            ->update(['helpful_yes' => $helpful, 'helpful_no' => $notHelpful]);
 
         return $this->respondWithData(['message' => 'Feedback submitted successfully']);
     }
