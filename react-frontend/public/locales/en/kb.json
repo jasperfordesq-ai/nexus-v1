@@ -24,8 +24,8 @@
   "general_category": "General",
   "related_articles": "Related Articles",
   "feedback.question": "Was this article helpful?",
-  "feedback.yes": "Yes ({{count}})",
-  "feedback.no": "No ({{count}})",
+  "feedback.yes": "Yes",
+  "feedback.no": "No",
   "feedback_thanks": "Thank you for your feedback!",
   "feedback_failed": "Failed to submit feedback.",
   "error": {
@@ -40,7 +40,7 @@
   },
   "feedback": {
     "question": "Was this article helpful?",
-    "yes": "Yes ({{count}})",
-    "no": "No ({{count}})"
+    "yes": "Yes",
+    "no": "No"
   }
 }
