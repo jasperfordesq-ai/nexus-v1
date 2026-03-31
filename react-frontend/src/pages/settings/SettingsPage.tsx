@@ -431,6 +431,9 @@ export function SettingsPage() {
     const file = event.target.files?.[0];
     if (!file) return;
 
+    // Reset input so the same file can be re-selected
+    event.target.value = '';
+
     if (!file.type.startsWith('image/')) {
       toast.error(t('toasts.invalid_file_type'), t('toasts.invalid_file_type_desc'));
       return;

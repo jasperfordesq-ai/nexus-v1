@@ -707,6 +707,7 @@ export function OnboardingPage() {
                 >
                   <div className="relative group">
                     <Avatar
+                      key={user?.avatar_url || 'no-avatar'}
                       src={resolveAvatarUrl(user?.avatar_url)}
                       name={user?.first_name || user?.name}
                       className="w-28 h-28 ring-4 ring-theme-default group-hover:ring-emerald-500/30 transition-all"

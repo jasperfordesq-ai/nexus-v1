@@ -96,6 +96,7 @@ export function ProfileTab({
         <div className="flex flex-col sm:flex-row items-center sm:items-start gap-4 sm:gap-6 mb-8">
           <div className="relative">
             <Avatar
+              key={profileData.avatar || 'no-avatar'}
               src={resolveAvatarUrl(profileData.avatar)}
               name={profileData.first_name || profileData.name}
               className="w-20 h-20 ring-4 ring-theme-default"
