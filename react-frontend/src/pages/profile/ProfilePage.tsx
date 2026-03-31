@@ -25,7 +25,6 @@ import {
   UserPlus,
   UserCheck,
   MessageSquare,
-  Edit,
   Star,
   Clock,
   ListTodo,
@@ -560,25 +559,14 @@ export function ProfilePage() {
               {/* Actions */}
               <div className="flex flex-wrap justify-center sm:justify-start gap-3 mt-6">
                 {isOwnProfile ? (
-                  <>
-                    <Link to={tenantPath('/settings?tab=profile')}>
-                      <Button
-                        className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
-                        startContent={<Edit className="w-4 h-4" aria-hidden="true" />}
-                      >
-                        {t('edit_profile')}
-                      </Button>
-                    </Link>
-                    <Link to={tenantPath('/settings')}>
-                      <Button
-                        variant="flat"
-                        className="bg-theme-elevated text-theme-primary"
-                        startContent={<Settings className="w-4 h-4" aria-hidden="true" />}
-                      >
-                        {t('settings')}
-                      </Button>
-                    </Link>
-                  </>
+                  <Link to={tenantPath('/settings')}>
+                    <Button
+                      className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
+                      startContent={<Settings className="w-4 h-4" aria-hidden="true" />}
+                    >
+                      {t('settings')}
+                    </Button>
+                  </Link>
                 ) : (
                   <>
                     <Link to={tenantPath(`/messages/new/${profile.id}`)}>
@@ -725,7 +713,7 @@ export function ProfilePage() {
           onSelectionChange={(key) => setActiveTab(key as string)}
           aria-label={t('aria.profile_sections', 'Profile sections')}
           classNames={{
-            tabList: 'bg-theme-elevated p-1 rounded-lg',
+            tabList: 'bg-theme-elevated p-1 rounded-lg overflow-x-auto flex-nowrap',
             cursor: 'bg-theme-hover',
             tab: 'text-theme-muted data-[selected=true]:text-theme-primary',
           }}
