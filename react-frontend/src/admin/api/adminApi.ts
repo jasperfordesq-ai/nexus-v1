@@ -1633,7 +1633,7 @@ export const adminCrm = {
 
 export const adminKb = {
   get: (id: number) =>
-    api.get(`/v2/kb/${id}`),
+    api.get(`/v2/admin/resources/${id}`),
 
   create: (data: {
     title: string;

@@ -111,7 +111,25 @@ class AdminResourcesController extends BaseApiController
             return $this->respondWithError('NOT_FOUND', __('api.article_not_found'), null, 404);
         }
 
-        return $this->respondWithData((array) $article);
+        // Include attachments
+        $attachments = DB::table('knowledge_base_attachments')
+            ->where('article_id', $id)
+            ->where('tenant_id', $tenantId)
+            ->orderBy('sort_order')
+            ->get()
+            ->map(fn ($a) => [
+                'id'         => (int) $a->id,
+                'file_name'  => $a->file_name,
+                'file_url'   => $a->file_url,
+                'mime_type'  => $a->mime_type,
+                'file_size'  => (int) $a->file_size,
+            ])
+            ->all();
+
+        $data = (array) $article;
+        $data['attachments'] = $attachments;
+
+        return $this->respondWithData($data);
     }
 
     /**
