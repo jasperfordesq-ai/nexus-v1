@@ -6,15 +6,16 @@
 
 namespace App\Services;
 
+use App\Core\EmailTemplateBuilder;
+use App\Core\Mailer;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Mail;
 
 /**
  * FederationEmailService — Email notifications for cross-tenant federation events.
  *
  * Sends notification emails for federated messages, transactions, weekly digests,
- * and partnership requests using Laravel's Mail facade.
+ * and partnership requests using rich HTML templates via EmailTemplateBuilder.
  */
 class FederationEmailService
 {
@@ -40,17 +41,29 @@ class FederationEmailService
             $tenantName = $senderTenant->name ?? 'a partner community';
             $preview = mb_substr(strip_tags($messagePreview), 0, 200);
 
-            Mail::raw(
-                "Hello " . trim(($recipient->first_name ?? '') . ' ' . ($recipient->last_name ?? '')) . ",\n\n"
-                . "You have a new federated message from {$senderName} ({$tenantName}):\n\n"
-                . "\"{$preview}\"\n\n"
-                . "Log in to your timebank to read and reply.\n\n"
-                . "— Project NEXUS Federation",
-                function ($message) use ($recipient, $senderName) {
-                    $message->to($recipient->email)
-                        ->subject("New federated message from {$senderName}");
-                }
-            );
+            $recipientName = trim(($recipient->first_name ?? '') . ' ' . ($recipient->last_name ?? ''));
+            $safeSenderName = htmlspecialchars($senderName, ENT_QUOTES, 'UTF-8');
+            $safeTenantName = htmlspecialchars($tenantName, ENT_QUOTES, 'UTF-8');
+            $safePreview = htmlspecialchars($preview, ENT_QUOTES, 'UTF-8');
+
+            $subject = "New federated message from {$senderName}";
+
+            $html = EmailTemplateBuilder::make()
+                ->theme('federation')
+                ->title('New Federated Message')
+                ->previewText("{$senderName} from {$tenantName} sent you a message")
+                ->greeting($recipientName)
+                ->paragraph("You have a new cross-community message from {$safeSenderName} in {$safeTenantName}.")
+                ->infoCard([
+                    'From' => $safeSenderName,
+                    'Community' => $safeTenantName,
+                ])
+                ->blockquote($safePreview)
+                ->button('Read & Reply', EmailTemplateBuilder::tenantUrl('/messages'))
+                ->render();
+
+            $mailer = Mailer::forCurrentTenant();
+            $mailer->send($recipient->email, $subject, $html);
 
             Log::info('[FederationEmail] Message notification sent', [
                 'recipient' => $recipientUserId,
@@ -81,19 +94,29 @@ class FederationEmailService
             $senderName = $sender ? trim(($sender->first_name ?? '') . ' ' . ($sender->last_name ?? '')) : 'A federation member';
             $tenantName = $senderTenant->name ?? 'a partner community';
 
-            Mail::raw(
-                "Hello " . trim(($recipient->first_name ?? '') . ' ' . ($recipient->last_name ?? '')) . ",\n\n"
-                . "You have received a cross-community time credit transfer:\n\n"
-                . "From: {$senderName} ({$tenantName})\n"
-                . "Amount: {$amount} hour(s)\n"
-                . "Description: {$description}\n\n"
-                . "Log in to your timebank to view your updated balance.\n\n"
-                . "— Project NEXUS Federation",
-                function ($message) use ($recipient, $amount) {
-                    $message->to($recipient->email)
-                        ->subject("You received {$amount} hour(s) via federation");
-                }
-            );
+            $recipientName = trim(($recipient->first_name ?? '') . ' ' . ($recipient->last_name ?? ''));
+            $safeSenderName = htmlspecialchars($senderName, ENT_QUOTES, 'UTF-8');
+            $safeTenantName = htmlspecialchars($tenantName, ENT_QUOTES, 'UTF-8');
+            $safeDescription = htmlspecialchars($description, ENT_QUOTES, 'UTF-8');
+
+            $subject = "You received {$amount} hour(s) via federation";
+
+            $html = EmailTemplateBuilder::make()
+                ->theme('success')
+                ->title('Time Credits Received')
+                ->previewText("You received {$amount} hour(s) from {$senderName}")
+                ->greeting($recipientName)
+                ->paragraph("{$safeSenderName} from {$safeTenantName} has sent you a cross-community time credit transfer.")
+                ->infoCard([
+                    'From' => "{$safeSenderName} ({$safeTenantName})",
+                    'Amount' => "{$amount} hour(s)",
+                    'Description' => $safeDescription,
+                ])
+                ->button('View Your Wallet', EmailTemplateBuilder::tenantUrl('/wallet'))
+                ->render();
+
+            $mailer = Mailer::forCurrentTenant();
+            $mailer->send($recipient->email, $subject, $html);
 
             return true;
         } catch (\Exception $e) {
@@ -119,19 +142,30 @@ class FederationEmailService
             $recipientName = $recipient ? trim(($recipient->first_name ?? '') . ' ' . ($recipient->last_name ?? '')) : 'a federation member';
             $tenantName = $recipientTenant->name ?? 'a partner community';
 
-            Mail::raw(
-                "Hello " . trim(($sender->first_name ?? '') . ' ' . ($sender->last_name ?? '')) . ",\n\n"
-                . "Your cross-community time credit transfer has been processed:\n\n"
-                . "To: {$recipientName} ({$tenantName})\n"
-                . "Amount: {$amount} hour(s)\n"
-                . "Description: {$description}\n"
-                . "Your new balance: {$newBalance} hour(s)\n\n"
-                . "— Project NEXUS Federation",
-                function ($message) use ($sender, $amount) {
-                    $message->to($sender->email)
-                        ->subject("Federation transfer of {$amount} hour(s) confirmed");
-                }
-            );
+            $senderName = trim(($sender->first_name ?? '') . ' ' . ($sender->last_name ?? ''));
+            $safeRecipientName = htmlspecialchars($recipientName, ENT_QUOTES, 'UTF-8');
+            $safeTenantName = htmlspecialchars($tenantName, ENT_QUOTES, 'UTF-8');
+            $safeDescription = htmlspecialchars($description, ENT_QUOTES, 'UTF-8');
+
+            $subject = "Federation transfer of {$amount} hour(s) confirmed";
+
+            $html = EmailTemplateBuilder::make()
+                ->theme('success')
+                ->title('Transfer Confirmed')
+                ->previewText("Your transfer of {$amount} hour(s) to {$recipientName} is confirmed")
+                ->greeting($senderName)
+                ->paragraph("Your cross-community time credit transfer has been processed successfully.")
+                ->infoCard([
+                    'To' => "{$safeRecipientName} ({$safeTenantName})",
+                    'Amount' => "{$amount} hour(s)",
+                    'Description' => $safeDescription,
+                    'New Balance' => "{$newBalance} hour(s)",
+                ])
+                ->button('View Your Wallet', EmailTemplateBuilder::tenantUrl('/wallet'))
+                ->render();
+
+            $mailer = Mailer::forCurrentTenant();
+            $mailer->send($sender->email, $subject, $html);
 
             return true;
         } catch (\Exception $e) {
@@ -178,19 +212,30 @@ class FederationEmailService
 
             $userName = trim(($user->first_name ?? '') . ' ' . ($user->last_name ?? ''));
 
-            Mail::raw(
-                "Hello {$userName},\n\n"
-                . "Here's your weekly federation activity summary for {$tenantName}:\n\n"
-                . "- Cross-community messages: {$messageCount}\n"
-                . "- Cross-community transactions: {$transactionCount}\n"
-                . "- New federation connections: {$connectionCount}\n\n"
-                . "Log in to see full details.\n\n"
-                . "— Project NEXUS Federation",
-                function ($message) use ($user, $tenantName) {
-                    $message->to($user->email)
-                        ->subject("Weekly Federation Digest — {$tenantName}");
-                }
-            );
+            $subject = "Weekly Federation Digest — {$tenantName}";
+
+            $builder = EmailTemplateBuilder::make()
+                ->theme('federation')
+                ->title('Federation Weekly Digest')
+                ->previewText("Your weekly federation activity summary for {$tenantName}")
+                ->greeting($userName)
+                ->paragraph('Here\'s your cross-community activity summary for the past week.')
+                ->statCards([
+                    ['value' => (string) $messageCount, 'label' => 'Messages', 'icon' => "\xF0\x9F\x92\xAC"],
+                    ['value' => (string) $transactionCount, 'label' => 'Transactions', 'icon' => "\xF0\x9F\x92\xB0"],
+                    ['value' => (string) $connectionCount, 'label' => 'Connections', 'icon' => "\xF0\x9F\xA4\x9D"],
+                ]);
+
+            if ($messageCount === 0 && $transactionCount === 0 && $connectionCount === 0) {
+                $builder->paragraph('It was a quiet week — no cross-community activity to report.');
+            }
+
+            $html = $builder
+                ->button('Explore Federation', EmailTemplateBuilder::tenantUrl('/federation'))
+                ->render();
+
+            $mailer = Mailer::forCurrentTenant();
+            $mailer->send($user->email, $subject, $html);
 
             return true;
         } catch (\Exception $e) {
@@ -223,23 +268,37 @@ class FederationEmailService
                 return false;
             }
 
-            $notesText = $notes ? "\nNotes from the requesting community:\n\"{$notes}\"\n" : '';
+            $safeRequestingName = htmlspecialchars($requestingTenantName, ENT_QUOTES, 'UTF-8');
 
             foreach ($admins as $admin) {
                 $adminName = trim(($admin->first_name ?? '') . ' ' . ($admin->last_name ?? ''));
 
-                Mail::raw(
-                    "Hello {$adminName},\n\n"
-                    . "{$requestingTenantName} has sent your community a federation partnership request.\n\n"
-                    . "Requested level: {$levelName}\n"
-                    . $notesText . "\n"
-                    . "Log in to your admin panel to review and respond to this request.\n\n"
-                    . "— Project NEXUS Federation",
-                    function ($message) use ($admin, $requestingTenantName) {
-                        $message->to($admin->email)
-                            ->subject("Federation Partnership Request from {$requestingTenantName}");
-                    }
-                );
+                $subject = "Federation Partnership Request from {$requestingTenantName}";
+
+                $builder = EmailTemplateBuilder::make()
+                    ->theme('federation')
+                    ->title('Federation Partnership Request')
+                    ->previewText("{$requestingTenantName} wants to partner with your community")
+                    ->greeting($adminName)
+                    ->paragraph("{$safeRequestingName} has sent your community a federation partnership request.")
+                    ->infoCard([
+                        'From Community' => $safeRequestingName,
+                        'Requested Level' => htmlspecialchars($levelName, ENT_QUOTES, 'UTF-8'),
+                    ]);
+
+                if ($notes !== null && $notes !== '') {
+                    $builder->blockquote(
+                        htmlspecialchars($notes, ENT_QUOTES, 'UTF-8'),
+                        $safeRequestingName
+                    );
+                }
+
+                $html = $builder
+                    ->button('Review Request', EmailTemplateBuilder::tenantUrl('/admin/federation'))
+                    ->render();
+
+                $mailer = Mailer::forCurrentTenant();
+                $mailer->send($admin->email, $subject, $html);
             }
 
             Log::info('[FederationEmail] Partnership notification sent', [

@@ -6,6 +6,7 @@
 
 namespace App\Services;
 
+use App\Core\EmailTemplateBuilder;
 use App\Core\TenantContext;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
@@ -324,44 +325,46 @@ class GroupReportingService
     }
 
     /**
-     * Build the plain-text body for a group weekly digest email.
+     * Build the HTML body for a group weekly digest email.
      */
     private static function buildDigestEmailBody(string $name, array $stats, string $communityName): string
     {
-        $greeting = $name ? "Hi {$name}," : 'Hi,';
+        $safeName = htmlspecialchars($name, ENT_QUOTES, 'UTF-8');
+        $safeGroupName = htmlspecialchars($stats['group_name'], ENT_QUOTES, 'UTF-8');
+        $safeCommunityName = htmlspecialchars($communityName, ENT_QUOTES, 'UTF-8');
 
-        $lines = [
-            $greeting,
-            '',
-            "Here's your weekly summary for \"{$stats['group_name']}\" on {$communityName}:",
-            '',
-        ];
+        $builder = EmailTemplateBuilder::make()
+            ->theme('brand')
+            ->title('Group Weekly Summary')
+            ->previewText("This week in \"{$safeGroupName}\" on {$safeCommunityName}")
+            ->greeting($safeName ?: 'there')
+            ->paragraph("Here's your weekly summary for <strong>&ldquo;{$safeGroupName}&rdquo;</strong> on <strong>{$safeCommunityName}</strong>.");
 
+        // Build stat cards for non-zero activity metrics
+        $statCards = [];
         if ($stats['new_members'] > 0) {
-            $label = $stats['new_members'] === 1 ? 'new member' : 'new members';
-            $lines[] = "New Members: {$stats['new_members']} {$label} joined this week";
+            $statCards[] = ['value' => (string) $stats['new_members'], 'label' => 'New Members', 'icon' => '👥'];
         }
-
         if ($stats['new_discussions'] > 0) {
-            $label = $stats['new_discussions'] === 1 ? 'new discussion' : 'new discussions';
-            $lines[] = "Discussions: {$stats['new_discussions']} {$label} started";
+            $statCards[] = ['value' => (string) $stats['new_discussions'], 'label' => 'New Discussions', 'icon' => '💬'];
         }
-
         if ($stats['new_posts'] > 0) {
-            $label = $stats['new_posts'] === 1 ? 'new post' : 'new posts';
-            $lines[] = "Posts: {$stats['new_posts']} {$label}";
+            $statCards[] = ['value' => (string) $stats['new_posts'], 'label' => 'New Posts', 'icon' => '📝'];
         }
-
         if ($stats['new_events'] > 0) {
-            $label = $stats['new_events'] === 1 ? 'new event' : 'new events';
-            $lines[] = "Events: {$stats['new_events']} {$label} created";
+            $statCards[] = ['value' => (string) $stats['new_events'], 'label' => 'New Events', 'icon' => '📅'];
         }
 
-        $lines[] = '';
-        $lines[] = "Total Members: {$stats['total_members']}";
-        $lines[] = '';
-        $lines[] = 'Thank you for keeping your community active!';
+        if (!empty($statCards)) {
+            $builder->statCards($statCards);
+        } else {
+            $builder->paragraph('It was a quiet week in this group — check back next week!');
+        }
 
-        return implode("\n", $lines);
+        $builder->infoCard(['Total Members' => (string) $stats['total_members']])
+            ->paragraph('Thank you for keeping your community active!')
+            ->button('Visit Group', EmailTemplateBuilder::tenantUrl('/groups'));
+
+        return $builder->render();
     }
 }

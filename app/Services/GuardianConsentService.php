@@ -6,6 +6,8 @@
 
 namespace App\Services;
 
+use App\Core\EmailTemplateBuilder;
+use App\Core\Mailer;
 use App\Core\TenantContext;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -131,21 +133,28 @@ class GuardianConsentService
             . '/volunteering/guardian-consent/verify/' . $consentToken;
 
         try {
-            \Illuminate\Support\Facades\Mail::raw(
-                "Dear {$guardianData['guardian_name']},\n\n"
-                . "A minor in your care has requested your consent to participate in volunteering activities on Project NEXUS.\n\n"
-                . "To grant your consent, please visit the following link:\n"
-                . "{$verifyUrl}\n\n"
-                . "This link will expire in " . self::CONSENT_EXPIRY_DAYS . " days.\n\n"
-                . "If you did not expect this request, you can safely ignore this email.\n\n"
-                . "Regards,\nProject NEXUS",
-                function ($message) use ($guardianData) {
-                    $message->to($guardianData['guardian_email'], $guardianData['guardian_name'])
-                            ->subject('Guardian Consent Request — Project NEXUS');
-                }
-            );
+            $safeName = htmlspecialchars($guardianData['guardian_name'], ENT_QUOTES, 'UTF-8');
+            $safeRelationship = htmlspecialchars($guardianData['relationship'], ENT_QUOTES, 'UTF-8');
+
+            $html = EmailTemplateBuilder::make()
+                ->theme('brand')
+                ->title('Guardian Consent Request')
+                ->previewText('A minor in your care needs your consent to participate in volunteering')
+                ->greeting($safeName)
+                ->paragraph('A minor in your care has requested your consent to participate in volunteering activities on <strong>Project NEXUS</strong>.')
+                ->highlight('Your consent is required before they can participate. Please review and respond using the button below.', '📋')
+                ->infoCard([
+                    'Relationship' => $safeRelationship,
+                    'Expires' => 'in ' . self::CONSENT_EXPIRY_DAYS . ' days',
+                ])
+                ->button('Grant Consent', $verifyUrl)
+                ->paragraph('If you did not expect this request, you can safely ignore this email. No action will be taken without your explicit consent.')
+                ->render();
+
+            $mailer = Mailer::forCurrentTenant();
+            $mailer->send($guardianData['guardian_email'], 'Guardian Consent Request — Project NEXUS', $html);
         } catch (\Throwable $e) {
-            \Illuminate\Support\Facades\Log::warning('Failed to send guardian consent email: ' . $e->getMessage());
+            Log::warning('Failed to send guardian consent email: ' . $e->getMessage());
             // Don't fail the request — consent record is still created
         }
 

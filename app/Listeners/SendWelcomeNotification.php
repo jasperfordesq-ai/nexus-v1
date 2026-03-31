@@ -6,10 +6,10 @@
 
 namespace App\Listeners;
 
+use App\Core\EmailTemplateBuilder;
 use App\Core\TenantContext;
 use App\Events\UserRegistered;
 use App\Models\Notification;
-use App\Services\EmailService;
 use App\Services\SearchService;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Support\Facades\Log;
@@ -51,22 +51,28 @@ class SendWelcomeNotification implements ShouldQueue
             $userEmail = $event->user->email ?? null;
 
             if ($userEmail) {
-                /** @var EmailService $emailService */
-                $emailService = app(EmailService::class);
+                $safeTenantName = htmlspecialchars($tenantName, ENT_QUOTES, 'UTF-8');
+                $safeUserName = htmlspecialchars($userName, ENT_QUOTES, 'UTF-8');
 
-                $emailService->send(
-                    $userEmail,
-                    "Welcome to {$tenantName}!",
-                    "Hi {$userName},\n\n"
-                    . "Welcome to {$tenantName}! We're excited to have you join our community.\n\n"
-                    . "Here are some things you can do to get started:\n"
-                    . "- Complete your profile\n"
-                    . "- Browse listings from other members\n"
-                    . "- Connect with people in your community\n\n"
-                    . "If you have any questions, don't hesitate to reach out.\n\n"
-                    . "Best regards,\n"
-                    . "The {$tenantName} Team"
-                );
+                $html = EmailTemplateBuilder::make()
+                    ->theme('success')
+                    ->title("Welcome to {$safeTenantName}! 👋")
+                    ->previewText("Welcome aboard, {$safeUserName}! Here's how to get started.")
+                    ->greeting($safeUserName)
+                    ->paragraph("Welcome to <strong>{$safeTenantName}</strong>! We're excited to have you join our community.")
+                    ->highlight("Here are some things to get started:", '✨')
+                    ->bulletList([
+                        '<strong>Complete your profile</strong> — let others know who you are and what you can offer',
+                        '<strong>Browse listings</strong> — discover skills and services offered by other members',
+                        '<strong>Make connections</strong> — reach out to people in your community',
+                        '<strong>Explore events</strong> — find upcoming activities and gatherings',
+                    ])
+                    ->paragraph("If you have any questions, don't hesitate to reach out. We're here to help!")
+                    ->button('Explore Your Community', EmailTemplateBuilder::tenantUrl('/feed'))
+                    ->render();
+
+                $mailer = \App\Core\Mailer::forCurrentTenant();
+                $mailer->send($userEmail, "Welcome to {$tenantName}!", $html);
             }
         } catch (\Throwable $e) {
             Log::error('SendWelcomeNotification listener failed', [

@@ -6,6 +6,7 @@
 
 namespace App\Services;
 
+use App\Core\EmailTemplateBuilder;
 use App\Core\TenantContext;
 use App\Models\User;
 use App\Models\UserBadge;
@@ -259,42 +260,52 @@ class GamificationEmailService
     }
 
     /**
-     * Build the plain-text body for a weekly digest email.
+     * Build the HTML body for a weekly digest email.
      */
     private function buildDigestEmailBody(string $name, array $digest, string $communityName): string
     {
-        $greeting = $name ? "Hi {$name}," : 'Hi,';
-        $lines = [
-            $greeting,
-            '',
-            "Here's your weekly progress update from {$communityName}:",
-            '',
-            "XP Earned This Week: {$digest['xp_earned']}",
-            "Current Level: {$digest['level']}",
+        $safeName = htmlspecialchars($name ?: '', ENT_QUOTES, 'UTF-8');
+        $safeCommunity = htmlspecialchars($communityName, ENT_QUOTES, 'UTF-8');
+
+        $builder = EmailTemplateBuilder::make()
+            ->theme('achievement')
+            ->title('Your Weekly Progress')
+            ->previewText("You earned {$digest['xp_earned']} XP this week on {$safeCommunity}")
+            ->greeting($safeName ?: 'there')
+            ->paragraph("Here's your weekly progress update from <strong>{$safeCommunity}</strong>.");
+
+        // Build stat cards — always show XP and Level
+        $stats = [
+            ['value' => (string) $digest['xp_earned'], 'label' => 'XP Earned', 'icon' => "\u{26A1}"],
+            ['value' => (string) $digest['level'], 'label' => 'Level', 'icon' => "\u{1F3C6}"],
         ];
 
         if ($digest['rank']) {
-            $lines[] = "Leaderboard Rank: #{$digest['rank']}";
+            $stats[] = ['value' => '#' . $digest['rank'], 'label' => 'Rank', 'icon' => "\u{1F4CA}"];
         }
 
         if ($digest['streak'] > 0) {
-            $lines[] = "Current Login Streak: {$digest['streak']} days";
+            $stats[] = ['value' => $digest['streak'] . ' days', 'label' => 'Streak', 'icon' => "\u{1F525}"];
         }
 
+        $builder->statCards($stats);
+
+        // Badges earned this week
         if (!empty($digest['badges_earned'])) {
-            $lines[] = '';
-            $lines[] = 'Badges Earned This Week:';
+            $badgeItems = [];
             foreach ($digest['badges_earned'] as $badge) {
                 $icon = $badge['icon'] ?? '';
-                $badgeName = $badge['name'] ?? $badge['badge_key'] ?? 'Badge';
-                $lines[] = "  {$icon} {$badgeName}";
+                $badgeName = htmlspecialchars($badge['name'] ?? $badge['badge_key'] ?? 'Badge', ENT_QUOTES, 'UTF-8');
+                $badgeItems[] = ['text' => trim("{$icon} {$badgeName}"), 'color' => '#8b5cf6'];
             }
+            $builder->badges($badgeItems);
         }
 
-        $lines[] = '';
-        $lines[] = 'Keep up the great work!';
+        $builder
+            ->paragraph('Keep up the great work — your contributions make the community stronger!')
+            ->button('View Leaderboard', EmailTemplateBuilder::tenantUrl('/leaderboard'));
 
-        return implode("\n", $lines);
+        return $builder->render();
     }
 
     /**
@@ -304,67 +315,89 @@ class GamificationEmailService
      */
     private function buildMilestoneEmail(string $name, string $type, array $data): array
     {
-        $greeting = $name ? "Hi {$name}," : 'Hi,';
+        $safeName = htmlspecialchars($name ?: '', ENT_QUOTES, 'UTF-8');
 
         switch ($type) {
             case 'level_up':
-                $level = $data['level'] ?? '?';
+                $level = htmlspecialchars((string) ($data['level'] ?? '?'), ENT_QUOTES, 'UTF-8');
                 $subject = "Congratulations! You reached Level {$level}";
-                $body = implode("\n", [
-                    $greeting,
-                    '',
-                    "Congratulations! You've just reached Level {$level}!",
-                    '',
-                    'Keep contributing to your community to unlock even more achievements.',
-                ]);
+                $body = EmailTemplateBuilder::make()
+                    ->theme('achievement')
+                    ->title("Level Up! \u{1F389}")
+                    ->previewText("Congratulations — you reached Level {$level}!")
+                    ->greeting($safeName)
+                    ->highlight("You've just reached <strong>Level {$level}</strong>!", "\u{1F389}")
+                    ->paragraph('Keep contributing to your community to unlock even more achievements.')
+                    ->button('View Your Profile', EmailTemplateBuilder::tenantUrl('/profile'))
+                    ->render();
                 break;
 
             case 'badge_earned':
-                $badgeName = $data['badge_name'] ?? $data['name'] ?? 'a new badge';
+                $badgeName = htmlspecialchars((string) ($data['badge_name'] ?? $data['name'] ?? 'a new badge'), ENT_QUOTES, 'UTF-8');
                 $badgeIcon = $data['icon'] ?? '';
                 $subject = "You earned a new badge: {$badgeName}";
-                $body = implode("\n", [
-                    $greeting,
-                    '',
-                    "You've just earned the {$badgeIcon} {$badgeName} badge!",
-                    '',
-                    !empty($data['description']) ? $data['description'] : 'Great work contributing to your community!',
-                ]);
+                $builder = EmailTemplateBuilder::make()
+                    ->theme('achievement')
+                    ->title("Badge Earned! {$badgeIcon}")
+                    ->previewText("You earned the {$badgeName} badge!")
+                    ->greeting($safeName)
+                    ->highlight("You've earned the <strong>{$badgeIcon} {$badgeName}</strong> badge!", "\u{1F3C5}");
+
+                if (!empty($data['description'])) {
+                    $builder->paragraph(htmlspecialchars($data['description'], ENT_QUOTES, 'UTF-8'));
+                } else {
+                    $builder->paragraph('Great work contributing to your community!');
+                }
+
+                $body = $builder
+                    ->button('View Your Badges', EmailTemplateBuilder::tenantUrl('/profile'))
+                    ->render();
                 break;
 
             case 'streak_milestone':
-                $days = $data['days'] ?? $data['streak'] ?? '?';
+                $days = htmlspecialchars((string) ($data['days'] ?? $data['streak'] ?? '?'), ENT_QUOTES, 'UTF-8');
                 $subject = "Amazing! {$days}-day login streak";
-                $body = implode("\n", [
-                    $greeting,
-                    '',
-                    "Incredible dedication! You've maintained a {$days}-day login streak.",
-                    '',
-                    'Your consistency is inspiring to the whole community.',
-                ]);
+                $body = EmailTemplateBuilder::make()
+                    ->theme('achievement')
+                    ->title("Streak Milestone! \u{1F525}")
+                    ->previewText("Incredible — {$days}-day login streak!")
+                    ->greeting($safeName)
+                    ->statCards([
+                        ['value' => (string) $days, 'label' => 'Day Login Streak', 'icon' => "\u{1F525}"],
+                    ])
+                    ->paragraph('Your consistency is inspiring to the whole community. Keep it going!')
+                    ->button('Continue Your Streak', EmailTemplateBuilder::tenantUrl('/feed'))
+                    ->render();
                 break;
 
             case 'leaderboard_top':
-                $position = $data['position'] ?? $data['rank'] ?? '?';
+                $position = htmlspecialchars((string) ($data['position'] ?? $data['rank'] ?? '?'), ENT_QUOTES, 'UTF-8');
                 $subject = "You're #{$position} on the leaderboard!";
-                $body = implode("\n", [
-                    $greeting,
-                    '',
-                    "You've climbed to position #{$position} on the community leaderboard!",
-                    '',
-                    'Keep it up to maintain your spot at the top.',
-                ]);
+                $body = EmailTemplateBuilder::make()
+                    ->theme('achievement')
+                    ->title("Leaderboard Climb! \u{1F4CA}")
+                    ->previewText("You're now #{$position} on the leaderboard!")
+                    ->greeting($safeName)
+                    ->statCards([
+                        ['value' => '#' . $position, 'label' => 'Leaderboard Position', 'icon' => "\u{1F4CA}"],
+                    ])
+                    ->paragraph('Keep it up to maintain your spot at the top.')
+                    ->button('View Leaderboard', EmailTemplateBuilder::tenantUrl('/leaderboard'))
+                    ->render();
                 break;
 
             default:
                 $subject = 'Achievement Unlocked!';
-                $body = implode("\n", [
-                    $greeting,
-                    '',
-                    'Congratulations on your latest achievement!',
-                    '',
-                    !empty($data['message']) ? $data['message'] : 'Keep contributing to your community.',
-                ]);
+                $message = !empty($data['message'])
+                    ? htmlspecialchars($data['message'], ENT_QUOTES, 'UTF-8')
+                    : 'Congratulations on your latest achievement!';
+                $body = EmailTemplateBuilder::make()
+                    ->theme('achievement')
+                    ->title("Achievement Unlocked! \u{1F3C6}")
+                    ->greeting($safeName)
+                    ->highlight($message, "\u{1F3C6}")
+                    ->button('View Your Profile', EmailTemplateBuilder::tenantUrl('/profile'))
+                    ->render();
                 break;
         }
 
