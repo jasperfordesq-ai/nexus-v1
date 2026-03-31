@@ -7,7 +7,7 @@
 namespace App\Http\Controllers\Api;
 
 use Illuminate\Http\JsonResponse;
-use App\Services\KnowledgeBaseService;
+use Illuminate\Support\Facades\DB;
 
 /**
  * AdminResourcesController -- Admin resource / knowledge base management.
@@ -18,40 +18,80 @@ class AdminResourcesController extends BaseApiController
 {
     protected bool $isV2Api = true;
 
-    public function __construct(
-        private readonly KnowledgeBaseService $knowledgeBaseService,
-    ) {}
-
     /**
      * GET /api/v2/admin/resources
      *
-     * Query params: search, status, page, limit
+     * Query params: search, status (all|published|draft), page, limit
      */
     public function index(): JsonResponse
     {
         $this->requireAdmin();
+        $tenantId = $this->getTenantId();
 
-        $filters = [
-            'search' => $this->query('search'),
-            'status' => $this->query('status'),
-            'page' => max(1, $this->queryInt('page', 1)),
-            'limit' => min(200, max(1, $this->queryInt('limit', 50))),
-        ];
+        $search = $this->query('search', '');
+        $status = $this->query('status', 'all');
+        $page   = max(1, $this->queryInt('page', 1));
+        $limit  = min(200, max(1, $this->queryInt('limit', 50)));
+        $offset = ($page - 1) * $limit;
 
-        $result = $this->knowledgeBaseService->getAll($filters);
+        $query = DB::table('knowledge_base_articles as a')
+            ->leftJoin('users as u', 'a.created_by', '=', 'u.id')
+            ->leftJoin('categories as rc', 'a.category_id', '=', 'rc.id')
+            ->where('a.tenant_id', $tenantId);
 
-        $items = $result['data'] ?? $result['items'] ?? $result;
-        $total = $result['total'] ?? (is_array($items) ? count($items) : 0);
-        $page = $filters['page'];
-        $limit = $filters['limit'];
-
-        if (is_array($items) && !isset($result['total'])) {
-            $offset = ($page - 1) * $limit;
-            $paged = array_slice($items, $offset, $limit);
-            return $this->respondWithPaginatedCollection($paged, count($items), $page, $limit);
+        if ($status === 'published') {
+            $query->where('a.is_published', true);
+        } elseif ($status === 'draft') {
+            $query->where('a.is_published', false);
         }
 
-        return $this->respondWithPaginatedCollection($items, $total, $page, $limit);
+        if (! empty(trim($search))) {
+            $like = '%' . $search . '%';
+            $query->where(function ($q) use ($like) {
+                $q->where('a.title', 'LIKE', $like)
+                  ->orWhere('a.content', 'LIKE', $like);
+            });
+        }
+
+        $total = (clone $query)->count();
+
+        $items = $query
+            ->orderByDesc('a.updated_at')
+            ->offset($offset)
+            ->limit($limit)
+            ->select(
+                'a.id', 'a.title', 'a.slug', 'a.content_type',
+                'a.is_published', 'a.views_count', 'a.helpful_yes',
+                'a.created_at', 'a.updated_at',
+                'u.first_name as author_first_name',
+                'u.last_name as author_last_name',
+                'rc.name as category_name'
+            )
+            ->get()
+            ->map(fn ($row) => [
+                'id'            => (int) $row->id,
+                'title'         => $row->title,
+                'category'      => $row->category_name ?? '',
+                'author_name'   => trim(($row->author_first_name ?? '') . ' ' . ($row->author_last_name ?? '')) ?: 'System',
+                'views'         => (int) $row->views_count,
+                'helpful_votes' => (int) $row->helpful_yes,
+                'status'        => $row->is_published ? 'published' : 'draft',
+                'updated_at'    => $row->updated_at,
+            ])
+            ->all();
+
+        return response()->json([
+            'success' => true,
+            'data' => [
+                'items' => $items,
+                'meta' => [
+                    'page'       => $page,
+                    'per_page'   => $limit,
+                    'total'      => $total,
+                    'total_pages' => $total > 0 ? (int) ceil($total / $limit) : 0,
+                ],
+            ],
+        ]);
     }
 
     /**
@@ -60,14 +100,18 @@ class AdminResourcesController extends BaseApiController
     public function show(int $id): JsonResponse
     {
         $this->requireAdmin();
+        $tenantId = $this->getTenantId();
 
-        $article = $this->knowledgeBaseService->getById($id);
+        $article = DB::table('knowledge_base_articles')
+            ->where('id', $id)
+            ->where('tenant_id', $tenantId)
+            ->first();
 
-        if (!$article) {
+        if (! $article) {
             return $this->respondWithError('NOT_FOUND', __('api.article_not_found'), null, 404);
         }
 
-        return $this->respondWithData($article);
+        return $this->respondWithData((array) $article);
     }
 
     /**
@@ -76,18 +120,40 @@ class AdminResourcesController extends BaseApiController
     public function destroy(int $id): JsonResponse
     {
         $this->requireAdmin();
+        $tenantId = $this->getTenantId();
 
-        $article = $this->knowledgeBaseService->getById($id);
-        if (!$article) {
+        $exists = DB::table('knowledge_base_articles')
+            ->where('id', $id)
+            ->where('tenant_id', $tenantId)
+            ->exists();
+
+        if (! $exists) {
             return $this->respondWithError('NOT_FOUND', __('api.article_not_found'), null, 404);
         }
 
-        $deleted = $this->knowledgeBaseService->delete($id);
+        // Delete attachments from disk
+        $attachments = DB::table('knowledge_base_attachments')
+            ->where('article_id', $id)
+            ->where('tenant_id', $tenantId)
+            ->get();
 
-        if ($deleted) {
-            return $this->respondWithData(['deleted' => true, 'id' => $id]);
+        foreach ($attachments as $att) {
+            if ($att->file_path) {
+                \Illuminate\Support\Facades\Storage::disk('public')->delete($att->file_path);
+            }
         }
 
-        return $this->respondWithError('DELETE_FAILED', __('api.delete_failed', ['resource' => 'article']), null, 400);
+        // Delete article (attachments cascade via FK, feedback manually)
+        DB::table('knowledge_base_feedback')
+            ->where('article_id', $id)
+            ->where('tenant_id', $tenantId)
+            ->delete();
+
+        DB::table('knowledge_base_articles')
+            ->where('id', $id)
+            ->where('tenant_id', $tenantId)
+            ->delete();
+
+        return $this->respondWithData(['deleted' => true, 'id' => $id]);
     }
 }
