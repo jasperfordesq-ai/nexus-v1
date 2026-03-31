@@ -83,7 +83,7 @@ class CommentsController extends BaseApiController
         return $this->respondWithData([
             'id'             => $comment->id,
             'content'        => $comment->content,
-            'created_at'     => (string) $comment->created_at,
+            'created_at'     => $comment->created_at?->toIso8601String(),
             'edited'         => false,
             'is_own'         => true,
             'author'         => [

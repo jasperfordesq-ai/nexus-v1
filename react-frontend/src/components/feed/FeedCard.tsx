@@ -51,6 +51,8 @@ import {
   Users,
   Trophy,
   Zap,
+  Pencil,
+  X,
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
@@ -181,12 +183,34 @@ const typeConfig = {
 
 interface CommentItemProps {
   comment: FeedComment;
+  currentUserId?: number;
+  isAuthenticated: boolean;
+  onEdit: (commentId: number, content: string) => Promise<boolean>;
+  onDelete: (commentId: number) => Promise<boolean>;
 }
 
-export const CommentItem = React.memo(function CommentItem({ comment }: CommentItemProps) {
+export const CommentItem = React.memo(function CommentItem({ comment, currentUserId, isAuthenticated, onEdit, onDelete }: CommentItemProps) {
   const { t } = useTranslation('feed');
   const { tenantPath } = useTenant();
   const [showReplies, setShowReplies] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
+  const [editContent, setEditContent] = useState(comment.content);
+  const [isSubmittingEdit, setIsSubmittingEdit] = useState(false);
+
+  const isOwn = currentUserId === comment.author.id || comment.is_own;
+
+  const handleSaveEdit = async () => {
+    if (!editContent.trim()) return;
+    setIsSubmittingEdit(true);
+    const ok = await onEdit(comment.id, editContent.trim());
+    if (ok) setIsEditing(false);
+    setIsSubmittingEdit(false);
+  };
+
+  const handleDelete = async () => {
+    if (!window.confirm(t('card.delete_comment_confirm', 'Delete this comment?'))) return;
+    await onDelete(comment.id);
+  };
 
   return (
     <div className="flex items-start gap-2.5">
@@ -211,7 +235,44 @@ export const CommentItem = React.memo(function CommentItem({ comment }: CommentI
               <span className="text-[10px] text-[var(--text-subtle)] italic">({t('card.edited')})</span>
             )}
           </div>
-          <p className="text-xs text-[var(--text-secondary)] mt-0.5 whitespace-pre-wrap leading-relaxed"><MentionRenderer text={comment.content} showUserCard={false} /></p>
+          {isEditing ? (
+            <div className="mt-1.5 space-y-2">
+              <Input
+                value={editContent}
+                onChange={(e) => setEditContent(e.target.value)}
+                size="sm"
+                classNames={{
+                  input: 'bg-transparent text-[var(--text-primary)] text-xs',
+                  inputWrapper: 'bg-[var(--surface-hover)] border-[var(--border-default)] min-h-[32px]',
+                }}
+              />
+              <div className="flex gap-1.5">
+                <Button
+                  size="sm"
+                  isIconOnly
+                  variant="flat"
+                  className="w-6 h-6 min-w-0 bg-emerald-500/20 text-emerald-500"
+                  onPress={handleSaveEdit}
+                  isLoading={isSubmittingEdit}
+                  aria-label={t('card.save', 'Save')}
+                >
+                  <Check className="w-3 h-3" />
+                </Button>
+                <Button
+                  size="sm"
+                  isIconOnly
+                  variant="flat"
+                  className="w-6 h-6 min-w-0 bg-red-500/10 text-red-500"
+                  onPress={() => { setIsEditing(false); setEditContent(comment.content); }}
+                  aria-label={t('card.cancel', 'Cancel')}
+                >
+                  <X className="w-3 h-3" />
+                </Button>
+              </div>
+            </div>
+          ) : (
+            <p className="text-xs text-[var(--text-secondary)] mt-0.5 whitespace-pre-wrap leading-relaxed"><MentionRenderer text={comment.content} showUserCard={false} /></p>
+          )}
         </div>
         <div className="flex items-center gap-3 mt-1 px-1">
           <span className="text-[10px] text-[var(--text-subtle)]">
@@ -227,6 +288,28 @@ export const CommentItem = React.memo(function CommentItem({ comment }: CommentI
             >
               {showReplies ? t('card.hide') : `${comment.replies.length}`} {comment.replies.length === 1 ? t('card.reply') : t('card.replies')}
             </Button>
+          )}
+          {isAuthenticated && !isEditing && isOwn && (
+            <>
+              <Button
+                variant="light"
+                size="sm"
+                onPress={() => { setIsEditing(true); setEditContent(comment.content); }}
+                className="text-[10px] text-[var(--text-subtle)] hover:text-[var(--text-primary)] flex items-center gap-0.5 h-auto p-0 min-w-0"
+                startContent={<Pencil className="w-2.5 h-2.5" aria-hidden="true" />}
+              >
+                {t('card.edit', 'Edit')}
+              </Button>
+              <Button
+                variant="light"
+                size="sm"
+                onPress={handleDelete}
+                className="text-[10px] text-red-400 hover:text-red-500 flex items-center gap-0.5 h-auto p-0 min-w-0"
+                startContent={<Trash2 className="w-2.5 h-2.5" aria-hidden="true" />}
+              >
+                {t('card.delete', 'Delete')}
+              </Button>
+            </>
           )}
         </div>
 
@@ -396,6 +479,35 @@ const FeedCard = React.memo(function FeedCard({
       logError('Failed to submit comment', err);
     } finally {
       setIsSubmittingComment(false);
+    }
+  };
+
+  const handleEditComment = async (commentId: number, content: string): Promise<boolean> => {
+    try {
+      const response = await api.put(`/v2/comments/${commentId}`, { content });
+      if (response.success) {
+        loadComments();
+        return true;
+      }
+      return false;
+    } catch (err) {
+      logError('Failed to edit comment', err);
+      return false;
+    }
+  };
+
+  const handleDeleteComment = async (commentId: number): Promise<boolean> => {
+    try {
+      const response = await api.delete(`/v2/comments/${commentId}`);
+      if (response.success) {
+        setLocalCommentsCount((prev) => Math.max(0, prev - 1));
+        loadComments();
+        return true;
+      }
+      return false;
+    } catch (err) {
+      logError('Failed to delete comment', err);
+      return false;
     }
   };
 
@@ -931,7 +1043,14 @@ const FeedCard = React.memo(function FeedCard({
               ) : (
                 <div className="space-y-3">
                   {comments.map((comment) => (
-                    <CommentItem key={comment.id} comment={comment} />
+                    <CommentItem
+                      key={comment.id}
+                      comment={comment}
+                      currentUserId={currentUserId}
+                      isAuthenticated={isAuthenticated}
+                      onEdit={handleEditComment}
+                      onDelete={handleDeleteComment}
+                    />
                   ))}
                 </div>
               )}

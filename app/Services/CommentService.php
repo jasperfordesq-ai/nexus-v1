@@ -81,7 +81,7 @@ class CommentService
             $item = [
                 'id' => $cid,
                 'content' => $comment->content ?? '',
-                'created_at' => (string) $comment->created_at,
+                'created_at' => $comment->created_at?->toIso8601String(),
                 'edited' => $comment->updated_at && $comment->updated_at->gt($comment->created_at),
                 'is_own' => (int) $comment->user_id === $currentUserId,
                 'author' => [
@@ -275,6 +275,13 @@ class CommentService
         $rootComments = [];
 
         foreach ($allComments as &$comment) {
+            // Ensure created_at includes timezone for correct client-side relative time
+            if (!empty($comment['created_at']) && !str_contains($comment['created_at'], 'T')) {
+                $comment['created_at'] = \Carbon\Carbon::parse($comment['created_at'], 'UTC')->toIso8601String();
+            }
+            if (!empty($comment['updated_at']) && !str_contains($comment['updated_at'], 'T')) {
+                $comment['updated_at'] = \Carbon\Carbon::parse($comment['updated_at'], 'UTC')->toIso8601String();
+            }
             $comment['reactions'] = $reactionsByComment[$comment['id']] ?? [];
             $comment['user_reactions'] = $userReactionsByComment[$comment['id']] ?? [];
             $comment['is_owner'] = ($currentUserId && (int) $comment['user_id'] === $currentUserId);
