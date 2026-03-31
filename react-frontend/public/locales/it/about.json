@@ -240,9 +240,9 @@
     "discussion_factor_3_title": "Efficienza della piattaforma digitale",
     "discussion_factor_3_description": "La piattaforma di abbinamento online riduce i costi di coordinamento e consente ai membri di organizzare gli scambi in modo autonomo, aumentando la scalabilità.",
     "aria": {
-      "activity_statistics": "TBI activity statistics",
-      "sroi_breakdown": "SROI breakdown",
-      "recommendations": "Recommendations"
+      "activity_statistics": "Statistiche delle attività TBI",
+      "sroi_breakdown": "Dettaglio SROI",
+      "recommendations": "Raccomandazioni"
     },
     "rec_header": "Raccomandazione",
     "rec_priority_header": "Priorità",
@@ -370,10 +370,10 @@
     "badge_ongoing": "In corso",
     "badge_pitch": "Presentare",
     "aria": {
-      "pillar_1_initiatives": "Strategic pillar 1 initiatives",
-      "pillar_2_initiatives": "Strategic pillar 2 initiatives",
-      "year_1_roadmap": "Year 1 roadmap",
-      "risk_and_mitigation": "Risk and mitigation"
+      "pillar_1_initiatives": "Iniziative del pilastro strategico 1",
+      "pillar_2_initiatives": "Iniziative del pilastro strategico 2",
+      "year_1_roadmap": "Roadmap del primo anno",
+      "risk_and_mitigation": "Rischi e mitigazione"
     },
     "risk_header": "Rischio",
     "likelihood_header": "Probabilità",

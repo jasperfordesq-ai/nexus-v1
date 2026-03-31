@@ -2,11 +2,9 @@
   "page_title": "Ideenwettbewerbe",
   "title": "Ideenwettbewerbe",
   "subtitle": "Teilen Sie Ideen, stimmen Sie ab und gestalten Sie Ihre Gemeinschaft mit",
-
   "actions": {
     "retry": "Erneut versuchen"
   },
-
   "tabs": {
     "all": "Alle",
     "open": "Offen",
@@ -16,7 +14,6 @@
     "archived": "Archiviert",
     "favorites": "Meine Favoriten"
   },
-
   "status": {
     "draft": "Entwurf",
     "open": "Offen",
@@ -25,7 +22,6 @@
     "closed": "Geschlossen",
     "archived": "Archiviert"
   },
-
   "idea_status": {
     "draft": "Entwurf",
     "submitted": "Eingereicht",
@@ -33,7 +29,6 @@
     "winner": "Gewinner",
     "withdrawn": "Zurückgezogen"
   },
-
   "challenge": {
     "ideas_count": "{{count}} Ideen",
     "ideas_count_one": "{{count}} Idee",
@@ -48,7 +43,6 @@
     "outcome": "Ergebnis",
     "team_links": "Projektteams"
   },
-
   "challenges": {
     "title": "Wettbewerbe",
     "empty_title": "Noch keine Wettbewerbe",
@@ -58,7 +52,6 @@
     "load_error": "Wettbewerbe konnten nicht geladen werden",
     "load_more": "Mehr laden"
   },
-
   "ideas": {
     "title": "Ideen",
     "empty_title": "Noch keine Ideen",
@@ -90,14 +83,12 @@
     "draft_created": "Erstellt {{date}}",
     "new_idea": "Neue Idee"
   },
-
   "idea_detail": {
     "page_title": "Ideendetails",
     "back_to_challenge": "Zurück zum Wettbewerb",
     "submitted_by": "Eingereicht von {{name}}",
     "submitted_on": "Eingereicht am {{date}}"
   },
-
   "comments": {
     "title": "Kommentare",
     "empty_title": "Noch keine Kommentare",
@@ -109,7 +100,6 @@
     "load_more": "Mehr Kommentare laden",
     "load_error": "Kommentare konnten nicht geladen werden"
   },
-
   "form": {
     "title_label": "Titel",
     "title_placeholder": "Geben Sie einen klaren, beschreibenden Titel ein",
@@ -142,18 +132,15 @@
     "updating": "Wird aktualisiert...",
     "cancel": "Abbrechen"
   },
-
   "create_page": {
     "page_title": "Wettbewerb erstellen",
     "title": "Ideenwettbewerb erstellen",
     "subtitle": "Stellen Sie eine Problemstellung für Ihre Gemeinschaft zur Lösung bereit"
   },
-
   "edit_page": {
     "page_title": "Wettbewerb bearbeiten",
     "title": "Ideenwettbewerb bearbeiten"
   },
-
   "admin": {
     "change_status": "Status ändern",
     "set_open": "Für Einreichungen öffnen",
@@ -172,7 +159,6 @@
     "status_updated": "Wettbewerbsstatus aktualisiert",
     "idea_status_updated": "Ideenstatus aktualisiert"
   },
-
   "toast": {
     "challenge_created": "Wettbewerb erfolgreich erstellt",
     "challenge_updated": "Wettbewerb erfolgreich aktualisiert",
@@ -209,7 +195,6 @@
     "template_applied": "Vorlage erfolgreich angewendet",
     "error_generic": "Etwas ist schiefgelaufen. Bitte versuchen Sie es erneut."
   },
-
   "favorites": {
     "add": "Zu Favoriten hinzufügen",
     "remove": "Aus Favoriten entfernen",
@@ -217,18 +202,14 @@
     "empty_title": "Noch keine Favoriten",
     "empty_description": "Markieren Sie einen Wettbewerb mit einem Herz, um ihn zu Ihren Favoriten hinzuzufügen."
   },
-
   "views": "Aufrufe",
-
   "featured": "Hervorgehoben",
-
   "search": {
     "label": "Wettbewerbe durchsuchen",
     "placeholder": "Wettbewerbe nach Titel oder Beschreibung durchsuchen...",
     "clear_tags": "Schlagwörter löschen",
     "no_results": "Keine Wettbewerbe entsprechen Ihrer Suche"
   },
-
   "tags": {
     "label": "Schlagwörter",
     "placeholder": "Schlagwörter hinzufügen (Enter drücken)",
@@ -237,54 +218,49 @@
     "skills": "Benötigte Fähigkeiten",
     "general": "Allgemeine Schlagwörter"
   },
-
   "cover_image": {
     "label": "Titelbild-URL",
     "placeholder": "https://example.com/bild.jpg",
     "helper": "Bannerbild für den Wettbewerb (empfohlen 600x400)"
   },
-
   "guidance": {
     "title": "Tipps für einen großartigen Wettbewerb",
     "intro": "Ein gut formulierter Wettbewerb inspiriert bessere Ideen. Hier sind einige Tipps, die Ihnen helfen, eine effektive Problemstellung zu erstellen.",
     "tips": {
       "clear_problem": {
-        "title": "\uD83C\uDFAF Definieren Sie ein klares Problem",
+        "title": "🎯 Definieren Sie ein klares Problem",
         "description": "Benennen Sie das spezifische Problem, das die Gemeinschaft angehen soll. Vermeiden Sie vage oder zu breit gefasste Aussagen."
       },
       "scope": {
-        "title": "\uD83D\uDCCF Setzen Sie einen realistischen Rahmen",
+        "title": "📏 Setzen Sie einen realistischen Rahmen",
         "description": "Definieren Sie klare Grenzen und Einschränkungen, damit Ideen fokussiert und umsetzbar bleiben."
       },
       "criteria": {
-        "title": "\u2696\uFE0F Erklären Sie die Bewertungskriterien",
+        "title": "⚖️ Erklären Sie die Bewertungskriterien",
         "description": "Teilen Sie den Teilnehmern mit, wie Ideen bewertet werden — Machbarkeit, Kreativität, Wirkung oder Wirtschaftlichkeit."
       },
       "engagement": {
-        "title": "\uD83D\uDCA1 Fördern Sie die Teilnahme",
+        "title": "💡 Fördern Sie die Teilnahme",
         "description": "Verwenden Sie einladende Sprache. Fügen Sie einen Preis oder eine Anerkennung hinzu, um Einreichungen zu motivieren."
       }
     },
-    "examples_toggle": "Beispiele für starke vs. schwache Wettbewerbe anzeigen \u25B8",
+    "examples_toggle": "Beispiele für starke vs. schwache Wettbewerbe anzeigen ▸",
     "example_good": {
-      "label": "\u2705 Starker Wettbewerb:",
+      "label": "✅ Starker Wettbewerb:",
       "text": "Wie können wir die Lebensmittelverschwendung in unserer Gemeinschaft im nächsten Jahr um 25% reduzieren? Wir suchen nach praktischen, kostengünstigen Ideen, die lokale Unternehmen und Bewohner gemeinsam umsetzen können."
     },
     "example_weak": {
-      "label": "\u274C Schwacher Wettbewerb:",
+      "label": "❌ Schwacher Wettbewerb:",
       "text": "Wir brauchen Ideen zum Thema Umwelt.",
       "why": "Zu vage — kein spezifisches Problem, keine Einschränkungen, keine Erfolgskriterien."
     }
   },
-
   "duplicate": {
     "button": "Wettbewerb duplizieren",
     "success": "Wettbewerb erfolgreich dupliziert",
     "error": "Wettbewerb konnte nicht dupliziert werden"
   },
-
   "idea_image": "Ideenbild",
-
   "media": {
     "title": "Anhänge",
     "add": "Anhang hinzufügen",
@@ -302,7 +278,6 @@
     "delete_confirm": "Diesen Anhang entfernen?",
     "empty": "Keine Anhänge"
   },
-
   "convert_to_group": {
     "button": "Team erstellen",
     "title": "Projektteam aus Idee erstellen",
@@ -318,7 +293,6 @@
     "error": "Team konnte nicht erstellt werden",
     "already_converted": "Diese Idee wurde bereits in ein Team umgewandelt"
   },
-
   "campaigns": {
     "title": "Kampagnen",
     "page_title": "Kampagnen",
@@ -330,7 +304,6 @@
     "link_challenge": "Wettbewerb verknüpfen",
     "unlink_challenge": "Wettbewerb trennen"
   },
-
   "templates": {
     "title": "Wettbewerbsvorlagen",
     "page_title": "Wettbewerbsvorlagen",
@@ -340,7 +313,6 @@
     "use_template": "Diese Vorlage verwenden",
     "start_from_template": "Von Vorlage starten"
   },
-
   "outcomes": {
     "title": "Wirkungsverfolgung",
     "page_title": "Wirkungs-Dashboard",
@@ -361,7 +333,6 @@
     "implemented_count": "Umgesetzt",
     "in_progress_count": "In Bearbeitung"
   },
-
   "tasks": {
     "title": "Aufgaben",
     "status_label": "Status",
@@ -382,7 +353,6 @@
     "overdue": "Überfällig",
     "stats": "Aufgabenstatistik"
   },
-
   "documents": {
     "title": "Dokumente",
     "upload": "Dokument hochladen",
@@ -391,7 +361,6 @@
     "delete_confirm": "Dieses Dokument löschen?",
     "max_size": "Maximale Dateigröße: 10 MB"
   },
-
   "chatrooms": {
     "title": "Kanäle",
     "create": "Kanal erstellen",
@@ -403,7 +372,6 @@
     "delete_channel": "Kanal löschen",
     "delete_channel_confirm": "Diesen Kanal und alle Nachrichten löschen?"
   },
-
   "categories": {
     "title": "Kategorien",
     "manage": "Kategorien verwalten",
@@ -416,7 +384,6 @@
     "color_label": "Farbe",
     "delete_confirm": "Diese Kategorie löschen?"
   },
-
   "validation": {
     "title_required": "Titel ist erforderlich",
     "description_required": "Beschreibung ist erforderlich",

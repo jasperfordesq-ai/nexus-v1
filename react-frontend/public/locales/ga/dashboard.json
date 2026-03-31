@@ -83,14 +83,14 @@
     "streak_days_other": "{{count}} la"
   },
   "aria": {
-    "loading_listings": "Loading listings",
-    "loading_activity": "Loading activity",
-    "loading_events": "Loading events",
-    "loading_groups": "Loading groups",
-    "loading_progress": "Loading progress",
-    "loading_suggestions": "Loading suggestions",
-    "loading_endorsements": "Loading endorsements",
-    "loading_pending_reviews": "Loading pending reviews"
+    "loading_listings": "Liosta\u00ed \u00e1 lucht\u00fa",
+    "loading_activity": "Gn\u00edomha\u00edocht \u00e1 lucht\u00fa",
+    "loading_events": "Imeachta\u00ed \u00e1 lucht\u00fa",
+    "loading_groups": "Gr\u00fapa\u00ed \u00e1 lucht\u00fa",
+    "loading_progress": "Dul chun cinn \u00e1 lucht\u00fa",
+    "loading_suggestions": "Molta\u00ed \u00e1 lucht\u00fa",
+    "loading_endorsements": "Formhuinith\u00ed \u00e1 lucht\u00fa",
+    "loading_pending_reviews": "L\u00e9irmheasanna ar feitheamh \u00e1 lucht\u00fa"
   },
   "reviews": {
     "sent": "Seolta {{amount}}u",

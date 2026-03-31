@@ -414,57 +414,60 @@
   "messages.aria_reply": "Responder mensaje",
   "messages.aria_send_reply": "Enviar respuesta",
   "partner_detail.federation_partner_badge": "Socio de Federación",
-  "hub": {},
+  "hub": {
+    "toast_error": "Error"
+  },
   "messages": {
-    "aria_back_to_list": "Back to message list",
-    "aria_read": "Read",
-    "aria_delivered": "Delivered",
-    "aria_reply": "Reply message",
-    "aria_send_reply": "Send reply"
+    "aria_back_to_list": "Volver a la lista de mensajes",
+    "aria_read": "Leído",
+    "aria_delivered": "Entregado",
+    "aria_reply": "Responder mensaje",
+    "aria_send_reply": "Enviar respuesta",
+    "toast_error": "Error"
   },
   "onboarding": {
-    "reach_label_remote_ok": "Remote OK"
+    "reach_label_remote_ok": "Remoto OK"
   },
   "listings": {},
   "members": {
-    "reach_remote_ok": "Remote OK",
-    "aria_search": "Search federated members",
-    "aria_filter_community": "Filter by partner community",
-    "aria_filter_skills": "Filter by skills"
+    "reach_remote_ok": "Remoto OK",
+    "aria_search": "Buscar miembros federados",
+    "aria_filter_community": "Filtrar por comunidad asociada",
+    "aria_filter_skills": "Filtrar por habilidades"
   },
   "events": {},
   "partners": {},
   "partner_detail": {
-    "federation_partner_badge": "Federation Partner"
+    "federation_partner_badge": "Socio de federación"
   },
   "member_profile": {},
   "settings": {},
   "connections": {
-    "page_title": "Connections",
-    "breadcrumb_federation": "Federation",
-    "breadcrumb_connections": "Connections",
-    "title": "Federation Connections",
-    "subtitle": "Manage your cross-community connections",
-    "tab_connected": "Connected",
-    "tab_received": "Received",
-    "tab_sent": "Sent",
-    "loading": "Loading connections...",
-    "empty_connected": "No connections yet",
-    "empty_received": "No pending requests",
-    "empty_sent": "No sent requests",
-    "empty_connected_desc": "Connect with members from partner communities to grow your network.",
-    "empty_received_desc": "When someone sends you a connection request, it will appear here.",
-    "empty_sent_desc": "Connection requests you send will appear here.",
-    "browse_members": "Browse Federation Members",
-    "unknown_member": "Federation Member",
-    "message": "Message",
-    "remove": "Remove connection",
-    "accept": "Accept",
-    "decline": "Decline",
-    "pending": "Pending",
-    "accepted_success": "Connection accepted!",
-    "rejected_success": "Connection request declined",
-    "removed_success": "Connection removed",
-    "action_failed": "Action failed"
+    "page_title": "Conexiones",
+    "breadcrumb_federation": "Federación",
+    "breadcrumb_connections": "Conexiones",
+    "title": "Conexiones de federación",
+    "subtitle": "Administre sus conexiones entre comunidades",
+    "tab_connected": "Conectados",
+    "tab_received": "Recibidos",
+    "tab_sent": "Enviados",
+    "loading": "Cargando conexiones...",
+    "empty_connected": "Aún no hay conexiones",
+    "empty_received": "No hay solicitudes pendientes",
+    "empty_sent": "No hay solicitudes enviadas",
+    "empty_connected_desc": "Conéctese con miembros de comunidades asociadas para ampliar su red.",
+    "empty_received_desc": "Cuando alguien le envíe una solicitud de conexión, aparecerá aquí.",
+    "empty_sent_desc": "Las solicitudes de conexión que envíe aparecerán aquí.",
+    "browse_members": "Explorar miembros de federación",
+    "unknown_member": "Miembro de federación",
+    "message": "Mensaje",
+    "remove": "Eliminar conexión",
+    "accept": "Aceptar",
+    "decline": "Rechazar",
+    "pending": "Pendiente",
+    "accepted_success": "¡Conexión aceptada!",
+    "rejected_success": "Solicitud de conexión rechazada",
+    "removed_success": "Conexión eliminada",
+    "action_failed": "La acción falló"
   }
 }

@@ -55,7 +55,7 @@
     "load_error": "Theip ar an liosta a luchtú",
     "update_success": "Liosta nuashonraithe go rathúil",
     "create_success": "Liosta cruthaithe go rathúil",
-    "aria_remove_image": "Remove image"
+    "aria_remove_image": "Bain \u00edomh\u00e1"
   },
   "page_subtitle": "Brabhsáil seirbhísí agus iarratais ón bpobal",
   "search_placeholder": "Cuardaigh de réir teideal, cur síos, suíomh nó ainm...",
@@ -147,8 +147,8 @@
     "aria_add": "Cuir clib scile leis"
   },
   "aria": {
-    "view_mode": "View mode",
-    "loading_listings": "Loading listings"
+    "view_mode": "M\u00f3d amhairc",
+    "loading_listings": "Liosta\u00ed \u00e1 lucht\u00fa"
   },
   "analytics": {
     "title": "Anailísíocht Liostaithe",

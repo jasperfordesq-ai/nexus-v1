@@ -66,6 +66,6 @@
   "delete": "Eliminar",
   "delete_saved_search": "Eliminar pesquisa guardada",
   "aria": {
-    "loading_search_results": "Loading search results"
+    "loading_search_results": "A carregar resultados da pesquisa"
   }
 }

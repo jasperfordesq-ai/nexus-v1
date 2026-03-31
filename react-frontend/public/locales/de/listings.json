@@ -55,7 +55,7 @@
     "load_error": "Inserat konnte nicht geladen werden",
     "update_success": "Inserat erfolgreich aktualisiert",
     "create_success": "Inserat erfolgreich erstellt",
-    "aria_remove_image": "Remove image"
+    "aria_remove_image": "Bild entfernen"
   },
   "page_subtitle": "Dienstleistungen und Gesuche der Gemeinschaft durchsuchen",
   "search_placeholder": "Nach Titel, Beschreibung, Standort oder Name suchen...",
@@ -147,8 +147,8 @@
     "aria_add": "Fähigkeits-Tag hinzufügen"
   },
   "aria": {
-    "view_mode": "View mode",
-    "loading_listings": "Loading listings"
+    "view_mode": "Ansichtsmodus",
+    "loading_listings": "Inserate werden geladen"
   },
   "analytics": {
     "title": "Anzeigenanalyse",

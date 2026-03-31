@@ -107,9 +107,9 @@
     "delete_confirm_title": "Eliminar Recurso",
     "delete_confirm_message": "Tem a certeza de que pretende eliminar \"{{title}}\"? Esta ação não pode ser desfeita.",
     "delete_confirm": "Eliminar",
-    "aria_move_up": "Move up",
-    "aria_move_down": "Move down",
-    "aria_upload_progress": "Upload progress"
+    "aria_move_up": "Mover para cima",
+    "aria_move_down": "Mover para baixo",
+    "aria_upload_progress": "Progresso do carregamento"
   },
   "not_found": {
     "page_title": "Página Não Encontrada",

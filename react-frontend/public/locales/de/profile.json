@@ -100,14 +100,14 @@
   "listing_image_alt": "Anzeigenbild",
   "credits_sent_success": "Kredite an {{name}} gesendet",
   "aria": {
-    "profile_sections": "Profile sections",
-    "about_this_user": "About this user",
-    "user_listings": "User listings",
-    "user_activity_feed": "User activity feed",
-    "user_availability": "User availability",
-    "user_reviews": "User reviews",
-    "user_achievements": "User achievements",
-    "loading_reviews": "Loading reviews"
+    "profile_sections": "Profilbereiche",
+    "about_this_user": "Über diesen Benutzer",
+    "user_listings": "Inserate des Benutzers",
+    "user_activity_feed": "Aktivitäts-Feed des Benutzers",
+    "user_availability": "Verfügbarkeit des Benutzers",
+    "user_reviews": "Bewertungen des Benutzers",
+    "user_achievements": "Erfolge des Benutzers",
+    "loading_reviews": "Bewertungen werden geladen"
   },
   "review_modal": {
     "title": "Bewertung schreiben",

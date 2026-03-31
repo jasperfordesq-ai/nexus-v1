@@ -14,13 +14,13 @@
     "tab_badges": "Insígnias",
     "tab_challenges": "Desafios",
     "tab_collections": "Coleções",
-    "tab_journeys": "Journeys",
-    "tab_engagement": "Engagement",
+    "tab_journeys": "Percursos",
+    "tab_engagement": "Envolvimento",
     "tab_shop": "Loja XP",
     "engagement": {
-      "title": "Monthly Engagement",
-      "months_active": "{{count}} of 12 months",
-      "description": "Months where you completed at least one meaningful activity (exchange, listing, review, or volunteer hours)."
+      "title": "Envolvimento Mensal",
+      "months_active": "{{count}} de 12 meses",
+      "description": "Meses em que completou pelo menos uma atividade significativa (troca, anúncio, avaliação ou horas de voluntariado)."
     },
     "filter_by_type": "Filtrar por tipo",
     "filter_badges_aria": "Filtrar insígnias por tipo",
@@ -193,13 +193,13 @@
     "page_title": "Tabela de Classificação",
     "title": "Tabela de Classificação",
     "subtitle": "Veja quem lidera a comunidade",
-    "subtitle_redesign": "See how our community is growing together",
-    "tabs_aria": "Community views",
+    "subtitle_redesign": "Veja como a nossa comunidade está a crescer em conjunto",
+    "tabs_aria": "Vistas da comunidade",
     "tab": {
-      "community": "Community Impact",
-      "journey": "My Journey",
-      "spotlight": "Spotlight",
-      "competitive": "Most Active"
+      "community": "Impacto na Comunidade",
+      "journey": "O Meu Percurso",
+      "spotlight": "Destaque",
+      "competitive": "Mais Ativos"
     },
     "unable_to_load": "Não Foi Possível Carregar a Tabela",
     "try_again": "Tentar Novamente",

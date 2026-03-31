@@ -65,8 +65,8 @@
   "error": {
     "load_balance": "Falha ao carregar saldo da carteira",
     "load_wallet": "Falha ao carregar dados da carteira. Tente novamente.",
-    "session_expired": "Your session has expired. Please log in again.",
-    "load_community_fund": "Could not load community fund"
+    "session_expired": "A sua sessão expirou. Inicie sessão novamente.",
+    "load_community_fund": "Não foi possível carregar o fundo comunitário"
   },
   "no_members_found": "Nenhum membro encontrado",
   "donate": "Doar",
@@ -117,9 +117,9 @@
     "submit": "Submeter avaliação"
   },
   "aria": {
-    "export_csv": "Export transactions to CSV",
-    "loading_transactions": "Loading transactions",
-    "transaction_detail": "{{direction}} {{amount}} hours {{name}}"
+    "export_csv": "Exportar transações para CSV",
+    "loading_transactions": "A carregar transações",
+    "transaction_detail": "{{direction}} {{amount}} horas {{name}}"
   },
   "available_balance": "Saldo disponível",
   "recipient": "Destinatário",

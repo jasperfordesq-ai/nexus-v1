@@ -65,8 +65,8 @@
   "error": {
     "load_balance": "Error al cargar el saldo de la billetera",
     "load_wallet": "Error al cargar los datos de la billetera. Por favor intenta de nuevo.",
-    "session_expired": "Your session has expired. Please log in again.",
-    "load_community_fund": "Could not load community fund"
+    "session_expired": "Su sesión ha expirado. Por favor, inicie sesión nuevamente.",
+    "load_community_fund": "No se pudo cargar el fondo comunitario"
   },
   "no_members_found": "No se encontraron miembros",
   "donate": "Donar",
@@ -117,9 +117,9 @@
     "submit": "Enviar calificación"
   },
   "aria": {
-    "export_csv": "Export transactions to CSV",
-    "loading_transactions": "Loading transactions",
-    "transaction_detail": "{{direction}} {{amount}} hours {{name}}"
+    "export_csv": "Exportar transacciones a CSV",
+    "loading_transactions": "Cargando transacciones",
+    "transaction_detail": "{{direction}} {{amount}} horas {{name}}"
   },
   "available_balance": "Saldo disponible",
   "recipient": "Destinatario",

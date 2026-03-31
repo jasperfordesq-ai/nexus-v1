@@ -87,8 +87,8 @@
     "add_as_role": "Aggiungi come {{role}}",
     "no_members_found": "Nessun membro trovato corrispondente alla Sua ricerca.",
     "done": "Fatto",
-    "aria_exchange_participants": "Exchange participants",
-    "aria_hour_split": "Hour split"
+    "aria_exchange_participants": "Partecipanti allo scambio",
+    "aria_hour_split": "Suddivisione ore"
   },
   "create": {
     "page_title": "Crea scambio di gruppo",
@@ -142,7 +142,7 @@
     "weight_placeholder": "Peso",
     "hours_for": "Ore per {{name}}",
     "weight_for": "Peso per {{name}}",
-    "aria_hour_split_preview": "Hour split preview"
+    "aria_hour_split_preview": "Anteprima suddivisione ore"
   },
   "toast": {
     "load_more_failed": "Impossibile caricare altri scambi",

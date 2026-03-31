@@ -107,9 +107,9 @@
     "delete_confirm_title": "Supprimer la ressource",
     "delete_confirm_message": "Êtes-vous sûr de vouloir supprimer « {{title}} » ? Cette action est irréversible.",
     "delete_confirm": "Supprimer",
-    "aria_move_up": "Move up",
-    "aria_move_down": "Move down",
-    "aria_upload_progress": "Upload progress"
+    "aria_move_up": "Déplacer vers le haut",
+    "aria_move_down": "Déplacer vers le bas",
+    "aria_upload_progress": "Progression du téléchargement"
   },
   "not_found": {
     "page_title": "Page non trouvée",
@@ -144,7 +144,7 @@
   },
   "custom_page": {
     "default_title": "Page",
-    "not_found_description": "The page you're looking for doesn't exist or is no longer available.",
-    "back_to_home": "Back to Home"
+    "not_found_description": "La page que vous recherchez n’existe pas ou n’est plus disponible.",
+    "back_to_home": "Retour à l’accueil"
   }
 }

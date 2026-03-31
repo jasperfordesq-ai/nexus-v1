@@ -87,8 +87,8 @@
     "add_as_role": "Agregar como {{role}}",
     "no_members_found": "No se encontraron miembros que coincidan con tu búsqueda.",
     "done": "Listo",
-    "aria_exchange_participants": "Exchange participants",
-    "aria_hour_split": "Hour split"
+    "aria_exchange_participants": "Participantes del intercambio",
+    "aria_hour_split": "Division de horas"
   },
   "create": {
     "page_title": "Crear Intercambio Grupal",
@@ -142,7 +142,7 @@
     "weight_placeholder": "Peso",
     "hours_for": "Horas para {{name}}",
     "weight_for": "Peso para {{name}}",
-    "aria_hour_split_preview": "Hour split preview"
+    "aria_hour_split_preview": "Vista previa de la division de horas"
   },
   "toast": {
     "load_more_failed": "Error al cargar más intercambios",

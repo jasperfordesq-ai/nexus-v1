@@ -56,7 +56,7 @@
     "set_custom_desc": "Socraigh teachtaireacht stádais shaincheaptha",
     "set_custom_title": "Socraigh Stádas Saincheaptha",
     "clear_custom": "Glan stádas saincheaptha",
-    "emoji_label": "Emoji",
+    "emoji_label": "Straoiseog",
     "status_label": "Stádas",
     "status_placeholder": "I gcruinniú",
     "char_count": "{{current}}/80 carachtar"
@@ -68,7 +68,7 @@
     "aria_endorse": "Formhuinigh {{skillName}}",
     "endorsed": "Formhuinithe",
     "endorse": "Formhuinigh",
-    "endorse_failed": "Failed to endorse",
-    "remove_failed": "Failed to remove endorsement"
+    "endorse_failed": "Theip ar an bhformhuini\u00fa",
+    "remove_failed": "Theip ar an bhformhuini\u00fa a bhaint"
   }
 }

@@ -14,13 +14,13 @@
     "tab_badges": "Suaitheantais",
     "tab_challenges": "Dushláin",
     "tab_collections": "Bailiucháin",
-    "tab_journeys": "Journeys",
-    "tab_engagement": "Engagement",
+    "tab_journeys": "Turais",
+    "tab_engagement": "Rannph\u00e1irt\u00edocht",
     "tab_shop": "Siopa XP",
     "engagement": {
-      "title": "Monthly Engagement",
-      "months_active": "{{count}} of 12 months",
-      "description": "Months where you completed at least one meaningful activity (exchange, listing, review, or volunteer hours)."
+      "title": "Rannph\u00e1irt\u00edocht Mh\u00edos\u00fail",
+      "months_active": "{{count}} as 12 mh\u00ed",
+      "description": "M\u00edonna inar chom\u00e1in t\u00fa gn\u00edomha\u00edocht fhiúntach amháin ar a laghad (malartú, liostú, léirmheas, nó uaireanta deonacha)."
     },
     "filter_by_type": "Scag de réir cineáil",
     "filter_badges_aria": "Scag suaitheantais de réir cineáil",
@@ -193,13 +193,13 @@
     "page_title": "Clár Ceannairí",
     "title": "Clár Ceannairí",
     "subtitle": "Féach cé atá chun tosaigh sa phobal",
-    "subtitle_redesign": "See how our community is growing together",
-    "tabs_aria": "Community views",
+    "subtitle_redesign": "F\u00e9ach conas at\u00e1 \u00e1r bpobal ag f\u00e1s le ch\u00e9ile",
+    "tabs_aria": "Amhairc phobail",
     "tab": {
-      "community": "Community Impact",
-      "journey": "My Journey",
-      "spotlight": "Spotlight",
-      "competitive": "Most Active"
+      "community": "Tionchar Pobail",
+      "journey": "Mo Thuras",
+      "spotlight": "Spotsholas",
+      "competitive": "Is Gn\u00edomha\u00ed"
     },
     "unable_to_load": "Ní Féidir an Clár Ceannairí a Lódáil",
     "try_again": "Bain Triail Eile As",

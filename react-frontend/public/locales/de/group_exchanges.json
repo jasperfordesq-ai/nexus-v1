@@ -87,8 +87,8 @@
     "add_as_role": "Als {{role}} hinzufügen",
     "no_members_found": "Keine Mitglieder gefunden, die Ihrer Suche entsprechen.",
     "done": "Fertig",
-    "aria_exchange_participants": "Exchange participants",
-    "aria_hour_split": "Hour split"
+    "aria_exchange_participants": "Austauschteilnehmer",
+    "aria_hour_split": "Stundenaufteilung"
   },
   "create": {
     "page_title": "Gruppentausch erstellen",
@@ -142,7 +142,7 @@
     "weight_placeholder": "Gewichtung",
     "hours_for": "Stunden für {{name}}",
     "weight_for": "Gewichtung für {{name}}",
-    "aria_hour_split_preview": "Hour split preview"
+    "aria_hour_split_preview": "Vorschau der Stundenaufteilung"
   },
   "toast": {
     "load_more_failed": "Weitere Tauschvorgänge konnten nicht geladen werden",

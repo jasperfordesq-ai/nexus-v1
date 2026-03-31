@@ -362,7 +362,7 @@
     "label": "Mode du fil"
   },
   "location": {
-    "global": "Global",
+    "global": "Mondial",
     "nearby": "Près de moi",
     "radius": "{{km}} km",
     "km": "km",

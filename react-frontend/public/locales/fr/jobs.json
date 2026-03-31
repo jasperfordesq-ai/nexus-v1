@@ -114,9 +114,9 @@
     "target": "Déplacer vers",
     "add": "Ajouter une règle",
     "delete": "Supprimer",
-    "action_move_stage": "Move stage",
-    "action_auto_reject": "Auto-reject",
-    "action_notify_me": "Notify me"
+    "action_move_stage": "Changer d’étape",
+    "action_auto_reject": "Rejet automatique",
+    "action_notify_me": "Me notifier"
   },
   "employer": {
     "page_title": "Profil de l'employeur",
@@ -823,7 +823,7 @@
     "first_time_banner": "Première publication ?",
     "first_time_desc": "Notre assistant d'intégration vous guidera dans la publication de votre première offre.",
     "start_wizard": "Démarrer l'assistant",
-    "aria_progress": "Onboarding progress"
+    "aria_progress": "Progression de l’intégration"
   },
   "preview": {
     "title": "Aperçu de l'offre",
@@ -885,7 +885,7 @@
     "jobs": "Emplois"
   },
   "aria": {
-    "qualification_percentage": "Qualification percentage"
+    "qualification_percentage": "Pourcentage de qualification"
   },
   "deadline_countdown_one": "Clôture dans {{count}} jour",
   "deadline_countdown_other": "Clôture dans {{count}} jours"

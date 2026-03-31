@@ -7,7 +7,7 @@
   "template_created": "Meta criada a partir do modelo!",
   "template_create_failed": "Falha ao criar meta a partir do modelo.",
   "checkin": {
-    "aria_progress_percentage": "Progress percentage",
+    "aria_progress_percentage": "Percentagem de progresso",
     "title": "Check-in",
     "new_checkin": "Novo Check-in",
     "history": "Histórico",

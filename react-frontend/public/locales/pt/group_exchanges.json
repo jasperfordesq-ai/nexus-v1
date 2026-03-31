@@ -87,8 +87,8 @@
     "add_as_role": "Adicionar como {{role}}",
     "no_members_found": "Nenhum membro encontrado correspondente à sua pesquisa.",
     "done": "Concluído",
-    "aria_exchange_participants": "Exchange participants",
-    "aria_hour_split": "Hour split"
+    "aria_exchange_participants": "Participantes da troca",
+    "aria_hour_split": "Divisão de horas"
   },
   "create": {
     "page_title": "Criar Troca de Grupo",
@@ -142,7 +142,7 @@
     "weight_placeholder": "Peso",
     "hours_for": "Horas para {{name}}",
     "weight_for": "Peso para {{name}}",
-    "aria_hour_split_preview": "Hour split preview"
+    "aria_hour_split_preview": "Pré-visualização da divisão de horas"
   },
   "toast": {
     "load_more_failed": "Falha ao carregar mais trocas",

@@ -83,14 +83,14 @@
     "streak_days_other": "{{count}} dias"
   },
   "aria": {
-    "loading_listings": "Loading listings",
-    "loading_activity": "Loading activity",
-    "loading_events": "Loading events",
-    "loading_groups": "Loading groups",
-    "loading_progress": "Loading progress",
-    "loading_suggestions": "Loading suggestions",
-    "loading_endorsements": "Loading endorsements",
-    "loading_pending_reviews": "Loading pending reviews"
+    "loading_listings": "A carregar anúncios",
+    "loading_activity": "A carregar atividade",
+    "loading_events": "A carregar eventos",
+    "loading_groups": "A carregar grupos",
+    "loading_progress": "A carregar progresso",
+    "loading_suggestions": "A carregar sugestões",
+    "loading_endorsements": "A carregar recomendações",
+    "loading_pending_reviews": "A carregar avaliações pendentes"
   },
   "reviews": {
     "sent": "Enviou {{amount}}h",

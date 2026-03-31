@@ -156,10 +156,10 @@
   "hour": "hora",
   "hours": "horas",
   "hours_review": {
-    "approve": "Approve",
-    "decline": "Decline",
-    "approve_aria": "Approve hours for {{name}}",
-    "decline_aria": "Decline hours for {{name}}"
+    "approve": "Aprobar",
+    "decline": "Rechazar",
+    "approve_aria": "Aprobar horas para {{name}}",
+    "decline_aria": "Rechazar horas para {{name}}"
   },
   "expenses": {
     "heading": "Mis Gastos",
@@ -268,7 +268,7 @@
     "payment_methods": {
       "card": "tarjeta",
       "bank_transfer": "transferencia bancaria",
-      "paypal": "paypal"
+      "paypal": "PayPal"
     },
     "status": {
       "completed": "Completado",
@@ -408,15 +408,15 @@
     }
   },
   "aria": {
-    "volunteering_sections": "Volunteering sections"
+    "volunteering_sections": "Secciones de voluntariado"
   },
   "credentials": {
-    "aria_remove_file": "Remove selected file",
-    "aria_upload_document": "Upload credential document"
+    "aria_remove_file": "Eliminar archivo seleccionado",
+    "aria_upload_document": "Subir documento de credencial"
   },
   "applications": {
-    "aria_select_all": "Select all visible pending applications",
-    "aria_search_volunteers": "Search volunteers by name"
+    "aria_select_all": "Seleccionar todas las solicitudes pendientes visibles",
+    "aria_search_volunteers": "Buscar voluntarios por nombre"
   },
   "common": {
     "refresh": "Actualizar",

@@ -14,13 +14,13 @@
     "tab_badges": "Abzeichen",
     "tab_challenges": "Herausforderungen",
     "tab_collections": "Sammlungen",
-    "tab_journeys": "Journeys",
+    "tab_journeys": "Entwicklungswege",
     "tab_engagement": "Engagement",
     "tab_shop": "XP-Shop",
     "engagement": {
-      "title": "Monthly Engagement",
-      "months_active": "{{count}} of 12 months",
-      "description": "Months where you completed at least one meaningful activity (exchange, listing, review, or volunteer hours)."
+      "title": "Monatliches Engagement",
+      "months_active": "{{count}} von 12 Monaten",
+      "description": "Monate, in denen Sie mindestens eine sinnvolle Aktivität durchgeführt haben (Austausch, Inserat, Bewertung oder Freiwilligenstunden)."
     },
     "filter_by_type": "Nach Typ filtern",
     "filter_badges_aria": "Abzeichen nach Typ filtern",
@@ -193,13 +193,13 @@
     "page_title": "Rangliste",
     "title": "Rangliste",
     "subtitle": "Sehen Sie, wer in der Gemeinschaft führt",
-    "subtitle_redesign": "See how our community is growing together",
-    "tabs_aria": "Community views",
+    "subtitle_redesign": "Sehen Sie, wie unsere Community gemeinsam wächst",
+    "tabs_aria": "Community-Ansichten",
     "tab": {
-      "community": "Community Impact",
-      "journey": "My Journey",
-      "spotlight": "Spotlight",
-      "competitive": "Most Active"
+      "community": "Community-Wirkung",
+      "journey": "Mein Weg",
+      "spotlight": "Im Rampenlicht",
+      "competitive": "Aktivste"
     },
     "unable_to_load": "Rangliste konnte nicht geladen werden",
     "try_again": "Erneut versuchen",

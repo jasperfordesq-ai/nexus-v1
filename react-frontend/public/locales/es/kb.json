@@ -29,18 +29,18 @@
   "feedback_thanks": "¡Gracias por tu opinión!",
   "feedback_failed": "Error al enviar la opinión.",
   "error": {
-    "title": "Unable to load",
-    "article_not_found": "Article not found.",
-    "article_title": "Unable to load article"
+    "title": "No se pudo cargar",
+    "article_not_found": "Artículo no encontrado.",
+    "article_title": "No se pudo cargar el artículo"
   },
   "empty": {
-    "title": "No articles found",
-    "search_description": "Try a different search term.",
-    "no_articles": "No knowledge base articles have been published yet."
+    "title": "No se encontraron artículos",
+    "search_description": "Intente con un término de búsqueda diferente.",
+    "no_articles": "Aún no se han publicado artículos en la base de conocimiento."
   },
   "feedback": {
-    "question": "Was this article helpful?",
-    "yes": "Yes ({{count}})",
+    "question": "¿Fue útil este artículo?",
+    "yes": "Sí ({{count}})",
     "no": "No ({{count}})"
   }
 }

@@ -423,16 +423,18 @@
     "aria_send_reply": "Enviar resposta"
   },
   "onboarding": {
-    "reach_label_remote_ok": "Remote OK"
+    "reach_label_remote_ok": "Remoto OK"
   },
   "listings": {},
   "members": {
-    "reach_remote_ok": "Remote OK",
+    "reach_remote_ok": "Remoto OK",
     "aria_search": "Pesquisar membros federados",
     "aria_filter_community": "Filtrar por comunidade parceira",
     "aria_filter_skills": "Filtrar por competências"
   },
-  "events": {},
+  "events": {
+    "online": "Online"
+  },
   "partners": {},
   "partner_detail": {
     "federation_partner_badge": "Parceiro de Federação"

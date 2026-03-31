@@ -14,13 +14,13 @@
     "tab_badges": "Insignias",
     "tab_challenges": "Retos",
     "tab_collections": "Colecciones",
-    "tab_journeys": "Journeys",
-    "tab_engagement": "Engagement",
+    "tab_journeys": "Recorridos",
+    "tab_engagement": "Participación",
     "tab_shop": "Tienda XP",
     "engagement": {
-      "title": "Monthly Engagement",
-      "months_active": "{{count}} of 12 months",
-      "description": "Months where you completed at least one meaningful activity (exchange, listing, review, or volunteer hours)."
+      "title": "Participación mensual",
+      "months_active": "{{count}} de 12 meses",
+      "description": "Meses en los que completó al menos una actividad significativa (intercambio, anuncio, reseña u horas de voluntariado)."
     },
     "filter_by_type": "Filtrar por tipo",
     "filter_badges_aria": "Filtrar insignias por tipo",
@@ -193,13 +193,13 @@
     "page_title": "Clasificación",
     "title": "Clasificación",
     "subtitle": "Mira quién lidera la comunidad",
-    "subtitle_redesign": "See how our community is growing together",
-    "tabs_aria": "Community views",
+    "subtitle_redesign": "Vea cómo nuestra comunidad crece junta",
+    "tabs_aria": "Vistas de la comunidad",
     "tab": {
-      "community": "Community Impact",
-      "journey": "My Journey",
-      "spotlight": "Spotlight",
-      "competitive": "Most Active"
+      "community": "Impacto comunitario",
+      "journey": "Mi recorrido",
+      "spotlight": "Destacados",
+      "competitive": "Más activos"
     },
     "unable_to_load": "No se Pudo Cargar la Clasificación",
     "try_again": "Intentar de Nuevo",

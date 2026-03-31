@@ -240,9 +240,9 @@
     "discussion_factor_3_title": "Effizienz der digitalen Plattform",
     "discussion_factor_3_description": "Die Online-Vermittlungsplattform reduziert den Koordinationsaufwand und ermöglicht es Mitgliedern, Austausche selbstständig zu arrangieren, was die Skalierbarkeit erhöht.",
     "aria": {
-      "activity_statistics": "TBI activity statistics",
-      "sroi_breakdown": "SROI breakdown",
-      "recommendations": "Recommendations"
+      "activity_statistics": "TBI-Aktivitätsstatistiken",
+      "sroi_breakdown": "SROI-Aufschlüsselung",
+      "recommendations": "Empfehlungen"
     },
     "rec_header": "Empfehlung",
     "rec_priority_header": "Priorität",
@@ -370,10 +370,10 @@
     "badge_ongoing": "Laufend",
     "badge_pitch": "Vorstellen",
     "aria": {
-      "pillar_1_initiatives": "Strategic pillar 1 initiatives",
-      "pillar_2_initiatives": "Strategic pillar 2 initiatives",
-      "year_1_roadmap": "Year 1 roadmap",
-      "risk_and_mitigation": "Risk and mitigation"
+      "pillar_1_initiatives": "Initiativen des strategischen Pfeilers 1",
+      "pillar_2_initiatives": "Initiativen des strategischen Pfeilers 2",
+      "year_1_roadmap": "Roadmap für Jahr 1",
+      "risk_and_mitigation": "Risiko und Maßnahmen"
     },
     "risk_header": "Risiko",
     "likelihood_header": "Wahrscheinlichkeit",

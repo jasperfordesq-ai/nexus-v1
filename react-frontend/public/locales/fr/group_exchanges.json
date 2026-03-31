@@ -87,8 +87,8 @@
     "add_as_role": "Ajouter comme {{role}}",
     "no_members_found": "Aucun membre trouvé correspondant à votre recherche.",
     "done": "Terminé",
-    "aria_exchange_participants": "Exchange participants",
-    "aria_hour_split": "Hour split"
+    "aria_exchange_participants": "Participants de l’échange",
+    "aria_hour_split": "Répartition des heures"
   },
   "create": {
     "page_title": "Créer un échange de groupe",
@@ -125,7 +125,7 @@
     "add_participants_desc": "Recherchez des membres et ajoutez-les comme fournisseurs ou bénéficiaires. Vous avez besoin d'au moins 1 fournisseur et 1 bénéficiaire.",
     "providers_count": "Fournisseurs ({{count}})",
     "receivers_count": "Bénéficiaires ({{count}})",
-    "no_participants_yet": "No participants added yet",
+    "no_participants_yet": "Aucun participant ajouté pour le moment",
     "validation_min_participants": "Vous avez besoin d'au moins 1 fournisseur et 1 bénéficiaire pour continuer.",
     "hour_split_preview": "Aperçu de la répartition des heures",
     "hour_split_preview_desc": "Vérifiez comment les heures seront réparties entre les participants.",
@@ -142,7 +142,7 @@
     "weight_placeholder": "Pondération",
     "hours_for": "Heures pour {{name}}",
     "weight_for": "Pondération pour {{name}}",
-    "aria_hour_split_preview": "Hour split preview"
+    "aria_hour_split_preview": "Aperçu de la répartition des heures"
   },
   "toast": {
     "load_more_failed": "Impossible de charger plus d'échanges",

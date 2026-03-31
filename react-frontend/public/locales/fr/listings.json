@@ -55,7 +55,7 @@
     "load_error": "Échec du chargement de l'annonce",
     "update_success": "Annonce mise à jour avec succès",
     "create_success": "Annonce créée avec succès",
-    "aria_remove_image": "Remove image"
+    "aria_remove_image": "Supprimer l’image"
   },
   "page_subtitle": "Parcourez les services et demandes de la communauté",
   "search_placeholder": "Rechercher par titre, description, localisation ou nom...",
@@ -147,8 +147,8 @@
     "aria_add": "Ajouter une étiquette de compétence"
   },
   "aria": {
-    "view_mode": "View mode",
-    "loading_listings": "Loading listings"
+    "view_mode": "Mode d’affichage",
+    "loading_listings": "Chargement des annonces"
   },
   "analytics": {
     "title": "Statistiques de l'annonce",

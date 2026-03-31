@@ -156,10 +156,10 @@
   "hour": "hora",
   "hours": "horas",
   "hours_review": {
-    "approve": "Approve",
-    "decline": "Decline",
-    "approve_aria": "Approve hours for {{name}}",
-    "decline_aria": "Decline hours for {{name}}"
+    "approve": "Aprovar",
+    "decline": "Recusar",
+    "approve_aria": "Aprovar horas para {{name}}",
+    "decline_aria": "Recusar horas para {{name}}"
   },
   "expenses": {
     "heading": "As Minhas Despesas",
@@ -408,15 +408,15 @@
     }
   },
   "aria": {
-    "volunteering_sections": "Volunteering sections"
+    "volunteering_sections": "Secções de voluntariado"
   },
   "credentials": {
-    "aria_remove_file": "Remove selected file",
-    "aria_upload_document": "Upload credential document"
+    "aria_remove_file": "Remover ficheiro selecionado",
+    "aria_upload_document": "Carregar documento de credencial"
   },
   "applications": {
-    "aria_select_all": "Select all visible pending applications",
-    "aria_search_volunteers": "Search volunteers by name"
+    "aria_select_all": "Selecionar todas as candidaturas pendentes visíveis",
+    "aria_search_volunteers": "Pesquisar voluntários por nome"
   },
   "common": {
     "refresh": "Atualizar",

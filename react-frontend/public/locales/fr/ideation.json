@@ -2,11 +2,9 @@
   "page_title": "Defis d'ideation",
   "title": "Defis d'ideation",
   "subtitle": "Partagez des idees, votez et contribuez a faconner votre communaute",
-
   "actions": {
     "retry": "Reessayer"
   },
-
   "tabs": {
     "all": "Tout",
     "open": "Ouvert",
@@ -16,7 +14,6 @@
     "archived": "Archive",
     "favorites": "Mes favoris"
   },
-
   "status": {
     "draft": "Brouillon",
     "open": "Ouvert",
@@ -25,7 +22,6 @@
     "closed": "Ferme",
     "archived": "Archive"
   },
-
   "idea_status": {
     "draft": "Brouillon",
     "submitted": "Soumise",
@@ -33,7 +29,6 @@
     "winner": "Gagnante",
     "withdrawn": "Retiree"
   },
-
   "challenge": {
     "ideas_count": "{{count}} idees",
     "ideas_count_one": "{{count}} idee",
@@ -48,7 +43,6 @@
     "outcome": "Resultat",
     "team_links": "Equipes de projet"
   },
-
   "challenges": {
     "title": "Defis",
     "empty_title": "Aucun defi pour le moment",
@@ -58,7 +52,6 @@
     "load_error": "Impossible de charger les defis",
     "load_more": "Charger plus"
   },
-
   "ideas": {
     "title": "Idees",
     "empty_title": "Aucune idee pour le moment",
@@ -90,14 +83,12 @@
     "draft_created": "Cree le {{date}}",
     "new_idea": "Nouvelle idee"
   },
-
   "idea_detail": {
     "page_title": "Details de l'idee",
     "back_to_challenge": "Retour au defi",
     "submitted_by": "Soumise par {{name}}",
     "submitted_on": "Soumise le {{date}}"
   },
-
   "comments": {
     "title": "Commentaires",
     "empty_title": "Aucun commentaire pour le moment",
@@ -109,7 +100,6 @@
     "load_more": "Charger plus de commentaires",
     "load_error": "Impossible de charger les commentaires"
   },
-
   "form": {
     "title_label": "Titre",
     "title_placeholder": "Entrez un titre clair et descriptif",
@@ -142,18 +132,15 @@
     "updating": "Mise a jour...",
     "cancel": "Annuler"
   },
-
   "create_page": {
     "page_title": "Creer un defi",
     "title": "Creer un defi d'ideation",
     "subtitle": "Publiez un probleme a resoudre pour votre communaute"
   },
-
   "edit_page": {
     "page_title": "Modifier le defi",
     "title": "Modifier le defi d'ideation"
   },
-
   "admin": {
     "change_status": "Changer le statut",
     "set_open": "Ouvrir aux soumissions",
@@ -172,7 +159,6 @@
     "status_updated": "Statut du defi mis a jour",
     "idea_status_updated": "Statut de l'idee mis a jour"
   },
-
   "toast": {
     "challenge_created": "Defi cree avec succes",
     "challenge_updated": "Defi mis a jour avec succes",
@@ -209,7 +195,6 @@
     "template_applied": "Modele applique avec succes",
     "error_generic": "Une erreur s'est produite. Veuillez reessayer."
   },
-
   "favorites": {
     "add": "Ajouter aux favoris",
     "remove": "Retirer des favoris",
@@ -217,18 +202,14 @@
     "empty_title": "Aucun favori pour le moment",
     "empty_description": "Cliquez sur le coeur d'un defi pour l'ajouter a vos favoris."
   },
-
   "views": "vues",
-
   "featured": "En vedette",
-
   "search": {
     "label": "Rechercher des defis",
     "placeholder": "Rechercher des defis par titre ou description...",
     "clear_tags": "Effacer les tags",
     "no_results": "Aucun defi ne correspond a votre recherche"
   },
-
   "tags": {
     "label": "Tags",
     "placeholder": "Ajouter des tags (appuyez sur Entree)",
@@ -237,54 +218,49 @@
     "skills": "Competences requises",
     "general": "Tags generaux"
   },
-
   "cover_image": {
     "label": "URL de l'image de couverture",
     "placeholder": "https://example.com/image.jpg",
     "helper": "Image de banniere pour le defi (recommande 600x400)"
   },
-
   "guidance": {
     "title": "Conseils pour rediger un excellent defi",
     "intro": "Un defi bien formule inspire de meilleures idees. Voici quelques conseils pour creer un enonce de probleme efficace.",
     "tips": {
       "clear_problem": {
-        "title": "\uD83C\uDFAF Definissez un probleme clair",
+        "title": "🎯 Definissez un probleme clair",
         "description": "Enoncez le probleme specifique que vous souhaitez que la communaute traite. Evitez les declarations vagues ou trop generales."
       },
       "scope": {
-        "title": "\uD83D\uDCCF Definissez un cadre realiste",
+        "title": "📏 Definissez un cadre realiste",
         "description": "Definissez des limites et contraintes claires pour que les idees restent focalisees et realisables."
       },
       "criteria": {
-        "title": "\u2696\uFE0F Expliquez les criteres d'evaluation",
+        "title": "⚖️ Expliquez les criteres d'evaluation",
         "description": "Indiquez aux participants comment les idees seront jugees — faisabilite, creativite, impact ou rapport cout-efficacite."
       },
       "engagement": {
-        "title": "\uD83D\uDCA1 Encouragez la participation",
+        "title": "💡 Encouragez la participation",
         "description": "Utilisez un langage accueillant. Ajoutez un prix ou une reconnaissance pour motiver les soumissions."
       }
     },
-    "examples_toggle": "Voir des exemples de bons vs. mauvais defis \u25B8",
+    "examples_toggle": "Voir des exemples de bons vs. mauvais defis ▸",
     "example_good": {
-      "label": "\u2705 Defi solide :",
+      "label": "✅ Defi solide :",
       "text": "Comment pourrions-nous reduire le gaspillage alimentaire dans notre communaute de 25 % au cours de la prochaine annee ? Nous recherchons des idees pratiques et peu couteuses que les entreprises locales et les residents peuvent mettre en oeuvre ensemble."
     },
     "example_weak": {
-      "label": "\u274C Defi faible :",
+      "label": "❌ Defi faible :",
       "text": "Nous avons besoin d'idees sur l'environnement.",
       "why": "Trop vague — pas de probleme specifique, pas de contraintes, pas de criteres de succes."
     }
   },
-
   "duplicate": {
     "button": "Dupliquer le defi",
     "success": "Defi duplique avec succes",
     "error": "Echec de la duplication du defi"
   },
-
   "idea_image": "Image de l'idee",
-
   "media": {
     "title": "Pieces jointes",
     "add": "Ajouter une piece jointe",
@@ -296,13 +272,12 @@
     "caption_placeholder": "Breve description (optionnel)",
     "type_label": "Type",
     "type_image": "Image",
-    "type_video": "Video",
+    "type_video": "Vidéo",
     "type_document": "Document",
     "type_link": "Lien",
     "delete_confirm": "Supprimer cette piece jointe ?",
     "empty": "Aucune piece jointe"
   },
-
   "convert_to_group": {
     "button": "Creer une equipe",
     "title": "Creer une equipe de projet a partir de l'idee",
@@ -318,7 +293,6 @@
     "error": "Echec de la creation de l'equipe",
     "already_converted": "Cette idee a deja ete convertie en equipe"
   },
-
   "campaigns": {
     "title": "Campagnes",
     "page_title": "Campagnes",
@@ -330,7 +304,6 @@
     "link_challenge": "Lier un defi",
     "unlink_challenge": "Delier un defi"
   },
-
   "templates": {
     "title": "Modeles de defis",
     "page_title": "Modeles de defis",
@@ -340,7 +313,6 @@
     "use_template": "Utiliser ce modele",
     "start_from_template": "Partir d'un modele"
   },
-
   "outcomes": {
     "title": "Suivi de l'impact",
     "page_title": "Tableau de bord de l'impact",
@@ -361,7 +333,6 @@
     "implemented_count": "Mis en oeuvre",
     "in_progress_count": "En cours"
   },
-
   "tasks": {
     "title": "Taches",
     "status_label": "Statut",
@@ -382,7 +353,6 @@
     "overdue": "En retard",
     "stats": "Statistiques des taches"
   },
-
   "documents": {
     "title": "Documents",
     "upload": "Televerser un document",
@@ -391,11 +361,10 @@
     "delete_confirm": "Supprimer ce document ?",
     "max_size": "Taille max. du fichier : 10 Mo"
   },
-
   "chatrooms": {
     "title": "Canaux",
     "create": "Creer un canal",
-    "general": "General",
+    "general": "Général",
     "empty_title": "Aucun message pour le moment",
     "empty_description": "Lancez la conversation !",
     "message_placeholder": "Ecrivez un message...",
@@ -403,9 +372,8 @@
     "delete_channel": "Supprimer le canal",
     "delete_channel_confirm": "Supprimer ce canal et tous ses messages ?"
   },
-
   "categories": {
-    "title": "Categories",
+    "title": "Catégories",
     "manage": "Gerer les categories",
     "all": "Toutes les categories",
     "create": "Ajouter une categorie",
@@ -416,7 +384,6 @@
     "color_label": "Couleur",
     "delete_confirm": "Supprimer cette categorie ?"
   },
-
   "validation": {
     "title_required": "Le titre est requis",
     "description_required": "La description est requise",

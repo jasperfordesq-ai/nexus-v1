@@ -55,7 +55,7 @@
     "load_error": "Impossibile caricare l'annuncio",
     "update_success": "Annuncio aggiornato con successo",
     "create_success": "Annuncio creato con successo",
-    "aria_remove_image": "Remove image"
+    "aria_remove_image": "Rimuovi immagine"
   },
   "page_subtitle": "Sfoglia i servizi e le richieste della comunità",
   "search_placeholder": "Cerca per titolo, descrizione, località o nome...",
@@ -147,8 +147,8 @@
     "aria_add": "Aggiungi tag competenza"
   },
   "aria": {
-    "view_mode": "View mode",
-    "loading_listings": "Loading listings"
+    "view_mode": "Modalità di visualizzazione",
+    "loading_listings": "Caricamento annunci"
   },
   "analytics": {
     "title": "Analisi Annuncio",

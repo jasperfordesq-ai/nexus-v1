@@ -97,7 +97,7 @@
   "withdraw_success": "Bewerbung zurückgezogen.",
   "withdraw_failed": "Failed to withdraw application.",
   "hours_logged_success": "Stunden erfolgreich erfasst!",
-  "hours_log_failed": "Failed to log hours. Please try again.",
+  "hours_log_failed": "Stunden konnten nicht erfasst werden. Bitte versuchen Sie es erneut.",
   "organisers_note": "Hinweis des Organisators:",
   "date_range_sr": "Möglichkeitszeitraum",
   "loading": "Wird geladen...",
@@ -156,10 +156,10 @@
   "hour": "Stunde",
   "hours": "Stunden",
   "hours_review": {
-    "approve": "Approve",
-    "decline": "Decline",
-    "approve_aria": "Approve hours for {{name}}",
-    "decline_aria": "Decline hours for {{name}}"
+    "approve": "Genehmigen",
+    "decline": "Ablehnen",
+    "approve_aria": "Stunden für {{name}} genehmigen",
+    "decline_aria": "Stunden für {{name}} ablehnen"
   },
   "expenses": {
     "heading": "Meine Ausgaben",
@@ -228,7 +228,7 @@
     "propose_button": "Vorschlagen",
     "title_required": "Titel und Beschreibung sind erforderlich.",
     "propose_success": "Projekt erfolgreich vorgeschlagen!",
-    "propose_error": "Failed to propose project.",
+    "propose_error": "Projekt konnte nicht vorgeschlagen werden.",
     "status": {
       "proposed": "Vorgeschlagen",
       "under_review": "In Überprüfung",
@@ -310,7 +310,7 @@
     "payment_unexpected": "Unerwarteter Zahlungsstatus. Bitte kontaktieren Sie den Support.",
     "payment_error": "Bei der Zahlung ist ein Fehler aufgetreten.",
     "receipt_title": "Spendenbeleg",
-    "receipt_ref": "Ref: {{ref}}",
+    "receipt_ref": "Ref.: {{ref}}",
     "receipt_donor": "Spender",
     "receipt_date": "Datum",
     "receipt_community": "Gemeinschaft",
@@ -408,15 +408,15 @@
     }
   },
   "aria": {
-    "volunteering_sections": "Volunteering sections"
+    "volunteering_sections": "Freiwilligenarbeit-Bereiche"
   },
   "credentials": {
-    "aria_remove_file": "Remove selected file",
-    "aria_upload_document": "Upload credential document"
+    "aria_remove_file": "Ausgewählte Datei entfernen",
+    "aria_upload_document": "Nachweis-Dokument hochladen"
   },
   "applications": {
-    "aria_select_all": "Select all visible pending applications",
-    "aria_search_volunteers": "Search volunteers by name"
+    "aria_select_all": "Alle sichtbaren ausstehenden Bewerbungen auswählen",
+    "aria_search_volunteers": "Freiwillige nach Name suchen"
   },
   "common": {
     "refresh": "Aktualisieren",

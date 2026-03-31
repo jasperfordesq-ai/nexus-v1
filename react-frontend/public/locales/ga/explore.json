@@ -32,7 +32,7 @@
   "top_contributors": {
     "title": "Barrannpháirtithe",
     "subtitle": "Ceannairí pobail de réir taithí",
-    "level": "Lv.{{level}}"
+    "level": "Lbh.{{level}}"
   },
   "trending_hashtags": {
     "title": "Haischlibeanna Treochtúla",
@@ -118,7 +118,7 @@
     "deadline": "Spriocdháta: {{date}}"
   },
   "aria": {
-    "content_tabs": "Explore content tabs"
+    "content_tabs": "Cluaisíní ábhair Aimsigh"
   },
   "tabs": {
     "all": "Gach rud",

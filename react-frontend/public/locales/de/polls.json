@@ -67,14 +67,14 @@
   "try_again": "Erneut versuchen",
   "collapse": "Einklappen",
   "expand": "Umfrage erstellen",
-  "poll_type": "Poll Type",
-  "poll_type_standard": "Standard (pick one)",
-  "poll_type_ranked": "Ranked Choice (order preferences)",
-  "category_label": "Category (optional)",
-  "category_placeholder": "e.g. Community, Events, Feedback",
-  "anonymous_voting": "Anonymous Voting",
-  "anonymous_voting_desc": "Hide voter identities in results",
+  "poll_type": "Umfragetyp",
+  "poll_type_standard": "Standard (eine Auswahl)",
+  "poll_type_ranked": "Rangwahl (Präferenzen ordnen)",
+  "category_label": "Kategorie (optional)",
+  "category_placeholder": "z. B. Community, Veranstaltungen, Feedback",
+  "anonymous_voting": "Anonyme Abstimmung",
+  "anonymous_voting_desc": "Wähleridentitäten in Ergebnissen verbergen",
   "aria": {
-    "export_csv": "Export results as CSV"
+    "export_csv": "Ergebnisse als CSV exportieren"
   }
 }

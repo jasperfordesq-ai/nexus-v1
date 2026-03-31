@@ -55,7 +55,7 @@
     "load_error": "Falha ao carregar anúncio",
     "update_success": "Anúncio atualizado com sucesso",
     "create_success": "Anúncio criado com sucesso",
-    "aria_remove_image": "Remove image"
+    "aria_remove_image": "Remover imagem"
   },
   "page_subtitle": "Explore serviços e pedidos da comunidade",
   "search_placeholder": "Pesquisar por título, descrição, localização ou nome...",
@@ -147,8 +147,8 @@
     "aria_add": "Adicionar etiqueta de competência"
   },
   "aria": {
-    "view_mode": "View mode",
-    "loading_listings": "Loading listings"
+    "view_mode": "Modo de visualização",
+    "loading_listings": "A carregar anúncios"
   },
   "analytics": {
     "title": "Análise do Anúncio",

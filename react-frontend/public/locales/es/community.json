@@ -245,7 +245,7 @@
     "add_member_heading": "Añadir Miembro al Grupo",
     "add_member_desc": "Introduzca la dirección de correo electrónico de la persona que desea añadir a esta reserva de grupo. Recibirá una notificación.",
     "email_label": "Dirección de Correo Electrónico",
-    "email_placeholder": "member@example.com",
+    "email_placeholder": "miembro@ejemplo.com",
     "cancel": "Cancelar",
     "add_member_failed": "No se pudo añadir al miembro. Es posible que ya esté en el grupo o que el correo electrónico no sea válido.",
     "add_member_error": "No se pudo añadir al miembro. Por favor, compruebe el correo electrónico e inténtelo de nuevo."

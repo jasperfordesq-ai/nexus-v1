@@ -1,5 +1,5 @@
 {
-  "title": "Mission Control",
+  "title": "Centre de commande",
   "subtitle": "Vue d'ensemble en temps réel et centre de commande de la plateforme",
   "tour_btn": "Visite guidée",
   "refresh": "Actualiser",
@@ -10,7 +10,7 @@
     "back": "Retour",
     "next": "Suivant"
   },
-  "load_error": "Failed to load dashboard data",
+  "load_error": "Impossible de charger les données du tableau de bord",
   "stats": {
     "users_online": "Utilisateurs en ligne",
     "active_sessions": "Sessions actives",
@@ -19,19 +19,19 @@
     "transactions": "Transactions",
     "hours_exchanged": "Heures échangées",
     "hours": "Heures",
-    "new_users_this_month": "New Users This Month",
-    "active_users": "Active Users",
-    "total_listings": "Total Listings",
-    "new_listings_this_month": "New Listings This Month"
+    "new_users_this_month": "Nouveaux utilisateurs ce mois-ci",
+    "active_users": "Utilisateurs actifs",
+    "total_listings": "Total des annonces",
+    "new_listings_this_month": "Nouvelles annonces ce mois-ci"
   },
   "trends": {
-    "card_title": "Transaction Trends",
-    "hours_suffix": "hrs",
-    "no_data": "No trend data available"
+    "card_title": "Tendances des transactions",
+    "hours_suffix": "h",
+    "no_data": "Aucune donnée de tendance disponible"
   },
   "alerts": {
-    "pending_approvals": "Members awaiting approval",
-    "pending_listings": "Listings awaiting moderation",
+    "pending_approvals": "Membres en attente d’approbation",
+    "pending_listings": "Annonces en attente de modération",
     "users_pending_one": "{{count}} utilisateur en attente",
     "users_pending_other": "{{count}} utilisateurs en attente",
     "users_pending_text": "De nouvelles inscriptions de membres nécessitent votre examen",
@@ -59,7 +59,7 @@
     "group_locations_desc": "Délimitations géographiques",
     "group_ranking": "Classement des groupes",
     "group_ranking_desc": "Groupes mis en avant de manière intelligente",
-    "ai_assistant": "AI Assistant",
+    "ai_assistant": "Assistant IA",
     "ai_assistant_desc": "Configurer les fournisseurs d'IA",
     "smart_matching": "Correspondance intelligente",
     "smart_matching_desc": "Recommandations propulsées par l'IA",
@@ -67,13 +67,13 @@
     "feed_algorithm_desc": "Configuration EdgeRank",
     "algorithm_settings": "Paramètres d'algorithme",
     "algorithm_settings_desc": "MatchRank & CommunityRank",
-    "timebanking": "Timebanking",
+    "timebanking": "Banque de temps",
     "timebanking_desc": "Analytiques et portefeuilles d'organisations",
-    "seo": "SEO Manager",
+    "seo": "Gestionnaire SEO",
     "seo_desc": "Optimisation pour les moteurs de recherche",
     "error_tracking": "Suivi des erreurs 404",
     "error_tracking_desc": "Surveiller les liens brisés",
-    "cron_jobs": "Cron Jobs",
+    "cron_jobs": "Tâches planifiées",
     "cron_jobs_desc": "Tâches planifiées"
   },
   "activity": {
@@ -94,10 +94,10 @@
     "view_listings": "Voir les annonces",
     "send_newsletter": "Envoyer une newsletter",
     "new_blog_post": "Nouvel article de Blog",
-    "gamification": "Gamification",
+    "gamification": "Ludification",
     "settings": "Paramètres",
-    "enterprise": "Enterprise",
-    "advanced_controls": "Advanced Controls"
+    "enterprise": "Entreprise",
+    "advanced_controls": "Contrôles avancés"
   },
   "enterprise": {
     "card_title": "Suite Enterprise",
@@ -112,7 +112,7 @@
     "details": "Détails",
     "database": "Base de données",
     "cache": "Cache",
-    "queue": "Cron Jobs",
+    "queue": "Tâches planifiées",
     "api": "API e-mail"
   }
 }

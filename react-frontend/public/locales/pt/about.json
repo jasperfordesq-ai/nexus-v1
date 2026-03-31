@@ -240,9 +240,9 @@
     "discussion_factor_3_title": "Eficiência da Plataforma Digital",
     "discussion_factor_3_description": "A plataforma de correspondência online reduz a sobrecarga de coordenação e permite que os membros organizem trocas de forma independente, aumentando a escalabilidade.",
     "aria": {
-      "activity_statistics": "TBI activity statistics",
-      "sroi_breakdown": "SROI breakdown",
-      "recommendations": "Recommendations"
+      "activity_statistics": "Estatísticas de atividade TBI",
+      "sroi_breakdown": "Detalhe do SROI",
+      "recommendations": "Recomendações"
     },
     "rec_header": "Recomendação",
     "rec_priority_header": "Prioridade",
@@ -370,10 +370,10 @@
     "badge_ongoing": "Contínuo",
     "badge_pitch": "Apresentar",
     "aria": {
-      "pillar_1_initiatives": "Strategic pillar 1 initiatives",
-      "pillar_2_initiatives": "Strategic pillar 2 initiatives",
-      "year_1_roadmap": "Year 1 roadmap",
-      "risk_and_mitigation": "Risk and mitigation"
+      "pillar_1_initiatives": "Iniciativas do pilar estratégico 1",
+      "pillar_2_initiatives": "Iniciativas do pilar estratégico 2",
+      "year_1_roadmap": "Roteiro do primeiro ano",
+      "risk_and_mitigation": "Risco e mitigação"
     },
     "risk_header": "Risco",
     "likelihood_header": "Probabilidade",

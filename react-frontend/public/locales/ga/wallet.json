@@ -65,8 +65,8 @@
   "error": {
     "load_balance": "Theip ar luchtú iarmhéid an sparáin",
     "load_wallet": "Theip ar luchtú sonraí an sparáin. Bain triail eile as le do thoil.",
-    "session_expired": "Your session has expired. Please log in again.",
-    "load_community_fund": "Could not load community fund"
+    "session_expired": "T\u00e1 do sheisi\u00fan imithe in \u00e9ag. Log\u00e1il isteach ar\u00eds le do thoil.",
+    "load_community_fund": "N\u00edorbh fh\u00e9idir an ciste pobail a lucht\u00fa"
   },
   "no_members_found": "Níor aimsíodh comhaltaí",
   "donate": "Tabhair",
@@ -117,9 +117,9 @@
     "submit": "Seol Rátáil"
   },
   "aria": {
-    "export_csv": "Export transactions to CSV",
-    "loading_transactions": "Loading transactions",
-    "transaction_detail": "{{direction}} {{amount}} hours {{name}}"
+    "export_csv": "Easp\u00f3rt\u00e1il idirbhearta go CSV",
+    "loading_transactions": "Idirbhearta \u00e1 lucht\u00fa",
+    "transaction_detail": "{{direction}} {{amount}} uair {{name}}"
   },
   "available_balance": "Iarmhéid ar Fáil",
   "recipient": "Faighteoir",

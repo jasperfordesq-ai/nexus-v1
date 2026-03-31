@@ -114,9 +114,9 @@
     "target": "Verschieben nach",
     "add": "Regel hinzufügen",
     "delete": "Löschen",
-    "action_move_stage": "Move stage",
-    "action_auto_reject": "Auto-reject",
-    "action_notify_me": "Notify me"
+    "action_move_stage": "Phase verschieben",
+    "action_auto_reject": "Automatisch ablehnen",
+    "action_notify_me": "Benachrichtigen"
   },
   "employer": {
     "page_title": "Arbeitgeberprofil",
@@ -210,7 +210,7 @@
   },
   "salary": {
     "label": "Vergütung",
-    "range": "{{min}} - {{max}}",
+    "range": "{{min}} – {{max}}",
     "min_only": "Ab {{min}}",
     "max_only": "Bis zu {{max}}",
     "negotiable": "Verhandelbar",
@@ -823,7 +823,7 @@
     "first_time_banner": "Erstes Mal posten?",
     "first_time_desc": "Unser Onboarding-Assistent führt Sie durch das Erstellen Ihrer ersten Stellenanzeige.",
     "start_wizard": "Assistent starten",
-    "aria_progress": "Onboarding progress"
+    "aria_progress": "Onboarding-Fortschritt"
   },
   "preview": {
     "title": "Stellen-Vorschau",
@@ -885,7 +885,7 @@
     "jobs": "Stellen"
   },
   "aria": {
-    "qualification_percentage": "Qualification percentage"
+    "qualification_percentage": "Qualifikationsprozentsatz"
   },
   "deadline_countdown_one": "Schließt in {{count}} Tag",
   "deadline_countdown_other": "Schließt in {{count}} Tagen"

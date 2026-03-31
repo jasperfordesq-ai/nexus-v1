@@ -240,9 +240,9 @@
     "discussion_factor_3_title": "Efficacité de la plateforme numérique",
     "discussion_factor_3_description": "La plateforme de mise en relation en ligne réduit les coûts de coordination et permet aux membres d'organiser les échanges de manière autonome, augmentant l'évolutivité.",
     "aria": {
-      "activity_statistics": "TBI activity statistics",
-      "sroi_breakdown": "SROI breakdown",
-      "recommendations": "Recommendations"
+      "activity_statistics": "Statistiques d’activité TBI",
+      "sroi_breakdown": "Détail du SROI",
+      "recommendations": "Recommandations"
     },
     "rec_header": "Recommandation",
     "rec_priority_header": "Priorité",
@@ -370,10 +370,10 @@
     "badge_ongoing": "En cours",
     "badge_pitch": "Présenter",
     "aria": {
-      "pillar_1_initiatives": "Strategic pillar 1 initiatives",
-      "pillar_2_initiatives": "Strategic pillar 2 initiatives",
-      "year_1_roadmap": "Year 1 roadmap",
-      "risk_and_mitigation": "Risk and mitigation"
+      "pillar_1_initiatives": "Initiatives du pilier stratégique 1",
+      "pillar_2_initiatives": "Initiatives du pilier stratégique 2",
+      "year_1_roadmap": "Feuille de route de l’année 1",
+      "risk_and_mitigation": "Risques et mesures d’atténuation"
     },
     "risk_header": "Risque",
     "likelihood_header": "Probabilité",

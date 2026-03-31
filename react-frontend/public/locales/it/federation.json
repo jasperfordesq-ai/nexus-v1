@@ -423,7 +423,8 @@
     "aria_send_reply": "Invia risposta"
   },
   "onboarding": {
-    "reach_label_remote_ok": "Da remoto OK"
+    "reach_label_remote_ok": "Da remoto OK",
+    "step_privacy": "Privacy"
   },
   "listings": {},
   "members": {
@@ -432,7 +433,9 @@
     "aria_filter_community": "Filtra per comunità partner",
     "aria_filter_skills": "Filtra per competenze"
   },
-  "events": {},
+  "events": {
+    "online": "Online"
+  },
   "partners": {},
   "partner_detail": {
     "federation_partner_badge": "Partner della Federazione"

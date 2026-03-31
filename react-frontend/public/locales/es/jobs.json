@@ -114,9 +114,9 @@
     "target": "Mover a",
     "add": "Añadir Regla",
     "delete": "Eliminar",
-    "action_move_stage": "Move stage",
-    "action_auto_reject": "Auto-reject",
-    "action_notify_me": "Notify me"
+    "action_move_stage": "Mover etapa",
+    "action_auto_reject": "Rechazo automático",
+    "action_notify_me": "Notificarme"
   },
   "employer": {
     "page_title": "Perfil del Empleador",
@@ -823,7 +823,7 @@
     "first_time_banner": "¿Primera vez publicando?",
     "first_time_desc": "Nuestro asistente de incorporación te guiará para publicar tu primer empleo.",
     "start_wizard": "Iniciar Asistente",
-    "aria_progress": "Onboarding progress"
+    "aria_progress": "Progreso de incorporación"
   },
   "preview": {
     "title": "Vista Previa del Empleo",
@@ -885,7 +885,7 @@
     "jobs": "Empleos"
   },
   "aria": {
-    "qualification_percentage": "Qualification percentage"
+    "qualification_percentage": "Porcentaje de calificación"
   },
   "deadline_countdown_one": "Cierra en {{count}} día",
   "deadline_countdown_other": "Cierra en {{count}} días"

@@ -5,8 +5,8 @@
   },
   "page_title": "Aktivitäts-Dashboard",
   "page_subtitle": "Ihre Gemeinschaftsbeteiligung auf einen Blick.",
-  "error_load_failed": "Failed to load activity dashboard",
-  "error_load_failed_detail": "Failed to load your activity data. Please try again.",
+  "error_load_failed": "Aktivitäts-Dashboard konnte nicht geladen werden",
+  "error_load_failed_detail": "Ihre Aktivitätsdaten konnten nicht geladen werden. Bitte versuchen Sie es erneut.",
   "unable_to_load": "Laden nicht möglich",
   "try_again": "Erneut versuchen",
   "stats": {

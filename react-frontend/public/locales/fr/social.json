@@ -56,7 +56,7 @@
     "set_custom_desc": "Définir un message de statut personnalisé",
     "set_custom_title": "Définir un statut personnalisé",
     "clear_custom": "Effacer le statut personnalisé",
-    "emoji_label": "Emoji",
+    "emoji_label": "Émoji",
     "status_label": "Statut",
     "status_placeholder": "En réunion",
     "char_count": "{{current}}/80 caractères"
@@ -68,7 +68,7 @@
     "aria_endorse": "Recommander {{skillName}}",
     "endorsed": "Recommandé",
     "endorse": "Recommander",
-    "endorse_failed": "Failed to endorse",
-    "remove_failed": "Failed to remove endorsement"
+    "endorse_failed": "Impossible de recommander",
+    "remove_failed": "Impossible de retirer la recommandation"
   }
 }

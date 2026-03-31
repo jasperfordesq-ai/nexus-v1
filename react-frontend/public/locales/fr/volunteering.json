@@ -156,10 +156,10 @@
   "hour": "heure",
   "hours": "heures",
   "hours_review": {
-    "approve": "Approve",
-    "decline": "Decline",
-    "approve_aria": "Approve hours for {{name}}",
-    "decline_aria": "Decline hours for {{name}}"
+    "approve": "Approuver",
+    "decline": "Refuser",
+    "approve_aria": "Approuver les heures de {{name}}",
+    "decline_aria": "Refuser les heures de {{name}}"
   },
   "expenses": {
     "heading": "Mes dépenses",
@@ -268,7 +268,7 @@
     "payment_methods": {
       "card": "carte",
       "bank_transfer": "virement bancaire",
-      "paypal": "paypal"
+      "paypal": "PayPal"
     },
     "status": {
       "completed": "Terminé",
@@ -282,7 +282,7 @@
       "active_campaigns": "Campagnes actives"
     },
     "day_status": {
-      "active": "Active",
+      "active": "Actif",
       "upcoming": "À venir",
       "ended": "Terminée"
     },
@@ -408,15 +408,15 @@
     }
   },
   "aria": {
-    "volunteering_sections": "Volunteering sections"
+    "volunteering_sections": "Sections de bénévolat"
   },
   "credentials": {
-    "aria_remove_file": "Remove selected file",
-    "aria_upload_document": "Upload credential document"
+    "aria_remove_file": "Supprimer le fichier sélectionné",
+    "aria_upload_document": "Télécharger un document de certification"
   },
   "applications": {
-    "aria_select_all": "Select all visible pending applications",
-    "aria_search_volunteers": "Search volunteers by name"
+    "aria_select_all": "Sélectionner toutes les candidatures en attente visibles",
+    "aria_search_volunteers": "Rechercher des bénévoles par nom"
   },
   "common": {
     "refresh": "Actualiser",

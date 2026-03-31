@@ -274,7 +274,7 @@
     "type_image": "Immagine",
     "type_video": "Video",
     "type_document": "Documento",
-    "type_link": "Link",
+    "type_link": "Collegamento",
     "delete_confirm": "Rimuovere questo allegato?",
     "empty": "Nessun allegato"
   },

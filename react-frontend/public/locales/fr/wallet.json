@@ -65,8 +65,8 @@
   "error": {
     "load_balance": "Impossible de charger le solde du portefeuille",
     "load_wallet": "Impossible de charger les données du portefeuille. Veuillez réessayer.",
-    "session_expired": "Your session has expired. Please log in again.",
-    "load_community_fund": "Could not load community fund"
+    "session_expired": "Votre session a expiré. Veuillez vous reconnecter.",
+    "load_community_fund": "Impossible de charger le fonds communautaire"
   },
   "no_members_found": "Aucun membre trouvé",
   "donate": "Faire un don",
@@ -117,9 +117,9 @@
     "submit": "Soumettre l'évaluation"
   },
   "aria": {
-    "export_csv": "Export transactions to CSV",
-    "loading_transactions": "Loading transactions",
-    "transaction_detail": "{{direction}} {{amount}} hours {{name}}"
+    "export_csv": "Exporter les transactions en CSV",
+    "loading_transactions": "Chargement des transactions",
+    "transaction_detail": "{{direction}} {{amount}} heures {{name}}"
   },
   "available_balance": "Solde disponible",
   "recipient": "Destinataire",

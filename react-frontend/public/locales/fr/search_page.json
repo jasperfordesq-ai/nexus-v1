@@ -66,6 +66,6 @@
   "delete": "Supprimer",
   "delete_saved_search": "Supprimer la recherche enregistrée",
   "aria": {
-    "loading_search_results": "Loading search results"
+    "loading_search_results": "Chargement des résultats de recherche"
   }
 }

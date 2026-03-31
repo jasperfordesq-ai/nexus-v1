@@ -156,10 +156,10 @@
   "hour": "uair",
   "hours": "uaireanta",
   "hours_review": {
-    "approve": "Approve",
-    "decline": "Decline",
-    "approve_aria": "Approve hours for {{name}}",
-    "decline_aria": "Decline hours for {{name}}"
+    "approve": "Ceadaigh",
+    "decline": "Di\u00faltaigh",
+    "approve_aria": "Ceadaigh uaireanta do {{name}}",
+    "decline_aria": "Di\u00faltaigh uaireanta do {{name}}"
   },
   "expenses": {
     "heading": "Mo Chostais",
@@ -408,15 +408,15 @@
     }
   },
   "aria": {
-    "volunteering_sections": "Volunteering sections"
+    "volunteering_sections": "Rann\u00f3ga oibre deonaí"
   },
   "credentials": {
-    "aria_remove_file": "Remove selected file",
-    "aria_upload_document": "Upload credential document"
+    "aria_remove_file": "Bain an comhad roghnaithe",
+    "aria_upload_document": "Uasl\u00f3d\u00e1il doicim\u00e9ad dintiúir"
   },
   "applications": {
-    "aria_select_all": "Select all visible pending applications",
-    "aria_search_volunteers": "Search volunteers by name"
+    "aria_select_all": "Roghnaigh gach iarratas ar feitheamh infheicthe",
+    "aria_search_volunteers": "Cuardaigh oibr\u00ed deonacha de r\u00e9ir ainm"
   },
   "common": {
     "refresh": "Athnuaigh",

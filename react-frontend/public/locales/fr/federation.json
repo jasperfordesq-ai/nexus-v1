@@ -416,55 +416,71 @@
   "partner_detail.federation_partner_badge": "Federation Partner",
   "hub": {},
   "messages": {
-    "aria_back_to_list": "Back to message list",
-    "aria_read": "Read",
-    "aria_delivered": "Delivered",
-    "aria_reply": "Reply message",
-    "aria_send_reply": "Send reply"
+    "aria_back_to_list": "Retour à la liste des messages",
+    "aria_read": "Lu",
+    "aria_delivered": "Remis",
+    "aria_reply": "Répondre au message",
+    "aria_send_reply": "Envoyer la réponse",
+    "breadcrumb_messages": "Messages",
+    "message_label": "Message"
   },
   "onboarding": {
-    "reach_label_remote_ok": "Remote OK"
+    "reach_label_remote_ok": "À distance accepté",
+    "step_communication": "Communication",
+    "summary_communication": "Communication",
+    "summary_transactions": "Transactions"
   },
   "listings": {},
   "members": {
-    "reach_remote_ok": "Remote OK",
-    "aria_search": "Search federated members",
-    "aria_filter_community": "Filter by partner community",
-    "aria_filter_skills": "Filter by skills"
+    "reach_remote_ok": "À distance accepté",
+    "aria_search": "Rechercher des membres fédérés",
+    "aria_filter_community": "Filtrer par communauté partenaire",
+    "aria_filter_skills": "Filtrer par compétences"
   },
-  "events": {},
-  "partners": {},
+  "events": {
+    "breadcrumb_federation": "Fédération"
+  },
+  "partners": {
+    "breadcrumb_federation": "Fédération"
+  },
   "partner_detail": {
-    "federation_partner_badge": "Federation Partner"
+    "federation_partner_badge": "Partenaire de fédération",
+    "breadcrumb_federation": "Fédération"
   },
-  "member_profile": {},
-  "settings": {},
+  "member_profile": {
+    "breadcrumb_federation": "Fédération"
+  },
+  "settings": {
+    "breadcrumb_federation": "Fédération",
+    "federation_toggled_title": "Fédération {{action}}",
+    "communication": "Communication"
+  },
   "connections": {
-    "page_title": "Connections",
-    "breadcrumb_federation": "Federation",
-    "breadcrumb_connections": "Connections",
-    "title": "Federation Connections",
-    "subtitle": "Manage your cross-community connections",
-    "tab_connected": "Connected",
-    "tab_received": "Received",
-    "tab_sent": "Sent",
-    "loading": "Loading connections...",
-    "empty_connected": "No connections yet",
-    "empty_received": "No pending requests",
-    "empty_sent": "No sent requests",
-    "empty_connected_desc": "Connect with members from partner communities to grow your network.",
-    "empty_received_desc": "When someone sends you a connection request, it will appear here.",
-    "empty_sent_desc": "Connection requests you send will appear here.",
-    "browse_members": "Browse Federation Members",
-    "unknown_member": "Federation Member",
+    "page_title": "Connexions",
+    "breadcrumb_federation": "Fédération",
+    "breadcrumb_connections": "Connexions",
+    "title": "Connexions de fédération",
+    "subtitle": "Gérez vos connexions inter-communautaires",
+    "tab_connected": "Connectés",
+    "tab_received": "Reçus",
+    "tab_sent": "Envoyés",
+    "loading": "Chargement des connexions...",
+    "empty_connected": "Aucune connexion pour le moment",
+    "empty_received": "Aucune demande en attente",
+    "empty_sent": "Aucune demande envoyée",
+    "empty_connected_desc": "Connectez-vous avec des membres de communautés partenaires pour élargir votre réseau.",
+    "empty_received_desc": "Lorsqu’une personne vous envoie une demande de connexion, elle apparaîtra ici.",
+    "empty_sent_desc": "Les demandes de connexion que vous envoyez apparaîtront ici.",
+    "browse_members": "Parcourir les membres de la fédération",
+    "unknown_member": "Membre de la fédération",
     "message": "Message",
-    "remove": "Remove connection",
-    "accept": "Accept",
-    "decline": "Decline",
-    "pending": "Pending",
-    "accepted_success": "Connection accepted!",
-    "rejected_success": "Connection request declined",
-    "removed_success": "Connection removed",
-    "action_failed": "Action failed"
+    "remove": "Supprimer la connexion",
+    "accept": "Accepter",
+    "decline": "Refuser",
+    "pending": "En attente",
+    "accepted_success": "Connexion acceptée !",
+    "rejected_success": "Demande de connexion refusée",
+    "removed_success": "Connexion supprimée",
+    "action_failed": "L’action a échoué"
   }
 }

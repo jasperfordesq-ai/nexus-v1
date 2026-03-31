@@ -240,9 +240,9 @@
     "discussion_factor_3_title": "Éifeachtúlacht an Ardáin Dhigitigh",
     "discussion_factor_3_description": "Laghdaíonn an t-ardán meaitseála ar líne forchostas comhordúcháin agus cuireann ar chumas ball malartuithe a shocrú go neamhspleách, ag méadú inscálaitheachta.",
     "aria": {
-      "activity_statistics": "TBI activity statistics",
-      "sroi_breakdown": "SROI breakdown",
-      "recommendations": "Recommendations"
+      "activity_statistics": "Staitistic\u00ed gn\u00edomha\u00edochta TBI",
+      "sroi_breakdown": "Miondeal\u00fa SROI",
+      "recommendations": "Molta\u00ed"
     },
     "rec_header": "Moladh",
     "rec_priority_header": "Tosaíocht",
@@ -370,10 +370,10 @@
     "badge_ongoing": "Leanúnach",
     "badge_pitch": "Cur i Láthair",
     "aria": {
-      "pillar_1_initiatives": "Strategic pillar 1 initiatives",
-      "pillar_2_initiatives": "Strategic pillar 2 initiatives",
-      "year_1_roadmap": "Year 1 roadmap",
-      "risk_and_mitigation": "Risk and mitigation"
+      "pillar_1_initiatives": "Tionscnaimh cholún straitéiseach 1",
+      "pillar_2_initiatives": "Tionscnaimh cholún straitéiseach 2",
+      "year_1_roadmap": "Treochlár bhliain 1",
+      "risk_and_mitigation": "Riosca agus maolú"
     },
     "risk_header": "Riosca",
     "likelihood_header": "Dóchúlacht",

@@ -240,9 +240,9 @@
     "discussion_factor_3_title": "Eficiencia de la Plataforma Digital",
     "discussion_factor_3_description": "La plataforma de emparejamiento en línea reduce la carga de coordinación y permite a los miembros organizar intercambios de forma independiente, aumentando la escalabilidad.",
     "aria": {
-      "activity_statistics": "TBI activity statistics",
-      "sroi_breakdown": "SROI breakdown",
-      "recommendations": "Recommendations"
+      "activity_statistics": "Estadísticas de actividad de TBI",
+      "sroi_breakdown": "Desglose de SROI",
+      "recommendations": "Recomendaciones"
     },
     "rec_header": "Recomendación",
     "rec_priority_header": "Prioridad",
@@ -370,10 +370,10 @@
     "badge_ongoing": "En curso",
     "badge_pitch": "Presentar",
     "aria": {
-      "pillar_1_initiatives": "Strategic pillar 1 initiatives",
-      "pillar_2_initiatives": "Strategic pillar 2 initiatives",
-      "year_1_roadmap": "Year 1 roadmap",
-      "risk_and_mitigation": "Risk and mitigation"
+      "pillar_1_initiatives": "Iniciativas del pilar estratégico 1",
+      "pillar_2_initiatives": "Iniciativas del pilar estratégico 2",
+      "year_1_roadmap": "Hoja de ruta del año 1",
+      "risk_and_mitigation": "Riesgos y mitigación"
     },
     "risk_header": "Riesgo",
     "likelihood_header": "Probabilidad",

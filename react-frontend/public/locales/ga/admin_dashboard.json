@@ -10,7 +10,7 @@
     "back": "Ar ais",
     "next": "Ar aghaidh"
   },
-  "load_error": "Failed to load dashboard data",
+  "load_error": "Theip ar shonra\u00ed an phain\u00e9il a lucht\u00fa",
   "stats": {
     "users_online": "Úsáideoirí ar Líne",
     "active_sessions": "Seisiúin Ghníomhacha",
@@ -19,19 +19,19 @@
     "transactions": "Idirbhearta",
     "hours_exchanged": "Uaireanta Malartaithe",
     "hours": "Uaireanta",
-    "new_users_this_month": "New Users This Month",
-    "active_users": "Active Users",
-    "total_listings": "Total Listings",
-    "new_listings_this_month": "New Listings This Month"
+    "new_users_this_month": "\u00das\u00e1ideoir\u00ed Nua an Mh\u00ed Seo",
+    "active_users": "\u00das\u00e1ideoir\u00ed Gn\u00edomhacha",
+    "total_listings": "Liosta\u00ed Ioml\u00e1na",
+    "new_listings_this_month": "Liosta\u00ed Nua an Mh\u00ed Seo"
   },
   "trends": {
-    "card_title": "Transaction Trends",
-    "hours_suffix": "hrs",
-    "no_data": "No trend data available"
+    "card_title": "Treochtai Idirbheart",
+    "hours_suffix": "u",
+    "no_data": "N\u00edl sonra\u00ed treochtai ar f\u00e1il"
   },
   "alerts": {
-    "pending_approvals": "Members awaiting approval",
-    "pending_listings": "Listings awaiting moderation",
+    "pending_approvals": "Comhalta\u00ed ag fanacht le cead\u00fa",
+    "pending_listings": "Liosta\u00ed ag fanacht le meas\u00fan\u00fa",
     "users_pending_one": "{{count}} Úsáideoir ar Feitheamh",
     "users_pending_other": "{{count}} Úsáideoir ar Feitheamh",
     "users_pending_text": "Teastaíonn d'athbhreithniú ar chlárúcháin chomhaltaí nua",
@@ -96,8 +96,8 @@
     "new_blog_post": "Postáil Bhlag Nua",
     "gamification": "Cluichíocht",
     "settings": "Socruithe",
-    "enterprise": "Enterprise",
-    "advanced_controls": "Advanced Controls"
+    "enterprise": "Fiontra\u00edocht",
+    "advanced_controls": "Rialacháin Ardleibh\u00e9il"
   },
   "enterprise": {
     "card_title": "Sraith Fiontraíochta",

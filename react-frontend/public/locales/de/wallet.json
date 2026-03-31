@@ -65,8 +65,8 @@
   "error": {
     "load_balance": "Kontostand konnte nicht geladen werden",
     "load_wallet": "Zeitkonto-Daten konnten nicht geladen werden. Bitte versuchen Sie es erneut.",
-    "session_expired": "Your session has expired. Please log in again.",
-    "load_community_fund": "Could not load community fund"
+    "session_expired": "Ihre Sitzung ist abgelaufen. Bitte melden Sie sich erneut an.",
+    "load_community_fund": "Community-Fonds konnte nicht geladen werden"
   },
   "no_members_found": "Keine Mitglieder gefunden",
   "donate": "Spenden",
@@ -117,9 +117,9 @@
     "submit": "Bewertung abgeben"
   },
   "aria": {
-    "export_csv": "Export transactions to CSV",
-    "loading_transactions": "Loading transactions",
-    "transaction_detail": "{{direction}} {{amount}} hours {{name}}"
+    "export_csv": "Transaktionen als CSV exportieren",
+    "loading_transactions": "Transaktionen werden geladen",
+    "transaction_detail": "{{direction}} {{amount}} Stunden {{name}}"
   },
   "available_balance": "Verfügbares Guthaben",
   "recipient": "Empfänger",

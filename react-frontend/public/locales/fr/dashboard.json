@@ -28,7 +28,7 @@
     "upcoming_events": "Événements à venir",
     "your_progress": "Votre progression",
     "pending_reviews": "Avis en attente",
-    "endorsements": "Endorsements"
+    "endorsements": "Recommandations"
   },
   "view_all": "Voir tout",
   "view_all_caps": "Voir tout",
@@ -83,14 +83,14 @@
     "streak_days_other": "{{count}} jours"
   },
   "aria": {
-    "loading_listings": "Loading listings",
-    "loading_activity": "Loading activity",
-    "loading_events": "Loading events",
-    "loading_groups": "Loading groups",
-    "loading_progress": "Loading progress",
-    "loading_suggestions": "Loading suggestions",
-    "loading_endorsements": "Loading endorsements",
-    "loading_pending_reviews": "Loading pending reviews"
+    "loading_listings": "Chargement des annonces",
+    "loading_activity": "Chargement de l’activité",
+    "loading_events": "Chargement des événements",
+    "loading_groups": "Chargement des groupes",
+    "loading_progress": "Chargement de la progression",
+    "loading_suggestions": "Chargement des suggestions",
+    "loading_endorsements": "Chargement des recommandations",
+    "loading_pending_reviews": "Chargement des avis en attente"
   },
   "reviews": {
     "sent": "Envoyé {{amount}}h",

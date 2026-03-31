@@ -14,13 +14,13 @@
     "tab_badges": "Badge",
     "tab_challenges": "Sfide",
     "tab_collections": "Collezioni",
-    "tab_journeys": "Journeys",
-    "tab_engagement": "Engagement",
+    "tab_journeys": "Percorsi",
+    "tab_engagement": "Coinvolgimento",
     "tab_shop": "Negozio XP",
     "engagement": {
-      "title": "Monthly Engagement",
-      "months_active": "{{count}} of 12 months",
-      "description": "Months where you completed at least one meaningful activity (exchange, listing, review, or volunteer hours)."
+      "title": "Coinvolgimento mensile",
+      "months_active": "{{count}} di 12 mesi",
+      "description": "Mesi in cui ha completato almeno un'attività significativa (scambio, annuncio, recensione o ore di volontariato)."
     },
     "filter_by_type": "Filtra per tipo",
     "filter_badges_aria": "Filtra badge per tipo",
@@ -193,13 +193,13 @@
     "page_title": "Classifica",
     "title": "Classifica",
     "subtitle": "Scopra chi guida la comunità",
-    "subtitle_redesign": "See how our community is growing together",
-    "tabs_aria": "Community views",
+    "subtitle_redesign": "Scopra come la nostra comunità sta crescendo insieme",
+    "tabs_aria": "Viste della comunità",
     "tab": {
-      "community": "Community Impact",
-      "journey": "My Journey",
-      "spotlight": "Spotlight",
-      "competitive": "Most Active"
+      "community": "Impatto sulla comunità",
+      "journey": "Il mio percorso",
+      "spotlight": "In evidenza",
+      "competitive": "Più attivi"
     },
     "unable_to_load": "Impossibile caricare la classifica",
     "try_again": "Riprovi",

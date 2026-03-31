@@ -68,7 +68,7 @@
     "aria_endorse": "Raccomanda {{skillName}}",
     "endorsed": "Raccomandato",
     "endorse": "Raccomanda",
-    "endorse_failed": "Failed to endorse",
-    "remove_failed": "Failed to remove endorsement"
+    "endorse_failed": "Raccomandazione non riuscita",
+    "remove_failed": "Rimozione della raccomandazione non riuscita"
   }
 }

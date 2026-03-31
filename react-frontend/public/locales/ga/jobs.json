@@ -114,9 +114,9 @@
     "target": "Bog go",
     "add": "Cuir Riail Leis",
     "delete": "Scrios",
-    "action_move_stage": "Move stage",
-    "action_auto_reject": "Auto-reject",
-    "action_notify_me": "Notify me"
+    "action_move_stage": "Bog c\u00e9im",
+    "action_auto_reject": "Uathdhiúltú",
+    "action_notify_me": "Cuir ar an eolas mé"
   },
   "employer": {
     "page_title": "Próifíl Fostóra",
@@ -823,7 +823,7 @@
     "first_time_banner": "An chéad uair ag postáil?",
     "first_time_desc": "Treorófar tú ag ár ndraoi iontráil tríd an gcéad phost a phostáil.",
     "start_wizard": "Tosaigh Draoi",
-    "aria_progress": "Onboarding progress"
+    "aria_progress": "Dul chun cinn ionchorpr\u00fa"
   },
   "preview": {
     "title": "Réamhamharc Poist",
@@ -885,7 +885,7 @@
     "jobs": "Poist"
   },
   "aria": {
-    "qualification_percentage": "Qualification percentage"
+    "qualification_percentage": "C\u00e9atad\u00e1n c\u00e1il\u00edochta"
   },
   "deadline_countdown_one": "Ag dúnadh i gceann {{count}} lá",
   "deadline_countdown_other": "Ag dúnadh i gceann {{count}} lá"

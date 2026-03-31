@@ -114,9 +114,9 @@
     "target": "Sposta a",
     "add": "Aggiungi Regola",
     "delete": "Elimina",
-    "action_move_stage": "Move stage",
-    "action_auto_reject": "Auto-reject",
-    "action_notify_me": "Notify me"
+    "action_move_stage": "Sposta fase",
+    "action_auto_reject": "Rifiuto automatico",
+    "action_notify_me": "Avvisami"
   },
   "employer": {
     "page_title": "Profilo Datore di Lavoro",
@@ -470,7 +470,7 @@
     "role_reviewer": "Revisore",
     "role_interviewer": "Intervistatore",
     "role_hiring_manager": "Responsabile Assunzioni",
-    "role_manager": "Manager",
+    "role_manager": "Responsabile",
     "added": "Membro del team aggiunto",
     "removed": "Membro del team rimosso",
     "edit_only": "Disponibile dopo il salvataggio del lavoro"
@@ -823,7 +823,7 @@
     "first_time_banner": "Prima pubblicazione?",
     "first_time_desc": "La nostra procedura guidata ti aiuterà a pubblicare il tuo primo lavoro.",
     "start_wizard": "Avvia Procedura Guidata",
-    "aria_progress": "Onboarding progress"
+    "aria_progress": "Avanzamento onboarding"
   },
   "preview": {
     "title": "Anteprima Lavoro",
@@ -885,7 +885,7 @@
     "jobs": "Lavori"
   },
   "aria": {
-    "qualification_percentage": "Qualification percentage"
+    "qualification_percentage": "Percentuale di qualifica"
   },
   "deadline_countdown_one": "Chiude tra {{count}} giorno",
   "deadline_countdown_other": "Chiude tra {{count}} giorni"

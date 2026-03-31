@@ -14,13 +14,13 @@
     "tab_badges": "Badges",
     "tab_challenges": "Défis",
     "tab_collections": "Collections",
-    "tab_journeys": "Journeys",
+    "tab_journeys": "Parcours",
     "tab_engagement": "Engagement",
     "tab_shop": "Boutique XP",
     "engagement": {
-      "title": "Monthly Engagement",
-      "months_active": "{{count}} of 12 months",
-      "description": "Months where you completed at least one meaningful activity (exchange, listing, review, or volunteer hours)."
+      "title": "Engagement mensuel",
+      "months_active": "{{count}} sur 12 mois",
+      "description": "Mois au cours desquels vous avez effectué au moins une activité significative (échange, annonce, avis ou heures de bénévolat)."
     },
     "filter_by_type": "Filtrer par type",
     "filter_badges_aria": "Filtrer les badges par type",
@@ -33,7 +33,7 @@
     "locked": "Verrouillé",
     "daily_reward": {
       "title": "Récompense quotidienne",
-      "loading": "Loading daily reward",
+      "loading": "Chargement de la récompense quotidienne",
       "come_back_tomorrow": "Revenez demain pour {{xp}} XP !",
       "day_streak": "Série de {{count}} jours",
       "claim_today": "Réclamez {{xp}} XP aujourd'hui !",
@@ -88,7 +88,7 @@
       "load_failed": "Échec du chargement",
       "load_failed_desc": "Impossible de charger la boutique XP."
     },
-    "loading": "Loading achievements",
+    "loading": "Chargement des réalisations",
     "showcase": {
       "manage_title": "Gérer la vitrine de badges",
       "select_badges": "Sélectionnez jusqu'à 5 badges à afficher sur votre profil. ({{count}}/5 sélectionnés)",
@@ -108,7 +108,7 @@
   "goals": {
     "page_title": "Objectifs",
     "title": "Objectifs",
-    "loading": "Loading goals",
+    "loading": "Chargement des objectifs",
     "subtitle": "Définissez des objectifs et suivez votre progression",
     "new_goal": "Nouvel objectif",
     "from_template": "À partir d'un modèle",
@@ -193,13 +193,13 @@
     "page_title": "Classement",
     "title": "Classement",
     "subtitle": "Découvrez qui mène la communauté",
-    "subtitle_redesign": "See how our community is growing together",
-    "tabs_aria": "Community views",
+    "subtitle_redesign": "Découvrez comment notre communauté grandit ensemble",
+    "tabs_aria": "Vues de la communauté",
     "tab": {
-      "community": "Community Impact",
-      "journey": "My Journey",
-      "spotlight": "Spotlight",
-      "competitive": "Most Active"
+      "community": "Impact communautaire",
+      "journey": "Mon parcours",
+      "spotlight": "En vedette",
+      "competitive": "Les plus actifs"
     },
     "unable_to_load": "Impossible de charger le classement",
     "try_again": "Réessayer",
@@ -235,8 +235,8 @@
       "all_seasons": "Toutes les saisons",
       "hide_history": "Masquer l'historique des saisons",
       "history": "Historique des saisons",
-      "active": "Active",
-      "loading": "Loading season",
+      "active": "Actif",
+      "loading": "Chargement de la saison",
       "load_failed": "Échec du chargement",
       "load_failed_desc": "Impossible de charger l'historique des saisons."
     },
