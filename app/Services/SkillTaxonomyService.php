@@ -289,7 +289,10 @@ class SkillTaxonomyService
             ->leftJoin('skill_categories as sc', 'us.skill_id', '=', 'sc.id')
             ->where('us.user_id', $userId)
             ->where('us.tenant_id', $tenantId)
-            ->select('us.*', 'sc.name as category_name', 'sc.icon')
+            ->select('us.id', 'us.user_id', 'us.tenant_id', 'us.category_id', 'us.skill_name',
+                'us.proficiency as proficiency_level',
+                'us.is_offering', 'us.is_requesting', 'us.created_at',
+                'sc.name as category_name', 'sc.icon')
             ->orderByDesc('us.created_at')
             ->get()
             ->map(fn ($r) => (array) $r)
@@ -308,7 +311,10 @@ class SkillTaxonomyService
             ->where('us.user_id', $userId)
             ->where('us.tenant_id', $tenantId)
             ->select(
-                'us.*', 'sc.name as category_name', 'sc.slug as category_slug',
+                'us.id', 'us.user_id', 'us.tenant_id', 'us.category_id', 'us.skill_name',
+                'us.proficiency as proficiency_level',
+                'us.is_offering', 'us.is_requesting', 'us.created_at',
+                'sc.name as category_name', 'sc.slug as category_slug',
                 DB::raw('(SELECT COUNT(*) FROM skill_endorsements se WHERE se.endorsed_id = us.user_id AND se.skill_name = us.skill_name AND se.tenant_id = us.tenant_id) as endorsement_count')
             )
             ->orderBy('us.skill_name')
@@ -358,7 +364,7 @@ class SkillTaxonomyService
         }
 
         $categoryId  = ! empty($data['category_id']) ? (int) $data['category_id'] : null;
-        $proficiency = $data['proficiency'] ?? 'intermediate';
+        $proficiency = $data['proficiency_level'] ?? $data['proficiency'] ?? 'intermediate';
         $validProficiencies = ['beginner', 'intermediate', 'advanced', 'expert'];
         if (! in_array($proficiency, $validProficiencies)) {
             $proficiency = 'intermediate';
@@ -422,10 +428,11 @@ class SkillTaxonomyService
         if (isset($data['category_id'])) {
             $updates['category_id'] = ! empty($data['category_id']) ? (int) $data['category_id'] : null;
         }
-        if (isset($data['proficiency'])) {
+        $profVal = $data['proficiency_level'] ?? $data['proficiency'] ?? null;
+        if ($profVal !== null) {
             $valid = ['beginner', 'intermediate', 'advanced', 'expert'];
-            if (in_array($data['proficiency'], $valid)) {
-                $updates['proficiency'] = $data['proficiency'];
+            if (in_array($profVal, $valid)) {
+                $updates['proficiency'] = $profVal;
             }
         }
         if (isset($data['is_offering'])) {
