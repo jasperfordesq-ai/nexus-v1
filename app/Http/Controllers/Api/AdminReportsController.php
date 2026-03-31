@@ -82,7 +82,7 @@ class AdminReportsController extends BaseApiController
             $params[] = $effectiveTenantId;
         }
 
-        if ($type && in_array($type, ['listing', 'user', 'message'], true)) {
+        if ($type && in_array($type, ['listing', 'user', 'message', 'post', 'feed_post'], true)) {
             $conditions[] = 'r.target_type = ?';
             $params[] = $type;
         }
