@@ -38,7 +38,7 @@ import { ArrowLeft, Save, Upload, FileText, Trash2, Download, X } from 'lucide-r
 import { usePageTitle } from '@/hooks';
 import { useTenant, useToast } from '@/contexts';
 import { adminKb } from '../../api/adminApi';
-import { api } from '@/lib/api';
+import { api, API_BASE } from '@/lib/api';
 import { PageHeader } from '../../components';
 import { useTranslation } from 'react-i18next';
 
@@ -83,6 +83,14 @@ function formatFileSize(bytes: number): string {
 }
 
 const ACCEPTED_FILE_TYPES = '.md,.pdf,.doc,.docx,.txt,.csv,.xls,.xlsx';
+
+function resolveAttachmentUrl(fileUrl: string): string {
+  if (fileUrl.startsWith('/api/')) {
+    const apiOrigin = API_BASE.replace(/\/api\/?$/, '');
+    return apiOrigin + fileUrl;
+  }
+  return fileUrl;
+}
 
 export function KBArticleForm() {
   const { t } = useTranslation('admin');
@@ -692,7 +700,7 @@ export function KBArticleForm() {
                       <div className="flex gap-1">
                         <Button
                           isIconOnly size="sm" variant="flat" color="default"
-                          as="a" href={att.file_url} download={att.file_name}
+                          as="a" href={resolveAttachmentUrl(att.file_url)} download={att.file_name}
                           target="_blank" rel="noopener noreferrer"
                           aria-label="Download"
                         >

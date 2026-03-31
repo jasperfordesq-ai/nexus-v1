@@ -50,7 +50,7 @@ const MarkdownRenderer = lazy(() =>
 import { GlassCard } from '@/components/ui';
 import { useTenant, useToast } from '@/contexts';
 import { usePageTitle } from '@/hooks';
-import { api } from '@/lib/api';
+import { api, API_BASE } from '@/lib/api';
 import { logError } from '@/lib/logger';
 import { formatRelativeTime } from '@/lib/helpers';
 
@@ -103,6 +103,16 @@ function formatFileSize(bytes: number): string {
   if (bytes < 1024) return `${bytes} B`;
   if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(0)} KB`;
   return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+}
+
+/** Resolve attachment URL — prefix with API origin if it's a relative /api/ path */
+function resolveAttachmentUrl(fileUrl: string): string {
+  if (fileUrl.startsWith('/api/')) {
+    // API_BASE is like "https://api.project-nexus.ie/api" — extract origin
+    const apiOrigin = API_BASE.replace(/\/api\/?$/, '');
+    return apiOrigin + fileUrl;
+  }
+  return fileUrl;
 }
 
 /* ───────────────────────── Component ───────────────────────── */
@@ -322,7 +332,7 @@ export function KBArticlePage() {
                     <Button
                       key={att.id}
                       as="a"
-                      href={att.file_url}
+                      href={resolveAttachmentUrl(att.file_url)}
                       download={att.file_name}
                       target="_blank"
                       rel="noopener noreferrer"
