@@ -374,6 +374,35 @@ class KnowledgeBaseController extends BaseApiController
     }
 
     /**
+     * GET /api/v2/kb/{id}/attachments/{attachmentId}/download
+     *
+     * Download a file attachment (public).
+     */
+    public function downloadAttachment(int $id, int $attachmentId): \Symfony\Component\HttpFoundation\Response
+    {
+        $tenantId = $this->getTenantId();
+
+        $attachment = DB::table('knowledge_base_attachments')
+            ->where('id', $attachmentId)
+            ->where('article_id', $id)
+            ->where('tenant_id', $tenantId)
+            ->first();
+
+        if (! $attachment) {
+            return $this->respondWithError('NOT_FOUND', 'Attachment not found', null, 404);
+        }
+
+        $disk = \Illuminate\Support\Facades\Storage::disk('public');
+        if (! $disk->exists($attachment->file_path)) {
+            return $this->respondWithError('NOT_FOUND', 'File not found on disk', null, 404);
+        }
+
+        return $disk->download($attachment->file_path, $attachment->file_name, [
+            'Content-Type' => $attachment->mime_type,
+        ]);
+    }
+
+    /**
      * DELETE /api/v2/kb/{id}/attachments/{attachmentId}
      *
      * Delete a file attachment from a KB article (admin only).

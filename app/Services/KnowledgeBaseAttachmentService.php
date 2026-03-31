@@ -95,19 +95,24 @@ class KnowledgeBaseAttachmentService
             return ['error' => 'Failed to store file.'];
         }
 
-        $fileUrl = '/storage/' . $path;
-
+        // URL will be set after insert (needs the attachment ID)
         $id = DB::table('knowledge_base_attachments')->insertGetId([
             'article_id' => $articleId,
             'tenant_id'  => $tenantId,
             'file_name'  => $originalName,
             'file_path'  => $path,
-            'file_url'   => $fileUrl,
+            'file_url'   => '', // placeholder, updated below
             'mime_type'   => $ext === 'md' ? 'text/markdown' : $detectedMime,
             'file_size'  => $file->getSize(),
             'sort_order' => 0,
             'created_at' => now(),
         ]);
+
+        // Set the download URL using the API endpoint
+        $fileUrl = "/api/v2/kb/{$articleId}/attachments/{$id}/download";
+        DB::table('knowledge_base_attachments')
+            ->where('id', $id)
+            ->update(['file_url' => $fileUrl]);
 
         return [
             'id'         => $id,

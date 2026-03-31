@@ -632,6 +632,7 @@ Route::put('/v2/kb/{id}', [\App\Http\Controllers\Api\KnowledgeBaseController::cl
 Route::delete('/v2/kb/{id}', [\App\Http\Controllers\Api\KnowledgeBaseController::class, 'destroy']);
 Route::post('/v2/kb/{id}/feedback', [\App\Http\Controllers\Api\KnowledgeBaseController::class, 'feedback']);
 Route::post('/v2/kb/{id}/attachments', [\App\Http\Controllers\Api\KnowledgeBaseController::class, 'uploadAttachment']);
+Route::get('/v2/kb/{id}/attachments/{attachmentId}/download', [\App\Http\Controllers\Api\KnowledgeBaseController::class, 'downloadAttachment'])->withoutMiddleware('auth:sanctum');
 Route::delete('/v2/kb/{id}/attachments/{attachmentId}', [\App\Http\Controllers\Api\KnowledgeBaseController::class, 'deleteAttachment']);
 
 // ============================================

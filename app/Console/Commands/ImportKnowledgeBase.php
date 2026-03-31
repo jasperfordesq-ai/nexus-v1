@@ -257,17 +257,22 @@ class ImportKnowledgeBase extends Command
             'docx' => 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
         ];
 
-        DB::table('knowledge_base_attachments')->insert([
+        $attachmentId = DB::table('knowledge_base_attachments')->insertGetId([
             'article_id' => $articleId,
             'tenant_id'  => $tenantId,
             'file_name'  => $originalName,
             'file_path'  => $storagePath,
-            'file_url'   => '/storage/' . $storagePath,
+            'file_url'   => '', // placeholder
             'mime_type'   => $mimeMap[$ext] ?? 'application/octet-stream',
             'file_size'  => $file->getSize(),
             'sort_order' => 0,
             'created_at' => now(),
         ]);
+
+        // Set download URL using the API endpoint
+        DB::table('knowledge_base_attachments')
+            ->where('id', $attachmentId)
+            ->update(['file_url' => "/api/v2/kb/{$articleId}/attachments/{$attachmentId}/download"]);
 
         $this->attachmentsCreated++;
     }
