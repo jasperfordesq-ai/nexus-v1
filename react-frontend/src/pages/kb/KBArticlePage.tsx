@@ -186,8 +186,8 @@ export function KBArticlePage() {
           if (!prev) return prev;
           return {
             ...prev,
-            helpful_count: prev.helpful_count + (isHelpful ? 1 : 0),
-            not_helpful_count: prev.not_helpful_count + (!isHelpful ? 1 : 0),
+            helpful_yes: prev.helpful_yes + (isHelpful ? 1 : 0),
+            helpful_no: prev.helpful_no + (!isHelpful ? 1 : 0),
           };
         });
       }
@@ -250,17 +250,17 @@ export function KBArticlePage() {
           <BookOpen className="w-3.5 h-3.5" aria-hidden="true" />
           {t("title")}
         </Link>
-        {article.category && (
+        {article.category_name && (
           <>
             <ChevronRight className="w-3 h-3 text-theme-subtle" aria-hidden="true" />
-            <span className="text-theme-subtle">{article.category}</span>
+            <span className="text-theme-subtle">{article.category_name}</span>
           </>
         )}
-        {article.parent_id && article.parent_title && (
+        {article.parent_article_id && article.parent_title && (
           <>
             <ChevronRight className="w-3 h-3 text-theme-subtle" aria-hidden="true" />
             <Link
-              to={tenantPath(`/kb/${article.parent_id}`)}
+              to={tenantPath(`/kb/${article.parent_article_id}`)}
               className="hover:text-theme-primary transition-colors"
             >
               {article.parent_title}
@@ -282,9 +282,9 @@ export function KBArticlePage() {
               {article.title}
             </h1>
             <div className="flex items-center gap-3 flex-wrap text-xs text-theme-subtle">
-              {article.category && (
+              {article.category_name && (
                 <Chip size="sm" variant="flat" className="bg-blue-500/10 text-blue-400">
-                  {article.category}
+                  {article.category_name}
                 </Chip>
               )}
               <span className="flex items-center gap-1">
@@ -293,7 +293,7 @@ export function KBArticlePage() {
               </span>
               <span className="flex items-center gap-1">
                 <Eye className="w-3 h-3" aria-hidden="true" />
-                {t("views", { count: article.view_count })}
+                {t("views", { count: article.views_count })}
               </span>
             </div>
           </div>
@@ -424,7 +424,7 @@ export function KBArticlePage() {
                   onPress={() => handleFeedback(true)}
                   isLoading={isSubmittingFeedback}
                 >
-                  {t('feedback.yes', { count: article.helpful_count })}
+                  {t('feedback.yes', { count: article.helpful_yes })}
                 </Button>
                 <Button
                   variant="flat"
@@ -433,7 +433,7 @@ export function KBArticlePage() {
                   onPress={() => handleFeedback(false)}
                   isLoading={isSubmittingFeedback}
                 >
-                  {t('feedback.no', { count: article.not_helpful_count })}
+                  {t('feedback.no', { count: article.helpful_no })}
                 </Button>
               </div>
             </>

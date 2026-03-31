@@ -4,16 +4,16 @@
 // See NOTICE file for attribution and acknowledgements.
 
 /**
- * R4 - Knowledge Base Page
+ * Knowledge Base Page
  *
- * Displays a searchable, categorized knowledge base with article listings.
- * Supports nested navigation (parent/children articles).
+ * Browsable, searchable knowledge base with category tabs, article cards,
+ * and polished UI. Supports nested articles and search.
  *
  * API: GET /api/v2/kb
  *      GET /api/v2/kb/search?q=...
  */
 
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import {
@@ -21,6 +21,8 @@ import {
   Input,
   Chip,
   Spinner,
+  Tabs,
+  Tab,
 } from '@heroui/react';
 import {
   BookOpen,
@@ -32,6 +34,7 @@ import {
   Clock,
   Eye,
   Folder,
+  File,
 } from 'lucide-react';
 import { GlassCard } from '@/components/ui';
 import { EmptyState } from '@/components/feedback';
@@ -48,16 +51,32 @@ interface KBArticle {
   id: number;
   title: string;
   slug: string;
-  excerpt: string | null;
-  category: string | null;
-  parent_id: number | null;
+  content_type: string;
+  category_id: number | null;
+  category_name: string | null;
+  parent_article_id: number | null;
   is_published: boolean;
-  view_count: number;
-  helpful_count: number;
-  not_helpful_count: number;
+  views_count: number;
+  helpful_yes: number;
+  helpful_no: number;
   created_at: string;
-  updated_at: string;
-  children_count?: number;
+  updated_at: string | null;
+  author: { id: number; name: string } | null;
+  // Search results shape
+  content_preview?: string;
+  helpfulness?: number | null;
+}
+
+const ALL_CATEGORIES = '__all__';
+
+/* ───────────────────────── Helpers ───────────────────────── */
+
+function getContentTypeIcon(type: string) {
+  switch (type) {
+    case 'markdown': return 'MD';
+    case 'plain': return 'TXT';
+    default: return null;
+  }
 }
 
 /* ───────────────────────── Component ───────────────────────── */
@@ -73,15 +92,13 @@ export function KnowledgeBasePage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [isSearching, setIsSearching] = useState(false);
   const [searchResults, setSearchResults] = useState<KBArticle[] | null>(null);
+  const [activeCategory, setActiveCategory] = useState<string>(ALL_CATEGORIES);
 
-  // AbortController ref to cancel stale requests
   const abortRef = useRef<AbortController | null>(null);
-
-  // Stable refs for t — avoids re-creating callbacks when i18n namespace loads
   const tRef = useRef(t);
   tRef.current = t;
 
-  // Load top-level articles
+  // Load articles
   const loadArticles = useCallback(async () => {
     abortRef.current?.abort();
     const controller = new AbortController();
@@ -90,10 +107,11 @@ export function KnowledgeBasePage() {
     try {
       setIsLoading(true);
       setError(null);
-      const response = await api.get<KBArticle[]>('/v2/kb');
+      const response = await api.get<KBArticle[]>('/v2/kb?per_page=100');
       if (controller.signal.aborted) return;
       if (response.success && response.data) {
-        setArticles(Array.isArray(response.data) ? response.data : []);
+        const items = Array.isArray(response.data) ? response.data : [];
+        setArticles(items);
       } else {
         setError(tRef.current('error.load_articles'));
       }
@@ -137,47 +155,68 @@ export function KnowledgeBasePage() {
     }
   }, []);
 
-  // Debounced search
   useEffect(() => {
-    const timer = setTimeout(() => {
-      handleSearch(searchQuery);
-    }, 300);
+    const timer = setTimeout(() => handleSearch(searchQuery), 300);
     return () => clearTimeout(timer);
   }, [searchQuery, handleSearch]);
 
-  // Group articles by category
-  const groupedArticles = (searchResults || articles).reduce<Record<string, KBArticle[]>>((acc, article) => {
-    const cat = article.category || t('general_category');
-    if (!acc[cat]) acc[cat] = [];
-    acc[cat].push(article);
-    return acc;
-  }, {});
+  // Extract unique categories from articles
+  const categories = useMemo(() => {
+    const cats = new Map<string, number>();
+    for (const a of articles) {
+      const name = a.category_name || t('general_category');
+      cats.set(name, (cats.get(name) || 0) + 1);
+    }
+    return Array.from(cats.entries()).sort(([a], [b]) => a.localeCompare(b));
+  }, [articles, t]);
 
-  const displayArticles = searchResults || articles;
+  // Filter articles by active category
+  const displayArticles = useMemo(() => {
+    const source = searchResults || articles;
+    if (activeCategory === ALL_CATEGORIES || searchResults) return source;
+    const generalLabel = t('general_category');
+    return source.filter((a) => {
+      const cat = a.category_name || generalLabel;
+      return cat === activeCategory;
+    });
+  }, [searchResults, articles, activeCategory, t]);
+
+  // Group filtered articles by category
+  const groupedArticles = useMemo(() => {
+    const groups: Record<string, KBArticle[]> = {};
+    for (const article of displayArticles) {
+      const cat = article.category_name || t('general_category');
+      if (!groups[cat]) groups[cat] = [];
+      groups[cat].push(article);
+    }
+    return Object.entries(groups).sort(([a], [b]) => a.localeCompare(b));
+  }, [displayArticles, t]);
 
   const containerVariants = {
     hidden: { opacity: 0 },
-    visible: { opacity: 1, transition: { staggerChildren: 0.05 } },
+    visible: { opacity: 1, transition: { staggerChildren: 0.04 } },
   };
 
   const itemVariants = {
-    hidden: { opacity: 0, y: 15 },
+    hidden: { opacity: 0, y: 12 },
     visible: { opacity: 1, y: 0 },
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 max-w-4xl mx-auto">
       {/* Header */}
-      <div>
-        <h1 className="text-2xl font-bold text-theme-primary flex items-center gap-3">
-          <BookOpen className="w-7 h-7 text-blue-400" aria-hidden="true" />
+      <div className="text-center py-4">
+        <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-gradient-to-br from-blue-500 to-indigo-600 mb-4">
+          <BookOpen className="w-7 h-7 text-white" aria-hidden="true" />
+        </div>
+        <h1 className="text-3xl font-bold text-theme-primary">
           {t('title')}
         </h1>
-        <p className="text-theme-muted mt-1">{t('description')}</p>
+        <p className="text-theme-muted mt-2 max-w-lg mx-auto">{t('description')}</p>
       </div>
 
       {/* Search */}
-      <div className="max-w-xl">
+      <div className="max-w-xl mx-auto">
         <Input
           placeholder={t('search_placeholder')}
           value={searchQuery}
@@ -187,26 +226,66 @@ export function KnowledgeBasePage() {
           endContent={isSearching ? <Spinner size="sm" /> : undefined}
           classNames={{
             input: 'bg-transparent text-theme-primary',
-            inputWrapper: 'bg-theme-elevated border-theme-default',
+            inputWrapper: 'bg-theme-elevated border-theme-default shadow-sm',
           }}
           size="lg"
+          isClearable
+          onClear={() => { setSearchQuery(''); setSearchResults(null); }}
         />
       </div>
 
       {/* Search Results Indicator */}
       {searchResults !== null && (
-        <div className="flex items-center gap-2">
+        <div className="flex items-center justify-center gap-2">
           <Chip
             size="sm"
             variant="flat"
             className="bg-blue-500/10 text-blue-400"
-            onClose={() => {
-              setSearchQuery('');
-              setSearchResults(null);
-            }}
+            onClose={() => { setSearchQuery(''); setSearchResults(null); }}
           >
             {t('search_results', { count: searchResults.length, query: searchQuery })}
           </Chip>
+        </div>
+      )}
+
+      {/* Category Tabs */}
+      {!searchResults && categories.length > 1 && !isLoading && (
+        <div className="flex justify-center">
+          <Tabs
+            selectedKey={activeCategory}
+            onSelectionChange={(key) => setActiveCategory(key as string)}
+            variant="underlined"
+            size="sm"
+            classNames={{
+              tabList: 'gap-4 flex-wrap justify-center',
+              tab: 'px-1',
+            }}
+          >
+            <Tab
+              key={ALL_CATEGORIES}
+              title={
+                <span className="flex items-center gap-1.5">
+                  {t('all_categories', 'All')}
+                  <Chip size="sm" variant="flat" className="text-[10px] min-w-5 h-4 bg-theme-elevated text-theme-subtle">
+                    {articles.length}
+                  </Chip>
+                </span>
+              }
+            />
+            {categories.map(([name, count]) => (
+              <Tab
+                key={name}
+                title={
+                  <span className="flex items-center gap-1.5">
+                    {name}
+                    <Chip size="sm" variant="flat" className="text-[10px] min-w-5 h-4 bg-theme-elevated text-theme-subtle">
+                      {count}
+                    </Chip>
+                  </span>
+                }
+              />
+            ))}
+          </Tabs>
         </div>
       )}
 
@@ -231,12 +310,13 @@ export function KnowledgeBasePage() {
         <>
           {isLoading ? (
             <div className="space-y-4">
-              {[1, 2, 3, 4].map((i) => (
+              {[1, 2, 3].map((i) => (
                 <GlassCard key={i} className="p-5 animate-pulse">
-                  <div className="h-4 bg-theme-hover rounded w-1/4 mb-3" />
-                  <div className="space-y-2">
-                    <div className="h-10 bg-theme-hover rounded" />
-                    <div className="h-10 bg-theme-hover rounded" />
+                  <div className="h-4 bg-theme-hover rounded w-1/4 mb-4" />
+                  <div className="space-y-3">
+                    <div className="h-14 bg-theme-hover rounded" />
+                    <div className="h-14 bg-theme-hover rounded" />
+                    <div className="h-14 bg-theme-hover rounded" />
                   </div>
                 </GlassCard>
               ))}
@@ -254,16 +334,16 @@ export function KnowledgeBasePage() {
               animate="visible"
               className="space-y-6"
             >
-              {Object.entries(groupedArticles).map(([category, catArticles]) => (
+              {groupedArticles.map(([category, catArticles]) => (
                 <motion.div key={category} variants={itemVariants}>
                   <GlassCard className="overflow-hidden">
                     {/* Category header */}
-                    <div className="px-5 py-3 bg-theme-hover/30 border-b border-theme-default">
+                    <div className="px-5 py-3 bg-gradient-to-r from-blue-500/5 to-indigo-500/5 border-b border-theme-default">
                       <h2 className="text-sm font-semibold text-theme-primary flex items-center gap-2">
                         <Folder className="w-4 h-4 text-blue-400" aria-hidden="true" />
                         {category}
                         <Chip size="sm" variant="flat" className="text-[10px] bg-theme-elevated text-theme-subtle">
-                          {catArticles.length}
+                          {catArticles.length} {catArticles.length === 1 ? 'article' : 'articles'}
                         </Chip>
                       </h2>
                     </div>
@@ -274,33 +354,41 @@ export function KnowledgeBasePage() {
                         <Link
                           key={article.id}
                           to={tenantPath(`/kb/${article.id}`)}
-                          className="flex items-center gap-4 px-5 py-3 hover:bg-theme-hover/30 transition-colors group"
+                          className="flex items-center gap-4 px-5 py-4 hover:bg-theme-hover/40 transition-colors group"
                         >
-                          <div className="w-9 h-9 rounded-lg bg-blue-500/10 flex items-center justify-center flex-shrink-0">
-                            <FileText className="w-4 h-4 text-blue-400" aria-hidden="true" />
+                          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500/10 to-indigo-500/10 flex items-center justify-center flex-shrink-0">
+                            <FileText className="w-5 h-5 text-blue-400" aria-hidden="true" />
                           </div>
                           <div className="flex-1 min-w-0">
-                            <h3 className="text-sm font-medium text-theme-primary group-hover:text-blue-400 transition-colors truncate">
-                              {article.title}
-                            </h3>
-                            {article.excerpt && (
-                              <p className="text-xs text-theme-muted line-clamp-1 mt-0.5">{article.excerpt}</p>
+                            <div className="flex items-center gap-2">
+                              <h3 className="text-sm font-semibold text-theme-primary group-hover:text-blue-400 transition-colors truncate">
+                                {article.title}
+                              </h3>
+                              {getContentTypeIcon(article.content_type) && (
+                                <Chip size="sm" variant="flat" className="text-[9px] h-4 bg-theme-elevated text-theme-subtle flex-shrink-0">
+                                  {getContentTypeIcon(article.content_type)}
+                                </Chip>
+                              )}
+                            </div>
+                            {article.content_preview && (
+                              <p className="text-xs text-theme-muted line-clamp-1 mt-0.5">{article.content_preview}</p>
                             )}
-                            <div className="flex items-center gap-3 text-xs text-theme-subtle mt-1">
-                              <span className="flex items-center gap-1">
-                                <Clock className="w-3 h-3" aria-hidden="true" />
-                                {formatRelativeTime(article.updated_at)}
-                              </span>
-                              {article.view_count > 0 && (
+                            <div className="flex items-center gap-3 text-xs text-theme-subtle mt-1.5">
+                              {article.updated_at && (
                                 <span className="flex items-center gap-1">
-                                  <Eye className="w-3 h-3" aria-hidden="true" />
-                                  {article.view_count}
+                                  <Clock className="w-3 h-3" aria-hidden="true" />
+                                  {formatRelativeTime(article.updated_at)}
                                 </span>
                               )}
-                              {(article.children_count ?? 0) > 0 && (
+                              {article.views_count > 0 && (
                                 <span className="flex items-center gap-1">
-                                  <Folder className="w-3 h-3" aria-hidden="true" />
-                                  {t('sub_articles', { count: article.children_count })}
+                                  <Eye className="w-3 h-3" aria-hidden="true" />
+                                  {article.views_count.toLocaleString()} views
+                                </span>
+                              )}
+                              {article.author && (
+                                <span className="text-theme-subtle">
+                                  by {article.author.name}
                                 </span>
                               )}
                             </div>
@@ -315,6 +403,22 @@ export function KnowledgeBasePage() {
             </motion.div>
           )}
         </>
+      )}
+
+      {/* Stats footer */}
+      {!isLoading && !error && articles.length > 0 && (
+        <div className="flex items-center justify-center gap-4 text-xs text-theme-subtle py-2">
+          <span className="flex items-center gap-1">
+            <File className="w-3 h-3" aria-hidden="true" />
+            {articles.length} {articles.length === 1 ? 'article' : 'articles'}
+          </span>
+          {categories.length > 0 && (
+            <span className="flex items-center gap-1">
+              <Folder className="w-3 h-3" aria-hidden="true" />
+              {categories.length} {categories.length === 1 ? 'category' : 'categories'}
+            </span>
+          )}
+        </div>
       )}
     </div>
   );
