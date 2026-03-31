@@ -424,7 +424,7 @@ export function KBArticlePage() {
                   onPress={() => handleFeedback(true)}
                   isLoading={isSubmittingFeedback}
                 >
-                  {t('feedback.yes', { count: article.helpful_yes })}
+                  {t('feedback.yes', 'Yes')} ({article.helpful_yes ?? 0})
                 </Button>
                 <Button
                   variant="flat"
@@ -433,7 +433,7 @@ export function KBArticlePage() {
                   onPress={() => handleFeedback(false)}
                   isLoading={isSubmittingFeedback}
                 >
-                  {t('feedback.no', { count: article.helpful_no })}
+                  {t('feedback.no', 'No')} ({article.helpful_no ?? 0})
                 </Button>
               </div>
             </>
