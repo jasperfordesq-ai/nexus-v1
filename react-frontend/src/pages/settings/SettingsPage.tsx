@@ -775,7 +775,7 @@ export function SettingsPage() {
           selectedKey={activeTab}
           onSelectionChange={(key) => setActiveTab(key as string)}
           classNames={{
-            tabList: 'bg-theme-elevated p-1 rounded-lg flex-wrap',
+            tabList: 'bg-theme-elevated p-1 rounded-lg overflow-x-auto flex-nowrap',
             cursor: 'bg-theme-hover',
             tab: 'text-theme-muted data-[selected=true]:text-theme-primary',
           }}
