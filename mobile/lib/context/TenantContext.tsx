@@ -26,6 +26,9 @@ const TenantContext = createContext<TenantContextValue | null>(null);
 /** Default brand color used before tenant config loads */
 const FALLBACK_PRIMARY = '#006FEE';
 
+/** SecureStore key for cached tenant config — mirrors AuthContext's cache-first pattern. */
+const TENANT_CONFIG_CACHE_KEY = 'nexus_tenant_config';
+
 export function TenantProvider({ children }: { children: React.ReactNode }) {
   // Start with null slug to indicate "not yet read from storage".
   // This prevents a flicker where the default tenant config renders briefly
@@ -34,14 +37,36 @@ export function TenantProvider({ children }: { children: React.ReactNode }) {
   const [tenant, setTenant] = useState<TenantConfig | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  const loadTenantConfig = useCallback(async (slug: string) => {
+  const loadTenantConfig = useCallback(async (slug: string, skipCache = false) => {
     setIsLoading(true);
     try {
-      // The API client attaches X-Tenant-Slug from storage automatically.
-      // We first write the slug so the header is set correctly.
+      // Write the slug so the API client's X-Tenant-Slug header is correct.
       await storage.set(STORAGE_KEYS.TENANT_SLUG, slug);
+
+      // Cache-first: render from cached config immediately, then validate
+      // in the background. Mirrors AuthContext's session restore pattern.
+      if (!skipCache) {
+        const cached = await storage.getJson<TenantConfig>(TENANT_CONFIG_CACHE_KEY);
+        if (cached) {
+          setTenant(cached);
+          setIsLoading(false);
+
+          // Background: fetch fresh config and update if successful.
+          // On network failure, keep the cached config (offline resilience).
+          getTenantConfig()
+            .then(async (response) => {
+              setTenant(response.data);
+              await storage.setJson(TENANT_CONFIG_CACHE_KEY, response.data);
+            })
+            .catch(() => { /* keep cached config */ });
+          return;
+        }
+      }
+
+      // No cache (first launch or explicit refresh) — must wait for network
       const response = await getTenantConfig();
       setTenant(response.data);
+      await storage.setJson(TENANT_CONFIG_CACHE_KEY, response.data);
     } catch {
       // Tenant config failed — app still works with null tenant (graceful degradation)
       setTenant(null);
@@ -66,7 +91,9 @@ export function TenantProvider({ children }: { children: React.ReactNode }) {
   const setTenantSlug = useCallback(
     async (slug: string) => {
       setSlug(slug);
-      await loadTenantConfig(slug);
+      // Clear stale cache when switching tenants — force fresh fetch
+      await storage.remove(TENANT_CONFIG_CACHE_KEY);
+      await loadTenantConfig(slug, true);
     },
     [loadTenantConfig],
   );

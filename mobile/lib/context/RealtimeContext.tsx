@@ -20,14 +20,19 @@ import { initRealtime, getRealtimeClient, type PusherConfig } from '@/lib/realti
 import { registerRefreshCallback, unregisterRefreshCallback } from '@/lib/notifications';
 import { useAuthContext } from '@/lib/context/AuthContext';
 import type { Message } from '@/lib/api/messages';
+import type { NotificationCounts } from '@/lib/api/notifications';
 
 type MessageHandler = (msg: Message) => void;
 
 interface RealtimeContextValue {
   /** Current unread message count (seeded from API, bumped by Pusher). */
   unreadMessages: number;
-  /** Call when the user opens the Messages tab — resets the badge. */
+  /** Total unread notification count (all categories). Single source of truth. */
+  unreadNotifications: number;
+  /** Call when the user opens the Messages tab — resets the message badge. */
   resetUnread: () => void;
+  /** Manually trigger a count refresh (e.g. after marking notifications read). */
+  refreshCounts: () => void;
   /**
    * Subscribe to incoming Pusher messages for a specific conversation.
    * Returns an unsubscribe function — call it in a useEffect cleanup.
@@ -37,7 +42,9 @@ interface RealtimeContextValue {
 
 const RealtimeContext = createContext<RealtimeContextValue>({
   unreadMessages: 0,
+  unreadNotifications: 0,
   resetUnread: () => undefined,
+  refreshCounts: () => undefined,
   subscribeToMessages: () => () => undefined,
 });
 
@@ -52,39 +59,71 @@ function isMessagePayload(data: unknown): data is { conversation_id: number; mes
   return typeof obj.conversation_id === 'number' && typeof obj.message === 'object' && obj.message !== null;
 }
 
+/** Minimum interval between foreground-resume refreshes (ms). */
+const REFRESH_THROTTLE_MS = 30_000;
+
 export function RealtimeProvider({ children }: { children: React.ReactNode }) {
   const { isAuthenticated } = useAuthContext();
   const [unreadMessages, setUnreadMessages] = useState(0);
+  const [unreadNotifications, setUnreadNotifications] = useState(0);
   const channelRef = useRef<Channel | null>(null);
   const appStateRef = useRef<AppStateStatus>(AppState.currentState);
   /** conversation_id → set of handlers listening for new messages */
   const messageListenersRef = useRef<Map<number, Set<MessageHandler>>>(new Map());
   /** Track whether the refresh callback is currently registered */
   const refreshCallbackRegisteredRef = useRef(false);
+  /** Cached Pusher config — avoids re-fetching on every auth state change */
+  const pusherConfigRef = useRef<PusherConfig | null>(null);
+  /** Timestamp of last successful count refresh — throttles foreground resume calls */
+  const lastRefreshRef = useRef(0);
 
-  // Seed unread count from REST API whenever auth state changes
+  // Single function to fetch all notification counts — the ONLY place this
+  // endpoint is called. HomeScreen and TabsLayout read from context instead.
+  const refreshCounts = useCallback(() => {
+    if (!isAuthenticated) return;
+    const now = Date.now();
+    if (now - lastRefreshRef.current < REFRESH_THROTTLE_MS) return;
+    lastRefreshRef.current = now;
+
+    api
+      .get<{ data: NotificationCounts }>(`${API_V2}/notifications/counts`)
+      .then((res) => {
+        setUnreadMessages(res.data.messages);
+        setUnreadNotifications(res.data.total);
+      })
+      .catch(() => { /* non-critical — badges stay at previous value */ });
+  }, [isAuthenticated]);
+
+  // Seed counts from REST API on initial auth
   useEffect(() => {
     if (!isAuthenticated) {
       setUnreadMessages(0);
+      setUnreadNotifications(0);
       return;
     }
+    // Force immediate refresh (bypass throttle for initial seed)
+    lastRefreshRef.current = 0;
+    refreshCounts();
+  }, [isAuthenticated, refreshCounts]);
 
-    api
-      .get<{ data: { messages: number; notifications: number } }>(`${API_V2}/notifications/counts`)
-      .then((res) => setUnreadMessages(res.data.messages))
-      .catch(() => { /* non-critical — badge just stays at 0 */ });
-  }, [isAuthenticated]);
-
-  // Connect to Pusher and subscribe to personal channel for live updates
+  // Connect to Pusher — uses cached config to avoid redundant network calls.
+  // Only fetches fresh config on first connect or when cache is empty.
   useEffect(() => {
     if (!isAuthenticated) return;
 
     let mounted = true;
 
-    api
-      .get<PusherConfig>(`${API_V2}/pusher/config`)
-      .then((config) => {
-        if (!mounted) return;
+    async function connectPusher() {
+      try {
+        let config = pusherConfigRef.current;
+
+        // Only fetch Pusher config if we don't have it cached
+        if (!config) {
+          config = await api.get<PusherConfig>(`${API_V2}/pusher/config`);
+          if (!mounted) return;
+          pusherConfigRef.current = config;
+        }
+
         if (!config.enabled || !config.key) return;
 
         const client = initRealtime(config);
@@ -126,8 +165,12 @@ export function RealtimeProvider({ children }: { children: React.ReactNode }) {
             setUnreadMessages((prev) => prev + 1);
           }
         });
-      })
-      .catch(() => { /* Pusher not configured — silent no-op */ });
+      } catch {
+        /* Pusher not configured — silent no-op */
+      }
+    }
+
+    void connectPusher();
 
     return () => {
       mounted = false;
@@ -139,11 +182,17 @@ export function RealtimeProvider({ children }: { children: React.ReactNode }) {
     };
   }, [isAuthenticated]);
 
-  // Re-fetch unread count when the app returns to the foreground,
-  // and reconnect Pusher if it dropped while backgrounded.
+  // Clear Pusher config cache on logout so next login gets fresh config
   useEffect(() => {
     if (!isAuthenticated) {
-      // Explicitly unregister refresh callback when auth is lost
+      pusherConfigRef.current = null;
+    }
+  }, [isAuthenticated]);
+
+  // Foreground resume: refresh counts + reconnect Pusher.
+  // Throttled to prevent rapid fire on quick background/foreground cycling.
+  useEffect(() => {
+    if (!isAuthenticated) {
       if (refreshCallbackRegisteredRef.current) {
         unregisterRefreshCallback();
         refreshCallbackRegisteredRef.current = false;
@@ -151,31 +200,32 @@ export function RealtimeProvider({ children }: { children: React.ReactNode }) {
       return;
     }
 
-    function refreshCounts() {
-      api
-        .get<{ data: { messages: number; notifications: number } }>(`${API_V2}/notifications/counts`)
-        .then((res) => setUnreadMessages(res.data.messages))
-        .catch(() => { /* non-critical */ });
-    }
+    const handleForegroundResume = () => {
+      refreshCounts();
 
-    // AppState: re-fetch whenever app comes back to foreground
+      // Reconnect Pusher if it disconnected while backgrounded
+      const client = getRealtimeClient();
+      if (client && client.connection.state !== 'connected') {
+        client.connect();
+      }
+    };
+
     const appStateSubscription = AppState.addEventListener('change', (nextState: AppStateStatus) => {
       const prev = appStateRef.current;
       appStateRef.current = nextState;
 
       if (prev !== 'active' && nextState === 'active') {
-        refreshCounts();
-
-        // Reconnect Pusher if it disconnected while backgrounded
-        const client = getRealtimeClient();
-        if (client && client.connection.state !== 'connected') {
-          client.connect();
-        }
+        handleForegroundResume();
       }
     });
 
     // Push notifications: silent data pushes also trigger a count refresh
-    registerRefreshCallback(refreshCounts);
+    registerRefreshCallback(() => {
+      // Bypass throttle for push-triggered refreshes — the server sent us
+      // a signal that counts changed, so we should always honour it.
+      lastRefreshRef.current = 0;
+      refreshCounts();
+    });
     refreshCallbackRegisteredRef.current = true;
 
     return () => {
@@ -183,7 +233,7 @@ export function RealtimeProvider({ children }: { children: React.ReactNode }) {
       unregisterRefreshCallback();
       refreshCallbackRegisteredRef.current = false;
     };
-  }, [isAuthenticated]);
+  }, [isAuthenticated, refreshCounts]);
 
   const resetUnread = useCallback(() => setUnreadMessages(0), []);
 
@@ -200,7 +250,9 @@ export function RealtimeProvider({ children }: { children: React.ReactNode }) {
   );
 
   return (
-    <RealtimeContext.Provider value={{ unreadMessages, resetUnread, subscribeToMessages }}>
+    <RealtimeContext.Provider
+      value={{ unreadMessages, unreadNotifications, resetUnread, refreshCounts, subscribeToMessages }}
+    >
       {children}
     </RealtimeContext.Provider>
   );

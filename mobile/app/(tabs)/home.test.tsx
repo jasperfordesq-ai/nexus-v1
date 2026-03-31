@@ -65,9 +65,15 @@ jest.mock('@/lib/hooks/usePaginatedApi', () => ({
   usePaginatedApi: (...args: unknown[]) => mockUsePaginatedApi(...args),
 }));
 
-const mockUseApi = jest.fn();
-jest.mock('@/lib/hooks/useApi', () => ({
-  useApi: (...args: unknown[]) => mockUseApi(...args),
+const mockRealtimeContext = {
+  unreadMessages: 0,
+  unreadNotifications: 0,
+  resetUnread: jest.fn(),
+  refreshCounts: jest.fn(),
+  subscribeToMessages: jest.fn(() => jest.fn()),
+};
+jest.mock('@/lib/context/RealtimeContext', () => ({
+  useRealtimeContext: () => mockRealtimeContext,
 }));
 
 jest.mock('@expo/vector-icons', () => ({
@@ -76,10 +82,6 @@ jest.mock('@expo/vector-icons', () => ({
 
 jest.mock('@/lib/api/feed', () => ({
   getFeed: jest.fn(),
-}));
-
-jest.mock('@/lib/api/notifications', () => ({
-  getNotificationCounts: jest.fn(),
 }));
 
 jest.mock('@/components/FeedItem', () => {
@@ -113,11 +115,10 @@ const defaultPaginatedState = {
   refresh: jest.fn(),
 };
 
-const defaultApiState = { data: null, isLoading: false, error: null, refresh: jest.fn() };
-
 beforeEach(() => {
   mockUsePaginatedApi.mockReturnValue(defaultPaginatedState);
-  mockUseApi.mockReturnValue(defaultApiState);
+  mockRealtimeContext.unreadNotifications = 0;
+  mockRealtimeContext.unreadMessages = 0;
 });
 
 const mockFeedItem = {
@@ -194,24 +195,14 @@ describe('HomeScreen', () => {
   });
 
   it('shows unread notification badge when there are unread notifications', () => {
-    mockUseApi.mockReturnValueOnce({
-      data: { data: { total: 3 } },
-      isLoading: false,
-      error: null,
-      refresh: jest.fn(),
-    });
+    mockRealtimeContext.unreadNotifications = 3;
 
     const { getByText } = render(<HomeScreen />);
     expect(getByText('3')).toBeTruthy();
   });
 
   it('shows 9+ badge when unread notification count exceeds 9', () => {
-    mockUseApi.mockReturnValueOnce({
-      data: { data: { total: 14 } },
-      isLoading: false,
-      error: null,
-      refresh: jest.fn(),
-    });
+    mockRealtimeContext.unreadNotifications = 14;
 
     const { getByText } = render(<HomeScreen />);
     expect(getByText('9+')).toBeTruthy();

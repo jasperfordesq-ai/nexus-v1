@@ -12,8 +12,6 @@ import { useTranslation } from 'react-i18next';
 
 import { usePrimaryColor } from '@/lib/hooks/useTenant';
 import { useTheme } from '@/lib/hooks/useTheme';
-import { useApi } from '@/lib/hooks/useApi';
-import { getNotificationCounts } from '@/lib/api/notifications';
 import { useRealtimeContext } from '@/lib/context/RealtimeContext';
 
 type IoniconName = React.ComponentProps<typeof Ionicons>['name'];
@@ -96,11 +94,8 @@ export default function TabsLayout() {
   const pathname = usePathname();
   const insets = useSafeAreaInsets();
 
-  // Fetch notification counts for the messages badge
-  const { data: countsData } = useApi(() => getNotificationCounts());
-  const apiUnread = countsData?.data?.messages ?? 0;
-  // Prefer real-time count from Pusher; fall back to API count
-  const messagesBadgeCount = unreadMessages > 0 ? unreadMessages : apiUnread;
+  // Single source of truth from RealtimeContext — no duplicate API call
+  const messagesBadgeCount = unreadMessages;
 
   // Clear the badge whenever the user navigates to the Messages tab
   useEffect(() => {

@@ -21,12 +21,11 @@ import { Ionicons } from '@expo/vector-icons';
 import * as Sentry from '@sentry/react-native';
 import { useTranslation } from 'react-i18next';
 import { getFeed, type FeedItem as FeedItemType, type FeedResponse } from '@/lib/api/feed';
-import { getNotificationCounts } from '@/lib/api/notifications';
 import { usePaginatedApi } from '@/lib/hooks/usePaginatedApi';
-import { useApi } from '@/lib/hooks/useApi';
 import { useAuth } from '@/lib/hooks/useAuth';
 import { usePrimaryColor } from '@/lib/hooks/useTenant';
 import { useTheme, type Theme } from '@/lib/hooks/useTheme';
+import { useRealtimeContext } from '@/lib/context/RealtimeContext';
 import FeedItem from '@/components/FeedItem';
 import OfflineBanner from '@/components/OfflineBanner';
 import StoryCircles from '@/components/StoryCircles';
@@ -89,8 +88,8 @@ export default function HomeScreen() {
     }
   }, [isLoading]);
 
-  const { data: countsData } = useApi(() => getNotificationCounts());
-  const unreadNotifications = countsData?.data?.total ?? 0;
+  // Read from the single source of truth — no duplicate API call
+  const { unreadNotifications } = useRealtimeContext();
 
   // Derive unique members from feed for story circles (exclude current user — "You" circle handles that)
   const storyMembers = useMemo(() => {
@@ -116,7 +115,7 @@ export default function HomeScreen() {
   }, []);
 
   const keyExtractor = useCallback(
-    (item: FeedItemType, index: number) => `${item.type}-${item.id}-${index}`,
+    (item: FeedItemType) => `${item.type}-${item.id}`,
     [],
   );
 
