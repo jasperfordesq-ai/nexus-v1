@@ -134,9 +134,9 @@ class WebPushService
      */
     private static function createWebPushInstance(): ?WebPush
     {
-        $publicKey  = env('VAPID_PUBLIC_KEY');
-        $privateKey = env('VAPID_PRIVATE_KEY');
-        $subject    = env('VAPID_SUBJECT', 'mailto:hello@project-nexus.ie');
+        $publicKey  = config('services.vapid.public_key');
+        $privateKey = config('services.vapid.private_key');
+        $subject    = config('services.vapid.subject', 'mailto:hello@project-nexus.ie');
 
         if (empty($publicKey) || empty($privateKey)) {
             Log::warning('WebPushService: VAPID keys not configured');
