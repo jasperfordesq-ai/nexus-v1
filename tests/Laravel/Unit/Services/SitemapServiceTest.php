@@ -208,35 +208,37 @@ class SitemapServiceTest extends TestCase
         $this->assertStringNotContainsString("/listings/{$id}", $xml);
     }
 
-    // Groups, jobs, events, profiles, KB, resources, organisations, volunteering,
-    // ideation are all behind ProtectedRoute (login required) — correctly EXCLUDED
-    // from sitemap since crawlers cannot access them.
+    // Content types are now public (routes moved outside ProtectedRoute)
+    // and included in the sitemap.
 
-    public function test_generateForTenant_excludes_protected_groups(): void
+    public function test_generateForTenant_includes_public_groups(): void
     {
         Cache::flush();
         $xml = $this->service->generateForTenant($this->testTenantId);
-        $this->assertStringNotContainsString('/groups/', $xml);
+        // Tenant 2 has public groups
+        $this->assertStringContainsString('/groups/', $xml);
     }
 
-    public function test_generateForTenant_excludes_protected_jobs(): void
+    public function test_generateForTenant_includes_events_listing(): void
     {
         Cache::flush();
         $xml = $this->service->generateForTenant($this->testTenantId);
-        $this->assertStringNotContainsString('/jobs/', $xml);
+        $this->assertStringContainsString('/events', $xml);
     }
 
-    public function test_generateForTenant_excludes_protected_kb_articles(): void
+    public function test_generateForTenant_includes_kb_articles(): void
     {
         Cache::flush();
         $xml = $this->service->generateForTenant($this->testTenantId);
-        $this->assertStringNotContainsString('/kb/', $xml);
+        // KB listing page should be present
+        $this->assertStringContainsString('/kb', $xml);
     }
 
-    public function test_generateForTenant_excludes_protected_profiles(): void
+    public function test_generateForTenant_excludes_profiles(): void
     {
         Cache::flush();
         $xml = $this->service->generateForTenant($this->testTenantId);
+        // Profiles require per-user consent — excluded
         $this->assertStringNotContainsString('/profile/', $xml);
     }
 

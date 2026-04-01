@@ -129,15 +129,15 @@ Route::get('/v2/presence/online-count', [\App\Http\Controllers\Api\PresenceContr
 // MIGRATED ROUTES — Events
 // Source: httpdocs/routes/events.php
 // ============================================
-Route::get('/v2/events', [\App\Http\Controllers\Api\EventsController::class, 'index']);
-Route::get('/v2/events/nearby', [\App\Http\Controllers\Api\EventsController::class, 'nearby']);
+Route::get('/v2/events', [\App\Http\Controllers\Api\EventsController::class, 'index'])->withoutMiddleware('auth:sanctum');
+Route::get('/v2/events/nearby', [\App\Http\Controllers\Api\EventsController::class, 'nearby'])->withoutMiddleware('auth:sanctum');
 Route::post('/v2/events', [\App\Http\Controllers\Api\EventsController::class, 'store']);
-Route::get('/v2/events/{id}', [\App\Http\Controllers\Api\EventsController::class, 'show']);
+Route::get('/v2/events/{id}', [\App\Http\Controllers\Api\EventsController::class, 'show'])->withoutMiddleware('auth:sanctum');
 Route::put('/v2/events/{id}', [\App\Http\Controllers\Api\EventsController::class, 'update']);
 Route::delete('/v2/events/{id}', [\App\Http\Controllers\Api\EventsController::class, 'destroy']);
 Route::post('/v2/events/{id}/rsvp', [\App\Http\Controllers\Api\EventsController::class, 'rsvp']);
 Route::delete('/v2/events/{id}/rsvp', [\App\Http\Controllers\Api\EventsController::class, 'removeRsvp']);
-Route::get('/v2/events/{id}/attendees', [\App\Http\Controllers\Api\EventsController::class, 'attendees']);
+Route::get('/v2/events/{id}/attendees', [\App\Http\Controllers\Api\EventsController::class, 'attendees'])->withoutMiddleware('auth:sanctum');
 Route::post('/v2/events/{id}/attendees/{attendeeId}/check-in', [\App\Http\Controllers\Api\EventsController::class, 'checkIn']);
 Route::post('/v2/events/{id}/cancel', [\App\Http\Controllers\Api\EventsController::class, 'cancel']);
 Route::post('/v2/events/{id}/waitlist', [\App\Http\Controllers\Api\EventsController::class, 'waitlist']);
@@ -204,23 +204,23 @@ Route::get('/v2/connections/status/me', function () {
     return response()->json(['errors' => [['code' => 'invalid_user', 'message' => 'Cannot check connection status with yourself']]], 422);
 }); // Guard: reject literal "me" before {userId} param
 // ============================================
-Route::get('/v2/groups', [\App\Http\Controllers\Api\GroupsController::class, 'index']);
+Route::get('/v2/groups', [\App\Http\Controllers\Api\GroupsController::class, 'index'])->withoutMiddleware('auth:sanctum');
 Route::post('/v2/groups', [\App\Http\Controllers\Api\GroupsController::class, 'store']);
 Route::get('/v2/groups/recommendations', [\App\Http\Controllers\Api\GroupRecommendController::class, 'index']);
 Route::post('/v2/groups/recommendations/track', [\App\Http\Controllers\Api\GroupRecommendController::class, 'track']);
 Route::get('/v2/groups/recommendations/metrics', [\App\Http\Controllers\Api\GroupRecommendController::class, 'metrics']);
-Route::get('/v2/groups/{id}', [\App\Http\Controllers\Api\GroupsController::class, 'show']);
+Route::get('/v2/groups/{id}', [\App\Http\Controllers\Api\GroupsController::class, 'show'])->withoutMiddleware('auth:sanctum');
 Route::put('/v2/groups/{id}', [\App\Http\Controllers\Api\GroupsController::class, 'update']);
 Route::delete('/v2/groups/{id}', [\App\Http\Controllers\Api\GroupsController::class, 'destroy']);
 Route::get('/v2/groups/{id}/similar', [\App\Http\Controllers\Api\GroupRecommendController::class, 'similar']);
 Route::post('/v2/groups/{id}/join', [\App\Http\Controllers\Api\GroupsController::class, 'join']);
 Route::delete('/v2/groups/{id}/membership', [\App\Http\Controllers\Api\GroupsController::class, 'leave']);
-Route::get('/v2/groups/{id}/members', [\App\Http\Controllers\Api\GroupsController::class, 'members']);
+Route::get('/v2/groups/{id}/members', [\App\Http\Controllers\Api\GroupsController::class, 'members'])->withoutMiddleware('auth:sanctum');
 Route::put('/v2/groups/{id}/members/{userId}', [\App\Http\Controllers\Api\GroupsController::class, 'updateMember']);
 Route::delete('/v2/groups/{id}/members/{userId}', [\App\Http\Controllers\Api\GroupsController::class, 'removeMember']);
 Route::get('/v2/groups/{id}/requests', [\App\Http\Controllers\Api\GroupsController::class, 'pendingRequests']);
 Route::post('/v2/groups/{id}/requests/{userId}', [\App\Http\Controllers\Api\GroupsController::class, 'handleRequest']);
-Route::get('/v2/groups/{id}/discussions', [\App\Http\Controllers\Api\GroupsController::class, 'discussions']);
+Route::get('/v2/groups/{id}/discussions', [\App\Http\Controllers\Api\GroupsController::class, 'discussions'])->withoutMiddleware('auth:sanctum');
 Route::post('/v2/groups/{id}/discussions', [\App\Http\Controllers\Api\GroupsController::class, 'createDiscussion']);
 Route::get('/v2/groups/{id}/discussions/{discussionId}', [\App\Http\Controllers\Api\GroupsController::class, 'discussionMessages']);
 Route::post('/v2/groups/{id}/discussions/{discussionId}/messages', [\App\Http\Controllers\Api\GroupsController::class, 'postToDiscussion']);
@@ -435,7 +435,7 @@ Route::get('/v2/polls/{id}/export', [\App\Http\Controllers\Api\PollsController::
 // MIGRATED ROUTES — Content (Jobs, Ideation, Goals, Gamification, Volunteering, Comments, Blog, Help, Pages, Resources, KB)
 // Source: httpdocs/routes/content.php
 // ============================================
-Route::get('/v2/jobs', [\App\Http\Controllers\Api\JobVacanciesController::class, 'index']);
+Route::get('/v2/jobs', [\App\Http\Controllers\Api\JobVacanciesController::class, 'index'])->withoutMiddleware('auth:sanctum');
 Route::post('/v2/jobs', [\App\Http\Controllers\Api\JobVacanciesController::class, 'store']);
 Route::get('/v2/jobs/recommended', [\App\Http\Controllers\Api\JobVacanciesController::class, 'recommended']);
 Route::get('/v2/jobs/applications/{id}/cv', [\App\Http\Controllers\Api\JobVacanciesController::class, 'downloadCv']);
@@ -476,7 +476,7 @@ Route::post('/v2/jobs/{id}/applications/bulk-status', [\App\Http\Controllers\Api
 // Static literal routes MUST come before {id} wildcard to avoid mismatching
 Route::get('/v2/jobs/my-interviews', [\App\Http\Controllers\Api\JobVacanciesController::class, 'myInterviews']);
 Route::get('/v2/jobs/my-offers', [\App\Http\Controllers\Api\JobVacanciesController::class, 'myOffers']);
-Route::get('/v2/jobs/{id}', [\App\Http\Controllers\Api\JobVacanciesController::class, 'show']);
+Route::get('/v2/jobs/{id}', [\App\Http\Controllers\Api\JobVacanciesController::class, 'show'])->withoutMiddleware('auth:sanctum');
 Route::put('/v2/jobs/{id}', [\App\Http\Controllers\Api\JobVacanciesController::class, 'update']);
 Route::delete('/v2/jobs/{id}', [\App\Http\Controllers\Api\JobVacanciesController::class, 'destroy']);
 Route::post('/v2/jobs/{id}/apply', [\App\Http\Controllers\Api\JobVacanciesController::class, 'apply']);
@@ -523,7 +523,7 @@ Route::post('/v2/jobs/{id}/interview-slots/bulk', [\App\Http\Controllers\Api\Job
 Route::post('/v2/jobs/interview-slots/{slotId}/book', [\App\Http\Controllers\Api\JobVacanciesController::class, 'bookInterviewSlot']);
 Route::delete('/v2/jobs/interview-slots/{slotId}/book', [\App\Http\Controllers\Api\JobVacanciesController::class, 'cancelInterviewSlotBooking']);
 Route::delete('/v2/jobs/interview-slots/{slotId}', [\App\Http\Controllers\Api\JobVacanciesController::class, 'deleteInterviewSlot']);
-Route::get('/v2/ideation-challenges', [\App\Http\Controllers\Api\IdeationChallengesController::class, 'index']);
+Route::get('/v2/ideation-challenges', [\App\Http\Controllers\Api\IdeationChallengesController::class, 'index'])->withoutMiddleware('auth:sanctum');
 Route::post('/v2/ideation-challenges', [\App\Http\Controllers\Api\IdeationChallengesController::class, 'store']);
 Route::get('/v2/ideation-ideas/{id}', [\App\Http\Controllers\Api\IdeationChallengesController::class, 'showIdea']);
 Route::put('/v2/ideation-ideas/{id}', [\App\Http\Controllers\Api\IdeationChallengesController::class, 'updateIdea']);
@@ -534,7 +534,7 @@ Route::put('/v2/ideation-ideas/{id}/status', [\App\Http\Controllers\Api\Ideation
 Route::get('/v2/ideation-ideas/{id}/comments', [\App\Http\Controllers\Api\IdeationChallengesController::class, 'comments']);
 Route::post('/v2/ideation-ideas/{id}/comments', [\App\Http\Controllers\Api\IdeationChallengesController::class, 'addComment']);
 Route::delete('/v2/ideation-comments/{id}', [\App\Http\Controllers\Api\IdeationChallengesController::class, 'deleteComment']);
-Route::get('/v2/ideation-challenges/{id}', [\App\Http\Controllers\Api\IdeationChallengesController::class, 'show']);
+Route::get('/v2/ideation-challenges/{id}', [\App\Http\Controllers\Api\IdeationChallengesController::class, 'show'])->withoutMiddleware('auth:sanctum');
 Route::put('/v2/ideation-challenges/{id}', [\App\Http\Controllers\Api\IdeationChallengesController::class, 'update']);
 Route::delete('/v2/ideation-challenges/{id}', [\App\Http\Controllers\Api\IdeationChallengesController::class, 'destroy']);
 Route::put('/v2/ideation-challenges/{id}/status', [\App\Http\Controllers\Api\IdeationChallengesController::class, 'updateStatus']);
@@ -584,9 +584,9 @@ Route::get('/v2/gamification/community-dashboard', [\App\Http\Controllers\Api\Ga
 Route::get('/v2/gamification/personal-journey', [\App\Http\Controllers\Api\GamificationV2Controller::class, 'personalJourney']);
 Route::get('/v2/gamification/member-spotlight', [\App\Http\Controllers\Api\GamificationV2Controller::class, 'memberSpotlight']);
 Route::get('/v2/gamification/engagement-history', [\App\Http\Controllers\Api\GamificationV2Controller::class, 'engagementHistory']);
-Route::get('/v2/volunteering/opportunities', [\App\Http\Controllers\Api\VolunteerController::class, 'opportunities']);
+Route::get('/v2/volunteering/opportunities', [\App\Http\Controllers\Api\VolunteerController::class, 'opportunities'])->withoutMiddleware('auth:sanctum');
 Route::post('/v2/volunteering/opportunities', [\App\Http\Controllers\Api\VolunteerController::class, 'createOpportunity']);
-Route::get('/v2/volunteering/opportunities/{id}', [\App\Http\Controllers\Api\VolunteerController::class, 'showOpportunity']);
+Route::get('/v2/volunteering/opportunities/{id}', [\App\Http\Controllers\Api\VolunteerController::class, 'showOpportunity'])->withoutMiddleware('auth:sanctum');
 Route::put('/v2/volunteering/opportunities/{id}', [\App\Http\Controllers\Api\VolunteerController::class, 'updateOpportunity']);
 Route::delete('/v2/volunteering/opportunities/{id}', [\App\Http\Controllers\Api\VolunteerController::class, 'deleteOpportunity']);
 Route::get('/v2/volunteering/opportunities/{id}/shifts', [\App\Http\Controllers\Api\VolunteerController::class, 'shifts']);
@@ -604,9 +604,9 @@ Route::get('/v2/volunteering/hours/summary', [\App\Http\Controllers\Api\Voluntee
 Route::get('/v2/volunteering/hours/pending-review', [\App\Http\Controllers\Api\VolunteerController::class, 'pendingHoursReview']);
 Route::put('/v2/volunteering/hours/{id}/verify', [\App\Http\Controllers\Api\VolunteerController::class, 'verifyHours']);
 Route::get('/v2/volunteering/my-organisations', [\App\Http\Controllers\Api\VolunteerController::class, 'myOrganisations']);
-Route::get('/v2/volunteering/organisations', [\App\Http\Controllers\Api\VolunteerController::class, 'organisations']);
+Route::get('/v2/volunteering/organisations', [\App\Http\Controllers\Api\VolunteerController::class, 'organisations'])->withoutMiddleware('auth:sanctum');
 Route::post('/v2/volunteering/organisations', [\App\Http\Controllers\Api\VolunteerController::class, 'createOrganisation']);
-Route::get('/v2/volunteering/organisations/{id}', [\App\Http\Controllers\Api\VolunteerController::class, 'showOrganisation']);
+Route::get('/v2/volunteering/organisations/{id}', [\App\Http\Controllers\Api\VolunteerController::class, 'showOrganisation'])->withoutMiddleware('auth:sanctum');
 Route::post('/v2/volunteering/reviews', [\App\Http\Controllers\Api\VolunteerController::class, 'createReview']);
 Route::get('/v2/volunteering/reviews/{type}/{id}', [\App\Http\Controllers\Api\VolunteerController::class, 'getReviews']);
 Route::get('/v2/comments', [\App\Http\Controllers\Api\CommentsController::class, 'index']);
@@ -621,7 +621,7 @@ Route::get('/v2/blog/categories', [\App\Http\Controllers\Api\BlogPublicControlle
 Route::get('/v2/blog/{slug}', [\App\Http\Controllers\Api\BlogPublicController::class, 'show'])->withoutMiddleware('auth:sanctum');
 Route::get('/v2/help/faqs', [\App\Http\Controllers\Api\HelpController::class, 'getFaqs'])->withoutMiddleware('auth:sanctum');
 Route::get('/v2/pages/{slug}', [\App\Http\Controllers\Api\PagesPublicController::class, 'show'])->withoutMiddleware('auth:sanctum');
-Route::get('/v2/resources', [\App\Http\Controllers\Api\ResourcePublicController::class, 'index']);
+Route::get('/v2/resources', [\App\Http\Controllers\Api\ResourcePublicController::class, 'index'])->withoutMiddleware('auth:sanctum');
 Route::get('/v2/resources/categories', [\App\Http\Controllers\Api\ResourcePublicController::class, 'categories']);
 Route::get('/v2/resources/categories/tree', [\App\Http\Controllers\Api\ResourceCategoryController::class, 'tree']);
 Route::post('/v2/resources/categories', [\App\Http\Controllers\Api\ResourceCategoryController::class, 'store'])->middleware('admin');

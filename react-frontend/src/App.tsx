@@ -320,6 +320,134 @@ function AppRoutes() {
           </FeatureGate>
         } />
 
+        {/* Public: Events (feature-gated, view-only) */}
+        <Route path="events" element={
+          <FeatureGate feature="events" fallback={<ComingSoonPage feature="Events" />}>
+            <FeatureErrorBoundary featureName="Events">
+              <EventsPage />
+            </FeatureErrorBoundary>
+          </FeatureGate>
+        } />
+        <Route path="events/:id" element={
+          <FeatureGate feature="events" redirect="/">
+            <FeatureErrorBoundary featureName="Events">
+              <EventDetailPage />
+            </FeatureErrorBoundary>
+          </FeatureGate>
+        } />
+
+        {/* Public: Groups (feature-gated, view-only) */}
+        <Route path="groups" element={
+          <FeatureGate feature="groups" fallback={<ComingSoonPage feature="Groups" />}>
+            <FeatureErrorBoundary featureName="Groups">
+              <GroupsPage />
+            </FeatureErrorBoundary>
+          </FeatureGate>
+        } />
+        <Route path="groups/:id" element={
+          <FeatureGate feature="groups" redirect="/">
+            <FeatureErrorBoundary featureName="Groups">
+              <GroupDetailPage />
+            </FeatureErrorBoundary>
+          </FeatureGate>
+        } />
+
+        {/* Public: Job Vacancies (feature-gated, view-only) */}
+        <Route path="jobs" element={
+          <FeatureGate feature="job_vacancies" fallback={<ComingSoonPage feature="Job Vacancies" />}>
+            <FeatureErrorBoundary featureName="Job Vacancies">
+              <JobsPage />
+            </FeatureErrorBoundary>
+          </FeatureGate>
+        } />
+        <Route path="jobs/:id" element={
+          <FeatureGate feature="job_vacancies" redirect="/">
+            <FeatureErrorBoundary featureName="Job Vacancies">
+              <JobDetailPage />
+            </FeatureErrorBoundary>
+          </FeatureGate>
+        } />
+
+        {/* Public: Volunteering (feature-gated, view-only) */}
+        <Route path="volunteering" element={
+          <FeatureGate feature="volunteering" fallback={<ComingSoonPage feature="Volunteering" />}>
+            <FeatureErrorBoundary featureName="Volunteering">
+              <VolunteeringPage />
+            </FeatureErrorBoundary>
+          </FeatureGate>
+        } />
+        <Route path="volunteering/opportunities/:id" element={
+          <FeatureGate feature="volunteering" redirect="/">
+            <FeatureErrorBoundary featureName="Volunteering">
+              <OpportunityDetailPage />
+            </FeatureErrorBoundary>
+          </FeatureGate>
+        } />
+
+        {/* Public: Resources (feature-gated) */}
+        <Route path="resources" element={
+          <FeatureGate feature="resources" fallback={<ComingSoonPage feature="Resources" />}>
+            <FeatureErrorBoundary featureName="Resources">
+              <ResourcesPage />
+            </FeatureErrorBoundary>
+          </FeatureGate>
+        } />
+
+        {/* Public: Knowledge Base (feature-gated) */}
+        <Route path="kb" element={
+          <FeatureGate feature="resources" fallback={<ComingSoonPage feature="Knowledge Base" />}>
+            <FeatureErrorBoundary featureName="Knowledge Base">
+              <KnowledgeBasePage />
+            </FeatureErrorBoundary>
+          </FeatureGate>
+        } />
+        <Route path="kb/:id" element={
+          <FeatureGate feature="resources" redirect="/">
+            <FeatureErrorBoundary featureName="Knowledge Base">
+              <KBArticlePage />
+            </FeatureErrorBoundary>
+          </FeatureGate>
+        } />
+
+        {/* Public: Organisations (feature-gated, view-only) */}
+        <Route path="organisations" element={
+          <FeatureGate feature="organisations" fallback={<ComingSoonPage feature="Organisations" />}>
+            <FeatureErrorBoundary featureName="Organisations">
+              <OrganisationsPage />
+            </FeatureErrorBoundary>
+          </FeatureGate>
+        } />
+        <Route path="organisations/:id" element={
+          <FeatureGate feature="organisations" redirect="/">
+            <FeatureErrorBoundary featureName="Organisations">
+              <OrganisationDetailPage />
+            </FeatureErrorBoundary>
+          </FeatureGate>
+        } />
+
+        {/* Public: Ideation (feature-gated, view-only) */}
+        <Route path="ideation" element={
+          <FeatureGate feature="ideation_challenges" fallback={<ComingSoonPage feature="Ideation Challenges" />}>
+            <FeatureErrorBoundary featureName="Ideation Challenges">
+              <IdeationPage />
+            </FeatureErrorBoundary>
+          </FeatureGate>
+        } />
+        <Route path="ideation/:id" element={
+          <FeatureGate feature="ideation_challenges" redirect="/">
+            <FeatureErrorBoundary featureName="Ideation Challenges">
+              <ChallengeDetailPage />
+            </FeatureErrorBoundary>
+          </FeatureGate>
+        } />
+        <Route path="ideation/:challengeId/ideas/:id" element={
+          <FeatureGate feature="ideation_challenges" redirect="/">
+            <FeatureErrorBoundary featureName="Ideation Challenges">
+              <IdeaDetailPage />
+            </FeatureErrorBoundary>
+          </FeatureGate>
+        } />
+
         {/* Protected Routes */}
         <Route element={<ProtectedRoute />}>
           {/* Core Features (module-gated) */}
@@ -496,14 +624,7 @@ function AppRoutes() {
             </FeatureGate>
           } />
 
-          {/* Feature-gated: Events */}
-          <Route path="events" element={
-            <FeatureGate feature="events" fallback={<ComingSoonPage feature="Events" />}>
-              <FeatureErrorBoundary featureName="Events">
-                <EventsPage />
-              </FeatureErrorBoundary>
-            </FeatureGate>
-          } />
+          {/* Feature-gated: Events (create/edit only — view routes are public) */}
           <Route path="events/create" element={
             <FeatureGate feature="events" redirect="/dashboard">
               <FeatureErrorBoundary featureName="Events">
@@ -518,22 +639,8 @@ function AppRoutes() {
               </FeatureErrorBoundary>
             </FeatureGate>
           } />
-          <Route path="events/:id" element={
-            <FeatureGate feature="events" redirect="/dashboard">
-              <FeatureErrorBoundary featureName="Events">
-                <EventDetailPage />
-              </FeatureErrorBoundary>
-            </FeatureGate>
-          } />
 
-          {/* Feature-gated: Groups */}
-          <Route path="groups" element={
-            <FeatureGate feature="groups" fallback={<ComingSoonPage feature="Groups" />}>
-              <FeatureErrorBoundary featureName="Groups">
-                <GroupsPage />
-              </FeatureErrorBoundary>
-            </FeatureGate>
-          } />
+          {/* Feature-gated: Groups (create/edit only — view routes are public) */}
           <Route path="groups/create" element={
             <FeatureGate feature="groups" redirect="/dashboard">
               <FeatureErrorBoundary featureName="Groups">
@@ -545,13 +652,6 @@ function AppRoutes() {
             <FeatureGate feature="groups" redirect="/dashboard">
               <FeatureErrorBoundary featureName="Groups">
                 <CreateGroupPage />
-              </FeatureErrorBoundary>
-            </FeatureGate>
-          } />
-          <Route path="groups/:id" element={
-            <FeatureGate feature="groups" redirect="/dashboard">
-              <FeatureErrorBoundary featureName="Groups">
-                <GroupDetailPage />
               </FeatureErrorBoundary>
             </FeatureGate>
           } />
@@ -597,14 +697,7 @@ function AppRoutes() {
             </FeatureGate>
           } />
 
-          {/* Feature-gated: Job Vacancies */}
-          <Route path="jobs" element={
-            <FeatureGate feature="job_vacancies" fallback={<ComingSoonPage feature="Job Vacancies" />}>
-              <FeatureErrorBoundary featureName="Job Vacancies">
-                <JobsPage />
-              </FeatureErrorBoundary>
-            </FeatureGate>
-          } />
+          {/* Feature-gated: Job Vacancies (create/edit/manage only — view routes are public) */}
           <Route path="jobs/create" element={
             <FeatureGate feature="job_vacancies" redirect="/dashboard">
               <FeatureErrorBoundary featureName="Job Vacancies">
@@ -616,13 +709,6 @@ function AppRoutes() {
             <FeatureGate feature="job_vacancies" redirect="/dashboard">
               <FeatureErrorBoundary featureName="Job Vacancies">
                 <CreateJobPage />
-              </FeatureErrorBoundary>
-            </FeatureGate>
-          } />
-          <Route path="jobs/:id" element={
-            <FeatureGate feature="job_vacancies" redirect="/dashboard">
-              <FeatureErrorBoundary featureName="Job Vacancies">
-                <JobDetailPage />
               </FeatureErrorBoundary>
             </FeatureGate>
           } />
@@ -683,14 +769,7 @@ function AppRoutes() {
             </FeatureGate>
           } />
 
-          {/* Feature-gated: Ideation Challenges */}
-          <Route path="ideation" element={
-            <FeatureGate feature="ideation_challenges" fallback={<ComingSoonPage feature="Ideation Challenges" />}>
-              <FeatureErrorBoundary featureName="Ideation Challenges">
-                <IdeationPage />
-              </FeatureErrorBoundary>
-            </FeatureGate>
-          } />
+          {/* Feature-gated: Ideation Challenges (create/edit/manage only — view routes are public) */}
           <Route path="ideation/create" element={
             <FeatureGate feature="ideation_challenges" redirect="/dashboard">
               <FeatureErrorBoundary featureName="Ideation Challenges">
@@ -702,20 +781,6 @@ function AppRoutes() {
             <FeatureGate feature="ideation_challenges" redirect="/dashboard">
               <FeatureErrorBoundary featureName="Ideation Challenges">
                 <CreateChallengePage />
-              </FeatureErrorBoundary>
-            </FeatureGate>
-          } />
-          <Route path="ideation/:id" element={
-            <FeatureGate feature="ideation_challenges" redirect="/dashboard">
-              <FeatureErrorBoundary featureName="Ideation Challenges">
-                <ChallengeDetailPage />
-              </FeatureErrorBoundary>
-            </FeatureGate>
-          } />
-          <Route path="ideation/:challengeId/ideas/:id" element={
-            <FeatureGate feature="ideation_challenges" redirect="/dashboard">
-              <FeatureErrorBoundary featureName="Ideation Challenges">
-                <IdeaDetailPage />
               </FeatureErrorBoundary>
             </FeatureGate>
           } />
@@ -741,14 +806,7 @@ function AppRoutes() {
             </FeatureGate>
           } />
 
-          {/* Feature-gated: Volunteering */}
-          <Route path="volunteering" element={
-            <FeatureGate feature="volunteering" fallback={<ComingSoonPage feature="Volunteering" />}>
-              <FeatureErrorBoundary featureName="Volunteering">
-                <VolunteeringPage />
-              </FeatureErrorBoundary>
-            </FeatureGate>
-          } />
+          {/* Feature-gated: Volunteering (create/manage only — view routes are public) */}
           <Route path="volunteering/create" element={
             <FeatureGate feature="volunteering" fallback={<ComingSoonPage feature="Volunteering" />}>
               <FeatureErrorBoundary featureName="Volunteering">
@@ -756,32 +814,13 @@ function AppRoutes() {
               </FeatureErrorBoundary>
             </FeatureGate>
           } />
-          <Route path="volunteering/opportunities/:id" element={
-            <FeatureGate feature="volunteering" fallback={<ComingSoonPage feature="Volunteering" />}>
-              <FeatureErrorBoundary featureName="Volunteering">
-                <OpportunityDetailPage />
-              </FeatureErrorBoundary>
-            </FeatureGate>
-          } />
           <Route path="volunteering/my-applications" element={<Navigate to="../volunteering?tab=applications" replace />} />
+
+          {/* Feature-gated: Organisations (register only — view routes are public) */}
           <Route path="organisations/register" element={
             <FeatureGate feature="organisations" fallback={<ComingSoonPage feature="Organisations" />}>
               <FeatureErrorBoundary featureName="Organisations">
                 <RegisterOrganisationPage />
-              </FeatureErrorBoundary>
-            </FeatureGate>
-          } />
-          <Route path="organisations" element={
-            <FeatureGate feature="organisations" fallback={<ComingSoonPage feature="Organisations" />}>
-              <FeatureErrorBoundary featureName="Organisations">
-                <OrganisationsPage />
-              </FeatureErrorBoundary>
-            </FeatureGate>
-          } />
-          <Route path="organisations/:id" element={
-            <FeatureGate feature="organisations" fallback={<ComingSoonPage feature="Organisations" />}>
-              <FeatureErrorBoundary featureName="Organisations">
-                <OrganisationDetailPage />
               </FeatureErrorBoundary>
             </FeatureGate>
           } />
@@ -812,31 +851,6 @@ function AppRoutes() {
             <FeatureGate module="feed" redirect="/dashboard">
               <FeatureErrorBoundary featureName="Feed">
                 <HashtagsDiscoveryPage />
-              </FeatureErrorBoundary>
-            </FeatureGate>
-          } />
-
-          {/* Feature-gated: Resources */}
-          <Route path="resources" element={
-            <FeatureGate feature="resources" fallback={<ComingSoonPage feature="Resources" />}>
-              <FeatureErrorBoundary featureName="Resources">
-                <ResourcesPage />
-              </FeatureErrorBoundary>
-            </FeatureGate>
-          } />
-
-          {/* Feature-gated: Knowledge Base (R4) */}
-          <Route path="kb" element={
-            <FeatureGate feature="resources" fallback={<ComingSoonPage feature="Knowledge Base" />}>
-              <FeatureErrorBoundary featureName="Knowledge Base">
-                <KnowledgeBasePage />
-              </FeatureErrorBoundary>
-            </FeatureGate>
-          } />
-          <Route path="kb/:id" element={
-            <FeatureGate feature="resources" redirect="/dashboard">
-              <FeatureErrorBoundary featureName="Knowledge Base">
-                <KBArticlePage />
               </FeatureErrorBoundary>
             </FeatureGate>
           } />
