@@ -92,6 +92,7 @@ import {
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
+import { PageMeta } from '@/components/seo/PageMeta';
 import { EmptyState } from '@/components/feedback';
 import { useAuth, useToast, useTenant } from '@/contexts';
 import { api } from '@/lib/api';
@@ -910,6 +911,11 @@ export function JobDetailPage() {
 
   return (
     <main className="space-y-6">
+      <PageMeta
+        title={vacancy.title}
+        description={vacancy.description?.substring(0, 160)}
+      />
+
       {/* Back nav */}
       <Link to={tenantPath('/jobs')} className="inline-flex items-center gap-2 text-theme-muted hover:text-theme-primary transition-colors">
         <ArrowLeft className="w-4 h-4" aria-hidden="true" />

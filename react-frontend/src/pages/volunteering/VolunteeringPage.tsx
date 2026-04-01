@@ -63,6 +63,7 @@ import {
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
+import { PageMeta } from '@/components/seo/PageMeta';
 import { EmptyState } from '@/components/feedback';
 import { useAuth, useTenant, useToast } from '@/contexts';
 import { usePageTitle } from '@/hooks';
@@ -200,6 +201,11 @@ export function VolunteeringPage() {
 
   return (
     <div className="space-y-6">
+      <PageMeta
+        title={t('page_title')}
+        description={t('subtitle')}
+      />
+
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>

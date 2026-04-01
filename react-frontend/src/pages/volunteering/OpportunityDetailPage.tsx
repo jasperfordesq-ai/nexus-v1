@@ -51,7 +51,9 @@ import {
   ChevronDown,
   QrCode,
 } from 'lucide-react';
+import { Helmet } from 'react-helmet-async';
 import { GlassCard } from '@/components/ui';
+import { PageMeta } from '@/components/seo/PageMeta';
 import { LoadingScreen } from '@/components/feedback';
 import { Breadcrumbs } from '@/components/navigation';
 import { useAuth, useTenant } from '@/contexts';
@@ -717,6 +719,23 @@ export function OpportunityDetailPage() {
 
   return (
     <div className="max-w-4xl mx-auto px-4 py-6 space-y-6">
+      <PageMeta
+        title={opp.title}
+        description={opp.description?.substring(0, 160)}
+      />
+      <Helmet>
+        <script type="application/ld+json">
+          {JSON.stringify({
+            '@context': 'https://schema.org',
+            '@type': 'VolunteerAction',
+            name: opp.title,
+            ...(opp.description ? { description: opp.description.substring(0, 300) } : {}),
+            ...(opp.location ? { location: { '@type': 'Place', name: opp.location } } : {}),
+            ...(opp.organization ? { agent: { '@type': 'Organization', name: opp.organization.name } } : {}),
+          })}
+        </script>
+      </Helmet>
+
       <Breadcrumbs
         items={[
           { label: t('breadcrumb_volunteering', 'Volunteering'), href: tenantPath('/volunteering') },

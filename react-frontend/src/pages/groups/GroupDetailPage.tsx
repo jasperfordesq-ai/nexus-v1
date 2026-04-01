@@ -53,6 +53,7 @@ import {
   Megaphone,
 } from 'lucide-react';
 import { GlassCard } from '@/components/ui';
+import { PageMeta } from '@/components/seo/PageMeta';
 import { Breadcrumbs } from '@/components/navigation';
 import { ComposeHub } from '@/components/compose';
 import { LoadingScreen, EmptyState } from '@/components/feedback';
@@ -948,6 +949,12 @@ export function GroupDetailPage() {
       animate={{ opacity: 1, y: 0 }}
       className="max-w-4xl mx-auto space-y-6"
     >
+      <PageMeta
+        title={group?.name}
+        description={group?.description?.substring(0, 160)}
+        image={group?.image_url || group?.cover_image_url || undefined}
+      />
+
       {/* Breadcrumbs */}
       <Breadcrumbs items={[
         { label: t('title'), href: tenantPath('/groups') },

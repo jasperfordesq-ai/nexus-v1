@@ -53,7 +53,9 @@ import {
   Video,
   BarChart3,
 } from 'lucide-react';
+import { Helmet } from 'react-helmet-async';
 import { GlassCard } from '@/components/ui';
+import { PageMeta } from '@/components/seo/PageMeta';
 import { Breadcrumbs } from '@/components/navigation';
 import { LoadingScreen, EmptyState } from '@/components/feedback';
 import { LocationMapCard } from '@/components/location';
@@ -526,6 +528,30 @@ export function EventDetailPage() {
       animate={{ opacity: 1, y: 0 }}
       className="max-w-4xl mx-auto space-y-6"
     >
+      <PageMeta
+        title={event.title}
+        description={event.description?.substring(0, 160)}
+        image={event.cover_image ? resolveAssetUrl(event.cover_image) : undefined}
+      />
+      <Helmet>
+        <script type="application/ld+json">
+          {JSON.stringify({
+            '@context': 'https://schema.org',
+            '@type': 'Event',
+            name: event.title,
+            ...(event.description ? { description: event.description.substring(0, 300) } : {}),
+            startDate: event.start_date,
+            ...(event.end_date ? { endDate: event.end_date } : {}),
+            ...(event.location ? { location: { '@type': 'Place', name: event.location } } : {}),
+            ...(event.cover_image ? { image: resolveAssetUrl(event.cover_image) } : {}),
+            organizer: {
+              '@type': 'Person',
+              name: event.organizer?.name || `${event.organizer?.first_name} ${event.organizer?.last_name}`.trim() || 'Community Member',
+            },
+          })}
+        </script>
+      </Helmet>
+
       {/* Breadcrumbs */}
       <Breadcrumbs items={[
         { label: t('title'), href: tenantPath('/events') },
