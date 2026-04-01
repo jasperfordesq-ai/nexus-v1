@@ -193,6 +193,16 @@ class AIServiceFactory
         $config = self::getConfig();
         $providerConfig = $config['providers'][$providerId] ?? [];
 
+        // Ensure api_url is always set for cloud providers (config file may not exist)
+        if (empty($providerConfig['api_url'])) {
+            $providerConfig['api_url'] = match ($providerId) {
+                'openai' => 'https://api.openai.com/v1',
+                'anthropic' => 'https://api.anthropic.com/v1',
+                'gemini' => 'https://generativelanguage.googleapis.com/v1beta',
+                default => $providerConfig['api_url'] ?? '',
+            };
+        }
+
         $tenantId = TenantContext::getId();
         $hasDbKey = false;
         $apiKeySource = 'CONFIG/ENV';
