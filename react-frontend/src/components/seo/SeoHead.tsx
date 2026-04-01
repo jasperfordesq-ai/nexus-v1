@@ -79,6 +79,9 @@ export function SeoHead() {
         {JSON.stringify(orgSchema)}
       </script>
 
+      {/* og:locale for current language */}
+      <meta property="og:locale" content={document.documentElement.lang || 'en'} />
+
       {/* hreflang alternate links for multi-language SEO */}
       {SUPPORTED_LANGUAGES.map(lang => (
         <link key={lang} rel="alternate" hrefLang={lang} href={`${currentUrl}?lng=${lang}`} />
