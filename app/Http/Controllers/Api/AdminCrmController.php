@@ -223,8 +223,9 @@ class AdminCrmController extends BaseApiController
         }
 
         if ($search && mb_strlen($search) >= 2) {
-            $searchTerm = '%' . $search . '%';
-            $where .= " AND (mn.content LIKE ? OR u.name LIKE ?)";
+            $escaped = str_replace(['%', '_'], ['\\%', '\\_'], $search);
+            $searchTerm = '%' . $escaped . '%';
+            $where .= " AND (mn.content LIKE ? ESCAPE '\\\\' OR u.name LIKE ? ESCAPE '\\\\')";
             $params[] = $searchTerm;
             $params[] = $searchTerm;
         }
@@ -399,8 +400,9 @@ class AdminCrmController extends BaseApiController
         }
 
         if ($search && mb_strlen($search) >= 2) {
-            $searchTerm = '%' . $search . '%';
-            $where .= " AND (ct.title LIKE ? OR ct.description LIKE ?)";
+            $escaped = str_replace(['%', '_'], ['\\%', '\\_'], $search);
+            $searchTerm = '%' . $escaped . '%';
+            $where .= " AND (ct.title LIKE ? ESCAPE '\\\\' OR ct.description LIKE ? ESCAPE '\\\\')";
             $params[] = $searchTerm;
             $params[] = $searchTerm;
         }
@@ -439,6 +441,12 @@ class AdminCrmController extends BaseApiController
 
         if (!$title) {
             return $this->respondWithError('VALIDATION_ERROR', __('api.title_is_required'), null, 400);
+        }
+
+        // Validate assignee belongs to this tenant
+        $assignee = DB::selectOne("SELECT id FROM users WHERE id = ? AND tenant_id = ?", [$assignedTo, $tenantId]);
+        if (!$assignee) {
+            $assignedTo = $adminId; // fallback to current admin
         }
 
         $validPriorities = ['low', 'medium', 'high', 'urgent'];
@@ -505,23 +513,32 @@ class AdminCrmController extends BaseApiController
         $validStatuses = ['pending', 'in_progress', 'completed', 'cancelled'];
         if ($status !== null && in_array($status, $validStatuses, true)) {
             $updates[] = "status = ?"; $params[] = $status;
-            if ($status === 'completed') { $updates[] = "completed_at = NOW()"; }
+            if ($status === 'completed') {
+                $updates[] = "completed_at = NOW()";
+            } elseif ($task->status === 'completed') {
+                $updates[] = "completed_at = NULL";
+            }
         }
 
         $assignedTo = $this->input('assigned_to');
-        if ($assignedTo !== null) { $updates[] = "assigned_to = ?"; $params[] = (int) $assignedTo; }
+        if ($assignedTo !== null) {
+            $assignee = DB::selectOne("SELECT id FROM users WHERE id = ? AND tenant_id = ?", [(int) $assignedTo, $tenantId]);
+            if ($assignee) {
+                $updates[] = "assigned_to = ?"; $params[] = (int) $assignedTo;
+            }
+        }
 
-        $dueDate = $this->input('due_date');
-        if ($dueDate !== null) {
-            if ($dueDate === '' || $dueDate === null) {
+        if (request()->has('due_date')) {
+            $dueDate = $this->input('due_date');
+            if (!$dueDate) {
                 $updates[] = "due_date = NULL";
             } elseif (preg_match('/^\d{4}-\d{2}-\d{2}$/', $dueDate)) {
                 $updates[] = "due_date = ?"; $params[] = $dueDate;
             }
         }
 
-        $userIdInput = $this->input('user_id');
-        if ($userIdInput !== null) {
+        if (request()->has('user_id')) {
+            $userIdInput = $this->input('user_id');
             $updates[] = "user_id = ?"; $params[] = $userIdInput ? (int) $userIdInput : null;
         }
 

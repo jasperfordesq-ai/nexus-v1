@@ -152,14 +152,10 @@ export default function CoordinatorTasks() {
       if (searchQuery.trim().length >= 2) params.search = searchQuery.trim();
 
       const res = await adminCrm.getTasks(params);
-      if (res.success && res.data) {
-        const payload = res.data as unknown;
-        if (payload && typeof payload === 'object') {
-          const p = payload as { data?: Task[]; meta?: { total?: number; page?: number; pages?: number } };
-          setTasks(p.data || []);
-          setTotal(p.meta?.total || 0);
-          setTotalPages(p.meta?.pages || 1);
-        }
+      if (res.success) {
+        setTasks(Array.isArray(res.data) ? res.data as Task[] : []);
+        setTotal(res.meta?.total || 0);
+        setTotalPages(res.meta?.total_pages || 1);
       }
     } catch {
       toast.error(t('crm.failed_to_load_tasks'));
@@ -225,8 +221,9 @@ export default function CoordinatorTasks() {
         description: formDescription.trim() || null,
         priority: formPriority,
         assigned_to: formAssignedTo ? Number(formAssignedTo) : undefined,
-        user_id: formUserId ? Number(formUserId) : undefined,
-        due_date: formDueDate || undefined,
+        // When editing, send null explicitly so the backend clears the field
+        user_id: formUserId ? Number(formUserId) : (editingTask ? null : undefined),
+        due_date: formDueDate || (editingTask ? null : undefined),
       };
 
       if (editingTask) {

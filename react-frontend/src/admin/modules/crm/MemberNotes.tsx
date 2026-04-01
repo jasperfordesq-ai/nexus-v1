@@ -108,13 +108,14 @@ export function MemberNotes() {
       if (searchQuery.trim().length >= 2) params.search = searchQuery.trim();
 
       const res = await adminCrm.getNotes(params);
-      if (res.success && res.data) {
-        const payload = res.data as unknown;
-        if (payload && typeof payload === 'object') {
-          const p = payload as { data?: Note[]; meta?: NotesMeta };
-          setNotes(p.data || []);
-          if (p.meta) setMeta(p.meta);
-        }
+      if (res.success) {
+        setNotes(Array.isArray(res.data) ? res.data as Note[] : []);
+        setMeta({
+          total: res.meta?.total || 0,
+          page: res.meta?.current_page || 1,
+          limit: res.meta?.per_page || ITEMS_PER_PAGE,
+          pages: res.meta?.total_pages || 1,
+        });
       }
     } catch {
       setNotes([]);

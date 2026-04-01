@@ -160,13 +160,14 @@ export function ActivityTimeline() {
         type: filterType || undefined,
         days: filterDays ? Number(filterDays) : undefined,
       });
-      if (res.success && res.data) {
-        const payload = res.data as unknown;
-        if (payload && typeof payload === 'object') {
-          const p = payload as { data?: TimelineEntry[]; meta?: TimelineMeta };
-          setEntries(p.data || []);
-          if (p.meta) setMeta(p.meta);
-        }
+      if (res.success) {
+        setEntries(Array.isArray(res.data) ? res.data as TimelineEntry[] : []);
+        setMeta({
+          total: res.meta?.total || 0,
+          page: res.meta?.current_page || 1,
+          limit: res.meta?.per_page || ITEMS_PER_PAGE,
+          pages: res.meta?.total_pages || 1,
+        });
       }
     } catch {
       setEntries([]);
