@@ -50,7 +50,7 @@ export function GifPicker({ onSelect }: GifPickerProps) {
     if (!value.trim()) {
       // Show trending again
       if (hasFetchedTrending) {
-        featured(20).then(setGifs);
+        featured(20).then(setGifs).catch(() => setGifs([]));
       }
       return;
     }
@@ -59,6 +59,7 @@ export function GifPicker({ onSelect }: GifPickerProps) {
       setIsLoading(true);
       searchGifs(value.trim(), 20)
         .then(setGifs)
+        .catch(() => setGifs([]))
         .finally(() => setIsLoading(false));
     }, 300);
   }, [hasFetchedTrending]);

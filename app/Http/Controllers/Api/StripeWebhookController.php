@@ -68,19 +68,12 @@ class StripeWebhookController extends BaseApiController
             return $this->respondWithData(['received' => true]);
         }
 
-        // Record the event as "processing" for idempotency (or update if retrying a failed event)
-        if ($existing) {
-            DB::table('stripe_webhook_events')
-                ->where('event_id', $eventId)
-                ->update(['status' => 'processing', 'processed_at' => now()]);
-        } else {
-            DB::table('stripe_webhook_events')->insert([
-                'event_id' => $eventId,
-                'event_type' => $event->type,
-                'status' => 'processing',
-                'processed_at' => now(),
-            ]);
-        }
+        // Atomic upsert — prevents TOCTOU race where two concurrent deliveries
+        // both pass the above check and double-process the same event
+        DB::table('stripe_webhook_events')->updateOrInsert(
+            ['event_id' => $eventId],
+            ['event_type' => $event->type, 'status' => 'processing', 'processed_at' => now()]
+        );
 
         // Dispatch to the appropriate handler
         try {

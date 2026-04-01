@@ -42,6 +42,9 @@ class WebAuthnController extends BaseApiController
         $this->rateLimit('webauthn_register_challenge', 10, 60);
 
         $userId = $this->requireAuth();
+
+        // Per-user rate limit to prevent user ID enumeration
+        $this->rateLimit("webauthn_register_user_{$userId}", 3, 600);
         $user = $this->getWebAuthnUser($userId);
 
         if (!$user) {

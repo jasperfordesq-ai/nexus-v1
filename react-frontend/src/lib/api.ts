@@ -203,8 +203,25 @@ class ApiClient {
   // Request deduplication: track in-flight GET requests
   private inflightRequests: Map<string, Promise<ApiResponse<unknown>>> = new Map();
 
+  // Cross-tab token refresh coordination
+  private static readonly REFRESH_LOCK_KEY = 'nexus_token_refresh_lock';
+  private static readonly REFRESH_LOCK_TTL = 15_000; // 15 seconds max
+
   constructor(baseUrl: string = API_BASE) {
     this.baseUrl = baseUrl;
+
+    // Listen for cross-tab token updates
+    if (typeof window !== 'undefined') {
+      window.addEventListener('storage', (e) => {
+        if (e.key === 'access_token' && e.newValue && this.isRefreshing) {
+          // Another tab successfully refreshed — resolve our pending requests
+          this.pendingRequests.forEach(({ resolve }) => resolve(true));
+          this.pendingRequests = [];
+          this.isRefreshing = false;
+          this.refreshPromise = null;
+        }
+      });
+    }
   }
 
   /**
@@ -333,12 +350,48 @@ class ApiClient {
   }
 
   /**
-   * Handle token refresh with request queuing
+   * Acquire a cross-tab lock via localStorage to prevent concurrent refreshes.
+   * Returns true if this tab acquired the lock.
+   */
+  private acquireRefreshLock(): boolean {
+    const now = Date.now();
+    const existing = localStorage.getItem(ApiClient.REFRESH_LOCK_KEY);
+    if (existing) {
+      const lockTime = parseInt(existing, 10);
+      if (now - lockTime < ApiClient.REFRESH_LOCK_TTL) {
+        return false; // Another tab holds a valid lock
+      }
+    }
+    localStorage.setItem(ApiClient.REFRESH_LOCK_KEY, String(now));
+    return true;
+  }
+
+  private releaseRefreshLock(): void {
+    localStorage.removeItem(ApiClient.REFRESH_LOCK_KEY);
+  }
+
+  /**
+   * Handle token refresh with request queuing and cross-tab coordination
    */
   private async handleTokenRefresh(): Promise<boolean> {
-    // If already refreshing, wait for the result
+    // If this tab is already refreshing, wait for the result
     if (this.isRefreshing && this.refreshPromise) {
       return this.refreshPromise;
+    }
+
+    // Check if another tab is currently refreshing
+    if (!this.acquireRefreshLock()) {
+      // Another tab is refreshing — wait for the storage event to signal completion
+      return new Promise<boolean>((resolve, reject) => {
+        this.pendingRequests.push({ resolve, reject });
+        // Timeout fallback: if the other tab's refresh doesn't complete, retry ourselves
+        setTimeout(() => {
+          if (this.pendingRequests.length > 0) {
+            this.pendingRequests.forEach(({ resolve: r }) => r(false));
+            this.pendingRequests = [];
+          }
+        }, ApiClient.REFRESH_LOCK_TTL);
+      });
     }
 
     this.isRefreshing = true;
@@ -360,6 +413,7 @@ class ApiClient {
     } finally {
       this.isRefreshing = false;
       this.refreshPromise = null;
+      this.releaseRefreshLock();
     }
   }
 
@@ -792,18 +846,25 @@ export async function checkBackendHealth(): Promise<{
  * Should be called once on app initialization
  */
 export async function fetchCsrfToken(): Promise<string | null> {
-  try {
-    const response = await api.get<{ csrf_token: string }>('/csrf-token', { skipCsrf: true });
-    // Backend returns { data: { csrf_token: "..." } }, unwrapped to { csrf_token: "..." }
-    const token = response.data?.csrf_token;
-    if (response.success && token) {
-      tokenManager.setCsrfToken(token);
-      return token;
+  for (let attempt = 0; attempt < 3; attempt++) {
+    try {
+      const response = await api.get<{ csrf_token: string }>('/csrf-token', { skipCsrf: true });
+      // Backend returns { data: { csrf_token: "..." } }, unwrapped to { csrf_token: "..." }
+      const token = response.data?.csrf_token;
+      if (response.success && token) {
+        tokenManager.setCsrfToken(token);
+        return token;
+      }
+      return null;
+    } catch {
+      if (attempt < 2) {
+        await new Promise((r) => setTimeout(r, 1000 * (attempt + 1)));
+        continue;
+      }
+      return null;
     }
-    return null;
-  } catch {
-    return null;
   }
+  return null;
 }
 
 // ─────────────────────────────────────────────────────────────────────────────

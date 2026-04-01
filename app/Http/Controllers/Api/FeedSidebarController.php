@@ -80,6 +80,7 @@ class FeedSidebarController extends BaseApiController
             $connectedIds = [$userId]; // exclude self
             try {
                 $connections = DB::table('connections')
+                    ->where('connections.tenant_id', $tenantId)
                     ->where('status', 'accepted')
                     ->where(function ($q) use ($userId) {
                         $q->where('requester_id', $userId)
@@ -277,6 +278,7 @@ class FeedSidebarController extends BaseApiController
                 $connectedIds = [$userId];
                 try {
                     $cids = DB::table('connections')
+                        ->where('connections.tenant_id', $tenantId)
                         ->where('status', 'accepted')
                         ->where(function ($q) use ($userId) {
                             $q->where('requester_id', $userId)->orWhere('receiver_id', $userId);

@@ -66,11 +66,19 @@ class AuthService
     {
         $tenantId = TenantContext::getId();
 
-        return DB::table('api_tokens')
+        $deleted = DB::table('api_tokens')
             ->join('users', 'api_tokens.user_id', '=', 'users.id')
             ->where('api_tokens.token', hash('sha256', $token))
             ->where('users.tenant_id', $tenantId)
             ->delete() > 0;
+
+        // Clear legacy session bridge to prevent stale authentication
+        if (session_status() === PHP_SESSION_ACTIVE) {
+            $_SESSION = [];
+            session_destroy();
+        }
+
+        return $deleted;
     }
 
     /**
@@ -121,7 +129,7 @@ class AuthService
         $newToken = Str::random(64);
         $expiresAt = now()->addDays(30);
 
-        DB::table('api_tokens')
+        $updated = DB::table('api_tokens')
             ->where('token', $hashed)
             ->where('user_id', $record->user_id)
             ->update([
@@ -129,6 +137,10 @@ class AuthService
                 'expires_at' => $expiresAt,
                 'updated_at' => now(),
             ]);
+
+        if ($updated === 0) {
+            return null;
+        }
 
         return ['token' => $newToken, 'expires_at' => $expiresAt->toIso8601String()];
     }

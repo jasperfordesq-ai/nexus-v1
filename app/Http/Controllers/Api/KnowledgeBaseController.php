@@ -383,11 +383,20 @@ class KnowledgeBaseController extends BaseApiController
      */
     public function downloadAttachment(int $id, int $attachmentId): \Symfony\Component\HttpFoundation\Response
     {
-        // Don't use getTenantId() — direct browser links have no tenant header.
-        // The article_id + attachment_id pair is unique, so we just verify the FK.
+        // Verify the article exists and get its tenant_id for cross-tenant scoping
+        $article = DB::table('knowledge_base_articles')
+            ->where('id', $id)
+            ->first(['id', 'tenant_id']);
+
+        if (! $article) {
+            return $this->respondWithError('NOT_FOUND', 'Article not found', null, 404);
+        }
+
+        // Scope attachment lookup to the article's tenant to prevent cross-tenant access
         $attachment = DB::table('knowledge_base_attachments')
             ->where('id', $attachmentId)
             ->where('article_id', $id)
+            ->where('tenant_id', $article->tenant_id)
             ->first();
 
         if (! $attachment) {

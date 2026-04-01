@@ -147,8 +147,8 @@ class MemberActivityService
                 ->limit($limit)
                 ->get();
             $items = $items->merge($comments);
-        } catch (\Exception $e) {
-            // Table may not exist
+        } catch (\Illuminate\Database\QueryException $e) {
+            report($e);
         }
 
         // Connections
@@ -172,8 +172,8 @@ class MemberActivityService
                 ->limit($limit)
                 ->get();
             $items = $items->merge($connections);
-        } catch (\Exception $e) {
-            // Table may not exist
+        } catch (\Illuminate\Database\QueryException $e) {
+            report($e);
         }
 
         // Event RSVPs
@@ -192,8 +192,8 @@ class MemberActivityService
                 ->limit($limit)
                 ->get();
             $items = $items->merge($events);
-        } catch (\Exception $e) {
-            // Table may not exist
+        } catch (\Illuminate\Database\QueryException $e) {
+            report($e);
         }
 
         return $items

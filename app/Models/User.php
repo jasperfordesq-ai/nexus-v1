@@ -81,6 +81,14 @@ class User extends Authenticatable
         return $bio ? mb_substr($bio, 0, 120) : null;
     }
 
+    /**
+     * Mutator: strip HTML tags from phone numbers to prevent stored XSS / display corruption.
+     */
+    public function setPhoneAttribute(?string $value): void
+    {
+        $this->attributes['phone'] = $value !== null ? strip_tags($value) : null;
+    }
+
     public function getAuthPassword(): string
     {
         return $this->password_hash;
