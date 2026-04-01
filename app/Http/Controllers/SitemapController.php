@@ -8,28 +8,44 @@
 namespace App\Http\Controllers;
 
 use App\Services\SitemapService;
+use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\DB;
 
 /**
  * SitemapController — Serves dynamically generated XML sitemaps.
  *
- * These are web routes (not API), returning application/xml responses.
- * Crawlers access these directly without authentication.
+ * Smart domain detection: if the request comes from a tenant's custom
+ * domain (e.g., hour-timebank.ie), /sitemap.xml returns that tenant's
+ * sitemap directly. On the main app domain, it returns the full index.
  *
- * Routes:
- *   GET /sitemap.xml         → Sitemap index (all active tenants)
- *   GET /sitemap-{slug}.xml  → Per-tenant sitemap
+ * This means every domain just submits /sitemap.xml to Google Search
+ * Console — simple, no special paths needed.
  */
 class SitemapController
 {
     /**
      * GET /sitemap.xml
      *
-     * Returns a sitemap index listing per-tenant sitemaps.
+     * If the request comes from a tenant's custom domain, return that
+     * tenant's sitemap. Otherwise return the sitemap index.
      */
-    public function index(SitemapService $service): Response
+    public function index(SitemapService $service, Request $request): Response
     {
-        $xml = $service->generateIndex();
+        // Check if the request host matches a tenant's custom domain
+        $host = $request->getHost();
+        $tenant = DB::selectOne(
+            "SELECT id, slug FROM tenants WHERE domain = ? AND is_active = 1",
+            [$host]
+        );
+
+        if ($tenant) {
+            // Custom domain — return this tenant's sitemap directly
+            $xml = $service->generateForTenant((int) $tenant->id);
+        } else {
+            // Main app domain — return the full sitemap index
+            $xml = $service->generateIndex();
+        }
 
         return response($xml, 200)
             ->header('Content-Type', 'application/xml; charset=UTF-8')
