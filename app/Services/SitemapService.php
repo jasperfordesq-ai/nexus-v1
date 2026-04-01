@@ -43,13 +43,17 @@ class SitemapService
                 "SELECT id, slug, domain, updated_at FROM tenants WHERE is_active = 1 ORDER BY id"
             );
 
-            $apiBase = $this->getApiBaseUrl();
+            // Use the frontend URL for sub-sitemap references so Google finds
+            // them on the same domain as the content URLs.
+            $frontendBase = rtrim(env('FRONTEND_URL', 'https://app.project-nexus.ie'), '/');
             $sitemaps = [];
 
             foreach ($tenants as $tenant) {
                 $slug = !empty($tenant->slug) ? $tenant->slug : 'main';
+                // Tenants with custom domains get their sitemap referenced from that domain
+                $base = !empty($tenant->domain) ? ('https://' . rtrim($tenant->domain, '/')) : $frontendBase;
                 $sitemaps[] = [
-                    'loc' => "{$apiBase}/sitemap-{$slug}.xml",
+                    'loc' => "{$base}/sitemap-{$slug}.xml",
                     'lastmod' => $this->formatDate($tenant->updated_at),
                 ];
             }

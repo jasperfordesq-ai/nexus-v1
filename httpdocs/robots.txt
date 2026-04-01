@@ -54,4 +54,5 @@ User-agent: Applebot-Extended
 Disallow: /
 
 # Sitemap — dynamically generated, covers all active tenants
-Sitemap: https://api.project-nexus.ie/sitemap.xml
+# Served from the frontend domain (nginx proxies to API backend)
+Sitemap: https://app.project-nexus.ie/sitemap.xml
