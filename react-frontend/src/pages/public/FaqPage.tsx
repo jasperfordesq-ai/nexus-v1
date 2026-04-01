@@ -18,6 +18,7 @@ import {
   Rocket, Wallet, Handshake, Trophy, ShieldCheck,
   Search, HelpCircle,
 } from 'lucide-react';
+import { Helmet } from 'react-helmet-async';
 import { useTranslation } from 'react-i18next';
 import { useTenant } from '@/contexts';
 import { usePageTitle } from '@/hooks';
@@ -327,6 +328,36 @@ export function FaqPage() {
     },
   ], [tenantPath, t]);
 
+  // Build FAQPage JSON-LD schema from categories
+  // Questions are plain strings from t(). Answers use the first paragraph translation.
+  const faqSchema = useMemo(() => {
+    const answerKeys: Record<string, string[]> = {
+      getting_started: ['answer_p1', 'answer_p1', 'answer_intro', 'answer_intro'],
+      time_credits: ['answer_p1', 'answer_intro', 'answer_intro', 'answer', 'answer_intro'],
+      exchanges_safety: ['answer_intro', 'answer_intro', 'answer_intro', 'answer'],
+      badges_rewards: ['answer_intro', 'answer_intro', 'answer_before_link'],
+      account_privacy: ['answer_before_link', 'answer_intro', 'answer_intro', 'answer_intro'],
+    };
+    const catKeys = ['getting_started', 'time_credits', 'exchanges_safety', 'badges_rewards', 'account_privacy'];
+
+    const mainEntity = catKeys.flatMap((catKey, ci) =>
+      (categories[ci]?.items || []).map((item, qi) => ({
+        '@type': 'Question' as const,
+        name: item.question,
+        acceptedAnswer: {
+          '@type': 'Answer' as const,
+          text: t(`faq.categories.${catKey}.q${qi + 1}.${answerKeys[catKey]?.[qi] || 'answer_p1'}`, { defaultValue: item.question }),
+        },
+      }))
+    );
+
+    return {
+      '@context': 'https://schema.org',
+      '@type': 'FAQPage',
+      mainEntity,
+    };
+  }, [categories, t]);
+
   // Filter by search query
   const filteredCategories = useMemo(() => {
     if (!searchQuery.trim()) return categories;
@@ -342,6 +373,9 @@ export function FaqPage() {
   return (
     <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
       <PageMeta title={t('faq.page_title', { defaultValue: 'FAQ' })} description={t('faq.meta_description', { defaultValue: 'Frequently asked questions about the community platform.' })} />
+      <Helmet>
+        <script type="application/ld+json">{JSON.stringify(faqSchema)}</script>
+      </Helmet>
       <motion.div
         variants={containerVariants}
         initial="hidden"
