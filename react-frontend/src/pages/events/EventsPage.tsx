@@ -38,6 +38,7 @@ import { api } from '@/lib/api';
 import { MAPS_ENABLED } from '@/lib/map-config';
 import { logError } from '@/lib/logger';
 import { usePageTitle } from '@/hooks';
+import { PageMeta } from '@/components/seo/PageMeta';
 import type { Event } from '@/types/api';
 
 type EventFilter = 'upcoming' | 'past' | 'all';
@@ -230,6 +231,7 @@ export function EventsPage() {
 
   return (
     <div className="space-y-6">
+      <PageMeta title={t('page_title', { defaultValue: 'Events' })} description={t('page_description', { defaultValue: 'Discover community events, workshops, and meetups near you.' })} />
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>

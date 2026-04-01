@@ -58,6 +58,7 @@ import { api, API_BASE, tokenManager } from '@/lib/api';
 import { logError } from '@/lib/logger';
 import { formatRelativeTime } from '@/lib/helpers';
 import { usePageTitle } from '@/hooks';
+import { PageMeta } from '@/components/seo/PageMeta';
 
 /* ───────────────────────── Types ───────────────────────── */
 
@@ -535,6 +536,7 @@ export function ResourcesPage() {
 
   return (
     <div className="space-y-6">
+      <PageMeta title={t('page_title', { defaultValue: 'Resources' })} description={t('page_description', { defaultValue: 'Community resources, documents, and guides.' })} />
       {/* Header */}
       <div className="flex items-center justify-between flex-wrap gap-4">
         <div>

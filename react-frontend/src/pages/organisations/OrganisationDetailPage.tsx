@@ -49,6 +49,7 @@ import { EmptyState, LoadingScreen } from '@/components/feedback';
 import { Breadcrumbs } from '@/components/navigation';
 import { useAuth, useTenant } from '@/contexts';
 import { usePageTitle } from '@/hooks';
+import { PageMeta } from '@/components/seo/PageMeta';
 import { resolveAvatarUrl } from '@/lib/helpers';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
@@ -250,6 +251,7 @@ export function OrganisationDetailPage() {
 
   return (
     <div className="space-y-6">
+      <PageMeta title={organisation?.name} description={organisation?.description?.substring(0, 160)} />
       {/* Breadcrumbs */}
       <Breadcrumbs items={[
         { label: t('organisation_detail.breadcrumb_volunteering'), href: '/volunteering' },

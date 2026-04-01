@@ -41,6 +41,7 @@ import { EmptyState } from '@/components/feedback';
 import { useTranslation } from 'react-i18next';
 import { useTenant } from '@/contexts';
 import { usePageTitle } from '@/hooks';
+import { PageMeta } from '@/components/seo/PageMeta';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
 import { formatRelativeTime } from '@/lib/helpers';
@@ -204,6 +205,7 @@ export function KnowledgeBasePage() {
 
   return (
     <div className="space-y-6 max-w-4xl mx-auto">
+      <PageMeta title={t('page_title', { defaultValue: 'Knowledge Base' })} description={t('page_description', { defaultValue: 'Articles, guides, and tutorials for the community.' })} />
       {/* Header */}
       <div className="text-center py-4">
         <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-gradient-to-br from-blue-500 to-indigo-600 mb-4">

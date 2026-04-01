@@ -32,6 +32,7 @@ import { EmptyState } from '@/components/feedback';
 import { Breadcrumbs } from '@/components/navigation';
 import { useAuth, useTenant } from '@/contexts';
 import { usePageTitle } from '@/hooks';
+import { PageMeta } from '@/components/seo/PageMeta';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
 
@@ -143,6 +144,7 @@ export function OrganisationsPage() {
 
   return (
     <div className="space-y-6">
+      <PageMeta title={t('page_title', { defaultValue: 'Organisations' })} description={t('page_description', { defaultValue: 'Community organisations and partners.' })} />
       {/* Breadcrumbs */}
       <Breadcrumbs items={[
         { label: t('organisations.breadcrumb_volunteering'), href: '/volunteering' },

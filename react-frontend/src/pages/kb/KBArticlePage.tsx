@@ -50,6 +50,7 @@ const MarkdownRenderer = lazy(() =>
 import { GlassCard } from '@/components/ui';
 import { useTenant, useToast } from '@/contexts';
 import { usePageTitle } from '@/hooks';
+import { PageMeta } from '@/components/seo/PageMeta';
 import { api, API_BASE } from '@/lib/api';
 import { logError } from '@/lib/logger';
 import { formatRelativeTime } from '@/lib/helpers';
@@ -250,6 +251,7 @@ export function KBArticlePage() {
 
   return (
     <div className="space-y-6 max-w-4xl mx-auto">
+      <PageMeta title={article?.title} description={article?.content?.replace(/<[^>]*>/g, '').substring(0, 160)} />
       {/* Breadcrumb */}
       <nav className="flex items-center gap-2 text-sm text-theme-muted flex-wrap">
         <Link

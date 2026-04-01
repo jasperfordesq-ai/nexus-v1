@@ -31,6 +31,7 @@ import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
 import { resolveAvatarUrl } from '@/lib/helpers';
 import { usePageTitle } from '@/hooks';
+import { PageMeta } from '@/components/seo/PageMeta';
 import type { Group } from '@/types/api';
 
 type GroupFilter = 'all' | 'joined' | 'public' | 'private';
@@ -166,6 +167,7 @@ export function GroupsPage() {
 
   return (
     <div className="space-y-6">
+      <PageMeta title={t('page_title', { defaultValue: 'Groups' })} description={t('page_description', { defaultValue: 'Browse and join community groups and interest circles.' })} />
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>

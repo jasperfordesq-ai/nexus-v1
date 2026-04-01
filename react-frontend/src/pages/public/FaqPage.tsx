@@ -21,6 +21,7 @@ import {
 import { useTranslation } from 'react-i18next';
 import { useTenant } from '@/contexts';
 import { usePageTitle } from '@/hooks';
+import { PageMeta } from '@/components/seo/PageMeta';
 import { GlassCard } from '@/components/ui';
 
 interface FaqItem {
@@ -340,6 +341,7 @@ export function FaqPage() {
 
   return (
     <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+      <PageMeta title={t('faq.page_title', { defaultValue: 'FAQ' })} description={t('faq.meta_description', { defaultValue: 'Frequently asked questions about the community platform.' })} />
       <motion.div
         variants={containerVariants}
         initial="hidden"

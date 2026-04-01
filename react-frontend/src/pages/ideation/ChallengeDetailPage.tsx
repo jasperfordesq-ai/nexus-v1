@@ -74,6 +74,7 @@ import { GlassCard } from '@/components/ui';
 import { EmptyState } from '@/components/feedback';
 import { useAuth, useToast, useTenant } from '@/contexts';
 import { usePageTitle } from '@/hooks';
+import { PageMeta } from '@/components/seo/PageMeta';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
 import { resolveAvatarUrl, resolveAssetUrl, formatRelativeTime } from '@/lib/helpers';
@@ -812,6 +813,7 @@ export function ChallengeDetailPage() {
 
   return (
     <div className="max-w-4xl mx-auto px-4 py-6">
+      <PageMeta title={challenge?.title} description={challenge?.description?.substring(0, 160)} />
       {/* Back link */}
       <Button
         variant="light"

@@ -51,6 +51,7 @@ import {
 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { usePageTitle } from '@/hooks/usePageTitle';
+import { PageMeta } from '@/components/seo/PageMeta';
 import { useApi } from '@/hooks/useApi';
 import { useTenant, useAuth } from '@/contexts';
 import { resolveAvatarUrl, resolveAssetUrl } from '@/lib/helpers';
@@ -533,6 +534,7 @@ export default function ExplorePage() {
 
   return (
     <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
+      <PageMeta title={t('explore.page_title', { defaultValue: 'Explore' })} description={t('explore.meta_description', { defaultValue: 'Discover community content, listings, events, and more.' })} />
 
       {/* ─── Hero Search Bar ──────────────────────────────────────────────── */}
       <motion.div

@@ -57,6 +57,7 @@ import { useAuth, useToast, useTenant } from '@/contexts';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
 import { usePageTitle } from '@/hooks';
+import { PageMeta } from '@/components/seo/PageMeta';
 
 interface JobVacancy {
   id: number;
@@ -311,6 +312,7 @@ export function JobsPage() {
 
   return (
     <div className="space-y-6">
+      <PageMeta title={t('page_title', { defaultValue: 'Job Vacancies' })} description={t('page_description', { defaultValue: 'Find job opportunities, volunteering positions, and timebank roles.' })} />
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
