@@ -274,7 +274,6 @@ export function AiSettings() {
     );
   }
 
-  const activeProvider = PROVIDERS.find(p => p.key === form.ai_provider);
 
   return (
     <div>
@@ -384,7 +383,7 @@ export function AiSettings() {
                     ))}
                   </Select>
 
-                  {provider.key !== PROVIDERS[PROVIDERS.length - 1].key && <Divider />}
+                  {provider.key !== PROVIDERS[PROVIDERS.length - 1]!.key && <Divider />}
                 </div>
               );
             })}
