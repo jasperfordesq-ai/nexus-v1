@@ -22,7 +22,8 @@ export function SeoHead() {
 
   const siteName = branding.name || 'NEXUS';
   const siteUrl = typeof window !== 'undefined' ? window.location.origin : '';
-  const currentUrl = `${siteUrl}${location.pathname}`;
+  // Use only the pathname (no query params) for canonical/hreflang to avoid stacking
+  const canonicalPath = `${siteUrl}${location.pathname}`;
 
   // Build path segments for BreadcrumbList JSON-LD
   const pathSegments = location.pathname.split('/').filter(Boolean);
@@ -84,9 +85,9 @@ export function SeoHead() {
 
       {/* hreflang alternate links for multi-language SEO */}
       {SUPPORTED_LANGUAGES.map(lang => (
-        <link key={lang} rel="alternate" hrefLang={lang} href={`${currentUrl}?lng=${lang}`} />
+        <link key={lang} rel="alternate" hrefLang={lang} href={`${canonicalPath}?lng=${lang}`} />
       ))}
-      <link rel="alternate" hrefLang="x-default" href={currentUrl} />
+      <link rel="alternate" hrefLang="x-default" href={canonicalPath} />
 
       {/* BreadcrumbList JSON-LD (only on non-homepage routes) */}
       {pathSegments.length > 0 && (

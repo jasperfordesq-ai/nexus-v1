@@ -586,6 +586,11 @@ class TenantHierarchyService
             ['tenant_id' => $tenantId, 'setting_key' => 'general.admin_approval', 'setting_value' => 'true', 'setting_type' => 'boolean'],
             ['tenant_id' => $tenantId, 'setting_key' => 'general.email_verification', 'setting_value' => 'true', 'setting_type' => 'boolean'],
             ['tenant_id' => $tenantId, 'setting_key' => 'general.maintenance_mode', 'setting_value' => 'false', 'setting_type' => 'boolean'],
+            // SEO defaults — ensure every new tenant has sitemap, canonical, OG, and Twitter cards enabled
+            ['tenant_id' => $tenantId, 'setting_key' => 'seo_auto_sitemap', 'setting_value' => '1', 'setting_type' => 'boolean'],
+            ['tenant_id' => $tenantId, 'setting_key' => 'seo_canonical_urls', 'setting_value' => '1', 'setting_type' => 'boolean'],
+            ['tenant_id' => $tenantId, 'setting_key' => 'seo_open_graph', 'setting_value' => '1', 'setting_type' => 'boolean'],
+            ['tenant_id' => $tenantId, 'setting_key' => 'seo_twitter_cards', 'setting_value' => '1', 'setting_type' => 'boolean'],
         ];
 
         foreach ($defaultSettings as $setting) {

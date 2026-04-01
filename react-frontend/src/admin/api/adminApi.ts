@@ -1212,8 +1212,8 @@ export const adminSettings = {
 // ─────────────────────────────────────────────────────────────────────────────
 
 export const adminTools = {
-  getRedirects: () => api.get<Array<{ id: number; from_url: string; to_url: string; status_code: number; hits: number; created_at: string }>>('/v2/admin/tools/redirects'),
-  createRedirect: (data: { from_url: string; to_url: string; status_code?: number }) =>
+  getRedirects: () => api.get<Array<{ id: number; source_url: string; destination_url: string; hits: number; created_at: string }>>('/v2/admin/tools/redirects'),
+  createRedirect: (data: { source_url: string; destination_url: string }) =>
     api.post<{ id: number }>('/v2/admin/tools/redirects', data),
   deleteRedirect: (id: number) => api.delete<{ success: boolean }>(`/v2/admin/tools/redirects/${id}`),
 

@@ -18,8 +18,6 @@ import {
   ModalBody,
   ModalFooter,
   Input,
-  Select,
-  SelectItem,
   useDisclosure,
 } from '@heroui/react';
 import { ArrowRightLeft, Plus, Trash2 } from 'lucide-react';
@@ -31,9 +29,8 @@ import { adminTools } from '../../api/adminApi';
 import { useTranslation } from 'react-i18next';
 interface Redirect {
   id: number;
-  from_url: string;
-  to_url: string;
-  status_code: number;
+  source_url: string;
+  destination_url: string;
   hits: number;
   created_at: string;
 }
@@ -51,7 +48,6 @@ export function Redirects() {
   const { isOpen: isAddOpen, onOpen: onAddOpen, onClose: onAddClose } = useDisclosure();
   const [fromUrl, setFromUrl] = useState('');
   const [toUrl, setToUrl] = useState('');
-  const [statusCode, setStatusCode] = useState<string>('301');
 
   // Delete confirm
   const [deleteTarget, setDeleteTarget] = useState<Redirect | null>(null);
@@ -81,16 +77,14 @@ export function Redirects() {
     setSaving(true);
     try {
       const res = await adminTools.createRedirect({
-        from_url: fromUrl.trim(),
-        to_url: toUrl.trim(),
-        status_code: Number(statusCode),
+        source_url: fromUrl.trim(),
+        destination_url: toUrl.trim(),
       });
 
       if (res.success) {
         toast.success(t('advanced.redirect_created'));
         setFromUrl('');
         setToUrl('');
-        setStatusCode('301');
         onAddClose();
         await fetchRedirects();
       } else {
@@ -128,16 +122,8 @@ export function Redirects() {
   };
 
   const columns: Column<Redirect>[] = [
-    { key: 'from_url', label: t('advanced.col_from_url'), sortable: true },
-    { key: 'to_url', label: t('advanced.col_to_url'), sortable: true },
-    {
-      key: 'status_code',
-      label: t('advanced.col_status_code'),
-      sortable: true,
-      render: (item) => (
-        <span className="font-mono text-sm">{item.status_code}</span>
-      ),
-    },
+    { key: 'source_url', label: t('advanced.col_from_url'), sortable: true },
+    { key: 'destination_url', label: t('advanced.col_to_url'), sortable: true },
     { key: 'hits', label: t('advanced.col_hits'), sortable: true },
     {
       key: 'created_at',
@@ -224,18 +210,6 @@ export function Redirects() {
               onValueChange={setToUrl}
               description={t('advanced.desc_the_destination_u_r_l_path')}
             />
-            <Select
-              label={t('advanced.label_status_code')}
-              variant="bordered"
-              selectedKeys={[statusCode]}
-              onSelectionChange={(keys) => {
-                const selected = Array.from(keys)[0];
-                if (selected) setStatusCode(String(selected));
-              }}
-            >
-              <SelectItem key="301">{t('advanced.status_301')}</SelectItem>
-              <SelectItem key="302">{t('advanced.status_302')}</SelectItem>
-            </Select>
           </ModalBody>
           <ModalFooter>
             <Button variant="flat" onPress={onAddClose} isDisabled={saving}>
@@ -254,7 +228,7 @@ export function Redirects() {
         onClose={() => setDeleteTarget(null)}
         onConfirm={handleDelete}
         title={t('advanced.delete_redirect_title')}
-        message={t('advanced.delete_redirect_message', { url: deleteTarget?.from_url })}
+        message={t('advanced.delete_redirect_message', { url: deleteTarget?.source_url })}
         confirmLabel={t('advanced.delete')}
         confirmColor="danger"
         isLoading={deleting}

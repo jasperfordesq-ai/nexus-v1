@@ -38,7 +38,7 @@ class AdminToolsController extends BaseApiController
 
         try {
             $redirects = DB::select(
-                "SELECT id, tenant_id, from_url, to_url, status_code, hits, created_at
+                "SELECT id, tenant_id, source_url, destination_url, hits, created_at
                  FROM seo_redirects WHERE tenant_id = ? ORDER BY created_at DESC",
                 [$tenantId]
             );
@@ -46,9 +46,8 @@ class AdminToolsController extends BaseApiController
             $formatted = array_map(fn($r) => [
                 'id' => (int) $r->id,
                 'tenant_id' => (int) $r->tenant_id,
-                'from_url' => $r->from_url,
-                'to_url' => $r->to_url,
-                'status_code' => (int) ($r->status_code ?? 301),
+                'source_url' => $r->source_url,
+                'destination_url' => $r->destination_url,
                 'hits' => (int) ($r->hits ?? 0),
                 'created_at' => $r->created_at ?? '',
             ], $redirects);
@@ -65,31 +64,26 @@ class AdminToolsController extends BaseApiController
         $this->requireAdmin();
         $tenantId = $this->getTenantId();
 
-        $fromUrl = trim($this->input('from_url', ''));
-        $toUrl = trim($this->input('to_url', ''));
-        $statusCode = (int) ($this->input('status_code', 301));
+        $sourceUrl = trim($this->input('source_url', $this->input('from_url', '')));
+        $destinationUrl = trim($this->input('destination_url', $this->input('to_url', '')));
 
-        if (empty($fromUrl)) {
-            return $this->respondWithError('VALIDATION_ERROR', __('api.from_url_required'), 'from_url', 422);
+        if (empty($sourceUrl)) {
+            return $this->respondWithError('VALIDATION_ERROR', __('api.from_url_required'), 'source_url', 422);
         }
-        if (empty($toUrl)) {
-            return $this->respondWithError('VALIDATION_ERROR', __('api.to_url_required'), 'to_url', 422);
-        }
-        if (!in_array($statusCode, [301, 302, 307, 308], true)) {
-            $statusCode = 301;
+        if (empty($destinationUrl)) {
+            return $this->respondWithError('VALIDATION_ERROR', __('api.to_url_required'), 'destination_url', 422);
         }
 
         try {
             DB::insert(
-                "INSERT INTO seo_redirects (tenant_id, from_url, to_url, status_code) VALUES (?, ?, ?, ?)",
-                [$tenantId, $fromUrl, $toUrl, $statusCode]
+                "INSERT INTO seo_redirects (tenant_id, source_url, destination_url) VALUES (?, ?, ?)",
+                [$tenantId, $sourceUrl, $destinationUrl]
             );
 
             return $this->respondWithData([
                 'id' => (int) DB::getPdo()->lastInsertId(),
-                'from_url' => $fromUrl,
-                'to_url' => $toUrl,
-                'status_code' => $statusCode,
+                'source_url' => $sourceUrl,
+                'destination_url' => $destinationUrl,
             ], null, 201);
         } catch (\Throwable $e) {
             return $this->respondWithError('SERVER_ERROR', __('api.redirect_create_failed'), null, 500);

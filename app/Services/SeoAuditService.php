@@ -169,7 +169,7 @@ class SeoAuditService
     private function checkBlogPostMeta(int $tenantId): array
     {
         $total = (int) DB::selectOne(
-            "SELECT COUNT(*) AS cnt FROM blog_posts WHERE tenant_id = ? AND status = 'published'",
+            "SELECT COUNT(*) AS cnt FROM posts WHERE tenant_id = ? AND status = 'published'",
             [$tenantId]
         )->cnt;
 
@@ -179,9 +179,9 @@ class SeoAuditService
 
         $missingMeta = DB::select(
             "SELECT bp.id, bp.title, bp.slug
-             FROM blog_posts bp
+             FROM posts bp
              LEFT JOIN seo_metadata sm ON sm.tenant_id = bp.tenant_id
-                AND sm.entity_type = 'blog_post' AND sm.entity_id = bp.id
+                AND sm.entity_type = 'post' AND sm.entity_id = bp.id
              WHERE bp.tenant_id = ? AND bp.status = 'published'
                 AND (sm.meta_title IS NULL OR sm.meta_title = ''
                      OR sm.meta_description IS NULL OR sm.meta_description = '')
@@ -437,9 +437,9 @@ class SeoAuditService
     {
         $issues = [];
 
-        // Check for very short blog posts
+        // Check for very short blog posts (blog data lives in the `posts` table)
         $shortPosts = (int) DB::selectOne(
-            "SELECT COUNT(*) AS cnt FROM blog_posts
+            "SELECT COUNT(*) AS cnt FROM posts
              WHERE tenant_id = ? AND status = 'published' AND LENGTH(content) < 300",
             [$tenantId]
         )->cnt;
