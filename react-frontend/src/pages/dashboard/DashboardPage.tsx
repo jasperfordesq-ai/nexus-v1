@@ -41,14 +41,22 @@ interface GamificationProfile {
 interface FeedActivityItem {
   id: number;
   content: string;
-  author_name: string;
-  author_avatar: string;
-  author_id: number;
+  author: {
+    id: number;
+    name: string;
+    avatar_url?: string;
+  };
   created_at: string;
   type: 'post' | 'listing' | 'event' | 'poll' | 'goal' | 'blog' | 'discussion';
   likes_count: number;
   comments_count: number;
   is_liked: boolean;
+}
+
+/** Strip HTML tags for plain-text preview */
+function stripHtml(html: string): string {
+  if (!html) return '';
+  return html.replace(/<[^>]*>/g, '').trim();
 }
 
 interface EndorsementEntry { skill: string; count: number; }
@@ -346,10 +354,10 @@ export function DashboardPage() {
                   <div className="divide-y divide-[var(--glass-border)]">
                     {stats.recentActivity.map((item, idx) => (
                       <Link key={`${item.type}-${item.id}-${idx}`} to={tenantPath('/feed')} className="flex items-center gap-3 py-3 first:pt-0 last:pb-0 group">
-                        <Avatar src={resolveAvatarUrl(item.author_avatar)} name={item.author_name} size="sm" className="shrink-0" />
+                        <Avatar src={resolveAvatarUrl(item.author?.avatar_url)} name={item.author?.name} size="sm" className="shrink-0" />
                         <div className="flex-1 min-w-0">
-                          <p className="text-sm text-theme-primary"><span className="font-medium">{item.author_name}</span>{' '}<span className="text-theme-muted">{formatActivityAction(item, t)}</span></p>
-                          <p className="text-xs text-theme-subtle line-clamp-1">{item.content}</p>
+                          <p className="text-sm text-theme-primary"><span className="font-medium">{item.author?.name}</span>{' '}<span className="text-theme-muted">{formatActivityAction(item, t)}</span></p>
+                          <p className="text-xs text-theme-subtle line-clamp-1">{stripHtml(item.content)}</p>
                         </div>
                         <div className="flex items-center gap-3 shrink-0 text-theme-subtle text-xs">
                           {item.likes_count > 0 && (<span className="hidden sm:flex items-center gap-1"><Heart className="w-3 h-3" aria-hidden="true" />{item.likes_count}</span>)}

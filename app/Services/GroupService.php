@@ -683,6 +683,7 @@ class GroupService
         $isMember = DB::table('group_members')
             ->where('group_id', $groupId)
             ->where('user_id', $userId)
+            ->where('tenant_id', TenantContext::getId())
             ->where('status', 'active')
             ->exists();
 
@@ -749,6 +750,7 @@ class GroupService
         $isMember = DB::table('group_members')
             ->where('group_id', $groupId)
             ->where('user_id', $userId)
+            ->where('tenant_id', TenantContext::getId())
             ->where('status', 'active')
             ->exists();
 

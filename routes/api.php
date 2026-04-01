@@ -220,7 +220,7 @@ Route::put('/v2/groups/{id}/members/{userId}', [\App\Http\Controllers\Api\Groups
 Route::delete('/v2/groups/{id}/members/{userId}', [\App\Http\Controllers\Api\GroupsController::class, 'removeMember']);
 Route::get('/v2/groups/{id}/requests', [\App\Http\Controllers\Api\GroupsController::class, 'pendingRequests']);
 Route::post('/v2/groups/{id}/requests/{userId}', [\App\Http\Controllers\Api\GroupsController::class, 'handleRequest']);
-Route::get('/v2/groups/{id}/discussions', [\App\Http\Controllers\Api\GroupsController::class, 'discussions'])->withoutMiddleware('auth:sanctum');
+Route::get('/v2/groups/{id}/discussions', [\App\Http\Controllers\Api\GroupsController::class, 'discussions']);
 Route::post('/v2/groups/{id}/discussions', [\App\Http\Controllers\Api\GroupsController::class, 'createDiscussion']);
 Route::get('/v2/groups/{id}/discussions/{discussionId}', [\App\Http\Controllers\Api\GroupsController::class, 'discussionMessages']);
 Route::post('/v2/groups/{id}/discussions/{discussionId}/messages', [\App\Http\Controllers\Api\GroupsController::class, 'postToDiscussion']);
