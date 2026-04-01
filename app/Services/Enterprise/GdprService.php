@@ -775,10 +775,11 @@ class GdprService
     {
         try {
             return $this->query(
-                "SELECT id, user_message, ai_response, model, created_at
-                 FROM ai_chat_messages
-                 WHERE user_id = ? AND tenant_id = ?
-                 ORDER BY created_at DESC",
+                "SELECT m.id, m.role, m.content, m.model, m.created_at
+                 FROM ai_messages m
+                 INNER JOIN ai_conversations c ON c.id = m.conversation_id
+                 WHERE c.user_id = ? AND c.tenant_id = ?
+                 ORDER BY m.created_at DESC",
                 [$userId, $this->tenantId]
             )->fetchAll();
         } catch (\Throwable $e) {
@@ -885,10 +886,18 @@ class GdprService
 
             // 3a. Delete AI chat history (GDPR: user content sent to third-party AI)
             try {
-                $this->query(
-                    "DELETE FROM ai_chat_messages WHERE user_id = ? AND tenant_id = ?",
+                $convIds = $this->query(
+                    "SELECT id FROM ai_conversations WHERE user_id = ? AND tenant_id = ?",
                     [$userId, $this->tenantId]
-                );
+                )->fetchAll(\PDO::FETCH_COLUMN);
+                if (!empty($convIds)) {
+                    $placeholders = implode(',', array_fill(0, count($convIds), '?'));
+                    $this->query("DELETE FROM ai_messages WHERE conversation_id IN ($placeholders)", $convIds);
+                    $this->query(
+                        "DELETE FROM ai_conversations WHERE user_id = ? AND tenant_id = ?",
+                        [$userId, $this->tenantId]
+                    );
+                }
             } catch (\Throwable $e) {
                 // Table may not exist on all deployments
             }

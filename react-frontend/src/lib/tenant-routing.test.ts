@@ -157,6 +157,23 @@ describe('tenant-routing', () => {
     it('handles empty string slug', () => {
       expect(tenantPath('/dashboard', '')).toBe('/dashboard');
     });
+
+    it('does not double-prefix when path already has slug', () => {
+      expect(tenantPath('/hour-timebank/federation', 'hour-timebank')).toBe('/hour-timebank/federation');
+    });
+
+    it('does not double-prefix when path is just the slug', () => {
+      expect(tenantPath('/hour-timebank', 'hour-timebank')).toBe('/hour-timebank');
+    });
+
+    it('is case-insensitive for double-prefix detection', () => {
+      expect(tenantPath('/HOUR-TIMEBANK/dashboard', 'hour-timebank')).toBe('/HOUR-TIMEBANK/dashboard');
+    });
+
+    it('does not falsely skip prefixing for similar slug names', () => {
+      // "hour-timebank-2" starts with "hour-timebank" but is a different slug
+      expect(tenantPath('/hour-timebank-2/dashboard', 'hour-timebank')).toBe('/hour-timebank/hour-timebank-2/dashboard');
+    });
   });
 
   describe('stripTenantSlug', () => {

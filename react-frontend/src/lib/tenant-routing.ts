@@ -130,7 +130,13 @@ export function tenantPath(path: string, tenantSlug: string | null | undefined):
   if (!tenantSlug) return path;
   // Ensure path starts with /
   const normalizedPath = path.startsWith('/') ? path : '/' + path;
-  return '/' + tenantSlug + normalizedPath;
+  // Prevent double-prefixing (e.g. Breadcrumbs wrapping an already-wrapped href)
+  const prefix = '/' + tenantSlug;
+  if (normalizedPath.toLowerCase().startsWith(prefix.toLowerCase() + '/') ||
+      normalizedPath.toLowerCase() === prefix.toLowerCase()) {
+    return normalizedPath;
+  }
+  return prefix + normalizedPath;
 }
 
 /**

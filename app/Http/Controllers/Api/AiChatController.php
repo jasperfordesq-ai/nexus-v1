@@ -48,19 +48,72 @@ class AiChatController extends BaseApiController
         $message = $this->requireInput('message');
         $conversationId = $this->input('conversation_id');
 
+        // Create or find conversation
+        if ($conversationId) {
+            $conversation = DB::selectOne(
+                'SELECT id FROM ai_conversations WHERE id = ? AND tenant_id = ? AND user_id = ?',
+                [$conversationId, $tenantId, $userId]
+            );
+            if (!$conversation) {
+                $conversationId = null;
+            }
+        }
+
+        if (!$conversationId) {
+            DB::insert(
+                'INSERT INTO ai_conversations (tenant_id, user_id, title, created_at, updated_at) VALUES (?, ?, ?, NOW(), NOW())',
+                [$tenantId, $userId, mb_substr($message, 0, 100)]
+            );
+            $conversationId = (int) DB::getPdo()->lastInsertId();
+        }
+
+        // Save user message
         DB::insert(
-            'INSERT INTO ai_chat_messages (tenant_id, user_id, conversation_id, role, content, created_at) VALUES (?, ?, ?, ?, ?, NOW())',
-            [$tenantId, $userId, $conversationId, 'user', $message]
+            'INSERT INTO ai_messages (conversation_id, role, content, created_at) VALUES (?, ?, ?, NOW())',
+            [$conversationId, 'user', $message]
         );
 
-        $content = 'AI chat is not yet configured for this tenant.';
+        // Build conversation history for context
+        $history = DB::select(
+            'SELECT role, content FROM ai_messages WHERE conversation_id = ? ORDER BY created_at ASC',
+            [$conversationId]
+        );
+        $chatMessages = [
+            ['role' => 'system', 'content' => AIServiceFactory::getSystemPrompt() ?: 'You are a helpful community assistant for a timebanking platform.'],
+        ];
+        foreach ($history as $row) {
+            $chatMessages[] = ['role' => $row->role, 'content' => $row->content];
+        }
 
-        // Store the assistant reply
+        // Call AI provider with fallback
+        $content = null;
+        $tokensUsed = null;
+        $model = null;
+        $provider = null;
+
+        try {
+            $response = AIServiceFactory::chatWithFallback($chatMessages);
+            $content = $response['content'] ?? '';
+            $tokensUsed = $response['tokens_used'] ?? null;
+            $model = $response['model'] ?? null;
+            $provider = $response['provider'] ?? null;
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::warning('AI chat provider failed', [
+                'error' => $e->getMessage(),
+                'tenant_id' => $tenantId,
+            ]);
+            $content = 'AI chat is not currently available. Please try again later.';
+        }
+
+        // Save assistant reply
         DB::insert(
-            'INSERT INTO ai_chat_messages (tenant_id, user_id, conversation_id, role, content, created_at) VALUES (?, ?, ?, ?, ?, NOW())',
-            [$tenantId, $userId, $conversationId, 'assistant', $content]
+            'INSERT INTO ai_messages (conversation_id, role, content, tokens_used, model, created_at) VALUES (?, ?, ?, ?, ?, NOW())',
+            [$conversationId, 'assistant', $content, $tokensUsed, $model]
         );
         $messageId = (int) DB::getPdo()->lastInsertId();
+
+        // Update conversation timestamp
+        DB::update('UPDATE ai_conversations SET updated_at = NOW() WHERE id = ?', [$conversationId]);
 
         return $this->respondWithData([
             'success' => true,
@@ -70,8 +123,9 @@ class AiChatController extends BaseApiController
                 'role' => 'assistant',
                 'content' => $content,
             ],
-            'tokens_used' => null,
-            'model' => null,
+            'tokens_used' => $tokensUsed,
+            'model' => $model,
+            'provider' => $provider,
         ]);
     }
 
@@ -103,15 +157,20 @@ class AiChatController extends BaseApiController
         $offset = ($page - 1) * $perPage;
 
         $items = DB::select(
-            'SELECT * FROM ai_chat_messages WHERE tenant_id = ? AND user_id = ? ORDER BY created_at DESC LIMIT ? OFFSET ?',
+            'SELECT m.* FROM ai_messages m
+             INNER JOIN ai_conversations c ON c.id = m.conversation_id
+             WHERE c.tenant_id = ? AND c.user_id = ?
+             ORDER BY m.created_at DESC LIMIT ? OFFSET ?',
             [$tenantId, $userId, $perPage, $offset]
         );
-        $total = DB::selectOne(
-            'SELECT COUNT(*) as cnt FROM ai_chat_messages WHERE tenant_id = ? AND user_id = ?',
+        $total = (int) DB::selectOne(
+            'SELECT COUNT(*) as cnt FROM ai_messages m
+             INNER JOIN ai_conversations c ON c.id = m.conversation_id
+             WHERE c.tenant_id = ? AND c.user_id = ?',
             [$tenantId, $userId]
         )->cnt;
 
-        return $this->respondWithPaginatedCollection($items, (int) $total, $page, $perPage);
+        return $this->respondWithPaginatedCollection($items, $total, $page, $perPage);
     }
 
     // =====================================================================

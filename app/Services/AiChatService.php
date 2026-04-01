@@ -75,10 +75,12 @@ class AiChatService
      */
     public function getHistory(int $userId, int $limit = 50): array
     {
-        return DB::table('ai_chat_messages')
-            ->where('tenant_id', TenantContext::getId())
-            ->where('user_id', $userId)
-            ->orderByDesc('created_at')
+        return DB::table('ai_messages as m')
+            ->join('ai_conversations as c', 'c.id', '=', 'm.conversation_id')
+            ->where('c.tenant_id', TenantContext::getId())
+            ->where('c.user_id', $userId)
+            ->select('m.*')
+            ->orderByDesc('m.created_at')
             ->limit(min($limit, 200))
             ->get()
             ->map(fn ($r) => (array) $r)
@@ -178,12 +180,35 @@ PROMPT;
      */
     private function saveMessage(int $userId, string $userMessage, string $aiReply): void
     {
-        DB::table('ai_chat_messages')->insert([
-            'tenant_id'  => TenantContext::getId(),
-            'user_id'    => $userId,
-            'user_msg'   => $userMessage,
-            'ai_reply'   => $aiReply,
-            'created_at' => now(),
+        $tenantId = TenantContext::getId();
+
+        // Find or create the latest conversation for this user
+        $conversation = DB::table('ai_conversations')
+            ->where('tenant_id', $tenantId)
+            ->where('user_id', $userId)
+            ->orderByDesc('updated_at')
+            ->first();
+
+        if (!$conversation) {
+            DB::table('ai_conversations')->insert([
+                'tenant_id'  => $tenantId,
+                'user_id'    => $userId,
+                'title'      => mb_substr($userMessage, 0, 100),
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+            $conversationId = (int) DB::getPdo()->lastInsertId();
+        } else {
+            $conversationId = $conversation->id;
+        }
+
+        DB::table('ai_messages')->insert([
+            ['conversation_id' => $conversationId, 'role' => 'user', 'content' => $userMessage, 'created_at' => now()],
+            ['conversation_id' => $conversationId, 'role' => 'assistant', 'content' => $aiReply, 'created_at' => now()],
         ]);
+
+        DB::table('ai_conversations')
+            ->where('id', $conversationId)
+            ->update(['updated_at' => now()]);
     }
 }
