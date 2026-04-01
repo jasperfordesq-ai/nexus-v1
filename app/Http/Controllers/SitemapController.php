@@ -42,12 +42,20 @@ class SitemapController
             [$host]
         );
 
+        // Only known domains get a sitemap. Unknown domains get empty XML
+        // to prevent cross-domain contamination in Google Search Console.
+        $frontendHost = parse_url(env('FRONTEND_URL', 'https://app.project-nexus.ie'), PHP_URL_HOST);
+
         if ($tenant) {
-            // Custom domain — return this tenant's sitemap directly
+            // Known tenant custom domain — return that tenant's sitemap
             $xml = $service->generateForTenant((int) $tenant->id);
-        } else {
+        } elseif ($host === $frontendHost || $host === 'api.project-nexus.ie') {
             // Main app domain — return the full sitemap index
             $xml = $service->generateIndex();
+        } else {
+            // Unknown domain — return empty sitemap (don't leak cross-domain URLs)
+            $xml = '<?xml version="1.0" encoding="UTF-8"?>' . "\n"
+                 . '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"></urlset>' . "\n";
         }
 
         return response($xml, 200)
