@@ -29,7 +29,7 @@ class MemberAvailabilityController extends BaseApiController
 
         $availability = $this->memberAvailabilityService->getUserAvailability($userId);
 
-        return $this->respondWithData($availability);
+        return $this->respondWithData(['weekly' => $availability]);
     }
 
     /** PUT /api/v2/users/me/availability */
@@ -39,9 +39,9 @@ class MemberAvailabilityController extends BaseApiController
         $this->rateLimit('availability_update', 10, 60);
 
         $data = $this->getAllInput();
-        $schedule = $data['schedule'] ?? $data['slots'] ?? [];
+        $schedule = $data['schedule'] ?? $data['slots'] ?? null;
 
-        if (empty($schedule) || !is_array($schedule)) {
+        if ($schedule === null || !is_array($schedule)) {
             return $this->respondWithError('VALIDATION_ERROR', __('api.schedule_required_array'), 'schedule', 422);
         }
 
@@ -53,7 +53,7 @@ class MemberAvailabilityController extends BaseApiController
 
         $availability = $this->memberAvailabilityService->getUserAvailability($userId);
 
-        return $this->respondWithData($availability);
+        return $this->respondWithData(['weekly' => $availability]);
     }
 
     /** PUT /api/v2/users/me/availability/{day} */
@@ -73,7 +73,7 @@ class MemberAvailabilityController extends BaseApiController
 
         $availability = $this->memberAvailabilityService->getUserAvailability($userId);
 
-        return $this->respondWithData($availability);
+        return $this->respondWithData(['weekly' => $availability]);
     }
 
     /** POST /api/v2/users/me/availability/date */
@@ -91,7 +91,7 @@ class MemberAvailabilityController extends BaseApiController
 
         $availability = $this->memberAvailabilityService->getUserAvailability($userId);
 
-        return $this->respondWithData($availability, null, 201);
+        return $this->respondWithData(['weekly' => $availability], null, 201);
     }
 
     /** DELETE /api/v2/users/me/availability/{id} */
@@ -111,7 +111,7 @@ class MemberAvailabilityController extends BaseApiController
 
         $availability = $this->memberAvailabilityService->getUserAvailability($id);
 
-        return $this->respondWithData($availability);
+        return $this->respondWithData(['weekly' => $availability]);
     }
 
     /** GET /api/v2/members/availability/compatible */

@@ -69,8 +69,8 @@ import { AvailabilityGrid } from '../AvailabilityGrid';
 
 const mockAvailabilityData = {
   weekly: [
-    { day_of_week: 0, start_time: '09:00', end_time: '17:00', is_available: true },
-    { day_of_week: 2, start_time: '10:00', end_time: '14:00', is_available: true },
+    { day_of_week: 1, start_time: '09:00', end_time: '17:00' }, // Monday (backend: 1=Mon)
+    { day_of_week: 3, start_time: '10:00', end_time: '14:00' }, // Wednesday (backend: 3=Wed)
   ],
   timezone: 'Europe/Dublin',
 };
@@ -222,6 +222,144 @@ describe('AvailabilityGrid', () => {
 
     await waitFor(() => {
       expect(screen.getByText(/Click on time slots/)).toBeInTheDocument();
+    });
+  });
+
+  it('maps backend day_of_week to correct grid column (Monday=1 → grid col 0)', async () => {
+    // Backend: day_of_week 5 = Friday, 09:00-10:00
+    vi.mocked(api.get).mockResolvedValueOnce({
+      success: true,
+      data: {
+        weekly: [{ day_of_week: 5, start_time: '09:00', end_time: '10:00' }],
+      },
+    });
+
+    render(<AvailabilityGrid editable={true} />);
+
+    await waitFor(() => {
+      // Friday 09:00 should be "Available", Thursday 09:00 should be "Unavailable"
+      const fridaySlot = screen.getByLabelText('Friday 09:00: Available');
+      expect(fridaySlot).toBeInTheDocument();
+      const thursdaySlot = screen.getByLabelText('Thursday 09:00: Unavailable');
+      expect(thursdaySlot).toBeInTheDocument();
+    });
+  });
+
+  it('maps Sunday (backend day_of_week=0) to last grid column', async () => {
+    vi.mocked(api.get).mockResolvedValueOnce({
+      success: true,
+      data: {
+        weekly: [{ day_of_week: 0, start_time: '10:00', end_time: '11:00' }],
+      },
+    });
+
+    render(<AvailabilityGrid editable={true} />);
+
+    await waitFor(() => {
+      const sundaySlot = screen.getByLabelText('Sunday 10:00: Available');
+      expect(sundaySlot).toBeInTheDocument();
+      const saturdaySlot = screen.getByLabelText('Saturday 10:00: Unavailable');
+      expect(saturdaySlot).toBeInTheDocument();
+    });
+  });
+
+  it('normalizes MySQL TIME format HH:MM:SS to HH:MM for grid lookup', async () => {
+    // MySQL returns "09:00:00" not "09:00"
+    vi.mocked(api.get).mockResolvedValueOnce({
+      success: true,
+      data: {
+        weekly: [{ day_of_week: 1, start_time: '09:00:00', end_time: '11:00:00' }],
+      },
+    });
+
+    render(<AvailabilityGrid editable={true} />);
+
+    await waitFor(() => {
+      const slot9 = screen.getByLabelText('Monday 09:00: Available');
+      expect(slot9).toBeInTheDocument();
+      const slot10 = screen.getByLabelText('Monday 10:00: Available');
+      expect(slot10).toBeInTheDocument();
+      // 11:00 is the end_time, so it should NOT be available
+      const slot11 = screen.getByLabelText('Monday 11:00: Unavailable');
+      expect(slot11).toBeInTheDocument();
+    });
+  });
+
+  it('handles end-of-day slots with end_time beyond grid (22:00)', async () => {
+    // User selected 21:00 (last slot) → saved with end_time = "22:00"
+    vi.mocked(api.get).mockResolvedValueOnce({
+      success: true,
+      data: {
+        weekly: [{ day_of_week: 2, start_time: '21:00', end_time: '22:00' }],
+      },
+    });
+
+    render(<AvailabilityGrid editable={true} />);
+
+    await waitFor(() => {
+      const lastSlot = screen.getByLabelText('Tuesday 21:00: Available');
+      expect(lastSlot).toBeInTheDocument();
+    });
+  });
+
+  it('sends correct backend day_of_week when saving (grid Fri=4 → backend 5)', async () => {
+    vi.mocked(api.get).mockResolvedValueOnce({
+      success: true,
+      data: { weekly: [] },
+    });
+    vi.mocked(api.put).mockResolvedValueOnce({ success: true, data: { weekly: [] } });
+
+    render(<AvailabilityGrid editable={true} />);
+
+    await waitFor(() => {
+      expect(screen.getByText('Set Your Availability')).toBeInTheDocument();
+    });
+
+    // Click Friday 15:00 (grid column 4)
+    const fridaySlot = screen.getByLabelText('Friday 15:00: Unavailable');
+    fridaySlot.click();
+
+    // Click Save
+    await waitFor(() => {
+      expect(screen.getByText('Save')).toBeInTheDocument();
+    });
+    screen.getByText('Save').click();
+
+    await waitFor(() => {
+      expect(api.put).toHaveBeenCalledWith('/v2/users/me/availability', {
+        slots: [{ day_of_week: 5, start_time: '15:00', end_time: '16:00' }],
+      });
+    });
+  });
+
+  it('sends empty slots array when all availability is cleared', async () => {
+    // Load with one slot, then toggle it off
+    vi.mocked(api.get).mockResolvedValueOnce({
+      success: true,
+      data: {
+        weekly: [{ day_of_week: 1, start_time: '09:00', end_time: '10:00' }],
+      },
+    });
+    vi.mocked(api.put).mockResolvedValueOnce({ success: true, data: { weekly: [] } });
+
+    render(<AvailabilityGrid editable={true} />);
+
+    await waitFor(() => {
+      expect(screen.getByLabelText('Monday 09:00: Available')).toBeInTheDocument();
+    });
+
+    // Toggle it off
+    screen.getByLabelText('Monday 09:00: Available').click();
+
+    await waitFor(() => {
+      expect(screen.getByText('Save')).toBeInTheDocument();
+    });
+    screen.getByText('Save').click();
+
+    await waitFor(() => {
+      expect(api.put).toHaveBeenCalledWith('/v2/users/me/availability', {
+        slots: [],
+      });
     });
   });
 });

@@ -25,10 +25,9 @@ import { logError } from '@/lib/logger';
 
 export interface AvailabilitySlot {
   id?: number;
-  day_of_week: number; // 0 = Monday, 6 = Sunday
-  start_time: string; // "09:00"
-  end_time: string;   // "17:00"
-  is_available: boolean;
+  day_of_week: number; // Backend convention: 0 = Sunday, 6 = Saturday
+  start_time: string;  // "09:00"
+  end_time: string;    // "17:00"
 }
 
 interface AvailabilityData {
@@ -78,8 +77,12 @@ export function AvailabilityGrid({
   const toastRef = useRef(toast);
   toastRef.current = toast;
 
-  // Build key for slot map
+  // Build key for slot map (day = grid index: 0=Mon, 6=Sun)
   const slotKey = (day: number, time: string) => `${day}-${time}`;
+
+  // Backend uses 0=Sunday, 6=Saturday; grid uses 0=Monday, 6=Sunday
+  const backendDayToGrid = (d: number) => (d + 6) % 7;
+  const gridDayToBackend = (d: number) => (d + 1) % 7;
 
   // Load availability
   const loadAvailability = useCallback(async () => {
@@ -104,13 +107,20 @@ export function AvailabilityGrid({
         const weekly = response.data.weekly || [];
 
         weekly.forEach((slot) => {
-          // Mark all time slots between start and end as available
-          const startIdx = TIME_SLOTS.indexOf(slot.start_time);
-          const endIdx = TIME_SLOTS.indexOf(slot.end_time);
-          if (startIdx >= 0 && endIdx >= 0) {
+          // Convert backend day (0=Sun) to grid index (0=Mon)
+          const gridDay = backendDayToGrid(slot.day_of_week);
+          // MySQL TIME columns return "HH:MM:SS"; normalize to "HH:MM"
+          const startTime = slot.start_time.substring(0, 5);
+          const endTime = slot.end_time.substring(0, 5);
+          const startIdx = TIME_SLOTS.indexOf(startTime);
+          // end_time may be past the last grid slot (e.g., "22:00")
+          let endIdx = TIME_SLOTS.indexOf(endTime);
+          if (endIdx < 0 && startIdx >= 0) endIdx = TIME_SLOTS.length;
+          if (startIdx >= 0) {
             for (let i = startIdx; i < endIdx; i++) {
               const ts = TIME_SLOTS[i];
-              if (ts) newSlots.set(slotKey(slot.day_of_week, ts), slot.is_available);
+              // Rows exist only for available slots; is_available isn't a DB column
+              if (ts) newSlots.set(slotKey(gridDay, ts), true);
             }
           }
         });
@@ -164,10 +174,9 @@ export function AvailabilityGrid({
             rangeStart = ts;
           } else if (!isAvail && rangeStart) {
             availabilitySlots.push({
-              day_of_week: day,
+              day_of_week: gridDayToBackend(day),
               start_time: rangeStart,
               end_time: ts,
-              is_available: true,
             });
             rangeStart = null;
           }
@@ -176,10 +185,9 @@ export function AvailabilityGrid({
         // Close any open range at end of day
         if (rangeStart) {
           availabilitySlots.push({
-            day_of_week: day,
+            day_of_week: gridDayToBackend(day),
             start_time: rangeStart,
             end_time: '22:00',
-            is_available: true,
           });
         }
       }

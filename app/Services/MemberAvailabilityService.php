@@ -161,11 +161,25 @@ class MemberAvailabilityService
     /**
      * Set a bulk availability schedule (all 7 days at once).
      *
-     * @param array $schedule ['0' => [slots], '1' => [slots], ...]
+     * Accepts either:
+     * - Flat array: [['day_of_week' => 1, 'start_time' => '09:00', 'end_time' => '17:00'], ...]
+     * - Nested by day: ['0' => [['start_time' => '09:00', 'end_time' => '17:00']], '1' => [...], ...]
      */
     public function setBulkAvailability(int $userId, array $schedule): bool
     {
         $this->errors = [];
+
+        // Detect flat array format (each item has day_of_week) and regroup by day
+        if (!empty($schedule) && isset($schedule[0]['day_of_week'])) {
+            $grouped = [];
+            foreach ($schedule as $slot) {
+                $day = (int) ($slot['day_of_week'] ?? -1);
+                if ($day >= 0 && $day <= 6) {
+                    $grouped[$day][] = $slot;
+                }
+            }
+            $schedule = $grouped;
+        }
 
         try {
             return DB::transaction(function () use ($userId, $schedule) {
