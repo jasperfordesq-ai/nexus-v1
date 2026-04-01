@@ -161,45 +161,39 @@ class AuthController extends BaseApiController
             $isMobile = $this->tokenService->isMobileRequest();
             $wantsStateless = $isMobile || isset($_SERVER['HTTP_X_STATELESS_AUTH']);
 
-            // 2FA CHECK — ENFORCED FOR ADMIN USERS
-            $isAdminUser = in_array($user['role'] ?? '', ['admin', 'tenant_admin', 'tenant_super_admin', 'super_admin'])
-                || !empty($user['is_super_admin'])
-                || !empty($user['is_tenant_super_admin']);
+            // 2FA CHECK — ENFORCED FOR ALL USERS WHO HAVE IT ENABLED
+            $has2faEnabled = !empty($user['totp_enabled']) || $this->totpService->isEnabled((int)$user['id']);
+            $isTrustedDevice = $has2faEnabled && $this->totpService->isTrustedDevice((int)$user['id']);
 
-            if ($isAdminUser) {
-                $has2faEnabled = !empty($user['totp_enabled']) || $this->totpService->isEnabled((int)$user['id']);
-                $isTrustedDevice = $has2faEnabled && $this->totpService->isTrustedDevice((int)$user['id']);
+            if ($has2faEnabled && !$isTrustedDevice) {
+                // 2FA required - create challenge token
+                $twoFactorToken = $this->twoFactorChallengeManager->create(
+                    (int)$user['id'],
+                    ['totp', 'backup_code']
+                );
 
-                if ($has2faEnabled && !$isTrustedDevice) {
-                    // 2FA required - create challenge token
-                    $twoFactorToken = $this->twoFactorChallengeManager->create(
-                        (int)$user['id'],
-                        ['totp', 'backup_code']
-                    );
-
-                    // For session-based clients, also store in session
-                    if (!$wantsStateless) {
-                        if (session_status() == PHP_SESSION_NONE) {
-                            session_start();
-                        }
-                        $_SESSION['pending_2fa_user_id'] = $user['id'];
-                        $_SESSION['pending_2fa_expires'] = time() + 300;
+                // For session-based clients, also store in session
+                if (!$wantsStateless) {
+                    if (session_status() == PHP_SESSION_NONE) {
+                        session_start();
                     }
-
-                    return response()->json([
-                        'success' => false,
-                        'requires_2fa' => true,
-                        'two_factor_token' => $twoFactorToken,
-                        'methods' => ['totp', 'backup_code'],
-                        'code' => ApiErrorCodes::AUTH_2FA_REQUIRED,
-                        'message' => 'Two-factor authentication required',
-                        'user' => [
-                            'id' => $user['id'],
-                            'first_name' => $user['first_name'],
-                            'email_masked' => $this->maskEmail($user['email'])
-                        ]
-                    ], 200);
+                    $_SESSION['pending_2fa_user_id'] = $user['id'];
+                    $_SESSION['pending_2fa_expires'] = time() + 300;
                 }
+
+                return response()->json([
+                    'success' => false,
+                    'requires_2fa' => true,
+                    'two_factor_token' => $twoFactorToken,
+                    'methods' => ['totp', 'backup_code'],
+                    'code' => ApiErrorCodes::AUTH_2FA_REQUIRED,
+                    'message' => 'Two-factor authentication required',
+                    'user' => [
+                        'id' => $user['id'],
+                        'first_name' => $user['first_name'],
+                        'email_masked' => $this->maskEmail($user['email'])
+                    ]
+                ], 200);
             }
 
             // NO 2FA or TRUSTED DEVICE - Complete login normally
