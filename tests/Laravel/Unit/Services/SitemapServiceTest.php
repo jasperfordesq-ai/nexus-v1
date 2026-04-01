@@ -136,7 +136,8 @@ class SitemapServiceTest extends TestCase
 
     public function test_generateForTenant_includes_blog_posts(): void
     {
-        DB::table('blog_posts')->insertOrIgnore([
+        // Blog data lives in the `posts` table (not `blog_posts`)
+        DB::table('posts')->insertOrIgnore([
             'id' => 90001,
             'tenant_id' => $this->testTenantId,
             'author_id' => $this->userId,
@@ -144,7 +145,6 @@ class SitemapServiceTest extends TestCase
             'slug' => 'test-sitemap-blog-post',
             'content' => 'Test content for sitemap',
             'status' => 'published',
-            'published_at' => now()->subDay(),
             'created_at' => now(),
             'updated_at' => now(),
         ]);
@@ -156,7 +156,7 @@ class SitemapServiceTest extends TestCase
 
     public function test_generateForTenant_excludes_draft_blog_posts(): void
     {
-        DB::table('blog_posts')->insertOrIgnore([
+        DB::table('posts')->insertOrIgnore([
             'id' => 90002,
             'tenant_id' => $this->testTenantId,
             'author_id' => $this->userId,
@@ -164,7 +164,6 @@ class SitemapServiceTest extends TestCase
             'slug' => 'draft-post-sitemap',
             'content' => 'Draft content',
             'status' => 'draft',
-            'published_at' => null,
             'created_at' => now(),
             'updated_at' => now(),
         ]);
@@ -404,7 +403,7 @@ class SitemapServiceTest extends TestCase
     public function test_sitemap_does_not_leak_cross_tenant_content(): void
     {
         // Seed content for tenant 999
-        DB::table('blog_posts')->insertOrIgnore([
+        DB::table('posts')->insertOrIgnore([
             'id' => 90099,
             'tenant_id' => 999,
             'author_id' => $this->userId,
@@ -412,7 +411,6 @@ class SitemapServiceTest extends TestCase
             'slug' => 'cross-tenant-post-sitemap',
             'content' => 'This belongs to another tenant',
             'status' => 'published',
-            'published_at' => now(),
             'created_at' => now(),
             'updated_at' => now(),
         ]);

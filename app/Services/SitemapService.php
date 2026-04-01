@@ -251,11 +251,13 @@ class SitemapService
 
     private function getBlogUrls(int $tenantId, string $baseUrl): array
     {
+        // Blog data lives in the `posts` table (not `blog_posts` which is empty).
+        // The `posts` table has no `published_at` column — use updated_at/created_at.
         $rows = DB::select(
-            "SELECT slug, COALESCE(updated_at, published_at, created_at) AS lastmod
-             FROM blog_posts
-             WHERE tenant_id = ? AND status = 'published' AND published_at IS NOT NULL
-             ORDER BY published_at DESC",
+            "SELECT slug, COALESCE(updated_at, created_at) AS lastmod
+             FROM posts
+             WHERE tenant_id = ? AND status = 'published'
+             ORDER BY created_at DESC",
             [$tenantId]
         );
 
