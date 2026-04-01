@@ -32,8 +32,11 @@ class SitemapController
      */
     public function index(SitemapService $service, Request $request): Response
     {
-        // Check if the request host matches a tenant's custom domain
-        $host = $request->getHost();
+        // Check if the request host matches a tenant's custom domain.
+        // X-Sitemap-Host is set by the frontend nginx proxy to preserve
+        // the original domain (e.g., hour-timebank.ie) before proxying
+        // to the API backend.
+        $host = $request->header('X-Sitemap-Host', $request->getHost());
         $tenant = DB::selectOne(
             "SELECT id, slug FROM tenants WHERE domain = ? AND is_active = 1",
             [$host]
