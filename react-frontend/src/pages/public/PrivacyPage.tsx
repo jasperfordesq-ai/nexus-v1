@@ -34,6 +34,7 @@ import {
 import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
 import { CustomLegalDocument } from '@/components/legal/CustomLegalDocument';
+import { PageMeta } from '@/components/seo/PageMeta';
 import { useTenant } from '@/contexts';
 import { usePageTitle } from '@/hooks';
 import { useLegalDocument } from '@/hooks/useLegalDocument';
@@ -186,6 +187,7 @@ export function PrivacyPage() {
       animate="visible"
       className="max-w-4xl mx-auto space-y-8"
     >
+      <PageMeta title={t('privacy.page_title', { defaultValue: 'Privacy Policy' })} description={t('privacy.meta_description', { defaultValue: 'Our privacy policy explains how we collect, use, and protect your data.' })} />
       {/* Hero Header */}
       <motion.div variants={itemVariants} className="text-center">
         <div className="inline-flex p-4 rounded-2xl bg-gradient-to-br from-indigo-500/20 to-purple-500/20 mb-4">

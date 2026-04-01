@@ -46,6 +46,7 @@ $app = Application::configure(basePath: dirname(__DIR__))
             \App\Http\Middleware\ResolveTenant::class,
             \App\Http\Middleware\CheckMaintenanceMode::class,
             \App\Http\Middleware\SetLocale::class,
+            \App\Http\Middleware\SeoRedirectMiddleware::class,
         ]);
 
         $middleware->alias([

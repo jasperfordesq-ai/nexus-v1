@@ -30,6 +30,7 @@ import {
 import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
 import { CustomLegalDocument } from '@/components/legal/CustomLegalDocument';
+import { PageMeta } from '@/components/seo/PageMeta';
 import { useTenant } from '@/contexts';
 import { usePageTitle } from '@/hooks';
 import { useLegalDocument } from '@/hooks/useLegalDocument';
@@ -166,6 +167,7 @@ export function CookiesPage() {
       animate="visible"
       className="max-w-4xl mx-auto space-y-8"
     >
+      <PageMeta title={t('cookies.page_title', { defaultValue: 'Cookie Policy' })} description={t('cookies.meta_description', { defaultValue: 'Information about how we use cookies on our platform.' })} />
       {/* Hero Header */}
       <motion.div variants={itemVariants} className="text-center">
         <div className="inline-flex p-4 rounded-2xl bg-gradient-to-br from-amber-500/20 to-orange-500/20 mb-4">

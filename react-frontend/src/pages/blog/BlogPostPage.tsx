@@ -45,6 +45,7 @@ import DOMPurify from 'dompurify';
 import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
 import { Breadcrumbs } from '@/components/navigation';
+import { Helmet } from 'react-helmet-async';
 import { PageMeta } from '@/components/seo';
 import { useAuth, useToast, useTenant } from '@/contexts';
 import { usePageTitle } from '@/hooks';
@@ -113,7 +114,7 @@ export function BlogPostPage() {
   const { t } = useTranslation('blog');
   const { slug } = useParams<{ slug: string }>();
   const { isAuthenticated, user } = useAuth();
-  const { tenantPath } = useTenant();
+  const { tenantPath, branding } = useTenant();
   const toast = useToast();
   const [post, setPost] = useState<BlogPostDetail | null>(null);
   usePageTitle(post?.title || t('page_title'));
@@ -336,7 +337,31 @@ export function BlogPostPage() {
       <PageMeta
         title={post.meta_title || post.title}
         description={post.meta_description || post.excerpt}
+        image={post.featured_image ? resolveAssetUrl(post.featured_image) : undefined}
       />
+
+      {/* Article JSON-LD structured data */}
+      <Helmet>
+        <script type="application/ld+json">
+          {JSON.stringify({
+            '@context': 'https://schema.org',
+            '@type': 'Article',
+            headline: post.title,
+            ...(post.featured_image ? { image: post.featured_image } : {}),
+            datePublished: post.published_at || post.created_at,
+            author: {
+              '@type': 'Person',
+              name: post.author?.name || 'Unknown',
+            },
+            publisher: {
+              '@type': 'Organization',
+              name: branding.name || 'NEXUS',
+              ...(branding.logo ? { logo: { '@type': 'ImageObject', url: branding.logo } } : {}),
+            },
+            description: post.meta_description || post.excerpt || '',
+          })}
+        </script>
+      </Helmet>
 
       <article className="max-w-3xl mx-auto space-y-6">
         {/* Breadcrumbs */}

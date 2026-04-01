@@ -31,6 +31,7 @@ import {
 import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
 import { EmptyState } from '@/components/feedback';
+import { PageMeta } from '@/components/seo/PageMeta';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
 import { resolveAssetUrl, resolveAvatarUrl } from '@/lib/helpers';
@@ -187,6 +188,7 @@ export function BlogPage() {
 
   return (
     <div className="space-y-6">
+      <PageMeta title={t('page_title')} description={t('page_description', { defaultValue: 'Latest blog posts and community stories' })} />
       {/* Header */}
       <div>
         <h1 className="text-2xl font-bold text-theme-primary flex items-center gap-3">

@@ -22,6 +22,7 @@ import { DevelopmentStatusBanner } from './DevelopmentStatusBanner';
 import { SessionExpiredModal } from '@/components/feedback';
 import { AppUpdateModal } from '@/components/feedback/AppUpdateModal';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
+import { SeoHead } from '@/components/seo';
 import { useApiErrorHandler } from '@/hooks';
 import { useHeaderScroll } from '@/hooks/useHeaderScroll';
 import { useAppUpdate } from '@/hooks/useAppUpdate';
@@ -74,6 +75,9 @@ export function Layout({
 
   return (
     <div className="min-h-screen max-w-[100vw] flex flex-col overflow-x-clip">
+      {/* Global SEO tags (verification meta, Organization JSON-LD) */}
+      <SeoHead />
+
       {/* Skip navigation — visible on focus only */}
       <a
         href="#main-content"

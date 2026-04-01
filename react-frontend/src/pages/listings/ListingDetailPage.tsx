@@ -31,6 +31,7 @@ import {
 import { GlassCard, ImagePlaceholder } from '@/components/ui';
 import { Breadcrumbs } from '@/components/navigation';
 import { LoadingScreen, EmptyState } from '@/components/feedback';
+import { PageMeta } from '@/components/seo/PageMeta';
 import { LocationMapCard } from '@/components/location';
 import { CommentsSection, LikersModal, ShareButton } from '@/components/social';
 import { ListingAnalyticsPanel } from '@/components/listings/ListingAnalyticsPanel';
@@ -242,6 +243,7 @@ export function ListingDetailPage() {
       animate={{ opacity: 1, y: 0 }}
       className="max-w-4xl mx-auto space-y-6"
     >
+      <PageMeta title={listing?.title} description={listing?.description?.substring(0, 160)} image={listing?.image_url || undefined} />
       {/* Breadcrumbs */}
       <Breadcrumbs items={[
         { label: t('title'), href: tenantPath('/listings') },

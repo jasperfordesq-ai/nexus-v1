@@ -36,6 +36,7 @@ import {
 import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
 import { CustomLegalDocument } from '@/components/legal/CustomLegalDocument';
+import { PageMeta } from '@/components/seo/PageMeta';
 import { useTenant } from '@/contexts';
 import { usePageTitle } from '@/hooks';
 import { useLegalDocument } from '@/hooks/useLegalDocument';
@@ -72,7 +73,12 @@ export function TermsPage() {
   }
 
   // Default fallback — generic terms content
-  return <DefaultTermsContent branding={branding} tenantPath={tenantPath} />;
+  return (
+    <>
+      <PageMeta title={t('terms.page_title', { defaultValue: 'Terms of Service' })} description={t('terms.meta_description', { defaultValue: 'Terms and conditions for using our community platform.' })} />
+      <DefaultTermsContent branding={branding} tenantPath={tenantPath} />
+    </>
+  );
 }
 
 // ─────────────────────────────────────────────────────────────────────────────

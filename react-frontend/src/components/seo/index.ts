@@ -4,3 +4,4 @@
 // See NOTICE file for attribution and acknowledgements.
 
 export { PageMeta } from './PageMeta';
+export { SeoHead } from './SeoHead';

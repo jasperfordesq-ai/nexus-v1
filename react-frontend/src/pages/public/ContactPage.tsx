@@ -18,6 +18,7 @@ import { useTranslation } from 'react-i18next';
 import { useTenant, useAuth } from '@/contexts';
 import { usePageTitle } from '@/hooks';
 import { GlassCard } from '@/components/ui';
+import { PageMeta } from '@/components/seo/PageMeta';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
 
@@ -64,6 +65,7 @@ export function ContactPage() {
 
   return (
     <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+      <PageMeta title={t('contact.title', { defaultValue: 'Contact Us' })} description={t('contact.meta_description', { defaultValue: 'Get in touch with our community support team.' })} />
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
