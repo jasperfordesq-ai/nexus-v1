@@ -219,6 +219,7 @@ class KnowledgeBaseController extends BaseApiController
                 : $data['content'];
         }
         if (isset($data['content_type'])) $updateData['content_type'] = $data['content_type'];
+        if (array_key_exists('video_url', $data)) $updateData['video_url'] = ! empty($data['video_url']) ? trim($data['video_url']) : null;
         if (array_key_exists('category_id', $data)) $updateData['category_id'] = $data['category_id'];
         if (array_key_exists('parent_article_id', $data)) $updateData['parent_article_id'] = $data['parent_article_id'];
         if (isset($data['sort_order'])) $updateData['sort_order'] = (int) $data['sort_order'];

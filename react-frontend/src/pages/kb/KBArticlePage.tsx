@@ -71,6 +71,7 @@ interface KBArticleFull {
   slug: string;
   content: string;
   content_type: 'html' | 'markdown' | 'plain';
+  video_url: string | null;
   excerpt: string | null;
   category: string | null;
   category_name: string | null;
@@ -98,6 +99,14 @@ interface KBChild {
 }
 
 /* ───────────────────────── Helpers ───────────────────────── */
+
+/** Extract YouTube video ID from various URL formats */
+function extractYouTubeId(url: string): string | null {
+  const match = url.match(
+    /(?:youtube\.com\/(?:watch\?v=|embed\/|v\/|shorts\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})/,
+  );
+  return match?.[1] ?? null;
+}
 
 function formatFileSize(bytes: number): string {
   if (bytes < 1024) return `${bytes} B`;
@@ -299,6 +308,22 @@ export function KBArticlePage() {
           </div>
 
           <Divider className="my-4" />
+
+          {/* YouTube Video */}
+          {article.video_url && extractYouTubeId(article.video_url) && (
+            <div className="mb-6">
+              <div className="relative w-full rounded-xl overflow-hidden" style={{ paddingBottom: '56.25%' }}>
+                <iframe
+                  className="absolute inset-0 w-full h-full"
+                  src={`https://www.youtube-nocookie.com/embed/${extractYouTubeId(article.video_url)}`}
+                  title={article.title}
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allowFullScreen
+                  loading="lazy"
+                />
+              </div>
+            </div>
+          )}
 
           {/* Article Content */}
           {article.content_type === 'markdown' ? (

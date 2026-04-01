@@ -34,7 +34,7 @@ import {
 const RichTextEditor = lazy(() =>
   import('../../components/RichTextEditor').then((m) => ({ default: m.RichTextEditor })),
 );
-import { ArrowLeft, Save, Upload, FileText, Trash2, Download, X } from 'lucide-react';
+import { ArrowLeft, Save, Upload, FileText, Trash2, Download, X, Youtube } from 'lucide-react';
 import { usePageTitle } from '@/hooks';
 import { useTenant, useToast } from '@/contexts';
 import { adminKb } from '../../api/adminApi';
@@ -122,6 +122,7 @@ export function KBArticleForm() {
   const [categoryId, setCategoryId] = useState('');
   const [parentArticleId, setParentArticleId] = useState('');
   const [sortOrder, setSortOrder] = useState('0');
+  const [videoUrl, setVideoUrl] = useState('');
 
   // File upload state
   const [pendingFile, setPendingFile] = useState<File | null>(null);
@@ -200,6 +201,7 @@ export function KBArticleForm() {
         setCategoryId(data.category_id ? String(data.category_id) : '');
         setParentArticleId(data.parent_article_id ? String(data.parent_article_id) : '');
         setSortOrder(String(data.sort_order ?? 0));
+        setVideoUrl((data as Record<string, unknown>).video_url as string || '');
         setAttachments(data.attachments || []);
         // Set mode based on content_type
         setMode(data.content_type === 'markdown' ? 'upload' : 'write');
@@ -346,6 +348,7 @@ export function KBArticleForm() {
         category_id: categoryId ? Number(categoryId) : null,
         parent_article_id: parentArticleId ? Number(parentArticleId) : null,
         sort_order: Number(sortOrder) || 0,
+        video_url: videoUrl.trim() || null,
       };
 
       const res = isEdit
@@ -587,6 +590,20 @@ export function KBArticleForm() {
               description={t(
                 'resources.excerpt_desc',
                 'Brief description shown in article listings. If blank, the first lines of content are used.',
+              )}
+            />
+
+            {/* YouTube Video */}
+            <Input
+              label={t('resources.video_url', 'YouTube Video URL')}
+              placeholder="https://www.youtube.com/watch?v=..."
+              value={videoUrl}
+              onValueChange={setVideoUrl}
+              isDisabled={submitting}
+              startContent={<Youtube size={16} className="text-red-500 flex-shrink-0" />}
+              description={t(
+                'resources.video_url_desc',
+                'Paste a YouTube link to embed a video at the top of the article.',
               )}
             />
 

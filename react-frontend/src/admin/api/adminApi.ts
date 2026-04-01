@@ -1640,6 +1640,7 @@ export const adminKb = {
     slug?: string;
     content?: string;
     content_type?: 'html' | 'plain' | 'markdown';
+    video_url?: string | null;
     category_id?: number | null;
     parent_article_id?: number | null;
     sort_order?: number;
@@ -1652,6 +1653,7 @@ export const adminKb = {
     slug?: string;
     content?: string;
     content_type?: 'html' | 'plain' | 'markdown';
+    video_url?: string | null;
     category_id?: number | null;
     parent_article_id?: number | null;
     sort_order?: number;
