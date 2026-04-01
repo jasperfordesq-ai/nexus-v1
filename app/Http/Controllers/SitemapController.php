@@ -13,80 +13,87 @@ use Illuminate\Http\Response;
 use Illuminate\Support\Facades\DB;
 
 /**
- * SitemapController — Serves dynamically generated XML sitemaps.
+ * SitemapController — Every domain gets /sitemap.xml with its own URLs.
  *
- * Smart domain detection: if the request comes from a tenant's custom
- * domain (e.g., hour-timebank.ie), /sitemap.xml returns that tenant's
- * sitemap directly. On the main app domain, it returns the full index.
+ * Domain detection:
+ *   1. Tenant custom domain (hour-timebank.ie) → that tenant's content
+ *   2. Main app domain (app.project-nexus.ie) → all tenants without custom domains
+ *   3. Any other domain serving the React app → master tenant's content
  *
- * This means every domain just submits /sitemap.xml to Google Search
- * Console — simple, no special paths needed.
+ * URLs in the sitemap always use the requesting domain — no cross-domain leaks.
  */
 class SitemapController
 {
     /**
      * GET /sitemap.xml
      *
-     * If the request comes from a tenant's custom domain, return that
-     * tenant's sitemap. Otherwise return the sitemap index.
+     * Every domain gets a proper sitemap with its own URLs.
      */
     public function index(SitemapService $service, Request $request): Response
     {
-        // Check if the request host matches a tenant's custom domain.
-        // X-Sitemap-Host is set by the frontend nginx proxy to preserve
-        // the original domain (e.g., hour-timebank.ie) before proxying
-        // to the API backend.
         $host = $request->header('X-Sitemap-Host', $request->getHost());
+        $baseUrl = 'https://' . $host;
+        $frontendHost = parse_url(env('FRONTEND_URL', 'https://app.project-nexus.ie'), PHP_URL_HOST);
+
+        // 1. Check if this domain belongs to a specific tenant
         $tenant = DB::selectOne(
             "SELECT id, slug FROM tenants WHERE domain = ? AND is_active = 1",
             [$host]
         );
 
-        // Only known domains get a sitemap. Unknown domains get empty XML
-        // to prevent cross-domain contamination in Google Search Console.
-        $frontendHost = parse_url(env('FRONTEND_URL', 'https://app.project-nexus.ie'), PHP_URL_HOST);
-
         if ($tenant) {
-            // Known tenant custom domain — return that tenant's sitemap
-            $xml = $service->generateForTenant((int) $tenant->id);
-        } elseif ($host === $frontendHost || $host === 'api.project-nexus.ie') {
-            // Main app domain — return the full sitemap index
-            $xml = $service->generateIndex();
-        } else {
-            // Unknown domain — return empty sitemap (don't leak cross-domain URLs)
-            $xml = '<?xml version="1.0" encoding="UTF-8"?>' . "\n"
-                 . '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"></urlset>' . "\n";
+            // Tenant custom domain — that tenant's sitemap, this domain's URLs
+            $xml = $service->generateForTenant((int) $tenant->id, $baseUrl);
+            return $this->xmlResponse($xml);
         }
 
-        return response($xml, 200)
+        // 2. Main app domain — all tenants without custom domains
+        if ($host === $frontendHost) {
+            $xml = $service->generateForAppDomain();
+            return $this->xmlResponse($xml);
+        }
+
+        // 3. Any other domain — master tenant's content, this domain's URLs
+        $masterTenant = DB::selectOne(
+            "SELECT id FROM tenants WHERE is_active = 1 ORDER BY id LIMIT 1"
+        );
+        if ($masterTenant) {
+            $xml = $service->generateForTenant((int) $masterTenant->id, $baseUrl);
+        } else {
+            $xml = $this->emptyUrlset();
+        }
+
+        return $this->xmlResponse($xml);
+    }
+
+    /**
+     * GET /sitemap-{slug}.xml
+     */
+    public function tenant(SitemapService $service, Request $request, string $slug): Response
+    {
+        $tenantId = $service->resolveTenantBySlug($slug);
+
+        if ($tenantId === null) {
+            return $this->xmlResponse($this->emptyUrlset(), 404);
+        }
+
+        $host = $request->header('X-Sitemap-Host', $request->getHost());
+        $xml = $service->generateForTenant($tenantId, 'https://' . $host);
+
+        return $this->xmlResponse($xml);
+    }
+
+    private function xmlResponse(string $xml, int $status = 200): Response
+    {
+        return response($xml, $status)
             ->header('Content-Type', 'application/xml; charset=UTF-8')
             ->header('Cache-Control', 'public, max-age=3600')
             ->header('X-Robots-Tag', 'noindex');
     }
 
-    /**
-     * GET /sitemap-{slug}.xml
-     *
-     * Returns the sitemap for a specific tenant identified by slug.
-     */
-    public function tenant(SitemapService $service, string $slug): Response
+    private function emptyUrlset(): string
     {
-        $tenantId = $service->resolveTenantBySlug($slug);
-
-        if ($tenantId === null) {
-            return response(
-                '<?xml version="1.0" encoding="UTF-8"?>' . "\n"
-                . '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"></urlset>' . "\n",
-                404
-            )
-                ->header('Content-Type', 'application/xml; charset=UTF-8');
-        }
-
-        $xml = $service->generateForTenant($tenantId);
-
-        return response($xml, 200)
-            ->header('Content-Type', 'application/xml; charset=UTF-8')
-            ->header('Cache-Control', 'public, max-age=3600')
-            ->header('X-Robots-Tag', 'noindex');
+        return '<?xml version="1.0" encoding="UTF-8"?>' . "\n"
+             . '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"></urlset>' . "\n";
     }
 }

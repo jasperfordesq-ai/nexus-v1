@@ -63,11 +63,14 @@ class SitemapService
     }
 
     /**
-     * Generate sitemap XML for a specific tenant by ID.
+     * Generate sitemap XML for a specific tenant.
+     * If $overrideBaseUrl is provided, use it instead of the tenant's domain.
+     * This lets any domain serve a sitemap with its own URLs.
      */
-    public function generateForTenant(int $tenantId): string
+    public function generateForTenant(int $tenantId, ?string $overrideBaseUrl = null): string
     {
-        return Cache::remember(self::CACHE_PREFIX . "tenant:{$tenantId}", self::CACHE_TTL, function () use ($tenantId) {
+        $cacheKey = self::CACHE_PREFIX . "tenant:{$tenantId}" . ($overrideBaseUrl ? ':' . md5($overrideBaseUrl) : '');
+        return Cache::remember($cacheKey, self::CACHE_TTL, function () use ($tenantId, $overrideBaseUrl) {
             $tenant = DB::selectOne(
                 "SELECT id, slug, domain, features, configuration FROM tenants WHERE id = ? AND is_active = 1",
                 [$tenantId]
@@ -77,7 +80,44 @@ class SitemapService
                 return $this->buildUrlsetXml([]);
             }
 
-            return $this->buildTenantSitemap($tenant);
+            return $this->buildTenantSitemap($tenant, $overrideBaseUrl);
+        });
+    }
+
+    /**
+     * Generate a combined sitemap for app.project-nexus.ie.
+     * Includes all tenants that don't have their own custom domain,
+     * with URLs prefixed by /{tenant-slug}/.
+     */
+    public function generateForAppDomain(): string
+    {
+        return Cache::remember(self::CACHE_PREFIX . 'app-domain', self::CACHE_TTL, function () {
+            $tenants = DB::select(
+                "SELECT id, slug, domain, features, configuration FROM tenants WHERE is_active = 1 ORDER BY id"
+            );
+
+            $frontendBase = rtrim(env('FRONTEND_URL', 'https://app.project-nexus.ie'), '/');
+            $allUrls = [];
+
+            foreach ($tenants as $tenant) {
+                // Skip tenants with their own custom domain — they have their own sitemap
+                if (!empty($tenant->domain)) {
+                    continue;
+                }
+
+                $baseUrl = empty($tenant->slug)
+                    ? $frontendBase
+                    : $frontendBase . '/' . $tenant->slug;
+
+                $urls = $this->collectTenantUrls($tenant, $baseUrl);
+                $allUrls = array_merge($allUrls, $urls);
+            }
+
+            if (count($allUrls) > self::MAX_URLS_PER_SITEMAP) {
+                $allUrls = array_slice($allUrls, 0, self::MAX_URLS_PER_SITEMAP);
+            }
+
+            return $this->buildUrlsetXml($allUrls);
         });
     }
 
@@ -120,6 +160,7 @@ class SitemapService
         }
 
         Cache::forget(self::CACHE_PREFIX . 'index');
+        Cache::forget(self::CACHE_PREFIX . 'app-domain');
         $cleared++;
 
         return $cleared;
@@ -162,25 +203,14 @@ class SitemapService
     // Core sitemap builder
     // =========================================================================
 
-    private function buildTenantSitemap(object $tenant): string
+    private function buildTenantSitemap(object $tenant, ?string $overrideBaseUrl = null): string
     {
-        $baseUrl = $this->resolveBaseUrl($tenant);
-        $tenantId = (int) $tenant->id;
-        $urls = [];
-
-        // Static pages (always included)
-        $urls = array_merge($urls, $this->getStaticPageUrls($tenant, $baseUrl));
-
-        // Dynamic content (feature/module gated)
-        $contentMethods = $this->getContentMethods($tenant);
-        foreach ($contentMethods as $method) {
-            $urls = array_merge($urls, $method($tenantId, $baseUrl));
-        }
+        $urls = $this->collectTenantUrls($tenant, $overrideBaseUrl);
 
         // Enforce protocol limit
         if (count($urls) > self::MAX_URLS_PER_SITEMAP) {
             Log::warning('Sitemap URL count exceeds limit', [
-                'tenant_id' => $tenantId,
+                'tenant_id' => (int) $tenant->id,
                 'url_count' => count($urls),
                 'max' => self::MAX_URLS_PER_SITEMAP,
             ]);
@@ -188,6 +218,25 @@ class SitemapService
         }
 
         return $this->buildUrlsetXml($urls);
+    }
+
+    /**
+     * Collect all URLs for a tenant. Reusable by both single-tenant and app-domain sitemaps.
+     */
+    private function collectTenantUrls(object $tenant, ?string $overrideBaseUrl = null): array
+    {
+        $baseUrl = $overrideBaseUrl ?? $this->resolveBaseUrl($tenant);
+        $tenantId = (int) $tenant->id;
+        $urls = [];
+
+        $urls = array_merge($urls, $this->getStaticPageUrls($tenant, $baseUrl));
+
+        $contentMethods = $this->getContentMethods($tenant);
+        foreach ($contentMethods as $method) {
+            $urls = array_merge($urls, $method($tenantId, $baseUrl));
+        }
+
+        return $urls;
     }
 
     /**
