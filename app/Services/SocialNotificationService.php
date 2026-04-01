@@ -187,6 +187,9 @@ class SocialNotificationService
     {
         $routes = [
             'post' => '/feed',
+            'feed_post' => '/feed',
+            'blog_post' => '/blog/' . $contentId,
+            'blog' => '/blog/' . $contentId,
             'listing' => '/listings/' . $contentId,
             'event' => '/events/' . $contentId,
             'goal' => '/goals',
@@ -194,6 +197,7 @@ class SocialNotificationService
             'resource' => '/resources',
             'volunteering' => '/volunteering/opportunities/' . $contentId,
             'review' => '/dashboard',
+            'comment' => '/feed',
         ];
         return $routes[$contentType] ?? '/';
     }
@@ -334,10 +338,19 @@ class SocialNotificationService
 
             switch ($contentType) {
                 case 'post':
+                case 'feed_post':
                     $userId = DB::table('feed_posts')
                         ->where('id', $contentId)
                         ->where('tenant_id', $tenantId)
                         ->value('user_id');
+                    return $userId ? (int) $userId : null;
+
+                case 'blog_post':
+                case 'blog':
+                    $userId = DB::table('blog_posts')
+                        ->where('id', $contentId)
+                        ->where('tenant_id', $tenantId)
+                        ->value('author_id');
                     return $userId ? (int) $userId : null;
 
                 case 'listing':
@@ -416,10 +429,21 @@ class SocialNotificationService
 
             switch ($contentType) {
                 case 'post':
+                case 'feed_post':
                     $text = (string) DB::table('feed_posts')
                         ->where('id', $contentId)
                         ->where('tenant_id', $tenantId)
                         ->value('content');
+                    break;
+
+                case 'blog_post':
+                case 'blog':
+                    $row = DB::table('blog_posts')
+                        ->where('id', $contentId)
+                        ->where('tenant_id', $tenantId)
+                        ->select(['title', 'excerpt'])
+                        ->first();
+                    $text = $row ? ($row->title . ': ' . ($row->excerpt ?? '')) : '';
                     break;
 
                 case 'listing':
@@ -440,11 +464,52 @@ class SocialNotificationService
                     $text = $row ? ($row->title . ': ' . ($row->description ?? '')) : '';
                     break;
 
+                case 'goal':
+                    $row = DB::table('goals')
+                        ->where('id', $contentId)
+                        ->where('tenant_id', $tenantId)
+                        ->select(['title', 'description'])
+                        ->first();
+                    $text = $row ? ($row->title . ': ' . ($row->description ?? '')) : '';
+                    break;
+
+                case 'poll':
+                    $text = (string) DB::table('polls')
+                        ->where('id', $contentId)
+                        ->where('tenant_id', $tenantId)
+                        ->value('question');
+                    break;
+
+                case 'resource':
+                    $row = DB::table('resources')
+                        ->where('id', $contentId)
+                        ->where('tenant_id', $tenantId)
+                        ->select(['title', 'description'])
+                        ->first();
+                    $text = $row ? ($row->title . ': ' . ($row->description ?? '')) : '';
+                    break;
+
+                case 'volunteering':
+                    $row = DB::table('vol_opportunities')
+                        ->where('id', $contentId)
+                        ->where('tenant_id', $tenantId)
+                        ->select(['title', 'description'])
+                        ->first();
+                    $text = $row ? ($row->title . ': ' . ($row->description ?? '')) : '';
+                    break;
+
                 case 'review':
                     $text = (string) DB::table('reviews')
                         ->where('id', $contentId)
                         ->where('tenant_id', $tenantId)
                         ->value('comment');
+                    break;
+
+                case 'comment':
+                    $text = (string) DB::table('comments')
+                        ->where('id', $contentId)
+                        ->where('tenant_id', $tenantId)
+                        ->value('content');
                     break;
 
                 default:

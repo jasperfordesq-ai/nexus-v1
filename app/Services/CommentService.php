@@ -146,21 +146,18 @@ class CommentService
             Log::warning("CommentService::create mention processing failed: " . $e->getMessage());
         }
 
-        // Notify the content owner that someone commented on their content
+        // Notify the content owner that someone commented on their content (platform + email)
         try {
             $ownerId = self::resolveContentOwnerId($targetType, $targetId, $tenantId);
 
             if ($ownerId && $ownerId !== $userId) {
-                $commenter = User::find($userId);
-                $commenterName = $commenter
-                    ? trim(($commenter->first_name ?? '') . ' ' . ($commenter->last_name ?? ''))
-                    : 'Someone';
-
-                $label = self::contentTypeLabel($targetType);
-                $message = "{$commenterName} commented on your {$label}";
-                $link = "/{$targetType}s/{$targetId}";
-
-                Notification::createNotification($ownerId, $message, $link, 'comment', false, $tenantId);
+                SocialNotificationService::notifyComment(
+                    $ownerId,
+                    $userId,
+                    $targetType,
+                    $targetId,
+                    $content
+                );
             }
         } catch (\Throwable $e) {
             Log::warning('CommentService::create content owner notification failed', [
@@ -601,6 +598,13 @@ class CommentService
      */
     private static function saveMentions(int $commentId, array $usernames, int $mentioningUserId, int $tenantId): void
     {
+        // Look up the comment's target so mention notifications link to the right content
+        $comment = DB::table('comments')
+            ->where('id', $commentId)
+            ->where('tenant_id', $tenantId)
+            ->select(['target_type', 'target_id', 'content'])
+            ->first();
+
         foreach ($usernames as $username) {
             $user = DB::table('users')
                 ->where('tenant_id', $tenantId)
@@ -622,13 +626,15 @@ class CommentService
                         'created_at' => now(),
                     ]);
 
-                    \App\Services\SocialNotificationService::notifyComment(
-                        $user->id,
-                        $mentioningUserId,
-                        'mention',
-                        $commentId,
-                        'mentioned you in a comment'
-                    );
+                    if ($comment) {
+                        SocialNotificationService::notifyComment(
+                            $user->id,
+                            $mentioningUserId,
+                            $comment->target_type,
+                            (int) $comment->target_id,
+                            $comment->content ?? ''
+                        );
+                    }
                 } catch (\Exception $e) {
                     // Ignore duplicate mention errors
                 }

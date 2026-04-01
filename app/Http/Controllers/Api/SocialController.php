@@ -16,6 +16,7 @@ use App\Services\PostMediaService;
 use App\Services\SocialNotificationService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use App\Models\FeedPost;
 
 /**
@@ -212,6 +213,17 @@ class SocialController extends BaseApiController
             }
 
             $action = 'liked';
+
+            // Send platform + email notification to content owner
+            try {
+                $contentOwnerId = SocialNotificationService::getContentOwnerId($targetType, $targetId);
+                if ($contentOwnerId && $contentOwnerId !== $userId) {
+                    $preview = SocialNotificationService::getContentPreview($targetType, $targetId);
+                    SocialNotificationService::notifyLike($contentOwnerId, $userId, $targetType, $targetId, $preview);
+                }
+            } catch (\Throwable $e) {
+                Log::warning('SocialController::likeV2 notification failed', ['error' => $e->getMessage()]);
+            }
         }
 
         // Get updated count (tenant-scoped)
@@ -1090,6 +1102,11 @@ class SocialController extends BaseApiController
         try {
             if (true /* CommentService injected via DI */) {
                 $result = $this->commentService->addComment($userId, $tenantId, $targetType, $targetId, $content, $parentId);
+
+                if (($result['status'] ?? '') === 'success') {
+                    $this->notifyComment($userId, $targetType, $targetId, $content);
+                }
+
                 return $this->respondWithData($result);
             }
 
