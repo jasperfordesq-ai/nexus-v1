@@ -283,10 +283,10 @@ require dirname(__DIR__) . '/partials/super-admin-header.php';
                         <i class="fa-solid fa-users"></i>
                         Global User Directory
                     </a>
-                    <button onclick="window.open('/cron/process-queue?key=<?= htmlspecialchars($cronKey) ?>', '_blank')" class="super-admin-btn super-admin-btn-secondary" style="width: 100%; justify-content: flex-start;">
+                    <span class="super-admin-btn super-admin-btn-secondary" style="width: 100%; justify-content: flex-start; opacity: 0.5; cursor: not-allowed;" title="Queue runs automatically via Laravel scheduler">
                         <i class="fa-solid fa-play"></i>
-                        Run Queue Worker
-                    </button>
+                        Queue Worker (automatic)
+                    </span>
                     <a href="#deploy" class="super-admin-btn super-admin-btn-secondary" style="width: 100%; justify-content: flex-start;">
                         <i class="fa-solid fa-rocket"></i>
                         Deploy New Instance
@@ -311,22 +311,17 @@ require dirname(__DIR__) . '/partials/super-admin-header.php';
                 </div>
             </div>
             <div class="super-admin-card-body">
-                <p style="font-size: 0.8rem; color: rgba(255,255,255,0.6); margin: 0 0 12px;">Add these to your server's crontab:</p>
+                <p style="font-size: 0.8rem; color: rgba(255,255,255,0.6); margin: 0 0 12px;">Add this single entry to the host crontab:</p>
 
                 <div style="background: rgba(0,0,0,0.3); border-radius: 8px; padding: 12px; font-family: monospace; font-size: 0.7rem; color: #34d399; overflow-x: auto; margin-bottom: 16px;">
-                    <div style="color: rgba(255,255,255,0.4); margin-bottom: 8px;"># Every Minute (Instant Emails)</div>
-                    <div style="word-break: break-all;">* * * * * curl -s "<?= $appUrl ?>/cron/process-queue?key=<?= $cronKey ?>"</div>
-                    <div style="color: rgba(255,255,255,0.4); margin: 12px 0 8px;"># Daily 5PM (Digest)</div>
-                    <div style="word-break: break-all;">0 17 * * * curl -s "<?= $appUrl ?>/cron/daily-digest?key=<?= $cronKey ?>"</div>
+                    <div style="color: rgba(255,255,255,0.4); margin-bottom: 8px;"># Laravel scheduler — runs every minute, handles all tasks internally</div>
+                    <div style="word-break: break-all;">* * * * * docker exec nexus-php-app php /var/www/html/artisan schedule:run >> /var/log/nexus-scheduler.log 2>&1</div>
                 </div>
 
-                <div style="display: flex; gap: 8px; flex-wrap: wrap;">
-                    <button onclick="window.open('/cron/process-queue?key=<?= htmlspecialchars($cronKey) ?>', '_blank')" class="super-admin-btn super-admin-btn-secondary super-admin-btn-sm" style="flex: 1;">
-                        <i class="fa-solid fa-bolt"></i> Queue
-                    </button>
-                    <button onclick="window.open('/cron/daily-digest?key=<?= htmlspecialchars($cronKey) ?>', '_blank')" class="super-admin-btn super-admin-btn-secondary super-admin-btn-sm" style="flex: 1;">
-                        <i class="fa-solid fa-envelope"></i> Digest
-                    </button>
+                <div style="background: rgba(245, 158, 11, 0.1); border: 1px solid rgba(245, 158, 11, 0.25); border-radius: 8px; padding: 10px; font-size: 0.75rem; color: #fcd34d;">
+                    <i class="fa-solid fa-exclamation-triangle"></i>
+                    <strong>Do NOT</strong> add curl-based cron entries — they were removed to prevent duplicate email sends.
+                    Use the <a href="<?= $basePath ?>/admin-legacy/cron-jobs" style="color: #a5b4fc;">Cron Jobs dashboard</a> to manually trigger individual jobs.
                 </div>
             </div>
         </div>

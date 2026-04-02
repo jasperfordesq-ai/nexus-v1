@@ -526,8 +526,8 @@ class CronJobRunner
 
     /**
      * Process Scheduled Newsletters
-     * Should be triggered every 5-15 minutes via cron job.
-     * URI: /cron/process-newsletters
+     * Called internally by runAll() every 5 minutes and by admin panel manual trigger.
+     * NOT an HTTP endpoint — the /cron/* routes were removed (2026-04-02, email bombing fix).
      */
     public function processNewsletters()
     {
@@ -556,8 +556,8 @@ class CronJobRunner
 
     /**
      * Process Recurring Newsletters
-     * Should be triggered every 15 minutes via cron job.
-     * URI: /cron/process-recurring
+     * Called internally by runAll() every 15 minutes and by admin panel manual trigger.
+     * NOT an HTTP endpoint — the /cron/* routes were removed (2026-04-02, email bombing fix).
      */
     public function processRecurring()
     {
@@ -586,8 +586,8 @@ class CronJobRunner
 
     /**
      * Process Newsletter Queue (for large sends)
-     * Should be triggered every 2-5 minutes via cron job.
-     * URI: /cron/process-newsletter-queue
+     * Called internally by runAll() every minute and by admin panel manual trigger.
+     * NOT an HTTP endpoint — the /cron/* routes were removed (2026-04-02, email bombing fix).
      */
     public function processNewsletterQueue()
     {
@@ -663,8 +663,8 @@ class CronJobRunner
 
     /**
      * Cleanup expired tokens and old data
-     * Should be triggered once daily.
-     * URI: /cron/cleanup
+     * Called internally by runAll() daily at midnight and by admin panel manual trigger.
+     * NOT an HTTP endpoint — the /cron/* routes were removed (2026-04-02, email bombing fix).
      */
     public function cleanup()
     {
@@ -780,9 +780,10 @@ class CronJobRunner
     }
 
     /**
-     * Run all cron tasks (master endpoint)
-     * Called every minute via crontab. Internal scheduling determines which tasks run.
-     * URI: /cron/run-all
+     * Run all cron tasks (master scheduler)
+     * Called every minute via `artisan schedule:run` (Laravel scheduler in bootstrap/app.php).
+     * The HTTP /cron/run-all route was removed (2026-04-02) to prevent duplicate execution.
+     * The ONLY trigger is: docker exec nexus-php-app php artisan schedule:run (host crontab).
      *
      * Schedule overview:
      *   Every run:    Instant queue, newsletter queue

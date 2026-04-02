@@ -58,14 +58,11 @@ class RouteServiceProvider extends ServiceProvider
                 ->prefix('api')
                 ->group(base_path('routes/api.php'));
 
-            // Cron endpoint — no /api prefix (external callers hit /cron/run-all directly)
-            // CronJobRunner authenticates via CRON_KEY query param or X-Cron-Key header.
-            Route::match(['get', 'post'], '/cron/run-all', function () {
-                $runner = app(\App\Services\CronJobRunner::class);
-                $runner->runAll();
-                // runAll() outputs directly via echo — return empty to avoid double output
-                return '';
-            });
+            // HTTP cron endpoint REMOVED (2026-04-02) — email bombing root cause.
+            // The /cron/run-all route allowed a second execution path (curl-based cron)
+            // that bypassed withoutOverlapping() and caused duplicate newsletter sends.
+            // The ONLY cron trigger is now: docker exec nexus-php-app artisan schedule:run
+            // (root crontab on the host, every minute).
 
             // Sitemap endpoints — no /api prefix (crawlers access these directly)
             Route::get('/sitemap.xml', [\App\Http\Controllers\SitemapController::class, 'index']);

@@ -72,35 +72,26 @@ $appUrl = $appUrl ?? $basePath;
         <div class="admin-card-body">
             <p class="guide-text">Cron jobs are essential background tasks that keep your platform running smoothly. They handle automated emails, cleanup tasks, and various scheduled operations.</p>
 
-            <div class="info-box info">
-                <i class="fa-solid fa-lightbulb"></i>
+            <div class="info-box warning">
+                <i class="fa-solid fa-exclamation-triangle"></i>
                 <div>
-                    <strong>Pro Tip:</strong> If your hosting provider only allows a limited number of cron jobs, use the <strong>Master Cron Runner</strong> (<code>/cron/run-all</code>) which intelligently runs all tasks based on the current time.
+                    <strong>Important (2026-04-02):</strong> The HTTP-based cron endpoints (<code>/cron/run-all</code>, etc.) have been <strong>removed</strong> to prevent duplicate email sends. The only supported cron trigger is the <strong>Laravel scheduler</strong> via <code>artisan schedule:run</code>. See the Docker/Linux tab for the correct setup. <strong>Do NOT add curl-based cron entries — they will cause duplicate newsletters.</strong>
                 </div>
             </div>
 
-            <h4 class="section-heading">Security Configuration</h4>
-            <p class="guide-text">All cron endpoints require authentication via a secret key. Set the <code>CRON_KEY</code> environment variable in your <code>.env</code> file:</p>
+            <h4 class="section-heading">Recommended Setup (Docker)</h4>
+            <p class="guide-text">Add this single entry to the host machine's root crontab:</p>
 
             <div class="code-block">
-                <div class="code-label">Environment Variable</div>
+                <div class="code-label">Host crontab (the only cron entry needed)</div>
                 <button class="copy-btn" onclick="copyCode(this)"><i class="fa-solid fa-copy"></i> Copy</button>
-                <pre>CRON_KEY=<?= htmlspecialchars($cronKey ?: 'your-secure-random-key-here') ?></pre>
+                <pre># Laravel scheduler — runs every minute, CronJobRunner handles internal scheduling
+* * * * * docker exec nexus-php-app php /var/www/html/artisan schedule:run >> /var/log/nexus-scheduler.log 2>&1</pre>
             </div>
 
-            <p class="guide-text">Then use this key when calling cron endpoints:</p>
+            <p class="guide-text">The Laravel scheduler calls <code>CronJobRunner::runAll()</code> which intelligently determines which tasks to run based on the current time (newsletters, digests, cleanup, etc.).</p>
 
-            <div class="code-block">
-                <div class="code-label">Usage Examples</div>
-                <button class="copy-btn" onclick="copyCode(this)"><i class="fa-solid fa-copy"></i> Copy</button>
-                <pre># Via URL parameter
-<?= htmlspecialchars($appUrl) ?>/cron/run-all?key=YOUR_CRON_KEY
-
-# Via HTTP header
-curl -H "X-Cron-Key: YOUR_CRON_KEY" <?= htmlspecialchars($appUrl) ?>/cron/run-all</pre>
-            </div>
-
-            <h4 class="section-heading">Recommended Cron Schedule</h4>
+            <h4 class="section-heading">All Scheduled Tasks</h4>
             <div class="cron-table-wrapper">
                 <table class="cron-table">
                     <thead>
@@ -108,7 +99,7 @@ curl -H "X-Cron-Key: YOUR_CRON_KEY" <?= htmlspecialchars($appUrl) ?>/cron/run-al
                             <th>Task</th>
                             <th>Frequency</th>
                             <th>Expression</th>
-                            <th>Endpoint</th>
+                            <th>Handler</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -124,18 +115,8 @@ curl -H "X-Cron-Key: YOUR_CRON_KEY" <?= htmlspecialchars($appUrl) ?>/cron/run-al
                 </table>
             </div>
 
-            <h4 class="section-heading">Minimum Recommended Setup</h4>
-            <p class="guide-text">If you can only configure a few cron jobs, these are the most important:</p>
-            <ol class="guide-list">
-                <li><strong>Master Cron Runner</strong> - <code>/cron/run-all</code> every minute (handles everything)</li>
-                <li><strong>OR</strong> these individual jobs:
-                    <ul>
-                        <li>Instant Queue - <code>/cron/process-queue</code> every 2 minutes</li>
-                        <li>Newsletter Queue - <code>/cron/process-newsletter-queue</code> every 3 minutes</li>
-                        <li>Daily Cleanup - <code>/cron/cleanup</code> daily at midnight</li>
-                    </ul>
-                </li>
-            </ol>
+            <h4 class="section-heading">Manual Trigger</h4>
+            <p class="guide-text">Individual jobs can be triggered manually from the <a href="<?= $basePath ?>/admin-legacy/cron-jobs" style="color: #a5b4fc;">Cron Jobs dashboard</a> using the "Run Now" button. This is safe and does not conflict with the scheduler.</p>
         </div>
     </div>
 </div>

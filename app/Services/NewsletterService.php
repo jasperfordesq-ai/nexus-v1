@@ -152,6 +152,17 @@ class NewsletterService
                 throw new \Exception('Newsletter already sent');
             }
 
+            // Guard against re-send within a short window (email bombing fix, 2026-04-02).
+            // If this newsletter was sent in the last 5 minutes, refuse to re-send.
+            // This catches edge cases where processRecurring() resets status to 'active'
+            // and a second runner immediately re-claims before last_sent_at propagates.
+            if ($newsletter->sent_at) {
+                $secondsSinceLastSend = time() - strtotime($newsletter->sent_at);
+                if ($secondsSinceLastSend < 300) {
+                    throw new \Exception("Newsletter {$newsletterId} was sent {$secondsSinceLastSend}s ago — refusing re-send (dedup guard)");
+                }
+            }
+
             // Use segment_id from newsletter if not passed
             if (!$segmentId && !empty($newsletter->segment_id)) {
                 $segmentId = (int) $newsletter->segment_id;
@@ -168,8 +179,13 @@ class NewsletterService
                 throw new \Exception('No eligible recipients found');
             }
 
-            // Clear old queue and queue new recipients
-            DB::table('newsletter_queue')->where('newsletter_id', $newsletterId)->delete();
+            // Clear old queue and queue new recipients.
+            // Only clear items that haven't been sent — preserve 'sent' records
+            // to avoid nuking the audit trail if sendNow() is called twice.
+            DB::table('newsletter_queue')
+                ->where('newsletter_id', $newsletterId)
+                ->whereIn('status', ['pending', 'processing', 'failed'])
+                ->delete();
 
             $queued = self::queueRecipientsWithTokens($newsletterId, $recipients);
 
@@ -323,12 +339,27 @@ class NewsletterService
     {
         $queued = 0;
 
+        // Build set of emails that were already successfully sent in this cycle.
+        // This prevents re-queuing recipients if sendNow() is called twice
+        // (email bombing fix, 2026-04-02).
+        $alreadySent = DB::table('newsletter_queue')
+            ->where('newsletter_id', $newsletterId)
+            ->where('status', 'sent')
+            ->pluck('email')
+            ->flip()
+            ->all();
+
         foreach ($recipients as $recipient) {
+            $email = $recipient['email'] ?? '';
+            if (empty($email) || isset($alreadySent[$email])) {
+                continue; // Skip already-sent recipients
+            }
+
             $token = $recipient['unsubscribe_token'] ?? bin2hex(random_bytes(32));
 
             DB::table('newsletter_queue')->insert([
                 'newsletter_id' => $newsletterId,
-                'email' => $recipient['email'],
+                'email' => $email,
                 'user_id' => $recipient['user_id'] ?? null,
                 'name' => $recipient['name'] ?? '',
                 'first_name' => $recipient['first_name'] ?? '',
@@ -1175,49 +1206,64 @@ HTML;
                 // Set correct tenant context for this newsletter's tenant
                 TenantContext::setById($newsletter->tenant_id);
 
-                // Check if enough time has passed since last send
+                // Check if enough time has passed since last send.
+                // Uses a 90% threshold of the configured interval to prevent edge-case
+                // re-sends when two runners overlap (email bombing fix, 2026-04-02).
                 $lastSent = $newsletter->last_sent_at ?? null;
                 $interval = $newsletter->recurring_interval ?? 'weekly';
 
                 $shouldSend = !$lastSent;
                 if ($lastSent) {
-                    $daysSince = (int) ((time() - strtotime($lastSent)) / 86400);
-                    $shouldSend = match ($interval) {
-                        'daily' => $daysSince >= 1,
-                        'weekly' => $daysSince >= 7,
-                        'monthly' => $daysSince >= 30,
-                        default => false,
+                    $secondsSince = time() - strtotime($lastSent);
+                    // Minimum seconds that must pass before re-sending (90% of interval)
+                    $minSeconds = match ($interval) {
+                        'daily' => (int) (86400 * 0.9),    // ~21.6 hours
+                        'weekly' => (int) (604800 * 0.9),   // ~6.3 days
+                        'monthly' => (int) (2592000 * 0.9), // ~27 days
+                        default => PHP_INT_MAX,
                     };
+                    $shouldSend = $secondsSince >= $minSeconds;
                 }
 
-                if ($shouldSend) {
-                    // Atomically claim by setting status to 'sending' — prevents
-                    // concurrent runners from processing the same recurring newsletter.
-                    $claimed = DB::table('newsletters')
+                if (!$shouldSend) {
+                    continue;
+                }
+
+                // Atomically claim by setting status to 'sending' AND updating
+                // last_sent_at in the SAME statement. This prevents a second runner
+                // from re-claiming after the first resets status to 'active', because
+                // last_sent_at will already be set to now() and the shouldSend check
+                // will fail on the next cycle.
+                $claimed = DB::table('newsletters')
+                    ->where('id', $newsletter->id)
+                    ->where('status', 'active')
+                    ->update([
+                        'status' => 'sending',
+                        'last_sent_at' => now(),
+                        'updated_at' => now(),
+                    ]);
+
+                if (!$claimed) {
+                    continue; // Another runner already claimed it
+                }
+
+                try {
+                    $service = app(self::class);
+                    $service->sendNow((int) $newsletter->id);
+                    // Restore to 'active' for the next recurring cycle.
+                    // last_sent_at was already set during the atomic claim above.
+                    DB::table('newsletters')
                         ->where('id', $newsletter->id)
-                        ->where('status', 'active')
-                        ->update(['status' => 'sending', 'updated_at' => now()]);
-
-                    if (!$claimed) {
-                        continue; // Another runner already claimed it
-                    }
-
-                    try {
-                        $service = app(self::class);
-                        $service->sendNow((int) $newsletter->id);
-                        // Restore to 'active' for the next recurring cycle
-                        DB::table('newsletters')
-                            ->where('id', $newsletter->id)
-                            ->update(['status' => 'active', 'last_sent_at' => now(), 'updated_at' => now()]);
-                        $processed++;
-                    } catch (\Exception $e) {
-                        // Revert status so it can be retried next cycle
-                        DB::table('newsletters')
-                            ->where('id', $newsletter->id)
-                            ->where('status', 'sending')
-                            ->update(['status' => 'active', 'updated_at' => now()]);
-                        Log::error("Failed to process recurring newsletter {$newsletter->id}: " . $e->getMessage());
-                    }
+                        ->update(['status' => 'active', 'updated_at' => now()]);
+                    $processed++;
+                } catch (\Exception $e) {
+                    // Revert status so it can be retried next cycle.
+                    // last_sent_at stays set — this prevents re-send storms on error.
+                    DB::table('newsletters')
+                        ->where('id', $newsletter->id)
+                        ->where('status', 'sending')
+                        ->update(['status' => 'active', 'updated_at' => now()]);
+                    Log::error("Failed to process recurring newsletter {$newsletter->id}: " . $e->getMessage());
                 }
             }
         } catch (\Exception $e) {
