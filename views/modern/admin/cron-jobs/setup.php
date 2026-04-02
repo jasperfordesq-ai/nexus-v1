@@ -121,7 +121,7 @@ $appUrl = $appUrl ?? $basePath;
     </div>
 </div>
 
-<!-- Plesk Section -->
+<!-- Docker Section (Primary) -->
 <div class="setup-section" id="plesk">
     <div class="admin-glass-card">
         <div class="admin-card-header">
@@ -129,49 +129,38 @@ $appUrl = $appUrl ?? $basePath;
                 <i class="fa-solid fa-server"></i>
             </div>
             <div class="admin-card-header-content">
-                <h3 class="admin-card-title">Plesk (Azure/Google Cloud VMs)</h3>
-                <p class="admin-card-subtitle">Setup for Plesk control panel</p>
+                <h3 class="admin-card-title">Docker (Production)</h3>
+                <p class="admin-card-subtitle">Recommended setup for Docker deployments</p>
             </div>
         </div>
         <div class="admin-card-body">
-            <h4 class="section-heading"><span class="step-badge">1</span> Access Scheduled Tasks</h4>
-            <ol class="guide-list">
-                <li>Log in to your Plesk control panel</li>
-                <li>Navigate to <strong>Tools & Settings</strong> > <strong>Scheduled Tasks</strong></li>
-                <li>Or go to <strong>Websites & Domains</strong> > select your domain > <strong>Scheduled Tasks</strong></li>
-            </ol>
+            <h4 class="section-heading"><span class="step-badge">1</span> Add to Host Crontab</h4>
+            <p class="guide-text">On the <strong>host machine</strong> (not inside the container), add this single crontab entry:</p>
 
-            <h4 class="section-heading"><span class="step-badge">2</span> Add a New Task</h4>
-            <ol class="guide-list">
-                <li>Click <strong>Add Task</strong></li>
-                <li>Select <strong>Run a command</strong> for wget/curl</li>
-            </ol>
-
-            <h4 class="section-heading"><span class="step-badge">3</span> Configure Using wget</h4>
             <div class="code-block">
-                <div class="code-label">Master Cron (runs every minute)</div>
+                <div class="code-label">sudo crontab -e</div>
                 <button class="copy-btn" onclick="copyCode(this)"><i class="fa-solid fa-copy"></i> Copy</button>
-                <pre>/usr/bin/wget -q -O /dev/null "<?= htmlspecialchars($appUrl) ?>/cron/run-all?key=<?= htmlspecialchars($cronKey ?: 'YOUR_CRON_KEY') ?>"</pre>
+                <pre># Laravel scheduler — runs every minute, CronJobRunner handles all tasks internally
+* * * * * docker exec nexus-php-app php /var/www/html/artisan schedule:run >> /var/log/nexus-scheduler.log 2>&1</pre>
             </div>
 
-            <h4 class="section-heading"><span class="step-badge">4</span> Set Schedule</h4>
-            <ul class="guide-list">
-                <li><strong>Every minute:</strong> <code>* * * * *</code></li>
-                <li><strong>Every 5 minutes:</strong> <code>*/5 * * * *</code></li>
-                <li><strong>Daily at 8 AM:</strong> <code>0 8 * * *</code></li>
-            </ul>
+            <h4 class="section-heading"><span class="step-badge">2</span> Verify</h4>
+            <div class="code-block">
+                <button class="copy-btn" onclick="copyCode(this)"><i class="fa-solid fa-copy"></i> Copy</button>
+                <pre>sudo crontab -l</pre>
+            </div>
 
-            <div class="info-box warning">
-                <i class="fa-solid fa-exclamation-triangle"></i>
+            <div class="info-box success">
+                <i class="fa-solid fa-check-circle"></i>
                 <div>
-                    <strong>Important:</strong> Make sure your PHP version and timeout settings allow scripts to run for at least 2-5 minutes for longer tasks like newsletter sending.
+                    <strong>That's it!</strong> The Laravel scheduler calls <code>CronJobRunner::runAll()</code> every minute, which internally determines which of the 40+ tasks to run based on the current time. No other cron entries needed.
                 </div>
             </div>
         </div>
     </div>
 </div>
 
-<!-- cPanel Section -->
+<!-- cPanel / Shared Hosting Section -->
 <div class="setup-section" id="cpanel">
     <div class="admin-glass-card">
         <div class="admin-card-header">
@@ -179,8 +168,8 @@ $appUrl = $appUrl ?? $basePath;
                 <i class="fa-solid fa-cog"></i>
             </div>
             <div class="admin-card-header-content">
-                <h3 class="admin-card-title">cPanel</h3>
-                <p class="admin-card-subtitle">Setup for cPanel hosting</p>
+                <h3 class="admin-card-title">cPanel / Shared Hosting</h3>
+                <p class="admin-card-subtitle">Setup for shared hosting with shell access</p>
             </div>
         </div>
         <div class="admin-card-body">
@@ -192,21 +181,15 @@ $appUrl = $appUrl ?? $basePath;
 
             <h4 class="section-heading"><span class="step-badge">2</span> Add Cron Job</h4>
             <div class="code-block">
-                <div class="code-label">Using wget</div>
+                <div class="code-label">Laravel Scheduler (every minute)</div>
                 <button class="copy-btn" onclick="copyCode(this)"><i class="fa-solid fa-copy"></i> Copy</button>
-                <pre>/usr/bin/wget -q -O /dev/null "<?= htmlspecialchars($appUrl) ?>/cron/run-all?key=<?= htmlspecialchars($cronKey ?: 'YOUR_CRON_KEY') ?>" >/dev/null 2>&1</pre>
-            </div>
-
-            <div class="code-block">
-                <div class="code-label">Using curl</div>
-                <button class="copy-btn" onclick="copyCode(this)"><i class="fa-solid fa-copy"></i> Copy</button>
-                <pre>/usr/bin/curl -s "<?= htmlspecialchars($appUrl) ?>/cron/run-all?key=<?= htmlspecialchars($cronKey ?: 'YOUR_CRON_KEY') ?>" >/dev/null 2>&1</pre>
+                <pre>* * * * * cd /path/to/your/project && php artisan schedule:run >> /dev/null 2>&1</pre>
             </div>
 
             <div class="info-box info">
                 <i class="fa-solid fa-info-circle"></i>
                 <div>
-                    <strong>Note:</strong> On shared hosting, you may be limited to running cron jobs every 15 minutes. Use the Master Cron Runner which handles all timing internally.
+                    <strong>Note:</strong> Replace <code>/path/to/your/project</code> with your actual project root. On shared hosting limited to every 15 minutes, the scheduler will still work — it just checks less frequently.
                 </div>
             </div>
         </div>
@@ -232,28 +215,12 @@ $appUrl = $appUrl ?? $basePath;
                 <pre>crontab -e</pre>
             </div>
 
-            <h4 class="section-heading"><span class="step-badge">2</span> Add Cron Entries</h4>
+            <h4 class="section-heading"><span class="step-badge">2</span> Add Laravel Scheduler Entry</h4>
             <div class="code-block">
-                <div class="code-label">Option A: Master Cron (Recommended)</div>
+                <div class="code-label">Single cron entry (handles all 40+ tasks)</div>
                 <button class="copy-btn" onclick="copyCode(this)"><i class="fa-solid fa-copy"></i> Copy</button>
-                <pre># Run master cron every minute
-* * * * * /usr/bin/curl -s "<?= htmlspecialchars($appUrl) ?>/cron/run-all?key=<?= htmlspecialchars($cronKey ?: 'YOUR_CRON_KEY') ?>" >/dev/null 2>&1</pre>
-            </div>
-
-            <div class="code-block">
-                <div class="code-label">Option B: Individual Jobs</div>
-                <button class="copy-btn" onclick="copyCode(this)"><i class="fa-solid fa-copy"></i> Copy</button>
-                <pre># Instant queue - every 2 minutes
-*/2 * * * * /usr/bin/curl -s "<?= htmlspecialchars($appUrl) ?>/cron/process-queue?key=<?= htmlspecialchars($cronKey ?: 'YOUR_CRON_KEY') ?>" >/dev/null 2>&1
-
-# Newsletter queue - every 3 minutes
-*/3 * * * * /usr/bin/curl -s "<?= htmlspecialchars($appUrl) ?>/cron/process-newsletter-queue?key=<?= htmlspecialchars($cronKey ?: 'YOUR_CRON_KEY') ?>" >/dev/null 2>&1
-
-# Daily digest - 8 AM
-0 8 * * * /usr/bin/curl -s "<?= htmlspecialchars($appUrl) ?>/cron/daily-digest?key=<?= htmlspecialchars($cronKey ?: 'YOUR_CRON_KEY') ?>" >/dev/null 2>&1
-
-# Cleanup - midnight
-0 0 * * * /usr/bin/curl -s "<?= htmlspecialchars($appUrl) ?>/cron/cleanup?key=<?= htmlspecialchars($cronKey ?: 'YOUR_CRON_KEY') ?>" >/dev/null 2>&1</pre>
+                <pre># Laravel scheduler — runs every minute
+* * * * * cd /path/to/your/project && php artisan schedule:run >> /dev/null 2>&1</pre>
             </div>
 
             <h4 class="section-heading"><span class="step-badge">3</span> Verify Crontab</h4>
@@ -265,7 +232,7 @@ $appUrl = $appUrl ?? $basePath;
             <div class="info-box success">
                 <i class="fa-solid fa-check-circle"></i>
                 <div>
-                    <strong>Best Practice:</strong> Use <code>>/dev/null 2>&1</code> at the end of each command to suppress output emails.
+                    <strong>Best Practice:</strong> Use <code>>> /dev/null 2>&1</code> to suppress output emails. The scheduler handles timing internally — you only need this one entry.
                 </div>
             </div>
         </div>
@@ -280,46 +247,30 @@ $appUrl = $appUrl ?? $basePath;
                 <i class="fa-brands fa-microsoft"></i>
             </div>
             <div class="admin-card-header-content">
-                <h3 class="admin-card-title">Azure WebJobs / Azure Functions</h3>
-                <p class="admin-card-subtitle">Cloud-native scheduling on Azure</p>
+                <h3 class="admin-card-title">Azure VM (Docker)</h3>
+                <p class="admin-card-subtitle">Current production setup</p>
             </div>
         </div>
         <div class="admin-card-body">
-            <h4 class="section-heading">Option 1: Azure WebJobs</h4>
-            <ol class="guide-list">
-                <li>Go to your App Service in Azure Portal</li>
-                <li>Navigate to <strong>WebJobs</strong> under Settings</li>
-                <li>Click <strong>+ Add</strong></li>
-            </ol>
-
+            <h4 class="section-heading"><span class="step-badge">1</span> SSH into the Azure VM</h4>
             <div class="code-block">
-                <div class="code-label">run.ps1</div>
                 <button class="copy-btn" onclick="copyCode(this)"><i class="fa-solid fa-copy"></i> Copy</button>
-                <pre>Invoke-WebRequest -Uri "<?= htmlspecialchars($appUrl) ?>/cron/run-all?key=<?= htmlspecialchars($cronKey ?: 'YOUR_CRON_KEY') ?>" -Method GET</pre>
+                <pre>ssh azureuser@your-vm-ip</pre>
             </div>
 
+            <h4 class="section-heading"><span class="step-badge">2</span> Add to Root Crontab</h4>
             <div class="code-block">
-                <div class="code-label">settings.job (schedule every minute)</div>
+                <div class="code-label">sudo crontab -e</div>
                 <button class="copy-btn" onclick="copyCode(this)"><i class="fa-solid fa-copy"></i> Copy</button>
-                <pre>{
-    "schedule": "0 * * * * *"
-}</pre>
+                <pre># Laravel scheduler — runs every minute, CronJobRunner handles internal scheduling
+* * * * * docker exec nexus-php-app php /var/www/html/artisan schedule:run >> /var/log/nexus-scheduler.log 2>&1</pre>
             </div>
 
-            <h4 class="section-heading">Option 2: Azure Functions (Timer Trigger)</h4>
-            <div class="code-block">
-                <div class="code-label">function.json</div>
-                <button class="copy-btn" onclick="copyCode(this)"><i class="fa-solid fa-copy"></i> Copy</button>
-                <pre>{
-    "bindings": [
-        {
-            "name": "myTimer",
-            "type": "timerTrigger",
-            "direction": "in",
-            "schedule": "0 * * * * *"
-        }
-    ]
-}</pre>
+            <div class="info-box warning">
+                <i class="fa-solid fa-exclamation-triangle"></i>
+                <div>
+                    <strong>Do NOT use Azure WebJobs, Functions, or Cloud Scheduler to hit HTTP endpoints.</strong> The <code>/cron/*</code> HTTP endpoints were removed to prevent duplicate email sends. Use <code>artisan schedule:run</code> only.
+                </div>
             </div>
         </div>
     </div>
@@ -334,37 +285,30 @@ $appUrl = $appUrl ?? $basePath;
             </div>
             <div class="admin-card-header-content">
                 <h3 class="admin-card-title">Google Cloud Platform</h3>
-                <p class="admin-card-subtitle">Cloud Scheduler setup</p>
+                <p class="admin-card-subtitle">GCE VM with Docker</p>
             </div>
         </div>
         <div class="admin-card-body">
-            <h4 class="section-heading"><span class="step-badge">1</span> Enable Cloud Scheduler API</h4>
+            <h4 class="section-heading"><span class="step-badge">1</span> SSH into the GCE VM</h4>
             <div class="code-block">
                 <button class="copy-btn" onclick="copyCode(this)"><i class="fa-solid fa-copy"></i> Copy</button>
-                <pre>gcloud services enable cloudscheduler.googleapis.com</pre>
+                <pre>gcloud compute ssh your-instance-name</pre>
             </div>
 
-            <h4 class="section-heading"><span class="step-badge">2</span> Create a Scheduler Job</h4>
+            <h4 class="section-heading"><span class="step-badge">2</span> Add to Root Crontab</h4>
             <div class="code-block">
+                <div class="code-label">sudo crontab -e</div>
                 <button class="copy-btn" onclick="copyCode(this)"><i class="fa-solid fa-copy"></i> Copy</button>
-                <pre>gcloud scheduler jobs create http nexus-cron-master \
-    --schedule="* * * * *" \
-    --uri="<?= htmlspecialchars($appUrl) ?>/cron/run-all?key=<?= htmlspecialchars($cronKey ?: 'YOUR_CRON_KEY') ?>" \
-    --http-method=GET \
-    --time-zone="UTC" \
-    --location="us-central1"</pre>
+                <pre># Laravel scheduler — runs every minute
+* * * * * docker exec nexus-php-app php /var/www/html/artisan schedule:run >> /var/log/nexus-scheduler.log 2>&1</pre>
             </div>
 
-            <h4 class="section-heading">Using Cloud Console</h4>
-            <ol class="guide-list">
-                <li>Go to <strong>Cloud Scheduler</strong> in GCP Console</li>
-                <li>Click <strong>Create Job</strong></li>
-                <li>Enter job name and select region</li>
-                <li>Set frequency: <code>* * * * *</code></li>
-                <li>Select <strong>HTTP</strong> as target type</li>
-                <li>Enter your cron URL with key</li>
-                <li>Click <strong>Create</strong></li>
-            </ol>
+            <div class="info-box warning">
+                <i class="fa-solid fa-exclamation-triangle"></i>
+                <div>
+                    <strong>Do NOT use GCP Cloud Scheduler to hit HTTP endpoints.</strong> The <code>/cron/*</code> HTTP endpoints were removed. Use <code>artisan schedule:run</code> via the VM crontab only.
+                </div>
+            </div>
         </div>
     </div>
 </div>

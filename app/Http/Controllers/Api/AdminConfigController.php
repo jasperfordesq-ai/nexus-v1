@@ -532,6 +532,7 @@ class AdminConfigController extends BaseApiController
                     'volunteer-lapsed-nudge' => 'volunteerLapsedNudge',
                     'volunteer-expiry-warnings' => 'volunteerExpiryWarnings',
                     'recurring-shifts' => 'recurringShifts',
+                    'volunteer-expire-consents' => 'volunteerExpireConsents',
                     // Maintenance
                     'cleanup' => 'cleanup',
                     'geocode-batch' => 'geocodeBatch',
@@ -1559,6 +1560,7 @@ class AdminConfigController extends BaseApiController
             ['id' => 'volunteer-lapsed-nudge', 'name' => 'Lapsed Volunteer Nudge', 'command' => 'volunteerLapsedNudge', 'schedule' => '0 5 * * *', 'category' => 'volunteering', 'description' => 'Nudges volunteers who haven\'t been active recently.'],
             ['id' => 'volunteer-expiry-warnings', 'name' => 'Volunteer Credential Expiry', 'command' => 'volunteerExpiryWarnings', 'schedule' => '0 5 * * *', 'category' => 'volunteering', 'description' => 'Warns volunteers about expiring credentials and training.'],
             ['id' => 'recurring-shifts', 'name' => 'Generate Recurring Shifts', 'command' => 'recurringShifts', 'schedule' => '0 6 * * *', 'category' => 'volunteering', 'description' => 'Auto-generates volunteer shifts 14 days ahead from recurring templates.'],
+            ['id' => 'volunteer-expire-consents', 'name' => 'Expire Guardian Consents', 'command' => 'volunteerExpireConsents', 'schedule' => '0 5 * * *', 'category' => 'volunteering', 'description' => 'Expires guardian consent records that have passed their expiry date.'],
 
             // ── Maintenance ──
             ['id' => 'cleanup', 'name' => 'System Cleanup', 'command' => 'cleanup', 'schedule' => '0 0 * * *', 'category' => 'maintenance', 'description' => 'Cleans expired tokens, old queue entries, API tokens, and tracking data.'],
