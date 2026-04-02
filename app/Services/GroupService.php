@@ -39,9 +39,14 @@ class GroupService
             ->with(['creator:id,first_name,last_name,avatar_url'])
             ->withCount('activeMembers');
 
-        // Only show top-level groups on the main listing (sub-groups appear on parent detail pages)
+        // Show featured groups (regardless of hierarchy) + top-level non-featured groups
         if (empty($filters['parent_id'])) {
-            $query->topLevel();
+            $query->where(function (Builder $q) {
+                $q->where('is_featured', true)
+                  ->orWhere(function (Builder $q2) {
+                      $q2->whereNull('parent_id')->orWhere('parent_id', 0);
+                  });
+            });
         }
 
         if (! empty($filters['visibility'])) {
