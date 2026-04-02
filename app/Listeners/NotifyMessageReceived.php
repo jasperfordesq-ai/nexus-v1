@@ -6,6 +6,7 @@
 
 namespace App\Listeners;
 
+use App\Core\EmailTemplateBuilder;
 use App\Core\TenantContext;
 use App\Events\MessageSent;
 use App\Models\Notification;
@@ -53,6 +54,9 @@ class NotifyMessageReceived implements ShouldQueue
             $link = '/messages/' . $senderId;
             $content = "{$senderName} sent you a message";
 
+            // Build a rich HTML email body using EmailTemplateBuilder
+            $htmlContent = $this->buildMessageEmailHtml($event, $senderName, $link);
+
             // Check email_messages preference — default to sending (opt-out model)
             $emailEnabled = true;
             try {
@@ -66,7 +70,7 @@ class NotifyMessageReceived implements ShouldQueue
             }
 
             if ($emailEnabled) {
-                // Bell + email (via dispatcher)
+                // Bell + email (via dispatcher) — pass the rich HTML body
                 NotificationDispatcher::dispatch(
                     $recipientId,
                     'global',
@@ -74,7 +78,7 @@ class NotifyMessageReceived implements ShouldQueue
                     'new_message',
                     $content,
                     $link,
-                    null
+                    $htmlContent
                 );
             } else {
                 // Bell only — user opted out of message emails
@@ -90,5 +94,49 @@ class NotifyMessageReceived implements ShouldQueue
                 'trace' => $e->getTraceAsString(),
             ]);
         }
+    }
+
+    /**
+     * Build a beautiful HTML email for new message notifications.
+     */
+    private function buildMessageEmailHtml(MessageSent $event, string $senderName, string $link): string
+    {
+        $messageUrl = EmailTemplateBuilder::tenantUrl($link);
+
+        // Get a safe preview of the message body (strip HTML, truncate)
+        $rawBody = $event->message->body ?? '';
+        $preview = strip_tags($rawBody);
+        $preview = mb_strlen($preview) > 200 ? mb_substr($preview, 0, 200) . '…' : $preview;
+
+        // Get recipient name for greeting
+        $recipientName = 'there';
+        try {
+            $recipient = User::withoutGlobalScopes()->find((int) $event->message->receiver_id);
+            if ($recipient) {
+                $recipientName = $recipient->first_name ?? $recipient->name ?? 'there';
+            }
+        } catch (\Throwable $e) {
+            // Fallback to generic greeting
+        }
+
+        $builder = EmailTemplateBuilder::make()
+            ->theme('brand')
+            ->title('New Message')
+            ->previewText("{$senderName} sent you a message")
+            ->greeting($recipientName)
+            ->paragraph("You have a new message from <strong>" . htmlspecialchars($senderName, ENT_QUOTES, 'UTF-8') . "</strong>.");
+
+        // Include message preview if available (not voice messages)
+        if (!empty($preview) && !$event->message->is_voice) {
+            $builder->blockquote($preview, $senderName);
+        } elseif ($event->message->is_voice) {
+            $builder->highlight('This is a voice message — listen to it on the platform.', '🎙️');
+        }
+
+        $builder->button('View Conversation', $messageUrl)
+            ->divider()
+            ->paragraph('<span style="font-size: 13px; color: #6b7280;">You can reply directly from the platform. To stop receiving message emails, update your <a href="' . EmailTemplateBuilder::tenantUrl('/notifications') . '">notification preferences</a>.</span>');
+
+        return $builder->render();
     }
 }

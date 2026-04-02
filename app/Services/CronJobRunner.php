@@ -372,103 +372,113 @@ class CronJobRunner
             if ($claimed === 0) {
                 echo "No pending instant notifications.\n";
             } else {
-                // Fetch the items we just claimed
+                // Fetch ONLY items we just claimed (status=processing) — use a batch marker
+                // to avoid picking up stale items from crashed previous runs
                 $sql = "SELECT q.*, u.email, u.name, u.tenant_id as user_tenant_id
                         FROM notification_queue q
                         JOIN users u ON q.user_id = u.id
                         WHERE q.frequency = 'instant' AND q.status = 'processing'
-                        ORDER BY q.created_at ASC";
+                        ORDER BY q.created_at ASC
+                        LIMIT 50";
 
                 $items = array_map(fn($r) => (array) $r, DB::select($sql));
 
                 foreach ($items as $item) {
-                    // Set tenant context so URLs and SMTP credentials are correct
-                    if (!empty($item['user_tenant_id'])) {
-                        TenantContext::setById($item['user_tenant_id']);
-                    }
+                    // Per-item exception handling: one bad item must never affect others
+                    try {
+                        // Set tenant context so URLs and SMTP credentials are correct
+                        if (!empty($item['user_tenant_id'])) {
+                            TenantContext::setById($item['user_tenant_id']);
+                        }
 
-                    echo "Sending Instant ID {$item['id']} to {$item['email']}... ";
+                        echo "Sending Instant ID {$item['id']} to {$item['email']}... ";
 
-                    // Reconstruct subject
-                    $subject = "Notification from Nexus";
-                    if ($item['activity_type'] === 'new_topic') {
-                        $subject = "New Discussion: " . substr(strip_tags($item['content_snippet']), 0, 50) . "...";
-                    } elseif ($item['activity_type'] === 'new_reply') {
-                        $subject = "New Reply to Discussion";
-                    } elseif ($item['activity_type'] === 'new_message') {
-                        $subject = "💬 New Message";
-                    } elseif ($item['activity_type'] === 'hot_match') {
-                        $subject = "🔥 Hot Match Found!";
-                    } elseif ($item['activity_type'] === 'mutual_match') {
-                        $subject = "🤝 Mutual Match Opportunity";
-                    } elseif ($item['activity_type'] === 'match_digest') {
-                        $subject = "📊 Your Match Digest";
-                    } elseif ($item['activity_type'] === 'match_approval_request') {
-                        $subject = "📋 Match Needs Approval";
-                    } elseif ($item['activity_type'] === 'match_approved') {
-                        $subject = "✅ You've Been Matched!";
-                    } elseif ($item['activity_type'] === 'match_rejected') {
-                        $subject = "Match Update";
-                    // Exchange workflow notifications
-                    } elseif ($item['activity_type'] === 'exchange_request_received') {
-                        $subject = "📥 New Exchange Request";
-                    } elseif ($item['activity_type'] === 'exchange_request_declined') {
-                        $subject = "Exchange Request Declined";
-                    } elseif ($item['activity_type'] === 'exchange_approved') {
-                        $subject = "✅ Exchange Approved - Ready to Begin!";
-                    } elseif ($item['activity_type'] === 'exchange_rejected') {
-                        $subject = "Exchange Not Approved";
-                    } elseif ($item['activity_type'] === 'exchange_completed') {
-                        $subject = "🎉 Exchange Completed!";
-                    } elseif ($item['activity_type'] === 'exchange_cancelled') {
-                        $subject = "Exchange Cancelled";
-                    } elseif ($item['activity_type'] === 'exchange_disputed') {
-                        $subject = "⚠️ Exchange Dispute - Broker Review Needed";
-                    }
+                        // Reconstruct subject
+                        $subject = self::resolveEmailSubject($item['activity_type'], $item['content_snippet'] ?? '');
 
-                    $body = $item['email_body'] ?? nl2br($item['content_snippet']);
+                        $body = $item['email_body'] ?? nl2br($item['content_snippet']);
 
-                    // Replace placeholder URLs in email body
-                    $baseUrl = TenantContext::getFrontendUrl();
-                    $basePath = TenantContext::getSlugPrefix();
+                        // Replace placeholder URLs in email body
+                        $baseUrl = TenantContext::getFrontendUrl();
+                        $basePath = TenantContext::getSlugPrefix();
 
-                    // Replace {{MATCHES_URL}} placeholder
-                    $body = str_replace('{{MATCHES_URL}}', $baseUrl . $basePath . '/matches', $body);
+                        // Replace {{MATCHES_URL}} placeholder
+                        $body = str_replace('{{MATCHES_URL}}', $baseUrl . $basePath . '/matches', $body);
 
-                    // Replace {{LISTING_URL}} placeholder (for hot/mutual match emails)
-                    if (!empty($item['link']) && strpos($item['link'], '/listings/') !== false) {
-                        $body = str_replace('{{LISTING_URL}}', $baseUrl . $basePath . $item['link'], $body);
-                    }
+                        // Replace {{LISTING_URL}} placeholder (for hot/mutual match emails)
+                        if (!empty($item['link']) && strpos($item['link'], '/listings/') !== false) {
+                            $body = str_replace('{{LISTING_URL}}', $baseUrl . $basePath . $item['link'], $body);
+                        }
 
-                    // Replace {{EXCHANGE_URL}} placeholder (for exchange notifications)
-                    if (!empty($item['link']) && strpos($item['link'], '/exchanges/') !== false) {
-                        $body = str_replace('{{EXCHANGE_URL}}', $baseUrl . $basePath . $item['link'], $body);
-                    }
+                        // Replace {{EXCHANGE_URL}} placeholder (for exchange notifications)
+                        if (!empty($item['link']) && strpos($item['link'], '/exchanges/') !== false) {
+                            $body = str_replace('{{EXCHANGE_URL}}', $baseUrl . $basePath . $item['link'], $body);
+                        }
 
-                    // Create mailer with tenant context for correct SMTP credentials
-                    $mailer = Mailer::forCurrentTenant();
+                        // Create mailer with tenant context for correct SMTP credentials
+                        $mailer = Mailer::forCurrentTenant();
 
-                    if ($mailer->send($item['email'], $subject, $body)) {
-                        DB::update("UPDATE notification_queue SET status = 'sent', sent_at = NOW() WHERE id = ?", [$item['id']]);
-                        echo "OK.\n";
-                    } else {
-                        DB::update("UPDATE notification_queue SET status = 'failed' WHERE id = ?", [$item['id']]);
-                        echo "FAILED.\n";
+                        if ($mailer->send($item['email'], $subject, $body)) {
+                            DB::update("UPDATE notification_queue SET status = 'sent', sent_at = NOW() WHERE id = ?", [$item['id']]);
+                            echo "OK.\n";
+                        } else {
+                            DB::update("UPDATE notification_queue SET status = 'failed' WHERE id = ?", [$item['id']]);
+                            echo "FAILED.\n";
+                        }
+                    } catch (\Throwable $itemError) {
+                        // Mark this individual item as failed — do NOT revert to pending
+                        echo "ERROR: {$itemError->getMessage()}\n";
+                        try {
+                            DB::update("UPDATE notification_queue SET status = 'failed' WHERE id = ?", [$item['id']]);
+                        } catch (\Throwable $dbError) {
+                            echo "Could not mark item {$item['id']} as failed: {$dbError->getMessage()}\n";
+                        }
                     }
                 }
             }
+
+            // Clean up any stale 'processing' items older than 10 minutes (from crashed runs)
+            DB::update("UPDATE notification_queue SET status = 'failed' WHERE status = 'processing' AND created_at < DATE_SUB(NOW(), INTERVAL 10 MINUTE)");
+
             echo "Done.\n";
         } catch (\Throwable $e) {
             echo "\nError: " . $e->getMessage() . "\n";
             $status = 'error';
 
-            // On exception, revert any 'processing' items back to 'pending' for retry
-            DB::update("UPDATE notification_queue SET status = 'pending' WHERE frequency = 'instant' AND status = 'processing'");
+            // Mark any remaining processing items as failed — NEVER revert to pending
+            // (reverting to pending causes duplicate sends when items were already emailed)
+            DB::update("UPDATE notification_queue SET status = 'failed' WHERE frequency = 'instant' AND status = 'processing'");
         }
 
         $output = ob_get_clean();
         echo $output;
         $this->logJob($status, $output);
+    }
+
+    /**
+     * Map activity_type to a human-readable email subject line.
+     */
+    private static function resolveEmailSubject(string $activityType, string $contentSnippet = ''): string
+    {
+        return match ($activityType) {
+            'new_topic' => "New Discussion: " . substr(strip_tags($contentSnippet), 0, 50) . "...",
+            'new_reply' => "New Reply to Discussion",
+            'new_message' => "\xF0\x9F\x92\xAC New Message",
+            'hot_match' => "\xF0\x9F\x94\xA5 Hot Match Found!",
+            'mutual_match' => "\xF0\x9F\xA4\x9D Mutual Match Opportunity",
+            'match_digest' => "\xF0\x9F\x93\x8A Your Match Digest",
+            'match_approval_request' => "\xF0\x9F\x93\x8B Match Needs Approval",
+            'match_approved' => "\xE2\x9C\x85 You've Been Matched!",
+            'match_rejected' => "Match Update",
+            'exchange_request_received' => "\xF0\x9F\x93\xA5 New Exchange Request",
+            'exchange_request_declined' => "Exchange Request Declined",
+            'exchange_approved' => "\xE2\x9C\x85 Exchange Approved - Ready to Begin!",
+            'exchange_rejected' => "Exchange Not Approved",
+            'exchange_completed' => "\xF0\x9F\x8E\x89 Exchange Completed!",
+            'exchange_cancelled' => "Exchange Cancelled",
+            'exchange_disputed' => "\xE2\x9A\xA0\xEF\xB8\x8F Exchange Dispute - Broker Review Needed",
+            default => "Notification from Nexus",
+        };
     }
 
     private function generateEmailHtml($user, $items, $frequency)
@@ -1086,49 +1096,63 @@ class CronJobRunner
             return;
         }
 
-        // Fetch the items we just claimed, including tenant_id for context
+        // Fetch ONLY items we just claimed (limit matches claim batch)
         $sql = "SELECT q.*, u.email, u.name, u.tenant_id as user_tenant_id
                 FROM notification_queue q
                 JOIN users u ON q.user_id = u.id
                 WHERE q.frequency = 'instant' AND q.status = 'processing'
-                ORDER BY q.created_at ASC";
+                ORDER BY q.created_at ASC
+                LIMIT 50";
 
         $items = array_map(fn($r) => (array) $r, DB::select($sql));
 
         $sent = 0;
         foreach ($items as $item) {
-            // Set tenant context so SMTP credentials are correct
-            if (!empty($item['user_tenant_id'])) {
-                TenantContext::setById($item['user_tenant_id']);
-            }
+            // Per-item exception handling: one bad item must never affect others
+            try {
+                // Set tenant context so SMTP credentials are correct
+                if (!empty($item['user_tenant_id'])) {
+                    TenantContext::setById($item['user_tenant_id']);
+                }
 
-            $subject = "Notification from Nexus";
-            if ($item['activity_type'] === 'new_topic') {
-                $subject = "New Discussion: " . substr(strip_tags($item['content_snippet']), 0, 50) . "...";
-            } elseif ($item['activity_type'] === 'new_reply') {
-                $subject = "New Reply to Discussion";
-            } elseif ($item['activity_type'] === 'new_message') {
-                $subject = "💬 New Message";
-            } elseif ($item['activity_type'] === 'hot_match') {
-                $subject = "🔥 Hot Match Found!";
-            } elseif ($item['activity_type'] === 'mutual_match') {
-                $subject = "🤝 Mutual Match Opportunity";
-            } elseif ($item['activity_type'] === 'match_digest') {
-                $subject = "📊 Your Match Digest";
-            }
+                $subject = self::resolveEmailSubject($item['activity_type'], $item['content_snippet'] ?? '');
 
-            $body = $item['email_body'] ?? nl2br($item['content_snippet']);
+                $body = $item['email_body'] ?? nl2br($item['content_snippet']);
 
-            // Create mailer with tenant context for correct SMTP credentials
-            $mailer = Mailer::forCurrentTenant();
+                // Replace placeholder URLs in email body
+                $baseUrl = TenantContext::getFrontendUrl();
+                $basePath = TenantContext::getSlugPrefix();
+                $body = str_replace('{{MATCHES_URL}}', $baseUrl . $basePath . '/matches', $body);
+                if (!empty($item['link']) && strpos($item['link'], '/listings/') !== false) {
+                    $body = str_replace('{{LISTING_URL}}', $baseUrl . $basePath . $item['link'], $body);
+                }
+                if (!empty($item['link']) && strpos($item['link'], '/exchanges/') !== false) {
+                    $body = str_replace('{{EXCHANGE_URL}}', $baseUrl . $basePath . $item['link'], $body);
+                }
 
-            if ($mailer->send($item['email'], $subject, $body)) {
-                DB::update("UPDATE notification_queue SET status = 'sent', sent_at = NOW() WHERE id = ?", [$item['id']]);
-                $sent++;
-            } else {
-                DB::update("UPDATE notification_queue SET status = 'failed' WHERE id = ?", [$item['id']]);
+                // Create mailer with tenant context for correct SMTP credentials
+                $mailer = Mailer::forCurrentTenant();
+
+                if ($mailer->send($item['email'], $subject, $body)) {
+                    DB::update("UPDATE notification_queue SET status = 'sent', sent_at = NOW() WHERE id = ?", [$item['id']]);
+                    $sent++;
+                } else {
+                    DB::update("UPDATE notification_queue SET status = 'failed' WHERE id = ?", [$item['id']]);
+                }
+            } catch (\Throwable $itemError) {
+                // Mark this individual item as failed — do NOT leave in 'processing' state
+                echo "   ERROR on item {$item['id']}: {$itemError->getMessage()}\n";
+                try {
+                    DB::update("UPDATE notification_queue SET status = 'failed' WHERE id = ?", [$item['id']]);
+                } catch (\Throwable $dbError) {
+                    // Last resort — log but don't crash the batch
+                }
             }
         }
+
+        // Clean up any stale 'processing' items older than 10 minutes (from crashed runs)
+        DB::update("UPDATE notification_queue SET status = 'failed' WHERE status = 'processing' AND created_at < DATE_SUB(NOW(), INTERVAL 10 MINUTE)");
+
         echo "   Sent $sent instant notifications.\n";
     }
 
