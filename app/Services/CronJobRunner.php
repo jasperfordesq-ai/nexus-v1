@@ -202,6 +202,32 @@ class CronJobRunner
      */
     private function runSubTask(string $jobId, callable $task): string
     {
+        // Circuit breaker: if this task has failed 3+ times consecutively,
+        // skip it for this run to avoid wasting resources on a broken task.
+        // Resets automatically once a run succeeds.
+        try {
+            $recentRuns = DB::select(
+                "SELECT status FROM cron_logs WHERE job_id = ? ORDER BY executed_at DESC LIMIT 3",
+                [$jobId]
+            );
+            if (count($recentRuns) >= 3) {
+                $allFailed = true;
+                foreach ($recentRuns as $run) {
+                    if ($run->status !== 'error') {
+                        $allFailed = false;
+                        break;
+                    }
+                }
+                if ($allFailed) {
+                    $msg = "CIRCUIT BREAKER: Skipped '{$jobId}' — failed 3+ times consecutively. Will auto-reset on next success.\n";
+                    echo $msg;
+                    return $msg;
+                }
+            }
+        } catch (\Throwable $e) {
+            // cron_logs table may not exist yet — skip circuit breaker check
+        }
+
         $start = microtime(true);
         $status = 'success';
         ob_start();
@@ -1224,6 +1250,23 @@ class CronJobRunner
      */
     private function processNewsletterQueueInternal()
     {
+        // Auto-retry: reset failed items that are older than 30 minutes back to pending
+        // for one more attempt (max 1 retry). This acts as a dead-letter recovery.
+        try {
+            $retried = DB::update(
+                "UPDATE newsletter_queue SET status = 'pending', error_message = CONCAT(IFNULL(error_message,''), ' [auto-retry]')
+                 WHERE status = 'failed'
+                 AND updated_at < DATE_SUB(NOW(), INTERVAL 30 MINUTE)
+                 AND (error_message IS NULL OR error_message NOT LIKE '%[auto-retry]%')
+                 LIMIT 50"
+            );
+            if ($retried > 0) {
+                echo "   Auto-retried {$retried} previously failed queue items.\n";
+            }
+        } catch (\Throwable $e) {
+            // Non-critical — continue with normal processing
+        }
+
         $sql = "SELECT DISTINCT newsletter_id FROM newsletter_queue WHERE status = 'pending' LIMIT 5";
         $pending = array_map(fn($r) => (array) $r, DB::select($sql));
 

@@ -5,12 +5,11 @@
 
 /**
  * Cron Job Setup
- * Platform setup guide for configuring cron job execution
- * Parity: PHP CronJobController::setup()
+ * Platform setup guide for configuring the Laravel scheduler.
  *
- * SECURITY: The CRON_KEY is a server-side secret and must NEVER be exposed
- * in the client bundle. All examples use YOUR_CRON_KEY placeholder.
- * Admins must retrieve the actual key from the server .env file.
+ * All cron jobs run via `artisan schedule:run` which calls CronJobRunner::runAll().
+ * HTTP-based cron endpoints (/cron/*) were removed (2026-04-02) to prevent
+ * duplicate email sends. This page reflects the single-trigger model.
  */
 
 import { useState } from 'react';
@@ -22,6 +21,7 @@ import {
   Tabs,
   Tab,
   Code,
+  Chip,
 } from '@heroui/react';
 import {
   Server,
@@ -34,13 +34,9 @@ import {
 import { usePageTitle } from '@/hooks';
 import { useToast } from '@/contexts';
 import { PageHeader } from '../../components';
+import { adminSystem } from '../../api/adminApi';
 
 import { useTranslation } from 'react-i18next';
-// ─────────────────────────────────────────────────────────────────────────────
-// Constants — only the public API URL is safe to derive client-side
-// ─────────────────────────────────────────────────────────────────────────────
-
-const KEY_PLACEHOLDER = 'YOUR_CRON_KEY';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Component
@@ -52,9 +48,6 @@ export function CronJobSetup() {
   const toast = useToast();
   const [testing, setTesting] = useState(false);
 
-  const API_URL = import.meta.env.VITE_API_BASE?.replace('/api', '') || 'https://api.project-nexus.ie';
-  const CRON_URL = `${API_URL}/cron.php`;
-
   const copyToClipboard = (text: string, label: string) => {
     navigator.clipboard.writeText(text);
     toast.success(`${label} copied to clipboard`);
@@ -63,10 +56,14 @@ export function CronJobSetup() {
   const handleTestConnection = async () => {
     setTesting(true);
     try {
-      await new Promise((resolve) => setTimeout(resolve, 1500));
-      toast.success(t('system.test_connection_successful'));
+      const res = await adminSystem.getCronJobs();
+      if (res.success && Array.isArray(res.data)) {
+        toast.success(`Connection OK — ${res.data.length} cron jobs found`);
+      } else {
+        toast.error('API responded but returned unexpected data');
+      }
     } catch {
-      toast.error(t('system.test_connection_failed'));
+      toast.error('Failed to connect to the cron API — check your authentication');
     }
     setTesting(false);
   };
@@ -78,24 +75,19 @@ export function CronJobSetup() {
         description={t('system.cron_job_setup_desc')}
       />
 
-      {/* CRON_KEY Info */}
+      {/* Important Notice */}
       <Card shadow="sm" className="mb-6">
-        <CardHeader className="flex items-center gap-2">
-          <Server size={18} className="text-warning" />
-          <span className="text-lg font-semibold">Cron Authentication Key</span>
-        </CardHeader>
-        <CardBody className="space-y-3">
-          <div className="bg-primary/10 border border-primary/20 rounded-lg p-3 flex items-start gap-2">
-            <Info size={16} className="text-primary mt-0.5 shrink-0" />
+        <CardBody>
+          <div className="bg-warning/10 border border-warning/20 rounded-lg p-3 flex items-start gap-2">
+            <AlertTriangle size={16} className="text-warning mt-0.5 shrink-0" />
             <div className="text-sm text-default-700 dark:text-default-300">
               <p className="font-medium mb-1">
-                Your CRON_KEY is configured in the server&apos;s <Code className="text-xs">.env</Code> file.
+                All cron jobs run via the Laravel scheduler
               </p>
               <p className="text-xs text-default-500">
-                For security, the key is not exposed to the browser. Log in to your server
-                and check the <Code className="text-xs">CRON_KEY</Code> variable in your <Code className="text-xs">.env</Code> file.
-                Replace <Code className="text-xs">{KEY_PLACEHOLDER}</Code> in the commands below with
-                your actual key.
+                The only cron entry needed is <Code className="text-xs">artisan schedule:run</Code> every
+                minute. HTTP-based cron endpoints (<Code className="text-xs">/cron/*</Code>) were removed
+                to prevent duplicate email sends. Do not use curl-based cron triggers.
               </p>
             </div>
           </div>
@@ -106,9 +98,9 @@ export function CronJobSetup() {
       <Card shadow="sm" className="mb-6">
         <CardBody className="flex flex-row items-center justify-between gap-4">
           <div>
-            <p className="font-medium">Test Cron Connection</p>
+            <p className="font-medium">Test Cron API</p>
             <p className="text-sm text-default-500">
-              Verify that your setup can trigger cron jobs
+              Verify that the cron job system is responding and reporting jobs
             </p>
           </div>
           <Button
@@ -135,51 +127,158 @@ export function CronJobSetup() {
               panel: 'px-4 pb-4',
             }}
           >
-            {/* cPanel */}
-            <Tab key="cpanel" title="cPanel">
+            {/* Docker (Primary) */}
+            <Tab key="docker" title={<div className="flex items-center gap-1.5"><Server size={14} /> Docker <Chip size="sm" color="success" variant="flat">Recommended</Chip></div>}>
               <div className="space-y-4 pt-4">
                 <div>
                   <h3 className="text-base font-semibold mb-2">
-                    1. Access Cron Jobs
-                  </h3>
-                  <p className="text-sm text-default-600">
-                    Log in to cPanel and navigate to <strong>Advanced</strong> →{' '}
-                    <strong>Cron Jobs</strong>
-                  </p>
-                </div>
-
-                <div>
-                  <h3 className="text-base font-semibold mb-2">
-                    2. Add New Cron Job
+                    1. Add to Host Crontab
                   </h3>
                   <p className="text-sm text-default-600 mb-2">
-                    Click &quot;Add New Cron Job&quot; and configure:
+                    On the <strong>host machine</strong> (not inside the container), add this single entry:
                   </p>
-                  <ul className="text-sm text-default-600 space-y-1 ml-4">
-                    <li>• <strong>Common Settings:</strong> Every 5 minutes</li>
-                    <li>• <strong>Minute:</strong> */5</li>
-                    <li>• <strong>Hour:</strong> *</li>
-                    <li>• <strong>Day:</strong> *</li>
-                    <li>• <strong>Month:</strong> *</li>
-                    <li>• <strong>Weekday:</strong> *</li>
-                  </ul>
-                </div>
-
-                <div>
-                  <h3 className="text-base font-semibold mb-2">3. Command</h3>
-                  <div className="flex items-center gap-2 mb-2">
+                  <div className="flex items-center gap-2">
                     <Code className="flex-1 text-xs break-all">
-                      curl -H &quot;X-Cron-Key: {KEY_PLACEHOLDER}&quot; {CRON_URL}
+                      * * * * * docker exec nexus-php-app php /var/www/html/artisan schedule:run {'>'}{'>'}  /var/log/nexus-scheduler.log 2{'>'}&1
                     </Code>
                     <Button
                       size="sm"
                       variant="flat"
                       isIconOnly
-                      aria-label={t('system.label_copy_c_u_r_l_command')}
+                      aria-label="Copy crontab entry"
                       onPress={() =>
                         copyToClipboard(
-                          `curl -H "X-Cron-Key: ${KEY_PLACEHOLDER}" ${CRON_URL}`,
-                          'Command'
+                          '* * * * * docker exec nexus-php-app php /var/www/html/artisan schedule:run >> /var/log/nexus-scheduler.log 2>&1',
+                          'Crontab entry'
+                        )
+                      }
+                    >
+                      <Copy size={14} />
+                    </Button>
+                  </div>
+                </div>
+
+                <div>
+                  <h3 className="text-base font-semibold mb-2">2. Verify</h3>
+                  <Code className="block text-xs">sudo crontab -l</Code>
+                </div>
+
+                <div className="bg-success/10 border border-success/20 rounded-lg p-3 flex items-start gap-2">
+                  <CheckCircle size={16} className="text-success mt-0.5 shrink-0" />
+                  <p className="text-xs text-default-600">
+                    <strong>That&apos;s it!</strong> The Laravel scheduler calls <Code className="text-xs">CronJobRunner::runAll()</Code> every
+                    minute, which internally determines which of the 40+ tasks to run.
+                  </p>
+                </div>
+              </div>
+            </Tab>
+
+            {/* Linux */}
+            <Tab key="linux" title="Linux / VPS">
+              <div className="space-y-4 pt-4">
+                <div>
+                  <h3 className="text-base font-semibold mb-2">1. Edit Crontab</h3>
+                  <Code className="block text-xs">crontab -e</Code>
+                </div>
+
+                <div>
+                  <h3 className="text-base font-semibold mb-2">2. Add Laravel Scheduler Entry</h3>
+                  <div className="flex items-center gap-2">
+                    <Code className="flex-1 text-xs break-all">
+                      * * * * * cd /path/to/your/project && php artisan schedule:run {'>'}{'>'}  /dev/null 2{'>'}&1
+                    </Code>
+                    <Button
+                      size="sm"
+                      variant="flat"
+                      isIconOnly
+                      aria-label="Copy crontab entry"
+                      onPress={() =>
+                        copyToClipboard(
+                          '* * * * * cd /path/to/your/project && php artisan schedule:run >> /dev/null 2>&1',
+                          'Crontab entry'
+                        )
+                      }
+                    >
+                      <Copy size={14} />
+                    </Button>
+                  </div>
+                  <p className="text-xs text-default-500 mt-1">
+                    Replace <Code className="text-xs">/path/to/your/project</Code> with your actual project root.
+                  </p>
+                </div>
+
+                <div>
+                  <h3 className="text-base font-semibold mb-2">3. Verify</h3>
+                  <Code className="block text-xs">crontab -l</Code>
+                </div>
+              </div>
+            </Tab>
+
+            {/* cPanel */}
+            <Tab key="cpanel" title="cPanel">
+              <div className="space-y-4 pt-4">
+                <div>
+                  <h3 className="text-base font-semibold mb-2">1. Access Cron Jobs</h3>
+                  <p className="text-sm text-default-600">
+                    Log in to cPanel, navigate to <strong>Advanced</strong> &rarr; <strong>Cron Jobs</strong>
+                  </p>
+                </div>
+
+                <div>
+                  <h3 className="text-base font-semibold mb-2">2. Add Cron Job</h3>
+                  <p className="text-sm text-default-600 mb-2">
+                    Set to run every minute (<Code className="text-xs">* * * * *</Code>) with:
+                  </p>
+                  <div className="flex items-center gap-2">
+                    <Code className="flex-1 text-xs break-all">
+                      cd /home/username/public_html && php artisan schedule:run {'>'}{'>'}  /dev/null 2{'>'}&1
+                    </Code>
+                    <Button
+                      size="sm"
+                      variant="flat"
+                      isIconOnly
+                      aria-label="Copy cPanel command"
+                      onPress={() =>
+                        copyToClipboard(
+                          'cd /home/username/public_html && php artisan schedule:run >> /dev/null 2>&1',
+                          'cPanel command'
+                        )
+                      }
+                    >
+                      <Copy size={14} />
+                    </Button>
+                  </div>
+                  <p className="text-xs text-default-500 mt-1">
+                    Replace <Code className="text-xs">/home/username/public_html</Code> with your actual path.
+                    On shared hosting limited to every 5 or 15 minutes, adjust the schedule — the scheduler still handles timing internally.
+                  </p>
+                </div>
+              </div>
+            </Tab>
+
+            {/* Azure */}
+            <Tab key="azure" title="Azure VM">
+              <div className="space-y-4 pt-4">
+                <div>
+                  <h3 className="text-base font-semibold mb-2">1. SSH into the VM</h3>
+                  <Code className="block text-xs">ssh azureuser@your-vm-ip</Code>
+                </div>
+
+                <div>
+                  <h3 className="text-base font-semibold mb-2">2. Add to Root Crontab</h3>
+                  <div className="flex items-center gap-2">
+                    <Code className="flex-1 text-xs break-all">
+                      * * * * * docker exec nexus-php-app php /var/www/html/artisan schedule:run {'>'}{'>'}  /var/log/nexus-scheduler.log 2{'>'}&1
+                    </Code>
+                    <Button
+                      size="sm"
+                      variant="flat"
+                      isIconOnly
+                      aria-label="Copy Azure crontab entry"
+                      onPress={() =>
+                        copyToClipboard(
+                          '* * * * * docker exec nexus-php-app php /var/www/html/artisan schedule:run >> /var/log/nexus-scheduler.log 2>&1',
+                          'Azure crontab entry'
                         )
                       }
                     >
@@ -191,159 +290,36 @@ export function CronJobSetup() {
                 <div className="bg-warning/10 border border-warning/20 rounded-lg p-3 flex items-start gap-2">
                   <AlertTriangle size={16} className="text-warning mt-0.5 shrink-0" />
                   <p className="text-xs text-warning-700 dark:text-warning-300">
-                    Replace {KEY_PLACEHOLDER} with your actual CRON_KEY from the server .env file
+                    Do <strong>not</strong> use Azure WebJobs, Functions, or Cloud Scheduler to hit HTTP
+                    endpoints. Use <Code className="text-xs">artisan schedule:run</Code> only.
                   </p>
                 </div>
               </div>
             </Tab>
 
-            {/* AWS EventBridge */}
-            <Tab key="aws" title="AWS EventBridge">
+            {/* GCP */}
+            <Tab key="gcp" title="GCP">
               <div className="space-y-4 pt-4">
                 <div>
-                  <h3 className="text-base font-semibold mb-2">
-                    1. Create EventBridge Rule
-                  </h3>
-                  <p className="text-sm text-default-600">
-                    Go to AWS EventBridge console and create a new rule
-                  </p>
+                  <h3 className="text-base font-semibold mb-2">1. SSH into the GCE VM</h3>
+                  <Code className="block text-xs">gcloud compute ssh your-instance-name</Code>
                 </div>
 
                 <div>
-                  <h3 className="text-base font-semibold mb-2">
-                    2. Schedule Pattern
-                  </h3>
-                  <p className="text-sm text-default-600 mb-2">Choose &quot;Schedule&quot; and set:</p>
-                  <Code className="block text-xs">rate(5 minutes)</Code>
-                </div>
-
-                <div>
-                  <h3 className="text-base font-semibold mb-2">3. Target</h3>
-                  <ul className="text-sm text-default-600 space-y-1 ml-4">
-                    <li>• <strong>Target Type:</strong> AWS API Gateway</li>
-                    <li>• <strong>Method:</strong> GET</li>
-                    <li>• <strong>URL:</strong> {CRON_URL}</li>
-                    <li>• <strong>Header:</strong> X-Cron-Key: {KEY_PLACEHOLDER}</li>
-                  </ul>
-                </div>
-
-                <div>
-                  <h3 className="text-base font-semibold mb-2">
-                    4. Alternative: Lambda Function
-                  </h3>
-                  <p className="text-sm text-default-600 mb-2">
-                    Create a Lambda function with this code:
-                  </p>
-                  <pre className="bg-default-100 p-3 rounded-lg text-xs overflow-x-auto">
-{`const https = require('https');
-
-exports.handler = async (event) => {
-  const options = {
-    hostname: '${API_URL.replace('https://', '')}',
-    path: '/cron.php',
-    method: 'GET',
-    headers: {
-      'X-Cron-Key': '${KEY_PLACEHOLDER}'
-    }
-  };
-
-  return new Promise((resolve, reject) => {
-    const req = https.request(options, (res) => {
-      resolve({ statusCode: res.statusCode });
-    });
-    req.on('error', reject);
-    req.end();
-  });
-};`}
-                  </pre>
-                </div>
-              </div>
-            </Tab>
-
-            {/* Google Cloud Scheduler */}
-            <Tab key="gcp" title="Google Cloud">
-              <div className="space-y-4 pt-4">
-                <div>
-                  <h3 className="text-base font-semibold mb-2">
-                    1. Enable Cloud Scheduler API
-                  </h3>
-                  <p className="text-sm text-default-600">
-                    In Google Cloud Console, enable Cloud Scheduler API
-                  </p>
-                </div>
-
-                <div>
-                  <h3 className="text-base font-semibold mb-2">2. Create Job</h3>
-                  <ul className="text-sm text-default-600 space-y-1 ml-4">
-                    <li>• <strong>Name:</strong> nexus-cron</li>
-                    <li>• <strong>Frequency:</strong> */5 * * * *</li>
-                    <li>• <strong>Timezone:</strong> Your timezone</li>
-                    <li>• <strong>Target:</strong> HTTP</li>
-                  </ul>
-                </div>
-
-                <div>
-                  <h3 className="text-base font-semibold mb-2">3. HTTP Target</h3>
-                  <ul className="text-sm text-default-600 space-y-1 ml-4">
-                    <li>• <strong>URL:</strong> {CRON_URL}</li>
-                    <li>• <strong>HTTP Method:</strong> GET</li>
-                    <li>• <strong>Header Name:</strong> X-Cron-Key</li>
-                    <li>• <strong>Header Value:</strong> {KEY_PLACEHOLDER}</li>
-                  </ul>
-                </div>
-
-                <div>
-                  <h3 className="text-base font-semibold mb-2">
-                    4. gcloud CLI (Alternative)
-                  </h3>
+                  <h3 className="text-base font-semibold mb-2">2. Add to Root Crontab</h3>
                   <div className="flex items-center gap-2">
                     <Code className="flex-1 text-xs break-all">
-                      gcloud scheduler jobs create http nexus-cron --schedule=&quot;*/5 * *
-                      * *&quot; --uri=&quot;{CRON_URL}&quot; --http-method=GET
-                      --headers=&quot;X-Cron-Key={KEY_PLACEHOLDER}&quot;
+                      * * * * * docker exec nexus-php-app php /var/www/html/artisan schedule:run {'>'}{'>'}  /var/log/nexus-scheduler.log 2{'>'}&1
                     </Code>
                     <Button
                       size="sm"
                       variant="flat"
                       isIconOnly
-                      aria-label={t('system.label_copy_gcloud_command')}
+                      aria-label="Copy GCP crontab entry"
                       onPress={() =>
                         copyToClipboard(
-                          `gcloud scheduler jobs create http nexus-cron --schedule="*/5 * * * *" --uri="${CRON_URL}" --http-method=GET --headers="X-Cron-Key=${KEY_PLACEHOLDER}"`,
-                          'gcloud command'
-                        )
-                      }
-                    >
-                      <Copy size={14} />
-                    </Button>
-                  </div>
-                </div>
-              </div>
-            </Tab>
-
-            {/* Linux Crontab */}
-            <Tab key="linux" title="Linux Crontab">
-              <div className="space-y-4 pt-4">
-                <div>
-                  <h3 className="text-base font-semibold mb-2">1. Edit Crontab</h3>
-                  <Code className="block text-xs">crontab -e</Code>
-                </div>
-
-                <div>
-                  <h3 className="text-base font-semibold mb-2">2. Add Entry</h3>
-                  <div className="flex items-center gap-2">
-                    <Code className="flex-1 text-xs break-all">
-                      */5 * * * * curl -H &quot;X-Cron-Key: {KEY_PLACEHOLDER}&quot; {CRON_URL}
-                    </Code>
-                    <Button
-                      size="sm"
-                      variant="flat"
-                      isIconOnly
-                      aria-label={t('system.label_copy_crontab_entry')}
-                      onPress={() =>
-                        copyToClipboard(
-                          `*/5 * * * * curl -H "X-Cron-Key: ${KEY_PLACEHOLDER}" ${CRON_URL}`,
-                          'Crontab entry'
+                          '* * * * * docker exec nexus-php-app php /var/www/html/artisan schedule:run >> /var/log/nexus-scheduler.log 2>&1',
+                          'GCP crontab entry'
                         )
                       }
                     >
@@ -352,46 +328,12 @@ exports.handler = async (event) => {
                   </div>
                 </div>
 
-                <div>
-                  <h3 className="text-base font-semibold mb-2">3. Verify</h3>
-                  <Code className="block text-xs">crontab -l</Code>
-                </div>
-
-                <div>
-                  <h3 className="text-base font-semibold mb-2">
-                    4. Check Logs (Optional)
-                  </h3>
-                  <Code className="block text-xs">tail -f /var/log/syslog | grep CRON</Code>
-                </div>
-              </div>
-            </Tab>
-
-            {/* Docker */}
-            <Tab key="docker" title="Docker">
-              <div className="space-y-4 pt-4">
-                <div>
-                  <h3 className="text-base font-semibold mb-2">
-                    1. Add Service to docker-compose.yml
-                  </h3>
-                  <pre className="bg-default-100 p-3 rounded-lg text-xs overflow-x-auto">
-{`services:
-  cron:
-    image: alpine:latest
-    container_name: nexus-cron
-    command: >
-      sh -c "echo '*/5 * * * * wget --header='X-Cron-Key: ${KEY_PLACEHOLDER}' -q -O- ${CRON_URL}' > /etc/crontabs/root && crond -f"
-    restart: unless-stopped`}
-                  </pre>
-                </div>
-
-                <div>
-                  <h3 className="text-base font-semibold mb-2">2. Start Container</h3>
-                  <Code className="block text-xs">docker-compose up -d cron</Code>
-                </div>
-
-                <div>
-                  <h3 className="text-base font-semibold mb-2">3. Check Logs</h3>
-                  <Code className="block text-xs">docker logs -f nexus-cron</Code>
+                <div className="bg-warning/10 border border-warning/20 rounded-lg p-3 flex items-start gap-2">
+                  <AlertTriangle size={16} className="text-warning mt-0.5 shrink-0" />
+                  <p className="text-xs text-warning-700 dark:text-warning-300">
+                    Do <strong>not</strong> use GCP Cloud Scheduler to hit HTTP endpoints. Use the VM
+                    crontab with <Code className="text-xs">artisan schedule:run</Code> only.
+                  </p>
                 </div>
               </div>
             </Tab>
@@ -401,25 +343,32 @@ exports.handler = async (event) => {
 
       {/* Verification Checklist */}
       <Card shadow="sm" className="mt-6">
-        <CardHeader>
+        <CardHeader className="flex items-center gap-2">
+          <Info size={18} className="text-primary" />
           <h3 className="text-lg font-semibold">Verification Checklist</h3>
         </CardHeader>
         <CardBody className="space-y-2">
           <div className="flex items-center gap-2">
             <CheckCircle size={16} className="text-success" />
-            <span className="text-sm">CRON_KEY is set in your server .env file</span>
+            <span className="text-sm">
+              <Code className="text-xs">artisan schedule:run</Code> is in the host crontab (every minute)
+            </span>
           </div>
           <div className="flex items-center gap-2">
             <CheckCircle size={16} className="text-success" />
-            <span className="text-sm">First cron job has executed successfully</span>
+            <span className="text-sm">First scheduled run has executed (check logs page)</span>
           </div>
           <div className="flex items-center gap-2">
             <CheckCircle size={16} className="text-success" />
-            <span className="text-sm">Logs are populating in the database</span>
+            <span className="text-sm">Cron logs are populating in the dashboard</span>
           </div>
           <div className="flex items-center gap-2">
             <CheckCircle size={16} className="text-success" />
-            <span className="text-sm">Test connection button works</span>
+            <span className="text-sm">Test Connection button returns job count</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <CheckCircle size={16} className="text-success" />
+            <span className="text-sm">No curl-based or HTTP cron triggers are configured</span>
           </div>
         </CardBody>
       </Card>
