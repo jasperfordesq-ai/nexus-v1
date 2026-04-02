@@ -1085,17 +1085,19 @@ HTML;
      */
     public static function processScheduled(): int
     {
-        $tenantId = TenantContext::getId();
         $processed = 0;
 
         try {
+            // Query ALL tenants — this runs from cron where tenant context is unreliable.
             $newsletters = DB::table('newsletters')
-                ->where('tenant_id', $tenantId)
                 ->where('status', 'scheduled')
                 ->where('scheduled_at', '<=', now())
                 ->get();
 
             foreach ($newsletters as $newsletter) {
+                // Set correct tenant context for this newsletter's tenant
+                TenantContext::setById($newsletter->tenant_id);
+
                 // Atomically claim by flipping status from 'scheduled' → 'sending'.
                 // If another cron process already claimed this newsletter the UPDATE
                 // will match 0 rows and we skip it, preventing duplicate sends.
@@ -1139,17 +1141,19 @@ HTML;
      */
     public static function processRecurring(): int
     {
-        $tenantId = TenantContext::getId();
         $processed = 0;
 
         try {
+            // Query ALL tenants — this runs from cron where tenant context is unreliable.
             $newsletters = DB::table('newsletters')
-                ->where('tenant_id', $tenantId)
                 ->where('is_recurring', true)
                 ->where('status', 'active')
                 ->get();
 
             foreach ($newsletters as $newsletter) {
+                // Set correct tenant context for this newsletter's tenant
+                TenantContext::setById($newsletter->tenant_id);
+
                 // Check if enough time has passed since last send
                 $lastSent = $newsletter->last_sent_at ?? null;
                 $interval = $newsletter->recurring_interval ?? 'weekly';

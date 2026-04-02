@@ -60,7 +60,7 @@ class RouteServiceProvider extends ServiceProvider
 
             // Cron endpoint — no /api prefix (external callers hit /cron/run-all directly)
             // CronJobRunner authenticates via CRON_KEY query param or X-Cron-Key header.
-            Route::post('/cron/run-all', function () {
+            Route::match(['get', 'post'], '/cron/run-all', function () {
                 $runner = app(\App\Services\CronJobRunner::class);
                 $runner->runAll();
                 // runAll() outputs directly via echo — return empty to avoid double output

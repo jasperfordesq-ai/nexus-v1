@@ -191,7 +191,7 @@ class AdminNewsletterController extends BaseApiController
             $params = [];
 
             $allowedFields = [
-                'name', 'subject', 'preview_text', 'content', 'status',
+                'name', 'subject', 'preview_text', 'content',
                 'target_audience', 'scheduled_at', 'subject_b',
                 'target_counties', 'target_towns', 'target_groups',
                 'ab_winner_metric',
