@@ -29,8 +29,7 @@ $app = Application::configure(basePath: dirname(__DIR__))
         })
             ->everyMinute()
             ->name('nexus:run-all')
-            ->withoutOverlapping(10)
-            ->runInBackground();
+            ->withoutOverlapping(10);
 
         $schedule->call(function () {
             \App\Services\JobExpiryNotificationService::notifyExpiringSoon();
