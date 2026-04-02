@@ -799,9 +799,12 @@ class CronJobRunner
      *   07:00:        Abuse daily report
      *   08:00:        Daily digest, balance alerts, job expiry
      *   09:00:        Match digest daily
+     *   Every 6 hrs:  Verification reminders
+     *   04:30:        Expire abandoned verifications
      *   Fri 17:00:    Weekly digest
      *   Sun 02:00:    Abuse cleanup
      *   Sun 03:00:    Gamification cleanup
+     *   Sun 03:30:    Purge old verification sessions
      *   Mon 04:00:    Gamification weekly digest
      *   Mon 09:00:    Federation digest, group digests, match digest weekly
      */
@@ -1090,6 +1093,40 @@ class CronJobRunner
                 $taskNum++;
                 echo "\n[{$taskNum}] Match digest weekly...\n";
                 echo $this->runSubTask('match-digest-weekly', fn() => $this->matchDigestInternal('weekly'));
+            }
+
+            // ── IDENTITY VERIFICATION TASKS ──
+            // These were previously triggered via curl cron entries hitting HTTP endpoints
+            // that no longer exist. Migrated into runAll() on 2026-04-02.
+
+            // Every 6 hours: send verification reminders to users with incomplete verifications
+            if ($minute === 0 && $hour % 6 === 0) {
+                $taskNum++;
+                echo "\n[{$taskNum}] Verification reminders...\n";
+                echo $this->runSubTask('verification-reminders', function () {
+                    $sent = \App\Services\Identity\RegistrationOrchestrationService::sendVerificationReminders();
+                    echo "   Sent {$sent} verification reminders.\n";
+                });
+            }
+
+            // Daily at 4:30 AM: expire abandoned verification sessions (72h+)
+            if ($hour === 4 && $minute === 30) {
+                $taskNum++;
+                echo "\n[{$taskNum}] Expire abandoned verifications...\n";
+                echo $this->runSubTask('expire-verifications', function () {
+                    $expired = \App\Services\Identity\RegistrationOrchestrationService::expireAbandonedSessions();
+                    echo "   Expired {$expired} abandoned verification sessions.\n";
+                });
+            }
+
+            // Weekly (Sunday 3:30 AM): purge completed/expired sessions older than 180 days
+            if ($dayOfWeek === 0 && $hour === 3 && $minute === 30) {
+                $taskNum++;
+                echo "\n[{$taskNum}] Purge old verification sessions...\n";
+                echo $this->runSubTask('purge-verification-sessions', function () {
+                    $purged = \App\Services\Identity\RegistrationOrchestrationService::purgeOldSessions(180);
+                    echo "   Purged {$purged} old verification sessions.\n";
+                });
             }
 
             echo "\n=== Cron Run Complete ({$taskNum} tasks checked) ===\n";
@@ -2687,5 +2724,181 @@ class CronJobRunner
         } catch (\Throwable $e) {
             echo "   Sitemap generation error: {$e->getMessage()}\n";
         }
+    }
+
+    // ─── Admin Panel Wrapper Methods ────────────────────────────────────
+    // Thin wrappers that let the admin panel manually trigger tasks that
+    // normally run inside runAll(). Added 2026-04-02 to complete the
+    // migration from old PHP scripts to CronJobRunner.
+
+    public function gamificationDaily(): void
+    {
+        $this->checkAccess();
+        $this->startJob('gamification-daily');
+        ob_start();
+        try { $this->gamificationDailyInternal(); $this->logJob('success', ob_get_clean()); }
+        catch (\Throwable $e) { $out = ob_get_clean(); $this->logJob('error', $out . "\n" . $e->getMessage()); }
+    }
+
+    public function gamificationCampaigns(): void
+    {
+        $this->checkAccess();
+        $this->startJob('gamification-campaigns');
+        ob_start();
+        try { $this->gamificationCampaignsInternal(); $this->logJob('success', ob_get_clean()); }
+        catch (\Throwable $e) { $out = ob_get_clean(); $this->logJob('error', $out . "\n" . $e->getMessage()); }
+    }
+
+    public function gamificationLeaderboard(): void
+    {
+        $this->checkAccess();
+        $this->startJob('gamification-leaderboard');
+        ob_start();
+        try { $this->gamificationLeaderboardSnapshotInternal(); $this->logJob('success', ob_get_clean()); }
+        catch (\Throwable $e) { $out = ob_get_clean(); $this->logJob('error', $out . "\n" . $e->getMessage()); }
+    }
+
+    public function gamificationChallenges(): void
+    {
+        $this->checkAccess();
+        $this->startJob('gamification-challenges');
+        ob_start();
+        try { $this->gamificationChallengeCheckInternal(); $this->logJob('success', ob_get_clean()); }
+        catch (\Throwable $e) { $out = ob_get_clean(); $this->logJob('error', $out . "\n" . $e->getMessage()); }
+    }
+
+    public function gamificationWeeklyDigest(): void
+    {
+        $this->checkAccess();
+        $this->startJob('gamification-weekly-digest');
+        ob_start();
+        try { $this->gamificationWeeklyDigestInternal(); $this->logJob('success', ob_get_clean()); }
+        catch (\Throwable $e) { $out = ob_get_clean(); $this->logJob('error', $out . "\n" . $e->getMessage()); }
+    }
+
+    public function gamificationStreaks(): void
+    {
+        $this->checkAccess();
+        $this->startJob('gamification-streaks');
+        ob_start();
+        try { $this->gamificationStreakMilestonesInternal(); $this->logJob('success', ob_get_clean()); }
+        catch (\Throwable $e) { $out = ob_get_clean(); $this->logJob('error', $out . "\n" . $e->getMessage()); }
+    }
+
+    public function gamificationCleanup(): void
+    {
+        $this->checkAccess();
+        $this->startJob('gamification-cleanup');
+        ob_start();
+        try { $this->gamificationCleanupInternal(); $this->logJob('success', ob_get_clean()); }
+        catch (\Throwable $e) { $out = ob_get_clean(); $this->logJob('error', $out . "\n" . $e->getMessage()); }
+    }
+
+    public function groupWeeklyDigest(): void
+    {
+        $this->checkAccess();
+        $this->startJob('group-weekly-digest');
+        ob_start();
+        try { $this->groupWeeklyDigestsInternal(); $this->logJob('success', ob_get_clean()); }
+        catch (\Throwable $e) { $out = ob_get_clean(); $this->logJob('error', $out . "\n" . $e->getMessage()); }
+    }
+
+    public function abuseDetection(): void
+    {
+        $this->checkAccess();
+        $this->startJob('abuse-detection');
+        ob_start();
+        try { $this->abuseDetectionInternal(); $this->logJob('success', ob_get_clean()); }
+        catch (\Throwable $e) { $out = ob_get_clean(); $this->logJob('error', $out . "\n" . $e->getMessage()); }
+    }
+
+    public function abuseDailyReport(): void
+    {
+        $this->checkAccess();
+        $this->startJob('abuse-daily-report');
+        ob_start();
+        try { $this->abuseDetectionDailyReportInternal(); $this->logJob('success', ob_get_clean()); }
+        catch (\Throwable $e) { $out = ob_get_clean(); $this->logJob('error', $out . "\n" . $e->getMessage()); }
+    }
+
+    public function abuseCleanup(): void
+    {
+        $this->checkAccess();
+        $this->startJob('abuse-cleanup');
+        ob_start();
+        try { $this->abuseDetectionCleanupInternal(); $this->logJob('success', ob_get_clean()); }
+        catch (\Throwable $e) { $out = ob_get_clean(); $this->logJob('error', $out . "\n" . $e->getMessage()); }
+    }
+
+    public function eventReminders(): void
+    {
+        $this->checkAccess();
+        $this->startJob('event-reminders');
+        ob_start();
+        try { $this->eventRemindersInternal(); $this->logJob('success', ob_get_clean()); }
+        catch (\Throwable $e) { $out = ob_get_clean(); $this->logJob('error', $out . "\n" . $e->getMessage()); }
+    }
+
+    public function inactiveMembers(): void
+    {
+        $this->checkAccess();
+        $this->startJob('inactive-members');
+        ob_start();
+        try { $this->inactiveMemberDetectionInternal(); $this->logJob('success', ob_get_clean()); }
+        catch (\Throwable $e) { $out = ob_get_clean(); $this->logJob('error', $out . "\n" . $e->getMessage()); }
+    }
+
+    public function listingExpiry(): void
+    {
+        $this->checkAccess();
+        $this->startJob('listing-expiry');
+        ob_start();
+        try { $this->listingExpiryInternal(); $this->logJob('success', ob_get_clean()); }
+        catch (\Throwable $e) { $out = ob_get_clean(); $this->logJob('error', $out . "\n" . $e->getMessage()); }
+    }
+
+    public function listingExpiryReminders(): void
+    {
+        $this->checkAccess();
+        $this->startJob('listing-expiry-reminders');
+        ob_start();
+        try { $this->listingExpiryRemindersInternal(); $this->logJob('success', ob_get_clean()); }
+        catch (\Throwable $e) { $out = ob_get_clean(); $this->logJob('error', $out . "\n" . $e->getMessage()); }
+    }
+
+    public function jobExpiry(): void
+    {
+        $this->checkAccess();
+        $this->startJob('job-expiry');
+        ob_start();
+        try { $this->jobExpiryInternal(); $this->logJob('success', ob_get_clean()); }
+        catch (\Throwable $e) { $out = ob_get_clean(); $this->logJob('error', $out . "\n" . $e->getMessage()); }
+    }
+
+    public function balanceAlerts(): void
+    {
+        $this->checkAccess();
+        $this->startJob('balance-alerts');
+        ob_start();
+        try { $this->balanceAlertsInternal(); $this->logJob('success', ob_get_clean()); }
+        catch (\Throwable $e) { $out = ob_get_clean(); $this->logJob('error', $out . "\n" . $e->getMessage()); }
+    }
+
+    public function goalReminders(): void
+    {
+        $this->checkAccess();
+        $this->startJob('goal-reminders');
+        ob_start();
+        try { $this->goalRemindersInternal(); $this->logJob('success', ob_get_clean()); }
+        catch (\Throwable $e) { $out = ob_get_clean(); $this->logJob('error', $out . "\n" . $e->getMessage()); }
+    }
+
+    public function recurringShifts(): void
+    {
+        $this->checkAccess();
+        $this->startJob('recurring-shifts');
+        ob_start();
+        try { $this->recurringShiftGenerationInternal(); $this->logJob('success', ob_get_clean()); }
+        catch (\Throwable $e) { $out = ob_get_clean(); $this->logJob('error', $out . "\n" . $e->getMessage()); }
     }
 }

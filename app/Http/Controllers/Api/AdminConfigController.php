@@ -489,19 +489,61 @@ class AdminConfigController extends BaseApiController
                 }
 
                 $cronKey = \App\Core\Env::get('CRON_KEY');
+
+                // Maps admin panel job IDs → CronJobRunner public method names.
+                // Every job in getCronJobDefinitions() must have an entry here
+                // or in $adminMethodMap below.
                 $methodMap = [
+                    // Master
+                    'run-all' => 'runAll',
+                    // Notifications
+                    'process-queue' => 'runInstantQueue',
                     'daily-digest' => 'dailyDigest',
                     'weekly-digest' => 'weeklyDigest',
-                    'process-queue' => 'runInstantQueue',
+                    // Newsletters
                     'process-newsletters' => 'processNewsletters',
                     'process-recurring' => 'processRecurring',
                     'process-newsletter-queue' => 'processNewsletterQueue',
+                    // Matching
+                    'notify-hot-matches' => 'notifyHotMatches',
                     'match-digest-daily' => 'matchDigestDaily',
                     'match-digest-weekly' => 'matchDigestWeekly',
-                    'notify-hot-matches' => 'notifyHotMatches',
-                    'geocode-batch' => 'geocodeBatch',
+                    // Gamification
+                    'gamification-daily' => 'gamificationDaily',
+                    'gamification-campaigns' => 'gamificationCampaigns',
+                    'gamification-leaderboard' => 'gamificationLeaderboard',
+                    'gamification-challenges' => 'gamificationChallenges',
+                    'gamification-weekly-digest' => 'gamificationWeeklyDigest',
+                    'gamification-streaks' => 'gamificationStreaks',
+                    'gamification-cleanup' => 'gamificationCleanup',
+                    // Groups
+                    'group-weekly-digest' => 'groupWeeklyDigest',
+                    // Security
+                    'abuse-detection' => 'abuseDetection',
+                    'abuse-daily-report' => 'abuseDailyReport',
+                    'abuse-cleanup' => 'abuseCleanup',
+                    // Verification
+                    'verification-reminders' => 'verificationReminders',
+                    'expire-verifications' => 'expireVerifications',
+                    'purge-verification-sessions' => 'purgeVerificationSessions',
+                    // Volunteering
+                    'volunteer-pre-shift' => 'volunteerPreShiftReminders',
+                    'volunteer-post-shift' => 'volunteerPostShiftFeedback',
+                    'volunteer-lapsed-nudge' => 'volunteerLapsedNudge',
+                    'volunteer-expiry-warnings' => 'volunteerExpiryWarnings',
+                    'recurring-shifts' => 'recurringShifts',
+                    // Maintenance
                     'cleanup' => 'cleanup',
-                    'run-all' => 'runAll',
+                    'geocode-batch' => 'geocodeBatch',
+                    'event-reminders' => 'eventReminders',
+                    'inactive-members' => 'inactiveMembers',
+                    'listing-expiry' => 'listingExpiry',
+                    'listing-expiry-reminders' => 'listingExpiryReminders',
+                    'job-expiry' => 'jobExpiry',
+                    'federation-weekly-digest' => 'federationWeeklyDigest',
+                    'balance-alerts' => 'balanceAlerts',
+                    'goal-reminders' => 'goalReminders',
+                    'retry-failed-webhooks' => 'retryFailedWebhooks',
                 ];
 
                 $adminMethodMap = [
@@ -509,8 +551,8 @@ class AdminConfigController extends BaseApiController
                 ];
 
                 if (isset($methodMap[$jobSlug])) {
-                    // CronJobRunner handles all 12+ cron jobs via direct service calls.
-                    // Scheduling is also handled by app/Console/Kernel.php (Laravel scheduler).
+                    // CronJobRunner handles all cron jobs via direct service calls.
+                    // Scheduling is handled by bootstrap/app.php (Laravel scheduler).
                     if (!class_exists('\App\Services\CronJobRunner')) {
                         $output = "CronJobRunner not available — job '{$jobSlug}' requires App\\Services\\CronJobRunner";
                         $status = 'error';
@@ -1459,29 +1501,77 @@ class AdminConfigController extends BaseApiController
         );
     }
 
+    /**
+     * Complete list of all cron jobs managed by CronJobRunner.
+     *
+     * All jobs run automatically via the Laravel scheduler (artisan schedule:run)
+     * which calls CronJobRunner::runAll() every minute. The command field is
+     * the CronJobRunner method name (no HTTP endpoints — those were removed
+     * 2026-04-02 to prevent duplicate email sends).
+     */
     private function getCronJobDefinitions(): array
     {
         return [
-            ['id' => 'daily-digest', 'name' => 'Daily Digest', 'command' => '/cron/daily-digest', 'schedule' => '0 8 * * *', 'category' => 'notifications', 'description' => 'Sends daily notification digest emails to users who opted for daily frequency.'],
-            ['id' => 'weekly-digest', 'name' => 'Weekly Digest', 'command' => '/cron/weekly-digest', 'schedule' => '0 17 * * 5', 'category' => 'notifications', 'description' => 'Sends weekly notification digest emails (typically on Fridays at 5 PM).'],
-            ['id' => 'process-queue', 'name' => 'Instant Notification Queue', 'command' => '/cron/process-queue', 'schedule' => '*/2 * * * *', 'category' => 'notifications', 'description' => 'Processes the instant notification queue, sending pending notifications immediately.'],
-            ['id' => 'process-newsletters', 'name' => 'Process Scheduled Newsletters', 'command' => '/cron/process-newsletters', 'schedule' => '*/5 * * * *', 'category' => 'newsletters', 'description' => 'Checks for newsletters scheduled to be sent and initiates their sending process.'],
-            ['id' => 'process-recurring', 'name' => 'Process Recurring Newsletters', 'command' => '/cron/process-recurring', 'schedule' => '*/15 * * * *', 'category' => 'newsletters', 'description' => 'Handles recurring/automated newsletters (e.g., weekly community updates).'],
-            ['id' => 'process-newsletter-queue', 'name' => 'Newsletter Queue Processor', 'command' => '/cron/process-newsletter-queue', 'schedule' => '*/3 * * * *', 'category' => 'newsletters', 'description' => 'Processes the newsletter sending queue for large sends.'],
-            ['id' => 'match-digest-daily', 'name' => 'Daily Match Digest', 'command' => '/cron/match-digest-daily', 'schedule' => '0 9 * * *', 'category' => 'matching', 'description' => 'Sends daily match recommendations to users.'],
-            ['id' => 'match-digest-weekly', 'name' => 'Weekly Match Digest', 'command' => '/cron/match-digest-weekly', 'schedule' => '0 9 * * 1', 'category' => 'matching', 'description' => 'Sends weekly match recommendations summary.'],
-            ['id' => 'notify-hot-matches', 'name' => 'Hot Match Notifications', 'command' => '/cron/notify-hot-matches', 'schedule' => '0 * * * *', 'category' => 'matching', 'description' => 'Notifies users of new high-scoring matches.'],
-            ['id' => 'geocode-batch', 'name' => 'Batch Geocoding', 'command' => '/cron/geocode-batch', 'schedule' => '*/30 * * * *', 'category' => 'geocoding', 'description' => 'Geocodes users and listings missing lat/lng coordinates.'],
-            ['id' => 'cleanup', 'name' => 'System Cleanup', 'command' => '/cron/cleanup', 'schedule' => '0 0 * * *', 'category' => 'maintenance', 'description' => 'Cleans expired tokens, old queue entries, and tracking data.'],
-            ['id' => 'run-all', 'name' => 'Master Cron Runner', 'command' => '/cron/run-all', 'schedule' => '* * * * *', 'category' => 'master', 'description' => 'Runs all appropriate cron tasks based on the current time.'],
-            ['id' => 'gamification-daily', 'name' => 'Gamification Daily Tasks', 'command' => 'scripts/cron/gamification_cron.php daily', 'schedule' => '0 3 * * *', 'category' => 'gamification', 'description' => 'Processes streak resets, daily bonuses, and badge checks.'],
-            ['id' => 'gamification-weekly-digest', 'name' => 'Gamification Weekly Digest', 'command' => 'scripts/cron/gamification_cron.php weekly_digest', 'schedule' => '0 4 * * 1', 'category' => 'gamification', 'description' => 'Sends weekly progress email digests to users.'],
-            ['id' => 'gamification-campaigns', 'name' => 'Process Achievement Campaigns', 'command' => 'scripts/cron/gamification_cron.php campaigns', 'schedule' => '0 * * * *', 'category' => 'gamification', 'description' => 'Processes recurring achievement campaigns.'],
-            ['id' => 'gamification-leaderboard', 'name' => 'Leaderboard Snapshot', 'command' => 'scripts/cron/gamification_cron.php leaderboard_snapshot', 'schedule' => '0 0 * * *', 'category' => 'gamification', 'description' => 'Creates daily leaderboard snapshots.'],
-            ['id' => 'gamification-challenges', 'name' => 'Check Challenge Expirations', 'command' => 'scripts/cron/gamification_cron.php check_challenges', 'schedule' => '30 * * * *', 'category' => 'gamification', 'description' => 'Expires completed challenges and updates statuses.'],
-            ['id' => 'update-featured-groups', 'name' => 'Update Featured Groups', 'command' => '/admin-legacy/cron/update-featured-groups', 'schedule' => '0 8 * * *', 'category' => 'groups', 'description' => 'Updates featured groups based on ranking algorithms.'],
-            ['id' => 'group-weekly-digest', 'name' => 'Group Weekly Digests', 'command' => 'scripts/cron/send_group_digests.php', 'schedule' => '0 9 * * 1', 'category' => 'groups', 'description' => 'Sends weekly analytics digest emails to group owners.'],
-            ['id' => 'abuse-detection', 'name' => 'Timebanking Abuse Detection', 'command' => 'scripts/cron/abuse_detection_cron.php', 'schedule' => '0 2 * * *', 'category' => 'security', 'description' => 'Scans transactions for potential abuse patterns.'],
+            // ── Master ──
+            ['id' => 'run-all', 'name' => 'Master Cron Runner', 'command' => 'runAll', 'schedule' => '* * * * *', 'category' => 'master', 'description' => 'Runs all appropriate cron tasks based on the current time. This is the only scheduled entry — all other jobs run inside it.'],
+
+            // ── Notifications ──
+            ['id' => 'process-queue', 'name' => 'Instant Notification Queue', 'command' => 'runInstantQueue', 'schedule' => '* * * * *', 'category' => 'notifications', 'description' => 'Processes the instant notification queue, sending pending notifications immediately.'],
+            ['id' => 'daily-digest', 'name' => 'Daily Digest', 'command' => 'dailyDigest', 'schedule' => '0 8 * * *', 'category' => 'notifications', 'description' => 'Sends daily notification digest emails to users who opted for daily frequency.'],
+            ['id' => 'weekly-digest', 'name' => 'Weekly Digest', 'command' => 'weeklyDigest', 'schedule' => '0 17 * * 5', 'category' => 'notifications', 'description' => 'Sends weekly notification digest emails (Fridays at 5 PM).'],
+
+            // ── Newsletters ──
+            ['id' => 'process-newsletters', 'name' => 'Process Scheduled Newsletters', 'command' => 'processNewsletters', 'schedule' => '*/5 * * * *', 'category' => 'newsletters', 'description' => 'Checks for newsletters scheduled to be sent and initiates their sending process.'],
+            ['id' => 'process-recurring', 'name' => 'Process Recurring Newsletters', 'command' => 'processRecurring', 'schedule' => '*/15 * * * *', 'category' => 'newsletters', 'description' => 'Handles recurring/automated newsletters (e.g., weekly community updates).'],
+            ['id' => 'process-newsletter-queue', 'name' => 'Newsletter Queue Processor', 'command' => 'processNewsletterQueue', 'schedule' => '* * * * *', 'category' => 'newsletters', 'description' => 'Processes the newsletter sending queue in batches for large sends.'],
+
+            // ── Matching ──
+            ['id' => 'notify-hot-matches', 'name' => 'Hot Match Notifications', 'command' => 'notifyHotMatches', 'schedule' => '0 * * * *', 'category' => 'matching', 'description' => 'Notifies users of new high-scoring matches.'],
+            ['id' => 'match-digest-daily', 'name' => 'Daily Match Digest', 'command' => 'matchDigestDaily', 'schedule' => '0 9 * * *', 'category' => 'matching', 'description' => 'Sends daily match recommendations to users.'],
+            ['id' => 'match-digest-weekly', 'name' => 'Weekly Match Digest', 'command' => 'matchDigestWeekly', 'schedule' => '0 9 * * 1', 'category' => 'matching', 'description' => 'Sends weekly match recommendations summary (Mondays 9 AM).'],
+
+            // ── Gamification ──
+            ['id' => 'gamification-daily', 'name' => 'Gamification Daily Tasks', 'command' => 'gamificationDaily', 'schedule' => '0 3 * * *', 'category' => 'gamification', 'description' => 'Processes streak resets, daily bonuses, and badge checks.'],
+            ['id' => 'gamification-campaigns', 'name' => 'Process Achievement Campaigns', 'command' => 'gamificationCampaigns', 'schedule' => '0 * * * *', 'category' => 'gamification', 'description' => 'Processes recurring achievement campaigns.'],
+            ['id' => 'gamification-leaderboard', 'name' => 'Leaderboard Snapshot', 'command' => 'gamificationLeaderboard', 'schedule' => '0 0 * * *', 'category' => 'gamification', 'description' => 'Creates daily leaderboard snapshots and finalizes seasons.'],
+            ['id' => 'gamification-challenges', 'name' => 'Check Challenge Expirations', 'command' => 'gamificationChallenges', 'schedule' => '30 * * * *', 'category' => 'gamification', 'description' => 'Expires completed challenges and updates statuses.'],
+            ['id' => 'gamification-weekly-digest', 'name' => 'Gamification Weekly Digest', 'command' => 'gamificationWeeklyDigest', 'schedule' => '0 4 * * 1', 'category' => 'gamification', 'description' => 'Sends weekly progress email digests to users.'],
+            ['id' => 'gamification-streaks', 'name' => 'Gamification Streak Milestones', 'command' => 'gamificationStreaks', 'schedule' => '0 1 * * *', 'category' => 'gamification', 'description' => 'Checks and awards streak milestones (7/14/30/60/90/180/365 days).'],
+            ['id' => 'gamification-cleanup', 'name' => 'Gamification Cleanup', 'command' => 'gamificationCleanup', 'schedule' => '0 3 * * 0', 'category' => 'gamification', 'description' => 'Cleans old XP notifications, campaign awards, and analytics data.'],
+
+            // ── Groups ──
+            ['id' => 'update-featured-groups', 'name' => 'Update Featured Groups', 'command' => 'updateFeaturedGroups', 'schedule' => '0 8 * * *', 'category' => 'groups', 'description' => 'Updates featured groups based on ranking algorithms.'],
+            ['id' => 'group-weekly-digest', 'name' => 'Group Weekly Digests', 'command' => 'groupWeeklyDigest', 'schedule' => '0 9 * * 1', 'category' => 'groups', 'description' => 'Sends weekly analytics digest emails to group owners.'],
+
+            // ── Security ──
+            ['id' => 'abuse-detection', 'name' => 'Abuse Detection', 'command' => 'abuseDetection', 'schedule' => '0 * * * *', 'category' => 'security', 'description' => 'Scans transactions for potential abuse patterns.'],
+            ['id' => 'abuse-daily-report', 'name' => 'Abuse Daily Report', 'command' => 'abuseDailyReport', 'schedule' => '0 7 * * *', 'category' => 'security', 'description' => 'Sends daily abuse detection report to admins.'],
+            ['id' => 'abuse-cleanup', 'name' => 'Abuse Alert Cleanup', 'command' => 'abuseCleanup', 'schedule' => '0 2 * * 0', 'category' => 'security', 'description' => 'Archives old alerts and auto-dismisses low-severity items.'],
+
+            // ── Identity Verification ──
+            ['id' => 'verification-reminders', 'name' => 'Verification Reminders', 'command' => 'verificationReminders', 'schedule' => '0 */6 * * *', 'category' => 'verification', 'description' => 'Sends reminders to users with incomplete identity verifications.'],
+            ['id' => 'expire-verifications', 'name' => 'Expire Abandoned Verifications', 'command' => 'expireVerifications', 'schedule' => '30 4 * * *', 'category' => 'verification', 'description' => 'Expires verification sessions abandoned for 72+ hours.'],
+            ['id' => 'purge-verification-sessions', 'name' => 'Purge Old Verification Data', 'command' => 'purgeVerificationSessions', 'schedule' => '30 3 * * 0', 'category' => 'verification', 'description' => 'Purges completed/expired verification sessions older than 180 days.'],
+
+            // ── Volunteering ──
+            ['id' => 'volunteer-pre-shift', 'name' => 'Volunteer Pre-Shift Reminders', 'command' => 'volunteerPreShiftReminders', 'schedule' => '*/30 * * * *', 'category' => 'volunteering', 'description' => 'Sends reminders 24h and 2h before volunteer shifts.'],
+            ['id' => 'volunteer-post-shift', 'name' => 'Volunteer Post-Shift Feedback', 'command' => 'volunteerPostShiftFeedback', 'schedule' => '*/30 * * * *', 'category' => 'volunteering', 'description' => 'Sends feedback request after completed shifts.'],
+            ['id' => 'volunteer-lapsed-nudge', 'name' => 'Lapsed Volunteer Nudge', 'command' => 'volunteerLapsedNudge', 'schedule' => '0 5 * * *', 'category' => 'volunteering', 'description' => 'Nudges volunteers who haven\'t been active recently.'],
+            ['id' => 'volunteer-expiry-warnings', 'name' => 'Volunteer Credential Expiry', 'command' => 'volunteerExpiryWarnings', 'schedule' => '0 5 * * *', 'category' => 'volunteering', 'description' => 'Warns volunteers about expiring credentials and training.'],
+            ['id' => 'recurring-shifts', 'name' => 'Generate Recurring Shifts', 'command' => 'recurringShifts', 'schedule' => '0 6 * * *', 'category' => 'volunteering', 'description' => 'Auto-generates volunteer shifts 14 days ahead from recurring templates.'],
+
+            // ── Maintenance ──
+            ['id' => 'cleanup', 'name' => 'System Cleanup', 'command' => 'cleanup', 'schedule' => '0 0 * * *', 'category' => 'maintenance', 'description' => 'Cleans expired tokens, old queue entries, API tokens, and tracking data.'],
+            ['id' => 'geocode-batch', 'name' => 'Batch Geocoding', 'command' => 'geocodeBatch', 'schedule' => '*/30 * * * *', 'category' => 'maintenance', 'description' => 'Geocodes users and listings missing lat/lng coordinates.'],
+            ['id' => 'event-reminders', 'name' => 'Event Reminders', 'command' => 'eventReminders', 'schedule' => '*/15 * * * *', 'category' => 'notifications', 'description' => 'Sends reminders 24h and 1h before events.'],
+            ['id' => 'inactive-members', 'name' => 'Inactive Member Detection', 'command' => 'inactiveMembers', 'schedule' => '0 2 * * *', 'category' => 'maintenance', 'description' => 'Detects and flags inactive members for follow-up.'],
+            ['id' => 'listing-expiry', 'name' => 'Listing Expiry Processing', 'command' => 'listingExpiry', 'schedule' => '0 8 * * *', 'category' => 'maintenance', 'description' => 'Expires listings that have passed their expiry date.'],
+            ['id' => 'listing-expiry-reminders', 'name' => 'Listing Expiry Reminders', 'command' => 'listingExpiryReminders', 'schedule' => '0 8 * * *', 'category' => 'notifications', 'description' => 'Warns listing owners 3 days before their listing expires.'],
+            ['id' => 'job-expiry', 'name' => 'Job Vacancy Expiry', 'command' => 'jobExpiry', 'schedule' => '0 8 * * *', 'category' => 'maintenance', 'description' => 'Expires job vacancies that have passed their closing date.'],
+            ['id' => 'federation-weekly-digest', 'name' => 'Federation Weekly Digest', 'command' => 'federationWeeklyDigest', 'schedule' => '0 9 * * 1', 'category' => 'notifications', 'description' => 'Sends federation activity digest to opted-in tenants.'],
+            ['id' => 'balance-alerts', 'name' => 'Balance Alerts', 'command' => 'balanceAlerts', 'schedule' => '0 8 * * *', 'category' => 'notifications', 'description' => 'Checks organization wallet balances and sends low/critical alerts.'],
+            ['id' => 'goal-reminders', 'name' => 'Goal Reminders', 'command' => 'goalReminders', 'schedule' => '0 8 * * *', 'category' => 'notifications', 'description' => 'Sends reminders for goals that are due or behind schedule.'],
+            ['id' => 'retry-failed-webhooks', 'name' => 'Retry Failed Webhooks', 'command' => 'retryFailedWebhooks', 'schedule' => '*/5 * * * *', 'category' => 'maintenance', 'description' => 'Retries webhook deliveries that previously failed.'],
         ];
     }
 
