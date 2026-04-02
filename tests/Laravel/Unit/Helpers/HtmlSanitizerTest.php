@@ -97,11 +97,10 @@ class HtmlSanitizerTest extends TestCase
         $this->assertStringContainsString('Hello World', $result);
     }
 
-    public function test_stripAll_encodes_special_chars(): void
+    public function test_stripAll_preserves_special_chars_as_plain_text(): void
     {
-        $result = HtmlSanitizer::stripAll('Test & "quotes"');
-        $this->assertStringContainsString('&amp;', $result);
-        $this->assertStringContainsString('&quot;', $result);
+        $result = HtmlSanitizer::stripAll('Test & "quotes" it\'s');
+        $this->assertEquals('Test & "quotes" it\'s', $result);
     }
 
     // -------------------------------------------------------

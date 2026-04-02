@@ -206,7 +206,7 @@ class HtmlSanitizer
      */
     public static function stripAll(string $html): string
     {
-        return htmlspecialchars(strip_tags($html), ENT_QUOTES, 'UTF-8');
+        return strip_tags($html);
     }
 
     // =========================================================================

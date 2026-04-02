@@ -208,12 +208,12 @@ class HtmlSanitizerServiceTest extends \Tests\Laravel\TestCase
         $this->assertStringNotContainsString('<', $result);
     }
 
-    public function testStripAllEscapesSpecialChars(): void
+    public function testStripAllPreservesSpecialCharsAsPlainText(): void
     {
-        $html = '<p>A & B</p>';
+        $html = '<p>A & B "it\'s"</p>';
         $result = $this->sanitizer->stripAll($html);
 
-        $this->assertStringContainsString('&amp;', $result);
+        $this->assertEquals('A & B "it\'s"', $result);
     }
 
     // =========================================================================
