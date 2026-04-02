@@ -134,49 +134,60 @@ class NewsletterService
      */
     public static function sendNow(int $newsletterId, string $targetAudience = 'all_members', ?int $segmentId = null): int
     {
-        $newsletter = Newsletter::find($newsletterId);
-
-        if (!$newsletter) {
-            throw new \Exception('Newsletter not found');
+        // Exclusive lock per newsletter — prevents concurrent sendNow() calls
+        // (e.g., admin double-click, cron overlap, or processScheduled race).
+        $lock = \Illuminate\Support\Facades\Cache::lock("newsletter:send:{$newsletterId}", 600);
+        if (!$lock->get()) {
+            throw new \Exception("Newsletter {$newsletterId} is already being sent by another process");
         }
 
-        if ($newsletter->status === 'sent') {
-            throw new \Exception('Newsletter already sent');
+        try {
+            $newsletter = Newsletter::find($newsletterId);
+
+            if (!$newsletter) {
+                throw new \Exception('Newsletter not found');
+            }
+
+            if ($newsletter->status === 'sent') {
+                throw new \Exception('Newsletter already sent');
+            }
+
+            // Use segment_id from newsletter if not passed
+            if (!$segmentId && !empty($newsletter->segment_id)) {
+                $segmentId = (int) $newsletter->segment_id;
+            }
+
+            // Resolve recipients
+            if ($segmentId) {
+                $recipients = self::getSegmentRecipients($segmentId);
+            } else {
+                $recipients = self::getRecipientsList($targetAudience);
+            }
+
+            if (empty($recipients)) {
+                throw new \Exception('No eligible recipients found');
+            }
+
+            // Clear old queue and queue new recipients
+            DB::table('newsletter_queue')->where('newsletter_id', $newsletterId)->delete();
+
+            $queued = self::queueRecipientsWithTokens($newsletterId, $recipients);
+
+            // Update newsletter status
+            $newsletter->update([
+                'status' => 'sending',
+                'total_recipients' => $queued,
+                'target_audience' => $targetAudience,
+                'segment_id' => $segmentId,
+            ]);
+
+            // Process queue
+            self::processQueue($newsletterId);
+
+            return $queued;
+        } finally {
+            $lock->release();
         }
-
-        // Use segment_id from newsletter if not passed
-        if (!$segmentId && !empty($newsletter->segment_id)) {
-            $segmentId = (int) $newsletter->segment_id;
-        }
-
-        // Resolve recipients
-        if ($segmentId) {
-            $recipients = self::getSegmentRecipients($segmentId);
-        } else {
-            $recipients = self::getRecipientsList($targetAudience);
-        }
-
-        if (empty($recipients)) {
-            throw new \Exception('No eligible recipients found');
-        }
-
-        // Clear old queue and queue new recipients
-        DB::table('newsletter_queue')->where('newsletter_id', $newsletterId)->delete();
-
-        $queued = self::queueRecipientsWithTokens($newsletterId, $recipients);
-
-        // Update newsletter status
-        $newsletter->update([
-            'status' => 'sending',
-            'total_recipients' => $queued,
-            'target_audience' => $targetAudience,
-            'segment_id' => $segmentId,
-        ]);
-
-        // Process queue
-        self::processQueue($newsletterId);
-
-        return $queued;
     }
 
     /**
@@ -201,17 +212,27 @@ class NewsletterService
         $sent = 0;
         $failed = 0;
 
-        // Process all pending items in batches
+        // Process all pending items in batches with ATOMIC CLAIMING.
+        // Step 1: UPDATE status to 'processing' (claim) — prevents other runners
+        //         from picking up the same items.
+        // Step 2: SELECT only 'processing' items (ours) — safe from races.
         do {
-            $pending = DB::table('newsletter_queue')
-                ->where('newsletter_id', $newsletterId)
-                ->where('status', 'pending')
-                ->limit($batchSize)
-                ->get();
+            $claimed = DB::update(
+                "UPDATE newsletter_queue SET status = 'processing'
+                 WHERE newsletter_id = ? AND status = 'pending'
+                 ORDER BY id ASC LIMIT ?",
+                [$newsletterId, $batchSize]
+            );
 
-            if ($pending->isEmpty()) {
+            if ($claimed === 0) {
                 break;
             }
+
+            $pending = DB::table('newsletter_queue')
+                ->where('newsletter_id', $newsletterId)
+                ->where('status', 'processing')
+                ->limit($batchSize)
+                ->get();
 
             foreach ($pending as $item) {
                 try {
@@ -1170,11 +1191,31 @@ HTML;
                 }
 
                 if ($shouldSend) {
+                    // Atomically claim by setting status to 'sending' — prevents
+                    // concurrent runners from processing the same recurring newsletter.
+                    $claimed = DB::table('newsletters')
+                        ->where('id', $newsletter->id)
+                        ->where('status', 'active')
+                        ->update(['status' => 'sending', 'updated_at' => now()]);
+
+                    if (!$claimed) {
+                        continue; // Another runner already claimed it
+                    }
+
                     try {
                         $service = app(self::class);
                         $service->sendNow((int) $newsletter->id);
+                        // Restore to 'active' for the next recurring cycle
+                        DB::table('newsletters')
+                            ->where('id', $newsletter->id)
+                            ->update(['status' => 'active', 'last_sent_at' => now(), 'updated_at' => now()]);
                         $processed++;
                     } catch (\Exception $e) {
+                        // Revert status so it can be retried next cycle
+                        DB::table('newsletters')
+                            ->where('id', $newsletter->id)
+                            ->where('status', 'sending')
+                            ->update(['status' => 'active', 'updated_at' => now()]);
                         Log::error("Failed to process recurring newsletter {$newsletter->id}: " . $e->getMessage());
                     }
                 }

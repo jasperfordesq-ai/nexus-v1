@@ -4,7 +4,6 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
@@ -19,18 +18,8 @@ $app = Application::configure(basePath: dirname(__DIR__))
     ->withCommands([
         __DIR__ . '/../app/Console/Commands',
     ])
-    ->withSchedule(function (Schedule $schedule) {
-        // CronJobRunner::runAll() has internal time-checking logic that determines
-        // which tasks to execute based on current minute/hour/day-of-week.
-        // We schedule it every minute and let its internal scheduling handle the rest.
-        $schedule->call(function () {
-            $runner = app(\App\Services\CronJobRunner::class);
-            $runner->runAll();
-        })
-            ->everyMinute()
-            ->name('nexus:run-all')
-            ->withoutOverlapping(10);
-    })
+    // Schedule defined in app/Console/Kernel.php — single source of truth.
+    // Do NOT register tasks here to avoid double-execution.
     ->withRouting(
         // Routes loaded by RouteServiceProvider (no /api prefix).
         // Only register the health-check here to avoid double-loading.

@@ -6,6 +6,7 @@
 
 namespace App\Services;
 
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use App\Core\Mailer;
 use App\Core\Env;
@@ -806,6 +807,30 @@ class CronJobRunner
     public function runAll()
     {
         $this->checkAccess();
+
+        // Acquire exclusive lock — prevents concurrent execution from HTTP + scheduler.
+        // If another runner holds the lock, bail immediately to avoid double-sends.
+        $lock = Cache::lock('cron:run-all', 600); // 10-minute TTL
+        if (!$lock->get()) {
+            if (php_sapi_name() !== 'cli') {
+                header('Content-Type: text/plain');
+            }
+            echo "Cron already running — skipped to prevent duplicate execution.\n";
+            return;
+        }
+
+        try {
+            $this->runAllInternal();
+        } finally {
+            $lock->release();
+        }
+    }
+
+    /**
+     * Internal implementation of runAll(), called under exclusive lock.
+     */
+    private function runAllInternal(): void
+    {
         $this->startJob('run-all');
 
         header('Content-Type: text/plain');
