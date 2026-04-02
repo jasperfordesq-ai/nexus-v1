@@ -4,6 +4,7 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
+use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
@@ -18,8 +19,53 @@ $app = Application::configure(basePath: dirname(__DIR__))
     ->withCommands([
         __DIR__ . '/../app/Console/Commands',
     ])
-    // Schedule defined in app/Console/Kernel.php — single source of truth.
-    // Do NOT register tasks here to avoid double-execution.
+    ->withSchedule(function (Schedule $schedule) {
+        // SINGLE source of truth for scheduling — do NOT also define in Kernel.php.
+        // CronJobRunner::runAll() has internal time-checking that determines which
+        // tasks to execute. We schedule it every minute and let it handle the rest.
+        $schedule->call(function () {
+            $runner = app(\App\Services\CronJobRunner::class);
+            $runner->runAll();
+        })
+            ->everyMinute()
+            ->name('nexus:run-all')
+            ->withoutOverlapping(10)
+            ->runInBackground();
+
+        $schedule->call(function () {
+            \App\Services\JobExpiryNotificationService::notifyExpiringSoon();
+        })
+            ->dailyAt('08:00')
+            ->name('job-expiry-notifications')
+            ->withoutOverlapping();
+
+        $schedule->command('safeguarding:clear-expired-monitoring')
+            ->daily()
+            ->withoutOverlapping()
+            ->name('safeguarding-clear-expired-monitoring');
+
+        $schedule->command('safeguarding:purge-message-copies')
+            ->weekly()
+            ->withoutOverlapping()
+            ->name('safeguarding-purge-message-copies');
+
+        $schedule->command('federation:purge-external-logs')
+            ->daily()
+            ->withoutOverlapping()
+            ->name('federation-purge-external-logs');
+
+        $schedule->command('sitemap:generate')
+            ->dailyAt('04:00')
+            ->withoutOverlapping()
+            ->name('sitemap-generate');
+
+        $schedule->call(function () {
+            app(\App\Services\FeedService::class)->publishScheduledPosts();
+        })
+            ->everyMinute()
+            ->withoutOverlapping(5)
+            ->name('feed:publish-scheduled-posts');
+    })
     ->withRouting(
         // Routes loaded by RouteServiceProvider (no /api prefix).
         // Only register the health-check here to avoid double-loading.

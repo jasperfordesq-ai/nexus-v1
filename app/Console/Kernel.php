@@ -27,50 +27,13 @@ class Kernel extends ConsoleKernel
      * Individual public methods on CronJobRunner remain callable via the admin
      * panel HTTP endpoints for manual triggering.
      */
+    /**
+     * Schedule is defined in bootstrap/app.php via withSchedule() — single source of truth.
+     * Do NOT add tasks here to avoid double registration.
+     */
     protected function schedule(Schedule $schedule): void
     {
-        $schedule->call(function () {
-            $runner = app(CronJobRunner::class);
-            $runner->runAll();
-        })
-            ->everyMinute()
-            ->withoutOverlapping(10)
-            ->name('nexus:run-all')
-            ->runInBackground();
-
-        $schedule->call(function () {
-            JobExpiryNotificationService::notifyExpiringSoon();
-        })
-            ->dailyAt('08:00')
-            ->name('job-expiry-notifications')
-            ->withoutOverlapping();
-
-        $schedule->command('safeguarding:clear-expired-monitoring')
-            ->daily()
-            ->withoutOverlapping()
-            ->name('safeguarding-clear-expired-monitoring');
-
-        $schedule->command('safeguarding:purge-message-copies')
-            ->weekly()
-            ->withoutOverlapping()
-            ->name('safeguarding-purge-message-copies');
-
-        $schedule->command('federation:purge-external-logs')
-            ->daily()
-            ->withoutOverlapping()
-            ->name('federation-purge-external-logs');
-
-        $schedule->command('sitemap:generate')
-            ->dailyAt('04:00')
-            ->withoutOverlapping()
-            ->name('sitemap-generate');
-
-        $schedule->call(function () {
-            app(FeedService::class)->publishScheduledPosts();
-        })
-            ->everyMinute()
-            ->withoutOverlapping(5)
-            ->name('feed:publish-scheduled-posts');
+        // Intentionally empty — see bootstrap/app.php
     }
 
     /**
