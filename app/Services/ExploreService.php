@@ -1111,8 +1111,8 @@ class ExploreService
                     bp.id, bp.title, bp.slug,
                     LEFT(bp.excerpt, 200) AS excerpt,
                     bp.featured_image AS image_url,
-                    bp.published_at, bp.reading_time_minutes,
-                    COALESCE(bp.view_count, 0) AS view_count,
+                    bp.published_at,
+                    COALESCE(bp.views, 0) AS view_count,
                     COALESCE(u.first_name, '') AS author_first_name,
                     COALESCE(u.last_name, '') AS author_last_name,
                     u.avatar_url AS author_avatar
@@ -1121,7 +1121,7 @@ class ExploreService
                 WHERE bp.tenant_id = ?
                     AND bp.status = 'published'
                     AND bp.published_at IS NOT NULL
-                ORDER BY bp.view_count DESC, bp.published_at DESC
+                ORDER BY bp.views DESC, bp.published_at DESC
                 LIMIT 4
             ", [$tenantId, $tenantId]);
 
@@ -1132,7 +1132,6 @@ class ExploreService
                 'excerpt' => $row->excerpt,
                 'image_url' => $row->image_url,
                 'published_at' => $row->published_at,
-                'reading_time' => (int) ($row->reading_time_minutes ?? 0),
                 'view_count' => (int) $row->view_count,
                 'author_name' => trim($row->author_first_name . ' ' . $row->author_last_name),
                 'author_avatar' => $row->author_avatar,
@@ -1159,12 +1158,11 @@ class ExploreService
                     vo.id, vo.title, vo.description, vo.location,
                     vo.skills_needed, vo.created_at,
                     COALESCE(org.name, '') AS org_name,
-                    org.logo_url AS org_logo,
                     (SELECT COUNT(*) FROM vol_applications va WHERE va.opportunity_id = vo.id) AS application_count
                 FROM vol_opportunities vo
                 LEFT JOIN volunteering_organizations org ON org.id = vo.organization_id AND org.tenant_id = ?
                 WHERE vo.tenant_id = ?
-                    AND vo.status = 'active'
+                    AND vo.is_active = 1
                 ORDER BY vo.created_at DESC
                 LIMIT 4
             ", [$tenantId, $tenantId]);
@@ -1176,7 +1174,6 @@ class ExploreService
                 'location' => $row->location,
                 'skills_needed' => $row->skills_needed,
                 'org_name' => $row->org_name,
-                'org_logo' => $row->org_logo,
                 'application_count' => (int) $row->application_count,
                 'created_at' => $row->created_at,
             ], $rows);
@@ -1199,12 +1196,12 @@ class ExploreService
 
             $rows = DB::select("
                 SELECT
-                    o.id, o.name, o.description, o.logo_url,
-                    o.website_url, o.created_at,
-                    (SELECT COUNT(*) FROM vol_opportunities vo WHERE vo.organization_id = o.id AND vo.tenant_id = ? AND vo.status = 'active') AS opportunity_count
+                    o.id, o.name, o.description,
+                    o.website, o.created_at,
+                    (SELECT COUNT(*) FROM vol_opportunities vo WHERE vo.organization_id = o.id AND vo.tenant_id = ? AND vo.is_active = 1) AS opportunity_count
                 FROM volunteering_organizations o
                 WHERE o.tenant_id = ?
-                    AND o.is_active = 1
+                    AND o.status = 'approved'
                 ORDER BY opportunity_count DESC, o.created_at DESC
                 LIMIT 4
             ", [$tenantId, $tenantId]);
@@ -1213,8 +1210,7 @@ class ExploreService
                 'id' => $row->id,
                 'name' => $row->name,
                 'description' => $row->description ? mb_substr($row->description, 0, 120) : null,
-                'logo_url' => $row->logo_url,
-                'website_url' => $row->website_url,
+                'website_url' => $row->website,
                 'opportunity_count' => (int) $row->opportunity_count,
             ], $rows);
         } catch (\Throwable $e) {
@@ -1236,16 +1232,16 @@ class ExploreService
 
             $rows = DB::select("
                 SELECT
-                    p.id, p.question, p.description, p.created_at, p.closes_at,
+                    p.id, p.question, p.description, p.created_at, p.expires_at,
                     COALESCE(u.first_name, '') AS author_first_name,
                     COALESCE(u.last_name, '') AS author_last_name,
                     (SELECT COUNT(*) FROM poll_options po WHERE po.poll_id = p.id) AS option_count,
-                    (SELECT COUNT(DISTINCT pr.user_id) FROM poll_responses pr WHERE pr.poll_id = p.id) AS vote_count
+                    (SELECT COUNT(DISTINCT pv.user_id) FROM poll_votes pv WHERE pv.poll_id = p.id) AS vote_count
                 FROM polls p
-                JOIN users u ON u.id = p.creator_id AND u.tenant_id = ? AND u.status = 'active'
+                JOIN users u ON u.id = p.user_id AND u.tenant_id = ? AND u.status = 'active'
                 WHERE p.tenant_id = ?
-                    AND p.status = 'active'
-                    AND (p.closes_at IS NULL OR p.closes_at > NOW())
+                    AND p.is_active = 1
+                    AND (p.expires_at IS NULL OR p.expires_at > NOW())
                 ORDER BY vote_count DESC, p.created_at DESC
                 LIMIT 4
             ", [$tenantId, $tenantId]);
@@ -1257,7 +1253,7 @@ class ExploreService
                 'author_name' => trim($row->author_first_name . ' ' . $row->author_last_name),
                 'option_count' => (int) $row->option_count,
                 'vote_count' => (int) $row->vote_count,
-                'closes_at' => $row->closes_at,
+                'closes_at' => $row->expires_at,
                 'created_at' => $row->created_at,
             ], $rows);
         } catch (\Throwable $e) {
@@ -1307,38 +1303,8 @@ class ExploreService
      */
     private function getFeaturedResources(int $tenantId): array
     {
-        try {
-            $tableExists = DB::select("SHOW TABLES LIKE 'resource_items'");
-            if (empty($tableExists)) {
-                return [];
-            }
-
-            $rows = DB::select("
-                SELECT
-                    ri.id, ri.title, ri.description, ri.resource_type, ri.url,
-                    COALESCE(ri.view_count, 0) AS view_count,
-                    COALESCE(rc.name, '') AS category_name
-                FROM resource_items ri
-                LEFT JOIN resource_categories rc ON rc.id = ri.category_id
-                WHERE ri.tenant_id = ?
-                    AND ri.status = 'published'
-                ORDER BY ri.is_featured DESC, ri.view_count DESC
-                LIMIT 4
-            ", [$tenantId]);
-
-            return array_map(fn($row) => [
-                'id' => $row->id,
-                'title' => $row->title,
-                'description' => $row->description ? mb_substr($row->description, 0, 120) : null,
-                'resource_type' => $row->resource_type,
-                'url' => $row->url,
-                'view_count' => (int) $row->view_count,
-                'category_name' => $row->category_name,
-            ], $rows);
-        } catch (\Throwable $e) {
-            Log::warning('ExploreService::getFeaturedResources failed', ['error' => $e->getMessage()]);
-            return [];
-        }
+        // resource_items table is a stub (only id + created_at) — not yet fully implemented
+        return [];
     }
 
     /**
@@ -1357,11 +1323,11 @@ class ExploreService
                     jv.id, jv.title, jv.description, jv.location,
                     jv.deadline, jv.created_at,
                     COALESCE(org.name, '') AS org_name,
-                    (SELECT COUNT(*) FROM job_applications ja WHERE ja.job_id = jv.id) AS application_count
+                    (SELECT COUNT(*) FROM job_applications ja WHERE ja.vacancy_id = jv.id) AS application_count
                 FROM job_vacancies jv
                 LEFT JOIN volunteering_organizations org ON org.id = jv.organization_id AND org.tenant_id = ?
                 WHERE jv.tenant_id = ?
-                    AND jv.status = 'active'
+                    AND jv.status = 'open'
                     AND (jv.deadline IS NULL OR jv.deadline > NOW())
                 ORDER BY jv.created_at DESC
                 LIMIT 4
