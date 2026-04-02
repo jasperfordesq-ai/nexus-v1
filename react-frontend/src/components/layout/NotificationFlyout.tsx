@@ -262,6 +262,7 @@ export function NotificationFlyout() {
           placement="bottom"
           hideCloseButton
           classNames={{
+            wrapper: 'z-[400]',
             base: 'bg-[var(--surface-dropdown)] rounded-t-2xl max-h-[85vh]',
             header: 'p-0',
             body: 'p-0',
