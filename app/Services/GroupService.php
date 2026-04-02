@@ -39,6 +39,11 @@ class GroupService
             ->with(['creator:id,first_name,last_name,avatar_url'])
             ->withCount('activeMembers');
 
+        // Only show top-level groups on the main listing (sub-groups appear on parent detail pages)
+        if (empty($filters['parent_id'])) {
+            $query->topLevel();
+        }
+
         if (! empty($filters['visibility'])) {
             $query->where('visibility', $filters['visibility']);
         }
