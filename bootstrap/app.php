@@ -62,8 +62,8 @@ $app = Application::configure(basePath: dirname(__DIR__))
             app(\App\Services\FeedService::class)->publishScheduledPosts();
         })
             ->everyMinute()
-            ->withoutOverlapping(5)
-            ->name('feed:publish-scheduled-posts');
+            ->name('feed:publish-scheduled-posts')
+            ->withoutOverlapping(5);
     })
     ->withRouting(
         // Routes loaded by RouteServiceProvider (no /api prefix).
