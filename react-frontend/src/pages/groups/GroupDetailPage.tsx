@@ -1277,7 +1277,7 @@ export function GroupDetailPage() {
         const activeSecondaryTab = secondaryTabs.find((tab) => tab.key === activeTab);
 
         return (
-          <div className="flex items-center gap-1 bg-theme-elevated p-1 rounded-lg overflow-hidden" role="tablist" aria-label={t('detail.tab_nav_aria', 'Group navigation')}>
+          <div className="flex items-center gap-1 bg-theme-elevated p-1 rounded-lg overflow-x-auto scrollbar-hide" role="tablist" aria-label={t('detail.tab_nav_aria', 'Group navigation')}>
             {/* Primary tabs */}
             {primaryTabs.map((tab) => {
               const Icon = tab.icon;
@@ -1288,14 +1288,14 @@ export function GroupDetailPage() {
                   role="tab"
                   aria-selected={isActive}
                   onClick={() => setActiveTab(tab.key)}
-                  className={`flex items-center gap-1.5 px-3 py-2 rounded-md text-sm font-medium transition-all whitespace-nowrap ${
+                  className={`flex items-center gap-1.5 px-2 sm:px-3 py-2 rounded-md text-sm font-medium transition-all whitespace-nowrap ${
                     isActive
                       ? 'bg-theme-hover text-theme-primary shadow-sm'
                       : 'text-theme-muted hover:text-theme-primary hover:bg-theme-hover/50'
                   }`}
                 >
                   <Icon className="w-4 h-4 flex-shrink-0" aria-hidden="true" />
-                  <span className="hidden sm:inline">{tab.label}</span>
+                  <span className="hidden md:inline">{tab.label}</span>
                 </button>
               );
             })}
@@ -1307,7 +1307,7 @@ export function GroupDetailPage() {
             <Dropdown>
               <DropdownTrigger>
                 <button
-                  className={`flex items-center gap-1.5 px-3 py-2 rounded-md text-sm font-medium transition-all whitespace-nowrap ${
+                  className={`flex items-center gap-1.5 px-2 sm:px-3 py-2 rounded-md text-sm font-medium transition-all whitespace-nowrap ${
                     isSecondaryActive
                       ? 'bg-theme-hover text-theme-primary shadow-sm'
                       : 'text-theme-muted hover:text-theme-primary hover:bg-theme-hover/50'
@@ -1318,12 +1318,12 @@ export function GroupDetailPage() {
                   {isSecondaryActive && activeSecondaryTab ? (
                     <>
                       {(() => { const Icon = activeSecondaryTab.icon; return <Icon className="w-4 h-4 flex-shrink-0" aria-hidden="true" />; })()}
-                      <span className="hidden sm:inline">{activeSecondaryTab.label}</span>
+                      <span className="hidden md:inline">{activeSecondaryTab.label}</span>
                     </>
                   ) : (
                     <>
-                      <span className="hidden sm:inline">{t('detail.tab_more_label', 'More')}</span>
-                      <span className="sm:hidden text-xs">...</span>
+                      <span className="hidden md:inline">{t('detail.tab_more_label', 'More')}</span>
+                      <span className="md:hidden text-xs">+</span>
                     </>
                   )}
                   <ChevronDown className="w-3 h-3 flex-shrink-0" aria-hidden="true" />

@@ -380,6 +380,15 @@
   margin-bottom: 0.125rem;
 }
 
+/* Hide scrollbar for horizontal-scroll tab bars */
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
 /* @mention highlighting in group discussions/posts */
 .mention-highlight {
   color: var(--heroui-primary);
