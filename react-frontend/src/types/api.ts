@@ -232,8 +232,14 @@ export interface Listing {
   longitude?: number | null;
   image_url?: string | null;
   gallery?: string[];
+  images?: Array<{ id: number; url: string; sort_order: number; alt_text?: string | null }>;
+  availability?: {
+    slots?: string[];
+    notes?: string;
+  } | null;
   status: ListingStatus | null;
   federated_visibility?: 'none' | 'listed' | 'bookable';
+  service_type?: 'physical_only' | 'remote_only' | 'hybrid' | 'location_dependent' | null;
   views_count?: number;
   view_count?: number;
   contact_count?: number;
@@ -250,8 +256,19 @@ export interface Listing {
   rejection_reason?: string | null;
   can_edit?: boolean;
   can_delete?: boolean;
+  is_reported?: boolean;  // Whether current user has already reported this listing
   created_at: string;
   updated_at: string;
+
+  // Reciprocity: other listings by the same member
+  member_offers?: Array<{ id: number; title: string; type: string; hours_estimate?: number }>;
+  member_requests?: Array<{ id: number; title: string; type: string; hours_estimate?: number }>;
+
+  // Trust signals
+  author_verified?: boolean;
+  author_rating?: number;
+  author_reviews_count?: number;
+  author_exchanges_count?: number;
 
   // Nested author info
   author_name?: string;
@@ -1120,10 +1137,156 @@ export interface TenantConfig {
     about?: { title: string; slug: string }[];
     footer?: { title: string; slug: string }[];
   };
+  /** Listing module configuration */
+  listing_config?: ListingConfig;
+  /** Volunteering module configuration — tabs + feature options */
+  volunteering_config?: VolunteeringConfig;
+  /** Jobs module configuration */
+  job_config?: JobConfig;
+  /** Group tab visibility — which tabs are enabled for group detail view */
+  group_tabs?: GroupTabConfig;
   /** Language codes supported by this tenant (e.g. ['en', 'ga'] or ['de', 'fr', 'it', 'en']) */
   supported_languages?: string[];
   /** Default language for this tenant (e.g. 'de' for Swiss tenants) */
   default_language?: string;
+}
+
+export interface GroupTabConfig {
+  tab_feed: boolean;
+  tab_discussion: boolean;
+  tab_members: boolean;
+  tab_events: boolean;
+  tab_files: boolean;
+  tab_announcements: boolean;
+  tab_qa: boolean;
+  tab_wiki: boolean;
+  tab_media: boolean;
+  tab_chatrooms: boolean;
+  tab_tasks: boolean;
+  tab_challenges: boolean;
+  tab_analytics: boolean;
+  tab_subgroups: boolean;
+}
+
+export interface ListingConfig {
+  // Moderation
+  'listing.moderation_enabled': boolean;
+  'listing.auto_approve_trusted': boolean;
+  // Limits
+  'listing.max_per_user': number;
+  'listing.max_images': number;
+  'listing.max_image_size_mb': number;
+  'listing.require_image': boolean;
+  'listing.min_title_length': number;
+  'listing.min_description_length': number;
+  // Types & Options
+  'listing.allow_offers': boolean;
+  'listing.allow_requests': boolean;
+  'listing.require_category': boolean;
+  'listing.require_location': boolean;
+  'listing.require_hours_estimate': boolean;
+  'listing.enable_skill_tags': boolean;
+  'listing.enable_service_type': boolean;
+  // Expiry
+  'listing.auto_expire_days': number;
+  'listing.max_renewals': number;
+  'listing.renewal_days': number;
+  'listing.expiry_reminders': boolean;
+  // Features
+  'listing.enable_featured': boolean;
+  'listing.featured_duration_days': number;
+  'listing.enable_ai_descriptions': boolean;
+  'listing.enable_reporting': boolean;
+  'listing.enable_favourites': boolean;
+  'listing.enable_map_view': boolean;
+  'listing.enable_reciprocity': boolean;
+}
+
+export interface VolunteeringConfig {
+  // Tab visibility (17 tabs)
+  'volunteering.tab_opportunities': boolean;
+  'volunteering.tab_applications': boolean;
+  'volunteering.tab_hours': boolean;
+  'volunteering.tab_recommended': boolean;
+  'volunteering.tab_certificates': boolean;
+  'volunteering.tab_alerts': boolean;
+  'volunteering.tab_wellbeing': boolean;
+  'volunteering.tab_credentials': boolean;
+  'volunteering.tab_waitlist': boolean;
+  'volunteering.tab_swaps': boolean;
+  'volunteering.tab_group_signups': boolean;
+  'volunteering.tab_hours_review': boolean;
+  'volunteering.tab_expenses': boolean;
+  'volunteering.tab_safeguarding': boolean;
+  'volunteering.tab_community_projects': boolean;
+  'volunteering.tab_donations': boolean;
+  'volunteering.tab_accessibility': boolean;
+  // Shifts & Applications
+  'volunteering.swap_requires_admin': boolean;
+  'volunteering.auto_approve_applications': boolean;
+  'volunteering.require_org_note_on_decline': boolean;
+  'volunteering.cancellation_deadline_hours': number;
+  'volunteering.max_hours_per_shift': number;
+  // Hours & Verification
+  'volunteering.hours_require_verification': boolean;
+  'volunteering.min_hours_for_certificate': number;
+  // Emergency Alerts
+  'volunteering.alert_default_expiry_hours': number;
+  'volunteering.alert_skill_matching': boolean;
+  // Expenses
+  'volunteering.expenses_enabled': boolean;
+  'volunteering.expense_require_receipt': boolean;
+  'volunteering.expense_max_amount': number;
+  // Wellbeing & Safety
+  'volunteering.burnout_detection': boolean;
+  'volunteering.guardian_consent_required': boolean;
+  // Features
+  'volunteering.enable_qr_checkin': boolean;
+  'volunteering.enable_recurring_shifts': boolean;
+  'volunteering.enable_reviews': boolean;
+  'volunteering.enable_matching': boolean;
+}
+
+export interface JobConfig {
+  // Tab / Page visibility
+  'jobs.tab_browse': boolean;
+  'jobs.tab_saved': boolean;
+  'jobs.tab_my_postings': boolean;
+  'jobs.page_kanban': boolean;
+  'jobs.page_analytics': boolean;
+  'jobs.page_bias_audit': boolean;
+  'jobs.page_talent_search': boolean;
+  'jobs.page_alerts': boolean;
+  // Job Types & Posting Rules
+  'jobs.allow_paid': boolean;
+  'jobs.allow_volunteer': boolean;
+  'jobs.allow_timebank': boolean;
+  'jobs.require_salary': boolean;
+  'jobs.default_currency': string;
+  'jobs.max_postings_per_user': number;
+  'jobs.default_deadline_days': number;
+  // Moderation
+  'jobs.moderation_enabled': boolean;
+  'jobs.spam_detection': boolean;
+  'jobs.auto_approve_trusted': boolean;
+  // Applications & Pipeline
+  'jobs.enable_cv_upload': boolean;
+  'jobs.require_cover_message': boolean;
+  'jobs.enable_interview_scheduling': boolean;
+  'jobs.enable_offers': boolean;
+  'jobs.enable_scorecards': boolean;
+  'jobs.enable_pipeline_rules': boolean;
+  'jobs.enable_blind_hiring': boolean;
+  // Features
+  'jobs.enable_featured': boolean;
+  'jobs.featured_duration_days': number;
+  'jobs.enable_ai_descriptions': boolean;
+  'jobs.enable_skills_matching': boolean;
+  'jobs.enable_referrals': boolean;
+  'jobs.enable_templates': boolean;
+  'jobs.enable_rss_feed': boolean;
+  'jobs.enable_saved_profiles': boolean;
+  'jobs.enable_employer_branding': boolean;
 }
 
 // ─────────────────────────────────────────────────────────────────────────────

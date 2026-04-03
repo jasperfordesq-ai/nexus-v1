@@ -147,8 +147,15 @@ export function VolunteeringPage() {
   const { t } = useTranslation('volunteering');
   usePageTitle(t('page_title'));
   const { isAuthenticated } = useAuth();
-  const { tenantPath, hasFeature } = useTenant();
+  const { tenantPath, hasFeature, volunteeringConfig } = useTenant();
   const [searchParams, setSearchParams] = useSearchParams();
+  // Check if a volunteering tab is enabled via config
+  // Config keys use underscores (tab_group_signups), frontend tab keys use hyphens (group-signups)
+  const isTabEnabled = useCallback((tabKey: VolunteerTab): boolean => {
+    const configKey = `volunteering.tab_${tabKey.replace(/-/g, '_')}` as keyof import('@/types').VolunteeringConfig;
+    return volunteeringConfig[configKey] !== false;
+  }, [volunteeringConfig]);
+
   const initialTab = (searchParams.get('tab') as VolunteerTab) ?? 'opportunities';
   const [tab, setTabState] = useState<VolunteerTab>(initialTab);
 
@@ -238,222 +245,78 @@ export function VolunteeringPage() {
       </div>
 
       {/* Tabs */}
-      <div className="flex gap-2 flex-wrap" role="tablist" aria-label={t('aria.volunteering_sections', 'Volunteering sections')}>
-        <Button
-          role="tab"
-          id="vol-tab-opportunities"
-          aria-selected={tab === 'opportunities'}
-          variant={tab === 'opportunities' ? 'solid' : 'flat'}
-          className={tab === 'opportunities' ? 'bg-gradient-to-r from-rose-500 to-pink-600 text-white' : 'bg-theme-elevated text-theme-muted'}
-          onPress={() => setTab('opportunities')}
-          startContent={<Briefcase className="w-4 h-4" aria-hidden="true" />}
-        >
-          {t('tab_opportunities')}
-        </Button>
-        {isAuthenticated && (
-          <>
-            <Button
-              role="tab"
-              id="vol-tab-applications"
-              aria-selected={tab === 'applications'}
-              variant={tab === 'applications' ? 'solid' : 'flat'}
-              className={tab === 'applications' ? 'bg-gradient-to-r from-rose-500 to-pink-600 text-white' : 'bg-theme-elevated text-theme-muted'}
-              onPress={() => setTab('applications')}
-              startContent={<Send className="w-4 h-4" aria-hidden="true" />}
-            >
-              {t('tab_applications')}
-            </Button>
-            <Button
-              role="tab"
-              id="vol-tab-hours"
-              aria-selected={tab === 'hours'}
-              variant={tab === 'hours' ? 'solid' : 'flat'}
-              className={tab === 'hours' ? 'bg-gradient-to-r from-rose-500 to-pink-600 text-white' : 'bg-theme-elevated text-theme-muted'}
-              onPress={() => setTab('hours')}
-              startContent={<Timer className="w-4 h-4" aria-hidden="true" />}
-            >
-              {t('tab_hours')}
-            </Button>
-            <Button
-              role="tab"
-              id="vol-tab-recommended"
-              aria-selected={tab === 'recommended'}
-              variant={tab === 'recommended' ? 'solid' : 'flat'}
-              className={tab === 'recommended' ? 'bg-gradient-to-r from-rose-500 to-pink-600 text-white' : 'bg-theme-elevated text-theme-muted'}
-              onPress={() => setTab('recommended')}
-              startContent={<Sparkles className="w-4 h-4" aria-hidden="true" />}
-            >
-              {t('tab_for_you', 'For You')}
-            </Button>
-            <Button
-              role="tab"
-              id="vol-tab-certificates"
-              aria-selected={tab === 'certificates'}
-              variant={tab === 'certificates' ? 'solid' : 'flat'}
-              className={tab === 'certificates' ? 'bg-gradient-to-r from-rose-500 to-pink-600 text-white' : 'bg-theme-elevated text-theme-muted'}
-              onPress={() => setTab('certificates')}
-              startContent={<Award className="w-4 h-4" aria-hidden="true" />}
-            >
-              {t('tab_certificates', 'Certificates')}
-            </Button>
-            <Button
-              role="tab"
-              id="vol-tab-alerts"
-              aria-selected={tab === 'alerts'}
-              variant={tab === 'alerts' ? 'solid' : 'flat'}
-              className={tab === 'alerts' ? 'bg-gradient-to-r from-rose-500 to-pink-600 text-white' : 'bg-theme-elevated text-theme-muted'}
-              onPress={() => setTab('alerts')}
-              startContent={<Siren className="w-4 h-4" aria-hidden="true" />}
-            >
-              {t('tab_alerts', 'Alerts')}
-            </Button>
-            <Button
-              role="tab"
-              id="vol-tab-wellbeing"
-              aria-selected={tab === 'wellbeing'}
-              variant={tab === 'wellbeing' ? 'solid' : 'flat'}
-              className={tab === 'wellbeing' ? 'bg-gradient-to-r from-rose-500 to-pink-600 text-white' : 'bg-theme-elevated text-theme-muted'}
-              onPress={() => setTab('wellbeing')}
-              startContent={<Smile className="w-4 h-4" aria-hidden="true" />}
-            >
-              {t('tab_wellbeing', 'Wellbeing')}
-            </Button>
-            <Button
-              role="tab"
-              id="vol-tab-credentials"
-              aria-selected={tab === 'credentials'}
-              variant={tab === 'credentials' ? 'solid' : 'flat'}
-              className={tab === 'credentials' ? 'bg-gradient-to-r from-rose-500 to-pink-600 text-white' : 'bg-theme-elevated text-theme-muted'}
-              onPress={() => setTab('credentials')}
-              startContent={<ShieldCheck className="w-4 h-4" aria-hidden="true" />}
-            >
-              {t('tab_credentials', 'Credentials')}
-            </Button>
-            <Button
-              role="tab"
-              id="vol-tab-waitlist"
-              aria-selected={tab === 'waitlist'}
-              variant={tab === 'waitlist' ? 'solid' : 'flat'}
-              className={tab === 'waitlist' ? 'bg-gradient-to-r from-rose-500 to-pink-600 text-white' : 'bg-theme-elevated text-theme-muted'}
-              onPress={() => setTab('waitlist')}
-              startContent={<Clock className="w-4 h-4" aria-hidden="true" />}
-            >
-              {t('tab_waitlist', 'Waitlist')}
-            </Button>
-            <Button
-              role="tab"
-              id="vol-tab-swaps"
-              aria-selected={tab === 'swaps'}
-              variant={tab === 'swaps' ? 'solid' : 'flat'}
-              className={tab === 'swaps' ? 'bg-gradient-to-r from-rose-500 to-pink-600 text-white' : 'bg-theme-elevated text-theme-muted'}
-              onPress={() => setTab('swaps')}
-              startContent={<ArrowLeftRight className="w-4 h-4" aria-hidden="true" />}
-            >
-              {t('tab_swap_requests', 'Swap Requests')}
-            </Button>
-            <Button
-              role="tab"
-              id="vol-tab-group-signups"
-              aria-selected={tab === 'group-signups'}
-              variant={tab === 'group-signups' ? 'solid' : 'flat'}
-              className={tab === 'group-signups' ? 'bg-gradient-to-r from-rose-500 to-pink-600 text-white' : 'bg-theme-elevated text-theme-muted'}
-              onPress={() => setTab('group-signups')}
-              startContent={<Users className="w-4 h-4" aria-hidden="true" />}
-            >
-              {t('tab_group_signups', 'Group Sign-ups')}
-            </Button>
-            <Button
-              role="tab"
-              id="vol-tab-hours-review"
-              aria-selected={tab === 'hours-review'}
-              variant={tab === 'hours-review' ? 'solid' : 'flat'}
-              className={tab === 'hours-review' ? 'bg-gradient-to-r from-rose-500 to-pink-600 text-white' : 'bg-theme-elevated text-theme-muted'}
-              onPress={() => setTab('hours-review')}
-              startContent={<ClipboardCheck className="w-4 h-4" aria-hidden="true" />}
-            >
-              {t('tab_hours_review', 'Hours Review')}
-            </Button>
-            <Button
-              role="tab"
-              id="vol-tab-expenses"
-              aria-selected={tab === 'expenses'}
-              variant={tab === 'expenses' ? 'solid' : 'flat'}
-              className={tab === 'expenses' ? 'bg-gradient-to-r from-rose-500 to-pink-600 text-white' : 'bg-theme-elevated text-theme-muted'}
-              onPress={() => setTab('expenses')}
-              startContent={<Receipt className="w-4 h-4" aria-hidden="true" />}
-            >
-              {t('tab_expenses', 'Expenses')}
-            </Button>
-            <Button
-              role="tab"
-              id="vol-tab-safeguarding"
-              aria-selected={tab === 'safeguarding'}
-              variant={tab === 'safeguarding' ? 'solid' : 'flat'}
-              className={tab === 'safeguarding' ? 'bg-gradient-to-r from-rose-500 to-pink-600 text-white' : 'bg-theme-elevated text-theme-muted'}
-              onPress={() => setTab('safeguarding')}
-              startContent={<Shield className="w-4 h-4" aria-hidden="true" />}
-            >
-              {t('tab_safeguarding', 'Safeguarding')}
-            </Button>
-            <Button
-              role="tab"
-              id="vol-tab-community-projects"
-              aria-selected={tab === 'community-projects'}
-              variant={tab === 'community-projects' ? 'solid' : 'flat'}
-              className={tab === 'community-projects' ? 'bg-gradient-to-r from-rose-500 to-pink-600 text-white' : 'bg-theme-elevated text-theme-muted'}
-              onPress={() => setTab('community-projects')}
-              startContent={<Lightbulb className="w-4 h-4" aria-hidden="true" />}
-            >
-              {t('tab_community_projects', 'Projects')}
-            </Button>
-            <Button
-              role="tab"
-              id="vol-tab-donations"
-              aria-selected={tab === 'donations'}
-              variant={tab === 'donations' ? 'solid' : 'flat'}
-              className={tab === 'donations' ? 'bg-gradient-to-r from-rose-500 to-pink-600 text-white' : 'bg-theme-elevated text-theme-muted'}
-              onPress={() => setTab('donations')}
-              startContent={<HandHeart className="w-4 h-4" aria-hidden="true" />}
-            >
-              {t('tab_donations', 'Donations')}
-            </Button>
-            <Button
-              role="tab"
-              id="vol-tab-accessibility"
-              aria-selected={tab === 'accessibility'}
-              variant={tab === 'accessibility' ? 'solid' : 'flat'}
-              className={tab === 'accessibility' ? 'bg-gradient-to-r from-rose-500 to-pink-600 text-white' : 'bg-theme-elevated text-theme-muted'}
-              onPress={() => setTab('accessibility')}
-              startContent={<Accessibility className="w-4 h-4" aria-hidden="true" />}
-            >
-              {t('tab_accessibility', 'Accessibility')}
-            </Button>
-          </>
-        )}
-      </div>
+      {/* Tabs — data-driven with config-based visibility */}
+      {(() => {
+        type TabDef = { key: VolunteerTab; icon: typeof Briefcase; label: string; authOnly?: boolean };
+        const allTabs: TabDef[] = [
+          { key: 'opportunities', icon: Briefcase, label: t('tab_opportunities') },
+          { key: 'applications', icon: Send, label: t('tab_applications'), authOnly: true },
+          { key: 'hours', icon: Timer, label: t('tab_hours'), authOnly: true },
+          { key: 'recommended', icon: Sparkles, label: t('tab_for_you', 'For You'), authOnly: true },
+          { key: 'certificates', icon: Award, label: t('tab_certificates', 'Certificates'), authOnly: true },
+          { key: 'alerts', icon: Siren, label: t('tab_alerts', 'Alerts'), authOnly: true },
+          { key: 'wellbeing', icon: Smile, label: t('tab_wellbeing', 'Wellbeing'), authOnly: true },
+          { key: 'credentials', icon: ShieldCheck, label: t('tab_credentials', 'Credentials'), authOnly: true },
+          { key: 'waitlist', icon: Clock, label: t('tab_waitlist', 'Waitlist'), authOnly: true },
+          { key: 'swaps', icon: ArrowLeftRight, label: t('tab_swap_requests', 'Swap Requests'), authOnly: true },
+          { key: 'group-signups', icon: Users, label: t('tab_group_signups', 'Group Sign-ups'), authOnly: true },
+          { key: 'hours-review', icon: ClipboardCheck, label: t('tab_hours_review', 'Hours Review'), authOnly: true },
+          { key: 'expenses', icon: Receipt, label: t('tab_expenses', 'Expenses'), authOnly: true },
+          { key: 'safeguarding', icon: Shield, label: t('tab_safeguarding', 'Safeguarding'), authOnly: true },
+          { key: 'community-projects', icon: Lightbulb, label: t('tab_community_projects', 'Projects'), authOnly: true },
+          { key: 'donations', icon: HandHeart, label: t('tab_donations', 'Donations'), authOnly: true },
+          { key: 'accessibility', icon: Accessibility, label: t('tab_accessibility', 'Accessibility'), authOnly: true },
+        ];
 
-      {/* Tab Content */}
-      <div role="tabpanel" aria-labelledby={`vol-tab-${tab}`}>
-      {tab === 'opportunities' && <OpportunitiesTab />}
-      {tab === 'applications' && <ApplicationsTab />}
-      {tab === 'hours' && <HoursTab />}
-      {tab === 'recommended' && <RecommendedShiftsTab />}
-      {tab === 'certificates' && <CertificatesTab />}
-      {tab === 'alerts' && <EmergencyAlertsTab />}
-      {tab === 'wellbeing' && <WellbeingTab />}
-      {tab === 'credentials' && <CredentialVerificationTab />}
-      {tab === 'waitlist' && <WaitlistTab />}
-      {tab === 'swaps' && <ShiftSwapsTab />}
-      {tab === 'group-signups' && <GroupSignUpTab />}
-      {tab === 'hours-review' && <HoursReviewTab />}
-      <Suspense fallback={<div className="flex justify-center py-12"><Spinner size="lg" /></div>}>
-        {tab === 'expenses' && <ExpensesTab />}
-        {tab === 'safeguarding' && <SafeguardingTab />}
-        {tab === 'community-projects' && <CommunityProjectsTab />}
-        {tab === 'donations' && <DonationsTab />}
-        {tab === 'accessibility' && <AccessibilityTab />}
-      </Suspense>
-      </div>
+        const visibleTabs = allTabs.filter(t => {
+          if (t.authOnly && !isAuthenticated) return false;
+          return isTabEnabled(t.key);
+        });
+
+        return (
+          <>
+            <div className="flex gap-2 flex-wrap" role="tablist" aria-label={t('aria.volunteering_sections', 'Volunteering sections')}>
+              {visibleTabs.map(({ key, icon: Icon, label }) => (
+                <Button
+                  key={key}
+                  role="tab"
+                  id={`vol-tab-${key}`}
+                  aria-selected={tab === key}
+                  variant={tab === key ? 'solid' : 'flat'}
+                  className={tab === key ? 'bg-gradient-to-r from-rose-500 to-pink-600 text-white' : 'bg-theme-elevated text-theme-muted'}
+                  onPress={() => setTab(key)}
+                  startContent={<Icon className="w-4 h-4" aria-hidden="true" />}
+                >
+                  {label}
+                </Button>
+              ))}
+            </div>
+
+            {/* Tab Content */}
+            <div role="tabpanel" aria-labelledby={`vol-tab-${tab}`}>
+              {tab === 'opportunities' && isTabEnabled('opportunities') && <OpportunitiesTab />}
+              {tab === 'applications' && isTabEnabled('applications') && <ApplicationsTab />}
+              {tab === 'hours' && isTabEnabled('hours') && <HoursTab />}
+              {tab === 'recommended' && isTabEnabled('recommended') && <RecommendedShiftsTab />}
+              {tab === 'certificates' && isTabEnabled('certificates') && <CertificatesTab />}
+              {tab === 'alerts' && isTabEnabled('alerts') && <EmergencyAlertsTab />}
+              {tab === 'wellbeing' && isTabEnabled('wellbeing') && <WellbeingTab />}
+              {tab === 'credentials' && isTabEnabled('credentials') && <CredentialVerificationTab />}
+              {tab === 'waitlist' && isTabEnabled('waitlist') && <WaitlistTab />}
+              {tab === 'swaps' && isTabEnabled('swaps') && <ShiftSwapsTab />}
+              {tab === 'group-signups' && isTabEnabled('group-signups') && <GroupSignUpTab />}
+              {tab === 'hours-review' && isTabEnabled('hours-review') && <HoursReviewTab />}
+              <Suspense fallback={<div className="flex justify-center py-12"><Spinner size="lg" /></div>}>
+                {tab === 'expenses' && isTabEnabled('expenses') && <ExpensesTab />}
+                {tab === 'safeguarding' && isTabEnabled('safeguarding') && <SafeguardingTab />}
+                {tab === 'community-projects' && isTabEnabled('community-projects') && <CommunityProjectsTab />}
+                {tab === 'donations' && isTabEnabled('donations') && <DonationsTab />}
+                {tab === 'accessibility' && isTabEnabled('accessibility') && <AccessibilityTab />}
+              </Suspense>
+            </div>
+          </>
+        );
+      })()}
     </div>
   );
 }

@@ -165,6 +165,7 @@ Route::get('/v2/listings/featured', [\App\Http\Controllers\Api\ListingsControlle
 Route::get('/v2/listings/tags/popular', [\App\Http\Controllers\Api\ListingsController::class, 'popularTags']);
 Route::get('/v2/listings/tags/autocomplete', [\App\Http\Controllers\Api\ListingsController::class, 'autocompleteTags']);
 Route::post('/v2/listings', [\App\Http\Controllers\Api\ListingsController::class, 'store']);
+Route::post('/v2/listings/generate-description', [\App\Http\Controllers\Api\ListingsController::class, 'generateDescription']);
 Route::get('/v2/listings/{id}', [\App\Http\Controllers\Api\ListingsController::class, 'show']);
 Route::put('/v2/listings/{id}', [\App\Http\Controllers\Api\ListingsController::class, 'update']);
 Route::delete('/v2/listings/{id}', [\App\Http\Controllers\Api\ListingsController::class, 'destroy']);
@@ -172,9 +173,13 @@ Route::post('/v2/listings/{id}/save', [\App\Http\Controllers\Api\ListingsControl
 Route::delete('/v2/listings/{id}/save', [\App\Http\Controllers\Api\ListingsController::class, 'unsaveListing']);
 Route::post('/v2/listings/{id}/image', [\App\Http\Controllers\Api\ListingsController::class, 'uploadImage']);
 Route::delete('/v2/listings/{id}/image', [\App\Http\Controllers\Api\ListingsController::class, 'deleteImage']);
+Route::post('/v2/listings/{id}/images', [\App\Http\Controllers\Api\ListingsController::class, 'uploadImages']);
+Route::delete('/v2/listings/{id}/images/{imageId}', [\App\Http\Controllers\Api\ListingsController::class, 'deleteListingImage']);
+Route::put('/v2/listings/{id}/images/reorder', [\App\Http\Controllers\Api\ListingsController::class, 'reorderImages']);
 Route::post('/v2/listings/{id}/renew', [\App\Http\Controllers\Api\ListingsController::class, 'renew']);
 Route::get('/v2/listings/{id}/analytics', [\App\Http\Controllers\Api\ListingsController::class, 'analytics']);
 Route::put('/v2/listings/{id}/tags', [\App\Http\Controllers\Api\ListingsController::class, 'setSkillTags']);
+Route::post('/v2/listings/{id}/report', [\App\Http\Controllers\Api\ListingsController::class, 'report']);
 
 // ============================================
 // MIGRATED ROUTES — Messages
@@ -815,6 +820,16 @@ Route::delete('/v2/admin/identity/provider-credentials/{slug}', [\App\Http\Contr
 Route::get('/v2/admin/invite-codes', [\App\Http\Controllers\Api\RegistrationPolicyController::class, 'listInviteCodes']);
 Route::post('/v2/admin/invite-codes', [\App\Http\Controllers\Api\RegistrationPolicyController::class, 'generateInviteCodes']);
 Route::delete('/v2/admin/invite-codes/{id}', [\App\Http\Controllers\Api\RegistrationPolicyController::class, 'deactivateInviteCode']);
+Route::get('/v2/admin/config/groups', [\App\Http\Controllers\Api\AdminConfigController::class, 'getGroupConfig']);
+Route::put('/v2/admin/config/groups', [\App\Http\Controllers\Api\AdminConfigController::class, 'updateGroupConfig']);
+Route::put('/v2/admin/config/groups/bulk', [\App\Http\Controllers\Api\AdminConfigController::class, 'updateGroupConfigBulk']);
+Route::get('/v2/admin/config/listings', [\App\Http\Controllers\Api\AdminConfigController::class, 'getListingConfig']);
+Route::put('/v2/admin/config/listings', [\App\Http\Controllers\Api\AdminConfigController::class, 'updateListingConfig']);
+Route::put('/v2/admin/config/listings/bulk', [\App\Http\Controllers\Api\AdminConfigController::class, 'updateListingConfigBulk']);
+Route::get('/v2/admin/config/volunteering', [\App\Http\Controllers\Api\AdminConfigController::class, 'getVolunteeringConfig']);
+Route::put('/v2/admin/config/volunteering/bulk', [\App\Http\Controllers\Api\AdminConfigController::class, 'updateVolunteeringConfigBulk']);
+Route::get('/v2/admin/config/jobs', [\App\Http\Controllers\Api\AdminConfigController::class, 'getJobConfig']);
+Route::put('/v2/admin/config/jobs/bulk', [\App\Http\Controllers\Api\AdminConfigController::class, 'updateJobConfigBulk']);
 Route::get('/v2/admin/config/ai', [\App\Http\Controllers\Api\AdminConfigController::class, 'getAiConfig']);
 Route::put('/v2/admin/config/ai', [\App\Http\Controllers\Api\AdminConfigController::class, 'updateAiConfig']);
 Route::get('/v2/admin/config/feed-algorithm', [\App\Http\Controllers\Api\AdminConfigController::class, 'getFeedAlgorithmConfig']);

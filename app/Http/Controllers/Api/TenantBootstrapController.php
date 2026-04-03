@@ -6,7 +6,11 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Services\GroupConfigurationService;
+use App\Services\JobConfigurationService;
+use App\Services\ListingConfigurationService;
 use App\Services\RedisCache;
+use App\Services\VolunteeringConfigurationService;
 use App\Services\TenantFeatureConfig;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
@@ -302,6 +306,25 @@ class TenantBootstrapController extends BaseApiController
             'vetting_enabled' => $this->brokerControlConfigService->isVettingEnabled(),
             'insurance_enabled' => $this->brokerControlConfigService->isInsuranceEnabled(),
         ];
+
+        // Listing module configuration — expose to frontend for UI gating
+        $data['listing_config'] = ListingConfigurationService::getAll();
+
+        // Volunteering module configuration — tabs + feature options
+        $data['volunteering_config'] = VolunteeringConfigurationService::getAll();
+
+        // Jobs module configuration
+        $data['job_config'] = JobConfigurationService::getAll();
+
+        // Group tab visibility — only include tab_* keys for frontend filtering
+        $groupConfig = GroupConfigurationService::getAll();
+        $groupTabs = [];
+        foreach ($groupConfig as $key => $value) {
+            if (str_starts_with($key, 'tab_')) {
+                $groupTabs[$key] = (bool) $value;
+            }
+        }
+        $data['group_tabs'] = $groupTabs;
 
         $data['supported_languages'] = $config['supported_languages'] ?? ['en', 'ga', 'de', 'fr', 'it', 'pt', 'es', 'nl', 'pl', 'ja', 'ar'];
         $data['default_language'] = $config['default_language'] ?? 'en';

@@ -1,0 +1,245 @@
+// Copyright © 2024–2026 Jasper Ford
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Author: Jasper Ford
+// See NOTICE file for attribution and acknowledgements.
+
+/**
+ * Module Configuration
+ * Central admin page listing all platform modules with granular config options.
+ * Marked as Beta — under active development.
+ */
+
+import { useState, useCallback, useEffect, useMemo } from 'react';
+import { Input, Spinner, ButtonGroup, Button, Chip } from '@heroui/react';
+import { Search, RefreshCw, Construction } from 'lucide-react';
+import { usePageTitle } from '@/hooks';
+import { useToast, useTenant } from '@/contexts';
+import { adminConfig } from '../../api/adminApi';
+import { PageHeader } from '../../components';
+import type { TenantConfig } from '../../api/types';
+import ModuleCard from './ModuleCard';
+import ModuleConfigModal from './ModuleConfigModal';
+import {
+  getCoreModules,
+  getFeatureModules,
+  type ModuleDefinition,
+} from './moduleRegistry';
+
+type FilterType = 'all' | 'core' | 'feature';
+
+export default function ModuleConfiguration() {
+  usePageTitle('Module Configuration');
+  const toast = useToast();
+  const { refreshTenant } = useTenant();
+
+  const [config, setConfig] = useState<TenantConfig | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [toggling, setToggling] = useState<string | null>(null);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [filterType, setFilterType] = useState<FilterType>('all');
+  const [selectedModule, setSelectedModule] = useState<ModuleDefinition | null>(null);
+
+  const coreModules = getCoreModules();
+  const featureModules = getFeatureModules();
+
+  const loadConfig = useCallback(async () => {
+    setLoading(true);
+    try {
+      const res = await adminConfig.get();
+      if (res.success && res.data) {
+        setConfig(res.data);
+      }
+    } catch {
+      toast.error('Failed to load module configuration');
+    } finally {
+      setLoading(false);
+    }
+  }, [toast]);
+
+  useEffect(() => {
+    loadConfig();
+  }, [loadConfig]);
+
+  // ── Toggle handlers (same pattern as TenantFeatures.tsx) ────────────────
+
+  const handleToggle = async (id: string, enabled: boolean) => {
+    if (!config) return;
+
+    // Determine if this is a core module or feature
+    const isCore = coreModules.some(m => m.id === id);
+    setToggling(id);
+
+    const res = isCore
+      ? await adminConfig.updateModule(id, enabled)
+      : await adminConfig.updateFeature(id, enabled);
+
+    if (res.success) {
+      setConfig(prev => {
+        if (!prev) return prev;
+        if (isCore) {
+          return { ...prev, modules: { ...prev.modules, [id]: enabled } };
+        }
+        return { ...prev, features: { ...prev.features, [id]: enabled } };
+      });
+      const mod = [...coreModules, ...featureModules].find(m => m.id === id);
+      toast.success(`${mod?.name || id} ${enabled ? 'enabled' : 'disabled'}`);
+      refreshTenant();
+    } else {
+      toast.error(res.error || 'Failed to update module');
+    }
+    setToggling(null);
+  };
+
+  // ── Filter logic ────────────────────────────────────────────────────────
+
+  const filterModules = useCallback((modules: ModuleDefinition[]) => {
+    if (!searchQuery) return modules;
+    const q = searchQuery.toLowerCase();
+    return modules.filter(
+      m => m.name.toLowerCase().includes(q) || m.description.toLowerCase().includes(q)
+    );
+  }, [searchQuery]);
+
+  const filteredCore = useMemo(
+    () => filterType !== 'feature' ? filterModules(coreModules) : [],
+    [filterType, filterModules, coreModules]
+  );
+
+  const filteredFeatures = useMemo(
+    () => filterType !== 'core' ? filterModules(featureModules) : [],
+    [filterType, filterModules, featureModules]
+  );
+
+  function isModuleEnabled(id: string, isCore: boolean): boolean {
+    if (!config) return true; // Default to enabled while loading
+    if (isCore) {
+      return config.modules?.[id] !== false;
+    }
+    return config.features?.[id] !== false;
+  }
+
+  // ── Render ──────────────────────────────────────────────────────────────
+
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center min-h-[400px]">
+        <Spinner size="lg" />
+      </div>
+    );
+  }
+
+  return (
+    <div className="max-w-7xl mx-auto px-4 pb-8">
+      <PageHeader
+        title="Module Configuration"
+        description="View and configure all platform modules. Toggle modules on or off and customize their behaviour."
+        actions={
+          <div className="flex items-center gap-2">
+            <Chip color="warning" variant="flat" size="sm" startContent={<Construction size={14} />}>
+              Beta
+            </Chip>
+            <Button variant="flat" size="sm" startContent={<RefreshCw size={16} />} onPress={loadConfig}>
+              Refresh
+            </Button>
+          </div>
+        }
+      />
+
+      {/* Search + filter bar */}
+      <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 mb-6">
+        <Input
+          size="sm"
+          variant="bordered"
+          placeholder="Search modules..."
+          startContent={<Search size={16} className="text-default-400" />}
+          value={searchQuery}
+          onValueChange={setSearchQuery}
+          className="sm:max-w-xs"
+          isClearable
+          onClear={() => setSearchQuery('')}
+        />
+        <ButtonGroup size="sm" variant="flat">
+          <Button
+            color={filterType === 'all' ? 'primary' : 'default'}
+            onPress={() => setFilterType('all')}
+          >
+            All ({coreModules.length + featureModules.length})
+          </Button>
+          <Button
+            color={filterType === 'core' ? 'primary' : 'default'}
+            onPress={() => setFilterType('core')}
+          >
+            Core ({coreModules.length})
+          </Button>
+          <Button
+            color={filterType === 'feature' ? 'primary' : 'default'}
+            onPress={() => setFilterType('feature')}
+          >
+            Features ({featureModules.length})
+          </Button>
+        </ButtonGroup>
+      </div>
+
+      {/* Core Modules section */}
+      {filteredCore.length > 0 && (
+        <section className="mb-8">
+          <h2 className="text-lg font-semibold mb-4">Core Modules</h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+            {filteredCore.map(mod => (
+              <ModuleCard
+                key={mod.id}
+                module={mod}
+                enabled={isModuleEnabled(mod.id, true)}
+                onToggle={handleToggle}
+                onConfigure={setSelectedModule}
+                toggling={toggling === mod.id}
+              />
+            ))}
+          </div>
+        </section>
+      )}
+
+      {/* Optional Features section */}
+      {filteredFeatures.length > 0 && (
+        <section className="mb-8">
+          <h2 className="text-lg font-semibold mb-4">Optional Features</h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+            {filteredFeatures.map(mod => (
+              <ModuleCard
+                key={mod.id}
+                module={mod}
+                enabled={isModuleEnabled(mod.id, false)}
+                onToggle={handleToggle}
+                onConfigure={setSelectedModule}
+                toggling={toggling === mod.id}
+              />
+            ))}
+          </div>
+        </section>
+      )}
+
+      {/* No results */}
+      {filteredCore.length === 0 && filteredFeatures.length === 0 && (
+        <div className="flex flex-col items-center justify-center py-16 text-default-400">
+          <Search size={48} className="mb-4" />
+          <p className="text-lg">No modules match your search</p>
+          <Button
+            variant="light"
+            size="sm"
+            className="mt-2"
+            onPress={() => { setSearchQuery(''); setFilterType('all'); }}
+          >
+            Clear filters
+          </Button>
+        </div>
+      )}
+
+      {/* Config modal */}
+      <ModuleConfigModal
+        module={selectedModule}
+        isOpen={selectedModule !== null}
+        onClose={() => setSelectedModule(null)}
+      />
+    </div>
+  );
+}

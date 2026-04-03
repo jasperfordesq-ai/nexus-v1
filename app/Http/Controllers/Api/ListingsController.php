@@ -10,13 +10,17 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use App\Core\TenantContext;
+use App\Models\ListingImage;
 use App\Models\Notification;
+use App\Services\AiChatService;
 use App\Services\ListingService;
 use App\Services\ListingAnalyticsService;
+use App\Services\ListingConfigurationService;
 use App\Services\ListingExpiryService;
 use App\Services\ListingRankingService;
 use App\Services\ListingSkillTagService;
 use App\Services\ListingFeaturedService;
+use App\Models\ListingReport;
 
 /**
  * ListingsController - Listings CRUD, search, favorites, tags, analytics, renewal.
@@ -29,6 +33,7 @@ class ListingsController extends BaseApiController
     protected bool $isV2Api = true;
 
     public function __construct(
+        private readonly AiChatService $aiService,
         private readonly ListingAnalyticsService $listingAnalyticsService,
         private readonly ListingExpiryService $listingExpiryService,
         private readonly ListingFeaturedService $listingFeaturedService,
@@ -73,6 +78,19 @@ class ListingsController extends BaseApiController
 
         if ($this->queryBool('featured_first')) {
             $filters['featured_first'] = true;
+        }
+
+        if ($this->query('min_hours')) {
+            $filters['min_hours'] = (float) $this->query('min_hours');
+        }
+        if ($this->query('max_hours')) {
+            $filters['max_hours'] = (float) $this->query('max_hours');
+        }
+        if ($this->query('service_type')) {
+            $filters['service_type'] = $this->query('service_type');
+        }
+        if ($this->query('posted_within')) {
+            $filters['posted_within'] = (int) $this->query('posted_within');
         }
 
         if ($this->query('cursor')) {
@@ -142,7 +160,68 @@ class ListingsController extends BaseApiController
             $listing['skill_tags'] = [];
         }
 
+        // Attach images
+        try {
+            $images = ListingImage::where('listing_id', $id)
+                ->orderBy('sort_order')
+                ->get();
+            $listing['images'] = $images->map(fn($img) => [
+                'id' => $img->id,
+                'url' => $img->image_url,
+                'sort_order' => $img->sort_order,
+                'alt_text' => $img->alt_text,
+            ])->values()->toArray();
+        } catch (\Throwable $e) {
+            $listing['images'] = [];
+        }
+
         $listing['is_featured'] = (bool) ($listing['is_featured'] ?? false);
+
+        // Reciprocity: load the listing owner's OTHER active listings (max 6)
+        try {
+            $ownerUserId = (int) ($listing['user_id'] ?? 0);
+            $tenantId = TenantContext::getId();
+
+            if ($ownerUserId > 0) {
+                $otherListings = DB::table('listings')
+                    ->where('tenant_id', $tenantId)
+                    ->where('user_id', $ownerUserId)
+                    ->where('id', '!=', $id)
+                    ->where(function ($q) {
+                        $q->whereNull('status')->orWhere('status', 'active');
+                    })
+                    ->select(['id', 'title', 'type', 'hours_estimate'])
+                    ->orderByDesc('created_at')
+                    ->limit(6)
+                    ->get();
+
+                $listing['member_offers'] = $otherListings
+                    ->filter(fn ($l) => $l->type === 'offer')
+                    ->map(fn ($l) => [
+                        'id' => $l->id,
+                        'title' => $l->title,
+                        'type' => $l->type,
+                        'hours_estimate' => $l->hours_estimate,
+                    ])
+                    ->values()
+                    ->all();
+
+                $listing['member_requests'] = $otherListings
+                    ->filter(fn ($l) => $l->type === 'request')
+                    ->map(fn ($l) => [
+                        'id' => $l->id,
+                        'title' => $l->title,
+                        'type' => $l->type,
+                        'hours_estimate' => $l->hours_estimate,
+                    ])
+                    ->values()
+                    ->all();
+            }
+        } catch (\Throwable $e) {
+            Log::warning('Failed to load reciprocity listings', ['listing_id' => $id, 'error' => $e->getMessage()]);
+            $listing['member_offers'] = [];
+            $listing['member_requests'] = [];
+        }
 
         return $this->respondWithData($listing);
     }
@@ -635,5 +714,368 @@ class ListingsController extends BaseApiController
             \Log::error('Listing image upload failed', ['error' => $e->getMessage()]);
             return $this->respondWithError('UPLOAD_FAILED', __('api.listing_image_upload_failed'), 'image', 500);
         }
+    }
+
+    // -----------------------------------------------------------------
+    //  POST /api/v2/listings/{id}/report
+    // -----------------------------------------------------------------
+
+    /**
+     * Report a listing for community moderation.
+     *
+     * Authenticated users can flag a listing as inappropriate. Each user
+     * may only report a given listing once (409 on duplicates).
+     * Rate-limited to 5 reports per hour per user.
+     */
+    public function report(int $id): JsonResponse
+    {
+        $userId = $this->requireAuth();
+        $this->rateLimit('listing_report', 5, 3600);
+
+        $tenantId = TenantContext::getId();
+
+        // Validate the listing exists and is active
+        $listing = $this->listingService->getById($id);
+        if (!$listing) {
+            return $this->respondWithError('NOT_FOUND', __('api.listing_not_found'), null, 404);
+        }
+
+        // Cannot report your own listing
+        if ((int) ($listing['user_id'] ?? 0) === $userId) {
+            return $this->respondWithError('FORBIDDEN', 'You cannot report your own listing.', null, 403);
+        }
+
+        // Validate input
+        $data = $this->getAllInput();
+
+        $validReasons = ['inappropriate', 'safety_concern', 'misleading', 'spam', 'not_timebank_service', 'other'];
+        $reason = $data['reason'] ?? null;
+        if (!$reason || !in_array($reason, $validReasons, true)) {
+            return $this->respondWithError('VALIDATION_ERROR', 'A valid reason is required.', 'reason', 422);
+        }
+
+        $details = isset($data['details']) ? trim((string) $data['details']) : null;
+        if ($details !== null && mb_strlen($details) > 500) {
+            return $this->respondWithError('VALIDATION_ERROR', 'Details must not exceed 500 characters.', 'details', 422);
+        }
+
+        // Check for duplicate report
+        $existing = ListingReport::withoutGlobalScopes()
+            ->where('tenant_id', $tenantId)
+            ->where('listing_id', $id)
+            ->where('reporter_id', $userId)
+            ->first();
+
+        if ($existing) {
+            return $this->respondWithError('ALREADY_REPORTED', 'You have already reported this listing.', null, 409);
+        }
+
+        // Create the report
+        ListingReport::create([
+            'tenant_id'   => $tenantId,
+            'listing_id'  => $id,
+            'reporter_id' => $userId,
+            'reason'      => $reason,
+            'details'     => $details ?: null,
+            'status'      => 'pending',
+        ]);
+
+        Log::info('Listing reported', [
+            'listing_id'  => $id,
+            'reporter_id' => $userId,
+            'reason'      => $reason,
+            'tenant_id'   => $tenantId,
+        ]);
+
+        return $this->respondWithData([
+            'reported' => true,
+            'message'  => 'Thank you for your report. Our team will review it.',
+        ], null, 201);
+    }
+
+    // -----------------------------------------------------------------
+    //  POST /api/v2/listings/{id}/images — Multi-image upload
+    // -----------------------------------------------------------------
+
+    /**
+     * Upload up to 5 images for a listing (multipart form).
+     * Field name: 'images[]'
+     * Creates ListingImage records with incremental sort_order.
+     * Sets the first image as listing.image_url for backward compatibility.
+     */
+    public function uploadImages(int $id): JsonResponse
+    {
+        $userId = $this->requireAuth();
+        $this->rateLimit('listing_images_upload', 10, 60);
+
+        $listing = $this->listingService->getById($id);
+        if (!$listing) {
+            return $this->respondWithError('NOT_FOUND', __('api.listing_not_found'), null, 404);
+        }
+
+        if (!$this->listingService->canModify($listing, $userId)) {
+            return $this->respondWithError('FORBIDDEN', __('api.listing_modify_forbidden'), null, 403);
+        }
+
+        $files = request()->file('images');
+        if (!$files || !is_array($files) || count($files) === 0) {
+            // Fall back to single file field name
+            $singleFile = request()->file('image');
+            if ($singleFile && $singleFile->isValid()) {
+                $files = [$singleFile];
+            } else {
+                return $this->respondWithError('VALIDATION_ERROR', 'No images uploaded.', 'images', 400);
+            }
+        }
+
+        // Check existing image count against configured limit
+        $maxImages = (int) ListingConfigurationService::get(ListingConfigurationService::CONFIG_MAX_IMAGES, 5);
+        $existingCount = ListingImage::where('listing_id', $id)->count();
+        if ($existingCount + count($files) > $maxImages) {
+            return $this->respondWithError(
+                'VALIDATION_ERROR',
+                'Maximum ' . $maxImages . ' images per listing. Currently ' . $existingCount . ' images, trying to add ' . count($files) . '.',
+                'images',
+                422
+            );
+        }
+
+        $maxSortOrder = ListingImage::where('listing_id', $id)->max('sort_order') ?? -1;
+        $tenantId = TenantContext::getId();
+        $createdImages = [];
+
+        foreach ($files as $file) {
+            if (!$file->isValid()) {
+                continue;
+            }
+
+            // Validate size and type
+            if ($file->getSize() > 8 * 1024 * 1024) {
+                continue; // skip oversized files
+            }
+
+            $allowedMimes = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
+            if (!in_array($file->getMimeType(), $allowedMimes)) {
+                continue; // skip non-image files
+            }
+
+            try {
+                $fileArray = [
+                    'name'     => $file->getClientOriginalName(),
+                    'type'     => $file->getMimeType(),
+                    'tmp_name' => $file->getRealPath(),
+                    'error'    => UPLOAD_ERR_OK,
+                    'size'     => $file->getSize(),
+                ];
+
+                $imageUrl = \App\Core\ImageUploader::upload($fileArray);
+                $maxSortOrder++;
+
+                $listingImage = ListingImage::create([
+                    'tenant_id'  => $tenantId,
+                    'listing_id' => $id,
+                    'image_url'  => $imageUrl,
+                    'sort_order' => $maxSortOrder,
+                    'alt_text'   => null,
+                ]);
+
+                $createdImages[] = [
+                    'id'         => $listingImage->id,
+                    'url'        => $listingImage->image_url,
+                    'sort_order' => $listingImage->sort_order,
+                    'alt_text'   => $listingImage->alt_text,
+                ];
+            } catch (\Exception $e) {
+                \Log::warning('Multi-image upload: one file failed', ['error' => $e->getMessage()]);
+            }
+        }
+
+        // Update listing.image_url to the first image (backward compat)
+        $firstImage = ListingImage::where('listing_id', $id)
+            ->orderBy('sort_order')
+            ->first();
+
+        if ($firstImage) {
+            $this->listingService->update($id, ['image_url' => $firstImage->image_url]);
+        }
+
+        return $this->respondWithData($createdImages, null, 201);
+    }
+
+    // -----------------------------------------------------------------
+    //  DELETE /api/v2/listings/{id}/images/{imageId}
+    // -----------------------------------------------------------------
+
+    /**
+     * Delete a specific image from a listing.
+     * If the deleted image was listing.image_url, updates to the next image or null.
+     */
+    public function deleteListingImage(int $id, int $imageId): JsonResponse
+    {
+        $userId = $this->requireAuth();
+
+        $listing = $this->listingService->getById($id);
+        if (!$listing) {
+            return $this->respondWithError('NOT_FOUND', __('api.listing_not_found'), null, 404);
+        }
+
+        if (!$this->listingService->canModify($listing, $userId)) {
+            return $this->respondWithError('FORBIDDEN', __('api.listing_modify_forbidden'), null, 403);
+        }
+
+        $image = ListingImage::where('listing_id', $id)
+            ->where('id', $imageId)
+            ->first();
+
+        if (!$image) {
+            return $this->respondWithError('NOT_FOUND', 'Image not found.', null, 404);
+        }
+
+        $deletedUrl = $image->image_url;
+        $image->delete();
+
+        // If the deleted image was the listing's primary image, update to next or null
+        if (($listing['image_url'] ?? null) === $deletedUrl) {
+            $nextImage = ListingImage::where('listing_id', $id)
+                ->orderBy('sort_order')
+                ->first();
+            $this->listingService->update($id, [
+                'image_url' => $nextImage ? $nextImage->image_url : null,
+            ]);
+        }
+
+        // Return remaining images
+        $remaining = ListingImage::where('listing_id', $id)
+            ->orderBy('sort_order')
+            ->get()
+            ->map(fn($img) => [
+                'id'         => $img->id,
+                'url'        => $img->image_url,
+                'sort_order' => $img->sort_order,
+                'alt_text'   => $img->alt_text,
+            ])->values()->toArray();
+
+        return $this->respondWithData($remaining);
+    }
+
+    // -----------------------------------------------------------------
+    //  PUT /api/v2/listings/{id}/images/reorder
+    // -----------------------------------------------------------------
+
+    /**
+     * Reorder images for a listing.
+     * Accepts { "image_ids": [3, 1, 2] } — array of image IDs in desired order.
+     */
+    public function reorderImages(int $id): JsonResponse
+    {
+        $userId = $this->requireAuth();
+
+        $listing = $this->listingService->getById($id);
+        if (!$listing) {
+            return $this->respondWithError('NOT_FOUND', __('api.listing_not_found'), null, 404);
+        }
+
+        if (!$this->listingService->canModify($listing, $userId)) {
+            return $this->respondWithError('FORBIDDEN', __('api.listing_modify_forbidden'), null, 403);
+        }
+
+        $data = $this->getAllInput();
+        $imageIds = $data['image_ids'] ?? [];
+
+        if (!is_array($imageIds) || empty($imageIds)) {
+            return $this->respondWithError('VALIDATION_ERROR', 'image_ids must be a non-empty array.', 'image_ids', 400);
+        }
+
+        // Verify all IDs belong to this listing
+        $existingIds = ListingImage::where('listing_id', $id)
+            ->pluck('id')
+            ->toArray();
+
+        foreach ($imageIds as $imgId) {
+            if (!in_array((int) $imgId, $existingIds)) {
+                return $this->respondWithError('VALIDATION_ERROR', "Image ID {$imgId} does not belong to this listing.", 'image_ids', 422);
+            }
+        }
+
+        // Update sort_order
+        foreach ($imageIds as $index => $imgId) {
+            ListingImage::where('id', (int) $imgId)
+                ->where('listing_id', $id)
+                ->update(['sort_order' => $index]);
+        }
+
+        // Update listing.image_url to the first image
+        $firstImage = ListingImage::where('listing_id', $id)
+            ->orderBy('sort_order')
+            ->first();
+
+        if ($firstImage) {
+            $this->listingService->update($id, ['image_url' => $firstImage->image_url]);
+        }
+
+        // Return reordered images
+        $images = ListingImage::where('listing_id', $id)
+            ->orderBy('sort_order')
+            ->get()
+            ->map(fn($img) => [
+                'id'         => $img->id,
+                'url'        => $img->image_url,
+                'sort_order' => $img->sort_order,
+                'alt_text'   => $img->alt_text,
+            ])->values()->toArray();
+
+        return $this->respondWithData($images);
+    }
+
+    // -----------------------------------------------------------------
+    //  POST /api/v2/listings/generate-description
+    // -----------------------------------------------------------------
+
+    /**
+     * Generate a listing description using AI.
+     *
+     * Body: title (required), category (optional), type (optional), notes (optional).
+     * Rate limited to 5 per minute per user.
+     */
+    public function generateDescription(): JsonResponse
+    {
+        $userId = $this->requireAuth();
+        $this->rateLimit('listing_ai_generate', 5, 60);
+
+        $title = trim($this->input('title', ''));
+        $category = trim($this->input('category', ''));
+        $type = $this->input('type', 'offer');
+        $notes = trim($this->input('notes', ''));
+
+        if (empty($title)) {
+            return $this->respondWithError('VALIDATION_REQUIRED_FIELD', __('api.title_required'), 'title', 422);
+        }
+
+        $typeLabel = $type === 'request'
+            ? 'Service being requested'
+            : 'Service being offered';
+
+        $prompt = "You are helping a member of a community timebank write a listing description. "
+            . "Timebanks are where community members exchange services for time credits (1 hour = 1 credit). "
+            . "Write a friendly, clear description for this listing:\n\n"
+            . "Type: {$typeLabel}\n"
+            . "Title: {$title}\n"
+            . ($category !== '' ? "Category: {$category}\n" : '')
+            . ($notes !== '' ? "Additional context from the member: {$notes}\n" : '')
+            . "\nWrite 2-3 short paragraphs. Be warm and community-focused. "
+            . "Mention what the person will get from this exchange. Keep it under 200 words. "
+            . "Do not use markdown formatting. Do not include a title heading — just the description body.";
+
+        $result = $this->aiService->chat(0, $prompt, [
+            'system_prompt' => 'You are a friendly community writing assistant for a timebanking platform. Write clear, inclusive, and welcoming listing descriptions.',
+            'max_tokens' => 512,
+            'model' => 'gpt-4o-mini',
+        ]);
+
+        if (!empty($result['error'])) {
+            return $this->respondWithError('AI_SERVICE_ERROR', $result['reply'] ?? 'Could not generate description.', null, 503);
+        }
+
+        return $this->respondWithData(['description' => $result['reply']]);
     }
 }

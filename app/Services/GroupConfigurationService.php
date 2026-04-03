@@ -45,6 +45,25 @@ class GroupConfigurationService
     public const CONFIG_MAX_DESCRIPTION_LENGTH = 'max_description_length';
 
     // =========================================================================
+    // Tab visibility keys — control which tabs appear in group detail view
+    // =========================================================================
+
+    public const CONFIG_TAB_FEED = 'tab_feed';
+    public const CONFIG_TAB_DISCUSSION = 'tab_discussion';
+    public const CONFIG_TAB_MEMBERS = 'tab_members';
+    public const CONFIG_TAB_EVENTS = 'tab_events';
+    public const CONFIG_TAB_FILES = 'tab_files';
+    public const CONFIG_TAB_ANNOUNCEMENTS = 'tab_announcements';
+    public const CONFIG_TAB_QA = 'tab_qa';
+    public const CONFIG_TAB_WIKI = 'tab_wiki';
+    public const CONFIG_TAB_MEDIA = 'tab_media';
+    public const CONFIG_TAB_CHATROOMS = 'tab_chatrooms';
+    public const CONFIG_TAB_TASKS = 'tab_tasks';
+    public const CONFIG_TAB_CHALLENGES = 'tab_challenges';
+    public const CONFIG_TAB_ANALYTICS = 'tab_analytics';
+    public const CONFIG_TAB_SUBGROUPS = 'tab_subgroups';
+
+    // =========================================================================
     // Default values
     // =========================================================================
 
@@ -63,6 +82,21 @@ class GroupConfigurationService
         self::CONFIG_PROFANITY_FILTER_ENABLED   => false,
         self::CONFIG_MIN_DESCRIPTION_LENGTH     => 10,
         self::CONFIG_MAX_DESCRIPTION_LENGTH     => 5000,
+        // Tab visibility (all enabled by default)
+        self::CONFIG_TAB_FEED           => true,
+        self::CONFIG_TAB_DISCUSSION     => true,
+        self::CONFIG_TAB_MEMBERS        => true,
+        self::CONFIG_TAB_EVENTS         => true,
+        self::CONFIG_TAB_FILES          => true,
+        self::CONFIG_TAB_ANNOUNCEMENTS  => true,
+        self::CONFIG_TAB_QA             => true,
+        self::CONFIG_TAB_WIKI           => true,
+        self::CONFIG_TAB_MEDIA          => true,
+        self::CONFIG_TAB_CHATROOMS      => true,
+        self::CONFIG_TAB_TASKS          => true,
+        self::CONFIG_TAB_CHALLENGES     => true,
+        self::CONFIG_TAB_ANALYTICS      => true,
+        self::CONFIG_TAB_SUBGROUPS      => true,
     ];
 
     /** Cache TTL in seconds (1 hour). */
@@ -284,6 +318,21 @@ class GroupConfigurationService
 
             self::CONFIG_MIN_DESCRIPTION_LENGTH,
             self::CONFIG_MAX_DESCRIPTION_LENGTH       => 'content',
+
+            self::CONFIG_TAB_FEED,
+            self::CONFIG_TAB_DISCUSSION,
+            self::CONFIG_TAB_MEMBERS,
+            self::CONFIG_TAB_EVENTS,
+            self::CONFIG_TAB_FILES,
+            self::CONFIG_TAB_ANNOUNCEMENTS,
+            self::CONFIG_TAB_QA,
+            self::CONFIG_TAB_WIKI,
+            self::CONFIG_TAB_MEDIA,
+            self::CONFIG_TAB_CHATROOMS,
+            self::CONFIG_TAB_TASKS,
+            self::CONFIG_TAB_CHALLENGES,
+            self::CONFIG_TAB_ANALYTICS,
+            self::CONFIG_TAB_SUBGROUPS                => 'tabs',
 
             default                                   => 'features',
         };

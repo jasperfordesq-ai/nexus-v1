@@ -292,6 +292,62 @@ export const adminConfig = {
       '/v2/admin/config/languages',
       config
     ),
+
+  getGroupConfig: () =>
+    api.get<{ config: Record<string, boolean | number | string>; defaults: Record<string, boolean | number | string> }>(
+      '/v2/admin/config/groups'
+    ),
+
+  updateGroupConfig: (key: string, value: boolean | number | string) =>
+    api.put<{ key: string; value: boolean | number | string }>(
+      '/v2/admin/config/groups',
+      { key, value }
+    ),
+
+  updateGroupConfigBulk: (settings: Record<string, boolean | number | string>) =>
+    api.put<{ updated: Record<string, boolean | number | string> }>(
+      '/v2/admin/config/groups/bulk',
+      { settings }
+    ),
+
+  getListingConfig: () =>
+    api.get<{ config: Record<string, boolean | number | string>; defaults: Record<string, boolean | number | string> }>(
+      '/v2/admin/config/listings'
+    ),
+
+  updateListingConfig: (key: string, value: boolean | number | string) =>
+    api.put<{ key: string; value: boolean | number | string }>(
+      '/v2/admin/config/listings',
+      { key, value }
+    ),
+
+  updateListingConfigBulk: (settings: Record<string, boolean | number | string>) =>
+    api.put<{ updated: Record<string, boolean | number | string> }>(
+      '/v2/admin/config/listings/bulk',
+      { settings }
+    ),
+
+  getVolunteeringConfig: () =>
+    api.get<{ config: Record<string, boolean | number | string>; defaults: Record<string, boolean | number | string> }>(
+      '/v2/admin/config/volunteering'
+    ),
+
+  updateVolunteeringConfigBulk: (settings: Record<string, boolean | number | string>) =>
+    api.put<{ updated: Record<string, boolean | number | string> }>(
+      '/v2/admin/config/volunteering/bulk',
+      { settings }
+    ),
+
+  getJobConfig: () =>
+    api.get<{ config: Record<string, boolean | number | string>; defaults: Record<string, boolean | number | string> }>(
+      '/v2/admin/config/jobs'
+    ),
+
+  updateJobConfigBulk: (settings: Record<string, boolean | number | string>) =>
+    api.put<{ updated: Record<string, boolean | number | string> }>(
+      '/v2/admin/config/jobs/bulk',
+      { settings }
+    ),
 };
 
 // ─────────────────────────────────────────────────────────────────────────────

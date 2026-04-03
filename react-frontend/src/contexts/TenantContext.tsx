@@ -33,7 +33,7 @@ import { detectTenantFromUrl, tenantPath as buildTenantPath } from '@/lib/tenant
 import { validateResponseIfPresent } from '@/lib/api-validation';
 import { tenantBootstrapSchema } from '@/lib/api-schemas';
 import { setSentryTenant } from '@/lib/sentry';
-import type { TenantConfig, TenantFeatures, TenantModules, TenantBranding } from '@/types';
+import type { TenantConfig, TenantFeatures, TenantModules, TenantBranding, GroupTabConfig, ListingConfig, VolunteeringConfig, JobConfig } from '@/types';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Types
@@ -51,8 +51,13 @@ interface TenantContextValue extends TenantState {
   features: TenantFeatures;
   modules: TenantModules;
   branding: TenantBranding;
+  groupTabs: GroupTabConfig;
+  listingConfig: ListingConfig;
+  volunteeringConfig: VolunteeringConfig;
+  jobConfig: JobConfig;
   hasFeature: (feature: keyof TenantFeatures) => boolean;
   hasModule: (module: keyof TenantModules) => boolean;
+  hasGroupTab: (tab: keyof GroupTabConfig) => boolean;
   refreshTenant: () => Promise<void>;
   /** The current tenant slug from URL (path or subdomain). Null if no slug in URL. */
   tenantSlug: string | null;
@@ -97,6 +102,131 @@ const defaultModules: TenantModules = {
   profile: true,
   settings: true,
   dashboard: true,
+};
+
+// Default group tab visibility — all enabled
+const defaultGroupTabs: GroupTabConfig = {
+  tab_feed: true,
+  tab_discussion: true,
+  tab_members: true,
+  tab_events: true,
+  tab_files: true,
+  tab_announcements: true,
+  tab_qa: true,
+  tab_wiki: true,
+  tab_media: true,
+  tab_chatrooms: true,
+  tab_tasks: true,
+  tab_challenges: true,
+  tab_analytics: true,
+  tab_subgroups: true,
+};
+
+// Default listing config — all features enabled, sensible limits
+const defaultListingConfig: ListingConfig = {
+  'listing.moderation_enabled': false,
+  'listing.auto_approve_trusted': false,
+  'listing.max_per_user': 50,
+  'listing.max_images': 5,
+  'listing.max_image_size_mb': 8,
+  'listing.require_image': false,
+  'listing.min_title_length': 5,
+  'listing.min_description_length': 20,
+  'listing.allow_offers': true,
+  'listing.allow_requests': true,
+  'listing.require_category': true,
+  'listing.require_location': false,
+  'listing.require_hours_estimate': false,
+  'listing.enable_skill_tags': true,
+  'listing.enable_service_type': true,
+  'listing.auto_expire_days': 0,
+  'listing.max_renewals': 12,
+  'listing.renewal_days': 30,
+  'listing.expiry_reminders': true,
+  'listing.enable_featured': true,
+  'listing.featured_duration_days': 7,
+  'listing.enable_ai_descriptions': true,
+  'listing.enable_reporting': true,
+  'listing.enable_favourites': true,
+  'listing.enable_map_view': true,
+  'listing.enable_reciprocity': true,
+};
+
+// Default volunteering config — all tabs enabled, sensible defaults
+const defaultVolunteeringConfig: VolunteeringConfig = {
+  'volunteering.tab_opportunities': true,
+  'volunteering.tab_applications': true,
+  'volunteering.tab_hours': true,
+  'volunteering.tab_recommended': true,
+  'volunteering.tab_certificates': true,
+  'volunteering.tab_alerts': true,
+  'volunteering.tab_wellbeing': true,
+  'volunteering.tab_credentials': true,
+  'volunteering.tab_waitlist': true,
+  'volunteering.tab_swaps': true,
+  'volunteering.tab_group_signups': true,
+  'volunteering.tab_hours_review': true,
+  'volunteering.tab_expenses': true,
+  'volunteering.tab_safeguarding': true,
+  'volunteering.tab_community_projects': true,
+  'volunteering.tab_donations': true,
+  'volunteering.tab_accessibility': true,
+  'volunteering.swap_requires_admin': false,
+  'volunteering.auto_approve_applications': false,
+  'volunteering.require_org_note_on_decline': false,
+  'volunteering.cancellation_deadline_hours': 24,
+  'volunteering.max_hours_per_shift': 8,
+  'volunteering.hours_require_verification': true,
+  'volunteering.min_hours_for_certificate': 1,
+  'volunteering.alert_default_expiry_hours': 24,
+  'volunteering.alert_skill_matching': true,
+  'volunteering.expenses_enabled': true,
+  'volunteering.expense_require_receipt': false,
+  'volunteering.expense_max_amount': 500,
+  'volunteering.burnout_detection': true,
+  'volunteering.guardian_consent_required': false,
+  'volunteering.enable_qr_checkin': true,
+  'volunteering.enable_recurring_shifts': true,
+  'volunteering.enable_reviews': true,
+  'volunteering.enable_matching': true,
+};
+
+// Default job config
+const defaultJobConfig: JobConfig = {
+  'jobs.tab_browse': true,
+  'jobs.tab_saved': true,
+  'jobs.tab_my_postings': true,
+  'jobs.page_kanban': true,
+  'jobs.page_analytics': true,
+  'jobs.page_bias_audit': true,
+  'jobs.page_talent_search': true,
+  'jobs.page_alerts': true,
+  'jobs.allow_paid': true,
+  'jobs.allow_volunteer': true,
+  'jobs.allow_timebank': true,
+  'jobs.require_salary': false,
+  'jobs.default_currency': 'EUR',
+  'jobs.max_postings_per_user': 20,
+  'jobs.default_deadline_days': 30,
+  'jobs.moderation_enabled': false,
+  'jobs.spam_detection': true,
+  'jobs.auto_approve_trusted': false,
+  'jobs.enable_cv_upload': true,
+  'jobs.require_cover_message': false,
+  'jobs.enable_interview_scheduling': true,
+  'jobs.enable_offers': true,
+  'jobs.enable_scorecards': true,
+  'jobs.enable_pipeline_rules': true,
+  'jobs.enable_blind_hiring': false,
+  'jobs.enable_featured': true,
+  'jobs.featured_duration_days': 7,
+  'jobs.enable_ai_descriptions': true,
+  'jobs.enable_skills_matching': true,
+  'jobs.enable_referrals': true,
+  'jobs.enable_templates': true,
+  'jobs.enable_rss_feed': true,
+  'jobs.enable_saved_profiles': true,
+  'jobs.enable_employer_branding': true,
 };
 
 // Default branding
@@ -271,6 +401,46 @@ export function TenantProvider({ children, tenantSlug }: TenantProviderProps) {
   }, [state.tenant]);
 
   /**
+   * Get listing config with fallback to defaults
+   */
+  const listingConfig = useMemo<ListingConfig>(() => {
+    if (!state.tenant?.listing_config) {
+      return defaultListingConfig;
+    }
+    return { ...defaultListingConfig, ...state.tenant.listing_config };
+  }, [state.tenant?.listing_config]);
+
+  /**
+   * Get job config with fallback to defaults
+   */
+  const jobConfig = useMemo<JobConfig>(() => {
+    if (!state.tenant?.job_config) {
+      return defaultJobConfig;
+    }
+    return { ...defaultJobConfig, ...state.tenant.job_config };
+  }, [state.tenant?.job_config]);
+
+  /**
+   * Get volunteering config with fallback to defaults
+   */
+  const volunteeringConfig = useMemo<VolunteeringConfig>(() => {
+    if (!state.tenant?.volunteering_config) {
+      return defaultVolunteeringConfig;
+    }
+    return { ...defaultVolunteeringConfig, ...state.tenant.volunteering_config };
+  }, [state.tenant?.volunteering_config]);
+
+  /**
+   * Get group tab config with fallback to defaults (all enabled)
+   */
+  const groupTabs = useMemo<GroupTabConfig>(() => {
+    if (!state.tenant?.group_tabs) {
+      return defaultGroupTabs;
+    }
+    return { ...defaultGroupTabs, ...state.tenant.group_tabs };
+  }, [state.tenant?.group_tabs]);
+
+  /**
    * Check if feature is enabled
    */
   const hasFeature = useCallback((feature: keyof TenantFeatures): boolean => {
@@ -283,6 +453,13 @@ export function TenantProvider({ children, tenantSlug }: TenantProviderProps) {
   const hasModule = useCallback((module: keyof TenantModules): boolean => {
     return modules[module] ?? false;
   }, [modules]);
+
+  /**
+   * Check if a group tab is enabled
+   */
+  const hasGroupTab = useCallback((tab: keyof GroupTabConfig): boolean => {
+    return groupTabs[tab] ?? true;
+  }, [groupTabs]);
 
   /**
    * Build a path with the current tenant slug prefix.
@@ -325,15 +502,20 @@ export function TenantProvider({ children, tenantSlug }: TenantProviderProps) {
       features,
       modules,
       branding,
+      groupTabs,
+      listingConfig,
+      volunteeringConfig,
+      jobConfig,
       hasFeature,
       hasModule,
+      hasGroupTab,
       refreshTenant,
       tenantSlug: effectiveTenantSlug || null,
       tenantPath,
       supportedLanguages,
       defaultLanguage,
     }),
-    [state, features, modules, branding, hasFeature, hasModule, refreshTenant, effectiveTenantSlug, tenantPath, supportedLanguages, defaultLanguage]
+    [state, features, modules, branding, groupTabs, listingConfig, volunteeringConfig, jobConfig, hasFeature, hasModule, hasGroupTab, refreshTenant, effectiveTenantSlug, tenantPath, supportedLanguages, defaultLanguage]
   );
 
   return (

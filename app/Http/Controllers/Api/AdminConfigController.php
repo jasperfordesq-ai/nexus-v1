@@ -8,7 +8,11 @@ namespace App\Http\Controllers\Api;
 
 use App\Services\FederationFeatureService;
 use App\Services\FeedRankingService;
+use App\Services\GroupConfigurationService;
+use App\Services\JobConfigurationService;
+use App\Services\ListingConfigurationService;
 use App\Services\ListingRankingService;
+use App\Services\VolunteeringConfigurationService;
 use App\Services\MemberRankingService;
 use App\Services\RedisCache;
 use App\Services\SearchService;
@@ -1634,5 +1638,275 @@ class AdminConfigController extends BaseApiController
         } catch (\Throwable $e) {
             return null;
         }
+    }
+
+    // =========================================================================
+    // Groups Module Configuration
+    // =========================================================================
+
+    /** GET /api/v2/admin/config/groups */
+    public function getGroupConfig(): JsonResponse
+    {
+        $this->requireAdmin();
+
+        $all = GroupConfigurationService::getAll();
+
+        return $this->respondWithData([
+            'config' => $all,
+            'defaults' => GroupConfigurationService::DEFAULTS,
+        ]);
+    }
+
+    /** PUT /api/v2/admin/config/groups */
+    public function updateGroupConfig(): JsonResponse
+    {
+        $this->requireAdmin();
+        $tenantId = $this->getTenantId();
+
+        $key = $this->input('key');
+        $value = $this->input('value');
+
+        if (!$key || !is_string($key)) {
+            return $this->respondWithError('VALIDATION_ERROR', 'Configuration key is required', 'key', 422);
+        }
+
+        if (!array_key_exists($key, GroupConfigurationService::DEFAULTS)) {
+            return $this->respondWithError('VALIDATION_ERROR', "Unknown configuration key: {$key}", 'key', 422);
+        }
+
+        if ($value === null) {
+            return $this->respondWithError('VALIDATION_ERROR', 'Value is required', 'value', 422);
+        }
+
+        // Type coercion based on default type
+        $defaultValue = GroupConfigurationService::DEFAULTS[$key];
+        if (is_bool($defaultValue)) {
+            $value = filter_var($value, FILTER_VALIDATE_BOOLEAN);
+        } elseif (is_int($defaultValue)) {
+            $value = (int) $value;
+        }
+
+        GroupConfigurationService::set($key, $value);
+
+        // Invalidate bootstrap cache so frontend picks up changes
+        $this->redisCache->delete('tenant_bootstrap', $tenantId);
+
+        return $this->respondWithData([
+            'key' => $key,
+            'value' => $value,
+        ]);
+    }
+
+    /** PUT /api/v2/admin/config/groups/bulk */
+    public function updateGroupConfigBulk(): JsonResponse
+    {
+        $this->requireAdmin();
+        $tenantId = $this->getTenantId();
+
+        $settings = $this->input('settings');
+        if (!is_array($settings) || empty($settings)) {
+            return $this->respondWithError('VALIDATION_ERROR', 'Settings array is required', 'settings', 422);
+        }
+
+        $updated = [];
+        foreach ($settings as $key => $value) {
+            if (!is_string($key) || !array_key_exists($key, GroupConfigurationService::DEFAULTS)) {
+                continue;
+            }
+
+            $defaultValue = GroupConfigurationService::DEFAULTS[$key];
+            if (is_bool($defaultValue)) {
+                $value = filter_var($value, FILTER_VALIDATE_BOOLEAN);
+            } elseif (is_int($defaultValue)) {
+                $value = (int) $value;
+            }
+
+            GroupConfigurationService::set($key, $value);
+            $updated[$key] = $value;
+        }
+
+        $this->redisCache->delete('tenant_bootstrap', $tenantId);
+
+        return $this->respondWithData(['updated' => $updated]);
+    }
+
+    // =========================================================================
+    // Listings Module Configuration
+    // =========================================================================
+
+    /** GET /api/v2/admin/config/listings */
+    public function getListingConfig(): JsonResponse
+    {
+        $this->requireAdmin();
+
+        $all = ListingConfigurationService::getAll();
+
+        return $this->respondWithData([
+            'config' => $all,
+            'defaults' => ListingConfigurationService::DEFAULTS,
+        ]);
+    }
+
+    /** PUT /api/v2/admin/config/listings */
+    public function updateListingConfig(): JsonResponse
+    {
+        $this->requireAdmin();
+        $tenantId = $this->getTenantId();
+
+        $key = $this->input('key');
+        $value = $this->input('value');
+
+        if (!$key || !is_string($key)) {
+            return $this->respondWithError('VALIDATION_ERROR', 'Configuration key is required', 'key', 422);
+        }
+
+        if (!array_key_exists($key, ListingConfigurationService::DEFAULTS)) {
+            return $this->respondWithError('VALIDATION_ERROR', "Unknown configuration key: {$key}", 'key', 422);
+        }
+
+        if ($value === null) {
+            return $this->respondWithError('VALIDATION_ERROR', 'Value is required', 'value', 422);
+        }
+
+        $defaultValue = ListingConfigurationService::DEFAULTS[$key];
+        if (is_bool($defaultValue)) {
+            $value = filter_var($value, FILTER_VALIDATE_BOOLEAN);
+        } elseif (is_int($defaultValue)) {
+            $value = (int) $value;
+        }
+
+        ListingConfigurationService::set($key, $value);
+        $this->redisCache->delete('tenant_bootstrap', $tenantId);
+
+        return $this->respondWithData(['key' => $key, 'value' => $value]);
+    }
+
+    /** PUT /api/v2/admin/config/listings/bulk */
+    public function updateListingConfigBulk(): JsonResponse
+    {
+        $this->requireAdmin();
+        $tenantId = $this->getTenantId();
+
+        $settings = $this->input('settings');
+        if (!is_array($settings) || empty($settings)) {
+            return $this->respondWithError('VALIDATION_ERROR', 'Settings array is required', 'settings', 422);
+        }
+
+        $updated = [];
+        foreach ($settings as $key => $value) {
+            if (!is_string($key) || !array_key_exists($key, ListingConfigurationService::DEFAULTS)) {
+                continue;
+            }
+
+            $defaultValue = ListingConfigurationService::DEFAULTS[$key];
+            if (is_bool($defaultValue)) {
+                $value = filter_var($value, FILTER_VALIDATE_BOOLEAN);
+            } elseif (is_int($defaultValue)) {
+                $value = (int) $value;
+            }
+
+            ListingConfigurationService::set($key, $value);
+            $updated[$key] = $value;
+        }
+
+        $this->redisCache->delete('tenant_bootstrap', $tenantId);
+
+        return $this->respondWithData(['updated' => $updated]);
+    }
+
+    // =========================================================================
+    // Volunteering Module Configuration
+    // =========================================================================
+
+    /** GET /api/v2/admin/config/volunteering */
+    public function getVolunteeringConfig(): JsonResponse
+    {
+        $this->requireAdmin();
+
+        return $this->respondWithData([
+            'config' => VolunteeringConfigurationService::getAll(),
+            'defaults' => VolunteeringConfigurationService::DEFAULTS,
+        ]);
+    }
+
+    /** PUT /api/v2/admin/config/volunteering/bulk */
+    public function updateVolunteeringConfigBulk(): JsonResponse
+    {
+        $this->requireAdmin();
+        $tenantId = $this->getTenantId();
+
+        $settings = $this->input('settings');
+        if (!is_array($settings) || empty($settings)) {
+            return $this->respondWithError('VALIDATION_ERROR', 'Settings array is required', 'settings', 422);
+        }
+
+        $updated = [];
+        foreach ($settings as $key => $value) {
+            if (!is_string($key) || !array_key_exists($key, VolunteeringConfigurationService::DEFAULTS)) {
+                continue;
+            }
+
+            $defaultValue = VolunteeringConfigurationService::DEFAULTS[$key];
+            if (is_bool($defaultValue)) {
+                $value = filter_var($value, FILTER_VALIDATE_BOOLEAN);
+            } elseif (is_int($defaultValue)) {
+                $value = (int) $value;
+            }
+
+            VolunteeringConfigurationService::set($key, $value);
+            $updated[$key] = $value;
+        }
+
+        $this->redisCache->delete('tenant_bootstrap', $tenantId);
+
+        return $this->respondWithData(['updated' => $updated]);
+    }
+
+    // =========================================================================
+    // Jobs Module Configuration
+    // =========================================================================
+
+    /** GET /api/v2/admin/config/jobs */
+    public function getJobConfig(): JsonResponse
+    {
+        $this->requireAdmin();
+
+        return $this->respondWithData([
+            'config' => JobConfigurationService::getAll(),
+            'defaults' => JobConfigurationService::DEFAULTS,
+        ]);
+    }
+
+    /** PUT /api/v2/admin/config/jobs/bulk */
+    public function updateJobConfigBulk(): JsonResponse
+    {
+        $this->requireAdmin();
+        $tenantId = $this->getTenantId();
+
+        $settings = $this->input('settings');
+        if (!is_array($settings) || empty($settings)) {
+            return $this->respondWithError('VALIDATION_ERROR', 'Settings array is required', 'settings', 422);
+        }
+
+        $updated = [];
+        foreach ($settings as $key => $value) {
+            if (!is_string($key) || !array_key_exists($key, JobConfigurationService::DEFAULTS)) {
+                continue;
+            }
+
+            $defaultValue = JobConfigurationService::DEFAULTS[$key];
+            if (is_bool($defaultValue)) {
+                $value = filter_var($value, FILTER_VALIDATE_BOOLEAN);
+            } elseif (is_int($defaultValue)) {
+                $value = (int) $value;
+            }
+
+            JobConfigurationService::set($key, $value);
+            $updated[$key] = $value;
+        }
+
+        $this->redisCache->delete('tenant_bootstrap', $tenantId);
+
+        return $this->respondWithData(['updated' => $updated]);
     }
 }

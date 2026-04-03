@@ -120,7 +120,7 @@ export function JobsPage() {
   const { t } = useTranslation('jobs');
   usePageTitle(t('title'));
   const { isAuthenticated } = useAuth();
-  const { tenantPath, hasFeature } = useTenant();
+  const { tenantPath, hasFeature, jobConfig } = useTenant();
   const toast = useToast();
   const [searchParams, setSearchParams] = useSearchParams();
 
@@ -367,33 +367,39 @@ export function JobsPage() {
             cursor: 'bg-primary',
           }}
         >
-          <Tab
-            key="browse"
-            title={
-              <span className="flex items-center gap-2">
-                <Briefcase className="w-4 h-4" aria-hidden="true" />
-                {t('title')}
-              </span>
-            }
-          />
-          <Tab
-            key="saved"
-            title={
-              <span className="flex items-center gap-2">
-                <Bookmark className="w-4 h-4" aria-hidden="true" />
-                {t('saved.title')}
-              </span>
-            }
-          />
-          <Tab
-            key="my-postings"
-            title={
-              <span className="flex items-center gap-2">
-                <Briefcase className="w-4 h-4" aria-hidden="true" />
-                {t('my_postings.title', 'My Postings')}
-              </span>
-            }
-          />
+          {jobConfig['jobs.tab_browse'] !== false && (
+            <Tab
+              key="browse"
+              title={
+                <span className="flex items-center gap-2">
+                  <Briefcase className="w-4 h-4" aria-hidden="true" />
+                  {t('title')}
+                </span>
+              }
+            />
+          )}
+          {jobConfig['jobs.tab_saved'] !== false && (
+            <Tab
+              key="saved"
+              title={
+                <span className="flex items-center gap-2">
+                  <Bookmark className="w-4 h-4" aria-hidden="true" />
+                  {t('saved.title')}
+                </span>
+              }
+            />
+          )}
+          {jobConfig['jobs.tab_my_postings'] !== false && (
+            <Tab
+              key="my-postings"
+              title={
+                <span className="flex items-center gap-2">
+                  <Briefcase className="w-4 h-4" aria-hidden="true" />
+                  {t('my_postings.title', 'My Postings')}
+                </span>
+              }
+            />
+          )}
         </Tabs>
       )}
 

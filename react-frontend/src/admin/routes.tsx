@@ -18,6 +18,7 @@ import { SuperAdminRoute } from './SuperAdminRoute';
 const AdminDashboard = lazy(() => import('./modules/dashboard/AdminDashboard'));
 const UserList = lazy(() => import('./modules/users/UserList'));
 const TenantFeatures = lazy(() => import('./modules/config/TenantFeatures'));
+const ModuleConfiguration = lazy(() => import('./modules/config/ModuleConfiguration'));
 const UserCreate = lazy(() => import('./modules/users/UserCreate'));
 const UserEdit = lazy(() => import('./modules/users/UserEdit'));
 const ListingsAdmin = lazy(() => import('./modules/listings/ListingsAdmin'));
@@ -446,6 +447,7 @@ export function AdminRoutes() {
       <Route path="settings/registration-policy" element={<Lazy><RegistrationPolicySettings /></Lazy>} />
       <Route path="onboarding-settings" element={<Lazy><OnboardingSettings /></Lazy>} />
       <Route path="tenant-features" element={<Lazy><TenantFeatures /></Lazy>} />
+      <Route path="module-configuration" element={<Lazy><ModuleConfiguration /></Lazy>} />
       <Route path="cron-jobs" element={<Lazy><CronJobs /></Lazy>} />
       <Route path="cron-jobs/logs" element={<Lazy><CronJobLogs /></Lazy>} />
       <Route path="cron-jobs/settings" element={<Lazy><CronJobSettings /></Lazy>} />

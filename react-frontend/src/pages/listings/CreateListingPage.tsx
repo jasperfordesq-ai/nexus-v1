@@ -20,6 +20,12 @@ import {
   CheckCircle,
   ImagePlus,
   X,
+  MapPin,
+  Monitor,
+  ArrowRightLeft,
+  HelpCircle,
+  Sparkles,
+  Info,
 } from 'lucide-react';
 import { PlaceAutocompleteInput } from '@/components/location';
 import { SkillTagsInput } from '@/components/listings/SkillTagsInput';
@@ -37,18 +43,23 @@ interface FormData {
   title: string;
   description: string;
   type: 'offer' | 'request';
+  service_type: 'physical_only' | 'remote_only' | 'hybrid' | 'location_dependent';
   category_id: string;
   hours_estimate: string;
   location: string;
   latitude?: number;
   longitude?: number;
   skill_tags: string[];
+  experience_level?: string;
+  equipment_provided?: string;
+  accessibility_notes?: string;
 }
 
 const initialFormData: FormData = {
   title: '',
   description: '',
   type: 'offer',
+  service_type: 'hybrid',
   category_id: '',
   hours_estimate: '1',
   location: '',
@@ -60,7 +71,7 @@ export function CreateListingPage() {
   usePageTitle(t('create'));
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const { tenantPath } = useTenant();
+  const { tenantPath, listingConfig } = useTenant();
   const toast = useToast();
   const isEditing = !!id;
 
@@ -73,6 +84,7 @@ export function CreateListingPage() {
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [existingImageUrl, setExistingImageUrl] = useState<string | null>(null);
   const [removeExistingImage, setRemoveExistingImage] = useState(false);
+  const [isGenerating, setIsGenerating] = useState(false);
 
   // Cleanup object URL on unmount or when preview changes
   useEffect(() => {
@@ -105,6 +117,7 @@ export function CreateListingPage() {
             title: listing.title,
             description: listing.description,
             type: listing.type,
+            service_type: listing.service_type || 'hybrid',
             category_id: listing.category_id?.toString() || '',
             hours_estimate: (listing.hours_estimate ?? listing.estimated_hours ?? 1).toString(),
             location: listing.location || '',
@@ -132,25 +145,29 @@ export function CreateListingPage() {
 
   function validateForm(): boolean {
     const newErrors: Partial<Record<keyof FormData, string>> = {};
+    const minTitle = listingConfig['listing.min_title_length'] || 5;
+    const minDesc = listingConfig['listing.min_description_length'] || 20;
 
     if (!formData.title.trim()) {
       newErrors.title = t('form.title_required');
-    } else if (formData.title.length < 5) {
+    } else if (formData.title.length < minTitle) {
       newErrors.title = t('form.title_min_length');
     }
 
     if (!formData.description.trim()) {
       newErrors.description = t('form.description_required');
-    } else if (formData.description.length < 20) {
+    } else if (formData.description.length < minDesc) {
       newErrors.description = t('form.description_min_length');
     }
 
-    if (!formData.category_id) {
+    if (listingConfig['listing.require_category'] && !formData.category_id) {
       newErrors.category_id = t('form.category_required');
     }
 
     const hours = parseFloat(formData.hours_estimate);
-    if (isNaN(hours) || hours < 0.5 || hours > 100) {
+    if (listingConfig['listing.require_hours_estimate'] && (isNaN(hours) || hours < 0.5 || hours > 100)) {
+      newErrors.hours_estimate = t('form.hours_range');
+    } else if (formData.hours_estimate && (isNaN(hours) || hours < 0.5 || hours > 100)) {
       newErrors.hours_estimate = t('form.hours_range');
     }
 
@@ -166,10 +183,42 @@ export function CreateListingPage() {
     try {
       setIsSubmitting(true);
 
+      // Build enriched description with optional structured details
+      let enrichedDescription = formData.description;
+      const details: string[] = [];
+      if (formData.experience_level) {
+        const labels: Record<string, string> = {
+          beginner_friendly: 'Beginner-friendly (anyone can learn)',
+          some_experience: 'Some experience helpful',
+          experienced: 'Experienced practitioner',
+          professional: 'Professional / certified',
+        };
+        details.push(`Experience: ${labels[formData.experience_level] || formData.experience_level}`);
+      }
+      if (formData.equipment_provided) {
+        const labels: Record<string, string> = {
+          provided: 'Equipment provided',
+          partial: 'Some equipment needed from you',
+          bring_own: 'Bring your own equipment',
+          not_applicable: 'N/A',
+        };
+        details.push(`Equipment: ${labels[formData.equipment_provided] || formData.equipment_provided}`);
+      }
+      if (formData.accessibility_notes) {
+        details.push(`Accessibility: ${formData.accessibility_notes}`);
+      }
+      if (details.length > 0) {
+        enrichedDescription += '\n\n---\n' + details.join('\n');
+      }
+
+      // Strip frontend-only structured fields from the API payload
+      const { experience_level: _el, equipment_provided: _ep, accessibility_notes: _an, ...rest } = formData;
       const payload = {
-        ...formData,
+        ...rest,
+        description: enrichedDescription,
         category_id: parseInt(formData.category_id),
         hours_estimate: parseFloat(formData.hours_estimate),
+        service_type: formData.service_type,
         skill_tags: formData.skill_tags,
       };
 
@@ -212,6 +261,32 @@ export function CreateListingPage() {
     setFormData((prev) => ({ ...prev, [field]: value }));
     if (errors[field]) {
       setErrors((prev) => ({ ...prev, [field]: undefined }));
+    }
+  }
+
+  async function handleGenerateDescription() {
+    if (!formData.title.trim()) return;
+    setIsGenerating(true);
+    try {
+      const categoryName = categories.find((c) => c.id.toString() === formData.category_id)?.name || '';
+      const response = await api.post<{ description: string }>('/v2/listings/generate-description', {
+        title: formData.title,
+        category: categoryName,
+        type: formData.type,
+        notes: formData.description, // Use existing description as context
+      });
+      if (response.success && response.data) {
+        const desc = ((response.data as Record<string, unknown>)?.description ?? '') as string;
+        if (desc) {
+          updateField('description', desc);
+          toast.success(t('form.ai_generated', 'Description generated! Feel free to edit it.'));
+        }
+      }
+    } catch (error) {
+      logError('Failed to generate description', error);
+      toast.error(t('form.ai_generate_failed', 'Could not generate description. Please write one manually.'));
+    } finally {
+      setIsGenerating(false);
     }
   }
 
@@ -311,6 +386,169 @@ export function CreateListingPage() {
                 label: 'text-theme-muted',
               }}
             />
+            <div className="flex items-center gap-2 mt-2">
+              <Button
+                size="sm"
+                variant="flat"
+                className="bg-theme-elevated text-theme-primary"
+                startContent={<Sparkles className="w-3.5 h-3.5" />}
+                onPress={handleGenerateDescription}
+                isLoading={isGenerating}
+                isDisabled={!formData.title.trim() || isGenerating}
+              >
+                {isGenerating
+                  ? t('form.ai_generating', 'Generating...')
+                  : t('form.ai_help_write', 'Help me write this')}
+              </Button>
+              {!formData.title.trim() && (
+                <span className="text-xs text-theme-subtle">
+                  {t('form.ai_enter_title_first', 'Enter a title first')}
+                </span>
+              )}
+            </div>
+          </div>
+
+          {/* Optional Service Details */}
+          <details className="group">
+            <summary className="cursor-pointer text-sm font-medium text-theme-muted hover:text-theme-primary flex items-center gap-2 select-none">
+              <Info className="w-4 h-4" />
+              {t('form.service_details_toggle', 'Add more details about your service (optional)')}
+            </summary>
+            <div className="mt-3 space-y-4 pl-6">
+              {/* Experience Level */}
+              <Select
+                label={t('form.experience_label', 'Experience Level')}
+                placeholder={t('form.experience_placeholder', 'How experienced are you?')}
+                selectedKeys={formData.experience_level ? [formData.experience_level] : []}
+                onChange={(e) => updateField('experience_level', e.target.value)}
+                classNames={{
+                  trigger: 'bg-theme-elevated border-theme-default',
+                  value: 'text-theme-primary',
+                  label: 'text-theme-muted',
+                }}
+              >
+                <SelectItem key="beginner_friendly">
+                  {t('form.experience_beginner', 'Beginner-friendly (anyone can learn)')}
+                </SelectItem>
+                <SelectItem key="some_experience">
+                  {t('form.experience_some', 'Some experience helpful')}
+                </SelectItem>
+                <SelectItem key="experienced">
+                  {t('form.experience_experienced', 'Experienced practitioner')}
+                </SelectItem>
+                <SelectItem key="professional">
+                  {t('form.experience_professional', 'Professional / certified')}
+                </SelectItem>
+              </Select>
+
+              {/* Equipment/Tools */}
+              <Select
+                label={t('form.equipment_label', 'Equipment / Tools')}
+                placeholder={t('form.equipment_placeholder', 'Do you provide what\'s needed?')}
+                selectedKeys={formData.equipment_provided ? [formData.equipment_provided] : []}
+                onChange={(e) => updateField('equipment_provided', e.target.value)}
+                classNames={{
+                  trigger: 'bg-theme-elevated border-theme-default',
+                  value: 'text-theme-primary',
+                  label: 'text-theme-muted',
+                }}
+              >
+                <SelectItem key="provided">
+                  {t('form.equipment_provided_option', 'I\'ll provide everything needed')}
+                </SelectItem>
+                <SelectItem key="partial">
+                  {t('form.equipment_partial', 'Some things needed from you')}
+                </SelectItem>
+                <SelectItem key="bring_own">
+                  {t('form.equipment_bring_own', 'You\'ll need to provide your own')}
+                </SelectItem>
+                <SelectItem key="not_applicable">
+                  {t('form.equipment_na', 'Not applicable')}
+                </SelectItem>
+              </Select>
+
+              {/* Accessibility Notes */}
+              <Input
+                label={t('form.accessibility_label', 'Accessibility Notes')}
+                placeholder={t('form.accessibility_placeholder', 'e.g., Wheelchair accessible, hearing loop available')}
+                value={formData.accessibility_notes || ''}
+                onChange={(e) => updateField('accessibility_notes', e.target.value)}
+                classNames={{
+                  input: 'bg-transparent text-theme-primary',
+                  inputWrapper: 'bg-theme-elevated border-theme-default',
+                  label: 'text-theme-muted',
+                }}
+              />
+            </div>
+          </details>
+
+          {/* Service Delivery Mode */}
+          <div>
+            <label className="block text-sm font-medium text-theme-muted mb-3">
+              {t('form.service_type_label', 'How is this service delivered?')}
+            </label>
+            <RadioGroup
+              value={formData.service_type}
+              onValueChange={(value) => updateField('service_type', value as FormData['service_type'])}
+              classNames={{ wrapper: 'grid grid-cols-2 gap-3' }}
+            >
+              <Radio
+                value="physical_only"
+                classNames={{
+                  base: 'p-3 border border-theme-default rounded-lg data-[selected=true]:border-emerald-500',
+                  label: 'text-theme-primary',
+                }}
+              >
+                <div className="flex items-center gap-2">
+                  <MapPin className="w-4 h-4 text-emerald-500 shrink-0" />
+                  <div>
+                    <div className="font-medium text-sm">{t('form.service_type_physical', 'In-Person Only')}</div>
+                  </div>
+                </div>
+              </Radio>
+              <Radio
+                value="remote_only"
+                classNames={{
+                  base: 'p-3 border border-theme-default rounded-lg data-[selected=true]:border-blue-500',
+                  label: 'text-theme-primary',
+                }}
+              >
+                <div className="flex items-center gap-2">
+                  <Monitor className="w-4 h-4 text-blue-500 shrink-0" />
+                  <div>
+                    <div className="font-medium text-sm">{t('form.service_type_remote', 'Remote / Online')}</div>
+                  </div>
+                </div>
+              </Radio>
+              <Radio
+                value="hybrid"
+                classNames={{
+                  base: 'p-3 border border-theme-default rounded-lg data-[selected=true]:border-teal-500',
+                  label: 'text-theme-primary',
+                }}
+              >
+                <div className="flex items-center gap-2">
+                  <ArrowRightLeft className="w-4 h-4 text-teal-500 shrink-0" />
+                  <div>
+                    <div className="font-medium text-sm">{t('form.service_type_hybrid', 'Either (In-Person or Remote)')}</div>
+                  </div>
+                </div>
+              </Radio>
+              <Radio
+                value="location_dependent"
+                classNames={{
+                  base: 'p-3 border border-theme-default rounded-lg data-[selected=true]:border-gray-500',
+                  label: 'text-theme-primary',
+                }}
+              >
+                <div className="flex items-center gap-2">
+                  <HelpCircle className="w-4 h-4 text-gray-500 shrink-0" />
+                  <div>
+                    <div className="font-medium text-sm">{t('form.service_type_depends', 'Depends on Service')}</div>
+                  </div>
+                </div>
+              </Radio>
+            </RadioGroup>
           </div>
 
           {/* Category */}
