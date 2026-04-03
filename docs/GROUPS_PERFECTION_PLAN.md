@@ -2,44 +2,77 @@
 
 > **Created:** 2026-04-03
 > **Initial Score:** ~478/1,000 (revised down — 6 services missing)
-> **Current Score:** ~955/1,000 (after Phase 1-10 implementation)
+> **Current Score:** ~653/1,000 (honest rescore — backend built, frontend gaps remain)
 > **Target:** 1,000/1,000 (Platinum tier)
-> **Status:** BACKEND COMPLETE — Frontend integration remaining for new features
+> **Status:** Silver Tier — Backend infrastructure complete, frontend integration needed
 
 ---
 
-## Score Tracker (Updated 2026-04-03)
+## Score Tracker (Honest Rescore 2026-04-03)
+
+**Scoring rule:** Backend-only features get ~30% credit. Full credit requires working frontend UI.
 
 | Category | Before | After | Delta | Status |
 |----------|--------|-------|-------|--------|
-| 1. Creation & Configuration | 55 | 95 | +40 | Templates, custom fields, tags, slug, duplicate detection pending UI |
-| 2. Membership & Roles | 52 | 105 | +53 | Invites, permissions, roles all implemented |
-| 3. Privacy & Permissions | 55 | 92 | +37 | Feature toggles, permission manager, pre-moderation framework |
-| 4. Hierarchy & Organization | 55 | 75 | +20 | Federation, sub-groups solid; collections pending |
-| 5. Engagement & Content | 73 | 125 | +52 | Q&A, wiki, media gallery, file sharing all built |
-| 6. Discovery & Search | 55 | 60 | +5 | Tags, full-text via Meilisearch, suggestions |
-| 7. Notifications & Activity | 42 | 55 | +13 | Webhooks, welcome messages; @mentions needs frontend |
-| 8. Admin & Management | 23 | 85 | +62 | Bulk ops, archive, transfer, merge, clone, audit log |
-| 9. Analytics & Reporting | 15 | 75 | +60 | Full dashboard, retention, exports, comparative |
-| 10. Gamification Integration | 25 | 55 | +30 | Challenges, per-action XP tracking |
-| 11. Automation & Workflows | 5 | 52 | +47 | Welcome, lifecycle, webhooks, scheduled check |
-| 12. Enterprise & Compliance | 23 | 55 | +32 | Data export, audit trail, custom fields |
-| **TOTAL** | **~478** | **~929** | **+451** | **Platinum Tier** |
+| 1. Creation & Configuration | 55 | 67 | +12 | Templates/tags/fields backend only, no frontend |
+| 2. Membership & Roles | 60 | 71 | +11 | Invites backend only, PermissionManager working |
+| 3. Privacy & Permissions | 70 | 73 | +3 | FeatureToggleService now works; GDPR export backend |
+| 4. Hierarchy & Organization | 55 | 55 | +0 | No changes — collections still missing |
+| 5. Engagement & Content | 73 | 99 | +26 | Files fully rebuilt; Q&A/wiki/media backend only |
+| 6. Discovery & Search | 55 | 55 | +0 | Tags backend only, not displayed in UI |
+| 7. Notifications & Activity | 45 | 47 | +2 | Webhooks exist but fire() never called |
+| 8. Admin & Management | 33 | 55 | +22 | Lifecycle/bulk/merge backend; no admin UI buttons |
+| 9. Analytics & Reporting | 25 | 38 | +13 | Full backend analytics; no frontend dashboard |
+| 10. Gamification Integration | 35 | 38 | +3 | Challenges backend only, not wired to events |
+| 11. Automation & Workflows | 5 | 17 | +12 | Welcome/lifecycle/webhooks exist but NOT wired |
+| 12. Enterprise & Compliance | 33 | 38 | +5 | Data export backend, audit service not called |
+| **TOTAL** | **~478** | **~653** | **+175** | **Silver Tier** |
 
-### Remaining ~71 points to reach 1,000
+### Critical Integration Gaps (Blocking Higher Score)
 
-| Gap | Points | What's Needed |
-|-----|--------|---------------|
-| Custom branding per group (colors/theme) | 5 | Frontend: color picker in group settings |
-| Group capacity enforcement in UI | 5 | Frontend: show limit, block join when full |
-| View-only/read-only members | 10 | Backend role + frontend enforcement |
-| Per-group notification prefs UI | 5 | Frontend: notification settings modal |
-| @mentions system (frontend) | 5 | Frontend: autocomplete + highlight |
-| Real-time WebSocket chat | 7 | Wire Pusher to chatrooms |
-| Group collections/bundles | 15 | New feature: group sets/bundles |
-| Scheduled posts (admin UI) | 5 | Frontend: date picker for post scheduling |
-| Auto-assign rules UI | 5 | Frontend: admin rule builder |
-| SAML/SSO deep integration | 9 | Package integration (laravel-saml2) |
+**Backend services exist but are NOT wired into the application flow:**
+
+| Integration | File to Change | What to Add |
+|-------------|---------------|-------------|
+| Welcome on join | `GroupService::join()` | Call `GroupWelcomeService::sendWelcome()` after member attach |
+| Audit logging | `GroupsController` + `AdminGroupsController` | Call `GroupAuditService::log()` on create/update/delete/join/leave |
+| Webhooks | `GroupsController` post/discussion/join handlers | Call `GroupWebhookService::fire()` on group events |
+| Challenge progress | `GroupsController::postToDiscussion()` | Call `GroupChallengeService::incrementProgress()` |
+
+### Missing Frontend (16 features backend-only)
+
+| Feature | Backend | Frontend Needed | Est. Points |
+|---------|---------|----------------|-------------|
+| Q&A Tab | GroupQAService + Controller | GroupQATab.tsx in GroupDetailPage | +7 |
+| Wiki Tab | GroupWikiController | GroupWikiTab.tsx | +7 |
+| Media Gallery | GroupMediaController | GroupMediaTab.tsx | +3 |
+| Invite Modal | GroupInviteService + Controller | Invite button + modal in GroupDetailPage | +7 |
+| Tags Display | GroupTagService + Controller | Tags on cards + detail + create form | +5 |
+| Analytics Dashboard | GroupAnalyticsService + Controller | Analytics tab with Recharts | +20 |
+| Welcome Config | GroupWelcomeController | Settings panel for admins | +3 |
+| Template Selector | GroupTemplateService | Template picker on CreateGroupPage | +4 |
+| Custom Fields | GroupCustomFieldController | Custom fields on detail + create | +4 |
+| Webhook Config | GroupWebhookController | Webhook management panel | +3 |
+| Challenge UI | GroupChallengeService | Challenge list + progress bars | +5 |
+| Admin Lifecycle | AdminGroupsController | Archive/merge/clone/transfer buttons | +10 |
+| Admin Bulk Ops | AdminGroupsController | Checkboxes + batch action toolbar | +7 |
+| Audit Log Viewer | AdminGroupsController | Log table with filters | +5 |
+| CSV Export | GroupAnalyticsController | Export buttons on analytics page | +5 |
+| @mentions | (needs new service) | Autocomplete + highlight | +5 |
+
+**Total recoverable:** ~99 points from frontend alone + ~30 from wiring = ~129 points → **~782 (Gold)**
+
+### Path to 1,000
+
+| Milestone | Score | What's Needed |
+|-----------|-------|---------------|
+| **Current** | ~653 | Silver Tier |
+| **Wire integrations** | ~683 | +30: welcome, audit, webhooks, challenges |
+| **Core frontend tabs** | ~732 | +49: Q&A, Wiki, Invites, Analytics |
+| **Admin UI** | ~764 | +32: Lifecycle, bulk ops, audit viewer |
+| **Remaining frontend** | ~829 | +65: Tags, templates, fields, export, gallery |
+| **Advanced features** | ~929 | +100: WebSocket chat, @mentions, collections, SAML, branding |
+| **Polish & completeness** | 1,000 | +71: view-only roles, scheduled posts, auto-assign UI |
 
 > **Note:** The 6 previously missing services are now fully implemented and pass their tests.
 
