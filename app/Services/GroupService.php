@@ -823,6 +823,7 @@ class GroupService
             try { GroupWebhookService::fire($groupId, GroupWebhookService::EVENT_DISCUSSION_CREATED, ['discussion_id' => $discussion->id, 'title' => $title]); } catch (\Throwable $e) {}
             try { GroupAuditService::log(GroupAuditService::ACTION_DISCUSSION_CREATED, $groupId, $userId, ['discussion_id' => $discussion->id]); } catch (\Throwable $e) {}
             try { GroupChallengeService::incrementProgress($groupId, 'discussions'); } catch (\Throwable $e) {}
+            try { GroupMentionService::notifyMentioned($groupId, $userId, $content, 'discussion', $discussion->id); } catch (\Throwable $e) {}
 
             return [
                 'id'            => $discussion->id,
@@ -993,6 +994,7 @@ class GroupService
         try { GroupWebhookService::fire($groupId, GroupWebhookService::EVENT_POST_CREATED, ['post_id' => $post->id, 'discussion_id' => $discussionId]); } catch (\Throwable $e) {}
         try { GroupAuditService::log(GroupAuditService::ACTION_POST_CREATED, $groupId, $userId, ['post_id' => $post->id]); } catch (\Throwable $e) {}
         try { GroupChallengeService::incrementProgress($groupId, 'posts'); } catch (\Throwable $e) {}
+        try { GroupMentionService::notifyMentioned($groupId, $userId, $content, 'post', $post->id); } catch (\Throwable $e) {}
 
         $post->load('user:id,first_name,last_name,avatar_url');
         $user = $post->user;

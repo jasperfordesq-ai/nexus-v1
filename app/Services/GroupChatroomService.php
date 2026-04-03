@@ -351,6 +351,24 @@ class GroupChatroomService
             'created_at'  => now(),
         ]);
 
+        // Broadcast via Pusher
+        try {
+            event(new \App\Events\GroupChatroomMessagePosted(
+                $tenantId,
+                (int) $chatroom->group_id,
+                $chatroomId,
+                [
+                    'id' => (int) $id,
+                    'chatroom_id' => $chatroomId,
+                    'user_id' => $userId,
+                    'body' => $body,
+                    'created_at' => now()->toIso8601String(),
+                ]
+            ));
+        } catch (\Throwable $e) {
+            // Non-critical — message is saved, broadcast failed
+        }
+
         return (int) $id;
     }
 

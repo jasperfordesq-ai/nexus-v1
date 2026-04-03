@@ -379,3 +379,13 @@
 .feed-content li {
   margin-bottom: 0.125rem;
 }
+
+/* @mention highlighting in group discussions/posts */
+.mention-highlight {
+  color: var(--heroui-primary);
+  font-weight: 500;
+  cursor: pointer;
+}
+.mention-highlight:hover {
+  text-decoration: underline;
+}

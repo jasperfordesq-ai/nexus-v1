@@ -41,7 +41,7 @@ import {
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { EmptyState } from '@/components/feedback';
-import { useAuth, useToast } from '@/contexts';
+import { useAuth, useToast, usePusherOptional } from '@/contexts';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
 import { resolveAvatarUrl, formatRelativeTime } from '@/lib/helpers';
@@ -90,6 +90,7 @@ export function TeamChatrooms({ groupId, isGroupAdmin }: TeamChatroomsProps) {
   const { t: tGroups } = useTranslation('groups');
   const { isAuthenticated, user } = useAuth();
   const toast = useToast();
+  const pusher = usePusherOptional();
 
   const [chatrooms, setChatrooms] = useState<Chatroom[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -195,6 +196,31 @@ export function TeamChatrooms({ groupId, isGroupAdmin }: TeamChatroomsProps) {
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
+
+  // Real-time message updates via Pusher
+  useEffect(() => {
+    if (!pusher?.client || !pusher.tenantId || !groupId || !activeChatroomId) return;
+
+    const channelName = `private-tenant.${pusher.tenantId}.group.${groupId}`;
+
+    try {
+      const channel = pusher.client.subscribe(channelName);
+
+      const handler = (data: { chatroom_id: number; message: ChatMessage }) => {
+        if (data.chatroom_id === activeChatroomId && data.message.user_id !== user?.id) {
+          setMessages(prev => [...prev, data.message]);
+        }
+      };
+
+      channel.bind('chatroom.message_posted', handler);
+
+      return () => {
+        channel.unbind('chatroom.message_posted', handler);
+      };
+    } catch {
+      // Pusher not available — fall back to polling
+    }
+  }, [pusher, groupId, activeChatroomId, user?.id]);
 
   const handleSendMessage = async () => {
     if (!newMessage.trim() || !activeChatroomId) return;

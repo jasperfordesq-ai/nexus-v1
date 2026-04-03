@@ -54,6 +54,7 @@ export function GroupList() {
   const [search, setSearch] = useState('');
   const [confirmDelete, setConfirmDelete] = useState<AdminGroup | null>(null);
   const [actionLoading, setActionLoading] = useState(false);
+  const [selectedIds, setSelectedIds] = useState<Set<number>>(new Set());
 
   const loadItems = useCallback(async () => {
     setLoading(true);
@@ -148,7 +149,57 @@ export function GroupList() {
     }
   };
 
+  const handleBulkArchive = async () => {
+    try {
+      await api.post('/v2/admin/groups/bulk-archive', { group_ids: Array.from(selectedIds) });
+      toast.success(`${selectedIds.size} groups archived`);
+      setSelectedIds(new Set());
+      loadItems();
+    } catch { toast.error('Failed to archive groups'); }
+  };
+
+  const handleBulkDelete = async () => {
+    if (!confirm(`Delete ${selectedIds.size} groups? This cannot be undone.`)) return;
+    // Delete one by one (no bulk delete endpoint)
+    for (const id of selectedIds) {
+      try { await adminGroups.delete(id); } catch { /* skip failures */ }
+    }
+    toast.success(`${selectedIds.size} groups deleted`);
+    setSelectedIds(new Set());
+    loadItems();
+  };
+
   const columns: Column<AdminGroup>[] = [
+    {
+      key: 'select',
+      label: (
+        <input
+          type="checkbox"
+          checked={selectedIds.size === items.length && items.length > 0}
+          onChange={(e) => {
+            if (e.target.checked) {
+              setSelectedIds(new Set(items.map(i => i.id)));
+            } else {
+              setSelectedIds(new Set());
+            }
+          }}
+          aria-label="Select all"
+        />
+      ),
+      render: (item) => (
+        <input
+          type="checkbox"
+          checked={selectedIds.has(item.id)}
+          onChange={(e) => {
+            const next = new Set(selectedIds);
+            if (e.target.checked) next.add(item.id);
+            else next.delete(item.id);
+            setSelectedIds(next);
+          }}
+          aria-label={`Select ${item.name}`}
+        />
+      ),
+    },
     {
       key: 'name',
       label: t('groups.col_group'),
@@ -321,6 +372,15 @@ export function GroupList() {
           <Tab key="archived" title={t('groups.tab_archived')} />
         </Tabs>
       </div>
+
+      {selectedIds.size > 0 && (
+        <div className="flex items-center gap-3 p-3 mb-4 bg-primary/10 rounded-lg">
+          <span className="text-sm font-medium">{selectedIds.size} selected</span>
+          <Button size="sm" variant="flat" onPress={handleBulkArchive}>Archive</Button>
+          <Button size="sm" variant="flat" color="danger" onPress={handleBulkDelete}>Delete</Button>
+          <Button size="sm" variant="flat" onPress={() => setSelectedIds(new Set())}>Clear</Button>
+        </div>
+      )}
 
       <DataTable
         columns={columns}

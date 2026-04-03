@@ -87,6 +87,10 @@ import { GroupChallengesTab } from './tabs/GroupChallengesTab';
 import { PinnedAnnouncementsBanner } from './components/PinnedAnnouncementsBanner';
 import { GroupNotificationPrefs } from './components/GroupNotificationPrefs';
 
+// Lazy-load rich text editor (only when discussion modal opens)
+import { lazy, Suspense } from 'react';
+const RichTextEditor = lazy(() => import('@/admin/components/RichTextEditor'));
+
 // ─────────────────────────────────────────────────────────────────────────────
 // Types
 // ─────────────────────────────────────────────────────────────────────────────
@@ -1565,18 +1569,18 @@ export function GroupDetailPage() {
                     label: 'text-theme-muted',
                   }}
                 />
-                <Textarea
-                  label={t('detail.discussion_content_label')}
-                  placeholder={t('detail.discussion_content_placeholder')}
-                  value={newDiscussionContent}
-                  onChange={(e) => setNewDiscussionContent(e.target.value)}
-                  minRows={4}
-                  classNames={{
-                    input: 'bg-transparent text-theme-primary',
-                    inputWrapper: 'bg-theme-elevated border-theme-default',
-                    label: 'text-theme-muted',
-                  }}
-                />
+                <div>
+                  <label className="text-sm text-theme-muted mb-1 block">
+                    {t('detail.discussion_content_label')}
+                  </label>
+                  <Suspense fallback={<Textarea placeholder={t('detail.discussion_content_placeholder')} minRows={4} value={newDiscussionContent} onChange={(e) => setNewDiscussionContent(e.target.value)} classNames={{ input: 'bg-transparent text-theme-primary', inputWrapper: 'bg-theme-elevated border-theme-default' }} />}>
+                    <RichTextEditor
+                      value={newDiscussionContent}
+                      onChange={setNewDiscussionContent}
+                      placeholder={t('detail.discussion_content_placeholder')}
+                    />
+                  </Suspense>
+                </div>
               </ModalBody>
               <ModalFooter>
                 <Button variant="flat" className="bg-theme-elevated text-theme-primary" onPress={onClose}>
