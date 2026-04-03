@@ -1,5 +1,8 @@
 {
   "active": "Active",
+  "aria": {
+    "breadcrumbs": "Breadcrumb navigation"
+  },
   "activity": {
     "card_title": "Card",
     "empty": "No activity found",

@@ -28,7 +28,7 @@ class GroupTagController extends BaseApiController
 
         $tags = GroupTagService::getForGroup($id);
 
-        return $this->successResponse($tags);
+        return $this->respondWithData($tags);
     }
 
     /**
@@ -44,13 +44,13 @@ class GroupTagController extends BaseApiController
         $tagIds = request()->input('tag_ids');
 
         if (!is_array($tagIds)) {
-            return $this->errorResponse('A valid tag_ids array is required', 422);
+            return $this->error('A valid tag_ids array is required', 422);
         }
 
         GroupTagService::setForGroup($id, $tagIds);
         $updatedTags = GroupTagService::getForGroup($id);
 
-        return $this->successResponse($updatedTags);
+        return $this->respondWithData($updatedTags);
     }
 
     /**
@@ -70,7 +70,7 @@ class GroupTagController extends BaseApiController
 
         $tags = GroupTagService::getAll($filters);
 
-        return $this->successResponse($tags);
+        return $this->respondWithData($tags);
     }
 
     /**
@@ -86,7 +86,7 @@ class GroupTagController extends BaseApiController
         $limit = $this->queryInt('limit', 20);
         $tags = GroupTagService::getPopular($limit);
 
-        return $this->successResponse($tags);
+        return $this->respondWithData($tags);
     }
 
     /**
@@ -102,6 +102,6 @@ class GroupTagController extends BaseApiController
         $q = $this->query('q', '');
         $suggestions = GroupTagService::suggest($q);
 
-        return $this->successResponse($suggestions);
+        return $this->respondWithData($suggestions);
     }
 }

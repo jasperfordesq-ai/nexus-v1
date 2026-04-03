@@ -133,6 +133,8 @@
   "federation_webhooks": "Webhooks",
   "onboarding_settings": "Onboarding Settings",
   "safeguarding_options": "Safeguarding Options",
+  "feature_flags": "Feature Flags",
+  "secrets_vault": "Secrets Vault",
   "sections": {
     "content": "Content",
     "community": "Community",

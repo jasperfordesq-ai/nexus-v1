@@ -43,10 +43,10 @@ class GroupFilesController extends BaseApiController
         if ($result === null) {
             $errors = $this->fileService->getErrors();
             $code = ($errors[0]['code'] ?? '') === 'FORBIDDEN' ? 403 : 400;
-            return $this->errorResponse($errors[0]['message'] ?? 'Error listing files', $code);
+            return $this->error($errors[0]['message'] ?? 'Error listing files', $code);
         }
 
-        return $this->successResponse($result);
+        return $this->respondWithData($result);
     }
 
     /**
@@ -63,7 +63,7 @@ class GroupFilesController extends BaseApiController
         $file = $request->file('file');
 
         if (!$file) {
-            return $this->errorResponse('No file provided', 400);
+            return $this->error('No file provided', 400);
         }
 
         $result = $this->fileService->upload($groupId, $userId, [
@@ -79,10 +79,10 @@ class GroupFilesController extends BaseApiController
                 'FILE_TOO_LARGE', 'INVALID_TYPE', 'INVALID_FILE' => 422,
                 default => 400,
             };
-            return $this->errorResponse($errors[0]['message'] ?? 'Upload failed', $code);
+            return $this->error($errors[0]['message'] ?? 'Upload failed', $code);
         }
 
-        return $this->successResponse($result, 201);
+        return $this->respondWithData($result, null, 201);
     }
 
     /**
@@ -104,12 +104,12 @@ class GroupFilesController extends BaseApiController
                 'FORBIDDEN' => 403,
                 default => 400,
             };
-            return $this->errorResponse($errors[0]['message'] ?? 'Download failed', $code);
+            return $this->error($errors[0]['message'] ?? 'Download failed', $code);
         }
 
         $disk = Storage::disk('local');
         if (!$disk->exists($result['file_path'])) {
-            return $this->errorResponse('File not found on disk', 404);
+            return $this->error('File not found on disk', 404);
         }
 
         return $disk->download(
@@ -138,10 +138,10 @@ class GroupFilesController extends BaseApiController
                 'FORBIDDEN' => 403,
                 default => 400,
             };
-            return $this->errorResponse($errors[0]['message'] ?? 'Delete failed', $code);
+            return $this->error($errors[0]['message'] ?? 'Delete failed', $code);
         }
 
-        return $this->successResponse(['message' => 'File deleted']);
+        return $this->respondWithData(['message' => 'File deleted']);
     }
 
     /**
@@ -155,7 +155,7 @@ class GroupFilesController extends BaseApiController
         }
 
         $folders = $this->fileService->getFolders($groupId);
-        return $this->successResponse($folders);
+        return $this->respondWithData($folders);
     }
 
     /**
@@ -169,6 +169,6 @@ class GroupFilesController extends BaseApiController
         }
 
         $stats = $this->fileService->getStats($groupId);
-        return $this->successResponse($stats);
+        return $this->respondWithData($stats);
     }
 }
