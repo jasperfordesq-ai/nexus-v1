@@ -62,9 +62,10 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
   };
 
   handleGoHome = () => {
-    // Preserve tenant slug from current URL (e.g., /hour-timebank/dashboard → /hour-timebank/)
-    const match = window.location.pathname.match(/^\/([^/]+)\//);
-    window.location.href = match ? `/${match[1]}/` : '/';
+    // Use stored tenant slug from localStorage — resilient even when the URL
+    // has lost the slug prefix (e.g., after a redirect stripped it)
+    const storedSlug = localStorage.getItem('nexus_tenant_slug');
+    window.location.href = storedSlug ? `/${storedSlug}/` : '/';
   };
 
   handleTryAgain = () => {

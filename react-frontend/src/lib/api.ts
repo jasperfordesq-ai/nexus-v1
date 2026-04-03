@@ -39,6 +39,7 @@ export const API_BASE = import.meta.env.VITE_API_BASE || '/api';
 const TOKEN_KEY = 'nexus_access_token';
 const REFRESH_TOKEN_KEY = 'nexus_refresh_token';
 const TENANT_ID_KEY = 'nexus_tenant_id';
+const TENANT_SLUG_KEY = 'nexus_tenant_slug';
 const CSRF_TOKEN_KEY = 'nexus_csrf_token';
 
 // Default tenant ID - only used if nothing is in localStorage
@@ -154,6 +155,14 @@ export const tokenManager = {
     localStorage.setItem(TENANT_ID_KEY, String(id));
   },
 
+  getTenantSlug(): string | null {
+    return localStorage.getItem(TENANT_SLUG_KEY);
+  },
+
+  setTenantSlug(slug: string): void {
+    localStorage.setItem(TENANT_SLUG_KEY, slug);
+  },
+
   clearTokens(): void {
     localStorage.removeItem(TOKEN_KEY);
     localStorage.removeItem(REFRESH_TOKEN_KEY);
@@ -163,6 +172,7 @@ export const tokenManager = {
     localStorage.removeItem(TOKEN_KEY);
     localStorage.removeItem(REFRESH_TOKEN_KEY);
     localStorage.removeItem(TENANT_ID_KEY);
+    localStorage.removeItem(TENANT_SLUG_KEY);
   },
 
   hasAccessToken(): boolean {

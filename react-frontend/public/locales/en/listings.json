@@ -146,6 +146,8 @@
     "placeholder": "Type a skill and press Enter...",
     "aria_add": "Add skill tag"
   },
+  "more_filters": "More filters",
+  "filters_label": "Filters",
   "aria": {
     "view_mode": "View mode",
     "loading_listings": "Loading listings"

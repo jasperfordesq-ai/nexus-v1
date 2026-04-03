@@ -263,9 +263,12 @@ export function TenantProvider({ children, tenantSlug }: TenantProviderProps) {
     notFoundSlug: null,
   });
 
-  // Determine effective slug: route param > URL detection (subdomain/path)
+  // Determine effective slug: route param > URL detection > stored slug (localStorage fallback)
+  // The stored slug fallback prevents losing the tenant when a redirect/error strips
+  // the slug prefix from the URL (e.g., /hour-timebank/listings → /listings).
   const detected = useMemo(() => detectTenantFromUrl(), []);
-  const effectiveTenantSlug = tenantSlug || detected.slug;
+  const storedSlug = useMemo(() => tokenManager.getTenantSlug(), []);
+  const effectiveTenantSlug = tenantSlug || detected.slug || storedSlug;
 
   /**
    * Fetch tenant bootstrap data
@@ -302,6 +305,9 @@ export function TenantProvider({ children, tenantSlug }: TenantProviderProps) {
             api.clearInflightRequests();
           }
           tokenManager.setTenantId(tenant.id);
+        }
+        if (tenant.slug) {
+          tokenManager.setTenantSlug(tenant.slug);
         }
 
         // Fetch CSRF token for form submissions
