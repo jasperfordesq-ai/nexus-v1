@@ -134,15 +134,15 @@ export function GroupQATab({ groupId, isAdmin, isMember = true }: GroupQATabProp
         if (search.trim()) params.set('q', search.trim());
 
         const resp = await api.get(`/v2/groups/${groupId}/questions?${params}`);
-        const data = resp.data;
+        const data = resp.data ?? {};
 
         if (reset) {
-          setQuestions(data.items || []);
+          setQuestions(data.items ?? []);
         } else {
-          setQuestions((prev) => [...prev, ...(data.items || [])]);
+          setQuestions((prev) => [...prev, ...(data.items ?? [])]);
         }
-        setCursor(data.cursor || null);
-        setHasMore(data.has_more || false);
+        setCursor(data.cursor ?? null);
+        setHasMore(data.has_more ?? false);
       } catch (err) {
         logError('GroupQATab.loadQuestions', err);
       } finally {
@@ -488,7 +488,7 @@ export function GroupQATab({ groupId, isAdmin, isMember = true }: GroupQATabProp
       {/* Question list */}
       {questions.length === 0 ? (
         <EmptyState
-          icon={HelpCircle}
+          icon={<HelpCircle className="w-12 h-12" aria-hidden="true" />}
           title={t('qa.empty_title', 'No questions yet')}
           description={
             search
