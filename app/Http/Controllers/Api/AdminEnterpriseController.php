@@ -587,14 +587,25 @@ class AdminEnterpriseController extends BaseApiController
     }
 
     /**
-     * Direct tenant columns that the System Config page exposes as settings.
-     * These live on the tenants table, NOT in the configuration JSON.
+     * Settings source map: where each System Config setting actually lives.
+     * 'column'  → direct column on the tenants table
+     * 'setting' → key-value row in tenant_settings table
+     * 'config'  → key in tenants.configuration JSON (default for unmapped keys)
      */
     private const CONFIG_DIRECT_COLUMNS = [
         'site_name' => 'name',
         'site_description' => 'description',
         'contact_email' => 'contact_email',
-        'timezone' => 'timezone',
+    ];
+
+    private const CONFIG_TENANT_SETTINGS = [
+        'timezone' => 'general.timezone',
+        'registration_enabled' => 'general.registration_mode',
+        'require_approval' => 'general.admin_approval',
+        'require_email_verification' => 'general.email_verification',
+        'welcome_message' => 'general.welcome_message',
+        'starting_balance' => 'general.welcome_credits',
+        'onboarding_enabled' => 'onboarding.enabled',
     ];
 
     /** GET /api/v2/admin/enterprise/config */
@@ -603,19 +614,62 @@ class AdminEnterpriseController extends BaseApiController
         $this->requireAdmin();
         $tenantId = $this->getTenantId();
         try {
-            $columns = implode(', ', array_unique(array_merge(['configuration'], array_values(self::CONFIG_DIRECT_COLUMNS))));
+            // 1. Read configuration JSON + direct columns from tenants table
+            $directCols = array_unique(array_values(self::CONFIG_DIRECT_COLUMNS));
+            $columns = implode(', ', array_merge(['configuration'], $directCols));
             $row = DB::selectOne("SELECT {$columns} FROM tenants WHERE id = ?", [$tenantId]);
             $config = json_decode($row->configuration ?? '{}', true) ?: [];
 
-            // Merge direct columns into config so the frontend sees them
+            // 2. Merge direct columns
             foreach (self::CONFIG_DIRECT_COLUMNS as $configKey => $dbColumn) {
-                if (!isset($config[$configKey]) && isset($row->$dbColumn)) {
-                    $config[$configKey] = $row->$dbColumn;
+                $config[$configKey] = $row->$dbColumn ?? '';
+            }
+
+            // 3. Read tenant_settings and merge
+            try {
+                $settingKeys = array_values(self::CONFIG_TENANT_SETTINGS);
+                $placeholders = implode(',', array_fill(0, count($settingKeys), '?'));
+                $settings = DB::select(
+                    "SELECT setting_key, setting_value, setting_type FROM tenant_settings WHERE tenant_id = ? AND setting_key IN ({$placeholders})",
+                    array_merge([$tenantId], $settingKeys)
+                );
+
+                $settingValues = [];
+                foreach ($settings as $s) {
+                    $settingValues[$s->setting_key] = $this->castSettingValue($s->setting_value, $s->setting_type);
                 }
+
+                foreach (self::CONFIG_TENANT_SETTINGS as $configKey => $settingKey) {
+                    if (isset($settingValues[$settingKey])) {
+                        $value = $settingValues[$settingKey];
+                        // registration_mode is 'open'/'closed'/'invite_only' — convert to boolean
+                        if ($configKey === 'registration_enabled') {
+                            $config[$configKey] = ($value === 'open' || $value === true || $value === '1');
+                        } else {
+                            $config[$configKey] = $value;
+                        }
+                    }
+                }
+            } catch (\Exception $e) {
+                \Illuminate\Support\Facades\Log::warning('[AdminEnterprise] tenant_settings read failed: ' . $e->getMessage());
             }
 
             return $this->respondWithData($config);
         } catch (\Exception $e) { return $this->respondWithData([]); }
+    }
+
+    /** Cast a tenant_settings value based on its setting_type */
+    private function castSettingValue(?string $value, ?string $type): mixed
+    {
+        if ($value === null) return null;
+        return match ($type) {
+            'boolean' => filter_var($value, FILTER_VALIDATE_BOOLEAN),
+            'integer' => (int) $value,
+            'float' => (float) $value,
+            'json', 'array' => json_decode($value, true) ?? $value,
+            // Some boolean settings are stored with setting_type='string' but value 'true'/'false'
+            default => in_array($value, ['true', 'false'], true) ? ($value === 'true') : $value,
+        };
     }
 
     /** PUT /api/v2/admin/enterprise/config */
@@ -623,21 +677,21 @@ class AdminEnterpriseController extends BaseApiController
     {
         $this->requireAdmin();
         $tenantId = $this->getTenantId();
+        $adminId = $this->getUserId();
         $newConfig = $this->getAllInput();
         if (empty($newConfig)) { return $this->respondWithError('VALIDATION_ERROR', __('api.no_configuration_data'), null, 422); }
 
         try {
-            // Separate direct columns from configuration JSON
-            $directUpdates = [];
             $jsonConfig = $newConfig;
+
+            // 1. Extract and update direct tenant columns
+            $directUpdates = [];
             foreach (self::CONFIG_DIRECT_COLUMNS as $configKey => $dbColumn) {
                 if (array_key_exists($configKey, $jsonConfig)) {
                     $directUpdates[$dbColumn] = $jsonConfig[$configKey];
                     unset($jsonConfig[$configKey]);
                 }
             }
-
-            // Update direct columns on tenants table
             if (!empty($directUpdates)) {
                 $setParts = [];
                 $params = [];
@@ -649,21 +703,47 @@ class AdminEnterpriseController extends BaseApiController
                 DB::update("UPDATE tenants SET " . implode(', ', $setParts) . " WHERE id = ?", $params);
             }
 
-            // Update configuration JSON (remaining keys)
+            // 2. Extract and update tenant_settings entries
+            foreach (self::CONFIG_TENANT_SETTINGS as $configKey => $settingKey) {
+                if (!array_key_exists($configKey, $jsonConfig)) continue;
+
+                $value = $jsonConfig[$configKey];
+                unset($jsonConfig[$configKey]);
+
+                // Convert registration_enabled boolean back to registration_mode string
+                if ($configKey === 'registration_enabled') {
+                    $value = $value ? 'open' : 'closed';
+                    $settingType = 'string';
+                } elseif (is_bool($value)) {
+                    $settingType = 'boolean';
+                    $value = $value ? '1' : '0';
+                } elseif (is_int($value) || (is_string($value) && ctype_digit($value))) {
+                    $settingType = 'integer';
+                    $value = (string) $value;
+                } else {
+                    $settingType = 'string';
+                    $value = (string) $value;
+                }
+
+                DB::statement(
+                    "INSERT INTO tenant_settings (tenant_id, setting_key, setting_value, setting_type, updated_by, updated_at)
+                     VALUES (?, ?, ?, ?, ?, NOW())
+                     ON DUPLICATE KEY UPDATE setting_value = VALUES(setting_value), setting_type = VALUES(setting_type), updated_by = VALUES(updated_by), updated_at = NOW()",
+                    [$tenantId, $settingKey, $value, $settingType, $adminId]
+                );
+            }
+
+            // 3. Remaining keys go into configuration JSON
             $row = DB::selectOne("SELECT configuration FROM tenants WHERE id = ?", [$tenantId]);
             $existing = json_decode($row->configuration ?? '{}', true) ?: [];
             $merged = array_merge($existing, $jsonConfig);
             DB::update("UPDATE tenants SET configuration = ? WHERE id = ?", [json_encode($merged), $tenantId]);
 
+            // Invalidate cache
             try { app(\App\Services\RedisCache::class)->delete('tenant_bootstrap', $tenantId); } catch (\Throwable $e) { \Illuminate\Support\Facades\Log::warning('[AdminEnterprise] Cache invalidation failed: ' . $e->getMessage()); }
 
-            // Return merged view (direct + JSON)
-            foreach (self::CONFIG_DIRECT_COLUMNS as $configKey => $dbColumn) {
-                if (isset($directUpdates[$dbColumn])) {
-                    $merged[$configKey] = $directUpdates[$dbColumn];
-                }
-            }
-            return $this->respondWithData($merged);
+            // Return full merged view by re-reading
+            return $this->config();
         } catch (\Exception $e) {
             return $this->respondWithError('UPDATE_FAILED', __('api.config_update_failed'), null, 500);
         }
