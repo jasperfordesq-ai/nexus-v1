@@ -56,7 +56,7 @@ export function HashtagRenderer({
   return (
     <span className={className}>
       {parts.map((part, idx) => (
-        <Fragment key={idx}>
+        <Fragment key={`${part.type}-${idx}-${part.value.slice(0, 16)}`}>
           {part.type === 'hashtag' ? (
             <Link
               to={tenantPath(`/feed/hashtag/${part.value}`)}

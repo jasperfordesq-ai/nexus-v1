@@ -58,71 +58,74 @@ function getDeviceIcon(cred: Credential) {
   return Monitor;
 }
 
-function getDeviceLabel(cred: Credential): string {
+function getDeviceLabel(cred: Credential, t: (key: string, options?: Record<string, unknown>) => string): string {
   if (cred.device_name) return cred.device_name;
   // Fallback for credentials registered before device_name was added
-  if (cred.authenticator_type === 'platform') return 'Built-in authenticator';
-  if (cred.authenticator_type === 'cross-platform') return 'External authenticator';
-  return 'Passkey';
+  if (cred.authenticator_type === 'platform') return t('biometric.label_builtin', { defaultValue: 'Built-in authenticator' });
+  if (cred.authenticator_type === 'cross-platform') return t('biometric.label_external', { defaultValue: 'External authenticator' });
+  return t('biometric.label_passkey', { defaultValue: 'Passkey' });
 }
 
-const PLATFORM_INSTRUCTIONS: Record<DevicePlatform, { title: string; steps: string[] }> = {
-  windows: {
-    title: 'Setting up on Windows',
-    steps: [
-      'Click "This PC" to create a passkey stored on this computer. You\'ll confirm with your Windows Hello PIN, fingerprint, or face.',
-      'Requirement: You must have Windows Hello set up first. Go to Windows Settings > Accounts > Sign-in options > PIN to set it up.',
-      'Or click "Phone, tablet, or security key" to scan a QR code with your phone instead.',
-      'To set up passkeys on your phone too, open this page on your phone and tap "This device".',
-    ],
-  },
-  mac: {
-    title: 'Setting up on Mac',
-    steps: [
-      'Click "This Mac" — your browser will prompt Touch ID or your Mac password.',
-      'The passkey syncs via iCloud Keychain to your iPhone, iPad, and other Macs automatically.',
-      'Or click "Phone, tablet, or security key" to register a different device.',
-    ],
-  },
-  iphone: {
-    title: 'Setting up on iPhone',
-    steps: [
-      'Tap "This device" to create a passkey using Face ID or Touch ID.',
-      'The passkey is saved to iCloud Keychain and works on all your Apple devices.',
-      'You can also tap "Phone, tablet, or security key" to register a security key.',
-    ],
-  },
-  ipad: {
-    title: 'Setting up on iPad',
-    steps: [
-      'Tap "This device" to create a passkey using Face ID or Touch ID.',
-      'The passkey is saved to iCloud Keychain and works on all your Apple devices.',
-      'You can also tap "Phone, tablet, or security key" to register a security key.',
-    ],
-  },
-  android: {
-    title: 'Setting up on Android',
-    steps: [
-      'Tap "This device" to create a passkey using your fingerprint, face, or screen lock.',
-      'The passkey is saved to Google Password Manager and works on all your Android devices and Chrome browsers.',
-      'You can also tap "Phone, tablet, or security key" to register a security key.',
-    ],
-  },
-  linux: {
-    title: 'Setting up on Linux',
-    steps: [
-      'Click "This device" — your browser will use its built-in passkey manager.',
-      'Or click "Phone, tablet, or security key" to use a USB security key or scan a QR code with your phone.',
-    ],
-  },
-  unknown: {
-    title: 'Setting up a passkey',
-    steps: [
-      'Click "This device" to create a passkey on the device you\'re using now.',
-      'Or click "Phone, tablet, or security key" to register a different device.',
-    ],
-  },
-};
+function getPlatformInstructions(platform: DevicePlatform, t: (key: string, options?: Record<string, unknown>) => string): { title: string; steps: string[] } {
+  const instructions: Record<DevicePlatform, { title: string; steps: string[] }> = {
+    windows: {
+      title: t('biometric.platform_windows_title', { defaultValue: 'Setting up on Windows' }),
+      steps: [
+        t('biometric.platform_windows_step1', { defaultValue: 'Click "This PC" to create a passkey stored on this computer. You\'ll confirm with your Windows Hello PIN, fingerprint, or face.' }),
+        t('biometric.platform_windows_step2', { defaultValue: 'Requirement: You must have Windows Hello set up first. Go to Windows Settings > Accounts > Sign-in options > PIN to set it up.' }),
+        t('biometric.platform_windows_step3', { defaultValue: 'Or click "Phone, tablet, or security key" to scan a QR code with your phone instead.' }),
+        t('biometric.platform_windows_step4', { defaultValue: 'To set up passkeys on your phone too, open this page on your phone and tap "This device".' }),
+      ],
+    },
+    mac: {
+      title: t('biometric.platform_mac_title', { defaultValue: 'Setting up on Mac' }),
+      steps: [
+        t('biometric.platform_mac_step1', { defaultValue: 'Click "This Mac" — your browser will prompt Touch ID or your Mac password.' }),
+        t('biometric.platform_mac_step2', { defaultValue: 'The passkey syncs via iCloud Keychain to your iPhone, iPad, and other Macs automatically.' }),
+        t('biometric.platform_mac_step3', { defaultValue: 'Or click "Phone, tablet, or security key" to register a different device.' }),
+      ],
+    },
+    iphone: {
+      title: t('biometric.platform_iphone_title', { defaultValue: 'Setting up on iPhone' }),
+      steps: [
+        t('biometric.platform_iphone_step1', { defaultValue: 'Tap "This device" to create a passkey using Face ID or Touch ID.' }),
+        t('biometric.platform_iphone_step2', { defaultValue: 'The passkey is saved to iCloud Keychain and works on all your Apple devices.' }),
+        t('biometric.platform_iphone_step3', { defaultValue: 'You can also tap "Phone, tablet, or security key" to register a security key.' }),
+      ],
+    },
+    ipad: {
+      title: t('biometric.platform_ipad_title', { defaultValue: 'Setting up on iPad' }),
+      steps: [
+        t('biometric.platform_ipad_step1', { defaultValue: 'Tap "This device" to create a passkey using Face ID or Touch ID.' }),
+        t('biometric.platform_ipad_step2', { defaultValue: 'The passkey is saved to iCloud Keychain and works on all your Apple devices.' }),
+        t('biometric.platform_ipad_step3', { defaultValue: 'You can also tap "Phone, tablet, or security key" to register a security key.' }),
+      ],
+    },
+    android: {
+      title: t('biometric.platform_android_title', { defaultValue: 'Setting up on Android' }),
+      steps: [
+        t('biometric.platform_android_step1', { defaultValue: 'Tap "This device" to create a passkey using your fingerprint, face, or screen lock.' }),
+        t('biometric.platform_android_step2', { defaultValue: 'The passkey is saved to Google Password Manager and works on all your Android devices and Chrome browsers.' }),
+        t('biometric.platform_android_step3', { defaultValue: 'You can also tap "Phone, tablet, or security key" to register a security key.' }),
+      ],
+    },
+    linux: {
+      title: t('biometric.platform_linux_title', { defaultValue: 'Setting up on Linux' }),
+      steps: [
+        t('biometric.platform_linux_step1', { defaultValue: 'Click "This device" — your browser will use its built-in passkey manager.' }),
+        t('biometric.platform_linux_step2', { defaultValue: 'Or click "Phone, tablet, or security key" to use a USB security key or scan a QR code with your phone.' }),
+      ],
+    },
+    unknown: {
+      title: t('biometric.platform_unknown_title', { defaultValue: 'Setting up a passkey' }),
+      steps: [
+        t('biometric.platform_unknown_step1', { defaultValue: 'Click "This device" to create a passkey on the device you\'re using now.' }),
+        t('biometric.platform_unknown_step2', { defaultValue: 'Or click "Phone, tablet, or security key" to register a different device.' }),
+      ],
+    },
+  };
+  return instructions[platform];
+}
 
 export function BiometricSettings() {
   const { t } = useTranslation('settings');
@@ -139,7 +142,7 @@ export function BiometricSettings() {
   const [showInstructions, setShowInstructions] = useState(true); // Auto-show on first visit
 
   const platform = detectPlatform();
-  const instructions = PLATFORM_INSTRUCTIONS[platform];
+  const instructions = getPlatformInstructions(platform, t);
   const removeAllConfirm = useDisclosure();
 
   const loadCredentials = useCallback(async () => {
@@ -368,7 +371,7 @@ export function BiometricSettings() {
                       />
                     ) : (
                       <p className="text-sm font-medium text-theme-primary truncate">
-                        {getDeviceLabel(cred)}{' '}
+                        {getDeviceLabel(cred, t)}{' '}
                         <span className="text-theme-subtle font-mono text-xs">
                           ...{cred.credential_id.slice(-8)}
                         </span>
@@ -399,7 +402,7 @@ export function BiometricSettings() {
                     className="text-theme-subtle hover:bg-theme-hover"
                     onPress={() => {
                       setEditingId(cred.credential_id);
-                      setEditName(getDeviceLabel(cred));
+                      setEditName(getDeviceLabel(cred, t));
                     }}
                     aria-label={t('passkey_rename', { defaultValue: 'Rename passkey' })}
                   >

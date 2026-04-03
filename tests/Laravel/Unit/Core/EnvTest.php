@@ -17,16 +17,18 @@ class EnvTest extends TestCase
 
     public function test_load_with_laravel_booted_is_noop(): void
     {
-        // When Laravel is booted, load() should do nothing and not throw
+        // When Laravel is booted, load() should do nothing and not throw.
+        // Reaching the assertion means no exception was thrown.
         Env::load('/nonexistent/.env');
-        $this->assertTrue(true); // No exception = pass
+        $this->addToAssertionCount(1);
     }
 
     public function test_load_nonexistent_file_does_not_throw(): void
     {
-        // Even outside Laravel, a missing file should not throw
+        // Even outside Laravel, a missing file should not throw.
+        // Reaching the assertion means no exception was thrown.
         Env::load('/tmp/definitely-does-not-exist-' . uniqid() . '/.env');
-        $this->assertTrue(true);
+        $this->addToAssertionCount(1);
     }
 
     // -------------------------------------------------------

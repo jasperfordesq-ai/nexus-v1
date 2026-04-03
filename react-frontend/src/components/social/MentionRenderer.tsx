@@ -174,7 +174,7 @@ export function MentionRenderer({
   return (
     <>
       {parts.map((part, idx) => (
-        <Fragment key={idx}>
+        <Fragment key={`${part.type}-${idx}-${part.value.slice(0, 16)}`}>
           {part.type === 'mention' ? (
             <MentionLink
               username={part.value}

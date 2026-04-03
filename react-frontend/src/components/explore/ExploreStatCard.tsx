@@ -21,6 +21,7 @@ export function ExploreStatCard({ icon: Icon, label, value, suffix = '' }: Explo
   const [displayValue, setDisplayValue] = useState(0);
   const [hasAnimated, setHasAnimated] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
+  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   useEffect(() => {
     const element = ref.current;
@@ -37,7 +38,13 @@ export function ExploreStatCard({ icon: Icon, label, value, suffix = '' }: Explo
     );
 
     observer.observe(element);
-    return () => observer.disconnect();
+    return () => {
+      observer.disconnect();
+      if (timerRef.current) {
+        clearInterval(timerRef.current);
+        timerRef.current = null;
+      }
+    };
   }, [value, hasAnimated]);
 
   function animateCount(target: number) {
@@ -47,11 +54,14 @@ export function ExploreStatCard({ icon: Icon, label, value, suffix = '' }: Explo
     let current = 0;
     const increment = target / steps;
 
-    const timer = setInterval(() => {
+    timerRef.current = setInterval(() => {
       current += increment;
       if (current >= target) {
         setDisplayValue(target);
-        clearInterval(timer);
+        if (timerRef.current) {
+          clearInterval(timerRef.current);
+          timerRef.current = null;
+        }
       } else {
         setDisplayValue(Math.floor(current));
       }

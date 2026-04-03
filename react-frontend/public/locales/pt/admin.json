@@ -1766,7 +1766,17 @@
     "status_pending": "Pendente",
     "status_rejected": "Rejeitado",
     "status_suspended": "Suspenso",
-    "status_terminated": "Terminado"
+    "status_terminated": "Terminado",
+    "click_star_for_primary": "click star to toggle primary",
+    "failed_to_update_topics": "Failed to update topics",
+    "placeholder_all_topics": "All Topics...",
+    "primary_count": "{{count}} primary",
+    "save_topics": "Save Topics",
+    "topic_tags_desc": "Select up to 10 topics that describe your community. Star up to 3 as primary — these appear first in the directory.",
+    "topic_tags_title": "Topic & Interest Tags",
+    "topics_selected": "{{count}} of 10 selected",
+    "topics_updated_successfully": "Topics updated successfully",
+    "your_selected_topics": "Your Selected Topics"
   },
   "gamification": {
     "activate": "Ativar",

@@ -36,22 +36,93 @@ class DeliverabilityTrackingServiceTest extends \Tests\Laravel\TestCase
 
     public function testCreateDeliverableWithService()
     {
-        $this->markTestSkipped('DeliverabilityTrackingService uses wrong import for ActivityLog (Nexus\Services\ActivityLog vs Nexus\Models\ActivityLog)');
+        $result = DeliverabilityTrackingService::createDeliverable(
+            $this->testUserId,
+            'Service Test Deliverable',
+            'Test description',
+            ['priority' => 'high']
+        );
+
+        $this->assertIsArray($result);
+        $this->assertEquals('Service Test Deliverable', $result['title']);
+        $this->assertEquals($this->testUserId, $result['owner_id']);
+        $this->assertEquals('draft', $result['status']);
     }
 
     public function testUpdateDeliverableStatus()
     {
-        $this->markTestSkipped('DeliverabilityTrackingService uses wrong import for ActivityLog (Nexus\Services\ActivityLog vs Nexus\Models\ActivityLog)');
+        $result = DeliverabilityTrackingService::createDeliverable(
+            $this->testUserId,
+            'Status Update Test'
+        );
+
+        $this->assertIsArray($result);
+
+        $updated = DeliverabilityTrackingService::updateDeliverableStatus(
+            $result['id'],
+            'in_progress',
+            $this->testUserId
+        );
+
+        $this->assertTrue($updated);
+
+        $deliverable = Database::query(
+            "SELECT status FROM deliverables WHERE id = ?",
+            [$result['id']]
+        )->fetch(\PDO::FETCH_ASSOC);
+
+        $this->assertEquals('in_progress', $deliverable['status']);
     }
 
     public function testUpdateStatusAutoProgressMapping()
     {
-        $this->markTestSkipped('DeliverabilityTrackingService uses wrong import for ActivityLog (Nexus\Services\ActivityLog vs Nexus\Models\ActivityLog)');
+        $result = DeliverabilityTrackingService::createDeliverable(
+            $this->testUserId,
+            'Progress Mapping Test'
+        );
+
+        $this->assertIsArray($result);
+
+        // Update to 'review' should set progress to 75
+        DeliverabilityTrackingService::updateDeliverableStatus(
+            $result['id'],
+            'review',
+            $this->testUserId
+        );
+
+        $deliverable = Database::query(
+            "SELECT progress_percentage FROM deliverables WHERE id = ?",
+            [$result['id']]
+        )->fetch(\PDO::FETCH_ASSOC);
+
+        $this->assertEquals(75, (float) $deliverable['progress_percentage']);
     }
 
     public function testCompleteDeliverable()
     {
-        $this->markTestSkipped('DeliverabilityTrackingService uses wrong import for ActivityLog (Nexus\Services\ActivityLog vs Nexus\Models\ActivityLog)');
+        $result = DeliverabilityTrackingService::createDeliverable(
+            $this->testUserId,
+            'Completion Test'
+        );
+
+        $this->assertIsArray($result);
+
+        $completed = DeliverabilityTrackingService::completeDeliverable(
+            $result['id'],
+            $this->testUserId,
+            ['actual_hours' => 5.0]
+        );
+
+        $this->assertTrue($completed);
+
+        $deliverable = Database::query(
+            "SELECT status, progress_percentage, completed_at FROM deliverables WHERE id = ?",
+            [$result['id']]
+        )->fetch(\PDO::FETCH_ASSOC);
+
+        $this->assertEquals('completed', $deliverable['status']);
+        $this->assertEquals(100, (float) $deliverable['progress_percentage']);
+        $this->assertNotNull($deliverable['completed_at']);
     }
 
     public function testRecalculateProgressFromMilestones()

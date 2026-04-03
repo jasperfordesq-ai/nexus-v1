@@ -1643,8 +1643,11 @@ Route::middleware(['auth:sanctum', 'admin'])->group(function () {
     Route::get('/v2/admin/search/trending', [\App\Http\Controllers\Api\AdminListingsController::class, 'searchTrending']);
     Route::get('/v2/admin/search/zero-results', [\App\Http\Controllers\Api\AdminListingsController::class, 'searchZeroResults']);
 });
-Route::get('/v2/matches/all', [\App\Http\Controllers\Api\MatchingController::class, 'allMatches']);
-Route::post('/v2/matches/{id}/dismiss', [\App\Http\Controllers\Api\MatchingController::class, 'dismiss']);
+// Matching routes — auth:sanctum required (controller uses $this->requireAuth())
+Route::middleware('auth:sanctum')->group(function () {
+    Route::get('/v2/matches/all', [\App\Http\Controllers\Api\MatchingController::class, 'allMatches']);
+    Route::post('/v2/matches/{id}/dismiss', [\App\Http\Controllers\Api\MatchingController::class, 'dismiss']);
+});
 
 // ============================================
 // MIGRATED ROUTES — Legacy API (Polls, Goals, Events, Wallet, Cookie Consent, Legal, Nexus Score, Notifications, Listings)
