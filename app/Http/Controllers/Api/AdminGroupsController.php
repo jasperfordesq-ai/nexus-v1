@@ -1061,4 +1061,186 @@ class AdminGroupsController extends BaseApiController
             return $this->respondWithError('ANALYTICS_ERROR', __('api.fetch_failed', ['resource' => 'group analytics']), null, 500);
         }
     }
+
+    // =========================================================================
+    // Lifecycle & Bulk Operations
+    // =========================================================================
+
+    /** POST /api/v2/admin/groups/{id}/archive */
+    public function archiveGroup(int $id): JsonResponse
+    {
+        $this->requireAdmin();
+        $userId = $this->requireUserId();
+        if ($userId instanceof JsonResponse) return $userId;
+
+        $reason = request()->input('reason', '');
+        $success = \App\Services\GroupLifecycleService::archive($id, $userId, $reason);
+
+        return $success
+            ? $this->successResponse(['message' => 'Group archived'])
+            : $this->errorResponse('Failed to archive group', 400);
+    }
+
+    /** POST /api/v2/admin/groups/{id}/unarchive */
+    public function unarchiveGroup(int $id): JsonResponse
+    {
+        $this->requireAdmin();
+        $userId = $this->requireUserId();
+        if ($userId instanceof JsonResponse) return $userId;
+
+        $success = \App\Services\GroupLifecycleService::unarchive($id, $userId);
+
+        return $success
+            ? $this->successResponse(['message' => 'Group unarchived'])
+            : $this->errorResponse('Failed to unarchive group', 400);
+    }
+
+    /** POST /api/v2/admin/groups/bulk-archive */
+    public function bulkArchive(): JsonResponse
+    {
+        $this->requireAdmin();
+        $userId = $this->requireUserId();
+        if ($userId instanceof JsonResponse) return $userId;
+
+        $groupIds = request()->input('group_ids', []);
+        if (empty($groupIds) || !is_array($groupIds)) {
+            return $this->errorResponse('group_ids array required', 400);
+        }
+
+        $affected = \App\Services\GroupLifecycleService::bulkArchive($groupIds, $userId);
+        return $this->successResponse(['archived' => $affected]);
+    }
+
+    /** POST /api/v2/admin/groups/bulk-unarchive */
+    public function bulkUnarchive(): JsonResponse
+    {
+        $this->requireAdmin();
+        $userId = $this->requireUserId();
+        if ($userId instanceof JsonResponse) return $userId;
+
+        $groupIds = request()->input('group_ids', []);
+        if (empty($groupIds) || !is_array($groupIds)) {
+            return $this->errorResponse('group_ids array required', 400);
+        }
+
+        $affected = \App\Services\GroupLifecycleService::bulkUnarchive($groupIds, $userId);
+        return $this->successResponse(['unarchived' => $affected]);
+    }
+
+    /** POST /api/v2/admin/groups/{id}/transfer-ownership */
+    public function transferOwnership(int $id): JsonResponse
+    {
+        $this->requireAdmin();
+        $userId = $this->requireUserId();
+        if ($userId instanceof JsonResponse) return $userId;
+
+        $newOwnerId = (int) request()->input('new_owner_id');
+        if (!$newOwnerId) {
+            return $this->errorResponse('new_owner_id required', 400);
+        }
+
+        $success = \App\Services\GroupLifecycleService::transferOwnership($id, $newOwnerId, $userId);
+
+        return $success
+            ? $this->successResponse(['message' => 'Ownership transferred'])
+            : $this->errorResponse('Failed to transfer ownership. Ensure user is an active member.', 400);
+    }
+
+    /** POST /api/v2/admin/groups/{id}/merge */
+    public function mergeGroup(int $id): JsonResponse
+    {
+        $this->requireAdmin();
+        $userId = $this->requireUserId();
+        if ($userId instanceof JsonResponse) return $userId;
+
+        $targetGroupId = (int) request()->input('target_group_id');
+        if (!$targetGroupId) {
+            return $this->errorResponse('target_group_id required', 400);
+        }
+
+        $success = \App\Services\GroupLifecycleService::mergeGroups($id, $targetGroupId, $userId);
+
+        return $success
+            ? $this->successResponse(['message' => 'Groups merged successfully'])
+            : $this->errorResponse('Failed to merge groups', 400);
+    }
+
+    /** POST /api/v2/admin/groups/{id}/clone */
+    public function cloneGroup(int $id): JsonResponse
+    {
+        $this->requireAdmin();
+        $userId = $this->requireUserId();
+        if ($userId instanceof JsonResponse) return $userId;
+
+        $newName = request()->input('name');
+        if (!$newName) {
+            return $this->errorResponse('name required', 400);
+        }
+
+        $cloneMembers = (bool) request()->input('clone_members', false);
+        $newGroupId = \App\Services\GroupLifecycleService::cloneGroup($id, $newName, $userId, $cloneMembers);
+
+        return $newGroupId
+            ? $this->successResponse(['id' => $newGroupId, 'message' => 'Group cloned'])
+            : $this->errorResponse('Failed to clone group', 400);
+    }
+
+    /** GET /api/v2/admin/groups/{id}/audit-log */
+    public function auditLog(int $id): JsonResponse
+    {
+        $this->requireAdmin();
+
+        try {
+            $filters = [];
+            if ($this->query('action')) {
+                $filters['action'] = $this->query('action');
+            }
+            $logs = \App\Services\GroupAuditService::getGroupLog($id, $filters);
+            return $this->successResponse($logs);
+        } catch (\Throwable $e) {
+            return $this->successResponse([]);
+        }
+    }
+
+    // =========================================================================
+    // Tags Management
+    // =========================================================================
+
+    /** GET /api/v2/admin/group-tags */
+    public function listTags(): JsonResponse
+    {
+        $this->requireAdmin();
+        $tags = \App\Services\GroupTagService::getAll([
+            'search' => $this->query('q'),
+            'limit' => $this->queryInt('limit', 100),
+        ]);
+        return $this->successResponse($tags);
+    }
+
+    /** POST /api/v2/admin/group-tags */
+    public function createTag(): JsonResponse
+    {
+        $this->requireAdmin();
+
+        $name = request()->input('name');
+        if (!$name) {
+            return $this->errorResponse('name required', 400);
+        }
+
+        $tag = \App\Services\GroupTagService::create($name, request()->input('color'));
+        return $tag
+            ? $this->successResponse($tag, 201)
+            : $this->errorResponse('Failed to create tag', 400);
+    }
+
+    /** DELETE /api/v2/admin/group-tags/{tagId} */
+    public function deleteTag(int $tagId): JsonResponse
+    {
+        $this->requireAdmin();
+
+        $success = \App\Services\GroupTagService::delete($tagId);
+        return $success
+            ? $this->successResponse(['message' => 'Tag deleted'])
+            : $this->errorResponse('Tag not found', 404);
+    }
 }

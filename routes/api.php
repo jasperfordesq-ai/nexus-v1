@@ -229,6 +229,55 @@ Route::get('/v2/groups/{id}/announcements', [\App\Http\Controllers\Api\GroupsCon
 Route::post('/v2/groups/{id}/announcements', [\App\Http\Controllers\Api\GroupsController::class, 'createAnnouncement']);
 Route::put('/v2/groups/{id}/announcements/{announcementId}', [\App\Http\Controllers\Api\GroupsController::class, 'updateAnnouncement']);
 Route::delete('/v2/groups/{id}/announcements/{announcementId}', [\App\Http\Controllers\Api\GroupsController::class, 'deleteAnnouncement']);
+Route::get('/v2/groups/{id}/files', [\App\Http\Controllers\Api\GroupFilesController::class, 'index']);
+Route::post('/v2/groups/{id}/files', [\App\Http\Controllers\Api\GroupFilesController::class, 'store']);
+Route::get('/v2/groups/{id}/files/folders', [\App\Http\Controllers\Api\GroupFilesController::class, 'folders']);
+Route::get('/v2/groups/{id}/files/stats', [\App\Http\Controllers\Api\GroupFilesController::class, 'stats']);
+Route::get('/v2/groups/{id}/files/{fileId}/download', [\App\Http\Controllers\Api\GroupFilesController::class, 'download']);
+Route::delete('/v2/groups/{id}/files/{fileId}', [\App\Http\Controllers\Api\GroupFilesController::class, 'destroy']);
+Route::get('/v2/groups/{id}/analytics', [\App\Http\Controllers\Api\GroupAnalyticsController::class, 'dashboard']);
+Route::get('/v2/groups/{id}/analytics/growth', [\App\Http\Controllers\Api\GroupAnalyticsController::class, 'growth']);
+Route::get('/v2/groups/{id}/analytics/engagement', [\App\Http\Controllers\Api\GroupAnalyticsController::class, 'engagement']);
+Route::get('/v2/groups/{id}/analytics/contributors', [\App\Http\Controllers\Api\GroupAnalyticsController::class, 'contributors']);
+Route::get('/v2/groups/{id}/analytics/retention', [\App\Http\Controllers\Api\GroupAnalyticsController::class, 'retention']);
+Route::get('/v2/groups/{id}/analytics/comparative', [\App\Http\Controllers\Api\GroupAnalyticsController::class, 'comparative']);
+Route::get('/v2/groups/{id}/analytics/export/members', [\App\Http\Controllers\Api\GroupAnalyticsController::class, 'exportMembers']);
+Route::get('/v2/groups/{id}/analytics/export/activity', [\App\Http\Controllers\Api\GroupAnalyticsController::class, 'exportActivity']);
+Route::get('/v2/groups/{id}/invites', [\App\Http\Controllers\Api\GroupInviteController::class, 'index']);
+Route::post('/v2/groups/{id}/invites/link', [\App\Http\Controllers\Api\GroupInviteController::class, 'createLink']);
+Route::post('/v2/groups/{id}/invites/email', [\App\Http\Controllers\Api\GroupInviteController::class, 'sendEmails']);
+Route::delete('/v2/groups/{id}/invites/{inviteId}', [\App\Http\Controllers\Api\GroupInviteController::class, 'revoke']);
+Route::post('/v2/groups/invite/{token}/accept', [\App\Http\Controllers\Api\GroupInviteController::class, 'accept']);
+Route::get('/v2/groups/{id}/tags', [\App\Http\Controllers\Api\GroupTagController::class, 'index']);
+Route::put('/v2/groups/{id}/tags', [\App\Http\Controllers\Api\GroupTagController::class, 'update']);
+Route::get('/v2/group-tags', [\App\Http\Controllers\Api\GroupTagController::class, 'allTags']);
+Route::get('/v2/group-tags/popular', [\App\Http\Controllers\Api\GroupTagController::class, 'popular']);
+Route::get('/v2/group-tags/suggest', [\App\Http\Controllers\Api\GroupTagController::class, 'suggest']);
+Route::get('/v2/groups/{id}/questions', [\App\Http\Controllers\Api\GroupQAController::class, 'index']);
+Route::post('/v2/groups/{id}/questions', [\App\Http\Controllers\Api\GroupQAController::class, 'ask']);
+Route::get('/v2/groups/{id}/questions/{questionId}', [\App\Http\Controllers\Api\GroupQAController::class, 'show']);
+Route::post('/v2/groups/{id}/questions/{questionId}/answers', [\App\Http\Controllers\Api\GroupQAController::class, 'answer']);
+Route::post('/v2/groups/{id}/answers/{answerId}/accept', [\App\Http\Controllers\Api\GroupQAController::class, 'accept']);
+Route::post('/v2/groups/{id}/qa/vote', [\App\Http\Controllers\Api\GroupQAController::class, 'vote']);
+Route::get('/v2/groups/{id}/wiki', [\App\Http\Controllers\Api\GroupWikiController::class, 'index']);
+Route::post('/v2/groups/{id}/wiki', [\App\Http\Controllers\Api\GroupWikiController::class, 'create']);
+Route::get('/v2/groups/{id}/wiki/{slug}', [\App\Http\Controllers\Api\GroupWikiController::class, 'show']);
+Route::put('/v2/groups/{id}/wiki/{pageId}', [\App\Http\Controllers\Api\GroupWikiController::class, 'update']);
+Route::delete('/v2/groups/{id}/wiki/{pageId}', [\App\Http\Controllers\Api\GroupWikiController::class, 'destroy']);
+Route::get('/v2/groups/{id}/wiki/{pageId}/revisions', [\App\Http\Controllers\Api\GroupWikiController::class, 'revisions']);
+Route::get('/v2/groups/{id}/media', [\App\Http\Controllers\Api\GroupMediaController::class, 'index']);
+Route::post('/v2/groups/{id}/media', [\App\Http\Controllers\Api\GroupMediaController::class, 'upload']);
+Route::delete('/v2/groups/{id}/media/{mediaId}', [\App\Http\Controllers\Api\GroupMediaController::class, 'destroy']);
+Route::get('/v2/groups/{id}/webhooks', [\App\Http\Controllers\Api\GroupWebhookController::class, 'index']);
+Route::post('/v2/groups/{id}/webhooks', [\App\Http\Controllers\Api\GroupWebhookController::class, 'store']);
+Route::delete('/v2/groups/{id}/webhooks/{webhookId}', [\App\Http\Controllers\Api\GroupWebhookController::class, 'destroy']);
+Route::put('/v2/groups/{id}/webhooks/{webhookId}/toggle', [\App\Http\Controllers\Api\GroupWebhookController::class, 'toggle']);
+Route::get('/v2/groups/{id}/welcome', [\App\Http\Controllers\Api\GroupWelcomeController::class, 'getConfig']);
+Route::put('/v2/groups/{id}/welcome', [\App\Http\Controllers\Api\GroupWelcomeController::class, 'setConfig']);
+Route::get('/v2/group-templates', [\App\Http\Controllers\Api\GroupTemplateController::class, 'index']);
+Route::get('/v2/groups/{id}/custom-fields', [\App\Http\Controllers\Api\GroupCustomFieldController::class, 'getValues']);
+Route::put('/v2/groups/{id}/custom-fields', [\App\Http\Controllers\Api\GroupCustomFieldController::class, 'setValues']);
+Route::get('/v2/groups/{id}/export', [\App\Http\Controllers\Api\GroupDataExportController::class, 'exportAll']);
 Route::get('/v2/connections', [\App\Http\Controllers\Api\ConnectionsController::class, 'index']);
 Route::get('/v2/connections/pending', [\App\Http\Controllers\Api\ConnectionsController::class, 'pendingCounts']);
 Route::get('/v2/connections/status/{userId}', [\App\Http\Controllers\Api\ConnectionsController::class, 'status']);
@@ -883,6 +932,17 @@ Route::get('/v2/admin/groups/{groupId}/members', [\App\Http\Controllers\Api\Admi
 Route::post('/v2/admin/groups/{groupId}/members/{userId}/promote', [\App\Http\Controllers\Api\AdminGroupsController::class, 'promoteMember']);
 Route::post('/v2/admin/groups/{groupId}/members/{userId}/demote', [\App\Http\Controllers\Api\AdminGroupsController::class, 'demoteMember']);
 Route::delete('/v2/admin/groups/{groupId}/members/{userId}', [\App\Http\Controllers\Api\AdminGroupsController::class, 'kickMember']);
+Route::post('/v2/admin/groups/bulk-archive', [\App\Http\Controllers\Api\AdminGroupsController::class, 'bulkArchive']);
+Route::post('/v2/admin/groups/bulk-unarchive', [\App\Http\Controllers\Api\AdminGroupsController::class, 'bulkUnarchive']);
+Route::post('/v2/admin/groups/{id}/archive', [\App\Http\Controllers\Api\AdminGroupsController::class, 'archiveGroup']);
+Route::post('/v2/admin/groups/{id}/unarchive', [\App\Http\Controllers\Api\AdminGroupsController::class, 'unarchiveGroup']);
+Route::post('/v2/admin/groups/{id}/transfer-ownership', [\App\Http\Controllers\Api\AdminGroupsController::class, 'transferOwnership']);
+Route::post('/v2/admin/groups/{id}/merge', [\App\Http\Controllers\Api\AdminGroupsController::class, 'mergeGroup']);
+Route::post('/v2/admin/groups/{id}/clone', [\App\Http\Controllers\Api\AdminGroupsController::class, 'cloneGroup']);
+Route::get('/v2/admin/groups/{id}/audit-log', [\App\Http\Controllers\Api\AdminGroupsController::class, 'auditLog']);
+Route::get('/v2/admin/group-tags', [\App\Http\Controllers\Api\AdminGroupsController::class, 'listTags']);
+Route::post('/v2/admin/group-tags', [\App\Http\Controllers\Api\AdminGroupsController::class, 'createTag']);
+Route::delete('/v2/admin/group-tags/{tagId}', [\App\Http\Controllers\Api\AdminGroupsController::class, 'deleteTag']);
 Route::get('/v2/admin/timebanking/stats', [\App\Http\Controllers\Api\AdminTimebankingController::class, 'stats']);
 Route::get('/v2/admin/timebanking/alerts', [\App\Http\Controllers\Api\AdminTimebankingController::class, 'alerts']);
 Route::put('/v2/admin/timebanking/alerts/{id}', [\App\Http\Controllers\Api\AdminTimebankingController::class, 'updateAlert']);
@@ -912,6 +972,42 @@ Route::get('/v2/admin/enterprise/monitoring/logs', [\App\Http\Controllers\Api\Ad
 Route::get('/v2/admin/enterprise/config', [\App\Http\Controllers\Api\AdminEnterpriseController::class, 'config']);
 Route::put('/v2/admin/enterprise/config', [\App\Http\Controllers\Api\AdminEnterpriseController::class, 'updateConfig']);
 Route::get('/v2/admin/enterprise/config/secrets', [\App\Http\Controllers\Api\AdminEnterpriseController::class, 'secrets']);
+
+// Enterprise GDPR — extended endpoints
+Route::get('/v2/admin/enterprise/gdpr/statistics', [\App\Http\Controllers\Api\AdminEnterpriseController::class, 'gdprStatistics']);
+Route::post('/v2/admin/enterprise/gdpr/requests', [\App\Http\Controllers\Api\AdminEnterpriseController::class, 'createGdprRequest']);
+Route::get('/v2/admin/enterprise/gdpr/requests/{id}', [\App\Http\Controllers\Api\AdminEnterpriseController::class, 'showGdprRequest']);
+Route::put('/v2/admin/enterprise/gdpr/requests/{id}/assign', [\App\Http\Controllers\Api\AdminEnterpriseController::class, 'assignGdprRequest']);
+Route::post('/v2/admin/enterprise/gdpr/requests/{id}/notes', [\App\Http\Controllers\Api\AdminEnterpriseController::class, 'addGdprRequestNote']);
+Route::post('/v2/admin/enterprise/gdpr/requests/{id}/export', [\App\Http\Controllers\Api\AdminEnterpriseController::class, 'generateGdprExport']);
+
+// Enterprise GDPR — consent type management
+Route::get('/v2/admin/enterprise/gdpr/consent-types', [\App\Http\Controllers\Api\AdminEnterpriseController::class, 'consentTypes']);
+Route::post('/v2/admin/enterprise/gdpr/consent-types', [\App\Http\Controllers\Api\AdminEnterpriseController::class, 'createConsentType']);
+Route::put('/v2/admin/enterprise/gdpr/consent-types/{id}', [\App\Http\Controllers\Api\AdminEnterpriseController::class, 'updateConsentType']);
+Route::delete('/v2/admin/enterprise/gdpr/consent-types/{id}', [\App\Http\Controllers\Api\AdminEnterpriseController::class, 'deleteConsentType']);
+Route::get('/v2/admin/enterprise/gdpr/consent-types/{slug}/users', [\App\Http\Controllers\Api\AdminEnterpriseController::class, 'consentTypeUsers']);
+Route::get('/v2/admin/enterprise/gdpr/consent-types/{slug}/export', [\App\Http\Controllers\Api\AdminEnterpriseController::class, 'exportConsentTypeUsers']);
+
+// Enterprise GDPR — breach detail & DPA notification
+Route::get('/v2/admin/enterprise/gdpr/breaches/{id}', [\App\Http\Controllers\Api\AdminEnterpriseController::class, 'showBreach']);
+Route::put('/v2/admin/enterprise/gdpr/breaches/{id}', [\App\Http\Controllers\Api\AdminEnterpriseController::class, 'updateBreach']);
+Route::post('/v2/admin/enterprise/gdpr/breaches/{id}/notify-dpa', [\App\Http\Controllers\Api\AdminEnterpriseController::class, 'notifyDpa']);
+
+// Enterprise monitoring — log files, requirements, health history
+Route::get('/v2/admin/enterprise/monitoring/log-files', [\App\Http\Controllers\Api\AdminEnterpriseController::class, 'logFiles']);
+Route::get('/v2/admin/enterprise/monitoring/log-files/{filename}', [\App\Http\Controllers\Api\AdminEnterpriseController::class, 'viewLogFile']);
+Route::delete('/v2/admin/enterprise/monitoring/log-files/{filename}', [\App\Http\Controllers\Api\AdminEnterpriseController::class, 'clearLogFile']);
+Route::get('/v2/admin/enterprise/monitoring/requirements', [\App\Http\Controllers\Api\AdminEnterpriseController::class, 'systemRequirements']);
+Route::get('/v2/admin/enterprise/monitoring/health-history', [\App\Http\Controllers\Api\AdminEnterpriseController::class, 'healthCheckHistory']);
+
+// Enterprise config — feature flags & secrets management
+Route::get('/v2/admin/enterprise/config/features', [\App\Http\Controllers\Api\AdminEnterpriseController::class, 'featureFlags']);
+Route::patch('/v2/admin/enterprise/config/features', [\App\Http\Controllers\Api\AdminEnterpriseController::class, 'updateFeatureFlag']);
+Route::post('/v2/admin/enterprise/config/secrets/{key}/rotate', [\App\Http\Controllers\Api\AdminEnterpriseController::class, 'rotateSecret']);
+Route::delete('/v2/admin/enterprise/config/secrets/{key}', [\App\Http\Controllers\Api\AdminEnterpriseController::class, 'deleteSecret']);
+Route::post('/v2/admin/enterprise/config/secrets/test-vault', [\App\Http\Controllers\Api\AdminEnterpriseController::class, 'testVaultConnection']);
+
 Route::get('/v2/admin/legal-documents', [\App\Http\Controllers\Api\AdminEnterpriseController::class, 'legalDocs']);
 Route::post('/v2/admin/legal-documents', [\App\Http\Controllers\Api\AdminEnterpriseController::class, 'createLegalDoc']);
 Route::get('/v2/admin/legal-documents/compliance', [\App\Http\Controllers\Api\AdminLegalDocController::class, 'getComplianceStats']);
