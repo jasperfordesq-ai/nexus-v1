@@ -87,7 +87,9 @@ const CONFIG_SCHEMA: ConfigGroup[] = [
       { key: 'site_name', label: 'Site Name', description: 'The name displayed in the header and page titles', type: 'text', default: '' },
       { key: 'site_description', label: 'Site Description', description: 'Brief description shown in SEO metadata', type: 'textarea', default: '' },
       { key: 'contact_email', label: 'Contact Email', description: 'Main contact email for the platform', type: 'email', default: '' },
+      { key: 'contact_phone', label: 'Contact Phone', description: 'Main contact phone number', type: 'text', default: '' },
       { key: 'timezone', label: 'Timezone', description: 'Default timezone for date/time display', type: 'text', default: 'UTC' },
+      { key: 'footer_text', label: 'Footer / Legal Text', description: 'Displayed in the site footer (e.g., charity number, company registration)', type: 'textarea', default: '' },
       {
         key: 'locale', label: 'Default Locale', description: 'Default language for the platform', type: 'select', default: 'en',
         options: [
@@ -108,6 +110,7 @@ const CONFIG_SCHEMA: ConfigGroup[] = [
       { key: 'registration_enabled', label: 'Open Registration', description: 'Allow new members to sign up', type: 'boolean', default: true },
       { key: 'require_approval', label: 'Require Admin Approval', description: 'New accounts must be approved before activation', type: 'boolean', default: false },
       { key: 'require_email_verification', label: 'Require Email Verification', description: 'Members must verify email before accessing the platform', type: 'boolean', default: true },
+      { key: 'maintenance_mode', label: 'Maintenance Mode', description: 'Only admins can access the platform while enabled', type: 'boolean', default: false },
       { key: 'onboarding_enabled', label: 'Onboarding Flow', description: 'Show guided onboarding for new members', type: 'boolean', default: true },
       { key: 'welcome_message', label: 'Welcome Message', description: 'Message shown to new members after registration', type: 'textarea', default: '' },
     ],

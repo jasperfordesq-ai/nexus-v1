@@ -10,8 +10,9 @@
  */
 
 import { useState, useCallback, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import {
-  Card, CardBody, CardHeader, Switch, Spinner, Button, Divider,
+  Card, CardBody, CardHeader, Spinner, Button, Divider,
   Select, SelectItem, Checkbox,
 } from '@heroui/react';
 import {
@@ -28,43 +29,9 @@ import { usePageTitle } from '@/hooks';
 import { useToast, useTenant } from '@/contexts';
 import { adminConfig } from '../../api/adminApi';
 import { PageHeader } from '../../components';
-import type { TenantConfig, CacheStats, BackgroundJob } from '../../api/types';
+import type { CacheStats, BackgroundJob } from '../../api/types';
 
 import { useTranslation } from 'react-i18next';
-// Feature metadata for display
-const FEATURE_META: Record<string, { label: string; description: string }> = {
-  events: { label: 'Events', description: 'Community events with RSVPs' },
-  groups: { label: 'Groups', description: 'Community groups and discussions' },
-  gamification: { label: 'Gamification', description: 'Badges, achievements, XP, leaderboards' },
-  goals: { label: 'Goals', description: 'Personal and community goals' },
-  blog: { label: 'Blog', description: 'Community blog/news posts' },
-  resources: { label: 'Resources', description: 'Shared resource library' },
-  volunteering: { label: 'Volunteering', description: 'Volunteer opportunities and hours' },
-  exchange_workflow: { label: 'Exchange Workflow', description: 'Structured exchange requests with broker approval' },
-  organisations: { label: 'Organisations', description: 'Organization profiles and management' },
-  federation: { label: 'Federation', description: 'Multi-community network and partnerships' },
-  connections: { label: 'Connections', description: 'User connections and friend requests' },
-  reviews: { label: 'Reviews', description: 'Member reviews and ratings' },
-  polls: { label: 'Polls', description: 'Community polls and voting' },
-  job_vacancies: { label: 'Job Vacancies', description: 'Job postings and application management' },
-  ideation_challenges: { label: 'Ideation Challenges', description: 'Community challenges with idea voting' },
-  direct_messaging: { label: 'Direct Messaging', description: 'Private messaging between members' },
-  group_exchanges: { label: 'Group Exchanges', description: 'Multi-party group exchange sessions' },
-  search: { label: 'Search', description: 'Full-text search across listings, members, and content' },
-  ai_chat: { label: 'AI Assistant', description: 'AI-powered chat assistant for members' },
-};
-
-const MODULE_META: Record<string, { label: string; description: string }> = {
-  listings: { label: 'Listings', description: 'Service offers and requests marketplace' },
-  wallet: { label: 'Wallet', description: 'Time credit transactions and balance' },
-  messages: { label: 'Messages', description: 'Messaging system' },
-  dashboard: { label: 'Dashboard', description: 'Member dashboard' },
-  feed: { label: 'Feed', description: 'Social activity feed' },
-  notifications: { label: 'Notifications', description: 'In-app notifications' },
-  profile: { label: 'Profile', description: 'User profiles' },
-  settings: { label: 'Settings', description: 'User settings' },
-};
-
 const PLATFORM_LANGUAGES = [
   { code: 'en', label: 'English', short: 'EN' },
   { code: 'ga', label: 'Gaeilge', short: 'GA' },
@@ -85,11 +52,9 @@ export function TenantFeatures() {
   const toast = useToast();
   const { refreshTenant, supportedLanguages, defaultLanguage } = useTenant();
 
-  const [config, setConfig] = useState<TenantConfig | null>(null);
   const [cacheStats, setCacheStats] = useState<CacheStats | null>(null);
   const [jobs, setJobs] = useState<BackgroundJob[]>([]);
   const [loading, setLoading] = useState(true);
-  const [toggling, setToggling] = useState<string | null>(null);
 
   // Language config state
   const [langDefault, setLangDefault] = useState(defaultLanguage);
@@ -104,15 +69,11 @@ export function TenantFeatures() {
 
   const loadConfig = useCallback(async () => {
     setLoading(true);
-    const [configRes, cacheRes, jobsRes] = await Promise.all([
-      adminConfig.get(),
+    const [cacheRes, jobsRes] = await Promise.all([
       adminConfig.getCacheStats(),
       adminConfig.getJobs(),
     ]);
 
-    if (configRes.success && configRes.data) {
-      setConfig(configRes.data);
-    }
     if (cacheRes.success && cacheRes.data) {
       setCacheStats(cacheRes.data);
     }
@@ -125,38 +86,6 @@ export function TenantFeatures() {
   useEffect(() => {
     loadConfig();
   }, [loadConfig]);
-
-  const handleFeatureToggle = async (feature: string, enabled: boolean) => {
-    setToggling(feature);
-    const res = await adminConfig.updateFeature(feature, enabled);
-    if (res.success) {
-      setConfig((prev) =>
-        prev ? { ...prev, features: { ...prev.features, [feature]: enabled } } : prev
-      );
-      toast.success(`${FEATURE_META[feature]?.label || feature} ${enabled ? 'enabled' : 'disabled'}`);
-      // Refresh TenantContext so nav items update immediately
-      refreshTenant();
-    } else {
-      toast.error(res.error || 'Failed to update feature');
-    }
-    setToggling(null);
-  };
-
-  const handleModuleToggle = async (module: string, enabled: boolean) => {
-    setToggling(module);
-    const res = await adminConfig.updateModule(module, enabled);
-    if (res.success) {
-      setConfig((prev) =>
-        prev ? { ...prev, modules: { ...prev.modules, [module]: enabled } } : prev
-      );
-      toast.success(`${MODULE_META[module]?.label || module} ${enabled ? 'enabled' : 'disabled'}`);
-      // Refresh TenantContext so nav items update immediately
-      refreshTenant();
-    } else {
-      toast.error(res.error || 'Failed to update module');
-    }
-    setToggling(null);
-  };
 
   const handleClearCache = async () => {
     const res = await adminConfig.clearCache('tenant');
@@ -308,54 +237,21 @@ export function TenantFeatures() {
           <Card shadow="sm">
             <CardHeader className="flex items-center gap-2 px-4 pt-4 pb-0">
               <Zap size={18} className="text-primary" />
-              <h3 className="font-semibold">Features</h3>
-              <span className="text-sm text-default-400">Optional add-on modules</span>
+              <h3 className="font-semibold">Features &amp; Modules</h3>
             </CardHeader>
-            <CardBody className="divide-y divide-divider px-4">
-              {Object.entries(config?.features || {}).map(([key, enabled]) => {
-                const meta = FEATURE_META[key];
-                return (
-                  <div key={key} className="flex items-center justify-between py-3">
-                    <div>
-                      <p className="font-medium">{meta?.label || key}</p>
-                      <p className="text-sm text-default-500">{meta?.description || ''}</p>
-                    </div>
-                    <Switch
-                      isSelected={enabled}
-                      onValueChange={(val) => handleFeatureToggle(key, val)}
-                      isDisabled={toggling === key}
-                      size="sm"
-                    />
-                  </div>
-                );
-              })}
-            </CardBody>
-          </Card>
-
-          <Card shadow="sm">
-            <CardHeader className="flex items-center gap-2 px-4 pt-4 pb-0">
-              <Cog size={18} className="text-secondary" />
-              <h3 className="font-semibold">Core Modules</h3>
-              <span className="text-sm text-default-400">Core platform functionality</span>
-            </CardHeader>
-            <CardBody className="divide-y divide-divider px-4">
-              {Object.entries(config?.modules || {}).map(([key, enabled]) => {
-                const meta = MODULE_META[key];
-                return (
-                  <div key={key} className="flex items-center justify-between py-3">
-                    <div>
-                      <p className="font-medium">{meta?.label || key}</p>
-                      <p className="text-sm text-default-500">{meta?.description || ''}</p>
-                    </div>
-                    <Switch
-                      isSelected={enabled}
-                      onValueChange={(val) => handleModuleToggle(key, val)}
-                      isDisabled={toggling === key}
-                      size="sm"
-                    />
-                  </div>
-                );
-              })}
+            <CardBody className="px-4 pb-4">
+              <p className="text-sm text-default-500 mb-3">
+                Feature flags and core module toggles are managed in the Enterprise section.
+              </p>
+              <Button
+                as={Link}
+                to="../enterprise/config/features"
+                color="primary"
+                variant="flat"
+                startContent={<Cog size={16} />}
+              >
+                Manage Feature Flags
+              </Button>
             </CardBody>
           </Card>
         </div>

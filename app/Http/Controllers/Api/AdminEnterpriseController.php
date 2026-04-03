@@ -596,6 +596,7 @@ class AdminEnterpriseController extends BaseApiController
         'site_name' => 'name',
         'site_description' => 'description',
         'contact_email' => 'contact_email',
+        'contact_phone' => 'contact_phone',
     ];
 
     private const CONFIG_TENANT_SETTINGS = [
@@ -603,8 +604,10 @@ class AdminEnterpriseController extends BaseApiController
         'registration_enabled' => 'general.registration_mode',
         'require_approval' => 'general.admin_approval',
         'require_email_verification' => 'general.email_verification',
+        'maintenance_mode' => 'general.maintenance_mode',
         'welcome_message' => 'general.welcome_message',
         'starting_balance' => 'general.welcome_credits',
+        'footer_text' => 'general.footer_text',
         'onboarding_enabled' => 'onboarding.enabled',
     ];
 
