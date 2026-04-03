@@ -31,6 +31,10 @@ interface PusherConfig {
 interface PusherContextValue {
   /** Whether Pusher is connected */
   isConnected: boolean;
+  /** Raw Pusher client for subscribing to arbitrary channels */
+  client: Pusher | null;
+  /** Current tenant ID (needed for channel names) */
+  tenantId: number | string | null;
   /** Subscribe to a conversation channel */
   subscribeToConversation: (otherUserId: number) => void;
   /** Unsubscribe from a conversation channel */
@@ -138,15 +142,32 @@ export function PusherProvider({ children }: PusherProviderProps) {
       // built-in XHR POST hits the backend without proper CORS headers.
       authorizer: (channel) => ({
         authorize: (socketId, callback) => {
-          api.post<{ auth: string; channel_data?: string }>('/pusher/auth', {
-            socket_id: socketId,
-            channel_name: channel.name,
+          // Use raw fetch instead of api.post to avoid triggering SESSION_EXPIRED_EVENT
+          // on Pusher auth 401s — a transient Pusher auth failure during a network blip
+          // should NOT log the user out of the entire application.
+          const token = tokenManager.getAccessToken();
+          const tenantId = tokenManager.getTenantId?.() ?? '';
+          fetch(`${import.meta.env.VITE_API_BASE || '/api'}/pusher/auth`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              ...(token ? { Authorization: `Bearer ${token}` } : {}),
+              ...(tenantId ? { 'X-Tenant-ID': String(tenantId) } : {}),
+            },
+            body: JSON.stringify({ socket_id: socketId, channel_name: channel.name }),
           })
-            .then((response) => {
-              if (response.success && response.data) {
-                callback(null, response.data as { auth: string });
+            .then(async (res) => {
+              if (!res.ok) {
+                callback(new Error(`Pusher auth failed: ${res.status}`), null as never);
+                return;
+              }
+              const data = await res.json();
+              // Handle both direct response and wrapped {success, data} format
+              const authData = data?.data ?? data;
+              if (authData?.auth) {
+                callback(null, authData as { auth: string });
               } else {
-                callback(new Error(response.error || 'Pusher auth failed'), null as never);
+                callback(new Error('Pusher auth: no auth token in response'), null as never);
               }
             })
             .catch((err) => {
@@ -339,9 +360,13 @@ export function PusherProvider({ children }: PusherProviderProps) {
     }
   }, []);
 
+  const tenantIdValue = user?.tenant_id || tokenManager.getTenantId() || null;
+
   const value = useMemo<PusherContextValue>(
     () => ({
       isConnected,
+      client: pusherRef.current,
+      tenantId: tenantIdValue,
       subscribeToConversation,
       unsubscribeFromConversation,
       onNewMessage,
@@ -350,7 +375,8 @@ export function PusherProvider({ children }: PusherProviderProps) {
       onFeedPost,
       sendTyping,
     }),
-    [isConnected, subscribeToConversation, unsubscribeFromConversation, onNewMessage, onTyping, onUnreadCount, onFeedPost, sendTyping]
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [isConnected, tenantIdValue, subscribeToConversation, unsubscribeFromConversation, onNewMessage, onTyping, onUnreadCount, onFeedPost, sendTyping]
   );
 
   return (
