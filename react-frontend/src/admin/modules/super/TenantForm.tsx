@@ -148,7 +148,7 @@ export function TenantForm() {
     features: {} as Record<string, boolean>,
     // Languages
     default_language: 'en',
-    supported_languages: ['en', 'ga', 'de', 'fr', 'it', 'pt', 'es'] as string[],
+    supported_languages: ['en', 'ga', 'de', 'fr', 'it', 'pt', 'es', 'nl', 'pl', 'ja', 'ar'] as string[],
     // Legal documents
     privacy_text: '',
     terms_text: '',

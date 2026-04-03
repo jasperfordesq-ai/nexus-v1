@@ -47,9 +47,13 @@ i18n
     },
   });
 
-// Keep <html lang="..."> in sync with the active language for accessibility & SEO
+/** Languages that use right-to-left script direction. */
+const RTL_LANGUAGES = new Set(['ar']);
+
+// Keep <html lang="..."> and dir in sync with the active language for accessibility & SEO
 i18n.on('languageChanged', (lng: string) => {
   document.documentElement.lang = lng;
+  document.documentElement.dir = RTL_LANGUAGES.has(lng) ? 'rtl' : 'ltr';
 });
 
 export default i18n;

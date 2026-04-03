@@ -437,14 +437,14 @@ describe('TenantContext', () => {
       expect(result.current.supportedLanguages).toEqual(['en', 'ga']);
     });
 
-    it('falls back to [en, ga] when no supported_languages in tenant data', async () => {
+    it('falls back to all 11 languages when no supported_languages in tenant data', async () => {
       const tenantNoLangs = { ...mockTenantConfig, supported_languages: undefined };
       mockApiGet.mockResolvedValue({ success: true, data: tenantNoLangs });
 
       const { result } = renderHook(() => useTenant(), { wrapper: tenantWrapper });
       await waitFor(() => expect(result.current.isLoading).toBe(false));
 
-      expect(result.current.supportedLanguages).toEqual(['en', 'ga']);
+      expect(result.current.supportedLanguages).toEqual(['en', 'ga', 'de', 'fr', 'it', 'pt', 'es', 'nl', 'pl', 'ja', 'ar']);
     });
 
     it('exposes defaultLanguage from tenant data', async () => {

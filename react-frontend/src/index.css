@@ -62,6 +62,22 @@
 .hover\:border-theme-hover:hover { border-color: var(--border-hover); }
 
 /* ─────────────────────────────────────────────
+   RTL (RIGHT-TO-LEFT) SUPPORT
+   Applied automatically when dir="rtl" is set on <html>
+   (e.g. Arabic). Tailwind's rtl: variant handles
+   component-level overrides.
+   ───────────────────────────────────────────── */
+
+[dir="rtl"] {
+  text-align: right;
+}
+
+[dir="rtl"] [data-slot="popover"],
+[dir="rtl"] [data-slot="listbox"] {
+  text-align: right;
+}
+
+/* ─────────────────────────────────────────────
    LEGAL DOCUMENT CONTENT
    Styles for HTML rendered via dangerouslySetInnerHTML
    in custom legal documents (Terms, Privacy, etc.)

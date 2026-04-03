@@ -73,6 +73,10 @@ const PLATFORM_LANGUAGES = [
   { code: 'it', label: 'Italiano', short: 'IT' },
   { code: 'pt', label: 'Português', short: 'PT' },
   { code: 'es', label: 'Español', short: 'ES' },
+  { code: 'nl', label: 'Nederlands', short: 'NL' },
+  { code: 'pl', label: 'Polski', short: 'PL' },
+  { code: 'ja', label: '日本語', short: 'JA' },
+  { code: 'ar', label: 'العربية', short: 'AR' },
 ];
 
 export function TenantFeatures() {

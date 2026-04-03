@@ -303,7 +303,7 @@ class TenantBootstrapController extends BaseApiController
             'insurance_enabled' => $this->brokerControlConfigService->isInsuranceEnabled(),
         ];
 
-        $data['supported_languages'] = $config['supported_languages'] ?? ['en', 'ga', 'de', 'fr', 'it', 'pt', 'es'];
+        $data['supported_languages'] = $config['supported_languages'] ?? ['en', 'ga', 'de', 'fr', 'it', 'pt', 'es', 'nl', 'pl', 'ja', 'ar'];
         $data['default_language'] = $config['default_language'] ?? 'en';
 
         $menuPages = $this->buildMenuPages((int) $tenant['id']);

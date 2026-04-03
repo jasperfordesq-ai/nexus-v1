@@ -76,6 +76,10 @@ const LANGUAGE_LABELS: Record<string, string> = {
   it: 'Italiano',
   pt: 'Português',
   es: 'Español',
+  nl: 'Nederlands',
+  pl: 'Polski',
+  ja: '日本語',
+  ar: 'العربية',
 };
 
 export function TenantShow() {

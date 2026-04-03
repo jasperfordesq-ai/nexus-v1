@@ -14,7 +14,7 @@ import { useTenant } from '@/contexts';
  * hreflang alternate links for multi-language SEO, and BreadcrumbList JSON-LD.
  * Place this in Layout.tsx so it runs on every page load.
  */
-const SUPPORTED_LANGUAGES = ['en', 'ga', 'de', 'fr', 'it', 'pt', 'es'] as const;
+const SUPPORTED_LANGUAGES = ['en', 'ga', 'de', 'fr', 'it', 'pt', 'es', 'nl', 'pl', 'ja', 'ar'] as const;
 
 export function SeoHead() {
   const { branding, tenant } = useTenant();

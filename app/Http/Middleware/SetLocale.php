@@ -24,7 +24,7 @@ use Symfony\Component\HttpFoundation\Response;
  */
 class SetLocale
 {
-    private const SUPPORTED_LOCALES = ['en', 'ga', 'de', 'fr', 'it', 'pt', 'es'];
+    private const SUPPORTED_LOCALES = ['en', 'ga', 'de', 'fr', 'it', 'pt', 'es', 'nl', 'pl', 'ja', 'ar'];
 
     public function handle(Request $request, Closure $next): Response
     {

@@ -118,7 +118,7 @@ class AdminConfigController extends BaseApiController
 
     private const NATIVE_APP_SENSITIVE_KEYS = ['native_app_fcm_server_key', 'native_app_apns_key_id'];
 
-    private const VALID_LANGUAGES = ['en', 'ga', 'de', 'fr', 'it', 'pt', 'es'];
+    private const VALID_LANGUAGES = ['en', 'ga', 'de', 'fr', 'it', 'pt', 'es', 'nl', 'pl', 'ja', 'ar'];
 
     // =========================================================================
     // Config (already native)

@@ -42,6 +42,10 @@ const ALL_LANGUAGES: Language[] = [
   { code: 'it', label: 'Italiano', short: 'IT' },
   { code: 'pt', label: 'Português', short: 'PT' },
   { code: 'es', label: 'Español', short: 'ES' },
+  { code: 'nl', label: 'Nederlands', short: 'NL' },
+  { code: 'pl', label: 'Polski', short: 'PL' },
+  { code: 'ja', label: '日本語', short: 'JA' },
+  { code: 'ar', label: 'العربية', short: 'AR' },
 ];
 
 interface LanguageSwitcherProps {
@@ -106,7 +110,7 @@ export function LanguageSwitcher({ compact = true }: LanguageSwitcherProps) {
             key={lang.code}
             className={lang.code === currentLang.code ? 'bg-theme-active' : ''}
           >
-            <span className="font-medium text-xs text-theme-subtle mr-2">{lang.short}</span>
+            <span className="font-medium text-xs text-theme-subtle me-2">{lang.short}</span>
             <span>{lang.label}</span>
           </DropdownItem>
         ))}

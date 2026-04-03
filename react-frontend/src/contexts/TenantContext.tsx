@@ -293,7 +293,7 @@ export function TenantProvider({ children, tenantSlug }: TenantProviderProps) {
   }, [effectiveTenantSlug]);
 
   const supportedLanguages = useMemo<string[]>(
-    () => state.tenant?.supported_languages ?? ['en', 'ga'],
+    () => state.tenant?.supported_languages ?? ['en', 'ga', 'de', 'fr', 'it', 'pt', 'es', 'nl', 'pl', 'ja', 'ar'],
     [state.tenant]
   );
 
