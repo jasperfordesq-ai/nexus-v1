@@ -14,8 +14,6 @@ import { motion } from 'framer-motion';
 import {
   Button,
   Avatar,
-  Tabs,
-  Tab,
   Modal,
   ModalContent,
   ModalHeader,
@@ -25,6 +23,10 @@ import {
   Textarea,
   Switch,
   Spinner,
+  Dropdown,
+  DropdownTrigger,
+  DropdownMenu,
+  DropdownItem,
   useDisclosure,
 } from '@heroui/react';
 import {
@@ -51,6 +53,7 @@ import {
   Flag,
   FolderOpen,
   Megaphone,
+  ChevronDown,
 } from 'lucide-react';
 import { GlassCard } from '@/components/ui';
 import { PageMeta } from '@/components/seo/PageMeta';
@@ -1245,146 +1248,112 @@ export function GroupDetailPage() {
       <PinnedAnnouncementsBanner groupId={group.id} />
 
       {/* Tabs */}
-      <Tabs
-        selectedKey={activeTab}
-        onSelectionChange={(key) => setActiveTab(key as string)}
-        classNames={{
-          tabList: 'bg-theme-elevated p-1 rounded-lg',
-          cursor: 'bg-theme-hover',
-          tab: 'text-theme-muted data-[selected=true]:text-theme-primary',
-        }}
-      >
-        <Tab
-          key="feed"
-          title={
-            <span className="flex items-center gap-2">
-              <Newspaper className="w-4 h-4" aria-hidden="true" />
-              {t('detail.tab_feed', 'Feed')}
-            </span>
-          }
-        />
-        <Tab
-          key="discussion"
-          title={
-            <span className="flex items-center gap-2">
-              <MessageSquare className="w-4 h-4" aria-hidden="true" />
-              {t('detail.tab_discussion')}
-            </span>
-          }
-        />
-        <Tab
-          key="members"
-          title={
-            <span className="flex items-center gap-2">
-              <Users className="w-4 h-4" aria-hidden="true" />
-              {t('detail.tab_members')}
-            </span>
-          }
-        />
-        <Tab
-          key="events"
-          title={
-            <span className="flex items-center gap-2">
-              <Calendar className="w-4 h-4" aria-hidden="true" />
-              {t('detail.tab_events')}
-            </span>
-          }
-        />
-        <Tab
-          key="files"
-          title={
-            <span className="flex items-center gap-2">
-              <FolderOpen className="w-4 h-4" aria-hidden="true" />
-              {t('detail.tab_files', 'Files')}
-            </span>
-          }
-        />
-        <Tab
-          key="announcements"
-          title={
-            <span className="flex items-center gap-2">
-              <Megaphone className="w-4 h-4" aria-hidden="true" />
-              {t('detail.tab_announcements', 'Announcements')}
-            </span>
-          }
-        />
-        <Tab
-          key="chatrooms"
-          title={
-            <span className="flex items-center gap-2">
-              <MessageSquare className="w-4 h-4" aria-hidden="true" />
-              {t('detail.tab_channels', 'Channels')}
-            </span>
-          }
-        />
-        <Tab
-          key="tasks"
-          title={
-            <span className="flex items-center gap-2">
-              <CheckCircle className="w-4 h-4" aria-hidden="true" />
-              {t('detail.tab_tasks', 'Tasks')}
-            </span>
-          }
-        />
-        <Tab
-          key="qa"
-          title={
-            <span className="flex items-center gap-2">
-              <AlertCircle className="w-4 h-4" aria-hidden="true" />
-              {t('detail.tab_qa', 'Q&A')}
-            </span>
-          }
-        />
-        <Tab
-          key="wiki"
-          title={
-            <span className="flex items-center gap-2">
-              <FileText className="w-4 h-4" aria-hidden="true" />
-              {t('detail.tab_wiki', 'Wiki')}
-            </span>
-          }
-        />
-        <Tab
-          key="media"
-          title={
-            <span className="flex items-center gap-2">
-              <Image className="w-4 h-4" aria-hidden="true" />
-              {t('detail.tab_media', 'Gallery')}
-            </span>
-          }
-        />
-        <Tab
-          key="challenges"
-          title={
-            <span className="flex items-center gap-2">
-              <Flag className="w-4 h-4" aria-hidden="true" />
-              {t('detail.tab_challenges', 'Challenges')}
-            </span>
-          }
-        />
-        {userIsAdmin && (
-          <Tab
-            key="analytics"
-            title={
-              <span className="flex items-center gap-2">
-                <Newspaper className="w-4 h-4" aria-hidden="true" />
-                {t('detail.tab_analytics', 'Analytics')}
-              </span>
-            }
-          />
-        )}
-        {hasSubGroups && (
-          <Tab
-            key="subgroups"
-            title={
-              <span className="flex items-center gap-2">
-                <FolderTree className="w-4 h-4" aria-hidden="true" />
-                {t('detail.tab_subgroups')} ({group.sub_groups?.length})
-              </span>
-            }
-          />
-        )}
-      </Tabs>
+      {/* ─── Navigation: Primary Tabs + "More" Overflow ─── */}
+      {(() => {
+        const primaryTabs = [
+          { key: 'feed', icon: Newspaper, label: t('detail.tab_feed', 'Feed') },
+          { key: 'discussion', icon: MessageSquare, label: t('detail.tab_discussion', 'Discussion') },
+          { key: 'members', icon: Users, label: t('detail.tab_members', 'Members') },
+          { key: 'events', icon: Calendar, label: t('detail.tab_events', 'Events') },
+          { key: 'files', icon: FolderOpen, label: t('detail.tab_files', 'Files') },
+        ];
+
+        const secondaryTabs = [
+          // Content
+          { key: 'announcements', icon: Megaphone, label: t('detail.tab_announcements', 'Announcements'), section: t('detail.tab_section_content', 'Content') },
+          { key: 'qa', icon: AlertCircle, label: t('detail.tab_qa', 'Q&A'), section: null },
+          { key: 'wiki', icon: FileText, label: t('detail.tab_wiki', 'Wiki'), section: null },
+          { key: 'media', icon: Image, label: t('detail.tab_media', 'Gallery'), section: null },
+          // Collaboration
+          { key: 'chatrooms', icon: MessageSquare, label: t('detail.tab_channels', 'Channels'), section: t('detail.tab_section_collab', 'Collaboration') },
+          { key: 'tasks', icon: CheckCircle, label: t('detail.tab_tasks', 'Tasks'), section: null },
+          { key: 'challenges', icon: Flag, label: t('detail.tab_challenges', 'Challenges'), section: null },
+          // Admin (conditional)
+          ...(userIsAdmin ? [{ key: 'analytics', icon: Newspaper, label: t('detail.tab_analytics', 'Analytics'), section: t('detail.tab_section_admin', 'Admin') }] : []),
+          ...(hasSubGroups ? [{ key: 'subgroups', icon: FolderTree, label: `${t('detail.tab_subgroups', 'Subgroups')} (${group.sub_groups?.length ?? 0})`, section: null }] : []),
+        ];
+
+        const isSecondaryActive = secondaryTabs.some((tab) => tab.key === activeTab);
+        const activeSecondaryTab = secondaryTabs.find((tab) => tab.key === activeTab);
+
+        return (
+          <div className="flex items-center gap-1 bg-theme-elevated p-1 rounded-lg overflow-hidden" role="tablist" aria-label={t('detail.tab_nav_aria', 'Group navigation')}>
+            {/* Primary tabs */}
+            {primaryTabs.map((tab) => {
+              const Icon = tab.icon;
+              const isActive = activeTab === tab.key;
+              return (
+                <button
+                  key={tab.key}
+                  role="tab"
+                  aria-selected={isActive}
+                  onClick={() => setActiveTab(tab.key)}
+                  className={`flex items-center gap-1.5 px-3 py-2 rounded-md text-sm font-medium transition-all whitespace-nowrap ${
+                    isActive
+                      ? 'bg-theme-hover text-theme-primary shadow-sm'
+                      : 'text-theme-muted hover:text-theme-primary hover:bg-theme-hover/50'
+                  }`}
+                >
+                  <Icon className="w-4 h-4 flex-shrink-0" aria-hidden="true" />
+                  <span className="hidden sm:inline">{tab.label}</span>
+                </button>
+              );
+            })}
+
+            {/* Divider */}
+            <div className="w-px h-6 bg-theme-default mx-1 flex-shrink-0" aria-hidden="true" />
+
+            {/* "More" dropdown for secondary tabs */}
+            <Dropdown>
+              <DropdownTrigger>
+                <button
+                  className={`flex items-center gap-1.5 px-3 py-2 rounded-md text-sm font-medium transition-all whitespace-nowrap ${
+                    isSecondaryActive
+                      ? 'bg-theme-hover text-theme-primary shadow-sm'
+                      : 'text-theme-muted hover:text-theme-primary hover:bg-theme-hover/50'
+                  }`}
+                  aria-label={t('detail.tab_more', 'More sections')}
+                  aria-haspopup="true"
+                >
+                  {isSecondaryActive && activeSecondaryTab ? (
+                    <>
+                      {(() => { const Icon = activeSecondaryTab.icon; return <Icon className="w-4 h-4 flex-shrink-0" aria-hidden="true" />; })()}
+                      <span className="hidden sm:inline">{activeSecondaryTab.label}</span>
+                    </>
+                  ) : (
+                    <>
+                      <span className="hidden sm:inline">{t('detail.tab_more_label', 'More')}</span>
+                      <span className="sm:hidden text-xs">...</span>
+                    </>
+                  )}
+                  <ChevronDown className="w-3 h-3 flex-shrink-0" aria-hidden="true" />
+                </button>
+              </DropdownTrigger>
+              <DropdownMenu
+                aria-label={t('detail.tab_more_menu', 'More group sections')}
+                onAction={(key) => setActiveTab(key as string)}
+                selectedKeys={new Set([activeTab])}
+                selectionMode="single"
+              >
+                {secondaryTabs.map((tab, idx) => {
+                  const Icon = tab.icon;
+                  const showSection = tab.section && (idx === 0 || secondaryTabs[idx - 1]?.section !== tab.section);
+                  return (
+                    <DropdownItem
+                      key={tab.key}
+                      startContent={<Icon className="w-4 h-4" />}
+                      description={showSection ? undefined : undefined}
+                      className={activeTab === tab.key ? 'bg-primary/10 text-primary' : ''}
+                    >
+                      {showSection ? `${tab.section} — ${tab.label}` : tab.label}
+                    </DropdownItem>
+                  );
+                })}
+              </DropdownMenu>
+            </Dropdown>
+          </div>
+        );
+      })()}
 
       {/* Tab Content */}
       <div>
