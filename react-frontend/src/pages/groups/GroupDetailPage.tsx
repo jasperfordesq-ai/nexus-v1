@@ -85,6 +85,7 @@ import { GroupMediaTab } from './tabs/GroupMediaTab';
 import { GroupAnalyticsTab } from './tabs/GroupAnalyticsTab';
 import { GroupChallengesTab } from './tabs/GroupChallengesTab';
 import { PinnedAnnouncementsBanner } from './components/PinnedAnnouncementsBanner';
+import { GroupNotificationPrefs } from './components/GroupNotificationPrefs';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Types
@@ -200,6 +201,9 @@ export function GroupDetailPage() {
 
   // Tags state
   const [groupTags, setGroupTags] = useState<Array<{ id: number; name: string; color?: string }>>([]);
+
+  // Notification preferences modal
+  const [showNotifPrefs, setShowNotifPrefs] = useState(false);
 
   // Expanded discussion state
   const [expandedDiscussionId, setExpandedDiscussionId] = useState<number | null>(null);
@@ -1077,6 +1081,17 @@ export function GroupDetailPage() {
                 >
                   {userIsMember ? t('detail.leave_group') : t('detail.join_group')}
                 </Button>
+                {userIsMember && (
+                  <Button
+                    isIconOnly
+                    variant="flat"
+                    size="sm"
+                    onPress={() => setShowNotifPrefs(true)}
+                    aria-label={t('detail.notification_prefs', 'Notification preferences')}
+                  >
+                    <Megaphone className="w-4 h-4" />
+                  </Button>
+                )}
                 {userIsAdmin && (
                   <Button
                     variant="bordered"
@@ -1878,6 +1893,15 @@ export function GroupDetailPage() {
           </ModalFooter>
         </ModalContent>
       </Modal>
+      {/* ─── Notification Preferences Modal ─── */}
+      {showNotifPrefs && group && (
+        <GroupNotificationPrefs
+          groupId={group.id}
+          isOpen={showNotifPrefs}
+          onClose={() => setShowNotifPrefs(false)}
+        />
+      )}
+
       {/* ─── Invite Modal ─── */}
       <Modal
         isOpen={showInviteModal}

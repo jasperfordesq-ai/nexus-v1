@@ -79,6 +79,9 @@ class GroupPermissionManager
             self::PERM_GROUP_POST_DISCUSSION,
             self::PERM_GROUP_INVITE_MEMBERS,
         ],
+        'viewer' => [
+            // Read-only — no write permissions
+        ],
     ];
 
     public function __construct()

@@ -1243,4 +1243,98 @@ class AdminGroupsController extends BaseApiController
             ? $this->successResponse(['message' => 'Tag deleted'])
             : $this->errorResponse('Tag not found', 404);
     }
+
+    // =========================================================================
+    // Collections
+    // =========================================================================
+
+    public function listCollections(): JsonResponse
+    {
+        $this->requireAdmin();
+        return $this->successResponse(\App\Services\GroupCollectionService::getAll());
+    }
+
+    public function createCollection(): JsonResponse
+    {
+        $this->requireAdmin();
+        $userId = $this->requireUserId();
+        if ($userId instanceof JsonResponse) return $userId;
+        $data = request()->only(['name', 'description', 'image_url', 'sort_order']);
+        if (empty($data['name'])) return $this->errorResponse('name required', 400);
+        $id = \App\Services\GroupCollectionService::create($data, $userId);
+        return $this->successResponse(['id' => $id], 201);
+    }
+
+    public function updateCollection(int $id): JsonResponse
+    {
+        $this->requireAdmin();
+        $data = request()->only(['name', 'description', 'image_url', 'sort_order', 'is_active']);
+        return \App\Services\GroupCollectionService::update($id, $data)
+            ? $this->successResponse(['message' => 'Updated'])
+            : $this->errorResponse('Not found', 404);
+    }
+
+    public function deleteCollection(int $id): JsonResponse
+    {
+        $this->requireAdmin();
+        return \App\Services\GroupCollectionService::delete($id)
+            ? $this->successResponse(['message' => 'Deleted'])
+            : $this->errorResponse('Not found', 404);
+    }
+
+    public function setCollectionGroups(int $id): JsonResponse
+    {
+        $this->requireAdmin();
+        $groupIds = request()->input('group_ids', []);
+        if (!is_array($groupIds)) return $this->errorResponse('group_ids array required', 400);
+        \App\Services\GroupCollectionService::setGroups($id, $groupIds);
+        return $this->successResponse(['message' => 'Groups set']);
+    }
+
+    // =========================================================================
+    // Auto-Assign Rules
+    // =========================================================================
+
+    public function listAutoAssignRules(): JsonResponse
+    {
+        $this->requireAdmin();
+        $tenantId = $this->getTenantId();
+        $rules = DB::table('group_auto_assign_rules as r')
+            ->join('groups as g', 'r.group_id', '=', 'g.id')
+            ->where('r.tenant_id', $tenantId)
+            ->select('r.*', 'g.name as group_name')
+            ->orderBy('r.group_id')
+            ->get()->map(fn ($r) => (array) $r)->toArray();
+        return $this->successResponse($rules);
+    }
+
+    public function createAutoAssignRule(): JsonResponse
+    {
+        $this->requireAdmin();
+        $tenantId = $this->getTenantId();
+        $data = request()->only(['group_id', 'rule_type', 'rule_value']);
+        if (empty($data['group_id']) || empty($data['rule_type']) || empty($data['rule_value'])) {
+            return $this->errorResponse('group_id, rule_type, and rule_value required', 400);
+        }
+        $id = DB::table('group_auto_assign_rules')->insertGetId([
+            'tenant_id' => $tenantId,
+            'group_id' => (int) $data['group_id'],
+            'rule_type' => $data['rule_type'],
+            'rule_value' => $data['rule_value'],
+            'is_active' => true,
+            'created_at' => now(),
+        ]);
+        return $this->successResponse(['id' => $id], 201);
+    }
+
+    public function deleteAutoAssignRule(int $id): JsonResponse
+    {
+        $this->requireAdmin();
+        $tenantId = $this->getTenantId();
+        $deleted = DB::table('group_auto_assign_rules')
+            ->where('id', $id)->where('tenant_id', $tenantId)->delete();
+        return $deleted > 0
+            ? $this->successResponse(['message' => 'Rule deleted'])
+            : $this->errorResponse('Not found', 404);
+    }
 }

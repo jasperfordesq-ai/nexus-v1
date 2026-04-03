@@ -281,6 +281,13 @@ Route::get('/v2/groups/{id}/export', [\App\Http\Controllers\Api\GroupDataExportC
 Route::get('/v2/groups/{id}/challenges', [\App\Http\Controllers\Api\GroupChallengeController::class, 'index']);
 Route::post('/v2/groups/{id}/challenges', [\App\Http\Controllers\Api\GroupChallengeController::class, 'store']);
 Route::delete('/v2/groups/{id}/challenges/{challengeId}', [\App\Http\Controllers\Api\GroupChallengeController::class, 'destroy']);
+Route::get('/v2/groups/{id}/scheduled-posts', [\App\Http\Controllers\Api\GroupScheduledPostController::class, 'index']);
+Route::post('/v2/groups/{id}/scheduled-posts', [\App\Http\Controllers\Api\GroupScheduledPostController::class, 'store']);
+Route::delete('/v2/groups/{id}/scheduled-posts/{postId}', [\App\Http\Controllers\Api\GroupScheduledPostController::class, 'cancel']);
+Route::get('/v2/groups/{id}/notification-prefs', [\App\Http\Controllers\Api\GroupNotificationPrefController::class, 'get']);
+Route::put('/v2/groups/{id}/notification-prefs', [\App\Http\Controllers\Api\GroupNotificationPrefController::class, 'set']);
+Route::get('/v2/group-collections', [\App\Http\Controllers\Api\GroupCollectionController::class, 'index']);
+Route::get('/v2/group-collections/{id}', [\App\Http\Controllers\Api\GroupCollectionController::class, 'show']);
 Route::get('/v2/connections', [\App\Http\Controllers\Api\ConnectionsController::class, 'index']);
 Route::get('/v2/connections/pending', [\App\Http\Controllers\Api\ConnectionsController::class, 'pendingCounts']);
 Route::get('/v2/connections/status/{userId}', [\App\Http\Controllers\Api\ConnectionsController::class, 'status']);
@@ -946,6 +953,14 @@ Route::get('/v2/admin/groups/{id}/audit-log', [\App\Http\Controllers\Api\AdminGr
 Route::get('/v2/admin/group-tags', [\App\Http\Controllers\Api\AdminGroupsController::class, 'listTags']);
 Route::post('/v2/admin/group-tags', [\App\Http\Controllers\Api\AdminGroupsController::class, 'createTag']);
 Route::delete('/v2/admin/group-tags/{tagId}', [\App\Http\Controllers\Api\AdminGroupsController::class, 'deleteTag']);
+Route::get('/v2/admin/group-collections', [\App\Http\Controllers\Api\AdminGroupsController::class, 'listCollections']);
+Route::post('/v2/admin/group-collections', [\App\Http\Controllers\Api\AdminGroupsController::class, 'createCollection']);
+Route::put('/v2/admin/group-collections/{id}', [\App\Http\Controllers\Api\AdminGroupsController::class, 'updateCollection']);
+Route::delete('/v2/admin/group-collections/{id}', [\App\Http\Controllers\Api\AdminGroupsController::class, 'deleteCollection']);
+Route::put('/v2/admin/group-collections/{id}/groups', [\App\Http\Controllers\Api\AdminGroupsController::class, 'setCollectionGroups']);
+Route::get('/v2/admin/group-auto-assign-rules', [\App\Http\Controllers\Api\AdminGroupsController::class, 'listAutoAssignRules']);
+Route::post('/v2/admin/group-auto-assign-rules', [\App\Http\Controllers\Api\AdminGroupsController::class, 'createAutoAssignRule']);
+Route::delete('/v2/admin/group-auto-assign-rules/{id}', [\App\Http\Controllers\Api\AdminGroupsController::class, 'deleteAutoAssignRule']);
 Route::get('/v2/admin/timebanking/stats', [\App\Http\Controllers\Api\AdminTimebankingController::class, 'stats']);
 Route::get('/v2/admin/timebanking/alerts', [\App\Http\Controllers\Api\AdminTimebankingController::class, 'alerts']);
 Route::put('/v2/admin/timebanking/alerts/{id}', [\App\Http\Controllers\Api\AdminTimebankingController::class, 'updateAlert']);
@@ -980,6 +995,7 @@ Route::get('/v2/admin/enterprise/config/secrets', [\App\Http\Controllers\Api\Adm
 
 // Enterprise GDPR — extended endpoints
 Route::get('/v2/admin/enterprise/gdpr/statistics', [\App\Http\Controllers\Api\AdminEnterpriseController::class, 'gdprStatistics']);
+Route::get('/v2/admin/enterprise/gdpr/trends', [\App\Http\Controllers\Api\AdminEnterpriseController::class, 'gdprTrends']);
 Route::post('/v2/admin/enterprise/gdpr/requests', [\App\Http\Controllers\Api\AdminEnterpriseController::class, 'createGdprRequest']);
 Route::get('/v2/admin/enterprise/gdpr/requests/{id}', [\App\Http\Controllers\Api\AdminEnterpriseController::class, 'showGdprRequest']);
 Route::put('/v2/admin/enterprise/gdpr/requests/{id}/assign', [\App\Http\Controllers\Api\AdminEnterpriseController::class, 'assignGdprRequest']);
