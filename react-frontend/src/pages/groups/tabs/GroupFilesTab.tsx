@@ -138,15 +138,15 @@ export function GroupFilesTab({ groupId, isAdmin, isMember = true }: GroupFilesT
         if (search.trim()) params.set('q', search.trim());
 
         const resp = await api.get(`/v2/groups/${groupId}/files?${params}`);
-        const data = resp.data;
+        const data = resp.data ?? {};
 
         if (reset) {
-          setFiles(data.items || []);
+          setFiles(data.items ?? []);
         } else {
-          setFiles((prev) => [...prev, ...(data.items || [])]);
+          setFiles((prev) => [...prev, ...(data.items ?? [])]);
         }
-        setCursor(data.cursor || null);
-        setHasMore(data.has_more || false);
+        setCursor(data.cursor ?? null);
+        setHasMore(data.has_more ?? false);
       } catch (err) {
         logError('GroupFilesTab.loadFiles', err);
       } finally {
@@ -315,7 +315,7 @@ export function GroupFilesTab({ groupId, isAdmin, isMember = true }: GroupFilesT
       {/* File list */}
       {files.length === 0 ? (
         <EmptyState
-          icon={FolderOpen}
+          icon={<FolderOpen className="w-12 h-12" aria-hidden="true" />}
           title={t('files.empty_title', 'No files yet')}
           description={
             search

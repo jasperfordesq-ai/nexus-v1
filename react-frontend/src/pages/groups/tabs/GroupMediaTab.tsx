@@ -104,15 +104,15 @@ export function GroupMediaTab({ groupId, isAdmin, isMember = true }: GroupMediaT
         if (filter !== 'all') params.set('type', filter);
 
         const resp = await api.get(`/v2/groups/${groupId}/media?${params}`);
-        const data = resp.data;
+        const data = resp.data ?? {};
 
         if (reset) {
-          setItems(data.items || []);
+          setItems(data.items ?? []);
         } else {
-          setItems((prev) => [...prev, ...(data.items || [])]);
+          setItems((prev) => [...prev, ...(data.items ?? [])]);
         }
-        setCursor(data.cursor || null);
-        setHasMore(data.has_more || false);
+        setCursor(data.cursor ?? null);
+        setHasMore(data.has_more ?? false);
       } catch (err) {
         logError('GroupMediaTab.loadMedia', err);
       } finally {
