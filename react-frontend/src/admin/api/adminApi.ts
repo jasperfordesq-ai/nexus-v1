@@ -8,7 +8,7 @@
  * Wraps the main api client with admin-specific endpoints
  */
 
-import { api, type ApiResponse } from '@/lib/api';
+import { api, API_BASE, type ApiResponse } from '@/lib/api';
 import type {
   AdminDashboardStats,
   MonthlyTrend,
@@ -762,8 +762,11 @@ export const adminEnterprise = {
   createBreach: (data: { title: string; description?: string; severity?: string; affected_users?: number }) =>
     api.post<GdprBreach>('/v2/admin/enterprise/gdpr/breaches', data),
 
-  getGdprAudit: () =>
-    api.get<GdprAuditEntry[]>('/v2/admin/enterprise/gdpr/audit'),
+  getGdprAudit: (params: { page?: number; per_page?: number; action?: string; entity_type?: string; date_from?: string; date_to?: string; user_id?: number } = {}) =>
+    api.get<PaginatedResponse<GdprAuditEntry>>(`/v2/admin/enterprise/gdpr/audit${buildQuery(params)}`),
+
+  getGdprAuditExportUrl: (params: { action?: string; entity_type?: string; date_from?: string; date_to?: string; user_id?: number } = {}) =>
+    `${API_BASE}/v2/admin/enterprise/gdpr/audit/export${buildQuery(params)}`,
 
   getMonitoring: () =>
     api.get<SystemHealth>('/v2/admin/enterprise/monitoring'),
@@ -781,6 +784,9 @@ export const adminEnterprise = {
 
   updateConfig: (data: Record<string, unknown>) =>
     api.put<{ success: boolean }>('/v2/admin/enterprise/config', data),
+
+  resetConfig: (keys?: string[]) =>
+    api.post<{ success: boolean }>('/v2/admin/enterprise/config/reset', keys ? { keys } : {}),
 
   getSecrets: () =>
     api.get<SecretEntry[]>('/v2/admin/enterprise/config/secrets'),

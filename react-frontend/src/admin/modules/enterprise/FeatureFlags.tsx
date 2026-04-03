@@ -9,8 +9,20 @@
  */
 
 import { useEffect, useState, useCallback } from 'react';
-import { Card, CardBody, CardHeader, Button, Spinner, Switch } from '@heroui/react';
-import { RefreshCw, ToggleLeft, Boxes } from 'lucide-react';
+import {
+  Card,
+  CardBody,
+  CardHeader,
+  Button,
+  Spinner,
+  Switch,
+  Modal,
+  ModalContent,
+  ModalHeader,
+  ModalBody,
+  ModalFooter,
+} from '@heroui/react';
+import { RefreshCw, ToggleLeft, Boxes, AlertTriangle } from 'lucide-react';
 import { usePageTitle } from '@/hooks';
 import { useToast } from '@/contexts';
 import { adminEnterprise } from '../../api/adminApi';
@@ -18,6 +30,50 @@ import { PageHeader } from '../../components';
 import type { FeatureFlags as FeatureFlagsType } from '../../api/types';
 
 import { useTranslation } from 'react-i18next';
+
+const FLAG_DESCRIPTIONS: Record<string, string> = {
+  // Features
+  events: 'Community events calendar with RSVP and attendance tracking',
+  groups: 'Community groups and hubs for members to organize around interests',
+  gamification: 'Badges, XP points, leaderboards, and achievement campaigns',
+  goals: 'Community goals that members can contribute to collectively',
+  blog: 'Community blog with articles, categories, and author management',
+  resources: 'Knowledge base articles and resource library',
+  volunteering: 'Volunteer opportunities and organization management',
+  exchange_workflow: 'Broker-controlled exchange workflow with approval steps',
+  organisations: 'Organization profiles and organizational wallets',
+  federation: 'Multi-community federation and partner directory',
+  connections: 'Member-to-member connection requests and network',
+  reviews: 'Member reviews and ratings after exchanges',
+  polls: 'Community polls and surveys',
+  job_vacancies: 'Job vacancy board with applications and CV uploads',
+  ideation_challenges: 'Innovation challenges and idea submissions',
+  direct_messaging: 'Direct messaging between members',
+  group_exchanges: 'Time credit exchanges within groups',
+  search: 'Full-text search across listings, members, and content',
+  ai_chat: 'AI-powered chat assistant for members',
+  // Modules
+  listings:
+    'Core listing/service marketplace — members cannot browse or post services without this',
+  wallet: 'Time credit wallet — all transactions and balances depend on this',
+  messages: 'Messaging system — inbox and conversations',
+  dashboard: 'Member dashboard — the main landing page after login',
+  feed: 'Activity feed — community updates and social posts',
+  notifications: 'Notification system — alerts, badges, and push notifications',
+  profile: 'Member profiles — viewing and editing profile information',
+  settings: 'Account settings — password, preferences, security options',
+};
+
+const CRITICAL_FLAGS = new Set([
+  'listings',
+  'wallet',
+  'messages',
+  'dashboard',
+  'feed',
+  'notifications',
+  'profile',
+  'settings',
+]);
 
 function formatKey(key: string): string {
   return key
@@ -33,6 +89,10 @@ export function FeatureFlags() {
   const [data, setData] = useState<FeatureFlagsType | null>(null);
   const [loading, setLoading] = useState(true);
   const [togglingKeys, setTogglingKeys] = useState<Set<string>>(new Set());
+  const [confirmModal, setConfirmModal] = useState<{
+    key: string;
+    type: 'feature' | 'module';
+  } | null>(null);
 
   const loadData = useCallback(async () => {
     setLoading(true);
@@ -52,7 +112,7 @@ export function FeatureFlags() {
     loadData();
   }, [loadData]);
 
-  const handleToggle = async (key: string, value: boolean, type: 'feature' | 'module') => {
+  const executeToggle = async (key: string, value: boolean, type: 'feature' | 'module') => {
     const toggleKey = `${type}:${key}`;
     setTogglingKeys((prev) => new Set(prev).add(toggleKey));
 
@@ -102,6 +162,22 @@ export function FeatureFlags() {
     }
   };
 
+  const handleToggle = (key: string, value: boolean, type: 'feature' | 'module') => {
+    // If disabling a critical flag, show confirmation modal first
+    if (!value && CRITICAL_FLAGS.has(key)) {
+      setConfirmModal({ key, type });
+      return;
+    }
+    executeToggle(key, value, type);
+  };
+
+  const handleConfirmDisable = () => {
+    if (confirmModal) {
+      executeToggle(confirmModal.key, false, confirmModal.type);
+      setConfirmModal(null);
+    }
+  };
+
   const renderSection = (
     title: string,
     icon: React.ReactNode,
@@ -122,14 +198,30 @@ export function FeatureFlags() {
               const toggleKey = `${type}:${key}`;
               const isToggling = togglingKeys.has(toggleKey);
 
+              const isCritical = CRITICAL_FLAGS.has(key);
+              const description = FLAG_DESCRIPTIONS[key];
+
               return (
                 <div
                   key={key}
                   className="flex items-center justify-between gap-3 rounded-lg border border-divider p-3"
                 >
-                  <span className="text-sm font-medium text-foreground">
-                    {formatKey(key)}
-                  </span>
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-center gap-1.5">
+                      <span className="text-sm font-medium text-foreground">
+                        {formatKey(key)}
+                      </span>
+                      {isCritical && (
+                        <AlertTriangle size={14} className="shrink-0 text-warning" />
+                      )}
+                    </div>
+                    {description && (
+                      <p className="mt-0.5 text-xs text-default-400">{description}</p>
+                    )}
+                    {isCritical && (
+                      <p className="mt-0.5 text-xs font-medium text-warning">Core module</p>
+                    )}
+                  </div>
                   <Switch
                     size="sm"
                     isSelected={items[key]}
@@ -184,6 +276,50 @@ export function FeatureFlags() {
           )}
         </div>
       ) : null}
+
+      {/* Critical flag disable confirmation modal */}
+      <Modal
+        isOpen={!!confirmModal}
+        onClose={() => setConfirmModal(null)}
+        size="md"
+      >
+        <ModalContent>
+          {() => (
+            <>
+              <ModalHeader className="flex items-center gap-2">
+                <AlertTriangle size={20} className="text-warning" />
+                <span>Disable {confirmModal ? formatKey(confirmModal.key) : ''}?</span>
+              </ModalHeader>
+              <ModalBody>
+                <p className="text-sm text-default-600">
+                  This will prevent all users from accessing{' '}
+                  <span className="font-semibold text-foreground">
+                    {confirmModal
+                      ? FLAG_DESCRIPTIONS[confirmModal.key]?.toLowerCase() ||
+                        formatKey(confirmModal.key).toLowerCase()
+                      : ''}
+                  </span>
+                  . Are you sure you want to disable this?
+                </p>
+                <div className="mt-2 rounded-lg border border-warning/30 bg-warning/10 p-3">
+                  <p className="text-xs font-medium text-warning">
+                    {confirmModal ? formatKey(confirmModal.key) : ''} is a core module.
+                    Disabling it may significantly impact the user experience.
+                  </p>
+                </div>
+              </ModalBody>
+              <ModalFooter>
+                <Button variant="flat" onPress={() => setConfirmModal(null)}>
+                  Cancel
+                </Button>
+                <Button color="danger" onPress={handleConfirmDisable}>
+                  Disable
+                </Button>
+              </ModalFooter>
+            </>
+          )}
+        </ModalContent>
+      </Modal>
     </div>
   );
 }

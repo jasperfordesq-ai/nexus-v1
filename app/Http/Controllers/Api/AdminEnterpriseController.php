@@ -360,14 +360,124 @@ class AdminEnterpriseController extends BaseApiController
         $perPage = min(100, max(1, (int) request()->query('per_page', 25)));
         $offset = ($page - 1) * $perPage;
 
+        // Build dynamic WHERE clause for filters
+        $where = "gal.tenant_id = ?";
+        $params = [$tenantId];
+
+        $action = request()->query('action');
+        if ($action && $action !== 'all') {
+            $where .= " AND gal.action = ?";
+            $params[] = $action;
+        }
+
+        $entityType = request()->query('entity_type');
+        if ($entityType && $entityType !== 'all') {
+            $where .= " AND gal.entity_type = ?";
+            $params[] = $entityType;
+        }
+
+        $dateFrom = request()->query('date_from');
+        if ($dateFrom && preg_match('/^\d{4}-\d{2}-\d{2}$/', $dateFrom)) {
+            $where .= " AND gal.created_at >= ?";
+            $params[] = $dateFrom . ' 00:00:00';
+        }
+
+        $dateTo = request()->query('date_to');
+        if ($dateTo && preg_match('/^\d{4}-\d{2}-\d{2}$/', $dateTo)) {
+            $where .= " AND gal.created_at <= ?";
+            $params[] = $dateTo . ' 23:59:59';
+        }
+
+        $userId = request()->query('user_id');
+        if ($userId && is_numeric($userId)) {
+            $where .= " AND gal.admin_id = ?";
+            $params[] = (int) $userId;
+        }
+
         try {
-            $total = (int) (DB::selectOne("SELECT COUNT(*) as cnt FROM gdpr_audit_log WHERE tenant_id = ?", [$tenantId])->cnt ?? 0);
+            $total = (int) (DB::selectOne("SELECT COUNT(*) as cnt FROM gdpr_audit_log gal WHERE $where", $params)->cnt ?? 0);
+            $fetchParams = array_merge($params, [$perPage, $offset]);
             $entries = array_map(fn($r) => (array)$r, DB::select(
-                "SELECT gal.id, gal.tenant_id, gal.admin_id, gal.action, gal.entity_type, gal.entity_id, gal.old_value, gal.new_value, gal.ip_address, gal.created_at, u.name as user_name FROM gdpr_audit_log gal LEFT JOIN users u ON u.id = gal.admin_id WHERE gal.tenant_id = ? ORDER BY gal.created_at DESC LIMIT ? OFFSET ?",
-                [$tenantId, $perPage, $offset]
+                "SELECT gal.id, gal.tenant_id, gal.admin_id, gal.action, gal.entity_type, gal.entity_id, gal.old_value, gal.new_value, gal.ip_address, gal.created_at, u.name as user_name FROM gdpr_audit_log gal LEFT JOIN users u ON u.id = gal.admin_id WHERE $where ORDER BY gal.created_at DESC LIMIT ? OFFSET ?",
+                $fetchParams
             ));
-            return $this->respondWithData(['data' => $entries, 'total' => $total, 'page' => $page, 'per_page' => $perPage]);
-        } catch (\Exception $e) { return $this->respondWithData(['data' => [], 'total' => 0, 'page' => $page, 'per_page' => $perPage]); }
+            return $this->respondWithPaginatedCollection($entries, $total, $page, $perPage);
+        } catch (\Exception $e) { return $this->respondWithPaginatedCollection([], 0, 1, $perPage); }
+    }
+
+    /** GET /api/v2/admin/enterprise/gdpr/audit/export */
+    public function gdprAuditExport(): \Symfony\Component\HttpFoundation\StreamedResponse
+    {
+        $this->requireAdmin();
+        $tenantId = $this->getTenantId();
+
+        // Build dynamic WHERE clause for filters (same as gdprAudit)
+        $where = "gal.tenant_id = ?";
+        $params = [$tenantId];
+
+        $action = request()->query('action');
+        if ($action && $action !== 'all') {
+            $where .= " AND gal.action = ?";
+            $params[] = $action;
+        }
+
+        $entityType = request()->query('entity_type');
+        if ($entityType && $entityType !== 'all') {
+            $where .= " AND gal.entity_type = ?";
+            $params[] = $entityType;
+        }
+
+        $dateFrom = request()->query('date_from');
+        if ($dateFrom && preg_match('/^\d{4}-\d{2}-\d{2}$/', $dateFrom)) {
+            $where .= " AND gal.created_at >= ?";
+            $params[] = $dateFrom . ' 00:00:00';
+        }
+
+        $dateTo = request()->query('date_to');
+        if ($dateTo && preg_match('/^\d{4}-\d{2}-\d{2}$/', $dateTo)) {
+            $where .= " AND gal.created_at <= ?";
+            $params[] = $dateTo . ' 23:59:59';
+        }
+
+        $userId = request()->query('user_id');
+        if ($userId && is_numeric($userId)) {
+            $where .= " AND gal.admin_id = ?";
+            $params[] = (int) $userId;
+        }
+
+        return response()->streamDownload(function () use ($where, $params) {
+            $handle = fopen('php://output', 'w');
+            fputcsv($handle, ['ID', 'Admin', 'Action', 'Entity Type', 'Entity ID', 'Old Value', 'New Value', 'IP Address', 'Date']);
+
+            try {
+                $rows = DB::select(
+                    "SELECT gal.id, gal.action, gal.entity_type, gal.entity_id, gal.old_value, gal.new_value, gal.ip_address, gal.created_at, u.name as user_name
+                     FROM gdpr_audit_log gal
+                     LEFT JOIN users u ON u.id = gal.admin_id
+                     WHERE $where
+                     ORDER BY gal.created_at DESC",
+                    $params
+                );
+
+                foreach ($rows as $row) {
+                    fputcsv($handle, [
+                        $row->id,
+                        $row->user_name ?? '',
+                        $row->action ?? '',
+                        $row->entity_type ?? '',
+                        $row->entity_id ?? '',
+                        $row->old_value ?? '',
+                        $row->new_value ?? '',
+                        $row->ip_address ?? '',
+                        $row->created_at ?? '',
+                    ]);
+                }
+            } catch (\Exception $e) {
+                fputcsv($handle, ['Error exporting data', '', '', '', '', '', '', '', '']);
+            }
+
+            fclose($handle);
+        }, 'gdpr-audit-log.csv', ['Content-Type' => 'text/csv']);
     }
 
     /** GET /api/v2/admin/enterprise/monitoring */
@@ -476,6 +586,34 @@ class AdminEnterpriseController extends BaseApiController
             return $this->respondWithData($merged);
         } catch (\Exception $e) {
             return $this->respondWithError('UPDATE_FAILED', __('api.config_update_failed'), null, 500);
+        }
+    }
+
+    /** POST /api/v2/admin/enterprise/config/reset */
+    public function resetConfig(): JsonResponse
+    {
+        $this->requireAdmin();
+        $tenantId = $this->getTenantId();
+
+        $keys = $this->input('keys');
+
+        try {
+            if (!empty($keys) && is_array($keys)) {
+                // Reset specific keys
+                $row = DB::selectOne("SELECT configuration FROM tenants WHERE id = ?", [$tenantId]);
+                $config = json_decode($row->configuration ?? '{}', true) ?: [];
+                foreach ($keys as $key) {
+                    unset($config[$key]);
+                }
+                DB::update("UPDATE tenants SET configuration = ? WHERE id = ?", [json_encode($config), $tenantId]);
+            } else {
+                // Reset all
+                DB::update("UPDATE tenants SET configuration = '{}' WHERE id = ?", [$tenantId]);
+            }
+            try { app(\App\Services\RedisCache::class)->delete('tenant_bootstrap', $tenantId); } catch (\Throwable $e) {}
+            return $this->respondWithData(['reset' => true]);
+        } catch (\Exception $e) {
+            return $this->respondWithError('RESET_FAILED', 'Failed to reset configuration', null, 500);
         }
     }
 

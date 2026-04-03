@@ -748,9 +748,14 @@ export interface GdprBreach {
 
 export interface GdprAuditEntry {
   id: number;
-  user_id: number;
+  admin_id: number;
   user_name: string;
   action: string;
+  entity_type: string;
+  entity_id: number;
+  old_value: string | null;
+  new_value: string | null;
+  ip_address: string | null;
   description: string;
   created_at: string;
 }
