@@ -623,7 +623,7 @@ export interface GdprRequest {
   user_id: number;
   user_name: string;
   user_email?: string;
-  type: 'access' | 'deletion' | 'portability' | 'rectification';
+  type: 'access' | 'erasure' | 'portability' | 'rectification' | 'restriction' | 'objection';
   status: 'pending' | 'processing' | 'completed' | 'rejected';
   notes?: string;
   created_at: string;
@@ -742,7 +742,7 @@ export interface GdprBreach {
   title: string;
   description: string;
   severity: 'low' | 'medium' | 'high' | 'critical';
-  status: 'open' | 'investigating' | 'resolved';
+  status: 'open' | 'investigating' | 'contained' | 'resolved';
   reported_at: string;
 }
 
@@ -778,6 +778,145 @@ export interface ErrorLogEntry {
   description: string;
   ip_address?: string;
   created_at: string;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Enterprise — Extended Types
+// ─────────────────────────────────────────────────────────────────────────────
+
+export interface GdprRequestDetail extends GdprRequest {
+  request_type: string;
+  priority: string;
+  verified_at: string | null;
+  acknowledged_at: string | null;
+  processed_at: string | null;
+  processed_by: number | null;
+  assigned_to: number | null;
+  assigned_to_name: string | null;
+  export_file_path: string | null;
+  export_expires_at: string | null;
+  rejection_reason: string | null;
+  metadata: Record<string, unknown> | null;
+  timeline: GdprTimelineEntry[];
+  sla_deadline: string;
+  sla_days_remaining: number;
+  sla_overdue: boolean;
+}
+
+export interface GdprTimelineEntry {
+  id: number;
+  action: string;
+  entity_type: string;
+  entity_id: number;
+  old_value: string | null;
+  new_value: string | null;
+  admin_id: number;
+  user_name: string;
+  ip_address: string | null;
+  created_at: string;
+}
+
+export interface ConsentType {
+  id: number;
+  slug: string;
+  name: string;
+  description: string | null;
+  category: string | null;
+  is_required: boolean;
+  legal_basis: string | null;
+  retention_days: number | null;
+  display_order: number;
+  is_active: boolean;
+  current_version: string | null;
+  granted_count: number;
+  denied_count: number;
+  created_at: string;
+  updated_at: string | null;
+}
+
+export interface ConsentTypeUser {
+  user_id: number;
+  user_name: string;
+  user_email: string;
+  consent_given: boolean;
+  given_at: string | null;
+  ip_address: string | null;
+  version: string | null;
+}
+
+export interface GdprBreachDetail extends GdprBreach {
+  breach_type: string;
+  data_categories_affected: string[] | null;
+  number_of_records_affected: number | null;
+  number_of_users_affected: number | null;
+  detected_at: string | null;
+  occurred_at: string | null;
+  contained_at: string | null;
+  resolved_at: string | null;
+  reported_to_authority: boolean;
+  dpa_notified_at: string | null;
+  authority_reference: string | null;
+  users_notified: boolean;
+  remediation_actions: string | null;
+  root_cause: string | null;
+  lessons_learned: string | null;
+  prevention_measures: string | null;
+  escalated_at: string | null;
+  created_by: number | null;
+  created_by_name: string | null;
+}
+
+export interface GdprStatistics {
+  requests_by_status: Record<string, number>;
+  requests_by_type: Record<string, number>;
+  total_requests: number;
+  pending_count: number;
+  overdue_count: number;
+  avg_processing_days: number | null;
+  active_breaches: number;
+  consent_coverage_percent: number;
+  compliance_score: number;
+}
+
+export interface LogFile {
+  name: string;
+  size: string;
+  size_bytes: number;
+  modified_at: string;
+  line_count: number;
+}
+
+export interface LogFileContent {
+  filename: string;
+  content: Array<{ line: number; text: string; level?: string }>;
+  total_lines: number;
+  filtered_count: number;
+}
+
+export interface SystemRequirements {
+  php: { version: string; meets_minimum: boolean };
+  extensions: Array<{ name: string; loaded: boolean; required: boolean }>;
+  writable_directories: Array<{ path: string; writable: boolean }>;
+  services: Array<{ name: string; status: 'ok' | 'fail' }>;
+  ini_settings: Record<string, string>;
+}
+
+export interface HealthCheckHistoryEntry {
+  id: number;
+  status: 'healthy' | 'degraded' | 'unhealthy';
+  checks: HealthCheckResult['checks'];
+  latency_ms: number | null;
+  created_at: string;
+}
+
+export interface FeatureFlags {
+  features: Record<string, boolean>;
+  modules: Record<string, boolean>;
+}
+
+export interface SecretEntryExtended extends SecretEntry {
+  category: string;
+  masked_value: string;
 }
 
 // ─────────────────────────────────────────────────────────────────────────────

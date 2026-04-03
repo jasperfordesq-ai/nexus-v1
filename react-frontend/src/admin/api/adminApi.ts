@@ -68,13 +68,23 @@ import type {
   Role,
   GdprDashboardStats,
   GdprRequest,
+  GdprRequestDetail,
   GdprConsent,
   GdprBreach,
+  GdprBreachDetail,
   GdprAuditEntry,
+  GdprStatistics,
+  ConsentType,
+  ConsentTypeUser,
   SystemHealth,
   HealthCheckResult,
+  HealthCheckHistoryEntry,
   ErrorLogEntry,
   SecretEntry,
+  LogFile,
+  LogFileContent,
+  SystemRequirements,
+  FeatureFlags,
   LegalDocument,
   LegalDocumentVersion,
   VersionComparison,
@@ -774,6 +784,89 @@ export const adminEnterprise = {
 
   getSecrets: () =>
     api.get<SecretEntry[]>('/v2/admin/enterprise/config/secrets'),
+
+  // GDPR Request Detail & Management
+  getGdprRequest: (id: number) =>
+    api.get<GdprRequestDetail>(`/v2/admin/enterprise/gdpr/requests/${id}`),
+
+  createGdprRequest: (data: { user_id: number; type: string; priority?: string; notes?: string }) =>
+    api.post<GdprRequest>('/v2/admin/enterprise/gdpr/requests', data),
+
+  assignGdprRequest: (id: number, assignedTo: number) =>
+    api.put<{ success: boolean }>(`/v2/admin/enterprise/gdpr/requests/${id}/assign`, { assigned_to: assignedTo }),
+
+  addGdprRequestNote: (id: number, note: string) =>
+    api.post<{ success: boolean }>(`/v2/admin/enterprise/gdpr/requests/${id}/notes`, { note }),
+
+  generateGdprExport: (id: number) =>
+    api.post<{ success: boolean; file_path?: string }>(`/v2/admin/enterprise/gdpr/requests/${id}/export`),
+
+  // GDPR Consent Types
+  getConsentTypes: () =>
+    api.get<ConsentType[]>('/v2/admin/enterprise/gdpr/consent-types'),
+
+  createConsentType: (data: Partial<ConsentType>) =>
+    api.post<ConsentType>('/v2/admin/enterprise/gdpr/consent-types', data),
+
+  updateConsentType: (id: number, data: Partial<ConsentType>) =>
+    api.put<ConsentType>(`/v2/admin/enterprise/gdpr/consent-types/${id}`, data),
+
+  deleteConsentType: (id: number) =>
+    api.delete<{ success: boolean }>(`/v2/admin/enterprise/gdpr/consent-types/${id}`),
+
+  getConsentTypeUsers: (slug: string, params: { page?: number; per_page?: number } = {}) =>
+    api.get<PaginatedResponse<ConsentTypeUser>>(`/v2/admin/enterprise/gdpr/consent-types/${slug}/users${buildQuery(params)}`),
+
+  exportConsentTypeUsers: (slug: string) =>
+    `/v2/admin/enterprise/gdpr/consent-types/${slug}/export`,
+
+  // GDPR Breach Detail
+  getGdprBreach: (id: number) =>
+    api.get<GdprBreachDetail>(`/v2/admin/enterprise/gdpr/breaches/${id}`),
+
+  updateGdprBreach: (id: number, data: Partial<GdprBreachDetail>) =>
+    api.put<{ success: boolean }>(`/v2/admin/enterprise/gdpr/breaches/${id}`, data),
+
+  notifyDpa: (id: number) =>
+    api.post<{ success: boolean }>(`/v2/admin/enterprise/gdpr/breaches/${id}/notify-dpa`),
+
+  // GDPR Statistics
+  getGdprStatistics: () =>
+    api.get<GdprStatistics>('/v2/admin/enterprise/gdpr/statistics'),
+
+  // Monitoring — Log Files
+  getLogFiles: () =>
+    api.get<LogFile[]>('/v2/admin/enterprise/monitoring/log-files'),
+
+  getLogFile: (filename: string, params: { lines?: number; level?: string } = {}) =>
+    api.get<LogFileContent>(`/v2/admin/enterprise/monitoring/log-files/${filename}${buildQuery(params)}`),
+
+  clearLogFile: (filename: string) =>
+    api.delete<{ success: boolean }>(`/v2/admin/enterprise/monitoring/log-files/${filename}`),
+
+  // Monitoring — Requirements & Health History
+  getSystemRequirements: () =>
+    api.get<SystemRequirements>('/v2/admin/enterprise/monitoring/requirements'),
+
+  getHealthHistory: () =>
+    api.get<HealthCheckHistoryEntry[]>('/v2/admin/enterprise/monitoring/health-history'),
+
+  // Config — Feature Flags
+  getFeatureFlags: () =>
+    api.get<FeatureFlags>('/v2/admin/enterprise/config/features'),
+
+  updateFeatureFlag: (data: { key: string; value: boolean; type: 'feature' | 'module' }) =>
+    api.patch<{ success: boolean }>('/v2/admin/enterprise/config/features', data),
+
+  // Config — Secrets Management
+  rotateSecret: (key: string) =>
+    api.post<{ success: boolean; manual_required?: boolean; message?: string }>(`/v2/admin/enterprise/config/secrets/${key}/rotate`),
+
+  deleteSecret: (key: string) =>
+    api.delete<{ success: boolean; manual_required?: boolean; message?: string }>(`/v2/admin/enterprise/config/secrets/${key}`),
+
+  testVaultConnection: () =>
+    api.post<{ success: boolean; services: Record<string, boolean> }>('/v2/admin/enterprise/config/secrets/test-vault'),
 };
 
 // ─────────────────────────────────────────────────────────────────────────────

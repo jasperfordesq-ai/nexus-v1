@@ -415,8 +415,19 @@ class AdminEnterpriseController extends BaseApiController
         $checks[] = ['name' => 'PHP >= 8.2', 'status' => version_compare(PHP_VERSION, '8.2.0', '>=') ? 'ok' : 'fail'];
 
         $hasFailures = !empty(array_filter($checks, fn($c) => $c['status'] === 'fail'));
+        $overallStatus = $hasFailures ? 'unhealthy' : 'healthy';
 
-        return $this->respondWithData(['status' => $hasFailures ? 'unhealthy' : 'healthy', 'checks' => $checks]);
+        // Record in health_check_history
+        try {
+            DB::insert(
+                "INSERT INTO health_check_history (tenant_id, status, checks, created_at) VALUES (?, ?, ?, NOW())",
+                [$this->getTenantId(), $overallStatus, json_encode($checks)]
+            );
+        } catch (\Exception $e) {
+            // Table may not exist yet — don't break the health check
+        }
+
+        return $this->respondWithData(['status' => $overallStatus, 'checks' => $checks]);
     }
 
     /** GET /api/v2/admin/enterprise/logs */
@@ -472,14 +483,1011 @@ class AdminEnterpriseController extends BaseApiController
     public function secrets(): JsonResponse
     {
         $this->requireAdmin();
-        $secretKeys = ['DB_HOST','DB_NAME','DB_USER','DB_PASS','PUSHER_APP_ID','PUSHER_KEY','PUSHER_SECRET','PUSHER_CLUSTER','OPENAI_API_KEY','GMAIL_CLIENT_ID','GMAIL_CLIENT_SECRET','GMAIL_REFRESH_TOKEN','JWT_SECRET','REDIS_HOST','REDIS_PORT','REDIS_PASSWORD','FCM_SERVER_KEY','VAPID_PUBLIC_KEY','VAPID_PRIVATE_KEY'];
+
+        $categoryMap = [
+            'DB_HOST' => 'database', 'DB_NAME' => 'database', 'DB_USER' => 'database', 'DB_PASS' => 'database',
+            'PUSHER_APP_ID' => 'push', 'PUSHER_KEY' => 'push', 'PUSHER_SECRET' => 'push', 'PUSHER_CLUSTER' => 'push',
+            'OPENAI_API_KEY' => 'ai',
+            'GMAIL_CLIENT_ID' => 'email', 'GMAIL_CLIENT_SECRET' => 'email', 'GMAIL_REFRESH_TOKEN' => 'email',
+            'JWT_SECRET' => 'auth',
+            'REDIS_HOST' => 'cache', 'REDIS_PORT' => 'cache', 'REDIS_PASSWORD' => 'cache',
+            'FCM_SERVER_KEY' => 'push', 'VAPID_PUBLIC_KEY' => 'push', 'VAPID_PRIVATE_KEY' => 'push',
+        ];
+
         $secrets = [];
-        foreach ($secretKeys as $key) {
+        foreach ($categoryMap as $key => $category) {
             $value = getenv($key);
-            $secrets[] = ['key' => $key, 'is_set' => $value !== false && $value !== ''];
+            $isSet = $value !== false && $value !== '';
+            $maskedValue = null;
+            if ($isSet && strlen($value) > 4) {
+                $maskedValue = substr($value, 0, 2) . '****' . substr($value, -2);
+            } elseif ($isSet) {
+                $maskedValue = '****';
+            }
+            $secrets[] = [
+                'key' => $key,
+                'is_set' => $isSet,
+                'category' => $category,
+                'masked_value' => $maskedValue,
+            ];
         }
         return $this->respondWithData($secrets);
     }
+
+    // ─── GDPR Request Detail & Management ─────────────────────────────
+
+    /** GET /api/v2/admin/enterprise/gdpr/requests/{id} */
+    public function showGdprRequest(int $id): JsonResponse
+    {
+        $this->requireAdmin();
+        $tenantId = $this->getTenantId();
+
+        try {
+            $request = DB::selectOne(
+                "SELECT gr.*, gr.request_type as type, u.name as user_name, u.email as user_email,
+                        au.name as assigned_to_name
+                 FROM gdpr_requests gr
+                 LEFT JOIN users u ON u.id = gr.user_id
+                 LEFT JOIN users au ON au.id = gr.assigned_to
+                 WHERE gr.id = ? AND gr.tenant_id = ?",
+                [$id, $tenantId]
+            );
+
+            if (!$request) {
+                return $this->respondWithError('NOT_FOUND', 'GDPR request not found', null, 404);
+            }
+
+            $result = (array) $request;
+
+            // Timeline from audit log
+            try {
+                $timeline = array_map(fn($r) => (array) $r, DB::select(
+                    "SELECT gal.id, gal.action, gal.old_value, gal.new_value, gal.ip_address, gal.created_at,
+                            u.name as admin_name
+                     FROM gdpr_audit_log gal
+                     LEFT JOIN users u ON u.id = gal.admin_id
+                     WHERE gal.entity_type = 'gdpr_request' AND gal.entity_id = ? AND gal.tenant_id = ?
+                     ORDER BY gal.created_at ASC",
+                    [$id, $tenantId]
+                ));
+            } catch (\Exception $e) {
+                $timeline = [];
+            }
+
+            $result['timeline'] = $timeline;
+
+            // SLA calculation (30 days from created_at)
+            $createdAt = strtotime($result['created_at'] ?? 'now');
+            $slaDeadline = date('Y-m-d H:i:s', $createdAt + (30 * 86400));
+            $slaDaysRemaining = max(0, (int) ceil(($createdAt + (30 * 86400) - time()) / 86400));
+            $result['sla_deadline'] = $slaDeadline;
+            $result['sla_days_remaining'] = $slaDaysRemaining;
+
+            return $this->respondWithData($result);
+        } catch (\Exception $e) {
+            return $this->respondWithError('FETCH_FAILED', 'Failed to fetch GDPR request', null, 500);
+        }
+    }
+
+    /** POST /api/v2/admin/enterprise/gdpr/requests */
+    public function createGdprRequest(): JsonResponse
+    {
+        $this->requireAdmin();
+        $tenantId = $this->getTenantId();
+        $input = $this->getAllInput();
+
+        $userId = (int) ($input['user_id'] ?? 0);
+        $type = trim($input['type'] ?? '');
+        $priority = trim($input['priority'] ?? 'normal');
+        $notes = $input['notes'] ?? null;
+
+        if (!$userId) {
+            return $this->respondWithError('VALIDATION_ERROR', 'User ID is required', 'user_id', 422);
+        }
+
+        $validTypes = ['access', 'erasure', 'portability', 'rectification', 'restriction', 'objection'];
+        if (!in_array($type, $validTypes, true)) {
+            return $this->respondWithError('VALIDATION_ERROR', 'Invalid request type. Must be one of: ' . implode(', ', $validTypes), 'type', 422);
+        }
+
+        try {
+            DB::insert(
+                "INSERT INTO gdpr_requests (tenant_id, user_id, request_type, priority, notes, status, created_at, updated_at)
+                 VALUES (?, ?, ?, ?, ?, 'pending', NOW(), NOW())",
+                [$tenantId, $userId, $type, $priority, $notes]
+            );
+            $requestId = (int) DB::getPdo()->lastInsertId();
+
+            // Log the action
+            try {
+                DB::insert(
+                    "INSERT INTO gdpr_audit_log (tenant_id, admin_id, action, entity_type, entity_id, new_value, ip_address, created_at)
+                     VALUES (?, ?, 'create_request', 'gdpr_request', ?, ?, ?, NOW())",
+                    [$tenantId, $this->getUserId(), $requestId, json_encode(['type' => $type, 'user_id' => $userId]), request()->ip()]
+                );
+            } catch (\Exception $e) {
+                // Audit log failure should not break the main operation
+            }
+
+            return $this->respondWithData(['id' => $requestId, 'message' => 'GDPR request created successfully'], null, 201);
+        } catch (\Exception $e) {
+            return $this->respondWithError('CREATE_FAILED', 'Failed to create GDPR request', null, 500);
+        }
+    }
+
+    /** PUT /api/v2/admin/enterprise/gdpr/requests/{id}/assign */
+    public function assignGdprRequest(int $id): JsonResponse
+    {
+        $this->requireAdmin();
+        $tenantId = $this->getTenantId();
+        $assignedTo = (int) ($this->input('assigned_to') ?? 0);
+
+        if (!$assignedTo) {
+            return $this->respondWithError('VALIDATION_ERROR', 'assigned_to (user ID) is required', 'assigned_to', 422);
+        }
+
+        try {
+            $affected = DB::update(
+                "UPDATE gdpr_requests SET assigned_to = ?, updated_at = NOW() WHERE id = ? AND tenant_id = ?",
+                [$assignedTo, $id, $tenantId]
+            );
+
+            if ($affected === 0) {
+                return $this->respondWithError('NOT_FOUND', 'GDPR request not found', null, 404);
+            }
+
+            try {
+                DB::insert(
+                    "INSERT INTO gdpr_audit_log (tenant_id, admin_id, action, entity_type, entity_id, new_value, ip_address, created_at)
+                     VALUES (?, ?, 'assign_request', 'gdpr_request', ?, ?, ?, NOW())",
+                    [$tenantId, $this->getUserId(), $id, json_encode(['assigned_to' => $assignedTo]), request()->ip()]
+                );
+            } catch (\Exception $e) {}
+
+            return $this->respondWithData(['id' => $id, 'assigned_to' => $assignedTo, 'updated' => true]);
+        } catch (\Exception $e) {
+            return $this->respondWithError('UPDATE_FAILED', 'Failed to assign GDPR request', null, 500);
+        }
+    }
+
+    /** POST /api/v2/admin/enterprise/gdpr/requests/{id}/notes */
+    public function addGdprRequestNote(int $id): JsonResponse
+    {
+        $this->requireAdmin();
+        $tenantId = $this->getTenantId();
+        $note = trim($this->input('note') ?? '');
+
+        if ($note === '') {
+            return $this->respondWithError('VALIDATION_ERROR', 'Note text is required', 'note', 422);
+        }
+
+        try {
+            $request = DB::selectOne("SELECT notes FROM gdpr_requests WHERE id = ? AND tenant_id = ?", [$id, $tenantId]);
+            if (!$request) {
+                return $this->respondWithError('NOT_FOUND', 'GDPR request not found', null, 404);
+            }
+
+            // Get admin name
+            $adminName = 'Admin';
+            try {
+                $admin = DB::selectOne("SELECT name FROM users WHERE id = ?", [$this->getUserId()]);
+                if ($admin) { $adminName = $admin->name; }
+            } catch (\Exception $e) {}
+
+            $timestamp = date('Y-m-d H:i:s');
+            $existingNotes = $request->notes ?? '';
+            $newNotes = $existingNotes
+                ? $existingNotes . "\n[{$timestamp}] {$adminName}: {$note}"
+                : "[{$timestamp}] {$adminName}: {$note}";
+
+            DB::update(
+                "UPDATE gdpr_requests SET notes = ?, updated_at = NOW() WHERE id = ? AND tenant_id = ?",
+                [$newNotes, $id, $tenantId]
+            );
+
+            try {
+                DB::insert(
+                    "INSERT INTO gdpr_audit_log (tenant_id, admin_id, action, entity_type, entity_id, new_value, ip_address, created_at)
+                     VALUES (?, ?, 'add_note', 'gdpr_request', ?, ?, ?, NOW())",
+                    [$tenantId, $this->getUserId(), $id, json_encode(['note' => $note]), request()->ip()]
+                );
+            } catch (\Exception $e) {}
+
+            return $this->respondWithData(['id' => $id, 'notes' => $newNotes, 'updated' => true]);
+        } catch (\Exception $e) {
+            return $this->respondWithError('UPDATE_FAILED', 'Failed to add note to GDPR request', null, 500);
+        }
+    }
+
+    /** POST /api/v2/admin/enterprise/gdpr/requests/{id}/export */
+    public function generateGdprExport(int $id): JsonResponse
+    {
+        $this->requireAdmin();
+        $tenantId = $this->getTenantId();
+
+        try {
+            $request = DB::selectOne("SELECT * FROM gdpr_requests WHERE id = ? AND tenant_id = ?", [$id, $tenantId]);
+            if (!$request) {
+                return $this->respondWithError('NOT_FOUND', 'GDPR request not found', null, 404);
+            }
+
+            $gdprService = new \App\Services\Enterprise\GdprService($tenantId);
+            $filePath = $gdprService->generateDataExport((int) $request->user_id, $id);
+
+            $expiresAt = date('Y-m-d H:i:s', strtotime('+30 days'));
+            DB::update(
+                "UPDATE gdpr_requests SET export_file_path = ?, export_expires_at = ?, updated_at = NOW() WHERE id = ? AND tenant_id = ?",
+                [$filePath, $expiresAt, $id, $tenantId]
+            );
+
+            try {
+                DB::insert(
+                    "INSERT INTO gdpr_audit_log (tenant_id, admin_id, action, entity_type, entity_id, new_value, ip_address, created_at)
+                     VALUES (?, ?, 'generate_export', 'gdpr_request', ?, ?, ?, NOW())",
+                    [$tenantId, $this->getUserId(), $id, json_encode(['file_path' => $filePath]), request()->ip()]
+                );
+            } catch (\Exception $e) {}
+
+            return $this->respondWithData([
+                'id' => $id,
+                'export_file_path' => $filePath,
+                'export_expires_at' => $expiresAt,
+                'message' => 'Data export generated successfully',
+            ]);
+        } catch (\Exception $e) {
+            return $this->respondWithError('EXPORT_FAILED', 'Failed to generate data export: ' . $e->getMessage(), null, 500);
+        }
+    }
+
+    // ─── GDPR Consent Type Management ────────────────────────────────
+
+    /** GET /api/v2/admin/enterprise/gdpr/consent-types */
+    public function consentTypes(): JsonResponse
+    {
+        $this->requireAdmin();
+        $tenantId = $this->getTenantId();
+
+        try {
+            $types = array_map(fn($r) => (array) $r, DB::select(
+                "SELECT ct.*,
+                        COALESCE((SELECT COUNT(*) FROM user_consents uc WHERE uc.consent_type = ct.slug AND uc.tenant_id = ct.tenant_id AND uc.consent_given = 1), 0) as granted_count,
+                        COALESCE((SELECT COUNT(*) FROM user_consents uc WHERE uc.consent_type = ct.slug AND uc.tenant_id = ct.tenant_id AND uc.consent_given = 0), 0) as denied_count
+                 FROM consent_types ct
+                 WHERE ct.tenant_id = ?
+                 ORDER BY ct.display_order ASC, ct.name ASC",
+                [$tenantId]
+            ));
+            return $this->respondWithData($types);
+        } catch (\Exception $e) {
+            // Table may not exist
+            return $this->respondWithData([]);
+        }
+    }
+
+    /** POST /api/v2/admin/enterprise/gdpr/consent-types */
+    public function createConsentType(): JsonResponse
+    {
+        $this->requireAdmin();
+        $tenantId = $this->getTenantId();
+        $input = $this->getAllInput();
+
+        $slug = trim($input['slug'] ?? '');
+        $name = trim($input['name'] ?? '');
+        if (!$slug || !$name) {
+            return $this->respondWithError('VALIDATION_ERROR', 'Slug and name are required', null, 422);
+        }
+
+        try {
+            DB::insert(
+                "INSERT INTO consent_types (tenant_id, slug, name, description, category, is_required, legal_basis, retention_days, display_order, is_active, created_at, updated_at)
+                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW(), NOW())",
+                [
+                    $tenantId, $slug, $name,
+                    $input['description'] ?? null,
+                    $input['category'] ?? 'general',
+                    (int) ($input['is_required'] ?? 0),
+                    $input['legal_basis'] ?? null,
+                    isset($input['retention_days']) ? (int) $input['retention_days'] : null,
+                    (int) ($input['display_order'] ?? 0),
+                    (int) ($input['is_active'] ?? 1),
+                ]
+            );
+            $newId = (int) DB::getPdo()->lastInsertId();
+
+            $created = DB::selectOne("SELECT * FROM consent_types WHERE id = ?", [$newId]);
+            return $this->respondWithData($created ? (array) $created : ['id' => $newId], null, 201);
+        } catch (\Exception $e) {
+            return $this->respondWithError('CREATE_FAILED', 'Failed to create consent type: ' . $e->getMessage(), null, 500);
+        }
+    }
+
+    /** PUT /api/v2/admin/enterprise/gdpr/consent-types/{id} */
+    public function updateConsentType(int $id): JsonResponse
+    {
+        $this->requireAdmin();
+        $tenantId = $this->getTenantId();
+        $input = $this->getAllInput();
+
+        $allowedFields = ['slug', 'name', 'description', 'category', 'is_required', 'legal_basis', 'retention_days', 'display_order', 'is_active'];
+        $setParts = [];
+        $params = [];
+
+        foreach ($allowedFields as $field) {
+            if (isset($input[$field])) {
+                $setParts[] = "{$field} = ?";
+                $params[] = in_array($field, ['is_required', 'is_active', 'retention_days', 'display_order'])
+                    ? (int) $input[$field]
+                    : $input[$field];
+            }
+        }
+
+        if (empty($setParts)) {
+            return $this->respondWithError('VALIDATION_ERROR', 'No fields to update', null, 422);
+        }
+
+        $setParts[] = 'updated_at = NOW()';
+        $params[] = $id;
+        $params[] = $tenantId;
+
+        try {
+            $affected = DB::update("UPDATE consent_types SET " . implode(', ', $setParts) . " WHERE id = ? AND tenant_id = ?", $params);
+            if ($affected === 0) {
+                return $this->respondWithError('NOT_FOUND', 'Consent type not found', null, 404);
+            }
+            $updated = DB::selectOne("SELECT * FROM consent_types WHERE id = ? AND tenant_id = ?", [$id, $tenantId]);
+            return $this->respondWithData($updated ? (array) $updated : ['id' => $id, 'updated' => true]);
+        } catch (\Exception $e) {
+            return $this->respondWithError('UPDATE_FAILED', 'Failed to update consent type', null, 500);
+        }
+    }
+
+    /** DELETE /api/v2/admin/enterprise/gdpr/consent-types/{id} */
+    public function deleteConsentType(int $id): JsonResponse
+    {
+        $this->requireAdmin();
+        $tenantId = $this->getTenantId();
+
+        try {
+            DB::delete("DELETE FROM consent_types WHERE id = ? AND tenant_id = ?", [$id, $tenantId]);
+            return $this->respondWithData(['deleted' => true]);
+        } catch (\Exception $e) {
+            return $this->respondWithError('DELETE_FAILED', 'Failed to delete consent type', null, 500);
+        }
+    }
+
+    /** GET /api/v2/admin/enterprise/gdpr/consent-types/{slug}/users */
+    public function consentTypeUsers(string $slug): JsonResponse
+    {
+        $this->requireAdmin();
+        $tenantId = $this->getTenantId();
+        $page = $this->queryInt('page', 1, 1);
+        $perPage = $this->queryInt('per_page', 20, 1, 100);
+        $offset = ($page - 1) * $perPage;
+
+        try {
+            $total = (int) (DB::selectOne(
+                "SELECT COUNT(*) as cnt FROM user_consents WHERE consent_type = ? AND tenant_id = ?",
+                [$slug, $tenantId]
+            )->cnt ?? 0);
+
+            $users = array_map(fn($r) => (array) $r, DB::select(
+                "SELECT uc.id, uc.user_id, uc.consent_type, uc.consent_given, uc.given_at, uc.ip_address,
+                        u.name as user_name, u.email as user_email
+                 FROM user_consents uc
+                 LEFT JOIN users u ON u.id = uc.user_id
+                 WHERE uc.consent_type = ? AND uc.tenant_id = ?
+                 ORDER BY uc.given_at DESC
+                 LIMIT ? OFFSET ?",
+                [$slug, $tenantId, $perPage, $offset]
+            ));
+
+            return $this->respondWithPaginatedCollection($users, $total, $page, $perPage);
+        } catch (\Exception $e) {
+            return $this->respondWithPaginatedCollection([], 0, 1, $perPage);
+        }
+    }
+
+    /** GET /api/v2/admin/enterprise/gdpr/consent-types/{slug}/export */
+    public function exportConsentTypeUsers(string $slug): \Symfony\Component\HttpFoundation\StreamedResponse
+    {
+        $this->requireAdmin();
+        $tenantId = $this->getTenantId();
+
+        return response()->streamDownload(function () use ($slug, $tenantId) {
+            $handle = fopen('php://output', 'w');
+            fputcsv($handle, ['user_name', 'user_email', 'consent_given', 'given_at', 'ip_address']);
+
+            try {
+                $rows = DB::select(
+                    "SELECT u.name as user_name, u.email as user_email, uc.consent_given, uc.given_at, uc.ip_address
+                     FROM user_consents uc
+                     LEFT JOIN users u ON u.id = uc.user_id
+                     WHERE uc.consent_type = ? AND uc.tenant_id = ?
+                     ORDER BY uc.given_at DESC",
+                    [$slug, $tenantId]
+                );
+
+                foreach ($rows as $row) {
+                    fputcsv($handle, [
+                        $row->user_name ?? '',
+                        $row->user_email ?? '',
+                        $row->consent_given ? 'Yes' : 'No',
+                        $row->given_at ?? '',
+                        $row->ip_address ?? '',
+                    ]);
+                }
+            } catch (\Exception $e) {
+                // Write error row
+                fputcsv($handle, ['Error exporting data', '', '', '', '']);
+            }
+
+            fclose($handle);
+        }, "consent-{$slug}-users.csv", ['Content-Type' => 'text/csv']);
+    }
+
+    // ─── GDPR Breach Detail ─────────────────────────────────────────
+
+    /** GET /api/v2/admin/enterprise/gdpr/breaches/{id} */
+    public function showBreach(int $id): JsonResponse
+    {
+        $this->requireAdmin();
+        $tenantId = $this->getTenantId();
+
+        try {
+            $breach = DB::selectOne(
+                "SELECT dbl.*, u.name as created_by_name
+                 FROM data_breach_log dbl
+                 LEFT JOIN users u ON u.id = dbl.created_by
+                 WHERE dbl.id = ? AND dbl.tenant_id = ?",
+                [$id, $tenantId]
+            );
+
+            if (!$breach) {
+                return $this->respondWithError('NOT_FOUND', 'Breach record not found', null, 404);
+            }
+
+            return $this->respondWithData((array) $breach);
+        } catch (\Exception $e) {
+            return $this->respondWithError('FETCH_FAILED', 'Failed to fetch breach record', null, 500);
+        }
+    }
+
+    /** PUT /api/v2/admin/enterprise/gdpr/breaches/{id} */
+    public function updateBreach(int $id): JsonResponse
+    {
+        $this->requireAdmin();
+        $tenantId = $this->getTenantId();
+        $input = $this->getAllInput();
+
+        $allowedFields = [
+            'status', 'root_cause', 'remediation_actions', 'lessons_learned',
+            'prevention_measures', 'contained_at', 'resolved_at',
+        ];
+
+        $setParts = [];
+        $params = [];
+
+        foreach ($allowedFields as $field) {
+            if (isset($input[$field])) {
+                $setParts[] = "{$field} = ?";
+                $params[] = $input[$field];
+            }
+        }
+
+        if (empty($setParts)) {
+            return $this->respondWithError('VALIDATION_ERROR', 'No fields to update', null, 422);
+        }
+
+        $setParts[] = 'updated_at = NOW()';
+        $params[] = $id;
+        $params[] = $tenantId;
+
+        try {
+            $affected = DB::update("UPDATE data_breach_log SET " . implode(', ', $setParts) . " WHERE id = ? AND tenant_id = ?", $params);
+            if ($affected === 0) {
+                return $this->respondWithError('NOT_FOUND', 'Breach record not found', null, 404);
+            }
+
+            try {
+                DB::insert(
+                    "INSERT INTO gdpr_audit_log (tenant_id, admin_id, action, entity_type, entity_id, new_value, ip_address, created_at)
+                     VALUES (?, ?, 'update_breach', 'data_breach', ?, ?, ?, NOW())",
+                    [$tenantId, $this->getUserId(), $id, json_encode(array_intersect_key($input, array_flip($allowedFields))), request()->ip()]
+                );
+            } catch (\Exception $e) {}
+
+            return $this->respondWithData(['id' => $id, 'updated' => true]);
+        } catch (\Exception $e) {
+            return $this->respondWithError('UPDATE_FAILED', 'Failed to update breach record', null, 500);
+        }
+    }
+
+    /** POST /api/v2/admin/enterprise/gdpr/breaches/{id}/notify-dpa */
+    public function notifyDpa(int $id): JsonResponse
+    {
+        $this->requireAdmin();
+        $tenantId = $this->getTenantId();
+
+        try {
+            $affected = DB::update(
+                "UPDATE data_breach_log SET dpa_notified_at = NOW(), reported_to_authority = 1, updated_at = NOW() WHERE id = ? AND tenant_id = ?",
+                [$id, $tenantId]
+            );
+
+            if ($affected === 0) {
+                return $this->respondWithError('NOT_FOUND', 'Breach record not found', null, 404);
+            }
+
+            try {
+                DB::insert(
+                    "INSERT INTO gdpr_audit_log (tenant_id, admin_id, action, entity_type, entity_id, new_value, ip_address, created_at)
+                     VALUES (?, ?, 'notify_dpa', 'data_breach', ?, ?, ?, NOW())",
+                    [$tenantId, $this->getUserId(), $id, json_encode(['dpa_notified' => true]), request()->ip()]
+                );
+            } catch (\Exception $e) {}
+
+            return $this->respondWithData(['id' => $id, 'dpa_notified' => true, 'message' => 'DPA notification recorded successfully']);
+        } catch (\Exception $e) {
+            return $this->respondWithError('UPDATE_FAILED', 'Failed to record DPA notification', null, 500);
+        }
+    }
+
+    // ─── GDPR Statistics ─────────────────────────────────────────────
+
+    /** GET /api/v2/admin/enterprise/gdpr/statistics */
+    public function gdprStatistics(): JsonResponse
+    {
+        $this->requireAdmin();
+        $tenantId = $this->getTenantId();
+
+        try {
+            $gdprService = new \App\Services\Enterprise\GdprService($tenantId);
+            $stats = $gdprService->getStatistics();
+            return $this->respondWithData($stats);
+        } catch (\Exception $e) {
+            // Fall back to manual computation
+        }
+
+        try {
+            // Request counts by status
+            $statusCounts = [];
+            $rows = DB::select(
+                "SELECT status, COUNT(*) as cnt FROM gdpr_requests WHERE tenant_id = ? GROUP BY status",
+                [$tenantId]
+            );
+            foreach ($rows as $row) {
+                $statusCounts[$row->status] = (int) $row->cnt;
+            }
+
+            // Request counts by type
+            $typeCounts = [];
+            $rows = DB::select(
+                "SELECT request_type, COUNT(*) as cnt FROM gdpr_requests WHERE tenant_id = ? GROUP BY request_type",
+                [$tenantId]
+            );
+            foreach ($rows as $row) {
+                $typeCounts[$row->request_type] = (int) $row->cnt;
+            }
+
+            // Average processing time
+            $avgRow = DB::selectOne(
+                "SELECT AVG(TIMESTAMPDIFF(HOUR, created_at, completed_at)) as avg_hours
+                 FROM gdpr_requests WHERE tenant_id = ? AND status = 'completed' AND completed_at IS NOT NULL",
+                [$tenantId]
+            );
+            $avgProcessingHours = round((float) ($avgRow->avg_hours ?? 0), 1);
+
+            // Active breaches
+            $activeBreaches = (int) (DB::selectOne(
+                "SELECT COUNT(*) as cnt FROM data_breach_log WHERE tenant_id = ? AND status IN ('open', 'investigating')",
+                [$tenantId]
+            )->cnt ?? 0);
+
+            $totalBreaches = (int) (DB::selectOne(
+                "SELECT COUNT(*) as cnt FROM data_breach_log WHERE tenant_id = ?",
+                [$tenantId]
+            )->cnt ?? 0);
+
+            // Overdue requests (pending/processing where created_at + 30 days < NOW())
+            $overdueCount = (int) (DB::selectOne(
+                "SELECT COUNT(*) as cnt FROM gdpr_requests
+                 WHERE tenant_id = ? AND status IN ('pending', 'processing') AND DATE_ADD(created_at, INTERVAL 30 DAY) < NOW()",
+                [$tenantId]
+            )->cnt ?? 0);
+
+            // Consent coverage
+            $totalUsers = (int) (DB::selectOne("SELECT COUNT(*) as cnt FROM users WHERE tenant_id = ?", [$tenantId])->cnt ?? 0);
+            $usersWithConsent = (int) (DB::selectOne(
+                "SELECT COUNT(DISTINCT user_id) as cnt FROM user_consents WHERE tenant_id = ? AND consent_given = 1",
+                [$tenantId]
+            )->cnt ?? 0);
+            $consentCoverage = $totalUsers > 0 ? round($usersWithConsent / $totalUsers, 4) : 0;
+
+            // Compliance score
+            $totalRequests = array_sum($statusCounts);
+            $completedOnTime = 0;
+            try {
+                $completedOnTime = (int) (DB::selectOne(
+                    "SELECT COUNT(*) as cnt FROM gdpr_requests
+                     WHERE tenant_id = ? AND status = 'completed' AND completed_at IS NOT NULL
+                     AND TIMESTAMPDIFF(DAY, created_at, completed_at) <= 30",
+                    [$tenantId]
+                )->cnt ?? 0);
+            } catch (\Exception $e) {}
+
+            $complianceScore = 0;
+            if ($totalRequests > 0) {
+                $complianceScore += ($completedOnTime / $totalRequests) * 40;
+            } else {
+                $complianceScore += 40; // No requests = perfect request compliance
+            }
+            $complianceScore += $consentCoverage * 30;
+            $complianceScore += (1 - ($activeBreaches / max($totalBreaches, 1))) * 30;
+            $complianceScore = (int) min(100, max(0, round($complianceScore)));
+
+            return $this->respondWithData([
+                'requests_by_status' => $statusCounts,
+                'requests_by_type' => $typeCounts,
+                'avg_processing_hours' => $avgProcessingHours,
+                'active_breaches' => $activeBreaches,
+                'total_breaches' => $totalBreaches,
+                'overdue_requests' => $overdueCount,
+                'total_users' => $totalUsers,
+                'users_with_consent' => $usersWithConsent,
+                'consent_coverage' => $consentCoverage,
+                'compliance_score' => $complianceScore,
+            ]);
+        } catch (\Exception $e) {
+            return $this->respondWithData([
+                'requests_by_status' => [],
+                'requests_by_type' => [],
+                'avg_processing_hours' => 0,
+                'active_breaches' => 0,
+                'total_breaches' => 0,
+                'overdue_requests' => 0,
+                'total_users' => 0,
+                'users_with_consent' => 0,
+                'consent_coverage' => 0,
+                'compliance_score' => 0,
+            ]);
+        }
+    }
+
+    // ─── Monitoring — Log Files ──────────────────────────────────────
+
+    /** GET /api/v2/admin/enterprise/monitoring/log-files */
+    public function logFiles(): JsonResponse
+    {
+        $this->requireAdmin();
+
+        try {
+            $logDir = storage_path('logs');
+            $files = [];
+
+            if (is_dir($logDir)) {
+                foreach (scandir($logDir) as $file) {
+                    if ($file === '.' || $file === '..') continue;
+                    if (!str_ends_with($file, '.log')) continue;
+
+                    $fullPath = $logDir . DIRECTORY_SEPARATOR . $file;
+                    if (!is_file($fullPath)) continue;
+
+                    $sizeBytes = filesize($fullPath);
+                    $lineCount = 0;
+
+                    // Count lines but cap file read at 10MB to avoid OOM
+                    if ($sizeBytes > 0 && $sizeBytes <= 10 * 1024 * 1024) {
+                        $content = file_get_contents($fullPath);
+                        $lineCount = substr_count($content, "\n");
+                        unset($content);
+                    } elseif ($sizeBytes > 10 * 1024 * 1024) {
+                        $content = file_get_contents($fullPath, false, null, 0, 10 * 1024 * 1024);
+                        $lineCount = substr_count($content, "\n");
+                        unset($content);
+                    }
+
+                    $files[] = [
+                        'name' => $file,
+                        'size' => $this->formatBytes($sizeBytes),
+                        'size_bytes' => $sizeBytes,
+                        'modified_at' => date('Y-m-d H:i:s', filemtime($fullPath)),
+                        'line_count' => $lineCount,
+                    ];
+                }
+            }
+
+            // Sort by modified_at descending
+            usort($files, fn($a, $b) => strcmp($b['modified_at'], $a['modified_at']));
+
+            return $this->respondWithData($files);
+        } catch (\Exception $e) {
+            return $this->respondWithData([]);
+        }
+    }
+
+    /** GET /api/v2/admin/enterprise/monitoring/log-files/{filename} */
+    public function viewLogFile(string $filename): JsonResponse
+    {
+        $this->requireAdmin();
+
+        // Security: no path traversal
+        if (str_contains($filename, '/') || str_contains($filename, '\\') || str_contains($filename, '..')) {
+            return $this->respondWithError('VALIDATION_ERROR', 'Invalid filename', 'filename', 400);
+        }
+        if (!str_ends_with($filename, '.log')) {
+            return $this->respondWithError('VALIDATION_ERROR', 'Only .log files are allowed', 'filename', 400);
+        }
+
+        $filePath = storage_path('logs') . DIRECTORY_SEPARATOR . $filename;
+        if (!is_file($filePath)) {
+            return $this->respondWithError('NOT_FOUND', 'Log file not found', null, 404);
+        }
+
+        $maxLines = $this->queryInt('lines', 200, 1, 1000);
+        $levelFilter = $this->query('level'); // ERROR, WARNING, INFO, DEBUG
+
+        try {
+            $allLines = file($filePath, FILE_IGNORE_NEW_LINES);
+            $totalLines = count($allLines);
+
+            // Take the last N lines (most recent)
+            $lines = array_slice($allLines, -$maxLines);
+            unset($allLines);
+
+            // Apply level filter if provided
+            $filtered = [];
+            if ($levelFilter) {
+                $levelFilter = strtoupper($levelFilter);
+                foreach ($lines as $idx => $line) {
+                    if (stripos($line, ".{$levelFilter}:") !== false || stripos($line, "[{$levelFilter}]") !== false) {
+                        $filtered[] = ['line_number' => $totalLines - count($lines) + $idx + 1, 'text' => $line];
+                    }
+                }
+            } else {
+                foreach ($lines as $idx => $line) {
+                    $filtered[] = ['line_number' => $totalLines - count($lines) + $idx + 1, 'text' => $line];
+                }
+            }
+
+            return $this->respondWithData([
+                'filename' => $filename,
+                'content' => $filtered,
+                'total_lines' => $totalLines,
+                'filtered_count' => count($filtered),
+            ]);
+        } catch (\Exception $e) {
+            return $this->respondWithError('READ_FAILED', 'Failed to read log file', null, 500);
+        }
+    }
+
+    /** DELETE /api/v2/admin/enterprise/monitoring/log-files/{filename} */
+    public function clearLogFile(string $filename): JsonResponse
+    {
+        $this->requireAdmin();
+
+        if (str_contains($filename, '/') || str_contains($filename, '\\') || str_contains($filename, '..')) {
+            return $this->respondWithError('VALIDATION_ERROR', 'Invalid filename', 'filename', 400);
+        }
+        if (!str_ends_with($filename, '.log')) {
+            return $this->respondWithError('VALIDATION_ERROR', 'Only .log files are allowed', 'filename', 400);
+        }
+
+        $filePath = storage_path('logs') . DIRECTORY_SEPARATOR . $filename;
+        if (!is_file($filePath)) {
+            return $this->respondWithError('NOT_FOUND', 'Log file not found', null, 404);
+        }
+
+        try {
+            file_put_contents($filePath, '');
+            return $this->respondWithData(['filename' => $filename, 'cleared' => true, 'message' => 'Log file cleared successfully']);
+        } catch (\Exception $e) {
+            return $this->respondWithError('CLEAR_FAILED', 'Failed to clear log file', null, 500);
+        }
+    }
+
+    // ─── Monitoring — System Requirements ────────────────────────────
+
+    /** GET /api/v2/admin/enterprise/monitoring/requirements */
+    public function systemRequirements(): JsonResponse
+    {
+        $this->requireAdmin();
+
+        // PHP version
+        $php = [
+            'version' => PHP_VERSION,
+            'meets_minimum' => version_compare(PHP_VERSION, '8.2.0', '>='),
+        ];
+
+        // Extensions
+        $requiredExtensions = ['pdo_mysql', 'redis', 'zip', 'mbstring', 'gd', 'curl', 'json', 'openssl', 'fileinfo', 'bcmath', 'ctype', 'dom', 'iconv', 'tokenizer', 'xml'];
+        $extensions = [];
+        foreach ($requiredExtensions as $ext) {
+            $extensions[] = [
+                'name' => $ext,
+                'loaded' => extension_loaded($ext),
+                'required' => true,
+            ];
+        }
+
+        // Writable directories
+        $dirs = [
+            storage_path(),
+            storage_path('logs'),
+            storage_path('framework/cache'),
+            storage_path('framework/sessions'),
+        ];
+        $writableDirs = [];
+        foreach ($dirs as $dir) {
+            $writableDirs[] = [
+                'path' => $dir,
+                'writable' => is_dir($dir) && is_writable($dir),
+            ];
+        }
+
+        // Services
+        $dbOk = false;
+        try { DB::select("SELECT 1"); $dbOk = true; } catch (\Exception $e) {}
+
+        $redisOk = false;
+        try { $stats = app(\App\Services\RedisCache::class)->getStats(); $redisOk = !empty($stats['enabled']); } catch (\Throwable $e) {}
+
+        $services = [
+            ['name' => 'database', 'connected' => $dbOk],
+            ['name' => 'redis', 'connected' => $redisOk],
+        ];
+
+        // INI settings
+        $iniSettings = [
+            'max_execution_time' => ini_get('max_execution_time'),
+            'memory_limit' => ini_get('memory_limit'),
+            'upload_max_filesize' => ini_get('upload_max_filesize'),
+            'post_max_size' => ini_get('post_max_size'),
+            'max_input_vars' => ini_get('max_input_vars'),
+        ];
+
+        return $this->respondWithData([
+            'php' => $php,
+            'extensions' => $extensions,
+            'writable_directories' => $writableDirs,
+            'services' => $services,
+            'ini_settings' => $iniSettings,
+        ]);
+    }
+
+    // ─── Monitoring — Health Check History ───────────────────────────
+
+    /** GET /api/v2/admin/enterprise/monitoring/health-history */
+    public function healthCheckHistory(): JsonResponse
+    {
+        $this->requireAdmin();
+        $tenantId = $this->getTenantId();
+
+        try {
+            $history = array_map(fn($r) => (array) $r, DB::select(
+                "SELECT * FROM health_check_history WHERE tenant_id = ? ORDER BY created_at DESC LIMIT 10",
+                [$tenantId]
+            ));
+            return $this->respondWithData($history);
+        } catch (\Exception $e) {
+            // Table may not exist yet
+            return $this->respondWithData([]);
+        }
+    }
+
+    // ─── Config — Feature Flags ──────────────────────────────────────
+
+    /** GET /api/v2/admin/enterprise/config/features */
+    public function featureFlags(): JsonResponse
+    {
+        $this->requireAdmin();
+        $tenantId = $this->getTenantId();
+
+        try {
+            $row = DB::selectOne("SELECT features, configuration FROM tenants WHERE id = ?", [$tenantId]);
+            $features = json_decode($row->features ?? '{}', true) ?: [];
+            $configuration = json_decode($row->configuration ?? '{}', true) ?: [];
+            $modules = $configuration['modules'] ?? [];
+
+            return $this->respondWithData([
+                'features' => $features,
+                'modules' => $modules,
+            ]);
+        } catch (\Exception $e) {
+            return $this->respondWithData(['features' => [], 'modules' => []]);
+        }
+    }
+
+    /** PATCH /api/v2/admin/enterprise/config/features */
+    public function updateFeatureFlag(): JsonResponse
+    {
+        $this->requireAdmin();
+        $tenantId = $this->getTenantId();
+        $input = $this->getAllInput();
+
+        $key = trim($input['key'] ?? '');
+        $value = (bool) ($input['value'] ?? false);
+        $type = trim($input['type'] ?? 'feature');
+
+        if (!$key) {
+            return $this->respondWithError('VALIDATION_ERROR', 'Key is required', 'key', 422);
+        }
+
+        if (!in_array($type, ['feature', 'module'], true)) {
+            return $this->respondWithError('VALIDATION_ERROR', 'Type must be "feature" or "module"', 'type', 422);
+        }
+
+        try {
+            $row = DB::selectOne("SELECT features, configuration FROM tenants WHERE id = ?", [$tenantId]);
+
+            if ($type === 'feature') {
+                $features = json_decode($row->features ?? '{}', true) ?: [];
+                $features[$key] = $value;
+                DB::update("UPDATE tenants SET features = ? WHERE id = ?", [json_encode($features), $tenantId]);
+            } else {
+                $configuration = json_decode($row->configuration ?? '{}', true) ?: [];
+                $modules = $configuration['modules'] ?? [];
+                $modules[$key] = $value;
+                $configuration['modules'] = $modules;
+                DB::update("UPDATE tenants SET configuration = ? WHERE id = ?", [json_encode($configuration), $tenantId]);
+            }
+
+            // Invalidate tenant bootstrap cache
+            try {
+                app(\App\Services\RedisCache::class)->delete('tenant_bootstrap', $tenantId);
+            } catch (\Throwable $e) {}
+
+            return $this->respondWithData(['key' => $key, 'value' => $value, 'type' => $type, 'updated' => true]);
+        } catch (\Exception $e) {
+            return $this->respondWithError('UPDATE_FAILED', 'Failed to update feature flag', null, 500);
+        }
+    }
+
+    // ─── Config — Secrets Management Enhancement ─────────────────────
+
+    /** POST /api/v2/admin/enterprise/config/secrets/{key}/rotate */
+    public function rotateSecret(string $key): JsonResponse
+    {
+        $this->requireAdmin();
+
+        return $this->respondWithData([
+            'key' => $key,
+            'manual_required' => true,
+            'message' => 'Secret rotation requires server access. Use SSH to rotate secrets in the .env file.',
+        ]);
+    }
+
+    /** DELETE /api/v2/admin/enterprise/config/secrets/{key} */
+    public function deleteSecret(string $key): JsonResponse
+    {
+        $this->requireAdmin();
+
+        return $this->respondWithData([
+            'key' => $key,
+            'manual_required' => true,
+            'message' => 'Secret deletion requires server access. Use SSH to remove secrets from the .env file.',
+        ]);
+    }
+
+    /** POST /api/v2/admin/enterprise/config/secrets/test-vault */
+    public function testVaultConnection(): JsonResponse
+    {
+        $this->requireAdmin();
+
+        $checks = [
+            'DB_HOST' => getenv('DB_HOST') !== false && getenv('DB_HOST') !== '',
+            'REDIS_HOST' => getenv('REDIS_HOST') !== false && getenv('REDIS_HOST') !== '',
+            'PUSHER_KEY' => getenv('PUSHER_KEY') !== false && getenv('PUSHER_KEY') !== '',
+        ];
+
+        $allSet = !in_array(false, $checks, true);
+
+        return $this->respondWithData([
+            'status' => $allSet ? 'connected' : 'partial',
+            'checks' => $checks,
+        ]);
+    }
+
+    // ─── Legal Documents ─────────────────────────────────────────────
 
     /** GET /api/v2/admin/legal-documents */
     public function legalDocs(): JsonResponse

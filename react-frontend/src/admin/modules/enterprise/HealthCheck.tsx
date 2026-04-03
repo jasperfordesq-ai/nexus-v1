@@ -5,29 +5,52 @@
 
 /**
  * Health Check
- * Quick system health status indicators.
+ * System health status indicators with history.
  */
 
 import { useEffect, useState, useCallback } from 'react';
-import { Card, CardBody, Button, Spinner, Chip } from '@heroui/react';
+import {
+  Card,
+  CardBody,
+  CardHeader,
+  Button,
+  Spinner,
+  Chip,
+  Divider,
+} from '@heroui/react';
 import {
   CheckCircle,
   XCircle,
   RefreshCw,
   HeartPulse,
+  History,
 } from 'lucide-react';
 import { usePageTitle } from '@/hooks';
 import { adminEnterprise } from '../../api/adminApi';
 import { PageHeader } from '../../components';
-import type { HealthCheckResult } from '../../api/types';
+import type { HealthCheckResult, HealthCheckHistoryEntry } from '../../api/types';
 
 import { useTranslation } from 'react-i18next';
+
+function statusBorderClass(status: string): string {
+  switch (status) {
+    case 'ok':
+      return 'border-success';
+    case 'fail':
+      return 'border-danger';
+    default:
+      return 'border-default-200';
+  }
+}
+
 export function HealthCheck() {
   const { t } = useTranslation('admin');
   usePageTitle(t('enterprise.page_title'));
 
   const [result, setResult] = useState<HealthCheckResult | null>(null);
+  const [history, setHistory] = useState<HealthCheckHistoryEntry[]>([]);
   const [loading, setLoading] = useState(true);
+  const [historyLoading, setHistoryLoading] = useState(true);
 
   const loadData = useCallback(async () => {
     setLoading(true);
@@ -46,9 +69,30 @@ export function HealthCheck() {
     }
   }, []);
 
+  const loadHistory = useCallback(async () => {
+    setHistoryLoading(true);
+    try {
+      const res = await adminEnterprise.getHealthHistory();
+      if (res.success && res.data) {
+        const data = res.data as unknown;
+        setHistory(Array.isArray(data) ? data.slice(0, 10) : []);
+      }
+    } catch {
+      // Silently handle — history is supplementary
+    } finally {
+      setHistoryLoading(false);
+    }
+  }, []);
+
   useEffect(() => {
     loadData();
-  }, [loadData]);
+    loadHistory();
+  }, [loadData, loadHistory]);
+
+  const handleRefresh = () => {
+    loadData();
+    loadHistory();
+  };
 
   const statusColor = result?.status === 'healthy' ? 'success' : result?.status === 'degraded' ? 'warning' : 'danger';
 
@@ -61,7 +105,7 @@ export function HealthCheck() {
           <Button
             variant="flat"
             startContent={<RefreshCw size={16} />}
-            onPress={loadData}
+            onPress={handleRefresh}
             isLoading={loading}
             size="sm"
           >
@@ -75,7 +119,7 @@ export function HealthCheck() {
           <Spinner size="lg" />
         </div>
       ) : result ? (
-        <div className="space-y-4">
+        <div className="space-y-6">
           {/* Overall Status */}
           <Card shadow="sm">
             <CardBody className="flex flex-row items-center gap-4 p-6">
@@ -91,23 +135,34 @@ export function HealthCheck() {
             </CardBody>
           </Card>
 
-          {/* Individual Checks */}
-          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
+          {/* Individual Checks - Enhanced with colored borders */}
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {result.checks.map((check) => (
-              <Card key={check.name} shadow="sm">
-                <CardBody className="flex flex-row items-center gap-3 p-4">
-                  {check.status === 'ok' ? (
-                    <CheckCircle size={20} className="text-success shrink-0" />
-                  ) : (
-                    <XCircle size={20} className="text-danger shrink-0" />
-                  )}
+              <Card
+                key={check.name}
+                shadow="sm"
+                className={`border-l-4 ${statusBorderClass(check.status)}`}
+              >
+                <CardBody className="flex flex-row items-center gap-4 p-5">
+                  <div className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-full ${check.status === 'ok' ? 'bg-success/10' : 'bg-danger/10'}`}>
+                    {check.status === 'ok' ? (
+                      <CheckCircle size={24} className="text-success" />
+                    ) : (
+                      <XCircle size={24} className="text-danger" />
+                    )}
+                  </div>
                   <div className="min-w-0 flex-1">
-                    <p className="font-medium text-foreground">{check.name}</p>
-                    <p className="text-xs text-default-500">
+                    <p className="text-base font-semibold text-foreground">{check.name}</p>
+                    <p className="text-sm text-default-500">
                       {check.status === 'ok' ? t('enterprise.operational') : t('enterprise.failed')}
-                      {check.free && ` | Free: ${check.free}`}
-                      {check.total && ` / Total: ${check.total}`}
                     </p>
+                    {(check.free || check.total) && (
+                      <p className="text-xs text-default-400 mt-1">
+                        {check.free && `Free: ${check.free}`}
+                        {check.free && check.total && ' / '}
+                        {check.total && `Total: ${check.total}`}
+                      </p>
+                    )}
                   </div>
                   <Chip
                     size="sm"
@@ -120,6 +175,61 @@ export function HealthCheck() {
               </Card>
             ))}
           </div>
+
+          {/* Health Check History */}
+          <Card shadow="sm">
+            <CardHeader className="flex items-center gap-2 px-6 pt-5 pb-0">
+              <History size={18} className="text-default-500" />
+              <h3 className="text-base font-semibold">History</h3>
+              <Chip size="sm" variant="flat" color="default">
+                Last {history.length} checks
+              </Chip>
+            </CardHeader>
+            <Divider className="mt-3" />
+            <CardBody className="px-0 pb-0">
+              {historyLoading ? (
+                <div className="flex justify-center py-8">
+                  <Spinner size="sm" />
+                </div>
+              ) : history.length === 0 ? (
+                <div className="py-8 text-center">
+                  <p className="text-default-500">No history available</p>
+                </div>
+              ) : (
+                <div className="overflow-x-auto">
+                  <table className="w-full text-sm">
+                    <thead>
+                      <tr className="border-b border-divider">
+                        <th className="text-left px-6 py-3 text-xs font-medium text-default-500 uppercase">Status</th>
+                        <th className="text-left px-6 py-3 text-xs font-medium text-default-500 uppercase">Latency</th>
+                        <th className="text-left px-6 py-3 text-xs font-medium text-default-500 uppercase">Timestamp</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {history.map((entry) => {
+                        const histColor = entry.status === 'healthy' ? 'success' : entry.status === 'degraded' ? 'warning' : 'danger';
+                        return (
+                          <tr key={entry.id} className="border-b border-divider last:border-0 hover:bg-default-50">
+                            <td className="px-6 py-3">
+                              <Chip size="sm" variant="flat" color={histColor} className="capitalize">
+                                {entry.status}
+                              </Chip>
+                            </td>
+                            <td className="px-6 py-3 font-mono text-default-600">
+                              {entry.latency_ms !== null ? `${entry.latency_ms} ms` : '---'}
+                            </td>
+                            <td className="px-6 py-3 text-default-500">
+                              {new Date(entry.created_at).toLocaleString()}
+                            </td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </CardBody>
+          </Card>
         </div>
       ) : null}
     </div>

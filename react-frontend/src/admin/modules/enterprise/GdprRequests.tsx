@@ -5,12 +5,14 @@
 
 /**
  * GDPR Requests
- * DataTable of GDPR requests with status filter and update action.
+ * DataTable of GDPR requests with status filter, SLA badges, and row navigation.
  */
 
 import { useEffect, useState, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
   Button,
+  Chip,
   Dropdown,
   DropdownTrigger,
   DropdownMenu,
@@ -18,9 +20,9 @@ import {
   Select,
   SelectItem,
 } from '@heroui/react';
-import { RefreshCw, MoreVertical } from 'lucide-react';
+import { RefreshCw, MoreVertical, Plus } from 'lucide-react';
 import { usePageTitle } from '@/hooks';
-import { useToast } from '@/contexts';
+import { useTenant, useToast } from '@/contexts';
 import { adminEnterprise } from '../../api/adminApi';
 import { PageHeader, DataTable, StatusBadge } from '../../components';
 import type { Column } from '../../components';
@@ -29,10 +31,40 @@ import type { GdprRequest } from '../../api/types';
 import { useTranslation } from 'react-i18next';
 const STATUS_OPTION_KEYS = ['all', 'pending', 'processing', 'completed', 'rejected'] as const;
 
+function SlaChip({ createdAt }: { createdAt: string }) {
+  const created = new Date(createdAt);
+  const deadline = new Date(created.getTime() + 30 * 24 * 60 * 60 * 1000);
+  const now = new Date();
+  const diffMs = deadline.getTime() - now.getTime();
+  const daysRemaining = Math.ceil(diffMs / (1000 * 60 * 60 * 24));
+
+  if (daysRemaining < 0) {
+    return (
+      <Chip size="sm" variant="flat" color="danger">
+        Overdue by {Math.abs(daysRemaining)} day{Math.abs(daysRemaining) !== 1 ? 's' : ''}
+      </Chip>
+    );
+  }
+  if (daysRemaining <= 7) {
+    return (
+      <Chip size="sm" variant="flat" color="warning">
+        {daysRemaining} day{daysRemaining !== 1 ? 's' : ''} left
+      </Chip>
+    );
+  }
+  return (
+    <Chip size="sm" variant="flat" color="success">
+      {daysRemaining} days left
+    </Chip>
+  );
+}
+
 export function GdprRequests() {
   const { t } = useTranslation('admin');
   usePageTitle(t('enterprise.page_title'));
+  const { tenantPath } = useTenant();
   const toast = useToast();
+  const navigate = useNavigate();
 
   const [requests, setRequests] = useState<GdprRequest[]>([]);
   const [loading, setLoading] = useState(true);
@@ -102,6 +134,11 @@ export function GdprRequests() {
       render: (r) => <StatusBadge status={r.status} />,
     },
     {
+      key: 'sla',
+      label: 'SLA',
+      render: (r) => <SlaChip createdAt={r.created_at} />,
+    },
+    {
       key: 'created_at',
       label: t('enterprise.col_created'),
       sortable: true,
@@ -118,6 +155,9 @@ export function GdprRequests() {
             </Button>
           </DropdownTrigger>
           <DropdownMenu aria-label={t('enterprise.label_request_actions')}>
+            <DropdownItem key="view" onPress={() => navigate(tenantPath(`/admin/enterprise/gdpr/requests/${r.id}`))}>
+              View Details
+            </DropdownItem>
             <DropdownItem key="processing" onPress={() => handleStatusUpdate(r.id, 'processing')}>
               {t('enterprise.mark_processing')}
             </DropdownItem>
@@ -139,15 +179,25 @@ export function GdprRequests() {
         title={t('enterprise.gdpr_requests_title')}
         description={t('enterprise.gdpr_requests_desc')}
         actions={
-          <Button
-            variant="flat"
-            startContent={<RefreshCw size={16} />}
-            onPress={loadData}
-            isLoading={loading}
-            size="sm"
-          >
-            {t('common.refresh')}
-          </Button>
+          <div className="flex gap-2">
+            <Button
+              variant="flat"
+              startContent={<RefreshCw size={16} />}
+              onPress={loadData}
+              isLoading={loading}
+              size="sm"
+            >
+              {t('common.refresh')}
+            </Button>
+            <Button
+              color="primary"
+              startContent={<Plus size={16} />}
+              onPress={() => navigate(tenantPath('/admin/enterprise/gdpr/requests/create'))}
+              size="sm"
+            >
+              Create Request
+            </Button>
+          </div>
         }
       />
 

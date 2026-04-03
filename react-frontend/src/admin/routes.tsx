@@ -86,6 +86,14 @@ const LegalDocList = lazy(() => import('./modules/enterprise/LegalDocList'));
 const LegalDocForm = lazy(() => import('./modules/enterprise/LegalDocForm'));
 const LegalDocVersionList = lazy(() => import('./modules/enterprise/LegalDocVersionList'));
 const LegalDocComplianceDashboard = lazy(() => import('./modules/enterprise/LegalDocComplianceDashboard'));
+const GdprRequestDetail = lazy(() => import('./modules/enterprise/GdprRequestDetail'));
+const GdprRequestCreate = lazy(() => import('./modules/enterprise/GdprRequestCreate'));
+const GdprConsentTypes = lazy(() => import('./modules/enterprise/GdprConsentTypes'));
+const GdprBreachDetail = lazy(() => import('./modules/enterprise/GdprBreachDetail'));
+const LogFiles = lazy(() => import('./modules/enterprise/LogFiles'));
+const LogFileViewer = lazy(() => import('./modules/enterprise/LogFileViewer'));
+const SystemRequirements = lazy(() => import('./modules/enterprise/SystemRequirements'));
+const FeatureFlags = lazy(() => import('./modules/enterprise/FeatureFlags'));
 
 // Performance module
 const PerformanceDashboard = lazy(() => import('./modules/performance/PerformanceDashboard'));
@@ -387,14 +395,22 @@ export function AdminRoutes() {
       <Route path="enterprise/permissions" element={<Lazy><PermissionBrowser /></Lazy>} />
       <Route path="enterprise/gdpr" element={<Lazy><GdprDashboard /></Lazy>} />
       <Route path="enterprise/gdpr/requests" element={<Lazy><GdprRequests /></Lazy>} />
+      <Route path="enterprise/gdpr/requests/create" element={<Lazy><GdprRequestCreate /></Lazy>} />
+      <Route path="enterprise/gdpr/requests/:id" element={<Lazy><GdprRequestDetail /></Lazy>} />
       <Route path="enterprise/gdpr/consents" element={<Lazy><GdprConsents /></Lazy>} />
+      <Route path="enterprise/gdpr/consent-types" element={<Lazy><GdprConsentTypes /></Lazy>} />
       <Route path="enterprise/gdpr/breaches" element={<Lazy><GdprBreaches /></Lazy>} />
+      <Route path="enterprise/gdpr/breaches/:id" element={<Lazy><GdprBreachDetail /></Lazy>} />
       <Route path="enterprise/gdpr/audit" element={<Lazy><GdprAuditLog /></Lazy>} />
       <Route path="enterprise/monitoring" element={<Lazy><SystemMonitoring /></Lazy>} />
       <Route path="enterprise/monitoring/health" element={<Lazy><HealthCheck /></Lazy>} />
       <Route path="enterprise/monitoring/logs" element={<Lazy><ErrorLogs /></Lazy>} />
+      <Route path="enterprise/monitoring/log-files" element={<Lazy><LogFiles /></Lazy>} />
+      <Route path="enterprise/monitoring/log-files/:filename" element={<Lazy><LogFileViewer /></Lazy>} />
+      <Route path="enterprise/monitoring/requirements" element={<Lazy><SystemRequirements /></Lazy>} />
       <Route path="enterprise/config" element={<Lazy><SystemConfig /></Lazy>} />
       <Route path="enterprise/config/secrets" element={<Lazy><SecretsVault /></Lazy>} />
+      <Route path="enterprise/config/features" element={<Lazy><FeatureFlags /></Lazy>} />
 
       {/* ─── PERFORMANCE ─── */}
       <Route path="performance" element={<Lazy><PerformanceDashboard /></Lazy>} />
