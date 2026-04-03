@@ -1,0 +1,35 @@
+{
+  "page_title": "Matches",
+  "breadcrumb_dashboard": "Dashboard",
+  "breadcrumb_matches": "Matches",
+  "heading": "Your Matches",
+  "subtitle": "Discover connections across listings, jobs, volunteering, and groups",
+  "refresh": "Refresh",
+
+  "stats_total_matches": "Total Matches",
+  "stats_avg_score": "Avg Score",
+  "stats_hot_matches": "Hot Matches",
+  "stats_source_types": "Source Types",
+
+  "filter_all": "All",
+
+  "source_listing": "Listing",
+  "source_job": "Job",
+  "source_volunteering": "Volunteering",
+  "source_group": "Group",
+
+  "empty_title_all": "No matches yet",
+  "empty_title_filtered": "No {{source}} matches",
+  "empty_description": "Matches will appear here as the system finds connections for you across the platform.",
+  "browse_listings": "Browse Listings",
+
+  "score_label": "Match score: {{score}}%",
+  "score_percent": "{{score}}% match",
+  "reasons_more": "+{{count}} more",
+
+  "view_details": "View match details",
+  "not_interested": "Not interested",
+
+  "load_failed": "Failed to load matches",
+  "match_hidden": "Match hidden — we'll show you fewer like this"
+}

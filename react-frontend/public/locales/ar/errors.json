@@ -1,0 +1,23 @@
+{
+  "generic": "Something went wrong. Please try again.",
+  "not_found": "Page not found",
+  "unauthorized": "You don't have permission to view this page",
+  "network": "Network error. Please check your connection.",
+  "loading_failed": "Failed to load content. Please refresh.",
+  "session_expired": "Session Expired",
+  "session_expired_message": "Your session has expired due to inactivity. Please log in again to continue.",
+  "dismiss": "Dismiss",
+  "offline_message": "You are offline. Some features may be unavailable.",
+  "update_available": "Update Available",
+  "version_info": "Version {{currentVersion}} is now available (you have {{clientVersion}})",
+  "whats_new": "What's new:",
+  "later": "Later",
+  "download_update": "Download Update",
+  "validation": {
+    "required": "This field is required",
+    "email": "Please enter a valid email address",
+    "phone": "Please enter a valid phone number",
+    "min_length": "Must be at least {{min}} characters",
+    "max_length": "Must be no more than {{max}} characters"
+  }
+}

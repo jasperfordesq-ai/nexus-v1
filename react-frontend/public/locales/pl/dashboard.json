@@ -1,0 +1,101 @@
+{
+  "meta": {
+    "title": "Dashboard",
+    "description": "Your personal dashboard. View your balance, listings, and activity."
+  },
+  "welcome_back": "Welcome back, {{name}}!",
+  "community_activity": "Here's what's happening in your {{community}} community",
+  "unable_to_load": "Unable to Load Dashboard",
+  "try_again": "Try Again",
+  "onboarding": {
+    "banner_title": "Complete your profile setup",
+    "banner_subtitle": "Tell us about your interests and skills to get personalized matches",
+    "get_started": "Get Started"
+  },
+  "new_listing": "New Listing",
+  "stats": {
+    "balance": "Balance",
+    "active_listings": "Active Listings",
+    "messages": "Messages",
+    "pending": "Pending"
+  },
+  "sections": {
+    "recent_listings": "Recent Listings",
+    "recent_activity": "Recent Activity",
+    "quick_actions": "Quick Actions",
+    "suggested_for_you": "Suggested for You",
+    "my_groups": "My Groups",
+    "upcoming_events": "Upcoming Events",
+    "your_progress": "Your Progress",
+    "pending_reviews": "Pending Reviews",
+    "endorsements": "Endorsements"
+  },
+  "view_all": "View all",
+  "view_all_caps": "View All",
+  "browse_all": "Browse All",
+  "view_achievements": "View Achievements",
+  "view_all_transactions": "View All Transactions",
+  "quick_actions": {
+    "create_listing": "Create Listing",
+    "messages": "Messages",
+    "view_wallet": "View Wallet",
+    "find_members": "Find Members",
+    "browse_events": "Browse Events",
+    "notifications": "Notifications"
+  },
+  "listings": {
+    "offering": "Offering",
+    "requesting": "Requesting",
+    "offer": "Offer",
+    "request": "Request",
+    "empty": "No recent listings",
+    "create_first": "Create your first listing"
+  },
+  "activity": {
+    "action_listing": "shared a listing",
+    "action_event": "posted about an event",
+    "action_poll": "created a poll",
+    "action_goal": "set a new goal",
+    "action_post": "shared a post",
+    "empty": "No recent activity",
+    "check_feed": "Check out the feed"
+  },
+  "suggestions": {
+    "empty": "No suggestions yet"
+  },
+  "groups": {
+    "members_count": "{{count}} members",
+    "empty": "You haven't joined any groups yet",
+    "discover": "Discover groups"
+  },
+  "events": {
+    "online_event": "Online event",
+    "empty": "No upcoming events",
+    "browse": "Browse events"
+  },
+  "gamification": {
+    "level": "Level {{level}}",
+    "badges": "Badges",
+    "streak": "Streak",
+    "xp_progress": "XP Progress",
+    "start_earning": "Start earning XP by participating in the community!",
+    "streak_days_one": "{{count}} day",
+    "streak_days_other": "{{count}} days"
+  },
+  "aria": {
+    "loading_listings": "Loading listings",
+    "loading_activity": "Loading activity",
+    "loading_events": "Loading events",
+    "loading_groups": "Loading groups",
+    "loading_progress": "Loading progress",
+    "loading_suggestions": "Loading suggestions",
+    "loading_endorsements": "Loading endorsements",
+    "loading_pending_reviews": "Loading pending reviews"
+  },
+  "reviews": {
+    "sent": "Sent {{amount}}h",
+    "received": "Received {{amount}}h",
+    "review": "Review",
+    "none_pending": "No pending reviews"
+  }
+}

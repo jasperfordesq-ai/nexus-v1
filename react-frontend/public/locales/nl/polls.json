@@ -1,0 +1,80 @@
+{
+  "title": "Polls",
+  "subtitle": "Vote and see what the community thinks",
+  "page_title": "Polls",
+  "create_poll": "Create Poll",
+  "question": "Question",
+  "question_placeholder": "What would you like to ask?",
+  "description": "Description (optional)",
+  "description_placeholder": "Add some context to your poll...",
+  "options": "Options",
+  "option_placeholder": "Option {{number}}",
+  "add_option": "Add Option",
+  "remove_option": "Remove option",
+  "expires_at": "End date (optional)",
+  "no_deadline": "Leave blank for no deadline",
+  "submit": "Create Poll",
+  "vote": "Vote",
+  "votes": "votes",
+  "votes_one": "vote",
+  "voted": "You voted",
+  "results": "Results",
+  "total_votes": "{{count}} votes",
+  "total_votes_one": "{{count}} vote",
+  "status": {
+    "open": "Open",
+    "closed": "Closed"
+  },
+  "tabs": {
+    "open": "Open",
+    "closed": "Closed",
+    "mine": "My Polls",
+    "aria_label": "Poll filter tabs"
+  },
+  "empty": {
+    "title": "No polls yet",
+    "description": "Be the first to create a poll and get the community's opinion.",
+    "description_closed": "No closed polls to show.",
+    "description_mine": "You haven't created any polls yet."
+  },
+  "time_remaining": "{{time}} left",
+  "expired": "Expired",
+  "created_by": "by",
+  "delete_poll": "Delete Poll",
+  "confirm_delete": {
+    "title": "Delete Poll",
+    "message": "Are you sure you want to delete this poll? This action cannot be undone.",
+    "confirm": "Delete",
+    "cancel": "Cancel"
+  },
+  "toast": {
+    "created": "Poll created successfully!",
+    "create_failed": "Failed to create poll. Please try again.",
+    "voted": "Vote recorded!",
+    "vote_failed": "Failed to record vote. Please try again.",
+    "deleted": "Poll deleted.",
+    "delete_failed": "Failed to delete poll. Please try again.",
+    "csv_exported": "CSV exported successfully.",
+    "export_failed": "Failed to export poll results."
+  },
+  "errors": {
+    "question_required": "Please enter a question for your poll.",
+    "min_options": "Please provide at least 2 options.",
+    "load_failed": "Unable to load polls.",
+    "load_more_failed": "Failed to load more polls."
+  },
+  "load_more": "Load More",
+  "try_again": "Try Again",
+  "collapse": "Collapse",
+  "expand": "Create a poll",
+  "poll_type": "Poll Type",
+  "poll_type_standard": "Standard (pick one)",
+  "poll_type_ranked": "Ranked Choice (order preferences)",
+  "category_label": "Category (optional)",
+  "category_placeholder": "e.g. Community, Events, Feedback",
+  "anonymous_voting": "Anonymous Voting",
+  "anonymous_voting_desc": "Hide voter identities in results",
+  "aria": {
+    "export_csv": "Export results as CSV"
+  }
+}

@@ -1,0 +1,488 @@
+{
+  "home": {
+    "meta_description": "Exchange skills and services using time credits. Join our community-driven time banking platform.",
+    "meta_keywords": "time banking, skill exchange, community, volunteer, time credits",
+    "badge": "The Future of Time Banking",
+    "headline_1": "Exchange Skills,",
+    "headline_2": "Build Community",
+    "subheadline": "{{name}} is a modern time banking platform where every hour of service is valued equally. Trade your skills, earn time credits, and connect with your community.",
+    "cta_dashboard": "Go to Dashboard",
+    "cta_get_started": "Get Started Free",
+    "cta_learn_more": "Learn More",
+    "features": {
+      "0": {
+        "title": "Time Credits",
+        "description": "Exchange skills using time as currency"
+      },
+      "1": {
+        "title": "Community",
+        "description": "Connect with local service providers"
+      },
+      "2": {
+        "title": "Instant",
+        "description": "Quick and seamless transactions"
+      }
+    },
+    "stats": {
+      "active_members": "Active Members",
+      "hours_exchanged": "Hours Exchanged",
+      "active_listings": "Active Listings",
+      "communities": "Communities"
+    },
+    "scroll_down": "Scroll down",
+    "how_it_works": {
+      "title": "How It Works",
+      "subtitle": "Get started in four simple steps",
+      "steps": {
+        "0": {
+          "title": "Sign Up Free",
+          "description": "Create your profile in minutes and list the skills you can offer."
+        },
+        "1": {
+          "title": "Browse & Connect",
+          "description": "Find services you need and connect with local community members."
+        },
+        "2": {
+          "title": "Exchange Services",
+          "description": "Arrange skill exchanges and help each other out."
+        },
+        "3": {
+          "title": "Earn Credits",
+          "description": "Get one time credit for every hour you give. Spend them freely."
+        }
+      }
+    },
+    "why_timebanking": {
+      "title": "Why Time Banking?",
+      "subtitle": "The core principles that make our community work",
+      "values": {
+        "0": {
+          "title": "Equal Value",
+          "description": "Every hour is worth the same. Whether you're teaching piano or mowing lawns, your time has equal value."
+        },
+        "1": {
+          "title": "Build Trust",
+          "description": "Reviews and ratings help you find reliable service providers and build your reputation in the community."
+        },
+        "2": {
+          "title": "Stay Local",
+          "description": "Connect with neighbors and strengthen your local community through meaningful skill exchanges."
+        }
+      }
+    },
+    "cta_section": {
+      "title": "Ready to get started?",
+      "description": "Join thousands of community members who are already exchanging skills and building meaningful connections.",
+      "button": "Create Your Free Account"
+    }
+  },
+  "about": {
+    "meta_title": "About {{name}}",
+    "meta_description": "Learn about {{name}} — a time banking platform where communities exchange skills using time as currency.",
+    "hero_title": "About {{name}}",
+    "hero_description": "{{name}} is a modern time banking platform where every hour of service is valued equally. We help communities exchange skills, build trust, and create a fairer local economy — one hour at a time.",
+    "how_it_works": {
+      "title": "How It Works",
+      "subtitle": "Getting started is simple. Four steps to join and begin exchanging skills in your community.",
+      "steps": {
+        "0": {
+          "title": "Create Your Profile",
+          "description": "Sign up for free and list the skills you can offer to your community."
+        },
+        "1": {
+          "title": "Find What You Need",
+          "description": "Browse listings to discover services offered by members near you."
+        },
+        "2": {
+          "title": "Exchange Services",
+          "description": "Connect with members and arrange skill exchanges that work for both of you."
+        },
+        "3": {
+          "title": "Earn & Spend Credits",
+          "description": "Earn one time credit for every hour you give, and spend them on services you need."
+        }
+      }
+    },
+    "values": {
+      "title": "Our Values",
+      "subtitle": "The principles that guide everything we do at {{name}}.",
+      "items": {
+        "0": {
+          "title": "Equality",
+          "description": "Every person's time is valued equally. One hour of gardening is worth the same as one hour of tutoring."
+        },
+        "1": {
+          "title": "Community",
+          "description": "We believe in building strong local connections. Every exchange strengthens the fabric of your neighbourhood."
+        },
+        "2": {
+          "title": "Trust & Safety",
+          "description": "Reviews, ratings, and broker oversight ensure a safe environment for all members to participate."
+        },
+        "3": {
+          "title": "Sustainability",
+          "description": "By sharing skills locally, we reduce waste, support circular economies, and strengthen local resilience."
+        }
+      }
+    },
+    "stats": {
+      "members": "Members",
+      "hours_exchanged": "Hours Exchanged",
+      "active_listings": "Active Listings",
+      "communities": "Communities"
+    },
+    "credits": {
+      "title": "Powered by Project NEXUS",
+      "subtitle": "Open-source community platform created by Jasper Ford. Licensed under AGPL v3.",
+      "creator": "Creator",
+      "founders_heading": "Founders of hOUR Timebank CLG",
+      "contributors": "Contributors",
+      "research_heading": "Research Foundation",
+      "research_description": "Informed by a social impact study commissioned by the {{name}}.",
+      "acknowledgements": "Acknowledgements",
+      "open_source": "Open Source",
+      "license_text": "Licensed under the GNU Affero General Public License v3 (AGPL-3.0).",
+      "v1_source": "V1 Source Code (PHP + React)",
+      "v2_source": "V2 Source Code (ASP.NET Core)"
+    },
+    "cta": {
+      "title": "Ready to Get Involved?",
+      "description": "Whether you want to share your skills or find help with something, our community is here for you.",
+      "dashboard": "Go to Dashboard",
+      "join": "Join for Free",
+      "help_center": "Help Center",
+      "contact_us": "Contact Us"
+    }
+  },
+  "contact": {
+    "title": "Contact Us",
+    "subtitle": "Have a question about {{name}}? We'd love to hear from you.",
+    "success_title": "Message Sent!",
+    "success_message": "We'll get back to you as soon as possible.",
+    "back_to_help": "Back to Help Center",
+    "error_fallback": "Failed to send message. Please try again.",
+    "form": {
+      "name_label": "Name",
+      "name_placeholder": "Your name",
+      "email_label": "Email",
+      "email_placeholder": "you@example.com",
+      "subject_label": "Subject",
+      "subject_placeholder": "What is this about?",
+      "subjects": {
+        "general": "General Inquiry",
+        "account": "Account Help",
+        "technical": "Technical Issue",
+        "feedback": "Feedback / Suggestion",
+        "other": "Other"
+      },
+      "message_label": "Message",
+      "message_placeholder": "How can we help?",
+      "submit": "Send Message",
+      "login_prompt_before": "Already have an account?",
+      "login_link": "Log in",
+      "login_prompt_after": "for faster support."
+    }
+  },
+  "faq": {
+    "title": "Frequently Asked Questions",
+    "subtitle_before_link": "Can't find what you're looking for? Visit our",
+    "help_center_link": "Help Center",
+    "subtitle_after_link": "for detailed guides.",
+    "search_placeholder": "Search questions...",
+    "no_results": "No matching questions found. Try a different search term.",
+    "cta_title": "Still have questions?",
+    "cta_description": "Our support team is here to help.",
+    "cta_button": "Contact Support",
+    "categories": {
+      "getting_started": {
+        "title": "Getting Started",
+        "q1": {
+          "question": "What is time banking?",
+          "answer_p1": "Time banking is a community exchange system where one hour of help equals one time credit, regardless of the service provided. Whether you're teaching a language, helping with gardening, or providing tech support, your time is valued equally.",
+          "answer_p2": "It's a way to build community connections while exchanging skills and services without traditional money."
+        },
+        "q2": {
+          "question": "Is it free to join?",
+          "answer_p1": "Yes! Membership is completely free. The only currency used is time credits, which you earn by helping others in the community.",
+          "answer_p2": "New members often receive a small number of starter credits to help them get started."
+        },
+        "q3": {
+          "question": "How do I get started?",
+          "answer_intro": "Here's how to begin:",
+          "step1_bold": "Complete your profile",
+          "step1_text": "Add a photo, bio, and your skills",
+          "step2_bold": "Browse the marketplace",
+          "step2_text": "See what services are offered and needed",
+          "step3_bold": "Post an offer",
+          "step3_text": "Share what you can help others with",
+          "step4_bold": "Make a request",
+          "step4_text": "Ask for something you need",
+          "step5_bold": "Connect with members",
+          "step5_text": "Build your network"
+        },
+        "q4": {
+          "question": "What skills can I offer?",
+          "answer_intro": "Almost anything! Common offerings include:",
+          "skill1": "Home help (gardening, cleaning, minor repairs)",
+          "skill2": "Tech support (computer help, phone setup)",
+          "skill3": "Teaching (languages, music, academic subjects)",
+          "skill4": "Creative services (design, photography, writing)",
+          "skill5": "Transportation (rides, errands)",
+          "skill6": "Companionship (walks, visits, conversation)",
+          "skill7": "Professional skills (accounting, legal advice, etc.)",
+          "answer_outro": "Everyone has something valuable to offer!"
+        }
+      },
+      "time_credits": {
+        "title": "Time Credits",
+        "q1": {
+          "question": "What is a time credit?",
+          "answer_p1": "One time credit equals one hour of service. It's the currency of our community.",
+          "answer_p2": "You can also exchange partial hours: 30 minutes = 0.5 credits, 15 minutes = 0.25 credits."
+        },
+        "q2": {
+          "question": "How do I earn time credits?",
+          "answer_intro": "You earn credits by:",
+          "way1_bold": "Providing services",
+          "way1_text": "to other members",
+          "way2_bold": "Logging volunteer hours",
+          "way2_text": "with approved organisations",
+          "way3_bold": "Receiving donations",
+          "way3_text": "from other members",
+          "way4_bold": "Starter credits",
+          "way4_text": "when you first join"
+        },
+        "q3": {
+          "question": "Can I donate my credits?",
+          "answer_intro": "Yes! You can:",
+          "option1": "Transfer credits to any other member",
+          "option2": "Donate to the community pot (helps members who need extra support)",
+          "answer_link_before": "Go to your ",
+          "wallet_link": "Wallet",
+          "answer_link_after": " to send credits."
+        },
+        "q4": {
+          "question": "Can my balance go negative?",
+          "answer": "Some communities allow limited negative balances to help new members get started before they've had a chance to earn credits. Check with your community coordinator for the specific rules in your timebank."
+        },
+        "q5": {
+          "question": "What if I sent credits to the wrong person?",
+          "answer_intro": "Transactions cannot be automatically reversed. If you made a mistake:",
+          "step1": "Contact the recipient and ask them to send the credits back",
+          "step2": "If you can't resolve it, contact support for assistance",
+          "answer_outro": "Always double-check the recipient before confirming a transfer."
+        }
+      },
+      "exchanges_safety": {
+        "title": "Exchanges & Safety",
+        "q1": {
+          "question": "How do I arrange an exchange?",
+          "answer_intro": "The typical process is:",
+          "step1": "Find an offer or request that interests you",
+          "step2": "Message the member to discuss details",
+          "step3": "Agree on when, where, and estimated time",
+          "step4": "Meet and complete the exchange",
+          "step5": "The person who received help sends time credits",
+          "step6": "Leave a review for each other"
+        },
+        "q2": {
+          "question": "Is it safe to meet strangers?",
+          "answer_intro": "We recommend these safety practices:",
+          "tip1": "Meet in public places for first exchanges",
+          "tip2": "Check the member's profile and reviews",
+          "tip3": "Tell someone where you're going",
+          "tip4": "Trust your instincts — if something feels wrong, leave",
+          "tip5": "Start with smaller, low-risk exchanges",
+          "answer_outro": "Report any concerning behaviour to our support team."
+        },
+        "q3": {
+          "question": "What if someone doesn't show up or complete the service?",
+          "answer_intro": "Communication is key. If there's an issue:",
+          "step1": "Message the member to discuss what happened",
+          "step2": "Try to find a resolution together",
+          "step3": "If you can't resolve it, contact support",
+          "answer_outro": "Repeated no-shows or poor behaviour may result in account restrictions."
+        },
+        "q4": {
+          "question": "Are the services insured?",
+          "answer": "Exchanges are informal arrangements between community members. We don't provide insurance coverage for services. For higher-risk activities, discuss liability with the other member beforehand. Some members have their own professional insurance."
+        }
+      },
+      "badges_rewards": {
+        "title": "Badges & Rewards",
+        "q1": {
+          "question": "What are badges and XP?",
+          "answer_intro": "Our gamification system rewards community participation:",
+          "item1_bold": "XP (Experience Points)",
+          "item1_text": "Earned for various activities, helping you level up",
+          "item2_bold": "Badges",
+          "item2_text": "Achievements for reaching milestones (60+ to collect!)",
+          "item3_bold": "Levels",
+          "item3_text": "Progress from Newcomer to Timebank Legend",
+          "item4_bold": "Streaks",
+          "item4_text": "Rewards for daily engagement"
+        },
+        "q2": {
+          "question": "How do I earn XP?",
+          "answer_intro": "You earn XP for many activities:",
+          "activity1": "Sending/receiving time credits",
+          "activity2": "Creating listings",
+          "activity3": "Logging volunteer hours",
+          "activity4": "Attending events",
+          "activity5": "Making connections",
+          "activity6": "Daily logins",
+          "activity7": "Earning badges"
+        },
+        "q3": {
+          "question": "Can I opt out of leaderboards?",
+          "answer_before_link": "Yes! If you prefer privacy, you can opt out of appearing on public leaderboards in your ",
+          "settings_link": "Settings",
+          "answer_after_link": ". You'll still earn XP and badges, they just won't be visible to others on the rankings."
+        }
+      },
+      "account_privacy": {
+        "title": "Account & Privacy",
+        "q1": {
+          "question": "How do I change my password?",
+          "answer_before_link": "Go to ",
+          "settings_link": "Settings",
+          "answer_after_link": " > Security to change your password. You'll need to enter your current password first. If you've forgotten your password, use the \"Forgot Password\" link on the login page."
+        },
+        "q2": {
+          "question": "Who can see my profile?",
+          "answer_intro": "By default, your profile is visible to other community members. You can control:",
+          "item1": "What contact information is displayed",
+          "item2": "Whether you appear on leaderboards",
+          "item3": "Your general location visibility",
+          "answer_link_before": "Adjust these in your ",
+          "settings_link": "Settings",
+          "answer_link_after": "."
+        },
+        "q3": {
+          "question": "How do I delete my account?",
+          "answer_intro": "If you wish to leave the community:",
+          "step1": "Go to Settings > Account",
+          "step2": "Click \"Delete Account\"",
+          "step3": "Confirm your decision",
+          "answer_outro": "Note: Your transaction history will be retained for record-keeping, but your personal information will be removed."
+        },
+        "q4": {
+          "question": "How is my data protected?",
+          "answer_intro": "We take privacy seriously:",
+          "item1": "Your data is encrypted and securely stored",
+          "item2": "We never sell your information",
+          "item3": "You can request a copy of your data at any time",
+          "item4": "We comply with GDPR and data protection regulations"
+        }
+      }
+    }
+  },
+  "maintenance": {
+    "title": "We'll be back soon!",
+    "description": "is currently undergoing scheduled maintenance to improve your experience.",
+    "apology": "We apologize for any inconvenience. Please check back in a little while.",
+    "thanks": "Thank you for your patience!",
+    "admin_login": "Admin Login",
+    "deploy_notice": "This platform is still being actively built, so there may be phases of rapid deployments. During these times, the server automatically enters maintenance mode. This normally only lasts about five minutes while new changes are being applied."
+  },
+  "dev_status": {
+    "title": "Development status: {{stage}}",
+    "where_we_are": {
+      "title": "Where we are now",
+      "paragraph1": "This platform was born in the middle of December 2025, with development beginning around 15/12/2025.",
+      "paragraph2": "It grew quickly in a short space of time. By around 15/02/2026, much of the earlier work on both the front end and the back end had been intentionally scrapped and rewritten so the platform could be rebuilt on stronger foundations.",
+      "paragraph3": "Around 24/02/2026, we decided to rewrite the front end in React. The front end is the part people see and interact with — a bit like the body of the platform. We made that change to create a cleaner and more flexible user experience built on reusable components, improve responsiveness across devices — especially on mobile — and make the interface easier to improve and maintain as the platform grows.",
+      "paragraph4": "Around 17/03/2026, we decided to rewrite the back end in Laravel. The back end is the part working behind the scenes — a bit like the brain of the platform. We made that change to give the platform a stronger and more maintainable foundation, with better structure for authentication, validation, background processing, caching, and long-term developer productivity.",
+      "paragraph5": "As of 24/03/2026, this remains a very new platform that is evolving quickly. Most core functionality is already in place, but some parts are still being refined as the new front end and new back end are connected together and polished.",
+      "paragraph6": "We are also working on a dedicated mobile phone app in the background, which should be available soon."
+    },
+    "whats_stable": {
+      "title": "What's stable and working",
+      "core_title": "Core platform",
+      "core_item1": "Member registration, login, two-factor auth (TOTP + WebAuthn), guided onboarding",
+      "core_item2": "Time credit wallet — earning, spending, transfers, broker controls, and full transaction history",
+      "core_item3": "Multi-tenant architecture — unlimited communities, each with isolated data and custom branding",
+      "core_item4": "Exchange workflow — structured service exchange lifecycle with broker approval",
+      "core_item5": "Federation — cross-community exchange, shared listings, events, and messaging across connected platforms",
+      "core_item6": "Progressive Web App — installable on any device, works offline",
+      "member_title": "Member experience",
+      "member_item1": "Service marketplace — post offers and requests, browse and smart-match listings",
+      "member_item2": "Social feed — posts, comments, likes, polls, hashtags, and voice messages",
+      "member_item3": "Messaging — direct conversations with read receipts and real-time updates",
+      "member_item4": "Events — creating, discovering, RSVPs, and calendar export",
+      "member_item5": "Groups — community sub-groups with discussions, roles, and moderation",
+      "member_item6": "Group exchanges — bulk community service exchanges",
+      "member_item7": "Members directory — browse, filter, and discover people",
+      "member_item8": "Connections — follow and connect with community members",
+      "member_item9": "Reviews and ratings — build trust through member feedback",
+      "member_item10": "Endorsements — peer skill and experience endorsements",
+      "member_item11": "Polls — community voting and surveys",
+      "member_item12": "Skills browse — explore skill taxonomy and discover expertise",
+      "member_item13": "Volunteering — opportunities, shifts, applications, and hours logging",
+      "member_item14": "Job vacancies — full recruitment module with alerts and analytics",
+      "member_item15": "Organisations — company and employer profiles with sub-accounts",
+      "member_item16": "Goals and impact — personal goals, mentoring, and community impact tracking",
+      "member_item17": "Ideation challenges — innovation hub with campaigns, ideas, voting, and outcomes",
+      "member_item18": "Achievements and gamification — XP, badges, challenges, streaks, leaderboard, and Nexus Score",
+      "member_item19": "Personal insights — individual engagement metrics and personalised recommendations",
+      "content_title": "Content and communication",
+      "content_item1": "Blog — tenant content management and community news",
+      "content_item2": "Resources and knowledge base — structured articles and shared resource library",
+      "content_item3": "Help center — documentation hub and FAQ",
+      "content_item4": "Newsletter system — email campaigns with smart segments, templates, and send-time optimisation",
+      "content_item5": "AI Chat — AI-powered assistant for platform guidance",
+      "content_item6": "Custom pages — tenant-managed CMS pages",
+      "content_item7": "Legal hub — versioned legal documents with acceptance gates and audit trail",
+      "platform_title": "Platform and security",
+      "platform_item1": "Enterprise security — CSRF, rate limiting, TOTP 2FA, and WebAuthn passwordless auth",
+      "platform_item2": "GDPR compliance — data requests, consent management, breach tracking, and audit log",
+      "platform_item3": "Fraud and abuse detection — automated suspicious activity alerts and content moderation",
+      "platform_item4": "WCAG 2.1 AA accessibility compliance",
+      "platform_item5": "7 languages — English, Irish, German, French, Italian, Portuguese, and Spanish",
+      "platform_item6": "Admin panel — tenant configuration, user management, analytics, and moderation",
+      "platform_item7": "Algorithm controls — live health dashboard and tuning for all ranking systems",
+      "platform_item8": "Dark mode and mobile-responsive UI"
+    },
+    "whats_rough": {
+      "title": "What may still be rough",
+      "item1": "Federation (cross-community) features — functional but still accumulating real-world edge cases",
+      "item2": "AI Chat assistant — depends on external AI providers; response quality varies by configuration",
+      "item3": "Nexus Score breakdown — newly launched; scoring weights may be adjusted as usage data grows",
+      "item4": "Smart feed ranking — EdgeRank algorithm is live but cold-start behaviour for new members is still being tuned",
+      "item5": "Push notifications (mobile) — may have delivery delays on some devices or browsers",
+      "item6": "Non-English translations — AI-generated and not yet reviewed by native speakers"
+    },
+    "how_we_catch_bugs": {
+      "title": "How we catch bugs",
+      "intro": "We use a multi-layer approach to catch and fix issues quickly:",
+      "method1_bold": "Automated tests",
+      "method1_text": "250+ PHP unit/integration tests and React component tests run on every commit",
+      "method2_bold": "Sentry error tracking",
+      "method2_text": "exceptions on both frontend and backend are captured in real time",
+      "method3_bold": "Cloudflare analytics",
+      "method3_text": "traffic anomalies and error spikes are monitored continuously",
+      "method4_bold": "Manual QA",
+      "method4_text": "core user journeys are tested across multiple tenant configurations before each deployment",
+      "method5_bold": "Community testing",
+      "method5_text": "real members across multiple active communities help us surface edge cases in production"
+    },
+    "how_to_help": {
+      "title": "How to help",
+      "report_bug_title": "Report a bug",
+      "report_bug_description": "Found something broken? Please open an issue on GitHub — it's the fastest way to get a fix in front of us. Include what you were doing, what you expected, and what actually happened.",
+      "github_link": "Open an issue on GitHub",
+      "become_tester_title": "Bring your community onto NEXUS",
+      "become_tester_description": "If you run a timebank or community network and want to join the platform, we'd love to work with you. Reach out via GitHub Discussions or the contact page — we support communities of all sizes."
+    },
+    "security": {
+      "title": "Security disclosure",
+      "description_before_email": "If you discover a security vulnerability, please do not open a public issue. Instead, contact us confidentially at",
+      "description_after_email": ". We will respond within 72 hours and work with you on responsible disclosure."
+    }
+  },
+  "kb": {
+    "title": "Knowledge Base",
+    "description": "Find answers, guides, and helpful resources",
+    "search_placeholder": "Search the knowledge base..."
+  }
+}
