@@ -149,7 +149,7 @@ export function GroupAnalyticsTab({ groupId, isAdmin }: GroupAnalyticsTabProps) 
         const mapped: AnalyticsDashboard = {
           kpi: (raw.overview ?? raw.kpi ?? {}) as KpiData,
           growth: (raw.member_growth ?? raw.growth ?? []) as GrowthPoint[],
-          engagement: (raw.engagement ?? { timeline: [], summary: {} }) as EngagementData,
+          engagement: ((raw.engagement as Record<string, unknown>)?.timeline ?? raw.engagement ?? []) as EngagementPoint[],
           top_contributors: (raw.top_contributors ?? []) as Contributor[],
           activity_breakdown: (raw.activity_breakdown ?? raw.activity ?? {}) as ActivityBreakdown,
           retention: (raw.retention ?? []) as RetentionCohort[],

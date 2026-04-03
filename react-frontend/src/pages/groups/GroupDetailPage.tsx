@@ -145,7 +145,7 @@ export function GroupDetailPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { user: currentUser, isAuthenticated } = useAuth();
-  const { tenantPath } = useTenant();
+  const { tenantPath, hasGroupTab } = useTenant();
   const toast = useToast();
 
   // AbortController ref to cancel stale requests
@@ -287,8 +287,8 @@ export function GroupDetailPage() {
   useEffect(() => {
     if (!id) return;
     api.get(`/v2/groups/${id}/tags`)
-      .then((resp) => setGroupTags(resp.data || []))
-      .catch(() => {});
+      .then((resp) => setGroupTags(resp.data ?? []))
+      .catch((err) => { logError('GroupDetailPage.loadTags', err); });
   }, [id]);
 
   // Invite handlers
@@ -1256,7 +1256,7 @@ export function GroupDetailPage() {
           { key: 'members', icon: Users, label: t('detail.tab_members', 'Members') },
           { key: 'events', icon: Calendar, label: t('detail.tab_events', 'Events') },
           { key: 'files', icon: FolderOpen, label: t('detail.tab_files', 'Files') },
-        ];
+        ].filter(tab => hasGroupTab(`tab_${tab.key}` as keyof import('@/types').GroupTabConfig));
 
         const secondaryTabs = [
           // Content
@@ -1271,7 +1271,7 @@ export function GroupDetailPage() {
           // Admin (conditional)
           ...(userIsAdmin ? [{ key: 'analytics', icon: Newspaper, label: t('detail.tab_analytics', 'Analytics'), section: t('detail.tab_section_admin', 'Admin') }] : []),
           ...(hasSubGroups ? [{ key: 'subgroups', icon: FolderTree, label: `${t('detail.tab_subgroups', 'Subgroups')} (${group.sub_groups?.length ?? 0})`, section: null }] : []),
-        ];
+        ].filter(tab => hasGroupTab(`tab_${tab.key}` as keyof import('@/types').GroupTabConfig));
 
         const isSecondaryActive = secondaryTabs.some((tab) => tab.key === activeTab);
         const activeSecondaryTab = secondaryTabs.find((tab) => tab.key === activeTab);

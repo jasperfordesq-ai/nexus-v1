@@ -315,7 +315,7 @@ class GroupQAService
             // Change vote direction
             DB::table('group_qa_votes')
                 ->where('id', $existing->id)
-                ->update(['vote' => $vote, 'created_at' => now()]);
+                ->update(['vote' => $vote]);
             DB::table($table)->where('id', $targetId)->increment('vote_count', $vote * 2);
         } else {
             DB::table('group_qa_votes')->insert([
