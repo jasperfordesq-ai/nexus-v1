@@ -74,6 +74,7 @@ import type {
   GdprBreachDetail,
   GdprAuditEntry,
   GdprStatistics,
+  GdprTrendData,
   ConsentType,
   ConsentTypeUser,
   SystemHealth,
@@ -839,6 +840,10 @@ export const adminEnterprise = {
   // GDPR Statistics
   getGdprStatistics: () =>
     api.get<GdprStatistics>('/v2/admin/enterprise/gdpr/statistics'),
+
+  // GDPR Trends (6-month history + period comparison)
+  getGdprTrends: () =>
+    api.get<GdprTrendData>('/v2/admin/enterprise/gdpr/trends'),
 
   // Monitoring — Log Files
   getLogFiles: () =>

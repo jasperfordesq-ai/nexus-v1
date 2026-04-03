@@ -767,6 +767,15 @@ export interface EnterpriseDashboardStats {
   health_status: 'healthy' | 'degraded' | 'unhealthy';
   db_connected: boolean;
   redis_connected: boolean;
+  memory_percent: number;
+  disk_percent: number;
+  recent_gdpr_activity: Array<{
+    id: number;
+    action: string;
+    entity_type: string;
+    created_at: string;
+    user_name: string;
+  }>;
 }
 
 export interface SecretEntry {
@@ -881,6 +890,18 @@ export interface GdprStatistics {
   active_breaches: number;
   consent_coverage_percent: number;
   compliance_score: number;
+}
+
+export interface GdprTrendData {
+  months: string[];
+  requests: number[];
+  breaches: number[];
+  comparison: {
+    this_month_requests: number;
+    last_month_requests: number;
+    this_month_completed: number;
+    last_month_completed: number;
+  };
 }
 
 export interface LogFile {

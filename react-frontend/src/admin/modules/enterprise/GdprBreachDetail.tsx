@@ -13,7 +13,7 @@ import { useEffect, useState, useCallback, useMemo } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import {
   Card, CardBody, CardHeader, Chip, Button, Spinner,
-  Textarea, Divider,
+  Textarea, Divider, Progress,
 } from '@heroui/react';
 import {
   ArrowLeft, Save, AlertTriangle, Shield, CheckCircle,
@@ -68,6 +68,9 @@ export function GdprBreachDetail() {
   const [lessonsLearned, setLessonsLearned] = useState('');
   const [preventionMeasures, setPreventionMeasures] = useState('');
 
+  // Live countdown timer for DPA 72-hour deadline
+  const [now, setNow] = useState(Date.now());
+
   const breachId = useMemo(() => (id ? parseInt(id, 10) : 0), [id]);
 
   const loadData = useCallback(async () => {
@@ -93,6 +96,13 @@ export function GdprBreachDetail() {
   useEffect(() => {
     loadData();
   }, [loadData]);
+
+  // Tick the countdown every minute while DPA notification is pending
+  useEffect(() => {
+    if (breach?.dpa_notified_at || !breach?.detected_at) return;
+    const interval = setInterval(() => setNow(Date.now()), 60000);
+    return () => clearInterval(interval);
+  }, [breach?.dpa_notified_at, breach?.detected_at]);
 
   const handleStatusUpdate = async (updates: Partial<GdprBreachDetailType>) => {
     setActionLoading(true);
@@ -173,10 +183,20 @@ export function GdprBreachDetail() {
     );
   }
 
-  // Compute 72-hour warning for DPA notification
+  // Compute live 72-hour countdown for DPA notification
   const detectedAt = breach.detected_at ? new Date(breach.detected_at) : null;
-  const hoursElapsed = detectedAt ? (Date.now() - detectedAt.getTime()) / (1000 * 60 * 60) : 0;
-  const dpaUrgent = !breach.dpa_notified_at && hoursElapsed > 48;
+  const deadlineMs = detectedAt ? detectedAt.getTime() + 72 * 60 * 60 * 1000 : 0;
+  const remainingMs = deadlineMs - now;
+  const hoursRemaining = remainingMs / (1000 * 60 * 60);
+  const isOverdue = remainingMs < 0;
+  const dpaUrgent = !breach.dpa_notified_at && hoursRemaining < 24;
+
+  const formatCountdown = (ms: number): string => {
+    const abs = Math.abs(ms);
+    const hours = Math.floor(abs / (1000 * 60 * 60));
+    const minutes = Math.floor((abs % (1000 * 60 * 60)) / (1000 * 60));
+    return `${hours}h ${minutes}m`;
+  };
 
   return (
     <div>
@@ -390,17 +410,35 @@ export function GdprBreachDetail() {
                 </>
               ) : (
                 <>
+                  {detectedAt && (
+                    <Card shadow="none" className={`border-2 ${isOverdue ? 'border-danger' : hoursRemaining < 24 ? 'border-warning' : 'border-success'}`}>
+                      <CardBody className="p-4 text-center">
+                        <p className="text-xs text-default-500 mb-1">DPA Notification Deadline</p>
+                        <p className={`text-2xl font-bold ${isOverdue ? 'text-danger' : hoursRemaining < 24 ? 'text-warning' : 'text-success'}`}>
+                          {isOverdue ? '\u2212' : ''}{formatCountdown(remainingMs)}
+                        </p>
+                        <p className={`text-xs mt-1 ${isOverdue ? 'text-danger' : 'text-default-400'}`}>
+                          {isOverdue ? 'OVERDUE \u2014 notify DPA immediately' : hoursRemaining < 24 ? 'Less than 24 hours remaining' : 'remaining to notify DPA'}
+                        </p>
+                        <Progress
+                          value={isOverdue ? 100 : Math.min(100, ((72 - hoursRemaining) / 72) * 100)}
+                          color={isOverdue ? 'danger' : hoursRemaining < 24 ? 'warning' : 'success'}
+                          size="sm"
+                          className="mt-3"
+                        />
+                      </CardBody>
+                    </Card>
+                  )}
                   {dpaUrgent && (
                     <div className="p-3 rounded-lg bg-danger-50 border border-danger-200">
                       <div className="flex items-center gap-2 text-danger">
                         <AlertTriangle size={16} />
-                        <span className="text-sm font-semibold">72-hour deadline approaching</span>
+                        <span className="text-sm font-semibold">
+                          {isOverdue ? 'Deadline exceeded' : 'Deadline approaching'}
+                        </span>
                       </div>
                       <p className="text-xs text-danger-600 mt-1">
                         GDPR requires DPA notification within 72 hours of detection.
-                        {hoursElapsed > 72
-                          ? ` ${Math.floor(hoursElapsed - 72)} hours overdue.`
-                          : ` ${Math.floor(72 - hoursElapsed)} hours remaining.`}
                       </p>
                     </div>
                   )}

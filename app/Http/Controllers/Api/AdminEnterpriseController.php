@@ -62,10 +62,38 @@ class AdminEnterpriseController extends BaseApiController
 
         $healthStatus = ($dbConnected && $redisConnected) ? 'healthy' : ($dbConnected ? 'degraded' : 'unhealthy');
 
+        $memPercent = 0;
+        try {
+            $memUsage = memory_get_usage(true);
+            $memLimitStr = ini_get('memory_limit');
+            $memLimit = (int)$memLimitStr;
+            if (stripos($memLimitStr, 'G') !== false) $memLimit *= 1024 * 1024 * 1024;
+            elseif (stripos($memLimitStr, 'M') !== false) $memLimit *= 1024 * 1024;
+            elseif (stripos($memLimitStr, 'K') !== false) $memLimit *= 1024;
+            if ($memLimit > 0) $memPercent = round(($memUsage / $memLimit) * 100, 1);
+        } catch (\Exception $e) {}
+
+        $diskPercent = 0;
+        try {
+            $diskFree = disk_free_space('/');
+            $diskTotal = disk_total_space('/');
+            if ($diskTotal > 0 && $diskFree !== false) $diskPercent = round((1 - $diskFree / $diskTotal) * 100, 1);
+        } catch (\Exception $e) {}
+
+        $recentActivity = [];
+        try {
+            $recentActivity = array_map(fn($r) => (array)$r, DB::select(
+                "SELECT gal.id, gal.action, gal.entity_type, gal.created_at, u.name as user_name FROM gdpr_audit_log gal LEFT JOIN users u ON u.id = gal.admin_id WHERE gal.tenant_id = ? ORDER BY gal.created_at DESC LIMIT 5",
+                [$tenantId]
+            ));
+        } catch (\Exception $e) {}
+
         return $this->respondWithData([
             'user_count' => $userCount, 'role_count' => $roleCount,
             'pending_gdpr_requests' => $pendingGdpr, 'health_status' => $healthStatus,
             'db_connected' => $dbConnected, 'redis_connected' => $redisConnected,
+            'memory_percent' => $memPercent, 'disk_percent' => $diskPercent,
+            'recent_gdpr_activity' => $recentActivity,
         ]);
     }
 
@@ -1287,6 +1315,83 @@ class AdminEnterpriseController extends BaseApiController
                 'users_with_consent' => 0,
                 'consent_coverage' => 0,
                 'compliance_score' => 0,
+            ]);
+        }
+    }
+
+    // ─── GDPR Trends ──────────────────────────────────────────────────
+
+    /** GET /api/v2/admin/enterprise/gdpr/trends */
+    public function gdprTrends(): JsonResponse
+    {
+        $this->requireAdmin();
+        $tenantId = $this->getTenantId();
+
+        try {
+            $months = [];
+            $requests = [];
+            $breaches = [];
+
+            // Get last 6 months of data
+            for ($i = 5; $i >= 0; $i--) {
+                $monthStart = date('Y-m-01', strtotime("-{$i} months"));
+                $monthEnd = date('Y-m-t', strtotime("-{$i} months"));
+                $monthLabel = date('M Y', strtotime("-{$i} months"));
+                $months[] = $monthLabel;
+
+                $reqCount = 0;
+                try {
+                    $reqCount = (int)(DB::selectOne(
+                        "SELECT COUNT(*) as cnt FROM gdpr_requests WHERE tenant_id = ? AND created_at >= ? AND created_at <= ?",
+                        [$tenantId, $monthStart, $monthEnd . ' 23:59:59']
+                    )->cnt ?? 0);
+                } catch (\Exception $e) {}
+                $requests[] = $reqCount;
+
+                $breachCount = 0;
+                try {
+                    $breachCount = (int)(DB::selectOne(
+                        "SELECT COUNT(*) as cnt FROM data_breach_log WHERE tenant_id = ? AND created_at >= ? AND created_at <= ?",
+                        [$tenantId, $monthStart, $monthEnd . ' 23:59:59']
+                    )->cnt ?? 0);
+                } catch (\Exception $e) {}
+                $breaches[] = $breachCount;
+            }
+
+            // Previous period comparison (this month vs last month)
+            $thisMonthStart = date('Y-m-01');
+            $lastMonthStart = date('Y-m-01', strtotime('-1 month'));
+            $lastMonthEnd = date('Y-m-t', strtotime('-1 month'));
+
+            $thisMonthRequests = 0;
+            $lastMonthRequests = 0;
+            try {
+                $thisMonthRequests = (int)(DB::selectOne("SELECT COUNT(*) as cnt FROM gdpr_requests WHERE tenant_id = ? AND created_at >= ?", [$tenantId, $thisMonthStart])->cnt ?? 0);
+                $lastMonthRequests = (int)(DB::selectOne("SELECT COUNT(*) as cnt FROM gdpr_requests WHERE tenant_id = ? AND created_at >= ? AND created_at <= ?", [$tenantId, $lastMonthStart, $lastMonthEnd . ' 23:59:59'])->cnt ?? 0);
+            } catch (\Exception $e) {}
+
+            $thisMonthCompleted = 0;
+            $lastMonthCompleted = 0;
+            try {
+                $thisMonthCompleted = (int)(DB::selectOne("SELECT COUNT(*) as cnt FROM gdpr_requests WHERE tenant_id = ? AND status = 'completed' AND completed_at >= ?", [$tenantId, $thisMonthStart])->cnt ?? 0);
+                $lastMonthCompleted = (int)(DB::selectOne("SELECT COUNT(*) as cnt FROM gdpr_requests WHERE tenant_id = ? AND status = 'completed' AND completed_at >= ? AND completed_at <= ?", [$tenantId, $lastMonthStart, $lastMonthEnd . ' 23:59:59'])->cnt ?? 0);
+            } catch (\Exception $e) {}
+
+            return $this->respondWithData([
+                'months' => $months,
+                'requests' => $requests,
+                'breaches' => $breaches,
+                'comparison' => [
+                    'this_month_requests' => $thisMonthRequests,
+                    'last_month_requests' => $lastMonthRequests,
+                    'this_month_completed' => $thisMonthCompleted,
+                    'last_month_completed' => $lastMonthCompleted,
+                ],
+            ]);
+        } catch (\Exception $e) {
+            return $this->respondWithData([
+                'months' => [], 'requests' => [], 'breaches' => [],
+                'comparison' => ['this_month_requests' => 0, 'last_month_requests' => 0, 'this_month_completed' => 0, 'last_month_completed' => 0],
             ]);
         }
     }

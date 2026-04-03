@@ -10,7 +10,7 @@
 
 import { useEffect, useState, useCallback } from 'react';
 import { Link } from 'react-router-dom';
-import { Card, CardBody, Button, Spinner } from '@heroui/react';
+import { Card, CardBody, Button, Spinner, Chip } from '@heroui/react';
 import {
   Users,
   Shield,
@@ -18,6 +18,8 @@ import {
   HeartPulse,
   ArrowRight,
   RefreshCw,
+  Database,
+  Cpu,
 } from 'lucide-react';
 import { usePageTitle } from '@/hooks';
 import { useTenant } from '@/contexts';
@@ -112,6 +114,29 @@ export function EnterpriseDashboard() {
         />
       </div>
 
+      {/* System Health */}
+      {stats && (
+        <Card shadow="sm" className="mb-6">
+          <CardBody className="p-4">
+            <p className="text-sm font-semibold text-default-700 mb-3">System Health</p>
+            <div className="flex flex-wrap gap-3">
+              <Chip color={stats.db_connected ? 'success' : 'danger'} variant="flat" size="sm" startContent={<Database size={12} />}>
+                Database {stats.db_connected ? 'Connected' : 'Disconnected'}
+              </Chip>
+              <Chip color={stats.redis_connected ? 'success' : 'danger'} variant="flat" size="sm" startContent={<Cpu size={12} />}>
+                Redis {stats.redis_connected ? 'Connected' : 'Disconnected'}
+              </Chip>
+              <Chip color={stats.memory_percent > 90 ? 'danger' : stats.memory_percent > 70 ? 'warning' : 'success'} variant="flat" size="sm">
+                Memory {stats.memory_percent}%
+              </Chip>
+              <Chip color={stats.disk_percent > 90 ? 'danger' : stats.disk_percent > 70 ? 'warning' : 'success'} variant="flat" size="sm">
+                Disk {stats.disk_percent}%
+              </Chip>
+            </div>
+          </CardBody>
+        </Card>
+      )}
+
       {/* Quick Links */}
       <Card shadow="sm">
         <CardBody className="p-4">
@@ -139,6 +164,27 @@ export function EnterpriseDashboard() {
           )}
         </CardBody>
       </Card>
+
+      {/* Recent GDPR Activity */}
+      {stats?.recent_gdpr_activity && stats.recent_gdpr_activity.length > 0 && (
+        <Card shadow="sm" className="mt-6">
+          <CardBody className="p-4">
+            <p className="text-sm font-semibold text-default-700 mb-3">Recent GDPR Activity</p>
+            <div className="space-y-2">
+              {stats.recent_gdpr_activity.map((entry) => (
+                <div key={entry.id} className="flex items-center justify-between text-sm border-b border-divider pb-2 last:border-0">
+                  <div className="flex items-center gap-2">
+                    <Chip size="sm" variant="flat" color="primary">{entry.action}</Chip>
+                    <span className="text-default-600">{entry.entity_type}</span>
+                    {entry.user_name && <span className="text-default-400">by {entry.user_name}</span>}
+                  </div>
+                  <span className="text-default-400 text-xs">{new Date(entry.created_at).toLocaleString()}</span>
+                </div>
+              ))}
+            </div>
+          </CardBody>
+        </Card>
+      )}
     </div>
   );
 }

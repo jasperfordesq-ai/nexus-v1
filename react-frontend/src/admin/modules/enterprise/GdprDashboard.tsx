@@ -21,11 +21,12 @@ import {
   Plus,
   ShieldAlert,
 } from 'lucide-react';
+import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { usePageTitle } from '@/hooks';
 import { useTenant } from '@/contexts';
 import { adminEnterprise } from '../../api/adminApi';
 import { StatCard, PageHeader } from '../../components';
-import type { GdprDashboardStats, GdprStatistics } from '../../api/types';
+import type { GdprDashboardStats, GdprStatistics, GdprTrendData } from '../../api/types';
 
 import { useTranslation } from 'react-i18next';
 
@@ -76,20 +77,25 @@ export function GdprDashboard() {
 
   const [stats, setStats] = useState<GdprDashboardStats | null>(null);
   const [statistics, setStatistics] = useState<GdprStatistics | null>(null);
+  const [trends, setTrends] = useState<GdprTrendData | null>(null);
   const [loading, setLoading] = useState(true);
 
   const loadData = useCallback(async () => {
     setLoading(true);
     try {
-      const [dashRes, statsRes] = await Promise.all([
+      const [dashRes, statsRes, trendsRes] = await Promise.all([
         adminEnterprise.getGdprDashboard(),
         adminEnterprise.getGdprStatistics(),
+        adminEnterprise.getGdprTrends(),
       ]);
       if (dashRes.success && dashRes.data) {
         setStats(dashRes.data as unknown as GdprDashboardStats);
       }
       if (statsRes.success && statsRes.data) {
         setStatistics(statsRes.data as unknown as GdprStatistics);
+      }
+      if (trendsRes.success && trendsRes.data) {
+        setTrends(trendsRes.data as unknown as GdprTrendData);
       }
     } catch (err) {
       console.error('Failed to load GDPR dashboard data', err);
@@ -106,6 +112,23 @@ export function GdprDashboard() {
   const overdueCount = statistics?.overdue_count ?? 0;
   const complianceScore = statistics?.compliance_score ?? 0;
   const consentCoverage = statistics?.consent_coverage_percent ?? 0;
+
+  // Build chart data from trends
+  const chartData = trends ? trends.months.map((month, i) => ({
+    month,
+    requests: trends.requests[i],
+    breaches: trends.breaches[i],
+  })) : [];
+
+  // Compute period-over-period trend for requests
+  const requestsTrend = trends && trends.comparison.last_month_requests > 0
+    ? Math.round(((trends.comparison.this_month_requests - trends.comparison.last_month_requests) / trends.comparison.last_month_requests) * 100)
+    : undefined;
+
+  // Compute period-over-period trend for completed requests
+  const completedTrend = trends && trends.comparison.last_month_completed > 0
+    ? Math.round(((trends.comparison.this_month_completed - trends.comparison.last_month_completed) / trends.comparison.last_month_completed) * 100)
+    : undefined;
 
   const links = [
     { label: t('enterprise.link_data_requests'), href: tenantPath('/admin/enterprise/gdpr/requests'), icon: FileWarning, description: t('enterprise.link_data_requests_desc') },
@@ -173,6 +196,8 @@ export function GdprDashboard() {
             icon={FileWarning}
             color="warning"
             loading={loading}
+            trend={requestsTrend}
+            trendLabel="vs last month"
           />
           <StatCard
             label="Completed This Month"
@@ -180,6 +205,8 @@ export function GdprDashboard() {
             icon={UserCheck}
             color="success"
             loading={loading}
+            trend={completedTrend}
+            trendLabel="vs last month"
           />
           <StatCard
             label="Consent Coverage"
@@ -197,6 +224,25 @@ export function GdprDashboard() {
           />
         </div>
       </div>
+
+      {/* Trend Chart — Last 6 Months */}
+      {trends && chartData.length > 0 && (
+        <Card shadow="sm" className="mb-6">
+          <CardBody className="p-4">
+            <p className="text-sm font-semibold text-default-700 mb-4">Requests &amp; Breaches — Last 6 Months</p>
+            <ResponsiveContainer width="100%" height={250}>
+              <AreaChart data={chartData}>
+                <CartesianGrid strokeDasharray="3 3" stroke="var(--color-divider, #e5e7eb)" />
+                <XAxis dataKey="month" tick={{ fontSize: 12 }} />
+                <YAxis allowDecimals={false} tick={{ fontSize: 12 }} />
+                <Tooltip />
+                <Area type="monotone" dataKey="requests" stackId="1" stroke="#006FEE" fill="#006FEE" fillOpacity={0.2} name="Requests" />
+                <Area type="monotone" dataKey="breaches" stackId="2" stroke="#f31260" fill="#f31260" fillOpacity={0.2} name="Breaches" />
+              </AreaChart>
+            </ResponsiveContainer>
+          </CardBody>
+        </Card>
+      )}
 
       {/* Request Type Breakdown + Overdue Alert */}
       {statistics && (

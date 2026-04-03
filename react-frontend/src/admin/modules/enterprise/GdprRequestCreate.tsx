@@ -9,19 +9,20 @@
  * Route: /admin/enterprise/gdpr/requests/create
  */
 
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
-  Card, CardBody, Input, Textarea, Select, SelectItem, Button,
+  Card, CardBody, Input, Textarea, Select, SelectItem, Button, Chip, Spinner,
 } from '@heroui/react';
 import {
-  ArrowLeft, Save, Eye, Trash2, Download, Edit, Lock, AlertTriangle,
+  ArrowLeft, Save, Eye, Trash2, Download, Edit, Lock, AlertTriangle, Search,
 } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import { usePageTitle } from '@/hooks';
 import { useTenant, useToast } from '@/contexts';
-import { adminEnterprise } from '../../api/adminApi';
+import { adminEnterprise, adminUsers } from '../../api/adminApi';
 import { PageHeader } from '../../components';
+import type { AdminUser } from '../../api/types';
 
 import { useTranslation } from 'react-i18next';
 
@@ -55,6 +56,58 @@ export function GdprRequestCreate() {
   const [priority, setPriority] = useState('normal');
   const [notes, setNotes] = useState('');
   const [saving, setSaving] = useState(false);
+
+  // User search autocomplete state
+  const [userSearch, setUserSearch] = useState('');
+  const [userResults, setUserResults] = useState<AdminUser[]>([]);
+  const [searchLoading, setSearchLoading] = useState(false);
+  const [selectedUser, setSelectedUser] = useState<AdminUser | null>(null);
+  const [showDropdown, setShowDropdown] = useState(false);
+  const [searchDone, setSearchDone] = useState(false);
+  const searchTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  const debouncedSearch = (query: string) => {
+    if (searchTimeoutRef.current) clearTimeout(searchTimeoutRef.current);
+    if (query.length < 2) {
+      setUserResults([]);
+      setShowDropdown(false);
+      setSearchDone(false);
+      return;
+    }
+    setSearchDone(false);
+    searchTimeoutRef.current = setTimeout(async () => {
+      setSearchLoading(true);
+      try {
+        const res = await adminUsers.list({ search: query, page: 1, limit: 10 });
+        if (res.success && res.data) {
+          const data = res.data as unknown as { data?: AdminUser[] } | AdminUser[];
+          const users = Array.isArray(data) ? data : (data as { data?: AdminUser[] }).data || [];
+          setUserResults(users);
+          setShowDropdown(users.length > 0);
+          setSearchDone(true);
+        }
+      } catch {
+        setUserResults([]);
+        setSearchDone(true);
+      } finally {
+        setSearchLoading(false);
+      }
+    }, 300);
+  };
+
+  const handleSelectUser = (user: AdminUser) => {
+    setSelectedUser(user);
+    setUserId(String(user.id));
+    setUserSearch('');
+    setUserResults([]);
+    setShowDropdown(false);
+  };
+
+  const handleDeselectUser = () => {
+    setSelectedUser(null);
+    setUserId('');
+    setUserSearch('');
+  };
 
   const handleSubmit = async () => {
     const parsedUserId = parseInt(userId, 10);
@@ -109,16 +162,67 @@ export function GdprRequestCreate() {
 
       <Card shadow="sm">
         <CardBody className="p-6 space-y-6">
-          {/* User ID */}
-          <Input
-            label="User ID"
-            placeholder="Enter the user ID"
-            type="number"
-            value={userId}
-            onValueChange={setUserId}
-            variant="bordered"
-            isRequired
-          />
+          {/* User Search */}
+          <div>
+            {selectedUser ? (
+              <div className="space-y-2">
+                <p className="text-sm font-medium text-default-700">
+                  User <span className="text-danger">*</span>
+                </p>
+                <Chip
+                  onClose={handleDeselectUser}
+                  variant="flat"
+                  color="primary"
+                  size="lg"
+                >
+                  {selectedUser.name} ({selectedUser.email}) — ID #{selectedUser.id}
+                </Chip>
+              </div>
+            ) : (
+              <div className="relative">
+                <Input
+                  label="Search User"
+                  placeholder="Type name or email to search..."
+                  value={userSearch}
+                  onValueChange={(val) => {
+                    setUserSearch(val);
+                    debouncedSearch(val);
+                  }}
+                  onFocus={() => {
+                    if (userResults.length > 0) setShowDropdown(true);
+                  }}
+                  onBlur={() => {
+                    // Delay to allow click on dropdown items
+                    setTimeout(() => setShowDropdown(false), 200);
+                  }}
+                  variant="bordered"
+                  isRequired
+                  startContent={<Search size={16} />}
+                  endContent={searchLoading ? <Spinner size="sm" /> : undefined}
+                />
+                {showDropdown && userResults.length > 0 && (
+                  <div className="absolute z-50 w-full mt-1 bg-content1 border border-divider rounded-xl shadow-lg max-h-60 overflow-y-auto">
+                    {userResults.map((user) => (
+                      <button
+                        key={user.id}
+                        type="button"
+                        onMouseDown={(e) => e.preventDefault()}
+                        onClick={() => handleSelectUser(user)}
+                        className="w-full text-left px-4 py-2.5 hover:bg-default-100 transition-colors first:rounded-t-xl last:rounded-b-xl"
+                      >
+                        <span className="font-medium text-sm">{user.name}</span>
+                        <span className="text-default-500 text-sm"> ({user.email})</span>
+                        <span className="text-default-400 text-xs ml-1">— ID #{user.id}</span>
+                      </button>
+                    ))}
+                  </div>
+                )}
+                {searchDone && !searchLoading && userResults.length === 0 && userSearch.length >= 2 && (
+                  <p className="text-xs text-default-400 mt-1">No users found for "{userSearch}"</p>
+                )}
+              </div>
+            )}
+          </div>
 
           {/* Request Type - Card Selector */}
           <div>
