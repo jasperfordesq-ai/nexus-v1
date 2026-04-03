@@ -1015,7 +1015,7 @@ export const adminFederation = {
   terminatePartnership: (id: number) =>
     api.post<{ success: boolean }>(`/v2/admin/federation/partnerships/${id}/terminate`, {}),
 
-  getDirectory: (params?: { search?: string; region?: string; category?: string; exclude_partnered?: boolean }) =>
+  getDirectory: (params?: { search?: string; region?: string; category?: string; topic?: string; exclude_partnered?: boolean }) =>
     api.get<Array<{ id: number; name: string; slug: string; domain: string; description?: string; region?: string }>>(`/v2/admin/federation/directory${buildQuery(params || {})}`),
 
   requestPartnership: (targetTenantId: number, notes?: string) =>
@@ -1025,6 +1025,15 @@ export const adminFederation = {
 
   updateProfile: (data: Record<string, unknown>) =>
     api.put<{ success: boolean }>('/v2/admin/federation/directory/profile', data),
+
+  getTopics: () =>
+    api.get<Array<{ id: number; name: string; slug: string; icon: string; category: string; tenant_count: number }>>('/v2/admin/federation/topics'),
+
+  getMyTopics: () =>
+    api.get<Array<{ id: number; name: string; slug: string; icon: string; category: string; is_primary: boolean }>>('/v2/admin/federation/topics/mine'),
+
+  updateMyTopics: (topicIds: number[], primaryIds: number[] = []) =>
+    api.put<Array<{ id: number; name: string; slug: string; icon: string; category: string; is_primary: boolean }>>('/v2/admin/federation/topics/mine', { topic_ids: topicIds, primary_ids: primaryIds }),
 
   getAnalytics: () => api.get<{ total_partnerships: number; active_partnerships: number; cross_tenant_transactions: number; cross_tenant_messages: number }>('/v2/admin/federation/analytics'),
 

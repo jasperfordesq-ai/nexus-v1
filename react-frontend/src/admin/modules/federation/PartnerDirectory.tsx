@@ -49,6 +49,14 @@ import { adminFederation } from '../../api/adminApi';
 import { PageHeader, EmptyState } from '../../components';
 
 import { useTranslation } from 'react-i18next';
+interface CommunityTopic {
+  name: string;
+  slug: string;
+  icon: string;
+  category: string;
+  is_primary: boolean;
+}
+
 interface Community {
   id: number;
   name: string;
@@ -70,12 +78,23 @@ interface Community {
   groups_enabled?: number;
   partnership_status?: string | null;
   partnership_id?: number | null;
+  topics?: CommunityTopic[];
+}
+
+interface TopicFilter {
+  id: number;
+  name: string;
+  slug: string;
+  icon: string;
+  category: string;
+  tenant_count: number;
 }
 
 interface DirectoryResponse {
   communities: Community[];
   regions: string[];
   categories: string[];
+  topics: TopicFilter[];
 }
 
 const partnershipStatusConfig: Record<string, { color: 'success' | 'warning' | 'danger' | 'default'; icon: typeof CheckCircle; label: string }> = {
@@ -94,12 +113,14 @@ export function PartnerDirectory() {
   const [communities, setCommunities] = useState<Community[]>([]);
   const [regions, setRegions] = useState<string[]>([]);
   const [categories, setCategories] = useState<string[]>([]);
+  const [topics, setTopics] = useState<TopicFilter[]>([]);
   const [loading, setLoading] = useState(true);
 
   // Filters
   const [search, setSearch] = useState('');
   const [regionFilter, setRegionFilter] = useState('');
   const [categoryFilter, setCategoryFilter] = useState('');
+  const [topicFilter, setTopicFilter] = useState('');
   const [hidePartnered, setHidePartnered] = useState(false);
 
   // Partnership request modal
@@ -107,7 +128,7 @@ export function PartnerDirectory() {
   const [requestNotes, setRequestNotes] = useState('');
   const [requestLoading, setRequestLoading] = useState(false);
 
-  const loadData = useCallback(async (params?: { search?: string; region?: string; category?: string; exclude_partnered?: boolean }) => {
+  const loadData = useCallback(async (params?: { search?: string; region?: string; category?: string; topic?: string; exclude_partnered?: boolean }) => {
     setLoading(true);
     try {
       const res = await adminFederation.getDirectory(params);
@@ -117,6 +138,7 @@ export function PartnerDirectory() {
           setCommunities(payload.communities || []);
           setRegions(payload.regions || []);
           setCategories(payload.categories || []);
+          setTopics(payload.topics || []);
         } else if (Array.isArray(payload)) {
           // Fallback for old response format
           setCommunities(payload as unknown as Community[]);
@@ -137,11 +159,12 @@ export function PartnerDirectory() {
         search: search || undefined,
         region: regionFilter || undefined,
         category: categoryFilter || undefined,
+        topic: topicFilter || undefined,
         exclude_partnered: hidePartnered || undefined,
       });
     }, 300);
     return () => clearTimeout(timer);
-  }, [search, regionFilter, categoryFilter, hidePartnered, loadData]);
+  }, [search, regionFilter, categoryFilter, topicFilter, hidePartnered, loadData]);
 
   const handleRequestPartnership = async () => {
     if (!requestTarget) return;
@@ -152,7 +175,7 @@ export function PartnerDirectory() {
         toast.success(t('federation.partnership_request_sent', { name: requestTarget.name }));
         setRequestTarget(null);
         setRequestNotes('');
-        loadData({ search, region: regionFilter, category: categoryFilter, exclude_partnered: hidePartnered });
+        loadData({ search, region: regionFilter, category: categoryFilter, topic: topicFilter, exclude_partnered: hidePartnered });
       } else {
         const errorData = res.data as { error?: string } | undefined;
         toast.error(errorData?.error || t('federation.failed_to_send_partnership_request'));
@@ -162,14 +185,6 @@ export function PartnerDirectory() {
     } finally {
       setRequestLoading(false);
     }
-  };
-
-  const parseCategories = (cats?: string): string[] => {
-    if (!cats) return [];
-    if (cats.startsWith('[')) {
-      try { return JSON.parse(cats); } catch { return []; }
-    }
-    return cats.split(',').map(c => c.trim()).filter(Boolean);
   };
 
   const enabledFeatures = (community: Community): string[] => {
@@ -188,14 +203,16 @@ export function PartnerDirectory() {
     if (search) count++;
     if (regionFilter) count++;
     if (categoryFilter) count++;
+    if (topicFilter) count++;
     if (hidePartnered) count++;
     return count;
-  }, [search, regionFilter, categoryFilter, hidePartnered]);
+  }, [search, regionFilter, categoryFilter, topicFilter, hidePartnered]);
 
   const clearFilters = () => {
     setSearch('');
     setRegionFilter('');
     setCategoryFilter('');
+    setTopicFilter('');
     setHidePartnered(false);
   };
 
@@ -208,7 +225,7 @@ export function PartnerDirectory() {
           <Button
             variant="flat"
             startContent={<RefreshCw size={16} />}
-            onPress={() => loadData({ search, region: regionFilter, category: categoryFilter, exclude_partnered: hidePartnered })}
+            onPress={() => loadData({ search, region: regionFilter, category: categoryFilter, topic: topicFilter, exclude_partnered: hidePartnered })}
             isLoading={loading}
           >
             {t('federation.refresh')}
@@ -264,6 +281,26 @@ export function PartnerDirectory() {
                 ))}
               </Select>
             )}
+            {topics.length > 0 && (
+              <Select
+                className="w-full md:w-48"
+                placeholder={t('federation.placeholder_all_topics', 'All Topics')}
+                size="sm"
+                variant="bordered"
+                selectedKeys={topicFilter ? [topicFilter] : []}
+                onSelectionChange={(keys) => {
+                  const arr = Array.from(keys);
+                  setTopicFilter(arr.length > 0 ? String(arr[0]) : '');
+                }}
+                startContent={<Tag size={14} className="text-default-400" />}
+              >
+                {topics.map((tp) => (
+                  <SelectItem key={tp.slug} textValue={tp.name}>
+                    {tp.name} ({tp.tenant_count})
+                  </SelectItem>
+                ))}
+              </Select>
+            )}
           </div>
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
@@ -312,7 +349,7 @@ export function PartnerDirectory() {
       {communities.length > 0 && (
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
           {communities.map((community) => {
-            const cats = parseCategories(community.categories);
+            const communityTopics = community.topics || [];
             const features = enabledFeatures(community);
             const status = community.partnership_status;
             const statusConf = status ? partnershipStatusConfig[status] : null;
@@ -378,16 +415,22 @@ export function PartnerDirectory() {
                     )}
                   </div>
 
-                  {cats.length > 0 && (
+                  {communityTopics.length > 0 && (
                     <div className="flex flex-wrap gap-1">
-                      {cats.slice(0, 4).map((cat) => (
-                        <Chip key={cat} size="sm" variant="flat" startContent={<Tag size={10} />}>
-                          {cat}
+                      {communityTopics.slice(0, 5).map((topic) => (
+                        <Chip
+                          key={topic.slug}
+                          size="sm"
+                          variant={topic.is_primary ? 'solid' : 'flat'}
+                          color={topic.is_primary ? 'warning' : 'default'}
+                          startContent={<Tag size={10} />}
+                        >
+                          {topic.name}
                         </Chip>
                       ))}
-                      {cats.length > 4 && (
+                      {communityTopics.length > 5 && (
                         <Chip size="sm" variant="flat" color="default">
-                          {t('federation.more_count', { count: cats.length - 4 })}
+                          {t('federation.more_count', { count: communityTopics.length - 5 })}
                         </Chip>
                       )}
                     </div>

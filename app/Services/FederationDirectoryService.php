@@ -24,7 +24,7 @@ class FederationDirectoryService
     /**
      * Get discoverable timebanks visible to a given tenant.
      *
-     * Filters by search term, region, and category. Excludes the requesting tenant.
+     * Filters by search term, region, topic, and category. Excludes the requesting tenant.
      */
     public static function getDiscoverableTimebanks(int $currentTenantId, array $filters = []): array
     {
@@ -59,6 +59,15 @@ class FederationDirectoryService
                 $params[] = $filters['region'];
             }
 
+            if (!empty($filters['topic'])) {
+                $query .= " AND t.id IN (
+                    SELECT ftt.tenant_id FROM federation_tenant_topics ftt
+                    JOIN federation_topics ft ON ft.id = ftt.topic_id
+                    WHERE ft.slug = ?
+                )";
+                $params[] = $filters['topic'];
+            }
+
             if (!empty($filters['exclude_partnered'])) {
                 $query .= " AND t.id NOT IN (
                     SELECT CASE WHEN fp.tenant_id = ? THEN fp.partner_tenant_id ELSE fp.tenant_id END
@@ -74,12 +83,17 @@ class FederationDirectoryService
 
             $rows = DB::select($query, $params);
 
-            return array_map(function ($row) {
+            // Batch-load topics for all returned tenant IDs
+            $tenantIds = array_map(fn($r) => (int) $r->id, $rows);
+            $topicsByTenant = self::getTopicsForTenants($tenantIds);
+
+            return array_map(function ($row) use ($topicsByTenant) {
                 $showMembers = (bool) ($row->show_member_count ?? true);
                 $showActivity = (bool) ($row->show_activity_stats ?? false);
+                $tid = (int) $row->id;
 
                 return [
-                    'id' => (int) $row->id,
+                    'id' => $tid,
                     'name' => $row->display_name ?: $row->name,
                     'slug' => $row->slug,
                     'tagline' => $row->tagline ?? null,
@@ -91,6 +105,7 @@ class FederationDirectoryService
                     'member_count' => $showMembers ? (int) ($row->member_count ?: $row->live_member_count) : null,
                     'active_listings_count' => $showActivity ? (int) ($row->active_listings_count ?? 0) : null,
                     'total_hours_exchanged' => $showActivity ? (float) ($row->total_hours_exchanged ?? 0) : null,
+                    'topics' => $topicsByTenant[$tid] ?? [],
                     'is_active' => (bool) $row->is_active,
                     'created_at' => $row->created_at,
                 ];
@@ -273,6 +288,176 @@ class FederationDirectoryService
         } catch (\Exception $e) {
             Log::error('[FederationDirectory] updateDirectoryProfile failed', ['error' => $e->getMessage()]);
             return false;
+        }
+    }
+
+    // ─────────────────────────────────────────────────────────────────────────
+    // Topic / Interest Tags
+    // ─────────────────────────────────────────────────────────────────────────
+
+    /**
+     * Get all available federation topics grouped by category.
+     */
+    public static function getAllTopics(): array
+    {
+        try {
+            $rows = DB::select(
+                "SELECT ft.id, ft.name, ft.slug, ft.icon, ft.category, ft.sort_order,
+                        (SELECT COUNT(*) FROM federation_tenant_topics ftt WHERE ftt.topic_id = ft.id) as tenant_count
+                 FROM federation_topics ft
+                 ORDER BY ft.sort_order ASC, ft.name ASC"
+            );
+
+            return array_map(fn($r) => [
+                'id' => (int) $r->id,
+                'name' => $r->name,
+                'slug' => $r->slug,
+                'icon' => $r->icon,
+                'category' => $r->category,
+                'tenant_count' => (int) $r->tenant_count,
+            ], $rows);
+        } catch (\Exception $e) {
+            Log::error('[FederationDirectory] getAllTopics failed', ['error' => $e->getMessage()]);
+            return [];
+        }
+    }
+
+    /**
+     * Get topics with at least one tenant using them (for directory filtering).
+     */
+    public static function getActiveTopics(): array
+    {
+        try {
+            $rows = DB::select(
+                "SELECT ft.id, ft.name, ft.slug, ft.icon, ft.category,
+                        COUNT(ftt.tenant_id) as tenant_count
+                 FROM federation_topics ft
+                 JOIN federation_tenant_topics ftt ON ftt.topic_id = ft.id
+                 GROUP BY ft.id, ft.name, ft.slug, ft.icon, ft.category
+                 ORDER BY tenant_count DESC, ft.sort_order ASC"
+            );
+
+            return array_map(fn($r) => [
+                'id' => (int) $r->id,
+                'name' => $r->name,
+                'slug' => $r->slug,
+                'icon' => $r->icon,
+                'category' => $r->category,
+                'tenant_count' => (int) $r->tenant_count,
+            ], $rows);
+        } catch (\Exception $e) {
+            Log::error('[FederationDirectory] getActiveTopics failed', ['error' => $e->getMessage()]);
+            return [];
+        }
+    }
+
+    /**
+     * Get topics selected by a specific tenant.
+     */
+    public static function getTenantTopics(int $tenantId): array
+    {
+        try {
+            $rows = DB::select(
+                "SELECT ft.id, ft.name, ft.slug, ft.icon, ft.category, ftt.is_primary
+                 FROM federation_tenant_topics ftt
+                 JOIN federation_topics ft ON ft.id = ftt.topic_id
+                 WHERE ftt.tenant_id = ?
+                 ORDER BY ftt.is_primary DESC, ft.sort_order ASC",
+                [$tenantId]
+            );
+
+            return array_map(fn($r) => [
+                'id' => (int) $r->id,
+                'name' => $r->name,
+                'slug' => $r->slug,
+                'icon' => $r->icon,
+                'category' => $r->category,
+                'is_primary' => (bool) $r->is_primary,
+            ], $rows);
+        } catch (\Exception $e) {
+            Log::error('[FederationDirectory] getTenantTopics failed', ['error' => $e->getMessage()]);
+            return [];
+        }
+    }
+
+    /**
+     * Set topics for a tenant (replaces existing selections).
+     *
+     * @param int   $tenantId
+     * @param array $topicIds     Array of topic IDs to assign
+     * @param array $primaryIds   Array of topic IDs to mark as primary (subset of $topicIds)
+     */
+    public static function setTenantTopics(int $tenantId, array $topicIds, array $primaryIds = []): bool
+    {
+        try {
+            DB::beginTransaction();
+
+            DB::delete("DELETE FROM federation_tenant_topics WHERE tenant_id = ?", [$tenantId]);
+
+            if (!empty($topicIds)) {
+                // Validate topic IDs exist
+                $placeholders = implode(',', array_fill(0, count($topicIds), '?'));
+                $validRows = DB::select(
+                    "SELECT id FROM federation_topics WHERE id IN ({$placeholders})",
+                    $topicIds
+                );
+                $validIds = array_map(fn($r) => (int) $r->id, $validRows);
+
+                foreach ($validIds as $topicId) {
+                    DB::insert(
+                        "INSERT INTO federation_tenant_topics (tenant_id, topic_id, is_primary) VALUES (?, ?, ?)",
+                        [$tenantId, $topicId, in_array($topicId, $primaryIds) ? 1 : 0]
+                    );
+                }
+            }
+
+            DB::commit();
+            Log::info('[FederationDirectory] Tenant topics updated', ['tenant_id' => $tenantId, 'count' => count($topicIds)]);
+            return true;
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('[FederationDirectory] setTenantTopics failed', ['error' => $e->getMessage()]);
+            return false;
+        }
+    }
+
+    /**
+     * Batch-load topics for multiple tenants (used by directory listing).
+     *
+     * @return array<int, array> Map of tenant_id => array of topic objects
+     */
+    private static function getTopicsForTenants(array $tenantIds): array
+    {
+        if (empty($tenantIds)) {
+            return [];
+        }
+
+        try {
+            $placeholders = implode(',', array_fill(0, count($tenantIds), '?'));
+            $rows = DB::select(
+                "SELECT ftt.tenant_id, ft.name, ft.slug, ft.icon, ft.category, ftt.is_primary
+                 FROM federation_tenant_topics ftt
+                 JOIN federation_topics ft ON ft.id = ftt.topic_id
+                 WHERE ftt.tenant_id IN ({$placeholders})
+                 ORDER BY ftt.is_primary DESC, ft.sort_order ASC",
+                $tenantIds
+            );
+
+            $map = [];
+            foreach ($rows as $row) {
+                $tid = (int) $row->tenant_id;
+                $map[$tid][] = [
+                    'name' => $row->name,
+                    'slug' => $row->slug,
+                    'icon' => $row->icon,
+                    'category' => $row->category,
+                    'is_primary' => (bool) $row->is_primary,
+                ];
+            }
+            return $map;
+        } catch (\Exception $e) {
+            Log::error('[FederationDirectory] getTopicsForTenants failed', ['error' => $e->getMessage()]);
+            return [];
         }
     }
 }

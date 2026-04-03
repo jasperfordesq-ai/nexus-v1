@@ -522,13 +522,15 @@ class AdminFederationController extends BaseApiController
         $search = $this->query('search'); if ($search) { $filters['search'] = substr(trim($search), 0, 200); }
         $region = $this->query('region'); if ($region) { $filters['region'] = substr(trim($region), 0, 100); }
         $category = $this->query('category'); if ($category) { $filters['category'] = substr(trim($category), 0, 100); }
+        $topic = $this->query('topic'); if ($topic) { $filters['topic'] = substr(trim($topic), 0, 100); }
         if ($this->queryBool('exclude_partnered')) { $filters['exclude_partnered'] = true; }
 
         try {
             $communities = $this->federationDirectoryService->getDiscoverableTimebanks($tenantId, $filters);
             $regions = $this->federationDirectoryService->getAvailableRegions();
             $categories = $this->federationDirectoryService->getAvailableCategories();
-            return $this->respondWithData(['communities' => $communities, 'regions' => $regions, 'categories' => $categories]);
+            $topics = $this->federationDirectoryService->getActiveTopics();
+            return $this->respondWithData(['communities' => $communities, 'regions' => $regions, 'categories' => $categories, 'topics' => $topics]);
         } catch (\Exception $e) {
             try {
                 $fallback = DB::select(
@@ -576,6 +578,48 @@ class AdminFederationController extends BaseApiController
         } catch (\Exception $e) {
             return $this->respondWithError('UPDATE_FAILED', __('api.update_failed', ['resource' => 'federation profile']), null, 500);
         }
+    }
+
+    // ─────────────────────────────────────────────────────────────────────────
+    // Topic / Interest Tags
+    // ─────────────────────────────────────────────────────────────────────────
+
+    /** GET /api/v2/admin/federation/topics — All predefined topics. */
+    public function topics(): JsonResponse
+    {
+        $this->requireAdmin();
+        $topics = $this->federationDirectoryService->getAllTopics();
+        return $this->respondWithData($topics);
+    }
+
+    /** GET /api/v2/admin/federation/topics/mine — This tenant's selected topics. */
+    public function myTopics(): JsonResponse
+    {
+        $this->requireAdmin();
+        $tenantId = TenantContext::getId();
+        $topics = $this->federationDirectoryService->getTenantTopics($tenantId);
+        return $this->respondWithData($topics);
+    }
+
+    /** PUT /api/v2/admin/federation/topics/mine — Set this tenant's topics. */
+    public function updateMyTopics(): JsonResponse
+    {
+        $this->requireAdmin();
+        $tenantId = TenantContext::getId();
+        $input = $this->getAllInput();
+
+        $topicIds = array_map('intval', $input['topic_ids'] ?? []);
+        $primaryIds = array_map('intval', $input['primary_ids'] ?? []);
+
+        if (count($topicIds) > 10) {
+            return $this->respondWithError('VALIDATION_ERROR', 'Maximum 10 topics allowed.', null, 422);
+        }
+
+        $ok = $this->federationDirectoryService->setTenantTopics($tenantId, $topicIds, $primaryIds);
+        if ($ok) {
+            return $this->respondWithData($this->federationDirectoryService->getTenantTopics($tenantId));
+        }
+        return $this->respondWithError('UPDATE_FAILED', __('api.update_failed', ['resource' => 'topics']), null, 500);
     }
 
     // ─────────────────────────────────────────────────────────────────────────
