@@ -586,14 +586,35 @@ class AdminEnterpriseController extends BaseApiController
         }
     }
 
+    /**
+     * Direct tenant columns that the System Config page exposes as settings.
+     * These live on the tenants table, NOT in the configuration JSON.
+     */
+    private const CONFIG_DIRECT_COLUMNS = [
+        'site_name' => 'name',
+        'site_description' => 'description',
+        'contact_email' => 'contact_email',
+        'timezone' => 'timezone',
+    ];
+
     /** GET /api/v2/admin/enterprise/config */
     public function config(): JsonResponse
     {
         $this->requireAdmin();
         $tenantId = $this->getTenantId();
         try {
-            $row = DB::selectOne("SELECT configuration FROM tenants WHERE id = ?", [$tenantId]);
-            return $this->respondWithData(json_decode($row->configuration ?? '{}', true) ?: []);
+            $columns = implode(', ', array_unique(array_merge(['configuration'], array_values(self::CONFIG_DIRECT_COLUMNS))));
+            $row = DB::selectOne("SELECT {$columns} FROM tenants WHERE id = ?", [$tenantId]);
+            $config = json_decode($row->configuration ?? '{}', true) ?: [];
+
+            // Merge direct columns into config so the frontend sees them
+            foreach (self::CONFIG_DIRECT_COLUMNS as $configKey => $dbColumn) {
+                if (!isset($config[$configKey]) && isset($row->$dbColumn)) {
+                    $config[$configKey] = $row->$dbColumn;
+                }
+            }
+
+            return $this->respondWithData($config);
         } catch (\Exception $e) { return $this->respondWithData([]); }
     }
 
@@ -606,11 +627,42 @@ class AdminEnterpriseController extends BaseApiController
         if (empty($newConfig)) { return $this->respondWithError('VALIDATION_ERROR', __('api.no_configuration_data'), null, 422); }
 
         try {
+            // Separate direct columns from configuration JSON
+            $directUpdates = [];
+            $jsonConfig = $newConfig;
+            foreach (self::CONFIG_DIRECT_COLUMNS as $configKey => $dbColumn) {
+                if (array_key_exists($configKey, $jsonConfig)) {
+                    $directUpdates[$dbColumn] = $jsonConfig[$configKey];
+                    unset($jsonConfig[$configKey]);
+                }
+            }
+
+            // Update direct columns on tenants table
+            if (!empty($directUpdates)) {
+                $setParts = [];
+                $params = [];
+                foreach ($directUpdates as $col => $val) {
+                    $setParts[] = "{$col} = ?";
+                    $params[] = $val;
+                }
+                $params[] = $tenantId;
+                DB::update("UPDATE tenants SET " . implode(', ', $setParts) . " WHERE id = ?", $params);
+            }
+
+            // Update configuration JSON (remaining keys)
             $row = DB::selectOne("SELECT configuration FROM tenants WHERE id = ?", [$tenantId]);
             $existing = json_decode($row->configuration ?? '{}', true) ?: [];
-            $merged = array_merge($existing, $newConfig);
+            $merged = array_merge($existing, $jsonConfig);
             DB::update("UPDATE tenants SET configuration = ? WHERE id = ?", [json_encode($merged), $tenantId]);
+
             try { app(\App\Services\RedisCache::class)->delete('tenant_bootstrap', $tenantId); } catch (\Throwable $e) { \Illuminate\Support\Facades\Log::warning('[AdminEnterprise] Cache invalidation failed: ' . $e->getMessage()); }
+
+            // Return merged view (direct + JSON)
+            foreach (self::CONFIG_DIRECT_COLUMNS as $configKey => $dbColumn) {
+                if (isset($directUpdates[$dbColumn])) {
+                    $merged[$configKey] = $directUpdates[$dbColumn];
+                }
+            }
             return $this->respondWithData($merged);
         } catch (\Exception $e) {
             return $this->respondWithError('UPDATE_FAILED', __('api.config_update_failed'), null, 500);
