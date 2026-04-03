@@ -128,7 +128,7 @@ class ListingService
                 }
 
                 $q = Listing::query()
-                    ->with(['user:id,first_name,last_name,organization_name,profile_type,avatar_url,tagline',
+                    ->with(['user:id,first_name,last_name,organization_name,profile_type,avatar_url,tagline,is_verified',
                             'category:id,name,color,slug'])
                     ->whereIn('id', $ids)
                     ->where(function (Builder $sq) {
@@ -138,6 +138,21 @@ class ListingService
                 // Multi-type arrays can't be expressed in the Meilisearch filter above
                 if (!empty($filters['type']) && is_array($filters['type'])) {
                     $q->whereIn('type', $filters['type']);
+                }
+
+                // Faceted filters — applied post-Meilisearch on SQL hydration
+                if (!empty($filters['min_hours'])) {
+                    $q->where('hours_estimate', '>=', (float) $filters['min_hours']);
+                }
+                if (!empty($filters['max_hours'])) {
+                    $q->where('hours_estimate', '<=', (float) $filters['max_hours']);
+                }
+                if (!empty($filters['service_type'])) {
+                    $types = is_string($filters['service_type']) ? explode(',', $filters['service_type']) : $filters['service_type'];
+                    $q->whereIn('service_type', $types);
+                }
+                if (!empty($filters['posted_within'])) {
+                    $q->where('created_at', '>=', now()->subDays((int) $filters['posted_within']));
                 }
 
                 $listingsById = $q->get()->keyBy('id');
@@ -171,7 +186,7 @@ class ListingService
         // ── End Meilisearch path ─────────────────────────────────────────────
 
         $query = Listing::query()
-            ->with(['user:id,first_name,last_name,organization_name,profile_type,avatar_url,tagline',
+            ->with(['user:id,first_name,last_name,organization_name,profile_type,avatar_url,tagline,is_verified',
                      'category:id,name,color,slug']);
 
         // Status filter
@@ -233,6 +248,25 @@ class ListingService
                     $q->whereIn('tag', $skills);
                 });
             }
+        }
+
+        // Faceted filters: hours estimate range
+        if (!empty($filters['min_hours'])) {
+            $query->where('hours_estimate', '>=', (float) $filters['min_hours']);
+        }
+        if (!empty($filters['max_hours'])) {
+            $query->where('hours_estimate', '<=', (float) $filters['max_hours']);
+        }
+
+        // Faceted filters: service delivery mode
+        if (!empty($filters['service_type'])) {
+            $types = is_string($filters['service_type']) ? explode(',', $filters['service_type']) : $filters['service_type'];
+            $query->whereIn('service_type', $types);
+        }
+
+        // Faceted filters: posted within N days
+        if (!empty($filters['posted_within'])) {
+            $query->where('created_at', '>=', now()->subDays((int) $filters['posted_within']));
         }
 
         // Cursor pagination (ID-based, descending)
@@ -305,6 +339,20 @@ class ListingService
         $cat = $listing->category;
         $data['category_name']  = $cat?->name;
         $data['category_color'] = $cat?->color;
+
+        // Lightweight trust signals for list view
+        if ($user) {
+            $data['author_verified'] = (bool) ($user->is_verified ?? false);
+            try {
+                $avgRating = DB::table('reviews')
+                    ->where('receiver_id', $user->id)
+                    ->where('tenant_id', \App\Core\TenantContext::getId())
+                    ->avg('rating');
+                $data['author_rating'] = $avgRating ? round((float) $avgRating, 1) : null;
+            } catch (\Throwable $e) {
+                $data['author_rating'] = null;
+            }
+        }
 
         if ($currentUserId) {
             $data['is_favorited'] = isset($savedIds[$listing->id]);
@@ -411,6 +459,25 @@ class ListingService
             }
         }
 
+        // Faceted filters: hours estimate range
+        if (!empty($filters['min_hours'])) {
+            $query->where('hours_estimate', '>=', (float) $filters['min_hours']);
+        }
+        if (!empty($filters['max_hours'])) {
+            $query->where('hours_estimate', '<=', (float) $filters['max_hours']);
+        }
+
+        // Faceted filters: service delivery mode
+        if (!empty($filters['service_type'])) {
+            $types = is_string($filters['service_type']) ? explode(',', $filters['service_type']) : $filters['service_type'];
+            $query->whereIn('service_type', $types);
+        }
+
+        // Faceted filters: posted within N days
+        if (!empty($filters['posted_within'])) {
+            $query->where('created_at', '>=', now()->subDays((int) $filters['posted_within']));
+        }
+
         return $query->count();
     }
 
@@ -421,7 +488,7 @@ class ListingService
     {
         $query = Listing::query()
             ->with([
-                'user:id,first_name,last_name,organization_name,profile_type,avatar_url,tagline',
+                'user:id,first_name,last_name,organization_name,profile_type,avatar_url,tagline,is_verified',
                 'category',
                 'skillTags',
             ]);
@@ -461,6 +528,34 @@ class ListingService
                 'avatar_url' => $user->avatar_url,
                 'tagline'    => $user->tagline,
             ];
+
+            // Trust signals — full stats for detail view
+            $data['author_verified'] = (bool) ($user->is_verified ?? false);
+            try {
+                $reviewStats = DB::table('reviews')
+                    ->where('receiver_id', $user->id)
+                    ->where('tenant_id', $tenantId)
+                    ->selectRaw('AVG(rating) as avg_rating, COUNT(*) as review_count')
+                    ->first();
+                $data['author_rating'] = $reviewStats && $reviewStats->avg_rating
+                    ? round((float) $reviewStats->avg_rating, 1) : null;
+                $data['author_reviews_count'] = $reviewStats ? (int) $reviewStats->review_count : 0;
+            } catch (\Throwable $e) {
+                $data['author_rating'] = null;
+                $data['author_reviews_count'] = 0;
+            }
+            try {
+                $data['author_exchanges_count'] = (int) DB::table('exchange_requests')
+                    ->where('tenant_id', $tenantId)
+                    ->where('status', 'completed')
+                    ->where(function ($q) use ($user) {
+                        $q->where('requester_id', $user->id)
+                          ->orWhere('provider_id', $user->id);
+                    })
+                    ->count();
+            } catch (\Throwable $e) {
+                $data['author_exchanges_count'] = 0;
+            }
         } else {
             $data['author_name'] = 'Unknown User';
             $data['author_avatar'] = null;
@@ -742,6 +837,7 @@ class ListingService
                 'longitude'             => $data['longitude'] ?? null,
                 'hours_estimate'        => isset($data['hours_estimate']) ? (float) $data['hours_estimate'] : null,
                 'federated_visibility'  => $data['federated_visibility'] ?? 'none',
+                'availability'          => $data['availability'] ?? null,
                 'status'                => 'active',
             ]);
 
@@ -804,7 +900,7 @@ class ListingService
         $allowed = [
             'title', 'description', 'type', 'category_id', 'image_url',
             'location', 'latitude', 'longitude', 'hours_estimate',
-            'federated_visibility', 'status', 'sdg_goals',
+            'federated_visibility', 'status', 'sdg_goals', 'availability',
         ];
 
         $listing->fill(collect($data)->only($allowed)->all());

@@ -1,7 +1,7 @@
 {
   "title": "Mission Control",
   "subtitle": "Echtzeit-Plattformübersicht und Kommandozentrale",
-  "tour_btn": "Rundgang",
+  "tour_btn": "Tour",
   "refresh": "Aktualisieren",
   "view_all_activity": "Alle Aktivitäten anzeigen",
   "tour": {
@@ -10,7 +10,7 @@
     "back": "Zurück",
     "next": "Weiter"
   },
-  "load_error": "Dashboard-Daten konnten nicht geladen werden",
+  "load_error": "Failed to load dashboard data",
   "stats": {
     "users_online": "Benutzer online",
     "active_sessions": "Aktive Sitzungen",
@@ -19,19 +19,19 @@
     "transactions": "Transaktionen",
     "hours_exchanged": "Getauschte Stunden",
     "hours": "Stunden",
-    "new_users_this_month": "Neue Benutzer diesen Monat",
-    "active_users": "Aktive Benutzer",
-    "total_listings": "Inserate gesamt",
-    "new_listings_this_month": "Neue Inserate diesen Monat"
+    "new_users_this_month": "New Users This Month",
+    "active_users": "Active Users",
+    "total_listings": "Total Listings",
+    "new_listings_this_month": "New Listings This Month"
   },
   "trends": {
-    "card_title": "Transaktionstrends",
-    "hours_suffix": "Std.",
-    "no_data": "Keine Trenddaten verfügbar"
+    "card_title": "Transaction Trends",
+    "hours_suffix": "hrs",
+    "no_data": "No trend data available"
   },
   "alerts": {
-    "pending_approvals": "Mitglieder warten auf Genehmigung",
-    "pending_listings": "Inserate warten auf Moderation",
+    "pending_approvals": "Members awaiting approval",
+    "pending_listings": "Listings awaiting moderation",
     "users_pending_one": "{{count}} Benutzer ausstehend",
     "users_pending_other": "{{count}} Benutzer ausstehend",
     "users_pending_text": "Neue Mitgliederregistrierungen erfordern Ihre Prüfung",
@@ -59,21 +59,21 @@
     "group_locations_desc": "Geografische Grenzen",
     "group_ranking": "Gruppenranking",
     "group_ranking_desc": "Intelligente hervorgehobene Gruppen",
-    "ai_assistant": "KI-Assistent",
+    "ai_assistant": "AI Assistant",
     "ai_assistant_desc": "KI-Anbieter konfigurieren",
     "smart_matching": "Smart Matching",
     "smart_matching_desc": "KI-gestützte Empfehlungen",
-    "feed_algorithm": "Feed-Algorithmus",
+    "feed_algorithm": "Feed Algorithm",
     "feed_algorithm_desc": "EdgeRank-Konfiguration",
-    "algorithm_settings": "Algorithmus-Einstellungen",
+    "algorithm_settings": "Algorithm Settings",
     "algorithm_settings_desc": "MatchRank & CommunityRank",
-    "timebanking": "Zeitbank",
+    "timebanking": "Timebanking",
     "timebanking_desc": "Analysen & Organisationskonten",
-    "seo": "SEO-Manager",
+    "seo": "SEO Manager",
     "seo_desc": "Suchmaschinenoptimierung",
     "error_tracking": "404-Fehlerverfolgung",
     "error_tracking_desc": "Fehlerhafte Links überwachen",
-    "cron_jobs": "Cron-Jobs",
+    "cron_jobs": "Cron Jobs",
     "cron_jobs_desc": "Geplante Aufgaben"
   },
   "activity": {
@@ -97,7 +97,7 @@
     "gamification": "Gamification",
     "settings": "Einstellungen",
     "enterprise": "Enterprise",
-    "advanced_controls": "Erweiterte Steuerung"
+    "advanced_controls": "Advanced Controls"
   },
   "enterprise": {
     "card_title": "Enterprise Suite",
@@ -112,7 +112,7 @@
     "details": "Details",
     "database": "Datenbank",
     "cache": "Cache",
-    "queue": "Cron-Jobs",
+    "queue": "Cron Jobs",
     "api": "E-Mail-API"
   }
 }

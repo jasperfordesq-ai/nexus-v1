@@ -16,7 +16,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import {
   Modal, ModalContent, ModalHeader, ModalBody, ModalFooter,
-  Card, CardHeader, CardBody, Switch, Input, Select, SelectItem,
+  Card, CardBody, Switch, Input, Select, SelectItem,
   Button, Chip, Spinner, Divider,
 } from '@heroui/react';
 import { ExternalLink, Save, Info, Construction } from 'lucide-react';
@@ -300,7 +300,7 @@ export default function ModuleConfigModal({ module, isOpen, onClose }: ModuleCon
   const isEditable = isBroker || isGroupConfig || isListingConfig || isVolunteeringConfig || isJobConfig;
 
   return (
-    <Modal size="3xl" isOpen={isOpen} onClose={onClose} scrollBehavior="inside">
+    <Modal size="4xl" isOpen={isOpen} onClose={onClose} scrollBehavior="inside">
       <ModalContent>
         <ModalHeader className="flex items-center gap-3">
           <div
@@ -312,7 +312,7 @@ export default function ModuleConfigModal({ module, isOpen, onClose }: ModuleCon
           >
             <Icon size={20} />
           </div>
-          <div className="flex-1">
+          <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2">
               <span>{module.name} Configuration</span>
               {!isEditable && (
@@ -373,11 +373,11 @@ export default function ModuleConfigModal({ module, isOpen, onClose }: ModuleCon
           {!isLinkOut && (!isEditable || !loading) && categories.map(category => {
             const categoryOptions = module.configOptions.filter(o => o.category === category);
             return (
-              <Card key={category} className="mb-4" shadow="sm">
-                <CardHeader className="pb-0 px-4 pt-3">
+              <div key={category} className="mb-5 rounded-lg border border-default-200 bg-default-50/50">
+                <div className="px-5 pt-4 pb-1">
                   <h4 className="text-sm font-semibold text-default-700">{category}</h4>
-                </CardHeader>
-                <CardBody className="gap-0 px-4 pt-2 pb-3">
+                </div>
+                <div className="px-5 pb-4">
                   {categoryOptions.map((option, idx) => {
                     // Determine the current value based on config source
                     let currentValue: boolean | number | string = option.defaultValue;
@@ -417,8 +417,8 @@ export default function ModuleConfigModal({ module, isOpen, onClose }: ModuleCon
                       </div>
                     );
                   })}
-                </CardBody>
-              </Card>
+                </div>
+              </div>
             );
           })}
 
@@ -471,17 +471,17 @@ interface ConfigOptionRowProps {
 
 function ConfigOptionRow({ option, value, onChange, disabled }: ConfigOptionRowProps) {
   return (
-    <div className="flex items-center justify-between gap-4 py-1.5">
+    <div className="flex items-start justify-between gap-6 py-2.5">
       <div className="flex-1 min-w-0">
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 flex-wrap">
           <span className="text-sm font-medium">{option.label}</span>
           {option.comingSoon && (
             <Chip size="sm" variant="flat" color="warning">Coming Soon</Chip>
           )}
         </div>
-        <p className="text-xs text-default-500 mt-0.5">{option.description}</p>
+        <p className="text-xs text-default-500 mt-1 leading-relaxed">{option.description}</p>
       </div>
-      <div className="flex-shrink-0">
+      <div className="flex-shrink-0 pt-0.5">
         {option.type === 'boolean' && (
           <Switch
             size="sm"
@@ -496,7 +496,7 @@ function ConfigOptionRow({ option, value, onChange, disabled }: ConfigOptionRowP
             type="number"
             size="sm"
             variant="bordered"
-            className="w-24"
+            className="w-28"
             value={String(value)}
             min={option.min}
             max={option.max}
@@ -509,7 +509,7 @@ function ConfigOptionRow({ option, value, onChange, disabled }: ConfigOptionRowP
           <Input
             size="sm"
             variant="bordered"
-            className="w-48"
+            className="w-56"
             value={value as string}
             isDisabled={disabled}
             onValueChange={(val) => onChange(val)}
@@ -520,7 +520,7 @@ function ConfigOptionRow({ option, value, onChange, disabled }: ConfigOptionRowP
           <Select
             size="sm"
             variant="bordered"
-            className="w-32"
+            className="w-40"
             selectedKeys={[value as string]}
             isDisabled={disabled}
             onSelectionChange={(keys) => {

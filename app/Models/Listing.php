@@ -37,6 +37,7 @@ class Listing extends Model
         'subcategory_id',
         'federated_visibility',
         'service_type',
+        'availability',
         'direct_messaging_disabled',
         'exchange_workflow_required',
         'hours_estimate',
@@ -56,6 +57,7 @@ class Listing extends Model
 
     protected $casts = [
         'sdg_goals' => 'array',
+        'availability' => 'array',
         'latitude' => 'float',
         'longitude' => 'float',
         'price' => 'decimal:2',
@@ -94,6 +96,11 @@ class Listing extends Model
     public function skillTags(): HasMany
     {
         return $this->hasMany(ListingSkillTag::class);
+    }
+
+    public function images(): HasMany
+    {
+        return $this->hasMany(ListingImage::class)->orderBy('sort_order');
     }
 
     // ---------------------------------------------------------------

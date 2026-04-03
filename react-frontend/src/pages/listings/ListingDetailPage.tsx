@@ -11,7 +11,7 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
-import { Button, Avatar, Chip, useDisclosure } from '@heroui/react';
+import { Button, Avatar, Chip, useDisclosure, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, RadioGroup, Radio, Textarea } from '@heroui/react';
 import {
   Clock,
   MapPin,
@@ -27,6 +27,11 @@ import {
   Bookmark,
   RefreshCw,
   BarChart3,
+  Flag,
+  Monitor,
+  HelpCircle,
+  ShieldCheck,
+  Star,
 } from 'lucide-react';
 import { GlassCard, ImagePlaceholder } from '@/components/ui';
 import { Breadcrumbs } from '@/components/navigation';
@@ -63,6 +68,11 @@ export function ListingDetailPage() {
   const [showComments, setShowComments] = useState(false);
   const [isRenewing, setIsRenewing] = useState(false);
   const [showAnalytics, setShowAnalytics] = useState(false);
+  const [isReported, setIsReported] = useState(false);
+  const [isReporting, setIsReporting] = useState(false);
+  const [reportReason, setReportReason] = useState<string>('');
+  const [reportDetails, setReportDetails] = useState('');
+  const { isOpen: isReportOpen, onOpen: onReportOpen, onClose: onReportClose } = useDisclosure();
 
   // AbortController ref to cancel stale requests
   const abortRef = useRef<AbortController | null>(null);
@@ -204,6 +214,36 @@ export function ListingDetailPage() {
       toastRef.current.error(tRef.current('renew_error'));
     } finally {
       setIsRenewing(false);
+    }
+  };
+
+  const handleReport = async () => {
+    if (!listing || isReporting || !reportReason) return;
+    setIsReporting(true);
+    try {
+      const payload: { reason: string; details?: string } = { reason: reportReason };
+      if (reportDetails.trim()) {
+        payload.details = reportDetails.trim();
+      }
+      const response = await api.post(`/v2/listings/${listing.id}/report`, payload);
+      if (response.success) {
+        setIsReported(true);
+        onReportClose();
+        setReportReason('');
+        setReportDetails('');
+        toastRef.current.success(tRef.current('report_success', 'Thank you for your report. Our team will review it.'));
+      } else if (response.code === 'ALREADY_REPORTED') {
+        setIsReported(true);
+        onReportClose();
+        toastRef.current.info(tRef.current('report_already', 'You have already reported this listing.'));
+      } else {
+        toastRef.current.error(tRef.current('report_error', 'Failed to submit report. Please try again.'));
+      }
+    } catch (err) {
+      logError('Failed to report listing', err);
+      toastRef.current.error(tRef.current('report_error', 'Failed to submit report. Please try again.'));
+    } finally {
+      setIsReporting(false);
     }
   };
 
@@ -374,6 +414,31 @@ export function ListingDetailPage() {
               <div className="text-theme-primary capitalize">{listing.status}</div>
             </div>
           </div>
+
+          {listing.service_type && (
+            <div className="flex items-center gap-3 text-theme-muted">
+              <div className={`p-2 rounded-lg ${
+                listing.service_type === 'remote_only' ? 'bg-blue-500/20' :
+                listing.service_type === 'hybrid' ? 'bg-teal-500/20' :
+                listing.service_type === 'physical_only' ? 'bg-emerald-500/20' :
+                'bg-gray-500/20'
+              }`} aria-hidden="true">
+                {listing.service_type === 'remote_only' && <Monitor className="w-5 h-5 text-blue-600 dark:text-blue-400" />}
+                {listing.service_type === 'hybrid' && <ArrowRightLeft className="w-5 h-5 text-teal-600 dark:text-teal-400" />}
+                {listing.service_type === 'physical_only' && <MapPin className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />}
+                {listing.service_type === 'location_dependent' && <HelpCircle className="w-5 h-5 text-gray-600 dark:text-gray-400" />}
+              </div>
+              <div>
+                <div className="text-xs text-theme-subtle">Delivery Mode</div>
+                <div className="text-theme-primary">
+                  {listing.service_type === 'physical_only' && 'In-Person Only'}
+                  {listing.service_type === 'remote_only' && 'Remote / Online'}
+                  {listing.service_type === 'hybrid' && 'In-Person or Remote'}
+                  {listing.service_type === 'location_dependent' && 'Depends on Service'}
+                </div>
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Location - Separate Row to prevent text bleeding */}
@@ -529,9 +594,62 @@ export function ListingDetailPage() {
               isAuthenticated={isAuthenticated}
               className="flex-1 sm:flex-none"
             />
+            <Button
+              variant="flat"
+              className={`flex-1 sm:flex-none ${isReported ? 'bg-orange-500/20 text-orange-500' : 'bg-theme-elevated text-theme-primary'}`}
+              startContent={<Flag className="w-4 h-4" aria-hidden="true" />}
+              onPress={onReportOpen}
+              isDisabled={isReported}
+            >
+              {isReported ? t('detail_reported', 'Reported') : t('detail_report', 'Report')}
+            </Button>
           </div>
         )}
       </GlassCard>
+
+      {/* Report Listing Modal */}
+      <Modal isOpen={isReportOpen} onClose={onReportClose} size="md">
+        <ModalContent>
+          <ModalHeader className="text-theme-primary">{t('report_title', 'Report this listing')}</ModalHeader>
+          <ModalBody>
+            <RadioGroup
+              label={t('report_reason_label', 'Why are you reporting this listing?')}
+              value={reportReason}
+              onValueChange={setReportReason}
+              classNames={{ label: 'text-theme-secondary' }}
+            >
+              <Radio value="inappropriate">{t('report_reason_inappropriate', 'Inappropriate content')}</Radio>
+              <Radio value="safety_concern">{t('report_reason_safety', 'Safety concern')}</Radio>
+              <Radio value="misleading">{t('report_reason_misleading', 'Misleading description')}</Radio>
+              <Radio value="spam">{t('report_reason_spam', 'Spam or scam')}</Radio>
+              <Radio value="not_timebank_service">{t('report_reason_not_timebank', 'Not a timebank service')}</Radio>
+              <Radio value="other">{t('report_reason_other', 'Other')}</Radio>
+            </RadioGroup>
+            <Textarea
+              label={t('report_details_label', 'Additional details')}
+              placeholder={t('report_details_placeholder', 'Tell us more (optional)')}
+              value={reportDetails}
+              onValueChange={setReportDetails}
+              maxLength={500}
+              variant="bordered"
+              classNames={{ label: 'text-theme-secondary' }}
+            />
+          </ModalBody>
+          <ModalFooter>
+            <Button variant="light" onPress={onReportClose}>
+              {t('cancel', 'Cancel')}
+            </Button>
+            <Button
+              color="danger"
+              onPress={() => void handleReport()}
+              isDisabled={!reportReason || isReporting}
+              isLoading={isReporting}
+            >
+              {t('report_submit', 'Submit Report')}
+            </Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
 
       {/* User Card */}
       {(listing.user || listing.author_name) && (() => {
@@ -557,12 +675,34 @@ export function ListingDetailPage() {
                 className="ring-2 ring-white/20 group-hover:ring-indigo-500/50 transition-all"
               />
               <div className="flex-1 min-w-0">
-                <h3 className="font-semibold text-theme-primary group-hover:text-indigo-400 transition-colors">
-                  {userName}
-                </h3>
+                <div className="flex items-center gap-2">
+                  <h3 className="font-semibold text-theme-primary group-hover:text-indigo-400 transition-colors">
+                    {userName}
+                  </h3>
+                  {listing.author_verified && (
+                    <ShieldCheck className="w-4 h-4 text-blue-500 shrink-0" aria-label="Verified member" />
+                  )}
+                </div>
                 {listing.user?.tagline && (
                   <p className="text-theme-muted text-sm truncate">{listing.user.tagline}</p>
                 )}
+                <div className="flex items-center gap-3 mt-1 flex-wrap">
+                  {listing.author_rating != null && listing.author_rating > 0 && (
+                    <span className="flex items-center gap-1 text-xs text-theme-muted">
+                      <Star className="w-3.5 h-3.5 fill-amber-500 text-amber-500" aria-hidden="true" />
+                      <span className="font-medium text-theme-primary">{listing.author_rating.toFixed(1)}</span>
+                      {listing.author_reviews_count != null && listing.author_reviews_count > 0 && (
+                        <span>({listing.author_reviews_count} {listing.author_reviews_count === 1 ? 'review' : 'reviews'})</span>
+                      )}
+                    </span>
+                  )}
+                  {listing.author_exchanges_count != null && listing.author_exchanges_count > 0 && (
+                    <span className="flex items-center gap-1 text-xs text-theme-muted">
+                      <ArrowRightLeft className="w-3.5 h-3.5" aria-hidden="true" />
+                      {listing.author_exchanges_count} {listing.author_exchanges_count === 1 ? 'exchange' : 'exchanges'} completed
+                    </span>
+                  )}
+                </div>
                 <p className="text-xs text-theme-subtle mt-1">{t('detail_view_profile')}</p>
               </div>
             </Link>
@@ -587,6 +727,44 @@ export function ListingDetailPage() {
               </span>
             ))}
           </div>
+        </GlassCard>
+      )}
+
+      {/* Member's Other Listings (Reciprocity) */}
+      {((listing.member_offers?.length ?? 0) > 0 || (listing.member_requests?.length ?? 0) > 0) && (
+        <GlassCard className="p-6">
+          <h2 className="text-lg font-semibold text-theme-primary mb-4 flex items-center gap-2">
+            <ArrowRightLeft className="w-5 h-5 text-emerald-500" aria-hidden="true" />
+            {t('detail_more_from', { name: listing.author_name || t('detail_this_member', 'this member'), defaultValue: 'More from {{name}}' })}
+          </h2>
+          {(listing.member_offers?.length ?? 0) > 0 && (
+            <div className="mb-3">
+              <h3 className="text-sm font-medium text-emerald-500 mb-2">{t('detail_also_offers', 'Also offers:')}</h3>
+              <div className="flex flex-wrap gap-2">
+                {listing.member_offers!.map((l) => (
+                  <Link key={l.id} to={tenantPath(`/listings/${l.id}`)}>
+                    <Chip variant="flat" className="bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 cursor-pointer hover:bg-emerald-500/20">
+                      {l.title}
+                    </Chip>
+                  </Link>
+                ))}
+              </div>
+            </div>
+          )}
+          {(listing.member_requests?.length ?? 0) > 0 && (
+            <div>
+              <h3 className="text-sm font-medium text-amber-500 mb-2">{t('detail_looking_for', 'Looking for:')}</h3>
+              <div className="flex flex-wrap gap-2">
+                {listing.member_requests!.map((l) => (
+                  <Link key={l.id} to={tenantPath(`/listings/${l.id}`)}>
+                    <Chip variant="flat" className="bg-amber-500/10 text-amber-600 dark:text-amber-400 cursor-pointer hover:bg-amber-500/20">
+                      {l.title}
+                    </Chip>
+                  </Link>
+                ))}
+              </div>
+            </div>
+          )}
         </GlassCard>
       )}
 

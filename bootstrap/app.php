@@ -64,6 +64,11 @@ $app = Application::configure(basePath: dirname(__DIR__))
             ->everyMinute()
             ->name('feed:publish-scheduled-posts')
             ->withoutOverlapping(5);
+
+        $schedule->command('listings:process-search-alerts')
+            ->hourly()
+            ->withoutOverlapping()
+            ->name('listings-process-search-alerts');
     })
     ->withRouting(
         // Routes loaded by RouteServiceProvider (no /api prefix).
