@@ -23,9 +23,16 @@ import {
   MapPin,
   Tag,
   Clock,
+  Calendar,
   Heart,
   AlertTriangle,
   RefreshCw,
+  Monitor,
+  ArrowRightLeft,
+  ShieldCheck,
+  Star,
+  SlidersHorizontal,
+  X,
 } from 'lucide-react';
 import { GlassCard, AlgorithmLabel, ListingSkeleton, ImagePlaceholder } from '@/components/ui';
 import { FeaturedBadge } from '@/components/listings/FeaturedBadge';
@@ -62,6 +69,20 @@ export function ListingsPage() {
   const [hasMore, setHasMore] = useState(false);
   const [nearMeEnabled, setNearMeEnabled] = useState(false);
   const [radiusKm, setRadiusKm] = useState(25);
+  const [hoursRange, setHoursRange] = useState('any');
+  const [serviceMode, setServiceMode] = useState('any');
+  const [postedWithin, setPostedWithin] = useState('any');
+  const [showAdvancedFilters, setShowAdvancedFilters] = useState(false);
+
+  // Count of active advanced filters (shown as badge on the toggle button)
+  const activeFilterCount = useMemo(() => {
+    let count = 0;
+    if (hoursRange !== 'any') count++;
+    if (serviceMode !== 'any') count++;
+    if (postedWithin !== 'any') count++;
+    if (nearMeEnabled) count++;
+    return count;
+  }, [hoursRange, serviceMode, postedWithin, nearMeEnabled]);
 
   // Use a ref for cursor to avoid infinite re-render loop (same pattern as FeedPage)
   const cursorRef = useRef<string | null>(null);
@@ -96,6 +117,25 @@ export function ListingsPage() {
       if (selectedCategory) params.set('category', selectedCategory);
       if (!reset && cursorRef.current) params.set('cursor', cursorRef.current);
       params.set('per_page', '20');
+
+      // Faceted filters
+      if (hoursRange !== 'any') {
+        const hoursMap: Record<string, { min?: string; max?: string }> = {
+          'quick': { max: '1' },
+          'short': { min: '1', max: '3' },
+          'half_day': { min: '3', max: '6' },
+          'full_day': { min: '6' },
+        };
+        const range = hoursMap[hoursRange];
+        if (range?.min) params.set('min_hours', range.min);
+        if (range?.max) params.set('max_hours', range.max);
+      }
+      if (serviceMode !== 'any') {
+        params.set('service_type', serviceMode === 'remote' ? 'remote_only,hybrid' : 'physical_only');
+      }
+      if (postedWithin !== 'any') {
+        params.set('posted_within', postedWithin);
+      }
 
       let endpoint = '/v2/listings';
       if (nearMeEnabled && user?.latitude != null && user?.longitude != null) {
@@ -139,7 +179,7 @@ export function ListingsPage() {
         setIsLoading(false);
       }
     }
-  }, [searchQuery, selectedType, selectedCategory, nearMeEnabled, user?.latitude, user?.longitude, radiusKm]);
+  }, [searchQuery, selectedType, selectedCategory, nearMeEnabled, user?.latitude, user?.longitude, radiusKm, hoursRange, serviceMode, postedWithin]);
 
   // Keep a ref so effects always call the latest version without depending on it
   const loadListingsRef = useRef(loadListings);
@@ -165,7 +205,7 @@ export function ListingsPage() {
   useEffect(() => {
     loadListingsRef.current(true);
     return () => { abortRef.current?.abort(); };
-  }, [searchQuery, selectedType, selectedCategory, nearMeEnabled, user?.latitude, user?.longitude, radiusKm]);
+  }, [searchQuery, selectedType, selectedCategory, nearMeEnabled, user?.latitude, user?.longitude, radiusKm, hoursRange, serviceMode, postedWithin]);
 
   // Sync URL params with filter state (harmless if it re-runs)
   useEffect(() => {
@@ -264,8 +304,9 @@ export function ListingsPage() {
 
       {/* Filters */}
       <GlassCard className="p-4">
+        {/* Row 1: Search + primary filters */}
         <form onSubmit={handleSearch} className="flex flex-col lg:flex-row gap-4">
-          <div className="flex-1">
+          <div className="flex-1 min-w-0">
             <Input
               placeholder={t('search_placeholder')}
               value={searchQuery}
@@ -279,7 +320,7 @@ export function ListingsPage() {
             />
           </div>
 
-          <div className="flex flex-col sm:flex-row flex-wrap gap-3">
+          <div className="flex flex-col sm:flex-row flex-wrap gap-3 items-stretch sm:items-center">
             <Select
               aria-label={t('filter_type_label')}
               placeholder={t('filter_type_label')}
@@ -319,40 +360,24 @@ export function ListingsPage() {
               {(cat) => <SelectItem key={cat.slug}>{cat.name}</SelectItem>}
             </Select>
 
+            {/* Filters toggle */}
             <Button
-              variant={nearMeEnabled ? 'solid' : 'flat'}
-              className={nearMeEnabled
+              variant={showAdvancedFilters ? 'solid' : 'flat'}
+              className={showAdvancedFilters
                 ? 'bg-primary text-white min-h-[40px]'
                 : 'bg-theme-elevated text-theme-primary min-h-[40px]'}
-              startContent={<MapPin className="w-4 h-4" aria-hidden="true" />}
-              onPress={handleNearMeToggle}
-              aria-pressed={nearMeEnabled}
-              aria-label={t('near_me', 'Near me')}
+              startContent={<SlidersHorizontal className="w-4 h-4" aria-hidden="true" />}
+              onPress={() => setShowAdvancedFilters((prev) => !prev)}
+              aria-expanded={showAdvancedFilters}
+              aria-label={t('more_filters', 'More filters')}
             >
-              {t('near_me', 'Near me')}
+              {t('filters_label', 'Filters')}
+              {activeFilterCount > 0 && (
+                <span className="ml-1 inline-flex items-center justify-center w-5 h-5 rounded-full bg-white/20 text-xs font-bold">
+                  {activeFilterCount}
+                </span>
+              )}
             </Button>
-
-            {nearMeEnabled && (
-              <Select
-                aria-label={t('radius_label', 'Radius')}
-                selectedKeys={[String(radiusKm)]}
-                onSelectionChange={(keys) => {
-                  const val = keys instanceof Set ? ([...keys][0] as string) : '25';
-                  setRadiusKm(Number(val) || 25);
-                }}
-                className="w-full sm:w-32"
-                classNames={{
-                  trigger: 'bg-theme-elevated border-theme-default hover:bg-theme-hover',
-                  value: 'text-theme-primary',
-                }}
-              >
-                <SelectItem key="5">5 km</SelectItem>
-                <SelectItem key="10">10 km</SelectItem>
-                <SelectItem key="25">25 km</SelectItem>
-                <SelectItem key="50">50 km</SelectItem>
-                <SelectItem key="100">100 km</SelectItem>
-              </Select>
-            )}
 
             <div className="flex rounded-lg overflow-hidden border border-theme-default" role="group" aria-label={t('aria.view_mode', 'View mode')}>
               <Button
@@ -390,6 +415,123 @@ export function ListingsPage() {
             </div>
           </div>
         </form>
+
+        {/* Row 2: Advanced filters (toggled) */}
+        {showAdvancedFilters && (
+          <div className="flex flex-col sm:flex-row flex-wrap gap-3 mt-3 pt-3 border-t border-theme-default">
+            <Select
+              aria-label={t('filter_hours', 'Duration')}
+              selectedKeys={[hoursRange]}
+              onSelectionChange={(keys) => {
+                const val = keys instanceof Set ? ([...keys][0] as string) : 'any';
+                setHoursRange(val || 'any');
+              }}
+              className="w-full sm:w-40"
+              classNames={{
+                trigger: 'bg-theme-elevated border-theme-default hover:bg-theme-hover',
+                value: 'text-theme-primary',
+              }}
+              startContent={<Clock className="w-4 h-4 text-theme-subtle" />}
+            >
+              <SelectItem key="any">{t('filter_any_duration', 'Any duration')}</SelectItem>
+              <SelectItem key="quick">{t('filter_quick', 'Quick (under 1h)')}</SelectItem>
+              <SelectItem key="short">{t('filter_short', 'Short (1-3h)')}</SelectItem>
+              <SelectItem key="half_day">{t('filter_half_day', 'Half day (3-6h)')}</SelectItem>
+              <SelectItem key="full_day">{t('filter_full_day', 'Full day (6h+)')}</SelectItem>
+            </Select>
+
+            <Select
+              aria-label={t('filter_service_mode', 'Service mode')}
+              selectedKeys={[serviceMode]}
+              onSelectionChange={(keys) => {
+                const val = keys instanceof Set ? ([...keys][0] as string) : 'any';
+                setServiceMode(val || 'any');
+              }}
+              className="w-full sm:w-44"
+              classNames={{
+                trigger: 'bg-theme-elevated border-theme-default hover:bg-theme-hover',
+                value: 'text-theme-primary',
+              }}
+              startContent={<MapIcon className="w-4 h-4 text-theme-subtle" />}
+            >
+              <SelectItem key="any">{t('filter_any_mode', 'Any mode')}</SelectItem>
+              <SelectItem key="remote">{t('filter_remote', 'Remote available')}</SelectItem>
+              <SelectItem key="in_person">{t('filter_in_person', 'In-person only')}</SelectItem>
+            </Select>
+
+            <Select
+              aria-label={t('filter_posted_date', 'Posted date')}
+              selectedKeys={[postedWithin]}
+              onSelectionChange={(keys) => {
+                const val = keys instanceof Set ? ([...keys][0] as string) : 'any';
+                setPostedWithin(val || 'any');
+              }}
+              className="w-full sm:w-36"
+              classNames={{
+                trigger: 'bg-theme-elevated border-theme-default hover:bg-theme-hover',
+                value: 'text-theme-primary',
+              }}
+              startContent={<Calendar className="w-4 h-4 text-theme-subtle" />}
+            >
+              <SelectItem key="any">{t('filter_any_time', 'Any time')}</SelectItem>
+              <SelectItem key="1">{t('filter_today', 'Today')}</SelectItem>
+              <SelectItem key="7">{t('filter_this_week', 'This week')}</SelectItem>
+              <SelectItem key="30">{t('filter_this_month', 'This month')}</SelectItem>
+            </Select>
+
+            <Button
+              variant={nearMeEnabled ? 'solid' : 'flat'}
+              className={nearMeEnabled
+                ? 'bg-primary text-white min-h-[40px]'
+                : 'bg-theme-elevated text-theme-primary min-h-[40px]'}
+              startContent={<MapPin className="w-4 h-4" aria-hidden="true" />}
+              onPress={handleNearMeToggle}
+              aria-pressed={nearMeEnabled}
+              aria-label={t('near_me', 'Near me')}
+            >
+              {t('near_me', 'Near me')}
+            </Button>
+
+            {nearMeEnabled && (
+              <Select
+                aria-label={t('radius_label', 'Radius')}
+                selectedKeys={[String(radiusKm)]}
+                onSelectionChange={(keys) => {
+                  const val = keys instanceof Set ? ([...keys][0] as string) : '25';
+                  setRadiusKm(Number(val) || 25);
+                }}
+                className="w-full sm:w-32"
+                classNames={{
+                  trigger: 'bg-theme-elevated border-theme-default hover:bg-theme-hover',
+                  value: 'text-theme-primary',
+                }}
+              >
+                <SelectItem key="5">5 km</SelectItem>
+                <SelectItem key="10">10 km</SelectItem>
+                <SelectItem key="25">25 km</SelectItem>
+                <SelectItem key="50">50 km</SelectItem>
+                <SelectItem key="100">100 km</SelectItem>
+              </Select>
+            )}
+
+            {activeFilterCount > 0 && (
+              <Button
+                variant="light"
+                className="text-theme-muted hover:text-theme-primary min-h-[40px]"
+                startContent={<X className="w-4 h-4" aria-hidden="true" />}
+                onPress={() => {
+                  setHoursRange('any');
+                  setServiceMode('any');
+                  setPostedWithin('any');
+                  setNearMeEnabled(false);
+                }}
+                aria-label={t('clear_filters', 'Clear filters')}
+              >
+                {t('clear_filters', 'Clear filters')}
+              </Button>
+            )}
+          </div>
+        )}
       </GlassCard>
 
       {/* Listings Grid/List */}
@@ -628,6 +770,18 @@ const ListingCard = memo(function ListingCard({ listing, viewMode, isSaving, onT
             {listing.type === 'offer' ? t('offering') : t('requesting')}
           </span>
           {listing.is_featured && <FeaturedBadge />}
+          {listing.service_type === 'remote_only' && (
+            <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-blue-500/20 text-blue-600 dark:text-blue-400 font-medium flex items-center gap-0.5">
+              <Monitor className="w-2.5 h-2.5" aria-hidden="true" />
+              Remote
+            </span>
+          )}
+          {listing.service_type === 'hybrid' && (
+            <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-teal-500/20 text-teal-600 dark:text-teal-400 font-medium flex items-center gap-0.5">
+              <ArrowRightLeft className="w-2.5 h-2.5" aria-hidden="true" />
+              Remote Available
+            </span>
+          )}
           {listing.category_name && (
             <span className="text-xs px-2 py-1 rounded-full bg-theme-hover text-theme-muted">
               {listing.category_name}
@@ -665,6 +819,15 @@ const ListingCard = memo(function ListingCard({ listing, viewMode, isSaving, onT
               className="shrink-0 w-6 h-6"
             />
             <span className="text-sm text-theme-subtle truncate">{listing.author_name}</span>
+            {listing.author_verified && (
+              <ShieldCheck className="w-3.5 h-3.5 text-blue-500 shrink-0" aria-label="Verified member" />
+            )}
+            {listing.author_rating != null && listing.author_rating > 0 && (
+              <span className="flex items-center gap-0.5 text-[11px] text-amber-500 shrink-0">
+                <Star className="w-3 h-3 fill-amber-500" aria-hidden="true" />
+                {listing.author_rating.toFixed(1)}
+              </span>
+            )}
           </div>
           <div className="flex items-center gap-2 text-xs text-theme-subtle min-w-0 overflow-hidden">
             {hours && (
