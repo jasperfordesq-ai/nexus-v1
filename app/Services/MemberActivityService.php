@@ -80,11 +80,9 @@ class MemberActivityService
         $txns = Transaction::query()
             ->where(fn (Builder $q) => $q->where('sender_id', $userId)->orWhere('receiver_id', $userId))
             ->where('status', 'completed')
-            ->select(
-                'id',
-                DB::raw("CASE WHEN sender_id = {$userId} THEN 'gave_hours' ELSE 'received_hours' END as activity_type"),
-                DB::raw("CONCAT(amount, ' hour(s)') as description"),
-                'created_at'
+            ->selectRaw(
+                "id, CASE WHEN sender_id = ? THEN 'gave_hours' ELSE 'received_hours' END as activity_type, CONCAT(amount, ' hour(s)') as description, created_at",
+                [$userId]
             )
             ->orderByDesc('created_at')
             ->limit($limit)
@@ -121,17 +119,18 @@ class MemberActivityService
             ->leftJoin('users as r', 'transactions.receiver_id', '=', 'r.id')
             ->where(fn (Builder $q) => $q->where('transactions.sender_id', $userId)->orWhere('transactions.receiver_id', $userId))
             ->where('transactions.status', 'completed')
-            ->select(
-                'transactions.id',
-                DB::raw("CASE WHEN transactions.sender_id = {$userId} THEN 'gave_hours' ELSE 'received_hours' END as activity_type"),
-                DB::raw("CONCAT(
-                    CASE WHEN transactions.sender_id = {$userId} THEN 'Gave ' ELSE 'Received ' END,
-                    transactions.amount, ' hour(s)',
-                    CASE WHEN transactions.sender_id = {$userId} THEN CONCAT(' to ', COALESCE(r.first_name, ''), ' ', COALESCE(r.last_name, ''))
-                         ELSE CONCAT(' from ', COALESCE(s.first_name, ''), ' ', COALESCE(s.last_name, ''))
-                    END
-                ) as description"),
-                'transactions.created_at'
+            ->selectRaw(
+                "transactions.id,
+                 CASE WHEN transactions.sender_id = ? THEN 'gave_hours' ELSE 'received_hours' END as activity_type,
+                 CONCAT(
+                     CASE WHEN transactions.sender_id = ? THEN 'Gave ' ELSE 'Received ' END,
+                     transactions.amount, ' hour(s)',
+                     CASE WHEN transactions.sender_id = ? THEN CONCAT(' to ', COALESCE(r.first_name, ''), ' ', COALESCE(r.last_name, ''))
+                          ELSE CONCAT(' from ', COALESCE(s.first_name, ''), ' ', COALESCE(s.last_name, ''))
+                     END
+                 ) as description,
+                 transactions.created_at",
+                [$userId, $userId, $userId]
             )
             ->orderByDesc('transactions.created_at')
             ->limit($limit)
@@ -158,15 +157,16 @@ class MemberActivityService
                 ->leftJoin('users as u2', 'connections.receiver_id', '=', 'u2.id')
                 ->where(fn (Builder $q) => $q->where('connections.requester_id', $userId)->orWhere('connections.receiver_id', $userId))
                 ->where('connections.status', 'accepted')
-                ->select(
-                    'connections.id',
-                    DB::raw("'connection' as activity_type"),
-                    DB::raw("CONCAT('Connected with ',
-                        CASE WHEN connections.requester_id = {$userId} THEN CONCAT(u2.first_name, ' ', u2.last_name)
-                             ELSE CONCAT(u1.first_name, ' ', u1.last_name)
-                        END
-                    ) as description"),
-                    'connections.updated_at as created_at'
+                ->selectRaw(
+                    "connections.id,
+                     'connection' as activity_type,
+                     CONCAT('Connected with ',
+                         CASE WHEN connections.requester_id = ? THEN CONCAT(u2.first_name, ' ', u2.last_name)
+                              ELSE CONCAT(u1.first_name, ' ', u1.last_name)
+                         END
+                     ) as description,
+                     connections.updated_at as created_at",
+                    [$userId]
                 )
                 ->orderByDesc('connections.updated_at')
                 ->limit($limit)
@@ -269,12 +269,10 @@ class MemberActivityService
             $skills = DB::table('user_skills as us')
                 ->where('us.user_id', $userId)
                 ->where('us.tenant_id', $tenantId)
-                ->select(
-                    'us.skill_name',
-                    'us.is_offering',
-                    'us.is_requesting',
-                    'us.proficiency',
-                    DB::raw("(SELECT COUNT(*) FROM skill_endorsements se WHERE se.endorsed_id = {$userId} AND se.skill_name = us.skill_name AND se.tenant_id = {$tenantId}) as endorsements")
+                ->select(['us.skill_name', 'us.is_offering', 'us.is_requesting', 'us.proficiency'])
+                ->selectRaw(
+                    "(SELECT COUNT(*) FROM skill_endorsements se WHERE se.endorsed_id = ? AND se.skill_name = us.skill_name AND se.tenant_id = ?) as endorsements",
+                    [$userId, $tenantId]
                 )
                 ->orderBy('us.skill_name')
                 ->get()

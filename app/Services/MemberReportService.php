@@ -35,13 +35,13 @@ class MemberReportService
             ->where('u.tenant_id', $tenantId)
             ->where('u.status', 'active')
             ->where('u.last_login_at', '>=', $cutoff)
-            ->select([
-                'u.id', 'u.first_name', 'u.last_name', 'u.email', 'u.last_login_at',
-                'u.created_at', 'u.avatar_url',
-                DB::raw("(SELECT COUNT(*) FROM transactions t WHERE (t.sender_id = u.id OR t.receiver_id = u.id) AND t.tenant_id = {$tenantId} AND t.status = 'completed') as transaction_count"),
-                DB::raw("(SELECT COALESCE(SUM(t.amount), 0) FROM transactions t WHERE t.sender_id = u.id AND t.tenant_id = {$tenantId} AND t.status = 'completed') as hours_given"),
-                DB::raw("(SELECT COALESCE(SUM(t.amount), 0) FROM transactions t WHERE t.receiver_id = u.id AND t.tenant_id = {$tenantId} AND t.status = 'completed') as hours_received"),
-            ])
+            ->select(['u.id', 'u.first_name', 'u.last_name', 'u.email', 'u.last_login_at', 'u.created_at', 'u.avatar_url'])
+            ->selectRaw(
+                "(SELECT COUNT(*) FROM transactions t WHERE (t.sender_id = u.id OR t.receiver_id = u.id) AND t.tenant_id = ? AND t.status = 'completed') as transaction_count,
+                 (SELECT COALESCE(SUM(t.amount), 0) FROM transactions t WHERE t.sender_id = u.id AND t.tenant_id = ? AND t.status = 'completed') as hours_given,
+                 (SELECT COALESCE(SUM(t.amount), 0) FROM transactions t WHERE t.receiver_id = u.id AND t.tenant_id = ? AND t.status = 'completed') as hours_received",
+                [$tenantId, $tenantId, $tenantId]
+            )
             ->orderByDesc('u.last_login_at')
             ->limit($limit)
             ->offset($offset)
@@ -186,11 +186,14 @@ class MemberReportService
             ->where('last_login_at', '>=', $cutoff)
             ->count();
 
-        $traders = (int) DB::table(DB::raw(
-            "(SELECT sender_id as user_id FROM transactions WHERE tenant_id = {$tenantId} AND created_at >= '{$cutoff}' AND status = 'completed'
-              UNION
-              SELECT receiver_id as user_id FROM transactions WHERE tenant_id = {$tenantId} AND created_at >= '{$cutoff}' AND status = 'completed') t"
-        ))->distinct()->count('user_id');
+        $traders = (int) DB::selectOne(
+            "SELECT COUNT(DISTINCT user_id) as cnt FROM (
+                SELECT sender_id as user_id FROM transactions WHERE tenant_id = ? AND created_at >= ? AND status = 'completed'
+                UNION
+                SELECT receiver_id as user_id FROM transactions WHERE tenant_id = ? AND created_at >= ? AND status = 'completed'
+            ) t",
+            [$tenantId, $cutoff, $tenantId, $cutoff]
+        )->cnt;
 
         $posts = 0;
         try {
@@ -251,12 +254,13 @@ class MemberReportService
         $rows = DB::table('users as u')
             ->where('u.tenant_id', $tenantId)
             ->where('u.status', 'active')
-            ->select([
-                'u.id', 'u.first_name', 'u.last_name', 'u.avatar_url',
-                DB::raw("COALESCE((SELECT SUM(t.amount) FROM transactions t WHERE t.sender_id = u.id AND t.tenant_id = {$tenantId} AND t.status = 'completed' AND t.created_at >= '{$cutoff}'), 0) as hours_given"),
-                DB::raw("COALESCE((SELECT SUM(t.amount) FROM transactions t WHERE t.receiver_id = u.id AND t.tenant_id = {$tenantId} AND t.status = 'completed' AND t.created_at >= '{$cutoff}'), 0) as hours_received"),
-                DB::raw("COALESCE((SELECT COUNT(*) FROM transactions t WHERE (t.sender_id = u.id OR t.receiver_id = u.id) AND t.tenant_id = {$tenantId} AND t.status = 'completed' AND t.created_at >= '{$cutoff}'), 0) as transaction_count"),
-            ])
+            ->select(['u.id', 'u.first_name', 'u.last_name', 'u.avatar_url'])
+            ->selectRaw(
+                "COALESCE((SELECT SUM(t.amount) FROM transactions t WHERE t.sender_id = u.id AND t.tenant_id = ? AND t.status = 'completed' AND t.created_at >= ?), 0) as hours_given,
+                 COALESCE((SELECT SUM(t.amount) FROM transactions t WHERE t.receiver_id = u.id AND t.tenant_id = ? AND t.status = 'completed' AND t.created_at >= ?), 0) as hours_received,
+                 COALESCE((SELECT COUNT(*) FROM transactions t WHERE (t.sender_id = u.id OR t.receiver_id = u.id) AND t.tenant_id = ? AND t.status = 'completed' AND t.created_at >= ?), 0) as transaction_count",
+                [$tenantId, $cutoff, $tenantId, $cutoff, $tenantId, $cutoff]
+            )
             ->havingRaw('(hours_given + hours_received) > 0')
             ->orderByRaw('(hours_given + hours_received) DESC')
             ->limit($limit)

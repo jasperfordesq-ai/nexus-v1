@@ -28,14 +28,13 @@ class InactiveMemberService
         $users = DB::table('users as u')
             ->where('u.tenant_id', $tenantId)
             ->where('u.status', 'active')
-            ->select([
-                'u.id as user_id',
-                'u.last_login_at',
-                'u.created_at as member_since',
-                DB::raw("(SELECT MAX(t.created_at) FROM transactions t WHERE (t.sender_id = u.id OR t.receiver_id = u.id) AND t.tenant_id = {$tenantId} AND t.status = 'completed') as last_transaction_at"),
-                DB::raw("(SELECT MAX(fp.created_at) FROM feed_posts fp WHERE fp.user_id = u.id AND fp.tenant_id = {$tenantId}) as last_post_at"),
-                DB::raw("(SELECT MAX(er.created_at) FROM event_rsvps er WHERE er.user_id = u.id AND er.tenant_id = {$tenantId} AND er.status = 'going') as last_event_at"),
-            ])
+            ->select(['u.id as user_id', 'u.last_login_at', 'u.created_at as member_since'])
+            ->selectRaw(
+                "(SELECT MAX(t.created_at) FROM transactions t WHERE (t.sender_id = u.id OR t.receiver_id = u.id) AND t.tenant_id = ? AND t.status = 'completed') as last_transaction_at,
+                 (SELECT MAX(fp.created_at) FROM feed_posts fp WHERE fp.user_id = u.id AND fp.tenant_id = ?) as last_post_at,
+                 (SELECT MAX(er.created_at) FROM event_rsvps er WHERE er.user_id = u.id AND er.tenant_id = ? AND er.status = 'going') as last_event_at",
+                [$tenantId, $tenantId, $tenantId]
+            )
             ->get();
 
         $flagged = 0;

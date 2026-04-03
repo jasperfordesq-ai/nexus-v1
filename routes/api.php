@@ -1099,6 +1099,9 @@ Route::get('/v2/admin/federation/partnerships/{id}/stats', [\App\Http\Controller
 Route::get('/v2/admin/federation/directory', [\App\Http\Controllers\Api\AdminFederationController::class, 'directory']);
 Route::get('/v2/admin/federation/directory/profile', [\App\Http\Controllers\Api\AdminFederationController::class, 'profile']);
 Route::put('/v2/admin/federation/directory/profile', [\App\Http\Controllers\Api\AdminFederationController::class, 'updateProfile']);
+Route::get('/v2/admin/federation/topics', [\App\Http\Controllers\Api\AdminFederationController::class, 'topics']);
+Route::get('/v2/admin/federation/topics/mine', [\App\Http\Controllers\Api\AdminFederationController::class, 'myTopics']);
+Route::put('/v2/admin/federation/topics/mine', [\App\Http\Controllers\Api\AdminFederationController::class, 'updateMyTopics']);
 Route::get('/v2/admin/federation/analytics', [\App\Http\Controllers\Api\AdminFederationController::class, 'analytics']);
 Route::get('/v2/admin/federation/activity', [\App\Http\Controllers\Api\AdminFederationController::class, 'activityFeed']);
 Route::get('/v2/admin/federation/api-keys', [\App\Http\Controllers\Api\AdminFederationController::class, 'apiKeys']);
@@ -1365,8 +1368,8 @@ Route::post('/auth/revoke-all', [\App\Http\Controllers\Api\AuthController::class
 Route::post('/auth/admin-session', [\App\Http\Controllers\Api\AuthController::class, 'adminSession']);
 Route::get('/auth/admin-session', [\App\Http\Controllers\Api\AuthController::class, 'adminSession']);
 Route::get('/v2/auth/verification-status', [\App\Http\Controllers\Api\RegistrationPolicyController::class, 'getVerificationStatus']);
-Route::post('/v2/auth/start-verification', [\App\Http\Controllers\Api\RegistrationPolicyController::class, 'startVerification']);
-Route::post('/v2/auth/validate-invite', [\App\Http\Controllers\Api\RegistrationPolicyController::class, 'validateInviteCode']);
+Route::post('/v2/auth/start-verification', [\App\Http\Controllers\Api\RegistrationPolicyController::class, 'startVerification'])->middleware('throttle:10,1');
+Route::post('/v2/auth/validate-invite', [\App\Http\Controllers\Api\RegistrationPolicyController::class, 'validateInviteCode'])->middleware('throttle:10,1');
 Route::get('/v2/auth/registration-info', [\App\Http\Controllers\Api\RegistrationPolicyController::class, 'getRegistrationInfo']);
 // NOTE: identity webhook route moved to public webhook section (below auth group)
 // NOTE: /docs, /auth/forgot-password, /auth/reset-password, /auth/verify-email,
