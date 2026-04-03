@@ -77,10 +77,38 @@ class GroupQAService
         }
 
         return [
-            'items' => array_map(fn ($q) => (array) $q, $questions),
+            'items' => array_map(fn ($q) => self::formatQuestion((array) $q), $questions),
             'cursor' => $nextCursor,
             'has_more' => $hasMore,
         ];
+    }
+
+    /**
+     * Format a question row into the expected API response shape.
+     */
+    private static function formatQuestion(array $q): array
+    {
+        $q['author'] = [
+            'id' => (int) ($q['author_id'] ?? 0),
+            'name' => $q['author_name'] ?? 'Unknown',
+            'avatar' => $q['author_avatar'] ?? null,
+        ];
+        $q['has_accepted_answer'] = !empty($q['accepted_answer_id']);
+        $q['user_vote'] = 0; // Default — enriched per-request if needed
+        unset($q['author_id'], $q['author_name'], $q['author_avatar']);
+        return $q;
+    }
+
+    private static function formatAnswer(array $a): array
+    {
+        $a['author'] = [
+            'id' => (int) ($a['author_id'] ?? 0),
+            'name' => $a['author_name'] ?? 'Unknown',
+            'avatar' => $a['author_avatar'] ?? null,
+        ];
+        $a['user_vote'] = 0;
+        unset($a['author_id'], $a['author_name'], $a['author_avatar']);
+        return $a;
     }
 
     /**
@@ -94,7 +122,7 @@ class GroupQAService
             ->join('users as u', 'gq.user_id', '=', 'u.id')
             ->where('gq.id', $questionId)
             ->where('gq.tenant_id', $tenantId)
-            ->select('gq.*', 'u.name as author_name', 'u.avatar_url as author_avatar')
+            ->select('gq.*', 'u.id as author_id', 'u.name as author_name', 'u.avatar_url as author_avatar')
             ->first();
 
         if (!$question) return null;
@@ -106,15 +134,15 @@ class GroupQAService
             ->join('users as u', 'ga.user_id', '=', 'u.id')
             ->where('ga.question_id', $questionId)
             ->where('ga.tenant_id', $tenantId)
-            ->select('ga.*', 'u.name as author_name', 'u.avatar_url as author_avatar')
+            ->select('ga.*', 'u.id as author_id', 'u.name as author_name', 'u.avatar_url as author_avatar')
             ->orderByDesc('ga.is_accepted')
             ->orderByDesc('ga.vote_count')
             ->orderBy('ga.created_at')
             ->get()
-            ->map(fn ($row) => (array) $row)
+            ->map(fn ($row) => self::formatAnswer((array) $row))
             ->toArray();
 
-        $result = (array) $question;
+        $result = self::formatQuestion((array) $question);
         $result['answers'] = $answers;
         return $result;
     }
@@ -267,8 +295,9 @@ class GroupQAService
             return false;
         }
 
-        // Check existing vote
+        // Check existing vote (tenant-scoped)
         $existing = DB::table('group_qa_votes')
+            ->where('tenant_id', $tenantId)
             ->where('user_id', $userId)
             ->where('votable_type', $type)
             ->where('votable_id', $targetId)

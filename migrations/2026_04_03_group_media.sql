@@ -6,7 +6,7 @@ CREATE TABLE IF NOT EXISTS group_media (
     id INT AUTO_INCREMENT PRIMARY KEY,
     tenant_id INT NOT NULL,
     group_id INT NOT NULL,
-    user_id INT NOT NULL,
+    uploaded_by INT NOT NULL,
     media_type ENUM('image', 'video') NOT NULL DEFAULT 'image',
     file_path VARCHAR(500) NULL,
     url VARCHAR(500) NULL COMMENT 'External URL for video embeds',

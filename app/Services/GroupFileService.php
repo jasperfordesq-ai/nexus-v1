@@ -163,6 +163,11 @@ class GroupFileService
             'created_at' => now(),
         ]);
 
+        // Fire integrations
+        try { GroupWebhookService::fire($groupId, GroupWebhookService::EVENT_FILE_UPLOADED, ['file_id' => $id, 'file_name' => $originalName]); } catch (\Throwable $e) {}
+        try { GroupAuditService::log('file_uploaded', $groupId, $userId, ['file_id' => $id, 'file_name' => $originalName]); } catch (\Throwable $e) {}
+        try { GroupChallengeService::incrementProgress($groupId, 'files'); } catch (\Throwable $e) {}
+
         return [
             'id' => $id,
             'file_name' => $originalName,

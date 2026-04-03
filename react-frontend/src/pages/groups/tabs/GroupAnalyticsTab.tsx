@@ -144,7 +144,18 @@ export function GroupAnalyticsTab({ groupId, isAdmin }: GroupAnalyticsTabProps) 
     try {
       const res = await api.get(`/v2/groups/${groupId}/analytics?days=${days}`);
       if (res.success && res.data) {
-        setData(res.data as AnalyticsDashboard);
+        // Map backend field names to frontend interface
+        const raw = res.data as Record<string, unknown>;
+        const mapped: AnalyticsDashboard = {
+          kpi: (raw.overview ?? raw.kpi ?? {}) as KpiData,
+          growth: (raw.member_growth ?? raw.growth ?? []) as GrowthPoint[],
+          engagement: (raw.engagement ?? { timeline: [], summary: {} }) as EngagementData,
+          top_contributors: (raw.top_contributors ?? []) as Contributor[],
+          activity_breakdown: (raw.activity_breakdown ?? raw.activity ?? {}) as ActivityBreakdown,
+          retention: (raw.retention ?? []) as RetentionCohort[],
+          comparative: (raw.comparative ?? {}) as ComparativeStats,
+        };
+        setData(mapped);
       }
     } catch (err) {
       logError('GroupAnalyticsTab.loadAnalytics', err);
@@ -289,7 +300,7 @@ export function GroupAnalyticsTab({ groupId, isAdmin }: GroupAnalyticsTabProps) 
             <div>
               <p className="text-xs text-theme-subtle">{t('analytics.participation_rate', 'Participation Rate')}</p>
               <p className="text-xl font-bold text-theme-primary">
-                {loading ? <Spinner size="sm" /> : `${((kpi?.participation_rate ?? 0) * 100).toFixed(1)}%`}
+                {loading ? <Spinner size="sm" /> : `${(kpi?.participation_rate ?? 0).toFixed(1)}%`}
               </p>
             </div>
           </div>
@@ -345,7 +356,7 @@ export function GroupAnalyticsTab({ groupId, isAdmin }: GroupAnalyticsTabProps) 
                 <Tooltip contentStyle={tooltipStyle} labelStyle={{ fontWeight: 600 }} />
                 <Line
                   type="monotone"
-                  dataKey="members"
+                  dataKey="total_members"
                   name={t('analytics.chart_total_members', 'Total Members')}
                   stroke={CHART_COLOR_MAP.primary}
                   strokeWidth={2}

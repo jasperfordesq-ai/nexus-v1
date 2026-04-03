@@ -166,11 +166,17 @@ class GroupQAController extends BaseApiController
         if ($targetId <= 0) {
             return $this->errorResponse('A valid target_id is required', 422);
         }
-        if (!in_array($vote, ['up', 'down'], true)) {
-            return $this->errorResponse('Vote must be "up" or "down"', 422);
+        // Accept both 'up'/'down' strings and 1/-1 integers
+        $voteValue = match ($vote) {
+            'up', '1', 1 => 1,
+            'down', '-1', -1 => -1,
+            default => null,
+        };
+        if ($voteValue === null) {
+            return $this->errorResponse('Vote must be "up"/"down" or 1/-1', 422);
         }
 
-        $result = $this->qaService->vote($userId, $type, $targetId, $vote);
+        $result = $this->qaService->vote($userId, $type, $targetId, $voteValue);
 
         if ($result === null) {
             return $this->errorResponse('Failed to record vote', 400);

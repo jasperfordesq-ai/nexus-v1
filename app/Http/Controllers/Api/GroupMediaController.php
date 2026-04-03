@@ -161,6 +161,16 @@ class GroupMediaController extends BaseApiController
             return $this->errorResponse('Media not found', 404);
         }
 
+        // Authorization: only uploader or group admin can delete
+        $isUploader = (int) $media->uploaded_by === $userId;
+        $isAdmin = DB::selectOne(
+            "SELECT 1 FROM group_members WHERE group_id = ? AND user_id = ? AND status = 'active' AND role IN ('admin', 'owner')",
+            [$id, $userId]
+        );
+        if (!$isUploader && !$isAdmin) {
+            return $this->errorResponse('Only the uploader or a group admin can delete media', 403);
+        }
+
         // Delete file from storage
         if ($media->file_path && Storage::disk('public')->exists($media->file_path)) {
             Storage::disk('public')->delete($media->file_path);

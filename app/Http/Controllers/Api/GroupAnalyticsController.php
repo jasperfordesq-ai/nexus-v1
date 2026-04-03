@@ -7,24 +7,49 @@
 namespace App\Http\Controllers\Api;
 
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\DB;
+use App\Core\TenantContext;
 use App\Services\GroupAnalyticsService;
 
 /**
  * GroupAnalyticsController — Dashboard, growth, engagement, retention, and export analytics for groups.
+ *
+ * All endpoints require group admin/owner role.
  */
 class GroupAnalyticsController extends BaseApiController
 {
     protected bool $isV2Api = true;
 
     /**
-     * GET /api/v2/groups/{id}/analytics/dashboard
+     * Verify user is admin/owner of the group.
+     */
+    private function requireGroupAdmin(int $groupId, int $userId): ?JsonResponse
+    {
+        $tenantId = TenantContext::getId();
+        $isAdmin = DB::table('group_members')
+            ->join('groups', 'groups.id', '=', 'group_members.group_id')
+            ->where('group_members.group_id', $groupId)
+            ->where('group_members.user_id', $userId)
+            ->where('group_members.status', 'active')
+            ->whereIn('group_members.role', ['admin', 'owner'])
+            ->where('groups.tenant_id', $tenantId)
+            ->exists();
+
+        if (!$isAdmin) {
+            return $this->errorResponse('Only group admins can access analytics', 403);
+        }
+        return null;
+    }
+
+    /**
+     * GET /api/v2/groups/{id}/analytics
      */
     public function dashboard(int $id): JsonResponse
     {
         $userId = $this->requireUserId();
-        if ($userId instanceof JsonResponse) {
-            return $userId;
-        }
+        if ($userId instanceof JsonResponse) return $userId;
+        $authCheck = $this->requireGroupAdmin($id, $userId);
+        if ($authCheck) return $authCheck;
 
         $days = $this->queryInt('days', 30);
         $result = GroupAnalyticsService::getDashboard($id, $days);
@@ -38,78 +63,51 @@ class GroupAnalyticsController extends BaseApiController
     public function growth(int $id): JsonResponse
     {
         $userId = $this->requireUserId();
-        if ($userId instanceof JsonResponse) {
-            return $userId;
-        }
+        if ($userId instanceof JsonResponse) return $userId;
+        $authCheck = $this->requireGroupAdmin($id, $userId);
+        if ($authCheck) return $authCheck;
 
-        $days = $this->queryInt('days', 30);
-        $result = GroupAnalyticsService::getMemberGrowth($id, $days);
-
-        return $this->successResponse($result);
+        return $this->successResponse(GroupAnalyticsService::getMemberGrowth($id, $this->queryInt('days', 30)));
     }
 
-    /**
-     * GET /api/v2/groups/{id}/analytics/engagement
-     */
     public function engagement(int $id): JsonResponse
     {
         $userId = $this->requireUserId();
-        if ($userId instanceof JsonResponse) {
-            return $userId;
-        }
+        if ($userId instanceof JsonResponse) return $userId;
+        $authCheck = $this->requireGroupAdmin($id, $userId);
+        if ($authCheck) return $authCheck;
 
-        $days = $this->queryInt('days', 30);
-        $result = GroupAnalyticsService::getEngagementMetrics($id, $days);
-
-        return $this->successResponse($result);
+        return $this->successResponse(GroupAnalyticsService::getEngagementMetrics($id, $this->queryInt('days', 30)));
     }
 
-    /**
-     * GET /api/v2/groups/{id}/analytics/contributors
-     */
     public function contributors(int $id): JsonResponse
     {
         $userId = $this->requireUserId();
-        if ($userId instanceof JsonResponse) {
-            return $userId;
-        }
+        if ($userId instanceof JsonResponse) return $userId;
+        $authCheck = $this->requireGroupAdmin($id, $userId);
+        if ($authCheck) return $authCheck;
 
-        $days = $this->queryInt('days', 30);
-        $limit = $this->queryInt('limit', 10);
-        $result = GroupAnalyticsService::getTopContributors($id, $days, $limit);
-
-        return $this->successResponse($result);
+        return $this->successResponse(GroupAnalyticsService::getTopContributors($id, $this->queryInt('days', 30), $this->queryInt('limit', 10)));
     }
 
-    /**
-     * GET /api/v2/groups/{id}/analytics/retention
-     */
     public function retention(int $id): JsonResponse
     {
         $userId = $this->requireUserId();
-        if ($userId instanceof JsonResponse) {
-            return $userId;
-        }
+        if ($userId instanceof JsonResponse) return $userId;
+        $authCheck = $this->requireGroupAdmin($id, $userId);
+        if ($authCheck) return $authCheck;
 
-        $months = $this->queryInt('months', 6);
-        $result = GroupAnalyticsService::getRetentionMetrics($id, $months);
-
-        return $this->successResponse($result);
+        return $this->successResponse(GroupAnalyticsService::getRetentionMetrics($id, $this->queryInt('months', 6)));
     }
 
-    /**
-     * GET /api/v2/groups/{id}/analytics/comparative
-     */
     public function comparative(int $id): JsonResponse
     {
         $userId = $this->requireUserId();
-        if ($userId instanceof JsonResponse) {
-            return $userId;
-        }
+        if ($userId instanceof JsonResponse) return $userId;
+        $authCheck = $this->requireGroupAdmin($id, $userId);
+        if ($authCheck) return $authCheck;
 
-        $result = GroupAnalyticsService::getComparativeAnalytics($id);
-
-        return $this->successResponse($result);
+        return $this->successResponse(GroupAnalyticsService::getComparativeAnalytics($id));
     }
 
     /**
@@ -118,9 +116,9 @@ class GroupAnalyticsController extends BaseApiController
     public function exportMembers(int $id): JsonResponse|\Symfony\Component\HttpFoundation\StreamedResponse
     {
         $userId = $this->requireUserId();
-        if ($userId instanceof JsonResponse) {
-            return $userId;
-        }
+        if ($userId instanceof JsonResponse) return $userId;
+        $authCheck = $this->requireGroupAdmin($id, $userId);
+        if ($authCheck) return $authCheck;
 
         $members = GroupAnalyticsService::exportMembers($id);
 
@@ -149,9 +147,9 @@ class GroupAnalyticsController extends BaseApiController
     public function exportActivity(int $id): JsonResponse|\Symfony\Component\HttpFoundation\StreamedResponse
     {
         $userId = $this->requireUserId();
-        if ($userId instanceof JsonResponse) {
-            return $userId;
-        }
+        if ($userId instanceof JsonResponse) return $userId;
+        $authCheck = $this->requireGroupAdmin($id, $userId);
+        if ($authCheck) return $authCheck;
 
         $days = $this->queryInt('days', 30);
         $activity = GroupAnalyticsService::exportActivity($id, $days);
