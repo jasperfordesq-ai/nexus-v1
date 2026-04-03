@@ -240,6 +240,9 @@ class GroupService
             $group->cached_member_count = 1;
             $group->save();
 
+            // Log group creation
+            try { GroupAuditService::log(GroupAuditService::ACTION_GROUP_CREATED, $group->id, $userId, ['name' => $group->name]); } catch (\Throwable $e) {}
+
             return $group->fresh(['creator']);
         });
     }
@@ -274,6 +277,12 @@ class GroupService
 
         if ($status === 'active') {
             $group->increment('cached_member_count');
+
+            // Send welcome message + fire webhook + log audit
+            try { GroupWelcomeService::sendWelcome($groupId, $userId); } catch (\Throwable $e) {}
+            try { GroupWebhookService::fire($groupId, GroupWebhookService::EVENT_MEMBER_JOINED, ['user_id' => $userId]); } catch (\Throwable $e) {}
+            try { GroupAuditService::log(GroupAuditService::ACTION_MEMBER_JOINED, $groupId, $userId); } catch (\Throwable $e) {}
+            try { GroupChallengeService::incrementProgress($groupId, 'members'); } catch (\Throwable $e) {}
         }
 
         return ['success' => true, 'status' => $status];
@@ -291,6 +300,8 @@ class GroupService
 
         if ($detached > 0) {
             $group->decrement('cached_member_count');
+            try { GroupWebhookService::fire($groupId, GroupWebhookService::EVENT_MEMBER_LEFT, ['user_id' => $userId]); } catch (\Throwable $e) {}
+            try { GroupAuditService::log(GroupAuditService::ACTION_MEMBER_LEFT, $groupId, $userId); } catch (\Throwable $e) {}
         }
 
         return $detached > 0;
@@ -667,6 +678,12 @@ class GroupService
             if ($group) {
                 $group->increment('cached_member_count');
             }
+
+            // Send welcome message + fire webhook + log audit
+            try { GroupWelcomeService::sendWelcome($groupId, $requesterId); } catch (\Throwable $e) {}
+            try { GroupWebhookService::fire($groupId, GroupWebhookService::EVENT_MEMBER_JOINED, ['user_id' => $requesterId]); } catch (\Throwable $e) {}
+            try { GroupAuditService::log(GroupAuditService::ACTION_MEMBER_JOINED, $groupId, $requesterId, ['approved_by' => $adminUserId]); } catch (\Throwable $e) {}
+            try { GroupChallengeService::incrementProgress($groupId, 'members'); } catch (\Throwable $e) {}
         } else {
             // Reject — remove the pending row
             DB::table('group_members')
@@ -801,6 +818,11 @@ class GroupService
 
             $discussion->load('user:id,first_name,last_name,avatar_url');
             $user = $discussion->user;
+
+            // Fire integrations
+            try { GroupWebhookService::fire($groupId, GroupWebhookService::EVENT_DISCUSSION_CREATED, ['discussion_id' => $discussion->id, 'title' => $title]); } catch (\Throwable $e) {}
+            try { GroupAuditService::log(GroupAuditService::ACTION_DISCUSSION_CREATED, $groupId, $userId, ['discussion_id' => $discussion->id]); } catch (\Throwable $e) {}
+            try { GroupChallengeService::incrementProgress($groupId, 'discussions'); } catch (\Throwable $e) {}
 
             return [
                 'id'            => $discussion->id,
@@ -966,6 +988,11 @@ class GroupService
             'user_id'       => $userId,
             'content'       => $content,
         ]);
+
+        // Fire integrations
+        try { GroupWebhookService::fire($groupId, GroupWebhookService::EVENT_POST_CREATED, ['post_id' => $post->id, 'discussion_id' => $discussionId]); } catch (\Throwable $e) {}
+        try { GroupAuditService::log(GroupAuditService::ACTION_POST_CREATED, $groupId, $userId, ['post_id' => $post->id]); } catch (\Throwable $e) {}
+        try { GroupChallengeService::incrementProgress($groupId, 'posts'); } catch (\Throwable $e) {}
 
         $post->load('user:id,first_name,last_name,avatar_url');
         $user = $post->user;

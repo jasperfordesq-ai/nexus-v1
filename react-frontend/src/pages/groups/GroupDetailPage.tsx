@@ -79,6 +79,11 @@ import { GroupAnnouncementsTab } from './tabs/GroupAnnouncementsTab';
 import { GroupChatroomsTab } from './tabs/GroupChatroomsTab';
 import { GroupTasksTab } from './tabs/GroupTasksTab';
 import { GroupSubgroupsTab } from './tabs/GroupSubgroupsTab';
+import { GroupQATab } from './tabs/GroupQATab';
+import { GroupWikiTab } from './tabs/GroupWikiTab';
+import { GroupMediaTab } from './tabs/GroupMediaTab';
+import { GroupAnalyticsTab } from './tabs/GroupAnalyticsTab';
+import { GroupChallengesTab } from './tabs/GroupChallengesTab';
 import { PinnedAnnouncementsBanner } from './components/PinnedAnnouncementsBanner';
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -186,6 +191,16 @@ export function GroupDetailPage() {
   const [newDiscussionContent, setNewDiscussionContent] = useState('');
   const [creatingDiscussion, setCreatingDiscussion] = useState(false);
 
+  // Invite modal state
+  const [showInviteModal, setShowInviteModal] = useState(false);
+  const [inviteEmails, setInviteEmails] = useState('');
+  const [inviteMessage, setInviteMessage] = useState('');
+  const [inviteLink, setInviteLink] = useState<string | null>(null);
+  const [sendingInvites, setSendingInvites] = useState(false);
+
+  // Tags state
+  const [groupTags, setGroupTags] = useState<Array<{ id: number; name: string; color?: string }>>([]);
+
   // Expanded discussion state
   const [expandedDiscussionId, setExpandedDiscussionId] = useState<number | null>(null);
   const [expandedDiscussion, setExpandedDiscussion] = useState<DiscussionDetail | null>(null);
@@ -256,6 +271,43 @@ export function GroupDetailPage() {
   useEffect(() => {
     loadGroup();
   }, [loadGroup]);
+
+  // Load tags for the group
+  useEffect(() => {
+    if (!id) return;
+    api.get(`/v2/groups/${id}/tags`)
+      .then((resp) => setGroupTags(resp.data || []))
+      .catch(() => {});
+  }, [id]);
+
+  // Invite handlers
+  const handleGenerateInviteLink = async () => {
+    if (!id) return;
+    try {
+      const resp = await api.post(`/v2/groups/${id}/invites/link`);
+      setInviteLink(resp.data?.invite_url || null);
+    } catch (err) {
+      logError('GroupDetailPage.generateInviteLink', err);
+    }
+  };
+
+  const handleSendInvites = async () => {
+    if (!id || !inviteEmails.trim()) return;
+    setSendingInvites(true);
+    try {
+      const emails = inviteEmails.split(',').map((e: string) => e.trim()).filter(Boolean);
+      await api.post(`/v2/groups/${id}/invites/email`, { emails, message: inviteMessage });
+      toast.success(t('detail.invites_sent', 'Invitations sent!'));
+      setInviteEmails('');
+      setInviteMessage('');
+      setShowInviteModal(false);
+    } catch (err) {
+      logError('GroupDetailPage.sendInvites', err);
+      toast.error(t('detail.invites_failed', 'Failed to send invitations'));
+    } finally {
+      setSendingInvites(false);
+    }
+  };
 
   // ─────────────────────────────────────────────────────────────────────────
   // Load Group Feed
@@ -1013,20 +1065,47 @@ export function GroupDetailPage() {
               </>
             )}
             {isAuthenticated && (
-              <Button
-                className={userIsMember
-                  ? 'bg-theme-hover text-theme-primary'
-                  : 'bg-gradient-to-r from-indigo-500 to-purple-600 text-white'
-                }
-                startContent={userIsMember ? <UserMinus className="w-4 h-4" aria-hidden="true" /> : <UserPlus className="w-4 h-4" aria-hidden="true" />}
-                onPress={handleJoinLeave}
-                isLoading={isJoining}
-              >
-                {userIsMember ? t('detail.leave_group') : t('detail.join_group')}
-              </Button>
+              <div className="flex items-center gap-2">
+                <Button
+                  className={userIsMember
+                    ? 'bg-theme-hover text-theme-primary'
+                    : 'bg-gradient-to-r from-indigo-500 to-purple-600 text-white'
+                  }
+                  startContent={userIsMember ? <UserMinus className="w-4 h-4" aria-hidden="true" /> : <UserPlus className="w-4 h-4" aria-hidden="true" />}
+                  onPress={handleJoinLeave}
+                  isLoading={isJoining}
+                >
+                  {userIsMember ? t('detail.leave_group') : t('detail.join_group')}
+                </Button>
+                {userIsAdmin && (
+                  <Button
+                    variant="bordered"
+                    size="sm"
+                    startContent={<UserPlus className="w-4 h-4" aria-hidden="true" />}
+                    onPress={() => setShowInviteModal(true)}
+                    aria-label={t('detail.invite_members', 'Invite Members')}
+                  >
+                    {t('detail.invite', 'Invite')}
+                  </Button>
+                )}
+              </div>
             )}
           </div>
         </div>
+
+        {/* Tags */}
+        {groupTags.length > 0 && (
+          <div className="flex flex-wrap gap-2 mb-4">
+            {groupTags.map((tag: { id: number; name: string; color?: string }) => (
+              <span
+                key={tag.id}
+                className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-primary/10 text-primary"
+              >
+                {tag.name}
+              </span>
+            ))}
+          </div>
+        )}
 
         {/* Description */}
         <p className="text-theme-muted mb-6">
@@ -1228,6 +1307,53 @@ export function GroupDetailPage() {
             </span>
           }
         />
+        <Tab
+          key="qa"
+          title={
+            <span className="flex items-center gap-2">
+              <AlertCircle className="w-4 h-4" aria-hidden="true" />
+              {t('detail.tab_qa', 'Q&A')}
+            </span>
+          }
+        />
+        <Tab
+          key="wiki"
+          title={
+            <span className="flex items-center gap-2">
+              <FileText className="w-4 h-4" aria-hidden="true" />
+              {t('detail.tab_wiki', 'Wiki')}
+            </span>
+          }
+        />
+        <Tab
+          key="media"
+          title={
+            <span className="flex items-center gap-2">
+              <Image className="w-4 h-4" aria-hidden="true" />
+              {t('detail.tab_media', 'Gallery')}
+            </span>
+          }
+        />
+        <Tab
+          key="challenges"
+          title={
+            <span className="flex items-center gap-2">
+              <Flag className="w-4 h-4" aria-hidden="true" />
+              {t('detail.tab_challenges', 'Challenges')}
+            </span>
+          }
+        />
+        {userIsAdmin && (
+          <Tab
+            key="analytics"
+            title={
+              <span className="flex items-center gap-2">
+                <Newspaper className="w-4 h-4" aria-hidden="true" />
+                {t('detail.tab_analytics', 'Analytics')}
+              </span>
+            }
+          />
+        )}
         {hasSubGroups && (
           <Tab
             key="subgroups"
@@ -1374,6 +1500,21 @@ export function GroupDetailPage() {
             />
           </GlassCard>
         ))}
+        {activeTab === 'qa' && (
+          <GroupQATab groupId={group.id} isAdmin={userIsAdmin} isMember={userIsMember} />
+        )}
+        {activeTab === 'wiki' && (
+          <GroupWikiTab groupId={group.id} isAdmin={userIsAdmin} isMember={userIsMember} />
+        )}
+        {activeTab === 'media' && (
+          <GroupMediaTab groupId={group.id} isAdmin={userIsAdmin} isMember={userIsMember} />
+        )}
+        {activeTab === 'challenges' && (
+          <GroupChallengesTab groupId={group.id} isAdmin={userIsAdmin} isMember={userIsMember} />
+        )}
+        {activeTab === 'analytics' && userIsAdmin && (
+          <GroupAnalyticsTab groupId={group.id} isAdmin={userIsAdmin} />
+        )}
         {activeTab === 'subgroups' && hasSubGroups && (
           <GroupSubgroupsTab subGroups={group.sub_groups!} />
         )}
@@ -1735,6 +1876,81 @@ export function GroupDetailPage() {
               {t('detail.report_submit', 'Report')}
             </Button>
           </ModalFooter>
+        </ModalContent>
+      </Modal>
+      {/* ─── Invite Modal ─── */}
+      <Modal
+        isOpen={showInviteModal}
+        onOpenChange={setShowInviteModal}
+        classNames={{
+          base: 'bg-content1 border border-theme-default',
+          header: 'border-b border-theme-default',
+          footer: 'border-t border-theme-default',
+        }}
+        size="lg"
+      >
+        <ModalContent>
+          {(onClose) => (
+            <>
+              <ModalHeader className="text-theme-primary flex items-center gap-2">
+                <UserPlus className="w-5 h-5 text-purple-400" aria-hidden="true" />
+                {t('detail.invite_members', 'Invite Members')}
+              </ModalHeader>
+              <ModalBody>
+                <div className="space-y-4">
+                  {/* Invite link */}
+                  <div>
+                    <p className="text-sm text-theme-subtle mb-2">{t('detail.invite_link_desc', 'Share a link anyone can use to join:')}</p>
+                    {inviteLink ? (
+                      <div className="flex items-center gap-2">
+                        <Input value={inviteLink} readOnly size="sm" className="flex-1" />
+                        <Button size="sm" variant="flat" onPress={() => { navigator.clipboard.writeText(inviteLink); toast.success(t('detail.link_copied', 'Link copied!')); }}>
+                          {t('detail.copy', 'Copy')}
+                        </Button>
+                      </div>
+                    ) : (
+                      <Button size="sm" variant="bordered" onPress={handleGenerateInviteLink}>
+                        {t('detail.generate_link', 'Generate Invite Link')}
+                      </Button>
+                    )}
+                  </div>
+
+                  <div className="border-t border-theme-default pt-4">
+                    <p className="text-sm text-theme-subtle mb-2">{t('detail.invite_email_desc', 'Or invite by email (comma-separated):')}</p>
+                    <Textarea
+                      placeholder={t('detail.invite_email_placeholder', 'email1@example.com, email2@example.com')}
+                      value={inviteEmails}
+                      onValueChange={setInviteEmails}
+                      minRows={2}
+                      size="sm"
+                      aria-label={t('detail.invite_emails_aria', 'Email addresses to invite')}
+                    />
+                    <Input
+                      label={t('detail.invite_message_label', 'Personal message (optional)')}
+                      placeholder={t('detail.invite_message_placeholder', 'Join our group!')}
+                      value={inviteMessage}
+                      onValueChange={setInviteMessage}
+                      size="sm"
+                      className="mt-2"
+                    />
+                  </div>
+                </div>
+              </ModalBody>
+              <ModalFooter>
+                <Button variant="flat" onPress={onClose}>
+                  {t('detail.cancel', 'Cancel')}
+                </Button>
+                <Button
+                  color="primary"
+                  onPress={handleSendInvites}
+                  isLoading={sendingInvites}
+                  isDisabled={!inviteEmails.trim()}
+                >
+                  {t('detail.send_invites', 'Send Invitations')}
+                </Button>
+              </ModalFooter>
+            </>
+          )}
         </ModalContent>
       </Modal>
     </motion.div>

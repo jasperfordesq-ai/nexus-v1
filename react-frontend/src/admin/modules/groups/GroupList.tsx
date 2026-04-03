@@ -19,6 +19,7 @@ import { Trash2, Users, Eye, EyeOff, Lock, MoreVertical, Power, PowerOff } from 
 import { usePageTitle } from '@/hooks';
 import { useTenant, useToast } from '@/contexts';
 import { adminGroups } from '../../api/adminApi';
+import { api } from '@/lib/api';
 import { DataTable, PageHeader, ConfirmModal, type Column } from '../../components';
 import type { AdminGroup } from '../../api/types';
 
@@ -120,6 +121,33 @@ export function GroupList() {
     }
   };
 
+  const handleArchive = async (item: AdminGroup) => {
+    const action = item.status === 'archived' ? 'unarchive' : 'archive';
+    try {
+      const res = await api.post(`/v2/admin/groups/${item.id}/${action}`);
+      if (res?.success) {
+        toast.success(`Group ${action}d: ${item.name}`);
+        loadItems();
+      }
+    } catch {
+      toast.error(`Failed to ${action} group`);
+    }
+  };
+
+  const handleClone = async (item: AdminGroup) => {
+    const name = prompt('Name for cloned group:', `${item.name} (Copy)`);
+    if (!name) return;
+    try {
+      const res = await api.post(`/v2/admin/groups/${item.id}/clone`, { name, clone_members: false });
+      if (res?.success) {
+        toast.success(`Group cloned: ${name}`);
+        loadItems();
+      }
+    } catch {
+      toast.error('Failed to clone group');
+    }
+  };
+
   const columns: Column<AdminGroup>[] = [
     {
       key: 'name',
@@ -217,6 +245,9 @@ export function GroupList() {
             onAction={(key) => {
               if (key === 'view') navigate(tenantPath(`/groups/${item.id}`));
               else if (key === 'toggle-status') handleStatusToggle(item);
+              else if (key === 'archive') handleArchive(item);
+              else if (key === 'clone') handleClone(item);
+              else if (key === 'audit') navigate(tenantPath(`/admin/groups/${item.id}?tab=audit`));
               else if (key === 'delete') setConfirmDelete(item);
             }}
           >
@@ -229,6 +260,18 @@ export function GroupList() {
               className={item.status === 'active' ? 'text-warning' : 'text-success'}
             >
               {item.status === 'active' ? t('groups.deactivate') : t('groups.activate')}
+            </DropdownItem>
+            <DropdownItem
+              key="archive"
+              startContent={<EyeOff size={14} />}
+            >
+              {item.status === 'archived' ? 'Unarchive' : 'Archive'}
+            </DropdownItem>
+            <DropdownItem key="clone" startContent={<Users size={14} />}>
+              Clone Group
+            </DropdownItem>
+            <DropdownItem key="audit" startContent={<Eye size={14} />}>
+              Audit Log
             </DropdownItem>
             <DropdownItem key="delete" startContent={<Trash2 size={14} />} className="text-danger" color="danger">
               {t('common.delete')}

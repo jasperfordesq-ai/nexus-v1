@@ -63,6 +63,8 @@ export function CreateGroupPage() {
   const toast = useToast();
 
   const [formData, setFormData] = useState<FormData>(initialFormData);
+  const [templates, setTemplates] = useState<Array<{ id: number; name: string; description?: string; icon?: string; default_visibility?: string }>>([]);
+  const [selectedTemplate, setSelectedTemplate] = useState<number | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [loadError, setLoadError] = useState<string | null>(null);
@@ -113,6 +115,23 @@ export function CreateGroupPage() {
       loadGroup();
     }
   }, [isEditing, loadGroup]);
+
+  // Load templates for new group creation
+  useEffect(() => {
+    if (isEditing) return;
+    api.get('/v2/group-templates')
+      .then((resp) => setTemplates(resp.data || []))
+      .catch(() => {});
+  }, [isEditing]);
+
+  const applyTemplate = (templateId: number) => {
+    const tmpl = templates.find((t) => t.id === templateId);
+    if (!tmpl) return;
+    setSelectedTemplate(templateId);
+    if (tmpl.default_visibility) {
+      setFormData((prev) => ({ ...prev, is_private: tmpl.default_visibility === 'private' }));
+    }
+  };
 
   // Clean up object URLs on unmount
   useEffect(() => {
@@ -365,6 +384,32 @@ export function CreateGroupPage() {
               </div>
             </div>
           </div>
+
+          {/* Template Selector (new groups only) */}
+          {!isEditing && templates.length > 0 && (
+            <div>
+              <p className="text-sm font-medium text-theme-primary mb-2">
+                {t('form.template_label', 'Start from a template (optional)')}
+              </p>
+              <div className="flex flex-wrap gap-2">
+                {templates.map((tmpl) => (
+                  <button
+                    key={tmpl.id}
+                    type="button"
+                    onClick={() => applyTemplate(tmpl.id)}
+                    className={`px-3 py-2 rounded-lg border text-sm transition-colors ${
+                      selectedTemplate === tmpl.id
+                        ? 'border-primary bg-primary/10 text-primary'
+                        : 'border-theme-default bg-content1 text-theme-primary hover:border-primary/50'
+                    }`}
+                  >
+                    {tmpl.icon && <span className="mr-1">{tmpl.icon}</span>}
+                    {tmpl.name}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
 
           {/* Group Name */}
           <div>

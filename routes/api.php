@@ -278,6 +278,9 @@ Route::get('/v2/group-templates', [\App\Http\Controllers\Api\GroupTemplateContro
 Route::get('/v2/groups/{id}/custom-fields', [\App\Http\Controllers\Api\GroupCustomFieldController::class, 'getValues']);
 Route::put('/v2/groups/{id}/custom-fields', [\App\Http\Controllers\Api\GroupCustomFieldController::class, 'setValues']);
 Route::get('/v2/groups/{id}/export', [\App\Http\Controllers\Api\GroupDataExportController::class, 'exportAll']);
+Route::get('/v2/groups/{id}/challenges', [\App\Http\Controllers\Api\GroupChallengeController::class, 'index']);
+Route::post('/v2/groups/{id}/challenges', [\App\Http\Controllers\Api\GroupChallengeController::class, 'store']);
+Route::delete('/v2/groups/{id}/challenges/{challengeId}', [\App\Http\Controllers\Api\GroupChallengeController::class, 'destroy']);
 Route::get('/v2/connections', [\App\Http\Controllers\Api\ConnectionsController::class, 'index']);
 Route::get('/v2/connections/pending', [\App\Http\Controllers\Api\ConnectionsController::class, 'pendingCounts']);
 Route::get('/v2/connections/status/{userId}', [\App\Http\Controllers\Api\ConnectionsController::class, 'status']);
@@ -965,12 +968,14 @@ Route::put('/v2/admin/enterprise/gdpr/requests/{id}', [\App\Http\Controllers\Api
 Route::get('/v2/admin/enterprise/gdpr/consents', [\App\Http\Controllers\Api\AdminEnterpriseController::class, 'gdprConsents']);
 Route::get('/v2/admin/enterprise/gdpr/breaches', [\App\Http\Controllers\Api\AdminEnterpriseController::class, 'gdprBreaches']);
 Route::post('/v2/admin/enterprise/gdpr/breaches', [\App\Http\Controllers\Api\AdminEnterpriseController::class, 'createBreach']);
+Route::get('/v2/admin/enterprise/gdpr/audit/export', [\App\Http\Controllers\Api\AdminEnterpriseController::class, 'gdprAuditExport']);
 Route::get('/v2/admin/enterprise/gdpr/audit', [\App\Http\Controllers\Api\AdminEnterpriseController::class, 'gdprAudit']);
 Route::get('/v2/admin/enterprise/monitoring', [\App\Http\Controllers\Api\AdminEnterpriseController::class, 'monitoring']);
 Route::get('/v2/admin/enterprise/monitoring/health', [\App\Http\Controllers\Api\AdminEnterpriseController::class, 'healthCheck']);
 Route::get('/v2/admin/enterprise/monitoring/logs', [\App\Http\Controllers\Api\AdminEnterpriseController::class, 'logs']);
 Route::get('/v2/admin/enterprise/config', [\App\Http\Controllers\Api\AdminEnterpriseController::class, 'config']);
 Route::put('/v2/admin/enterprise/config', [\App\Http\Controllers\Api\AdminEnterpriseController::class, 'updateConfig']);
+Route::post('/v2/admin/enterprise/config/reset', [\App\Http\Controllers\Api\AdminEnterpriseController::class, 'resetConfig']);
 Route::get('/v2/admin/enterprise/config/secrets', [\App\Http\Controllers\Api\AdminEnterpriseController::class, 'secrets']);
 
 // Enterprise GDPR — extended endpoints

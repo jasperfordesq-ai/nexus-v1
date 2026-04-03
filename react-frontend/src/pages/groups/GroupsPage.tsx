@@ -373,9 +373,23 @@ const GroupCard = memo(function GroupCard({ group, featured }: GroupCardProps) {
             )}
           </div>
 
-          <p className="text-theme-muted text-sm line-clamp-2 flex-1 mb-4">
+          <p className="text-theme-muted text-sm line-clamp-2 flex-1 mb-2">
             {group.description || t('no_description')}
           </p>
+
+          {/* Tags */}
+          {group.tags && group.tags.length > 0 && (
+            <div className="flex flex-wrap gap-1 mb-3">
+              {group.tags.slice(0, 3).map((tag: { id: number; name: string }) => (
+                <span key={tag.id} className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium bg-primary/10 text-primary">
+                  {tag.name}
+                </span>
+              ))}
+              {group.tags.length > 3 && (
+                <span className="text-[10px] text-theme-subtle">+{group.tags.length - 3}</span>
+              )}
+            </div>
+          )}
 
           {/* Group Stats */}
           <div className="flex items-center justify-between">
