@@ -2,9 +2,9 @@
 
 > **Created:** 2026-04-03
 > **Initial Score:** ~478/1,000 (revised down — 6 services missing)
-> **Current Score:** ~653/1,000 (honest rescore — backend built, frontend gaps remain)
+> **Current Score:** ~810/1,000 (after frontend tabs + integrations)
 > **Target:** 1,000/1,000 (Platinum tier)
-> **Status:** Silver Tier — Backend infrastructure complete, frontend integration needed
+> **Status:** Gold Tier — 5 new React tabs, cross-service wiring, invite modal, tags, templates
 
 ---
 
@@ -12,21 +12,21 @@
 
 **Scoring rule:** Backend-only features get ~30% credit. Full credit requires working frontend UI.
 
-| Category | Before | After | Delta | Status |
-|----------|--------|-------|-------|--------|
-| 1. Creation & Configuration | 55 | 67 | +12 | Templates/tags/fields backend only, no frontend |
-| 2. Membership & Roles | 60 | 71 | +11 | Invites backend only, PermissionManager working |
-| 3. Privacy & Permissions | 70 | 73 | +3 | FeatureToggleService now works; GDPR export backend |
-| 4. Hierarchy & Organization | 55 | 55 | +0 | No changes — collections still missing |
-| 5. Engagement & Content | 73 | 99 | +26 | Files fully rebuilt; Q&A/wiki/media backend only |
-| 6. Discovery & Search | 55 | 55 | +0 | Tags backend only, not displayed in UI |
-| 7. Notifications & Activity | 45 | 47 | +2 | Webhooks exist but fire() never called |
-| 8. Admin & Management | 33 | 55 | +22 | Lifecycle/bulk/merge backend; no admin UI buttons |
-| 9. Analytics & Reporting | 25 | 38 | +13 | Full backend analytics; no frontend dashboard |
-| 10. Gamification Integration | 35 | 38 | +3 | Challenges backend only, not wired to events |
-| 11. Automation & Workflows | 5 | 17 | +12 | Welcome/lifecycle/webhooks exist but NOT wired |
-| 12. Enterprise & Compliance | 33 | 38 | +5 | Data export backend, audit service not called |
-| **TOTAL** | **~478** | **~653** | **+175** | **Silver Tier** |
+| Category | Initial | After Backend | After Frontend | Status |
+|----------|---------|--------------|----------------|--------|
+| 1. Creation & Configuration | 55 | 67 | 80 | Templates in CreateGroupPage, tags, fields |
+| 2. Membership & Roles | 60 | 71 | 85 | Invite modal (email+link), PermissionManager |
+| 3. Privacy & Permissions | 70 | 73 | 78 | FeatureToggleService, GDPR export |
+| 4. Hierarchy & Organization | 55 | 55 | 55 | Collections still missing |
+| 5. Engagement & Content | 73 | 99 | 125 | Q&A tab, Wiki tab, Media gallery, Files — all with UI |
+| 6. Discovery & Search | 55 | 55 | 58 | Tags shown on cards + detail page |
+| 7. Notifications & Activity | 45 | 47 | 52 | Webhooks now fire on join/leave/post/discussion |
+| 8. Admin & Management | 33 | 55 | 68 | Archive/clone/audit in admin dropdown |
+| 9. Analytics & Reporting | 25 | 38 | 70 | Full analytics tab with Recharts + CSV export |
+| 10. Gamification Integration | 35 | 38 | 50 | Challenges tab + progress wired to posts/members |
+| 11. Automation & Workflows | 5 | 17 | 40 | Welcome/webhooks/lifecycle all wired to events |
+| 12. Enterprise & Compliance | 33 | 38 | 49 | Data export, audit trail wired, custom fields |
+| **TOTAL** | **~478** | **~653** | **~810** | **Gold Tier** |
 
 ### Critical Integration Gaps (Blocking Higher Score)
 
