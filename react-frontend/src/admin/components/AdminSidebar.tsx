@@ -307,6 +307,7 @@ function useAdminNav(): NavSection[] {
         icon: Settings,
         items: [
           { label: t('onboarding_settings'), href: '/admin/onboarding-settings', icon: Sparkles },
+          { label: 'Module Configuration', href: '/admin/module-configuration', icon: Puzzle, badge: 'BETA' },
           { label: t('cron_jobs'), href: '/admin/cron-jobs', icon: Timer },
           { label: t('cron_logs'), href: '/admin/cron-jobs/logs', icon: FileText },
           { label: t('cron_settings'), href: '/admin/cron-jobs/settings', icon: Settings },
