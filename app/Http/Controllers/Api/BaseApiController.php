@@ -625,6 +625,19 @@ abstract class BaseApiController extends Controller
      */
     protected function resolveSanctumUserOptionally(): ?int
     {
+        // Use the 'api' guard (sanctum driver) to resolve the user from the
+        // Bearer token. This works even when auth:sanctum middleware was removed
+        // via withoutMiddleware(), because the guard reads the token directly.
+        try {
+            $user = Auth::guard('api')->user();
+            if ($user) {
+                return (int) $user->id;
+            }
+        } catch (\Throwable $e) {
+            // Invalid token — ignore
+        }
+
+        // Fallback: manual token lookup (e.g. if guard config differs)
         $bearer = request()->bearerToken();
         if (!$bearer) {
             return null;
