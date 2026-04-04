@@ -56,7 +56,7 @@ class SeoRedirectMiddleware
 
             if ($redirect && $redirect->destination_url !== $path) {
                 // Increment hit counter asynchronously (non-blocking)
-                DB::update("UPDATE seo_redirects SET hits = hits + 1 WHERE id = ?", [$redirect->id]);
+                DB::update("UPDATE seo_redirects SET hits = IFNULL(hits, 0) + 1 WHERE id = ?", [$redirect->id]);
 
                 return redirect($redirect->destination_url, 301);
             }

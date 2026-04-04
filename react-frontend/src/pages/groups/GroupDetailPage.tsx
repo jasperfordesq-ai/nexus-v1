@@ -9,6 +9,7 @@
  */
 
 import { useState, useEffect, useCallback, useRef } from 'react';
+import { Helmet } from 'react-helmet-async';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import {
@@ -1017,6 +1018,18 @@ export function GroupDetailPage() {
         description={group?.description?.substring(0, 160)}
         image={group?.image_url || group?.cover_image_url || undefined}
       />
+      <Helmet>
+        <script type="application/ld+json">
+          {JSON.stringify({
+            '@context': 'https://schema.org',
+            '@type': 'Organization',
+            name: group?.name,
+            ...(group?.description ? { description: group.description.substring(0, 300) } : {}),
+            ...(group?.image_url || group?.cover_image_url ? { image: group.image_url || group.cover_image_url } : {}),
+            ...(group?.member_count ? { numberOfEmployees: { '@type': 'QuantitativeValue', value: group.member_count } } : {}),
+          })}
+        </script>
+      </Helmet>
 
       {/* Breadcrumbs */}
       <Breadcrumbs items={[

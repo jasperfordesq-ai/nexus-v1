@@ -338,6 +338,8 @@ export function BlogPostPage() {
         title={post.meta_title || post.title}
         description={post.meta_description || post.excerpt}
         image={post.featured_image ? resolveAssetUrl(post.featured_image) : undefined}
+        type="article"
+        publishedTime={post.published_at || post.created_at}
       />
 
       {/* Article JSON-LD structured data */}

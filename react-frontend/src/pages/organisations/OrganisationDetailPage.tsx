@@ -13,6 +13,7 @@
  */
 
 import { useState, useEffect, useCallback, useRef } from 'react';
+import { Helmet } from 'react-helmet-async';
 import { useParams, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import {
@@ -252,6 +253,19 @@ export function OrganisationDetailPage() {
   return (
     <div className="space-y-6">
       <PageMeta title={organisation?.name} description={organisation?.description?.substring(0, 160)} />
+      <Helmet>
+        <script type="application/ld+json">
+          {JSON.stringify({
+            '@context': 'https://schema.org',
+            '@type': 'Organization',
+            name: organisation?.name,
+            ...(organisation?.description ? { description: organisation.description.substring(0, 300) } : {}),
+            ...(organisation?.logo_url ? { logo: organisation.logo_url } : {}),
+            ...(organisation?.website ? { url: organisation.website } : {}),
+            ...(organisation?.email ? { email: organisation.email } : {}),
+          })}
+        </script>
+      </Helmet>
       {/* Breadcrumbs */}
       <Breadcrumbs items={[
         { label: t('organisation_detail.breadcrumb_volunteering'), href: '/volunteering' },

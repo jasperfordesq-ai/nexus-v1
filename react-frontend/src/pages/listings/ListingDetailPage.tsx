@@ -8,6 +8,7 @@
  */
 
 import { useState, useEffect, useCallback, useRef } from 'react';
+import { Helmet } from 'react-helmet-async';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
@@ -284,6 +285,22 @@ export function ListingDetailPage() {
       className="max-w-4xl mx-auto space-y-6"
     >
       <PageMeta title={listing?.title} description={listing?.description?.substring(0, 160)} image={listing?.image_url || undefined} />
+      <Helmet>
+        <script type="application/ld+json">
+          {JSON.stringify({
+            '@context': 'https://schema.org',
+            '@type': 'Service',
+            name: listing?.title,
+            ...(listing?.description ? { description: listing.description.substring(0, 300) } : {}),
+            ...(listing?.image_url ? { image: listing.image_url } : {}),
+            ...(listing?.category?.name || listing?.category_name ? { category: listing.category?.name || listing.category_name } : {}),
+            provider: {
+              '@type': 'Person',
+              name: listing?.user?.name || `${listing?.user?.first_name ?? ''} ${listing?.user?.last_name ?? ''}`.trim() || 'Community Member',
+            },
+          })}
+        </script>
+      </Helmet>
       {/* Breadcrumbs */}
       <Breadcrumbs items={[
         { label: t('title'), href: tenantPath('/listings') },

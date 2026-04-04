@@ -182,6 +182,7 @@ export function HomePage() {
   return (
     <>
       <PageMeta
+        title={t('home.meta_title', 'Community Timebanking Platform')}
         description={t('home.meta_description')}
         keywords={t('home.meta_keywords')}
       />
