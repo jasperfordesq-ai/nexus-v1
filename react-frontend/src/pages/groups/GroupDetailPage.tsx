@@ -278,7 +278,7 @@ export function GroupDetailPage() {
     } finally {
       setIsLoading(false);
     }
-  }, [id]);
+  }, [id, isAuthenticated]);
 
   useEffect(() => {
     loadGroup();
@@ -621,6 +621,10 @@ export function GroupDetailPage() {
           member_count: memberCount + 1,
           members_count: memberCount + 1,
         } : null);
+        toastRef.current.success(tRef.current('toast.joined'));
+      } else if (response.code === 'JOIN_FAILED' && response.error?.toLowerCase().includes('already')) {
+        // 409 — already a member but UI was stale; refresh to sync state
+        await loadGroup();
         toastRef.current.success(tRef.current('toast.joined'));
       } else {
         toastRef.current.error(tRef.current('toast.join_failed'));
