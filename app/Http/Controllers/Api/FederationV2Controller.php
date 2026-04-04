@@ -194,7 +194,9 @@ class FederationV2Controller extends BaseApiController
                     CASE WHEN fp.tenant_id = ? THEN t2.location_name ELSE t1.location_name END as partner_location,
                     CASE WHEN fp.tenant_id = ? THEN t2.country_code ELSE t1.country_code END as partner_country,
                     CASE WHEN fp.tenant_id = ? THEN dp2.logo_url ELSE dp1.logo_url END as partner_logo,
-                    CASE WHEN fp.tenant_id = ? THEN dp2.member_count ELSE dp1.member_count END as partner_member_count
+                    (SELECT COUNT(*) FROM users u
+                     WHERE u.tenant_id = CASE WHEN fp.tenant_id = ? THEN fp.partner_tenant_id ELSE fp.tenant_id END
+                       AND u.status = 'active') as partner_member_count
                 FROM federation_partnerships fp
                 LEFT JOIN tenants t1 ON fp.tenant_id = t1.id
                 LEFT JOIN tenants t2 ON fp.partner_tenant_id = t2.id
