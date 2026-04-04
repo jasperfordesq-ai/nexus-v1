@@ -30,7 +30,7 @@ return new class extends Migration
         if (! Schema::hasTable('federation_tenant_topics')) {
             Schema::create('federation_tenant_topics', function (Blueprint $table) {
                 $table->id();
-                $table->unsignedBigInteger('tenant_id');
+                $table->integer('tenant_id');
                 $table->unsignedBigInteger('topic_id');
                 $table->boolean('is_primary')->default(false);
                 $table->timestamp('created_at')->useCurrent();
