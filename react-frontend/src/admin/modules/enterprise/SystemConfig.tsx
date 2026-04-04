@@ -109,9 +109,9 @@ const CONFIG_SCHEMA: ConfigGroup[] = [
     settings: [
       { key: 'registration_enabled', label: 'Open Registration (read-only)', description: 'Managed via Settings → Registration Policy — toggle disabled to prevent overwriting granular policy modes', type: 'boolean', default: true },
       { key: 'require_approval', label: 'Require Admin Approval (read-only)', description: 'Managed via Settings → Registration Policy', type: 'boolean', default: false },
-      { key: 'require_email_verification', label: 'Require Email Verification', description: 'Members must verify email before accessing the platform', type: 'boolean', default: true },
+      { key: 'require_email_verification', label: 'Require Email Verification (read-only)', description: 'Managed via Settings → Registration Policy', type: 'boolean', default: true },
       { key: 'maintenance_mode', label: 'Maintenance Mode (read-only)', description: 'Managed via CLI: sudo bash scripts/maintenance.sh on|off — UI toggle disabled because maintenance mode requires both file and database layers', type: 'boolean', default: false },
-      { key: 'onboarding_enabled', label: 'Onboarding Flow', description: 'Show guided onboarding for new members', type: 'boolean', default: true },
+      { key: 'onboarding_enabled', label: 'Onboarding Flow (read-only)', description: 'Managed via Settings → Onboarding Configuration', type: 'boolean', default: true },
       { key: 'welcome_message', label: 'Welcome Message', description: 'Message shown to new members after registration', type: 'textarea', default: '' },
     ],
   },
@@ -367,7 +367,7 @@ export function SystemConfig() {
       // Excluded keys are managed by dedicated pages and must not be overwritten here:
       // - maintenance_mode: requires file + DB layers (use CLI)
       // - registration_enabled/require_approval: managed by Registration Policy page
-      const SAVE_EXCLUDED = new Set(['maintenance_mode', 'registration_enabled', 'require_approval']);
+      const SAVE_EXCLUDED = new Set(['maintenance_mode', 'registration_enabled', 'require_approval', 'require_email_verification', 'onboarding_enabled']);
       const payload: Record<string, unknown> = {};
       for (const key of SCHEMA_KEYS) {
         if (SAVE_EXCLUDED.has(key)) continue;
@@ -408,7 +408,7 @@ export function SystemConfig() {
     switch (def.type) {
       case 'boolean': {
         // Some settings are managed by dedicated pages and must not be toggled here
-        const READ_ONLY_KEYS = new Set(['maintenance_mode', 'registration_enabled', 'require_approval']);
+        const READ_ONLY_KEYS = new Set(['maintenance_mode', 'registration_enabled', 'require_approval', 'require_email_verification', 'onboarding_enabled']);
         const isReadOnly = READ_ONLY_KEYS.has(def.key);
         return (
           <div key={def.key} className="flex items-center justify-between gap-4 py-2">

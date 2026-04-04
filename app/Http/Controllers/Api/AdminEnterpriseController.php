@@ -607,7 +607,7 @@ class AdminEnterpriseController extends BaseApiController
         'require_email_verification' => 'general.email_verification',
         'maintenance_mode' => 'general.maintenance_mode',
         'welcome_message' => 'general.welcome_message',
-        'starting_balance' => 'general.welcome_credits',
+        'starting_balance' => 'wallet.starting_balance',
         'footer_text' => 'general.footer_text',
         'locale' => 'general.default_locale',
         'onboarding_enabled' => 'onboarding.enabled',
@@ -825,12 +825,13 @@ class AdminEnterpriseController extends BaseApiController
     }
 
     /** POST /api/v2/admin/enterprise/config/reset */
-    // Keys managed by dedicated admin pages — never delete on reset to avoid cross-page conflicts
+    // Keys managed by dedicated admin pages — never delete on reset, never save from enterprise config
     private const SHARED_KEYS = [
-        'registration_enabled',  // Registration Policy page
-        'require_approval',      // Registration Policy page
-        'onboarding_enabled',    // Onboarding Settings page
-        'maintenance_mode',      // CLI-only (scripts/maintenance.sh)
+        'registration_enabled',          // Registration Policy page
+        'require_approval',              // Registration Policy page
+        'require_email_verification',    // Registration Policy page
+        'onboarding_enabled',            // Onboarding Settings page
+        'maintenance_mode',              // CLI-only (scripts/maintenance.sh)
     ];
 
     public function resetConfig(): JsonResponse
