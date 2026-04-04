@@ -46,7 +46,7 @@ export const RESERVED_PATHS = new Set([
   'timebanking-guide', 'partner', 'social-prescribing', 'impact-summary', 'impact-report', 'strategic-plan',
   'communities', 'local-groups', 'services',
   // System paths
-  'admin', 'admin-legacy', 'super-admin', 'api', 'assets',
+  'admin', 'admin-legacy', 'super-admin', 'broker', 'api', 'assets',
   'uploads', 'classic', 'health', 'favicon.ico', 'robots.txt',
   'sitemap.xml', 'manifest.json', 'service-worker.js', '.well-known',
   'page',

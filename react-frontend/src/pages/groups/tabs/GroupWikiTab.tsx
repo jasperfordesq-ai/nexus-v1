@@ -160,7 +160,8 @@ export function GroupWikiTab({ groupId, isAdmin, isMember = true }: GroupWikiTab
     setLoading(true);
     try {
       const res = await api.get(`/v2/groups/${groupId}/wiki`);
-      const items = Array.isArray(res.data) ? res.data : res.data?.pages ?? [];
+      const raw = res.data as WikiPageSummary[] | { pages?: WikiPageSummary[] } | undefined;
+      const items = Array.isArray(raw) ? raw : (raw as { pages?: WikiPageSummary[] })?.pages ?? [];
       setPages(items);
     } catch (err) {
       logError('GroupWikiTab.loadPages', err);
@@ -183,7 +184,7 @@ export function GroupWikiTab({ groupId, isAdmin, isMember = true }: GroupWikiTab
       setRevisions([]);
       try {
         const res = await api.get(`/v2/groups/${groupId}/wiki/${slug}`);
-        setSelectedPage(res.data);
+        setSelectedPage(res.data as WikiPageDetail);
       } catch (err) {
         logError('GroupWikiTab.loadPage', err);
         toast.error(t('wiki.page_load_failed', 'Failed to load page'));
@@ -205,7 +206,7 @@ export function GroupWikiTab({ groupId, isAdmin, isMember = true }: GroupWikiTab
       };
       if (newParentId) body.parent_id = newParentId;
 
-      const res = await api.post(`/v2/groups/${groupId}/wiki`, body);
+      const res = await api.post<{ slug?: string }>(`/v2/groups/${groupId}/wiki`, body);
       if (res.success) {
         toast.success(t('wiki.created', 'Page created'));
         setNewTitle('');
@@ -278,7 +279,8 @@ export function GroupWikiTab({ groupId, isAdmin, isMember = true }: GroupWikiTab
       setRevisionsLoading(true);
       try {
         const res = await api.get(`/v2/groups/${groupId}/wiki/${pageId}/revisions`);
-        const items = Array.isArray(res.data) ? res.data : res.data?.revisions ?? [];
+        const rawRevisions = res.data as WikiRevision[] | { revisions?: WikiRevision[] } | undefined;
+        const items = Array.isArray(rawRevisions) ? rawRevisions : (rawRevisions as { revisions?: WikiRevision[] })?.revisions ?? [];
         setRevisions(items);
         setRevisionsOpen(true);
       } catch (err) {

@@ -34,7 +34,7 @@ import { Search, RefreshCw } from 'lucide-react';
 
 export interface Column<T> {
   key: string;
-  label: string;
+  label: ReactNode;
   sortable?: boolean;
   render?: (item: T) => ReactNode;
   width?: number;

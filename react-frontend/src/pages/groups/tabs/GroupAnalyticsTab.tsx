@@ -151,7 +151,7 @@ export function GroupAnalyticsTab({ groupId, isAdmin }: GroupAnalyticsTabProps) 
           growth: (raw.member_growth ?? raw.growth ?? []) as GrowthPoint[],
           engagement: ((raw.engagement as Record<string, unknown>)?.timeline ?? raw.engagement ?? []) as EngagementPoint[],
           top_contributors: (raw.top_contributors ?? []) as Contributor[],
-          activity_breakdown: (raw.activity_breakdown ?? raw.activity ?? {}) as ActivityBreakdown,
+          activity_breakdown: (Array.isArray(raw.activity_breakdown ?? raw.activity) ? (raw.activity_breakdown ?? raw.activity) : []) as ActivityBreakdown[],
           retention: (raw.retention ?? []) as RetentionCohort[],
           comparative: (raw.comparative ?? {}) as ComparativeStats,
         };
@@ -531,8 +531,8 @@ export function GroupAnalyticsTab({ groupId, isAdmin }: GroupAnalyticsTabProps) 
                   </Pie>
                   <Tooltip
                     contentStyle={tooltipStyle}
-                    formatter={(value: number, name: string) => [
-                      `${value}`,
+                    formatter={(value, name) => [
+                      `${value ?? 0}`,
                       name,
                     ]}
                   />

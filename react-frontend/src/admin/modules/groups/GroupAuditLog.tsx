@@ -159,9 +159,10 @@ export function GroupAuditLog({ groupId }: GroupAuditLogProps) {
           <SelectItem key="all">
             {t('groups.audit_all_actions', 'All actions')}
           </SelectItem>
-          {uniqueActions.map((action) => (
+          {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
+          {...uniqueActions.map((action) => (
             <SelectItem key={action}>{action}</SelectItem>
-          ))}
+          )) as any}
         </Select>
       </div>
 

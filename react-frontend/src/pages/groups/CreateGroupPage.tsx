@@ -121,7 +121,7 @@ export function CreateGroupPage() {
   useEffect(() => {
     if (isEditing) return;
     api.get('/v2/group-templates')
-      .then((resp) => setTemplates(resp.data || []))
+      .then((resp) => setTemplates((resp.data ?? []) as Array<{ id: number; name: string; description?: string; icon?: string; default_visibility?: string }>))
       .catch(() => {});
   }, [isEditing]);
 

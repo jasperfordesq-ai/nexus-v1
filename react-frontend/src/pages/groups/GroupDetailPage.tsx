@@ -288,7 +288,7 @@ export function GroupDetailPage() {
   useEffect(() => {
     if (!id) return;
     api.get(`/v2/groups/${id}/tags`)
-      .then((resp) => setGroupTags(resp.data ?? []))
+      .then((resp) => setGroupTags((resp.data ?? []) as Array<{ id: number; name: string; color?: string }>))
       .catch((err) => { logError('GroupDetailPage.loadTags', err); });
   }, [id]);
 
@@ -296,7 +296,7 @@ export function GroupDetailPage() {
   const handleGenerateInviteLink = async () => {
     if (!id) return;
     try {
-      const resp = await api.post(`/v2/groups/${id}/invites/link`);
+      const resp = await api.post<{ invite_url: string }>(`/v2/groups/${id}/invites/link`);
       setInviteLink(resp.data?.invite_url || null);
     } catch (err) {
       logError('GroupDetailPage.generateInviteLink', err);

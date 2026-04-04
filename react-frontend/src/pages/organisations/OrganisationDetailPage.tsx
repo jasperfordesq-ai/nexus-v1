@@ -64,6 +64,7 @@ interface OrganisationDetail {
   logo_url: string | null;
   website: string | null;
   contact_email: string | null;
+  email: string | null;
   location: string | null;
   opportunity_count: number;
   total_hours: number;

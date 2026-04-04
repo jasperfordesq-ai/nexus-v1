@@ -37,7 +37,7 @@ class EnsureIsAdmin
             || $user->is_super_admin
             || $user->is_tenant_super_admin
             || $user->is_god
-            || in_array($user->role ?? '', ['admin', 'tenant_admin', 'super_admin']);
+            || in_array($user->role ?? '', ['admin', 'tenant_admin', 'super_admin', 'broker']);
 
         if (!$isAdmin) {
             return response()->json([

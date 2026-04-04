@@ -25,7 +25,6 @@ import {
   DropdownMenu,
   DropdownItem,
   useDisclosure,
-  Progress,
 } from '@heroui/react';
 import {
   FolderOpen,
@@ -138,7 +137,7 @@ export function GroupFilesTab({ groupId, isAdmin, isMember = true }: GroupFilesT
         if (search.trim()) params.set('q', search.trim());
 
         const resp = await api.get(`/v2/groups/${groupId}/files?${params}`);
-        const data = resp.data ?? {};
+        const data = (resp.data ?? {}) as { items?: GroupFile[]; cursor?: string | null; has_more?: boolean };
 
         if (reset) {
           setFiles(data.items ?? []);
@@ -159,7 +158,7 @@ export function GroupFilesTab({ groupId, isAdmin, isMember = true }: GroupFilesT
   const loadFolders = useCallback(async () => {
     try {
       const resp = await api.get(`/v2/groups/${groupId}/files/folders`);
-      setFolders(resp.data || []);
+      setFolders((resp.data || []) as Folder[]);
     } catch (err) {
       logError('GroupFilesTab.loadFolders', err);
     }

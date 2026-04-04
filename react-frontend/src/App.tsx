@@ -100,6 +100,9 @@ const VerifyIdentityPage = lazyWithRetry(() => import('./pages/auth/VerifyIdenti
 // Admin Panel (lazy-loaded — keeps recharts, jsPDF, admin sidebar/header out of main bundle)
 const AdminApp = lazyWithRetry(() => import('@/admin/AdminApp'));
 
+// Broker Panel (lazy-loaded — simplified admin interface for brokers)
+const BrokerApp = lazyWithRetry(() => import('@/broker/BrokerApp'));
+
 // Lazy-loaded Pages (all use lazyWithRetry to handle stale chunk errors after deploys)
 const HomePage = lazyWithRetry(() => import('@/pages/public/HomePage'));
 const DashboardPage = lazyWithRetry(() => import('@/pages/dashboard/DashboardPage'));
@@ -942,6 +945,9 @@ function AppRoutes() {
 
       {/* Admin Panel (separate layout, no main navbar/footer) — fully lazy-loaded */}
       <Route path="admin/*" element={<AdminApp />} />
+
+      {/* Broker Panel (simplified admin for brokers) — fully lazy-loaded */}
+      <Route path="broker/*" element={<BrokerApp />} />
 
       {/* 404 Fallback (must be after admin to avoid catching /admin paths) */}
       <Route element={<Layout />}>

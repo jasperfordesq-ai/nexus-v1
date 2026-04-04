@@ -104,7 +104,7 @@ export function GroupMediaTab({ groupId, isAdmin, isMember = true }: GroupMediaT
         if (filter !== 'all') params.set('type', filter);
 
         const resp = await api.get(`/v2/groups/${groupId}/media?${params}`);
-        const data = resp.data ?? {};
+        const data = (resp.data ?? {}) as { items?: MediaItem[]; cursor?: string | null; has_more?: boolean };
 
         if (reset) {
           setItems(data.items ?? []);

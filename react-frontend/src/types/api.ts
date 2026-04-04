@@ -27,7 +27,7 @@ export interface User {
   latitude?: number | null;
   longitude?: number | null;
   skills?: string[];
-  role?: 'member' | 'admin' | 'moderator' | 'tenant_admin' | 'super_admin';
+  role?: 'member' | 'admin' | 'moderator' | 'broker' | 'tenant_admin' | 'super_admin';
   is_super_admin?: boolean;
   is_god?: boolean;
   is_tenant_super_admin?: boolean;
@@ -852,6 +852,7 @@ export interface Group {
   };
   is_featured?: boolean;
   federated_visibility?: 'none' | 'listed' | 'joinable';
+  tags?: Array<{ id: number; name: string }>;
   created_at: string;
 }
 

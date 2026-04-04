@@ -134,7 +134,7 @@ export function GroupQATab({ groupId, isAdmin, isMember = true }: GroupQATabProp
         if (search.trim()) params.set('q', search.trim());
 
         const resp = await api.get(`/v2/groups/${groupId}/questions?${params}`);
-        const data = resp.data ?? {};
+        const data = (resp.data ?? {}) as { items?: Question[]; cursor?: string | null; has_more?: boolean };
 
         if (reset) {
           setQuestions(data.items ?? []);
@@ -181,7 +181,7 @@ export function GroupQATab({ groupId, isAdmin, isMember = true }: GroupQATabProp
 
       try {
         const resp = await api.get(`/v2/groups/${groupId}/questions/${questionId}`);
-        setExpandedDetail(resp.data);
+        setExpandedDetail(resp.data as QuestionDetail);
       } catch (err) {
         logError('GroupQATab.loadDetail', err);
         toast.error(t('qa.load_error', 'Failed to load question'));

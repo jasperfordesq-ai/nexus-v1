@@ -27,7 +27,7 @@ i18n
       'admin_dashboard', 'admin_nav', 'auth', 'dashboard',
       'emails', 'errors', 'goals', 'ideation', 'jobs', 'kb',
       'listings', 'matches', 'messages', 'polls', 'settings',
-      'social', 'volunteering', 'explore',
+      'social', 'volunteering', 'explore', 'broker',
     ],
     debug: import.meta.env.DEV,
 

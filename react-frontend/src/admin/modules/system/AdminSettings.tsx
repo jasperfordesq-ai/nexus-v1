@@ -71,9 +71,9 @@ export function AdminSettings() {
           contact_email: (tenant.contact_email as string) ?? '',
           contact_phone: (tenant.contact_phone as string) ?? '',
           registration_mode: (settings.registration_mode as string) ?? 'open',
-          email_verification: settings.email_verification === 'true' || settings.email_verification === true || settings.email_verification === '1',
-          admin_approval: settings.admin_approval === 'true' || settings.admin_approval === true || settings.admin_approval === '1',
-          maintenance_mode: settings.maintenance_mode === 'true' || settings.maintenance_mode === true || settings.maintenance_mode === '1',
+          email_verification: settings.email_verification === 'true' || settings.email_verification === '1',
+          admin_approval: settings.admin_approval === 'true' || settings.admin_approval === '1',
+          maintenance_mode: settings.maintenance_mode === 'true' || settings.maintenance_mode === '1',
           footer_text: (settings.footer_text as string) ?? '',
         };
         setForm(loaded);

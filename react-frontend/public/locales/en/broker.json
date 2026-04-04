@@ -1,0 +1,212 @@
+{
+  "checking_permissions": "Checking permissions...",
+
+  "sidebar": {
+    "title": "Broker Panel",
+    "expand": "Expand sidebar",
+    "collapse": "Collapse sidebar",
+    "full_admin": "Full Admin Panel"
+  },
+
+  "header": {
+    "toggle_sidebar": "Toggle sidebar",
+    "back_to_site": "Back to Site",
+    "notifications": "Notifications",
+    "user_menu": "User menu",
+    "my_profile": "My Profile",
+    "sign_out": "Sign Out"
+  },
+
+  "nav": {
+    "dashboard": "Dashboard",
+    "members": "Members",
+    "onboarding": "Onboarding",
+    "safeguarding": "Safeguarding",
+    "vetting": "Vetting & DBS",
+    "exchanges": "Exchanges",
+    "messages": "Messages"
+  },
+
+  "breadcrumbs": {
+    "aria_label": "Breadcrumb navigation",
+    "dashboard": "Broker Panel",
+    "members": "Members",
+    "onboarding": "Onboarding",
+    "safeguarding": "Safeguarding",
+    "vetting": "Vetting & DBS",
+    "exchanges": "Exchanges",
+    "messages": "Messages"
+  },
+
+  "dashboard": {
+    "title": "Broker Dashboard",
+    "description": "Your daily overview of community management tasks.",
+    "pending_members": "Pending Members",
+    "safeguarding_alerts": "Safeguarding Alerts",
+    "unreviewed_messages": "Unreviewed Messages",
+    "pending_exchanges": "Pending Exchanges",
+    "vetting_expiring": "Vetting Expiring",
+    "monitored_users": "Monitored Users",
+    "high_risk_listings": "High Risk Listings",
+    "new_signups_today": "New Signups Today",
+    "quick_actions": "Quick Actions",
+    "recent_activity": "Recent Activity",
+    "no_activity": "No recent activity.",
+    "view_all": "View All"
+  },
+
+  "members": {
+    "title": "Members",
+    "description": "View and manage community members.",
+    "tab_all": "All",
+    "tab_pending": "Pending",
+    "tab_active": "Active",
+    "tab_suspended": "Suspended",
+    "search_placeholder": "Search members...",
+    "col_name": "Name",
+    "col_email": "Email",
+    "col_status": "Status",
+    "col_joined": "Joined",
+    "col_actions": "Actions",
+    "approve": "Approve",
+    "suspend": "Suspend",
+    "reactivate": "Reactivate",
+    "view_profile": "View Profile",
+    "confirm_approve_title": "Approve Member",
+    "confirm_approve_message": "Are you sure you want to approve this member? They will gain full access to the platform.",
+    "confirm_suspend_title": "Suspend Member",
+    "confirm_suspend_message": "Are you sure you want to suspend this member? They will lose access to the platform.",
+    "approved_success": "Member approved successfully.",
+    "suspended_success": "Member suspended successfully.",
+    "reactivated_success": "Member reactivated successfully.",
+    "action_failed": "Action failed. Please try again."
+  },
+
+  "onboarding": {
+    "title": "Onboarding",
+    "description": "Track new member progress and approve pending registrations.",
+    "funnel_title": "Onboarding Funnel",
+    "stage_registered": "Registered",
+    "stage_email_verified": "Email Verified",
+    "stage_profile_complete": "Profile Complete",
+    "stage_first_exchange": "First Exchange",
+    "pending_approvals": "Pending Approvals",
+    "no_pending": "No pending members to approve."
+  },
+
+  "safeguarding": {
+    "title": "Safeguarding",
+    "description": "Monitor safeguarding alerts, guardian assignments, and member preferences.",
+    "tab_flagged": "Flagged Messages",
+    "tab_guardians": "Guardian Assignments",
+    "tab_preferences": "Member Preferences",
+    "col_sender": "Sender",
+    "col_receiver": "Receiver",
+    "col_reason": "Flag Reason",
+    "col_severity": "Severity",
+    "col_date": "Date",
+    "col_status": "Status",
+    "col_ward": "Ward",
+    "col_guardian": "Guardian",
+    "col_assigned": "Assigned",
+    "col_consent": "Consent",
+    "col_member": "Member",
+    "col_options": "Preferences",
+    "mark_reviewed": "Mark Reviewed",
+    "review_notes_placeholder": "Add review notes...",
+    "reviewed_success": "Message reviewed successfully.",
+    "no_flagged": "No flagged messages to review.",
+    "no_assignments": "No guardian assignments.",
+    "no_preferences": "No member safeguarding preferences recorded."
+  },
+
+  "vetting": {
+    "title": "Vetting & DBS",
+    "description": "Manage vetting records, DBS checks, and expiry tracking.",
+    "tab_all": "All",
+    "tab_pending": "Pending",
+    "tab_verified": "Verified",
+    "tab_expiring": "Expiring Soon",
+    "col_member": "Member",
+    "col_type": "Type",
+    "col_reference": "Reference",
+    "col_status": "Status",
+    "col_expiry": "Expiry Date",
+    "col_actions": "Actions",
+    "verify": "Verify",
+    "reject": "Reject",
+    "reject_reason_placeholder": "Reason for rejection...",
+    "verified_success": "Vetting record verified.",
+    "rejected_success": "Vetting record rejected.",
+    "no_records": "No vetting records found."
+  },
+
+  "exchanges": {
+    "title": "Exchanges",
+    "description": "Oversee pending exchange requests and disputes.",
+    "tab_all": "All",
+    "tab_pending": "Pending",
+    "tab_approved": "Approved",
+    "tab_disputed": "Disputed",
+    "col_from": "From",
+    "col_to": "To",
+    "col_service": "Service",
+    "col_hours": "Hours",
+    "col_status": "Status",
+    "col_date": "Date",
+    "col_actions": "Actions",
+    "approve": "Approve",
+    "reject": "Reject",
+    "notes_placeholder": "Add notes...",
+    "reason_placeholder": "Reason for rejection...",
+    "approved_success": "Exchange approved.",
+    "rejected_success": "Exchange rejected.",
+    "no_exchanges": "No exchanges found."
+  },
+
+  "messages": {
+    "title": "Message Review",
+    "description": "Review flagged conversations requiring broker oversight.",
+    "filter_unreviewed": "Unreviewed",
+    "filter_all": "All",
+    "filter_flagged": "Flagged",
+    "col_sender": "Sender",
+    "col_receiver": "Receiver",
+    "col_preview": "Preview",
+    "col_reason": "Reason",
+    "col_severity": "Severity",
+    "col_date": "Date",
+    "col_actions": "Actions",
+    "mark_reviewed": "Mark Reviewed",
+    "reviewed_success": "Message marked as reviewed.",
+    "no_messages": "No messages to review."
+  },
+
+  "status": {
+    "active": "Active",
+    "pending": "Pending",
+    "suspended": "Suspended",
+    "banned": "Banned",
+    "verified": "Verified",
+    "expired": "Expired",
+    "rejected": "Rejected",
+    "approved": "Approved",
+    "disputed": "Disputed",
+    "reviewed": "Reviewed",
+    "unreviewed": "Unreviewed",
+    "low": "Low",
+    "medium": "Medium",
+    "high": "High",
+    "critical": "Critical"
+  },
+
+  "common": {
+    "loading": "Loading...",
+    "error": "Something went wrong. Please try again.",
+    "confirm": "Confirm",
+    "cancel": "Cancel",
+    "save": "Save",
+    "refresh": "Refresh",
+    "no_data": "No data available."
+  }
+}
