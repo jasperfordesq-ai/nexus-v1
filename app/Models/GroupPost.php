@@ -17,6 +17,9 @@ class GroupPost extends Model
 
     protected $table = 'group_posts';
 
+    // group_posts table has created_at but no updated_at column
+    const UPDATED_AT = null;
+
     protected $fillable = [
         'tenant_id', 'discussion_id', 'user_id', 'content',
     ];
