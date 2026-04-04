@@ -90,6 +90,14 @@ Route::get('/v2/categories', function (\Illuminate\Http\Request $request) {
 });
 
 // ============================================
+// Public group routes (optional auth — viewer_membership populated when Bearer token present)
+// These are outside the auth:sanctum group so Sanctum middleware doesn't interfere.
+// ============================================
+Route::get('/v2/groups', [\App\Http\Controllers\Api\GroupsController::class, 'index']);
+Route::get('/v2/groups/{id}', [\App\Http\Controllers\Api\GroupsController::class, 'show']);
+Route::get('/v2/groups/{id}/members', [\App\Http\Controllers\Api\GroupsController::class, 'members']);
+
+// ============================================
 // Authenticated routes — Sanctum token authentication required
 // Controllers also enforce auth via $this->requireAuth() as a fallback
 // ============================================
@@ -209,18 +217,17 @@ Route::get('/v2/connections/status/me', function () {
     return response()->json(['errors' => [['code' => 'invalid_user', 'message' => 'Cannot check connection status with yourself']]], 422);
 }); // Guard: reject literal "me" before {userId} param
 // ============================================
-Route::get('/v2/groups', [\App\Http\Controllers\Api\GroupsController::class, 'index'])->withoutMiddleware('auth:sanctum');
+// NOTE: GET /v2/groups, /v2/groups/{id}, /v2/groups/{id}/members are registered
+// as public routes ABOVE this auth group (with optional auth in the controller).
 Route::post('/v2/groups', [\App\Http\Controllers\Api\GroupsController::class, 'store']);
 Route::get('/v2/groups/recommendations', [\App\Http\Controllers\Api\GroupRecommendController::class, 'index']);
 Route::post('/v2/groups/recommendations/track', [\App\Http\Controllers\Api\GroupRecommendController::class, 'track']);
 Route::get('/v2/groups/recommendations/metrics', [\App\Http\Controllers\Api\GroupRecommendController::class, 'metrics']);
-Route::get('/v2/groups/{id}', [\App\Http\Controllers\Api\GroupsController::class, 'show'])->withoutMiddleware('auth:sanctum');
 Route::put('/v2/groups/{id}', [\App\Http\Controllers\Api\GroupsController::class, 'update']);
 Route::delete('/v2/groups/{id}', [\App\Http\Controllers\Api\GroupsController::class, 'destroy']);
 Route::get('/v2/groups/{id}/similar', [\App\Http\Controllers\Api\GroupRecommendController::class, 'similar']);
 Route::post('/v2/groups/{id}/join', [\App\Http\Controllers\Api\GroupsController::class, 'join']);
 Route::delete('/v2/groups/{id}/membership', [\App\Http\Controllers\Api\GroupsController::class, 'leave']);
-Route::get('/v2/groups/{id}/members', [\App\Http\Controllers\Api\GroupsController::class, 'members'])->withoutMiddleware('auth:sanctum');
 Route::put('/v2/groups/{id}/members/{userId}', [\App\Http\Controllers\Api\GroupsController::class, 'updateMember']);
 Route::delete('/v2/groups/{id}/members/{userId}', [\App\Http\Controllers\Api\GroupsController::class, 'removeMember']);
 Route::get('/v2/groups/{id}/requests', [\App\Http\Controllers\Api\GroupsController::class, 'pendingRequests']);

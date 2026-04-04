@@ -36,7 +36,15 @@ class GroupsController extends BaseApiController
      */
     public function index(): JsonResponse
     {
-        $userId = $this->getOptionalUserId() ?? $this->resolveSanctumUserOptionally();
+        $userId = null;
+        try {
+            $user = \Illuminate\Support\Facades\Auth::guard('api')->user();
+            if ($user) {
+                $userId = (int) $user->id;
+            }
+        } catch (\Throwable $e) {
+            // Invalid token — proceed as unauthenticated
+        }
 
         $filters = [
             'limit' => $this->queryInt('per_page', 20, 1, 100),
@@ -83,17 +91,22 @@ class GroupsController extends BaseApiController
     /**
      * GET /api/v2/groups/{id}
      *
-     * Public endpoint (withoutMiddleware) — manually resolve Sanctum user
-     * when a Bearer token is present so viewer_membership is populated.
+     * Public endpoint (registered outside auth:sanctum group).
+     * Resolves authenticated user via Auth::guard('api') when Bearer token is
+     * present, so viewer_membership is populated for logged-in users.
      */
     public function show(int $id): JsonResponse
     {
-        $userId = $this->getOptionalUserId();
-
-        // withoutMiddleware('auth:sanctum') means Auth::user() is null even
-        // when a valid Bearer token is sent. Manually resolve Sanctum token.
-        if (!$userId) {
-            $userId = $this->resolveSanctumUserOptionally();
+        // This route is outside the auth:sanctum middleware group, so we
+        // resolve the user directly from the Bearer token via the api guard.
+        $userId = null;
+        try {
+            $user = \Illuminate\Support\Facades\Auth::guard('api')->user();
+            if ($user) {
+                $userId = (int) $user->id;
+            }
+        } catch (\Throwable $e) {
+            // Invalid/expired token — proceed as unauthenticated
         }
 
         $group = $this->groupService->getById($id, $userId);
