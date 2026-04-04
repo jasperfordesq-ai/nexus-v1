@@ -22,14 +22,14 @@ return new class extends Migration
 
         Schema::create('listing_reports', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('tenant_id');
-            $table->unsignedBigInteger('listing_id');
-            $table->unsignedBigInteger('reporter_id');
+            $table->integer('tenant_id');
+            $table->integer('listing_id');
+            $table->integer('reporter_id');
             $table->enum('reason', ['inappropriate', 'safety_concern', 'misleading', 'spam', 'not_timebank_service', 'other']);
             $table->text('details')->nullable();
             $table->enum('status', ['pending', 'reviewed', 'dismissed', 'action_taken'])->default('pending');
             $table->text('admin_notes')->nullable();
-            $table->unsignedBigInteger('reviewed_by')->nullable();
+            $table->integer('reviewed_by')->nullable();
             $table->timestamp('reviewed_at')->nullable();
             $table->timestamps();
 

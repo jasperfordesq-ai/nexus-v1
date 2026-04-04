@@ -12,10 +12,14 @@ return new class extends Migration
 {
     public function up(): void
     {
+        if (Schema::hasTable('listing_images')) {
+            return;
+        }
+
         Schema::create('listing_images', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('tenant_id');
-            $table->unsignedBigInteger('listing_id');
+            $table->integer('tenant_id');
+            $table->integer('listing_id');
             $table->string('image_url');
             $table->unsignedSmallInteger('sort_order')->default(0);
             $table->string('alt_text')->nullable();
