@@ -67,7 +67,6 @@ import {
 import { useTranslation } from 'react-i18next';
 import { useAuth, useTenant, useNotifications, useTheme, useMenuContext } from '@/contexts';
 import { resolveAvatarUrl } from '@/lib/helpers';
-import { navigateToLegacyAdmin } from '@/lib/nav-helpers';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 import { DesktopMenuItems } from '@/components/navigation';
 import { SearchOverlay } from '@/components/layout/SearchOverlay';
@@ -391,18 +390,6 @@ export function Navbar({ onMobileMenuOpen, externalSearchOpen, onSearchOpenChang
                     <Shield className="w-3.5 h-3.5 shrink-0" aria-hidden="true" />
                     <span className="hidden md:inline">{t('user_menu.admin_panel')}</span>
                   </Button>
-                  {user?.email === 'jasper.ford.esq@gmail.com' && (
-                  <Button
-                    variant="light"
-                    size="sm"
-                    className="text-theme-muted hover:text-theme-primary h-7 min-w-0 px-2 gap-1 text-xs shrink-0"
-                    onPress={navigateToLegacyAdmin}
-                    aria-label={t('user_menu.legacy_admin')}
-                  >
-                    <LayoutDashboard className="w-3.5 h-3.5 shrink-0" aria-hidden="true" />
-                    <span className="hidden md:inline">{t('user_menu.legacy_admin')}</span>
-                  </Button>
-                  )}
                 </>
               )}
               {isAuthenticated && <span className="text-[var(--border-default)] text-xs select-none shrink-0">|</span>}

@@ -71,7 +71,6 @@ import { useTranslation } from 'react-i18next';
 import { useAuth, useTenant, useNotifications, useCookieConsent, useTheme } from '@/contexts';
 import { resolveAvatarUrl } from '@/lib/helpers';
 import type { TenantFeatures, TenantModules } from '@/types/api';
-import { navigateToLegacyAdmin } from '@/lib/nav-helpers';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 import { useMenuContext } from '@/contexts';
 import { MobileMenuItems } from '@/components/navigation';
@@ -502,17 +501,6 @@ export function MobileDrawer({ isOpen, onClose, onSearchOpen }: MobileDrawerProp
                         <Shield className="w-3.5 h-3.5" aria-hidden="true" />
                         {t('user_menu.admin_panel')}
                       </Button>
-                      {user?.email === 'jasper.ford.esq@gmail.com' && (
-                      <Button
-                        variant="light"
-                        size="sm"
-                        className="text-theme-muted hover:text-theme-primary h-8 min-w-0 px-2 gap-1.5 text-xs"
-                        onPress={navigateToLegacyAdmin}
-                      >
-                        <LayoutDashboard className="w-3.5 h-3.5" aria-hidden="true" />
-                        {t('user_menu.legacy_admin')}
-                      </Button>
-                      )}
                     </>
                   )}
                 </div>
