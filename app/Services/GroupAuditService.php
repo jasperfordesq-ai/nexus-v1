@@ -8,7 +8,7 @@ declare(strict_types=1);
 
 namespace App\Services;
 
-use App\Core\Database;
+use Illuminate\Support\Facades\DB;
 use App\Core\TenantContext;
 
 /**
@@ -17,8 +17,6 @@ use App\Core\TenantContext;
  * Tracks group lifecycle events (create, update, delete, feature),
  * member management (join, leave, kick, ban), and content moderation
  * (discussions, posts). All operations are tenant-scoped.
- *
- * Uses the legacy Database class (PDO wrapper) for direct SQL queries.
  */
 class GroupAuditService
 {
@@ -41,129 +39,94 @@ class GroupAuditService
 
     /**
      * Log an audit entry for a group action.
-     *
-     * Inserts a row into group_audit_log with the current tenant context,
-     * optional JSON details, and the client IP address.
-     *
-     * @param string $action  One of the ACTION_* constants
-     * @param int    $groupId The group this action relates to
-     * @param int    $userId  The user who performed the action
-     * @param array  $details Optional key-value details (stored as JSON)
-     *
-     * @return int|string The inserted row ID (via PDO::lastInsertId)
      */
-    public static function log(string $action, int $groupId, int $userId, array $details = []): int|string
+    public static function log(string $action, int $groupId, int $userId, array $details = []): int
     {
         $tenantId = TenantContext::getId();
-        $ipAddress = $_SERVER['REMOTE_ADDR'] ?? null;
+        $ipAddress = $_SERVER['REMOTE_ADDR'] ?? request()->ip() ?? null;
         $detailsJson = !empty($details) ? json_encode($details) : null;
 
-        Database::query(
-            "INSERT INTO group_audit_log (tenant_id, group_id, user_id, action, details, ip_address, created_at)
-             VALUES (?, ?, ?, ?, ?, ?, NOW())",
-            [$tenantId, $groupId, $userId, $action, $detailsJson, $ipAddress]
-        );
-
-        return Database::getInstance()->lastInsertId();
+        return DB::table('group_audit_log')->insertGetId([
+            'tenant_id'  => $tenantId,
+            'group_id'   => $groupId,
+            'user_id'    => $userId,
+            'action'     => $action,
+            'details'    => $detailsJson,
+            'ip_address' => $ipAddress,
+            'created_at' => now(),
+        ]);
     }
 
     /**
      * Get the audit log for a specific group.
-     *
-     * Returns all audit entries for the group within the current tenant,
-     * optionally filtered by action type. Results are ordered newest-first.
-     *
-     * @param int   $groupId The group to retrieve logs for
-     * @param array $filters Optional filters: ['action' => 'group_updated']
-     *
-     * @return array Array of associative arrays (one per log entry)
      */
     public static function getGroupLog(int $groupId, array $filters = []): array
     {
         $tenantId = TenantContext::getId();
-        $params = [$groupId, $tenantId];
 
-        $sql = "SELECT * FROM group_audit_log WHERE group_id = ? AND tenant_id = ?";
+        $query = DB::table('group_audit_log')
+            ->where('group_id', $groupId)
+            ->where('tenant_id', $tenantId);
 
         if (!empty($filters['action'])) {
-            $sql .= " AND action = ?";
-            $params[] = $filters['action'];
+            $query->where('action', $filters['action']);
         }
 
-        $sql .= " ORDER BY created_at DESC";
-
-        $stmt = Database::query($sql, $params);
-
-        return $stmt->fetchAll(\PDO::FETCH_ASSOC) ?: [];
+        return $query->orderByDesc('created_at')
+            ->get()
+            ->map(fn ($row) => (array) $row)
+            ->toArray();
     }
 
     /**
      * Get a specific user's activity within a group.
-     *
-     * Returns all audit entries for the given user in the given group,
-     * scoped to the current tenant. Results are ordered newest-first.
-     *
-     * @param int $groupId The group to query
-     * @param int $userId  The user whose activity to retrieve
-     *
-     * @return array Array of associative arrays (one per log entry)
      */
     public static function getUserGroupActivity(int $groupId, int $userId): array
     {
         $tenantId = TenantContext::getId();
 
-        $stmt = Database::query(
-            "SELECT * FROM group_audit_log
-             WHERE group_id = ? AND user_id = ? AND tenant_id = ?
-             ORDER BY created_at DESC",
-            [$groupId, $userId, $tenantId]
-        );
-
-        return $stmt->fetchAll(\PDO::FETCH_ASSOC) ?: [];
+        return DB::table('group_audit_log')
+            ->where('group_id', $groupId)
+            ->where('user_id', $userId)
+            ->where('tenant_id', $tenantId)
+            ->orderByDesc('created_at')
+            ->get()
+            ->map(fn ($row) => (array) $row)
+            ->toArray();
     }
 
     /**
      * Get an activity summary for a group.
-     *
-     * Returns aggregate statistics including total action count,
-     * a breakdown of actions by type, and the top 5 most active users.
-     *
-     * @param int $groupId The group to summarize
-     *
-     * @return array{total_actions: int, actions_by_type: array, most_active_users: array}
      */
     public static function getActivitySummary(int $groupId): array
     {
         $tenantId = TenantContext::getId();
 
-        // Total actions
-        $stmt = Database::query(
-            "SELECT COUNT(*) as total FROM group_audit_log WHERE group_id = ? AND tenant_id = ?",
-            [$groupId, $tenantId]
-        );
-        $row = $stmt->fetch(\PDO::FETCH_ASSOC);
-        $totalActions = (int) ($row['total'] ?? 0);
+        $totalActions = (int) DB::table('group_audit_log')
+            ->where('group_id', $groupId)
+            ->where('tenant_id', $tenantId)
+            ->count();
 
-        // Actions by type
-        $stmt = Database::query(
-            "SELECT action, COUNT(*) as count FROM group_audit_log
-             WHERE group_id = ? AND tenant_id = ?
-             GROUP BY action
-             ORDER BY count DESC",
-            [$groupId, $tenantId]
-        );
-        $actionsByType = $stmt->fetchAll(\PDO::FETCH_ASSOC) ?: [];
+        $actionsByType = DB::table('group_audit_log')
+            ->where('group_id', $groupId)
+            ->where('tenant_id', $tenantId)
+            ->select('action', DB::raw('COUNT(*) as count'))
+            ->groupBy('action')
+            ->orderByDesc('count')
+            ->get()
+            ->map(fn ($row) => (array) $row)
+            ->toArray();
 
-        // Most active users (top 5)
-        $stmt = Database::query(
-            "SELECT user_id, COUNT(*) as action_count FROM group_audit_log
-             WHERE group_id = ? AND tenant_id = ?
-             GROUP BY user_id
-             ORDER BY action_count DESC
-             LIMIT 5",
-            [$groupId, $tenantId]
-        );
-        $mostActiveUsers = $stmt->fetchAll(\PDO::FETCH_ASSOC) ?: [];
+        $mostActiveUsers = DB::table('group_audit_log')
+            ->where('group_id', $groupId)
+            ->where('tenant_id', $tenantId)
+            ->select('user_id', DB::raw('COUNT(*) as action_count'))
+            ->groupBy('user_id')
+            ->orderByDesc('action_count')
+            ->limit(5)
+            ->get()
+            ->map(fn ($row) => (array) $row)
+            ->toArray();
 
         return [
             'total_actions'     => $totalActions,

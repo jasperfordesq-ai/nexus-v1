@@ -47,7 +47,7 @@ class GroupWelcomeController extends BaseApiController
         }
 
         $enabled = (bool) request()->input('enabled', false);
-        $message = request()->input('message', '');
+        $message = request()->input('message') ?? '';
 
         GroupWelcomeService::setConfig($id, $enabled, $message);
 
