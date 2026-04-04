@@ -55,6 +55,7 @@ import { StoryHighlights } from '@/components/stories/StoryHighlights';
 import { useTranslation } from 'react-i18next';
 import { useAuth, useFeature, useToast, useTenant } from '@/contexts';
 import { usePageTitle } from '@/hooks';
+import { PageMeta } from '@/components/seo';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
 import { resolveAvatarUrl, resolveAssetUrl } from '@/lib/helpers';
@@ -469,6 +470,7 @@ export function ProfilePage() {
       animate="visible"
       className="max-w-4xl mx-auto space-y-6"
     >
+      <PageMeta title="Profile" noIndex />
       {/* Profile Header */}
       <motion.div variants={itemVariants}>
         <GlassCard className="p-6 sm:p-8">

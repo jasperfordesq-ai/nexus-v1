@@ -43,6 +43,7 @@ import { useAuth, useToast, useTenant } from '@/contexts';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
 import { usePageTitle } from '@/hooks';
+import { PageMeta } from '@/components/seo';
 
 const STORAGE_KEY = 'nexus_employer_onboarding';
 const TOTAL_STEPS = 4;
@@ -202,6 +203,7 @@ export function EmployerOnboardingPage() {
 
   return (
     <div className="max-w-2xl mx-auto space-y-6">
+      <PageMeta title="Employer Onboarding" noIndex />
       {/* Header */}
       <div className="flex items-center gap-3">
         <Link

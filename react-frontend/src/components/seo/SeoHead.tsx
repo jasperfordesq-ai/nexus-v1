@@ -8,22 +8,33 @@ import { useLocation } from 'react-router-dom';
 import { useTenant } from '@/contexts';
 
 /**
- * SeoHead -- Global SEO tags rendered on every page.
+ * SeoHead — Global SEO tags rendered on every page via Layout.
  *
- * Renders: verification meta tags, Organization JSON-LD schema,
- * hreflang alternate links for multi-language SEO, and BreadcrumbList JSON-LD.
- * Place this in Layout.tsx so it runs on every page load.
+ * Renders:
+ *  - Webmaster verification meta tags (Google, Bing)
+ *  - Organization JSON-LD structured data
+ *  - BreadcrumbList JSON-LD (non-homepage)
+ *  - x-default hreflang (clean URL, no language query params)
+ *
+ * NOTE: This is a client-side SPA with i18next for localisation.
+ * Language switching happens in the browser — there are no separate
+ * server-side language URLs. Therefore we emit only `x-default`
+ * hreflang pointing to the clean canonical URL, not per-language
+ * `?lng=` variants (which created 3,997 hreflang/HTML-lang mismatches
+ * in Ahrefs because the rendered HTML lang didn't match the hreflang).
+ *
+ * The `<html lang>` attribute is synced dynamically by i18n.ts via
+ * `i18n.on('languageChanged')` — no Helmet intervention needed.
  */
-const SUPPORTED_LANGUAGES = ['en', 'ga', 'de', 'fr', 'it', 'pt', 'es', 'nl', 'pl', 'ja', 'ar'] as const;
-
 export function SeoHead() {
   const { branding, tenant } = useTenant();
   const location = useLocation();
 
   const siteName = branding.name || 'NEXUS';
   const siteUrl = typeof window !== 'undefined' ? window.location.origin : '';
-  // Use only the pathname (no query params) for canonical/hreflang to avoid stacking
-  const canonicalPath = `${siteUrl}${location.pathname}`;
+  // Clean canonical: pathname only, no query params or hash
+  const cleanPath = location.pathname === '/' ? '/' : location.pathname.replace(/\/+$/, '');
+  const canonicalPath = `${siteUrl}${cleanPath}`;
 
   // Build path segments for BreadcrumbList JSON-LD
   const pathSegments = location.pathname.split('/').filter(Boolean);
@@ -80,13 +91,8 @@ export function SeoHead() {
         {JSON.stringify(orgSchema)}
       </script>
 
-      {/* og:locale for current language */}
-      <meta property="og:locale" content={document.documentElement.lang || 'en'} />
-
-      {/* hreflang alternate links for multi-language SEO */}
-      {SUPPORTED_LANGUAGES.map(lang => (
-        <link key={lang} rel="alternate" hrefLang={lang} href={`${canonicalPath}?lng=${lang}`} />
-      ))}
+      {/* x-default hreflang — clean canonical URL, no ?lng= variants.
+          This is the only hreflang needed for a client-side i18n SPA. */}
       <link rel="alternate" hrefLang="x-default" href={canonicalPath} />
 
       {/* BreadcrumbList JSON-LD (only on non-homepage routes) */}

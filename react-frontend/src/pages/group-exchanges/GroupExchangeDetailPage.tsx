@@ -60,6 +60,7 @@ import { GlassCard } from '@/components/ui';
 import { Breadcrumbs } from '@/components/navigation';
 import { LoadingScreen, EmptyState } from '@/components/feedback';
 import { useAuth, useToast, useTenant } from '@/contexts';
+import { PageMeta } from '@/components/seo';
 import { usePageTitle } from '@/hooks';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
@@ -440,6 +441,7 @@ export function GroupExchangeDetailPage() {
       animate={{ opacity: 1, y: 0 }}
       className="max-w-3xl mx-auto space-y-6"
     >
+      <PageMeta title="Group Exchange" noIndex />
       {/* Breadcrumbs */}
       <Breadcrumbs items={[
         { label: t('title'), href: tenantPath('/group-exchanges') },

@@ -38,6 +38,7 @@ import {
 import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
 import { EmptyState } from '@/components/feedback';
+import { PageMeta } from '@/components/seo';
 import { usePageTitle } from '@/hooks';
 import { useAuth, useTenant, useToast } from '@/contexts';
 import { api } from '@/lib/api';
@@ -206,6 +207,7 @@ export function GroupExchangesPage() {
       animate={{ opacity: 1, y: 0 }}
       className="space-y-6"
     >
+      <PageMeta title="Group Exchanges" noIndex />
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>

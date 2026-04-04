@@ -13,6 +13,7 @@ import { Button } from '@heroui/react';
 import { Home, ArrowLeft, Construction } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
+import { PageMeta } from '@/components/seo';
 import { useTenant } from '@/contexts';
 import { usePageTitle } from '@/hooks';
 
@@ -26,6 +27,7 @@ export function ComingSoonPage({ feature = 'This feature' }: ComingSoonPageProps
   usePageTitle(t('coming_soon.page_title'));
   return (
     <div className="min-h-[80vh] flex items-center justify-center px-4">
+      <PageMeta title={t('coming_soon.page_title')} noIndex />
       <motion.div
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}

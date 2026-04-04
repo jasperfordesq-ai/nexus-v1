@@ -5,6 +5,7 @@
 
 import { FileText } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import { PageMeta } from '@/components/seo';
 import { usePageTitle } from '@/hooks/usePageTitle';
 import {
   PlatformLegalPage,
@@ -599,14 +600,17 @@ export function PlatformTermsPage() {
   ];
 
   return (
-    <PlatformLegalPage
-      title={t('platform_terms.title')}
-      subtitle={t('platform_terms.subtitle')}
-      icon={FileText}
-      effectiveDate="1 March 2026"
-      sections={sections}
-      crossLinks={crossLinks}
-    />
+    <>
+      <PageMeta title="Platform Terms of Service" />
+      <PlatformLegalPage
+        title={t('platform_terms.title')}
+        subtitle={t('platform_terms.subtitle')}
+        icon={FileText}
+        effectiveDate="1 March 2026"
+        sections={sections}
+        crossLinks={crossLinks}
+      />
+    </>
   );
 }
 

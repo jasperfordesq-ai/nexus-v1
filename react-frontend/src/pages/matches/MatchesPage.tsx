@@ -40,6 +40,7 @@ import { GlassCard, AlgorithmLabel } from '@/components/ui';
 import { EmptyState } from '@/components/feedback';
 import { Breadcrumbs } from '@/components/navigation';
 import { useAuth, useToast, useTenant } from '@/contexts';
+import { PageMeta } from '@/components/seo';
 import { usePageTitle } from '@/hooks';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
@@ -158,6 +159,7 @@ export function MatchesPage() {
   // ─── Render ───
   return (
     <div className="max-w-4xl mx-auto px-4 py-6 space-y-6">
+      <PageMeta title="Matches" noIndex />
       <Breadcrumbs items={[{ label: t('breadcrumb_dashboard'), href: tenantPath('/dashboard') }, { label: t('breadcrumb_matches') }]} />
 
       {/* Header */}

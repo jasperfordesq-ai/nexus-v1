@@ -44,6 +44,7 @@ import { useAuth, useTenant } from '@/contexts';
 import type { RegisterResult } from '@/contexts/AuthContext';
 import { usePageTitle } from '@/hooks';
 import { GlassCard } from '@/components/ui';
+import { PageMeta } from '@/components/seo';
 import { PlaceAutocompleteInput } from '@/components/location';
 import { api, tokenManager } from '@/lib/api';
 import { logError } from '@/lib/logger';
@@ -1094,6 +1095,7 @@ export function RegisterPage() {
 
   return (
     <div className="min-h-screen flex items-center justify-center p-4 py-12">
+      <PageMeta title="Create Account" noIndex />
       {/* Background blobs */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none">
         <div className="blob blob-indigo" />

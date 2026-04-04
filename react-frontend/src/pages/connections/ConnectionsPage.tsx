@@ -42,6 +42,7 @@ import { useTranslation } from 'react-i18next';
 import { api } from '@/lib/api';
 import { resolveAvatarUrl } from '@/lib/helpers';
 import { usePageTitle } from '@/hooks';
+import { PageMeta } from '@/components/seo';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Types
@@ -571,6 +572,7 @@ export default function ConnectionsPage() {
 
   return (
     <div className="min-h-screen py-6 px-4">
+      <PageMeta title="Connections" noIndex />
       <div className="max-w-3xl mx-auto">
         {/* Page header */}
         <div className="mb-6">

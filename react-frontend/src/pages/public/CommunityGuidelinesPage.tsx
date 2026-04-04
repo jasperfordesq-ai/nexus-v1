@@ -19,6 +19,7 @@ import { Users, ArrowLeft, FileText, Send } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
 import { CustomLegalDocument } from '@/components/legal/CustomLegalDocument';
+import { PageMeta } from '@/components/seo';
 import { useTenant } from '@/contexts';
 import { usePageTitle } from '@/hooks';
 import { useLegalDocument } from '@/hooks/useLegalDocument';
@@ -49,7 +50,12 @@ export function CommunityGuidelinesPage() {
 
   // Custom document exists — render it
   if (customDoc) {
-    return <CustomLegalDocument document={customDoc} />;
+    return (
+      <>
+        <PageMeta title="Community Guidelines" description="Community guidelines for respectful and productive timebanking." />
+        <CustomLegalDocument document={customDoc} />
+      </>
+    );
   }
 
   // No custom document — show placeholder
@@ -60,6 +66,7 @@ export function CommunityGuidelinesPage() {
       animate="visible"
       className="max-w-4xl mx-auto space-y-6"
     >
+      <PageMeta title="Community Guidelines" description="Community guidelines for respectful and productive timebanking." />
       <motion.div variants={itemVariants} className="text-center">
         <div className="inline-flex p-4 rounded-2xl bg-gradient-to-br from-blue-500/20 to-purple-500/20 mb-4">
           <Users className="w-10 h-10 text-blue-500 dark:text-blue-400" aria-hidden="true" />

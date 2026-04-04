@@ -37,6 +37,7 @@ import {
 import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
 import { Breadcrumbs } from '@/components/navigation';
+import { PageMeta } from '@/components/seo';
 import { useAuth, useTenant } from '@/contexts';
 import { usePageTitle } from '@/hooks';
 import { api } from '@/lib/api';
@@ -194,6 +195,7 @@ export function FederationPartnerDetailPage() {
 
   return (
     <div className="space-y-6">
+      <PageMeta title="Partner Details" noIndex />
       {/* Breadcrumbs */}
       <Breadcrumbs
         items={[

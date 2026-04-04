@@ -57,6 +57,7 @@ import { GlassCard } from '@/components/ui';
 import { useAuth, useToast, useTenant } from '@/contexts';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
+import { PageMeta } from '@/components/seo';
 import { usePageTitle } from '@/hooks';
 
 interface JobFormData {
@@ -668,6 +669,7 @@ export function CreateJobPage() {
 
   return (
     <div className="space-y-6 max-w-2xl mx-auto">
+      <PageMeta title="Post a Job" noIndex />
       {/* Back nav */}
       <Link
         to={isEditing ? tenantPath(`/jobs/${id}`) : tenantPath('/jobs')}

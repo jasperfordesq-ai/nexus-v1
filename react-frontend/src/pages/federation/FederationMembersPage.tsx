@@ -39,6 +39,7 @@ import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
 import { Breadcrumbs } from '@/components/navigation';
 import { EmptyState } from '@/components/feedback';
+import { PageMeta } from '@/components/seo';
 import { useAuth, useTenant, useToast } from '@/contexts';
 import { api } from '@/lib/api';
 import { resolveAvatarUrl } from '@/lib/helpers';
@@ -255,6 +256,7 @@ export function FederationMembersPage() {
 
   return (
     <div className="space-y-6">
+      <PageMeta title="Federation Members" noIndex />
       {/* Breadcrumbs */}
       <Breadcrumbs
         items={[

@@ -5,6 +5,7 @@
 
 import { AlertTriangle } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import { PageMeta } from '@/components/seo';
 import { usePageTitle } from '@/hooks/usePageTitle';
 import {
   PlatformLegalPage,
@@ -553,17 +554,20 @@ export function PlatformDisclaimerPage() {
   const { t } = useTranslation('legal');
   usePageTitle(t('platform_disclaimer.page_title'));
   return (
-    <PlatformLegalPage
-      title={t('platform_disclaimer.title')}
-      subtitle={t('platform_disclaimer.subtitle')}
-      icon={AlertTriangle}
-      effectiveDate="1 March 2026"
-      sections={sections}
-      crossLinks={[
-        { label: t('platform_disclaimer.link_terms'), to: '/platform/terms' },
-        { label: t('platform_disclaimer.link_privacy'), to: '/platform/privacy' },
-      ]}
-    />
+    <>
+      <PageMeta title="Platform Disclaimer" />
+      <PlatformLegalPage
+        title={t('platform_disclaimer.title')}
+        subtitle={t('platform_disclaimer.subtitle')}
+        icon={AlertTriangle}
+        effectiveDate="1 March 2026"
+        sections={sections}
+        crossLinks={[
+          { label: t('platform_disclaimer.link_terms'), to: '/platform/terms' },
+          { label: t('platform_disclaimer.link_privacy'), to: '/platform/privacy' },
+        ]}
+      />
+    </>
   );
 }
 

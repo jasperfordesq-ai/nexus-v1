@@ -93,6 +93,7 @@ class AdminConfigController extends BaseApiController
         'seo_title_suffix' => '',
         'seo_meta_description' => '',
         'seo_meta_keywords' => '',
+        'seo_og_image_url' => '',
         'seo_auto_sitemap' => '1',
         'seo_canonical_urls' => '1',
         'seo_open_graph' => '1',
@@ -1074,6 +1075,44 @@ class AdminConfigController extends BaseApiController
         $this->redisCache->delete('tenant_bootstrap', $tenantId);
 
         return $this->respondWithData(['updated' => true, 'keys_updated' => $updated]);
+    }
+
+    // =========================================================================
+    // Sitemap Management
+    // =========================================================================
+
+    /** GET /api/v2/admin/config/sitemap-stats */
+    public function getSitemapStats(): JsonResponse
+    {
+        $this->requireAdmin();
+        $tenantId = TenantContext::getId();
+
+        $sitemapService = app(\App\Services\SitemapService::class);
+        $stats = $sitemapService->getStats($tenantId);
+
+        $tenant = DB::selectOne("SELECT slug, domain FROM tenants WHERE id = ?", [$tenantId]);
+        $frontendBase = rtrim(env('FRONTEND_URL', 'https://app.project-nexus.ie'), '/');
+        $sitemapUrl = !empty($tenant->domain)
+            ? 'https://' . rtrim($tenant->domain, '/') . '/sitemap.xml'
+            : $frontendBase . '/sitemap.xml';
+
+        return $this->respondWithData([
+            'sitemap_url' => $sitemapUrl,
+            'total_urls' => $stats['total_urls'],
+            'content_types' => $stats['content_types'],
+        ]);
+    }
+
+    /** POST /api/v2/admin/config/sitemap-clear-cache */
+    public function clearSitemapCache(): JsonResponse
+    {
+        $this->requireAdmin();
+        $tenantId = TenantContext::getId();
+
+        $sitemapService = app(\App\Services\SitemapService::class);
+        $cleared = $sitemapService->clearCache($tenantId);
+
+        return $this->respondWithData(['cleared' => $cleared]);
     }
 
     // =========================================================================

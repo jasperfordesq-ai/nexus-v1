@@ -23,6 +23,7 @@ import { useTranslation } from 'react-i18next';
 import { GlassCard, ExchangeCardSkeleton } from '@/components/ui';
 import { EmptyState } from '@/components/feedback';
 import { useAuth, useToast, useTenant } from '@/contexts';
+import { PageMeta } from '@/components/seo';
 import { usePageTitle } from '@/hooks';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
@@ -182,6 +183,7 @@ export function ExchangesPage() {
     <div
       className="space-y-6"
     >
+      <PageMeta title="Exchanges" noIndex />
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>

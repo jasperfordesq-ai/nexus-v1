@@ -26,6 +26,7 @@ import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import { GlassCard } from '@/components/ui';
 import { usePageTitle } from '@/hooks';
+import { PageMeta } from '@/components/seo';
 import { useAuth } from '@/contexts/AuthContext';
 import { useTenant } from '@/contexts/TenantContext';
 import { useToast } from '@/contexts/ToastContext';
@@ -246,6 +247,7 @@ export default function NexusScorePage() {
       initial="hidden"
       animate="show"
     >
+      <PageMeta title="NexusScore" noIndex />
       {/* ── Header ─────────────────────────────────────────────────────────── */}
       <motion.div variants={itemVariants} className="flex items-center justify-between gap-4">
         <div>

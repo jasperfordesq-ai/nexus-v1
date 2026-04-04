@@ -38,6 +38,7 @@ import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
 import { resolveAvatarUrl } from '@/lib/helpers';
 import { usePageTitle } from '@/hooks';
+import { PageMeta } from '@/components/seo';
 
 interface Candidate {
   id: number;
@@ -195,6 +196,7 @@ export function TalentSearchPage() {
 
   return (
     <div className="space-y-6">
+      <PageMeta title="Talent Search" noIndex />
       {/* Back navigation */}
       <Link
         to={tenantPath('/jobs')}

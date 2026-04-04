@@ -31,6 +31,7 @@ import {
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
+import { PageMeta } from '@/components/seo';
 import { useTenant, useAuth } from '@/contexts';
 import { usePageTitle } from '@/hooks';
 import { api } from '@/lib/api';
@@ -193,6 +194,7 @@ export function VerifyIdentityPage() {
   if (pageState === 'loading') {
     return (
       <div className="min-h-screen flex items-center justify-center p-4">
+        <PageMeta title="Verify Identity" noIndex />
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="w-full max-w-md">
           <GlassCard className="p-8 text-center">
             <div className="w-16 h-16 mx-auto mb-6 rounded-full bg-indigo-500/20 flex items-center justify-center">

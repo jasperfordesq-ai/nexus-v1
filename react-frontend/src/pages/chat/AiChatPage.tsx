@@ -28,6 +28,7 @@ import { Bot, Send, RefreshCw, Sparkles, AlertCircle, Zap } from 'lucide-react';
 import { useAuth, useTenant, useToast } from '@/contexts';
 import api from '@/lib/api';
 import { usePageTitle } from '@/hooks';
+import { PageMeta } from '@/components/seo';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Types
@@ -405,6 +406,7 @@ export default function AiChatPage() {
       className="flex flex-col h-[calc(100dvh-4rem)]"
       aria-label={t('aria_chat')}
     >
+      <PageMeta title="AI Chat" noIndex />
       {/* Header */}
       <div className="flex items-center justify-between px-4 py-3 border-b border-[var(--border-default)] bg-[var(--color-surface)] flex-shrink-0">
         <div className="flex items-center gap-3">

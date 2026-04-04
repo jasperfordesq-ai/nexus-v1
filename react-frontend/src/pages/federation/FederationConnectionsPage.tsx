@@ -33,6 +33,7 @@ import {
 import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
 import { Breadcrumbs } from '@/components/navigation';
+import { PageMeta } from '@/components/seo';
 import { usePageTitle } from '@/hooks';
 import { useTenant, useToast } from '@/contexts';
 import { api } from '@/lib/api';
@@ -137,6 +138,7 @@ export function FederationConnectionsPage() {
   };
   return (
     <div className="space-y-6">
+      <PageMeta title="Federation Connections" noIndex />
       <Breadcrumbs
         items={[
           { label: t('connections.breadcrumb_federation', 'Federation'), href: tenantPath('/federation') },

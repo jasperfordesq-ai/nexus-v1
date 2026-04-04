@@ -41,6 +41,7 @@ import { useAuth, useToast, useTenant } from '@/contexts';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
 import { usePageTitle } from '@/hooks';
+import { PageMeta } from '@/components/seo';
 
 import { useTranslation } from 'react-i18next';
 // ---------------------------------------------------------------------------
@@ -855,6 +856,7 @@ export function MyApplicationsPage() {
 
   return (
     <div className='max-w-3xl mx-auto px-4 py-8'>
+      <PageMeta title="My Applications" noIndex />
       {/* Page header */}
       <div className='mb-6 flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3'>
         <div>

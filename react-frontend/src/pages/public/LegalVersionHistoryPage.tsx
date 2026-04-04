@@ -40,6 +40,7 @@ import {
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
+import { PageMeta } from '@/components/seo';
 import { useTenant } from '@/contexts';
 import { usePageTitle } from '@/hooks';
 import { api } from '@/lib/api';
@@ -232,6 +233,7 @@ export function LegalVersionHistoryPage() {
       animate="visible"
       className="max-w-4xl mx-auto space-y-6"
     >
+      <PageMeta title="Legal Version History" description="Version history of our legal documents and policies." />
       {/* Back link */}
       <motion.div variants={itemVariants}>
         <Link

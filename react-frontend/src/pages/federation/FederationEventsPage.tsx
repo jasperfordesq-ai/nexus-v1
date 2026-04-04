@@ -42,6 +42,7 @@ import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
 import { Breadcrumbs } from '@/components/navigation';
 import { EmptyState } from '@/components/feedback';
+import { PageMeta } from '@/components/seo';
 import { useToast, useTenant } from '@/contexts';
 import { usePageTitle } from '@/hooks';
 import { api } from '@/lib/api';
@@ -204,6 +205,7 @@ export function FederationEventsPage() {
 
   return (
     <div className="space-y-6">
+      <PageMeta title="Federation Events" noIndex />
       {/* Breadcrumbs */}
       <Breadcrumbs
         items={[

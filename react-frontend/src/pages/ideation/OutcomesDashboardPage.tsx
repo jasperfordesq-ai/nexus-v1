@@ -33,6 +33,7 @@ import { GlassCard } from '@/components/ui';
 import { EmptyState } from '@/components/feedback';
 import { useTenant } from '@/contexts';
 import { usePageTitle } from '@/hooks';
+import { PageMeta } from '@/components/seo';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
 
@@ -122,6 +123,7 @@ export function OutcomesDashboardPage() {
 
   return (
     <div className="max-w-5xl mx-auto px-4 py-6">
+      <PageMeta title="Outcomes Dashboard" noIndex />
       {/* Back link */}
       <Button
         variant="light"

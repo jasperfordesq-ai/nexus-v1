@@ -36,6 +36,7 @@ import { api } from '@/lib/api';
 import { formatRelativeTime } from '@/lib/helpers';
 import { logError } from '@/lib/logger';
 import { usePageTitle } from '@/hooks';
+import { PageMeta } from '@/components/seo';
 import type { Notification } from '@/types/api';
 
 type NotificationFilter = 'all' | 'unread';
@@ -151,6 +152,7 @@ export function NotificationsPage() {
 
   return (
     <div className="max-w-3xl mx-auto space-y-6">
+      <PageMeta title="Notifications" noIndex />
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>

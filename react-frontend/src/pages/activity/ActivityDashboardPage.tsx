@@ -40,6 +40,7 @@ import { GlassCard } from '@/components/ui';
 import { EmptyState } from '@/components/feedback';
 // No context imports needed - standalone dashboard
 import { usePageTitle } from '@/hooks';
+import { PageMeta } from '@/components/seo';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
 import { formatRelativeTime } from '@/lib/helpers';
@@ -292,6 +293,7 @@ export function ActivityDashboardPage() {
       animate="visible"
       className="max-w-5xl mx-auto space-y-6"
     >
+      <PageMeta title="Activity Dashboard" noIndex />
       {/* Header */}
       <motion.div variants={itemVariants}>
         <h1 className="text-2xl font-bold text-theme-primary flex items-center gap-3">

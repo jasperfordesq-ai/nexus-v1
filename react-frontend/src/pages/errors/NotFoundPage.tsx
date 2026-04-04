@@ -13,6 +13,7 @@ import { Button } from '@heroui/react';
 import { Home, ArrowLeft, Search } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
+import { PageMeta } from '@/components/seo';
 import { useTenant } from '@/contexts';
 import { usePageTitle } from '@/hooks';
 
@@ -22,6 +23,7 @@ export function NotFoundPage() {
   usePageTitle(t('not_found.page_title'));
   return (
     <div className="min-h-[80vh] flex items-center justify-center px-4">
+      <PageMeta title={t('not_found.page_title')} noIndex />
       <motion.div
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}

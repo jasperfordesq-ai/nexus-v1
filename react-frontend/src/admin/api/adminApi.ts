@@ -1367,6 +1367,8 @@ export const adminSettings = {
 
   getSeoSettings: () => api.get<Record<string, unknown>>('/v2/admin/config/seo'),
   updateSeoSettings: (data: Record<string, unknown>) => api.put<{ success: boolean }>('/v2/admin/config/seo', data),
+  getSitemapStats: () => api.get<{ sitemap_url: string; total_urls: number; content_types: Record<string, number> }>('/v2/admin/config/sitemap-stats'),
+  clearSitemapCache: () => api.post<{ cleared: number }>('/v2/admin/config/sitemap-clear-cache'),
 
   getNativeAppSettings: () => api.get<Record<string, unknown>>('/v2/admin/config/native-app'),
   updateNativeAppSettings: (data: Record<string, unknown>) => api.put<{ success: boolean }>('/v2/admin/config/native-app', data),

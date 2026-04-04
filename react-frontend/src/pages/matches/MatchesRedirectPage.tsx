@@ -6,6 +6,7 @@
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import { PageMeta } from '@/components/seo';
 import { useTenant } from '@/contexts';
 import { usePageTitle } from '@/hooks/usePageTitle';
 
@@ -30,5 +31,5 @@ export default function MatchesRedirectPage() {
     navigate(tenantPath('/listings'), { replace: true });
   }, [navigate, tenantPath]);
 
-  return null;
+  return <PageMeta title="Matches" noIndex />;
 }

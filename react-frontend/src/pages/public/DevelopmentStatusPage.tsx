@@ -13,6 +13,7 @@
 import { Card, CardBody, CardHeader, Divider, Chip } from '@heroui/react';
 import { FlaskConical, CheckCircle, AlertTriangle, Bug, Shield, Users, ExternalLink } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import { PageMeta } from '@/components/seo';
 import { usePageTitle } from '@/hooks/usePageTitle';
 import { RELEASE_STATUS } from '@/config/releaseStatus';
 
@@ -22,6 +23,7 @@ export function DevelopmentStatusPage() {
 
   return (
     <div className="max-w-3xl mx-auto space-y-6 py-4">
+      <PageMeta title="Development Status" noIndex />
       {/* Header */}
       <div className="flex items-start gap-3">
         <FlaskConical className="w-8 h-8 text-amber-500 shrink-0 mt-1" aria-hidden="true" />

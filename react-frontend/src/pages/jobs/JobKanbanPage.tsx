@@ -46,6 +46,7 @@ import { useAuth, useToast, useTenant } from '@/contexts';
 import { api, API_BASE } from '@/lib/api';
 import { logError } from '@/lib/logger';
 import { usePageTitle } from '@/hooks';
+import { PageMeta } from '@/components/seo';
 import { resolveAvatarUrl } from '@/lib/helpers';
 
 // ---------------------------------------------------------------------------
@@ -677,6 +678,7 @@ export function JobKanbanPage() {
 
   return (
     <div className="space-y-6">
+      <PageMeta title="Job Applications" noIndex />
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>

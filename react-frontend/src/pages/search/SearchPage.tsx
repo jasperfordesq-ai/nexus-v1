@@ -32,6 +32,7 @@ import { useToast, useTenant } from '@/contexts';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
 import { resolveAvatarUrl, resolveAssetUrl } from '@/lib/helpers';
+import { PageMeta } from '@/components/seo';
 import { usePageTitle } from '@/hooks';
 import type { Listing, User as UserType, Event, Group } from '@/types/api';
 
@@ -229,6 +230,7 @@ export function SearchPage() {
 
   return (
     <div className="max-w-4xl mx-auto space-y-6">
+      <PageMeta title="Search" noIndex />
       {/* Search Header */}
       <div>
         <h1 className="text-2xl font-bold text-theme-primary flex items-center gap-3">

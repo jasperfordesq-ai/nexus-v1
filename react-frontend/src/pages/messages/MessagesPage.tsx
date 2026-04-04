@@ -23,6 +23,7 @@ import { EmptyState } from '@/components/feedback';
 import { useAuth, usePusherOptional, useToast, useTenant } from '@/contexts';
 import { usePresenceOptional } from '@/contexts/PresenceContext';
 import { usePageTitle } from '@/hooks';
+import { PageMeta } from '@/components/seo';
 import type { NewMessageEvent } from '@/contexts';
 import { api } from '@/lib/api';
 import { formatRelativeTime, resolveAvatarUrl } from '@/lib/helpers';
@@ -375,6 +376,7 @@ export function MessagesPage() {
 
   return (
     <div className="max-w-3xl mx-auto space-y-6">
+      <PageMeta title="Messages" noIndex />
       {/* Messaging Disabled Notice (feature flag) */}
       {!isDirectMessagingEnabled && (
         <GlassCard className="p-4 border-l-4 border-amber-500 bg-amber-500/10">

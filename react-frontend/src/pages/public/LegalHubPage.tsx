@@ -32,6 +32,7 @@ import {
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
+import { PageMeta } from '@/components/seo';
 import { useTenant } from '@/contexts';
 import { usePageTitle } from '@/hooks';
 
@@ -123,6 +124,7 @@ export function LegalHubPage() {
       animate="visible"
       className="max-w-4xl mx-auto space-y-8"
     >
+      <PageMeta title="Legal Information" description="Legal documents, policies, and compliance information." />
       {/* Hero Header */}
       <motion.div variants={itemVariants} className="text-center">
         <div className="inline-flex p-4 rounded-2xl bg-gradient-to-br from-indigo-500/20 to-purple-500/20 mb-4">

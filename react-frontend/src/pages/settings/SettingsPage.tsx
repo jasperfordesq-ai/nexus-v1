@@ -49,6 +49,7 @@ import { useAuth, useToast, useTenant } from '@/contexts';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
 import { usePageTitle } from '@/hooks';
+import { PageMeta } from '@/components/seo';
 import { useTranslation } from 'react-i18next';
 
 // Tab components
@@ -763,6 +764,7 @@ export function SettingsPage() {
       animate="visible"
       className="max-w-3xl mx-auto space-y-6"
     >
+      <PageMeta title="Settings" noIndex />
       {/* Header */}
       <motion.div variants={itemVariants}>
         <h1 className="text-2xl font-bold text-theme-primary flex items-center gap-3">

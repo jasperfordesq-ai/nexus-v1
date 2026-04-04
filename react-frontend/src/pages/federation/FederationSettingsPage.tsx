@@ -42,6 +42,7 @@ import {
 import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
 import { Breadcrumbs } from '@/components/navigation';
+import { PageMeta } from '@/components/seo';
 import { usePageTitle } from '@/hooks';
 import { useToast, useTenant } from '@/contexts';
 import { api } from '@/lib/api';
@@ -286,6 +287,7 @@ export function FederationSettingsPage() {
       animate="visible"
       className="max-w-3xl mx-auto space-y-6"
     >
+      <PageMeta title="Federation Settings" noIndex />
       {/* Breadcrumbs */}
       <Breadcrumbs items={[
         { label: t('settings.breadcrumb_federation'), href: tenantPath('/federation') },

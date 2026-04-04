@@ -21,6 +21,7 @@ import { Breadcrumbs } from '@/components/navigation';
 import { useToast, useTenant } from '@/contexts';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
+import { PageMeta } from '@/components/seo';
 import { usePageTitle } from '@/hooks';
 
 interface FormData {
@@ -132,6 +133,7 @@ export default function RegisterOrganisationPage() {
       animate={{ opacity: 1, y: 0 }}
       className="max-w-2xl mx-auto space-y-6"
     >
+      <PageMeta title="Register Organisation" noIndex />
       {/* Breadcrumbs */}
       <Breadcrumbs items={[
         { label: t('organisations.heading'), href: '/organisations' },

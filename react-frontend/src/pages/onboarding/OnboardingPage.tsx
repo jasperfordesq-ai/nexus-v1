@@ -49,6 +49,7 @@ import {
 import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
 import { usePageTitle } from '@/hooks';
+import { PageMeta } from '@/components/seo';
 import { useOnboardingConfig } from '@/hooks/useOnboardingConfig';
 import { useToast, useTenant, useAuth } from '@/contexts';
 import { api } from '@/lib/api';
@@ -539,6 +540,7 @@ export function OnboardingPage() {
 
   return (
     <div className="max-w-2xl mx-auto py-6 px-4 space-y-6">
+      <PageMeta title="Onboarding" noIndex />
       {/* Header */}
       <motion.div
         initial={{ opacity: 0, y: -10 }}

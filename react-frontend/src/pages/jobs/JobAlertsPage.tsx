@@ -50,6 +50,7 @@ import { useToast, useTenant } from '@/contexts';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
 import { usePageTitle } from '@/hooks';
+import { PageMeta } from '@/components/seo';
 
 interface JobAlert {
   id: number;
@@ -194,6 +195,7 @@ export function JobAlertsPage() {
 
   return (
     <div className="space-y-6 max-w-2xl mx-auto">
+      <PageMeta title="Job Alerts" noIndex />
       {/* Back nav */}
       <Link
         to={tenantPath('/jobs')}

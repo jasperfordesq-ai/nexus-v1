@@ -10,6 +10,7 @@ import { CheckCircle, XCircle, Loader2, Mail } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { api } from '@/lib/api';
 import { usePageTitle } from '@/hooks';
+import { PageMeta } from '@/components/seo';
 import { useTenant } from '@/contexts';
 
 type State = 'loading' | 'success' | 'already_done' | 'invalid' | 'error';
@@ -62,6 +63,7 @@ export default function NewsletterUnsubscribePage() {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-content2 px-4">
+      <PageMeta title="Newsletter Unsubscribe" noIndex />
       <div className="w-full max-w-md bg-content1 rounded-2xl shadow-lg p-8 text-center">
         <div className="mb-6">
           <Mail className="mx-auto text-default-400" size={40} />

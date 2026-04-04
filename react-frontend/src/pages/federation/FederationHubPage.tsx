@@ -49,6 +49,7 @@ import {
 import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
 import { Breadcrumbs, type BreadcrumbItem } from '@/components/navigation';
+import { PageMeta } from '@/components/seo';
 import { useTenant, useToast } from '@/contexts';
 import { usePageTitle } from '@/hooks';
 import { api } from '@/lib/api';
@@ -823,6 +824,7 @@ export default function FederationHubPage() {
 
   return (
     <div className="max-w-6xl mx-auto px-4 py-8">
+      <PageMeta title="Federation Hub" noIndex />
       <Breadcrumbs items={breadcrumbs} />
 
       {/* Page header */}

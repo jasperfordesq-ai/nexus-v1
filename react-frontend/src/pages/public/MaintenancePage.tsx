@@ -11,6 +11,7 @@
 import { Card, CardBody, Button } from '@heroui/react';
 import { Wrench, LogIn, Info } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import { PageMeta } from '@/components/seo';
 import { useTenant } from '@/contexts';
 import { tenantPath } from '@/lib/tenant-routing';
 import { usePageTitle } from '@/hooks/usePageTitle';
@@ -25,6 +26,7 @@ export function MaintenancePage() {
 
   return (
     <div className="min-h-screen bg-linear-to-br from-primary-500 to-secondary-600 flex items-center justify-center p-4">
+      <PageMeta title="Maintenance" noIndex />
       <Card className="max-w-lg w-full">
         <CardBody className="text-center py-12 px-6 gap-6">
           <div className="flex justify-center">

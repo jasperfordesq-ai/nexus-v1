@@ -25,6 +25,7 @@ import { LoadingScreen } from '@/components/feedback';
 import { useToast, useTenant } from '@/contexts';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
+import { PageMeta } from '@/components/seo';
 import { usePageTitle } from '@/hooks';
 
 interface MyOrganisation {
@@ -205,6 +206,7 @@ export default function CreateOpportunityPage() {
       animate={{ opacity: 1, y: 0 }}
       className="max-w-2xl mx-auto space-y-6"
     >
+      <PageMeta title="Create Opportunity" noIndex />
       {/* Breadcrumbs */}
       <Breadcrumbs items={[
         { label: t('volunteering.heading'), href: tenantPath('/volunteering') },

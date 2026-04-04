@@ -36,6 +36,7 @@ import { useTenant } from '@/contexts';
 import { api, API_BASE } from '@/lib/api';
 import { logError } from '@/lib/logger';
 import { usePageTitle } from '@/hooks';
+import { PageMeta } from '@/components/seo';
 
 interface AnalyticsData {
   job_id: number;
@@ -161,6 +162,7 @@ export function JobAnalyticsPage() {
 
   return (
     <div className="space-y-6">
+      <PageMeta title="Job Analytics" noIndex />
       {/* Back nav */}
       <Link
         to={tenantPath(`/jobs/${id}`)}

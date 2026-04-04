@@ -31,6 +31,7 @@ import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
 import { EmptyState } from '@/components/feedback';
 import { usePageTitle } from '@/hooks';
+import { PageMeta } from '@/components/seo';
 import { useAuth, useTenant } from '@/contexts';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
@@ -249,6 +250,7 @@ export function SkillsBrowsePage() {
 
   return (
     <div className="max-w-5xl mx-auto space-y-6">
+      <PageMeta title="Browse Skills" noIndex />
       {/* ── Hero / Explainer ──────────────────────────────────────────── */}
       <GlassCard className="p-6 sm:p-8 relative overflow-hidden">
         <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-bl from-indigo-500/5 to-transparent rounded-full -translate-y-1/2 translate-x-1/2 pointer-events-none" />

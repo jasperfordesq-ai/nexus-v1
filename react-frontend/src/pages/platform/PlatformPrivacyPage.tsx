@@ -12,6 +12,7 @@
 
 import { Shield } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import { PageMeta } from '@/components/seo';
 import { usePageTitle } from '@/hooks/usePageTitle';
 import {
   PlatformLegalPage,
@@ -489,17 +490,20 @@ export function PlatformPrivacyPage() {
   const { t } = useTranslation('legal');
   usePageTitle(t('platform_privacy.page_title'));
   return (
-    <PlatformLegalPage
-      title={t('platform_privacy.title')}
-      subtitle={t('platform_privacy.subtitle')}
-      icon={Shield}
-      effectiveDate="1 March 2026"
-      sections={sections}
-      crossLinks={[
-        { label: t('platform_privacy.link_terms'), to: '/platform/terms' },
-        { label: t('platform_privacy.link_disclaimer'), to: '/platform/disclaimer' },
-      ]}
-    />
+    <>
+      <PageMeta title="Platform Privacy Policy" />
+      <PlatformLegalPage
+        title={t('platform_privacy.title')}
+        subtitle={t('platform_privacy.subtitle')}
+        icon={Shield}
+        effectiveDate="1 March 2026"
+        sections={sections}
+        crossLinks={[
+          { label: t('platform_privacy.link_terms'), to: '/platform/terms' },
+          { label: t('platform_privacy.link_disclaimer'), to: '/platform/disclaimer' },
+        ]}
+      />
+    </>
   );
 }
 

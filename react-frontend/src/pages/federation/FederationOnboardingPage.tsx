@@ -50,6 +50,7 @@ import {
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
+import { PageMeta } from '@/components/seo';
 import { usePageTitle } from '@/hooks';
 import { useAuth, useToast, useTenant } from '@/contexts';
 import { api } from '@/lib/api';
@@ -232,6 +233,7 @@ export function FederationOnboardingPage() {
 
   return (
     <div className="max-w-2xl mx-auto py-6 space-y-6">
+      <PageMeta title="Federation Onboarding" noIndex />
       {/* Title */}
       <motion.div
         initial={{ opacity: 0, y: -10 }}

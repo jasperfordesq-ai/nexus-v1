@@ -291,17 +291,34 @@ class SitemapService
         $now = $this->formatDate(date('Y-m-d'));
         $urls = [];
 
-        // Homepage
+        // Homepage (highest priority — refreshes daily)
         $urls[] = $this->url($baseUrl, '/', $now, 'daily', '1.0');
 
-        // About & help (always present)
-        $urls[] = $this->url($baseUrl, '/about', $now, 'monthly', '0.5');
+        // About, help, explore, contact, FAQ (always present)
+        $urls[] = $this->url($baseUrl, '/about', $now, 'monthly', '0.6');
         $urls[] = $this->url($baseUrl, '/help', $now, 'monthly', '0.5');
+        $urls[] = $this->url($baseUrl, '/explore', $now, 'weekly', '0.7');
+        $urls[] = $this->url($baseUrl, '/contact', $now, 'yearly', '0.4');
+        $urls[] = $this->url($baseUrl, '/faq', $now, 'monthly', '0.5');
 
         // Legal pages
-        foreach (['terms', 'privacy', 'cookies', 'accessibility'] as $page) {
+        foreach (['terms', 'privacy', 'cookies', 'accessibility', 'acceptable-use', 'community-guidelines'] as $page) {
             $urls[] = $this->url($baseUrl, "/{$page}", $now, 'yearly', '0.2');
         }
+        // Legal hub & version history
+        $urls[] = $this->url($baseUrl, '/legal', $now, 'monthly', '0.3');
+        $urls[] = $this->url($baseUrl, '/legal/history', $now, 'monthly', '0.2');
+
+        // Public members directory
+        $urls[] = $this->url($baseUrl, '/members', $now, 'weekly', '0.6');
+
+        // Leaderboard (if gamification enabled)
+        if ($this->hasFeature($tenant, 'gamification')) {
+            $urls[] = $this->url($baseUrl, '/leaderboard', $now, 'daily', '0.6');
+        }
+
+        // Knowledge base listing
+        $urls[] = $this->url($baseUrl, '/kb', $now, 'weekly', '0.5');
 
         // Public content listing pages (all now accessible without login)
         if ($this->hasModule($tenant, 'listings')) {

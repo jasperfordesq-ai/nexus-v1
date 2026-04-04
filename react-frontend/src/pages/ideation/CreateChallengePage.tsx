@@ -43,6 +43,7 @@ import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
 import { EmptyState } from '@/components/feedback';
 import { useAuth, useToast, useTenant } from '@/contexts';
+import { PageMeta } from '@/components/seo';
 import { usePageTitle } from '@/hooks';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
@@ -389,6 +390,7 @@ export function CreateChallengePage() {
 
   return (
     <div className="max-w-3xl mx-auto px-4 py-6">
+      <PageMeta title="Create Challenge" noIndex />
       {/* Back link */}
       <Button
         variant="light"

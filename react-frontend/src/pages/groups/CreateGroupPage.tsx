@@ -31,6 +31,7 @@ import { LoadingScreen } from '@/components/feedback';
 import { PlaceAutocompleteInput } from '@/components/location';
 import { useTranslation } from 'react-i18next';
 import { useToast, useTenant } from '@/contexts';
+import { PageMeta } from '@/components/seo';
 import { usePageTitle } from '@/hooks';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
@@ -316,6 +317,7 @@ export function CreateGroupPage() {
       animate={{ opacity: 1, y: 0 }}
       className="max-w-2xl mx-auto space-y-6"
     >
+      <PageMeta title="Create Group" noIndex />
       {/* Breadcrumbs */}
       <Breadcrumbs items={[
         { label: t('title'), href: tenantPath('/groups') },

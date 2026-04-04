@@ -46,6 +46,7 @@ import {
 import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
 import { Breadcrumbs } from '@/components/navigation';
+import { PageMeta } from '@/components/seo';
 import { usePageTitle } from '@/hooks';
 import { useAuth, useTenant, useToast } from '@/contexts';
 import { api } from '@/lib/api';
@@ -487,6 +488,7 @@ export function FederationMessagesPage() {
 
   return (
     <div className="max-w-6xl mx-auto space-y-4">
+      <PageMeta title="Federation Messages" noIndex />
       <Breadcrumbs items={breadcrumbItems} />
 
       {/* Feature disabled notice */}

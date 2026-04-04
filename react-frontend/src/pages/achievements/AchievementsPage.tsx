@@ -53,6 +53,7 @@ import i18n from '@/i18n';
 import { GlassCard } from '@/components/ui';
 import { EmptyState } from '@/components/feedback';
 import { usePageTitle } from '@/hooks';
+import { PageMeta } from '@/components/seo';
 import { useToast } from '@/contexts/ToastContext';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
@@ -1332,6 +1333,7 @@ export function AchievementsPage() {
 
   return (
     <div className="space-y-6">
+      <PageMeta title="Achievements" noIndex />
       {/* Header */}
       <div>
         <h1 className="text-2xl font-bold text-theme-primary flex items-center gap-3">

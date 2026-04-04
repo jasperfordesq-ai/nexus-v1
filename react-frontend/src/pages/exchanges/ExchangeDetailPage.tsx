@@ -50,6 +50,7 @@ import { Breadcrumbs } from '@/components/navigation';
 import { LoadingScreen, EmptyState } from '@/components/feedback';
 import { RatingModal } from '@/components/wallet';
 import { useAuth, useToast, useTenant } from '@/contexts';
+import { PageMeta } from '@/components/seo';
 import { usePageTitle } from '@/hooks';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
@@ -390,6 +391,7 @@ export function ExchangeDetailPage() {
       animate={{ opacity: 1, y: 0 }}
       className="max-w-3xl mx-auto space-y-6"
     >
+      <PageMeta title="Exchange Details" noIndex />
       {/* Breadcrumbs */}
       <Breadcrumbs items={[
         { label: t('breadcrumb.exchanges'), href: tenantPath('/exchanges') },

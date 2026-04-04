@@ -53,6 +53,7 @@ import { useAuth, useTenant } from '@/contexts';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
 import { usePageTitle } from '@/hooks';
+import { PageMeta } from '@/components/seo';
 
 interface FunnelStage {
   stage: string;
@@ -215,6 +216,7 @@ export function BiasAuditPage() {
 
   return (
     <div className="space-y-6">
+      <PageMeta title="Bias Audit" noIndex />
       {/* Back navigation */}
       <Link
         to={tenantPath('/jobs')}

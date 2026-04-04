@@ -24,6 +24,7 @@ import { GlassCard } from '@/components/ui';
 import { LoadingScreen } from '@/components/feedback';
 import { useAuth, usePusherOptional, useTenant } from '@/contexts';
 import { usePageTitle } from '@/hooks';
+import { PageMeta } from '@/components/seo';
 import type { NewMessageEvent, TypingEvent } from '@/contexts';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
@@ -1221,6 +1222,7 @@ export function ConversationPage() {
 
   return (
     <div className="-my-6 sm:-my-8 h-[calc(100dvh-4rem-4rem)] md:h-[calc(100dvh-4rem)] flex flex-col max-w-3xl mx-auto">
+      <PageMeta title="Conversation" noIndex />
       {/* Header */}
       <GlassCard className="p-4 mb-4">
         <div className="flex items-center justify-between">

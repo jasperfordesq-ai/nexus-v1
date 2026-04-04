@@ -19,6 +19,7 @@ import { LoadingScreen } from '@/components/feedback';
 import { Breadcrumbs } from '@/components/navigation';
 import { useTenant } from '@/contexts';
 import { usePageTitle } from '@/hooks';
+import { PageMeta } from '@/components/seo';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
 
@@ -117,6 +118,7 @@ export function EmployerBrandPage() {
 
   return (
     <div className="max-w-4xl mx-auto px-4 py-6 space-y-4">
+      <PageMeta title="Employer Brand" noIndex />
       <Breadcrumbs items={[
         { label: t('nav.jobs', 'Jobs'), href: '/jobs' },
         { label: employer?.name ?? t('employer.page_title', 'Employer') },

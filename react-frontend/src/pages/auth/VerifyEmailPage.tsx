@@ -18,6 +18,7 @@ import { Button } from '@heroui/react';
 import { CheckCircle, XCircle, Loader2, ArrowLeft, Mail, ShieldCheck } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
+import { PageMeta } from '@/components/seo';
 import { useTenant, useAuth } from '@/contexts';
 import { usePageTitle } from '@/hooks';
 import { api } from '@/lib/api';
@@ -95,6 +96,7 @@ export function VerifyEmailPage() {
   if (state === 'loading') {
     return (
       <div className="min-h-screen flex items-center justify-center p-4">
+        <PageMeta title="Verify Email" noIndex />
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
