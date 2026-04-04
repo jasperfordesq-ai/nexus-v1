@@ -436,10 +436,11 @@ class GroupLifecycleService
     {
         $tenantId = TenantContext::getId();
 
+        // groups table uses is_active boolean, not a status column
         $affected = DB::table('groups')
             ->where('tenant_id', $tenantId)
             ->whereIn('id', $groupIds)
-            ->where('status', self::STATUS_ARCHIVED)
+            ->where('is_active', false)
             ->update(['is_active' => true, 'updated_at' => now()]);
 
         return $affected;

@@ -39,7 +39,7 @@ class TenantService
 
         $settings = DB::table('tenant_settings')
             ->where('tenant_id', $tenant->id)
-            ->pluck('value', 'key')
+            ->pluck('setting_value', 'setting_key')
             ->all();
 
         return [
@@ -66,7 +66,7 @@ class TenantService
     {
         return DB::table('tenant_settings')
             ->where('tenant_id', $tenantId)
-            ->pluck('value', 'key')
+            ->pluck('setting_value', 'setting_key')
             ->all();
     }
 }

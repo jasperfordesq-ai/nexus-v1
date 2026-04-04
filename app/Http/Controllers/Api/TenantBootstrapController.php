@@ -456,6 +456,21 @@ class TenantBootstrapController extends BaseApiController
             $branding['og_image_url'] = UrlHelper::absolute($tenant['og_image_url']);
         }
 
+        // Fall back to the seo_og_image_url tenant setting if no column value
+        if (empty($branding['og_image_url'])) {
+            try {
+                $seoOg = DB::table('tenant_settings')
+                    ->where('tenant_id', $tenant['id'])
+                    ->where('setting_key', 'seo_og_image_url')
+                    ->value('setting_value');
+                if (!empty($seoOg)) {
+                    $branding['og_image_url'] = UrlHelper::absolute($seoOg);
+                }
+            } catch (\Throwable) {
+                // tenant_settings table may not exist
+            }
+        }
+
         return $branding;
     }
 
