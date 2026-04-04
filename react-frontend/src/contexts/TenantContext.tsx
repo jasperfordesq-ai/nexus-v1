@@ -270,6 +270,12 @@ export function TenantProvider({ children, tenantSlug }: TenantProviderProps) {
   const storedSlug = useMemo(() => tokenManager.getTenantSlug(), []);
   const effectiveTenantSlug = tenantSlug || detected.slug || storedSlug;
 
+  // Path-based routing: only prepend slug in URLs when the tenant was detected from
+  // the URL path (source === 'path'). On custom domains (timebank.global) or subdomains
+  // (hour-timebank.project-nexus.ie), the domain IS the tenant identifier — slug must
+  // NOT appear in paths. The storedSlug fallback is still used for bootstrap API calls.
+  const usePathBasedSlug = detected.source === 'path' || (tenantSlug != null && tenantSlug !== '');
+
   /**
    * Fetch tenant bootstrap data
    */
@@ -472,8 +478,13 @@ export function TenantProvider({ children, tenantSlug }: TenantProviderProps) {
    * Preserves the slug in all internal navigation.
    */
   const tenantPath = useCallback((path: string): string => {
+    // Only prepend slug when on a path-based domain (localhost, app.project-nexus.ie).
+    // On custom domains (timebank.global), paths stay clean — domain identifies tenant.
+    if (!usePathBasedSlug) {
+      return path.startsWith('/') ? path : '/' + path;
+    }
     return buildTenantPath(path, effectiveTenantSlug);
-  }, [effectiveTenantSlug]);
+  }, [effectiveTenantSlug, usePathBasedSlug]);
 
   const supportedLanguages = useMemo<string[]>(
     () => state.tenant?.supported_languages ?? ['en', 'ga', 'de', 'fr', 'it', 'pt', 'es', 'nl', 'pl', 'ja', 'ar'],
@@ -516,12 +527,14 @@ export function TenantProvider({ children, tenantSlug }: TenantProviderProps) {
       hasModule,
       hasGroupTab,
       refreshTenant,
-      tenantSlug: effectiveTenantSlug || null,
+      // Only expose slug when path-based routing is active (slug appears in URL).
+      // On custom domains, slug is null — the domain identifies the tenant.
+      tenantSlug: usePathBasedSlug ? (effectiveTenantSlug || null) : null,
       tenantPath,
       supportedLanguages,
       defaultLanguage,
     }),
-    [state, features, modules, branding, groupTabs, listingConfig, volunteeringConfig, jobConfig, hasFeature, hasModule, hasGroupTab, refreshTenant, effectiveTenantSlug, tenantPath, supportedLanguages, defaultLanguage]
+    [state, features, modules, branding, groupTabs, listingConfig, volunteeringConfig, jobConfig, hasFeature, hasModule, hasGroupTab, refreshTenant, effectiveTenantSlug, usePathBasedSlug, tenantPath, supportedLanguages, defaultLanguage]
   );
 
   return (

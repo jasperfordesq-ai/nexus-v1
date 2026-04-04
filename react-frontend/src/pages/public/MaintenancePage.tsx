@@ -13,16 +13,15 @@ import { Wrench, LogIn, Info } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { PageMeta } from '@/components/seo';
 import { useTenant } from '@/contexts';
-import { tenantPath } from '@/lib/tenant-routing';
 import { usePageTitle } from '@/hooks/usePageTitle';
 import { Link } from 'react-router-dom';
 
 export function MaintenancePage() {
   const { t } = useTranslation('public');
   usePageTitle(t('maintenance.title'));
-  const { tenant } = useTenant();
+  const { tenant, tenantPath } = useTenant();
   const tenantName = tenant?.name || 'Project NEXUS';
-  const adminPath = tenantPath('/admin', tenant?.slug);
+  const adminPath = tenantPath('/admin');
 
   return (
     <div className="min-h-screen bg-linear-to-br from-primary-500 to-secondary-600 flex items-center justify-center p-4">
