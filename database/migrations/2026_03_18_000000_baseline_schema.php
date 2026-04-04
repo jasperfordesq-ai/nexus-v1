@@ -8,18 +8,14 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Support\Facades\DB;
 
 /**
- * Baseline schema migration — loads the full 386-table production schema.
+ * SUPERSEDED — this migration is kept for historical record only.
  *
- * On existing databases (production), every table already exists, so the
- * IF NOT EXISTS guards in the SQL will skip creation. Safe to run anywhere.
+ * The full schema is now managed via Laravel's native schema dump at
+ * database/schema/mysql-schema.sql. On a fresh database, `php artisan migrate`
+ * loads that dump first (which includes laravel_migrations data), so this
+ * migration is never re-executed.
  *
- * On fresh databases, this creates the entire schema from scratch so that
- * `php artisan migrate` produces a working database.
- *
- * The SQL dump is stored at database/schema/nexus-baseline.sql and was
- * generated from the local dev database on 2026-03-21.
- *
- * The down() method is intentionally empty — this baseline is irreversible.
+ * The old nexus-baseline.sql file has been removed.
  */
 return new class extends Migration
 {

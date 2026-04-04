@@ -58,6 +58,7 @@ CLAUDE.md
 !/scripts/check-migration-ci.sh
 !/scripts/maintenance.sh
 !/scripts/safe-deploy.sh
+!/scripts/refresh-schema-dump.sh
 
 # ─── Deploy & Production Config ───────────────────────────────────────────────
 compose.prod.yml

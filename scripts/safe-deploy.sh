@@ -986,6 +986,16 @@ if [ "$LARAVEL_MIGRATE" = "1" ]; then
         log_err "Laravel artisan migration failed — consider rollback"
         exit 1
     fi
+
+    # Refresh the schema dump so it stays current with the latest migrations.
+    # This file is committed to git — new contributors get a working DB from it.
+    log_step "=== Refreshing Schema Dump ==="
+    if DEPLOY_ENV=production DB_USER="${DB_USER:-nexus}" DB_PASS="${DB_PASS:-}" DB_NAME="${DB_NAME:-nexus}" \
+       bash "$DEPLOY_DIR/scripts/refresh-schema-dump.sh" --production 2>&1 | tee -a "$LOG_FILE"; then
+        log_ok "Schema dump refreshed at database/schema/mysql-schema.sql"
+    else
+        log_info "Schema dump refresh failed (non-fatal) — regenerate manually"
+    fi
 fi
 
 # Verify production images (catches dev-on-prod bug)
