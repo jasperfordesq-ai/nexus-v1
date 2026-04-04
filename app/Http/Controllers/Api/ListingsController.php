@@ -416,6 +416,11 @@ class ListingsController extends BaseApiController
             $filters['cursor'] = $this->query('cursor');
         }
 
+        $userId = $this->getOptionalUserId();
+        if ($userId !== null) {
+            $filters['current_user_id'] = $userId;
+        }
+
         $result = $this->listingService->getNearby($lat, $lon, $filters);
 
         return $this->respondWithCollection(

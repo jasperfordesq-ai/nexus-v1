@@ -524,6 +524,7 @@ class ListingService
         }
 
         $data = $listing->toArray();
+        $tenantId = \App\Core\TenantContext::getId();
 
         // Author info — replace the eager-loaded user relation with safe public fields only
         $user = $listing->user;
@@ -578,7 +579,6 @@ class ListingService
         $data['category_color'] = $listing->category?->color;
 
         // Engagement counts (wrapped in try/catch — tables may not exist during migration)
-        $tenantId = \App\Core\TenantContext::getId();
         try {
             $data['likes_count'] = (int) DB::table('likes')
                 ->where('tenant_id', $tenantId)
@@ -732,16 +732,39 @@ class ListingService
             $items->pop();
         }
 
-        $result = $items->map(function (Listing $listing) {
+        $currentUserId = !empty($filters['current_user_id']) ? (int) $filters['current_user_id'] : null;
+        $tenantId = \App\Core\TenantContext::getId();
+
+        // Eager-load is_favorited flag
+        $savedIds = [];
+        if ($currentUserId && $items->isNotEmpty()) {
+            $savedIds = DB::table('user_saved_listings')
+                ->where('user_id', $currentUserId)
+                ->where('tenant_id', $tenantId)
+                ->whereIn('listing_id', $items->pluck('id'))
+                ->pluck('listing_id')->flip()->all();
+        }
+
+        $result = $items->map(function (Listing $listing) use ($savedIds, $currentUserId) {
             $data = $listing->toArray();
             $user = $listing->user;
             $data['author_name'] = ($user && $user->profile_type === 'organisation' && $user->organization_name)
                 ? $user->organization_name
                 : trim(($user->first_name ?? '') . ' ' . ($user->last_name ?? ''));
             $data['author_avatar'] = $user->avatar_url ?? null;
+            $data['author_verified'] = (bool) ($user->is_verified ?? false);
+            $data['user'] = $user ? [
+                'id'         => $user->id,
+                'name'       => $data['author_name'],
+                'avatar'     => $user->avatar_url,
+                'avatar_url' => $user->avatar_url,
+            ] : null;
             $data['category_name'] = $listing->category?->name;
             $data['category_color'] = $listing->category?->color;
             $data['distance_km'] = round((float) $listing->distance_km, 2);
+            $data['is_favorited'] = isset($savedIds[$listing->id]);
+            $data['can_edit'] = $currentUserId === $listing->user_id;
+            $data['can_delete'] = $currentUserId === $listing->user_id;
             return $data;
         })->all();
 
