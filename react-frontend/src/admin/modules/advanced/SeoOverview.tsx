@@ -28,7 +28,7 @@ import {
 import { usePageTitle } from '@/hooks';
 import { useToast } from '@/contexts';
 import { PageHeader } from '../../components';
-import { adminSettings } from '../../api/adminApi';
+import { adminSettings, adminTools } from '../../api/adminApi';
 import { useTranslation } from 'react-i18next';
 
 // Keys that map to the backend's seo_* tenant_settings rows
@@ -56,6 +56,11 @@ interface SeoCheckResult {
   detail: string;
 }
 
+interface ServerAuditResult {
+  checks: Array<{ name: string; description: string; status: 'pass' | 'warning' | 'fail'; details?: string }>;
+  last_run_at: string | null;
+}
+
 export function SeoOverview() {
   const { t } = useTranslation('admin');
   usePageTitle(t('advanced.page_title'));
@@ -65,6 +70,8 @@ export function SeoOverview() {
   const [sitemapStats, setSitemapStats] = useState<SitemapStats | null>(null);
   const [sitemapLoading, setSitemapLoading] = useState(false);
   const [clearingCache, setClearingCache] = useState(false);
+  const [serverAudit, setServerAudit] = useState<ServerAuditResult | null>(null);
+  const [auditRunning, setAuditRunning] = useState(false);
   const [formData, setFormData] = useState<Record<string, unknown>>({
     seo_title_suffix: '',
     seo_meta_description: '',
@@ -111,6 +118,37 @@ export function SeoOverview() {
   useEffect(() => {
     loadSitemapStats();
   }, [loadSitemapStats]);
+
+  // Load last server-side SEO audit on mount
+  useEffect(() => {
+    adminTools.getSeoAudit()
+      .then(res => {
+        if (res.data) {
+          const raw = res.data as unknown as ServerAuditResult;
+          if (raw?.checks) setServerAudit(raw);
+        }
+      })
+      .catch(() => { /* silently fail — audit is optional */ });
+  }, []);
+
+  const handleRunAudit = async () => {
+    setAuditRunning(true);
+    try {
+      const res = await adminTools.runSeoAudit();
+      if (res.data) {
+        // The run endpoint returns results directly; re-fetch to get full structure
+        const freshRes = await adminTools.getSeoAudit();
+        if (freshRes.data) {
+          setServerAudit(freshRes.data as unknown as ServerAuditResult);
+        }
+        toast.success('SEO audit completed');
+      }
+    } catch {
+      toast.error('Failed to run SEO audit');
+    } finally {
+      setAuditRunning(false);
+    }
+  };
 
   const handleClearSitemapCache = async () => {
     setClearingCache(true);
@@ -547,6 +585,54 @@ export function SeoOverview() {
               </div>
             ) : (
               <p className="text-sm text-default-500">Unable to load sitemap stats</p>
+            )}
+          </CardBody>
+        </Card>
+
+        {/* Server-Side SEO Audit */}
+        <Card shadow="sm">
+          <CardHeader className="flex items-center justify-between">
+            <h3 className="text-lg font-semibold flex items-center gap-2">
+              <Search size={20} />
+              Server-Side SEO Audit
+            </h3>
+            <div className="flex items-center gap-2">
+              {serverAudit?.last_run_at && (
+                <span className="text-xs text-default-400">
+                  Last run: {new Date(serverAudit.last_run_at).toLocaleDateString()}
+                </span>
+              )}
+              <Button
+                size="sm"
+                color="primary"
+                variant="flat"
+                onPress={handleRunAudit}
+                isLoading={auditRunning}
+              >
+                Run Audit
+              </Button>
+            </div>
+          </CardHeader>
+          <CardBody>
+            {serverAudit?.checks && serverAudit.checks.length > 0 ? (
+              <div className="space-y-2">
+                {serverAudit.checks.map((check, idx) => (
+                  <div key={idx} className="flex items-start gap-3 py-1">
+                    {check.status === 'pass' && <CheckCircle size={18} className="text-success mt-0.5 shrink-0" />}
+                    {check.status === 'warning' && <AlertTriangle size={18} className="text-warning mt-0.5 shrink-0" />}
+                    {check.status === 'fail' && <XCircle size={18} className="text-danger mt-0.5 shrink-0" />}
+                    <div className="min-w-0">
+                      <p className="font-medium text-sm">{check.name}</p>
+                      <p className="text-xs text-default-500">{check.description}</p>
+                      {check.details && <p className="text-xs text-default-400 mt-0.5">{check.details}</p>}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p className="text-sm text-default-500">
+                {auditRunning ? 'Running audit...' : 'No audit results yet. Click "Run Audit" to check your SEO configuration.'}
+              </p>
             )}
           </CardBody>
         </Card>

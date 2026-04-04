@@ -7,8 +7,16 @@
  * PageMeta — Per-page SEO meta tags via react-helmet-async.
  *
  * Sets title, description, canonical URL (query-param-stripped), Open Graph,
- * Twitter Card, and robots directives. Uses tenant branding for sensible
- * defaults so every page has complete meta tags even without explicit props.
+ * Twitter Card, and robots directives.
+ *
+ * Reads admin-configured SEO settings from the tenant context:
+ *  - seo_title_suffix → custom title suffix (overrides branding.name)
+ *  - seo_meta_description → global fallback description
+ *  - seo_meta_keywords → global fallback keywords
+ *  - seo_og_image_url → default OG image (via branding.og_image_url)
+ *  - seo_canonical_urls → whether to emit canonical link tags
+ *  - seo_open_graph → whether to emit OG tags
+ *  - seo_twitter_cards → whether to emit Twitter Card tags
  */
 
 import { Helmet } from 'react-helmet-async';
@@ -47,6 +55,22 @@ function buildCanonicalUrl(origin: string, pathname: string): string {
   return `${origin}${cleanPath}`;
 }
 
+/** Read a string setting from tenant.settings safely. */
+function getSetting(settings: Record<string, unknown> | undefined, key: string): string {
+  if (!settings || typeof settings[key] !== 'string') return '';
+  return settings[key] as string;
+}
+
+/** Read a boolean setting from tenant.settings safely (defaults to true). */
+function getBoolSetting(settings: Record<string, unknown> | undefined, key: string): boolean {
+  if (!settings || settings[key] === undefined) return true;
+  const val = settings[key];
+  if (typeof val === 'boolean') return val;
+  if (val === '1' || val === 'true') return true;
+  if (val === '0' || val === 'false') return false;
+  return true;
+}
+
 export function PageMeta({
   title,
   description,
@@ -58,15 +82,37 @@ export function PageMeta({
   publishedTime,
   modifiedTime,
 }: PageMetaProps) {
-  const { branding } = useTenant();
+  const { branding, tenant } = useTenant();
   const location = useLocation();
 
-  const siteName = branding.name || 'NEXUS';
-  const fullTitle = title ? `${title} | ${siteName}` : siteName;
+  const settings = tenant?.settings as Record<string, unknown> | undefined;
+
+  // Admin-configured SEO settings (from tenant_settings table via bootstrap)
+  const adminTitleSuffix = getSetting(settings, 'seo_title_suffix');
+  const adminDescription = getSetting(settings, 'seo_meta_description');
+  const adminKeywords = getSetting(settings, 'seo_meta_keywords');
+  const enableCanonical = getBoolSetting(settings, 'seo_canonical_urls');
+  const enableOpenGraph = getBoolSetting(settings, 'seo_open_graph');
+  const enableTwitterCards = getBoolSetting(settings, 'seo_twitter_cards');
+
+  // Site name: admin title suffix > tenant meta title > branding name > NEXUS
+  const seoTitle = (tenant?.seo?.meta_title || '').trim();
+  const siteName = adminTitleSuffix
+    ? adminTitleSuffix.replace(/^\s*\|\s*/, '') // Strip leading " | " if present
+    : seoTitle || branding.name || 'NEXUS';
+  const titleSuffix = adminTitleSuffix || ` | ${siteName}`;
+  const fullTitle = title ? `${title}${titleSuffix}` : siteName;
+
+  // Description: explicit > admin global > tenant seo description > branding tagline > platform default
   const metaDescription =
     description ||
+    adminDescription ||
+    (tenant?.seo?.meta_description || '').trim() ||
     branding.tagline ||
     'Community timebanking platform — exchange skills, build connections, strengthen your community.';
+
+  // Keywords: explicit > admin global keywords
+  const metaKeywords = keywords || adminKeywords || undefined;
 
   // Canonical: always clean pathname, never include query params or hash
   const origin = typeof window !== 'undefined' ? window.location.origin : '';
@@ -84,37 +130,45 @@ export function PageMeta({
       {/* Primary Meta Tags */}
       <title>{fullTitle}</title>
       <meta name="description" content={metaDescription} />
-      {keywords && <meta name="keywords" content={keywords} />}
+      {metaKeywords && <meta name="keywords" content={metaKeywords} />}
 
       {/* Canonical URL — always clean, no query params */}
-      {canonicalUrl && <link rel="canonical" href={canonicalUrl} />}
+      {enableCanonical && canonicalUrl && <link rel="canonical" href={canonicalUrl} />}
 
       {/* Robots */}
       {noIndex && <meta name="robots" content="noindex, nofollow" />}
 
-      {/* Open Graph / Facebook */}
-      <meta property="og:type" content={type} />
-      <meta property="og:site_name" content={siteName} />
-      <meta property="og:title" content={fullTitle} />
-      <meta property="og:description" content={metaDescription} />
-      {canonicalUrl && <meta property="og:url" content={canonicalUrl} />}
-      <meta property="og:image" content={ogImage} />
-      <meta property="og:image:width" content="1200" />
-      <meta property="og:image:height" content="630" />
+      {/* Open Graph / Facebook (respects admin toggle) */}
+      {enableOpenGraph && (
+        <>
+          <meta property="og:type" content={type} />
+          <meta property="og:site_name" content={siteName} />
+          <meta property="og:title" content={fullTitle} />
+          <meta property="og:description" content={metaDescription} />
+          {canonicalUrl && <meta property="og:url" content={canonicalUrl} />}
+          <meta property="og:image" content={ogImage} />
+          <meta property="og:image:width" content="1200" />
+          <meta property="og:image:height" content="630" />
+        </>
+      )}
 
       {/* Article-specific OG tags */}
-      {type === 'article' && publishedTime && (
+      {enableOpenGraph && type === 'article' && publishedTime && (
         <meta property="article:published_time" content={publishedTime} />
       )}
-      {type === 'article' && modifiedTime && (
+      {enableOpenGraph && type === 'article' && modifiedTime && (
         <meta property="article:modified_time" content={modifiedTime} />
       )}
 
-      {/* Twitter Card */}
-      <meta name="twitter:card" content="summary_large_image" />
-      <meta name="twitter:title" content={fullTitle} />
-      <meta name="twitter:description" content={metaDescription} />
-      <meta name="twitter:image" content={ogImage} />
+      {/* Twitter Card (respects admin toggle) */}
+      {enableTwitterCards && (
+        <>
+          <meta name="twitter:card" content="summary_large_image" />
+          <meta name="twitter:title" content={fullTitle} />
+          <meta name="twitter:description" content={metaDescription} />
+          <meta name="twitter:image" content={ogImage} />
+        </>
+      )}
     </Helmet>
   );
 }
