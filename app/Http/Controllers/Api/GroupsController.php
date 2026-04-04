@@ -96,6 +96,16 @@ class GroupsController extends BaseApiController
             $userId = $this->resolveSanctumUserOptionally();
         }
 
+        // DEBUG: temporary logging to diagnose viewer_membership issue
+        \Log::info('GroupsController::show', [
+            'group_id' => $id,
+            'resolved_user_id' => $userId,
+            'has_bearer' => (bool) request()->bearerToken(),
+            'bearer_prefix' => $userId ? null : substr(request()->bearerToken() ?? '', 0, 10),
+            'auth_user' => \Auth::user()?->id,
+            'guard_api_user' => \Auth::guard('api')->user()?->id ?? null,
+        ]);
+
         $group = $this->groupService->getById($id, $userId);
 
         if (!$group) {
