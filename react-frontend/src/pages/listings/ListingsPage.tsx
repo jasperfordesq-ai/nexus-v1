@@ -64,16 +64,36 @@ export function ListingsPage() {
   const [loadError, setLoadError] = useState<string | null>(null);
   const [searchInput, setSearchInput] = useState(searchParams.get('q') || '');
   const [searchQuery, setSearchQuery] = useState(searchParams.get('q') || '');
-  const [selectedType, setSelectedType] = useState<ListingType>((searchParams.get('type') as ListingType) || 'all');
+  const validTypes: ListingType[] = ['all', 'offer', 'request'];
+  const validHours = ['any', 'quick', 'short', 'half_day', 'full_day'];
+  const validService = ['any', 'remote', 'in_person'];
+  const validPosted = ['any', '1', '7', '30'];
+
+  const [selectedType, setSelectedType] = useState<ListingType>(() => {
+    const v = searchParams.get('type');
+    return v && validTypes.includes(v as ListingType) ? (v as ListingType) : 'all';
+  });
   const [selectedCategory, setSelectedCategory] = useState(searchParams.get('category') || '');
   const [viewMode, setViewMode] = useState<ViewMode>('grid');
   const [hasMore, setHasMore] = useState(false);
   const [totalItems, setTotalItems] = useState<number | null>(null);
   const [nearMeEnabled, setNearMeEnabled] = useState(searchParams.get('near_me') === '1');
-  const [radiusKm, setRadiusKm] = useState(Number(searchParams.get('radius')) || 25);
-  const [hoursRange, setHoursRange] = useState(searchParams.get('hours') || 'any');
-  const [serviceMode, setServiceMode] = useState(searchParams.get('service') || 'any');
-  const [postedWithin, setPostedWithin] = useState(searchParams.get('posted') || 'any');
+  const [radiusKm, setRadiusKm] = useState(() => {
+    const v = Number(searchParams.get('radius'));
+    return [5, 10, 25, 50, 100].includes(v) ? v : 25;
+  });
+  const [hoursRange, setHoursRange] = useState(() => {
+    const v = searchParams.get('hours');
+    return v && validHours.includes(v) ? v : 'any';
+  });
+  const [serviceMode, setServiceMode] = useState(() => {
+    const v = searchParams.get('service');
+    return v && validService.includes(v) ? v : 'any';
+  });
+  const [postedWithin, setPostedWithin] = useState(() => {
+    const v = searchParams.get('posted');
+    return v && validPosted.includes(v) ? v : 'any';
+  });
   const [showAdvancedFilters, setShowAdvancedFilters] = useState(
     // Auto-expand if any advanced filter is active from URL
     !!(searchParams.get('hours') || searchParams.get('service') || searchParams.get('posted') || searchParams.get('near_me')),
@@ -734,6 +754,18 @@ const ListingCard = memo(function ListingCard({ listing, viewMode, isSaving, onT
                 }`}>
                   {listing.type === 'offer' ? t('offering') : t('requesting')}
                 </span>
+                {listing.service_type === 'remote_only' && (
+                  <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-blue-500/20 text-blue-600 dark:text-blue-400 font-medium flex items-center gap-0.5">
+                    <Monitor className="w-2.5 h-2.5" aria-hidden="true" />
+                    Remote
+                  </span>
+                )}
+                {listing.service_type === 'hybrid' && (
+                  <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-teal-500/20 text-teal-600 dark:text-teal-400 font-medium flex items-center gap-0.5">
+                    <ArrowRightLeft className="w-2.5 h-2.5" aria-hidden="true" />
+                    Remote Available
+                  </span>
+                )}
                 {listing.category_name && (
                   <span className="text-[10px] px-2 py-0.5 rounded-full bg-theme-hover text-theme-muted">
                     {listing.category_name}

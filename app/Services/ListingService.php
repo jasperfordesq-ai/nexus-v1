@@ -66,7 +66,12 @@ class ListingService
         // When a search term is present and Meilisearch is available, use it for
         // typo-tolerant, relevance-ranked ID retrieval, then hydrate from SQL.
         // Falls through to the SQL path below if Meilisearch is unavailable.
-        if (!empty($filters['search'])) {
+        // Skip Meilisearch when faceted filters are active — they're applied
+        // post-search in SQL which breaks pagination (IDs filtered out → fewer
+        // items than limit). The SQL path handles all filters correctly.
+        $hasFacetedFilters = !empty($filters['min_hours']) || !empty($filters['max_hours'])
+            || !empty($filters['service_type']) || !empty($filters['posted_within']);
+        if (!empty($filters['search']) && !$hasFacetedFilters) {
             $tenantId = \App\Core\TenantContext::getId();
 
             // Decode Meilisearch offset cursor (format: "meili:<offset>")
