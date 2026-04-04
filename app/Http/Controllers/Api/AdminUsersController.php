@@ -275,7 +275,7 @@ class AdminUsersController extends BaseApiController
         $params = [];
 
         // SECURITY: Restrict role values to prevent privilege escalation (SEC-007)
-        $allowedRoles = ['member', 'admin', 'broker'];
+        $allowedRoles = ['member', 'admin', 'broker', 'moderator', 'newsletter_admin'];
         // Only super admins can assign elevated roles
         if (isset($input['role']) && in_array($input['role'], ['tenant_admin', 'super_admin', 'god'], true)) {
             if (!$this->isCallerSuperAdmin($adminId)) {
@@ -386,7 +386,14 @@ class AdminUsersController extends BaseApiController
         $location = trim($input['location'] ?? '');
 
         // SECURITY: Restrict role to prevent privilege escalation via user creation (SEC-009)
-        $allowedRoles = ['member', 'admin', 'broker'];
+        $allowedRoles = ['member', 'admin', 'broker', 'moderator', 'newsletter_admin'];
+        // Only super admins can assign elevated roles like tenant_admin
+        if ($role === 'tenant_admin') {
+            if (!$this->isCallerSuperAdmin($adminId)) {
+                return $this->respondWithError('AUTH_INSUFFICIENT_PERMISSIONS', __('api.only_super_admins_assign_roles'), null, 403);
+            }
+            $allowedRoles[] = 'tenant_admin';
+        }
         if (!in_array($role, $allowedRoles, true)) {
             return $this->respondWithError('VALIDATION_ERROR', __('api.invalid_role_allowed', ['roles' => implode(', ', $allowedRoles)]), 'role', 422);
         }
