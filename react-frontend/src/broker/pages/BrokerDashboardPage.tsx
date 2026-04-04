@@ -212,7 +212,7 @@ export default function BrokerDashboardPage() {
           loading={false}
         />
         <StatCard
-          label={t('dashboard.new_signups_today')}
+          label={t('dashboard.safeguarding_flags')}
           value={stats.onboarding_safeguarding_flags}
           icon={UserPlus}
           color="success"
@@ -278,7 +278,9 @@ export default function BrokerDashboardPage() {
                           <span className="font-medium">
                             {entry.first_name} {entry.last_name}
                           </span>{' '}
-                          {entry.details}
+                          <span className="text-default-500">
+                            {entry.action_type?.replace(/_/g, ' ')}
+                          </span>
                         </p>
                         <p className="text-xs text-default-400 mt-0.5">
                           {new Date(entry.created_at).toLocaleString()}

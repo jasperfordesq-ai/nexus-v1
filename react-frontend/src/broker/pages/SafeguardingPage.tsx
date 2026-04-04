@@ -50,15 +50,20 @@ interface SafeguardingDashboard {
 
 interface FlaggedMessage {
   id: number;
-  sender_name: string;
-  receiver_name: string;
-  message_body: string;
+  sender?: { id: number; name: string; avatar_url?: string };
+  recipient?: { id: number; name: string; avatar_url?: string };
+  sender_name?: string;
+  receiver_name?: string;
+  message_content?: string;
+  message_body?: string;
   copy_reason?: string;
   flag_reason?: string;
-  flag_severity: 'low' | 'medium' | 'high' | 'critical';
-  reviewed_at: string | null;
-  reviewed_by: number | null;
-  review_notes: string | null;
+  severity?: string;
+  flag_severity?: string;
+  is_reviewed?: boolean;
+  reviewed_at?: string | null;
+  reviewed_by?: string | null;
+  review_notes?: string | null;
   created_at: string;
 }
 
@@ -244,17 +249,25 @@ export default function SafeguardingPage() {
   // ── Column definitions ───────────────────────────────────────────────────
 
   const flaggedColumns: Column<FlaggedMessage>[] = useMemo(() => [
-    { key: 'sender_name', label: t('safeguarding.col_sender') },
-    { key: 'receiver_name', label: t('safeguarding.col_receiver') },
+    {
+      key: 'sender',
+      label: t('safeguarding.col_sender'),
+      render: (item) => item.sender?.name || item.sender_name || '—',
+    },
+    {
+      key: 'recipient',
+      label: t('safeguarding.col_receiver'),
+      render: (item) => item.recipient?.name || item.receiver_name || '—',
+    },
     {
       key: 'flag_reason',
       label: t('safeguarding.col_reason'),
       render: (item) => item.flag_reason || item.copy_reason || '—',
     },
     {
-      key: 'flag_severity',
+      key: 'severity',
       label: t('safeguarding.col_severity'),
-      render: (item) => <SeverityChip severity={item.flag_severity} />,
+      render: (item) => <SeverityChip severity={item.severity || item.flag_severity || 'low'} />,
     },
     {
       key: 'created_at',
@@ -262,10 +275,10 @@ export default function SafeguardingPage() {
       render: (item) => new Date(item.created_at).toLocaleDateString(),
     },
     {
-      key: 'reviewed_at',
+      key: 'is_reviewed',
       label: t('safeguarding.col_status'),
       render: (item) =>
-        item.reviewed_at ? (
+        (item.is_reviewed || item.reviewed_at) ? (
           <Chip size="sm" color="success" variant="flat">{t('status.reviewed')}</Chip>
         ) : (
           <Chip size="sm" color="warning" variant="flat">{t('status.unreviewed')}</Chip>
@@ -273,9 +286,9 @@ export default function SafeguardingPage() {
     },
     {
       key: 'actions',
-      label: t('safeguarding.col_ward'), // reuse generic "Actions" concept
+      label: '',
       render: (item) =>
-        !item.reviewed_at ? (
+        !(item.is_reviewed || item.reviewed_at) ? (
           <Button
             size="sm"
             color="primary"
@@ -505,11 +518,11 @@ export default function SafeguardingPage() {
                   <p className="mb-1 font-medium">
                     {reviewTarget.sender_name} &rarr; {reviewTarget.receiver_name}
                   </p>
-                  <p className="text-default-500">{reviewTarget.message_body}</p>
+                  <p className="text-default-500">{reviewTarget.message_content || reviewTarget.message_body || ''}</p>
                 </div>
                 <div className="flex items-center gap-2">
                   <span className="text-sm text-default-500">Severity:</span>
-                  <SeverityChip severity={reviewTarget.flag_severity} />
+                  <SeverityChip severity={reviewTarget.severity || reviewTarget.flag_severity || 'low'} />
                 </div>
                 <Textarea
                   label="Review Notes"

@@ -13,7 +13,7 @@ import { Link, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Button, Chip, Tooltip } from '@heroui/react';
 import { useAuth, useTenant } from '@/contexts';
-import { adminBroker } from '@/admin/api/adminApi';
+import { adminBroker, adminUsers } from '@/admin/api/adminApi';
 import {
   LayoutDashboard,
   Users,
@@ -82,14 +82,29 @@ export function BrokerSidebar({ collapsed, onToggle }: BrokerSidebarProps) {
     { key: 'messages', label: t('nav.messages'), icon: MessageSquareWarning, path: '/broker/messages', badgeKey: 'unreviewed_messages' },
   ];
 
-  // Fetch badge counts
+  // Fetch badge counts from broker dashboard + pending users count
   const fetchBadges = useCallback(async () => {
     try {
-      const res = await adminBroker.getDashboard();
-      if (res.success && res.data) {
-        const d = res.data as unknown as Record<string, unknown>;
+      const [dashRes, usersRes] = await Promise.all([
+        adminBroker.getDashboard(),
+        adminUsers.list({ status: 'pending', limit: 1 }),
+      ]);
+
+      let pendingMembers = 0;
+      if (usersRes.success && usersRes.data) {
+        const payload = usersRes.data as unknown;
+        if (Array.isArray(payload)) {
+          pendingMembers = payload.length;
+        } else if (payload && typeof payload === 'object') {
+          const paged = payload as { data: unknown[]; meta?: { total: number } };
+          pendingMembers = paged.meta?.total ?? paged.data?.length ?? 0;
+        }
+      }
+
+      if (dashRes.success && dashRes.data) {
+        const d = dashRes.data as unknown as Record<string, unknown>;
         setBadges({
-          pending_members: Number(d.pending_approvals ?? d.pending_members ?? 0),
+          pending_members: pendingMembers,
           safeguarding_alerts: Number(d.safeguarding_alerts ?? 0),
           vetting_expiring: Number(d.vetting_expiring ?? 0),
           pending_exchanges: Number(d.pending_exchanges ?? 0),

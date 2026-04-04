@@ -11,22 +11,42 @@
  * in App.tsx so the broker UI stays out of the main application bundle.
  */
 
+import { Suspense } from 'react';
 import { Routes, Route } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { BrokerRoute } from './BrokerRoute';
 import { BrokerLayout } from './BrokerLayout';
 import { BrokerRoutes } from './routes';
 import { ErrorBoundary } from '@/components/feedback/ErrorBoundary';
+import { LoadingScreen } from '@/components/feedback';
+
+function BrokerAppInner() {
+  // Ensure 'broker' namespace is loaded before rendering any broker components.
+  // Without this, useTranslation('broker') in child components may render raw
+  // keys on first paint because HttpBackend loads namespaces asynchronously.
+  const { ready } = useTranslation('broker');
+
+  if (!ready) {
+    return <LoadingScreen />;
+  }
+
+  return (
+    <Routes>
+      <Route element={<BrokerRoute />}>
+        <Route element={<BrokerLayout />}>
+          {BrokerRoutes()}
+        </Route>
+      </Route>
+    </Routes>
+  );
+}
 
 export default function BrokerApp() {
   return (
     <ErrorBoundary>
-      <Routes>
-        <Route element={<BrokerRoute />}>
-          <Route element={<BrokerLayout />}>
-            {BrokerRoutes()}
-          </Route>
-        </Route>
-      </Routes>
+      <Suspense fallback={<LoadingScreen />}>
+        <BrokerAppInner />
+      </Suspense>
     </ErrorBoundary>
   );
 }
