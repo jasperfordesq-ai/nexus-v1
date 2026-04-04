@@ -378,8 +378,7 @@ class ListingService
         // posted_within) since Meilisearch can't apply those — its total
         // would be inaccurate.
         $hasFacetedFilters = !empty($filters['min_hours']) || !empty($filters['max_hours'])
-            || !empty($filters['service_type']) || !empty($filters['posted_within'])
-            || !empty($filters['skills']);
+            || !empty($filters['service_type']) || !empty($filters['posted_within']);
         if (!empty($filters['search']) && !$hasFacetedFilters) {
             $tenantId     = \App\Core\TenantContext::getId();
             $meiliFilters = [];
@@ -400,6 +399,14 @@ class ListingService
             }
             if (!empty($filters['user_id'])) {
                 $meiliFilters[] = 'user_id = ' . (int) $filters['user_id'];
+            }
+            if (!empty($filters['skills'])) {
+                $skills = is_array($filters['skills'])
+                    ? $filters['skills']
+                    : explode(',', $filters['skills']);
+                foreach (array_filter(array_map(fn($s) => strtolower(trim($s)), $skills)) as $skill) {
+                    $meiliFilters[] = "skill_tags = '" . str_replace("'", "\\'", $skill) . "'";
+                }
             }
             $meiliResult = SearchService::searchListingIds($filters['search'], $tenantId, $meiliFilters, 1, 0);
             if ($meiliResult !== null) {
