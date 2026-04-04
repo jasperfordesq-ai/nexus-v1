@@ -96,8 +96,26 @@ class GroupCollectionService
 
     public static function setGroups(int $collectionId, array $groupIds): void
     {
+        $tenantId = TenantContext::getId();
+
+        // Validate collection belongs to current tenant
+        $collection = DB::table('group_collections')
+            ->where('id', $collectionId)
+            ->where('tenant_id', $tenantId)
+            ->first();
+        if (!$collection) {
+            return;
+        }
+
+        // Validate group IDs belong to current tenant
+        $validGroupIds = DB::table('groups')
+            ->where('tenant_id', $tenantId)
+            ->whereIn('id', $groupIds)
+            ->pluck('id')
+            ->toArray();
+
         DB::table('group_collection_items')->where('collection_id', $collectionId)->delete();
-        foreach ($groupIds as $i => $gid) {
+        foreach ($validGroupIds as $i => $gid) {
             DB::table('group_collection_items')->insert([
                 'collection_id' => $collectionId,
                 'group_id' => $gid,

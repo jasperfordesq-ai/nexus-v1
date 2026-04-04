@@ -41,7 +41,7 @@ class GroupMediaController extends BaseApiController
         $where = "WHERE m.group_id = ? AND m.tenant_id = ?";
 
         if ($type && in_array($type, ['image', 'video'], true)) {
-            $where .= " AND m.type = ?";
+            $where .= " AND m.media_type = ?";
             $params = [$tenantId, $id, $tenantId, $type];
         }
 
@@ -53,8 +53,9 @@ class GroupMediaController extends BaseApiController
             }
         }
 
-        $sql = "SELECT m.id, m.file_name, m.file_path, m.file_url, m.type, m.mime_type,
-                       m.file_size, m.uploaded_by, u.name AS uploader_name,
+        $sql = "SELECT m.id, m.file_path, m.url, m.media_type AS type,
+                       m.thumbnail_path AS thumbnail_url,
+                       m.caption, m.file_size, m.uploaded_by, u.name AS uploader_name,
                        m.created_at
                 FROM group_media m
                 LEFT JOIN users u ON u.id = m.uploaded_by AND u.tenant_id = ?
@@ -123,9 +124,9 @@ class GroupMediaController extends BaseApiController
         $now = now()->toDateTimeString();
 
         DB::insert(
-            "INSERT INTO group_media (group_id, tenant_id, file_name, file_path, file_url, type, mime_type, file_size, uploaded_by, created_at)
-             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
-            [$id, $tenantId, $file->getClientOriginalName(), $path, $fileUrl, $type, $mime, $file->getSize(), $userId, $now]
+            "INSERT INTO group_media (group_id, tenant_id, file_path, url, media_type, file_size, uploaded_by, created_at)
+             VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+            [$id, $tenantId, $path, $fileUrl, $type, $file->getSize(), $userId, $now]
         );
 
         $mediaId = (int) DB::getPdo()->lastInsertId();

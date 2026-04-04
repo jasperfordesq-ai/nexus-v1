@@ -274,6 +274,7 @@ export function EventsPage() {
             placeholder={t('filter_placeholder')}
             aria-label={t('filter_aria')}
             selectedKeys={[filter]}
+            disallowEmptySelection
             onChange={(e) => setFilter(e.target.value as EventFilter)}
             className="w-32 sm:w-40"
             classNames={{
@@ -304,6 +305,7 @@ export function EventsPage() {
             <Select
               aria-label={t('radius_label', 'Radius')}
               selectedKeys={[String(radiusKm)]}
+              disallowEmptySelection
               onSelectionChange={(keys) => {
                 const val = keys instanceof Set ? ([...keys][0] as string) : '25';
                 setRadiusKm(Number(val) || 25);

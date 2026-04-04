@@ -141,15 +141,15 @@ class SeoAuditService
 
         $issues = [];
 
-        if (empty($settings['seo_canonical_urls']) || $settings['seo_canonical_urls'] !== '1') {
+        if (!filter_var($settings['seo_canonical_urls'] ?? false, FILTER_VALIDATE_BOOLEAN)) {
             $issues[] = 'Canonical URLs are not enabled';
         }
 
-        if (empty($settings['seo_open_graph']) || $settings['seo_open_graph'] !== '1') {
+        if (!filter_var($settings['seo_open_graph'] ?? false, FILTER_VALIDATE_BOOLEAN)) {
             $issues[] = 'Open Graph tags are not enabled';
         }
 
-        if (empty($settings['seo_twitter_cards']) || $settings['seo_twitter_cards'] !== '1') {
+        if (!filter_var($settings['seo_twitter_cards'] ?? false, FILTER_VALIDATE_BOOLEAN)) {
             $issues[] = 'Twitter Cards are not enabled';
         }
 
@@ -381,7 +381,7 @@ class SeoAuditService
         $settings = $this->getTenantSettings($tenantId, ['seo_canonical_urls']);
         $issues = [];
 
-        if (empty($settings['seo_canonical_urls']) || $settings['seo_canonical_urls'] !== '1') {
+        if (!filter_var($settings['seo_canonical_urls'] ?? false, FILTER_VALIDATE_BOOLEAN)) {
             $issues[] = 'Canonical URL generation is disabled — duplicate content risk';
         }
 
@@ -412,11 +412,11 @@ class SeoAuditService
 
         $issues = [];
 
-        if (empty($settings['seo_open_graph']) || $settings['seo_open_graph'] !== '1') {
+        if (!filter_var($settings['seo_open_graph'] ?? false, FILTER_VALIDATE_BOOLEAN)) {
             $issues[] = 'Open Graph tags are disabled — social sharing will show generic previews';
         }
 
-        if (empty($settings['seo_twitter_cards']) || $settings['seo_twitter_cards'] !== '1') {
+        if (!filter_var($settings['seo_twitter_cards'] ?? false, FILTER_VALIDATE_BOOLEAN)) {
             $issues[] = 'Twitter Cards are disabled';
         }
 

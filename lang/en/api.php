@@ -743,6 +743,7 @@ return [
     'gdpr_request_update_failed'           => 'Failed to update GDPR request',
     'breach_report_failed'                 => 'Failed to report breach',
     'config_update_failed'                 => 'Failed to update configuration',
+    'config_load_failed'                   => 'Failed to load configuration',
     'legal_doc_create_failed'              => 'Failed to create legal document',
     'legal_doc_update_failed'              => 'Failed to update legal document',
     'legal_doc_delete_failed'              => 'Failed to delete legal document',

@@ -45,6 +45,9 @@ class GroupWikiController extends BaseApiController
             [$tenantId, $id, $tenantId]
         );
 
+        // Nest author for frontend compatibility
+        $pages = array_map(fn ($p) => $this->nestWikiAuthor($p), $pages);
+
         return $this->successResponse($pages);
     }
 
@@ -95,9 +98,9 @@ class GroupWikiController extends BaseApiController
 
         // Create initial revision
         DB::insert(
-            "INSERT INTO group_wiki_revisions (page_id, tenant_id, content, edited_by, change_summary, created_at)
-             VALUES (?, ?, ?, ?, ?, ?)",
-            [$pageId, $tenantId, $content, $userId, 'Initial version', $now]
+            "INSERT INTO group_wiki_revisions (page_id, content, edited_by, change_summary, created_at)
+             VALUES (?, ?, ?, ?, ?)",
+            [$pageId, $content, $userId, 'Initial version', $now]
         );
 
         $page = DB::selectOne(
@@ -108,7 +111,7 @@ class GroupWikiController extends BaseApiController
             [$tenantId, $pageId, $tenantId]
         );
 
-        return $this->successResponse($page, 201);
+        return $this->successResponse($this->nestWikiAuthor($page), 201);
     }
 
     /**
@@ -137,7 +140,7 @@ class GroupWikiController extends BaseApiController
             return $this->errorResponse('Wiki page not found', 404);
         }
 
-        return $this->successResponse($page);
+        return $this->successResponse($this->nestWikiAuthor($page));
     }
 
     /**
@@ -173,9 +176,9 @@ class GroupWikiController extends BaseApiController
 
         // Save old content as a revision
         DB::insert(
-            "INSERT INTO group_wiki_revisions (page_id, tenant_id, content, edited_by, change_summary, created_at)
-             VALUES (?, ?, ?, ?, ?, ?)",
-            [$pageId, $tenantId, $page->content, $userId, $changeSummary, $now]
+            "INSERT INTO group_wiki_revisions (page_id, content, edited_by, change_summary, created_at)
+             VALUES (?, ?, ?, ?, ?)",
+            [$pageId, $page->content, $userId, $changeSummary, $now]
         );
 
         // Update the page
@@ -205,7 +208,7 @@ class GroupWikiController extends BaseApiController
             [$tenantId, $pageId, $tenantId]
         );
 
-        return $this->successResponse($updated);
+        return $this->successResponse($this->nestWikiAuthor($updated));
     }
 
     /**
@@ -233,8 +236,8 @@ class GroupWikiController extends BaseApiController
 
         // Delete revisions first, then the page
         DB::delete(
-            "DELETE FROM group_wiki_revisions WHERE page_id = ? AND tenant_id = ?",
-            [$pageId, $tenantId]
+            "DELETE FROM group_wiki_revisions WHERE page_id = ?",
+            [$pageId]
         );
 
         DB::delete(
@@ -274,11 +277,36 @@ class GroupWikiController extends BaseApiController
                     r.change_summary, r.created_at
              FROM group_wiki_revisions r
              LEFT JOIN users u ON u.id = r.edited_by AND u.tenant_id = ?
-             WHERE r.page_id = ? AND r.tenant_id = ?
+             WHERE r.page_id = ?
              ORDER BY r.created_at DESC",
-            [$tenantId, $pageId, $tenantId]
+            [$tenantId, $pageId]
         );
 
+        // Nest editor for frontend compatibility
+        $revisions = array_map(function ($r) {
+            $arr = (array) $r;
+            $arr['editor'] = [
+                'id' => $arr['edited_by'] ?? null,
+                'name' => $arr['editor_name'] ?? null,
+            ];
+            unset($arr['edited_by'], $arr['editor_name']);
+            return $arr;
+        }, $revisions);
+
         return $this->successResponse($revisions);
+    }
+
+    /**
+     * Transform flat author fields into nested object for frontend.
+     */
+    private function nestWikiAuthor(object $row): array
+    {
+        $arr = (array) $row;
+        $arr['author'] = [
+            'id' => $arr['created_by'] ?? null,
+            'name' => $arr['author_name'] ?? null,
+        ];
+        unset($arr['author_name']);
+        return $arr;
     }
 }

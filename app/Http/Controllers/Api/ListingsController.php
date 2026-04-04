@@ -391,6 +391,25 @@ class ListingsController extends BaseApiController
 
         if ($this->query('category_id')) {
             $filters['category_id'] = $this->queryInt('category_id');
+        } elseif ($this->query('category')) {
+            $filters['category_slug'] = $this->query('category');
+        }
+
+        if ($this->query('q')) {
+            $filters['search'] = $this->query('q');
+        }
+
+        if ($this->query('min_hours')) {
+            $filters['min_hours'] = (float) $this->query('min_hours');
+        }
+        if ($this->query('max_hours')) {
+            $filters['max_hours'] = (float) $this->query('max_hours');
+        }
+        if ($this->query('service_type')) {
+            $filters['service_type'] = $this->query('service_type');
+        }
+        if ($this->query('posted_within')) {
+            $filters['posted_within'] = (int) $this->query('posted_within');
         }
 
         if ($this->query('cursor')) {

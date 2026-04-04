@@ -67,8 +67,21 @@ class Group extends Model
     public function members(): BelongsToMany
     {
         return $this->belongsToMany(User::class, 'group_members')
-                     ->withPivot('role', 'status')
+                     ->withPivot('role', 'status', 'tenant_id')
                      ->withTimestamps();
+    }
+
+    /**
+     * Attach members with automatic tenant_id population.
+     *
+     * The group_members.tenant_id defaults to 1 in the DB, which causes
+     * tenant-scoped queries to fail. This ensures attach() always sets
+     * tenant_id to match the group's tenant.
+     */
+    public function attachMember(int $userId, array $attributes = []): void
+    {
+        $attributes['tenant_id'] = $this->tenant_id ?? \App\Core\TenantContext::getId();
+        $this->members()->attach($userId, $attributes);
     }
 
     public function activeMembers(): BelongsToMany

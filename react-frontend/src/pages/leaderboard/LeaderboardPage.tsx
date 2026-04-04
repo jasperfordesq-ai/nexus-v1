@@ -39,6 +39,7 @@ import {
 import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
 import { EmptyState } from '@/components/feedback';
+import { PageMeta } from '@/components/seo';
 import { usePageTitle } from '@/hooks';
 import { useToast, useTenant } from '@/contexts';
 import { api } from '@/lib/api';
@@ -508,6 +509,7 @@ export function LeaderboardPage() {
 
   return (
     <div className="space-y-6">
+      <PageMeta title="Leaderboard" description="Community leaderboard — see top contributors and most active members." />
       {/* Header */}
       <div>
         <h1 className="text-2xl font-bold text-theme-primary flex items-center gap-3">
@@ -641,6 +643,7 @@ function CompetitiveLeaderboard(props: any) {
             selectedKeys={[type]}
             onChange={(e) => setType((e.target.value as LeaderboardType) || 'xp')}
             className="w-full sm:w-48"
+            disallowEmptySelection
             classNames={{
               trigger: 'bg-theme-elevated border-theme-default hover:bg-theme-hover',
               value: 'text-theme-primary',
@@ -660,6 +663,7 @@ function CompetitiveLeaderboard(props: any) {
             selectedKeys={[period]}
             onChange={(e) => setPeriod(e.target.value as LeaderboardPeriod)}
             className="w-full sm:w-44"
+            disallowEmptySelection
             classNames={{
               trigger: 'bg-theme-elevated border-theme-default hover:bg-theme-hover',
               value: 'text-theme-primary',

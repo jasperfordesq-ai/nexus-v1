@@ -144,8 +144,7 @@ class GroupChallengeService
                         'tenant_id' => $challenge->tenant_id,
                         'user_id' => $userId,
                         'xp_amount' => $challenge->reward_xp,
-                        'source' => 'group_challenge',
-                        'source_id' => $challengeId,
+                        'action' => 'group_challenge',
                         'description' => 'Challenge completed: ' . $challenge->title,
                         'created_at' => now(),
                     ]);

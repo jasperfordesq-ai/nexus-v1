@@ -158,15 +158,15 @@ Route::post('/v2/events/{id}/image', [\App\Http\Controllers\Api\EventsController
 // returns JsonResponse from every method, and handles validation via
 // Laravel's ValidationException. See ListingsController.php for the
 // reference implementation pattern to follow for all other controllers.
-Route::get('/v2/listings', [\App\Http\Controllers\Api\ListingsController::class, 'index']);
-Route::get('/v2/listings/nearby', [\App\Http\Controllers\Api\ListingsController::class, 'nearby']);
+Route::get('/v2/listings', [\App\Http\Controllers\Api\ListingsController::class, 'index'])->withoutMiddleware('auth:sanctum');
+Route::get('/v2/listings/nearby', [\App\Http\Controllers\Api\ListingsController::class, 'nearby'])->withoutMiddleware('auth:sanctum');
 Route::get('/v2/listings/saved', [\App\Http\Controllers\Api\ListingsController::class, 'getSavedListings']);
-Route::get('/v2/listings/featured', [\App\Http\Controllers\Api\ListingsController::class, 'featured']);
-Route::get('/v2/listings/tags/popular', [\App\Http\Controllers\Api\ListingsController::class, 'popularTags']);
-Route::get('/v2/listings/tags/autocomplete', [\App\Http\Controllers\Api\ListingsController::class, 'autocompleteTags']);
+Route::get('/v2/listings/featured', [\App\Http\Controllers\Api\ListingsController::class, 'featured'])->withoutMiddleware('auth:sanctum');
+Route::get('/v2/listings/tags/popular', [\App\Http\Controllers\Api\ListingsController::class, 'popularTags'])->withoutMiddleware('auth:sanctum');
+Route::get('/v2/listings/tags/autocomplete', [\App\Http\Controllers\Api\ListingsController::class, 'autocompleteTags'])->withoutMiddleware('auth:sanctum');
 Route::post('/v2/listings', [\App\Http\Controllers\Api\ListingsController::class, 'store']);
 Route::post('/v2/listings/generate-description', [\App\Http\Controllers\Api\ListingsController::class, 'generateDescription']);
-Route::get('/v2/listings/{id}', [\App\Http\Controllers\Api\ListingsController::class, 'show']);
+Route::get('/v2/listings/{id}', [\App\Http\Controllers\Api\ListingsController::class, 'show'])->withoutMiddleware('auth:sanctum');
 Route::put('/v2/listings/{id}', [\App\Http\Controllers\Api\ListingsController::class, 'update']);
 Route::delete('/v2/listings/{id}', [\App\Http\Controllers\Api\ListingsController::class, 'destroy']);
 Route::post('/v2/listings/{id}/save', [\App\Http\Controllers\Api\ListingsController::class, 'saveListing']);

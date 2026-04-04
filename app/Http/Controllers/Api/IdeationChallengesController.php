@@ -65,14 +65,17 @@ class IdeationChallengesController extends BaseApiController
     {
         foreach ($errors as $error) {
             $code = $error['code'] ?? '';
-            if ($code === ApiErrorCodes::RESOURCE_NOT_FOUND) {
+            if ($code === ApiErrorCodes::RESOURCE_NOT_FOUND || $code === 'NOT_FOUND') {
                 return 404;
             }
-            if ($code === ApiErrorCodes::RESOURCE_FORBIDDEN) {
+            if ($code === ApiErrorCodes::RESOURCE_FORBIDDEN || $code === 'FORBIDDEN') {
                 return 403;
             }
             if ($code === ApiErrorCodes::RESOURCE_CONFLICT) {
                 return 409;
+            }
+            if ($code === 'SERVER_ERROR') {
+                return 500;
             }
         }
         return 422;

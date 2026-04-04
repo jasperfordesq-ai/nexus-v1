@@ -455,6 +455,7 @@ export function JobsPage() {
               onChange={(e) => setSelectedSort(e.target.value || 'newest')}
               className="w-48"
               size="sm"
+              disallowEmptySelection
               startContent={<ArrowUpDown className="w-3.5 h-3.5 text-theme-subtle" aria-hidden="true" />}
               classNames={{
                 trigger: 'bg-theme-elevated border-theme-default',

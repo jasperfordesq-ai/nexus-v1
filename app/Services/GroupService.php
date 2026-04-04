@@ -232,7 +232,7 @@ class GroupService
             $group->save();
 
             // Auto-join creator as admin
-            $group->members()->attach($userId, [
+            $group->attachMember($userId, [
                 'role'   => 'admin',
                 'status' => 'active',
             ]);
@@ -252,8 +252,11 @@ class GroupService
      */
     public static function join(int $groupId, int $userId): array
     {
-        /** @var Group $group */
-        $group = Group::query()->findOrFail($groupId);
+        /** @var Group|null $group */
+        $group = Group::query()->find($groupId);
+        if (!$group) {
+            return ['success' => false, 'error' => 'Group not found'];
+        }
 
         $existing = DB::table('group_members')
             ->where('group_id', $groupId)
@@ -270,7 +273,7 @@ class GroupService
 
         $status = $group->visibility === 'private' ? 'pending' : 'active';
 
-        $group->members()->attach($userId, [
+        $group->attachMember($userId, [
             'role'   => 'member',
             'status' => $status,
         ]);
@@ -293,8 +296,12 @@ class GroupService
      */
     public static function leave(int $groupId, int $userId): bool
     {
-        /** @var Group $group */
-        $group = Group::query()->findOrFail($groupId);
+        /** @var Group|null $group */
+        $group = Group::query()->find($groupId);
+        if (!$group) {
+            self::$errors[] = ['code' => 'NOT_FOUND', 'message' => 'Group not found'];
+            return false;
+        }
 
         $detached = $group->members()->detach($userId);
 
@@ -559,8 +566,12 @@ class GroupService
         }
 
         // Can't change owner's role
-        /** @var Group $group */
-        $group = Group::query()->findOrFail($groupId);
+        /** @var Group|null $group */
+        $group = Group::query()->find($groupId);
+        if (!$group) {
+            self::$errors[] = ['code' => 'NOT_FOUND', 'message' => 'Group not found'];
+            return false;
+        }
         if ((int) $group->owner_id === $targetUserId) {
             self::$errors[] = ['code' => 'FORBIDDEN', 'message' => 'Cannot change the owner\'s role'];
             return false;
@@ -587,8 +598,12 @@ class GroupService
         }
 
         // Can't remove the owner
-        /** @var Group $group */
-        $group = Group::query()->findOrFail($groupId);
+        /** @var Group|null $group */
+        $group = Group::query()->find($groupId);
+        if (!$group) {
+            self::$errors[] = ['code' => 'NOT_FOUND', 'message' => 'Group not found'];
+            return false;
+        }
         if ((int) $group->owner_id === $targetUserId) {
             self::$errors[] = ['code' => 'FORBIDDEN', 'message' => 'Cannot remove the group owner'];
             return false;
@@ -706,11 +721,12 @@ class GroupService
     {
         self::$errors = [];
 
-        // Check membership
+        // Check membership — group_id FK to groups (which is tenant-scoped),
+        // so group_id + user_id + status is sufficient. Some legacy data has
+        // group_members.tenant_id=1 instead of the group's actual tenant.
         $isMember = DB::table('group_members')
             ->where('group_id', $groupId)
             ->where('user_id', $userId)
-            ->where('tenant_id', TenantContext::getId())
             ->where('status', 'active')
             ->exists();
 
@@ -773,11 +789,12 @@ class GroupService
     {
         self::$errors = [];
 
-        // Check membership
+        // Check membership — group_id FK to groups (which is tenant-scoped),
+        // so group_id + user_id + status is sufficient. Some legacy data has
+        // group_members.tenant_id=1 instead of the group's actual tenant.
         $isMember = DB::table('group_members')
             ->where('group_id', $groupId)
             ->where('user_id', $userId)
-            ->where('tenant_id', TenantContext::getId())
             ->where('status', 'active')
             ->exists();
 

@@ -508,6 +508,42 @@ abstract class BaseApiController extends Controller
     }
 
     /**
+     * Alias for requireAuth() — used by group controllers.
+     *
+     * @return int User ID
+     *
+     * @throws \Illuminate\Http\Exceptions\HttpResponseException if not authenticated
+     */
+    protected function requireUserId(): int
+    {
+        return $this->getUserId();
+    }
+
+    /**
+     * Alias for respondWithData() — used by group controllers.
+     *
+     * @param mixed $data Response data
+     * @param int $status HTTP status code
+     * @return JsonResponse
+     */
+    protected function successResponse($data, int $status = 200): JsonResponse
+    {
+        return $this->respondWithData($data, null, $status);
+    }
+
+    /**
+     * Alias for error() — used by group controllers.
+     *
+     * @param string $message Error message
+     * @param int $status HTTP status code
+     * @return JsonResponse
+     */
+    protected function errorResponse(string $message, int $status = 400): JsonResponse
+    {
+        return $this->error($message, $status);
+    }
+
+    /**
      * Require admin role
      *
      * Accepts admin, tenant_admin, super_admin, and god roles.

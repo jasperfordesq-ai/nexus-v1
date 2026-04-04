@@ -42,7 +42,11 @@ class GroupLifecycleService
             ->where('tenant_id', $tenantId)
             ->first();
 
-        return $group ? ($group->status ?? self::STATUS_ACTIVE) : null;
+        if (!$group) {
+            return null;
+        }
+        // groups table only has is_active boolean, not a status column
+        return ($group->is_active ?? true) ? self::STATUS_ACTIVE : self::STATUS_ARCHIVED;
     }
 
     /**
@@ -61,11 +65,11 @@ class GroupLifecycleService
             return false;
         }
 
+        // groups table only has is_active boolean, not a status column
         $affected = DB::table('groups')
             ->where('id', $groupId)
             ->where('tenant_id', $tenantId)
             ->update([
-                'status' => $newStatus,
                 'is_active' => in_array($newStatus, [self::STATUS_ACTIVE, self::STATUS_DORMANT], true),
                 'updated_at' => now(),
             ]);
@@ -194,6 +198,7 @@ class GroupLifecycleService
 
                 if (!$exists) {
                     DB::table('group_members')->insert([
+                        'tenant_id' => $tenantId,
                         'group_id' => $targetGroupId,
                         'user_id' => $member->user_id,
                         'role' => 'member', // Demote to member in merged group
@@ -241,7 +246,7 @@ class GroupLifecycleService
             // Mark source group as deleted
             DB::table('groups')
                 ->where('id', $sourceGroupId)
-                ->update(['status' => 'archived', 'is_active' => false, 'updated_at' => now()]);
+                ->update(['is_active' => false, 'updated_at' => now()]);
         });
 
         try {
@@ -288,6 +293,7 @@ class GroupLifecycleService
 
         // Add owner as member
         DB::table('group_members')->insert([
+            'tenant_id' => $tenantId,
             'group_id' => $newGroupId,
             'user_id' => $ownerId,
             'role' => 'owner',
@@ -306,6 +312,7 @@ class GroupLifecycleService
 
             foreach ($members as $member) {
                 DB::table('group_members')->insert([
+                    'tenant_id' => $tenantId,
                     'group_id' => $newGroupId,
                     'user_id' => $member->user_id,
                     'role' => 'member',
@@ -350,7 +357,6 @@ class GroupLifecycleService
         $activeGroups = DB::table('groups')
             ->where('tenant_id', $tenantId)
             ->where('is_active', true)
-            ->whereNotIn('status', [self::STATUS_DORMANT, self::STATUS_ARCHIVED, self::STATUS_DELETED])
             ->get();
 
         foreach ($activeGroups as $group) {
@@ -360,13 +366,13 @@ class GroupLifecycleService
                 // Auto-archive if beyond archive threshold
                 DB::table('groups')
                     ->where('id', $group->id)
-                    ->update(['status' => self::STATUS_ARCHIVED, 'is_active' => false, 'updated_at' => now()]);
+                    ->update(['is_active' => false, 'updated_at' => now()]);
                 $stats['archived']++;
             } elseif ($lastActivity && $lastActivity < $dormantThreshold) {
                 // Mark as dormant
                 DB::table('groups')
                     ->where('id', $group->id)
-                    ->update(['status' => self::STATUS_DORMANT, 'updated_at' => now()]);
+                    ->update(['updated_at' => now()]);
                 $stats['dormant']++;
             }
         }
@@ -418,7 +424,7 @@ class GroupLifecycleService
             ->where('tenant_id', $tenantId)
             ->whereIn('id', $groupIds)
             ->where('is_active', true)
-            ->update(['status' => self::STATUS_ARCHIVED, 'is_active' => false, 'updated_at' => now()]);
+            ->update(['is_active' => false, 'updated_at' => now()]);
 
         return $affected;
     }
@@ -434,7 +440,7 @@ class GroupLifecycleService
             ->where('tenant_id', $tenantId)
             ->whereIn('id', $groupIds)
             ->where('status', self::STATUS_ARCHIVED)
-            ->update(['status' => self::STATUS_ACTIVE, 'is_active' => true, 'updated_at' => now()]);
+            ->update(['is_active' => true, 'updated_at' => now()]);
 
         return $affected;
     }

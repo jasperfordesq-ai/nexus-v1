@@ -131,6 +131,7 @@ class IdeaTeamConversionService
 
                 // Add the converting user as a group member (admin role)
                 DB::table('group_members')->insertOrIgnore([
+                    'tenant_id'  => $tenantId,
                     'group_id'   => $groupId,
                     'user_id'    => $userId,
                     'role'       => 'admin',
@@ -142,6 +143,7 @@ class IdeaTeamConversionService
                 // If the idea author is different from the converter, add them too
                 if ((int) $idea->user_id !== $userId) {
                     DB::table('group_members')->insertOrIgnore([
+                        'tenant_id'  => $tenantId,
                         'group_id'   => $groupId,
                         'user_id'    => $idea->user_id,
                         'role'       => 'member',

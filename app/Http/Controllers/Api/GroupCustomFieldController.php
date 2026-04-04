@@ -52,12 +52,11 @@ class GroupCustomFieldController extends BaseApiController
             return $this->errorResponse('A valid fields object is required', 422);
         }
 
-        $result = GroupCustomFieldService::setValues($id, $fields);
+        GroupCustomFieldService::setValues($id, $fields);
 
-        if ($result === null) {
-            return $this->errorResponse('Failed to update custom fields', 400);
-        }
+        // Re-fetch updated values to return
+        $updated = GroupCustomFieldService::getValues($id);
 
-        return $this->successResponse($result);
+        return $this->successResponse($updated);
     }
 }

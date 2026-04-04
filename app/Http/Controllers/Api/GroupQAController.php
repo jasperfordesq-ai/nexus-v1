@@ -176,12 +176,12 @@ class GroupQAController extends BaseApiController
             return $this->errorResponse('Vote must be "up"/"down" or 1/-1', 422);
         }
 
-        $result = $this->qaService->vote($userId, $type, $targetId, $voteValue);
+        $success = $this->qaService->vote($userId, $type, $targetId, $voteValue);
 
-        if ($result === null) {
+        if (!$success) {
             return $this->errorResponse('Failed to record vote', 400);
         }
 
-        return $this->successResponse($result);
+        return $this->successResponse(['message' => 'Vote recorded']);
     }
 }

@@ -50,6 +50,7 @@ class GroupDataExportService
         return DB::table('group_members as gm')
             ->join('users as u', 'gm.user_id', '=', 'u.id')
             ->where('gm.group_id', $groupId)
+            ->where('u.tenant_id', $tenantId)
             ->select('u.id', 'u.name', 'u.email', 'gm.role', 'gm.status', 'gm.created_at as joined_at')
             ->get()
             ->map(fn ($row) => (array) $row)
@@ -113,7 +114,7 @@ class GroupDataExportService
         return DB::table('events')
             ->where('group_id', $groupId)
             ->where('tenant_id', $tenantId)
-            ->select('id', 'title', 'description', 'start_date', 'end_date', 'location', 'created_at')
+            ->select('id', 'title', 'description', 'start_time', 'end_time', 'location', 'created_at')
             ->get()
             ->map(fn ($row) => (array) $row)
             ->toArray();

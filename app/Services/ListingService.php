@@ -368,8 +368,14 @@ class ListingService
      */
     public static function countAll(array $filters = []): int
     {
-        // Use Meilisearch's estimated total when a search term is present
-        if (!empty($filters['search'])) {
+        // Use Meilisearch's estimated total when a search term is present,
+        // BUT only when no faceted filters are active (hours, service_type,
+        // posted_within) since Meilisearch can't apply those — its total
+        // would be inaccurate.
+        $hasFacetedFilters = !empty($filters['min_hours']) || !empty($filters['max_hours'])
+            || !empty($filters['service_type']) || !empty($filters['posted_within'])
+            || !empty($filters['skills']);
+        if (!empty($filters['search']) && !$hasFacetedFilters) {
             $tenantId     = \App\Core\TenantContext::getId();
             $meiliFilters = [];
             if (!empty($filters['category_id'])) {
@@ -675,6 +681,46 @@ class ListingService
             $query->where('category_id', (int) $filters['category_id']);
         }
 
+        // Category slug filter (resolve slug → id, tenant-scoped)
+        if (!empty($filters['category_slug'])) {
+            $catId = DB::table('categories')
+                ->where('slug', $filters['category_slug'])
+                ->where('type', 'listing')
+                ->where('tenant_id', \App\Core\TenantContext::getId())
+                ->value('id');
+            if ($catId) {
+                $query->where('category_id', $catId);
+            }
+        }
+
+        // Search (basic LIKE on title/description)
+        if (! empty($filters['search'])) {
+            $term = '%' . $filters['search'] . '%';
+            $query->where(function (\Illuminate\Database\Eloquent\Builder $q) use ($term) {
+                $q->where('title', 'LIKE', $term)
+                  ->orWhere('description', 'LIKE', $term);
+            });
+        }
+
+        // Faceted filters: hours estimate range
+        if (!empty($filters['min_hours'])) {
+            $query->where('hours_estimate', '>=', (float) $filters['min_hours']);
+        }
+        if (!empty($filters['max_hours'])) {
+            $query->where('hours_estimate', '<=', (float) $filters['max_hours']);
+        }
+
+        // Faceted filters: service delivery mode
+        if (!empty($filters['service_type'])) {
+            $types = is_string($filters['service_type']) ? explode(',', $filters['service_type']) : $filters['service_type'];
+            $query->whereIn('service_type', $types);
+        }
+
+        // Faceted filters: posted within N days
+        if (!empty($filters['posted_within'])) {
+            $query->where('created_at', '>=', now()->subDays((int) $filters['posted_within']));
+        }
+
         $items = $query->offset($offset)->limit($limit + 1)->get();
         $hasMore = $items->count() > $limit;
         if ($hasMore) {
@@ -836,6 +882,7 @@ class ListingService
                 'latitude'              => $data['latitude'] ?? null,
                 'longitude'             => $data['longitude'] ?? null,
                 'hours_estimate'        => isset($data['hours_estimate']) ? (float) $data['hours_estimate'] : null,
+                'service_type'          => $data['service_type'] ?? 'physical_only',
                 'federated_visibility'  => $data['federated_visibility'] ?? 'none',
                 'availability'          => $data['availability'] ?? null,
                 'status'                => 'active',
@@ -900,7 +947,7 @@ class ListingService
         $allowed = [
             'title', 'description', 'type', 'category_id', 'image_url',
             'location', 'latitude', 'longitude', 'hours_estimate',
-            'federated_visibility', 'status', 'sdg_goals', 'availability',
+            'service_type', 'federated_visibility', 'status', 'sdg_goals', 'availability',
         ];
 
         $listing->fill(collect($data)->only($allowed)->all());
@@ -1041,6 +1088,7 @@ class ListingService
 
         $tenantId = \App\Core\TenantContext::getId();
         $rules['category_id']          = "sometimes|nullable|integer|exists:categories,id,tenant_id,{$tenantId}";
+        $rules['service_type']         = 'sometimes|in:physical_only,remote_only,hybrid,location_dependent';
         $rules['federated_visibility'] = 'sometimes|in:none,listed,bookable';
         $rules['hours_estimate']       = 'sometimes|nullable|numeric|min:0';
 

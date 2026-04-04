@@ -70,9 +70,9 @@ export function AdminSettings() {
           contact_email: (tenant.contact_email as string) ?? '',
           contact_phone: (tenant.contact_phone as string) ?? '',
           registration_mode: (settings.registration_mode as string) ?? 'open',
-          email_verification: settings.email_verification === 'true',
-          admin_approval: settings.admin_approval === 'true',
-          maintenance_mode: settings.maintenance_mode === 'true',
+          email_verification: settings.email_verification === 'true' || settings.email_verification === true || settings.email_verification === '1',
+          admin_approval: settings.admin_approval === 'true' || settings.admin_approval === true || settings.admin_approval === '1',
+          maintenance_mode: settings.maintenance_mode === 'true' || settings.maintenance_mode === true || settings.maintenance_mode === '1',
           footer_text: (settings.footer_text as string) ?? '',
         });
       }
@@ -90,6 +90,7 @@ export function AdminSettings() {
   const handleSave = async () => {
     setSaving(true);
     try {
+      // maintenance_mode excluded — requires file + DB layers, must use CLI
       const res = await adminSettings.update({
         name: form.name,
         description: form.description,
@@ -98,7 +99,6 @@ export function AdminSettings() {
         registration_mode: form.registration_mode,
         email_verification: String(form.email_verification),
         admin_approval: String(form.admin_approval),
-        maintenance_mode: String(form.maintenance_mode),
         footer_text: form.footer_text,
       });
 
@@ -237,12 +237,12 @@ export function AdminSettings() {
             </div>
             <div className="flex items-center justify-between">
               <div>
-                <p className="font-medium">Maintenance Mode</p>
-                <p className="text-sm text-default-500">Only admins can access the platform</p>
+                <p className="font-medium text-default-400">Maintenance Mode (read-only)</p>
+                <p className="text-sm text-default-500">Use CLI: <code className="text-xs bg-default-100 px-1 rounded">sudo bash scripts/maintenance.sh on|off</code></p>
               </div>
               <Switch
                 isSelected={form.maintenance_mode}
-                onValueChange={(val) => setForm(prev => ({ ...prev, maintenance_mode: val }))}
+                isDisabled
                 aria-label={t('system.label_maintenance_mode')}
               />
             </div>

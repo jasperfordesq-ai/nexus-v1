@@ -212,6 +212,7 @@ export function GroupsPage() {
             selectedKeys={[filter]}
             onChange={(e) => setFilter(e.target.value as GroupFilter)}
             className="w-32 sm:w-40"
+            disallowEmptySelection
             classNames={{
               trigger: 'bg-theme-elevated border-theme-default hover:bg-theme-hover',
               value: 'text-theme-primary',

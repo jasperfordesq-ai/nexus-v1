@@ -36,7 +36,7 @@ class ListingModerationService
                 ->where('setting_key', 'general.listing_moderation_enabled')
                 ->value('setting_value');
 
-            return $value === '1';
+            return filter_var($value, FILTER_VALIDATE_BOOLEAN);
         } catch (\Exception $e) {
             return false;
         }

@@ -165,6 +165,7 @@ export function AdvancedSearchFilters({
               label={t('filter_content_type')}
               selectedKeys={filters.type ? [filters.type] : ['all']}
               onChange={(e) => updateFilter('type', e.target.value)}
+              disallowEmptySelection
               classNames={{
                 trigger: 'bg-theme-elevated border-theme-default',
                 value: 'text-theme-primary',
@@ -182,6 +183,7 @@ export function AdvancedSearchFilters({
               label={t('filter_category')}
               selectedKeys={filters.category_id ? [filters.category_id] : []}
               onChange={(e) => updateFilter('category_id', e.target.value)}
+              disallowEmptySelection
               classNames={{
                 trigger: 'bg-theme-elevated border-theme-default',
                 value: 'text-theme-primary',
@@ -196,6 +198,7 @@ export function AdvancedSearchFilters({
               label={t('filter_sort_by')}
               selectedKeys={filters.sort ? [filters.sort] : ['relevance']}
               onChange={(e) => updateFilter('sort', e.target.value)}
+              disallowEmptySelection
               classNames={{
                 trigger: 'bg-theme-elevated border-theme-default',
                 value: 'text-theme-primary',

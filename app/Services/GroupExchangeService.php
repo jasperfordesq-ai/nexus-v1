@@ -427,27 +427,33 @@ class GroupExchangeService
                     continue;
                 }
 
-                $txnType = $entry['role'] === 'provider' ? 'credit' : 'debit';
+                // Providers earn credits, receivers spend them
+                if ($entry['role'] === 'provider') {
+                    // Credit the provider: system (sender=0) sends to provider
+                    $txnId = DB::table('transactions')->insertGetId([
+                        'tenant_id'        => $tenantId,
+                        'sender_id'        => $exchange->created_by,
+                        'receiver_id'      => $entry['user_id'],
+                        'amount'           => (int) $entry['hours'],
+                        'description'      => "Group exchange: {$exchange->title}",
+                        'status'           => 'completed',
+                        'transaction_type' => 'exchange',
+                        'listing_id'       => null,
+                        'created_at'       => now(),
+                    ]);
+                    $transactionIds[] = (int) $txnId;
 
-                $txnId = DB::table('wallet_transactions')->insertGetId([
-                    'tenant_id'      => $tenantId,
-                    'user_id'        => $entry['user_id'],
-                    'amount'         => $entry['hours'],
-                    'type'           => $txnType,
-                    'description'    => "Group exchange: {$exchange->title}",
-                    'reference_type' => 'group_exchange',
-                    'reference_id'   => $exchangeId,
-                    'created_at'     => now(),
-                ]);
-
-                $transactionIds[] = (int) $txnId;
-
-                // Update user wallet balance
-                $balanceChange = $txnType === 'credit' ? $entry['hours'] : -$entry['hours'];
-                DB::table('users')
-                    ->where('id', $entry['user_id'])
-                    ->where('tenant_id', $tenantId)
-                    ->increment('time_balance', $balanceChange);
+                    DB::table('users')
+                        ->where('id', $entry['user_id'])
+                        ->where('tenant_id', $tenantId)
+                        ->increment('balance', (int) $entry['hours']);
+                } else {
+                    // Debit the receiver
+                    DB::table('users')
+                        ->where('id', $entry['user_id'])
+                        ->where('tenant_id', $tenantId)
+                        ->decrement('balance', (int) $entry['hours']);
+                }
             }
 
             // Mark exchange as completed

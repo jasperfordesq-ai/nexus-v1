@@ -600,6 +600,7 @@ class AdminEnterpriseController extends BaseApiController
     ];
 
     private const CONFIG_TENANT_SETTINGS = [
+        // General
         'timezone' => 'general.timezone',
         'registration_enabled' => 'general.registration_mode',
         'require_approval' => 'general.admin_approval',
@@ -608,7 +609,56 @@ class AdminEnterpriseController extends BaseApiController
         'welcome_message' => 'general.welcome_message',
         'starting_balance' => 'general.welcome_credits',
         'footer_text' => 'general.footer_text',
+        'locale' => 'general.default_locale',
         'onboarding_enabled' => 'onboarding.enabled',
+        // Wallet
+        'max_transaction' => 'wallet.max_transaction',
+        'currency_name' => 'wallet.currency_name',
+        'currency_symbol' => 'wallet.currency_symbol',
+        // Content & Moderation
+        'auto_approve_listings' => 'content.auto_approve_listings',
+        'auto_approve_blog' => 'content.auto_approve_blog',
+        'profanity_filter' => 'content.profanity_filter',
+        'max_listing_images' => 'listing.max_images',
+        // Notifications
+        'email_notifications_enabled' => 'notifications.email_enabled',
+        'push_notifications_enabled' => 'notifications.push_enabled',
+        'digest_frequency' => 'notifications.digest_frequency',
+        // Limits
+        'max_listings_per_user' => 'listing.max_per_user',
+        'max_groups_per_user' => 'limits.max_groups_per_user',
+        'max_file_upload_mb' => 'general.max_upload_size_mb',
+    ];
+
+    /** Schema defaults — ensures every key is always present in the API response */
+    private const CONFIG_DEFAULTS = [
+        'site_name' => '',
+        'site_description' => '',
+        'contact_email' => '',
+        'contact_phone' => '',
+        'timezone' => 'UTC',
+        'registration_enabled' => true,
+        'require_approval' => false,
+        'require_email_verification' => true,
+        'maintenance_mode' => false,
+        'welcome_message' => '',
+        'starting_balance' => 0,
+        'footer_text' => '',
+        'locale' => 'en',
+        'onboarding_enabled' => true,
+        'max_transaction' => 0,
+        'currency_name' => 'Hours',
+        'currency_symbol' => 'h',
+        'auto_approve_listings' => true,
+        'auto_approve_blog' => false,
+        'profanity_filter' => false,
+        'max_listing_images' => 5,
+        'email_notifications_enabled' => true,
+        'push_notifications_enabled' => true,
+        'digest_frequency' => 'weekly',
+        'max_listings_per_user' => 0,
+        'max_groups_per_user' => 0,
+        'max_file_upload_mb' => 10,
     ];
 
     /** GET /api/v2/admin/enterprise/config */
@@ -617,18 +667,31 @@ class AdminEnterpriseController extends BaseApiController
         $this->requireAdmin();
         $tenantId = $this->getTenantId();
         try {
+            // Start with schema defaults so every key is always present
+            $config = self::CONFIG_DEFAULTS;
+
             // 1. Read configuration JSON + direct columns from tenants table
             $directCols = array_unique(array_values(self::CONFIG_DIRECT_COLUMNS));
             $columns = implode(', ', array_merge(['configuration'], $directCols));
             $row = DB::selectOne("SELECT {$columns} FROM tenants WHERE id = ?", [$tenantId]);
-            $config = json_decode($row->configuration ?? '{}', true) ?: [];
+            $jsonConfig = json_decode($row->configuration ?? '{}', true) ?: [];
 
-            // 2. Merge direct columns
-            foreach (self::CONFIG_DIRECT_COLUMNS as $configKey => $dbColumn) {
-                $config[$configKey] = $row->$dbColumn ?? '';
+            // Merge JSON config (non-schema keys only — schema keys come from proper sources)
+            foreach ($jsonConfig as $k => $v) {
+                if (!array_key_exists($k, self::CONFIG_DEFAULTS)) {
+                    $config[$k] = $v;
+                }
             }
 
-            // 3. Read tenant_settings and merge
+            // 2. Merge direct columns (override defaults)
+            foreach (self::CONFIG_DIRECT_COLUMNS as $configKey => $dbColumn) {
+                $val = $row->$dbColumn ?? null;
+                if ($val !== null && $val !== '') {
+                    $config[$configKey] = $val;
+                }
+            }
+
+            // 3. Read tenant_settings and merge (override defaults)
             try {
                 $settingKeys = array_values(self::CONFIG_TENANT_SETTINGS);
                 $placeholders = implode(',', array_fill(0, count($settingKeys), '?'));
@@ -658,7 +721,10 @@ class AdminEnterpriseController extends BaseApiController
             }
 
             return $this->respondWithData($config);
-        } catch (\Exception $e) { return $this->respondWithData([]); }
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error('[AdminEnterprise] config() failed: ' . $e->getMessage());
+            return $this->respondWithError('CONFIG_LOAD_FAILED', __('api.config_load_failed'), null, 500);
+        }
     }
 
     /** Cast a tenant_settings value based on its setting_type */
@@ -685,6 +751,8 @@ class AdminEnterpriseController extends BaseApiController
         if (empty($newConfig)) { return $this->respondWithError('VALIDATION_ERROR', __('api.no_configuration_data'), null, 422); }
 
         try {
+            DB::beginTransaction();
+
             $jsonConfig = $newConfig;
 
             // 1. Extract and update direct tenant columns
@@ -718,11 +786,11 @@ class AdminEnterpriseController extends BaseApiController
                     $value = $value ? 'open' : 'closed';
                     $settingType = 'string';
                 } elseif (is_bool($value)) {
-                    $settingType = 'boolean';
-                    $value = $value ? '1' : '0';
-                } elseif (is_int($value) || (is_string($value) && ctype_digit($value))) {
+                    $settingType = 'string';
+                    $value = $value ? 'true' : 'false';
+                } elseif (is_int($value) || is_float($value) || (is_string($value) && is_numeric($value) && !str_contains($value, '.'))) {
                     $settingType = 'integer';
-                    $value = (string) $value;
+                    $value = (string) (int) $value;
                 } else {
                     $settingType = 'string';
                     $value = (string) $value;
@@ -742,17 +810,29 @@ class AdminEnterpriseController extends BaseApiController
             $merged = array_merge($existing, $jsonConfig);
             DB::update("UPDATE tenants SET configuration = ? WHERE id = ?", [json_encode($merged), $tenantId]);
 
-            // Invalidate cache
+            DB::commit();
+
+            // Invalidate cache (outside transaction — non-critical)
             try { app(\App\Services\RedisCache::class)->delete('tenant_bootstrap', $tenantId); } catch (\Throwable $e) { \Illuminate\Support\Facades\Log::warning('[AdminEnterprise] Cache invalidation failed: ' . $e->getMessage()); }
 
             // Return full merged view by re-reading
             return $this->config();
         } catch (\Exception $e) {
+            DB::rollBack();
+            \Illuminate\Support\Facades\Log::error('[AdminEnterprise] updateConfig failed: ' . $e->getMessage());
             return $this->respondWithError('UPDATE_FAILED', __('api.config_update_failed'), null, 500);
         }
     }
 
     /** POST /api/v2/admin/enterprise/config/reset */
+    // Keys managed by dedicated admin pages — never delete on reset to avoid cross-page conflicts
+    private const SHARED_KEYS = [
+        'registration_enabled',  // Registration Policy page
+        'require_approval',      // Registration Policy page
+        'onboarding_enabled',    // Onboarding Settings page
+        'maintenance_mode',      // CLI-only (scripts/maintenance.sh)
+    ];
+
     public function resetConfig(): JsonResponse
     {
         $this->requireAdmin();
@@ -762,16 +842,34 @@ class AdminEnterpriseController extends BaseApiController
 
         try {
             if (!empty($keys) && is_array($keys)) {
-                // Reset specific keys
+                // Reset specific keys — from JSON blob and tenant_settings
                 $row = DB::selectOne("SELECT configuration FROM tenants WHERE id = ?", [$tenantId]);
                 $config = json_decode($row->configuration ?? '{}', true) ?: [];
                 foreach ($keys as $key) {
                     unset($config[$key]);
+                    // Skip shared keys to avoid cross-page conflicts
+                    if (in_array($key, self::SHARED_KEYS, true)) continue;
+                    if (isset(self::CONFIG_TENANT_SETTINGS[$key])) {
+                        DB::delete("DELETE FROM tenant_settings WHERE tenant_id = ? AND setting_key = ?", [$tenantId, self::CONFIG_TENANT_SETTINGS[$key]]);
+                    }
                 }
                 DB::update("UPDATE tenants SET configuration = ? WHERE id = ?", [json_encode($config), $tenantId]);
             } else {
-                // Reset all
+                // Reset all — clear JSON blob and enterprise-only tenant_settings (skip shared keys)
                 DB::update("UPDATE tenants SET configuration = '{}' WHERE id = ?", [$tenantId]);
+                $resettableKeys = [];
+                foreach (self::CONFIG_TENANT_SETTINGS as $configKey => $settingKey) {
+                    if (!in_array($configKey, self::SHARED_KEYS, true)) {
+                        $resettableKeys[] = $settingKey;
+                    }
+                }
+                if (!empty($resettableKeys)) {
+                    $placeholders = implode(',', array_fill(0, count($resettableKeys), '?'));
+                    DB::delete(
+                        "DELETE FROM tenant_settings WHERE tenant_id = ? AND setting_key IN ({$placeholders})",
+                        array_merge([$tenantId], $resettableKeys)
+                    );
+                }
             }
             try { app(\App\Services\RedisCache::class)->delete('tenant_bootstrap', $tenantId); } catch (\Throwable $e) {}
             return $this->respondWithData(['reset' => true]);

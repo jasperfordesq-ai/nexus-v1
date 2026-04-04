@@ -31,6 +31,7 @@ import { GlassCard, MemberCardSkeleton, AlgorithmLabel } from '@/components/ui';
 import { PresenceIndicator } from '@/components/social';
 import { EntityMapView } from '@/components/location';
 import { EmptyState } from '@/components/feedback';
+import { PageMeta } from '@/components/seo';
 import { useAuth, useToast, useTenant, useFeature } from '@/contexts';
 import { usePresenceOptional } from '@/contexts/PresenceContext';
 import { api } from '@/lib/api';
@@ -254,6 +255,7 @@ export function MembersPage() {
 
   return (
     <div className="space-y-6">
+      <PageMeta title="Members" description="Browse community members, connect and exchange time credits." />
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
@@ -348,6 +350,7 @@ export function MembersPage() {
             <Select
               placeholder={t('members.sort_by')}
               selectedKeys={[sortBy]}
+              disallowEmptySelection
               onChange={(e) => setSortBy(e.target.value as SortOption)}
               className="w-36 sm:w-44"
               aria-label={t('members.sort_by')}
@@ -381,6 +384,7 @@ export function MembersPage() {
               <Select
                 aria-label={t('members.radius_label', 'Radius')}
                 selectedKeys={[String(radiusKm)]}
+                disallowEmptySelection
                 onSelectionChange={(keys) => {
                   const val = keys instanceof Set ? ([...keys][0] as string) : '25';
                   setRadiusKm(Number(val) || 25);

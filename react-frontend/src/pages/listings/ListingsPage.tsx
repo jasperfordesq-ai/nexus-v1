@@ -62,17 +62,22 @@ export function ListingsPage() {
   const [categories, setCategories] = useState<Category[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [loadError, setLoadError] = useState<string | null>(null);
+  const [searchInput, setSearchInput] = useState(searchParams.get('q') || '');
   const [searchQuery, setSearchQuery] = useState(searchParams.get('q') || '');
   const [selectedType, setSelectedType] = useState<ListingType>((searchParams.get('type') as ListingType) || 'all');
   const [selectedCategory, setSelectedCategory] = useState(searchParams.get('category') || '');
   const [viewMode, setViewMode] = useState<ViewMode>('grid');
   const [hasMore, setHasMore] = useState(false);
-  const [nearMeEnabled, setNearMeEnabled] = useState(false);
-  const [radiusKm, setRadiusKm] = useState(25);
-  const [hoursRange, setHoursRange] = useState('any');
-  const [serviceMode, setServiceMode] = useState('any');
-  const [postedWithin, setPostedWithin] = useState('any');
-  const [showAdvancedFilters, setShowAdvancedFilters] = useState(false);
+  const [totalItems, setTotalItems] = useState<number | null>(null);
+  const [nearMeEnabled, setNearMeEnabled] = useState(searchParams.get('near_me') === '1');
+  const [radiusKm, setRadiusKm] = useState(Number(searchParams.get('radius')) || 25);
+  const [hoursRange, setHoursRange] = useState(searchParams.get('hours') || 'any');
+  const [serviceMode, setServiceMode] = useState(searchParams.get('service') || 'any');
+  const [postedWithin, setPostedWithin] = useState(searchParams.get('posted') || 'any');
+  const [showAdvancedFilters, setShowAdvancedFilters] = useState(
+    // Auto-expand if any advanced filter is active from URL
+    !!(searchParams.get('hours') || searchParams.get('service') || searchParams.get('posted') || searchParams.get('near_me')),
+  );
 
   // Count of active advanced filters (shown as badge on the toggle button)
   const activeFilterCount = useMemo(() => {
@@ -160,6 +165,9 @@ export function ListingsPage() {
         // Handle pagination meta if present
         cursorRef.current = response.meta?.cursor ?? null;
         setHasMore(response.meta?.has_more ?? false);
+        if (reset && response.meta?.total_items != null) {
+          setTotalItems(response.meta.total_items);
+        }
       } else {
         if (reset) {
           setListings([]);
@@ -201,6 +209,12 @@ export function ListingsPage() {
     }).catch((error) => logError('Failed to load categories', error));
   }, []);
 
+  // Debounce search input → searchQuery (300ms)
+  useEffect(() => {
+    const timer = setTimeout(() => setSearchQuery(searchInput), 300);
+    return () => clearTimeout(timer);
+  }, [searchInput]);
+
   // Load listings when filters change — separate from URL sync to avoid reset loops
   useEffect(() => {
     loadListingsRef.current(true);
@@ -210,15 +224,20 @@ export function ListingsPage() {
   // Sync URL params with filter state (harmless if it re-runs)
   useEffect(() => {
     const params = new URLSearchParams();
-    if (searchQuery) params.set('q', searchQuery);
+    if (searchInput) params.set('q', searchInput);
     if (selectedType !== 'all') params.set('type', selectedType);
     if (selectedCategory) params.set('category', selectedCategory);
+    if (hoursRange !== 'any') params.set('hours', hoursRange);
+    if (serviceMode !== 'any') params.set('service', serviceMode);
+    if (postedWithin !== 'any') params.set('posted', postedWithin);
+    if (nearMeEnabled) params.set('near_me', '1');
+    if (nearMeEnabled && radiusKm !== 25) params.set('radius', String(radiusKm));
     setSearchParams(params, { replace: true });
-  }, [searchQuery, selectedType, selectedCategory, setSearchParams]);
+  }, [searchInput, selectedType, selectedCategory, hoursRange, serviceMode, postedWithin, nearMeEnabled, radiusKm, setSearchParams]);
 
   function handleSearch(e: React.FormEvent) {
     e.preventDefault();
-    loadListings(true);
+    setSearchQuery(searchInput); // Immediately apply (bypass debounce)
   }
 
   function handleNearMeToggle() {
@@ -309,8 +328,8 @@ export function ListingsPage() {
           <div className="flex-1 min-w-0">
             <Input
               placeholder={t('search_placeholder')}
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
+              value={searchInput}
+              onChange={(e) => setSearchInput(e.target.value)}
               startContent={<Search className="w-4 h-4 text-theme-subtle" />}
               aria-label={t('search_placeholder')}
               classNames={{
@@ -325,6 +344,7 @@ export function ListingsPage() {
               aria-label={t('filter_type_label')}
               placeholder={t('filter_type_label')}
               selectedKeys={[selectedType]}
+              disallowEmptySelection
               onSelectionChange={(keys) => {
                 const val = keys instanceof Set ? ([...keys][0] as string) : 'all';
                 setSelectedType((val || 'all') as ListingType);
@@ -345,6 +365,7 @@ export function ListingsPage() {
               aria-label={t('filter_category_label')}
               placeholder={t('filter_category_label')}
               selectedKeys={[categories.length > 0 ? (selectedCategory || 'all') : 'all']}
+              disallowEmptySelection
               onSelectionChange={(keys) => {
                 const val = keys instanceof Set ? ([...keys][0] as string) : 'all';
                 setSelectedCategory(val === 'all' ? '' : (val || ''));
@@ -421,7 +442,9 @@ export function ListingsPage() {
           <div className="flex flex-col sm:flex-row flex-wrap gap-3 mt-3 pt-3 border-t border-theme-default">
             <Select
               aria-label={t('filter_hours', 'Duration')}
+              placeholder={t('filter_hours', 'Duration')}
               selectedKeys={[hoursRange]}
+              disallowEmptySelection
               onSelectionChange={(keys) => {
                 const val = keys instanceof Set ? ([...keys][0] as string) : 'any';
                 setHoursRange(val || 'any');
@@ -442,7 +465,9 @@ export function ListingsPage() {
 
             <Select
               aria-label={t('filter_service_mode', 'Service mode')}
+              placeholder={t('filter_service_mode', 'Service mode')}
               selectedKeys={[serviceMode]}
+              disallowEmptySelection
               onSelectionChange={(keys) => {
                 const val = keys instanceof Set ? ([...keys][0] as string) : 'any';
                 setServiceMode(val || 'any');
@@ -461,7 +486,9 @@ export function ListingsPage() {
 
             <Select
               aria-label={t('filter_posted_date', 'Posted date')}
+              placeholder={t('filter_posted_date', 'Posted date')}
               selectedKeys={[postedWithin]}
+              disallowEmptySelection
               onSelectionChange={(keys) => {
                 const val = keys instanceof Set ? ([...keys][0] as string) : 'any';
                 setPostedWithin(val || 'any');
@@ -495,7 +522,9 @@ export function ListingsPage() {
             {nearMeEnabled && (
               <Select
                 aria-label={t('radius_label', 'Radius')}
+                placeholder={t('radius_label', 'Radius')}
                 selectedKeys={[String(radiusKm)]}
+                disallowEmptySelection
                 onSelectionChange={(keys) => {
                   const val = keys instanceof Set ? ([...keys][0] as string) : '25';
                   setRadiusKm(Number(val) || 25);
@@ -533,6 +562,13 @@ export function ListingsPage() {
           </div>
         )}
       </GlassCard>
+
+      {/* Results count */}
+      {!isLoading && totalItems != null && listings.length > 0 && (
+        <p className="text-sm text-theme-muted">
+          {t('results_count', '{{count}} listings found', { count: totalItems })}
+        </p>
+      )}
 
       {/* Listings Grid/List */}
       {isLoading && listings.length === 0 ? (

@@ -542,7 +542,7 @@ class ShiftSwapService
                 ->where('setting_key', 'volunteering.swap_requires_admin')
                 ->value('setting_value');
 
-            return $result === '1';
+            return filter_var($result, FILTER_VALIDATE_BOOLEAN);
         } catch (\Throwable $e) {
             return false;
         }

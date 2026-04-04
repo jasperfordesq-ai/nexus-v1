@@ -299,8 +299,9 @@ class TenantBootstrapController extends BaseApiController
         $data['settings'] = $this->buildGeneralSettings((int) $tenant['id']);
 
         // Add onboarding module flags to bootstrap (non-sensitive, safe for public payload)
-        $data['settings']['onboarding_enabled'] = $this->getOnboardingSetting((int) $tenant['id'], 'onboarding.enabled', '1') === '1';
-        $data['settings']['onboarding_mandatory'] = $this->getOnboardingSetting((int) $tenant['id'], 'onboarding.mandatory', '1') === '1';
+        // filter_var handles both '1'/'0' (from OnboardingConfig) and 'true'/'false' (from EnterpriseConfig)
+        $data['settings']['onboarding_enabled'] = filter_var($this->getOnboardingSetting((int) $tenant['id'], 'onboarding.enabled', '1'), FILTER_VALIDATE_BOOLEAN);
+        $data['settings']['onboarding_mandatory'] = filter_var($this->getOnboardingSetting((int) $tenant['id'], 'onboarding.mandatory', '1'), FILTER_VALIDATE_BOOLEAN);
 
         $data['compliance'] = [
             'vetting_enabled' => $this->brokerControlConfigService->isVettingEnabled(),

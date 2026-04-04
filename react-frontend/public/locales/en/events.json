@@ -1,4 +1,7 @@
 {
+  "page_title": "Events",
+  "page_description": "Discover community events, workshops, and meetups near you.",
+  "near_me": "Near me",
   "title": "Events",
   "subtitle": "Discover and join community events",
   "create_event": "Create Event",

@@ -110,9 +110,9 @@ class GroupsController extends BaseApiController
 
         $data = $this->getAllInput();
 
-        $groupId = $this->groupService->create($userId, $data);
+        $createdGroup = $this->groupService->create($userId, $data);
 
-        if ($groupId === null) {
+        if ($createdGroup === null) {
             $errors = $this->groupService->getErrors();
             $status = 422;
             foreach ($errors as $error) {
@@ -124,6 +124,8 @@ class GroupsController extends BaseApiController
             return $this->respondWithErrors($errors, $status);
         }
 
+        // create() returns a Group model — use its ID to fetch the full response
+        $groupId = $createdGroup instanceof \App\Models\Group ? $createdGroup->id : (int) $createdGroup;
         $group = $this->groupService->getById($groupId, $userId);
 
         // Award XP for creating a group
@@ -212,29 +214,22 @@ class GroupsController extends BaseApiController
         $userId = $this->requireAuth();
         $this->rateLimit('groups_join', 30, 60);
 
-        $status = $this->groupService->join($id, $userId);
+        $result = $this->groupService->join($id, $userId);
 
-        if ($status === null) {
-            $errors = $this->groupService->getErrors();
-            $httpStatus = 422;
-            foreach ($errors as $error) {
-                if ($error['code'] === 'NOT_FOUND') {
-                    $httpStatus = 404;
-                    break;
-                }
-                if ($error['code'] === 'ALREADY_MEMBER' || $error['code'] === 'PENDING') {
-                    $httpStatus = 409;
-                    break;
-                }
-            }
-            return $this->respondWithErrors($errors, $httpStatus);
+        if (!($result['success'] ?? false)) {
+            $error = $result['error'] ?? 'Failed to join group';
+            $httpStatus = str_contains($error, 'banned') ? 403
+                : (str_contains($error, 'Already') || str_contains($error, 'pending') ? 409 : 422);
+            return $this->respondWithError('JOIN_FAILED', $error, null, $httpStatus);
         }
+
+        $joinStatus = $result['status'] ?? 'active';
 
         // Notify based on join result
         try {
-            if ($status === 'active') {
+            if ($joinStatus === 'active') {
                 $this->groupNotificationService->notifyJoined($id, $userId);
-            } elseif ($status === 'pending') {
+            } elseif ($joinStatus === 'pending') {
                 $this->groupNotificationService->notifyJoinRequest($id, $userId);
             }
         } catch (\Throwable $e) {
@@ -242,7 +237,7 @@ class GroupsController extends BaseApiController
         }
 
         // Award XP when user actually joins (not just pending request)
-        if ($status === 'active') {
+        if ($joinStatus === 'active') {
             try {
                 \App\Services\GamificationService::awardXP($userId, \App\Services\GamificationService::XP_VALUES['join_group'], 'join_group', 'Joined a group');
             } catch (\Throwable $e) {
@@ -251,8 +246,8 @@ class GroupsController extends BaseApiController
         }
 
         return $this->respondWithData([
-            'status'  => $status,
-            'message' => $status === 'active' ? 'Successfully joined the group' : 'Join request submitted',
+            'status'  => $joinStatus,
+            'message' => $joinStatus === 'active' ? 'Successfully joined the group' : 'Join request submitted',
         ]);
     }
 

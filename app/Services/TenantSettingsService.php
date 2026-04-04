@@ -46,6 +46,22 @@ class TenantSettingsService
     }
 
     /**
+     * Check if admin approval is required for this tenant.
+     */
+    public static function requiresAdminApproval(int $tenantId): bool
+    {
+        return static::getBool($tenantId, 'admin_approval', false);
+    }
+
+    /**
+     * Check if email verification is required for this tenant.
+     */
+    public static function requiresEmailVerification(int $tenantId): bool
+    {
+        return static::getBool($tenantId, 'email_verification', false);
+    }
+
+    /**
      * Set a tenant setting value.
      */
     public static function set(int $tenantId, string $key, string $value, string $type = 'string'): void

@@ -74,7 +74,7 @@ class AdminGroupsController extends BaseApiController
             $items = DB::select(
                 "SELECT g.*, CONCAT(COALESCE(u.first_name, ''), ' ', COALESCE(u.last_name, '')) as creator_name,
                     t.name as tenant_name,
-                    (SELECT COUNT(*) FROM group_members gm WHERE gm.group_id = g.id AND gm.status = 'approved') as member_count
+                    (SELECT COUNT(*) FROM group_members gm WHERE gm.group_id = g.id AND gm.status = 'active') as member_count
                  FROM `groups` g
                  LEFT JOIN users u ON g.owner_id = u.id
                  LEFT JOIN tenants t ON g.tenant_id = t.id
@@ -120,7 +120,7 @@ class AdminGroupsController extends BaseApiController
 
             $stats = DB::selectOne(
                 "SELECT
-                    (SELECT COUNT(*) FROM group_posts WHERE group_id = ?) as posts_count,
+                    (SELECT COUNT(*) FROM group_posts gp JOIN group_discussions gd ON gp.discussion_id = gd.id WHERE gd.group_id = ?) as posts_count,
                     (SELECT COUNT(*) FROM events WHERE group_id = ?) as events_count",
                 [$id, $id]
             );
@@ -160,7 +160,7 @@ class AdminGroupsController extends BaseApiController
         try {
             $totalGroups = (int) DB::selectOne("SELECT COUNT(*) as cnt FROM `groups` WHERE tenant_id = ?", [$tenantId])->cnt;
             $totalMembers = (int) DB::selectOne(
-                "SELECT COUNT(*) as cnt FROM group_members gm JOIN `groups` g ON gm.group_id = g.id WHERE g.tenant_id = ? AND gm.status = 'approved'",
+                "SELECT COUNT(*) as cnt FROM group_members gm JOIN `groups` g ON gm.group_id = g.id WHERE g.tenant_id = ? AND gm.status = 'active'",
                 [$tenantId]
             )->cnt;
             $avgMembers = $totalGroups > 0 ? round($totalMembers / $totalGroups, 1) : 0;
@@ -172,7 +172,7 @@ class AdminGroupsController extends BaseApiController
 
             $mostActive = DB::select(
                 "SELECT g.id, g.name,
-                    (SELECT COUNT(*) FROM group_members gm WHERE gm.group_id = g.id AND gm.status = 'approved') as member_count
+                    (SELECT COUNT(*) FROM group_members gm WHERE gm.group_id = g.id AND gm.status = 'active') as member_count
                  FROM `groups` g WHERE g.tenant_id = ? ORDER BY member_count DESC LIMIT 5",
                 [$tenantId]
             );
@@ -301,8 +301,8 @@ class AdminGroupsController extends BaseApiController
                 return $this->respondWithError('NOT_FOUND', __('api.pending_request_not_found'), null, 404);
             }
 
-            DB::update(
-                "UPDATE group_members SET status = 'rejected', updated_at = NOW() WHERE id = ? AND group_id IN (SELECT id FROM `groups` WHERE tenant_id = ?)",
+            DB::delete(
+                "DELETE FROM group_members WHERE id = ? AND group_id IN (SELECT id FROM `groups` WHERE tenant_id = ?)",
                 [(int) $id, $tenantId]
             );
             ActivityLog::log($adminId, 'admin_reject_group_member', "Rejected membership #{$id} for group \"{$membership->group_name}\"");
@@ -1046,7 +1046,7 @@ class AdminGroupsController extends BaseApiController
 
             $memberCount = (int) (DB::selectOne("SELECT COUNT(*) as cnt FROM group_members WHERE group_id = ? AND tenant_id = ?", [$id, $tenantId])->cnt ?? 0);
             $postsCount = 0;
-            try { $postsCount = (int) (DB::selectOne("SELECT COUNT(*) as cnt FROM group_posts WHERE group_id = ? AND tenant_id = ?", [$id, $tenantId])->cnt ?? 0); } catch (\Throwable $e) {}
+            try { $postsCount = (int) (DB::selectOne("SELECT COUNT(*) as cnt FROM group_posts gp JOIN group_discussions gd ON gp.discussion_id = gd.id WHERE gd.group_id = ? AND gd.tenant_id = ?", [$id, $tenantId])->cnt ?? 0); } catch (\Throwable $e) {}
             $eventsCount = 0;
             try { $eventsCount = (int) (DB::selectOne("SELECT COUNT(*) as cnt FROM events WHERE group_id = ? AND tenant_id = ?", [$id, $tenantId])->cnt ?? 0); } catch (\Throwable $e) {}
 

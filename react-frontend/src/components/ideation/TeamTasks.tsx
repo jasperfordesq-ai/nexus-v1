@@ -156,7 +156,7 @@ export function TeamTasks({ groupId, isGroupAdmin, members = [] }: TeamTasksProp
 
   const fetchStats = useCallback(async () => {
     try {
-      const response = await api.get<TaskStats>(`/v2/groups/${groupId}/tasks/stats`);
+      const response = await api.get<TaskStats>(`/v2/groups/${groupId}/task-stats`);
       if (response.success && response.data) {
         setStats(response.data);
       }

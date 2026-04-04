@@ -107,10 +107,10 @@ const CONFIG_SCHEMA: ConfigGroup[] = [
     description: 'Control how new members join',
     icon: <UserPlus size={18} />,
     settings: [
-      { key: 'registration_enabled', label: 'Open Registration', description: 'Allow new members to sign up', type: 'boolean', default: true },
-      { key: 'require_approval', label: 'Require Admin Approval', description: 'New accounts must be approved before activation', type: 'boolean', default: false },
+      { key: 'registration_enabled', label: 'Open Registration (read-only)', description: 'Managed via Settings → Registration Policy — toggle disabled to prevent overwriting granular policy modes', type: 'boolean', default: true },
+      { key: 'require_approval', label: 'Require Admin Approval (read-only)', description: 'Managed via Settings → Registration Policy', type: 'boolean', default: false },
       { key: 'require_email_verification', label: 'Require Email Verification', description: 'Members must verify email before accessing the platform', type: 'boolean', default: true },
-      { key: 'maintenance_mode', label: 'Maintenance Mode', description: 'Only admins can access the platform while enabled', type: 'boolean', default: false },
+      { key: 'maintenance_mode', label: 'Maintenance Mode (read-only)', description: 'Managed via CLI: sudo bash scripts/maintenance.sh on|off — UI toggle disabled because maintenance mode requires both file and database layers', type: 'boolean', default: false },
       { key: 'onboarding_enabled', label: 'Onboarding Flow', description: 'Show guided onboarding for new members', type: 'boolean', default: true },
       { key: 'welcome_message', label: 'Welcome Message', description: 'Message shown to new members after registration', type: 'textarea', default: '' },
     ],
@@ -172,6 +172,54 @@ const CONFIG_SCHEMA: ConfigGroup[] = [
 /** All known schema keys for fast lookup */
 const SCHEMA_KEYS = new Set(CONFIG_SCHEMA.flatMap((g) => g.settings.map((s) => s.key)));
 
+/** Schema definitions keyed by setting key for fast lookup */
+const SCHEMA_MAP = new Map<string, ConfigSettingDef>(
+  CONFIG_SCHEMA.flatMap((g) => g.settings.map((s) => [s.key, s] as const)),
+);
+
+/**
+ * Normalize a raw API value to the correct JS type based on schema definition.
+ * Handles all the string/boolean/number coercion issues from mixed storage formats.
+ */
+function normalizeValue(raw: unknown, def: ConfigSettingDef): unknown {
+  if (raw === undefined || raw === null) return def.default ?? '';
+
+  switch (def.type) {
+    case 'boolean':
+      if (typeof raw === 'boolean') return raw;
+      if (typeof raw === 'number') return raw !== 0;
+      if (typeof raw === 'string') {
+        return raw === 'true' || raw === '1' || raw === 'on';
+      }
+      return Boolean(raw);
+
+    case 'number': {
+      if (typeof raw === 'number') return raw;
+      const num = Number(raw);
+      return isNaN(num) ? (def.default ?? 0) : num;
+    }
+
+    case 'select':
+    case 'text':
+    case 'email':
+    case 'url':
+    case 'textarea':
+      return String(raw ?? '');
+
+    default:
+      return raw;
+  }
+}
+
+/** Normalize all schema keys in a loaded config object */
+function normalizeConfig(data: Record<string, unknown>): Record<string, unknown> {
+  const result = { ...data };
+  for (const [key, def] of SCHEMA_MAP) {
+    result[key] = normalizeValue(result[key], def);
+  }
+  return result;
+}
+
 // ─────────────────────────────────────────────────────────────────────────────
 // Validation helpers
 // ─────────────────────────────────────────────────────────────────────────────
@@ -226,6 +274,7 @@ export function SystemConfig() {
   const [edited, setEdited] = useState<Record<string, unknown>>({});
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState(false);
   const [saving, setSaving] = useState(false);
   const [resetting, setResetting] = useState(false);
   const [showResetModal, setShowResetModal] = useState(false);
@@ -237,16 +286,22 @@ export function SystemConfig() {
 
   const loadData = useCallback(async () => {
     setLoading(true);
+    setLoadError(false);
     try {
       const res = await adminEnterprise.getConfig();
-      if (res.success && res.data) {
-        const data = res.data as unknown as Record<string, unknown>;
-        setConfig(data);
-        setEdited({ ...data });
-        setErrors({});
+      if (!res.success || !res.data) {
+        toast.error(res.error || t('enterprise.failed_to_load_configuration'));
+        setLoadError(true);
+        return;
       }
+      const raw = res.data as unknown as Record<string, unknown>;
+      const data = normalizeConfig(raw);
+      setConfig(data);
+      setEdited({ ...data });
+      setErrors({});
     } catch {
       toast.error(t('enterprise.failed_to_load_configuration'));
+      setLoadError(true);
     } finally {
       setLoading(false);
     }
@@ -288,6 +343,10 @@ export function SystemConfig() {
   // ── Save handler ──────────────────────────────────────────────────────
 
   async function handleSave() {
+    if (loadError) {
+      toast.error('Cannot save — configuration failed to load. Please reload the page.');
+      return;
+    }
     // Validate all schema fields
     const newErrors: Record<string, string> = {};
     for (const group of CONFIG_SCHEMA) {
@@ -304,7 +363,17 @@ export function SystemConfig() {
 
     setSaving(true);
     try {
-      await adminEnterprise.updateConfig(edited);
+      // Only send schema-defined keys — exclude unknown/JSON blob keys (modules, federation, etc.)
+      // Excluded keys are managed by dedicated pages and must not be overwritten here:
+      // - maintenance_mode: requires file + DB layers (use CLI)
+      // - registration_enabled/require_approval: managed by Registration Policy page
+      const SAVE_EXCLUDED = new Set(['maintenance_mode', 'registration_enabled', 'require_approval']);
+      const payload: Record<string, unknown> = {};
+      for (const key of SCHEMA_KEYS) {
+        if (SAVE_EXCLUDED.has(key)) continue;
+        if (key in edited) payload[key] = edited[key];
+      }
+      await adminEnterprise.updateConfig(payload);
       toast.success(t('enterprise.configuration_saved'));
       await loadData();
     } catch {
@@ -337,12 +406,15 @@ export function SystemConfig() {
     const error = errors[def.key];
 
     switch (def.type) {
-      case 'boolean':
+      case 'boolean': {
+        // Some settings are managed by dedicated pages and must not be toggled here
+        const READ_ONLY_KEYS = new Set(['maintenance_mode', 'registration_enabled', 'require_approval']);
+        const isReadOnly = READ_ONLY_KEYS.has(def.key);
         return (
           <div key={def.key} className="flex items-center justify-between gap-4 py-2">
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-1.5">
-                <span className="text-sm font-medium text-foreground">{def.label}</span>
+                <span className={`text-sm font-medium ${isReadOnly ? 'text-default-400' : 'text-foreground'}`}>{def.label}</span>
                 <Tooltip content={def.description} delay={300}>
                   <Info size={14} className="text-default-400 shrink-0 cursor-help" />
                 </Tooltip>
@@ -350,13 +422,15 @@ export function SystemConfig() {
               <p className="text-xs text-default-400 mt-0.5">{def.description}</p>
             </div>
             <Switch
-              isSelected={Boolean(value)}
-              onValueChange={(v) => handleChange(def.key, v, def)}
+              isSelected={value === true}
+              onValueChange={isReadOnly ? undefined : (v) => handleChange(def.key, v, def)}
+              isDisabled={isReadOnly}
               aria-label={def.label}
               size="sm"
             />
           </div>
         );
+      }
 
       case 'select':
         return (
@@ -424,7 +498,7 @@ export function SystemConfig() {
             <Input
               type="number"
               value={String(value ?? '')}
-              onValueChange={(v) => handleChange(def.key, v === '' ? '' : Number(v), def)}
+              onValueChange={(v) => handleChange(def.key, v === '' ? (def.default ?? 0) : Number(v), def)}
               aria-label={def.label}
               variant="bordered"
               size="sm"
@@ -475,6 +549,23 @@ export function SystemConfig() {
         <div className="flex justify-center py-16">
           <Spinner size="lg" />
         </div>
+      </div>
+    );
+  }
+
+  if (loadError) {
+    return (
+      <div>
+        <PageHeader title={t('enterprise.system_config_title')} description={t('enterprise.system_config_desc')} />
+        <Card shadow="sm" className="border-danger-200 bg-danger-50">
+          <CardBody className="text-center py-12">
+            <p className="text-danger font-medium mb-3">Failed to load configuration</p>
+            <p className="text-sm text-default-500 mb-4">The server returned an error. Your settings are not shown to prevent accidental overwrites.</p>
+            <Button color="primary" variant="flat" onPress={loadData} startContent={<RefreshCw size={16} />}>
+              Retry
+            </Button>
+          </CardBody>
+        </Card>
       </div>
     );
   }
@@ -559,7 +650,7 @@ export function SystemConfig() {
               {unknownKeys.map((key) => {
                 const rawValue = edited[key];
                 const displayValue = typeof rawValue === 'object' && rawValue !== null
-                  ? JSON.stringify(rawValue)
+                  ? JSON.stringify(rawValue, null, 2)
                   : String(rawValue ?? '');
                 return (
                   <div key={key} className="flex items-start gap-3">
@@ -568,19 +659,12 @@ export function SystemConfig() {
                     </div>
                     <Input
                       value={displayValue}
-                      onValueChange={(v) => {
-                        // Try to parse JSON for complex values, fallback to string
-                        try {
-                          const parsed = JSON.parse(v);
-                          handleChange(key, parsed);
-                        } catch {
-                          handleChange(key, v);
-                        }
-                      }}
+                      isReadOnly
                       aria-label={key}
                       variant="bordered"
                       size="sm"
                       className="flex-1"
+                      description="Managed by other configuration pages"
                     />
                   </div>
                 );

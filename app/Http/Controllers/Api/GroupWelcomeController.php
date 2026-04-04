@@ -49,12 +49,11 @@ class GroupWelcomeController extends BaseApiController
         $enabled = (bool) request()->input('enabled', false);
         $message = request()->input('message', '');
 
-        $result = GroupWelcomeService::setConfig($id, $enabled, $message);
+        GroupWelcomeService::setConfig($id, $enabled, $message);
 
-        if ($result === null) {
-            return $this->errorResponse('Failed to update welcome configuration', 400);
-        }
+        // Re-fetch updated config to return
+        $updated = GroupWelcomeService::getConfig($id);
 
-        return $this->successResponse($result);
+        return $this->successResponse($updated);
     }
 }
