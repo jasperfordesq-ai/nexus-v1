@@ -2,6 +2,8 @@
   "page_title": "Events",
   "page_description": "Discover community events, workshops, and meetups near you.",
   "near_me": "Near me",
+  "near_me_no_location": "Set your location in your profile to use Near me",
+  "radius_label": "Radius",
   "title": "Events",
   "subtitle": "Discover and join community events",
   "create_event": "Create Event",
@@ -114,6 +116,7 @@
   "form": {
     "create_title": "Create New Event",
     "edit_title": "Edit Event",
+    "group_event_notice": "This event will be associated with your group.",
     "loading": "Loading event...",
     "unable_to_load": "Unable to Load Event",
     "back_to_events": "Back to Events",

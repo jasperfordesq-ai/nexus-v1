@@ -37,7 +37,7 @@ class EventsController extends BaseApiController
      */
     public function index(): JsonResponse
     {
-        $userId = $this->getOptionalUserId();
+        $userId = $this->getOptionalUserId() ?? $this->resolveSanctumUserOptionally();
 
         $filters = [
             'limit' => $this->queryInt('per_page', 20, 1, 100),
@@ -86,7 +86,7 @@ class EventsController extends BaseApiController
      */
     public function show(int $id): JsonResponse
     {
-        $userId = $this->getOptionalUserId();
+        $userId = $this->getOptionalUserId() ?? $this->resolveSanctumUserOptionally();
 
         $event = $this->eventService->getById($id, $userId);
 
@@ -158,9 +158,9 @@ class EventsController extends BaseApiController
 
         $data = $this->getAllInput();
 
-        $eventId = $this->eventService->create($userId, $data);
+        $result = $this->eventService->create($userId, $data);
 
-        if ($eventId === null) {
+        if ($result === null) {
             $errors = $this->eventService->getErrors();
             $status = 422;
             foreach ($errors as $error) {
@@ -171,6 +171,9 @@ class EventsController extends BaseApiController
             }
             return $this->respondWithErrors($errors, $status);
         }
+
+        // create() returns an Event model (Laravel) or an int ID (legacy)
+        $eventId = $result instanceof \App\Models\Event ? $result->id : (int) $result;
 
         // Link polls to this event
         if (! empty($data['poll_ids']) && is_array($data['poll_ids'])) {

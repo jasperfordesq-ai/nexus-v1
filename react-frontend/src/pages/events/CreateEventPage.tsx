@@ -9,7 +9,7 @@
  */
 
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { useParams, useNavigate, Link } from 'react-router-dom';
+import { useParams, useNavigate, useSearchParams, Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
 import { Button, Input, Textarea, Select, SelectItem, DatePicker, TimeInput, Switch, CheckboxGroup, Checkbox } from '@heroui/react';
@@ -150,9 +150,11 @@ export function CreateEventPage() {
   const { t } = useTranslation('events');
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const { tenantPath } = useTenant();
   const toast = useToast();
   const isEditing = !!id;
+  const groupId = searchParams.get('group_id');
   usePageTitle(isEditing ? t('form.edit_title') : t('form.create_title'));
 
   const [formData, setFormData] = useState<FormData>(initialFormData);
@@ -427,6 +429,11 @@ export function CreateEventPage() {
         video_url: formData.allowRemoteAttendance && formData.videoUrl.trim() ? formData.videoUrl.trim() : null,
       };
 
+      // Associate event with group when created from group Events tab
+      if (groupId && !isEditing) {
+        payload.group_id = parseInt(groupId);
+      }
+
       if (formData.category) {
         const categoryInt = parseInt(formData.category);
         if (!isNaN(categoryInt)) {
@@ -548,6 +555,15 @@ export function CreateEventPage() {
           <Calendar className="w-7 h-7 text-amber-600 dark:text-amber-400" aria-hidden="true" />
           {isEditing ? t('form.edit_title') : t('form.create_title')}
         </h1>
+
+        {groupId && !isEditing && (
+          <div className="flex items-center gap-3 p-3 mb-4 rounded-lg bg-primary/5 border border-primary/20">
+            <Users className="w-5 h-5 text-primary flex-shrink-0" />
+            <p className="text-sm text-theme-primary">
+              {t('form.group_event_notice', 'This event will be associated with your group.')}
+            </p>
+          </div>
+        )}
 
         <form onSubmit={handleSubmit} className="space-y-6">
           {/* Cover Image Upload */}

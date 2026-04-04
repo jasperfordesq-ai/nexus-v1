@@ -48,7 +48,7 @@ class ListingsController extends BaseApiController
 
     public function index(): JsonResponse
     {
-        $userId = $this->getOptionalUserId();
+        $userId = $this->getOptionalUserId() ?? $this->resolveSanctumUserOptionally();
 
         $filters = [];
 
@@ -136,7 +136,7 @@ class ListingsController extends BaseApiController
 
     public function show(int $id): JsonResponse
     {
-        $userId = $this->getOptionalUserId();
+        $userId = $this->getOptionalUserId() ?? $this->resolveSanctumUserOptionally();
         $listing = $this->listingService->getById($id, false, $userId);
 
         if (!$listing) {
@@ -416,7 +416,7 @@ class ListingsController extends BaseApiController
             $filters['cursor'] = $this->query('cursor');
         }
 
-        $userId = $this->getOptionalUserId();
+        $userId = $this->getOptionalUserId() ?? $this->resolveSanctumUserOptionally();
         if ($userId !== null) {
             $filters['current_user_id'] = $userId;
         }
