@@ -363,15 +363,20 @@ export function SystemConfig() {
 
     setSaving(true);
     try {
-      // Only send schema-defined keys — exclude unknown/JSON blob keys (modules, federation, etc.)
-      // Excluded keys are managed by dedicated pages and must not be overwritten here:
-      // - maintenance_mode: requires file + DB layers (use CLI)
-      // - registration_enabled/require_approval: managed by Registration Policy page
-      const SAVE_EXCLUDED = new Set(['maintenance_mode']);
+      // Only send fields the user actually changed — prevents clobbering values
+      // set on other pages or in previous sessions. maintenance_mode is always
+      // excluded because it requires the .maintenance file layer (CLI only).
       const payload: Record<string, unknown> = {};
       for (const key of SCHEMA_KEYS) {
-        if (SAVE_EXCLUDED.has(key)) continue;
-        if (key in edited) payload[key] = edited[key];
+        if (key === 'maintenance_mode') continue;
+        if (key in edited && JSON.stringify(edited[key]) !== JSON.stringify(config[key])) {
+          payload[key] = edited[key];
+        }
+      }
+      if (Object.keys(payload).length === 0) {
+        toast.error('No changes to save');
+        setSaving(false);
+        return;
       }
       await adminEnterprise.updateConfig(payload);
       toast.success(t('enterprise.configuration_saved'));

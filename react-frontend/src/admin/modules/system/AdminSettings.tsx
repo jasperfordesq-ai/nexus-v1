@@ -51,6 +51,7 @@ export function AdminSettings() {
   const { tenant } = useTenant();
 
   const [form, setForm] = useState<SettingsForm>(DEFAULT_SETTINGS);
+  const [originalForm, setOriginalForm] = useState<SettingsForm>(DEFAULT_SETTINGS);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
 
@@ -64,7 +65,7 @@ export function AdminSettings() {
         const tenant = data.tenant;
         const settings = data.settings;
 
-        setForm({
+        const loaded: SettingsForm = {
           name: (tenant.name as string) ?? '',
           description: (tenant.description as string) ?? '',
           contact_email: (tenant.contact_email as string) ?? '',
@@ -74,7 +75,9 @@ export function AdminSettings() {
           admin_approval: settings.admin_approval === 'true' || settings.admin_approval === true || settings.admin_approval === '1',
           maintenance_mode: settings.maintenance_mode === 'true' || settings.maintenance_mode === true || settings.maintenance_mode === '1',
           footer_text: (settings.footer_text as string) ?? '',
-        });
+        };
+        setForm(loaded);
+        setOriginalForm(loaded);
       }
     } catch {
       toast.error(t('system.failed_to_load_settings'));
@@ -90,17 +93,24 @@ export function AdminSettings() {
   const handleSave = async () => {
     setSaving(true);
     try {
-      // maintenance_mode excluded — requires file + DB layers, must use CLI
-      const res = await adminSettings.update({
-        name: form.name,
-        description: form.description,
-        contact_email: form.contact_email,
-        contact_phone: form.contact_phone,
-        registration_mode: form.registration_mode,
-        email_verification: String(form.email_verification),
-        admin_approval: String(form.admin_approval),
-        footer_text: form.footer_text,
-      });
+      // Only send fields that actually changed — prevents clobbering values
+      // set on other admin pages (enterprise config, registration policy, etc.)
+      const changes: Record<string, unknown> = {};
+      if (form.name !== originalForm.name) changes.name = form.name;
+      if (form.description !== originalForm.description) changes.description = form.description;
+      if (form.contact_email !== originalForm.contact_email) changes.contact_email = form.contact_email;
+      if (form.contact_phone !== originalForm.contact_phone) changes.contact_phone = form.contact_phone;
+      if (form.registration_mode !== originalForm.registration_mode) changes.registration_mode = form.registration_mode;
+      if (form.email_verification !== originalForm.email_verification) changes.email_verification = String(form.email_verification);
+      if (form.admin_approval !== originalForm.admin_approval) changes.admin_approval = String(form.admin_approval);
+      if (form.footer_text !== originalForm.footer_text) changes.footer_text = form.footer_text;
+
+      if (Object.keys(changes).length === 0) {
+        toast.error('No changes to save');
+        setSaving(false);
+        return;
+      }
+      const res = await adminSettings.update(changes);
 
       if (res.success) {
         toast.success(t('system.settings_saved'));
