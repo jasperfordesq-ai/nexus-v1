@@ -309,13 +309,16 @@ class SitemapService
         $urls[] = $this->url($baseUrl, '/legal', $now, 'monthly', '0.3');
         $urls[] = $this->url($baseUrl, '/legal/history', $now, 'monthly', '0.2');
 
-        // Public members directory
-        $urls[] = $this->url($baseUrl, '/members', $now, 'weekly', '0.6');
-
-        // Leaderboard (if gamification enabled)
-        if ($this->hasFeature($tenant, 'gamification')) {
-            $urls[] = $this->url($baseUrl, '/leaderboard', $now, 'daily', '0.6');
+        // Platform-level legal pages
+        foreach (['platform/terms', 'platform/privacy', 'platform/disclaimer'] as $page) {
+            $urls[] = $this->url($baseUrl, "/{$page}", $now, 'yearly', '0.2');
         }
+
+        // Timebanking guide (public educational content)
+        $urls[] = $this->url($baseUrl, '/timebanking-guide', $now, 'monthly', '0.5');
+
+        // NOTE: /members and /leaderboard are PROTECTED routes (require auth).
+        // Do NOT add them to the sitemap — crawlers cannot access them.
 
         // Knowledge base listing
         $urls[] = $this->url($baseUrl, '/kb', $now, 'weekly', '0.5');

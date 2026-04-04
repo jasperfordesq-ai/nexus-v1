@@ -914,6 +914,7 @@ export function JobDetailPage() {
       <PageMeta
         title={vacancy.title}
         description={vacancy.description?.substring(0, 160)}
+        image={vacancy.organization?.logo_url || undefined}
       />
 
       {/* Back nav */}

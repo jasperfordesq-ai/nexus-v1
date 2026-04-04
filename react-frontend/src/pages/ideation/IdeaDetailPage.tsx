@@ -51,6 +51,7 @@ import {
   Users,
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import { Helmet } from 'react-helmet-async';
 import { GlassCard } from '@/components/ui';
 import { EmptyState } from '@/components/feedback';
 import { useAuth, useToast, useTenant } from '@/contexts';
@@ -418,6 +419,16 @@ export function IdeaDetailPage() {
   return (
     <div className="max-w-4xl mx-auto px-4 py-6">
       <PageMeta title={idea?.title} description={idea?.description?.substring(0, 160)} />
+      <Helmet>
+        <script type="application/ld+json">
+          {JSON.stringify({
+            '@context': 'https://schema.org',
+            '@type': 'CreativeWork',
+            name: idea?.title,
+            ...(idea?.description ? { description: idea.description.substring(0, 300) } : {}),
+          })}
+        </script>
+      </Helmet>
       {/* Back link */}
       <Button
         variant="light"

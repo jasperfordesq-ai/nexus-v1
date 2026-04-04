@@ -252,7 +252,7 @@ export function OrganisationDetailPage() {
 
   return (
     <div className="space-y-6">
-      <PageMeta title={organisation?.name} description={organisation?.description?.substring(0, 160)} />
+      <PageMeta title={organisation?.name} description={organisation?.description?.substring(0, 160)} image={organisation?.logo_url || undefined} />
       <Helmet>
         <script type="application/ld+json">
           {JSON.stringify({

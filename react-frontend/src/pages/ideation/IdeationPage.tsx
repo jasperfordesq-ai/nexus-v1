@@ -328,7 +328,7 @@ export function IdeationPage() {
     <div className="max-w-6xl mx-auto px-4 py-6">
       <PageMeta
         title={t('page_title')}
-        description={t('subtitle')}
+        description={t('page_description', { defaultValue: 'Browse community challenges, submit ideas, and vote on solutions.' })}
       />
 
       {/* Header */}

@@ -613,6 +613,35 @@ abstract class BaseApiController extends Controller
         return TenantContext::getId();
     }
 
+    /**
+     * Manually resolve a Sanctum user from Bearer token on public routes.
+     *
+     * Routes with withoutMiddleware('auth:sanctum') skip token processing,
+     * so Auth::user() is null even when a valid token is sent. This method
+     * manually authenticates the token so public endpoints can optionally
+     * return viewer-specific data (e.g. viewer_membership on groups).
+     *
+     * @return int|null User ID or null if no valid token
+     */
+    protected function resolveSanctumUserOptionally(): ?int
+    {
+        $bearer = request()->bearerToken();
+        if (!$bearer) {
+            return null;
+        }
+
+        try {
+            $token = \Laravel\Sanctum\PersonalAccessToken::findToken($bearer);
+            if ($token && $token->tokenable) {
+                return (int) $token->tokenable->id;
+            }
+        } catch (\Throwable $e) {
+            // Invalid token — ignore
+        }
+
+        return null;
+    }
+
     // ============================================
     // RATE LIMITING
     // ============================================

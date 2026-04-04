@@ -1,5 +1,6 @@
 {
   "home": {
+    "meta_title": "Community Timebanking Platform",
     "meta_description": "Exchange skills and services using time credits. Join our community-driven time banking platform.",
     "meta_keywords": "time banking, skill exchange, community, volunteer, time credits",
     "badge": "The Future of Time Banking",
@@ -155,6 +156,7 @@
     }
   },
   "contact": {
+    "meta_description": "Get in touch with our community support team. We're here to help.",
     "title": "Contact Us",
     "subtitle": "Have a question about {{name}}? We'd love to hear from you.",
     "success_title": "Message Sent!",
@@ -184,6 +186,8 @@
     }
   },
   "faq": {
+    "page_title": "Frequently Asked Questions",
+    "meta_description": "Find answers to common questions about timebanking, exchanges, and community features.",
     "title": "Frequently Asked Questions",
     "subtitle_before_link": "Can't find what you're looking for? Visit our",
     "help_center_link": "Help Center",

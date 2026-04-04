@@ -1,5 +1,6 @@
 {
   "help": {
+    "meta_description": "Browse help articles, guides, and FAQs to get the most out of the platform.",
     "page_title": "Help Center",
     "heading": "Help Center",
     "subtitle": "Find answers to common questions about {{name}}",

@@ -247,7 +247,7 @@ export function CampaignDetailPage() {
 
   return (
     <div className="max-w-5xl mx-auto px-4 py-6">
-      <PageMeta title="Campaign Details" noIndex />
+      <PageMeta title={campaign?.title || 'Campaign'} description={campaign?.description?.substring(0, 160)} noIndex />
       {/* Back link */}
       <Button
         variant="light"

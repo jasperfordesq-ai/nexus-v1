@@ -36,7 +36,7 @@ class GroupsController extends BaseApiController
      */
     public function index(): JsonResponse
     {
-        $userId = $this->getOptionalUserId();
+        $userId = $this->getOptionalUserId() ?? $this->resolveSanctumUserOptionally();
 
         $filters = [
             'limit' => $this->queryInt('per_page', 20, 1, 100),
@@ -82,10 +82,19 @@ class GroupsController extends BaseApiController
 
     /**
      * GET /api/v2/groups/{id}
+     *
+     * Public endpoint (withoutMiddleware) — manually resolve Sanctum user
+     * when a Bearer token is present so viewer_membership is populated.
      */
     public function show(int $id): JsonResponse
     {
         $userId = $this->getOptionalUserId();
+
+        // withoutMiddleware('auth:sanctum') means Auth::user() is null even
+        // when a valid Bearer token is sent. Manually resolve Sanctum token.
+        if (!$userId) {
+            $userId = $this->resolveSanctumUserOptionally();
+        }
 
         $group = $this->groupService->getById($id, $userId);
 

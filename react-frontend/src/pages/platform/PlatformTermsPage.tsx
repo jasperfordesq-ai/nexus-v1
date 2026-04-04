@@ -601,7 +601,7 @@ export function PlatformTermsPage() {
 
   return (
     <>
-      <PageMeta title="Platform Terms of Service" />
+      <PageMeta title="Platform Terms of Service" description="Terms of service governing use of the NEXUS community timebanking platform." />
       <PlatformLegalPage
         title={t('platform_terms.title')}
         subtitle={t('platform_terms.subtitle')}

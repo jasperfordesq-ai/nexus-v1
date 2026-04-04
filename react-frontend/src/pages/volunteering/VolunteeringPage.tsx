@@ -210,7 +210,7 @@ export function VolunteeringPage() {
     <div className="space-y-6">
       <PageMeta
         title={t('page_title')}
-        description={t('subtitle')}
+        description={t('page_description', { defaultValue: 'Discover volunteering opportunities in your community.' })}
       />
 
       {/* Header */}

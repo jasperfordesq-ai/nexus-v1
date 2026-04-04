@@ -1,38 +1,86 @@
 # robots.txt for app.project-nexus.ie (React frontend)
-# Generated: 2026-04-04
+# Updated: 2026-04-04
+# Comprehensive: every auth-required route is blocked.
 
 User-agent: *
 Allow: /
 
-# Block auth and private areas
+# ── Auth pages ──
 Disallow: /login
 Disallow: /register
 Disallow: /password/
 Disallow: /logout
+Disallow: /verify-email
+Disallow: /verify-identity
+
+# ── Protected member pages ──
 Disallow: /dashboard
-Disallow: /messages
-Disallow: /wallet
-Disallow: /notifications
+Disallow: /profile
+Disallow: /members
+Disallow: /connections
 Disallow: /settings
 Disallow: /onboarding
+Disallow: /notifications
 Disallow: /search
+Disallow: /activity
+Disallow: /skills
+Disallow: /achievements
+Disallow: /leaderboard
+Disallow: /nexus-score
+Disallow: /goals
+Disallow: /polls
+Disallow: /matches
+Disallow: /feed
+
+# ── Protected communication ──
+Disallow: /messages
+Disallow: /wallet
+Disallow: /chat
+
+# ── Protected create/edit routes ──
+Disallow: /listings/create
+Disallow: /listings/new
+Disallow: /listings/*/edit
+Disallow: /events/create
+Disallow: /events/*/edit
+Disallow: /groups/create
+Disallow: /groups/*/edit
+Disallow: /jobs/create
+Disallow: /jobs/*/edit
+Disallow: /jobs/alerts
+Disallow: /jobs/my-applications
+Disallow: /jobs/talent-search
+Disallow: /jobs/analytics
+Disallow: /jobs/kanban
+Disallow: /jobs/bias-audit
+Disallow: /jobs/employer-brand
+Disallow: /jobs/employer-onboarding
+Disallow: /ideation/create
+Disallow: /ideation/campaigns
+Disallow: /ideation/outcomes
+Disallow: /volunteering/create
+Disallow: /volunteering/my-applications
+Disallow: /organisations/register
+
+# ── Protected exchange/transaction pages ──
 Disallow: /exchanges
 Disallow: /group-exchanges
-Disallow: /federation/
-Disallow: /chat
-Disallow: /activity
-Disallow: /goals
-Disallow: /skills
-Disallow: /matches
-Disallow: /nexus-score
-Disallow: /polls
 
-# Block admin areas
+# ── Protected federation pages ──
+Disallow: /federation/
+
+# ── Newsletter utility ──
+Disallow: /newsletter/
+
+# ── Admin areas ──
 Disallow: /admin/
 Disallow: /admin-legacy/
 Disallow: /super-admin/
 
-# Block AI training bots (keep search indexing)
+# ── System/dev pages ──
+Disallow: /development-status
+
+# ── Block AI training bots (preserve search indexing) ──
 User-agent: GPTBot
 Disallow: /
 

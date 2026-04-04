@@ -516,8 +516,10 @@ export function AuthProvider({ children }: AuthProviderProps) {
       logWarn('Logout request failed - proceeding with local logout');
     }
 
-    // Always clear ALL local data (tokens AND tenant ID) regardless of server response
-    tokenManager.clearAll();
+    // Clear auth tokens but preserve tenant context (slug + ID).
+    // Tenant is not a security credential — it's a UX preference that should
+    // survive logout so the user stays on the same community's login page.
+    tokenManager.clearTokens();
 
     // Clear Sentry user context and capture logout event
     captureAuthEvent('logout', userId);
@@ -583,7 +585,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
       // localStorage 'storage' event only fires in OTHER tabs (not the one that made the change).
       // When access token is removed (logout in another tab), clear state here too.
       if (event.key === 'nexus_access_token' && event.newValue === null && state.status === 'authenticated') {
-        tokenManager.clearAll();
+        tokenManager.clearTokens();
         setState({
           user: null,
           status: 'idle',

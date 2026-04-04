@@ -722,6 +722,7 @@ export function OpportunityDetailPage() {
       <PageMeta
         title={opp.title}
         description={opp.description?.substring(0, 160)}
+        image={opp.organization?.logo_url || undefined}
       />
       <Helmet>
         <script type="application/ld+json">

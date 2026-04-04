@@ -180,7 +180,11 @@ export function PostDetailPage() {
 
   return (
     <>
-      <PageMeta title={t('post_detail.title', 'Post')} />
+      <PageMeta
+        title={item?.content?.substring(0, 60) || t('post_detail.title', 'Post')}
+        description={item?.content?.substring(0, 160)}
+        noIndex
+      />
       <div className="space-y-4 max-w-2xl mx-auto">
         <div>
           <Link to={tenantPath('/feed')}>

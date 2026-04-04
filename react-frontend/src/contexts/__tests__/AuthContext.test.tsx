@@ -374,7 +374,7 @@ describe('AuthContext', () => {
       expect(result.current.status).toBe('idle');
     });
 
-    it('calls tokenManager.clearAll() to remove tokens and tenant id', async () => {
+    it('calls tokenManager.clearTokens() to remove auth tokens but preserve tenant', async () => {
       mockTokenManager.hasAccessToken.mockReturnValue(true);
       mockApiGet.mockResolvedValue({ success: true, data: mockUser });
       mockApiPost.mockResolvedValue({ success: true });
@@ -386,7 +386,7 @@ describe('AuthContext', () => {
         await result.current.logout();
       });
 
-      expect(mockTokenManager.clearAll).toHaveBeenCalled();
+      expect(mockTokenManager.clearTokens).toHaveBeenCalled();
     });
 
     it('still clears local state even if server-side logout request fails', async () => {
@@ -405,7 +405,7 @@ describe('AuthContext', () => {
       // Local state still cleared
       expect(result.current.isAuthenticated).toBe(false);
       expect(result.current.user).toBeNull();
-      expect(mockTokenManager.clearAll).toHaveBeenCalled();
+      expect(mockTokenManager.clearTokens).toHaveBeenCalled();
     });
   });
 

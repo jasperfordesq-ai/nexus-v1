@@ -1,5 +1,6 @@
 {
   "terms": {
+    "meta_description": "Terms and conditions governing the use of our community timebanking platform.",
     "page_title": "Terms of Service",
     "heading": "Terms of Service",
     "subtitle": "The rules and guidelines for using our platform",
@@ -96,6 +97,7 @@
     "privacy_policy_link": "Privacy Policy"
   },
   "privacy": {
+    "meta_description": "How we collect, use, and protect your personal data on our community platform.",
     "page_title": "Privacy Policy",
     "heading": "Privacy Policy",
     "subtitle": "How we collect, use, and protect your personal information",
@@ -206,6 +208,7 @@
     "contact_privacy_team": "Contact Our Privacy Team"
   },
   "cookies": {
+    "meta_description": "Information about how we use cookies to improve your experience on our platform.",
     "page_title": "Cookie Policy",
     "heading": "Cookie Policy",
     "subtitle": "How we use cookies and similar technologies on our platform",
@@ -287,6 +290,7 @@
     "privacy_policy_link": "Privacy Policy"
   },
   "accessibility": {
+    "meta_description": "Our commitment to making the platform accessible to everyone, following WCAG 2.1 AA standards.",
     "page_title": "Accessibility",
     "heading": "Accessibility Statement",
     "subtitle": "{{name}} is committed to ensuring digital accessibility for people of all abilities.",

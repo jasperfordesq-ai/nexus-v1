@@ -70,6 +70,7 @@ import {
   Layers,
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import { Helmet } from 'react-helmet-async';
 import { GlassCard } from '@/components/ui';
 import { EmptyState } from '@/components/feedback';
 import { useAuth, useToast, useTenant } from '@/contexts';
@@ -813,7 +814,18 @@ export function ChallengeDetailPage() {
 
   return (
     <div className="max-w-4xl mx-auto px-4 py-6">
-      <PageMeta title={challenge?.title} description={challenge?.description?.substring(0, 160)} />
+      <PageMeta title={challenge?.title} description={challenge?.description?.substring(0, 160)} image={challenge?.cover_image ? resolveAssetUrl(challenge.cover_image) : undefined} />
+      <Helmet>
+        <script type="application/ld+json">
+          {JSON.stringify({
+            '@context': 'https://schema.org',
+            '@type': 'CreativeWork',
+            name: challenge?.title,
+            ...(challenge?.description ? { description: challenge.description.substring(0, 300) } : {}),
+            ...(challenge?.cover_image ? { image: resolveAssetUrl(challenge.cover_image) } : {}),
+          })}
+        </script>
+      </Helmet>
       {/* Back link */}
       <Button
         variant="light"

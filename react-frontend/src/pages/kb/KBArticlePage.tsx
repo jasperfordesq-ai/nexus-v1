@@ -42,6 +42,7 @@ import {
   File,
 } from 'lucide-react';
 import DOMPurify from 'dompurify';
+import { Helmet } from 'react-helmet-async';
 import { lazy, Suspense } from 'react';
 
 const MarkdownRenderer = lazy(() =>
@@ -252,6 +253,18 @@ export function KBArticlePage() {
   return (
     <div className="space-y-6 max-w-4xl mx-auto">
       <PageMeta title={article?.title} description={article?.content?.replace(/<[^>]*>/g, '').substring(0, 160)} />
+      <Helmet>
+        <script type="application/ld+json">
+          {JSON.stringify({
+            '@context': 'https://schema.org',
+            '@type': 'Article',
+            headline: article?.title,
+            ...(article?.excerpt ? { description: article.excerpt } : {}),
+            ...(article?.updated_at ? { dateModified: article.updated_at } : {}),
+            ...(article?.created_at ? { datePublished: article.created_at } : {}),
+          })}
+        </script>
+      </Helmet>
       {/* Breadcrumb */}
       <nav className="flex items-center gap-2 text-sm text-theme-muted flex-wrap">
         <Link
