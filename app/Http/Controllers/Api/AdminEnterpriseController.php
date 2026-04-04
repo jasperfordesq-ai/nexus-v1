@@ -825,13 +825,9 @@ class AdminEnterpriseController extends BaseApiController
     }
 
     /** POST /api/v2/admin/enterprise/config/reset */
-    // Keys managed by dedicated admin pages — never delete on reset, never save from enterprise config
+    // Keys that require special handling — maintenance_mode needs file + DB layers (CLI only)
     private const SHARED_KEYS = [
-        'registration_enabled',          // Registration Policy page
-        'require_approval',              // Registration Policy page
-        'require_email_verification',    // Registration Policy page
-        'onboarding_enabled',            // Onboarding Settings page
-        'maintenance_mode',              // CLI-only (scripts/maintenance.sh)
+        'maintenance_mode',  // CLI-only (scripts/maintenance.sh) — file + DB layers
     ];
 
     public function resetConfig(): JsonResponse
