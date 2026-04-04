@@ -484,6 +484,7 @@ export function FeedPage() {
     <PageMeta
       title={t("title")}
       description={t("subtitle")}
+      noIndex
     />
     <div className="max-w-5xl mx-auto flex gap-6">
       {/* Main Feed Column */}
