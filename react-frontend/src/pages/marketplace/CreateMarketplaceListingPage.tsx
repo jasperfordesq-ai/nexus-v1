@@ -111,8 +111,8 @@ export function CreateMarketplaceListingPage() {
   const navigate = useNavigate();
   const { t } = useTranslation('marketplace');
   usePageTitle(t('create.page_title', 'Sell Something - Marketplace'));
-  const { isAuthenticated, user } = useAuth();
-  const { tenantPath, hasFeature } = useTenant();
+  const { isAuthenticated } = useAuth();
+  const { tenantPath } = useTenant();
   const toast = useToast();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -642,7 +642,7 @@ export function CreateMarketplaceListingPage() {
                       key={field.key}
                       label={field.label}
                       placeholder={`Select ${field.label.toLowerCase()}`}
-                      selectedKeys={templateFields[field.key] ? [templateFields[field.key]] : []}
+                      selectedKeys={templateFields[field.key] ? [templateFields[field.key]].filter(Boolean) as string[] : []}
                       onSelectionChange={(keys) => {
                         const selected = Array.from(keys)[0];
                         setTemplateFields((prev) => ({

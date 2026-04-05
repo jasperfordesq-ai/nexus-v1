@@ -149,22 +149,6 @@ export function MarketplaceCollectionsPage() {
     }
   };
 
-  // ─── Delete collection ─────────────────────────────────────────────
-  const handleDeleteCollection = async (id: number) => {
-    try {
-      await api.delete(`/v2/marketplace/collections/${id}`);
-      setCollections((prev) => prev.filter((c) => c.id !== id));
-      if (selectedCollection?.id === id) {
-        setSelectedCollection(null);
-        setCollectionItems([]);
-      }
-      toast.success(t('collections.deleted', 'Collection deleted'));
-    } catch (err) {
-      logError('Failed to delete collection', err);
-      toast.error(t('collections.delete_error', 'Failed to delete collection'));
-    }
-  };
-
   // ─── View collection items ─────────────────────────────────────────
   const handleViewCollection = async (collection: MarketplaceCollection) => {
     setSelectedCollection(collection);

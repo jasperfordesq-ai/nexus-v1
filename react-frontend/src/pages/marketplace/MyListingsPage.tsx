@@ -44,7 +44,6 @@ import {
 import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
 import { EmptyState } from '@/components/feedback';
-import { MarketplaceListingGrid } from '@/components/marketplace';
 import type { MarketplaceListingItem } from '@/types/marketplace';
 import { useAuth, useToast, useTenant } from '@/contexts';
 import { api } from '@/lib/api';
@@ -66,6 +65,7 @@ interface SellerDashboardStats {
   total_views: number;
   total_revenue: number;
   revenue_currency: string;
+  [key: string]: number | string;
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -246,7 +246,7 @@ export function MyListingsPage() {
         setListings((prev) => prev.filter((l) => l.id !== removeTargetId));
         // Update stats
         if (stats) {
-          setStats((prev) => prev ? { ...prev, [`${activeTab}_listings`]: Math.max(0, (prev as Record<string, number>)[`${activeTab}_listings`] - 1) } : prev);
+          setStats((prev) => prev ? { ...prev, [`${activeTab}_listings`]: Math.max(0, prev[`${activeTab}_listings`] - 1) } : prev);
         }
         onRemoveClose();
       } else {
@@ -335,7 +335,7 @@ export function MyListingsPage() {
                   <span>{t(tab.tKey, tab.label)}</span>
                   {stats && (
                     <span className="text-xs text-default-400">
-                      ({(stats as Record<string, number>)[`${tab.key}_listings`] ?? 0})
+                      ({stats[`${tab.key}_listings`] ?? 0})
                     </span>
                   )}
                 </div>

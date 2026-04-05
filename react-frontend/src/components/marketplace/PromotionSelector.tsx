@@ -18,7 +18,6 @@ import {
   Button,
   Card,
   CardBody,
-  Chip,
   Spinner,
 } from '@heroui/react';
 import { Zap, Star, ArrowUpCircle, LayoutGrid, Clock, Check } from 'lucide-react';

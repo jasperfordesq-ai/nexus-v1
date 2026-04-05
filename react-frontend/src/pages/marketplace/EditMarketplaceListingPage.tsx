@@ -674,7 +674,7 @@ export function EditMarketplaceListingPage() {
                       key={field.key}
                       label={field.label}
                       placeholder={`Select ${field.label.toLowerCase()}`}
-                      selectedKeys={templateFields[field.key] ? [templateFields[field.key]] : []}
+                      selectedKeys={templateFields[field.key] ? [templateFields[field.key]].filter(Boolean) as string[] : []}
                       onSelectionChange={(keys) => {
                         const selected = Array.from(keys)[0];
                         setTemplateFields((prev) => ({

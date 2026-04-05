@@ -399,7 +399,7 @@ export function MarketplaceCategoryPage() {
                   label={field.label}
                   placeholder={`Any ${field.label}`}
                   size="sm"
-                  selectedKeys={templateFilterValues[field.key] ? [templateFilterValues[field.key]] : []}
+                  selectedKeys={templateFilterValues[field.key] ? [templateFilterValues[field.key]].filter(Boolean) as string[] : []}
                   onSelectionChange={(keys) => {
                     const selected = Array.from(keys)[0];
                     setTemplateFilterValues((prev) => ({

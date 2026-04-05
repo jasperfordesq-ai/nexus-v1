@@ -249,7 +249,7 @@ function ImageGallery({ images, videoUrl }: { images: ListingDetail['images']; v
         <AnimatePresence mode="wait">
           <motion.img
             key={activeIndex}
-            src={images[activeIndex].url}
+            src={images[activeIndex]?.url}
             alt={t('listing.image_alt', 'Image {{number}}', { number: activeIndex + 1 })}
             className="w-full h-full object-contain"
             initial={{ opacity: 0 }}
@@ -397,7 +397,7 @@ export function MarketplaceListingPage() {
     const load = async () => {
       try {
         const response = await api.get<SellerListing[]>(
-          `/v2/marketplace/sellers/${listing.user.id}/listings?limit=4`
+          `/v2/marketplace/sellers/${listing.user!.id}/listings?limit=4`
         );
         if (!cancelled && response.success && response.data) {
           setSellerListings(response.data.filter((l) => l.id !== listing.id));
@@ -740,7 +740,7 @@ export function MarketplaceListingPage() {
                     <span className="text-xs text-default-400 capitalize">
                       {key.replace(/_/g, ' ')}
                     </span>
-                    <p className="text-sm text-foreground">{value}</p>
+                    <p className="text-sm text-foreground">{String(value)}</p>
                   </div>
                 ))}
               </div>

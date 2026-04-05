@@ -71,7 +71,7 @@ export function CommunityDeliveryCard({
   informational = false,
 }: CommunityDeliveryCardProps) {
   const { t } = useTranslation('marketplace');
-  const { isAuthenticated, user } = useAuth();
+  const { isAuthenticated } = useAuth();
   const toast = useToast();
   const { isOpen, onOpen, onClose } = useDisclosure();
 
@@ -87,7 +87,8 @@ export function CommunityDeliveryCard({
     setLoading(true);
     try {
       const response = await api.get(`/v2/marketplace/orders/${orderId}/delivery-offers`);
-      setOffers(response.data.data ?? response.data ?? []);
+      const raw = response.data as any;
+      setOffers(raw.data ?? raw ?? []);
     } catch (err) {
       logError('Failed to load delivery offers', err);
     } finally {
@@ -110,7 +111,7 @@ export function CommunityDeliveryCard({
         estimated_minutes: estimatedMinutes ? parseInt(estimatedMinutes, 10) : undefined,
         notes: notes || undefined,
       });
-      toast.showToast(t('community_delivery.offer_sent', 'Delivery offer sent!'), 'success');
+      toast.success(t('community_delivery.offer_sent', 'Delivery offer sent!'));
       onClose();
       setTimeCredits('1');
       setEstimatedMinutes('');
@@ -118,7 +119,7 @@ export function CommunityDeliveryCard({
       loadOffers();
     } catch (err) {
       logError('Failed to submit delivery offer', err);
-      toast.showToast(t('community_delivery.offer_failed', 'Failed to send delivery offer'), 'error');
+      toast.error(t('community_delivery.offer_failed', 'Failed to send delivery offer'));
     } finally {
       setSubmitting(false);
     }
@@ -128,11 +129,11 @@ export function CommunityDeliveryCard({
     if (!orderId) return;
     try {
       await api.put(`/v2/marketplace/orders/${orderId}/delivery-offers/${delivererId}/accept`);
-      toast.showToast(t('community_delivery.offer_accepted', 'Delivery offer accepted!'), 'success');
+      toast.success(t('community_delivery.offer_accepted', 'Delivery offer accepted!'));
       loadOffers();
     } catch (err) {
       logError('Failed to accept delivery offer', err);
-      toast.showToast(t('community_delivery.accept_failed', 'Failed to accept offer'), 'error');
+      toast.error(t('community_delivery.accept_failed', 'Failed to accept offer'));
     }
   };
 
@@ -140,11 +141,11 @@ export function CommunityDeliveryCard({
     if (!orderId) return;
     try {
       await api.put(`/v2/marketplace/orders/${orderId}/delivery-offers/${delivererId}/confirm`);
-      toast.showToast(t('community_delivery.delivery_confirmed', 'Delivery confirmed! Time credits awarded.'), 'success');
+      toast.success(t('community_delivery.delivery_confirmed', 'Delivery confirmed! Time credits awarded.'));
       loadOffers();
     } catch (err) {
       logError('Failed to confirm delivery', err);
-      toast.showToast(t('community_delivery.confirm_failed', 'Failed to confirm delivery'), 'error');
+      toast.error(t('community_delivery.confirm_failed', 'Failed to confirm delivery'));
     }
   };
 

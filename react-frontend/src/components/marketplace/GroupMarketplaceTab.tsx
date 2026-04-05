@@ -60,16 +60,16 @@ export function GroupMarketplaceTab({ groupId }: GroupMarketplaceTabProps) {
     }
 
     try {
-      const params: Record<string, string> = { limit: '20' };
+      const qs = new URLSearchParams({ limit: '20' });
       if (append && cursor) {
-        params.cursor = cursor;
+        qs.set('cursor', cursor);
       }
       if (categoryId != null) {
-        params.category_id = String(categoryId);
+        qs.set('category_id', String(categoryId));
       }
 
-      const response = await api.get(`/v2/marketplace/groups/${groupId}/listings`, { params });
-      const data = response.data;
+      const response = await api.get(`/v2/marketplace/groups/${groupId}/listings?${qs.toString()}`);
+      const data = response.data as any;
       const items = data.data ?? data.items ?? [];
 
       if (append) {
@@ -90,7 +90,8 @@ export function GroupMarketplaceTab({ groupId }: GroupMarketplaceTabProps) {
   const loadStats = useCallback(async () => {
     try {
       const response = await api.get(`/v2/marketplace/groups/${groupId}/stats`);
-      setStats(response.data.data ?? response.data);
+      const raw = response.data as any;
+      setStats(raw.data ?? raw);
     } catch (err) {
       logError('Failed to load group marketplace stats', err);
     }

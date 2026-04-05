@@ -52,7 +52,7 @@ export function AiReplySuggestion({
       const response = await api.post(`/v2/marketplace/listings/${listingId}/auto-reply`, {
         message: buyerMessage,
       });
-      const data = response.data.data ?? response.data;
+      const data = (response.data as any).data ?? response.data;
       setReply(data.reply ?? '');
       setGenerated(true);
     } catch (err) {
