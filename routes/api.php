@@ -761,6 +761,8 @@ Route::delete('/v2/marketplace/listings/{id}', [\App\Http\Controllers\Api\Market
 Route::post('/v2/marketplace/listings/{id}/images', [\App\Http\Controllers\Api\MarketplaceListingController::class, 'uploadImages']);
 Route::put('/v2/marketplace/listings/{id}/images/reorder', [\App\Http\Controllers\Api\MarketplaceListingController::class, 'reorderImages']);
 Route::delete('/v2/marketplace/listings/{id}/images/{imageId}', [\App\Http\Controllers\Api\MarketplaceListingController::class, 'deleteImage']);
+Route::post('/v2/marketplace/listings/{id}/video', [\App\Http\Controllers\Api\MarketplaceListingController::class, 'uploadVideo']);
+Route::delete('/v2/marketplace/listings/{id}/video', [\App\Http\Controllers\Api\MarketplaceListingController::class, 'deleteVideo']);
 Route::post('/v2/marketplace/listings/{id}/renew', [\App\Http\Controllers\Api\MarketplaceListingController::class, 'renew']);
 Route::get('/v2/marketplace/listings/{id}/analytics', [\App\Http\Controllers\Api\MarketplaceListingController::class, 'analytics']);
 Route::post('/v2/marketplace/listings/generate-description', [\App\Http\Controllers\Api\MarketplaceListingController::class, 'generateDescription']);
@@ -952,6 +954,12 @@ Route::get('/v2/admin/config/volunteering', [\App\Http\Controllers\Api\AdminConf
 Route::put('/v2/admin/config/volunteering/bulk', [\App\Http\Controllers\Api\AdminConfigController::class, 'updateVolunteeringConfigBulk']);
 Route::get('/v2/admin/config/jobs', [\App\Http\Controllers\Api\AdminConfigController::class, 'getJobConfig']);
 Route::put('/v2/admin/config/jobs/bulk', [\App\Http\Controllers\Api\AdminConfigController::class, 'updateJobConfigBulk']);
+Route::get('/v2/admin/config/translation', [\App\Http\Controllers\Api\AdminConfigController::class, 'getTranslationConfig']);
+Route::put('/v2/admin/config/translation', [\App\Http\Controllers\Api\AdminConfigController::class, 'updateTranslationConfig']);
+Route::put('/v2/admin/config/translation/bulk', [\App\Http\Controllers\Api\AdminConfigController::class, 'updateTranslationConfigBulk']);
+Route::get('/v2/admin/translation/glossary', [\App\Http\Controllers\Api\AdminConfigController::class, 'getGlossary']);
+Route::post('/v2/admin/translation/glossary', [\App\Http\Controllers\Api\AdminConfigController::class, 'createGlossaryEntry']);
+Route::delete('/v2/admin/translation/glossary/{id}', [\App\Http\Controllers\Api\AdminConfigController::class, 'deleteGlossaryEntry']);
 Route::get('/v2/admin/config/ai', [\App\Http\Controllers\Api\AdminConfigController::class, 'getAiConfig']);
 Route::put('/v2/admin/config/ai', [\App\Http\Controllers\Api\AdminConfigController::class, 'updateAiConfig']);
 Route::get('/v2/admin/config/feed-algorithm', [\App\Http\Controllers\Api\AdminConfigController::class, 'getFeedAlgorithmConfig']);

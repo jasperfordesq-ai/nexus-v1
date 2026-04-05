@@ -52,6 +52,7 @@ export interface MarketplaceListingDetail extends MarketplaceListingItem {
     alt_text?: string;
     is_primary: boolean;
   }>;
+  video_url?: string | null;
   saves_count: number;
   expires_at?: string;
   updated_at?: string;

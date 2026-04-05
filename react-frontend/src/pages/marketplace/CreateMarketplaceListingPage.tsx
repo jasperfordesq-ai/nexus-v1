@@ -254,7 +254,7 @@ export function CreateMarketplaceListingPage() {
 
   const handleVideoSelect = useCallback((files: FileList | null) => {
     if (!files || files.length === 0) return;
-    const file = files[0];
+    const file = files[0] as File;
 
     if (!ALLOWED_VIDEO_TYPES.includes(file.type)) {
       toast.error(t('create.video_type_error', 'Only MP4, WebM, and MOV video files are allowed.'));

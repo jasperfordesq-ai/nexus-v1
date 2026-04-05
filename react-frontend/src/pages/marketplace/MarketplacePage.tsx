@@ -17,7 +17,7 @@
 
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
-import { Button, Input, Spinner } from '@heroui/react';
+import { Button, Input } from '@heroui/react';
 import {
   Search,
   Plus,
