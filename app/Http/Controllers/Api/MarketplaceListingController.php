@@ -152,6 +152,13 @@ class MarketplaceListingController extends BaseApiController
         if ($this->query('cursor')) {
             $filters['cursor'] = $this->query('cursor');
         }
+        if ($this->query('status')) {
+            $filters['status'] = $this->query('status');
+        }
+        // Only allow user_id filter when it matches the authenticated user (own listings)
+        if ($this->query('user_id') && $userId && (int) $this->query('user_id') === $userId) {
+            $filters['user_id'] = $userId;
+        }
 
         $result = MarketplaceListingService::getAll($filters);
 
