@@ -64,7 +64,7 @@ class MarketplaceConfigurationService
         self::CONFIG_PLATFORM_FEE_PERCENT      => 5,
         self::CONFIG_ESCROW_AUTO_RELEASE_DAYS  => 14,
 
-        self::CONFIG_MODERATION_ENABLED        => true,
+        self::CONFIG_MODERATION_ENABLED        => false,
         self::CONFIG_DSA_COMPLIANCE            => false,
         self::CONFIG_AUTO_APPROVE_TRUSTED      => false,
 
