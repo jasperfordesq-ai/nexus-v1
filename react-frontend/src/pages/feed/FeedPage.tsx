@@ -102,6 +102,7 @@ export function FeedPage() {
   // Compose Hub
   const { isOpen: isCreateOpen, onOpen: onCreateOpen, onClose: onCreateClose } = useDisclosure();
   const [composeDefaultTab, setComposeDefaultTab] = useState<ComposeTab>('post');
+  const openCompose = (tab: ComposeTab = 'post') => { setComposeDefaultTab(tab); onCreateOpen(); };
 
   // Report modal
   const { isOpen: isReportOpen, onOpen: onReportOpen, onClose: onReportClose } = useDisclosure();
@@ -508,7 +509,7 @@ export function FeedPage() {
           <Button
             className="hidden sm:flex bg-gradient-to-r from-indigo-500 to-purple-600 text-white shadow-lg shadow-indigo-500/25 hover:shadow-indigo-500/40 transition-shadow"
             startContent={<Plus className="w-4 h-4" aria-hidden="true" />}
-            onPress={onCreateOpen}
+            onPress={() => openCompose('post')}
           >
             {t('new_post')}
           </Button>
@@ -523,7 +524,7 @@ export function FeedPage() {
             size="sm"
             className="sm:hidden bg-gradient-to-r from-indigo-500 to-purple-600 text-white shadow-md"
             startContent={<Plus className="w-3.5 h-3.5" aria-hidden="true" />}
-            onPress={onCreateOpen}
+            onPress={() => openCompose('post')}
           >
             {t('new_post')}
           </Button>
@@ -543,8 +544,8 @@ export function FeedPage() {
             role="button"
             tabIndex={0}
             aria-label={t('whats_on_your_mind')}
-            onClick={() => { setComposeDefaultTab("listing"); onCreateOpen(); }}
-            onKeyDown={(e: KeyboardEvent<HTMLDivElement>) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setComposeDefaultTab("listing"); onCreateOpen(); } }}
+            onClick={() => openCompose('post')}
+            onKeyDown={(e: KeyboardEvent<HTMLDivElement>) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openCompose('post'); } }}
           >
             <Avatar
               name={user?.first_name || 'You'}
@@ -562,7 +563,7 @@ export function FeedPage() {
                 size="sm"
                 variant="light"
                 className="text-[var(--text-muted)]"
-                onPress={() => { setComposeDefaultTab('post'); onCreateOpen(); }}
+                onPress={() => openCompose('post')}
                 aria-label={t('add_image_aria')}
               >
                 <ImagePlus className="w-4 h-4" />
@@ -572,7 +573,7 @@ export function FeedPage() {
                 size="sm"
                 variant="light"
                 className="text-[var(--text-muted)]"
-                onPress={() => { setComposeDefaultTab('poll'); onCreateOpen(); }}
+                onPress={() => openCompose('poll')}
                 aria-label={t('create_poll_aria')}
               >
                 <BarChart3 className="w-4 h-4" />
@@ -671,7 +672,7 @@ export function FeedPage() {
                 <Button
                   className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white shadow-lg shadow-indigo-500/25"
                   startContent={<Plus className="w-4 h-4" aria-hidden="true" />}
-                  onPress={onCreateOpen}
+                  onPress={() => openCompose('post')}
                 >
                   {t('create_post')}
                 </Button>
@@ -800,7 +801,7 @@ export function FeedPage() {
     </div>
 
     {/* Mobile FAB */}
-    {isAuthenticated && <MobileFAB onPress={onCreateOpen} />}
+    {isAuthenticated && <MobileFAB onPress={() => openCompose('post')} />}
     </>
   );
 }
