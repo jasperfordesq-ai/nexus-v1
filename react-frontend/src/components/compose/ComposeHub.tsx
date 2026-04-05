@@ -57,7 +57,7 @@ const TABS_WITH_GROUPS: ComposeTab[] = ['post', 'poll', 'event'];
 export function ComposeHub({
   isOpen,
   onClose,
-  defaultTab = 'listing',
+  defaultTab = 'post',
   onSuccess,
   groupId,
 }: ComposeHubProps) {
