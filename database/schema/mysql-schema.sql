@@ -604,6 +604,8 @@ CREATE TABLE `categories` (
   `tenant_id` int(11) NOT NULL,
   `name` varchar(50) NOT NULL,
   `slug` varchar(255) NOT NULL,
+  `sort_order` int(11) NOT NULL DEFAULT 0,
+  `is_active` tinyint(1) NOT NULL DEFAULT 1,
   `color` varchar(50) DEFAULT 'blue',
   `created_at` datetime DEFAULT current_timestamp(),
   `type` varchar(50) NOT NULL DEFAULT 'listing',
@@ -1786,7 +1788,7 @@ CREATE TABLE `event_rsvps` (
   KEY `idx_federated_events` (`is_federated`,`source_tenant_id`),
   CONSTRAINT `event_rsvps_event_id_foreign` FOREIGN KEY (`event_id`) REFERENCES `events` (`id`) ON DELETE CASCADE,
   CONSTRAINT `event_rsvps_user_id_foreign` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=16 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=17 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `event_series`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -2527,7 +2529,7 @@ CREATE TABLE `federation_tenant_features` (
   UNIQUE KEY `unique_tenant_feature` (`tenant_id`,`feature_key`),
   KEY `idx_tenant` (`tenant_id`),
   KEY `idx_feature` (`feature_key`)
-) ENGINE=InnoDB AUTO_INCREMENT=150 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=151 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `federation_tenant_settings`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -2802,7 +2804,7 @@ CREATE TABLE `feed_impressions` (
   UNIQUE KEY `uq_impression` (`post_id`,`user_id`,`tenant_id`),
   KEY `idx_post_tenant` (`post_id`,`tenant_id`),
   KEY `idx_user_tenant` (`user_id`,`tenant_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=410 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=417 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `feed_likes`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -5010,7 +5012,7 @@ CREATE TABLE `laravel_migrations` (
   `migration` varchar(255) NOT NULL,
   `batch` int(11) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=44 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=45 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `leaderboard_cache`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -5389,7 +5391,7 @@ CREATE TABLE `login_attempts` (
   PRIMARY KEY (`id`),
   KEY `idx_identifier_type` (`identifier`,`type`),
   KEY `idx_attempted_at` (`attempted_at`)
-) ENGINE=InnoDB AUTO_INCREMENT=35257 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=35273 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `match_approvals`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -6373,7 +6375,7 @@ CREATE TABLE `notification_queue` (
   PRIMARY KEY (`id`),
   KEY `user_id` (`user_id`),
   CONSTRAINT `notification_queue_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=172 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=173 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `notification_settings`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -6417,7 +6419,7 @@ CREATE TABLE `notifications` (
   KEY `idx_notifications_user_read` (`user_id`,`is_read`),
   KEY `idx_notif_tenant_user_read_deleted` (`tenant_id`,`user_id`,`is_read`,`deleted_at`),
   CONSTRAINT `notifications_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=3517 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=3518 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `org_alert_settings`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -6823,7 +6825,7 @@ CREATE TABLE `personal_access_tokens` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `personal_access_tokens_token_unique` (`token`),
   KEY `personal_access_tokens_tokenable_type_tokenable_id_index` (`tokenable_type`,`tokenable_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=108 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=109 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `poll_options`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -9104,7 +9106,7 @@ CREATE TABLE `user_xp_log` (
   PRIMARY KEY (`id`),
   KEY `idx_user` (`tenant_id`,`user_id`),
   KEY `idx_user_xp_log_action` (`tenant_id`,`action`)
-) ENGINE=InnoDB AUTO_INCREMENT=16298 DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=16299 DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `user_xp_purchases`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -10333,7 +10335,8 @@ INSERT INTO `laravel_migrations` VALUES
 (40,'2026_04_03_200001_create_listing_images_table',17),
 (41,'2026_04_03_200002_add_availability_to_listings',17),
 (42,'2026_04_03_300001_add_last_notified_at_to_saved_searches',17),
-(43,'2026_04_04_110000_add_missing_columns_to_events',17);
+(43,'2026_04_04_110000_add_missing_columns_to_events',17),
+(44,'2026_04_05_104458_add_sort_order_and_is_active_to_categories_table',18);
 /*!40000 ALTER TABLE `laravel_migrations` ENABLE KEYS */;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
