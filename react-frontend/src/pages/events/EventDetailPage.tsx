@@ -155,7 +155,7 @@ export function EventDetailPage() {
       setError(null);
       const [eventRes, attendeesRes] = await Promise.all([
         api.get<Event>(`/v2/events/${id}`),
-        api.get<AttendeeWithCheckIn[]>(`/v2/events/${id}/attendees?per_page=50`).catch(() => ({ success: true, data: [] })),
+        api.get<AttendeeWithCheckIn[]>(`/v2/events/${id}/attendees?per_page=50&status=all`).catch(() => ({ success: true, data: [] })),
       ]);
 
       if (controller.signal.aborted) return;

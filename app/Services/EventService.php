@@ -552,7 +552,7 @@ class EventService
         $status = $filters['status'] ?? 'going';
         $cursor = $filters['cursor'] ?? null;
 
-        $validStatuses = ['going', 'interested', 'invited', 'attended'];
+        $validStatuses = ['going', 'interested', 'invited', 'attended', 'all'];
         if (!in_array($status, $validStatuses)) {
             $status = 'going';
         }
@@ -565,7 +565,17 @@ class EventService
             }
         }
 
-        $params = [$eventId, $status];
+        $tenantId = \App\Core\TenantContext::getId();
+
+        // Build WHERE clause: 'all' returns going + interested
+        if ($status === 'all') {
+            $params = [$eventId, 'going', 'interested', $tenantId];
+            $statusSql = 'r.status IN (?, ?)';
+        } else {
+            $params = [$eventId, $status, $tenantId];
+            $statusSql = 'r.status = ?';
+        }
+
         $cursorSql = '';
         if ($cursorId) {
             $cursorSql = ' AND r.id > ?';
@@ -573,15 +583,12 @@ class EventService
         }
         $params[] = $limit + 1;
 
-        $tenantId = \App\Core\TenantContext::getId();
-        array_splice($params, 2, 0, [$tenantId]);
-
         $rows = DB::select(
             "SELECT r.id as rsvp_id, r.user_id, r.status, r.created_at as rsvp_at,
                    u.name, u.first_name, u.last_name, u.avatar_url
             FROM event_rsvps r
             JOIN users u ON r.user_id = u.id
-            WHERE r.event_id = ? AND r.status = ? AND r.tenant_id = ?{$cursorSql}
+            WHERE r.event_id = ? AND {$statusSql} AND r.tenant_id = ?{$cursorSql}
             ORDER BY r.id ASC LIMIT ?",
             $params
         );
