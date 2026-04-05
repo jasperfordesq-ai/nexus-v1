@@ -379,6 +379,12 @@ class TenantContext
     public static function getSlugPrefix(): string
     {
         $tenant = self::get();
+
+        // Custom-domain tenants don't need slug in URLs — tenant is identified by domain
+        if (!empty($tenant['domain']) && ($tenant['id'] ?? 0) > 1) {
+            return '';
+        }
+
         $slug = $tenant['slug'] ?? '';
         return $slug ? '/' . $slug : '';
     }

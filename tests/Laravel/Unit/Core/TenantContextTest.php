@@ -61,11 +61,20 @@ class TenantContextTest extends TestCase
     // getSlugPrefix()
     // -------------------------------------------------------
 
-    public function test_getSlugPrefix_returns_slug_with_slash_for_non_master(): void
+    public function test_getSlugPrefix_returns_empty_for_custom_domain_tenant(): void
     {
+        // hour-timebank (tenant 2) has custom domain hour-timebank.ie
         TenantContext::setById($this->testTenantId);
         $prefix = TenantContext::getSlugPrefix();
-        $this->assertSame('/hour-timebank', $prefix);
+        $this->assertSame('', $prefix);
+    }
+
+    public function test_getSlugPrefix_returns_slug_with_slash_for_tenant_without_domain(): void
+    {
+        // public-sector-demo (tenant 3) has no custom domain
+        TenantContext::setById(3);
+        $prefix = TenantContext::getSlugPrefix();
+        $this->assertSame('/public-sector-demo', $prefix);
     }
 
     // -------------------------------------------------------
