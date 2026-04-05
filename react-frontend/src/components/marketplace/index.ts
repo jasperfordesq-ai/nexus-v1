@@ -16,3 +16,12 @@ export { MarketplaceFacetedSearch } from './MarketplaceFacetedSearch';
 export { CategoryChips } from './CategoryChips';
 export { MarketplaceEmptyState } from './MarketplaceEmptyState';
 export { BusinessSellerBadge } from './BusinessSellerBadge';
+export { SavedSearchCard } from './SavedSearchCard';
+export { CollectionCard } from './CollectionCard';
+export { PromotionSelector } from './PromotionSelector';
+
+// Phase 5 — NEXUS Differentiators
+export { GroupMarketplaceTab } from './GroupMarketplaceTab';
+export { HybridPriceDisplay } from './HybridPriceDisplay';
+export { CommunityDeliveryCard } from './CommunityDeliveryCard';
+export { AiReplySuggestion } from './AiReplySuggestion';

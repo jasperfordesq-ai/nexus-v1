@@ -1,0 +1,124 @@
+<?php
+// Copyright © 2024–2026 Jasper Ford
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Author: Jasper Ford
+// See NOTICE file for attribution and acknowledgements.
+
+namespace App\Http\Controllers\Api;
+
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
+use App\Core\TenantContext;
+use App\Services\MarketplaceCommunityDeliveryService;
+
+/**
+ * MarketplaceCommunityDeliveryController — Community delivery endpoints.
+ *
+ * Handles the lifecycle of community-powered delivery offers:
+ * offer, accept, confirm, and list delivery offers for an order.
+ */
+class MarketplaceCommunityDeliveryController extends BaseApiController
+{
+    protected bool $isV2Api = true;
+
+    private function ensureFeature(): void
+    {
+        if (!TenantContext::hasFeature('marketplace')) {
+            throw new \Illuminate\Http\Exceptions\HttpResponseException(
+                $this->respondWithError('FEATURE_DISABLED', 'The marketplace feature is not enabled for this community.', null, 403)
+            );
+        }
+    }
+
+    /**
+     * POST /v2/marketplace/orders/{orderId}/delivery-offers
+     *
+     * Community member offers to deliver an order for time credits.
+     */
+    public function store(Request $request, int $orderId): JsonResponse
+    {
+        $this->ensureFeature();
+
+        $userId = $request->user()?->id;
+        if (!$userId) {
+            return $this->respondWithError('UNAUTHORIZED', 'Authentication required.', null, 401);
+        }
+
+        $data = $request->validate([
+            'time_credits' => 'required|numeric|min:0.25|max:100',
+            'estimated_minutes' => 'nullable|integer|min:5|max:1440',
+            'notes' => 'nullable|string|max:500',
+        ]);
+
+        try {
+            $offer = MarketplaceCommunityDeliveryService::offerDelivery($orderId, $userId, $data);
+            return $this->respondWithData($offer, null, 201);
+        } catch (\InvalidArgumentException $e) {
+            return $this->respondWithError('VALIDATION_ERROR', $e->getMessage(), null, 422);
+        } catch (\RuntimeException $e) {
+            return $this->respondWithError('DELIVERY_OFFER_ERROR', $e->getMessage(), null, 400);
+        }
+    }
+
+    /**
+     * GET /v2/marketplace/orders/{orderId}/delivery-offers
+     *
+     * List all delivery offers for an order.
+     */
+    public function index(Request $request, int $orderId): JsonResponse
+    {
+        $this->ensureFeature();
+
+        $userId = $request->user()?->id;
+        if (!$userId) {
+            return $this->respondWithError('UNAUTHORIZED', 'Authentication required.', null, 401);
+        }
+
+        $offers = MarketplaceCommunityDeliveryService::getDeliveryOffers($orderId);
+        return $this->respondWithData($offers);
+    }
+
+    /**
+     * PUT /v2/marketplace/orders/{orderId}/delivery-offers/{delivererId}/accept
+     *
+     * Accept a delivery offer. Declines all other pending offers.
+     */
+    public function accept(Request $request, int $orderId, int $delivererId): JsonResponse
+    {
+        $this->ensureFeature();
+
+        $userId = $request->user()?->id;
+        if (!$userId) {
+            return $this->respondWithError('UNAUTHORIZED', 'Authentication required.', null, 401);
+        }
+
+        try {
+            MarketplaceCommunityDeliveryService::acceptDeliveryOffer($orderId, $delivererId);
+            return $this->respondWithData(['message' => 'Delivery offer accepted']);
+        } catch (\RuntimeException $e) {
+            return $this->respondWithError('DELIVERY_ACCEPT_ERROR', $e->getMessage(), null, 400);
+        }
+    }
+
+    /**
+     * PUT /v2/marketplace/orders/{orderId}/delivery-offers/{delivererId}/confirm
+     *
+     * Confirm delivery completion and award time credits.
+     */
+    public function confirm(Request $request, int $orderId, int $delivererId): JsonResponse
+    {
+        $this->ensureFeature();
+
+        $userId = $request->user()?->id;
+        if (!$userId) {
+            return $this->respondWithError('UNAUTHORIZED', 'Authentication required.', null, 401);
+        }
+
+        try {
+            MarketplaceCommunityDeliveryService::confirmDelivery($orderId, $delivererId);
+            return $this->respondWithData(['message' => 'Delivery confirmed, time credits awarded']);
+        } catch (\RuntimeException $e) {
+            return $this->respondWithError('DELIVERY_CONFIRM_ERROR', $e->getMessage(), null, 400);
+        }
+    }
+}

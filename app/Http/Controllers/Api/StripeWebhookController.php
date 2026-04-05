@@ -7,6 +7,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Services\StripeDonationService;
+use App\Services\MarketplacePaymentService;
 use App\Services\StripeService;
 use App\Services\StripeSubscriptionService;
 use Illuminate\Http\JsonResponse;
@@ -86,6 +87,7 @@ class StripeWebhookController extends BaseApiController
                 'payment_intent.succeeded' => $this->handlePaymentSucceeded($event->data->object),
                 'payment_intent.payment_failed' => $this->handlePaymentFailed($event->data->object),
                 'charge.refunded' => $this->handleChargeRefunded($event->data->object),
+                'account.updated' => $this->handleAccountUpdated($event->data->object),
                 default => Log::info("Stripe webhook: unhandled event type {$event->type}"),
             };
         } catch (\Exception $e) {
@@ -147,6 +149,9 @@ class StripeWebhookController extends BaseApiController
     private function handlePaymentSucceeded(object $paymentIntent): void
     {
         StripeDonationService::handlePaymentSucceeded($paymentIntent);
+
+        // Also dispatch to marketplace handler (it checks nexus_type metadata internally)
+        MarketplacePaymentService::handleWebhookEvent('payment_intent.succeeded', $paymentIntent);
     }
 
     private function handlePaymentFailed(object $paymentIntent): void
@@ -157,5 +162,14 @@ class StripeWebhookController extends BaseApiController
     private function handleChargeRefunded(object $charge): void
     {
         StripeDonationService::handleChargeRefunded($charge);
+
+        // Also dispatch to marketplace handler (it checks for marketplace payments internally)
+        MarketplacePaymentService::handleWebhookEvent('charge.refunded', $charge);
+    }
+
+    private function handleAccountUpdated(object $account): void
+    {
+        // Connect account updates — marketplace seller onboarding
+        MarketplacePaymentService::handleWebhookEvent('account.updated', $account);
     }
 }

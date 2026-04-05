@@ -798,6 +798,45 @@ Route::post('/v2/marketplace/orders/{id}/rate', [\App\Http\Controllers\Api\Marke
 Route::get('/v2/marketplace/orders/{id}/ratings', [\App\Http\Controllers\Api\MarketplaceOrderController::class, 'orderRatings']);
 Route::post('/v2/marketplace/orders/{id}/dispute', [\App\Http\Controllers\Api\MarketplaceOrderController::class, 'dispute']);
 
+// Marketplace Payments — Stripe Connect
+Route::post('/v2/marketplace/payments/create-intent', [\App\Http\Controllers\Api\MarketplacePaymentController::class, 'createIntent']);
+Route::post('/v2/marketplace/payments/confirm', [\App\Http\Controllers\Api\MarketplacePaymentController::class, 'confirm']);
+Route::get('/v2/marketplace/payments/{id}/status', [\App\Http\Controllers\Api\MarketplacePaymentController::class, 'status']);
+Route::get('/v2/marketplace/seller/payouts', [\App\Http\Controllers\Api\MarketplacePaymentController::class, 'payouts']);
+Route::get('/v2/marketplace/seller/balance', [\App\Http\Controllers\Api\MarketplacePaymentController::class, 'balance']);
+Route::post('/v2/marketplace/seller/onboard', [\App\Http\Controllers\Api\MarketplacePaymentController::class, 'onboard']);
+
+// Marketplace Discovery — Saved searches & collections
+Route::get('/v2/marketplace/saved-searches', [\App\Http\Controllers\Api\MarketplaceDiscoveryController::class, 'listSavedSearches']);
+Route::post('/v2/marketplace/saved-searches', [\App\Http\Controllers\Api\MarketplaceDiscoveryController::class, 'storeSavedSearch']);
+Route::delete('/v2/marketplace/saved-searches/{id}', [\App\Http\Controllers\Api\MarketplaceDiscoveryController::class, 'destroySavedSearch']);
+Route::get('/v2/marketplace/collections', [\App\Http\Controllers\Api\MarketplaceDiscoveryController::class, 'listCollections']);
+Route::post('/v2/marketplace/collections', [\App\Http\Controllers\Api\MarketplaceDiscoveryController::class, 'storeCollection']);
+Route::put('/v2/marketplace/collections/{id}', [\App\Http\Controllers\Api\MarketplaceDiscoveryController::class, 'updateCollection']);
+Route::delete('/v2/marketplace/collections/{id}', [\App\Http\Controllers\Api\MarketplaceDiscoveryController::class, 'destroyCollection']);
+Route::post('/v2/marketplace/collections/{id}/items', [\App\Http\Controllers\Api\MarketplaceDiscoveryController::class, 'addCollectionItem']);
+Route::delete('/v2/marketplace/collections/{id}/items/{listingId}', [\App\Http\Controllers\Api\MarketplaceDiscoveryController::class, 'removeCollectionItem']);
+Route::get('/v2/marketplace/collections/{id}/items', [\App\Http\Controllers\Api\MarketplaceDiscoveryController::class, 'listCollectionItems']);
+
+// Marketplace Promotions — Paid listing promotions
+Route::get('/v2/marketplace/promotions/products', [\App\Http\Controllers\Api\MarketplacePromotionController::class, 'products']);
+Route::post('/v2/marketplace/listings/{id}/promote', [\App\Http\Controllers\Api\MarketplacePromotionController::class, 'promote']);
+Route::get('/v2/marketplace/listings/{id}/promotion', [\App\Http\Controllers\Api\MarketplacePromotionController::class, 'showPromotion']);
+Route::get('/v2/marketplace/promotions/mine', [\App\Http\Controllers\Api\MarketplacePromotionController::class, 'myPromotions']);
+
+// Marketplace Group — Group-scoped marketplace (MKT37)
+Route::get('/v2/marketplace/groups/{groupId}/listings', [\App\Http\Controllers\Api\MarketplaceGroupController::class, 'listings']);
+Route::get('/v2/marketplace/groups/{groupId}/stats', [\App\Http\Controllers\Api\MarketplaceGroupController::class, 'stats']);
+
+// Marketplace Community Delivery — Peer-to-peer delivery for time credits (MKT39)
+Route::post('/v2/marketplace/orders/{orderId}/delivery-offers', [\App\Http\Controllers\Api\MarketplaceCommunityDeliveryController::class, 'store']);
+Route::get('/v2/marketplace/orders/{orderId}/delivery-offers', [\App\Http\Controllers\Api\MarketplaceCommunityDeliveryController::class, 'index']);
+Route::put('/v2/marketplace/orders/{orderId}/delivery-offers/{delivererId}/accept', [\App\Http\Controllers\Api\MarketplaceCommunityDeliveryController::class, 'accept']);
+Route::put('/v2/marketplace/orders/{orderId}/delivery-offers/{delivererId}/confirm', [\App\Http\Controllers\Api\MarketplaceCommunityDeliveryController::class, 'confirm']);
+
+// Marketplace AI — Auto-reply for sellers (MKT32)
+Route::post('/v2/marketplace/listings/{id}/auto-reply', [\App\Http\Controllers\Api\MarketplaceAiController::class, 'autoReply']);
+
 }); // End Route::middleware('auth:sanctum')
 
 // ============================================
@@ -1968,6 +2007,9 @@ Route::post('/v2/webhooks/identity/{provider_slug}', [\App\Http\Controllers\Api\
 
 // Stripe webhook (no auth, no CSRF — signature verified in controller)
 Route::post('/v2/webhooks/stripe', [\App\Http\Controllers\Api\StripeWebhookController::class, 'handleWebhook'])->middleware('throttle:120,1');
+
+// Marketplace Stripe webhook (separate endpoint for Connect events with marketplace-specific secret)
+Route::post('/v2/marketplace/webhooks/stripe', [\App\Http\Controllers\Api\StripeWebhookController::class, 'handleWebhook'])->middleware('throttle:120,1');
 
 // Public billing — available plans (pricing page, no auth required)
 Route::get('/v2/billing/plans', [\App\Http\Controllers\Api\AdminBillingController::class, 'getPlansPublic']);

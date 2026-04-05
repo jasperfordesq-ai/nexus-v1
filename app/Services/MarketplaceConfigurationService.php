@@ -187,6 +187,11 @@ class MarketplaceConfigurationService
         return (bool) self::get(self::CONFIG_ALLOW_HYBRID_PRICING, false);
     }
 
+    public static function allowCommunityDelivery(): bool
+    {
+        return (bool) self::get(self::CONFIG_ALLOW_COMMUNITY_DELIVERY, false);
+    }
+
     // =========================================================================
     // Internal helpers
     // =========================================================================

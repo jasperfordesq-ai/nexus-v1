@@ -199,6 +199,8 @@ const MarketplaceCategoryPage = lazyWithRetry(() => import('./pages/marketplace/
 const EditMarketplaceListingPage = lazyWithRetry(() => import('./pages/marketplace/EditMarketplaceListingPage'));
 const MyListingsPage = lazyWithRetry(() => import('./pages/marketplace/MyListingsPage'));
 const MyOffersPage = lazyWithRetry(() => import('./pages/marketplace/MyOffersPage'));
+const MarketplaceCollectionsPage = lazyWithRetry(() => import('./pages/marketplace/MarketplaceCollectionsPage'));
+const FreeItemsPage = lazyWithRetry(() => import('./pages/marketplace/FreeItemsPage'));
 
 // Static Pages
 const DevelopmentStatusPage = lazyWithRetry(() => import('@/pages/public/DevelopmentStatusPage'));
@@ -422,6 +424,20 @@ function AppRoutes() {
           <FeatureGate feature="marketplace" redirect="/">
             <FeatureErrorBoundary featureName="Marketplace">
               <MyOffersPage />
+            </FeatureErrorBoundary>
+          </FeatureGate>
+        } />
+        <Route path="marketplace/collections" element={
+          <FeatureGate feature="marketplace" redirect="/">
+            <FeatureErrorBoundary featureName="Marketplace">
+              <MarketplaceCollectionsPage />
+            </FeatureErrorBoundary>
+          </FeatureGate>
+        } />
+        <Route path="marketplace/free" element={
+          <FeatureGate feature="marketplace" fallback={<ComingSoonPage feature="Marketplace" />}>
+            <FeatureErrorBoundary featureName="Marketplace">
+              <FreeItemsPage />
             </FeatureErrorBoundary>
           </FeatureGate>
         } />

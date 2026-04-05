@@ -139,3 +139,138 @@ export interface MarketplaceSellerProfile {
   member_since?: string;
   joined_marketplace_at?: string;
 }
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Saved Search Types
+// ─────────────────────────────────────────────────────────────────────────────
+
+export interface MarketplaceSavedSearch {
+  id: number;
+  name: string;
+  search_query?: string | null;
+  filters?: {
+    category_id?: number;
+    price_min?: number;
+    price_max?: number;
+    condition?: string;
+    location?: string;
+    radius?: number;
+  } | null;
+  alert_frequency: 'instant' | 'daily' | 'weekly';
+  alert_channel: 'email' | 'push' | 'both';
+  is_active: boolean;
+  last_alerted_at?: string | null;
+  created_at: string;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Collection Types
+// ─────────────────────────────────────────────────────────────────────────────
+
+export interface MarketplaceCollection {
+  id: number;
+  name: string;
+  description?: string | null;
+  is_public: boolean;
+  item_count: number;
+  created_at: string;
+  updated_at?: string;
+}
+
+export interface MarketplaceCollectionItem {
+  collection_item_id: number;
+  note?: string | null;
+  added_at: string;
+  listing: {
+    id: number;
+    title: string;
+    price: number | null;
+    price_currency: string;
+    price_type: string;
+    condition: string | null;
+    location?: string;
+    status: string;
+    image: { url: string; thumbnail_url?: string; alt_text?: string } | null;
+    category?: { id: number; name: string; slug: string; icon?: string } | null;
+    user?: { id: number; name: string; avatar_url?: string } | null;
+    created_at: string;
+  };
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Promotion Types
+// ─────────────────────────────────────────────────────────────────────────────
+
+export interface MarketplacePromotionProduct {
+  type: 'bump' | 'featured' | 'top_of_category' | 'homepage_carousel';
+  label: string;
+  description: string;
+  price: number;
+  currency: string;
+  duration_hours: number;
+}
+
+export interface MarketplacePromotion {
+  id: number;
+  promotion_type: 'bump' | 'featured' | 'top_of_category' | 'homepage_carousel';
+  amount_paid: number;
+  currency: string;
+  started_at: string;
+  expires_at: string;
+  is_active: boolean;
+  impressions: number;
+  clicks: number;
+  listing?: {
+    id: number;
+    title: string;
+    status: string;
+  } | null;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Group Marketplace Types (Phase 5 — MKT37)
+// ─────────────────────────────────────────────────────────────────────────────
+
+export interface GroupMarketplaceStats {
+  active_listings: number;
+  total_listed: number;
+  total_sellers: number;
+  categories: Array<{
+    id: number;
+    name: string;
+    slug: string;
+    icon?: string;
+    listing_count: number;
+  }>;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Community Delivery Types (Phase 5 — MKT39)
+// ─────────────────────────────────────────────────────────────────────────────
+
+export interface MarketplaceDeliveryOffer {
+  id: number;
+  order_id: number;
+  deliverer_id: number;
+  time_credits: number;
+  estimated_minutes: number | null;
+  notes: string | null;
+  status: 'pending' | 'accepted' | 'declined' | 'completed' | 'cancelled';
+  accepted_at: string | null;
+  completed_at: string | null;
+  created_at: string;
+  deliverer?: {
+    id: number;
+    name: string;
+    avatar_url: string | null;
+    is_verified: boolean;
+  };
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// AI Reply Types (Phase 5 — MKT32)
+// ─────────────────────────────────────────────────────────────────────────────
+
+export interface AiAutoReplyResponse {
+  reply: string;
+}

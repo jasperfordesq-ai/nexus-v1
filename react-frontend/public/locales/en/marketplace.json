@@ -274,7 +274,8 @@
   "delivery_method": {
     "pickup": "Pickup Only",
     "shipping": "Shipping Only",
-    "both": "Pickup or Shipping"
+    "both": "Pickup or Shipping",
+    "community_delivery": "Community Delivery"
   },
 
   "sort": {
@@ -405,5 +406,138 @@
     "counter_message_placeholder": "Explain your counter-offer...",
     "counter_sent_success": "Counter-offer sent",
     "send_counter": "Send Counter"
+  },
+
+  "collections": {
+    "page_title": "My Collections",
+    "meta_description": "Manage your marketplace collections and saved searches.",
+    "subtitle": "Organize and track your favorite marketplace items",
+    "tab_collections": "Collections",
+    "create": "New Collection",
+    "create_title": "Create Collection",
+    "name_label": "Name",
+    "name_placeholder": "e.g. Gift Ideas, Home Decor...",
+    "description_label": "Description (optional)",
+    "description_placeholder": "What is this collection for?",
+    "make_public": "Make this collection public",
+    "public": "Public",
+    "private": "Private",
+    "item_count": "{{count}} items",
+    "item_count_one": "{{count}} item",
+    "item_count_other": "{{count}} items",
+    "category": "Category",
+    "created": "Collection created",
+    "create_error": "Failed to create collection",
+    "deleted": "Collection deleted",
+    "delete_error": "Failed to delete collection",
+    "load_error": "Failed to load collections",
+    "items_load_error": "Failed to load items",
+    "remove_item": "Remove",
+    "remove_item_error": "Failed to remove item",
+    "empty_title": "No Items Yet",
+    "empty_description": "Add items from marketplace listings to this collection.",
+    "browse_marketplace": "Browse Marketplace",
+    "empty_collections_title": "No Collections Yet",
+    "empty_collections_description": "Create a collection to organize your favorite marketplace items.",
+    "sign_in_title": "Sign In Required",
+    "sign_in_description": "Sign in to manage your collections and saved searches."
+  },
+
+  "saved_searches": {
+    "tab_title": "Saved Searches",
+    "empty_title": "No Saved Searches",
+    "empty_description": "Save a search from the marketplace to get alerts when new matching items are listed.",
+    "browse": "Search Marketplace",
+    "deleted": "Saved search deleted",
+    "delete_error": "Failed to delete",
+    "delete": "Delete saved search",
+    "toggle_active": "Toggle active",
+    "frequency_instant": "Instant",
+    "frequency_daily": "Daily",
+    "frequency_weekly": "Weekly",
+    "channel_email": "Email",
+    "channel_push": "Push",
+    "channel_both": "Email & Push"
+  },
+
+  "promotions": {
+    "title": "Promote Listing",
+    "load_error": "Failed to load promotion options.",
+    "create_error": "Failed to create promotion.",
+    "confirm_promote": "Promote for {{price}}",
+    "select_type": "Select a promotion",
+    "free_label": "Free",
+    "bump": "Bump to Top",
+    "featured": "Featured Listing",
+    "top_of_category": "Top of Category",
+    "homepage_carousel": "Homepage Carousel"
+  },
+
+  "free": {
+    "page_title": "Free Items",
+    "meta_description": "Browse free items available in your community marketplace.",
+    "subtitle": "Items available for free from your community",
+    "give_away": "Give Something Away",
+    "cta_title": "Declutter and help your community",
+    "cta_description": "List items you no longer need as free and give them a new home.",
+    "unable_to_load": "Unable to load free items",
+    "load_more_failed": "Failed to load more items",
+    "no_items_title": "No Free Items",
+    "no_items_description": "There are no free items available right now. Check back later or be the first to give something away!"
+  },
+
+  "group_marketplace": {
+    "active_listings": "active listings",
+    "total_listed": "total listed",
+    "sellers": "sellers",
+    "sell_to_group": "Sell to Group",
+    "empty_title": "No Group Listings Yet",
+    "empty_description": "Be the first group member to list something for sale!",
+    "tab_label": "Marketplace"
+  },
+
+  "hybrid_pricing": {
+    "tooltip": "Time credits earned through community timebanking",
+    "explanation": "Hybrid pricing lets you pay with a combination of regular currency and time credits you have earned through community service.",
+    "label": "Pay with cash + time credits",
+    "learn_more": "What are time credits?"
+  },
+
+  "community_delivery": {
+    "title": "Community Delivery",
+    "description": "A community member can deliver this item and earn time credits.",
+    "tooltip": "Community delivery is a NEXUS feature where community members offer to deliver items for time credits instead of cash. This supports the local community and the timebanking ecosystem.",
+    "step1": "Community members offer to deliver",
+    "step2": "Deliverer earns time credits on completion",
+    "step3": "Buyer confirms delivery, credits are transferred",
+    "offers_title": "Delivery Offers",
+    "unknown": "Unknown",
+    "accept": "Accept",
+    "confirm": "Confirm Delivery",
+    "offer_to_deliver": "Offer to Deliver",
+    "offer_modal_title": "Offer to Deliver",
+    "offer_modal_description": "Offer to deliver this item and earn time credits. The buyer/seller will review your offer.",
+    "time_credits_label": "Time Credits (hours)",
+    "time_credits_hint": "How many time credits you want to earn for this delivery",
+    "estimated_time_label": "Estimated Delivery Time (minutes)",
+    "notes_label": "Notes (optional)",
+    "notes_placeholder": "Any details about your delivery availability...",
+    "send_offer": "Send Offer",
+    "offer_sent": "Delivery offer sent!",
+    "offer_failed": "Failed to send delivery offer",
+    "offer_accepted": "Delivery offer accepted!",
+    "accept_failed": "Failed to accept offer",
+    "delivery_confirmed": "Delivery confirmed! Time credits awarded.",
+    "confirm_failed": "Failed to confirm delivery"
+  },
+
+  "ai_reply": {
+    "suggest": "Suggest Reply",
+    "suggested_reply": "AI Suggested Reply",
+    "regenerate": "Regenerate",
+    "copy": "Copy",
+    "copied": "Copied",
+    "use_reply": "Use This Reply",
+    "error": "Failed to generate a reply. Please try again."
   }
 }

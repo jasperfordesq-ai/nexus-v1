@@ -77,6 +77,22 @@ $app = Application::configure(basePath: dirname(__DIR__))
             ->hourly()
             ->name('marketplace:expire-stale-offers')
             ->withoutOverlapping(5);
+
+        // Marketplace: deactivate expired promotions
+        $schedule->call(function () {
+            \App\Services\MarketplacePromotionService::deactivateExpired();
+        })
+            ->hourly()
+            ->name('marketplace:deactivate-expired-promotions')
+            ->withoutOverlapping(5);
+
+        // Marketplace: auto-release escrow holds past their release_after date
+        $schedule->call(function () {
+            \App\Services\MarketplaceEscrowService::processAutoReleases();
+        })
+            ->hourly()
+            ->name('marketplace:process-escrow-releases')
+            ->withoutOverlapping(5);
     })
     ->withRouting(
         // Routes loaded by RouteServiceProvider (no /api prefix).
