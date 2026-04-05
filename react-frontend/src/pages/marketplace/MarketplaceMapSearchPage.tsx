@@ -40,8 +40,6 @@ import { EmptyState } from '@/components/feedback';
 import { MapSearchView } from '@/components/marketplace/MapSearchView';
 import { MarketplaceListingGrid } from '@/components/marketplace';
 import type { MarketplaceListingItem } from '@/types/marketplace';
-import type { MarketplaceListingItem } from '@/types/marketplace';
-import type { ApiMarketplaceListing } from '@/lib/marketplace-utils';
 import { useAuth, useToast, useTenant } from '@/contexts';
 import { useGeolocation } from '@/hooks/useGeolocation';
 import { usePageTitle } from '@/hooks';
@@ -53,7 +51,7 @@ import { PageMeta } from '@/components/seo/PageMeta';
 // Types
 // ─────────────────────────────────────────────────────────────────────────────
 
-interface NearbyListing extends ApiMarketplaceListing {
+interface NearbyListing extends MarketplaceListingItem {
   latitude?: number;
   longitude?: number;
   distance_km?: number;

@@ -19,8 +19,6 @@ import { GlassCard } from '@/components/ui';
 import { EmptyState } from '@/components/feedback';
 import { MarketplaceListingGrid } from '@/components/marketplace';
 import type { MarketplaceListingItem } from '@/types/marketplace';
-import type { MarketplaceListingItem } from '@/types/marketplace';
-import type { ApiMarketplaceListing } from '@/lib/marketplace-utils';
 import { useAuth, useToast, useTenant } from '@/contexts';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
@@ -60,7 +58,7 @@ export function FreeItemsPage() {
         params.set('cursor', cursorRef.current);
       }
 
-      const response = await api.get<ApiMarketplaceListing[]>(
+      const response = await api.get<MarketplaceListingItem[]>(
         `/v2/marketplace/listings?${params}`,
       );
 

@@ -36,8 +36,6 @@ import {
   CategoryChips,
 } from '@/components/marketplace';
 import type { MarketplaceListingItem, MarketplaceCategory } from '@/types/marketplace';
-import type { MarketplaceListingItem } from '@/types/marketplace';
-import type { ApiMarketplaceListing } from '@/lib/marketplace-utils';
 import { useAuth, useToast, useTenant } from '@/contexts';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
@@ -145,7 +143,7 @@ export function MarketplacePage() {
     let cancelled = false;
     const load = async () => {
       try {
-        const response = await api.get<ApiMarketplaceListing[]>('/v2/marketplace/listings/featured');
+        const response = await api.get<MarketplaceListingItem[]>('/v2/marketplace/listings/featured');
         if (!cancelled && response.success && response.data) {
           setFeaturedListings(response.data as MarketplaceListingItem[]);
         }
@@ -175,7 +173,7 @@ export function MarketplacePage() {
         params.set('cursor', cursorRef.current);
       }
 
-      const response = await api.get<ApiMarketplaceListing[]>(`/v2/marketplace/listings?${params}`);
+      const response = await api.get<MarketplaceListingItem[]>(`/v2/marketplace/listings?${params}`);
       if (response.success && response.data) {
         const mapped = response.data as MarketplaceListingItem[];
         if (append) {

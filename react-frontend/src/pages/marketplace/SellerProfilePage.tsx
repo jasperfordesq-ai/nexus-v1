@@ -40,8 +40,6 @@ import { GlassCard } from '@/components/ui';
 import { EmptyState } from '@/components/feedback';
 import { MarketplaceListingGrid } from '@/components/marketplace';
 import type { MarketplaceListingItem } from '@/types/marketplace';
-import type { MarketplaceListingItem } from '@/types/marketplace';
-import type { ApiMarketplaceListing } from '@/lib/marketplace-utils';
 import { useAuth, useToast, useTenant } from '@/contexts';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
@@ -157,7 +155,7 @@ export function SellerProfilePage() {
     const load = async () => {
       setIsLoadingListings(true);
       try {
-        const response = await api.get<ApiMarketplaceListing[]>(
+        const response = await api.get<MarketplaceListingItem[]>(
           `/v2/marketplace/sellers/${id}/listings?limit=50`
         );
         if (!cancelled && response.success && response.data) {
