@@ -671,8 +671,8 @@ class MarketplaceListingService
         try {
             $coords = GeocodingService::geocode($listing->location);
             if ($coords) {
-                $listing->latitude = $coords['lat'];
-                $listing->longitude = $coords['lng'];
+                $listing->latitude = $coords['latitude'];
+                $listing->longitude = $coords['longitude'];
                 $listing->save();
             }
         } catch (\Throwable $e) {

@@ -293,23 +293,7 @@ export function CreateMarketplaceListingPage() {
 
     setIsSubmitting(true);
     try {
-      // First upload images
-      let uploadedImageIds: number[] = [];
-      if (images.length > 0) {
-        const formData = new FormData();
-        images.forEach((img, idx) => {
-          formData.append(`images[${idx}]`, img.file);
-        });
-        const uploadResponse = await api.upload<{ image_ids: number[] }>(
-          '/v2/marketplace/listings/images',
-          formData
-        );
-        if (uploadResponse.success && uploadResponse.data?.image_ids) {
-          uploadedImageIds = uploadResponse.data.image_ids;
-        }
-      }
-
-      // Create listing
+      // Create listing first
       const body: Record<string, unknown> = {
         title: title.trim(),
         description: description.trim(),
@@ -317,12 +301,11 @@ export function CreateMarketplaceListingPage() {
         price_type: priceType,
         delivery_method: deliveryMethod,
         quantity: parseInt(quantity) || 1,
-        image_ids: uploadedImageIds,
       };
 
       if (categoryId) body.category_id = parseInt(categoryId);
       if (priceType !== 'free' && price) body.price = parseFloat(price);
-      if (currency) body.currency = currency;
+      if (currency) body.price_currency = currency;
       if (location.trim()) body.location = location.trim();
 
       // Include template fields
@@ -330,18 +313,30 @@ export function CreateMarketplaceListingPage() {
         Object.entries(templateFields).filter(([, v]) => v.trim() !== '')
       );
       if (Object.keys(filledTemplateFields).length > 0) {
-        body.template_fields = filledTemplateFields;
+        body.template_data = filledTemplateFields;
       }
 
       const response = await api.post<{ id: number }>('/v2/marketplace/listings', body);
-      if (response.success && response.data?.id) {
-        toast.success(t('create.created_success', 'Listing created successfully!'));
-        // Cleanup blob URLs
-        images.forEach((img) => URL.revokeObjectURL(img.url));
-        navigate(tenantPath(`/marketplace/${response.data.id}`));
-      } else {
+      if (!response.success || !response.data?.id) {
         toast.error(response.error || t('create.created_error', 'Failed to create listing'));
+        return;
       }
+
+      const listingId = response.data.id;
+
+      // Then upload images to the created listing
+      if (images.length > 0) {
+        const formData = new FormData();
+        images.forEach((img, idx) => {
+          formData.append(`images[${idx}]`, img.file);
+        });
+        await api.upload(`/v2/marketplace/listings/${listingId}/images`, formData);
+      }
+
+      toast.success(t('create.created_success', 'Listing created successfully!'));
+      // Cleanup blob URLs
+      images.forEach((img) => URL.revokeObjectURL(img.url));
+      navigate(tenantPath(`/marketplace/${listingId}`));
     } catch (err) {
       logError('Failed to create marketplace listing', err);
       toast.error(t('create.created_error_retry', 'Failed to create listing. Please try again.'));
