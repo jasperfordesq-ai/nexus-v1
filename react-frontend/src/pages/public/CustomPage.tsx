@@ -115,7 +115,7 @@ export function CustomPage() {
 
       <div className="max-w-4xl mx-auto px-4 py-8 space-y-6">
         <Breadcrumbs items={[
-          { label: t('not_found.go_home', 'Home'), href: tenantPath('/') },
+          { label: t('not_found.go_home', 'Home'), href: '/' },
           { label: page.title },
         ]} />
 

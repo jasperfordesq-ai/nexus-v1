@@ -48,7 +48,7 @@ export function AdminSettings() {
   const { t } = useTranslation('admin');
   usePageTitle(t('system.page_title'));
   const toast = useToast();
-  const { tenant } = useTenant();
+  const { tenant, tenantPath } = useTenant();
 
   const [form, setForm] = useState<SettingsForm>(DEFAULT_SETTINGS);
   const [originalForm, setOriginalForm] = useState<SettingsForm>(DEFAULT_SETTINGS);
@@ -205,7 +205,7 @@ export function AdminSettings() {
         <Card shadow="sm">
           <CardHeader className="flex items-center justify-between">
             <h3 className="text-lg font-semibold">Registration & Access</h3>
-            <Link to="../settings/registration-policy">
+            <Link to={tenantPath("/admin/settings/registration-policy")}>
               <Button size="sm" variant="flat" color="primary" startContent={<ShieldCheck size={14} />}>
                 Advanced Policy
               </Button>

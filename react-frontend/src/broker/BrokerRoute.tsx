@@ -25,7 +25,7 @@ export function BrokerRoute() {
   }
 
   if (!isAuthenticated) {
-    return <Navigate to={tenantPath('/login')} state={{ from: location.pathname }} replace />;
+    return <Navigate to={tenantPath('/login')} state={{ from: tenantPath(location.pathname) }} replace />;
   }
 
   const role = (user?.role as string) || '';

@@ -141,7 +141,7 @@ export function FederationConnectionsPage() {
       <PageMeta title="Federation Connections" noIndex />
       <Breadcrumbs
         items={[
-          { label: t('connections.breadcrumb_federation', 'Federation'), href: tenantPath('/federation') },
+          { label: t('connections.breadcrumb_federation', 'Federation'), href: '/federation' },
           { label: t('connections.breadcrumb_connections', 'Connections') },
         ]}
       />

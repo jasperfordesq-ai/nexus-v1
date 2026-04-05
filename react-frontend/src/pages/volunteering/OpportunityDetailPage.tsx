@@ -739,7 +739,7 @@ export function OpportunityDetailPage() {
 
       <Breadcrumbs
         items={[
-          { label: t('breadcrumb_volunteering', 'Volunteering'), href: tenantPath('/volunteering') },
+          { label: t('breadcrumb_volunteering', 'Volunteering'), href: '/volunteering' },
           { label: opp.title },
         ]}
       />

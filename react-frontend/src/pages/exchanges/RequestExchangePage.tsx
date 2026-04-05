@@ -194,8 +194,8 @@ export function RequestExchangePage() {
       <PageMeta title="Request Exchange" noIndex />
       {/* Breadcrumbs */}
       <Breadcrumbs items={[
-        { label: t('request.breadcrumb_listings'), href: tenantPath('/listings') },
-        { label: listing?.title || t('request.breadcrumb_listing'), href: id ? tenantPath(`/listings/${id}`) : tenantPath('/listings') },
+        { label: t('request.breadcrumb_listings'), href: '/listings' },
+        { label: listing?.title || t('request.breadcrumb_listing'), href: id ? `/listings/${id}` : '/listings' },
         { label: t('request.breadcrumb_request') },
       ]} />
 

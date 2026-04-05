@@ -156,8 +156,8 @@ export function FederationPartnerDetailPage() {
       <div className="space-y-6">
         <Breadcrumbs
           items={[
-            { label: t('partner_detail.breadcrumb_federation'), href: tenantPath('/federation') },
-            { label: t('partner_detail.breadcrumb_partners'), href: tenantPath('/federation/partners') },
+            { label: t('partner_detail.breadcrumb_federation'), href: '/federation' },
+            { label: t('partner_detail.breadcrumb_partners'), href: '/federation/partners' },
             { label: t('partner_detail.breadcrumb_not_found') },
           ]}
         />
@@ -199,8 +199,8 @@ export function FederationPartnerDetailPage() {
       {/* Breadcrumbs */}
       <Breadcrumbs
         items={[
-          { label: t('partner_detail.breadcrumb_federation'), href: tenantPath('/federation') },
-          { label: t('partner_detail.breadcrumb_partners'), href: tenantPath('/federation/partners') },
+          { label: t('partner_detail.breadcrumb_federation'), href: '/federation' },
+          { label: t('partner_detail.breadcrumb_partners'), href: '/federation/partners' },
           { label: partner.name },
         ]}
       />

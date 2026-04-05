@@ -25,7 +25,7 @@ export function AdminRoute() {
   }
 
   if (!isAuthenticated) {
-    return <Navigate to={tenantPath('/login')} state={{ from: location.pathname }} replace />;
+    return <Navigate to={tenantPath('/login')} state={{ from: tenantPath(location.pathname) }} replace />;
   }
 
   // The User type only defines role as 'member' | 'admin' | 'moderator',

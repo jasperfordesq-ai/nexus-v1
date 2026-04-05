@@ -43,7 +43,7 @@ import { GlassCard } from '@/components/ui';
 import { Breadcrumbs } from '@/components/navigation';
 import { EmptyState } from '@/components/feedback';
 import { PageMeta } from '@/components/seo';
-import { useToast, useTenant } from '@/contexts';
+import { useToast } from '@/contexts';
 import { usePageTitle } from '@/hooks';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
@@ -57,7 +57,6 @@ export function FederationEventsPage() {
   const { t } = useTranslation('federation');
   usePageTitle(t('events.page_title'));
   const toast = useToast();
-  const { tenantPath } = useTenant();
   const [searchParams, setSearchParams] = useSearchParams();
 
   // Data
@@ -209,7 +208,7 @@ export function FederationEventsPage() {
       {/* Breadcrumbs */}
       <Breadcrumbs
         items={[
-          { label: t('events.breadcrumb_federation'), href: tenantPath('/federation') },
+          { label: t('events.breadcrumb_federation'), href: '/federation' },
           { label: t('events.breadcrumb_events') },
         ]}
       />

@@ -12,7 +12,7 @@
 import { useState, useCallback, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
-  Tabs, Tab, Button, Chip, Avatar,
+  Tabs, Tab, Button, Chip, Avatar, Checkbox,
   Dropdown, DropdownTrigger, DropdownMenu, DropdownItem,
 } from '@heroui/react';
 import { Trash2, Users, Eye, EyeOff, Lock, MoreVertical, Power, PowerOff } from 'lucide-react';
@@ -173,11 +173,10 @@ export function GroupList() {
     {
       key: 'select',
       label: (
-        <input
-          type="checkbox"
-          checked={selectedIds.size === items.length && items.length > 0}
-          onChange={(e) => {
-            if (e.target.checked) {
+        <Checkbox
+          isSelected={selectedIds.size === items.length && items.length > 0}
+          onValueChange={(checked) => {
+            if (checked) {
               setSelectedIds(new Set(items.map(i => i.id)));
             } else {
               setSelectedIds(new Set());
@@ -187,12 +186,11 @@ export function GroupList() {
         />
       ),
       render: (item) => (
-        <input
-          type="checkbox"
-          checked={selectedIds.has(item.id)}
-          onChange={(e) => {
+        <Checkbox
+          isSelected={selectedIds.has(item.id)}
+          onValueChange={(checked) => {
             const next = new Set(selectedIds);
-            if (e.target.checked) next.add(item.id);
+            if (checked) next.add(item.id);
             else next.delete(item.id);
             setSelectedIds(next);
           }}

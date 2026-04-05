@@ -304,7 +304,7 @@ export function CreateListingPage() {
       <PageMeta title="Create Listing" noIndex />
       {/* Breadcrumbs */}
       <Breadcrumbs items={[
-        { label: t('title'), href: tenantPath('/listings') },
+        { label: t('title'), href: '/listings' },
         { label: isEditing ? t('form.edit_title') : t('form.new_title') },
       ]} />
 

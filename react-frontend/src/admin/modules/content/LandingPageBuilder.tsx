@@ -10,6 +10,7 @@
  */
 
 import { useState, useEffect, useCallback, useRef } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   Card,
   CardBody,
@@ -58,13 +59,13 @@ import { DEFAULT_LANDING_PAGE_CONFIG } from '@/types/landing-page';
 // Constants
 // ─────────────────────────────────────────────────────────────────────────────
 
-const SECTION_LABELS: Record<LandingSectionType, string> = {
-  hero: 'Hero Banner',
-  feature_pills: 'Feature Pills',
-  stats: 'Live Stats',
-  how_it_works: 'How It Works',
-  core_values: 'Core Values',
-  cta: 'Call to Action',
+const SECTION_LABEL_KEYS: Record<LandingSectionType, string> = {
+  hero: 'content.landing_section_hero',
+  feature_pills: 'content.landing_section_feature_pills',
+  stats: 'content.landing_section_stats',
+  how_it_works: 'content.landing_section_how_it_works',
+  core_values: 'content.landing_section_core_values',
+  cta: 'content.landing_section_cta',
 };
 
 const ICON_OPTIONS: LandingIconId[] = [
@@ -86,7 +87,7 @@ const ICON_OPTIONS: LandingIconId[] = [
   'thumbs-up',
 ];
 
-const HELPER_TEXT = 'Leave blank to use the default text from your language translations';
+const HELPER_TEXT_KEY = 'content.landing_helper_text';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Helpers
@@ -146,16 +147,18 @@ function cleanConfig(config: LandingPageConfig): LandingPageConfig {
 function IconSelect({
   value,
   onChange,
-  label = 'Icon',
+  label,
+  placeholder,
 }: {
   value?: LandingIconId;
   onChange: (val: LandingIconId | undefined) => void;
-  label?: string;
+  label: string;
+  placeholder: string;
 }) {
   return (
     <Select
       label={label}
-      placeholder="Select an icon"
+      placeholder={placeholder}
       selectedKeys={value ? [value] : []}
       onSelectionChange={(keys) => {
         const selected = Array.from(keys)[0] as string | undefined;
@@ -182,14 +185,15 @@ function HeroEditor({
   content: HeroContent;
   onChange: (c: HeroContent) => void;
 }) {
+  const { t } = useTranslation('admin');
   const update = (field: keyof HeroContent, value: string) => {
     onChange({ ...content, [field]: value });
   };
   return (
     <div className="flex flex-col gap-4">
       <Input
-        label="Badge Text"
-        placeholder="e.g. Welcome to our community"
+        label={t('content.landing_label_badge_text')}
+        placeholder={t('content.landing_placeholder_badge_text')}
         value={content.badge_text || ''}
         onValueChange={(v) => update('badge_text', v)}
         variant="bordered"
@@ -197,16 +201,16 @@ function HeroEditor({
       />
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
         <Input
-          label="Headline Line 1"
-          placeholder="e.g. Build Stronger"
+          label={t('content.landing_label_headline_line_1')}
+          placeholder={t('content.landing_placeholder_headline_1')}
           value={content.headline_1 || ''}
           onValueChange={(v) => update('headline_1', v)}
           variant="bordered"
           size="sm"
         />
         <Input
-          label="Headline Line 2"
-          placeholder="e.g. Communities"
+          label={t('content.landing_label_headline_line_2')}
+          placeholder={t('content.landing_placeholder_headline_2')}
           value={content.headline_2 || ''}
           onValueChange={(v) => update('headline_2', v)}
           variant="bordered"
@@ -214,8 +218,8 @@ function HeroEditor({
         />
       </div>
       <Textarea
-        label="Subheadline"
-        placeholder="A brief description of your community"
+        label={t('content.landing_label_subheadline')}
+        placeholder={t('content.landing_placeholder_subheadline')}
         value={content.subheadline || ''}
         onValueChange={(v) => update('subheadline', v)}
         variant="bordered"
@@ -223,45 +227,45 @@ function HeroEditor({
         minRows={2}
       />
       <Divider />
-      <p className="text-sm font-medium text-default-600">Primary CTA</p>
+      <p className="text-sm font-medium text-default-600">{t('content.landing_primary_cta')}</p>
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
         <Input
-          label="Button Text"
-          placeholder="e.g. Get Started"
+          label={t('content.landing_label_button_text')}
+          placeholder={t('content.landing_placeholder_button_text_get_started')}
           value={content.cta_primary_text || ''}
           onValueChange={(v) => update('cta_primary_text', v)}
           variant="bordered"
           size="sm"
         />
         <Input
-          label="Button Link"
-          placeholder="e.g. /register"
+          label={t('content.landing_label_button_link')}
+          placeholder={t('content.landing_placeholder_button_link_register')}
           value={content.cta_primary_link || ''}
           onValueChange={(v) => update('cta_primary_link', v)}
           variant="bordered"
           size="sm"
         />
       </div>
-      <p className="text-sm font-medium text-default-600">Secondary CTA</p>
+      <p className="text-sm font-medium text-default-600">{t('content.landing_secondary_cta')}</p>
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
         <Input
-          label="Button Text"
-          placeholder="e.g. Learn More"
+          label={t('content.landing_label_button_text')}
+          placeholder={t('content.landing_placeholder_button_text_learn_more')}
           value={content.cta_secondary_text || ''}
           onValueChange={(v) => update('cta_secondary_text', v)}
           variant="bordered"
           size="sm"
         />
         <Input
-          label="Button Link"
-          placeholder="e.g. /about"
+          label={t('content.landing_label_button_link')}
+          placeholder={t('content.landing_placeholder_button_link_about')}
           value={content.cta_secondary_link || ''}
           onValueChange={(v) => update('cta_secondary_link', v)}
           variant="bordered"
           size="sm"
         />
       </div>
-      <p className="text-xs text-default-400">{HELPER_TEXT}</p>
+      <p className="text-xs text-default-400">{t(HELPER_TEXT_KEY)}</p>
     </div>
   );
 }
@@ -273,6 +277,7 @@ function FeaturePillsEditor({
   content: FeaturePillsContent;
   onChange: (c: FeaturePillsContent) => void;
 }) {
+  const { t } = useTranslation('admin');
   const items = content.items || [];
 
   const updateItem = (index: number, field: keyof FeaturePillItem, value: string) => {
@@ -307,7 +312,7 @@ function FeaturePillsEditor({
           <CardBody className="flex flex-col gap-3 p-3">
             <div className="flex items-center justify-between">
               <span className="text-sm font-medium text-default-600">
-                Item {i + 1}
+                {t('content.landing_item_number', { number: i + 1 })}
               </span>
               <Button
                 size="sm"
@@ -316,23 +321,25 @@ function FeaturePillsEditor({
                 startContent={<Trash2 size={14} />}
                 onPress={() => removeItem(i)}
               >
-                Remove
+                {t('content.landing_remove')}
               </Button>
             </div>
             <div className="grid grid-cols-1 gap-3 md:grid-cols-3">
               <IconSelect
                 value={item.icon}
                 onChange={(val) => updateItemIcon(i, val)}
+                label={t('content.landing_label_icon')}
+                placeholder={t('content.landing_placeholder_select_icon')}
               />
               <Input
-                label="Title"
+                label={t('content.landing_label_title')}
                 value={item.title}
                 onValueChange={(v) => updateItem(i, 'title', v)}
                 variant="bordered"
                 size="sm"
               />
               <Input
-                label="Description"
+                label={t('content.landing_label_description')}
                 value={item.description}
                 onValueChange={(v) => updateItem(i, 'description', v)}
                 variant="bordered"
@@ -350,10 +357,10 @@ function FeaturePillsEditor({
           onPress={addItem}
           className="self-start"
         >
-          Add Item
+          {t('content.landing_add_item')}
         </Button>
       )}
-      <p className="text-xs text-default-400">{HELPER_TEXT}</p>
+      <p className="text-xs text-default-400">{t(HELPER_TEXT_KEY)}</p>
     </div>
   );
 }
@@ -365,6 +372,7 @@ function StatsEditor({
   content: StatsContent;
   onChange: (c: StatsContent) => void;
 }) {
+  const { t } = useTranslation('admin');
   return (
     <div className="flex flex-col gap-4">
       <Switch
@@ -372,10 +380,10 @@ function StatsEditor({
         onValueChange={(val) => onChange({ ...content, show_live_stats: val })}
         size="sm"
       >
-        Show Live Stats
+        {t('content.landing_show_live_stats')}
       </Switch>
       <p className="text-xs text-default-400">
-        When enabled, real-time platform statistics are displayed on the landing page.
+        {t('content.landing_show_live_stats_desc')}
       </p>
     </div>
   );
@@ -388,6 +396,7 @@ function HowItWorksEditor({
   content: HowItWorksContent;
   onChange: (c: HowItWorksContent) => void;
 }) {
+  const { t } = useTranslation('admin');
   const steps = content.steps || [];
 
   const updateStep = (index: number, field: keyof HowItWorksStep, value: string) => {
@@ -417,16 +426,16 @@ function HowItWorksEditor({
     <div className="flex flex-col gap-4">
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
         <Input
-          label="Section Title"
-          placeholder="e.g. How It Works"
+          label={t('content.landing_label_section_title')}
+          placeholder={t('content.landing_placeholder_section_title_how_it_works')}
           value={content.title || ''}
           onValueChange={(v) => onChange({ ...content, title: v })}
           variant="bordered"
           size="sm"
         />
         <Input
-          label="Section Subtitle"
-          placeholder="e.g. Getting started is easy"
+          label={t('content.landing_label_section_subtitle')}
+          placeholder={t('content.landing_placeholder_section_subtitle_how_it_works')}
           value={content.subtitle || ''}
           onValueChange={(v) => onChange({ ...content, subtitle: v })}
           variant="bordered"
@@ -439,7 +448,7 @@ function HowItWorksEditor({
           <CardBody className="flex flex-col gap-3 p-3">
             <div className="flex items-center justify-between">
               <span className="text-sm font-medium text-default-600">
-                Step {i + 1}
+                {t('content.landing_step_number', { number: i + 1 })}
               </span>
               <Button
                 size="sm"
@@ -448,23 +457,25 @@ function HowItWorksEditor({
                 startContent={<Trash2 size={14} />}
                 onPress={() => removeStep(i)}
               >
-                Remove
+                {t('content.landing_remove')}
               </Button>
             </div>
             <div className="grid grid-cols-1 gap-3 md:grid-cols-3">
               <IconSelect
                 value={step.icon}
                 onChange={(val) => updateStepIcon(i, val)}
+                label={t('content.landing_label_icon')}
+                placeholder={t('content.landing_placeholder_select_icon')}
               />
               <Input
-                label="Title"
+                label={t('content.landing_label_title')}
                 value={step.title}
                 onValueChange={(v) => updateStep(i, 'title', v)}
                 variant="bordered"
                 size="sm"
               />
               <Input
-                label="Description"
+                label={t('content.landing_label_description')}
                 value={step.description}
                 onValueChange={(v) => updateStep(i, 'description', v)}
                 variant="bordered"
@@ -481,9 +492,9 @@ function HowItWorksEditor({
         onPress={addStep}
         className="self-start"
       >
-        Add Step
+        {t('content.landing_add_step')}
       </Button>
-      <p className="text-xs text-default-400">{HELPER_TEXT}</p>
+      <p className="text-xs text-default-400">{t(HELPER_TEXT_KEY)}</p>
     </div>
   );
 }
@@ -495,6 +506,7 @@ function CoreValuesEditor({
   content: CoreValuesContent;
   onChange: (c: CoreValuesContent) => void;
 }) {
+  const { t } = useTranslation('admin');
   const values = content.values || [];
 
   const updateValue = (index: number, field: keyof CoreValue, value: string) => {
@@ -518,16 +530,16 @@ function CoreValuesEditor({
     <div className="flex flex-col gap-4">
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
         <Input
-          label="Section Title"
-          placeholder="e.g. Our Values"
+          label={t('content.landing_label_section_title')}
+          placeholder={t('content.landing_placeholder_section_title_core_values')}
           value={content.title || ''}
           onValueChange={(v) => onChange({ ...content, title: v })}
           variant="bordered"
           size="sm"
         />
         <Input
-          label="Section Subtitle"
-          placeholder="e.g. What drives our community"
+          label={t('content.landing_label_section_subtitle')}
+          placeholder={t('content.landing_placeholder_section_subtitle_core_values')}
           value={content.subtitle || ''}
           onValueChange={(v) => onChange({ ...content, subtitle: v })}
           variant="bordered"
@@ -540,7 +552,7 @@ function CoreValuesEditor({
           <CardBody className="flex flex-col gap-3 p-3">
             <div className="flex items-center justify-between">
               <span className="text-sm font-medium text-default-600">
-                Value {i + 1}
+                {t('content.landing_value_number', { number: i + 1 })}
               </span>
               <Button
                 size="sm"
@@ -549,18 +561,18 @@ function CoreValuesEditor({
                 startContent={<Trash2 size={14} />}
                 onPress={() => removeValue(i)}
               >
-                Remove
+                {t('content.landing_remove')}
               </Button>
             </div>
             <Input
-              label="Title"
+              label={t('content.landing_label_title')}
               value={val.title}
               onValueChange={(v) => updateValue(i, 'title', v)}
               variant="bordered"
               size="sm"
             />
             <Textarea
-              label="Description"
+              label={t('content.landing_label_description')}
               value={val.description}
               onValueChange={(v) => updateValue(i, 'description', v)}
               variant="bordered"
@@ -577,9 +589,9 @@ function CoreValuesEditor({
         onPress={addValue}
         className="self-start"
       >
-        Add Value
+        {t('content.landing_add_value')}
       </Button>
-      <p className="text-xs text-default-400">{HELPER_TEXT}</p>
+      <p className="text-xs text-default-400">{t(HELPER_TEXT_KEY)}</p>
     </div>
   );
 }
@@ -591,22 +603,23 @@ function CtaEditor({
   content: CtaContent;
   onChange: (c: CtaContent) => void;
 }) {
+  const { t } = useTranslation('admin');
   const update = (field: keyof CtaContent, value: string) => {
     onChange({ ...content, [field]: value });
   };
   return (
     <div className="flex flex-col gap-4">
       <Input
-        label="Title"
-        placeholder="e.g. Ready to Get Started?"
+        label={t('content.landing_label_title')}
+        placeholder={t('content.landing_placeholder_cta_title')}
         value={content.title || ''}
         onValueChange={(v) => update('title', v)}
         variant="bordered"
         size="sm"
       />
       <Textarea
-        label="Description"
-        placeholder="A compelling description to encourage sign-ups"
+        label={t('content.landing_label_description')}
+        placeholder={t('content.landing_placeholder_cta_description')}
         value={content.description || ''}
         onValueChange={(v) => update('description', v)}
         variant="bordered"
@@ -615,23 +628,23 @@ function CtaEditor({
       />
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
         <Input
-          label="Button Text"
-          placeholder="e.g. Join Now"
+          label={t('content.landing_label_button_text')}
+          placeholder={t('content.landing_placeholder_button_text_join_now')}
           value={content.button_text || ''}
           onValueChange={(v) => update('button_text', v)}
           variant="bordered"
           size="sm"
         />
         <Input
-          label="Button Link"
-          placeholder="e.g. /register"
+          label={t('content.landing_label_button_link')}
+          placeholder={t('content.landing_placeholder_button_link_register')}
           value={content.button_link || ''}
           onValueChange={(v) => update('button_link', v)}
           variant="bordered"
           size="sm"
         />
       </div>
-      <p className="text-xs text-default-400">{HELPER_TEXT}</p>
+      <p className="text-xs text-default-400">{t(HELPER_TEXT_KEY)}</p>
     </div>
   );
 }
@@ -661,8 +674,10 @@ function SectionCard({
   onMoveDown: () => void;
   onContentChange: (content: LandingSection['content']) => void;
 }) {
+  const { t } = useTranslation('admin');
   const sectionType = section.type as LandingSectionType;
-  const label = SECTION_LABELS[sectionType] || sectionType;
+  const labelKey = SECTION_LABEL_KEYS[sectionType];
+  const label = labelKey ? t(labelKey) : sectionType;
 
   const renderEditor = () => {
     switch (sectionType) {
@@ -709,7 +724,7 @@ function SectionCard({
           />
         );
       default:
-        return <p className="text-sm text-default-400">No editor available for this section type.</p>;
+        return <p className="text-sm text-default-400">{t('content.landing_no_editor_available')}</p>;
     }
   };
 
@@ -732,7 +747,7 @@ function SectionCard({
           <div>
             <p className="text-sm font-semibold">{label}</p>
             <p className="text-xs text-default-400">
-              {section.enabled ? 'Visible' : 'Hidden'}
+              {section.enabled ? t('content.landing_visible') : t('content.landing_hidden')}
             </p>
           </div>
         </div>
@@ -741,7 +756,7 @@ function SectionCard({
             size="sm"
             isSelected={section.enabled}
             onValueChange={onToggleEnabled}
-            aria-label={`Toggle ${label}`}
+            aria-label={t('content.landing_toggle_section', { section: label })}
           />
           <Button
             isIconOnly
@@ -749,7 +764,7 @@ function SectionCard({
             variant="light"
             isDisabled={isFirst}
             onPress={onMoveUp}
-            aria-label={`Move ${label} up`}
+            aria-label={t('content.landing_move_up', { section: label })}
           >
             <ChevronUp size={16} />
           </Button>
@@ -759,7 +774,7 @@ function SectionCard({
             variant="light"
             isDisabled={isLast}
             onPress={onMoveDown}
-            aria-label={`Move ${label} down`}
+            aria-label={t('content.landing_move_down', { section: label })}
           >
             <ChevronDown size={16} />
           </Button>
@@ -780,7 +795,8 @@ function SectionCard({
 // ─────────────────────────────────────────────────────────────────────────────
 
 export function LandingPageBuilder() {
-  usePageTitle('Admin - Landing Page Builder');
+  const { t } = useTranslation('admin');
+  usePageTitle(t('content.landing_page_title'));
   const toast = useToast();
 
   // State
@@ -813,12 +829,12 @@ export function LandingPageBuilder() {
         }
       }
     } catch {
-      toast.error('Failed to load landing page configuration');
+      toast.error(t('content.landing_failed_to_load'));
     } finally {
       setLoading(false);
       initialLoadDone.current = true;
     }
-  }, [toast]);
+  }, [toast, t]);
 
   useEffect(() => {
     fetchConfig();
@@ -852,14 +868,14 @@ export function LandingPageBuilder() {
       const cleaned = cleanConfig(config);
       const res = await adminLandingPage.update(cleaned);
       if (res.success) {
-        toast.success('Landing page configuration saved');
+        toast.success(t('content.landing_saved'));
         setSavedConfig(cloneConfig(config));
         setIsDirty(false);
       } else {
-        toast.error('Failed to save configuration');
+        toast.error(t('content.landing_failed_to_save'));
       }
     } catch {
-      toast.error('Failed to save configuration');
+      toast.error(t('content.landing_failed_to_save'));
     } finally {
       setSaving(false);
     }
@@ -876,12 +892,12 @@ export function LandingPageBuilder() {
         setSavedConfig(null);
         setIsDirty(false);
         setExpandedSections(new Set());
-        toast.success('Landing page reset to defaults');
+        toast.success(t('content.landing_reset_success'));
       } else {
-        toast.error('Failed to reset configuration');
+        toast.error(t('content.landing_failed_to_reset'));
       }
     } catch {
-      toast.error('Failed to reset configuration');
+      toast.error(t('content.landing_failed_to_reset'));
     } finally {
       setSaving(false);
       setConfirmReset(false);
@@ -945,7 +961,7 @@ export function LandingPageBuilder() {
   if (loading) {
     return (
       <div className="flex min-h-[400px] items-center justify-center">
-        <Spinner size="lg" label="Loading landing page configuration..." />
+        <Spinner size="lg" label={t('content.landing_loading')} />
       </div>
     );
   }
@@ -953,13 +969,13 @@ export function LandingPageBuilder() {
   return (
     <div className="mx-auto max-w-4xl">
       <PageHeader
-        title="Landing Page Builder"
-        description="Customize your community's landing page sections and content"
+        title={t('content.landing_builder_title')}
+        description={t('content.landing_builder_description')}
         actions={
           <div className="flex items-center gap-2">
             {confirmReset ? (
               <>
-                <span className="text-sm text-danger">Reset all customizations?</span>
+                <span className="text-sm text-danger">{t('content.landing_reset_confirm_prompt')}</span>
                 <Button
                   size="sm"
                   color="danger"
@@ -967,7 +983,7 @@ export function LandingPageBuilder() {
                   onPress={handleReset}
                   isLoading={saving}
                 >
-                  Confirm Reset
+                  {t('content.landing_confirm_reset')}
                 </Button>
                 <Button
                   size="sm"
@@ -975,7 +991,7 @@ export function LandingPageBuilder() {
                   onPress={() => setConfirmReset(false)}
                   isDisabled={saving}
                 >
-                  Cancel
+                  {t('content.landing_cancel')}
                 </Button>
               </>
             ) : (
@@ -986,7 +1002,7 @@ export function LandingPageBuilder() {
                 onPress={() => setConfirmReset(true)}
                 isDisabled={saving}
               >
-                Reset to Defaults
+                {t('content.landing_reset_to_defaults')}
               </Button>
             )}
             <Button
@@ -997,7 +1013,7 @@ export function LandingPageBuilder() {
               isDisabled={!isDirty || saving}
               isLoading={saving}
             >
-              Save Changes
+              {t('content.landing_save_changes')}
             </Button>
           </div>
         }
@@ -1007,8 +1023,7 @@ export function LandingPageBuilder() {
       <div className="mb-4 flex items-center gap-2 rounded-lg border border-default-200 bg-default-50 px-4 py-3">
         <Layers size={16} className="text-default-400" />
         <p className="text-sm text-default-500">
-          Sections are displayed on the landing page in the order shown below.
-          Use the arrow buttons to reorder, and the toggle to show or hide each section.
+          {t('content.landing_ordering_info')}
         </p>
       </div>
 
@@ -1034,7 +1049,7 @@ export function LandingPageBuilder() {
       {isDirty && (
         <div className="mt-4 rounded-lg border border-warning-200 bg-warning-50 px-4 py-3">
           <p className="text-sm text-warning-700">
-            You have unsaved changes. Click &quot;Save Changes&quot; to apply them.
+            {t('content.landing_unsaved_changes')}
           </p>
         </div>
       )}

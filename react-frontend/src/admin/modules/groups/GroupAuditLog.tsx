@@ -14,6 +14,12 @@ import {
   Select,
   SelectItem,
   Spinner,
+  Table,
+  TableHeader,
+  TableBody,
+  TableRow,
+  TableColumn,
+  TableCell,
 } from '@heroui/react';
 import { ScrollText, ChevronDown, ChevronUp } from 'lucide-react';
 import { useToast } from '@/contexts';
@@ -175,59 +181,50 @@ export function GroupAuditLog({ groupId }: GroupAuditLogProps) {
           {t('groups.audit_empty', 'No audit entries found')}
         </p>
       ) : (
-        <div className="overflow-x-auto">
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="border-b border-default-200">
-                <th className="text-left py-2 px-3 text-default-500 font-medium">
-                  {t('groups.audit_col_date', 'Date')}
-                </th>
-                <th className="text-left py-2 px-3 text-default-500 font-medium">
-                  {t('groups.audit_col_action', 'Action')}
-                </th>
-                <th className="text-left py-2 px-3 text-default-500 font-medium">
-                  {t('groups.audit_col_user', 'User')}
-                </th>
-                <th className="text-left py-2 px-3 text-default-500 font-medium">
-                  {t('groups.audit_col_details', 'Details')}
-                </th>
-                <th className="text-left py-2 px-3 text-default-500 font-medium">
-                  {t('groups.audit_col_ip', 'IP Address')}
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              {entries.map((entry) => (
-                <tr
-                  key={entry.id}
-                  className="border-b border-default-100 hover:bg-default-50 transition-colors"
-                >
-                  <td className="py-2 px-3 text-xs text-default-500 whitespace-nowrap">
+        <Table aria-label={t('groups.audit_log_title', 'Audit Log')}>
+          <TableHeader>
+            <TableColumn>{t('groups.audit_col_date', 'Date')}</TableColumn>
+            <TableColumn>{t('groups.audit_col_action', 'Action')}</TableColumn>
+            <TableColumn>{t('groups.audit_col_user', 'User')}</TableColumn>
+            <TableColumn>{t('groups.audit_col_details', 'Details')}</TableColumn>
+            <TableColumn>{t('groups.audit_col_ip', 'IP Address')}</TableColumn>
+          </TableHeader>
+          <TableBody>
+            {entries.map((entry) => (
+              <TableRow key={entry.id}>
+                <TableCell>
+                  <span className="text-xs text-default-500 whitespace-nowrap">
                     {new Date(entry.created_at).toLocaleString()}
-                  </td>
-                  <td className="py-2 px-3">
-                    <Chip
-                      size="sm"
-                      variant="flat"
-                      color={getActionColor(entry.action)}
-                    >
-                      {entry.action}
-                    </Chip>
-                  </td>
-                  <td className="py-2 px-3 text-xs text-default-600">
+                  </span>
+                </TableCell>
+                <TableCell>
+                  <Chip
+                    size="sm"
+                    variant="flat"
+                    color={getActionColor(entry.action)}
+                  >
+                    {entry.action}
+                  </Chip>
+                </TableCell>
+                <TableCell>
+                  <span className="text-xs text-default-600">
                     #{entry.user_id}
-                  </td>
-                  <td className="py-2 px-3 max-w-[300px]">
+                  </span>
+                </TableCell>
+                <TableCell>
+                  <div className="max-w-[300px]">
                     <ExpandableDetails details={entry.details} />
-                  </td>
-                  <td className="py-2 px-3 text-xs text-default-400 font-mono">
+                  </div>
+                </TableCell>
+                <TableCell>
+                  <span className="text-xs text-default-400 font-mono">
                     {entry.ip_address ?? '-'}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+                  </span>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
       )}
     </GlassCard>
   );

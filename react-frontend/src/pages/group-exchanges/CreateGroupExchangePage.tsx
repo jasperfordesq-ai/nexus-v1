@@ -390,7 +390,7 @@ export function CreateGroupExchangePage() {
       <PageMeta title="Create Group Exchange" noIndex />
       {/* Breadcrumbs */}
       <Breadcrumbs items={[
-        { label: t('title'), href: tenantPath('/group-exchanges') },
+        { label: t('title'), href: '/group-exchanges' },
         { label: t('create.breadcrumb') },
       ]} />
 

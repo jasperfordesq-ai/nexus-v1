@@ -10,6 +10,7 @@
 
 import { Card, CardBody, Switch, Button, Chip } from '@heroui/react';
 import { Settings2 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import type { ModuleDefinition } from './moduleRegistry';
 
 interface ModuleCardProps {
@@ -21,6 +22,7 @@ interface ModuleCardProps {
 }
 
 export default function ModuleCard({ module, enabled, onToggle, onConfigure, toggling }: ModuleCardProps) {
+  const { t } = useTranslation('admin');
   const Icon = module.icon;
   const optionCount = module.configOptions.length;
   const liveCount = module.configOptions.filter(o => !o.comingSoon).length;
@@ -47,7 +49,7 @@ export default function ModuleCard({ module, enabled, onToggle, onConfigure, tog
                 isSelected={enabled}
                 isDisabled={toggling}
                 onValueChange={(val) => onToggle(module.id, val)}
-                aria-label={`Toggle ${module.name}`}
+                aria-label={t('config.toggle_module', { name: module.name })}
                 className="flex-shrink-0"
               />
             </div>

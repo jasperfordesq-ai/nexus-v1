@@ -20,7 +20,7 @@ import {
 } from '@heroui/react';
 import { Plus, MoreVertical, Edit, Trash2, Megaphone, Play, Pause, RotateCcw } from 'lucide-react';
 import { usePageTitle } from '@/hooks';
-import { useToast } from '@/contexts';
+import { useToast, useTenant } from '@/contexts';
 import { adminGamification } from '../../api/adminApi';
 import { DataTable, PageHeader, ConfirmModal, StatusBadge, EmptyState, type Column } from '../../components';
 import type { Campaign } from '../../api/types';
@@ -34,6 +34,7 @@ export function CampaignList() {
   const { t } = useTranslation('admin');
   usePageTitle(t('gamification.page_title'));
   const toast = useToast();
+  const { tenantPath } = useTenant();
   const navigate = useNavigate();
 
   const [campaigns, setCampaigns] = useState<Campaign[]>([]);
@@ -92,7 +93,7 @@ export function CampaignList() {
     const handleAction = (key: React.Key) => {
       const action = key as ActionKey;
       if (action === 'edit') {
-        navigate(`/admin/gamification/campaigns/edit/${campaign.id}`);
+        navigate(tenantPath(`/admin/gamification/campaigns/edit/${campaign.id}`));
       } else if (action === 'activate') {
         handleStatusChange(campaign, 'active');
       } else if (action === 'pause') {
@@ -209,7 +210,7 @@ export function CampaignList() {
         title={t('gamification.campaign_list_title')}
         description={t('gamification.campaign_list_desc')}
         actions={
-          <Link to="/admin/gamification/campaigns/create">
+          <Link to={tenantPath("/admin/gamification/campaigns/create")}>
             <Button color="primary" startContent={<Plus size={16} />}>
               {t('gamification.create_campaign')}
             </Button>
@@ -223,7 +224,7 @@ export function CampaignList() {
           title={t('gamification.no_campaigns_yet')}
           description={t('gamification.desc_create_your_first_campaign_to_start_awar')}
           actionLabel={t('gamification.create_campaign')}
-          onAction={() => navigate('/admin/gamification/campaigns/create')}
+          onAction={() => navigate(tenantPath('/admin/gamification/campaigns/create'))}
         />
       ) : (
         <DataTable

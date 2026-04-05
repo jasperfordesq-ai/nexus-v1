@@ -160,7 +160,7 @@ export function MatchesPage() {
   return (
     <div className="max-w-4xl mx-auto px-4 py-6 space-y-6">
       <PageMeta title="Matches" noIndex />
-      <Breadcrumbs items={[{ label: t('breadcrumb_dashboard'), href: tenantPath('/dashboard') }, { label: t('breadcrumb_matches') }]} />
+      <Breadcrumbs items={[{ label: t('breadcrumb_dashboard'), href: '/dashboard' }, { label: t('breadcrumb_matches') }]} />
 
       {/* Header */}
       <div className="flex items-center justify-between">

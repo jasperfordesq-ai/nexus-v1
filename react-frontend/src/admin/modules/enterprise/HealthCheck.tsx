@@ -17,6 +17,12 @@ import {
   Spinner,
   Chip,
   Divider,
+  Table,
+  TableHeader,
+  TableBody,
+  TableRow,
+  TableColumn,
+  TableCell,
 } from '@heroui/react';
 import {
   CheckCircle,
@@ -196,37 +202,37 @@ export function HealthCheck() {
                   <p className="text-default-500">No history available</p>
                 </div>
               ) : (
-                <div className="overflow-x-auto">
-                  <table className="w-full text-sm">
-                    <thead>
-                      <tr className="border-b border-divider">
-                        <th className="text-left px-6 py-3 text-xs font-medium text-default-500 uppercase">Status</th>
-                        <th className="text-left px-6 py-3 text-xs font-medium text-default-500 uppercase">Latency</th>
-                        <th className="text-left px-6 py-3 text-xs font-medium text-default-500 uppercase">Timestamp</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {history.map((entry) => {
-                        const histColor = entry.status === 'healthy' ? 'success' : entry.status === 'degraded' ? 'warning' : 'danger';
-                        return (
-                          <tr key={entry.id} className="border-b border-divider last:border-0 hover:bg-default-50">
-                            <td className="px-6 py-3">
-                              <Chip size="sm" variant="flat" color={histColor} className="capitalize">
-                                {entry.status}
-                              </Chip>
-                            </td>
-                            <td className="px-6 py-3 font-mono text-default-600">
+                <Table aria-label="Health check history" removeWrapper>
+                  <TableHeader>
+                    <TableColumn>STATUS</TableColumn>
+                    <TableColumn>LATENCY</TableColumn>
+                    <TableColumn>TIMESTAMP</TableColumn>
+                  </TableHeader>
+                  <TableBody>
+                    {history.map((entry) => {
+                      const histColor = entry.status === 'healthy' ? 'success' : entry.status === 'degraded' ? 'warning' : 'danger';
+                      return (
+                        <TableRow key={entry.id}>
+                          <TableCell>
+                            <Chip size="sm" variant="flat" color={histColor} className="capitalize">
+                              {entry.status}
+                            </Chip>
+                          </TableCell>
+                          <TableCell>
+                            <span className="font-mono text-default-600">
                               {entry.latency_ms !== null ? `${entry.latency_ms} ms` : '---'}
-                            </td>
-                            <td className="px-6 py-3 text-default-500">
+                            </span>
+                          </TableCell>
+                          <TableCell>
+                            <span className="text-default-500">
                               {new Date(entry.created_at).toLocaleString()}
-                            </td>
-                          </tr>
-                        );
-                      })}
-                    </tbody>
-                  </table>
-                </div>
+                            </span>
+                          </TableCell>
+                        </TableRow>
+                      );
+                    })}
+                  </TableBody>
+                </Table>
               )}
             </CardBody>
           </Card>

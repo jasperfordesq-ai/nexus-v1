@@ -24,7 +24,7 @@ import {
 } from '@heroui/react';
 import { ArrowLeft, Save, Award } from 'lucide-react';
 import { usePageTitle } from '@/hooks';
-import { useToast } from '@/contexts';
+import { useToast, useTenant } from '@/contexts';
 import { adminGamification } from '../../api/adminApi';
 import { PageHeader } from '../../components';
 
@@ -75,6 +75,7 @@ export function CreateBadge() {
   const { t } = useTranslation('admin');
   usePageTitle(t('gamification.page_title'));
   const toast = useToast();
+  const { tenantPath } = useTenant();
   const navigate = useNavigate();
 
   const [formData, setFormData] = useState<FormData>({
@@ -123,7 +124,7 @@ export function CreateBadge() {
 
     if (res.success) {
       toast.success(t('gamification.badge_created', { name: formData.name.trim() }));
-      navigate('/admin/custom-badges');
+      navigate(tenantPath('/admin/custom-badges'));
     } else {
       const errorMsg = (res as { error?: string }).error
         || (res as { errors?: Array<{ message: string }> }).errors?.[0]?.message
@@ -140,7 +141,7 @@ export function CreateBadge() {
         title={t('gamification.create_badge_title')}
         description={t('gamification.create_badge_desc')}
         actions={
-          <Link to="/admin/custom-badges">
+          <Link to={tenantPath("/admin/custom-badges")}>
             <Button variant="flat" startContent={<ArrowLeft size={16} />}>
               {t('gamification.back_to_badges')}
             </Button>
@@ -253,7 +254,7 @@ export function CreateBadge() {
           </div>
 
           <div className="flex justify-end gap-2 pt-2">
-            <Link to="/admin/custom-badges">
+            <Link to={tenantPath("/admin/custom-badges")}>
               <Button variant="flat" isDisabled={saving}>{t('gamification.cancel')}</Button>
             </Link>
             <Button

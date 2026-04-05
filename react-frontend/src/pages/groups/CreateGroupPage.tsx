@@ -320,7 +320,7 @@ export function CreateGroupPage() {
       <PageMeta title="Create Group" noIndex />
       {/* Breadcrumbs */}
       <Breadcrumbs items={[
-        { label: t('title'), href: tenantPath('/groups') },
+        { label: t('title'), href: '/groups' },
         { label: isEditing ? t('form.nav_edit') : t('form.nav_new') },
       ]} />
 

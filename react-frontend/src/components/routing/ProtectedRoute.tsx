@@ -39,7 +39,7 @@ export function ProtectedRoute({ children }: ProtectedRouteProps) {
 
   // Redirect to login if not authenticated, preserving tenant slug prefix
   if (!isAuthenticated) {
-    return <Navigate to={tenantPath('/login')} state={{ from: location.pathname }} replace />;
+    return <Navigate to={tenantPath('/login')} state={{ from: tenantPath(location.pathname) }} replace />;
   }
 
   // Redirect to onboarding only if the flag is not set AND onboarding is

@@ -11,6 +11,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import {
   Card,
   CardBody,
@@ -18,6 +19,12 @@ import {
   Button,
   Chip,
   Spinner,
+  Table,
+  TableHeader,
+  TableBody,
+  TableRow,
+  TableColumn,
+  TableCell,
 } from '@heroui/react';
 import {
   ShoppingBag,
@@ -83,7 +90,8 @@ const statusColors: Record<string, 'success' | 'warning' | 'danger' | 'default'>
 // ─────────────────────────────────────────────────────────────────────────────
 
 export function MarketplaceAdmin() {
-  usePageTitle('Marketplace Admin');
+  const { t } = useTranslation('admin');
+  usePageTitle(t('marketplace.page_title'));
   const toast = useToast();
   const { tenantPath } = useTenant();
 
@@ -114,7 +122,7 @@ export function MarketplaceAdmin() {
         }
       }
     } catch {
-      toast.error('Failed to load marketplace dashboard');
+      toast.error(t('marketplace.failed_load_dashboard'));
     } finally {
       setLoading(false);
     }
@@ -127,15 +135,15 @@ export function MarketplaceAdmin() {
   return (
     <div>
       <PageHeader
-        title="Marketplace"
-        description="Manage marketplace listings, sellers, and orders"
+        title={t('marketplace.title')}
+        description={t('marketplace.description')}
         actions={
           <Button
             variant="flat"
             startContent={<RefreshCw size={16} />}
             onPress={loadDashboard}
           >
-            Refresh
+            {t('marketplace.refresh')}
           </Button>
         }
       />
@@ -143,35 +151,35 @@ export function MarketplaceAdmin() {
       {/* Stats Cards */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-5 mb-6">
         <StatCard
-          label="Total Listings"
+          label={t('marketplace.stat_total_listings')}
           value={stats?.total_listings ?? 0}
           icon={ShoppingBag}
           color="primary"
           loading={loading}
         />
         <StatCard
-          label="Active Listings"
+          label={t('marketplace.stat_active_listings')}
           value={stats?.active_listings ?? 0}
           icon={PackageCheck}
           color="success"
           loading={loading}
         />
         <StatCard
-          label="Total Sellers"
+          label={t('marketplace.stat_total_sellers')}
           value={stats?.total_sellers ?? 0}
           icon={Store}
           color="secondary"
           loading={loading}
         />
         <StatCard
-          label="Pending Moderation"
+          label={t('marketplace.stat_pending_moderation')}
           value={stats?.pending_moderation ?? 0}
           icon={Clock}
           color="warning"
           loading={loading}
         />
         <StatCard
-          label="Total Orders"
+          label={t('marketplace.stat_total_orders')}
           value={stats?.total_orders ?? 0}
           icon={DollarSign}
           color="default"
@@ -188,9 +196,9 @@ export function MarketplaceAdmin() {
                 <Shield size={24} />
               </div>
               <div className="flex-1 min-w-0">
-                <p className="font-semibold text-foreground">Moderation Queue</p>
+                <p className="font-semibold text-foreground">{t('marketplace.moderation_queue')}</p>
                 <p className="text-sm text-default-500">
-                  Review and approve pending marketplace listings
+                  {t('marketplace.moderation_queue_desc')}
                 </p>
               </div>
               <ChevronRight size={20} className="text-default-400" />
@@ -204,9 +212,9 @@ export function MarketplaceAdmin() {
                 <Users size={24} />
               </div>
               <div className="flex-1 min-w-0">
-                <p className="font-semibold text-foreground">Seller Management</p>
+                <p className="font-semibold text-foreground">{t('marketplace.seller_management')}</p>
                 <p className="text-sm text-default-500">
-                  Manage seller profiles, verify businesses, handle suspensions
+                  {t('marketplace.seller_management_desc')}
                 </p>
               </div>
               <ChevronRight size={20} className="text-default-400" />
@@ -218,74 +226,70 @@ export function MarketplaceAdmin() {
       {/* Recent Listings Table */}
       <Card shadow="sm">
         <CardHeader className="flex items-center justify-between px-4 pt-4">
-          <h3 className="text-lg font-semibold text-foreground">Recent Listings</h3>
+          <h3 className="text-lg font-semibold text-foreground">{t('marketplace.recent_listings')}</h3>
           <Link to={tenantPath('/admin/marketplace/moderation')}>
             <Button size="sm" variant="flat" color="primary">
-              View All
+              {t('marketplace.view_all')}
             </Button>
           </Link>
         </CardHeader>
         <CardBody className="px-4 pb-4">
           {loading ? (
             <div className="flex items-center justify-center py-12">
-              <Spinner label="Loading recent listings..." />
+              <Spinner label={t('marketplace.loading_recent_listings')} />
             </div>
           ) : recentListings.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-12 text-center">
               <ShoppingBag size={32} className="text-default-300 mb-2" />
-              <p className="text-sm text-default-500">No marketplace listings yet</p>
+              <p className="text-sm text-default-500">{t('marketplace.no_listings_yet')}</p>
             </div>
           ) : (
-            <div className="overflow-x-auto">
-              <table className="w-full text-sm">
-                <thead>
-                  <tr className="border-b border-divider">
-                    <th className="py-2 px-3 text-left text-xs font-medium text-default-500 uppercase">Title</th>
-                    <th className="py-2 px-3 text-left text-xs font-medium text-default-500 uppercase">Seller</th>
-                    <th className="py-2 px-3 text-left text-xs font-medium text-default-500 uppercase">Price</th>
-                    <th className="py-2 px-3 text-left text-xs font-medium text-default-500 uppercase">Status</th>
-                    <th className="py-2 px-3 text-left text-xs font-medium text-default-500 uppercase">Moderation</th>
-                    <th className="py-2 px-3 text-left text-xs font-medium text-default-500 uppercase">Created</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {recentListings.map((listing) => (
-                    <tr key={listing.id} className="border-b border-divider last:border-0">
-                      <td className="py-2.5 px-3">
-                        <span className="font-medium text-foreground">{listing.title}</span>
-                      </td>
-                      <td className="py-2.5 px-3 text-default-600">{listing.seller_name}</td>
-                      <td className="py-2.5 px-3 text-default-600">
-                        {listing.currency ?? ''}{listing.price?.toFixed(2) ?? '0.00'}
-                      </td>
-                      <td className="py-2.5 px-3">
-                        <Chip
-                          size="sm"
-                          variant="flat"
-                          color={statusColors[listing.status] || 'default'}
-                          className="capitalize"
-                        >
-                          {listing.status}
-                        </Chip>
-                      </td>
-                      <td className="py-2.5 px-3">
-                        <Chip
-                          size="sm"
-                          variant="flat"
-                          color={moderationColors[listing.moderation_status] || 'default'}
-                          className="capitalize"
-                        >
-                          {listing.moderation_status}
-                        </Chip>
-                      </td>
-                      <td className="py-2.5 px-3 text-default-500">
-                        {new Date(listing.created_at).toLocaleDateString()}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+            <Table aria-label={t('marketplace.recent_listings')} removeWrapper>
+              <TableHeader>
+                <TableColumn>{t('marketplace.col_title')}</TableColumn>
+                <TableColumn>{t('marketplace.col_seller')}</TableColumn>
+                <TableColumn>{t('marketplace.col_price')}</TableColumn>
+                <TableColumn>{t('marketplace.col_status')}</TableColumn>
+                <TableColumn>{t('marketplace.col_moderation')}</TableColumn>
+                <TableColumn>{t('marketplace.col_created')}</TableColumn>
+              </TableHeader>
+              <TableBody>
+                {recentListings.map((listing) => (
+                  <TableRow key={listing.id}>
+                    <TableCell>
+                      <span className="font-medium text-foreground">{listing.title}</span>
+                    </TableCell>
+                    <TableCell className="text-default-600">{listing.seller_name}</TableCell>
+                    <TableCell className="text-default-600">
+                      {listing.currency ?? ''}{listing.price?.toFixed(2) ?? '0.00'}
+                    </TableCell>
+                    <TableCell>
+                      <Chip
+                        size="sm"
+                        variant="flat"
+                        color={statusColors[listing.status] || 'default'}
+                        className="capitalize"
+                      >
+                        {listing.status}
+                      </Chip>
+                    </TableCell>
+                    <TableCell>
+                      <Chip
+                        size="sm"
+                        variant="flat"
+                        color={moderationColors[listing.moderation_status] || 'default'}
+                        className="capitalize"
+                      >
+                        {listing.moderation_status}
+                      </Chip>
+                    </TableCell>
+                    <TableCell className="text-default-500">
+                      {new Date(listing.created_at).toLocaleDateString()}
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
           )}
         </CardBody>
       </Card>

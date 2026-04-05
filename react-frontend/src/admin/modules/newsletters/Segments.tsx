@@ -21,6 +21,7 @@ import {
 } from '@heroui/react';
 import { Filter, Plus, RefreshCw, MoreVertical, Pencil, Trash2, Users } from 'lucide-react';
 import { usePageTitle } from '@/hooks';
+import { useTenant } from '@/contexts';
 import { adminNewsletters } from '../../api/adminApi';
 import { DataTable, PageHeader, EmptyState, ConfirmModal, type Column } from '../../components';
 
@@ -39,6 +40,7 @@ interface Segment {
 
 export function Segments() {
   const { t } = useTranslation('admin');
+  const { tenantPath } = useTenant();
   usePageTitle(t('newsletters.page_title'));
   const navigate = useNavigate();
   const [items, setItems] = useState<Segment[]>([]);
@@ -153,7 +155,7 @@ export function Segments() {
               <DropdownItem
                 key="edit"
                 startContent={<Pencil size={14} />}
-                onPress={() => navigate(`/admin/newsletters/segments/edit/${item.id}`)}
+                onPress={() => navigate(tenantPath(`/admin/newsletters/segments/edit/${item.id}`))}
               >
                 Edit
               </DropdownItem>
@@ -186,7 +188,7 @@ export function Segments() {
             <Button
               color="primary"
               startContent={<Plus size={16} />}
-              onPress={() => navigate('/admin/newsletters/segments/create')}
+              onPress={() => navigate(tenantPath('/admin/newsletters/segments/create'))}
             >
               Create Segment
             </Button>
@@ -197,7 +199,7 @@ export function Segments() {
           title={t('newsletters.no_segments_created')}
           description={t('newsletters.desc_create_audience_segments_to_target_speci')}
           actionLabel="Create Your First Segment"
-          onAction={() => navigate('/admin/newsletters/segments/create')}
+          onAction={() => navigate(tenantPath('/admin/newsletters/segments/create'))}
         />
       </div>
     );
@@ -221,7 +223,7 @@ export function Segments() {
             <Button
               color="primary"
               startContent={<Plus size={16} />}
-              onPress={() => navigate('/admin/newsletters/segments/create')}
+              onPress={() => navigate(tenantPath('/admin/newsletters/segments/create'))}
             >
               Create Segment
             </Button>

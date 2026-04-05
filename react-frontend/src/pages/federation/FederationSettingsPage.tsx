@@ -44,7 +44,7 @@ import { GlassCard } from '@/components/ui';
 import { Breadcrumbs } from '@/components/navigation';
 import { PageMeta } from '@/components/seo';
 import { usePageTitle } from '@/hooks';
-import { useToast, useTenant } from '@/contexts';
+import { useToast } from '@/contexts';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
 import type { FederationSettings } from '@/types/api';
@@ -89,7 +89,6 @@ export function FederationSettingsPage() {
   const { t } = useTranslation('federation');
   usePageTitle(t('settings.page_title'));
   const toast = useToast();
-  const { tenantPath } = useTenant();
 
   // AbortController ref to cancel stale requests
   const abortRef = useRef<AbortController | null>(null);
@@ -259,7 +258,7 @@ export function FederationSettingsPage() {
     return (
       <div className="max-w-3xl mx-auto">
         <Breadcrumbs items={[
-          { label: t('settings.breadcrumb_federation'), href: tenantPath('/federation') },
+          { label: t('settings.breadcrumb_federation'), href: '/federation' },
           { label: t('settings.breadcrumb_settings') },
         ]} />
         <GlassCard className="p-8 text-center">
@@ -290,7 +289,7 @@ export function FederationSettingsPage() {
       <PageMeta title="Federation Settings" noIndex />
       {/* Breadcrumbs */}
       <Breadcrumbs items={[
-        { label: t('settings.breadcrumb_federation'), href: tenantPath('/federation') },
+        { label: t('settings.breadcrumb_federation'), href: '/federation' },
         { label: t('settings.breadcrumb_settings') },
       ]} />
 

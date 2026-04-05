@@ -31,9 +31,10 @@ import { Outlet, Routes, useLocation } from 'react-router-dom';
 import { TenantProvider, useTenant, useAuth } from '@/contexts';
 import { AuthProvider, NotificationsProvider, PusherProvider, MenuProvider } from '@/contexts';
 import { PresenceProvider } from '@/contexts/PresenceContext';
-import { detectTenantFromUrl } from '@/lib/tenant-routing';
+import { detectTenantFromUrl, RESERVED_PATHS } from '@/lib/tenant-routing';
+import { tokenManager } from '@/lib/api';
 import { CookieConsentBanner } from '@/components/feedback';
-import { lazy, Suspense } from 'react';
+import { lazy, Suspense, useLayoutEffect } from 'react';
 import { Spinner } from '@heroui/react';
 
 const MaintenancePage = lazy(() => import('@/pages/public/MaintenancePage'));
@@ -54,6 +55,40 @@ export function TenantShell({ appRoutes }: TenantShellProps) {
   // - R4: No tenant → null
   const { slug: detectedSlug } = detectTenantFromUrl();
   const effectiveSlug = detectedSlug ?? undefined;
+
+  // ── SLUG RECOVERY REDIRECT — SYNCHRONOUS, BEFORE ANY CHILDREN MOUNT ────
+  // On shared hosts (localhost, app.project-nexus.ie) the URL path MUST include
+  // the tenant slug prefix. If the slug is missing but we know which tenant the
+  // user is on (from localStorage), redirect IMMEDIATELY via window.location.
+  //
+  // This fires DURING the render, before TenantProvider or any page component
+  // mounts. It catches ALL cases where the slug gets lost.
+  //
+  // SAFE for custom domains: hostname check ensures this NEVER fires on custom
+  // domains or subdomains — only on localhost, 127.0.0.1, app.project-nexus.ie.
+  // SLUG RECOVERY — fires synchronously during render, before children mount.
+  // On shared hosts, if the slug is missing from the URL but we know which tenant
+  // the user is on (from localStorage), redirect via window.location.replace().
+  // SAFE: only fires on localhost/127.0.0.1/app.project-nexus.ie — never on
+  // custom domains or subdomains.
+  if (!effectiveSlug && typeof window !== 'undefined') {
+    const hostname = window.location.hostname;
+    const isSharedHost = hostname === 'localhost' || hostname === '127.0.0.1' || hostname === 'app.project-nexus.ie';
+
+    if (isSharedHost) {
+      const storedSlug = tokenManager.getTenantSlug();
+      if (storedSlug) {
+        const firstSegment = window.location.pathname.split('/').filter(Boolean)[0]?.toLowerCase();
+        const isReservedOrEmpty = !firstSegment || RESERVED_PATHS.has(firstSegment);
+
+        if (isReservedOrEmpty) {
+          const path = window.location.pathname === '/' ? '' : window.location.pathname;
+          window.location.replace(`${window.location.origin}/${storedSlug}${path}${window.location.search}${window.location.hash}`);
+          return null;
+        }
+      }
+    }
+  }
 
   return (
     <TenantProvider tenantSlug={effectiveSlug}>
@@ -120,14 +155,18 @@ function TenantGuard({
 
   // Show maintenance page to non-admin users when maintenance mode is enabled
   // Allow access to admin routes and auth pages (login, register) even in maintenance mode
-  const isAdminRoute = location.pathname.startsWith('/admin') ||
-                       location.pathname.includes('/admin') ||
-                       (slugPrefix ? location.pathname.startsWith(`/${slugPrefix}/admin`) : false);
+  const lowerPath = location.pathname.toLowerCase();
+  const lowerPrefix = slugPrefix?.toLowerCase();
+
+  const isAdminRoute = lowerPath === '/admin' ||
+                       lowerPath.startsWith('/admin/') ||
+                       (lowerPrefix ? (lowerPath === `/${lowerPrefix}/admin` ||
+                                       lowerPath.startsWith(`/${lowerPrefix}/admin/`)) : false);
 
   const authPaths = ['login', 'register', 'password/forgot', 'password/reset', 'verify-email'];
   const isAuthRoute = authPaths.some((p) =>
-    location.pathname === `/${p}` ||
-    (slugPrefix && location.pathname === `/${slugPrefix}/${p}`)
+    lowerPath === `/${p}` ||
+    (lowerPrefix && lowerPath === `/${lowerPrefix}/${p}`)
   );
 
   if (maintenanceMode && !isAdmin && !isAdminRoute && !isAuthRoute) {
@@ -143,13 +182,51 @@ function TenantGuard({
   if (slugPrefix && appRoutes) {
     const strippedPath = location.pathname.replace(new RegExp(`^/${slugPrefix}`, 'i'), '') || '/';
     return (
-      <Routes location={{ ...location, pathname: strippedPath }}>
-        {appRoutes()}
-      </Routes>
+      <>
+        <SlugUrlGuard slug={slugPrefix} />
+        <Routes location={{ ...location, pathname: strippedPath }}>
+          {appRoutes()}
+        </Routes>
+      </>
     );
   }
 
   return <>{children}</>;
+}
+
+/**
+ * Slug URL Guard — restores the tenant slug in the browser URL.
+ *
+ * React Router v6's <Routes location={customLocation}> with a stripped pathname
+ * can cause the browser URL to lose the slug prefix (the nested Routes syncs
+ * the browser URL to the custom location's pathname on certain renders).
+ *
+ * This component fires a synchronous useLayoutEffect (before the browser paints)
+ * that checks if the slug is missing from the browser URL and restores it via
+ * history.replaceState. The user never sees the wrong URL.
+ *
+ * SAFE for custom domains: this component is only rendered when slugPrefix is
+ * defined, which only happens on shared hosts (localhost, app.project-nexus.ie).
+ */
+function SlugUrlGuard({ slug }: { slug: string }) {
+  useLayoutEffect(() => {
+    // ONLY restore slug on shared hosts where the path prefix IS the tenant identifier.
+    // On subdomains (hour-timebank.project-nexus.ie) or custom domains (hour-timebank.ie),
+    // the slug belongs in the domain, NOT the path — never touch the URL there.
+    const hostname = window.location.hostname;
+    const isSharedHost = hostname === 'localhost' || hostname === '127.0.0.1' || hostname === 'app.project-nexus.ie';
+    if (!isSharedHost) return;
+
+    const currentPath = window.location.pathname;
+    const prefix = '/' + slug;
+    // If the browser URL doesn't start with the slug prefix, restore it
+    if (!currentPath.toLowerCase().startsWith(prefix.toLowerCase() + '/') &&
+        currentPath.toLowerCase() !== prefix.toLowerCase()) {
+      const correctedUrl = prefix + currentPath + window.location.search + window.location.hash;
+      window.history.replaceState(window.history.state, '', correctedUrl);
+    }
+  });
+  return null;
 }
 
 /**

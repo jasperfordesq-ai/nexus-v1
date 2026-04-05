@@ -14,7 +14,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { Card, CardBody, Button } from '@heroui/react';
 import { Plus, Award, Trash2 } from 'lucide-react';
 import { usePageTitle } from '@/hooks';
-import { useToast } from '@/contexts';
+import { useToast, useTenant } from '@/contexts';
 import { adminGamification } from '../../api/adminApi';
 import { PageHeader, ConfirmModal, EmptyState } from '../../components';
 import type { BadgeDefinition } from '../../api/types';
@@ -28,6 +28,7 @@ export function CustomBadges() {
   const { t } = useTranslation('admin');
   usePageTitle(t('gamification.page_title'));
   const toast = useToast();
+  const { tenantPath } = useTenant();
   const navigate = useNavigate();
 
   const [badges, setBadges] = useState<BadgeDefinition[]>([]);
@@ -77,7 +78,7 @@ export function CustomBadges() {
         title={t('gamification.custom_badges_title')}
         description={t('gamification.custom_badges_desc')}
         actions={
-          <Link to="/admin/custom-badges/create">
+          <Link to={tenantPath("/admin/custom-badges/create")}>
             <Button color="primary" startContent={<Plus size={16} />}>
               {t('gamification.create_badge')}
             </Button>
@@ -110,7 +111,7 @@ export function CustomBadges() {
           title={t('gamification.no_custom_badges')}
           description={t('gamification.desc_create_your_first_custom_badge_to_reward')}
           actionLabel={t('gamification.create_badge')}
-          onAction={() => navigate('/admin/custom-badges/create')}
+          onAction={() => navigate(tenantPath('/admin/custom-badges/create'))}
         />
       ) : (
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">

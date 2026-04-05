@@ -171,7 +171,7 @@ export function FederationMessagesPage() {
   usePageTitle(t('messages.page_title'));
 
   const { user } = useAuth();
-  const { hasFeature, tenantPath } = useTenant();
+  const { hasFeature } = useTenant();
   const toast = useToast();
   const [searchParams, setSearchParams] = useSearchParams();
 
@@ -479,7 +479,7 @@ export function FederationMessagesPage() {
 
   // ── Breadcrumbs ──
   const breadcrumbItems = [
-    { label: t('messages.breadcrumb_federation'), href: tenantPath('/federation') },
+    { label: t('messages.breadcrumb_federation'), href: '/federation' },
     { label: t('messages.breadcrumb_messages') },
   ];
 

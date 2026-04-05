@@ -36,6 +36,7 @@ import {
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { usePageTitle } from '@/hooks';
+import { useTenant } from '@/contexts';
 import { adminNewsletters } from '../../api/adminApi';
 import { PageHeader } from '../../components';
 
@@ -110,6 +111,7 @@ function generateId(): string {
 
 export function SegmentForm() {
   const { t } = useTranslation('admin');
+  const { tenantPath } = useTenant();
   const { id } = useParams<{ id: string }>();
   const isEdit = Boolean(id);
   const navigate = useNavigate();
@@ -163,7 +165,7 @@ export function SegmentForm() {
       }
     }).catch(() => {
       // Navigate back if segment not found
-      navigate('/admin/newsletters/segments');
+      navigate(tenantPath('/admin/newsletters/segments'));
     }).finally(() => setLoading(false));
   }, [isEdit, id, navigate]);
 
@@ -260,7 +262,7 @@ export function SegmentForm() {
       } else {
         await adminNewsletters.createSegment(payload);
       }
-      navigate('/admin/newsletters/segments');
+      navigate(tenantPath('/admin/newsletters/segments'));
     } catch {
       setErrors({ form: 'Failed to save segment. Please try again.' });
     }
@@ -373,7 +375,7 @@ export function SegmentForm() {
           <Button
             variant="flat"
             startContent={<ArrowLeft size={16} />}
-            onPress={() => navigate('/admin/newsletters/segments')}
+            onPress={() => navigate(tenantPath('/admin/newsletters/segments'))}
           >
             Back to Segments
           </Button>
@@ -600,7 +602,7 @@ export function SegmentForm() {
       <div className="flex justify-end gap-3 pb-8">
         <Button
           variant="flat"
-          onPress={() => navigate('/admin/newsletters/segments')}
+          onPress={() => navigate(tenantPath('/admin/newsletters/segments'))}
         >
           Cancel
         </Button>

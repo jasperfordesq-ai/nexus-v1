@@ -394,7 +394,7 @@ export function ExchangeDetailPage() {
       <PageMeta title="Exchange Details" noIndex />
       {/* Breadcrumbs */}
       <Breadcrumbs items={[
-        { label: t('breadcrumb.exchanges'), href: tenantPath('/exchanges') },
+        { label: t('breadcrumb.exchanges'), href: '/exchanges' },
         { label: exchange?.listing?.title || t('breadcrumb.exchange') },
       ]} />
 

@@ -35,7 +35,7 @@ function ComplianceScoreRing({ score, size = 120 }: { score: number; size?: numb
   const circumference = 2 * Math.PI * radius;
   const progress = (score / 100) * circumference;
   const color = score >= 80 ? 'text-success' : score >= 50 ? 'text-warning' : 'text-danger';
-  const strokeColor = score >= 80 ? '#17c964' : score >= 50 ? '#f5a524' : '#f31260';
+  const strokeColor = score >= 80 ? 'hsl(var(--heroui-success))' : score >= 50 ? 'hsl(var(--heroui-warning))' : 'hsl(var(--heroui-danger))';
 
   return (
     <div className="relative inline-flex items-center justify-center" style={{ width: size, height: size }}>
@@ -236,8 +236,8 @@ export function GdprDashboard() {
                 <XAxis dataKey="month" tick={{ fontSize: 12 }} />
                 <YAxis allowDecimals={false} tick={{ fontSize: 12 }} />
                 <Tooltip />
-                <Area type="monotone" dataKey="requests" stackId="1" stroke="#006FEE" fill="#006FEE" fillOpacity={0.2} name="Requests" />
-                <Area type="monotone" dataKey="breaches" stackId="2" stroke="#f31260" fill="#f31260" fillOpacity={0.2} name="Breaches" />
+                <Area type="monotone" dataKey="requests" stackId="1" stroke="hsl(var(--heroui-primary))" fill="hsl(var(--heroui-primary))" fillOpacity={0.2} name="Requests" />
+                <Area type="monotone" dataKey="breaches" stackId="2" stroke="hsl(var(--heroui-danger))" fill="hsl(var(--heroui-danger))" fillOpacity={0.2} name="Breaches" />
               </AreaChart>
             </ResponsiveContainer>
           </CardBody>

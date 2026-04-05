@@ -14,7 +14,7 @@ import { Link } from 'react-router-dom';
 import { Card, CardBody, CardHeader, Button, Spinner } from '@heroui/react';
 import { ArrowLeft, Award, Users, Zap, Target } from 'lucide-react';
 import { usePageTitle } from '@/hooks';
-import { useToast } from '@/contexts';
+import { useToast, useTenant } from '@/contexts';
 import { adminGamification } from '../../api/adminApi';
 import { StatCard, PageHeader } from '../../components';
 import type { GamificationStats, BadgeDefinition } from '../../api/types';
@@ -28,6 +28,7 @@ export function GamificationAnalytics() {
   const { t } = useTranslation('admin');
   usePageTitle(t('gamification.page_title'));
   const toast = useToast();
+  const { tenantPath } = useTenant();
 
   const [stats, setStats] = useState<GamificationStats | null>(null);
   const [badges, setBadges] = useState<BadgeDefinition[]>([]);
@@ -71,7 +72,7 @@ export function GamificationAnalytics() {
         title={t('gamification.gamification_analytics_title')}
         description={t('gamification.gamification_analytics_desc')}
         actions={
-          <Link to="../gamification">
+          <Link to={tenantPath("/admin/gamification")}>
             <Button variant="flat" startContent={<ArrowLeft size={16} />}>
               {t('gamification.back_to_hub')}
             </Button>

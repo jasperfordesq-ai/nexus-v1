@@ -21,6 +21,7 @@ import {
 } from '@heroui/react';
 import { ExternalLink, Save, Info, Construction } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { useToast, useTenant } from '@/contexts';
 import { adminBroker, adminConfig } from '../../api/adminApi';
 import type { BrokerConfig } from '../../api/types';
@@ -34,6 +35,7 @@ interface ModuleConfigModalProps {
 }
 
 export default function ModuleConfigModal({ module, isOpen, onClose }: ModuleConfigModalProps) {
+  const { t } = useTranslation('admin');
   const toast = useToast();
   const navigate = useNavigate();
   const { tenantPath, refreshTenant } = useTenant();
@@ -66,7 +68,7 @@ export default function ModuleConfigModal({ module, isOpen, onClose }: ModuleCon
         setBrokerConfig(res.data);
       }
     } catch {
-      toast.error('Failed to load broker configuration');
+      toast.error(t('config.modal_broker_load_failed'));
     } finally {
       setLoading(false);
     }
@@ -80,7 +82,7 @@ export default function ModuleConfigModal({ module, isOpen, onClose }: ModuleCon
         setGroupConfig(res.data.config);
       }
     } catch {
-      toast.error('Failed to load group configuration');
+      toast.error(t('config.modal_group_load_failed'));
     } finally {
       setLoading(false);
     }
@@ -94,7 +96,7 @@ export default function ModuleConfigModal({ module, isOpen, onClose }: ModuleCon
         setListingConfig(res.data.config);
       }
     } catch {
-      toast.error('Failed to load listing configuration');
+      toast.error(t('config.modal_listing_load_failed'));
     } finally {
       setLoading(false);
     }
@@ -108,7 +110,7 @@ export default function ModuleConfigModal({ module, isOpen, onClose }: ModuleCon
         setVolunteeringConfig(res.data.config);
       }
     } catch {
-      toast.error('Failed to load volunteering configuration');
+      toast.error(t('config.modal_volunteering_load_failed'));
     } finally {
       setLoading(false);
     }
@@ -122,7 +124,7 @@ export default function ModuleConfigModal({ module, isOpen, onClose }: ModuleCon
         setJobConfig(res.data.config);
       }
     } catch {
-      toast.error('Failed to load job configuration');
+      toast.error(t('config.modal_job_load_failed'));
     } finally {
       setLoading(false);
     }
@@ -159,11 +161,11 @@ export default function ModuleConfigModal({ module, isOpen, onClose }: ModuleCon
     try {
       const res = await adminBroker.saveConfiguration(brokerConfig);
       if (res.success) {
-        toast.success('Exchange workflow configuration saved');
+        toast.success(t('config.modal_broker_saved'));
         setHasChanges(false);
         onClose();
       } else {
-        toast.error('Failed to save configuration');
+        toast.error(t('config.modal_save_failed'));
       }
     } catch {
       toast.error('Failed to save configuration');
@@ -178,12 +180,12 @@ export default function ModuleConfigModal({ module, isOpen, onClose }: ModuleCon
     try {
       const res = await adminConfig.updateGroupConfigBulk(groupConfig);
       if (res.success) {
-        toast.success('Group configuration saved');
+        toast.success(t('config.modal_group_saved'));
         setHasChanges(false);
         refreshTenant();
         onClose();
       } else {
-        toast.error('Failed to save configuration');
+        toast.error(t('config.modal_save_failed'));
       }
     } catch {
       toast.error('Failed to save configuration');
@@ -198,12 +200,12 @@ export default function ModuleConfigModal({ module, isOpen, onClose }: ModuleCon
     try {
       const res = await adminConfig.updateListingConfigBulk(listingConfig);
       if (res.success) {
-        toast.success('Listing configuration saved');
+        toast.success(t('config.modal_listing_saved'));
         setHasChanges(false);
         refreshTenant();
         onClose();
       } else {
-        toast.error('Failed to save configuration');
+        toast.error(t('config.modal_save_failed'));
       }
     } catch {
       toast.error('Failed to save configuration');
@@ -218,12 +220,12 @@ export default function ModuleConfigModal({ module, isOpen, onClose }: ModuleCon
     try {
       const res = await adminConfig.updateVolunteeringConfigBulk(volunteeringConfig);
       if (res.success) {
-        toast.success('Volunteering configuration saved');
+        toast.success(t('config.modal_volunteering_saved'));
         setHasChanges(false);
         refreshTenant();
         onClose();
       } else {
-        toast.error('Failed to save configuration');
+        toast.error(t('config.modal_save_failed'));
       }
     } catch {
       toast.error('Failed to save configuration');
@@ -238,12 +240,12 @@ export default function ModuleConfigModal({ module, isOpen, onClose }: ModuleCon
     try {
       const res = await adminConfig.updateJobConfigBulk(jobConfig);
       if (res.success) {
-        toast.success('Job configuration saved');
+        toast.success(t('config.modal_job_saved'));
         setHasChanges(false);
         refreshTenant();
         onClose();
       } else {
-        toast.error('Failed to save configuration');
+        toast.error(t('config.modal_save_failed'));
       }
     } catch {
       toast.error('Failed to save configuration');
@@ -314,10 +316,10 @@ export default function ModuleConfigModal({ module, isOpen, onClose }: ModuleCon
           </div>
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2">
-              <span>{module.name} Configuration</span>
+              <span>{t('config.modal_title', { name: module.name })}</span>
               {!isEditable && (
                 <Chip size="sm" variant="flat" color="warning" startContent={<Construction size={12} />}>
-                  Beta
+                  {t('config.beta')}
                 </Chip>
               )}
             </div>
@@ -340,7 +342,7 @@ export default function ModuleConfigModal({ module, isOpen, onClose }: ModuleCon
                 <Info size={40} className="text-default-400" />
                 <div className="text-center">
                   <p className="text-sm text-default-600">
-                    Onboarding has a dedicated configuration page with step management, safeguarding presets, and visibility gating.
+                    {t('config.modal_onboarding_desc')}
                   </p>
                 </div>
                 {module.detailPageUrl && (
@@ -350,7 +352,7 @@ export default function ModuleConfigModal({ module, isOpen, onClose }: ModuleCon
                     startContent={<ExternalLink size={16} />}
                     onPress={handleNavigateToDetail}
                   >
-                    Go to Onboarding Settings
+                    {t('config.modal_go_to_onboarding')}
                   </Button>
                 )}
               </CardBody>
@@ -363,7 +365,7 @@ export default function ModuleConfigModal({ module, isOpen, onClose }: ModuleCon
               <CardBody className="flex flex-row items-center gap-3 py-3">
                 <Construction size={18} className="text-warning flex-shrink-0" />
                 <p className="text-sm text-warning-700 dark:text-warning-400">
-                  Configuration options for this module are under development. These options preview what will be available soon.
+                  {t('config.modal_coming_soon_notice')}
                 </p>
               </CardBody>
             </Card>
@@ -431,7 +433,7 @@ export default function ModuleConfigModal({ module, isOpen, onClose }: ModuleCon
                 startContent={<ExternalLink size={14} />}
                 onPress={handleNavigateToDetail}
               >
-                Open full Broker Configuration page
+                {t('config.modal_open_broker_page')}
               </Button>
             </div>
           )}
@@ -439,7 +441,7 @@ export default function ModuleConfigModal({ module, isOpen, onClose }: ModuleCon
 
         <ModalFooter>
           <Button variant="flat" onPress={onClose}>
-            {isEditable && hasChanges ? 'Cancel' : 'Close'}
+            {isEditable && hasChanges ? t('config.cancel') : t('config.close')}
           </Button>
           {isEditable && (
             <Button
@@ -449,7 +451,7 @@ export default function ModuleConfigModal({ module, isOpen, onClose }: ModuleCon
               isDisabled={!hasChanges || (isBroker && !brokerConfig) || (isGroupConfig && !groupConfig) || (isListingConfig && !listingConfig) || (isVolunteeringConfig && !volunteeringConfig) || (isJobConfig && !jobConfig)}
               onPress={isBroker ? handleSaveBrokerConfig : isListingConfig ? handleSaveListingConfig : isVolunteeringConfig ? handleSaveVolunteeringConfig : isJobConfig ? handleSaveJobConfig : handleSaveGroupConfig}
             >
-              Save Changes
+              {t('config.save_changes')}
             </Button>
           )}
         </ModalFooter>
@@ -470,13 +472,14 @@ interface ConfigOptionRowProps {
 }
 
 function ConfigOptionRow({ option, value, onChange, disabled }: ConfigOptionRowProps) {
+  const { t } = useTranslation('admin');
   return (
     <div className="flex items-start justify-between gap-6 py-2.5">
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-2 flex-wrap">
           <span className="text-sm font-medium">{option.label}</span>
           {option.comingSoon && (
-            <Chip size="sm" variant="flat" color="warning">Coming Soon</Chip>
+            <Chip size="sm" variant="flat" color="warning">{t('config.coming_soon')}</Chip>
           )}
         </div>
         <p className="text-xs text-default-500 mt-1 leading-relaxed">{option.description}</p>

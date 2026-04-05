@@ -304,7 +304,7 @@ export function ListingDetailPage() {
       </Helmet>
       {/* Breadcrumbs */}
       <Breadcrumbs items={[
-        { label: t('title'), href: tenantPath('/listings') },
+        { label: t('title'), href: '/listings' },
         { label: listing?.title || 'Listing' },
       ]} />
 

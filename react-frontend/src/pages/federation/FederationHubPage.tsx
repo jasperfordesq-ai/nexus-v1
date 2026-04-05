@@ -610,11 +610,11 @@ export default function FederationHubPage() {
   const { t } = useTranslation('federation');
   usePageTitle(t('hub.page_title'));
 
-  const { tenant, tenantPath } = useTenant();
+  const { tenant } = useTenant();
   const toast = useToast();
 
   const breadcrumbs: BreadcrumbItem[] = [
-    { label: t('hub.breadcrumb_dashboard'), href: tenantPath('/dashboard') },
+    { label: t('hub.breadcrumb_dashboard'), href: '/dashboard' },
     { label: t('hub.breadcrumb_federation') },
   ];
 

@@ -545,7 +545,7 @@ export function CreateEventPage() {
       <PageMeta title="Create Event" noIndex />
       {/* Breadcrumbs */}
       <Breadcrumbs items={[
-        { label: t('title'), href: tenantPath('/events') },
+        { label: t('title'), href: '/events' },
         { label: isEditing ? t('form.nav_edit') : t('form.nav_new') },
       ]} />
 

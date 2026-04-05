@@ -52,6 +52,7 @@ import {
   Globe,
   AlertTriangle,
 } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { usePageTitle } from '@/hooks';
 import { useToast, useTenant } from '@/contexts';
@@ -125,7 +126,8 @@ export function OnboardingSettings() {
   const { t } = useTranslation('admin');
   usePageTitle(t('system.onboarding.page_title'));
   const toast = useToast();
-  const { tenant } = useTenant();
+  const { tenant, tenantPath } = useTenant();
+  const navigate = useNavigate();
 
   const [config, setConfig] = useState<OnboardingConfig | null>(null);
   const [safeguardingOptions, setSafeguardingOptions] = useState<SafeguardingOption[]>([]);
@@ -449,7 +451,7 @@ export function OnboardingSettings() {
               ) : (
                 <p className="text-sm text-theme-muted">{t('system.onboarding.no_options_configured')}</p>
               )}
-              <Button size="sm" variant="light" color="primary" className="mt-3" onPress={() => { window.location.href = '/admin/safeguarding-options'; }}>
+              <Button size="sm" variant="light" color="primary" className="mt-3" onPress={() => { navigate(tenantPath('/admin/safeguarding-options')); }}>
                 {t('system.onboarding.manage_options')}
               </Button>
             </div>

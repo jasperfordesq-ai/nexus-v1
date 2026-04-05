@@ -222,7 +222,7 @@ export function FederationListingsPage() {
       {/* Breadcrumbs */}
       <Breadcrumbs
         items={[
-          { label: t('listings.breadcrumb_federation'), href: tenantPath('/federation') },
+          { label: t('listings.breadcrumb_federation'), href: '/federation' },
           { label: t('listings.breadcrumb_listings') },
         ]}
       />

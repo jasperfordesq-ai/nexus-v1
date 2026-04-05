@@ -223,7 +223,7 @@ class ApiClient {
     // Listen for cross-tab token updates
     if (typeof window !== 'undefined') {
       window.addEventListener('storage', (e) => {
-        if (e.key === 'access_token' && e.newValue && this.isRefreshing) {
+        if (e.key === TOKEN_KEY && e.newValue && this.isRefreshing) {
           // Another tab successfully refreshed — resolve our pending requests
           this.pendingRequests.forEach(({ resolve }) => resolve(true));
           this.pendingRequests = [];

@@ -555,7 +555,7 @@ export function EventDetailPage() {
 
       {/* Breadcrumbs */}
       <Breadcrumbs items={[
-        { label: t('title'), href: tenantPath('/events') },
+        { label: t('title'), href: '/events' },
         { label: event?.title || t('title') },
       ]} />
 

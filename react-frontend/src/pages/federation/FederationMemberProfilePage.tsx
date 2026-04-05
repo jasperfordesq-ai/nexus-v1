@@ -168,8 +168,8 @@ export function FederationMemberProfilePage() {
       <div className="space-y-6">
         <Breadcrumbs
           items={[
-            { label: t('member_profile.breadcrumb_federation'), href: tenantPath('/federation') },
-            { label: t('member_profile.breadcrumb_members'), href: tenantPath('/federation/members') },
+            { label: t('member_profile.breadcrumb_federation'), href: '/federation' },
+            { label: t('member_profile.breadcrumb_members'), href: '/federation/members' },
             { label: t('member_profile.breadcrumb_profile') },
           ]}
         />
@@ -211,8 +211,8 @@ export function FederationMemberProfilePage() {
       {/* Breadcrumbs */}
       <Breadcrumbs
         items={[
-          { label: t('member_profile.breadcrumb_federation'), href: tenantPath('/federation') },
-          { label: t('member_profile.breadcrumb_members'), href: tenantPath('/federation/members') },
+          { label: t('member_profile.breadcrumb_federation'), href: '/federation' },
+          { label: t('member_profile.breadcrumb_members'), href: '/federation/members' },
           { label: displayName },
         ]}
       />

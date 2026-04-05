@@ -1067,7 +1067,7 @@ export function GroupDetailPage() {
 
       {/* Breadcrumbs */}
       <Breadcrumbs items={[
-        { label: t('title'), href: tenantPath('/groups') },
+        { label: t('title'), href: '/groups' },
         { label: group?.name || t('title') },
       ]} />
 

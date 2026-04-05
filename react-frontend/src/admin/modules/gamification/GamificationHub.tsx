@@ -14,7 +14,7 @@ import { Link } from 'react-router-dom';
 import { Card, CardBody, CardHeader, Button, Spinner } from '@heroui/react';
 import { Award, Users, Zap, Target, RefreshCw, ArrowRight, Megaphone, BarChart3, Settings2 } from 'lucide-react';
 import { usePageTitle } from '@/hooks';
-import { useToast } from '@/contexts';
+import { useToast, useTenant } from '@/contexts';
 import { adminGamification } from '../../api/adminApi';
 import { StatCard, PageHeader } from '../../components';
 import type { GamificationStats } from '../../api/types';
@@ -28,6 +28,7 @@ export function GamificationHub() {
   const { t } = useTranslation('admin');
   usePageTitle(t('gamification.page_title'));
   const toast = useToast();
+  const { tenantPath } = useTenant();
 
   const [stats, setStats] = useState<GamificationStats | null>(null);
   const [loading, setLoading] = useState(true);
@@ -161,7 +162,7 @@ export function GamificationHub() {
             <h3 className="text-lg font-semibold text-foreground">{t('gamification.quick_links')}</h3>
           </CardHeader>
           <CardBody className="gap-3">
-            <Link to="../gamification/campaigns" className="block">
+            <Link to={tenantPath("/admin/gamification/campaigns")} className="block">
               <Card shadow="none" className="bg-default-50 hover:bg-default-100 transition-colors cursor-pointer">
                 <CardBody className="flex flex-row items-center gap-3 p-3">
                   <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
@@ -176,7 +177,7 @@ export function GamificationHub() {
               </Card>
             </Link>
 
-            <Link to="../custom-badges" className="block">
+            <Link to={tenantPath("/admin/custom-badges")} className="block">
               <Card shadow="none" className="bg-default-50 hover:bg-default-100 transition-colors cursor-pointer">
                 <CardBody className="flex flex-row items-center gap-3 p-3">
                   <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-success/10 text-success">
@@ -191,7 +192,7 @@ export function GamificationHub() {
               </Card>
             </Link>
 
-            <Link to="../gamification/badge-config" className="block">
+            <Link to={tenantPath("/admin/gamification/badge-config")} className="block">
               <Card shadow="none" className="bg-default-50 hover:bg-default-100 transition-colors cursor-pointer">
                 <CardBody className="flex flex-row items-center gap-3 p-3">
                   <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-secondary/10 text-secondary">
@@ -206,7 +207,7 @@ export function GamificationHub() {
               </Card>
             </Link>
 
-            <Link to="../gamification/analytics" className="block">
+            <Link to={tenantPath("/admin/gamification/analytics")} className="block">
               <Card shadow="none" className="bg-default-50 hover:bg-default-100 transition-colors cursor-pointer">
                 <CardBody className="flex flex-row items-center gap-3 p-3">
                   <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-warning/10 text-warning">

@@ -50,6 +50,12 @@ When running audits, limit parallel background agents to **5 maximum**. Do NOT s
 
 ## Deployment Checklist
 
+### 🔴 NEVER AUTO-DEPLOY (CRITICAL)
+
+**NEVER start a deployment unless the user explicitly tells you to deploy.** Completing a task (code changes, bug fix, feature implementation, audit fix, etc.) does NOT imply "deploy it." Always stop after committing/pushing and wait for the user to give a direct deployment instruction (e.g., "deploy", "push to production", "run safe-deploy"). This is a production server — unauthorized deployments cause downtime and disruption.
+
+This applies to ALL agents, including background agents and teammate agents in swarm mode. No agent may initiate SSH, run `safe-deploy.sh`, or trigger any production deployment autonomously.
+
 After deploying to production, always check for CORS errors, tenant binding issues, and feature gate problems. Run a quick smoke test of critical endpoints before reporting deployment success.
 
 When deploying to production, always verify the deployment is working by checking key endpoints before reporting success. Never skip migration dry-runs on production.

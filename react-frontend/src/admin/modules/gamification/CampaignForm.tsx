@@ -25,7 +25,7 @@ import {
 } from '@heroui/react';
 import { ArrowLeft, Save } from 'lucide-react';
 import { usePageTitle } from '@/hooks';
-import { useToast } from '@/contexts';
+import { useToast, useTenant } from '@/contexts';
 import { adminGamification } from '../../api/adminApi';
 import { PageHeader } from '../../components';
 import { useTranslation } from 'react-i18next';
@@ -89,6 +89,7 @@ export function CampaignForm() {
   const isEdit = !!id;
   usePageTitle(isEdit ? t('gamification.edit_campaign_title') : t('gamification.create_campaign_title'));
   const toast = useToast();
+  const { tenantPath } = useTenant();
   const navigate = useNavigate();
 
   const [formData, setFormData] = useState<FormData>(INITIAL_FORM);
@@ -134,7 +135,7 @@ export function CampaignForm() {
         });
       } else {
         toast.error(t('gamification.campaign_not_found'));
-        navigate('/admin/gamification/campaigns');
+        navigate(tenantPath('/admin/gamification/campaigns'));
       }
     }
     setLoadingCampaign(false);
@@ -173,7 +174,7 @@ export function CampaignForm() {
       const res = await adminGamification.updateCampaign(Number(id), payload);
       if (res.success) {
         toast.success(t('gamification.campaign_updated'));
-        navigate('/admin/gamification/campaigns');
+        navigate(tenantPath('/admin/gamification/campaigns'));
       } else {
         const errorMsg = (res as { error?: string }).error
           || (res as { errors?: Array<{ message: string }> }).errors?.[0]?.message
@@ -184,7 +185,7 @@ export function CampaignForm() {
       const res = await adminGamification.createCampaign(payload);
       if (res.success) {
         toast.success(t('gamification.campaign_created'));
-        navigate('/admin/gamification/campaigns');
+        navigate(tenantPath('/admin/gamification/campaigns'));
       } else {
         const errorMsg = (res as { error?: string }).error
           || (res as { errors?: Array<{ message: string }> }).errors?.[0]?.message
@@ -210,7 +211,7 @@ export function CampaignForm() {
         title={isEdit ? t('gamification.edit_campaign') : t('gamification.create_campaign')}
         description={isEdit ? t('gamification.edit_campaign_desc') : t('gamification.create_campaign_desc')}
         actions={
-          <Link to="/admin/gamification/campaigns">
+          <Link to={tenantPath("/admin/gamification/campaigns")}>
             <Button variant="flat" startContent={<ArrowLeft size={16} />}>
               {t('gamification.back_to_campaigns')}
             </Button>
@@ -335,7 +336,7 @@ export function CampaignForm() {
           )}
 
           <div className="flex justify-end gap-2 pt-2">
-            <Link to="/admin/gamification/campaigns">
+            <Link to={tenantPath("/admin/gamification/campaigns")}>
               <Button variant="flat" isDisabled={saving}>{t('gamification.cancel')}</Button>
             </Link>
             <Button

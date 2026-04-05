@@ -9,6 +9,7 @@
  */
 
 import { useState, useEffect, useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   Tabs,
   Tab,
@@ -80,7 +81,8 @@ const MODERATION_TABS = ['all', 'pending', 'approved', 'rejected', 'flagged'] as
 // ─────────────────────────────────────────────────────────────────────────────
 
 export function MarketplaceModerationPage() {
-  usePageTitle('Marketplace Moderation');
+  const { t } = useTranslation('admin');
+  usePageTitle(t('marketplace.moderation_page_title'));
   const toast = useToast();
   const { tenantPath } = useTenant();
 
@@ -124,7 +126,7 @@ export function MarketplaceModerationPage() {
         }
       }
     } catch {
-      toast.error('Failed to load marketplace listings');
+      toast.error(t('marketplace.failed_load_listings'));
     } finally {
       setLoading(false);
     }
@@ -141,13 +143,13 @@ export function MarketplaceModerationPage() {
     try {
       const res = await api.post(`/v2/admin/marketplace/listings/${item.id}/approve`);
       if (res?.success) {
-        toast.success(`"${item.title}" approved`);
+        toast.success(t('marketplace.listing_approved', { title: item.title }));
         loadListings();
       } else {
-        toast.error((res as { error?: string }).error || 'Failed to approve listing');
+        toast.error((res as { error?: string }).error || t('marketplace.failed_approve_listing'));
       }
     } catch {
-      toast.error('An unexpected error occurred');
+      toast.error(t('marketplace.unexpected_error'));
     } finally {
       setActionLoading(false);
     }
@@ -161,15 +163,15 @@ export function MarketplaceModerationPage() {
         notes: rejectNotes,
       });
       if (res?.success) {
-        toast.success(`"${rejectTarget.title}" rejected`);
+        toast.success(t('marketplace.listing_rejected', { title: rejectTarget.title }));
         setRejectTarget(null);
         setRejectNotes('');
         loadListings();
       } else {
-        toast.error((res as { error?: string }).error || 'Failed to reject listing');
+        toast.error((res as { error?: string }).error || t('marketplace.failed_reject_listing'));
       }
     } catch {
-      toast.error('An unexpected error occurred');
+      toast.error(t('marketplace.unexpected_error'));
     } finally {
       setRejectLoading(false);
     }
@@ -181,13 +183,13 @@ export function MarketplaceModerationPage() {
     try {
       const res = await api.delete(`/v2/admin/marketplace/listings/${confirmDelete.id}`);
       if (res?.success) {
-        toast.success(`"${confirmDelete.title}" removed`);
+        toast.success(t('marketplace.listing_removed', { title: confirmDelete.title }));
         loadListings();
       } else {
-        toast.error((res as { error?: string }).error || 'Failed to delete listing');
+        toast.error((res as { error?: string }).error || t('marketplace.failed_delete_listing'));
       }
     } catch {
-      toast.error('An unexpected error occurred');
+      toast.error(t('marketplace.unexpected_error'));
     } finally {
       setActionLoading(false);
       setConfirmDelete(null);
@@ -212,7 +214,7 @@ export function MarketplaceModerationPage() {
     },
     {
       key: 'title',
-      label: 'Title',
+      label: t('marketplace.col_title'),
       sortable: true,
       render: (item) => (
         <span className="font-medium text-foreground">{item.title}</span>
@@ -220,7 +222,7 @@ export function MarketplaceModerationPage() {
     },
     {
       key: 'seller_name',
-      label: 'Seller',
+      label: t('marketplace.col_seller'),
       sortable: true,
       render: (item) => (
         <span className="text-sm text-default-600">{item.seller_name}</span>
@@ -228,7 +230,7 @@ export function MarketplaceModerationPage() {
     },
     {
       key: 'price',
-      label: 'Price',
+      label: t('marketplace.col_price'),
       sortable: true,
       render: (item) => (
         <span className="text-sm text-default-600">
@@ -238,7 +240,7 @@ export function MarketplaceModerationPage() {
     },
     {
       key: 'category',
-      label: 'Category',
+      label: t('marketplace.col_category'),
       sortable: true,
       render: (item) => (
         <span className="text-sm text-default-500">{item.category || '--'}</span>
@@ -246,7 +248,7 @@ export function MarketplaceModerationPage() {
     },
     {
       key: 'status',
-      label: 'Status',
+      label: t('marketplace.col_status'),
       sortable: true,
       render: (item) => (
         <Chip
@@ -261,7 +263,7 @@ export function MarketplaceModerationPage() {
     },
     {
       key: 'moderation_status',
-      label: 'Moderation',
+      label: t('marketplace.col_moderation'),
       sortable: true,
       render: (item) => (
         <Chip
@@ -276,7 +278,7 @@ export function MarketplaceModerationPage() {
     },
     {
       key: 'created_at',
-      label: 'Created',
+      label: t('marketplace.col_created'),
       sortable: true,
       render: (item) => (
         <span className="text-sm text-default-500">
@@ -286,12 +288,12 @@ export function MarketplaceModerationPage() {
     },
     {
       key: 'actions',
-      label: 'Actions',
+      label: t('marketplace.col_actions'),
       render: (item) => (
         <div className="flex gap-1">
           {(item.moderation_status === 'pending' || item.moderation_status === 'flagged') && (
             <>
-              <Tooltip content="Approve">
+              <Tooltip content={t('marketplace.action_approve')}>
                 <Button
                   isIconOnly
                   size="sm"
@@ -299,12 +301,12 @@ export function MarketplaceModerationPage() {
                   color="success"
                   onPress={() => handleApprove(item)}
                   isDisabled={actionLoading}
-                  aria-label="Approve listing"
+                  aria-label={t('marketplace.action_approve_listing')}
                 >
                   <CheckCircle size={14} />
                 </Button>
               </Tooltip>
-              <Tooltip content="Reject">
+              <Tooltip content={t('marketplace.action_reject')}>
                 <Button
                   isIconOnly
                   size="sm"
@@ -315,14 +317,14 @@ export function MarketplaceModerationPage() {
                     setRejectNotes('');
                   }}
                   isDisabled={actionLoading}
-                  aria-label="Reject listing"
+                  aria-label={t('marketplace.action_reject_listing')}
                 >
                   <XCircle size={14} />
                 </Button>
               </Tooltip>
             </>
           )}
-          <Tooltip content="View listing">
+          <Tooltip content={t('marketplace.action_view_listing')}>
             <Button
               isIconOnly
               size="sm"
@@ -332,12 +334,12 @@ export function MarketplaceModerationPage() {
               href={tenantPath(`/marketplace/${item.id}`)}
               target="_blank"
               rel="noopener noreferrer"
-              aria-label="View listing"
+              aria-label={t('marketplace.action_view_listing')}
             >
               <Eye size={14} />
             </Button>
           </Tooltip>
-          <Tooltip content="Delete">
+          <Tooltip content={t('marketplace.action_delete')}>
             <Button
               isIconOnly
               size="sm"
@@ -345,7 +347,7 @@ export function MarketplaceModerationPage() {
               color="danger"
               onPress={() => setConfirmDelete(item)}
               isDisabled={actionLoading}
-              aria-label="Delete listing"
+              aria-label={t('marketplace.action_delete_listing')}
             >
               <Trash2 size={14} />
             </Button>
@@ -358,15 +360,15 @@ export function MarketplaceModerationPage() {
   return (
     <div>
       <PageHeader
-        title="Marketplace Moderation"
-        description="Review and moderate marketplace listings"
+        title={t('marketplace.moderation_title')}
+        description={t('marketplace.moderation_description')}
         actions={
           <Button
             variant="flat"
             startContent={<RefreshCw size={16} />}
             onPress={loadListings}
           >
-            Refresh
+            {t('marketplace.refresh')}
           </Button>
         }
       />
@@ -393,7 +395,7 @@ export function MarketplaceModerationPage() {
         columns={columns}
         data={items}
         isLoading={loading}
-        searchPlaceholder="Search listings..."
+        searchPlaceholder={t('marketplace.search_listings')}
         onSearch={(q) => {
           setSearch(q);
           setPage(1);
@@ -406,11 +408,11 @@ export function MarketplaceModerationPage() {
         emptyContent={
           <EmptyState
             icon={ShoppingBag}
-            title="No listings found"
+            title={t('marketplace.no_listings_found')}
             description={
               search || moderationFilter !== 'all'
-                ? 'Try adjusting your filters or search query'
-                : 'No marketplace listings have been created yet'
+                ? t('marketplace.try_adjusting_filters')
+                : t('marketplace.no_listings_created_yet')
             }
           />
         }
@@ -429,16 +431,15 @@ export function MarketplaceModerationPage() {
           <ModalContent>
             <ModalHeader className="flex items-center gap-2">
               <XCircle size={20} className="text-danger" />
-              Reject Listing
+              {t('marketplace.reject_listing_title')}
             </ModalHeader>
             <ModalBody>
               <p className="text-sm text-default-600 mb-3">
-                You are rejecting <strong>{rejectTarget.title}</strong> by{' '}
-                {rejectTarget.seller_name}. Please provide a reason.
+                {t('marketplace.reject_listing_message', { title: rejectTarget.title, seller: rejectTarget.seller_name })}
               </p>
               <Textarea
-                label="Moderation Notes"
-                placeholder="Enter the reason for rejection..."
+                label={t('marketplace.moderation_notes_label')}
+                placeholder={t('marketplace.rejection_reason_placeholder')}
                 value={rejectNotes}
                 onValueChange={setRejectNotes}
                 minRows={3}
@@ -455,7 +456,7 @@ export function MarketplaceModerationPage() {
                 }}
                 isDisabled={rejectLoading}
               >
-                Cancel
+                {t('marketplace.cancel')}
               </Button>
               <Button
                 color="danger"
@@ -463,7 +464,7 @@ export function MarketplaceModerationPage() {
                 isLoading={rejectLoading}
                 isDisabled={rejectLoading || !rejectNotes.trim()}
               >
-                Reject Listing
+                {t('marketplace.reject_listing_btn')}
               </Button>
             </ModalFooter>
           </ModalContent>
@@ -476,9 +477,9 @@ export function MarketplaceModerationPage() {
           isOpen={!!confirmDelete}
           onClose={() => setConfirmDelete(null)}
           onConfirm={handleDelete}
-          title="Delete Listing"
-          message={`Are you sure you want to permanently remove "${confirmDelete.title}"? This action cannot be undone.`}
-          confirmLabel="Delete"
+          title={t('marketplace.delete_listing_title')}
+          message={t('marketplace.delete_listing_message', { title: confirmDelete.title })}
+          confirmLabel={t('marketplace.delete_btn')}
           confirmColor="danger"
           isLoading={actionLoading}
         />

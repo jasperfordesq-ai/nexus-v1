@@ -9,6 +9,7 @@
  */
 
 import { useState, useEffect, useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   Tabs,
   Tab,
@@ -62,7 +63,8 @@ const typeColors: Record<string, 'primary' | 'secondary' | 'default'> = {
 // ─────────────────────────────────────────────────────────────────────────────
 
 export function MarketplaceSellerAdmin() {
-  usePageTitle('Marketplace Sellers');
+  const { t } = useTranslation('admin');
+  usePageTitle(t('marketplace.sellers_page_title'));
   const toast = useToast();
   const { tenantPath } = useTenant();
 
@@ -111,7 +113,7 @@ export function MarketplaceSellerAdmin() {
         }
       }
     } catch {
-      toast.error('Failed to load sellers');
+      toast.error(t('marketplace.failed_load_sellers'));
     } finally {
       setLoading(false);
     }
