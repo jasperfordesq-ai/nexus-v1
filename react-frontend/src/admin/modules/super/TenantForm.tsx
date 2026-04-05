@@ -100,7 +100,7 @@ export function TenantForm() {
   const { id } = useParams<{ id: string }>();
   const [searchParams] = useSearchParams();
   const isEdit = !!id;
-  usePageTitle(isEdit ? 'Super Admin - Edit Tenant' : 'Super Admin - Create Tenant');
+  usePageTitle(isEdit ? t('tenant_form.page_title_edit') : t('tenant_form.page_title_create'));
   const { tenantPath } = useTenant();
   const toast = useToast();
   const navigate = useNavigate();
@@ -218,7 +218,7 @@ export function TenantForm() {
         });
       }
     } catch {
-      toast.error('Failed to load tenant');
+      toast.error(t('tenant_form.failed_to_load_tenant'));
     }
     setLoading(false);
   }, [id, toast]);
@@ -251,11 +251,11 @@ export function TenantForm() {
 
   const handleSubmit = async () => {
     if (!form.name.trim()) {
-      toast.error('Tenant name is required');
+      toast.error(t('tenant_form.name_required'));
       return;
     }
     if (!isEdit && !form.slug.trim()) {
-      toast.error('Tenant slug is required');
+      toast.error(t('tenant_form.slug_required'));
       return;
     }
 
@@ -299,7 +299,7 @@ export function TenantForm() {
       }
 
       if (res.success) {
-        toast.success(`Tenant ${isEdit ? 'updated' : 'created'} successfully`);
+        toast.success(isEdit ? t('tenant_form.tenant_updated') : t('tenant_form.tenant_created'));
         if (isEdit) {
           navigate(tenantPath(`/admin/super/tenants/${id}`));
         } else {
@@ -308,10 +308,10 @@ export function TenantForm() {
           navigate(tenantPath(newId ? `/admin/super/tenants/${newId}` : '/admin/super/tenants'));
         }
       } else {
-        toast.error(res.error || `Failed to ${isEdit ? 'update' : 'create'} tenant`);
+        toast.error(res.error || (isEdit ? t('tenant_form.failed_to_update_tenant') : t('tenant_form.failed_to_create_tenant')));
       }
     } catch {
-      toast.error('An error occurred');
+      toast.error(t('tenant_form.an_error_occurred'));
     }
     setSaving(false);
   };
@@ -327,15 +327,15 @@ export function TenantForm() {
   return (
     <div>
       <nav className="flex items-center gap-1 text-sm text-default-500 mb-1">
-        <Link to={tenantPath('/admin/super')} className="hover:text-primary">Super Admin</Link>
+        <Link to={tenantPath('/admin/super')} className="hover:text-primary">{t('tenant_form.breadcrumb_super_admin')}</Link>
         <span>/</span>
-        <Link to={tenantPath('/admin/super/tenants')} className="hover:text-primary">Tenants</Link>
+        <Link to={tenantPath('/admin/super/tenants')} className="hover:text-primary">{t('tenant_form.breadcrumb_tenants')}</Link>
         <span>/</span>
-        <span className="text-foreground">{isEdit ? 'Edit' : 'Create'}</span>
+        <span className="text-foreground">{isEdit ? t('tenant_form.breadcrumb_edit') : t('tenant_form.breadcrumb_create')}</span>
       </nav>
       <PageHeader
-        title={isEdit ? `Edit Tenant: ${form.name}` : 'Create Tenant'}
-        description={isEdit ? 'Update tenant configuration' : 'Set up a new community tenant'}
+        title={isEdit ? t('tenant_form.title_edit', { name: form.name }) : t('tenant_form.title_create')}
+        description={isEdit ? t('tenant_form.desc_edit') : t('tenant_form.desc_create')}
         actions={
           <div className="flex items-center gap-2">
             <Button
@@ -343,7 +343,7 @@ export function TenantForm() {
               startContent={<ArrowLeft size={16} />}
               onPress={() => navigate(tenantPath(isEdit ? `/admin/super/tenants/${id}` : '/admin/super/tenants'))}
             >
-              Back
+              {t('tenant_form.back')}
             </Button>
             <Button
               color="primary"
@@ -351,7 +351,7 @@ export function TenantForm() {
               onPress={handleSubmit}
               isLoading={saving}
             >
-              {isEdit ? 'Save Changes' : 'Create Tenant'}
+              {isEdit ? t('tenant_form.save_changes') : t('tenant_form.create_tenant')}
             </Button>
           </div>
         }
@@ -479,13 +479,13 @@ export function TenantForm() {
                   <Eye size={12} /> {t('tenant_form.google_search_preview')}
                 </p>
                 <p className="text-lg text-blue-700 dark:text-primary truncate">
-                  {form.meta_title || form.name || 'Page Title'}
+                  {form.meta_title || form.name || t('tenant_form.page_title_fallback')}
                 </p>
                 <p className="text-sm text-green-700 dark:text-success truncate">
                   {form.domain ? `https://${form.domain}` : `https://${form.slug || 'tenant'}.project-nexus.ie`}
                 </p>
                 <p className="text-sm text-default-600 line-clamp-2">
-                  {form.meta_description || 'No description set. Add a meta description to improve search visibility.'}
+                  {form.meta_description || t('tenant_form.no_description_set')}
                 </p>
               </div>
               <Input
@@ -493,7 +493,7 @@ export function TenantForm() {
                 placeholder={t('tenant_form.meta_title_placeholder')}
                 value={form.meta_title}
                 onValueChange={(v) => updateField('meta_title', v)}
-                description={`${form.meta_title.length}/70 characters`}
+                description={t('tenant_form.characters_count', { count: form.meta_title.length, max: 70 })}
                 maxLength={70}
               />
               <Textarea
@@ -501,7 +501,7 @@ export function TenantForm() {
                 placeholder={t('tenant_form.meta_description_placeholder')}
                 value={form.meta_description}
                 onValueChange={(v) => updateField('meta_description', v)}
-                description={`${form.meta_description.length}/180 characters`}
+                description={t('tenant_form.characters_count', { count: form.meta_description.length, max: 180 })}
                 maxLength={180}
                 minRows={2}
               />
@@ -537,7 +537,7 @@ export function TenantForm() {
                 className="max-w-xs"
                 description={t('tenant_form.robots_description')}
               >
-                <SelectItem key="index, follow">index, follow (default)</SelectItem>
+                <SelectItem key="index, follow">{t('tenant_form.robots_index_follow')}</SelectItem>
                 <SelectItem key="noindex, follow">noindex, follow</SelectItem>
                 <SelectItem key="index, nofollow">index, nofollow</SelectItem>
                 <SelectItem key="noindex, nofollow">noindex, nofollow</SelectItem>

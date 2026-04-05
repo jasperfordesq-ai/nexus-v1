@@ -111,7 +111,7 @@ export function SeoOverview() {
           setSitemapStats(res.data as unknown as SitemapStats);
         }
       })
-      .catch(() => toast.error('Failed to load sitemap stats'))
+      .catch(() => toast.error(t('advanced.failed_to_load_sitemap_stats')))
       .finally(() => setSitemapLoading(false));
   }, [toast]);
 
@@ -141,10 +141,10 @@ export function SeoOverview() {
         if (freshRes.data) {
           setServerAudit(freshRes.data as unknown as ServerAuditResult);
         }
-        toast.success('SEO audit completed');
+        toast.success(t('advanced.seo_audit_completed'));
       }
     } catch {
-      toast.error('Failed to run SEO audit');
+      toast.error(t('advanced.failed_to_run_seo_audit'));
     } finally {
       setAuditRunning(false);
     }
@@ -154,10 +154,10 @@ export function SeoOverview() {
     setClearingCache(true);
     try {
       await adminSettings.clearSitemapCache();
-      toast.success('Sitemap cache cleared — will regenerate on next request');
+      toast.success(t('advanced.sitemap_cache_cleared'));
       loadSitemapStats();
     } catch {
-      toast.error('Failed to clear sitemap cache');
+      toast.error(t('advanced.failed_to_clear_sitemap_cache'));
     } finally {
       setClearingCache(false);
     }
@@ -307,12 +307,12 @@ export function SeoOverview() {
           <CardHeader className="flex items-center justify-between">
             <h3 className="text-lg font-semibold flex items-center gap-2">
               <BarChart3 size={20} />
-              SEO Health Check
+              {t('advanced.seo_health_check_heading')}
             </h3>
             <div className="flex items-center gap-2">
-              <Chip color="success" variant="flat" size="sm">{passCount} pass</Chip>
-              {warnCount > 0 && <Chip color="warning" variant="flat" size="sm">{warnCount} warning</Chip>}
-              {failCount > 0 && <Chip color="danger" variant="flat" size="sm">{failCount} fail</Chip>}
+              <Chip color="success" variant="flat" size="sm">{passCount} {t('advanced.chip_pass')}</Chip>
+              {warnCount > 0 && <Chip color="warning" variant="flat" size="sm">{warnCount} {t('advanced.chip_warning')}</Chip>}
+              {failCount > 0 && <Chip color="danger" variant="flat" size="sm">{failCount} {t('advanced.chip_fail')}</Chip>}
             </div>
           </CardHeader>
           <CardBody>
@@ -347,7 +347,7 @@ export function SeoOverview() {
               variant="bordered"
               value={String(formData.tenant_meta_title || '')}
               onValueChange={(v) => updateField('tenant_meta_title', v)}
-              description="Used as the site name in page titles (e.g. 'Page Title | Your Timebank')"
+              description={t('advanced.desc_meta_title')}
             />
             <Input
               label={t('advanced.label_meta_description')}
@@ -355,7 +355,7 @@ export function SeoOverview() {
               variant="bordered"
               value={String(formData.tenant_meta_description || '')}
               onValueChange={(v) => updateField('tenant_meta_description', v)}
-              description={`${String(formData.tenant_meta_description || '').length}/160 characters (aim for 150–160)`}
+              description={`${String(formData.tenant_meta_description || '').length}/160 ${t('advanced.desc_meta_description_chars')}`}
             />
             <Input
               label={t('advanced.label_h1_headline')}
@@ -363,7 +363,7 @@ export function SeoOverview() {
               variant="bordered"
               value={String(formData.tenant_h1_headline || '')}
               onValueChange={(v) => updateField('tenant_h1_headline', v)}
-              description="Main H1 heading on your homepage — important for SEO"
+              description={t('advanced.desc_h1_headline')}
             />
             <Input
               label={t('advanced.label_hero_intro_text')}
@@ -380,24 +380,24 @@ export function SeoOverview() {
           <CardHeader>
             <h3 className="text-lg font-semibold flex items-center gap-2">
               <Image size={20} />
-              Default Social Sharing Image
+              {t('advanced.social_sharing_image_heading')}
             </h3>
           </CardHeader>
           <CardBody className="gap-4">
             <Input
-              label="OG Image URL"
+              label={t('advanced.label_og_image_url')}
               placeholder="https://your-domain.com/images/og-default.png"
               variant="bordered"
               value={String(formData.seo_og_image_url || '')}
               onValueChange={(v) => updateField('seo_og_image_url', v)}
-              description="Default image shown when pages are shared on social media (recommended: 1200x630px). Falls back to your logo if not set."
+              description={t('advanced.desc_og_image_url')}
             />
             {String(formData.seo_og_image_url || '') && (
               <div className="border border-default-200 rounded-lg p-3">
-                <p className="text-xs text-default-500 mb-2">Preview:</p>
+                <p className="text-xs text-default-500 mb-2">{t('advanced.og_image_preview')}:</p>
                 <img
                   src={String(formData.seo_og_image_url)}
-                  alt="OG Image Preview"
+                  alt={t('advanced.og_image_preview')}
                   className="max-w-xs rounded-md"
                   onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
                 />
@@ -421,7 +421,7 @@ export function SeoOverview() {
               variant="bordered"
               value={String(formData.seo_title_suffix || '')}
               onValueChange={(v) => updateField('seo_title_suffix', v)}
-              description="Appended to every page title (e.g. 'Listings | Your Timebank')"
+              description={t('advanced.desc_title_suffix')}
             />
             <Input
               label={t('advanced.label_global_meta_description')}
@@ -429,7 +429,7 @@ export function SeoOverview() {
               variant="bordered"
               value={String(formData.seo_meta_description || '')}
               onValueChange={(v) => updateField('seo_meta_description', v)}
-              description={`${String(formData.seo_meta_description || '').length}/160 characters — fallback for pages without custom descriptions`}
+              description={`${String(formData.seo_meta_description || '').length}/160 ${t('advanced.desc_global_meta_description_chars')}`}
             />
             <Input
               label={t('advanced.label_meta_keywords')}
@@ -437,7 +437,7 @@ export function SeoOverview() {
               variant="bordered"
               value={String(formData.seo_meta_keywords || '')}
               onValueChange={(v) => updateField('seo_meta_keywords', v)}
-              description="Comma-separated keywords (minor SEO impact, but good for consistency)"
+              description={t('advanced.desc_meta_keywords')}
             />
           </CardBody>
         </Card>
@@ -515,7 +515,7 @@ export function SeoOverview() {
               minRows={4}
               value={String(formData.seo_robots_txt || '')}
               onValueChange={(v) => updateField('seo_robots_txt', v)}
-              description="Custom rules appended to the default robots.txt (advanced)"
+              description={t('advanced.desc_custom_robots_txt')}
             />
           </CardBody>
         </Card>
@@ -525,7 +525,7 @@ export function SeoOverview() {
           <CardHeader className="flex items-center justify-between">
             <h3 className="text-lg font-semibold flex items-center gap-2">
               <FileText size={20} />
-              Sitemap
+              {t('advanced.sitemap_heading')}
             </h3>
             <div className="flex items-center gap-2">
               <Button
@@ -535,7 +535,7 @@ export function SeoOverview() {
                 onPress={loadSitemapStats}
                 isLoading={sitemapLoading}
               >
-                Refresh
+                {t('advanced.btn_refresh')}
               </Button>
               <Button
                 size="sm"
@@ -544,7 +544,7 @@ export function SeoOverview() {
                 onPress={handleClearSitemapCache}
                 isLoading={clearingCache}
               >
-                Clear Cache
+                {t('advanced.btn_clear_cache')}
               </Button>
             </div>
           </CardHeader>
@@ -554,7 +554,7 @@ export function SeoOverview() {
             ) : sitemapStats ? (
               <div className="space-y-3">
                 <div className="flex items-center justify-between">
-                  <span className="text-sm font-medium">Sitemap URL</span>
+                  <span className="text-sm font-medium">{t('advanced.sitemap_url_label')}</span>
                   <a
                     href={sitemapStats.sitemap_url}
                     target="_blank"
@@ -567,12 +567,12 @@ export function SeoOverview() {
                 </div>
                 <Divider />
                 <div className="flex items-center justify-between">
-                  <span className="text-sm font-medium">Total URLs</span>
+                  <span className="text-sm font-medium">{t('advanced.sitemap_total_urls')}</span>
                   <Chip color="primary" variant="flat">{sitemapStats.total_urls}</Chip>
                 </div>
                 <Divider />
                 <div>
-                  <p className="text-sm font-medium mb-2">URLs by Content Type</p>
+                  <p className="text-sm font-medium mb-2">{t('advanced.sitemap_urls_by_type')}</p>
                   <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
                     {Object.entries(sitemapStats.content_types).map(([type, count]) => (
                       <div key={type} className="flex items-center justify-between bg-default-100 rounded-lg px-3 py-2">
@@ -584,7 +584,7 @@ export function SeoOverview() {
                 </div>
               </div>
             ) : (
-              <p className="text-sm text-default-500">Unable to load sitemap stats</p>
+              <p className="text-sm text-default-500">{t('advanced.unable_to_load_sitemap_stats')}</p>
             )}
           </CardBody>
         </Card>
@@ -594,12 +594,12 @@ export function SeoOverview() {
           <CardHeader className="flex items-center justify-between">
             <h3 className="text-lg font-semibold flex items-center gap-2">
               <Search size={20} />
-              Server-Side SEO Audit
+              {t('advanced.server_seo_audit_heading')}
             </h3>
             <div className="flex items-center gap-2">
               {serverAudit?.last_run_at && (
                 <span className="text-xs text-default-400">
-                  Last run: {new Date(serverAudit.last_run_at).toLocaleDateString()}
+                  {t('advanced.last_run_label')}: {new Date(serverAudit.last_run_at).toLocaleDateString()}
                 </span>
               )}
               <Button
@@ -609,7 +609,7 @@ export function SeoOverview() {
                 onPress={handleRunAudit}
                 isLoading={auditRunning}
               >
-                Run Audit
+                {t('advanced.run_audit')}
               </Button>
             </div>
           </CardHeader>
@@ -631,7 +631,7 @@ export function SeoOverview() {
               </div>
             ) : (
               <p className="text-sm text-default-500">
-                {auditRunning ? 'Running audit...' : 'No audit results yet. Click "Run Audit" to check your SEO configuration.'}
+                {auditRunning ? t('advanced.running_audit') : t('advanced.no_audit_results_prompt')}
               </p>
             )}
           </CardBody>

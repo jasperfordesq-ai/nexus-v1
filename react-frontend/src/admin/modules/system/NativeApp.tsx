@@ -77,7 +77,7 @@ export function NativeApp() {
 
       <div className="space-y-4">
         <Card shadow="sm">
-          <CardHeader><h3 className="text-lg font-semibold flex items-center gap-2"><Smartphone size={20} /> App Configuration</h3></CardHeader>
+          <CardHeader><h3 className="text-lg font-semibold flex items-center gap-2"><Smartphone size={20} /> {t('system.app_configuration_heading')}</h3></CardHeader>
           <CardBody className="gap-4">
             <Input
               label={t('system.label_app_name')}
@@ -107,12 +107,12 @@ export function NativeApp() {
         </Card>
 
         <Card shadow="sm">
-          <CardHeader><h3 className="text-lg font-semibold">Push Notifications</h3></CardHeader>
+          <CardHeader><h3 className="text-lg font-semibold">{t('system.push_notifications_heading')}</h3></CardHeader>
           <CardBody className="gap-4">
             <div className="flex items-center justify-between">
               <div>
-                <p className="font-medium">Enable Push Notifications</p>
-                <p className="text-sm text-default-500">Send push notifications to mobile app users</p>
+                <p className="font-medium">{t('system.enable_push_notifications')}</p>
+                <p className="text-sm text-default-500">{t('system.enable_push_notifications_desc')}</p>
               </div>
               <Switch isSelected={!!formData.push_enabled} onValueChange={(v) => updateField('push_enabled', v)} aria-label={t('system.label_push_notifications')} />
             </div>
@@ -138,19 +138,19 @@ export function NativeApp() {
         </Card>
 
         <Card shadow="sm">
-          <CardHeader><h3 className="text-lg font-semibold">PWA Settings</h3></CardHeader>
+          <CardHeader><h3 className="text-lg font-semibold">{t('system.pwa_settings_heading')}</h3></CardHeader>
           <CardBody className="space-y-3">
             <div className="flex items-center justify-between">
               <div>
-                <p className="font-medium">Service Worker Enabled</p>
-                <p className="text-sm text-default-500">Enable offline support and caching</p>
+                <p className="font-medium">{t('system.service_worker_enabled')}</p>
+                <p className="text-sm text-default-500">{t('system.service_worker_enabled_desc')}</p>
               </div>
               <Switch isSelected={!!formData.service_worker_enabled} onValueChange={(v) => updateField('service_worker_enabled', v)} aria-label={t('system.label_service_worker')} />
             </div>
             <div className="flex items-center justify-between">
               <div>
-                <p className="font-medium">Install Prompt</p>
-                <p className="text-sm text-default-500">Show "Add to Home Screen" prompt</p>
+                <p className="font-medium">{t('system.install_prompt')}</p>
+                <p className="text-sm text-default-500">{t('system.install_prompt_desc')}</p>
               </div>
               <Switch isSelected={!!formData.install_prompt_enabled} onValueChange={(v) => updateField('install_prompt_enabled', v)} aria-label={t('system.label_install_prompt')} />
             </div>
@@ -158,7 +158,7 @@ export function NativeApp() {
         </Card>
 
         <div className="flex justify-end">
-          <Button color="primary" startContent={<Save size={16} />} onPress={handleSave} isLoading={saving}>Save Settings</Button>
+          <Button color="primary" startContent={<Save size={16} />} onPress={handleSave} isLoading={saving}>{t('system.save_settings')}</Button>
         </div>
       </div>
     </div>

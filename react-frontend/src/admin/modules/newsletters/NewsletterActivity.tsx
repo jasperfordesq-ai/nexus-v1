@@ -242,7 +242,7 @@ export function NewsletterActivity() {
     <div>
       <PageHeader
         title={t('newsletters.newsletter_activity_title')}
-        description={totalCount > 0 ? `${totalCount.toLocaleString()} total records` : undefined}
+        description={totalCount > 0 ? t('newsletters.total_records', { count: totalCount }) : undefined}
         actions={
           <div className="flex gap-2">
             {showExport && currentData.length > 0 && (
@@ -251,7 +251,7 @@ export function NewsletterActivity() {
                 startContent={<Download size={16} />}
                 onPress={handleExport}
               >
-                Export CSV
+                {t('newsletters.export_csv')}
               </Button>
             )}
             <Button
@@ -259,7 +259,7 @@ export function NewsletterActivity() {
               startContent={<ArrowLeft size={16} />}
               onPress={() => navigate(backPath)}
             >
-              Back to Stats
+              {t('newsletters.back_to_stats')}
             </Button>
           </div>
         }
@@ -281,7 +281,7 @@ export function NewsletterActivity() {
               title={
                 <div className="flex items-center gap-2">
                   <Activity size={16} />
-                  <span>Activity Log</span>
+                  <span>{t('newsletters.tab_activity_log')}</span>
                 </div>
               }
             />
@@ -290,7 +290,7 @@ export function NewsletterActivity() {
               title={
                 <div className="flex items-center gap-2">
                   <Eye size={16} />
-                  <span>Who Opened</span>
+                  <span>{t('newsletters.tab_who_opened')}</span>
                 </div>
               }
             />
@@ -299,7 +299,7 @@ export function NewsletterActivity() {
               title={
                 <div className="flex items-center gap-2">
                   <MousePointer size={16} />
-                  <span>Who Clicked</span>
+                  <span>{t('newsletters.tab_who_clicked')}</span>
                 </div>
               }
             />
@@ -308,7 +308,7 @@ export function NewsletterActivity() {
               title={
                 <div className="flex items-center gap-2">
                   <UserX size={16} />
-                  <span>Non-Openers</span>
+                  <span>{t('newsletters.tab_non_openers')}</span>
                 </div>
               }
             />
@@ -317,7 +317,7 @@ export function NewsletterActivity() {
               title={
                 <div className="flex items-center gap-2">
                   <UserCheck size={16} />
-                  <span>Opened, No Click</span>
+                  <span>{t('newsletters.tab_opened_no_click')}</span>
                 </div>
               }
             />
@@ -335,7 +335,7 @@ export function NewsletterActivity() {
                   className="cursor-pointer"
                   onClick={() => setActivityFilter(f)}
                 >
-                  {f === 'all' ? 'All Events' : f === 'open' ? 'Opens Only' : 'Clicks Only'}
+                  {f === 'all' ? t('newsletters.filter_all_events') : f === 'open' ? t('newsletters.filter_opens_only') : t('newsletters.filter_clicks_only')}
                 </Chip>
               ))}
             </div>
@@ -354,17 +354,17 @@ export function NewsletterActivity() {
               classNames={{ th: 'text-default-500 text-xs uppercase' }}
             >
               <TableHeader>
-                <TableColumn>EMAIL</TableColumn>
-                <TableColumn>ACTION</TableColumn>
-                <TableColumn>URL</TableColumn>
-                <TableColumn>TIME</TableColumn>
-                <TableColumn>USER AGENT</TableColumn>
-                <TableColumn>IP</TableColumn>
+                <TableColumn>{t('newsletters.col_email')}</TableColumn>
+                <TableColumn>{t('newsletters.col_action')}</TableColumn>
+                <TableColumn>{t('newsletters.col_url')}</TableColumn>
+                <TableColumn>{t('newsletters.col_time')}</TableColumn>
+                <TableColumn>{t('newsletters.col_user_agent')}</TableColumn>
+                <TableColumn>{t('newsletters.col_ip')}</TableColumn>
               </TableHeader>
               <TableBody
                 items={activityEvents}
                 emptyContent={
-                  <EmptyState message={`No ${activityFilter === 'all' ? '' : activityFilter + ' '}events recorded yet.`} />
+                  <EmptyState message={t('newsletters.empty_no_events')} />
                 }
               >
                 {(event) => (
@@ -404,13 +404,13 @@ export function NewsletterActivity() {
               classNames={{ th: 'text-default-500 text-xs uppercase' }}
             >
               <TableHeader>
-                <TableColumn>EMAIL</TableColumn>
-                <TableColumn align="center">OPEN COUNT</TableColumn>
-                <TableColumn>FIRST OPENED</TableColumn>
+                <TableColumn>{t('newsletters.col_email')}</TableColumn>
+                <TableColumn align="center">{t('newsletters.col_open_count')}</TableColumn>
+                <TableColumn>{t('newsletters.col_first_opened')}</TableColumn>
               </TableHeader>
               <TableBody
                 items={openers}
-                emptyContent={<EmptyState message="No one has opened this newsletter yet." />}
+                emptyContent={<EmptyState message={t('newsletters.empty_no_openers')} />}
               >
                 {(row) => (
                   <TableRow key={row.email}>
@@ -435,14 +435,14 @@ export function NewsletterActivity() {
               classNames={{ th: 'text-default-500 text-xs uppercase' }}
             >
               <TableHeader>
-                <TableColumn>EMAIL</TableColumn>
-                <TableColumn align="center">CLICK COUNT</TableColumn>
-                <TableColumn align="center">UNIQUE LINKS</TableColumn>
-                <TableColumn>FIRST CLICKED</TableColumn>
+                <TableColumn>{t('newsletters.col_email')}</TableColumn>
+                <TableColumn align="center">{t('newsletters.col_click_count')}</TableColumn>
+                <TableColumn align="center">{t('newsletters.col_unique_links')}</TableColumn>
+                <TableColumn>{t('newsletters.col_first_clicked')}</TableColumn>
               </TableHeader>
               <TableBody
                 items={clickers}
-                emptyContent={<EmptyState message="No one has clicked a link in this newsletter yet." />}
+                emptyContent={<EmptyState message={t('newsletters.empty_no_clickers')} />}
               >
                 {(row) => (
                   <TableRow key={row.email}>
@@ -472,13 +472,13 @@ export function NewsletterActivity() {
               classNames={{ th: 'text-default-500 text-xs uppercase' }}
             >
               <TableHeader>
-                <TableColumn>EMAIL</TableColumn>
-                <TableColumn>NAME</TableColumn>
-                <TableColumn>SENT AT</TableColumn>
+                <TableColumn>{t('newsletters.col_email')}</TableColumn>
+                <TableColumn>{t('newsletters.col_name')}</TableColumn>
+                <TableColumn>{t('newsletters.col_sent_at')}</TableColumn>
               </TableHeader>
               <TableBody
                 items={nonOpeners}
-                emptyContent={<EmptyState message="Everyone who was sent this newsletter has opened it!" icon={<Users size={48} className="text-success-300" />} />}
+                emptyContent={<EmptyState message={t('newsletters.empty_all_opened')} icon={<Users size={48} className="text-success-300" />} />}
               >
                 {(row) => (
                   <TableRow key={row.email}>
@@ -499,14 +499,14 @@ export function NewsletterActivity() {
               classNames={{ th: 'text-default-500 text-xs uppercase' }}
             >
               <TableHeader>
-                <TableColumn>EMAIL</TableColumn>
-                <TableColumn>NAME</TableColumn>
-                <TableColumn align="center">OPEN COUNT</TableColumn>
-                <TableColumn>FIRST OPENED</TableColumn>
+                <TableColumn>{t('newsletters.col_email')}</TableColumn>
+                <TableColumn>{t('newsletters.col_name')}</TableColumn>
+                <TableColumn align="center">{t('newsletters.col_open_count')}</TableColumn>
+                <TableColumn>{t('newsletters.col_first_opened')}</TableColumn>
               </TableHeader>
               <TableBody
                 items={openedNoClick}
-                emptyContent={<EmptyState message="Everyone who opened also clicked a link!" icon={<MousePointer size={48} className="text-success-300" />} />}
+                emptyContent={<EmptyState message={t('newsletters.empty_all_clicked')} icon={<MousePointer size={48} className="text-success-300" />} />}
               >
                 {(row) => (
                   <TableRow key={row.email}>
@@ -545,10 +545,11 @@ export function NewsletterActivity() {
 // ─── Sub-Components ─────────────────────────────────────────────────────────
 
 function EmptyState({ message, icon }: { message: string; icon?: React.ReactNode }) {
+  const { t: tLocal } = useTranslation('admin');
   return (
     <div className="flex flex-col items-center gap-3 py-12 text-center">
       {icon || <Inbox size={48} className="text-default-300" />}
-      <p className="text-lg font-semibold text-default-500">No data</p>
+      <p className="text-lg font-semibold text-default-500">{tLocal('no_data')}</p>
       <p className="text-sm text-default-400">{message}</p>
     </div>
   );

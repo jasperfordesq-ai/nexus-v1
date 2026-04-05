@@ -34,28 +34,22 @@ const severityColorMap: Record<string, 'default' | 'primary' | 'warning' | 'dang
   critical: 'danger',
 };
 
-interface TimelineStep {
-  label: string;
-  dateField: keyof GdprBreachDetailType;
-  icon: typeof CheckCircle;
-}
-
-const TIMELINE_STEPS: TimelineStep[] = [
-  { label: 'Detected', dateField: 'detected_at', icon: Search },
-  { label: 'Investigating', dateField: 'reported_at', icon: Search },
-  { label: 'Contained', dateField: 'contained_at', icon: Shield },
-  { label: 'Resolved', dateField: 'resolved_at', icon: CheckCircle },
-  { label: 'DPA Notified', dateField: 'dpa_notified_at', icon: Bell },
+const TIMELINE_STEP_KEYS: { labelKey: string; dateField: keyof GdprBreachDetailType; icon: typeof CheckCircle }[] = [
+  { labelKey: 'enterprise.gdpr_timeline_detected', dateField: 'detected_at', icon: Search },
+  { labelKey: 'enterprise.gdpr_timeline_investigating', dateField: 'reported_at', icon: Search },
+  { labelKey: 'enterprise.gdpr_timeline_contained', dateField: 'contained_at', icon: Shield },
+  { labelKey: 'enterprise.gdpr_timeline_resolved', dateField: 'resolved_at', icon: CheckCircle },
+  { labelKey: 'enterprise.gdpr_timeline_dpa_notified', dateField: 'dpa_notified_at', icon: Bell },
 ];
 
 export function GdprBreachDetail() {
-  useTranslation('admin');
+  const { t } = useTranslation('admin');
   const { id } = useParams();
   const navigate = useNavigate();
   const { tenantPath } = useTenant();
   const toast = useToast();
 
-  usePageTitle(`Data Breach #${id}`);
+  usePageTitle(t('enterprise.gdpr_breach_page_title', { id }));
 
   const [breach, setBreach] = useState<GdprBreachDetailType | null>(null);
   const [loading, setLoading] = useState(true);
@@ -87,7 +81,7 @@ export function GdprBreachDetail() {
         setPreventionMeasures(data.prevention_measures || '');
       }
     } catch {
-      toast.error('Failed to load breach details');
+      toast.error(t('enterprise.gdpr_failed_load_breach'));
     } finally {
       setLoading(false);
     }
@@ -109,13 +103,13 @@ export function GdprBreachDetail() {
     try {
       const res = await adminEnterprise.updateGdprBreach(breachId, updates);
       if (res.success) {
-        toast.success('Breach updated successfully');
+        toast.success(t('enterprise.gdpr_breach_updated'));
         loadData();
       } else {
-        toast.error('Failed to update breach');
+        toast.error(t('enterprise.gdpr_failed_update_breach'));
       }
     } catch {
-      toast.error('Failed to update breach');
+      toast.error(t('enterprise.gdpr_failed_update_breach'));
     } finally {
       setActionLoading(false);
     }
@@ -131,13 +125,13 @@ export function GdprBreachDetail() {
         prevention_measures: preventionMeasures.trim() || null,
       });
       if (res.success) {
-        toast.success('Response details saved');
+        toast.success(t('enterprise.gdpr_response_saved'));
         loadData();
       } else {
-        toast.error('Failed to save response details');
+        toast.error(t('enterprise.gdpr_failed_save_response'));
       }
     } catch {
-      toast.error('Failed to save response details');
+      toast.error(t('enterprise.gdpr_failed_save_response'));
     } finally {
       setSaveLoading(false);
     }
@@ -148,13 +142,13 @@ export function GdprBreachDetail() {
     try {
       const res = await adminEnterprise.notifyDpa(breachId);
       if (res.success) {
-        toast.success('DPA notification sent');
+        toast.success(t('enterprise.gdpr_dpa_notification_sent'));
         loadData();
       } else {
-        toast.error('Failed to send DPA notification');
+        toast.error(t('enterprise.gdpr_failed_notify_dpa'));
       }
     } catch {
-      toast.error('Failed to send DPA notification');
+      toast.error(t('enterprise.gdpr_failed_notify_dpa'));
     } finally {
       setActionLoading(false);
     }
@@ -171,13 +165,13 @@ export function GdprBreachDetail() {
   if (!breach) {
     return (
       <div className="text-center py-16">
-        <p className="text-default-500">Breach not found</p>
+        <p className="text-default-500">{t('enterprise.gdpr_breach_not_found')}</p>
         <Button
           variant="flat"
           className="mt-4"
           onPress={() => navigate(tenantPath('/admin/enterprise/gdpr/breaches'))}
         >
-          Back to Breaches
+          {t('enterprise.gdpr_back_to_breaches')}
         </Button>
       </div>
     );
@@ -201,8 +195,8 @@ export function GdprBreachDetail() {
   return (
     <div>
       <PageHeader
-        title={`Data Breach #${breach.id}: ${breach.title}`}
-        description={`${breach.breach_type || breach.severity} severity breach`}
+        title={t('enterprise.gdpr_breach_detail_title', { id: breach.id, title: breach.title })}
+        description={t('enterprise.gdpr_breach_detail_desc', { type: breach.breach_type || breach.severity })}
         actions={
           <Button
             variant="flat"
@@ -210,7 +204,7 @@ export function GdprBreachDetail() {
             onPress={() => navigate(tenantPath('/admin/enterprise/gdpr/breaches'))}
             size="sm"
           >
-            Back to Breaches
+            {t('enterprise.gdpr_back_to_breaches')}
           </Button>
         }
       />
@@ -221,7 +215,7 @@ export function GdprBreachDetail() {
           {/* Overview Card */}
           <Card shadow="sm">
             <CardHeader className="px-4 pt-4 pb-0">
-              <h3 className="text-lg font-semibold">Overview</h3>
+              <h3 className="text-lg font-semibold">{t('enterprise.gdpr_overview')}</h3>
             </CardHeader>
             <CardBody className="p-4 space-y-4">
               <p className="text-default-700">{breach.description}</p>
@@ -233,14 +227,14 @@ export function GdprBreachDetail() {
                   color={severityColorMap[breach.severity] || 'default'}
                   className="capitalize"
                 >
-                  {breach.severity} severity
+                  {t('enterprise.gdpr_severity_label', { severity: breach.severity })}
                 </Chip>
                 <StatusBadge status={breach.status} />
               </div>
 
               {breach.data_categories_affected && breach.data_categories_affected.length > 0 && (
                 <div>
-                  <p className="text-sm text-default-500 mb-2">Data Categories Affected</p>
+                  <p className="text-sm text-default-500 mb-2">{t('enterprise.gdpr_data_categories_affected')}</p>
                   <div className="flex flex-wrap gap-1.5">
                     {breach.data_categories_affected.map((cat) => (
                       <Chip key={cat} size="sm" variant="bordered" className="capitalize">
@@ -256,26 +250,26 @@ export function GdprBreachDetail() {
           {/* Impact Card */}
           <Card shadow="sm">
             <CardHeader className="px-4 pt-4 pb-0">
-              <h3 className="text-lg font-semibold">Impact Assessment</h3>
+              <h3 className="text-lg font-semibold">{t('enterprise.gdpr_impact_assessment')}</h3>
             </CardHeader>
             <CardBody className="p-4">
               <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
                 <div>
-                  <p className="text-sm text-default-500">Records Affected</p>
+                  <p className="text-sm text-default-500">{t('enterprise.gdpr_records_affected')}</p>
                   <p className="text-xl font-bold">{breach.number_of_records_affected ?? 'N/A'}</p>
                 </div>
                 <div>
-                  <p className="text-sm text-default-500">Users Affected</p>
+                  <p className="text-sm text-default-500">{t('enterprise.gdpr_users_affected')}</p>
                   <p className="text-xl font-bold">{breach.number_of_users_affected ?? 'N/A'}</p>
                 </div>
                 <div>
-                  <p className="text-sm text-default-500">Detected</p>
+                  <p className="text-sm text-default-500">{t('enterprise.gdpr_detected')}</p>
                   <p className="font-medium text-sm">
                     {breach.detected_at ? new Date(breach.detected_at).toLocaleString() : 'N/A'}
                   </p>
                 </div>
                 <div>
-                  <p className="text-sm text-default-500">Occurred</p>
+                  <p className="text-sm text-default-500">{t('enterprise.gdpr_occurred')}</p>
                   <p className="font-medium text-sm">
                     {breach.occurred_at ? new Date(breach.occurred_at).toLocaleString() : 'N/A'}
                   </p>
@@ -287,7 +281,7 @@ export function GdprBreachDetail() {
           {/* Response Card */}
           <Card shadow="sm">
             <CardHeader className="px-4 pt-4 pb-0 flex justify-between items-center">
-              <h3 className="text-lg font-semibold">Response & Analysis</h3>
+              <h3 className="text-lg font-semibold">{t('enterprise.gdpr_response_analysis')}</h3>
               <Button
                 size="sm"
                 color="primary"
@@ -295,37 +289,37 @@ export function GdprBreachDetail() {
                 onPress={handleSaveResponse}
                 isLoading={saveLoading}
               >
-                Save
+                {t('enterprise.gdpr_save')}
               </Button>
             </CardHeader>
             <CardBody className="p-4 space-y-4">
               <Textarea
-                label="Root Cause"
-                placeholder="Describe the root cause of this breach..."
+                label={t('enterprise.gdpr_root_cause')}
+                placeholder={t('enterprise.gdpr_root_cause_placeholder')}
                 value={rootCause}
                 onValueChange={setRootCause}
                 variant="bordered"
                 minRows={2}
               />
               <Textarea
-                label="Remediation Actions"
-                placeholder="List the actions taken to remediate this breach..."
+                label={t('enterprise.gdpr_remediation_actions')}
+                placeholder={t('enterprise.gdpr_remediation_actions_placeholder')}
                 value={remediationActions}
                 onValueChange={setRemediationActions}
                 variant="bordered"
                 minRows={2}
               />
               <Textarea
-                label="Lessons Learned"
-                placeholder="What lessons were learned from this breach..."
+                label={t('enterprise.gdpr_lessons_learned')}
+                placeholder={t('enterprise.gdpr_lessons_learned_placeholder')}
                 value={lessonsLearned}
                 onValueChange={setLessonsLearned}
                 variant="bordered"
                 minRows={2}
               />
               <Textarea
-                label="Prevention Measures"
-                placeholder="What measures will prevent future occurrences..."
+                label={t('enterprise.gdpr_prevention_measures')}
+                placeholder={t('enterprise.gdpr_prevention_measures_placeholder')}
                 value={preventionMeasures}
                 onValueChange={setPreventionMeasures}
                 variant="bordered"
@@ -340,14 +334,14 @@ export function GdprBreachDetail() {
           {/* Timeline Card */}
           <Card shadow="sm">
             <CardHeader className="px-4 pt-4 pb-0">
-              <h3 className="text-lg font-semibold">Timeline</h3>
+              <h3 className="text-lg font-semibold">{t('enterprise.gdpr_timeline')}</h3>
             </CardHeader>
             <CardBody className="p-4">
               <div className="relative pl-6">
                 <div className="absolute left-2 top-1 bottom-1 w-0.5 bg-default-200" />
 
                 <div className="space-y-5">
-                  {TIMELINE_STEPS.map((step) => {
+                  {TIMELINE_STEP_KEYS.map((step) => {
                     const dateValue = breach[step.dateField] as string | null;
                     const completed = !!dateValue;
                     const Icon = step.icon;
@@ -364,7 +358,7 @@ export function GdprBreachDetail() {
                         <div className="flex items-center gap-2">
                           <Icon size={14} className={completed ? 'text-success' : 'text-default-300'} />
                           <span className={`text-sm font-medium ${completed ? 'text-foreground' : 'text-default-400'}`}>
-                            {step.label}
+                            {t(step.labelKey)}
                           </span>
                         </div>
                         {completed && (
@@ -385,7 +379,7 @@ export function GdprBreachDetail() {
             <CardHeader className="px-4 pt-4 pb-0">
               <h3 className="text-lg font-semibold flex items-center gap-2">
                 <Bell size={18} />
-                DPA Notification
+                {t('enterprise.gdpr_dpa_notification')}
               </h3>
             </CardHeader>
             <CardBody className="p-4 space-y-3">
@@ -393,17 +387,17 @@ export function GdprBreachDetail() {
                 <>
                   <div className="flex items-center gap-2 text-success">
                     <CheckCircle size={16} />
-                    <span className="text-sm font-medium">Notified</span>
+                    <span className="text-sm font-medium">{t('enterprise.gdpr_notified')}</span>
                   </div>
                   <div>
-                    <p className="text-sm text-default-500">Date</p>
+                    <p className="text-sm text-default-500">{t('enterprise.gdpr_date')}</p>
                     <p className="font-medium text-sm">
                       {new Date(breach.dpa_notified_at).toLocaleString()}
                     </p>
                   </div>
                   {breach.authority_reference && (
                     <div>
-                      <p className="text-sm text-default-500">Reference</p>
+                      <p className="text-sm text-default-500">{t('enterprise.gdpr_reference')}</p>
                       <p className="font-medium text-sm">{breach.authority_reference}</p>
                     </div>
                   )}
@@ -413,12 +407,12 @@ export function GdprBreachDetail() {
                   {detectedAt && (
                     <Card shadow="none" className={`border-2 ${isOverdue ? 'border-danger' : hoursRemaining < 24 ? 'border-warning' : 'border-success'}`}>
                       <CardBody className="p-4 text-center">
-                        <p className="text-xs text-default-500 mb-1">DPA Notification Deadline</p>
+                        <p className="text-xs text-default-500 mb-1">{t('enterprise.gdpr_dpa_deadline')}</p>
                         <p className={`text-2xl font-bold ${isOverdue ? 'text-danger' : hoursRemaining < 24 ? 'text-warning' : 'text-success'}`}>
                           {isOverdue ? '\u2212' : ''}{formatCountdown(remainingMs)}
                         </p>
                         <p className={`text-xs mt-1 ${isOverdue ? 'text-danger' : 'text-default-400'}`}>
-                          {isOverdue ? 'OVERDUE \u2014 notify DPA immediately' : hoursRemaining < 24 ? 'Less than 24 hours remaining' : 'remaining to notify DPA'}
+                          {isOverdue ? t('enterprise.gdpr_dpa_overdue') : hoursRemaining < 24 ? t('enterprise.gdpr_dpa_less_than_24h') : t('enterprise.gdpr_dpa_remaining')}
                         </p>
                         <Progress
                           value={isOverdue ? 100 : Math.min(100, ((72 - hoursRemaining) / 72) * 100)}
@@ -434,11 +428,11 @@ export function GdprBreachDetail() {
                       <div className="flex items-center gap-2 text-danger">
                         <AlertTriangle size={16} />
                         <span className="text-sm font-semibold">
-                          {isOverdue ? 'Deadline exceeded' : 'Deadline approaching'}
+                          {isOverdue ? t('enterprise.gdpr_deadline_exceeded') : t('enterprise.gdpr_deadline_approaching')}
                         </span>
                       </div>
                       <p className="text-xs text-danger-600 mt-1">
-                        GDPR requires DPA notification within 72 hours of detection.
+                        {t('enterprise.gdpr_dpa_72h_requirement')}
                       </p>
                     </div>
                   )}
@@ -451,7 +445,7 @@ export function GdprBreachDetail() {
                     className="w-full"
                     size="sm"
                   >
-                    Notify DPA
+                    {t('enterprise.gdpr_notify_dpa')}
                   </Button>
                 </>
               )}
@@ -461,7 +455,7 @@ export function GdprBreachDetail() {
           {/* Actions Card */}
           <Card shadow="sm">
             <CardHeader className="px-4 pt-4 pb-0">
-              <h3 className="text-lg font-semibold">Actions</h3>
+              <h3 className="text-lg font-semibold">{t('enterprise.gdpr_actions')}</h3>
             </CardHeader>
             <CardBody className="p-4 space-y-2">
               {breach.status === 'open' && (
@@ -474,7 +468,7 @@ export function GdprBreachDetail() {
                   className="w-full"
                   size="sm"
                 >
-                  Mark as Investigating
+                  {t('enterprise.gdpr_mark_investigating')}
                 </Button>
               )}
               {(breach.status === 'open' || breach.status === 'investigating') && (
@@ -487,7 +481,7 @@ export function GdprBreachDetail() {
                   className="w-full"
                   size="sm"
                 >
-                  Mark as Contained
+                  {t('enterprise.gdpr_mark_contained')}
                 </Button>
               )}
               {breach.status !== 'resolved' && (
@@ -500,7 +494,7 @@ export function GdprBreachDetail() {
                   className="w-full"
                   size="sm"
                 >
-                  Mark as Resolved
+                  {t('enterprise.gdpr_mark_resolved')}
                 </Button>
               )}
               <Divider />
@@ -513,7 +507,7 @@ export function GdprBreachDetail() {
                 className="w-full"
                 size="sm"
               >
-                Escalate
+                {t('enterprise.gdpr_escalate')}
               </Button>
             </CardBody>
           </Card>

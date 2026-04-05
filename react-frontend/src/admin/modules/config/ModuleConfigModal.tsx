@@ -168,7 +168,7 @@ export default function ModuleConfigModal({ module, isOpen, onClose }: ModuleCon
         toast.error(t('config.modal_save_failed'));
       }
     } catch {
-      toast.error('Failed to save configuration');
+      toast.error(t('config.modal_save_failed'));
     } finally {
       setSaving(false);
     }
@@ -188,7 +188,7 @@ export default function ModuleConfigModal({ module, isOpen, onClose }: ModuleCon
         toast.error(t('config.modal_save_failed'));
       }
     } catch {
-      toast.error('Failed to save configuration');
+      toast.error(t('config.modal_save_failed'));
     } finally {
       setSaving(false);
     }
@@ -208,7 +208,7 @@ export default function ModuleConfigModal({ module, isOpen, onClose }: ModuleCon
         toast.error(t('config.modal_save_failed'));
       }
     } catch {
-      toast.error('Failed to save configuration');
+      toast.error(t('config.modal_save_failed'));
     } finally {
       setSaving(false);
     }
@@ -228,7 +228,7 @@ export default function ModuleConfigModal({ module, isOpen, onClose }: ModuleCon
         toast.error(t('config.modal_save_failed'));
       }
     } catch {
-      toast.error('Failed to save configuration');
+      toast.error(t('config.modal_save_failed'));
     } finally {
       setSaving(false);
     }
@@ -248,7 +248,7 @@ export default function ModuleConfigModal({ module, isOpen, onClose }: ModuleCon
         toast.error(t('config.modal_save_failed'));
       }
     } catch {
-      toast.error('Failed to save configuration');
+      toast.error(t('config.modal_save_failed'));
     } finally {
       setSaving(false);
     }

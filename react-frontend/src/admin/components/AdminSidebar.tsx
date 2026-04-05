@@ -238,7 +238,7 @@ function useAdminNav(): NavSection[] {
       },
       ...(hasFeature('marketplace') ? [{
         key: 'marketplace',
-        label: t('marketplace', { defaultValue: 'Marketplace' }),
+        label: t('marketplace.label', { defaultValue: 'Marketplace' }),
         icon: ShoppingBag as LucideIcon,
         items: [
           { label: t('marketplace_dashboard', { defaultValue: 'Dashboard' }), href: '/admin/marketplace', icon: ShoppingBag as LucideIcon },

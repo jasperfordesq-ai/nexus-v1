@@ -63,14 +63,14 @@ export default function ModuleCard({ module, enabled, onToggle, onConfigure, tog
             {optionCount > 0 ? (
               <Chip size="sm" variant="flat" color={liveCount > 0 ? 'primary' : 'default'}>
                 {liveCount > 0
-                  ? `${liveCount} option${liveCount !== 1 ? 's' : ''}`
-                  : `${optionCount} planned`}
+                  ? t('config.option_count', { count: liveCount })
+                  : t('config.planned_count', { count: optionCount })}
               </Chip>
             ) : (
-              <Chip size="sm" variant="flat" color="default">No options</Chip>
+              <Chip size="sm" variant="flat" color="default">{t('config.no_options')}</Chip>
             )}
             {module.type === 'core' && (
-              <Chip size="sm" variant="flat" color="secondary">Core</Chip>
+              <Chip size="sm" variant="flat" color="secondary">{t('config.core')}</Chip>
             )}
           </div>
           {optionCount > 0 && (
@@ -80,7 +80,7 @@ export default function ModuleCard({ module, enabled, onToggle, onConfigure, tog
               startContent={<Settings2 size={14} />}
               onPress={() => onConfigure(module)}
             >
-              Configure
+              {t('config.configure')}
             </Button>
           )}
         </div>

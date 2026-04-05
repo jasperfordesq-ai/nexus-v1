@@ -109,33 +109,33 @@ export function ImageSettings() {
         </Card>
 
         <Card shadow="sm">
-          <CardHeader><h3 className="text-lg font-semibold">Processing</h3></CardHeader>
+          <CardHeader><h3 className="text-lg font-semibold">{t('system.processing_heading')}</h3></CardHeader>
           <CardBody className="space-y-3">
             <div className="flex items-center justify-between">
               <div>
-                <p className="font-medium">Auto-Resize</p>
-                <p className="text-sm text-default-500">Automatically resize images exceeding max dimensions</p>
+                <p className="font-medium">{t('system.auto_resize')}</p>
+                <p className="text-sm text-default-500">{t('system.auto_resize_desc')}</p>
               </div>
               <Switch isSelected={!!formData.auto_resize} onValueChange={(v) => updateField('auto_resize', v)} aria-label={t('system.label_auto_resize')} />
             </div>
             <div className="flex items-center justify-between">
               <div>
-                <p className="font-medium">Auto-Convert to WebP</p>
-                <p className="text-sm text-default-500">Convert uploaded images to WebP format</p>
+                <p className="font-medium">{t('system.auto_convert_webp')}</p>
+                <p className="text-sm text-default-500">{t('system.auto_convert_webp_desc')}</p>
               </div>
               <Switch isSelected={!!formData.auto_webp} onValueChange={(v) => updateField('auto_webp', v)} aria-label={t('system.label_auto_web_p')} />
             </div>
             <div className="flex items-center justify-between">
               <div>
-                <p className="font-medium">Strip EXIF Data</p>
-                <p className="text-sm text-default-500">Remove metadata from uploaded images for privacy</p>
+                <p className="font-medium">{t('system.strip_exif')}</p>
+                <p className="text-sm text-default-500">{t('system.strip_exif_desc')}</p>
               </div>
               <Switch isSelected={!!formData.strip_exif} onValueChange={(v) => updateField('strip_exif', v)} aria-label={t('system.label_strip_e_x_i_f')} />
             </div>
             <div className="flex items-center justify-between">
               <div>
-                <p className="font-medium">Generate Thumbnails</p>
-                <p className="text-sm text-default-500">Create thumbnail versions for listing cards</p>
+                <p className="font-medium">{t('system.generate_thumbnails')}</p>
+                <p className="text-sm text-default-500">{t('system.generate_thumbnails_desc')}</p>
               </div>
               <Switch isSelected={!!formData.generate_thumbnails} onValueChange={(v) => updateField('generate_thumbnails', v)} aria-label={t('system.label_thumbnails')} />
             </div>
@@ -143,7 +143,7 @@ export function ImageSettings() {
         </Card>
 
         <div className="flex justify-end">
-          <Button color="primary" startContent={<Save size={16} />} onPress={handleSave} isLoading={saving}>Save Settings</Button>
+          <Button color="primary" startContent={<Save size={16} />} onPress={handleSave} isLoading={saving}>{t('system.save_settings')}</Button>
         </div>
       </div>
     </div>

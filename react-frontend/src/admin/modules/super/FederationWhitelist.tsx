@@ -101,7 +101,7 @@ export default function FederationWhitelist() {
       setNotes('');
       loadData();
     } else {
-      toast.error(res.error || 'Failed to add tenant to whitelist');
+      toast.error(res.error || t('federation_whitelist.failed_to_add'));
     }
   };
 
@@ -112,7 +112,7 @@ export default function FederationWhitelist() {
       setRemoving(null);
       toast.success(t('super.tenant_removed_from_whitelist'));
     } else {
-      toast.error(res.error || 'Failed to remove tenant');
+      toast.error(res.error || t('federation_whitelist.failed_to_remove'));
       setRemoving(null);
     }
   };
@@ -185,14 +185,14 @@ export default function FederationWhitelist() {
         <CardBody>
           <Table aria-label={t('super.label_whitelisted_tenants')} shadow="sm" isStriped>
             <TableHeader>
-              <TableColumn>Tenant</TableColumn>
-              <TableColumn>Domain</TableColumn>
-              <TableColumn>Approved By</TableColumn>
-              <TableColumn>Date</TableColumn>
-              <TableColumn>Notes</TableColumn>
-              <TableColumn>Actions</TableColumn>
+              <TableColumn>{t('federation_whitelist.col_tenant')}</TableColumn>
+              <TableColumn>{t('federation_whitelist.col_domain')}</TableColumn>
+              <TableColumn>{t('federation_whitelist.col_approved_by')}</TableColumn>
+              <TableColumn>{t('federation_whitelist.col_date')}</TableColumn>
+              <TableColumn>{t('federation_whitelist.col_notes')}</TableColumn>
+              <TableColumn>{t('federation_whitelist.col_actions')}</TableColumn>
             </TableHeader>
-            <TableBody emptyContent="No tenants whitelisted yet">
+            <TableBody emptyContent={t('federation_whitelist.no_tenants_whitelisted')}>
               {entries.map(entry => (
                 <TableRow key={entry.id}>
                   <TableCell>
@@ -220,7 +220,7 @@ export default function FederationWhitelist() {
                         variant="flat"
                         color="primary"
                       >
-                        View
+                        {t('federation_whitelist.view')}
                       </Button>
                       <Button
                         size="sm"
@@ -229,7 +229,7 @@ export default function FederationWhitelist() {
                         onPress={() => setRemoving(entry.tenant_id)}
                         startContent={<Trash2 className="w-4 h-4" />}
                       >
-                        Remove
+                        {t('federation_whitelist.remove')}
                       </Button>
                     </div>
                   </TableCell>

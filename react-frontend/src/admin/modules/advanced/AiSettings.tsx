@@ -83,11 +83,11 @@ interface FormState {
 // Constants
 // ---------------------------------------------------------------------------
 
-const PROVIDERS: { key: ProviderId; label: string; keyField: keyof FormState; modelField: keyof FormState }[] = [
-  { key: 'openai', label: 'OpenAI', keyField: 'openai_api_key', modelField: 'openai_model' },
-  { key: 'anthropic', label: 'Anthropic', keyField: 'anthropic_api_key', modelField: 'claude_model' },
-  { key: 'gemini', label: 'Google Gemini', keyField: 'gemini_api_key', modelField: 'gemini_model' },
-  { key: 'ollama', label: 'Ollama (Self-hosted)', keyField: 'ollama_host' as keyof FormState, modelField: 'ollama_model' },
+const PROVIDERS: { key: ProviderId; labelKey: string; keyField: keyof FormState; modelField: keyof FormState }[] = [
+  { key: 'openai', labelKey: 'advanced.provider_openai', keyField: 'openai_api_key', modelField: 'openai_model' },
+  { key: 'anthropic', labelKey: 'advanced.provider_anthropic', keyField: 'anthropic_api_key', modelField: 'claude_model' },
+  { key: 'gemini', labelKey: 'advanced.provider_google_gemini', keyField: 'gemini_api_key', modelField: 'gemini_model' },
+  { key: 'ollama', labelKey: 'advanced.provider_ollama', keyField: 'ollama_host' as keyof FormState, modelField: 'ollama_model' },
 ];
 
 const MODEL_SUGGESTIONS: Record<ProviderId, string[]> = {
@@ -97,12 +97,12 @@ const MODEL_SUGGESTIONS: Record<ProviderId, string[]> = {
   ollama: ['llama2', 'llama3', 'mistral', 'codellama'],
 };
 
-const FEATURE_TOGGLES: { key: keyof FormState; label: string; description: string }[] = [
-  { key: 'ai_chat_enabled', label: 'AI Chat Assistant', description: 'Allow members to chat with an AI assistant' },
-  { key: 'ai_content_gen_enabled', label: 'Content Generation', description: 'AI-powered content suggestions and generation' },
-  { key: 'ai_recommendations_enabled', label: 'Smart Recommendations', description: 'AI-driven listing and member recommendations' },
-  { key: 'ai_analytics_enabled', label: 'AI Analytics', description: 'AI-powered insights and analytics dashboards' },
-  { key: 'ai_moderation_enabled', label: 'Content Moderation', description: 'Automatic AI content moderation and flagging' },
+const FEATURE_TOGGLES: { key: keyof FormState; labelKey: string; descKey: string }[] = [
+  { key: 'ai_chat_enabled', labelKey: 'advanced.feat_ai_chat', descKey: 'advanced.feat_ai_chat_desc' },
+  { key: 'ai_content_gen_enabled', labelKey: 'advanced.feat_content_gen', descKey: 'advanced.feat_content_gen_desc' },
+  { key: 'ai_recommendations_enabled', labelKey: 'advanced.feat_recommendations', descKey: 'advanced.feat_recommendations_desc' },
+  { key: 'ai_analytics_enabled', labelKey: 'advanced.feat_ai_analytics', descKey: 'advanced.feat_ai_analytics_desc' },
+  { key: 'ai_moderation_enabled', labelKey: 'advanced.feat_moderation', descKey: 'advanced.feat_moderation_desc' },
 ];
 
 const DEFAULT_FORM: FormState = {
@@ -308,10 +308,10 @@ export function AiSettings() {
                 if (v) updateField('ai_provider', String(v));
               }}
               variant="bordered"
-              description="Select the primary AI provider for this tenant"
+              description={t('advanced.desc_select_ai_provider')}
             >
               {PROVIDERS.map(p => (
-                <SelectItem key={p.key}>{p.label}</SelectItem>
+                <SelectItem key={p.key}>{t(p.labelKey)}</SelectItem>
               ))}
             </Select>
           </CardBody>
@@ -321,7 +321,7 @@ export function AiSettings() {
         <Card shadow="sm">
           <CardHeader>
             <h3 className="text-lg font-semibold flex items-center gap-2">
-              <Key size={20} /> Provider Configuration
+              <Key size={20} /> {t('advanced.provider_configuration_heading')}
             </h3>
           </CardHeader>
           <CardBody className="gap-6">
@@ -336,47 +336,47 @@ export function AiSettings() {
               return (
                 <div key={provider.key} className="space-y-3">
                   <div className="flex items-center gap-2">
-                    <p className="font-medium">{provider.label}</p>
-                    {isActive && <Chip size="sm" color="primary" variant="flat">Active</Chip>}
+                    <p className="font-medium">{t(provider.labelKey)}</p>
+                    {isActive && <Chip size="sm" color="primary" variant="flat">{t('advanced.chip_active')}</Chip>}
                     {!isOllama && hasKeySet && !userTyped && (
-                      <Chip size="sm" color="success" variant="flat">Key configured</Chip>
+                      <Chip size="sm" color="success" variant="flat">{t('advanced.chip_key_configured')}</Chip>
                     )}
                   </div>
 
                   {!isOllama ? (
                     <Input
-                      label="API Key"
+                      label={t('advanced.label_api_key')}
                       type="password"
-                      placeholder={hasKeySet ? `Current: ${masked}` : 'Enter API key...'}
+                      placeholder={hasKeySet ? `${t('advanced.placeholder_current')}: ${masked}` : t('advanced.placeholder_enter_api_key')}
                       variant="bordered"
                       description={
                         hasKeySet
-                          ? 'A key is already saved. Enter a new value to replace it, or leave empty to keep the current key.'
-                          : 'Enter your API key. It will be stored securely.'
+                          ? t('advanced.desc_api_key_replace')
+                          : t('advanced.desc_api_key_new')
                       }
                       value={form[apiKeyField] as string}
                       onValueChange={(v) => updateApiKey(apiKeyField, v)}
                     />
                   ) : (
                     <Input
-                      label="Ollama Host URL"
+                      label={t('advanced.label_ollama_host_url')}
                       placeholder="http://localhost:11434"
                       variant="bordered"
-                      description="The URL of your self-hosted Ollama instance"
+                      description={t('advanced.desc_ollama_host')}
                       value={form.ollama_host}
                       onValueChange={(v) => updateField('ollama_host', v)}
                     />
                   )}
 
                   <Select
-                    label="Model"
+                    label={t('advanced.label_model')}
                     selectedKeys={[form[provider.modelField] as string]}
                     onSelectionChange={(keys) => {
                       const v = Array.from(keys)[0];
                       if (v) updateField(provider.modelField, String(v));
                     }}
                     variant="bordered"
-                    description="Select or type a model name"
+                    description={t('advanced.desc_select_model')}
                   >
                     {MODEL_SUGGESTIONS[provider.key].map(m => (
                       <SelectItem key={m}>{m}</SelectItem>
@@ -394,21 +394,21 @@ export function AiSettings() {
         <Card shadow="sm">
           <CardHeader>
             <h3 className="text-lg font-semibold flex items-center gap-2">
-              <Cpu size={20} /> AI Features
+              <Cpu size={20} /> {t('advanced.ai_features_heading')}
             </h3>
           </CardHeader>
           <CardBody className="space-y-3">
             {FEATURE_TOGGLES.map(feat => (
               <div key={feat.key} className="flex items-center justify-between py-1">
                 <div>
-                  <p className="text-sm font-medium">{feat.label}</p>
-                  <p className="text-xs text-default-400">{feat.description}</p>
+                  <p className="text-sm font-medium">{t(feat.labelKey)}</p>
+                  <p className="text-xs text-default-400">{t(feat.descKey)}</p>
                 </div>
                 <Switch
                   size="sm"
                   isSelected={!!form[feat.key]}
                   onValueChange={(v) => updateField(feat.key, v)}
-                  aria-label={feat.label}
+                  aria-label={t(feat.labelKey)}
                 />
               </div>
             ))}
@@ -419,25 +419,25 @@ export function AiSettings() {
         <Card shadow="sm">
           <CardHeader>
             <h3 className="text-lg font-semibold flex items-center gap-2">
-              <Sliders size={20} /> Usage Limits
+              <Sliders size={20} /> {t('advanced.usage_limits_heading')}
             </h3>
           </CardHeader>
           <CardBody className="gap-4">
             <Input
-              label="Default Daily Limit"
+              label={t('advanced.label_default_daily_limit')}
               type="number"
               placeholder="50"
               variant="bordered"
-              description="Maximum AI requests per user per day"
+              description={t('advanced.desc_default_daily_limit')}
               value={form.default_daily_limit}
               onValueChange={(v) => updateField('default_daily_limit', v)}
             />
             <Input
-              label="Default Monthly Limit"
+              label={t('advanced.label_default_monthly_limit')}
               type="number"
               placeholder="1000"
               variant="bordered"
-              description="Maximum AI requests per user per month"
+              description={t('advanced.desc_default_monthly_limit')}
               value={form.default_monthly_limit}
               onValueChange={(v) => updateField('default_monthly_limit', v)}
             />
@@ -450,10 +450,9 @@ export function AiSettings() {
             <div className="flex items-start gap-3">
               <Shield size={20} className="text-default-400 mt-0.5 shrink-0" />
               <div>
-                <p className="text-sm font-medium">Security</p>
+                <p className="text-sm font-medium">{t('advanced.security_heading')}</p>
                 <p className="text-xs text-default-400">
-                  API keys are stored in the database per-tenant. Existing keys are masked when displayed.
-                  Empty key fields on save will not overwrite existing keys — only enter a value when you want to change it.
+                  {t('advanced.security_note')}
                 </p>
               </div>
             </div>

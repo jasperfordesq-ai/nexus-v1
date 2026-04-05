@@ -130,7 +130,7 @@ export function NewsletterBounces() {
     try {
       const res = await adminNewsletters.unsuppress(unsuppressTarget);
       if (res.success) {
-        toast.success(`${unsuppressTarget} removed from suppression list`);
+        toast.success(t('newsletters.email_unsuppressed', { email: unsuppressTarget }));
         setUnsuppressTarget(null);
         loadSuppressionList();
       } else {
@@ -195,7 +195,7 @@ export function NewsletterBounces() {
               onPress={() => activeTab === 'bounces' ? loadBounces() : loadSuppressionList()}
               isLoading={loading}
             >
-              Refresh
+              {t('newsletters.refresh')}
             </Button>
             {activeTab === 'bounces' && (
               <Button
@@ -204,7 +204,7 @@ export function NewsletterBounces() {
                 onPress={exportBounces}
                 isDisabled={bounces.length === 0}
               >
-                Export CSV
+                {t('newsletters.export_csv')}
               </Button>
             )}
           </div>
@@ -215,7 +215,7 @@ export function NewsletterBounces() {
         <Card>
           <CardBody className="gap-2">
             <div className="flex items-center justify-between">
-              <span className="text-sm text-default-500">Total Bounces (7d)</span>
+              <span className="text-sm text-default-500">{t('newsletters.stat_total_bounces_7d')}</span>
               <AlertTriangle size={20} className="text-warning" />
             </div>
             <p className="text-2xl font-bold">{totalBounces7d.toLocaleString()}</p>
@@ -225,7 +225,7 @@ export function NewsletterBounces() {
         <Card>
           <CardBody className="gap-2">
             <div className="flex items-center justify-between">
-              <span className="text-sm text-default-500">Hard Bounces</span>
+              <span className="text-sm text-default-500">{t('newsletters.stat_hard_bounces')}</span>
               <AlertTriangle size={20} className="text-danger" />
             </div>
             <p className="text-2xl font-bold">{hardBounces.toLocaleString()}</p>
@@ -235,7 +235,7 @@ export function NewsletterBounces() {
         <Card>
           <CardBody className="gap-2">
             <div className="flex items-center justify-between">
-              <span className="text-sm text-default-500">Suppressed Emails</span>
+              <span className="text-sm text-default-500">{t('newsletters.stat_suppressed_emails')}</span>
               <Trash2 size={20} className="text-default-400" />
             </div>
             <p className="text-2xl font-bold">{suppressedCount.toLocaleString()}</p>
@@ -249,7 +249,7 @@ export function NewsletterBounces() {
           <Card className="md:col-span-2">
             <CardHeader className="flex gap-2 items-center">
               <TrendingUp size={20} />
-              <span>Bounce Trends (12 weeks)</span>
+              <span>{t('newsletters.section_bounce_trends')}</span>
             </CardHeader>
             <CardBody>
               <ResponsiveContainer width="100%" height={260}>
@@ -259,9 +259,9 @@ export function NewsletterBounces() {
                   <YAxis allowDecimals={false} tick={{ fontSize: 12 }} />
                   <Tooltip />
                   <Legend />
-                  <Bar dataKey="hard" name="Hard" fill={CHART_COLOR_MAP.dangerAlt} stackId="a" radius={[0, 0, 0, 0]} />
-                  <Bar dataKey="soft" name="Soft" fill={CHART_COLOR_MAP.warningAlt} stackId="a" radius={[0, 0, 0, 0]} />
-                  <Bar dataKey="complaint" name="Complaint" fill={CHART_COLOR_MAP.purple} stackId="a" radius={[4, 4, 0, 0]} />
+                  <Bar dataKey="hard" name={t('newsletters.bounce_type_hard')} fill={CHART_COLOR_MAP.dangerAlt} stackId="a" radius={[0, 0, 0, 0]} />
+                  <Bar dataKey="soft" name={t('newsletters.bounce_type_soft')} fill={CHART_COLOR_MAP.warningAlt} stackId="a" radius={[0, 0, 0, 0]} />
+                  <Bar dataKey="complaint" name={t('newsletters.bounce_type_complaint')} fill={CHART_COLOR_MAP.purple} stackId="a" radius={[4, 4, 0, 0]} />
                 </BarChart>
               </ResponsiveContainer>
             </CardBody>
@@ -270,11 +270,11 @@ export function NewsletterBounces() {
           <Card>
             <CardHeader className="flex gap-2 items-center">
               <AlertTriangle size={20} />
-              <span>Top Bounce Reasons</span>
+              <span>{t('newsletters.section_top_bounce_reasons')}</span>
             </CardHeader>
             <CardBody>
               {reasonSummary.length === 0 ? (
-                <p className="text-sm text-default-400">No data</p>
+                <p className="text-sm text-default-400">{t('no_data')}</p>
               ) : (
                 <div className="space-y-2">
                   {reasonSummary.map((r) => (
@@ -334,15 +334,15 @@ export function NewsletterBounces() {
           {activeTab === 'bounces' ? (
             <Table aria-label={t('newsletters.label_bounces_table')} isStriped>
               <TableHeader>
-                <TableColumn>EMAIL</TableColumn>
-                <TableColumn>TYPE</TableColumn>
-                <TableColumn>REASON</TableColumn>
-                <TableColumn>CAMPAIGN</TableColumn>
-                <TableColumn>DATE</TableColumn>
+                <TableColumn>{t('newsletters.col_email')}</TableColumn>
+                <TableColumn>{t('newsletters.col_type')}</TableColumn>
+                <TableColumn>{t('newsletters.col_reason')}</TableColumn>
+                <TableColumn>{t('newsletters.col_campaign')}</TableColumn>
+                <TableColumn>{t('newsletters.col_date')}</TableColumn>
               </TableHeader>
               <TableBody
                 items={filteredBounces}
-                emptyContent={loading ? 'Loading...' : 'No bounces found'}
+                emptyContent={loading ? t('newsletters.loading') : t('newsletters.empty_no_bounces')}
               >
                 {(bounce) => (
                   <TableRow key={bounce.id}>
@@ -372,15 +372,15 @@ export function NewsletterBounces() {
           ) : (
             <Table aria-label={t('newsletters.label_suppression_list_table')} isStriped>
               <TableHeader>
-                <TableColumn>EMAIL</TableColumn>
-                <TableColumn>REASON</TableColumn>
-                <TableColumn>BOUNCE COUNT</TableColumn>
-                <TableColumn>SUPPRESSED AT</TableColumn>
-                <TableColumn>ACTIONS</TableColumn>
+                <TableColumn>{t('newsletters.col_email')}</TableColumn>
+                <TableColumn>{t('newsletters.col_reason')}</TableColumn>
+                <TableColumn>{t('newsletters.col_bounce_count')}</TableColumn>
+                <TableColumn>{t('newsletters.col_suppressed_at')}</TableColumn>
+                <TableColumn>{t('newsletters.col_actions')}</TableColumn>
               </TableHeader>
               <TableBody
                 items={filteredSuppression}
-                emptyContent={loading ? 'Loading...' : 'No suppressed emails'}
+                emptyContent={loading ? t('newsletters.loading') : t('newsletters.empty_no_suppressed')}
               >
                 {(entry) => (
                   <TableRow key={entry.email}>
@@ -405,7 +405,7 @@ export function NewsletterBounces() {
                         color="primary"
                         onPress={() => setUnsuppressTarget(entry.email)}
                       >
-                        Unsuppress
+                        {t('newsletters.btn_unsuppress')}
                       </Button>
                     </TableCell>
                   </TableRow>
@@ -422,8 +422,8 @@ export function NewsletterBounces() {
           onClose={() => setUnsuppressTarget(null)}
           onConfirm={handleUnsuppress}
           title={t('newsletters.unsuppress_email')}
-          message={`Remove "${unsuppressTarget}" from the suppression list? They will be able to receive newsletters again.`}
-          confirmLabel="Unsuppress"
+          message={t('newsletters.unsuppress_confirm_message', { email: unsuppressTarget })}
+          confirmLabel={t('newsletters.btn_unsuppress')}
           confirmColor="primary"
           isLoading={processing}
         />

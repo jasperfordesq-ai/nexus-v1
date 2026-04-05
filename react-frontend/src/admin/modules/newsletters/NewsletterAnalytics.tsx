@@ -206,7 +206,7 @@ export function NewsletterAnalytics() {
             onPress={loadData}
             isLoading={loading}
           >
-            Refresh
+            {t('newsletters.refresh')}
           </Button>
         }
       />
@@ -258,9 +258,9 @@ export function NewsletterAnalytics() {
               <BarChart3 size={20} />
             </div>
             <div>
-              <h3 className="text-base font-semibold">Engagement Summary</h3>
+              <h3 className="text-base font-semibold">{t('newsletters.section_engagement_summary')}</h3>
               <p className="text-sm text-default-500">
-                Aggregate metrics across all campaigns
+                {t('newsletters.engagement_summary_desc')}
               </p>
             </div>
           </CardHeader>
@@ -307,9 +307,9 @@ export function NewsletterAnalytics() {
               <TrendingUp size={20} />
             </div>
             <div>
-              <h3 className="text-base font-semibold">Monthly Performance</h3>
+              <h3 className="text-base font-semibold">{t('newsletters.section_monthly_performance')}</h3>
               <p className="text-sm text-default-500">
-                Email volume and engagement over time
+                {t('newsletters.monthly_performance_desc')}
               </p>
             </div>
           </CardHeader>
@@ -329,19 +329,19 @@ export function NewsletterAnalytics() {
                   formatter={(value, name) => {
                     const v = value as number;
                     const n = name as string;
-                    if (n === 'openRate' || n === 'clickRate') return [`${v}%`, n === 'openRate' ? 'Open Rate' : 'Click Rate'];
-                    return [v.toLocaleString(), n === 'sent' ? 'Emails Sent' : n === 'opens' ? 'Opens' : 'Clicks'];
+                    if (n === 'openRate' || n === 'clickRate') return [`${v}%`, n === 'openRate' ? t('newsletters.chart_open_rate') : t('newsletters.chart_click_rate')];
+                    return [v.toLocaleString(), n === 'sent' ? t('newsletters.chart_emails_sent') : n === 'opens' ? t('newsletters.chart_opens') : t('newsletters.chart_clicks')];
                   }}
                   labelFormatter={(label) => String(label)}
                 />
                 <Legend
                   formatter={(value: string) => {
                     const labels: Record<string, string> = {
-                      sent: 'Emails Sent',
-                      opens: 'Opens',
-                      clicks: 'Clicks',
-                      openRate: 'Open Rate %',
-                      clickRate: 'Click Rate %',
+                      sent: t('newsletters.chart_emails_sent'),
+                      opens: t('newsletters.chart_opens'),
+                      clicks: t('newsletters.chart_clicks'),
+                      openRate: t('newsletters.chart_open_rate_pct'),
+                      clickRate: t('newsletters.chart_click_rate_pct'),
                     };
                     return labels[value] ?? value;
                   }}
@@ -361,13 +361,13 @@ export function NewsletterAnalytics() {
                 classNames={{ th: 'text-xs uppercase', td: 'py-2' }}
               >
                 <TableHeader>
-                  <TableColumn>Month</TableColumn>
-                  <TableColumn className="text-center">Newsletters</TableColumn>
-                  <TableColumn className="text-center">Emails Sent</TableColumn>
-                  <TableColumn className="text-center">Opens</TableColumn>
-                  <TableColumn className="text-center">Clicks</TableColumn>
-                  <TableColumn className="text-center">Open Rate</TableColumn>
-                  <TableColumn className="text-center">Click Rate</TableColumn>
+                  <TableColumn>{t('newsletters.col_month')}</TableColumn>
+                  <TableColumn className="text-center">{t('newsletters.col_newsletters')}</TableColumn>
+                  <TableColumn className="text-center">{t('newsletters.col_emails_sent')}</TableColumn>
+                  <TableColumn className="text-center">{t('newsletters.col_opens')}</TableColumn>
+                  <TableColumn className="text-center">{t('newsletters.col_clicks')}</TableColumn>
+                  <TableColumn className="text-center">{t('newsletters.col_open_rate')}</TableColumn>
+                  <TableColumn className="text-center">{t('newsletters.col_click_rate')}</TableColumn>
                 </TableHeader>
                 <TableBody>
                   {chartData.map((row) => (
@@ -418,9 +418,9 @@ export function NewsletterAnalytics() {
               <Trophy size={20} />
             </div>
             <div>
-              <h3 className="text-base font-semibold">Top Performing Newsletters</h3>
+              <h3 className="text-base font-semibold">{t('newsletters.section_top_performers')}</h3>
               <p className="text-sm text-default-500">
-                Ranked by open rate (minimum 10 recipients)
+                {t('newsletters.top_performers_desc')}
               </p>
             </div>
           </CardHeader>
@@ -432,11 +432,11 @@ export function NewsletterAnalytics() {
             >
               <TableHeader>
                 <TableColumn className="w-[50px]">#</TableColumn>
-                <TableColumn>Subject</TableColumn>
-                <TableColumn className="text-center">Recipients</TableColumn>
-                <TableColumn className="text-center">Open Rate</TableColumn>
-                <TableColumn className="text-center">Click Rate</TableColumn>
-                <TableColumn className="text-end">Date</TableColumn>
+                <TableColumn>{t('newsletters.col_subject')}</TableColumn>
+                <TableColumn className="text-center">{t('newsletters.col_recipients')}</TableColumn>
+                <TableColumn className="text-center">{t('newsletters.col_open_rate')}</TableColumn>
+                <TableColumn className="text-center">{t('newsletters.col_click_rate')}</TableColumn>
+                <TableColumn className="text-end">{t('newsletters.col_date')}</TableColumn>
               </TableHeader>
               <TableBody>
                 {topPerformers.map((nl, idx) => (
@@ -491,9 +491,9 @@ export function NewsletterAnalytics() {
               <Target size={20} />
             </div>
             <div>
-              <h3 className="text-base font-semibold">Industry Benchmark Comparison</h3>
+              <h3 className="text-base font-semibold">{t('newsletters.section_benchmark')}</h3>
               <p className="text-sm text-default-500">
-                Your rates vs. all-industry averages (Mailchimp 2024)
+                {t('newsletters.benchmark_desc')}
               </p>
             </div>
           </CardHeader>
@@ -521,9 +521,9 @@ export function NewsletterAnalytics() {
             <div className="mb-4 flex h-20 w-20 items-center justify-center rounded-2xl bg-default-100">
               <BarChart3 size={40} className="text-default-300" />
             </div>
-            <h3 className="text-lg font-semibold">No analytics data yet</h3>
+            <h3 className="text-lg font-semibold">{t('newsletters.empty_no_analytics')}</h3>
             <p className="mt-1 text-default-500">
-              Send your first newsletter to start seeing performance metrics.
+              {t('newsletters.empty_no_analytics_desc')}
             </p>
           </CardBody>
         </Card>
@@ -582,6 +582,7 @@ function BenchmarkCard({
   yours: number;
   benchmark: number;
 }) {
+  const { t: tLocal } = useTranslation('admin');
   const diff = yours - benchmark;
   const diffPct = benchmark > 0 ? Math.round((diff / benchmark) * 100) : 0;
   const isAbove = diff >= 0;
@@ -591,11 +592,11 @@ function BenchmarkCard({
       <p className="mb-3 text-sm font-semibold text-default-700">{label}</p>
       <div className="flex items-end justify-between gap-4">
         <div>
-          <p className="text-xs text-default-500">Your Average</p>
+          <p className="text-xs text-default-500">{tLocal('newsletters.your_average')}</p>
           <p className="text-2xl font-bold text-foreground">{yours}%</p>
         </div>
         <div className="text-right">
-          <p className="text-xs text-default-500">Industry Avg</p>
+          <p className="text-xs text-default-500">{tLocal('newsletters.industry_avg')}</p>
           <p className="text-2xl font-bold text-default-400">{benchmark}%</p>
         </div>
       </div>
@@ -614,7 +615,7 @@ function BenchmarkCard({
           {diffPct}%)
         </Chip>
         <span className="text-xs text-default-500">
-          {isAbove ? 'above' : 'below'} benchmark
+          {isAbove ? tLocal('newsletters.above_benchmark') : tLocal('newsletters.below_benchmark')}
         </span>
       </div>
     </div>

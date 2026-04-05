@@ -177,14 +177,14 @@ export function NewsletterStats() {
       if (statsRes.success && statsRes.data) {
         setData(statsRes.data as unknown as StatsData);
       } else {
-        setError('Newsletter not found');
+        setError(t('newsletters.error_not_found'));
       }
       if (clientsRes.success && clientsRes.data) {
         const raw = clientsRes.data as unknown as { email_clients?: Array<{ client: string; count: number }> };
         setEmailClients(raw?.email_clients ?? []);
       }
     } catch {
-      setError('Failed to load newsletter stats');
+      setError(t('newsletters.error_failed_to_load_stats'));
     }
     setLoading(false);
   }, [id]);
@@ -197,7 +197,7 @@ export function NewsletterStats() {
     try {
       const res = await adminNewsletters.selectAbWinner(Number(id), winner);
       if (res.success) {
-        toast.success(`Subject ${winner.toUpperCase()} selected as winner`);
+        toast.success(t('newsletters.winner_selected', { variant: winner.toUpperCase() }));
         loadStats();
       } else {
         toast.error(t('newsletters.failed_to_select_winner'));
@@ -237,7 +237,7 @@ export function NewsletterStats() {
               startContent={<ArrowLeft size={16} />}
               onPress={() => navigate(tenantPath('/admin/newsletters'))}
             >
-              Back
+              {t('newsletters.back')}
             </Button>
           }
         />
@@ -267,20 +267,20 @@ export function NewsletterStats() {
               startContent={<ArrowLeft size={16} />}
               onPress={() => navigate(tenantPath('/admin/newsletters'))}
             >
-              Back
+              {t('newsletters.back')}
             </Button>
           }
         />
         <Card>
           <CardBody className="flex flex-col items-center gap-3 py-12 text-center">
             <Mail size={48} className="text-default-300" />
-            <p className="text-lg font-semibold text-default-600">{error || 'Newsletter not found'}</p>
+            <p className="text-lg font-semibold text-default-600">{error || t('newsletters.error_not_found')}</p>
             <Button
               color="primary"
               variant="flat"
               onPress={() => navigate(tenantPath('/admin/newsletters'))}
             >
-              Back to Newsletters
+              {t('newsletters.back_to_newsletters')}
             </Button>
           </CardBody>
         </Card>
@@ -304,7 +304,7 @@ export function NewsletterStats() {
               startContent={<ArrowLeft size={16} />}
               onPress={() => navigate(tenantPath('/admin/newsletters'))}
             >
-              Back
+              {t('newsletters.back')}
             </Button>
             {newsletter.status === 'sent' && (
               <Button
@@ -312,7 +312,7 @@ export function NewsletterStats() {
                 startContent={<BarChart3 size={16} />}
                 onPress={() => navigate(tenantPath(`/admin/newsletters/${id}/activity`))}
               >
-                Activity Log
+                {t('newsletters.activity_log')}
               </Button>
             )}
             {nonOpenerCount > 0 && newsletter.status === 'sent' && (
@@ -322,7 +322,7 @@ export function NewsletterStats() {
                 startContent={<Send size={16} />}
                 onPress={() => setResendOpen(true)}
               >
-                Resend to {nonOpenerCount.toLocaleString()} Non-Openers
+                {t('newsletters.resend_to_non_openers_count', { count: nonOpenerCount })}
               </Button>
             )}
           </div>
@@ -336,9 +336,9 @@ export function NewsletterStats() {
             <h2 className="text-xl font-bold text-foreground">{newsletter.subject}</h2>
             <p className="mt-1 text-sm text-default-500">
               {newsletter.sent_at
-                ? `Sent on ${new Date(newsletter.sent_at).toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' })}`
-                : `Created ${newsletter.created_at ? new Date(newsletter.created_at).toLocaleDateString() : ''}`}
-              {newsletter.author_name ? ` by ${newsletter.author_name}` : ''}
+                ? t('newsletters.sent_on', { date: new Date(newsletter.sent_at).toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' }) })
+                : t('newsletters.created_on', { date: newsletter.created_at ? new Date(newsletter.created_at).toLocaleDateString() : '' })}
+              {newsletter.author_name ? ` ${t('newsletters.by_author', { name: newsletter.author_name })}` : ''}
             </p>
           </div>
           <div className="flex items-center gap-2">
@@ -365,28 +365,28 @@ export function NewsletterStats() {
           value={`${engagement.success_rate}%`}
           icon={CheckCircle}
           color="success"
-          description={`${delivery.delivered.toLocaleString()} delivered`}
+          description={`${delivery.delivered.toLocaleString()} ${t('newsletters.delivered_label')}`}
         />
         <StatCard
           label={t('newsletters.label_open_rate')}
           value={`${engagement.open_rate}%`}
           icon={Eye}
           color="primary"
-          description={`${engagement.unique_opens.toLocaleString()} unique opens`}
+          description={`${engagement.unique_opens.toLocaleString()} ${t('newsletters.unique_opens_label')}`}
         />
         <StatCard
           label={t('newsletters.label_click_rate')}
           value={`${engagement.click_rate}%`}
           icon={MousePointer}
           color="warning"
-          description={`${engagement.unique_clicks.toLocaleString()} unique clicks`}
+          description={`${engagement.unique_clicks.toLocaleString()} ${t('newsletters.unique_clicks_label')}`}
         />
         <StatCard
           label={t('newsletters.label_click_to_open_rate')}
           value={`${engagement.click_to_open_rate}%`}
           icon={BarChart3}
           color="secondary"
-          description={`${engagement.total_clicks.toLocaleString()} total clicks`}
+          description={`${engagement.total_clicks.toLocaleString()} ${t('newsletters.total_clicks_desc')}`}
         />
       </div>
 
@@ -394,7 +394,7 @@ export function NewsletterStats() {
       <Card shadow="sm" className="mb-6">
         <CardHeader className="flex flex-row items-center gap-2 px-5 pb-0 pt-5">
           <TrendingUp size={18} className="text-default-400" />
-          <h3 className="text-lg font-semibold text-foreground">Engagement Funnel</h3>
+          <h3 className="text-lg font-semibold text-foreground">{t('newsletters.section_engagement_funnel')}</h3>
         </CardHeader>
         <CardBody className="space-y-4 px-5 pb-5">
           <FunnelBar
@@ -423,7 +423,7 @@ export function NewsletterStats() {
       {/* ── Delivery Stats Card ── */}
       <Card shadow="sm" className="mb-6">
         <CardHeader className="px-5 pb-0 pt-5">
-          <h3 className="text-lg font-semibold text-foreground">Delivery Stats</h3>
+          <h3 className="text-lg font-semibold text-foreground">{t('newsletters.section_delivery_stats')}</h3>
         </CardHeader>
         <CardBody className="space-y-4 px-5 pb-5">
           <DeliveryBar label={t('newsletters.label_delivered')} value={delivery.delivered} total={delivery.total_sent + delivery.pending} color="success" />
@@ -438,7 +438,7 @@ export function NewsletterStats() {
         <Card shadow="sm" className="mb-6 border-2 border-warning-200">
           <CardHeader className="flex flex-row items-center gap-3 px-5 pb-0 pt-5">
             <Chip size="sm" color="warning" variant="solid">A/B</Chip>
-            <h3 className="text-lg font-semibold text-foreground">Subject Line Test Results</h3>
+            <h3 className="text-lg font-semibold text-foreground">{t('newsletters.section_ab_test_results')}</h3>
           </CardHeader>
           <CardBody className="space-y-5 px-5 pb-5">
             {/* Winner Announcement */}
@@ -447,7 +447,7 @@ export function NewsletterStats() {
                 <Trophy size={24} className="text-success" />
                 <div>
                   <p className="font-semibold text-success-700 dark:text-success">
-                    Winner: Subject {ab_test.winner.toUpperCase()}
+                    {t('newsletters.winner_subject', { variant: ab_test.winner.toUpperCase() })}
                   </p>
                   <p className="text-sm text-success-600 dark:text-success-400">
                     &quot;{ab_test.winner === 'a' ? ab_test.subject_a : ab_test.subject_b}&quot;
@@ -487,10 +487,10 @@ export function NewsletterStats() {
             {/* Split info + Select Winner Buttons */}
             <div className="flex flex-wrap items-center gap-3 border-t border-divider pt-4">
               <span className="text-sm text-default-500">
-                Split: {ab_test.split_percentage}% A / {100 - ab_test.split_percentage}% B
-                &bull; Winning metric: {ab_test.winner_metric === 'clicks' ? 'Click Rate' : 'Open Rate'}
+                {t('newsletters.ab_split_info', { a: ab_test.split_percentage, b: 100 - ab_test.split_percentage })}
+                &bull; {t('newsletters.winning_metric')}: {ab_test.winner_metric === 'clicks' ? t('newsletters.col_click_rate') : t('newsletters.col_open_rate')}
                 {ab_test.winning_margin > 0 && (
-                  <> &bull; Margin: {ab_test.winning_margin}%</>
+                  <> &bull; {t('newsletters.margin')}: {ab_test.winning_margin}%</>
                 )}
               </span>
               {!ab_test.winner && (
@@ -502,7 +502,7 @@ export function NewsletterStats() {
                     isLoading={selectingWinner}
                     onPress={() => handleSelectWinner('a')}
                   >
-                    Select A as Winner
+                    {t('newsletters.select_a_as_winner')}
                   </Button>
                   <Button
                     size="sm"
@@ -511,7 +511,7 @@ export function NewsletterStats() {
                     isLoading={selectingWinner}
                     onPress={() => handleSelectWinner('b')}
                   >
-                    Select B as Winner
+                    {t('newsletters.select_b_as_winner')}
                   </Button>
                 </div>
               )}
@@ -527,7 +527,7 @@ export function NewsletterStats() {
           <Card shadow="sm" className="lg:col-span-1">
             <CardHeader className="flex flex-row items-center gap-2 px-5 pb-0 pt-5">
               <Monitor size={18} className="text-default-400" />
-              <h3 className="text-lg font-semibold text-foreground">Devices</h3>
+              <h3 className="text-lg font-semibold text-foreground">{t('newsletters.section_devices')}</h3>
             </CardHeader>
             <CardBody className="px-5 pb-5">
               <div className="mx-auto h-48 w-48">
@@ -581,8 +581,8 @@ export function NewsletterStats() {
           <Card shadow="sm" className={deviceTotal > 0 ? 'lg:col-span-2' : 'lg:col-span-3'}>
             <CardHeader className="flex flex-row items-center gap-2 px-5 pb-0 pt-5">
               <Clock size={18} className="text-default-400" />
-              <h3 className="text-lg font-semibold text-foreground">Engagement Timeline</h3>
-              <span className="ml-auto text-xs text-default-400">First 48 hours after send</span>
+              <h3 className="text-lg font-semibold text-foreground">{t('newsletters.section_engagement_timeline')}</h3>
+              <span className="ml-auto text-xs text-default-400">{t('newsletters.first_48_hours')}</span>
             </CardHeader>
             <CardBody className="px-5 pb-5">
               <div className="h-64 w-full">
@@ -603,13 +603,13 @@ export function NewsletterStats() {
                         borderRadius: '8px',
                         fontSize: '13px',
                       }}
-                      labelFormatter={(h) => `Hour ${h}`}
+                      labelFormatter={(h) => t('newsletters.hour_label', { hour: h })}
                     />
                     <Legend />
                     <Line
                       type="monotone"
                       dataKey="opens"
-                      name="Opens"
+                      name={t('newsletters.chart_opens')}
                       stroke="hsl(var(--heroui-primary))"
                       strokeWidth={2}
                       dot={false}
@@ -618,7 +618,7 @@ export function NewsletterStats() {
                     <Line
                       type="monotone"
                       dataKey="clicks"
-                      name="Clicks"
+                      name={t('newsletters.chart_clicks')}
                       stroke="hsl(var(--heroui-success))"
                       strokeWidth={2}
                       dot={false}
@@ -629,9 +629,9 @@ export function NewsletterStats() {
               </div>
               <Divider className="my-3" />
               <p className="text-center text-sm text-default-400">
-                Total opens: {engagement.total_opens.toLocaleString()} | Total clicks: {engagement.total_clicks.toLocaleString()}
+                {t('newsletters.total_opens_label')}: {engagement.total_opens.toLocaleString()} | {t('newsletters.total_clicks_label')}: {engagement.total_clicks.toLocaleString()}
                 {peak_engagement && peak_engagement.max_opens_per_hour > 0 && (
-                  <> | Peak: {peak_engagement.max_opens_per_hour} opens at hour {peak_engagement.peak_hour}</>
+                  <> | {t('newsletters.peak_label', { count: peak_engagement.max_opens_per_hour, hour: peak_engagement.peak_hour })}</>
                 )}
               </p>
             </CardBody>
@@ -644,7 +644,7 @@ export function NewsletterStats() {
         <Card shadow="sm" className="mb-6">
           <CardHeader className="flex flex-row items-center gap-2 px-5 pb-0 pt-5">
             <Mail size={18} className="text-default-400" />
-            <h3 className="text-lg font-semibold text-foreground">Email Clients</h3>
+            <h3 className="text-lg font-semibold text-foreground">{t('newsletters.section_email_clients')}</h3>
           </CardHeader>
           <CardBody className="px-5 pb-5">
             <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5">
@@ -655,7 +655,7 @@ export function NewsletterStats() {
                   <div key={ec.client} className="text-center">
                     <p className="text-2xl font-bold text-foreground">{pct}%</p>
                     <p className="text-sm text-default-500">{ec.client}</p>
-                    <p className="text-xs text-default-400">{ec.count.toLocaleString()} opens</p>
+                    <p className="text-xs text-default-400">{ec.count.toLocaleString()} {t('newsletters.opens_label')}</p>
                   </div>
                 );
               })}
@@ -669,7 +669,7 @@ export function NewsletterStats() {
         <Card shadow="sm" className="mb-6">
           <CardHeader className="flex flex-row items-center gap-2 px-5 pb-0 pt-5">
             <ExternalLink size={18} className="text-default-400" />
-            <h3 className="text-lg font-semibold text-foreground">Top Clicked Links</h3>
+            <h3 className="text-lg font-semibold text-foreground">{t('newsletters.section_top_clicked_links')}</h3>
           </CardHeader>
           <CardBody className="px-5 pb-5">
             <Table
@@ -678,9 +678,9 @@ export function NewsletterStats() {
               classNames={{ th: 'text-default-500 text-xs uppercase' }}
             >
               <TableHeader>
-                <TableColumn>URL</TableColumn>
-                <TableColumn align="end">Clicks</TableColumn>
-                <TableColumn align="end">Unique</TableColumn>
+                <TableColumn>{t('newsletters.col_url')}</TableColumn>
+                <TableColumn align="end">{t('newsletters.col_clicks')}</TableColumn>
+                <TableColumn align="end">{t('newsletters.col_unique')}</TableColumn>
               </TableHeader>
               <TableBody>
                 {top_links.map((link) => (
@@ -715,7 +715,7 @@ export function NewsletterStats() {
           <CardHeader className="flex flex-row items-center justify-between px-5 pb-0 pt-5">
             <div className="flex items-center gap-2">
               <BarChart3 size={18} className="text-default-400" />
-              <h3 className="text-lg font-semibold text-foreground">Recent Activity</h3>
+              <h3 className="text-lg font-semibold text-foreground">{t('newsletters.section_recent_activity')}</h3>
             </div>
             {newsletter.status === 'sent' && (
               <Button
@@ -723,7 +723,7 @@ export function NewsletterStats() {
                 variant="light"
                 onPress={() => navigate(tenantPath(`/admin/newsletters/${id}/activity`))}
               >
-                View All
+                {t('newsletters.view_all')}
               </Button>
             )}
           </CardHeader>
@@ -735,9 +735,9 @@ export function NewsletterStats() {
                 classNames={{ th: 'text-default-500 text-xs uppercase', td: 'py-2' }}
               >
                 <TableHeader>
-                  <TableColumn>Event</TableColumn>
-                  <TableColumn>Email</TableColumn>
-                  <TableColumn>Time</TableColumn>
+                  <TableColumn>{t('newsletters.col_event')}</TableColumn>
+                  <TableColumn>{t('newsletters.col_email')}</TableColumn>
+                  <TableColumn>{t('newsletters.col_time')}</TableColumn>
                 </TableHeader>
                 <TableBody>
                   {recent_activity.map((item) => (
@@ -748,7 +748,7 @@ export function NewsletterStats() {
                           variant="flat"
                           color={item.action_type === 'open' ? 'primary' : 'success'}
                         >
-                          {item.action_type === 'open' ? 'Opened' : 'Clicked'}
+                          {item.action_type === 'open' ? t('newsletters.action_opened') : t('newsletters.action_clicked')}
                         </Chip>
                       </TableCell>
                       <TableCell>
@@ -780,7 +780,7 @@ export function NewsletterStats() {
       {/* ── Quick Actions ── */}
       <Card shadow="sm" className="mb-6">
         <CardHeader className="px-5 pb-0 pt-5">
-          <h3 className="text-lg font-semibold text-foreground">Actions</h3>
+          <h3 className="text-lg font-semibold text-foreground">{t('newsletters.section_actions')}</h3>
         </CardHeader>
         <CardBody className="px-5 pb-5">
           <div className="flex flex-wrap gap-3">
@@ -791,7 +791,7 @@ export function NewsletterStats() {
                 window.open(`/api/v2/admin/newsletters/${id}/preview`, '_blank');
               }}
             >
-              View Email Content
+              {t('newsletters.view_email_content')}
             </Button>
             <Button
               variant="flat"
@@ -810,7 +810,7 @@ export function NewsletterStats() {
                 }
               }}
             >
-              Duplicate Newsletter
+              {t('newsletters.btn_duplicate_newsletter')}
             </Button>
             {newsletter.status === 'sent' && (
               <Button
@@ -818,7 +818,7 @@ export function NewsletterStats() {
                 startContent={<BarChart3 size={16} />}
                 onPress={() => navigate(tenantPath(`/admin/newsletters/${id}/activity`))}
               >
-                Full Activity Log
+                {t('newsletters.btn_full_activity_log')}
               </Button>
             )}
           </div>
@@ -925,6 +925,7 @@ function AbVariantCard({
   isLeading: boolean;
   chipColor: 'primary' | 'warning';
 }) {
+  const { t: tLocal } = useTranslation('admin');
   return (
     <Card
       shadow="none"
@@ -936,31 +937,31 @@ function AbVariantCard({
           {isWinner && (
             <div className="flex items-center gap-1 text-success">
               <Trophy size={14} />
-              <span className="text-xs font-semibold">Winner</span>
+              <span className="text-xs font-semibold">{tLocal('newsletters.winner')}</span>
             </div>
           )}
           {isLeading && !isWinner && (
-            <span className="text-xs font-medium text-success">Leading</span>
+            <span className="text-xs font-medium text-success">{tLocal('newsletters.leading')}</span>
           )}
         </div>
         <p className="text-sm italic text-default-600">&quot;{subject}&quot;</p>
         <div className="grid grid-cols-3 gap-3 text-center">
           <div>
             <p className="text-2xl font-bold text-primary">{openRate}%</p>
-            <p className="text-xs text-default-500">Open Rate</p>
+            <p className="text-xs text-default-500">{tLocal('newsletters.col_open_rate')}</p>
           </div>
           <div>
             <p className="text-2xl font-bold text-success">{clickRate}%</p>
-            <p className="text-xs text-default-500">Click Rate</p>
+            <p className="text-xs text-default-500">{tLocal('newsletters.col_click_rate')}</p>
           </div>
           <div>
             <p className="text-2xl font-bold text-foreground">{sent.toLocaleString()}</p>
-            <p className="text-xs text-default-500">Sent</p>
+            <p className="text-xs text-default-500">{tLocal('newsletters.col_sent')}</p>
           </div>
         </div>
         <div className="flex justify-center gap-4 border-t border-divider pt-2 text-xs text-default-400">
-          <span>{opens.toLocaleString()} opens</span>
-          <span>{clicks.toLocaleString()} clicks</span>
+          <span>{opens.toLocaleString()} {tLocal('newsletters.opens_label')}</span>
+          <span>{clicks.toLocaleString()} {tLocal('newsletters.clicks_label')}</span>
         </div>
       </CardBody>
     </Card>

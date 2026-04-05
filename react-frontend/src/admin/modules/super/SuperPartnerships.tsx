@@ -100,7 +100,7 @@ export default function Partnerships() {
       setActionPartnership(null);
       toast.success(t('super.partnership_suspended'));
     } else {
-      toast.error(res.error || 'Failed to suspend partnership');
+      toast.error(res.error || t('super.failed_to_suspend_partnership'));
     }
   };
 
@@ -115,7 +115,7 @@ export default function Partnerships() {
       setActionPartnership(null);
       toast.success(t('super.partnership_terminated'));
     } else {
-      toast.error(res.error || 'Failed to terminate partnership');
+      toast.error(res.error || t('super.failed_to_terminate_partnership'));
     }
   };
 
@@ -179,7 +179,7 @@ export default function Partnerships() {
                 <TrendingUp className="w-5 h-5 text-success" />
               </div>
               <div>
-                <p className="text-xs text-default-500">Active</p>
+                <p className="text-xs text-default-500">{t('super.label_active')}</p>
                 <p className="text-2xl font-bold text-success">{stats.active}</p>
               </div>
             </div>
@@ -193,7 +193,7 @@ export default function Partnerships() {
                 <TrendingUp className="w-5 h-5 text-warning" />
               </div>
               <div>
-                <p className="text-xs text-default-500">Pending</p>
+                <p className="text-xs text-default-500">{t('super.label_pending')}</p>
                 <p className="text-2xl font-bold text-warning">{stats.pending}</p>
               </div>
             </div>
@@ -207,7 +207,7 @@ export default function Partnerships() {
                 <Pause className="w-5 h-5 text-danger" />
               </div>
               <div>
-                <p className="text-xs text-default-500">Suspended</p>
+                <p className="text-xs text-default-500">{t('super.label_suspended')}</p>
                 <p className="text-2xl font-bold text-danger">{stats.suspended}</p>
               </div>
             </div>
@@ -221,7 +221,7 @@ export default function Partnerships() {
                 <XCircle className="w-5 h-5 text-default-500" />
               </div>
               <div>
-                <p className="text-xs text-default-500">Terminated</p>
+                <p className="text-xs text-default-500">{t('super.label_terminated')}</p>
                 <p className="text-2xl font-bold">{stats.terminated}</p>
               </div>
             </div>
@@ -236,24 +236,24 @@ export default function Partnerships() {
             selectedKey={filter}
             onSelectionChange={(key) => setFilter(key as PartnershipStatus)}
           >
-            <Tab key="all" title={`All (${partnerships.length})`} />
-            <Tab key="active" title={`Active (${stats.active})`} />
-            <Tab key="pending" title={`Pending (${stats.pending})`} />
-            <Tab key="suspended" title={`Suspended (${stats.suspended})`} />
-            <Tab key="terminated" title={`Terminated (${stats.terminated})`} />
+            <Tab key="all" title={`${t('super.tab_all')} (${partnerships.length})`} />
+            <Tab key="active" title={`${t('super.tab_active')} (${stats.active})`} />
+            <Tab key="pending" title={`${t('super.tab_pending')} (${stats.pending})`} />
+            <Tab key="suspended" title={`${t('super.tab_suspended')} (${stats.suspended})`} />
+            <Tab key="terminated" title={`${t('super.tab_terminated')} (${stats.terminated})`} />
           </Tabs>
         </CardHeader>
         <CardBody>
           <Table aria-label={t('super.label_federation_partnerships')} shadow="sm" isStriped>
             <TableHeader>
-              <TableColumn>Partnership</TableColumn>
-              <TableColumn>Level</TableColumn>
-              <TableColumn>Features</TableColumn>
-              <TableColumn>Status</TableColumn>
-              <TableColumn>Created</TableColumn>
-              <TableColumn>Actions</TableColumn>
+              <TableColumn>{t('super.col_partnership')}</TableColumn>
+              <TableColumn>{t('super.col_level')}</TableColumn>
+              <TableColumn>{t('super.col_features')}</TableColumn>
+              <TableColumn>{t('super.col_status')}</TableColumn>
+              <TableColumn>{t('super.col_created')}</TableColumn>
+              <TableColumn>{t('super.col_actions')}</TableColumn>
             </TableHeader>
-            <TableBody emptyContent={`No ${filter !== 'all' ? filter : ''} partnerships found`}>
+            <TableBody emptyContent={t('super.no_partnerships_found', { filter: filter !== 'all' ? filter : '' })}>
               {filteredPartnerships.map(partnership => (
                 <TableRow key={partnership.id}>
                   <TableCell>
@@ -297,7 +297,7 @@ export default function Partnerships() {
                           onPress={() => setActionPartnership({ id: partnership.id, action: 'suspend' })}
                           startContent={<Pause className="w-4 h-4" />}
                         >
-                          Suspend
+                          {t('super.suspend')}
                         </Button>
                       )}
                       {(partnership.status === 'active' || partnership.status === 'suspended') && (
@@ -308,7 +308,7 @@ export default function Partnerships() {
                           onPress={() => setActionPartnership({ id: partnership.id, action: 'terminate' })}
                           startContent={<XCircle className="w-4 h-4" />}
                         >
-                          Terminate
+                          {t('super.terminate')}
                         </Button>
                       )}
                     </div>
@@ -332,13 +332,13 @@ export default function Partnerships() {
               handleTerminate(actionPartnership.id);
             }
           }}
-          title={actionPartnership.action === 'suspend' ? 'Suspend Partnership' : 'Terminate Partnership'}
+          title={actionPartnership.action === 'suspend' ? t('super.suspend_partnership') : t('super.terminate_partnership')}
           message={
             actionPartnership.action === 'suspend'
-              ? 'Are you sure you want to suspend this partnership? All federation features will be temporarily disabled.'
-              : 'Are you sure you want to terminate this partnership? This action cannot be undone.'
+              ? t('super.suspend_partnership_message')
+              : t('super.terminate_partnership_message')
           }
-          confirmLabel={actionPartnership.action === 'suspend' ? 'Suspend' : 'Terminate'}
+          confirmLabel={actionPartnership.action === 'suspend' ? t('super.suspend') : t('super.terminate')}
           confirmColor="danger"
         />
       )}
