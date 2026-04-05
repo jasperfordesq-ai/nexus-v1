@@ -50,6 +50,7 @@ import {
   User,
   ExternalLink,
   Flag,
+  CheckCircle,
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
@@ -69,33 +70,37 @@ interface ListingDetail {
   id: number;
   title: string;
   description: string;
+  tagline?: string;
   price: number | null;
-  price_type: 'fixed' | 'negotiable' | 'free';
-  currency: string;
+  price_currency: string;
+  price_type: 'fixed' | 'negotiable' | 'free' | 'auction' | 'contact';
+  time_credit_price?: number | null;
   condition: string;
   quantity: number;
-  category_id: number | null;
-  category_name: string | null;
-  category_slug: string | null;
+  category?: { id: number; name: string; slug: string; icon?: string } | null;
   location: string | null;
   latitude: number | null;
   longitude: number | null;
+  shipping_available: boolean;
+  local_pickup: boolean;
   delivery_method: string | null;
-  images: { id: number; url: string; thumbnail_url: string }[];
-  seller: {
+  seller_type: string;
+  images: { id: number; url: string; thumbnail_url?: string; alt_text?: string; is_primary?: boolean }[];
+  user: {
     id: number;
     name: string;
     avatar_url: string | null;
-    rating: number | null;
-    response_time: string | null;
-    seller_type: string | null;
-    listings_count: number;
-  };
-  template_fields: Record<string, string> | null;
+    is_verified?: boolean;
+    member_since?: string;
+  } | null;
+  template_data: Record<string, unknown> | null;
   views_count: number;
+  saves_count: number;
   is_saved: boolean;
-  is_featured: boolean;
+  is_own: boolean;
+  is_promoted: boolean;
   status: string;
+  expires_at?: string;
   created_at: string;
   updated_at: string;
 }
@@ -183,7 +188,7 @@ function buildProductSchema(
     'offers': {
       '@type': 'Offer',
       'url': canonicalUrl,
-      'priceCurrency': listing.currency || 'EUR',
+      'priceCurrency': listing.price_currency || 'EUR',
       'price': listing.price_type === 'free' ? '0' : String(listing.price ?? 0),
       'availability': AVAILABILITY_MAP[listing.status] ?? 'https://schema.org/InStock',
       'itemCondition': listing.condition
@@ -191,7 +196,7 @@ function buildProductSchema(
         : undefined,
       'seller': {
         '@type': 'Person',
-        'name': listing.seller.name,
+        'name': listing.user?.name || '',
       },
     },
   };
@@ -367,13 +372,13 @@ export function MarketplaceListingPage() {
 
   // Load seller listings
   useEffect(() => {
-    if (!listing?.seller.id) return;
+    if (!listing?.user?.id) return;
     let cancelled = false;
 
     const load = async () => {
       try {
         const response = await api.get<SellerListing[]>(
-          `/v2/marketplace/sellers/${listing.seller.id}/listings?limit=4`
+          `/v2/marketplace/sellers/${listing.user.id}/listings?limit=4`
         );
         if (!cancelled && response.success && response.data) {
           setSellerListings(response.data.filter((l) => l.id !== listing.id));
@@ -466,7 +471,7 @@ export function MarketplaceListingPage() {
     );
   }
 
-  const priceDisplay = formatPrice(listing.price, listing.price_type, listing.currency);
+  const priceDisplay = formatPrice(listing.price, listing.price_type, listing.price_currency);
 
   return (
     <>
@@ -487,14 +492,14 @@ export function MarketplaceListingPage() {
           >
             {t('listing.marketplace', 'Marketplace')}
           </Button>
-          {listing.category_name && listing.category_slug && (
+          {listing.category?.name && listing.category?.slug && (
             <>
               <span className="text-default-300">/</span>
               <Link
-                to={tenantPath(`/marketplace/category/${listing.category_slug}`)}
+                to={tenantPath(`/marketplace/category/${listing.category?.slug}`)}
                 className="text-default-500 hover:text-primary transition-colors"
               >
-                {listing.category_name}
+                {listing.category?.name}
               </Link>
             </>
           )}
@@ -565,7 +570,7 @@ export function MarketplaceListingPage() {
                     {t('listing.available_count', '{{count}} available', { count: listing.quantity })}
                   </Chip>
                 )}
-                {listing.is_featured && (
+                {listing.is_promoted && (
                   <Chip size="sm" color="warning" variant="flat" startContent={<Star className="w-3 h-3" />}>
                     {t('listing.featured', 'Featured')}
                   </Chip>
@@ -595,8 +600,8 @@ export function MarketplaceListingPage() {
                   <BuyNowButton
                     listingId={listing.id}
                     price={listing.price}
-                    currency={listing.currency}
-                    sellerId={listing.seller.id}
+                    currency={listing.price_currency}
+                    sellerId={listing.user.id}
                     onSuccess={() => {
                       toast.success(t('listing.order_created', 'Order created!'));
                     }}
@@ -619,7 +624,7 @@ export function MarketplaceListingPage() {
                     fullWidth
                     startContent={<MessageCircle className="w-4 h-4" />}
                     as={Link}
-                    to={tenantPath(`/messages?to=${listing.seller.id}&ref=marketplace&listing=${listing.id}`)}
+                    to={tenantPath(`/messages?to=${listing.user.id}&ref=marketplace&listing=${listing.id}`)}
                     isDisabled={!isAuthenticated}
                   >
                     {t('listing.message_seller', 'Message Seller')}
@@ -640,46 +645,42 @@ export function MarketplaceListingPage() {
             {/* Seller card */}
             <GlassCard className="p-5 space-y-3">
               <h3 className="text-sm font-semibold text-default-500 uppercase tracking-wide">
-                {t('listing.seller', 'Seller')}
+                {t('listing.user', 'Seller')}
               </h3>
               <div className="flex items-center gap-3">
                 <Avatar
-                  src={listing.seller.avatar_url || undefined}
-                  name={listing.seller.name}
+                  src={listing.user.avatar_url || undefined}
+                  name={listing.user.name}
                   size="lg"
                 />
                 <div className="min-w-0 flex-1">
                   <Link
-                    to={tenantPath(`/marketplace/seller/${listing.seller.id}`)}
+                    to={tenantPath(`/marketplace/seller/${listing.user.id}`)}
                     className="font-semibold text-foreground hover:text-primary transition-colors"
                   >
-                    {listing.seller.name}
+                    {listing.user.name}
                   </Link>
                   <div className="flex items-center gap-3 text-xs text-default-400 mt-0.5">
-                    {listing.seller.rating !== null && (
-                      <span className="flex items-center gap-0.5">
-                        <Star className="w-3 h-3 fill-warning text-warning" />
-                        {listing.seller.rating.toFixed(1)}
+                    {listing.user?.is_verified && (
+                      <span className="flex items-center gap-0.5 text-primary">
+                        <CheckCircle className="w-3 h-3" />
+                        {t('listing.verified', 'Verified')}
                       </span>
                     )}
-                    {listing.seller.response_time && (
-                      <span className="flex items-center gap-0.5">
-                        <Clock className="w-3 h-3" />
-                        {listing.seller.response_time}
-                      </span>
+                    {listing.user?.member_since && (
+                      <span>{t('listing.member_since', 'Member since {{date}}', { date: new Date(listing.user.member_since).getFullYear() })}</span>
                     )}
-                    <span>{t('listing.listings_count', '{{count}} listings', { count: listing.seller.listings_count })}</span>
                   </div>
-                  {listing.seller.seller_type && (
+                  {listing.seller_type === 'business' && (
                     <Chip size="sm" variant="flat" color="secondary" className="mt-1">
-                      {listing.seller.seller_type === 'business' ? t('listing.seller_type_business', 'Business') : t('listing.seller_type_private', 'Private')}
+                      {t('listing.seller_type_business', 'Business')}
                     </Chip>
                   )}
                 </div>
               </div>
               <Button
                 as={Link}
-                to={tenantPath(`/marketplace/seller/${listing.seller.id}`)}
+                to={tenantPath(`/marketplace/seller/${listing.user.id}`)}
                 variant="flat"
                 fullWidth
                 size="sm"
@@ -711,12 +712,12 @@ export function MarketplaceListingPage() {
           </div>
 
           {/* Template fields */}
-          {listing.template_fields && Object.keys(listing.template_fields).length > 0 && (
+          {listing.template_data && Object.keys(listing.template_data).length > 0 && (
             <>
               <Divider />
               <h3 className="text-md font-semibold text-foreground">{t('listing.details', 'Details')}</h3>
               <div className="grid grid-cols-2 gap-3">
-                {Object.entries(listing.template_fields).map(([key, value]) => (
+                {Object.entries(listing.template_data).map(([key, value]) => (
                   <div key={key} className="space-y-0.5">
                     <span className="text-xs text-default-400 capitalize">
                       {key.replace(/_/g, ' ')}
@@ -735,11 +736,11 @@ export function MarketplaceListingPage() {
             <div className="flex items-center justify-between">
               <h2 className="text-lg font-semibold text-foreground flex items-center gap-2">
                 <User className="w-5 h-5 text-default-400" />
-                {t('listing.more_from_seller', 'More from {{name}}', { name: listing.seller.name })}
+                {t('listing.more_from_seller', 'More from {{name}}', { name: listing.user.name })}
               </h2>
               <Button
                 as={Link}
-                to={tenantPath(`/marketplace/seller/${listing.seller.id}`)}
+                to={tenantPath(`/marketplace/seller/${listing.user.id}`)}
                 variant="light"
                 size="sm"
                 endContent={<ChevronRight className="w-4 h-4" />}
@@ -819,7 +820,7 @@ export function MarketplaceListingPage() {
                     onValueChange={setOfferAmount}
                     startContent={
                       <span className="text-default-400 text-sm">
-                        {listing.currency || 'EUR'}
+                        {listing.price_currency || 'EUR'}
                       </span>
                     }
                     isRequired
