@@ -44,12 +44,10 @@ return new class extends Migration
                 $table->foreign('marketplace_listing_id')
                     ->references('id')->on('marketplace_listings')
                     ->onDelete('cascade');
-                $table->foreign('reporter_id')
-                    ->references('id')->on('users')
-                    ->onDelete('cascade');
-                $table->foreign('handled_by')
-                    ->references('id')->on('users')
-                    ->onDelete('set null');
+
+                // user indexes (no FK — users table has different charset/collation)
+                $table->index('reporter_id', 'mr_reporter_id_idx');
+                $table->index('handled_by', 'mr_handled_by_idx');
 
                 $table->index(['tenant_id', 'status']);
                 $table->index(['tenant_id', 'marketplace_listing_id']);

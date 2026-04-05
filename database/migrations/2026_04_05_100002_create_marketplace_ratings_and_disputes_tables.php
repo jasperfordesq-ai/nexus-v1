@@ -40,10 +40,12 @@ return new class extends Migration
                     'msr_tenant_order_role_unique'
                 );
 
-                // Foreign keys
+                // Foreign keys (marketplace tables only — users has different charset)
                 $table->foreign('order_id')->references('id')->on('marketplace_orders')->cascadeOnDelete();
-                $table->foreign('rater_id')->references('id')->on('users')->cascadeOnDelete();
-                $table->foreign('ratee_id')->references('id')->on('users')->cascadeOnDelete();
+
+                // user indexes (no FK — users table has different charset/collation)
+                $table->index('rater_id', 'msr_rater_id_idx');
+                $table->index('ratee_id', 'msr_ratee_id_idx');
             });
         }
 
@@ -82,9 +84,12 @@ return new class extends Migration
                 // Composite indexes
                 $table->index(['tenant_id', 'status'], 'md_tenant_status_idx');
 
-                // Foreign keys
+                // Foreign keys (marketplace tables only — users has different charset)
                 $table->foreign('order_id')->references('id')->on('marketplace_orders')->cascadeOnDelete();
-                $table->foreign('opened_by')->references('id')->on('users')->cascadeOnDelete();
+
+                // user indexes (no FK — users table has different charset/collation)
+                $table->index('opened_by', 'md_opened_by_idx');
+                $table->index('resolved_by', 'md_resolved_by_idx');
             });
         }
     }

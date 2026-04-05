@@ -68,8 +68,10 @@ return new class extends Migration
             // Fulltext index for search
             $table->fullText(['title', 'description'], 'mpl_title_description_ft');
 
-            // Foreign keys
-            $table->foreign('user_id')->references('id')->on('users')->cascadeOnDelete();
+            // user_id index (no FK — users table has different charset/collation)
+            $table->index('user_id', 'mpl_user_id_idx');
+            // moderated_by index
+            $table->index('moderated_by', 'mpl_moderated_by_idx');
             // category_id FK is deferred to Migration 2 (marketplace_categories must exist first)
         });
     }

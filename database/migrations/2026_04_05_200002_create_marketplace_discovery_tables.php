@@ -27,7 +27,8 @@ return new class extends Migration
                 $table->boolean('is_active')->default(true);
                 $table->timestamps();
 
-                $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
+                // user index (no FK — users table has different charset/collation)
+                $table->index('user_id', 'mss_user_id_idx');
                 $table->index(['tenant_id', 'user_id']);
             });
         }
@@ -44,7 +45,8 @@ return new class extends Migration
                 $table->unsignedInteger('item_count')->default(0);
                 $table->timestamps();
 
-                $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
+                // user index (no FK — users table has different charset/collation)
+                $table->index('user_id', 'mc_user_id_idx');
                 $table->index(['tenant_id', 'user_id']);
             });
         }
@@ -90,7 +92,8 @@ return new class extends Migration
                 $table->foreign('marketplace_listing_id')
                     ->references('id')->on('marketplace_listings')
                     ->onDelete('cascade');
-                $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
+                // user index (no FK — users table has different charset/collation)
+                $table->index('user_id', 'mpr_user_id_idx');
                 $table->index(['tenant_id', 'marketplace_listing_id', 'is_active'], 'mp_listing_active_idx');
                 $table->index(['tenant_id', 'user_id'], 'mp_user_idx');
                 $table->index(['is_active', 'expires_at'], 'mp_active_expires_idx');

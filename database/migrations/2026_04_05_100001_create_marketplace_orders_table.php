@@ -68,11 +68,13 @@ return new class extends Migration
             $table->index(['tenant_id', 'seller_id'], 'mo_tenant_seller_idx');
             $table->index(['tenant_id', 'status'], 'mo_tenant_status_idx');
 
-            // Foreign keys
-            $table->foreign('buyer_id')->references('id')->on('users')->cascadeOnDelete();
-            $table->foreign('seller_id')->references('id')->on('users')->cascadeOnDelete();
+            // Foreign keys (marketplace tables only — users has different charset)
             $table->foreign('marketplace_listing_id')->references('id')->on('marketplace_listings')->cascadeOnDelete();
             $table->foreign('marketplace_offer_id')->references('id')->on('marketplace_offers')->nullOnDelete();
+
+            // user indexes (no FK — users table has different charset/collation)
+            $table->index('buyer_id', 'mo_buyer_id_idx');
+            $table->index('seller_id', 'mo_seller_id_idx');
         });
     }
 

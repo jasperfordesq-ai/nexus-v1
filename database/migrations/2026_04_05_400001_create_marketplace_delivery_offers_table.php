@@ -38,7 +38,7 @@ return new class extends Migration
             $table->index(['deliverer_id', 'status'], 'idx_mdo_deliverer_status');
             $table->index('tenant_id', 'idx_mdo_tenant');
 
-            $table->foreign('deliverer_id')->references('id')->on('users')->cascadeOnDelete();
+            // Note: deliverer_id is already covered by idx_mdo_deliverer_status composite index above
         });
     }
 
