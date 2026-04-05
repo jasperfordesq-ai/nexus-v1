@@ -725,7 +725,7 @@ class MarketplacePaymentService
         return [
             'pending' => round((float) $pending, 2),
             'available' => round((float) $available, 2),
-            'currency' => 'EUR',
+            'currency' => 'EUR', // TODO: derive from seller's actual payment currency — global platform
             'total_earned' => round((float) $totalEarned, 2),
         ];
     }

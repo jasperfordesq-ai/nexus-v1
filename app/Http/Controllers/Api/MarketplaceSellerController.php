@@ -50,7 +50,12 @@ class MarketplaceSellerController extends BaseApiController
         $this->ensureFeature();
         $this->rateLimit('marketplace_seller_view', 60, 60);
 
-        $profile = MarketplaceSellerService::getPublicProfile($id);
+        // The frontend passes user_id (from listing.user.id), so try looking
+        // up the profile by user_id first, falling back to profile ID.
+        $profileByUser = MarketplaceSellerService::getByUserId($id);
+        $profileId = $profileByUser ? $profileByUser->id : $id;
+
+        $profile = MarketplaceSellerService::getPublicProfile($profileId);
 
         if ($profile === null) {
             return $this->respondWithError('NOT_FOUND', 'Seller profile not found.', null, 404);
@@ -71,8 +76,10 @@ class MarketplaceSellerController extends BaseApiController
         $this->ensureFeature();
         $this->rateLimit('marketplace_seller_listings', 60, 60);
 
-        // Resolve the seller profile to get the user_id
-        $profile = MarketplaceSellerService::getById($id);
+        // The frontend passes the user_id (from listing.user.id), so look up
+        // the seller profile by user_id first, falling back to profile ID.
+        $profile = MarketplaceSellerService::getByUserId((int) $id)
+            ?? MarketplaceSellerService::getById($id);
         if (!$profile) {
             return $this->respondWithError('NOT_FOUND', 'Seller profile not found.', null, 404);
         }

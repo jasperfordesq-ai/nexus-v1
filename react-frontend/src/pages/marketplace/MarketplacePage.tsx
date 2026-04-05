@@ -55,7 +55,7 @@ interface ApiCategory {
   name: string;
   slug: string;
   icon: string | null;
-  listings_count: number;
+  listing_count: number;
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -76,7 +76,7 @@ function toSharedCategory(cat: ApiCategory): MarketplaceCategory {
     name: cat.name,
     slug: cat.slug,
     icon: cat.icon ?? undefined,
-    listing_count: cat.listings_count,
+    listing_count: cat.listing_count,
   };
 }
 
@@ -436,7 +436,7 @@ export function MarketplacePage() {
                         {cat.name}
                       </span>
                       <div className="flex items-center gap-1">
-                        <span className="text-xs text-default-400">{cat.listings_count}</span>
+                        <span className="text-xs text-default-400">{cat.listing_count}</span>
                         <ChevronRight className="w-3.5 h-3.5 text-default-300 group-hover:text-primary transition-colors" />
                       </div>
                     </Link>

@@ -52,19 +52,22 @@ import { PageMeta } from '@/components/seo/PageMeta';
 
 interface SellerProfile {
   id: number;
-  name: string;
+  user_id: number;
+  display_name: string;
   avatar_url: string | null;
   bio: string | null;
   seller_type: 'private' | 'business' | null;
-  trust_score: number | null;
+  community_trust_score: number | null;
   total_sales: number;
   avg_rating: number | null;
-  total_reviews: number;
-  response_time: string | null;
-  active_listings_count: number;
+  total_ratings: number;
+  response_time_avg: string | null;
+  active_listings: number;
   member_since: string;
   location: string | null;
-  is_verified: boolean;
+  is_verified?: boolean;
+  is_community_endorsed?: boolean;
+  business_verified?: boolean;
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -143,7 +146,7 @@ export function SellerProfilePage() {
   // Update page title
   useEffect(() => {
     if (seller?.name) {
-      document.title = `${seller.name} - ${t('seller.page_title', 'Seller Profile')}`;
+      document.title = `${seller.display_name} - ${t('seller.page_title', 'Seller Profile')}`;
     }
   }, [seller?.name]);
 
@@ -233,8 +236,8 @@ export function SellerProfilePage() {
   return (
     <>
       <PageMeta
-        title={`${seller.name} - ${t('seller.page_title', 'Seller Profile')}`}
-        description={seller.bio?.slice(0, 160) || t('seller.view_listings', "View {{name}}'s marketplace listings.", { name: seller.name })}
+        title={`${seller.display_name} - ${t('seller.page_title', 'Seller Profile')}`}
+        description={seller.bio?.slice(0, 160) || t('seller.view_listings', "View {{name}}'s marketplace listings.", { name: seller.display_name })}
       />
 
       <div className="max-w-5xl mx-auto px-4 py-6 space-y-6">
@@ -254,15 +257,15 @@ export function SellerProfilePage() {
           <div className="flex flex-col sm:flex-row items-center sm:items-start gap-5">
             <Avatar
               src={seller.avatar_url || undefined}
-              name={seller.name}
+              name={seller.display_name}
               className="w-20 h-20 text-xl"
               isBordered
               color="primary"
             />
             <div className="flex-1 text-center sm:text-left space-y-2">
               <div className="flex items-center justify-center sm:justify-start gap-2 flex-wrap">
-                <h1 className="text-2xl font-bold text-foreground">{seller.name}</h1>
-                {seller.is_verified && (
+                <h1 className="text-2xl font-bold text-foreground">{seller.display_name}</h1>
+                {(seller.business_verified || seller.is_community_endorsed) && (
                   <Chip
                     size="sm"
                     color="success"
@@ -297,7 +300,7 @@ export function SellerProfilePage() {
               </div>
 
               {/* Trust score */}
-              {seller.trust_score !== null && seller.trust_score > 0 && (
+              {seller.community_trust_score !== null && seller.community_trust_score > 0 && (
                 <div className="flex items-center justify-center sm:justify-start gap-1.5">
                   <span className="text-xs text-default-400">{t('seller.community_trust', 'Community Trust:')}</span>
                   <div className="flex items-center gap-0.5">
@@ -305,14 +308,14 @@ export function SellerProfilePage() {
                       <Star
                         key={level}
                         className={`w-3.5 h-3.5 ${
-                          level <= Math.round((seller.trust_score ?? 0) / 20)
+                          level <= Math.round((seller.community_trust_score ?? 0) / 20)
                             ? 'fill-warning text-warning'
                             : 'text-default-200'
                         }`}
                       />
                     ))}
                   </div>
-                  <span className="text-xs font-medium text-foreground">{seller.trust_score}%</span>
+                  <span className="text-xs font-medium text-foreground">{seller.community_trust_score}%</span>
                 </div>
               )}
             </div>
@@ -324,7 +327,7 @@ export function SellerProfilePage() {
                   variant="bordered"
                   startContent={<MessageCircle className="w-4 h-4" />}
                   as={Link}
-                  to={tenantPath(`/messages?to=${seller.id}`)}
+                  to={tenantPath(`/messages?to=${seller.user_id}`)}
                 >
                   {t('seller.message', 'Message')}
                 </Button>
@@ -347,13 +350,13 @@ export function SellerProfilePage() {
             />
             <StatCard
               icon={Clock}
-              label={t('seller.response_time', 'Response Time')}
-              value={seller.response_time || t('seller.na', 'N/A')}
+              label={t('seller.response_time_avg', 'Response Time')}
+              value={seller.response_time_avg || t('seller.na', 'N/A')}
             />
             <StatCard
               icon={Package}
               label={t('seller.active_listings', 'Active Listings')}
-              value={seller.active_listings_count}
+              value={seller.active_listings}
             />
           </div>
         </GlassCard>
@@ -381,7 +384,7 @@ export function SellerProfilePage() {
               <div className="flex items-center gap-2">
                 <Star className="w-4 h-4" />
                 {t('seller.tab_reviews', 'Reviews')}
-                <Chip size="sm" variant="flat">{seller.total_reviews}</Chip>
+                <Chip size="sm" variant="flat">{seller.total_ratings}</Chip>
               </div>
             }
           />
@@ -398,7 +401,7 @@ export function SellerProfilePage() {
               <EmptyState
                 icon={<ShoppingBag className="w-8 h-8" />}
                 title={t('seller.no_listings_title', 'No Listings')}
-                description={t('seller.no_listings_description', "{{name}} doesn't have any active listings right now.", { name: seller.name })}
+                description={t('seller.no_listings_description', "{{name}} doesn't have any active listings right now.", { name: seller.display_name })}
               />
             ) : (
               <MarketplaceListingGrid

@@ -84,7 +84,7 @@ class MarketplacePromotionService
                 'label' => $info['label'],
                 'description' => $info['description'],
                 'price' => $price,
-                'currency' => 'EUR',
+                'currency' => 'EUR', // TODO: derive from tenant's default currency — global platform
                 'duration_hours' => $info['duration_hours'],
             ];
         }

@@ -260,6 +260,11 @@ class MarketplaceListingService
             $query->where('created_at', '>=', now()->subDays((int) $filters['posted_within']));
         }
 
+        // Featured first (must be BEFORE the main sort so it takes priority)
+        if (!empty($filters['featured_first'])) {
+            $query->orderByRaw('promoted_until > NOW() DESC');
+        }
+
         // Sorting
         $sort = $filters['sort'] ?? 'newest';
         match ($sort) {
@@ -268,11 +273,6 @@ class MarketplaceListingService
             'popular' => $query->orderBy('views_count', 'desc'),
             default => $query->orderBy('id', 'desc'), // newest
         };
-
-        // Featured first
-        if (!empty($filters['featured_first'])) {
-            $query->orderByRaw('promoted_until > NOW() DESC');
-        }
 
         // Cursor pagination
         if ($cursor) {
@@ -386,6 +386,17 @@ class MarketplaceListingService
      */
     public static function create(int $userId, array $data): MarketplaceListing
     {
+        // Enforce max active listings per seller
+        $maxListings = MarketplaceConfigurationService::maxActiveListings();
+        if ($maxListings > 0) {
+            $activeCount = MarketplaceListing::where('user_id', $userId)
+                ->where('status', 'active')
+                ->count();
+            if ($activeCount >= $maxListings) {
+                throw new \InvalidArgumentException("Maximum of {$maxListings} active listings reached.");
+            }
+        }
+
         $listing = new MarketplaceListing();
         $listing->tenant_id = TenantContext::getId();
         $listing->user_id = $userId;

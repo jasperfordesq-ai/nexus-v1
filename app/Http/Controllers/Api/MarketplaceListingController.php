@@ -524,7 +524,7 @@ class MarketplaceListingController extends BaseApiController
             );
         }
 
-        $tenantId = \App\Models\TenantContext::getId();
+        $tenantId = TenantContext::getId();
         $dir = "uploads/marketplace/videos/{$tenantId}";
         $filename = time() . '_' . uniqid() . '.' . ($file->guessExtension() ?: 'mp4');
 
@@ -986,6 +986,11 @@ class MarketplaceListingController extends BaseApiController
         foreach ($rows as $row) {
             $csv .= implode(',', array_map(function ($field) {
                 $str = (string) ($field ?? '');
+                // CSV injection protection: prefix cells starting with formula
+                // characters with a single quote to prevent spreadsheet execution.
+                if ($str !== '' && in_array($str[0], ['=', '+', '-', '@'], true)) {
+                    $str = "'" . $str;
+                }
                 // Escape fields containing commas, quotes, or newlines
                 if (str_contains($str, ',') || str_contains($str, '"') || str_contains($str, "\n")) {
                     return '"' . str_replace('"', '""', $str) . '"';

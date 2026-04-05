@@ -178,6 +178,11 @@ class MarketplaceOrderService
      */
     public static function complete(MarketplaceOrder $order): MarketplaceOrder
     {
+        // Prevent double-completion (and double stat increment)
+        if ($order->status === 'completed') {
+            return $order;
+        }
+
         if (!in_array($order->status, ['delivered', 'paid', 'shipped'], true)) {
             throw new \InvalidArgumentException('Order must be delivered before it can be completed.');
         }

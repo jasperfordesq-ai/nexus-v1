@@ -30,7 +30,6 @@ import {
   SelectItem,
   RadioGroup,
   Radio,
-  Switch,
   Spinner,
   Chip,
 } from '@heroui/react';
@@ -46,8 +45,6 @@ import {
   DollarSign,
   FileText,
   Upload,
-  GripVertical,
-  Image as ImageIcon,
   Video,
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
@@ -296,9 +293,10 @@ export function CreateMarketplaceListingPage() {
     }
     setIsGeneratingDesc(true);
     try {
+      const selectedCategory = categories.find((c) => String(c.id) === categoryId);
       const response = await api.post<{ description: string }>('/v2/marketplace/listings/generate-description', {
         title,
-        category_id: categoryId || undefined,
+        category: selectedCategory?.name || undefined,
         condition,
       });
       if (response.success && response.data?.description) {

@@ -104,19 +104,12 @@ class MarketplaceEscrowService
                 $payment->save();
             }
 
-            // Complete the order if it's in delivered state
+            // Complete the order if it's in a completable state.
+            // Delegates to MarketplaceOrderService::complete() which handles
+            // the status transition and seller stats (with double-completion guard).
             $order = $escrow->order;
             if ($order && in_array($order->status, ['delivered', 'paid', 'shipped'], true)) {
-                $order->status = 'completed';
-                $order->escrow_released_at = now();
-                $order->save();
-
-                // Update seller stats
-                $sellerProfile = \App\Models\MarketplaceSellerProfile::where('user_id', $order->seller_id)->first();
-                if ($sellerProfile) {
-                    $sellerProfile->increment('total_sales');
-                    $sellerProfile->increment('total_revenue', (float) $order->total_price);
-                }
+                MarketplaceOrderService::complete($order);
             }
         });
 

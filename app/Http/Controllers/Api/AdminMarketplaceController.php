@@ -71,7 +71,7 @@ class AdminMarketplaceController extends BaseApiController
             'total_sellers' => $totalSellers,
             'total_orders' => $totalOrders,
             'revenue' => $revenue,
-            'currency' => 'EUR',
+            'currency' => 'EUR', // TODO: derive from tenant's default currency or payment data — global platform
         ]);
     }
 
@@ -240,6 +240,18 @@ class AdminMarketplaceController extends BaseApiController
             ->limit($perPage)
             ->get();
 
+        // Pre-fetch active listing counts to avoid N+1 queries
+        $sellerUserIds = $sellers->pluck('user_id')->filter()->all();
+        $listingCounts = [];
+        if (!empty($sellerUserIds)) {
+            $listingCounts = MarketplaceListing::whereIn('user_id', $sellerUserIds)
+                ->where('status', 'active')
+                ->groupBy('user_id')
+                ->selectRaw('user_id, count(*) as cnt')
+                ->pluck('cnt', 'user_id')
+                ->all();
+        }
+
         $items = $sellers->map(fn ($s) => [
             'id' => $s->id,
             'user_id' => $s->user_id,
@@ -251,7 +263,7 @@ class AdminMarketplaceController extends BaseApiController
             'total_sales' => $s->total_sales,
             'avg_rating' => $s->avg_rating,
             'total_ratings' => $s->total_ratings,
-            'active_listings' => MarketplaceListing::where('user_id', $s->user_id)->where('status', 'active')->count(),
+            'active_listings' => $listingCounts[$s->user_id] ?? 0,
             'joined_marketplace_at' => $s->joined_marketplace_at?->toISOString(),
             'user' => $s->user ? [
                 'id' => $s->user->id,

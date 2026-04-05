@@ -412,6 +412,11 @@ class MarketplaceReportService
     /**
      * Suspend the seller who owns the reported listing.
      * Deactivates all their active listings.
+     *
+     * TODO: Add an `is_suspended` flag to MarketplaceSellerProfile and check it
+     *       in MarketplaceListingService::create() to prevent suspended sellers
+     *       from creating new listings. Currently suspension only deactivates
+     *       existing listings but doesn't block new ones.
      */
     private static function suspendSeller(int $listingId): void
     {

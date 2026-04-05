@@ -348,9 +348,10 @@ export function EditMarketplaceListingPage() {
     }
     setIsGeneratingDesc(true);
     try {
+      const selectedCategory = categories.find((c) => String(c.id) === categoryId);
       const response = await api.post<{ description: string }>('/v2/marketplace/listings/generate-description', {
         title,
-        category_id: categoryId || undefined,
+        category: selectedCategory?.name || undefined,
         condition,
       });
       if (response.success && response.data?.description) {
@@ -378,27 +379,27 @@ export function EditMarketplaceListingPage() {
 
     setIsSubmitting(true);
     try {
+      // Delete removed images via individual API calls
+      for (const removedId of removedImageIds) {
+        try {
+          await api.delete(`/v2/marketplace/listings/${id}/images/${removedId}`);
+        } catch (err) {
+          logError('Failed to delete image', err);
+        }
+      }
+
       // Upload new images
-      let uploadedImageIds: number[] = [];
       const newImageFiles = images.filter((img) => !img.isExisting && img.file);
       if (newImageFiles.length > 0) {
         const formData = new FormData();
         newImageFiles.forEach((img, idx) => {
           formData.append(`images[${idx}]`, img.file!);
         });
-        const uploadResponse = await api.upload<{ image_ids: number[] }>(
-          '/v2/marketplace/listings/images',
+        await api.upload(
+          `/v2/marketplace/listings/${id}/images`,
           formData
         );
-        if (uploadResponse.success && uploadResponse.data?.image_ids) {
-          uploadedImageIds = uploadResponse.data.image_ids;
-        }
       }
-
-      // Build the image_ids array: existing (not removed) + newly uploaded
-      const existingImageIds = images
-        .filter((img) => img.isExisting && img.serverId)
-        .map((img) => img.serverId!);
 
       const body: Record<string, unknown> = {
         title: title.trim(),
@@ -407,13 +408,11 @@ export function EditMarketplaceListingPage() {
         price_type: priceType,
         delivery_method: deliveryMethod,
         quantity: parseInt(quantity) || 1,
-        image_ids: [...existingImageIds, ...uploadedImageIds],
-        removed_image_ids: removedImageIds,
       };
 
       if (categoryId) body.category_id = parseInt(categoryId);
       if (priceType !== 'free' && price) body.price = parseFloat(price);
-      if (currency) body.currency = currency;
+      if (currency) body.price_currency = currency;
       if (location.trim()) body.location = location.trim();
 
       // Include template fields
@@ -421,7 +420,7 @@ export function EditMarketplaceListingPage() {
         Object.entries(templateFields).filter(([, v]) => v.trim() !== '')
       );
       if (Object.keys(filledTemplateFields).length > 0) {
-        body.template_fields = filledTemplateFields;
+        body.template_data = filledTemplateFields;
       }
 
       const response = await api.put(`/v2/marketplace/listings/${id}`, body);

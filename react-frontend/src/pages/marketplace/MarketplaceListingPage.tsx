@@ -110,7 +110,7 @@ interface SellerListing {
   title: string;
   price: number | null;
   price_type: string;
-  currency: string;
+  price_currency: string;
   images: { url: string; thumbnail_url: string }[];
 }
 
@@ -617,7 +617,7 @@ export function MarketplaceListingPage() {
                     listingTitle={listing.title}
                     price={listing.price}
                     currency={listing.price_currency}
-                    sellerId={listing.user.id}
+                    sellerId={listing.user?.id ?? 0}
                     onSuccess={() => {
                       toast.success(t('listing.order_created', 'Order created!'));
                     }}
@@ -639,9 +639,9 @@ export function MarketplaceListingPage() {
                     variant="bordered"
                     fullWidth
                     startContent={<MessageCircle className="w-4 h-4" />}
-                    as={Link}
-                    to={tenantPath(`/messages?to=${listing.user.id}&ref=marketplace&listing_id=${listing.id}&listing_title=${encodeURIComponent(listing.title)}&body=${encodeURIComponent(t('listing.message_template', 'Hi, I\'m interested in your listing: {{title}}', { title: listing.title }))}`)}
-                    isDisabled={!isAuthenticated}
+                    as={listing.user ? Link : undefined}
+                    to={listing.user ? tenantPath(`/messages?to=${listing.user.id}&ref=marketplace&listing_id=${listing.id}&listing_title=${encodeURIComponent(listing.title)}&body=${encodeURIComponent(t('listing.message_template', 'Hi, I\'m interested in your listing: {{title}}', { title: listing.title }))}`) : undefined}
+                    isDisabled={!isAuthenticated || !listing.user}
                   >
                     {t('listing.message_seller', 'Message Seller')}
                   </Button>
@@ -659,6 +659,7 @@ export function MarketplaceListingPage() {
             </GlassCard>
 
             {/* Seller card */}
+            {listing.user && (
             <GlassCard className="p-5 space-y-3">
               <h3 className="text-sm font-semibold text-default-500 uppercase tracking-wide">
                 {t('listing.user', 'Seller')}
@@ -677,13 +678,13 @@ export function MarketplaceListingPage() {
                     {listing.user.name}
                   </Link>
                   <div className="flex items-center gap-3 text-xs text-default-400 mt-0.5">
-                    {listing.user?.is_verified && (
+                    {listing.user.is_verified && (
                       <span className="flex items-center gap-0.5 text-primary">
                         <CheckCircle className="w-3 h-3" />
                         {t('listing.verified', 'Verified')}
                       </span>
                     )}
-                    {listing.user?.member_since && (
+                    {listing.user.member_since && (
                       <span>{t('listing.member_since', 'Member since {{date}}', { date: new Date(listing.user.member_since).getFullYear() })}</span>
                     )}
                   </div>
@@ -705,6 +706,7 @@ export function MarketplaceListingPage() {
                 {t('listing.view_profile', 'View Profile')}
               </Button>
             </GlassCard>
+            )}
 
             {/* Delivery */}
             {listing.delivery_method && (
@@ -752,11 +754,11 @@ export function MarketplaceListingPage() {
             <div className="flex items-center justify-between">
               <h2 className="text-lg font-semibold text-foreground flex items-center gap-2">
                 <User className="w-5 h-5 text-default-400" />
-                {t('listing.more_from_seller', 'More from {{name}}', { name: listing.user.name })}
+                {t('listing.more_from_seller', 'More from {{name}}', { name: listing.user?.name ?? '' })}
               </h2>
               <Button
                 as={Link}
-                to={tenantPath(`/marketplace/seller/${listing.user.id}`)}
+                to={tenantPath(`/marketplace/seller/${listing.user?.id}`)}
                 variant="light"
                 size="sm"
                 endContent={<ChevronRight className="w-4 h-4" />}
@@ -791,7 +793,7 @@ export function MarketplaceListingPage() {
                         {item.title}
                       </p>
                       <p className="text-sm font-semibold text-primary mt-0.5">
-                        {formatPrice(item.price, item.price_type, item.currency)}
+                        {formatPrice(item.price, item.price_type, item.price_currency)}
                       </p>
                     </div>
                   </GlassCard>
@@ -808,6 +810,15 @@ export function MarketplaceListingPage() {
             size="sm"
             color="danger"
             startContent={<Flag className="w-3.5 h-3.5" />}
+            onPress={async () => {
+              if (!isAuthenticated) { toast.error(t('listing.sign_in_to_report', 'Sign in to report')); return; }
+              const reason = window.prompt(t('listing.report_reason_prompt', 'Why are you reporting this listing?'));
+              if (!reason) return;
+              try {
+                await api.post(`/v2/marketplace/listings/${listing.id}/report`, { reason: 'other', description: reason });
+                toast.success(t('listing.report_submitted', 'Report submitted. Thank you.'));
+              } catch { toast.error(t('listing.report_error', 'Failed to submit report')); }
+            }}
           >
             {t('listing.report_listing', 'Report this listing')}
           </Button>
