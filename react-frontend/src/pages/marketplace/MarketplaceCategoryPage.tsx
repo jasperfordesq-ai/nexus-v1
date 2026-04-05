@@ -40,7 +40,7 @@ import {
 import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
 import { EmptyState } from '@/components/feedback';
-import { MarketplaceListingGrid } from '@/components/marketplace';
+import { MarketplaceListingGrid, MarketplaceListingGridSkeleton } from '@/components/marketplace';
 import type { MarketplaceListingItem } from '@/types/marketplace';
 import { useAuth, useToast, useTenant } from '@/contexts';
 import { api } from '@/lib/api';
@@ -563,9 +563,7 @@ export function MarketplaceCategoryPage() {
           {/* Listings */}
           <div className="flex-1 min-w-0">
             {isLoading ? (
-              <div className="flex justify-center py-16">
-                <Spinner size="lg" color="primary" />
-              </div>
+              <MarketplaceListingGridSkeleton />
             ) : listings.length === 0 ? (
               <EmptyState
                 icon={<ShoppingBag className="w-8 h-8" />}

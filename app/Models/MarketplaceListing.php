@@ -53,6 +53,7 @@ class MarketplaceListing extends Model
         'expires_at',
         'renewed_at',
         'renewal_count',
+        'video_url',
     ];
 
     /**

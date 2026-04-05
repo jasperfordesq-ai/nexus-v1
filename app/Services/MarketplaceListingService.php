@@ -11,6 +11,7 @@ use App\Models\MarketplaceListing;
 use App\Models\MarketplaceImage;
 use App\Models\MarketplaceSavedListing;
 use App\Services\MarketplaceConfigurationService;
+use App\Services\SearchService;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\DB;
 
@@ -57,6 +58,127 @@ class MarketplaceListingService
             ? (int) $filters['current_user_id']
             : null;
 
+        // ── Meilisearch search path ──────────────────────────────────────────
+        // When a search term is present and Meilisearch is available, use it for
+        // typo-tolerant, relevance-ranked ID retrieval, then hydrate from SQL.
+        // Falls through to the SQL path below if Meilisearch is unavailable.
+        // Skip Meilisearch when browsing own listings (user_id filter) or when
+        // price range / posted_within facets are active — they're applied
+        // post-search in SQL which breaks pagination.
+        $hasFacetedFilters = !empty($filters['price_min']) || !empty($filters['price_max'])
+            || !empty($filters['posted_within']);
+        if (!empty($filters['search']) && empty($filters['user_id']) && !$hasFacetedFilters) {
+            $tenantId = TenantContext::getId();
+
+            // Decode Meilisearch offset cursor (format: "meili:<offset>")
+            $meiliOffset = 0;
+            if ($cursor !== null) {
+                $decoded = base64_decode($cursor, true);
+                if ($decoded !== false && str_starts_with($decoded, 'meili:')) {
+                    $meiliOffset = (int) substr($decoded, 6);
+                }
+            }
+
+            // Build Meilisearch filter expressions from applicable filters
+            $meiliFilters = [];
+
+            if (!empty($filters['category_id'])) {
+                $meiliFilters[] = 'category_id = ' . (int) $filters['category_id'];
+            } elseif (!empty($filters['category_slug'])) {
+                $catId = DB::table('marketplace_categories')
+                    ->where('slug', $filters['category_slug'])
+                    ->where(function ($q) {
+                        $q->where('tenant_id', TenantContext::getId())
+                          ->orWhereNull('tenant_id');
+                    })
+                    ->value('id');
+                if ($catId) {
+                    $meiliFilters[] = 'category_id = ' . $catId;
+                }
+            }
+
+            if (!empty($filters['price_type'])) {
+                $meiliFilters[] = "price_type = '{$filters['price_type']}'";
+            }
+
+            if (!empty($filters['condition'])) {
+                $conditions = is_array($filters['condition'])
+                    ? $filters['condition']
+                    : explode(',', $filters['condition']);
+                if (count($conditions) === 1) {
+                    $meiliFilters[] = "condition = '" . str_replace("'", "\\'", $conditions[0]) . "'";
+                } else {
+                    $parts = array_map(fn($c) => "condition = '" . str_replace("'", "\\'", $c) . "'", $conditions);
+                    $meiliFilters[] = '(' . implode(' OR ', $parts) . ')';
+                }
+            }
+
+            if (!empty($filters['seller_type'])) {
+                $meiliFilters[] = "seller_type = '{$filters['seller_type']}'";
+            }
+
+            if (!empty($filters['delivery_method'])) {
+                $meiliFilters[] = "delivery_method = '{$filters['delivery_method']}'";
+            }
+
+            $meiliResult = SearchService::searchMarketplaceListingIds(
+                $filters['search'], $tenantId, $meiliFilters, $limit + 1, $meiliOffset
+            );
+
+            if ($meiliResult !== null) {
+                $ids     = $meiliResult['ids'];
+                $hasMore = count($ids) > $limit;
+                if ($hasMore) {
+                    array_pop($ids);
+                }
+
+                if (empty($ids)) {
+                    return ['items' => [], 'cursor' => null, 'has_more' => false];
+                }
+
+                $q = MarketplaceListing::query()
+                    ->with([
+                        'user:id,first_name,last_name,avatar_url,is_verified',
+                        'category:id,name,slug,icon',
+                        'images' => fn ($qq) => $qq->orderBy('sort_order')->limit(5),
+                    ])
+                    ->whereIn('id', $ids)
+                    ->where('status', 'active')
+                    ->where('moderation_status', 'approved');
+
+                $listingsById = $q->get()->keyBy('id');
+
+                // Saved listing IDs for current user
+                $savedIds = [];
+                if ($currentUserId && $listingsById->isNotEmpty()) {
+                    $savedIds = DB::table('marketplace_saved_listings')
+                        ->where('user_id', $currentUserId)
+                        ->where('tenant_id', $tenantId)
+                        ->whereIn('marketplace_listing_id', $listingsById->keys())
+                        ->pluck('marketplace_listing_id')
+                        ->flip()
+                        ->all();
+                }
+
+                // Preserve Meilisearch relevance order
+                $items = [];
+                foreach ($ids as $id) {
+                    $listing = $listingsById[$id] ?? null;
+                    if ($listing) {
+                        $items[] = self::formatListingItem($listing, $savedIds, $currentUserId);
+                    }
+                }
+
+                return [
+                    'items'    => $items,
+                    'cursor'   => $hasMore ? base64_encode('meili:' . ($meiliOffset + $limit)) : null,
+                    'has_more' => $hasMore,
+                ];
+            }
+            // Meilisearch unavailable — fall through to SQL path
+        }
+        // ── End Meilisearch path ─────────────────────────────────────────────
+
         $query = MarketplaceListing::query()
             ->with([
                 'user:id,first_name,last_name,avatar_url,is_verified',
@@ -93,7 +215,7 @@ class MarketplaceListingService
             }
         }
 
-        // Search
+        // Search (SQL fallback — used when Meilisearch is unavailable)
         if (!empty($filters['search'])) {
             $search = $filters['search'];
             $query->where(function (Builder $q) use ($search) {
@@ -296,6 +418,9 @@ class MarketplaceListingService
             self::geocodeListing($listing);
         }
 
+        // Sync to Meilisearch index (non-blocking, best-effort)
+        SearchService::indexMarketplaceListing($listing);
+
         return $listing;
     }
 
@@ -325,6 +450,9 @@ class MarketplaceListingService
             self::geocodeListing($listing);
         }
 
+        // Sync updated listing to Meilisearch index (non-blocking, best-effort)
+        SearchService::indexMarketplaceListing($listing);
+
         return $listing;
     }
 
@@ -335,6 +463,9 @@ class MarketplaceListingService
     {
         $listing->status = 'removed';
         $listing->save();
+
+        // Remove from Meilisearch index (non-blocking, best-effort)
+        SearchService::removeMarketplaceListing($listing->id);
     }
 
     /**
@@ -347,6 +478,9 @@ class MarketplaceListingService
         $listing->renewed_at = now();
         $listing->renewal_count = ($listing->renewal_count ?? 0) + 1;
         $listing->save();
+
+        // Re-index renewed listing in Meilisearch
+        SearchService::indexMarketplaceListing($listing);
 
         return $listing;
     }
@@ -642,6 +776,7 @@ class MarketplaceListingService
             'seller_type' => $listing->seller_type,
             'status' => $listing->status,
             'template_data' => $listing->template_data,
+            'video_url' => $listing->video_url,
             'images' => $images,
             'user' => $listing->user ? [
                 'id' => $listing->user->id,

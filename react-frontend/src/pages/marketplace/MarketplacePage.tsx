@@ -35,6 +35,7 @@ import { GlassCard } from '@/components/ui';
 import { EmptyState } from '@/components/feedback';
 import {
   MarketplaceListingGrid,
+  MarketplaceListingGridSkeleton,
   CategoryChips,
 } from '@/components/marketplace';
 import type { MarketplaceListingItem, MarketplaceCategory } from '@/types/marketplace';
@@ -343,9 +344,7 @@ export function MarketplacePage() {
 
             {/* All listings */}
             {isLoading ? (
-              <div className="flex justify-center py-16">
-                <Spinner size="lg" color="primary" />
-              </div>
+              <MarketplaceListingGridSkeleton />
             ) : error ? (
               <GlassCard className="p-8 text-center">
                 <p className="text-danger mb-4">{error}</p>

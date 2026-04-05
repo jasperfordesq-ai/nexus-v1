@@ -9,6 +9,7 @@ namespace App\Services;
 use App\Models\Event;
 use App\Models\Group;
 use App\Models\Listing;
+use App\Models\MarketplaceListing;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Builder;
 use App\Core\TenantContext;
@@ -113,6 +114,13 @@ class SearchService
                 'sortable'   => ['created_at', 'members_count'],
                 'ranking'    => ['words', 'typo', 'proximity', 'attribute', 'sort', 'exactness'],
             ],
+            'marketplace_listings' => [
+                'pk'         => 'id',
+                'searchable' => ['title', 'description', 'tagline', 'location'],
+                'filterable' => ['tenant_id', 'category_id', 'status', 'moderation_status', 'price_type', 'condition', 'seller_type', 'delivery_method'],
+                'sortable'   => ['created_at', 'price'],
+                'ranking'    => ['words', 'typo', 'proximity', 'attribute', 'sort', 'exactness'],
+            ],
         ];
 
         foreach ($configs as $name => $cfg) {
@@ -164,6 +172,14 @@ class SearchService
             'childcare'     => ['babysitting', 'child minding', 'kids'],
             'tech support'  => ['IT help', 'computer help', 'technology', 'IT support'],
             'computer'      => ['IT', 'technology', 'tech', 'digital'],
+            // Marketplace concepts
+            'buy'           => ['purchase', 'get', 'acquire'],
+            'sell'          => ['selling', 'sale', 'for sale'],
+            'used'          => ['second hand', 'secondhand', 'pre-owned', 'preloved'],
+            'new'           => ['brand new', 'unused', 'sealed'],
+            'free'          => ['giveaway', 'donate', 'donation'],
+            'pickup'        => ['collection', 'collect', 'local pickup'],
+            'delivery'      => ['shipping', 'post', 'courier', 'ship'],
         ];
 
         foreach ($configs as $name => $_) {
@@ -409,6 +425,98 @@ class SearchService
             static::client()->index('groups')->deleteDocument($groupId);
         } catch (\Throwable) {
             // Non-critical — document may already be absent
+        }
+    }
+
+    // =========================================================================
+    // Marketplace listing indexing
+    // =========================================================================
+
+    /**
+     * Index a marketplace listing into Meilisearch.
+     * Silently skips if Meilisearch is unavailable.
+     * Accepts an Eloquent MarketplaceListing model or a plain array (from sync script).
+     */
+    public static function indexMarketplaceListing(array|MarketplaceListing $listing): void
+    {
+        if (!static::isAvailable()) {
+            return;
+        }
+
+        $doc = $listing instanceof MarketplaceListing ? [
+            'id'                => $listing->id,
+            'tenant_id'         => $listing->tenant_id,
+            'title'             => $listing->title ?? '',
+            'description'       => $listing->description ?? '',
+            'tagline'           => $listing->tagline ?? '',
+            'location'          => $listing->location ?? '',
+            'category_id'       => $listing->category_id,
+            'price'             => (float) ($listing->price ?? 0),
+            'price_type'        => $listing->price_type ?? 'fixed',
+            'condition'         => $listing->condition ?? '',
+            'seller_type'       => $listing->seller_type ?? 'private',
+            'delivery_method'   => $listing->delivery_method ?? 'pickup',
+            'status'            => $listing->status ?? 'active',
+            'moderation_status' => $listing->moderation_status ?? 'pending',
+            'created_at'        => $listing->created_at?->timestamp ?? 0,
+        ] : $listing;
+
+        static::client()->index('marketplace_listings')->addDocuments([$doc]);
+    }
+
+    /**
+     * Remove a marketplace listing from the Meilisearch index.
+     * Silently skips if Meilisearch is unavailable.
+     */
+    public static function removeMarketplaceListing(int $listingId): void
+    {
+        if (!static::isAvailable()) {
+            return;
+        }
+        try {
+            static::client()->index('marketplace_listings')->deleteDocument($listingId);
+        } catch (\Throwable) {
+            // Non-critical — document may already be absent
+        }
+    }
+
+    /**
+     * Search marketplace listings in Meilisearch and return matching IDs + estimated total.
+     *
+     * Returns null when Meilisearch is unavailable — callers should fall back to SQL.
+     *
+     * @param  array<string> $extraFilters  Additional Meilisearch filter strings
+     * @return array{ids: int[], total: int}|null
+     */
+    public static function searchMarketplaceListingIds(
+        string $term,
+        int $tenantId,
+        array $extraFilters = [],
+        int $limit = 20,
+        int $offset = 0,
+    ): ?array {
+        if (!static::isAvailable()) {
+            return null;
+        }
+        try {
+            $filterParts = [
+                "tenant_id = {$tenantId}",
+                "status = 'active'",
+                "moderation_status = 'approved'",
+                ...$extraFilters,
+            ];
+            $result = static::client()->index('marketplace_listings')->search($term, [
+                'filter'               => implode(' AND ', $filterParts),
+                'limit'                => max(0, $limit),
+                'offset'               => $offset,
+                'attributesToRetrieve' => ['id'],
+            ]);
+            return [
+                'ids'   => array_column($result->getHits(), 'id'),
+                'total' => $result->getEstimatedTotalHits() ?? count($result->getHits()),
+            ];
+        } catch (\Throwable) {
+            return null;
         }
     }
 

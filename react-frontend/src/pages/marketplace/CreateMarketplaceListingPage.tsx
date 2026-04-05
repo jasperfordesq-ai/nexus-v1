@@ -48,6 +48,7 @@ import {
   Upload,
   GripVertical,
   Image as ImageIcon,
+  Video,
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
@@ -130,6 +131,9 @@ export function CreateMarketplaceListingPage() {
   const [deliveryMethod, setDeliveryMethod] = useState('pickup');
   const [quantity, setQuantity] = useState('1');
   const [images, setImages] = useState<ImagePreview[]>([]);
+  const [videoFile, setVideoFile] = useState<File | null>(null);
+  const [videoPreviewUrl, setVideoPreviewUrl] = useState<string | null>(null);
+  const videoInputRef = useRef<HTMLInputElement>(null);
   const [templateFields, setTemplateFields] = useState<Record<string, string>>({});
 
   // Data state
@@ -244,6 +248,36 @@ export function CreateMarketplaceListingPage() {
     });
   }, []);
 
+  // Video handling
+  const MAX_VIDEO_SIZE = 50 * 1024 * 1024; // 50MB
+  const ALLOWED_VIDEO_TYPES = ['video/mp4', 'video/webm', 'video/quicktime'];
+
+  const handleVideoSelect = useCallback((files: FileList | null) => {
+    if (!files || files.length === 0) return;
+    const file = files[0];
+
+    if (!ALLOWED_VIDEO_TYPES.includes(file.type)) {
+      toast.error(t('create.video_type_error', 'Only MP4, WebM, and MOV video files are allowed.'));
+      return;
+    }
+    if (file.size > MAX_VIDEO_SIZE) {
+      toast.error(t('create.video_size_error', '{{name}} exceeds the 50MB video size limit.', { name: file.name }));
+      return;
+    }
+
+    // Revoke previous preview URL
+    if (videoPreviewUrl) URL.revokeObjectURL(videoPreviewUrl);
+
+    setVideoFile(file);
+    setVideoPreviewUrl(URL.createObjectURL(file));
+  }, [videoPreviewUrl, toast, t]);
+
+  const removeVideo = useCallback(() => {
+    if (videoPreviewUrl) URL.revokeObjectURL(videoPreviewUrl);
+    setVideoFile(null);
+    setVideoPreviewUrl(null);
+  }, [videoPreviewUrl]);
+
   // Drag and drop
   const handleDrop = useCallback((e: React.DragEvent) => {
     e.preventDefault();
@@ -334,9 +368,17 @@ export function CreateMarketplaceListingPage() {
         await api.upload(`/v2/marketplace/listings/${listingId}/images`, formData);
       }
 
+      // Upload video if one was selected
+      if (videoFile) {
+        const videoFormData = new FormData();
+        videoFormData.append('video', videoFile);
+        await api.upload(`/v2/marketplace/listings/${listingId}/video`, videoFormData);
+      }
+
       toast.success(t('create.created_success', 'Listing created successfully!'));
       // Cleanup blob URLs
       images.forEach((img) => URL.revokeObjectURL(img.url));
+      if (videoPreviewUrl) URL.revokeObjectURL(videoPreviewUrl);
       navigate(tenantPath(`/marketplace/${listingId}`));
     } catch (err) {
       logError('Failed to create marketplace listing', err);
@@ -446,6 +488,57 @@ export function CreateMarketplaceListingPage() {
                   <span className="text-xs text-default-400 mt-1">{t('create.add', 'Add')}</span>
                 </button>
               )}
+            </div>
+          )}
+        </GlassCard>
+
+        {/* Section 1b: Video */}
+        <GlassCard className="p-6 space-y-4">
+          <h2 className="text-lg font-semibold text-foreground flex items-center gap-2">
+            <Video className="w-5 h-5 text-primary" />
+            {t('create.video', 'Video')}
+            <span className="text-sm font-normal text-default-400">
+              {t('create.video_optional', '(optional, max 1 video, 50MB)')}
+            </span>
+          </h2>
+
+          {videoPreviewUrl ? (
+            <div className="relative aspect-video rounded-xl overflow-hidden bg-black">
+              <video
+                src={videoPreviewUrl}
+                controls
+                preload="metadata"
+                className="w-full h-full object-contain"
+              />
+              <button
+                onClick={removeVideo}
+                className="absolute top-2 right-2 p-1.5 rounded-full bg-danger/90 text-white
+                  hover:bg-danger transition-colors"
+                aria-label={t('create.remove_video', 'Remove video')}
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+          ) : (
+            <div
+              onClick={() => videoInputRef.current?.click()}
+              className="border-2 border-dashed border-default-300 rounded-xl p-6 text-center cursor-pointer
+                hover:border-primary hover:bg-primary/5 transition-colors"
+            >
+              <Video className="w-8 h-8 text-default-300 mx-auto mb-2" />
+              <p className="text-sm text-default-500">
+                {t('create.video_drop_zone', 'Click to add a video')}
+              </p>
+              <p className="text-xs text-default-400 mt-1">
+                {t('create.video_limits', 'MP4, WebM, or MOV. Max 50MB.')}
+              </p>
+              <input
+                ref={videoInputRef}
+                type="file"
+                accept="video/mp4,video/webm,video/quicktime"
+                onChange={(e) => handleVideoSelect(e.target.files)}
+                className="hidden"
+              />
             </div>
           )}
         </GlassCard>

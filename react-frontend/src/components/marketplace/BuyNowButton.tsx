@@ -17,12 +17,13 @@
  */
 
 import { useState, useCallback } from 'react';
-import { Button } from '@heroui/react';
+import { Button, useDisclosure } from '@heroui/react';
 import { CreditCard } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useAuth, useToast } from '@/contexts';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
+import { StripeCheckoutModal } from './StripeCheckoutModal';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Types
@@ -30,6 +31,7 @@ import { logError } from '@/lib/logger';
 
 interface BuyNowButtonProps {
   listingId: number;
+  listingTitle?: string;
   price: number;
   currency: string;
   sellerId: number;
@@ -54,6 +56,7 @@ interface CreateIntentResponse {
 
 export function BuyNowButton({
   listingId,
+  listingTitle,
   price,
   currency,
   sellerId,
@@ -63,8 +66,10 @@ export function BuyNowButton({
   const { t } = useTranslation('marketplace');
   const { user } = useAuth();
   const toast = useToast();
+  const checkoutModal = useDisclosure();
 
   const [isProcessing, setIsProcessing] = useState(false);
+  const [clientSecret, setClientSecret] = useState<string | null>(null);
 
   const isOwnListing = user?.id === sellerId;
 
@@ -95,7 +100,14 @@ export function BuyNowButton({
         return;
       }
 
-      // Step 3: Redirect to Stripe Checkout if available
+      // Step 3a: If a client_secret is returned, open the embedded checkout modal
+      if (intentRes.data.client_secret) {
+        setClientSecret(intentRes.data.client_secret);
+        checkoutModal.onOpen();
+        return;
+      }
+
+      // Step 3b: Redirect to Stripe Checkout if available
       if (intentRes.data.checkout_url) {
         window.location.href = intentRes.data.checkout_url;
         return;
@@ -112,7 +124,7 @@ export function BuyNowButton({
     } finally {
       setIsProcessing(false);
     }
-  }, [listingId, isOwnListing, user, toast, onSuccess]);
+  }, [listingId, isOwnListing, user, toast, onSuccess, checkoutModal]);
 
   // Format price for button label
   const priceLabel = new Intl.NumberFormat(undefined, {
@@ -123,19 +135,41 @@ export function BuyNowButton({
   }).format(price);
 
   return (
-    <Button
-      color="success"
-      variant="solid"
-      fullWidth
-      startContent={!isProcessing ? <CreditCard className="w-4 h-4" /> : undefined}
-      onPress={handleBuyNow}
-      isLoading={isProcessing}
-      isDisabled={isOwnListing || !user}
-      className={className}
-      aria-label={t('orders.buy.buy_now_aria', 'Buy now for {{price}}', { price: priceLabel })}
-    >
-      {t('orders.buy.buy_now', 'Buy Now')} {priceLabel}
-    </Button>
+    <>
+      <Button
+        color="success"
+        variant="solid"
+        fullWidth
+        startContent={!isProcessing ? <CreditCard className="w-4 h-4" /> : undefined}
+        onPress={handleBuyNow}
+        isLoading={isProcessing}
+        isDisabled={isOwnListing || !user}
+        className={className}
+        aria-label={t('orders.buy.buy_now_aria', 'Buy now for {{price}}', { price: priceLabel })}
+      >
+        {t('orders.buy.buy_now', 'Buy Now')} {priceLabel}
+      </Button>
+
+      {/* Embedded Stripe Checkout Modal */}
+      {clientSecret && (
+        <StripeCheckoutModal
+          isOpen={checkoutModal.isOpen}
+          clientSecret={clientSecret}
+          amount={price}
+          currency={currency}
+          listingTitle={listingTitle}
+          onSuccess={() => {
+            checkoutModal.onClose();
+            setClientSecret(null);
+            onSuccess();
+          }}
+          onClose={() => {
+            checkoutModal.onClose();
+            setClientSecret(null);
+          }}
+        />
+      )}
+    </>
   );
 }
 

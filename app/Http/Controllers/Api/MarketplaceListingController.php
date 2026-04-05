@@ -474,6 +474,84 @@ class MarketplaceListingController extends BaseApiController
         return $this->noContent();
     }
 
+    /**
+     * POST /v2/marketplace/listings/{id}/video — Upload a video to a listing.
+     *
+     * Accepts multipart/form-data with a single 'video' file.
+     * Maximum 50 MB, allowed types: MP4, WebM, QuickTime (MOV).
+     * Stores the file and sets the listing's video_url column.
+     */
+    public function uploadVideo(int $id): JsonResponse
+    {
+        $this->ensureFeature();
+        $userId = $this->requireAuth();
+        $this->rateLimit('marketplace_image_upload', 30, 60);
+
+        $listing = $this->findListingOrFail($id);
+        $this->ensureOwner($listing, $userId);
+
+        $request = request();
+        if (!$request->hasFile('video')) {
+            return $this->respondWithError('VALIDATION_ERROR', 'No video file provided.', 'video', 422);
+        }
+
+        $file = $request->file('video');
+        $allowedMimes = ['video/mp4', 'video/webm', 'video/quicktime'];
+        $maxSize = 50 * 1024 * 1024; // 50 MB
+
+        if (!in_array($file->getMimeType(), $allowedMimes, true)) {
+            return $this->respondWithError(
+                'VALIDATION_ERROR',
+                'Invalid video type. Allowed: MP4, WebM, MOV.',
+                'video',
+                422
+            );
+        }
+
+        if ($file->getSize() > $maxSize) {
+            return $this->respondWithError(
+                'VALIDATION_ERROR',
+                'Video file exceeds the 50 MB size limit.',
+                'video',
+                422
+            );
+        }
+
+        $tenantId = \App\Models\TenantContext::getId();
+        $dir = "uploads/marketplace/videos/{$tenantId}";
+        $filename = time() . '_' . uniqid() . '.' . ($file->guessExtension() ?: 'mp4');
+
+        $path = $file->storeAs($dir, $filename, 'public');
+        $url = '/storage/' . $path;
+
+        $listing->update(['video_url' => $url]);
+
+        return $this->respondWithData(['video_url' => $url], null, 201);
+    }
+
+    /**
+     * DELETE /v2/marketplace/listings/{id}/video — Remove the listing video.
+     */
+    public function deleteVideo(int $id): JsonResponse
+    {
+        $this->ensureFeature();
+        $userId = $this->requireAuth();
+        $this->rateLimit('marketplace_action', 30, 60);
+
+        $listing = $this->findListingOrFail($id);
+        $this->ensureOwner($listing, $userId);
+
+        if ($listing->video_url) {
+            // Delete the file from storage if it's a local path
+            $storagePath = str_replace('/storage/', '', $listing->video_url);
+            \Illuminate\Support\Facades\Storage::disk('public')->delete($storagePath);
+        }
+
+        $listing->update(['video_url' => null]);
+
+        return $this->noContent();
+    }
+
     // =====================================================================
     //  Renew / Analytics (authenticated, owner-only)
     // =====================================================================

@@ -7,7 +7,7 @@
 /**
  * Meilisearch Sync Script
  *
- * Backfills all active listings, users, events, and groups into Meilisearch indexes.
+ * Backfills all active listings, users, events, groups, and marketplace listings into Meilisearch indexes.
  * Safe to re-run at any time — Meilisearch upserts are idempotent.
  *
  * Usage:
@@ -20,8 +20,8 @@
  * Options:
  *   --tenant=<id>                    Process a single tenant by ID
  *   --all-tenants                    Process all active tenants
- *   --type=listing|user|event|group  Process only one content type (default: all)
- *   --dry-run                        Count rows without sending to Meilisearch
+ *   --type=listing|user|event|group|marketplace  Process only one content type (default: all)
+ *   --dry-run                                   Count rows without sending to Meilisearch
  *   --help                           Show this message
  */
 
@@ -50,14 +50,15 @@ sync_search_index.php — Backfill Meilisearch indexes from the database
 Options:
   --tenant=<id>                    Process a single tenant by ID
   --all-tenants                    Process all active tenants
-  --type=listing|user|event|group  Process only one content type (default: all four)
-  --dry-run                        Count items without indexing
-  --help                           Show this message
+  --type=listing|user|event|group|marketplace  Process only one content type (default: all five)
+  --dry-run                                    Count items without indexing
+  --help                                       Show this message
 
 Examples:
   php scripts/sync_search_index.php --tenant=2
   php scripts/sync_search_index.php --all-tenants
   php scripts/sync_search_index.php --all-tenants --type=listing
+  php scripts/sync_search_index.php --all-tenants --type=marketplace
   php scripts/sync_search_index.php --all-tenants --type=event
   php scripts/sync_search_index.php --tenant=2 --dry-run
 
@@ -68,7 +69,7 @@ HELP;
 $dryRun     = isset($opts['dry-run']);
 $typeFilter = $opts['type'] ?? null; // null = all four types
 
-$validTypes = ['listing', 'user', 'event', 'group'];
+$validTypes = ['listing', 'user', 'event', 'group', 'marketplace'];
 if ($typeFilter !== null && !in_array($typeFilter, $validTypes, true)) {
     fwrite(STDERR, "Error: --type must be one of: " . implode(', ', $validTypes) . "\n");
     exit(1);
@@ -99,7 +100,7 @@ if (empty($tenantIds)) {
 // Ensure indexes exist (creates them if missing, sets attributes)
 // ============================================================
 if (!$dryRun) {
-    echo "Configuring Meilisearch indexes (listings, users, events, groups)...\n";
+    echo "Configuring Meilisearch indexes (listings, users, events, groups, marketplace_listings)...\n";
     SearchService::ensureIndexes();
 
     if (!SearchService::isAvailable()) {
@@ -112,7 +113,7 @@ if (!$dryRun) {
 // ============================================================
 // Process tenants
 // ============================================================
-$typesLabel = $typeFilter ?? 'listing + user + event + group';
+$typesLabel = $typeFilter ?? 'listing + user + event + group + marketplace';
 echo "Sync search index" . ($dryRun ? " [DRY RUN]" : "") . "\n";
 echo "Tenants  : " . implode(', ', $tenantIds) . "\n";
 echo "Types    : {$typesLabel}\n\n";
@@ -150,6 +151,13 @@ foreach ($tenantIds as $tenantId) {
 
     if (!$typeFilter || $typeFilter === 'group') {
         [$proc, $skip, $err] = syncGroups($tenantId, $dryRun);
+        $totalProcessed += $proc;
+        $totalSkipped   += $skip;
+        $totalErrors    += $err;
+    }
+
+    if (!$typeFilter || $typeFilter === 'marketplace') {
+        [$proc, $skip, $err] = syncMarketplaceListings($tenantId, $dryRun);
         $totalProcessed += $proc;
         $totalSkipped   += $skip;
         $totalErrors    += $err;
@@ -272,6 +280,38 @@ function syncGroups(int $tenantId, bool $dryRun): array
     ));
 
     return batchIndex($rows, 'groups', 'group', $dryRun, fn($row) => SearchService::indexGroup($row));
+}
+
+/**
+ * Load and index all active+approved marketplace listings for a tenant in batches of 100.
+ * Returns [processed, skipped, errors].
+ *
+ * @return array{int, int, int}
+ */
+function syncMarketplaceListings(int $tenantId, bool $dryRun): array
+{
+    $rows = array_map(fn($r) => (array) $r, DB::select(
+        "SELECT ml.id, ml.tenant_id, ml.category_id,
+                ml.title, ml.description, ml.tagline, ml.location,
+                ml.price, ml.price_type, ml.`condition`, ml.seller_type,
+                ml.delivery_method, ml.status, ml.moderation_status,
+                UNIX_TIMESTAMP(ml.created_at) as created_at
+         FROM marketplace_listings ml
+         WHERE ml.tenant_id = ?
+           AND ml.status = 'active'
+           AND ml.moderation_status = 'approved'
+         ORDER BY ml.id",
+        [$tenantId]
+    ));
+
+    // Ensure numeric types for Meilisearch filterable attributes
+    $rows = array_map(function (array $row): array {
+        $row['price'] = (float) ($row['price'] ?? 0);
+        $row['category_id'] = $row['category_id'] ? (int) $row['category_id'] : null;
+        return $row;
+    }, $rows);
+
+    return batchIndex($rows, 'marketplace_listings', 'marketplace_listing', $dryRun, fn($row) => SearchService::indexMarketplaceListing($row));
 }
 
 /**

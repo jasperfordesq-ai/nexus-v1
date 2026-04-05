@@ -55,7 +55,7 @@ import {
 import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
 import { EmptyState } from '@/components/feedback';
-import { BuyNowButton } from '@/components/marketplace';
+import { BuyNowButton, MarketplaceListingDetailSkeleton } from '@/components/marketplace';
 import { useAuth, useToast, useTenant } from '@/contexts';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
@@ -86,6 +86,7 @@ interface ListingDetail {
   delivery_method: string | null;
   seller_type: string;
   images: { id: number; url: string; thumbnail_url?: string; alt_text?: string; is_primary?: boolean }[];
+  video_url?: string | null;
   user: {
     id: number;
     name: string;
@@ -213,11 +214,11 @@ function buildProductSchema(
 // Image Gallery
 // ─────────────────────────────────────────────────────────────────────────────
 
-function ImageGallery({ images }: { images: ListingDetail['images'] }) {
+function ImageGallery({ images, videoUrl }: { images: ListingDetail['images']; videoUrl?: string | null }) {
   const { t } = useTranslation('marketplace');
   const [activeIndex, setActiveIndex] = useState(0);
 
-  if (images.length === 0) {
+  if (images.length === 0 && !videoUrl) {
     return (
       <div className="aspect-video bg-default-100 rounded-xl flex items-center justify-center">
         <ShoppingBag className="w-16 h-16 text-default-300" />
@@ -227,6 +228,23 @@ function ImageGallery({ images }: { images: ListingDetail['images'] }) {
 
   return (
     <div className="space-y-3">
+      {/* Video player — shown above images if available */}
+      {videoUrl && (
+        <div className="relative aspect-video bg-black rounded-xl overflow-hidden">
+          <video
+            src={videoUrl}
+            controls
+            preload="metadata"
+            className="w-full h-full object-contain"
+            aria-label={t('listing.video', 'Listing video')}
+          >
+            {t('listing.video_unsupported', 'Your browser does not support the video tag.')}
+          </video>
+        </div>
+      )}
+
+      {images.length === 0 ? null : (
+      <>
       {/* Main image */}
       <div className="relative aspect-video bg-default-100 rounded-xl overflow-hidden">
         <AnimatePresence mode="wait">
@@ -294,6 +312,8 @@ function ImageGallery({ images }: { images: ListingDetail['images'] }) {
             </button>
           ))}
         </div>
+      )}
+      </>
       )}
     </div>
   );
@@ -448,13 +468,9 @@ export function MarketplaceListingPage() {
     }
   }, [listing, offerAmount, offerMessage, toast, offerModal]);
 
-  // Loading state
+  // Loading state — skeleton instead of spinner
   if (isLoading) {
-    return (
-      <div className="flex justify-center py-24">
-        <Spinner size="lg" color="primary" />
-      </div>
-    );
+    return <MarketplaceListingDetailSkeleton />;
   }
 
   // Error state
@@ -509,7 +525,7 @@ export function MarketplaceListingPage() {
         <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
           {/* Image gallery — 3 cols */}
           <div className="lg:col-span-3">
-            <ImageGallery images={listing.images} />
+            <ImageGallery images={listing.images} videoUrl={listing.video_url} />
           </div>
 
           {/* Details sidebar — 2 cols */}
@@ -599,6 +615,7 @@ export function MarketplaceListingPage() {
                 {listing.price_type === 'fixed' && listing.price != null && listing.price > 0 && (
                   <BuyNowButton
                     listingId={listing.id}
+                    listingTitle={listing.title}
                     price={listing.price}
                     currency={listing.price_currency}
                     sellerId={listing.user.id}
@@ -624,7 +641,7 @@ export function MarketplaceListingPage() {
                     fullWidth
                     startContent={<MessageCircle className="w-4 h-4" />}
                     as={Link}
-                    to={tenantPath(`/messages?to=${listing.user.id}&ref=marketplace&listing=${listing.id}`)}
+                    to={tenantPath(`/messages?to=${listing.user.id}&ref=marketplace&listing_id=${listing.id}&listing_title=${encodeURIComponent(listing.title)}&body=${encodeURIComponent(t('listing.message_template', 'Hi, I\'m interested in your listing: {{title}}', { title: listing.title }))}`)}
                     isDisabled={!isAuthenticated}
                   >
                     {t('listing.message_seller', 'Message Seller')}
