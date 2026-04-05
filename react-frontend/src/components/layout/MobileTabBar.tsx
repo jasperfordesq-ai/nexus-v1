@@ -68,7 +68,7 @@ export function MobileTabBar({ onMenuOpen }: MobileTabBarProps) {
     badgeCount?: number;
     module?: string;
   }[] = [
-    { key: 'home',     label: t('nav.home'),     icon: House,         path: tenantPath('/dashboard'), module: 'dashboard' },
+    { key: 'home',     label: t('nav.home'),     icon: House,         path: tenantPath('/feed'), module: 'feed' },
     { key: 'listings', label: t('nav.listings'), icon: ListTodo,      path: tenantPath('/listings'),  module: 'listings' },
     { key: 'create',   label: t('mobile_tab.create'),   icon: Plus,          action: handleCreateOpen,       isCreate: true },
     { key: 'messages', label: t('nav.messages'), icon: MessageSquare, path: tenantPath('/messages'),  badgeCount: counts.messages, module: 'messages' },

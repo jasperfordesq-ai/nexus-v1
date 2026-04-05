@@ -103,8 +103,8 @@ export function MobileDrawer({ isOpen, onClose, onSearchOpen }: MobileDrawerProp
   // Nav item arrays
   const mainNavItems = [
     { label: t('nav.home'), href: '/', icon: Home },
-    { label: t('nav.dashboard'), href: '/dashboard', icon: LayoutDashboard, auth: true, module: 'dashboard' as keyof TenantModules },
     { label: t('nav.feed'), href: '/feed', icon: Newspaper, auth: true, module: 'feed' as keyof TenantModules },
+    { label: t('nav.dashboard'), href: '/dashboard', icon: LayoutDashboard, auth: true, module: 'dashboard' as keyof TenantModules },
     { label: t('nav.explore', 'Explore'), href: '/explore', icon: Compass },
     { label: t('nav.messages'), href: '/messages', icon: MessageSquare, auth: true, module: 'messages' as keyof TenantModules },
   ];

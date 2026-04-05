@@ -455,23 +455,7 @@ export function Navbar({ onMobileMenuOpen, externalSearchOpen, onSearchOpenChang
               ) : (
               <>
               {/* Primary nav items — collapse into More when space is tight */}
-              {hasModule('dashboard') && maxVisibleNav >= 1 && (
-                <NavLink
-                  to={tenantPath('/dashboard')}
-                  className={({ isActive }) =>
-                    `flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-all ${
-                      isActive
-                        ? 'bg-theme-active text-theme-primary'
-                        : 'text-theme-muted hover:text-theme-primary hover:bg-theme-hover'
-                    }`
-                  }
-                >
-                  <LayoutDashboard className="w-4 h-4" aria-hidden="true" />
-                  <span>{t('nav.dashboard')}</span>
-                </NavLink>
-              )}
-
-              {hasModule('feed') && maxVisibleNav >= 2 && (
+              {hasModule('feed') && maxVisibleNav >= 1 && (
                 <NavLink
                   to={tenantPath('/feed')}
                   className={({ isActive }) =>
@@ -484,6 +468,22 @@ export function Navbar({ onMobileMenuOpen, externalSearchOpen, onSearchOpenChang
                 >
                   <Newspaper className="w-4 h-4" aria-hidden="true" />
                   <span>{t('nav.feed')}</span>
+                </NavLink>
+              )}
+
+              {hasModule('dashboard') && maxVisibleNav >= 2 && (
+                <NavLink
+                  to={tenantPath('/dashboard')}
+                  className={({ isActive }) =>
+                    `flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-all ${
+                      isActive
+                        ? 'bg-theme-active text-theme-primary'
+                        : 'text-theme-muted hover:text-theme-primary hover:bg-theme-hover'
+                    }`
+                  }
+                >
+                  <LayoutDashboard className="w-4 h-4" aria-hidden="true" />
+                  <span>{t('nav.dashboard')}</span>
                 </NavLink>
               )}
 

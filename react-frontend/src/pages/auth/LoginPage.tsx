@@ -86,7 +86,7 @@ export function LoginPage() {
   const conditionalAbortRef = useRef<AbortController | null>(null);
 
   // Redirect after successful login (preserve tenant slug prefix)
-  const from = (location.state as { from?: string })?.from || tenantPath('/dashboard');
+  const from = (location.state as { from?: string })?.from || tenantPath('/feed');
 
   // Clear stale auth tokens on mount — login page should always start clean
   useEffect(() => {
