@@ -294,7 +294,7 @@ function PlaceAutocompleteWithGoogle(props: PlaceAutocompleteInputProps) {
         <ul
           role="listbox"
           className="absolute z-50 mt-1 w-full max-h-60 overflow-y-auto rounded-xl
-                     border border-glass-border bg-theme-surface/95 backdrop-blur-xl
+                     border border-glass-border bg-theme-surface
                      shadow-lg shadow-black/10 dark:shadow-black/30"
         >
           {suggestions.map((suggestion, index) => {
