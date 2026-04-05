@@ -37,7 +37,7 @@ import { GlassCard } from '@/components/ui';
 import { EmptyState } from '@/components/feedback';
 import { MarketplaceListingGrid } from '@/components/marketplace';
 import type { MarketplaceListingItem } from '@/types/marketplace';
-import { mapApiToListingItem } from '@/lib/marketplace-utils';
+import type { MarketplaceListingItem } from '@/types/marketplace';
 import type { ApiMarketplaceListing } from '@/lib/marketplace-utils';
 import { useAuth, useToast, useTenant } from '@/contexts';
 import { api } from '@/lib/api';
@@ -192,7 +192,7 @@ export function MarketplaceSearchPage() {
 
       const response = await api.get<ApiMarketplaceListing[]>(`/v2/marketplace/listings?${params}`);
       if (response.success && response.data) {
-        const mapped = response.data.map(mapApiToListingItem);
+        const mapped = response.data as MarketplaceListingItem[];
         if (append) {
           setListings((prev) => [...prev, ...mapped]);
         } else {

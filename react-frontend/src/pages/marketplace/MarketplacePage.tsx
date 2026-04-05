@@ -36,7 +36,7 @@ import {
   CategoryChips,
 } from '@/components/marketplace';
 import type { MarketplaceListingItem, MarketplaceCategory } from '@/types/marketplace';
-import { mapApiToListingItem } from '@/lib/marketplace-utils';
+import type { MarketplaceListingItem } from '@/types/marketplace';
 import type { ApiMarketplaceListing } from '@/lib/marketplace-utils';
 import { useAuth, useToast, useTenant } from '@/contexts';
 import { api } from '@/lib/api';
@@ -147,7 +147,7 @@ export function MarketplacePage() {
       try {
         const response = await api.get<ApiMarketplaceListing[]>('/v2/marketplace/listings/featured');
         if (!cancelled && response.success && response.data) {
-          setFeaturedListings(response.data.map(mapApiToListingItem));
+          setFeaturedListings(response.data as MarketplaceListingItem[]);
         }
       } catch (err) {
         logError('Failed to load featured listings', err);
@@ -177,7 +177,7 @@ export function MarketplacePage() {
 
       const response = await api.get<ApiMarketplaceListing[]>(`/v2/marketplace/listings?${params}`);
       if (response.success && response.data) {
-        const mapped = response.data.map(mapApiToListingItem);
+        const mapped = response.data as MarketplaceListingItem[];
         if (append) {
           setListings((prev) => [...prev, ...mapped]);
         } else {

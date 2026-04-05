@@ -40,7 +40,7 @@ import { GlassCard } from '@/components/ui';
 import { EmptyState } from '@/components/feedback';
 import { MarketplaceListingGrid } from '@/components/marketplace';
 import type { MarketplaceListingItem } from '@/types/marketplace';
-import { mapApiToListingItem } from '@/lib/marketplace-utils';
+import type { MarketplaceListingItem } from '@/types/marketplace';
 import type { ApiMarketplaceListing } from '@/lib/marketplace-utils';
 import { useAuth, useToast, useTenant } from '@/contexts';
 import { api } from '@/lib/api';
@@ -161,7 +161,7 @@ export function SellerProfilePage() {
           `/v2/marketplace/sellers/${id}/listings?limit=50`
         );
         if (!cancelled && response.success && response.data) {
-          setListings(response.data.map(mapApiToListingItem));
+          setListings(response.data as MarketplaceListingItem[]);
         }
       } catch (err) {
         if (!cancelled) logError('Failed to load seller listings', err);

@@ -40,7 +40,7 @@ import { EmptyState } from '@/components/feedback';
 import { MapSearchView } from '@/components/marketplace/MapSearchView';
 import { MarketplaceListingGrid } from '@/components/marketplace';
 import type { MarketplaceListingItem } from '@/types/marketplace';
-import { mapApiToListingItem } from '@/lib/marketplace-utils';
+import type { MarketplaceListingItem } from '@/types/marketplace';
 import type { ApiMarketplaceListing } from '@/lib/marketplace-utils';
 import { useAuth, useToast, useTenant } from '@/contexts';
 import { useGeolocation } from '@/hooks/useGeolocation';
@@ -178,7 +178,7 @@ export function MarketplaceMapSearchPage() {
       );
       if (response.success && response.data) {
         const mapped = response.data.map((item) => ({
-          ...mapApiToListingItem(item),
+          ...(item as unknown as MarketplaceListingItem),
           latitude: item.latitude,
           longitude: item.longitude,
           distance_km: item.distance_km,
