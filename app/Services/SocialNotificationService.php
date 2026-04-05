@@ -196,6 +196,8 @@ class SocialNotificationService
             'poll' => '/polls',
             'resource' => '/resources',
             'volunteering' => '/volunteering/opportunities/' . $contentId,
+            'ideation_challenge' => '/ideation/' . $contentId,
+            'challenge_idea' => '/ideation/' . $contentId,
             'review' => '/dashboard',
             'comment' => '/feed',
         ];

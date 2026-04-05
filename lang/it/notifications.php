@@ -38,6 +38,30 @@ return [
     'email_view_content'         => 'View :content_type',
     'email_view_comment'         => 'View Comment',
 
+    // =========================================================================
+    // IdeationChallengeService
+    // =========================================================================
+    'ideation_idea_submitted'           => ':name submitted an idea ":title" to your challenge ":challenge"',
+    'ideation_idea_voted'               => ':name voted on your idea ":title"',
+    'ideation_idea_commented'           => ':name commented on your idea: ":comment"',
+    'ideation_idea_status_changed'      => 'Your idea ":title" has been marked as :status',
+    'ideation_status_shortlisted'       => 'shortlisted',
+    'ideation_status_winner'            => 'a winner',
+    'ideation_status_withdrawn'         => 'withdrawn',
+
+    // Ideation email subjects & labels
+    'ideation_email_idea_submitted_title'    => 'New Idea Submitted',
+    'ideation_email_idea_submitted_subtitle' => ':name submitted an idea to your challenge ":challenge"',
+    'ideation_email_idea_voted_title'        => 'New Vote on Your Idea',
+    'ideation_email_idea_voted_subtitle'     => ':name voted on your idea',
+    'ideation_email_idea_commented_title'    => 'New Comment on Your Idea',
+    'ideation_email_idea_commented_subtitle' => ':name commented on your idea',
+    'ideation_email_idea_won_title'          => 'Your Idea Won!',
+    'ideation_email_idea_status_title'       => 'Idea Status Update',
+    'ideation_email_idea_status_subtitle'    => 'Your idea has been marked as :status',
+    'ideation_email_view_challenge'          => 'View Challenge',
+    'ideation_email_view_idea'               => 'View Idea',
+
     // Content type labels
     'content_type_post'          => 'post',
     'content_type_listing'       => 'listing',

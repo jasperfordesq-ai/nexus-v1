@@ -31,6 +31,7 @@ class NotificationService
         'jobs'         => ['job_application', 'job_application_status'],
         'safeguarding' => ['safeguarding_flag', 'safeguarding_assignment', 'broker_review', 'safeguarding_incident'],
         'system'       => ['system', 'announcement', 'welcome', 'badge', 'achievement', 'level_up'],
+        'ideation'     => ['ideation_idea_submitted', 'ideation_idea_voted', 'ideation_idea_commented', 'ideation_idea_status', 'ideation_idea_won'],
         'security'     => ['password_changed', 'email_changed', '2fa_enabled', '2fa_disabled', 'passkey_registered', 'passkey_removed', 'security'],
     ];
 
@@ -107,6 +108,7 @@ class NotificationService
             'groups' => 0,
             'listings' => 0,
             'jobs' => 0,
+            'ideation' => 0,
             'safeguarding' => 0,
             'system' => 0,
             'security' => 0,
