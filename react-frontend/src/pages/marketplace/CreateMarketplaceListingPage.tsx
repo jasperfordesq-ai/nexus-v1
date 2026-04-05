@@ -301,6 +301,7 @@ export function CreateMarketplaceListingPage() {
         price_type: priceType,
         delivery_method: deliveryMethod,
         quantity: parseInt(quantity) || 1,
+        status: 'active',
       };
 
       if (categoryId) body.category_id = parseInt(categoryId);
