@@ -27,6 +27,8 @@ import {
   Star,
   Grid3X3,
   Heart,
+  Package,
+  HandCoins,
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
@@ -456,13 +458,36 @@ export function MarketplacePage() {
                   {t('hub.advanced_search', 'Advanced Search')}
                 </Link>
                 {isAuthenticated && (
-                  <Link
-                    to={tenantPath('/marketplace/search?saved=1')}
-                    className="flex items-center gap-2 text-sm text-default-600 hover:text-primary transition-colors"
-                  >
-                    <Heart className="w-4 h-4" />
-                    {t('hub.saved_items', 'Saved Items')}
-                  </Link>
+                  <>
+                    <Link
+                      to={tenantPath('/marketplace/my-listings')}
+                      className="flex items-center gap-2 text-sm text-default-600 hover:text-primary transition-colors"
+                    >
+                      <Package className="w-4 h-4" />
+                      {t('hub.my_listings', 'My Listings')}
+                    </Link>
+                    <Link
+                      to={tenantPath('/marketplace/my-offers')}
+                      className="flex items-center gap-2 text-sm text-default-600 hover:text-primary transition-colors"
+                    >
+                      <HandCoins className="w-4 h-4" />
+                      {t('hub.my_offers', 'My Offers')}
+                    </Link>
+                    <Link
+                      to={tenantPath('/marketplace/orders')}
+                      className="flex items-center gap-2 text-sm text-default-600 hover:text-primary transition-colors"
+                    >
+                      <ShoppingBag className="w-4 h-4" />
+                      {t('hub.my_orders', 'My Orders')}
+                    </Link>
+                    <Link
+                      to={tenantPath('/marketplace/collections')}
+                      className="flex items-center gap-2 text-sm text-default-600 hover:text-primary transition-colors"
+                    >
+                      <Heart className="w-4 h-4" />
+                      {t('hub.saved_items', 'Saved Items')}
+                    </Link>
+                  </>
                 )}
               </div>
             </GlassCard>

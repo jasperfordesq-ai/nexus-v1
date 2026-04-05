@@ -63,8 +63,19 @@ class MarketplaceListingService
                 'category:id,name,slug,icon',
                 'images' => fn ($q) => $q->orderBy('sort_order')->limit(5),
             ])
-            ->where('status', 'active')
-            ->where('moderation_status', 'approved');
+            ;
+
+        // When browsing own listings, show all statuses; otherwise only active+approved
+        if (!empty($filters['user_id'])) {
+            $query->where('user_id', (int) $filters['user_id']);
+            // Optionally filter by status if specified
+            if (!empty($filters['status'])) {
+                $query->where('status', $filters['status']);
+            }
+        } else {
+            $query->where('status', 'active')
+                  ->where('moderation_status', 'approved');
+        }
 
         // Category filter
         if (!empty($filters['category_id'])) {
@@ -125,11 +136,6 @@ class MarketplaceListingService
         // Posted within X days
         if (!empty($filters['posted_within'])) {
             $query->where('created_at', '>=', now()->subDays((int) $filters['posted_within']));
-        }
-
-        // User's own listings
-        if (!empty($filters['user_id'])) {
-            $query->where('user_id', (int) $filters['user_id']);
         }
 
         // Sorting
