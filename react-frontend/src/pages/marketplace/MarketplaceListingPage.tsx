@@ -390,7 +390,7 @@ export function MarketplaceListingPage() {
 
     load();
     return () => { cancelled = true; };
-  }, [listing?.seller.id, listing?.id]);
+  }, [listing?.user?.id, listing?.id]);
 
   // Toggle save
   const handleToggleSave = useCallback(async () => {
