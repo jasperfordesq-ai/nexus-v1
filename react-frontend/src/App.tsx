@@ -201,6 +201,10 @@ const MyListingsPage = lazyWithRetry(() => import('./pages/marketplace/MyListing
 const MyOffersPage = lazyWithRetry(() => import('./pages/marketplace/MyOffersPage'));
 const MarketplaceCollectionsPage = lazyWithRetry(() => import('./pages/marketplace/MarketplaceCollectionsPage'));
 const FreeItemsPage = lazyWithRetry(() => import('./pages/marketplace/FreeItemsPage'));
+const MarketplaceMapSearchPage = lazyWithRetry(() => import('./pages/marketplace/MarketplaceMapSearchPage'));
+const BuyerOrdersPage = lazyWithRetry(() => import('./pages/marketplace/BuyerOrdersPage'));
+const SellerOrdersPage = lazyWithRetry(() => import('./pages/marketplace/SellerOrdersPage'));
+const StripeOnboardingPage = lazyWithRetry(() => import('./pages/marketplace/StripeOnboardingPage'));
 
 // Static Pages
 const DevelopmentStatusPage = lazyWithRetry(() => import('@/pages/public/DevelopmentStatusPage'));
@@ -396,6 +400,13 @@ function AppRoutes() {
           <FeatureGate feature="marketplace" redirect="/">
             <FeatureErrorBoundary featureName="Marketplace">
               <MarketplaceSearchPage />
+            </FeatureErrorBoundary>
+          </FeatureGate>
+        } />
+        <Route path="marketplace/map" element={
+          <FeatureGate feature="marketplace" redirect="/">
+            <FeatureErrorBoundary featureName="Marketplace">
+              <MarketplaceMapSearchPage />
             </FeatureErrorBoundary>
           </FeatureGate>
         } />
@@ -862,6 +873,27 @@ function AppRoutes() {
             <FeatureGate feature="marketplace" redirect="/dashboard">
               <FeatureErrorBoundary featureName="Marketplace">
                 <CreateMarketplaceListingPage />
+              </FeatureErrorBoundary>
+            </FeatureGate>
+          } />
+          <Route path="marketplace/orders" element={
+            <FeatureGate feature="marketplace" redirect="/dashboard">
+              <FeatureErrorBoundary featureName="Marketplace">
+                <BuyerOrdersPage />
+              </FeatureErrorBoundary>
+            </FeatureGate>
+          } />
+          <Route path="marketplace/orders/sales" element={
+            <FeatureGate feature="marketplace" redirect="/dashboard">
+              <FeatureErrorBoundary featureName="Marketplace">
+                <SellerOrdersPage />
+              </FeatureErrorBoundary>
+            </FeatureGate>
+          } />
+          <Route path="marketplace/seller/onboard" element={
+            <FeatureGate feature="marketplace" redirect="/dashboard">
+              <FeatureErrorBoundary featureName="Marketplace">
+                <StripeOnboardingPage />
               </FeatureErrorBoundary>
             </FeatureGate>
           } />

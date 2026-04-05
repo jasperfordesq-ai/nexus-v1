@@ -93,6 +93,14 @@ $app = Application::configure(basePath: dirname(__DIR__))
             ->hourly()
             ->name('marketplace:process-escrow-releases')
             ->withoutOverlapping(5);
+
+        // Marketplace: auto-acknowledge DSA reports older than 24h (MKT6)
+        $schedule->call(function () {
+            \App\Services\MarketplaceReportService::processUnacknowledged();
+        })
+            ->hourly()
+            ->name('marketplace:process-unacknowledged-reports')
+            ->withoutOverlapping(5);
     })
     ->withRouting(
         // Routes loaded by RouteServiceProvider (no /api prefix).

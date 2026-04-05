@@ -12,3 +12,6 @@ export { MyOffersPage } from './MyOffersPage';
 export { MarketplaceSearchPage } from './MarketplaceSearchPage';
 export { SellerProfilePage } from './SellerProfilePage';
 export { MarketplaceCategoryPage } from './MarketplaceCategoryPage';
+export { BuyerOrdersPage } from './BuyerOrdersPage';
+export { SellerOrdersPage } from './SellerOrdersPage';
+export { StripeOnboardingPage } from './StripeOnboardingPage';

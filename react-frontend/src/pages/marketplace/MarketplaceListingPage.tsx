@@ -54,6 +54,7 @@ import {
 import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
 import { EmptyState } from '@/components/feedback';
+import { BuyNowButton } from '@/components/marketplace';
 import { useAuth, useToast, useTenant } from '@/contexts';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
@@ -517,28 +518,41 @@ export function MarketplaceListingPage() {
               </div>
 
               {/* Action buttons */}
-              <div className="flex gap-2 pt-2">
-                {listing.price_type !== 'free' && (
+              <div className="flex flex-col gap-2 pt-2">
+                {listing.price_type === 'fixed' && listing.price != null && listing.price > 0 && (
+                  <BuyNowButton
+                    listingId={listing.id}
+                    price={listing.price}
+                    currency={listing.currency}
+                    sellerId={listing.seller.id}
+                    onSuccess={() => {
+                      toast.success(t('listing.order_created', 'Order created!'));
+                    }}
+                  />
+                )}
+                <div className="flex gap-2">
+                  {listing.price_type !== 'free' && (
+                    <Button
+                      color="primary"
+                      fullWidth
+                      startContent={<DollarSign className="w-4 h-4" />}
+                      onPress={offerModal.onOpen}
+                      isDisabled={!isAuthenticated}
+                    >
+                      {t('listing.make_offer', 'Make Offer')}
+                    </Button>
+                  )}
                   <Button
-                    color="primary"
+                    variant="bordered"
                     fullWidth
-                    startContent={<DollarSign className="w-4 h-4" />}
-                    onPress={offerModal.onOpen}
+                    startContent={<MessageCircle className="w-4 h-4" />}
+                    as={Link}
+                    to={tenantPath(`/messages?to=${listing.seller.id}&ref=marketplace&listing=${listing.id}`)}
                     isDisabled={!isAuthenticated}
                   >
-                    {t('listing.make_offer', 'Make Offer')}
+                    {t('listing.message_seller', 'Message Seller')}
                   </Button>
-                )}
-                <Button
-                  variant="bordered"
-                  fullWidth
-                  startContent={<MessageCircle className="w-4 h-4" />}
-                  as={Link}
-                  to={tenantPath(`/messages?to=${listing.seller.id}&ref=marketplace&listing=${listing.id}`)}
-                  isDisabled={!isAuthenticated}
-                >
-                  {t('listing.message_seller', 'Message Seller')}
-                </Button>
+                </div>
               </div>
 
               {!isAuthenticated && (

@@ -12,8 +12,10 @@ use App\Models\MarketplaceCategoryTemplate;
 use App\Models\MarketplaceListing;
 use App\Services\AiChatService;
 use App\Services\ImageUploadService;
+use App\Services\MarketplaceConfigurationService;
 use App\Services\MarketplaceListingService;
 use App\Services\MarketplaceSellerService;
+use Illuminate\Support\Facades\Log;
 
 /**
  * MarketplaceListingController — Standalone marketplace listing endpoints.
@@ -763,5 +765,293 @@ class MarketplaceListingController extends BaseApiController
             'name'        => $template->name,
             'fields'      => $template->fields ?? [],
         ]);
+    }
+
+    // =====================================================================
+    //  Pro Seller Bulk Tools (Phase 4)
+    // =====================================================================
+
+    /**
+     * POST /v2/marketplace/listings/bulk-action — Bulk action on own listings.
+     *
+     * Body: { listing_ids: [1,2,3], action: 'activate'|'deactivate'|'renew'|'remove' }
+     * Owner-only: all listed IDs must belong to the authenticated user.
+     */
+    public function bulkAction(): JsonResponse
+    {
+        $this->ensureFeature();
+        $userId = $this->requireAuth();
+        $this->rateLimit('marketplace_bulk', 10, 60);
+
+        $validated = request()->validate([
+            'listing_ids' => 'required|array|min:1|max:100',
+            'listing_ids.*' => 'integer',
+            'action' => 'required|string|in:activate,deactivate,renew,remove',
+        ]);
+
+        $listingIds = $validated['listing_ids'];
+        $action = $validated['action'];
+
+        // Verify all listings belong to this user
+        $listings = MarketplaceListing::whereIn('id', $listingIds)
+            ->where('user_id', $userId)
+            ->get();
+
+        if ($listings->count() !== count($listingIds)) {
+            return $this->respondWithError(
+                'FORBIDDEN',
+                'One or more listings do not exist or do not belong to you.',
+                null,
+                403
+            );
+        }
+
+        $processed = 0;
+
+        foreach ($listings as $listing) {
+            switch ($action) {
+                case 'activate':
+                    if (in_array($listing->status, ['draft', 'inactive'], true)) {
+                        $listing->status = 'active';
+                        $listing->save();
+                        $processed++;
+                    }
+                    break;
+
+                case 'deactivate':
+                    if ($listing->status === 'active') {
+                        $listing->status = 'inactive';
+                        $listing->save();
+                        $processed++;
+                    }
+                    break;
+
+                case 'renew':
+                    $durationDays = MarketplaceConfigurationService::listingDurationDays();
+                    MarketplaceListingService::renew($listing, $durationDays);
+                    $processed++;
+                    break;
+
+                case 'remove':
+                    MarketplaceListingService::remove($listing);
+                    $processed++;
+                    break;
+            }
+        }
+
+        return $this->respondWithData([
+            'action' => $action,
+            'requested' => count($listingIds),
+            'processed' => $processed,
+        ]);
+    }
+
+    /**
+     * GET /v2/marketplace/listings/export-csv — Export user's own listings as CSV.
+     *
+     * Returns a CSV file download of the authenticated user's marketplace listings.
+     */
+    public function exportCsv(): JsonResponse
+    {
+        $this->ensureFeature();
+        $userId = $this->requireAuth();
+        $this->rateLimit('marketplace_export', 5, 60);
+
+        $listings = MarketplaceListing::where('user_id', $userId)
+            ->with('category:id,name,slug')
+            ->orderBy('id', 'desc')
+            ->get();
+
+        $headers = [
+            'id', 'title', 'description', 'tagline', 'price', 'price_currency',
+            'price_type', 'time_credit_price', 'category', 'condition',
+            'quantity', 'location', 'delivery_method', 'seller_type',
+            'status', 'views_count', 'saves_count', 'created_at', 'expires_at',
+        ];
+
+        $rows = [];
+        $rows[] = $headers;
+
+        foreach ($listings as $listing) {
+            $rows[] = [
+                $listing->id,
+                $listing->title,
+                $listing->description,
+                $listing->tagline,
+                $listing->price,
+                $listing->price_currency,
+                $listing->price_type,
+                $listing->time_credit_price,
+                $listing->category?->name,
+                $listing->condition,
+                $listing->quantity,
+                $listing->location,
+                $listing->delivery_method,
+                $listing->seller_type,
+                $listing->status,
+                $listing->views_count,
+                $listing->saves_count,
+                $listing->created_at?->toISOString(),
+                $listing->expires_at?->toISOString(),
+            ];
+        }
+
+        // Build CSV string
+        $csv = '';
+        foreach ($rows as $row) {
+            $csv .= implode(',', array_map(function ($field) {
+                $str = (string) ($field ?? '');
+                // Escape fields containing commas, quotes, or newlines
+                if (str_contains($str, ',') || str_contains($str, '"') || str_contains($str, "\n")) {
+                    return '"' . str_replace('"', '""', $str) . '"';
+                }
+                return $str;
+            }, $row)) . "\n";
+        }
+
+        return response()->json([
+            'data' => [
+                'csv' => $csv,
+                'filename' => 'marketplace-listings-' . date('Y-m-d') . '.csv',
+                'count' => $listings->count(),
+            ],
+        ])->header('Content-Type', 'application/json');
+    }
+
+    /**
+     * POST /v2/marketplace/listings/import-csv — Import listings from CSV.
+     *
+     * Accepts a CSV file and creates draft listings for each row.
+     * Columns: title, description, price, price_currency, price_type,
+     * category_id, condition, quantity, location, delivery_method.
+     */
+    public function importCsv(): JsonResponse
+    {
+        $this->ensureFeature();
+        $userId = $this->requireAuth();
+        $this->rateLimit('marketplace_import', 3, 60);
+
+        $request = request();
+        $request->validate([
+            'file' => 'required|file|mimes:csv,txt|max:2048',
+        ]);
+
+        $file = $request->file('file');
+        $content = file_get_contents($file->getRealPath());
+
+        if (!$content) {
+            return $this->respondWithError('VALIDATION_ERROR', 'Could not read the CSV file.', 'file', 422);
+        }
+
+        $lines = str_getcsv($content, "\n");
+        if (count($lines) < 2) {
+            return $this->respondWithError('VALIDATION_ERROR', 'CSV file must have a header row and at least one data row.', 'file', 422);
+        }
+
+        // Parse header
+        $headerLine = array_shift($lines);
+        $headers = str_getcsv($headerLine);
+        $headers = array_map('trim', $headers);
+        $headers = array_map('strtolower', $headers);
+
+        $requiredColumns = ['title', 'description'];
+        foreach ($requiredColumns as $col) {
+            if (!in_array($col, $headers, true)) {
+                return $this->respondWithError(
+                    'VALIDATION_ERROR',
+                    "CSV file must contain a '{$col}' column.",
+                    'file',
+                    422
+                );
+            }
+        }
+
+        // Ensure seller profile exists
+        MarketplaceSellerService::getOrCreateProfile($userId);
+
+        $created = 0;
+        $errors = [];
+        $maxImport = 50;
+
+        foreach ($lines as $lineNum => $line) {
+            if ($created >= $maxImport) {
+                $errors[] = "Reached maximum import limit of {$maxImport} listings.";
+                break;
+            }
+
+            $row = str_getcsv($line);
+            if (count($row) !== count($headers)) {
+                $errors[] = "Row " . ($lineNum + 2) . ": column count mismatch.";
+                continue;
+            }
+
+            $data = array_combine($headers, $row);
+
+            // Validate required fields
+            $title = trim($data['title'] ?? '');
+            $description = trim($data['description'] ?? '');
+
+            if (empty($title) || empty($description)) {
+                $errors[] = "Row " . ($lineNum + 2) . ": title and description are required.";
+                continue;
+            }
+
+            if (strlen($title) > 200 || strlen($description) > 10000) {
+                $errors[] = "Row " . ($lineNum + 2) . ": title or description exceeds length limit.";
+                continue;
+            }
+
+            $listingData = [
+                'title' => $title,
+                'description' => $description,
+                'status' => 'draft', // Always create as draft
+            ];
+
+            // Optional fields
+            if (!empty($data['price'])) {
+                $listingData['price'] = (float) $data['price'];
+            }
+            if (!empty($data['price_currency'])) {
+                $listingData['price_currency'] = strtoupper(substr(trim($data['price_currency']), 0, 3));
+            }
+            if (!empty($data['price_type']) && in_array($data['price_type'], ['fixed', 'negotiable', 'free', 'auction', 'contact'], true)) {
+                $listingData['price_type'] = $data['price_type'];
+            }
+            if (!empty($data['category_id'])) {
+                $listingData['category_id'] = (int) $data['category_id'];
+            }
+            if (!empty($data['condition']) && in_array($data['condition'], ['new', 'like_new', 'good', 'fair', 'poor'], true)) {
+                $listingData['condition'] = $data['condition'];
+            }
+            if (!empty($data['quantity'])) {
+                $listingData['quantity'] = max(1, (int) $data['quantity']);
+            }
+            if (!empty($data['location'])) {
+                $listingData['location'] = trim($data['location']);
+            }
+            if (!empty($data['delivery_method']) && in_array($data['delivery_method'], ['pickup', 'shipping', 'both', 'community_delivery'], true)) {
+                $listingData['delivery_method'] = $data['delivery_method'];
+            }
+            if (!empty($data['tagline'])) {
+                $listingData['tagline'] = substr(trim($data['tagline']), 0, 300);
+            }
+
+            try {
+                MarketplaceListingService::create($userId, $listingData);
+                $created++;
+            } catch (\Throwable $e) {
+                Log::warning('Marketplace CSV import: row failed', [
+                    'row' => $lineNum + 2,
+                    'error' => $e->getMessage(),
+                ]);
+                $errors[] = "Row " . ($lineNum + 2) . ": " . $e->getMessage();
+            }
+        }
+
+        return $this->respondWithData([
+            'created' => $created,
+            'errors' => $errors,
+            'message' => "{$created} listing(s) imported as drafts.",
+        ], null, 201);
     }
 }

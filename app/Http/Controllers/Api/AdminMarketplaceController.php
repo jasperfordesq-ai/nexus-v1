@@ -10,6 +10,7 @@ use App\Core\TenantContext;
 use App\Models\MarketplaceListing;
 use App\Models\MarketplaceSellerProfile;
 use App\Services\MarketplaceConfigurationService;
+use App\Services\MarketplaceReportService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
 
@@ -299,5 +300,96 @@ class AdminMarketplaceController extends BaseApiController
             ->update(['status' => 'removed', 'moderation_status' => 'rejected']);
 
         return $this->respondWithData(['message' => 'Seller suspended and all listings deactivated.']);
+    }
+
+    // -----------------------------------------------------------------
+    //  DSA Reports (Phase 4)
+    // -----------------------------------------------------------------
+
+    /**
+     * GET /v2/admin/marketplace/reports — Pending reports queue (paginated).
+     *
+     * Supports ?status= filter and offset pagination.
+     */
+    public function reports(): JsonResponse
+    {
+        $this->ensureFeature();
+        $this->rateLimit('admin_marketplace_reports', 30, 60);
+
+        $page = $this->queryInt('page', 1, 1);
+        $perPage = $this->queryInt('per_page', 20, 1, 100);
+        $status = $this->query('status');
+
+        $result = MarketplaceReportService::getPendingReports($perPage, $page, $status);
+
+        return $this->respondWithPaginatedCollection(
+            $result['items'],
+            $result['total'],
+            $result['page'],
+            $result['per_page']
+        );
+    }
+
+    /**
+     * POST /v2/admin/marketplace/reports/{id}/acknowledge — Acknowledge a report.
+     *
+     * Sets acknowledged_at and moves status to under_review.
+     * DSA requires acknowledgement within 24 hours.
+     */
+    public function acknowledgeReport(int $id): JsonResponse
+    {
+        $this->ensureFeature();
+        $this->rateLimit('admin_marketplace_reports', 30, 60);
+
+        $adminId = $this->requireAdmin();
+
+        try {
+            $report = MarketplaceReportService::acknowledgeReport($id, $adminId);
+        } catch (\InvalidArgumentException $e) {
+            return $this->respondWithError('VALIDATION_ERROR', $e->getMessage(), null, 422);
+        }
+
+        return $this->respondWithData(['message' => 'Report acknowledged.', 'status' => $report->status]);
+    }
+
+    /**
+     * PUT /v2/admin/marketplace/reports/{id}/resolve — Resolve a report.
+     *
+     * Body: { action_taken: 'none'|'warning'|'listing_removed'|'seller_suspended', resolution_reason: '...' }
+     */
+    public function resolveReport(int $id): JsonResponse
+    {
+        $this->ensureFeature();
+        $this->rateLimit('admin_marketplace_reports', 30, 60);
+
+        $adminId = $this->requireAdmin();
+
+        $validated = request()->validate([
+            'action_taken' => 'required|string|in:none,warning,listing_removed,seller_suspended',
+            'resolution_reason' => 'required|string|max:5000',
+        ]);
+
+        try {
+            $report = MarketplaceReportService::resolveReport($id, $adminId, $validated);
+        } catch (\InvalidArgumentException $e) {
+            return $this->respondWithError('VALIDATION_ERROR', $e->getMessage(), null, 422);
+        }
+
+        return $this->respondWithData(['message' => 'Report resolved.', 'status' => $report->status, 'action_taken' => $report->action_taken]);
+    }
+
+    /**
+     * GET /v2/admin/marketplace/transparency — DSA transparency stats.
+     *
+     * Returns aggregate data required for DSA transparency reporting.
+     */
+    public function transparencyStats(): JsonResponse
+    {
+        $this->ensureFeature();
+        $this->rateLimit('admin_marketplace_transparency', 30, 60);
+
+        $stats = MarketplaceReportService::getTransparencyStats();
+
+        return $this->respondWithData($stats);
     }
 }

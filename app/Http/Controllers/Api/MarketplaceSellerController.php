@@ -7,7 +7,9 @@
 namespace App\Http\Controllers\Api;
 
 use App\Core\TenantContext;
+use App\Models\MarketplaceShippingOption;
 use App\Services\MarketplaceSellerService;
+use App\Services\MarketplaceShippingOptionService;
 use Illuminate\Http\JsonResponse;
 
 /**
@@ -157,5 +159,122 @@ class MarketplaceSellerController extends BaseApiController
             'stripe_account_id' => $profile->stripe_account_id,
             'stripe_onboarding_complete' => (bool) $profile->stripe_onboarding_complete,
         ]);
+    }
+
+    // -----------------------------------------------------------------
+    //  Shipping Options (Phase 4 — MKT31)
+    // -----------------------------------------------------------------
+
+    /**
+     * GET /v2/marketplace/seller/shipping-options — List seller's shipping options.
+     */
+    public function shippingOptions(): JsonResponse
+    {
+        $this->ensureFeature();
+        $this->rateLimit('marketplace_seller_shipping', 60, 60);
+
+        $userId = $this->requireAuth();
+        $profile = MarketplaceSellerService::getOrCreateProfile($userId);
+
+        $options = MarketplaceShippingOptionService::getSellerOptions($profile->id);
+
+        return $this->respondWithData($options);
+    }
+
+    /**
+     * POST /v2/marketplace/seller/shipping-options — Create a shipping option.
+     */
+    public function createShippingOption(): JsonResponse
+    {
+        $this->ensureFeature();
+        $this->rateLimit('marketplace_seller_shipping', 30, 60);
+
+        $userId = $this->requireAuth();
+        $profile = MarketplaceSellerService::getOrCreateProfile($userId);
+
+        $validated = request()->validate([
+            'courier_name' => 'required|string|max:100',
+            'courier_code' => 'nullable|string|max:50',
+            'price' => 'required|numeric|min:0',
+            'currency' => 'nullable|string|max:3',
+            'estimated_days' => 'nullable|integer|min:1|max:365',
+            'is_default' => 'nullable|boolean',
+        ]);
+
+        $option = MarketplaceShippingOptionService::createOption($profile->id, $validated);
+
+        return $this->respondWithData([
+            'id' => $option->id,
+            'courier_name' => $option->courier_name,
+            'courier_code' => $option->courier_code,
+            'price' => $option->price,
+            'currency' => $option->currency,
+            'estimated_days' => $option->estimated_days,
+            'is_default' => $option->is_default,
+            'is_active' => $option->is_active,
+        ], null, 201);
+    }
+
+    /**
+     * PUT /v2/marketplace/seller/shipping-options/{id} — Update a shipping option.
+     */
+    public function updateShippingOption(int $id): JsonResponse
+    {
+        $this->ensureFeature();
+        $this->rateLimit('marketplace_seller_shipping', 30, 60);
+
+        $userId = $this->requireAuth();
+        $profile = MarketplaceSellerService::getOrCreateProfile($userId);
+
+        $option = MarketplaceShippingOption::where('id', $id)
+            ->where('seller_id', $profile->id)
+            ->first();
+
+        if (!$option) {
+            return $this->respondWithError('NOT_FOUND', 'Shipping option not found.', null, 404);
+        }
+
+        $validated = request()->validate([
+            'courier_name' => 'sometimes|string|max:100',
+            'courier_code' => 'nullable|string|max:50',
+            'price' => 'sometimes|numeric|min:0',
+            'currency' => 'nullable|string|max:3',
+            'estimated_days' => 'nullable|integer|min:1|max:365',
+            'is_default' => 'nullable|boolean',
+            'is_active' => 'nullable|boolean',
+        ]);
+
+        $updated = MarketplaceShippingOptionService::updateOption($option, $validated);
+
+        return $this->respondWithData([
+            'id' => $updated->id,
+            'courier_name' => $updated->courier_name,
+            'courier_code' => $updated->courier_code,
+            'price' => $updated->price,
+            'currency' => $updated->currency,
+            'estimated_days' => $updated->estimated_days,
+            'is_default' => $updated->is_default,
+            'is_active' => $updated->is_active,
+        ]);
+    }
+
+    /**
+     * DELETE /v2/marketplace/seller/shipping-options/{id} — Delete a shipping option.
+     */
+    public function deleteShippingOption(int $id): JsonResponse
+    {
+        $this->ensureFeature();
+        $this->rateLimit('marketplace_seller_shipping', 30, 60);
+
+        $userId = $this->requireAuth();
+        $profile = MarketplaceSellerService::getOrCreateProfile($userId);
+
+        try {
+            MarketplaceShippingOptionService::deleteOption($id, $profile->id);
+        } catch (\InvalidArgumentException $e) {
+            return $this->respondWithError('NOT_FOUND', $e->getMessage(), null, 404);
+        }
+
+        return $this->noContent();
     }
 }

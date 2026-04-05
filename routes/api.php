@@ -837,6 +837,20 @@ Route::put('/v2/marketplace/orders/{orderId}/delivery-offers/{delivererId}/confi
 // Marketplace AI — Auto-reply for sellers (MKT32)
 Route::post('/v2/marketplace/listings/{id}/auto-reply', [\App\Http\Controllers\Api\MarketplaceAiController::class, 'autoReply']);
 
+// Marketplace DSA Reports — User reporting (MKT6)
+Route::post('/v2/marketplace/listings/{id}/report', [\App\Http\Controllers\Api\MarketplaceReportController::class, 'store']);
+
+// Marketplace Shipping Options — Seller shipping management (MKT31)
+Route::get('/v2/marketplace/seller/shipping-options', [\App\Http\Controllers\Api\MarketplaceSellerController::class, 'shippingOptions']);
+Route::post('/v2/marketplace/seller/shipping-options', [\App\Http\Controllers\Api\MarketplaceSellerController::class, 'createShippingOption']);
+Route::put('/v2/marketplace/seller/shipping-options/{id}', [\App\Http\Controllers\Api\MarketplaceSellerController::class, 'updateShippingOption']);
+Route::delete('/v2/marketplace/seller/shipping-options/{id}', [\App\Http\Controllers\Api\MarketplaceSellerController::class, 'deleteShippingOption']);
+
+// Marketplace Pro Seller Bulk Tools — Bulk actions, CSV export/import
+Route::post('/v2/marketplace/listings/bulk-action', [\App\Http\Controllers\Api\MarketplaceListingController::class, 'bulkAction']);
+Route::get('/v2/marketplace/listings/export-csv', [\App\Http\Controllers\Api\MarketplaceListingController::class, 'exportCsv']);
+Route::post('/v2/marketplace/listings/import-csv', [\App\Http\Controllers\Api\MarketplaceListingController::class, 'importCsv']);
+
 }); // End Route::middleware('auth:sanctum')
 
 // ============================================
@@ -1335,6 +1349,13 @@ Route::delete('/v2/admin/marketplace/listings/{id}', [\App\Http\Controllers\Api\
 Route::get('/v2/admin/marketplace/sellers', [\App\Http\Controllers\Api\AdminMarketplaceController::class, 'sellers']);
 Route::post('/v2/admin/marketplace/sellers/{id}/verify', [\App\Http\Controllers\Api\AdminMarketplaceController::class, 'verifySeller']);
 Route::post('/v2/admin/marketplace/sellers/{id}/suspend', [\App\Http\Controllers\Api\AdminMarketplaceController::class, 'suspendSeller']);
+// Marketplace Admin — DSA Reports (Phase 4)
+Route::get('/v2/admin/marketplace/reports', [\App\Http\Controllers\Api\AdminMarketplaceController::class, 'reports']);
+Route::post('/v2/admin/marketplace/reports/{id}/acknowledge', [\App\Http\Controllers\Api\AdminMarketplaceController::class, 'acknowledgeReport']);
+Route::put('/v2/admin/marketplace/reports/{id}/resolve', [\App\Http\Controllers\Api\AdminMarketplaceController::class, 'resolveReport']);
+Route::get('/v2/admin/marketplace/transparency', [\App\Http\Controllers\Api\AdminMarketplaceController::class, 'transparencyStats']);
+// Marketplace Admin — DSA Reports for a specific listing
+Route::get('/v2/admin/marketplace/listings/{id}/reports', [\App\Http\Controllers\Api\MarketplaceReportController::class, 'index']);
 
 Route::get('/v2/admin/ideation', [\App\Http\Controllers\Api\AdminIdeationController::class, 'index']);
 Route::get('/v2/admin/ideation/{id}', [\App\Http\Controllers\Api\AdminIdeationController::class, 'show']);

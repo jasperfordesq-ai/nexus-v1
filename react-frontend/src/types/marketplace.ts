@@ -268,9 +268,48 @@ export interface MarketplaceDeliveryOffer {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
+// Shipping Types
+// ─────────────────────────────────────────────────────────────────────────────
+
+export interface MarketplaceShippingOption {
+  id: number;
+  courier_name: string;
+  courier_code?: string;
+  price: number;
+  currency: string;
+  estimated_days?: number;
+  is_default: boolean;
+  is_active: boolean;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
 // AI Reply Types (Phase 5 — MKT32)
 // ─────────────────────────────────────────────────────────────────────────────
 
 export interface AiAutoReplyResponse {
   reply: string;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Order Types (Stripe Payment Flow)
+// ─────────────────────────────────────────────────────────────────────────────
+
+export interface MarketplaceOrderItem {
+  id: number;
+  order_number: string;
+  buyer: { id: number; name: string; avatar_url?: string };
+  seller: { id: number; name: string; avatar_url?: string };
+  listing: { id: number; title: string; image?: { url: string } };
+  quantity: number;
+  unit_price: number;
+  total_price: number;
+  currency: string;
+  status: string;
+  tracking_number?: string;
+  tracking_url?: string;
+  shipping_method?: string;
+  buyer_confirmed_at?: string;
+  seller_confirmed_at?: string;
+  created_at: string;
+  ratings?: Array<{ rating: number; rater_role: string; comment?: string }>;
 }
