@@ -14,7 +14,6 @@ use App\Models\User;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Str;
 use Illuminate\Validation\Rules\Password;
 /**
  * RegistrationService — Laravel DI-based service for user registration.
@@ -66,7 +65,6 @@ class RegistrationService
             $user->email = strtolower(trim($data['email']));
             $user->password_hash = Hash::make($data['password']);
             $user->status = 'pending';
-            $user->verification_token = Str::random(64);
 
             // Welcome credits are granted during admin approval (AdminUsersController::grantWelcomeCredits)
             // NOT at registration time — to avoid double-crediting on tenants with admin_approval enabled

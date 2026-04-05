@@ -12,10 +12,15 @@ use App\Events\UserRegistered;
 use App\Models\Notification;
 use App\Services\SearchService;
 use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
 /**
  * Sends a welcome notification (email + in-app) when a new user registers.
+ *
+ * For pending users (awaiting email verification), this sends a combined
+ * welcome + verification email with a verify link. For already-active users
+ * (e.g. admin-created), it sends a generic welcome.
  */
 class SendWelcomeNotification implements ShouldQueue
 {
@@ -45,18 +50,49 @@ class SendWelcomeNotification implements ShouldQueue
                 'created_at' => now(),
             ]);
 
-            // Send welcome email
+            // Send email
             $tenantName = TenantContext::get()['name'] ?? 'Project NEXUS';
             $userName = $event->user->first_name ?? $event->user->name ?? 'there';
             $userEmail = $event->user->email ?? null;
 
-            if ($userEmail) {
-                $safeTenantName = htmlspecialchars($tenantName, ENT_QUOTES, 'UTF-8');
-                $safeUserName = htmlspecialchars($userName, ENT_QUOTES, 'UTF-8');
+            if (!$userEmail) {
+                return;
+            }
+
+            $safeTenantName = htmlspecialchars($tenantName, ENT_QUOTES, 'UTF-8');
+            $safeUserName = htmlspecialchars($userName, ENT_QUOTES, 'UTF-8');
+
+            // For pending users: send combined welcome + verification email
+            $isPending = ($event->user->status ?? '') === 'pending'
+                      || empty($event->user->email_verified_at);
+
+            if ($isPending) {
+                $verifyUrl = $this->generateVerificationToken($event->user->id, $event->tenantId);
 
                 $html = EmailTemplateBuilder::make()
                     ->theme('success')
-                    ->title("Welcome to {$safeTenantName}! 👋")
+                    ->title("Welcome to {$safeTenantName}!")
+                    ->previewText("Verify your email to get started on {$safeTenantName}.")
+                    ->greeting($safeUserName)
+                    ->paragraph("Welcome to <strong>{$safeTenantName}</strong>! We're excited to have you join our community.")
+                    ->paragraph("Please verify your email address by clicking the button below to activate your account. This link expires in 24 hours.")
+                    ->button('Verify Email & Get Started', $verifyUrl)
+                    ->paragraph("Once verified, you can:")
+                    ->bulletList([
+                        '<strong>Complete your profile</strong> — let others know who you are',
+                        '<strong>Browse listings</strong> — discover skills and services offered by members',
+                        '<strong>Make connections</strong> — reach out to people in your community',
+                    ])
+                    ->paragraph("If you did not create this account, you can safely ignore this email.")
+                    ->render();
+
+                $mailer = \App\Core\Mailer::forCurrentTenant();
+                $mailer->send($userEmail, "Verify Your Email - {$tenantName}", $html);
+            } else {
+                // Already active user (admin-created) — generic welcome only
+                $html = EmailTemplateBuilder::make()
+                    ->theme('success')
+                    ->title("Welcome to {$safeTenantName}!")
                     ->previewText("Welcome aboard, {$safeUserName}! Here's how to get started.")
                     ->greeting($safeUserName)
                     ->paragraph("Welcome to <strong>{$safeTenantName}</strong>! We're excited to have you join our community.")
@@ -81,5 +117,50 @@ class SendWelcomeNotification implements ShouldQueue
                 'trace' => $e->getTraceAsString(),
             ]);
         }
+    }
+
+    /**
+     * Generate a verification token using the email_verification_tokens table
+     * (the same system that EmailVerificationController::verifyEmail() checks).
+     */
+    private function generateVerificationToken(int $userId, int $tenantId): string
+    {
+        $token = bin2hex(random_bytes(32));
+        $hashedToken = password_hash($token, PASSWORD_DEFAULT);
+        $expiresAt = date('Y-m-d H:i:s', time() + 86400); // 24 hours
+
+        // Ensure table exists
+        DB::statement("
+            CREATE TABLE IF NOT EXISTS `email_verification_tokens` (
+                `id` INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+                `user_id` INT UNSIGNED NOT NULL,
+                `tenant_id` INT(11) NOT NULL,
+                `token` VARCHAR(255) NOT NULL,
+                `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                `expires_at` TIMESTAMP NOT NULL,
+                INDEX `idx_user_id` (`user_id`),
+                INDEX `idx_tenant_id` (`tenant_id`),
+                INDEX `idx_tenant_user` (`tenant_id`, `user_id`),
+                INDEX `idx_expires_at` (`expires_at`)
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+        ");
+
+        // Clean up old tokens for this user
+        DB::delete(
+            "DELETE FROM email_verification_tokens WHERE user_id = ? AND tenant_id = ?",
+            [$userId, $tenantId]
+        );
+
+        // Store hashed token
+        DB::insert(
+            "INSERT INTO email_verification_tokens (user_id, tenant_id, token, expires_at) VALUES (?, ?, ?, ?)",
+            [$userId, $tenantId, $hashedToken, $expiresAt]
+        );
+
+        // Build the verification URL
+        $appUrl = TenantContext::getFrontendUrl();
+        $basePath = TenantContext::getSlugPrefix();
+
+        return $appUrl . $basePath . '/verify-email?token=' . $token;
     }
 }

@@ -93,9 +93,9 @@ class EmailVerificationController extends BaseApiController
             ]);
         }
 
-        // Mark user as verified (tenant-scoped)
+        // Mark user as verified and activate if pending (tenant-scoped)
         DB::update(
-            "UPDATE users SET email_verified_at = NOW(), is_verified = 1 WHERE id = ? AND tenant_id = ?",
+            "UPDATE users SET email_verified_at = NOW(), is_verified = 1, status = CASE WHEN status = 'pending' THEN 'active' ELSE status END WHERE id = ? AND tenant_id = ?",
             [$userId, $tenantId]
         );
 
