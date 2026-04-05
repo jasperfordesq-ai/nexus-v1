@@ -48,7 +48,8 @@
     "knowledge_base": "Knowledge Base",
     "unread_notifications": "{{count}} unread notifications",
     "timebanking": "Timebanking",
-    "explore": "Explore"
+    "explore": "Explore",
+    "marketplace": "Marketplace"
   },
   "nav_desc": {
     "feed": "Community feed",
@@ -92,7 +93,8 @@
     "impact_report": "Detailed impact data",
     "strategic_plan": "Our strategic direction",
     "timebanking_listings": "Offers & requests",
-    "messages": "Your messages"
+    "messages": "Your messages",
+    "marketplace": "Buy & sell in your community"
   },
   "user_menu": {
     "my_profile": "My Profile",
