@@ -1047,7 +1047,12 @@ export function RegisterPage() {
                       <div>
                         <p className="font-medium text-blue-600 dark:text-blue-400">{t('register.verify_email_title', { defaultValue: 'Verify your email' })}</p>
                         <p className="text-blue-600/80 dark:text-blue-300/80 mt-1">
-                          {t('register.verify_email_body', { defaultValue: "We've sent a verification link to <strong>{{email}}</strong>. Please check your inbox and click the link to verify your email address.", email })}
+                          <Trans
+                            i18nKey="register.verify_email_body"
+                            defaults="We've sent a verification link to <strong>{{email}}</strong>. Please check your inbox and click the link to verify your email address."
+                            values={{ email }}
+                            components={{ strong: <strong /> }}
+                          />
                         </p>
                       </div>
                     </div>
