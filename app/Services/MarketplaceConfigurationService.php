@@ -164,7 +164,7 @@ class MarketplaceConfigurationService
 
     public static function moderationEnabled(): bool
     {
-        return (bool) self::get(self::CONFIG_MODERATION_ENABLED, true);
+        return (bool) self::get(self::CONFIG_MODERATION_ENABLED);
     }
 
     public static function allowShipping(): bool
