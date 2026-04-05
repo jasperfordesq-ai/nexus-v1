@@ -274,6 +274,10 @@ class SitemapService
         if ($this->hasFeature($tenant, 'organisations')) {
             $methods['organisations'] = fn (int $tid, string $base) => $this->getOrganizationUrls($tid, $base);
         }
+        if ($this->hasFeature($tenant, 'marketplace')) {
+            $methods['marketplace_listings'] = fn (int $tid, string $base) => $this->getMarketplaceListingUrls($tid, $base);
+            $methods['marketplace_categories'] = fn (int $tid, string $base) => $this->getMarketplaceCategoryUrls($tid, $base);
+        }
         $methods['cms_pages'] = fn (int $tid, string $base) => $this->getCmsPageUrls($tid, $base);
         $methods['kb_articles'] = fn (int $tid, string $base) => $this->getKbArticleUrls($tid, $base);
 
@@ -350,6 +354,11 @@ class SitemapService
         }
         if ($this->hasFeature($tenant, 'organisations')) {
             $urls[] = $this->url($baseUrl, '/organisations', $now, 'weekly', '0.6');
+        }
+        if ($this->hasFeature($tenant, 'marketplace')) {
+            $urls[] = $this->url($baseUrl, '/marketplace', $now, 'daily', '0.8');
+            $urls[] = $this->url($baseUrl, '/marketplace/free', $now, 'weekly', '0.6');
+            $urls[] = $this->url($baseUrl, '/marketplace/map', $now, 'weekly', '0.5');
         }
 
         return $urls;
@@ -484,6 +493,38 @@ class SitemapService
 
         return array_map(
             fn ($r) => $this->url($baseUrl, "/resources/{$r->id}", $this->formatDate($r->lastmod), 'monthly', '0.5'),
+            $rows
+        );
+    }
+
+    private function getMarketplaceListingUrls(int $tenantId, string $baseUrl): array
+    {
+        $rows = DB::select(
+            "SELECT id, COALESCE(updated_at, created_at) AS lastmod
+             FROM marketplace_listings
+             WHERE tenant_id = ? AND status = 'active' AND moderation_status = 'approved'
+             ORDER BY created_at DESC",
+            [$tenantId]
+        );
+
+        return array_map(
+            fn ($r) => $this->url($baseUrl, "/marketplace/{$r->id}", $this->formatDate($r->lastmod), 'weekly', '0.7'),
+            $rows
+        );
+    }
+
+    private function getMarketplaceCategoryUrls(int $tenantId, string $baseUrl): array
+    {
+        $rows = DB::select(
+            "SELECT slug, COALESCE(updated_at, created_at) AS lastmod
+             FROM marketplace_categories
+             WHERE (tenant_id = ? OR tenant_id IS NULL) AND is_active = 1
+             ORDER BY sort_order ASC",
+            [$tenantId]
+        );
+
+        return array_map(
+            fn ($r) => $this->url($baseUrl, "/marketplace/category/{$r->slug}", $this->formatDate($r->lastmod), 'weekly', '0.6'),
             $rows
         );
     }

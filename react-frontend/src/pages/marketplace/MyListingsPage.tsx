@@ -267,7 +267,7 @@ export function MyListingsPage() {
 
   return (
     <>
-      <PageMeta title={t('my_listings.page_title', 'My Listings - Marketplace')} />
+      <PageMeta title={t('my_listings.page_title', 'My Listings - Marketplace')} noIndex={true} />
 
       <div className="max-w-7xl mx-auto px-4 py-6 space-y-6">
         {/* Header */}

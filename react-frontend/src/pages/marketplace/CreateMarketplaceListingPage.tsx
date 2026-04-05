@@ -357,7 +357,7 @@ export function CreateMarketplaceListingPage() {
 
   return (
     <>
-      <PageMeta title={t('create.page_title', 'Sell Something - Marketplace')} />
+      <PageMeta title={t('create.page_title', 'Sell Something - Marketplace')} noIndex={true} />
 
       <div className="max-w-3xl mx-auto px-4 py-6 space-y-6">
         {/* Header */}

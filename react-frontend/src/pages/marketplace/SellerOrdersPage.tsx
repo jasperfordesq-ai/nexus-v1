@@ -370,7 +370,7 @@ export function SellerOrdersPage() {
 
   return (
     <>
-      <PageMeta title={t('orders.seller.page_title', 'My Sales - Marketplace')} />
+      <PageMeta title={t('orders.seller.page_title', 'My Sales - Marketplace')} noIndex={true} />
 
       <div className="max-w-3xl mx-auto px-4 py-6 space-y-6">
         {/* Header */}

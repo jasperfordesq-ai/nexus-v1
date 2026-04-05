@@ -144,6 +144,67 @@ function formatPrice(price: number | null, priceType: string, currency: string):
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
+// JSON-LD structured data
+// ─────────────────────────────────────────────────────────────────────────────
+
+const AVAILABILITY_MAP: Record<string, string> = {
+  active: 'https://schema.org/InStock',
+  sold: 'https://schema.org/SoldOut',
+  reserved: 'https://schema.org/LimitedAvailability',
+  expired: 'https://schema.org/Discontinued',
+};
+
+const CONDITION_MAP: Record<string, string> = {
+  new: 'https://schema.org/NewCondition',
+  like_new: 'https://schema.org/UsedCondition',
+  good: 'https://schema.org/UsedCondition',
+  fair: 'https://schema.org/UsedCondition',
+  poor: 'https://schema.org/DamagedCondition',
+};
+
+function buildProductSchema(
+  listing: ListingDetail,
+  tenantPath: (p: string) => string,
+  tenantName: string,
+): string {
+  const base = window.location.origin;
+  const canonicalUrl = base + tenantPath(`/marketplace/${listing.id}`);
+
+  const schema: Record<string, unknown> = {
+    '@context': 'https://schema.org',
+    '@type': 'Product',
+    'name': listing.title,
+    'description': listing.description ?? '',
+    'sku': String(listing.id),
+    'brand': {
+      '@type': 'Organization',
+      'name': tenantName,
+    },
+    'offers': {
+      '@type': 'Offer',
+      'url': canonicalUrl,
+      'priceCurrency': listing.currency || 'EUR',
+      'price': listing.price_type === 'free' ? '0' : String(listing.price ?? 0),
+      'availability': AVAILABILITY_MAP[listing.status] ?? 'https://schema.org/InStock',
+      'itemCondition': listing.condition
+        ? (CONDITION_MAP[listing.condition] ?? 'https://schema.org/UsedCondition')
+        : undefined,
+      'seller': {
+        '@type': 'Person',
+        'name': listing.seller.name,
+      },
+    },
+  };
+
+  // Image URLs
+  if (listing.images.length > 0) {
+    schema['image'] = listing.images.map((img) => img.url);
+  }
+
+  return JSON.stringify(schema);
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
 // Image Gallery
 // ─────────────────────────────────────────────────────────────────────────────
 
@@ -243,7 +304,7 @@ export function MarketplaceListingPage() {
   const { t } = useTranslation('marketplace');
   usePageTitle(t('page_title', 'Marketplace'));
   const { isAuthenticated } = useAuth();
-  const { tenantPath } = useTenant();
+  const { tenantPath, branding } = useTenant();
   const toast = useToast();
   const offerModal = useDisclosure();
 
@@ -292,6 +353,17 @@ export function MarketplaceListingPage() {
       document.title = `${listing.title} - ${t('page_title', 'Marketplace')}`;
     }
   }, [listing?.title]);
+
+  // JSON-LD structured data — inject via textContent (XSS-safe, avoids dangerouslySetInnerHTML)
+  // Must be before any early returns to satisfy Rules of Hooks
+  useEffect(() => {
+    if (!listing) return;
+    const script = document.createElement('script');
+    script.type = 'application/ld+json';
+    script.textContent = buildProductSchema(listing, tenantPath, branding.name);
+    document.head.appendChild(script);
+    return () => { script.remove(); };
+  }, [listing, tenantPath, branding.name]);
 
   // Load seller listings
   useEffect(() => {

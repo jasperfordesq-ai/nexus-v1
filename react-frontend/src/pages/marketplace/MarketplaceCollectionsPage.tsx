@@ -259,7 +259,7 @@ export function MarketplaceCollectionsPage() {
   if (selectedCollection) {
     return (
       <>
-        <PageMeta title={selectedCollection.name} />
+        <PageMeta title={selectedCollection.name} noIndex={true} />
         <div className="max-w-7xl mx-auto px-4 py-6 space-y-6">
           <div className="flex items-center gap-3">
             <Button
@@ -371,6 +371,7 @@ export function MarketplaceCollectionsPage() {
       <PageMeta
         title={t('collections.page_title', 'My Collections')}
         description={t('collections.meta_description', 'Manage your marketplace collections and saved searches.')}
+        noIndex={true}
       />
 
       <div className="max-w-7xl mx-auto px-4 py-6 space-y-6">
