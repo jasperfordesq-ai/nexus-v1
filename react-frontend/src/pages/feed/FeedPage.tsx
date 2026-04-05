@@ -101,7 +101,7 @@ export function FeedPage() {
 
   // Compose Hub
   const { isOpen: isCreateOpen, onOpen: onCreateOpen, onClose: onCreateClose } = useDisclosure();
-  const [composeDefaultTab, setComposeDefaultTab] = useState<ComposeTab>('listing');
+  const [composeDefaultTab, setComposeDefaultTab] = useState<ComposeTab>('post');
 
   // Report modal
   const { isOpen: isReportOpen, onOpen: onReportOpen, onClose: onReportClose } = useDisclosure();
