@@ -614,42 +614,56 @@ abstract class BaseApiController extends Controller
     }
 
     /**
-     * Manually resolve a Sanctum user from Bearer token on public routes.
+     * Resolve the authenticated user from a Bearer token on public routes.
      *
-     * Routes with withoutMiddleware('auth:sanctum') skip token processing,
-     * so Auth::user() is null even when a valid token is sent. This method
-     * manually authenticates the token so public endpoints can optionally
-     * return viewer-specific data (e.g. viewer_membership on groups).
+     * Public routes (outside auth:sanctum middleware) don't run the Authenticate
+     * middleware, so Auth::user() is null even when a valid token is sent. This
+     * method replicates the same hybrid auth logic as Authenticate middleware:
+     *   1. Try Sanctum guard (native Sanctum tokens)
+     *   2. Try Sanctum PersonalAccessToken lookup
+     *   3. Try legacy JWT validation (most users still have JWT tokens)
      *
      * @return int|null User ID or null if no valid token
      */
     protected function resolveSanctumUserOptionally(): ?int
     {
-        // Use the 'api' guard (sanctum driver) to resolve the user from the
-        // Bearer token. This works even when auth:sanctum middleware was removed
-        // via withoutMiddleware(), because the guard reads the token directly.
+        // 1. Try the Sanctum guard directly
         try {
             $user = Auth::guard('api')->user();
             if ($user) {
                 return (int) $user->id;
             }
         } catch (\Throwable $e) {
-            // Invalid token — ignore
+            // Invalid token — try fallbacks
         }
 
-        // Fallback: manual token lookup (e.g. if guard config differs)
         $bearer = request()->bearerToken();
         if (!$bearer) {
             return null;
         }
 
+        // 2. Try Sanctum PersonalAccessToken lookup
         try {
             $token = \Laravel\Sanctum\PersonalAccessToken::findToken($bearer);
             if ($token && $token->tokenable) {
                 return (int) $token->tokenable->id;
             }
         } catch (\Throwable $e) {
-            // Invalid token — ignore
+            // Not a Sanctum token — try legacy JWT
+        }
+
+        // 3. Try legacy JWT validation (same logic as Authenticate middleware)
+        try {
+            $tokenService = app(\App\Services\TokenService::class);
+            $payload = $tokenService->validateToken($bearer);
+            if ($payload) {
+                $userId = (int) ($payload['user_id'] ?? $payload['sub'] ?? 0);
+                if ($userId) {
+                    return $userId;
+                }
+            }
+        } catch (\Throwable $e) {
+            // Invalid JWT — ignore
         }
 
         return null;

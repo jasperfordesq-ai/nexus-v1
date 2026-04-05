@@ -36,15 +36,7 @@ class GroupsController extends BaseApiController
      */
     public function index(): JsonResponse
     {
-        $userId = null;
-        try {
-            $user = \Illuminate\Support\Facades\Auth::guard('api')->user();
-            if ($user) {
-                $userId = (int) $user->id;
-            }
-        } catch (\Throwable $e) {
-            // Invalid token — proceed as unauthenticated
-        }
+        $userId = $this->resolveSanctumUserOptionally();
 
         $filters = [
             'limit' => $this->queryInt('per_page', 20, 1, 100),
@@ -97,17 +89,10 @@ class GroupsController extends BaseApiController
      */
     public function show(int $id): JsonResponse
     {
-        // This route is outside the auth:sanctum middleware group, so we
-        // resolve the user directly from the Bearer token via the api guard.
-        $userId = null;
-        try {
-            $user = \Illuminate\Support\Facades\Auth::guard('api')->user();
-            if ($user) {
-                $userId = (int) $user->id;
-            }
-        } catch (\Throwable $e) {
-            // Invalid/expired token — proceed as unauthenticated
-        }
+        // This route is outside the auth:sanctum middleware group, so use the
+        // base controller helper that falls back to manual token lookup when
+        // the Sanctum guard fails for stateful-domain requests.
+        $userId = $this->resolveSanctumUserOptionally();
 
         $group = $this->groupService->getById($id, $userId);
 

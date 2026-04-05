@@ -612,19 +612,23 @@ export function GroupDetailPage() {
     try {
       setIsJoining(true);
       const memberCount = getMemberCount(group);
-      const response = await api.post(`/v2/groups/${group.id}/join`);
+      const response = await api.post<{ status?: string }>(`/v2/groups/${group.id}/join`);
       if (response.success) {
+        const joinStatus = response.data?.status ?? 'active';
         setGroup((prev) => prev ? {
           ...prev,
-          is_member: true,
-          viewer_membership: prev.viewer_membership ? { ...prev.viewer_membership, status: 'active' } : { status: 'active', role: 'member', is_admin: false },
-          member_count: memberCount + 1,
-          members_count: memberCount + 1,
+          is_member: joinStatus === 'active',
+          viewer_membership: { status: joinStatus as 'active' | 'pending' | 'none', role: 'member', is_admin: false },
+          member_count: joinStatus === 'active' ? memberCount + 1 : memberCount,
+          members_count: joinStatus === 'active' ? memberCount + 1 : memberCount,
         } : null);
-        toastRef.current.success(tRef.current('toast.joined'));
+        toastRef.current.success(
+          joinStatus === 'active'
+            ? tRef.current('toast.joined')
+            : tRef.current('toast.join_requested', 'Join request submitted')
+        );
       } else if (response.code === 'JOIN_FAILED' && response.error?.toLowerCase().includes('already')) {
         // 409 — already a member but UI was stale; refresh to sync state
-        await loadGroup();
         toastRef.current.success(tRef.current('toast.joined'));
       } else {
         toastRef.current.error(tRef.current('toast.join_failed'));
@@ -634,6 +638,21 @@ export function GroupDetailPage() {
       toastRef.current.error(tRef.current('toast.something_wrong'));
     } finally {
       setIsJoining(false);
+    }
+
+    // Always refresh from server to get authoritative membership state.
+    // This runs after isJoining is cleared so the button isn't stuck loading.
+    try {
+      const fresh = await api.get<GroupDetails>(`/v2/groups/${group.id}`);
+      if (fresh.success && fresh.data) {
+        setGroup(fresh.data);
+        // Reload feed if we just became a member
+        if (isMember(fresh.data) && !feedLoaded) {
+          loadGroupFeed();
+        }
+      }
+    } catch {
+      // Silent — optimistic state is already set
     }
   }
 
@@ -662,6 +681,16 @@ export function GroupDetailPage() {
     } finally {
       setIsJoining(false);
       setShowLeaveConfirm(false);
+    }
+
+    // Refresh from server to get authoritative state
+    try {
+      const fresh = await api.get<GroupDetails>(`/v2/groups/${group.id}`);
+      if (fresh.success && fresh.data) {
+        setGroup(fresh.data);
+      }
+    } catch {
+      // Silent — optimistic state is already set
     }
   }
 
