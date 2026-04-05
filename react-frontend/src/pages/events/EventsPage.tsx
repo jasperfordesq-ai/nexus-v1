@@ -31,6 +31,7 @@ import {
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
+import { SafeHtml } from '@/components/ui/SafeHtml';
 import { EntityMapView } from '@/components/location';
 import { EmptyState } from '@/components/feedback';
 import { useAuth, useToast, useTenant } from '@/contexts';
@@ -548,7 +549,7 @@ const EventCard = memo(function EventCard({ event }: EventCardProps) {
                   </Chip>
                 )}
               </div>
-              <p className="text-theme-muted text-sm line-clamp-2 mt-1">{event.description}</p>
+              <SafeHtml content={event.description} className="text-theme-muted text-sm line-clamp-2 mt-1" as="p" />
 
               <div className="flex flex-wrap items-center gap-4 mt-3 text-sm text-theme-subtle">
                 {event.status === 'cancelled' && (

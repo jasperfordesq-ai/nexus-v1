@@ -12,6 +12,7 @@
 import { useState, useEffect } from 'react';
 import { Chip } from '@heroui/react';
 import { Megaphone } from 'lucide-react';
+import { SafeHtml } from '@/components/ui/SafeHtml';
 import { api } from '@/lib/api';
 import { useTranslation } from 'react-i18next';
 
@@ -66,7 +67,7 @@ export function PinnedAnnouncementsBanner({ groupId, isMember }: PinnedAnnouncem
           <Megaphone className="w-4 h-4 text-primary flex-shrink-0 mt-0.5" />
           <div className="flex-1 min-w-0">
             <p className="text-sm font-medium text-theme-primary">{announcement.title}</p>
-            <p className="text-xs text-theme-subtle mt-0.5 line-clamp-2">{announcement.content}</p>
+            <SafeHtml content={announcement.content} className="text-xs text-theme-subtle mt-0.5 line-clamp-2" as="p" />
           </div>
           <Chip size="sm" variant="flat" color="primary" className="flex-shrink-0">{t('announcements.pinned', 'Pinned')}</Chip>
         </div>

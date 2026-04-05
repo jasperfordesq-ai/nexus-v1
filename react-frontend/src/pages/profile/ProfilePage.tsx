@@ -43,6 +43,7 @@ import {
 } from 'lucide-react';
 import DOMPurify from 'dompurify';
 import { GlassCard } from '@/components/ui';
+import { SafeHtml } from '@/components/ui/SafeHtml';
 import { LoadingScreen, EmptyState } from '@/components/feedback';
 import { LocationMapCard } from '@/components/location';
 import { ReviewModal } from '@/components/reviews';
@@ -875,7 +876,7 @@ export function ProfilePage() {
                             </Chip>
                           </div>
                           <h3 className="font-medium text-theme-primary mb-1">{listing.title}</h3>
-                          <p className="text-sm text-theme-subtle line-clamp-2">{listing.description}</p>
+                          <SafeHtml content={listing.description} className="text-sm text-theme-subtle line-clamp-2" as="p" />
                           <div className="flex items-center gap-2 mt-3 text-xs text-theme-subtle">
                             <Clock className="w-3 h-3" aria-hidden="true" />
                             {listing.hours_estimate ?? listing.estimated_hours ?? '\u2014'}h

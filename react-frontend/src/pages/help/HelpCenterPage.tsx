@@ -16,6 +16,7 @@ import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Accordion, AccordionItem, Button, Input, Spinner } from '@heroui/react';
+import { SafeHtml } from '@/components/ui/SafeHtml';
 import {
   HelpCircle,
   Search,
@@ -230,7 +231,7 @@ export function HelpCenterPage() {
                       aria-label={faq.question}
                       title={faq.question}
                     >
-                      {faq.answer}
+                      <SafeHtml content={faq.answer} className="text-sm text-theme-muted leading-relaxed" />
                     </AccordionItem>
                   ))}
                 </Accordion>

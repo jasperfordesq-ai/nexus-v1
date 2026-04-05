@@ -53,6 +53,7 @@ import {
 import { useTranslation } from 'react-i18next';
 import { Helmet } from 'react-helmet-async';
 import { GlassCard } from '@/components/ui';
+import { SafeHtml } from '@/components/ui/SafeHtml';
 import { EmptyState } from '@/components/feedback';
 import { useAuth, useToast, useTenant } from '@/contexts';
 import { usePageTitle } from '@/hooks';
@@ -472,9 +473,7 @@ export function IdeaDetailPage() {
             </div>
 
             {/* Description */}
-            <p className="text-[var(--color-text-secondary)] whitespace-pre-wrap">
-              {idea.description}
-            </p>
+            <SafeHtml content={idea.description} className="text-[var(--color-text-secondary)] whitespace-pre-wrap" as="div" />
 
             {/* Convert to Group Button */}
             {canConvertToGroup && (
@@ -635,9 +634,7 @@ export function IdeaDetailPage() {
                       </Button>
                     )}
                   </div>
-                  <p className="text-sm text-[var(--color-text-secondary)] whitespace-pre-wrap">
-                    {comment.body}
-                  </p>
+                  <SafeHtml content={comment.body} className="text-sm text-[var(--color-text-secondary)] whitespace-pre-wrap" as="div" />
                 </div>
               </div>
             </GlassCard>

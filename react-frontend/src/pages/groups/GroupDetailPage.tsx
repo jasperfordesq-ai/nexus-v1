@@ -57,6 +57,7 @@ import {
   ChevronDown,
 } from 'lucide-react';
 import { GlassCard } from '@/components/ui';
+import { SafeHtml } from '@/components/ui/SafeHtml';
 import { PageMeta } from '@/components/seo/PageMeta';
 import { Breadcrumbs } from '@/components/navigation';
 import { ComposeHub } from '@/components/compose';
@@ -1176,9 +1177,7 @@ export function GroupDetailPage() {
         )}
 
         {/* Description */}
-        <p className="text-theme-muted mb-6">
-          {group.description || t('detail.no_description')}
-        </p>
+        <SafeHtml content={group.description || t('detail.no_description')} className="text-theme-muted mb-6" as="div" />
 
         {/* Quick Stats */}
         <div className="flex flex-wrap gap-3 sm:gap-6">

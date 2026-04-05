@@ -70,6 +70,7 @@ import { VideoPlayer } from './VideoPlayer';
 import { ReactionPicker, ReactionSummary, type ReactionType } from '@/components/social';
 import { LinkPreviewCard } from '@/components/social/LinkPreviewCard';
 import { MentionRenderer } from '@/components/social/MentionRenderer';
+import { SafeHtml, containsHtml } from '@/components/ui/SafeHtml';
 
 /* ───────────────────────── Props ───────────────────────── */
 
@@ -270,6 +271,8 @@ export const CommentItem = React.memo(function CommentItem({ comment, currentUse
                 </Button>
               </div>
             </div>
+          ) : containsHtml(comment.content) ? (
+            <SafeHtml content={comment.content} className="text-xs text-[var(--text-secondary)] mt-0.5 whitespace-pre-wrap leading-relaxed" as="div" />
           ) : (
             <p className="text-xs text-[var(--text-secondary)] mt-0.5 whitespace-pre-wrap leading-relaxed"><MentionRenderer text={comment.content} showUserCard={false} /></p>
           )}

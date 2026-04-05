@@ -37,6 +37,7 @@ import {
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
+import { SafeHtml } from '@/components/ui/SafeHtml';
 import { EmptyState } from '@/components/feedback';
 import { useToast } from '@/contexts';
 import { api } from '@/lib/api';
@@ -232,9 +233,7 @@ export function GroupAnnouncementsTab({ groupId, isAdmin }: GroupAnnouncementsTa
                         </Chip>
                       )}
                     </div>
-                    <p className="text-sm text-theme-secondary whitespace-pre-wrap">
-                      {announcement.content}
-                    </p>
+                    <SafeHtml content={announcement.content} className="text-sm text-theme-secondary whitespace-pre-wrap" as="div" />
                     <div className="flex items-center gap-2 mt-2 text-xs text-theme-subtle">
                       <span>{announcement.author.name}</span>
                       <span className="text-theme-muted">·</span>

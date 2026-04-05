@@ -35,6 +35,7 @@ import {
   Star,
 } from 'lucide-react';
 import { GlassCard, ImagePlaceholder } from '@/components/ui';
+import { SafeHtml } from '@/components/ui/SafeHtml';
 import { Breadcrumbs } from '@/components/navigation';
 import { LoadingScreen, EmptyState } from '@/components/feedback';
 import { PageMeta } from '@/components/seo/PageMeta';
@@ -496,7 +497,7 @@ export function ListingDetailPage() {
         <div className="mb-8">
           <h2 className="text-lg font-semibold text-theme-primary mb-3">{t('detail_description')}</h2>
           <div className="prose prose-invert max-w-none">
-            <p className="text-theme-muted whitespace-pre-wrap wrap-break-word">{listing.description}</p>
+            <SafeHtml content={listing.description} className="text-theme-muted whitespace-pre-wrap wrap-break-word" as="div" />
           </div>
         </div>
 

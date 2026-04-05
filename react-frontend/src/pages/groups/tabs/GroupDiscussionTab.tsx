@@ -26,6 +26,7 @@ import {
   ChevronUp,
 } from 'lucide-react';
 import { GlassCard } from '@/components/ui';
+import { SafeHtml } from '@/components/ui/SafeHtml';
 import { EmptyState } from '@/components/feedback';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '@/contexts';
@@ -226,7 +227,7 @@ export function GroupDiscussionTab({
                           <>
                             {/* Original discussion content */}
                             <div className="p-3 rounded-lg bg-theme-elevated/50">
-                              <p className="text-sm text-theme-muted whitespace-pre-wrap">{expandedDiscussion.content}</p>
+                              <SafeHtml content={expandedDiscussion.content ?? ''} className="text-sm text-theme-muted whitespace-pre-wrap" as="div" />
                             </div>
 
                             {/* Messages */}

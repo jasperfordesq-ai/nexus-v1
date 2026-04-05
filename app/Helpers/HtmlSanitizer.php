@@ -192,7 +192,7 @@ class HtmlSanitizer
         }
 
         if (preg_match('/^(https?:\/\/|mailto:|tel:|\/|#)/', $lowerUrl) || !preg_match('/^[a-z]+:/i', $url)) {
-            return htmlspecialchars($url, ENT_QUOTES, 'UTF-8');
+            return $url;
         }
 
         return false;

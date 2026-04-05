@@ -36,6 +36,7 @@ import type { FeedComment } from '@/components/feed/types';
 import { AVAILABLE_REACTIONS } from '@/hooks/useSocialInteractions';
 import type { MentionUser } from '@/hooks/useSocialInteractions';
 import { MentionRenderer } from './MentionRenderer';
+import { SafeHtml, containsHtml } from '@/components/ui/SafeHtml';
 
 /* ─── Props ─────────────────────────────────────────────────── */
 
@@ -169,6 +170,8 @@ function CommentItemInner({
                 </Button>
               </div>
             </div>
+          ) : containsHtml(comment.content) ? (
+            <SafeHtml content={comment.content} className="text-xs text-[var(--text-secondary)] mt-0.5 whitespace-pre-wrap leading-relaxed" as="div" />
           ) : (
             <p className="text-xs text-[var(--text-secondary)] mt-0.5 whitespace-pre-wrap leading-relaxed">
               <MentionRenderer text={comment.content} showUserCard={false} />

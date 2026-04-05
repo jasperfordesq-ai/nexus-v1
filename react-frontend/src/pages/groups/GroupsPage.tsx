@@ -25,6 +25,7 @@ import {
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { GlassCard, GroupCardSkeleton } from '@/components/ui';
+import { SafeHtml } from '@/components/ui/SafeHtml';
 import { EmptyState } from '@/components/feedback';
 import { useAuth, useToast, useTenant } from '@/contexts';
 import { api } from '@/lib/api';
@@ -374,9 +375,7 @@ const GroupCard = memo(function GroupCard({ group, featured }: GroupCardProps) {
             )}
           </div>
 
-          <p className="text-theme-muted text-sm line-clamp-2 flex-1 mb-2">
-            {group.description || t('no_description')}
-          </p>
+          <SafeHtml content={group.description || t('no_description')} className="text-theme-muted text-sm line-clamp-2 flex-1 mb-2" as="p" />
 
           {/* Tags */}
           {group.tags && group.tags.length > 0 && (

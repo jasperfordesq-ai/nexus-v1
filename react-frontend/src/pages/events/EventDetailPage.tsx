@@ -55,6 +55,7 @@ import {
 } from 'lucide-react';
 import { Helmet } from 'react-helmet-async';
 import { GlassCard } from '@/components/ui';
+import { SafeHtml } from '@/components/ui/SafeHtml';
 import { PageMeta } from '@/components/seo/PageMeta';
 import { Breadcrumbs } from '@/components/navigation';
 import { LoadingScreen, EmptyState } from '@/components/feedback';
@@ -871,7 +872,7 @@ export function EventDetailPage() {
               <div className="mb-8">
                 <h2 className="text-lg font-semibold text-theme-primary mb-3">{t('detail.about')}</h2>
                 <div className="prose prose-invert max-w-none">
-                  <p className="text-theme-muted whitespace-pre-wrap">{event.description}</p>
+                  <SafeHtml content={event.description} className="text-theme-muted whitespace-pre-wrap" as="div" />
                 </div>
               </div>
 

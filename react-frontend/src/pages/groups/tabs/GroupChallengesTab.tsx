@@ -37,6 +37,7 @@ import {
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
+import { SafeHtml } from '@/components/ui/SafeHtml';
 import { EmptyState } from '@/components/feedback';
 import { useToast } from '@/contexts';
 import { api } from '@/lib/api';
@@ -256,9 +257,7 @@ export function GroupChallengesTab({ groupId, isAdmin }: GroupChallengesTabProps
                     : challenge.metric}
               </Chip>
             </div>
-            <p className="text-sm text-theme-secondary line-clamp-2">
-              {challenge.description}
-            </p>
+            <SafeHtml content={challenge.description} className="text-sm text-theme-secondary line-clamp-2" as="p" />
           </div>
 
           {/* XP reward badge */}

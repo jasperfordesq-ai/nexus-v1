@@ -34,6 +34,7 @@ import {
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
+import { SafeHtml } from '@/components/ui/SafeHtml';
 import { EmptyState } from '@/components/feedback';
 import { useToast } from '@/contexts';
 import { api } from '@/lib/api';
@@ -579,9 +580,7 @@ export function GroupQATab({ groupId, isAdmin, isMember = true }: GroupQATabProp
                   ) : expandedDetail ? (
                     <>
                       {/* Question body */}
-                      <div className="text-sm text-theme-secondary whitespace-pre-wrap">
-                        {expandedDetail.body}
-                      </div>
+                      <SafeHtml content={expandedDetail.body} className="text-sm text-theme-secondary whitespace-pre-wrap" as="div" />
 
                       {/* Answers */}
                       {expandedDetail.answers.length > 0 && (
@@ -612,9 +611,7 @@ export function GroupQATab({ groupId, isAdmin, isMember = true }: GroupQATabProp
 
                               {/* Answer content */}
                               <div className="flex-1 min-w-0">
-                                <div className="text-sm text-theme-secondary whitespace-pre-wrap">
-                                  {answer.body}
-                                </div>
+                                <SafeHtml content={answer.body} className="text-sm text-theme-secondary whitespace-pre-wrap" as="div" />
                                 <div className="flex items-center gap-2 mt-2 text-xs text-theme-subtle">
                                   <span>{answer.author.name}</span>
                                   <span aria-hidden="true">&#183;</span>

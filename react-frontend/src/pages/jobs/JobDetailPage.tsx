@@ -92,6 +92,7 @@ import {
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
+import { SafeHtml } from '@/components/ui/SafeHtml';
 import { PageMeta } from '@/components/seo/PageMeta';
 import { EmptyState } from '@/components/feedback';
 import { useAuth, useToast, useTenant } from '@/contexts';
@@ -1383,7 +1384,7 @@ export function JobDetailPage() {
           {/* Description */}
           <GlassCard className="p-6">
             <h2 className="text-lg font-semibold text-theme-primary mb-4">{t('detail.about')}</h2>
-            <div className="text-theme-secondary whitespace-pre-wrap">{vacancy.description}</div>
+            <SafeHtml content={vacancy.description} className="text-theme-secondary whitespace-pre-wrap" as="div" />
           </GlassCard>
 
           {/* Match Explanation Card — "Why You Match" */}

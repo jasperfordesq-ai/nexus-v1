@@ -44,6 +44,7 @@ import {
 import DOMPurify from 'dompurify';
 import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
+import { SafeHtml } from '@/components/ui/SafeHtml';
 import { Breadcrumbs } from '@/components/navigation';
 import { Helmet } from 'react-helmet-async';
 import { PageMeta } from '@/components/seo';
@@ -686,7 +687,7 @@ function CommentItem({
                 <span className="text-xs text-theme-subtle">{t('post.edited')}</span>
               )}
             </div>
-            <p className="text-sm text-theme-muted whitespace-pre-wrap">{comment.content}</p>
+            <SafeHtml content={comment.content} className="text-sm text-theme-muted whitespace-pre-wrap" as="div" />
           </div>
 
           {/* Reactions Display */}
