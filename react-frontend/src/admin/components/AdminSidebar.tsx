@@ -89,6 +89,8 @@ import {
   Webhook,
   Puzzle,
   Palette,
+  ShoppingBag,
+  Store,
   type LucideIcon,
 } from 'lucide-react';
 
@@ -233,6 +235,16 @@ function useAdminNav(): NavSection[] {
           { label: t('volunteering'), href: '/admin/volunteering', icon: Heart },
         ],
       },
+      ...(hasFeature('marketplace') ? [{
+        key: 'marketplace',
+        label: t('marketplace', { defaultValue: 'Marketplace' }),
+        icon: ShoppingBag as LucideIcon,
+        items: [
+          { label: t('marketplace_dashboard', { defaultValue: 'Dashboard' }), href: '/admin/marketplace', icon: ShoppingBag as LucideIcon },
+          { label: t('marketplace_moderation', { defaultValue: 'Moderation Queue' }), href: '/admin/marketplace/moderation', icon: ShieldCheck as LucideIcon },
+          { label: t('marketplace_sellers', { defaultValue: 'Seller Management' }), href: '/admin/marketplace/sellers', icon: Store as LucideIcon },
+        ],
+      }] as NavSection[] : []),
       {
         key: 'marketing',
         label: t('marketing'),

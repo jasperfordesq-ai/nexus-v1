@@ -786,6 +786,18 @@ Route::post('/v2/marketplace/seller/profile', [\App\Http\Controllers\Api\Marketp
 Route::get('/v2/marketplace/seller/dashboard', [\App\Http\Controllers\Api\MarketplaceSellerController::class, 'dashboard']);
 Route::get('/v2/marketplace/seller/onboard/status', [\App\Http\Controllers\Api\MarketplaceSellerController::class, 'onboardStatus']);
 
+// Marketplace Orders — Purchase lifecycle
+Route::post('/v2/marketplace/orders', [\App\Http\Controllers\Api\MarketplaceOrderController::class, 'store']);
+Route::get('/v2/marketplace/orders/purchases', [\App\Http\Controllers\Api\MarketplaceOrderController::class, 'purchases']);
+Route::get('/v2/marketplace/orders/sales', [\App\Http\Controllers\Api\MarketplaceOrderController::class, 'sales']);
+Route::get('/v2/marketplace/orders/{id}', [\App\Http\Controllers\Api\MarketplaceOrderController::class, 'show']);
+Route::put('/v2/marketplace/orders/{id}/ship', [\App\Http\Controllers\Api\MarketplaceOrderController::class, 'ship']);
+Route::put('/v2/marketplace/orders/{id}/confirm-delivery', [\App\Http\Controllers\Api\MarketplaceOrderController::class, 'confirmDelivery']);
+Route::put('/v2/marketplace/orders/{id}/cancel', [\App\Http\Controllers\Api\MarketplaceOrderController::class, 'cancel']);
+Route::post('/v2/marketplace/orders/{id}/rate', [\App\Http\Controllers\Api\MarketplaceOrderController::class, 'rate']);
+Route::get('/v2/marketplace/orders/{id}/ratings', [\App\Http\Controllers\Api\MarketplaceOrderController::class, 'orderRatings']);
+Route::post('/v2/marketplace/orders/{id}/dispute', [\App\Http\Controllers\Api\MarketplaceOrderController::class, 'dispute']);
+
 }); // End Route::middleware('auth:sanctum')
 
 // ============================================
@@ -1275,6 +1287,16 @@ Route::get('/v2/admin/jobs/{id}/applications', [\App\Http\Controllers\Api\AdminJ
 Route::post('/v2/admin/jobs/{id}/approve', [\App\Http\Controllers\Api\AdminJobsController::class, 'approve']);
 Route::post('/v2/admin/jobs/{id}/reject', [\App\Http\Controllers\Api\AdminJobsController::class, 'reject']);
 Route::post('/v2/admin/jobs/{id}/flag', [\App\Http\Controllers\Api\AdminJobsController::class, 'flag']);
+// Marketplace Admin
+Route::get('/v2/admin/marketplace/dashboard', [\App\Http\Controllers\Api\AdminMarketplaceController::class, 'dashboard']);
+Route::get('/v2/admin/marketplace/listings', [\App\Http\Controllers\Api\AdminMarketplaceController::class, 'listings']);
+Route::post('/v2/admin/marketplace/listings/{id}/approve', [\App\Http\Controllers\Api\AdminMarketplaceController::class, 'approveListing']);
+Route::post('/v2/admin/marketplace/listings/{id}/reject', [\App\Http\Controllers\Api\AdminMarketplaceController::class, 'rejectListing']);
+Route::delete('/v2/admin/marketplace/listings/{id}', [\App\Http\Controllers\Api\AdminMarketplaceController::class, 'destroyListing']);
+Route::get('/v2/admin/marketplace/sellers', [\App\Http\Controllers\Api\AdminMarketplaceController::class, 'sellers']);
+Route::post('/v2/admin/marketplace/sellers/{id}/verify', [\App\Http\Controllers\Api\AdminMarketplaceController::class, 'verifySeller']);
+Route::post('/v2/admin/marketplace/sellers/{id}/suspend', [\App\Http\Controllers\Api\AdminMarketplaceController::class, 'suspendSeller']);
+
 Route::get('/v2/admin/ideation', [\App\Http\Controllers\Api\AdminIdeationController::class, 'index']);
 Route::get('/v2/admin/ideation/{id}', [\App\Http\Controllers\Api\AdminIdeationController::class, 'show']);
 Route::delete('/v2/admin/ideation/{id}', [\App\Http\Controllers\Api\AdminIdeationController::class, 'destroy']);

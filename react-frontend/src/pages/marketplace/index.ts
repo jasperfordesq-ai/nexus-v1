@@ -6,6 +6,9 @@
 export { MarketplacePage } from './MarketplacePage';
 export { MarketplaceListingPage } from './MarketplaceListingPage';
 export { CreateMarketplaceListingPage } from './CreateMarketplaceListingPage';
+export { EditMarketplaceListingPage } from './EditMarketplaceListingPage';
+export { MyListingsPage } from './MyListingsPage';
+export { MyOffersPage } from './MyOffersPage';
 export { MarketplaceSearchPage } from './MarketplaceSearchPage';
 export { SellerProfilePage } from './SellerProfilePage';
 export { MarketplaceCategoryPage } from './MarketplaceCategoryPage';

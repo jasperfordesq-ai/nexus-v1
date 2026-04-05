@@ -1,0 +1,285 @@
+<?php
+// Copyright © 2024–2026 Jasper Ford
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Author: Jasper Ford
+// See NOTICE file for attribution and acknowledgements.
+
+namespace App\Http\Controllers\Api;
+
+use App\Core\TenantContext;
+use App\Models\MarketplaceOrder;
+use App\Services\MarketplaceOrderService;
+use App\Services\MarketplaceRatingService;
+use Illuminate\Http\JsonResponse;
+
+/**
+ * MarketplaceOrderController — Order lifecycle, ratings, and disputes.
+ */
+class MarketplaceOrderController extends BaseApiController
+{
+    protected bool $isV2Api = true;
+
+    private function ensureFeature(): void
+    {
+        if (!TenantContext::hasFeature('marketplace')) {
+            abort(403, 'Marketplace feature is not enabled for this tenant.');
+        }
+    }
+
+    // -----------------------------------------------------------------
+    //  Orders
+    // -----------------------------------------------------------------
+
+    /**
+     * POST /v2/marketplace/orders — Create order (buy now or from accepted offer).
+     */
+    public function store(): JsonResponse
+    {
+        $this->ensureFeature();
+        $userId = $this->requireAuth();
+        $this->rateLimit('marketplace_order_create', 10, 60);
+
+        $data = request()->validate([
+            'listing_id' => 'required|integer|exists:marketplace_listings,id',
+            'offer_id' => 'nullable|integer|exists:marketplace_offers,id',
+            'quantity' => 'nullable|integer|min:1',
+            'shipping_method' => 'nullable|string|max:100',
+            'delivery_address' => 'nullable|array',
+            'delivery_notes' => 'nullable|string|max:500',
+        ]);
+
+        try {
+            if (!empty($data['offer_id'])) {
+                $offer = \App\Models\MarketplaceOffer::findOrFail($data['offer_id']);
+                if ($offer->buyer_id !== $userId) {
+                    return $this->respondWithError('FORBIDDEN', 'You can only create orders from your own accepted offers.', null, 403);
+                }
+                $order = MarketplaceOrderService::createFromOffer($offer);
+            } else {
+                $order = MarketplaceOrderService::createDirectPurchase($userId, $data['listing_id'], $data);
+            }
+
+            return $this->respondWithData(MarketplaceOrderService::formatOrder($order), null, 201);
+        } catch (\InvalidArgumentException $e) {
+            return $this->respondWithError('VALIDATION_ERROR', $e->getMessage(), null, 422);
+        }
+    }
+
+    /**
+     * GET /v2/marketplace/orders/{id} — Order detail.
+     */
+    public function show(int $id): JsonResponse
+    {
+        $this->ensureFeature();
+        $userId = $this->requireAuth();
+        $this->rateLimit('marketplace_order_read', 30, 60);
+
+        $order = MarketplaceOrderService::getById($id);
+        if (!$order) {
+            return $this->respondWithError('NOT_FOUND', 'Order not found.', null, 404);
+        }
+
+        if ($order->buyer_id !== $userId && $order->seller_id !== $userId) {
+            return $this->respondWithError('FORBIDDEN', 'You do not have access to this order.', null, 403);
+        }
+
+        return $this->respondWithData(MarketplaceOrderService::formatOrder($order));
+    }
+
+    /**
+     * GET /v2/marketplace/orders/purchases — Buyer's purchase history.
+     */
+    public function purchases(): JsonResponse
+    {
+        $this->ensureFeature();
+        $userId = $this->requireAuth();
+        $this->rateLimit('marketplace_order_read', 30, 60);
+
+        $result = MarketplaceOrderService::getBuyerOrders(
+            $userId,
+            $this->query('status'),
+            $this->queryInt('limit', 20, 1, 100),
+            $this->query('cursor')
+        );
+
+        return $this->respondWithCollection(
+            $result['items'],
+            $result['cursor'],
+            $this->queryInt('limit', 20),
+            $result['has_more']
+        );
+    }
+
+    /**
+     * GET /v2/marketplace/orders/sales — Seller's sales history.
+     */
+    public function sales(): JsonResponse
+    {
+        $this->ensureFeature();
+        $userId = $this->requireAuth();
+        $this->rateLimit('marketplace_order_read', 30, 60);
+
+        $result = MarketplaceOrderService::getSellerOrders(
+            $userId,
+            $this->query('status'),
+            $this->queryInt('limit', 20, 1, 100),
+            $this->query('cursor')
+        );
+
+        return $this->respondWithCollection(
+            $result['items'],
+            $result['cursor'],
+            $this->queryInt('limit', 20),
+            $result['has_more']
+        );
+    }
+
+    /**
+     * PUT /v2/marketplace/orders/{id}/ship — Mark order as shipped.
+     */
+    public function ship(int $id): JsonResponse
+    {
+        $this->ensureFeature();
+        $userId = $this->requireAuth();
+        $this->rateLimit('marketplace_order_update', 15, 60);
+
+        $order = MarketplaceOrder::findOrFail($id);
+        if ($order->seller_id !== $userId) {
+            return $this->respondWithError('FORBIDDEN', 'Only the seller can mark an order as shipped.', null, 403);
+        }
+
+        $data = request()->validate([
+            'tracking_number' => 'nullable|string|max:255',
+            'tracking_url' => 'nullable|string|max:500|url',
+            'shipping_method' => 'nullable|string|max:100',
+        ]);
+
+        try {
+            $order = MarketplaceOrderService::markShipped($order, $data);
+            return $this->respondWithData(MarketplaceOrderService::formatOrder($order));
+        } catch (\InvalidArgumentException $e) {
+            return $this->respondWithError('VALIDATION_ERROR', $e->getMessage(), null, 422);
+        }
+    }
+
+    /**
+     * PUT /v2/marketplace/orders/{id}/confirm-delivery — Buyer confirms receipt.
+     */
+    public function confirmDelivery(int $id): JsonResponse
+    {
+        $this->ensureFeature();
+        $userId = $this->requireAuth();
+        $this->rateLimit('marketplace_order_update', 15, 60);
+
+        $order = MarketplaceOrder::findOrFail($id);
+        if ($order->buyer_id !== $userId) {
+            return $this->respondWithError('FORBIDDEN', 'Only the buyer can confirm delivery.', null, 403);
+        }
+
+        try {
+            $order = MarketplaceOrderService::confirmDelivery($order);
+            return $this->respondWithData(MarketplaceOrderService::formatOrder($order));
+        } catch (\InvalidArgumentException $e) {
+            return $this->respondWithError('VALIDATION_ERROR', $e->getMessage(), null, 422);
+        }
+    }
+
+    /**
+     * PUT /v2/marketplace/orders/{id}/cancel — Cancel order.
+     */
+    public function cancel(int $id): JsonResponse
+    {
+        $this->ensureFeature();
+        $userId = $this->requireAuth();
+        $this->rateLimit('marketplace_order_update', 15, 60);
+
+        $order = MarketplaceOrder::findOrFail($id);
+        if ($order->buyer_id !== $userId && $order->seller_id !== $userId) {
+            return $this->respondWithError('FORBIDDEN', 'You do not have access to this order.', null, 403);
+        }
+
+        $data = request()->validate([
+            'reason' => 'required|string|max:500',
+        ]);
+
+        try {
+            $order = MarketplaceOrderService::cancel($order, $data['reason']);
+            return $this->respondWithData(MarketplaceOrderService::formatOrder($order));
+        } catch (\InvalidArgumentException $e) {
+            return $this->respondWithError('VALIDATION_ERROR', $e->getMessage(), null, 422);
+        }
+    }
+
+    // -----------------------------------------------------------------
+    //  Ratings
+    // -----------------------------------------------------------------
+
+    /**
+     * POST /v2/marketplace/orders/{id}/rate — Rate a completed order.
+     */
+    public function rate(int $id): JsonResponse
+    {
+        $this->ensureFeature();
+        $userId = $this->requireAuth();
+        $this->rateLimit('marketplace_rate', 10, 60);
+
+        $data = request()->validate([
+            'rating' => 'required|integer|min:1|max:5',
+            'comment' => 'nullable|string|max:1000',
+            'is_anonymous' => 'nullable|boolean',
+        ]);
+
+        $order = MarketplaceOrder::findOrFail($id);
+        $role = $order->buyer_id === $userId ? 'buyer' : ($order->seller_id === $userId ? 'seller' : null);
+
+        if (!$role) {
+            return $this->respondWithError('FORBIDDEN', 'You are not a participant in this order.', null, 403);
+        }
+
+        try {
+            $rating = MarketplaceRatingService::rateOrder($id, $userId, $role, $data);
+            return $this->respondWithData($rating->toArray(), null, 201);
+        } catch (\InvalidArgumentException $e) {
+            return $this->respondWithError('VALIDATION_ERROR', $e->getMessage(), null, 422);
+        }
+    }
+
+    /**
+     * GET /v2/marketplace/orders/{id}/ratings — Get ratings for an order.
+     */
+    public function orderRatings(int $id): JsonResponse
+    {
+        $this->ensureFeature();
+        $this->rateLimit('marketplace_rate', 30, 60);
+
+        return $this->respondWithData(MarketplaceRatingService::getOrderRatings($id));
+    }
+
+    // -----------------------------------------------------------------
+    //  Disputes
+    // -----------------------------------------------------------------
+
+    /**
+     * POST /v2/marketplace/orders/{id}/dispute — Open a dispute.
+     */
+    public function dispute(int $id): JsonResponse
+    {
+        $this->ensureFeature();
+        $userId = $this->requireAuth();
+        $this->rateLimit('marketplace_dispute', 5, 60);
+
+        $data = request()->validate([
+            'reason' => 'required|string|in:not_received,not_as_described,damaged,wrong_item,other',
+            'description' => 'required|string|max:2000',
+            'evidence_urls' => 'nullable|array|max:10',
+            'evidence_urls.*' => 'string|max:500',
+        ]);
+
+        try {
+            $dispute = MarketplaceRatingService::openDispute($id, $userId, $data);
+            return $this->respondWithData($dispute->toArray(), null, 201);
+        } catch (\InvalidArgumentException $e) {
+            return $this->respondWithError('VALIDATION_ERROR', $e->getMessage(), null, 422);
+        }
+    }
+}

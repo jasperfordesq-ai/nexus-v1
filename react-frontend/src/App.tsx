@@ -196,6 +196,9 @@ const CreateMarketplaceListingPage = lazyWithRetry(() => import('./pages/marketp
 const MarketplaceSearchPage = lazyWithRetry(() => import('./pages/marketplace/MarketplaceSearchPage'));
 const SellerProfilePage = lazyWithRetry(() => import('./pages/marketplace/SellerProfilePage'));
 const MarketplaceCategoryPage = lazyWithRetry(() => import('./pages/marketplace/MarketplaceCategoryPage'));
+const EditMarketplaceListingPage = lazyWithRetry(() => import('./pages/marketplace/EditMarketplaceListingPage'));
+const MyListingsPage = lazyWithRetry(() => import('./pages/marketplace/MyListingsPage'));
+const MyOffersPage = lazyWithRetry(() => import('./pages/marketplace/MyOffersPage'));
 
 // Static Pages
 const DevelopmentStatusPage = lazyWithRetry(() => import('@/pages/public/DevelopmentStatusPage'));
@@ -405,6 +408,27 @@ function AppRoutes() {
           <FeatureGate feature="marketplace" redirect="/">
             <FeatureErrorBoundary featureName="Marketplace">
               <MarketplaceCategoryPage />
+            </FeatureErrorBoundary>
+          </FeatureGate>
+        } />
+        <Route path="marketplace/my-listings" element={
+          <FeatureGate feature="marketplace" redirect="/">
+            <FeatureErrorBoundary featureName="Marketplace">
+              <MyListingsPage />
+            </FeatureErrorBoundary>
+          </FeatureGate>
+        } />
+        <Route path="marketplace/my-offers" element={
+          <FeatureGate feature="marketplace" redirect="/">
+            <FeatureErrorBoundary featureName="Marketplace">
+              <MyOffersPage />
+            </FeatureErrorBoundary>
+          </FeatureGate>
+        } />
+        <Route path="marketplace/:id/edit" element={
+          <FeatureGate feature="marketplace" redirect="/">
+            <FeatureErrorBoundary featureName="Marketplace">
+              <EditMarketplaceListingPage />
             </FeatureErrorBoundary>
           </FeatureGate>
         } />

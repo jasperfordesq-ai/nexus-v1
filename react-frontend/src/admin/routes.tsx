@@ -137,6 +137,11 @@ const ResourceCategoriesAdmin = lazy(() => import('./modules/resources/ResourceC
 const JobsAdmin = lazy(() => import('./modules/jobs/JobsAdmin'));
 const JobModerationQueue = lazy(() => import('./modules/jobs/JobModerationQueue'));
 
+// Marketplace module
+const MarketplaceAdmin = lazy(() => import('./modules/marketplace/MarketplaceAdmin'));
+const MarketplaceModerationPage = lazy(() => import('./modules/marketplace/MarketplaceModerationPage'));
+const MarketplaceSellerAdmin = lazy(() => import('./modules/marketplace/MarketplaceSellerAdmin'));
+
 // Ideation / Challenges module
 const IdeationAdmin = lazy(() => import('./modules/ideation/IdeationAdmin'));
 
@@ -499,6 +504,11 @@ export function AdminRoutes() {
       {/* ─── JOBS ─── */}
       <Route path="jobs" element={<Lazy><JobsAdmin /></Lazy>} />
       <Route path="jobs/moderation" element={<Lazy><JobModerationQueue /></Lazy>} />
+
+      {/* ─── MARKETPLACE ─── */}
+      <Route path="marketplace" element={<Lazy><MarketplaceAdmin /></Lazy>} />
+      <Route path="marketplace/moderation" element={<Lazy><MarketplaceModerationPage /></Lazy>} />
+      <Route path="marketplace/sellers" element={<Lazy><MarketplaceSellerAdmin /></Lazy>} />
 
       {/* ─── IDEATION / CHALLENGES ─── */}
       <Route path="ideation" element={<Lazy><IdeationAdmin /></Lazy>} />
