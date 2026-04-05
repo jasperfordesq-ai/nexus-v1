@@ -2052,4 +2052,178 @@ class AdminConfigController extends BaseApiController
 
         return $this->respondWithData(['success' => true]);
     }
+
+    // =========================================================================
+    // Translation Configuration (INT9)
+    // =========================================================================
+
+    /** GET /api/v2/admin/config/translation */
+    public function getTranslationConfig(): JsonResponse
+    {
+        $this->requireAdmin();
+
+        $all = \App\Services\TranslationConfigurationService::getAll();
+
+        return $this->respondWithData([
+            'config' => $all,
+            'defaults' => \App\Services\TranslationConfigurationService::DEFAULTS,
+        ]);
+    }
+
+    /** PUT /api/v2/admin/config/translation */
+    public function updateTranslationConfig(): JsonResponse
+    {
+        $this->requireAdmin();
+        $tenantId = $this->getTenantId();
+
+        $key = $this->input('key');
+        $value = $this->input('value');
+
+        if (!$key || !is_string($key)) {
+            return $this->respondWithError('VALIDATION_ERROR', 'Configuration key is required', 'key', 422);
+        }
+
+        if (!array_key_exists($key, \App\Services\TranslationConfigurationService::DEFAULTS)) {
+            return $this->respondWithError('VALIDATION_ERROR', "Unknown configuration key: {$key}", 'key', 422);
+        }
+
+        if ($value === null) {
+            return $this->respondWithError('VALIDATION_ERROR', 'Value is required', 'value', 422);
+        }
+
+        $defaultValue = \App\Services\TranslationConfigurationService::DEFAULTS[$key];
+        if (is_bool($defaultValue)) {
+            $value = filter_var($value, FILTER_VALIDATE_BOOLEAN);
+        } elseif (is_int($defaultValue)) {
+            $value = max(1, min(1000, (int) $value));
+        }
+
+        \App\Services\TranslationConfigurationService::set($key, $value);
+        $this->redisCache->delete('tenant_bootstrap', $tenantId);
+
+        return $this->respondWithData(['key' => $key, 'value' => $value]);
+    }
+
+    /** PUT /api/v2/admin/config/translation/bulk */
+    public function updateTranslationConfigBulk(): JsonResponse
+    {
+        $this->requireAdmin();
+        $tenantId = $this->getTenantId();
+
+        $settings = $this->input('settings');
+        if (!is_array($settings) || empty($settings)) {
+            return $this->respondWithError('VALIDATION_ERROR', 'Settings array is required', 'settings', 422);
+        }
+
+        $updated = [];
+        foreach ($settings as $key => $value) {
+            if (!is_string($key) || !array_key_exists($key, \App\Services\TranslationConfigurationService::DEFAULTS)) {
+                continue;
+            }
+
+            $defaultValue = \App\Services\TranslationConfigurationService::DEFAULTS[$key];
+            if (is_bool($defaultValue)) {
+                $value = filter_var($value, FILTER_VALIDATE_BOOLEAN);
+            } elseif (is_int($defaultValue)) {
+                $value = max(1, min(1000, (int) $value));
+            }
+
+            \App\Services\TranslationConfigurationService::set($key, $value);
+            $updated[$key] = $value;
+        }
+
+        $this->redisCache->delete('tenant_bootstrap', $tenantId);
+
+        return $this->respondWithData(['updated' => $updated]);
+    }
+
+    // =========================================================================
+    // Translation Glossary CRUD (INT10)
+    // =========================================================================
+
+    /** GET /api/v2/admin/translation/glossary */
+    public function getGlossary(): JsonResponse
+    {
+        $this->requireAdmin();
+        $tenantId = $this->getTenantId();
+
+        if (!DB::getSchemaBuilder()->hasTable('translation_glossaries')) {
+            return $this->respondWithData(['items' => [], 'total' => 0]);
+        }
+
+        $language = $this->query('language');
+        $query = DB::table('translation_glossaries')->where('tenant_id', $tenantId);
+
+        if ($language) {
+            $query->where('target_language', $language);
+        }
+
+        $items = $query->orderBy('source_term')->get();
+
+        return $this->respondWithData(['items' => $items, 'total' => $items->count()]);
+    }
+
+    /** POST /api/v2/admin/translation/glossary */
+    public function createGlossaryEntry(): JsonResponse
+    {
+        $this->requireAdmin();
+        $tenantId = $this->getTenantId();
+
+        $sourceTerm = trim($this->input('source_term', ''));
+        $targetTerm = trim($this->input('target_term', ''));
+        $targetLanguage = trim($this->input('target_language', ''));
+
+        if (empty($sourceTerm)) {
+            return $this->respondWithError('VALIDATION_ERROR', 'Source term is required', 'source_term', 422);
+        }
+        if (empty($targetTerm)) {
+            return $this->respondWithError('VALIDATION_ERROR', 'Target term is required', 'target_term', 422);
+        }
+        if (empty($targetLanguage)) {
+            return $this->respondWithError('VALIDATION_ERROR', 'Target language is required', 'target_language', 422);
+        }
+        if (mb_strlen($sourceTerm) > 255 || mb_strlen($targetTerm) > 255) {
+            return $this->respondWithError('VALIDATION_ERROR', 'Terms must be 255 characters or fewer', null, 422);
+        }
+        if (!preg_match('/^[a-z]{2,3}(-[A-Za-z]{2,4})?$/', $targetLanguage)) {
+            return $this->respondWithError('VALIDATION_ERROR', 'target_language must be a valid ISO 639-1 code (e.g. en, fr, de)', 'target_language', 422);
+        }
+
+        try {
+            $id = DB::table('translation_glossaries')->insertGetId([
+                'tenant_id' => $tenantId,
+                'source_term' => $sourceTerm,
+                'target_term' => $targetTerm,
+                'target_language' => $targetLanguage,
+                'is_active' => true,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+        } catch (\Illuminate\Database\QueryException $e) {
+            if (str_contains($e->getMessage(), 'Duplicate entry') || str_contains($e->getMessage(), '1062')) {
+                return $this->respondWithError('DUPLICATE', "A glossary entry for \"{$sourceTerm}\" in {$targetLanguage} already exists", 'source_term', 409);
+            }
+            throw $e;
+        }
+
+        return $this->respondWithData(['id' => $id], null, 201);
+    }
+
+    /** DELETE /api/v2/admin/translation/glossary/{id} */
+    public function deleteGlossaryEntry(int $id): JsonResponse
+    {
+        $this->requireAdmin();
+        $tenantId = $this->getTenantId();
+
+        $deleted = DB::table('translation_glossaries')
+            ->where('id', $id)
+            ->where('tenant_id', $tenantId)
+            ->delete();
+
+        if (!$deleted) {
+            return $this->respondWithError('NOT_FOUND', 'Glossary entry not found', null, 404);
+        }
+
+        return $this->respondWithData(['deleted' => true]);
+    }
 }

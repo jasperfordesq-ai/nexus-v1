@@ -1081,6 +1081,7 @@ export interface TenantFeatures {
   search: boolean;
   ai_chat: boolean;
   marketplace: boolean;
+  message_translation: boolean;
 }
 
 export interface TenantModules {

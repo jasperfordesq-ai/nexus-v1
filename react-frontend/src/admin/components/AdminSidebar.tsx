@@ -91,6 +91,7 @@ import {
   Palette,
   ShoppingBag,
   Store,
+  Languages,
   type LucideIcon,
 } from 'lucide-react';
 
@@ -324,6 +325,7 @@ function useAdminNav(): NavSection[] {
           { label: t('onboarding_settings'), href: '/admin/onboarding-settings', icon: Sparkles },
           { label: t('tenant_features'), href: '/admin/tenant-features', icon: Cog },
           { label: 'Module Configuration', href: '/admin/module-configuration', icon: Puzzle, badge: 'BETA' },
+          { label: t('translation_config', { defaultValue: 'Translation' }), href: '/admin/translation-config', icon: Languages },
           { label: t('cron_jobs'), href: '/admin/cron-jobs', icon: Timer },
           { label: t('cron_logs'), href: '/admin/cron-jobs/logs', icon: FileText },
           { label: t('cron_settings'), href: '/admin/cron-jobs/settings', icon: Settings },

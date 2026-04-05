@@ -978,6 +978,7 @@ return [
     'message_voice_send_failed'            => 'Failed to send voice message',
     'message_target_language_required'     => 'Target language is required',
     'message_no_transcript'                => 'This message has no transcript to translate',
+    'message_no_translatable_content'     => 'This message has no content to translate',
     'message_translation_failed'           => 'Translation failed. Please try again.',
     'conversation_not_found'               => 'Conversation not found',
 

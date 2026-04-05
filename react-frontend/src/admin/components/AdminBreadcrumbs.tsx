@@ -151,6 +151,8 @@ const SEGMENT_LABEL_KEYS: Record<string, string> = {
   'registration-policy': 'breadcrumbs.registration_policy',
   'onboarding-settings': 'breadcrumbs.onboarding_settings',
   'tenant-features': 'breadcrumbs.tenant_features',
+  'module-configuration': 'breadcrumbs.module_configuration',
+  'translation-config': 'breadcrumbs.translation_config',
   'cron-jobs': 'breadcrumbs.cron_jobs',
   setup: 'breadcrumbs.setup',
   'activity-log': 'breadcrumbs.activity_log',

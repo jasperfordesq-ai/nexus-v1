@@ -126,5 +126,13 @@
   "voice.hide_transcript": "Ocultar transcripción",
   "voice.translate": "Traducir",
   "voice.translating": "Traduciendo...",
-  "voice.translation_failed": "Error en la traducción. Inténtalo de nuevo."
+  "voice.translation_failed": "Error en la traducción. Inténtalo de nuevo.",
+  "translate": {
+    "translate": "Traducir",
+    "view_original": "Ver original",
+    "show_translation": "Mostrar traducción",
+    "translating": "Traduciendo...",
+    "translation_failed": "Error en la traducción. Inténtelo de nuevo.",
+    "translated_label": "Traducido"
+  }
 }

@@ -126,5 +126,13 @@
     "translate": "Translate",
     "translating": "Translating...",
     "translation_failed": "Translation failed. Please try again."
+  },
+  "translate": {
+    "translate": "Vertalen",
+    "view_original": "Origineel bekijken",
+    "show_translation": "Vertaling tonen",
+    "translating": "Vertalen...",
+    "translation_failed": "Vertaling mislukt. Probeer het opnieuw.",
+    "translated_label": "Vertaald"
   }
 }

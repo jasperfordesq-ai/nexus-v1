@@ -53,6 +53,7 @@ const FEATURE_META: Record<string, { label: string; description: string }> = {
   search: { label: 'Search', description: 'Full-text search across listings, members, and content' },
   ai_chat: { label: 'AI Assistant', description: 'AI-powered chat assistant for members' },
   marketplace: { label: 'Marketplace', description: 'Commercial buy/sell marketplace (separate from timebanking listings)' },
+  message_translation: { label: 'Message Translation', description: 'AI-powered translation for direct messages and voice transcripts (GPT-4o-mini)' },
 };
 
 const MODULE_META: Record<string, { label: string; description: string }> = {

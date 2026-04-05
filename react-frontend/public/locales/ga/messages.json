@@ -126,5 +126,13 @@
   "voice.hide_transcript": "Folaigh an trascríbhinn",
   "voice.translate": "Aistrigh",
   "voice.translating": "Ag aistriú...",
-  "voice.translation_failed": "Theip ar an aistriúchán. Bain triail eile as."
+  "voice.translation_failed": "Theip ar an aistriúchán. Bain triail eile as.",
+  "translate": {
+    "translate": "Aistrigh",
+    "view_original": "Féach ar an mbunleagan",
+    "show_translation": "Taispeáin an t-aistriúchán",
+    "translating": "Ag aistriú...",
+    "translation_failed": "Theip ar an aistriúchán. Bain triail eile as.",
+    "translated_label": "Aistrithe"
+  }
 }

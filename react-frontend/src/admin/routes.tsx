@@ -12,7 +12,14 @@
 import { Suspense, lazy } from 'react';
 import { Route, Navigate } from 'react-router-dom';
 import { LoadingScreen } from '@/components/feedback';
+import { useTenant } from '@/contexts';
 import { SuperAdminRoute } from './SuperAdminRoute';
+
+/** Small wrapper so Navigate targets can use tenantPath() inside Route elements. */
+function TenantRedirect({ to }: { to: string }) {
+  const { tenantPath } = useTenant();
+  return <Navigate to={tenantPath(to)} replace />;
+}
 
 // Lazy-loaded admin pages
 const AdminDashboard = lazy(() => import('./modules/dashboard/AdminDashboard'));
@@ -136,6 +143,9 @@ const ResourceCategoriesAdmin = lazy(() => import('./modules/resources/ResourceC
 // Jobs module
 const JobsAdmin = lazy(() => import('./modules/jobs/JobsAdmin'));
 const JobModerationQueue = lazy(() => import('./modules/jobs/JobModerationQueue'));
+
+// Translation config module
+const TranslationConfig = lazy(() => import('./modules/config/TranslationConfig'));
 
 // Marketplace module
 const MarketplaceAdmin = lazy(() => import('./modules/marketplace/MarketplaceAdmin'));
@@ -367,7 +377,7 @@ export function AdminRoutes() {
       {/* ─── ADVANCED ─── */}
       <Route path="ai-settings" element={<Lazy><AiSettings /></Lazy>} />
       <Route path="email-settings" element={<Lazy><EmailSettings /></Lazy>} />
-      <Route path="feed-algorithm" element={<Navigate to="/admin/algorithm-settings" replace />} />
+      <Route path="feed-algorithm" element={<TenantRedirect to="/admin/algorithm-settings" />} />
       <Route path="algorithm-settings" element={<Lazy><AlgorithmSettings /></Lazy>} />
       <Route path="seo" element={<Lazy><SeoOverview /></Lazy>} />
       <Route path="seo/audit" element={<Lazy><SeoAudit /></Lazy>} />
@@ -455,6 +465,7 @@ export function AdminRoutes() {
       <Route path="onboarding-settings" element={<Lazy><OnboardingSettings /></Lazy>} />
       <Route path="tenant-features" element={<Lazy><TenantFeatures /></Lazy>} />
       <Route path="module-configuration" element={<Lazy><ModuleConfiguration /></Lazy>} />
+      <Route path="translation-config" element={<Lazy><TranslationConfig /></Lazy>} />
       <Route path="cron-jobs" element={<Lazy><CronJobs /></Lazy>} />
       <Route path="cron-jobs/logs" element={<Lazy><CronJobLogs /></Lazy>} />
       <Route path="cron-jobs/settings" element={<Lazy><CronJobSettings /></Lazy>} />
@@ -557,7 +568,7 @@ export function AdminRoutes() {
       <Route path="moderation/queue" element={<Lazy><ModerationQueuePage /></Lazy>} />
 
       {/* ─── REDIRECT: /admin/login → main login page ─── */}
-      <Route path="login" element={<Navigate to="/login" replace />} />
+      <Route path="login" element={<TenantRedirect to="/login" />} />
 
       {/* ─── 404 CATCH-ALL ─── */}
       <Route path="*" element={<Lazy><AdminNotFound /></Lazy>} />

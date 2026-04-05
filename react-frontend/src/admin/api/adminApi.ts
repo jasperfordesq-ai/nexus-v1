@@ -348,6 +348,35 @@ export const adminConfig = {
       '/v2/admin/config/jobs/bulk',
       { settings }
     ),
+
+  // Translation config (INT9)
+  getTranslationConfig: () =>
+    api.get<{ config: Record<string, boolean | number | string>; defaults: Record<string, boolean | number | string> }>(
+      '/v2/admin/config/translation'
+    ),
+
+  updateTranslationConfig: (key: string, value: boolean | number | string) =>
+    api.put<{ key: string; value: boolean | number | string }>(
+      '/v2/admin/config/translation',
+      { key, value }
+    ),
+
+  // Translation glossary (INT10)
+  getGlossary: (language?: string) =>
+    api.get<{ items: Array<{ id: number; source_term: string; target_term: string; target_language: string; is_active: boolean }>; total: number }>(
+      '/v2/admin/translation/glossary' + (language ? `?language=${language}` : '')
+    ),
+
+  createGlossaryEntry: (sourceTerm: string, targetTerm: string, targetLanguage: string) =>
+    api.post<{ id: number }>(
+      '/v2/admin/translation/glossary',
+      { source_term: sourceTerm, target_term: targetTerm, target_language: targetLanguage }
+    ),
+
+  deleteGlossaryEntry: (id: number) =>
+    api.delete<{ deleted: boolean }>(
+      `/v2/admin/translation/glossary/${id}`
+    ),
 };
 
 // ─────────────────────────────────────────────────────────────────────────────

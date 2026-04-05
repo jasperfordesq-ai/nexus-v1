@@ -3,19 +3,27 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import { useState, useEffect, useRef, memo, type ReactNode } from 'react';
+import { useState, useEffect, useRef, useCallback, memo, type ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
 import { Button, Avatar, Input } from '@heroui/react';
 import { SmilePlus, MoreVertical, Pencil, Trash2, Check, CheckCheck, FileText, Languages } from 'lucide-react';
 import { resolveAvatarUrl } from '@/lib/helpers';
 import { api } from '@/lib/api';
+import { useTenant } from '@/contexts/TenantContext';
 import type { Message } from '@/types/api';
 import { VoiceMessagePlayer } from './VoiceMessagePlayer';
 import { MessageLinkPreview } from './MessageLinkPreview';
 
 // Available reaction emojis
 const REACTION_EMOJIS = ['👍', '❤️', '😂', '😮', '😢', '🙏'];
+
+// Human-readable language names for translate button labels
+const LANG_NAMES: Record<string, string> = {
+  en: 'English', fr: 'French', de: 'German', es: 'Spanish',
+  it: 'Italian', pt: 'Portuguese', ga: 'Irish', nl: 'Dutch',
+  pl: 'Polish', ja: 'Japanese', ar: 'Arabic',
+};
 
 interface OtherUser {
   id: number;
@@ -40,6 +48,8 @@ export interface MessageBubbleProps {
   onEditingTextChange?: (text: string) => void;
   onSaveEdit?: () => void;
   onCancelEdit?: () => void;
+  /** Pre-translated text supplied by auto-translate (from ConversationPage) */
+  autoTranslatedText?: string | null;
 }
 
 export const MessageBubble = memo(function MessageBubble({
@@ -58,14 +68,28 @@ export const MessageBubble = memo(function MessageBubble({
   onEditingTextChange,
   onSaveEdit,
   onCancelEdit,
+  autoTranslatedText,
 }: MessageBubbleProps) {
   const { t, i18n } = useTranslation('messages');
+  const { hasFeature } = useTenant();
+  const translationEnabled = hasFeature('message_translation');
   const [showReactionPicker, setShowReactionPicker] = useState(false);
   const [showMessageMenu, setShowMessageMenu] = useState(false);
   const [translatedText, setTranslatedText] = useState<string | null>(null);
+  const [translationError, setTranslationError] = useState<string | null>(null);
   const [isTranslating, setIsTranslating] = useState(false);
+  const [showOriginal, setShowOriginal] = useState(false);
+  const translationCacheRef = useRef<Map<string, string>>(new Map());
   const reactionPickerRef = useRef<HTMLDivElement>(null);
   const messageMenuRef = useRef<HTMLDivElement>(null);
+
+  // When auto-translate provides a translation from the parent, populate internal state
+  useEffect(() => {
+    if (autoTranslatedText) {
+      setTranslatedText(autoTranslatedText);
+      setShowOriginal(false);
+    }
+  }, [autoTranslatedText]);
   const isVoiceMessage = message.is_voice || message.audio_url;
   const isDeleted = message.is_deleted;
 
@@ -90,22 +114,48 @@ export const MessageBubble = memo(function MessageBubble({
   const reactions = message.reactions || {};
   const hasReactions = Object.keys(reactions).length > 0;
 
-  // Translate a voice message transcript
-  async function handleTranslate() {
-    if (isTranslating || !message.transcript) return;
+  // Translation: determine if content is translatable and if already in user's language
+  const messageText = message.body || message.content || '';
+  const hasTranslatableContent = !!(message.transcript || messageText);
+  const userLangBase = (i18n.language || 'en').split('-')[0] ?? 'en';
+  const userLangName = LANG_NAMES[userLangBase] ?? userLangBase;
+  // For voice messages, we know the source language — skip translate if it matches user's UI language
+  const isAlreadyInUserLanguage = isVoiceMessage && message.transcript_language === userLangBase;
+
+  const handleTranslate = useCallback(async () => {
+    if (isTranslating || !hasTranslatableContent) return;
+
+    // If already translated, toggle between translated and original
+    if (translatedText) {
+      setShowOriginal(prev => !prev);
+      return;
+    }
+
+    // Check cache first (avoids redundant API calls)
+    const cacheKey = `${message.id}:${userLangBase}`;
+    const cached = translationCacheRef.current.get(cacheKey);
+    if (cached) {
+      setTranslatedText(cached);
+      setShowOriginal(false);
+      return;
+    }
+
     setIsTranslating(true);
+    setTranslationError(null);
     try {
-      const targetLanguage = i18n.language || 'en';
       const response = await api.post<{ translated_text: string }>(`/v2/messages/${message.id}/translate`, {
-        target_language: targetLanguage,
+        target_language: userLangBase,
       });
-      setTranslatedText(response.data?.translated_text ?? '');
+      const translated = response.data?.translated_text ?? '';
+      translationCacheRef.current.set(cacheKey, translated);
+      setTranslatedText(translated);
+      setShowOriginal(false);
     } catch {
-      setTranslatedText(t('voice.translation_failed'));
+      setTranslationError(t('translate.translation_failed'));
     } finally {
       setIsTranslating(false);
     }
-  }
+  }, [isTranslating, hasTranslatableContent, translatedText, message.id, userLangBase, t]);
 
   // Highlight search terms in message body
   function highlightText(text: string): ReactNode {
@@ -188,22 +238,38 @@ export const MessageBubble = memo(function MessageBubble({
                 transcriptLanguage={message.transcript_language}
               />
               {/* Translate button for voice messages with transcripts */}
-              {message.transcript && (
+              {translationEnabled && message.transcript && !isAlreadyInUserLanguage && (
                 <div className="mt-1">
-                  <Button
-                    size="sm"
-                    variant="light"
-                    className="h-6 min-w-0 px-2 text-xs opacity-60 hover:opacity-100 gap-1"
-                    onPress={handleTranslate}
-                    isDisabled={isTranslating}
-                    startContent={<Languages className="w-3 h-3" aria-hidden="true" />}
-                  >
-                    {isTranslating ? t('voice.translating') : t('voice.translate')}
-                  </Button>
-                  {translatedText && (
+                  <div className="flex items-center gap-1.5">
+                    <Button
+                      size="sm"
+                      variant="light"
+                      className={`h-6 min-w-0 px-2 text-xs gap-1 ${isOwn ? 'text-white/60 hover:text-white/100' : 'opacity-60 hover:opacity-100'} ${isTranslating ? 'animate-pulse' : ''}`}
+                      onPress={handleTranslate}
+                      isDisabled={isTranslating}
+                      startContent={<Languages className="w-3 h-3" aria-hidden="true" />}
+                      aria-label={translatedText ? t('translate.view_original') : `${t('translate.translate_to')} ${userLangName}`}
+                    >
+                      {isTranslating
+                        ? t('translate.translating')
+                        : translatedText
+                          ? (showOriginal ? t('translate.show_translation') : t('translate.view_original'))
+                          : `${t('translate.translate_to')} ${userLangName}`
+                      }
+                    </Button>
+                    {translatedText && !showOriginal && (
+                      <span className={`text-[10px] px-1.5 py-0.5 rounded-full ${isOwn ? 'bg-white/15 text-white/60' : 'bg-theme-muted/10 text-theme-muted'}`}>
+                        {t('translate.translated_label')}
+                      </span>
+                    )}
+                  </div>
+                  {translatedText && !showOriginal && (
                     <p className="text-xs opacity-70 mt-1 whitespace-pre-wrap leading-relaxed italic">
                       {translatedText}
                     </p>
+                  )}
+                  {translationError && !translatedText && (
+                    <p className="text-xs text-red-400 mt-1">{translationError}</p>
                   )}
                 </div>
               )}
@@ -211,11 +277,47 @@ export const MessageBubble = memo(function MessageBubble({
           ) : (
             <>
               {(message.body || message.content) && (
-                <p className="text-sm whitespace-pre-wrap">{highlightText(message.body || message.content || '')}</p>
+                <>
+                  {/* Show translated text or original */}
+                  {translatedText && !showOriginal ? (
+                    <p className="text-sm whitespace-pre-wrap">{translatedText}</p>
+                  ) : (
+                    <p className="text-sm whitespace-pre-wrap">{highlightText(message.body || message.content || '')}</p>
+                  )}
+                </>
               )}
               {/* Edited indicator */}
               {message.is_edited && (
                 <span className="text-[10px] opacity-40 ml-1">{t('message_edited_indicator')}</span>
+              )}
+              {/* Translate button for text messages */}
+              {translationEnabled && !isDeleted && (message.body || message.content) && (
+                <div className="mt-1 flex items-center gap-1.5">
+                  <Button
+                    size="sm"
+                    variant="light"
+                    className={`h-6 min-w-0 px-2 text-xs gap-1 ${isOwn ? 'text-white/60 hover:text-white/100' : 'opacity-60 hover:opacity-100'} ${isTranslating ? 'animate-pulse' : ''}`}
+                    onPress={handleTranslate}
+                    isDisabled={isTranslating}
+                    startContent={<Languages className="w-3 h-3" aria-hidden="true" />}
+                    aria-label={translatedText ? t('translate.view_original') : `${t('translate.translate_to')} ${userLangName}`}
+                  >
+                    {isTranslating
+                      ? t('translate.translating')
+                      : translatedText
+                        ? (showOriginal ? t('translate.show_translation') : t('translate.view_original'))
+                        : `${t('translate.translate_to')} ${userLangName}`
+                    }
+                  </Button>
+                  {translatedText && !showOriginal && (
+                    <span className={`text-[10px] px-1.5 py-0.5 rounded-full ${isOwn ? 'bg-white/15 text-white/60' : 'bg-theme-muted/10 text-theme-muted'}`}>
+                      {t('translate.translated_label')}
+                    </span>
+                  )}
+                  {translationError && !translatedText && (
+                    <span className="text-xs text-red-400">{translationError}</span>
+                  )}
+                </div>
               )}
               {/* Attachments */}
               {message.attachments && message.attachments.length > 0 && (

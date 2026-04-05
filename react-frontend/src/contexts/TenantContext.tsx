@@ -93,6 +93,7 @@ const defaultFeatures: TenantFeatures = {
   search: true,
   ai_chat: true,
   marketplace: false,
+  message_translation: true,
 };
 
 // Default modules (all enabled)
@@ -273,11 +274,19 @@ export function TenantProvider({ children, tenantSlug }: TenantProviderProps) {
   const storedSlug = useMemo(() => tokenManager.getTenantSlug(), []);
   const effectiveTenantSlug = tenantSlug || detected.slug || storedSlug;
 
-  // Path-based routing: only prepend slug in URLs when the tenant was detected from
-  // the URL path (source === 'path'). On custom domains (timebank.global) or subdomains
-  // (hour-timebank.project-nexus.ie), the domain IS the tenant identifier — slug must
-  // NOT appear in paths. The storedSlug fallback is still used for bootstrap API calls.
-  const usePathBasedSlug = detected.source === 'path' || (tenantSlug != null && tenantSlug !== '');
+  // Path-based routing: needed on shared hosts (localhost, app.project-nexus.ie) where
+  // multiple tenants share the same domain and the URL path prefix is the only way to
+  // identify the tenant. On custom domains (hour-timebank.ie) or tenant subdomains
+  // (hour-timebank.project-nexus.ie), the domain IS the identifier — no path prefix.
+  //
+  // CRITICAL: This must NOT depend on detected.source, because after a redirect strips
+  // the slug from the URL and the user refreshes, detected.source becomes null — causing
+  // tenantPath() to stop prepending the slug permanently. Instead, derive from hostname.
+  const isSharedHost = useMemo(() => {
+    const hostname = typeof window !== 'undefined' ? window.location.hostname : '';
+    return hostname === 'localhost' || hostname === '127.0.0.1' || hostname === 'app.project-nexus.ie';
+  }, []);
+  const usePathBasedSlug = isSharedHost && !!effectiveTenantSlug;
 
   /**
    * Fetch tenant bootstrap data

@@ -126,5 +126,13 @@
   "voice.hide_transcript": "Nascondi trascrizione",
   "voice.translate": "Traduci",
   "voice.translating": "Traduzione in corso...",
-  "voice.translation_failed": "Traduzione non riuscita. Riprova."
+  "voice.translation_failed": "Traduzione non riuscita. Riprova.",
+  "translate": {
+    "translate": "Traduci",
+    "view_original": "Mostra originale",
+    "show_translation": "Mostra traduzione",
+    "translating": "Traduzione in corso...",
+    "translation_failed": "Traduzione non riuscita. Riprova.",
+    "translated_label": "Tradotto"
+  }
 }

@@ -10,6 +10,7 @@ use Illuminate\Http\JsonResponse;
 use App\Services\MessageService;
 use App\Services\BrokerMessageVisibilityService;
 use App\Services\TranscriptionService;
+use App\Services\TranslationConfigurationService;
 use App\Core\AudioUploader;
 use App\Models\Message;
 use Illuminate\Support\Facades\DB;
@@ -570,16 +571,25 @@ class MessagesController extends BaseApiController
     /**
      * POST /api/v2/messages/{id}/translate
      *
-     * Translate a voice message transcript to the requested target language.
+     * Translate a message to the requested target language.
+     * Supports both voice message transcripts and text message bodies.
      * User must be the sender or receiver of the message.
      */
     public function translateTranscript(int $id): JsonResponse
     {
         $userId = $this->requireAuth();
+
+        if (!\App\Core\TenantContext::hasFeature('message_translation')) {
+            return $this->respondWithError('FEATURE_DISABLED', __('api.feature_disabled'), null, 403);
+        }
+
         $this->rateLimit('messages_translate', 20, 60);
 
-        $targetLanguage = request()->input('target_language', '');
+        $targetLanguage = trim(request()->input('target_language', ''));
         if (empty($targetLanguage)) {
+            return $this->respondWithError('VALIDATION_ERROR', __('api.message_target_language_required'), 'target_language', 400);
+        }
+        if (strlen($targetLanguage) > 10 || !preg_match('/^[a-z]{2,3}(-[A-Za-z]{2,4})?$/', $targetLanguage)) {
             return $this->respondWithError('VALIDATION_ERROR', __('api.message_target_language_required'), 'target_language', 400);
         }
 
@@ -599,13 +609,67 @@ class MessagesController extends BaseApiController
             return $this->respondWithError('NOT_FOUND', __('api.message_not_found'), null, 404);
         }
 
-        if (empty($message->transcript)) {
-            return $this->respondWithError('NO_TRANSCRIPT', __('api.message_no_transcript'), null, 422);
+        // Determine what to translate: transcript (voice messages) or body (text messages)
+        $sourceText = null;
+        $fromLanguage = 'auto';
+
+        if (!empty($message->transcript)) {
+            $sourceText = $message->transcript;
+            $fromLanguage = $message->transcript_language ?? 'auto';
+        } elseif (!empty($message->body)) {
+            $sourceText = $message->body;
+            $fromLanguage = 'auto';
         }
 
-        $fromLanguage = $message->transcript_language ?? 'en';
+        if (empty($sourceText)) {
+            return $this->respondWithError('NO_CONTENT', __('api.message_no_translatable_content'), null, 422);
+        }
 
-        $translatedText = TranscriptionService::translate($message->transcript, $fromLanguage, $targetLanguage);
+        // INT7: Fetch conversation context for better disambiguation
+        $conversationContext = [];
+        $translationConfig = TranslationConfigurationService::getAll();
+        if (!empty($translationConfig['translation.context_aware'])) {
+            $contextLimit = (int) ($translationConfig['translation.context_messages'] ?? 5);
+            $otherUserId = ($message->sender_id === $userId) ? $message->receiver_id : $message->sender_id;
+            $contextRows = DB::table('messages')
+                ->where('tenant_id', $tenantId)
+                ->where(function ($q) use ($userId, $otherUserId) {
+                    $q->where(function ($q2) use ($userId, $otherUserId) {
+                        $q2->where('sender_id', $userId)->where('receiver_id', $otherUserId);
+                    })->orWhere(function ($q2) use ($userId, $otherUserId) {
+                        $q2->where('sender_id', $otherUserId)->where('receiver_id', $userId);
+                    });
+                })
+                ->where('id', '<', $id)
+                ->where('is_deleted', false)
+                ->orderByDesc('id')
+                ->limit($contextLimit)
+                ->pluck('body')
+                ->reverse()
+                ->values()
+                ->filter(fn($b) => !empty($b))
+                ->toArray();
+            $conversationContext = $contextRows;
+        }
+
+        // INT10: Load glossary terms for the target language (only when enabled)
+        $glossary = [];
+        if (!empty($translationConfig['translation.glossary_enabled'])
+            && DB::getSchemaBuilder()->hasTable('translation_glossaries')
+        ) {
+            // Limit to 50 terms to keep the LLM prompt within reasonable token bounds
+            $glossaryRows = DB::table('translation_glossaries')
+                ->where('tenant_id', $tenantId)
+                ->where('target_language', $targetLanguage)
+                ->where('is_active', true)
+                ->limit(50)
+                ->get(['source_term', 'target_term']);
+            foreach ($glossaryRows as $row) {
+                $glossary[$row->source_term] = $row->target_term;
+            }
+        }
+
+        $translatedText = TranscriptionService::translate($sourceText, $fromLanguage, $targetLanguage, $conversationContext, $glossary);
 
         if ($translatedText === null) {
             return $this->respondWithError('TRANSLATION_FAILED', __('api.message_translation_failed'), null, 500);
@@ -613,6 +677,8 @@ class MessagesController extends BaseApiController
 
         return $this->respondWithData([
             'translated_text' => $translatedText,
+            'source_type'     => !empty($message->transcript) ? 'transcript' : 'body',
+            'context_used'    => !empty($conversationContext),
         ]);
     }
 

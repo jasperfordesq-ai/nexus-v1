@@ -126,5 +126,13 @@
   "voice.hide_transcript": "Masquer la transcription",
   "voice.translate": "Traduire",
   "voice.translating": "Traduction en cours...",
-  "voice.translation_failed": "Échec de la traduction. Veuillez réessayer."
+  "voice.translation_failed": "Échec de la traduction. Veuillez réessayer.",
+  "translate": {
+    "translate": "Traduire",
+    "view_original": "Voir l'original",
+    "show_translation": "Afficher la traduction",
+    "translating": "Traduction en cours...",
+    "translation_failed": "La traduction a échoué. Veuillez réessayer.",
+    "translated_label": "Traduit"
+  }
 }

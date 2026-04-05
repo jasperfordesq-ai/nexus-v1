@@ -17,8 +17,8 @@ import { useState, useEffect, useRef, useCallback, type ChangeEvent, type FormEv
 import { useTranslation } from 'react-i18next';
 import { useParams, Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { AnimatePresence } from 'framer-motion';
-import { Button, Avatar, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, Input } from '@heroui/react';
-import { ArrowLeft, Info, Loader2, MoreVertical, Trash2, Search, X, FileText, AlertTriangle } from 'lucide-react';
+import { Button, Avatar, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, Input, Tooltip } from '@heroui/react';
+import { ArrowLeft, Info, Loader2, MoreVertical, Trash2, Search, X, FileText, AlertTriangle, Languages } from 'lucide-react';
 import { useToast } from '@/contexts';
 import { GlassCard } from '@/components/ui';
 import { LoadingScreen } from '@/components/feedback';
@@ -66,7 +66,7 @@ interface PaginationState {
 }
 
 export function ConversationPage() {
-  const { t } = useTranslation('messages');
+  const { t, i18n } = useTranslation('messages');
   const [pageTitle, setPageTitle] = useState(t('title'));
   usePageTitle(pageTitle);
   const { id, userId } = useParams<{ id?: string; userId?: string }>();
@@ -75,7 +75,7 @@ export function ConversationPage() {
   const { user } = useAuth();
   const toast = useToast();
   const pusher = usePusherOptional();
-  const { hasFeature, tenantPath } = useTenant();
+  const { hasFeature, tenantPath, tenantSlug } = useTenant();
   const isDirectMessagingEnabled = hasFeature('direct_messaging');
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const messagesContainerRef = useRef<HTMLDivElement>(null);
@@ -147,6 +147,118 @@ export function ConversationPage() {
     under_monitoring: boolean;
     restriction_reason: string | null;
   } | null>(null);
+
+  // ── Translation hint banner (dismissed per-user, scoped to tenant) ──
+  const tenantScope = tenantSlug || 'default';
+  const TRANSLATION_HINT_KEY = `nexus_translation_hint_dismissed_${tenantScope}`;
+  const translationFeatureEnabled = hasFeature('message_translation');
+  const [translationHintDismissed, setTranslationHintDismissed] = useState(() =>
+    localStorage.getItem(TRANSLATION_HINT_KEY) === '1'
+  );
+  const dismissTranslationHint = useCallback(() => {
+    setTranslationHintDismissed(true);
+    localStorage.setItem(TRANSLATION_HINT_KEY, '1');
+  }, [TRANSLATION_HINT_KEY]);
+
+  // ── Auto-translate state (scoped to tenant) ──────────────────────────────
+  const STORAGE_KEY = `nexus_auto_translate_${tenantScope}`;
+
+  function getAutoTranslatePrefs(): Record<string, string> {
+    try { return JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}'); } catch { return {}; }
+  }
+
+  function isAutoTranslateEnabled(otherUserId: number): boolean {
+    return !!getAutoTranslatePrefs()[String(otherUserId)];
+  }
+
+  function toggleAutoTranslate(otherUserId: number, targetLang: string): boolean {
+    const prefs = getAutoTranslatePrefs();
+    if (prefs[String(otherUserId)]) {
+      delete prefs[String(otherUserId)];
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(prefs));
+      return false;
+    } else {
+      prefs[String(otherUserId)] = targetLang;
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(prefs));
+      return true;
+    }
+  }
+
+  const [autoTranslateOn, setAutoTranslateOn] = useState(false);
+  const [autoTranslations, setAutoTranslations] = useState<Map<number, string>>(new Map());
+  const autoTranslatingRef = useRef(false);
+  const translatedIdsRef = useRef<Set<number>>(new Set());
+
+  // Sync autoTranslateOn from localStorage when the other user changes
+  useEffect(() => {
+    if (conversation?.meta?.other_user?.id) {
+      setAutoTranslateOn(isAutoTranslateEnabled(conversation.meta.other_user.id));
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- only re-check when other_user changes
+  }, [conversation?.meta?.other_user?.id]);
+
+  // Auto-translate effect: translate untranslated messages from the other user
+  useEffect(() => {
+    if (!autoTranslateOn || !conversation?.messages?.length || autoTranslatingRef.current) return;
+    const otherUserId = conversation?.meta?.other_user?.id;
+    if (!otherUserId) return;
+    const targetLang = (i18n.language || 'en').split('-')[0] || 'en';
+
+    // Find messages from the other user that haven't been translated or queued yet
+    const untranslated = conversation.messages.filter(
+      (msg) => msg.sender_id === otherUserId
+        && !autoTranslations.has(msg.id)
+        && !translatedIdsRef.current.has(msg.id)
+        && (msg.body || msg.content)
+    );
+    if (untranslated.length === 0) return;
+
+    // Mark these as queued immediately to prevent duplicate API calls
+    for (const msg of untranslated) {
+      translatedIdsRef.current.add(msg.id);
+    }
+    autoTranslatingRef.current = true;
+
+    // Translate each message sequentially to avoid overwhelming the API
+    (async () => {
+      const newTranslations = new Map(autoTranslations);
+      for (const msg of untranslated) {
+        try {
+          const response = await api.post<{ translated_text: string }>(`/v2/messages/${msg.id}/translate`, {
+            target_language: targetLang,
+          });
+          const translated = response.data?.translated_text;
+          if (translated) {
+            newTranslations.set(msg.id, translated);
+          }
+        } catch {
+          // Remove from dedup set so retry is possible on next cycle
+          translatedIdsRef.current.delete(msg.id);
+        }
+      }
+      setAutoTranslations(newTranslations);
+      autoTranslatingRef.current = false;
+    })();
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- autoTranslateOn + messages length + language change trigger re-translation
+  }, [autoTranslateOn, conversation?.messages?.length, i18n.language]);
+
+  function handleAutoTranslateToggle() {
+    const otherUser = conversation?.meta?.other_user;
+    if (!otherUser) return;
+    const targetLang = (i18n.language || 'en').split('-')[0] || 'en';
+    const nowEnabled = toggleAutoTranslate(otherUser.id, targetLang);
+    setAutoTranslateOn(nowEnabled);
+
+    if (nowEnabled) {
+      toast.success(t('auto_translate.enabled_toast'));
+    } else {
+      toast.info(t('auto_translate.disabled_toast'));
+      // Clear auto-translations and dedup set when disabled
+      setAutoTranslations(new Map());
+      translatedIdsRef.current.clear();
+    }
+  }
+  // ── End auto-translate state ──────────────────────────────────────────────
 
   // Update page title when conversation loads
   useEffect(() => {
@@ -332,6 +444,11 @@ export function ConversationPage() {
   // Memoize loadConversation
   const loadConversation = useCallback(async () => {
     if (!targetId) return;
+
+    // Clear auto-translate state from previous conversation
+    setAutoTranslations(new Map());
+    translatedIdsRef.current.clear();
+    autoTranslatingRef.current = false;
 
     try {
       setIsLoading(true);
@@ -1267,6 +1384,25 @@ export function ConversationPage() {
               <Search className="w-4 h-4" />
             </Button>
 
+            {/* Auto-translate toggle */}
+            {translationFeatureEnabled && (
+              <Tooltip content={autoTranslateOn ? t('auto_translate.tooltip_on') : t('auto_translate.tooltip_off')}>
+                <Button
+                  isIconOnly
+                  variant="flat"
+                  size="sm"
+                  className={autoTranslateOn
+                    ? 'bg-indigo-500/20 text-indigo-500 ring-1 ring-indigo-500/30'
+                    : 'bg-theme-elevated text-theme-muted'
+                  }
+                  aria-label={autoTranslateOn ? t('auto_translate.tooltip_on') : t('auto_translate.tooltip_off')}
+                  onPress={handleAutoTranslateToggle}
+                >
+                  <Languages className="w-4 h-4" />
+                </Button>
+              </Tooltip>
+            )}
+
             <Link to={tenantPath(`/profile/${other_user.id}`)}>
               <Button
                 isIconOnly
@@ -1399,6 +1535,45 @@ export function ConversationPage() {
         </div>
       )}
 
+      {/* Translation feature hint — shown once, dismissible */}
+      {translationFeatureEnabled && !translationHintDismissed && (
+        <div className="flex items-start gap-3 p-3 bg-indigo-500/10 border border-indigo-500/20 rounded-lg" role="status">
+          <Languages className="w-5 h-5 text-indigo-500 flex-shrink-0 mt-0.5" aria-hidden="true" />
+          <div className="flex-1 text-sm text-indigo-700 dark:text-indigo-300">
+            <p className="font-medium">{t('translate_hint.title')}</p>
+            <p className="mt-0.5 opacity-80">{t('translate_hint.body')}</p>
+          </div>
+          <Button
+            isIconOnly
+            size="sm"
+            variant="light"
+            className="text-indigo-400 hover:text-indigo-600 dark:hover:text-indigo-200 flex-shrink-0 -mt-0.5"
+            onPress={dismissTranslationHint}
+            aria-label={t('translate_hint.dismiss')}
+          >
+            <X className="w-4 h-4" />
+          </Button>
+        </div>
+      )}
+
+      {/* Auto-translate active indicator */}
+      {translationFeatureEnabled && autoTranslateOn && (
+        <div className="flex items-center gap-2 px-3 py-2 bg-indigo-500/10 rounded-lg" role="status">
+          <Languages className="w-4 h-4 text-indigo-500 flex-shrink-0" aria-hidden="true" />
+          <p className="text-xs text-indigo-600 dark:text-indigo-300 flex-1">
+            {t('auto_translate.active_banner')}
+          </p>
+          <Button
+            size="sm"
+            variant="light"
+            className="h-6 min-w-0 px-2 text-xs text-indigo-500"
+            onPress={handleAutoTranslateToggle}
+          >
+            {t('auto_translate.turn_off')}
+          </Button>
+        </div>
+      )}
+
       {/* Listing Context Card */}
       {listing && (
         <GlassCard className="p-4">
@@ -1496,6 +1671,7 @@ export function ConversationPage() {
                   onEditingTextChange={setEditingText}
                   onSaveEdit={saveEdit}
                   onCancelEdit={cancelEditing}
+                  autoTranslatedText={autoTranslations.get(message.id) ?? null}
                 />
               ))}
             </AnimatePresence>

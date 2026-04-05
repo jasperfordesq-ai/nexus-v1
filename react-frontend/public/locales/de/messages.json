@@ -126,5 +126,13 @@
   "voice.hide_transcript": "Transkript ausblenden",
   "voice.translate": "Übersetzen",
   "voice.translating": "Wird übersetzt...",
-  "voice.translation_failed": "Übersetzung fehlgeschlagen. Bitte versuchen Sie es erneut."
+  "voice.translation_failed": "Übersetzung fehlgeschlagen. Bitte versuchen Sie es erneut.",
+  "translate": {
+    "translate": "Übersetzen",
+    "view_original": "Original anzeigen",
+    "show_translation": "Übersetzung anzeigen",
+    "translating": "Wird übersetzt...",
+    "translation_failed": "Übersetzung fehlgeschlagen. Bitte versuchen Sie es erneut.",
+    "translated_label": "Übersetzt"
+  }
 }

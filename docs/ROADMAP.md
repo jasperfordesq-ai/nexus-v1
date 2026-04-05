@@ -45,11 +45,16 @@ Features enabling a **global network of timebanks** communicating across languag
 
 | # | Item | Status | Priority | Effort | Notes |
 |---|------|--------|----------|--------|-------|
-| INT1 | Auto-translate typed messages | 📋 Planned | High | Small | OpenAI API already integrated. Add translate button on message bubbles. Receiver sees message in their preferred language with "View original" toggle. |
+| INT1 | Auto-translate typed messages | ✅ Done | — | — | Translate button on text message bubbles via `POST /v2/messages/{id}/translate`. Supports both voice transcripts and text bodies. "View original" / "Show translation" toggle. Uses GPT-4o-mini via `TranscriptionService::translate()`. Feature-gated per tenant (`message_translation`). |
 | INT2 | Voice message transcription + translation | ✅ Done | — | — | `TranscriptionService` (Whisper API + gpt-4o-mini translation). Transcripts stored on messages, collapsible display in VoiceMessagePlayer, translate button in MessageBubble. |
 | INT3 | Federated message translation | 📋 Planned | Medium | Medium | Federation messaging is text-only today. Add translation layer so cross-tenant messages auto-translate. Also add voice/attachment support to federation messages. |
 | INT4 | Additional UI languages | ✅ Done | — | — | Now 11 languages: en, ga, de, fr, it, pt, es + Dutch (nl), Polish (pl), Japanese (ja), Arabic (ar with RTL). All 33 namespace files per language. |
 | INT5 | Real-time voice-to-voice interpretation | 💡 Future | Low | Very Large | WebRTC live calling + streaming speech-to-text + real-time translation + text-to-speech. Stretch goal — depends on SOC4 (voice/video calling) existing first. |
+| INT6 | Server-side Redis translation cache | ✅ Done | — | — | SHA-256 hash of `text:from:to` as Redis key (24h TTL). `TranscriptionService::translate()` checks `Cache::get()` before OpenAI call. Bypassed when context/glossary are active (unique per-request). |
+| INT7 | Context-aware conversational translation | ✅ Done | — | — | When `translation.context_aware` is enabled, backend fetches preceding N messages and feeds them into the LLM prompt. Configurable via `translation.context_messages` (default 5). |
+| INT8 | Auto-translate entire conversation thread | ✅ Done | — | — | Languages icon toggle in conversation header. Stores preference in localStorage per conversation partner. Auto-translates all incoming messages on load. Gated behind `message_translation` feature. |
+| INT9 | Translation admin config per tenant | ✅ Done | — | — | Admin page at `/admin/translation-config`. `TranslationConfigurationService` with 7 settings (engine, context-aware, rate limits, glossary toggle). `tenant_settings` storage with Redis cache. |
+| INT10 | Custom glossary / brand dictionary | ✅ Done | — | — | `translation_glossaries` table (tenant-scoped). Admin CRUD at `/admin/translation-config`. Terms injected into LLM system prompt. Up to 50 terms per translation request. |
 
 ### Federation Enhancements
 
