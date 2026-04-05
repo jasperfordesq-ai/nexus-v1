@@ -445,19 +445,29 @@ class TenantContext
      */
     public static function getFrontendUrl(): string
     {
-        // 1. Explicit FRONTEND_URL env var (React app URL — highest priority)
+        // 1. Tenant custom domain (highest priority — e.g. pairc-goodman.com)
+        try {
+            $tenant = self::get();
+            if (!empty($tenant['domain']) && ($tenant['id'] ?? 0) > 1) {
+                return 'https://' . rtrim($tenant['domain'], '/');
+            }
+        } catch (\Throwable $e) {
+            // Tenant not resolved yet — fall through
+        }
+
+        // 2. Explicit FRONTEND_URL env var (React app URL)
         $frontendUrl = Env::get('FRONTEND_URL');
         if ($frontendUrl) {
             return rtrim($frontendUrl, '/');
         }
 
-        // 2. Tenant domain (may be legacy PHP domain — use as fallback)
+        // 3. Tenant setting (may be legacy PHP domain — use as fallback)
         $siteUrl = self::getSetting('site_url');
         if ($siteUrl) {
             return rtrim($siteUrl, '/');
         }
 
-        // 3. Fallback to APP_URL (may be API domain — not ideal)
+        // 4. Fallback to APP_URL (may be API domain — not ideal)
         $appUrl = Env::get('APP_URL');
         if ($appUrl) {
             return rtrim($appUrl, '/');
