@@ -74,7 +74,7 @@ export function StripeOnboardingPage() {
   const [isStarting, setIsStarting] = useState(false);
 
   // Did Stripe just redirect back?
-  const isReturn = searchParams.get('return') === '1' || searchParams.get('refresh') === '1';
+  const isReturn = searchParams.get('return') === '1' || searchParams.get('complete') === '1' || searchParams.get('refresh') === '1';
 
   // Redirect if not authenticated
   useEffect(() => {

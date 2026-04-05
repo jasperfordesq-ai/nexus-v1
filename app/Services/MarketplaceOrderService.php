@@ -219,7 +219,11 @@ class MarketplaceOrderService
             ->orderBy('id', 'desc');
 
         if ($status) {
-            $query->where('status', $status);
+            if (str_contains($status, ',')) {
+                $query->whereIn('status', explode(',', $status));
+            } else {
+                $query->where('status', $status);
+            }
         }
 
         if ($cursor) {
@@ -253,7 +257,11 @@ class MarketplaceOrderService
             ->orderBy('id', 'desc');
 
         if ($status) {
-            $query->where('status', $status);
+            if (str_contains($status, ',')) {
+                $query->whereIn('status', explode(',', $status));
+            } else {
+                $query->where('status', $status);
+            }
         }
 
         if ($cursor) {

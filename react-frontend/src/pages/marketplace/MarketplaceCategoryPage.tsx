@@ -58,7 +58,7 @@ interface CategoryDetail {
   slug: string;
   description: string | null;
   icon: string | null;
-  listings_count: number;
+  listing_count: number;
   parent_id: number | null;
 }
 
@@ -483,7 +483,7 @@ export function MarketplaceCategoryPage() {
                 <p className="text-sm text-default-500 mt-1">{category.description}</p>
               )}
               <p className="text-xs text-default-400 mt-1">
-                {t('category.listings_count', '{{count}} listing', { count: category.listings_count })}{category.listings_count !== 1 ? 's' : ''}
+                {t('category.listing_count', '{{count}} listing', { count: category.listing_count })}{category.listing_count !== 1 ? 's' : ''}
               </p>
             </div>
           </div>

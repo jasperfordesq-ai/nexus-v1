@@ -61,7 +61,7 @@ interface ApiCategory {
   id: number;
   name: string;
   slug: string;
-  listings_count: number;
+  listing_count: number;
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -320,7 +320,7 @@ export function MarketplaceMapSearchPage() {
           >
             {categories.map((cat) => (
               <SelectItem key={String(cat.id)}>
-                {cat.name} ({cat.listings_count})
+                {cat.name} ({cat.listing_count})
               </SelectItem>
             ))}
           </Select>
