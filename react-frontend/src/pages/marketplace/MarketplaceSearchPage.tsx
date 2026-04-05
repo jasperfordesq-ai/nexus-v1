@@ -50,7 +50,7 @@ interface ApiCategory {
   id: number;
   name: string;
   slug: string;
-  listings_count: number;
+  listing_count: number;
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -121,9 +121,9 @@ export function MarketplaceSearchPage() {
     searchParams.get('condition')?.split(',').filter(Boolean) || []
   );
   const [sellerType, setSellerType] = useState(searchParams.get('seller_type') || '');
-  const [deliveryMethod, setDeliveryMethod] = useState(searchParams.get('delivery') || '');
+  const [deliveryMethod, setDeliveryMethod] = useState(searchParams.get('delivery_method') || '');
   const [sortBy, setSortBy] = useState(searchParams.get('sort') || 'newest');
-  const [postedWithin, setPostedWithin] = useState(searchParams.get('days') || '');
+  const [postedWithin, setPostedWithin] = useState(searchParams.get('posted_within') || '');
   const [showFilters, setShowFilters] = useState(false);
 
   // Data state
@@ -179,9 +179,9 @@ export function MarketplaceSearchPage() {
       if (priceMax) params.set('price_max', priceMax);
       if (selectedConditions.length > 0) params.set('condition', selectedConditions.join(','));
       if (sellerType) params.set('seller_type', sellerType);
-      if (deliveryMethod) params.set('delivery', deliveryMethod);
+      if (deliveryMethod) params.set('delivery_method', deliveryMethod);
       if (sortBy !== 'newest') params.set('sort', sortBy);
-      if (postedWithin) params.set('days', postedWithin);
+      if (postedWithin) params.set('posted_within', postedWithin);
       params.set('limit', String(ITEMS_PER_PAGE));
       if (append && cursorRef.current) {
         params.set('cursor', cursorRef.current);
@@ -228,9 +228,9 @@ export function MarketplaceSearchPage() {
     if (priceMax) params.set('price_max', priceMax);
     if (selectedConditions.length > 0) params.set('condition', selectedConditions.join(','));
     if (sellerType) params.set('seller_type', sellerType);
-    if (deliveryMethod) params.set('delivery', deliveryMethod);
+    if (deliveryMethod) params.set('delivery_method', deliveryMethod);
     if (sortBy !== 'newest') params.set('sort', sortBy);
-    if (postedWithin) params.set('days', postedWithin);
+    if (postedWithin) params.set('posted_within', postedWithin);
     setSearchParams(params, { replace: true });
   }, [debouncedQuery, categoryId, priceMin, priceMax, selectedConditions, sellerType, deliveryMethod, sortBy, postedWithin, setSearchParams]);
 
@@ -309,7 +309,7 @@ export function MarketplaceSearchPage() {
         >
           {categories.map((cat) => (
             <SelectItem key={String(cat.id)}>
-              {cat.name} ({cat.listings_count})
+              {cat.name} ({cat.listing_count})
             </SelectItem>
           ))}
         </Select>

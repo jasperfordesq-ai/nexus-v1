@@ -145,10 +145,10 @@ export function SellerProfilePage() {
 
   // Update page title
   useEffect(() => {
-    if (seller?.name) {
+    if (seller?.display_name) {
       document.title = `${seller.display_name} - ${t('seller.page_title', 'Seller Profile')}`;
     }
-  }, [seller?.name]);
+  }, [seller?.display_name, t]);
 
   // Load seller listings
   useEffect(() => {

@@ -153,13 +153,35 @@ class MarketplaceSellerService
             ->where('status', 'sold')
             ->count();
 
+        $draftListings = MarketplaceListing::where('user_id', $userId)
+            ->where('status', 'draft')
+            ->count();
+
+        $expiredListings = MarketplaceListing::where('user_id', $userId)
+            ->where('status', 'expired')
+            ->count();
+
+        $totalRevenue = 0.0;
+        $revenueCurrency = 'EUR';
+        if (DB::getSchemaBuilder()->hasTable('marketplace_orders')) {
+            $totalRevenue = (float) DB::table('marketplace_orders')
+                ->where('seller_id', $userId)
+                ->where('tenant_id', $tenantId)
+                ->where('status', 'completed')
+                ->sum('total_price');
+        }
+
         return [
             'active_listings' => $activeListings,
-            'total_listings' => $totalListings,
+            'draft_listings' => $draftListings,
             'sold_listings' => $soldListings,
+            'expired_listings' => $expiredListings,
+            'total_listings' => $totalListings,
             'total_views' => (int) $totalViews,
             'total_saves' => (int) $totalSaves,
             'pending_offers' => $pendingOffers,
+            'total_revenue' => $totalRevenue,
+            'revenue_currency' => $revenueCurrency,
         ];
     }
 
