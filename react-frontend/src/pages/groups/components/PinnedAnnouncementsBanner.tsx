@@ -26,14 +26,16 @@ interface PinnedAnnouncement {
 
 interface PinnedAnnouncementsBannerProps {
   groupId: number;
+  isMember: boolean;
 }
 
-export function PinnedAnnouncementsBanner({ groupId }: PinnedAnnouncementsBannerProps) {
+export function PinnedAnnouncementsBanner({ groupId, isMember }: PinnedAnnouncementsBannerProps) {
   const { t } = useTranslation('groups');
   const [pinned, setPinned] = useState<PinnedAnnouncement[]>([]);
   const [loaded, setLoaded] = useState(false);
 
   useEffect(() => {
+    if (!isMember) { setLoaded(true); return; }
     async function load() {
       try {
         const res = await api.get(`/v2/groups/${groupId}/announcements?pinned=1`);
@@ -50,7 +52,7 @@ export function PinnedAnnouncementsBanner({ groupId }: PinnedAnnouncementsBanner
       setLoaded(true);
     }
     load();
-  }, [groupId]);
+  }, [groupId, isMember]);
 
   if (!loaded || pinned.length === 0) return null;
 

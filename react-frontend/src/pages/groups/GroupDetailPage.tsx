@@ -1291,7 +1291,7 @@ export function GroupDetailPage() {
       </GlassCard>
 
       {/* Pinned Announcements Banner (GR3) */}
-      <PinnedAnnouncementsBanner groupId={group.id} />
+      <PinnedAnnouncementsBanner groupId={group.id} isMember={userIsMember} />
 
       {/* Tabs */}
       {/* ─── Navigation: Primary Tabs + "More" Overflow ─── */}
