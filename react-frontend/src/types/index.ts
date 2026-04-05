@@ -20,3 +20,6 @@ export {
   transformUser,
   transformListing,
 } from './frontend';
+
+// Export landing page config types
+export * from './landing-page';

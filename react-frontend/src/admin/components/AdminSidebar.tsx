@@ -88,6 +88,7 @@ import {
   FileSearch,
   Webhook,
   Puzzle,
+  Palette,
   type LucideIcon,
 } from 'lucide-react';
 
@@ -168,6 +169,7 @@ function useAdminNav(): NavSection[] {
           { label: t('blog_posts'), href: '/admin/blog', icon: FileText },
           { label: t('resources'), href: '/admin/resources', icon: BookOpen },
           { label: t('pages'), href: '/admin/pages', icon: FileText },
+          { label: t('landing_page', { defaultValue: 'Landing Page' }), href: '/admin/landing-page', icon: Palette },
           { label: t('menus'), href: '/admin/menus', icon: Menu },
           { label: t('categories'), href: '/admin/categories', icon: FolderTree },
           { label: t('attributes'), href: '/admin/attributes', icon: Tags },

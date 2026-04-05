@@ -33,7 +33,8 @@ import { detectTenantFromUrl, tenantPath as buildTenantPath } from '@/lib/tenant
 import { validateResponseIfPresent } from '@/lib/api-validation';
 import { tenantBootstrapSchema } from '@/lib/api-schemas';
 import { setSentryTenant } from '@/lib/sentry';
-import type { TenantConfig, TenantFeatures, TenantModules, TenantBranding, GroupTabConfig, ListingConfig, VolunteeringConfig, JobConfig } from '@/types';
+import { DEFAULT_LANDING_PAGE_CONFIG } from '@/types';
+import type { TenantConfig, TenantFeatures, TenantModules, TenantBranding, GroupTabConfig, ListingConfig, VolunteeringConfig, JobConfig, LandingPageConfig } from '@/types';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Types
@@ -55,6 +56,7 @@ interface TenantContextValue extends TenantState {
   listingConfig: ListingConfig;
   volunteeringConfig: VolunteeringConfig;
   jobConfig: JobConfig;
+  landingPageConfig: LandingPageConfig;
   hasFeature: (feature: keyof TenantFeatures) => boolean;
   hasModule: (module: keyof TenantModules) => boolean;
   hasGroupTab: (tab: keyof GroupTabConfig) => boolean;
@@ -443,6 +445,16 @@ export function TenantProvider({ children, tenantSlug }: TenantProviderProps) {
   }, [state.tenant?.volunteering_config]);
 
   /**
+   * Get landing page config with fallback to defaults (all sections enabled, default order)
+   */
+  const landingPageConfig = useMemo<LandingPageConfig>(() => {
+    if (!state.tenant?.landing_page_config) {
+      return DEFAULT_LANDING_PAGE_CONFIG;
+    }
+    return state.tenant.landing_page_config;
+  }, [state.tenant?.landing_page_config]);
+
+  /**
    * Get group tab config with fallback to defaults (all enabled)
    */
   const groupTabs = useMemo<GroupTabConfig>(() => {
@@ -523,6 +535,7 @@ export function TenantProvider({ children, tenantSlug }: TenantProviderProps) {
       listingConfig,
       volunteeringConfig,
       jobConfig,
+      landingPageConfig,
       hasFeature,
       hasModule,
       hasGroupTab,
@@ -534,7 +547,7 @@ export function TenantProvider({ children, tenantSlug }: TenantProviderProps) {
       supportedLanguages,
       defaultLanguage,
     }),
-    [state, features, modules, branding, groupTabs, listingConfig, volunteeringConfig, jobConfig, hasFeature, hasModule, hasGroupTab, refreshTenant, effectiveTenantSlug, usePathBasedSlug, tenantPath, supportedLanguages, defaultLanguage]
+    [state, features, modules, branding, groupTabs, listingConfig, volunteeringConfig, jobConfig, landingPageConfig, hasFeature, hasModule, hasGroupTab, refreshTenant, effectiveTenantSlug, usePathBasedSlug, tenantPath, supportedLanguages, defaultLanguage]
   );
 
   return (

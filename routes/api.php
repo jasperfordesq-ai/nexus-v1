@@ -854,6 +854,9 @@ Route::get('/v2/admin/config/languages', [\App\Http\Controllers\Api\AdminConfigC
 Route::put('/v2/admin/config/languages', [\App\Http\Controllers\Api\AdminConfigController::class, 'updateLanguageConfig']);
 Route::get('/v2/admin/config/native-app', [\App\Http\Controllers\Api\AdminConfigController::class, 'getNativeAppConfig']);
 Route::put('/v2/admin/config/native-app', [\App\Http\Controllers\Api\AdminConfigController::class, 'updateNativeAppConfig']);
+// ── Admin: Landing Page Configuration ──────────────────────────────────────
+Route::get('/v2/admin/config/landing-page', [\App\Http\Controllers\Api\AdminConfigController::class, 'getLandingPageConfig']);
+Route::put('/v2/admin/config/landing-page', [\App\Http\Controllers\Api\AdminConfigController::class, 'updateLandingPageConfig']);
 // ── Admin: Onboarding Module Configuration ─────────────────────────────────
 Route::get('/v2/admin/config/onboarding', [\App\Http\Controllers\Api\AdminOnboardingConfigController::class, 'getConfig']);
 Route::put('/v2/admin/config/onboarding', [\App\Http\Controllers\Api\AdminOnboardingConfigController::class, 'updateConfig']);

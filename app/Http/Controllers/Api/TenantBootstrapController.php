@@ -335,6 +335,9 @@ class TenantBootstrapController extends BaseApiController
             $data['menu_pages'] = $menuPages;
         }
 
+        // Landing page configuration (per-tenant customizable sections)
+        $data['landing_page_config'] = $this->buildLandingPageConfig((int) $tenant['id']);
+
         return $data;
     }
 
@@ -428,6 +431,29 @@ class TenantBootstrapController extends BaseApiController
         }
 
         return $result;
+    }
+
+    /**
+     * Build landing page configuration from tenant settings.
+     * Returns null if no custom config — frontend uses defaults.
+     */
+    private function buildLandingPageConfig(int $tenantId): ?array
+    {
+        try {
+            $row = DB::table('tenant_settings')
+                ->where('tenant_id', $tenantId)
+                ->where('setting_key', 'landing_page.config')
+                ->value('setting_value');
+
+            if (empty($row)) {
+                return null;
+            }
+
+            $config = json_decode($row, true);
+            return is_array($config) ? $config : null;
+        } catch (\Throwable $e) {
+            return null;
+        }
     }
 
     private function buildBrandingData(array $tenant, ?array $config): array

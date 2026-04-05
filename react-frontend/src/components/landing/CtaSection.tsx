@@ -1,0 +1,61 @@
+// Copyright © 2024–2026 Jasper Ford
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Author: Jasper Ford
+// See NOTICE file for attribution and acknowledgements.
+
+import { Link } from 'react-router-dom';
+import { motion } from 'framer-motion';
+import { Button } from '@heroui/react';
+import { ArrowRight } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
+import { useTenant, useAuth } from '@/contexts';
+import type { CtaContent } from '@/types';
+
+interface CtaSectionProps {
+  content?: CtaContent;
+}
+
+export function CtaSection({ content }: CtaSectionProps) {
+  const { t } = useTranslation('public');
+  const { tenantPath } = useTenant();
+  const { isAuthenticated } = useAuth();
+
+  // Only render for unauthenticated visitors
+  if (isAuthenticated) {
+    return null;
+  }
+
+  const title = content?.title || t('home.cta_section.title');
+  const description = content?.description || t('home.cta_section.description');
+  const buttonText = content?.button_text || t('home.cta_section.button');
+  const buttonLink = content?.button_link || '/register';
+
+  return (
+    <section className="py-20 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-4xl mx-auto text-center">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          className="p-6 sm:p-8 lg:p-12 rounded-3xl bg-gradient-to-br from-indigo-500/10 to-purple-500/10 border border-theme-default"
+        >
+          <h2 className="text-3xl sm:text-4xl font-bold text-theme-primary mb-4">
+            {title}
+          </h2>
+          <p className="text-theme-muted mb-8 max-w-xl mx-auto">
+            {description}
+          </p>
+          <Link to={tenantPath(buttonLink)}>
+            <Button
+              size="lg"
+              className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white font-semibold px-10"
+              endContent={<ArrowRight className="w-5 h-5" aria-hidden="true" />}
+            >
+              {buttonText}
+            </Button>
+          </Link>
+        </motion.div>
+      </div>
+    </section>
+  );
+}

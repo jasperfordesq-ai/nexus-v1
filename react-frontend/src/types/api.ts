@@ -1150,6 +1150,8 @@ export interface TenantConfig {
   supported_languages?: string[];
   /** Default language for this tenant (e.g. 'de' for Swiss tenants) */
   default_language?: string;
+  /** Per-tenant landing page configuration (sections, content, ordering) */
+  landing_page_config?: import('./landing-page').LandingPageConfig;
 }
 
 export interface GroupTabConfig {

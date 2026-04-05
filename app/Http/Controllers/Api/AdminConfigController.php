@@ -18,6 +18,7 @@ use App\Services\RedisCache;
 use App\Services\SearchService;
 use App\Services\SmartMatchingEngine;
 use App\Services\TenantFeatureConfig;
+use App\Services\TenantSettingsService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
 use App\Core\TenantContext;
@@ -1947,5 +1948,108 @@ class AdminConfigController extends BaseApiController
         $this->redisCache->delete('tenant_bootstrap', $tenantId);
 
         return $this->respondWithData(['updated' => $updated]);
+    }
+
+    // =========================================================================
+    // Landing Page Configuration
+    // =========================================================================
+
+    /**
+     * GET /api/v2/admin/config/landing-page
+     *
+     * Returns the landing page configuration for the current tenant.
+     */
+    public function getLandingPageConfig(): JsonResponse
+    {
+        $this->requireAdmin();
+        $tenantId = $this->getTenantId();
+
+        $row = DB::table('tenant_settings')
+            ->where('tenant_id', $tenantId)
+            ->where('setting_key', 'landing_page.config')
+            ->value('setting_value');
+
+        $config = null;
+        if (!empty($row)) {
+            $decoded = json_decode($row, true);
+            if (is_array($decoded)) {
+                $config = $decoded;
+            }
+        }
+
+        return $this->respondWithData([
+            'config' => $config,
+        ]);
+    }
+
+    /**
+     * PUT /api/v2/admin/config/landing-page
+     *
+     * Saves the landing page configuration for the current tenant.
+     * Validates the structure before saving.
+     */
+    public function updateLandingPageConfig(): JsonResponse
+    {
+        $this->requireAdmin();
+        $tenantId = $this->getTenantId();
+
+        $config = $this->input('config');
+
+        if ($config !== null && !is_array($config)) {
+            return $this->respondWithError('VALIDATION_ERROR', 'Config must be an object or null', null, 422);
+        }
+
+        // Validate structure if config provided
+        if ($config !== null) {
+            if (!isset($config['sections']) || !is_array($config['sections'])) {
+                return $this->respondWithError('VALIDATION_ERROR', 'Config must have a sections array', null, 422);
+            }
+
+            $validTypes = ['hero', 'feature_pills', 'stats', 'how_it_works', 'core_values', 'cta'];
+            foreach ($config['sections'] as $i => $section) {
+                if (!isset($section['id'], $section['type'], $section['enabled'], $section['order'])) {
+                    return $this->respondWithError('VALIDATION_ERROR', "Section $i missing required fields (id, type, enabled, order)", null, 422);
+                }
+                if (!in_array($section['type'], $validTypes, true)) {
+                    return $this->respondWithError('VALIDATION_ERROR', "Section $i has invalid type: {$section['type']}", null, 422);
+                }
+            }
+        }
+
+        if ($config === null) {
+            // Delete the setting to revert to defaults
+            DB::table('tenant_settings')
+                ->where('tenant_id', $tenantId)
+                ->where('setting_key', 'landing_page.config')
+                ->delete();
+        } else {
+            // Upsert the setting
+            $existing = DB::table('tenant_settings')
+                ->where('tenant_id', $tenantId)
+                ->where('setting_key', 'landing_page.config')
+                ->exists();
+
+            $jsonValue = json_encode($config, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+
+            if ($existing) {
+                DB::table('tenant_settings')
+                    ->where('tenant_id', $tenantId)
+                    ->where('setting_key', 'landing_page.config')
+                    ->update(['setting_value' => $jsonValue]);
+            } else {
+                DB::table('tenant_settings')->insert([
+                    'tenant_id' => $tenantId,
+                    'setting_key' => 'landing_page.config',
+                    'setting_value' => $jsonValue,
+                    'setting_type' => 'json',
+                ]);
+            }
+        }
+
+        // Clear tenant bootstrap cache so changes take effect immediately
+        $this->redisCache->delete('tenant_bootstrap', $tenantId);
+        TenantSettingsService::clearCacheForTenant($tenantId);
+
+        return $this->respondWithData(['success' => true]);
     }
 }

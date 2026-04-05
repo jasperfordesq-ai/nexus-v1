@@ -1843,6 +1843,20 @@ export const adminKb = {
 };
 
 // ─────────────────────────────────────────────────────────────────────────────
+// Landing Page
+// ─────────────────────────────────────────────────────────────────────────────
+
+export const adminLandingPage = {
+  get: () =>
+    api.get<{ config: import('../../types/landing-page').LandingPageConfig | null }>(
+      '/v2/admin/config/landing-page',
+    ),
+
+  update: (config: import('../../types/landing-page').LandingPageConfig | null) =>
+    api.put<{ success: boolean }>('/v2/admin/config/landing-page', { config }),
+};
+
+// ─────────────────────────────────────────────────────────────────────────────
 // Re-export for convenience
 // ─────────────────────────────────────────────────────────────────────────────
 

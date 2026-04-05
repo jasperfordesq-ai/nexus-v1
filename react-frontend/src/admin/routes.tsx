@@ -258,6 +258,7 @@ const AttributesAdmin = lazy(() => import('./modules/content/AttributesAdmin'));
 const PlansAdmin = lazy(() => import('./modules/content/PlansAdmin'));
 const PlanForm = lazy(() => import('./modules/content/PlanForm'));
 const SubscriptionsAdmin = lazy(() => import('./modules/content/Subscriptions'));
+const LandingPageBuilder = lazy(() => import('./modules/content/LandingPageBuilder'));
 
 // Wrap lazy components in Suspense
 function Lazy({ children }: { children: React.ReactNode }) {
@@ -303,6 +304,7 @@ export function AdminRoutes() {
       <Route path="categories/create" element={<Lazy><CategoriesAdmin /></Lazy>} />
       <Route path="categories/edit/:id" element={<Lazy><CategoriesAdmin /></Lazy>} />
       <Route path="attributes" element={<Lazy><AttributesAdmin /></Lazy>} />
+      <Route path="landing-page" element={<Lazy><LandingPageBuilder /></Lazy>} />
 
       {/* ─── ENGAGEMENT ─── */}
       <Route path="gamification" element={<Lazy><GamificationHub /></Lazy>} />
