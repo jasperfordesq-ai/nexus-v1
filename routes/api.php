@@ -1430,8 +1430,8 @@ Route::middleware('throttle:30,1')->group(function () {
     Route::post('/auth/refresh-session', [\App\Http\Controllers\Api\AuthController::class, 'refreshSession']);
     Route::post('/auth/restore-session', [\App\Http\Controllers\Api\AuthController::class, 'restoreSession']);
 });
-// Rate-limited auth endpoints (10 requests/minute per IP — brute force protection)
-Route::middleware('throttle:10,1')->group(function () {
+// Rate-limited auth endpoints (30 requests/minute per IP — DoS protection; brute-force handled by DB limiter in controller)
+Route::middleware('throttle:30,1')->group(function () {
     Route::post('/auth/login', [\App\Http\Controllers\Api\AuthController::class, 'login']);
     Route::post('/v2/auth/register', [\App\Http\Controllers\Api\RegistrationController::class, 'register']);
     Route::post('/totp/verify', [\App\Http\Controllers\Api\TotpController::class, 'verify']);

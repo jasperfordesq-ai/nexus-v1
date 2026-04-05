@@ -41,7 +41,7 @@ export function HeroSection({ content }: HeroSectionProps) {
   const ctaPrimaryLink = content?.cta_primary_link || '/register';
   const ctaSecondaryText = content?.cta_secondary_text || t('home.cta_learn_more');
   const ctaSecondaryLink = content?.cta_secondary_link || '/about';
-  const ctaDashboardText = t('home.cta_dashboard');
+  const ctaFeedText = t('home.cta_feed', { defaultValue: t('home.cta_dashboard') });
 
   const scrollToSection = () => {
     document.getElementById('features')?.scrollIntoView({ behavior: 'smooth' });
@@ -88,13 +88,13 @@ export function HeroSection({ content }: HeroSectionProps) {
             className="mt-10 flex flex-col sm:flex-row gap-4 justify-center"
           >
             {isAuthenticated ? (
-              <Link to={tenantPath('/dashboard')}>
+              <Link to={tenantPath('/feed')}>
                 <Button
                   size="lg"
                   className="w-full sm:w-auto bg-gradient-to-r from-indigo-500 via-purple-500 to-indigo-600 text-white font-semibold px-8 shadow-lg shadow-indigo-500/25 hover:shadow-indigo-500/40 transition-shadow"
                   endContent={<ArrowRight className="w-5 h-5" aria-hidden="true" />}
                 >
-                  {ctaDashboardText}
+                  {ctaFeedText}
                 </Button>
               </Link>
             ) : (

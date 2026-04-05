@@ -77,18 +77,9 @@ class AuthController extends BaseApiController
             );
         }
 
-        // SECURITY: Redis-based rate limiting (fast, per-IP, 10 attempts per minute)
+        // SECURITY: Database-based brute force protection (tracks FAILED attempts only)
+        // Route-level throttle:30,1 middleware handles general request-rate DoS protection.
         $ip = \App\Core\ClientIp::get();
-        if (!$this->rateLimitService->increment("auth:login:$ip", 10, 60)) {
-            return $this->authError(
-                __('api.too_many_login_attempts'),
-                ApiErrorCodes::RATE_LIMIT_EXCEEDED,
-                429,
-                ['retry_after' => 60]
-            );
-        }
-
-        // SECURITY: Database-based rate limiting for brute force protection (tracks failed attempts)
         if (!empty($email)) {
             $emailLimit = \App\Core\RateLimiter::check($email, 'email');
             if ($emailLimit['limited']) {
@@ -143,8 +134,7 @@ class AuthController extends BaseApiController
             }
             \App\Core\RateLimiter::recordAttempt($ip, 'ip', true);
 
-            // Clear Redis rate limit counter on successful login
-            $this->rateLimitService->reset("auth:login:$ip");
+            // (DB brute force counters already cleared by recordAttempt with success=true)
 
             // Registration policy enforcement
             $gateBlock = $this->tenantSettingsService->checkLoginGatesForUser($user);
