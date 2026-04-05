@@ -284,13 +284,13 @@ export function GroupDetailPage() {
     loadGroup();
   }, [loadGroup]);
 
-  // Load tags for the group
+  // Load tags for the group (requires auth)
   useEffect(() => {
-    if (!id) return;
+    if (!id || !isAuthenticated) return;
     api.get(`/v2/groups/${id}/tags`)
       .then((resp) => setGroupTags((resp.data ?? []) as Array<{ id: number; name: string; color?: string }>))
       .catch((err) => { logError('GroupDetailPage.loadTags', err); });
-  }, [id]);
+  }, [id, isAuthenticated]);
 
   // Invite handlers
   const handleGenerateInviteLink = async () => {

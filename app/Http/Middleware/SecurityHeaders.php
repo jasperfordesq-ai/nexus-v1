@@ -19,7 +19,7 @@ class SecurityHeaders
         $response->headers->set('X-Frame-Options', 'SAMEORIGIN');
         $response->headers->set('X-Content-Type-Options', 'nosniff');
         $response->headers->set('X-XSS-Protection', '1; mode=block');
-        $response->headers->set('Content-Security-Policy', "default-src 'self' https: data: blob:; script-src 'self' 'unsafe-inline' https:; style-src 'self' 'unsafe-inline' https:; connect-src 'self' https: wss://*.pusher.com wss://ws-eu.pusher.com; img-src 'self' https: data: blob:; font-src 'self' https: data:; frame-ancestors 'self';");
+        $response->headers->set('Content-Security-Policy', "default-src 'self' https: data: blob:; script-src 'self' 'unsafe-inline' https:; style-src 'self' 'unsafe-inline' https:; connect-src 'self' https: wss://*.pusher.com wss://ws-eu.pusher.com; img-src 'self' https: data: blob:; font-src 'self' https: data:; worker-src 'self' blob:; frame-ancestors 'self';");
         $response->headers->set('Referrer-Policy', 'strict-origin-when-cross-origin');
 
         if ($request->secure()) {
