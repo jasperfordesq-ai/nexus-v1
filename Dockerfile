@@ -200,6 +200,10 @@ RUN mkdir -p /var/www/html/httpdocs/uploads /var/www/html/uploads /var/www/html/
     && chown -R www-data:www-data /var/www/html/httpdocs/uploads /var/www/html/uploads /var/www/html/public/uploads \
     && chmod -R 775 /var/www/html/httpdocs/uploads /var/www/html/uploads /var/www/html/public/uploads
 
+# Symlink storage/app/public into the web root so /storage/* URLs work
+# (used by marketplace image uploads and any Laravel Storage::disk('public') files)
+RUN ln -sf /var/www/html/storage/app/public /var/www/html/httpdocs/storage
+
 # Ensure Laravel storage and bootstrap/cache are writable by www-data
 RUN chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache
 
