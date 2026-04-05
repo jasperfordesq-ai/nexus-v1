@@ -406,8 +406,14 @@ class MarketplaceListingService
         $listing->local_pickup = $data['local_pickup'] ?? true;
         $listing->delivery_method = $data['delivery_method'] ?? 'pickup';
         $listing->seller_type = $data['seller_type'] ?? 'private';
-        $listing->status = $data['status'] ?? 'draft';
-        $listing->moderation_status = MarketplaceConfigurationService::moderationEnabled() ? 'pending' : 'approved';
+        $listing->status = $data['status'] ?? 'active';
+        // Only require moderation if explicitly enabled for this tenant
+        try {
+            $moderationEnabled = MarketplaceConfigurationService::moderationEnabled();
+        } catch (\Throwable $e) {
+            $moderationEnabled = false; // Default to no moderation if config unavailable
+        }
+        $listing->moderation_status = $moderationEnabled ? 'pending' : 'approved';
         $listing->template_data = $data['template_data'] ?? null;
         $durationDays = (int) ($data['duration_days'] ?? MarketplaceConfigurationService::listingDurationDays());
         $listing->expires_at = now()->addDays($durationDays);
