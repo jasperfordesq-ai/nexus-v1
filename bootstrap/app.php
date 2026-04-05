@@ -69,6 +69,14 @@ $app = Application::configure(basePath: dirname(__DIR__))
             ->hourly()
             ->withoutOverlapping()
             ->name('listings-process-search-alerts');
+
+        // Marketplace: expire stale offers (pending/countered past their expires_at)
+        $schedule->call(function () {
+            \App\Services\MarketplaceOfferService::expireStaleOffers();
+        })
+            ->hourly()
+            ->name('marketplace:expire-stale-offers')
+            ->withoutOverlapping(5);
     })
     ->withRouting(
         // Routes loaded by RouteServiceProvider (no /api prefix).

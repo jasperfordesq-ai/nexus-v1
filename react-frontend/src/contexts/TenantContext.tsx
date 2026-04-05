@@ -92,6 +92,7 @@ const defaultFeatures: TenantFeatures = {
   group_exchanges: true,
   search: true,
   ai_chat: true,
+  marketplace: false,
 };
 
 // Default modules (all enabled)

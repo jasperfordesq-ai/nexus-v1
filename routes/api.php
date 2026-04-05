@@ -749,7 +749,57 @@ Route::post('/v2/stories/{id}/stickers', [\App\Http\Controllers\Api\StoryControl
 Route::post('/v2/donations/payment-intent', [\App\Http\Controllers\Api\DonationPaymentController::class, 'createPaymentIntent']);
 Route::get('/v2/donations/{id}/receipt', [\App\Http\Controllers\Api\DonationPaymentController::class, 'getDonationReceipt']);
 
+// ============================================
+// Marketplace Module — Authenticated routes
+// Completely standalone from Listings (timebanking)
+// ============================================
+
+// Marketplace Listings — CRUD & management
+Route::post('/v2/marketplace/listings', [\App\Http\Controllers\Api\MarketplaceListingController::class, 'store']);
+Route::put('/v2/marketplace/listings/{id}', [\App\Http\Controllers\Api\MarketplaceListingController::class, 'update']);
+Route::delete('/v2/marketplace/listings/{id}', [\App\Http\Controllers\Api\MarketplaceListingController::class, 'destroy']);
+Route::post('/v2/marketplace/listings/{id}/images', [\App\Http\Controllers\Api\MarketplaceListingController::class, 'uploadImages']);
+Route::put('/v2/marketplace/listings/{id}/images/reorder', [\App\Http\Controllers\Api\MarketplaceListingController::class, 'reorderImages']);
+Route::delete('/v2/marketplace/listings/{id}/images/{imageId}', [\App\Http\Controllers\Api\MarketplaceListingController::class, 'deleteImage']);
+Route::post('/v2/marketplace/listings/{id}/renew', [\App\Http\Controllers\Api\MarketplaceListingController::class, 'renew']);
+Route::get('/v2/marketplace/listings/{id}/analytics', [\App\Http\Controllers\Api\MarketplaceListingController::class, 'analytics']);
+Route::post('/v2/marketplace/listings/generate-description', [\App\Http\Controllers\Api\MarketplaceListingController::class, 'generateDescription']);
+
+// Marketplace Listings — Saved/favorites
+Route::get('/v2/marketplace/listings/saved', [\App\Http\Controllers\Api\MarketplaceListingController::class, 'savedListings']);
+Route::post('/v2/marketplace/listings/{id}/save', [\App\Http\Controllers\Api\MarketplaceListingController::class, 'save']);
+Route::delete('/v2/marketplace/listings/{id}/save', [\App\Http\Controllers\Api\MarketplaceListingController::class, 'unsave']);
+
+// Marketplace Offers — Negotiation
+Route::post('/v2/marketplace/listings/{id}/offers', [\App\Http\Controllers\Api\MarketplaceOfferController::class, 'store']);
+Route::get('/v2/marketplace/listings/{id}/offers', [\App\Http\Controllers\Api\MarketplaceOfferController::class, 'listForListing']);
+Route::put('/v2/marketplace/offers/{id}/accept', [\App\Http\Controllers\Api\MarketplaceOfferController::class, 'accept']);
+Route::put('/v2/marketplace/offers/{id}/decline', [\App\Http\Controllers\Api\MarketplaceOfferController::class, 'decline']);
+Route::put('/v2/marketplace/offers/{id}/counter', [\App\Http\Controllers\Api\MarketplaceOfferController::class, 'counter']);
+Route::put('/v2/marketplace/offers/{id}/accept-counter', [\App\Http\Controllers\Api\MarketplaceOfferController::class, 'acceptCounter']);
+Route::delete('/v2/marketplace/offers/{id}', [\App\Http\Controllers\Api\MarketplaceOfferController::class, 'withdraw']);
+Route::get('/v2/marketplace/my-offers/sent', [\App\Http\Controllers\Api\MarketplaceOfferController::class, 'sentOffers']);
+Route::get('/v2/marketplace/my-offers/received', [\App\Http\Controllers\Api\MarketplaceOfferController::class, 'receivedOffers']);
+
+// Marketplace Seller — Profile & dashboard
+Route::post('/v2/marketplace/seller/profile', [\App\Http\Controllers\Api\MarketplaceSellerController::class, 'updateProfile']);
+Route::get('/v2/marketplace/seller/dashboard', [\App\Http\Controllers\Api\MarketplaceSellerController::class, 'dashboard']);
+Route::get('/v2/marketplace/seller/onboard/status', [\App\Http\Controllers\Api\MarketplaceSellerController::class, 'onboardStatus']);
+
 }); // End Route::middleware('auth:sanctum')
+
+// ============================================
+// Marketplace Module — Public routes (no auth required)
+// ============================================
+Route::get('/v2/marketplace/listings', [\App\Http\Controllers\Api\MarketplaceListingController::class, 'index']);
+Route::get('/v2/marketplace/listings/nearby', [\App\Http\Controllers\Api\MarketplaceListingController::class, 'nearby']);
+Route::get('/v2/marketplace/listings/featured', [\App\Http\Controllers\Api\MarketplaceListingController::class, 'featured']);
+Route::get('/v2/marketplace/listings/free', [\App\Http\Controllers\Api\MarketplaceListingController::class, 'free']);
+Route::get('/v2/marketplace/listings/{id}', [\App\Http\Controllers\Api\MarketplaceListingController::class, 'show']);
+Route::get('/v2/marketplace/categories', [\App\Http\Controllers\Api\MarketplaceListingController::class, 'categories']);
+Route::get('/v2/marketplace/categories/{id}/template', [\App\Http\Controllers\Api\MarketplaceListingController::class, 'categoryTemplate']);
+Route::get('/v2/marketplace/sellers/{id}', [\App\Http\Controllers\Api\MarketplaceSellerController::class, 'show']);
+Route::get('/v2/marketplace/sellers/{id}/listings', [\App\Http\Controllers\Api\MarketplaceSellerController::class, 'listings']);
 
 // ============================================
 // Admin routes — Sanctum auth + admin middleware

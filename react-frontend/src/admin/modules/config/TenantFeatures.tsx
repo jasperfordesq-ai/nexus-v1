@@ -52,6 +52,7 @@ const FEATURE_META: Record<string, { label: string; description: string }> = {
   group_exchanges: { label: 'Group Exchanges', description: 'Multi-party group exchange sessions' },
   search: { label: 'Search', description: 'Full-text search across listings, members, and content' },
   ai_chat: { label: 'AI Assistant', description: 'AI-powered chat assistant for members' },
+  marketplace: { label: 'Marketplace', description: 'Commercial buy/sell marketplace (separate from timebanking listings)' },
 };
 
 const MODULE_META: Record<string, { label: string; description: string }> = {

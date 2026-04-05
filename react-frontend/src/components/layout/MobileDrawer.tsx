@@ -58,6 +58,7 @@ import {
   Cookie,
   Bot,
   Briefcase,
+  ShoppingBag,
   Lightbulb,
   GraduationCap,
   Activity,
@@ -124,6 +125,7 @@ export function MobileDrawer({ isOpen, onClose, onSearchOpen }: MobileDrawerProp
     { label: t('nav.volunteering'), href: '/volunteering', icon: Heart, feature: 'volunteering' as const },
     { label: t('nav.resources'), href: '/resources', icon: FolderOpen, feature: 'resources' as const },
     { label: t('nav.jobs'), href: '/jobs', icon: Briefcase, feature: 'job_vacancies' as const },
+    { label: t('nav.marketplace', 'Marketplace'), href: '/marketplace', icon: ShoppingBag, feature: 'marketplace' as const },
   ];
 
   const engageNavItems = [

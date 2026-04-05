@@ -1080,6 +1080,7 @@ export interface TenantFeatures {
   group_exchanges: boolean;
   search: boolean;
   ai_chat: boolean;
+  marketplace: boolean;
 }
 
 export interface TenantModules {

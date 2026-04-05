@@ -38,6 +38,7 @@ import {
   Repeat2,
   Search,
   Brain,
+  ShoppingBag,
 } from 'lucide-react';
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -598,6 +599,28 @@ const FEATURE_MODULES: ModuleDefinition[] = [
     configOptions: [
       { key: 'ai_chat.daily_message_limit', label: 'Daily Message Limit', description: 'Maximum AI chat messages per user per day (0 = unlimited)', type: 'number', defaultValue: 50, category: 'Limits', comingSoon: true, min: 0, max: 1000 },
       { key: 'ai_chat.show_context_sources', label: 'Show Context Sources', description: 'Show which community data the AI referenced', type: 'boolean', defaultValue: true, category: 'Features', comingSoon: true },
+    ],
+  },
+  {
+    id: 'marketplace',
+    name: 'Marketplace',
+    description: 'Commercial buy/sell marketplace for physical goods and paid services',
+    icon: ShoppingBag,
+    type: 'feature',
+    configSource: 'tenant_features',
+    configOptions: [
+      { key: 'marketplace.enabled', label: 'Marketplace Enabled', description: 'Master switch to enable the marketplace module', type: 'boolean', defaultValue: false, category: 'General' },
+      { key: 'marketplace.allow_shipping', label: 'Allow Shipping', description: 'Enable shipping options for marketplace listings', type: 'boolean', defaultValue: false, category: 'General' },
+      { key: 'marketplace.allow_free_items', label: 'Allow Free Items', description: 'Enable a free items section in the marketplace', type: 'boolean', defaultValue: true, category: 'General' },
+      { key: 'marketplace.allow_business_sellers', label: 'Allow Business Sellers', description: 'Allow business accounts to sell in the marketplace', type: 'boolean', defaultValue: true, category: 'General' },
+      { key: 'marketplace.allow_hybrid_pricing', label: 'Allow Hybrid Pricing', description: 'Allow items priced with both time credits and cash', type: 'boolean', defaultValue: false, category: 'Pricing' },
+      { key: 'marketplace.stripe_enabled', label: 'Stripe Payments', description: 'Enable in-app payments via Stripe', type: 'boolean', defaultValue: false, category: 'Pricing' },
+      { key: 'marketplace.escrow_enabled', label: 'Escrow Protection', description: 'Enable escrow buyer protection for transactions', type: 'boolean', defaultValue: false, category: 'Pricing' },
+      { key: 'marketplace.platform_fee_percent', label: 'Platform Fee (%)', description: 'Platform take rate percentage on marketplace sales', type: 'number', defaultValue: 5, category: 'Pricing', min: 0, max: 50 },
+      { key: 'marketplace.moderation_enabled', label: 'Require Moderation', description: 'Marketplace listings require admin approval before going live', type: 'boolean', defaultValue: true, category: 'Moderation' },
+      { key: 'marketplace.max_images', label: 'Max Images Per Listing', description: 'Maximum number of images per marketplace listing', type: 'number', defaultValue: 20, category: 'Limits', min: 1, max: 50 },
+      { key: 'marketplace.max_active_listings', label: 'Max Active Listings', description: 'Maximum active marketplace listings per user', type: 'number', defaultValue: 50, category: 'Limits', min: 1, max: 500 },
+      { key: 'marketplace.listing_duration_days', label: 'Listing Duration (Days)', description: 'Number of days before marketplace listings auto-expire', type: 'number', defaultValue: 30, category: 'Limits', min: 1, max: 365 },
     ],
   },
 ];

@@ -35,6 +35,7 @@ class TenantFeatureConfig
         'group_exchanges' => true,
         'search' => true,
         'ai_chat' => true,
+        'marketplace' => false,
     ];
 
     /**

@@ -1,0 +1,767 @@
+<?php
+// Copyright © 2024–2026 Jasper Ford
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Author: Jasper Ford
+// See NOTICE file for attribution and acknowledgements.
+
+namespace App\Http\Controllers\Api;
+
+use Illuminate\Http\JsonResponse;
+use App\Core\TenantContext;
+use App\Models\MarketplaceCategoryTemplate;
+use App\Models\MarketplaceListing;
+use App\Services\AiChatService;
+use App\Services\ImageUploadService;
+use App\Services\MarketplaceListingService;
+use App\Services\MarketplaceSellerService;
+
+/**
+ * MarketplaceListingController — Standalone marketplace listing endpoints.
+ *
+ * Handles listing CRUD, image management, search/browse, categories,
+ * saved/favorites, analytics, and AI description generation.
+ *
+ * Completely separate from timebanking listings (ListingController).
+ */
+class MarketplaceListingController extends BaseApiController
+{
+    protected bool $isV2Api = true;
+
+    public function __construct(
+        private readonly ImageUploadService $imageUploadService,
+        private readonly AiChatService $aiChatService,
+    ) {}
+
+    // =====================================================================
+    //  Feature gate
+    // =====================================================================
+
+    /**
+     * Ensure the marketplace feature is enabled for the current tenant.
+     */
+    private function ensureFeature(): void
+    {
+        if (!TenantContext::hasFeature('marketplace')) {
+            throw new \Illuminate\Http\Exceptions\HttpResponseException(
+                $this->respondWithError('FEATURE_DISABLED', 'The marketplace feature is not enabled for this community.', null, 403)
+            );
+        }
+    }
+
+    // =====================================================================
+    //  Ownership helper
+    // =====================================================================
+
+    /**
+     * Verify that the authenticated user owns the given listing.
+     *
+     * @throws \Illuminate\Http\Exceptions\HttpResponseException
+     */
+    private function ensureOwner(MarketplaceListing $listing, int $userId): void
+    {
+        if ((int) $listing->user_id !== $userId) {
+            throw new \Illuminate\Http\Exceptions\HttpResponseException(
+                $this->respondWithError('FORBIDDEN', 'You do not have permission to modify this listing.', null, 403)
+            );
+        }
+    }
+
+    /**
+     * Find a listing by ID or throw a 404 error response.
+     *
+     * @throws \Illuminate\Http\Exceptions\HttpResponseException
+     */
+    private function findListingOrFail(int $id): MarketplaceListing
+    {
+        $listing = MarketplaceListing::find($id);
+
+        if (!$listing) {
+            throw new \Illuminate\Http\Exceptions\HttpResponseException(
+                $this->respondWithError('RESOURCE_NOT_FOUND', 'Marketplace listing not found.', null, 404)
+            );
+        }
+
+        return $listing;
+    }
+
+    // =====================================================================
+    //  Browse / Search (public)
+    // =====================================================================
+
+    /**
+     * GET /v2/marketplace/listings — Browse/search marketplace listings.
+     *
+     * Supports filtering by category, price range, condition, seller type,
+     * delivery method, posted date, and text search. Cursor-paginated.
+     */
+    public function index(): JsonResponse
+    {
+        $this->ensureFeature();
+        $this->rateLimit('marketplace_browse', 60, 60);
+
+        $userId = $this->getOptionalUserId() ?? $this->resolveSanctumUserOptionally();
+
+        $limit = $this->queryInt('limit', 20, 1, 100);
+
+        $filters = [
+            'limit'           => $limit,
+            'current_user_id' => $userId,
+        ];
+
+        if ($this->query('q')) {
+            $filters['search'] = $this->query('q');
+        }
+        if ($this->query('category_id')) {
+            $filters['category_id'] = $this->queryInt('category_id');
+        }
+        if ($this->query('category')) {
+            $filters['category_slug'] = $this->query('category');
+        }
+        if ($this->query('price_min') !== null) {
+            $filters['price_min'] = (float) $this->query('price_min');
+        }
+        if ($this->query('price_max') !== null) {
+            $filters['price_max'] = (float) $this->query('price_max');
+        }
+        if ($this->query('price_type')) {
+            $filters['price_type'] = $this->query('price_type');
+        }
+        if ($this->query('condition')) {
+            $filters['condition'] = $this->query('condition');
+        }
+        if ($this->query('seller_type')) {
+            $filters['seller_type'] = $this->query('seller_type');
+        }
+        if ($this->query('delivery_method')) {
+            $filters['delivery_method'] = $this->query('delivery_method');
+        }
+        if ($this->query('posted_within')) {
+            $filters['posted_within'] = $this->queryInt('posted_within');
+        }
+        if ($this->query('sort')) {
+            $validSorts = ['newest', 'price_asc', 'price_desc', 'popular'];
+            if (in_array($this->query('sort'), $validSorts, true)) {
+                $filters['sort'] = $this->query('sort');
+            }
+        }
+        if ($this->queryBool('featured_first')) {
+            $filters['featured_first'] = true;
+        }
+        if ($this->query('cursor')) {
+            $filters['cursor'] = $this->query('cursor');
+        }
+
+        $result = MarketplaceListingService::getAll($filters);
+
+        return $this->respondWithCollection(
+            $result['items'],
+            $result['cursor'],
+            $limit,
+            $result['has_more']
+        );
+    }
+
+    /**
+     * GET /v2/marketplace/listings/{id} — Single listing detail.
+     *
+     * Public endpoint. Increments view count. Returns full detail
+     * including all images, seller info, and saved status.
+     */
+    public function show(int $id): JsonResponse
+    {
+        $this->ensureFeature();
+        $this->rateLimit('marketplace_show', 60, 60);
+
+        $userId = $this->getOptionalUserId() ?? $this->resolveSanctumUserOptionally();
+
+        $listing = MarketplaceListingService::getById($id, $userId);
+
+        if (!$listing) {
+            return $this->respondWithError('RESOURCE_NOT_FOUND', 'Marketplace listing not found.', null, 404);
+        }
+
+        // Record view asynchronously (best-effort)
+        MarketplaceListingService::recordView($id);
+
+        return $this->respondWithData($listing);
+    }
+
+    // =====================================================================
+    //  CRUD (authenticated)
+    // =====================================================================
+
+    /**
+     * POST /v2/marketplace/listings — Create a new marketplace listing.
+     *
+     * Requires authentication. Auto-creates a seller profile if the user
+     * doesn't have one. Returns the created listing with 201 status.
+     */
+    public function store(): JsonResponse
+    {
+        $this->ensureFeature();
+        $userId = $this->requireAuth();
+        $this->rateLimit('marketplace_create', 10, 60);
+
+        $data = request()->validate([
+            'title'              => 'required|string|max:200',
+            'description'        => 'required|string|max:10000',
+            'tagline'            => 'nullable|string|max:300',
+            'price'              => 'nullable|numeric|min:0',
+            'price_currency'     => 'nullable|string|max:3',
+            'price_type'         => 'nullable|string|in:fixed,negotiable,free,auction,contact',
+            'time_credit_price'  => 'nullable|numeric|min:0',
+            'category_id'        => 'nullable|integer|exists:marketplace_categories,id',
+            'condition'          => 'nullable|string|in:new,like_new,good,fair,poor',
+            'quantity'           => 'nullable|integer|min:1',
+            'location'           => 'nullable|string|max:255',
+            'latitude'           => 'nullable|numeric|between:-90,90',
+            'longitude'          => 'nullable|numeric|between:-180,180',
+            'shipping_available' => 'nullable|boolean',
+            'local_pickup'       => 'nullable|boolean',
+            'delivery_method'    => 'nullable|string|in:pickup,shipping,both,community_delivery',
+            'seller_type'        => 'nullable|string|in:private,business',
+            'status'             => 'nullable|string|in:draft,active',
+            'duration_days'      => 'nullable|integer|min:1|max:90',
+            'template_data'      => 'nullable|array',
+        ]);
+
+        // Ensure the user has a seller profile
+        MarketplaceSellerService::getOrCreateProfile($userId);
+
+        try {
+            $listing = MarketplaceListingService::create($userId, $data);
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::error('Marketplace listing creation failed', [
+                'user_id' => $userId,
+                'error'   => $e->getMessage(),
+            ]);
+            return $this->respondWithError('SERVER_INTERNAL_ERROR', 'Failed to create listing. Please try again.', null, 500);
+        }
+
+        $detail = MarketplaceListingService::getById($listing->id, $userId);
+
+        $meta = null;
+        if ($listing->moderation_status === 'pending') {
+            $meta = ['notice' => 'Your listing has been submitted for review and will be published once approved.'];
+        }
+
+        return $this->respondWithData($detail, $meta, 201);
+    }
+
+    /**
+     * PUT /v2/marketplace/listings/{id} — Update an existing listing.
+     *
+     * Owner-only. Validates ownership before applying changes.
+     */
+    public function update(int $id): JsonResponse
+    {
+        $this->ensureFeature();
+        $userId = $this->requireAuth();
+        $this->rateLimit('marketplace_update', 15, 60);
+
+        $listing = $this->findListingOrFail($id);
+        $this->ensureOwner($listing, $userId);
+
+        $data = request()->validate([
+            'title'              => 'sometimes|string|max:200',
+            'description'        => 'sometimes|string|max:10000',
+            'tagline'            => 'nullable|string|max:300',
+            'price'              => 'nullable|numeric|min:0',
+            'price_currency'     => 'nullable|string|max:3',
+            'price_type'         => 'nullable|string|in:fixed,negotiable,free,auction,contact',
+            'time_credit_price'  => 'nullable|numeric|min:0',
+            'category_id'        => 'nullable|integer|exists:marketplace_categories,id',
+            'condition'          => 'nullable|string|in:new,like_new,good,fair,poor',
+            'quantity'           => 'nullable|integer|min:1',
+            'location'           => 'nullable|string|max:255',
+            'latitude'           => 'nullable|numeric|between:-90,90',
+            'longitude'          => 'nullable|numeric|between:-180,180',
+            'shipping_available' => 'nullable|boolean',
+            'local_pickup'       => 'nullable|boolean',
+            'delivery_method'    => 'nullable|string|in:pickup,shipping,both,community_delivery',
+            'seller_type'        => 'nullable|string|in:private,business',
+            'status'             => 'nullable|string|in:draft,active',
+            'template_data'      => 'nullable|array',
+        ]);
+
+        try {
+            MarketplaceListingService::update($listing, $data);
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::error('Marketplace listing update failed', [
+                'listing_id' => $id,
+                'user_id'    => $userId,
+                'error'      => $e->getMessage(),
+            ]);
+            return $this->respondWithError('SERVER_INTERNAL_ERROR', 'Failed to update listing. Please try again.', null, 500);
+        }
+
+        $detail = MarketplaceListingService::getById($id, $userId);
+
+        return $this->respondWithData($detail);
+    }
+
+    /**
+     * DELETE /v2/marketplace/listings/{id} — Remove a listing.
+     *
+     * Owner-only. Soft-removes (sets status to 'removed').
+     */
+    public function destroy(int $id): JsonResponse
+    {
+        $this->ensureFeature();
+        $userId = $this->requireAuth();
+        $this->rateLimit('marketplace_delete', 10, 60);
+
+        $listing = $this->findListingOrFail($id);
+        $this->ensureOwner($listing, $userId);
+
+        MarketplaceListingService::remove($listing);
+
+        return $this->noContent();
+    }
+
+    // =====================================================================
+    //  Images (authenticated, owner-only)
+    // =====================================================================
+
+    /**
+     * POST /v2/marketplace/listings/{id}/images — Upload images to a listing.
+     *
+     * Accepts multipart/form-data with images[] files. Maximum 20 images
+     * per listing. Uses ImageUploadService for upload handling.
+     */
+    public function uploadImages(int $id): JsonResponse
+    {
+        $this->ensureFeature();
+        $userId = $this->requireAuth();
+        $this->rateLimit('marketplace_image_upload', 30, 60);
+
+        $listing = $this->findListingOrFail($id);
+        $this->ensureOwner($listing, $userId);
+
+        // Check existing image count against tenant config
+        $maxImages = \App\Services\MarketplaceConfigurationService::maxImages();
+        $existingCount = $listing->images()->count();
+        if ($existingCount >= $maxImages) {
+            return $this->respondWithError(
+                'VALIDATION_ERROR',
+                "Maximum of {$maxImages} images per listing has been reached.",
+                'images',
+                422
+            );
+        }
+
+        // Collect uploaded files
+        $request = request();
+        $files = [];
+
+        if ($request->hasFile('images')) {
+            $imageFiles = $request->file('images');
+            if (is_array($imageFiles)) {
+                $files = array_merge($files, $imageFiles);
+            } else {
+                $files[] = $imageFiles;
+            }
+        }
+
+        // Also support numbered fields (image_0, image_1, etc.)
+        for ($i = 0; $i < 20; $i++) {
+            $key = "image_{$i}";
+            if ($request->hasFile($key)) {
+                $files[] = $request->file($key);
+            }
+        }
+
+        // Fallback: single 'image' field
+        if (empty($files) && $request->hasFile('image')) {
+            $files[] = $request->file('image');
+        }
+
+        if (empty($files)) {
+            return $this->respondWithError('VALIDATION_ERROR', 'No image files provided.', 'images', 422);
+        }
+
+        // Cap at remaining slots
+        $remainingSlots = 20 - $existingCount;
+        if (count($files) > $remainingSlots) {
+            $files = array_slice($files, 0, $remainingSlots);
+        }
+
+        $uploadedImages = [];
+
+        foreach ($files as $file) {
+            try {
+                $result = $this->imageUploadService->upload($file, 'marketplace');
+
+                $uploadedImages[] = [
+                    'url'           => $result['url'],
+                    'thumbnail_url' => $result['url'], // thumbnail generation handled separately if needed
+                    'alt_text'      => $file->getClientOriginalName(),
+                ];
+            } catch (\InvalidArgumentException $e) {
+                // Skip invalid files but continue with valid ones
+                \Illuminate\Support\Facades\Log::warning('Marketplace image upload skipped', [
+                    'listing_id' => $id,
+                    'error'      => $e->getMessage(),
+                ]);
+            }
+        }
+
+        if (empty($uploadedImages)) {
+            return $this->respondWithError('UPLOAD_FAILED', 'No valid images could be uploaded. Allowed: JPEG, PNG, GIF, WebP (max 10 MB).', null, 422);
+        }
+
+        MarketplaceListingService::addImages($listing, $uploadedImages);
+
+        // Reload images to return current state
+        $listing->load(['images' => fn ($q) => $q->orderBy('sort_order')]);
+
+        $images = $listing->images->map(fn ($img) => [
+            'id'            => $img->id,
+            'url'           => $img->image_url,
+            'thumbnail_url' => $img->thumbnail_url,
+            'alt_text'      => $img->alt_text,
+            'is_primary'    => (bool) $img->is_primary,
+            'sort_order'    => $img->sort_order,
+        ])->all();
+
+        return $this->respondWithData($images, null, 201);
+    }
+
+    /**
+     * PUT /v2/marketplace/listings/{id}/images/reorder — Reorder listing images.
+     *
+     * Body: { "image_ids": [3, 1, 2] }
+     */
+    public function reorderImages(int $id): JsonResponse
+    {
+        $this->ensureFeature();
+        $userId = $this->requireAuth();
+        $this->rateLimit('marketplace_action', 30, 60);
+
+        $listing = $this->findListingOrFail($id);
+        $this->ensureOwner($listing, $userId);
+
+        $data = request()->validate([
+            'image_ids'   => 'required|array|min:1',
+            'image_ids.*' => 'integer',
+        ]);
+
+        MarketplaceListingService::reorderImages($listing, $data['image_ids']);
+
+        return $this->respondWithData(['reordered' => true]);
+    }
+
+    /**
+     * DELETE /v2/marketplace/listings/{id}/images/{imageId} — Delete a listing image.
+     */
+    public function deleteImage(int $id, int $imageId): JsonResponse
+    {
+        $this->ensureFeature();
+        $userId = $this->requireAuth();
+        $this->rateLimit('marketplace_action', 30, 60);
+
+        $listing = $this->findListingOrFail($id);
+        $this->ensureOwner($listing, $userId);
+
+        $deleted = MarketplaceListingService::deleteImage($listing, $imageId);
+
+        if (!$deleted) {
+            return $this->respondWithError('RESOURCE_NOT_FOUND', 'Image not found for this listing.', null, 404);
+        }
+
+        return $this->noContent();
+    }
+
+    // =====================================================================
+    //  Renew / Analytics (authenticated, owner-only)
+    // =====================================================================
+
+    /**
+     * POST /v2/marketplace/listings/{id}/renew — Renew an expired listing.
+     *
+     * Owner-only. Resets the listing to active status with a new expiry.
+     */
+    public function renew(int $id): JsonResponse
+    {
+        $this->ensureFeature();
+        $userId = $this->requireAuth();
+        $this->rateLimit('marketplace_action', 30, 60);
+
+        $listing = $this->findListingOrFail($id);
+        $this->ensureOwner($listing, $userId);
+
+        $days = $this->inputInt('duration_days', 30, 1, 90);
+
+        $updated = MarketplaceListingService::renew($listing, $days);
+        $detail = MarketplaceListingService::getById($updated->id, $userId);
+
+        return $this->respondWithData($detail);
+    }
+
+    /**
+     * GET /v2/marketplace/listings/{id}/analytics — Listing performance analytics.
+     *
+     * Owner-only. Returns views, saves, contacts, offers, and date info.
+     */
+    public function analytics(int $id): JsonResponse
+    {
+        $this->ensureFeature();
+        $userId = $this->requireAuth();
+        $this->rateLimit('marketplace_action', 30, 60);
+
+        $listing = $this->findListingOrFail($id);
+        $this->ensureOwner($listing, $userId);
+
+        $analytics = MarketplaceListingService::getAnalytics($listing);
+
+        return $this->respondWithData($analytics);
+    }
+
+    // =====================================================================
+    //  AI Description Generation (authenticated)
+    // =====================================================================
+
+    /**
+     * POST /v2/marketplace/listings/generate-description — AI description.
+     *
+     * Uses AiChatService to generate a marketplace listing description
+     * from the provided title, category, and condition.
+     */
+    public function generateDescription(): JsonResponse
+    {
+        $this->ensureFeature();
+        $userId = $this->requireAuth();
+        $this->rateLimit('marketplace_ai_generate', 5, 60);
+
+        $data = request()->validate([
+            'title'     => 'required|string|max:200',
+            'category'  => 'nullable|string|max:100',
+            'condition' => 'nullable|string|max:50',
+        ]);
+
+        $prompt = "Write a compelling marketplace listing description for the following item. "
+            . "Keep it concise (2-3 paragraphs), honest, and appealing to buyers.\n\n"
+            . "Title: {$data['title']}";
+
+        if (!empty($data['category'])) {
+            $prompt .= "\nCategory: {$data['category']}";
+        }
+        if (!empty($data['condition'])) {
+            $prompt .= "\nCondition: {$data['condition']}";
+        }
+
+        $prompt .= "\n\nWrite only the description, no titles or headers.";
+
+        $result = $this->aiChatService->chat($userId, $prompt, [
+            'system_prompt' => 'You are a helpful assistant that writes marketplace listing descriptions. Be concise, honest, and appealing. Do not invent features or specs not implied by the title.',
+            'max_tokens'    => 512,
+        ]);
+
+        if (!empty($result['error'])) {
+            return $this->respondWithError('AI_GENERATION_FAILED', 'Could not generate a description. Please try again or write one manually.', null, 422);
+        }
+
+        return $this->respondWithData([
+            'description' => $result['reply'],
+        ]);
+    }
+
+    // =====================================================================
+    //  Specialty Browse (public)
+    // =====================================================================
+
+    /**
+     * GET /v2/marketplace/listings/nearby — Geolocation-based listing search.
+     *
+     * Requires latitude and longitude query params. Optional radius (km, default 25).
+     */
+    public function nearby(): JsonResponse
+    {
+        $this->ensureFeature();
+        $this->rateLimit('marketplace_browse', 60, 60);
+
+        $lat = $this->query('latitude');
+        $lng = $this->query('longitude');
+
+        if ($lat === null || $lng === null) {
+            return $this->respondWithError('VALIDATION_ERROR', 'Latitude and longitude are required.', 'latitude', 422);
+        }
+
+        $lat = (float) $lat;
+        $lng = (float) $lng;
+
+        if ($lat < -90 || $lat > 90 || $lng < -180 || $lng > 180) {
+            return $this->respondWithError('VALIDATION_ERROR', 'Invalid coordinates.', 'latitude', 422);
+        }
+
+        $radius = (float) ($this->query('radius') ?? 25);
+        $radius = max(1, min($radius, 200));
+
+        $limit = $this->queryInt('limit', 20, 1, 100);
+
+        $items = MarketplaceListingService::getNearby($lat, $lng, $radius, $limit);
+
+        return $this->respondWithData($items);
+    }
+
+    /**
+     * GET /v2/marketplace/listings/featured — Promoted/featured listings.
+     *
+     * Returns active listings that have an active promotion (promoted_until > now).
+     */
+    public function featured(): JsonResponse
+    {
+        $this->ensureFeature();
+        $this->rateLimit('marketplace_browse', 60, 60);
+
+        $userId = $this->getOptionalUserId() ?? $this->resolveSanctumUserOptionally();
+        $limit = $this->queryInt('limit', 20, 1, 50);
+
+        $result = MarketplaceListingService::getAll([
+            'limit'           => $limit,
+            'featured_first'  => true,
+            'current_user_id' => $userId,
+            'sort'            => 'newest',
+        ]);
+
+        // Filter to only promoted items
+        $featured = array_filter($result['items'], fn ($item) => !empty($item['is_promoted']));
+
+        return $this->respondWithData(array_values($featured));
+    }
+
+    /**
+     * GET /v2/marketplace/listings/free — Free items only.
+     *
+     * Convenience endpoint that filters to price_type=free.
+     */
+    public function free(): JsonResponse
+    {
+        $this->ensureFeature();
+        $this->rateLimit('marketplace_browse', 60, 60);
+
+        $userId = $this->getOptionalUserId() ?? $this->resolveSanctumUserOptionally();
+        $limit = $this->queryInt('limit', 20, 1, 100);
+        $cursor = $this->query('cursor');
+
+        $result = MarketplaceListingService::getAll([
+            'limit'           => $limit,
+            'cursor'          => $cursor,
+            'price_type'      => 'free',
+            'current_user_id' => $userId,
+        ]);
+
+        return $this->respondWithCollection(
+            $result['items'],
+            $result['cursor'],
+            $limit,
+            $result['has_more']
+        );
+    }
+
+    // =====================================================================
+    //  Saved / Favorites (authenticated)
+    // =====================================================================
+
+    /**
+     * GET /v2/marketplace/listings/saved — User's saved/bookmarked listings.
+     */
+    public function savedListings(): JsonResponse
+    {
+        $this->ensureFeature();
+        $userId = $this->requireAuth();
+        $this->rateLimit('marketplace_action', 30, 60);
+
+        $limit = $this->queryInt('limit', 20, 1, 100);
+        $cursor = $this->query('cursor');
+
+        $result = MarketplaceListingService::getSavedListings($userId, $limit, $cursor);
+
+        return $this->respondWithCollection(
+            $result['items'],
+            $result['cursor'],
+            $limit,
+            $result['has_more']
+        );
+    }
+
+    /**
+     * POST /v2/marketplace/listings/{id}/save — Save/bookmark a listing.
+     */
+    public function save(int $id): JsonResponse
+    {
+        $this->ensureFeature();
+        $userId = $this->requireAuth();
+        $this->rateLimit('marketplace_action', 30, 60);
+
+        // Verify the listing exists
+        $this->findListingOrFail($id);
+
+        MarketplaceListingService::saveListing($userId, $id);
+
+        return $this->respondWithData(['saved' => true], null, 201);
+    }
+
+    /**
+     * DELETE /v2/marketplace/listings/{id}/save — Unsave/unbookmark a listing.
+     */
+    public function unsave(int $id): JsonResponse
+    {
+        $this->ensureFeature();
+        $userId = $this->requireAuth();
+        $this->rateLimit('marketplace_action', 30, 60);
+
+        // Verify the listing exists
+        $this->findListingOrFail($id);
+
+        MarketplaceListingService::unsaveListing($userId, $id);
+
+        return $this->respondWithData(['saved' => false]);
+    }
+
+    // =====================================================================
+    //  Categories (public)
+    // =====================================================================
+
+    /**
+     * GET /v2/marketplace/categories — All marketplace categories with counts.
+     */
+    public function categories(): JsonResponse
+    {
+        $this->ensureFeature();
+        $this->rateLimit('marketplace_browse', 60, 60);
+
+        $categories = MarketplaceListingService::getCategories();
+
+        return $this->respondWithData($categories);
+    }
+
+    /**
+     * GET /v2/marketplace/categories/{id}/template — Category template fields.
+     *
+     * Returns the template field definitions for a specific category,
+     * used by the frontend to render dynamic form fields.
+     */
+    public function categoryTemplate(int $id): JsonResponse
+    {
+        $this->ensureFeature();
+        $this->rateLimit('marketplace_browse', 60, 60);
+
+        $template = MarketplaceCategoryTemplate::where('category_id', $id)->first();
+
+        if (!$template) {
+            return $this->respondWithData([
+                'category_id' => $id,
+                'name'        => null,
+                'fields'      => [],
+            ]);
+        }
+
+        return $this->respondWithData([
+            'id'          => $template->id,
+            'category_id' => $template->category_id,
+            'name'        => $template->name,
+            'fields'      => $template->fields ?? [],
+        ]);
+    }
+}

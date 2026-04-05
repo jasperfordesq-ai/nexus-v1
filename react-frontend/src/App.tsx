@@ -189,6 +189,14 @@ const HashtagsDiscoveryPage = lazyWithRetry(() => import('@/pages/feed/HashtagsD
 const PostDetailPage = lazyWithRetry(() => import('@/pages/feed/PostDetailPage'));
 const ExplorePage = lazyWithRetry(() => import('@/pages/explore/ExplorePage'));
 
+// Marketplace Pages
+const MarketplacePage = lazyWithRetry(() => import('./pages/marketplace/MarketplacePage'));
+const MarketplaceListingPage = lazyWithRetry(() => import('./pages/marketplace/MarketplaceListingPage'));
+const CreateMarketplaceListingPage = lazyWithRetry(() => import('./pages/marketplace/CreateMarketplaceListingPage'));
+const MarketplaceSearchPage = lazyWithRetry(() => import('./pages/marketplace/MarketplaceSearchPage'));
+const SellerProfilePage = lazyWithRetry(() => import('./pages/marketplace/SellerProfilePage'));
+const MarketplaceCategoryPage = lazyWithRetry(() => import('./pages/marketplace/MarketplaceCategoryPage'));
+
 // Static Pages
 const DevelopmentStatusPage = lazyWithRetry(() => import('@/pages/public/DevelopmentStatusPage'));
 const AboutPage = lazyWithRetry(() => import('@/pages/public/AboutPage'));
@@ -367,6 +375,43 @@ function AppRoutes() {
           <FeatureGate feature="job_vacancies" redirect="/">
             <FeatureErrorBoundary featureName="Job Vacancies">
               <JobDetailPage />
+            </FeatureErrorBoundary>
+          </FeatureGate>
+        } />
+
+        {/* Public: Marketplace (feature-gated, view-only) */}
+        <Route path="marketplace" element={
+          <FeatureGate feature="marketplace" fallback={<ComingSoonPage feature="Marketplace" />}>
+            <FeatureErrorBoundary featureName="Marketplace">
+              <MarketplacePage />
+            </FeatureErrorBoundary>
+          </FeatureGate>
+        } />
+        <Route path="marketplace/search" element={
+          <FeatureGate feature="marketplace" redirect="/">
+            <FeatureErrorBoundary featureName="Marketplace">
+              <MarketplaceSearchPage />
+            </FeatureErrorBoundary>
+          </FeatureGate>
+        } />
+        <Route path="marketplace/seller/:id" element={
+          <FeatureGate feature="marketplace" redirect="/">
+            <FeatureErrorBoundary featureName="Marketplace">
+              <SellerProfilePage />
+            </FeatureErrorBoundary>
+          </FeatureGate>
+        } />
+        <Route path="marketplace/category/:slug" element={
+          <FeatureGate feature="marketplace" redirect="/">
+            <FeatureErrorBoundary featureName="Marketplace">
+              <MarketplaceCategoryPage />
+            </FeatureErrorBoundary>
+          </FeatureGate>
+        } />
+        <Route path="marketplace/:id" element={
+          <FeatureGate feature="marketplace" redirect="/">
+            <FeatureErrorBoundary featureName="Marketplace">
+              <MarketplaceListingPage />
             </FeatureErrorBoundary>
           </FeatureGate>
         } />
@@ -768,6 +813,15 @@ function AppRoutes() {
             <FeatureGate feature="job_vacancies" redirect="/dashboard">
               <FeatureErrorBoundary featureName="Job Vacancies">
                 <EmployerOnboardingPage />
+              </FeatureErrorBoundary>
+            </FeatureGate>
+          } />
+
+          {/* Feature-gated: Marketplace (create/sell only — view routes are public) */}
+          <Route path="marketplace/sell" element={
+            <FeatureGate feature="marketplace" redirect="/dashboard">
+              <FeatureErrorBoundary featureName="Marketplace">
+                <CreateMarketplaceListingPage />
               </FeatureErrorBoundary>
             </FeatureGate>
           } />

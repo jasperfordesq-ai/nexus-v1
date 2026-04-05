@@ -52,6 +52,7 @@ const FEATURE_META: { key: string; label: string; description: string; icon: typ
   { key: 'messages', label: 'Messages', description: 'Private messaging between members', icon: MessageCircle },
   { key: 'dashboard', label: 'Dashboard', description: 'Member dashboard overview', icon: LayoutDashboard },
   { key: 'feed', label: 'Feed', description: 'Community activity feed', icon: Rss },
+  { key: 'marketplace', label: 'Marketplace', description: 'Commercial buy/sell marketplace (separate from timebanking listings)', icon: ShoppingBag },
 ];
 
 const COUNTRY_CODES = [
