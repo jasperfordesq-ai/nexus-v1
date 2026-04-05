@@ -259,7 +259,7 @@ export function MarketplacePage() {
     return (
       <div className="max-w-5xl mx-auto px-4 py-12">
         <EmptyState
-          icon={ShoppingBag}
+          icon={<ShoppingBag className="w-8 h-8" />}
           title={t('hub_feature_gate.title', 'Marketplace Not Available')}
           description={t('hub_feature_gate.description', 'The marketplace feature is not enabled for this community.')}
         />
@@ -355,7 +355,7 @@ export function MarketplacePage() {
               </GlassCard>
             ) : listings.length === 0 ? (
               <EmptyState
-                icon={ShoppingBag}
+                icon={<ShoppingBag className="w-8 h-8" />}
                 title={t('hub.no_listings_title', 'No Listings Found')}
                 description={
                   debouncedQuery || selectedCategoryId != null

@@ -223,7 +223,7 @@ export function SellerProfilePage() {
     return (
       <div className="max-w-3xl mx-auto px-4 py-12">
         <EmptyState
-          icon={User}
+          icon={<User className="w-8 h-8" />}
           title={t('seller.not_found_title', 'Seller Not Found')}
           description={error || t('seller.not_found_description', 'This seller profile could not be found.')}
           action={{ label: t('seller.back_to_marketplace', 'Back to Marketplace'), onClick: () => navigate(tenantPath('/marketplace')) }}
@@ -398,7 +398,7 @@ export function SellerProfilePage() {
               </div>
             ) : listings.length === 0 ? (
               <EmptyState
-                icon={ShoppingBag}
+                icon={<ShoppingBag className="w-8 h-8" />}
                 title={t('seller.no_listings_title', 'No Listings')}
                 description={t('seller.no_listings_description', "{{name}} doesn't have any active listings right now.", { name: seller.name })}
               />

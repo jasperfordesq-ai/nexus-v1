@@ -354,7 +354,7 @@ export function MyListingsPage() {
           </div>
         ) : listings.length === 0 ? (
           <EmptyState
-            icon={Package}
+            icon={<Package className="w-8 h-8" />}
             title={t(`my_listings.empty_${activeTab}_title`, 'No Listings')}
             description={t(`my_listings.empty_${activeTab}_description`, 'You don\'t have any listings in this category yet.')}
             action={

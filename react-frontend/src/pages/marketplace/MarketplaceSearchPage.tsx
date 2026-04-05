@@ -583,7 +583,7 @@ export function MarketplaceSearchPage() {
               </div>
             ) : listings.length === 0 ? (
               <EmptyState
-                icon={Search}
+                icon={<Search className="w-8 h-8" />}
                 title={t('search.no_results_title', 'No Results Found')}
                 description={t('search.no_results_description', "Try adjusting your search or filters to find what you're looking for.")}
                 action={

@@ -235,7 +235,7 @@ export function MarketplaceCollectionsPage() {
     return (
       <div className="max-w-5xl mx-auto px-4 py-12">
         <EmptyState
-          icon={ShoppingBag}
+          icon={<ShoppingBag className="w-8 h-8" />}
           title={t('hub_feature_gate.title', 'Marketplace Not Available')}
           description={t('hub_feature_gate.description', 'The marketplace feature is not enabled for this community.')}
         />
@@ -247,7 +247,7 @@ export function MarketplaceCollectionsPage() {
     return (
       <div className="max-w-5xl mx-auto px-4 py-12">
         <EmptyState
-          icon={FolderHeart}
+          icon={<FolderHeart className="w-8 h-8" />}
           title={t('collections.sign_in_title', 'Sign In Required')}
           description={t('collections.sign_in_description', 'Sign in to manage your collections and saved searches.')}
         />
@@ -300,7 +300,7 @@ export function MarketplaceCollectionsPage() {
             </div>
           ) : collectionItems.length === 0 ? (
             <EmptyState
-              icon={Package}
+              icon={<Package className="w-8 h-8" />}
               title={t('collections.empty_title', 'No Items Yet')}
               description={t('collections.empty_description', 'Add items from marketplace listings to this collection.')}
               action={{
@@ -419,7 +419,7 @@ export function MarketplaceCollectionsPage() {
               </div>
             ) : collections.length === 0 ? (
               <EmptyState
-                icon={FolderHeart}
+                icon={<FolderHeart className="w-8 h-8" />}
                 title={t('collections.empty_collections_title', 'No Collections Yet')}
                 description={t('collections.empty_collections_description', 'Create a collection to organize your favorite marketplace items.')}
                 action={{
@@ -458,7 +458,7 @@ export function MarketplaceCollectionsPage() {
               </div>
             ) : savedSearches.length === 0 ? (
               <EmptyState
-                icon={Search}
+                icon={<Search className="w-8 h-8" />}
                 title={t('saved_searches.empty_title', 'No Saved Searches')}
                 description={t('saved_searches.empty_description', 'Save a search from the marketplace to get alerts when new matching items are listed.')}
                 action={{

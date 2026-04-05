@@ -317,7 +317,7 @@ export function MyOffersPage() {
           </div>
         ) : offers.length === 0 ? (
           <EmptyState
-            icon={activeTab === 'sent' ? Send : Inbox}
+            icon={activeTab === 'sent' ? <Send className="w-8 h-8" /> : <Inbox className="w-8 h-8" />}
             title={
               activeTab === 'sent'
                 ? t('my_offers.empty_sent_title', 'No Offers Sent')

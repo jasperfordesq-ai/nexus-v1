@@ -336,7 +336,7 @@ export function MarketplaceCategoryPage() {
     return (
       <div className="max-w-3xl mx-auto px-4 py-12">
         <EmptyState
-          icon={Tag}
+          icon={<Tag className="w-8 h-8" />}
           title={t('category.not_found_title', 'Category Not Found')}
           description={categoryError || t('category.not_found_description', 'This category does not exist.')}
           action={{ label: t('category.back_to_marketplace', 'Back to Marketplace'), onClick: () => navigate(tenantPath('/marketplace')) }}
@@ -570,7 +570,7 @@ export function MarketplaceCategoryPage() {
               </div>
             ) : listings.length === 0 ? (
               <EmptyState
-                icon={ShoppingBag}
+                icon={<ShoppingBag className="w-8 h-8" />}
                 title={t('category.no_listings_title', 'No Listings Found')}
                 description={
                   debouncedQuery || activeFilterCount > 0

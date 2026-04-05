@@ -385,7 +385,7 @@ export function MarketplaceListingPage() {
     return (
       <div className="max-w-3xl mx-auto px-4 py-12">
         <EmptyState
-          icon={ShoppingBag}
+          icon={<ShoppingBag className="w-8 h-8" />}
           title={t('listing.not_found_title', 'Listing Not Found')}
           description={error || t('listing.not_found_description', 'This listing may have been removed or is no longer available.')}
           action={{ label: t('listing.back_to_marketplace', 'Back to Marketplace'), onClick: () => navigate(tenantPath('/marketplace')) }}
