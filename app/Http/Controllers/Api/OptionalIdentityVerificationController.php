@@ -49,6 +49,50 @@ class OptionalIdentityVerificationController extends BaseApiController
         // Check for any active verification session
         $latestSession = IdentityVerificationSessionService::getLatestForUser($tenantId, $userId);
 
+        // If there's an active session (created/started), poll Stripe directly
+        // This works even if the webhook hasn't arrived yet
+        if ($latestSession && in_array($latestSession['status'], ['created', 'started', 'processing'], true)) {
+            $providerSessionId = $latestSession['provider_session_id'] ?? null;
+            if ($providerSessionId) {
+                try {
+                    $provider = IdentityProviderRegistry::get('stripe_identity');
+                    $stripeStatus = $provider->getSessionStatus($providerSessionId);
+                    $mappedStatus = $stripeStatus['status'] ?? null;
+
+                    // If Stripe says verified but our DB still says created, update everything
+                    if ($mappedStatus === 'passed' && $latestSession['status'] !== 'passed') {
+                        IdentityVerificationSessionService::updateStatus(
+                            (int) $latestSession['id'],
+                            'passed',
+                            null,
+                            null,
+                            null
+                        );
+                        $latestSession['status'] = 'passed';
+
+                        // Auto-grant badge
+                        if (!$hasIdBadge) {
+                            self::grantIdVerifiedBadge($userId, $tenantId);
+                            $hasIdBadge = true;
+                        }
+                    } elseif ($mappedStatus === 'failed') {
+                        IdentityVerificationSessionService::updateStatus(
+                            (int) $latestSession['id'],
+                            'failed',
+                            null,
+                            null,
+                            $stripeStatus['failure_reason'] ?? 'Verification failed'
+                        );
+                        $latestSession['status'] = 'failed';
+                        $latestSession['failure_reason'] = $stripeStatus['failure_reason'] ?? 'Verification failed';
+                    }
+                } catch (\Throwable $e) {
+                    // Non-critical — continue with DB status
+                    Log::warning('Stripe Identity status check failed', ['error' => $e->getMessage()]);
+                }
+            }
+        }
+
         return $this->respondWithData([
             'has_id_verified_badge' => $hasIdBadge,
             'verification_status' => $latestSession ? $latestSession['status'] : null,
