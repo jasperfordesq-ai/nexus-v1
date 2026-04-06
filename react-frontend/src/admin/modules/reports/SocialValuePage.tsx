@@ -507,7 +507,7 @@ export function SocialValuePage() {
                 <Divider />
                 <div className="text-xs text-default-400 space-y-1">
                   <p>
-                    <strong>Period:</strong> {data.period.from} to {data.period.to}
+                    <strong>Period:</strong> {data.period?.from ?? '--'} to {data.period?.to ?? '--'}
                   </p>
                   <p>
                     <strong>Hour Value:</strong> {formatCurrency(data.config.hour_value, currency)}/hr

@@ -2418,11 +2418,14 @@ document.addEventListener('DOMContentLoaded', function() {
 })();
 </script>
 
-<?php require __DIR__ . '/admin-modals.php'; ?>
-<?php require __DIR__ . '/admin-bulk-actions.php'; ?>
-<?php require __DIR__ . '/admin-export.php'; ?>
-<?php require __DIR__ . '/admin-validation.php'; ?>
-<?php require __DIR__ . '/admin-realtime.php'; ?>
+<?php
+$sharedAdminPartials = __DIR__ . '/../partials/admin';
+require $sharedAdminPartials . '/admin-modals.php';
+require $sharedAdminPartials . '/admin-bulk-actions.php';
+require $sharedAdminPartials . '/admin-export.php';
+require $sharedAdminPartials . '/admin-validation.php';
+require $sharedAdminPartials . '/admin-realtime.php';
+?>
 
 <style>
 .admin-help-shortcuts {

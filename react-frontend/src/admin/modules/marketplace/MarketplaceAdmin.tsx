@@ -267,7 +267,7 @@ export function MarketplaceAdmin() {
                     </TableCell>
                     <TableCell className="text-default-600">{listing.user?.name ?? '--'}</TableCell>
                     <TableCell className="text-default-600">
-                      {listing.price_currency ?? ''}{Number(listing.price ?? 0).toFixed(2)}
+                      {listing.price_currency ?? ''}{(parseFloat(String(listing.price)) || 0).toFixed(2)}
                     </TableCell>
                     <TableCell>
                       <Chip
