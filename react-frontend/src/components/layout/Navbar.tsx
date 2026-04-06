@@ -178,7 +178,8 @@ export function Navbar({ onMobileMenuOpen, externalSearchOpen, onSearchOpenChang
           setIsIdVerified(res.data.has_id_verified_badge);
         }
       } catch {
-        // Non-critical — hide the button if we can't check
+        // Non-critical — default to showing the button if we can't check
+        if (!cancelled) setIsIdVerified(false);
       }
     })();
     return () => { cancelled = true; };
