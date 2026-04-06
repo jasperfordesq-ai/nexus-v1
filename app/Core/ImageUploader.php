@@ -227,6 +227,28 @@ class ImageUploader
                 return;
         }
 
+        // Fix EXIF orientation — phones store rotation as metadata, not pixels.
+        // Without this, photos taken in portrait appear sideways.
+        if ($mime === 'image/jpeg' && \function_exists('exif_read_data')) {
+            $exif = @\exif_read_data($path);
+            if ($exif && !empty($exif['Orientation'])) {
+                switch ((int) $exif['Orientation']) {
+                    case 3: // 180°
+                        $image = \imagerotate($image, 180, 0);
+                        break;
+                    case 6: // 90° CW (phone held upright)
+                        $image = \imagerotate($image, -90, 0);
+                        break;
+                    case 8: // 90° CCW
+                        $image = \imagerotate($image, 90, 0);
+                        break;
+                }
+                // Update dimensions after rotation
+                $srcWidth = \imagesx($image);
+                $srcHeight = \imagesy($image);
+            }
+        }
+
         $targetWidth = $options['width'] ?? $srcWidth;
         $targetHeight = $options['height'] ?? ($options['crop'] ? $targetWidth : $srcHeight);
 

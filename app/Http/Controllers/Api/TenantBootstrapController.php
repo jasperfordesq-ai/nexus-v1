@@ -92,38 +92,46 @@ class TenantBootstrapController extends BaseApiController
             return $this->respondWithData($data);
         }
 
-        // Origin-based resolution for custom domains
-        $origin = $_SERVER['HTTP_ORIGIN'] ?? '';
-        if ($origin) {
-            $originHost = parse_url($origin, PHP_URL_HOST);
-            if ($originHost) {
-                $originHost = preg_replace('/^www\./', '', $originHost);
+        // Host-based resolution takes priority — TenantContext was resolved from
+        // the actual HTTP Host header by index.php (the domain the user is on).
+        // Only fall back to Origin header when TenantContext resolved to master (ID 1),
+        // which means the Host was a generic/shared domain (e.g. app.project-nexus.ie).
+        $tenantId = TenantContext::getId();
 
-                $originTenant = DB::table('tenants')
-                    ->where('domain', $originHost)
-                    ->where('is_active', 1)
-                    ->first();
+        // Origin-based resolution — ONLY when Host resolved to master tenant.
+        // The Origin header reflects where the request came from, NOT where the user
+        // is navigating. Using it when a custom domain already resolved the tenant
+        // caused cross-tenant redirects (e.g. tonks.us user seeing pairc-goodman.com).
+        if ($tenantId <= 1) {
+            $origin = $_SERVER['HTTP_ORIGIN'] ?? '';
+            if ($origin) {
+                $originHost = parse_url($origin, PHP_URL_HOST);
+                if ($originHost) {
+                    $originHost = preg_replace('/^www\./', '', $originHost);
 
-                if ($originTenant && (int) $originTenant->id !== 1) {
-                    $originTenant = (array) $originTenant;
-                    $tenantId = (int) $originTenant['id'];
+                    $originTenant = DB::table('tenants')
+                        ->where('domain', $originHost)
+                        ->where('is_active', 1)
+                        ->first();
 
-                    TenantContext::setById($tenantId);
+                    if ($originTenant && (int) $originTenant->id !== 1) {
+                        $originTenant = (array) $originTenant;
+                        $tenantId = (int) $originTenant['id'];
 
-                    $cached = $this->redisCache->get(self::CACHE_KEY, $tenantId);
-                    if ($cached !== null) {
-                        return $this->respondWithData($cached);
+                        TenantContext::setById($tenantId);
+
+                        $cached = $this->redisCache->get(self::CACHE_KEY, $tenantId);
+                        if ($cached !== null) {
+                            return $this->respondWithData($cached);
+                        }
+
+                        $data = $this->buildBootstrapData($originTenant);
+                        $this->redisCache->set(self::CACHE_KEY, $data, self::CACHE_TTL, $tenantId);
+                        return $this->respondWithData($data);
                     }
-
-                    $data = $this->buildBootstrapData($originTenant);
-                    $this->redisCache->set(self::CACHE_KEY, $data, self::CACHE_TTL, $tenantId);
-                    return $this->respondWithData($data);
                 }
             }
         }
-
-        // Default: use TenantContext resolved by index.php
-        $tenantId = TenantContext::getId();
 
         $cached = $this->redisCache->get(self::CACHE_KEY, $tenantId);
         if ($cached !== null) {
