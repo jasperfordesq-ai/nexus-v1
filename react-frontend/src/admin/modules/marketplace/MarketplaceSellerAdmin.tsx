@@ -37,14 +37,18 @@ import { PageHeader, DataTable, ConfirmModal, EmptyState, type Column } from '..
 
 interface Seller {
   id: number;
-  name: string;
-  type: 'private' | 'business';
-  is_verified: boolean;
+  user_id: number;
+  display_name: string;
+  seller_type: 'private' | 'business';
+  business_name: string | null;
+  business_verified: boolean;
+  is_community_endorsed: boolean;
   active_listings: number;
   total_sales: number;
   avg_rating: number;
-  joined_at: string;
-  status: string;
+  total_ratings: number;
+  joined_marketplace_at: string | null;
+  user: { id: number; name: string; email: string; avatar_url: string | null } | null;
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -83,16 +87,16 @@ export function MarketplaceSellerAdmin() {
   const loadSellers = useCallback(async () => {
     setLoading(true);
     try {
-      const params = new URLSearchParams({ page: String(page), limit: '20' });
+      const params = new URLSearchParams({ page: String(page), per_page: '20' });
       if (search) params.set('search', search);
       if (filter !== 'all') {
         // Map UI filter tabs to API parameters
         if (filter === 'private' || filter === 'business') {
-          params.set('type', filter);
+          params.set('seller_type', filter);
         } else if (filter === 'verified') {
-          params.set('verified', '1');
+          params.set('verified', 'true');
         } else if (filter === 'unverified') {
-          params.set('verified', '0');
+          params.set('verified', 'false');
         }
       }
 
@@ -131,7 +135,7 @@ export function MarketplaceSellerAdmin() {
     try {
       const res = await api.post(`/v2/admin/marketplace/sellers/${confirmVerify.id}/verify`);
       if (res?.success) {
-        toast.success(t('marketplace.seller_verified', { name: confirmVerify.name }));
+        toast.success(t('marketplace.seller_verified', { name: confirmVerify.display_name }));
         loadSellers();
       } else {
         toast.error((res as { error?: string }).error || t('marketplace.failed_verify_seller'));
@@ -150,7 +154,7 @@ export function MarketplaceSellerAdmin() {
     try {
       const res = await api.post(`/v2/admin/marketplace/sellers/${confirmSuspend.id}/suspend`);
       if (res?.success) {
-        toast.success(t('marketplace.seller_suspended', { name: confirmSuspend.name }));
+        toast.success(t('marketplace.seller_suspended', { name: confirmSuspend.display_name }));
         loadSellers();
       } else {
         toast.error((res as { error?: string }).error || t('marketplace.failed_suspend_seller'));
@@ -166,13 +170,14 @@ export function MarketplaceSellerAdmin() {
   // ─── Render star rating ────────────────────────────────────────────────────
 
   function renderRating(rating: number) {
-    if (!rating || rating === 0) {
+    const num = Number(rating);
+    if (!num || num === 0) {
       return <span className="text-sm text-default-400">--</span>;
     }
     return (
       <div className="flex items-center gap-1">
         <Star size={14} className="text-warning fill-warning" />
-        <span className="text-sm text-default-600">{rating.toFixed(1)}</span>
+        <span className="text-sm text-default-600">{num.toFixed(1)}</span>
       </div>
     );
   }
@@ -181,13 +186,13 @@ export function MarketplaceSellerAdmin() {
 
   const columns: Column<Seller>[] = [
     {
-      key: 'name',
+      key: 'display_name',
       label: t('marketplace.col_seller_name'),
       sortable: true,
       render: (item) => (
         <div className="flex items-center gap-2">
-          <span className="font-medium text-foreground">{item.name}</span>
-          {item.is_verified && (
+          <span className="font-medium text-foreground">{item.display_name}</span>
+          {item.business_verified && (
             <Tooltip content={t('marketplace.verified_seller')}>
               <BadgeCheck size={16} className="text-success shrink-0" />
             </Tooltip>
@@ -196,17 +201,17 @@ export function MarketplaceSellerAdmin() {
       ),
     },
     {
-      key: 'type',
+      key: 'seller_type',
       label: t('marketplace.col_type'),
       sortable: true,
       render: (item) => (
         <Chip
           size="sm"
           variant="flat"
-          color={typeColors[item.type] || 'default'}
+          color={typeColors[item.seller_type] || 'default'}
           className="capitalize"
         >
-          {item.type}
+          {item.seller_type}
         </Chip>
       ),
     },
@@ -233,12 +238,14 @@ export function MarketplaceSellerAdmin() {
       render: (item) => renderRating(item.avg_rating),
     },
     {
-      key: 'joined_at',
+      key: 'joined_marketplace_at',
       label: t('marketplace.col_joined'),
       sortable: true,
       render: (item) => (
         <span className="text-sm text-default-500">
-          {new Date(item.joined_at).toLocaleDateString()}
+          {item.joined_marketplace_at
+            ? new Date(item.joined_marketplace_at).toLocaleDateString()
+            : '--'}
         </span>
       ),
     },
@@ -247,7 +254,7 @@ export function MarketplaceSellerAdmin() {
       label: t('marketplace.col_actions'),
       render: (item) => (
         <div className="flex gap-1">
-          {item.type === 'business' && !item.is_verified && (
+          {item.seller_type === 'business' && !item.business_verified && (
             <Tooltip content={t('marketplace.action_verify_business')}>
               <Button
                 isIconOnly
@@ -282,7 +289,7 @@ export function MarketplaceSellerAdmin() {
               variant="flat"
               color="primary"
               as="a"
-              href={tenantPath(`/profile/${item.id}`)}
+              href={tenantPath(`/profile/${item.user_id}`)}
               target="_blank"
               rel="noopener noreferrer"
               aria-label={t('marketplace.action_view_seller_profile')}
@@ -363,7 +370,7 @@ export function MarketplaceSellerAdmin() {
           onClose={() => setConfirmVerify(null)}
           onConfirm={handleVerify}
           title={t('marketplace.verify_seller_title')}
-          message={t('marketplace.verify_seller_message', { name: confirmVerify.name })}
+          message={t('marketplace.verify_seller_message', { name: confirmVerify.display_name })}
           confirmLabel={t('marketplace.verify_btn')}
           confirmColor="primary"
           isLoading={actionLoading}
@@ -377,7 +384,7 @@ export function MarketplaceSellerAdmin() {
           onClose={() => setConfirmSuspend(null)}
           onConfirm={handleSuspend}
           title={t('marketplace.suspend_seller_title')}
-          message={t('marketplace.suspend_seller_message', { name: confirmSuspend.name })}
+          message={t('marketplace.suspend_seller_message', { name: confirmSuspend.display_name })}
           confirmLabel={t('marketplace.suspend_btn')}
           confirmColor="danger"
           isLoading={actionLoading}
