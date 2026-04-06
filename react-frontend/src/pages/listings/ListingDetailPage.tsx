@@ -31,7 +31,6 @@ import {
   Flag,
   Monitor,
   HelpCircle,
-  ShieldCheck,
   Star,
 } from 'lucide-react';
 import { GlassCard, ImagePlaceholder } from '@/components/ui';
