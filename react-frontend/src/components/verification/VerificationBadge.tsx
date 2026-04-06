@@ -4,16 +4,17 @@
 // See NOTICE file for attribution and acknowledgements.
 
 /**
- * VerificationBadge - Displays verification badge icons on profiles
+ * VerificationBadge — Displays labeled verification badges on profiles,
+ * listings, members, exchanges, marketplace, and messages.
  *
  * Badge types: email_verified, phone_verified, id_verified,
  * dbs_checked, admin_verified.
  *
- * Shows as shield icons with tooltip on hover.
+ * Shows as labeled chips with icons — always visible, no hover required.
  */
 
 import { useState, useEffect } from 'react';
-import { Tooltip, Chip } from '@heroui/react';
+import { Chip } from '@heroui/react';
 import {
   ShieldCheck,
   Mail,
@@ -33,12 +34,12 @@ import { logError } from '@/lib/logger';
 
 export interface VerificationBadgeData {
   type: string;
-  badge_type?: string; // API returns badge_type, normalize to type
+  badge_type?: string;
   label: string;
   description?: string;
   verified?: boolean;
   verified_at?: string;
-  granted_at?: string; // API returns granted_at
+  granted_at?: string;
   verified_by?: string;
   verified_by_name?: string;
 }
@@ -49,44 +50,62 @@ export interface VerificationBadgeData {
 
 const badgeConfig: Record<string, {
   icon: React.ReactNode;
+  iconSm: React.ReactNode;
   color: string;
   bgColor: string;
   label: string;
 }> = {
   email_verified: {
     icon: <Mail className="w-3.5 h-3.5" />,
-    color: 'text-blue-500',
+    iconSm: <Mail className="w-3 h-3" />,
+    color: 'text-blue-600 dark:text-blue-400',
     bgColor: 'bg-blue-500/10',
     label: 'Email Verified',
   },
   phone_verified: {
     icon: <Phone className="w-3.5 h-3.5" />,
-    color: 'text-emerald-500',
+    iconSm: <Phone className="w-3 h-3" />,
+    color: 'text-emerald-600 dark:text-emerald-400',
     bgColor: 'bg-emerald-500/10',
     label: 'Phone Verified',
   },
   id_verified: {
     icon: <Fingerprint className="w-3.5 h-3.5" />,
-    color: 'text-purple-500',
+    iconSm: <Fingerprint className="w-3 h-3" />,
+    color: 'text-purple-600 dark:text-purple-400',
     bgColor: 'bg-purple-500/10',
     label: 'ID Verified',
   },
   dbs_checked: {
     icon: <FileCheck className="w-3.5 h-3.5" />,
-    color: 'text-amber-500',
+    iconSm: <FileCheck className="w-3 h-3" />,
+    color: 'text-amber-600 dark:text-amber-400',
     bgColor: 'bg-amber-500/10',
     label: 'DBS Checked',
   },
   admin_verified: {
     icon: <UserCheck className="w-3.5 h-3.5" />,
-    color: 'text-indigo-500',
+    iconSm: <UserCheck className="w-3 h-3" />,
+    color: 'text-indigo-600 dark:text-indigo-400',
     bgColor: 'bg-indigo-500/10',
     label: 'Admin Verified',
   },
 };
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Single Badge Icon
+// Helpers — normalize API response
+// ─────────────────────────────────────────────────────────────────────────────
+
+function normalizeBadges(data: any[]): VerificationBadgeData[] {
+  return data.map((b: any) => ({
+    ...b,
+    type: b.type || b.badge_type,
+    verified_at: b.verified_at || b.granted_at,
+  }));
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Single Badge Icon (tooltip-only, for very tight spaces)
 // ─────────────────────────────────────────────────────────────────────────────
 
 export function VerificationBadgeIcon({
@@ -98,6 +117,7 @@ export function VerificationBadgeIcon({
 }) {
   const config = badgeConfig[badge.type] || {
     icon: <ShieldCheck className="w-3.5 h-3.5" />,
+    iconSm: <ShieldCheck className="w-3 h-3" />,
     color: 'text-theme-subtle',
     bgColor: 'bg-theme-elevated',
     label: badge.label || badge.type,
@@ -109,35 +129,20 @@ export function VerificationBadgeIcon({
     lg: 'w-10 h-10',
   };
 
-  const tooltipContent = (
-    <div className="text-center py-1 px-1">
-      <p className="font-medium text-xs">{config.label}</p>
-      {badge.description && (
-        <p className="text-[10px] text-default-400 mt-0.5">{badge.description}</p>
-      )}
-      {badge.verified_at && (
-        <p className="text-[10px] text-default-400 mt-0.5">
-          Since {new Date(badge.verified_at).toLocaleDateString(undefined, { month: 'short', year: 'numeric' })}
-        </p>
-      )}
-    </div>
-  );
-
   return (
-    <Tooltip content={tooltipContent} delay={200} closeDelay={0} size="sm">
-      <div
-        className={`${sizeClasses[size]} rounded-full ${config.bgColor} ${config.color} flex items-center justify-center`}
-        aria-label={config.label}
-        role="img"
-      >
-        {config.icon}
-      </div>
-    </Tooltip>
+    <div
+      className={`${sizeClasses[size]} rounded-full ${config.bgColor} ${config.color} flex items-center justify-center`}
+      aria-label={config.label}
+      role="img"
+      title={config.label}
+    >
+      {config.icon}
+    </div>
   );
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Badge Row (multiple badges inline)
+// Badge Row — LABELED chips (primary display for all pages)
 // ─────────────────────────────────────────────────────────────────────────────
 
 export function VerificationBadgeRow({
@@ -166,13 +171,7 @@ export function VerificationBadgeRow({
       try {
         const response = await api.get<VerificationBadgeData[]>(`/v2/users/${userId}/verification-badges`);
         if (response.success && response.data) {
-          // API returns badge_type, normalize to type for config lookup
-          const normalized = (Array.isArray(response.data) ? response.data : []).map((b: any) => ({
-            ...b,
-            type: b.type || b.badge_type,
-            verified_at: b.verified_at || b.granted_at,
-          }));
-          setBadges(normalized);
+          setBadges(normalizeBadges(Array.isArray(response.data) ? response.data : []));
         }
       } catch (err) {
         logError('Failed to load verification badges', err);
@@ -186,16 +185,48 @@ export function VerificationBadgeRow({
   if (!isLoaded || badges.length === 0) return null;
 
   return (
-    <div className="flex items-center gap-1" aria-label={t('aria.verification_badges')}>
-      {badges.map((badge) => (
-        <VerificationBadgeIcon key={badge.type} badge={badge} size={size} />
-      ))}
+    <div className="flex items-center gap-1.5 flex-wrap" aria-label={t('aria.verification_badges', 'Verification badges')}>
+      {badges.map((badge) => {
+        const config = badgeConfig[badge.type] || {
+          icon: <ShieldCheck className="w-3.5 h-3.5" />,
+          iconSm: <ShieldCheck className="w-3 h-3" />,
+          color: 'text-theme-subtle',
+          bgColor: 'bg-theme-elevated',
+          label: badge.label || badge.type,
+        };
+
+        if (size === 'sm') {
+          // Compact labeled chip for inline use (members list, messages, exchanges)
+          return (
+            <span
+              key={badge.type}
+              className={`inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full text-[11px] font-medium ${config.bgColor} ${config.color}`}
+            >
+              {config.iconSm}
+              {config.label}
+            </span>
+          );
+        }
+
+        // Medium/large: HeroUI Chip for profile and detail pages
+        return (
+          <Chip
+            key={badge.type}
+            size="sm"
+            variant="flat"
+            className={`${config.bgColor} ${config.color} font-medium`}
+            startContent={config.icon}
+          >
+            {config.label}
+          </Chip>
+        );
+      })}
     </div>
   );
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Badge Summary Card (for profile page)
+// Badge Summary Card (for profile sidebar/details section)
 // ─────────────────────────────────────────────────────────────────────────────
 
 export function VerificationBadgeSummary({
@@ -211,12 +242,7 @@ export function VerificationBadgeSummary({
       try {
         const response = await api.get<VerificationBadgeData[]>(`/v2/users/${userId}/verification-badges`);
         if (response.success && response.data) {
-          const normalized = (Array.isArray(response.data) ? response.data : []).map((b: any) => ({
-            ...b,
-            type: b.type || b.badge_type,
-            verified_at: b.verified_at || b.granted_at,
-          }));
-          setBadges(normalized);
+          setBadges(normalizeBadges(Array.isArray(response.data) ? response.data : []));
         }
       } catch (err) {
         logError('Failed to load verification badges', err);
@@ -228,8 +254,6 @@ export function VerificationBadgeSummary({
   }, [userId]);
 
   if (isLoading) return null;
-
-  // API only returns active badges (non-revoked, non-expired)
   if (badges.length === 0) return null;
 
   return (
@@ -246,7 +270,7 @@ export function VerificationBadgeSummary({
               key={badge.type}
               size="sm"
               variant="flat"
-              className={`${config?.bgColor || 'bg-theme-elevated'} ${config?.color || 'text-theme-muted'}`}
+              className={`${config?.bgColor || 'bg-theme-elevated'} ${config?.color || 'text-theme-muted'} font-medium`}
               startContent={config?.icon || <ShieldCheck className="w-3 h-3" />}
             >
               {config?.label || badge.label}
