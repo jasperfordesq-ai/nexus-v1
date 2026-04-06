@@ -98,7 +98,7 @@ class MarketplaceListingService
             }
 
             if (!empty($filters['price_type'])) {
-                $meiliFilters[] = "price_type = '{$filters['price_type']}'";
+                $meiliFilters[] = "price_type = '" . str_replace("'", "\\'", $filters['price_type']) . "'";
             }
 
             if (!empty($filters['condition'])) {
@@ -114,11 +114,11 @@ class MarketplaceListingService
             }
 
             if (!empty($filters['seller_type'])) {
-                $meiliFilters[] = "seller_type = '{$filters['seller_type']}'";
+                $meiliFilters[] = "seller_type = '" . str_replace("'", "\\'", $filters['seller_type']) . "'";
             }
 
             if (!empty($filters['delivery_method'])) {
-                $meiliFilters[] = "delivery_method = '{$filters['delivery_method']}'";
+                $meiliFilters[] = "delivery_method = '" . str_replace("'", "\\'", $filters['delivery_method']) . "'";
             }
 
             $meiliResult = SearchService::searchMarketplaceListingIds(

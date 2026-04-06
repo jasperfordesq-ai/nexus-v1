@@ -109,7 +109,7 @@ class MarketplaceCommunityDeliveryService
         ]);
 
         return self::formatOffer(
-            DB::table('marketplace_delivery_offers')->where('id', $offerId)->first()
+            DB::table('marketplace_delivery_offers')->where('id', $offerId)->where('tenant_id', TenantContext::getId())->first()
         );
     }
 

@@ -44,15 +44,17 @@ import { PageHeader, DataTable, ConfirmModal, EmptyState, type Column } from '..
 interface MarketplaceListing {
   id: number;
   title: string;
-  seller_name: string;
-  seller_id: number;
-  image_url?: string;
   price: number;
-  currency: string;
-  category?: string;
+  price_currency: string;
+  price_type: string;
   status: string;
   moderation_status: string;
   moderation_notes?: string;
+  seller_type: string;
+  views_count: number;
+  image: string | null;
+  category: string | null;
+  user: { id: number; name: string } | null;
   created_at: string;
 }
 
@@ -105,8 +107,8 @@ export function MarketplaceModerationPage() {
   const loadListings = useCallback(async () => {
     setLoading(true);
     try {
-      const params = new URLSearchParams({ page: String(page), limit: '20' });
-      if (search) params.set('search', search);
+      const params = new URLSearchParams({ page: String(page), per_page: '20' });
+      if (search) params.set('q', search);
       if (moderationFilter !== 'all') params.set('moderation_status', moderationFilter);
 
       const res = await api.get<MarketplaceListing[]>(
@@ -204,7 +206,7 @@ export function MarketplaceModerationPage() {
       label: '',
       render: (item) => (
         <Avatar
-          src={item.image_url || undefined}
+          src={item.image || undefined}
           name={item.title.charAt(0)}
           size="sm"
           radius="lg"
@@ -221,11 +223,11 @@ export function MarketplaceModerationPage() {
       ),
     },
     {
-      key: 'seller_name',
+      key: 'user',
       label: t('marketplace.col_seller'),
       sortable: true,
       render: (item) => (
-        <span className="text-sm text-default-600">{item.seller_name}</span>
+        <span className="text-sm text-default-600">{item.user?.name ?? '--'}</span>
       ),
     },
     {
@@ -234,7 +236,7 @@ export function MarketplaceModerationPage() {
       sortable: true,
       render: (item) => (
         <span className="text-sm text-default-600">
-          {item.currency ?? ''}{Number(item.price ?? 0).toFixed(2)}
+          {item.price_currency ?? ''}{Number(item.price ?? 0).toFixed(2)}
         </span>
       ),
     },
@@ -435,7 +437,7 @@ export function MarketplaceModerationPage() {
             </ModalHeader>
             <ModalBody>
               <p className="text-sm text-default-600 mb-3">
-                {t('marketplace.reject_listing_message', { title: rejectTarget.title, seller: rejectTarget.seller_name })}
+                {t('marketplace.reject_listing_message', { title: rejectTarget.title, seller: rejectTarget.user?.name ?? '--' })}
               </p>
               <Textarea
                 label={t('marketplace.moderation_notes_label')}

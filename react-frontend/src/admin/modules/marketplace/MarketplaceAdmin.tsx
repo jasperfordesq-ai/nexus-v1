@@ -58,11 +58,17 @@ interface DashboardStats {
 interface RecentListing {
   id: number;
   title: string;
-  seller_name: string;
+  price: number;
+  price_currency: string;
+  price_type: string;
   status: string;
   moderation_status: string;
-  price: number;
-  currency: string;
+  moderation_notes?: string;
+  seller_type: string;
+  views_count: number;
+  image: string | null;
+  category: string | null;
+  user: { id: number; name: string } | null;
   created_at: string;
 }
 
@@ -104,7 +110,7 @@ export function MarketplaceAdmin() {
     try {
       const [statsRes, listingsRes] = await Promise.all([
         api.get<DashboardStats>('/v2/admin/marketplace/dashboard'),
-        api.get<RecentListing[]>('/v2/admin/marketplace/listings?limit=10'),
+        api.get<RecentListing[]>('/v2/admin/marketplace/listings?per_page=10'),
       ]);
 
       if (statsRes.success && statsRes.data) {
@@ -259,9 +265,9 @@ export function MarketplaceAdmin() {
                     <TableCell>
                       <span className="font-medium text-foreground">{listing.title}</span>
                     </TableCell>
-                    <TableCell className="text-default-600">{listing.seller_name}</TableCell>
+                    <TableCell className="text-default-600">{listing.user?.name ?? '--'}</TableCell>
                     <TableCell className="text-default-600">
-                      {listing.currency ?? ''}{Number(listing.price ?? 0).toFixed(2)}
+                      {listing.price_currency ?? ''}{Number(listing.price ?? 0).toFixed(2)}
                     </TableCell>
                     <TableCell>
                       <Chip

@@ -178,8 +178,12 @@ class MarketplaceEscrowService
 
         foreach ($escrows as $escrow) {
             try {
+                // Set tenant context before any scoped operations
+                TenantContext::setId($escrow->tenant_id);
+
                 // Check for open disputes on this order
                 $hasDispute = DB::table('marketplace_disputes')
+                    ->where('tenant_id', $escrow->tenant_id)
                     ->where('order_id', $escrow->order_id)
                     ->where('status', 'open')
                     ->exists();
@@ -195,9 +199,6 @@ class MarketplaceEscrowService
                     ]);
                     continue;
                 }
-
-                // Set tenant context for the release
-                TenantContext::setId($escrow->tenant_id);
 
                 self::releaseFunds($escrow, 'auto_timeout');
                 $count++;

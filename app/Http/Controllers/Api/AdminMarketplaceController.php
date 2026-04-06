@@ -39,17 +39,20 @@ class AdminMarketplaceController extends BaseApiController
      */
     public function dashboard(): JsonResponse
     {
+        $this->requireAdmin();
         $this->ensureFeature();
         $this->rateLimit('admin_marketplace_dashboard', 30, 60);
 
         $tenantId = TenantContext::getId();
 
-        $totalListings = MarketplaceListing::count();
-        $activeListings = MarketplaceListing::where('status', 'active')
+        $totalListings = MarketplaceListing::where('tenant_id', $tenantId)->count();
+        $activeListings = MarketplaceListing::where('tenant_id', $tenantId)
+            ->where('status', 'active')
             ->where('moderation_status', 'approved')
             ->count();
-        $pendingModeration = MarketplaceListing::where('moderation_status', 'pending')->count();
-        $totalSellers = MarketplaceSellerProfile::count();
+        $pendingModeration = MarketplaceListing::where('tenant_id', $tenantId)
+            ->where('moderation_status', 'pending')->count();
+        $totalSellers = MarketplaceSellerProfile::where('tenant_id', $tenantId)->count();
 
         $totalOrders = 0;
         $revenue = 0;
@@ -84,6 +87,7 @@ class AdminMarketplaceController extends BaseApiController
      */
     public function listings(): JsonResponse
     {
+        $this->requireAdmin();
         $this->ensureFeature();
         $this->rateLimit('admin_marketplace_listings', 30, 60);
 
@@ -146,6 +150,7 @@ class AdminMarketplaceController extends BaseApiController
      */
     public function approveListing(int $id): JsonResponse
     {
+        $this->requireAdmin();
         $this->ensureFeature();
         $this->rateLimit('admin_marketplace_moderate', 30, 60);
 
@@ -170,6 +175,7 @@ class AdminMarketplaceController extends BaseApiController
      */
     public function rejectListing(int $id): JsonResponse
     {
+        $this->requireAdmin();
         $this->ensureFeature();
         $this->rateLimit('admin_marketplace_moderate', 30, 60);
 
@@ -193,6 +199,7 @@ class AdminMarketplaceController extends BaseApiController
      */
     public function destroyListing(int $id): JsonResponse
     {
+        $this->requireAdmin();
         $this->ensureFeature();
         $this->rateLimit('admin_marketplace_moderate', 15, 60);
 
@@ -215,6 +222,7 @@ class AdminMarketplaceController extends BaseApiController
      */
     public function sellers(): JsonResponse
     {
+        $this->requireAdmin();
         $this->ensureFeature();
         $this->rateLimit('admin_marketplace_sellers', 30, 60);
 
@@ -281,6 +289,7 @@ class AdminMarketplaceController extends BaseApiController
      */
     public function verifySeller(int $id): JsonResponse
     {
+        $this->requireAdmin();
         $this->ensureFeature();
         $this->rateLimit('admin_marketplace_sellers', 15, 60);
 
@@ -301,13 +310,15 @@ class AdminMarketplaceController extends BaseApiController
      */
     public function suspendSeller(int $id): JsonResponse
     {
+        $this->requireAdmin();
         $this->ensureFeature();
         $this->rateLimit('admin_marketplace_sellers', 15, 60);
 
         $seller = MarketplaceSellerProfile::findOrFail($id);
 
-        // Deactivate all their listings
-        MarketplaceListing::where('user_id', $seller->user_id)
+        // Deactivate all their listings within this tenant
+        MarketplaceListing::where('tenant_id', TenantContext::getId())
+            ->where('user_id', $seller->user_id)
             ->where('status', 'active')
             ->update(['status' => 'removed', 'moderation_status' => 'rejected']);
 
@@ -325,6 +336,7 @@ class AdminMarketplaceController extends BaseApiController
      */
     public function reports(): JsonResponse
     {
+        $this->requireAdmin();
         $this->ensureFeature();
         $this->rateLimit('admin_marketplace_reports', 30, 60);
 
@@ -397,6 +409,7 @@ class AdminMarketplaceController extends BaseApiController
      */
     public function transparencyStats(): JsonResponse
     {
+        $this->requireAdmin();
         $this->ensureFeature();
         $this->rateLimit('admin_marketplace_transparency', 30, 60);
 
