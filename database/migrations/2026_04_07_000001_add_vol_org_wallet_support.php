@@ -24,10 +24,10 @@ return new class extends Migration
         if (!Schema::hasTable('vol_org_transactions')) {
             Schema::create('vol_org_transactions', function (Blueprint $table) {
                 $table->id();
-                $table->unsignedInteger('tenant_id');
-                $table->unsignedInteger('vol_organization_id');
-                $table->unsignedInteger('user_id')->nullable()->comment('Volunteer or admin who triggered this');
-                $table->unsignedInteger('vol_log_id')->nullable()->comment('Links to approved hours entry');
+                $table->integer('tenant_id');
+                $table->integer('vol_organization_id');
+                $table->integer('user_id')->nullable()->comment('Volunteer or admin who triggered this');
+                $table->integer('vol_log_id')->nullable()->comment('Links to approved hours entry');
                 $table->enum('type', ['deposit', 'withdrawal', 'volunteer_payment', 'admin_adjustment']);
                 $table->decimal('amount', 10, 2)->comment('Positive=credit to org, Negative=debit from org');
                 $table->decimal('balance_after', 10, 2)->comment('Org balance after this transaction');
@@ -39,9 +39,6 @@ return new class extends Migration
                 $table->index('user_id', 'idx_vot_user');
                 $table->index('vol_log_id', 'idx_vot_log');
                 $table->index('created_at', 'idx_vot_date');
-
-                $table->foreign('tenant_id')->references('id')->on('tenants')->cascadeOnDelete();
-                $table->foreign('vol_organization_id')->references('id')->on('vol_organizations')->cascadeOnDelete();
             });
         }
     }
