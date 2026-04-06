@@ -270,8 +270,18 @@ export function TenantProvider({ children, tenantSlug }: TenantProviderProps) {
   // Determine effective slug: route param > URL detection > stored slug (localStorage fallback)
   // The stored slug fallback prevents losing the tenant when a redirect/error strips
   // the slug prefix from the URL (e.g., /hour-timebank/listings → /listings).
+  //
+  // GUARD: Only use stored slug when user has auth tokens. Without tokens, the stored
+  // slug may be stale from a previous session or contaminated by another browser tab
+  // visiting a different tenant. Using it would bootstrap the wrong tenant, showing
+  // the wrong branding on the login page and potentially authenticating against the
+  // wrong community. When tokens are cleared, fall through to backend Host-based
+  // resolution or the login page's tenant chooser dropdown.
   const detected = useMemo(() => detectTenantFromUrl(), []);
-  const storedSlug = useMemo(() => tokenManager.getTenantSlug(), []);
+  const storedSlug = useMemo(() => {
+    const hasTokens = tokenManager.hasAccessToken() || tokenManager.hasRefreshToken();
+    return hasTokens ? tokenManager.getTenantSlug() : null;
+  }, []);
   const effectiveTenantSlug = tenantSlug || detected.slug || storedSlug;
 
   // Path-based routing: needed on shared hosts (localhost, app.project-nexus.ie) where
@@ -312,8 +322,17 @@ export function TenantProvider({ children, tenantSlug }: TenantProviderProps) {
 
         // TRS-001: Stale localStorage override
         // If URL resolved a tenant and it differs from stored value, override.
+        //
+        // GUARD: Only write to localStorage when the bootstrap response matches
+        // the slug we requested (or no slug was requested). This prevents a
+        // cross-tenant localStorage poisoning scenario where an unexpected
+        // bootstrap response overwrites the stored slug, causing TenantShell's
+        // slug recovery to redirect to the wrong tenant on the next visit.
+        const responseMatchesRequest = !effectiveTenantSlug
+          || (tenant.slug && tenant.slug === effectiveTenantSlug);
+
         const storedTenantId = tokenManager.getTenantId();
-        if (tenant.id) {
+        if (tenant.id && responseMatchesRequest) {
           if (storedTenantId && String(storedTenantId) !== String(tenant.id)) {
             console.warn(
               `[TenantContext] Overriding stale localStorage tenant_id. ` +
@@ -324,8 +343,13 @@ export function TenantProvider({ children, tenantSlug }: TenantProviderProps) {
           }
           tokenManager.setTenantId(tenant.id);
         }
-        if (tenant.slug) {
+        if (tenant.slug && responseMatchesRequest) {
           tokenManager.setTenantSlug(tenant.slug);
+        } else if (tenant.slug && !responseMatchesRequest) {
+          console.warn(
+            `[TenantContext] Bootstrap response slug "${tenant.slug}" does not match ` +
+            `requested slug "${effectiveTenantSlug}" — NOT updating localStorage`
+          );
         }
 
         // Fetch CSRF token for form submissions

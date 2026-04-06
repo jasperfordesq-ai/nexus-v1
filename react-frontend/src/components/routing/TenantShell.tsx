@@ -61,23 +61,23 @@ export function TenantShell({ appRoutes }: TenantShellProps) {
   // the tenant slug prefix. If the slug is missing but we know which tenant the
   // user is on (from localStorage), redirect IMMEDIATELY via window.location.
   //
-  // This fires DURING the render, before TenantProvider or any page component
-  // mounts. It catches ALL cases where the slug gets lost.
+  // GUARD: Only recover the slug when the user has active auth tokens. Without
+  // this guard, a stale slug in localStorage (from visiting another tenant in a
+  // different tab, or from a previous session) causes cross-tenant redirects —
+  // e.g. user on hour-timebank gets sent to park-goodman's login page. When
+  // tokens are cleared (logout / session expiry), the slug fallback is skipped
+  // and the user sees the login page's tenant chooser instead.
   //
   // SAFE for custom domains: hostname check ensures this NEVER fires on custom
   // domains or subdomains — only on localhost, 127.0.0.1, app.project-nexus.ie.
-  // SLUG RECOVERY — fires synchronously during render, before children mount.
-  // On shared hosts, if the slug is missing from the URL but we know which tenant
-  // the user is on (from localStorage), redirect via window.location.replace().
-  // SAFE: only fires on localhost/127.0.0.1/app.project-nexus.ie — never on
-  // custom domains or subdomains.
   if (!effectiveSlug && typeof window !== 'undefined') {
     const hostname = window.location.hostname;
     const isSharedHost = hostname === 'localhost' || hostname === '127.0.0.1' || hostname === 'app.project-nexus.ie';
 
     if (isSharedHost) {
       const storedSlug = tokenManager.getTenantSlug();
-      if (storedSlug) {
+      const hasAuthTokens = tokenManager.hasAccessToken() || tokenManager.hasRefreshToken();
+      if (storedSlug && hasAuthTokens) {
         const firstSegment = window.location.pathname.split('/').filter(Boolean)[0]?.toLowerCase();
         const isReservedOrEmpty = !firstSegment || RESERVED_PATHS.has(firstSegment);
 

@@ -424,7 +424,11 @@ describe('AuthContext', () => {
         expect(screen.getByTestId('status')).toHaveTextContent('idle');
       });
 
-      expect(tokenManager.clearAll).toHaveBeenCalled();
+      // clearTokens (not clearAll) — tenant slug/ID are preserved on logout
+      // so the user stays on the same community's login page. Stale slugs are
+      // harmless because TenantShell and TenantProvider only use them when
+      // auth tokens exist.
+      expect(tokenManager.clearTokens).toHaveBeenCalled();
       expect(api.post).toHaveBeenCalledWith('/auth/logout', expect.any(Object));
     });
 
@@ -455,7 +459,7 @@ describe('AuthContext', () => {
       });
 
       // Should still clear tokens even on network error
-      expect(tokenManager.clearAll).toHaveBeenCalled();
+      expect(tokenManager.clearTokens).toHaveBeenCalled();
     });
   });
 

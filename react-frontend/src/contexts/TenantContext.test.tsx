@@ -23,6 +23,10 @@ vi.mock('@/lib/api', () => ({
   tokenManager: {
     getTenantId: vi.fn().mockReturnValue(null),
     setTenantId: vi.fn(),
+    getTenantSlug: vi.fn().mockReturnValue(null),
+    setTenantSlug: vi.fn(),
+    hasAccessToken: vi.fn().mockReturnValue(false),
+    hasRefreshToken: vi.fn().mockReturnValue(false),
   },
   fetchCsrfToken: (...args: unknown[]) => mockFetchCsrfToken(...args),
 }));
