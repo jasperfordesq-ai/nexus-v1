@@ -68,6 +68,7 @@ export function VerifyIdentityOptionalPage() {
   const [errorMessage, setErrorMessage] = useState('');
   const [isStarting, setIsStarting] = useState(false);
   const pollRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const userStartedRef = useRef(false); // Tracks if user clicked "Start Verification" this session
 
   const stopPolling = useCallback(() => {
     if (pollRef.current) {
@@ -94,14 +95,15 @@ export function VerifyIdentityOptionalPage() {
         setPageState('verified');
         stopPolling();
       } else if (sessionStatus === 'started' || sessionStatus === 'processing') {
-        // Only truly in-progress states (user opened Stripe's form)
         setPageState('in_progress');
       } else if (sessionStatus === 'created') {
-        // Session was created but user hasn't opened Stripe yet — show start with redirect
-        if (data.latest_session) {
-          setRedirectUrl(null); // Let them start fresh
+        if (userStartedRef.current) {
+          // User already clicked start — keep showing in_progress while Stripe loads
+          setPageState('in_progress');
+        } else {
+          // Initial page load with a stale created session — let them start fresh
+          setPageState('start');
         }
-        setPageState('start');
       } else if (sessionStatus === 'failed') {
         setFailureReason(data.latest_session?.failure_reason || null);
         setPageState('failed');
@@ -129,6 +131,7 @@ export function VerifyIdentityOptionalPage() {
   const handleStartVerification = async () => {
     setIsStarting(true);
     setErrorMessage('');
+    userStartedRef.current = true;
     try {
       const response = await api.post<StartVerificationResponse>('/v2/identity/start');
       if (response.success && response.data) {
@@ -403,7 +406,7 @@ export function VerifyIdentityOptionalPage() {
                   variant="flat"
                   size="sm"
                   className="w-full text-theme-muted"
-                  onPress={() => { stopPolling(); setPageState('start'); setRedirectUrl(null); }}
+                  onPress={() => { stopPolling(); setPageState('start'); setRedirectUrl(null); userStartedRef.current = false; }}
                 >
                   Cancel & Start Over
                 </Button>
