@@ -1654,6 +1654,10 @@ Route::post('/auth/admin-session', [\App\Http\Controllers\Api\AuthController::cl
 Route::get('/auth/admin-session', [\App\Http\Controllers\Api\AuthController::class, 'adminSession']);
 Route::get('/v2/auth/verification-status', [\App\Http\Controllers\Api\RegistrationPolicyController::class, 'getVerificationStatus']);
 Route::post('/v2/auth/start-verification', [\App\Http\Controllers\Api\RegistrationPolicyController::class, 'startVerification'])->middleware('throttle:10,1');
+
+// Optional identity verification (for active users wanting an ID Verified badge)
+Route::get('/v2/identity/status', [\App\Http\Controllers\Api\OptionalIdentityVerificationController::class, 'getStatus']);
+Route::post('/v2/identity/start', [\App\Http\Controllers\Api\OptionalIdentityVerificationController::class, 'startVerification'])->middleware('throttle:5,1');
 Route::post('/v2/auth/validate-invite', [\App\Http\Controllers\Api\RegistrationPolicyController::class, 'validateInviteCode'])->middleware('throttle:10,1');
 Route::get('/v2/auth/registration-info', [\App\Http\Controllers\Api\RegistrationPolicyController::class, 'getRegistrationInfo']);
 // NOTE: identity webhook route moved to public webhook section (below auth group)

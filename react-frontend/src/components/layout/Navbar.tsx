@@ -64,6 +64,7 @@ import {
   GraduationCap,
   Activity,
   ShoppingBag,
+  Fingerprint,
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useAuth, useTenant, useNotifications, useTheme, useMenuContext } from '@/contexts';
@@ -163,6 +164,25 @@ export function Navbar({ onMobileMenuOpen, externalSearchOpen, onSearchOpenChang
     if (open) { setTimebankingOpen(false); setCommunityOpen(false); setMoreOpen(false); setCreateOpen(false); }
     setUserOpen(open);
   }, []);
+
+  // Identity verification badge check — show "Verify Identity" in utility bar if not yet verified
+  const [isIdVerified, setIsIdVerified] = useState<boolean | null>(null);
+  useEffect(() => {
+    if (!isAuthenticated || !user?.id) return;
+    let cancelled = false;
+    (async () => {
+      try {
+        const { api } = await import('@/lib/api');
+        const res = await api.get<{ has_id_verified_badge: boolean }>('/v2/identity/status');
+        if (!cancelled && res.success && res.data) {
+          setIsIdVerified(res.data.has_id_verified_badge);
+        }
+      } catch {
+        // Non-critical — hide the button if we can't check
+      }
+    })();
+    return () => { cancelled = true; };
+  }, [isAuthenticated, user?.id]);
 
   const dropdownNavigate = useCallback((path: string) => {
     closeAllDropdowns();
@@ -377,6 +397,21 @@ export function Navbar({ onMobileMenuOpen, externalSearchOpen, onSearchOpenChang
                   <HelpCircle className="w-3.5 h-3.5 shrink-0" aria-hidden="true" />
                   <span className="hidden md:inline">{t('user_menu.help_center')}</span>
                 </Button>
+              )}
+              {/* Verify Identity — show for authenticated users without ID badge */}
+              {isAuthenticated && isIdVerified === false && (
+                <>
+                  <span className="text-[var(--border-default)] text-xs select-none shrink-0">|</span>
+                  <Button
+                    variant="light"
+                    size="sm"
+                    className="text-purple-500 hover:text-purple-600 dark:text-purple-400 dark:hover:text-purple-300 h-7 min-w-0 px-2 gap-1 text-xs shrink-0"
+                    onPress={() => navigate(tenantPath('/verify-identity-optional'))}
+                  >
+                    <Fingerprint className="w-3.5 h-3.5 shrink-0" aria-hidden="true" />
+                    <span className="hidden md:inline">Verify Identity</span>
+                  </Button>
+                </>
               )}
               {/* Admin links — admin users only */}
               {isAuthenticated && isAdmin && (

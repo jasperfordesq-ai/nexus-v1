@@ -129,6 +129,19 @@ class IdentityWebhookController extends BaseApiController
             $result
         );
 
+        // Auto-grant ID Verified badge when verification passes
+        if ($status === 'passed') {
+            try {
+                OptionalIdentityVerificationController::grantIdVerifiedBadge(
+                    (int) $session['user_id'],
+                    (int) $session['tenant_id']
+                );
+            } catch (\Throwable $e) {
+                // Non-critical — log but don't fail the webhook
+                error_log("[IdentityWebhook] Failed to grant id_verified badge: " . $e->getMessage());
+            }
+        }
+
         // Always return 200 to the webhook provider
         return $this->respondWithData(['received' => true, 'status' => $status]);
     }

@@ -96,6 +96,7 @@ const ForgotPasswordPage = lazyWithRetry(() => import('./pages/auth/ForgotPasswo
 const ResetPasswordPage = lazyWithRetry(() => import('./pages/auth/ResetPasswordPage'));
 const VerifyEmailPage = lazyWithRetry(() => import('./pages/auth/VerifyEmailPage'));
 const VerifyIdentityPage = lazyWithRetry(() => import('./pages/auth/VerifyIdentityPage'));
+const VerifyIdentityOptionalPage = lazyWithRetry(() => import('./pages/settings/VerifyIdentityOptionalPage'));
 
 // Admin Panel (lazy-loaded — keeps recharts, jsPDF, admin sidebar/header out of main bundle)
 const AdminApp = lazyWithRetry(() => import('@/admin/AdminApp'));
@@ -620,6 +621,7 @@ function AppRoutes() {
               </FeatureErrorBoundary>
             </FeatureGate>
           } />
+          <Route path="verify-identity-optional" element={<VerifyIdentityOptionalPage />} />
           <Route path="search" element={
             <FeatureGate feature="search" redirect="/dashboard">
               <FeatureErrorBoundary featureName="Search">
