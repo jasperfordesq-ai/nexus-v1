@@ -33,11 +33,14 @@ import { logError } from '@/lib/logger';
 
 export interface VerificationBadgeData {
   type: string;
+  badge_type?: string; // API returns badge_type, normalize to type
   label: string;
-  description: string;
-  verified: boolean;
+  description?: string;
+  verified?: boolean;
   verified_at?: string;
+  granted_at?: string; // API returns granted_at
   verified_by?: string;
+  verified_by_name?: string;
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -163,7 +166,13 @@ export function VerificationBadgeRow({
       try {
         const response = await api.get<VerificationBadgeData[]>(`/v2/users/${userId}/verification-badges`);
         if (response.success && response.data) {
-          setBadges(response.data.filter((b) => b.verified));
+          // API returns badge_type, normalize to type for config lookup
+          const normalized = (Array.isArray(response.data) ? response.data : []).map((b: any) => ({
+            ...b,
+            type: b.type || b.badge_type,
+            verified_at: b.verified_at || b.granted_at,
+          }));
+          setBadges(normalized);
         }
       } catch (err) {
         logError('Failed to load verification badges', err);
@@ -202,7 +211,12 @@ export function VerificationBadgeSummary({
       try {
         const response = await api.get<VerificationBadgeData[]>(`/v2/users/${userId}/verification-badges`);
         if (response.success && response.data) {
-          setBadges(response.data);
+          const normalized = (Array.isArray(response.data) ? response.data : []).map((b: any) => ({
+            ...b,
+            type: b.type || b.badge_type,
+            verified_at: b.verified_at || b.granted_at,
+          }));
+          setBadges(normalized);
         }
       } catch (err) {
         logError('Failed to load verification badges', err);
@@ -215,8 +229,8 @@ export function VerificationBadgeSummary({
 
   if (isLoading) return null;
 
-  const verifiedBadges = badges.filter((b) => b.verified);
-  if (verifiedBadges.length === 0) return null;
+  // API only returns active badges (non-revoked, non-expired)
+  if (badges.length === 0) return null;
 
   return (
     <div className="space-y-2">
@@ -225,7 +239,7 @@ export function VerificationBadgeSummary({
         <span className="text-sm font-medium text-theme-primary">Verification</span>
       </div>
       <div className="flex flex-wrap gap-2">
-        {verifiedBadges.map((badge) => {
+        {badges.map((badge) => {
           const config = badgeConfig[badge.type];
           return (
             <Chip
