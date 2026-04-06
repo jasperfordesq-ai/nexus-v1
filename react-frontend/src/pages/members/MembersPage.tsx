@@ -32,7 +32,6 @@ import { PresenceIndicator } from '@/components/social';
 import { EntityMapView } from '@/components/location';
 import { EmptyState } from '@/components/feedback';
 import { PageMeta } from '@/components/seo';
-import { VerificationBadgeRow } from '@/components/verification/VerificationBadge';
 import { useAuth, useToast, useTenant, useFeature } from '@/contexts';
 import { usePresenceOptional } from '@/contexts/PresenceContext';
 import { api } from '@/lib/api';
@@ -606,7 +605,6 @@ const MemberCard = memo(function MemberCard({ member, viewMode, sortBy }: Member
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-1.5">
                   <h3 className="font-semibold text-theme-primary">{displayName}</h3>
-                  <VerificationBadgeRow userId={member.id} size="sm" />
                   {hasGamification && level > 0 && (
                     <Chip size="sm" variant="flat" className="bg-indigo-100 dark:bg-indigo-900/40 text-indigo-700 dark:text-indigo-300 text-xs h-5 min-w-0">
                       {t('common.level_short', { level, defaultValue: 'Lv. {{level}}' })}
@@ -677,7 +675,6 @@ const MemberCard = memo(function MemberCard({ member, viewMode, sortBy }: Member
           </div>
           <div className="flex items-center justify-center gap-1.5">
             <h3 className="font-semibold text-theme-primary">{displayName}</h3>
-            <VerificationBadgeRow userId={member.id} size="sm" />
             {hasGamification && level > 0 && (
               <Chip size="sm" variant="flat" className="bg-indigo-100 dark:bg-indigo-900/40 text-indigo-700 dark:text-indigo-300 text-xs h-5 min-w-0">
                 {t('common.level_short', { level, defaultValue: 'Lv. {{level}}' })}

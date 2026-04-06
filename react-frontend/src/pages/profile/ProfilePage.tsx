@@ -40,8 +40,6 @@ import {
   ArrowUpRight,
   ArrowDownLeft,
   Rss,
-  ShieldCheck,
-  ShieldAlert,
 } from 'lucide-react';
 import DOMPurify from 'dompurify';
 import { GlassCard } from '@/components/ui';
@@ -121,40 +119,6 @@ interface GamificationBadgeResponse {
   description?: string;
   icon?: string;
   earned_at?: string | null;
-}
-
-/** Prominent trust banner showing verified/unverified status on profiles */
-function ProfileTrustBanner({ userId }: { userId: number }) {
-  const [hasIdBadge, setHasIdBadge] = useState<boolean | null>(null);
-
-  useEffect(() => {
-    if (!userId) return;
-    let cancelled = false;
-    api.get(`/v2/users/${userId}/verification-badges`).then((res: any) => {
-      if (cancelled) return;
-      const badges = Array.isArray(res?.data) ? res.data : [];
-      setHasIdBadge(badges.some((b: any) => (b.type || b.badge_type) === 'id_verified'));
-    }).catch(() => { if (!cancelled) setHasIdBadge(false); });
-    return () => { cancelled = true; };
-  }, [userId]);
-
-  if (hasIdBadge === null) return null;
-
-  if (hasIdBadge) {
-    return (
-      <div className="mt-3 flex items-center gap-2 px-3 py-2 rounded-xl bg-emerald-500/10 border border-emerald-500/20">
-        <ShieldCheck className="w-5 h-5 text-emerald-600 dark:text-emerald-400 shrink-0" />
-        <span className="text-sm font-semibold text-emerald-700 dark:text-emerald-300">Identity Verified</span>
-      </div>
-    );
-  }
-
-  return (
-    <div className="mt-3 flex items-center gap-2 px-3 py-2 rounded-xl bg-amber-500/10 border border-amber-500/20">
-      <ShieldAlert className="w-5 h-5 text-amber-600 dark:text-amber-400 shrink-0" />
-      <span className="text-sm font-medium text-amber-700 dark:text-amber-300">Identity Not Verified</span>
-    </div>
-  );
 }
 
 export function ProfilePage() {
@@ -548,9 +512,6 @@ export function ProfilePage() {
               {profile.tagline && (
                 <p className="text-theme-muted mt-1">{profile.tagline}</p>
               )}
-
-              {/* Identity Trust Banner */}
-              <ProfileTrustBanner userId={profile.id} />
 
               {/* Meta */}
               <div className="flex flex-wrap justify-center sm:justify-start gap-4 mt-4 text-sm text-theme-subtle">

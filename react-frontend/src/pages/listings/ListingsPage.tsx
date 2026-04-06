@@ -35,7 +35,6 @@ import {
 } from 'lucide-react';
 import { GlassCard, AlgorithmLabel, ListingSkeleton, ImagePlaceholder } from '@/components/ui';
 import { FeaturedBadge } from '@/components/listings/FeaturedBadge';
-import { VerificationBadgeRow } from '@/components/verification/VerificationBadge';
 import { EntityMapView } from '@/components/location';
 import { EmptyState } from '@/components/feedback';
 import { PageMeta } from '@/components/seo';
@@ -772,10 +771,7 @@ const ListingCard = memo(function ListingCard({ listing, viewMode, isSaving, onT
                   </span>
                 )}
               </div>
-              <div className="flex items-center gap-1.5">
-                <h3 className="font-semibold text-theme-primary truncate">{listing.title}</h3>
-                <VerificationBadgeRow userId={listing.user_id} size="sm" />
-              </div>
+              <h3 className="font-semibold text-theme-primary truncate">{listing.title}</h3>
               <p className="text-theme-muted text-sm line-clamp-1 mt-0.5">{listing.description}</p>
             </div>
             <div className="flex flex-col items-end gap-1 text-xs text-theme-subtle shrink-0">
@@ -890,7 +886,6 @@ const ListingCard = memo(function ListingCard({ listing, viewMode, isSaving, onT
               className="shrink-0 w-6 h-6"
             />
             <span className="text-sm text-theme-subtle truncate">{listing.author_name}</span>
-            <VerificationBadgeRow userId={listing.user_id} size="sm" />
             {listing.author_rating != null && listing.author_rating > 0 && (
               <span className="flex items-center gap-0.5 text-[11px] text-amber-500 shrink-0">
                 <Star className="w-3 h-3 fill-amber-500" aria-hidden="true" />
