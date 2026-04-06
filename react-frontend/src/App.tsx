@@ -622,6 +622,7 @@ function AppRoutes() {
             </FeatureGate>
           } />
           <Route path="verify-identity-optional" element={<VerifyIdentityOptionalPage />} />
+          <Route path="verify-identity/callback" element={<VerifyIdentityOptionalPage />} />
           <Route path="search" element={
             <FeatureGate feature="search" redirect="/dashboard">
               <FeatureErrorBoundary featureName="Search">
