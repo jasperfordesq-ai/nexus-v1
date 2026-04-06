@@ -98,6 +98,7 @@ services:
         VITE_PUSHER_KEY: ${PUSHER_KEY:-}
         VITE_PUSHER_CLUSTER: ${PUSHER_CLUSTER:-eu}
         VITE_GIPHY_API_KEY: ${GIPHY_API_KEY:-}
+        VITE_STRIPE_PUBLISHABLE_KEY: ${STRIPE_PUBLISHABLE_KEY:-}
         BUILD_COMMIT: ${BUILD_COMMIT:-unknown}
     image: nexus-react-prod:latest
     container_name: nexus-react-prod
