@@ -172,14 +172,16 @@ export function VolunteeringPage() {
     }, { replace: true });
   }, [setSearchParams]);
   const [hasApprovedOrg, setHasApprovedOrg] = useState(false);
+  const [myOrgs, setMyOrgs] = useState<Array<{ id: number; name: string; status: string; member_role: string; balance?: number }>>([]);
 
   useEffect(() => {
     if (!hasFeature('volunteering')) return;
     let cancelled = false;
     if (isAuthenticated) {
-      api.get<Array<{ status: string; member_role: string }>>('/v2/volunteering/my-organisations')
+      api.get<Array<{ id: number; name: string; status: string; member_role: string; balance?: number }>>('/v2/volunteering/my-organisations')
         .then((res) => {
           if (!cancelled && res.success && Array.isArray(res.data)) {
+            setMyOrgs(res.data);
             setHasApprovedOrg(
               res.data.some((org) => org.status === 'approved' && ['owner', 'admin'].includes(org.member_role)),
             );
@@ -243,6 +245,27 @@ export function VolunteeringPage() {
           </Link>
         </div>
       </div>
+
+      {/* My Organisations — quick access to org dashboards */}
+      {myOrgs.length > 0 && myOrgs.some(o => o.status === 'approved' && ['owner', 'admin'].includes(o.member_role)) && (
+        <div className="flex flex-wrap gap-3">
+          {myOrgs
+            .filter(o => o.status === 'approved' && ['owner', 'admin'].includes(o.member_role))
+            .map(o => (
+              <Link key={o.id} to={tenantPath(`/volunteering/org/${o.id}/dashboard`)}>
+                <Button
+                  size="sm"
+                  variant="flat"
+                  className="bg-theme-elevated text-theme-primary border border-theme-default"
+                  startContent={<Building2 className="w-4 h-4 text-rose-400" aria-hidden="true" />}
+                >
+                  {o.name} {t('org_dashboard_link', 'Dashboard')}
+                </Button>
+              </Link>
+            ))
+          }
+        </div>
+      )}
 
       {/* Tabs */}
       {/* Tabs — data-driven with config-based visibility */}

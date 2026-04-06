@@ -679,6 +679,16 @@ Route::get('/v2/volunteering/my-organisations', [\App\Http\Controllers\Api\Volun
 Route::get('/v2/volunteering/organisations', [\App\Http\Controllers\Api\VolunteerController::class, 'organisations'])->withoutMiddleware('auth:sanctum');
 Route::post('/v2/volunteering/organisations', [\App\Http\Controllers\Api\VolunteerController::class, 'createOrganisation']);
 Route::get('/v2/volunteering/organisations/{id}', [\App\Http\Controllers\Api\VolunteerController::class, 'showOrganisation'])->withoutMiddleware('auth:sanctum');
+// Organisation dashboard & wallet endpoints (org owner/admin only)
+Route::get('/v2/volunteering/organisations/{id}/stats', [\App\Http\Controllers\Api\VolunteerController::class, 'orgStats']);
+Route::get('/v2/volunteering/organisations/{id}/wallet', [\App\Http\Controllers\Api\VolunteerController::class, 'orgWalletBalance']);
+Route::get('/v2/volunteering/organisations/{id}/wallet/transactions', [\App\Http\Controllers\Api\VolunteerController::class, 'orgWalletTransactions']);
+Route::post('/v2/volunteering/organisations/{id}/wallet/deposit', [\App\Http\Controllers\Api\VolunteerController::class, 'orgWalletDeposit']);
+Route::put('/v2/volunteering/organisations/{id}/wallet/auto-pay', [\App\Http\Controllers\Api\VolunteerController::class, 'orgWalletAutoPayToggle']);
+Route::get('/v2/volunteering/organisations/{id}/volunteers', [\App\Http\Controllers\Api\VolunteerController::class, 'orgVolunteers']);
+Route::get('/v2/volunteering/organisations/{id}/applications', [\App\Http\Controllers\Api\VolunteerController::class, 'orgApplications']);
+Route::get('/v2/volunteering/organisations/{id}/hours/pending', [\App\Http\Controllers\Api\VolunteerController::class, 'orgHoursPending']);
+Route::put('/v2/volunteering/organisations/{id}', [\App\Http\Controllers\Api\VolunteerController::class, 'updateOrganisation']);
 Route::post('/v2/volunteering/reviews', [\App\Http\Controllers\Api\VolunteerController::class, 'createReview']);
 Route::get('/v2/volunteering/reviews/{type}/{id}', [\App\Http\Controllers\Api\VolunteerController::class, 'getReviews']);
 Route::get('/v2/comments', [\App\Http\Controllers\Api\CommentsController::class, 'index']);
@@ -1301,6 +1311,8 @@ Route::put('/v2/admin/volunteering/training/{id}/reject', [\App\Http\Controllers
 Route::get('/v2/admin/volunteering/incidents', [\App\Http\Controllers\Api\VolunteerWellbeingController::class, 'adminIncidents']);
 Route::put('/v2/admin/volunteering/incidents/{id}', [\App\Http\Controllers\Api\VolunteerWellbeingController::class, 'updateIncident']);
 Route::put('/v2/admin/volunteering/organizations/{id}/dlp', [\App\Http\Controllers\Api\VolunteerWellbeingController::class, 'assignDlp']);
+Route::put('/v2/admin/volunteering/organizations/{id}/wallet/adjust', [\App\Http\Controllers\Api\AdminVolunteerController::class, 'adjustOrgWallet']);
+Route::get('/v2/admin/volunteering/organizations/{id}/wallet/transactions', [\App\Http\Controllers\Api\AdminVolunteerController::class, 'orgWalletTransactions']);
 Route::get('/v2/admin/volunteering/custom-fields', [\App\Http\Controllers\Api\VolunteerCommunityController::class, 'adminCustomFields']);
 Route::post('/v2/admin/volunteering/custom-fields', [\App\Http\Controllers\Api\VolunteerCommunityController::class, 'createCustomField']);
 Route::put('/v2/admin/volunteering/custom-fields/{id}', [\App\Http\Controllers\Api\VolunteerCommunityController::class, 'updateCustomField']);

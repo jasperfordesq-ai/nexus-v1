@@ -16,9 +16,12 @@ use App\Services\VolunteerMatchingService;
 use App\Core\TenantContext;
 use App\Models\Notification;
 use App\Models\User;
+use App\Services\NotificationDispatcher;
+use App\Services\VolOrgWalletService;
 use App\Models\VolApplication;
 use App\Models\VolOpportunity;
 use App\Models\VolShift;
+use Illuminate\Support\Facades\DB;
 
 /**
  * VolunteerController -- Core volunteering: opportunities, applications, shifts, hours,
@@ -176,11 +179,17 @@ class VolunteerController extends BaseApiController
             if ($opportunity && $opportunity->created_by && $opportunity->created_by !== $userId) {
                 $volunteer = User::find($userId);
                 $volunteerName = $volunteer->name ?? 'Someone';
-                Notification::createNotification(
+                $notifContent = "{$volunteerName} applied for your volunteer opportunity: {$opportunity->title}";
+                $notifLink = "/volunteering/opportunities/{$id}";
+
+                NotificationDispatcher::dispatch(
                     (int) $opportunity->created_by,
-                    "{$volunteerName} applied for your volunteer opportunity",
-                    "/volunteering/opportunities/{$id}/applications",
-                    'volunteering'
+                    'global',
+                    0,
+                    'vol_application_received',
+                    $notifContent,
+                    $notifLink,
+                    null
                 );
             }
         } catch (\Throwable $e) {
@@ -235,21 +244,30 @@ class VolunteerController extends BaseApiController
             return $this->respondWithErrors($errors, $this->getErrorStatus($errors));
         }
 
-        // Notify the volunteer about the application decision
+        // Notify the volunteer about the application decision (bell + email + push)
         try {
             $application = VolApplication::find($id);
             if ($application && $application->user_id) {
                 $opportunityId = $application->opportunity_id;
+                $opportunity = VolOpportunity::find($opportunityId);
+                $oppTitle = $opportunity->title ?? 'a volunteer opportunity';
+
                 if ($action === 'approve') {
-                    $message = 'Your volunteer application was accepted!';
+                    $message = "Your volunteer application for \"{$oppTitle}\" was accepted!";
+                    $notifType = 'vol_application_approved';
                 } else {
-                    $message = 'Your volunteer application was not accepted';
+                    $message = "Your volunteer application for \"{$oppTitle}\" was not accepted";
+                    $notifType = 'vol_application_declined';
                 }
-                Notification::createNotification(
+
+                NotificationDispatcher::dispatch(
                     (int) $application->user_id,
+                    'global',
+                    0,
+                    $notifType,
                     $message,
                     "/volunteering/opportunities/{$opportunityId}",
-                    'volunteering'
+                    null
                 );
             }
         } catch (\Throwable $e) {
@@ -519,6 +537,369 @@ class VolunteerController extends BaseApiController
         ]);
 
         return $this->respondWithData($shifts);
+    }
+
+    // ========================================
+    // ORGANISATION DASHBOARD & WALLET
+    // ========================================
+
+    /**
+     * Verify the current user is owner/admin of the given vol org.
+     * Returns the org row or null (and sets 403 response).
+     */
+    private function ensureOrgAccess(int $orgId): ?object
+    {
+        $tenantId = TenantContext::getId();
+        $userId = $this->getUserId();
+
+        $org = DB::selectOne(
+            "SELECT * FROM vol_organizations WHERE id = ? AND tenant_id = ?",
+            [$orgId, $tenantId]
+        );
+        if (!$org) {
+            return null;
+        }
+
+        if ((int) $org->user_id === $userId) {
+            return $org;
+        }
+
+        $membership = DB::selectOne(
+            "SELECT role FROM org_members WHERE tenant_id = ? AND organization_id = ? AND user_id = ? AND status = 'active'",
+            [$tenantId, $orgId, $userId]
+        );
+
+        if ($membership && in_array($membership->role, ['owner', 'admin'], true)) {
+            return $org;
+        }
+
+        return null;
+    }
+
+    public function orgStats($id): JsonResponse
+    {
+        $this->ensureFeature();
+        $this->rateLimit('vol_org_stats', 60, 60);
+        $org = $this->ensureOrgAccess((int) $id);
+        if (!$org) return $this->respondWithError('FORBIDDEN', 'Access denied', null, 403);
+
+        $tenantId = TenantContext::getId();
+        $orgId = (int) $org->id;
+
+        $stats = DB::selectOne("
+            SELECT
+                (SELECT COUNT(DISTINCT va.user_id) FROM vol_applications va
+                 JOIN vol_opportunities vo ON va.opportunity_id = vo.id
+                 WHERE vo.organization_id = ? AND va.tenant_id = ? AND va.status = 'approved') as total_volunteers,
+                (SELECT COUNT(*) FROM vol_applications va2
+                 JOIN vol_opportunities vo2 ON va2.opportunity_id = vo2.id
+                 WHERE vo2.organization_id = ? AND va2.tenant_id = ? AND va2.status = 'pending') as pending_applications,
+                (SELECT COUNT(*) FROM vol_logs vl
+                 WHERE vl.organization_id = ? AND vl.tenant_id = ? AND vl.status = 'pending') as pending_hours,
+                (SELECT COALESCE(SUM(vl2.hours), 0) FROM vol_logs vl2
+                 WHERE vl2.organization_id = ? AND vl2.tenant_id = ? AND vl2.status = 'approved') as total_approved_hours,
+                (SELECT COUNT(*) FROM vol_opportunities vo3
+                 WHERE vo3.organization_id = ? AND vo3.tenant_id = ? AND vo3.status = 'active') as active_opportunities
+        ", [$orgId, $tenantId, $orgId, $tenantId, $orgId, $tenantId, $orgId, $tenantId, $orgId, $tenantId]);
+
+        return $this->respondWithData([
+            'total_volunteers' => (int) $stats->total_volunteers,
+            'pending_applications' => (int) $stats->pending_applications,
+            'pending_hours' => (int) $stats->pending_hours,
+            'total_approved_hours' => (float) $stats->total_approved_hours,
+            'active_opportunities' => (int) $stats->active_opportunities,
+            'wallet_balance' => (float) $org->balance,
+            'auto_pay_enabled' => (bool) $org->auto_pay_enabled,
+            'org_name' => $org->name,
+        ]);
+    }
+
+    public function orgWalletBalance($id): JsonResponse
+    {
+        $this->ensureFeature();
+        $this->rateLimit('vol_org_wallet', 60, 60);
+        $org = $this->ensureOrgAccess((int) $id);
+        if (!$org) return $this->respondWithError('FORBIDDEN', 'Access denied', null, 403);
+
+        $summary = VolOrgWalletService::getWalletSummary((int) $id);
+        return $this->respondWithData($summary);
+    }
+
+    public function orgWalletTransactions($id): JsonResponse
+    {
+        $this->ensureFeature();
+        $this->rateLimit('vol_org_wallet_txns', 60, 60);
+        $org = $this->ensureOrgAccess((int) $id);
+        if (!$org) return $this->respondWithError('FORBIDDEN', 'Access denied', null, 403);
+
+        $filters = [
+            'limit' => $this->queryInt('per_page', 20, 1, 50),
+            'cursor' => $this->query('cursor'),
+            'type' => $this->query('type'),
+        ];
+
+        $result = VolOrgWalletService::getTransactions((int) $id, $filters);
+        return $this->respondWithCollection($result['items'], $result['cursor'], $filters['limit'], $result['has_more']);
+    }
+
+    public function orgWalletDeposit($id): JsonResponse
+    {
+        $this->ensureFeature();
+        $userId = $this->getUserId();
+        $this->rateLimit('vol_org_wallet_deposit', 10, 60);
+        $org = $this->ensureOrgAccess((int) $id);
+        if (!$org) return $this->respondWithError('FORBIDDEN', 'Access denied', null, 403);
+
+        $amount = (float) $this->input('amount', 0);
+        $note = trim((string) $this->input('note', ''));
+
+        if ($amount <= 0) {
+            return $this->respondWithError('VALIDATION_ERROR', 'Amount must be greater than 0', 'amount', 400);
+        }
+
+        $result = VolOrgWalletService::depositFromUser($userId, (int) $id, $amount, $note ?: null);
+        if (!$result['success']) {
+            return $this->respondWithError('VALIDATION_ERROR', $result['message'], null, 400);
+        }
+
+        return $this->respondWithData([
+            'message' => $result['message'],
+            'new_balance' => $result['new_balance'],
+        ]);
+    }
+
+    public function orgWalletAutoPayToggle($id): JsonResponse
+    {
+        $this->ensureFeature();
+        $this->rateLimit('vol_org_autopay', 20, 60);
+        $org = $this->ensureOrgAccess((int) $id);
+        if (!$org) return $this->respondWithError('FORBIDDEN', 'Access denied', null, 403);
+
+        $enabled = $this->inputBool('enabled');
+        $tenantId = TenantContext::getId();
+
+        DB::update(
+            "UPDATE vol_organizations SET auto_pay_enabled = ? WHERE id = ? AND tenant_id = ?",
+            [$enabled ? 1 : 0, (int) $id, $tenantId]
+        );
+
+        return $this->respondWithData(['auto_pay_enabled' => $enabled]);
+    }
+
+    public function orgVolunteers($id): JsonResponse
+    {
+        $this->ensureFeature();
+        $this->rateLimit('vol_org_volunteers', 60, 60);
+        $org = $this->ensureOrgAccess((int) $id);
+        if (!$org) return $this->respondWithError('FORBIDDEN', 'Access denied', null, 403);
+
+        $tenantId = TenantContext::getId();
+        $orgId = (int) $id;
+        $limit = $this->queryInt('per_page', 20, 1, 50);
+        $cursor = $this->query('cursor');
+
+        $params = [$orgId, $tenantId];
+        $cursorClause = '';
+        if ($cursor) {
+            $cursorClause = ' AND u.id < ?';
+            $params[] = (int) $cursor;
+        }
+        $params[] = $limit + 1;
+
+        $rows = DB::select("
+            SELECT u.id, u.name, u.avatar_url, u.email,
+                   MAX(va.created_at) as applied_at,
+                   COALESCE(SUM(CASE WHEN vl.status = 'approved' THEN vl.hours ELSE 0 END), 0) as total_hours,
+                   COUNT(DISTINCT va.id) as applications_count
+            FROM users u
+            INNER JOIN vol_applications va ON va.user_id = u.id AND va.status = 'approved'
+            INNER JOIN vol_opportunities vo ON va.opportunity_id = vo.id AND vo.organization_id = ?
+            LEFT JOIN vol_logs vl ON vl.user_id = u.id AND vl.organization_id = vo.organization_id AND vl.tenant_id = ?
+            WHERE va.tenant_id = u.tenant_id
+            {$cursorClause}
+            GROUP BY u.id, u.name, u.avatar_url, u.email
+            ORDER BY u.id DESC
+            LIMIT ?
+        ", $params);
+
+        $hasMore = count($rows) > $limit;
+        if ($hasMore) array_pop($rows);
+
+        $items = array_map(fn ($r) => [
+            'id' => (int) $r->id,
+            'name' => $r->name,
+            'avatar_url' => $r->avatar_url,
+            'email' => $r->email,
+            'total_hours' => (float) $r->total_hours,
+            'applications_count' => (int) $r->applications_count,
+            'applied_at' => $r->applied_at,
+        ], $rows);
+
+        $lastItem = end($items);
+        $nextCursor = $lastItem ? (string) $lastItem['id'] : null;
+        return $this->respondWithCollection($items, $hasMore ? $nextCursor : null, $limit, $hasMore);
+    }
+
+    public function orgApplications($id): JsonResponse
+    {
+        $this->ensureFeature();
+        $this->rateLimit('vol_org_applications', 60, 60);
+        $org = $this->ensureOrgAccess((int) $id);
+        if (!$org) return $this->respondWithError('FORBIDDEN', 'Access denied', null, 403);
+
+        $tenantId = TenantContext::getId();
+        $orgId = (int) $id;
+        $limit = $this->queryInt('per_page', 20, 1, 50);
+        $cursor = $this->query('cursor');
+        $statusFilter = $this->query('status');
+
+        $params = [$orgId, $tenantId];
+        $whereClauses = '';
+        if ($statusFilter && in_array($statusFilter, ['pending', 'approved', 'declined'])) {
+            $whereClauses .= ' AND va.status = ?';
+            $params[] = $statusFilter;
+        }
+        if ($cursor) {
+            $whereClauses .= ' AND va.id < ?';
+            $params[] = (int) $cursor;
+        }
+        $params[] = $limit + 1;
+
+        $rows = DB::select("
+            SELECT va.id, va.status, va.message, va.org_note, va.created_at, va.shift_id,
+                   u.id as user_id, u.name as user_name, u.avatar_url as user_avatar,
+                   u.email as user_email,
+                   vo.id as opportunity_id, vo.title as opportunity_title,
+                   vs.start_time as shift_start, vs.end_time as shift_end
+            FROM vol_applications va
+            INNER JOIN vol_opportunities vo ON va.opportunity_id = vo.id AND vo.organization_id = ?
+            INNER JOIN users u ON va.user_id = u.id
+            LEFT JOIN vol_shifts vs ON va.shift_id = vs.id
+            WHERE va.tenant_id = ?
+            {$whereClauses}
+            ORDER BY va.id DESC
+            LIMIT ?
+        ", $params);
+
+        $hasMore = count($rows) > $limit;
+        if ($hasMore) array_pop($rows);
+
+        $items = array_map(fn ($r) => [
+            'id' => (int) $r->id,
+            'status' => $r->status,
+            'message' => $r->message,
+            'org_note' => $r->org_note,
+            'created_at' => $r->created_at,
+            'user' => [
+                'id' => (int) $r->user_id,
+                'name' => $r->user_name,
+                'avatar_url' => $r->user_avatar,
+                'email' => $r->user_email,
+            ],
+            'opportunity' => [
+                'id' => (int) $r->opportunity_id,
+                'title' => $r->opportunity_title,
+            ],
+            'shift' => $r->shift_start ? [
+                'start_time' => $r->shift_start,
+                'end_time' => $r->shift_end,
+            ] : null,
+        ], $rows);
+
+        $lastItem = end($items);
+        $nextCursor = $lastItem ? (string) $lastItem['id'] : null;
+        return $this->respondWithCollection($items, $hasMore ? $nextCursor : null, $limit, $hasMore);
+    }
+
+    public function orgHoursPending($id): JsonResponse
+    {
+        $this->ensureFeature();
+        $this->rateLimit('vol_org_hours_pending', 60, 60);
+        $org = $this->ensureOrgAccess((int) $id);
+        if (!$org) return $this->respondWithError('FORBIDDEN', 'Access denied', null, 403);
+
+        $tenantId = TenantContext::getId();
+        $orgId = (int) $id;
+        $limit = $this->queryInt('per_page', 20, 1, 50);
+        $cursor = $this->query('cursor');
+
+        $params = [$orgId, $tenantId];
+        $cursorClause = '';
+        if ($cursor) {
+            $cursorClause = ' AND vl.id < ?';
+            $params[] = (int) $cursor;
+        }
+        $params[] = $limit + 1;
+
+        $rows = DB::select("
+            SELECT vl.id, vl.hours, vl.date_logged as date, vl.description, vl.status, vl.created_at,
+                   u.id as user_id, u.name as user_name, u.avatar_url as user_avatar,
+                   vo.id as opportunity_id, vo.title as opportunity_title
+            FROM vol_logs vl
+            INNER JOIN users u ON vl.user_id = u.id
+            LEFT JOIN vol_opportunities vo ON vl.opportunity_id = vo.id
+            WHERE vl.organization_id = ? AND vl.tenant_id = ? AND vl.status = 'pending'
+            {$cursorClause}
+            ORDER BY vl.id DESC
+            LIMIT ?
+        ", $params);
+
+        $hasMore = count($rows) > $limit;
+        if ($hasMore) array_pop($rows);
+
+        $items = array_map(fn ($r) => [
+            'id' => (int) $r->id,
+            'hours' => (float) $r->hours,
+            'date' => $r->date,
+            'description' => $r->description,
+            'status' => $r->status,
+            'created_at' => $r->created_at,
+            'user' => [
+                'id' => (int) $r->user_id,
+                'name' => $r->user_name,
+                'avatar_url' => $r->user_avatar,
+            ],
+            'opportunity' => $r->opportunity_id ? [
+                'id' => (int) $r->opportunity_id,
+                'title' => $r->opportunity_title,
+            ] : null,
+        ], $rows);
+
+        $lastItem = end($items);
+        $nextCursor = $lastItem ? (string) $lastItem['id'] : null;
+        return $this->respondWithCollection($items, $hasMore ? $nextCursor : null, $limit, $hasMore);
+    }
+
+    public function updateOrganisation($id): JsonResponse
+    {
+        $this->ensureFeature();
+        $this->rateLimit('vol_org_update', 10, 60);
+        $org = $this->ensureOrgAccess((int) $id);
+        if (!$org) return $this->respondWithError('FORBIDDEN', 'Access denied', null, 403);
+
+        $tenantId = TenantContext::getId();
+        $updates = [];
+        $params = [];
+
+        $fields = ['name', 'description', 'contact_email', 'website'];
+        foreach ($fields as $field) {
+            $value = $this->input($field);
+            if ($value !== null) {
+                $updates[] = "{$field} = ?";
+                $params[] = trim($value);
+            }
+        }
+
+        if (empty($updates)) {
+            return $this->respondWithError('VALIDATION_ERROR', 'No fields to update', null, 400);
+        }
+
+        $params[] = (int) $id;
+        $params[] = $tenantId;
+        DB::update("UPDATE vol_organizations SET " . implode(', ', $updates) . " WHERE id = ? AND tenant_id = ?", $params);
+
+        $updatedOrg = $this->volunteerService->getOrganizationById((int) $id, true);
+        return $this->respondWithData($updatedOrg);
     }
 
     // ========================================

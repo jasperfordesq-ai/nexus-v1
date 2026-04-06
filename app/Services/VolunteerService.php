@@ -1064,8 +1064,83 @@ class VolunteerService
         $status = $action === 'approve' ? 'approved' : self::getDeclineStatusValue();
 
         try {
-            DB::update("UPDATE vol_logs SET status = ? WHERE id = ? AND tenant_id = ?", [$status, $logId, $tenantId]);
-            return true;
+            return DB::transaction(function () use ($logId, $tenantId, $status, $action, $log, $org, $adminUserId) {
+                // 1. Update hours status
+                DB::update("UPDATE vol_logs SET status = ? WHERE id = ? AND tenant_id = ?", [$status, $logId, $tenantId]);
+
+                $hours = (float) $log->hours;
+                $volunteerId = (int) $log->user_id;
+
+                // 2. If approved and org has auto-pay enabled, pay volunteer from org wallet
+                if ($action === 'approve' && $org->auto_pay_enabled) {
+                    $result = VolOrgWalletService::payVolunteer(
+                        (int) $org->id,
+                        $volunteerId,
+                        $hours,
+                        $adminUserId,
+                        "Auto-payment for {$hours}h volunteered",
+                        $logId
+                    );
+
+                    if ($result['success']) {
+                        // Notify volunteer: hours approved + credits paid
+                        NotificationDispatcher::dispatch(
+                            $volunteerId,
+                            'global',
+                            0,
+                            'vol_hours_approved',
+                            "Your {$hours}h were approved and {$hours} time credits added to your wallet!",
+                            '/wallet',
+                            null
+                        );
+                    } else {
+                        // Insufficient balance — still approve hours, notify both parties
+                        NotificationDispatcher::dispatch(
+                            $volunteerId,
+                            'global',
+                            0,
+                            'vol_hours_approved',
+                            "Your {$hours}h were approved! Time credits will be paid when the organization funds their wallet.",
+                            '/volunteering?tab=hours',
+                            null
+                        );
+                        // Notify org owner about low balance
+                        NotificationDispatcher::dispatch(
+                            (int) $org->user_id,
+                            'global',
+                            0,
+                            'vol_hours_approved',
+                            "Approved {$hours}h for a volunteer but your org wallet has insufficient balance. Please fund your wallet.",
+                            '/volunteering/org/' . (int) $org->id . '/dashboard?tab=wallet',
+                            null
+                        );
+                    }
+                } elseif ($action === 'approve') {
+                    // Auto-pay disabled — just notify volunteer of approval
+                    NotificationDispatcher::dispatch(
+                        $volunteerId,
+                        'global',
+                        0,
+                        'vol_hours_approved',
+                        "Your {$hours}h of volunteering were approved!",
+                        '/volunteering?tab=hours',
+                        null
+                    );
+                } else {
+                    // Declined — notify volunteer
+                    NotificationDispatcher::dispatch(
+                        $volunteerId,
+                        'global',
+                        0,
+                        'vol_hours_declined',
+                        "Your {$hours}h volunteering log was declined.",
+                        '/volunteering?tab=hours',
+                        null
+                    );
+                }
+
+                return true;
+            });
         } catch (\Exception $e) {
             error_log("VolunteerService::verifyHours error: " . $e->getMessage());
             self::$errors[] = ['code' => 'SERVER_ERROR', 'message' => 'Failed to verify hours'];

@@ -534,4 +534,49 @@ class AdminVolunteerController extends BaseApiController
         return $this->respondWithData(['reminders_sent' => $sent]);
     }
 
+    /**
+     * Admin: adjust a volunteer organization's wallet balance (top-up or deduct).
+     */
+    public function adjustOrgWallet(int $id): JsonResponse
+    {
+        $this->requireSuperAdmin();
+
+        $amount = (float) $this->input('amount', 0);
+        $reason = trim((string) $this->input('reason', ''));
+
+        if ($amount == 0) {
+            return $this->respondWithError('VALIDATION_ERROR', 'Amount cannot be zero', 'amount', 400);
+        }
+        if (empty($reason)) {
+            return $this->respondWithError('VALIDATION_ERROR', 'Reason is required', 'reason', 400);
+        }
+
+        $adminId = $this->getUserId();
+        $result = \App\Services\VolOrgWalletService::adminAdjustment($id, $amount, $adminId, $reason);
+
+        if (!$result['success']) {
+            return $this->respondWithError('VALIDATION_ERROR', $result['message'], null, 400);
+        }
+
+        return $this->respondWithData([
+            'message' => $result['message'],
+            'new_balance' => $result['new_balance'],
+        ]);
+    }
+
+    /**
+     * Admin: get transaction history for a volunteer organization's wallet.
+     */
+    public function orgWalletTransactions(int $id): JsonResponse
+    {
+        $this->requireSuperAdmin();
+
+        $filters = [
+            'limit' => $this->queryInt('per_page', 20, 1, 50),
+            'cursor' => $this->query('cursor'),
+        ];
+
+        $result = \App\Services\VolOrgWalletService::getTransactions($id, $filters);
+        return $this->respondWithCollection($result['items'], $result['cursor'], $filters['limit'], $result['has_more']);
+    }
 }
