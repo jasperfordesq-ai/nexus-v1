@@ -234,7 +234,7 @@ export function MarketplaceModerationPage() {
       sortable: true,
       render: (item) => (
         <span className="text-sm text-default-600">
-          {item.currency ?? ''}{item.price?.toFixed(2) ?? '0.00'}
+          {item.currency ?? ''}{Number(item.price ?? 0).toFixed(2)}
         </span>
       ),
     },

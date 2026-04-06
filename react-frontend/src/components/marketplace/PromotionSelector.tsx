@@ -166,7 +166,7 @@ export function PromotionSelector({
                             <div className="flex items-center gap-2">
                               <span className="font-bold text-foreground">
                                 {product.price > 0
-                                  ? `${product.currency} ${product.price.toFixed(2)}`
+                                  ? `${product.currency} ${Number(product.price).toFixed(2)}`
                                   : t('promotions.free_label', 'Free')}
                               </span>
                               {isSelected && <Check className="w-5 h-5 text-primary" />}
@@ -205,7 +205,7 @@ export function PromotionSelector({
           >
             {selectedProduct
               ? t('promotions.confirm_promote', 'Promote for {{price}}', {
-                  price: `${selectedProduct.currency} ${selectedProduct.price.toFixed(2)}`,
+                  price: `${selectedProduct.currency} ${Number(selectedProduct.price).toFixed(2)}`,
                 })
               : t('promotions.select_type', 'Select a promotion')}
           </Button>
