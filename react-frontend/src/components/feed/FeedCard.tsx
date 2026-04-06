@@ -71,6 +71,7 @@ import { ReactionPicker, ReactionSummary, type ReactionType } from '@/components
 import { LinkPreviewCard } from '@/components/social/LinkPreviewCard';
 import { MentionRenderer } from '@/components/social/MentionRenderer';
 import { SafeHtml, containsHtml } from '@/components/ui/SafeHtml';
+import { VerificationBadgeRow } from '@/components/verification/VerificationBadge';
 
 /* ───────────────────────── Props ───────────────────────── */
 
@@ -542,6 +543,7 @@ const FeedCard = React.memo(function FeedCard({
                 >
                   {author.name}
                 </Link>
+                <VerificationBadgeRow userId={author.id} size="sm" />
                 {typeLabel && (
                   detailPath ? (
                     <Link to={tenantPath(detailPath)} onClick={recordClick}>
