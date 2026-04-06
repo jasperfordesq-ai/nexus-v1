@@ -32,9 +32,9 @@ return new class extends Migration
 
             $table->index('tenant_id');
             // Prevent duplicate glossary entries for the same term and language within a tenant
-            $table->unique(['tenant_id', 'source_term', 'target_language']);
+            $table->unique(['tenant_id', 'source_term', 'target_language'], 'glossaries_tenant_term_lang_unique');
             // Optimise lookups for active glossary entries by tenant and language
-            $table->index(['tenant_id', 'target_language', 'is_active']);
+            $table->index(['tenant_id', 'target_language', 'is_active'], 'glossaries_tenant_lang_active_idx');
         });
     }
 

@@ -10,6 +10,7 @@ namespace App\Services;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Schema;
 
 /**
  * SitemapService — Generates XML sitemaps per the Sitemaps 0.9 protocol.
@@ -499,6 +500,10 @@ class SitemapService
 
     private function getMarketplaceListingUrls(int $tenantId, string $baseUrl): array
     {
+        if (!Schema::hasTable('marketplace_listings')) {
+            return [];
+        }
+
         $rows = DB::select(
             "SELECT id, COALESCE(updated_at, created_at) AS lastmod
              FROM marketplace_listings
@@ -515,6 +520,10 @@ class SitemapService
 
     private function getMarketplaceCategoryUrls(int $tenantId, string $baseUrl): array
     {
+        if (!Schema::hasTable('marketplace_categories')) {
+            return [];
+        }
+
         $rows = DB::select(
             "SELECT slug, COALESCE(updated_at, created_at) AS lastmod
              FROM marketplace_categories
