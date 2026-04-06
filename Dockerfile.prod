@@ -194,6 +194,10 @@ RUN mkdir -p /var/www/html/storage/app/public \
 RUN mkdir -p /var/www/html/httpdocs/uploads /var/www/html/public/uploads/posts \
     && chown -R www-data:www-data /var/www/html
 
+# Symlink storage/app/public into the web root so /storage/* URLs work
+# (artisan storage:link targets /public/ but our document root is /httpdocs/)
+RUN ln -sf /var/www/html/storage/app/public /var/www/html/httpdocs/storage
+
 # Ensure Laravel storage and bootstrap/cache are writable by www-data
 RUN chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache
 
@@ -222,6 +226,6 @@ CMD ["sh", "-c", "\
         php /var/www/html/artisan config:cache 2>/dev/null || true; \
         php /var/www/html/artisan route:cache 2>/dev/null || true; \
         php /var/www/html/artisan event:cache 2>/dev/null || true; \
-        php /var/www/html/artisan storage:link 2>/dev/null || true; \
+        ln -sf /var/www/html/storage/app/public /var/www/html/httpdocs/storage 2>/dev/null || true; \
     fi; \
     apache2-foreground"]

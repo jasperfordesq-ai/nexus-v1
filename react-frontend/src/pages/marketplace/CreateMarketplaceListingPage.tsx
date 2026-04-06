@@ -39,7 +39,6 @@ import {
   Plus,
   Sparkles,
   ArrowLeft,
-  MapPin,
   Truck,
   Package,
   DollarSign,
@@ -54,6 +53,7 @@ import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
 import { usePageTitle } from '@/hooks';
 import { PageMeta } from '@/components/seo/PageMeta';
+import { PlaceAutocompleteInput } from '@/components/location';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Types
@@ -125,6 +125,8 @@ export function CreateMarketplaceListingPage() {
   const [currency, setCurrency] = useState('EUR');
   const [priceType, setPriceType] = useState('fixed');
   const [location, setLocation] = useState('');
+  const [latitude, setLatitude] = useState<number | undefined>();
+  const [longitude, setLongitude] = useState<number | undefined>();
   const [deliveryMethod, setDeliveryMethod] = useState('pickup');
   const [quantity, setQuantity] = useState('1');
   const [images, setImages] = useState<ImagePreview[]>([]);
@@ -340,6 +342,8 @@ export function CreateMarketplaceListingPage() {
       if (priceType !== 'free' && price) body.price = parseFloat(price);
       if (currency) body.price_currency = currency;
       if (location.trim()) body.location = location.trim();
+      if (latitude !== undefined) body.latitude = latitude;
+      if (longitude !== undefined) body.longitude = longitude;
 
       // Include template fields
       const filledTemplateFields = Object.fromEntries(
@@ -745,12 +749,25 @@ export function CreateMarketplaceListingPage() {
             {t('create.location_delivery', 'Location & Delivery')}
           </h2>
 
-          <Input
+          <PlaceAutocompleteInput
             label={t('create.location_label', 'Location')}
             placeholder={t('create.location_placeholder', 'City, town, or area')}
             value={location}
-            onValueChange={setLocation}
-            startContent={<MapPin className="w-4 h-4 text-default-400" />}
+            onChange={setLocation}
+            onPlaceSelect={(place) => {
+              setLocation(place.formattedAddress);
+              setLatitude(place.lat);
+              setLongitude(place.lng);
+            }}
+            onClear={() => {
+              setLocation('');
+              setLatitude(undefined);
+              setLongitude(undefined);
+            }}
+            classNames={{
+              inputWrapper: 'bg-theme-elevated border-theme-default',
+              label: 'text-theme-muted',
+            }}
           />
 
           <RadioGroup
