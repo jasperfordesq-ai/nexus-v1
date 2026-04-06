@@ -4,13 +4,10 @@
 // See NOTICE file for attribution and acknowledgements.
 
 /**
- * VerificationBadge — Displays labeled verification badges on profiles,
- * listings, members, exchanges, marketplace, and messages.
+ * VerificationBadge — Displays labeled verification badges across the platform.
  *
- * Badge types: email_verified, phone_verified, id_verified,
- * dbs_checked, admin_verified.
- *
- * Shows as labeled chips with icons — always visible, no hover required.
+ * Used on: profiles, listings, members, exchanges, marketplace, messages, mobile menu.
+ * Always shows labels — never just icons. Green = ID Verified (trust signal).
  */
 
 import { useState, useEffect } from 'react';
@@ -19,7 +16,6 @@ import {
   ShieldCheck,
   Mail,
   Phone,
-  Fingerprint,
   FileCheck,
   UserCheck,
   Shield,
@@ -45,7 +41,7 @@ export interface VerificationBadgeData {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Badge Config
+// Badge Config — GREEN for ID Verified (trust signal)
 // ─────────────────────────────────────────────────────────────────────────────
 
 const badgeConfig: Record<string, {
@@ -70,10 +66,10 @@ const badgeConfig: Record<string, {
     label: 'Phone Verified',
   },
   id_verified: {
-    icon: <Fingerprint className="w-3.5 h-3.5" />,
-    iconSm: <Fingerprint className="w-3 h-3" />,
-    color: 'text-purple-600 dark:text-purple-400',
-    bgColor: 'bg-purple-500/10',
+    icon: <ShieldCheck className="w-3.5 h-3.5" />,
+    iconSm: <ShieldCheck className="w-3 h-3" />,
+    color: 'text-emerald-700 dark:text-emerald-300',
+    bgColor: 'bg-emerald-500/15 dark:bg-emerald-500/20',
     label: 'ID Verified',
   },
   dbs_checked: {
@@ -105,7 +101,7 @@ function normalizeBadges(data: any[]): VerificationBadgeData[] {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Single Badge Icon (tooltip-only, for very tight spaces)
+// Single Badge Icon (for tooltip-only compact spaces)
 // ─────────────────────────────────────────────────────────────────────────────
 
 export function VerificationBadgeIcon({
@@ -142,7 +138,7 @@ export function VerificationBadgeIcon({
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Badge Row — LABELED chips (primary display for all pages)
+// Badge Row — LABELED chips (primary display component used everywhere)
 // ─────────────────────────────────────────────────────────────────────────────
 
 export function VerificationBadgeRow({
@@ -196,11 +192,10 @@ export function VerificationBadgeRow({
         };
 
         if (size === 'sm') {
-          // Compact labeled chip for inline use (members list, messages, exchanges)
           return (
             <span
               key={badge.type}
-              className={`inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full text-[11px] font-medium ${config.bgColor} ${config.color}`}
+              className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-semibold ${config.bgColor} ${config.color}`}
             >
               {config.iconSm}
               {config.label}
@@ -208,13 +203,13 @@ export function VerificationBadgeRow({
           );
         }
 
-        // Medium/large: HeroUI Chip for profile and detail pages
+        // Medium/large: bigger chip for profile and detail pages
         return (
           <Chip
             key={badge.type}
-            size="sm"
+            size="md"
             variant="flat"
-            className={`${config.bgColor} ${config.color} font-medium`}
+            className={`${config.bgColor} ${config.color} font-semibold`}
             startContent={config.icon}
           >
             {config.label}
@@ -257,10 +252,10 @@ export function VerificationBadgeSummary({
   if (badges.length === 0) return null;
 
   return (
-    <div className="space-y-2">
+    <div className="space-y-3">
       <div className="flex items-center gap-2">
-        <Shield className="w-4 h-4 text-indigo-500" aria-hidden="true" />
-        <span className="text-sm font-medium text-theme-primary">Verification</span>
+        <Shield className="w-4 h-4 text-emerald-500" aria-hidden="true" />
+        <span className="text-sm font-semibold text-theme-primary">Verification Status</span>
       </div>
       <div className="flex flex-wrap gap-2">
         {badges.map((badge) => {
@@ -268,10 +263,10 @@ export function VerificationBadgeSummary({
           return (
             <Chip
               key={badge.type}
-              size="sm"
+              size="md"
               variant="flat"
-              className={`${config?.bgColor || 'bg-theme-elevated'} ${config?.color || 'text-theme-muted'} font-medium`}
-              startContent={config?.icon || <ShieldCheck className="w-3 h-3" />}
+              className={`${config?.bgColor || 'bg-theme-elevated'} ${config?.color || 'text-theme-muted'} font-semibold`}
+              startContent={config?.icon || <ShieldCheck className="w-3.5 h-3.5" />}
             >
               {config?.label || badge.label}
             </Chip>

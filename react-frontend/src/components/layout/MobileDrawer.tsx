@@ -65,9 +65,11 @@ import {
   Sun,
   Moon,
   FlaskConical,
+  Fingerprint,
 } from 'lucide-react';
 import { RELEASE_STATUS } from '@/config/releaseStatus';
 import { TenantLogo } from '@/components/branding';
+import { VerificationBadgeRow } from '@/components/verification/VerificationBadge';
 import { useTranslation } from 'react-i18next';
 import { useAuth, useTenant, useNotifications, useCookieConsent, useTheme } from '@/contexts';
 import { resolveAvatarUrl } from '@/lib/helpers';
@@ -75,6 +77,37 @@ import type { TenantFeatures, TenantModules } from '@/types/api';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 import { useMenuContext } from '@/contexts';
 import { MobileMenuItems } from '@/components/navigation';
+
+// Identity verification CTA for mobile menu — shows "Verify Identity" if not verified
+function IdentityVerificationCTA({ userId, tenantPath, onClose }: { userId: number; tenantPath: (p: string) => string; onClose: () => void }) {
+  const [isVerified, setIsVerified] = useState<boolean | null>(null);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (!userId) return;
+    let cancelled = false;
+    import('@/lib/api').then(({ api }) => {
+      api.get('/v2/identity/status').then((res: any) => {
+        if (!cancelled) setIsVerified(res?.data?.has_id_verified_badge === true);
+      }).catch(() => { if (!cancelled) setIsVerified(false); });
+    }).catch(() => { if (!cancelled) setIsVerified(false); });
+    return () => { cancelled = true; };
+  }, [userId]);
+
+  if (isVerified === null) return null; // Loading
+  if (isVerified) return null; // Already verified — VerificationBadgeRow handles display
+
+  return (
+    <button
+      type="button"
+      onClick={() => { onClose(); setTimeout(() => navigate(tenantPath('/verify-identity-optional')), 150); }}
+      className="mt-2 w-full flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-700 dark:text-emerald-300 text-sm font-semibold transition-colors hover:bg-emerald-500/20"
+    >
+      <Fingerprint className="w-4 h-4" />
+      Verify Your Identity
+    </button>
+  );
+}
 
 interface MobileDrawerProps {
   isOpen: boolean;
@@ -305,6 +338,10 @@ export function MobileDrawer({ isOpen, onClose, onSearchOpen }: MobileDrawerProp
                   <p className="text-sm text-theme-subtle">{user.email}</p>
                 </div>
               </Link>
+
+              {/* Identity Verification Status */}
+              <VerificationBadgeRow userId={user.id} size="sm" />
+              <IdentityVerificationCTA userId={user.id} tenantPath={tenantPath} onClose={onClose} />
 
               {/* Quick Stats */}
               <div className="grid grid-cols-3 gap-2 mt-3">

@@ -414,7 +414,7 @@ export function Navbar({ onMobileMenuOpen, externalSearchOpen, onSearchOpenChang
                     <Button
                       variant="light"
                       size="sm"
-                      className="text-purple-500 hover:text-purple-600 dark:text-purple-400 dark:hover:text-purple-300 h-7 min-w-0 px-2 gap-1 text-xs shrink-0 font-medium"
+                      className="text-emerald-600 hover:text-emerald-700 dark:text-emerald-400 dark:hover:text-emerald-300 h-7 min-w-0 px-2 gap-1 text-xs shrink-0 font-semibold"
                       onPress={() => navigate(tenantPath('/verify-identity-optional'))}
                     >
                       <Fingerprint className="w-3.5 h-3.5 shrink-0" aria-hidden="true" />
