@@ -55,12 +55,12 @@ class IdentityVerificationSessionService
      */
     public static function getById(int $sessionId): ?array
     {
-        $row = DB::statement(
+        $rows = DB::select(
             "SELECT * FROM identity_verification_sessions WHERE id = ?",
             [$sessionId]
-        )->fetch();
+        );
 
-        return $row ?: null;
+        return !empty($rows) ? (array) $rows[0] : null;
     }
 
     /**
@@ -79,9 +79,9 @@ class IdentityVerificationSessionService
 
         $query .= " ORDER BY created_at DESC LIMIT 1";
 
-        $row = DB::statement($query, $params)->fetch();
+        $rows = DB::select($query, $params);
 
-        return $row ?: null;
+        return !empty($rows) ? (array) $rows[0] : null;
     }
 
     /**
@@ -89,14 +89,14 @@ class IdentityVerificationSessionService
      */
     public static function getLatestForUser(int $tenantId, int $userId): ?array
     {
-        $row = DB::statement(
+        $rows = DB::select(
             "SELECT * FROM identity_verification_sessions
              WHERE tenant_id = ? AND user_id = ?
              ORDER BY created_at DESC LIMIT 1",
             [$tenantId, $userId]
-        )->fetch();
+        );
 
-        return $row ?: null;
+        return !empty($rows) ? (array) $rows[0] : null;
     }
 
     /**
@@ -104,12 +104,14 @@ class IdentityVerificationSessionService
      */
     public static function getAllForUser(int $tenantId, int $userId): array
     {
-        return DB::statement(
+        $rows = DB::select(
             "SELECT * FROM identity_verification_sessions
              WHERE tenant_id = ? AND user_id = ?
              ORDER BY created_at DESC",
             [$tenantId, $userId]
-        )->fetchAll();
+        );
+
+        return array_map(fn($row) => (array) $row, $rows);
     }
 
     /**
@@ -144,7 +146,7 @@ class IdentityVerificationSessionService
      */
     public static function getPendingForTenant(int $tenantId, int $limit = 50, int $offset = 0): array
     {
-        return DB::statement(
+        $rows = DB::select(
             "SELECT ivs.*, u.first_name, u.last_name, u.email
              FROM identity_verification_sessions ivs
              JOIN users u ON u.id = ivs.user_id
@@ -152,7 +154,9 @@ class IdentityVerificationSessionService
              ORDER BY ivs.created_at DESC
              LIMIT ? OFFSET ?",
             [$tenantId, $limit, $offset]
-        )->fetchAll();
+        );
+
+        return array_map(fn($row) => (array) $row, $rows);
     }
 
     /**
@@ -165,7 +169,7 @@ class IdentityVerificationSessionService
      */
     public static function getAbandoned(int $hoursOld = 24, int $limit = 100): array
     {
-        return DB::statement(
+        $rows = DB::select(
             "SELECT ivs.*, u.first_name, u.last_name, u.email, u.tenant_id
              FROM identity_verification_sessions ivs
              JOIN users u ON u.id = ivs.user_id
@@ -175,7 +179,9 @@ class IdentityVerificationSessionService
              ORDER BY ivs.created_at ASC
              LIMIT ?",
             [$hoursOld, $limit]
-        )->fetchAll();
+        );
+
+        return array_map(fn($row) => (array) $row, $rows);
     }
 
     /**
@@ -197,15 +203,13 @@ class IdentityVerificationSessionService
      */
     public static function expireAbandoned(int $hoursOld = 72): int
     {
-        $stmt = DB::statement(
+        return DB::affectingStatement(
             "UPDATE identity_verification_sessions
              SET status = 'expired', completed_at = NOW(), updated_at = NOW()
              WHERE status IN ('created', 'started')
                AND created_at < DATE_SUB(NOW(), INTERVAL ? HOUR)",
             [$hoursOld]
         );
-
-        return $stmt->rowCount();
     }
 
     /**
@@ -217,14 +221,12 @@ class IdentityVerificationSessionService
      */
     public static function purgeOldSessions(int $retentionDays = 180): int
     {
-        $stmt = DB::statement(
+        return DB::affectingStatement(
             "DELETE FROM identity_verification_sessions
              WHERE status IN ('passed', 'failed', 'expired', 'cancelled')
                AND completed_at IS NOT NULL
                AND completed_at < DATE_SUB(NOW(), INTERVAL ? DAY)",
             [$retentionDays]
         );
-
-        return $stmt->rowCount();
     }
 }
