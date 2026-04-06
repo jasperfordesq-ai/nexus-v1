@@ -72,8 +72,8 @@ class OptionalIdentityVerificationController extends BaseApiController
         $userId = $this->requireAuth();
         $tenantId = $this->getTenantId();
 
-        // Rate limit: 5 starts per user per hour
-        $this->rateLimit("optional_verify_{$userId}", 5, 3600);
+        // Rate limit: 20 starts per user per hour
+        $this->rateLimit("optional_verify_{$userId}", 20, 3600);
 
         // Check if already verified
         $badges = $this->badgeService->getUserBadges($userId);

@@ -134,7 +134,14 @@ export function VerifyIdentityOptionalPage() {
     userStartedRef.current = true;
     try {
       const response = await api.post<StartVerificationResponse>('/v2/identity/start');
-      if (response.success && response.data) {
+      if (!response.success) {
+        // API returned an error (rate limit, server error, etc.)
+        const msg = (response as any)?.errors?.[0]?.message || 'Unable to start verification. Please try again later.';
+        setErrorMessage(msg);
+        userStartedRef.current = false;
+        return;
+      }
+      if (response.data) {
         if (response.data.already_verified) {
           setPageState('verified');
           return;
