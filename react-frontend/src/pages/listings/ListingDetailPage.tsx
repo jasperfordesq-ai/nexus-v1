@@ -43,6 +43,7 @@ import { LocationMapCard } from '@/components/location';
 import { CommentsSection, LikersModal, ShareButton } from '@/components/social';
 import { ListingAnalyticsPanel } from '@/components/listings/ListingAnalyticsPanel';
 import { FeaturedBadge } from '@/components/listings/FeaturedBadge';
+import { VerificationBadgeRow } from '@/components/verification/VerificationBadge';
 import { useAuth, useToast, useTenant } from '@/contexts';
 import { usePageTitle, useSocialInteractions } from '@/hooks';
 import { api } from '@/lib/api';
@@ -697,9 +698,7 @@ export function ListingDetailPage() {
                   <h3 className="font-semibold text-theme-primary group-hover:text-indigo-400 transition-colors">
                     {userName}
                   </h3>
-                  {listing.author_verified && (
-                    <ShieldCheck className="w-4 h-4 text-blue-500 shrink-0" aria-label="Verified member" />
-                  )}
+                  {listing.user?.id && <VerificationBadgeRow userId={listing.user.id} size="sm" />}
                 </div>
                 {listing.user?.tagline && (
                   <p className="text-theme-muted text-sm truncate">{listing.user.tagline}</p>

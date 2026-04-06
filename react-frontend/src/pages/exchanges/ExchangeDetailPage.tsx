@@ -49,6 +49,7 @@ import { GlassCard } from '@/components/ui';
 import { Breadcrumbs } from '@/components/navigation';
 import { LoadingScreen, EmptyState } from '@/components/feedback';
 import { RatingModal } from '@/components/wallet';
+import { VerificationBadgeRow } from '@/components/verification/VerificationBadge';
 import { useAuth, useToast, useTenant } from '@/contexts';
 import { PageMeta } from '@/components/seo';
 import { usePageTitle } from '@/hooks';
@@ -448,6 +449,7 @@ export function ExchangeDetailPage() {
                   {exchange.requester?.name || t('unknown')}
                   {isRequester && ` (${t('detail.you')})`}
                 </p>
+                {exchange.requester?.id && <VerificationBadgeRow userId={exchange.requester.id} size="sm" />}
                 {exchange.requester_confirmed_at && (
                   <p className="text-xs text-emerald-400 flex items-center gap-1">
                     <CheckCircle className="w-3 h-3" aria-hidden="true" />
@@ -471,6 +473,7 @@ export function ExchangeDetailPage() {
                   {exchange.provider?.name || t('unknown')}
                   {isProvider && ` (${t('detail.you')})`}
                 </p>
+                {exchange.provider?.id && <VerificationBadgeRow userId={exchange.provider.id} size="sm" />}
                 {exchange.provider_confirmed_at && (
                   <p className="text-xs text-emerald-400 flex items-center gap-1">
                     <CheckCircle className="w-3 h-3" aria-hidden="true" />

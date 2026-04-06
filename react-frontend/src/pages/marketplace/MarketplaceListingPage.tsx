@@ -60,6 +60,7 @@ import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
 import { usePageTitle } from '@/hooks';
 import { PageMeta } from '@/components/seo/PageMeta';
+import { VerificationBadgeRow } from '@/components/verification/VerificationBadge';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Types
@@ -677,13 +678,8 @@ export function MarketplaceListingPage() {
                   >
                     {listing.user.name}
                   </Link>
+                  <VerificationBadgeRow userId={listing.user.id} size="sm" />
                   <div className="flex items-center gap-3 text-xs text-default-400 mt-0.5">
-                    {listing.user.is_verified && (
-                      <span className="flex items-center gap-0.5 text-primary">
-                        <CheckCircle className="w-3 h-3" />
-                        {t('listing.verified', 'Verified')}
-                      </span>
-                    )}
                     {listing.user.member_since && (
                       <span>{t('listing.member_since', 'Member since {{date}}', { date: new Date(listing.user.member_since).getFullYear() })}</span>
                     )}

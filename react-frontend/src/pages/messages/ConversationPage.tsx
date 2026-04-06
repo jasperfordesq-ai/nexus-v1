@@ -25,6 +25,7 @@ import { LoadingScreen } from '@/components/feedback';
 import { useAuth, usePusherOptional, useTenant } from '@/contexts';
 import { usePageTitle } from '@/hooks';
 import { PageMeta } from '@/components/seo';
+import { VerificationBadgeRow } from '@/components/verification/VerificationBadge';
 import type { NewMessageEvent, TypingEvent } from '@/contexts';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
@@ -1364,7 +1365,10 @@ export function ConversationPage() {
                 className="ring-2 ring-white/20"
               />
               <div>
-                <h2 className="font-semibold text-theme-primary">{other_user.name}</h2>
+                <div className="flex items-center gap-1.5">
+                  <h2 className="font-semibold text-theme-primary">{other_user.name}</h2>
+                  <VerificationBadgeRow userId={other_user.id} size="sm" />
+                </div>
                 {other_user.tagline && (
                   <p className="text-xs text-theme-subtle">{other_user.tagline}</p>
                 )}

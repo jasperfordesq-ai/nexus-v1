@@ -495,7 +495,7 @@ export function ProfilePage() {
               <div className="flex flex-col sm:flex-row items-center sm:items-start gap-2">
                 <h1 className="text-lg sm:text-2xl lg:text-3xl font-bold text-theme-primary">{profile.name}</h1>
                 {/* Verification badges */}
-                <VerificationBadgeRow userId={profile.id} size="sm" />
+                <VerificationBadgeRow userId={profile.id} size="md" />
                 {/* Connected chip for other users */}
                 {!isOwnProfile && connectionStatus === 'connected' && (
                   <Chip

@@ -65,6 +65,7 @@ import {
   Activity,
   ShoppingBag,
   Fingerprint,
+  ShieldCheck,
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useAuth, useTenant, useNotifications, useTheme, useMenuContext } from '@/contexts';
@@ -165,23 +166,24 @@ export function Navbar({ onMobileMenuOpen, externalSearchOpen, onSearchOpenChang
     setUserOpen(open);
   }, []);
 
-  // Identity verification badge check — show "Verify Identity" in utility bar if not yet verified
-  const [isIdVerified, setIsIdVerified] = useState<boolean | null>(null);
+  // Identity verification status — shows "Verify Identity" or "Identity Verified" in utility bar
+  const [isIdVerified, setIsIdVerified] = useState<boolean>(false);
+  const [idVerifiedLoaded, setIdVerifiedLoaded] = useState(false);
   useEffect(() => {
     if (!isAuthenticated || !user?.id) return;
     let cancelled = false;
-    (async () => {
-      try {
-        const { api } = await import('@/lib/api');
-        const res = await api.get<{ has_id_verified_badge: boolean }>('/v2/identity/status');
-        if (!cancelled && res.success && res.data) {
-          setIsIdVerified(res.data.has_id_verified_badge);
-        }
-      } catch {
-        // Non-critical — default to showing the button if we can't check
-        if (!cancelled) setIsIdVerified(false);
-      }
-    })();
+    import('@/lib/api').then(({ api }) => {
+      api.get('/v2/identity/status').then((res: any) => {
+        if (cancelled) return;
+        const data = res?.data;
+        setIsIdVerified(data?.has_id_verified_badge === true);
+        setIdVerifiedLoaded(true);
+      }).catch(() => {
+        if (!cancelled) { setIsIdVerified(false); setIdVerifiedLoaded(true); }
+      });
+    }).catch(() => {
+      if (!cancelled) { setIsIdVerified(false); setIdVerifiedLoaded(true); }
+    });
     return () => { cancelled = true; };
   }, [isAuthenticated, user?.id]);
 
@@ -399,19 +401,26 @@ export function Navbar({ onMobileMenuOpen, externalSearchOpen, onSearchOpenChang
                   <span className="hidden md:inline">{t('user_menu.help_center')}</span>
                 </Button>
               )}
-              {/* Verify Identity — show for authenticated users without ID badge */}
-              {isAuthenticated && isIdVerified === false && (
+              {/* Identity verification status */}
+              {isAuthenticated && idVerifiedLoaded && (
                 <>
                   <span className="text-[var(--border-default)] text-xs select-none shrink-0">|</span>
-                  <Button
-                    variant="light"
-                    size="sm"
-                    className="text-purple-500 hover:text-purple-600 dark:text-purple-400 dark:hover:text-purple-300 h-7 min-w-0 px-2 gap-1 text-xs shrink-0"
-                    onPress={() => navigate(tenantPath('/verify-identity-optional'))}
-                  >
-                    <Fingerprint className="w-3.5 h-3.5 shrink-0" aria-hidden="true" />
-                    <span className="hidden md:inline">Verify Identity</span>
-                  </Button>
+                  {isIdVerified ? (
+                    <div className="flex items-center gap-1 px-2 h-7 text-xs text-emerald-600 dark:text-emerald-400 shrink-0">
+                      <ShieldCheck className="w-3.5 h-3.5 shrink-0" aria-hidden="true" />
+                      <span className="hidden md:inline">Verified</span>
+                    </div>
+                  ) : (
+                    <Button
+                      variant="light"
+                      size="sm"
+                      className="text-purple-500 hover:text-purple-600 dark:text-purple-400 dark:hover:text-purple-300 h-7 min-w-0 px-2 gap-1 text-xs shrink-0 font-medium"
+                      onPress={() => navigate(tenantPath('/verify-identity-optional'))}
+                    >
+                      <Fingerprint className="w-3.5 h-3.5 shrink-0" aria-hidden="true" />
+                      <span className="hidden md:inline">Verify Identity</span>
+                    </Button>
+                  )}
                 </>
               )}
               {/* Admin links — admin users only */}
