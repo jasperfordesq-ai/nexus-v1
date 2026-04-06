@@ -93,8 +93,15 @@ export function VerifyIdentityOptionalPage() {
       if (sessionStatus === 'passed') {
         setPageState('verified');
         stopPolling();
-      } else if (sessionStatus === 'started' || sessionStatus === 'processing' || sessionStatus === 'created') {
+      } else if (sessionStatus === 'started' || sessionStatus === 'processing') {
+        // Only truly in-progress states (user opened Stripe's form)
         setPageState('in_progress');
+      } else if (sessionStatus === 'created') {
+        // Session was created but user hasn't opened Stripe yet — show start with redirect
+        if (data.latest_session) {
+          setRedirectUrl(null); // Let them start fresh
+        }
+        setPageState('start');
       } else if (sessionStatus === 'failed') {
         setFailureReason(data.latest_session?.failure_reason || null);
         setPageState('failed');
@@ -389,6 +396,26 @@ export function VerifyIdentityOptionalPage() {
               <div className="flex items-center justify-center gap-2 text-sm text-theme-muted">
                 <Loader2 className="w-4 h-4 animate-spin" />
                 Waiting for verification result...
+              </div>
+
+              <div className="flex flex-col gap-2 pt-2">
+                <Button
+                  variant="flat"
+                  size="sm"
+                  className="w-full text-theme-muted"
+                  onPress={() => { stopPolling(); setPageState('start'); setRedirectUrl(null); }}
+                >
+                  Cancel & Start Over
+                </Button>
+                <Button
+                  variant="light"
+                  size="sm"
+                  className="w-full text-theme-subtle"
+                  startContent={<ArrowLeft className="w-3.5 h-3.5" />}
+                  onPress={() => navigate(tenantPath('/dashboard'))}
+                >
+                  Back to Dashboard
+                </Button>
               </div>
             </div>
           )}
