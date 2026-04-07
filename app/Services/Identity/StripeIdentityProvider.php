@@ -78,9 +78,13 @@ class StripeIdentityProvider implements IdentityVerificationProviderInterface
             $params['options']['document']['allowed_types'] = ['driving_license', 'passport', 'id_card'];
         }
 
-        // TODO: Pass provided_details for name/DOB matching once correct Stripe API
-        // parameter is confirmed. Stripe API version 2024-12-18.acacia rejects
-        // 'provided_details[name]' — needs investigation of correct param format.
+        // Stripe Identity doesn't accept name/DOB upfront for matching.
+        // Instead, after verification passes, we retrieve verified_outputs
+        // (name + DOB extracted from document) and compare against the user's profile.
+        // Pass email/phone in provided_details if available.
+        if (!empty($metadata['provided_details']['email'])) {
+            $params['provided_details'] = ['email' => $metadata['provided_details']['email']];
+        }
 
         // Return URL after hosted verification
         $frontendUrl = \App\Core\TenantContext::getFrontendUrl();
@@ -102,7 +106,10 @@ class StripeIdentityProvider implements IdentityVerificationProviderInterface
     public function getSessionStatus(string $providerSessionId): array
     {
         $apiKey = $this->getGlobalApiKey();
-        $response = $this->stripeRequest('GET', "/identity/verification_sessions/{$providerSessionId}", [], $apiKey);
+
+        // Expand verified_outputs to get name/DOB from the document
+        $params = ['expand' => ['verified_outputs']];
+        $response = $this->stripeRequest('GET', "/identity/verification_sessions/{$providerSessionId}", $params, $apiKey);
 
         $statusMap = [
             'requires_input' => 'started',
@@ -119,11 +126,17 @@ class StripeIdentityProvider implements IdentityVerificationProviderInterface
             $failureReason = $response['last_error']['reason'] ?? 'Verification requires additional input';
         }
 
+        // Extract verified outputs (name, DOB from the document)
+        $verifiedOutputs = $response['verified_outputs'] ?? null;
+
         return [
             'status' => $status,
             'decision' => $response['status'] === 'verified' ? 'approved' : null,
-            'risk_score' => null, // Stripe Identity doesn't expose a risk score
+            'risk_score' => null,
             'failure_reason' => $failureReason,
+            'verified_first_name' => $verifiedOutputs['first_name'] ?? null,
+            'verified_last_name' => $verifiedOutputs['last_name'] ?? null,
+            'verified_dob' => $verifiedOutputs['dob'] ?? null,
         ];
     }
 

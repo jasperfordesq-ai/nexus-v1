@@ -71,14 +71,26 @@ class OptionalIdentityVerificationController extends BaseApiController
                     $mappedStatus = $stripeStatus['status'] ?? null;
 
                     if ($mappedStatus === 'passed' && $latestSession['status'] !== 'passed') {
-                        IdentityVerificationSessionService::updateStatus(
-                            (int) $latestSession['id'], 'passed', null, null, null
-                        );
-                        $latestSession['status'] = 'passed';
+                        // Verify name and DOB match the user's profile
+                        $mismatch = self::checkNameDobMismatch($userId, $tenantId, $stripeStatus);
 
-                        if (!$hasIdBadge) {
-                            self::grantIdVerifiedBadge($userId, $tenantId);
-                            $hasIdBadge = true;
+                        if ($mismatch) {
+                            // Document verified but details don't match profile
+                            IdentityVerificationSessionService::updateStatus(
+                                (int) $latestSession['id'], 'failed', null, null, $mismatch
+                            );
+                            $latestSession['status'] = 'failed';
+                            $latestSession['failure_reason'] = $mismatch;
+                        } else {
+                            IdentityVerificationSessionService::updateStatus(
+                                (int) $latestSession['id'], 'passed', null, null, null
+                            );
+                            $latestSession['status'] = 'passed';
+
+                            if (!$hasIdBadge) {
+                                self::grantIdVerifiedBadge($userId, $tenantId);
+                                $hasIdBadge = true;
+                            }
                         }
                     } elseif ($mappedStatus === 'failed') {
                         IdentityVerificationSessionService::updateStatus(
@@ -266,21 +278,14 @@ class OptionalIdentityVerificationController extends BaseApiController
             return $this->respondWithError('SERVICE_UNAVAILABLE', 'Identity verification is not currently available.', null, 503);
         }
 
-        // Load credentials + pass user details for name/DOB matching
+        // Load credentials + pass user email to Stripe (only email/phone accepted)
+        // Name/DOB matching happens AFTER verification via verified_outputs comparison
         $providerConfig = TenantProviderCredentialService::get($tenantId, $providerSlug) ?? [];
 
-        $dob = $user->date_of_birth;
-        $providerConfig['provided_details'] = [
-            'name' => [
-                'first_name' => $user->first_name ?? '',
-                'last_name' => $user->last_name ?? '',
-            ],
-            'dob' => [
-                'day' => (int) date('d', strtotime($dob)),
-                'month' => (int) date('m', strtotime($dob)),
-                'year' => (int) date('Y', strtotime($dob)),
-            ],
-        ];
+        $userEmail = DB::table('users')->where('id', $userId)->where('tenant_id', $tenantId)->value('email');
+        if ($userEmail) {
+            $providerConfig['provided_details'] = ['email' => $userEmail];
+        }
 
         try {
             $providerData = $provider->createSession($userId, $tenantId, 'document_selfie', $providerConfig);
@@ -349,5 +354,69 @@ class OptionalIdentityVerificationController extends BaseApiController
         );
 
         Log::info("ID Verified badge granted to user {$userId} in tenant {$tenantId}");
+    }
+
+    /**
+     * Compare Stripe's verified_outputs (name/DOB from document) against the user's profile.
+     * Returns a mismatch reason string, or null if everything matches.
+     */
+    private static function checkNameDobMismatch(int $userId, int $tenantId, array $stripeStatus): ?string
+    {
+        $user = DB::table('users')
+            ->where('id', $userId)
+            ->where('tenant_id', $tenantId)
+            ->first(['first_name', 'last_name', 'date_of_birth']);
+
+        if (!$user) {
+            return null; // Can't check — allow through
+        }
+
+        $mismatches = [];
+
+        // Compare first name (case-insensitive)
+        $docFirstName = $stripeStatus['verified_first_name'] ?? null;
+        if ($docFirstName && $user->first_name) {
+            if (mb_strtolower(trim($docFirstName)) !== mb_strtolower(trim($user->first_name))) {
+                $mismatches[] = 'first name';
+            }
+        }
+
+        // Compare last name (case-insensitive)
+        $docLastName = $stripeStatus['verified_last_name'] ?? null;
+        if ($docLastName && $user->last_name) {
+            if (mb_strtolower(trim($docLastName)) !== mb_strtolower(trim($user->last_name))) {
+                $mismatches[] = 'last name';
+            }
+        }
+
+        // Compare DOB
+        $docDob = $stripeStatus['verified_dob'] ?? null;
+        if ($docDob && $user->date_of_birth) {
+            // Stripe returns DOB as { year, month, day }
+            if (is_array($docDob)) {
+                $docDobStr = sprintf('%04d-%02d-%02d', $docDob['year'] ?? 0, $docDob['month'] ?? 0, $docDob['day'] ?? 0);
+            } else {
+                $docDobStr = (string) $docDob;
+            }
+            $userDobStr = date('Y-m-d', strtotime($user->date_of_birth));
+
+            if ($docDobStr !== $userDobStr) {
+                $mismatches[] = 'date of birth';
+            }
+        }
+
+        if (!empty($mismatches)) {
+            $fields = implode(' and ', $mismatches);
+            Log::warning("Identity verification name/DOB mismatch for user {$userId}", [
+                'mismatched_fields' => $mismatches,
+                'doc_first_name' => $docFirstName,
+                'doc_last_name' => $docLastName,
+                'profile_first_name' => $user->first_name,
+                'profile_last_name' => $user->last_name,
+            ]);
+            return "The {$fields} on your ID document does not match your profile. Please update your profile details and try again.";
+        }
+
+        return null; // All matches
     }
 }
