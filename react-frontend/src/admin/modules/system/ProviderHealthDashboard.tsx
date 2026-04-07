@@ -94,6 +94,7 @@ function formatLevel(level: string): string {
 
 export function ProviderHealthDashboard() {
   const toast = useToast();
+  const { t } = useTranslation();
   const [providers, setProviders] = useState<ProviderHealth[]>([]);
   const [loading, setLoading] = useState(true);
 
