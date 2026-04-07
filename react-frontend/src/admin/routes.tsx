@@ -151,6 +151,9 @@ const ResourceCategoriesAdmin = lazy(() => import('./modules/resources/ResourceC
 // Jobs module
 const JobsAdmin = lazy(() => import('./modules/jobs/JobsAdmin'));
 const JobModerationQueue = lazy(() => import('./modules/jobs/JobModerationQueue'));
+const JobBiasAudit = lazy(() => import('./modules/jobs/JobBiasAudit'));
+const JobPipelineOverview = lazy(() => import('./modules/jobs/JobPipelineOverview'));
+const JobTemplatesAdmin = lazy(() => import('./modules/jobs/JobTemplatesAdmin'));
 
 // Translation config module
 const TranslationConfig = lazy(() => import('./modules/config/TranslationConfig'));
@@ -531,6 +534,9 @@ export function AdminRoutes() {
       {/* ─── JOBS ─── */}
       <Route path="jobs" element={<Lazy><JobsAdmin /></Lazy>} />
       <Route path="jobs/moderation" element={<Lazy><JobModerationQueue /></Lazy>} />
+      <Route path="jobs/bias-audit" element={<Lazy><JobBiasAudit /></Lazy>} />
+      <Route path="jobs/pipeline" element={<Lazy><JobPipelineOverview /></Lazy>} />
+      <Route path="jobs/templates" element={<Lazy><JobTemplatesAdmin /></Lazy>} />
 
       {/* ─── MARKETPLACE ─── */}
       <Route path="marketplace" element={<Lazy><MarketplaceAdmin /></Lazy>} />

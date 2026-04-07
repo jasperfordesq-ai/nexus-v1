@@ -8,10 +8,19 @@ namespace App\Http\Controllers\Api;
 
 use Illuminate\Http\JsonResponse;
 use App\Services\JobBiasAuditService;
+use App\Services\JobInterviewService;
 use App\Services\JobModerationService;
+use App\Services\JobOfferService;
 use App\Services\JobSpamDetectionService;
+use App\Services\JobTemplateService;
 use App\Services\JobVacancyService;
 use App\Core\TenantContext;
+use App\Models\JobApplication;
+use App\Models\JobInterview;
+use App\Models\JobOffer;
+use App\Models\JobTemplate;
+use App\Models\JobVacancy;
+use Illuminate\Support\Facades\DB;
 
 /**
  * AdminJobsController -- Admin job vacancy management.
@@ -251,5 +260,188 @@ class AdminJobsController extends BaseApiController
         $report = $this->biasAuditService->generateReport($tenantId, $jobId, $dateFrom, $dateTo);
 
         return $this->respondWithData($report);
+    }
+
+    // =====================================================================
+    // AGGREGATE STATS (Phase 1)
+    // =====================================================================
+
+    /** GET /api/v2/admin/jobs/stats — Platform-wide job statistics. */
+    public function stats(): JsonResponse
+    {
+        $this->requireAdmin();
+        $tenantId = TenantContext::getId();
+
+        $totalJobs = JobVacancy::where('tenant_id', $tenantId)->count();
+        $openJobs = JobVacancy::where('tenant_id', $tenantId)->where('status', 'open')->count();
+        $totalApplications = JobApplication::whereHas('vacancy', fn($q) => $q->where('tenant_id', $tenantId))->count();
+
+        // Conversion rate: applications / total views
+        $totalViews = (int) JobVacancy::where('tenant_id', $tenantId)->sum('views_count');
+        $conversionRate = $totalViews > 0 ? round(($totalApplications / $totalViews) * 100, 1) : 0;
+
+        // Average time to fill (days) for filled vacancies (using updated_at as proxy)
+        $avgTimeToFill = JobVacancy::where('tenant_id', $tenantId)
+            ->where('status', 'filled')
+            ->selectRaw('AVG(DATEDIFF(updated_at, created_at)) as avg_days')
+            ->value('avg_days');
+
+        // Active interviews count
+        $activeInterviews = JobInterview::where('tenant_id', $tenantId)
+            ->whereIn('status', ['proposed', 'accepted'])
+            ->count();
+
+        // Pending offers count
+        $pendingOffers = JobOffer::where('tenant_id', $tenantId)
+            ->where('status', 'pending')
+            ->count();
+
+        // Applications by stage breakdown
+        $stageBreakdown = JobApplication::whereHas('vacancy', fn($q) => $q->where('tenant_id', $tenantId))
+            ->select('status', DB::raw('COUNT(*) as count'))
+            ->groupBy('status')
+            ->pluck('count', 'status')
+            ->toArray();
+
+        return $this->respondWithData([
+            'total_jobs'         => $totalJobs,
+            'open_jobs'          => $openJobs,
+            'total_applications' => $totalApplications,
+            'total_views'        => $totalViews,
+            'conversion_rate'    => $conversionRate,
+            'avg_time_to_fill'   => $avgTimeToFill ? round((float) $avgTimeToFill, 1) : null,
+            'active_interviews'  => $activeInterviews,
+            'pending_offers'     => $pendingOffers,
+            'stage_breakdown'    => $stageBreakdown,
+        ]);
+    }
+
+    // =====================================================================
+    // INTERVIEW & OFFER OVERSIGHT (Phase 3)
+    // =====================================================================
+
+    /** GET /api/v2/admin/jobs/interviews — All interviews across jobs. */
+    public function interviews(): JsonResponse
+    {
+        $this->requireAdmin();
+        $tenantId = TenantContext::getId();
+
+        $page = $this->queryInt('page', 1, 1);
+        $limit = $this->queryInt('limit', 50, 1, 200);
+        $statusFilter = $this->query('status');
+
+        $query = JobInterview::with([
+                'application:id,user_id,vacancy_id,status',
+                'application.applicant:id,first_name,last_name,avatar_url,email',
+                'vacancy:id,title,user_id',
+            ])
+            ->where('tenant_id', $tenantId)
+            ->orderByDesc('scheduled_at');
+
+        if ($statusFilter) {
+            $query->where('status', $statusFilter);
+        }
+
+        $total = $query->count();
+        $items = $query->skip(($page - 1) * $limit)->take($limit)->get()->map(function ($interview) {
+            $arr = $interview->toArray();
+            $arr['candidate_name'] = null;
+            $arr['candidate_email'] = null;
+            $arr['job_title'] = $interview->vacancy->title ?? null;
+            if ($interview->application && $interview->application->applicant) {
+                $a = $interview->application->applicant;
+                $arr['candidate_name'] = trim(($a->first_name ?? '') . ' ' . ($a->last_name ?? ''));
+                $arr['candidate_email'] = $a->email ?? null;
+            }
+            return $arr;
+        })->toArray();
+
+        return $this->respondWithPaginatedCollection($items, $total, $page, $limit);
+    }
+
+    /** GET /api/v2/admin/jobs/offers — All offers across jobs. */
+    public function offers(): JsonResponse
+    {
+        $this->requireAdmin();
+        $tenantId = TenantContext::getId();
+
+        $page = $this->queryInt('page', 1, 1);
+        $limit = $this->queryInt('limit', 50, 1, 200);
+        $statusFilter = $this->query('status');
+
+        $query = JobOffer::with([
+                'application:id,user_id,vacancy_id,status',
+                'application.applicant:id,first_name,last_name,avatar_url,email',
+                'vacancy:id,title,user_id',
+            ])
+            ->where('tenant_id', $tenantId)
+            ->orderByDesc('created_at');
+
+        if ($statusFilter) {
+            $query->where('status', $statusFilter);
+        }
+
+        $total = $query->count();
+        $items = $query->skip(($page - 1) * $limit)->take($limit)->get()->map(function ($offer) {
+            $arr = $offer->toArray();
+            $arr['candidate_name'] = null;
+            $arr['candidate_email'] = null;
+            $arr['job_title'] = $offer->vacancy->title ?? null;
+            if ($offer->application && $offer->application->applicant) {
+                $a = $offer->application->applicant;
+                $arr['candidate_name'] = trim(($a->first_name ?? '') . ' ' . ($a->last_name ?? ''));
+                $arr['candidate_email'] = $a->email ?? null;
+            }
+            return $arr;
+        })->toArray();
+
+        return $this->respondWithPaginatedCollection($items, $total, $page, $limit);
+    }
+
+    // =====================================================================
+    // TEMPLATE MANAGEMENT (Phase 4)
+    // =====================================================================
+
+    /** GET /api/v2/admin/jobs/templates — List all job templates. */
+    public function templates(): JsonResponse
+    {
+        $this->requireAdmin();
+        $tenantId = TenantContext::getId();
+
+        $page = $this->queryInt('page', 1, 1);
+        $limit = $this->queryInt('limit', 50, 1, 200);
+
+        $query = JobTemplate::with('creator:id,first_name,last_name')
+            ->where('tenant_id', $tenantId)
+            ->orderByDesc('use_count')
+            ->orderByDesc('updated_at');
+
+        $total = $query->count();
+        $items = $query->skip(($page - 1) * $limit)->take($limit)->get()->map(function ($t) {
+            $arr = $t->toArray();
+            $arr['creator_name'] = $t->creator
+                ? trim(($t->creator->first_name ?? '') . ' ' . ($t->creator->last_name ?? ''))
+                : null;
+            return $arr;
+        })->toArray();
+
+        return $this->respondWithPaginatedCollection($items, $total, $page, $limit);
+    }
+
+    /** DELETE /api/v2/admin/jobs/templates/{id} */
+    public function deleteTemplate(int $id): JsonResponse
+    {
+        $this->requireAdmin();
+        $tenantId = TenantContext::getId();
+
+        $deleted = JobTemplate::where('tenant_id', $tenantId)
+            ->where('id', $id)
+            ->delete();
+
+        if ($deleted) {
+            return $this->respondWithData(['deleted' => true, 'id' => $id]);
+        }
+
+        return $this->respondWithError('NOT_FOUND', __('api.job_not_found'), null, 404);
     }
 }

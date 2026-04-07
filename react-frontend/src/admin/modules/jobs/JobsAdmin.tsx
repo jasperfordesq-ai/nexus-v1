@@ -11,18 +11,19 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { Tabs, Tab, Chip, Button, Tooltip, Avatar, Spinner, Textarea, Select, SelectItem, Card, CardBody } from '@heroui/react';
-import { Briefcase, Star, StarOff, Trash2, Eye, RefreshCw, ChevronDown, ChevronUp, Users, ClipboardList, CheckCircle2, Save } from 'lucide-react';
+import { Briefcase, Star, StarOff, Trash2, Eye, RefreshCw, ChevronDown, ChevronUp, Users, ClipboardList, CheckCircle2, Save, FileText, Calendar, Gift, TrendingUp } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { usePageTitle } from '@/hooks';
 import { useToast, useTenant } from '@/contexts';
 import { api } from '@/lib/api';
 import { resolveAvatarUrl } from '@/lib/helpers';
-import { PageHeader, DataTable, ConfirmModal, EmptyState, type Column } from '../../components';
+import { PageHeader, DataTable, ConfirmModal, EmptyState, StatCard, type Column } from '../../components';
 
 interface Job { id: number; title: string; organization_name?: string; poster_name?: string; type?: string; applications_count: number; views_count: number; is_featured: boolean; status: string; deadline?: string; created_at: string; }
 interface JobsMeta { page: number; per_page: number; total: number; total_pages: number; }
 interface Applicant { id: number; name: string; avatar_url?: string; email?: string; }
-interface Application { id: number; vacancy_id: number; user_id: number; applicant: Applicant; status: string; message?: string; reviewer_notes?: string; created_at: string; updated_at?: string; }
+interface Application { id: number; vacancy_id: number; user_id: number; applicant: Applicant; status: string; message?: string; reviewer_notes?: string; cv_url?: string; has_interview?: boolean; interview_status?: string; has_offer?: boolean; offer_status?: string; created_at: string; updated_at?: string; }
+interface JobStats { total_jobs: number; open_jobs: number; total_applications: number; total_views: number; conversion_rate: number; avg_time_to_fill: number | null; active_interviews: number; pending_offers: number; stage_breakdown: Record<string, number>; }
 
 const STATUS_TAB_KEYS = ['all', 'open', 'closed', 'expired'] as const;
 const statusColorMap: Record<string, 'success' | 'default' | 'warning'> = { open: 'success', closed: 'default', expired: 'warning' };
@@ -52,6 +53,17 @@ function ApplicationCard({ application, onStatusUpdate }: ApplicationCardProps) 
           </div>
           {application.applicant.email && <p className='text-xs text-default-500 truncate mt-0.5'>{application.applicant.email}</p>}
           <p className='text-xs text-default-400 mt-0.5'>{t('jobs.applied_date')}{' '}{new Date(application.created_at).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' })}</p>
+          <div className='flex items-center gap-1.5 mt-1 flex-wrap'>
+            {application.cv_url && (
+              <Chip size='sm' variant='flat' color='primary' startContent={<FileText size={10} />} className='h-5 text-[10px]'>CV</Chip>
+            )}
+            {application.has_interview && (
+              <Chip size='sm' variant='flat' color='warning' startContent={<Calendar size={10} />} className='h-5 text-[10px] capitalize'>{application.interview_status ?? 'Interview'}</Chip>
+            )}
+            {application.has_offer && (
+              <Chip size='sm' variant='flat' color='secondary' startContent={<Gift size={10} />} className='h-5 text-[10px] capitalize'>{application.offer_status ?? 'Offer'}</Chip>
+            )}
+          </div>
         </div>
       </div>
       {application.message && (<div><Button variant="light" size="sm" className='flex items-center gap-1 text-xs text-default-500 hover:text-default-700 h-auto p-0' onPress={() => setExpanded((v) => !v)} aria-expanded={expanded}>
@@ -92,6 +104,19 @@ export function JobsAdmin() {
   const [applications, setApplications] = useState<Application[]>([]);
   const [appsLoading, setAppsLoading] = useState(false);
   const [appsError, setAppsError] = useState<string | null>(null);
+  const [stats, setStats] = useState<JobStats | null>(null);
+  const [statsLoading, setStatsLoading] = useState(true);
+
+  const loadStats = useCallback(async () => {
+    setStatsLoading(true);
+    try {
+      const res = await api.get<JobStats>('/v2/admin/jobs/stats');
+      if (res.success) setStats(res.data as JobStats);
+    } catch { /* silent */ }
+    finally { setStatsLoading(false); }
+  }, []);
+
+  useEffect(() => { loadStats(); }, [loadStats]);
 
   const loadJobs = useCallback(async () => {
     setLoading(true);
@@ -280,6 +305,12 @@ export function JobsAdmin() {
       <PageHeader title={t('jobs.page_title')} description={t('jobs.page_description')}
         actions={<Button variant='flat' startContent={<RefreshCw size={16} />} onPress={loadJobs}>{t('common.refresh')}</Button>}
       />
+      <div className='grid grid-cols-2 md:grid-cols-4 gap-4 mb-6'>
+        <StatCard label={t('jobs.stat_total_jobs')} value={stats?.total_jobs ?? 0} icon={Briefcase} color='primary' loading={statsLoading} />
+        <StatCard label={t('jobs.stat_applications')} value={stats?.total_applications ?? 0} icon={Users} color='success' loading={statsLoading} />
+        <StatCard label={t('jobs.stat_conversion')} value={`${stats?.conversion_rate ?? 0}%`} icon={TrendingUp} color='warning' loading={statsLoading} />
+        <StatCard label={t('jobs.stat_interviews')} value={stats?.active_interviews ?? 0} icon={Calendar} color='secondary' loading={statsLoading} description={stats?.pending_offers ? `${stats.pending_offers} pending offers` : undefined} />
+      </div>
       <div className='mb-6'>
         <Tabs selectedKey={panelTab} onSelectionChange={(key) => setPanelTab(key as 'listings' | 'applications')}
           variant='underlined' size='md' aria-label={t('jobs.panels_aria')}>
