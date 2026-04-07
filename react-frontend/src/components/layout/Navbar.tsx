@@ -260,13 +260,11 @@ export function Navbar({ onMobileMenuOpen, externalSearchOpen, onSearchOpenChang
   // ─── Collapsed primary nav items → overflow into MegaMenu ────────────────
   const overflowNavItems = useMemo(() => {
     const items: { label: string; desc: string; href: string; icon: typeof LayoutDashboard; module?: string }[] = [];
-    if (hasModule('dashboard') && maxVisibleNav < 1)
-      items.push({ label: t('nav.dashboard'), desc: t('nav_desc.dashboard', 'Your personal dashboard'), href: tenantPath('/dashboard'), icon: LayoutDashboard, module: 'dashboard' });
-    if (hasModule('feed') && maxVisibleNav < 2)
+    if (hasModule('feed') && maxVisibleNav < 1)
       items.push({ label: t('nav.feed'), desc: t('nav_desc.feed', 'Community feed'), href: tenantPath('/feed'), icon: Newspaper, module: 'feed' });
-    if (maxVisibleNav < 3)
+    if (maxVisibleNav < 2)
       items.push({ label: t('nav.explore', 'Explore'), desc: t('nav_desc.explore', 'Discover content'), href: tenantPath('/explore'), icon: Compass });
-    if (hasModule('messages') && maxVisibleNav < 5)
+    if (hasModule('messages') && maxVisibleNav < 4)
       items.push({ label: t('nav.messages'), desc: t('nav_desc.messages', 'Your messages'), href: tenantPath('/messages'), icon: MessageSquare, module: 'messages' });
     return items;
   }, [maxVisibleNav, hasModule, t, tenantPath]);
@@ -391,6 +389,18 @@ export function Navbar({ onMobileMenuOpen, externalSearchOpen, onSearchOpenChang
         >
           <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="flex items-center justify-end gap-1 h-8 flex-nowrap overflow-x-auto">
+              {/* Dashboard — authenticated users */}
+              {isAuthenticated && hasModule('dashboard') && (
+                <Button
+                  variant="light"
+                  size="sm"
+                  className="text-theme-muted hover:text-theme-primary h-7 min-w-0 px-2 gap-1 text-xs shrink-0"
+                  onPress={() => navigate(tenantPath('/dashboard'))}
+                >
+                  <LayoutDashboard className="w-3.5 h-3.5 shrink-0" aria-hidden="true" />
+                  <span className="hidden md:inline">{t('nav.dashboard')}</span>
+                </Button>
+              )}
               {/* Help Center — authenticated users */}
               {isAuthenticated && (
                 <Button
@@ -520,24 +530,8 @@ export function Navbar({ onMobileMenuOpen, externalSearchOpen, onSearchOpenChang
                 </NavLink>
               )}
 
-              {hasModule('dashboard') && maxVisibleNav >= 2 && (
-                <NavLink
-                  to={tenantPath('/dashboard')}
-                  className={({ isActive }) =>
-                    `flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-all ${
-                      isActive
-                        ? 'bg-theme-active text-theme-primary'
-                        : 'text-theme-muted hover:text-theme-primary hover:bg-theme-hover'
-                    }`
-                  }
-                >
-                  <LayoutDashboard className="w-4 h-4" aria-hidden="true" />
-                  <span>{t('nav.dashboard')}</span>
-                </NavLink>
-              )}
-
               {/* Explore / Discover */}
-              {maxVisibleNav >= 3 && (
+              {maxVisibleNav >= 2 && (
                 <NavLink
                   to={tenantPath('/explore')}
                   className={({ isActive }) =>
@@ -554,7 +548,7 @@ export function Navbar({ onMobileMenuOpen, externalSearchOpen, onSearchOpenChang
               )}
 
               {/* Timebanking Dropdown — replaces top-level Listings link */}
-              {timebankingItems.length > 0 && maxVisibleNav >= 4 && (
+              {timebankingItems.length > 0 && maxVisibleNav >= 3 && (
                 <Dropdown placement="bottom-start" isOpen={timebankingOpen} onOpenChange={handleTimebankingOpenChange} shouldBlockScroll={false}>
                   <DropdownTrigger>
                     <Button
@@ -595,7 +589,7 @@ export function Navbar({ onMobileMenuOpen, externalSearchOpen, onSearchOpenChang
                 </Dropdown>
               )}
 
-              {hasModule('messages') && maxVisibleNav >= 5 && (
+              {hasModule('messages') && maxVisibleNav >= 4 && (
                 <NavLink
                   to={tenantPath('/messages')}
                   className={({ isActive }) =>
