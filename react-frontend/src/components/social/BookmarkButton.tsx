@@ -9,7 +9,7 @@
  * Supports optimistic updates.
  */
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { Button, Tooltip } from '@heroui/react';
 import { Bookmark, BookmarkCheck } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
@@ -36,6 +36,11 @@ export function BookmarkButton({
   const { t } = useTranslation('social');
   const [bookmarked, setBookmarked] = useState(initialBookmarked);
   const [isLoading, setIsLoading] = useState(false);
+
+  // Sync state when parent provides updated prop (e.g. feed reload)
+  useEffect(() => {
+    setBookmarked(initialBookmarked);
+  }, [initialBookmarked]);
 
   const handleToggle = useCallback(async () => {
     if (isLoading) return;

@@ -283,7 +283,7 @@ export function FeedPage() {
       if (!matchesFilter) return;
 
       // If scrolled down, buffer the post and show "new posts" chip
-      if (window.scrollY > 200) {
+      if (window.scrollY > 200) { // matches SCROLL_THRESHOLD in scroll handler
         pendingPostsRef.current = [incoming, ...pendingPostsRef.current];
         setPendingPostCount((n) => n + 1);
         return;

@@ -37,7 +37,10 @@ export interface FeedItem {
   likes_count: number;
   comments_count: number;
   views_count?: number;
+  share_count?: number;
   is_liked: boolean;
+  is_shared?: boolean;
+  is_bookmarked?: boolean;
   image_url?: string;
   /** Multi-image media attachments (carousel). */
   media?: PostMedia[];

@@ -25,8 +25,6 @@ import { SuggestedListingsWidget } from './SuggestedListingsWidget';
 import type { SuggestedListing } from './SuggestedListingsWidget';
 import { TopCategoriesWidget } from './TopCategoriesWidget';
 import type { Category } from './TopCategoriesWidget';
-import { PeopleYouMayKnowWidget } from './PeopleYouMayKnowWidget';
-import type { SuggestedMember } from './PeopleYouMayKnowWidget';
 import { UpcomingEventsWidget } from './UpcomingEventsWidget';
 import type { UpcomingEvent } from './UpcomingEventsWidget';
 import { PopularGroupsWidget } from './PopularGroupsWidget';
@@ -40,7 +38,7 @@ interface SidebarApiResponse {
   community_stats?: CommunityStats;
   suggested_listings?: SuggestedListing[];
   top_categories?: Category[];
-  suggested_members?: SuggestedMember[];
+
   upcoming_events?: UpcomingEvent[];
   popular_groups?: PopularGroup[];
   profile_stats?: Record<string, unknown> | null;

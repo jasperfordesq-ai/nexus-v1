@@ -456,27 +456,28 @@ const FeedCard = React.memo(function FeedCard({
 
   // View tracking — fire once per session per post when entering viewport
   const viewTrackedRef = useRef(false);
-  const viewObserverRef = useRef<IntersectionObserver | null>(null);
   const viewTargetRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
-    if (viewTrackedRef.current) return;
+    // Reset tracking flag when item changes
+    viewTrackedRef.current = false;
+
     const el = viewTargetRef.current;
     if (!el) return;
 
-    viewObserverRef.current = new IntersectionObserver(
+    const observer = new IntersectionObserver(
       (entries) => {
         if (entries[0]?.isIntersecting && !viewTrackedRef.current) {
           viewTrackedRef.current = true;
           api.post(`/v2/feed/posts/${item.id}/view`).catch(() => {});
-          viewObserverRef.current?.disconnect();
+          observer.disconnect();
         }
       },
       { threshold: 0.5 }
     );
-    viewObserverRef.current.observe(el);
+    observer.observe(el);
 
-    return () => viewObserverRef.current?.disconnect();
+    return () => observer.disconnect();
   }, [item.id]);
 
   const author = getAuthor(item);
@@ -862,7 +863,18 @@ const FeedCard = React.memo(function FeedCard({
           />
         </div>
 
-{/* Link Previews */}        {item.link_previews && item.link_previews.length > 0 && (          <div className={`mb-4 ${item.link_previews.length > 1 ? 'space-y-2' : ''}`}>            {item.link_previews.map((lp) => (              <LinkPreviewCard                key={lp.url}                preview={lp}                compact={item.link_previews!.length > 1}              />            ))}          </div>        )}
+        {/* Link Previews */}
+        {item.link_previews && item.link_previews.length > 0 && (
+          <div className={`mb-4 ${item.link_previews.length > 1 ? 'space-y-2' : ''}`}>
+            {item.link_previews.map((lp) => (
+              <LinkPreviewCard
+                key={lp.url}
+                preview={lp}
+                compact={item.link_previews!.length > 1}
+              />
+            ))}
+          </div>
+        )}
         {/* Quoted Post Embed (quote repost) */}
         {item.quoted_post && (
           <div className="mb-4">
@@ -1183,7 +1195,7 @@ const FeedCard = React.memo(function FeedCard({
 
           {/* Bookmark Button */}
           {isAuthenticated && (
-            <BookmarkButton type={item.type === 'post' ? 'post' : item.type} id={item.id} />
+            <BookmarkButton type={item.type === 'post' ? 'post' : item.type} id={item.id} isBookmarked={item.is_bookmarked} />
           )}
         </div>
 

@@ -366,14 +366,49 @@ class FeedService
             unset($item);
         }
 
-        // Batch load link previews for post items
-        try {
-            $postIds = [];
-            foreach ($items as $item) {
-                if ($item['type'] === 'post') {
-                    $postIds[] = (int) $item['id'];
+        // Batch load views_count + share_count for post items from feed_posts table
+        $postIds = [];
+        foreach ($items as $item) {
+            if ($item['type'] === 'post') {
+                $postIds[] = (int) $item['id'];
+            }
+        }
+        if (!empty($postIds)) {
+            $postMeta = DB::table('feed_posts')
+                ->whereIn('id', $postIds)
+                ->where('tenant_id', $tenantId)
+                ->select('id', 'views_count', 'share_count')
+                ->get()
+                ->keyBy('id');
+            foreach ($items as &$item) {
+                if ($item['type'] === 'post' && isset($postMeta[$item['id']])) {
+                    $item['views_count'] = (int) $postMeta[$item['id']]->views_count;
+                    $item['share_count'] = (int) $postMeta[$item['id']]->share_count;
                 }
             }
+            unset($item);
+        }
+
+        // Batch load bookmark status for current user
+        if ($currentUserId && !empty($postIds)) {
+            $bookmarkedPostIds = DB::table('bookmarks')
+                ->where('user_id', $currentUserId)
+                ->where('tenant_id', $tenantId)
+                ->where('bookmarkable_type', 'post')
+                ->whereIn('bookmarkable_id', $postIds)
+                ->pluck('bookmarkable_id')
+                ->all();
+            $bookmarkedSet = array_flip($bookmarkedPostIds);
+            foreach ($items as &$item) {
+                if ($item['type'] === 'post') {
+                    $item['is_bookmarked'] = isset($bookmarkedSet[$item['id']]);
+                }
+            }
+            unset($item);
+        }
+
+        // Batch load link previews for post items
+        try {
             if (!empty($postIds)) {
                 /** @var LinkPreviewService $linkPreviewService */
                 $linkPreviewService = app(LinkPreviewService::class);
