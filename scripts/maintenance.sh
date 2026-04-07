@@ -92,11 +92,11 @@ db_maintenance_set() {
 
     # Update existing rows
     local updated
-    updated=$(docker exec "$DB_CONTAINER" mysql -u"$DB_USER" -p"$DB_PASS" "$DB_NAME" -sN -e \
+    updated=$(docker exec -e MYSQL_PWD="$DB_PASS" "$DB_CONTAINER" mysql -u"$DB_USER" "$DB_NAME" -sN -e \
         "UPDATE tenant_settings SET setting_value = '$value' WHERE setting_key = 'general.maintenance_mode'; SELECT ROW_COUNT();" 2>/dev/null)
 
     # Insert for any tenants that don't have the setting yet
-    docker exec "$DB_CONTAINER" mysql -u"$DB_USER" -p"$DB_PASS" "$DB_NAME" -e \
+    docker exec -e MYSQL_PWD="$DB_PASS" "$DB_CONTAINER" mysql -u"$DB_USER" "$DB_NAME" -e \
         "INSERT IGNORE INTO tenant_settings (tenant_id, setting_key, setting_value, setting_type)
          SELECT t.id, 'general.maintenance_mode', '$value', 'boolean'
          FROM tenants t WHERE t.is_active = 1
@@ -158,11 +158,11 @@ db_maintenance_status() {
     fi
 
     local count
-    count=$(docker exec "$DB_CONTAINER" mysql -u"$DB_USER" -p"$DB_PASS" "$DB_NAME" -sN -e \
+    count=$(docker exec -e MYSQL_PWD="$DB_PASS" "$DB_CONTAINER" mysql -u"$DB_USER" "$DB_NAME" -sN -e \
         "SELECT COUNT(*) FROM tenant_settings WHERE setting_key = 'general.maintenance_mode' AND setting_value = 'true';" 2>/dev/null || echo "?")
 
     local total
-    total=$(docker exec "$DB_CONTAINER" mysql -u"$DB_USER" -p"$DB_PASS" "$DB_NAME" -sN -e \
+    total=$(docker exec -e MYSQL_PWD="$DB_PASS" "$DB_CONTAINER" mysql -u"$DB_USER" "$DB_NAME" -sN -e \
         "SELECT COUNT(*) FROM tenant_settings WHERE setting_key = 'general.maintenance_mode';" 2>/dev/null || echo "?")
 
     if [ "$count" = "0" ]; then
@@ -317,7 +317,7 @@ maintenance_status() {
     get_db_creds
     if [ -n "$DB_PASS" ]; then
         local db_count
-        db_count=$(docker exec "$DB_CONTAINER" mysql -u"$DB_USER" -p"$DB_PASS" "$DB_NAME" -sN -e \
+        db_count=$(docker exec -e MYSQL_PWD="$DB_PASS" "$DB_CONTAINER" mysql -u"$DB_USER" "$DB_NAME" -sN -e \
             "SELECT COUNT(*) FROM tenant_settings WHERE setting_key = 'general.maintenance_mode' AND setting_value = 'true';" 2>/dev/null || echo "0")
         if [ "$db_count" != "0" ]; then
             db_on=true

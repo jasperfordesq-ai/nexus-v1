@@ -12,8 +12,9 @@
 #   logs      - Tail the latest deploy log (follow mode: logs -f)
 #
 # Flags:
-#   --migrate - Also run `php artisan migrate --force` (Laravel migrations)
-#   --detach  - Run deploy in background, detached from terminal/SSH.
+#   --migrate  - Also run `php artisan migrate --force` (Laravel migrations)
+#   --no-cache - Force Docker builds without layer caching (default for full mode)
+#   --detach   - Run deploy in background, detached from terminal/SSH.
 #               Returns immediately with PID + log path. The deploy
 #               continues even if SSH disconnects. Check progress with:
 #                 sudo bash scripts/safe-deploy.sh logs -f
@@ -31,12 +32,22 @@
 
 set -e
 
+# --- Deploy state flags ---
+# Used by the EXIT trap to decide whether to auto-disable maintenance mode.
+# If we enabled maintenance and the deploy didn't succeed, the trap disables it
+# so the site comes back online with the OLD (working) containers.
+DEPLOY_SUCCESS=0
+MAINTENANCE_ENABLED_BY_US=0
+
 # --- Configuration ---
 DEPLOY_DIR="/opt/nexus-php"
 LOCK_FILE="$DEPLOY_DIR/.deploy.lock"
 LOG_DIR="$DEPLOY_DIR/logs"
 LAST_DEPLOY_FILE="$DEPLOY_DIR/.last-successful-deploy"
 MIN_DISK_SPACE_MB=1024  # 1GB minimum free space
+
+# Enable BuildKit for faster parallel builds and better layer caching
+export DOCKER_BUILDKIT=1
 
 # --- Colors ---
 RED='\033[0;31m'
@@ -182,7 +193,7 @@ _deploy_db_maintenance_set() {
     fi
 
     if docker ps --filter "name=nexus-php-db" --format "{{.Names}}" | grep -q "nexus-php-db"; then
-        docker exec nexus-php-db mysql -u"$DB_USER" -p"$DB_PASS" "$DB_NAME" -e \
+        docker exec -e MYSQL_PWD="$DB_PASS" nexus-php-db mysql -u"$DB_USER" "$DB_NAME" -e \
             "UPDATE tenant_settings SET setting_value = '$value' WHERE setting_key = 'general.maintenance_mode';" 2>/dev/null \
             && log_ok "Layer 2: Database maintenance_mode = '$value'" \
             || log_warn "Layer 2: Database update failed"
@@ -227,7 +238,18 @@ re_enable_maintenance_after_rebuild() {
 
 # --- Helper functions ---
 cleanup() {
+    local exit_code=$?
     stop_keepalive  # Kill any lingering keepalive background process
+
+    # If WE enabled maintenance and deploy didn't succeed, auto-disable it.
+    # The OLD containers are still running and healthy — bring the site back online.
+    if [ "$MAINTENANCE_ENABLED_BY_US" = "1" ] && [ "$DEPLOY_SUCCESS" = "0" ]; then
+        echo ""
+        log_warn "Deploy failed (exit $exit_code) — automatically disabling maintenance mode"
+        # Use || true so the trap itself doesn't fail (we're already in cleanup)
+        disable_maintenance_mode 2>/dev/null || log_err "Could not auto-disable maintenance mode — run: sudo bash scripts/maintenance.sh off"
+    fi
+
     if [ -f "$LOCK_FILE" ]; then
         rm -f "$LOCK_FILE"
         log_info "Deployment lock released"
@@ -238,12 +260,28 @@ trap cleanup EXIT
 
 check_lock() {
     if [ -f "$LOCK_FILE" ]; then
-        LOCK_PID=$(cat "$LOCK_FILE")
+        LOCK_PID=$(cat "$LOCK_FILE" 2>/dev/null || echo "0")
+
+        # Lock files older than 30 minutes are always stale (no deploy takes that long)
+        LOCK_AGE=$(( $(date +%s) - $(stat -c %Y "$LOCK_FILE" 2>/dev/null || echo "0") ))
+        if [ "$LOCK_AGE" -gt 1800 ]; then
+            log_warn "Lock file is $((LOCK_AGE / 60))m old — removing stale lock"
+            rm -f "$LOCK_FILE"
+            return
+        fi
+
         if ps -p "$LOCK_PID" > /dev/null 2>&1; then
-            log_err "Another deployment is running (PID: $LOCK_PID)"
-            exit 1
+            # Verify it's actually a deploy process, not a recycled PID
+            PROC_CMD=$(ps -p "$LOCK_PID" -o args= 2>/dev/null || echo "")
+            if echo "$PROC_CMD" | grep -q "safe-deploy"; then
+                log_err "Another deployment is running (PID: $LOCK_PID, age: $((LOCK_AGE / 60))m)"
+                exit 1
+            else
+                log_warn "Stale lock (PID $LOCK_PID recycled to different process) — removing"
+                rm -f "$LOCK_FILE"
+            fi
         else
-            log_warn "Stale lock file found (removing)"
+            log_warn "Stale lock file found (PID $LOCK_PID dead) — removing"
             rm -f "$LOCK_FILE"
         fi
     fi
@@ -371,7 +409,7 @@ validate_environment() {
 
     # Check database connectivity (read password from .env)
     DB_PASS=$(grep "^DB_PASSWORD=" "$DEPLOY_DIR/.env" 2>/dev/null | cut -d'=' -f2 | tr -d '"')
-    if docker exec nexus-php-db mysqladmin ping -h localhost -unexus -p"$DB_PASS" > /dev/null 2>&1; then
+    if docker exec -e MYSQL_PWD="$DB_PASS" nexus-php-db mysqladmin ping -h localhost -unexus > /dev/null 2>&1; then
         log_ok "Database connection OK"
     else
         log_err "Database connection failed"
@@ -484,16 +522,25 @@ run_smoke_tests() {
         TESTS_FAILED=1
     fi
 
-    # Test API bootstrap endpoint
-    if curl -sf http://127.0.0.1:8090/api/v2/tenant/bootstrap > /dev/null 2>&1; then
-        log_ok "API bootstrap endpoint OK"
+    # Test API bootstrap endpoint (with tenant context for real validation)
+    local BOOTSTRAP
+    BOOTSTRAP=$(curl -sf -H "X-Tenant-Slug: hour-timebank" http://127.0.0.1:8090/api/v2/tenant/bootstrap 2>/dev/null || echo "")
+    if echo "$BOOTSTRAP" | grep -q '"tenant"'; then
+        log_ok "API bootstrap returns valid tenant data"
+    elif [ -n "$BOOTSTRAP" ]; then
+        log_warn "API bootstrap responded but missing tenant data"
     else
         log_warn "API bootstrap endpoint failed (may require tenant header)"
     fi
 
-    # Test frontend
-    if curl -sf http://127.0.0.1:3000/ > /dev/null 2>&1; then
-        log_ok "Frontend health check passed"
+    # Test frontend — verify it serves the React app, not an error page
+    local FRONTEND_HTML
+    FRONTEND_HTML=$(curl -sf http://127.0.0.1:3000/ 2>/dev/null || echo "")
+    if echo "$FRONTEND_HTML" | grep -q 'id="root"'; then
+        log_ok "Frontend serves React app"
+    elif [ -n "$FRONTEND_HTML" ]; then
+        log_err "Frontend responded but missing React root element"
+        TESTS_FAILED=1
     else
         log_err "Frontend health check failed"
         TESTS_FAILED=1
@@ -508,7 +555,7 @@ run_smoke_tests() {
 
     # Check database connectivity (read password from .env)
     DB_PASS=$(grep "^DB_PASSWORD=" "$DEPLOY_DIR/.env" 2>/dev/null | cut -d'=' -f2 | tr -d '"')
-    if docker exec nexus-php-db mysqladmin ping -h localhost -unexus -p"$DB_PASS" > /dev/null 2>&1; then
+    if docker exec -e MYSQL_PWD="$DB_PASS" nexus-php-db mysqladmin ping -h localhost -unexus > /dev/null 2>&1; then
         log_ok "Database still accessible"
     else
         log_err "Database connection lost"
@@ -546,16 +593,28 @@ prune_docker_images() {
 purge_cloudflare_cache() {
     log_step "=== Cloudflare Cache Purge (All Domains) ==="
 
-    if [ -f "$DEPLOY_DIR/scripts/purge-cloudflare-cache.sh" ]; then
-        bash "$DEPLOY_DIR/scripts/purge-cloudflare-cache.sh" 2>&1 | tee -a "$LOG_FILE"
-        if [ ${PIPESTATUS[0]} -eq 0 ]; then
-            log_ok "Cloudflare cache purged for all domains"
-        else
-            log_warn "Some Cloudflare cache purges failed (non-blocking)"
-        fi
-    else
-        log_warn "purge-cloudflare-cache.sh not found — skipping cache purge"
+    if [ ! -f "$DEPLOY_DIR/scripts/purge-cloudflare-cache.sh" ]; then
+        log_err "purge-cloudflare-cache.sh not found — Cloudflare cache NOT purged!"
+        log_err "Users may see stale content. Run manually: sudo bash scripts/purge-cloudflare-cache.sh"
+        return 1
     fi
+
+    # Try up to 2 times (network can be flaky)
+    local attempt
+    for attempt in 1 2; do
+        if bash "$DEPLOY_DIR/scripts/purge-cloudflare-cache.sh" 2>&1 | tee -a "$LOG_FILE"; then
+            log_ok "Cloudflare cache purged for all domains"
+            return 0
+        fi
+        if [ "$attempt" -eq 1 ]; then
+            log_warn "Cloudflare purge failed — retrying in 5 seconds..."
+            sleep 5
+        fi
+    done
+
+    log_err "Cloudflare cache purge FAILED after 2 attempts — users may see stale content"
+    log_err "Run manually: sudo bash scripts/purge-cloudflare-cache.sh"
+    return 1  # Non-blocking for deploy (maintenance mode still disabled) but clearly logged
 }
 
 # --- Automated database migrations ---
@@ -576,7 +635,7 @@ run_pending_migrations() {
     DB_NAME=$(grep "^DB_NAME=" "$DEPLOY_DIR/.env" 2>/dev/null | cut -d'=' -f2 | tr -d '"' || echo "nexus")
 
     # Ensure the migrations tracking table exists
-    docker exec nexus-php-db mysql -u"$DB_USER" -p"$DB_PASS" "$DB_NAME" -e "
+    docker exec -e MYSQL_PWD="$DB_PASS" nexus-php-db mysql -u"$DB_USER" "$DB_NAME" -e "
         CREATE TABLE IF NOT EXISTS migrations (
             id INT AUTO_INCREMENT PRIMARY KEY,
             migration_name VARCHAR(255) NOT NULL UNIQUE,
@@ -587,7 +646,7 @@ run_pending_migrations() {
 
     # Get list of already-applied migrations
     local APPLIED
-    APPLIED=$(docker exec nexus-php-db mysql -u"$DB_USER" -p"$DB_PASS" "$DB_NAME" \
+    APPLIED=$(docker exec -e MYSQL_PWD="$DB_PASS" nexus-php-db mysql -u"$DB_USER" "$DB_NAME" \
         -N -e "SELECT migration_name FROM migrations WHERE migration_name IS NOT NULL;" 2>/dev/null || echo "")
 
     # Find pending .sql files (sorted alphabetically)
@@ -629,9 +688,9 @@ run_pending_migrations() {
         fi
 
         log_info "Running: $BASENAME"
-        if docker exec -i nexus-php-db mysql -u"$DB_USER" -p"$DB_PASS" "$DB_NAME" < "$SQL_FILE" 2>&1 | tee -a "$LOG_FILE"; then
+        if docker exec -i -e MYSQL_PWD="$DB_PASS" nexus-php-db mysql -u"$DB_USER" "$DB_NAME" < "$SQL_FILE" 2>&1 | tee -a "$LOG_FILE"; then
             # Record as applied
-            docker exec nexus-php-db mysql -u"$DB_USER" -p"$DB_PASS" "$DB_NAME" -e "
+            docker exec -e MYSQL_PWD="$DB_PASS" nexus-php-db mysql -u"$DB_USER" "$DB_NAME" -e "
                 INSERT IGNORE INTO migrations (migration_name, backups, executed_at)
                 VALUES ('$BASENAME', '$BASENAME', NOW());
             " 2>/dev/null
@@ -737,9 +796,14 @@ deploy_quick() {
     export BUILD_COMMIT=$(git rev-parse --short HEAD)
     log_info "Build commit: $BUILD_COMMIT"
 
-    # Rebuild React frontend with --no-cache (CRITICAL: without this, old image keeps running)
-    log_info "Rebuilding React frontend with --no-cache..."
-    build_with_keepalive docker compose build --no-cache frontend
+    # Build flags: quick mode uses layer caching by default (faster).
+    # Use --no-cache flag to force a clean rebuild: safe-deploy.sh quick --no-cache
+    local BUILD_FLAGS=""
+    [ "${FORCE_NO_CACHE:-0}" = "1" ] && BUILD_FLAGS="--no-cache"
+
+    # Rebuild React frontend (layer caching skips npm install if deps unchanged)
+    log_info "Rebuilding React frontend${BUILD_FLAGS:+ ($BUILD_FLAGS)}..."
+    build_with_keepalive docker compose build $BUILD_FLAGS frontend
     log_ok "React frontend rebuilt"
 
     # Run pending database migrations (before container rebuild)
@@ -749,8 +813,8 @@ deploy_quick() {
     fi
 
     # Rebuild sales site
-    log_info "Rebuilding sales site..."
-    build_with_keepalive docker compose build --no-cache sales
+    log_info "Rebuilding sales site${BUILD_FLAGS:+ ($BUILD_FLAGS)}..."
+    build_with_keepalive docker compose build $BUILD_FLAGS sales
     log_ok "Sales site rebuilt"
 
     # Recreate frontend + sales containers with new images, restart PHP for OPCache
@@ -916,7 +980,7 @@ show_status() {
         DB_PASS=$(grep "^DB_PASS=" "$DEPLOY_DIR/.env" 2>/dev/null | cut -d'=' -f2 | tr -d '"')
         DB_NAME=$(grep "^DB_NAME=" "$DEPLOY_DIR/.env" 2>/dev/null | cut -d'=' -f2 | tr -d '"' || echo "nexus")
         local APPLIED
-        APPLIED=$(docker exec nexus-php-db mysql -u"$DB_USER" -p"$DB_PASS" "$DB_NAME" \
+        APPLIED=$(docker exec -e MYSQL_PWD="$DB_PASS" nexus-php-db mysql -u"$DB_USER" "$DB_NAME" \
             -N -e "SELECT migration_name FROM migrations WHERE migration_name IS NOT NULL;" 2>/dev/null || echo "")
         local PENDING_COUNT=0
         for SQL_FILE in "$MIGRATION_DIR"/*.sql; do
@@ -1048,6 +1112,7 @@ mkdir -p "$LOG_DIR"
 MODE="${1:-quick}"
 LARAVEL_MIGRATE="${LARAVEL_MIGRATE:-0}"
 DETACH=0
+FORCE_NO_CACHE=0
 
 # Check for flags in all args
 shift 2>/dev/null || true
@@ -1055,6 +1120,7 @@ for arg in "$@"; do
     case "$arg" in
         --migrate) LARAVEL_MIGRATE=1 ;;
         --detach|-d) DETACH=1 ;;
+        --no-cache) FORCE_NO_CACHE=1 ;;
     esac
 done
 
@@ -1077,6 +1143,7 @@ if [ "$DETACH" = "1" ] && [ -z "${__NEXUS_DEPLOY_DETACHED__:-}" ]; then
     # Reconstruct flags for the child
     CHILD_ARGS=""
     [ "$LARAVEL_MIGRATE" = "1" ] && CHILD_ARGS="$CHILD_ARGS --migrate"
+    [ "$FORCE_NO_CACHE" = "1" ] && CHILD_ARGS="$CHILD_ARGS --no-cache"
     run_detached "$MODE" $CHILD_ARGS
     exit 0
 fi
@@ -1110,6 +1177,7 @@ fi
 
 # Enable maintenance mode before any changes
 MAINTENANCE_DEFERRED=0
+MAINTENANCE_ENABLED_BY_US=1
 enable_maintenance_mode
 
 # Execute deployment based on mode
@@ -1183,6 +1251,7 @@ VEOF
     prune_docker_images
 
     # Disable maintenance mode — deploy succeeded, go live
+    DEPLOY_SUCCESS=1
     disable_maintenance_mode
 
     echo "" | tee -a "$LOG_FILE"
@@ -1196,6 +1265,8 @@ else
     echo "" | tee -a "$LOG_FILE"
     log_err "Deployment completed but smoke tests failed"
     log_err "MAINTENANCE MODE IS STILL ON — platform is NOT live"
+    # Intentionally keep maintenance on — don't let the trap auto-disable it
+    MAINTENANCE_ENABLED_BY_US=0
     log_warn "The platform remains in maintenance mode for safety."
     log_warn "Fix the issue, then either:"
     log_warn "  1. Re-deploy:  sudo bash scripts/safe-deploy.sh full"

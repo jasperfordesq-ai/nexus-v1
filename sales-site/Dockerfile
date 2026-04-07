@@ -1,4 +1,4 @@
-FROM nginx:alpine
+FROM nginx:alpine3.21
 
 # Copy custom nginx config
 COPY nginx.conf /etc/nginx/conf.d/default.conf

@@ -566,18 +566,29 @@ jobs:
         with:
           node-version: ${{ env.NODE_VERSION }}
 
-      - name: Install axe-core CLI
-        run: npm install -g @axe-core/cli
+      - name: Download React build artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: react-frontend-build
+          path: react-frontend/dist
 
-      - name: "WARNING: WCAG 2.1 AA scan — public pages"
+      - name: Install axe-core CLI and serve
+        run: npm install -g @axe-core/cli serve
+
+      - name: Serve built frontend and run WCAG scan
         run: |
-          echo "Running axe accessibility scan on live app..."
+          # Serve the built React app locally (not production!)
+          npx serve -s react-frontend/dist -l 3000 &
+          SERVE_PID=$!
+          sleep 3
+
+          echo "Running axe accessibility scan on local build..."
 
           PAGES=(
-            "https://app.project-nexus.ie/hour-timebank"
-            "https://app.project-nexus.ie/hour-timebank/login"
-            "https://app.project-nexus.ie/hour-timebank/about"
-            "https://app.project-nexus.ie/hour-timebank/help"
+            "http://localhost:3000/hour-timebank"
+            "http://localhost:3000/hour-timebank/login"
+            "http://localhost:3000/hour-timebank/about"
+            "http://localhost:3000/hour-timebank/help"
           )
 
           VIOLATIONS=0
@@ -600,6 +611,9 @@ jobs:
 
           echo ""
           echo "Total violations across all pages: $VIOLATIONS"
+
+          # Clean up local server
+          kill "$SERVE_PID" 2>/dev/null || true
 
           if [ "$VIOLATIONS" -gt 0 ]; then
             echo "::error::Accessibility: Found $VIOLATIONS WCAG 2.1 AA violations. Fix before merging."

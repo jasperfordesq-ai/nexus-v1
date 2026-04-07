@@ -58,6 +58,7 @@ CLAUDE.md
 !/scripts/check-migration-ci.sh
 !/scripts/maintenance.sh
 !/scripts/safe-deploy.sh
+!/scripts/purge-cloudflare-cache.sh
 !/scripts/refresh-schema-dump.sh
 !/scripts/check-i18n.sh
 !/scripts/check-i18n-drift.mjs

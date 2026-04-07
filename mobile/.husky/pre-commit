@@ -1,10 +1,5 @@
 #!/usr/bin/env sh
-# Mobile pre-commit hook — Unix line endings required (LF, not CRLF)
-. "$(dirname -- "$0")/_/husky.sh"
 
-cd mobile
-echo "Running type check..."
-npm run type-check
-echo "Running lint..."
-npm run lint || echo "⚠️  Mobile lint failed (eslint-plugin-react compat issue) — non-blocking"
+# Mobile pre-commit hook disabled — mobile development on hold
+# CI pipeline handles type-check and lint validation
 exit 0

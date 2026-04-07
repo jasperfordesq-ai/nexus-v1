@@ -1,7 +1,5 @@
 #!/usr/bin/env sh
-# Mobile pre-push hook — Unix line endings required (LF, not CRLF)
-. "$(dirname -- "$0")/_/husky.sh"
 
-cd mobile
-echo "Running tests before push..."
-npm run test:ci || echo "⚠️  Mobile tests failed (pre-existing api.upload issue) — non-blocking"
+# Mobile pre-push hook disabled — mobile development on hold
+# CI pipeline handles all test validation
+exit 0
