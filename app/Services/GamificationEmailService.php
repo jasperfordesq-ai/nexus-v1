@@ -111,7 +111,7 @@ class GamificationEmailService
                         }
 
                         $name = trim(($user->first_name ?? '') . ' ' . ($user->last_name ?? ''));
-                        $subject = 'Your Weekly Progress Digest';
+                        $subject = __('emails.gamification_digest.subject');
                         $body = $this->buildDigestEmailBody($name, $digest, $tenant->name ?? 'your community');
 
                         $success = $emailService->send($user->email, $subject, $body);
@@ -269,23 +269,23 @@ class GamificationEmailService
 
         $builder = EmailTemplateBuilder::make()
             ->theme('achievement')
-            ->title('Your Weekly Progress')
-            ->previewText("You earned {$digest['xp_earned']} XP this week on {$safeCommunity}")
+            ->title(__('emails.gamification_digest.title'))
+            ->previewText(__('emails.gamification_digest.preview', ['xp' => $digest['xp_earned'], 'community' => $safeCommunity]))
             ->greeting($safeName ?: 'there')
-            ->paragraph("Here's your weekly progress update from <strong>{$safeCommunity}</strong>.");
+            ->paragraph(__('emails.gamification_digest.intro', ['community' => $safeCommunity]));
 
         // Build stat cards — always show XP and Level
         $stats = [
-            ['value' => (string) $digest['xp_earned'], 'label' => 'XP Earned', 'icon' => "\u{26A1}"],
-            ['value' => (string) $digest['level'], 'label' => 'Level', 'icon' => "\u{1F3C6}"],
+            ['value' => (string) $digest['xp_earned'], 'label' => __('emails.gamification_digest.xp_earned'), 'icon' => "\u{26A1}"],
+            ['value' => (string) $digest['level'], 'label' => __('emails.gamification_digest.level'), 'icon' => "\u{1F3C6}"],
         ];
 
         if ($digest['rank']) {
-            $stats[] = ['value' => '#' . $digest['rank'], 'label' => 'Rank', 'icon' => "\u{1F4CA}"];
+            $stats[] = ['value' => '#' . $digest['rank'], 'label' => __('emails.gamification_digest.rank'), 'icon' => "\u{1F4CA}"];
         }
 
         if ($digest['streak'] > 0) {
-            $stats[] = ['value' => $digest['streak'] . ' days', 'label' => 'Streak', 'icon' => "\u{1F525}"];
+            $stats[] = ['value' => __('emails.gamification_digest.streak_days', ['days' => $digest['streak']]), 'label' => __('emails.gamification_digest.streak'), 'icon' => "\u{1F525}"];
         }
 
         $builder->statCards($stats);
@@ -302,8 +302,8 @@ class GamificationEmailService
         }
 
         $builder
-            ->paragraph('Keep up the great work — your contributions make the community stronger!')
-            ->button('View Leaderboard', EmailTemplateBuilder::tenantUrl('/leaderboard'));
+            ->paragraph(__('emails.gamification_digest.encouragement'))
+            ->button(__('emails.gamification_digest.view_leaderboard'), EmailTemplateBuilder::tenantUrl('/leaderboard'));
 
         return $builder->render();
     }
@@ -320,83 +320,83 @@ class GamificationEmailService
         switch ($type) {
             case 'level_up':
                 $level = htmlspecialchars((string) ($data['level'] ?? '?'), ENT_QUOTES, 'UTF-8');
-                $subject = "Congratulations! You reached Level {$level}";
+                $subject = __('emails.gamification_milestone.level_up_subject', ['level' => $level]);
                 $body = EmailTemplateBuilder::make()
                     ->theme('achievement')
-                    ->title("Level Up! \u{1F389}")
-                    ->previewText("Congratulations — you reached Level {$level}!")
+                    ->title(__('emails.gamification_milestone.level_up_title') . " \u{1F389}")
+                    ->previewText(__('emails.gamification_milestone.level_up_preview', ['level' => $level]))
                     ->greeting($safeName)
-                    ->highlight("You've just reached <strong>Level {$level}</strong>!", "\u{1F389}")
-                    ->paragraph('Keep contributing to your community to unlock even more achievements.')
-                    ->button('View Your Profile', EmailTemplateBuilder::tenantUrl('/profile'))
+                    ->highlight(__('emails.gamification_milestone.level_up_highlight', ['level' => $level]), "\u{1F389}")
+                    ->paragraph(__('emails.gamification_milestone.level_up_body'))
+                    ->button(__('emails.gamification_milestone.view_profile'), EmailTemplateBuilder::tenantUrl('/profile'))
                     ->render();
                 break;
 
             case 'badge_earned':
                 $badgeName = htmlspecialchars((string) ($data['badge_name'] ?? $data['name'] ?? 'a new badge'), ENT_QUOTES, 'UTF-8');
                 $badgeIcon = $data['icon'] ?? '';
-                $subject = "You earned a new badge: {$badgeName}";
+                $subject = __('emails.gamification_milestone.badge_earned_subject', ['badge' => $badgeName]);
                 $builder = EmailTemplateBuilder::make()
                     ->theme('achievement')
-                    ->title("Badge Earned! {$badgeIcon}")
-                    ->previewText("You earned the {$badgeName} badge!")
+                    ->title(__('emails.gamification_milestone.badge_earned_title') . " {$badgeIcon}")
+                    ->previewText(__('emails.gamification_milestone.badge_earned_preview', ['badge' => $badgeName]))
                     ->greeting($safeName)
-                    ->highlight("You've earned the <strong>{$badgeIcon} {$badgeName}</strong> badge!", "\u{1F3C5}");
+                    ->highlight(__('emails.gamification_milestone.badge_earned_highlight', ['icon' => $badgeIcon, 'badge' => $badgeName]), "\u{1F3C5}");
 
                 if (!empty($data['description'])) {
                     $builder->paragraph(htmlspecialchars($data['description'], ENT_QUOTES, 'UTF-8'));
                 } else {
-                    $builder->paragraph('Great work contributing to your community!');
+                    $builder->paragraph(__('emails.gamification_milestone.badge_earned_body'));
                 }
 
                 $body = $builder
-                    ->button('View Your Badges', EmailTemplateBuilder::tenantUrl('/profile'))
+                    ->button(__('emails.gamification_milestone.view_badges'), EmailTemplateBuilder::tenantUrl('/profile'))
                     ->render();
                 break;
 
             case 'streak_milestone':
                 $days = htmlspecialchars((string) ($data['days'] ?? $data['streak'] ?? '?'), ENT_QUOTES, 'UTF-8');
-                $subject = "Amazing! {$days}-day login streak";
+                $subject = __('emails.gamification_milestone.streak_subject', ['days' => $days]);
                 $body = EmailTemplateBuilder::make()
                     ->theme('achievement')
-                    ->title("Streak Milestone! \u{1F525}")
-                    ->previewText("Incredible — {$days}-day login streak!")
+                    ->title(__('emails.gamification_milestone.streak_title') . " \u{1F525}")
+                    ->previewText(__('emails.gamification_milestone.streak_preview', ['days' => $days]))
                     ->greeting($safeName)
                     ->statCards([
-                        ['value' => (string) $days, 'label' => 'Day Login Streak', 'icon' => "\u{1F525}"],
+                        ['value' => (string) $days, 'label' => __('emails.gamification_milestone.streak_label'), 'icon' => "\u{1F525}"],
                     ])
-                    ->paragraph('Your consistency is inspiring to the whole community. Keep it going!')
-                    ->button('Continue Your Streak', EmailTemplateBuilder::tenantUrl('/feed'))
+                    ->paragraph(__('emails.gamification_milestone.streak_body'))
+                    ->button(__('emails.gamification_milestone.continue_streak'), EmailTemplateBuilder::tenantUrl('/feed'))
                     ->render();
                 break;
 
             case 'leaderboard_top':
                 $position = htmlspecialchars((string) ($data['position'] ?? $data['rank'] ?? '?'), ENT_QUOTES, 'UTF-8');
-                $subject = "You're #{$position} on the leaderboard!";
+                $subject = __('emails.gamification_milestone.leaderboard_subject', ['position' => $position]);
                 $body = EmailTemplateBuilder::make()
                     ->theme('achievement')
-                    ->title("Leaderboard Climb! \u{1F4CA}")
-                    ->previewText("You're now #{$position} on the leaderboard!")
+                    ->title(__('emails.gamification_milestone.leaderboard_title') . " \u{1F4CA}")
+                    ->previewText(__('emails.gamification_milestone.leaderboard_preview', ['position' => $position]))
                     ->greeting($safeName)
                     ->statCards([
-                        ['value' => '#' . $position, 'label' => 'Leaderboard Position', 'icon' => "\u{1F4CA}"],
+                        ['value' => '#' . $position, 'label' => __('emails.gamification_milestone.leaderboard_label'), 'icon' => "\u{1F4CA}"],
                     ])
-                    ->paragraph('Keep it up to maintain your spot at the top.')
-                    ->button('View Leaderboard', EmailTemplateBuilder::tenantUrl('/leaderboard'))
+                    ->paragraph(__('emails.gamification_milestone.leaderboard_body'))
+                    ->button(__('emails.gamification_digest.view_leaderboard'), EmailTemplateBuilder::tenantUrl('/leaderboard'))
                     ->render();
                 break;
 
             default:
-                $subject = 'Achievement Unlocked!';
+                $subject = __('emails.gamification_milestone.default_subject');
                 $message = !empty($data['message'])
                     ? htmlspecialchars($data['message'], ENT_QUOTES, 'UTF-8')
-                    : 'Congratulations on your latest achievement!';
+                    : __('emails.gamification_milestone.default_body');
                 $body = EmailTemplateBuilder::make()
                     ->theme('achievement')
-                    ->title("Achievement Unlocked! \u{1F3C6}")
+                    ->title(__('emails.gamification_milestone.default_title') . " \u{1F3C6}")
                     ->greeting($safeName)
                     ->highlight($message, "\u{1F3C6}")
-                    ->button('View Your Profile', EmailTemplateBuilder::tenantUrl('/profile'))
+                    ->button(__('emails.gamification_milestone.view_profile'), EmailTemplateBuilder::tenantUrl('/profile'))
                     ->render();
                 break;
         }

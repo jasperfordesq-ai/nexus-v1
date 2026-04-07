@@ -32,7 +32,7 @@ class JobAlertEmailService
     public static function sendImmediateAlert(User $recipient, JobVacancy $vacancy, JobAlert $alert): bool
     {
         try {
-            $subject = "New job matching your alert: {$vacancy->title}";
+            $subject = __('emails.job_alert.subject_single', ['title' => $vacancy->title]);
             $bodyHtml = self::buildAlertEmailHtml($recipient, [$vacancy]);
 
             Mail::html($bodyHtml, function ($message) use ($recipient, $subject) {
@@ -65,28 +65,34 @@ class JobAlertEmailService
 
         foreach ($vacancies as $v) {
             $title       = htmlspecialchars($v->title ?? '');
-            $location    = htmlspecialchars($v->location ?? ($v->is_remote ? 'Remote' : 'Location not specified'));
+            $location    = htmlspecialchars($v->location ?? ($v->is_remote ? __('emails.job_alert.remote') : __('emails.job_alert.location_not_specified')));
             $commitment  = htmlspecialchars(ucfirst(str_replace('_', ' ', $v->commitment ?? '')));
             $type        = htmlspecialchars(ucfirst($v->type ?? ''));
-            $deadline    = $v->deadline ? date('d M Y', strtotime($v->deadline)) : 'Open';
+            $deadline    = $v->deadline ? __('emails.job_alert.closes', ['date' => date('d M Y', strtotime($v->deadline))]) : __('emails.job_alert.deadline_open');
             $appUrl      = config('app.url', 'https://app.project-nexus.ie');
             $jobUrl      = "{$appUrl}/jobs/{$v->id}";
+            $viewJobText = __('emails.job_alert.view_job');
 
             $jobItems .= <<<HTML
             <tr>
               <td style="padding:16px;border-bottom:1px solid #e5e7eb;">
                 <a href="{$jobUrl}" style="font-size:16px;font-weight:600;color:#4f46e5;text-decoration:none;">{$title}</a>
                 <div style="margin-top:4px;font-size:13px;color:#6b7280;">
-                  {$location} &bull; {$commitment} &bull; {$type} &bull; Closes: {$deadline}
+                  {$location} &bull; {$commitment} &bull; {$type} &bull; {$deadline}
                 </div>
-                <a href="{$jobUrl}" style="display:inline-block;margin-top:8px;padding:6px 14px;background:#4f46e5;color:#fff;border-radius:6px;font-size:13px;text-decoration:none;">View Job</a>
+                <a href="{$jobUrl}" style="display:inline-block;margin-top:8px;padding:6px 14px;background:#4f46e5;color:#fff;border-radius:6px;font-size:13px;text-decoration:none;">{$viewJobText}</a>
               </td>
             </tr>
             HTML;
         }
 
         $count = count($vacancies);
-        $plural = $count === 1 ? 'job matches' : 'jobs match';
+        $plural = $count === 1 ? __('emails.job_alert.jobs_match_singular') : __('emails.job_alert.jobs_match_plural');
+        $heading = __('emails.job_alert.subject_digest', ['count' => $count, 'plural' => $plural]);
+        $greeting = __('emails.common.greeting', ['name' => $name]);
+        $receivingNotice = __('emails.job_alert.receiving_notice');
+        $manageAlertsLink = '<a href="' . $appUrl . '/jobs/alerts" style="color:#4f46e5;">' . __('emails.job_alert.manage_alerts') . '</a>';
+        $unsubscribeText = __('emails.job_alert.unsubscribe', ['link' => $manageAlertsLink]);
 
         return <<<HTML
         <!DOCTYPE html>
@@ -97,17 +103,17 @@ class JobAlertEmailService
               <table width="600" style="background:#fff;border-radius:12px;box-shadow:0 1px 3px rgba(0,0,0,.1);">
                 <tr>
                   <td style="padding:24px;background:#4f46e5;border-radius:12px 12px 0 0;">
-                    <h1 style="margin:0;font-size:20px;color:#fff;">Job Alert — {$count} new {$plural} your criteria</h1>
+                    <h1 style="margin:0;font-size:20px;color:#fff;">{$heading}</h1>
                   </td>
                 </tr>
-                <tr><td style="padding:16px 24px;font-size:14px;color:#374151;">Hi {$name},</td></tr>
+                <tr><td style="padding:16px 24px;font-size:14px;color:#374151;">{$greeting}</td></tr>
                 <tr><td>
                   <table width="100%">{$jobItems}</table>
                 </td></tr>
                 <tr>
                   <td style="padding:16px 24px;font-size:12px;color:#9ca3af;border-top:1px solid #e5e7eb;">
-                    You are receiving this because you set up a job alert on Project NEXUS.<br>
-                    To unsubscribe, <a href="{$appUrl}/jobs/alerts" style="color:#4f46e5;">manage your alerts here</a>.
+                    {$receivingNotice}<br>
+                    {$unsubscribeText}
                   </td>
                 </tr>
               </table>

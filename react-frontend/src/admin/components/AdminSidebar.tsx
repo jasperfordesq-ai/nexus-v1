@@ -115,6 +115,11 @@ interface NavSection {
   condition?: string;
 }
 
+// ⚠️ TRANSLATION KEY CONVENTION — READ BEFORE EDITING
+// Section labels use TOP-LEVEL keys from admin_nav.json: t('users'), t('crm'), etc.
+// Do NOT add a "sidebar." prefix — the "sidebar" namespace is only for
+// sidebar.admin, sidebar.expand_sidebar, sidebar.collapse_sidebar, sidebar.broker_panel.
+// Sub-item labels also use top-level keys: t('all_users'), t('blog_posts'), etc.
 function useAdminNav(): NavSection[] {
   const { t } = useTranslation('admin_nav');
   const { hasFeature } = useTenant();
@@ -136,7 +141,7 @@ function useAdminNav(): NavSection[] {
       },
       {
         key: 'users',
-        label: t('sidebar.users'),
+        label: t('users'),
         icon: Users,
         items: [
           { label: t('all_users'), href: '/admin/users', icon: Users },
@@ -145,7 +150,7 @@ function useAdminNav(): NavSection[] {
       },
       {
         key: 'crm',
-        label: t('sidebar.crm'),
+        label: t('crm'),
         icon: Contact,
         items: [
           { label: t('crm_dashboard'), href: '/admin/crm', icon: Contact },
@@ -158,7 +163,7 @@ function useAdminNav(): NavSection[] {
       },
       {
         key: 'listings',
-        label: t('sidebar.listings'),
+        label: t('listings'),
         icon: ListChecks,
         items: [
           { label: t('all_content'), href: '/admin/listings', icon: ListChecks },
@@ -166,15 +171,15 @@ function useAdminNav(): NavSection[] {
       },
       {
         key: 'content',
-        label: t('sidebar.content'),
+        label: t('content'),
         icon: Newspaper,
         items: [
           { label: t('blog_posts'), href: '/admin/blog', icon: FileText },
-          { label: t('sidebar.resources'), href: '/admin/resources', icon: BookOpen },
+          { label: t('resources'), href: '/admin/resources', icon: BookOpen },
           { label: t('pages'), href: '/admin/pages', icon: FileText },
           { label: t('landing_page', { defaultValue: 'Landing Page' }), href: '/admin/landing-page', icon: Palette },
           { label: t('menus'), href: '/admin/menus', icon: Menu },
-          { label: t('sidebar.categories'), href: '/admin/categories', icon: FolderTree },
+          { label: t('categories'), href: '/admin/categories', icon: FolderTree },
           { label: t('attributes'), href: '/admin/attributes', icon: Tags },
         ],
       },
@@ -191,7 +196,7 @@ function useAdminNav(): NavSection[] {
       },
       {
         key: 'matching',
-        label: t('sidebar.matching'),
+        label: t('matching'),
         icon: Zap,
         items: [
           { label: t('smart_matching'), href: '/admin/smart-matching', icon: Brain },
@@ -202,13 +207,13 @@ function useAdminNav(): NavSection[] {
           { label: t('vetting_records'), href: '/admin/broker-controls/vetting', icon: ShieldCheck },
           { label: t('insurance_certificates'), href: '/admin/broker-controls/insurance', icon: FileCheck },
           { label: t('review_archive'), href: '/admin/broker-controls/archives', icon: Archive },
-          { label: t('sidebar.safeguarding'), href: '/admin/safeguarding', icon: ShieldCheck },
+          { label: t('safeguarding'), href: '/admin/safeguarding', icon: ShieldCheck },
           { label: t('safeguarding_options'), href: '/admin/safeguarding-options', icon: Shield },
         ],
       },
       {
         key: 'moderation',
-        label: t('sidebar.moderation'),
+        label: t('moderation'),
         icon: Shield,
         items: [
           { label: t('content_queue'), href: '/admin/moderation/queue', icon: Shield, badge: 'NEW' },
@@ -220,23 +225,23 @@ function useAdminNav(): NavSection[] {
       },
       {
         key: 'community',
-        label: t('sidebar.community'),
+        label: t('community'),
         icon: Users,
         items: [
-          { label: t('sidebar.groups'), href: '/admin/groups', icon: Users },
+          { label: t('groups'), href: '/admin/groups', icon: Users },
           { label: t('group_types'), href: '/admin/groups/types', icon: FolderTree },
           { label: t('group_recommendations'), href: '/admin/groups/recommendations', icon: Brain },
           { label: t('group_ranking'), href: '/admin/groups/ranking', icon: Trophy },
-          { label: t('sidebar.events'), href: '/admin/events', icon: Calendar },
-          { label: t('sidebar.polls'), href: '/admin/polls', icon: BarChart2 },
-          { label: t('sidebar.goals'), href: '/admin/goals', icon: Target },
+          { label: t('events'), href: '/admin/events', icon: Calendar },
+          { label: t('polls'), href: '/admin/polls', icon: BarChart2 },
+          { label: t('goals'), href: '/admin/goals', icon: Target },
           { label: t('ideation_challenges'), href: '/admin/ideation', icon: Lightbulb },
-          { label: t('sidebar.jobs'), href: '/admin/jobs', icon: Briefcase },
+          { label: t('jobs'), href: '/admin/jobs', icon: Briefcase },
           { label: t('job_moderation'), href: '/admin/jobs/moderation', icon: ShieldCheck },
           { label: t('job_pipeline'), href: '/admin/jobs/pipeline', icon: Handshake },
           { label: t('job_bias_audit'), href: '/admin/jobs/bias-audit', icon: BarChart3 },
           { label: t('job_templates'), href: '/admin/jobs/templates', icon: FileText },
-          { label: t('sidebar.volunteering'), href: '/admin/volunteering', icon: Heart },
+          { label: t('volunteering'), href: '/admin/volunteering', icon: Heart },
         ],
       },
       ...(hasFeature('marketplace') ? [{
@@ -254,18 +259,18 @@ function useAdminNav(): NavSection[] {
         label: t('marketing'),
         icon: Megaphone,
         items: [
-          { label: t('sidebar.newsletters'), href: '/admin/newsletters', icon: Megaphone },
+          { label: t('newsletters'), href: '/admin/newsletters', icon: Megaphone },
           { label: t('subscribers'), href: '/admin/newsletters/subscribers', icon: Users },
           { label: t('templates'), href: '/admin/newsletters/templates', icon: FileText },
           { label: t('bounces'), href: '/admin/newsletters/bounces', icon: AlertTriangle },
           { label: t('send_time_optimizer'), href: '/admin/newsletters/send-time-optimizer', icon: Clock },
-          { label: t('sidebar.diagnostics'), href: '/admin/newsletters/diagnostics', icon: Stethoscope },
-          { label: t('sidebar.deliverability'), href: '/admin/deliverability', icon: Mail },
+          { label: t('diagnostics'), href: '/admin/newsletters/diagnostics', icon: Stethoscope },
+          { label: t('deliverability'), href: '/admin/deliverability', icon: Mail },
         ],
       },
       {
         key: 'analytics',
-        label: t('sidebar.analytics_reporting'),
+        label: t('analytics_reporting'),
         icon: BarChart3,
         items: [
           { label: t('community_analytics'), href: '/admin/community-analytics', icon: BarChart3 },
@@ -278,7 +283,7 @@ function useAdminNav(): NavSection[] {
       },
       {
         key: 'advanced',
-        label: t('sidebar.advanced'),
+        label: t('advanced'),
         icon: Sparkles,
         items: [
           { label: t('ai_settings'), href: '/admin/ai-settings', icon: Brain },
@@ -286,7 +291,7 @@ function useAdminNav(): NavSection[] {
           { label: t('algorithm_settings'), href: '/admin/algorithm-settings', icon: Cpu },
           { label: t('seo_overview'), href: '/admin/seo', icon: Search },
           { label: t('error_404_tracking'), href: '/admin/404-errors', icon: AlertTriangle },
-          { label: t('sidebar.diagnostics'), href: '/admin/matching-diagnostic', icon: Stethoscope },
+          { label: t('diagnostics'), href: '/admin/matching-diagnostic', icon: Stethoscope },
           { label: t('match_debug_panel'), href: '/admin/match-debug', icon: Target },
         ],
       },
@@ -295,17 +300,17 @@ function useAdminNav(): NavSection[] {
         label: t('financial'),
         icon: Coins,
         items: [
-          { label: t('sidebar.timebanking'), href: '/admin/timebanking', icon: Clock },
+          { label: t('timebanking'), href: '/admin/timebanking', icon: Clock },
           { label: t('fraud_alerts'), href: '/admin/timebanking/alerts', icon: AlertTriangle },
           { label: t('org_wallets'), href: '/admin/timebanking/org-wallets', icon: Wallet },
           { label: t('starting_balances'), href: '/admin/timebanking/starting-balances', icon: Wallet },
           { label: t('plans_pricing'), href: '/admin/plans', icon: CreditCard },
-          { label: t('sidebar.billing'), href: '/admin/billing', icon: CreditCard },
+          { label: t('billing'), href: '/admin/billing', icon: CreditCard },
         ],
       },
       {
         key: 'enterprise',
-        label: t('sidebar.enterprise'),
+        label: t('enterprise'),
         icon: Building2,
         items: [
           { label: t('enterprise_dashboard'), href: '/admin/enterprise', icon: Building2 },
@@ -321,13 +326,13 @@ function useAdminNav(): NavSection[] {
       },
       {
         key: 'system',
-        label: t('sidebar.system'),
+        label: t('system'),
         icon: Settings,
         items: [
           { label: t('settings'), href: '/admin/settings', icon: Settings },
           { label: t('onboarding_settings'), href: '/admin/onboarding-settings', icon: Sparkles },
           { label: t('tenant_features'), href: '/admin/tenant-features', icon: Cog },
-          { label: t('sidebar.module_configuration'), href: '/admin/module-configuration', icon: Puzzle, badge: 'BETA' },
+          { label: t('module_configuration'), href: '/admin/module-configuration', icon: Puzzle, badge: 'BETA' },
           { label: t('translation_config', { defaultValue: 'Translation' }), href: '/admin/translation-config', icon: Languages },
           { label: t('cron_jobs'), href: '/admin/cron-jobs', icon: Timer },
           { label: t('cron_logs'), href: '/admin/cron-jobs/logs', icon: FileText },
@@ -597,7 +602,7 @@ export function AdminSidebar({ collapsed, onToggle }: AdminSidebarProps) {
             <Link
               to={tenantPath('/broker')}
               className="flex items-center justify-center rounded-lg px-2 py-2 text-default-400 hover:bg-default-100 hover:text-foreground transition-colors"
-              title={t('sidebar.broker_panel')}
+              title={t('broker_panel')}
             >
               <ShieldCheck size={18} />
             </Link>
@@ -607,7 +612,7 @@ export function AdminSidebar({ collapsed, onToggle }: AdminSidebarProps) {
               className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm text-default-400 hover:bg-default-100 hover:text-foreground transition-colors"
             >
               <ShieldCheck size={18} />
-              <span>{t('sidebar.broker_panel')}</span>
+              <span>{t('broker_panel')}</span>
             </Link>
           )}
         </div>

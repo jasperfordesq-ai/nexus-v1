@@ -527,22 +527,29 @@ class CronJobRunner
         }
 
         $freqLabel = ucfirst($frequency);
+        $digestTitle = __('emails.digest.title', ['frequency' => $freqLabel]);
+        $userName = htmlspecialchars($user['name'] ?? 'there', ENT_QUOTES, 'UTF-8');
+        $digestGreeting = __('emails.digest.greeting', ['name' => $userName]);
+        $digestIntro = __('emails.digest.intro');
+        $digestOptedIn = __('emails.digest.opted_in_notice', ['frequency' => $frequency]);
+        $manageNotifications = __('emails.digest.manage_notifications');
+        $settingsUrl = TenantContext::getFrontendUrl() . TenantContext::getSlugPrefix() . '/dashboard?tab=notifications';
 
         return "
         <html>
         <body style='font-family: sans-serif; line-height: 1.5; color: #333;'>
             <div style='max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #ddd; border-radius: 8px;'>
-                <h2 style='color: #4f46e5;'>Your $freqLabel Digest</h2>
-                <p>Hello " . htmlspecialchars($user['name'] ?? 'there', ENT_QUOTES, 'UTF-8') . ",</p>
-                <p>Here is a summary of what you missed on Project NEXUS:</p>
+                <h2 style='color: #4f46e5;'>{$digestTitle}</h2>
+                <p>{$digestGreeting}</p>
+                <p>{$digestIntro}</p>
 
                 <div style='margin-top: 20px; border-top: 2px solid #eee; padding-top: 20px;'>
                     $listHtml
                 </div>
 
                 <div style='margin-top: 30px; font-size: 12px; color: #aaa; text-align: center;'>
-                    <p>You received this email because you opted for a $frequency summary.</p>
-                    <p><a href='" . TenantContext::getFrontendUrl() . TenantContext::getSlugPrefix() . "/dashboard?tab=notifications' style='color: #aaa;'>Manage Notifications</a></p>
+                    <p>{$digestOptedIn}</p>
+                    <p><a href='{$settingsUrl}' style='color: #aaa;'>{$manageNotifications}</a></p>
                 </div>
             </div>
         </body>

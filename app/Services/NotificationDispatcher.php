@@ -1061,6 +1061,9 @@ COMMENT;
                 : 'linear-gradient(135deg, #6b7280, #4b5563)');
 
         $year = date('Y');
+        $sentByText = __('emails.notification.sent_by', ['community' => $tenantName]);
+        $allRightsReserved = __('emails.footer.all_rights_reserved');
+        $viewProfileText = __('emails.notification.view_profile');
 
         return <<<HTML
 <!DOCTYPE html>
@@ -1100,7 +1103,7 @@ COMMENT;
                     {$commentHtml}
                     <tr>
                         <td style="padding: 0 24px 32px; text-align: center;">
-                            <a href="{$profileUrl}" style="display: inline-block; background: {$gradient}; color: #ffffff; padding: 14px 32px; border-radius: 8px; text-decoration: none; font-weight: 600; font-size: 16px;">View Your Profile</a>
+                            <a href="{$profileUrl}" style="display: inline-block; background: {$gradient}; color: #ffffff; padding: 14px 32px; border-radius: 8px; text-decoration: none; font-weight: 600; font-size: 16px;">{$viewProfileText}</a>
                         </td>
                     </tr>
                     <tr>
@@ -1108,8 +1111,8 @@ COMMENT;
                             <table role="presentation" width="100%" cellspacing="0" cellpadding="0">
                                 <tr>
                                     <td style="text-align: center;">
-                                        <p style="margin: 0 0 8px; font-size: 14px; color: #6b7280;">This email was sent by {$tenantName}</p>
-                                        <p style="margin: 0; font-size: 12px; color: #9ca3af;">&copy; {$year} Project NEXUS. All rights reserved.</p>
+                                        <p style="margin: 0 0 8px; font-size: 14px; color: #6b7280;">{$sentByText}</p>
+                                        <p style="margin: 0; font-size: 12px; color: #9ca3af;">&copy; {$year} {$tenantName}. {$allRightsReserved}</p>
                                     </td>
                                 </tr>
                             </table>
@@ -1139,6 +1142,9 @@ HTML;
         $emailConfig = self::getExchangeEmailConfig($type, $data, $details);
 
         $year = date('Y');
+        $greeting = __('emails.common.greeting', ['name' => $userName]);
+        $sentByText = __('emails.notification.sent_by', ['community' => $tenantName]);
+        $allRightsReserved = __('emails.footer.all_rights_reserved');
 
         return <<<HTML
 <!DOCTYPE html>
@@ -1158,7 +1164,7 @@ HTML;
                     </tr>
                     <tr>
                         <td style="padding: 32px 24px 16px;">
-                            <p style="margin: 0; font-size: 18px; color: #111827;">Hi {$userName},</p>
+                            <p style="margin: 0; font-size: 18px; color: #111827;">{$greeting}</p>
                         </td>
                     </tr>
                     <tr>
@@ -1218,8 +1224,8 @@ HTML;
                             <table role="presentation" width="100%" cellspacing="0" cellpadding="0">
                                 <tr>
                                     <td style="text-align: center;">
-                                        <p style="margin: 0 0 8px; font-size: 14px; color: #6b7280;">This email was sent by {$tenantName}</p>
-                                        <p style="margin: 0; font-size: 12px; color: #9ca3af;">&copy; {$year} Project NEXUS. All rights reserved.</p>
+                                        <p style="margin: 0 0 8px; font-size: 14px; color: #6b7280;">{$sentByText}</p>
+                                        <p style="margin: 0; font-size: 12px; color: #9ca3af;">&copy; {$year} {$tenantName}. {$allRightsReserved}</p>
                                     </td>
                                 </tr>
                             </table>

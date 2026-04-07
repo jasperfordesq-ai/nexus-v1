@@ -287,11 +287,12 @@ class EmailTemplateBuilder
     private function renderGreeting(array $block): string
     {
         $name = self::esc($block['name']);
+        $greeting = __('emails.common.greeting', ['name' => $name]);
         return <<<HTML
                             <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%">
                                 <tr>
                                     <td style="padding: 32px 40px 8px;" class="mobile-padding">
-                                        <p style="margin: 0; font-size: 18px; font-weight: 600; color: #111827; line-height: 1.5;" class="text-dark">Hi {$name},</p>
+                                        <p style="margin: 0; font-size: 18px; font-weight: 600; color: #111827; line-height: 1.5;" class="text-dark">{$greeting}</p>
                                     </td>
                                 </tr>
                             </table>
@@ -485,6 +486,7 @@ HTML;
     {
         $text = self::esc($block['text']);
         $url = $block['url'];
+        $fallbackText = __('emails.common.button_fallback_short');
 
         return <<<HTML
                             <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%">
@@ -504,7 +506,7 @@ HTML;
                                 <tr>
                                     <td style="padding: 4px 40px 16px; text-align: center;" class="mobile-padding">
                                         <p style="margin: 0; font-size: 12px; color: #9ca3af; line-height: 1.5;">
-                                            If the button doesn&rsquo;t work, copy this link:<br>
+                                            {$fallbackText}<br>
                                             <a href="{$url}" style="color: {$theme['primary']}; word-break: break-all; font-size: 11px;">{$url}</a>
                                         </p>
                                     </td>
@@ -554,8 +556,12 @@ HTML;
     private function renderWrapper(string $title, string $previewText, string $tenantName, array $theme, string $contentHtml, string $settingsUrl, string $year): string
     {
         $bgColor = '#f3f4f6';
-        $textColor = '#374151';
         $mutedColor = '#6b7280';
+
+        // Translated footer strings
+        $allRightsReserved = __('emails.footer.all_rights_reserved');
+        $memberNotice = __('emails.footer.member_notice', ['community' => $tenantName]);
+        $managePreferences = __('emails.footer.manage_preferences');
 
         return <<<HTML
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
@@ -651,20 +657,20 @@ HTML;
                                 <tr>
                                     <td style="text-align: center; padding-bottom: 12px;">
                                         <p style="margin: 0; font-size: 14px; color: {$mutedColor};">
-                                            &copy; {$year} {$tenantName}. All rights reserved.
+                                            &copy; {$year} {$tenantName}. {$allRightsReserved}
                                         </p>
                                     </td>
                                 </tr>
                                 <tr>
                                     <td style="text-align: center; padding-bottom: 12px;">
                                         <p style="margin: 0; font-size: 13px; color: #9ca3af; line-height: 1.6;">
-                                            You received this email because you are a member of the {$tenantName} community.
+                                            {$memberNotice}
                                         </p>
                                     </td>
                                 </tr>
                                 <tr>
                                     <td style="text-align: center;">
-                                        <a href="{$settingsUrl}" style="color: {$mutedColor}; text-decoration: underline; font-size: 13px;">Manage Notification Preferences</a>
+                                        <a href="{$settingsUrl}" style="color: {$mutedColor}; text-decoration: underline; font-size: 13px;">{$managePreferences}</a>
                                     </td>
                                 </tr>
                             </table>

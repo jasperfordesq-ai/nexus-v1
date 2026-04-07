@@ -51,6 +51,12 @@ class EmailTemplate
         $basePath = TenantContext::getSlugPrefix();
         $settingsUrl = $frontendUrl . $basePath . '/notifications';
 
+        // Translated footer/common strings
+        $buttonFallbackText = __('emails.common.button_fallback');
+        $allRightsReserved = __('emails.footer.all_rights_reserved');
+        $memberNotice = __('emails.footer.member_notice', ['community' => $tenantName]);
+        $managePreferences = __('emails.footer.manage_preferences');
+
         // Button HTML
         $buttonHtml = '';
         if ($btnText && $btnUrl) {
@@ -75,7 +81,7 @@ class EmailTemplate
                                 <tr>
                                     <td style="padding: 0 40px 30px;" class="mobile-padding">
                                         <p style="margin: 0; font-size: 13px; color: {$mutedColor}; line-height: 1.6;" class="text-muted">
-                                            If the button above doesn't work, copy and paste this link into your browser:<br>
+                                            {$buttonFallbackText}<br>
                                             <a href="{$btnUrl}" style="color: {$brandColor}; word-break: break-all;">{$btnUrl}</a>
                                         </p>
                                     </td>
@@ -208,20 +214,20 @@ HTML;
                                 <tr>
                                     <td style="text-align: center; padding-bottom: 15px;">
                                         <p style="margin: 0; font-size: 14px; color: #6b7280;">
-                                            &copy; {$year} {$tenantName}. All rights reserved.
+                                            &copy; {$year} {$tenantName}. {$allRightsReserved}
                                         </p>
                                     </td>
                                 </tr>
                                 <tr>
                                     <td style="text-align: center; padding-bottom: 15px;">
                                         <p style="margin: 0; font-size: 13px; color: #9ca3af; line-height: 1.6;">
-                                            You received this email because you are a member of the {$tenantName} community.
+                                            {$memberNotice}
                                         </p>
                                     </td>
                                 </tr>
                                 <tr>
                                     <td style="text-align: center;">
-                                        <a href="{$settingsUrl}" style="color: #6b7280; text-decoration: underline; font-size: 13px;">Manage Notification Preferences</a>
+                                        <a href="{$settingsUrl}" style="color: #6b7280; text-decoration: underline; font-size: 13px;">{$managePreferences}</a>
                                     </td>
                                 </tr>
                             </table>

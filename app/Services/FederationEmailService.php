@@ -46,20 +46,20 @@ class FederationEmailService
             $safeTenantName = htmlspecialchars($tenantName, ENT_QUOTES, 'UTF-8');
             $safePreview = htmlspecialchars($preview, ENT_QUOTES, 'UTF-8');
 
-            $subject = "New federated message from {$senderName}";
+            $subject = __('emails.federation.message_subject', ['sender' => $senderName]);
 
             $html = EmailTemplateBuilder::make()
                 ->theme('federation')
-                ->title('New Federated Message')
-                ->previewText("{$senderName} from {$tenantName} sent you a message")
+                ->title(__('emails.federation.message_title'))
+                ->previewText(__('emails.federation.message_preview', ['sender' => $senderName, 'community' => $tenantName]))
                 ->greeting($recipientName)
-                ->paragraph("You have a new cross-community message from {$safeSenderName} in {$safeTenantName}.")
+                ->paragraph(__('emails.federation.message_body', ['sender' => $safeSenderName, 'community' => $safeTenantName]))
                 ->infoCard([
-                    'From' => $safeSenderName,
-                    'Community' => $safeTenantName,
+                    __('emails.federation.label_from') => $safeSenderName,
+                    __('emails.federation.label_community') => $safeTenantName,
                 ])
                 ->blockquote($safePreview)
-                ->button('Read & Reply', EmailTemplateBuilder::tenantUrl('/messages'))
+                ->button(__('emails.federation.read_reply'), EmailTemplateBuilder::tenantUrl('/messages'))
                 ->render();
 
             $mailer = Mailer::forCurrentTenant();
@@ -99,20 +99,20 @@ class FederationEmailService
             $safeTenantName = htmlspecialchars($tenantName, ENT_QUOTES, 'UTF-8');
             $safeDescription = htmlspecialchars($description, ENT_QUOTES, 'UTF-8');
 
-            $subject = "You received {$amount} hour(s) via federation";
+            $subject = __('emails.federation.transaction_received_subject', ['amount' => $amount]);
 
             $html = EmailTemplateBuilder::make()
                 ->theme('success')
-                ->title('Time Credits Received')
-                ->previewText("You received {$amount} hour(s) from {$senderName}")
+                ->title(__('emails.federation.transaction_received_title'))
+                ->previewText(__('emails.federation.transaction_received_preview', ['amount' => $amount, 'sender' => $senderName]))
                 ->greeting($recipientName)
-                ->paragraph("{$safeSenderName} from {$safeTenantName} has sent you a cross-community time credit transfer.")
+                ->paragraph(__('emails.federation.transaction_received_body', ['sender' => $safeSenderName, 'community' => $safeTenantName]))
                 ->infoCard([
-                    'From' => "{$safeSenderName} ({$safeTenantName})",
-                    'Amount' => "{$amount} hour(s)",
-                    'Description' => $safeDescription,
+                    __('emails.federation.label_from') => "{$safeSenderName} ({$safeTenantName})",
+                    __('emails.federation.label_amount') => __('emails.federation.hours', ['amount' => $amount]),
+                    __('emails.federation.label_description') => $safeDescription,
                 ])
-                ->button('View Your Wallet', EmailTemplateBuilder::tenantUrl('/wallet'))
+                ->button(__('emails.federation.view_wallet'), EmailTemplateBuilder::tenantUrl('/wallet'))
                 ->render();
 
             $mailer = Mailer::forCurrentTenant();
@@ -147,21 +147,21 @@ class FederationEmailService
             $safeTenantName = htmlspecialchars($tenantName, ENT_QUOTES, 'UTF-8');
             $safeDescription = htmlspecialchars($description, ENT_QUOTES, 'UTF-8');
 
-            $subject = "Federation transfer of {$amount} hour(s) confirmed";
+            $subject = __('emails.federation.transaction_confirmed_subject', ['amount' => $amount]);
 
             $html = EmailTemplateBuilder::make()
                 ->theme('success')
-                ->title('Transfer Confirmed')
-                ->previewText("Your transfer of {$amount} hour(s) to {$recipientName} is confirmed")
+                ->title(__('emails.federation.transaction_confirmed_title'))
+                ->previewText(__('emails.federation.transaction_confirmed_preview', ['amount' => $amount, 'recipient' => $recipientName]))
                 ->greeting($senderName)
-                ->paragraph("Your cross-community time credit transfer has been processed successfully.")
+                ->paragraph(__('emails.federation.transaction_confirmed_body'))
                 ->infoCard([
-                    'To' => "{$safeRecipientName} ({$safeTenantName})",
-                    'Amount' => "{$amount} hour(s)",
-                    'Description' => $safeDescription,
-                    'New Balance' => "{$newBalance} hour(s)",
+                    __('emails.federation.label_to') => "{$safeRecipientName} ({$safeTenantName})",
+                    __('emails.federation.label_amount') => __('emails.federation.hours', ['amount' => $amount]),
+                    __('emails.federation.label_description') => $safeDescription,
+                    __('emails.federation.label_new_balance') => __('emails.federation.hours', ['amount' => $newBalance]),
                 ])
-                ->button('View Your Wallet', EmailTemplateBuilder::tenantUrl('/wallet'))
+                ->button(__('emails.federation.view_wallet'), EmailTemplateBuilder::tenantUrl('/wallet'))
                 ->render();
 
             $mailer = Mailer::forCurrentTenant();
@@ -212,26 +212,26 @@ class FederationEmailService
 
             $userName = trim(($user->first_name ?? '') . ' ' . ($user->last_name ?? ''));
 
-            $subject = "Weekly Federation Digest — {$tenantName}";
+            $subject = __('emails.federation.digest_subject', ['community' => $tenantName]);
 
             $builder = EmailTemplateBuilder::make()
                 ->theme('federation')
-                ->title('Federation Weekly Digest')
-                ->previewText("Your weekly federation activity summary for {$tenantName}")
+                ->title(__('emails.federation.digest_title'))
+                ->previewText(__('emails.federation.digest_preview', ['community' => $tenantName]))
                 ->greeting($userName)
-                ->paragraph('Here\'s your cross-community activity summary for the past week.')
+                ->paragraph(__('emails.federation.digest_body'))
                 ->statCards([
-                    ['value' => (string) $messageCount, 'label' => 'Messages', 'icon' => "\xF0\x9F\x92\xAC"],
-                    ['value' => (string) $transactionCount, 'label' => 'Transactions', 'icon' => "\xF0\x9F\x92\xB0"],
-                    ['value' => (string) $connectionCount, 'label' => 'Connections', 'icon' => "\xF0\x9F\xA4\x9D"],
+                    ['value' => (string) $messageCount, 'label' => __('emails.federation.label_messages'), 'icon' => "\xF0\x9F\x92\xAC"],
+                    ['value' => (string) $transactionCount, 'label' => __('emails.federation.label_transactions'), 'icon' => "\xF0\x9F\x92\xB0"],
+                    ['value' => (string) $connectionCount, 'label' => __('emails.federation.label_connections'), 'icon' => "\xF0\x9F\xA4\x9D"],
                 ]);
 
             if ($messageCount === 0 && $transactionCount === 0 && $connectionCount === 0) {
-                $builder->paragraph('It was a quiet week — no cross-community activity to report.');
+                $builder->paragraph(__('emails.federation.digest_quiet'));
             }
 
             $html = $builder
-                ->button('Explore Federation', EmailTemplateBuilder::tenantUrl('/federation'))
+                ->button(__('emails.federation.explore_federation'), EmailTemplateBuilder::tenantUrl('/federation'))
                 ->render();
 
             $mailer = Mailer::forCurrentTenant();
@@ -273,17 +273,17 @@ class FederationEmailService
             foreach ($admins as $admin) {
                 $adminName = trim(($admin->first_name ?? '') . ' ' . ($admin->last_name ?? ''));
 
-                $subject = "Federation Partnership Request from {$requestingTenantName}";
+                $subject = __('emails.federation.partnership_subject', ['community' => $requestingTenantName]);
 
                 $builder = EmailTemplateBuilder::make()
                     ->theme('federation')
-                    ->title('Federation Partnership Request')
-                    ->previewText("{$requestingTenantName} wants to partner with your community")
+                    ->title(__('emails.federation.partnership_title'))
+                    ->previewText(__('emails.federation.partnership_preview', ['community' => $requestingTenantName]))
                     ->greeting($adminName)
-                    ->paragraph("{$safeRequestingName} has sent your community a federation partnership request.")
+                    ->paragraph(__('emails.federation.partnership_body', ['community' => $safeRequestingName]))
                     ->infoCard([
-                        'From Community' => $safeRequestingName,
-                        'Requested Level' => htmlspecialchars($levelName, ENT_QUOTES, 'UTF-8'),
+                        __('emails.federation.label_from_community') => $safeRequestingName,
+                        __('emails.federation.label_requested_level') => htmlspecialchars($levelName, ENT_QUOTES, 'UTF-8'),
                     ]);
 
                 if ($notes !== null && $notes !== '') {
@@ -294,7 +294,7 @@ class FederationEmailService
                 }
 
                 $html = $builder
-                    ->button('Review Request', EmailTemplateBuilder::tenantUrl('/admin/federation'))
+                    ->button(__('emails.federation.review_request'), EmailTemplateBuilder::tenantUrl('/admin/federation'))
                     ->render();
 
                 $mailer = Mailer::forCurrentTenant();

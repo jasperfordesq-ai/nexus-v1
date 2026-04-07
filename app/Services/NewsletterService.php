@@ -398,6 +398,8 @@ class NewsletterService
         $subject = $newsletter['subject'] ?? '';
         $previewText = $newsletter['preview_text'] ?? '';
         $year = date('Y');
+        $allRightsReserved = __('emails.footer.all_rights_reserved');
+        $subscriberNotice = __('emails.newsletter.subscriber_notice', ['community' => $tenantName]);
 
         // Brand colors
         $color = '#6366f1';
@@ -511,14 +513,14 @@ class NewsletterService
                                 <tr>
                                     <td style="text-align: center; padding-bottom: 15px;">
                                         <p style="margin: 0; font-size: 14px; color: #6b7280;">
-                                            &copy; {$year} {$tenantName}. All rights reserved.
+                                            &copy; {$year} {$tenantName}. {$allRightsReserved}
                                         </p>
                                     </td>
                                 </tr>
                                 <tr>
                                     <td style="text-align: center; padding-bottom: 15px;">
                                         <p style="margin: 0; font-size: 13px; color: #9ca3af; line-height: 1.6;">
-                                            You received this email because you're subscribed to the {$tenantName} newsletter.
+                                            {$subscriberNotice}
                                         </p>
                                     </td>
                                 </tr>
