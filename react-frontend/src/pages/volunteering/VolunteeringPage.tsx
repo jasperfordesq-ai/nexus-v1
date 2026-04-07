@@ -172,7 +172,6 @@ export function VolunteeringPage() {
     }, { replace: true });
   }, [setSearchParams]);
   const [hasApprovedOrg, setHasApprovedOrg] = useState(false);
-  const [myOrgs, setMyOrgs] = useState<Array<{ id: number; name: string; status: string; member_role: string; balance?: number }>>([]);
 
   useEffect(() => {
     if (!hasFeature('volunteering')) return;
@@ -184,7 +183,6 @@ export function VolunteeringPage() {
             // respondWithData wraps in { data: { items: [...] } } or may return array directly
             const raw = res.data as { data?: { items?: unknown[] }; items?: unknown[] };
             const items = (raw.data?.items ?? raw.items ?? (Array.isArray(res.data) ? res.data : [])) as Array<{ id: number; name: string; status: string; member_role: string; balance?: number }>;
-            setMyOrgs(items);
             setHasApprovedOrg(
               items.some((org) => org.status === 'approved' && ['owner', 'admin'].includes(org.member_role)),
             );
