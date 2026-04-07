@@ -13,6 +13,7 @@ use App\Services\LinkPreviewService;
 use App\Services\MentionService;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Schema;
 use App\Core\TenantContext;
 
 /**
@@ -374,15 +375,20 @@ class FeedService
             }
         }
         if (!empty($postIds)) {
+            $selectCols = ['id', 'share_count'];
+            $hasViewsCount = Schema::hasColumn('feed_posts', 'views_count');
+            if ($hasViewsCount) {
+                $selectCols[] = 'views_count';
+            }
             $postMeta = DB::table('feed_posts')
                 ->whereIn('id', $postIds)
                 ->where('tenant_id', $tenantId)
-                ->select('id', 'views_count', 'share_count')
+                ->select($selectCols)
                 ->get()
                 ->keyBy('id');
             foreach ($items as &$item) {
                 if ($item['type'] === 'post' && isset($postMeta[$item['id']])) {
-                    $item['views_count'] = (int) $postMeta[$item['id']]->views_count;
+                    $item['views_count'] = $hasViewsCount ? (int) $postMeta[$item['id']]->views_count : 0;
                     $item['share_count'] = (int) $postMeta[$item['id']]->share_count;
                 }
             }
