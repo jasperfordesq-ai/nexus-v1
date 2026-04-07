@@ -18,12 +18,9 @@ import {
   PopoverTrigger,
   PopoverContent,
   Avatar,
-  AvatarGroup,
   Button,
   Chip,
   Skeleton,
-  Card,
-  CardBody,
 } from '@heroui/react';
 import { UserPlus, UserCheck, MessageCircle } from 'lucide-react';
 import { useTranslation } from 'react-i18next';

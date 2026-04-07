@@ -17,7 +17,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Button, Avatar, Tabs, Tab, Chip, Skeleton, Modal, ModalContent, ModalHeader, Dropdown, DropdownTrigger, DropdownMenu, DropdownItem } from '@heroui/react';
+import { Button, Avatar, Tabs, Tab, Chip, Skeleton, Dropdown, DropdownTrigger, DropdownMenu, DropdownItem } from '@heroui/react';
 import {
   User,
   MapPin,
