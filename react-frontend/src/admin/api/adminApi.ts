@@ -1233,6 +1233,12 @@ export const adminVolunteering = {
   updateExpensePolicies: (data: Record<string, unknown>) =>
     api.put('/v2/admin/volunteering/expenses/policies', data),
 
+  getTrends: (period: string = 'week') =>
+    api.get(`/v2/admin/volunteering/trends?period=${period}`),
+
+  getActivityFeed: (limit: number = 20, days: number = 30) =>
+    api.get(`/v2/admin/volunteering/activity-feed?limit=${limit}&days=${days}`),
+
   // Training
   getTraining: () => api.get('/v2/admin/volunteering/training'),
   verifyTraining: (id: number) => api.put(`/v2/admin/volunteering/training/${id}/verify`, {}),
@@ -1283,6 +1289,28 @@ export const adminVolunteering = {
   deleteWebhook: (id: number) => api.delete(`/v2/admin/volunteering/webhooks/${id}`),
   testWebhook: (id: number) => api.post(`/v2/admin/volunteering/webhooks/${id}/test`, {}),
   getWebhookLogs: (id: number) => api.get(`/v2/admin/volunteering/webhooks/${id}/logs`),
+
+  // Giving Day Donors & Trends
+  getGivingDayDonors: (givingDayId: number, cursor?: string) =>
+    api.get(`/v2/admin/volunteering/giving-days/${givingDayId}/donors?per_page=20${cursor ? `&cursor=${cursor}` : ''}`),
+
+  getGivingDayTrends: (givingDayId: number, granularity: string = 'day') =>
+    api.get(`/v2/admin/volunteering/giving-days/${givingDayId}/trends?granularity=${granularity}`),
+
+  // Custom Fields reorder
+  reorderCustomFields: (fieldIds: number[]) =>
+    api.post('/v2/admin/volunteering/custom-fields/reorder', { field_ids: fieldIds }),
+
+  // Reminder delivery logs
+  getReminderLogs: (params?: { type?: string; channel?: string; per_page?: number; cursor?: string }) => {
+    const search = new URLSearchParams();
+    if (params?.type) search.set('type', params.type);
+    if (params?.channel) search.set('channel', params.channel);
+    if (params?.per_page) search.set('per_page', String(params.per_page));
+    if (params?.cursor) search.set('cursor', params.cursor);
+    const qs = search.toString();
+    return api.get(`/v2/admin/volunteering/reminder-logs${qs ? `?${qs}` : ''}`);
+  },
 };
 
 // ─────────────────────────────────────────────────────────────────────────────

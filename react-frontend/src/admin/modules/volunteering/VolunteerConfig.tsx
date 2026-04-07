@@ -537,10 +537,31 @@ function CustomFieldsTab() {
 
       {orderChanged && (
         <Card className="mb-4 border-primary/50 bg-primary-50/30">
-          <CardBody className="p-3">
+          <CardBody className="p-3 flex items-center justify-between">
             <p className="text-sm text-primary-700">
-              {t('volunteering.order_changed_note', 'Field order has been changed. Order changes will be saved on the next field edit.')}
+              {t('volunteering.order_changed_note', 'Field order has been changed. Save to persist the new order.')}
             </p>
+            <Button
+              size="sm"
+              color="primary"
+              startContent={<Save size={14} />}
+              isLoading={saving}
+              onPress={async () => {
+                setSaving(true);
+                try {
+                  const fieldIds = sortedFields.map((f) => f.id);
+                  await adminVolunteering.reorderCustomFields(fieldIds);
+                  toast.success(t('volunteering.order_saved', 'Field order saved'));
+                  setOrderChanged(false);
+                  loadData();
+                } catch {
+                  toast.error(t('volunteering.order_save_failed', 'Failed to save field order'));
+                }
+                setSaving(false);
+              }}
+            >
+              {t('volunteering.save_order', 'Save Order')}
+            </Button>
           </CardBody>
         </Card>
       )}
@@ -662,6 +683,26 @@ function RemindersTab() {
   const { isOpen: isTestOpen, onOpen: onTestOpen, onClose: onTestClose } = useDisclosure();
   const [testReminderLabel, setTestReminderLabel] = useState('');
 
+  // Delivery log state
+  interface DeliveryLog {
+    id: number;
+    user_name: string;
+    user_avatar: string | null;
+    reminder_type: string;
+    channel: string;
+    sent_at: string;
+  }
+  interface DeliveryStats {
+    total_sent: number;
+    by_channel: Record<string, number>;
+    by_type: Record<string, number>;
+  }
+  const [deliveryLogs, setDeliveryLogs] = useState<DeliveryLog[]>([]);
+  const [deliveryStats, setDeliveryStats] = useState<DeliveryStats | null>(null);
+  const [deliveryLoading, setDeliveryLoading] = useState(false);
+  const [deliveryFilterType, setDeliveryFilterType] = useState('');
+  const [deliveryFilterChannel, setDeliveryFilterChannel] = useState('');
+
   const loadData = useCallback(async () => {
     setLoading(true);
     try {
@@ -684,7 +725,27 @@ function RemindersTab() {
     setLoading(false);
   }, []);
 
+  const loadDeliveryLogs = useCallback(async (type?: string, channel?: string) => {
+    setDeliveryLoading(true);
+    try {
+      const res = await adminVolunteering.getReminderLogs({
+        type: type || undefined,
+        channel: channel || undefined,
+        per_page: 10,
+      });
+      if (res.success && res.data) {
+        const payload = res.data as unknown as { data?: DeliveryLog[]; stats?: DeliveryStats };
+        setDeliveryLogs(payload.data || []);
+        if (payload.stats) setDeliveryStats(payload.stats);
+      }
+    } catch {
+      setDeliveryLogs([]);
+    }
+    setDeliveryLoading(false);
+  }, []);
+
   useEffect(() => { loadData(); }, [loadData]);
+  useEffect(() => { loadDeliveryLogs(); }, [loadDeliveryLogs]);
 
   const updateReminder = (index: number, updates: Partial<ReminderSetting>) => {
     setReminders((prev) => prev.map((r, i) => (i === index ? { ...r, ...updates } : r)));
@@ -814,23 +875,114 @@ function RemindersTab() {
         ))}
       </div>
 
-      {/* Recent Deliveries Placeholder */}
+      {/* Recent Deliveries */}
       <div className="mt-8">
         <h4 className="text-md font-semibold mb-3 flex items-center gap-2">
           <Clock size={16} />
           {t('volunteering.recent_deliveries', 'Recent Deliveries')}
         </h4>
-        <Card className="bg-default-50">
-          <CardBody className="p-6 text-center">
-            <Clock size={32} className="mx-auto mb-3 text-default-300" />
-            <p className="text-default-500 text-sm">
-              {t(
-                'volunteering.delivery_logs_placeholder',
-                'Delivery logs coming soon. Check the notification queue in the main admin panel for current delivery status.',
-              )}
-            </p>
-          </CardBody>
-        </Card>
+
+        {/* Stats summary */}
+        {deliveryStats && (
+          <div className="flex flex-wrap gap-2 mb-3">
+            {Object.entries(deliveryStats.by_channel).map(([ch, count]) => (
+              <Chip key={ch} size="sm" variant="flat" color={ch === 'email' ? 'primary' : ch === 'push' ? 'secondary' : 'warning'}>
+                {count} {ch}
+              </Chip>
+            ))}
+            <Chip size="sm" variant="flat" color="default">
+              {deliveryStats.total_sent} {t('volunteering.total_sent', 'total sent')}
+            </Chip>
+          </div>
+        )}
+
+        {/* Filters */}
+        <div className="flex gap-2 mb-3">
+          <Select
+            label={t('volunteering.filter_type', 'Type')}
+            size="sm"
+            variant="bordered"
+            className="w-44"
+            selectedKeys={deliveryFilterType ? [deliveryFilterType] : []}
+            onSelectionChange={(keys) => {
+              const val = Array.from(keys)[0] as string || '';
+              setDeliveryFilterType(val);
+              loadDeliveryLogs(val, deliveryFilterChannel);
+            }}
+          >
+            <SelectItem key="">All</SelectItem>
+            <SelectItem key="pre_shift">Pre-shift</SelectItem>
+            <SelectItem key="post_shift_feedback">Post-shift Feedback</SelectItem>
+            <SelectItem key="lapsed_volunteer">Lapsed Volunteer</SelectItem>
+            <SelectItem key="credential_expiry">Credential Expiry</SelectItem>
+            <SelectItem key="training_expiry">Training Expiry</SelectItem>
+          </Select>
+          <Select
+            label={t('volunteering.filter_channel', 'Channel')}
+            size="sm"
+            variant="bordered"
+            className="w-36"
+            selectedKeys={deliveryFilterChannel ? [deliveryFilterChannel] : []}
+            onSelectionChange={(keys) => {
+              const val = Array.from(keys)[0] as string || '';
+              setDeliveryFilterChannel(val);
+              loadDeliveryLogs(deliveryFilterType, val);
+            }}
+          >
+            <SelectItem key="">All</SelectItem>
+            <SelectItem key="email">Email</SelectItem>
+            <SelectItem key="push">Push</SelectItem>
+            <SelectItem key="sms">SMS</SelectItem>
+          </Select>
+        </div>
+
+        {/* Log list */}
+        {deliveryLoading ? (
+          <Card className="bg-default-50">
+            <CardBody className="p-6 flex justify-center">
+              <div className="flex items-center gap-2 text-default-400">
+                <RefreshCw size={16} className="animate-spin" />
+                <span className="text-sm">{t('common.loading', 'Loading...')}</span>
+              </div>
+            </CardBody>
+          </Card>
+        ) : deliveryLogs.length === 0 ? (
+          <Card className="bg-default-50">
+            <CardBody className="p-6 text-center">
+              <Clock size={32} className="mx-auto mb-3 text-default-300" />
+              <p className="text-default-500 text-sm">
+                {t('volunteering.no_delivery_logs', 'No delivery logs found.')}
+              </p>
+            </CardBody>
+          </Card>
+        ) : (
+          <div className="flex flex-col gap-1">
+            {deliveryLogs.map((log) => (
+              <Card key={log.id} className="p-0">
+                <CardBody className="p-3">
+                  <div className="flex items-center gap-3">
+                    <div className="flex-1 min-w-0">
+                      <span className="text-sm font-medium">{log.user_name}</span>
+                    </div>
+                    <Chip size="sm" variant="flat" color="primary">
+                      {log.reminder_type.replace(/_/g, ' ')}
+                    </Chip>
+                    <Chip
+                      size="sm"
+                      variant="flat"
+                      color={log.channel === 'email' ? 'default' : log.channel === 'push' ? 'secondary' : 'warning'}
+                    >
+                      {log.channel}
+                    </Chip>
+                    <span className="text-xs text-default-400 whitespace-nowrap">
+                      {log.sent_at ? new Date(log.sent_at).toLocaleString() : ''}
+                    </span>
+                  </div>
+                </CardBody>
+              </Card>
+            ))}
+          </div>
+        )}
       </div>
 
       {/* Test Send Confirmation Modal */}

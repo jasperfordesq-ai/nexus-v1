@@ -23,6 +23,10 @@ import {
   Input,
   Textarea,
   Progress,
+  Spinner,
+  Avatar,
+  Tab,
+  Tabs,
   useDisclosure,
 } from '@heroui/react';
 import {
@@ -36,10 +40,14 @@ import {
   Calendar,
   Users,
   BarChart3,
+  EyeOff,
+  TrendingUp,
 } from 'lucide-react';
 import {
   BarChart,
   Bar,
+  AreaChart,
+  Area,
   XAxis,
   YAxis,
   CartesianGrid,
@@ -69,6 +77,30 @@ interface DonationStats {
   total_amount: number;
 }
 
+interface Donor {
+  id: number;
+  user_id: number;
+  name: string;
+  email: string;
+  avatar_url: string | null;
+  amount: number;
+  is_anonymous: boolean;
+  donated_at: string;
+}
+
+interface DonorResponse {
+  data: Donor[];
+  stats: { total_donors: number; anonymous_count: number; total_raised: number };
+  meta: { has_more: boolean; cursor: string | null };
+}
+
+interface TrendPoint {
+  period: string;
+  donors: number;
+  amount: number;
+  cumulative: number;
+}
+
 const emptyForm = {
   name: '',
   description: '',
@@ -90,6 +122,13 @@ export default function VolunteerGivingDays() {
   const [editingId, setEditingId] = useState<number | null>(null);
   const [form, setForm] = useState(emptyForm);
   const [selectedDayId, setSelectedDayId] = useState<number | null>(null);
+  const [donors, setDonors] = useState<Donor[]>([]);
+  const [donorStats, setDonorStats] = useState<DonorResponse['stats']>({ total_donors: 0, anonymous_count: 0, total_raised: 0 });
+  const [donorCursor, setDonorCursor] = useState<string | null>(null);
+  const [donorHasMore, setDonorHasMore] = useState(false);
+  const [donorsLoading, setDonorsLoading] = useState(false);
+  const [trends, setTrends] = useState<TrendPoint[]>([]);
+  const [trendsLoading, setTrendsLoading] = useState(false);
 
   const { isOpen, onOpen, onClose } = useDisclosure();
   const { isOpen: isDonorOpen, onOpen: onDonorOpen, onClose: onDonorClose } = useDisclosure();
@@ -214,8 +253,52 @@ export default function VolunteerGivingDays() {
     return 'danger';
   };
 
+  const loadDonors = useCallback(async (givingDayId: number, cursor?: string) => {
+    setDonorsLoading(true);
+    try {
+      const res = await adminVolunteering.getGivingDayDonors(givingDayId, cursor);
+      if (res.success && res.data) {
+        const payload = res.data as unknown as DonorResponse;
+        const newDonors = payload.data || [];
+        if (cursor) {
+          setDonors((prev) => [...prev, ...newDonors]);
+        } else {
+          setDonors(newDonors);
+        }
+        if (payload.stats) setDonorStats(payload.stats);
+        setDonorCursor(payload.meta?.cursor || null);
+        setDonorHasMore(payload.meta?.has_more || false);
+      }
+    } catch {
+      toast.error(t('volunteering.failed_to_load_donors', 'Failed to load donors'));
+    }
+    setDonorsLoading(false);
+  }, [toast, t]);
+
+  const loadTrends = useCallback(async (givingDayId: number) => {
+    setTrendsLoading(true);
+    try {
+      const res = await adminVolunteering.getGivingDayTrends(givingDayId);
+      if (res.success && res.data) {
+        const payload = res.data as unknown as { data?: { trends?: TrendPoint[] }; trends?: TrendPoint[] };
+        const trendData = payload.data?.trends || payload.trends || [];
+        setTrends(trendData);
+      }
+    } catch {
+      // Silently fail — trends are supplementary
+      setTrends([]);
+    }
+    setTrendsLoading(false);
+  }, []);
+
   const handleRowClick = (day: GivingDay) => {
     setSelectedDayId(day.id);
+    setDonors([]);
+    setTrends([]);
+    setDonorCursor(null);
+    setDonorHasMore(false);
+    loadDonors(day.id);
+    loadTrends(day.id);
     onDonorOpen();
   };
 
@@ -405,21 +488,153 @@ export default function VolunteerGivingDays() {
       </div>
 
       {/* Donor List Modal */}
-      <Modal isOpen={isDonorOpen} onClose={onDonorClose} size="lg">
+      <Modal isOpen={isDonorOpen} onClose={onDonorClose} size="2xl" scrollBehavior="inside">
         <ModalContent>
           <ModalHeader>
             {t('volunteering.donors_for', 'Donors for')}: {selectedDay?.name || ''}
           </ModalHeader>
           <ModalBody>
-            <div className="py-4 text-center">
-              <Users size={40} className="mx-auto mb-3 text-default-300" />
-              <p className="text-default-500">
-                {t(
-                  'volunteering.donor_list_placeholder',
-                  'Donor list available when donations are linked to giving days. This feature will show individual donor names, amounts, and dates once the donation records include a giving_day_id reference.',
-                )}
-              </p>
+            {/* Stats summary */}
+            <div className="grid grid-cols-3 gap-3 mb-4">
+              <Card className="bg-primary-50/30">
+                <CardBody className="p-3 text-center">
+                  <p className="text-xs text-default-500">{t('volunteering.total_donors', 'Total Donors')}</p>
+                  <p className="text-lg font-bold text-primary">{donorStats.total_donors}</p>
+                </CardBody>
+              </Card>
+              <Card className="bg-success-50/30">
+                <CardBody className="p-3 text-center">
+                  <p className="text-xs text-default-500">{t('volunteering.total_raised', 'Total Raised')}</p>
+                  <p className="text-lg font-bold text-success">{donorStats.total_raised.toLocaleString()}</p>
+                </CardBody>
+              </Card>
+              <Card className="bg-default-50">
+                <CardBody className="p-3 text-center">
+                  <p className="text-xs text-default-500">{t('volunteering.anonymous_donors', 'Anonymous')}</p>
+                  <p className="text-lg font-bold text-default-600">{donorStats.anonymous_count}</p>
+                </CardBody>
+              </Card>
             </div>
+
+            <Tabs variant="underlined" classNames={{ tabList: 'mb-3' }}>
+              <Tab
+                key="donors"
+                title={
+                  <div className="flex items-center gap-2">
+                    <Users size={14} />
+                    {t('volunteering.donor_list', 'Donors')}
+                  </div>
+                }
+              >
+                {donorsLoading && donors.length === 0 ? (
+                  <div className="flex justify-center py-8">
+                    <Spinner size="lg" />
+                  </div>
+                ) : donors.length === 0 ? (
+                  <div className="py-6 text-center">
+                    <Users size={32} className="mx-auto mb-2 text-default-300" />
+                    <p className="text-default-500 text-sm">
+                      {t('volunteering.no_donors_yet', 'No donors yet for this giving day.')}
+                    </p>
+                  </div>
+                ) : (
+                  <div className="flex flex-col gap-2">
+                    {donors.map((donor) => (
+                      <div key={donor.id} className="flex items-center gap-3 p-3 rounded-lg bg-default-50 hover:bg-default-100 transition-colors">
+                        {donor.is_anonymous ? (
+                          <div className="w-9 h-9 rounded-full bg-default-200 flex items-center justify-center">
+                            <EyeOff size={16} className="text-default-400" />
+                          </div>
+                        ) : (
+                          <Avatar
+                            src={donor.avatar_url || undefined}
+                            name={donor.name}
+                            size="sm"
+                            className="flex-shrink-0"
+                          />
+                        )}
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-medium truncate">
+                            {donor.is_anonymous
+                              ? t('volunteering.anonymous_donor', 'Anonymous Donor')
+                              : donor.name}
+                          </p>
+                          {!donor.is_anonymous && donor.email && (
+                            <p className="text-xs text-default-400 truncate">{donor.email}</p>
+                          )}
+                        </div>
+                        <div className="text-right flex-shrink-0">
+                          <p className="text-sm font-semibold text-success">{donor.amount.toLocaleString()}</p>
+                          <p className="text-xs text-default-400">
+                            {donor.donated_at ? new Date(donor.donated_at).toLocaleDateString() : ''}
+                          </p>
+                        </div>
+                      </div>
+                    ))}
+                    {donorHasMore && (
+                      <Button
+                        variant="flat"
+                        size="sm"
+                        className="mt-2"
+                        isLoading={donorsLoading}
+                        onPress={() => selectedDayId && donorCursor && loadDonors(selectedDayId, donorCursor)}
+                      >
+                        {t('common.load_more', 'Load More')}
+                      </Button>
+                    )}
+                  </div>
+                )}
+              </Tab>
+              <Tab
+                key="trends"
+                title={
+                  <div className="flex items-center gap-2">
+                    <TrendingUp size={14} />
+                    {t('volunteering.donation_trends', 'Trends')}
+                  </div>
+                }
+              >
+                {trendsLoading ? (
+                  <div className="flex justify-center py-8">
+                    <Spinner size="lg" />
+                  </div>
+                ) : trends.length === 0 ? (
+                  <div className="py-6 text-center">
+                    <TrendingUp size={32} className="mx-auto mb-2 text-default-300" />
+                    <p className="text-default-500 text-sm">
+                      {t('volunteering.no_trend_data', 'No trend data available yet.')}
+                    </p>
+                  </div>
+                ) : (
+                  <div className="h-64">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <AreaChart data={trends} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
+                        <CartesianGrid strokeDasharray="3 3" className="opacity-30" />
+                        <XAxis dataKey="period" fontSize={11} />
+                        <YAxis fontSize={11} />
+                        <Tooltip />
+                        <Area
+                          type="monotone"
+                          dataKey="cumulative"
+                          name={t('volunteering.cumulative_amount', 'Cumulative Amount')}
+                          stroke="hsl(var(--heroui-success))"
+                          fill="hsl(var(--heroui-success))"
+                          fillOpacity={0.2}
+                        />
+                        <Area
+                          type="monotone"
+                          dataKey="amount"
+                          name={t('volunteering.daily_amount', 'Daily Amount')}
+                          stroke="hsl(var(--heroui-primary))"
+                          fill="hsl(var(--heroui-primary))"
+                          fillOpacity={0.1}
+                        />
+                      </AreaChart>
+                    </ResponsiveContainer>
+                  </div>
+                )}
+              </Tab>
+            </Tabs>
           </ModalBody>
           <ModalFooter>
             <Button variant="flat" onPress={onDonorClose}>{t('common.close', 'Close')}</Button>

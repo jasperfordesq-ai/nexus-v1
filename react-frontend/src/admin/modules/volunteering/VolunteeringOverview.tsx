@@ -5,15 +5,17 @@
 
 /**
  * Volunteering Overview
- * Admin dashboard for volunteering module with stats and recent opportunities.
+ * Admin dashboard for volunteering module with stats, trends chart,
+ * quick actions, and real-time activity feed.
  */
 
 import { useState, useCallback, useEffect } from 'react';
-import { Card, CardBody, CardHeader, Button, Chip } from '@heroui/react';
+import { Card, CardBody, CardHeader, Button, Chip, Avatar, ButtonGroup, Skeleton } from '@heroui/react';
 import {
   Heart, Users, Clock, Briefcase, RefreshCw, AlertTriangle,
-  ClipboardCheck, Building2, DollarSign, ChevronRight, Circle,
+  ClipboardCheck, Building2, DollarSign, ChevronRight, Activity,
 } from 'lucide-react';
+import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { useNavigate } from 'react-router-dom';
 import { usePageTitle } from '@/hooks';
 import { useToast } from '@/contexts';
@@ -21,6 +23,7 @@ import { adminVolunteering } from '../../api/adminApi';
 import { PageHeader, StatCard } from '../../components';
 
 import { useTranslation } from 'react-i18next';
+
 interface VolStats {
   total_opportunities: number;
   active_opportunities: number;
@@ -39,12 +42,71 @@ interface Opportunity {
   created_at: string;
 }
 
+interface TrendPeriod {
+  period: string;
+  hours: number;
+  count: number;
+}
+
+interface AppPeriod {
+  period: string;
+  count: number;
+  approved: number;
+}
+
+interface VolPeriod {
+  period: string;
+  count: number;
+}
+
+interface TrendsData {
+  hours_by_period: TrendPeriod[];
+  applications_by_period: AppPeriod[];
+  volunteers_by_period: VolPeriod[];
+}
+
+interface ActivityItem {
+  type: string;
+  timestamp: string;
+  user_name: string;
+  avatar_url: string;
+  description: string;
+  entity_type: string;
+  entity_id: number;
+}
+
 interface QuickAction {
   label: string;
   description: string;
   icon: typeof ClipboardCheck;
   path: string;
   color: 'primary' | 'warning' | 'secondary' | 'success';
+}
+
+const ACTIVITY_TYPE_COLORS: Record<string, 'success' | 'warning' | 'danger' | 'primary' | 'default'> = {
+  hours_logged: 'success',
+  application_pending: 'warning',
+  application_approved: 'success',
+  application_declined: 'danger',
+  donation: 'primary',
+};
+
+function formatActivityType(type: string): string {
+  return type.replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase());
+}
+
+function formatTimestamp(ts: string): string {
+  const date = new Date(ts);
+  const now = new Date();
+  const diff = now.getTime() - date.getTime();
+  const mins = Math.floor(diff / 60000);
+  if (mins < 1) return 'Just now';
+  if (mins < 60) return `${mins}m ago`;
+  const hours = Math.floor(mins / 60);
+  if (hours < 24) return `${hours}h ago`;
+  const days = Math.floor(hours / 24);
+  if (days < 7) return `${days}d ago`;
+  return date.toLocaleDateString();
 }
 
 export function VolunteeringOverview() {
@@ -55,6 +117,15 @@ export function VolunteeringOverview() {
   const [stats, setStats] = useState<VolStats | null>(null);
   const [opportunities, setOpportunities] = useState<Opportunity[]>([]);
   const [loading, setLoading] = useState(true);
+
+  // Trends state
+  const [trends, setTrends] = useState<TrendsData | null>(null);
+  const [trendPeriod, setTrendPeriod] = useState<'week' | 'month'>('week');
+  const [trendsLoading, setTrendsLoading] = useState(true);
+
+  // Activity feed state
+  const [activities, setActivities] = useState<ActivityItem[]>([]);
+  const [activitiesLoading, setActivitiesLoading] = useState(true);
 
   const loadData = useCallback(async () => {
     setLoading(true);
@@ -79,7 +150,57 @@ export function VolunteeringOverview() {
     setLoading(false);
   }, [toast, t]);
 
+  const loadTrends = useCallback(async (period: string) => {
+    setTrendsLoading(true);
+    try {
+      const res = await adminVolunteering.getTrends(period);
+      if (res.success && res.data) {
+        const payload = res.data as unknown;
+        let d: TrendsData;
+        if (payload && typeof payload === 'object' && 'data' in payload) {
+          d = (payload as { data: TrendsData }).data;
+        } else {
+          d = payload as TrendsData;
+        }
+        setTrends(d);
+      }
+    } catch {
+      setTrends(null);
+    }
+    setTrendsLoading(false);
+  }, []);
+
+  const loadActivityFeed = useCallback(async () => {
+    setActivitiesLoading(true);
+    try {
+      const res = await adminVolunteering.getActivityFeed(20, 30);
+      if (res.success && res.data) {
+        const payload = res.data as unknown;
+        let d: { activities: ActivityItem[] };
+        if (payload && typeof payload === 'object' && 'data' in payload) {
+          d = (payload as { data: typeof d }).data;
+        } else {
+          d = payload as typeof d;
+        }
+        setActivities(d.activities || []);
+      }
+    } catch {
+      setActivities([]);
+    }
+    setActivitiesLoading(false);
+  }, []);
+
   useEffect(() => { loadData(); }, [loadData]);
+  useEffect(() => { loadTrends(trendPeriod); }, [loadTrends, trendPeriod]);
+  useEffect(() => { loadActivityFeed(); }, [loadActivityFeed]);
+
+  // Merge trend data for the chart
+  const chartData = trends ? trends.hours_by_period.map((h, i) => ({
+    period: h.period,
+    hours: h.hours,
+    applications: trends.applications_by_period[i]?.count ?? 0,
+    volunteers: trends.volunteers_by_period[i]?.count ?? 0,
+  })) : [];
 
   const quickActions: QuickAction[] = [
     { label: t('volunteering.review_applications', 'Review Applications'), description: t('volunteering.review_applications_desc', 'Review pending volunteer applications'), icon: ClipboardCheck, path: '/admin/volunteering/approvals', color: 'warning' },
@@ -94,12 +215,18 @@ export function VolunteeringOverview() {
     alerts.push({ message: t('volunteering.alert_pending_applications', '{{count}} applications pending review', { count: stats.pending_applications }), path: '/admin/volunteering/approvals' });
   }
 
+  const handleRefresh = () => {
+    loadData();
+    loadTrends(trendPeriod);
+    loadActivityFeed();
+  };
+
   return (
     <div>
       <PageHeader
         title={t('volunteering.volunteering_overview_title')}
         description={t('volunteering.volunteering_overview_desc')}
-        actions={<Button variant="flat" startContent={<RefreshCw size={16} />} onPress={loadData} isLoading={loading}>{t('common.refresh')}</Button>}
+        actions={<Button variant="flat" startContent={<RefreshCw size={16} />} onPress={handleRefresh} isLoading={loading}>{t('common.refresh')}</Button>}
       />
 
       {/* Alert Banners */}
@@ -133,6 +260,93 @@ export function VolunteeringOverview() {
         <StatCard label={t('volunteering.label_total_applications')} value={stats?.total_applications ?? 0} icon={Users} color="primary" loading={loading} />
         <StatCard label={t('volunteering.label_active_volunteers')} value={stats?.active_volunteers ?? 0} icon={Users} color="success" loading={loading} />
       </div>
+
+      {/* Trends Chart */}
+      <Card shadow="sm" className="mb-6">
+        <CardHeader className="flex flex-row items-center justify-between">
+          <h3 className="text-lg font-semibold">{t('volunteering.trends_title', 'Trends (Last 12 Weeks)')}</h3>
+          <ButtonGroup size="sm" variant="flat">
+            <Button
+              color={trendPeriod === 'week' ? 'primary' : 'default'}
+              onPress={() => setTrendPeriod('week')}
+            >
+              {t('volunteering.weekly', 'Weekly')}
+            </Button>
+            <Button
+              color={trendPeriod === 'month' ? 'primary' : 'default'}
+              onPress={() => setTrendPeriod('month')}
+            >
+              {t('volunteering.monthly', 'Monthly')}
+            </Button>
+          </ButtonGroup>
+        </CardHeader>
+        <CardBody>
+          {trendsLoading ? (
+            <div className="flex flex-col gap-2">
+              <Skeleton className="h-[300px] w-full rounded-lg" />
+            </div>
+          ) : chartData.length === 0 ? (
+            <div className="flex flex-col items-center py-8 text-default-400">
+              <Activity size={40} className="mb-2" />
+              <p>{t('volunteering.no_trend_data', 'No trend data available')}</p>
+            </div>
+          ) : (
+            <ResponsiveContainer width="100%" height={300}>
+              <AreaChart data={chartData} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
+                <defs>
+                  <linearGradient id="gradHours" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor="#22c55e" stopOpacity={0.3} />
+                    <stop offset="95%" stopColor="#22c55e" stopOpacity={0} />
+                  </linearGradient>
+                  <linearGradient id="gradApplications" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.3} />
+                    <stop offset="95%" stopColor="#3b82f6" stopOpacity={0} />
+                  </linearGradient>
+                  <linearGradient id="gradVolunteers" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor="#a855f7" stopOpacity={0.3} />
+                    <stop offset="95%" stopColor="#a855f7" stopOpacity={0} />
+                  </linearGradient>
+                </defs>
+                <CartesianGrid strokeDasharray="3 3" stroke="var(--color-default-200, #e5e7eb)" />
+                <XAxis dataKey="period" tick={{ fontSize: 12 }} stroke="var(--color-default-400, #9ca3af)" />
+                <YAxis tick={{ fontSize: 12 }} stroke="var(--color-default-400, #9ca3af)" />
+                <Tooltip
+                  contentStyle={{
+                    backgroundColor: 'var(--color-surface, #fff)',
+                    border: '1px solid var(--color-default-200, #e5e7eb)',
+                    borderRadius: '8px',
+                    fontSize: '13px',
+                  }}
+                />
+                <Area
+                  type="monotone"
+                  dataKey="hours"
+                  name={t('volunteering.chart_hours', 'Hours')}
+                  stroke="#22c55e"
+                  fill="url(#gradHours)"
+                  strokeWidth={2}
+                />
+                <Area
+                  type="monotone"
+                  dataKey="applications"
+                  name={t('volunteering.chart_applications', 'Applications')}
+                  stroke="#3b82f6"
+                  fill="url(#gradApplications)"
+                  strokeWidth={2}
+                />
+                <Area
+                  type="monotone"
+                  dataKey="volunteers"
+                  name={t('volunteering.chart_volunteers', 'Volunteers')}
+                  stroke="#a855f7"
+                  fill="url(#gradVolunteers)"
+                  strokeWidth={2}
+                />
+              </AreaChart>
+            </ResponsiveContainer>
+          )}
+        </CardBody>
+      </Card>
 
       {/* Quick Action Cards */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4 mb-6">
@@ -183,51 +397,52 @@ export function VolunteeringOverview() {
         </CardBody>
       </Card>
 
-      {/* Recent Activity Timeline */}
+      {/* Activity Feed */}
       <Card shadow="sm">
-        <CardHeader><h3 className="text-lg font-semibold">{t('volunteering.recent_activity', 'Recent Activity')}</h3></CardHeader>
+        <CardHeader><h3 className="text-lg font-semibold">{t('volunteering.activity_feed', 'Activity Feed')}</h3></CardHeader>
         <CardBody>
-          {opportunities.length === 0 ? (
+          {activitiesLoading ? (
+            <div className="space-y-4">
+              {[...Array(5)].map((_, i) => (
+                <div key={i} className="flex items-start gap-3">
+                  <Skeleton className="h-10 w-10 rounded-full shrink-0" />
+                  <div className="flex-1 space-y-2">
+                    <Skeleton className="h-4 w-3/4 rounded-lg" />
+                    <Skeleton className="h-3 w-1/2 rounded-lg" />
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : activities.length === 0 ? (
             <div className="flex flex-col items-center py-8 text-default-400">
               <Clock size={40} className="mb-2" />
               <p>{t('volunteering.no_recent_activity', 'No recent activity')}</p>
             </div>
           ) : (
-            <div className="relative pl-6">
-              {/* Vertical timeline line */}
-              <div className="absolute left-[9px] top-2 bottom-2 w-px bg-default-200" />
-              <div className="space-y-4">
-                {opportunities.slice(0, 10).map((opp, idx) => {
-                  const date = opp.created_at ? new Date(opp.created_at) : null;
-                  return (
-                    <div key={opp.id} className="relative flex items-start gap-3">
-                      {/* Timeline dot */}
-                      <div className="absolute -left-6 top-1">
-                        <Circle
-                          size={12}
-                          className={idx === 0 ? 'text-primary fill-primary' : 'text-default-300 fill-default-300'}
-                        />
+            <div className="space-y-4">
+              {activities.map((item, idx) => {
+                const typeColor = ACTIVITY_TYPE_COLORS[item.type] ?? 'default';
+                return (
+                  <div key={`${item.type}-${item.entity_id}-${idx}`} className="flex items-start gap-3">
+                    <Avatar
+                      src={item.avatar_url || undefined}
+                      name={item.user_name}
+                      size="sm"
+                      className="shrink-0"
+                    />
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <span className="text-sm font-medium">{item.user_name}</span>
+                        <Chip size="sm" variant="flat" color={typeColor} className="capitalize">
+                          {formatActivityType(item.type)}
+                        </Chip>
                       </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="text-sm font-medium">
-                          {opp.title}
-                        </p>
-                        <p className="text-xs text-default-400">
-                          {t('volunteering.created_by', 'Created by {{name}}', { name: `${opp.first_name} ${opp.last_name}` })}
-                          {date && (
-                            <span className="ml-2">
-                              {date.toLocaleDateString()} {date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                            </span>
-                          )}
-                        </p>
-                      </div>
-                      <Chip size="sm" variant="flat" color={['active', 'open'].includes(opp.status) ? 'success' : 'default'} className="capitalize shrink-0">
-                        {opp.status}
-                      </Chip>
+                      <p className="text-sm text-default-500 mt-0.5">{item.description}</p>
+                      <p className="text-xs text-default-400 mt-1">{formatTimestamp(item.timestamp)}</p>
                     </div>
-                  );
-                })}
-              </div>
+                  </div>
+                );
+              })}
             </div>
           )}
         </CardBody>

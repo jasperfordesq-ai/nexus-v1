@@ -1318,6 +1318,13 @@ Route::get('/v2/admin/volunteering/organizations/{id}/wallet/transactions', [\Ap
 Route::put('/v2/admin/volunteering/organizations/{id}/status', [\App\Http\Controllers\Api\AdminVolunteerController::class, 'updateOrgStatus']);
 Route::get('/v2/admin/volunteering/hours', [\App\Http\Controllers\Api\AdminVolunteerController::class, 'listHours']);
 Route::post('/v2/admin/volunteering/hours/{id}/verify', [\App\Http\Controllers\Api\AdminVolunteerController::class, 'verifyHours']);
+// Analytics, activity feed, reorder, donors, trends
+Route::get('/v2/admin/volunteering/trends', [\App\Http\Controllers\Api\AdminVolunteerController::class, 'trends']);
+Route::get('/v2/admin/volunteering/reminder-logs', [\App\Http\Controllers\Api\AdminVolunteerController::class, 'reminderLogs']);
+Route::post('/v2/admin/volunteering/custom-fields/reorder', [\App\Http\Controllers\Api\AdminVolunteerController::class, 'reorderCustomFields']);
+Route::get('/v2/admin/volunteering/giving-days/{id}/donors', [\App\Http\Controllers\Api\AdminVolunteerController::class, 'givingDayDonors']);
+Route::get('/v2/admin/volunteering/giving-days/{id}/trends', [\App\Http\Controllers\Api\AdminVolunteerController::class, 'givingDayTrends']);
+Route::get('/v2/admin/volunteering/activity-feed', [\App\Http\Controllers\Api\AdminVolunteerController::class, 'activityFeed']);
 Route::get('/v2/admin/volunteering/custom-fields', [\App\Http\Controllers\Api\VolunteerCommunityController::class, 'adminCustomFields']);
 Route::post('/v2/admin/volunteering/custom-fields', [\App\Http\Controllers\Api\VolunteerCommunityController::class, 'createCustomField']);
 Route::put('/v2/admin/volunteering/custom-fields/{id}', [\App\Http\Controllers\Api\VolunteerCommunityController::class, 'updateCustomField']);

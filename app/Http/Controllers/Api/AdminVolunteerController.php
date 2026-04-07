@@ -722,4 +722,334 @@ class AdminVolunteerController extends BaseApiController
         $result = \App\Services\VolOrgWalletService::getTransactions($id, $filters);
         return $this->respondWithCollection($result['items'], $result['cursor'], $filters['limit'], $result['has_more']);
     }
+
+    // ========================================
+    // TRENDS & ANALYTICS
+    // ========================================
+
+    /** GET /api/v2/admin/volunteering/trends */
+    public function trends(): JsonResponse
+    {
+        $this->requireAdmin();
+        $tenantId = TenantContext::getId();
+        $period = $this->query('period', 'week');
+        $format = $period === 'month' ? '%Y-%m' : '%Y-%u';
+        $labelFormat = $period === 'month' ? '%Y-%m' : '%Y-W%u';
+        $days = $period === 'month' ? 365 : 90;
+
+        try {
+            $hoursByPeriod = DB::select("
+                SELECT DATE_FORMAT(created_at, ?) as period_key,
+                       DATE_FORMAT(created_at, ?) as period_label,
+                       ROUND(COALESCE(SUM(hours), 0), 1) as hours,
+                       COUNT(*) as count
+                FROM vol_logs
+                WHERE tenant_id = ? AND created_at >= DATE_SUB(NOW(), INTERVAL ? DAY)
+                GROUP BY period_key, period_label ORDER BY period_key ASC
+            ", [$format, $labelFormat, $tenantId, $days]);
+
+            $applicationsByPeriod = DB::select("
+                SELECT DATE_FORMAT(va.created_at, ?) as period_key,
+                       DATE_FORMAT(va.created_at, ?) as period_label,
+                       COUNT(*) as count,
+                       SUM(CASE WHEN va.status = 'approved' THEN 1 ELSE 0 END) as approved
+                FROM vol_applications va
+                JOIN vol_opportunities vo ON va.opportunity_id = vo.id
+                WHERE va.tenant_id = ? AND va.created_at >= DATE_SUB(NOW(), INTERVAL ? DAY)
+                GROUP BY period_key, period_label ORDER BY period_key ASC
+            ", [$format, $labelFormat, $tenantId, $days]);
+
+            $volunteersByPeriod = DB::select("
+                SELECT DATE_FORMAT(created_at, ?) as period_key,
+                       DATE_FORMAT(created_at, ?) as period_label,
+                       COUNT(DISTINCT user_id) as count
+                FROM vol_logs
+                WHERE tenant_id = ? AND created_at >= DATE_SUB(NOW(), INTERVAL ? DAY)
+                GROUP BY period_key, period_label ORDER BY period_key ASC
+            ", [$format, $labelFormat, $tenantId, $days]);
+
+            return $this->respondWithData([
+                'period' => $period,
+                'hours_by_period' => array_map(fn($r) => ['period' => $r->period_label, 'hours' => (float) $r->hours, 'count' => (int) $r->count], $hoursByPeriod),
+                'applications_by_period' => array_map(fn($r) => ['period' => $r->period_label, 'count' => (int) $r->count, 'approved' => (int) $r->approved], $applicationsByPeriod),
+                'volunteers_by_period' => array_map(fn($r) => ['period' => $r->period_label, 'count' => (int) $r->count], $volunteersByPeriod),
+            ]);
+        } catch (\Exception $e) {
+            Log::error("AdminVolunteerController::trends error: " . $e->getMessage());
+            return $this->respondWithData(['period' => $period, 'hours_by_period' => [], 'applications_by_period' => [], 'volunteers_by_period' => []]);
+        }
+    }
+
+    /** GET /api/v2/admin/volunteering/reminder-logs */
+    public function reminderLogs(): JsonResponse
+    {
+        $this->requireAdmin();
+        $tenantId = TenantContext::getId();
+        $perPage = $this->queryInt('per_page', 20, 1, 50);
+        $cursor = $this->query('cursor');
+        $type = $this->query('type');
+        $channel = $this->query('channel');
+
+        try {
+            // Stats
+            $stats = DB::selectOne("
+                SELECT COUNT(*) as total_sent,
+                       SUM(CASE WHEN channel = 'email' THEN 1 ELSE 0 END) as email_count,
+                       SUM(CASE WHEN channel = 'push' THEN 1 ELSE 0 END) as push_count,
+                       SUM(CASE WHEN channel = 'sms' THEN 1 ELSE 0 END) as sms_count
+                FROM vol_reminders_sent WHERE tenant_id = ?
+            ", [$tenantId]);
+
+            $typeStats = DB::select("
+                SELECT reminder_type, COUNT(*) as count
+                FROM vol_reminders_sent WHERE tenant_id = ?
+                GROUP BY reminder_type
+            ", [$tenantId]);
+
+            // Paginated logs
+            $sql = "SELECT vrs.*, u.name as user_name, u.avatar_url
+                    FROM vol_reminders_sent vrs
+                    LEFT JOIN users u ON vrs.user_id = u.id
+                    WHERE vrs.tenant_id = ?";
+            $params = [$tenantId];
+
+            if ($type) { $sql .= " AND vrs.reminder_type = ?"; $params[] = $type; }
+            if ($channel) { $sql .= " AND vrs.channel = ?"; $params[] = $channel; }
+            if ($cursor) {
+                $decoded = base64_decode($cursor, true);
+                if ($decoded && is_numeric($decoded)) { $sql .= " AND vrs.id < ?"; $params[] = (int) $decoded; }
+            }
+
+            $sql .= " ORDER BY vrs.sent_at DESC, vrs.id DESC LIMIT ?";
+            $params[] = $perPage + 1;
+
+            $rows = DB::select($sql, $params);
+            $hasMore = count($rows) > $perPage;
+            if ($hasMore) array_pop($rows);
+
+            $items = array_map(fn($r) => [
+                'id' => (int) $r->id,
+                'user_id' => (int) $r->user_id,
+                'user_name' => $r->user_name ?? 'Unknown',
+                'user_avatar' => $r->avatar_url,
+                'reminder_type' => $r->reminder_type,
+                'channel' => $r->channel,
+                'reference_id' => $r->reference_id ? (int) $r->reference_id : null,
+                'sent_at' => $r->sent_at,
+            ], $rows);
+
+            $lastItem = end($items);
+            $nextCursor = ($hasMore && $lastItem) ? base64_encode((string) $lastItem['id']) : null;
+
+            $byType = [];
+            foreach ($typeStats as $ts) { $byType[$ts->reminder_type] = (int) $ts->count; }
+
+            return response()->json([
+                'success' => true,
+                'data' => $items,
+                'stats' => [
+                    'total_sent' => (int) ($stats->total_sent ?? 0),
+                    'by_channel' => ['email' => (int) ($stats->email_count ?? 0), 'push' => (int) ($stats->push_count ?? 0), 'sms' => (int) ($stats->sms_count ?? 0)],
+                    'by_type' => $byType,
+                ],
+                'meta' => ['per_page' => $perPage, 'has_more' => $hasMore, 'cursor' => $nextCursor],
+            ]);
+        } catch (\Exception $e) {
+            Log::error("AdminVolunteerController::reminderLogs error: " . $e->getMessage());
+            return response()->json([
+                'success' => true, 'data' => [],
+                'stats' => ['total_sent' => 0, 'by_channel' => ['email' => 0, 'push' => 0, 'sms' => 0], 'by_type' => []],
+                'meta' => ['per_page' => $perPage, 'has_more' => false, 'cursor' => null],
+            ]);
+        }
+    }
+
+    /** POST /api/v2/admin/volunteering/custom-fields/reorder */
+    public function reorderCustomFields(): JsonResponse
+    {
+        $this->requireAdmin();
+        $tenantId = TenantContext::getId();
+        $fieldIds = $this->input('field_ids');
+
+        if (!is_array($fieldIds) || empty($fieldIds)) {
+            return $this->respondWithError('VALIDATION_ERROR', 'field_ids must be a non-empty array', 'field_ids', 400);
+        }
+
+        try {
+            $updated = 0;
+            foreach ($fieldIds as $order => $fieldId) {
+                $affected = DB::update(
+                    "UPDATE vol_custom_fields SET display_order = ? WHERE id = ? AND tenant_id = ?",
+                    [$order, (int) $fieldId, $tenantId]
+                );
+                $updated += $affected;
+            }
+            return $this->respondWithData(['success' => true, 'updated_count' => $updated]);
+        } catch (\Exception $e) {
+            Log::error("AdminVolunteerController::reorderCustomFields error: " . $e->getMessage());
+            return $this->respondWithError('SERVER_ERROR', 'Failed to reorder fields', null, 500);
+        }
+    }
+
+    /** GET /api/v2/admin/volunteering/giving-days/{id}/donors */
+    public function givingDayDonors(int $id): JsonResponse
+    {
+        $this->requireAdmin();
+        $tenantId = TenantContext::getId();
+        $perPage = $this->queryInt('per_page', 20, 1, 50);
+        $cursor = $this->query('cursor');
+
+        try {
+            // Stats
+            $stats = DB::selectOne("
+                SELECT COUNT(*) as total_donors,
+                       SUM(CASE WHEN is_anonymous = 1 THEN 1 ELSE 0 END) as anonymous_count,
+                       COALESCE(SUM(amount), 0) as total_raised
+                FROM vol_donations
+                WHERE giving_day_id = ? AND tenant_id = ? AND status = 'completed'
+            ", [$id, $tenantId]);
+
+            // Paginated donor list
+            $sql = "SELECT vd.id, vd.user_id, vd.amount, vd.is_anonymous, vd.created_at as donated_at,
+                           u.name as user_name, u.email as user_email, u.avatar_url
+                    FROM vol_donations vd
+                    LEFT JOIN users u ON vd.user_id = u.id
+                    WHERE vd.giving_day_id = ? AND vd.tenant_id = ? AND vd.status = 'completed'";
+            $params = [$id, $tenantId];
+
+            if ($cursor) {
+                $decoded = base64_decode($cursor, true);
+                if ($decoded && is_numeric($decoded)) { $sql .= " AND vd.id < ?"; $params[] = (int) $decoded; }
+            }
+
+            $sql .= " ORDER BY vd.created_at DESC, vd.id DESC LIMIT ?";
+            $params[] = $perPage + 1;
+
+            $rows = DB::select($sql, $params);
+            $hasMore = count($rows) > $perPage;
+            if ($hasMore) array_pop($rows);
+
+            $items = array_map(fn($r) => [
+                'id' => (int) $r->id,
+                'user_id' => $r->user_id ? (int) $r->user_id : null,
+                'name' => $r->is_anonymous ? 'Anonymous' : ($r->user_name ?? 'Guest'),
+                'email' => $r->is_anonymous ? null : $r->user_email,
+                'avatar_url' => $r->is_anonymous ? null : $r->avatar_url,
+                'amount' => (float) $r->amount,
+                'is_anonymous' => (bool) $r->is_anonymous,
+                'donated_at' => $r->donated_at,
+            ], $rows);
+
+            $lastItem = end($items);
+            $nextCursor = ($hasMore && $lastItem) ? base64_encode((string) $lastItem['id']) : null;
+
+            return response()->json([
+                'success' => true,
+                'data' => $items,
+                'stats' => [
+                    'total_donors' => (int) ($stats->total_donors ?? 0),
+                    'anonymous_count' => (int) ($stats->anonymous_count ?? 0),
+                    'total_raised' => (float) ($stats->total_raised ?? 0),
+                ],
+                'meta' => ['per_page' => $perPage, 'has_more' => $hasMore, 'cursor' => $nextCursor],
+            ]);
+        } catch (\Exception $e) {
+            Log::error("AdminVolunteerController::givingDayDonors error: " . $e->getMessage());
+            return response()->json([
+                'success' => true, 'data' => [],
+                'stats' => ['total_donors' => 0, 'anonymous_count' => 0, 'total_raised' => 0],
+                'meta' => ['per_page' => $perPage, 'has_more' => false, 'cursor' => null],
+            ]);
+        }
+    }
+
+    /** GET /api/v2/admin/volunteering/activity-feed */
+    public function activityFeed(): JsonResponse
+    {
+        $this->requireAdmin();
+        $tenantId = TenantContext::getId();
+        $limit = $this->queryInt('limit', 50, 1, 100);
+        $days = $this->queryInt('days', 30, 1, 365);
+
+        try {
+            // UNION of recent volunteering activities from multiple tables
+            $activities = DB::select("
+                (SELECT 'hours_logged' as type, vl.created_at as timestamp,
+                        u.name as user_name, u.avatar_url,
+                        CONCAT(u.name, ' logged ', vl.hours, 'h') as description,
+                        'vol_logs' as entity_type, vl.id as entity_id
+                 FROM vol_logs vl JOIN users u ON vl.user_id = u.id
+                 WHERE vl.tenant_id = ? AND vl.created_at >= DATE_SUB(NOW(), INTERVAL ? DAY))
+                UNION ALL
+                (SELECT CONCAT('application_', va.status) as type, va.created_at as timestamp,
+                        u.name as user_name, u.avatar_url,
+                        CONCAT(u.name, ' ', IF(va.status='pending','applied for',''), IF(va.status='approved','was approved for',''), IF(va.status='declined','was declined for',''), ' \"', vo.title, '\"') as description,
+                        'vol_applications' as entity_type, va.id as entity_id
+                 FROM vol_applications va
+                 JOIN users u ON va.user_id = u.id
+                 JOIN vol_opportunities vo ON va.opportunity_id = vo.id
+                 WHERE va.tenant_id = ? AND va.created_at >= DATE_SUB(NOW(), INTERVAL ? DAY))
+                UNION ALL
+                (SELECT 'donation' as type, vd.created_at as timestamp,
+                        COALESCE(u.name, vd.donor_name, 'Anonymous') as user_name, u.avatar_url,
+                        CONCAT(COALESCE(u.name, vd.donor_name, 'Anonymous'), ' donated ', vd.amount) as description,
+                        'vol_donations' as entity_type, vd.id as entity_id
+                 FROM vol_donations vd
+                 LEFT JOIN users u ON vd.user_id = u.id
+                 WHERE vd.tenant_id = ? AND vd.created_at >= DATE_SUB(NOW(), INTERVAL ? DAY) AND vd.status = 'completed')
+                ORDER BY timestamp DESC LIMIT ?
+            ", [$tenantId, $days, $tenantId, $days, $tenantId, $days, $limit]);
+
+            $items = array_map(fn($r) => [
+                'type' => $r->type,
+                'timestamp' => $r->timestamp,
+                'user_name' => $r->user_name,
+                'avatar_url' => $r->avatar_url,
+                'description' => $r->description,
+                'entity_type' => $r->entity_type,
+                'entity_id' => (int) $r->entity_id,
+            ], $activities);
+
+            return $this->respondWithData(['activities' => $items]);
+        } catch (\Exception $e) {
+            Log::error("AdminVolunteerController::activityFeed error: " . $e->getMessage());
+            return $this->respondWithData(['activities' => []]);
+        }
+    }
+
+    /** GET /api/v2/admin/volunteering/giving-days/{id}/trends */
+    public function givingDayTrends(int $id): JsonResponse
+    {
+        $this->requireAdmin();
+        $tenantId = TenantContext::getId();
+        $granularity = $this->query('granularity', 'day');
+        $format = $granularity === 'week' ? '%Y-W%u' : '%Y-%m-%d';
+
+        try {
+            $rows = DB::select("
+                SELECT DATE_FORMAT(created_at, ?) as period,
+                       COUNT(DISTINCT user_id) as donors,
+                       COALESCE(SUM(amount), 0) as amount
+                FROM vol_donations
+                WHERE giving_day_id = ? AND tenant_id = ? AND status = 'completed'
+                GROUP BY period ORDER BY period ASC
+            ", [$format, $id, $tenantId]);
+
+            $cumulative = 0;
+            $trends = array_map(function ($r) use (&$cumulative) {
+                $cumulative += (float) $r->amount;
+                return [
+                    'period' => $r->period,
+                    'donors' => (int) $r->donors,
+                    'amount' => (float) $r->amount,
+                    'cumulative' => round($cumulative, 2),
+                ];
+            }, $rows);
+
+            return $this->respondWithData(['trends' => $trends]);
+        } catch (\Exception $e) {
+            Log::error("AdminVolunteerController::givingDayTrends error: " . $e->getMessage());
+            return $this->respondWithData(['trends' => []]);
+        }
+    }
 }
