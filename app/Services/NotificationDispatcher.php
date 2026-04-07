@@ -1653,4 +1653,231 @@ HTML;
 </div>
 HTML;
     }
+
+    // =========================================================================
+    // VOLUNTEERING EMAIL BUILDERS
+    // =========================================================================
+
+    /**
+     * Build HTML email for volunteer application approval.
+     */
+    public static function buildVolApplicationApprovedEmail(string $oppTitle, int $oppId): string
+    {
+        $tenant = TenantContext::get();
+        $tenantName = htmlspecialchars($tenant['name'] ?? 'Community', ENT_QUOTES, 'UTF-8');
+        $basePath = TenantContext::getSlugPrefix();
+        $frontendUrl = TenantContext::getFrontendUrl();
+        $oppTitleHtml = htmlspecialchars($oppTitle, ENT_QUOTES, 'UTF-8');
+
+        return <<<HTML
+<div style="font-family: system-ui, -apple-system, sans-serif; max-width: 600px; margin: 0 auto;">
+    <div style="background: linear-gradient(135deg, #22c55e, #059669); padding: 32px 24px; border-radius: 16px 16px 0 0; text-align: center;">
+        <div style="font-size: 48px; margin-bottom: 12px;">🎉</div>
+        <h1 style="color: white; margin: 0; font-size: 24px;">Application Accepted!</h1>
+        <p style="color: rgba(255,255,255,0.9); margin: 8px 0 0; font-size: 14px;">{$tenantName} Volunteering</p>
+    </div>
+    <div style="background: #f8fafc; padding: 32px 24px; border-radius: 0 0 16px 16px; border: 1px solid #e2e8f0; border-top: none;">
+        <p style="color: #1e293b; font-size: 16px; line-height: 1.6; margin: 0 0 16px;">
+            Great news! Your volunteer application has been <strong style="color: #16a34a;">approved</strong>.
+        </p>
+        <div style="background: white; border: 1px solid #e2e8f0; border-radius: 12px; padding: 16px; margin: 16px 0;">
+            <p style="color: #64748b; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; margin: 0 0 4px;">Opportunity</p>
+            <p style="color: #1e293b; font-size: 18px; font-weight: 600; margin: 0;">{$oppTitleHtml}</p>
+        </div>
+        <p style="color: #475569; font-size: 14px; line-height: 1.6;">
+            You can now sign up for shifts and start logging your volunteer hours. Thank you for making a difference in your community!
+        </p>
+        <div style="text-align: center; margin-top: 24px;">
+            <a href="{$frontendUrl}{$basePath}/volunteering/opportunities/{$oppId}" style="display: inline-block; background: linear-gradient(135deg, #22c55e, #059669); color: white; text-decoration: none; padding: 14px 32px; border-radius: 10px; font-weight: 600; font-size: 16px;">View Opportunity</a>
+        </div>
+    </div>
+</div>
+HTML;
+    }
+
+    /**
+     * Build HTML email for volunteer application decline.
+     */
+    public static function buildVolApplicationDeclinedEmail(string $oppTitle): string
+    {
+        $tenant = TenantContext::get();
+        $tenantName = htmlspecialchars($tenant['name'] ?? 'Community', ENT_QUOTES, 'UTF-8');
+        $basePath = TenantContext::getSlugPrefix();
+        $frontendUrl = TenantContext::getFrontendUrl();
+        $oppTitleHtml = htmlspecialchars($oppTitle, ENT_QUOTES, 'UTF-8');
+
+        return <<<HTML
+<div style="font-family: system-ui, -apple-system, sans-serif; max-width: 600px; margin: 0 auto;">
+    <div style="background: linear-gradient(135deg, #6366f1, #8b5cf6); padding: 32px 24px; border-radius: 16px 16px 0 0; text-align: center;">
+        <h1 style="color: white; margin: 0; font-size: 24px;">Application Update</h1>
+        <p style="color: rgba(255,255,255,0.9); margin: 8px 0 0; font-size: 14px;">{$tenantName} Volunteering</p>
+    </div>
+    <div style="background: #f8fafc; padding: 32px 24px; border-radius: 0 0 16px 16px; border: 1px solid #e2e8f0; border-top: none;">
+        <p style="color: #1e293b; font-size: 16px; line-height: 1.6; margin: 0 0 16px;">
+            Unfortunately, your application was not accepted this time.
+        </p>
+        <div style="background: white; border: 1px solid #e2e8f0; border-radius: 12px; padding: 16px; margin: 16px 0;">
+            <p style="color: #64748b; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; margin: 0 0 4px;">Opportunity</p>
+            <p style="color: #1e293b; font-size: 18px; font-weight: 600; margin: 0;">{$oppTitleHtml}</p>
+        </div>
+        <p style="color: #475569; font-size: 14px; line-height: 1.6;">
+            Don't be discouraged — there are many other volunteering opportunities available. Browse the latest openings and find the perfect fit for your skills.
+        </p>
+        <div style="text-align: center; margin-top: 24px;">
+            <a href="{$frontendUrl}{$basePath}/volunteering" style="display: inline-block; background: linear-gradient(135deg, #6366f1, #8b5cf6); color: white; text-decoration: none; padding: 14px 32px; border-radius: 10px; font-weight: 600; font-size: 16px;">Browse Opportunities</a>
+        </div>
+    </div>
+</div>
+HTML;
+    }
+
+    /**
+     * Build HTML email for volunteer hours approved with payment.
+     */
+    public static function buildVolHoursApprovedPaidEmail(float $hours, string $orgName): string
+    {
+        $tenant = TenantContext::get();
+        $tenantName = htmlspecialchars($tenant['name'] ?? 'Community', ENT_QUOTES, 'UTF-8');
+        $basePath = TenantContext::getSlugPrefix();
+        $frontendUrl = TenantContext::getFrontendUrl();
+        $orgNameHtml = htmlspecialchars($orgName, ENT_QUOTES, 'UTF-8');
+
+        return <<<HTML
+<div style="font-family: system-ui, -apple-system, sans-serif; max-width: 600px; margin: 0 auto;">
+    <div style="background: linear-gradient(135deg, #22c55e, #059669); padding: 32px 24px; border-radius: 16px 16px 0 0; text-align: center;">
+        <div style="font-size: 48px; margin-bottom: 12px;">⏰💰</div>
+        <h1 style="color: white; margin: 0; font-size: 24px;">Hours Approved &amp; Credits Paid!</h1>
+        <p style="color: rgba(255,255,255,0.9); margin: 8px 0 0; font-size: 14px;">{$tenantName} Volunteering</p>
+    </div>
+    <div style="background: #f8fafc; padding: 32px 24px; border-radius: 0 0 16px 16px; border: 1px solid #e2e8f0; border-top: none;">
+        <p style="color: #1e293b; font-size: 16px; line-height: 1.6; margin: 0 0 16px;">
+            Your volunteer hours have been approved and time credits have been added to your wallet!
+        </p>
+        <div style="display: flex; gap: 16px; margin: 20px 0;">
+            <div style="flex: 1; background: white; border: 1px solid #e2e8f0; border-radius: 12px; padding: 16px; text-align: center;">
+                <p style="color: #64748b; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; margin: 0 0 4px;">Hours Approved</p>
+                <p style="color: #22c55e; font-size: 28px; font-weight: 700; margin: 0;">{$hours}h</p>
+            </div>
+            <div style="flex: 1; background: white; border: 1px solid #e2e8f0; border-radius: 12px; padding: 16px; text-align: center;">
+                <p style="color: #64748b; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; margin: 0 0 4px;">Credits Earned</p>
+                <p style="color: #22c55e; font-size: 28px; font-weight: 700; margin: 0;">{$hours}</p>
+            </div>
+        </div>
+        <p style="color: #475569; font-size: 14px; line-height: 1.6;">
+            <strong>{$orgNameHtml}</strong> has paid you <strong>{$hours} time credits</strong> for your volunteering. You can spend these credits on services from other community members.
+        </p>
+        <div style="text-align: center; margin-top: 24px;">
+            <a href="{$frontendUrl}{$basePath}/wallet" style="display: inline-block; background: linear-gradient(135deg, #22c55e, #059669); color: white; text-decoration: none; padding: 14px 32px; border-radius: 10px; font-weight: 600; font-size: 16px;">View My Wallet</a>
+        </div>
+    </div>
+</div>
+HTML;
+    }
+
+    /**
+     * Build HTML email for volunteer hours approved (no payment).
+     */
+    public static function buildVolHoursApprovedEmail(float $hours, string $orgName): string
+    {
+        $tenant = TenantContext::get();
+        $tenantName = htmlspecialchars($tenant['name'] ?? 'Community', ENT_QUOTES, 'UTF-8');
+        $basePath = TenantContext::getSlugPrefix();
+        $frontendUrl = TenantContext::getFrontendUrl();
+        $orgNameHtml = htmlspecialchars($orgName, ENT_QUOTES, 'UTF-8');
+
+        return <<<HTML
+<div style="font-family: system-ui, -apple-system, sans-serif; max-width: 600px; margin: 0 auto;">
+    <div style="background: linear-gradient(135deg, #22c55e, #059669); padding: 32px 24px; border-radius: 16px 16px 0 0; text-align: center;">
+        <div style="font-size: 48px; margin-bottom: 12px;">✅</div>
+        <h1 style="color: white; margin: 0; font-size: 24px;">Hours Approved!</h1>
+        <p style="color: rgba(255,255,255,0.9); margin: 8px 0 0; font-size: 14px;">{$tenantName} Volunteering</p>
+    </div>
+    <div style="background: #f8fafc; padding: 32px 24px; border-radius: 0 0 16px 16px; border: 1px solid #e2e8f0; border-top: none;">
+        <p style="color: #1e293b; font-size: 16px; line-height: 1.6; margin: 0 0 16px;">
+            Your volunteer hours with <strong>{$orgNameHtml}</strong> have been verified and approved.
+        </p>
+        <div style="background: white; border: 1px solid #e2e8f0; border-radius: 12px; padding: 16px; text-align: center; margin: 20px 0;">
+            <p style="color: #64748b; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; margin: 0 0 4px;">Hours Approved</p>
+            <p style="color: #22c55e; font-size: 28px; font-weight: 700; margin: 0;">{$hours}h</p>
+        </div>
+        <p style="color: #475569; font-size: 14px; line-height: 1.6;">
+            Thank you for your valuable contribution to the community!
+        </p>
+        <div style="text-align: center; margin-top: 24px;">
+            <a href="{$frontendUrl}{$basePath}/volunteering?tab=hours" style="display: inline-block; background: linear-gradient(135deg, #22c55e, #059669); color: white; text-decoration: none; padding: 14px 32px; border-radius: 10px; font-weight: 600; font-size: 16px;">View My Hours</a>
+        </div>
+    </div>
+</div>
+HTML;
+    }
+
+    /**
+     * Build HTML email for volunteer hours declined.
+     */
+    public static function buildVolHoursDeclinedEmail(float $hours, string $orgName): string
+    {
+        $tenant = TenantContext::get();
+        $tenantName = htmlspecialchars($tenant['name'] ?? 'Community', ENT_QUOTES, 'UTF-8');
+        $basePath = TenantContext::getSlugPrefix();
+        $frontendUrl = TenantContext::getFrontendUrl();
+        $orgNameHtml = htmlspecialchars($orgName, ENT_QUOTES, 'UTF-8');
+
+        return <<<HTML
+<div style="font-family: system-ui, -apple-system, sans-serif; max-width: 600px; margin: 0 auto;">
+    <div style="background: linear-gradient(135deg, #6366f1, #8b5cf6); padding: 32px 24px; border-radius: 16px 16px 0 0; text-align: center;">
+        <h1 style="color: white; margin: 0; font-size: 24px;">Hours Update</h1>
+        <p style="color: rgba(255,255,255,0.9); margin: 8px 0 0; font-size: 14px;">{$tenantName} Volunteering</p>
+    </div>
+    <div style="background: #f8fafc; padding: 32px 24px; border-radius: 0 0 16px 16px; border: 1px solid #e2e8f0; border-top: none;">
+        <p style="color: #1e293b; font-size: 16px; line-height: 1.6; margin: 0 0 16px;">
+            Your <strong>{$hours}h</strong> volunteering log with <strong>{$orgNameHtml}</strong> was not approved.
+        </p>
+        <p style="color: #475569; font-size: 14px; line-height: 1.6;">
+            This may be due to a discrepancy in the hours recorded. If you believe this is an error, please contact the organisation directly to discuss.
+        </p>
+        <div style="text-align: center; margin-top: 24px;">
+            <a href="{$frontendUrl}{$basePath}/volunteering?tab=hours" style="display: inline-block; background: linear-gradient(135deg, #6366f1, #8b5cf6); color: white; text-decoration: none; padding: 14px 32px; border-radius: 10px; font-weight: 600; font-size: 16px;">View My Hours</a>
+        </div>
+    </div>
+</div>
+HTML;
+    }
+
+    /**
+     * Build HTML email for new volunteer application received (sent to org owner).
+     */
+    public static function buildVolApplicationReceivedEmail(string $volunteerName, string $oppTitle, int $orgId): string
+    {
+        $tenant = TenantContext::get();
+        $tenantName = htmlspecialchars($tenant['name'] ?? 'Community', ENT_QUOTES, 'UTF-8');
+        $basePath = TenantContext::getSlugPrefix();
+        $frontendUrl = TenantContext::getFrontendUrl();
+        $volunteerHtml = htmlspecialchars($volunteerName, ENT_QUOTES, 'UTF-8');
+        $oppTitleHtml = htmlspecialchars($oppTitle, ENT_QUOTES, 'UTF-8');
+
+        return <<<HTML
+<div style="font-family: system-ui, -apple-system, sans-serif; max-width: 600px; margin: 0 auto;">
+    <div style="background: linear-gradient(135deg, #f43f5e, #e11d48); padding: 32px 24px; border-radius: 16px 16px 0 0; text-align: center;">
+        <div style="font-size: 48px; margin-bottom: 12px;">🙋</div>
+        <h1 style="color: white; margin: 0; font-size: 24px;">New Volunteer Application</h1>
+        <p style="color: rgba(255,255,255,0.9); margin: 8px 0 0; font-size: 14px;">{$tenantName} Volunteering</p>
+    </div>
+    <div style="background: #f8fafc; padding: 32px 24px; border-radius: 0 0 16px 16px; border: 1px solid #e2e8f0; border-top: none;">
+        <p style="color: #1e293b; font-size: 16px; line-height: 1.6; margin: 0 0 16px;">
+            <strong>{$volunteerHtml}</strong> has applied to volunteer with your organisation.
+        </p>
+        <div style="background: white; border: 1px solid #e2e8f0; border-radius: 12px; padding: 16px; margin: 16px 0;">
+            <p style="color: #64748b; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; margin: 0 0 4px;">Opportunity</p>
+            <p style="color: #1e293b; font-size: 18px; font-weight: 600; margin: 0;">{$oppTitleHtml}</p>
+        </div>
+        <p style="color: #475569; font-size: 14px; line-height: 1.6;">
+            Review their application and approve or decline from your organisation dashboard.
+        </p>
+        <div style="text-align: center; margin-top: 24px;">
+            <a href="{$frontendUrl}{$basePath}/volunteering/org/{$orgId}/dashboard?tab=applications" style="display: inline-block; background: linear-gradient(135deg, #f43f5e, #e11d48); color: white; text-decoration: none; padding: 14px 32px; border-radius: 10px; font-weight: 600; font-size: 16px;">Review Application</a>
+        </div>
+    </div>
+</div>
+HTML;
+    }
 }

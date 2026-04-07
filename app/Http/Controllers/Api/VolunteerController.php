@@ -183,6 +183,12 @@ class VolunteerController extends BaseApiController
                 $orgId = $opportunity->organization_id;
                 $notifLink = "/volunteering/org/{$orgId}/dashboard?tab=applications";
 
+                $htmlContent = NotificationDispatcher::buildVolApplicationReceivedEmail(
+                    $volunteerName,
+                    $opportunity->title,
+                    (int) $orgId
+                );
+
                 NotificationDispatcher::dispatch(
                     (int) $opportunity->created_by,
                     'global',
@@ -190,7 +196,7 @@ class VolunteerController extends BaseApiController
                     'vol_application_received',
                     $notifContent,
                     $notifLink,
-                    null
+                    $htmlContent
                 );
             }
         } catch (\Throwable $e) {
@@ -256,9 +262,11 @@ class VolunteerController extends BaseApiController
                 if ($action === 'approve') {
                     $message = "Your volunteer application for \"{$oppTitle}\" was accepted!";
                     $notifType = 'vol_application_approved';
+                    $htmlContent = NotificationDispatcher::buildVolApplicationApprovedEmail($oppTitle, $opportunityId);
                 } else {
                     $message = "Your volunteer application for \"{$oppTitle}\" was not accepted";
                     $notifType = 'vol_application_declined';
+                    $htmlContent = NotificationDispatcher::buildVolApplicationDeclinedEmail($oppTitle);
                 }
 
                 NotificationDispatcher::dispatch(
@@ -268,7 +276,7 @@ class VolunteerController extends BaseApiController
                     $notifType,
                     $message,
                     "/volunteering/opportunities/{$opportunityId}",
-                    null
+                    $htmlContent
                 );
             }
         } catch (\Throwable $e) {

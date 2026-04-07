@@ -1082,6 +1082,8 @@ class VolunteerService
                         $logId
                     );
 
+                    $orgName = $org->name ?? 'Organization';
+
                     if ($result['success']) {
                         // Notify volunteer: hours approved + credits paid
                         NotificationDispatcher::dispatch(
@@ -1091,7 +1093,7 @@ class VolunteerService
                             'vol_hours_approved',
                             "Your {$hours}h were approved and {$hours} time credits added to your wallet!",
                             '/wallet',
-                            null
+                            NotificationDispatcher::buildVolHoursApprovedPaidEmail($hours, $orgName)
                         );
                     } else {
                         // Insufficient balance — still approve hours, notify both parties
@@ -1102,7 +1104,7 @@ class VolunteerService
                             'vol_hours_approved',
                             "Your {$hours}h were approved! Time credits will be paid when the organization funds their wallet.",
                             '/volunteering?tab=hours',
-                            null
+                            NotificationDispatcher::buildVolHoursApprovedEmail($hours, $orgName)
                         );
                         // Notify org owner about low balance
                         NotificationDispatcher::dispatch(
@@ -1116,6 +1118,7 @@ class VolunteerService
                         );
                     }
                 } elseif ($action === 'approve') {
+                    $orgName = $org->name ?? 'Organization';
                     // Auto-pay disabled — just notify volunteer of approval
                     NotificationDispatcher::dispatch(
                         $volunteerId,
@@ -1124,9 +1127,10 @@ class VolunteerService
                         'vol_hours_approved',
                         "Your {$hours}h of volunteering were approved!",
                         '/volunteering?tab=hours',
-                        null
+                        NotificationDispatcher::buildVolHoursApprovedEmail($hours, $orgName)
                     );
                 } else {
+                    $orgName = $org->name ?? 'Organization';
                     // Declined — notify volunteer
                     NotificationDispatcher::dispatch(
                         $volunteerId,
@@ -1135,7 +1139,7 @@ class VolunteerService
                         'vol_hours_declined',
                         "Your {$hours}h volunteering log was declined.",
                         '/volunteering?tab=hours',
-                        null
+                        NotificationDispatcher::buildVolHoursDeclinedEmail($hours, $orgName)
                     );
                 }
 
