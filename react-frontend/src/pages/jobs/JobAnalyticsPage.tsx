@@ -15,7 +15,7 @@
 
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { Button } from '@heroui/react';
+import { Button, Chip, Spinner } from '@heroui/react';
 import {
   BarChart3,
   Eye,
@@ -28,6 +28,7 @@ import {
   Download,
   Share2,
   Star,
+  Sparkles,
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
@@ -76,6 +77,15 @@ export function JobAnalyticsPage() {
   const [analytics, setAnalytics] = useState<AnalyticsData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [predictions, setPredictions] = useState<{
+    expected_applications: { value: number; current: number; label: string };
+    estimated_time_to_fill: { value: number | null; days_posted: number; label: string };
+    conversion_rate: { yours: number; average: number; label: string };
+    salary_comparison: { your_salary: number; market_avg: number; diff_percent: number; label: string } | null;
+    similar_jobs_analyzed: number;
+    ai_insights?: string[];
+  } | null>(null);
+  const [predictionsLoading, setPredictionsLoading] = useState(true);
 
   // AbortController ref to cancel stale requests
   const abortRef = useRef<AbortController | null>(null);
@@ -111,6 +121,18 @@ export function JobAnalyticsPage() {
   useEffect(() => {
     loadAnalytics();
   }, [loadAnalytics]);
+
+  const loadPredictions = useCallback(async () => {
+    if (!id) return;
+    setPredictionsLoading(true);
+    try {
+      const res = await api.get(`/v2/jobs/${id}/predictions`);
+      if (res.success && res.data) setPredictions(res.data as typeof predictions);
+    } catch { /* silent */ }
+    finally { setPredictionsLoading(false); }
+  }, [id]);
+
+  useEffect(() => { loadPredictions(); }, [loadPredictions]);
 
   if (isLoading) {
     return (
@@ -378,6 +400,101 @@ export function JobAnalyticsPage() {
           </div>
         </GlassCard>
       )}
+
+      {/* AI Predictions */}
+      <GlassCard className="p-6">
+        <div className="flex items-center gap-2 mb-4">
+          <Sparkles size={20} className="text-secondary" />
+          <h2 className="text-lg font-semibold text-theme-primary">
+            {t('analytics.predictions', { defaultValue: 'AI Predictions' })}
+          </h2>
+          {predictions && (
+            <Chip size="sm" variant="flat" color="default">
+              {t('analytics.based_on', { defaultValue: 'Based on {{count}} similar jobs', count: predictions.similar_jobs_analyzed })}
+            </Chip>
+          )}
+        </div>
+
+        {predictionsLoading ? (
+          <div className="flex justify-center py-8"><Spinner size="lg" /></div>
+        ) : !predictions ? (
+          <p className="text-center text-default-400 py-6">{t('analytics.no_predictions', { defaultValue: 'Insufficient data for predictions.' })}</p>
+        ) : (
+          <div className="space-y-4">
+            {/* Prediction cards */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              <div className="p-4 rounded-lg bg-default-50 border border-default-200">
+                <p className="text-xs text-default-500 uppercase tracking-wide">{t('analytics.expected_apps', { defaultValue: 'Expected Applications' })}</p>
+                <p className="text-2xl font-bold text-foreground mt-1">{predictions.expected_applications.value}</p>
+                <p className="text-xs mt-1">
+                  <span className="text-default-400">Current: {predictions.expected_applications.current}</span>
+                  {' · '}
+                  <Chip size="sm" variant="flat" color={predictions.expected_applications.current >= predictions.expected_applications.value ? 'success' : 'warning'}>
+                    {predictions.expected_applications.label}
+                  </Chip>
+                </p>
+              </div>
+
+              <div className="p-4 rounded-lg bg-default-50 border border-default-200">
+                <p className="text-xs text-default-500 uppercase tracking-wide">{t('analytics.time_to_fill', { defaultValue: 'Est. Time to Fill' })}</p>
+                <p className="text-2xl font-bold text-foreground mt-1">{predictions.estimated_time_to_fill.value ? `${predictions.estimated_time_to_fill.value}d` : 'N/A'}</p>
+                <p className="text-xs text-default-400 mt-1">Posted {predictions.estimated_time_to_fill.days_posted} days ago</p>
+              </div>
+
+              <div className="p-4 rounded-lg bg-default-50 border border-default-200">
+                <p className="text-xs text-default-500 uppercase tracking-wide">{t('analytics.conversion_comparison', { defaultValue: 'Conversion Rate' })}</p>
+                <p className="text-2xl font-bold text-foreground mt-1">{predictions.conversion_rate.yours}%</p>
+                <p className="text-xs mt-1">
+                  <span className="text-default-400">Avg: {predictions.conversion_rate.average}%</span>
+                  {' · '}
+                  <Chip size="sm" variant="flat" color={predictions.conversion_rate.yours >= predictions.conversion_rate.average ? 'success' : 'warning'}>
+                    {predictions.conversion_rate.label}
+                  </Chip>
+                </p>
+              </div>
+            </div>
+
+            {/* Salary comparison */}
+            {predictions.salary_comparison && (
+              <div className="p-4 rounded-lg bg-default-50 border border-default-200">
+                <p className="text-xs text-default-500 uppercase tracking-wide mb-2">{t('analytics.salary_comparison', { defaultValue: 'Salary vs Market' })}</p>
+                <div className="flex items-center gap-4">
+                  <div>
+                    <p className="text-sm text-default-500">Yours</p>
+                    <p className="text-lg font-bold">${predictions.salary_comparison.your_salary.toLocaleString()}</p>
+                  </div>
+                  <div className="text-default-300">vs</div>
+                  <div>
+                    <p className="text-sm text-default-500">Market Avg</p>
+                    <p className="text-lg font-bold">${predictions.salary_comparison.market_avg.toLocaleString()}</p>
+                  </div>
+                  <Chip size="sm" variant="flat" color={predictions.salary_comparison.diff_percent >= 0 ? 'success' : 'danger'}>
+                    {predictions.salary_comparison.diff_percent > 0 ? '+' : ''}{predictions.salary_comparison.diff_percent}% {predictions.salary_comparison.label}
+                  </Chip>
+                </div>
+              </div>
+            )}
+
+            {/* AI Insights */}
+            {predictions.ai_insights && predictions.ai_insights.length > 0 && (
+              <div className="p-4 rounded-lg bg-secondary/5 border border-secondary/20">
+                <div className="flex items-center gap-2 mb-3">
+                  <Sparkles size={16} className="text-secondary" />
+                  <p className="text-sm font-semibold text-secondary">{t('analytics.ai_insights', { defaultValue: 'AI Insights' })}</p>
+                </div>
+                <ul className="space-y-2">
+                  {predictions.ai_insights.map((insight, i) => (
+                    <li key={i} className="text-sm text-foreground flex items-start gap-2">
+                      <span className="text-secondary mt-0.5">•</span>
+                      <span>{insight}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+          </div>
+        )}
+      </GlassCard>
     </div>
   );
 }

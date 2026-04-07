@@ -28,6 +28,7 @@ import {
   ChevronDown,
   ChevronUp,
   Calendar,
+  CalendarPlus,
   AlertTriangle,
   History,
   MessageCircle,
@@ -396,6 +397,10 @@ function ApplicationCard({ application, onWithdraw, tenantPath, onMessageEmploye
                   {application.interview.location_notes}
                 </span>
               )}
+              {/* Calendar links */}
+              {application.interview.id && (
+                <CalendarLinks interviewId={application.interview.id} />
+              )}
               {/* Accept / Decline actions for proposed */}
               {application.interview.status === 'proposed' && (
                 <>
@@ -591,6 +596,54 @@ function ApplicationCard({ application, onWithdraw, tenantPath, onMessageEmploye
         </AnimatePresence>
       </GlassCard>
     </motion.div>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Calendar links helper
+// ---------------------------------------------------------------------------
+
+function CalendarLinks({ interviewId }: { interviewId: number }) {
+  const { t } = useTranslation('jobs');
+  const [links, setLinks] = useState<{ google?: string; outlook?: string; ics?: string } | null>(null);
+  const [loading, setLoading] = useState(false);
+
+  const fetchLinks = useCallback(async () => {
+    if (links || loading) return;
+    setLoading(true);
+    try {
+      const res = await api.get(`/v2/jobs/interviews/${interviewId}/calendar-links`);
+      if (res.success && res.data) setLinks(res.data as { google?: string; outlook?: string; ics?: string });
+    } catch { /* silent */ }
+    finally { setLoading(false); }
+  }, [interviewId, links, loading]);
+
+  if (!links) {
+    return (
+      <Button size="sm" variant="flat" startContent={<CalendarPlus size={14} />} onPress={fetchLinks} isLoading={loading}>
+        {t('interview.add_to_calendar', { defaultValue: 'Add to Calendar' })}
+      </Button>
+    );
+  }
+
+  return (
+    <div className="flex items-center gap-1.5">
+      {links.google && (
+        <Button size="sm" variant="flat" as="a" href={links.google} target="_blank" rel="noopener noreferrer" startContent={<CalendarPlus size={12} />}>
+          Google
+        </Button>
+      )}
+      {links.outlook && (
+        <Button size="sm" variant="flat" as="a" href={links.outlook} target="_blank" rel="noopener noreferrer" startContent={<CalendarPlus size={12} />}>
+          Outlook
+        </Button>
+      )}
+      {links.ics && (
+        <Button size="sm" variant="flat" as="a" href={links.ics} download="interview.ics" startContent={<Download size={12} />}>
+          .ics
+        </Button>
+      )}
+    </div>
   );
 }
 

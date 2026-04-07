@@ -92,6 +92,8 @@ import {
   Copy,
   Send,
   Video,
+  CalendarPlus,
+  Download,
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
@@ -1357,6 +1359,21 @@ export function JobDetailPage() {
                       startContent={<Video className="w-3.5 h-3.5" aria-hidden="true" />}
                     >
                       {t('interview.join_call', 'Join Video Call')}
+                    </Button>
+                  </div>
+                )}
+                {/* Calendar links */}
+                {pendingInterview.id && (
+                  <div className="mt-2 flex items-center gap-1.5">
+                    <Button
+                      size="sm"
+                      variant="flat"
+                      as="a"
+                      href={`/api/v2/jobs/interviews/${pendingInterview.id}/calendar`}
+                      download="interview.ics"
+                      startContent={<CalendarPlus className="w-3.5 h-3.5" />}
+                    >
+                      {t('interview.download_ics', { defaultValue: 'Download .ics' })}
                     </Button>
                   </div>
                 )}

@@ -30,6 +30,8 @@ import {
   Input,
   Textarea,
   Tooltip,
+  Tabs,
+  Tab,
 } from '@heroui/react';
 import {
   ArrowLeft,
@@ -41,6 +43,7 @@ import {
   DollarSign,
   Sparkles,
   Star,
+  ScrollText,
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
@@ -408,6 +411,13 @@ export function JobKanbanPage() {
   const [aiRankings, setAiRankings] = useState<Record<number, { rank: number; score: number; reason: string; community_xp?: number; community_level?: number; community_exchanges?: number; community_rating?: number | null; community_badges?: number }>>({});
   const [isRanking, setIsRanking] = useState(false);
 
+  // Activity Log (audit trail)
+  const [activeTab, setActiveTab] = useState<'pipeline' | 'activity'>('pipeline');
+  const [auditEvents, setAuditEvents] = useState<Array<{ type: string; timestamp: string; actor: string; description: string; details: string | null }>>([]);
+  const [auditLoading, setAuditLoading] = useState(false);
+  const [auditPage, setAuditPage] = useState(1);
+  const [auditTotal, setAuditTotal] = useState(0);
+
   usePageTitle(vacancy ? `${t('kanban.pipeline_title', 'Kanban Pipeline')} — ${vacancy.title}` : t('kanban.pipeline_title', 'Kanban Pipeline'));
 
   const abortRef = useRef<AbortController | null>(null);
@@ -663,6 +673,25 @@ export function JobKanbanPage() {
     }
   }, [id, isRanking, toast, t]);
 
+  // Audit trail loader
+  const loadAuditTrail = useCallback(async () => {
+    if (!id) return;
+    setAuditLoading(true);
+    try {
+      const res = await api.get(`/v2/jobs/${id}/audit-trail?page=${auditPage}&limit=50`);
+      if (res.success && res.data) {
+        setAuditEvents(Array.isArray(res.data) ? res.data : []);
+        const m = res.meta as Record<string, unknown> | undefined;
+        if (m?.total) setAuditTotal(Number(m.total));
+      }
+    } catch { /* silent */ }
+    finally { setAuditLoading(false); }
+  }, [id, auditPage]);
+
+  useEffect(() => {
+    if (activeTab === 'activity') loadAuditTrail();
+  }, [activeTab, loadAuditTrail]);
+
   // Map applications to columns
   const columnApplications = (columnStatus: string) =>
     applications.filter((app) => {
@@ -759,6 +788,15 @@ export function JobKanbanPage() {
         </div>
       </div>
 
+      {/* Tab navigation */}
+      <Tabs selectedKey={activeTab} onSelectionChange={(k) => setActiveTab(k as 'pipeline' | 'activity')} variant="underlined" className="mb-4">
+        <Tab key="pipeline" title={<div className="flex items-center gap-2"><Briefcase size={15} /><span>Pipeline</span></div>} />
+        <Tab key="activity" title={<div className="flex items-center gap-2"><ScrollText size={15} /><span>Activity Log</span></div>} />
+      </Tabs>
+
+      {/* Pipeline tab */}
+      {activeTab === 'pipeline' && (<>
+
       {/* Bulk action bar */}
       {selectedAppIds.size > 0 && (
         <div className="sticky top-0 z-20 flex items-center gap-3 p-3 mb-4 bg-primary/10 border border-primary/30 rounded-xl backdrop-blur-sm">
@@ -814,6 +852,55 @@ export function JobKanbanPage() {
           ))}
         </div>
       </div>
+
+      </>)}
+
+      {/* Activity Log tab */}
+      {activeTab === 'activity' && (
+        <div className="space-y-3">
+          {auditLoading ? (
+            <div className="flex justify-center py-12"><Spinner size="lg" /></div>
+          ) : auditEvents.length === 0 ? (
+            <div className="text-center py-12 text-default-400">
+              <ScrollText size={32} className="mx-auto mb-3" />
+              <p className="font-medium">No activity yet</p>
+              <p className="text-sm mt-1">Events will appear here as the hiring process progresses.</p>
+            </div>
+          ) : (
+            <div className="relative pl-6 border-l-2 border-default-200 space-y-4">
+              {auditEvents.map((event, i) => (
+                <div key={i} className="relative">
+                  <div className={`absolute -left-[25px] w-3 h-3 rounded-full border-2 border-background ${
+                    event.type === 'status_change' ? 'bg-primary' : event.type === 'interview' ? 'bg-secondary' : 'bg-warning'
+                  }`} />
+                  <div className="bg-default-50 rounded-lg p-3">
+                    <div className="flex items-center justify-between gap-2">
+                      <span className="text-sm font-medium text-foreground">{event.description}</span>
+                      <Chip size="sm" variant="flat" color={event.type === 'status_change' ? 'primary' : event.type === 'interview' ? 'secondary' : 'warning'} className="capitalize shrink-0">
+                        {event.type.replace('_', ' ')}
+                      </Chip>
+                    </div>
+                    <div className="flex items-center gap-2 mt-1 text-xs text-default-400">
+                      <span>{event.actor}</span>
+                      <span>·</span>
+                      <span>{new Date(event.timestamp).toLocaleString(undefined, { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}</span>
+                    </div>
+                    {event.details && (
+                      <p className="text-xs text-default-500 mt-1.5 bg-default-100 rounded px-2 py-1">{event.details}</p>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+          {auditTotal > 50 && (
+            <div className="flex justify-center gap-2 pt-2">
+              <Button size="sm" variant="flat" isDisabled={auditPage <= 1} onPress={() => setAuditPage(p => p - 1)}>Previous</Button>
+              <Button size="sm" variant="flat" onPress={() => setAuditPage(p => p + 1)}>Next</Button>
+            </div>
+          )}
+        </div>
+      )}
 
       {/* Feature 1: Interview Scheduling Modal */}
       <Modal isOpen={!!interviewModalApp} onClose={() => setInterviewModalApp(null)} size="md">
