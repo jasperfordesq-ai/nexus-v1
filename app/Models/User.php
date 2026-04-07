@@ -25,7 +25,7 @@ class User extends Authenticatable
         'name', 'first_name', 'last_name', 'email', 'username',
         'status', 'avatar_url', 'bio', 'location', 'latitude', 'longitude',
         'phone', 'is_verified', 'is_approved',
-        'onboarding_completed',
+        'onboarding_completed', 'date_of_birth',
         'profile_type', 'organization_name', 'totp_enabled',
         'notification_preferences',
         'email_verified_at', 'last_active_at',

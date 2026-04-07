@@ -124,6 +124,7 @@ export function SettingsPage() {
     first_name: '',
     last_name: '',
     name: '',
+    date_of_birth: '',
     phone: '',
     tagline: '',
     bio: '',
@@ -299,6 +300,7 @@ export function SettingsPage() {
         first_name: user.first_name || '',
         last_name: user.last_name || '',
         name: user.name || '',
+        date_of_birth: (user as any).date_of_birth || '',
         phone: user.phone || '',
         tagline: user.tagline || '',
         bio: user.bio || '',
@@ -350,7 +352,7 @@ export function SettingsPage() {
       const sanitizedBio = DOMPurify.sanitize(profileData.bio, {
         ALLOWED_TAGS: ['p', 'br', 'strong', 'em', 'a', 'ul', 'ol', 'li'],
       });
-      const payload = {
+      const payload: Record<string, any> = {
         first_name: profileData.first_name,
         last_name: profileData.last_name,
         name: profileData.first_name && profileData.last_name
@@ -365,6 +367,10 @@ export function SettingsPage() {
         profile_type: profileData.profile_type,
         organization_name: profileData.profile_type === 'organisation' ? profileData.organization_name : '',
       };
+      // Include DOB if set (backend will silently ignore if verified)
+      if (profileData.date_of_birth) {
+        payload.date_of_birth = profileData.date_of_birth;
+      }
       const response = await api.put('/v2/users/me', payload);
       if (response.success) {
         toast.success(t('toasts.profile_updated'));

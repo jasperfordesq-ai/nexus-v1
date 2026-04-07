@@ -184,7 +184,7 @@ class AdminUsersController extends BaseApiController
             "SELECT u.id, u.first_name, u.last_name, u.email, u.avatar_url, u.location, u.bio, u.tagline, u.phone,
                     u.role, u.status, u.is_approved, u.is_super_admin, u.is_god, u.is_tenant_super_admin, u.balance, u.profile_type,
                     u.organization_name, u.vetting_status, u.insurance_status, u.created_at, u.last_active_at,
-                    u.email_verified_at, u.is_verified,
+                    u.email_verified_at, u.is_verified, u.date_of_birth,
                     u.tenant_id, t.name as tenant_name
              FROM users u
              LEFT JOIN tenants t ON u.tenant_id = t.id

@@ -167,7 +167,7 @@ class UserService
 
         $allowed = [
             'first_name', 'last_name', 'email', 'bio', 'tagline', 'location', 'latitude', 'longitude',
-            'phone', 'avatar_url', 'organization_name', 'profile_type',
+            'phone', 'avatar_url', 'organization_name', 'profile_type', 'date_of_birth',
         ];
 
         $user->fill(collect($data)->only($allowed)->all());
@@ -733,6 +733,7 @@ class UserService
             $profile['tenant_id']               = $user->tenant_id;
             $profile['email']                   = $user->email;
             $profile['phone']                   = $user->phone;
+            $profile['date_of_birth']           = $user->date_of_birth;
             $profile['status']                  = $user->status ?? 'active';
             $profile['email_verified_at']       = $user->email_verified_at?->toISOString();
             $profile['balance']                 = (float) ($user->balance ?? 0);

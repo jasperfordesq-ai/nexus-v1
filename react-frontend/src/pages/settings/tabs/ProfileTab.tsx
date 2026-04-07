@@ -37,6 +37,7 @@ export interface ProfileFormData {
   first_name: string;
   last_name: string;
   name: string;
+  date_of_birth: string;
   phone: string;
   tagline: string;
   bio: string;
@@ -162,6 +163,19 @@ export function ProfileTab({
               endContent={isIdVerified ? <Lock className="w-4 h-4 text-theme-subtle" /> : undefined}
             />
           </div>
+
+          {/* Date of Birth */}
+          <Input
+            type="date"
+            label={t('profile.date_of_birth', 'Date of Birth')}
+            value={profileData.date_of_birth || ''}
+            onChange={(e) => onProfileDataChange((prev) => ({ ...prev, date_of_birth: e.target.value }))}
+            classNames={inputClassNames}
+            max={new Date().toISOString().split('T')[0]}
+            isReadOnly={isIdVerified}
+            endContent={isIdVerified ? <Lock className="w-4 h-4 text-theme-subtle" /> : undefined}
+            description={!isIdVerified && !profileData.date_of_birth ? t('profile.dob_description', 'Required for identity verification') : undefined}
+          />
 
           {/* Phone */}
           <Input
