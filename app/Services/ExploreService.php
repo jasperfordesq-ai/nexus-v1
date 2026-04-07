@@ -502,45 +502,77 @@ class ExploreService
 
     /**
      * Community stats: total members, exchanges this month, hours exchanged, active listings.
+     * Each stat is queried independently so a single failure doesn't zero out all stats.
      */
     private function getCommunityStats(int $tenantId): array
     {
+        $totalMembers = 0;
+        $exchangesThisMonth = 0;
+        $hoursExchanged = 0.0;
+        $activeListings = 0;
+
         try {
-            $memberCount = DB::selectOne(
+            $row = DB::selectOne(
                 "SELECT COUNT(*) AS cnt FROM users WHERE tenant_id = ? AND status = 'active'",
                 [$tenantId]
             );
+            $totalMembers = (int) ($row->cnt ?? 0);
+        } catch (\Throwable $e) {
+            Log::error('ExploreService::getCommunityStats members query failed', [
+                'tenant_id' => $tenantId,
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+        }
 
-            $exchangesThisMonth = DB::selectOne(
+        try {
+            $row = DB::selectOne(
                 "SELECT COUNT(*) AS cnt FROM transactions WHERE tenant_id = ? AND status = 'completed' AND created_at >= DATE_FORMAT(NOW(), '%Y-%m-01')",
                 [$tenantId]
             );
+            $exchangesThisMonth = (int) ($row->cnt ?? 0);
+        } catch (\Throwable $e) {
+            Log::error('ExploreService::getCommunityStats exchanges query failed', [
+                'tenant_id' => $tenantId,
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+        }
 
-            $hoursExchanged = DB::selectOne(
+        try {
+            $row = DB::selectOne(
                 "SELECT COALESCE(SUM(amount), 0) AS total FROM transactions WHERE tenant_id = ? AND status = 'completed'",
                 [$tenantId]
             );
+            $hoursExchanged = round((float) ($row->total ?? 0), 1);
+        } catch (\Throwable $e) {
+            Log::error('ExploreService::getCommunityStats hours query failed', [
+                'tenant_id' => $tenantId,
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+        }
 
-            $activeListings = DB::selectOne(
+        try {
+            $row = DB::selectOne(
                 "SELECT COUNT(*) AS cnt FROM listings WHERE tenant_id = ? AND status = 'active'",
                 [$tenantId]
             );
-
-            return [
-                'total_members' => (int) ($memberCount->cnt ?? 0),
-                'exchanges_this_month' => (int) ($exchangesThisMonth->cnt ?? 0),
-                'hours_exchanged' => round((float) ($hoursExchanged->total ?? 0), 1),
-                'active_listings' => (int) ($activeListings->cnt ?? 0),
-            ];
+            $activeListings = (int) ($row->cnt ?? 0);
         } catch (\Throwable $e) {
-            Log::warning('ExploreService::getCommunityStats failed', ['error' => $e->getMessage()]);
-            return [
-                'total_members' => 0,
-                'exchanges_this_month' => 0,
-                'hours_exchanged' => 0,
-                'active_listings' => 0,
-            ];
+            Log::error('ExploreService::getCommunityStats listings query failed', [
+                'tenant_id' => $tenantId,
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+            ]);
         }
+
+        return [
+            'total_members' => $totalMembers,
+            'exchanges_this_month' => $exchangesThisMonth,
+            'hours_exchanged' => $hoursExchanged,
+            'active_listings' => $activeListings,
+        ];
     }
 
     /**
