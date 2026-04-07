@@ -390,5 +390,8 @@
   "toast": {
     "aria_notifications": "Notifications",
     "aria_dismiss_notification": "Dismiss notification"
+  },
+  "verification": {
+    "not_id_verified": "Not ID Verified"
   }
 }

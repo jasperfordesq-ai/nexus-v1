@@ -14,6 +14,7 @@ import { useState, useEffect } from 'react';
 import { Chip } from '@heroui/react';
 import {
   ShieldCheck,
+  ShieldOff,
   Mail,
   Phone,
   FileCheck,
@@ -178,18 +179,33 @@ export function VerificationBadgeRow({
     loadBadges();
   }, [userId, propBadges]);
 
-  if (!isLoaded || badges.length === 0) return null;
+  if (!isLoaded) return null;
+
+  const hasIdVerified = badges.some((b) => b.type === 'id_verified');
+  const unverifiedConfig = {
+    icon: <ShieldOff className="w-3.5 h-3.5" />,
+    iconSm: <ShieldOff className="w-3 h-3" />,
+    color: 'text-theme-muted',
+    bgColor: 'bg-theme-elevated',
+    label: t('verification.not_id_verified', 'Not ID Verified'),
+  };
+
+  const allBadges = hasIdVerified ? badges : [
+    ...badges,
+    { type: '__unverified__', label: unverifiedConfig.label },
+  ];
 
   return (
     <div className="flex items-center gap-1.5 flex-wrap" aria-label={t('aria.verification_badges', 'Verification badges')}>
-      {badges.map((badge) => {
-        const config = badgeConfig[badge.type] || {
+      {allBadges.map((badge) => {
+        const isUnverified = badge.type === '__unverified__';
+        const config = isUnverified ? unverifiedConfig : (badgeConfig[badge.type] || {
           icon: <ShieldCheck className="w-3.5 h-3.5" />,
           iconSm: <ShieldCheck className="w-3 h-3" />,
           color: 'text-theme-subtle',
           bgColor: 'bg-theme-elevated',
           label: badge.label || badge.type,
-        };
+        });
 
         if (size === 'sm') {
           return (
@@ -249,7 +265,6 @@ export function VerificationBadgeSummary({
   }, [userId]);
 
   if (isLoading) return null;
-  if (badges.length === 0) return null;
 
   return (
     <div className="space-y-3">
@@ -257,22 +272,29 @@ export function VerificationBadgeSummary({
         <Shield className="w-4 h-4 text-emerald-500" aria-hidden="true" />
         <span className="text-sm font-semibold text-theme-primary">Verification Status</span>
       </div>
-      <div className="flex flex-wrap gap-2">
-        {badges.map((badge) => {
-          const config = badgeConfig[badge.type];
-          return (
-            <Chip
-              key={badge.type}
-              size="md"
-              variant="flat"
-              className={`${config?.bgColor || 'bg-theme-elevated'} ${config?.color || 'text-theme-muted'} font-semibold`}
-              startContent={config?.icon || <ShieldCheck className="w-3.5 h-3.5" />}
-            >
-              {config?.label || badge.label}
-            </Chip>
-          );
-        })}
-      </div>
+      {badges.length === 0 ? (
+        <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-theme-elevated">
+          <ShieldOff className="w-4 h-4 text-theme-muted shrink-0" aria-hidden="true" />
+          <span className="text-xs text-theme-muted">Identity not verified</span>
+        </div>
+      ) : (
+        <div className="flex flex-wrap gap-2">
+          {badges.map((badge) => {
+            const config = badgeConfig[badge.type];
+            return (
+              <Chip
+                key={badge.type}
+                size="md"
+                variant="flat"
+                className={`${config?.bgColor || 'bg-theme-elevated'} ${config?.color || 'text-theme-muted'} font-semibold`}
+                startContent={config?.icon || <ShieldCheck className="w-3.5 h-3.5" />}
+              >
+                {config?.label || badge.label}
+              </Chip>
+            );
+          })}
+        </div>
+      )}
     </div>
   );
 }
