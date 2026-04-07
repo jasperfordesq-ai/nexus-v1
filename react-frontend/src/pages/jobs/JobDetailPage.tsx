@@ -93,7 +93,6 @@ import {
   Send,
   Video,
   CalendarPlus,
-  Download,
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
