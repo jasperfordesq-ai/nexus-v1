@@ -58,6 +58,28 @@ class OptionalIdentityVerificationController extends BaseApiController
             ? IdentityVerificationPaymentService::hasCompletedPayment($tenantId, $userId)
             : true; // No fee = considered paid
 
+        // If payment is pending, check Stripe directly (webhook may be delayed)
+        if (!$paymentCompleted && $feeCents > 0) {
+            $pendingSession = DB::selectOne(
+                "SELECT id, stripe_payment_intent_id FROM identity_verification_sessions
+                 WHERE tenant_id = ? AND user_id = ? AND payment_status = 'pending' AND stripe_payment_intent_id IS NOT NULL
+                 ORDER BY id DESC LIMIT 1",
+                [$tenantId, $userId]
+            );
+            if ($pendingSession && $pendingSession->stripe_payment_intent_id) {
+                try {
+                    $client = \App\Services\StripeService::client();
+                    $pi = $client->paymentIntents->retrieve($pendingSession->stripe_payment_intent_id);
+                    if ($pi->status === 'succeeded') {
+                        IdentityVerificationSessionService::updatePaymentStatus((int) $pendingSession->id, 'completed');
+                        $paymentCompleted = true;
+                    }
+                } catch (\Throwable $e) {
+                    Log::warning('Stripe payment status check failed', ['error' => $e->getMessage()]);
+                }
+            }
+        }
+
         // Check for any active verification session
         $latestSession = IdentityVerificationSessionService::getLatestForUser($tenantId, $userId);
 
