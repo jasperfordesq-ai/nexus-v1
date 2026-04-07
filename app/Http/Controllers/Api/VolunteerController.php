@@ -180,7 +180,8 @@ class VolunteerController extends BaseApiController
                 $volunteer = User::find($userId);
                 $volunteerName = $volunteer->name ?? 'Someone';
                 $notifContent = "{$volunteerName} applied for your volunteer opportunity: {$opportunity->title}";
-                $notifLink = "/volunteering/opportunities/{$id}";
+                $orgId = $opportunity->organization_id;
+                $notifLink = "/volunteering/org/{$orgId}/dashboard?tab=applications";
 
                 NotificationDispatcher::dispatch(
                     (int) $opportunity->created_by,
