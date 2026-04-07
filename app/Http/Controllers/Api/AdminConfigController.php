@@ -2226,4 +2226,56 @@ class AdminConfigController extends BaseApiController
 
         return $this->respondWithData(['deleted' => true]);
     }
+
+    // =========================================================================
+    // Identity Verification Configuration
+    // =========================================================================
+
+    private const IDENTITY_DEFAULTS = [
+        'identity_verification_fee_cents' => 500,
+    ];
+
+    /** GET /api/v2/admin/config/identity */
+    public function getIdentityConfig(): JsonResponse
+    {
+        $this->requireAdmin();
+        $tenantId = TenantContext::getId();
+
+        $config = [];
+        foreach (self::IDENTITY_DEFAULTS as $key => $default) {
+            $config[$key] = (int) \App\Services\TenantSettingsService::get($tenantId, $key, (string) $default);
+        }
+
+        return $this->respondWithData([
+            'config' => $config,
+            'defaults' => self::IDENTITY_DEFAULTS,
+        ]);
+    }
+
+    /** PUT /api/v2/admin/config/identity/bulk */
+    public function updateIdentityConfigBulk(): JsonResponse
+    {
+        $this->requireSuperAdmin();
+        $tenantId = $this->getTenantId();
+
+        $settings = $this->input('settings');
+        if (!is_array($settings) || empty($settings)) {
+            return $this->respondWithError('VALIDATION_ERROR', 'Settings array is required', 'settings', 422);
+        }
+
+        $updated = [];
+        foreach ($settings as $key => $value) {
+            if (!array_key_exists($key, self::IDENTITY_DEFAULTS)) {
+                continue;
+            }
+            $value = max(0, (int) $value);
+            \App\Services\TenantSettingsService::set($tenantId, $key, (string) $value, 'integer');
+            $updated[$key] = $value;
+        }
+
+        $this->redisCache->delete('tenant_bootstrap', $tenantId);
+        \App\Services\TenantSettingsService::clearCacheForTenant($tenantId);
+
+        return $this->respondWithData(['updated' => $updated]);
+    }
 }

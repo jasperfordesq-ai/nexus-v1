@@ -58,6 +58,9 @@ export default function ModuleConfigModal({ module, isOpen, onClose }: ModuleCon
   // Job config state
   const [jobConfig, setJobConfig] = useState<Record<string, boolean | number | string> | null>(null);
 
+  // Identity verification config state
+  const [identityConfig, setIdentityConfig] = useState<Record<string, boolean | number | string> | null>(null);
+
   // ── Loaders ───────────────────────────────────────────────────────────────
 
   const loadBrokerConfig = useCallback(async () => {
@@ -130,6 +133,20 @@ export default function ModuleConfigModal({ module, isOpen, onClose }: ModuleCon
     }
   }, [toast]);
 
+  const loadIdentityConfig = useCallback(async () => {
+    setLoading(true);
+    try {
+      const res = await adminConfig.getIdentityConfig();
+      if (res.success && res.data) {
+        setIdentityConfig(res.data.config);
+      }
+    } catch {
+      toast.error('Failed to load identity verification config');
+    } finally {
+      setLoading(false);
+    }
+  }, [toast]);
+
   useEffect(() => {
     if (!isOpen || !module) {
       setHasChanges(false);
@@ -138,6 +155,7 @@ export default function ModuleConfigModal({ module, isOpen, onClose }: ModuleCon
       setListingConfig(null);
       setVolunteeringConfig(null);
       setJobConfig(null);
+      setIdentityConfig(null);
       return;
     }
     if (module.configSource === 'broker_config') {
@@ -150,6 +168,8 @@ export default function ModuleConfigModal({ module, isOpen, onClose }: ModuleCon
       loadVolunteeringConfig();
     } else if (module.configSource === 'job_config') {
       loadJobConfig();
+    } else if (module.configSource === 'identity_config') {
+      loadIdentityConfig();
     }
   }, [isOpen, module, loadBrokerConfig, loadGroupConfig, loadListingConfig, loadVolunteeringConfig, loadJobConfig]);
 
@@ -254,6 +274,25 @@ export default function ModuleConfigModal({ module, isOpen, onClose }: ModuleCon
     }
   }
 
+  async function handleSaveIdentityConfig() {
+    if (!identityConfig) return;
+    setSaving(true);
+    try {
+      const res = await adminConfig.updateIdentityConfigBulk(identityConfig);
+      if (res.success) {
+        toast.success('Identity verification settings saved');
+        setHasChanges(false);
+        refreshTenant();
+      } else {
+        toast.error(t('config.modal_save_failed'));
+      }
+    } catch {
+      toast.error(t('config.modal_save_failed'));
+    } finally {
+      setSaving(false);
+    }
+  }
+
   // ── Value updaters ────────────────────────────────────────────────────────
 
   function updateBrokerValue<K extends keyof BrokerConfig>(key: K, value: BrokerConfig[K]) {
@@ -281,6 +320,11 @@ export default function ModuleConfigModal({ module, isOpen, onClose }: ModuleCon
     setHasChanges(true);
   }
 
+  function updateIdentityValue(key: string, value: boolean | number | string) {
+    setIdentityConfig(prev => prev ? { ...prev, [key]: value } : prev);
+    setHasChanges(true);
+  }
+
   function handleNavigateToDetail() {
     if (module?.detailPageUrl) {
       onClose();
@@ -299,7 +343,8 @@ export default function ModuleConfigModal({ module, isOpen, onClose }: ModuleCon
   const isListingConfig = module.configSource === 'listing_config';
   const isVolunteeringConfig = module.configSource === 'volunteering_config';
   const isJobConfig = module.configSource === 'job_config';
-  const isEditable = isBroker || isGroupConfig || isListingConfig || isVolunteeringConfig || isJobConfig;
+  const isIdentityConfig = module.configSource === 'identity_config';
+  const isEditable = isBroker || isGroupConfig || isListingConfig || isVolunteeringConfig || isJobConfig || isIdentityConfig;
 
   return (
     <Modal size="4xl" isOpen={isOpen} onClose={onClose} scrollBehavior="inside">
@@ -393,6 +438,8 @@ export default function ModuleConfigModal({ module, isOpen, onClose }: ModuleCon
                       currentValue = volunteeringConfig[option.key] ?? option.defaultValue;
                     } else if (isJobConfig && jobConfig) {
                       currentValue = jobConfig[option.key] ?? option.defaultValue;
+                    } else if (isIdentityConfig && identityConfig) {
+                      currentValue = identityConfig[option.key] ?? option.defaultValue;
                     }
 
                     return (
@@ -412,9 +459,11 @@ export default function ModuleConfigModal({ module, isOpen, onClose }: ModuleCon
                               updateVolunteeringValue(option.key, val);
                             } else if (isJobConfig) {
                               updateJobValue(option.key, val);
+                            } else if (isIdentityConfig) {
+                              updateIdentityValue(option.key, val);
                             }
                           }}
-                          disabled={option.comingSoon === true || (isBroker && !brokerConfig) || (isGroupConfig && !groupConfig) || (isListingConfig && !listingConfig) || (isVolunteeringConfig && !volunteeringConfig) || (isJobConfig && !jobConfig)}
+                          disabled={option.comingSoon === true || (isBroker && !brokerConfig) || (isGroupConfig && !groupConfig) || (isListingConfig && !listingConfig) || (isVolunteeringConfig && !volunteeringConfig) || (isJobConfig && !jobConfig) || (isIdentityConfig && !identityConfig)}
                         />
                       </div>
                     );
@@ -448,8 +497,8 @@ export default function ModuleConfigModal({ module, isOpen, onClose }: ModuleCon
               color="primary"
               startContent={<Save size={16} />}
               isLoading={saving}
-              isDisabled={!hasChanges || (isBroker && !brokerConfig) || (isGroupConfig && !groupConfig) || (isListingConfig && !listingConfig) || (isVolunteeringConfig && !volunteeringConfig) || (isJobConfig && !jobConfig)}
-              onPress={isBroker ? handleSaveBrokerConfig : isListingConfig ? handleSaveListingConfig : isVolunteeringConfig ? handleSaveVolunteeringConfig : isJobConfig ? handleSaveJobConfig : handleSaveGroupConfig}
+              isDisabled={!hasChanges || (isBroker && !brokerConfig) || (isGroupConfig && !groupConfig) || (isListingConfig && !listingConfig) || (isVolunteeringConfig && !volunteeringConfig) || (isJobConfig && !jobConfig) || (isIdentityConfig && !identityConfig)}
+              onPress={isBroker ? handleSaveBrokerConfig : isListingConfig ? handleSaveListingConfig : isVolunteeringConfig ? handleSaveVolunteeringConfig : isJobConfig ? handleSaveJobConfig : isIdentityConfig ? handleSaveIdentityConfig : handleSaveGroupConfig}
             >
               {t('config.save_changes')}
             </Button>

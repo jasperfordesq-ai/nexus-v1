@@ -964,6 +964,8 @@ Route::get('/v2/admin/config/volunteering', [\App\Http\Controllers\Api\AdminConf
 Route::put('/v2/admin/config/volunteering/bulk', [\App\Http\Controllers\Api\AdminConfigController::class, 'updateVolunteeringConfigBulk']);
 Route::get('/v2/admin/config/jobs', [\App\Http\Controllers\Api\AdminConfigController::class, 'getJobConfig']);
 Route::put('/v2/admin/config/jobs/bulk', [\App\Http\Controllers\Api\AdminConfigController::class, 'updateJobConfigBulk']);
+Route::get('/v2/admin/config/identity', [\App\Http\Controllers\Api\AdminConfigController::class, 'getIdentityConfig']);
+Route::put('/v2/admin/config/identity/bulk', [\App\Http\Controllers\Api\AdminConfigController::class, 'updateIdentityConfigBulk']);
 Route::get('/v2/admin/config/translation', [\App\Http\Controllers\Api\AdminConfigController::class, 'getTranslationConfig']);
 Route::put('/v2/admin/config/translation', [\App\Http\Controllers\Api\AdminConfigController::class, 'updateTranslationConfig']);
 Route::put('/v2/admin/config/translation/bulk', [\App\Http\Controllers\Api\AdminConfigController::class, 'updateTranslationConfigBulk']);
@@ -1353,6 +1355,11 @@ Route::get('/v2/admin/jobs/moderation-queue', [\App\Http\Controllers\Api\AdminJo
 Route::get('/v2/admin/jobs/moderation-stats', [\App\Http\Controllers\Api\AdminJobsController::class, 'moderationStats']);
 Route::get('/v2/admin/jobs/spam-stats', [\App\Http\Controllers\Api\AdminJobsController::class, 'spamStats']);
 Route::get('/v2/admin/jobs/bias-audit', [\App\Http\Controllers\Api\AdminJobsController::class, 'biasAudit']);
+Route::get('/v2/admin/jobs/stats', [\App\Http\Controllers\Api\AdminJobsController::class, 'stats']);
+Route::get('/v2/admin/jobs/interviews', [\App\Http\Controllers\Api\AdminJobsController::class, 'interviews']);
+Route::get('/v2/admin/jobs/offers', [\App\Http\Controllers\Api\AdminJobsController::class, 'offers']);
+Route::get('/v2/admin/jobs/templates', [\App\Http\Controllers\Api\AdminJobsController::class, 'templates']);
+Route::delete('/v2/admin/jobs/templates/{id}', [\App\Http\Controllers\Api\AdminJobsController::class, 'deleteTemplate']);
 Route::put('/v2/admin/jobs/applications/{id}', [\App\Http\Controllers\Api\AdminJobsController::class, 'updateApplicationStatus']);
 // Wildcard {id} routes
 Route::get('/v2/admin/jobs/{id}', [\App\Http\Controllers\Api\AdminJobsController::class, 'show']);

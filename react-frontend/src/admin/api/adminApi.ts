@@ -349,6 +349,17 @@ export const adminConfig = {
       { settings }
     ),
 
+  getIdentityConfig: () =>
+    api.get<{ config: Record<string, boolean | number | string>; defaults: Record<string, boolean | number | string> }>(
+      '/v2/admin/config/identity'
+    ),
+
+  updateIdentityConfigBulk: (settings: Record<string, boolean | number | string>) =>
+    api.put<{ updated: Record<string, boolean | number | string> }>(
+      '/v2/admin/config/identity/bulk',
+      { settings }
+    ),
+
   // Translation config (INT9)
   getTranslationConfig: () =>
     api.get<{ config: Record<string, boolean | number | string>; defaults: Record<string, boolean | number | string> }>(
@@ -1255,6 +1266,11 @@ export const adminVolunteering = {
   createCustomField: (data: Record<string, unknown>) => api.post('/v2/admin/volunteering/custom-fields', data),
   updateCustomField: (id: number, data: Record<string, unknown>) => api.put(`/v2/admin/volunteering/custom-fields/${id}`, data),
   deleteCustomField: (id: number) => api.delete(`/v2/admin/volunteering/custom-fields/${id}`),
+
+  // Organization CRUD + Members
+  getOrgMembers: (orgId: number) => api.get(`/v2/volunteering/organisations/${orgId}/volunteers`),
+  createOrganization: (data: Record<string, unknown>) => api.post('/v2/volunteering/organisations', data),
+  updateOrganization: (orgId: number, data: Record<string, unknown>) => api.put(`/v2/volunteering/organisations/${orgId}`, data),
 
   // Reminders
   getReminderSettings: () => api.get('/v2/admin/volunteering/reminder-settings'),

@@ -39,6 +39,7 @@ import {
   Search,
   Brain,
   ShoppingBag,
+  ShieldCheck,
 } from 'lucide-react';
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -55,6 +56,7 @@ export type ConfigSource =
   | 'listing_config'
   | 'volunteering_config'
   | 'job_config'
+  | 'identity_config'
   | 'group_policies'
   | 'onboarding_config'
   | 'tenant_settings'
@@ -621,6 +623,17 @@ const FEATURE_MODULES: ModuleDefinition[] = [
       { key: 'marketplace.max_images', label: 'Max Images Per Listing', description: 'Maximum number of images per marketplace listing', type: 'number', defaultValue: 20, category: 'Limits', min: 1, max: 50 },
       { key: 'marketplace.max_active_listings', label: 'Max Active Listings', description: 'Maximum active marketplace listings per user', type: 'number', defaultValue: 50, category: 'Limits', min: 1, max: 500 },
       { key: 'marketplace.listing_duration_days', label: 'Listing Duration (Days)', description: 'Number of days before marketplace listings auto-expire', type: 'number', defaultValue: 30, category: 'Limits', min: 1, max: 365 },
+    ],
+  },
+  {
+    id: 'identity_verification',
+    name: 'Identity Verification',
+    description: 'Stripe Identity verification with ID Verified badge, document + selfie matching, and configurable fee',
+    icon: ShieldCheck,
+    type: 'feature',
+    configSource: 'identity_config',
+    configOptions: [
+      { key: 'identity_verification_fee_cents', label: 'Verification Fee (cents)', description: 'One-time fee charged for identity verification. Set to 0 for free verification. Value in cents (e.g. 500 = €5.00)', type: 'number', defaultValue: 500, category: 'Pricing', min: 0, max: 10000 },
     ],
   },
 ];
