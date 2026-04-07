@@ -60,6 +60,12 @@ After deploying to production, always check for CORS errors, tenant binding issu
 
 When deploying to production, always verify the deployment is working by checking key endpoints before reporting success. Never skip migration dry-runs on production.
 
+### 🔴 NEVER AUTO-PUSH TO BACKUP REPO (CRITICAL)
+
+**NEVER push to the `backup` remote (`nexus-v1-backup`) unless the user explicitly tells you to.** The backup repo is private and contains credentials, secrets, and all gitignored files. Only push when the user gives a direct instruction (e.g., "push the backup", "push to backup repo").
+
+See [BACKUP.md](BACKUP.md) for the full backup system documentation.
+
 ---
 
 ## Debugging Guidelines
@@ -143,6 +149,7 @@ The NGC folder (`C:\Users\{user}\AppData\Local\Microsoft\Ngc`) must exist — th
 | [docs/QA_AUDIT_AND_TEST_PLAN.md](docs/QA_AUDIT_AND_TEST_PLAN.md) | Master QA document |
 | [docs/LOCAL_DEV_SETUP.md](docs/LOCAL_DEV_SETUP.md) | Docker development setup |
 | [LARAVEL_MIGRATION_PLAN.md](LARAVEL_MIGRATION_PLAN.md) | Laravel migration plan, workflow, and effort estimates |
+| [BACKUP.md](BACKUP.md) | Full backup system — private repo for machine transfers (gitignored from public) |
 
 ---
 
@@ -600,4 +607,13 @@ ssh -i "C:\ssh-keys\project-nexus.pem" -o RequestTTY=force azureuser@20.224.171.
    sudo docker cp /opt/nexus-php/scripts/sync_search_index.php \
      nexus-php-app:/var/www/html/scripts/sync_search_index.php && \
    sudo docker exec nexus-php-app php scripts/sync_search_index.php --all-tenants"
+
+# Backup (full project snapshot to private repo)
+# See BACKUP.md for full documentation
+git checkout full-backup                    # Switch to backup branch
+git merge main --no-edit                    # Merge latest source
+# (swap .gitignore to minimal version — see BACKUP.md)
+git add -A && git commit --no-verify -m "chore: backup snapshot $(date +%Y-%m-%d)"
+git checkout main                           # Switch back
+git push backup full-backup                 # Push ONLY when user says to
 ```
