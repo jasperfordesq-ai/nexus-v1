@@ -47,11 +47,20 @@ BOLD='\033[1m'
 NC='\033[0m'
 
 # --- Logging functions ---
-log_ok()   { echo -e "${GREEN}[OK]${NC}   $1" | tee -a "$LOG_FILE"; }
-log_info() { echo -e "${CYAN}[INFO]${NC} $1" | tee -a "$LOG_FILE"; }
-log_warn() { echo -e "${YELLOW}[WARN]${NC} $1" | tee -a "$LOG_FILE"; }
-log_err()  { echo -e "${RED}[FAIL]${NC} $1" | tee -a "$LOG_FILE"; }
-log_step() { echo -e "\n${BOLD}$1${NC}" | tee -a "$LOG_FILE"; }
+# _log_out: in detached mode, just echo (stdout IS the log file).
+# In interactive mode, tee to both terminal and log file.
+_log_out() {
+    if [ -n "${__NEXUS_DEPLOY_DETACHED__:-}" ]; then
+        echo -e "$1"
+    else
+        echo -e "$1" | tee -a "$LOG_FILE"
+    fi
+}
+log_ok()   { _log_out "${GREEN}[OK]${NC}   $1"; }
+log_info() { _log_out "${CYAN}[INFO]${NC} $1"; }
+log_warn() { _log_out "${YELLOW}[WARN]${NC} $1"; }
+log_err()  { _log_out "${RED}[FAIL]${NC} $1"; }
+log_step() { _log_out "\n${BOLD}$1${NC}"; }
 
 # --- Maintenance Mode ---
 MAINTENANCE_FILE="/var/www/html/.maintenance"
@@ -64,6 +73,8 @@ PHP_CONTAINER="nexus-php-app"
 # every 30s to keep the connection alive.
 KEEPALIVE_PID=""
 start_keepalive() {
+    # Skip keepalive in detached mode — no SSH session to keep alive
+    if [ -n "${__NEXUS_DEPLOY_DETACHED__:-}" ]; then return 0; fi
     ( while true; do echo -n "." | tee -a "$LOG_FILE"; sleep 30; done ) &
     KEEPALIVE_PID=$!
 }
@@ -1070,13 +1081,13 @@ if [ "$DETACH" = "1" ] && [ -z "${__NEXUS_DEPLOY_DETACHED__:-}" ]; then
     exit 0
 fi
 
-# Set up LOG_FILE for tee calls
+# Set up LOG_FILE
+TIMESTAMP=$(date +%Y-%m-%d_%H-%M-%S)
 if [ -n "${__NEXUS_DEPLOY_DETACHED__:-}" ]; then
-    # Detached child: stdout/stderr already redirected to the log file by run_detached.
-    # Point LOG_FILE at /dev/null so tee doesn't double-write — stdout IS the log.
+    # Detached child: stdout/stderr already go to the log file via run_detached redirect.
+    # Point LOG_FILE at /dev/null so tee doesn't double-write.
     LOG_FILE="/dev/null"
 else
-    TIMESTAMP=$(date +%Y-%m-%d_%H-%M-%S)
     LOG_FILE="$LOG_DIR/deploy-$TIMESTAMP.log"
 fi
 
