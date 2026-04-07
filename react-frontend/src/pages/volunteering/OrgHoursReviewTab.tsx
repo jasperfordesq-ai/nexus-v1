@@ -80,11 +80,10 @@ function OrgHoursReviewTab({ orgId, balance, autoPay, onBalanceChange }: OrgHour
 
       if (controller.signal.aborted) return;
       if (response.success && response.data) {
-        // respondWithCollection returns { data: [...], meta: { cursor, has_more } }
-        const raw = response.data as unknown as { data?: PendingHourEntry[]; meta?: { cursor?: string; has_more?: boolean } };
-        const items = Array.isArray(raw.data) ? raw.data : [];
-        const nextCursor = raw.meta?.cursor ?? null;
-        const has_more = raw.meta?.has_more ?? false;
+        // api.get() already unwraps { data: [...], meta: {...} } → response.data = [...], response.meta = {...}
+        const items = Array.isArray(response.data) ? response.data : [];
+        const nextCursor = response.meta?.cursor ?? null;
+        const has_more = response.meta?.has_more ?? false;
         if (append) {
           setEntries((prev) => [...prev, ...items]);
         } else {

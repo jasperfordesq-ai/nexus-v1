@@ -144,11 +144,10 @@ export function OrgWalletTab({ orgId, balance, autoPay, onBalanceChange }: OrgWa
       if (controller.signal.aborted) return;
 
       if (response.success && response.data) {
-        // respondWithCollection returns { data: [...], meta: { cursor, has_more } }
-        const raw = response.data as unknown as { data?: WalletTransaction[]; meta?: { cursor?: string; has_more?: boolean }; items?: WalletTransaction[]; cursor?: string; has_more?: boolean };
-        const items = Array.isArray(raw.data) ? raw.data : (Array.isArray(raw.items) ? raw.items : []);
-        const newCursor = raw.meta?.cursor ?? raw.cursor ?? null;
-        const hasMoreData = raw.meta?.has_more ?? raw.has_more ?? false;
+        // api.get() already unwraps { data: [...], meta: {...} } → response.data = [...], response.meta = {...}
+        const items = Array.isArray(response.data) ? response.data : [];
+        const newCursor = response.meta?.cursor ?? null;
+        const hasMoreData = response.meta?.has_more ?? false;
 
         if (isAppend) {
           setTransactions((prev) => [...prev, ...items]);
