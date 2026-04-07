@@ -111,7 +111,11 @@ function OrgApplicationsTab({ orgId }: OrgApplicationsTabProps) {
         if (controller.signal.aborted) return;
 
         if (response.success && response.data) {
-          const { items, cursor: newCursor, has_more } = response.data;
+          // respondWithCollection returns { data: [...], meta: { cursor, has_more } }
+          const raw = response.data as unknown as { data: OrgApplication[]; meta: { cursor?: string; has_more: boolean } };
+          const items = Array.isArray(raw.data) ? raw.data : (Array.isArray(response.data) ? response.data as unknown as OrgApplication[] : []);
+          const newCursor = raw.meta?.cursor ?? null;
+          const has_more = raw.meta?.has_more ?? false;
           setApplications((prev) => (nextCursor ? [...prev, ...items] : items));
           setCursor(newCursor);
           setHasMore(has_more);
