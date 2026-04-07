@@ -37,7 +37,7 @@ class MarketplaceOfferController extends BaseApiController
     {
         if (!TenantContext::hasFeature('marketplace')) {
             throw new \Illuminate\Http\Exceptions\HttpResponseException(
-                $this->respondWithError('FEATURE_DISABLED', 'The marketplace feature is not enabled for this community.', null, 403)
+                $this->respondWithError('FEATURE_DISABLED', __('api_controllers_2.marketplace_offer.feature_disabled'), null, 403)
             );
         }
     }
@@ -87,7 +87,7 @@ class MarketplaceOfferController extends BaseApiController
         // Verify the authenticated user owns the listing
         $listing = MarketplaceListing::findOrFail($listingId);
         if ($listing->user_id !== $userId) {
-            return $this->respondWithError('FORBIDDEN', 'You do not own this listing.', null, 403);
+            return $this->respondWithError('FORBIDDEN', __('api_controllers_2.marketplace_offer.not_own_listing'), null, 403);
         }
 
         $offers = MarketplaceOfferService::getOffersForListing($listingId, $userId);
@@ -111,7 +111,7 @@ class MarketplaceOfferController extends BaseApiController
         $offer = MarketplaceOffer::findOrFail($id);
 
         if ($offer->seller_id !== $userId) {
-            return $this->respondWithError('FORBIDDEN', 'Only the seller can accept this offer.', null, 403);
+            return $this->respondWithError('FORBIDDEN', __('api_controllers_2.marketplace_offer.only_seller_accept'), null, 403);
         }
 
         try {
@@ -139,7 +139,7 @@ class MarketplaceOfferController extends BaseApiController
         $offer = MarketplaceOffer::findOrFail($id);
 
         if ($offer->seller_id !== $userId) {
-            return $this->respondWithError('FORBIDDEN', 'Only the seller can decline this offer.', null, 403);
+            return $this->respondWithError('FORBIDDEN', __('api_controllers_2.marketplace_offer.only_seller_decline'), null, 403);
         }
 
         try {
@@ -167,7 +167,7 @@ class MarketplaceOfferController extends BaseApiController
         $offer = MarketplaceOffer::findOrFail($id);
 
         if ($offer->seller_id !== $userId) {
-            return $this->respondWithError('FORBIDDEN', 'Only the seller can counter this offer.', null, 403);
+            return $this->respondWithError('FORBIDDEN', __('api_controllers_2.marketplace_offer.only_seller_counter'), null, 403);
         }
 
         $validated = request()->validate([
@@ -200,7 +200,7 @@ class MarketplaceOfferController extends BaseApiController
         $offer = MarketplaceOffer::findOrFail($id);
 
         if ($offer->buyer_id !== $userId) {
-            return $this->respondWithError('FORBIDDEN', 'Only the buyer can accept a counter-offer.', null, 403);
+            return $this->respondWithError('FORBIDDEN', __('api_controllers_2.marketplace_offer.only_buyer_accept_counter'), null, 403);
         }
 
         try {
@@ -228,13 +228,13 @@ class MarketplaceOfferController extends BaseApiController
         $offer = MarketplaceOffer::findOrFail($id);
 
         if ($offer->buyer_id !== $userId) {
-            return $this->respondWithError('FORBIDDEN', 'Only the buyer can withdraw their offer.', null, 403);
+            return $this->respondWithError('FORBIDDEN', __('api_controllers_2.marketplace_offer.only_buyer_withdraw'), null, 403);
         }
 
         try {
             MarketplaceOfferService::withdraw($offer, $userId);
 
-            return $this->respondWithData(['message' => 'Offer withdrawn successfully.']);
+            return $this->respondWithData(['message' => __('api_controllers_2.marketplace_offer.withdrawn')]);
         } catch (\InvalidArgumentException $e) {
             return $this->respondWithError('VALIDATION_ERROR', $e->getMessage(), null, 422);
         }

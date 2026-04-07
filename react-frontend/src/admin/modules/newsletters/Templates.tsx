@@ -119,10 +119,10 @@ export function Templates() {
     try {
       const res = await adminNewsletters.duplicateTemplate(template.id);
       if (res.success) {
-        toast.success(`Template duplicated as "${template.name} (Copy)"`);
+        toast.success(t('newsletters.template_duplicated_as', { name: `${template.name} (Copy)` }));
         loadData();
       } else {
-        toast.error(res.error || 'Failed to duplicate template');
+        toast.error(res.error || t('newsletters.failed_to_duplicate_template'));
       }
     } catch {
       toast.error(t('newsletters.an_unexpected_error_occurred'));
@@ -135,11 +135,11 @@ export function Templates() {
     try {
       const res = await adminNewsletters.deleteTemplate(deleteTarget.id);
       if (res.success) {
-        toast.success(`Template "${deleteTarget.name}" deleted`);
+        toast.success(t('newsletters.template_deleted', { name: deleteTarget.name }));
         setDeleteTarget(null);
         loadData();
       } else {
-        toast.error(res.error || 'Failed to delete template');
+        toast.error(res.error || t('newsletters.failed_to_delete_template'));
       }
     } catch {
       toast.error(t('newsletters.an_unexpected_error_occurred'));
@@ -353,7 +353,7 @@ export function Templates() {
         onClose={() => setDeleteTarget(null)}
         onConfirm={handleDelete}
         title={t('newsletters.delete_template')}
-        message={`Are you sure you want to delete "${deleteTarget?.name}"? This action cannot be undone.`}
+        message={t('newsletters.delete_template_confirm', { name: deleteTarget?.name })}
         confirmLabel="Delete"
         confirmColor="danger"
         isLoading={deleting}

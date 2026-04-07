@@ -89,7 +89,7 @@ class EmailVerificationController extends BaseApiController
 
             return $this->respondWithData([
                 'verified' => true,
-                'message' => 'Email address is already verified'
+                'message' => __('api_controllers_1.email_verification.already_verified')
             ]);
         }
 
@@ -124,7 +124,7 @@ class EmailVerificationController extends BaseApiController
 
         return $this->respondWithData([
             'verified' => true,
-            'message' => 'Email address verified successfully'
+            'message' => __('api_controllers_1.email_verification.verified_successfully')
         ]);
     }
 
@@ -164,7 +164,7 @@ class EmailVerificationController extends BaseApiController
         // Check if already verified
         if (!empty($user['email_verified_at'])) {
             return $this->respondWithData([
-                'message' => 'Email address is already verified',
+                'message' => __('api_controllers_1.email_verification.already_verified'),
                 'already_verified' => true
             ]);
         }
@@ -173,7 +173,7 @@ class EmailVerificationController extends BaseApiController
         $this->sendVerificationEmail($user);
 
         return $this->respondWithData([
-            'message' => 'Verification email sent'
+            'message' => __('api_controllers_1.email_verification.verification_sent')
         ]);
     }
 
@@ -196,7 +196,7 @@ class EmailVerificationController extends BaseApiController
         $tenantId = TenantContext::getId();
 
         // Always return the same success message (prevents user enumeration)
-        $genericResponse = ['message' => 'If an account with that email exists and is unverified, a new verification email has been sent.'];
+        $genericResponse = ['message' => __('api_controllers_1.email_verification.generic_resend')];
 
         if (empty($email) || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
             return $this->respondWithData($genericResponse);

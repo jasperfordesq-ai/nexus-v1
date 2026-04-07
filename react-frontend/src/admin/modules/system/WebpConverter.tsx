@@ -52,10 +52,10 @@ export function WebpConverter() {
     setConverting(true);
     try {
       await adminTools.runWebpConversion();
-      toast.success('WebP conversion complete', 'All eligible images have been converted.');
+      toast.success(t('system.webp_conversion_complete'), t('system.webp_all_converted'));
       await fetchStats();
     } catch {
-      toast.error('Conversion failed', 'An error occurred during WebP conversion.');
+      toast.error(t('system.conversion_failed'), t('system.webp_conversion_error'));
     } finally {
       setConverting(false);
     }

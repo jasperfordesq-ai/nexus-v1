@@ -62,7 +62,7 @@ export function BadgeConfiguration() {
     if (res.success && res.data) {
       setBadges(res.data as BadgeConfigEntry[]);
     } else {
-      toast.error('Failed to load badge configuration');
+      toast.error(t('gamification.failed_to_load_badge_configuration'));
     }
     setLoading(false);
   }, [toast]);
@@ -79,9 +79,9 @@ export function BadgeConfiguration() {
       setBadges((prev) =>
         prev.map((b) => (b.key === badge.key ? { ...b, is_enabled: enabled } : b)),
       );
-      toast.success(`${badge.name} ${enabled ? 'enabled' : 'disabled'}`);
+      toast.success(t('gamification.badge_toggled', { name: badge.name, status: enabled ? t('gamification.enabled') : t('gamification.disabled') }));
     } else {
-      toast.error('Failed to update badge');
+      toast.error(t('gamification.failed_to_update_badge'));
     }
     setUpdating(null);
   };
@@ -90,10 +90,10 @@ export function BadgeConfiguration() {
     setUpdating(badge.key);
     const res = await adminGamification.resetBadgeConfig(badge.key);
     if (res.success) {
-      toast.success(`${badge.name} reset to defaults`);
+      toast.success(t('gamification.badge_reset_to_defaults', { name: badge.name }));
       loadBadges();
     } else {
-      toast.error('Failed to reset badge');
+      toast.error(t('gamification.failed_to_reset_badge'));
     }
     setUpdating(null);
   };

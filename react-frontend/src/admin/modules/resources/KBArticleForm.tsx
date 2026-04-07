@@ -300,10 +300,10 @@ export function KBArticleForm() {
         setAttachments((prev) => [...prev, res.data as KBAttachment]);
         toast.success(t('resources.attachment_uploaded', 'File attached successfully'));
       } else {
-        toast.error(res.error || 'Failed to upload attachment');
+        toast.error(res.error || t('resources.failed_to_upload_attachment'));
       }
     } catch {
-      toast.error('Failed to upload attachment');
+      toast.error(t('resources.failed_to_upload_attachment'));
     } finally {
       setUploadingAttachment(false);
     }
@@ -318,7 +318,7 @@ export function KBArticleForm() {
         toast.success(t('resources.attachment_deleted', 'Attachment removed'));
       }
     } catch {
-      toast.error('Failed to delete attachment');
+      toast.error(t('resources.failed_to_delete_attachment'));
     }
   }
 

@@ -26,6 +26,6 @@ class GroupNotificationPrefController extends BaseApiController
         if ($userId instanceof JsonResponse) return $userId;
         $data = request()->only(['frequency', 'email_enabled', 'push_enabled']);
         GroupNotificationPreferenceService::set($userId, $id, $data);
-        return $this->successResponse(['message' => 'Preferences updated']);
+        return $this->successResponse(['message' => __('api_controllers_3.group_notification_pref.preferences_updated')]);
     }
 }

@@ -194,11 +194,11 @@ export function UserMonitoring() {
         ...(expiresDays ? { expires_days: Number(expiresDays) } : {}),
       });
       if (res?.success) {
-        toast.success(`${selectedUser.name} added to monitoring`);
+        toast.success(t('broker.user_added_to_monitoring', { name: selectedUser.name }));
         resetModalState();
         loadItems();
       } else {
-        toast.error(res?.error || 'Failed to add user to monitoring');
+        toast.error(res?.error || t('broker.failed_to_add_user_to_monitoring'));
       }
     } catch {
       toast.error(t('broker.failed_to_add_user_to_monitoring'));
@@ -208,7 +208,7 @@ export function UserMonitoring() {
   };
 
   const handleRemoveMonitoring = async (userId: number) => {
-    if (!window.confirm('Remove this user from monitoring? This will also re-enable their messaging if it was disabled.')) return;
+    if (!window.confirm(t('broker.confirm_remove_monitoring'))) return;
     setRemovingId(userId);
     try {
       const res = await adminBroker.setMonitoring(userId, { under_monitoring: false });
@@ -216,7 +216,7 @@ export function UserMonitoring() {
         toast.success(t('broker.user_removed_from_monitoring'));
         loadItems();
       } else {
-        toast.error(res?.error || 'Failed to remove user from monitoring');
+        toast.error(res?.error || t('broker.failed_to_remove_user_from_monitoring'));
       }
     } catch {
       toast.error(t('broker.failed_to_remove_user_from_monitoring'));

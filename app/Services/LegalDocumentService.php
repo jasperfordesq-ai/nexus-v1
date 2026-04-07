@@ -604,8 +604,8 @@ class LegalDocumentService
                 DB::table('notifications')->insert([
                     'user_id'    => $user->id,
                     'type'       => 'legal_update',
-                    'title'      => "Updated: {$document['title']}",
-                    'message'    => "Please review version {$version['version_number']} of our {$document['title']}",
+                    'title'      => __('svc_notifications.legal.update_title', ['title' => $document['title']]),
+                    'message'    => __('svc_notifications.legal.update_message', ['version' => $version['version_number'], 'title' => $document['title']]),
                     'link'       => '/' . ($document['slug'] ?? ''),
                     'created_at' => now(),
                 ]);

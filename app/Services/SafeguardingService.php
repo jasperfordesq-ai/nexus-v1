@@ -86,7 +86,7 @@ class SafeguardingService
                 'ward_user_id' => $wardUserId,
             ]);
 
-            return ['success' => true, 'message' => 'Safeguarding assignment created'];
+            return ['success' => true, 'message' => __('svc_notifications_2.safeguarding.assignment_created')];
         } catch (\Throwable $e) {
             Log::error('SafeguardingService::createAssignment error: ' . $e->getMessage());
             return ['success' => false, 'error' => 'Failed to create assignment'];

@@ -85,7 +85,7 @@ class PeerEndorsementController extends BaseApiController
             'endorsement_count' => $endorsementCount,
             'threshold' => self::ENDORSEMENT_THRESHOLD,
             'badge_granted' => $badgeGranted,
-            'message' => 'Peer endorsement recorded',
+            'message' => __('api_controllers_2.peer_endorsement.recorded'),
         ]);
     }
 }

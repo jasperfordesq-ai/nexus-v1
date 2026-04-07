@@ -185,7 +185,7 @@ class TwoFactorController extends BaseApiController
         }
 
         return $this->respondWithData([
-            'message' => 'Two-factor authentication has been disabled',
+            'message' => __('api_controllers_2.two_factor.disabled'),
         ]);
     }
 }

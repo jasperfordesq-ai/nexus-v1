@@ -56,10 +56,10 @@ export function SuperUserList() {
         setUsers(Array.isArray(res.data) ? res.data : []);
         setLastRefreshed(new Date());
       } else if (!res.success) {
-        toast.error(`Users: ${res.error || 'Failed to load user list'}`);
+        toast.error(`${t('super.users')}: ${res.error || t('super.failed_to_load_user_list')}`);
       }
     } catch (err) {
-      toast.error(`Users error: ${err instanceof Error ? err.message : 'Unknown error'}`);
+      toast.error(`${t('super.users_error')}: ${err instanceof Error ? err.message : t('super.unknown_error')}`);
     }
     setLoading(false);
   }, [page, search, tenantFilter, roleFilter, superAdminsOnly, toast]);
@@ -93,7 +93,7 @@ export function SuperUserList() {
       toast.success(t('super.user_updated_successfully'));
       loadUsers();
     } else {
-      toast.error(res?.error || 'Action failed');
+      toast.error(res?.error || t('super.action_failed'));
     }
     setActionLoading(false);
     setConfirmAction(null);

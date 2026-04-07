@@ -184,7 +184,7 @@ class AdminWalletGrantController extends BaseApiController
                 'admin_id' => $adminId,
                 'status' => 'completed',
             ],
-            'message' => 'Credits granted successfully',
+            'message' => __('api_controllers_1.admin_wallet_grant.credits_granted'),
         ]);
     }
 }

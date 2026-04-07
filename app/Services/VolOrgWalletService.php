@@ -167,10 +167,10 @@ class VolOrgWalletService
     public static function depositFromUser(int $userId, int $volOrgId, float $amount, ?string $note = null): array
     {
         if ($amount <= 0) {
-            return ['success' => false, 'message' => 'Amount must be greater than 0'];
+            return ['success' => false, 'message' => __('svc_notifications_2.vol_org_wallet.amount_must_be_greater_than_zero')];
         }
         if ($amount > 1000) {
-            return ['success' => false, 'message' => 'Deposit amount cannot exceed 1000 hours'];
+            return ['success' => false, 'message' => __('svc_notifications_2.vol_org_wallet.deposit_cannot_exceed_1000')];
         }
 
         $tenantId = TenantContext::getId();
@@ -183,7 +183,7 @@ class VolOrgWalletService
             );
 
             if (!$user) {
-                return ['success' => false, 'message' => 'User not found'];
+                return ['success' => false, 'message' => __('svc_notifications_2.vol_org_wallet.user_not_found')];
             }
 
             // Lock org row BEFORE validating user balance (prevent race condition on org balance_after)
@@ -193,17 +193,17 @@ class VolOrgWalletService
             );
 
             if (!$org) {
-                return ['success' => false, 'message' => 'Organization not found'];
+                return ['success' => false, 'message' => __('svc_notifications_2.vol_org_wallet.organization_not_found')];
             }
 
             // Use floor (not ceil) to prevent phantom debit: user loses same INT as org gains
             $intAmount = (int) floor($amount);
             if ($intAmount <= 0) {
-                return ['success' => false, 'message' => 'Amount must be at least 1 hour'];
+                return ['success' => false, 'message' => __('svc_notifications_2.vol_org_wallet.amount_must_be_at_least_1')];
             }
 
             if ((int) $user->balance < $intAmount) {
-                return ['success' => false, 'message' => 'Insufficient personal balance'];
+                return ['success' => false, 'message' => __('svc_notifications_2.vol_org_wallet.insufficient_personal_balance')];
             }
             DB::update(
                 "UPDATE users SET balance = balance - ? WHERE id = ? AND tenant_id = ?",
@@ -224,7 +224,7 @@ class VolOrgWalletService
                 VALUES (?, ?, ?, 'deposit', ?, ?, ?, NOW())
             ", [$tenantId, $volOrgId, $userId, $amount, $newBalance, $note ?: "Deposit from {$user->name}"]);
 
-            return ['success' => true, 'message' => 'Deposit successful', 'new_balance' => $newBalance];
+            return ['success' => true, 'message' => __('svc_notifications_2.vol_org_wallet.deposit_successful'), 'new_balance' => $newBalance];
         });
     }
 
@@ -242,7 +242,7 @@ class VolOrgWalletService
         ?int $logId = null
     ): array {
         if ($amount <= 0) {
-            return ['success' => false, 'message' => 'Amount must be greater than 0'];
+            return ['success' => false, 'message' => __('svc_notifications_2.vol_org_wallet.amount_must_be_greater_than_zero')];
         }
 
         $tenantId = TenantContext::getId();
@@ -255,11 +255,11 @@ class VolOrgWalletService
             );
 
             if (!$org) {
-                return ['success' => false, 'message' => 'Organization not found'];
+                return ['success' => false, 'message' => __('svc_notifications_2.vol_org_wallet.organization_not_found')];
             }
 
             if ((float) $org->balance < $amount) {
-                return ['success' => false, 'message' => 'Insufficient organization balance'];
+                return ['success' => false, 'message' => __('svc_notifications_2.vol_org_wallet.insufficient_organization_balance')];
             }
 
             // Lock volunteer user row
@@ -269,7 +269,7 @@ class VolOrgWalletService
             );
 
             if (!$volunteer) {
-                return ['success' => false, 'message' => 'Volunteer not found'];
+                return ['success' => false, 'message' => __('svc_notifications_2.vol_org_wallet.volunteer_not_found')];
             }
 
             // Deduct from org
@@ -302,7 +302,7 @@ class VolOrgWalletService
                 VALUES (?, ?, ?, ?, ?, 'volunteer', 'completed', NOW(), NOW())
             ", [$tenantId, (int) $org->user_id, $volunteerId, $intAmount, $description]);
 
-            return ['success' => true, 'message' => 'Payment successful', 'new_balance' => $newOrgBalance];
+            return ['success' => true, 'message' => __('svc_notifications_2.vol_org_wallet.payment_successful'), 'new_balance' => $newOrgBalance];
         });
     }
 
@@ -314,7 +314,7 @@ class VolOrgWalletService
     public static function adminAdjustment(int $volOrgId, float $amount, int $adminId, string $reason): array
     {
         if ($amount == 0) {
-            return ['success' => false, 'message' => 'Amount cannot be zero'];
+            return ['success' => false, 'message' => __('svc_notifications_2.vol_org_wallet.amount_cannot_be_zero')];
         }
 
         $tenantId = TenantContext::getId();
@@ -326,12 +326,12 @@ class VolOrgWalletService
             );
 
             if (!$org) {
-                return ['success' => false, 'message' => 'Organization not found'];
+                return ['success' => false, 'message' => __('svc_notifications_2.vol_org_wallet.organization_not_found')];
             }
 
             $newBalance = (float) $org->balance + $amount;
             if ($newBalance < 0) {
-                return ['success' => false, 'message' => 'Adjustment would result in negative balance'];
+                return ['success' => false, 'message' => __('svc_notifications_2.vol_org_wallet.adjustment_negative_balance')];
             }
 
             DB::update(
@@ -344,7 +344,7 @@ class VolOrgWalletService
                 VALUES (?, ?, ?, 'admin_adjustment', ?, ?, ?, NOW())
             ", [$tenantId, $volOrgId, $adminId, $amount, $newBalance, "Admin adjustment: {$reason}"]);
 
-            return ['success' => true, 'message' => 'Adjustment applied', 'new_balance' => $newBalance];
+            return ['success' => true, 'message' => __('svc_notifications_2.vol_org_wallet.adjustment_applied'), 'new_balance' => $newBalance];
         });
     }
 }

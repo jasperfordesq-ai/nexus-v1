@@ -52,15 +52,15 @@ class NotifyJobAlertSubscribers implements ShouldQueue
                     $alertUserId = (int) $alert->user_id;
                     Notification::createNotification(
                         $alertUserId,
-                        "New job matching your alert: {$vacancy->title}",
+                        __('svc_notifications.job_alert.match_bell', ['title' => $vacancy->title]),
                         "/jobs/{$vacancy->id}",
                         'job_application'
                     );
-                    RealtimeService::broadcastAndPush($alertUserId, 'New Job Match', [
+                    RealtimeService::broadcastAndPush($alertUserId, __('svc_notifications.job_alert.match_push_title'), [
                         'type'      => 'job_alert_match',
                         'job_id'    => (int) $vacancy->id,
                         'job_title' => $vacancy->title,
-                        'message'   => "New job matching your alert: {$vacancy->title}",
+                        'message'   => __('svc_notifications.job_alert.match_push_message', ['title' => $vacancy->title]),
                         'url'       => "/jobs/{$vacancy->id}",
                     ]);
 

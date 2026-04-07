@@ -62,11 +62,11 @@ export function SeedGenerator() {
 
       await adminTools.runSeedGenerator({ types: selected, counts });
       toast.success(
-        'Seed data generated',
-        `Generated data for: ${selected.join(', ')}`
+        t('system.seed_data_generated'),
+        t('system.generated_data_for', { types: selected.join(', ') })
       );
     } catch {
-      toast.error('Seed generation failed', 'An error occurred while generating test data.');
+      toast.error(t('system.seed_generation_failed'), t('system.seed_generation_error'));
     } finally {
       setRunning(false);
     }

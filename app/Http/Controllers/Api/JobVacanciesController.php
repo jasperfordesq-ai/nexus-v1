@@ -1795,18 +1795,18 @@ class JobVacanciesController extends BaseApiController
         $tenantId = TenantContext::getId();
 
         $vacancy = JobVacancy::where('tenant_id', $tenantId)->find($id);
-        if (!$vacancy) return $this->respondWithError('NOT_FOUND', 'Job not found', null, 404);
+        if (!$vacancy) return $this->respondWithError('NOT_FOUND', __('api_controllers_2.job_vacancies.job_not_found'), null, 404);
 
         // Must be vacancy owner or admin
         if ((int) $vacancy->user_id !== $userId) {
             $user = \App\Models\User::find($userId);
             if (!$user || !in_array($user->role, ['admin', 'super_admin'])) {
-                return $this->respondWithError('FORBIDDEN', 'Only the job poster can rank candidates', null, 403);
+                return $this->respondWithError('FORBIDDEN', __('api_controllers_2.job_vacancies.only_poster_can_rank'), null, 403);
             }
         }
 
         if (!\App\Services\AI\AIServiceFactory::isEnabled()) {
-            return $this->respondWithError('AI_DISABLED', 'AI is not configured', null, 503);
+            return $this->respondWithError('AI_DISABLED', __('api_controllers_2.job_vacancies.ai_not_configured'), null, 503);
         }
 
         // Get applications with applicant data + community trust signals
@@ -1816,7 +1816,7 @@ class JobVacanciesController extends BaseApiController
             ->get();
 
         if ($applications->isEmpty()) {
-            return $this->respondWithData(['rankings' => [], 'message' => 'No active applications to rank']);
+            return $this->respondWithData(['rankings' => [], 'message' => __('api_controllers_2.job_vacancies.no_active_applications')]);
         }
 
         // Enrich each applicant with community trust signals
@@ -1914,7 +1914,7 @@ class JobVacanciesController extends BaseApiController
             }
 
             if (!is_array($rankings)) {
-                return $this->respondWithError('AI_PARSE_ERROR', 'Failed to parse AI ranking response', null, 500);
+                return $this->respondWithError('AI_PARSE_ERROR', __('api_controllers_2.job_vacancies.ai_parse_error'), null, 500);
             }
 
             // Merge community data back into rankings for frontend display
@@ -1941,7 +1941,7 @@ class JobVacanciesController extends BaseApiController
             ]);
         } catch (\Throwable $e) {
             Log::error('aiRankCandidates failed', ['error' => $e->getMessage()]);
-            return $this->respondWithError('AI_ERROR', 'AI ranking failed', null, 500);
+            return $this->respondWithError('AI_ERROR', __('api_controllers_2.job_vacancies.ai_ranking_failed'), null, 500);
         }
     }
 
@@ -1972,7 +1972,7 @@ class JobVacanciesController extends BaseApiController
         $data = $this->getJsonInput();
 
         if (empty($data['name'])) {
-            return $this->respondWithError('VALIDATION_REQUIRED', 'Template name is required', 'name', 422);
+            return $this->respondWithError('VALIDATION_REQUIRED', __('api_controllers_2.job_vacancies.template_name_required'), 'name', 422);
         }
 
         $template = \App\Models\JobTemplate::create([
@@ -2002,7 +2002,7 @@ class JobVacanciesController extends BaseApiController
         if ($deleted) {
             return $this->respondWithData(['deleted' => true, 'id' => $id]);
         }
-        return $this->respondWithError('NOT_FOUND', 'Template not found', null, 404);
+        return $this->respondWithError('NOT_FOUND', __('api_controllers_2.job_vacancies.template_not_found'), null, 404);
     }
 
     /** POST /api/v2/jobs/offer-templates/{id}/render — Render a template with placeholders. */
@@ -2021,7 +2021,7 @@ class JobVacanciesController extends BaseApiController
             ->first();
 
         if (!$template) {
-            return $this->respondWithError('NOT_FOUND', 'Template not found', null, 404);
+            return $this->respondWithError('NOT_FOUND', __('api_controllers_2.job_vacancies.template_not_found'), null, 404);
         }
 
         // Increment use count
@@ -2094,12 +2094,12 @@ class JobVacanciesController extends BaseApiController
 
         $employerId = (int) ($data['employer_id'] ?? 0);
         if (!$employerId) {
-            return $this->respondWithError('VALIDATION_REQUIRED', 'employer_id is required', 'employer_id', 422);
+            return $this->respondWithError('VALIDATION_REQUIRED', __('api_controllers_2.job_vacancies.employer_id_required'), 'employer_id', 422);
         }
 
         $rating = (int) ($data['rating'] ?? 0);
         if ($rating < 1 || $rating > 5) {
-            return $this->respondWithError('VALIDATION_INVALID_VALUE', 'Rating must be 1-5', 'rating', 422);
+            return $this->respondWithError('VALIDATION_INVALID_VALUE', __('api_controllers_2.job_vacancies.rating_must_be_1_5'), 'rating', 422);
         }
 
         // Verify the reviewer actually completed a job with this employer
@@ -2111,7 +2111,7 @@ class JobVacanciesController extends BaseApiController
             ->exists();
 
         if (!$hasCompletedJob) {
-            return $this->respondWithError('NOT_ELIGIBLE', 'You can only review employers after completing a job with them', null, 403);
+            return $this->respondWithError('NOT_ELIGIBLE', __('api_controllers_2.job_vacancies.only_review_after_completing'), null, 403);
         }
 
         // Prevent duplicate reviews
@@ -2122,7 +2122,7 @@ class JobVacanciesController extends BaseApiController
             ->exists();
 
         if ($existing) {
-            return $this->respondWithError('DUPLICATE', 'You have already reviewed this employer', null, 409);
+            return $this->respondWithError('DUPLICATE', __('api_controllers_2.job_vacancies.already_reviewed_employer'), null, 409);
         }
 
         $review = Review::create([
@@ -2228,14 +2228,14 @@ class JobVacanciesController extends BaseApiController
             ->find($interviewId);
 
         if (!$interview) {
-            return $this->respondWithError('NOT_FOUND', 'Interview not found', null, 404);
+            return $this->respondWithError('NOT_FOUND', __('api_controllers_2.job_vacancies.interview_not_found'), null, 404);
         }
 
         // Must be the candidate or the job poster
         $isCandidate = $interview->application && (int) $interview->application->user_id === $userId;
         $isPoster = $interview->vacancy && (int) $interview->vacancy->user_id === $userId;
         if (!$isCandidate && !$isPoster) {
-            return $this->respondWithError('FORBIDDEN', 'Access denied', null, 403);
+            return $this->respondWithError('FORBIDDEN', __('api_controllers_2.job_vacancies.access_denied'), null, 403);
         }
 
         $title = 'Interview: ' . ($interview->vacancy->title ?? 'Job Interview');
@@ -2288,14 +2288,14 @@ class JobVacanciesController extends BaseApiController
 
         $vacancy = \App\Models\JobVacancy::where('tenant_id', $tenantId)->find($id);
         if (!$vacancy) {
-            return $this->respondWithError('NOT_FOUND', 'Job not found', null, 404);
+            return $this->respondWithError('NOT_FOUND', __('api_controllers_2.job_vacancies.job_not_found'), null, 404);
         }
 
         // Must be owner or admin
         if ((int) $vacancy->user_id !== $userId) {
             $user = \App\Models\User::find($userId);
             if (!$user || !in_array($user->role, ['admin', 'super_admin'])) {
-                return $this->respondWithError('FORBIDDEN', 'Access denied', null, 403);
+                return $this->respondWithError('FORBIDDEN', __('api_controllers_2.job_vacancies.access_denied'), null, 403);
             }
         }
 
@@ -2376,16 +2376,16 @@ class JobVacanciesController extends BaseApiController
         $tenantId = TenantContext::getId();
 
         $vacancy = \App\Models\JobVacancy::where('tenant_id', $tenantId)->find($id);
-        if (!$vacancy) return $this->respondWithError('NOT_FOUND', 'Job not found', null, 404);
+        if (!$vacancy) return $this->respondWithError('NOT_FOUND', __('api_controllers_2.job_vacancies.job_not_found'), null, 404);
 
         if (!\App\Services\AI\AIServiceFactory::isEnabled()) {
-            return $this->respondWithError('AI_DISABLED', 'AI is not configured', null, 503);
+            return $this->respondWithError('AI_DISABLED', __('api_controllers_2.job_vacancies.ai_not_configured'), null, 503);
         }
 
         $data = $this->getJsonInput();
         $userMessage = trim($data['message'] ?? '');
         if (empty($userMessage)) {
-            return $this->respondWithError('VALIDATION_REQUIRED', 'Message is required', 'message', 422);
+            return $this->respondWithError('VALIDATION_REQUIRED', __('api_controllers_2.job_vacancies.message_required'), 'message', 422);
         }
 
         // Build job context for the system prompt
@@ -2444,7 +2444,7 @@ class JobVacanciesController extends BaseApiController
             ]);
         } catch (\Throwable $e) {
             \Illuminate\Support\Facades\Log::error('aiJobChat failed', ['error' => $e->getMessage()]);
-            return $this->respondWithError('AI_ERROR', 'AI chat failed', null, 500);
+            return $this->respondWithError('AI_ERROR', __('api_controllers_2.job_vacancies.ai_chat_failed'), null, 500);
         }
     }
 
@@ -2455,13 +2455,13 @@ class JobVacanciesController extends BaseApiController
         $tenantId = TenantContext::getId();
 
         $vacancy = \App\Models\JobVacancy::where('tenant_id', $tenantId)->find($id);
-        if (!$vacancy) return $this->respondWithError('NOT_FOUND', 'Job not found', null, 404);
+        if (!$vacancy) return $this->respondWithError('NOT_FOUND', __('api_controllers_2.job_vacancies.job_not_found'), null, 404);
 
         // Must be owner or admin
         if ((int) $vacancy->user_id !== $userId) {
             $user = \App\Models\User::find($userId);
             if (!$user || !in_array($user->role, ['admin', 'super_admin'])) {
-                return $this->respondWithError('FORBIDDEN', 'Access denied', null, 403);
+                return $this->respondWithError('FORBIDDEN', __('api_controllers_2.job_vacancies.access_denied'), null, 403);
             }
         }
 

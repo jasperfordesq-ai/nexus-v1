@@ -100,7 +100,7 @@ class AdminCronController extends BaseApiController
         );
 
         if (!$log) {
-            return $this->error('Log not found', 404);
+            return $this->error(__('api_controllers_1.admin_cron.log_not_found'), 404);
         }
 
         $arr = (array) $log;
@@ -131,7 +131,7 @@ class AdminCronController extends BaseApiController
             );
         }
 
-        return $this->success(['message' => "Deleted {$rowCount} log entries", 'deleted_count' => $rowCount]);
+        return $this->success(['message' => __('api_controllers_1.admin_cron.deleted_log_entries', ['count' => $rowCount]), 'deleted_count' => $rowCount]);
     }
 
     // =========================================================================

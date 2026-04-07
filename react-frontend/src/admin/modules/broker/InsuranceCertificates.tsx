@@ -270,11 +270,11 @@ export function InsuranceCertificates() {
     try {
       const res = await adminInsurance.verify(item.id);
       if (res?.success) {
-        toast.success(`Insurance certificate for ${item.first_name} ${item.last_name} verified`);
+        toast.success(t('broker.insurance_certificate_verified', { name: `${item.first_name} ${item.last_name}` }));
         loadItems();
         loadStats();
       } else {
-        toast.error(res?.error || 'Failed to verify certificate');
+        toast.error(res?.error || t('broker.failed_to_verify_certificate'));
       }
     } catch {
       toast.error(t('broker.failed_to_verify_certificate'));
@@ -296,7 +296,7 @@ export function InsuranceCertificates() {
         loadItems();
         loadStats();
       } else {
-        toast.error(res?.error || 'Failed to reject certificate');
+        toast.error(res?.error || t('broker.failed_to_reject_certificate'));
       }
     } catch {
       toast.error(t('broker.failed_to_reject_certificate'));
@@ -317,7 +317,7 @@ export function InsuranceCertificates() {
         loadItems();
         loadStats();
       } else {
-        toast.error(res?.error || 'Failed to delete certificate');
+        toast.error(res?.error || t('broker.failed_to_delete_certificate'));
       }
     } catch {
       toast.error(t('broker.failed_to_delete_certificate'));
@@ -353,7 +353,7 @@ export function InsuranceCertificates() {
         loadItems();
         loadStats();
       } else {
-        toast.error(res?.error || 'Failed to create certificate');
+        toast.error(res?.error || t('broker.failed_to_create_certificate'));
       }
     } catch {
       toast.error(t('broker.failed_to_create_certificate'));
@@ -384,7 +384,7 @@ export function InsuranceCertificates() {
         loadItems();
         loadStats();
       } else {
-        toast.error(res?.error || 'Failed to update certificate');
+        toast.error(res?.error || t('broker.failed_to_update_certificate'));
       }
     } catch {
       toast.error(t('broker.failed_to_update_certificate'));
@@ -1108,7 +1108,7 @@ export function InsuranceCertificates() {
         onConfirm={handleDelete}
         title={t('broker.delete_insurance_certificate')}
         message={deleteItem
-          ? `Are you sure you want to delete the insurance certificate for ${deleteItem.first_name} ${deleteItem.last_name}? This action cannot be undone.`
+          ? t('broker.delete_insurance_certificate_confirm', { name: `${deleteItem.first_name} ${deleteItem.last_name}` })
           : ''}
         confirmLabel="Delete"
         confirmColor="danger"

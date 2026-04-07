@@ -471,7 +471,7 @@ class EventService
                     self::addToWaitlist($eventId, $userId);
                     self::$errors[] = [
                         'code' => 'EVENT_FULL',
-                        'message' => 'This event is full. You have been added to the waitlist.',
+                        'message' => __('svc_notifications_2.event.added_to_waitlist'),
                         'waitlisted' => true,
                     ];
                     return false;

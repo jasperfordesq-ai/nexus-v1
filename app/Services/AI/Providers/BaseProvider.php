@@ -166,7 +166,7 @@ abstract class BaseProvider implements AIProviderInterface
         if (!$this->isConfigured()) {
             return [
                 'success' => false,
-                'message' => 'Provider not configured (missing API key)',
+                'message' => __('svc_notifications_2.ai.provider_not_configured'),
                 'latency_ms' => 0,
                 'model' => $this->defaultModel,
                 'provider' => $this->getName()
@@ -184,7 +184,7 @@ abstract class BaseProvider implements AIProviderInterface
 
             return [
                 'success' => true,
-                'message' => 'Connection successful',
+                'message' => __('svc_notifications_2.ai.connection_successful'),
                 'latency_ms' => $latency,
                 'model' => $response['model'] ?? $this->defaultModel,
                 'provider' => $this->getName(),

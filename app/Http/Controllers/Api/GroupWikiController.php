@@ -245,7 +245,7 @@ class GroupWikiController extends BaseApiController
             [$pageId, $tenantId]
         );
 
-        return $this->successResponse(['message' => 'Wiki page deleted']);
+        return $this->successResponse(['message' => __('api_controllers_3.group_wiki.wiki_page_deleted')]);
     }
 
     /**

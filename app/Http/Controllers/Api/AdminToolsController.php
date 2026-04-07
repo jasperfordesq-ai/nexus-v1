@@ -184,7 +184,7 @@ class AdminToolsController extends BaseApiController
             DB::selectOne("SELECT 1");
             $tests[] = ['name' => 'Database Connection', 'status' => 'pass', 'duration_ms' => round((microtime(true) - $start) * 1000)];
         } catch (\Throwable $e) {
-            $tests[] = ['name' => 'Database Connection', 'status' => 'fail', 'duration_ms' => round((microtime(true) - $start) * 1000), 'error' => 'Connection failed'];
+            $tests[] = ['name' => 'Database Connection', 'status' => 'fail', 'duration_ms' => round((microtime(true) - $start) * 1000), 'error' => __('api_controllers_1.admin_tools.connection_failed')];
         }
 
         // Redis
@@ -193,7 +193,7 @@ class AdminToolsController extends BaseApiController
             $stats = $this->redisCache->getStats();
             $tests[] = ['name' => 'Redis Connection', 'status' => ($stats['enabled'] ?? false) ? 'pass' : 'fail', 'duration_ms' => round((microtime(true) - $start) * 1000)];
         } catch (\Throwable $e) {
-            $tests[] = ['name' => 'Redis Connection', 'status' => 'fail', 'duration_ms' => round((microtime(true) - $start) * 1000), 'error' => 'Connection failed'];
+            $tests[] = ['name' => 'Redis Connection', 'status' => 'fail', 'duration_ms' => round((microtime(true) - $start) * 1000), 'error' => __('api_controllers_1.admin_tools.connection_failed')];
         }
 
         // Token Service
@@ -202,7 +202,7 @@ class AdminToolsController extends BaseApiController
             $testToken = $this->tokenService->generateToken(0, $tenantId);
             $tests[] = ['name' => 'API Auth (Token Service)', 'status' => !empty($testToken) ? 'pass' : 'fail', 'duration_ms' => round((microtime(true) - $start) * 1000)];
         } catch (\Throwable $e) {
-            $tests[] = ['name' => 'API Auth (Token Service)', 'status' => 'fail', 'duration_ms' => round((microtime(true) - $start) * 1000), 'error' => 'Connection failed'];
+            $tests[] = ['name' => 'API Auth (Token Service)', 'status' => 'fail', 'duration_ms' => round((microtime(true) - $start) * 1000), 'error' => __('api_controllers_1.admin_tools.connection_failed')];
         }
 
         // Tenant
@@ -211,7 +211,7 @@ class AdminToolsController extends BaseApiController
             $tenant = DB::selectOne("SELECT id, name FROM tenants WHERE id = ?", [$tenantId]);
             $tests[] = ['name' => 'Tenant Bootstrap', 'status' => $tenant ? 'pass' : 'fail', 'duration_ms' => round((microtime(true) - $start) * 1000)];
         } catch (\Throwable $e) {
-            $tests[] = ['name' => 'Tenant Bootstrap', 'status' => 'fail', 'duration_ms' => round((microtime(true) - $start) * 1000), 'error' => 'Connection failed'];
+            $tests[] = ['name' => 'Tenant Bootstrap', 'status' => 'fail', 'duration_ms' => round((microtime(true) - $start) * 1000), 'error' => __('api_controllers_1.admin_tools.connection_failed')];
         }
 
         $passCount = count(array_filter($tests, fn($t) => $t['status'] === 'pass'));
@@ -275,7 +275,7 @@ class AdminToolsController extends BaseApiController
     public function runWebpConversion(): JsonResponse
     {
         $this->requireAdmin();
-        return $this->respondWithData(['started' => true, 'message' => 'Conversion queued']);
+        return $this->respondWithData(['started' => true, 'message' => __('api_controllers_1.admin_tools.conversion_queued')]);
     }
 
     /** POST /api/v2/admin/tools/seed-generator */
@@ -303,7 +303,7 @@ class AdminToolsController extends BaseApiController
 
         return $this->respondWithData([
             'started' => true,
-            'message' => 'Seed generation queued',
+            'message' => __('api_controllers_1.admin_tools.seed_generation_queued'),
             'types' => $types,
             'counts' => $counts,
         ]);
@@ -360,7 +360,7 @@ class AdminToolsController extends BaseApiController
         return $this->respondWithData([
             'restored' => true,
             'backup_id' => $id,
-            'message' => 'Blog backup restore queued',
+            'message' => __('api_controllers_1.admin_tools.blog_backup_restore_queued'),
         ]);
     }
 

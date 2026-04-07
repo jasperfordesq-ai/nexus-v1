@@ -250,7 +250,7 @@ class AdminGamificationController extends BaseApiController
                 }
             } while (count($users) === $chunkSize);
 
-            return $this->respondWithData(['users_checked' => $checked, 'message' => "Badge recheck completed for {$checked} users"]);
+            return $this->respondWithData(['users_checked' => $checked, 'message' => __('api_controllers_1.admin_gamification.badge_recheck_completed', ['count' => $checked])]);
         } catch (\Throwable $e) {
             Log::error('Badge recheck failed: ' . $e->getMessage());
             return $this->respondWithError('SERVER_ERROR', __('api.badge_recheck_failed'), null, 500);

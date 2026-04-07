@@ -193,7 +193,7 @@ class MenuController extends BaseApiController
         try {
             MenuManager::clearCache($tenantId);
 
-            return $this->respondWithData(['message' => 'Menu cache cleared successfully']);
+            return $this->respondWithData(['message' => __('api_controllers_2.menu.cache_cleared')]);
         } catch (\Throwable $e) {
             return $this->respondWithError('CACHE_CLEAR_FAILED', __('api.failed_to_clear_cache'), null, 500);
         }

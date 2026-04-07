@@ -177,7 +177,7 @@ class AuthController extends BaseApiController
                     'two_factor_token' => $twoFactorToken,
                     'methods' => ['totp', 'backup_code'],
                     'code' => ApiErrorCodes::AUTH_2FA_REQUIRED,
-                    'message' => 'Two-factor authentication required',
+                    'message' => __('api_controllers_1.auth.two_factor_required'),
                     'user' => [
                         'id' => $user['id'],
                         'first_name' => $user['first_name'],
@@ -346,7 +346,7 @@ class AuthController extends BaseApiController
 
         $response = [
             'success' => true,
-            'message' => 'Logged out successfully'
+            'message' => __('api_controllers_1.auth.logged_out')
         ];
 
         if ($tokenRevoked) {
@@ -705,7 +705,7 @@ class AuthController extends BaseApiController
 
         return response()->json([
             'success' => true,
-            'message' => 'Session refreshed',
+            'message' => __('api_controllers_1.auth.session_refreshed'),
             'expires_at' => $expiresAt,
             'session_lifetime' => $sessionLifetime
         ]);
@@ -797,11 +797,11 @@ class AuthController extends BaseApiController
 
         return response()->json([
             'success' => true,
-            'message' => 'Session restored from token',
+            'message' => __('api_controllers_1.auth.session_restored'),
             'user_id' => $user['id'],
             'session_id' => session_id(),
             '_deprecated' => [
-                'message' => 'This endpoint is deprecated. Mobile apps should use Bearer tokens directly without session sync.',
+                'message' => __('api_controllers_1.auth.session_deprecated'),
                 'sunset' => '2026-08-01',
                 'replacement' => 'Use Authorization: Bearer <token> header on all API requests'
             ]
@@ -919,7 +919,7 @@ class AuthController extends BaseApiController
         return response()->json([
             'data' => [
                 'revoked_count' => $revokedCount,
-                'message' => 'All refresh tokens have been revoked. You will need to log in again on all devices.'
+                'message' => __('api_controllers_1.auth.tokens_revoked')
             ]
         ]);
     }

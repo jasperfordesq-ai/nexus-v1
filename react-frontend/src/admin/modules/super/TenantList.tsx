@@ -72,10 +72,10 @@ export function TenantList() {
         setTenants(Array.isArray(res.data) ? res.data : []);
         setLastRefreshed(new Date());
       } else if (!res.success) {
-        toast.error(`Tenants: ${res.error || 'Failed to load tenant list'}`);
+        toast.error(`${t('super.tenants')}: ${res.error || t('super.failed_to_load_tenant_list')}`);
       }
     } catch (err) {
-      toast.error(`Tenants error: ${err instanceof Error ? err.message : 'Unknown error'}`);
+      toast.error(`${t('super.tenants_error')}: ${err instanceof Error ? err.message : t('super.unknown_error')}`);
     }
     setLoading(false);
   }, [filter, search, toast]);
@@ -107,10 +107,10 @@ export function TenantList() {
     }
 
     if (res?.success) {
-      toast.success(`Tenant ${type === 'toggle-hub' ? 'hub toggled' : type + 'd'} successfully`);
+      toast.success(t('super.tenant_action_success', { action: type === 'toggle-hub' ? t('super.hub_toggled') : type }));
       loadTenants();
     } else {
-      toast.error(res?.error || `Failed to ${type} tenant`);
+      toast.error(res?.error || t('super.failed_to_action_tenant', { action: type }));
     }
 
     setActionLoading(false);

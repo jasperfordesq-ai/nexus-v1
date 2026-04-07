@@ -213,7 +213,7 @@ class CookieConsentController extends BaseApiController
                 }
 
                 return $this->respondWithData([
-                    'message' => 'Consent preferences updated successfully',
+                    'message' => __('api_controllers_1.cookie_consent.preferences_updated'),
                     'consent' => array_merge(['id' => (int) $id], $categories),
                 ]);
             }
@@ -266,7 +266,7 @@ class CookieConsentController extends BaseApiController
                 }
 
                 return $this->respondWithData([
-                    'message' => 'Consent withdrawn successfully',
+                    'message' => __('api_controllers_1.cookie_consent.consent_withdrawn'),
                 ]);
             }
 

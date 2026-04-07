@@ -320,7 +320,7 @@ class RegistrationOrchestrationService
                     'requires_approval' => true,
                     'verification_session' => null,
                     'next_steps' => ['Your account will be manually reviewed by an administrator.'],
-                    'message' => 'Your account has been queued for manual review.',
+                    'message' => __('svc_notifications_2.registration.queued_for_review'),
                 ];
 
             case 'native_registration':
@@ -335,7 +335,7 @@ class RegistrationOrchestrationService
                     'requires_approval' => false,
                     'verification_session' => null,
                     'next_steps' => [],
-                    'message' => 'Registration complete!',
+                    'message' => __('svc_notifications_2.registration.complete'),
                 ];
 
             default:
@@ -345,7 +345,7 @@ class RegistrationOrchestrationService
                     'requires_approval' => false,
                     'verification_session' => null,
                     'next_steps' => ['Please contact support.'],
-                    'message' => 'Identity verification is currently unavailable.',
+                    'message' => __('svc_notifications_2.registration.verification_unavailable'),
                 ];
         }
     }
@@ -429,7 +429,7 @@ class RegistrationOrchestrationService
             'requires_approval' => false,
             'verification_session' => null,
             'next_steps' => [],
-            'message' => 'Registration complete! Welcome aboard.',
+            'message' => __('svc_notifications_2.registration.welcome'),
         ];
     }
 
@@ -455,7 +455,7 @@ class RegistrationOrchestrationService
                 \App\Services\NotificationDispatcher::notifyAdmins(
                     'pending_approval',
                     ['user_id' => $userId, 'user_name' => $userName, 'email' => $email],
-                    "New user {$userName} ({$email}) requires approval"
+                    __('svc_notifications.registration.admin_pending_approval', ['name' => $userName, 'email' => $email])
                 );
             }
         } catch (\Throwable $e) {
@@ -468,7 +468,7 @@ class RegistrationOrchestrationService
             'requires_approval' => true,
             'verification_session' => null,
             'next_steps' => ['Your account will be reviewed by a community administrator.'],
-            'message' => 'Registration successful! Your account is pending admin approval.',
+            'message' => __('svc_notifications_2.registration.pending_admin_approval'),
         ];
     }
 
@@ -495,7 +495,7 @@ class RegistrationOrchestrationService
             'requires_approval' => $policy['post_verification'] === 'admin_approval',
             'verification_session' => null, // Session created when user starts verification
             'next_steps' => ['Please complete identity verification to activate your account.'],
-            'message' => 'Registration successful! Please verify your identity to continue.',
+            'message' => __('svc_notifications_2.registration.verify_identity'),
         ];
     }
 
@@ -509,7 +509,7 @@ class RegistrationOrchestrationService
             'requires_approval' => true,
             'verification_session' => null,
             'next_steps' => ['Your account is pending review.'],
-            'message' => 'Registration received. An administrator will review your request.',
+            'message' => __('svc_notifications_2.registration.pending_review'),
         ];
     }
 
@@ -546,7 +546,7 @@ class RegistrationOrchestrationService
             'waitlist_position' => (int) $position,
             'verification_session' => null,
             'next_steps' => ["You're on the waitlist! Your position: #{$position}."],
-            'message' => "You've been added to the waitlist. We'll notify you when a spot opens up.",
+            'message' => __('svc_notifications_2.registration.added_to_waitlist'),
         ];
     }
 
@@ -617,7 +617,7 @@ class RegistrationOrchestrationService
 
             return [
                 'status' => 'approved',
-                'message' => 'User has been approved and activated.',
+                'message' => __('svc_notifications_2.registration.user_approved_activated'),
                 'user_id' => $userId,
                 'session_id' => $sessionId,
             ];
@@ -655,7 +655,7 @@ class RegistrationOrchestrationService
 
             return [
                 'status' => 'rejected',
-                'message' => 'User verification has been rejected.',
+                'message' => __('svc_notifications_2.registration.user_verification_rejected'),
                 'user_id' => $userId,
                 'session_id' => $sessionId,
             ];

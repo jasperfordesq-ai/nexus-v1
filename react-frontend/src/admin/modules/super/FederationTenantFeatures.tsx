@@ -135,10 +135,10 @@ export function FederationTenantFeatures() {
     setSaving(featureKey);
     const res = await adminSuper.updateTenantFederationFeature(numericTenantId, featureKey, enabled);
     if (res?.success) {
-      toast.success(`${enabled ? 'Enabled' : 'Disabled'} ${featureKey.replace(/_/g, ' ')}`);
+      toast.success(t('super.tenant_feature_toggled', { status: enabled ? t('super.enabled') : t('super.disabled'), name: featureKey.replace(/_/g, ' ') }));
       setFeatures((prev) => prev ? { ...prev, [featureKey]: enabled } : prev);
     } else {
-      toast.error('Failed to update feature');
+      toast.error(t('super.failed_to_update_feature'));
     }
     setSaving(null);
   };
@@ -148,18 +148,18 @@ export function FederationTenantFeatures() {
     if (whitelisted) {
       const res = await adminSuper.removeFromWhitelist(numericTenantId);
       if (res?.success) {
-        toast.success('Removed from whitelist');
+        toast.success(t('super.removed_from_whitelist'));
         setWhitelisted(false);
       } else {
-        toast.error('Failed to remove from whitelist');
+        toast.error(t('super.failed_to_remove_from_whitelist'));
       }
     } else {
       const res = await adminSuper.addToWhitelist(numericTenantId);
       if (res?.success) {
-        toast.success('Added to whitelist');
+        toast.success(t('super.added_to_whitelist'));
         setWhitelisted(true);
       } else {
-        toast.error('Failed to add to whitelist');
+        toast.error(t('super.failed_to_add_to_whitelist'));
       }
     }
     setSaving(null);
@@ -171,10 +171,10 @@ export function FederationTenantFeatures() {
       ? await adminSuper.suspendPartnership(partnerAction.id, 'Suspended by super admin')
       : await adminSuper.terminatePartnership(partnerAction.id, 'Terminated by super admin');
     if (res?.success) {
-      toast.success(`Partnership ${partnerAction.type}d`);
+      toast.success(t('super.partnership_action_success', { action: partnerAction.type }));
       loadData();
     } else {
-      toast.error('Action failed');
+      toast.error(t('super.action_failed'));
     }
     setPartnerAction(null);
   };
@@ -367,9 +367,9 @@ export function FederationTenantFeatures() {
         isOpen={!!partnerAction}
         onClose={() => setPartnerAction(null)}
         onConfirm={handlePartnerAction}
-        title={partnerAction ? `${partnerAction.type === 'suspend' ? 'Suspend' : 'Terminate'} Partnership` : ''}
-        message={`Are you sure you want to ${partnerAction?.type} this partnership?`}
-        confirmLabel={partnerAction?.type === 'suspend' ? 'Suspend' : 'Terminate'}
+        title={partnerAction ? (partnerAction.type === 'suspend' ? t('federation.suspend_partnership') : t('federation.terminate_partnership')) : ''}
+        message={t('federation.partnership_action_confirm', { action: partnerAction?.type })}
+        confirmLabel={partnerAction?.type === 'suspend' ? t('federation.suspend') : t('federation.terminate')}
         confirmColor="danger"
       />
     </div>

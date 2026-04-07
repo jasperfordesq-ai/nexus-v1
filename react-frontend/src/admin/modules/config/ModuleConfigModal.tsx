@@ -141,7 +141,7 @@ export default function ModuleConfigModal({ module, isOpen, onClose }: ModuleCon
         setIdentityConfig(res.data.config);
       }
     } catch {
-      toast.error('Failed to load identity verification config');
+      toast.error(t('config.modal_identity_load_failed'));
     } finally {
       setLoading(false);
     }
@@ -280,7 +280,7 @@ export default function ModuleConfigModal({ module, isOpen, onClose }: ModuleCon
     try {
       const res = await adminConfig.updateIdentityConfigBulk(identityConfig);
       if (res.success) {
-        toast.success('Identity verification settings saved');
+        toast.success(t('config.modal_identity_saved'));
         setHasChanges(false);
         refreshTenant();
       } else {

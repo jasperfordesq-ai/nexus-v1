@@ -129,10 +129,10 @@ export function SecretsVault() {
         setRotateMessage(res.data?.message || 'Secret rotation requires manual update.');
         setRotateModalOpen(true);
       } else {
-        toast.error('Failed to rotate secret');
+        toast.error(t('enterprise.failed_to_rotate_secret'));
       }
     } catch {
-      toast.error('Failed to rotate secret');
+      toast.error(t('enterprise.failed_to_rotate_secret'));
     } finally {
       setRotatingKey(null);
     }
@@ -146,10 +146,10 @@ export function SecretsVault() {
         setTestResults((res.data as unknown as { services: Record<string, boolean> }).services);
         setTestModalOpen(true);
       } else {
-        toast.error('Connection test failed');
+        toast.error(t('enterprise.connection_test_failed'));
       }
     } catch {
-      toast.error('Connection test failed');
+      toast.error(t('enterprise.connection_test_failed'));
     } finally {
       setTestingConnection(false);
     }

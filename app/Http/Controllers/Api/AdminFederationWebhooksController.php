@@ -279,7 +279,7 @@ class AdminFederationWebhooksController extends BaseApiController
             'event' => 'test',
             'timestamp' => now()->toIso8601String(),
             'data' => [
-                'message' => 'This is a test webhook delivery from Project NEXUS.',
+                'message' => __('api_controllers_3.federation_webhooks.test_message'),
                 'webhook_id' => $id,
             ],
         ];

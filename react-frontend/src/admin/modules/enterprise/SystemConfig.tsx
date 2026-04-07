@@ -344,7 +344,7 @@ export function SystemConfig() {
 
   async function handleSave() {
     if (loadError) {
-      toast.error('Cannot save — configuration failed to load. Please reload the page.');
+      toast.error(t('enterprise.cannot_save_config_not_loaded'));
       return;
     }
     // Validate all schema fields
@@ -357,7 +357,7 @@ export function SystemConfig() {
     }
     setErrors(newErrors);
     if (Object.keys(newErrors).length > 0) {
-      toast.error('Please fix validation errors before saving');
+      toast.error(t('enterprise.fix_validation_errors'));
       return;
     }
 
@@ -374,7 +374,7 @@ export function SystemConfig() {
         }
       }
       if (Object.keys(payload).length === 0) {
-        toast.error('No changes to save');
+        toast.error(t('enterprise.no_changes_to_save'));
         setSaving(false);
         return;
       }
@@ -394,11 +394,11 @@ export function SystemConfig() {
     setResetting(true);
     try {
       await adminEnterprise.resetConfig();
-      toast.success('Configuration reset to defaults');
+      toast.success(t('enterprise.configuration_reset_to_defaults'));
       setShowResetModal(false);
       await loadData();
     } catch {
-      toast.error('Failed to reset configuration');
+      toast.error(t('enterprise.failed_to_reset_configuration'));
     } finally {
       setResetting(false);
     }
@@ -685,12 +685,11 @@ export function SystemConfig() {
           {(onClose) => (
             <>
               <ModalHeader className="flex flex-col gap-1">
-                Reset Configuration
+                {t('enterprise.reset_configuration')}
               </ModalHeader>
               <ModalBody>
                 <p className="text-sm text-default-600">
-                  This will remove all configuration values and reset them to platform defaults.
-                  This action cannot be undone.
+                  {t('enterprise.reset_config_confirm')}
                 </p>
               </ModalBody>
               <ModalFooter>

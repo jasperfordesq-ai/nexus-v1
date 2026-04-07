@@ -251,11 +251,11 @@ export function VettingRecords() {
     try {
       const res = await adminVetting.verify(item.id);
       if (res?.success) {
-        toast.success(`Vetting record for ${item.first_name} ${item.last_name} verified`);
+        toast.success(t('broker.vetting_record_verified', { name: `${item.first_name} ${item.last_name}` }));
         loadItems();
         loadStats();
       } else {
-        toast.error(res?.error || 'Failed to verify record');
+        toast.error(res?.error || t('broker.failed_to_verify_record'));
       }
     } catch {
       toast.error(t('broker.failed_to_verify_record'));
@@ -273,11 +273,11 @@ export function VettingRecords() {
     try {
       const res = await adminVetting.reject(rejectModal.id, rejectReason);
       if (res?.success) {
-        toast.success(`Vetting record rejected`);
+        toast.success(t('broker.vetting_record_rejected'));
         loadItems();
         loadStats();
       } else {
-        toast.error(res?.error || 'Failed to reject record');
+        toast.error(res?.error || t('broker.failed_to_reject_record'));
       }
     } catch {
       toast.error(t('broker.failed_to_reject_record'));
@@ -298,7 +298,7 @@ export function VettingRecords() {
         loadItems();
         loadStats();
       } else {
-        toast.error(res?.error || 'Failed to delete record');
+        toast.error(res?.error || t('broker.failed_to_delete_record'));
       }
     } catch {
       toast.error(t('broker.failed_to_delete_record'));
@@ -335,7 +335,7 @@ export function VettingRecords() {
         loadItems();
         loadStats();
       } else {
-        toast.error(res?.error || 'Failed to create record');
+        toast.error(res?.error || t('broker.failed_to_create_record'));
       }
     } catch {
       toast.error(t('broker.failed_to_create_record'));
@@ -398,7 +398,7 @@ export function VettingRecords() {
         loadItems();
         loadStats();
       } else {
-        toast.error(res?.error || 'Failed to update record');
+        toast.error(res?.error || t('broker.failed_to_update_record'));
       }
     } catch {
       toast.error(t('broker.failed_to_update_record'));
@@ -420,7 +420,7 @@ export function VettingRecords() {
           setViewItem(res.data as VettingRecord);
         }
       } else {
-        toast.error(res?.error || 'Failed to upload document');
+        toast.error(res?.error || t('broker.failed_to_upload_document'));
       }
     } catch {
       toast.error(t('broker.failed_to_upload_document'));
@@ -445,15 +445,15 @@ export function VettingRecords() {
       if (res?.success && res.data) {
         const d = res.data as { processed: number; failed: number };
         const label = bulkAction === 'verify' ? 'verified' : bulkAction === 'reject' ? 'rejected' : 'deleted';
-        toast.success(`${d.processed} record(s) ${label}${d.failed > 0 ? `, ${d.failed} failed` : ''}`);
+        toast.success(t('broker.bulk_action_success', { processed: d.processed, label, failedText: d.failed > 0 ? `, ${d.failed} ${t('broker.bulk_failed')}` : '' }));
         setSelectedIds(new Set());
         loadItems();
         loadStats();
       } else {
-        toast.error(res?.error || `Bulk ${bulkAction} failed`);
+        toast.error(res?.error || t('broker.bulk_action_failed', { action: bulkAction }));
       }
     } catch {
-      toast.error(`Bulk ${bulkAction} failed`);
+      toast.error(t('broker.bulk_action_failed', { action: bulkAction }));
     } finally {
       setBulkLoading(false);
       setBulkAction(null);
@@ -1299,7 +1299,7 @@ export function VettingRecords() {
         onConfirm={handleDelete}
         title={t('broker.delete_vetting_record')}
         message={deleteItem
-          ? `Are you sure you want to delete the vetting record for ${deleteItem.first_name} ${deleteItem.last_name}? This action cannot be undone.`
+          ? t('broker.delete_vetting_record_confirm', { name: `${deleteItem.first_name} ${deleteItem.last_name}` })
           : ''}
         confirmLabel="Delete"
         confirmColor="danger"
@@ -1311,11 +1311,11 @@ export function VettingRecords() {
         isOpen={bulkAction === 'verify' || bulkAction === 'delete'}
         onClose={() => setBulkAction(null)}
         onConfirm={handleBulkAction}
-        title={bulkAction === 'verify' ? 'Bulk Verify Records' : 'Bulk Delete Records'}
+        title={bulkAction === 'verify' ? t('broker.bulk_verify_records') : t('broker.bulk_delete_records')}
         message={bulkAction === 'verify'
-          ? `Verify ${selectedIds.size} selected vetting record(s)? Only records with pending/submitted status will be verified.`
-          : `Permanently delete ${selectedIds.size} selected vetting record(s)? This action cannot be undone.`}
-        confirmLabel={bulkAction === 'verify' ? 'Verify All' : 'Delete All'}
+          ? t('broker.bulk_verify_confirm', { count: selectedIds.size })
+          : t('broker.bulk_delete_confirm', { count: selectedIds.size })}
+        confirmLabel={bulkAction === 'verify' ? t('broker.verify_all') : t('broker.delete_all')}
         confirmColor={bulkAction === 'verify' ? 'primary' : 'danger'}
         isLoading={bulkLoading}
       />

@@ -84,10 +84,10 @@ class GroupWebhookController extends BaseApiController
         $success = GroupWebhookService::delete($webhookId);
 
         if (!$success) {
-            return $this->errorResponse('Webhook not found', 404);
+            return $this->errorResponse(__('api_controllers_3.group_webhook.webhook_not_found'), 404);
         }
 
-        return $this->successResponse(['message' => 'Webhook deleted']);
+        return $this->successResponse(['message' => __('api_controllers_3.group_webhook.webhook_deleted')]);
     }
 
     /**

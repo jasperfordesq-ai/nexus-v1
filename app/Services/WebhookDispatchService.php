@@ -331,7 +331,7 @@ class WebhookDispatchService
             'event' => 'webhook.test',
             'timestamp' => now()->toIso8601String(),
             'tenant_id' => $tenantId,
-            'data' => ['message' => 'This is a test webhook delivery.'],
+            'data' => ['message' => __('svc_notifications_2.webhook.test_delivery')],
         ]);
 
         $signature = hash_hmac('sha256', $body, $webhook->secret ?? '');

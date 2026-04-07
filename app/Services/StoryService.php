@@ -429,7 +429,7 @@ class StoryService
 
                 RealtimeService::broadcastNotification($story->user_id, [
                     'type'    => 'story_reaction',
-                    'message' => "{$reactorName} reacted {$emoji} to your story",
+                    'message' => __('svc_notifications.story.reaction', ['name' => $reactorName, 'emoji' => $emoji]),
                     'link'    => '/feed',
                 ]);
             } catch (\Throwable $e) {

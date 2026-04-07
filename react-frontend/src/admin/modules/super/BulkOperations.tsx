@@ -68,11 +68,11 @@ export function BulkOperations() {
     });
     if (res?.success) {
       const result = res.data as BulkOperationResult | undefined;
-      toast.success(`Moved ${result?.updated_count || selectedUserIds.size} user(s)`);
+      toast.success(t('super.bulk_users_moved', { count: result?.updated_count || selectedUserIds.size }));
       setSelectedUserIds(new Set());
       loadUsersForTenant(sourceTenant);
     } else {
-      toast.error(res?.error || 'Bulk move failed');
+      toast.error(res?.error || t('super.bulk_move_failed'));
     }
     setMoveLoading(false);
     setMoveConfirm(false);
@@ -86,11 +86,11 @@ export function BulkOperations() {
     });
     if (res?.success) {
       const result = res.data as BulkOperationResult | undefined;
-      toast.success(`Updated ${result?.updated_count || selectedTenantIds.size} tenant(s)`);
+      toast.success(t('super.bulk_tenants_updated', { count: result?.updated_count || selectedTenantIds.size }));
       setSelectedTenantIds(new Set());
       loadTenants();
     } else {
-      toast.error(res?.error || 'Bulk update failed');
+      toast.error(res?.error || t('super.bulk_update_failed'));
     }
     setTenantLoading(false);
     setTenantConfirm(false);

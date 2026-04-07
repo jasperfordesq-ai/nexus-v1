@@ -166,7 +166,7 @@ class AdminOnboardingConfigController extends BaseApiController
         }
 
         return $this->respondWithData([
-            'message' => 'Onboarding settings updated',
+            'message' => __('api_controllers_1.admin_onboarding.settings_updated'),
             'updated_keys' => $updated,
         ]);
     }
@@ -206,7 +206,7 @@ class AdminOnboardingConfigController extends BaseApiController
         );
 
         return $this->respondWithData([
-            'message' => "Applied {$presetKey} preset",
+            'message' => __('api_controllers_1.admin_onboarding.preset_applied', ['preset' => $presetKey]),
             'options_created' => $created,
             'options_skipped_existing' => count($created) === 0 ? 'All options already exist — no changes made' : null,
         ]);

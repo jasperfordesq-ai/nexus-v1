@@ -141,7 +141,7 @@ class GroupFilesController extends BaseApiController
             return $this->error($errors[0]['message'] ?? 'Delete failed', $code);
         }
 
-        return $this->respondWithData(['message' => 'File deleted']);
+        return $this->respondWithData(['message' => __('api_controllers_1.group_files.file_deleted')]);
     }
 
     /**

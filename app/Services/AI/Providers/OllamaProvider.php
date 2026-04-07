@@ -221,7 +221,7 @@ class OllamaProvider extends BaseProvider
         if (!$this->isConfigured()) {
             return [
                 'success' => false,
-                'message' => 'Ollama host URL not configured',
+                'message' => __('svc_notifications_2.ai.ollama_not_configured'),
                 'latency_ms' => 0
             ];
         }
@@ -248,7 +248,7 @@ class OllamaProvider extends BaseProvider
             if ($error) {
                 return [
                     'success' => false,
-                    'message' => "Cannot connect to Ollama: $error",
+                    'message' => __('svc_notifications_2.ai.ollama_cannot_connect', ['error' => $error]),
                     'latency_ms' => $latency
                 ];
             }
@@ -259,14 +259,14 @@ class OllamaProvider extends BaseProvider
 
                 return [
                     'success' => true,
-                    'message' => "Connected to Ollama ($modelCount models available)",
+                    'message' => __('svc_notifications_2.ai.ollama_connected', ['count' => $modelCount]),
                     'latency_ms' => $latency
                 ];
             }
 
             return [
                 'success' => false,
-                'message' => "Ollama returned HTTP $httpCode",
+                'message' => __('svc_notifications_2.ai.ollama_http_error', ['code' => $httpCode]),
                 'latency_ms' => $latency
             ];
 

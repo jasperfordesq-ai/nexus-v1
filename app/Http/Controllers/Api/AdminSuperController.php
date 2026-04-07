@@ -303,7 +303,7 @@ class AdminSuperController extends BaseApiController
         if ($result['success']) {
             return $this->respondWithData([
                 'tenant_id' => $result['tenant_id'],
-                'message' => "Tenant '{$name}' created successfully",
+                'message' => __('api_controllers_1.admin_super.tenant_created', ['name' => $name]),
             ], null, 201);
         }
 
@@ -1255,7 +1255,7 @@ class AdminSuperController extends BaseApiController
         $result = $this->federationFeatureService->triggerEmergencyLockdown($userId, $reason);
 
         if ($result) {
-            return $this->respondWithData(['lockdown' => true, 'message' => 'Emergency lockdown activated']);
+            return $this->respondWithData(['lockdown' => true, 'message' => __('api_controllers_1.admin_super.lockdown_activated')]);
         }
 
         return $this->respondWithError(ApiErrorCodes::SERVER_INTERNAL_ERROR, __('api.federation_lockdown_activate_failed'), null, 500);
@@ -1269,7 +1269,7 @@ class AdminSuperController extends BaseApiController
         $result = $this->federationFeatureService->liftEmergencyLockdown($userId);
 
         if ($result) {
-            return $this->respondWithData(['lockdown' => false, 'message' => 'Emergency lockdown lifted']);
+            return $this->respondWithData(['lockdown' => false, 'message' => __('api_controllers_1.admin_super.lockdown_lifted')]);
         }
 
         return $this->respondWithError(ApiErrorCodes::SERVER_INTERNAL_ERROR, __('api.federation_lockdown_lift_failed'), null, 500);

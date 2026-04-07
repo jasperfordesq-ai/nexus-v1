@@ -1077,7 +1077,7 @@ class AdminGroupsController extends BaseApiController
         $success = \App\Services\GroupLifecycleService::archive($id, $userId, $reason);
 
         return $success
-            ? $this->successResponse(['message' => 'Group archived'])
+            ? $this->successResponse(['message' => __('api_controllers_1.admin_groups.group_archived')])
             : $this->errorResponse('Failed to archive group', 400);
     }
 
@@ -1091,7 +1091,7 @@ class AdminGroupsController extends BaseApiController
         $success = \App\Services\GroupLifecycleService::unarchive($id, $userId);
 
         return $success
-            ? $this->successResponse(['message' => 'Group unarchived'])
+            ? $this->successResponse(['message' => __('api_controllers_1.admin_groups.group_unarchived')])
             : $this->errorResponse('Failed to unarchive group', 400);
     }
 
@@ -1142,7 +1142,7 @@ class AdminGroupsController extends BaseApiController
         $success = \App\Services\GroupLifecycleService::transferOwnership($id, $newOwnerId, $userId);
 
         return $success
-            ? $this->successResponse(['message' => 'Ownership transferred'])
+            ? $this->successResponse(['message' => __('api_controllers_1.admin_groups.ownership_transferred')])
             : $this->errorResponse('Failed to transfer ownership. Ensure user is an active member.', 400);
     }
 
@@ -1161,7 +1161,7 @@ class AdminGroupsController extends BaseApiController
         $success = \App\Services\GroupLifecycleService::mergeGroups($id, $targetGroupId, $userId);
 
         return $success
-            ? $this->successResponse(['message' => 'Groups merged successfully'])
+            ? $this->successResponse(['message' => __('api_controllers_1.admin_groups.groups_merged')])
             : $this->errorResponse('Failed to merge groups', 400);
     }
 
@@ -1181,7 +1181,7 @@ class AdminGroupsController extends BaseApiController
         $newGroupId = \App\Services\GroupLifecycleService::cloneGroup($id, $newName, $userId, $cloneMembers);
 
         return $newGroupId
-            ? $this->successResponse(['id' => $newGroupId, 'message' => 'Group cloned'])
+            ? $this->successResponse(['id' => $newGroupId, 'message' => __('api_controllers_1.admin_groups.group_cloned')])
             : $this->errorResponse('Failed to clone group', 400);
     }
 
@@ -1240,7 +1240,7 @@ class AdminGroupsController extends BaseApiController
 
         $success = \App\Services\GroupTagService::delete($tagId);
         return $success
-            ? $this->successResponse(['message' => 'Tag deleted'])
+            ? $this->successResponse(['message' => __('api_controllers_1.admin_groups.tag_deleted')])
             : $this->errorResponse('Tag not found', 404);
     }
 
@@ -1270,7 +1270,7 @@ class AdminGroupsController extends BaseApiController
         $this->requireAdmin();
         $data = request()->only(['name', 'description', 'image_url', 'sort_order', 'is_active']);
         return \App\Services\GroupCollectionService::update($id, $data)
-            ? $this->successResponse(['message' => 'Updated'])
+            ? $this->successResponse(['message' => __('api_controllers_1.admin_groups.collection_updated')])
             : $this->errorResponse('Not found', 404);
     }
 
@@ -1278,7 +1278,7 @@ class AdminGroupsController extends BaseApiController
     {
         $this->requireAdmin();
         return \App\Services\GroupCollectionService::delete($id)
-            ? $this->successResponse(['message' => 'Deleted'])
+            ? $this->successResponse(['message' => __('api_controllers_1.admin_groups.collection_deleted')])
             : $this->errorResponse('Not found', 404);
     }
 
@@ -1288,7 +1288,7 @@ class AdminGroupsController extends BaseApiController
         $groupIds = request()->input('group_ids', []);
         if (!is_array($groupIds)) return $this->errorResponse('group_ids array required', 400);
         \App\Services\GroupCollectionService::setGroups($id, $groupIds);
-        return $this->successResponse(['message' => 'Groups set']);
+        return $this->successResponse(['message' => __('api_controllers_1.admin_groups.collection_groups_set')]);
     }
 
     // =========================================================================
@@ -1334,7 +1334,7 @@ class AdminGroupsController extends BaseApiController
         $deleted = DB::table('group_auto_assign_rules')
             ->where('id', $id)->where('tenant_id', $tenantId)->delete();
         return $deleted > 0
-            ? $this->successResponse(['message' => 'Rule deleted'])
+            ? $this->successResponse(['message' => __('api_controllers_1.admin_groups.rule_deleted')])
             : $this->errorResponse('Not found', 404);
     }
 }

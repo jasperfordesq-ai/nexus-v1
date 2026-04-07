@@ -141,7 +141,7 @@ class GroupExchangeController extends BaseApiController
 
         $this->groupExchangeService->updateStatus($id, 'cancelled');
 
-        return $this->respondWithData(['message' => 'Exchange cancelled']);
+        return $this->respondWithData(['message' => __('api_controllers_1.group_exchange.exchange_cancelled')]);
     }
 
     /** POST /api/v2/group-exchanges/{id}/participants */
@@ -230,7 +230,7 @@ class GroupExchangeController extends BaseApiController
         }
 
         return $this->respondWithData([
-            'message' => 'Exchange completed successfully',
+            'message' => __('api_controllers_1.group_exchange.exchange_completed'),
             'transaction_ids' => $result['transaction_ids'],
         ]);
     }

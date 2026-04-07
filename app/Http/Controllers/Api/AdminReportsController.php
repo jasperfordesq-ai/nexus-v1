@@ -250,7 +250,7 @@ class AdminReportsController extends BaseApiController
             Log::warning("AdminReportsController::resolve notification failed: " . $e->getMessage());
         }
 
-        return $this->respondWithData(['success' => true, 'message' => 'Report resolved']);
+        return $this->respondWithData(['success' => true, 'message' => __('api_controllers_1.admin_reports.report_resolved')]);
     }
 
     /**
@@ -306,7 +306,7 @@ class AdminReportsController extends BaseApiController
             Log::warning("AdminReportsController::dismiss notification failed: " . $e->getMessage());
         }
 
-        return $this->respondWithData(['success' => true, 'message' => 'Report dismissed']);
+        return $this->respondWithData(['success' => true, 'message' => __('api_controllers_1.admin_reports.report_dismissed')]);
     }
 
     /**

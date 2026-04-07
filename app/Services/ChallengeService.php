@@ -259,7 +259,7 @@ class ChallengeService
                     Notification::create([
                         'user_id' => $userId,
                         'type'    => 'achievement',
-                        'message' => "Challenge Complete! You finished '{$challenge->title}' — claim your reward!",
+                        'message' => __('svc_notifications.challenge.complete_claim', ['title' => $challenge->title]),
                         'link'    => '/achievements',
                     ]);
                 }
@@ -301,7 +301,7 @@ class ChallengeService
         Notification::create([
             'user_id' => $userId,
             'type'    => 'achievement',
-            'message' => "Challenge Complete! You finished '{$challenge->title}' and earned {$challenge->xp_reward} XP!",
+            'message' => __('svc_notifications.challenge.complete_earned', ['title' => $challenge->title, 'xp' => $challenge->xp_reward]),
             'link'    => '/achievements',
         ]);
     }

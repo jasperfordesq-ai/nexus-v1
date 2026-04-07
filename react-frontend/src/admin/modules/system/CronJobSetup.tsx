@@ -50,7 +50,7 @@ export function CronJobSetup() {
 
   const copyToClipboard = (text: string, label: string) => {
     navigator.clipboard.writeText(text);
-    toast.success(`${label} copied to clipboard`);
+    toast.success(t('system.label_copied_to_clipboard', { label }));
   };
 
   const handleTestConnection = async () => {
@@ -58,12 +58,12 @@ export function CronJobSetup() {
     try {
       const res = await adminSystem.getCronJobs();
       if (res.success && Array.isArray(res.data)) {
-        toast.success(`Connection OK — ${res.data.length} cron jobs found`);
+        toast.success(t('system.connection_ok', { count: res.data.length }));
       } else {
-        toast.error('API responded but returned unexpected data');
+        toast.error(t('system.api_unexpected_data'));
       }
     } catch {
-      toast.error('Failed to connect to the cron API — check your authentication');
+      toast.error(t('system.failed_to_connect_cron_api'));
     }
     setTesting(false);
   };

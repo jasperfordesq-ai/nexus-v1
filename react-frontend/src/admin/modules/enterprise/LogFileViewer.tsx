@@ -106,7 +106,7 @@ export function LogFileViewer() {
         setContent(res.data as unknown as LogFileContent);
       }
     } catch {
-      toast.error('Failed to load log file');
+      toast.error(t('enterprise.failed_to_load_log_file'));
     } finally {
       setLoading(false);
     }
@@ -140,12 +140,12 @@ export function LogFileViewer() {
     try {
       const res = await adminEnterprise.clearLogFile(filename);
       if (res.success) {
-        toast.success('Log file cleared');
+        toast.success(t('enterprise.log_file_cleared'));
         setClearModalOpen(false);
         loadData();
       }
     } catch {
-      toast.error('Failed to clear log file');
+      toast.error(t('enterprise.failed_to_clear_log_file'));
     } finally {
       setClearing(false);
     }
@@ -276,10 +276,10 @@ export function LogFileViewer() {
       {/* Clear Confirmation Modal */}
       <Modal isOpen={clearModalOpen} onClose={() => setClearModalOpen(false)}>
         <ModalContent>
-          <ModalHeader>Clear Log File</ModalHeader>
+          <ModalHeader>{t('enterprise.clear_log_file')}</ModalHeader>
           <ModalBody>
             <p className="text-default-600">
-              Are you sure you want to clear <strong className="font-mono">{filename}</strong>? This action cannot be undone.
+              {t('enterprise.clear_log_confirm', { filename })}
             </p>
           </ModalBody>
           <ModalFooter>

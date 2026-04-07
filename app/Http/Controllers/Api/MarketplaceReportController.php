@@ -28,7 +28,7 @@ class MarketplaceReportController extends BaseApiController
     {
         if (!TenantContext::hasFeature('marketplace')) {
             throw new \Illuminate\Http\Exceptions\HttpResponseException(
-                $this->respondWithError('FEATURE_DISABLED', 'The marketplace feature is not enabled for this community.', null, 403)
+                $this->respondWithError('FEATURE_DISABLED', __('api_controllers_2.marketplace_report.feature_disabled'), null, 403)
             );
         }
     }
@@ -65,7 +65,7 @@ class MarketplaceReportController extends BaseApiController
         return $this->respondWithData([
             'id' => $report->id,
             'status' => $report->status,
-            'message' => 'Your report has been submitted. We will review it within 24 hours as required by the Digital Services Act.',
+            'message' => __('api_controllers_2.marketplace_report.report_submitted'),
         ], null, 201);
     }
 

@@ -551,7 +551,7 @@ class AdminVolunteerController extends BaseApiController
                 Log::warning("AdminVolunteerController::approveApplication notification failed: " . $e->getMessage());
             }
 
-            return $this->respondWithData(['message' => 'Application approved']);
+            return $this->respondWithData(['message' => __('api_controllers_1.admin_volunteer.application_approved')]);
         } catch (\Exception $e) {
             return $this->respondWithError('SERVER_ERROR', __('api.approve_failed', ['resource' => 'application']), null, 500);
         }
@@ -606,7 +606,7 @@ class AdminVolunteerController extends BaseApiController
                 Log::warning("AdminVolunteerController::declineApplication notification failed: " . $e->getMessage());
             }
 
-            return $this->respondWithData(['message' => 'Application declined']);
+            return $this->respondWithData(['message' => __('api_controllers_1.admin_volunteer.application_declined')]);
         } catch (\Exception $e) {
             return $this->respondWithError('SERVER_ERROR', __('api.reject_failed', ['resource' => 'application']), null, 500);
         }
@@ -645,10 +645,10 @@ class AdminVolunteerController extends BaseApiController
         $reason = trim((string) $this->input('reason', ''));
 
         if ($amount == 0) {
-            return $this->respondWithError('VALIDATION_ERROR', 'Amount cannot be zero', 'amount', 400);
+            return $this->respondWithError('VALIDATION_ERROR', __('api_controllers_1.admin_volunteer.amount_cannot_be_zero'), 'amount', 400);
         }
         if (empty($reason)) {
-            return $this->respondWithError('VALIDATION_ERROR', 'Reason is required', 'reason', 400);
+            return $this->respondWithError('VALIDATION_ERROR', __('api_controllers_1.admin_volunteer.reason_required'), 'reason', 400);
         }
 
         $adminId = $this->getUserId();
@@ -675,11 +675,11 @@ class AdminVolunteerController extends BaseApiController
 
         $status = $this->input('status');
         if (!$status || !in_array($status, ['active', 'suspended'], true)) {
-            return $this->respondWithError('VALIDATION_ERROR', 'Status must be active or suspended', 'status', 400);
+            return $this->respondWithError('VALIDATION_ERROR', __('api_controllers_1.admin_volunteer.status_must_be_active_or_suspended'), 'status', 400);
         }
 
         if (!$this->tableExists('vol_organizations')) {
-            return $this->respondWithError('NOT_FOUND', 'Organization not found', null, 404);
+            return $this->respondWithError('NOT_FOUND', __('api_controllers_1.admin_volunteer.organization_not_found'), null, 404);
         }
 
         try {
@@ -689,7 +689,7 @@ class AdminVolunteerController extends BaseApiController
             );
 
             if (!$org) {
-                return $this->respondWithError('NOT_FOUND', 'Organization not found', null, 404);
+                return $this->respondWithError('NOT_FOUND', __('api_controllers_1.admin_volunteer.organization_not_found'), null, 404);
             }
 
             DB::update(
@@ -700,10 +700,10 @@ class AdminVolunteerController extends BaseApiController
             return $this->respondWithData([
                 'id' => $id,
                 'status' => $status,
-                'message' => "Organization status updated to {$status}",
+                'message' => __('api_controllers_1.admin_volunteer.org_status_updated', ['status' => $status]),
             ]);
         } catch (\Exception $e) {
-            return $this->respondWithError('SERVER_ERROR', 'Failed to update organization status', null, 500);
+            return $this->respondWithError('SERVER_ERROR', __('api_controllers_1.admin_volunteer.org_status_update_failed'), null, 500);
         }
     }
 

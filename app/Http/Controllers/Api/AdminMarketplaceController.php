@@ -26,7 +26,7 @@ class AdminMarketplaceController extends BaseApiController
     private function ensureFeature(): void
     {
         if (!TenantContext::hasFeature('marketplace')) {
-            abort(403, 'Marketplace feature is not enabled for this tenant.');
+            abort(403, __('api_controllers_1.admin_marketplace.feature_not_enabled'));
         }
     }
 
@@ -167,7 +167,7 @@ class AdminMarketplaceController extends BaseApiController
 
         $listing->save();
 
-        return $this->respondWithData(['message' => 'Listing approved.']);
+        return $this->respondWithData(['message' => __('api_controllers_1.admin_marketplace.listing_approved')]);
     }
 
     /**
@@ -191,7 +191,7 @@ class AdminMarketplaceController extends BaseApiController
         $listing->status = 'removed';
         $listing->save();
 
-        return $this->respondWithData(['message' => 'Listing rejected.']);
+        return $this->respondWithData(['message' => __('api_controllers_1.admin_marketplace.listing_rejected')]);
     }
 
     /**
@@ -210,7 +210,7 @@ class AdminMarketplaceController extends BaseApiController
         $listing->moderated_at = now();
         $listing->save();
 
-        return $this->respondWithData(['message' => 'Listing removed.']);
+        return $this->respondWithData(['message' => __('api_controllers_1.admin_marketplace.listing_removed')]);
     }
 
     // -----------------------------------------------------------------
@@ -296,13 +296,13 @@ class AdminMarketplaceController extends BaseApiController
         $seller = MarketplaceSellerProfile::findOrFail($id);
 
         if ($seller->seller_type !== 'business') {
-            return $this->respondWithError('VALIDATION_ERROR', 'Only business sellers can be verified.', null, 422);
+            return $this->respondWithError('VALIDATION_ERROR', __('api_controllers_1.admin_marketplace.only_business_sellers_verified'), null, 422);
         }
 
         $seller->business_verified = true;
         $seller->save();
 
-        return $this->respondWithData(['message' => 'Seller verified.']);
+        return $this->respondWithData(['message' => __('api_controllers_1.admin_marketplace.seller_verified')]);
     }
 
     /**
@@ -322,7 +322,7 @@ class AdminMarketplaceController extends BaseApiController
             ->where('status', 'active')
             ->update(['status' => 'removed', 'moderation_status' => 'rejected']);
 
-        return $this->respondWithData(['message' => 'Seller suspended and all listings deactivated.']);
+        return $this->respondWithData(['message' => __('api_controllers_1.admin_marketplace.seller_suspended')]);
     }
 
     // -----------------------------------------------------------------
@@ -373,7 +373,7 @@ class AdminMarketplaceController extends BaseApiController
             return $this->respondWithError('VALIDATION_ERROR', $e->getMessage(), null, 422);
         }
 
-        return $this->respondWithData(['message' => 'Report acknowledged.', 'status' => $report->status]);
+        return $this->respondWithData(['message' => __('api_controllers_1.admin_marketplace.report_acknowledged'), 'status' => $report->status]);
     }
 
     /**
@@ -399,7 +399,7 @@ class AdminMarketplaceController extends BaseApiController
             return $this->respondWithError('VALIDATION_ERROR', $e->getMessage(), null, 422);
         }
 
-        return $this->respondWithData(['message' => 'Report resolved.', 'status' => $report->status, 'action_taken' => $report->action_taken]);
+        return $this->respondWithData(['message' => __('api_controllers_1.admin_marketplace.report_resolved'), 'status' => $report->status, 'action_taken' => $report->action_taken]);
     }
 
     /**

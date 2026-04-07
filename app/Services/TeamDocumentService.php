@@ -80,7 +80,7 @@ class TeamDocumentService
         if (empty($fileData) || empty($fileData['tmp_name'])) {
             $this->errors[] = [
                 'code' => 'VALIDATION_ERROR',
-                'message' => 'No file provided',
+                'message' => __('svc_notifications_2.team_document.no_file_provided'),
                 'field' => 'file',
             ];
             return null;
@@ -89,7 +89,7 @@ class TeamDocumentService
         if (($fileData['error'] ?? UPLOAD_ERR_OK) !== UPLOAD_ERR_OK) {
             $this->errors[] = [
                 'code' => 'VALIDATION_ERROR',
-                'message' => 'File upload failed',
+                'message' => __('svc_notifications_2.team_document.file_upload_failed'),
                 'field' => 'file',
             ];
             return null;
@@ -116,7 +116,7 @@ class TeamDocumentService
         if (!in_array($mimeType, $allowedMimes, true)) {
             $this->errors[] = [
                 'code' => 'VALIDATION_ERROR',
-                'message' => 'File type not allowed. Accepted: PDF, images, Office documents, CSV, text.',
+                'message' => __('svc_notifications_2.team_document.file_type_not_allowed'),
                 'field' => 'file',
             ];
             return null;
@@ -128,7 +128,7 @@ class TeamDocumentService
         if ($fileSize > $maxSize) {
             $this->errors[] = [
                 'code' => 'VALIDATION_ERROR',
-                'message' => 'File must be under 20MB',
+                'message' => __('svc_notifications_2.team_document.file_must_be_under_20mb'),
                 'field' => 'file',
             ];
             return null;
@@ -161,7 +161,7 @@ class TeamDocumentService
         if (!copy($fileData['tmp_name'], $destPath)) {
             $this->errors[] = [
                 'code' => 'SERVER_ERROR',
-                'message' => 'Failed to save uploaded file',
+                'message' => __('svc_notifications_2.team_document.failed_to_save_file'),
             ];
             return null;
         }
@@ -199,7 +199,7 @@ class TeamDocumentService
         if (!$doc) {
             $this->errors[] = [
                 'code' => 'RESOURCE_NOT_FOUND',
-                'message' => 'Document not found',
+                'message' => __('svc_notifications_2.team_document.document_not_found'),
             ];
             return false;
         }

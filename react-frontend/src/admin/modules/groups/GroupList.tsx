@@ -127,11 +127,11 @@ export function GroupList() {
     try {
       const res = await api.post(`/v2/admin/groups/${item.id}/${action}`);
       if (res?.success) {
-        toast.success(`Group ${action}d: ${item.name}`);
+        toast.success(t('groups.group_action_success', { action, name: item.name }));
         loadItems();
       }
     } catch {
-      toast.error(`Failed to ${action} group`);
+      toast.error(t('groups.failed_to_action_group', { action }));
     }
   };
 
@@ -141,30 +141,30 @@ export function GroupList() {
     try {
       const res = await api.post(`/v2/admin/groups/${item.id}/clone`, { name, clone_members: false });
       if (res?.success) {
-        toast.success(`Group cloned: ${name}`);
+        toast.success(t('groups.group_cloned', { name }));
         loadItems();
       }
     } catch {
-      toast.error('Failed to clone group');
+      toast.error(t('groups.failed_to_clone_group'));
     }
   };
 
   const handleBulkArchive = async () => {
     try {
       await api.post('/v2/admin/groups/bulk-archive', { group_ids: Array.from(selectedIds) });
-      toast.success(`${selectedIds.size} groups archived`);
+      toast.success(t('groups.groups_archived', { count: selectedIds.size }));
       setSelectedIds(new Set());
       loadItems();
-    } catch { toast.error('Failed to archive groups'); }
+    } catch { toast.error(t('groups.failed_to_archive_groups')); }
   };
 
   const handleBulkDelete = async () => {
-    if (!confirm(`Delete ${selectedIds.size} groups? This cannot be undone.`)) return;
+    if (!confirm(t('groups.confirm_bulk_delete', { count: selectedIds.size }))) return;
     // Delete one by one (no bulk delete endpoint)
     for (const id of selectedIds) {
       try { await adminGroups.delete(id); } catch { /* skip failures */ }
     }
-    toast.success(`${selectedIds.size} groups deleted`);
+    toast.success(t('groups.groups_deleted', { count: selectedIds.size }));
     setSelectedIds(new Set());
     loadItems();
   };

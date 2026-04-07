@@ -473,7 +473,7 @@ export default function LegalDocVersionList() {
                       </ul>
                     </div>
                   </div>
-                  <p>Are you sure you want to publish version {selectedVersion?.version_number}?</p>
+                  <p>{t('enterprise.publish_version_confirm', { version: selectedVersion?.version_number })}</p>
                 </div>
               </ModalBody>
               <ModalFooter>
@@ -621,9 +621,9 @@ export default function LegalDocVersionList() {
                   <div className="flex items-start gap-3 p-3 bg-danger-50 dark:bg-danger-900/20 rounded-lg">
                     <AlertCircle size={20} className="text-danger shrink-0 mt-0.5" />
                     <div className="text-sm">
-                      <p className="font-medium mb-1">This action cannot be undone.</p>
+                      <p className="font-medium mb-1">{t('enterprise.action_cannot_be_undone')}</p>
                       <p className="text-[var(--color-text-secondary)]">
-                        Draft version {deleteTarget?.version_number} will be permanently deleted.
+                        {t('enterprise.draft_will_be_deleted', { version: deleteTarget?.version_number })}
                       </p>
                     </div>
                   </div>

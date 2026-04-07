@@ -71,7 +71,7 @@ class LegalController extends BaseApiController
 
         $this->legalService->acceptAll($userId, $tenantId);
 
-        return $this->respondWithData(['message' => 'All legal documents accepted']);
+        return $this->respondWithData(['message' => __('api_controllers_2.legal.all_accepted')]);
     }
 
     // ──────────────────────────────────────────────
@@ -287,7 +287,7 @@ class LegalController extends BaseApiController
 
             return $this->respondWithData([
                 'success' => true,
-                'message' => 'Acceptance recorded',
+                'message' => __('api_controllers_2.legal.acceptance_recorded'),
                 'accepted_at' => date('c'),
             ]);
         } catch (\Exception $e) {

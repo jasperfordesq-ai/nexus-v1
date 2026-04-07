@@ -551,6 +551,8 @@ class AdminVettingController extends BaseApiController
                 $basePath = TenantContext::getSlugPrefix();
                 $fullCtaUrl = $baseUrl . $basePath . $ctaPath;
                 $safeEmailBody = htmlspecialchars($emailBody, ENT_QUOTES, 'UTF-8');
+                $greeting = __('emails.common.greeting', ['name' => $recipientName]);
+                $subject = __('emails.vetting.subject', ['heading' => $emailHeading, 'tenant' => $tenantName]);
 
                 $html = <<<HTML
 <div style="font-family: system-ui, -apple-system, sans-serif; max-width: 600px; margin: 0 auto;">
@@ -559,7 +561,7 @@ class AdminVettingController extends BaseApiController
         <p style="color: rgba(255,255,255,0.9); margin: 8px 0 0;">{$tenantName}</p>
     </div>
     <div style="background: #f8fafc; padding: 24px; border-radius: 0 0 16px 16px; border: 1px solid #e2e8f0; border-top: none;">
-        <p style="color: #1e293b; font-size: 16px; line-height: 1.6;">Hi {$recipientName},</p>
+        <p style="color: #1e293b; font-size: 16px; line-height: 1.6;">{$greeting}</p>
         <p style="color: #1e293b; font-size: 16px; line-height: 1.6;">{$safeEmailBody}</p>
         <div style="text-align: center; margin-top: 24px;">
             <a href="{$fullCtaUrl}" style="display: inline-block; background: linear-gradient(135deg, {$gradientFrom}, {$gradientTo}); color: white; text-decoration: none; padding: 14px 32px; border-radius: 10px; font-weight: 600;">{$ctaLabel}</a>
@@ -567,8 +569,6 @@ class AdminVettingController extends BaseApiController
     </div>
 </div>
 HTML;
-
-                $subject = "{$emailHeading} - {$tenantName}";
                 $mailer = Mailer::forCurrentTenant();
                 $mailer->send($user->email, $subject, $html);
             }

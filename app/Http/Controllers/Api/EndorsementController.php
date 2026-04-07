@@ -56,7 +56,7 @@ class EndorsementController extends BaseApiController
 
         return $this->respondWithData([
             'endorsement_id' => $endorsementId,
-            'message' => 'Endorsement added',
+            'message' => __('api_controllers_1.endorsement.endorsement_added'),
         ]);
     }
 
@@ -78,7 +78,7 @@ class EndorsementController extends BaseApiController
 
         $this->endorsementService->removeEndorsement($userId, $id, $skillName);
 
-        return $this->respondWithData(['message' => 'Endorsement removed']);
+        return $this->respondWithData(['message' => __('api_controllers_1.endorsement.endorsement_removed')]);
     }
 
     /**

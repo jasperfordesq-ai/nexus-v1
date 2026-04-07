@@ -120,7 +120,7 @@ class NewsletterController extends BaseApiController
 
         if ($subscriber->status === 'unsubscribed') {
             return $this->respondWithData([
-                'message' => 'You are already unsubscribed.',
+                'message' => __('api_controllers_2.newsletter.already_unsubscribed'),
                 'already_done' => true,
             ]);
         }

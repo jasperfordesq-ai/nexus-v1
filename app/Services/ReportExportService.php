@@ -49,7 +49,7 @@ class ReportExportService
         if (empty($data['rows'])) {
             return [
                 'success'  => false,
-                'message'  => 'No data found for the selected report and filters.',
+                'message'  => __('svc_notifications_2.report_export.no_data'),
                 'csv'      => '',
                 'filename' => '',
             ];
@@ -105,7 +105,7 @@ class ReportExportService
         if (empty($data['rows'])) {
             return [
                 'success'  => false,
-                'message'  => 'No data found for the selected report and filters.',
+                'message'  => __('svc_notifications_2.report_export.no_data'),
                 'pdf'      => '',
                 'filename' => '',
             ];

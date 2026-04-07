@@ -97,7 +97,7 @@ class OrgWalletService
     public static function depositToOrg(int $userId, int $orgId, float $amount, ?string $note = null): array
     {
         if ($amount <= 0) {
-            return ['success' => false, 'message' => 'Amount must be greater than zero'];
+            return ['success' => false, 'message' => __('svc_notifications_2.org_wallet.amount_must_be_greater_than_zero')];
         }
 
         $tenantId = TenantContext::getId();
@@ -110,14 +110,14 @@ class OrgWalletService
             ->first();
 
         if (! $member) {
-            return ['success' => false, 'message' => 'User is not an active member of this organization'];
+            return ['success' => false, 'message' => __('svc_notifications_2.org_wallet.user_not_active_member')];
         }
 
         return DB::transaction(function () use ($userId, $orgId, $amount, $note, $tenantId) {
             // Check user balance
             $user = DB::table('users')->where('id', $userId)->where('tenant_id', $tenantId)->lockForUpdate()->first();
             if (! $user || (float) $user->balance < $amount) {
-                return ['success' => false, 'message' => 'Insufficient balance'];
+                return ['success' => false, 'message' => __('svc_notifications_2.org_wallet.insufficient_balance')];
             }
 
             // Deduct from user
@@ -152,7 +152,7 @@ class OrgWalletService
     public static function createTransferRequest(int $orgId, int $requesterId, int $recipientId, float $amount, ?string $description = null): array
     {
         if ($amount <= 0) {
-            return ['success' => false, 'message' => 'Amount must be greater than zero'];
+            return ['success' => false, 'message' => __('svc_notifications_2.org_wallet.amount_must_be_greater_than_zero')];
         }
 
         $tenantId = TenantContext::getId();
@@ -165,7 +165,7 @@ class OrgWalletService
             ->first();
 
         if (! $member) {
-            return ['success' => false, 'message' => 'Requester is not an active member of this organization'];
+            return ['success' => false, 'message' => __('svc_notifications_2.org_wallet.requester_not_active_member')];
         }
 
         // Check org wallet balance — note: this is a non-binding pre-check.
@@ -177,7 +177,7 @@ class OrgWalletService
             ->first();
 
         if (! $wallet || (float) $wallet->balance < $amount) {
-            return ['success' => false, 'message' => 'Insufficient organization wallet balance'];
+            return ['success' => false, 'message' => __('svc_notifications_2.org_wallet.insufficient_org_wallet_balance')];
         }
 
         $now = now();
@@ -206,7 +206,7 @@ class OrgWalletService
         // Pre-check (non-authoritative — real check is inside transaction)
         $request = DB::table('org_transfer_requests')->where('id', $requestId)->where('tenant_id', $tenantId)->first();
         if (! $request || $request->status !== 'pending') {
-            return ['success' => false, 'message' => 'Transfer request not found or not pending'];
+            return ['success' => false, 'message' => __('svc_notifications_2.org_wallet.transfer_request_not_found_or_not_pending')];
         }
 
         // Check approver is admin or owner
@@ -218,7 +218,7 @@ class OrgWalletService
             ->first();
 
         if (! $approverMember) {
-            return ['success' => false, 'message' => 'Only admin or owner can approve requests'];
+            return ['success' => false, 'message' => __('svc_notifications_2.org_wallet.only_admin_or_owner_can_approve')];
         }
 
         return DB::transaction(function () use ($requestId, $approverId, $tenantId) {
@@ -230,7 +230,7 @@ class OrgWalletService
                 ->first();
 
             if (! $request || $request->status !== 'pending') {
-                return ['success' => false, 'message' => 'Transfer request not found or already processed'];
+                return ['success' => false, 'message' => __('svc_notifications_2.org_wallet.transfer_request_not_found_or_already_processed')];
             }
 
             // Check wallet balance
@@ -241,7 +241,7 @@ class OrgWalletService
                 ->first();
 
             if (! $wallet || (float) $wallet->balance < (float) $request->amount) {
-                return ['success' => false, 'message' => 'Insufficient organization wallet balance'];
+                return ['success' => false, 'message' => __('svc_notifications_2.org_wallet.insufficient_org_wallet_balance')];
             }
 
             // Deduct from org wallet
@@ -294,7 +294,7 @@ class OrgWalletService
         // Pre-check
         $request = DB::table('org_transfer_requests')->where('id', $requestId)->where('tenant_id', $tenantId)->first();
         if (! $request || $request->status !== 'pending') {
-            return ['success' => false, 'message' => 'Transfer request not found or not pending'];
+            return ['success' => false, 'message' => __('svc_notifications_2.org_wallet.transfer_request_not_found_or_not_pending')];
         }
 
         // Check admin/owner role
@@ -306,7 +306,7 @@ class OrgWalletService
             ->first();
 
         if (! $adminMember) {
-            return ['success' => false, 'message' => 'Only admin or owner can reject requests'];
+            return ['success' => false, 'message' => __('svc_notifications_2.org_wallet.only_admin_or_owner_can_reject')];
         }
 
         // Atomic status update — only update if still pending to prevent race with approve
@@ -321,7 +321,7 @@ class OrgWalletService
             ]);
 
         if ($affected === 0) {
-            return ['success' => false, 'message' => 'Transfer request already processed'];
+            return ['success' => false, 'message' => __('svc_notifications_2.org_wallet.transfer_request_already_processed')];
         }
 
         return ['success' => true];
@@ -335,11 +335,11 @@ class OrgWalletService
         $tenantId = TenantContext::getId();
         $request = DB::table('org_transfer_requests')->where('id', $requestId)->where('tenant_id', $tenantId)->first();
         if (! $request || $request->status !== 'pending') {
-            return ['success' => false, 'message' => 'Transfer request not found or not pending'];
+            return ['success' => false, 'message' => __('svc_notifications_2.org_wallet.transfer_request_not_found_or_not_pending')];
         }
 
         if ((int) $request->requester_id !== $userId) {
-            return ['success' => false, 'message' => 'Only the requester can cancel this request'];
+            return ['success' => false, 'message' => __('svc_notifications_2.org_wallet.only_requester_can_cancel')];
         }
 
         DB::table('org_transfer_requests')
@@ -358,12 +358,12 @@ class OrgWalletService
     public static function directTransferFromOrg(int $orgId, int $recipientId, float $amount, ?string $note = null, ?int $adminId = null): array
     {
         if ($amount <= 0) {
-            return ['success' => false, 'message' => 'Amount must be greater than zero'];
+            return ['success' => false, 'message' => __('svc_notifications_2.org_wallet.amount_must_be_greater_than_zero')];
         }
 
         // Check admin/owner role — adminId is required for authorization
         if ($adminId === null) {
-            return ['success' => false, 'message' => 'Admin user ID is required for direct transfers'];
+            return ['success' => false, 'message' => __('svc_notifications_2.org_wallet.admin_user_id_required')];
         }
 
         $adminMember = DB::table('org_members')
@@ -374,7 +374,7 @@ class OrgWalletService
             ->first();
 
         if (! $adminMember) {
-            return ['success' => false, 'message' => 'Only admin or owner can perform direct transfers'];
+            return ['success' => false, 'message' => __('svc_notifications_2.org_wallet.only_admin_or_owner_can_direct_transfer')];
         }
 
         $tenantId = TenantContext::getId();
@@ -388,7 +388,7 @@ class OrgWalletService
                 ->first();
 
             if (! $wallet || (float) $wallet->balance < $amount) {
-                return ['success' => false, 'message' => 'Insufficient organization wallet balance'];
+                return ['success' => false, 'message' => __('svc_notifications_2.org_wallet.insufficient_org_wallet_balance')];
             }
 
             // Deduct from org wallet

@@ -74,7 +74,7 @@ class CheckMaintenanceMode
             // Return 503 for API requests
             return response()->json([
                 'success' => false,
-                'error' => 'Platform is currently under maintenance. Please check back soon.',
+                'error' => __('api_controllers_2.maintenance.under_maintenance'),
                 'code' => 'MAINTENANCE_MODE',
             ], 503, ['Retry-After' => '300']);
 

@@ -212,7 +212,7 @@ class AdminAnalyticsReportsController extends BaseApiController
 
         return $this->respondWithData([
             'updated' => $updated,
-            'message' => "{$updated} member(s) marked as notified",
+            'message' => __('api_controllers_1.admin_analytics_reports.members_marked_notified', ['count' => $updated]),
         ]);
     }
 

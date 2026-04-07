@@ -4,156 +4,219 @@
 # Author: Jasper Ford
 # See NOTICE file for attribution and acknowledgements.
 #
-# check-i18n.sh — Detect hardcoded English strings in email templates and services.
+# check-i18n.sh — Detect hardcoded English strings across the ENTIRE codebase.
 #
-# Scans PHP email/notification files for common hardcoded patterns that should
-# use __() translation helpers. Run in CI or pre-push to prevent i18n regressions.
+# Scans ALL PHP services/controllers/listeners and React admin components for
+# user-facing hardcoded English that should use translation functions.
+# Uses grep -r for speed (not file-by-file loops).
 #
 # Usage:
-#   bash scripts/check-i18n.sh          # Check all email-related PHP files
-#   bash scripts/check-i18n.sh --fix    # Show what needs fixing (no auto-fix)
+#   bash scripts/check-i18n.sh              # Full codebase scan
+#   bash scripts/check-i18n.sh --php-only   # PHP files only
+#   bash scripts/check-i18n.sh --react-only # React admin only
 
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 
-# Files to scan: email templates, services that send emails, notification dispatchers
-EMAIL_PATTERNS=(
-    "app/Core/EmailTemplate.php"
-    "app/Core/EmailTemplateBuilder.php"
-    "app/Services/*Email*.php"
-    "app/Services/NewsletterService.php"
-    "app/Services/NotificationDispatcher.php"
-    "app/Services/CronJobRunner.php"
-    "app/Services/ListingExpiryService.php"
-    "app/Services/ListingExpiryReminderService.php"
-    "app/Services/ListingModerationService.php"
-    "app/Services/AdminListingsService.php"
-    "app/Services/RegistrationService.php"
-    "app/Services/StoryService.php"
-    "app/Services/JobModerationService.php"
-    "app/Services/JobInterviewService.php"
-    "app/Services/GuardianConsentService.php"
-    "app/Services/SafeguardingService.php"
-    "app/Services/SocialNotificationService.php"
-    "app/Mail/*.php"
-)
-
-# Expand globs into actual file list
-FILES=()
-for pattern in "${EMAIL_PATTERNS[@]}"; do
-    # Use nullglob-safe expansion
-    for f in $PROJECT_ROOT/$pattern; do
-        [ -f "$f" ] && FILES+=("$f")
-    done
-done
-
-if [ ${#FILES[@]} -eq 0 ]; then
-    echo "✅ No email-related PHP files found to check."
-    exit 0
-fi
+MODE="${1:-all}"
 
 VIOLATIONS=0
-VIOLATION_DETAILS=""
+VIOLATION_FILE=$(mktemp)
 
 # ─────────────────────────────────────────────────────────────────────────────
-# Pattern checks — common hardcoded strings that should be translated
+# Helper: grep recursively for a pattern, exclude translated lines
+# Args: $1=pattern, $2=description, $3=directory, $4=include_glob, $5=exclude_regex
 # ─────────────────────────────────────────────────────────────────────────────
-
-check_pattern() {
+check_recursive() {
     local pattern="$1"
     local description="$2"
-    local exclude_pattern="${3:-}"
+    local dir="$3"
+    local include="${4:-*.php}"
+    local extra_exclude="${5:-NOMATCH_PLACEHOLDER_xyzzy}"
 
-    for file in "${FILES[@]}"; do
-        local relative="${file#$PROJECT_ROOT/}"
-        local matches
+    local matches
+    matches=$(grep -rnF --include="$include" "$pattern" "$dir" 2>/dev/null \
+        | grep -v '__(' \
+        | grep -v "t('" \
+        | grep -v 't("' \
+        | grep -v '// ' \
+        | grep -v '^\s*\*' \
+        | grep -v 'Log::' \
+        | grep -v 'logger(' \
+        | grep -v 'console\.' \
+        | grep -v 'import ' \
+        | grep -v '__tests__/' \
+        | grep -v '\.test\.' \
+        | grep -v 'nullable|' \
+        | grep -v 'required|' \
+        | grep -v 'string $subject' \
+        | grep -v 'toast\.error(`$' \
+        | grep -v "$extra_exclude" \
+        || true)
 
-        if [ -n "$exclude_pattern" ]; then
-            matches=$(grep -nF "$pattern" "$file" 2>/dev/null | grep -v '__(' | grep -v '^\s*//' | grep -v '^\s*\*' || true)
-        else
-            matches=$(grep -nF "$pattern" "$file" 2>/dev/null | grep -v '^\s*//' | grep -v '^\s*\*' || true)
-        fi
-
-        if [ -n "$matches" ]; then
-            while IFS= read -r line; do
-                VIOLATIONS=$((VIOLATIONS + 1))
-                VIOLATION_DETAILS="${VIOLATION_DETAILS}\n  ❌ ${relative}:${line}\n     → ${description}"
-            done <<< "$matches"
-        fi
-    done
+    if [ -n "$matches" ]; then
+        local count
+        count=$(echo "$matches" | wc -l)
+        VIOLATIONS=$((VIOLATIONS + count))
+        echo "$matches" | while IFS= read -r line; do
+            relative="${line#$PROJECT_ROOT/}"
+            echo "  ${relative}" >> "$VIOLATION_FILE"
+            echo "     -> ${description}" >> "$VIOLATION_FILE"
+            echo "" >> "$VIOLATION_FILE"
+        done
+    fi
 }
 
-echo "🔍 Checking email-related PHP files for hardcoded strings..."
-echo "   Scanning ${#FILES[@]} files..."
-echo ""
+# ═══════════════════════════════════════════════════════════════════════════════
+# PHASE 1: PHP
+# ═══════════════════════════════════════════════════════════════════════════════
 
-# Footer strings that should use __('emails.footer.*')
-check_pattern "All rights reserved" "Use __('emails.footer.all_rights_reserved')" "__\("
-check_pattern "Manage Notification Preferences" "Use __('emails.footer.manage_preferences')" "__\("
-check_pattern "Manage Preferences" "Use __('emails.footer.manage_preferences')" "__\("
+if [ "$MODE" != "--react-only" ]; then
+    echo "═══════════════════════════════════════════════════════════════"
+    echo "  PHASE 1: PHP (app/ directory)"
+    echo "═══════════════════════════════════════════════════════════════"
 
-# Common greetings that should use __('emails.common.greeting')
-check_pattern "Hi {\$" "Use __('emails.common.greeting', ['name' => \$name])" "exclude"
-check_pattern ">Hi {\$" "Use __('emails.common.greeting', ['name' => \$name])" "exclude"
+    APP="$PROJECT_ROOT/app"
+    CTRL="$PROJECT_ROOT/app/Http/Controllers"
 
-# Button fallback text
-check_pattern "If the button" "Use __('emails.common.button_fallback')" "__\("
+    # Email footers/greetings/fallbacks
+    check_recursive "All rights reserved" "Hardcoded footer text" "$APP"
+    check_recursive "Manage Notification Preferences" "Hardcoded footer text" "$APP"
+    check_recursive "If the button" "Hardcoded button fallback text" "$APP"
+    check_recursive "You received this email because" "Hardcoded footer notice" "$APP"
 
-# Member/subscriber notices
-check_pattern "You received this email because" "Use __('emails.footer.member_notice') or similar" "__\("
-check_pattern "you are a member of" "Use __('emails.footer.member_notice')" "__\("
+    # Greetings in email HTML
+    check_recursive ">Hi {\$" "Hardcoded email greeting" "$APP"
 
-# Common button text that should be translated
-check_pattern "'>View Job<" "Use __('emails.job_alert.view_job')" "__\("
-check_pattern "'>View Your Profile<" "Use __('emails.notification.view_profile')" "__\("
-check_pattern "'>View Your Wallet<" "Use __('emails.federation.view_wallet')" "__\("
-check_pattern "'>View Leaderboard<" "Use __('emails.gamification_digest.view_leaderboard')" "__\("
+    # Hardcoded subject lines
+    check_recursive '$subject = "' "Hardcoded email subject" "$APP"
+    check_recursive "\$subject = '" "Hardcoded email subject" "$APP"
 
-# Subject lines with hardcoded English (common patterns)
-# These use grep -v '__(' to exclude properly translated lines
-check_pattern '$subject = "' "Email subjects should use __() translations" "exclude"
-check_pattern "\$subject = '" "Email subjects should use __() translations" "exclude"
-
-# ─────────────────────────────────────────────────────────────────────────────
-# Also check React admin sidebar for the recurring sidebar.* prefix bug
-# ─────────────────────────────────────────────────────────────────────────────
-
-SIDEBAR_FILE="$PROJECT_ROOT/react-frontend/src/admin/components/AdminSidebar.tsx"
-if [ -f "$SIDEBAR_FILE" ]; then
-    # Allow sidebar.admin, sidebar.expand_sidebar, sidebar.collapse_sidebar, sidebar.broker_panel
-    BAD_SIDEBAR=$(grep -n "t('sidebar\." "$SIDEBAR_FILE" 2>/dev/null \
-        | grep -v "sidebar\.admin" \
-        | grep -v "sidebar\.expand_sidebar" \
-        | grep -v "sidebar\.collapse_sidebar" \
-        | grep -v "sidebar\.broker_panel" \
-        | grep -v '^\s*//' || true)
-
-    if [ -n "$BAD_SIDEBAR" ]; then
-        while IFS= read -r line; do
-            VIOLATIONS=$((VIOLATIONS + 1))
-            VIOLATION_DETAILS="${VIOLATION_DETAILS}\n  ❌ react-frontend/src/admin/components/AdminSidebar.tsx:${line}\n     → Use t('key') not t('sidebar.key') — sidebar keys are at JSON root level"
-        done <<< "$BAD_SIDEBAR"
+    # Push notification content (broadcastAndPush with inline English)
+    # We flag calls where the 2nd arg is a quoted string, not a __() call
+    PUSH_MATCHES=""
+    PUSH_MATCHES=$(grep -rnE "broadcastAndPush\([^,]+,\s*['\"]" "$APP" --include="*.php" 2>/dev/null \
+        | grep -v '__(' || true)
+    if [ -n "$PUSH_MATCHES" ]; then
+        push_count=0
+        push_count=$(echo "$PUSH_MATCHES" | wc -l)
+        VIOLATIONS=$((VIOLATIONS + push_count))
+        echo "$PUSH_MATCHES" | while IFS= read -r line; do
+            relative="${line#$PROJECT_ROOT/}"
+            echo "  ${relative}" >> "$VIOLATION_FILE"
+            echo "     -> Hardcoded push notification — use __() translation" >> "$VIOLATION_FILE"
+            echo "" >> "$VIOLATION_FILE"
+        done
     fi
+
+    # API response messages in controllers (exclude validation rules and internal type mappings)
+    check_recursive "'message' => '" "Hardcoded API response message" "$CTRL" "*.php" "message_received"
+    check_recursive "'message' => \"" "Hardcoded API response message" "$CTRL"
+    check_recursive "'error' => '" "Hardcoded API error message" "$CTRL"
+    check_recursive "'error' => \"" "Hardcoded API error message" "$CTRL"
+
+    # Notification content in services (bell notifications)
+    # 'message' => "English text" in notification inserts
+    NOTIF_MATCHES=""
+    NOTIF_MATCHES=$(grep -rnE "'message'\s*=>\s*['\"]" "$PROJECT_ROOT/app/Services" --include="*.php" 2>/dev/null \
+        | grep -v '__(' \
+        | grep -v 'Log::' \
+        | grep -v '// ' \
+        | grep -v '\$.*message' \
+        | grep -v "'message' => \$" \
+        | grep -v "'message' => 'message'" \
+        | grep -v "'message' => '/messages'" \
+        | grep -v "'message' => 'message_received'" \
+        || true)
+    if [ -n "$NOTIF_MATCHES" ]; then
+        notif_count=0
+        notif_count=$(echo "$NOTIF_MATCHES" | wc -l)
+        VIOLATIONS=$((VIOLATIONS + notif_count))
+        echo "$NOTIF_MATCHES" | while IFS= read -r line; do
+            relative="${line#$PROJECT_ROOT/}"
+            echo "  ${relative}" >> "$VIOLATION_FILE"
+            echo "     -> Hardcoded notification message — use __() translation" >> "$VIOLATION_FILE"
+            echo "" >> "$VIOLATION_FILE"
+        done
+    fi
+
+    echo "  Done."
+    echo ""
 fi
 
-# ─────────────────────────────────────────────────────────────────────────────
-# Report
-# ─────────────────────────────────────────────────────────────────────────────
+# ═══════════════════════════════════════════════════════════════════════════════
+# PHASE 2: React admin
+# ═══════════════════════════════════════════════════════════════════════════════
 
+if [ "$MODE" != "--php-only" ]; then
+    echo "═══════════════════════════════════════════════════════════════"
+    echo "  PHASE 2: React admin panel"
+    echo "═══════════════════════════════════════════════════════════════"
+
+    ADMIN="$PROJECT_ROOT/react-frontend/src/admin"
+
+    # Toast messages
+    check_recursive "toast.success('" "Hardcoded toast message" "$ADMIN" "*.tsx"
+    check_recursive 'toast.success("' "Hardcoded toast message" "$ADMIN" "*.tsx"
+    check_recursive 'toast.success(`' "Hardcoded toast message" "$ADMIN" "*.tsx"
+    check_recursive "toast.error('" "Hardcoded toast error" "$ADMIN" "*.tsx"
+    check_recursive 'toast.error("' "Hardcoded toast error" "$ADMIN" "*.tsx"
+    check_recursive 'toast.error(`' "Hardcoded toast error" "$ADMIN" "*.tsx"
+    check_recursive "showToast('" "Hardcoded toast message" "$ADMIN" "*.tsx"
+    check_recursive 'showToast("' "Hardcoded toast message" "$ADMIN" "*.tsx"
+
+    # Confirmation dialogs
+    check_recursive "Are you sure" "Hardcoded confirmation text" "$ADMIN" "*.tsx"
+    check_recursive "This action cannot be undone" "Hardcoded confirmation text" "$ADMIN" "*.tsx"
+    check_recursive "window.confirm(" "Use ConfirmModal with t() instead" "$ADMIN" "*.tsx"
+
+    # Sidebar prefix bug
+    SIDEBAR_FILE="$PROJECT_ROOT/react-frontend/src/admin/components/AdminSidebar.tsx"
+    if [ -f "$SIDEBAR_FILE" ]; then
+        BAD_SIDEBAR=$(grep -n "t('sidebar\." "$SIDEBAR_FILE" 2>/dev/null \
+            | grep -v "sidebar\.admin" \
+            | grep -v "sidebar\.expand_sidebar" \
+            | grep -v "sidebar\.collapse_sidebar" \
+            | grep -v "sidebar\.broker_panel" \
+            | grep -v '// ' || true)
+        if [ -n "$BAD_SIDEBAR" ]; then
+            sb_count=0
+            sb_count=$(echo "$BAD_SIDEBAR" | wc -l)
+            VIOLATIONS=$((VIOLATIONS + sb_count))
+            echo "$BAD_SIDEBAR" | while IFS= read -r line; do
+                echo "  AdminSidebar.tsx:${line}" >> "$VIOLATION_FILE"
+                echo "     -> sidebar.* prefix bug — use top-level key" >> "$VIOLATION_FILE"
+                echo "" >> "$VIOLATION_FILE"
+            done
+        fi
+    fi
+
+    echo "  Done."
+    echo ""
+fi
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# REPORT
+# ═══════════════════════════════════════════════════════════════════════════════
+
+echo "═══════════════════════════════════════════════════════════════"
 if [ $VIOLATIONS -gt 0 ]; then
-    echo "⚠️  Found ${VIOLATIONS} potential i18n violation(s):"
+    echo "  FAILED: ${VIOLATIONS} i18n violation(s) found"
+    echo "═══════════════════════════════════════════════════════════════"
     echo ""
-    echo -e "$VIOLATION_DETAILS"
-    echo ""
-    echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-    echo "All user-facing strings in email templates must use __() translations."
-    echo "Add keys to lang/en/emails.json, then reference with __('emails.section.key')."
-    echo "See CLAUDE.md section: NO HARDCODED STRINGS"
-    echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+    cat "$VIOLATION_FILE"
+    echo "───────────────────────────────────────────────────────────────"
+    echo "PHP: use __('key', ['param' => \$val]) with lang/en/*.json"
+    echo "React: use t('key', { param: val }) with public/locales/en/*.json"
+    echo "See CLAUDE.md: NO HARDCODED STRINGS"
+    echo "───────────────────────────────────────────────────────────────"
+    rm -f "$VIOLATION_FILE"
     exit 1
 else
-    echo "✅ No hardcoded string violations found in email templates."
+    echo "  PASSED: Zero i18n violations"
+    echo "═══════════════════════════════════════════════════════════════"
+    rm -f "$VIOLATION_FILE"
     exit 0
 fi

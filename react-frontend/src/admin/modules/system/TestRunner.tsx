@@ -96,7 +96,7 @@ export function TestRunner() {
 
         const failCount = results.filter(r => r.status !== 'pass').length;
         if (failCount > 0) {
-          toast.warning(`Health check complete`, `${failCount} test(s) failed`);
+          toast.warning(t('system.health_check_complete'), t('system.tests_failed', { count: failCount }));
         } else {
           toast.success(t('system.all_health_checks_passed'));
         }
@@ -112,7 +112,7 @@ export function TestRunner() {
         status: 'fail' as const,
         error: 'Health check API unavailable',
       })));
-      toast.error('Health check failed', 'Could not reach the health check endpoint');
+      toast.error(t('system.health_check_failed'), t('system.health_check_unreachable'));
     } finally {
       setRunning(false);
     }

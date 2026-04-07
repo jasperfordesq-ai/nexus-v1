@@ -243,7 +243,7 @@ class AdminReviewsController extends BaseApiController
             "Flagged review #{$id} for admin review (set status to pending)" . ($superAdmin ? " (tenant {$reviewTenantId})" : '')
         );
 
-        return $this->respondWithData(['success' => true, 'message' => 'Review flagged for attention']);
+        return $this->respondWithData(['success' => true, 'message' => __('api_controllers_1.admin_reviews.review_flagged')]);
     }
 
     /**
@@ -293,7 +293,7 @@ class AdminReviewsController extends BaseApiController
             Log::warning("AdminReviewsController::hide notification failed: " . $e->getMessage());
         }
 
-        return $this->respondWithData(['success' => true, 'message' => 'Review hidden']);
+        return $this->respondWithData(['success' => true, 'message' => __('api_controllers_1.admin_reviews.review_hidden')]);
     }
 
     /**
@@ -342,6 +342,6 @@ class AdminReviewsController extends BaseApiController
             Log::warning("AdminReviewsController::destroy notification failed: " . $e->getMessage());
         }
 
-        return $this->respondWithData(['success' => true, 'message' => 'Review deleted']);
+        return $this->respondWithData(['success' => true, 'message' => __('api_controllers_1.admin_reviews.review_deleted')]);
     }
 }

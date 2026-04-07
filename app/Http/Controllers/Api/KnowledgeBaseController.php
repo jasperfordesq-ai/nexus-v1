@@ -335,7 +335,7 @@ class KnowledgeBaseController extends BaseApiController
             ->where('tenant_id', $tenantId)
             ->update(['helpful_yes' => $helpful, 'helpful_no' => $notHelpful]);
 
-        return $this->respondWithData(['message' => 'Feedback submitted successfully']);
+        return $this->respondWithData(['message' => __('api_controllers_2.knowledge_base.feedback_submitted')]);
     }
 
     /**
@@ -389,7 +389,7 @@ class KnowledgeBaseController extends BaseApiController
             ->first(['id', 'tenant_id']);
 
         if (! $article) {
-            return $this->respondWithError('NOT_FOUND', 'Article not found', null, 404);
+            return $this->respondWithError('NOT_FOUND', __('api_controllers_2.knowledge_base.article_not_found'), null, 404);
         }
 
         // Scope attachment lookup to the article's tenant to prevent cross-tenant access
@@ -400,12 +400,12 @@ class KnowledgeBaseController extends BaseApiController
             ->first();
 
         if (! $attachment) {
-            return $this->respondWithError('NOT_FOUND', 'Attachment not found', null, 404);
+            return $this->respondWithError('NOT_FOUND', __('api_controllers_2.knowledge_base.attachment_not_found'), null, 404);
         }
 
         $disk = \Illuminate\Support\Facades\Storage::disk('public');
         if (! $disk->exists($attachment->file_path)) {
-            return $this->respondWithError('NOT_FOUND', 'File not found on disk', null, 404);
+            return $this->respondWithError('NOT_FOUND', __('api_controllers_2.knowledge_base.file_not_found_on_disk'), null, 404);
         }
 
         return $disk->download($attachment->file_path, $attachment->file_name, [
@@ -426,7 +426,7 @@ class KnowledgeBaseController extends BaseApiController
         $deleted = $this->attachmentService->delete($attachmentId, $id);
 
         if (! $deleted) {
-            return $this->respondWithError('NOT_FOUND', 'Attachment not found', null, 404);
+            return $this->respondWithError('NOT_FOUND', __('api_controllers_2.knowledge_base.attachment_not_found'), null, 404);
         }
 
         return $this->noContent();

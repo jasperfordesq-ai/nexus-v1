@@ -737,7 +737,7 @@ export function Webhooks() {
           title={t('federation.webhooks_delete_title', 'Delete Webhook')}
           message={t('federation.webhooks_delete_confirm', {
             url: deleteTarget.url,
-          }) || `Are you sure you want to delete the webhook for "${deleteTarget.url}"? All delivery logs will also be deleted. This action cannot be undone.`}
+          })}
           confirmLabel={t('federation.delete', 'Delete')}
           confirmColor="danger"
           isLoading={deleting}

@@ -212,7 +212,7 @@ class HelpController extends BaseApiController
         $helpful = $data['helpful'] ?? true;
 
         if (empty($articleSlug)) {
-            return $this->error('Missing article_slug', 400);
+            return $this->error(__('api_controllers_2.help.missing_article_slug'), 400);
         }
 
         $article = DB::table('help_articles')
@@ -221,7 +221,7 @@ class HelpController extends BaseApiController
             ->first();
 
         if (! $article) {
-            return $this->error('Article not found', 404);
+            return $this->error(__('api_controllers_2.help.article_not_found'), 404);
         }
 
         $userId = $this->getOptionalUserId();
@@ -254,10 +254,10 @@ class HelpController extends BaseApiController
                 'created_at' => now(),
             ]);
 
-            return $this->respondWithData(['message' => 'Feedback recorded']);
+            return $this->respondWithData(['message' => __('api_controllers_2.help.feedback_recorded')]);
         } catch (\Exception $e) {
             // Feedback table may not exist yet
-            return $this->respondWithData(['message' => 'Feedback recorded']);
+            return $this->respondWithData(['message' => __('api_controllers_2.help.feedback_recorded')]);
         }
     }
 }

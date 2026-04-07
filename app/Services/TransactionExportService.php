@@ -89,7 +89,7 @@ class TransactionExportService
 
             return [
                 'success' => false,
-                'message' => 'Failed to generate statement. Please try again.',
+                'message' => __('svc_notifications_2.transaction_export.failed'),
             ];
         }
     }

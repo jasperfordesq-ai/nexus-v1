@@ -181,14 +181,14 @@ class TenantSettingsService
         if ($verificationStatus === 'pending') {
             return [
                 'code' => 'AUTH_PENDING_VERIFICATION',
-                'message' => 'Your identity verification is pending. Please wait for approval.',
+                'message' => __('svc_notifications_2.tenant_settings.pending_verification'),
                 'extra' => ['pending_verification' => true],
             ];
         }
         if ($verificationStatus === 'failed') {
             return [
                 'code' => 'AUTH_VERIFICATION_FAILED',
-                'message' => 'Your identity verification has failed. Please contact support.',
+                'message' => __('svc_notifications_2.tenant_settings.verification_failed'),
                 'extra' => ['verification_failed' => true],
             ];
         }
@@ -198,7 +198,7 @@ class TenantSettingsService
             if (empty($user['email_verified_at'])) {
                 return [
                     'code' => 'AUTH_EMAIL_NOT_VERIFIED',
-                    'message' => 'Please verify your email address before logging in.',
+                    'message' => __('svc_notifications_2.tenant_settings.email_not_verified'),
                     'extra' => ['email_not_verified' => true],
                 ];
             }
@@ -209,7 +209,7 @@ class TenantSettingsService
             if (empty($user['is_approved'])) {
                 return [
                     'code' => 'AUTH_ACCOUNT_PENDING_APPROVAL',
-                    'message' => 'Your account is pending admin approval.',
+                    'message' => __('svc_notifications_2.tenant_settings.pending_admin_approval'),
                     'extra' => ['pending_approval' => true],
                 ];
             }

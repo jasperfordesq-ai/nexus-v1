@@ -469,25 +469,26 @@ class NexusScoreService
         $strongest = $categories[0];
         $insights[] = [
             'type'    => 'strength',
-            'title'   => "{$strongest['name']} is your strongest area!",
-            'message' => "You're in the top tier with {$strongest['data']['percentage']}% in {$strongest['name']}.",
+            'title'   => __('svc_notifications.nexus_score.strength_title', ['name' => $strongest['name']]),
+            'message' => __('svc_notifications.nexus_score.strength_message', ['percentage' => $strongest['data']['percentage'], 'name' => $strongest['name']]),
             'icon'    => "\xF0\x9F\x8F\x86",
         ];
 
         $weakest = $categories[count($categories) - 1];
         if ($weakest['data']['percentage'] < 50) {
-            $tips = [
-                'engagement' => 'Try sending and receiving time credits with different community members.',
-                'quality'    => 'Focus on completing transactions successfully and earning positive reviews.',
-                'volunteer'  => 'Log your volunteer hours regularly and maintain consistency.',
-                'activity'   => 'Create listings, join groups, and maintain a daily login streak.',
-                'badges'     => 'Complete challenges to earn more badges and achievements.',
-                'impact'     => 'Share posts and engage with the community feed.',
+            $tipKeys = [
+                'engagement' => 'tip_engagement',
+                'quality'    => 'tip_quality',
+                'volunteer'  => 'tip_volunteer',
+                'activity'   => 'tip_activity',
+                'badges'     => 'tip_badges',
+                'impact'     => 'tip_impact',
             ];
+            $tipKey = $tipKeys[$weakest['key']] ?? 'tip_default';
             $insights[] = [
                 'type'    => 'improvement',
-                'title'   => "Grow your {$weakest['name']} score",
-                'message' => $tips[$weakest['key']] ?? 'Keep participating in the community!',
+                'title'   => __('svc_notifications.nexus_score.improvement_title', ['name' => $weakest['name']]),
+                'message' => __('svc_notifications.nexus_score.' . $tipKey),
                 'icon'    => "\xF0\x9F\x92\xA1",
             ];
         }
@@ -495,8 +496,8 @@ class NexusScoreService
         if (($engagement['details']['unique_connections'] ?? 0) < 10) {
             $insights[] = [
                 'type'    => 'suggestion',
-                'title'   => 'Connect with more community members',
-                'message' => 'Exchange credits with new people to increase your network diversity.',
+                'title'   => __('svc_notifications.nexus_score.suggestion_connect_title'),
+                'message' => __('svc_notifications.nexus_score.suggestion_connect_message'),
                 'icon'    => "\xF0\x9F\xA4\x9D",
             ];
         }
@@ -504,8 +505,8 @@ class NexusScoreService
         if (($quality['details']['review_count'] ?? 0) < 5) {
             $insights[] = [
                 'type'    => 'suggestion',
-                'title'   => 'Complete more exchanges',
-                'message' => 'Build your reputation by completing transactions and earning reviews.',
+                'title'   => __('svc_notifications.nexus_score.suggestion_exchanges_title'),
+                'message' => __('svc_notifications.nexus_score.suggestion_exchanges_message'),
                 'icon'    => "\xE2\xAD\x90",
             ];
         }

@@ -113,7 +113,7 @@ class GroupInviteController extends BaseApiController
             return $this->errorResponse($errors[0]['message'] ?? 'Error revoking invite', $code);
         }
 
-        return $this->successResponse(['message' => 'Invite revoked']);
+        return $this->successResponse(['message' => __('api_controllers_1.group_invite.invite_revoked')]);
     }
 
     /**

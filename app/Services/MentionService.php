@@ -135,9 +135,10 @@ class MentionService
                     : $textPreview;
 
                 $entityLabel = self::getEntityLabel($entityType);
-                $message = "@{$mentionerName} mentioned you in a {$entityLabel}";
                 if ($shortPreview) {
-                    $message .= ": \"{$shortPreview}\"";
+                    $message = __('svc_notifications.mention.mentioned_in_with_preview', ['name' => $mentionerName, 'entity' => $entityLabel, 'preview' => $shortPreview]);
+                } else {
+                    $message = __('svc_notifications.mention.mentioned_in', ['name' => $mentionerName, 'entity' => $entityLabel]);
                 }
 
                 $link = self::getEntityLink($entityType, $entityId);

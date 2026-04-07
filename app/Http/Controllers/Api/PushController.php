@@ -56,7 +56,7 @@ class PushController extends BaseApiController
         $endpoint = $this->requireInput('endpoint');
         $this->pushService->unsubscribe($userId, $endpoint);
 
-        return $this->respondWithData(['message' => 'Unsubscribed successfully']);
+        return $this->respondWithData(['message' => __('api_controllers_2.push.unsubscribed')]);
     }
 
     /**
@@ -101,7 +101,7 @@ class PushController extends BaseApiController
         $subscriptions = array_map(fn($r) => (array)$r, $subscriptionResults);
 
         if (empty($subscriptions)) {
-            return $this->respondWithData(['sent' => 0, 'failed' => 0, 'message' => 'No subscribers found']);
+            return $this->respondWithData(['sent' => 0, 'failed' => 0, 'message' => __('api_controllers_2.push.no_subscribers')]);
         }
 
         $sent = 0;
@@ -205,7 +205,7 @@ class PushController extends BaseApiController
             return $this->respondWithData([
                 'registered' => false,
                 'pending' => true,
-                'message' => 'Token received - will be associated on login',
+                'message' => __('api_controllers_2.push.token_pending'),
             ]);
         }
 
@@ -221,7 +221,7 @@ class PushController extends BaseApiController
             if ($result) {
                 return $this->respondWithData([
                     'registered' => true,
-                    'message' => 'Device registered for push notifications',
+                    'message' => __('api_controllers_2.push.device_registered'),
                 ]);
             }
 

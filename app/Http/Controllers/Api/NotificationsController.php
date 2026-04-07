@@ -471,6 +471,6 @@ class NotificationsController extends BaseApiController
             return $this->respondWithError('VALIDATION_ERROR', __('api.missing_id_or_action'), null, 400);
         }
 
-        return $this->respondWithData(['message' => 'Notification deleted']);
+        return $this->respondWithData(['message' => __('api_controllers_2.notifications.deleted')]);
     }
 }

@@ -220,7 +220,7 @@ class WebAuthnController extends BaseApiController
             error_log("Failed to create passkey registered notification: " . $e->getMessage());
         }
 
-        return $this->respondWithData(['message' => 'Passkey registered successfully']);
+        return $this->respondWithData(['message' => __('api_controllers_2.webauthn.passkey_registered')]);
     }
 
     /** POST /api/webauthn/auth-challenge */
@@ -436,7 +436,7 @@ class WebAuthnController extends BaseApiController
         // (success, user, tokens). Frontend explicitly handles this shape.
         return response()->json([
             'success' => true,
-            'message' => 'Authentication successful',
+            'message' => __('api_controllers_2.webauthn.auth_successful'),
             'user' => [
                 'id' => $credential['uid'],
                 'first_name' => $credential['first_name'],
@@ -504,7 +504,7 @@ class WebAuthnController extends BaseApiController
             error_log("Failed to send passkey removed email: " . $e->getMessage());
         }
 
-        return $this->respondWithData(['message' => 'Credential(s) removed']);
+        return $this->respondWithData(['message' => __('api_controllers_2.webauthn.credentials_removed')]);
     }
 
     /** POST /api/webauthn/rename */
@@ -590,7 +590,7 @@ class WebAuthnController extends BaseApiController
         }
 
         return $this->respondWithData([
-            'message' => "Removed {$count} passkey(s). You can now re-register on any device.",
+            'message' => __('api_controllers_2.webauthn.all_removed', ['count' => $count]),
             'removed_count' => $count,
         ]);
     }

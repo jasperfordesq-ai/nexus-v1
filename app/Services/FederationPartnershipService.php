@@ -109,7 +109,7 @@ class FederationPartnershipService
                 ]);
             }
 
-            return ['success' => true, 'message' => 'Partnership request sent'];
+            return ['success' => true, 'message' => __('svc_notifications_2.federation.partnership_request_sent')];
         } catch (\Exception $e) {
             Log::error('FederationPartnershipService::requestPartnership error: ' . $e->getMessage());
             return ['success' => false, 'error' => 'Failed to create partnership request'];
@@ -158,7 +158,7 @@ class FederationPartnershipService
                 ['permissions' => $permissions]
             );
 
-            return ['success' => true, 'message' => 'Partnership approved'];
+            return ['success' => true, 'message' => __('svc_notifications_2.federation.partnership_approved')];
         } catch (\Exception $e) {
             Log::error('FederationPartnershipService::approvePartnership error: ' . $e->getMessage());
             return ['success' => false, 'error' => 'Failed to approve partnership'];
@@ -211,7 +211,7 @@ class FederationPartnershipService
                 ]
             );
 
-            return ['success' => true, 'message' => 'Counter-proposal sent'];
+            return ['success' => true, 'message' => __('svc_notifications_2.federation.counter_proposal_sent')];
         } catch (\Exception $e) {
             Log::error('FederationPartnershipService::counterPropose error: ' . $e->getMessage());
             return ['success' => false, 'error' => 'Failed to send counter-proposal'];
@@ -267,7 +267,7 @@ class FederationPartnershipService
                 ['accepted_level' => $partnership['federation_level']]
             );
 
-            return ['success' => true, 'message' => 'Counter-proposal accepted, partnership is now active'];
+            return ['success' => true, 'message' => __('svc_notifications_2.federation.counter_proposal_accepted')];
         } catch (\Exception $e) {
             Log::error('FederationPartnershipService::acceptCounterProposal error: ' . $e->getMessage());
             return ['success' => false, 'error' => 'Failed to accept counter-proposal'];
@@ -308,7 +308,7 @@ class FederationPartnershipService
                 ['reason' => $reason]
             );
 
-            return ['success' => true, 'message' => 'Partnership request rejected'];
+            return ['success' => true, 'message' => __('svc_notifications_2.federation.partnership_request_rejected')];
         } catch (\Exception $e) {
             Log::error('FederationPartnershipService::rejectPartnership error: ' . $e->getMessage());
             return ['success' => false, 'error' => 'Failed to reject partnership'];
@@ -348,7 +348,7 @@ class FederationPartnershipService
                 FederationAuditService::LEVEL_WARNING
             );
 
-            return ['success' => true, 'message' => 'Partnership suspended'];
+            return ['success' => true, 'message' => __('svc_notifications_2.federation.partnership_suspended')];
         } catch (\Exception $e) {
             Log::error('FederationPartnershipService::suspendPartnership error: ' . $e->getMessage());
             return ['success' => false, 'error' => 'Failed to suspend partnership'];
@@ -386,7 +386,7 @@ class FederationPartnershipService
                 []
             );
 
-            return ['success' => true, 'message' => 'Partnership reactivated'];
+            return ['success' => true, 'message' => __('svc_notifications_2.federation.partnership_reactivated')];
         } catch (\Exception $e) {
             Log::error('FederationPartnershipService::reactivatePartnership error: ' . $e->getMessage());
             return ['success' => false, 'error' => 'Failed to reactivate partnership'];
@@ -424,7 +424,7 @@ class FederationPartnershipService
                 FederationAuditService::LEVEL_WARNING
             );
 
-            return ['success' => true, 'message' => 'Partnership terminated'];
+            return ['success' => true, 'message' => __('svc_notifications_2.federation.partnership_terminated')];
         } catch (\Exception $e) {
             Log::error('FederationPartnershipService::terminatePartnership error: ' . $e->getMessage());
             return ['success' => false, 'error' => 'Failed to terminate partnership'];
@@ -463,7 +463,7 @@ class FederationPartnershipService
                 ['permissions' => $permissions]
             );
 
-            return ['success' => true, 'message' => 'Permissions updated'];
+            return ['success' => true, 'message' => __('svc_notifications_2.federation.permissions_updated')];
         } catch (\Exception $e) {
             Log::error('FederationPartnershipService::updatePermissions error: ' . $e->getMessage());
             return ['success' => false, 'error' => 'Failed to update permissions'];

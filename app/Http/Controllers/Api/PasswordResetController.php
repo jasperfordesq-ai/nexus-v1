@@ -61,7 +61,7 @@ class PasswordResetController extends BaseApiController
         if (!RateLimiter::attempt($emailKey, 3, 3600)) {
             // Still return success to prevent enumeration
             return $this->respondWithData([
-                'message' => 'If an account exists with that email address, a password reset link has been sent.'
+                'message' => __('api_controllers_2.password_reset.link_sent')
             ]);
         }
 
@@ -70,7 +70,7 @@ class PasswordResetController extends BaseApiController
 
         // Always return the same response
         return $this->respondWithData([
-            'message' => 'If an account exists with that email address, a password reset link has been sent.'
+            'message' => __('api_controllers_2.password_reset.link_sent')
         ]);
     }
 
@@ -217,7 +217,7 @@ class PasswordResetController extends BaseApiController
         }
 
         return $this->respondWithData([
-            'message' => 'Password updated successfully. Please log in with your new password.'
+            'message' => __('api_controllers_2.password_reset.updated')
         ]);
     }
 

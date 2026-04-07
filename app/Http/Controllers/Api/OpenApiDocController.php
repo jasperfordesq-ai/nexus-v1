@@ -62,7 +62,7 @@ class OpenApiDocController extends BaseApiController
 
         if (!file_exists($specPath)) {
             return response(json_encode([
-                'errors' => [['code' => 'RESOURCE_NOT_FOUND', 'message' => 'OpenAPI specification not found']],
+                'errors' => [['code' => 'RESOURCE_NOT_FOUND', 'message' => __('api_controllers_2.openapi.spec_not_found')]],
             ]), 404, ['Content-Type' => 'application/json']);
         }
 

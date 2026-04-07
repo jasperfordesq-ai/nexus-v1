@@ -167,7 +167,7 @@ class VolunteerCheckInController extends BaseApiController
             }
         }
 
-        return $this->respondWithData(['message' => 'Successfully checked out']);
+        return $this->respondWithData(['message' => __('api_controllers_2.volunteer_checkin.checked_out')]);
     }
 
     public function shiftCheckIns($id): JsonResponse

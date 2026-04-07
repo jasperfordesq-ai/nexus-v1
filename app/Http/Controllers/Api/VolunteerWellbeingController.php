@@ -254,7 +254,7 @@ class VolunteerWellbeingController extends BaseApiController
             return $this->respondWithErrors($errors, $this->getErrorStatus($errors));
         }
 
-        return $this->respondWithData(['id' => $alertId, 'message' => 'Emergency alert sent'], null, 201);
+        return $this->respondWithData(['id' => $alertId, 'message' => __('api_controllers_2.volunteer_wellbeing.emergency_alert_sent')], null, 201);
     }
 
     public function respondToEmergencyAlert($id): JsonResponse

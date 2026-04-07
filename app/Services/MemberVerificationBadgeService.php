@@ -131,7 +131,7 @@ class MemberVerificationBadgeService
             DB::table('notifications')->insert([
                 'user_id' => $userId,
                 'tenant_id' => $tenantId,
-                'message' => "You have been granted the '{$label}' verification badge",
+                'message' => __('svc_notifications.verification_badge.granted', ['label' => $label]),
                 'link' => '/settings',
                 'type' => 'verification',
                 'created_at' => now(),

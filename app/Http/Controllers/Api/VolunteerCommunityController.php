@@ -80,7 +80,7 @@ class VolunteerCommunityController extends BaseApiController
             return $this->respondWithErrors($errors, $this->getErrorStatus($errors));
         }
         $position = $this->shiftWaitlistService->getUserPosition((int) $id, $userId);
-        return $this->respondWithData(['id' => $entryId, 'position' => $position['position'] ?? 1, 'message' => 'Successfully joined the waitlist'], null, 201);
+        return $this->respondWithData(['id' => $entryId, 'position' => $position['position'] ?? 1, 'message' => __('api_controllers_2.volunteer_community.joined_waitlist')], null, 201);
     }
 
     public function leaveWaitlist($id): JsonResponse
@@ -124,7 +124,7 @@ class VolunteerCommunityController extends BaseApiController
             $errors = $this->shiftWaitlistService->getErrors();
             return $this->respondWithErrors($errors, $this->getErrorStatus($errors));
         }
-        return $this->respondWithData(['message' => 'Successfully claimed the shift spot']);
+        return $this->respondWithData(['message' => __('api_controllers_2.volunteer_community.claimed_spot')]);
     }
 
     public function myWaitlists(): JsonResponse
@@ -159,7 +159,7 @@ class VolunteerCommunityController extends BaseApiController
             $errors = $this->shiftSwapService->getErrors();
             return $this->respondWithErrors($errors, $this->getErrorStatus($errors));
         }
-        return $this->respondWithData(['id' => $swapId, 'message' => 'Swap request sent'], null, 201);
+        return $this->respondWithData(['id' => $swapId, 'message' => __('api_controllers_2.volunteer_community.swap_request_sent')], null, 201);
     }
 
     public function getSwapRequests(): JsonResponse
@@ -197,7 +197,7 @@ class VolunteerCommunityController extends BaseApiController
                 ->where('tenant_id', TenantContext::getId())
                 ->value('status');
             if ($actualStatus === 'admin_pending') {
-                return $this->respondWithData(['id' => (int) $id, 'status' => 'admin_pending', 'message' => 'Swap accepted but requires admin approval']);
+                return $this->respondWithData(['id' => (int) $id, 'status' => 'admin_pending', 'message' => __('api_controllers_2.volunteer_community.swap_admin_pending')]);
             }
         }
 
@@ -269,7 +269,7 @@ class VolunteerCommunityController extends BaseApiController
             $errors = $this->shiftGroupReservationService->getErrors();
             return $this->respondWithErrors($errors, $this->getErrorStatus($errors));
         }
-        return $this->respondWithData(['id' => $reservationId, 'message' => "Reserved {$slots} slots"], null, 201);
+        return $this->respondWithData(['id' => $reservationId, 'message' => __('api_controllers_2.volunteer_community.reserved_slots', ['slots' => $slots])], null, 201);
     }
 
     public function addGroupMember($id): JsonResponse
@@ -286,7 +286,7 @@ class VolunteerCommunityController extends BaseApiController
             $errors = $this->shiftGroupReservationService->getErrors();
             return $this->respondWithErrors($errors, $this->getErrorStatus($errors));
         }
-        return $this->respondWithData(['message' => 'Member added to group reservation']);
+        return $this->respondWithData(['message' => __('api_controllers_2.volunteer_community.member_added_reservation')]);
     }
 
     public function removeGroupMember($id, $userId): JsonResponse
@@ -413,7 +413,7 @@ class VolunteerCommunityController extends BaseApiController
         $deleted = $this->recurringShiftService->deleteFutureShifts($patternId, $userId);
 
         return $this->respondWithData([
-            'message' => 'Recurring pattern deactivated',
+            'message' => __('api_controllers_2.volunteer_community.recurring_deactivated'),
             'future_shifts_removed' => $deleted,
         ]);
     }
@@ -899,7 +899,7 @@ class VolunteerCommunityController extends BaseApiController
             return $this->respondWithError('INVALID_TOKEN', __('api.vol_consent_invalid_token'), null, 400);
         }
 
-        return $this->respondWithData(['success' => true, 'message' => 'Guardian consent has been granted successfully.']);
+        return $this->respondWithData(['success' => true, 'message' => __('api_controllers_2.volunteer_community.guardian_consent_granted')]);
     }
 
     public function withdrawGuardianConsent($id): JsonResponse

@@ -201,7 +201,7 @@ class GroupReportingService
                 }
 
                 $name = trim(($user->first_name ?? '') . ' ' . ($user->last_name ?? ''));
-                $subject = "Weekly Digest: {$group->name}";
+                $subject = __('emails.group_digest.subject', ['group' => $group->name]);
                 $body = self::buildDigestEmailBody($name, $stats, $tenant->name ?? 'your community');
 
                 $success = $emailService->send($user->email, $subject, $body);

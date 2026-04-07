@@ -59,16 +59,16 @@ class GroupQAController extends BaseApiController
         $body = request()->input('body');
 
         if (empty($title)) {
-            return $this->errorResponse('Title is required', 422);
+            return $this->errorResponse(__('api_controllers_3.group_qa.title_required'), 422);
         }
         if (empty($body)) {
-            return $this->errorResponse('Body is required', 422);
+            return $this->errorResponse(__('api_controllers_3.group_qa.body_required'), 422);
         }
 
         $result = $this->qaService->askQuestion($id, $userId, $title, $body);
 
         if ($result === null) {
-            return $this->errorResponse('Failed to create question', 400);
+            return $this->errorResponse(__('api_controllers_3.group_qa.failed_create_question'), 400);
         }
 
         return $this->successResponse($result, 201);
@@ -89,7 +89,7 @@ class GroupQAController extends BaseApiController
         $result = $this->qaService->getQuestion($questionId);
 
         if ($result === null) {
-            return $this->errorResponse('Question not found', 404);
+            return $this->errorResponse(__('api_controllers_3.group_qa.question_not_found'), 404);
         }
 
         return $this->successResponse($result);
@@ -110,13 +110,13 @@ class GroupQAController extends BaseApiController
         $body = request()->input('body');
 
         if (empty($body)) {
-            return $this->errorResponse('Body is required', 422);
+            return $this->errorResponse(__('api_controllers_3.group_qa.body_required'), 422);
         }
 
         $result = $this->qaService->postAnswer($questionId, $userId, $body);
 
         if ($result === null) {
-            return $this->errorResponse('Failed to post answer', 400);
+            return $this->errorResponse(__('api_controllers_3.group_qa.failed_post_answer'), 400);
         }
 
         return $this->successResponse($result, 201);
@@ -137,10 +137,10 @@ class GroupQAController extends BaseApiController
         $success = $this->qaService->acceptAnswer($answerId, $userId);
 
         if (!$success) {
-            return $this->errorResponse('Failed to accept answer', 400);
+            return $this->errorResponse(__('api_controllers_3.group_qa.failed_accept_answer'), 400);
         }
 
-        return $this->successResponse(['message' => 'Answer accepted']);
+        return $this->successResponse(['message' => __('api_controllers_3.group_qa.answer_accepted')]);
     }
 
     /**
@@ -161,10 +161,10 @@ class GroupQAController extends BaseApiController
         $vote = request()->input('vote');
 
         if (!in_array($type, ['question', 'answer'], true)) {
-            return $this->errorResponse('Type must be "question" or "answer"', 422);
+            return $this->errorResponse(__('api_controllers_3.group_qa.type_must_be_question_or_answer'), 422);
         }
         if ($targetId <= 0) {
-            return $this->errorResponse('A valid target_id is required', 422);
+            return $this->errorResponse(__('api_controllers_3.group_qa.valid_target_id_required'), 422);
         }
         // Accept both 'up'/'down' strings and 1/-1 integers
         $voteValue = match ($vote) {
@@ -173,15 +173,15 @@ class GroupQAController extends BaseApiController
             default => null,
         };
         if ($voteValue === null) {
-            return $this->errorResponse('Vote must be "up"/"down" or 1/-1', 422);
+            return $this->errorResponse(__('api_controllers_3.group_qa.vote_must_be_up_down'), 422);
         }
 
         $success = $this->qaService->vote($userId, $type, $targetId, $voteValue);
 
         if (!$success) {
-            return $this->errorResponse('Failed to record vote', 400);
+            return $this->errorResponse(__('api_controllers_3.group_qa.failed_record_vote'), 400);
         }
 
-        return $this->successResponse(['message' => 'Vote recorded']);
+        return $this->successResponse(['message' => __('api_controllers_3.group_qa.vote_recorded')]);
     }
 }

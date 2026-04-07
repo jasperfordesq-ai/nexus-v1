@@ -46,7 +46,7 @@ export function NewsletterResend({ isOpen, onClose, newsletterId, onSuccess }: N
           setInfo(res.data as ResendInfo);
         }
       } catch {
-        toast.error('Failed to load resend information');
+        toast.error(t('newsletters.failed_to_load_resend_info'));
       }
       setLoading(false);
     };
@@ -66,14 +66,14 @@ export function NewsletterResend({ isOpen, onClose, newsletterId, onSuccess }: N
 
       if (res.success) {
         const data = res.data as { queued_count?: number };
-        toast.success(`Resend queued for ${data.queued_count || 0} recipients`);
+        toast.success(t('newsletters.resend_queued', { count: data.queued_count || 0 }));
         onSuccess?.();
         onClose();
       } else {
-        toast.error('Failed to queue resend');
+        toast.error(t('newsletters.failed_to_queue_resend'));
       }
     } catch {
-      toast.error('Failed to queue resend');
+      toast.error(t('newsletters.failed_to_queue_resend'));
     }
     setSending(false);
   };

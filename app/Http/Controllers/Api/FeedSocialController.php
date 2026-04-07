@@ -136,7 +136,7 @@ class FeedSocialController extends BaseApiController
             ->where('tenant_id', $tenantId)
             ->update(['share_count' => DB::raw('GREATEST(share_count - 1, 0)')]);
 
-        return $this->respondWithData(['message' => 'Post unshared']);
+        return $this->respondWithData(['message' => __('api_controllers_1.feed_social.post_unshared')]);
     }
 
     /**

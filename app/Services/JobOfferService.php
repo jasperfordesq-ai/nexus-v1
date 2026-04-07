@@ -75,15 +75,15 @@ class JobOfferService
                 $candidateId = (int) $application->user_id;
                 Notification::createNotification(
                     $candidateId,
-                    "You have received a job offer for {$jobTitle}",
+                    __('svc_notifications.job_offer.received_bell', ['title' => $jobTitle]),
                     "/jobs/{$application->vacancy_id}",
                     'job_application_status'
                 );
-                RealtimeService::broadcastAndPush($candidateId, "Job Offer Received!", [
+                RealtimeService::broadcastAndPush($candidateId, __('svc_notifications.job_offer.received_push_title'), [
                     'type'      => 'job_offer_received',
                     'job_id'    => (int) $application->vacancy_id,
                     'job_title' => $jobTitle,
-                    'message'   => "You have received a job offer for {$jobTitle}",
+                    'message'   => __('svc_notifications.job_offer.received_push_message', ['title' => $jobTitle]),
                     'url'       => "/jobs/{$application->vacancy_id}",
                 ]);
             } catch (\Throwable $e) {
@@ -178,15 +178,15 @@ class JobOfferService
                     // Notify the candidate about their earned credits
                     Notification::createNotification(
                         $candidateId,
-                        "You earned {$creditAmount} time credits for completing {$jobTitle}!",
+                        __('svc_notifications.job_offer.credits_earned_bell', ['amount' => $creditAmount, 'title' => $jobTitle]),
                         '/wallet',
                         'transaction'
                     );
-                    RealtimeService::broadcastAndPush($candidateId, 'Time Credits Earned!', [
+                    RealtimeService::broadcastAndPush($candidateId, __('svc_notifications.job_offer.credits_earned_push_title'), [
                         'type'      => 'job_completion_credits',
                         'amount'    => $creditAmount,
                         'job_title' => $jobTitle,
-                        'message'   => "You earned {$creditAmount} time credits for completing {$jobTitle}!",
+                        'message'   => __('svc_notifications.job_offer.credits_earned_push_message', ['amount' => $creditAmount, 'title' => $jobTitle]),
                         'url'       => '/wallet',
                     ]);
                 }
@@ -201,15 +201,15 @@ class JobOfferService
                 if ($posterId) {
                     Notification::createNotification(
                         (int) $posterId,
-                        "Offer accepted for {$jobTitle}",
+                        __('svc_notifications.job_offer.accepted_bell', ['title' => $jobTitle]),
                         "/jobs/{$offer->vacancy_id}/applications",
                         'job_application_status'
                     );
-                    RealtimeService::broadcastAndPush((int) $posterId, "Offer accepted for {$jobTitle}", [
+                    RealtimeService::broadcastAndPush((int) $posterId, __('svc_notifications.job_offer.accepted_push_title', ['title' => $jobTitle]), [
                         'type'      => 'job_offer_accepted',
                         'job_id'    => (int) $offer->vacancy_id,
                         'job_title' => $jobTitle,
-                        'message'   => "Offer accepted for {$jobTitle}",
+                        'message'   => __('svc_notifications.job_offer.accepted_push_message', ['title' => $jobTitle]),
                         'url'       => "/jobs/{$offer->vacancy_id}/applications",
                     ]);
                 }
@@ -276,15 +276,15 @@ class JobOfferService
                 if ($posterId) {
                     Notification::createNotification(
                         (int) $posterId,
-                        "Offer rejected for {$jobTitle}",
+                        __('svc_notifications.job_offer.rejected_bell', ['title' => $jobTitle]),
                         "/jobs/{$offer->vacancy_id}/applications",
                         'job_application_status'
                     );
-                    RealtimeService::broadcastAndPush((int) $posterId, "Offer rejected for {$jobTitle}", [
+                    RealtimeService::broadcastAndPush((int) $posterId, __('svc_notifications.job_offer.rejected_push_title', ['title' => $jobTitle]), [
                         'type'      => 'job_offer_rejected',
                         'job_id'    => (int) $offer->vacancy_id,
                         'job_title' => $jobTitle,
-                        'message'   => "Offer rejected for {$jobTitle}",
+                        'message'   => __('svc_notifications.job_offer.rejected_push_message', ['title' => $jobTitle]),
                         'url'       => "/jobs/{$offer->vacancy_id}/applications",
                     ]);
                 }
@@ -336,15 +336,15 @@ class JobOfferService
                 if ($candidateId) {
                     Notification::createNotification(
                         (int) $candidateId,
-                        "Job offer withdrawn for {$jobTitle}",
+                        __('svc_notifications.job_offer.withdrawn_bell', ['title' => $jobTitle]),
                         "/jobs/{$offer->vacancy_id}",
                         'job_application_status'
                     );
-                    RealtimeService::broadcastAndPush((int) $candidateId, "Job offer withdrawn for {$jobTitle}", [
+                    RealtimeService::broadcastAndPush((int) $candidateId, __('svc_notifications.job_offer.withdrawn_push_title', ['title' => $jobTitle]), [
                         'type'      => 'job_offer_withdrawn',
                         'job_id'    => (int) $offer->vacancy_id,
                         'job_title' => $jobTitle,
-                        'message'   => "Job offer withdrawn for {$jobTitle}",
+                        'message'   => __('svc_notifications.job_offer.withdrawn_push_message', ['title' => $jobTitle]),
                         'url'       => "/jobs/{$offer->vacancy_id}",
                     ]);
                 }

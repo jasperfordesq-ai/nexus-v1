@@ -93,16 +93,16 @@ export function VerificationReviewQueue() {
       if (res.success) {
         toast.success(
           selectedAction === 'approve'
-            ? 'User approved and activated successfully.'
-            : 'User verification rejected.'
+            ? t('system.user_approved_activated')
+            : t('system.user_verification_rejected')
         );
         confirmModal.onClose();
         fetchSessions();
       } else {
-        toast.error(res.error || `Failed to ${selectedAction} verification.`);
+        toast.error(res.error || t('system.failed_to_action_verification', { action: selectedAction }));
       }
     } catch {
-      toast.error(`Failed to ${selectedAction} verification session.`);
+      toast.error(t('system.failed_to_action_verification_session', { action: selectedAction }));
     } finally {
       setActionLoading(false);
     }
@@ -233,7 +233,7 @@ export function VerificationReviewQueue() {
       <Modal isOpen={confirmModal.isOpen} onOpenChange={confirmModal.onOpenChange} size="sm">
         <ModalContent>
           <ModalHeader>
-            {selectedAction === 'approve' ? 'Approve User' : 'Reject User'}
+            {selectedAction === 'approve' ? t('verification.approve_user') : t('verification.reject_user')}
           </ModalHeader>
           <ModalBody>
             {selectedSession && (
@@ -241,15 +241,15 @@ export function VerificationReviewQueue() {
                 <p className="text-sm">
                   {selectedAction === 'approve' ? (
                     <>
-                      Are you sure you want to <strong className="text-success">approve</strong>{' '}
-                      <strong>{getUserName(selectedSession)}</strong>? They will be activated and
-                      granted full access to the platform.
+                      {t('verification.approve_confirm_prefix')}{' '}
+                      <strong className="text-success">{t('verification.approve')}</strong>{' '}
+                      <strong>{getUserName(selectedSession)}</strong>{t('verification.approve_confirm_suffix')}
                     </>
                   ) : (
                     <>
-                      Are you sure you want to <strong className="text-danger">reject</strong>{' '}
-                      <strong>{getUserName(selectedSession)}</strong>? Their verification will be
-                      marked as failed and they will be notified.
+                      {t('verification.reject_confirm_prefix')}{' '}
+                      <strong className="text-danger">{t('verification.reject')}</strong>{' '}
+                      <strong>{getUserName(selectedSession)}</strong>{t('verification.reject_confirm_suffix')}
                     </>
                   )}
                 </p>

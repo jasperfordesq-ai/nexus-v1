@@ -102,7 +102,7 @@ class OnboardingController extends BaseApiController
             if (!empty($user->onboarding_completed)) {
                 DB::rollback();
                 return $this->respondWithData([
-                    'message' => 'Onboarding already completed',
+                    'message' => __('api_controllers_2.onboarding.already_completed'),
                     'listings_created' => 0,
                     'listing_ids' => [],
                 ]);
@@ -237,7 +237,7 @@ class OnboardingController extends BaseApiController
         SafeguardingPreferenceService::saveUserPreferences($userId, $preferences, $ipAddress);
 
         return $this->respondWithData([
-            'message' => 'Safeguarding preferences saved',
+            'message' => __('api_controllers_2.onboarding.safeguarding_saved'),
             'preferences_count' => count($preferences),
         ]);
     }

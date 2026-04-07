@@ -832,10 +832,10 @@ export function CreditAgreements() {
           pendingAction?.action === 'terminate'
             ? t('federation.terminate_agreement_confirm', {
                 name: pendingAction?.partnerName,
-              }) || `Are you sure you want to terminate the agreement with "${pendingAction?.partnerName}"? This action cannot be undone.`
+              })
             : t('federation.suspend_agreement_confirm', {
                 name: pendingAction?.partnerName,
-              }) || `Are you sure you want to suspend the agreement with "${pendingAction?.partnerName}"? Credit exchanges will be paused.`
+              })
         }
         confirmLabel={
           pendingAction?.action === 'terminate'

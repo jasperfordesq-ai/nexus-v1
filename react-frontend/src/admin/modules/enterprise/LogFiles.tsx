@@ -74,7 +74,7 @@ export function LogFiles() {
         setFiles(Array.isArray(data) ? data : []);
       }
     } catch {
-      toast.error('Failed to load log files');
+      toast.error(t('enterprise.failed_to_load_log_files'));
     } finally {
       setLoading(false);
     }

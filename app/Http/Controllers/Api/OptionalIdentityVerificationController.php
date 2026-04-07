@@ -159,30 +159,30 @@ class OptionalIdentityVerificationController extends BaseApiController
         $badges = $this->badgeService->getUserBadges($userId);
         $hasIdBadge = collect($badges)->contains(fn($b) => $b['badge_type'] === 'id_verified');
         if ($hasIdBadge) {
-            return $this->respondWithError('FORBIDDEN', 'Your name and date of birth are locked after identity verification.', null, 403);
+            return $this->respondWithError('FORBIDDEN', __('api_controllers_2.identity.dob_locked'), null, 403);
         }
 
         $input = $this->getAllInput();
         $dobRaw = $input['date_of_birth'] ?? '';
 
         if (empty($dobRaw)) {
-            return $this->respondWithError('VALIDATION_REQUIRED_FIELD', 'Date of birth is required.', 'date_of_birth', 422);
+            return $this->respondWithError('VALIDATION_REQUIRED_FIELD', __('api_controllers_2.identity.dob_required'), 'date_of_birth', 422);
         }
 
         $dob = date('Y-m-d', strtotime($dobRaw));
         if (!$dob || $dob === '1970-01-01') {
-            return $this->respondWithError('VALIDATION_INVALID_FORMAT', 'Please enter a valid date of birth.', 'date_of_birth', 422);
+            return $this->respondWithError('VALIDATION_INVALID_FORMAT', __('api_controllers_2.identity.dob_invalid'), 'date_of_birth', 422);
         }
 
         // Must be in the past
         if (strtotime($dob) >= time()) {
-            return $this->respondWithError('VALIDATION_INVALID_FORMAT', 'Date of birth must be in the past.', 'date_of_birth', 422);
+            return $this->respondWithError('VALIDATION_INVALID_FORMAT', __('api_controllers_2.identity.dob_must_be_past'), 'date_of_birth', 422);
         }
 
         // Must be at least 16 years old
         $age = (int) date_diff(date_create($dob), date_create('today'))->y;
         if ($age < 16) {
-            return $this->respondWithError('VALIDATION_INVALID_FORMAT', 'You must be at least 16 years old.', 'date_of_birth', 422);
+            return $this->respondWithError('VALIDATION_INVALID_FORMAT', __('api_controllers_2.identity.must_be_16'), 'date_of_birth', 422);
         }
 
         DB::table('users')
@@ -209,7 +209,7 @@ class OptionalIdentityVerificationController extends BaseApiController
         $feeCents = IdentityVerificationPaymentService::getFeeCents($tenantId);
 
         if ($feeCents <= 0) {
-            return $this->respondWithData(['payment_required' => false, 'message' => 'No fee required.']);
+            return $this->respondWithData(['payment_required' => false, 'message' => __('api_controllers_2.identity.no_fee_required')]);
         }
 
         // Check if already paid
@@ -238,7 +238,7 @@ class OptionalIdentityVerificationController extends BaseApiController
             ]);
         } catch (\Throwable $e) {
             Log::error('Failed to create verification payment', ['user' => $userId, 'error' => $e->getMessage()]);
-            return $this->respondWithError('SERVER_INTERNAL_ERROR', 'Unable to process payment. Please try again.', null, 503);
+            return $this->respondWithError('SERVER_INTERNAL_ERROR', __('api_controllers_2.identity.payment_failed'), null, 503);
         }
     }
 
@@ -268,29 +268,29 @@ class OptionalIdentityVerificationController extends BaseApiController
             ->first(['id', 'first_name', 'last_name', 'date_of_birth']);
 
         if (!$user) {
-            return $this->respondWithError('RESOURCE_NOT_FOUND', 'User not found.', null, 404);
+            return $this->respondWithError('RESOURCE_NOT_FOUND', __('api_controllers_2.identity.user_not_found'), null, 404);
         }
 
         // Prerequisite: DOB must exist
         if (empty($user->date_of_birth)) {
-            return $this->respondWithError('DOB_REQUIRED', 'Please provide your date of birth first.', null, 422);
+            return $this->respondWithError('DOB_REQUIRED', __('api_controllers_2.identity.provide_dob_first'), null, 422);
         }
 
         // Prerequisite: Payment must be completed (if fee > 0)
         $feeCents = IdentityVerificationPaymentService::getFeeCents($tenantId);
         if ($feeCents > 0 && !IdentityVerificationPaymentService::hasCompletedPayment($tenantId, $userId)) {
-            return $this->respondWithError('PAYMENT_REQUIRED', 'Please complete payment first.', null, 422);
+            return $this->respondWithError('PAYMENT_REQUIRED', __('api_controllers_2.identity.complete_payment_first'), null, 422);
         }
 
         // Use Stripe Identity provider
         $providerSlug = 'stripe_identity';
         if (!IdentityProviderRegistry::has($providerSlug)) {
-            return $this->respondWithError('SERVICE_UNAVAILABLE', 'Identity verification is not currently available.', null, 503);
+            return $this->respondWithError('SERVICE_UNAVAILABLE', __('api_controllers_2.identity.not_available'), null, 503);
         }
 
         $provider = IdentityProviderRegistry::get($providerSlug);
         if (!$provider->isAvailable($tenantId)) {
-            return $this->respondWithError('SERVICE_UNAVAILABLE', 'Identity verification is not currently available.', null, 503);
+            return $this->respondWithError('SERVICE_UNAVAILABLE', __('api_controllers_2.identity.not_available'), null, 503);
         }
 
         // Load credentials + pass user email to Stripe (only email/phone accepted)
@@ -347,7 +347,7 @@ class OptionalIdentityVerificationController extends BaseApiController
             ]);
         } catch (\Throwable $e) {
             Log::error('Identity verification failed to start', ['user' => $userId, 'error' => $e->getMessage()]);
-            return $this->respondWithError('SERVER_INTERNAL_ERROR', 'Unable to start verification.', null, 503);
+            return $this->respondWithError('SERVER_INTERNAL_ERROR', __('api_controllers_2.identity.start_failed'), null, 503);
         }
     }
 

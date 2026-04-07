@@ -106,7 +106,7 @@ export function AdminSettings() {
       if (form.footer_text !== originalForm.footer_text) changes.footer_text = form.footer_text;
 
       if (Object.keys(changes).length === 0) {
-        toast.error('No changes to save');
+        toast.error(t('system.no_changes_to_save'));
         setSaving(false);
         return;
       }

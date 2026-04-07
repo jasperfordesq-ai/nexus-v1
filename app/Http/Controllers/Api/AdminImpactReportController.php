@@ -102,6 +102,6 @@ class AdminImpactReportController extends BaseApiController
             [json_encode($config), $tenantId]
         );
 
-        return $this->respondWithData(['message' => 'Configuration updated']);
+        return $this->respondWithData(['message' => __('api_controllers_1.admin_impact_report.config_updated')]);
     }
 }

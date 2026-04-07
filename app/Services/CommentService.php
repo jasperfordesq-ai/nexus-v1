@@ -385,7 +385,7 @@ class CommentService
             ->where('tenant_id', $tenantId)
             ->delete();
 
-        return ['success' => true, 'status' => 'success', 'message' => 'Comment deleted'];
+        return ['success' => true, 'status' => 'success', 'message' => __('svc_notifications_2.comment.deleted')];
     }
 
     /**

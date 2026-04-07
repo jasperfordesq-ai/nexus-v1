@@ -144,7 +144,7 @@ class GamificationController extends BaseApiController
         $limit = $this->queryInt('limit', 10, 1, 50);
 
         if (!array_key_exists($type, LeaderboardService::LEADERBOARD_TYPES)) {
-            return $this->success(['error' => 'Invalid leaderboard type']);
+            return $this->success(['error' => __('api_controllers_1.gamification.invalid_leaderboard_type')]);
         }
 
         $tenantId = $this->getTenantId();
@@ -381,7 +381,7 @@ class GamificationController extends BaseApiController
 
         try {
             UserBadge::updateShowcase($userId, $badgeKeys);
-            return $this->success(['message' => 'Showcase updated']);
+            return $this->success(['message' => __('api_controllers_1.gamification.showcase_updated')]);
         } catch (\Throwable $e) {
             return $this->error('An internal error occurred', 500, 'SERVER_ERROR');
         }
@@ -534,7 +534,7 @@ class GamificationController extends BaseApiController
         $this->requireAdmin();
 
         return $this->success([
-            'message' => 'Score recalculation initiated',
+            'message' => __('api_controllers_1.gamification.score_recalculation_initiated'),
             'note' => 'This process runs in the background',
         ]);
     }

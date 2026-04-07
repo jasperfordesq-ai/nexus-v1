@@ -97,7 +97,7 @@ class FederationV2Controller extends BaseApiController
         $current = $this->federationUserService->getUserSettings($userId);
 
         if ($current['federation_optin']) {
-            return $this->respondWithData(['success' => true, 'message' => 'Already opted in to federation.']);
+            return $this->respondWithData(['success' => true, 'message' => __('api_controllers_1.federation.already_opted_in')]);
         }
 
         $settings = array_merge($current, [
@@ -110,7 +110,7 @@ class FederationV2Controller extends BaseApiController
 
         if ($success) {
             $this->federationAuditService->log('user_federation_optin', $tenantId, null, $userId, [], FederationAuditService::LEVEL_INFO);
-            return $this->respondWithData(['success' => true, 'message' => 'Federation enabled successfully.']);
+            return $this->respondWithData(['success' => true, 'message' => __('api_controllers_1.federation.enabled_successfully')]);
         }
 
         return $this->respondWithError('OPT_IN_FAILED', __('api.fed_opt_in_failed'), null, 500);
@@ -149,7 +149,7 @@ class FederationV2Controller extends BaseApiController
 
         if ($success) {
             $this->federationAuditService->log('user_federation_optin', $tenantId, null, $userId, [], FederationAuditService::LEVEL_INFO);
-            return $this->respondWithData(['success' => true, 'message' => 'Federation enabled successfully.']);
+            return $this->respondWithData(['success' => true, 'message' => __('api_controllers_1.federation.enabled_successfully')]);
         }
 
         return $this->respondWithError('SETUP_FAILED', __('api.fed_setup_failed'), null, 500);
@@ -165,7 +165,7 @@ class FederationV2Controller extends BaseApiController
 
         if ($success) {
             $this->federationAuditService->log('user_federation_optout', $tenantId, null, $userId, [], FederationAuditService::LEVEL_INFO);
-            return $this->respondWithData(['success' => true, 'message' => 'Federation disabled successfully.']);
+            return $this->respondWithData(['success' => true, 'message' => __('api_controllers_1.federation.disabled_successfully')]);
         }
 
         return $this->respondWithError('OPT_OUT_FAILED', __('api.fed_opt_out_failed'), null, 500);
@@ -796,19 +796,19 @@ class FederationV2Controller extends BaseApiController
         // Validate required fields
         $errors = [];
         if (empty($receiverId)) {
-            $errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'receiver_id is required.', 'field' => 'receiver_id'];
+            $errors[] = ['code' => 'VALIDATION_ERROR', 'message' => __('api_controllers_1.federation_v2.receiver_id_required'), 'field' => 'receiver_id'];
         }
         if (empty($receiverTenantId)) {
-            $errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'receiver_tenant_id is required.', 'field' => 'receiver_tenant_id'];
+            $errors[] = ['code' => 'VALIDATION_ERROR', 'message' => __('api_controllers_1.federation_v2.receiver_tenant_id_required'), 'field' => 'receiver_tenant_id'];
         }
         if (empty($body)) {
-            $errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'Message body is required.', 'field' => 'body'];
+            $errors[] = ['code' => 'VALIDATION_ERROR', 'message' => __('api_controllers_1.federation_v2.message_body_required'), 'field' => 'body'];
         }
         if (mb_strlen($subject) > 255) {
-            $errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'Subject must not exceed 255 characters.', 'field' => 'subject'];
+            $errors[] = ['code' => 'VALIDATION_ERROR', 'message' => __('api_controllers_1.federation_v2.subject_max_length'), 'field' => 'subject'];
         }
         if (mb_strlen($body) > 10000) {
-            $errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'Message body must not exceed 10,000 characters.', 'field' => 'body'];
+            $errors[] = ['code' => 'VALIDATION_ERROR', 'message' => __('api_controllers_1.federation_v2.body_max_length'), 'field' => 'body'];
         }
         if (!empty($errors)) {
             return $this->respondWithErrors($errors);
@@ -1069,7 +1069,7 @@ class FederationV2Controller extends BaseApiController
         $success = $this->federationUserService->updateSettings($userId, $settings);
 
         if ($success) {
-            return $this->respondWithData(['success' => true, 'message' => 'Settings updated successfully.']);
+            return $this->respondWithData(['success' => true, 'message' => __('api_controllers_1.federation.settings_updated')]);
         }
 
         return $this->respondWithError('UPDATE_FAILED', __('api.fed_settings_update_failed'), null, 500);

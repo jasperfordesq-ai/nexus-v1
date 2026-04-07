@@ -46,7 +46,7 @@ class BlockUserController extends BaseApiController
 
         return $this->respondWithData([
             'success' => true,
-            'message' => 'User blocked',
+            'message' => __('api_controllers_1.block_user.user_blocked'),
             'blocked_user_id' => $id,
         ]);
     }
@@ -64,12 +64,12 @@ class BlockUserController extends BaseApiController
         $success = BlockUserService::unblock($userId, $id);
 
         if (!$success) {
-            return $this->respondWithError('NOT_FOUND', 'User was not blocked', null, 404);
+            return $this->respondWithError('NOT_FOUND', __('api_controllers_1.block_user.user_not_blocked'), null, 404);
         }
 
         return $this->respondWithData([
             'success' => true,
-            'message' => 'User unblocked',
+            'message' => __('api_controllers_1.block_user.user_unblocked'),
             'unblocked_user_id' => $id,
         ]);
     }

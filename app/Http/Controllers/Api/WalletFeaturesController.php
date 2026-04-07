@@ -161,7 +161,7 @@ class WalletFeaturesController extends BaseApiController
             return $this->error($result['error'], 400);
         }
 
-        return $this->respondWithData(['message' => 'Donation successful. Thank you!']);
+        return $this->respondWithData(['message' => __('api_controllers_2.wallet.donation_successful')]);
     }
 
     // ============================================
@@ -191,13 +191,13 @@ class WalletFeaturesController extends BaseApiController
         $data = $this->getAllInput();
 
         if (empty($data['name'])) {
-            return $this->error('Name is required', 400);
+            return $this->error(__('api_controllers_2.wallet.name_required'), 400);
         }
 
         $id = $this->transactionCategoryService->create($data);
 
         if (!$id) {
-            return $this->error('Failed to create category', 500);
+            return $this->error(__('api_controllers_2.wallet.create_category_failed'), 500);
         }
 
         $category = $this->transactionCategoryService->getById($id);
@@ -216,7 +216,7 @@ class WalletFeaturesController extends BaseApiController
         $success = $this->transactionCategoryService->update($id, $data);
 
         if (!$success) {
-            return $this->error('Failed to update category', 400);
+            return $this->error(__('api_controllers_2.wallet.update_category_failed'), 400);
         }
 
         $category = $this->transactionCategoryService->getById($id);
@@ -233,10 +233,10 @@ class WalletFeaturesController extends BaseApiController
         $success = $this->transactionCategoryService->delete($id);
 
         if (!$success) {
-            return $this->error('Cannot delete this category (may be a system category)', 400);
+            return $this->error(__('api_controllers_2.wallet.cannot_delete_category'), 400);
         }
 
-        return $this->respondWithData(['message' => 'Category deleted']);
+        return $this->respondWithData(['message' => __('api_controllers_2.wallet.category_deleted')]);
     }
 
     // ============================================
@@ -251,7 +251,7 @@ class WalletFeaturesController extends BaseApiController
         $data = $this->getAllInput();
 
         if (empty($data['rating'])) {
-            return $this->error('Rating is required (1-5)', 400);
+            return $this->error(__('api_controllers_2.wallet.rating_required'), 400);
         }
 
         $result = $this->exchangeRatingService->submitRating(
@@ -334,7 +334,7 @@ class WalletFeaturesController extends BaseApiController
             return $this->respondWithError('DONATION_FAILED', $result['error'], null, 400);
         }
 
-        return $this->respondWithData(['message' => 'Donation successful. Thank you!'], null, 201);
+        return $this->respondWithData(['message' => __('api_controllers_2.wallet.donation_successful')], null, 201);
     }
 
     /** GET /api/v2/wallet/donation-history */
@@ -373,7 +373,7 @@ class WalletFeaturesController extends BaseApiController
         $data = $this->getAllInput();
 
         if (!isset($data['amount'])) {
-            return $this->error('Amount is required', 400);
+            return $this->error(__('api_controllers_2.wallet.amount_required'), 400);
         }
 
         $amount = max(0, (float) $data['amount']);
@@ -381,12 +381,12 @@ class WalletFeaturesController extends BaseApiController
         try {
             $this->startingBalanceService->setStartingBalance($amount);
         } catch (\Exception $e) {
-            return $this->error('Failed to update starting balance', 500);
+            return $this->error(__('api_controllers_2.wallet.starting_balance_failed'), 500);
         }
 
         return $this->respondWithData([
             'starting_balance' => $amount,
-            'message' => 'Starting balance updated',
+            'message' => __('api_controllers_2.wallet.starting_balance_updated'),
         ]);
     }
 
@@ -421,6 +421,6 @@ class WalletFeaturesController extends BaseApiController
 
         // This line won't be reached in production (sendCSVDownload exits),
         // but provides a fallback for testing environments
-        return $this->respondWithData(['message' => 'Statement exported']);
+        return $this->respondWithData(['message' => __('api_controllers_2.wallet.statement_exported')]);
     }
 }

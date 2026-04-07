@@ -182,6 +182,6 @@ class GroupMediaController extends BaseApiController
             [$mediaId, $tenantId]
         );
 
-        return $this->successResponse(['message' => 'Media deleted']);
+        return $this->successResponse(['message' => __('api_controllers_3.group_media.media_deleted')]);
     }
 }

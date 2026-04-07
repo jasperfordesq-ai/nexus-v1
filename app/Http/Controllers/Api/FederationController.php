@@ -101,7 +101,7 @@ class FederationController extends BaseApiController
         $current = $this->federationUserService->getUserSettings($userId);
 
         if ($current['federation_optin']) {
-            return $this->respondWithData(['success' => true, 'message' => 'Already opted in to federation.']);
+            return $this->respondWithData(['success' => true, 'message' => __('api_controllers_1.federation.already_opted_in')]);
         }
 
         $settings = array_merge($current, [
@@ -117,7 +117,7 @@ class FederationController extends BaseApiController
 
         if ($success) {
             $this->federationAuditService->log('user_federation_optin', $tenantId, null, $userId, [], FederationAuditService::LEVEL_INFO);
-            return $this->respondWithData(['success' => true, 'message' => 'Federation enabled successfully.']);
+            return $this->respondWithData(['success' => true, 'message' => __('api_controllers_1.federation.enabled_successfully')]);
         } else {
             return $this->respondWithError('OPT_IN_FAILED', __('api.federation_opt_in_failed'), null, 500);
         }
@@ -156,7 +156,7 @@ class FederationController extends BaseApiController
 
         if ($success) {
             $this->federationAuditService->log('user_federation_optin', $tenantId, null, $userId, [], FederationAuditService::LEVEL_INFO);
-            return $this->respondWithData(['success' => true, 'message' => 'Federation enabled successfully.']);
+            return $this->respondWithData(['success' => true, 'message' => __('api_controllers_1.federation.enabled_successfully')]);
         } else {
             return $this->respondWithError('SETUP_FAILED', __('api.federation_opt_in_failed'), null, 500);
         }
@@ -172,7 +172,7 @@ class FederationController extends BaseApiController
 
         if ($success) {
             $this->federationAuditService->log('user_federation_optout', $tenantId, null, $userId, [], FederationAuditService::LEVEL_INFO);
-            return $this->respondWithData(['success' => true, 'message' => 'Federation disabled successfully.']);
+            return $this->respondWithData(['success' => true, 'message' => __('api_controllers_1.federation.disabled_successfully')]);
         } else {
             return $this->respondWithError('OPT_OUT_FAILED', __('api.federation_opt_out_failed'), null, 500);
         }
@@ -1116,7 +1116,7 @@ class FederationController extends BaseApiController
         }
 
         return $this->fedSuccess([
-            'valid' => true, 'message' => 'Signature verified successfully',
+            'valid' => true, 'message' => __('api_controllers_1.federation.signature_verified'),
             'platform' => ['id' => $partner['platform_id'], 'name' => $partner['name']],
             'timestamp_age_seconds' => $timeDiff,
         ]);

@@ -148,7 +148,7 @@ class BrokerMessageVisibilityService
                 Notification::create([
                     'tenant_id' => $tenantId,
                     'user_id' => $adminId,
-                    'message' => "New message for review from {$senderDisplayName}",
+                    'message' => __('svc_notifications.broker.message_for_review', ['sender' => $senderDisplayName]),
                     'link' => '/admin/broker-controls/messages',
                     'type' => 'broker_review',
                 ]);

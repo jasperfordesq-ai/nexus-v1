@@ -295,7 +295,7 @@ class AdminFeedController extends BaseApiController
             Log::warning("AdminFeedController::hide notification failed for {$sourceType} #{$id}: " . $e->getMessage());
         }
 
-        return $this->respondWithData(['success' => true, 'message' => 'Item hidden']);
+        return $this->respondWithData(['success' => true, 'message' => __('api_controllers_1.admin_feed.item_hidden')]);
     }
 
     /**
@@ -372,7 +372,7 @@ class AdminFeedController extends BaseApiController
             }
         }
 
-        return $this->respondWithData(['success' => true, 'message' => 'Item deleted']);
+        return $this->respondWithData(['success' => true, 'message' => __('api_controllers_1.admin_feed.item_deleted')]);
     }
 
     /**

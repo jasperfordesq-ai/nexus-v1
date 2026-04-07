@@ -79,7 +79,7 @@ export function LegalDocForm() {
         setStatus(doc.status || 'draft');
       }
     } catch {
-      toast.error('Failed to load document');
+      toast.error(t('enterprise.failed_to_load_document'));
     } finally {
       setLoading(false);
     }
@@ -91,7 +91,7 @@ export function LegalDocForm() {
 
   const handleSubmit = async () => {
     if (!title.trim()) {
-      toast.error('Title is required');
+      toast.error(t('enterprise.title_is_required'));
       return;
     }
 
@@ -113,14 +113,14 @@ export function LegalDocForm() {
       }
 
       if (res.success) {
-        toast.success(isEdit ? 'Document updated' : 'Document created');
+        toast.success(isEdit ? t('enterprise.document_updated') : t('enterprise.document_created'));
         navigate(tenantPath('/admin/legal-documents'));
       } else {
         const error = (res as { error?: string }).error || 'Save failed';
         toast.error(error);
       }
     } catch (err) {
-      toast.error(`Failed to ${isEdit ? 'update' : 'create'} document`);
+      toast.error(t('enterprise.failed_to_save_document'));
       console.error('Legal document save error:', err);
     } finally {
       setSaving(false);

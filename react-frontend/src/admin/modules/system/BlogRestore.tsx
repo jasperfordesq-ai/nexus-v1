@@ -74,14 +74,14 @@ export function BlogRestore() {
         const message = restored !== undefined
           ? `${restored} blog post${restored !== 1 ? 's' : ''} restored from ${confirmBackup.filename}`
           : `Blog data restored from ${confirmBackup.filename}`;
-        toast.success('Restore complete', message);
+        toast.success(t('system.restore_complete'), message);
         // Refresh the backup list in case status changed
         await fetchBackups();
       } else {
-        toast.error('Restore failed', 'The server returned an error. Please try again.');
+        toast.error(t('system.restore_failed'), t('system.restore_server_error'));
       }
     } catch {
-      toast.error('Restore failed', 'An error occurred while restoring the backup.');
+      toast.error(t('system.restore_failed'), t('system.restore_error_occurred'));
     } finally {
       setRestoringId(null);
     }
@@ -105,15 +105,15 @@ export function BlogRestore() {
       <div className="rounded-lg border border-warning-200 bg-warning-50 p-4 mb-4 flex items-start gap-3">
         <AlertTriangle size={20} className="text-warning shrink-0 mt-0.5" />
         <div>
-          <p className="font-medium text-warning-700">Use with Caution</p>
-          <p className="text-sm text-warning-600">Restoring blog posts will overwrite any current content with the backup version. This action cannot be undone.</p>
+          <p className="font-medium text-warning-700">{t('system.use_with_caution')}</p>
+          <p className="text-sm text-warning-600">{t('system.blog_restore_warning')}</p>
         </div>
       </div>
 
       {backups.length === 0 ? (
         <EmptyState
           icon={RotateCcw}
-          title="No Backups Available"
+          title={t('system.no_backups_available')}
           description={t('system.desc_blog_post_backups_will_appear_here_when_')}
         />
       ) : (
@@ -163,13 +163,13 @@ export function BlogRestore() {
         isOpen={confirmBackup !== null}
         onClose={() => setConfirmBackup(null)}
         onConfirm={handleRestoreConfirm}
-        title="Restore Blog Backup"
+        title={t('system.restore_blog_backup')}
         message={
           confirmBackup
-            ? `Are you sure you want to restore from "${confirmBackup.filename}"? This will overwrite current blog content with the backup version. This action cannot be undone.`
+            ? t('system.restore_blog_confirm', { filename: confirmBackup.filename })
             : ''
         }
-        confirmLabel="Restore Backup"
+        confirmLabel={t('system.restore_backup')}
         confirmColor="warning"
         isLoading={restoringId !== null}
       />

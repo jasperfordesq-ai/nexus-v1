@@ -240,7 +240,7 @@ export function Segments() {
         }}
         onConfirm={handleDelete}
         title={t('newsletters.delete_segment')}
-        message={`Are you sure you want to delete "${deleteTarget?.name}"? This action cannot be undone. Newsletters using this segment will no longer have a target audience.`}
+        message={t('newsletters.delete_segment_confirm', { name: deleteTarget?.name })}
         confirmLabel="Delete Segment"
         confirmColor="danger"
         isLoading={deleting}

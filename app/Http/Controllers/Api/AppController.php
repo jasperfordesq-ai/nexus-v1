@@ -133,6 +133,6 @@ class AppController extends BaseApiController
             json_encode($data)
         ));
 
-        return $this->respondWithData(['message' => 'Log recorded']);
+        return $this->respondWithData(['message' => __('api_controllers_1.app.log_recorded')]);
     }
 }

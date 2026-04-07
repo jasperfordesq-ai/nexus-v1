@@ -218,7 +218,7 @@ class StreakService
                     'current' => $currentStreak,
                     'longest' => $longestStreak,
                     'is_new'  => false,
-                    'message' => 'Already recorded today',
+                    'message' => __('svc_notifications_2.streak.already_recorded'),
                 ];
             }
 

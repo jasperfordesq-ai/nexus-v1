@@ -105,10 +105,10 @@ export function MatchDetail() {
     setApproveLoading(true);
     const res = await adminMatching.approveMatch(item.id);
     if (res.success) {
-      toast.success(`Match #${item.id} approved`);
+      toast.success(t('matching.match_approved', { id: item.id }));
       loadItem();
     } else {
-      toast.error(res.error || 'Failed to approve match');
+      toast.error(res.error || t('matching.failed_to_approve_match'));
     }
     setApproveLoading(false);
   };
@@ -122,12 +122,12 @@ export function MatchDetail() {
     setRejectLoading(true);
     const res = await adminMatching.rejectMatch(item.id, rejectReason.trim());
     if (res.success) {
-      toast.success(`Match #${item.id} rejected`);
+      toast.success(t('matching.match_rejected', { id: item.id }));
       setRejectModal(false);
       setRejectReason('');
       loadItem();
     } else {
-      toast.error(res.error || 'Failed to reject match');
+      toast.error(res.error || t('matching.failed_to_reject_match'));
     }
     setRejectLoading(false);
   };

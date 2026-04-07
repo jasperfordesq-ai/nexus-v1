@@ -350,7 +350,7 @@ class VolunteerController extends BaseApiController
             // Notification failure must not break the main flow
         }
 
-        return $this->respondWithData(['shift_id' => (int) $id, 'message' => 'Successfully signed up for shift']);
+        return $this->respondWithData(['shift_id' => (int) $id, 'message' => __('api_controllers_2.volunteer.signed_up_for_shift')]);
     }
 
     public function cancelSignup($id): JsonResponse
@@ -390,7 +390,7 @@ class VolunteerController extends BaseApiController
             $errors = $this->volunteerService->getErrors();
             return $this->respondWithErrors($errors, $this->getErrorStatus($errors));
         }
-        return $this->respondWithData(['id' => $logId, 'status' => 'pending', 'message' => 'Hours logged successfully, pending verification'], null, 201);
+        return $this->respondWithData(['id' => $logId, 'status' => 'pending', 'message' => __('api_controllers_2.volunteer.hours_logged_pending')], null, 201);
     }
 
     public function myHours(): JsonResponse
@@ -518,7 +518,7 @@ class VolunteerController extends BaseApiController
             $errors = $this->volunteerService->getErrors();
             return $this->respondWithErrors($errors, $this->getErrorStatus($errors));
         }
-        return $this->respondWithData(['id' => $reviewId, 'rating' => $rating, 'message' => 'Review submitted successfully'], null, 201);
+        return $this->respondWithData(['id' => $reviewId, 'rating' => $rating, 'message' => __('api_controllers_2.volunteer.review_submitted')], null, 201);
     }
 
     public function getReviews($type, $id): JsonResponse
@@ -599,7 +599,7 @@ class VolunteerController extends BaseApiController
         $this->ensureFeature();
         $this->rateLimit('vol_org_stats', 60, 60);
         $org = $this->ensureOrgAccess((int) $id);
-        if (!$org) return $this->respondWithError('FORBIDDEN', 'Access denied', null, 403);
+        if (!$org) return $this->respondWithError('FORBIDDEN', __('api_controllers_2.volunteer.access_denied'), null, 403);
 
         $tenantId = TenantContext::getId();
         $orgId = (int) $org->id;
@@ -637,7 +637,7 @@ class VolunteerController extends BaseApiController
         $this->ensureFeature();
         $this->rateLimit('vol_org_wallet', 60, 60);
         $org = $this->ensureOrgAccess((int) $id);
-        if (!$org) return $this->respondWithError('FORBIDDEN', 'Access denied', null, 403);
+        if (!$org) return $this->respondWithError('FORBIDDEN', __('api_controllers_2.volunteer.access_denied'), null, 403);
 
         $summary = VolOrgWalletService::getWalletSummary((int) $id);
         return $this->respondWithData($summary);
@@ -648,7 +648,7 @@ class VolunteerController extends BaseApiController
         $this->ensureFeature();
         $this->rateLimit('vol_org_wallet_txns', 60, 60);
         $org = $this->ensureOrgAccess((int) $id);
-        if (!$org) return $this->respondWithError('FORBIDDEN', 'Access denied', null, 403);
+        if (!$org) return $this->respondWithError('FORBIDDEN', __('api_controllers_2.volunteer.access_denied'), null, 403);
 
         $filters = [
             'limit' => $this->queryInt('per_page', 20, 1, 50),
@@ -666,13 +666,13 @@ class VolunteerController extends BaseApiController
         $userId = $this->getUserId();
         $this->rateLimit('vol_org_wallet_deposit', 10, 60);
         $org = $this->ensureOrgAccess((int) $id);
-        if (!$org) return $this->respondWithError('FORBIDDEN', 'Access denied', null, 403);
+        if (!$org) return $this->respondWithError('FORBIDDEN', __('api_controllers_2.volunteer.access_denied'), null, 403);
 
         $amount = (float) $this->input('amount', 0);
         $note = trim((string) $this->input('note', ''));
 
         if ($amount <= 0) {
-            return $this->respondWithError('VALIDATION_ERROR', 'Amount must be greater than 0', 'amount', 400);
+            return $this->respondWithError('VALIDATION_ERROR', __('api_controllers_2.volunteer.amount_gt_zero'), 'amount', 400);
         }
 
         $result = VolOrgWalletService::depositFromUser($userId, (int) $id, $amount, $note ?: null);
@@ -691,7 +691,7 @@ class VolunteerController extends BaseApiController
         $this->ensureFeature();
         $this->rateLimit('vol_org_autopay', 20, 60);
         $org = $this->ensureOrgAccess((int) $id);
-        if (!$org) return $this->respondWithError('FORBIDDEN', 'Access denied', null, 403);
+        if (!$org) return $this->respondWithError('FORBIDDEN', __('api_controllers_2.volunteer.access_denied'), null, 403);
 
         $enabled = $this->inputBool('enabled');
         $tenantId = TenantContext::getId();
@@ -709,7 +709,7 @@ class VolunteerController extends BaseApiController
         $this->ensureFeature();
         $this->rateLimit('vol_org_volunteers', 60, 60);
         $org = $this->ensureOrgAccess((int) $id);
-        if (!$org) return $this->respondWithError('FORBIDDEN', 'Access denied', null, 403);
+        if (!$org) return $this->respondWithError('FORBIDDEN', __('api_controllers_2.volunteer.access_denied'), null, 403);
 
         $tenantId = TenantContext::getId();
         $orgId = (int) $id;
@@ -763,7 +763,7 @@ class VolunteerController extends BaseApiController
         $this->ensureFeature();
         $this->rateLimit('vol_org_applications', 60, 60);
         $org = $this->ensureOrgAccess((int) $id);
-        if (!$org) return $this->respondWithError('FORBIDDEN', 'Access denied', null, 403);
+        if (!$org) return $this->respondWithError('FORBIDDEN', __('api_controllers_2.volunteer.access_denied'), null, 403);
 
         $tenantId = TenantContext::getId();
         $orgId = (int) $id;
@@ -834,7 +834,7 @@ class VolunteerController extends BaseApiController
         $this->ensureFeature();
         $this->rateLimit('vol_org_hours_pending', 60, 60);
         $org = $this->ensureOrgAccess((int) $id);
-        if (!$org) return $this->respondWithError('FORBIDDEN', 'Access denied', null, 403);
+        if (!$org) return $this->respondWithError('FORBIDDEN', __('api_controllers_2.volunteer.access_denied'), null, 403);
 
         $tenantId = TenantContext::getId();
         $orgId = (int) $id;
@@ -893,7 +893,7 @@ class VolunteerController extends BaseApiController
         $this->ensureFeature();
         $this->rateLimit('vol_org_update', 10, 60);
         $org = $this->ensureOrgAccess((int) $id);
-        if (!$org) return $this->respondWithError('FORBIDDEN', 'Access denied', null, 403);
+        if (!$org) return $this->respondWithError('FORBIDDEN', __('api_controllers_2.volunteer.access_denied'), null, 403);
 
         $tenantId = TenantContext::getId();
         $updates = [];
@@ -909,7 +909,7 @@ class VolunteerController extends BaseApiController
         }
 
         if (empty($updates)) {
-            return $this->respondWithError('VALIDATION_ERROR', 'No fields to update', null, 400);
+            return $this->respondWithError('VALIDATION_ERROR', __('api_controllers_2.volunteer.no_fields_to_update'), null, 400);
         }
 
         $params[] = (int) $id;

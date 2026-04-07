@@ -45,7 +45,7 @@ class MarketplaceListingController extends BaseApiController
     {
         if (!TenantContext::hasFeature('marketplace')) {
             throw new \Illuminate\Http\Exceptions\HttpResponseException(
-                $this->respondWithError('FEATURE_DISABLED', 'The marketplace feature is not enabled for this community.', null, 403)
+                $this->respondWithError('FEATURE_DISABLED', __('api_controllers_2.marketplace_listing.feature_disabled'), null, 403)
             );
         }
     }
@@ -63,7 +63,7 @@ class MarketplaceListingController extends BaseApiController
     {
         if ((int) $listing->user_id !== $userId) {
             throw new \Illuminate\Http\Exceptions\HttpResponseException(
-                $this->respondWithError('FORBIDDEN', 'You do not have permission to modify this listing.', null, 403)
+                $this->respondWithError('FORBIDDEN', __('api_controllers_2.marketplace_listing.no_permission_modify'), null, 403)
             );
         }
     }
@@ -79,7 +79,7 @@ class MarketplaceListingController extends BaseApiController
 
         if (!$listing) {
             throw new \Illuminate\Http\Exceptions\HttpResponseException(
-                $this->respondWithError('RESOURCE_NOT_FOUND', 'Marketplace listing not found.', null, 404)
+                $this->respondWithError('RESOURCE_NOT_FOUND', __('api_controllers_2.marketplace_listing.not_found'), null, 404)
             );
         }
 
@@ -186,7 +186,7 @@ class MarketplaceListingController extends BaseApiController
         $listing = MarketplaceListingService::getById($id, $userId);
 
         if (!$listing) {
-            return $this->respondWithError('RESOURCE_NOT_FOUND', 'Marketplace listing not found.', null, 404);
+            return $this->respondWithError('RESOURCE_NOT_FOUND', __('api_controllers_2.marketplace_listing.not_found'), null, 404);
         }
 
         // Record view asynchronously (best-effort)
@@ -244,7 +244,7 @@ class MarketplaceListingController extends BaseApiController
                 'user_id' => $userId,
                 'error'   => $e->getMessage(),
             ]);
-            return $this->respondWithError('SERVER_INTERNAL_ERROR', 'Failed to create listing. Please try again.', null, 500);
+            return $this->respondWithError('SERVER_INTERNAL_ERROR', __('api_controllers_2.marketplace_listing.create_failed'), null, 500);
         }
 
         $detail = MarketplaceListingService::getById($listing->id, $userId);
@@ -301,7 +301,7 @@ class MarketplaceListingController extends BaseApiController
                 'user_id'    => $userId,
                 'error'      => $e->getMessage(),
             ]);
-            return $this->respondWithError('SERVER_INTERNAL_ERROR', 'Failed to update listing. Please try again.', null, 500);
+            return $this->respondWithError('SERVER_INTERNAL_ERROR', __('api_controllers_2.marketplace_listing.update_failed'), null, 500);
         }
 
         $detail = MarketplaceListingService::getById($id, $userId);
@@ -353,7 +353,7 @@ class MarketplaceListingController extends BaseApiController
         if ($existingCount >= $maxImages) {
             return $this->respondWithError(
                 'VALIDATION_ERROR',
-                "Maximum of {$maxImages} images per listing has been reached.",
+                __('api_controllers_2.marketplace_listing.max_images_reached', ['max' => $maxImages]),
                 'images',
                 422
             );
@@ -386,7 +386,7 @@ class MarketplaceListingController extends BaseApiController
         }
 
         if (empty($files)) {
-            return $this->respondWithError('VALIDATION_ERROR', 'No image files provided.', 'images', 422);
+            return $this->respondWithError('VALIDATION_ERROR', __('api_controllers_2.marketplace_listing.no_image_files'), 'images', 422);
         }
 
         // Cap at remaining slots
@@ -416,7 +416,7 @@ class MarketplaceListingController extends BaseApiController
         }
 
         if (empty($uploadedImages)) {
-            return $this->respondWithError('UPLOAD_FAILED', 'No valid images could be uploaded. Allowed: JPEG, PNG, GIF, WebP (max 10 MB).', null, 422);
+            return $this->respondWithError('UPLOAD_FAILED', __('api_controllers_2.marketplace_listing.no_valid_images'), null, 422);
         }
 
         MarketplaceListingService::addImages($listing, $uploadedImages);
@@ -475,7 +475,7 @@ class MarketplaceListingController extends BaseApiController
         $deleted = MarketplaceListingService::deleteImage($listing, $imageId);
 
         if (!$deleted) {
-            return $this->respondWithError('RESOURCE_NOT_FOUND', 'Image not found for this listing.', null, 404);
+            return $this->respondWithError('RESOURCE_NOT_FOUND', __('api_controllers_2.marketplace_listing.image_not_found'), null, 404);
         }
 
         return $this->noContent();
@@ -499,7 +499,7 @@ class MarketplaceListingController extends BaseApiController
 
         $request = request();
         if (!$request->hasFile('video')) {
-            return $this->respondWithError('VALIDATION_ERROR', 'No video file provided.', 'video', 422);
+            return $this->respondWithError('VALIDATION_ERROR', __('api_controllers_2.marketplace_listing.no_video_file'), 'video', 422);
         }
 
         $file = $request->file('video');
@@ -509,7 +509,7 @@ class MarketplaceListingController extends BaseApiController
         if (!in_array($file->getMimeType(), $allowedMimes, true)) {
             return $this->respondWithError(
                 'VALIDATION_ERROR',
-                'Invalid video type. Allowed: MP4, WebM, MOV.',
+                __('api_controllers_2.marketplace_listing.invalid_video_type'),
                 'video',
                 422
             );
@@ -518,7 +518,7 @@ class MarketplaceListingController extends BaseApiController
         if ($file->getSize() > $maxSize) {
             return $this->respondWithError(
                 'VALIDATION_ERROR',
-                'Video file exceeds the 50 MB size limit.',
+                __('api_controllers_2.marketplace_listing.video_too_large'),
                 'video',
                 422
             );
@@ -645,7 +645,7 @@ class MarketplaceListingController extends BaseApiController
         ]);
 
         if (!empty($result['error'])) {
-            return $this->respondWithError('AI_GENERATION_FAILED', 'Could not generate a description. Please try again or write one manually.', null, 422);
+            return $this->respondWithError('AI_GENERATION_FAILED', __('api_controllers_2.marketplace_listing.ai_description_failed'), null, 422);
         }
 
         return $this->respondWithData([
@@ -671,14 +671,14 @@ class MarketplaceListingController extends BaseApiController
         $lng = $this->query('longitude');
 
         if ($lat === null || $lng === null) {
-            return $this->respondWithError('VALIDATION_ERROR', 'Latitude and longitude are required.', 'latitude', 422);
+            return $this->respondWithError('VALIDATION_ERROR', __('api_controllers_2.marketplace_listing.lat_lng_required'), 'latitude', 422);
         }
 
         $lat = (float) $lat;
         $lng = (float) $lng;
 
         if ($lat < -90 || $lat > 90 || $lng < -180 || $lng > 180) {
-            return $this->respondWithError('VALIDATION_ERROR', 'Invalid coordinates.', 'latitude', 422);
+            return $this->respondWithError('VALIDATION_ERROR', __('api_controllers_2.marketplace_listing.invalid_coordinates'), 'latitude', 422);
         }
 
         $radius = (float) ($this->query('radius') ?? 25);
@@ -1030,12 +1030,12 @@ class MarketplaceListingController extends BaseApiController
         $content = file_get_contents($file->getRealPath());
 
         if (!$content) {
-            return $this->respondWithError('VALIDATION_ERROR', 'Could not read the CSV file.', 'file', 422);
+            return $this->respondWithError('VALIDATION_ERROR', __('api_controllers_2.marketplace_listing.csv_read_failed'), 'file', 422);
         }
 
         $lines = str_getcsv($content, "\n");
         if (count($lines) < 2) {
-            return $this->respondWithError('VALIDATION_ERROR', 'CSV file must have a header row and at least one data row.', 'file', 422);
+            return $this->respondWithError('VALIDATION_ERROR', __('api_controllers_2.marketplace_listing.csv_header_required'), 'file', 422);
         }
 
         // Parse header
@@ -1049,7 +1049,7 @@ class MarketplaceListingController extends BaseApiController
             if (!in_array($col, $headers, true)) {
                 return $this->respondWithError(
                     'VALIDATION_ERROR',
-                    "CSV file must contain a '{$col}' column.",
+                    __('api_controllers_2.marketplace_listing.csv_missing_column', ['col' => $col]),
                     'file',
                     422
                 );
@@ -1141,7 +1141,7 @@ class MarketplaceListingController extends BaseApiController
         return $this->respondWithData([
             'created' => $created,
             'errors' => $errors,
-            'message' => "{$created} listing(s) imported as drafts.",
+            'message' => __('api_controllers_2.marketplace_listing.imported_as_drafts', ['count' => $created]),
         ], null, 201);
     }
 }

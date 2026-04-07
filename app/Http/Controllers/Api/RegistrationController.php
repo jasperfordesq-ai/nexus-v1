@@ -58,7 +58,7 @@ class RegistrationController extends BaseApiController
             return $this->respondWithError('VERIFICATION_FAILED', __('api.invalid_verification_token'), null, 400);
         }
 
-        return $this->respondWithData(['message' => 'Email verified successfully']);
+        return $this->respondWithData(['message' => __('api_controllers_2.registration.email_verified')]);
     }
 
     /**
@@ -75,6 +75,6 @@ class RegistrationController extends BaseApiController
 
         $this->registrationService->resendVerification($email, $this->getTenantId());
 
-        return $this->respondWithData(['message' => 'Verification email sent if account exists']);
+        return $this->respondWithData(['message' => __('api_controllers_2.registration.verification_sent')]);
     }
 }

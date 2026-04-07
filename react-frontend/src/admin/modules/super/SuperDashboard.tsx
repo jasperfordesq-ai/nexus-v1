@@ -51,16 +51,16 @@ export function SuperDashboard() {
       if (dashRes.success && dashRes.data) {
         setStats(dashRes.data);
       } else if (!dashRes.success) {
-        toast.error(`Dashboard: ${dashRes.error || 'Failed to load stats'}`);
+        toast.error(`${t('super.dashboard')}: ${dashRes.error || t('super.failed_to_load_stats')}`);
       }
 
       if (tenantsRes.success && tenantsRes.data) {
         setTenants(Array.isArray(tenantsRes.data) ? tenantsRes.data : []);
       } else if (!tenantsRes.success) {
-        toast.error(`Tenants: ${tenantsRes.error || 'Failed to load tenant list'}`);
+        toast.error(`${t('super.tenants')}: ${tenantsRes.error || t('super.failed_to_load_tenant_list')}`);
       }
     } catch (err) {
-      toast.error(`Dashboard error: ${err instanceof Error ? err.message : 'Unknown error'}`);
+      toast.error(`${t('super.dashboard_error')}: ${err instanceof Error ? err.message : t('super.unknown_error')}`);
     } finally {
       setLoading(false);
     }

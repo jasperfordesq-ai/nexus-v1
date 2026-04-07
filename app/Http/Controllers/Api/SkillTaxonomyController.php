@@ -108,7 +108,7 @@ class SkillTaxonomyController extends BaseApiController
             return $this->respondWithErrors($this->skillTaxonomyService->getErrors(), 422);
         }
 
-        return $this->respondWithData(['message' => 'Category deleted']);
+        return $this->respondWithData(['message' => __('api_controllers_2.skill_taxonomy.category_deleted')]);
     }
 
     // =============================================
@@ -214,6 +214,6 @@ class SkillTaxonomyController extends BaseApiController
 
         $this->skillTaxonomyService->removeUserSkill($userId, $id);
 
-        return $this->respondWithData(['message' => 'Skill removed']);
+        return $this->respondWithData(['message' => __('api_controllers_2.skill_taxonomy.skill_removed')]);
     }
 }

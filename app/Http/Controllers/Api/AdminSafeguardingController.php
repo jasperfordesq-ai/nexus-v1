@@ -451,7 +451,7 @@ class AdminSafeguardingController extends BaseApiController
                     'tenant_id' => $tenantId,
                     'user_id' => $guardianId,
                     'type' => 'safeguarding_assignment',
-                    'message' => 'You have been assigned as a safeguarding guardian for ' . ($wardUser->name ?? 'a member'),
+                    'message' => __('api_controllers_1.admin_safeguarding.guardian_assigned_notification', ['name' => $wardUser->name ?? __('api_controllers_1.admin_safeguarding.a_member')]),
                     'link' => '/admin/safeguarding',
                     'is_read' => false,
                 ]);
@@ -461,7 +461,7 @@ class AdminSafeguardingController extends BaseApiController
                     'tenant_id' => $tenantId,
                     'user_id' => $wardId,
                     'type' => 'safeguarding_assignment',
-                    'message' => ($guardianUser->name ?? 'A community coordinator') . ' has been assigned as your safeguarding support contact. You can give or revoke consent in your settings.',
+                    'message' => __('api_controllers_1.admin_safeguarding.ward_assigned_notification', ['guardian' => $guardianUser->name ?? __('api_controllers_1.admin_safeguarding.a_coordinator')]),
                     'link' => '/settings/safeguarding',
                     'is_read' => false,
                 ]);

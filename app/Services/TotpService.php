@@ -108,7 +108,7 @@ class TotpService
             return [
                 'limited' => true,
                 'retry_after' => max(0, $retryAfter),
-                'message' => "Too many failed attempts. Please try again in " . ceil($retryAfter / 60) . " minutes.",
+                'message' => __('svc_notifications.totp.rate_limited', ['minutes' => ceil($retryAfter / 60)]),
             ];
         }
 

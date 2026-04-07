@@ -232,7 +232,7 @@ class ReviewService
             'rating'      => $review->rating,
             'comment'     => $review->comment,
             'receiver_id' => $review->receiver_id,
-            'message'     => 'Review submitted successfully',
+            'message'     => __('svc_notifications_2.review.submitted_successfully'),
         ];
     }
 

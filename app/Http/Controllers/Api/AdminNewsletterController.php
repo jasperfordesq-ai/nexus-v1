@@ -2369,7 +2369,7 @@ class AdminNewsletterController extends BaseApiController
             return $this->respondWithData([
                 'queued' => $queued,
                 'status' => 'sending',
-                'message' => "Newsletter queued for {$queued} recipients",
+                'message' => __('api_controllers_1.admin_newsletter.newsletter_queued', ['count' => $queued]),
             ]);
         } catch (\Exception $e) {
             Log::error('Newsletter send failed', ['id' => $id, 'error' => $e->getMessage()]);
@@ -2424,14 +2424,14 @@ class AdminNewsletterController extends BaseApiController
                 $sampleRecipient
             );
 
-            $subject = '[TEST] ' . ($newsletter->subject ?? 'No Subject');
+            $subject = __('emails.newsletter.test_prefix') . ' ' . ($newsletter->subject ?? __('emails.newsletter.no_subject'));
 
             $sent = (new \App\Core\Mailer($tenantId))->send($admin->email, $subject, $html);
 
             if ($sent) {
                 return $this->respondWithData([
                     'sent_to' => $admin->email,
-                    'message' => "Test email sent to {$admin->email}",
+                    'message' => __('api_controllers_1.admin_newsletter.test_email_sent', ['email' => $admin->email]),
                 ]);
             } else {
                 return $this->respondWithError('SEND_FAILED', __('api.failed_send_test_email'));

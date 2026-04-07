@@ -25,7 +25,7 @@ class MarketplaceCommunityDeliveryController extends BaseApiController
     {
         if (!TenantContext::hasFeature('marketplace')) {
             throw new \Illuminate\Http\Exceptions\HttpResponseException(
-                $this->respondWithError('FEATURE_DISABLED', 'The marketplace feature is not enabled for this community.', null, 403)
+                $this->respondWithError('FEATURE_DISABLED', __('api_controllers_2.marketplace_delivery.feature_disabled'), null, 403)
             );
         }
     }
@@ -41,7 +41,7 @@ class MarketplaceCommunityDeliveryController extends BaseApiController
 
         $userId = $request->user()?->id;
         if (!$userId) {
-            return $this->respondWithError('UNAUTHORIZED', 'Authentication required.', null, 401);
+            return $this->respondWithError('UNAUTHORIZED', __('api_controllers_2.marketplace_delivery.auth_required'), null, 401);
         }
 
         $data = $request->validate([
@@ -71,7 +71,7 @@ class MarketplaceCommunityDeliveryController extends BaseApiController
 
         $userId = $request->user()?->id;
         if (!$userId) {
-            return $this->respondWithError('UNAUTHORIZED', 'Authentication required.', null, 401);
+            return $this->respondWithError('UNAUTHORIZED', __('api_controllers_2.marketplace_delivery.auth_required'), null, 401);
         }
 
         $offers = MarketplaceCommunityDeliveryService::getDeliveryOffers($orderId);
@@ -89,12 +89,12 @@ class MarketplaceCommunityDeliveryController extends BaseApiController
 
         $userId = $request->user()?->id;
         if (!$userId) {
-            return $this->respondWithError('UNAUTHORIZED', 'Authentication required.', null, 401);
+            return $this->respondWithError('UNAUTHORIZED', __('api_controllers_2.marketplace_delivery.auth_required'), null, 401);
         }
 
         try {
             MarketplaceCommunityDeliveryService::acceptDeliveryOffer($orderId, $delivererId);
-            return $this->respondWithData(['message' => 'Delivery offer accepted']);
+            return $this->respondWithData(['message' => __('api_controllers_2.marketplace_delivery.offer_accepted')]);
         } catch (\RuntimeException $e) {
             return $this->respondWithError('DELIVERY_ACCEPT_ERROR', $e->getMessage(), null, 400);
         }
@@ -111,12 +111,12 @@ class MarketplaceCommunityDeliveryController extends BaseApiController
 
         $userId = $request->user()?->id;
         if (!$userId) {
-            return $this->respondWithError('UNAUTHORIZED', 'Authentication required.', null, 401);
+            return $this->respondWithError('UNAUTHORIZED', __('api_controllers_2.marketplace_delivery.auth_required'), null, 401);
         }
 
         try {
             MarketplaceCommunityDeliveryService::confirmDelivery($orderId, $delivererId);
-            return $this->respondWithData(['message' => 'Delivery confirmed, time credits awarded']);
+            return $this->respondWithData(['message' => __('api_controllers_2.marketplace_delivery.delivery_confirmed')]);
         } catch (\RuntimeException $e) {
             return $this->respondWithError('DELIVERY_CONFIRM_ERROR', $e->getMessage(), null, 400);
         }

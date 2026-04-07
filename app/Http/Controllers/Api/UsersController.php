@@ -284,7 +284,7 @@ class UsersController extends BaseApiController
         }
 
         return $this->respondWithData([
-            'message' => 'Theme preference updated',
+            'message' => __('api_controllers_2.users.theme_updated'),
             'theme'   => $theme,
         ]);
     }
@@ -443,7 +443,7 @@ class UsersController extends BaseApiController
             return $this->respondWithErrors($errors, 400);
         }
 
-        return $this->respondWithData(['message' => 'Password updated successfully']);
+        return $this->respondWithData(['message' => __('api_controllers_2.users.password_updated')]);
     }
 
     // ================================================================
@@ -481,7 +481,7 @@ class UsersController extends BaseApiController
             return $this->respondWithErrors($errors, 400);
         }
 
-        return $this->respondWithData(['message' => 'Account deleted successfully']);
+        return $this->respondWithData(['message' => __('api_controllers_2.users.account_deleted')]);
     }
 
     // ================================================================
@@ -549,7 +549,7 @@ class UsersController extends BaseApiController
             return $this->respondWithError('UPDATE_FAILED', __('api.user_prefs_update_failed'), null, 500);
         }
 
-        return $this->respondWithData(['message' => 'Notification preferences updated']);
+        return $this->respondWithData(['message' => __('api_controllers_2.users.prefs_updated')]);
     }
 
     // ================================================================
@@ -769,7 +769,7 @@ class UsersController extends BaseApiController
                 return $this->success(['push_enabled' => $pushEnabled]);
             } catch (\Exception $e) {
                 Log::error('Failed to update push notification setting', ['user' => $userId, 'error' => $e->getMessage()]);
-                return $this->error('Failed to update notification settings', 500);
+                return $this->error(__('api_controllers_2.users.notification_settings_update_failed'), 500);
             }
         }
 
@@ -778,18 +778,18 @@ class UsersController extends BaseApiController
         $frequency = $input['frequency'] ?? null;
 
         if (!in_array($contextType, ['global', 'group', 'thread'])) {
-            return $this->error('Invalid context type', 400);
+            return $this->error(__('api_controllers_2.users.invalid_context_type'), 400);
         }
 
         if (!in_array($frequency, ['instant', 'daily', 'weekly', 'off'])) {
-            return $this->error('Invalid frequency', 400);
+            return $this->error(__('api_controllers_2.users.invalid_frequency'), 400);
         }
 
         if ($contextType === 'global') {
             $contextId = 0;
         } else {
             if (!$contextId) {
-                return $this->error('Context ID required', 400);
+                return $this->error(__('api_controllers_2.users.context_id_required'), 400);
             }
             $contextId = (int) $contextId;
 
@@ -801,7 +801,7 @@ class UsersController extends BaseApiController
                     ->where('tenant_id', $tenantId)
                     ->exists();
                 if (!$exists) {
-                    return $this->error('Invalid group ID', 400);
+                    return $this->error(__('api_controllers_2.users.invalid_group_id'), 400);
                 }
             } elseif ($contextType === 'thread') {
                 // Verify user is a participant in this thread
@@ -810,7 +810,7 @@ class UsersController extends BaseApiController
                     ->where('tenant_id', $tenantId)
                     ->exists();
                 if (!$exists) {
-                    return $this->error('Invalid thread ID', 400);
+                    return $this->error(__('api_controllers_2.users.invalid_thread_id'), 400);
                 }
             }
         }
@@ -828,7 +828,7 @@ class UsersController extends BaseApiController
             return $this->success(true);
         } catch (\Exception $e) {
             Log::error('Failed to update notification settings', ['user' => $userId, 'error' => $e->getMessage()]);
-            return $this->error('Failed to update notification settings', 500);
+            return $this->error(__('api_controllers_2.users.notification_settings_update_failed'), 500);
         }
     }
 

@@ -96,7 +96,7 @@ class TeamTaskService
         if ($title === '') {
             $this->errors[] = [
                 'code' => 'VALIDATION_ERROR',
-                'message' => 'Title is required',
+                'message' => __('svc_notifications_2.team_task.title_required'),
                 'field' => 'title',
             ];
             return null;
@@ -108,7 +108,7 @@ class TeamTaskService
         if (!in_array($status, $validStatuses, true)) {
             $this->errors[] = [
                 'code' => 'VALIDATION_ERROR',
-                'message' => 'Invalid status',
+                'message' => __('svc_notifications_2.team_task.invalid_status'),
                 'field' => 'status',
             ];
             return null;
@@ -119,7 +119,7 @@ class TeamTaskService
         if (!in_array($priority, $validPriorities, true)) {
             $this->errors[] = [
                 'code' => 'VALIDATION_ERROR',
-                'message' => 'Invalid priority',
+                'message' => __('svc_notifications_2.team_task.invalid_priority'),
                 'field' => 'priority',
             ];
             return null;
@@ -160,7 +160,7 @@ class TeamTaskService
         if (!$task) {
             $this->errors[] = [
                 'code' => 'RESOURCE_NOT_FOUND',
-                'message' => 'Task not found',
+                'message' => __('svc_notifications_2.team_task.task_not_found'),
             ];
             return false;
         }
@@ -172,7 +172,7 @@ class TeamTaskService
             if ($title === '') {
                 $this->errors[] = [
                     'code' => 'VALIDATION_ERROR',
-                    'message' => 'Title cannot be empty',
+                    'message' => __('svc_notifications_2.team_task.title_cannot_be_empty'),
                     'field' => 'title',
                 ];
                 return false;
@@ -193,7 +193,7 @@ class TeamTaskService
             if (!in_array($data['status'], $validStatuses, true)) {
                 $this->errors[] = [
                     'code' => 'VALIDATION_ERROR',
-                    'message' => 'Invalid status',
+                    'message' => __('svc_notifications_2.team_task.invalid_status'),
                     'field' => 'status',
                 ];
                 return false;
@@ -213,7 +213,7 @@ class TeamTaskService
             if (!in_array($data['priority'], $validPriorities, true)) {
                 $this->errors[] = [
                     'code' => 'VALIDATION_ERROR',
-                    'message' => 'Invalid priority',
+                    'message' => __('svc_notifications_2.team_task.invalid_priority'),
                     'field' => 'priority',
                 ];
                 return false;
@@ -255,7 +255,7 @@ class TeamTaskService
         if (!$deleted) {
             $this->errors[] = [
                 'code' => 'RESOURCE_NOT_FOUND',
-                'message' => 'Task not found',
+                'message' => __('svc_notifications_2.team_task.task_not_found'),
             ];
             return false;
         }

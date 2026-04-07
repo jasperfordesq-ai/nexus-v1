@@ -101,7 +101,7 @@ class MemberAvailabilityController extends BaseApiController
 
         $this->memberAvailabilityService->deleteSlot($userId, $id);
 
-        return $this->respondWithData(['message' => 'Slot deleted']);
+        return $this->respondWithData(['message' => __('api_controllers_2.member_availability.slot_deleted')]);
     }
 
     /** GET /api/v2/users/{id}/availability */

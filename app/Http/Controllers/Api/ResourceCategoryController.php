@@ -320,7 +320,7 @@ class ResourceCategoryController extends BaseApiController
             return $this->respondWithError('SERVER_INTERNAL_ERROR', __('api.failed_reorder_resources'), null, 500);
         }
 
-        return $this->respondWithData(['message' => 'Resources reordered successfully']);
+        return $this->respondWithData(['message' => __('api_controllers_2.resource_category.reordered')]);
     }
 
     // ----------------------------------------------------------------

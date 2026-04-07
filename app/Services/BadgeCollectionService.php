@@ -308,7 +308,7 @@ class BadgeCollectionService
             Notification::create([
                 'user_id' => $userId,
                 'type'    => 'achievement',
-                'message' => "Collection Complete! You finished '{$collection->name}' and earned {$collection->bonus_xp} bonus XP! {$collection->icon}",
+                'message' => __('svc_notifications.badge_collection.collection_complete', ['name' => $collection->name, 'xp' => $collection->bonus_xp, 'icon' => $collection->icon]),
                 'link'    => '/achievements',
             ]);
         } catch (\Throwable $e) {

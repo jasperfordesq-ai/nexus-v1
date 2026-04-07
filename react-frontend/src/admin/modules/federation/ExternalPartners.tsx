@@ -332,8 +332,8 @@ export function ExternalPartners() {
         );
         loadData();
       } else {
-        const errorMsg = (res as { error?: string }).error || 'Health check failed';
-        toast.error(`${partner.name}: ${errorMsg}`);
+        const errorMsg = (res as { error?: string }).error || t('federation.health_check_error');
+        toast.error(t('federation.health_check_partner_error', { name: partner.name, error: errorMsg }));
       }
     } catch (err) {
       logError('ExternalPartners.healthCheck', err);
@@ -729,7 +729,7 @@ export function ExternalPartners() {
           title={t('federation.delete_partner', 'Delete Partner')}
           message={t('federation.delete_partner_confirm', {
             name: deleteTarget.name,
-          }) || `Are you sure you want to delete "${deleteTarget.name}"? This action cannot be undone.`}
+          })}
           confirmLabel={t('federation.delete', 'Delete')}
           confirmColor="danger"
           isLoading={deleting}

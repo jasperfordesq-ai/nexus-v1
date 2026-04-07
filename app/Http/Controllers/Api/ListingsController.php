@@ -514,7 +514,7 @@ class ListingsController extends BaseApiController
 
                 Notification::create([
                     'user_id' => (int) $listing->user_id,
-                    'message' => "{$saverName} saved your listing \"{$title}\"",
+                    'message' => __('api_controllers_3.listings.listing_saved_notification', ['saver_name' => $saverName, 'title' => $title]),
                     'link' => "/listings/{$id}",
                     'type' => 'listing_saved',
                     'created_at' => now(),
@@ -766,7 +766,7 @@ class ListingsController extends BaseApiController
 
         // Cannot report your own listing
         if ((int) ($listing['user_id'] ?? 0) === $userId) {
-            return $this->respondWithError('FORBIDDEN', 'You cannot report your own listing.', null, 403);
+            return $this->respondWithError('FORBIDDEN', __('api_controllers_2.listings.cannot_report_own'), null, 403);
         }
 
         // Validate input
@@ -775,12 +775,12 @@ class ListingsController extends BaseApiController
         $validReasons = ['inappropriate', 'safety_concern', 'misleading', 'spam', 'not_timebank_service', 'other'];
         $reason = $data['reason'] ?? null;
         if (!$reason || !in_array($reason, $validReasons, true)) {
-            return $this->respondWithError('VALIDATION_ERROR', 'A valid reason is required.', 'reason', 422);
+            return $this->respondWithError('VALIDATION_ERROR', __('api_controllers_2.listings.valid_reason_required'), 'reason', 422);
         }
 
         $details = isset($data['details']) ? trim((string) $data['details']) : null;
         if ($details !== null && mb_strlen($details) > 500) {
-            return $this->respondWithError('VALIDATION_ERROR', 'Details must not exceed 500 characters.', 'details', 422);
+            return $this->respondWithError('VALIDATION_ERROR', __('api_controllers_2.listings.details_max_500'), 'details', 422);
         }
 
         // Check for duplicate report
@@ -791,7 +791,7 @@ class ListingsController extends BaseApiController
             ->first();
 
         if ($existing) {
-            return $this->respondWithError('ALREADY_REPORTED', 'You have already reported this listing.', null, 409);
+            return $this->respondWithError('ALREADY_REPORTED', __('api_controllers_2.listings.already_reported'), null, 409);
         }
 
         // Create the report
@@ -813,7 +813,7 @@ class ListingsController extends BaseApiController
 
         return $this->respondWithData([
             'reported' => true,
-            'message'  => 'Thank you for your report. Our team will review it.',
+            'message'  => __('api_controllers_2.listings.report_thank_you'),
         ], null, 201);
     }
 
@@ -848,7 +848,7 @@ class ListingsController extends BaseApiController
             if ($singleFile && $singleFile->isValid()) {
                 $files = [$singleFile];
             } else {
-                return $this->respondWithError('VALIDATION_ERROR', 'No images uploaded.', 'images', 400);
+                return $this->respondWithError('VALIDATION_ERROR', __('api_controllers_2.listings.no_images_uploaded'), 'images', 400);
             }
         }
 
@@ -952,7 +952,7 @@ class ListingsController extends BaseApiController
             ->first();
 
         if (!$image) {
-            return $this->respondWithError('NOT_FOUND', 'Image not found.', null, 404);
+            return $this->respondWithError('NOT_FOUND', __('api_controllers_2.listings.image_not_found'), null, 404);
         }
 
         $deletedUrl = $image->image_url;
@@ -1007,7 +1007,7 @@ class ListingsController extends BaseApiController
         $imageIds = $data['image_ids'] ?? [];
 
         if (!is_array($imageIds) || empty($imageIds)) {
-            return $this->respondWithError('VALIDATION_ERROR', 'image_ids must be a non-empty array.', 'image_ids', 400);
+            return $this->respondWithError('VALIDATION_ERROR', __('api_controllers_2.listings.image_ids_non_empty'), 'image_ids', 400);
         }
 
         // Verify all IDs belong to this listing

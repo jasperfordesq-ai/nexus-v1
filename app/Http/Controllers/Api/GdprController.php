@@ -122,7 +122,7 @@ class GdprController extends BaseApiController
                 'request_id' => $result['id'],
                 'type' => $type,
                 'status' => 'pending',
-                'message' => 'Your request has been submitted and will be processed within 30 days.',
+                'message' => __('api_controllers_1.gdpr.request_submitted'),
             ], null, 201);
         } catch (\Exception $e) {
             Log::error('GDPR request creation failed', ['user' => $userId, 'type' => $type, 'error' => $e->getMessage()]);
@@ -177,7 +177,7 @@ class GdprController extends BaseApiController
 
             return $this->respondWithData([
                 'request_id' => $result['id'],
-                'message' => 'Your account deletion request has been submitted. You will receive confirmation via email.',
+                'message' => __('api_controllers_1.gdpr.account_deletion_submitted'),
                 'logout_required' => true,
             ]);
         } catch (\Exception $e) {

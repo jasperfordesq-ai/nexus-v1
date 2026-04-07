@@ -129,7 +129,7 @@ class AdminSafeguardingOptionsController extends BaseApiController
             return $this->respondWithError('NOT_FOUND', __('api.safeguarding_option_not_found'), null, 404);
         }
 
-        return $this->respondWithData(['message' => 'Option updated']);
+        return $this->respondWithData(['message' => __('api_controllers_1.admin_safeguarding_options.option_updated')]);
     }
 
     /** DELETE /v2/admin/safeguarding/options/{id} */
@@ -143,7 +143,7 @@ class AdminSafeguardingOptionsController extends BaseApiController
             return $this->respondWithError('NOT_FOUND', __('api.safeguarding_option_not_found'), null, 404);
         }
 
-        return $this->respondWithData(['message' => 'Option deactivated']);
+        return $this->respondWithData(['message' => __('api_controllers_1.admin_safeguarding_options.option_deactivated')]);
     }
 
     /** PUT /v2/admin/safeguarding/options/reorder */
@@ -169,6 +169,6 @@ class AdminSafeguardingOptionsController extends BaseApiController
 
         SafeguardingPreferenceService::reorderOptions($tenantId, $order);
 
-        return $this->respondWithData(['message' => 'Options reordered']);
+        return $this->respondWithData(['message' => __('api_controllers_1.admin_safeguarding_options.options_reordered')]);
     }
 }

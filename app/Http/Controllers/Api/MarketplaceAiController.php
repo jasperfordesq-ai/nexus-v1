@@ -29,7 +29,7 @@ class MarketplaceAiController extends BaseApiController
     {
         if (!TenantContext::hasFeature('marketplace')) {
             throw new \Illuminate\Http\Exceptions\HttpResponseException(
-                $this->respondWithError('FEATURE_DISABLED', 'The marketplace feature is not enabled for this community.', null, 403)
+                $this->respondWithError('FEATURE_DISABLED', __('api_controllers_2.marketplace_ai.feature_disabled'), null, 403)
             );
         }
     }
@@ -46,7 +46,7 @@ class MarketplaceAiController extends BaseApiController
 
         $userId = $request->user()?->id;
         if (!$userId) {
-            return $this->respondWithError('UNAUTHORIZED', 'Authentication required.', null, 401);
+            return $this->respondWithError('UNAUTHORIZED', __('api_controllers_2.marketplace_ai.auth_required'), null, 401);
         }
 
         // Rate limit: 10 auto-replies per minute per user
@@ -54,12 +54,12 @@ class MarketplaceAiController extends BaseApiController
 
         $listing = MarketplaceListing::query()->find($id);
         if (!$listing) {
-            return $this->respondWithError('NOT_FOUND', 'Listing not found.', null, 404);
+            return $this->respondWithError('NOT_FOUND', __('api_controllers_2.marketplace_ai.listing_not_found'), null, 404);
         }
 
         // Only the listing owner can generate auto-replies
         if ($listing->user_id !== $userId) {
-            return $this->respondWithError('FORBIDDEN', 'Only the listing owner can generate auto-replies.', null, 403);
+            return $this->respondWithError('FORBIDDEN', __('api_controllers_2.marketplace_ai.only_owner_auto_reply'), null, 403);
         }
 
         $data = $request->validate([

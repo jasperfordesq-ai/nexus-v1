@@ -105,7 +105,7 @@ export function ProviderHealthDashboard() {
         setProviders(Array.isArray(res.data) ? res.data : []);
       }
     } catch {
-      toast.error('Failed to load provider health data');
+      toast.error(t('system.failed_to_load_provider_health'));
     } finally {
       setLoading(false);
     }

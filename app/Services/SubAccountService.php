@@ -248,7 +248,7 @@ class SubAccountService
                 'tenant_id'  => TenantContext::getId(),
                 'user_id'    => $childUserId,
                 'type'       => 'account',
-                'message'    => "{$parentName} has requested to manage your account as a {$type}",
+                'message'    => __('svc_notifications.sub_account.management_request', ['name' => $parentName, 'type' => $type]),
                 'link'       => '/settings',
                 'is_read'    => false,
                 'created_at' => now(),

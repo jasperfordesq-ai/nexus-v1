@@ -180,14 +180,14 @@ export function TemplateForm() {
 
       if (res.success) {
         toast.success(
-          isEdit ? 'Template updated successfully' : 'Template created successfully',
+          isEdit ? t('newsletters.template_updated') : t('newsletters.template_created'),
         );
         navigate(tenantPath('/admin/newsletters/templates'));
       } else {
-        toast.error(res.error || `Failed to ${isEdit ? 'update' : 'create'} template`);
+        toast.error(res.error || t('newsletters.failed_to_save_template'));
       }
     } catch {
-      toast.error('An unexpected error occurred');
+      toast.error(t('newsletters.an_unexpected_error_occurred'));
     } finally {
       setSubmitting(false);
     }
@@ -198,21 +198,21 @@ export function TemplateForm() {
     try {
       const res = await adminNewsletters.duplicateTemplate(Number(id));
       if (res.success) {
-        toast.success('Template duplicated successfully');
+        toast.success(t('newsletters.template_duplicated'));
         navigate(tenantPath('/admin/newsletters/templates'));
       } else {
-        toast.error(res.error || 'Failed to duplicate template');
+        toast.error(res.error || t('newsletters.failed_to_duplicate_template'));
       }
     } catch {
-      toast.error('An unexpected error occurred');
+      toast.error(t('newsletters.an_unexpected_error_occurred'));
     }
   }
 
   function copyToClipboard(text: string) {
     navigator.clipboard.writeText(text).then(() => {
-      toast.success(`Copied ${text} to clipboard`);
+      toast.success(t('newsletters.copied_to_clipboard', { text }));
     }).catch(() => {
-      toast.error('Failed to copy to clipboard');
+      toast.error(t('newsletters.failed_to_copy_to_clipboard'));
     });
   }
 

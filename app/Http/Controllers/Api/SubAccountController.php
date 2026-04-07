@@ -126,7 +126,7 @@ class SubAccountController extends BaseApiController
 
         $this->subAccountService->revokeRelationship($userId, $id);
 
-        return $this->respondWithData(['message' => 'Relationship revoked']);
+        return $this->respondWithData(['message' => __('api_controllers_2.sub_account.relationship_revoked')]);
     }
 
     /** GET /api/v2/users/me/sub-accounts/{childId}/activity */

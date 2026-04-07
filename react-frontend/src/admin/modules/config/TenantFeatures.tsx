@@ -135,11 +135,11 @@ export function TenantFeatures() {
       setConfig((prev) =>
         prev ? { ...prev, features: { ...prev.features, [feature]: enabled } } : prev
       );
-      toast.success(`${FEATURE_META[feature]?.label || feature} ${enabled ? 'enabled' : 'disabled'}`);
+      toast.success(t('config.feature_toggled', { name: FEATURE_META[feature]?.label || feature, status: enabled ? t('config.enabled') : t('config.disabled') }));
       // Refresh TenantContext so nav items update immediately
       refreshTenant();
     } else {
-      toast.error(res.error || 'Failed to update feature');
+      toast.error(res.error || t('config.failed_to_update_feature'));
     }
     setToggling(null);
   };
@@ -151,11 +151,11 @@ export function TenantFeatures() {
       setConfig((prev) =>
         prev ? { ...prev, modules: { ...prev.modules, [module]: enabled } } : prev
       );
-      toast.success(`${MODULE_META[module]?.label || module} ${enabled ? 'enabled' : 'disabled'}`);
+      toast.success(t('config.module_toggled', { name: MODULE_META[module]?.label || module, status: enabled ? t('config.enabled') : t('config.disabled') }));
       // Refresh TenantContext so nav items update immediately
       refreshTenant();
     } else {
-      toast.error(res.error || 'Failed to update module');
+      toast.error(res.error || t('config.failed_to_update_module'));
     }
     setToggling(null);
   };
@@ -205,7 +205,7 @@ export function TenantFeatures() {
       toast.success(t('config.language_settings_saved'));
       refreshTenant();
     } else {
-      toast.error(res.error || 'Failed to save language settings');
+      toast.error(res.error || t('config.failed_to_save_language_settings'));
     }
     setSavingLang(false);
   };

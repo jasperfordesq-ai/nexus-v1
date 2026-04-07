@@ -197,7 +197,7 @@ export function InactiveMembersPage() {
       }
     } catch (err) {
       console.error('Failed to load inactive members:', err);
-      toast.error('Failed to load inactive members');
+      toast.error(t('reports.failed_to_load_inactive_members'));
     } finally {
       setLoading(false);
     }

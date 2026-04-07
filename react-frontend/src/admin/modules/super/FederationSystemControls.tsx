@@ -106,7 +106,7 @@ export default function FederationSystemControls() {
       toast.success(t('super.emergency_lockdown_activated'));
       setLockdownReason('');
     } else {
-      toast.error(res.error || 'Failed to activate lockdown');
+      toast.error(res.error || t('super.failed_to_activate_lockdown'));
     }
   };
 
@@ -116,7 +116,7 @@ export default function FederationSystemControls() {
       setControls(prev => ({ ...prev, lockdown_active: false, lockdown_reason: undefined }));
       toast.success(t('super.emergency_lockdown_lifted'));
     } else {
-      toast.error(res.error || 'Failed to lift lockdown');
+      toast.error(res.error || t('super.failed_to_lift_lockdown'));
     }
   };
 
@@ -134,7 +134,7 @@ export default function FederationSystemControls() {
       setControls(prev => ({ ...prev, [key]: value }));
       toast.success(t('super.system_control_updated'));
     } else {
-      toast.error(res.error || 'Failed to update control');
+      toast.error(res.error || t('super.failed_to_update_control'));
     }
   };
 
@@ -143,9 +143,9 @@ export default function FederationSystemControls() {
     const res = await adminSuper.updateSystemControls({ [apiKey]: value });
     if (res.success) {
       setFeatures(prev => ({ ...prev, [key]: value }));
-      toast.success(`${key} feature ${value ? 'enabled' : 'disabled'}`);
+      toast.success(t('super.feature_toggled', { name: key, status: value ? t('super.enabled') : t('super.disabled') }));
     } else {
-      toast.error(res.error || 'Failed to update feature');
+      toast.error(res.error || t('super.failed_to_update_feature'));
     }
   };
 

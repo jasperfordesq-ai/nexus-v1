@@ -46,7 +46,7 @@ class GroupChallengeController extends BaseApiController
         if ($userId instanceof JsonResponse) return $userId;
 
         return GroupChallengeService::delete($challengeId)
-            ? $this->successResponse(['message' => 'Challenge deleted'])
+            ? $this->successResponse(['message' => __('api_controllers_1.group_challenge.challenge_deleted')])
             : $this->errorResponse('Challenge not found', 404);
     }
 }

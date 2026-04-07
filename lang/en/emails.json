@@ -146,11 +146,19 @@
     "partnership_body": "{{community}} has sent your community a federation partnership request.",
     "review_request": "Review Request"
   },
+  "vetting": {
+    "subject": "{{heading}} - {{tenant}}"
+  },
+  "group_digest": {
+    "subject": "Weekly Digest: {{group}}"
+  },
   "newsletter": {
     "subscriber_notice": "You received this email because you're subscribed to the {{community}} newsletter.",
     "unsubscribe": "Unsubscribe",
     "manage_preferences": "Manage Preferences",
-    "manage_email_preferences": "Manage Email Preferences"
+    "manage_email_preferences": "Manage Email Preferences",
+    "test_prefix": "[TEST]",
+    "no_subject": "No Subject"
   },
   "notification": {
     "sent_by": "This email was sent by {{community}}",

@@ -484,7 +484,7 @@ class GamificationService
         Notification::create([
             'user_id' => $userId,
             'type'    => 'achievement',
-            'message' => "You earned the '{$badge['name']}' badge! {$badge['icon']}",
+            'message' => __('svc_notifications.gamification.badge_earned', ['name' => $badge['name'], 'icon' => $badge['icon']]),
             'link'    => '/profile',
         ]);
 
@@ -607,7 +607,7 @@ class GamificationService
                 Notification::create([
                     'user_id' => $userId,
                     'type'    => 'achievement',
-                    'message' => "Congratulations! You've reached Level $newLevel!",
+                    'message' => __('svc_notifications.gamification.level_up', ['level' => $newLevel]),
                     'link'    => '/profile',
                 ]);
 

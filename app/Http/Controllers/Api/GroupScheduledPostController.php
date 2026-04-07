@@ -37,7 +37,7 @@ class GroupScheduledPostController extends BaseApiController
         $userId = $this->requireUserId();
         if ($userId instanceof JsonResponse) return $userId;
         return GroupScheduledPostService::cancel($postId)
-            ? $this->successResponse(['message' => 'Cancelled'])
-            : $this->errorResponse('Not found or already published', 404);
+            ? $this->successResponse(['message' => __('api_controllers_3.group_scheduled_post.cancelled')])
+            : $this->errorResponse(__('api_controllers_3.group_scheduled_post.not_found_or_published'), 404);
     }
 }

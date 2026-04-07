@@ -56,7 +56,7 @@ export function SystemRequirements() {
         setData(res.data as unknown as SystemRequirementsType);
       }
     } catch {
-      toast.error('Failed to load system requirements');
+      toast.error(t('enterprise.failed_to_load_system_requirements'));
     } finally {
       setLoading(false);
     }

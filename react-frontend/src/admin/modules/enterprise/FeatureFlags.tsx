@@ -102,7 +102,7 @@ export function FeatureFlags() {
         setData(res.data as unknown as FeatureFlagsType);
       }
     } catch {
-      toast.error('Failed to load feature flags');
+      toast.error(t('enterprise.failed_to_load_feature_flags'));
     } finally {
       setLoading(false);
     }
@@ -129,7 +129,7 @@ export function FeatureFlags() {
     try {
       const res = await adminEnterprise.updateFeatureFlag({ key, value, type });
       if (res.success) {
-        toast.success(`${formatKey(key)} ${value ? 'enabled' : 'disabled'}`);
+        toast.success(t('enterprise.feature_flag_toggled', { name: formatKey(key), status: value ? t('enterprise.enabled') : t('enterprise.disabled') }));
       } else {
         // Revert on failure
         setData((prev) => {
@@ -140,7 +140,7 @@ export function FeatureFlags() {
             [section]: { ...prev[section], [key]: !value },
           };
         });
-        toast.error(`Failed to update ${formatKey(key)}`);
+        toast.error(t('enterprise.failed_to_update_feature_flag', { name: formatKey(key) }));
       }
     } catch {
       // Revert on error
@@ -152,7 +152,7 @@ export function FeatureFlags() {
           [section]: { ...prev[section], [key]: !value },
         };
       });
-      toast.error(`Failed to update ${formatKey(key)}`);
+      toast.error(t('enterprise.failed_to_update_feature_flag', { name: formatKey(key) }));
     } finally {
       setTogglingKeys((prev) => {
         const next = new Set(prev);
@@ -288,23 +288,20 @@ export function FeatureFlags() {
             <>
               <ModalHeader className="flex items-center gap-2">
                 <AlertTriangle size={20} className="text-warning" />
-                <span>Disable {confirmModal ? formatKey(confirmModal.key) : ''}?</span>
+                <span>{t('enterprise.disable_feature_title', { feature: confirmModal ? formatKey(confirmModal.key) : '' })}</span>
               </ModalHeader>
               <ModalBody>
                 <p className="text-sm text-default-600">
-                  This will prevent all users from accessing{' '}
-                  <span className="font-semibold text-foreground">
-                    {confirmModal
+                  {t('enterprise.disable_feature_warning', {
+                    feature: confirmModal
                       ? FLAG_DESCRIPTIONS[confirmModal.key]?.toLowerCase() ||
                         formatKey(confirmModal.key).toLowerCase()
-                      : ''}
-                  </span>
-                  . Are you sure you want to disable this?
+                      : '',
+                  })}
                 </p>
                 <div className="mt-2 rounded-lg border border-warning/30 bg-warning/10 p-3">
                   <p className="text-xs font-medium text-warning">
-                    {confirmModal ? formatKey(confirmModal.key) : ''} is a core module.
-                    Disabling it may significantly impact the user experience.
+                    {t('enterprise.core_module_warning', { feature: confirmModal ? formatKey(confirmModal.key) : '' })}
                   </p>
                 </div>
               </ModalBody>

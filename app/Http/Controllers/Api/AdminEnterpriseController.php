@@ -372,7 +372,7 @@ class AdminEnterpriseController extends BaseApiController
                 "INSERT INTO data_breach_log (tenant_id, breach_type, description, severity, status, detected_at, created_by, created_at) VALUES (?, ?, ?, ?, 'open', NOW(), ?, NOW())",
                 [$tenantId, $breachType, $input['description'] ?? '', $input['severity'] ?? 'medium', $this->getUserId()]
             );
-            return $this->respondWithData(['id' => DB::getPdo()->lastInsertId(), 'message' => 'Breach reported successfully'], null, 201);
+            return $this->respondWithData(['id' => DB::getPdo()->lastInsertId(), 'message' => __('api_controllers_1.admin_enterprise.breach_reported')], null, 201);
         } catch (\Exception $e) {
             return $this->respondWithError('CREATE_FAILED', __('api.breach_report_failed'), null, 500);
         }
@@ -1005,9 +1005,9 @@ class AdminEnterpriseController extends BaseApiController
                 // Audit log failure should not break the main operation
             }
 
-            return $this->respondWithData(['id' => $requestId, 'message' => 'GDPR request created successfully'], null, 201);
+            return $this->respondWithData(['id' => $requestId, 'message' => __('api_controllers_1.admin_enterprise.gdpr_request_created')], null, 201);
         } catch (\Exception $e) {
-            return $this->respondWithError('CREATE_FAILED', 'Failed to create GDPR request', null, 500);
+            return $this->respondWithError('CREATE_FAILED', __('api_controllers_1.admin_enterprise.gdpr_request_create_failed'), null, 500);
         }
     }
 
@@ -1128,10 +1128,10 @@ class AdminEnterpriseController extends BaseApiController
                 'id' => $id,
                 'export_file_path' => $filePath,
                 'export_expires_at' => $expiresAt,
-                'message' => 'Data export generated successfully',
+                'message' => __('api_controllers_1.admin_enterprise.data_export_generated'),
             ]);
         } catch (\Exception $e) {
-            return $this->respondWithError('EXPORT_FAILED', 'Failed to generate data export: ' . $e->getMessage(), null, 500);
+            return $this->respondWithError('EXPORT_FAILED', __('api_controllers_1.admin_enterprise.data_export_failed') . ': ' . $e->getMessage(), null, 500);
         }
     }
 
@@ -1422,9 +1422,9 @@ class AdminEnterpriseController extends BaseApiController
                 );
             } catch (\Exception $e) {}
 
-            return $this->respondWithData(['id' => $id, 'dpa_notified' => true, 'message' => 'DPA notification recorded successfully']);
+            return $this->respondWithData(['id' => $id, 'dpa_notified' => true, 'message' => __('api_controllers_1.admin_enterprise.dpa_notification_recorded')]);
         } catch (\Exception $e) {
-            return $this->respondWithError('UPDATE_FAILED', 'Failed to record DPA notification', null, 500);
+            return $this->respondWithError('UPDATE_FAILED', __('api_controllers_1.admin_enterprise.dpa_notification_failed'), null, 500);
         }
     }
 
@@ -1688,12 +1688,12 @@ class AdminEnterpriseController extends BaseApiController
             return $this->respondWithError('VALIDATION_ERROR', 'Invalid filename', 'filename', 400);
         }
         if (!str_ends_with($filename, '.log')) {
-            return $this->respondWithError('VALIDATION_ERROR', 'Only .log files are allowed', 'filename', 400);
+            return $this->respondWithError('VALIDATION_ERROR', __('api_controllers_1.admin_enterprise.log_file_only_allowed'), 'filename', 400);
         }
 
         $filePath = storage_path('logs') . DIRECTORY_SEPARATOR . $filename;
         if (!is_file($filePath)) {
-            return $this->respondWithError('NOT_FOUND', 'Log file not found', null, 404);
+            return $this->respondWithError('NOT_FOUND', __('api_controllers_1.admin_enterprise.log_file_not_found'), null, 404);
         }
 
         $maxLines = $this->queryInt('lines', 200, 1, 1000);
@@ -1742,19 +1742,19 @@ class AdminEnterpriseController extends BaseApiController
             return $this->respondWithError('VALIDATION_ERROR', 'Invalid filename', 'filename', 400);
         }
         if (!str_ends_with($filename, '.log')) {
-            return $this->respondWithError('VALIDATION_ERROR', 'Only .log files are allowed', 'filename', 400);
+            return $this->respondWithError('VALIDATION_ERROR', __('api_controllers_1.admin_enterprise.log_file_only_allowed'), 'filename', 400);
         }
 
         $filePath = storage_path('logs') . DIRECTORY_SEPARATOR . $filename;
         if (!is_file($filePath)) {
-            return $this->respondWithError('NOT_FOUND', 'Log file not found', null, 404);
+            return $this->respondWithError('NOT_FOUND', __('api_controllers_1.admin_enterprise.log_file_not_found'), null, 404);
         }
 
         try {
             file_put_contents($filePath, '');
-            return $this->respondWithData(['filename' => $filename, 'cleared' => true, 'message' => 'Log file cleared successfully']);
+            return $this->respondWithData(['filename' => $filename, 'cleared' => true, 'message' => __('api_controllers_1.admin_enterprise.log_file_cleared')]);
         } catch (\Exception $e) {
-            return $this->respondWithError('CLEAR_FAILED', 'Failed to clear log file', null, 500);
+            return $this->respondWithError('CLEAR_FAILED', __('api_controllers_1.admin_enterprise.log_file_clear_failed'), null, 500);
         }
     }
 
@@ -1925,7 +1925,7 @@ class AdminEnterpriseController extends BaseApiController
         return $this->respondWithData([
             'key' => $key,
             'manual_required' => true,
-            'message' => 'Secret rotation requires server access. Use SSH to rotate secrets in the .env file.',
+            'message' => __('api_controllers_1.admin_enterprise.secret_rotation_requires_ssh'),
         ]);
     }
 
@@ -1937,7 +1937,7 @@ class AdminEnterpriseController extends BaseApiController
         return $this->respondWithData([
             'key' => $key,
             'manual_required' => true,
-            'message' => 'Secret deletion requires server access. Use SSH to remove secrets from the .env file.',
+            'message' => __('api_controllers_1.admin_enterprise.secret_deletion_requires_ssh'),
         ]);
     }
 

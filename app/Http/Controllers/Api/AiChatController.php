@@ -102,7 +102,7 @@ class AiChatController extends BaseApiController
                 'error' => $e->getMessage(),
                 'tenant_id' => $tenantId,
             ]);
-            $content = 'AI chat is not currently available. Please try again later.';
+            $content = __('api_controllers_1.ai_chat.not_available');
         }
 
         // Save assistant reply
@@ -289,7 +289,7 @@ class AiChatController extends BaseApiController
             \Illuminate\Support\Facades\Log::warning('AI provider test failed', ['provider' => $providerId, 'error' => $e->getMessage()]);
             return $this->respondWithData([
                 'success' => false,
-                'message' => 'Connection test failed',
+                'message' => __('api_controllers_1.ai_chat.connection_test_failed'),
             ]);
         }
     }

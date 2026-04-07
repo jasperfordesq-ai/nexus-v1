@@ -213,21 +213,21 @@ class ContentModerationService
     public static function review(int $id, int $tenantId, int $adminId, string $decision, ?string $rejectionReason = null): array
     {
         if (!in_array($decision, [self::STATUS_APPROVED, self::STATUS_REJECTED], true)) {
-            return ['success' => false, 'message' => 'Invalid decision. Must be approved or rejected.'];
+            return ['success' => false, 'message' => __('svc_notifications_2.moderation.invalid_decision')];
         }
 
         $item = ContentModerationQueue::query()->find($id);
 
         if (!$item) {
-            return ['success' => false, 'message' => 'Moderation queue item not found.'];
+            return ['success' => false, 'message' => __('svc_notifications_2.moderation.item_not_found')];
         }
 
         if ($item->status === self::STATUS_APPROVED || $item->status === self::STATUS_REJECTED) {
-            return ['success' => false, 'message' => 'This item has already been reviewed.'];
+            return ['success' => false, 'message' => __('svc_notifications_2.moderation.already_reviewed')];
         }
 
         if ($decision === self::STATUS_REJECTED && empty($rejectionReason)) {
-            return ['success' => false, 'message' => 'Rejection reason is required.'];
+            return ['success' => false, 'message' => __('svc_notifications_2.moderation.rejection_reason_required')];
         }
 
         $item->update([
@@ -242,7 +242,7 @@ class ContentModerationService
 
         return [
             'success' => true,
-            'message' => "Content has been {$decision}.",
+            'message' => __('svc_notifications_2.moderation.content_decision', ['decision' => $decision]),
             'content_type' => $item->content_type,
             'content_id' => (int) $item->content_id,
         ];
