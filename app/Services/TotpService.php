@@ -133,10 +133,16 @@ class TotpService
 
     /**
      * Check if current device is trusted for this user.
+     *
+     * Checks the X-Trusted-Device header first (sent by the React SPA from
+     * localStorage), then falls back to the cookie for legacy/session clients.
      */
     public static function isTrustedDevice(int $userId, ?string $deviceHash = null): bool
     {
-        $token = $_COOKIE[self::TRUSTED_DEVICE_COOKIE] ?? null;
+        // Prefer header (works cross-origin); fall back to cookie (legacy)
+        $token = request()->header('X-Trusted-Device')
+            ?? $_COOKIE[self::TRUSTED_DEVICE_COOKIE]
+            ?? null;
         if (!$token) {
             return false;
         }
@@ -164,8 +170,13 @@ class TotpService
 
     /**
      * Trust the current device for this user.
+     *
+     * Returns the plain token so the caller can include it in the API response.
+     * The frontend stores it in localStorage and sends it via X-Trusted-Device
+     * header on subsequent login requests — cookies don't work cross-origin
+     * (SameSite=Lax blocks cross-origin POST from app.* to api.*).
      */
-    public static function trustDevice(int $userId, ?string $deviceHash = null): void
+    public static function trustDevice(int $userId, ?string $deviceHash = null): ?string
     {
         $tenantId = TenantContext::getId();
         $token = bin2hex(random_bytes(32));
@@ -184,22 +195,10 @@ class TotpService
                 [$userId, $tenantId, $tokenHash, $deviceName, $ip, $userAgent, $expiresAt]
             );
 
-            $cookieExpires = time() + (self::TRUSTED_DEVICE_DAYS * 24 * 60 * 60);
-            $secure = request()->isSecure();
-
-            setcookie(
-                self::TRUSTED_DEVICE_COOKIE,
-                $token,
-                [
-                    'expires' => $cookieExpires,
-                    'path' => '/',
-                    'secure' => $secure,
-                    'httponly' => true,
-                    'samesite' => 'Lax',
-                ]
-            );
+            return $token;
         } catch (\Exception $e) {
             Log::error("Failed to trust device for user $userId: " . $e->getMessage());
+            return null;
         }
     }
 

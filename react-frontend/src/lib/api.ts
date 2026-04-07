@@ -41,6 +41,7 @@ const REFRESH_TOKEN_KEY = 'nexus_refresh_token';
 const TENANT_ID_KEY = 'nexus_tenant_id';
 const TENANT_SLUG_KEY = 'nexus_tenant_slug';
 const CSRF_TOKEN_KEY = 'nexus_csrf_token';
+const TRUSTED_DEVICE_KEY = 'nexus_trusted_device';
 
 // Default tenant ID - only used if nothing is in localStorage
 // In production, tenant is detected from subdomain during bootstrap
@@ -168,11 +169,25 @@ export const tokenManager = {
     localStorage.removeItem(REFRESH_TOKEN_KEY);
   },
 
+  // Trusted device token for 2FA "Remember this device" feature
+  getTrustedDeviceToken(): string | null {
+    return localStorage.getItem(TRUSTED_DEVICE_KEY);
+  },
+
+  setTrustedDeviceToken(token: string): void {
+    localStorage.setItem(TRUSTED_DEVICE_KEY, token);
+  },
+
+  clearTrustedDeviceToken(): void {
+    localStorage.removeItem(TRUSTED_DEVICE_KEY);
+  },
+
   clearAll(): void {
     localStorage.removeItem(TOKEN_KEY);
     localStorage.removeItem(REFRESH_TOKEN_KEY);
     localStorage.removeItem(TENANT_ID_KEY);
     localStorage.removeItem(TENANT_SLUG_KEY);
+    // Preserve trusted device token across logouts — it's meant to persist for 30 days
   },
 
   hasAccessToken(): boolean {
@@ -296,6 +311,12 @@ class ApiClient {
       if (tenantId) {
         headers.set('X-Tenant-ID', tenantId);
       }
+    }
+
+    // Add trusted device token for 2FA "Remember this device" (persists across logouts)
+    const trustedDeviceToken = tokenManager.getTrustedDeviceToken();
+    if (trustedDeviceToken) {
+      headers.set('X-Trusted-Device', trustedDeviceToken);
     }
 
     // Add CSRF token for state-changing requests (POST, PUT, PATCH, DELETE)

@@ -46,7 +46,7 @@ import { GlassCard } from '@/components/ui';
 import { AvailabilityGrid } from '@/components/availability/AvailabilityGrid';
 import { AppearanceSettings } from '@/components/settings/AppearanceSettings';
 import { useAuth, useToast, useTenant } from '@/contexts';
-import { api } from '@/lib/api';
+import { api, tokenManager } from '@/lib/api';
 import { logError } from '@/lib/logger';
 import { usePageTitle } from '@/hooks';
 import { PageMeta } from '@/components/seo';
@@ -623,6 +623,8 @@ export function SettingsPage() {
       if (response.success) {
         setTwoFactorEnabled(false);
         setBackupCodesRemaining(0);
+        // Clear the trusted device token since 2FA is now disabled
+        tokenManager.clearTrustedDeviceToken();
         toast.success(t('toasts.twofa_disabled'), t('toasts.twofa_disabled_desc'));
         twoFactorDisableModal.onClose();
         setTwoFactorDisablePassword('');

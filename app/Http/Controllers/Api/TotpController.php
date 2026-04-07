@@ -136,9 +136,10 @@ class TotpController extends BaseApiController
         // Clear session-based pending state
         unset($_SESSION['pending_2fa_user_id'], $_SESSION['pending_2fa_expires']);
 
-        // Trust device if requested
+        // Trust device if requested — returns the plain token for the frontend
+        $trustedDeviceToken = null;
         if ($trustDevice) {
-            $this->totpService->trustDevice($userId);
+            $trustedDeviceToken = $this->totpService->trustDevice($userId);
         }
 
         // Fetch user data for response
@@ -260,6 +261,12 @@ class TotpController extends BaseApiController
         // Include backup codes remaining if a backup code was used
         if ($useBackupCode && isset($result['codes_remaining'])) {
             $response['codes_remaining'] = $result['codes_remaining'];
+        }
+
+        // Include trusted device token so frontend can store it in localStorage
+        // and send it via X-Trusted-Device header on future login requests
+        if ($trustedDeviceToken) {
+            $response['trusted_device_token'] = $trustedDeviceToken;
         }
 
         return response()->json($response);
