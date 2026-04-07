@@ -19,6 +19,8 @@ import {
   Phone,
   Building2,
   Monitor,
+  Lock,
+  ShieldCheck,
 } from 'lucide-react';
 import { GlassCard } from '@/components/ui';
 import { PlaceAutocompleteInput } from '@/components/location';
@@ -50,6 +52,7 @@ interface ProfileTabProps {
   profileData: ProfileFormData;
   isSaving: boolean;
   isUploading: boolean;
+  isIdVerified?: boolean;
   onProfileDataChange: (updater: (prev: ProfileFormData) => ProfileFormData) => void;
   onSave: () => void;
   onAvatarUpload: (event: React.ChangeEvent<HTMLInputElement>) => void;
@@ -79,6 +82,7 @@ export function ProfileTab({
   profileData,
   isSaving,
   isUploading,
+  isIdVerified = false,
   onProfileDataChange,
   onSave,
   onAvatarUpload,
@@ -130,6 +134,14 @@ export function ProfileTab({
         {/* Form */}
         <div className="space-y-6">
           {/* Name fields */}
+          {isIdVerified && (
+            <div className="flex items-center gap-2 px-3 py-2 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-sm">
+              <ShieldCheck className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
+              <span className="text-emerald-700 dark:text-emerald-300 font-medium">
+                Your name is locked because your identity has been verified.
+              </span>
+            </div>
+          )}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <Input
               label={t('profile.first_name')}
@@ -137,6 +149,8 @@ export function ProfileTab({
               value={profileData.first_name}
               onChange={(e) => onProfileDataChange((prev) => ({ ...prev, first_name: e.target.value }))}
               classNames={inputClassNames}
+              isReadOnly={isIdVerified}
+              endContent={isIdVerified ? <Lock className="w-4 h-4 text-theme-subtle" /> : undefined}
             />
             <Input
               label={t('profile.last_name')}
@@ -144,6 +158,8 @@ export function ProfileTab({
               value={profileData.last_name}
               onChange={(e) => onProfileDataChange((prev) => ({ ...prev, last_name: e.target.value }))}
               classNames={inputClassNames}
+              isReadOnly={isIdVerified}
+              endContent={isIdVerified ? <Lock className="w-4 h-4 text-theme-subtle" /> : undefined}
             />
           </div>
 

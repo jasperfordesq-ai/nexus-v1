@@ -326,6 +326,21 @@ class UserService
      */
     public static function updateProfile(int $userId, array $data): bool
     {
+        // If user has id_verified badge, lock name and DOB fields
+        if (isset($data['first_name']) || isset($data['last_name']) || isset($data['date_of_birth'])) {
+            $tenantId = \App\Core\TenantContext::getId();
+            $hasIdBadge = \Illuminate\Support\Facades\DB::table('member_verification_badges')
+                ->where('user_id', $userId)
+                ->where('tenant_id', $tenantId)
+                ->where('badge_type', 'id_verified')
+                ->whereNull('revoked_at')
+                ->exists();
+
+            if ($hasIdBadge) {
+                unset($data['first_name'], $data['last_name'], $data['date_of_birth']);
+            }
+        }
+
         if (!empty($data) && !self::validateProfileUpdate($data)) {
             return false;
         }

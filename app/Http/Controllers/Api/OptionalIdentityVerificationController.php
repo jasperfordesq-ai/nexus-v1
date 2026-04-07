@@ -121,6 +121,13 @@ class OptionalIdentityVerificationController extends BaseApiController
         $userId = $this->requireAuth();
         $tenantId = $this->getTenantId();
 
+        // If already verified, DOB is locked
+        $badges = $this->badgeService->getUserBadges($userId);
+        $hasIdBadge = collect($badges)->contains(fn($b) => $b['badge_type'] === 'id_verified');
+        if ($hasIdBadge) {
+            return $this->respondWithError('FORBIDDEN', 'Your name and date of birth are locked after identity verification.', null, 403);
+        }
+
         $input = $this->getAllInput();
         $dobRaw = $input['date_of_birth'] ?? '';
 

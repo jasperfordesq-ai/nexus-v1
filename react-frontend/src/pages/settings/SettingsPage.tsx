@@ -108,6 +108,17 @@ export function SettingsPage() {
   // Error state for notification settings
   const [notificationError, setNotificationError] = useState<string | null>(null);
 
+  // Identity verification status — lock name fields if verified
+  const [isIdVerified, setIsIdVerified] = useState(false);
+  useEffect(() => {
+    if (!user?.id) return;
+    let cancelled = false;
+    api.get('/v2/identity/status').then((res: any) => {
+      if (!cancelled && res?.data?.has_id_verified_badge) setIsIdVerified(true);
+    }).catch(() => {});
+    return () => { cancelled = true; };
+  }, [user?.id]);
+
   // Profile form
   const [profileData, setProfileData] = useState<ProfileFormData>({
     first_name: '',
@@ -860,6 +871,7 @@ export function SettingsPage() {
               profileData={profileData}
               isSaving={isSaving}
               isUploading={isUploading}
+              isIdVerified={isIdVerified}
               onProfileDataChange={setProfileData}
               onSave={saveProfile}
               onAvatarUpload={handleAvatarUpload}
