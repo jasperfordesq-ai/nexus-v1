@@ -220,23 +220,16 @@ class OptionalIdentityVerificationController extends BaseApiController
         try {
             $result = IdentityVerificationPaymentService::createPaymentIntent($userId, $tenantId, $feeCents);
 
-            // Create a placeholder session to track the payment
-            $sessionId = IdentityVerificationSessionService::create(
-                $tenantId,
-                $userId,
-                'stripe_identity',
-                'document_selfie',
-                ['provider_session_id' => null, 'redirect_url' => null, 'client_token' => null]
-            );
-
-            // Link payment to session
-            IdentityVerificationSessionService::updatePaymentStatus($sessionId, 'pending', $result['payment_intent_id']);
-
-            // Store fee amount
+            // Record payment in a session row (not an active verification session)
             DB::statement(
-                "UPDATE identity_verification_sessions SET verification_fee_amount = ? WHERE id = ?",
-                [$feeCents, $sessionId]
+                "INSERT INTO identity_verification_sessions
+                    (tenant_id, user_id, provider_slug, verification_level, status,
+                     stripe_payment_intent_id, verification_fee_amount, payment_status)
+                 VALUES (?, ?, 'stripe_identity', 'document_selfie', 'cancelled',
+                         ?, ?, 'pending')",
+                [$tenantId, $userId, $result['payment_intent_id'], $feeCents]
             );
+            $sessionId = (int) DB::getPdo()->lastInsertId();
 
             return $this->respondWithData([
                 'client_secret' => $result['client_secret'],
