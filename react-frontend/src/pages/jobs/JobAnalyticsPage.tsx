@@ -461,12 +461,12 @@ export function JobAnalyticsPage() {
                 <div className="flex items-center gap-4">
                   <div>
                     <p className="text-sm text-default-500">Yours</p>
-                    <p className="text-lg font-bold">${predictions.salary_comparison.your_salary.toLocaleString()}</p>
+                    <p className="text-lg font-bold">{predictions.salary_comparison.your_salary.toLocaleString()}</p>
                   </div>
                   <div className="text-default-300">vs</div>
                   <div>
                     <p className="text-sm text-default-500">Market Avg</p>
-                    <p className="text-lg font-bold">${predictions.salary_comparison.market_avg.toLocaleString()}</p>
+                    <p className="text-lg font-bold">{predictions.salary_comparison.market_avg.toLocaleString()}</p>
                   </div>
                   <Chip size="sm" variant="flat" color={predictions.salary_comparison.diff_percent >= 0 ? 'success' : 'danger'}>
                     {predictions.salary_comparison.diff_percent > 0 ? '+' : ''}{predictions.salary_comparison.diff_percent}% {predictions.salary_comparison.label}

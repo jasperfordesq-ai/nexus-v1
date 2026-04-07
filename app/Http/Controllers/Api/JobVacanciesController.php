@@ -1844,6 +1844,7 @@ class JobVacanciesController extends BaseApiController
             // Badge count
             $badgeCount = DB::table('user_badges')
                 ->where('user_id', $appUserId)
+                ->where('tenant_id', $tenantId)
                 ->count();
 
             $candidateProfiles[] = [
@@ -1940,7 +1941,7 @@ class JobVacanciesController extends BaseApiController
             ]);
         } catch (\Throwable $e) {
             Log::error('aiRankCandidates failed', ['error' => $e->getMessage()]);
-            return $this->respondWithError('AI_ERROR', 'AI ranking failed: ' . $e->getMessage(), null, 500);
+            return $this->respondWithError('AI_ERROR', 'AI ranking failed', null, 500);
         }
     }
 
@@ -2131,12 +2132,12 @@ class JobVacanciesController extends BaseApiController
             'rating'      => $rating,
             'comment'     => trim($data['comment'] ?? ''),
             'review_type' => 'employer',
-            'dimensions'  => json_encode([
+            'dimensions'  => [
                 'respect'       => (int) ($data['respect'] ?? $rating),
                 'communication' => (int) ($data['communication'] ?? $rating),
                 'flexibility'   => (int) ($data['flexibility'] ?? $rating),
                 'impact'        => (int) ($data['impact'] ?? $rating),
-            ]),
+            ],
             'status' => 'approved',
         ]);
 
@@ -2222,12 +2223,19 @@ class JobVacanciesController extends BaseApiController
         $userId = $this->requireAuth();
         $tenantId = TenantContext::getId();
 
-        $interview = \App\Models\JobInterview::with(['vacancy:id,title,location'])
+        $interview = \App\Models\JobInterview::with(['vacancy:id,title,location,user_id', 'application:id,user_id'])
             ->where('tenant_id', $tenantId)
             ->find($interviewId);
 
         if (!$interview) {
             return $this->respondWithError('NOT_FOUND', 'Interview not found', null, 404);
+        }
+
+        // Must be the candidate or the job poster
+        $isCandidate = $interview->application && (int) $interview->application->user_id === $userId;
+        $isPoster = $interview->vacancy && (int) $interview->vacancy->user_id === $userId;
+        if (!$isCandidate && !$isPoster) {
+            return $this->respondWithError('FORBIDDEN', 'Access denied', null, 403);
         }
 
         $title = 'Interview: ' . ($interview->vacancy->title ?? 'Job Interview');

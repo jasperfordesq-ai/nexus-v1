@@ -681,7 +681,7 @@ export function JobKanbanPage() {
       const res = await api.get(`/v2/jobs/${id}/audit-trail?page=${auditPage}&limit=50`);
       if (res.success && res.data) {
         setAuditEvents(Array.isArray(res.data) ? res.data : []);
-        const m = res.meta as Record<string, unknown> | undefined;
+        const m = res.meta as unknown as Record<string, unknown> | undefined;
         if (m?.total) setAuditTotal(Number(m.total));
       }
     } catch { /* silent */ }
@@ -790,8 +790,8 @@ export function JobKanbanPage() {
 
       {/* Tab navigation */}
       <Tabs selectedKey={activeTab} onSelectionChange={(k) => setActiveTab(k as 'pipeline' | 'activity')} variant="underlined" className="mb-4">
-        <Tab key="pipeline" title={<div className="flex items-center gap-2"><Briefcase size={15} /><span>Pipeline</span></div>} />
-        <Tab key="activity" title={<div className="flex items-center gap-2"><ScrollText size={15} /><span>Activity Log</span></div>} />
+        <Tab key="pipeline" title={<div className="flex items-center gap-2"><Briefcase size={15} /><span>{t('kanban.tab_pipeline', { defaultValue: 'Pipeline' })}</span></div>} />
+        <Tab key="activity" title={<div className="flex items-center gap-2"><ScrollText size={15} /><span>{t('kanban.tab_activity', { defaultValue: 'Activity Log' })}</span></div>} />
       </Tabs>
 
       {/* Pipeline tab */}
@@ -863,8 +863,8 @@ export function JobKanbanPage() {
           ) : auditEvents.length === 0 ? (
             <div className="text-center py-12 text-default-400">
               <ScrollText size={32} className="mx-auto mb-3" />
-              <p className="font-medium">No activity yet</p>
-              <p className="text-sm mt-1">Events will appear here as the hiring process progresses.</p>
+              <p className="font-medium">{t('kanban.no_activity', { defaultValue: 'No activity yet' })}</p>
+              <p className="text-sm mt-1">{t('kanban.no_activity_hint', { defaultValue: 'Events will appear here as the hiring process progresses.' })}</p>
             </div>
           ) : (
             <div className="relative pl-6 border-l-2 border-default-200 space-y-4">
@@ -895,8 +895,8 @@ export function JobKanbanPage() {
           )}
           {auditTotal > 50 && (
             <div className="flex justify-center gap-2 pt-2">
-              <Button size="sm" variant="flat" isDisabled={auditPage <= 1} onPress={() => setAuditPage(p => p - 1)}>Previous</Button>
-              <Button size="sm" variant="flat" onPress={() => setAuditPage(p => p + 1)}>Next</Button>
+              <Button size="sm" variant="flat" isDisabled={auditPage <= 1} onPress={() => setAuditPage(p => p - 1)}>{t('common.previous', { defaultValue: 'Previous' })}</Button>
+              <Button size="sm" variant="flat" onPress={() => setAuditPage(p => p + 1)}>{t('common.next', { defaultValue: 'Next' })}</Button>
             </div>
           )}
         </div>

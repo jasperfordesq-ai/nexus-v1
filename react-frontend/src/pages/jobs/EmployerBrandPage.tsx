@@ -160,7 +160,7 @@ export function EmployerBrandPage() {
         setReviewComment('');
         loadReviews();
       } else {
-        setReviewError((res as { message?: string }).message ?? 'Failed to submit review');
+        setReviewError((res as { error?: string }).error ?? 'Failed to submit review');
       }
     } catch (err) {
       logError('EmployerBrandPage: review submit failed', err);

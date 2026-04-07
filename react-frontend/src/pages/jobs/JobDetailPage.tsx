@@ -378,6 +378,7 @@ export function JobDetailPage() {
   // CV Upload state
   const [cvFile, setCvFile] = useState<File | null>(null);
   const cvInputRef = useRef<HTMLInputElement>(null);
+  const aiChatEndRef = useRef<HTMLDivElement>(null);
 
   // Feature 5: CV parsing state
   const [cvParsed, setCvParsed] = useState<{ skills: string[]; summary?: string } | null>(null);
@@ -450,6 +451,11 @@ export function JobDetailPage() {
   tRef.current = t;
   const toastRef = useRef(toast);
   toastRef.current = toast;
+
+  // Auto-scroll AI chat to bottom when new messages arrive
+  useEffect(() => {
+    aiChatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [aiChatMessages]);
 
   const isOwner = vacancy && user && vacancy.user_id === user.id;
 
@@ -2411,6 +2417,7 @@ export function JobDetailPage() {
                   </div>
                 </div>
               )}
+              <div ref={aiChatEndRef} />
             </div>
             <div className="p-3 border-t border-divider flex gap-2">
               <Input
