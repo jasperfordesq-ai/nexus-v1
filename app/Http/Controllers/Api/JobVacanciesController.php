@@ -2041,4 +2041,515 @@ class JobVacanciesController extends BaseApiController
 
         return $this->respondWithData(['rendered' => $rendered, 'template_name' => $template->name]);
     }
+
+    /** GET /api/v2/jobs/employer-reviews/{userId} — Get reviews for an employer. */
+    public function employerReviews(int $userId): JsonResponse
+    {
+        $tenantId = TenantContext::getId();
+
+        $reviews = Review::where('tenant_id', $tenantId)
+            ->where('receiver_id', $userId)
+            ->where('review_type', 'employer')
+            ->where('status', 'approved')
+            ->with('reviewer:id,first_name,last_name,avatar_url')
+            ->orderByDesc('created_at')
+            ->limit(50)
+            ->get()
+            ->map(fn($r) => [
+                'id' => $r->id,
+                'rating' => $r->rating,
+                'comment' => $r->comment,
+                'dimensions' => $r->dimensions,
+                'reviewer' => $r->reviewer ? [
+                    'id' => $r->reviewer->id,
+                    'name' => trim(($r->reviewer->first_name ?? '') . ' ' . ($r->reviewer->last_name ?? '')),
+                    'avatar_url' => $r->reviewer->avatar_url,
+                ] : null,
+                'created_at' => $r->created_at?->toIso8601String(),
+            ]);
+
+        // Stats
+        $stats = [
+            'average_rating' => $reviews->avg('rating') ? round($reviews->avg('rating'), 1) : null,
+            'total_reviews' => $reviews->count(),
+            'distribution' => [
+                5 => $reviews->where('rating', 5)->count(),
+                4 => $reviews->where('rating', 4)->count(),
+                3 => $reviews->where('rating', 3)->count(),
+                2 => $reviews->where('rating', 2)->count(),
+                1 => $reviews->where('rating', 1)->count(),
+            ],
+        ];
+
+        return $this->respondWithData(['reviews' => $reviews->values(), 'stats' => $stats]);
+    }
+
+    /** POST /api/v2/jobs/employer-reviews — Leave a review for an employer (must have completed a job). */
+    public function createEmployerReview(): JsonResponse
+    {
+        $userId = $this->requireAuth();
+        $tenantId = TenantContext::getId();
+        $data = $this->getJsonInput();
+
+        $employerId = (int) ($data['employer_id'] ?? 0);
+        if (!$employerId) {
+            return $this->respondWithError('VALIDATION_REQUIRED', 'employer_id is required', 'employer_id', 422);
+        }
+
+        $rating = (int) ($data['rating'] ?? 0);
+        if ($rating < 1 || $rating > 5) {
+            return $this->respondWithError('VALIDATION_INVALID_VALUE', 'Rating must be 1-5', 'rating', 422);
+        }
+
+        // Verify the reviewer actually completed a job with this employer
+        $hasCompletedJob = JobApplication::whereHas('vacancy', function ($q) use ($employerId, $tenantId) {
+                $q->where('user_id', $employerId)->where('tenant_id', $tenantId);
+            })
+            ->where('user_id', $userId)
+            ->where('status', 'accepted')
+            ->exists();
+
+        if (!$hasCompletedJob) {
+            return $this->respondWithError('NOT_ELIGIBLE', 'You can only review employers after completing a job with them', null, 403);
+        }
+
+        // Prevent duplicate reviews
+        $existing = Review::where('tenant_id', $tenantId)
+            ->where('reviewer_id', $userId)
+            ->where('receiver_id', $employerId)
+            ->where('review_type', 'employer')
+            ->exists();
+
+        if ($existing) {
+            return $this->respondWithError('DUPLICATE', 'You have already reviewed this employer', null, 409);
+        }
+
+        $review = Review::create([
+            'tenant_id'   => $tenantId,
+            'reviewer_id' => $userId,
+            'receiver_id' => $employerId,
+            'rating'      => $rating,
+            'comment'     => trim($data['comment'] ?? ''),
+            'review_type' => 'employer',
+            'dimensions'  => json_encode([
+                'respect'       => (int) ($data['respect'] ?? $rating),
+                'communication' => (int) ($data['communication'] ?? $rating),
+                'flexibility'   => (int) ($data['flexibility'] ?? $rating),
+                'impact'        => (int) ($data['impact'] ?? $rating),
+            ]),
+            'status' => 'approved',
+        ]);
+
+        return $this->respondWithData($review->toArray());
+    }
+
+    // =====================================================================
+    // CALENDAR ICS EXPORT
+    // =====================================================================
+
+    /** GET /api/v2/jobs/interviews/{interviewId}/calendar — Download ICS file for interview. */
+    public function interviewCalendar(int $interviewId): \Illuminate\Http\Response
+    {
+        $userId = $this->requireAuth();
+        $tenantId = TenantContext::getId();
+
+        $interview = \App\Models\JobInterview::with(['vacancy:id,title,location', 'application:id,user_id'])
+            ->where('tenant_id', $tenantId)
+            ->find($interviewId);
+
+        if (!$interview) {
+            return response('Not found', 404);
+        }
+
+        // Must be the candidate or the job poster
+        $isCandidate = $interview->application && (int) $interview->application->user_id === $userId;
+        $isPoster = $interview->vacancy && (int) $interview->vacancy->user_id === $userId;
+        if (!$isCandidate && !$isPoster) {
+            return response('Forbidden', 403);
+        }
+
+        $title = 'Interview: ' . ($interview->vacancy->title ?? 'Job Interview');
+        $start = $interview->scheduled_at;
+        $end = $start->copy()->addMinutes($interview->duration_mins ?? 60);
+        $location = $interview->location_notes ?? $interview->vacancy->location ?? '';
+        $type = ucfirst($interview->interview_type ?? 'video');
+        $description = "Type: {$type}\\nDuration: " . ($interview->duration_mins ?? 60) . " minutes";
+        if ($interview->location_notes) {
+            $description .= "\\nNotes: {$interview->location_notes}";
+        }
+
+        $uid = "interview-{$interview->id}@" . config('app.url', 'project-nexus.ie');
+        $now = now()->format('Ymd\THis\Z');
+        $dtStart = $start->format('Ymd\THis\Z');
+        $dtEnd = $end->format('Ymd\THis\Z');
+
+        $ics = "BEGIN:VCALENDAR\r\n"
+            . "VERSION:2.0\r\n"
+            . "PRODID:-//Project NEXUS//Jobs//EN\r\n"
+            . "CALSCALE:GREGORIAN\r\n"
+            . "METHOD:PUBLISH\r\n"
+            . "BEGIN:VEVENT\r\n"
+            . "UID:{$uid}\r\n"
+            . "DTSTAMP:{$now}\r\n"
+            . "DTSTART:{$dtStart}\r\n"
+            . "DTEND:{$dtEnd}\r\n"
+            . "SUMMARY:{$title}\r\n"
+            . "DESCRIPTION:{$description}\r\n"
+            . "LOCATION:{$location}\r\n"
+            . "STATUS:CONFIRMED\r\n"
+            . "BEGIN:VALARM\r\n"
+            . "TRIGGER:-PT1H\r\n"
+            . "ACTION:DISPLAY\r\n"
+            . "DESCRIPTION:Interview reminder\r\n"
+            . "END:VALARM\r\n"
+            . "BEGIN:VALARM\r\n"
+            . "TRIGGER:-PT15M\r\n"
+            . "ACTION:DISPLAY\r\n"
+            . "DESCRIPTION:Interview in 15 minutes\r\n"
+            . "END:VALARM\r\n"
+            . "END:VEVENT\r\n"
+            . "END:VCALENDAR\r\n";
+
+        return response($ics, 200, [
+            'Content-Type' => 'text/calendar; charset=utf-8',
+            'Content-Disposition' => 'attachment; filename="interview.ics"',
+        ]);
+    }
+
+    /** GET /api/v2/jobs/interviews/{interviewId}/calendar-links — Get Add-to-Calendar deep links. */
+    public function interviewCalendarLinks(int $interviewId): JsonResponse
+    {
+        $userId = $this->requireAuth();
+        $tenantId = TenantContext::getId();
+
+        $interview = \App\Models\JobInterview::with(['vacancy:id,title,location'])
+            ->where('tenant_id', $tenantId)
+            ->find($interviewId);
+
+        if (!$interview) {
+            return $this->respondWithError('NOT_FOUND', 'Interview not found', null, 404);
+        }
+
+        $title = 'Interview: ' . ($interview->vacancy->title ?? 'Job Interview');
+        $start = $interview->scheduled_at;
+        $end = $start->copy()->addMinutes($interview->duration_mins ?? 60);
+        $location = $interview->location_notes ?? '';
+        $details = ucfirst($interview->interview_type ?? 'video') . ' interview';
+
+        // Google Calendar link
+        $googleParams = http_build_query([
+            'action' => 'TEMPLATE',
+            'text' => $title,
+            'dates' => $start->format('Ymd\THis\Z') . '/' . $end->format('Ymd\THis\Z'),
+            'details' => $details,
+            'location' => $location,
+        ]);
+        $googleLink = "https://calendar.google.com/calendar/render?{$googleParams}";
+
+        // Outlook web link
+        $outlookParams = http_build_query([
+            'subject' => $title,
+            'startdt' => $start->toIso8601String(),
+            'enddt' => $end->toIso8601String(),
+            'body' => $details,
+            'location' => $location,
+            'path' => '/calendar/action/compose',
+            'rru' => 'addevent',
+        ]);
+        $outlookLink = "https://outlook.live.com/calendar/0/deeplink/compose?{$outlookParams}";
+
+        // ICS download link
+        $icsLink = "/api/v2/jobs/interviews/{$interviewId}/calendar";
+
+        return $this->respondWithData([
+            'google' => $googleLink,
+            'outlook' => $outlookLink,
+            'ics' => $icsLink,
+        ]);
+    }
+
+    // =====================================================================
+    // AUDIT TRAIL
+    // =====================================================================
+
+    /** GET /api/v2/jobs/{id}/audit-trail — Get activity timeline for a job vacancy. */
+    public function auditTrail(int $id): JsonResponse
+    {
+        $userId = $this->requireAuth();
+        $tenantId = TenantContext::getId();
+
+        $vacancy = \App\Models\JobVacancy::where('tenant_id', $tenantId)->find($id);
+        if (!$vacancy) {
+            return $this->respondWithError('NOT_FOUND', 'Job not found', null, 404);
+        }
+
+        // Must be owner or admin
+        if ((int) $vacancy->user_id !== $userId) {
+            $user = \App\Models\User::find($userId);
+            if (!$user || !in_array($user->role, ['admin', 'super_admin'])) {
+                return $this->respondWithError('FORBIDDEN', 'Access denied', null, 403);
+            }
+        }
+
+        $page = $this->queryInt('page', 1, 1);
+        $limit = $this->queryInt('limit', 50, 1, 200);
+
+        // Combine multiple data sources into a unified timeline
+        $events = collect();
+
+        // 1. Application history events
+        $appHistory = \App\Models\JobApplicationHistory::whereHas('application', fn($q) => $q->where('vacancy_id', $id))
+            ->with(['changedByUser:id,first_name,last_name', 'application:id,user_id', 'application.applicant:id,first_name,last_name'])
+            ->orderByDesc('changed_at')
+            ->limit(200)
+            ->get();
+
+        foreach ($appHistory as $h) {
+            $actorName = $h->changedByUser ? trim(($h->changedByUser->first_name ?? '') . ' ' . ($h->changedByUser->last_name ?? '')) : 'System';
+            $candidateName = ($h->application && $h->application->applicant) ? trim(($h->application->applicant->first_name ?? '') . ' ' . ($h->application->applicant->last_name ?? '')) : 'Unknown';
+            $events->push([
+                'type' => 'status_change',
+                'timestamp' => $h->changed_at,
+                'actor' => $actorName,
+                'description' => "{$candidateName}: {$h->from_status} → {$h->to_status}",
+                'details' => $h->notes,
+            ]);
+        }
+
+        // 2. Interview events
+        $interviews = \App\Models\JobInterview::where('vacancy_id', $id)
+            ->where('tenant_id', $tenantId)
+            ->with(['application.applicant:id,first_name,last_name'])
+            ->orderByDesc('created_at')
+            ->get();
+
+        foreach ($interviews as $iv) {
+            $candidateName = ($iv->application && $iv->application->applicant) ? trim(($iv->application->applicant->first_name ?? '') . ' ' . ($iv->application->applicant->last_name ?? '')) : 'Unknown';
+            $events->push([
+                'type' => 'interview',
+                'timestamp' => $iv->created_at,
+                'actor' => 'System',
+                'description' => "Interview ({$iv->interview_type}) scheduled with {$candidateName} — status: {$iv->status}",
+                'details' => $iv->scheduled_at ? "Scheduled: " . $iv->scheduled_at->format('M j, Y g:i A') : null,
+            ]);
+        }
+
+        // 3. Offer events
+        $offers = \App\Models\JobOffer::where('vacancy_id', $id)
+            ->where('tenant_id', $tenantId)
+            ->with(['application.applicant:id,first_name,last_name'])
+            ->orderByDesc('created_at')
+            ->get();
+
+        foreach ($offers as $offer) {
+            $candidateName = ($offer->application && $offer->application->applicant) ? trim(($offer->application->applicant->first_name ?? '') . ' ' . ($offer->application->applicant->last_name ?? '')) : 'Unknown';
+            $salary = $offer->salary_offered ? '$' . number_format($offer->salary_offered, 0) : '';
+            $events->push([
+                'type' => 'offer',
+                'timestamp' => $offer->created_at,
+                'actor' => 'Employer',
+                'description' => "Offer sent to {$candidateName} {$salary} — status: {$offer->status}",
+                'details' => $offer->details,
+            ]);
+        }
+
+        // Sort all events by timestamp descending and paginate
+        $sorted = $events->sortByDesc('timestamp')->values();
+        $total = $sorted->count();
+        $paginated = $sorted->slice(($page - 1) * $limit, $limit)->values();
+
+        return $this->respondWithPaginatedCollection($paginated->toArray(), $total, $page, $limit);
+    }
+
+    /** POST /api/v2/jobs/{id}/ai-chat — AI chat about a specific job vacancy. */
+    public function aiJobChat(int $id): JsonResponse
+    {
+        $userId = $this->requireAuth();
+        $tenantId = TenantContext::getId();
+
+        $vacancy = \App\Models\JobVacancy::where('tenant_id', $tenantId)->find($id);
+        if (!$vacancy) return $this->respondWithError('NOT_FOUND', 'Job not found', null, 404);
+
+        if (!\App\Services\AI\AIServiceFactory::isEnabled()) {
+            return $this->respondWithError('AI_DISABLED', 'AI is not configured', null, 503);
+        }
+
+        $data = $this->getJsonInput();
+        $userMessage = trim($data['message'] ?? '');
+        if (empty($userMessage)) {
+            return $this->respondWithError('VALIDATION_REQUIRED', 'Message is required', 'message', 422);
+        }
+
+        // Build job context for the system prompt
+        $jobContext = "Job Title: {$vacancy->title}\n"
+            . "Type: {$vacancy->type}\n"
+            . "Commitment: {$vacancy->commitment}\n"
+            . "Location: " . ($vacancy->location ?? 'Not specified') . "\n"
+            . "Remote: " . ($vacancy->is_remote ? 'Yes' : 'No') . "\n"
+            . "Skills Required: " . ($vacancy->skills_required ?? 'Not specified') . "\n"
+            . "Salary: " . ($vacancy->salary_min ? "$" . number_format($vacancy->salary_min) . " - $" . number_format($vacancy->salary_max ?? 0) : 'Not disclosed') . "\n"
+            . "Description:\n" . substr($vacancy->description ?? '', 0, 1500);
+
+        // Get user's profile for personalized advice
+        $user = \App\Models\User::find($userId);
+        $userContext = '';
+        if ($user) {
+            $userContext = "\n\nAbout the user asking:\n"
+                . "Skills: " . ($user->skills ?? 'Not listed') . "\n"
+                . "Bio: " . substr($user->bio ?? '', 0, 300);
+        }
+
+        $systemPrompt = "You are a friendly, expert career advisor for a community timebanking platform called Project NEXUS. "
+            . "You are helping a community member learn about a specific job opportunity and prepare their application.\n\n"
+            . "JOB DETAILS:\n{$jobContext}\n"
+            . $userContext . "\n\n"
+            . "Guidelines:\n"
+            . "- Be encouraging and supportive\n"
+            . "- Give specific, actionable advice based on the actual job details\n"
+            . "- If the user asks about qualifications, compare their skills to the requirements\n"
+            . "- Help them craft application messages if asked\n"
+            . "- Keep responses concise (under 300 words)\n"
+            . "- If asked about salary, discuss what's listed; if undisclosed, suggest researching market rates\n"
+            . "- Mention relevant community aspects (timebanking, volunteering) when appropriate";
+
+        // Include conversation history if provided
+        $messages = [['role' => 'system', 'content' => $systemPrompt]];
+        $history = $data['history'] ?? [];
+        if (is_array($history)) {
+            foreach (array_slice($history, -6) as $msg) {
+                if (isset($msg['role'], $msg['content']) && in_array($msg['role'], ['user', 'assistant'])) {
+                    $messages[] = ['role' => $msg['role'], 'content' => $msg['content']];
+                }
+            }
+        }
+        $messages[] = ['role' => 'user', 'content' => $userMessage];
+
+        try {
+            $response = \App\Services\AI\AIServiceFactory::chatWithFallback(
+                $messages,
+                ['temperature' => 0.7, 'max_tokens' => 800]
+            );
+
+            return $this->respondWithData([
+                'reply' => $response['content'] ?? $response['message'] ?? '',
+                'provider' => $response['provider'] ?? 'unknown',
+            ]);
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::error('aiJobChat failed', ['error' => $e->getMessage()]);
+            return $this->respondWithError('AI_ERROR', 'AI chat failed', null, 500);
+        }
+    }
+
+    /** GET /api/v2/jobs/{id}/predictions — AI-powered predictions for a job vacancy. */
+    public function predictions(int $id): JsonResponse
+    {
+        $userId = $this->requireAuth();
+        $tenantId = TenantContext::getId();
+
+        $vacancy = \App\Models\JobVacancy::where('tenant_id', $tenantId)->find($id);
+        if (!$vacancy) return $this->respondWithError('NOT_FOUND', 'Job not found', null, 404);
+
+        // Must be owner or admin
+        if ((int) $vacancy->user_id !== $userId) {
+            $user = \App\Models\User::find($userId);
+            if (!$user || !in_array($user->role, ['admin', 'super_admin'])) {
+                return $this->respondWithError('FORBIDDEN', 'Access denied', null, 403);
+            }
+        }
+
+        // Gather historical data for similar jobs
+        $similarJobs = \App\Models\JobVacancy::where('tenant_id', $tenantId)
+            ->where('id', '!=', $id)
+            ->where('type', $vacancy->type)
+            ->where('status', 'filled')
+            ->select('id', 'applications_count', 'views_count', 'created_at', 'updated_at')
+            ->limit(50)
+            ->get();
+
+        $avgApplications = $similarJobs->avg('applications_count') ?: 0;
+        $avgViews = $similarJobs->avg('views_count') ?: 0;
+        $avgDaysToFill = $similarJobs->count() > 0
+            ? $similarJobs->avg(fn($j) => $j->created_at->diffInDays($j->updated_at))
+            : null;
+
+        // Current job metrics
+        $currentApps = $vacancy->applications_count ?? 0;
+        $currentViews = $vacancy->views_count ?? 0;
+        $daysPosted = $vacancy->created_at ? now()->diffInDays($vacancy->created_at) : 0;
+
+        // Conversion rate (applications/views) for this job vs average
+        $currentConversion = $currentViews > 0 ? round(($currentApps / $currentViews) * 100, 1) : 0;
+        $avgConversion = $avgViews > 0 ? round(($avgApplications / $avgViews) * 100, 1) : 0;
+
+        // Salary comparison
+        $avgSalary = \App\Models\JobVacancy::where('tenant_id', $tenantId)
+            ->where('type', $vacancy->type)
+            ->whereNotNull('salary_min')
+            ->where('salary_min', '>', 0)
+            ->avg('salary_min');
+
+        $salaryComparison = null;
+        if ($avgSalary && $vacancy->salary_min) {
+            $diff = round((($vacancy->salary_min - $avgSalary) / $avgSalary) * 100, 0);
+            $salaryComparison = [
+                'your_salary' => $vacancy->salary_min,
+                'market_avg' => round($avgSalary, 0),
+                'diff_percent' => $diff,
+                'label' => $diff > 0 ? 'above average' : ($diff < 0 ? 'below average' : 'at average'),
+            ];
+        }
+
+        // Build predictions
+        $predictions = [
+            'expected_applications' => [
+                'value' => max(1, round($avgApplications)),
+                'current' => $currentApps,
+                'label' => $currentApps >= $avgApplications ? 'Above average' : 'Below average',
+            ],
+            'estimated_time_to_fill' => [
+                'value' => $avgDaysToFill ? round($avgDaysToFill) : null,
+                'days_posted' => $daysPosted,
+                'label' => $avgDaysToFill ? round($avgDaysToFill) . ' days (based on ' . $similarJobs->count() . ' similar jobs)' : 'Insufficient data',
+            ],
+            'conversion_rate' => [
+                'yours' => $currentConversion,
+                'average' => $avgConversion,
+                'label' => $currentConversion > $avgConversion ? 'Above average' : 'Below average',
+            ],
+            'salary_comparison' => $salaryComparison,
+            'similar_jobs_analyzed' => $similarJobs->count(),
+        ];
+
+        // If AI is enabled, generate narrative insights
+        if (\App\Services\AI\AIServiceFactory::isEnabled()) {
+            try {
+                $prompt = "Given these job posting metrics, write 3 brief, actionable insights (1 sentence each) as a JSON array of strings:\n\n"
+                    . "Job: {$vacancy->title} ({$vacancy->type})\n"
+                    . "Days posted: {$daysPosted}\n"
+                    . "Applications: {$currentApps} (avg for similar: " . round($avgApplications) . ")\n"
+                    . "Views: {$currentViews} (avg: " . round($avgViews) . ")\n"
+                    . "Conversion: {$currentConversion}% (avg: {$avgConversion}%)\n"
+                    . ($salaryComparison ? "Salary: {$salaryComparison['diff_percent']}% " . $salaryComparison['label'] . "\n" : "")
+                    . "Similar filled jobs analyzed: " . $similarJobs->count() . "\n\n"
+                    . "Return ONLY a JSON array of 3 strings. No markdown.";
+
+                $aiRes = \App\Services\AI\AIServiceFactory::chatWithFallback(
+                    [['role' => 'user', 'content' => $prompt]],
+                    ['temperature' => 0.5, 'max_tokens' => 300]
+                );
+
+                $content = $aiRes['content'] ?? '';
+                if (preg_match('/\[[\s\S]*\]/', $content, $m)) {
+                    $insights = json_decode($m[0], true);
+                    if (is_array($insights)) {
+                        $predictions['ai_insights'] = $insights;
+                    }
+                }
+            } catch (\Throwable $e) {
+                // Non-fatal — predictions still work without AI insights
+            }
+        }
+
+        return $this->respondWithData($predictions);
+    }
 }

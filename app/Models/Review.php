@@ -20,8 +20,9 @@ class Review extends Model
     protected $table = 'reviews';
 
     protected $fillable = [
-        'reviewer_id', 'receiver_id', 'transaction_id',
+        'tenant_id', 'reviewer_id', 'receiver_id', 'transaction_id',
         'group_id', 'rating', 'comment', 'status',
+        'review_type', 'dimensions',
     ];
 
     /**
@@ -31,6 +32,7 @@ class Review extends Model
 
     protected $casts = [
         'rating' => 'integer',
+        'dimensions' => 'array',
     ];
 
     public function reviewer(): BelongsTo

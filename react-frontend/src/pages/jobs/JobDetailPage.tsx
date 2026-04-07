@@ -45,6 +45,7 @@ import {
   DropdownTrigger,
   DropdownMenu,
   DropdownItem,
+  Spinner,
 } from '@heroui/react';
 import {
   Briefcase,
@@ -89,6 +90,7 @@ import {
   CalendarClock,
   Globe,
   Copy,
+  Send,
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
@@ -406,6 +408,12 @@ export function JobDetailPage() {
 
   // Similar jobs
   const [similarJobs, setSimilarJobs] = useState<JobVacancy[]>([]);
+
+  // AI Job Chat
+  const [aiChatOpen, setAiChatOpen] = useState(false);
+  const [aiChatMessages, setAiChatMessages] = useState<Array<{role: 'user' | 'assistant'; content: string}>>([]);
+  const [aiChatInput, setAiChatInput] = useState('');
+  const [aiChatLoading, setAiChatLoading] = useState(false);
 
   // Inline interview/offer response (GAP 1)
   const [pendingInterview, setPendingInterview] = useState<InlineInterview | null>(null);
@@ -836,6 +844,30 @@ export function JobDetailPage() {
     }
   };
 
+  const handleAiChat = useCallback(async () => {
+    if (!id || !aiChatInput.trim() || aiChatLoading) return;
+    const userMsg = aiChatInput.trim();
+    setAiChatInput('');
+    setAiChatMessages(prev => [...prev, { role: 'user', content: userMsg }]);
+    setAiChatLoading(true);
+    try {
+      const res = await api.post(`/v2/jobs/${id}/ai-chat`, {
+        message: userMsg,
+        history: aiChatMessages,
+      });
+      if (res.success && res.data) {
+        const data = res.data as { reply: string };
+        setAiChatMessages(prev => [...prev, { role: 'assistant', content: data.reply }]);
+      } else {
+        setAiChatMessages(prev => [...prev, { role: 'assistant', content: 'Sorry, I could not process your request.' }]);
+      }
+    } catch {
+      setAiChatMessages(prev => [...prev, { role: 'assistant', content: 'Sorry, something went wrong.' }]);
+    } finally {
+      setAiChatLoading(false);
+    }
+  }, [id, aiChatInput, aiChatLoading, aiChatMessages]);
+
   // Feature 4: Load pipeline rules
   const loadPipelineRules = useCallback(async () => {
     if (!id) return;
@@ -919,6 +951,7 @@ export function JobDetailPage() {
   };
 
   return (
+    <>
     <main className="space-y-6">
       <PageMeta
         title={vacancy.title}
@@ -2269,6 +2302,72 @@ export function JobDetailPage() {
         </div>
       )}
     </main>
+
+    {/* AI Chat Drawer */}
+    {isAuthenticated && vacancy && !isOwner && (
+      <>
+        <Button
+          isIconOnly
+          color="secondary"
+          variant="shadow"
+          size="lg"
+          className="fixed bottom-6 right-6 z-40 rounded-full shadow-lg"
+          onPress={() => setAiChatOpen(true)}
+          aria-label={t('ai_chat.open', { defaultValue: 'Ask AI about this job' })}
+        >
+          <Sparkles size={22} />
+        </Button>
+        {aiChatOpen && (
+          <div className="fixed bottom-0 right-0 z-50 w-full max-w-md h-[500px] bg-background border-l border-t border-divider rounded-tl-2xl shadow-2xl flex flex-col">
+            <div className="flex items-center justify-between p-4 border-b border-divider">
+              <div className="flex items-center gap-2">
+                <Sparkles size={18} className="text-secondary" />
+                <span className="font-semibold text-sm">{t('ai_chat.title', { defaultValue: 'Ask AI about this job' })}</span>
+              </div>
+              <Button isIconOnly size="sm" variant="light" onPress={() => setAiChatOpen(false)}>
+                <X size={16} />
+              </Button>
+            </div>
+            <div className="flex-1 overflow-y-auto p-4 space-y-3">
+              {aiChatMessages.length === 0 && (
+                <div className="text-center text-default-400 text-sm py-8">
+                  <Sparkles size={24} className="mx-auto mb-2 text-secondary" />
+                  <p>{t('ai_chat.hint', { defaultValue: 'Ask me anything about this job — qualifications, salary, how to apply, interview tips...' })}</p>
+                </div>
+              )}
+              {aiChatMessages.map((msg, i) => (
+                <div key={i} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
+                  <div className={`max-w-[85%] rounded-2xl px-4 py-2.5 text-sm ${msg.role === 'user' ? 'bg-primary text-primary-foreground' : 'bg-default-100 text-foreground'}`}>
+                    {msg.content}
+                  </div>
+                </div>
+              ))}
+              {aiChatLoading && (
+                <div className="flex justify-start">
+                  <div className="bg-default-100 rounded-2xl px-4 py-2.5">
+                    <Spinner size="sm" />
+                  </div>
+                </div>
+              )}
+            </div>
+            <div className="p-3 border-t border-divider flex gap-2">
+              <Input
+                size="sm"
+                placeholder={t('ai_chat.placeholder', { defaultValue: 'Type your question...' })}
+                value={aiChatInput}
+                onValueChange={setAiChatInput}
+                onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleAiChat(); } }}
+                className="flex-1"
+              />
+              <Button isIconOnly size="sm" color="primary" onPress={handleAiChat} isDisabled={!aiChatInput.trim() || aiChatLoading}>
+                <Send size={14} />
+              </Button>
+            </div>
+          </div>
+        )}
+      </>
+    )}
+    </>
   );
 
   function renderApplySection() {

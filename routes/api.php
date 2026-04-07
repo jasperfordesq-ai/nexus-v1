@@ -350,6 +350,11 @@ Route::get('/v2/users/me/match-preferences', [\App\Http\Controllers\Api\MatchPre
 Route::put('/v2/users/me/match-preferences', [\App\Http\Controllers\Api\MatchPreferencesController::class, 'update']);
 Route::get('/v2/users/me/insurance', [\App\Http\Controllers\Api\UserInsuranceController::class, 'list']);
 Route::post('/v2/users/me/insurance', [\App\Http\Controllers\Api\UserInsuranceController::class, 'upload']);
+// Block users
+Route::get('/v2/users/blocked', [\App\Http\Controllers\Api\BlockUserController::class, 'index']);
+Route::post('/v2/users/{id}/block', [\App\Http\Controllers\Api\BlockUserController::class, 'block']);
+Route::delete('/v2/users/{id}/block', [\App\Http\Controllers\Api\BlockUserController::class, 'unblock']);
+Route::get('/v2/users/{id}/block-status', [\App\Http\Controllers\Api\BlockUserController::class, 'status']);
 Route::get('/v2/users/{id}', [\App\Http\Controllers\Api\UsersController::class, 'show']);
 Route::get('/v2/users/{id}/listings', [\App\Http\Controllers\Api\UsersController::class, 'listings']);
 Route::get('/v2/members/nearby', [\App\Http\Controllers\Api\UsersController::class, 'nearby']);
@@ -553,6 +558,9 @@ Route::post('/v2/jobs/alerts', [\App\Http\Controllers\Api\JobVacanciesController
 Route::delete('/v2/jobs/alerts/{id}', [\App\Http\Controllers\Api\JobVacanciesController::class, 'deleteAlert']);
 Route::put('/v2/jobs/alerts/{id}/unsubscribe', [\App\Http\Controllers\Api\JobVacanciesController::class, 'unsubscribeAlert']);
 Route::put('/v2/jobs/alerts/{id}/resubscribe', [\App\Http\Controllers\Api\JobVacanciesController::class, 'resubscribeAlert']);
+// Employer reviews
+Route::get('/v2/jobs/employer-reviews/{userId}', [\App\Http\Controllers\Api\JobVacanciesController::class, 'employerReviews'])->withoutMiddleware('auth:sanctum');
+Route::post('/v2/jobs/employer-reviews', [\App\Http\Controllers\Api\JobVacanciesController::class, 'createEmployerReview']);
 // Saved profile — static literal routes BEFORE {id} wildcard
 Route::get('/v2/jobs/saved-profile', [\App\Http\Controllers\Api\JobVacanciesController::class, 'getSavedProfile']);
 Route::put('/v2/jobs/saved-profile', [\App\Http\Controllers\Api\JobVacanciesController::class, 'saveSavedProfile']);
@@ -604,6 +612,9 @@ Route::post('/v2/jobs/applications/{id}/interview', [\App\Http\Controllers\Api\J
 Route::put('/v2/jobs/interviews/{id}/accept', [\App\Http\Controllers\Api\JobVacanciesController::class, 'acceptInterview']);
 Route::put('/v2/jobs/interviews/{id}/decline', [\App\Http\Controllers\Api\JobVacanciesController::class, 'declineInterview']);
 Route::delete('/v2/jobs/interviews/{id}', [\App\Http\Controllers\Api\JobVacanciesController::class, 'cancelInterview']);
+// Interview calendar export
+Route::get('/v2/jobs/interviews/{interviewId}/calendar', [\App\Http\Controllers\Api\JobVacanciesController::class, 'interviewCalendar']);
+Route::get('/v2/jobs/interviews/{interviewId}/calendar-links', [\App\Http\Controllers\Api\JobVacanciesController::class, 'interviewCalendarLinks']);
 Route::get('/v2/jobs/{id}/interviews', [\App\Http\Controllers\Api\JobVacanciesController::class, 'getInterviews']);
 // Offers
 Route::post('/v2/jobs/applications/{id}/offer', [\App\Http\Controllers\Api\JobVacanciesController::class, 'createOffer']);
@@ -630,6 +641,10 @@ Route::post('/v2/jobs/{id}/interview-slots/bulk', [\App\Http\Controllers\Api\Job
 Route::post('/v2/jobs/interview-slots/{slotId}/book', [\App\Http\Controllers\Api\JobVacanciesController::class, 'bookInterviewSlot']);
 Route::delete('/v2/jobs/interview-slots/{slotId}/book', [\App\Http\Controllers\Api\JobVacanciesController::class, 'cancelInterviewSlotBooking']);
 Route::delete('/v2/jobs/interview-slots/{slotId}', [\App\Http\Controllers\Api\JobVacanciesController::class, 'deleteInterviewSlot']);
+// Job audit trail
+Route::get('/v2/jobs/{id}/audit-trail', [\App\Http\Controllers\Api\JobVacanciesController::class, 'auditTrail']);
+Route::post('/v2/jobs/{id}/ai-chat', [\App\Http\Controllers\Api\JobVacanciesController::class, 'aiJobChat']);
+Route::get('/v2/jobs/{id}/predictions', [\App\Http\Controllers\Api\JobVacanciesController::class, 'predictions']);
 Route::get('/v2/ideation-challenges', [\App\Http\Controllers\Api\IdeationChallengesController::class, 'index'])->withoutMiddleware('auth:sanctum');
 Route::post('/v2/ideation-challenges', [\App\Http\Controllers\Api\IdeationChallengesController::class, 'store']);
 Route::get('/v2/ideation-ideas/{id}', [\App\Http\Controllers\Api\IdeationChallengesController::class, 'showIdea']);
