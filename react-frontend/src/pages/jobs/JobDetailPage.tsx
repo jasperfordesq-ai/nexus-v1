@@ -100,7 +100,7 @@ import { SafeHtml } from '@/components/ui/SafeHtml';
 import { PageMeta } from '@/components/seo/PageMeta';
 import { EmptyState } from '@/components/feedback';
 import { useAuth, useToast, useTenant } from '@/contexts';
-import { api } from '@/lib/api';
+import { api, API_BASE } from '@/lib/api';
 import { logError } from '@/lib/logger';
 import { usePageTitle } from '@/hooks';
 import { resolveAvatarUrl } from '@/lib/helpers';
@@ -881,10 +881,10 @@ export function JobDetailPage() {
         const data = res.data as { reply: string };
         setAiChatMessages(prev => [...prev, { role: 'assistant', content: data.reply }]);
       } else {
-        setAiChatMessages(prev => [...prev, { role: 'assistant', content: 'Sorry, I could not process your request.' }]);
+        setAiChatMessages(prev => [...prev, { role: 'assistant', content: tRef.current('ai_chat.error_response', 'Sorry, I could not process your request.') }]);
       }
     } catch {
-      setAiChatMessages(prev => [...prev, { role: 'assistant', content: 'Sorry, something went wrong.' }]);
+      setAiChatMessages(prev => [...prev, { role: 'assistant', content: tRef.current('ai_chat.error_generic', 'Sorry, something went wrong.') }]);
     } finally {
       setAiChatLoading(false);
     }
@@ -1374,7 +1374,7 @@ export function JobDetailPage() {
                       size="sm"
                       variant="flat"
                       as="a"
-                      href={`/api/v2/jobs/interviews/${pendingInterview.id}/calendar`}
+                      href={`${API_BASE}/v2/jobs/interviews/${pendingInterview.id}/calendar`}
                       download="interview.ics"
                       startContent={<CalendarPlus className="w-3.5 h-3.5" />}
                     >
@@ -1958,7 +1958,7 @@ export function JobDetailPage() {
                   )}
                   {usingSavedProfile && savedProfile?.cv_filename && (
                     <Chip size="sm" variant="flat" color="primary">
-                      Saved CV: {savedProfile.cv_filename}
+                      {t('saved_profile.cv_label', { defaultValue: 'Saved CV: {{filename}}', filename: savedProfile.cv_filename })}
                     </Chip>
                   )}
 

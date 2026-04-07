@@ -427,7 +427,7 @@ export function JobAnalyticsPage() {
                 <p className="text-xs text-default-500 uppercase tracking-wide">{t('analytics.expected_apps', { defaultValue: 'Expected Applications' })}</p>
                 <p className="text-2xl font-bold text-foreground mt-1">{predictions.expected_applications.value}</p>
                 <p className="text-xs mt-1">
-                  <span className="text-default-400">Current: {predictions.expected_applications.current}</span>
+                  <span className="text-default-400">{t('analytics.current', { defaultValue: 'Current' })}: {predictions.expected_applications.current}</span>
                   {' · '}
                   <Chip size="sm" variant="flat" color={predictions.expected_applications.current >= predictions.expected_applications.value ? 'success' : 'warning'}>
                     {predictions.expected_applications.label}
@@ -438,14 +438,14 @@ export function JobAnalyticsPage() {
               <div className="p-4 rounded-lg bg-default-50 border border-default-200">
                 <p className="text-xs text-default-500 uppercase tracking-wide">{t('analytics.time_to_fill', { defaultValue: 'Est. Time to Fill' })}</p>
                 <p className="text-2xl font-bold text-foreground mt-1">{predictions.estimated_time_to_fill.value ? `${predictions.estimated_time_to_fill.value}d` : 'N/A'}</p>
-                <p className="text-xs text-default-400 mt-1">Posted {predictions.estimated_time_to_fill.days_posted} days ago</p>
+                <p className="text-xs text-default-400 mt-1">{t('analytics.posted_days_ago', { defaultValue: 'Posted {{days}} days ago', days: predictions.estimated_time_to_fill.days_posted })}</p>
               </div>
 
               <div className="p-4 rounded-lg bg-default-50 border border-default-200">
                 <p className="text-xs text-default-500 uppercase tracking-wide">{t('analytics.conversion_comparison', { defaultValue: 'Conversion Rate' })}</p>
                 <p className="text-2xl font-bold text-foreground mt-1">{predictions.conversion_rate.yours}%</p>
                 <p className="text-xs mt-1">
-                  <span className="text-default-400">Avg: {predictions.conversion_rate.average}%</span>
+                  <span className="text-default-400">{t('analytics.avg', { defaultValue: 'Avg' })}: {predictions.conversion_rate.average}%</span>
                   {' · '}
                   <Chip size="sm" variant="flat" color={predictions.conversion_rate.yours >= predictions.conversion_rate.average ? 'success' : 'warning'}>
                     {predictions.conversion_rate.label}
@@ -460,12 +460,12 @@ export function JobAnalyticsPage() {
                 <p className="text-xs text-default-500 uppercase tracking-wide mb-2">{t('analytics.salary_comparison', { defaultValue: 'Salary vs Market' })}</p>
                 <div className="flex items-center gap-4">
                   <div>
-                    <p className="text-sm text-default-500">Yours</p>
+                    <p className="text-sm text-default-500">{t('analytics.yours', { defaultValue: 'Yours' })}</p>
                     <p className="text-lg font-bold">{predictions.salary_comparison.your_salary.toLocaleString()}</p>
                   </div>
                   <div className="text-default-300">vs</div>
                   <div>
-                    <p className="text-sm text-default-500">Market Avg</p>
+                    <p className="text-sm text-default-500">{t('analytics.market_avg', { defaultValue: 'Market Avg' })}</p>
                     <p className="text-lg font-bold">{predictions.salary_comparison.market_avg.toLocaleString()}</p>
                   </div>
                   <Chip size="sm" variant="flat" color={predictions.salary_comparison.diff_percent >= 0 ? 'success' : 'danger'}>

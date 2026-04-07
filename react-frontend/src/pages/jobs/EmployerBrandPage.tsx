@@ -160,11 +160,11 @@ export function EmployerBrandPage() {
         setReviewComment('');
         loadReviews();
       } else {
-        setReviewError((res as { error?: string }).error ?? 'Failed to submit review');
+        setReviewError((res as { error?: string }).error ?? t('employer.review_submit_failed', { defaultValue: 'Failed to submit review' }));
       }
     } catch (err) {
       logError('EmployerBrandPage: review submit failed', err);
-      setReviewError('Failed to submit review');
+      setReviewError(t('employer.review_submit_failed', { defaultValue: 'Failed to submit review' }));
     } finally {
       setSubmittingReview(false);
     }

@@ -598,11 +598,11 @@ export function JobKanbanPage() {
         setScorecardModalApp(null);
         setScorecardNotes('');
         setScorecardCriteria([
-          { label: 'Communication', score: 5 },
-          { label: 'Technical Skills', score: 5 },
-          { label: 'Cultural Fit', score: 5 },
-          { label: 'Experience', score: 5 },
-          { label: 'Motivation', score: 5 },
+          { label: tRef.current('scorecard.communication', 'Communication'), score: 5 },
+          { label: tRef.current('scorecard.technical', 'Technical Skills'), score: 5 },
+          { label: tRef.current('scorecard.cultural_fit', 'Cultural Fit'), score: 5 },
+          { label: tRef.current('scorecard.experience', 'Experience'), score: 5 },
+          { label: tRef.current('scorecard.motivation', 'Motivation'), score: 5 },
         ]);
       } else {
         toastRef.current.error(tRef.current('detail.status_update_error'));
