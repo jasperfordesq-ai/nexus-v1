@@ -52,9 +52,9 @@ interface HoverCardData {
   skills?: string[];
   interests?: string[];
   stats?: {
-    hours_given: number;
-    connections_count: number;
-    listings_count: number;
+    total_hours_given?: number;
+    connections_count?: number;
+    listings_count?: number;
   };
   connection_status?: 'none' | 'pending' | 'connected';
 }
@@ -98,7 +98,7 @@ export const UserHoverCard = memo(function UserHoverCard({
 
     setIsLoading(true);
     try {
-      const response = await api.get<HoverCardData>(`/v2/users/${userId}/profile`);
+      const response = await api.get<HoverCardData>(`/v2/users/${userId}`);
       if (response.success && response.data) {
         userCache.set(userId, response.data);
         setUserData(response.data);
@@ -175,7 +175,7 @@ export const UserHoverCard = memo(function UserHoverCard({
   const displayName = userData?.name || userData?.first_name || '';
   const avatarSrc = resolveAvatarUrl(userData?.avatar_url || userData?.avatar);
   const skills = userData?.skills?.slice(0, 4) || [];
-  const hoursGiven = userData?.stats?.hours_given ?? 0;
+  const hoursGiven = userData?.stats?.total_hours_given ?? 0;
   const connectionsCount = userData?.stats?.connections_count ?? 0;
   const listingsCount = userData?.stats?.listings_count ?? 0;
 
