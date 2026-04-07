@@ -78,10 +78,9 @@ class StripeIdentityProvider implements IdentityVerificationProviderInterface
             $params['options']['document']['allowed_types'] = ['driving_license', 'passport', 'id_card'];
         }
 
-        // Pass user details for name/DOB matching against the document
-        if (!empty($metadata['provided_details'])) {
-            $params['provided_details'] = $metadata['provided_details'];
-        }
+        // TODO: Pass provided_details for name/DOB matching once correct Stripe API
+        // parameter is confirmed. Stripe API version 2024-12-18.acacia rejects
+        // 'provided_details[name]' — needs investigation of correct param format.
 
         // Return URL after hosted verification
         $frontendUrl = \App\Core\TenantContext::getFrontendUrl();
