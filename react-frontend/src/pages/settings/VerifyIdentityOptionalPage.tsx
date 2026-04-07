@@ -6,15 +6,14 @@
 /**
  * VerifyIdentityOptionalPage — Voluntary identity verification for active members.
  *
- * Accessible from the utility bar "Verify Identity" button.
- * On success, the user earns an "ID Verified" badge on their profile.
- * Uses Stripe Identity for document + selfie verification.
+ * Flow: DOB collection → Payment (if fee > 0) → Stripe Identity → Badge granted.
+ * Payment is one-time per tenant. Retries after failure skip DOB and payment steps.
  */
 
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Button, Spinner } from '@heroui/react';
+import { Button, Spinner, Input } from '@heroui/react';
 import {
   ShieldCheck,
   ShieldX,
@@ -24,15 +23,22 @@ import {
   Loader2,
   RefreshCw,
   BadgeCheck,
+  CalendarDays,
+  CreditCard,
 } from 'lucide-react';
 import { GlassCard } from '@/components/ui';
 import { PageMeta } from '@/components/seo';
 import { useTenant, useAuth } from '@/contexts';
 import { usePageTitle } from '@/hooks';
 import { api } from '@/lib/api';
+import { StripePaymentForm } from '@/components/donations/StripePaymentForm';
 
 interface VerificationStatusResponse {
   has_id_verified_badge: boolean;
+  user_has_dob: boolean;
+  fee_cents: number;
+  fee_currency: string;
+  payment_completed: boolean;
   verification_status: string | null;
   latest_session: {
     id: number;
@@ -51,10 +57,9 @@ interface StartVerificationResponse {
   expires_at?: string | null;
   status?: string;
   already_verified?: boolean;
-  message?: string;
 }
 
-type PageState = 'loading' | 'start' | 'in_progress' | 'verified' | 'failed' | 'error';
+type PageState = 'loading' | 'dob_collection' | 'payment_required' | 'start' | 'in_progress' | 'verified' | 'failed' | 'error';
 
 export function VerifyIdentityOptionalPage() {
   usePageTitle('Verify Identity');
@@ -67,8 +72,13 @@ export function VerifyIdentityOptionalPage() {
   const [failureReason, setFailureReason] = useState<string | null>(null);
   const [errorMessage, setErrorMessage] = useState('');
   const [isStarting, setIsStarting] = useState(false);
+  const [feeCents, setFeeCents] = useState(0);
+  const [dob, setDob] = useState('');
+  const [isSavingDob, setIsSavingDob] = useState(false);
+  const [clientSecret, setClientSecret] = useState<string | null>(null);
+  const [isCreatingPayment, setIsCreatingPayment] = useState(false);
   const pollRef = useRef<ReturnType<typeof setInterval> | null>(null);
-  const userStartedRef = useRef(false); // Tracks if user clicked "Start Verification" this session
+  const userStartedRef = useRef(false);
 
   const stopPolling = useCallback(() => {
     if (pollRef.current) {
@@ -83,6 +93,7 @@ export function VerifyIdentityOptionalPage() {
       if (!response.success || !response.data) return;
 
       const data = response.data;
+      setFeeCents(data.fee_cents || 0);
 
       if (data.has_id_verified_badge) {
         setPageState('verified');
@@ -98,10 +109,8 @@ export function VerifyIdentityOptionalPage() {
         setPageState('in_progress');
       } else if (sessionStatus === 'created') {
         if (userStartedRef.current) {
-          // User already clicked start — keep showing in_progress while Stripe loads
           setPageState('in_progress');
         } else {
-          // Initial page load with a stale created session — let them start fresh
           setPageState('start');
         }
       } else if (sessionStatus === 'failed') {
@@ -109,7 +118,14 @@ export function VerifyIdentityOptionalPage() {
         setPageState('failed');
         stopPolling();
       } else {
-        setPageState('start');
+        // No active session — check prerequisites
+        if (!data.user_has_dob) {
+          setPageState('dob_collection');
+        } else if (data.fee_cents > 0 && !data.payment_completed) {
+          setPageState('payment_required');
+        } else {
+          setPageState('start');
+        }
       }
     } catch {
       setPageState('error');
@@ -128,6 +144,61 @@ export function VerifyIdentityOptionalPage() {
     return stopPolling;
   }, [isAuthenticated, fetchStatus, stopPolling]);
 
+  // ─── Handlers ──────────────────────────────────────────────────────
+
+  const handleSaveDob = async () => {
+    if (!dob) { setErrorMessage('Please enter your date of birth.'); return; }
+    setIsSavingDob(true);
+    setErrorMessage('');
+    try {
+      const response = await api.post('/v2/identity/save-dob', { date_of_birth: dob });
+      if (!response.success) {
+        setErrorMessage((response as any)?.errors?.[0]?.message || 'Failed to save date of birth.');
+        return;
+      }
+      // Re-fetch status to advance to next step
+      await fetchStatus();
+    } catch {
+      setErrorMessage('Failed to save date of birth. Please try again.');
+    } finally {
+      setIsSavingDob(false);
+    }
+  };
+
+  const handleCreatePayment = async () => {
+    setIsCreatingPayment(true);
+    setErrorMessage('');
+    try {
+      const response = await api.post<{ client_secret: string }>('/v2/identity/create-payment');
+      if (!response.success) {
+        const data = response as any;
+        if (data?.data?.already_paid || data?.data?.payment_required === false) {
+          await fetchStatus(); // Skip to next step
+          return;
+        }
+        setErrorMessage(data?.errors?.[0]?.message || 'Failed to create payment.');
+        return;
+      }
+      if (response.data?.client_secret) {
+        setClientSecret(response.data.client_secret);
+      }
+    } catch {
+      setErrorMessage('Failed to create payment. Please try again.');
+    } finally {
+      setIsCreatingPayment(false);
+    }
+  };
+
+  const handlePaymentSuccess = () => {
+    setClientSecret(null);
+    // Re-fetch status — payment_completed will now be true
+    fetchStatus();
+  };
+
+  const handlePaymentError = (error: string) => {
+    setErrorMessage(error);
+  };
+
   const handleStartVerification = async () => {
     setIsStarting(true);
     setErrorMessage('');
@@ -135,17 +206,15 @@ export function VerifyIdentityOptionalPage() {
     try {
       const response = await api.post<StartVerificationResponse>('/v2/identity/start');
       if (!response.success) {
-        // API returned an error (rate limit, server error, etc.)
-        const msg = (response as any)?.errors?.[0]?.message || 'Unable to start verification. Please try again later.';
-        setErrorMessage(msg);
+        const errCode = (response as any)?.errors?.[0]?.code;
+        if (errCode === 'DOB_REQUIRED') { setPageState('dob_collection'); return; }
+        if (errCode === 'PAYMENT_REQUIRED') { setPageState('payment_required'); return; }
+        setErrorMessage((response as any)?.errors?.[0]?.message || 'Unable to start verification.');
         userStartedRef.current = false;
         return;
       }
       if (response.data) {
-        if (response.data.already_verified) {
-          setPageState('verified');
-          return;
-        }
+        if (response.data.already_verified) { setPageState('verified'); return; }
         if (response.data.redirect_url) {
           setRedirectUrl(response.data.redirect_url);
           setPageState('in_progress');
@@ -163,27 +232,26 @@ export function VerifyIdentityOptionalPage() {
     }
   };
 
+  // ─── Render ────────────────────────────────────────────────────────
+
   if (!isAuthenticated) {
     return (
       <div className="min-h-[60vh] flex items-center justify-center p-4">
         <GlassCard className="p-8 text-center max-w-md">
           <p className="text-theme-muted mb-4">Please log in to verify your identity.</p>
-          <Link to={tenantPath('/login')}>
-            <Button color="primary">Go to Login</Button>
-          </Link>
+          <Link to={tenantPath('/login')}><Button color="primary">Go to Login</Button></Link>
         </GlassCard>
       </div>
     );
   }
 
-  // Loading
   if (pageState === 'loading') {
     return (
       <div className="min-h-[60vh] flex items-center justify-center p-4">
         <PageMeta title="Verify Identity" noIndex />
         <GlassCard className="p-8 text-center max-w-md">
-          <div className="w-16 h-16 mx-auto mb-6 rounded-full bg-purple-500/20 flex items-center justify-center">
-            <Loader2 className="w-8 h-8 text-purple-400 animate-spin" />
+          <div className="w-16 h-16 mx-auto mb-6 rounded-full bg-emerald-500/20 flex items-center justify-center">
+            <Loader2 className="w-8 h-8 text-emerald-400 animate-spin" />
           </div>
           <h1 className="text-2xl font-bold text-theme-primary">Checking verification status...</h1>
         </GlassCard>
@@ -191,7 +259,6 @@ export function VerifyIdentityOptionalPage() {
     );
   }
 
-  // Already verified
   if (pageState === 'verified') {
     return (
       <div className="min-h-[60vh] flex items-center justify-center p-4">
@@ -203,29 +270,15 @@ export function VerifyIdentityOptionalPage() {
             </div>
             <h1 className="text-2xl font-bold text-theme-primary mb-2">Identity Verified</h1>
             <p className="text-theme-muted mb-2">
-              Your identity has been verified. The <strong className="text-purple-500">ID Verified</strong> badge
-              is now visible on your profile.
+              Your identity has been verified. The <strong className="text-emerald-600 dark:text-emerald-400">ID Verified</strong> badge is now visible on your profile.
             </p>
-            <div className="flex items-center justify-center gap-2 mt-4 mb-6 p-3 rounded-xl bg-purple-500/10 border border-purple-500/20">
-              <Fingerprint className="w-5 h-5 text-purple-500" />
-              <span className="text-sm font-medium text-purple-600 dark:text-purple-400">ID Verified</span>
+            <div className="flex items-center justify-center gap-2 mt-4 mb-6 p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/20">
+              <ShieldCheck className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
+              <span className="text-sm font-semibold text-emerald-700 dark:text-emerald-300">ID Verified</span>
             </div>
             <div className="flex flex-col gap-3">
-              <Button
-                color="primary"
-                className="w-full"
-                onPress={() => navigate(tenantPath('/settings'))}
-              >
-                Go to Settings
-              </Button>
-              <Button
-                variant="flat"
-                className="w-full"
-                startContent={<ArrowLeft className="w-4 h-4" />}
-                onPress={() => navigate(tenantPath('/dashboard'))}
-              >
-                Back to Dashboard
-              </Button>
+              <Button color="primary" className="w-full" onPress={() => navigate(tenantPath('/settings'))}>Go to Settings</Button>
+              <Button variant="flat" className="w-full" startContent={<ArrowLeft className="w-4 h-4" />} onPress={() => navigate(tenantPath('/dashboard'))}>Back to Dashboard</Button>
             </div>
           </GlassCard>
         </motion.div>
@@ -233,7 +286,6 @@ export function VerifyIdentityOptionalPage() {
     );
   }
 
-  // Failed
   if (pageState === 'failed') {
     return (
       <div className="min-h-[60vh] flex items-center justify-center p-4">
@@ -245,29 +297,13 @@ export function VerifyIdentityOptionalPage() {
             </div>
             <h1 className="text-2xl font-bold text-theme-primary mb-2">Verification Unsuccessful</h1>
             <p className="text-theme-muted mb-2">We were unable to verify your identity.</p>
-            {failureReason && (
-              <p className="text-red-600 dark:text-red-400 text-sm mb-4">{failureReason}</p>
-            )}
+            {failureReason && <p className="text-red-600 dark:text-red-400 text-sm mb-4">{failureReason}</p>}
             <p className="text-theme-subtle text-sm mb-6">
-              Please ensure your photo ID is clear, well-lit, and that your selfie matches the document photo.
+              Please ensure your photo ID is clear, well-lit, and that your name and date of birth match your profile.
             </p>
             <div className="flex flex-col gap-3">
-              <Button
-                onPress={handleStartVerification}
-                isLoading={isStarting}
-                className="w-full bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
-                startContent={!isStarting ? <RefreshCw className="w-4 h-4" /> : undefined}
-              >
-                Try Again
-              </Button>
-              <Button
-                variant="flat"
-                className="w-full"
-                startContent={<ArrowLeft className="w-4 h-4" />}
-                onPress={() => navigate(tenantPath('/dashboard'))}
-              >
-                Back to Dashboard
-              </Button>
+              <Button onPress={handleStartVerification} isLoading={isStarting} className="w-full bg-gradient-to-r from-indigo-500 to-purple-600 text-white" startContent={!isStarting ? <RefreshCw className="w-4 h-4" /> : undefined}>Try Again</Button>
+              <Button variant="flat" className="w-full" startContent={<ArrowLeft className="w-4 h-4" />} onPress={() => navigate(tenantPath('/dashboard'))}>Back to Dashboard</Button>
             </div>
           </GlassCard>
         </motion.div>
@@ -275,7 +311,6 @@ export function VerifyIdentityOptionalPage() {
     );
   }
 
-  // Error
   if (pageState === 'error') {
     return (
       <div className="min-h-[60vh] flex items-center justify-center p-4">
@@ -287,20 +322,126 @@ export function VerifyIdentityOptionalPage() {
             </div>
             <h1 className="text-2xl font-bold text-theme-primary mb-2">Something went wrong</h1>
             <p className="text-theme-muted mb-6">{errorMessage}</p>
-            <Button
-              onPress={() => { setPageState('loading'); fetchStatus(); }}
-              className="w-full bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
-              startContent={<RefreshCw className="w-4 h-4" />}
-            >
-              Try Again
-            </Button>
+            <Button onPress={() => { setPageState('loading'); fetchStatus(); }} className="w-full bg-gradient-to-r from-indigo-500 to-purple-600 text-white" startContent={<RefreshCw className="w-4 h-4" />}>Try Again</Button>
           </GlassCard>
         </motion.div>
       </div>
     );
   }
 
-  // Start / In-progress
+  // ─── DOB Collection ────────────────────────────────────────────────
+
+  if (pageState === 'dob_collection') {
+    return (
+      <div className="min-h-[60vh] flex items-center justify-center p-4">
+        <PageMeta title="Verify Identity — Date of Birth" noIndex />
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="w-full max-w-md">
+          <GlassCard className="p-5 sm:p-8">
+            <div className="text-center mb-6">
+              <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-indigo-500/20 to-emerald-500/20 mb-4">
+                <CalendarDays className="w-8 h-8 text-indigo-500 dark:text-indigo-400" />
+              </div>
+              <h1 className="text-xl sm:text-2xl font-bold text-theme-primary">Date of Birth</h1>
+              <p className="text-theme-muted mt-2">
+                We need your date of birth to verify it matches your government-issued ID.
+              </p>
+              <p className="text-xs text-theme-subtle mt-1">Step 1 of {feeCents > 0 ? '3' : '2'}</p>
+            </div>
+
+            {errorMessage && (
+              <div className="mb-4 p-3 rounded-xl bg-red-500/10 border border-red-500/20 text-sm text-red-600 dark:text-red-400">{errorMessage}</div>
+            )}
+
+            <div className="space-y-4">
+              <Input
+                type="date"
+                label="Date of Birth"
+                value={dob}
+                onChange={(e) => setDob(e.target.value)}
+                variant="bordered"
+                max={new Date().toISOString().split('T')[0]}
+                classNames={{ label: 'text-theme-primary' }}
+              />
+
+              <Button
+                onPress={handleSaveDob}
+                isLoading={isSavingDob}
+                className="w-full bg-gradient-to-r from-indigo-500 to-emerald-600 text-white font-medium"
+                size="lg"
+                isDisabled={!dob}
+              >
+                Continue
+              </Button>
+
+              <Button variant="flat" className="w-full" startContent={<ArrowLeft className="w-4 h-4" />} onPress={() => navigate(tenantPath('/dashboard'))}>Maybe Later</Button>
+            </div>
+          </GlassCard>
+        </motion.div>
+      </div>
+    );
+  }
+
+  // ─── Payment Required ──────────────────────────────────────────────
+
+  if (pageState === 'payment_required') {
+    const feeDisplay = `€${(feeCents / 100).toFixed(2)}`;
+
+    return (
+      <div className="min-h-[60vh] flex items-center justify-center p-4">
+        <PageMeta title="Verify Identity — Payment" noIndex />
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="w-full max-w-md">
+          <GlassCard className="p-5 sm:p-8">
+            <div className="text-center mb-6">
+              <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-indigo-500/20 to-emerald-500/20 mb-4">
+                <CreditCard className="w-8 h-8 text-indigo-500 dark:text-indigo-400" />
+              </div>
+              <h1 className="text-xl sm:text-2xl font-bold text-theme-primary">Verification Fee</h1>
+              <p className="text-theme-muted mt-2">
+                Identity verification costs <strong className="text-theme-primary">{feeDisplay}</strong>. This is a one-time fee — you won't be charged again if you need to retry.
+              </p>
+              <p className="text-xs text-theme-subtle mt-1">Step 2 of 3</p>
+            </div>
+
+            {errorMessage && (
+              <div className="mb-4 p-3 rounded-xl bg-red-500/10 border border-red-500/20 text-sm text-red-600 dark:text-red-400">{errorMessage}</div>
+            )}
+
+            {!clientSecret ? (
+              <div className="space-y-4">
+                <div className="p-4 rounded-xl bg-indigo-500/5 border border-indigo-500/10 text-center">
+                  <p className="text-3xl font-bold text-theme-primary">{feeDisplay}</p>
+                  <p className="text-xs text-theme-muted mt-1">One-time identity verification fee</p>
+                </div>
+
+                <Button
+                  onPress={handleCreatePayment}
+                  isLoading={isCreatingPayment}
+                  className="w-full bg-gradient-to-r from-indigo-500 to-emerald-600 text-white font-medium"
+                  size="lg"
+                  startContent={!isCreatingPayment ? <CreditCard className="w-5 h-5" /> : undefined}
+                >
+                  Pay {feeDisplay}
+                </Button>
+
+                <Button variant="flat" className="w-full" startContent={<ArrowLeft className="w-4 h-4" />} onPress={() => navigate(tenantPath('/dashboard'))}>Maybe Later</Button>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                <StripePaymentForm
+                  clientSecret={clientSecret}
+                  onSuccess={handlePaymentSuccess}
+                  onError={handlePaymentError}
+                />
+              </div>
+            )}
+          </GlassCard>
+        </motion.div>
+      </div>
+    );
+  }
+
+  // ─── Start / In-progress ───────────────────────────────────────────
+
   return (
     <div className="min-h-[60vh] flex items-center justify-center p-4">
       <PageMeta title="Verify Identity" noIndex />
@@ -310,12 +451,12 @@ export function VerifyIdentityOptionalPage() {
             <motion.div
               initial={{ scale: 0.8 }}
               animate={{ scale: 1 }}
-              className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-indigo-500/20 to-purple-500/20 mb-4"
+              className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-indigo-500/20 to-emerald-500/20 mb-4"
             >
               {pageState === 'in_progress' ? (
                 <Spinner size="lg" color="secondary" />
               ) : (
-                <Fingerprint className="w-8 h-8 text-purple-500 dark:text-purple-400" />
+                <Fingerprint className="w-8 h-8 text-emerald-600 dark:text-emerald-400" />
               )}
             </motion.div>
             <h1 className="text-xl sm:text-2xl font-bold text-theme-primary">
@@ -324,38 +465,20 @@ export function VerifyIdentityOptionalPage() {
             <p className="text-theme-muted mt-2">
               {pageState === 'in_progress'
                 ? 'Please complete the verification in the opened window. This page will update automatically.'
-                : 'Verify your identity to earn the ID Verified badge on your profile. This helps build trust in the community.'}
+                : 'Submit your government-issued ID and a selfie to earn the ID Verified badge.'}
             </p>
+            {pageState === 'start' && (
+              <p className="text-xs text-theme-subtle mt-1">Step {feeCents > 0 ? '3 of 3' : '2 of 2'}</p>
+            )}
           </div>
 
           {errorMessage && (
-            <motion.div
-              initial={{ opacity: 0, y: -10 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="mb-6 p-4 rounded-xl bg-red-500/10 border border-red-500/20 text-sm text-red-600 dark:text-red-400"
-            >
-              {errorMessage}
-            </motion.div>
+            <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} className="mb-6 p-4 rounded-xl bg-red-500/10 border border-red-500/20 text-sm text-red-600 dark:text-red-400">{errorMessage}</motion.div>
           )}
 
           {pageState === 'start' && (
             <div className="space-y-4">
-              {/* What you get */}
-              <div className="p-4 rounded-xl bg-purple-500/5 border border-purple-500/10">
-                <h3 className="font-medium text-theme-primary text-sm mb-2">What you get</h3>
-                <div className="flex items-center gap-2 mb-2">
-                  <div className="w-8 h-8 rounded-full bg-purple-500/10 flex items-center justify-center">
-                    <Fingerprint className="w-4 h-4 text-purple-500" />
-                  </div>
-                  <div>
-                    <p className="text-sm font-medium text-purple-600 dark:text-purple-400">ID Verified Badge</p>
-                    <p className="text-xs text-theme-muted">Visible on your profile to other members</p>
-                  </div>
-                </div>
-              </div>
-
-              {/* What you need */}
-              <div className="p-4 rounded-xl bg-indigo-500/5 border border-indigo-500/10">
+              <div className="p-4 rounded-xl bg-emerald-500/5 border border-emerald-500/10">
                 <h3 className="font-medium text-theme-primary text-sm mb-2">What you'll need</h3>
                 <ul className="text-sm text-theme-muted space-y-1">
                   <li>• A valid government-issued photo ID</li>
@@ -367,7 +490,7 @@ export function VerifyIdentityOptionalPage() {
               <Button
                 onPress={handleStartVerification}
                 isLoading={isStarting}
-                className="w-full bg-gradient-to-r from-indigo-500 to-purple-600 text-white font-medium"
+                className="w-full bg-gradient-to-r from-indigo-500 to-emerald-600 text-white font-medium"
                 size="lg"
                 startContent={!isStarting ? <ShieldCheck className="w-5 h-5" /> : undefined}
                 spinner={<Loader2 className="w-4 h-4 animate-spin" />}
@@ -375,30 +498,14 @@ export function VerifyIdentityOptionalPage() {
                 Start Verification
               </Button>
 
-              <Button
-                variant="flat"
-                className="w-full"
-                startContent={<ArrowLeft className="w-4 h-4" />}
-                onPress={() => navigate(tenantPath('/dashboard'))}
-              >
-                Maybe Later
-              </Button>
+              <Button variant="flat" className="w-full" startContent={<ArrowLeft className="w-4 h-4" />} onPress={() => navigate(tenantPath('/dashboard'))}>Maybe Later</Button>
             </div>
           )}
 
           {pageState === 'in_progress' && (
             <div className="space-y-4">
               {redirectUrl && (
-                <Button
-                  as="a"
-                  href={redirectUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  variant="bordered"
-                  className="w-full border-indigo-500/30 text-theme-primary hover:bg-indigo-500/10"
-                  size="lg"
-                  startContent={<ExternalLink className="w-4 h-4" />}
-                >
+                <Button as="a" href={redirectUrl} target="_blank" rel="noopener noreferrer" variant="bordered" className="w-full border-indigo-500/30 text-theme-primary hover:bg-indigo-500/10" size="lg" startContent={<ExternalLink className="w-4 h-4" />}>
                   Open Verification Window
                 </Button>
               )}
@@ -409,23 +516,8 @@ export function VerifyIdentityOptionalPage() {
               </div>
 
               <div className="flex flex-col gap-2 pt-2">
-                <Button
-                  variant="flat"
-                  size="sm"
-                  className="w-full text-theme-muted"
-                  onPress={() => { stopPolling(); setPageState('start'); setRedirectUrl(null); userStartedRef.current = false; }}
-                >
-                  Cancel & Start Over
-                </Button>
-                <Button
-                  variant="light"
-                  size="sm"
-                  className="w-full text-theme-subtle"
-                  startContent={<ArrowLeft className="w-3.5 h-3.5" />}
-                  onPress={() => navigate(tenantPath('/dashboard'))}
-                >
-                  Back to Dashboard
-                </Button>
+                <Button variant="flat" size="sm" className="w-full text-theme-muted" onPress={() => { stopPolling(); setPageState('start'); setRedirectUrl(null); userStartedRef.current = false; }}>Cancel & Start Over</Button>
+                <Button variant="light" size="sm" className="w-full text-theme-subtle" startContent={<ArrowLeft className="w-3.5 h-3.5" />} onPress={() => navigate(tenantPath('/dashboard'))}>Back to Dashboard</Button>
               </div>
             </div>
           )}

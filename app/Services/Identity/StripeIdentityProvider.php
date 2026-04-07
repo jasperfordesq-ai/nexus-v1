@@ -78,6 +78,11 @@ class StripeIdentityProvider implements IdentityVerificationProviderInterface
             $params['options']['document']['allowed_types'] = ['driving_license', 'passport', 'id_card'];
         }
 
+        // Pass user details for name/DOB matching against the document
+        if (!empty($metadata['provided_details'])) {
+            $params['provided_details'] = $metadata['provided_details'];
+        }
+
         // Return URL after hosted verification
         $frontendUrl = \App\Core\TenantContext::getFrontendUrl();
         $slugPrefix = \App\Core\TenantContext::getSlugPrefix();

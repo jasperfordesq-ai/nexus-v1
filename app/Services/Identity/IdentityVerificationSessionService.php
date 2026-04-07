@@ -229,4 +229,51 @@ class IdentityVerificationSessionService
             [$retentionDays]
         );
     }
+
+    /**
+     * Check if user has completed payment for identity verification in this tenant.
+     * Used for the "pay once" rule — if they've paid before, skip payment on retry.
+     */
+    public static function hasCompletedPaymentForTenant(int $tenantId, int $userId): bool
+    {
+        $row = DB::selectOne(
+            "SELECT 1 FROM identity_verification_sessions
+             WHERE tenant_id = ? AND user_id = ? AND payment_status = 'completed'
+             LIMIT 1",
+            [$tenantId, $userId]
+        );
+        return $row !== null;
+    }
+
+    /**
+     * Update payment status on a session.
+     */
+    public static function updatePaymentStatus(int $sessionId, string $paymentStatus, ?string $paymentIntentId = null): void
+    {
+        $updates = ['payment_status' => $paymentStatus, 'updated_at' => now()];
+        $query = "UPDATE identity_verification_sessions SET payment_status = ?, updated_at = NOW()";
+        $params = [$paymentStatus];
+
+        if ($paymentIntentId !== null) {
+            $query .= ", stripe_payment_intent_id = ?";
+            $params[] = $paymentIntentId;
+        }
+
+        $query .= " WHERE id = ?";
+        $params[] = $sessionId;
+
+        DB::statement($query, $params);
+    }
+
+    /**
+     * Find a session by its Stripe PaymentIntent ID.
+     */
+    public static function findByPaymentIntentId(string $paymentIntentId): ?array
+    {
+        $rows = DB::select(
+            "SELECT * FROM identity_verification_sessions WHERE stripe_payment_intent_id = ? LIMIT 1",
+            [$paymentIntentId]
+        );
+        return !empty($rows) ? (array) $rows[0] : null;
+    }
 }

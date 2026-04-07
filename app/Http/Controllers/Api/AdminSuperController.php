@@ -1461,4 +1461,35 @@ class AdminSuperController extends BaseApiController
 
         return $this->respondWithError(ApiErrorCodes::SERVER_INTERNAL_ERROR, __('api.feature_update_failed'), null, 500);
     }
+
+    /**
+     * PUT /api/v2/admin/super/identity/fee
+     *
+     * Set the identity verification fee for a tenant. Super admin only.
+     * Body: { "tenant_id": 2, "fee_cents": 500 }
+     * Set fee_cents to 0 for free verification.
+     */
+    public function setIdentityVerificationFee(): JsonResponse
+    {
+        $this->requireSuperAdmin();
+
+        $input = $this->getAllInput();
+        $tenantId = (int) ($input['tenant_id'] ?? 0);
+        $feeCents = (int) ($input['fee_cents'] ?? -1);
+
+        if ($tenantId <= 0) {
+            return $this->respondWithError('VALIDATION_REQUIRED_FIELD', 'tenant_id is required.', 'tenant_id', 422);
+        }
+        if ($feeCents < 0) {
+            return $this->respondWithError('VALIDATION_INVALID_FORMAT', 'fee_cents must be 0 or greater.', 'fee_cents', 422);
+        }
+
+        \App\Services\TenantSettingsService::set($tenantId, 'identity_verification_fee_cents', (string) $feeCents, 'integer');
+
+        return $this->respondWithData([
+            'tenant_id' => $tenantId,
+            'fee_cents' => $feeCents,
+            'fee_display' => '€' . number_format($feeCents / 100, 2),
+        ]);
+    }
 }

@@ -152,11 +152,17 @@ class StripeWebhookController extends BaseApiController
 
         // Also dispatch to marketplace handler (it checks nexus_type metadata internally)
         MarketplacePaymentService::handleWebhookEvent('payment_intent.succeeded', $paymentIntent);
+
+        // Also dispatch to identity verification payment handler
+        \App\Services\Identity\IdentityVerificationPaymentService::handlePaymentSucceeded($paymentIntent);
     }
 
     private function handlePaymentFailed(object $paymentIntent): void
     {
         StripeDonationService::handlePaymentFailed($paymentIntent);
+
+        // Also dispatch to identity verification payment handler
+        \App\Services\Identity\IdentityVerificationPaymentService::handlePaymentFailed($paymentIntent);
     }
 
     private function handleChargeRefunded(object $charge): void

@@ -1539,6 +1539,9 @@ Route::post('/v2/admin/users/{id}/impersonate', [\App\Http\Controllers\Api\Admin
 Route::put('/v2/admin/users/{id}/super-admin', [\App\Http\Controllers\Api\AdminUsersController::class, 'setSuperAdmin']);
 Route::put('/v2/admin/users/{id}/global-super-admin', [\App\Http\Controllers\Api\AdminUsersController::class, 'setGlobalSuperAdmin']);
 
+// Identity verification fee configuration (super admin only)
+Route::put('/v2/admin/super/identity/fee', [\App\Http\Controllers\Api\AdminSuperController::class, 'setIdentityVerificationFee']);
+
 }); // End Route::middleware(['auth:sanctum', 'super-admin'])
 
 // ============================================
@@ -1670,6 +1673,8 @@ Route::post('/v2/auth/start-verification', [\App\Http\Controllers\Api\Registrati
 // Optional identity verification (for active users wanting an ID Verified badge)
 Route::get('/v2/identity/status', [\App\Http\Controllers\Api\OptionalIdentityVerificationController::class, 'getStatus']);
 Route::post('/v2/identity/start', [\App\Http\Controllers\Api\OptionalIdentityVerificationController::class, 'startVerification'])->middleware('throttle:5,1');
+Route::post('/v2/identity/save-dob', [\App\Http\Controllers\Api\OptionalIdentityVerificationController::class, 'saveDob'])->middleware('throttle:10,1');
+Route::post('/v2/identity/create-payment', [\App\Http\Controllers\Api\OptionalIdentityVerificationController::class, 'createPaymentIntent'])->middleware('throttle:5,1');
 Route::post('/v2/auth/validate-invite', [\App\Http\Controllers\Api\RegistrationPolicyController::class, 'validateInviteCode'])->middleware('throttle:10,1');
 Route::get('/v2/auth/registration-info', [\App\Http\Controllers\Api\RegistrationPolicyController::class, 'getRegistrationInfo']);
 // NOTE: identity webhook route moved to public webhook section (below auth group)
