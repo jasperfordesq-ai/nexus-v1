@@ -125,6 +125,14 @@ const NewsletterActivity = lazy(() => import('./modules/newsletters/NewsletterAc
 const VolunteeringOverview = lazy(() => import('./modules/volunteering/VolunteeringOverview'));
 const VolunteerApprovals = lazy(() => import('./modules/volunteering/VolunteerApprovals'));
 const VolunteerOrganizations = lazy(() => import('./modules/volunteering/VolunteerOrganizations'));
+const VolunteerExpenses = lazy(() => import('./modules/volunteering/VolunteerExpenses'));
+const VolunteerTraining = lazy(() => import('./modules/volunteering/VolunteerTraining'));
+const VolunteerSafeguarding = lazy(() => import('./modules/volunteering/VolunteerSafeguarding'));
+const VolunteerHoursAudit = lazy(() => import('./modules/volunteering/VolunteerHoursAudit'));
+const VolunteerGivingDays = lazy(() => import('./modules/volunteering/VolunteerGivingDays'));
+const VolunteerConsents = lazy(() => import('./modules/volunteering/VolunteerConsents'));
+const VolunteerProjects = lazy(() => import('./modules/volunteering/VolunteerProjects'));
+const VolunteerConfig = lazy(() => import('./modules/volunteering/VolunteerConfig'));
 
 // Events module
 const EventsAdmin = lazy(() => import('./modules/events/EventsAdmin'));
@@ -496,6 +504,14 @@ export function AdminRoutes() {
       <Route path="volunteering" element={<Lazy><VolunteeringOverview /></Lazy>} />
       <Route path="volunteering/approvals" element={<Lazy><VolunteerApprovals /></Lazy>} />
       <Route path="volunteering/organizations" element={<Lazy><VolunteerOrganizations /></Lazy>} />
+      <Route path="volunteering/expenses" element={<Lazy><VolunteerExpenses /></Lazy>} />
+      <Route path="volunteering/training" element={<Lazy><VolunteerTraining /></Lazy>} />
+      <Route path="volunteering/safeguarding" element={<Lazy><VolunteerSafeguarding /></Lazy>} />
+      <Route path="volunteering/hours" element={<Lazy><VolunteerHoursAudit /></Lazy>} />
+      <Route path="volunteering/giving-days" element={<Lazy><VolunteerGivingDays /></Lazy>} />
+      <Route path="volunteering/consents" element={<Lazy><VolunteerConsents /></Lazy>} />
+      <Route path="volunteering/projects" element={<Lazy><VolunteerProjects /></Lazy>} />
+      <Route path="volunteering/config" element={<Lazy><VolunteerConfig /></Lazy>} />
 
       {/* ─── EVENTS ─── */}
       <Route path="events" element={<Lazy><EventsAdmin /></Lazy>} />

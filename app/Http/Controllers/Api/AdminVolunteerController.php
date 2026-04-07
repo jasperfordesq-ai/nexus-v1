@@ -200,6 +200,106 @@ class AdminVolunteerController extends BaseApiController
         }
     }
 
+    /** GET /api/v2/admin/volunteering/hours */
+    public function listHours(): JsonResponse
+    {
+        $this->requireAdmin();
+        if (!TenantContext::hasFeature('volunteering')) {
+            return $this->respondWithError('FEATURE_DISABLED', __('api.service_unavailable'), null, 403);
+        }
+        $tenantId = $this->getTenantId();
+
+        $perPage = $this->queryInt('per_page', 20, 1, 50);
+        $status = $this->query('status');
+        $cursor = $this->query('cursor');
+
+        if (!$this->tableExists('vol_logs')) {
+            return $this->respondWithCollection([], null, $perPage, false);
+        }
+
+        try {
+            // Stats summary — paid/paid_amount columns may not exist
+            $hasPaidCol = Schema::hasColumn('vol_logs', 'paid');
+            $paidSelect = $hasPaidCol
+                ? "COALESCE(SUM(CASE WHEN status = 'approved' AND paid = 1 THEN paid_amount ELSE 0 END), 0)"
+                : '0';
+
+            $statsRow = DB::selectOne(
+                "SELECT
+                    COALESCE(SUM(hours), 0) as total_hours,
+                    COALESCE(SUM(CASE WHEN status = 'approved' THEN hours ELSE 0 END), 0) as approved_hours,
+                    COALESCE(SUM(CASE WHEN status = 'pending' THEN hours ELSE 0 END), 0) as pending_hours,
+                    {$paidSelect} as total_paid
+                 FROM vol_logs WHERE tenant_id = ?",
+                [$tenantId]
+            );
+
+            $paidCols = $hasPaidCol ? ', vl.paid, vl.paid_amount' : ', 0 as paid, 0 as paid_amount';
+            $sql = "SELECT vl.id, vl.hours, vl.status, vl.created_at{$paidCols},
+                           u.first_name, u.last_name,
+                           vo.name as org_name
+                    FROM vol_logs vl
+                    LEFT JOIN users u ON vl.user_id = u.id
+                    LEFT JOIN vol_organizations vo ON vl.organization_id = vo.id
+                    WHERE vl.tenant_id = ?";
+            $params = [$tenantId];
+
+            if ($status && in_array($status, ['pending', 'approved', 'declined'], true)) {
+                $sql .= " AND vl.status = ?";
+                $params[] = $status;
+            }
+
+            if ($cursor) {
+                $decoded = base64_decode($cursor, true);
+                if ($decoded && is_numeric($decoded)) {
+                    $sql .= " AND vl.id < ?";
+                    $params[] = (int) $decoded;
+                }
+            }
+
+            $sql .= " ORDER BY vl.created_at DESC, vl.id DESC LIMIT ?";
+            $params[] = $perPage + 1;
+
+            $results = DB::select($sql, $params);
+            $rows = array_map(fn($r) => (array)$r, $results);
+
+            $hasMore = count($rows) > $perPage;
+            if ($hasMore) {
+                array_pop($rows);
+            }
+
+            $nextCursor = null;
+            if ($hasMore && !empty($rows)) {
+                $lastRow = end($rows);
+                $nextCursor = base64_encode((string) $lastRow['id']);
+            }
+
+            return response()->json([
+                'success' => true,
+                'data' => $rows,
+                'stats' => [
+                    'total_hours' => round((float) ($statsRow->total_hours ?? 0), 1),
+                    'approved_hours' => round((float) ($statsRow->approved_hours ?? 0), 1),
+                    'pending_hours' => round((float) ($statsRow->pending_hours ?? 0), 1),
+                    'total_paid' => round((float) ($statsRow->total_paid ?? 0), 2),
+                ],
+                'meta' => [
+                    'per_page' => $perPage,
+                    'has_more' => $hasMore,
+                    'next_cursor' => $nextCursor,
+                ],
+            ]);
+        } catch (\Exception $e) {
+            Log::error("AdminVolunteerController::listHours error: " . $e->getMessage());
+            return response()->json([
+                'success' => true,
+                'data' => [],
+                'stats' => ['total_hours' => 0, 'approved_hours' => 0, 'pending_hours' => 0, 'total_paid' => 0],
+                'meta' => ['per_page' => $perPage, 'has_more' => false, 'next_cursor' => null],
+            ]);
+        }
+    }
+
     /** POST /api/v2/admin/volunteering/hours/{id}/verify */
     public function verifyHours(int $id): JsonResponse
     {
@@ -562,6 +662,49 @@ class AdminVolunteerController extends BaseApiController
             'message' => $result['message'],
             'new_balance' => $result['new_balance'],
         ]);
+    }
+
+    /** PUT /api/v2/admin/volunteering/organizations/{id}/status */
+    public function updateOrgStatus(int $id): JsonResponse
+    {
+        $this->requireAdmin();
+        if (!TenantContext::hasFeature('volunteering')) {
+            return $this->respondWithError('FEATURE_DISABLED', __('api.service_unavailable'), null, 403);
+        }
+        $tenantId = TenantContext::getId();
+
+        $status = $this->input('status');
+        if (!$status || !in_array($status, ['active', 'suspended'], true)) {
+            return $this->respondWithError('VALIDATION_ERROR', 'Status must be active or suspended', 'status', 400);
+        }
+
+        if (!$this->tableExists('vol_organizations')) {
+            return $this->respondWithError('NOT_FOUND', 'Organization not found', null, 404);
+        }
+
+        try {
+            $org = DB::selectOne(
+                "SELECT id, status FROM vol_organizations WHERE id = ? AND tenant_id = ?",
+                [$id, $tenantId]
+            );
+
+            if (!$org) {
+                return $this->respondWithError('NOT_FOUND', 'Organization not found', null, 404);
+            }
+
+            DB::update(
+                "UPDATE vol_organizations SET status = ?, updated_at = NOW() WHERE id = ? AND tenant_id = ?",
+                [$status, $id, $tenantId]
+            );
+
+            return $this->respondWithData([
+                'id' => $id,
+                'status' => $status,
+                'message' => "Organization status updated to {$status}",
+            ]);
+        } catch (\Exception $e) {
+            return $this->respondWithError('SERVER_ERROR', 'Failed to update organization status', null, 500);
+        }
     }
 
     /**

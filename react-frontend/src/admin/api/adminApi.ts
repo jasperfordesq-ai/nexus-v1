@@ -1181,6 +1181,92 @@ export const adminVolunteering = {
     api.post<{ success: boolean }>(`/v2/admin/volunteering/approvals/${id}/decline`, {}),
 
   getOrganizations: () => api.get<Array<{ id: number; name: string; opportunity_count: number; volunteer_count: number }>>('/v2/admin/volunteering/organizations'),
+
+  // Organization wallet management
+  adjustOrgWallet: (orgId: number, amount: number, reason: string) =>
+    api.put(`/v2/admin/volunteering/organizations/${orgId}/wallet/adjust`, { amount, reason }),
+
+  getOrgTransactions: (orgId: number, cursor?: string) =>
+    api.get(`/v2/admin/volunteering/organizations/${orgId}/wallet/transactions?per_page=20${cursor ? `&cursor=${cursor}` : ''}`),
+
+  updateOrgStatus: (orgId: number, status: 'active' | 'suspended') =>
+    api.put(`/v2/admin/volunteering/organizations/${orgId}/status`, { status }),
+
+  // Hours management
+  listHours: (params?: { status?: string; cursor?: string }) => {
+    const search = new URLSearchParams();
+    if (params?.status) search.set('status', params.status);
+    if (params?.cursor) search.set('cursor', params.cursor);
+    const qs = search.toString();
+    return api.get(`/v2/admin/volunteering/hours${qs ? `?${qs}` : ''}`);
+  },
+
+  verifyHours: (logId: number, action: 'approve' | 'decline') =>
+    api.post(`/v2/admin/volunteering/hours/${logId}/verify`, { action }),
+
+  // Applications with filters
+  getApplications: (params?: { status?: string; cursor?: string }) => {
+    const search = new URLSearchParams();
+    if (params?.status) search.set('status', params.status);
+    if (params?.cursor) search.set('cursor', params.cursor);
+    const qs = search.toString();
+    return api.get(`/v2/admin/volunteering/applications${qs ? `?${qs}` : ''}`);
+  },
+
+  // Expenses
+  getExpenses: () => api.get('/v2/admin/volunteering/expenses'),
+  reviewExpense: (id: number, data: { status: string; review_notes?: string; payment_reference?: string }) =>
+    api.put(`/v2/admin/volunteering/expenses/${id}`, data),
+  exportExpenses: () => api.get('/v2/admin/volunteering/expenses/export'),
+  getExpensePolicies: () => api.get('/v2/admin/volunteering/expenses/policies'),
+  updateExpensePolicies: (data: Record<string, unknown>) =>
+    api.put('/v2/admin/volunteering/expenses/policies', data),
+
+  // Training
+  getTraining: () => api.get('/v2/admin/volunteering/training'),
+  verifyTraining: (id: number) => api.put(`/v2/admin/volunteering/training/${id}/verify`, {}),
+  rejectTraining: (id: number) => api.put(`/v2/admin/volunteering/training/${id}/reject`, {}),
+
+  // Incidents
+  getIncidents: () => api.get('/v2/admin/volunteering/incidents'),
+  updateIncident: (id: number, data: { status: string; action_taken?: string; resolution_notes?: string }) =>
+    api.put(`/v2/admin/volunteering/incidents/${id}`, data),
+
+  // DLP
+  assignDlp: (orgId: number, dlpUserId: number) =>
+    api.put(`/v2/admin/volunteering/organizations/${orgId}/dlp`, { dlp_user_id: dlpUserId }),
+
+  // Giving Days
+  getGivingDays: () => api.get('/v2/admin/volunteering/giving-days'),
+  createGivingDay: (data: Record<string, unknown>) => api.post('/v2/admin/volunteering/giving-days', data),
+  updateGivingDay: (id: number, data: Record<string, unknown>) => api.put(`/v2/admin/volunteering/giving-days/${id}`, data),
+  exportDonations: () => api.get('/v2/admin/volunteering/donations/export'),
+
+  // Guardian Consents
+  getGuardianConsents: () => api.get('/v2/admin/volunteering/guardian-consents'),
+
+  // Community Projects
+  getCommunityProjects: () => api.get('/v2/admin/volunteering/community-projects'),
+  reviewCommunityProject: (id: number, data: { status: string; review_notes?: string }) =>
+    api.put(`/v2/admin/volunteering/community-projects/${id}/review`, data),
+
+  // Custom Fields
+  getCustomFields: () => api.get('/v2/admin/volunteering/custom-fields'),
+  createCustomField: (data: Record<string, unknown>) => api.post('/v2/admin/volunteering/custom-fields', data),
+  updateCustomField: (id: number, data: Record<string, unknown>) => api.put(`/v2/admin/volunteering/custom-fields/${id}`, data),
+  deleteCustomField: (id: number) => api.delete(`/v2/admin/volunteering/custom-fields/${id}`),
+
+  // Reminders
+  getReminderSettings: () => api.get('/v2/admin/volunteering/reminder-settings'),
+  updateReminderSettings: (data: Record<string, unknown>) => api.put('/v2/admin/volunteering/reminder-settings', data),
+
+  // Webhooks
+  getWebhooks: () => api.get('/v2/admin/volunteering/webhooks'),
+  createWebhook: (data: Record<string, unknown>) => api.post('/v2/admin/volunteering/webhooks', data),
+  updateWebhook: (id: number, data: Record<string, unknown>) => api.put(`/v2/admin/volunteering/webhooks/${id}`, data),
+  deleteWebhook: (id: number) => api.delete(`/v2/admin/volunteering/webhooks/${id}`),
+  testWebhook: (id: number) => api.post(`/v2/admin/volunteering/webhooks/${id}/test`, {}),
+  getWebhookLogs: (id: number) => api.get(`/v2/admin/volunteering/webhooks/${id}/logs`),
 };
 
 // ─────────────────────────────────────────────────────────────────────────────

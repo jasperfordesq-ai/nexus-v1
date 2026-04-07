@@ -1313,6 +1313,9 @@ Route::put('/v2/admin/volunteering/incidents/{id}', [\App\Http\Controllers\Api\V
 Route::put('/v2/admin/volunteering/organizations/{id}/dlp', [\App\Http\Controllers\Api\VolunteerWellbeingController::class, 'assignDlp']);
 Route::put('/v2/admin/volunteering/organizations/{id}/wallet/adjust', [\App\Http\Controllers\Api\AdminVolunteerController::class, 'adjustOrgWallet']);
 Route::get('/v2/admin/volunteering/organizations/{id}/wallet/transactions', [\App\Http\Controllers\Api\AdminVolunteerController::class, 'orgWalletTransactions']);
+Route::put('/v2/admin/volunteering/organizations/{id}/status', [\App\Http\Controllers\Api\AdminVolunteerController::class, 'updateOrgStatus']);
+Route::get('/v2/admin/volunteering/hours', [\App\Http\Controllers\Api\AdminVolunteerController::class, 'listHours']);
+Route::post('/v2/admin/volunteering/hours/{id}/verify', [\App\Http\Controllers\Api\AdminVolunteerController::class, 'verifyHours']);
 Route::get('/v2/admin/volunteering/custom-fields', [\App\Http\Controllers\Api\VolunteerCommunityController::class, 'adminCustomFields']);
 Route::post('/v2/admin/volunteering/custom-fields', [\App\Http\Controllers\Api\VolunteerCommunityController::class, 'createCustomField']);
 Route::put('/v2/admin/volunteering/custom-fields/{id}', [\App\Http\Controllers\Api\VolunteerCommunityController::class, 'updateCustomField']);
