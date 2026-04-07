@@ -716,7 +716,7 @@ class VolunteerController extends BaseApiController
         $limit = $this->queryInt('per_page', 20, 1, 50);
         $cursor = $this->query('cursor');
 
-        $params = [$orgId, $tenantId];
+        $params = [$orgId, $tenantId, $tenantId];
         $cursorClause = '';
         if ($cursor) {
             $cursorClause = ' AND u.id < ?';
@@ -733,7 +733,7 @@ class VolunteerController extends BaseApiController
             INNER JOIN vol_applications va ON va.user_id = u.id AND va.status = 'approved'
             INNER JOIN vol_opportunities vo ON va.opportunity_id = vo.id AND vo.organization_id = ?
             LEFT JOIN vol_logs vl ON vl.user_id = u.id AND vl.organization_id = vo.organization_id AND vl.tenant_id = ?
-            WHERE va.tenant_id = u.tenant_id
+            WHERE va.tenant_id = ?
             {$cursorClause}
             GROUP BY u.id, u.name, u.avatar_url, u.email
             ORDER BY u.id DESC
