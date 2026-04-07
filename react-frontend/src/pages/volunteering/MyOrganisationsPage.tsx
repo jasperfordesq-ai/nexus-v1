@@ -55,11 +55,14 @@ export default function MyOrganisationsPage() {
     abortRef.current = controller;
 
     setIsLoading(true);
-    api.get<MyOrg[]>('/v2/volunteering/my-organisations')
+    api.get<unknown>('/v2/volunteering/my-organisations')
       .then((res) => {
         if (controller.signal.aborted) return;
-        if (res.success && Array.isArray(res.data)) {
-          setOrgs(res.data);
+        if (res.success && res.data) {
+          // respondWithData wraps in { data: { items: [...] } }
+          const raw = res.data as { data?: { items?: unknown[] }; items?: unknown[] };
+          const items = (raw.data?.items ?? raw.items ?? (Array.isArray(res.data) ? res.data : [])) as MyOrg[];
+          setOrgs(items);
         }
       })
       .catch((err) => {

@@ -569,16 +569,25 @@ class VolunteerController extends BaseApiController
             return null;
         }
 
+        // Org creator always has access
         if ((int) $org->user_id === $userId) {
             return $org;
         }
 
+        // Org members with owner/admin role have access
         $membership = DB::selectOne(
             "SELECT role FROM org_members WHERE tenant_id = ? AND organization_id = ? AND user_id = ? AND status = 'active'",
             [$tenantId, $orgId, $userId]
         );
 
         if ($membership && in_array($membership->role, ['owner', 'admin'], true)) {
+            return $org;
+        }
+
+        // Site admins (super_admin, god) can access any org dashboard
+        $user = $this->resolveUser();
+        $role = $user->role ?? 'member';
+        if (in_array($role, ['super_admin', 'god']) || ($user->is_super_admin ?? false) || ($user->is_tenant_super_admin ?? false)) {
             return $org;
         }
 

@@ -178,12 +178,15 @@ export function VolunteeringPage() {
     if (!hasFeature('volunteering')) return;
     let cancelled = false;
     if (isAuthenticated) {
-      api.get<Array<{ id: number; name: string; status: string; member_role: string; balance?: number }>>('/v2/volunteering/my-organisations')
+      api.get<unknown>('/v2/volunteering/my-organisations')
         .then((res) => {
-          if (!cancelled && res.success && Array.isArray(res.data)) {
-            setMyOrgs(res.data);
+          if (!cancelled && res.success && res.data) {
+            // respondWithData wraps in { data: { items: [...] } } or may return array directly
+            const raw = res.data as { data?: { items?: unknown[] }; items?: unknown[] };
+            const items = (raw.data?.items ?? raw.items ?? (Array.isArray(res.data) ? res.data : [])) as Array<{ id: number; name: string; status: string; member_role: string; balance?: number }>;
+            setMyOrgs(items);
             setHasApprovedOrg(
-              res.data.some((org) => org.status === 'approved' && ['owner', 'admin'].includes(org.member_role)),
+              items.some((org) => org.status === 'approved' && ['owner', 'admin'].includes(org.member_role)),
             );
           }
         })
@@ -236,11 +239,7 @@ export function VolunteeringPage() {
             </Link>
           )}
           {hasApprovedOrg && (
-            <Link to={tenantPath(
-              myOrgs.filter(o => o.status === 'approved' && ['owner', 'admin'].includes(o.member_role)).length === 1
-                ? `/volunteering/org/${myOrgs.find(o => o.status === 'approved' && ['owner', 'admin'].includes(o.member_role))?.id}/dashboard`
-                : '/volunteering/my-organisations'
-            )}>
+            <Link to={tenantPath('/volunteering/my-organisations')}>
               <Button
                 className="bg-gradient-to-r from-rose-500 to-pink-600 text-white"
                 startContent={<Building2 className="w-4 h-4" aria-hidden="true" />}
