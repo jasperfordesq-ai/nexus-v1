@@ -146,9 +146,12 @@ class TotpController extends BaseApiController
         // from the current tenant context (cross-tenant login)
         $tenantId = TenantContext::getId();
         $userRow = DB::selectOne("
-            SELECT id, first_name, last_name, email, avatar_url, role, tenant_id,
-                   is_super_admin, is_tenant_super_admin, email_verified_at, is_approved, status
-            FROM users WHERE id = ? AND (tenant_id = ? OR is_super_admin = 1 OR is_tenant_super_admin = 1)
+            SELECT u.id, u.first_name, u.last_name, u.email, u.avatar_url, u.role, u.tenant_id,
+                   u.is_super_admin, u.is_tenant_super_admin, u.is_god, u.email_verified_at,
+                   u.is_approved, u.status, u.onboarding_completed, t.configuration
+            FROM users u
+            LEFT JOIN tenants t ON u.tenant_id = t.id
+            WHERE u.id = ? AND (u.tenant_id = ? OR u.is_super_admin = 1 OR u.is_tenant_super_admin = 1)
         ", [$userId, $tenantId]);
         $user = $userRow ? (array)$userRow : null;
 
@@ -172,7 +175,12 @@ class TotpController extends BaseApiController
         $accessToken = $this->tokenService->generateToken(
             (int)$user['id'],
             (int)$user['tenant_id'],
-            ['role' => $user['role'], 'email' => $user['email']],
+            [
+                'role' => $user['role'],
+                'email' => $user['email'],
+                'is_super_admin' => !empty($user['is_super_admin']),
+                'is_tenant_super_admin' => !empty($user['is_tenant_super_admin']),
+            ],
             $isMobile
         );
         $refreshToken = $this->tokenService->generateRefreshToken(
@@ -207,7 +215,21 @@ class TotpController extends BaseApiController
             $_SESSION['is_logged_in'] = true;
         }
 
-        // Return success response with tokens
+        // Issue Sanctum token alongside legacy JWT (matches AuthController login flow)
+        $sanctumToken = null;
+        try {
+            $eloquentUser = \App\Models\User::find((int)$user['id']);
+            if ($eloquentUser) {
+                $sanctumToken = $eloquentUser->createToken(
+                    $isMobile ? 'mobile-api' : 'web-api',
+                    ['*']
+                )->plainTextToken;
+            }
+        } catch (\Throwable $e) {
+            error_log('[TotpController] Sanctum token creation failed: ' . $e->getMessage());
+        }
+
+        // Return success response with tokens — MUST match AuthController::login() response shape
         $response = [
             'success' => true,
             'user' => [
@@ -216,7 +238,13 @@ class TotpController extends BaseApiController
                 'last_name' => $user['last_name'],
                 'email' => $user['email'],
                 'avatar_url' => $user['avatar_url'],
-                'tenant_id' => $user['tenant_id']
+                'tenant_id' => $user['tenant_id'],
+                'role' => $user['role'] ?? 'member',
+                'is_admin' => in_array($user['role'] ?? '', ['admin', 'tenant_admin', 'super_admin']) || !empty($user['is_super_admin']) || !empty($user['is_tenant_super_admin']),
+                'is_super_admin' => !empty($user['is_super_admin']),
+                'is_god' => !empty($user['is_god']),
+                'is_tenant_super_admin' => !empty($user['is_tenant_super_admin']),
+                'onboarding_completed' => (bool)($user['onboarding_completed'] ?? false),
             ],
             'access_token' => $accessToken,
             'refresh_token' => $refreshToken,
@@ -224,8 +252,9 @@ class TotpController extends BaseApiController
             'expires_in' => $this->tokenService->getAccessTokenExpiry($isMobile),
             'refresh_expires_in' => $this->tokenService->getRefreshTokenExpiry($isMobile),
             'is_mobile' => $isMobile,
-            // Legacy compatibility
-            'token' => $accessToken
+            'token' => $sanctumToken ?? $accessToken,
+            'sanctum_token' => $sanctumToken,
+            'config' => json_decode($user['configuration'] ?? '{"modules": {"events": true, "polls": true, "goals": true, "volunteering": true, "resources": true}}', true)
         ];
 
         // Include backup codes remaining if a backup code was used
