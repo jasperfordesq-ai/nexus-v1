@@ -1064,87 +1064,104 @@ class VolunteerService
         $status = $action === 'approve' ? 'approved' : self::getDeclineStatusValue();
 
         try {
-            return DB::transaction(function () use ($logId, $tenantId, $status, $action, $log, $org, $adminUserId) {
+            $hours = (float) $log->hours;
+            $volunteerId = (int) $log->user_id;
+            $orgName = $org->name ?? 'Organization';
+            $paymentResult = null;
+
+            // DB transaction for data mutations only — notifications sent AFTER commit
+            DB::transaction(function () use ($logId, $tenantId, $status, $action, $log, $org, $adminUserId, $hours, $volunteerId, &$paymentResult) {
                 // 1. Update hours status
                 DB::update("UPDATE vol_logs SET status = ? WHERE id = ? AND tenant_id = ?", [$status, $logId, $tenantId]);
 
-                $hours = (float) $log->hours;
-                $volunteerId = (int) $log->user_id;
-
-                // 2. If approved and org has auto-pay enabled, pay volunteer from org wallet
+                // 2. If approved and org has auto-pay enabled, pay inline (avoid nested transaction)
                 if ($action === 'approve' && $org->auto_pay_enabled) {
-                    $result = VolOrgWalletService::payVolunteer(
-                        (int) $org->id,
-                        $volunteerId,
-                        $hours,
-                        $adminUserId,
-                        "Auto-payment for {$hours}h volunteered",
-                        $logId
+                    $intHours = (int) floor($hours); // Use floor, not ceil, to prevent phantom debit
+                    // Lock org row
+                    $orgLocked = DB::selectOne(
+                        "SELECT id, balance, user_id FROM vol_organizations WHERE id = ? AND tenant_id = ? FOR UPDATE",
+                        [(int) $org->id, $tenantId]
                     );
 
-                    $orgName = $org->name ?? 'Organization';
+                    if ($orgLocked && (float) $orgLocked->balance >= $hours) {
+                        // Deduct from org
+                        DB::update(
+                            "UPDATE vol_organizations SET balance = balance - ? WHERE id = ? AND tenant_id = ?",
+                            [$hours, (int) $org->id, $tenantId]
+                        );
+                        $newOrgBalance = (float) $orgLocked->balance - $hours;
 
-                    if ($result['success']) {
-                        // Notify volunteer: hours approved + credits paid
-                        NotificationDispatcher::dispatch(
-                            $volunteerId,
-                            'global',
-                            0,
-                            'vol_hours_approved',
-                            "Your {$hours}h were approved and {$hours} time credits added to your wallet!",
-                            '/wallet',
-                            NotificationDispatcher::buildVolHoursApprovedPaidEmail($hours, $orgName)
-                        );
+                        // Credit to volunteer (INT — use floor to match deduction)
+                        if ($intHours > 0) {
+                            DB::update(
+                                "UPDATE users SET balance = balance + ? WHERE id = ? AND tenant_id = ?",
+                                [$intHours, $volunteerId, $tenantId]
+                            );
+                        }
+
+                        // Record in vol_org_transactions
+                        $description = "Auto-payment for {$hours}h volunteered";
+                        DB::insert("
+                            INSERT INTO vol_org_transactions (tenant_id, vol_organization_id, user_id, vol_log_id, type, amount, balance_after, description, created_at)
+                            VALUES (?, ?, ?, ?, 'volunteer_payment', ?, ?, ?, NOW())
+                        ", [$tenantId, (int) $org->id, $volunteerId, $logId, -$hours, $newOrgBalance, $description]);
+
+                        // Record in main transactions table
+                        DB::insert("
+                            INSERT INTO transactions (tenant_id, sender_id, receiver_id, amount, description, transaction_type, status, created_at, updated_at)
+                            VALUES (?, ?, ?, ?, ?, 'volunteer', 'completed', NOW(), NOW())
+                        ", [$tenantId, (int) $org->user_id, $volunteerId, $intHours, $description]);
+
+                        $paymentResult = 'paid';
                     } else {
-                        // Insufficient balance — still approve hours, notify both parties
-                        NotificationDispatcher::dispatch(
-                            $volunteerId,
-                            'global',
-                            0,
-                            'vol_hours_approved',
-                            "Your {$hours}h were approved! Time credits will be paid when the organization funds their wallet.",
-                            '/volunteering?tab=hours',
-                            NotificationDispatcher::buildVolHoursApprovedEmail($hours, $orgName)
-                        );
-                        // Notify org owner about low balance
-                        NotificationDispatcher::dispatch(
-                            (int) $org->user_id,
-                            'global',
-                            0,
-                            'vol_hours_approved',
-                            "Approved {$hours}h for a volunteer but your org wallet has insufficient balance. Please fund your wallet.",
-                            '/volunteering/org/' . (int) $org->id . '/dashboard?tab=wallet',
-                            null
-                        );
+                        $paymentResult = 'insufficient_balance';
                     }
-                } elseif ($action === 'approve') {
-                    $orgName = $org->name ?? 'Organization';
-                    // Auto-pay disabled — just notify volunteer of approval
+                }
+            });
+
+            // 3. Send notifications AFTER transaction committed successfully
+            try {
+                if ($action === 'approve' && $paymentResult === 'paid') {
                     NotificationDispatcher::dispatch(
-                        $volunteerId,
-                        'global',
-                        0,
-                        'vol_hours_approved',
+                        $volunteerId, 'global', 0, 'vol_hours_approved',
+                        "Your {$hours}h were approved and {$hours} time credits added to your wallet!",
+                        '/wallet',
+                        NotificationDispatcher::buildVolHoursApprovedPaidEmail($hours, $orgName)
+                    );
+                } elseif ($action === 'approve' && $paymentResult === 'insufficient_balance') {
+                    NotificationDispatcher::dispatch(
+                        $volunteerId, 'global', 0, 'vol_hours_approved',
+                        "Your {$hours}h were approved! Time credits will be paid when the organization funds their wallet.",
+                        '/volunteering?tab=hours',
+                        NotificationDispatcher::buildVolHoursApprovedEmail($hours, $orgName)
+                    );
+                    NotificationDispatcher::dispatch(
+                        (int) $org->user_id, 'global', 0, 'vol_hours_approved',
+                        "Approved {$hours}h for a volunteer but your org wallet has insufficient balance. Please fund your wallet.",
+                        '/volunteering/org/' . (int) $org->id . '/dashboard?tab=wallet',
+                        null
+                    );
+                } elseif ($action === 'approve') {
+                    NotificationDispatcher::dispatch(
+                        $volunteerId, 'global', 0, 'vol_hours_approved',
                         "Your {$hours}h of volunteering were approved!",
                         '/volunteering?tab=hours',
                         NotificationDispatcher::buildVolHoursApprovedEmail($hours, $orgName)
                     );
                 } else {
-                    $orgName = $org->name ?? 'Organization';
-                    // Declined — notify volunteer
                     NotificationDispatcher::dispatch(
-                        $volunteerId,
-                        'global',
-                        0,
-                        'vol_hours_declined',
+                        $volunteerId, 'global', 0, 'vol_hours_declined',
                         "Your {$hours}h volunteering log was declined.",
                         '/volunteering?tab=hours',
                         NotificationDispatcher::buildVolHoursDeclinedEmail($hours, $orgName)
                     );
                 }
+            } catch (\Throwable $e) {
+                // Notification failure must not affect the already-committed transaction
+                error_log("VolunteerService::verifyHours notification error: " . $e->getMessage());
+            }
 
-                return true;
-            });
+            return true;
         } catch (\Exception $e) {
             error_log("VolunteerService::verifyHours error: " . $e->getMessage());
             self::$errors[] = ['code' => 'SERVER_ERROR', 'message' => 'Failed to verify hours'];

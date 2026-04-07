@@ -874,6 +874,9 @@ class AdminVolunteerController extends BaseApiController
         if (!is_array($fieldIds) || empty($fieldIds)) {
             return $this->respondWithError('VALIDATION_ERROR', 'field_ids must be a non-empty array', 'field_ids', 400);
         }
+        if (count($fieldIds) > 100) {
+            return $this->respondWithError('VALIDATION_ERROR', 'Too many fields (max 100)', 'field_ids', 400);
+        }
 
         try {
             $updated = 0;
@@ -896,6 +899,13 @@ class AdminVolunteerController extends BaseApiController
     {
         $this->requireAdmin();
         $tenantId = TenantContext::getId();
+
+        // Verify giving day belongs to this tenant
+        $givingDay = DB::selectOne("SELECT id FROM vol_giving_days WHERE id = ? AND tenant_id = ?", [$id, $tenantId]);
+        if (!$givingDay) {
+            return $this->respondWithError('NOT_FOUND', 'Giving day not found', null, 404);
+        }
+
         $perPage = $this->queryInt('per_page', 20, 1, 50);
         $cursor = $this->query('cursor');
 
@@ -1022,6 +1032,13 @@ class AdminVolunteerController extends BaseApiController
     {
         $this->requireAdmin();
         $tenantId = TenantContext::getId();
+
+        // Verify giving day belongs to this tenant
+        $givingDay = DB::selectOne("SELECT id FROM vol_giving_days WHERE id = ? AND tenant_id = ?", [$id, $tenantId]);
+        if (!$givingDay) {
+            return $this->respondWithError('NOT_FOUND', 'Giving day not found', null, 404);
+        }
+
         $granularity = $this->query('granularity', 'day');
         $format = $granularity === 'week' ? '%Y-W%u' : '%Y-%m-%d';
 

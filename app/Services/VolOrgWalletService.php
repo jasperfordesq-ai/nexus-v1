@@ -186,11 +186,7 @@ class VolOrgWalletService
                 return ['success' => false, 'message' => 'User not found'];
             }
 
-            if ((int) $user->balance < (int) ceil($amount)) {
-                return ['success' => false, 'message' => 'Insufficient personal balance'];
-            }
-
-            // Lock org row
+            // Lock org row BEFORE validating user balance (prevent race condition on org balance_after)
             $org = DB::selectOne(
                 "SELECT id, name, balance FROM vol_organizations WHERE id = ? AND tenant_id = ? FOR UPDATE",
                 [$volOrgId, $tenantId]
@@ -200,20 +196,27 @@ class VolOrgWalletService
                 return ['success' => false, 'message' => 'Organization not found'];
             }
 
-            // Deduct from user (users.balance is INT)
-            $intAmount = (int) ceil($amount);
+            // Use floor (not ceil) to prevent phantom debit: user loses same INT as org gains
+            $intAmount = (int) floor($amount);
+            if ($intAmount <= 0) {
+                return ['success' => false, 'message' => 'Amount must be at least 1 hour'];
+            }
+
+            if ((int) $user->balance < $intAmount) {
+                return ['success' => false, 'message' => 'Insufficient personal balance'];
+            }
             DB::update(
                 "UPDATE users SET balance = balance - ? WHERE id = ? AND tenant_id = ?",
                 [$intAmount, $userId, $tenantId]
             );
 
-            // Credit to org
+            // Credit to org (same INT amount as deducted from user — no phantom credits)
             DB::update(
                 "UPDATE vol_organizations SET balance = balance + ? WHERE id = ? AND tenant_id = ?",
-                [$amount, $volOrgId, $tenantId]
+                [$intAmount, $volOrgId, $tenantId]
             );
 
-            $newBalance = (float) $org->balance + $amount;
+            $newBalance = (float) $org->balance + $intAmount;
 
             // Record org transaction
             DB::insert("
