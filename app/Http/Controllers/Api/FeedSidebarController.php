@@ -240,10 +240,12 @@ class FeedSidebarController extends BaseApiController
                     ->join('users as u', function ($join) use ($userId) {
                         $join->whereRaw("u.id = CASE WHEN c.requester_id = ? THEN c.receiver_id ELSE c.requester_id END", [$userId]);
                     })
+                    ->where('c.tenant_id', $tenantId)
                     ->where(function ($q) use ($userId) {
                         $q->where('c.requester_id', $userId)->orWhere('c.receiver_id', $userId);
                     })
                     ->where('c.status', 'accepted')
+                    ->distinct()
                     ->orderByDesc('u.last_active_at')
                     ->limit(8)
                     ->select('u.id', 'u.first_name', 'u.last_name', 'u.organization_name', 'u.profile_type', 'u.avatar_url', 'u.location', 'u.last_active_at')

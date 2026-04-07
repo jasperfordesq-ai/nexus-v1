@@ -66,6 +66,7 @@ import {
   ShoppingBag,
   Fingerprint,
   ShieldCheck,
+  Bookmark,
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useAuth, useTenant, useNotifications, useTheme, useMenuContext } from '@/contexts';
@@ -306,6 +307,7 @@ export function Navbar({ onMobileMenuOpen, externalSearchOpen, onSearchOpenChang
       items: [
         { label: t('nav.matches', 'Matches'), desc: t('nav_desc.matches'), href: tenantPath('/matches'), icon: Handshake },
         { label: t('nav.skills', 'Skills'), desc: t('nav_desc.skills'), href: tenantPath('/skills'), icon: GraduationCap },
+        { label: t('nav.saved', 'Saved'), desc: t('nav_desc.saved', 'Your bookmarked items'), href: tenantPath('/saved'), icon: Bookmark },
         { label: t('nav.activity', 'My Activity'), desc: t('nav_desc.activity'), href: tenantPath('/activity'), icon: Activity },
         { label: t('nav.ai_chat', 'AI Assistant'), desc: t('nav_desc.ai_chat'), href: tenantPath('/chat'), icon: Bot, feature: 'ai_chat' },
       ].filter(gateFilter),

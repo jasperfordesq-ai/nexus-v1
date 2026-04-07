@@ -13,12 +13,13 @@
  * Uses V2 API: POST /api/v2/feed/polls, POST /api/v2/feed/polls/{id}/vote
  */
 
-import { useState, useEffect, useCallback, useRef, Component, type ReactNode, type ErrorInfo, type KeyboardEvent } from 'react';
+import React, { useState, useEffect, useCallback, useRef, Component, type ReactNode, type ErrorInfo, type KeyboardEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Button,
   Avatar,
+  Chip,
   Textarea,
   Modal,
   ModalContent,
@@ -49,6 +50,7 @@ import { StoriesBar } from '@/components/feed/StoriesBar';
 import { FeedModeToggle } from '@/components/feed/FeedModeToggle';
 import { SubFilterChips } from '@/components/feed/SubFilterChips';
 import { MobileFAB } from '@/components/feed/MobileFAB';
+import { ConnectionSuggestionsWidget } from '@/components/feed/ConnectionSuggestionsWidget';
 import { useAuth, useToast, usePusherOptional, useTenant } from '@/contexts';
 import type { FeedPostEvent } from '@/contexts';
 import { api } from '@/lib/api';
@@ -93,6 +95,10 @@ export function FeedPage() {
   const [isLoadingMore, setIsLoadingMore] = useState(false);
   // Count of real-time posts received while the user hasn't scrolled to top
   const [pendingPostCount, setPendingPostCount] = useState(0);
+  // Whether the user is scrolled past the top of the feed
+  const [isScrolledDown, setIsScrolledDown] = useState(false);
+  // Buffer for real-time posts received while scrolled down
+  const pendingPostsRef = useRef<FeedItem[]>([]);
 
   // Feed mode: EdgeRank vs chronological
   const [feedMode, setFeedMode] = useState<'ranking' | 'recent'>('ranking');
@@ -218,6 +224,38 @@ export function FeedPage() {
   // eslint-disable-next-line react-hooks/exhaustive-deps -- abort and reload on filter change; loadFeed excluded to avoid loop
   }, [filter, feedMode, subFilter]);
 
+  /* ───────── Scroll position tracking ───────── */
+
+  useEffect(() => {
+    const SCROLL_THRESHOLD = 200;
+    let ticking = false;
+
+    const handleScroll = () => {
+      if (ticking) return;
+      ticking = true;
+      requestAnimationFrame(() => {
+        const scrolledDown = window.scrollY > SCROLL_THRESHOLD;
+        setIsScrolledDown(scrolledDown);
+
+        // If user scrolled back to top, flush buffered posts
+        if (!scrolledDown && pendingPostsRef.current.length > 0) {
+          const buffered = [...pendingPostsRef.current];
+          pendingPostsRef.current = [];
+          setPendingPostCount(0);
+          setItems((prev) => {
+            const existingKeys = new Set(prev.map((p) => `${p.type}-${p.id}`));
+            const newItems = buffered.filter((fi) => !existingKeys.has(`${fi.type}-${fi.id}`));
+            return [...newItems, ...prev];
+          });
+        }
+        ticking = false;
+      });
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
   /* ───────── Real-time feed subscription ───────── */
 
   useEffect(() => {
@@ -244,6 +282,14 @@ export function FeedPage() {
 
       if (!matchesFilter) return;
 
+      // If scrolled down, buffer the post and show "new posts" chip
+      if (window.scrollY > 200) {
+        pendingPostsRef.current = [incoming, ...pendingPostsRef.current];
+        setPendingPostCount((n) => n + 1);
+        return;
+      }
+
+      // At top of feed — prepend directly
       setItems((prev) => {
         // Guard against duplicates (e.g. race between Pusher event and manual reload)
         if (prev.some((p) => p.type === incoming.type && p.id === incoming.id)) {
@@ -251,8 +297,6 @@ export function FeedPage() {
         }
         return [incoming, ...prev];
       });
-
-      setPendingPostCount((n) => n + 1);
     });
 
     return unsub;
@@ -461,6 +505,16 @@ export function FeedPage() {
   /* ───────── New-posts banner dismiss ───────── */
 
   const handleScrollToNewPosts = () => {
+    // Flush buffered posts into the feed
+    if (pendingPostsRef.current.length > 0) {
+      const buffered = [...pendingPostsRef.current];
+      pendingPostsRef.current = [];
+      setItems((prev) => {
+        const existingKeys = new Set(prev.map((p) => `${p.type}-${p.id}`));
+        const newItems = buffered.filter((fi) => !existingKeys.has(`${fi.type}-${fi.id}`));
+        return [...newItems, ...prev];
+      });
+    }
     setPendingPostCount(0);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
@@ -606,26 +660,33 @@ export function FeedPage() {
       {/* Sub-Filter Chips (contextual, e.g. Listings -> Offers/Requests) */}
       <SubFilterChips filter={filter} subFilter={subFilter} onSubFilterChange={setSubFilter} />
 
-      {/* New posts banner — appears when real-time posts arrive off-screen */}
+      {/* New posts floating chip — appears when real-time posts arrive while scrolled down */}
       <AnimatePresence>
-        {pendingPostCount > 0 && (
+        {pendingPostCount > 0 && isScrolledDown && (
           <motion.div
-            key="new-posts-banner"
-            initial={{ opacity: 0, y: -12 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -12 }}
-            transition={{ duration: 0.2 }}
-            className="sticky top-4 z-20 flex justify-center"
+            key="new-posts-chip"
+            initial={{ opacity: 0, y: -20, scale: 0.9 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: -20, scale: 0.9 }}
+            transition={{ type: 'spring', stiffness: 300, damping: 25 }}
+            className="fixed top-20 left-1/2 -translate-x-1/2 z-50"
             role="status"
             aria-live="polite"
           >
-            <Button
-              onPress={handleScrollToNewPosts}
-              className="flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r from-indigo-500 to-purple-600 text-white text-sm font-medium shadow-lg shadow-indigo-500/30 hover:shadow-indigo-500/50 transition-shadow"
-              startContent={<ArrowUp className="w-3.5 h-3.5" aria-hidden="true" />}
+            <Chip
+              as="button"
+              color="primary"
+              variant="shadow"
+              size="lg"
+              classNames={{
+                base: 'cursor-pointer bg-gradient-to-r from-indigo-500 to-purple-600 shadow-lg shadow-indigo-500/30 hover:shadow-indigo-500/50 transition-shadow px-4 py-2 h-auto',
+                content: 'flex items-center gap-2 text-white font-medium text-sm',
+              }}
+              startContent={<ArrowUp className="w-3.5 h-3.5 text-white" aria-hidden="true" />}
+              onClick={handleScrollToNewPosts}
             >
               {t('realtime.new_posts', { count: pendingPostCount })}
-            </Button>
+            </Chip>
           </motion.div>
         )}
       </AnimatePresence>
@@ -681,23 +742,31 @@ export function FeedPage() {
           ) : (
             <div className="space-y-4">
               <AnimatePresence initial={false}>
-                {items.map((item) => (
-                  <motion.div key={`${item.type}-${item.id}`} initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, height: 0, overflow: 'hidden' }} transition={{ duration: 0.25 }}>
-                    <FeedCard
-                      item={item}
-                      onToggleLike={handleToggleLike}
-                      onReact={handleReact}
-                      onHidePost={handleHidePost}
-                      onMuteUser={handleMuteUser}
-                      onReportPost={openReportModal}
-                      onDeletePost={handleDeletePost}
-                      onAdminDeletePost={isAdmin ? handleAdminDeletePost : undefined}
-                      onVotePoll={handleVotePoll}
-                      isAuthenticated={isAuthenticated}
-                      currentUserId={user?.id}
-                      isAdmin={isAdmin}
-                    />
-                  </motion.div>
+                {items.map((item, index) => (
+                  <React.Fragment key={`${item.type}-${item.id}`}>
+                    <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, height: 0, overflow: 'hidden' }} transition={{ duration: 0.25 }}>
+                      <FeedCard
+                        item={item}
+                        onToggleLike={handleToggleLike}
+                        onReact={handleReact}
+                        onHidePost={handleHidePost}
+                        onMuteUser={handleMuteUser}
+                        onReportPost={openReportModal}
+                        onDeletePost={handleDeletePost}
+                        onAdminDeletePost={isAdmin ? handleAdminDeletePost : undefined}
+                        onVotePoll={handleVotePoll}
+                        isAuthenticated={isAuthenticated}
+                        currentUserId={user?.id}
+                        isAdmin={isAdmin}
+                      />
+                    </motion.div>
+                    {/* Show connection suggestions inline on mobile after every 10 posts */}
+                    {index === 9 && isAuthenticated && (
+                      <div className="lg:hidden">
+                        <ConnectionSuggestionsWidget layout="inline" />
+                      </div>
+                    )}
+                  </React.Fragment>
                 ))}
               </AnimatePresence>
 
@@ -712,6 +781,15 @@ export function FeedPage() {
                   >
                     {t('load_more')}
                   </Button>
+                </div>
+              )}
+
+              {/* Pagination loading skeletons */}
+              {isLoadingMore && (
+                <div className="space-y-4 pt-2">
+                  {[1, 2].map((i) => (
+                    <FeedSkeleton key={`load-more-skeleton-${i}`} />
+                  ))}
                 </div>
               )}
             </div>

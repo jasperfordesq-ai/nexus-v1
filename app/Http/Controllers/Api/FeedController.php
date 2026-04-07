@@ -77,6 +77,11 @@ class FeedController extends BaseApiController
 
         $post = $this->feedService->createPost($userId, $this->getAllInput());
 
+        // Handle validation errors from FeedService
+        if (is_array($post) && isset($post['error'])) {
+            return $this->respondWithError('VALIDATION_ERROR', $post['error'], null, 422);
+        }
+
         // Award XP for creating a post
         try {
             \App\Services\GamificationService::awardXP($userId, \App\Services\GamificationService::XP_VALUES['create_post'], 'create_post', 'Created a feed post');

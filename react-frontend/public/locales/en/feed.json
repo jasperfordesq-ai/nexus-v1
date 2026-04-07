@@ -53,8 +53,8 @@
     "share_failed": "Failed to share post"
   },
   "realtime": {
-    "new_posts_one": "1 new post",
-    "new_posts_other": "{{count}} new posts"
+    "new_posts_one": "1 new post — Tap to see",
+    "new_posts_other": "{{count}} new posts — Tap to see"
   },
   "compose": {
     "create_title": "Create {{type}}",
@@ -204,6 +204,7 @@
     "delete_post": "Delete Post",
     "hide_post": "Hide Post",
     "mute_user": "Mute {{name}}",
+    "block_user": "Block {{name}}",
     "report_post": "Report Post",
     "read_more": "Read more",
     "reviewed": "Reviewed",
@@ -220,6 +221,7 @@
     "write_comment": "Write a comment...",
     "no_comments": "No comments yet. Be the first to share your thoughts!",
     "admin_delete": "Delete (Admin)",
+    "view_analytics": "View Analytics",
     "type_post": "Post",
     "type_listing": "Listing",
     "type_event": "Event",
@@ -290,7 +292,36 @@
     "tooltip_share": "Share to your feed",
     "button_label": "Share",
     "button_label_count": "Share ({{count}})",
-    "shared_by": "<0>{{name}}</0> shared this"
+    "shared_by": "<0>{{name}}</0> shared this",
+    "menu_label": "Share options",
+    "repost": "Repost",
+    "repost_desc": "Share to your feed",
+    "repost_remove": "Remove Repost",
+    "repost_remove_desc": "Remove repost from your feed",
+    "quote": "Quote Post",
+    "quote_desc": "Repost with your commentary",
+    "quote_title": "Quote Post",
+    "quote_placeholder": "Add your thoughts...",
+    "quote_content_required": "Please add your commentary",
+    "quote_posted": "Quote post created",
+    "quote_failed": "Failed to create quote post",
+    "quote_submit": "Post",
+    "copy_link": "Copy Link",
+    "link_copied": "Link copied to clipboard",
+    "copy_failed": "Failed to copy link",
+    "external": "Share...",
+    "external_title": "Share Post",
+    "share_via": "Share via {{platform}}",
+    "send_dm": "Send via Message",
+    "dm_title": "Send via Message",
+    "dm_search_placeholder": "Search for a member...",
+    "dm_no_results": "No members found",
+    "dm_hint": "Type at least 2 characters to search",
+    "dm_sent": "Post shared with {{name}}",
+    "dm_failed": "Failed to send message",
+    "dm_sent_label": "Sent",
+    "dm_send": "Send",
+    "dm_done": "Done"
   },
   "trending": {
     "title": "Trending",
@@ -416,5 +447,14 @@
     "too_large": "Video must be smaller than {{size}}MB",
     "invalid_type": "Invalid video format. Supported: MP4, WebM, MOV",
     "remove": "Remove video"
+  },
+  "analytics": {
+    "title": "Post Analytics",
+    "views": "Views",
+    "likes": "Likes",
+    "comments": "Comments",
+    "shares": "Shares",
+    "reach": "Reach",
+    "reactions_breakdown": "Reactions Breakdown"
   }
 }

@@ -397,6 +397,26 @@ export interface Category {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
+// Bookmark Types
+// ─────────────────────────────────────────────────────────────────────────────
+
+export interface Bookmark {
+  id: number;
+  bookmarkable_type: string;
+  bookmarkable_id: number;
+  collection_id: number | null;
+  created_at: string;
+}
+
+export interface BookmarkCollection {
+  id: number;
+  name: string;
+  description: string | null;
+  is_default: boolean;
+  bookmarks_count?: number;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
 // Message Types
 // ─────────────────────────────────────────────────────────────────────────────
 
@@ -893,6 +913,14 @@ export interface Notification {
   action_url?: string;
   data?: Record<string, unknown>;
   created_at: string;
+  // Grouped notification fields
+  is_grouped?: boolean;
+  group_key?: string;
+  group_count?: number;
+  actors?: Array<{ id: number; name: string; avatar_url?: string | null }>;
+  remaining_count?: number;
+  latest_at?: string;
+  notification_ids?: number[];
 }
 
 // ─────────────────────────────────────────────────────────────────────────────

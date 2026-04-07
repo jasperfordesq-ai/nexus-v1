@@ -1,0 +1,106 @@
+<?php
+// Copyright © 2024–2026 Jasper Ford
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Author: Jasper Ford
+// See NOTICE file for attribution and acknowledgements.
+
+namespace App\Http\Controllers\Api;
+
+use App\Services\BlockUserService;
+use Illuminate\Http\JsonResponse;
+
+/**
+ * BlockUserController — block/unblock users and list blocked users.
+ *
+ * Endpoints:
+ *   POST   /api/v2/users/{id}/block    — block a user
+ *   DELETE /api/v2/users/{id}/block    — unblock a user
+ *   GET    /api/v2/users/blocked       — list blocked users
+ */
+class BlockUserController extends BaseApiController
+{
+    protected bool $isV2Api = true;
+
+    /**
+     * POST /api/v2/users/{id}/block
+     *
+     * Block a user. Optionally provide a reason.
+     * Body: { "reason"?: string }
+     */
+    public function block(int $id): JsonResponse
+    {
+        $userId = $this->requireAuth();
+        $this->rateLimit('block_user', 20, 60);
+
+        if ($userId === $id) {
+            return $this->respondWithError('VALIDATION_ERROR', 'You cannot block yourself', null, 400);
+        }
+
+        $reason = $this->input('reason');
+
+        try {
+            BlockUserService::block($userId, $id, $reason);
+        } catch (\RuntimeException $e) {
+            return $this->respondWithError('VALIDATION_ERROR', $e->getMessage(), null, 400);
+        }
+
+        return $this->respondWithData([
+            'success' => true,
+            'message' => 'User blocked',
+            'blocked_user_id' => $id,
+        ]);
+    }
+
+    /**
+     * DELETE /api/v2/users/{id}/block
+     *
+     * Unblock a user.
+     */
+    public function unblock(int $id): JsonResponse
+    {
+        $userId = $this->requireAuth();
+        $this->rateLimit('unblock_user', 20, 60);
+
+        $success = BlockUserService::unblock($userId, $id);
+
+        if (!$success) {
+            return $this->respondWithError('NOT_FOUND', 'User was not blocked', null, 404);
+        }
+
+        return $this->respondWithData([
+            'success' => true,
+            'message' => 'User unblocked',
+            'unblocked_user_id' => $id,
+        ]);
+    }
+
+    /**
+     * GET /api/v2/users/blocked
+     *
+     * List all users blocked by the current user.
+     */
+    public function index(): JsonResponse
+    {
+        $userId = $this->requireAuth();
+        $this->rateLimit('blocked_list', 30, 60);
+
+        $blockedUsers = BlockUserService::getBlockedUsers($userId);
+
+        return $this->respondWithData($blockedUsers->all());
+    }
+
+    /**
+     * GET /api/v2/users/{id}/block-status
+     *
+     * Check if a specific user is blocked.
+     */
+    public function status(int $id): JsonResponse
+    {
+        $userId = $this->requireAuth();
+
+        return $this->respondWithData([
+            'is_blocked' => BlockUserService::isBlocked($userId, $id),
+            'is_blocked_by' => BlockUserService::isBlocked($id, $userId),
+        ]);
+    }
+}

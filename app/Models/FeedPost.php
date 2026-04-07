@@ -20,7 +20,7 @@ class FeedPost extends Model
     protected $fillable = [
         'tenant_id', 'user_id', 'content', 'emoji', 'image_url', 'type',
         'parent_id', 'parent_type', 'visibility', 'group_id',
-        'scheduled_at', 'publish_status',
+        'scheduled_at', 'publish_status', 'quoted_post_id',
     ];
 
     /**
@@ -34,6 +34,7 @@ class FeedPost extends Model
         'group_id' => 'integer',
         'likes_count' => 'integer',
         'comments_count' => 'integer',
+        'views_count' => 'integer',
         'is_pinned' => 'boolean',
         'is_hidden' => 'boolean',
         'scheduled_at' => 'datetime',
@@ -47,5 +48,13 @@ class FeedPost extends Model
     public function parent(): BelongsTo
     {
         return $this->belongsTo(self::class, 'parent_id');
+    }
+
+    /**
+     * The post being quoted (quote repost).
+     */
+    public function quotedPost(): BelongsTo
+    {
+        return $this->belongsTo(self::class, 'quoted_post_id');
     }
 }

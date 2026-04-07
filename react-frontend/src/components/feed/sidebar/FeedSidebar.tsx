@@ -33,6 +33,7 @@ import { PopularGroupsWidget } from './PopularGroupsWidget';
 import type { PopularGroup } from './PopularGroupsWidget';
 import { TrendingHashtags } from '@/components/hashtags/TrendingHashtags';
 import { TopEndorsedWidget } from '@/components/endorsements/TopEndorsedWidget';
+import { ConnectionSuggestionsWidget } from '@/components/feed/ConnectionSuggestionsWidget';
 
 interface SidebarApiResponse {
   friends?: Friend[];
@@ -93,9 +94,7 @@ export function FeedSidebar() {
       {data?.top_categories && data.top_categories.length > 0 && (
         <TopCategoriesWidget categories={data.top_categories} />
       )}
-      {data?.suggested_members && data.suggested_members.length > 0 && (
-        <PeopleYouMayKnowWidget members={data.suggested_members} />
-      )}
+      {isAuthenticated && <ConnectionSuggestionsWidget layout="sidebar" />}
       {data?.upcoming_events && data.upcoming_events.length > 0 && (
         <UpcomingEventsWidget events={data.upcoming_events} />
       )}

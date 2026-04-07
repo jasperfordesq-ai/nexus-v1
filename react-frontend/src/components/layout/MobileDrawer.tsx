@@ -66,6 +66,7 @@ import {
   Moon,
   FlaskConical,
   Fingerprint,
+  Bookmark,
 } from 'lucide-react';
 import { RELEASE_STATUS } from '@/config/releaseStatus';
 import { TenantLogo } from '@/components/branding';
@@ -173,6 +174,7 @@ export function MobileDrawer({ isOpen, onClose, onSearchOpen }: MobileDrawerProp
     { label: t('nav.leaderboard'), href: '/leaderboard', icon: Medal, feature: 'gamification' as const },
     { label: t('nav.nexus_score', 'NexusScore'), href: '/nexus-score', icon: BarChart3, feature: 'gamification' as const },
     { label: t('nav.skills', 'Skills'), href: '/skills', icon: GraduationCap },
+    { label: t('nav.saved', 'Saved'), href: '/saved', icon: Bookmark, auth: true },
     { label: t('nav.activity', 'My Activity'), href: '/activity', icon: Activity },
     { label: t('nav.ai_chat', 'AI Assistant'), href: '/chat', icon: Bot, feature: 'ai_chat' as keyof TenantFeatures },
   ];

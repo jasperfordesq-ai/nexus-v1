@@ -8,7 +8,7 @@
  * Extracted from FeedPage.tsx for maintainability.
  */
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
@@ -32,6 +32,7 @@ import {
   MessageCircle,
   Send,
   MoreHorizontal,
+  Eye,
   EyeOff,
   VolumeX,
   Flag,
@@ -46,7 +47,6 @@ import {
   Calendar,
   MapPin,
   ArrowRight,
-  Repeat2,
   BookOpen,
   Users,
   Trophy,
@@ -55,8 +55,8 @@ import {
   X,
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { GlassCard } from '@/components/ui';
-import { useTenant, useToast } from '@/contexts';
+import { GlassCard, BottomSheet } from '@/components/ui';
+import { useTenant } from '@/contexts';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
 import { resolveAvatarUrl, resolveAssetUrl, formatRelativeTime, formatDate, formatTime } from '@/lib/helpers';
@@ -70,7 +70,12 @@ import { VideoPlayer } from './VideoPlayer';
 import { ReactionPicker, ReactionSummary, type ReactionType } from '@/components/social';
 import { LinkPreviewCard } from '@/components/social/LinkPreviewCard';
 import { MentionRenderer } from '@/components/social/MentionRenderer';
+import { UserHoverCard } from '@/components/social/UserHoverCard';
 import { SafeHtml, containsHtml } from '@/components/ui/SafeHtml';
+import { ShareButton } from './ShareButton';
+import { QuotedPostEmbed } from './QuotedPostEmbed';
+import { BookmarkButton } from '@/components/social';
+import { PostAnalyticsModal } from './PostAnalyticsModal';
 
 /* ───────────────────────── Props ───────────────────────── */
 
@@ -177,8 +182,46 @@ const typeConfig = {
   },
 };
 
-/* ────────────── Placeholder icon per feed type ────────────── */
+/* ────────────── Heart Overlay (double-tap to like) ────────────── */
 
+function HeartOverlay({ show }: { show: boolean }) {
+  return (
+    <AnimatePresence>
+      {show && (
+        <motion.div
+          key="heart-overlay"
+          initial={{ scale: 0, opacity: 0 }}
+          animate={{ scale: 1.2, opacity: 1 }}
+          exit={{ scale: 1.4, opacity: 0 }}
+          transition={{ duration: 0.4, ease: 'easeOut' }}
+          className="absolute inset-0 flex items-center justify-center pointer-events-none z-10"
+        >
+          <Heart className="w-20 h-20 text-white fill-white drop-shadow-lg" />
+        </motion.div>
+      )}
+    </AnimatePresence>
+  );
+}
+
+/**
+ * Hook to detect double-tap / double-click on an element.
+ * Returns a click handler and a ref for the timeout.
+ */
+function useDoubleTap(onDoubleTap: () => void, delay = 300) {
+  const lastTapRef = useRef<number>(0);
+
+  const handleTap = useCallback(() => {
+    const now = Date.now();
+    if (now - lastTapRef.current < delay) {
+      lastTapRef.current = 0;
+      onDoubleTap();
+    } else {
+      lastTapRef.current = now;
+    }
+  }, [onDoubleTap, delay]);
+
+  return handleTap;
+}
 
 /* ───────────────────────── Comment Item ───────────────────────── */
 
@@ -371,7 +414,6 @@ const FeedCard = React.memo(function FeedCard({
 }: FeedCardProps) {
   const { t } = useTranslation('feed');
   const { tenantPath } = useTenant();
-  const toast = useToast();
   const [showComments, setShowComments] = useState(defaultShowComments);
   const [comments, setComments] = useState<FeedComment[]>([]);
   const [isLoadingComments, setIsLoadingComments] = useState(defaultShowComments);
@@ -380,6 +422,62 @@ const FeedCard = React.memo(function FeedCard({
   const [localCommentsCount, setLocalCommentsCount] = useState(item.comments_count);
   const [pollData, setPollData] = useState<PollData | null>(item.poll_data ?? null);
   const [isLoadingPoll, setIsLoadingPoll] = useState(false);
+
+  // Double-tap to like
+  const [showHeartOverlay, setShowHeartOverlay] = useState(false);
+  const heartTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // Bottom sheet for mobile options menu
+  const [isOptionsSheetOpen, setIsOptionsSheetOpen] = useState(false);
+
+  const handleDoubleTapLike = useCallback(() => {
+    if (!isAuthenticated) return;
+    // Only like if not already liked
+    if (!item.is_liked) {
+      onToggleLike(item);
+    }
+    // Always show the heart animation
+    setShowHeartOverlay(true);
+    if (heartTimeoutRef.current) clearTimeout(heartTimeoutRef.current);
+    heartTimeoutRef.current = setTimeout(() => setShowHeartOverlay(false), 800);
+  }, [isAuthenticated, item, onToggleLike]);
+
+  const doubleTapHandler = useDoubleTap(handleDoubleTapLike);
+
+  // Clean up heart timeout on unmount
+  useEffect(() => {
+    return () => {
+      if (heartTimeoutRef.current) clearTimeout(heartTimeoutRef.current);
+    };
+  }, []);
+
+  // Post analytics modal
+  const [showAnalytics, setShowAnalytics] = useState(false);
+
+  // View tracking — fire once per session per post when entering viewport
+  const viewTrackedRef = useRef(false);
+  const viewObserverRef = useRef<IntersectionObserver | null>(null);
+  const viewTargetRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    if (viewTrackedRef.current) return;
+    const el = viewTargetRef.current;
+    if (!el) return;
+
+    viewObserverRef.current = new IntersectionObserver(
+      (entries) => {
+        if (entries[0]?.isIntersecting && !viewTrackedRef.current) {
+          viewTrackedRef.current = true;
+          api.post(`/v2/feed/posts/${item.id}/view`).catch(() => {});
+          viewObserverRef.current?.disconnect();
+        }
+      },
+      { threshold: 0.5 }
+    );
+    viewObserverRef.current.observe(el);
+
+    return () => viewObserverRef.current?.disconnect();
+  }, [item.id]);
 
   const author = getAuthor(item);
   const isOwnPost = currentUserId === author.id;
@@ -515,7 +613,7 @@ const FeedCard = React.memo(function FeedCard({
   };
 
   return (
-    <GlassCard ref={trackingRef} hoverable className="overflow-hidden group">
+    <GlassCard ref={(el: HTMLDivElement | null) => { (trackingRef as React.MutableRefObject<HTMLDivElement | null>).current = el; viewTargetRef.current = el; }} hoverable className="overflow-hidden group">
       {/* Type accent bar */}
       {typeLabel && (
         <div className={`h-0.5 bg-gradient-to-r ${config.gradient}`} />
@@ -525,23 +623,27 @@ const FeedCard = React.memo(function FeedCard({
         {/* Header */}
         <div className="flex items-start justify-between mb-4">
           <div className="flex items-center gap-3">
-            <Link to={tenantPath(`/profile/${author.id}`)} className="relative">
-              <Avatar
-                name={author.name}
-                src={resolveAvatarUrl(author.avatar)}
-                size="md"
-                className="ring-2 ring-[var(--border-default)] group-hover:ring-[var(--color-primary)]/30 transition-all"
-                isBordered
-              />
-            </Link>
+            <UserHoverCard userId={author.id}>
+              <Link to={tenantPath(`/profile/${author.id}`)} className="relative">
+                <Avatar
+                  name={author.name}
+                  src={resolveAvatarUrl(author.avatar)}
+                  size="md"
+                  className="ring-2 ring-[var(--border-default)] group-hover:ring-[var(--color-primary)]/30 transition-all"
+                  isBordered
+                />
+              </Link>
+            </UserHoverCard>
             <div className="min-w-0">
               <div className="flex items-center gap-2 flex-wrap">
-                <Link
-                  to={tenantPath(`/profile/${author.id}`)}
-                  className="font-semibold text-[var(--text-primary)] hover:text-[var(--color-primary)] transition-colors text-sm truncate"
-                >
-                  {author.name}
-                </Link>
+                <UserHoverCard userId={author.id}>
+                  <Link
+                    to={tenantPath(`/profile/${author.id}`)}
+                    className="font-semibold text-[var(--text-primary)] hover:text-[var(--color-primary)] transition-colors text-sm truncate"
+                  >
+                    {author.name}
+                  </Link>
+                </UserHoverCard>
                 {typeLabel && (
                   detailPath ? (
                     <Link to={tenantPath(detailPath)} onClick={recordClick}>
@@ -577,71 +679,165 @@ const FeedCard = React.memo(function FeedCard({
             </div>
           </div>
 
-          {/* 3-dot moderation menu */}
+          {/* 3-dot moderation menu — Dropdown on desktop, BottomSheet on mobile */}
           {isAuthenticated && (
-            <Dropdown placement="bottom-end">
-              <DropdownTrigger>
-                <Button
-                  isIconOnly
-                  size="sm"
-                  variant="light"
-                  className="text-[var(--text-subtle)] hover:text-[var(--text-primary)] min-w-0 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity"
-                  aria-label={t('card.post_options', 'Post options')}
-                >
-                  <MoreHorizontal className="w-4 h-4" />
-                </Button>
-              </DropdownTrigger>
-              <DropdownMenu aria-label={t('card.post_actions', 'Post actions')}>
-                {isOwnPost ? (
-                  <DropdownItem
-                    key="delete"
-                    startContent={<Trash2 className="w-4 h-4" aria-hidden="true" />}
-                    className="text-danger"
-                    color="danger"
-                    onPress={() => onDeletePost(item)}
-                  >
-                    {t('card.delete_post')}
-                  </DropdownItem>
-                ) : (
-                  <>
-                    <DropdownItem
-                      key="hide"
-                      startContent={<EyeOff className="w-4 h-4" aria-hidden="true" />}
-                      onPress={() => onHidePost(item)}
+            <>
+              {/* Desktop: HeroUI Dropdown */}
+              <div className="hidden sm:block">
+                <Dropdown placement="bottom-end">
+                  <DropdownTrigger>
+                    <Button
+                      isIconOnly
+                      size="sm"
+                      variant="light"
+                      className="text-[var(--text-subtle)] hover:text-[var(--text-primary)] min-w-0 opacity-0 group-hover:opacity-100 transition-opacity"
+                      aria-label={t('card.post_options', 'Post options')}
                     >
-                      {t('card.hide_post')}
-                    </DropdownItem>
-                    <DropdownItem
-                      key="mute"
-                      startContent={<VolumeX className="w-4 h-4" aria-hidden="true" />}
-                      onPress={() => onMuteUser(item)}
-                    >
-                      {t('card.mute_user', { name: author.name })}
-                    </DropdownItem>
-                    <DropdownItem
-                      key="report"
-                      startContent={<Flag className="w-4 h-4" aria-hidden="true" />}
-                      className="text-danger"
-                      color="danger"
-                      onPress={() => onReportPost(item)}
-                    >
-                      {t('card.report_post')}
-                    </DropdownItem>
-                    {isAdmin && onAdminDeletePost && (
-                      <DropdownItem
-                        key="admin-delete"
-                        startContent={<Trash2 className="w-4 h-4" aria-hidden="true" />}
-                        className="text-danger"
-                        color="danger"
-                        onPress={() => onAdminDeletePost(item)}
-                      >
-                        {t('card.admin_delete', 'Delete (Admin)')}
-                      </DropdownItem>
+                      <MoreHorizontal className="w-4 h-4" />
+                    </Button>
+                  </DropdownTrigger>
+                  <DropdownMenu aria-label={t('card.post_actions', 'Post actions')}>
+                    {isOwnPost ? (
+                      <>
+                        <DropdownItem
+                          key="analytics"
+                          startContent={<BarChart3 className="w-4 h-4" aria-hidden="true" />}
+                          onPress={() => setShowAnalytics(true)}
+                        >
+                          {t('card.view_analytics', 'View Analytics')}
+                        </DropdownItem>
+                        <DropdownItem
+                          key="delete"
+                          startContent={<Trash2 className="w-4 h-4" aria-hidden="true" />}
+                          className="text-danger"
+                          color="danger"
+                          onPress={() => onDeletePost(item)}
+                        >
+                          {t('card.delete_post')}
+                        </DropdownItem>
+                      </>
+                    ) : (
+                      <>
+                        <DropdownItem
+                          key="hide"
+                          startContent={<EyeOff className="w-4 h-4" aria-hidden="true" />}
+                          onPress={() => onHidePost(item)}
+                        >
+                          {t('card.hide_post')}
+                        </DropdownItem>
+                        <DropdownItem
+                          key="mute"
+                          startContent={<VolumeX className="w-4 h-4" aria-hidden="true" />}
+                          onPress={() => onMuteUser(item)}
+                        >
+                          {t('card.mute_user', { name: author.name })}
+                        </DropdownItem>
+                        <DropdownItem
+                          key="report"
+                          startContent={<Flag className="w-4 h-4" aria-hidden="true" />}
+                          className="text-danger"
+                          color="danger"
+                          onPress={() => onReportPost(item)}
+                        >
+                          {t('card.report_post')}
+                        </DropdownItem>
+                        {isAdmin && onAdminDeletePost && (
+                          <DropdownItem
+                            key="admin-delete"
+                            startContent={<Trash2 className="w-4 h-4" aria-hidden="true" />}
+                            className="text-danger"
+                            color="danger"
+                            onPress={() => onAdminDeletePost(item)}
+                          >
+                            {t('card.admin_delete', 'Delete (Admin)')}
+                          </DropdownItem>
+                        )}
+                      </>
                     )}
-                  </>
-                )}
-              </DropdownMenu>
-            </Dropdown>
+                  </DropdownMenu>
+                </Dropdown>
+              </div>
+
+              {/* Mobile: Button that opens BottomSheet */}
+              <Button
+                isIconOnly
+                size="sm"
+                variant="light"
+                className="sm:hidden text-[var(--text-subtle)] hover:text-[var(--text-primary)] min-w-0"
+                aria-label={t('card.post_options', 'Post options')}
+                onPress={() => setIsOptionsSheetOpen(true)}
+              >
+                <MoreHorizontal className="w-4 h-4" />
+              </Button>
+
+              {/* Mobile BottomSheet for post options */}
+              <BottomSheet
+                isOpen={isOptionsSheetOpen}
+                onClose={() => setIsOptionsSheetOpen(false)}
+                title={t('card.post_options', 'Post options')}
+                snapPoints={['auto']}
+              >
+                <div className="flex flex-col gap-1">
+                  {isOwnPost ? (
+                    <>
+                      <Button
+                        variant="light"
+                        className="justify-start text-[var(--text-primary)]"
+                        startContent={<BarChart3 className="w-4 h-4" aria-hidden="true" />}
+                        onPress={() => { setIsOptionsSheetOpen(false); setShowAnalytics(true); }}
+                      >
+                        {t('card.view_analytics', 'View Analytics')}
+                      </Button>
+                      <Button
+                        variant="light"
+                        className="justify-start text-danger"
+                        startContent={<Trash2 className="w-4 h-4" aria-hidden="true" />}
+                        onPress={() => { setIsOptionsSheetOpen(false); onDeletePost(item); }}
+                      >
+                        {t('card.delete_post')}
+                      </Button>
+                    </>
+                  ) : (
+                    <>
+                      <Button
+                        variant="light"
+                        className="justify-start text-[var(--text-primary)]"
+                        startContent={<EyeOff className="w-4 h-4" aria-hidden="true" />}
+                        onPress={() => { setIsOptionsSheetOpen(false); onHidePost(item); }}
+                      >
+                        {t('card.hide_post')}
+                      </Button>
+                      <Button
+                        variant="light"
+                        className="justify-start text-[var(--text-primary)]"
+                        startContent={<VolumeX className="w-4 h-4" aria-hidden="true" />}
+                        onPress={() => { setIsOptionsSheetOpen(false); onMuteUser(item); }}
+                      >
+                        {t('card.mute_user', { name: author.name })}
+                      </Button>
+                      <Button
+                        variant="light"
+                        className="justify-start text-danger"
+                        startContent={<Flag className="w-4 h-4" aria-hidden="true" />}
+                        onPress={() => { setIsOptionsSheetOpen(false); onReportPost(item); }}
+                      >
+                        {t('card.report_post')}
+                      </Button>
+                      {isAdmin && onAdminDeletePost && (
+                        <Button
+                          variant="light"
+                          className="justify-start text-danger"
+                          startContent={<Trash2 className="w-4 h-4" aria-hidden="true" />}
+                          onPress={() => { setIsOptionsSheetOpen(false); onAdminDeletePost(item); }}
+                        >
+                          {t('card.admin_delete', 'Delete (Admin)')}
+                        </Button>
+                      )}
+                    </>
+                  )}
+                </div>
+              </BottomSheet>
+            </>
           )}
         </div>
 
@@ -667,6 +863,13 @@ const FeedCard = React.memo(function FeedCard({
         </div>
 
 {/* Link Previews */}        {item.link_previews && item.link_previews.length > 0 && (          <div className={`mb-4 ${item.link_previews.length > 1 ? 'space-y-2' : ''}`}>            {item.link_previews.map((lp) => (              <LinkPreviewCard                key={lp.url}                preview={lp}                compact={item.link_previews!.length > 1}              />            ))}          </div>        )}
+        {/* Quoted Post Embed (quote repost) */}
+        {item.quoted_post && (
+          <div className="mb-4">
+            <QuotedPostEmbed post={item.quoted_post} />
+          </div>
+        )}
+
         {/* Event/Listing metadata */}
         {(item.type === 'event' || item.type === 'listing') && (item.start_date || item.location) && (
           <div className="mb-4 flex flex-wrap items-center gap-x-4 gap-y-1.5 text-xs text-[var(--text-muted)]">
@@ -687,9 +890,11 @@ const FeedCard = React.memo(function FeedCard({
         )}
 
         {/* Media: Multi-image carousel/grid, single image/video, or placeholder */}
+        {/* Wrapped with double-tap-to-like detection */}
         {item.media && item.media.length > 1 ? (
           /* Multi-media: use grid for 2-4, carousel for 5+ */
-          <div className="mb-4 -mx-5 overflow-hidden">
+          <div className="mb-4 -mx-5 overflow-hidden relative" onClick={doubleTapHandler}>
+            <HeartOverlay show={showHeartOverlay} />
             {item.media.length <= 4 ? (
               <MediaGrid media={item.media} className="mx-5" />
             ) : (
@@ -698,7 +903,8 @@ const FeedCard = React.memo(function FeedCard({
           </div>
         ) : item.media && item.media.length === 1 && item.media[0] ? (
           /* Single media item — use VideoPlayer for video, ImageCarousel for image */
-          <div className="mb-4 -mx-5 overflow-hidden">
+          <div className="mb-4 -mx-5 overflow-hidden relative" onClick={doubleTapHandler}>
+            <HeartOverlay show={showHeartOverlay} />
             {item.media[0].media_type === 'video' ? (
               <VideoPlayer media={item.media[0]} className="mx-5" />
             ) : (
@@ -706,7 +912,8 @@ const FeedCard = React.memo(function FeedCard({
             )}
           </div>
         ) : item.image_url ? (
-          <div className="mb-4 -mx-5 overflow-hidden">
+          <div className="mb-4 -mx-5 overflow-hidden relative" onClick={doubleTapHandler}>
+            <HeartOverlay show={showHeartOverlay} />
             {detailPath ? (
               <Link to={tenantPath(detailPath)}>
                 <img
@@ -874,10 +1081,10 @@ const FeedCard = React.memo(function FeedCard({
           </div>
         )}
 
-        {/* Stats Row — Reactions + Comments Count */}
-        {((item.reactions?.total ?? item.likes_count) > 0 || localCommentsCount > 0) && (
+        {/* Stats Row — Reactions + Comments Count + Views */}
+        {((item.reactions?.total ?? item.likes_count) > 0 || localCommentsCount > 0 || (item.views_count ?? 0) > 0) && (
           <div className="flex items-center justify-between text-xs text-[var(--text-subtle)] mb-3">
-            <span>
+            <span className="flex items-center gap-3">
               {item.reactions && item.reactions.total > 0 ? (
                 <ReactionSummary
                   counts={item.reactions.counts}
@@ -896,6 +1103,12 @@ const FeedCard = React.memo(function FeedCard({
                   {item.likes_count} {item.likes_count === 1 ? t('card.like') : t('card.likes')}
                 </span>
               ) : null}
+              {(item.views_count ?? 0) > 0 && (
+                <span className="flex items-center gap-1">
+                  <Eye className="w-3.5 h-3.5" aria-hidden="true" />
+                  {item.views_count}
+                </span>
+              )}
             </span>
             {localCommentsCount > 0 && (
               <Button
@@ -957,32 +1170,31 @@ const FeedCard = React.memo(function FeedCard({
             </Button>
           </Tooltip>
 
-          {/* Share Button */}
-          {item.type === 'post' && isAuthenticated && (
-            <Tooltip content={t('card.share_action', 'Share')} delay={400} closeDelay={0} size="sm">
-              <Button
-                size="sm"
-                variant="light"
-                className="flex-1 max-w-[140px] text-[var(--text-muted)] hover:text-emerald-500 transition-colors"
-                startContent={<Repeat2 className="w-[18px] h-[18px]" aria-hidden="true" />}
-                onPress={async () => {
-                  try {
-                    const res = await api.post(`/v2/feed/posts/${item.id}/share`);
-                    if (res.success) {
-                      toast.success(t('card.shared_success', 'Post shared to your feed'));
-                    } else {
-                      toast.error(res.error || t('card.share_failed', 'Failed to share'));
-                    }
-                  } catch {
-                    toast.error(t('card.share_failed', 'Failed to share'));
-                  }
-                }}
-              >
-                {t('card.share_action', 'Share')}
-              </Button>
-            </Tooltip>
+          {/* Share Button (enhanced dropdown) */}
+          {isAuthenticated && (
+            <ShareButton
+              postId={item.id}
+              shareCount={item.share_count ?? 0}
+              isShared={item.is_shared ?? false}
+              isAuthenticated={isAuthenticated}
+              post={item}
+            />
+          )}
+
+          {/* Bookmark Button */}
+          {isAuthenticated && (
+            <BookmarkButton type={item.type === 'post' ? 'post' : item.type} id={item.id} />
           )}
         </div>
+
+        {/* Post Analytics Modal */}
+        {showAnalytics && (
+          <PostAnalyticsModal
+            isOpen={showAnalytics}
+            onClose={() => setShowAnalytics(false)}
+            postId={item.id}
+          />
+        )}
 
         {/* Comments Section */}
         <AnimatePresence>

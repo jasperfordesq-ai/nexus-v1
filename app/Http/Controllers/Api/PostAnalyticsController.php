@@ -1,0 +1,110 @@
+<?php
+// Copyright © 2024–2026 Jasper Ford
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Author: Jasper Ford
+// See NOTICE file for attribution and acknowledgements.
+
+namespace App\Http\Controllers\Api;
+
+use App\Core\TenantContext;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\DB;
+
+/**
+ * PostAnalyticsController — Analytics for post authors.
+ *
+ * Endpoints (v2):
+ *   GET /api/v2/feed/posts/{id}/analytics  analytics()
+ *   POST /api/v2/feed/posts/{id}/view      recordView()
+ */
+class PostAnalyticsController extends BaseApiController
+{
+    protected bool $isV2Api = true;
+
+    /**
+     * GET /api/v2/feed/posts/{id}/analytics
+     *
+     * Only accessible by the post author or admins.
+     */
+    public function analytics(int $id): JsonResponse
+    {
+        $userId = $this->requireAuth();
+        $tenantId = $this->getTenantId();
+
+        // Fetch the post
+        $post = DB::table('feed_posts')
+            ->where('id', $id)
+            ->where('tenant_id', $tenantId)
+            ->first();
+
+        if (!$post) {
+            return $this->respondWithError('NOT_FOUND', 'Post not found.', null, 404);
+        }
+
+        // Check ownership or admin
+        $user = \Illuminate\Support\Facades\Auth::user();
+        $isAdmin = $user && in_array($user->role ?? 'member', ['admin', 'tenant_admin', 'super_admin', 'god']);
+
+        if ((int) $post->user_id !== $userId && !$isAdmin) {
+            return $this->respondWithError('FORBIDDEN', 'You can only view analytics for your own posts.', null, 403);
+        }
+
+        // Gather analytics
+        $viewsCount = (int) ($post->views_count ?? 0);
+        $likesCount = (int) ($post->likes_count ?? 0);
+        $commentsCount = (int) ($post->comments_count ?? 0);
+
+        // Shares count
+        $sharesCount = (int) DB::table('feed_posts')
+            ->where('parent_id', $id)
+            ->where('parent_type', 'share')
+            ->where('tenant_id', $tenantId)
+            ->count();
+
+        // Reaction breakdown
+        $reactionsBreakdown = DB::table('post_reactions')
+            ->where('post_id', $id)
+            ->where('tenant_id', $tenantId)
+            ->select('reaction_type', DB::raw('COUNT(*) as count'))
+            ->groupBy('reaction_type')
+            ->pluck('count', 'reaction_type')
+            ->toArray();
+
+        // Unique viewers (reach estimate)
+        $uniqueViewers = DB::table('post_views')
+            ->where('post_id', $id)
+            ->where('tenant_id', $tenantId)
+            ->count();
+
+        return $this->respondWithData([
+            'post_id' => $id,
+            'views_count' => $viewsCount,
+            'likes_count' => $likesCount,
+            'comments_count' => $commentsCount,
+            'shares_count' => $sharesCount,
+            'reactions_breakdown' => $reactionsBreakdown,
+            'reach_estimate' => $uniqueViewers,
+        ]);
+    }
+
+    /**
+     * POST /api/v2/feed/posts/{id}/view — Record a post view.
+     * Fire-and-forget from frontend.
+     */
+    public function recordView(int $id): JsonResponse
+    {
+        $userId = $this->getOptionalUserId();
+
+        $ipHash = hash('sha256', request()->ip() . ':' . $this->getTenantId());
+
+        try {
+            $viewService = app(\App\Services\PostViewService::class);
+            $viewService->recordView($id, $userId, $ipHash);
+        } catch (\Throwable $e) {
+            // Non-critical — don't fail the request
+            \Log::debug('View recording failed', ['post_id' => $id, 'error' => $e->getMessage()]);
+        }
+
+        return $this->respondWithData(['success' => true]);
+    }
+}

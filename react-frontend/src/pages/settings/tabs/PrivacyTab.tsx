@@ -223,6 +223,27 @@ export function PrivacyTab({
         </GlassCard>
       )}
 
+      {/* Blocked Users */}
+      <GlassCard className="p-6">
+        <Button
+          variant="flat"
+          className="w-full justify-between bg-theme-elevated text-theme-primary h-auto py-3 px-4"
+          startContent={
+            <div className="flex items-center gap-3">
+              <div className="p-2 rounded-lg bg-red-500/20">
+                <Ban className="w-4 h-4 text-red-600 dark:text-red-400" aria-hidden="true" />
+              </div>
+              <div className="text-left">
+                <p className="font-medium">{t('blocked_users.title', 'Blocked Users')}</p>
+                <p className="text-sm text-theme-subtle font-normal">{t('blocked_users.description', 'Manage users you have blocked')}</p>
+              </div>
+            </div>
+          }
+          endContent={<ChevronRight className="w-4 h-4 text-theme-muted" aria-hidden="true" />}
+          onPress={() => navigate(tenantPath('/settings/blocked'))}
+        />
+      </GlassCard>
+
       {/* GDPR Section */}
       <GlassCard className="p-6">
         <h2 className="text-lg font-semibold text-theme-primary mb-2 flex items-center gap-2">

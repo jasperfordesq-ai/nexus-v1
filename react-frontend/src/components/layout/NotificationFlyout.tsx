@@ -20,6 +20,8 @@ import {
   DrawerBody,
   Button,
   Skeleton,
+  Avatar,
+  AvatarGroup,
 } from '@heroui/react';
 import {
   Bell,
@@ -39,7 +41,7 @@ import { useMediaQuery } from '@/hooks/useMediaQuery';
 import { useTranslation } from 'react-i18next';
 import { useNotifications, useTenant } from '@/contexts';
 import { api } from '@/lib/api';
-import { formatRelativeTime } from '@/lib/helpers';
+import { formatRelativeTime, resolveAvatarUrl } from '@/lib/helpers';
 import { logError } from '@/lib/logger';
 import type { Notification } from '@/types/api';
 
@@ -75,7 +77,7 @@ export function NotificationFlyout() {
     const fetchId = ++fetchIdRef.current;
     try {
       setIsLoading(true);
-      const response = await api.get<Notification[]>('/v2/notifications?per_page=8');
+      const response = await api.get<Notification[]>('/v2/notifications/grouped?per_page=8');
       // Only apply if this is still the latest fetch
       if (fetchId === fetchIdRef.current && response.success && response.data) {
         setNotifications(response.data);
@@ -185,28 +187,53 @@ export function NotificationFlyout() {
         <div className="py-1">
           {notifications.map(notification => {
             const isUnread = !notification.read_at;
+            const isGrouped = notification.is_grouped && (notification.group_count ?? 0) > 1;
             return (
               <button
                 key={notification.id}
+                type="button"
                 onClick={() => handleNotificationClick(notification)}
                 className={`w-full flex items-start gap-3 px-4 py-3 text-left transition-colors hover:bg-theme-hover ${
                   isUnread ? 'bg-indigo-50/50 dark:bg-indigo-500/5' : ''
                 }`}
               >
-                <div className={`mt-0.5 p-1.5 rounded-full shrink-0 ${
-                  isUnread
-                    ? 'bg-indigo-100 dark:bg-indigo-500/20 text-indigo-600 dark:text-indigo-400'
-                    : 'bg-[var(--surface-elevated)] text-theme-subtle'
-                }`}>
-                  {getIcon(notification.type)}
-                </div>
+                {isGrouped && notification.actors && notification.actors.length > 1 ? (
+                  <div className="mt-0.5 shrink-0">
+                    <AvatarGroup max={3} size="sm" className="justify-start">
+                      {notification.actors.map((actor) => (
+                        <Avatar
+                          key={actor.id}
+                          name={actor.name}
+                          src={resolveAvatarUrl(actor.avatar_url)}
+                          size="sm"
+                          className="w-6 h-6"
+                        />
+                      ))}
+                    </AvatarGroup>
+                  </div>
+                ) : (
+                  <div className={`mt-0.5 p-1.5 rounded-full shrink-0 ${
+                    isUnread
+                      ? 'bg-indigo-100 dark:bg-indigo-500/20 text-indigo-600 dark:text-indigo-400'
+                      : 'bg-[var(--surface-elevated)] text-theme-subtle'
+                  }`}>
+                    {getIcon(notification.type)}
+                  </div>
+                )}
                 <div className="flex-1 min-w-0">
                   <p className={`text-sm leading-snug ${isUnread ? 'font-medium text-theme-primary' : 'text-theme-secondary'}`}>
                     {notification.message || notification.body || notification.title}
                   </p>
-                  <p className="text-xs text-theme-subtle mt-0.5">
-                    {formatRelativeTime(notification.created_at)}
-                  </p>
+                  <div className="flex items-center gap-2 mt-0.5">
+                    <p className="text-xs text-theme-subtle">
+                      {formatRelativeTime(notification.latest_at || notification.created_at)}
+                    </p>
+                    {isGrouped && (
+                      <span className="text-[10px] text-theme-subtle bg-[var(--surface-elevated)] px-1.5 py-0.5 rounded-full">
+                        {notification.group_count}
+                      </span>
+                    )}
+                  </div>
                 </div>
                 {isUnread && (
                   <span className="w-2 h-2 mt-2 rounded-full bg-indigo-500 shrink-0" aria-label={t('flyout.unread_dot_aria')} />

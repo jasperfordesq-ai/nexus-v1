@@ -141,6 +141,14 @@ class FeedService
             });
         }
 
+        // Exclude blocked users (both directions)
+        if ($currentUserId) {
+            $blockedIds = BlockUserService::getBlockedPairIds($currentUserId);
+            if (!empty($blockedIds)) {
+                $query->whereNotIn('feed_activity.user_id', $blockedIds);
+            }
+        }
+
         // Exclude muted users (both legacy and V2 tables)
         if ($currentUserId) {
             $query->whereNotExists(function ($sub) use ($currentUserId) {
@@ -381,6 +389,82 @@ class FeedService
             // Link preview loading should never break the feed
         }
 
+        // Batch load quoted posts for post items (quote reposts)
+        try {
+            if (!empty($postIds)) {
+                $quotedMap = DB::table('feed_posts')
+                    ->whereIn('id', $postIds)
+                    ->where('tenant_id', $tenantId)
+                    ->whereNotNull('quoted_post_id')
+                    ->pluck('quoted_post_id', 'id');
+
+                if ($quotedMap->isNotEmpty()) {
+                    $quotedPostIds = $quotedMap->values()->unique()->all();
+                    $quotedPosts = DB::table('feed_posts')
+                        ->join('users', 'feed_posts.user_id', '=', 'users.id')
+                        ->whereIn('feed_posts.id', $quotedPostIds)
+                        ->where('feed_posts.tenant_id', $tenantId)
+                        ->select([
+                            'feed_posts.id',
+                            'feed_posts.content',
+                            'feed_posts.image_url',
+                            'feed_posts.created_at',
+                            'feed_posts.user_id',
+                            DB::raw("COALESCE(users.name, CONCAT(users.first_name, ' ', users.last_name)) as author_name"),
+                            'users.avatar_url as author_avatar',
+                        ])
+                        ->get()
+                        ->keyBy('id');
+
+                    // Load media for quoted posts
+                    $quotedMediaMap = [];
+                    if ($quotedPosts->isNotEmpty()) {
+                        $quotedMedia = DB::table('post_media')
+                            ->whereIn('post_id', $quotedPostIds)
+                            ->where('tenant_id', $tenantId)
+                            ->orderBy('display_order')
+                            ->get();
+                        foreach ($quotedMedia as $m) {
+                            $quotedMediaMap[$m->post_id][] = [
+                                'id' => (int) $m->id,
+                                'media_type' => $m->media_type,
+                                'file_url' => $m->file_url,
+                                'thumbnail_url' => $m->thumbnail_url,
+                                'alt_text' => $m->alt_text,
+                            ];
+                        }
+                    }
+
+                    foreach ($items as &$item) {
+                        if ($item['type'] === 'post' && isset($quotedMap[$item['id']])) {
+                            $qpId = $quotedMap[$item['id']];
+                            if (isset($quotedPosts[$qpId])) {
+                                $qp = $quotedPosts[$qpId];
+                                $qpContent = $this->truncateWithFlag($qp->content ?? '', 280);
+                                $item['quoted_post'] = [
+                                    'id' => (int) $qp->id,
+                                    'content' => $qpContent['text'],
+                                    'content_truncated' => $qpContent['truncated'],
+                                    'image_url' => $qp->image_url,
+                                    'created_at' => (string) $qp->created_at,
+                                    'author' => [
+                                        'id' => (int) $qp->user_id,
+                                        'name' => $qp->author_name,
+                                        'avatar_url' => $qp->author_avatar ?? '/assets/img/defaults/default_avatar.png',
+                                    ],
+                                    'media' => $quotedMediaMap[$qpId] ?? [],
+                                ];
+                            }
+                        }
+                    }
+                    unset($item);
+                }
+            }
+        } catch (\Exception $e) {
+            // Quoted post loading should never break the feed
+            Log::warning('FeedService: quoted post batch load failed: ' . $e->getMessage());
+        }
+
         // Generate cursor
         $nextCursor = null;
         if ($hasMore && !empty($items)) {
@@ -542,6 +626,18 @@ class FeedService
             }
         }
 
+        // Validate quoted_post_id if provided (quote repost)
+        $quotedPostId = !empty($data['quoted_post_id']) ? (int) $data['quoted_post_id'] : null;
+        if ($quotedPostId) {
+            $quotedExists = DB::table('feed_posts')
+                ->where('id', $quotedPostId)
+                ->where('tenant_id', $tenantId)
+                ->exists();
+            if (!$quotedExists) {
+                return ['error' => 'Quoted post not found'];
+            }
+        }
+
         $post = $this->feedPost->newInstance([
             'user_id'        => $userId,
             'tenant_id'      => $tenantId,
@@ -555,6 +651,7 @@ class FeedService
             'group_id'       => $groupId,
             'publish_status' => $publishStatus,
             'scheduled_at'   => $scheduledAt,
+            'quoted_post_id' => $quotedPostId,
         ]);
 
         $post->save();
@@ -590,7 +687,28 @@ class FeedService
             }
         }
 
-        return $post->fresh(['user']);
+        $freshPost = $post->fresh(['user', 'quotedPost', 'quotedPost.user']);
+
+        // Append formatted quoted_post for API response
+        if ($freshPost->quotedPost) {
+            $qp = $freshPost->quotedPost;
+            $qpContent = $this->truncateWithFlag($qp->content ?? '', 280);
+            $freshPost->setAttribute('quoted_post', [
+                'id' => (int) $qp->id,
+                'content' => $qpContent['text'],
+                'content_truncated' => $qpContent['truncated'],
+                'image_url' => $qp->image_url,
+                'created_at' => (string) $qp->created_at,
+                'author' => [
+                    'id' => (int) $qp->user_id,
+                    'name' => $qp->user ? ($qp->user->name ?? ($qp->user->first_name . ' ' . $qp->user->last_name)) : 'Unknown',
+                    'avatar_url' => $qp->user?->avatar_url ?? '/assets/img/defaults/default_avatar.png',
+                ],
+                'media' => [],
+            ]);
+        }
+
+        return $freshPost;
     }
 
     /** @var array Validation error messages */

@@ -837,10 +837,26 @@ class SearchService
         $sort  = $filters['sort'] ?? 'relevance';
 
         if (static::isAvailable()) {
-            return $this->unifiedSearchViaMeilisearch($term, $filters, $limit, $type, $sort);
+            $result = $this->unifiedSearchViaMeilisearch($term, $filters, $limit, $type, $sort);
+        } else {
+            $result = $this->unifiedSearchViaSQL($term, $filters, $limit, $type, $sort);
         }
 
-        return $this->unifiedSearchViaSQL($term, $filters, $limit, $type, $sort);
+        // Filter out blocked users from search results
+        if ($userId && ($type === 'all' || $type === 'users')) {
+            $blockedIds = BlockUserService::getBlockedPairIds($userId);
+            if (!empty($blockedIds)) {
+                $result['items'] = array_values(array_filter($result['items'], function ($item) use ($blockedIds) {
+                    if (($item['type'] ?? '') === 'user') {
+                        return !in_array((int) ($item['id'] ?? 0), $blockedIds, true);
+                    }
+                    return true;
+                }));
+                $result['total'] = count($result['items']);
+            }
+        }
+
+        return $result;
     }
 
     private function unifiedSearchViaMeilisearch(string $term, array $filters, int $limit, string $type, string $sort): array

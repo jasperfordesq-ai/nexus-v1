@@ -3,6 +3,9 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
+export { BookmarkButton } from './BookmarkButton';
+export type { BookmarkButtonProps } from './BookmarkButton';
+
 export { CommentsSection } from './CommentsSection';
 export type { CommentsSectionProps } from './CommentsSection';
 
@@ -35,3 +38,5 @@ export type { MentionRendererProps, MentionData } from './MentionRenderer';
 
 export { MentionAutocomplete } from './MentionAutocomplete';
 export type { MentionAutocompleteProps, MentionSuggestion } from './MentionAutocomplete';
+
+export { UserHoverCard } from './UserHoverCard';

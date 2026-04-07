@@ -36,6 +36,7 @@ import type { FeedComment } from '@/components/feed/types';
 import { AVAILABLE_REACTIONS } from '@/hooks/useSocialInteractions';
 import type { MentionUser } from '@/hooks/useSocialInteractions';
 import { MentionRenderer } from './MentionRenderer';
+import { UserHoverCard } from './UserHoverCard';
 import { SafeHtml, containsHtml } from '@/components/ui/SafeHtml';
 
 /* ─── Props ─────────────────────────────────────────────────── */
@@ -109,23 +110,27 @@ function CommentItemInner({
 
   return (
     <div className={`flex items-start gap-2.5 ${depth > 0 ? 'ml-6 sm:ml-8 pl-3 border-l-2 border-[var(--color-primary)]/20' : ''}`}>
-      <Link to={tenantPath(`/profile/${comment.author.id}`)}>
-        <Avatar
-          name={comment.author.name}
-          src={resolveAvatarUrl(comment.author.avatar)}
-          size="sm"
-          className="w-7 h-7 flex-shrink-0 ring-2 ring-white/10"
-        />
-      </Link>
+      <UserHoverCard userId={comment.author.id}>
+        <Link to={tenantPath(`/profile/${comment.author.id}`)}>
+          <Avatar
+            name={comment.author.name}
+            src={resolveAvatarUrl(comment.author.avatar)}
+            size="sm"
+            className="w-7 h-7 flex-shrink-0 ring-2 ring-white/10"
+          />
+        </Link>
+      </UserHoverCard>
       <div className="flex-1 min-w-0">
         <div className="bg-[var(--surface-elevated)] rounded-2xl px-3.5 py-2.5 border border-[var(--border-default)]">
           <div className="flex items-center gap-2">
-            <Link
-              to={tenantPath(`/profile/${comment.author.id}`)}
-              className="text-xs font-semibold text-[var(--text-primary)] hover:text-[var(--color-primary)] transition-colors"
-            >
-              {comment.author.name}
-            </Link>
+            <UserHoverCard userId={comment.author.id}>
+              <Link
+                to={tenantPath(`/profile/${comment.author.id}`)}
+                className="text-xs font-semibold text-[var(--text-primary)] hover:text-[var(--color-primary)] transition-colors"
+              >
+                {comment.author.name}
+              </Link>
+            </UserHoverCard>
             {comment.edited && (
               <span className="text-[10px] text-[var(--text-subtle)] italic">
                 ({t('edited', 'edited')})

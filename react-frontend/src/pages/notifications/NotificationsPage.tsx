@@ -9,8 +9,8 @@
 
 import { useState, useEffect, useCallback, useRef, memo } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { motion } from 'framer-motion';
-import { Button, Skeleton } from '@heroui/react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Button, Skeleton, Avatar, AvatarGroup } from '@heroui/react';
 import {
   Bell,
   MessageSquare,
@@ -27,13 +27,15 @@ import {
   ShieldAlert,
   Shield,
   Eye,
+  ChevronDown,
+  ChevronUp,
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
 import { EmptyState } from '@/components/feedback';
 import { useToast, useTenant, useNotifications } from '@/contexts';
 import { api } from '@/lib/api';
-import { formatRelativeTime } from '@/lib/helpers';
+import { formatRelativeTime, resolveAvatarUrl } from '@/lib/helpers';
 import { logError } from '@/lib/logger';
 import { usePageTitle } from '@/hooks';
 import { PageMeta } from '@/components/seo';
@@ -69,7 +71,7 @@ export function NotificationsPage() {
     try {
       setIsLoading(true);
       setLoadError(null);
-      const response = await api.get<Notification[]>('/v2/notifications?per_page=50');
+      const response = await api.get<Notification[]>('/v2/notifications/grouped?per_page=50');
       if (controller.signal.aborted) return;
       if (response.success && response.data) {
         setNotifications(response.data);
@@ -113,6 +115,24 @@ export function NotificationsPage() {
     } catch (error) {
       logError('Failed to mark all as read', error);
       toastRef.current.error(tRef.current('toast.mark_all_failed'));
+    }
+  }
+
+  async function markGroupAsRead(notification: Notification) {
+    if (!notification.group_key) return;
+    try {
+      await api.post(`/v2/notifications/group/${encodeURIComponent(notification.group_key)}/read`);
+      setNotifications((prev) =>
+        prev.map((n) =>
+          n.group_key === notification.group_key
+            ? { ...n, read_at: new Date().toISOString() }
+            : n
+        )
+      );
+      refreshCounts();
+    } catch (error) {
+      logError('Failed to mark group as read', error);
+      toastRef.current.error(tRef.current('toast.mark_read_failed'));
     }
   }
 
@@ -261,7 +281,9 @@ export function NotificationsPage() {
             <motion.div key={notification.id} variants={itemVariants}>
               <NotificationCard
                 notification={notification}
-                onMarkRead={() => markAsRead(notification.id)}
+                onMarkRead={() => notification.is_grouped && notification.group_key
+                  ? markGroupAsRead(notification)
+                  : markAsRead(notification.id)}
                 onDelete={() => deleteNotification(notification.id)}
               />
             </motion.div>
@@ -282,8 +304,10 @@ const NotificationCard = memo(function NotificationCard({ notification, onMarkRe
   const { t } = useTranslation('notifications');
   const navigate = useNavigate();
   const { tenantPath } = useTenant();
+  const [isExpanded, setIsExpanded] = useState(false);
   const isUnread = !notification.read_at;
   const hasLink = !!notification.link;
+  const isGrouped = notification.is_grouped && (notification.group_count ?? 0) > 1;
 
   function handleClick() {
     if (!notification.link) return;
@@ -331,21 +355,57 @@ const NotificationCard = memo(function NotificationCard({ notification, onMarkRe
           tabIndex={hasLink ? 0 : undefined}
           onKeyDown={hasLink ? (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); handleClick(); } } : undefined}
         >
-          <div className={`p-2.5 rounded-full flex-shrink-0 ${colorClasses[color]}`}>
-            {icon}
-          </div>
+          {/* Grouped: show stacked avatars; Single: show icon */}
+          {isGrouped && notification.actors && notification.actors.length > 1 ? (
+            <div className="flex-shrink-0">
+              <AvatarGroup max={3} size="sm">
+                {notification.actors.map((actor) => (
+                  <Avatar
+                    key={actor.id}
+                    name={actor.name}
+                    src={resolveAvatarUrl(actor.avatar_url)}
+                    size="sm"
+                    className="w-8 h-8"
+                  />
+                ))}
+              </AvatarGroup>
+            </div>
+          ) : (
+            <div className={`p-2.5 rounded-full flex-shrink-0 ${colorClasses[color]}`}>
+              {icon}
+            </div>
+          )}
 
           <div className="flex-1 min-w-0">
             <p className={`${isUnread ? 'text-theme-primary font-medium' : 'text-theme-muted'}`}>
               {notification.message || notification.body}
             </p>
-            <p className="text-xs text-theme-subtle mt-1">
-              {formatRelativeTime(notification.created_at)}
-            </p>
+            <div className="flex items-center gap-2 mt-1">
+              <p className="text-xs text-theme-subtle">
+                {formatRelativeTime(notification.latest_at || notification.created_at)}
+              </p>
+              {isGrouped && (
+                <span className="text-[10px] text-theme-subtle bg-theme-elevated px-1.5 py-0.5 rounded-full">
+                  {notification.group_count} {t('notifications_count', 'notifications')}
+                </span>
+              )}
+            </div>
           </div>
         </div>
 
         <div className="flex items-center gap-1 flex-shrink-0">
+          {isGrouped && (
+            <Button
+              isIconOnly
+              variant="flat"
+              size="sm"
+              className="bg-theme-elevated text-theme-muted hover:text-theme-primary"
+              onPress={() => setIsExpanded(!isExpanded)}
+              aria-label={isExpanded ? t('collapse_group', 'Collapse') : t('expand_group', 'Expand')}
+            >
+              {isExpanded ? <ChevronUp className="w-4 h-4" aria-hidden="true" /> : <ChevronDown className="w-4 h-4" aria-hidden="true" />}
+            </Button>
+          )}
           {isUnread && (
             <Button
               isIconOnly
@@ -353,23 +413,58 @@ const NotificationCard = memo(function NotificationCard({ notification, onMarkRe
               size="sm"
               className="bg-theme-elevated text-theme-muted hover:text-theme-primary"
               onPress={onMarkRead}
-              aria-label={t('mark_read_aria')}
+              aria-label={isGrouped ? t('mark_group_read_aria', 'Mark group as read') : t('mark_read_aria')}
             >
               <Check className="w-4 h-4" aria-hidden="true" />
             </Button>
           )}
-          <Button
-            isIconOnly
-            variant="flat"
-            size="sm"
-            className="bg-theme-elevated text-theme-muted hover:text-red-500 dark:hover:text-red-400"
-            onPress={onDelete}
-            aria-label={t('delete_aria')}
-          >
-            <Trash2 className="w-4 h-4" aria-hidden="true" />
-          </Button>
+          {!isGrouped && (
+            <Button
+              isIconOnly
+              variant="flat"
+              size="sm"
+              className="bg-theme-elevated text-theme-muted hover:text-red-500 dark:hover:text-red-400"
+              onPress={onDelete}
+              aria-label={t('delete_aria')}
+            >
+              <Trash2 className="w-4 h-4" aria-hidden="true" />
+            </Button>
+          )}
         </div>
       </div>
+
+      {/* Expanded group: show individual actors */}
+      <AnimatePresence>
+        {isGrouped && isExpanded && notification.actors && (
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: 'auto' }}
+            exit={{ opacity: 0, height: 0 }}
+            className="mt-3 pt-3 border-t border-[var(--border-default)] space-y-2 overflow-hidden"
+          >
+            {notification.actors.map((actor) => (
+              <Link
+                key={actor.id}
+                to={tenantPath(`/profile/${actor.id}`)}
+                className="flex items-center gap-2.5 p-1.5 rounded-lg hover:bg-theme-hover transition-colors"
+              >
+                <Avatar
+                  name={actor.name}
+                  src={resolveAvatarUrl(actor.avatar_url)}
+                  size="sm"
+                  className="w-7 h-7"
+                />
+                <span className="text-sm text-theme-secondary">{actor.name}</span>
+              </Link>
+            ))}
+            {(notification.remaining_count ?? 0) > 0 && (
+              <p className="text-xs text-theme-subtle pl-10">
+                {t('and_others', 'and {{count}} others', { count: notification.remaining_count })}
+              </p>
+            )}
+          </motion.div>
+        )}
+      </AnimatePresence>
     </GlassCard>
   );
 });

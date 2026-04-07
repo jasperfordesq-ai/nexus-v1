@@ -16,7 +16,8 @@ import { useTranslation } from 'react-i18next';
 import { Link, useSearchParams, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Input, Avatar, Badge, Button, Modal, ModalContent, ModalHeader, ModalBody, Tabs, Tab, Skeleton } from '@heroui/react';
-import { Search, MessageSquare, Circle, Plus, Loader2, Archive, RotateCcw, AlertTriangle, ArrowRightLeft, RefreshCw } from 'lucide-react';
+import { Search, MessageSquare, Circle, Plus, Loader2, Archive, RotateCcw, AlertTriangle, ArrowRightLeft, RefreshCw, Users as UsersIcon } from 'lucide-react';
+import { CreateGroupModal } from './components/CreateGroupModal';
 import { GlassCard } from '@/components/ui';
 import { PresenceIndicator } from '@/components/social';
 import { EmptyState } from '@/components/feedback';
@@ -85,6 +86,7 @@ export function MessagesPage() {
 
   // New message modal state
   const [isNewMessageOpen, setIsNewMessageOpen] = useState(false);
+  const [isCreateGroupOpen, setIsCreateGroupOpen] = useState(false);
   const [userSearchQuery, setUserSearchQuery] = useState('');
   const [userSearchResults, setUserSearchResults] = useState<User[]>([]);
   const [isSearchingUsers, setIsSearchingUsers] = useState(false);
@@ -424,14 +426,25 @@ export function MessagesPage() {
           </h1>
           <p className="text-theme-muted mt-1">{t('page_subtitle')}</p>
         </div>
-        <Button
-          className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
-          startContent={<Plus className="w-4 h-4" />}
-          onPress={() => setIsNewMessageOpen(true)}
-          isDisabled={!isDirectMessagingEnabled || messagingRestricted}
-        >
-          {t('new_message')}
-        </Button>
+        <div className="flex gap-2">
+          <Button
+            className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
+            startContent={<Plus className="w-4 h-4" />}
+            onPress={() => setIsNewMessageOpen(true)}
+            isDisabled={!isDirectMessagingEnabled || messagingRestricted}
+          >
+            {t('new_message')}
+          </Button>
+          <Button
+            variant="flat"
+            className="bg-theme-elevated text-theme-primary"
+            startContent={<UsersIcon className="w-4 h-4" />}
+            onPress={() => setIsCreateGroupOpen(true)}
+            isDisabled={!isDirectMessagingEnabled || messagingRestricted}
+          >
+            {t('new_group', 'New Group')}
+          </Button>
+        </div>
       </div>
 
       {/* Tabs and Search */}
@@ -556,6 +569,16 @@ export function MessagesPage() {
           </ModalBody>
         </ModalContent>
       </Modal>
+
+      {/* Create Group Modal */}
+      <CreateGroupModal
+        isOpen={isCreateGroupOpen}
+        onClose={() => setIsCreateGroupOpen(false)}
+        onCreated={(groupId) => {
+          setIsCreateGroupOpen(false);
+          navigate(tenantPath(`/messages/${groupId}`));
+        }}
+      />
 
       {/* Conversations List */}
       {activeTab === 'inbox' ? (

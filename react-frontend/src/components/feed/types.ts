@@ -36,6 +36,7 @@ export interface FeedItem {
   type: 'post' | 'listing' | 'event' | 'poll' | 'goal' | 'review' | 'job' | 'challenge' | 'volunteer' | 'blog' | 'discussion' | 'badge_earned' | 'level_up';
   likes_count: number;
   comments_count: number;
+  views_count?: number;
   is_liked: boolean;
   image_url?: string;
   /** Multi-image media attachments (carousel). */
@@ -93,6 +94,26 @@ export interface FeedItem {
     content_type?: string | null;
     embed_html?: string | null;
   }>;
+  /** Quoted post (quote repost) — embedded original post */
+  quoted_post?: {
+    id: number;
+    content: string;
+    content_truncated?: boolean;
+    image_url?: string | null;
+    created_at: string;
+    author: {
+      id: number;
+      name: string;
+      avatar_url?: string | null;
+    };
+    media?: Array<{
+      id: number;
+      media_type: 'image' | 'video';
+      file_url: string;
+      thumbnail_url?: string | null;
+      alt_text?: string | null;
+    }>;
+  };
 }
 
 export interface PollData {

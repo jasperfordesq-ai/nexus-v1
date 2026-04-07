@@ -106,6 +106,14 @@ class UserService
             return null;
         }
 
+        // Check if either user has blocked the other
+        if ($viewerId && $viewerId !== $userId) {
+            if (BlockUserService::isBlockedEither($viewerId, $userId)) {
+                self::setError('FORBIDDEN', 'This profile is not available');
+                return null;
+            }
+        }
+
         // Check onboarding visibility gating (admin-configurable)
         // If the viewer is looking at someone else's profile, check if the target
         // meets the tenant's visibility requirements (onboarding complete, avatar, bio).

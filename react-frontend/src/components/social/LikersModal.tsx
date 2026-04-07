@@ -22,6 +22,7 @@ import { Heart } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useTenant } from '@/contexts';
 import { resolveAvatarUrl, formatRelativeTime } from '@/lib/helpers';
+import { UserHoverCard } from './UserHoverCard';
 import type { LikerUser, LikersResult } from '@/hooks/useSocialInteractions';
 
 export interface LikersModalProps {
@@ -105,16 +106,20 @@ export function LikersModal({ isOpen, onClose, loadLikers, likesCount }: LikersM
                   onClick={onClose}
                   className="flex items-center gap-3 p-2 rounded-lg hover:bg-[var(--surface-hover)] transition-colors"
                 >
-                  <Avatar
-                    name={liker.name}
-                    src={resolveAvatarUrl(liker.avatar_url)}
-                    size="sm"
-                    className="ring-2 ring-white/10"
-                  />
+                  <UserHoverCard userId={liker.id}>
+                    <Avatar
+                      name={liker.name}
+                      src={resolveAvatarUrl(liker.avatar_url)}
+                      size="sm"
+                      className="ring-2 ring-white/10"
+                    />
+                  </UserHoverCard>
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium text-[var(--text-primary)] truncate">
-                      {liker.name}
-                    </p>
+                    <UserHoverCard userId={liker.id}>
+                      <p className="text-sm font-medium text-[var(--text-primary)] truncate">
+                        {liker.name}
+                      </p>
+                    </UserHoverCard>
                     <p className="text-xs text-[var(--text-subtle)]">
                       {formatRelativeTime(liker.liked_at)}
                     </p>

@@ -17,7 +17,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Button, Avatar, Tabs, Tab, Chip, Skeleton } from '@heroui/react';
+import { Button, Avatar, Tabs, Tab, Chip, Skeleton, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Dropdown, DropdownTrigger, DropdownMenu, DropdownItem } from '@heroui/react';
 import {
   User,
   MapPin,
@@ -40,6 +40,8 @@ import {
   ArrowUpRight,
   ArrowDownLeft,
   Rss,
+  MoreVertical,
+  ShieldOff,
 } from 'lucide-react';
 import DOMPurify from 'dompurify';
 import { GlassCard } from '@/components/ui';
@@ -637,6 +639,35 @@ export function ProfilePage() {
                       >
                         {t('send_credits')}
                       </Button>
+                    )}
+                    {/* More options (Block) */}
+                    {isAuthenticated && !isOwnProfile && (
+                      <Dropdown>
+                        <DropdownTrigger>
+                          <Button isIconOnly variant="flat" className="bg-theme-elevated text-theme-secondary" aria-label={t('more_options', 'More options')}>
+                            <MoreVertical className="w-4 h-4" />
+                          </Button>
+                        </DropdownTrigger>
+                        <DropdownMenu
+                          aria-label={t('profile_actions', 'Profile actions')}
+                          onAction={async (key) => {
+                            if (key === 'block' && profile?.id) {
+                              if (!window.confirm(t('block_confirm', 'Block {{name}}? They won\'t be able to see your profile, message you, or interact with your content.', { name: profile.name || profile.first_name }))) return;
+                              try {
+                                await api.post(`/v2/users/${profile.id}/block`);
+                                toast.success(t('blocked_success', 'User blocked'));
+                              } catch (err) {
+                                logError('Failed to block user', err);
+                                toast.error(t('block_failed', 'Failed to block user'));
+                              }
+                            }
+                          }}
+                        >
+                          <DropdownItem key="block" className="text-danger" startContent={<ShieldOff className="w-4 h-4" />}>
+                            {t('block_user', 'Block User')}
+                          </DropdownItem>
+                        </DropdownMenu>
+                      </Dropdown>
                     )}
                   </>
                 )}

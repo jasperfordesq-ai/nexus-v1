@@ -115,6 +115,7 @@ const ConversationPage = lazyWithRetry(() => import('@/pages/messages/Conversati
 const WalletPage = lazyWithRetry(() => import('@/pages/wallet/WalletPage'));
 const ProfilePage = lazyWithRetry(() => import('@/pages/profile/ProfilePage'));
 const SettingsPage = lazyWithRetry(() => import('@/pages/settings/SettingsPage'));
+const BlockedUsersPage = lazyWithRetry(() => import('@/pages/settings/BlockedUsersPage'));
 const SearchPage = lazyWithRetry(() => import('@/pages/search/SearchPage'));
 const NotificationsPage = lazyWithRetry(() => import('@/pages/notifications/NotificationsPage'));
 const MembersPage = lazyWithRetry(() => import('@/pages/members/MembersPage'));
@@ -161,6 +162,7 @@ const OrganisationsPage = lazyWithRetry(() => import('@/pages/organisations/Orga
 const OrganisationDetailPage = lazyWithRetry(() => import('@/pages/organisations/OrganisationDetailPage'));
 const RegisterOrganisationPage = lazyWithRetry(() => import('@/pages/organisations/RegisterOrganisationPage'));
 const FeedPage = lazyWithRetry(() => import('@/pages/feed/FeedPage'));
+const BookmarksPage = lazyWithRetry(() => import('@/pages/bookmarks/BookmarksPage'));
 const BlogPage = lazyWithRetry(() => import('@/pages/blog/BlogPage'));
 const BlogPostPage = lazyWithRetry(() => import('@/pages/blog/BlogPostPage'));
 const ResourcesPage = lazyWithRetry(() => import('@/pages/resources/ResourcesPage'));
@@ -623,6 +625,11 @@ function AppRoutes() {
               </FeatureErrorBoundary>
             </FeatureGate>
           } />
+          <Route path="settings/blocked" element={
+            <FeatureErrorBoundary featureName="Blocked Users">
+              <BlockedUsersPage />
+            </FeatureErrorBoundary>
+          } />
           <Route path="verify-identity-optional" element={<VerifyIdentityOptionalPage />} />
           <Route path="verify-identity/callback" element={<VerifyIdentityOptionalPage />} />
           <Route path="search" element={
@@ -1001,6 +1008,13 @@ function AppRoutes() {
                 <HashtagsDiscoveryPage />
               </FeatureErrorBoundary>
             </FeatureGate>
+          } />
+
+          {/* Bookmarks / Saved Items */}
+          <Route path="saved" element={
+            <FeatureErrorBoundary featureName="Bookmarks">
+              <BookmarksPage />
+            </FeatureErrorBoundary>
           } />
 
           {/* Feature-gated: Federation */}

@@ -716,6 +716,9 @@ class MessageService
     /**
      * Toggle a reaction emoji on a message.
      *
+     * Writes to both the `message_reactions` table (for proper per-user tracking)
+     * and the `reactions` JSON column on `messages` (for backward compatibility).
+     *
      * @return bool|null True if added, false if removed, null on error
      */
     public static function toggleReaction(int $messageId, int $userId, string $emoji): ?bool
@@ -730,50 +733,78 @@ class MessageService
             return null;
         }
 
-        // User must be sender or receiver
-        if ((int) $message->sender_id !== $userId && (int) $message->receiver_id !== $userId) {
+        // User must be sender or receiver (1-to-1) or a conversation participant (group)
+        $isParticipant = false;
+        if ((int) $message->sender_id === $userId || (int) $message->receiver_id === $userId) {
+            $isParticipant = true;
+        } elseif ($message->conversation_id) {
+            $isParticipant = DB::table('conversation_participants')
+                ->where('conversation_id', $message->conversation_id)
+                ->where('user_id', $userId)
+                ->whereNull('left_at')
+                ->exists();
+        }
+
+        if (!$isParticipant) {
             self::$errors[] = ['code' => 'FORBIDDEN', 'message' => 'You cannot react to this message'];
             return null;
         }
 
-        if (! self::hasReactionsColumn()) {
-            self::$errors[] = ['code' => 'FEATURE_UNAVAILABLE', 'message' => 'Reactions feature not yet enabled'];
-            return null;
-        }
+        $tenantId = app('tenant.id');
 
-        return DB::transaction(function () use ($messageId, $userId, $emoji) {
-            $reactions = [];
-            $rawReactions = DB::table('messages')->where('id', $messageId)->lockForUpdate()->value('reactions');
-            if (! empty($rawReactions)) {
-                $reactions = json_decode($rawReactions, true) ?? [];
-            }
-
-            $userReactions = $reactions['_users'] ?? [];
-            $userKey = "{$userId}_{$emoji}";
+        return DB::transaction(function () use ($messageId, $userId, $emoji, $tenantId) {
+            // Toggle in message_reactions table
+            $existing = DB::table('message_reactions')
+                ->where('message_id', $messageId)
+                ->where('user_id', $userId)
+                ->where('emoji', $emoji)
+                ->first();
 
             $wasAdded = false;
-            if (isset($userReactions[$userKey])) {
-                // Remove
-                unset($userReactions[$userKey]);
-                if (isset($reactions[$emoji]) && $reactions[$emoji] > 0) {
-                    $reactions[$emoji]--;
-                    if ($reactions[$emoji] <= 0) {
-                        unset($reactions[$emoji]);
-                    }
-                }
+            if ($existing) {
+                DB::table('message_reactions')->where('id', $existing->id)->delete();
             } else {
-                // Add
-                $userReactions[$userKey] = true;
-                $reactions[$emoji] = ($reactions[$emoji] ?? 0) + 1;
+                DB::table('message_reactions')->insert([
+                    'tenant_id' => $tenantId,
+                    'message_id' => $messageId,
+                    'user_id' => $userId,
+                    'emoji' => $emoji,
+                    'created_at' => now(),
+                ]);
                 $wasAdded = true;
             }
 
-            $reactions['_users'] = $userReactions;
+            // Also update the JSON reactions column for backward compatibility
+            if (self::hasReactionsColumn()) {
+                $reactions = [];
+                $rawReactions = DB::table('messages')->where('id', $messageId)->lockForUpdate()->value('reactions');
+                if (! empty($rawReactions)) {
+                    $reactions = json_decode($rawReactions, true) ?? [];
+                }
 
-            DB::table('messages')
-                ->where('id', $messageId)
-                ->where('tenant_id', app('tenant.id'))
-                ->update(['reactions' => json_encode($reactions)]);
+                $userReactions = $reactions['_users'] ?? [];
+                $userKey = "{$userId}_{$emoji}";
+
+                if ($wasAdded) {
+                    $userReactions[$userKey] = true;
+                    $reactions[$emoji] = ($reactions[$emoji] ?? 0) + 1;
+                } else {
+                    unset($userReactions[$userKey]);
+                    if (isset($reactions[$emoji]) && $reactions[$emoji] > 0) {
+                        $reactions[$emoji]--;
+                        if ($reactions[$emoji] <= 0) {
+                            unset($reactions[$emoji]);
+                        }
+                    }
+                }
+
+                $reactions['_users'] = $userReactions;
+
+                DB::table('messages')
+                    ->where('id', $messageId)
+                    ->where('tenant_id', $tenantId)
+                    ->update(['reactions' => json_encode($reactions)]);
+            }
 
             return $wasAdded;
         });
