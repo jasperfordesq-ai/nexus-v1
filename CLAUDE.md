@@ -332,17 +332,23 @@ Full deployment guide: [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md)
 # Step 1: Push code (pre-push hook validates TypeScript + build)
 git push origin main
 
-# Step 2: SSH into the Azure VM
-ssh -i "C:\ssh-keys\project-nexus.pem" azureuser@20.224.171.253
+# Step 2: Deploy (--detach runs in background, survives SSH disconnect)
+ssh -i "C:\ssh-keys\project-nexus.pem" -o RequestTTY=force azureuser@20.224.171.253 \
+  "cd /opt/nexus-php && sudo bash scripts/safe-deploy.sh full --detach"
 
-# Step 3: Run deploy (on the server)
-cd /opt/nexus-php
-sudo bash scripts/safe-deploy.sh full       # Full: rebuild ALL containers (--no-cache)
-sudo bash scripts/safe-deploy.sh quick      # Quick: rebuild frontend + restart PHP
-sudo bash scripts/safe-deploy.sh rollback   # Rollback to last successful deploy
-sudo bash scripts/safe-deploy.sh status     # Check current deployment status
+# Step 3: Check progress (run as many times as needed)
+ssh -i "C:\ssh-keys\project-nexus.pem" -o RequestTTY=force azureuser@20.224.171.253 \
+  "cd /opt/nexus-php && sudo bash scripts/safe-deploy.sh logs"
+
+# Other modes
+sudo bash scripts/safe-deploy.sh quick --detach   # Quick: frontend + PHP restart
+sudo bash scripts/safe-deploy.sh rollback --detach # Rollback
+sudo bash scripts/safe-deploy.sh status            # Check deployment status
+sudo bash scripts/safe-deploy.sh logs -f           # Follow log live (Ctrl+C safe)
 ```
 
+> **⚠️ ALWAYS use `--detach` for deploys.** Docker builds take 10+ minutes. Without `--detach`, SSH will timeout and leave the site in maintenance mode. The `--detach` flag runs the deploy in a background process that survives SSH disconnects.
+>
 > **⚠️ Always use `full` for React/frontend changes.** The `quick` mode rebuilds frontend + restarts PHP, but `full` does a complete `--no-cache` rebuild of all containers which is safest.
 
 ### 🔴 Critical Deploy Rules
@@ -409,6 +415,19 @@ If a deploy fails, **maintenance mode stays ON**. Recovery:
 3. Force live: `sudo bash scripts/maintenance.sh off` (only if you're sure the platform is healthy)
 
 ### For AI assistants
+
+When the user says **"deploy"**, **ALWAYS use `--detach`**:
+```bash
+# Launch deploy (returns immediately — deploy runs in background)
+ssh -i "C:\ssh-keys\project-nexus.pem" -o RequestTTY=force azureuser@20.224.171.253 \
+  "cd /opt/nexus-php && sudo bash scripts/safe-deploy.sh full --detach"
+
+# Poll for completion (run every 30-60 seconds until done)
+ssh -i "C:\ssh-keys\project-nexus.pem" -o RequestTTY=force azureuser@20.224.171.253 \
+  "cd /opt/nexus-php && sudo bash scripts/safe-deploy.sh logs"
+```
+
+**NEVER run `safe-deploy.sh full` or `safe-deploy.sh quick` WITHOUT `--detach`** — Docker builds take 10+ minutes and WILL timeout the SSH session, leaving the site stuck in maintenance mode.
 
 When the user says **"maintenance mode on"**, run:
 ```bash
@@ -592,12 +611,14 @@ sudo bash scripts/maintenance.sh on         # Enable (all tenants, immediate)
 sudo bash scripts/maintenance.sh off        # Disable (platform goes live)
 sudo bash scripts/maintenance.sh status     # Check current status
 
-# Deploy (run on Azure VM via SSH) — maintenance mode is automatic
-sudo bash scripts/safe-deploy.sh full       # Full deploy (rebuild all)
-sudo bash scripts/safe-deploy.sh quick      # Quick deploy (frontend + PHP restart)
-sudo bash scripts/safe-deploy.sh rollback   # Rollback to last successful
-sudo bash scripts/safe-deploy.sh status     # Check deployment status
-bash scripts/purge-cloudflare-cache.sh      # Cache purge only
+# Deploy (run on Azure VM via SSH) — ALWAYS use --detach to survive SSH disconnects
+sudo bash scripts/safe-deploy.sh full --detach    # Full deploy (background, SSH-safe)
+sudo bash scripts/safe-deploy.sh quick --detach   # Quick deploy (background, SSH-safe)
+sudo bash scripts/safe-deploy.sh rollback --detach # Rollback (background, SSH-safe)
+sudo bash scripts/safe-deploy.sh status            # Check deployment status
+sudo bash scripts/safe-deploy.sh logs              # View latest deploy log
+sudo bash scripts/safe-deploy.sh logs -f           # Follow deploy log live
+bash scripts/purge-cloudflare-cache.sh             # Cache purge only
 
 # Meilisearch — re-sync search index (run from LOCAL machine via SSH)
 # scripts/ is NOT volume-mounted in the PHP container, so must docker cp before exec

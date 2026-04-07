@@ -2,18 +2,25 @@
 # =============================================================================
 # Project NEXUS - Safe Production Deploy Script (Enhanced)
 # =============================================================================
-# Usage: sudo bash scripts/safe-deploy.sh [quick|full|rollback|status] [--migrate]
+# Usage: sudo bash scripts/safe-deploy.sh [quick|full|rollback|status|logs] [--migrate] [--detach]
 #
 # Modes:
 #   quick     - Git pull + rebuild frontend + restart all (DEFAULT)
 #   full      - Git pull + rebuild ALL containers (--no-cache)
 #   rollback  - Rollback to last successful deploy (full rebuild)
 #   status    - Show current deployment status (no changes)
+#   logs      - Tail the latest deploy log (follow mode: logs -f)
 #
 # Flags:
 #   --migrate - Also run `php artisan migrate --force` (Laravel migrations)
+#   --detach  - Run deploy in background, detached from terminal/SSH.
+#               Returns immediately with PID + log path. The deploy
+#               continues even if SSH disconnects. Check progress with:
+#                 sudo bash scripts/safe-deploy.sh logs -f
+#                 sudo bash scripts/safe-deploy.sh status
 #
 # Features:
+#   - SSH-disconnect-proof deploys (--detach mode)
 #   - Rollback capability (saves last successful commit)
 #   - Pre-deploy validation (disk space, files, containers)
 #   - Post-deploy smoke tests (API, frontend, database)
@@ -852,6 +859,22 @@ rollback_deployment() {
 show_status() {
     log_step "=== Deployment Status ==="
 
+    # Check if a deploy is currently running
+    if [ -f "$LOCK_FILE" ]; then
+        local LOCK_PID
+        LOCK_PID=$(cat "$LOCK_FILE" 2>/dev/null)
+        if ps -p "$LOCK_PID" > /dev/null 2>&1; then
+            log_warn "Deploy is RUNNING in background (PID: $LOCK_PID)"
+            log_info "Follow live: sudo bash scripts/safe-deploy.sh logs -f"
+        else
+            log_info "No deploy in progress (stale lock file)"
+        fi
+    else
+        log_info "No deploy in progress"
+    fi
+
+    echo "" | tee -a "$LOG_FILE"
+
     # Current commit
     CURRENT_COMMIT=$(git rev-parse HEAD)
     log_info "Current commit: ${CURRENT_COMMIT:0:8}"
@@ -908,6 +931,97 @@ show_status() {
 }
 
 # =============================================================================
+# Logs subcommand — tail the latest deploy log
+# =============================================================================
+show_logs() {
+    local FOLLOW=0
+    local LINES=80
+    for arg in "$@"; do
+        case "$arg" in
+            -f|--follow) FOLLOW=1 ;;
+            [0-9]*) LINES="$arg" ;;
+        esac
+    done
+
+    # Find latest deploy log
+    local LATEST
+    LATEST=$(ls -t "$LOG_DIR"/deploy-*.log 2>/dev/null | head -1)
+    if [ -z "$LATEST" ]; then
+        echo "No deploy logs found in $LOG_DIR"
+        exit 1
+    fi
+
+    echo "=== Latest deploy log: $(basename "$LATEST") ==="
+
+    # Check if a deploy is currently running
+    if [ -f "$LOCK_FILE" ]; then
+        local LOCK_PID
+        LOCK_PID=$(cat "$LOCK_FILE" 2>/dev/null)
+        if ps -p "$LOCK_PID" > /dev/null 2>&1; then
+            echo ">>> Deploy is RUNNING (PID: $LOCK_PID) <<<"
+        else
+            echo ">>> Deploy finished (stale lock) <<<"
+        fi
+    else
+        echo ">>> No deploy in progress <<<"
+    fi
+    echo ""
+
+    if [ "$FOLLOW" = "1" ]; then
+        tail -f "$LATEST"
+    else
+        tail -n "$LINES" "$LATEST"
+    fi
+}
+
+# =============================================================================
+# Detach helper — re-exec this script in the background, fully detached
+# from the terminal/SSH session. Uses setsid + nohup so the process
+# survives SSH disconnects, terminal closes, and SIGHUP.
+# =============================================================================
+run_detached() {
+    local DEPLOY_MODE="$1"
+    shift
+    local EXTRA_ARGS="$*"
+
+    # Create log file early so we can tell the caller where it is
+    mkdir -p "$LOG_DIR"
+    local TS
+    TS=$(date +%Y-%m-%d_%H-%M-%S)
+    local DETACH_LOG="$LOG_DIR/deploy-$TS.log"
+    touch "$DETACH_LOG"
+
+    # Re-exec ourselves with the detach marker set, fully backgrounded
+    # setsid creates a new session (no controlling terminal)
+    # nohup prevents SIGHUP from killing us
+    # stdin from /dev/null, stdout+stderr to the log file
+    env __NEXUS_DEPLOY_DETACHED__=1 \
+        setsid nohup bash "$0" "$DEPLOY_MODE" $EXTRA_ARGS \
+        < /dev/null >> "$DETACH_LOG" 2>&1 &
+    local BG_PID=$!
+
+    # Disown so the shell doesn't wait for it
+    disown "$BG_PID" 2>/dev/null || true
+
+    echo "============================================"
+    echo "  Deploy launched in background"
+    echo "============================================"
+    echo ""
+    echo "  Mode:    $DEPLOY_MODE"
+    echo "  PID:     $BG_PID"
+    echo "  Log:     $DETACH_LOG"
+    echo ""
+    echo "  Monitor progress:"
+    echo "    sudo bash scripts/safe-deploy.sh logs       # last 80 lines"
+    echo "    sudo bash scripts/safe-deploy.sh logs -f    # follow live"
+    echo "    sudo bash scripts/safe-deploy.sh status     # deployment status"
+    echo ""
+    echo "  The deploy will complete even if SSH disconnects."
+    echo "  Maintenance mode is disabled automatically on success."
+    echo "============================================"
+}
+
+# =============================================================================
 # Main Execution
 # =============================================================================
 
@@ -919,33 +1033,58 @@ cd "$DEPLOY_DIR" || {
 # Create log directory
 mkdir -p "$LOG_DIR"
 
-# Create timestamped log file
-TIMESTAMP=$(date +%Y-%m-%d_%H-%M-%S)
-LOG_FILE="$LOG_DIR/deploy-$TIMESTAMP.log"
+# Parse mode and flags
+MODE="${1:-quick}"
+LARAVEL_MIGRATE="${LARAVEL_MIGRATE:-0}"
+DETACH=0
+
+# Check for flags in all args
+shift 2>/dev/null || true
+for arg in "$@"; do
+    case "$arg" in
+        --migrate) LARAVEL_MIGRATE=1 ;;
+        --detach|-d) DETACH=1 ;;
+    esac
+done
+
+# Handle logs subcommand (no lock needed)
+if [ "$MODE" = "logs" ]; then
+    show_logs "$@"
+    exit 0
+fi
+
+# Handle status mode (no lock needed)
+if [ "$MODE" = "status" ]; then
+    LOG_FILE="/dev/null"
+    show_status
+    exit 0
+fi
+
+# Handle --detach: re-exec in background and return immediately
+# Skip if we're already the detached child (marker is set)
+if [ "$DETACH" = "1" ] && [ -z "${__NEXUS_DEPLOY_DETACHED__:-}" ]; then
+    # Reconstruct flags for the child
+    CHILD_ARGS=""
+    [ "$LARAVEL_MIGRATE" = "1" ] && CHILD_ARGS="$CHILD_ARGS --migrate"
+    run_detached "$MODE" $CHILD_ARGS
+    exit 0
+fi
+
+# Set up LOG_FILE for tee calls
+if [ -n "${__NEXUS_DEPLOY_DETACHED__:-}" ]; then
+    # Detached child: stdout/stderr already redirected to the log file by run_detached.
+    # Point LOG_FILE at /dev/null so tee doesn't double-write — stdout IS the log.
+    LOG_FILE="/dev/null"
+else
+    TIMESTAMP=$(date +%Y-%m-%d_%H-%M-%S)
+    LOG_FILE="$LOG_DIR/deploy-$TIMESTAMP.log"
+fi
 
 echo "============================================" | tee "$LOG_FILE"
 echo "  Project NEXUS - Safe Production Deploy"    | tee -a "$LOG_FILE"
 echo "  Started: $(date '+%Y-%m-%d %H:%M:%S')"      | tee -a "$LOG_FILE"
 echo "============================================" | tee -a "$LOG_FILE"
 echo "" | tee -a "$LOG_FILE"
-
-# Parse mode and flags
-MODE="${1:-quick}"
-LARAVEL_MIGRATE="${LARAVEL_MIGRATE:-0}"
-
-# Check for --migrate flag in remaining args
-shift 2>/dev/null || true
-for arg in "$@"; do
-    case "$arg" in
-        --migrate) LARAVEL_MIGRATE=1 ;;
-    esac
-done
-
-# Handle status mode (no lock needed)
-if [ "$MODE" = "status" ]; then
-    show_status
-    exit 0
-fi
 
 # Check for deployment lock
 check_lock
