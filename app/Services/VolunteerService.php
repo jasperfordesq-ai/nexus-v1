@@ -1187,10 +1187,10 @@ class VolunteerService
         $sql = "
             SELECT vo.*, om.role as member_role
             FROM vol_organizations vo
-            JOIN org_members om ON om.organization_id = vo.id AND om.tenant_id = vo.tenant_id
+            JOIN org_members om ON om.organization_id = vo.id AND om.tenant_id = ?
             WHERE om.user_id = ? AND om.tenant_id = ? AND om.status = 'active'
         ";
-        $params = [$userId, $tenantId];
+        $params = [$tenantId, $userId, $tenantId];
 
         if ($cursorId) {
             $sql .= " AND vo.id < ?";
