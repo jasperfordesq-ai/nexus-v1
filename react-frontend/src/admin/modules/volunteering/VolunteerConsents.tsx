@@ -8,9 +8,9 @@
  * Admin read-only view of guardian consent records for minor volunteers.
  */
 
-import { useState, useCallback, useEffect } from 'react';
-import { Button, Chip } from '@heroui/react';
-import { ShieldCheck, RefreshCw } from 'lucide-react';
+import { useState, useCallback, useEffect, useMemo } from 'react';
+import { Button, Chip, Card, CardBody } from '@heroui/react';
+import { ShieldCheck, RefreshCw, AlertTriangle, Mail } from 'lucide-react';
 import { usePageTitle } from '@/hooks';
 import { useToast } from '@/contexts';
 import { adminVolunteering } from '../../api/adminApi';
@@ -65,6 +65,20 @@ export default function VolunteerConsents() {
 
   useEffect(() => { loadData(); }, [loadData]);
 
+  // Find consents expiring within 30 days
+  const now = new Date();
+  const thirtyDaysFromNow = new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000);
+  const expiringConsents = useMemo(
+    () =>
+      consents.filter((c) => {
+        if (!c.expires_date || c.status === 'expired' || c.status === 'withdrawn') return false;
+        const expiresAt = new Date(c.expires_date);
+        return expiresAt > now && expiresAt <= thirtyDaysFromNow;
+      }),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [consents],
+  );
+
   const columns: Column<GuardianConsent>[] = [
     {
       key: 'minor_name',
@@ -112,9 +126,44 @@ export default function VolunteerConsents() {
       key: 'expires_date',
       label: t('volunteering.col_expires_date', 'Expires'),
       sortable: true,
-      render: (row) => (
-        <span>{row.expires_date ? new Date(row.expires_date).toLocaleDateString() : '-'}</span>
-      ),
+      render: (row) => {
+        if (!row.expires_date) return <span>-</span>;
+        const expiresAt = new Date(row.expires_date);
+        const isExpiringSoon = expiresAt > now && expiresAt <= thirtyDaysFromNow;
+        return (
+          <span className={isExpiringSoon ? 'text-warning font-medium' : ''}>
+            {expiresAt.toLocaleDateString()}
+          </span>
+        );
+      },
+    },
+    {
+      key: 'actions' as keyof GuardianConsent,
+      label: t('common.actions', 'Actions'),
+      render: (row) => {
+        if (row.status !== 'expired') return null;
+        const subject = encodeURIComponent(
+          t('volunteering.consent_renewal_subject', 'Guardian Consent Renewal Required'),
+        );
+        const body = encodeURIComponent(
+          t(
+            'volunteering.consent_renewal_body',
+            `Dear ${row.guardian_name},\n\nThe guardian consent for ${row.minor_name}'s participation in "${row.opportunity_title}" has expired. Please renew the consent at your earliest convenience.\n\nThank you.`,
+          ),
+        );
+        return (
+          <Button
+            as="a"
+            href={`mailto:${row.guardian_email}?subject=${subject}&body=${body}`}
+            size="sm"
+            variant="flat"
+            color="warning"
+            startContent={<Mail size={14} />}
+          >
+            {t('volunteering.re_request', 'Re-request')}
+          </Button>
+        );
+      },
     },
   ];
 
@@ -129,6 +178,42 @@ export default function VolunteerConsents() {
           </Button>
         }
       />
+
+      {/* Expiry Warning Banner */}
+      {expiringConsents.length > 0 && (
+        <Card className="mb-6 border-warning/50 bg-warning-50/30">
+          <CardBody className="p-4">
+            <div className="flex items-start gap-3">
+              <AlertTriangle size={20} className="text-warning mt-0.5 shrink-0" />
+              <div>
+                <p className="font-semibold text-warning-700">
+                  {t('volunteering.expiring_consents_warning', '{{count}} consent(s) expiring within 30 days', {
+                    count: expiringConsents.length,
+                  })}
+                </p>
+                <ul className="mt-2 space-y-1">
+                  {expiringConsents.map((c) => (
+                    <li key={c.id} className="text-sm text-default-600">
+                      <span className="font-medium">{c.minor_name}</span>
+                      {' '}&mdash;{' '}
+                      {c.opportunity_title}
+                      {' '}&mdash;{' '}
+                      {t('volunteering.expires_on', 'expires')} {new Date(c.expires_date!).toLocaleDateString()}
+                      {' '}
+                      <a
+                        href={`mailto:${c.guardian_email}?subject=${encodeURIComponent('Guardian Consent Renewal')}`}
+                        className="text-warning-600 underline hover:text-warning-700"
+                      >
+                        ({t('volunteering.contact_guardian', 'contact guardian')})
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+          </CardBody>
+        </Card>
+      )}
 
       {consents.length === 0 && !loading ? (
         <EmptyState

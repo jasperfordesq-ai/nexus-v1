@@ -8,7 +8,7 @@
  * Admin page for managing volunteer expense submissions, reviews, and policies.
  */
 
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect, useMemo } from 'react';
 import {
   Button,
   Chip,
@@ -37,6 +37,10 @@ import {
   Clock,
   FileText,
   Settings,
+  CalendarRange,
+  Building2,
+  Eye,
+  ExternalLink,
 } from 'lucide-react';
 import { usePageTitle } from '@/hooks';
 import { useToast } from '@/contexts';
@@ -56,6 +60,7 @@ interface Expense {
   status: 'pending' | 'approved' | 'rejected' | 'paid';
   submitted_at: string;
   has_receipt: boolean;
+  receipt_path?: string;
   description?: string;
   review_notes?: string;
   payment_reference?: string;
@@ -120,6 +125,15 @@ export function VolunteerExpenses() {
   const [reviewNotes, setReviewNotes] = useState('');
   const [paymentReference, setPaymentReference] = useState('');
 
+  // Date range filter
+  const [dateFrom, setDateFrom] = useState<string>('');
+  const [dateTo, setDateTo] = useState<string>('');
+
+  // Receipt preview modal
+  const [receiptModal, setReceiptModal] = useState(false);
+  const [receiptUrl, setReceiptUrl] = useState<string>('');
+  const [receiptIsPdf, setReceiptIsPdf] = useState(false);
+
   // Policies
   const [policies, setPolicies] = useState<ExpensePolicy[]>([]);
   const [policiesLoading, setPoliciesLoading] = useState(false);
@@ -167,7 +181,55 @@ export function VolunteerExpenses() {
 
   useEffect(() => { loadData(); loadPolicies(); }, [loadData, loadPolicies]);
 
+  // ── Filtered data (by date range) ─────────────────────────────────────────
+  const filteredExpenses = useMemo(() => {
+    return expenses.filter((item) => {
+      if (!item.submitted_at) return true;
+      const itemDate = new Date(item.submitted_at);
+      if (dateFrom) {
+        const from = new Date(dateFrom);
+        from.setHours(0, 0, 0, 0);
+        if (itemDate < from) return false;
+      }
+      if (dateTo) {
+        const to = new Date(dateTo);
+        to.setHours(23, 59, 59, 999);
+        if (itemDate > to) return false;
+      }
+      return true;
+    });
+  }, [expenses, dateFrom, dateTo]);
+
+  // ── Per-org breakdown ───────────────────────────────────────────────────────
+  const orgBreakdown = useMemo(() => {
+    const map = new Map<string, { total: number; count: number; pending: number; approved: number }>();
+    filteredExpenses.forEach((item) => {
+      const orgName = item.organization_name || t('volunteering.unknown_org', 'Unknown');
+      if (!map.has(orgName)) map.set(orgName, { total: 0, count: 0, pending: 0, approved: 0 });
+      const entry = map.get(orgName)!;
+      entry.total += item.amount;
+      entry.count += 1;
+      if (item.status === 'pending') entry.pending += item.amount;
+      if (item.status === 'approved' || item.status === 'paid') entry.approved += item.amount;
+    });
+    return Array.from(map.entries())
+      .map(([name, data]) => ({ name, ...data }))
+      .sort((a, b) => b.total - a.total);
+  }, [filteredExpenses, t]);
+
   // ── Actions ────────────────────────────────────────────────────────────────
+
+  const openReceipt = (expense: Expense) => {
+    if (!expense.receipt_path) return;
+    const isPdf = expense.receipt_path.toLowerCase().endsWith('.pdf');
+    setReceiptUrl(expense.receipt_path);
+    setReceiptIsPdf(isPdf);
+    if (isPdf) {
+      window.open(expense.receipt_path, '_blank');
+    } else {
+      setReceiptModal(true);
+    }
+  };
 
   const openReview = (expense: Expense) => {
     setReviewExpense(expense);
@@ -312,9 +374,23 @@ export function VolunteerExpenses() {
       label: t('volunteering.col_receipt', 'Receipt?'),
       render: (item) =>
         item.has_receipt ? (
-          <Chip size="sm" color="success" variant="flat" startContent={<FileText size={12} />}>
-            {t('common.yes', 'Yes')}
-          </Chip>
+          <div className="flex items-center gap-1.5">
+            <Chip size="sm" color="success" variant="flat" startContent={<FileText size={12} />}>
+              {t('common.yes', 'Yes')}
+            </Chip>
+            {item.receipt_path && (
+              <Button
+                size="sm"
+                variant="light"
+                color="primary"
+                startContent={item.receipt_path.toLowerCase().endsWith('.pdf') ? <ExternalLink size={12} /> : <Eye size={12} />}
+                onPress={() => openReceipt(item)}
+                className="min-w-0 px-2"
+              >
+                {t('volunteering.view_receipt', 'View')}
+              </Button>
+            )}
+          </div>
         ) : (
           <span className="text-sm text-default-400">{t('common.no', 'No')}</span>
         ),
@@ -395,15 +471,102 @@ export function VolunteerExpenses() {
         />
       </div>
 
+      {/* Date range filter */}
+      <div className="flex flex-wrap items-end gap-3 mb-4">
+        <Input
+          type="date"
+          label={t('volunteering.date_from', 'From')}
+          size="sm"
+          className="w-44"
+          value={dateFrom}
+          onValueChange={setDateFrom}
+          startContent={<CalendarRange size={14} className="text-default-400" />}
+        />
+        <Input
+          type="date"
+          label={t('volunteering.date_to', 'To')}
+          size="sm"
+          className="w-44"
+          value={dateTo}
+          onValueChange={setDateTo}
+          startContent={<CalendarRange size={14} className="text-default-400" />}
+        />
+        {(dateFrom || dateTo) && (
+          <Button
+            size="sm"
+            variant="light"
+            onPress={() => { setDateFrom(''); setDateTo(''); }}
+          >
+            {t('common.clear_filters', 'Clear dates')}
+          </Button>
+        )}
+      </div>
+
       {/* Expenses Table */}
-      {!loading && expenses.length === 0 ? (
+      {!loading && filteredExpenses.length === 0 ? (
         <EmptyState
           icon={DollarSign}
           title={t('volunteering.no_expenses', 'No expenses submitted')}
           description={t('volunteering.no_expenses_desc', 'There are no volunteer expense claims to review.')}
         />
       ) : (
-        <DataTable columns={columns} data={expenses} isLoading={loading} onRefresh={loadData} />
+        <DataTable columns={columns} data={filteredExpenses} isLoading={loading} onRefresh={loadData} />
+      )}
+
+      {/* Per-org expense breakdown */}
+      {orgBreakdown.length > 0 && (
+        <Card className="mt-6">
+          <CardHeader>
+            <div className="flex items-center gap-2">
+              <Building2 size={18} />
+              <span className="font-semibold">
+                {t('volunteering.expense_org_breakdown_title', 'Expenses by Organization')}
+              </span>
+            </div>
+          </CardHeader>
+          <CardBody>
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="border-b border-divider text-left">
+                    <th className="py-2 px-3 font-medium text-default-500">
+                      {t('volunteering.col_organization', 'Organization')}
+                    </th>
+                    <th className="py-2 px-3 font-medium text-default-500 text-right">
+                      {t('volunteering.col_claims', 'Claims')}
+                    </th>
+                    <th className="py-2 px-3 font-medium text-default-500 text-right">
+                      {t('volunteering.col_pending_amount', 'Pending')}
+                    </th>
+                    <th className="py-2 px-3 font-medium text-default-500 text-right">
+                      {t('volunteering.col_approved_amount', 'Approved/Paid')}
+                    </th>
+                    <th className="py-2 px-3 font-medium text-default-500 text-right">
+                      {t('volunteering.col_total_amount', 'Total')}
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {orgBreakdown.map((org) => (
+                    <tr key={org.name} className="border-b border-divider/50 hover:bg-default-50">
+                      <td className="py-2 px-3 font-medium">{org.name}</td>
+                      <td className="py-2 px-3 text-right font-mono">{org.count}</td>
+                      <td className="py-2 px-3 text-right font-mono text-warning">
+                        {org.pending > 0 ? org.pending.toFixed(2) : '--'}
+                      </td>
+                      <td className="py-2 px-3 text-right font-mono text-success">
+                        {org.approved > 0 ? org.approved.toFixed(2) : '--'}
+                      </td>
+                      <td className="py-2 px-3 text-right font-mono font-semibold">
+                        {org.total.toFixed(2)}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </CardBody>
+        </Card>
       )}
 
       {/* Expense Policies (collapsible) */}
@@ -560,6 +723,44 @@ export function VolunteerExpenses() {
               {reviewAction === 'approved' && t('volunteering.approve', 'Approve')}
               {reviewAction === 'rejected' && t('volunteering.reject', 'Reject')}
               {reviewAction === 'paid' && t('volunteering.mark_as_paid', 'Mark as Paid')}
+            </Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
+
+      {/* Receipt Preview Modal */}
+      <Modal isOpen={receiptModal} onClose={() => setReceiptModal(false)} size="lg">
+        <ModalContent>
+          <ModalHeader>
+            {t('volunteering.receipt_preview', 'Receipt Preview')}
+          </ModalHeader>
+          <ModalBody>
+            {receiptUrl && !receiptIsPdf && (
+              <div className="flex justify-center">
+                <img
+                  src={receiptUrl}
+                  alt={t('volunteering.receipt_image', 'Receipt')}
+                  className="max-h-[500px] object-contain rounded-lg"
+                  onError={(e) => {
+                    (e.target as HTMLImageElement).src = 'data:image/svg+xml,' + encodeURIComponent(
+                      '<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200"><rect fill="#f4f4f5" width="200" height="200"/><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" fill="#a1a1aa" font-size="14">Image unavailable</text></svg>'
+                    );
+                  }}
+                />
+              </div>
+            )}
+          </ModalBody>
+          <ModalFooter>
+            <Button variant="flat" onPress={() => setReceiptModal(false)}>
+              {t('common.close', 'Close')}
+            </Button>
+            <Button
+              color="primary"
+              variant="flat"
+              startContent={<ExternalLink size={14} />}
+              onPress={() => window.open(receiptUrl, '_blank')}
+            >
+              {t('volunteering.open_full_size', 'Open Full Size')}
             </Button>
           </ModalFooter>
         </ModalContent>

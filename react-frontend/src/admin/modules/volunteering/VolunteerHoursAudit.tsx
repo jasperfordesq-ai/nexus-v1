@@ -15,6 +15,12 @@ import {
   Chip,
   Select,
   SelectItem,
+  Input,
+  Card,
+  CardBody,
+  CardHeader,
+  Tab,
+  Tabs,
 } from '@heroui/react';
 import {
   Clock,
@@ -24,12 +30,36 @@ import {
   RefreshCw,
   ThumbsUp,
   ThumbsDown,
+  Download,
+  Building2,
+  Banknote,
+  CalendarRange,
 } from 'lucide-react';
 import { usePageTitle } from '@/hooks';
 import { useToast } from '@/contexts';
 import { adminVolunteering } from '../../api/adminApi';
 import { PageHeader, StatCard, DataTable, EmptyState, type Column } from '../../components';
 import { useTranslation } from 'react-i18next';
+
+// ── Helpers ───────────────────────────────────────────────────────────────────
+
+function exportToCsv(data: Array<Record<string, unknown>>, filename: string) {
+  if (data.length === 0) return;
+  const first = data[0];
+  if (!first) return;
+  const headers = Object.keys(first);
+  const csv = [
+    headers.join(','),
+    ...data.map((r) => headers.map((h) => JSON.stringify(r[h] ?? '')).join(',')),
+  ].join('\n');
+  const blob = new Blob([csv], { type: 'text/csv' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = filename;
+  a.click();
+  URL.revokeObjectURL(url);
+}
 
 interface HoursStats {
   total_hours: number;
@@ -73,6 +103,13 @@ export function VolunteerHoursAudit() {
   const [cursor, setCursor] = useState<string | null>(null);
   const [hasMore, setHasMore] = useState(false);
   const [actionInProgress, setActionInProgress] = useState<number | null>(null);
+
+  // Date range filter
+  const [dateFrom, setDateFrom] = useState<string>('');
+  const [dateTo, setDateTo] = useState<string>('');
+
+  // Active tab
+  const [activeTab, setActiveTab] = useState<string>('hours');
 
   const loadData = useCallback(async (appendCursor?: string) => {
     if (!appendCursor) setLoading(true);
@@ -153,6 +190,58 @@ export function VolunteerHoursAudit() {
     }
     setActionInProgress(null);
   }, [toast, t, loadData]);
+
+  // ── Filtered data (by date range) ─────────────────────────────────────────
+  const filteredItems = useMemo(() => {
+    return items.filter((item) => {
+      if (!item.created_at) return true;
+      const itemDate = new Date(item.created_at);
+      if (dateFrom) {
+        const from = new Date(dateFrom);
+        from.setHours(0, 0, 0, 0);
+        if (itemDate < from) return false;
+      }
+      if (dateTo) {
+        const to = new Date(dateTo);
+        to.setHours(23, 59, 59, 999);
+        if (itemDate > to) return false;
+      }
+      return true;
+    });
+  }, [items, dateFrom, dateTo]);
+
+  // ── Per-org breakdown ───────────────────────────────────────────────────────
+  const orgBreakdown = useMemo(() => {
+    const map = new Map<string, { approved: number; pending: number }>();
+    filteredItems.forEach((item) => {
+      const orgName = item.org_name || t('volunteering.unknown_org', 'Unknown');
+      if (!map.has(orgName)) map.set(orgName, { approved: 0, pending: 0 });
+      const entry = map.get(orgName)!;
+      if (item.status === 'approved') entry.approved += item.hours;
+      else if (item.status === 'pending') entry.pending += item.hours;
+    });
+    return Array.from(map.entries())
+      .map(([name, data]) => ({ name, ...data }))
+      .sort((a, b) => (b.approved + b.pending) - (a.approved + a.pending));
+  }, [filteredItems, t]);
+
+  // ── Payment reconciliation data ─────────────────────────────────────────────
+  const paidEntries = useMemo(() => {
+    return filteredItems.filter((item) => item.paid === 1 || item.paid === true);
+  }, [filteredItems]);
+
+  const handleExportCsv = useCallback(() => {
+    const exportData = filteredItems.map((item) => ({
+      volunteer: `${item.first_name} ${item.last_name}`,
+      organization: item.org_name || '',
+      hours: item.hours,
+      status: item.status,
+      date: item.created_at ? new Date(item.created_at).toLocaleDateString() : '',
+      paid: (item.paid === 1 || item.paid === true) ? 'Yes' : 'No',
+      paid_amount: item.paid_amount || 0,
+    }));
+    exportToCsv(exportData, `volunteer-hours-${new Date().toISOString().split('T')[0]}.csv`);
+  }, [filteredItems]);
 
   const columns: Column<HourLog>[] = useMemo(() => [
     {
@@ -249,29 +338,67 @@ export function VolunteerHoursAudit() {
   ], [t, actionInProgress, handleVerify]);
 
   const topContent = useMemo(() => (
-    <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-      <Select
-        className="max-w-[200px]"
-        label={t('volunteering.filter_by_status', 'Filter by status')}
-        size="sm"
-        selectedKeys={new Set([statusFilter])}
-        onSelectionChange={(keys) => {
-          const val = Array.from(keys)[0] as string;
-          setStatusFilter(val || 'all');
-        }}
-      >
-        <SelectItem key="all">{t('common.all', 'All')}</SelectItem>
-        <SelectItem key="pending">{t('common.pending', 'Pending')}</SelectItem>
-        <SelectItem key="approved">{t('common.approved', 'Approved')}</SelectItem>
-        <SelectItem key="declined">{t('common.declined', 'Declined')}</SelectItem>
-      </Select>
-      {hasMore && (
-        <Button size="sm" variant="flat" onPress={() => loadData(cursor ?? undefined)} isLoading={loading}>
-          {t('common.load_more', 'Load More')}
+    <div className="flex flex-col gap-3">
+      <div className="flex flex-wrap items-end gap-3">
+        <Select
+          className="w-48"
+          label={t('volunteering.filter_by_status', 'Filter by status')}
+          size="sm"
+          selectedKeys={new Set([statusFilter])}
+          onSelectionChange={(keys) => {
+            const val = Array.from(keys)[0] as string;
+            setStatusFilter(val || 'all');
+          }}
+        >
+          <SelectItem key="all">{t('common.all', 'All')}</SelectItem>
+          <SelectItem key="pending">{t('common.pending', 'Pending')}</SelectItem>
+          <SelectItem key="approved">{t('common.approved', 'Approved')}</SelectItem>
+          <SelectItem key="declined">{t('common.declined', 'Declined')}</SelectItem>
+        </Select>
+        <Input
+          type="date"
+          label={t('volunteering.date_from', 'From')}
+          size="sm"
+          className="w-44"
+          value={dateFrom}
+          onValueChange={setDateFrom}
+          startContent={<CalendarRange size={14} className="text-default-400" />}
+        />
+        <Input
+          type="date"
+          label={t('volunteering.date_to', 'To')}
+          size="sm"
+          className="w-44"
+          value={dateTo}
+          onValueChange={setDateTo}
+          startContent={<CalendarRange size={14} className="text-default-400" />}
+        />
+        {(dateFrom || dateTo) && (
+          <Button
+            size="sm"
+            variant="light"
+            onPress={() => { setDateFrom(''); setDateTo(''); }}
+          >
+            {t('common.clear_filters', 'Clear dates')}
+          </Button>
+        )}
+        <Button
+          size="sm"
+          variant="flat"
+          startContent={<Download size={14} />}
+          onPress={handleExportCsv}
+          isDisabled={filteredItems.length === 0}
+        >
+          {t('volunteering.export_csv', 'Export CSV')}
         </Button>
-      )}
+        {hasMore && (
+          <Button size="sm" variant="flat" onPress={() => loadData(cursor ?? undefined)} isLoading={loading}>
+            {t('common.load_more', 'Load More')}
+          </Button>
+        )}
+      </div>
     </div>
-  ), [statusFilter, hasMore, cursor, loading, t, loadData]);
+  ), [statusFilter, hasMore, cursor, loading, t, loadData, dateFrom, dateTo, handleExportCsv, filteredItems.length]);
 
   return (
     <div>
@@ -317,22 +444,161 @@ export function VolunteerHoursAudit() {
         />
       </div>
 
-      {/* Hours table */}
-      {!loading && items.length === 0 ? (
-        <EmptyState
-          icon={Clock}
-          title={t('volunteering.no_hours', 'No hours logged')}
-          description={t('volunteering.no_hours_desc', 'No volunteer hours have been logged yet.')}
+      {/* Per-org breakdown */}
+      {orgBreakdown.length > 0 && (
+        <Card className="mb-6">
+          <CardHeader>
+            <div className="flex items-center gap-2">
+              <Building2 size={18} />
+              <span className="font-semibold">
+                {t('volunteering.org_breakdown_title', 'Hours by Organization')}
+              </span>
+            </div>
+          </CardHeader>
+          <CardBody>
+            <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-3">
+              {orgBreakdown.map((org) => (
+                <div
+                  key={org.name}
+                  className="flex items-center justify-between p-3 rounded-lg bg-default-50"
+                >
+                  <span className="font-medium text-sm truncate mr-2">{org.name}</span>
+                  <div className="flex gap-3 text-xs shrink-0">
+                    <span className="text-success">
+                      {org.approved} {t('volunteering.approved_abbr', 'approved')}
+                    </span>
+                    {org.pending > 0 && (
+                      <span className="text-warning">
+                        {org.pending} {t('volunteering.pending_abbr', 'pending')}
+                      </span>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </CardBody>
+        </Card>
+      )}
+
+      {/* Tabs: Hours table + Payment reconciliation */}
+      <Tabs
+        selectedKey={activeTab}
+        onSelectionChange={(key) => setActiveTab(key as string)}
+        variant="underlined"
+        className="mb-4"
+      >
+        <Tab key="hours" title={t('volunteering.tab_hours', 'Hours Log')} />
+        <Tab
+          key="payments"
+          title={
+            <div className="flex items-center gap-1.5">
+              <Banknote size={14} />
+              {t('volunteering.tab_payments', 'Payment Reconciliation')}
+            </div>
+          }
         />
-      ) : (
-        <DataTable
-          columns={columns}
-          data={items}
-          isLoading={loading}
-          onRefresh={() => loadData()}
-          searchable={false}
-          topContent={topContent}
-        />
+      </Tabs>
+
+      {activeTab === 'hours' && (
+        <>
+          {!loading && filteredItems.length === 0 ? (
+            <EmptyState
+              icon={Clock}
+              title={t('volunteering.no_hours', 'No hours logged')}
+              description={t('volunteering.no_hours_desc', 'No volunteer hours have been logged yet.')}
+            />
+          ) : (
+            <DataTable
+              columns={columns}
+              data={filteredItems}
+              isLoading={loading}
+              onRefresh={() => loadData()}
+              searchable={false}
+              topContent={topContent}
+            />
+          )}
+        </>
+      )}
+
+      {activeTab === 'payments' && (
+        <Card>
+          <CardHeader>
+            <div className="flex items-center gap-2">
+              <Banknote size={18} />
+              <span className="font-semibold">
+                {t('volunteering.payment_reconciliation_title', 'Payment Reconciliation')}
+              </span>
+            </div>
+          </CardHeader>
+          <CardBody>
+            {paidEntries.length === 0 ? (
+              <div className="text-center py-8">
+                <CreditCard size={40} className="mx-auto mb-3 text-default-300" />
+                <p className="text-default-500 text-sm">
+                  {t('volunteering.no_paid_entries', 'No paid entries found.')}
+                </p>
+                <p className="text-default-400 text-xs mt-1">
+                  {t('volunteering.payment_tracking_note', 'Payment tracking is available when auto-pay is enabled and hours are marked as paid.')}
+                </p>
+              </div>
+            ) : (
+              <div className="overflow-x-auto">
+                <table className="w-full text-sm">
+                  <thead>
+                    <tr className="border-b border-divider text-left">
+                      <th className="py-2 px-3 font-medium text-default-500">
+                        {t('volunteering.col_volunteer', 'Volunteer')}
+                      </th>
+                      <th className="py-2 px-3 font-medium text-default-500">
+                        {t('volunteering.col_organization', 'Organization')}
+                      </th>
+                      <th className="py-2 px-3 font-medium text-default-500">
+                        {t('volunteering.col_hours', 'Hours')}
+                      </th>
+                      <th className="py-2 px-3 font-medium text-default-500">
+                        {t('volunteering.col_amount_paid', 'Amount Paid')}
+                      </th>
+                      <th className="py-2 px-3 font-medium text-default-500">
+                        {t('volunteering.col_date', 'Date')}
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {paidEntries.map((entry) => (
+                      <tr key={entry.id} className="border-b border-divider/50 hover:bg-default-50">
+                        <td className="py-2 px-3 font-medium">
+                          {entry.first_name} {entry.last_name}
+                        </td>
+                        <td className="py-2 px-3">{entry.org_name || '--'}</td>
+                        <td className="py-2 px-3 font-mono">{entry.hours}</td>
+                        <td className="py-2 px-3 font-mono text-success">
+                          {entry.paid_amount > 0 ? entry.paid_amount.toFixed(2) : '--'}
+                        </td>
+                        <td className="py-2 px-3 text-default-500">
+                          {entry.created_at ? new Date(entry.created_at).toLocaleDateString() : '--'}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                  <tfoot>
+                    <tr className="border-t-2 border-divider font-semibold">
+                      <td className="py-2 px-3" colSpan={2}>
+                        {t('volunteering.total', 'Total')}
+                      </td>
+                      <td className="py-2 px-3 font-mono">
+                        {paidEntries.reduce((sum, e) => sum + e.hours, 0)}
+                      </td>
+                      <td className="py-2 px-3 font-mono text-success">
+                        {paidEntries.reduce((sum, e) => sum + (e.paid_amount || 0), 0).toFixed(2)}
+                      </td>
+                      <td />
+                    </tr>
+                  </tfoot>
+                </table>
+              </div>
+            )}
+          </CardBody>
+        </Card>
       )}
     </div>
   );

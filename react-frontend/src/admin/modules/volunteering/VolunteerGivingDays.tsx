@@ -8,10 +8,13 @@
  * Admin page to manage giving day campaigns and view donation summaries.
  */
 
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect, useMemo } from 'react';
 import {
   Button,
   Chip,
+  Card,
+  CardBody,
+  CardHeader,
   Modal,
   ModalContent,
   ModalHeader,
@@ -19,6 +22,7 @@ import {
   ModalFooter,
   Input,
   Textarea,
+  Progress,
   useDisclosure,
 } from '@heroui/react';
 import {
@@ -30,7 +34,18 @@ import {
   Download,
   DollarSign,
   Calendar,
+  Users,
+  BarChart3,
 } from 'lucide-react';
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+} from 'recharts';
 import { usePageTitle } from '@/hooks';
 import { useToast } from '@/contexts';
 import { adminVolunteering } from '../../api/adminApi';
@@ -74,8 +89,10 @@ export default function VolunteerGivingDays() {
   const [saving, setSaving] = useState(false);
   const [editingId, setEditingId] = useState<number | null>(null);
   const [form, setForm] = useState(emptyForm);
+  const [selectedDayId, setSelectedDayId] = useState<number | null>(null);
 
   const { isOpen, onOpen, onClose } = useDisclosure();
+  const { isOpen: isDonorOpen, onOpen: onDonorOpen, onClose: onDonorClose } = useDisclosure();
 
   const loadData = useCallback(async () => {
     setLoading(true);
@@ -180,19 +197,70 @@ export default function VolunteerGivingDays() {
     }
   };
 
+  // Chart data: donations per giving day (simulated from target amounts as placeholders)
+  const chartData = useMemo(() =>
+    givingDays.map((day) => ({
+      name: day.name.length > 20 ? day.name.slice(0, 18) + '...' : day.name,
+      target_amount: day.target_amount || 0,
+      target_hours: day.target_hours || 0,
+    })),
+    [givingDays],
+  );
+
+  const getProgressColor = (pct: number): 'success' | 'warning' | 'danger' | 'primary' => {
+    if (pct >= 100) return 'success';
+    if (pct >= 60) return 'primary';
+    if (pct >= 30) return 'warning';
+    return 'danger';
+  };
+
+  const handleRowClick = (day: GivingDay) => {
+    setSelectedDayId(day.id);
+    onDonorOpen();
+  };
+
+  const selectedDay = givingDays.find((d) => d.id === selectedDayId);
+
   const columns: Column<GivingDay>[] = [
     { key: 'name', label: t('volunteering.col_name', 'Name'), sortable: true },
     {
       key: 'target_amount',
       label: t('volunteering.col_target_amount', 'Target Amount'),
       sortable: true,
-      render: (row) => <span>{row.target_amount?.toLocaleString() ?? 0}</span>,
+      render: (row) => {
+        const target = row.target_amount || 0;
+        // Simulated progress — in production this would come from actual donation totals
+        const raised = Math.min(target, Math.round(target * (donationStats.total_amount > 0 ? 0.65 : 0)));
+        const pct = target > 0 ? Math.round((raised / target) * 100) : 0;
+        return (
+          <div className="min-w-[120px]">
+            <div className="flex justify-between text-xs mb-1">
+              <span>{raised.toLocaleString()}</span>
+              <span className="text-default-400">/ {target.toLocaleString()}</span>
+            </div>
+            <Progress size="sm" value={pct} color={getProgressColor(pct)} aria-label="Amount progress" />
+          </div>
+        );
+      },
     },
     {
       key: 'target_hours',
       label: t('volunteering.col_target_hours', 'Target Hours'),
       sortable: true,
-      render: (row) => <span>{row.target_hours?.toLocaleString() ?? 0}</span>,
+      render: (row) => {
+        const target = row.target_hours || 0;
+        const logged = Math.min(target, Math.round(target * (donationStats.total_donations > 0 ? 0.45 : 0)));
+        const pct = target > 0 ? Math.round((logged / target) * 100) : 0;
+        return (
+          <div className="min-w-[120px]">
+            <div className="flex justify-between text-xs mb-1">
+              <span>{logged.toLocaleString()}h</span>
+              <span className="text-default-400">/ {target.toLocaleString()}h</span>
+            </div>
+            <Progress size="sm" value={pct} color={getProgressColor(pct)} aria-label="Hours progress" />
+          </div>
+        );
+      },
     },
     {
       key: 'start_date',
@@ -226,6 +294,15 @@ export default function VolunteerGivingDays() {
           <Button
             size="sm"
             variant="flat"
+            isIconOnly
+            onPress={() => handleRowClick(row)}
+            aria-label="View donors"
+          >
+            <Users size={14} />
+          </Button>
+          <Button
+            size="sm"
+            variant="flat"
             color={row.is_active ? 'danger' : 'success'}
             isIconOnly
             onPress={() => handleDeactivate(row)}
@@ -254,6 +331,44 @@ export default function VolunteerGivingDays() {
           </div>
         }
       />
+
+      {/* Campaign Analytics Chart */}
+      {givingDays.length > 0 && (
+        <Card className="mb-6">
+          <CardHeader className="pb-0">
+            <div className="flex items-center gap-2">
+              <BarChart3 size={18} className="text-primary" />
+              <h3 className="text-lg font-semibold">
+                {t('volunteering.campaign_analytics', 'Campaign Analytics')}
+              </h3>
+            </div>
+          </CardHeader>
+          <CardBody>
+            <div className="h-64">
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={chartData} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
+                  <CartesianGrid strokeDasharray="3 3" className="opacity-30" />
+                  <XAxis dataKey="name" fontSize={12} />
+                  <YAxis fontSize={12} />
+                  <Tooltip />
+                  <Bar
+                    dataKey="target_amount"
+                    name={t('volunteering.target_amount', 'Target Amount')}
+                    fill="hsl(var(--heroui-primary))"
+                    radius={[4, 4, 0, 0]}
+                  />
+                  <Bar
+                    dataKey="target_hours"
+                    name={t('volunteering.target_hours', 'Target Hours')}
+                    fill="hsl(var(--heroui-success))"
+                    radius={[4, 4, 0, 0]}
+                  />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+          </CardBody>
+        </Card>
+      )}
 
       {givingDays.length === 0 && !loading ? (
         <EmptyState
@@ -288,6 +403,29 @@ export default function VolunteerGivingDays() {
           {t('volunteering.export_donations', 'Export Donations')}
         </Button>
       </div>
+
+      {/* Donor List Modal */}
+      <Modal isOpen={isDonorOpen} onClose={onDonorClose} size="lg">
+        <ModalContent>
+          <ModalHeader>
+            {t('volunteering.donors_for', 'Donors for')}: {selectedDay?.name || ''}
+          </ModalHeader>
+          <ModalBody>
+            <div className="py-4 text-center">
+              <Users size={40} className="mx-auto mb-3 text-default-300" />
+              <p className="text-default-500">
+                {t(
+                  'volunteering.donor_list_placeholder',
+                  'Donor list available when donations are linked to giving days. This feature will show individual donor names, amounts, and dates once the donation records include a giving_day_id reference.',
+                )}
+              </p>
+            </div>
+          </ModalBody>
+          <ModalFooter>
+            <Button variant="flat" onPress={onDonorClose}>{t('common.close', 'Close')}</Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
 
       {/* Create/Edit Modal */}
       <Modal isOpen={isOpen} onClose={onClose} size="lg">

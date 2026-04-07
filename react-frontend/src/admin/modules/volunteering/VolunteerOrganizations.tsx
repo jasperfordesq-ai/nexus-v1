@@ -32,6 +32,9 @@ import {
   ShieldCheck,
   ShieldOff,
   Search,
+  Pencil,
+  Users,
+  Plus,
 } from 'lucide-react';
 import { usePageTitle } from '@/hooks';
 import { useToast } from '@/contexts';
@@ -61,6 +64,24 @@ interface Transaction {
   created_at: string;
   admin_name?: string;
 }
+
+interface OrgMember {
+  id: number;
+  user_id: number;
+  first_name: string;
+  last_name: string;
+  role: string;
+  total_hours: number;
+}
+
+interface OrgFormData {
+  name: string;
+  description: string;
+  contact_email: string;
+  website: string;
+}
+
+const EMPTY_ORG_FORM: OrgFormData = { name: '', description: '', contact_email: '', website: '' };
 
 const STATUS_COLORS: Record<string, 'success' | 'danger' | 'warning' | 'default'> = {
   active: 'success',
@@ -93,6 +114,23 @@ export function VolunteerOrganizations() {
   const [txLoading, setTxLoading] = useState(false);
   const [txCursor, setTxCursor] = useState<string | null>(null);
   const [txHasMore, setTxHasMore] = useState(false);
+
+  // Edit org modal
+  const editModal = useDisclosure();
+  const [editOrg, setEditOrg] = useState<VolOrg | null>(null);
+  const [editForm, setEditForm] = useState<OrgFormData>(EMPTY_ORG_FORM);
+  const [editSubmitting, setEditSubmitting] = useState(false);
+
+  // Members modal
+  const membersModal = useDisclosure();
+  const [membersOrg, setMembersOrg] = useState<VolOrg | null>(null);
+  const [members, setMembers] = useState<OrgMember[]>([]);
+  const [membersLoading, setMembersLoading] = useState(false);
+
+  // Create org modal
+  const createModal = useDisclosure();
+  const [createForm, setCreateForm] = useState<OrgFormData>(EMPTY_ORG_FORM);
+  const [createSubmitting, setCreateSubmitting] = useState(false);
 
   const loadData = useCallback(async () => {
     setLoading(true);
@@ -226,6 +264,99 @@ export function VolunteerOrganizations() {
     }
   }, [toast, t, loadData]);
 
+  // --- Edit Organization ---
+  const openEditModal = useCallback((org: VolOrg) => {
+    setEditOrg(org);
+    setEditForm({
+      name: org.org_name || '',
+      description: '',
+      contact_email: '',
+      website: '',
+    });
+    editModal.onOpen();
+  }, [editModal]);
+
+  const handleEditSubmit = useCallback(async () => {
+    if (!editOrg) return;
+    if (!editForm.name.trim()) {
+      toast.error(t('volunteering.name_required', 'Organization name is required'));
+      return;
+    }
+    setEditSubmitting(true);
+    try {
+      const res = await adminVolunteering.updateOrganization(editOrg.org_id || editOrg.id, {
+        name: editForm.name.trim(),
+        description: editForm.description.trim(),
+        contact_email: editForm.contact_email.trim(),
+        website: editForm.website.trim(),
+      });
+      if (res.success) {
+        toast.success(t('volunteering.org_updated', 'Organization updated'));
+        editModal.onClose();
+        loadData();
+      } else {
+        toast.error((res as { message?: string }).message || t('volunteering.org_update_failed', 'Failed to update organization'));
+      }
+    } catch {
+      toast.error(t('volunteering.org_update_failed', 'Failed to update organization'));
+    }
+    setEditSubmitting(false);
+  }, [editOrg, editForm, toast, t, editModal, loadData]);
+
+  // --- View Members ---
+  const openMembersModal = useCallback(async (org: VolOrg) => {
+    setMembersOrg(org);
+    setMembers([]);
+    membersModal.onOpen();
+    setMembersLoading(true);
+    try {
+      const res = await adminVolunteering.getOrgMembers(org.org_id || org.id);
+      if (res.success && res.data) {
+        const payload = res.data as unknown;
+        if (Array.isArray(payload)) {
+          setMembers(payload as OrgMember[]);
+        } else if (payload && typeof payload === 'object' && 'data' in payload) {
+          setMembers((payload as { data: OrgMember[] }).data || []);
+        }
+      }
+    } catch {
+      toast.error(t('volunteering.failed_load_members', 'Failed to load members'));
+    }
+    setMembersLoading(false);
+  }, [membersModal, toast, t]);
+
+  // --- Create Organization ---
+  const openCreateModal = useCallback(() => {
+    setCreateForm(EMPTY_ORG_FORM);
+    createModal.onOpen();
+  }, [createModal]);
+
+  const handleCreateSubmit = useCallback(async () => {
+    if (!createForm.name.trim()) {
+      toast.error(t('volunteering.name_required', 'Organization name is required'));
+      return;
+    }
+    setCreateSubmitting(true);
+    try {
+      const res = await adminVolunteering.createOrganization({
+        name: createForm.name.trim(),
+        description: createForm.description.trim(),
+        contact_email: createForm.contact_email.trim(),
+        website: createForm.website.trim(),
+      });
+      if (res.success) {
+        toast.success(t('volunteering.org_created', 'Organization created'));
+        createModal.onClose();
+        loadData();
+      } else {
+        toast.error((res as { message?: string }).message || t('volunteering.org_create_failed', 'Failed to create organization'));
+      }
+    } catch {
+      toast.error(t('volunteering.org_create_failed', 'Failed to create organization'));
+    }
+    setCreateSubmitting(false);
+  }, [createForm, toast, t, createModal, loadData]);
+
   const columns: Column<VolOrg>[] = [
     { key: 'org_name', label: t('volunteering.col_organization', 'Organization'), sortable: true },
     {
@@ -277,6 +408,24 @@ export function VolunteerOrganizations() {
       label: t('common.actions', 'Actions'),
       render: (item) => (
         <div className="flex gap-1 flex-wrap">
+          <Button
+            size="sm"
+            variant="flat"
+            color="default"
+            startContent={<Pencil size={14} />}
+            onPress={() => openEditModal(item)}
+          >
+            {t('common.edit', 'Edit')}
+          </Button>
+          <Button
+            size="sm"
+            variant="flat"
+            color="default"
+            startContent={<Users size={14} />}
+            onPress={() => openMembersModal(item)}
+          >
+            {t('volunteering.members', 'Members')}
+          </Button>
           <Button
             size="sm"
             variant="flat"
@@ -363,9 +512,14 @@ export function VolunteerOrganizations() {
         title={t('volunteering.volunteer_organizations_title', 'Volunteer Organizations')}
         description={t('volunteering.volunteer_organizations_desc', 'Manage volunteer organizations, wallets, and statuses')}
         actions={
-          <Button variant="flat" startContent={<RefreshCw size={16} />} onPress={loadData} isLoading={loading}>
-            {t('common.refresh', 'Refresh')}
-          </Button>
+          <div className="flex gap-2">
+            <Button variant="flat" color="primary" startContent={<Plus size={16} />} onPress={openCreateModal}>
+              {t('volunteering.create_organization', 'Create Organization')}
+            </Button>
+            <Button variant="flat" startContent={<RefreshCw size={16} />} onPress={loadData} isLoading={loading}>
+              {t('common.refresh', 'Refresh')}
+            </Button>
+          </div>
         }
       />
 
@@ -479,6 +633,170 @@ export function VolunteerOrganizations() {
               <ModalFooter>
                 <Button variant="flat" onPress={onClose}>
                   {t('common.close', 'Close')}
+                </Button>
+              </ModalFooter>
+            </>
+          )}
+        </ModalContent>
+      </Modal>
+
+      {/* Edit Organization Modal */}
+      <Modal isOpen={editModal.isOpen} onOpenChange={editModal.onOpenChange} size="lg">
+        <ModalContent>
+          {(onClose) => (
+            <>
+              <ModalHeader>
+                {t('volunteering.edit_organization', 'Edit Organization')}
+                {editOrg && (
+                  <span className="block text-sm font-normal text-default-500 mt-1">{editOrg.org_name}</span>
+                )}
+              </ModalHeader>
+              <ModalBody className="flex flex-col gap-3">
+                <Input
+                  label={t('volunteering.org_name_label', 'Organization Name')}
+                  value={editForm.name}
+                  onValueChange={(v) => setEditForm(prev => ({ ...prev, name: v }))}
+                  variant="bordered"
+                  isRequired
+                />
+                <Textarea
+                  label={t('volunteering.org_description_label', 'Description')}
+                  value={editForm.description}
+                  onValueChange={(v) => setEditForm(prev => ({ ...prev, description: v }))}
+                  variant="bordered"
+                  minRows={3}
+                />
+                <Input
+                  label={t('volunteering.org_email_label', 'Contact Email')}
+                  type="email"
+                  value={editForm.contact_email}
+                  onValueChange={(v) => setEditForm(prev => ({ ...prev, contact_email: v }))}
+                  variant="bordered"
+                />
+                <Input
+                  label={t('volunteering.org_website_label', 'Website')}
+                  type="url"
+                  value={editForm.website}
+                  onValueChange={(v) => setEditForm(prev => ({ ...prev, website: v }))}
+                  variant="bordered"
+                  placeholder="https://"
+                />
+              </ModalBody>
+              <ModalFooter>
+                <Button variant="flat" onPress={onClose}>
+                  {t('common.cancel', 'Cancel')}
+                </Button>
+                <Button color="primary" onPress={handleEditSubmit} isLoading={editSubmitting}>
+                  {t('common.save', 'Save')}
+                </Button>
+              </ModalFooter>
+            </>
+          )}
+        </ModalContent>
+      </Modal>
+
+      {/* Members Modal */}
+      <Modal isOpen={membersModal.isOpen} onOpenChange={membersModal.onOpenChange} size="2xl" scrollBehavior="inside">
+        <ModalContent>
+          {(onClose) => (
+            <>
+              <ModalHeader>
+                {t('volunteering.organization_members', 'Organization Members')}
+                {membersOrg && (
+                  <span className="block text-sm font-normal text-default-500 mt-1">
+                    {membersOrg.org_name} — {membersOrg.member_count ?? 0} {t('volunteering.members', 'members')}
+                  </span>
+                )}
+              </ModalHeader>
+              <ModalBody>
+                {membersLoading ? (
+                  <div className="flex justify-center py-8">
+                    <span className="text-default-400">{t('common.loading', 'Loading...')}</span>
+                  </div>
+                ) : members.length === 0 ? (
+                  <div className="flex flex-col items-center py-8 text-default-400">
+                    <Users size={40} className="mb-2" />
+                    <p>{t('volunteering.no_members', 'No members found')}</p>
+                  </div>
+                ) : (
+                  <div className="space-y-2">
+                    {members.map((m) => (
+                      <div
+                        key={m.id || m.user_id}
+                        className="flex items-center justify-between rounded-lg border border-default-200 p-3"
+                      >
+                        <div className="flex items-center gap-3">
+                          <div className="w-8 h-8 rounded-full bg-default-100 flex items-center justify-center text-xs font-semibold text-default-600">
+                            {(m.first_name?.[0] || '').toUpperCase()}{(m.last_name?.[0] || '').toUpperCase()}
+                          </div>
+                          <div>
+                            <p className="text-sm font-medium">{m.first_name} {m.last_name}</p>
+                            <p className="text-xs text-default-400 capitalize">{m.role || t('volunteering.volunteer', 'Volunteer')}</p>
+                          </div>
+                        </div>
+                        <span className="text-sm font-mono text-default-500">
+                          {(m.total_hours ?? 0).toLocaleString()} {t('volunteering.hrs', 'hrs')}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </ModalBody>
+              <ModalFooter>
+                <Button variant="flat" onPress={onClose}>
+                  {t('common.close', 'Close')}
+                </Button>
+              </ModalFooter>
+            </>
+          )}
+        </ModalContent>
+      </Modal>
+
+      {/* Create Organization Modal */}
+      <Modal isOpen={createModal.isOpen} onOpenChange={createModal.onOpenChange} size="lg">
+        <ModalContent>
+          {(onClose) => (
+            <>
+              <ModalHeader>
+                {t('volunteering.create_organization', 'Create Organization')}
+              </ModalHeader>
+              <ModalBody className="flex flex-col gap-3">
+                <Input
+                  label={t('volunteering.org_name_label', 'Organization Name')}
+                  value={createForm.name}
+                  onValueChange={(v) => setCreateForm(prev => ({ ...prev, name: v }))}
+                  variant="bordered"
+                  isRequired
+                />
+                <Textarea
+                  label={t('volunteering.org_description_label', 'Description')}
+                  value={createForm.description}
+                  onValueChange={(v) => setCreateForm(prev => ({ ...prev, description: v }))}
+                  variant="bordered"
+                  minRows={3}
+                />
+                <Input
+                  label={t('volunteering.org_email_label', 'Contact Email')}
+                  type="email"
+                  value={createForm.contact_email}
+                  onValueChange={(v) => setCreateForm(prev => ({ ...prev, contact_email: v }))}
+                  variant="bordered"
+                />
+                <Input
+                  label={t('volunteering.org_website_label', 'Website')}
+                  type="url"
+                  value={createForm.website}
+                  onValueChange={(v) => setCreateForm(prev => ({ ...prev, website: v }))}
+                  variant="bordered"
+                  placeholder="https://"
+                />
+              </ModalBody>
+              <ModalFooter>
+                <Button variant="flat" onPress={onClose}>
+                  {t('common.cancel', 'Cancel')}
+                </Button>
+                <Button color="primary" onPress={handleCreateSubmit} isLoading={createSubmitting}>
+                  {t('volunteering.create', 'Create')}
                 </Button>
               </ModalFooter>
             </>

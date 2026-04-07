@@ -8,12 +8,15 @@
  * Admin page for verifying volunteer training certifications and compliance.
  */
 
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect, useMemo } from 'react';
 import {
   Button,
   Chip,
+  Checkbox,
   Select,
   SelectItem,
+  Card,
+  CardBody,
 } from '@heroui/react';
 import {
   GraduationCap,
@@ -23,6 +26,7 @@ import {
   Clock,
   AlertTriangle,
   ShieldCheck,
+  ListChecks,
 } from 'lucide-react';
 import { usePageTitle } from '@/hooks';
 import { useToast } from '@/contexts';
@@ -87,6 +91,10 @@ export function VolunteerTraining() {
   const [loading, setLoading] = useState(true);
   const [actionId, setActionId] = useState<number | null>(null);
 
+  // Bulk verify
+  const [selectedIds, setSelectedIds] = useState<Set<number>>(new Set());
+  const [bulkVerifying, setBulkVerifying] = useState(false);
+
   // Filters
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [typeFilter, setTypeFilter] = useState<string>('all');
@@ -146,6 +154,60 @@ export function VolunteerTraining() {
     setActionId(null);
   };
 
+  // ── Bulk verify ────────────────────────────────────────────────────────────
+
+  const handleBulkVerify = async () => {
+    if (selectedIds.size === 0) return;
+    setBulkVerifying(true);
+    let successCount = 0;
+    let failCount = 0;
+    for (const id of selectedIds) {
+      try {
+        const res = await adminVolunteering.verifyTraining(id);
+        if (res.success) successCount++;
+        else failCount++;
+      } catch {
+        failCount++;
+      }
+    }
+    if (successCount > 0) {
+      toast.success(
+        t('volunteering.bulk_verify_success', '{{count}} record(s) verified successfully', { count: successCount })
+      );
+    }
+    if (failCount > 0) {
+      toast.error(
+        t('volunteering.bulk_verify_fail', '{{count}} record(s) failed to verify', { count: failCount })
+      );
+    }
+    setSelectedIds(new Set());
+    setBulkVerifying(false);
+    loadData();
+  };
+
+  const toggleSelection = (id: number) => {
+    setSelectedIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  };
+
+  // ── Expiry alerts (within 30 days) ────────────────────────────────────────
+
+  const expiringRecords = useMemo(() => {
+    const now = new Date();
+    const thirtyDaysFromNow = new Date();
+    thirtyDaysFromNow.setDate(now.getDate() + 30);
+    return records.filter((r) => {
+      if (!r.expires_date) return false;
+      if (r.status === 'expired' || r.status === 'rejected') return false;
+      const expiryDate = new Date(r.expires_date);
+      return expiryDate > now && expiryDate <= thirtyDaysFromNow;
+    });
+  }, [records]);
+
   // ── Filtered data ──────────────────────────────────────────────────────────
 
   const filteredRecords = records.filter((r) => {
@@ -154,9 +216,47 @@ export function VolunteerTraining() {
     return true;
   });
 
+  // ── Pending records for bulk select ────────────────────────────────────────
+
+  const pendingRecords = useMemo(() => {
+    return filteredRecords.filter((r) => r.status === 'pending');
+  }, [filteredRecords]);
+
+  const allPendingSelected = pendingRecords.length > 0 && pendingRecords.every((r) => selectedIds.has(r.id));
+
+  const toggleSelectAll = () => {
+    if (allPendingSelected) {
+      setSelectedIds(new Set());
+    } else {
+      setSelectedIds(new Set(pendingRecords.map((r) => r.id)));
+    }
+  };
+
   // ── Columns ────────────────────────────────────────────────────────────────
 
   const columns: Column<TrainingRecord>[] = [
+    {
+      key: 'select',
+      label: pendingRecords.length > 0 ? (
+        <Checkbox
+          isSelected={allPendingSelected}
+          onValueChange={toggleSelectAll}
+          size="sm"
+          aria-label={t('volunteering.select_all', 'Select all pending')}
+        />
+      ) : '',
+      render: (item) => {
+        if (item.status !== 'pending') return null;
+        return (
+          <Checkbox
+            isSelected={selectedIds.has(item.id)}
+            onValueChange={() => toggleSelection(item.id)}
+            size="sm"
+            aria-label={t('volunteering.select_record', 'Select {{name}}', { name: item.volunteer_name })}
+          />
+        );
+      },
+    },
     {
       key: 'volunteer_name',
       label: t('volunteering.col_volunteer', 'Volunteer'),
@@ -316,6 +416,62 @@ export function VolunteerTraining() {
           loading={loading}
         />
       </div>
+
+      {/* Expiry alerts */}
+      {expiringRecords.length > 0 && (
+        <Card className="mb-4 border-warning/50 bg-warning-50/50">
+          <CardBody className="py-3 px-4">
+            <div className="flex items-start gap-2">
+              <AlertTriangle size={18} className="text-warning mt-0.5 shrink-0" />
+              <div>
+                <p className="font-semibold text-sm text-warning-700">
+                  {t('volunteering.expiry_alert_title', '{{count}} training record(s) expiring within 30 days', { count: expiringRecords.length })}
+                </p>
+                <ul className="mt-1.5 space-y-0.5">
+                  {expiringRecords.map((r) => (
+                    <li key={r.id} className="text-xs text-warning-600">
+                      <span className="font-medium">{r.volunteer_name}</span>
+                      {' — '}
+                      {TYPE_LABELS[r.training_type] || r.training_type}
+                      {' — '}
+                      {t('volunteering.expires_on', 'expires {{date}}', {
+                        date: new Date(r.expires_date!).toLocaleDateString(),
+                      })}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+          </CardBody>
+        </Card>
+      )}
+
+      {/* Bulk verify bar */}
+      {selectedIds.size > 0 && (
+        <div className="flex items-center gap-3 mb-4 p-3 rounded-lg bg-primary-50 border border-primary/20">
+          <ListChecks size={18} className="text-primary" />
+          <span className="text-sm font-medium text-primary-700">
+            {t('volunteering.bulk_selected', '{{count}} pending record(s) selected', { count: selectedIds.size })}
+          </span>
+          <Button
+            size="sm"
+            color="success"
+            variant="flat"
+            startContent={<CheckCircle size={14} />}
+            onPress={handleBulkVerify}
+            isLoading={bulkVerifying}
+          >
+            {t('volunteering.bulk_verify', 'Bulk Verify')}
+          </Button>
+          <Button
+            size="sm"
+            variant="light"
+            onPress={() => setSelectedIds(new Set())}
+          >
+            {t('common.clear_selection', 'Clear')}
+          </Button>
+        </div>
+      )}
 
       {/* Filters */}
       <div className="flex flex-wrap gap-3 mb-4">

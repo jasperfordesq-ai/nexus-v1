@@ -27,6 +27,9 @@ import {
   useDisclosure,
   Card,
   CardBody,
+  Checkbox,
+  RadioGroup,
+  Radio,
 } from '@heroui/react';
 import {
   RefreshCw,
@@ -41,6 +44,13 @@ import {
   FileText,
   CheckCircle,
   XCircle,
+  ArrowUp,
+  ArrowDown,
+  Eye,
+  Send,
+  RotateCcw,
+  Search,
+  Clock,
 } from 'lucide-react';
 import { usePageTitle } from '@/hooks';
 import { useToast } from '@/contexts';
@@ -57,6 +67,7 @@ interface CustomField {
   applies_to: string;
   is_required: boolean;
   options: string[] | null;
+  sort_order?: number;
 }
 
 const fieldTypeOptions = [
@@ -177,6 +188,136 @@ export default function VolunteerConfig() {
 // Tab 1: Custom Fields
 // ─────────────────────────────────────────────────────────────────────────────
 
+function FieldPreviewModal({
+  isOpen,
+  onClose,
+  field,
+}: {
+  isOpen: boolean;
+  onClose: () => void;
+  field: CustomField | null;
+}) {
+  const { t } = useTranslation('admin');
+  if (!field) return null;
+
+  const renderPreview = () => {
+    switch (field.field_type) {
+      case 'text':
+      case 'email':
+      case 'phone':
+      case 'number':
+        return (
+          <Input
+            label={field.label}
+            type={field.field_type === 'phone' ? 'tel' : field.field_type}
+            variant="bordered"
+            isRequired={field.is_required}
+            placeholder={`Enter ${field.label.toLowerCase()}...`}
+            isReadOnly
+          />
+        );
+      case 'textarea':
+        return (
+          <Textarea
+            label={field.label}
+            variant="bordered"
+            isRequired={field.is_required}
+            placeholder={`Enter ${field.label.toLowerCase()}...`}
+            minRows={3}
+            isReadOnly
+          />
+        );
+      case 'select':
+        return (
+          <Select
+            label={field.label}
+            variant="bordered"
+            isRequired={field.is_required}
+            placeholder={`Select ${field.label.toLowerCase()}`}
+          >
+            {(field.options || ['Option 1', 'Option 2', 'Option 3']).map((opt) => (
+              <SelectItem key={opt}>{opt}</SelectItem>
+            ))}
+          </Select>
+        );
+      case 'checkbox':
+        return (
+          <div className="flex flex-col gap-2">
+            <span className="text-sm font-medium">{field.label} {field.is_required && '*'}</span>
+            {(field.options || ['Option 1', 'Option 2']).map((opt) => (
+              <Checkbox key={opt}>{opt}</Checkbox>
+            ))}
+          </div>
+        );
+      case 'radio':
+        return (
+          <RadioGroup label={field.label} isRequired={field.is_required}>
+            {(field.options || ['Option 1', 'Option 2']).map((opt) => (
+              <Radio key={opt} value={opt}>{opt}</Radio>
+            ))}
+          </RadioGroup>
+        );
+      case 'date':
+        return (
+          <Input
+            label={field.label}
+            type="date"
+            variant="bordered"
+            isRequired={field.is_required}
+            isReadOnly
+          />
+        );
+      case 'file':
+        return (
+          <Input
+            label={field.label}
+            type="file"
+            variant="bordered"
+            isRequired={field.is_required}
+            isReadOnly
+          />
+        );
+      default:
+        return (
+          <Input
+            label={field.label}
+            variant="bordered"
+            isRequired={field.is_required}
+            isReadOnly
+          />
+        );
+    }
+  };
+
+  return (
+    <Modal isOpen={isOpen} onClose={onClose} size="md">
+      <ModalContent>
+        <ModalHeader>
+          {t('volunteering.field_preview', 'Field Preview')}: {field.label}
+        </ModalHeader>
+        <ModalBody>
+          <Card className="bg-default-50">
+            <CardBody className="p-4">
+              <p className="text-xs text-default-400 mb-3">
+                {t('volunteering.preview_description', 'This is how the field will appear to volunteers:')}
+              </p>
+              {renderPreview()}
+            </CardBody>
+          </Card>
+          <div className="mt-3 flex flex-wrap gap-2 text-xs text-default-500">
+            <Chip size="sm" variant="flat">{field.field_type}</Chip>
+            <Chip size="sm" variant="flat" color="primary">{field.applies_to}</Chip>
+            {field.is_required && <Chip size="sm" variant="flat" color="danger">{t('volunteering.required', 'Required')}</Chip>}
+          </div>
+        </ModalBody>
+        <ModalFooter>
+          <Button variant="flat" onPress={onClose}>{t('common.close', 'Close')}</Button>
+        </ModalFooter>
+      </ModalContent>
+    </Modal>
+  );
+}
+
 function CustomFieldsTab() {
   const { t } = useTranslation('admin');
   const toast = useToast();
@@ -187,9 +328,12 @@ function CustomFieldsTab() {
   const [editingId, setEditingId] = useState<number | null>(null);
   const [form, setForm] = useState(emptyFieldForm);
   const [deleteId, setDeleteId] = useState<number | null>(null);
+  const [previewField, setPreviewField] = useState<CustomField | null>(null);
+  const [orderChanged, setOrderChanged] = useState(false);
 
   const { isOpen, onOpen, onClose } = useDisclosure();
   const { isOpen: isDeleteOpen, onOpen: onDeleteOpen, onClose: onDeleteClose } = useDisclosure();
+  const { isOpen: isPreviewOpen, onOpen: onPreviewOpen, onClose: onPreviewClose } = useDisclosure();
 
   const loadData = useCallback(async () => {
     setLoading(true);
@@ -197,11 +341,17 @@ function CustomFieldsTab() {
       const res = await adminVolunteering.getCustomFields();
       if (res.success && res.data) {
         const payload = res.data as unknown;
+        let loadedFields: CustomField[];
         if (Array.isArray(payload)) {
-          setFields(payload);
+          loadedFields = payload;
         } else if (payload && typeof payload === 'object' && 'data' in payload) {
-          setFields((payload as { data: CustomField[] }).data || []);
+          loadedFields = (payload as { data: CustomField[] }).data || [];
+        } else {
+          loadedFields = [];
         }
+        // Assign sort_order if missing
+        setFields(loadedFields.map((f, i) => ({ ...f, sort_order: f.sort_order ?? i })));
+        setOrderChanged(false);
       }
     } catch {
       toast.error(t('volunteering.failed_to_load_fields', 'Failed to load custom fields'));
@@ -211,6 +361,27 @@ function CustomFieldsTab() {
   }, [toast, t]);
 
   useEffect(() => { loadData(); }, [loadData]);
+
+  const sortedFields = [...fields].sort((a, b) => (a.sort_order ?? 0) - (b.sort_order ?? 0));
+
+  const moveField = (index: number, direction: 'up' | 'down') => {
+    const sorted = [...sortedFields];
+    const newIndex = direction === 'up' ? index - 1 : index + 1;
+    if (newIndex < 0 || newIndex >= sorted.length) return;
+    // Swap sort_order values (bounds already checked above)
+    const currentItem = sorted[index]!;
+    const targetItem = sorted[newIndex]!;
+    const tempOrder = currentItem.sort_order ?? index;
+    sorted[index] = { ...currentItem, sort_order: targetItem.sort_order ?? newIndex };
+    sorted[newIndex] = { ...targetItem, sort_order: tempOrder };
+    setFields(sorted);
+    setOrderChanged(true);
+  };
+
+  const openPreview = (field: CustomField) => {
+    setPreviewField(field);
+    onPreviewOpen();
+  };
 
   const openCreate = () => {
     setEditingId(null);
@@ -304,23 +475,49 @@ function CustomFieldsTab() {
     {
       key: 'actions' as keyof CustomField,
       label: t('common.actions', 'Actions'),
-      render: (row) => (
-        <div className="flex items-center gap-1">
-          <Button size="sm" variant="flat" isIconOnly onPress={() => openEdit(row)} aria-label="Edit">
-            <Edit2 size={14} />
-          </Button>
-          <Button
-            size="sm"
-            variant="flat"
-            color="danger"
-            isIconOnly
-            onPress={() => { setDeleteId(row.id); onDeleteOpen(); }}
-            aria-label="Delete"
-          >
-            <Trash2 size={14} />
-          </Button>
-        </div>
-      ),
+      render: (row) => {
+        const idx = sortedFields.findIndex((f) => f.id === row.id);
+        return (
+          <div className="flex items-center gap-1">
+            <Button
+              size="sm"
+              variant="flat"
+              isIconOnly
+              isDisabled={idx <= 0}
+              onPress={() => moveField(idx, 'up')}
+              aria-label="Move up"
+            >
+              <ArrowUp size={14} />
+            </Button>
+            <Button
+              size="sm"
+              variant="flat"
+              isIconOnly
+              isDisabled={idx >= sortedFields.length - 1}
+              onPress={() => moveField(idx, 'down')}
+              aria-label="Move down"
+            >
+              <ArrowDown size={14} />
+            </Button>
+            <Button size="sm" variant="flat" isIconOnly onPress={() => openPreview(row)} aria-label="Preview">
+              <Eye size={14} />
+            </Button>
+            <Button size="sm" variant="flat" isIconOnly onPress={() => openEdit(row)} aria-label="Edit">
+              <Edit2 size={14} />
+            </Button>
+            <Button
+              size="sm"
+              variant="flat"
+              color="danger"
+              isIconOnly
+              onPress={() => { setDeleteId(row.id); onDeleteOpen(); }}
+              aria-label="Delete"
+            >
+              <Trash2 size={14} />
+            </Button>
+          </div>
+        );
+      },
     },
   ];
 
@@ -338,15 +535,28 @@ function CustomFieldsTab() {
         </div>
       </div>
 
-      {fields.length === 0 && !loading ? (
+      {orderChanged && (
+        <Card className="mb-4 border-primary/50 bg-primary-50/30">
+          <CardBody className="p-3">
+            <p className="text-sm text-primary-700">
+              {t('volunteering.order_changed_note', 'Field order has been changed. Order changes will be saved on the next field edit.')}
+            </p>
+          </CardBody>
+        </Card>
+      )}
+
+      {sortedFields.length === 0 && !loading ? (
         <EmptyState
           icon={FormInput}
           title={t('volunteering.no_custom_fields', 'No custom fields')}
           description={t('volunteering.no_custom_fields_desc', 'Add custom fields to collect additional data from volunteers.')}
         />
       ) : (
-        <DataTable columns={columns} data={fields} isLoading={loading} />
+        <DataTable columns={columns} data={sortedFields} isLoading={loading} />
       )}
+
+      {/* Field Preview Modal */}
+      <FieldPreviewModal isOpen={isPreviewOpen} onClose={onPreviewClose} field={previewField} />
 
       {/* Create/Edit Modal */}
       <Modal isOpen={isOpen} onClose={onClose} size="lg">
@@ -448,6 +658,9 @@ function RemindersTab() {
   const [reminders, setReminders] = useState<ReminderSetting[]>(defaultReminders);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [testingKey, setTestingKey] = useState<string | null>(null);
+  const { isOpen: isTestOpen, onOpen: onTestOpen, onClose: onTestClose } = useDisclosure();
+  const [testReminderLabel, setTestReminderLabel] = useState('');
 
   const loadData = useCallback(async () => {
     setLoading(true);
@@ -488,6 +701,22 @@ function RemindersTab() {
     setSaving(false);
   };
 
+  const openTestConfirm = (reminder: ReminderSetting) => {
+    setTestingKey(reminder.key);
+    setTestReminderLabel(reminder.label);
+    onTestOpen();
+  };
+
+  const handleTestSend = () => {
+    onTestClose();
+    toast.success(
+      t('volunteering.test_reminder_sent', 'Test "{{label}}" notification sent to your account', {
+        label: testReminderLabel,
+      }),
+    );
+    setTestingKey(null);
+  };
+
   return (
     <div>
       <div className="flex justify-between items-center mb-4">
@@ -517,11 +746,25 @@ function RemindersTab() {
                       {t(`volunteering.reminder_${reminder.key}`, reminder.label)}
                     </span>
                   </div>
-                  <Chip size="sm" variant="flat" color={reminder.enabled ? 'success' : 'default'}>
-                    {reminder.enabled
-                      ? t('volunteering.enabled', 'Enabled')
-                      : t('volunteering.disabled', 'Disabled')}
-                  </Chip>
+                  <div className="flex items-center gap-2">
+                    {reminder.enabled && (
+                      <Button
+                        size="sm"
+                        variant="flat"
+                        color="primary"
+                        startContent={<Send size={14} />}
+                        onPress={() => openTestConfirm(reminder)}
+                        isLoading={testingKey === reminder.key}
+                      >
+                        {t('volunteering.send_test', 'Send Test')}
+                      </Button>
+                    )}
+                    <Chip size="sm" variant="flat" color={reminder.enabled ? 'success' : 'default'}>
+                      {reminder.enabled
+                        ? t('volunteering.enabled', 'Enabled')
+                        : t('volunteering.disabled', 'Disabled')}
+                    </Chip>
+                  </div>
                 </div>
 
                 {reminder.enabled && (
@@ -570,6 +813,47 @@ function RemindersTab() {
           </Card>
         ))}
       </div>
+
+      {/* Recent Deliveries Placeholder */}
+      <div className="mt-8">
+        <h4 className="text-md font-semibold mb-3 flex items-center gap-2">
+          <Clock size={16} />
+          {t('volunteering.recent_deliveries', 'Recent Deliveries')}
+        </h4>
+        <Card className="bg-default-50">
+          <CardBody className="p-6 text-center">
+            <Clock size={32} className="mx-auto mb-3 text-default-300" />
+            <p className="text-default-500 text-sm">
+              {t(
+                'volunteering.delivery_logs_placeholder',
+                'Delivery logs coming soon. Check the notification queue in the main admin panel for current delivery status.',
+              )}
+            </p>
+          </CardBody>
+        </Card>
+      </div>
+
+      {/* Test Send Confirmation Modal */}
+      <Modal isOpen={isTestOpen} onClose={onTestClose} size="sm">
+        <ModalContent>
+          <ModalHeader>{t('volunteering.test_reminder_title', 'Send Test Notification')}</ModalHeader>
+          <ModalBody>
+            <p className="text-default-600">
+              {t(
+                'volunteering.test_reminder_confirm',
+                'Send a test "{{label}}" notification to yourself?',
+                { label: testReminderLabel },
+              )}
+            </p>
+          </ModalBody>
+          <ModalFooter>
+            <Button variant="flat" onPress={onTestClose}>{t('common.cancel', 'Cancel')}</Button>
+            <Button color="primary" startContent={<Send size={14} />} onPress={handleTestSend}>
+              {t('volunteering.confirm_send_test', 'Send Test')}
+            </Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
     </div>
   );
 }
@@ -591,6 +875,8 @@ function WebhooksTab() {
   const [testingId, setTestingId] = useState<number | null>(null);
   const [logs, setLogs] = useState<WebhookLog[]>([]);
   const [, setLogsWebhookId] = useState<number | null>(null);
+  const [retryingId, setRetryingId] = useState<number | null>(null);
+  const [logFilter, setLogFilter] = useState('');
 
   const { isOpen, onOpen, onClose } = useDisclosure();
   const { isOpen: isDeleteOpen, onOpen: onDeleteOpen, onClose: onDeleteClose } = useDisclosure();
@@ -685,7 +971,28 @@ function WebhooksTab() {
     setTestingId(null);
   };
 
+  const handleRetry = async (id: number) => {
+    setRetryingId(id);
+    try {
+      await adminVolunteering.testWebhook(id);
+      toast.success(t('volunteering.webhook_retry_sent', 'Retrying webhook...'));
+      loadData();
+    } catch {
+      toast.error(t('volunteering.webhook_retry_failed', 'Webhook retry failed'));
+    }
+    setRetryingId(null);
+  };
+
+  const filteredLogs = logFilter.trim()
+    ? logs.filter(
+        (log) =>
+          log.event.toLowerCase().includes(logFilter.toLowerCase()) ||
+          String(log.status_code).includes(logFilter),
+      )
+    : logs;
+
   const handleViewLogs = async (id: number) => {
+    setLogFilter('');
     setLogsWebhookId(id);
     try {
       const res = await adminVolunteering.getWebhookLogs(id);
@@ -761,6 +1068,19 @@ function WebhooksTab() {
           >
             <Play size={14} />
           </Button>
+          {row.failure_count > 0 && (
+            <Button
+              size="sm"
+              variant="flat"
+              color="warning"
+              isIconOnly
+              isLoading={retryingId === row.id}
+              onPress={() => handleRetry(row.id)}
+              aria-label="Retry failed"
+            >
+              <RotateCcw size={14} />
+            </Button>
+          )}
           <Button
             size="sm"
             variant="flat"
@@ -878,13 +1198,28 @@ function WebhooksTab() {
             {t('volunteering.webhook_logs_title', 'Webhook Dispatch Logs')}
           </ModalHeader>
           <ModalBody>
-            {logs.length === 0 ? (
+            {logs.length > 0 && (
+              <Input
+                placeholder={t('volunteering.filter_logs', 'Filter by event or status code...')}
+                value={logFilter}
+                onValueChange={setLogFilter}
+                variant="bordered"
+                size="sm"
+                startContent={<Search size={14} className="text-default-400" />}
+                className="mb-3"
+                isClearable
+                onClear={() => setLogFilter('')}
+              />
+            )}
+            {filteredLogs.length === 0 ? (
               <p className="text-default-500 text-center py-8">
-                {t('volunteering.no_webhook_logs', 'No dispatch logs for this webhook.')}
+                {logs.length === 0
+                  ? t('volunteering.no_webhook_logs', 'No dispatch logs for this webhook.')
+                  : t('volunteering.no_matching_logs', 'No logs match your filter.')}
               </p>
             ) : (
               <div className="flex flex-col gap-3">
-                {logs.map((log) => (
+                {filteredLogs.map((log) => (
                   <Card key={log.id} className="p-0">
                     <CardBody className="p-3">
                       <div className="flex items-center justify-between mb-2">

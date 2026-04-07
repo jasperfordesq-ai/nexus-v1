@@ -8,7 +8,7 @@
  * Admin page to review and manage community-proposed volunteer projects.
  */
 
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect, useMemo } from 'react';
 import {
   Button,
   Chip,
@@ -22,12 +22,13 @@ import {
   SelectItem,
   useDisclosure,
 } from '@heroui/react';
-import { FolderKanban, RefreshCw, ClipboardCheck } from 'lucide-react';
+import { FolderKanban, RefreshCw, ClipboardCheck, CheckCircle, Play, Flag, Users, PlusCircle } from 'lucide-react';
 import { usePageTitle } from '@/hooks';
 import { useToast } from '@/contexts';
 import { adminVolunteering } from '../../api/adminApi';
-import { DataTable, PageHeader, EmptyState, type Column } from '../../components';
+import { DataTable, PageHeader, StatCard, EmptyState, type Column } from '../../components';
 import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router-dom';
 
 interface CommunityProject {
   id: number;
@@ -60,6 +61,7 @@ export default function VolunteerProjects() {
   const { t } = useTranslation('admin');
   usePageTitle(t('volunteering.projects_title', 'Community Projects'));
   const toast = useToast();
+  const navigate = useNavigate();
 
   const [projects, setProjects] = useState<CommunityProject[]>([]);
   const [loading, setLoading] = useState(true);
@@ -118,6 +120,23 @@ export default function VolunteerProjects() {
     setSaving(false);
   };
 
+  const stats = useMemo(() => {
+    const total = projects.length;
+    const approved = projects.filter((p) => p.status === 'approved').length;
+    const active = projects.filter((p) => p.status === 'active').length;
+    const completed = projects.filter((p) => p.status === 'completed').length;
+    const totalSupporters = projects.reduce((sum, p) => sum + (p.supporters_count || 0), 0);
+    return { total, approved, active, completed, totalSupporters };
+  }, [projects]);
+
+  const handleCreateOpportunity = (project: CommunityProject) => {
+    const params = new URLSearchParams({
+      from_project: String(project.id),
+      title: project.title,
+    });
+    navigate(`/admin/volunteering/create?${params.toString()}`);
+  };
+
   const columns: Column<CommunityProject>[] = [
     {
       key: 'title',
@@ -166,15 +185,28 @@ export default function VolunteerProjects() {
       key: 'actions' as keyof CommunityProject,
       label: t('common.actions', 'Actions'),
       render: (row) => (
-        <Button
-          size="sm"
-          variant="flat"
-          color="primary"
-          startContent={<ClipboardCheck size={14} />}
-          onPress={() => openReview(row)}
-        >
-          {t('volunteering.review', 'Review')}
-        </Button>
+        <div className="flex items-center gap-1">
+          <Button
+            size="sm"
+            variant="flat"
+            color="primary"
+            startContent={<ClipboardCheck size={14} />}
+            onPress={() => openReview(row)}
+          >
+            {t('volunteering.review', 'Review')}
+          </Button>
+          {row.status === 'approved' && (
+            <Button
+              size="sm"
+              variant="flat"
+              color="success"
+              startContent={<PlusCircle size={14} />}
+              onPress={() => handleCreateOpportunity(row)}
+            >
+              {t('volunteering.create_opportunity', 'Create Opportunity')}
+            </Button>
+          )}
+        </div>
       ),
     },
   ];
@@ -190,6 +222,47 @@ export default function VolunteerProjects() {
           </Button>
         }
       />
+
+      {/* Project Analytics Stats */}
+      {projects.length > 0 && (
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-5 mb-6">
+          <StatCard
+            label={t('volunteering.total_projects', 'Total Projects')}
+            value={stats.total}
+            icon={FolderKanban}
+            color="default"
+            loading={loading}
+          />
+          <StatCard
+            label={t('volunteering.approved_projects', 'Approved')}
+            value={stats.approved}
+            icon={CheckCircle}
+            color="success"
+            loading={loading}
+          />
+          <StatCard
+            label={t('volunteering.active_projects', 'Active')}
+            value={stats.active}
+            icon={Play}
+            color="primary"
+            loading={loading}
+          />
+          <StatCard
+            label={t('volunteering.completed_projects', 'Completed')}
+            value={stats.completed}
+            icon={Flag}
+            color="secondary"
+            loading={loading}
+          />
+          <StatCard
+            label={t('volunteering.total_supporters', 'Total Supporters')}
+            value={stats.totalSupporters}
+            icon={Users}
+            color="warning"
+            loading={loading}
+          />
+        </div>
+      )}
 
       {projects.length === 0 && !loading ? (
         <EmptyState

@@ -34,6 +34,8 @@ import {
   CheckCircle,
   Clock,
   Users,
+  Activity,
+  ArrowRight,
 } from 'lucide-react';
 import { usePageTitle } from '@/hooks';
 import { useToast } from '@/contexts';
@@ -411,6 +413,90 @@ export function VolunteerSafeguarding() {
           )}
         </CardBody>
       </Card>
+
+      {/* Recent Actions / Audit Log */}
+      {incidents.length > 0 && (
+        <Card className="mt-6">
+          <CardHeader>
+            <div className="flex items-center gap-2">
+              <Activity size={18} />
+              <span className="font-semibold">
+                {t('volunteering.recent_actions_title', 'Recent Actions')}
+              </span>
+            </div>
+          </CardHeader>
+          <CardBody>
+            <div className="relative">
+              {/* Timeline line */}
+              <div className="absolute left-[15px] top-2 bottom-2 w-0.5 bg-default-200" />
+
+              <div className="space-y-4">
+                {[...incidents]
+                  .sort((a, b) => {
+                    const dateA = new Date(a.date || 0).getTime();
+                    const dateB = new Date(b.date || 0).getTime();
+                    return dateB - dateA;
+                  })
+                  .slice(0, 20)
+                  .map((incident) => (
+                    <div key={incident.id} className="flex items-start gap-3 relative pl-9">
+                      {/* Timeline dot */}
+                      <div
+                        className={`absolute left-[10px] top-1.5 w-3 h-3 rounded-full border-2 border-background ${
+                          incident.status === 'resolved' || incident.status === 'closed'
+                            ? 'bg-success'
+                            : incident.status === 'escalated'
+                              ? 'bg-danger'
+                              : incident.status === 'investigating'
+                                ? 'bg-primary'
+                                : 'bg-warning'
+                        }`}
+                      />
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <span className="text-sm font-medium">
+                            {TYPE_LABELS[incident.type] || incident.type}
+                          </span>
+                          <ArrowRight size={12} className="text-default-400" />
+                          <Chip
+                            size="sm"
+                            color={STATUS_COLORS[incident.status] || 'default'}
+                            variant="flat"
+                          >
+                            {incident.status === 'investigating'
+                              ? 'Under Investigation'
+                              : incident.status.charAt(0).toUpperCase() + incident.status.slice(1)}
+                          </Chip>
+                          <Chip
+                            size="sm"
+                            color={SEVERITY_COLORS[incident.severity] || 'default'}
+                            variant="dot"
+                          >
+                            {incident.severity}
+                          </Chip>
+                        </div>
+                        <p className="text-xs text-default-500 mt-0.5">
+                          {incident.subject_name}
+                          {incident.organization_name && ` — ${incident.organization_name}`}
+                          {' | '}
+                          {t('volunteering.reported_by', 'Reported by {{name}}', { name: incident.reporter_name })}
+                        </p>
+                        {incident.action_taken && (
+                          <p className="text-xs text-default-400 mt-0.5 italic">
+                            {incident.action_taken}
+                          </p>
+                        )}
+                        <p className="text-xs text-default-400 mt-0.5">
+                          {incident.date ? new Date(incident.date).toLocaleString() : '--'}
+                        </p>
+                      </div>
+                    </div>
+                  ))}
+              </div>
+            </div>
+          </CardBody>
+        </Card>
+      )}
 
       {/* Update Incident Modal */}
       <Modal isOpen={updateModal} onClose={() => setUpdateModal(false)} size="lg">
