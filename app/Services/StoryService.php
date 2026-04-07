@@ -1185,7 +1185,7 @@ class StoryService
             [$userId, $userId, $userId, 'accepted', $tenantId]
         );
 
-        $content = "{$userName} shared a new story";
+        $content = __('emails_misc.stories.new_story_notification', ['name' => $userName]);
         $link = '/feed';
 
         foreach ($connections as $connection) {

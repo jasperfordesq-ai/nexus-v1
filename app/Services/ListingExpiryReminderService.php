@@ -99,10 +99,12 @@ class ListingExpiryReminderService
         $diff = $now->diff($expiryDate);
         $daysLeft = $diff->days ?: 1;
 
-        $daysText = $daysLeft === 1 ? '1 day' : "{$daysLeft} days";
+        $daysText = $daysLeft === 1
+            ? __('emails_listings.listings.expiry_reminder.days_one')
+            : __('emails_listings.listings.expiry_reminder.days_other', ['count' => $daysLeft]);
         $expiryFormatted = date('M j, Y', strtotime($expiresAt));
 
-        $message = "Your listing \"{$title}\" expires in {$daysText} (on {$expiryFormatted}) — renew it to keep it active.";
+        $message = __('emails_listings.listings.expiry_reminder.notification', ['title' => $title, 'days_text' => $daysText, 'expiry_date' => $expiryFormatted]);
         $link = "/listings/{$listingId}";
 
         Notification::create([
@@ -122,21 +124,22 @@ class ListingExpiryReminderService
                 $basePath = TenantContext::getSlugPrefix();
                 $listingUrl = $frontendUrl . $basePath . $link;
 
-                $body = "<p>Hi " . htmlspecialchars($listing->first_name ?? $listing->name ?? 'there', ENT_QUOTES, 'UTF-8') . ",</p>"
-                    . "<p>Your listing <strong>\"{$title}\"</strong> expires in {$daysText} (on {$expiryFormatted}).</p>"
-                    . "<p>Renew it now to keep it visible to the community.</p>";
+                $ownerName = htmlspecialchars($listing->first_name ?? $listing->name ?? 'there', ENT_QUOTES, 'UTF-8');
+                $body = "<p>" . __('emails.common.greeting', ['name' => $ownerName]) . "</p>"
+                    . "<p>" . __('emails_listings.listings.expiry_reminder.body_expires', ['title' => $title, 'days_text' => $daysText, 'expiry_date' => $expiryFormatted]) . "</p>"
+                    . "<p>" . __('emails_listings.listings.expiry_reminder.body_renew') . "</p>";
 
                 $html = EmailTemplate::render(
-                    'Your listing expires in ' . $daysText,
-                    'Don\'t miss out — renew your listing to keep it active.',
+                    __('emails_listings.listings.expiry_reminder.heading', ['days_text' => $daysText]),
+                    __('emails_listings.listings.expiry_reminder.subheading'),
                     $body,
-                    'View Listing',
+                    __('emails_listings.listings.expiry_reminder.cta'),
                     $listingUrl,
                     $tenantName
                 );
 
                 $mailer = Mailer::forCurrentTenant();
-                $mailer->send($email, "Your listing expires in {$daysText}", $html);
+                $mailer->send($email, __('emails_listings.listings.expiry_reminder.subject', ['days_text' => $daysText]), $html);
             }
         } catch (\Exception $e) {
             Log::warning("[ListingExpiryReminderService] Email send failed for user={$userId}, listing={$listingId}: " . $e->getMessage());

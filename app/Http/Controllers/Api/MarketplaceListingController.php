@@ -251,7 +251,7 @@ class MarketplaceListingController extends BaseApiController
 
         $meta = null;
         if ($listing->moderation_status === 'pending') {
-            $meta = ['notice' => 'Your listing has been submitted for review and will be published once approved.'];
+            $meta = ['notice' => __('emails_misc.marketplace.listing_pending_notice')];
         }
 
         return $this->respondWithData($detail, $meta, 201);

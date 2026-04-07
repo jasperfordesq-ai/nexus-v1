@@ -35,7 +35,7 @@ class NotifyConnectionRequest implements ShouldQueue
 
             $requesterName = $event->requester->first_name ?? $event->requester->name ?? 'Someone';
             $targetUserId = $event->target->id;
-            $content = "{$requesterName} sent you a connection request";
+            $content = __('emails_misc.social.connection_request', ['name' => $requesterName]);
             $link = '/connections';
 
             // Check email_connections preference — default to sending (opt-out model)

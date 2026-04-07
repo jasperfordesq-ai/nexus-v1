@@ -26,6 +26,17 @@ EMAIL_PATTERNS=(
     "app/Services/NewsletterService.php"
     "app/Services/NotificationDispatcher.php"
     "app/Services/CronJobRunner.php"
+    "app/Services/ListingExpiryService.php"
+    "app/Services/ListingExpiryReminderService.php"
+    "app/Services/ListingModerationService.php"
+    "app/Services/AdminListingsService.php"
+    "app/Services/RegistrationService.php"
+    "app/Services/StoryService.php"
+    "app/Services/JobModerationService.php"
+    "app/Services/JobInterviewService.php"
+    "app/Services/GuardianConsentService.php"
+    "app/Services/SafeguardingService.php"
+    "app/Services/SocialNotificationService.php"
     "app/Mail/*.php"
 )
 

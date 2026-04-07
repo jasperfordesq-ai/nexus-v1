@@ -111,7 +111,7 @@ class JobModerationService
             try {
                 Notification::createNotification(
                     (int) $job->user_id,
-                    'Your job posting has been approved!',
+                    __('emails_misc.jobs.posting_approved'),
                     "/jobs/{$jobId}",
                     'job_moderation'
                 );
@@ -163,7 +163,7 @@ class JobModerationService
             try {
                 Notification::createNotification(
                     (int) $job->user_id,
-                    'Your job posting was not approved',
+                    __('emails_misc.jobs.posting_not_approved'),
                     "/jobs/{$jobId}",
                     'job_moderation'
                 );

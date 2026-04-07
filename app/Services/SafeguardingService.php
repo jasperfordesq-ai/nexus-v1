@@ -337,7 +337,7 @@ class SafeguardingService
                 $trainingName = $record->training_name ?? 'safeguarding training';
                 \App\Models\Notification::createNotification(
                     (int) $record->user_id,
-                    "Your {$trainingName} record has been verified!",
+                    __('emails_misc.safeguarding.training_verified', ['training_name' => $trainingName]),
                     '/dashboard',
                     'moderation',
                     true,
@@ -390,7 +390,7 @@ class SafeguardingService
                 $trainingName = $record->training_name ?? 'safeguarding training';
                 \App\Models\Notification::createNotification(
                     (int) $record->user_id,
-                    "Your {$trainingName} record was not approved. Please contact support for details.",
+                    __('emails_misc.safeguarding.training_not_approved', ['training_name' => $trainingName]),
                     '/help',
                     'moderation',
                     true,
@@ -691,7 +691,7 @@ class SafeguardingService
                     'tenant_id' => $tenantId,
                     'user_id' => $dlpUserId,
                     'type' => 'safeguarding_assignment',
-                    'message' => "You have been assigned as the Designated Liaison Person for safeguarding incident #{$incidentId}",
+                    'message' => __('emails_misc.safeguarding.dlp_assigned_bell', ['incident_id' => $incidentId]),
                     'link' => '/admin/safeguarding',
                     'is_read' => false,
                 ]);
@@ -716,22 +716,22 @@ class SafeguardingService
 
                     $emailBody = EmailTemplateBuilder::make()
                         ->theme('danger')
-                        ->title("DLP Assignment — Incident #{$incidentId}")
-                        ->previewText("[{$safeSeverity}] You've been assigned as DLP for incident #{$incidentId}")
+                        ->title(__('emails_misc.safeguarding.dlp_assigned_title', ['incident_id' => $incidentId]))
+                        ->previewText(__('emails_misc.safeguarding.dlp_assigned_preview', ['severity' => $safeSeverity, 'incident_id' => $incidentId]))
                         ->greeting($safeDlpName)
-                        ->highlight('You have been assigned as the <strong>Designated Liaison Person (DLP)</strong> for a safeguarding incident.', '🚨')
+                        ->highlight(__('emails_misc.safeguarding.dlp_assigned_highlight'), '🚨')
                         ->infoCard([
                             'Incident' => "#{$incidentId}",
                             'Severity' => $safeSeverity,
                             'Title' => $safeTitle,
                         ], 'Incident Details')
-                        ->paragraph('As DLP, you are responsible for coordinating the safeguarding response for this incident. Please review this immediately.')
-                        ->paragraph('All access to safeguarding data is audit-logged.')
-                        ->button('Review Incident', EmailTemplateBuilder::tenantUrl('/admin/safeguarding'))
+                        ->paragraph(__('emails_misc.safeguarding.dlp_assigned_body'))
+                        ->paragraph(__('emails_misc.safeguarding.dlp_assigned_audit_note'))
+                        ->button(__('emails_misc.safeguarding.dlp_assigned_cta'), EmailTemplateBuilder::tenantUrl('/admin/safeguarding'))
                         ->render();
 
                     $emailService = app(\App\Services\EmailService::class);
-                    $subject = "[NEXUS] [{$severityLabel}] DLP Assignment — Safeguarding Incident #{$incidentId}";
+                    $subject = __('emails_misc.safeguarding.dlp_assigned_subject', ['severity' => $severityLabel, 'incident_id' => $incidentId]);
                     $sent = $emailService->send($dlpUser->email, $subject, $emailBody);
                     if (!$sent) {
                         Log::critical('SafeguardingService::assignDlp: DLP assignment email failed to send', [
@@ -775,7 +775,7 @@ class SafeguardingService
             );
 
             $severityLabel = strtoupper($severity);
-            $message = "[{$severityLabel}] Safeguarding incident reported by {$reporterName}: {$title}";
+            $message = __('emails_misc.safeguarding.incident_reported_bell', ['severity' => $severityLabel, 'reporter' => $reporterName, 'title' => $title]);
 
             foreach ($staffUsers as $staff) {
                 \App\Models\Notification::create([
@@ -798,24 +798,24 @@ class SafeguardingService
 
                         $emailBody = EmailTemplateBuilder::make()
                             ->theme('danger')
-                            ->title('Safeguarding Incident Reported')
-                            ->previewText("[{$safeSeverity}] New {$safeType} incident reported by {$safeReporterName}")
-                            ->highlight("A <strong>{$safeSeverity}</strong> safeguarding incident has been reported.", '🚨')
+                            ->title(__('emails_misc.safeguarding.incident_reported_title'))
+                            ->previewText(__('emails_misc.safeguarding.incident_reported_preview', ['severity' => $safeSeverity, 'type' => $safeType, 'reporter' => $safeReporterName]))
+                            ->highlight(__('emails_misc.safeguarding.incident_reported_highlight', ['severity' => $safeSeverity]), '🚨')
                             ->infoCard([
                                 'Reported By' => $safeReporterName,
                                 'Title' => $safeTitle,
                                 'Severity' => $safeSeverity,
                                 'Type' => $safeType,
                             ], 'Incident Details')
-                            ->paragraph('Please review this in the admin panel and take appropriate action.')
-                            ->paragraph('This is an automated notification from the platform safeguarding system.')
-                            ->button('Review in Admin Panel', EmailTemplateBuilder::tenantUrl('/admin/safeguarding'))
+                            ->paragraph(__('emails_misc.safeguarding.incident_reported_review'))
+                            ->paragraph(__('emails_misc.safeguarding.incident_reported_auto_note'))
+                            ->button(__('emails_misc.safeguarding.incident_reported_cta'), EmailTemplateBuilder::tenantUrl('/admin/safeguarding'))
                             ->render();
 
                         $emailService = app(\App\Services\EmailService::class);
                         $sent = $emailService->send(
                             $staff->email,
-                            "[NEXUS] [{$severityLabel}] Safeguarding Incident — {$title}",
+                            __('emails_misc.safeguarding.incident_reported_subject', ['severity' => $severityLabel, 'title' => $title]),
                             $emailBody
                         );
                         if (!$sent) {
@@ -853,7 +853,7 @@ class SafeguardingService
                 'closed' => 'closed',
             ];
             $label = $statusLabels[$newStatus] ?? $newStatus;
-            $message = "Your safeguarding incident #{$incidentId} has been marked as {$label}";
+            $message = __('emails_misc.safeguarding.incident_status_changed', ['incident_id' => $incidentId, 'status' => $label]);
 
             // Notify reporter (bell)
             \App\Models\Notification::create([
@@ -871,7 +871,7 @@ class SafeguardingService
                     'tenant_id' => $tenantId,
                     'user_id' => $dlpUserId,
                     'type' => 'safeguarding_assignment',
-                    'message' => "Safeguarding incident #{$incidentId} status changed to {$label}",
+                    'message' => __('emails_misc.safeguarding.incident_status_dlp_bell', ['incident_id' => $incidentId, 'status' => $label]),
                     'link' => '/admin/safeguarding',
                     'is_read' => false,
                 ]);
@@ -886,23 +886,23 @@ class SafeguardingService
 
             if ($incident && in_array($incident->severity, ['high', 'critical'])) {
                 $severityLabel = strtoupper($incident->severity);
-                $emailSubject = "[NEXUS] [{$severityLabel}] Safeguarding Incident #{$incidentId} — {$label}";
+                $emailSubject = __('emails_misc.safeguarding.incident_updated_subject', ['severity' => $severityLabel, 'incident_id' => $incidentId, 'status' => $label]);
 
                 $safeSeverity = htmlspecialchars($severityLabel, ENT_QUOTES, 'UTF-8');
                 $safeLabel = htmlspecialchars($label, ENT_QUOTES, 'UTF-8');
 
                 $emailBody = EmailTemplateBuilder::make()
                     ->theme('danger')
-                    ->title('Safeguarding Incident Updated')
-                    ->previewText("[{$safeSeverity}] Incident #{$incidentId} status changed to {$safeLabel}")
+                    ->title(__('emails_misc.safeguarding.incident_updated_title'))
+                    ->previewText(__('emails_misc.safeguarding.incident_updated_preview', ['severity' => $safeSeverity, 'incident_id' => $incidentId, 'status' => $safeLabel]))
                     ->infoCard([
                         'Incident' => "#{$incidentId}",
                         'New Status' => $safeLabel,
                         'Severity' => $safeSeverity,
                     ], 'Status Update')
-                    ->paragraph('Please review this in the admin panel.')
-                    ->paragraph('This is an automated notification from the platform safeguarding system.')
-                    ->button('Review Incident', EmailTemplateBuilder::tenantUrl('/admin/safeguarding'))
+                    ->paragraph(__('emails_misc.safeguarding.incident_updated_review'))
+                    ->paragraph(__('emails_misc.safeguarding.incident_reported_auto_note'))
+                    ->button(__('emails_misc.safeguarding.dlp_assigned_cta'), EmailTemplateBuilder::tenantUrl('/admin/safeguarding'))
                     ->render();
 
                 $emailService = app(\App\Services\EmailService::class);

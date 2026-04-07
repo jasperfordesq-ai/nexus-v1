@@ -62,7 +62,7 @@ class ListingExpiryService
 
                 Notification::create([
                     'user_id' => $listing->user_id,
-                    'message' => "Your listing \"{$title}\" has expired. You can renew it to make it active again.",
+                    'message' => __('emails_listings.listings.expired.notification', ['title' => $title]),
                     'link' => $listingLink,
                     'type' => 'listing_expired',
                     'created_at' => now(),
@@ -88,21 +88,21 @@ class ListingExpiryService
                         $basePath = TenantContext::getSlugPrefix();
                         $listingUrl = $frontendUrl . $basePath . $listingLink;
 
-                        $body = "<p>Hi {$ownerName},</p>"
-                            . "<p>Your listing <strong>\"{$title}\"</strong> has expired.</p>"
-                            . "<p>You can renew it to make it visible to the community again.</p>";
+                        $body = "<p>" . __('emails.common.greeting', ['name' => $ownerName]) . "</p>"
+                            . "<p>" . __('emails_listings.listings.expired.body_expired', ['title' => $title]) . "</p>"
+                            . "<p>" . __('emails_listings.listings.expired.body_renew') . "</p>";
 
                         $html = EmailTemplate::render(
-                            'Your listing has expired',
-                            'Renew your listing to keep it active.',
+                            __('emails_listings.listings.expired.heading'),
+                            __('emails_listings.listings.expired.subheading'),
                             $body,
-                            'Renew Listing',
+                            __('emails_listings.listings.expired.cta'),
                             $listingUrl,
                             $tenantName
                         );
 
                         $mailer = Mailer::forCurrentTenant();
-                        $mailer->send($ownerEmail, 'Your listing has expired', $html);
+                        $mailer->send($ownerEmail, __('emails_listings.listings.expired.subject'), $html);
                     }
                 } catch (\Exception $e) {
                     Log::warning("[ListingExpiryService] Email send failed for user={$listing->user_id}, listing={$listing->id}: " . $e->getMessage());

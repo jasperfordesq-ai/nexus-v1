@@ -112,7 +112,7 @@ class ListingModerationService
         $title = htmlspecialchars($listing->title, ENT_QUOTES, 'UTF-8');
         Notification::create([
             'user_id' => $listing->user_id,
-            'message' => "Your listing \"{$title}\" has been approved and is now active.",
+            'message' => __('emails_listings.listings.approved.notification', ['title' => $title]),
             'link' => "/listings/{$listingId}",
             'type' => 'listing_approved',
             'created_at' => now(),
@@ -158,7 +158,7 @@ class ListingModerationService
         $safeReason = htmlspecialchars($reason, ENT_QUOTES, 'UTF-8');
         Notification::create([
             'user_id' => $listing->user_id,
-            'message' => "Your listing \"{$title}\" was not approved. Reason: {$safeReason}",
+            'message' => __('emails_listings.listings.rejected.notification', ['title' => $title, 'reason' => $safeReason]),
             'link' => "/listings/{$listingId}",
             'type' => 'listing_rejected',
             'created_at' => now(),
@@ -184,22 +184,22 @@ class ListingModerationService
                 $basePath = TenantContext::getSlugPrefix();
                 $listingUrl = $frontendUrl . $basePath . "/listings/{$listingId}";
 
-                $body = "<p>Hi {$ownerName},</p>"
-                    . "<p>Your listing <strong>\"{$title}\"</strong> was not approved.</p>"
-                    . "<p><strong>Reason:</strong> {$safeReason}</p>"
-                    . "<p>Please review and update your listing, then resubmit for approval.</p>";
+                $body = "<p>" . __('emails.common.greeting', ['name' => $ownerName]) . "</p>"
+                    . "<p>" . __('emails_listings.listings.rejected.body_not_approved', ['title' => $title]) . "</p>"
+                    . "<p>" . __('emails_listings.listings.rejected.body_reason', ['reason' => $safeReason]) . "</p>"
+                    . "<p>" . __('emails_listings.listings.rejected.body_resubmit') . "</p>";
 
                 $html = EmailTemplate::render(
-                    'Your listing needs changes',
-                    'Your listing was not approved — here\'s what to do next.',
+                    __('emails_listings.listings.rejected.heading'),
+                    __('emails_listings.listings.rejected.subheading'),
                     $body,
-                    'Edit Listing',
+                    __('emails_listings.listings.rejected.cta'),
                     $listingUrl,
                     $tenantName
                 );
 
                 $mailer = Mailer::forCurrentTenant();
-                $mailer->send($ownerEmail, 'Your listing needs changes', $html);
+                $mailer->send($ownerEmail, __('emails_listings.listings.rejected.subject'), $html);
             }
         } catch (\Exception $e) {
             Log::warning("[ListingModerationService] reject email failed for user={$listing->user_id}, listing={$listingId}: " . $e->getMessage());

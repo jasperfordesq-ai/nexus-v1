@@ -138,21 +138,21 @@ class GuardianConsentService
 
             $html = EmailTemplateBuilder::make()
                 ->theme('brand')
-                ->title('Guardian Consent Request')
-                ->previewText('A minor in your care needs your consent to participate in volunteering')
+                ->title(__('emails_misc.guardian.consent_title'))
+                ->previewText(__('emails_misc.guardian.consent_preview'))
                 ->greeting($safeName)
-                ->paragraph('A minor in your care has requested your consent to participate in volunteering activities on <strong>Project NEXUS</strong>.')
-                ->highlight('Your consent is required before they can participate. Please review and respond using the button below.', '📋')
+                ->paragraph(__('emails_misc.guardian.consent_body'))
+                ->highlight(__('emails_misc.guardian.consent_highlight'), '📋')
                 ->infoCard([
                     'Relationship' => $safeRelationship,
-                    'Expires' => 'in ' . self::CONSENT_EXPIRY_DAYS . ' days',
+                    'Expires' => __('emails_misc.guardian.consent_expires_label', ['days' => self::CONSENT_EXPIRY_DAYS]),
                 ])
-                ->button('Grant Consent', $verifyUrl)
-                ->paragraph('If you did not expect this request, you can safely ignore this email. No action will be taken without your explicit consent.')
+                ->button(__('emails_misc.guardian.consent_cta'), $verifyUrl)
+                ->paragraph(__('emails_misc.guardian.consent_ignore'))
                 ->render();
 
             $mailer = Mailer::forCurrentTenant();
-            $mailer->send($guardianData['guardian_email'], 'Guardian Consent Request — Project NEXUS', $html);
+            $mailer->send($guardianData['guardian_email'], __('emails_misc.guardian.consent_subject'), $html);
         } catch (\Throwable $e) {
             Log::warning('Failed to send guardian consent email: ' . $e->getMessage());
             // Don't fail the request — consent record is still created

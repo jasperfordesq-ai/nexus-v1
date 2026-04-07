@@ -213,7 +213,7 @@ class AdminListingsController extends BaseApiController
             $title = htmlspecialchars($item->title ?? '', ENT_QUOTES, 'UTF-8');
             Notification::create([
                 'user_id' => (int) $item->user_id,
-                'message' => "Your listing \"{$title}\" has been approved!",
+                'message' => __('emails_listings.listings.approved.notification_short', ['title' => $title]),
                 'link' => "/listings/{$id}",
                 'type' => 'listing_approved',
                 'created_at' => now(),
@@ -261,7 +261,7 @@ class AdminListingsController extends BaseApiController
             $title = htmlspecialchars($item->title ?? '', ENT_QUOTES, 'UTF-8');
             Notification::create([
                 'user_id' => (int) $item->user_id,
-                'message' => "Your listing \"{$title}\" has been removed by a moderator.",
+                'message' => __('emails_listings.listings.removed.notification', ['title' => $title]),
                 'link' => '/listings',
                 'type' => 'listing_removed',
                 'created_at' => now(),

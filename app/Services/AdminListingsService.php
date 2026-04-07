@@ -71,7 +71,7 @@ class AdminListingsService
                 $title = htmlspecialchars($listing->title ?? '', ENT_QUOTES, 'UTF-8');
                 \App\Models\Notification::createNotification(
                     (int) $listing->user_id,
-                    "Your listing \"{$title}\" has been approved!",
+                    __('emails_listings.listings.approved.notification_short', ['title' => $title]),
                     "/listings/{$listingId}",
                     'listing_approved',
                     true,
@@ -116,10 +116,11 @@ class AdminListingsService
             // Notify listing owner
             try {
                 $title = htmlspecialchars($listing->title ?? '', ENT_QUOTES, 'UTF-8');
-                $message = "Your listing \"{$title}\" was not approved.";
                 if (!empty($reason)) {
                     $safeReason = htmlspecialchars($reason, ENT_QUOTES, 'UTF-8');
-                    $message .= " Reason: {$safeReason}";
+                    $message = __('emails_listings.listings.rejected.notification', ['title' => $title, 'reason' => $safeReason]);
+                } else {
+                    $message = __('emails_listings.listings.rejected.notification_no_reason', ['title' => $title]);
                 }
                 \App\Models\Notification::createNotification(
                     (int) $listing->user_id,

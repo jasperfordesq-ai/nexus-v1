@@ -396,8 +396,8 @@ class NotificationDispatcher
             $basePath = TenantContext::getSlugPrefix();
             $walletUrl = $baseUrl . $basePath . '/wallet';
 
-            $hourLabel = $amount == 1 ? 'hour' : 'hours';
-            $subject = htmlspecialchars($senderName) . " sent you {$amount} {$hourLabel} on {$tenantName}";
+            $amountDisplay = $amount . ' hour' . ($amount != 1 ? 's' : '');
+            $subject = __('emails.notification.credit_received_subject', ['sender' => htmlspecialchars($senderName), 'amount' => $amountDisplay, 'community' => $tenantName]);
             $emailBody = self::buildCreditReceivedEmail(
                 htmlspecialchars($recipientName),
                 htmlspecialchars($senderName),
@@ -597,7 +597,7 @@ HTML;
                 $amount = $data['amount'] ?? 0;
                 return __('notifications.credit_received', ['name' => $senderName, 'amount' => $amount]);
             default:
-                return "Notification: {$type}";
+                return __('emails_notifications.default_notification', ['type' => $type]);
         }
     }
 
@@ -759,17 +759,21 @@ HTML;
         $title = htmlspecialchars($match['title'] ?? 'New Listing');
         $posterName = htmlspecialchars($match['user_name'] ?? 'Someone');
         $distance = $match['distance_km'] ?? null;
-        $distanceHtml = $distance !== null ? "<p style='color: #10b981;'>📍 {$distance} km away</p>" : '';
+        $distanceLabel = $distance !== null ? __('emails_notifications.hot_match.km_away', ['distance' => $distance]) : '';
+        $distanceHtml = $distance !== null ? "<p style='color: #10b981;'>📍 {$distanceLabel}</p>" : '';
+        $hotHeading = __('emails_notifications.hot_match.heading');
+        $hotSubheading = __('emails_notifications.hot_match.subheading', ['score' => $matchScore]);
+        $postedByText = __('emails_notifications.hot_match.posted_by', ['name' => $posterName]);
 
         return <<<HTML
 <div style="font-family: system-ui, -apple-system, sans-serif; max-width: 600px; margin: 0 auto;">
     <div style="background: linear-gradient(135deg, #f97316, #ef4444); padding: 24px; border-radius: 16px 16px 0 0; text-align: center;">
-        <h1 style="color: white; margin: 0; font-size: 24px;">Hot Match Found!</h1>
-        <p style="color: rgba(255,255,255,0.9); margin: 8px 0 0;">A {$matchScore}% compatible listing just appeared</p>
+        <h1 style="color: white; margin: 0; font-size: 24px;">{$hotHeading}</h1>
+        <p style="color: rgba(255,255,255,0.9); margin: 8px 0 0;">{$hotSubheading}</p>
     </div>
     <div style="background: #f8fafc; padding: 24px; border-radius: 0 0 16px 16px; border: 1px solid #e2e8f0; border-top: none;">
         <h2 style="color: #1e293b; margin: 0 0 8px;">{$title}</h2>
-        <p style="color: #6366f1; font-weight: 600; margin: 0 0 12px;">Posted by {$posterName}</p>
+        <p style="color: #6366f1; font-weight: 600; margin: 0 0 12px;">{$postedByText}</p>
         {$distanceHtml}
     </div>
 </div>
@@ -805,20 +809,26 @@ HTML;
         $theyOffer = htmlspecialchars($reciprocalInfo['they_offer'] ?? 'a skill you need');
         $youOffer = htmlspecialchars($reciprocalInfo['you_offer'] ?? 'something they need');
 
+        $mutualHeading = __('emails_notifications.mutual_match.heading');
+        $mutualSubheading = __('emails_notifications.mutual_match.subheading');
+        $exchangeWith = __('emails_notifications.mutual_match.exchange_with', ['name' => $posterName]);
+        $theyHelpLabel = __('emails_notifications.mutual_match.they_help_you');
+        $youHelpLabel = __('emails_notifications.mutual_match.you_help_them');
+
         return <<<HTML
 <div style="font-family: system-ui, -apple-system, sans-serif; max-width: 600px; margin: 0 auto;">
     <div style="background: linear-gradient(135deg, #10b981, #06b6d4); padding: 24px; border-radius: 16px 16px 0 0; text-align: center;">
-        <h1 style="color: white; margin: 0; font-size: 24px;">Mutual Match!</h1>
-        <p style="color: rgba(255,255,255,0.9); margin: 8px 0 0;">A perfect exchange opportunity</p>
+        <h1 style="color: white; margin: 0; font-size: 24px;">{$mutualHeading}</h1>
+        <p style="color: rgba(255,255,255,0.9); margin: 8px 0 0;">{$mutualSubheading}</p>
     </div>
     <div style="background: #f8fafc; padding: 24px; border-radius: 0 0 16px 16px; border: 1px solid #e2e8f0; border-top: none;">
-        <h2 style="color: #1e293b; margin: 0 0 16px;">Exchange with {$posterName}</h2>
+        <h2 style="color: #1e293b; margin: 0 0 16px;">{$exchangeWith}</h2>
         <div style="background: white; border: 1px solid #e2e8f0; border-radius: 12px; padding: 16px; margin-bottom: 16px;">
-            <p style="color: #64748b; margin: 0 0 8px; font-size: 14px;">They can help you with:</p>
+            <p style="color: #64748b; margin: 0 0 8px; font-size: 14px;">{$theyHelpLabel}</p>
             <p style="color: #10b981; font-weight: 600; margin: 0; font-size: 16px;">{$theyOffer}</p>
         </div>
         <div style="background: white; border: 1px solid #e2e8f0; border-radius: 12px; padding: 16px;">
-            <p style="color: #64748b; margin: 0 0 8px; font-size: 14px;">You can help them with:</p>
+            <p style="color: #64748b; margin: 0 0 8px; font-size: 14px;">{$youHelpLabel}</p>
             <p style="color: #6366f1; font-weight: 600; margin: 0; font-size: 16px;">{$youOffer}</p>
         </div>
     </div>
@@ -854,12 +864,13 @@ HTML;
             $matchUserName = !empty($match['user_name']) ? $match['user_name'] : trim(($match['first_name'] ?? '') . ' ' . ($match['last_name'] ?? ''));
             $posterName = htmlspecialchars($matchUserName ?: 'A member');
             $scoreColor = $score >= 85 ? '#ef4444' : ($score >= 70 ? '#6366f1' : '#64748b');
+            $byPosterText = __('emails_notifications.match_digest.by_poster', ['name' => $posterName]);
             $matchListHtml .= <<<HTML
 <div style="background: white; border: 1px solid #e2e8f0; border-radius: 10px; padding: 14px; margin-bottom: 10px;">
     <div style="display: flex; justify-content: space-between; align-items: center;">
         <div>
             <p style="color: #1e293b; font-weight: 600; margin: 0;">{$title}</p>
-            <p style="color: #64748b; font-size: 14px; margin: 4px 0 0;">by {$posterName}</p>
+            <p style="color: #64748b; font-size: 14px; margin: 4px 0 0;">{$byPosterText}</p>
         </div>
         <span style="background: {$scoreColor}; color: white; padding: 4px 10px; border-radius: 20px; font-weight: 700; font-size: 14px;">{$score}%</span>
     </div>
@@ -869,21 +880,27 @@ HTML;
 
         $statsHtml = '';
         if ($hotCount > 0) {
-            $statsHtml .= "<span style='background: #fef2f2; color: #ef4444; padding: 6px 12px; border-radius: 20px; margin-right: 8px;'>{$hotCount} Hot</span>";
+            $hotBadge = __('emails_notifications.match_digest.hot_badge', ['count' => $hotCount]);
+            $statsHtml .= "<span style='background: #fef2f2; color: #ef4444; padding: 6px 12px; border-radius: 20px; margin-right: 8px;'>{$hotBadge}</span>";
         }
         if ($mutualCount > 0) {
-            $statsHtml .= "<span style='background: #ecfdf5; color: #10b981; padding: 6px 12px; border-radius: 20px;'>{$mutualCount} Mutual</span>";
+            $mutualBadge = __('emails_notifications.match_digest.mutual_badge', ['count' => $mutualCount]);
+            $statsHtml .= "<span style='background: #ecfdf5; color: #10b981; padding: 6px 12px; border-radius: 20px;'>{$mutualBadge}</span>";
         }
+
+        $digestHeading = __('emails_notifications.match_digest.heading', ['period' => $periodTitle]);
+        $digestWaiting = __('emails_notifications.match_digest.matches_waiting', ['count' => $count]);
+        $topMatchesLabel = __('emails_notifications.match_digest.top_matches');
 
         return <<<HTML
 <div style="font-family: system-ui, -apple-system, sans-serif; max-width: 600px; margin: 0 auto;">
     <div style="background: linear-gradient(135deg, #6366f1, #8b5cf6); padding: 24px; border-radius: 16px 16px 0 0; text-align: center;">
-        <h1 style="color: white; margin: 0; font-size: 24px;">Your {$periodTitle} Match Digest</h1>
-        <p style="color: rgba(255,255,255,0.9); margin: 8px 0 0;">{$count} new matches waiting for you</p>
+        <h1 style="color: white; margin: 0; font-size: 24px;">{$digestHeading}</h1>
+        <p style="color: rgba(255,255,255,0.9); margin: 8px 0 0;">{$digestWaiting}</p>
     </div>
     <div style="background: #f8fafc; padding: 24px; border-radius: 0 0 16px 16px; border: 1px solid #e2e8f0; border-top: none;">
         <div style="margin-bottom: 20px; text-align: center;">{$statsHtml}</div>
-        <h3 style="color: #1e293b; margin: 0 0 16px;">Top Matches</h3>
+        <h3 style="color: #1e293b; margin: 0 0 16px;">{$topMatchesLabel}</h3>
         {$matchListHtml}
     </div>
 </div>
@@ -899,25 +916,32 @@ HTML;
         $userName = htmlspecialchars($userName, ENT_QUOTES, 'UTF-8');
         $listingTitle = htmlspecialchars($listingTitle, ENT_QUOTES, 'UTF-8');
 
+        $approvalHeading = __('emails_notifications.match_approval.heading');
+        $approvalBody = __('emails_notifications.match_approval.body');
+        $labelMember = __('emails_notifications.match_approval.label_member');
+        $labelMatched = __('emails_notifications.match_approval.label_matched_listing');
+        $reviewNote = __('emails_notifications.match_approval.review_note');
+        $btnReview = __('emails_notifications.match_approval.btn_review');
+
         return <<<HTML
 <div style="font-family: system-ui, -apple-system, sans-serif; max-width: 600px; margin: 0 auto;">
     <div style="background: linear-gradient(135deg, #f59e0b, #d97706); padding: 24px; border-radius: 16px 16px 0 0; text-align: center;">
-        <h1 style="color: white; margin: 0; font-size: 24px;">Match Needs Approval</h1>
+        <h1 style="color: white; margin: 0; font-size: 24px;">{$approvalHeading}</h1>
         <p style="color: rgba(255,255,255,0.9); margin: 8px 0 0;">{$tenantName}</p>
     </div>
     <div style="background: #f8fafc; padding: 24px; border-radius: 0 0 16px 16px; border: 1px solid #e2e8f0; border-top: none;">
-        <p style="color: #1e293b; font-size: 16px; line-height: 1.6;">A new match is waiting for your approval:</p>
+        <p style="color: #1e293b; font-size: 16px; line-height: 1.6;">{$approvalBody}</p>
         <div style="background: white; border: 1px solid #e2e8f0; border-radius: 12px; padding: 16px; margin: 16px 0;">
-            <p style="color: #64748b; margin: 0 0 8px; font-size: 14px;">Member:</p>
+            <p style="color: #64748b; margin: 0 0 8px; font-size: 14px;">{$labelMember}</p>
             <p style="color: #1e293b; font-weight: 600; margin: 0 0 16px; font-size: 18px;">{$userName}</p>
-            <p style="color: #64748b; margin: 0 0 8px; font-size: 14px;">Matched with listing:</p>
+            <p style="color: #64748b; margin: 0 0 8px; font-size: 14px;">{$labelMatched}</p>
             <p style="color: #6366f1; font-weight: 600; margin: 0; font-size: 18px;">{$listingTitle}</p>
         </div>
         <p style="color: #64748b; font-size: 14px; line-height: 1.6;">
-            Please review this match to ensure the member is suitable (mobility, health considerations) and the activity is within insurance coverage.
+            {$reviewNote}
         </p>
         <div style="text-align: center; margin-top: 24px;">
-            <a href="{$frontendUrl}{$basePath}/admin/match-approvals" style="display: inline-block; background: linear-gradient(135deg, #6366f1, #8b5cf6); color: white; text-decoration: none; padding: 14px 32px; border-radius: 10px; font-weight: 600;">Review Match</a>
+            <a href="{$frontendUrl}{$basePath}/admin/match-approvals" style="display: inline-block; background: linear-gradient(135deg, #6366f1, #8b5cf6); color: white; text-decoration: none; padding: 14px 32px; border-radius: 10px; font-weight: 600;">{$btnReview}</a>
         </div>
     </div>
 </div>
@@ -931,25 +955,29 @@ HTML;
         $basePath = TenantContext::getSlugPrefix();
         $frontendUrl = TenantContext::getFrontendUrl();
         $listingTitle = htmlspecialchars($listingTitle, ENT_QUOTES, 'UTF-8');
-        $scoreText = $matchScore > 0 ? " ({$matchScore}% match)" : "";
+        $scoreText = $matchScore > 0 ? " " . __('emails_notifications.match_approved.score_text', ['score' => $matchScore]) : "";
+        $matchedHeading = __('emails_notifications.match_approved.heading');
+        $matchedBody = __('emails_notifications.match_approved.body');
+        $matchedViewNote = __('emails_notifications.match_approved.view_note');
+        $btnViewMatch = __('emails_notifications.match_approved.btn_view');
 
         return <<<HTML
 <div style="font-family: system-ui, -apple-system, sans-serif; max-width: 600px; margin: 0 auto;">
     <div style="background: linear-gradient(135deg, #22c55e, #16a34a); padding: 24px; border-radius: 16px 16px 0 0; text-align: center;">
-        <h1 style="color: white; margin: 0; font-size: 24px;">You've Been Matched!</h1>
+        <h1 style="color: white; margin: 0; font-size: 24px;">{$matchedHeading}</h1>
         <p style="color: rgba(255,255,255,0.9); margin: 8px 0 0;">{$tenantName}</p>
     </div>
     <div style="background: #f8fafc; padding: 24px; border-radius: 0 0 16px 16px; border: 1px solid #e2e8f0; border-top: none;">
-        <p style="color: #1e293b; font-size: 16px; line-height: 1.6;">Great news! A coordinator has approved a match for you:</p>
+        <p style="color: #1e293b; font-size: 16px; line-height: 1.6;">{$matchedBody}</p>
         <div style="background: white; border: 1px solid #e2e8f0; border-radius: 12px; padding: 16px; margin: 16px 0; text-align: center;">
             <p style="color: #22c55e; font-weight: 600; margin: 0; font-size: 20px;">{$listingTitle}</p>
             <p style="color: #64748b; margin: 8px 0 0; font-size: 14px;">{$scoreText}</p>
         </div>
         <p style="color: #64748b; font-size: 14px; line-height: 1.6;">
-            Click below to view the listing and get in touch with the member.
+            {$matchedViewNote}
         </p>
         <div style="text-align: center; margin-top: 24px;">
-            <a href="{$frontendUrl}{$basePath}/listings/{$listingId}" style="display: inline-block; background: linear-gradient(135deg, #22c55e, #16a34a); color: white; text-decoration: none; padding: 14px 32px; border-radius: 10px; font-weight: 600;">View Match</a>
+            <a href="{$frontendUrl}{$basePath}/listings/{$listingId}" style="display: inline-block; background: linear-gradient(135deg, #22c55e, #16a34a); color: white; text-decoration: none; padding: 14px 32px; border-radius: 10px; font-weight: 600;">{$btnViewMatch}</a>
         </div>
     </div>
 </div>
@@ -965,33 +993,39 @@ HTML;
         $listingTitle = htmlspecialchars($listingTitle, ENT_QUOTES, 'UTF-8');
         $reason = htmlspecialchars($reason, ENT_QUOTES, 'UTF-8');
 
+        $reasonLabel = __('emails_notifications.match_rejected.label_reason');
         $reasonHtml = '';
         if (!empty($reason)) {
             $reasonHtml = <<<HTML
 <div style="background: #fef2f2; border: 1px solid #fecaca; border-radius: 12px; padding: 16px; margin: 16px 0;">
-    <p style="color: #dc2626; font-weight: 600; margin: 0 0 8px; font-size: 14px;">Reason:</p>
+    <p style="color: #dc2626; font-weight: 600; margin: 0 0 8px; font-size: 14px;">{$reasonLabel}</p>
     <p style="color: #7f1d1d; margin: 0; font-size: 14px; line-height: 1.5;">{$reason}</p>
 </div>
 HTML;
         }
 
+        $rejectedHeading = __('emails_notifications.match_rejected.heading');
+        $rejectedBody = __('emails_notifications.match_rejected.body');
+        $rejectedEncouragement = __('emails_notifications.match_rejected.encouragement');
+        $btnBrowse = __('emails_notifications.match_rejected.btn_browse');
+
         return <<<HTML
 <div style="font-family: system-ui, -apple-system, sans-serif; max-width: 600px; margin: 0 auto;">
     <div style="background: linear-gradient(135deg, #6366f1, #8b5cf6); padding: 24px; border-radius: 16px 16px 0 0; text-align: center;">
-        <h1 style="color: white; margin: 0; font-size: 24px;">Match Update</h1>
+        <h1 style="color: white; margin: 0; font-size: 24px;">{$rejectedHeading}</h1>
         <p style="color: rgba(255,255,255,0.9); margin: 8px 0 0;">{$tenantName}</p>
     </div>
     <div style="background: #f8fafc; padding: 24px; border-radius: 0 0 16px 16px; border: 1px solid #e2e8f0; border-top: none;">
-        <p style="color: #1e293b; font-size: 16px; line-height: 1.6;">Unfortunately, a coordinator has determined that the following match wasn't suitable at this time:</p>
+        <p style="color: #1e293b; font-size: 16px; line-height: 1.6;">{$rejectedBody}</p>
         <div style="background: white; border: 1px solid #e2e8f0; border-radius: 12px; padding: 16px; margin: 16px 0; text-align: center;">
             <p style="color: #64748b; font-weight: 600; margin: 0; font-size: 18px;">{$listingTitle}</p>
         </div>
         {$reasonHtml}
         <p style="color: #64748b; font-size: 14px; line-height: 1.6;">
-            Don't worry - there are plenty of other opportunities in your community! Browse more matches to find a good fit.
+            {$rejectedEncouragement}
         </p>
         <div style="text-align: center; margin-top: 24px;">
-            <a href="{$frontendUrl}{$basePath}/matches" style="display: inline-block; background: linear-gradient(135deg, #6366f1, #8b5cf6); color: white; text-decoration: none; padding: 14px 32px; border-radius: 10px; font-weight: 600;">Browse Matches</a>
+            <a href="{$frontendUrl}{$basePath}/matches" style="display: inline-block; background: linear-gradient(135deg, #6366f1, #8b5cf6); color: white; text-decoration: none; padding: 14px 32px; border-radius: 10px; font-weight: 600;">{$btnBrowse}</a>
         </div>
     </div>
 </div>
@@ -1006,6 +1040,7 @@ HTML;
         $creditGreeting = __('emails.common.greeting', ['name' => $recipientName]);
         $creditBody = __('emails.notification.credit_sent_body', ['sender' => $senderName, 'amount' => $amountDisplay, 'community' => $tenantName]);
         $viewWalletText = __('emails.notification.view_wallet');
+        $creditFooterTagline = __('emails_notifications.credit_received.footer_tagline', ['community' => $tenantName]);
 
         return <<<HTML
 <!DOCTYPE html>
@@ -1028,7 +1063,7 @@ HTML;
     </div>
   </td></tr>
   <tr><td style="padding:16px 32px;background:#f9fafb;border-top:1px solid #e5e7eb;text-align:center;">
-    <p style="margin:0;font-size:12px;color:#9ca3af;">{$tenantName} — Time credits that strengthen communities</p>
+    <p style="margin:0;font-size:12px;color:#9ca3af;">{$creditFooterTagline}</p>
   </td></tr>
 </table>
 </td></tr></table>
@@ -1040,6 +1075,9 @@ HTML;
     {
         $stars = str_repeat('&#9733;', $rating) . str_repeat('&#9734;', 5 - $rating);
         $starColor = $rating >= 4 ? '#f59e0b' : ($rating >= 3 ? '#6b7280' : '#ef4444');
+        $reviewBodyText = __('emails_notifications.review.review_body', ['reviewer' => "<strong>{$reviewerName}</strong>", 'community' => $tenantName]);
+        $ratingText = __('emails_notifications.review.rating_text', ['rating' => $rating]);
+        $whatTheySaidLabel = __('emails_notifications.review.what_they_said');
 
         $commentHtml = '';
         if ($comment) {
@@ -1049,7 +1087,7 @@ HTML;
                             <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background-color: #f9fafb; border-radius: 12px; border: 1px solid #e5e7eb;">
                                 <tr>
                                     <td style="padding: 20px;">
-                                        <p style="margin: 0 0 8px; font-size: 12px; color: #6b7280; text-transform: uppercase; letter-spacing: 0.5px;">What they said</p>
+                                        <p style="margin: 0 0 8px; font-size: 12px; color: #6b7280; text-transform: uppercase; letter-spacing: 0.5px;">{$whatTheySaidLabel}</p>
                                         <p style="margin: 0; font-size: 16px; color: #374151; font-style: italic; line-height: 1.6;">&ldquo;{$comment}&rdquo;</p>
                                     </td>
                                 </tr>
@@ -1095,7 +1133,7 @@ COMMENT;
                     <tr>
                         <td style="padding: 0 24px 16px;">
                             <p style="margin: 0; font-size: 16px; color: #374151; line-height: 1.6;">
-                                <strong>{$reviewerName}</strong> has left you a review on {$tenantName}.
+                                {$reviewBodyText}
                             </p>
                         </td>
                     </tr>
@@ -1103,7 +1141,7 @@ COMMENT;
                         <td style="padding: 0 24px 24px; text-align: center;">
                             <div style="display: inline-block; padding: 16px 32px; background-color: #fffbeb; border-radius: 12px; border: 1px solid #fde68a;">
                                 <span style="font-size: 36px; color: {$starColor}; letter-spacing: 4px;">{$stars}</span>
-                                <p style="margin: 8px 0 0; font-size: 14px; color: #92400e; font-weight: 500;">{$rating} out of 5 stars</p>
+                                <p style="margin: 8px 0 0; font-size: 14px; color: #92400e; font-weight: 500;">{$ratingText}</p>
                             </div>
                         </td>
                     </tr>
@@ -1152,6 +1190,9 @@ HTML;
         $greeting = __('emails.common.greeting', ['name' => $userName]);
         $sentByText = __('emails.notification.sent_by', ['community' => $tenantName]);
         $allRightsReserved = __('emails.footer.all_rights_reserved');
+        $labelService = __('emails_notifications.exchange.label_service');
+        $labelRequester = __('emails_notifications.exchange.label_requester');
+        $labelProvider = __('emails_notifications.exchange.label_provider');
 
         return <<<HTML
 <!DOCTYPE html>
@@ -1187,7 +1228,7 @@ HTML;
                                         <table role="presentation" width="100%" cellspacing="0" cellpadding="0">
                                             <tr>
                                                 <td style="padding-bottom: 16px; border-bottom: 1px solid #e5e7eb;">
-                                                    <p style="margin: 0 0 4px; font-size: 12px; color: #6b7280; text-transform: uppercase; letter-spacing: 0.5px;">Service</p>
+                                                    <p style="margin: 0 0 4px; font-size: 12px; color: #6b7280; text-transform: uppercase; letter-spacing: 0.5px;">{$labelService}</p>
                                                     <p style="margin: 0; font-size: 18px; color: #111827; font-weight: 600;">{$listingTitle}</p>
                                                     <span style="display: inline-block; margin-top: 8px; padding: 4px 12px; font-size: 12px; font-weight: 500; border-radius: 999px; background-color: {$emailConfig['typeColor']}; color: {$emailConfig['typeText']};">{$emailConfig['typeBadge']}</span>
                                                 </td>
@@ -1197,11 +1238,11 @@ HTML;
                                                     <table role="presentation" width="100%" cellspacing="0" cellpadding="0">
                                                         <tr>
                                                             <td width="50%" style="vertical-align: top;">
-                                                                <p style="margin: 0 0 4px; font-size: 12px; color: #6b7280;">Requester</p>
+                                                                <p style="margin: 0 0 4px; font-size: 12px; color: #6b7280;">{$labelRequester}</p>
                                                                 <p style="margin: 0; font-size: 14px; color: #111827; font-weight: 500;">{$requesterName}</p>
                                                             </td>
                                                             <td width="50%" style="vertical-align: top;">
-                                                                <p style="margin: 0 0 4px; font-size: 12px; color: #6b7280;">Provider</p>
+                                                                <p style="margin: 0 0 4px; font-size: 12px; color: #6b7280;">{$labelProvider}</p>
                                                                 <p style="margin: 0; font-size: 14px; color: #111827; font-weight: 500;">{$providerName}</p>
                                                             </td>
                                                         </tr>
@@ -1260,12 +1301,28 @@ HTML;
         $typeText = $listingType === 'offer' ? '#166534' : '#92400e';
         $typeBadge = $listingType === 'offer' ? __('notifications.exchange_type_offering') : __('notifications.exchange_type_requesting');
 
+        $labelProposedHours = __('emails_notifications.exchange.label_proposed_hours');
+        $labelApprovedHours = __('emails_notifications.exchange.label_approved_hours');
+        $labelHoursTransferred = __('emails_notifications.exchange.label_hours_transferred');
+        $labelAgreedHours = __('emails_notifications.exchange.label_agreed_hours');
+        $labelExpectedHours = __('emails_notifications.exchange.label_expected_hours');
+        $labelRequesterConfirmed = __('emails_notifications.exchange.label_requester_confirmed');
+        $labelProviderConfirmed = __('emails_notifications.exchange.label_provider_confirmed');
+        $labelReasonProvided = __('emails_notifications.exchange.label_reason_provided');
+        $labelCoordinatorsNote = __('emails_notifications.exchange.label_coordinators_note');
+        $labelNextStep = __('emails_notifications.exchange.label_next_step');
+        $labelWellDone = __('emails_notifications.exchange.label_well_done');
+        $labelUnderReview = __('emails_notifications.exchange.label_under_review');
+        $labelRemember = __('emails_notifications.exchange.label_remember');
+        $labelActionNeeded = __('emails_notifications.exchange.label_action_needed');
+        $labelWhyApproval = __('emails_notifications.exchange.label_why_approval');
+
         $configs = [
             'exchange_request_received' => [
                 'gradient' => 'linear-gradient(135deg, #6366f1, #8b5cf6)',
                 'icon' => '📥',
                 'title' => __('notifications.exchange_title_request_received'),
-                'message' => "<strong>{$requesterName}</strong> would like to exchange services with you! They've proposed <strong>{$hours} hour(s)</strong> for this exchange.",
+                'message' => __('emails_notifications.exchange.request_received_msg', ['name' => "<strong>{$requesterName}</strong>", 'hours' => "<strong>{$hours} hour(s)</strong>"]),
                 'buttonText' => __('notifications.exchange_btn_review'),
                 'helpText' => __('notifications.exchange_help_review'),
                 'typeColor' => $typeColor,
@@ -1274,7 +1331,7 @@ HTML;
                 'extraDetails' => $hours > 0 ? "
                     <tr>
                         <td style=\"padding-top: 16px; border-top: 1px solid #e5e7eb; margin-top: 16px;\">
-                            <p style=\"margin: 0 0 4px; font-size: 12px; color: #6b7280;\">Proposed Hours</p>
+                            <p style=\"margin: 0 0 4px; font-size: 12px; color: #6b7280;\">{$labelProposedHours}</p>
                             <p style=\"margin: 0; font-size: 24px; color: #6366f1; font-weight: 700;\">{$hours}h</p>
                         </td>
                     </tr>
@@ -1285,7 +1342,7 @@ HTML;
                 'gradient' => 'linear-gradient(135deg, #ef4444, #dc2626)',
                 'icon' => '❌',
                 'title' => __('notifications.exchange_title_request_declined'),
-                'message' => "Unfortunately, <strong>{$providerName}</strong> has declined your exchange request." . ($reason ? " They provided this reason: <em>\"{$reason}\"</em>" : ''),
+                'message' => __('emails_notifications.exchange.request_declined_msg', ['name' => "<strong>{$providerName}</strong>"]) . ($reason ? __('emails_notifications.exchange.request_declined_reason', ['reason' => $reason]) : ''),
                 'buttonText' => __('notifications.exchange_btn_browse'),
                 'helpText' => __('notifications.exchange_help_declined'),
                 'typeColor' => $typeColor,
@@ -1298,7 +1355,7 @@ HTML;
                             <table role=\"presentation\" width=\"100%\" cellspacing=\"0\" cellpadding=\"0\" style=\"background-color: #fef2f2; border-radius: 8px; border-left: 4px solid #ef4444;\">
                                 <tr>
                                     <td style=\"padding: 16px;\">
-                                        <p style=\"margin: 0 0 4px; font-size: 12px; color: #991b1b; font-weight: 600;\">Reason provided:</p>
+                                        <p style=\"margin: 0 0 4px; font-size: 12px; color: #991b1b; font-weight: 600;\">{$labelReasonProvided}</p>
                                         <p style=\"margin: 0; font-size: 14px; color: #7f1d1d;\">{$reason}</p>
                                     </td>
                                 </tr>
@@ -1311,7 +1368,7 @@ HTML;
                 'gradient' => 'linear-gradient(135deg, #10b981, #059669)',
                 'icon' => '✅',
                 'title' => __('notifications.exchange_title_approved'),
-                'message' => "Great news! Your exchange has been approved by a coordinator. You can now begin the service exchange.",
+                'message' => __('emails_notifications.exchange.approved_msg'),
                 'buttonText' => __('notifications.exchange_btn_start'),
                 'helpText' => __('notifications.exchange_help_approved'),
                 'typeColor' => $typeColor,
@@ -1320,7 +1377,7 @@ HTML;
                 'extraDetails' => "
                     <tr>
                         <td style=\"padding-top: 16px; border-top: 1px solid #e5e7eb; margin-top: 16px;\">
-                            <p style=\"margin: 0 0 4px; font-size: 12px; color: #6b7280;\">Approved Hours</p>
+                            <p style=\"margin: 0 0 4px; font-size: 12px; color: #6b7280;\">{$labelApprovedHours}</p>
                             <p style=\"margin: 0; font-size: 24px; color: #10b981; font-weight: 700;\">{$hours}h</p>
                         </td>
                     </tr>
@@ -1332,7 +1389,7 @@ HTML;
                                 <tr>
                                     <td style=\"padding: 16px;\">
                                         <p style=\"margin: 0; font-size: 14px; color: #065f46;\">
-                                            <strong>Next step:</strong> Contact the other party to arrange when and where the service will take place.
+                                            <strong>{$labelNextStep}</strong> " . __('emails_notifications.exchange.approved_next_step') . "
                                         </p>
                                     </td>
                                 </tr>
@@ -1345,7 +1402,7 @@ HTML;
                 'gradient' => 'linear-gradient(135deg, #ef4444, #dc2626)',
                 'icon' => '❌',
                 'title' => __('notifications.exchange_title_rejected'),
-                'message' => "A coordinator has reviewed this exchange and was unable to approve it at this time." . ($reason ? " Reason: <em>\"{$reason}\"</em>" : ''),
+                'message' => __('emails_notifications.exchange.rejected_msg') . ($reason ? __('emails_notifications.exchange.rejected_reason', ['reason' => $reason]) : ''),
                 'buttonText' => __('notifications.exchange_btn_view'),
                 'helpText' => __('notifications.exchange_help_rejected'),
                 'typeColor' => $typeColor,
@@ -1358,7 +1415,7 @@ HTML;
                             <table role=\"presentation\" width=\"100%\" cellspacing=\"0\" cellpadding=\"0\" style=\"background-color: #fef2f2; border-radius: 8px; border-left: 4px solid #ef4444;\">
                                 <tr>
                                     <td style=\"padding: 16px;\">
-                                        <p style=\"margin: 0 0 4px; font-size: 12px; color: #991b1b; font-weight: 600;\">Coordinator's note:</p>
+                                        <p style=\"margin: 0 0 4px; font-size: 12px; color: #991b1b; font-weight: 600;\">{$labelCoordinatorsNote}</p>
                                         <p style=\"margin: 0; font-size: 14px; color: #7f1d1d;\">{$reason}</p>
                                     </td>
                                 </tr>
@@ -1371,7 +1428,7 @@ HTML;
                 'gradient' => 'linear-gradient(135deg, #10b981, #059669)',
                 'icon' => '🎉',
                 'title' => __('notifications.exchange_title_completed'),
-                'message' => "Congratulations! Your exchange has been completed successfully. <strong>{$finalHours} hour(s)</strong> have been transferred.",
+                'message' => __('emails_notifications.exchange.completed_msg', ['hours' => "<strong>{$finalHours} hour(s)</strong>"]),
                 'buttonText' => __('notifications.exchange_btn_view_wallet'),
                 'helpText' => __('notifications.exchange_help_completed'),
                 'typeColor' => $typeColor,
@@ -1380,7 +1437,7 @@ HTML;
                 'extraDetails' => "
                     <tr>
                         <td style=\"padding-top: 16px; border-top: 1px solid #e5e7eb; margin-top: 16px;\">
-                            <p style=\"margin: 0 0 4px; font-size: 12px; color: #6b7280;\">Hours Transferred</p>
+                            <p style=\"margin: 0 0 4px; font-size: 12px; color: #6b7280;\">{$labelHoursTransferred}</p>
                             <p style=\"margin: 0; font-size: 32px; color: #10b981; font-weight: 700;\">{$finalHours}h</p>
                         </td>
                     </tr>
@@ -1392,7 +1449,7 @@ HTML;
                                 <tr>
                                     <td style=\"padding: 16px;\">
                                         <p style=\"margin: 0; font-size: 14px; color: #065f46;\">
-                                            <strong>Well done!</strong> Your time credit balance has been updated. Consider leaving a review for the other member!
+                                            <strong>{$labelWellDone}</strong> " . __('emails_notifications.exchange.completed_well_done') . "
                                         </p>
                                     </td>
                                 </tr>
@@ -1405,7 +1462,7 @@ HTML;
                 'gradient' => 'linear-gradient(135deg, #f59e0b, #d97706)',
                 'icon' => '⚠️',
                 'title' => __('notifications.exchange_title_cancelled'),
-                'message' => "This exchange has been cancelled." . ($reason ? " Reason: <em>\"{$reason}\"</em>" : ''),
+                'message' => __('emails_notifications.exchange.cancelled_msg') . ($reason ? __('emails_notifications.exchange.cancelled_reason', ['reason' => $reason]) : ''),
                 'buttonText' => __('notifications.exchange_btn_view'),
                 'helpText' => __('notifications.exchange_help_cancelled'),
                 'typeColor' => $typeColor,
@@ -1418,7 +1475,7 @@ HTML;
                 'gradient' => 'linear-gradient(135deg, #ef4444, #dc2626)',
                 'icon' => '⚠️',
                 'title' => __('notifications.exchange_title_disputed'),
-                'message' => "There's a discrepancy in the hours confirmed by both parties. A coordinator will review this exchange and help resolve the difference.",
+                'message' => __('emails_notifications.exchange.disputed_msg'),
                 'buttonText' => __('notifications.exchange_btn_view_exchange'),
                 'helpText' => __('notifications.exchange_help_disputed'),
                 'typeColor' => $typeColor,
@@ -1430,11 +1487,11 @@ HTML;
                             <table role=\"presentation\" width=\"100%\" cellspacing=\"0\" cellpadding=\"0\">
                                 <tr>
                                     <td width=\"50%\" style=\"text-align: center; padding: 8px;\">
-                                        <p style=\"margin: 0 0 4px; font-size: 12px; color: #6b7280;\">Requester confirmed</p>
+                                        <p style=\"margin: 0 0 4px; font-size: 12px; color: #6b7280;\">{$labelRequesterConfirmed}</p>
                                         <p style=\"margin: 0; font-size: 20px; color: #ef4444; font-weight: 700;\">{$data['requester_hours']}h</p>
                                     </td>
                                     <td width=\"50%\" style=\"text-align: center; padding: 8px;\">
-                                        <p style=\"margin: 0 0 4px; font-size: 12px; color: #6b7280;\">Provider confirmed</p>
+                                        <p style=\"margin: 0 0 4px; font-size: 12px; color: #6b7280;\">{$labelProviderConfirmed}</p>
                                         <p style=\"margin: 0; font-size: 20px; color: #ef4444; font-weight: 700;\">{$data['provider_hours']}h</p>
                                     </td>
                                 </tr>
@@ -1449,7 +1506,7 @@ HTML;
                                 <tr>
                                     <td style=\"padding: 16px;\">
                                         <p style=\"margin: 0; font-size: 14px; color: #7f1d1d;\">
-                                            <strong>Under review:</strong> A coordinator will review the confirmed hours and make a fair decision.
+                                            <strong>{$labelUnderReview}</strong> " . __('emails_notifications.exchange.disputed_under_review') . "
                                         </p>
                                     </td>
                                 </tr>
@@ -1462,7 +1519,7 @@ HTML;
                 'gradient' => 'linear-gradient(135deg, #10b981, #059669)',
                 'icon' => '✅',
                 'title' => __('notifications.exchange_title_accepted'),
-                'message' => "Great news! <strong>{$providerName}</strong> has accepted your exchange request. You can now coordinate when and where the service will take place.",
+                'message' => __('emails_notifications.exchange.accepted_msg', ['name' => "<strong>{$providerName}</strong>"]),
                 'buttonText' => __('notifications.exchange_btn_view_exchange'),
                 'helpText' => __('notifications.exchange_help_accepted'),
                 'typeColor' => $typeColor,
@@ -1471,7 +1528,7 @@ HTML;
                 'extraDetails' => "
                     <tr>
                         <td style=\"padding-top: 16px; border-top: 1px solid #e5e7eb; margin-top: 16px;\">
-                            <p style=\"margin: 0 0 4px; font-size: 12px; color: #6b7280;\">Agreed Hours</p>
+                            <p style=\"margin: 0 0 4px; font-size: 12px; color: #6b7280;\">{$labelAgreedHours}</p>
                             <p style=\"margin: 0; font-size: 24px; color: #10b981; font-weight: 700;\">{$hours}h</p>
                         </td>
                     </tr>
@@ -1483,7 +1540,7 @@ HTML;
                                 <tr>
                                     <td style=\"padding: 16px;\">
                                         <p style=\"margin: 0; font-size: 14px; color: #065f46;\">
-                                            <strong>Next step:</strong> Message {$providerName} to arrange when and where the service will happen.
+                                            <strong>{$labelNextStep}</strong> " . __('emails_notifications.exchange.accepted_next_step', ['name' => $providerName]) . "
                                         </p>
                                     </td>
                                 </tr>
@@ -1496,7 +1553,7 @@ HTML;
                 'gradient' => 'linear-gradient(135deg, #f59e0b, #d97706)',
                 'icon' => '⏳',
                 'title' => __('notifications.exchange_title_pending_broker'),
-                'message' => "The provider has accepted your request! Before you can begin, a community coordinator needs to review and approve this exchange.",
+                'message' => __('emails_notifications.exchange.pending_broker_msg'),
                 'buttonText' => __('notifications.exchange_btn_view_exchange'),
                 'helpText' => __('notifications.exchange_help_pending_broker'),
                 'typeColor' => $typeColor,
@@ -1505,7 +1562,7 @@ HTML;
                 'extraDetails' => "
                     <tr>
                         <td style=\"padding-top: 16px; border-top: 1px solid #e5e7eb; margin-top: 16px;\">
-                            <p style=\"margin: 0 0 4px; font-size: 12px; color: #6b7280;\">Proposed Hours</p>
+                            <p style=\"margin: 0 0 4px; font-size: 12px; color: #6b7280;\">{$labelProposedHours}</p>
                             <p style=\"margin: 0; font-size: 24px; color: #f59e0b; font-weight: 700;\">{$hours}h</p>
                         </td>
                     </tr>
@@ -1517,7 +1574,7 @@ HTML;
                                 <tr>
                                     <td style=\"padding: 16px;\">
                                         <p style=\"margin: 0; font-size: 14px; color: #92400e;\">
-                                            <strong>Why approval?</strong> Some exchanges require coordinator review to ensure safety and suitability for all members.
+                                            <strong>{$labelWhyApproval}</strong> " . __('emails_notifications.exchange.pending_broker_why') . "
                                         </p>
                                     </td>
                                 </tr>
@@ -1530,7 +1587,7 @@ HTML;
                 'gradient' => 'linear-gradient(135deg, #3b82f6, #1d4ed8)',
                 'icon' => '🚀',
                 'title' => __('notifications.exchange_title_started'),
-                'message' => "The exchange is now in progress! The service is being provided.",
+                'message' => __('emails_notifications.exchange.started_msg'),
                 'buttonText' => __('notifications.exchange_btn_view_exchange'),
                 'helpText' => __('notifications.exchange_help_started'),
                 'typeColor' => $typeColor,
@@ -1539,7 +1596,7 @@ HTML;
                 'extraDetails' => "
                     <tr>
                         <td style=\"padding-top: 16px; border-top: 1px solid #e5e7eb; margin-top: 16px;\">
-                            <p style=\"margin: 0 0 4px; font-size: 12px; color: #6b7280;\">Expected Hours</p>
+                            <p style=\"margin: 0 0 4px; font-size: 12px; color: #6b7280;\">{$labelExpectedHours}</p>
                             <p style=\"margin: 0; font-size: 24px; color: #3b82f6; font-weight: 700;\">{$hours}h</p>
                         </td>
                     </tr>
@@ -1551,7 +1608,7 @@ HTML;
                                 <tr>
                                     <td style=\"padding: 16px;\">
                                         <p style=\"margin: 0; font-size: 14px; color: #1e40af;\">
-                                            <strong>Remember:</strong> When the service is complete, mark it as done and confirm the actual hours worked.
+                                            <strong>{$labelRemember}</strong> " . __('emails_notifications.exchange.started_remember') . "
                                         </p>
                                     </td>
                                 </tr>
@@ -1564,7 +1621,7 @@ HTML;
                 'gradient' => 'linear-gradient(135deg, #8b5cf6, #7c3aed)',
                 'icon' => '✋',
                 'title' => __('notifications.exchange_title_ready_confirmation'),
-                'message' => "The exchange has been marked as complete! Please confirm the number of hours worked so the time credits can be transferred.",
+                'message' => __('emails_notifications.exchange.ready_confirmation_msg'),
                 'buttonText' => __('notifications.exchange_btn_confirm'),
                 'helpText' => __('notifications.exchange_help_ready_confirmation'),
                 'typeColor' => $typeColor,
@@ -1573,7 +1630,7 @@ HTML;
                 'extraDetails' => "
                     <tr>
                         <td style=\"padding-top: 16px; border-top: 1px solid #e5e7eb; margin-top: 16px;\">
-                            <p style=\"margin: 0 0 4px; font-size: 12px; color: #6b7280;\">Proposed Hours</p>
+                            <p style=\"margin: 0 0 4px; font-size: 12px; color: #6b7280;\">{$labelProposedHours}</p>
                             <p style=\"margin: 0; font-size: 24px; color: #8b5cf6; font-weight: 700;\">{$hours}h</p>
                         </td>
                     </tr>
@@ -1585,7 +1642,7 @@ HTML;
                                 <tr>
                                     <td style=\"padding: 16px;\">
                                         <p style=\"margin: 0; font-size: 14px; color: #5b21b6;\">
-                                            <strong>Action needed:</strong> Please confirm the hours as soon as possible so the other party receives their time credits.
+                                            <strong>{$labelActionNeeded}</strong> " . __('emails_notifications.exchange.ready_confirmation_action') . "
                                         </p>
                                     </td>
                                 </tr>
@@ -1682,26 +1739,33 @@ HTML;
         $frontendUrl = TenantContext::getFrontendUrl();
         $oppTitleHtml = htmlspecialchars($oppTitle, ENT_QUOTES, 'UTF-8');
 
+        $volAcceptedHeading = __('emails_notifications.volunteering.heading_accepted');
+        $volTenantLabel = __('emails_notifications.volunteering.tenant_volunteering', ['community' => $tenantName]);
+        $volApprovedBody = __('emails_notifications.volunteering.approved_body');
+        $volLabelOpp = __('emails_notifications.volunteering.label_opportunity');
+        $volApprovedNext = __('emails_notifications.volunteering.approved_next');
+        $volBtnViewOpp = __('emails_notifications.volunteering.btn_view_opportunity');
+
         return <<<HTML
 <div style="font-family: system-ui, -apple-system, sans-serif; max-width: 600px; margin: 0 auto;">
     <div style="background: linear-gradient(135deg, #22c55e, #059669); padding: 32px 24px; border-radius: 16px 16px 0 0; text-align: center;">
         <div style="font-size: 48px; margin-bottom: 12px;">🎉</div>
-        <h1 style="color: white; margin: 0; font-size: 24px;">Application Accepted!</h1>
-        <p style="color: rgba(255,255,255,0.9); margin: 8px 0 0; font-size: 14px;">{$tenantName} Volunteering</p>
+        <h1 style="color: white; margin: 0; font-size: 24px;">{$volAcceptedHeading}</h1>
+        <p style="color: rgba(255,255,255,0.9); margin: 8px 0 0; font-size: 14px;">{$volTenantLabel}</p>
     </div>
     <div style="background: #f8fafc; padding: 32px 24px; border-radius: 0 0 16px 16px; border: 1px solid #e2e8f0; border-top: none;">
         <p style="color: #1e293b; font-size: 16px; line-height: 1.6; margin: 0 0 16px;">
-            Great news! Your volunteer application has been <strong style="color: #16a34a;">approved</strong>.
+            {$volApprovedBody}
         </p>
         <div style="background: white; border: 1px solid #e2e8f0; border-radius: 12px; padding: 16px; margin: 16px 0;">
-            <p style="color: #64748b; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; margin: 0 0 4px;">Opportunity</p>
+            <p style="color: #64748b; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; margin: 0 0 4px;">{$volLabelOpp}</p>
             <p style="color: #1e293b; font-size: 18px; font-weight: 600; margin: 0;">{$oppTitleHtml}</p>
         </div>
         <p style="color: #475569; font-size: 14px; line-height: 1.6;">
-            You can now sign up for shifts and start logging your volunteer hours. Thank you for making a difference in your community!
+            {$volApprovedNext}
         </p>
         <div style="text-align: center; margin-top: 24px;">
-            <a href="{$frontendUrl}{$basePath}/volunteering/opportunities/{$oppId}" style="display: inline-block; background: linear-gradient(135deg, #22c55e, #059669); color: white; text-decoration: none; padding: 14px 32px; border-radius: 10px; font-weight: 600; font-size: 16px;">View Opportunity</a>
+            <a href="{$frontendUrl}{$basePath}/volunteering/opportunities/{$oppId}" style="display: inline-block; background: linear-gradient(135deg, #22c55e, #059669); color: white; text-decoration: none; padding: 14px 32px; border-radius: 10px; font-weight: 600; font-size: 16px;">{$volBtnViewOpp}</a>
         </div>
     </div>
 </div>
@@ -1719,25 +1783,32 @@ HTML;
         $frontendUrl = TenantContext::getFrontendUrl();
         $oppTitleHtml = htmlspecialchars($oppTitle, ENT_QUOTES, 'UTF-8');
 
+        $volDeclinedHeading = __('emails_notifications.volunteering.heading_declined');
+        $volTenantLabel = __('emails_notifications.volunteering.tenant_volunteering', ['community' => $tenantName]);
+        $volDeclinedBody = __('emails_notifications.volunteering.declined_body');
+        $volLabelOpp = __('emails_notifications.volunteering.label_opportunity');
+        $volDeclinedEncouragement = __('emails_notifications.volunteering.declined_encouragement');
+        $volBtnBrowse = __('emails_notifications.volunteering.btn_browse_opportunities');
+
         return <<<HTML
 <div style="font-family: system-ui, -apple-system, sans-serif; max-width: 600px; margin: 0 auto;">
     <div style="background: linear-gradient(135deg, #6366f1, #8b5cf6); padding: 32px 24px; border-radius: 16px 16px 0 0; text-align: center;">
-        <h1 style="color: white; margin: 0; font-size: 24px;">Application Update</h1>
-        <p style="color: rgba(255,255,255,0.9); margin: 8px 0 0; font-size: 14px;">{$tenantName} Volunteering</p>
+        <h1 style="color: white; margin: 0; font-size: 24px;">{$volDeclinedHeading}</h1>
+        <p style="color: rgba(255,255,255,0.9); margin: 8px 0 0; font-size: 14px;">{$volTenantLabel}</p>
     </div>
     <div style="background: #f8fafc; padding: 32px 24px; border-radius: 0 0 16px 16px; border: 1px solid #e2e8f0; border-top: none;">
         <p style="color: #1e293b; font-size: 16px; line-height: 1.6; margin: 0 0 16px;">
-            Unfortunately, your application was not accepted this time.
+            {$volDeclinedBody}
         </p>
         <div style="background: white; border: 1px solid #e2e8f0; border-radius: 12px; padding: 16px; margin: 16px 0;">
-            <p style="color: #64748b; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; margin: 0 0 4px;">Opportunity</p>
+            <p style="color: #64748b; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; margin: 0 0 4px;">{$volLabelOpp}</p>
             <p style="color: #1e293b; font-size: 18px; font-weight: 600; margin: 0;">{$oppTitleHtml}</p>
         </div>
         <p style="color: #475569; font-size: 14px; line-height: 1.6;">
-            Don't be discouraged — there are many other volunteering opportunities available. Browse the latest openings and find the perfect fit for your skills.
+            {$volDeclinedEncouragement}
         </p>
         <div style="text-align: center; margin-top: 24px;">
-            <a href="{$frontendUrl}{$basePath}/volunteering" style="display: inline-block; background: linear-gradient(135deg, #6366f1, #8b5cf6); color: white; text-decoration: none; padding: 14px 32px; border-radius: 10px; font-weight: 600; font-size: 16px;">Browse Opportunities</a>
+            <a href="{$frontendUrl}{$basePath}/volunteering" style="display: inline-block; background: linear-gradient(135deg, #6366f1, #8b5cf6); color: white; text-decoration: none; padding: 14px 32px; border-radius: 10px; font-weight: 600; font-size: 16px;">{$volBtnBrowse}</a>
         </div>
     </div>
 </div>
@@ -1755,32 +1826,40 @@ HTML;
         $frontendUrl = TenantContext::getFrontendUrl();
         $orgNameHtml = htmlspecialchars($orgName, ENT_QUOTES, 'UTF-8');
 
+        $volHoursPaidHeading = __('emails_notifications.volunteering.heading_hours_paid');
+        $volTenantLabel = __('emails_notifications.volunteering.tenant_volunteering', ['community' => $tenantName]);
+        $volHoursPaidBody = __('emails_notifications.volunteering.hours_paid_body');
+        $volLabelHoursApproved = __('emails_notifications.volunteering.label_hours_approved');
+        $volLabelCreditsEarned = __('emails_notifications.volunteering.label_credits_earned');
+        $volHoursPaidDetail = __('emails_notifications.volunteering.hours_paid_detail', ['org' => "<strong>{$orgNameHtml}</strong>", 'hours' => "<strong>{$hours} time credits</strong>"]);
+        $volBtnViewWallet = __('emails_notifications.volunteering.btn_view_wallet');
+
         return <<<HTML
 <div style="font-family: system-ui, -apple-system, sans-serif; max-width: 600px; margin: 0 auto;">
     <div style="background: linear-gradient(135deg, #22c55e, #059669); padding: 32px 24px; border-radius: 16px 16px 0 0; text-align: center;">
         <div style="font-size: 48px; margin-bottom: 12px;">⏰💰</div>
-        <h1 style="color: white; margin: 0; font-size: 24px;">Hours Approved &amp; Credits Paid!</h1>
-        <p style="color: rgba(255,255,255,0.9); margin: 8px 0 0; font-size: 14px;">{$tenantName} Volunteering</p>
+        <h1 style="color: white; margin: 0; font-size: 24px;">{$volHoursPaidHeading}</h1>
+        <p style="color: rgba(255,255,255,0.9); margin: 8px 0 0; font-size: 14px;">{$volTenantLabel}</p>
     </div>
     <div style="background: #f8fafc; padding: 32px 24px; border-radius: 0 0 16px 16px; border: 1px solid #e2e8f0; border-top: none;">
         <p style="color: #1e293b; font-size: 16px; line-height: 1.6; margin: 0 0 16px;">
-            Your volunteer hours have been approved and time credits have been added to your wallet!
+            {$volHoursPaidBody}
         </p>
         <div style="display: flex; gap: 16px; margin: 20px 0;">
             <div style="flex: 1; background: white; border: 1px solid #e2e8f0; border-radius: 12px; padding: 16px; text-align: center;">
-                <p style="color: #64748b; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; margin: 0 0 4px;">Hours Approved</p>
+                <p style="color: #64748b; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; margin: 0 0 4px;">{$volLabelHoursApproved}</p>
                 <p style="color: #22c55e; font-size: 28px; font-weight: 700; margin: 0;">{$hours}h</p>
             </div>
             <div style="flex: 1; background: white; border: 1px solid #e2e8f0; border-radius: 12px; padding: 16px; text-align: center;">
-                <p style="color: #64748b; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; margin: 0 0 4px;">Credits Earned</p>
+                <p style="color: #64748b; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; margin: 0 0 4px;">{$volLabelCreditsEarned}</p>
                 <p style="color: #22c55e; font-size: 28px; font-weight: 700; margin: 0;">{$hours}</p>
             </div>
         </div>
         <p style="color: #475569; font-size: 14px; line-height: 1.6;">
-            <strong>{$orgNameHtml}</strong> has paid you <strong>{$hours} time credits</strong> for your volunteering. You can spend these credits on services from other community members.
+            {$volHoursPaidDetail}
         </p>
         <div style="text-align: center; margin-top: 24px;">
-            <a href="{$frontendUrl}{$basePath}/wallet" style="display: inline-block; background: linear-gradient(135deg, #22c55e, #059669); color: white; text-decoration: none; padding: 14px 32px; border-radius: 10px; font-weight: 600; font-size: 16px;">View My Wallet</a>
+            <a href="{$frontendUrl}{$basePath}/wallet" style="display: inline-block; background: linear-gradient(135deg, #22c55e, #059669); color: white; text-decoration: none; padding: 14px 32px; border-radius: 10px; font-weight: 600; font-size: 16px;">{$volBtnViewWallet}</a>
         </div>
     </div>
 </div>
@@ -1798,26 +1877,33 @@ HTML;
         $frontendUrl = TenantContext::getFrontendUrl();
         $orgNameHtml = htmlspecialchars($orgName, ENT_QUOTES, 'UTF-8');
 
+        $volHoursApprovedHeading = __('emails_notifications.volunteering.heading_hours_approved');
+        $volTenantLabel = __('emails_notifications.volunteering.tenant_volunteering', ['community' => $tenantName]);
+        $volHoursApprovedBody = __('emails_notifications.volunteering.hours_approved_body', ['org' => "<strong>{$orgNameHtml}</strong>"]);
+        $volLabelHoursApproved = __('emails_notifications.volunteering.label_hours_approved');
+        $volHoursApprovedThanks = __('emails_notifications.volunteering.hours_approved_thanks');
+        $volBtnViewHours = __('emails_notifications.volunteering.btn_view_hours');
+
         return <<<HTML
 <div style="font-family: system-ui, -apple-system, sans-serif; max-width: 600px; margin: 0 auto;">
     <div style="background: linear-gradient(135deg, #22c55e, #059669); padding: 32px 24px; border-radius: 16px 16px 0 0; text-align: center;">
         <div style="font-size: 48px; margin-bottom: 12px;">✅</div>
-        <h1 style="color: white; margin: 0; font-size: 24px;">Hours Approved!</h1>
-        <p style="color: rgba(255,255,255,0.9); margin: 8px 0 0; font-size: 14px;">{$tenantName} Volunteering</p>
+        <h1 style="color: white; margin: 0; font-size: 24px;">{$volHoursApprovedHeading}</h1>
+        <p style="color: rgba(255,255,255,0.9); margin: 8px 0 0; font-size: 14px;">{$volTenantLabel}</p>
     </div>
     <div style="background: #f8fafc; padding: 32px 24px; border-radius: 0 0 16px 16px; border: 1px solid #e2e8f0; border-top: none;">
         <p style="color: #1e293b; font-size: 16px; line-height: 1.6; margin: 0 0 16px;">
-            Your volunteer hours with <strong>{$orgNameHtml}</strong> have been verified and approved.
+            {$volHoursApprovedBody}
         </p>
         <div style="background: white; border: 1px solid #e2e8f0; border-radius: 12px; padding: 16px; text-align: center; margin: 20px 0;">
-            <p style="color: #64748b; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; margin: 0 0 4px;">Hours Approved</p>
+            <p style="color: #64748b; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; margin: 0 0 4px;">{$volLabelHoursApproved}</p>
             <p style="color: #22c55e; font-size: 28px; font-weight: 700; margin: 0;">{$hours}h</p>
         </div>
         <p style="color: #475569; font-size: 14px; line-height: 1.6;">
-            Thank you for your valuable contribution to the community!
+            {$volHoursApprovedThanks}
         </p>
         <div style="text-align: center; margin-top: 24px;">
-            <a href="{$frontendUrl}{$basePath}/volunteering?tab=hours" style="display: inline-block; background: linear-gradient(135deg, #22c55e, #059669); color: white; text-decoration: none; padding: 14px 32px; border-radius: 10px; font-weight: 600; font-size: 16px;">View My Hours</a>
+            <a href="{$frontendUrl}{$basePath}/volunteering?tab=hours" style="display: inline-block; background: linear-gradient(135deg, #22c55e, #059669); color: white; text-decoration: none; padding: 14px 32px; border-radius: 10px; font-weight: 600; font-size: 16px;">{$volBtnViewHours}</a>
         </div>
     </div>
 </div>
@@ -1835,21 +1921,27 @@ HTML;
         $frontendUrl = TenantContext::getFrontendUrl();
         $orgNameHtml = htmlspecialchars($orgName, ENT_QUOTES, 'UTF-8');
 
+        $volHoursDeclinedHeading = __('emails_notifications.volunteering.heading_hours_declined');
+        $volTenantLabel = __('emails_notifications.volunteering.tenant_volunteering', ['community' => $tenantName]);
+        $volHoursDeclinedBody = __('emails_notifications.volunteering.hours_declined_body', ['hours' => "<strong>{$hours}h</strong>", 'org' => "<strong>{$orgNameHtml}</strong>"]);
+        $volHoursDeclinedNote = __('emails_notifications.volunteering.hours_declined_note');
+        $volBtnViewHours = __('emails_notifications.volunteering.btn_view_hours');
+
         return <<<HTML
 <div style="font-family: system-ui, -apple-system, sans-serif; max-width: 600px; margin: 0 auto;">
     <div style="background: linear-gradient(135deg, #6366f1, #8b5cf6); padding: 32px 24px; border-radius: 16px 16px 0 0; text-align: center;">
-        <h1 style="color: white; margin: 0; font-size: 24px;">Hours Update</h1>
-        <p style="color: rgba(255,255,255,0.9); margin: 8px 0 0; font-size: 14px;">{$tenantName} Volunteering</p>
+        <h1 style="color: white; margin: 0; font-size: 24px;">{$volHoursDeclinedHeading}</h1>
+        <p style="color: rgba(255,255,255,0.9); margin: 8px 0 0; font-size: 14px;">{$volTenantLabel}</p>
     </div>
     <div style="background: #f8fafc; padding: 32px 24px; border-radius: 0 0 16px 16px; border: 1px solid #e2e8f0; border-top: none;">
         <p style="color: #1e293b; font-size: 16px; line-height: 1.6; margin: 0 0 16px;">
-            Your <strong>{$hours}h</strong> volunteering log with <strong>{$orgNameHtml}</strong> was not approved.
+            {$volHoursDeclinedBody}
         </p>
         <p style="color: #475569; font-size: 14px; line-height: 1.6;">
-            This may be due to a discrepancy in the hours recorded. If you believe this is an error, please contact the organisation directly to discuss.
+            {$volHoursDeclinedNote}
         </p>
         <div style="text-align: center; margin-top: 24px;">
-            <a href="{$frontendUrl}{$basePath}/volunteering?tab=hours" style="display: inline-block; background: linear-gradient(135deg, #6366f1, #8b5cf6); color: white; text-decoration: none; padding: 14px 32px; border-radius: 10px; font-weight: 600; font-size: 16px;">View My Hours</a>
+            <a href="{$frontendUrl}{$basePath}/volunteering?tab=hours" style="display: inline-block; background: linear-gradient(135deg, #6366f1, #8b5cf6); color: white; text-decoration: none; padding: 14px 32px; border-radius: 10px; font-weight: 600; font-size: 16px;">{$volBtnViewHours}</a>
         </div>
     </div>
 </div>
@@ -1868,26 +1960,33 @@ HTML;
         $volunteerHtml = htmlspecialchars($volunteerName, ENT_QUOTES, 'UTF-8');
         $oppTitleHtml = htmlspecialchars($oppTitle, ENT_QUOTES, 'UTF-8');
 
+        $volAppReceivedHeading = __('emails_notifications.volunteering.heading_application_received');
+        $volTenantLabel = __('emails_notifications.volunteering.tenant_volunteering', ['community' => $tenantName]);
+        $volAppReceivedBody = __('emails_notifications.volunteering.application_received_body', ['name' => "<strong>{$volunteerHtml}</strong>"]);
+        $volLabelOpp = __('emails_notifications.volunteering.label_opportunity');
+        $volAppReceivedNote = __('emails_notifications.volunteering.application_received_note');
+        $volBtnReviewApp = __('emails_notifications.volunteering.btn_review_application');
+
         return <<<HTML
 <div style="font-family: system-ui, -apple-system, sans-serif; max-width: 600px; margin: 0 auto;">
     <div style="background: linear-gradient(135deg, #f43f5e, #e11d48); padding: 32px 24px; border-radius: 16px 16px 0 0; text-align: center;">
         <div style="font-size: 48px; margin-bottom: 12px;">🙋</div>
-        <h1 style="color: white; margin: 0; font-size: 24px;">New Volunteer Application</h1>
-        <p style="color: rgba(255,255,255,0.9); margin: 8px 0 0; font-size: 14px;">{$tenantName} Volunteering</p>
+        <h1 style="color: white; margin: 0; font-size: 24px;">{$volAppReceivedHeading}</h1>
+        <p style="color: rgba(255,255,255,0.9); margin: 8px 0 0; font-size: 14px;">{$volTenantLabel}</p>
     </div>
     <div style="background: #f8fafc; padding: 32px 24px; border-radius: 0 0 16px 16px; border: 1px solid #e2e8f0; border-top: none;">
         <p style="color: #1e293b; font-size: 16px; line-height: 1.6; margin: 0 0 16px;">
-            <strong>{$volunteerHtml}</strong> has applied to volunteer with your organisation.
+            {$volAppReceivedBody}
         </p>
         <div style="background: white; border: 1px solid #e2e8f0; border-radius: 12px; padding: 16px; margin: 16px 0;">
-            <p style="color: #64748b; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; margin: 0 0 4px;">Opportunity</p>
+            <p style="color: #64748b; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; margin: 0 0 4px;">{$volLabelOpp}</p>
             <p style="color: #1e293b; font-size: 18px; font-weight: 600; margin: 0;">{$oppTitleHtml}</p>
         </div>
         <p style="color: #475569; font-size: 14px; line-height: 1.6;">
-            Review their application and approve or decline from your organisation dashboard.
+            {$volAppReceivedNote}
         </p>
         <div style="text-align: center; margin-top: 24px;">
-            <a href="{$frontendUrl}{$basePath}/volunteering/org/{$orgId}/dashboard?tab=applications" style="display: inline-block; background: linear-gradient(135deg, #f43f5e, #e11d48); color: white; text-decoration: none; padding: 14px 32px; border-radius: 10px; font-weight: 600; font-size: 16px;">Review Application</a>
+            <a href="{$frontendUrl}{$basePath}/volunteering/org/{$orgId}/dashboard?tab=applications" style="display: inline-block; background: linear-gradient(135deg, #f43f5e, #e11d48); color: white; text-decoration: none; padding: 14px 32px; border-radius: 10px; font-weight: 600; font-size: 16px;">{$volBtnReviewApp}</a>
         </div>
     </div>
 </div>

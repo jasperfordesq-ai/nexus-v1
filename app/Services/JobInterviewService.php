@@ -70,17 +70,18 @@ class JobInterviewService
             try {
                 $jobTitle = $application->vacancy->title ?? 'a job';
                 $candidateId = (int) $application->user_id;
+                $interviewMsg = __('emails_misc.jobs.interview_requested', ['title' => $jobTitle]);
                 Notification::createNotification(
                     $candidateId,
-                    "Interview requested for {$jobTitle}",
+                    $interviewMsg,
                     "/jobs/{$application->vacancy_id}",
                     'job_application'
                 );
-                RealtimeService::broadcastAndPush($candidateId, "Interview requested for {$jobTitle}", [
+                RealtimeService::broadcastAndPush($candidateId, $interviewMsg, [
                     'type'      => 'job_interview_proposed',
                     'job_id'    => (int) $application->vacancy_id,
                     'job_title' => $jobTitle,
-                    'message'   => "Interview requested for {$jobTitle}",
+                    'message'   => $interviewMsg,
                     'url'       => "/jobs/{$application->vacancy_id}",
                 ]);
             } catch (\Throwable $e) {
@@ -132,17 +133,18 @@ class JobInterviewService
                 $jobTitle = $interview->application->vacancy->title ?? 'a job';
                 $posterId = $interview->application->vacancy->user_id ?? null;
                 if ($posterId) {
+                    $acceptMsg = __('emails_misc.jobs.interview_accepted', ['title' => $jobTitle]);
                     Notification::createNotification(
                         (int) $posterId,
-                        "Interview accepted for {$jobTitle}",
+                        $acceptMsg,
                         "/jobs/{$interview->vacancy_id}/applications",
                         'job_application_status'
                     );
-                    RealtimeService::broadcastAndPush((int) $posterId, "Interview accepted for {$jobTitle}", [
+                    RealtimeService::broadcastAndPush((int) $posterId, $acceptMsg, [
                         'type'      => 'job_interview_accepted',
                         'job_id'    => (int) $interview->vacancy_id,
                         'job_title' => $jobTitle,
-                        'message'   => "Interview accepted for {$jobTitle}",
+                        'message'   => $acceptMsg,
                         'url'       => "/jobs/{$interview->vacancy_id}/applications",
                     ]);
                 }
@@ -195,17 +197,18 @@ class JobInterviewService
                 $jobTitle = $interview->application->vacancy->title ?? 'a job';
                 $posterId = $interview->application->vacancy->user_id ?? null;
                 if ($posterId) {
+                    $declineMsg = __('emails_misc.jobs.interview_declined', ['title' => $jobTitle]);
                     Notification::createNotification(
                         (int) $posterId,
-                        "Interview declined for {$jobTitle}",
+                        $declineMsg,
                         "/jobs/{$interview->vacancy_id}/applications",
                         'job_application_status'
                     );
-                    RealtimeService::broadcastAndPush((int) $posterId, "Interview declined for {$jobTitle}", [
+                    RealtimeService::broadcastAndPush((int) $posterId, $declineMsg, [
                         'type'      => 'job_interview_declined',
                         'job_id'    => (int) $interview->vacancy_id,
                         'job_title' => $jobTitle,
-                        'message'   => "Interview declined for {$jobTitle}",
+                        'message'   => $declineMsg,
                         'url'       => "/jobs/{$interview->vacancy_id}/applications",
                     ]);
                 }
@@ -302,17 +305,18 @@ class JobInterviewService
                 $jobTitle = $interview->application->vacancy->title ?? 'a job';
                 $candidateId = $interview->application->user_id ?? null;
                 if ($candidateId) {
+                    $cancelMsg = __('emails_misc.jobs.interview_cancelled', ['title' => $jobTitle]);
                     Notification::createNotification(
                         (int) $candidateId,
-                        "Interview cancelled for {$jobTitle}",
+                        $cancelMsg,
                         "/jobs/{$interview->vacancy_id}",
                         'job_application_status'
                     );
-                    RealtimeService::broadcastAndPush((int) $candidateId, "Interview cancelled for {$jobTitle}", [
+                    RealtimeService::broadcastAndPush((int) $candidateId, $cancelMsg, [
                         'type'      => 'job_interview_cancelled',
                         'job_id'    => (int) $interview->vacancy_id,
                         'job_title' => $jobTitle,
-                        'message'   => "Interview cancelled for {$jobTitle}",
+                        'message'   => $cancelMsg,
                         'url'       => "/jobs/{$interview->vacancy_id}",
                     ]);
                 }
@@ -361,8 +365,8 @@ class JobInterviewService
                     $scheduledAt = $interview->scheduled_at->format('M j, g:i A');
                     $hoursUntil = (int) $now->diffInHours($interview->scheduled_at);
 
-                    $timeLabel = $hoursUntil <= 1 ? 'in 1 hour' : "in {$hoursUntil} hours";
-                    $message = "Interview reminder: {$jobTitle} — {$timeLabel} ({$scheduledAt})";
+                    $timeLabel = $hoursUntil <= 1 ? __('emails_misc.jobs.interview_in_1_hour') : __('emails_misc.jobs.interview_in_hours', ['hours' => $hoursUntil]);
+                    $message = __('emails_misc.jobs.interview_reminder', ['title' => $jobTitle, 'time_label' => $timeLabel, 'scheduled_at' => $scheduledAt]);
 
                     // Notify the candidate
                     $candidateId = $interview->application->user_id ?? null;
@@ -373,7 +377,7 @@ class JobInterviewService
                             "/jobs/{$interview->vacancy_id}",
                             'job_interview_proposed'
                         );
-                        RealtimeService::broadcastAndPush((int) $candidateId, 'Interview Reminder', [
+                        RealtimeService::broadcastAndPush((int) $candidateId, __('emails_misc.jobs.interview_reminder_push_title'), [
                             'type'      => 'job_interview_reminder',
                             'job_id'    => (int) $interview->vacancy_id,
                             'job_title' => $jobTitle,
@@ -391,7 +395,7 @@ class JobInterviewService
                             "/jobs/{$interview->vacancy_id}/applications",
                             'job_interview_proposed'
                         );
-                        RealtimeService::broadcastAndPush((int) $posterId, 'Interview Reminder', [
+                        RealtimeService::broadcastAndPush((int) $posterId, __('emails_misc.jobs.interview_reminder_push_title'), [
                             'type'      => 'job_interview_reminder',
                             'job_id'    => (int) $interview->vacancy_id,
                             'job_title' => $jobTitle,

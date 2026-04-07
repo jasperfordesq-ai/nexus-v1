@@ -96,7 +96,7 @@ class RegistrationService
         });
 
         if ($user === null) {
-            return ['error' => 'Registration could not be completed. Please try again or contact support.'];
+            return ['error' => __('emails_misc.registration.error_generic')];
         }
 
         // Dispatch UserRegistered event (triggers welcome notification, etc.)
@@ -117,7 +117,7 @@ class RegistrationService
                 'last_name' => $user->last_name,
             ],
             'requires_verification' => true,
-            'message' => 'Registration successful. Please check your email to verify your account.',
+            'message' => __('emails_misc.registration.success_message'),
         ];
     }
 
@@ -182,16 +182,16 @@ class RegistrationService
             $firstName = $user->first_name ?? 'there';
 
             $html = EmailTemplate::render(
-                'Verify Your Email Address',
-                "Hi {$firstName}, welcome to {$tenantName}!",
-                'Please verify your email address by clicking the button below.<br><br>If you did not create an account, please ignore this email.',
-                'Verify Email Address',
+                __('emails_misc.registration.verify_title'),
+                __('emails_misc.registration.verify_greeting', ['name' => $firstName, 'tenant' => $tenantName]),
+                __('emails_misc.registration.verify_body'),
+                __('emails_misc.registration.verify_cta'),
                 $verifyUrl,
                 $tenantName
             );
 
             $mailer = Mailer::forCurrentTenant();
-            $mailer->send($user->email, "Verify Your Email - {$tenantName}", $html);
+            $mailer->send($user->email, __('emails_misc.registration.verify_subject', ['tenant' => $tenantName]), $html);
         } catch (\Throwable $e) {
             Log::warning('RegistrationService: Failed to send verification email', [
                 'user_id' => $user->id,

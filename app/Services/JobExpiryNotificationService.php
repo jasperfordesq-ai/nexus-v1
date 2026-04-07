@@ -88,6 +88,7 @@ class JobExpiryNotificationService
         $renewUrl  = "{$appUrl}/jobs/{$vacancy->id}";
         $deadline  = $vacancy->deadline?->format('d M Y') ?? 'soon';
 
+        $greeting = __('emails_misc.jobs.expiry_greeting', ['name' => $name]);
         $heading = __('notifications.job_expiry_email_heading');
         $bodyText = __('notifications.job_expiry_email_body', ['title' => $title, 'deadline' => $deadline, 'days' => $daysLeft]);
         $ctaText = __('notifications.job_expiry_email_cta');
@@ -99,7 +100,7 @@ class JobExpiryNotificationService
         <table width="600" style="background:#fff;border-radius:12px;padding:32px;margin:0 auto;">
           <tr><td>
             <h2 style="color:#4f46e5;margin-top:0;">{$heading}</h2>
-            <p>Hi {$name},</p>
+            <p>{$greeting}</p>
             <p>{$bodyText}</p>
             <p>{$ctaText}</p>
             <a href="{$renewUrl}" style="display:inline-block;padding:10px 20px;background:#4f46e5;color:#fff;border-radius:8px;text-decoration:none;font-weight:600;">{$buttonText}</a>

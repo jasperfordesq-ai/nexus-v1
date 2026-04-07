@@ -93,7 +93,7 @@ class EventNotificationService
                 try {
                     $this->sendEventEmail(
                         $attendee,
-                        "Update: {$eventTitle}",
+                        __('emails.events.update_subject', ['title' => $eventTitle]),
                         $message,
                         $path,
                         'event_update'
@@ -272,7 +272,7 @@ class EventNotificationService
                     try {
                         $this->sendEventEmail(
                             $user,
-                            "Cancelled: \"{$eventTitle}\"",
+                            __('emails.events.cancelled_subject', ['title' => $eventTitle]),
                             $message,
                             $path,
                             'event_cancellation',
@@ -378,7 +378,7 @@ class EventNotificationService
                 try {
                     $this->sendEventEmail(
                         $attendee,
-                        "Updated: \"{$safeTitle}\" ({$changeLabel})",
+                        __('emails.events.updated_subject', ['title' => $safeTitle, 'changes' => $changeLabel]),
                         $message,
                         $path,
                         'event_update',
@@ -429,7 +429,9 @@ class EventNotificationService
             $eventTitle = $event->title;
             $organizerId = (int) $event->user_id;
 
-            $statusLabel = $status === 'going' ? 'is going to' : 'is interested in';
+            $statusLabel = $status === 'going'
+                ? __('emails.events.rsvp_status_going')
+                : __('emails.events.rsvp_status_interested');
 
             $path = '/events/' . $eventId;
             $message = $status === 'going'
@@ -459,7 +461,7 @@ class EventNotificationService
 
                     $this->sendEventEmail(
                         $organizer,
-                        "{$safeUserName} {$statusLabel} your event \"{$safeTitle}\"",
+                        __('emails.events.rsvp_subject', ['name' => $safeUserName, 'status_label' => $statusLabel, 'title' => $safeTitle]),
                         $message,
                         $path,
                         'event_rsvp',
@@ -657,6 +659,8 @@ class EventNotificationService
         $baseUrl = TenantContext::getFrontendUrl();
         $basePath = TenantContext::getSlugPrefix();
         $fullUrl = $baseUrl . $basePath . $link;
+        $greeting = htmlspecialchars(__('emails.common.greeting', ['name' => $recipientName]), ENT_QUOTES, 'UTF-8');
+        $viewEventLabel = htmlspecialchars(__('emails.events.view_event'), ENT_QUOTES, 'UTF-8');
 
         return <<<HTML
 <div style="font-family: system-ui, -apple-system, sans-serif; max-width: 600px; margin: 0 auto;">
@@ -665,10 +669,10 @@ class EventNotificationService
         <p style="color: rgba(255,255,255,0.9); margin: 8px 0 0;">{$tenantName}</p>
     </div>
     <div style="background: #f8fafc; padding: 24px; border-radius: 0 0 16px 16px; border: 1px solid #e2e8f0; border-top: none;">
-        <p style="color: #1e293b; font-size: 16px; line-height: 1.6;">Hi {$recipientName},</p>
+        <p style="color: #1e293b; font-size: 16px; line-height: 1.6;">{$greeting}</p>
         <p style="color: #1e293b; font-size: 16px; line-height: 1.6;">{$safeContent}</p>
         <div style="text-align: center; margin-top: 24px;">
-            <a href="{$fullUrl}" style="display: inline-block; background: linear-gradient(135deg, #6366f1, #8b5cf6); color: white; text-decoration: none; padding: 14px 32px; border-radius: 10px; font-weight: 600;">View Event</a>
+            <a href="{$fullUrl}" style="display: inline-block; background: linear-gradient(135deg, #6366f1, #8b5cf6); color: white; text-decoration: none; padding: 14px 32px; border-radius: 10px; font-weight: 600;">{$viewEventLabel}</a>
         </div>
     </div>
 </div>
@@ -683,31 +687,39 @@ HTML;
         $organizerName = htmlspecialchars($organizer->first_name ?? $organizer->name ?? 'there', ENT_QUOTES, 'UTF-8');
         $rsvpUserName = htmlspecialchars($rsvpUser->name ?? trim(($rsvpUser->first_name ?? '') . ' ' . ($rsvpUser->last_name ?? '')), ENT_QUOTES, 'UTF-8');
         $eventTitle = htmlspecialchars($event->title, ENT_QUOTES, 'UTF-8');
-        $statusLabel = $status === 'going' ? 'is going to' : 'is interested in';
+        $statusLabel = $status === 'going'
+            ? __('emails.events.rsvp_status_going')
+            : __('emails.events.rsvp_status_interested');
         $statusColor = $status === 'going' ? '#10b981' : '#f59e0b';
-        $statusBadge = $status === 'going' ? 'Going' : 'Interested';
+        $statusBadge = $status === 'going'
+            ? __('emails.events.rsvp_badge_going')
+            : __('emails.events.rsvp_badge_interested');
         $tenantName = htmlspecialchars(TenantContext::getSetting('site_name', 'Project NEXUS'), ENT_QUOTES, 'UTF-8');
         $baseUrl = TenantContext::getFrontendUrl();
         $basePath = TenantContext::getSlugPrefix();
         $eventUrl = $baseUrl . $basePath . '/events/' . $event->id;
+        $greeting = htmlspecialchars(__('emails.common.greeting', ['name' => $organizerName]), ENT_QUOTES, 'UTF-8');
+        $rsvpHeading = htmlspecialchars(__('emails.events.new_rsvp_heading'), ENT_QUOTES, 'UTF-8');
+        $rsvpBody = __('emails.events.rsvp_body', ['name' => $rsvpUserName, 'status_label' => $statusLabel]);
+        $viewEventLabel = htmlspecialchars(__('emails.events.view_event'), ENT_QUOTES, 'UTF-8');
 
         return <<<HTML
 <div style="font-family: system-ui, -apple-system, sans-serif; max-width: 600px; margin: 0 auto;">
     <div style="background: linear-gradient(135deg, #6366f1, #8b5cf6); padding: 24px; border-radius: 16px 16px 0 0; text-align: center;">
-        <h1 style="color: white; margin: 0; font-size: 22px;">New RSVP!</h1>
+        <h1 style="color: white; margin: 0; font-size: 22px;">{$rsvpHeading}</h1>
         <p style="color: rgba(255,255,255,0.9); margin: 8px 0 0;">{$tenantName}</p>
     </div>
     <div style="background: #f8fafc; padding: 24px; border-radius: 0 0 16px 16px; border: 1px solid #e2e8f0; border-top: none;">
-        <p style="color: #1e293b; font-size: 16px; line-height: 1.6;">Hi {$organizerName},</p>
+        <p style="color: #1e293b; font-size: 16px; line-height: 1.6;">{$greeting}</p>
         <p style="color: #1e293b; font-size: 16px; line-height: 1.6;">
-            <strong>{$rsvpUserName}</strong> {$statusLabel} your event:
+            {$rsvpBody}
         </p>
         <div style="background: white; border: 1px solid #e2e8f0; border-radius: 12px; padding: 16px; margin: 16px 0;">
             <h2 style="color: #1e293b; margin: 0 0 8px; font-size: 18px;">{$eventTitle}</h2>
             <span style="display: inline-block; background: {$statusColor}; color: white; padding: 4px 12px; border-radius: 16px; font-size: 13px; font-weight: 600;">{$statusBadge}</span>
         </div>
         <div style="text-align: center; margin-top: 24px;">
-            <a href="{$eventUrl}" style="display: inline-block; background: linear-gradient(135deg, #6366f1, #8b5cf6); color: white; text-decoration: none; padding: 14px 32px; border-radius: 10px; font-weight: 600;">View Event</a>
+            <a href="{$eventUrl}" style="display: inline-block; background: linear-gradient(135deg, #6366f1, #8b5cf6); color: white; text-decoration: none; padding: 14px 32px; border-radius: 10px; font-weight: 600;">{$viewEventLabel}</a>
         </div>
     </div>
 </div>
@@ -726,12 +738,13 @@ HTML;
         $basePath = TenantContext::getSlugPrefix();
         $eventsUrl = $baseUrl . $basePath . '/events';
 
+        $reasonLabel = htmlspecialchars(__('emails.events.cancelled_reason_label'), ENT_QUOTES, 'UTF-8');
         $reasonHtml = '';
         if (!empty($reason)) {
             $safeReason = htmlspecialchars($reason, ENT_QUOTES, 'UTF-8');
             $reasonHtml = <<<HTML
         <div style="background: #fef2f2; border: 1px solid #fecaca; border-radius: 8px; padding: 12px 16px; margin: 16px 0;">
-            <p style="color: #991b1b; margin: 0; font-size: 14px;"><strong>Reason:</strong> {$safeReason}</p>
+            <p style="color: #991b1b; margin: 0; font-size: 14px;"><strong>{$reasonLabel}</strong> {$safeReason}</p>
         </div>
 HTML;
         }
@@ -739,25 +752,31 @@ HTML;
         $dateHtml = '';
         if (!empty($event->start_time)) {
             $when = date('l, M j \a\t g:i A', strtotime($event->start_time));
-            $dateHtml = "<p style=\"color: #64748b; margin: 4px 0 0; font-size: 14px;\">Was scheduled for {$when}</p>";
+            $scheduledFor = htmlspecialchars(__('emails.events.cancelled_scheduled_for', ['when' => $when]), ENT_QUOTES, 'UTF-8');
+            $dateHtml = "<p style=\"color: #64748b; margin: 4px 0 0; font-size: 14px;\">{$scheduledFor}</p>";
         }
+
+        $cancelledHeading = htmlspecialchars(__('emails.events.cancelled_heading'), ENT_QUOTES, 'UTF-8');
+        $greeting = htmlspecialchars(__('emails.common.greeting', ['name' => $recipientName]), ENT_QUOTES, 'UTF-8');
+        $cancelledBody = htmlspecialchars(__('emails.events.cancelled_body'), ENT_QUOTES, 'UTF-8');
+        $browseEventsLabel = htmlspecialchars(__('emails.events.browse_events'), ENT_QUOTES, 'UTF-8');
 
         return <<<HTML
 <div style="font-family: system-ui, -apple-system, sans-serif; max-width: 600px; margin: 0 auto;">
     <div style="background: linear-gradient(135deg, #ef4444, #dc2626); padding: 24px; border-radius: 16px 16px 0 0; text-align: center;">
-        <h1 style="color: white; margin: 0; font-size: 22px;">Event Cancelled</h1>
+        <h1 style="color: white; margin: 0; font-size: 22px;">{$cancelledHeading}</h1>
         <p style="color: rgba(255,255,255,0.9); margin: 8px 0 0;">{$tenantName}</p>
     </div>
     <div style="background: #f8fafc; padding: 24px; border-radius: 0 0 16px 16px; border: 1px solid #e2e8f0; border-top: none;">
-        <p style="color: #1e293b; font-size: 16px; line-height: 1.6;">Hi {$recipientName},</p>
-        <p style="color: #1e293b; font-size: 16px; line-height: 1.6;">We're sorry to let you know that the following event has been cancelled:</p>
+        <p style="color: #1e293b; font-size: 16px; line-height: 1.6;">{$greeting}</p>
+        <p style="color: #1e293b; font-size: 16px; line-height: 1.6;">{$cancelledBody}</p>
         <div style="background: white; border: 1px solid #e2e8f0; border-radius: 12px; padding: 16px; margin: 16px 0;">
             <h2 style="color: #1e293b; margin: 0 0 4px; font-size: 18px;">{$eventTitle}</h2>
             {$dateHtml}
         </div>
         {$reasonHtml}
         <div style="text-align: center; margin-top: 24px;">
-            <a href="{$eventsUrl}" style="display: inline-block; background: linear-gradient(135deg, #6366f1, #8b5cf6); color: white; text-decoration: none; padding: 14px 32px; border-radius: 10px; font-weight: 600;">Browse Events</a>
+            <a href="{$eventsUrl}" style="display: inline-block; background: linear-gradient(135deg, #6366f1, #8b5cf6); color: white; text-decoration: none; padding: 14px 32px; border-radius: 10px; font-weight: 600;">{$browseEventsLabel}</a>
         </div>
     </div>
 </div>
@@ -776,34 +795,43 @@ HTML;
         $basePath = TenantContext::getSlugPrefix();
         $eventUrl = $baseUrl . $basePath . '/events/' . $event->id;
 
+        $dateTimeLabel = htmlspecialchars(__('emails.events.change_label_date_time'), ENT_QUOTES, 'UTF-8');
+        $locationLabel = htmlspecialchars(__('emails.events.change_label_location'), ENT_QUOTES, 'UTF-8');
+        $titleLabel = htmlspecialchars(__('emails.events.change_label_title'), ENT_QUOTES, 'UTF-8');
+
         $changesHtml = '';
         if (isset($changes['start_time'])) {
             $newTime = date('l, M j \a\t g:i A', strtotime($changes['start_time']));
-            $changesHtml .= "<li style=\"color: #1e293b; margin-bottom: 8px;\"><strong>Date/Time:</strong> {$newTime}</li>";
+            $changesHtml .= "<li style=\"color: #1e293b; margin-bottom: 8px;\"><strong>{$dateTimeLabel}</strong> {$newTime}</li>";
         }
         if (isset($changes['location'])) {
             $newLocation = htmlspecialchars($changes['location'], ENT_QUOTES, 'UTF-8');
-            $changesHtml .= "<li style=\"color: #1e293b; margin-bottom: 8px;\"><strong>Location:</strong> {$newLocation}</li>";
+            $changesHtml .= "<li style=\"color: #1e293b; margin-bottom: 8px;\"><strong>{$locationLabel}</strong> {$newLocation}</li>";
         }
         if (isset($changes['title'])) {
             $newTitle = htmlspecialchars($changes['title'], ENT_QUOTES, 'UTF-8');
-            $changesHtml .= "<li style=\"color: #1e293b; margin-bottom: 8px;\"><strong>Title:</strong> {$newTitle}</li>";
+            $changesHtml .= "<li style=\"color: #1e293b; margin-bottom: 8px;\"><strong>{$titleLabel}</strong> {$newTitle}</li>";
         }
+
+        $updatedHeading = htmlspecialchars(__('emails.events.updated_heading'), ENT_QUOTES, 'UTF-8');
+        $greeting = htmlspecialchars(__('emails.common.greeting', ['name' => $recipientName]), ENT_QUOTES, 'UTF-8');
+        $updatedBody = __('emails.events.updated_body', ['title' => $eventTitle]);
+        $viewUpdatedLabel = htmlspecialchars(__('emails.events.view_updated_event'), ENT_QUOTES, 'UTF-8');
 
         return <<<HTML
 <div style="font-family: system-ui, -apple-system, sans-serif; max-width: 600px; margin: 0 auto;">
     <div style="background: linear-gradient(135deg, #f59e0b, #d97706); padding: 24px; border-radius: 16px 16px 0 0; text-align: center;">
-        <h1 style="color: white; margin: 0; font-size: 22px;">Event Updated</h1>
+        <h1 style="color: white; margin: 0; font-size: 22px;">{$updatedHeading}</h1>
         <p style="color: rgba(255,255,255,0.9); margin: 8px 0 0;">{$tenantName}</p>
     </div>
     <div style="background: #f8fafc; padding: 24px; border-radius: 0 0 16px 16px; border: 1px solid #e2e8f0; border-top: none;">
-        <p style="color: #1e293b; font-size: 16px; line-height: 1.6;">Hi {$recipientName},</p>
-        <p style="color: #1e293b; font-size: 16px; line-height: 1.6;">The event <strong>"{$eventTitle}"</strong> has been updated:</p>
+        <p style="color: #1e293b; font-size: 16px; line-height: 1.6;">{$greeting}</p>
+        <p style="color: #1e293b; font-size: 16px; line-height: 1.6;">{$updatedBody}</p>
         <div style="background: white; border: 1px solid #e2e8f0; border-radius: 12px; padding: 16px; margin: 16px 0;">
             <ul style="padding-left: 20px; margin: 0;">{$changesHtml}</ul>
         </div>
         <div style="text-align: center; margin-top: 24px;">
-            <a href="{$eventUrl}" style="display: inline-block; background: linear-gradient(135deg, #6366f1, #8b5cf6); color: white; text-decoration: none; padding: 14px 32px; border-radius: 10px; font-weight: 600;">View Updated Event</a>
+            <a href="{$eventUrl}" style="display: inline-block; background: linear-gradient(135deg, #6366f1, #8b5cf6); color: white; text-decoration: none; padding: 14px 32px; border-radius: 10px; font-weight: 600;">{$viewUpdatedLabel}</a>
         </div>
     </div>
 </div>
@@ -823,19 +851,27 @@ HTML;
         $eventUrl = $baseUrl . $basePath . '/events/' . $event->id;
 
         $when = date('l, M j \a\t g:i A', strtotime($event->start_time));
-        $heading = $reminderType === '24h' ? 'Event Tomorrow' : 'Starting Soon';
+        $heading = $reminderType === '24h'
+            ? htmlspecialchars(__('emails.events.reminder_heading_24h'), ENT_QUOTES, 'UTF-8')
+            : htmlspecialchars(__('emails.events.reminder_heading_1h'), ENT_QUOTES, 'UTF-8');
         $gradientColors = $reminderType === '24h' ? '#6366f1, #8b5cf6' : '#f59e0b, #ef4444';
         $timeNote = $reminderType === '24h'
-            ? 'is happening tomorrow'
-            : 'starts in about 1 hour';
+            ? __('emails.events.reminder_time_note_24h')
+            : __('emails.events.reminder_time_note_1h');
 
+        $onlineEventLabel = htmlspecialchars(__('emails.events.online_event'), ENT_QUOTES, 'UTF-8');
         $locationHtml = '';
         if (!empty($event->is_online) && !empty($event->online_url)) {
-            $locationHtml = '<p style="color: #6366f1; margin: 4px 0 0; font-size: 14px;">Online Event</p>';
+            $locationHtml = "<p style=\"color: #6366f1; margin: 4px 0 0; font-size: 14px;\">{$onlineEventLabel}</p>";
         } elseif (!empty($event->location)) {
             $loc = htmlspecialchars($event->location, ENT_QUOTES, 'UTF-8');
-            $locationHtml = "<p style=\"color: #64748b; margin: 4px 0 0; font-size: 14px;\">Location: {$loc}</p>";
+            $locationLabelHtml = htmlspecialchars(__('emails.events.location_label', ['location' => $loc]), ENT_QUOTES, 'UTF-8');
+            $locationHtml = "<p style=\"color: #64748b; margin: 4px 0 0; font-size: 14px;\">{$locationLabelHtml}</p>";
         }
+
+        $greeting = htmlspecialchars(__('emails.common.greeting', ['name' => $recipientName]), ENT_QUOTES, 'UTF-8');
+        $reminderBody = __('emails.events.reminder_body', ['title' => $eventTitle, 'time_note' => $timeNote]);
+        $viewEventLabel = htmlspecialchars(__('emails.events.view_event'), ENT_QUOTES, 'UTF-8');
 
         return <<<HTML
 <div style="font-family: system-ui, -apple-system, sans-serif; max-width: 600px; margin: 0 auto;">
@@ -844,14 +880,14 @@ HTML;
         <p style="color: rgba(255,255,255,0.9); margin: 8px 0 0;">{$tenantName}</p>
     </div>
     <div style="background: #f8fafc; padding: 24px; border-radius: 0 0 16px 16px; border: 1px solid #e2e8f0; border-top: none;">
-        <p style="color: #1e293b; font-size: 16px; line-height: 1.6;">Hi {$recipientName},</p>
-        <p style="color: #1e293b; font-size: 16px; line-height: 1.6;">This is a friendly reminder that <strong>"{$eventTitle}"</strong> {$timeNote}.</p>
+        <p style="color: #1e293b; font-size: 16px; line-height: 1.6;">{$greeting}</p>
+        <p style="color: #1e293b; font-size: 16px; line-height: 1.6;">{$reminderBody}</p>
         <div style="background: white; border: 1px solid #e2e8f0; border-radius: 12px; padding: 16px; margin: 16px 0;">
             <p style="color: #1e293b; margin: 0; font-size: 15px; font-weight: 600;">{$when}</p>
             {$locationHtml}
         </div>
         <div style="text-align: center; margin-top: 24px;">
-            <a href="{$eventUrl}" style="display: inline-block; background: linear-gradient(135deg, #6366f1, #8b5cf6); color: white; text-decoration: none; padding: 14px 32px; border-radius: 10px; font-weight: 600;">View Event</a>
+            <a href="{$eventUrl}" style="display: inline-block; background: linear-gradient(135deg, #6366f1, #8b5cf6); color: white; text-decoration: none; padding: 14px 32px; border-radius: 10px; font-weight: 600;">{$viewEventLabel}</a>
         </div>
     </div>
 </div>
