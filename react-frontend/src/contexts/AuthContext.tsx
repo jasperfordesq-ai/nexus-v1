@@ -384,8 +384,8 @@ export function AuthProvider({ children }: AuthProviderProps) {
       tokenManager.setRefreshToken(data.refresh_token);
     }
     // Store trusted device token so future logins skip 2FA on this device
-    if ((data as Record<string, unknown>).trusted_device_token) {
-      tokenManager.setTrustedDeviceToken((data as Record<string, unknown>).trusted_device_token as string);
+    if (data.trusted_device_token) {
+      tokenManager.setTrustedDeviceToken(data.trusted_device_token);
     }
     // Only set tenant ID from user data if no tenant was pre-selected at login
     // This allows super admins to access any tenant they selected

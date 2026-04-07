@@ -115,6 +115,7 @@ export interface LoginSuccessResponse {
   token_type: 'Bearer';
   is_mobile?: boolean;
   token: string;  // Legacy alias for access_token
+  trusted_device_token?: string;
   config?: {
     modules?: Record<string, boolean>;
   };
